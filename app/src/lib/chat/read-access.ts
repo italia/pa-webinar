@@ -58,6 +58,7 @@ export async function authorizeChatRead(
       id: true,
       status: true,
       eventType: true,
+      accessMode: true,
       moderatorToken: true,
       joinPasswordHash: true,
     },

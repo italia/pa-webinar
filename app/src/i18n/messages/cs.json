@@ -733,7 +733,7 @@
       "updateEvent": "Aktualizovat událost",
       "step1": {
         "heading": "Základní informace",
-        "intro": "Název, popis, obrázek a termín události.",
+        "intro": "Název, popis a obrázek akce.",
         "coverImage": "Titulní obrázek",
         "coverImageHelp": "Zobrazuje se na veřejném webu a v e-mailech registrovaným.",
         "scheduleHeading": "Kalendář",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategorie (štítky)",
         "waitingRoomAudio": "Zvuk čekárny (volitelné)",
         "waitingRoomAudioHelp": "Přehráno před zahájením videohovoru.",
-        "parseTitleKickerLabel": "Název s nadtitulkem (oddělovač |)",
-        "parseTitleKickerHelp": "Pokud je zapnuto, název jako 'KONFERENCE | Digitální inovace' zobrazí KONFERENCE jako nadtitulek.",
         "maxParticipantsHelp": "Odhad očekávaného počtu lidí: slouží k dimenzování videoserveru a neomezuje registrace.",
         "validation": {
           "startsAt": "Neplatné datum začátku.",
@@ -773,7 +771,11 @@
           "HIGH": "Vysoká (720p, doporučeno)",
           "BALANCED": "Vyvážená (540p)",
           "SAVE_DATA": "Úspora dat (360p)"
-        }
+        },
+        "requiredLegend": "Pole označená * jsou potřeba k uložení akce: dokud jsou prázdná, je to u každého uvedeno.",
+        "kickerHint": "Nadtitulek napište před název a oddělte je znakem |, například „Cyklus setkání | První setkání“.",
+        "kickerUse": "Zobrazit „{kicker}“ jako nadtitulek",
+        "kickerPreview": "Takto vypadá na stránce akce"
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -832,7 +834,8 @@
             "name": "Účastník",
             "desc": "Sleduje akci a zapojuje se tak, jak určíte v tabulce níže."
           }
-        }
+        },
+        "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -864,7 +867,7 @@
         "personName": "Jméno",
         "personEmail": "E-mail",
         "peopleHeading": "Osoby akce",
-        "peopleHelp": "Pořadatelé, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup se svou rolí; co která role může, ukazuje krok „Oprávnění“.",
+        "peopleHelp": "Pořadatelé, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup se svou rolí; co která role může, ukazuje část „Pokročilá nastavení“.",
         "personRole": "Role",
         "roleOrganizer": "Pořadatel",
         "roleModerator": "Moderátor",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Volitelné: seznam lidí, které zvete. Registrace je otevřená, takže po zveřejnění se může registrovat kdokoli, pozvaný i nepozvaný. Platforma pozvánky neposílá: odkaz na akci sdílejte sami.",
         "invitationsHelpRestricted": "Registrace je omezená: registrovat se mohou jen adresy z tohoto seznamu. Platforma pozvánky neposílá: odkaz na akci sdílejte sami; odkaz pro vstup přijde e-mailem po registraci.",
         "logoExternal": "Veřejná stránka zobrazuje jen loga nahraná na tuto platformu: logo z jiného webu se nezobrazí.",
-        "primaryProfileInvalid": "Zkontrolujte organizaci a adresu loga."
+        "primaryProfileInvalid": "Zkontrolujte organizaci a adresu loga.",
+        "primaryMore": "Instituce, logo a veřejná stránka",
+        "accessHeading": "Kdo se přihlašuje",
+        "accessSiteDefault": "Řídí se nastavením webu: pokud ho správa změní, platí to i pro tuto akci.",
+        "accessNoInvitees": "Zatím žádní pozvaní: dokud je seznam níže prázdný, nikdo se nemůže přihlásit.",
+        "askHeading": "Na co se ptáme při přihlášce",
+        "askAlways": "Jméno a e-mail vždy. Navíc, pokud potřebujete:",
+        "askOrganization": "Organizace (povinná pro přihlášku)",
+        "askRole": "Funkce (nepovinné)",
+        "askType": "Typ organizace (nepovinné)",
+        "accessStaffOnly": "Kdo se může přihlásit, rozhoduje tým akce."
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Souhrn a publikování",
-        "intro": "Zkontrolujte informace a publikujte událost (nebo uložte jako koncept).",
+        "intro": "Akce tak, jak ji uvidí ostatní: zkontrolujte ji a pak zveřejněte nebo uložte jako koncept.",
         "summary": {
           "title": "Název",
           "schedule": "Kalendář",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Server odpověděl: {reason}. Zveřejněte ji ze stránky události.",
       "toFix": "K opravě:",
       "toFixField": "Pole {n}",
-      "stepsAriaLabel": "Kroky formuláře události"
+      "stepsAriaLabel": "Kroky formuláře události",
+      "flow": {
+        "steps": {
+          "base": "Akce",
+          "schedule": "Kdy",
+          "invites": "Osoby",
+          "review": "Shrnutí",
+          "advanced": "Pokročilá nastavení"
+        },
+        "templateInUse": "Šablona: <b>{name}</b>",
+        "noTemplate": "Akce bez šablony",
+        "changeTemplate": "Změnit šablonu",
+        "chooseTemplate": "Vybrat šablonu",
+        "backToReview": "Zpět na shrnutí",
+        "participantsCan": "Účastníci: {list}",
+        "none": "žádné",
+        "recordingManual": "K dispozici: začne až po stisknutí REC moderátorem.",
+        "aiAfter": "Po záznamu: {list}.",
+        "scheduleHeading": "Kdy se koná",
+        "scheduleIntro": "Datum, čas a kolik lidí čekáte: podle nich se připraví sál.",
+        "advancedIntro": "Hodnoty, které už zvolila šablona: změňte jen to, co je potřeba.",
+        "advancedIntroTemplate": "Hodnoty, které už zvolila šablona „{name}“: změňte jen to, co je potřeba.",
+        "requiredToSave": "Potřeba k uložení akce.",
+        "requiredToPublish": "Potřeba ke zveřejnění akce.",
+        "toComplete": "K doplnění",
+        "missingHeading": "Ke zveřejnění ještě chybí:",
+        "fieldOrganizerName": "Jméno hlavního organizátora",
+        "fieldOrganizerEmail": "E-mail hlavního organizátora",
+        "capacityWarning": "Kapacitu ověřte v technických údajích.",
+        "sections": {
+          "participation": "Účast a funkce sálu",
+          "recording": "Záznam a AI",
+          "content": "Obsah: materiály a dotazníky",
+          "room": "Čekárna a video",
+          "data": "Soukromí, data a stránka po akci",
+          "technical": "Technické údaje: kapacita a prostředky"
+        },
+        "formatInUse": "Formát: <b>{name}</b>",
+        "changeFormat": "Změnit formát",
+        "voiceAll": "Všichni mluví a ukazují se na videu",
+        "voiceSpeakers": "Mluví a ukazují se na videu řečníci a moderátoři; publikum píše do chatu",
+        "features": "Funkce: {list}",
+        "liveToggleNote": "Každou funkci lze zapnout a vypnout i během akce.",
+        "customize": "Přizpůsobit nastavení",
+        "changeLanguages": "Změnit jazyky",
+        "translationLine": "Překlad do: {list}",
+        "privacyTemplate": "Informace o ochraně soukromí: {name}",
+        "privacyCustom": "Informace o ochraně soukromí: text napsaný pro akci",
+        "privacyDocument": "Informace o ochraně soukromí: dokument akce",
+        "privacySite": "Informace o ochraně soukromí: ta z webu",
+        "untitled": "Akce bez názvu",
+        "carriedOver": "Ponechali jsme, co jste o akci napsali.",
+        "startOver": "Začít znovu",
+        "accessOpen": "Přihlásit se může kdokoli na stránce akce.",
+        "accessInvitation": "Jen pro pozvané. Pozvaných: {count}.",
+        "addInvitees": "Přidat pozvané",
+        "change": "Změnit",
+        "askLine": "Při přihlášce se ptáme na: {list}.",
+        "askName": "jméno",
+        "askEmail": "e-mail",
+        "askOrganization": "organizace",
+        "askRole": "funkce",
+        "askType": "typ organizace"
+      }
     },
     "nav": {
       "events": "Události",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Stavová stránka aktivní",
         "statusPageEnabledHelp": "Zveřejňuje stavovou stránku služby. Pokud je vypnuto, stránka neexistuje a její údaje vidí pouze administrátoři.",
         "guestAccessEnabled": "Přístup hostů aktivní",
-        "guestAccessEnabledHelp": "Neregistrovaní se mohou k probíhajícím událostem připojit jen se svým jménem. Pokud je vypnuto, k plánovaným událostem se lze připojit pouze po registraci nebo odkazem pro moderátora či řečníka; okamžité videohovory zůstávají otevřené každému, kdo má odkaz.",
+        "guestAccessEnabledHelp": "Neregistrovaní se mohou k probíhajícím událostem připojit jen se svým jménem. Pokud je vypnuto, k plánovaným událostem se lze připojit pouze po registraci nebo odkazem pro moderátora či řečníka; okamžité videohovory zůstávají otevřené každému, kdo má odkaz. Akce jen pro pozvané hosty nikdy nepouští.",
         "publicRegistrationEnabled": "Veřejná registrace aktivní",
-        "publicRegistrationEnabledHelp": "Na události se může registrovat kdokoli. Pokud je vypnuto, mohou se registrovat pouze osoby ze seznamu pozvaných na událost a osobní odkaz pro vstup se posílá pouze e-mailem; již registrovaní a odkazy pro moderátory a řečníky fungují dál.",
+        "publicRegistrationEnabledHelp": "Na události se může registrovat kdokoli. Pokud je vypnuto, mohou se registrovat pouze osoby ze seznamu pozvaných na událost a osobní odkaz pro vstup se posílá pouze e-mailem; již registrovaní a odkazy pro moderátory a řečníky fungují dál. Je to volba nabízená novým akcím: každá akce může v kroku „Osoby“ rozhodnout jinak.",
         "calendarPublic": "Veřejný kalendář",
         "calendarPublicHelp": "Zveřejnit kalendář událostí. Návštěvníci mohou vidět naplánované události.",
         "parseTitleKicker": "Názvy s redakčním kickerem",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Účastníci mohou mluvit",
         "video": "Účastníci mohou zapnout video",
-        "screenShare": "Účastníci mohou sdílet obrazovku"
+        "screenShare": "Účastníci mohou sdílet obrazovku",
+        "openRegistration": "Přihlášky otevřené všem"
       },
       "fields": {
         "dataRetention": "Uchování dat",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Video není k dispozici",
       "openInNewTab": "Otevřít na nové kartě"
+    },
+    "guided": {
+      "title": "Jaká je vaše akce?",
+      "intro": "Čtyři otázky pro začátek se správným nastavením. Každou funkci lze zapnout nebo vypnout i během akce.",
+      "peopleQ": "Kolik lidí čekáte?",
+      "people": {
+        "piccolo": "Do 20",
+        "medio": "Do 100",
+        "grande": "Přes 100"
+      },
+      "peopleHint": "Je to odhad pro přípravu sálu, ne limit registrací.",
+      "voiceQ": "Kdo může mluvit a ukázat se na videu?",
+      "voice": {
+        "all": "Všichni",
+        "allDesc": "Chat, mikrofon, video a obrazovka pro všechny",
+        "speakers": "Řečníci a moderátoři",
+        "speakersDesc": "Publikum píše do chatu a klade otázky"
+      },
+      "recQ": "Chcete mít možnost nahrávat?",
+      "rec": {
+        "yes": "Ano, když stisknete REC",
+        "yesDesc": "Po akci: přepis, shrnutí a překlad",
+        "no": "Ne",
+        "noDesc": "Žádný záznam, žádný souhlas k vyžádání"
+      },
+      "preview": "Vaše akce",
+      "previewPeople": "Očekávaní účastníci: asi {count}",
+      "continue": "Pokračovat",
+      "useTemplate": "Nebo použijte šablonu",
+      "summary": {
+        "piccolo": "Do 20 osob",
+        "medio": "Do 100 osob",
+        "grande": "Přes 100 osob",
+        "tutti": "všichni na videu",
+        "relatori": "mluví řečníci",
+        "si": "se záznamem",
+        "no": "bez záznamu",
+        "openAccess": "otevřené všem",
+        "inviteOnly": "jen pro pozvané"
+      },
+      "accessQ": "Kdo se může zúčastnit?",
+      "access": {
+        "open": "Každý, kdo se přihlásí",
+        "openDesc": "Kdo chce, přihlásí se na stránce akce",
+        "invitation": "Jen vámi pozvaní",
+        "invitationDesc": "Stránka zůstává viditelná, ale přihlásit se mohou jen pozvaní; bez přihlášky se dovnitř nedostanete"
+      },
+      "previewInvitation": "Přihlásit se mohou jen vámi pozvaní; bez přihlášky se nikdo nedostane dovnitř."
     }
   },
   "email": {

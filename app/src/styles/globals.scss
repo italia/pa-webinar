@@ -9725,6 +9725,559 @@ html.live-resizing .live-sidebar-resizer::after {
   }
 }
 
+// ── Le tre domande di un evento nuovo (formato) e l'anteprima accanto
+.formato {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 992px) {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.formato__domanda {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border: 0;
+
+  legend {
+    float: none;
+    width: auto;
+    margin-bottom: 0.6rem;
+    padding: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+}
+
+.formato__scelte {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.formato__scelte--tre {
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.formato__nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+.formato-scelta {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d6dee6;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover { border-color: #9fc3e8; }
+
+  &:focus-within {
+    outline: 2px solid #ffb400;
+    outline-offset: 2px;
+  }
+}
+
+.formato-scelta--attiva {
+  border-color: #0066cc;
+  background: #eef4fb;
+  box-shadow: inset 0 0 0 1px #0066cc;
+}
+
+.formato-scelta__icona {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e6eff8;
+  color: #0066cc;
+
+  .icon { fill: #0066cc; }
+}
+
+.formato-scelta--attiva .formato-scelta__icona {
+  background: #0066cc;
+  color: #fff;
+
+  .icon { fill: #fff; }
+}
+
+.formato-scelta__testo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-right: 1.25rem;
+}
+
+.formato-scelta__titolo {
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.formato-scelta__desc {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #455b71;
+}
+
+.formato-scelta__segno {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+
+  .icon { fill: #0066cc; }
+}
+
+.formato__anteprima {
+  padding: 1.25rem;
+  border: 1px solid #cfe0f2;
+  border-radius: 14px;
+  background: #f7fafd;
+
+  @media (min-width: 992px) {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.formato__anteprima-titolo {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.formato-modelli {
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+
+  > summary {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: var(--app-primary);
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  > div {
+    padding: 0 1rem 1rem;
+  }
+}
+
+// ── L'evento in righe con un'icona ciascuna: l'anteprima del formato e quella
+// del riepilogo.
+.anteprima-righe {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #e6edf4;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--app-text);
+
+    &:last-child { border-bottom: 0; }
+  }
+}
+
+.anteprima-righe__icona {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e6eff8;
+  color: #0066cc;
+
+  svg { width: 18px; height: 18px; }
+  .icon { fill: #0066cc; }
+}
+
+.anteprima-evento {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #d9dadb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.06);
+}
+
+.anteprima-evento__titolo {
+  margin: 0 0 0.75rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--app-text);
+}
+
+.anteprima-link {
+  font-size: inherit;
+  font-weight: 600;
+  vertical-align: baseline;
+}
+
+.anteprima-evento__avviso {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.25rem 0 0;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #8a5300;
+
+  .icon { fill: #8a5300; }
+}
+
+.anteprima-chip-elenco {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.anteprima-chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: #eef4fb;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #004d99;
+}
+
+.wizard-mancanti__titolo .icon { fill: #8a5300; }
+
+// ── Il modello in uso, sopra i passi del wizard
+.wizard-modello {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  background: #eef4fb;
+  color: var(--app-text);
+  font-size: 0.9rem;
+}
+
+// Il ritorno al riepilogo da un dettaglio (Persone, Permessi, Contenuti).
+.wizard-torna {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+// ── Le schede del riepilogo: una scelta del modello ciascuna, con «Modifica»
+.wizard-schede {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0 1rem;
+}
+
+.wizard-scheda {
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9rem;
+  color: var(--app-text);
+}
+
+.wizard-scheda__testa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.wizard-scheda__titolo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--app-text);
+}
+
+.wizard-scheda__corpo {
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+
+  // Bootstrap Italia ingrandisce i paragrafi del testo corrente: nelle schede
+  // restano alla misura del riepilogo.
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+// Le lingue di traduzione nella scheda: alla misura del suo testo.
+.wizard-scheda .lang-checklist .form-check [type='checkbox'] + label {
+  font-size: 0.9rem;
+}
+
+// ── I campi obbligatori del wizard: come il nome nella sala d'attesa,
+// lampeggiano di blu finche' sono vuoti (con la riga che dice a che cosa
+// servono) e, dopo un tentativo, insistono in ambra. Il rosso resta agli
+// errori veri.
+.wizard-campo--vuoto {
+  .form-control,
+  textarea {
+    animation: wizard-campo-anello 1.8s ease-in-out infinite;
+  }
+
+  label,
+  .form-label {
+    animation: wr-name-label 1.8s ease-in-out infinite;
+  }
+}
+
+.wizard-campo--insisti {
+  animation: wr-name-nudge 0.4s ease-in-out;
+
+  .form-control,
+  textarea {
+    border-color: #c27700 !important;
+    animation: wizard-campo-anello-ambra 1.2s ease-in-out infinite;
+  }
+
+  .invalid-feedback,
+  .text-danger {
+    color: #6b4400 !important;
+    font-weight: 600;
+  }
+}
+
+@keyframes wizard-campo-anello {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
+  50% { box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.35); }
+}
+
+@keyframes wizard-campo-anello-ambra {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 119, 0, 0.2); }
+  50% { box-shadow: 0 0 0 3px rgba(194, 119, 0, 0.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-campo--vuoto .form-control,
+  .wizard-campo--vuoto textarea {
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.35);
+  }
+
+  .wizard-campo--vuoto label,
+  .wizard-campo--vuoto .form-label,
+  .wizard-campo--insisti,
+  .wizard-campo--insisti .form-control,
+  .wizard-campo--insisti textarea {
+    animation: none;
+  }
+}
+
+// Una scelta che si vede ma non si cambia (la decide lo staff dell'evento).
+.formato-scelta--bloccata {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+// Chi si iscrive e cosa gli si chiede (passo «Persone»): una scelta da fare
+// prima di pubblicare, in vista e non ripiegata.
+.wizard-iscrizione {
+  border: 1px solid #D9E2EA;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background: #FFFFFF;
+}
+
+.wizard-iscrizione__titolo {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.wizard-iscrizione__domanda {
+  float: none;
+  padding: 0;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.wizard-iscrizione__avviso {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #FFF6E5;
+  color: #7A4D00;
+  font-size: 0.9rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: currentColor;
+  }
+}
+
+// Il sopratitolo accanto al titolo: come apparira' sulla pagina dell'evento.
+.wizard-sopratitolo {
+  border-left: 3px solid var(--app-primary);
+  border-radius: 0 6px 6px 0;
+  background: #F2F7FC;
+  padding: 0.75rem 1rem;
+}
+
+.wizard-sopratitolo__etichetta {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5A768A;
+}
+
+.wizard-sopratitolo__titolo {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--app-text);
+}
+
+.wizard-campo__hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #004d99;
+
+  svg { flex-shrink: 0; }
+}
+
+// Che cosa manca per pubblicare, in cima al riepilogo.
+.wizard-mancanti {
+  padding: 0.75rem 1rem;
+  border: 1px solid #f0c88a;
+  border-left: 4px solid #c27700;
+  border-radius: 8px;
+  background: #fff8ec;
+  font-size: 0.9rem;
+}
+
+.wizard-mancanti__titolo {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #6b4400;
+}
+
+.wizard-mancanti__elenco {
+  margin: 0;
+  padding-left: 1.1rem;
+
+  li { margin-bottom: 0.15rem; font-size: 0.9rem; }
+  .btn-link { font-weight: 600; font-size: 0.9rem; }
+}
+
+// Il titolo del gruppo di schede con le scelte del modello.
+.wizard-schede__gruppo {
+  margin: 0.5rem 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+// La barra dei passi: «Da completare» sotto il nome, e le impostazioni
+// avanzate a parte.
+.wizard-passi__da-fare {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8a5300;
+}
+
+.wizard-passi__avanzate {
+  display: flex;
+  align-items: center;
+  align-self: center;
+}
+
+// La regione del passo riceve il fuoco a ogni cambio di passo, perche' chi
+// usa un lettore di schermo sappia dov'e': non si raggiunge con Tab, e
+// l'anello di Bootstrap Italia attorno a tutto il passo sembrava un errore.
+// Bootstrap Italia la disegna con `!important` su `:focus:not(...)`.
+.wizard-contenuto:focus {
+  box-shadow: none !important;
+}
+
+// Le sezioni delle impostazioni avanzate.
+.wizard-avanzate {
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+
+  > summary {
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    list-style-position: inside;
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid #e8e8e8;
+  }
+}
+
+.wizard-avanzate__titolo {
+  display: inline;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.wizard-avanzate__corpo {
+  padding: 1rem;
+}
+
+// Un dato obbligatorio che manca: si vede prima di premere «Pubblica».
+.wizard-scheda__mancante {
+  color: #a1253b;
+}
+
+// Ente, logo e pagina pubblica dell'organizzatore principale, ripiegati.
+.wizard-primary__more > summary {
+  cursor: pointer;
+  color: var(--app-primary);
+  font-weight: 600;
+}
+
 // ── Sezioni richiudibili del passo «Persone» del wizard
 .wizard-group {
   border: 1px solid #d9dadb;

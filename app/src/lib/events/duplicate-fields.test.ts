@@ -116,6 +116,13 @@ describe('duplicatedConfig', () => {
     expect(out).not.toHaveProperty('peakParticipants');
   });
 
+  it('la copia non eredita l avvio automatico della registrazione', () => {
+    expect(duplicatedConfig({ recordingEnabled: true, autoStartRecording: true })).toMatchObject({
+      recordingEnabled: true,
+      autoStartRecording: false,
+    });
+  });
+
   it('preserves null (an explicit "no value") but skips undefined', () => {
     const out = duplicatedConfig({ gracePeriodMinutes: null, videoQuality: undefined });
     expect(out).toHaveProperty('gracePeriodMinutes', null);

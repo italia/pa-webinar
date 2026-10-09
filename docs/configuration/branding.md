@@ -233,7 +233,10 @@ language list, the default language and the catalog mechanics.
 convention. When it is on, an event title that contains `|` shows the part before the pipe as a small
 label above the main title, in listings, on the event page, in the waiting room and in the live room.
 It is off by default, so existing titles never change appearance. An event can override the site
-default in either direction (`Event.parseTitleKicker`; empty inherits the site setting).
+default in either direction (`Event.parseTitleKicker`; empty inherits the site setting). In the event
+wizard, under the title, a help line explains the convention; as soon as the title contains `|` with
+text on both sides, a box offers **Show “…” as a kicker above the title**, checked as the site setting
+says, with a preview of how the title will look.
 
 ## Header, footer and legal pages
 

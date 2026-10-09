@@ -733,7 +733,7 @@
       "updateEvent": "Uuenda sündmust",
       "step1": {
         "heading": "Põhiteave",
-        "intro": "Sündmuse pealkiri, kirjeldus, pilt ja kalender.",
+        "intro": "Ürituse pealkiri, kirjeldus ja pilt.",
         "coverImage": "Kaanepilt",
         "coverImageHelp": "Kuvatakse avalikul veebisaidil ja registreerunutele saadetavates e-kirjades.",
         "scheduleHeading": "Ajakava",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategooriad (sildid)",
         "waitingRoomAudio": "Ooteruumi heli (valikuline)",
         "waitingRoomAudioHelp": "Esitatakse enne videokõne algust.",
-        "parseTitleKickerLabel": "Pealkiri ülapealkirjaga (eraldaja |)",
-        "parseTitleKickerHelp": "Aktiveerituna kuvatakse pealkiri nagu 'KONVERENTS | Digitaalne innovatsioon' nii, et KONVERENTS näidatakse ülapealkirjana.",
         "maxParticipantsHelp": "Hinnanguline oodatavate inimeste arv: see on videoserveri mõõtmiseks ega piira registreerumisi.",
         "validation": {
           "startsAt": "Algusaeg pole kehtiv.",
@@ -773,7 +771,11 @@
           "HIGH": "Kõrge (720p, soovituslik)",
           "BALANCED": "Tasakaalustatud (540p)",
           "SAVE_DATA": "Andmesääst (360p)"
-        }
+        },
+        "requiredLegend": "Tärniga * väljad on vajalikud ürituse salvestamiseks: kuni need on tühjad, on see iga välja juures kirjas.",
+        "kickerHint": "Pealkirja kohal oleva rea jaoks kirjuta see enne pealkirja ja eralda märgiga |, näiteks „Kohtumiste sari | Esimene kohtumine“.",
+        "kickerUse": "Näita „{kicker}“ pealkirja kohal",
+        "kickerPreview": "Nii näeb see välja ürituse lehel"
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -832,7 +834,8 @@
             "name": "Osaleja",
             "desc": "Jälgib üritust ja osaleb nii, nagu allolevas tabelis otsustate."
           }
-        }
+        },
+        "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -864,7 +867,7 @@
         "personName": "Nimi",
         "personEmail": "E-post",
         "peopleHeading": "Ürituse inimesed",
-        "peopleHelp": "Korraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rollis; mida iga roll teha saab, näitab samm „Õigused“.",
+        "peopleHelp": "Korraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rollis; mida iga roll teha saab, näitab jaotis „Täpsemad seaded“.",
         "personRole": "Roll",
         "roleOrganizer": "Korraldaja",
         "roleModerator": "Moderaator",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Valikuline: nende inimeste loend, keda kutsute. Registreerimine on avatud, nii et pärast avaldamist võib registreeruda igaüks, kutsutud või mitte. Platvorm kutseid ei saada: jagage ürituse linki ise.",
         "invitationsHelpRestricted": "Registreerimine on piiratud: registreeruda saavad ainult selle loendi aadressid. Platvorm kutseid ei saada: jagage ürituse linki ise; sisenemislink saabub e-postiga pärast registreerimist.",
         "logoExternal": "Avalikul lehel kuvatakse ainult sellele platvormile üles laaditud logosid: teiselt saidilt pärit logo ei kuvata.",
-        "primaryProfileInvalid": "Kontrollige organisatsiooni ja logo aadressi."
+        "primaryProfileInvalid": "Kontrollige organisatsiooni ja logo aadressi.",
+        "primaryMore": "Asutus, logo ja avalik leht",
+        "accessHeading": "Kes registreeruvad",
+        "accessSiteDefault": "Järgib saidi seadet: kui haldus seda muudab, kehtib see ka sellele üritusele.",
+        "accessNoInvitees": "Kutsutuid veel pole: kuni allolev nimekiri on tühi, ei saa keegi registreeruda.",
+        "askHeading": "Mida registreerujatelt küsime",
+        "askAlways": "Nimi ja e-post alati. Lisaks, kui vaja:",
+        "askOrganization": "Organisatsioon (registreerumiseks kohustuslik)",
+        "askRole": "Roll (valikuline)",
+        "askType": "Organisatsiooni liik (valikuline)",
+        "accessStaffOnly": "Kes registreeruda saavad, otsustab ürituse meeskond."
       },
       "step4": {
         "heading": "Sisu ja materjalid",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Ülevaade ja avaldamine",
-        "intro": "Kontrollige andmeid ja avaldage sündmus (või salvestage mustandina).",
+        "intro": "Üritus nii, nagu teised seda näevad: kontrolli ja seejärel avalda või salvesta mustandina.",
         "summary": {
           "title": "Pealkiri",
           "schedule": "Ajakava",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Server vastas: {reason}. Avalda see sündmuse lehelt.",
       "toFix": "Parandada:",
       "toFixField": "Väli {n}",
-      "stepsAriaLabel": "Ürituse vormi sammud"
+      "stepsAriaLabel": "Ürituse vormi sammud",
+      "flow": {
+        "steps": {
+          "base": "Üritus",
+          "schedule": "Millal",
+          "invites": "Inimesed",
+          "review": "Kokkuvõte",
+          "advanced": "Täpsemad seaded"
+        },
+        "templateInUse": "Mall: <b>{name}</b>",
+        "noTemplate": "Üritus ilma mallita",
+        "changeTemplate": "Vaheta malli",
+        "chooseTemplate": "Vali mall",
+        "backToReview": "Tagasi kokkuvõttesse",
+        "participantsCan": "Osalejad: {list}",
+        "none": "puuduvad",
+        "recordingManual": "Saadaval: algab alles siis, kui juht vajutab REC.",
+        "aiAfter": "Pärast salvestust: {list}.",
+        "scheduleHeading": "Millal see toimub",
+        "scheduleIntro": "Kuupäev, kellaaeg ja oodatav osalejate arv: nendega valmistatakse ruum ette.",
+        "advancedIntro": "Malli juba valitud väärtused: muuda ainult vajalikku.",
+        "advancedIntroTemplate": "Malli „{name}” juba valitud väärtused: muuda ainult vajalikku.",
+        "requiredToSave": "Vajalik ürituse salvestamiseks.",
+        "requiredToPublish": "Vajalik ürituse avaldamiseks.",
+        "toComplete": "Täitmata",
+        "missingHeading": "Avaldamiseks on veel puudu:",
+        "fieldOrganizerName": "Peakorraldaja nimi",
+        "fieldOrganizerEmail": "Peakorraldaja e-post",
+        "capacityWarning": "Mahutavus tuleb kontrollida tehnilistes üksikasjades.",
+        "sections": {
+          "participation": "Osalemine ja ruumi funktsioonid",
+          "recording": "Salvestus ja tehisintellekt",
+          "content": "Sisu: materjalid ja küsimustikud",
+          "room": "Ooteruum ja video",
+          "data": "Privaatsus, andmed ja leht pärast üritust",
+          "technical": "Tehnilised üksikasjad: mahutavus ja ressursid"
+        },
+        "formatInUse": "Vorm: <b>{name}</b>",
+        "changeFormat": "Muuda vormi",
+        "voiceAll": "Kõik räägivad ja on videos näha",
+        "voiceSpeakers": "Esinejad ja juhid räägivad ja on videos näha; publik kirjutab vestlusesse",
+        "features": "Funktsioonid: {list}",
+        "liveToggleNote": "Iga funktsiooni saab sisse ja välja lülitada ka ürituse ajal.",
+        "customize": "Kohanda seadeid",
+        "changeLanguages": "Muuda keeli",
+        "translationLine": "Tõlge keeltesse: {list}",
+        "privacyTemplate": "Privaatsusteave: {name}",
+        "privacyCustom": "Privaatsusteave: ürituse jaoks kirjutatud tekst",
+        "privacyDocument": "Privaatsusteave: ürituse dokument",
+        "privacySite": "Privaatsusteave: saidi oma",
+        "untitled": "Pealkirjata üritus",
+        "carriedOver": "Võtsime üle selle, mida olid ürituse kohta kirjutanud.",
+        "startOver": "Alusta otsast",
+        "accessOpen": "Kõik saavad registreeruda ürituse lehel.",
+        "accessInvitation": "Ainult kutsega. Kutsutuid: {count}.",
+        "addInvitees": "Lisa kutsutud",
+        "change": "Muuda",
+        "askLine": "Registreerimisel küsime: {list}.",
+        "askName": "nimi",
+        "askEmail": "e-post",
+        "askOrganization": "organisatsioon",
+        "askRole": "roll",
+        "askType": "organisatsiooni liik"
+      }
     },
     "nav": {
       "events": "Üritused",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Olekuleht lubatud",
         "statusPageEnabledHelp": "Avaldab teenuse olekulehe. Kui see on välja lülitatud, lehte ei ole ja selle andmeid näevad ainult administraatorid.",
         "guestAccessEnabled": "Külaliste ligipääs lubatud",
-        "guestAccessEnabledHelp": "Registreerimata inimesed saavad toimuvatele üritustele siseneda ainult oma nimega. Kui see on välja lülitatud, saab kavandatud üritustele siseneda ainult registreerudes või moderaatori või esineja lingiga; kiired videokõned jäävad avatuks kõigile, kellel on link.",
+        "guestAccessEnabledHelp": "Registreerimata inimesed saavad toimuvatele üritustele siseneda ainult oma nimega. Kui see on välja lülitatud, saab kavandatud üritustele siseneda ainult registreerudes või moderaatori või esineja lingiga; kiired videokõned jäävad avatuks kõigile, kellel on link. Ainult kutsega üritusele külalisi kunagi ei lubata.",
         "publicRegistrationEnabled": "Avalik registreerumine lubatud",
-        "publicRegistrationEnabledHelp": "Üritustele saab registreeruda igaüks. Kui see on välja lülitatud, saavad registreeruda ainult ürituse kutsutute nimekirjas olevad isikud ja isiklik sisenemislink saadetakse ainult e-postiga; juba registreerunud ning moderaatorite ja esinejate lingid toimivad edasi.",
+        "publicRegistrationEnabledHelp": "Üritustele saab registreeruda igaüks. Kui see on välja lülitatud, saavad registreeruda ainult ürituse kutsutute nimekirjas olevad isikud ja isiklik sisenemislink saadetakse ainult e-postiga; juba registreerunud ning moderaatorite ja esinejate lingid toimivad edasi. See on uutele üritustele pakutav valik: iga üritus võib sammus „Inimesed“ teisiti otsustada.",
         "calendarPublic": "Avalik kalender",
         "calendarPublicHelp": "Avalda ürituste kalender. Külastajad saavad näha planeeritud üritusi.",
         "parseTitleKicker": "Toimetuslike ülapealkirjadega pealkirjad",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Osalejad saavad rääkida",
         "video": "Osalejad saavad video aktiveerida",
-        "screenShare": "Osalejad saavad ekraani jagada"
+        "screenShare": "Osalejad saavad ekraani jagada",
+        "openRegistration": "Registreerumine kõigile avatud"
       },
       "fields": {
         "dataRetention": "Andmete säilitamine",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Video pole saadaval",
       "openInNewTab": "Ava uuel vahelehel"
+    },
+    "guided": {
+      "title": "Milline on sinu üritus?",
+      "intro": "Neli küsimust, et alustada õigete seadetega. Iga funktsiooni saab ka ürituse ajal sisse või välja lülitada.",
+      "peopleQ": "Kui palju inimesi ootad?",
+      "people": {
+        "piccolo": "Kuni 20",
+        "medio": "Kuni 100",
+        "grande": "Üle 100"
+      },
+      "peopleHint": "See on hinnang ruumi ettevalmistamiseks, mitte registreerimiste piir.",
+      "voiceQ": "Kes võib rääkida ja videos näha olla?",
+      "voice": {
+        "all": "Kõik",
+        "allDesc": "Vestlus, mikrofon, video ja ekraan kõigile",
+        "speakers": "Esinejad ja juhid",
+        "speakersDesc": "Publik kirjutab vestlusesse ja esitab küsimusi"
+      },
+      "recQ": "Kas soovid salvestada?",
+      "rec": {
+        "yes": "Jah, kui vajutad REC",
+        "yesDesc": "Pärast üritust: transkriptsioon, kokkuvõte ja tõlge",
+        "no": "Ei",
+        "noDesc": "Salvestust pole, nõusolekut pole vaja küsida"
+      },
+      "preview": "Sinu üritus",
+      "previewPeople": "Oodatud osalejad: umbes {count}",
+      "continue": "Jätka",
+      "useTemplate": "Või kasuta malli",
+      "summary": {
+        "piccolo": "Kuni 20 inimest",
+        "medio": "Kuni 100 inimest",
+        "grande": "Üle 100 inimese",
+        "tutti": "kõik videos",
+        "relatori": "räägivad esinejad",
+        "si": "salvestusega",
+        "no": "salvestuseta",
+        "openAccess": "avatud kõigile",
+        "inviteOnly": "ainult kutsega"
+      },
+      "accessQ": "Kes saavad osaleda?",
+      "access": {
+        "open": "Kõik, kes registreeruvad",
+        "openDesc": "Soovijad registreeruvad ürituse lehel",
+        "invitation": "Ainult sinu kutsutud",
+        "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult kutsutud; registreerimata sisse ei pääse"
+      },
+      "previewInvitation": "Registreeruda saavad ainult sinu kutsutud; registreerimata ei pääse keegi sisse."
     }
   },
   "email": {

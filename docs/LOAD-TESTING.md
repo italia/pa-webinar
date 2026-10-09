@@ -375,11 +375,12 @@ event are:
 The values of the other limits are in [Reference limits](architecture/security.md#reference-limits).
 
 A registration test sends a JSON body with `displayName`, `email` and `consentGiven: true`. Add
-`consentRecording: true` when the event records and `consentMultitrack: true` when it has per-participant
-recording; without them the call answers `422`. The event must be open for registration. With public
-registration on (`publicRegistrationEnabled` in site settings), an accepted call answers `201` with
-`accessToken` and `joinUrl` and sets the `event_access_<eventId>` cookie. With it off, every valid call
-answers `202` with no token and no cookie, because the personal link travels only by email.
+`consentRecording: true` when the event records and `consentMultitrack: true` when it has
+per-participant recording; without them the call answers `422`. The event must be open for registration.
+With registration open to anyone (the event's `accessMode` `OPEN`, or `publicRegistrationEnabled` in
+site settings for an event without a choice), an accepted call answers `201` with `accessToken` and
+`joinUrl` and sets the `event_access_<eventId>` cookie. With invitation-only registration, every valid
+call answers `202` with no token and no cookie, because the personal link travels only by email.
 
 Registrations are real personal data. Run portal tests against a dedicated test event on a test
 installation, use addresses you control, point the installation's SMTP at a mail catcher so the email

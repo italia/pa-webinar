@@ -20,3 +20,14 @@ export function parseLocaleList(value: string | null | undefined): string[] {
   }
   return out;
 }
+
+/** Le lingue di traduzione di partenza di un evento: quelle dell'istanza,
+ *  senza la lingua in cui si trascrive; null se non ne resta nessuna. Le usa
+ *  il wizard dovunque la traduzione si accende da sola (un modello, la
+ *  registrazione, l'interruttore della traduzione). */
+export function lingueDiPartenzaTraduzione(
+  predefinite: string | null | undefined,
+  esclusa: string = SOURCE_LANGUAGE_FALLBACK,
+): string | null {
+  return parseLocaleList(predefinite).filter((c) => c !== esclusa).join(',') || null;
+}

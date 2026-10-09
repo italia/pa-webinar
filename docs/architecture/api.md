@@ -244,7 +244,7 @@ curl -b cookies.txt https://webinar.example.com/api/admin/analytics
 
 The application log records paths without query strings. Proxy and ingress access logs usually record full URLs, including any `?token=`. Every client you write should send `Authorization: Bearer`.
 
-The registration emails carry the access token together with a signature, on `GET /api/events/{slug}/registrations/enter?token=…&sig=…&lang=…`, or with `proof=…` in place of `sig=…` when the email was built while public registration was on. The route answers `303` to the room with `Referrer-Policy: no-referrer`, so the signature does not follow the visitor as a `Referer` ([Identity, access and tokens](identity-and-access.md#registrants)).
+The registration emails carry the access token together with a signature, on `GET /api/events/{slug}/registrations/enter?token=…&sig=…&lang=…`, or with `proof=…` in place of `sig=…` when the email was built while the event's registration was open to anyone. The route answers `303` to the room with `Referrer-Policy: no-referrer`, so the signature does not follow the visitor as a `Referer` ([Identity, access and tokens](identity-and-access.md#registrants)).
 
 One route carries a credential in its path: `GET /api/events/{slug}/registrations/{accessToken}`. Its path, with the registrant's access token in it, is written to the application log and to the `route` label of the HTTP metrics. Prefer the routes that take the token as a bearer.
 
@@ -369,7 +369,7 @@ A public, documented API is on the [roadmap](../ROADMAP.md). It needs broader co
 
 The method and the reference measurements are in [Load testing and reference measurements](../LOAD-TESTING.md). The media load toolkit in `scripts/load-test/` mints Jitsi tokens and drives the conference directly, bypassing the portal API. When you test the portal itself, keep the following in mind:
 
-- **Registration is `POST /api/events/{slug}/registrations`**, with a JSON body that includes `displayName`, `email` and `consentGiven: true`. Add `consentRecording: true` when the event records, and `consentMultitrack: true` when it has per-participant recording; without them the call answers 422. The event must be open for registration, and public registration must be on (`publicRegistrationEnabled` in site settings). While it is off, only invited addresses are registered, and every valid call answers `202` with no access token and no cookie, because the link travels only by email. With public registration on, each accepted call:
+- **Registration is `POST /api/events/{slug}/registrations`**, with a JSON body that includes `displayName`, `email` and `consentGiven: true`. Add `consentRecording: true` when the event records, and `consentMultitrack: true` when it has per-participant recording; without them the call answers 422. The event must be open for registration, and open to anyone: its `accessMode` is `OPEN`, or it has none and `publicRegistrationEnabled` is on in site settings. With invitation-only registration, only invited addresses are registered, and every valid call answers `202` with no access token and no cookie, because the link travels only by email. With registration open to anyone, each accepted call:
   - creates or updates the address-book person record (`Person`);
   - creates a `Registration` row with personal data encrypted at rest;
   - writes a consent entry to the GDPR audit log;

@@ -76,6 +76,12 @@ model Event {
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
 
+  // Chi puo' partecipare: OPEN si iscrive chiunque; INVITATION solo gli
+  // invitati (EventInvitation), e nessuno entra da ospite senza iscriversi.
+  // NULL = come dice il sito (SiteSetting.publicRegistrationEnabled e
+  // guestAccessEnabled). Vedi lib/events/registration-access.
+  accessMode EventAccessMode? @map("access_mode")
+
   // Registration profiling toggles
   requireOrganization     Boolean @default(false) @map("require_organization")
   requireOrganizationRole Boolean @default(false) @map("require_organization_role")
@@ -1502,6 +1508,12 @@ enum HomePageMode {
   EVENTS_LIST
   /// Contenuto scritto a mano dall'amministrazione, piu' l'elenco.
   CUSTOM
+}
+
+// Chi puo' partecipare a un evento (Event.accessMode).
+enum EventAccessMode {
+  OPEN // iscrizione aperta a chiunque
+  INVITATION // solo gli invitati, niente ingresso da ospite
 }
 
 // Engine della sala d'attesa (pre-join). Vedi SiteSetting.waitingRoomEngine

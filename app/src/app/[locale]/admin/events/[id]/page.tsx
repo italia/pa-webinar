@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { publicRegistrationFor } from '@/lib/events/registration-access';
 import EventManagementClient from '@/components/admin/event-management-client';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventPageMetadata } from '@/components/admin/admin-page-title';
@@ -181,6 +182,9 @@ export default async function EventManagePage({
     privacyPolicyText: event.privacyPolicyText,
     speakersInfo: event.speakersInfo as Record<string, string> | null,
     createdAt: event.createdAt.toISOString(),
+    accessMode: event.accessMode,
+    // Chi si iscrive davvero: la scelta dell'evento, o quella del sito.
+    registrationOpen: publicRegistrationFor(event, settings.publicRegistrationEnabled),
     requireOrganization: event.requireOrganization,
     requireOrganizationRole: event.requireOrganizationRole,
     requireOrganizationType: event.requireOrganizationType,

@@ -52,7 +52,7 @@ The rules live in `app/src/lib/events/visibility.ts`.
 | `ENDED` | Only while the post-event page is enabled (`postEventPublic`) and `postEventPublicUntil`, if set, is in the future | Closed |
 | `ARCHIVED` | No | Closed |
 
-"Open" means open to anyone while the site setting `publicRegistrationEnabled` is on. With it off, only the addresses on the event's invitation list can register, and an event without invitations accepts no new registrations ([Invitation-only registration](event-journey.md#invitation-only-registration)).
+"Open" means open to anyone when the event's `accessMode` is `OPEN`, or when it has no choice and the site setting `publicRegistrationEnabled` is on. Otherwise only the addresses on the event's invitation list can register, and an event without invitations accepts no new registrations ([Invitation-only registration](event-journey.md#invitation-only-registration)).
 
 The home page and the public calendar ask for upcoming events only (`publicEventStatusWhere({ includeEnded: false })`): they list `LIVE` events always and `PUBLISHED`, `PROVISIONING` and `IDLE` events only before `endsAt`. The other listings, the sitemap and the public API list `PUBLISHED` events whatever their `endsAt`. Registration is refused with `409` once a `PUBLISHED` event is past its end, and its registration page answers 404. Its public page shows it as ended, with no registration button, room link or add-to-calendar links: the page asks `isEventOpenForRegistration()` on the server rather than deciding from the status.
 
@@ -270,7 +270,7 @@ Transitions lag their nominal time by up to one lifecycle interval (one minute).
 Two layers decide whether someone gets into the conference: the waiting room, and the Jitsi token endpoint `POST /api/events/<slug>/jitsi/token`.
 
 - **The waiting room** enables its join button only when the event is `LIVE`, for every role. Moderators reach `LIVE` from `PUBLISHED`, `PROVISIONING` or `IDLE` with **Start event**.
-- **The token endpoint** mints a JWT only when the event is `PUBLISHED` or `LIVE`, and only when the event is `LIVE` for guests without a token. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on (otherwise `403`).
+- **The token endpoint** mints a JWT only when the event is `PUBLISHED` or `LIVE`, and only when the event is `LIVE` for guests without a token. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on and the event is not `INVITATION` (otherwise `403`).
 
 | Status | Moderator or speaker link | Registrant | Guest (no token) |
 |---|---|---|---|
@@ -282,7 +282,7 @@ Two layers decide whether someone gets into the conference: the waiting room, an
 
 When the token endpoint answers `409` to a client that tries to enter or rejoin, the client reads `/lifecycle`: an `ENDED` event takes it to the closing screen, and a `PUBLISHED`, `PROVISIONING` or `IDLE` one back to the waiting room.
 
-A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or set by an email entry link signed with `sig`, which the emails built while public registration is off carry. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
+A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or set by an email entry link signed with `sig`, which the emails built while the event's registration is by invitation only carry. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
 
 ## Timing semantics
 

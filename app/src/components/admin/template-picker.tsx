@@ -22,13 +22,18 @@ interface TemplateSummary {
 interface TemplatePickerProps {
   templates: TemplateSummary[];
   onSelect: (template: TemplateSummary) => void;
-  onSkip: () => void;
+  /** «Configura manualmente»: senza, il pulsante non c'e'. */
+  onSkip?: () => void;
+  /** La riga che invita a scegliere o a saltare; spenta sotto le domande del
+   *  formato, che la sostituiscono. */
+  showSubtitle?: boolean;
 }
 
 export default function TemplatePicker({
   templates,
   onSelect,
   onSkip,
+  showSubtitle = true,
 }: TemplatePickerProps) {
   const t = useTranslations('admin.templates');
   // Le funzioni con i nomi della matrice dei permessi del wizard.
@@ -36,7 +41,7 @@ export default function TemplatePicker({
 
   return (
     <div>
-      <p className="text-secondary mb-4">{t('pickerSubtitle')}</p>
+      {showSubtitle && <p className="text-secondary mb-4">{t('pickerSubtitle')}</p>}
 
       <div className="row g-3 mb-4">
         {templates.map((tpl) => (
@@ -126,13 +131,15 @@ export default function TemplatePicker({
         ))}
       </div>
 
-      <button
-        type="button"
-        className="btn btn-outline-secondary btn-sm"
-        onClick={onSkip}
-      >
-        {t('skipTemplate')}
-      </button>
+      {onSkip && (
+        <button
+          type="button"
+          className="btn btn-outline-secondary btn-sm"
+          onClick={onSkip}
+        >
+          {t('skipTemplate')}
+        </button>
+      )}
     </div>
   );
 }

@@ -733,7 +733,7 @@
       "updateEvent": "Atnaujinti renginį",
       "step1": {
         "heading": "Pagrindinė informacija",
-        "intro": "Renginio pavadinimas, aprašymas, paveikslėlis ir kalendorius.",
+        "intro": "Renginio pavadinimas, aprašymas ir paveikslėlis.",
         "coverImage": "Viršelio paveikslėlis",
         "coverImageHelp": "Rodomas viešoje svetainėje ir el. laiškuose užsiregistravusiesiems.",
         "scheduleHeading": "Kalendorius",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategorijos (žymos)",
         "waitingRoomAudio": "Laukiamojo garsas (neprivaloma)",
         "waitingRoomAudioHelp": "Grojamas prieš prasidedant vaizdo skambučiui.",
-        "parseTitleKickerLabel": "Pavadinimas su antrašte (skirtukas |)",
-        "parseTitleKickerHelp": "Įjungus, pavadinimas, pvz., „KONFERENCIJA | Skaitmeninės inovacijos“, KONFERENCIJA bus rodoma kaip antraštė.",
         "maxParticipantsHelp": "Numatomų žmonių skaičiaus įvertis: pagal jį parenkami vaizdo serverio pajėgumai, registracijų jis neriboja.",
         "validation": {
           "startsAt": "Neteisinga pradžios data.",
@@ -773,7 +771,11 @@
           "HIGH": "Aukšta (720p, rekomenduojama)",
           "BALANCED": "Subalansuota (540p)",
           "SAVE_DATA": "Duomenų taupymas (360p)"
-        }
+        },
+        "requiredLegend": "Laukai, pažymėti *, reikalingi renginiui išsaugoti: kol jie tušti, tai nurodyta prie kiekvieno.",
+        "kickerHint": "Norėdami pridėti antraštę virš pavadinimo, parašykite ją prieš pavadinimą ir atskirkite ženklu |, pavyzdžiui, „Susitikimų ciklas | Pirmasis susitikimas“.",
+        "kickerUse": "Rodyti „{kicker}“ virš pavadinimo",
+        "kickerPreview": "Taip atrodo renginio puslapyje"
       },
       "step2": {
         "heading": "Kas ką gali daryti",
@@ -832,7 +834,8 @@
             "name": "Dalyvis",
             "desc": "Stebi renginį ir dalyvauja taip, kaip nuspręsite toliau esančioje lentelėje."
           }
-        }
+        },
+        "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -864,7 +867,7 @@
         "personName": "Vardas",
         "personEmail": "El. paštas",
         "peopleHeading": "Renginio asmenys",
-        "peopleHelp": "Organizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą prisijungti su savo vaidmeniu; ką gali kiekvienas vaidmuo, rodo žingsnis „Leidimai“.",
+        "peopleHelp": "Organizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą prisijungti su savo vaidmeniu; ką gali kiekvienas vaidmuo, rodo skiltis „Išplėstiniai nustatymai“.",
         "personRole": "Vaidmuo",
         "roleOrganizer": "Organizatorius",
         "roleModerator": "Moderatorius",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Neprivaloma: jūsų kviečiamų asmenų sąrašas. Registracija atvira, todėl paskelbus gali registruotis bet kas, pakviestas ar ne. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys.",
         "invitationsHelpRestricted": "Registracija ribota: registruotis gali tik šio sąrašo adresai. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys; įėjimo nuoroda atkeliauja el. paštu po registracijos.",
         "logoExternal": "Viešame puslapyje rodomi tik į šią platformą įkelti logotipai: logotipas iš kitos svetainės nebus rodomas.",
-        "primaryProfileInvalid": "Patikrinkite organizaciją ir logotipo adresą."
+        "primaryProfileInvalid": "Patikrinkite organizaciją ir logotipo adresą.",
+        "primaryMore": "Įstaiga, logotipas ir viešas puslapis",
+        "accessHeading": "Kas registruojasi",
+        "accessSiteDefault": "Taikomas svetainės nustatymas: jei administracija jį pakeis, tai galios ir šiam renginiui.",
+        "accessNoInvitees": "Pakviestųjų dar nėra: kol žemiau esantis sąrašas tuščias, niekas negali užsiregistruoti.",
+        "askHeading": "Ko klausiame besiregistruojančių",
+        "askAlways": "Vardas ir el. paštas visada. Be to, jei reikia:",
+        "askOrganization": "Organizacija (privaloma registruojantis)",
+        "askRole": "Pareigos (neprivaloma)",
+        "askType": "Organizacijos tipas (neprivaloma)",
+        "accessStaffOnly": "Kas gali registruotis, sprendžia renginio komanda."
       },
       "step4": {
         "heading": "Turinys ir medžiaga",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Santrauka ir paskelbimas",
-        "intro": "Patikrinkite informaciją ir paskelbkite renginį (arba įrašykite kaip juodraštį).",
+        "intro": "Renginys taip, kaip jį matys kiti: patikrinkite, tada paskelbkite arba išsaugokite kaip juodraštį.",
         "summary": {
           "title": "Pavadinimas",
           "schedule": "Kalendorius",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje.",
       "toFix": "Reikia pataisyti:",
       "toFixField": "Laukas {n}",
-      "stepsAriaLabel": "Renginio formos žingsniai"
+      "stepsAriaLabel": "Renginio formos žingsniai",
+      "flow": {
+        "steps": {
+          "base": "Renginys",
+          "schedule": "Kada",
+          "invites": "Žmonės",
+          "review": "Santrauka",
+          "advanced": "Išplėstiniai nustatymai"
+        },
+        "templateInUse": "Šablonas: <b>{name}</b>",
+        "noTemplate": "Renginys be šablono",
+        "changeTemplate": "Keisti šabloną",
+        "chooseTemplate": "Pasirinkti šabloną",
+        "backToReview": "Grįžti į santrauką",
+        "participantsCan": "Dalyviai: {list}",
+        "none": "nėra",
+        "recordingManual": "Prieinama: prasideda tik tada, kai vedėjas paspaudžia REC.",
+        "aiAfter": "Po įrašymo: {list}.",
+        "scheduleHeading": "Kada vyksta",
+        "scheduleIntro": "Data, laikas ir kiek žmonių tikitės: pagal tai paruošiama salė.",
+        "advancedIntro": "Šablono jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
+        "advancedIntroTemplate": "Šablono „{name}“ jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
+        "requiredToSave": "Reikia renginiui išsaugoti.",
+        "requiredToPublish": "Reikia renginiui paskelbti.",
+        "toComplete": "Reikia užpildyti",
+        "missingHeading": "Kad paskelbtumėte, dar trūksta:",
+        "fieldOrganizerName": "Pagrindinio organizatoriaus vardas",
+        "fieldOrganizerEmail": "Pagrindinio organizatoriaus el. paštas",
+        "capacityWarning": "Pajėgumą reikia patikrinti techninėje informacijoje.",
+        "sections": {
+          "participation": "Dalyvavimas ir salės funkcijos",
+          "recording": "Įrašas ir DI",
+          "content": "Turinys: medžiaga ir klausimynai",
+          "room": "Laukiamasis ir vaizdas",
+          "data": "Privatumas, duomenys ir puslapis po renginio",
+          "technical": "Techninė informacija: pajėgumas ir ištekliai"
+        },
+        "formatInUse": "Formatas: <b>{name}</b>",
+        "changeFormat": "Keisti formatą",
+        "voiceAll": "Visi kalba ir rodosi vaizdo įraše",
+        "voiceSpeakers": "Kalba ir rodosi pranešėjai ir vedėjai; auditorija rašo pokalbiuose",
+        "features": "Funkcijos: {list}",
+        "liveToggleNote": "Kiekvieną funkciją galima įjungti ir išjungti ir renginio metu.",
+        "customize": "Pritaikyti nustatymus",
+        "changeLanguages": "Keisti kalbas",
+        "translationLine": "Vertimas į: {list}",
+        "privacyTemplate": "Privatumo pranešimas: {name}",
+        "privacyCustom": "Privatumo pranešimas: renginiui parašytas tekstas",
+        "privacyDocument": "Privatumo pranešimas: renginio dokumentas",
+        "privacySite": "Privatumo pranešimas: svetainės",
+        "untitled": "Renginys be pavadinimo",
+        "carriedOver": "Išsaugojome tai, ką buvote parašę apie renginį.",
+        "startOver": "Pradėti iš naujo",
+        "accessOpen": "Registruotis gali kiekvienas renginio puslapyje.",
+        "accessInvitation": "Tik su kvietimu. Pakviestų: {count}.",
+        "addInvitees": "Pridėti pakviestuosius",
+        "change": "Keisti",
+        "askLine": "Registruojantis prašome: {list}.",
+        "askName": "vardas",
+        "askEmail": "el. paštas",
+        "askOrganization": "organizacija",
+        "askRole": "pareigos",
+        "askType": "organizacijos tipas"
+      }
     },
     "nav": {
       "events": "Renginiai",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Būsenos puslapis įjungtas",
         "statusPageEnabledHelp": "Paskelbia paslaugos būsenos puslapį. Išjungus puslapio nėra, o jo duomenis mato tik administratoriai.",
         "guestAccessEnabled": "Svečio prieiga įjungta",
-        "guestAccessEnabledHelp": "Neužsiregistravę asmenys gali prisijungti prie vykstančių renginių nurodę tik savo vardą. Išjungus prie suplanuotų renginių galima prisijungti tik užsiregistravus arba su moderatoriaus ar pranešėjo nuoroda; momentiniai vaizdo skambučiai lieka atviri visiems, kas turi nuorodą.",
+        "guestAccessEnabledHelp": "Neužsiregistravę asmenys gali prisijungti prie vykstančių renginių nurodę tik savo vardą. Išjungus prie suplanuotų renginių galima prisijungti tik užsiregistravus arba su moderatoriaus ar pranešėjo nuoroda; momentiniai vaizdo skambučiai lieka atviri visiems, kas turi nuorodą. Į renginį tik su kvietimu svečiai neįleidžiami niekada.",
         "publicRegistrationEnabled": "Viešoji registracija įjungta",
-        "publicRegistrationEnabledHelp": "Į renginius gali registruotis bet kas. Išjungus registruotis gali tik renginio pakviestųjų sąraše esantys asmenys, o asmeninė prisijungimo nuoroda siunčiama tik el. paštu; jau užsiregistravusieji ir moderatorių bei pranešėjų nuorodos veikia toliau.",
+        "publicRegistrationEnabledHelp": "Į renginius gali registruotis bet kas. Išjungus registruotis gali tik renginio pakviestųjų sąraše esantys asmenys, o asmeninė prisijungimo nuoroda siunčiama tik el. paštu; jau užsiregistravusieji ir moderatorių bei pranešėjų nuorodos veikia toliau. Tai naujiems renginiams siūlomas pasirinkimas: kiekvienas renginys žingsnyje „Žmonės“ gali nuspręsti kitaip.",
         "calendarPublic": "Viešas kalendorius",
         "calendarPublicHelp": "Paskelbti renginių kalendorių. Lankytojai gali matyti suplanuotus renginius.",
         "parseTitleKicker": "Pavadinimai su redakcine antrašte",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Dalyviai gali kalbėti",
         "video": "Dalyviai gali įjungti vaizdą",
-        "screenShare": "Dalyviai gali bendrinti ekraną"
+        "screenShare": "Dalyviai gali bendrinti ekraną",
+        "openRegistration": "Registracija atvira visiems"
       },
       "fields": {
         "dataRetention": "Duomenų saugojimas",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Vaizdo įrašas nepasiekiamas",
       "openInNewTab": "Atidaryti naujame skirtuke"
+    },
+    "guided": {
+      "title": "Koks jūsų renginys?",
+      "intro": "Keturi klausimai, kad pradėtumėte su tinkamais nustatymais. Kiekvieną funkciją galima įjungti ar išjungti ir renginio metu.",
+      "peopleQ": "Kiek žmonių tikitės?",
+      "people": {
+        "piccolo": "Iki 20",
+        "medio": "Iki 100",
+        "grande": "Daugiau nei 100"
+      },
+      "peopleHint": "Tai įvertis salei paruošti, o ne registracijų riba.",
+      "voiceQ": "Kas gali kalbėti ir rodytis vaizdo įraše?",
+      "voice": {
+        "all": "Visi",
+        "allDesc": "Pokalbiai, mikrofonas, vaizdas ir ekranas visiems",
+        "speakers": "Pranešėjai ir vedėjai",
+        "speakersDesc": "Auditorija rašo pokalbiuose ir užduoda klausimus"
+      },
+      "recQ": "Ar norite galėti įrašyti?",
+      "rec": {
+        "yes": "Taip, kai paspaudžiate REC",
+        "yesDesc": "Po renginio: transkripcija, santrauka ir vertimas",
+        "no": "Ne",
+        "noDesc": "Jokio įrašo, nereikia prašyti sutikimo"
+      },
+      "preview": "Jūsų renginys",
+      "previewPeople": "Tikimasi dalyvių: apie {count}",
+      "continue": "Tęsti",
+      "useTemplate": "Arba naudokite šabloną",
+      "summary": {
+        "piccolo": "Iki 20 žmonių",
+        "medio": "Iki 100 žmonių",
+        "grande": "Daugiau nei 100 žmonių",
+        "tutti": "visi vaizdo įraše",
+        "relatori": "kalba pranešėjai",
+        "si": "su įrašu",
+        "no": "be įrašo",
+        "openAccess": "atvira visiems",
+        "inviteOnly": "tik su kvietimu"
+      },
+      "accessQ": "Kas gali dalyvauti?",
+      "access": {
+        "open": "Kiekvienas, kas užsiregistruoja",
+        "openDesc": "Kas nori, užsiregistruoja renginio puslapyje",
+        "invitation": "Tik jūsų pakviesti",
+        "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik pakviestieji; neužsiregistravus patekti negalima"
+      },
+      "previewInvitation": "Registruotis gali tik jūsų pakviesti; niekas nepateks neužsiregistravęs."
     }
   },
   "email": {

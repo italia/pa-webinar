@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
@@ -33,6 +34,7 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 
@@ -219,6 +221,22 @@ export const PUT = withErrorHandling(async (request, context) => {
     delete (data as Record<string, unknown>).moderatorEmail;
   }
 
+  // Chi partecipa lo decide lo staff dell'evento, come l'elenco degli invitati
+  // a cui si lega: un link di conduzione (condiviso, inoltrato, o di un
+  // co-moderatore) non apre ne' chiude l'iscrizione.
+  if (data.accessMode !== undefined && data.accessMode !== event.accessMode) {
+    try {
+      await requireEventManager(await cookies(), eventId);
+    } catch (err) {
+      // Senza una sessione dello staff che gestisce l'evento: 403. Altri
+      // errori (la banca dati) restano quello che sono.
+      if (err instanceof UnauthorizedError || err instanceof ForbiddenError) {
+        throw new ForbiddenError('Only the event staff can change who can take part');
+      }
+      throw err;
+    }
+  }
+
   // Il modello dell'informativa è una chiave esterna: un id inesistente
   // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
   // al posto di un errore sul campo.
@@ -373,8 +391,11 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
       }),
-      ...(data.autoStartRecording !== undefined && {
-        autoStartRecording: data.autoStartRecording,
+      // L'avvio automatico si puo' solo spegnere: la registrazione la avvia
+      // chi conduce con REC (un evento salvato prima lo tiene finche' non lo
+      // si spegne).
+      ...(data.autoStartRecording === false && {
+        autoStartRecording: false,
       }),
       ...(avToggles.participantsCanUnmute !== undefined && {
         participantsCanUnmute: avToggles.participantsCanUnmute,
@@ -401,6 +422,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.gdprTemplateId !== undefined && {
         gdprTemplateId: data.gdprTemplateId,
       }),
+      ...(data.accessMode !== undefined && { accessMode: data.accessMode }),
       ...(data.requireOrganization !== undefined && {
         requireOrganization: data.requireOrganization,
       }),

@@ -733,7 +733,7 @@
       "updateEvent": "Esemény frissítése",
       "step1": {
         "heading": "Alapadatok",
-        "intro": "Az esemény címe, leírása, borítóképe és időbeosztása.",
+        "intro": "Az esemény címe, leírása és képe.",
         "coverImage": "Borítókép",
         "coverImageHelp": "Megjelenik a nyilvános oldalon és a regisztráltaknak küldött e-mailekben.",
         "scheduleHeading": "Naptár",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategóriák (címkék)",
         "waitingRoomAudio": "Várószoba hangsávja (opcionális)",
         "waitingRoomAudioHelp": "A videohívás kezdete előtt kerül lejátszásra.",
-        "parseTitleKickerLabel": "Cím felcímmel (elválasztó: |)",
-        "parseTitleKickerHelp": "Bekapcsolva a 'KONFERENCIA | Digitális innováció' jellegű cím KONFERENCIA részét felcímként jeleníti meg.",
         "maxParticipantsHelp": "A várható résztvevők becsült száma: a videószerver méretezésére szolgál, és nem korlátozza a regisztrációkat.",
         "validation": {
           "startsAt": "Érvénytelen kezdési dátum.",
@@ -773,7 +771,11 @@
           "HIGH": "Magas (720p, ajánlott)",
           "BALANCED": "Kiegyensúlyozott (540p)",
           "SAVE_DATA": "Adattakarékos (360p)"
-        }
+        },
+        "requiredLegend": "A *-gal jelölt mezők az esemény mentéséhez kellenek: amíg üresek, mindegyiknél jelezzük.",
+        "kickerHint": "Felülcímhez írja a cím elé, és válassza el őket | jellel, például „Találkozósorozat | Az első találkozó”.",
+        "kickerUse": "„{kicker}” megjelenítése felülcímként",
+        "kickerPreview": "Így jelenik meg az esemény oldalán"
       },
       "step2": {
         "heading": "Ki mit tehet",
@@ -832,7 +834,8 @@
             "name": "Résztvevő",
             "desc": "Követi az eseményt, és úgy vesz részt, ahogy az alábbi táblázatban dönt."
           }
-        }
+        },
+        "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -864,7 +867,7 @@
         "personName": "Név",
         "personEmail": "E-mail",
         "peopleHeading": "Az esemény személyei",
-        "peopleHelp": "Szervezők, moderátorok és előadók. Mindenki saját hivatkozást kap, hogy a szerepével lépjen be; hogy melyik szerep mit tehet, az „Engedélyek” lépés mutatja.",
+        "peopleHelp": "Szervezők, moderátorok és előadók. Mindenki saját hivatkozást kap, hogy a szerepével lépjen be; hogy melyik szerep mit tehet, a „Speciális beállítások” rész mutatja.",
         "personRole": "Szerep",
         "roleOrganizer": "Szervező",
         "roleModerator": "Moderátor",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Nem kötelező: az Ön által meghívottak listája. A regisztráció nyitott, így közzététel után bárki regisztrálhat, meghívott vagy sem. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg.",
         "invitationsHelpRestricted": "A regisztráció korlátozott: csak a listán szereplő címek regisztrálhatnak. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg; a belépési hivatkozás a regisztráció után e-mailben érkezik.",
         "logoExternal": "A nyilvános oldal csak az erre a platformra feltöltött logókat mutatja: más webhelyről származó logó nem jelenik meg.",
-        "primaryProfileInvalid": "Ellenőrizze a szervezetet és a logó címét."
+        "primaryProfileInvalid": "Ellenőrizze a szervezetet és a logó címét.",
+        "primaryMore": "Intézmény, logó és nyilvános oldal",
+        "accessHeading": "Ki regisztrál",
+        "accessSiteDefault": "Az oldal beállítását követi: ha az adminisztráció módosítja, ez erre az eseményre is vonatkozik.",
+        "accessNoInvitees": "Még nincsenek meghívottak: amíg az alábbi lista üres, senki sem regisztrálhat.",
+        "askHeading": "Mit kérdezünk a regisztrálóktól",
+        "askAlways": "Nevet és e-mail-címet mindig. Ezen felül, ha szükséges:",
+        "askOrganization": "Szervezet (a regisztrációhoz kötelező)",
+        "askRole": "Beosztás (nem kötelező)",
+        "askType": "Szervezet típusa (nem kötelező)",
+        "accessStaffOnly": "Hogy ki regisztrálhat, arról az esemény csapata dönt."
       },
       "step4": {
         "heading": "Tartalmak és anyagok",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Összefoglaló és közzététel",
-        "intro": "Ellenőrizze az adatokat és tegye közzé az eseményt (vagy mentse piszkozatként).",
+        "intro": "Az esemény úgy, ahogy mások látni fogják: ellenőrizze, majd tegye közzé vagy mentse piszkozatként.",
         "summary": {
           "title": "Cím",
           "schedule": "Naptár",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. A szerver válasza: {reason}. Tegye közzé az esemény oldaláról.",
       "toFix": "Javítandó:",
       "toFixField": "{n}. mező",
-      "stepsAriaLabel": "Az eseményűrlap lépései"
+      "stepsAriaLabel": "Az eseményűrlap lépései",
+      "flow": {
+        "steps": {
+          "base": "Esemény",
+          "schedule": "Mikor",
+          "invites": "Személyek",
+          "review": "Összegzés",
+          "advanced": "Speciális beállítások"
+        },
+        "templateInUse": "Sablon: <b>{name}</b>",
+        "noTemplate": "Esemény sablon nélkül",
+        "changeTemplate": "Sablon módosítása",
+        "chooseTemplate": "Sablon választása",
+        "backToReview": "Vissza az összegzéshez",
+        "participantsCan": "Résztvevők: {list}",
+        "none": "nincs",
+        "recordingManual": "Elérhető: csak akkor indul, ha egy moderátor megnyomja a REC gombot.",
+        "aiAfter": "A felvétel után: {list}.",
+        "scheduleHeading": "Mikor kerül sor rá",
+        "scheduleIntro": "Dátum, időpont és a várt létszám: ezek alapján készül elő a terem.",
+        "advancedIntro": "A sablon által már kiválasztott értékek: csak azt módosítsa, amit kell.",
+        "advancedIntroTemplate": "A(z) „{name}” sablon által már kiválasztott értékek: csak azt módosítsa, amit kell.",
+        "requiredToSave": "Az esemény mentéséhez szükséges.",
+        "requiredToPublish": "Az esemény közzétételéhez szükséges.",
+        "toComplete": "Kitöltendő",
+        "missingHeading": "A közzétételhez még hiányzik:",
+        "fieldOrganizerName": "A fő szervező neve",
+        "fieldOrganizerEmail": "A fő szervező e-mail-címe",
+        "capacityWarning": "A kapacitást a technikai részleteknél ellenőrizze.",
+        "sections": {
+          "participation": "Részvétel és a terem funkciói",
+          "recording": "Felvétel és MI",
+          "content": "Tartalmak: anyagok és kérdőívek",
+          "room": "Váróterem és videó",
+          "data": "Adatvédelem, adatok és oldal az esemény után",
+          "technical": "Technikai részletek: kapacitás és erőforrások"
+        },
+        "formatInUse": "Formátum: <b>{name}</b>",
+        "changeFormat": "Formátum módosítása",
+        "voiceAll": "Mindenki beszél és megjelenik videón",
+        "voiceSpeakers": "Az előadók és moderátorok beszélnek és jelennek meg videón; a közönség a csevegőben ír",
+        "features": "Funkciók: {list}",
+        "liveToggleNote": "Minden funkció az esemény közben is be- és kikapcsolható.",
+        "customize": "Beállítások testreszabása",
+        "changeLanguages": "Nyelvek módosítása",
+        "translationLine": "Fordítás: {list}",
+        "privacyTemplate": "Adatvédelmi tájékoztató: {name}",
+        "privacyCustom": "Adatvédelmi tájékoztató: az eseményhez írt szöveg",
+        "privacyDocument": "Adatvédelmi tájékoztató: az esemény dokumentuma",
+        "privacySite": "Adatvédelmi tájékoztató: a webhelyé",
+        "untitled": "Cím nélküli esemény",
+        "carriedOver": "Megtartottuk, amit az eseményről írt.",
+        "startOver": "Kezdés elölről",
+        "accessOpen": "Bárki regisztrálhat az esemény oldalán.",
+        "accessInvitation": "Csak meghívással. Meghívottak: {count}.",
+        "addInvitees": "Meghívottak hozzáadása",
+        "change": "Módosítás",
+        "askLine": "Regisztrációkor ezeket kérjük: {list}.",
+        "askName": "név",
+        "askEmail": "e-mail",
+        "askOrganization": "szervezet",
+        "askRole": "beosztás",
+        "askType": "szervezet típusa"
+      }
     },
     "nav": {
       "events": "Események",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Állapotoldal aktív",
         "statusPageEnabledHelp": "Közzéteszi a szolgáltatás állapotoldalát. Kikapcsolva az oldal nem létezik, és az adatait csak az adminisztrátorok látják.",
         "guestAccessEnabled": "Vendég hozzáférés aktív",
-        "guestAccessEnabledHelp": "A nem regisztrált személyek csak a nevük megadásával csatlakozhatnak a folyamatban lévő eseményekhez. Kikapcsolva a tervezett eseményekre csak regisztrációval vagy moderátori, illetve előadói hivatkozással lehet belépni; az azonnali videohívások mindenki számára nyitva maradnak, akinek megvan a hivatkozás.",
+        "guestAccessEnabledHelp": "A nem regisztrált személyek csak a nevük megadásával csatlakozhatnak a folyamatban lévő eseményekhez. Kikapcsolva a tervezett eseményekre csak regisztrációval vagy moderátori, illetve előadói hivatkozással lehet belépni; az azonnali videohívások mindenki számára nyitva maradnak, akinek megvan a hivatkozás. A csak meghívottaknak szóló esemény soha nem enged be vendégeket.",
         "publicRegistrationEnabled": "Nyilvános regisztráció aktív",
-        "publicRegistrationEnabledHelp": "Bárki regisztrálhat az eseményekre. Kikapcsolva csak az esemény meghívotti listáján szereplők regisztrálhatnak, és a személyes belépési linket csak e-mailben küldjük el; a már regisztráltak, valamint a moderátori és előadói hivatkozások továbbra is működnek.",
+        "publicRegistrationEnabledHelp": "Bárki regisztrálhat az eseményekre. Kikapcsolva csak az esemény meghívotti listáján szereplők regisztrálhatnak, és a személyes belépési linket csak e-mailben küldjük el; a már regisztráltak, valamint a moderátori és előadói hivatkozások továbbra is működnek. Ez az új eseményeknek javasolt beállítás: minden esemény a „Személyek” lépésben dönthet másként.",
         "calendarPublic": "Nyilvános naptár",
         "calendarPublicHelp": "Az eseménynaptár közzététele. A látogatók megtekinthetik a tervezett eseményeket.",
         "parseTitleKicker": "Címek szerkesztői felcímmel",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "A résztvevők beszélhetnek",
         "video": "A résztvevők bekapcsolhatják a videót",
-        "screenShare": "A résztvevők megoszthatják a képernyőt"
+        "screenShare": "A résztvevők megoszthatják a képernyőt",
+        "openRegistration": "Regisztráció mindenki számára nyitott"
       },
       "fields": {
         "dataRetention": "Adatmegőrzés",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "A videó nem érhető el",
       "openInNewTab": "Megnyitás új lapon"
+    },
+    "guided": {
+      "title": "Milyen az eseménye?",
+      "intro": "Négy kérdés, hogy a megfelelő beállításokkal kezdjen. Minden funkció az esemény közben is be- vagy kikapcsolható.",
+      "peopleQ": "Hány résztvevőre számít?",
+      "people": {
+        "piccolo": "Legfeljebb 20",
+        "medio": "Legfeljebb 100",
+        "grande": "Több mint 100"
+      },
+      "peopleHint": "Ez becslés a terem előkészítéséhez, nem a jelentkezések korlátja.",
+      "voiceQ": "Ki beszélhet és jelenhet meg videón?",
+      "voice": {
+        "all": "Mindenki",
+        "allDesc": "Csevegés, mikrofon, videó és képernyő mindenkinek",
+        "speakers": "Előadók és moderátorok",
+        "speakersDesc": "A közönség a csevegőben ír és kérdez"
+      },
+      "recQ": "Szeretne felvételt készíteni?",
+      "rec": {
+        "yes": "Igen, amikor megnyomja a REC gombot",
+        "yesDesc": "Az esemény után: átirat, összefoglaló és fordítás",
+        "no": "Nem",
+        "noDesc": "Nincs felvétel, nincs kérendő hozzájárulás"
+      },
+      "preview": "Az Ön eseménye",
+      "previewPeople": "Várt résztvevők: kb. {count}",
+      "continue": "Tovább",
+      "useTemplate": "Vagy használjon sablont",
+      "summary": {
+        "piccolo": "Legfeljebb 20 fő",
+        "medio": "Legfeljebb 100 fő",
+        "grande": "Több mint 100 fő",
+        "tutti": "mindenki videón",
+        "relatori": "az előadók beszélnek",
+        "si": "felvétellel",
+        "no": "felvétel nélkül",
+        "openAccess": "mindenki számára nyitott",
+        "inviteOnly": "csak meghívással"
+      },
+      "accessQ": "Ki vehet részt?",
+      "access": {
+        "open": "Bárki, aki regisztrál",
+        "openDesc": "Aki szeretne, az esemény oldalán regisztrál",
+        "invitation": "Csak a meghívottjai",
+        "invitationDesc": "Az oldal látható marad, de csak a meghívottak regisztrálhatnak; regisztráció nélkül nincs belépés"
+      },
+      "previewInvitation": "Csak az Ön által meghívottak regisztrálhatnak; regisztráció nélkül senki sem lép be."
     }
   },
   "email": {

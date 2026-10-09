@@ -32,8 +32,12 @@ const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
  * names + free text) fetchable by slug forever.
  */
 describe('guestChatWindowOpen', () => {
-  const scheduled = (status: string) => ({ status, eventType: 'SCHEDULED' });
-  const instant = (status: string) => ({ status, eventType: 'INSTANT' });
+  const scheduled = (status: string, accessMode: string | null = null) => ({
+    status,
+    eventType: 'SCHEDULED',
+    accessMode,
+  });
+  const instant = (status: string) => ({ status, eventType: 'INSTANT', accessMode: null });
 
   it('opens while the room is live, whatever the event type', () => {
     expect(guestChatWindowOpen(scheduled('LIVE'), true)).toBe(true);
@@ -57,6 +61,10 @@ describe('guestChatWindowOpen', () => {
     expect(guestChatWindowOpen(scheduled('LIVE'), false)).toBe(false);
     expect(guestChatWindowOpen(instant('LIVE'), false)).toBe(true);
     expect(guestChatWindowOpen(instant('PROVISIONING'), false)).toBe(true);
+  });
+
+  it('shuts on an invitation-only event even with guest access on', () => {
+    expect(guestChatWindowOpen(scheduled('LIVE', 'INVITATION'), true)).toBe(false);
   });
 
   it('stays shut before and after the event — including ENDED and ARCHIVED', () => {

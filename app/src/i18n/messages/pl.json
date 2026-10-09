@@ -733,7 +733,7 @@
       "updateEvent": "Aktualizuj wydarzenie",
       "step1": {
         "heading": "Podstawowe informacje",
-        "intro": "Tytuł, opis, obraz i kalendarz wydarzenia.",
+        "intro": "Tytuł, opis i obraz wydarzenia.",
         "coverImage": "Obraz okładki",
         "coverImageHelp": "Wyświetlany w serwisie publicznym i w e-mailach do zarejestrowanych.",
         "scheduleHeading": "Kalendarz",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategorie (tagi)",
         "waitingRoomAudio": "Dźwięk poczekalni (opcjonalny)",
         "waitingRoomAudioHelp": "Odtwarzany przed rozpoczęciem rozmowy wideo.",
-        "parseTitleKickerLabel": "Tytuł z nagłówkiem (separator |)",
-        "parseTitleKickerHelp": "Gdy włączone, tytuł taki jak 'KONFERENCJA | Innowacje cyfrowe' wyświetli KONFERENCJA jako mały nadtytuł.",
         "maxParticipantsHelp": "Szacunkowa liczba oczekiwanych osób: służy do dobrania wydajności serwera wideo i nie ogranicza rejestracji.",
         "validation": {
           "startsAt": "Nieprawidłowa data rozpoczęcia.",
@@ -773,7 +771,11 @@
           "HIGH": "Wysoka (720p, zalecana)",
           "BALANCED": "Zrównoważona (540p)",
           "SAVE_DATA": "Oszczędzanie danych (360p)"
-        }
+        },
+        "requiredLegend": "Pola oznaczone * są potrzebne do zapisania wydarzenia: dopóki są puste, każde to mówi.",
+        "kickerHint": "Aby dodać nadtytuł, wpisz go przed tytułem i oddziel znakiem |, na przykład „Cykl spotkań | Pierwsze spotkanie”.",
+        "kickerUse": "Pokaż „{kicker}” jako nadtytuł",
+        "kickerPreview": "Tak wygląda na stronie wydarzenia"
       },
       "step2": {
         "heading": "Kto może co robić",
@@ -832,7 +834,8 @@
             "name": "Uczestnik",
             "desc": "Śledzi wydarzenie i bierze w nim udział tak, jak zdecydujesz w tabeli poniżej."
           }
-        }
+        },
+        "recordingManualNote": "Nagrywanie nigdy nie zaczyna się samo: prowadzący uruchamia je przyciskiem REC."
       },
       "step3": {
         "heading": "Osoby i zaproszenia",
@@ -864,7 +867,7 @@
         "personName": "Imię i nazwisko",
         "personEmail": "E-mail",
         "peopleHeading": "Osoby wydarzenia",
-        "peopleHelp": "Organizatorzy, moderatorzy i prelegenci. Każdy otrzymuje własny link, by wejść ze swoją rolą; co może każda rola, pokazuje krok „Uprawnienia”.",
+        "peopleHelp": "Organizatorzy, moderatorzy i prelegenci. Każdy otrzymuje własny link, by wejść ze swoją rolą; co może każda rola, pokazuje sekcja „Ustawienia zaawansowane”.",
         "personRole": "Rola",
         "roleOrganizer": "Organizator",
         "roleModerator": "Moderator",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Opcjonalnie: lista osób, które zapraszasz. Rejestracja jest otwarta, więc po publikacji każdy może się zarejestrować, zaproszony czy nie. Platforma nie wysyła zaproszeń: udostępnij link do wydarzenia samodzielnie.",
         "invitationsHelpRestricted": "Rejestracja jest ograniczona: mogą się rejestrować tylko adresy z tej listy. Platforma nie wysyła zaproszeń: udostępnij link do wydarzenia samodzielnie; link do wejścia przychodzi e-mailem po rejestracji.",
         "logoExternal": "Strona publiczna pokazuje tylko logo przesłane na tę platformę: logo z innej witryny nie będzie widoczne.",
-        "primaryProfileInvalid": "Sprawdź organizację i adres logo."
+        "primaryProfileInvalid": "Sprawdź organizację i adres logo.",
+        "primaryMore": "Instytucja, logo i strona publiczna",
+        "accessHeading": "Kto się zapisuje",
+        "accessSiteDefault": "Zgodnie z ustawieniem witryny: jeśli administracja je zmieni, dotyczy to także tego wydarzenia.",
+        "accessNoInvitees": "Nie ma jeszcze zaproszonych: dopóki lista poniżej jest pusta, nikt nie może się zapisać.",
+        "askHeading": "O co pytamy osoby, które się zapisują",
+        "askAlways": "Imię i nazwisko oraz e-mail, zawsze. Dodatkowo, jeśli potrzebujesz:",
+        "askOrganization": "Instytucja (wymagana przy zapisie)",
+        "askRole": "Stanowisko (opcjonalnie)",
+        "askType": "Rodzaj instytucji (opcjonalnie)",
+        "accessStaffOnly": "O tym, kto może się zapisać, decyduje zespół wydarzenia."
       },
       "step4": {
         "heading": "Treści i materiały",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Podsumowanie i publikacja",
-        "intro": "Sprawdź informacje i opublikuj wydarzenie (lub zapisz jako wersję roboczą).",
+        "intro": "Wydarzenie tak, jak zobaczą je inni: sprawdź, a potem opublikuj lub zapisz jako wersję roboczą.",
         "summary": {
           "title": "Tytuł",
           "schedule": "Kalendarz",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Odpowiedź serwera: {reason}. Opublikuj je na stronie wydarzenia.",
       "toFix": "Do poprawienia:",
       "toFixField": "Pole {n}",
-      "stepsAriaLabel": "Kroki formularza wydarzenia"
+      "stepsAriaLabel": "Kroki formularza wydarzenia",
+      "flow": {
+        "steps": {
+          "base": "Wydarzenie",
+          "schedule": "Kiedy",
+          "invites": "Osoby",
+          "review": "Podsumowanie",
+          "advanced": "Ustawienia zaawansowane"
+        },
+        "templateInUse": "Szablon: <b>{name}</b>",
+        "noTemplate": "Wydarzenie bez szablonu",
+        "changeTemplate": "Zmień szablon",
+        "chooseTemplate": "Wybierz szablon",
+        "backToReview": "Wróć do podsumowania",
+        "participantsCan": "Uczestnicy: {list}",
+        "none": "brak",
+        "recordingManual": "Dostępne: rozpoczyna się dopiero, gdy prowadzący naciśnie REC.",
+        "aiAfter": "Po nagraniu: {list}.",
+        "scheduleHeading": "Kiedy się odbywa",
+        "scheduleIntro": "Data, godzina i ilu osób się spodziewasz: służą do przygotowania sali.",
+        "advancedIntro": "Wartości już wybrane przez szablon: zmień tylko to, co potrzeba.",
+        "advancedIntroTemplate": "Wartości już wybrane przez szablon „{name}”: zmień tylko to, co potrzeba.",
+        "requiredToSave": "Potrzebne do zapisania wydarzenia.",
+        "requiredToPublish": "Potrzebne do opublikowania wydarzenia.",
+        "toComplete": "Do uzupełnienia",
+        "missingHeading": "Do publikacji brakuje jeszcze:",
+        "fieldOrganizerName": "Imię głównego organizatora",
+        "fieldOrganizerEmail": "E-mail głównego organizatora",
+        "capacityWarning": "Pojemność do sprawdzenia w szczegółach technicznych.",
+        "sections": {
+          "participation": "Udział i funkcje sali",
+          "recording": "Nagranie i AI",
+          "content": "Treści: materiały i ankiety",
+          "room": "Poczekalnia i obraz",
+          "data": "Prywatność, dane i strona po wydarzeniu",
+          "technical": "Szczegóły techniczne: pojemność i zasoby"
+        },
+        "formatInUse": "Format: <b>{name}</b>",
+        "changeFormat": "Zmień format",
+        "voiceAll": "Wszyscy mówią i pokazują się na wideo",
+        "voiceSpeakers": "Mówią i pokazują się na wideo prelegenci i prowadzący; publiczność pisze na czacie",
+        "features": "Funkcje: {list}",
+        "liveToggleNote": "Każdą funkcję można włączyć i wyłączyć także w trakcie wydarzenia.",
+        "customize": "Dostosuj ustawienia",
+        "changeLanguages": "Zmień języki",
+        "translationLine": "Tłumaczenie na: {list}",
+        "privacyTemplate": "Informacja o prywatności: {name}",
+        "privacyCustom": "Informacja o prywatności: tekst napisany dla wydarzenia",
+        "privacyDocument": "Informacja o prywatności: dokument wydarzenia",
+        "privacySite": "Informacja o prywatności: ta z witryny",
+        "untitled": "Wydarzenie bez tytułu",
+        "carriedOver": "Zachowaliśmy to, co napisałeś o wydarzeniu.",
+        "startOver": "Zacznij od nowa",
+        "accessOpen": "Każdy może się zapisać na stronie wydarzenia.",
+        "accessInvitation": "Tylko dla zaproszonych. Zaproszeni: {count}.",
+        "addInvitees": "Dodaj zaproszonych",
+        "change": "Zmień",
+        "askLine": "Przy zapisie pytamy o: {list}.",
+        "askName": "imię i nazwisko",
+        "askEmail": "e-mail",
+        "askOrganization": "instytucja",
+        "askRole": "stanowisko",
+        "askType": "rodzaj instytucji"
+      }
     },
     "nav": {
       "events": "Wydarzenia",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Strona statusu aktywna",
         "statusPageEnabledHelp": "Publikuje stronę statusu usługi. Po wyłączeniu strona nie istnieje, a jej dane widzą tylko administratorzy.",
         "guestAccessEnabled": "Dostęp gościnny aktywny",
-        "guestAccessEnabledHelp": "Osoby niezarejestrowane mogą dołączać do trwających wydarzeń, podając tylko imię. Po wyłączeniu do zaplanowanych wydarzeń można dołączyć tylko po rejestracji lub z linkiem moderatora albo prelegenta; wideorozmowy natychmiastowe pozostają otwarte dla każdego, kto ma link.",
+        "guestAccessEnabledHelp": "Osoby niezarejestrowane mogą dołączać do trwających wydarzeń, podając tylko imię. Po wyłączeniu do zaplanowanych wydarzeń można dołączyć tylko po rejestracji lub z linkiem moderatora albo prelegenta; wideorozmowy natychmiastowe pozostają otwarte dla każdego, kto ma link. Wydarzenie tylko dla zaproszonych nigdy nie wpuszcza gości.",
         "publicRegistrationEnabled": "Rejestracja publiczna aktywna",
-        "publicRegistrationEnabledHelp": "Każdy może rejestrować się na wydarzenia. Po wyłączeniu zarejestrować się mogą tylko osoby z listy zaproszonych na wydarzenie, a osobisty link do wejścia jest wysyłany wyłącznie e-mailem; osoby już zarejestrowane oraz linki moderatorów i prelegentów nadal działają.",
+        "publicRegistrationEnabledHelp": "Każdy może rejestrować się na wydarzenia. Po wyłączeniu zarejestrować się mogą tylko osoby z listy zaproszonych na wydarzenie, a osobisty link do wejścia jest wysyłany wyłącznie e-mailem; osoby już zarejestrowane oraz linki moderatorów i prelegentów nadal działają. To wybór proponowany nowym wydarzeniom: każde może zdecydować inaczej w kroku „Osoby”.",
         "calendarPublic": "Kalendarz publiczny",
         "calendarPublicHelp": "Opublikuj kalendarz wydarzeń. Odwiedzający mogą zobaczyć zaplanowane wydarzenia.",
         "parseTitleKicker": "Tytuły z nagłówkiem redakcyjnym",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Uczestnicy mogą włączyć mikrofon",
         "video": "Uczestnicy mogą włączyć wideo",
-        "screenShare": "Uczestnicy mogą udostępniać ekran"
+        "screenShare": "Uczestnicy mogą udostępniać ekran",
+        "openRegistration": "Zapisy otwarte dla wszystkich"
       },
       "fields": {
         "dataRetention": "Przechowywanie danych",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Wideo niedostępne",
       "openInNewTab": "Otwórz w nowej karcie"
+    },
+    "guided": {
+      "title": "Jakie jest Twoje wydarzenie?",
+      "intro": "Cztery pytania, aby zacząć z właściwymi ustawieniami. Każdą funkcję można też włączyć lub wyłączyć w trakcie wydarzenia.",
+      "peopleQ": "Ilu osób się spodziewasz?",
+      "people": {
+        "piccolo": "Do 20",
+        "medio": "Do 100",
+        "grande": "Ponad 100"
+      },
+      "peopleHint": "To szacunek do przygotowania sali, nie limit zapisów.",
+      "voiceQ": "Kto może mówić i pokazywać się na wideo?",
+      "voice": {
+        "all": "Wszyscy",
+        "allDesc": "Czat, mikrofon, wideo i ekran dla wszystkich",
+        "speakers": "Prelegenci i prowadzący",
+        "speakersDesc": "Publiczność pisze na czacie i zadaje pytania"
+      },
+      "recQ": "Chcesz mieć możliwość nagrywania?",
+      "rec": {
+        "yes": "Tak, gdy naciśniesz REC",
+        "yesDesc": "Po wydarzeniu: transkrypcja, podsumowanie i tłumaczenie",
+        "no": "Nie",
+        "noDesc": "Bez nagrania, bez zgody do zebrania"
+      },
+      "preview": "Twoje wydarzenie",
+      "previewPeople": "Oczekiwani uczestnicy: około {count}",
+      "continue": "Dalej",
+      "useTemplate": "Albo użyj szablonu",
+      "summary": {
+        "piccolo": "Do 20 osób",
+        "medio": "Do 100 osób",
+        "grande": "Ponad 100 osób",
+        "tutti": "wszyscy na wideo",
+        "relatori": "mówią prelegenci",
+        "si": "z nagraniem",
+        "no": "bez nagrania",
+        "openAccess": "otwarte dla wszystkich",
+        "inviteOnly": "tylko dla zaproszonych"
+      },
+      "accessQ": "Kto może wziąć udział?",
+      "access": {
+        "open": "Każdy, kto się zapisze",
+        "openDesc": "Kto chce, zapisuje się na stronie wydarzenia",
+        "invitation": "Tylko zaproszeni przez ciebie",
+        "invitationDesc": "Strona pozostaje widoczna, ale zapisać mogą się tylko zaproszeni; bez zapisu nie da się wejść"
+      },
+      "previewInvitation": "Zapisać mogą się tylko osoby, które zaprosisz; nikt nie wejdzie bez zapisu."
     }
   },
   "email": {

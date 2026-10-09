@@ -49,6 +49,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'permissionMatrix',
 
   // registration rules
+  'accessMode',
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
@@ -163,6 +164,9 @@ export function duplicatedConfig<T extends Record<string, unknown>>(
     if (value === null && JSON_FIELDS.has(field)) continue;
     out[field] = value;
   }
+  // La registrazione non parte mai da sola: la copia di un evento salvato con
+  // l'avvio automatico non lo eredita (la avvia chi conduce, con REC).
+  if (out.autoStartRecording !== undefined) out.autoStartRecording = false;
   // La matrice si salva normalizzata, come in ogni altra scrittura: una
   // sorgente salvata prima della regola avrebbe la colonna dei relatori
   // diversa da quella che il wizard mostra.

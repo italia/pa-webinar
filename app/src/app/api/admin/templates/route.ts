@@ -69,6 +69,8 @@ function toTemplateData<
   const { descriptionTemplate, permissionMatrix, ...rest } = d;
   return {
     ...rest,
+    // Un modello non avvia mai la registrazione da solo: la avvia chi conduce.
+    ...('autoStartRecording' in rest && { autoStartRecording: false }),
     ...(descriptionTemplate !== undefined && {
       descriptionTemplate:
         descriptionTemplate === null ? Prisma.DbNull : descriptionTemplate,

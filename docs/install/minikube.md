@@ -647,10 +647,11 @@ Compose stack.
 
 ### 3. Create a first event
 
-- **A scheduled event.** **New event** first offers the event templates;
-  **Configure manually** skips them. The wizard has five steps: **Basics**,
-  **Permissions**, **People**, **Content** and **Review**. Publishing needs a
-  moderator's name and email, entered in **Review**, used for the moderator
+- **A scheduled event.** **New event** first asks four questions on the
+  event's format (the saved templates stay in a folded list below them).
+  The wizard then has four steps, **Event**, **When**, **People** and
+  **Summary**, with **Advanced settings** apart. Publishing needs the lead
+  organizer's name and email, entered in **People**, used for the moderator
   link and the confirmation email; like every email of this setup, it lands
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands
   on the event's page in the administration area, which lists the
@@ -705,8 +706,8 @@ on the conference host first.
   Guests join without registering while the event is live.
 
 The **Invitations** list in the wizard sends nothing. It decides who may
-register when public registration is off, and you share the event link
-yourself.
+register when the event is open only to invitees, and you share the event
+link yourself.
 
 ### 6. Look around
 

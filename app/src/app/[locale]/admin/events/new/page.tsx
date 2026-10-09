@@ -13,7 +13,7 @@ import AdminPageHeader from '@/components/admin/admin-page-header';
 import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 interface CreateEventPageProps {
-  searchParams: Promise<{ template?: string; instant?: string }>;
+  searchParams: Promise<{ template?: string; instant?: string; formato?: string; scegli?: string }>;
 }
 
 export function generateMetadata() {
@@ -25,7 +25,7 @@ export default async function CreateEventPage({
 }: CreateEventPageProps) {
   // Creare eventi e' il mestiere dell'organizzatore (ADR-014).
   const session = await staffOLogin(await getLocale());
-  const { template: templateId, instant } = await searchParams;
+  const { template: templateId, instant, formato, scegli } = await searchParams;
 
   const [templates, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
@@ -114,6 +114,8 @@ export default async function CreateEventPage({
 
       <CreateEventWithTemplate
         initialInstant={instant === '1'}
+        formatoParam={formato ?? null}
+        scegliParam={scegli ?? null}
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
         siteTimezone={siteSettings.defaultTimezone}

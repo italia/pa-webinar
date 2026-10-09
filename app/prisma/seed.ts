@@ -27,19 +27,20 @@ async function main() {
   await prisma.eventTemplate.deleteMany({ where: { isSystem: false } });
 
   // Ensure system templates exist (idempotent — migration handles this, seed is a safety net).
-  // Gli stessi tre delle migrazioni 20261007150000_three_event_templates e
-  // 20261007233000_template_scenarios.
+  // I modelli di sistema delle migrazioni 20261007150000_three_event_templates,
+  // 20261007233000_template_scenarios, 20261010090000_template_registrazione_manuale
+  // e 20261010100000_template_formazione_stampa.
   const systemTemplates = [
     {
       name: 'Webinar pubblico',
       description:
-        "Per una grande platea, anche di centinaia di persone: moderatori e relatori in video con la condivisione dello schermo, il pubblico ascolta e partecipa con chat, domande (Q&A), sondaggi e agenda. La registrazione parte da sola; dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
+        "Per una grande platea, anche di centinaia di persone: moderatori e relatori in video con la condivisione dello schermo, il pubblico ascolta e partecipa con chat, domande (Q&A), sondaggi e agenda. La registrazione è disponibile e la avvia chi modera; se si registra, dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
       icon: 'it-presentation',
       qaEnabled: true,
       chatEnabled: true,
       agendaEnabled: true,
       recordingEnabled: true,
-      autoStartRecording: true,
+      autoStartRecording: false,
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
       participantsCanShareScreen: false,
@@ -91,6 +92,50 @@ async function main() {
       postEventPublic: true,
       isSystem: true,
       sortOrder: 2,
+    },
+    {
+      name: 'Corso di formazione',
+      description:
+        "Per un'aula virtuale di qualche decina di persone: chi partecipa può intervenire con microfono e webcam, fare domande (Q&A) e rispondere alle domande «In una parola», con l'agenda del corso. La registrazione è disponibile e la avvia chi conduce; se si registra, dopo il corso trascrizione, sintesi e traduzioni. La pagina dopo il corso non è pubblica.",
+      icon: 'it-file-slides',
+      qaEnabled: true,
+      chatEnabled: true,
+      agendaEnabled: true,
+      wordCloudEnabled: true,
+      recordingEnabled: true,
+      participantsCanUnmute: true,
+      participantsCanStartVideo: true,
+      participantsCanShareScreen: false,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
+      maxParticipants: 50,
+      defaultDurationMinutes: 120,
+      postEventPublic: false,
+      isSystem: true,
+      sortOrder: 3,
+    },
+    {
+      name: 'Conferenza stampa',
+      description:
+        "Per presentare una notizia ai giornalisti: relatori in video con la condivisione dello schermo, chi partecipa fa domande per iscritto (Q&A e chat) e chi modera dà la parola. La registrazione è disponibile e la avvia chi modera; se si registra, dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
+      icon: 'it-horn',
+      qaEnabled: true,
+      chatEnabled: true,
+      recordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
+      maxParticipants: 150,
+      defaultDurationMinutes: 60,
+      postEventPublic: true,
+      isSystem: true,
+      sortOrder: 4,
     },
   ];
   for (const tmpl of systemTemplates) {

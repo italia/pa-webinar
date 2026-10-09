@@ -733,7 +733,7 @@
       "updateEvent": "Evenement bijwerken",
       "step1": {
         "heading": "Basisinformatie",
-        "intro": "Titel, beschrijving, afbeelding en agenda van het evenement.",
+        "intro": "Titel, beschrijving en afbeelding van het evenement.",
         "coverImage": "Omslagafbeelding",
         "coverImageHelp": "Getoond op de openbare site en in de e-mails aan ingeschrevenen.",
         "scheduleHeading": "Agenda",
@@ -742,8 +742,6 @@
         "tagsHeading": "Categorieën (tags)",
         "waitingRoomAudio": "Audio wachtruimte (optioneel)",
         "waitingRoomAudioHelp": "Wordt afgespeeld voordat de videocall begint.",
-        "parseTitleKickerLabel": "Titel met bovenkop (scheidingsteken |)",
-        "parseTitleKickerHelp": "Indien actief wordt een titel als 'CONFERENTIE | Digitale innovatie' weergegeven met CONFERENTIE als bovenkop.",
         "maxParticipantsHelp": "Een schatting van het verwachte aantal personen: hiermee wordt de videoserver gedimensioneerd, het beperkt de inschrijvingen niet.",
         "validation": {
           "startsAt": "Ongeldige startdatum.",
@@ -773,7 +771,11 @@
           "HIGH": "Hoog (720p, aanbevolen)",
           "BALANCED": "Gebalanceerd (540p)",
           "SAVE_DATA": "Databesparing (360p)"
-        }
+        },
+        "requiredLegend": "Velden met * zijn nodig om het evenement op te slaan: zolang ze leeg zijn, staat het bij elk veld.",
+        "kickerHint": "Voor een bovenregel schrijft u die vóór de titel en scheidt u ze met |, bijvoorbeeld ‘Reeks bijeenkomsten | De eerste bijeenkomst’.",
+        "kickerUse": "‘{kicker}’ als bovenregel tonen",
+        "kickerPreview": "Zo ziet het eruit op de evenementpagina"
       },
       "step2": {
         "heading": "Wie mag wat",
@@ -832,7 +834,8 @@
             "name": "Deelnemer",
             "desc": "Volgt het evenement en doet mee zoals u in de tabel hieronder bepaalt."
           }
-        }
+        },
+        "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -864,7 +867,7 @@
         "personName": "Naam",
         "personEmail": "E-mail",
         "peopleHeading": "Personen van het evenement",
-        "peopleHelp": "Organisatoren, moderatoren en sprekers. Ieder krijgt een eigen link om met de eigen rol deel te nemen; wat elke rol mag, staat in de stap ‘Rechten’.",
+        "peopleHelp": "Organisatoren, moderatoren en sprekers. Ieder krijgt een eigen link om met de eigen rol deel te nemen; wat elke rol mag, staat in ‘Geavanceerde instellingen’.",
         "personRole": "Rol",
         "roleOrganizer": "Organisator",
         "roleModerator": "Moderator",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Optioneel: de lijst van personen die u uitnodigt. De inschrijving is open, dus na publicatie kan iedereen zich inschrijven, uitgenodigd of niet. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf.",
         "invitationsHelpRestricted": "De inschrijving is beperkt: alleen de adressen op deze lijst kunnen zich inschrijven. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf; de link om binnen te komen volgt na inschrijving per e-mail.",
         "logoExternal": "De openbare pagina toont alleen logo's die naar dit platform zijn geüpload: een logo van een andere website wordt niet getoond.",
-        "primaryProfileInvalid": "Controleer de organisatie en het adres van het logo."
+        "primaryProfileInvalid": "Controleer de organisatie en het adres van het logo.",
+        "primaryMore": "Organisatie, logo en openbare pagina",
+        "accessHeading": "Wie zich aanmeldt",
+        "accessSiteDefault": "Volgt de instelling van de site: als het beheer die wijzigt, geldt dat ook voor dit evenement.",
+        "accessNoInvitees": "Nog geen genodigden: zolang de lijst hieronder leeg is, kan niemand zich aanmelden.",
+        "askHeading": "Wat we vragen bij de aanmelding",
+        "askAlways": "Naam en e-mail, altijd. Daarnaast, als je het nodig hebt:",
+        "askOrganization": "Organisatie (verplicht om je aan te melden)",
+        "askRole": "Functie (optioneel)",
+        "askType": "Soort organisatie (optioneel)",
+        "accessStaffOnly": "Wie zich aanmeldt, beslist het team van het evenement."
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Overzicht en publicatie",
-        "intro": "Controleer de gegevens en publiceer het evenement (of sla op als concept).",
+        "intro": "Het evenement zoals anderen het zien: controleer het en publiceer het of sla het op als concept.",
         "summary": {
           "title": "Titel",
           "schedule": "Agenda",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement.",
       "toFix": "Te corrigeren:",
       "toFixField": "Veld {n}",
-      "stepsAriaLabel": "Stappen van het evenementformulier"
+      "stepsAriaLabel": "Stappen van het evenementformulier",
+      "flow": {
+        "steps": {
+          "base": "Evenement",
+          "schedule": "Wanneer",
+          "invites": "Personen",
+          "review": "Overzicht",
+          "advanced": "Geavanceerde instellingen"
+        },
+        "templateInUse": "Sjabloon: <b>{name}</b>",
+        "noTemplate": "Evenement zonder sjabloon",
+        "changeTemplate": "Sjabloon wijzigen",
+        "chooseTemplate": "Kies een sjabloon",
+        "backToReview": "Terug naar het overzicht",
+        "participantsCan": "Deelnemers: {list}",
+        "none": "geen",
+        "recordingManual": "Beschikbaar: start pas wanneer een gespreksleider op REC drukt.",
+        "aiAfter": "Na de opname: {list}.",
+        "scheduleHeading": "Wanneer het plaatsvindt",
+        "scheduleIntro": "Datum, tijd en hoeveel mensen je verwacht: daarmee wordt de zaal voorbereid.",
+        "advancedIntro": "Waarden die het sjabloon al heeft gekozen: wijzig alleen wat nodig is.",
+        "advancedIntroTemplate": "Waarden die het sjabloon ‘{name}’ al heeft gekozen: wijzig alleen wat nodig is.",
+        "requiredToSave": "Nodig om het evenement op te slaan.",
+        "requiredToPublish": "Nodig om het evenement te publiceren.",
+        "toComplete": "Nog in te vullen",
+        "missingHeading": "Om te publiceren ontbreekt nog:",
+        "fieldOrganizerName": "Naam van de hoofdorganisator",
+        "fieldOrganizerEmail": "E-mail van de hoofdorganisator",
+        "capacityWarning": "Capaciteit te controleren in de technische details.",
+        "sections": {
+          "participation": "Deelname en functies van de zaal",
+          "recording": "Opname en AI",
+          "content": "Inhoud: materiaal en vragenlijsten",
+          "room": "Wachtruimte en video",
+          "data": "Privacy, gegevens en pagina na het evenement",
+          "technical": "Technische details: capaciteit en middelen"
+        },
+        "formatInUse": "Formaat: <b>{name}</b>",
+        "changeFormat": "Formaat wijzigen",
+        "voiceAll": "Iedereen spreekt en komt in beeld",
+        "voiceSpeakers": "Sprekers en gespreksleiders spreken en komen in beeld; het publiek schrijft in de chat",
+        "features": "Functies: {list}",
+        "liveToggleNote": "Elke functie kan ook tijdens het evenement aan en uit.",
+        "customize": "Instellingen aanpassen",
+        "changeLanguages": "Talen wijzigen",
+        "translationLine": "Vertaling in: {list}",
+        "privacyTemplate": "Privacyverklaring: {name}",
+        "privacyCustom": "Privacyverklaring: tekst geschreven voor het evenement",
+        "privacyDocument": "Privacyverklaring: document van het evenement",
+        "privacySite": "Privacyverklaring: die van de site",
+        "untitled": "Evenement zonder titel",
+        "carriedOver": "We hebben overgenomen wat je voor het evenement had geschreven.",
+        "startOver": "Opnieuw beginnen",
+        "accessOpen": "Iedereen kan zich aanmelden via de evenementpagina.",
+        "accessInvitation": "Alleen op uitnodiging. Genodigden: {count}.",
+        "addInvitees": "Genodigden toevoegen",
+        "change": "Wijzigen",
+        "askLine": "Bij de aanmelding vragen we: {list}.",
+        "askName": "naam",
+        "askEmail": "e-mail",
+        "askOrganization": "organisatie",
+        "askRole": "functie",
+        "askType": "soort organisatie"
+      }
     },
     "nav": {
       "events": "Evenementen",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Statuspagina actief",
         "statusPageEnabledHelp": "Publiceert de servicestatuspagina. Indien uitgeschakeld bestaat de pagina niet en zijn de gegevens alleen zichtbaar voor beheerders.",
         "guestAccessEnabled": "Gasttoegang actief",
-        "guestAccessEnabledHelp": "Wie niet is ingeschreven, kan lopende evenementen bijwonen met alleen een naam. Indien uitgeschakeld, is deelname aan geplande evenementen alleen mogelijk met een inschrijving of met een moderator- of sprekerslink; directe videogesprekken blijven open voor iedereen met de link.",
+        "guestAccessEnabledHelp": "Wie niet is ingeschreven, kan lopende evenementen bijwonen met alleen een naam. Indien uitgeschakeld, is deelname aan geplande evenementen alleen mogelijk met een inschrijving of met een moderator- of sprekerslink; directe videogesprekken blijven open voor iedereen met de link. Een evenement alleen op uitnodiging laat nooit gasten zonder aanmelding toe.",
         "publicRegistrationEnabled": "Publieke inschrijving actief",
-        "publicRegistrationEnabledHelp": "Iedereen kan zich inschrijven voor evenementen. Indien uitgeschakeld, kunnen alleen personen op de uitnodigingslijst van het evenement zich inschrijven en wordt de persoonlijke link om deel te nemen alleen per e-mail verstuurd; bestaande inschrijvingen en moderator- en sprekerslinks blijven werken.",
+        "publicRegistrationEnabledHelp": "Iedereen kan zich inschrijven voor evenementen. Indien uitgeschakeld, kunnen alleen personen op de uitnodigingslijst van het evenement zich inschrijven en wordt de persoonlijke link om deel te nemen alleen per e-mail verstuurd; bestaande inschrijvingen en moderator- en sprekerslinks blijven werken. Dit is de keuze die nieuwe evenementen voorgesteld krijgen: elk evenement kan in de stap ‘Personen’ anders kiezen.",
         "calendarPublic": "Openbare kalender",
         "calendarPublicHelp": "De evenementenkalender publiceren. Bezoekers kunnen geplande evenementen zien.",
         "parseTitleKicker": "Titels met redactionele kicker",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",
         "video": "Deelnemers kunnen video starten",
-        "screenShare": "Deelnemers kunnen scherm delen"
+        "screenShare": "Deelnemers kunnen scherm delen",
+        "openRegistration": "Aanmelding open voor iedereen"
       },
       "fields": {
         "dataRetention": "Bewaartermijn gegevens",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Video niet beschikbaar",
       "openInNewTab": "Openen in een nieuw tabblad"
+    },
+    "guided": {
+      "title": "Hoe ziet je evenement eruit?",
+      "intro": "Vier vragen om te beginnen met de juiste instellingen. Elke functie kan ook tijdens het evenement aan- of uitgezet worden.",
+      "peopleQ": "Hoeveel mensen verwacht je?",
+      "people": {
+        "piccolo": "Tot 20",
+        "medio": "Tot 100",
+        "grande": "Meer dan 100"
+      },
+      "peopleHint": "Het is een schatting om de zaal voor te bereiden, geen limiet op inschrijvingen.",
+      "voiceQ": "Wie mag spreken en in beeld komen?",
+      "voice": {
+        "all": "Iedereen",
+        "allDesc": "Chat, microfoon, video en scherm voor iedereen",
+        "speakers": "Sprekers en gespreksleiders",
+        "speakersDesc": "Het publiek schrijft in de chat en stelt vragen"
+      },
+      "recQ": "Wil je kunnen opnemen?",
+      "rec": {
+        "yes": "Ja, wanneer je op REC drukt",
+        "yesDesc": "Na het evenement: transcriptie, samenvatting en vertaling",
+        "no": "Nee",
+        "noDesc": "Geen opname, geen toestemming te vragen"
+      },
+      "preview": "Je evenement",
+      "previewPeople": "Verwachte deelnemers: ongeveer {count}",
+      "continue": "Doorgaan",
+      "useTemplate": "Of gebruik een sjabloon",
+      "summary": {
+        "piccolo": "Tot 20 personen",
+        "medio": "Tot 100 personen",
+        "grande": "Meer dan 100 personen",
+        "tutti": "iedereen in beeld",
+        "relatori": "sprekers aan het woord",
+        "si": "met opname",
+        "no": "zonder opname",
+        "openAccess": "open voor iedereen",
+        "inviteOnly": "alleen op uitnodiging"
+      },
+      "accessQ": "Wie kan deelnemen?",
+      "access": {
+        "open": "Iedereen die zich aanmeldt",
+        "openDesc": "Wie wil, meldt zich aan via de evenementpagina",
+        "invitation": "Alleen wie je uitnodigt",
+        "invitationDesc": "De pagina blijft zichtbaar, maar alleen genodigden kunnen zich aanmelden; zonder aanmelding kom je er niet in"
+      },
+      "previewInvitation": "Alleen wie je uitnodigt kan zich aanmelden; zonder aanmelding komt niemand binnen."
     }
   },
   "email": {

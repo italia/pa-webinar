@@ -24,7 +24,7 @@ import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { csvText } from '@/lib/utils/csv';
 import { eventAdminPath } from '@/lib/events/admin-links';
-import type { WizardStep } from '@/lib/events/wizard-steps';
+import type { WizardAdvancedSection, WizardStep } from '@/lib/events/wizard-steps';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import {
@@ -169,6 +169,9 @@ interface EventData {
   recordingNotifyEnabled: boolean;
   recordingNotifiedAt: string | null;
   feedbackEnabled: boolean; recordingConsentText: string | null;
+  accessMode: 'OPEN' | 'INVITATION' | null;
+  /** Si iscrive chiunque (scelta dell'evento, o del sito). */
+  registrationOpen: boolean;
   requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
   moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
   jitsiRoomName: string; dataRetentionDays: number;
@@ -300,8 +303,8 @@ export default function EventManagementClient({
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = eventAdminPath(event.id, { edit: true, viaToken });
   // La modifica aperta sul passo che riguarda cio' che si sta guardando.
-  const editUrlAt = (step: WizardStep) =>
-    eventAdminPath(event.id, { edit: true, viaToken, step });
+  const editUrlAt = (step: WizardStep, section?: WizardAdvancedSection) =>
+    eventAdminPath(event.id, { edit: true, viaToken, step, section });
 
   // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
   // conduzione, e da partecipante, dalla stessa porta del pubblico — per
@@ -885,7 +888,7 @@ function TabNav({ active, onChange, t }: {
 // ── Tabs ──
 function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
   event: EventData; description: string; locale: string;
-  editUrlAt: (step: WizardStep) => string;
+  editUrlAt: (step: WizardStep, section?: WizardAdvancedSection) => string;
   publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
   instant: boolean;
 }) {
@@ -895,13 +898,25 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
   const t = useTranslations('admin');
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  const toggles: { label: string; value: boolean }[] = [
+  // Una voce puo' portare dove si cambia, se non e' fra le funzioni della sala.
+  const toggles: { label: string; value: boolean; href?: string }[] = [
     { label: te('manage.toggleChat'), value: event.chatEnabled },
     { label: te('manage.toggleQa'), value: event.qaEnabled },
     { label: te('manage.toggleRecording'), value: event.recordingEnabled },
     { label: td('toggles.unmute'), value: event.participantsCanUnmute },
     { label: td('toggles.video'), value: event.participantsCanStartVideo },
     { label: td('toggles.screenShare'), value: event.participantsCanShareScreen },
+    // Una chiamata rapida non ha iscrizione: il link e' l'invito.
+    // Si cambia nel passo «Persone», non con le funzioni della sala.
+    ...(instant
+      ? []
+      : [
+          {
+            label: td('toggles.openRegistration'),
+            value: event.registrationOpen,
+            href: editUrlAt('invites'),
+          },
+        ]),
   ];
 
   return (
@@ -916,7 +931,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={percorso(editUrlAt('permissions'))}
+          <Link href={percorso(editUrlAt('advanced', 'participation'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -929,7 +944,11 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
               <span style={{ color: toggle.value ? C_SUCCESS : C_DANGER, flexShrink: 0 }}>
                 <Svg name={toggle.value ? 'check' : 'x'} size={14} />
               </span>
-              <span>{toggle.label}</span>
+              {toggle.href ? (
+                <Link href={percorso(toggle.href)}>{toggle.label}</Link>
+              ) : (
+                <span>{toggle.label}</span>
+              )}
             </div>
           ))}
         </div>
@@ -965,7 +984,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
           icon="it-lock"
         >
         <div className="d-flex justify-content-end mb-3">
-          <Link href={percorso(editUrlAt('review'))}
+          <Link href={percorso(editUrlAt('advanced', 'data'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>

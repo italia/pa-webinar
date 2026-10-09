@@ -43,11 +43,12 @@ account that acted. [ADR-015](adr/015-named-administrators.md)
 
 **Guest** (UI **Guest**): a person who joins a live event with only a typed
 name, without registering (seat `guest-…`). Guests enter a scheduled event
-only while it is `LIVE`, and only while the site setting **Guest access
-enabled** is on; an instant call admits them whatever the setting, also while
-it warms up. Two other things share the word: the role `GUEST` on an
-invitation-list entry, and the `GUEST` column of the permission matrix, which
-stands for the whole audience.
+only while it is `LIVE`, only while the site setting **Guest access
+enabled** is on, and never when the event is open only to invitees; an
+instant call admits them whatever the setting, also while it warms up. Two
+other things share the word: the role `GUEST` on an invitation-list entry,
+and the `GUEST` column of the permission matrix, which stands for the whole
+audience.
 [Identity, access and tokens](architecture/identity-and-access.md)
 
 **Instance API key** (`ADMIN_API_KEY`, UI **Sign in with the instance key**):
@@ -227,8 +228,10 @@ retention, description) that pre-fills the event wizard. Every field stays
 editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
-**Event wizard**: the five-step form that creates or edits an event:
-**Basics**, **People**, **Permissions**, **Content** and **Review**.
+**Event wizard**: the form that creates or edits an event, after four
+questions on its format: four steps (**Event**, **When**, **People**,
+**Summary**) and the **Advanced settings** with what the format or template
+has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -240,9 +243,12 @@ separate entity in the data model. [Roadmap](ROADMAP.md)
 **Invitation** (`EventInvitation`, UI **Invitations**): an entry in an
 event's invitation list, staged in the wizard's **People** step with role
 `GUEST` or `SPEAKER` and optionally linked to an address-book person. The
-platform sends no invitation email. With **Public registration enabled** off,
-the list is the set of addresses allowed to register (invitation-only
-registration).
+platform sends no invitation email. Each event chooses who can take part
+(`accessMode`, UI **Who registers**): **Anyone who registers** or **Only
+people you invite**; an event without a choice follows **Public registration
+enabled**. When only invitees can take part, the list is the set of addresses
+allowed to register (invitation-only registration), and an event that chose
+it admits no guests.
 [From creation to recap](architecture/event-journey.md#invitations-and-named-grants)
 
 **Join password** (`joinPasswordHash`): an optional per-event password asked
@@ -269,7 +275,7 @@ can link an occurrence to the first event of its series through
 `recurrenceSeriesId`; the administration UI does not set this link.
 [From creation to recap](architecture/event-journey.md)
 
-**Permission matrix** (`permissionMatrix`, wizard step **Permissions**): the
+**Permission matrix** (`permissionMatrix`, wizard advanced settings, section **Participation and room features**): the
 role-by-feature table (chat, Q&A, microphone, camera, screen share, recording
 control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
 `GUEST` column is chosen and applied: moderators can always do everything,
@@ -345,7 +351,7 @@ bring the square back. `GARDEN` is a legacy value treated as `GAME`.
 **Waiting-room music** (`waitingRoomAudioUrl`, UI **Waiting-room audio
 (optional)**): audio a visitor can switch on in the waiting room while the
 event is `PUBLISHED`. It is offered only when the event has its own audio
-(upload or URL in the wizard's **Basics** step), and nothing plays until the
+(upload or URL in the wizard's advanced settings, **Waiting room and video**), and nothing plays until the
 visitor presses **Enable music**.
 [The waiting room and the square](architecture/waiting-room.md#waiting-room-music)
 
@@ -971,16 +977,17 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Template eventi | **Event templates** | event template (`EventTemplate`) |
-| Base | **Basics** | event wizard, step 1 |
-| Persone | **People** | event wizard, step 2 |
-| Permessi | **Permissions** | event wizard, step 3 (roles and permission matrix) |
-| Contenuti | **Content** | event wizard, step 4 |
-| Riepilogo | **Review** | event wizard, step 5 |
+| Evento | **Event** | event wizard, step 1 |
+| Quando | **When** | event wizard, step 2 |
+| Persone | **People** | event wizard, step 3 |
+| Riepilogo | **Summary** | event wizard, step 4 |
+| Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
 | Duplica per la prossima | **Duplicate for next time** | duplicate as the next occurrence |
 | Iscrizioni | **Sign-ups** | registrations (`Registration`) |
 | Registrazione all'evento | **Event registration** | registration (never "recording") |
 | Inviti | **Invitations** | invitations (`EventInvitation`) |
+| Chi si iscrive | **Who registers** | who can take part (`Event.accessMode`) |
 | Notifiche | **Notifications** | reminders (`EventReminder`) |
 | Questionari | **Questionnaires** | questionnaires |
 | Questionario di pre-registrazione | **Pre-registration questionnaire** | pre-registration questionnaire (`PRE_REGISTRATION`) |

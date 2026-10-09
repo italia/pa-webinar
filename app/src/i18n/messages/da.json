@@ -733,7 +733,7 @@
       "updateEvent": "Opdater arrangement",
       "step1": {
         "heading": "Grundlæggende oplysninger",
-        "intro": "Titel, beskrivelse, billede og tidsplan for arrangementet.",
+        "intro": "Arrangementets titel, beskrivelse og billede.",
         "coverImage": "Forsidebillede",
         "coverImageHelp": "Vises på det offentlige websted og i e-mails til tilmeldte.",
         "scheduleHeading": "Tidsplan",
@@ -742,8 +742,6 @@
         "tagsHeading": "Kategorier (tags)",
         "waitingRoomAudio": "Lyd i venteområde (valgfri)",
         "waitingRoomAudioHelp": "Afspilles før videokaldet starter.",
-        "parseTitleKickerLabel": "Titel med overtitel (separator |)",
-        "parseTitleKickerHelp": "Når aktiveret, vises en titel som 'KONFERENCE | Digital innovation' med KONFERENCE som overtitel.",
         "maxParticipantsHelp": "Et skøn over det forventede antal personer: det bruges til at dimensionere videoserveren og begrænser ikke tilmeldingerne.",
         "validation": {
           "startsAt": "Ugyldig startdato.",
@@ -773,7 +771,11 @@
           "HIGH": "Høj (720p, anbefales)",
           "BALANCED": "Balanceret (540p)",
           "SAVE_DATA": "Databesparelse (360p)"
-        }
+        },
+        "requiredLegend": "Felter markeret med * kræves for at gemme arrangementet: så længe de er tomme, står det ved hvert felt.",
+        "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
+        "kickerUse": "Vis »{kicker}« som overlinje",
+        "kickerPreview": "Sådan ser den ud på arrangementets side"
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -832,7 +834,8 @@
             "name": "Deltager",
             "desc": "Følger arrangementet og deltager, som du bestemmer i tabellen nedenfor."
           }
-        }
+        },
+        "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -864,7 +867,7 @@
         "personName": "Navn",
         "personEmail": "E-mail",
         "peopleHeading": "Arrangementets personer",
-        "peopleHelp": "Arrangører, moderatorer og talere. Hver får sit eget link til at deltage med sin rolle; hvad hver rolle kan, vises i trinnet “Tilladelser”.",
+        "peopleHelp": "Arrangører, moderatorer og talere. Hver får sit eget link til at deltage med sin rolle; hvad hver rolle kan, vises under “Avancerede indstillinger”.",
         "personRole": "Rolle",
         "roleOrganizer": "Arrangør",
         "roleModerator": "Moderator",
@@ -884,7 +887,17 @@
         "invitationsHelpOpen": "Valgfrit: listen over de personer, du inviterer. Tilmeldingen er åben, så efter offentliggørelse kan alle tilmelde sig, inviteret eller ej. Platformen sender ingen invitationer: del selv linket til arrangementet.",
         "invitationsHelpRestricted": "Tilmeldingen er begrænset: kun adresserne på denne liste kan tilmelde sig. Platformen sender ingen invitationer: del selv linket til arrangementet; linket til at deltage kommer på e-mail efter tilmelding.",
         "logoExternal": "Den offentlige side viser kun logoer, der er uploadet til denne platform: et logo fra et andet websted vises ikke.",
-        "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse."
+        "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse.",
+        "primaryMore": "Organisation, logo og offentlig side",
+        "accessHeading": "Hvem tilmelder sig",
+        "accessSiteDefault": "Følger webstedets indstilling: hvis administrationen ændrer den, gælder det også dette arrangement.",
+        "accessNoInvitees": "Ingen inviterede endnu: så længe listen nedenfor er tom, kan ingen tilmelde sig.",
+        "askHeading": "Hvad vi beder om ved tilmelding",
+        "askAlways": "Navn og e-mail, altid. Derudover, hvis du har brug for det:",
+        "askOrganization": "Organisation (krævet for at tilmelde sig)",
+        "askRole": "Rolle (valgfri)",
+        "askType": "Organisationstype (valgfri)",
+        "accessStaffOnly": "Hvem der tilmelder sig, bestemmer arrangementets team."
       },
       "step4": {
         "heading": "Indhold og materialer",
@@ -932,7 +945,7 @@
       },
       "step5": {
         "heading": "Oversigt og udgivelse",
-        "intro": "Kontrollér oplysningerne, og udgiv arrangementet (eller gem som kladde).",
+        "intro": "Arrangementet, som andre vil se det: tjek det, og offentliggør det eller gem det som kladde.",
         "summary": {
           "title": "Titel",
           "schedule": "Tidsplan",
@@ -991,7 +1004,70 @@
       "publishFailedDetail": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Serveren svarede: {reason}. Offentliggør det fra arrangementets side.",
       "toFix": "Skal rettes:",
       "toFixField": "Felt {n}",
-      "stepsAriaLabel": "Trin i formularen til begivenheden"
+      "stepsAriaLabel": "Trin i formularen til begivenheden",
+      "flow": {
+        "steps": {
+          "base": "Arrangement",
+          "schedule": "Hvornår",
+          "invites": "Personer",
+          "review": "Oversigt",
+          "advanced": "Avancerede indstillinger"
+        },
+        "templateInUse": "Skabelon: <b>{name}</b>",
+        "noTemplate": "Arrangement uden skabelon",
+        "changeTemplate": "Skift skabelon",
+        "chooseTemplate": "Vælg en skabelon",
+        "backToReview": "Tilbage til oversigten",
+        "participantsCan": "Deltagere: {list}",
+        "none": "ingen",
+        "recordingManual": "Tilgængelig: starter først, når en ordstyrer trykker på REC.",
+        "aiAfter": "Efter optagelsen: {list}.",
+        "scheduleHeading": "Hvornår det finder sted",
+        "scheduleIntro": "Dato, klokkeslæt og hvor mange du forventer: de bruges til at forberede rummet.",
+        "advancedIntro": "Værdier, som skabelonen allerede har valgt: ret kun det, der er brug for.",
+        "advancedIntroTemplate": "Værdier, som skabelonen »{name}« allerede har valgt: ret kun det, der er brug for.",
+        "requiredToSave": "Kræves for at gemme arrangementet.",
+        "requiredToPublish": "Kræves for at offentliggøre arrangementet.",
+        "toComplete": "Mangler",
+        "missingHeading": "For at offentliggøre mangler stadig:",
+        "fieldOrganizerName": "Hovedarrangørens navn",
+        "fieldOrganizerEmail": "Hovedarrangørens e-mail",
+        "capacityWarning": "Kapacitet skal tjekkes i de tekniske detaljer.",
+        "sections": {
+          "participation": "Deltagelse og rummets funktioner",
+          "recording": "Optagelse og AI",
+          "content": "Indhold: materialer og spørgeskemaer",
+          "room": "Venterum og video",
+          "data": "Privatliv, data og siden efter arrangementet",
+          "technical": "Tekniske detaljer: kapacitet og ressourcer"
+        },
+        "formatInUse": "Format: <b>{name}</b>",
+        "changeFormat": "Skift format",
+        "voiceAll": "Alle taler og vises på video",
+        "voiceSpeakers": "Talere og ordstyrere taler og vises på video; publikum skriver i chatten",
+        "features": "Funktioner: {list}",
+        "liveToggleNote": "Hver funktion kan også slås til og fra under arrangementet.",
+        "customize": "Tilpas indstillingerne",
+        "changeLanguages": "Skift sprog",
+        "translationLine": "Oversættelse til: {list}",
+        "privacyTemplate": "Privatlivsmeddelelse: {name}",
+        "privacyCustom": "Privatlivsmeddelelse: tekst skrevet til arrangementet",
+        "privacyDocument": "Privatlivsmeddelelse: arrangementets dokument",
+        "privacySite": "Privatlivsmeddelelse: sidens",
+        "untitled": "Arrangement uden titel",
+        "carriedOver": "Vi har beholdt det, du havde skrevet om arrangementet.",
+        "startOver": "Start forfra",
+        "accessOpen": "Alle kan tilmelde sig fra arrangementets side.",
+        "accessInvitation": "Kun for inviterede. Inviterede: {count}.",
+        "addInvitees": "Tilføj inviterede",
+        "change": "Skift",
+        "askLine": "Ved tilmelding beder vi om: {list}.",
+        "askName": "navn",
+        "askEmail": "e-mail",
+        "askOrganization": "organisation",
+        "askRole": "rolle",
+        "askType": "organisationstype"
+      }
     },
     "nav": {
       "events": "Begivenheder",
@@ -1775,9 +1851,9 @@
         "statusPageEnabled": "Statusside aktiveret",
         "statusPageEnabledHelp": "Offentliggør tjenestens statusside. Når den er slået fra, findes siden ikke, og dens data kan kun ses af administratorer.",
         "guestAccessEnabled": "Gæsteadgang aktiveret",
-        "guestAccessEnabledHelp": "Personer, der ikke er tilmeldt, kan deltage i igangværende begivenheder alene med deres navn. Når det er slået fra, kan man kun deltage i planlagte begivenheder med tilmelding eller med et moderator- eller oplægsholderlink; øjeblikkelige videoopkald forbliver åbne for alle med linket.",
+        "guestAccessEnabledHelp": "Personer, der ikke er tilmeldt, kan deltage i igangværende begivenheder alene med deres navn. Når det er slået fra, kan man kun deltage i planlagte begivenheder med tilmelding eller med et moderator- eller oplægsholderlink; øjeblikkelige videoopkald forbliver åbne for alle med linket. Et arrangement kun for inviterede lukker aldrig gæster ind.",
         "publicRegistrationEnabled": "Offentlig registrering aktiveret",
-        "publicRegistrationEnabledHelp": "Alle kan tilmelde sig begivenheder. Når det er slået fra, kan kun personer på begivenhedens invitationsliste tilmelde sig, og det personlige link til at deltage sendes kun via e-mail; allerede tilmeldte og moderator- og oplægsholderlinks virker fortsat.",
+        "publicRegistrationEnabledHelp": "Alle kan tilmelde sig begivenheder. Når det er slået fra, kan kun personer på begivenhedens invitationsliste tilmelde sig, og det personlige link til at deltage sendes kun via e-mail; allerede tilmeldte og moderator- og oplægsholderlinks virker fortsat. Det er valget, der foreslås for nye arrangementer: hvert arrangement kan vælge anderledes i trinnet “Personer”.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Offentliggør begivenhedskalenderen. Besøgende kan se planlagte begivenheder.",
         "parseTitleKicker": "Titler med redaktionel kicker",
@@ -2394,7 +2470,8 @@
       "toggles": {
         "unmute": "Deltagere kan slå mikrofonen til",
         "video": "Deltagere kan starte video",
-        "screenShare": "Deltagere kan dele skærm"
+        "screenShare": "Deltagere kan dele skærm",
+        "openRegistration": "Tilmelding åben for alle"
       },
       "fields": {
         "dataRetention": "Dataopbevaring",
@@ -3000,6 +3077,54 @@
     "videoPlayer": {
       "unavailable": "Videoen er ikke tilgængelig",
       "openInNewTab": "Åbn i en ny fane"
+    },
+    "guided": {
+      "title": "Hvordan er dit arrangement?",
+      "intro": "Fire spørgsmål for at starte med de rigtige indstillinger. Alle funktioner kan også slås til og fra under arrangementet.",
+      "peopleQ": "Hvor mange personer forventer du?",
+      "people": {
+        "piccolo": "Op til 20",
+        "medio": "Op til 100",
+        "grande": "Over 100"
+      },
+      "peopleHint": "Det er et skøn til at forberede rummet, ikke en grænse for tilmeldinger.",
+      "voiceQ": "Hvem må tale og vises på video?",
+      "voice": {
+        "all": "Alle",
+        "allDesc": "Chat, mikrofon, video og skærm for alle",
+        "speakers": "Talere og ordstyrere",
+        "speakersDesc": "Publikum skriver i chatten og stiller spørgsmål"
+      },
+      "recQ": "Vil du kunne optage?",
+      "rec": {
+        "yes": "Ja, når du trykker på REC",
+        "yesDesc": "Efter arrangementet: transskription, resumé og oversættelse",
+        "no": "Nej",
+        "noDesc": "Ingen optagelse, intet samtykke at indhente"
+      },
+      "preview": "Dit arrangement",
+      "previewPeople": "Forventede deltagere: ca. {count}",
+      "continue": "Fortsæt",
+      "useTemplate": "Eller brug en skabelon",
+      "summary": {
+        "piccolo": "Op til 20 personer",
+        "medio": "Op til 100 personer",
+        "grande": "Over 100 personer",
+        "tutti": "alle på video",
+        "relatori": "talerne taler",
+        "si": "med optagelse",
+        "no": "uden optagelse",
+        "openAccess": "åbent for alle",
+        "inviteOnly": "kun for inviterede"
+      },
+      "accessQ": "Hvem kan deltage?",
+      "access": {
+        "open": "Alle, der tilmelder sig",
+        "openDesc": "Alle, der vil, tilmelder sig fra arrangementets side",
+        "invitation": "Kun dem, du inviterer",
+        "invitationDesc": "Siden forbliver synlig, men kun inviterede kan tilmelde sig; uden tilmelding kommer man ikke ind"
+      },
+      "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding."
     }
   },
   "email": {

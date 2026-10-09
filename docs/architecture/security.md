@@ -370,7 +370,7 @@ The values below come from the route files. To list every call site with its val
 | Staff sign-in link request | `POST /api/staff/login-link` | IP / address with IP / address alone | 5 per minute / 3 per 10 minutes / 20 per hour |
 | Staff sign-in link check | `POST /api/staff/login-link/verify` | IP | 10 per minute |
 | Event and instant-call creation | `POST /api/events`, `POST /api/events/instant` | IP | 5 and 10 per minute |
-| Registration. With public registration off, this call can also resend the link of an address that is already registered | `POST /api/events/{slug}/registrations` | IP | 10 per minute |
+| Registration. With invitation-only registration, this call can also resend the link of an address that is already registered | `POST /api/events/{slug}/registrations` | IP | 10 per minute |
 | Personal link resend | `POST …/registrations/resend` | IP | 5 per minute |
 | Join password | `POST …/verify-password` | IP and event | 10 per minute |
 | Guest Jitsi token, including a personal link opened in another browser | `POST …/jitsi/token` | IP | `GUEST_JWT_RATE_LIMIT_PER_MINUTE`, default 120 per minute |
@@ -397,7 +397,7 @@ The guest limit is generous because many participants may join from behind one c
 
 - **No account enumeration on staff sign-in.** `POST /api/staff/login-link` answers 202 whether or not the address belongs to an active account; only its per-IP limit answers 429. The account lookup happens after the response is sent ([The one-time email link](identity-and-access.md#the-one-time-email-link)).
 - **No registration enumeration on resend.** The resend route answers the same way whether or not the address is registered ([Email and calendar](email.md)).
-- **Guest tokens only while `LIVE`.** A guest receives a Jitsi token only while the event is `LIVE` (`POST …/jitsi/token`). An administrator can turn guest access off for scheduled events (`guestAccessEnabled`, answered with 403 `GUEST_ACCESS_DISABLED`); instant calls stay open to anyone with the link. On a password-protected event, a guest also needs the `join_granted_<eventId>` cookie before a token is issued. Guests cannot upload chat attachments.
+- **Guest tokens only while `LIVE`.** A guest receives a Jitsi token only while the event is `LIVE` (`POST …/jitsi/token`). An administrator can turn guest access off for scheduled events (`guestAccessEnabled`, answered with 403 `GUEST_ACCESS_DISABLED`), and an invitation-only event (`accessMode` `INVITATION`) refuses guests the same way; instant calls stay open to anyone with the link. On a password-protected event, a guest also needs the `join_granted_<eventId>` cookie before a token is issued. Guests cannot upload chat attachments.
 - **Join passwords are hashed.** They are stored as scrypt hashes and never returned by the API ([Hashed secrets and stored tokens](data-model.md#hashed-secrets-and-stored-tokens)).
 - **Ingress limits are the only shared limit.** The chart's default values set no ingress rate limit. `infra/helm/pa-webinar/values-production.yaml` shows one example (`limit-rps`, `limit-burst-multiplier` and `limit-connections`). An ingress limit is the only limit that holds across replicas. Choose its values from real live-room traffic: each participant keeps several long-lived connections open, and a tight limit drops them. Sizing guidance is in [Infrastructure](../INFRASTRUCTURE.md).
 

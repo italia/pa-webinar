@@ -38,6 +38,7 @@ export interface ParticipantEntryEvent {
   slug: string;
   status: string;
   eventType: string;
+  accessMode: string | null;
   endsAt: Date | string;
   postEventPublic: boolean;
   postEventPublicUntil: Date | string | null;

@@ -212,15 +212,15 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `waitingRoomLeadMinutes` | **Waiting-room routing window (minutes)**, **Features** | `15` | A registration made within this many minutes of the start goes straight to the waiting room. An earlier one gets a confirmation with a calendar link. `0` always shows the confirmation. Accepts 0 to 1440. The value also bounds how early a visitor can wake a room (see [event lifecycle and bridge timing](#event-lifecycle-and-bridge-timing)) |
 | `githubUrl` | **GitHub repository URL**, **Features** | none | The source-code links in the footer, the security and release-notes pages, and the release SBOM viewer. It must have the form `https://github.com/<owner>/<repo>` for the release links to work |
 | `supportEmail` | **Support email**, **Features** | none | The contact address shown in the footer |
-| `guestAccessEnabled` | **Guest access enabled**, **Features** | `true` | When off, visitors without a token cannot join scheduled events: the live page sends them to registration (skipping the join-password step), the Jitsi token endpoint refuses guest tokens with `403` `GUEST_ACCESS_DISABLED`, the chat refuses tokenless readers and writers, and Q&A and polls refuse them too. The administration's **Direct invite (no registration)** link and the room's **Link to join** are hidden for scheduled events. Instant calls stay open to anyone with the link. Registrants and moderator or speaker links are unaffected. See [guests](../architecture/identity-and-access.md#guests) |
-| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. The setting is read when each email is built, and a link already sent keeps the behavior it was sent with ([Registrants](../architecture/identity-and-access.md#registrants)). An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
+| `guestAccessEnabled` | **Guest access enabled**, **Features** | `true` | When off, visitors without a token cannot join scheduled events: the live page sends them to registration (skipping the join-password step), the Jitsi token endpoint refuses guest tokens with `403` `GUEST_ACCESS_DISABLED`, the chat refuses tokenless readers and writers, and Q&A and polls refuse them too. The administration's **Direct invite (no registration)** link and the room's **Link to join** are hidden for scheduled events. Instant calls stay open to anyone with the link. Registrants and moderator or speaker links are unaffected. An event open only to invitees (`Event.accessMode` `INVITATION`) never admits guests, whatever this setting; one open to anyone (`OPEN`) follows it. See [guests](../architecture/identity-and-access.md#guests) |
+| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | The default for events that make no choice of their own (`Event.accessMode` `NULL`); an event's **Who registers** choice overrides it, and the new-event question **Who can take part?** proposes the answer that matches it. When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. The event's choice, or this setting, is read when each email is built, and a link already sent keeps the behavior it was sent with ([Registrants](../architecture/identity-and-access.md#registrants)). An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, set the event to **Only people you invite**, which also keeps guests out, or also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
 
 The whiteboard has no switch in the site settings. It is an opt-in on each event, and it also needs
 a whiteboard backend on the Jitsi side. The portal shows its **Whiteboard** button and the reminder
 to export the whiteboard only when the app environment sets `NEXT_PUBLIC_WHITEBOARD_ENABLED=true`
 for the whole installation. The live room reads that variable at request time, so a change needs a
 pod restart, not a new image. The same value drives the administration forms: when it is not `true`,
-the whiteboard switch of the event wizard (**Permissions** step) and of the event-template form cannot be switched
+the whiteboard switch of the event wizard (advanced settings, **Participation and room features**) and of the event-template form cannot be switched
 on and says why, while a value already on can still be switched off. The chart installs no whiteboard
 server: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that
 combination with the variable has not been tested (see the
@@ -354,12 +354,13 @@ included, so a copy keeps inheriting.
 
 | Event column | Falls back to | Values | Where it is set | Pre-filled by a template |
 |---|---|---|---|---|
-| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, **Basics**: **Estimated active share** | No |
+| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **Estimated active share** | No |
+| `accessMode` | `publicRegistrationEnabled`. Guest entry follows `guestAccessEnabled` either way, except that `INVITATION` admits no guests | `null`, `OPEN` or `INVITATION` | New-event question **Who can take part?**; wizard, **People**: **Who registers**, where an event left on `null` keeps following the site until a choice is made | No; the new-event questions set it |
 | `gracePeriodMinutes` | `eventGracePeriodMinutes` | `null` or -1 to 240 | Events API only; the wizard has no field. Instant calls are created with `-1` | No |
-| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Basics**: **Use kicker in title (\| separator)** | No |
-| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, **Basics**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
-| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, **Basics**: **Video/audio quality (this event)** | No |
-| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Permissions** | Yes |
+| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |
+| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, advanced settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
+| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, advanced settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
+| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Summary** (**Change languages**) or advanced settings, **Recording and AI** | Yes |
 
 Some event settings have no site-wide counterpart and exist only on the event. They default to off or
 empty in `app/prisma/schema.prisma`:
@@ -373,7 +374,7 @@ empty in `app/prisma/schema.prisma`:
 - live features such as `whiteboardEnabled`, which a template can pre-fill; the wizard and the template
   form offer the whiteboard only when the installation declares the whiteboard service
   (`NEXT_PUBLIC_WHITEBOARD_ENABLED`);
-- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in **Basics**),
+- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in the wizard's advanced settings, **Waiting room and video**),
   offered only while the event is `PUBLISHED` (see
   [waiting-room music](../architecture/waiting-room.md#waiting-room-music)). There is no site-wide
   default track, and a template cannot set one.

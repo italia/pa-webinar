@@ -17,6 +17,7 @@ function ev(over: Partial<ParticipantEntryEvent> = {}): ParticipantEntryEvent {
     slug: 'evento',
     status: 'PUBLISHED',
     eventType: 'SCHEDULED',
+    accessMode: null,
     endsAt: FUTURE,
     postEventPublic: false,
     postEventPublicUntil: null,

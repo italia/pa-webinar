@@ -3,6 +3,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
+import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { getSettings } from '@/lib/settings';
 import {
   absoluteEventImage,
@@ -121,7 +122,8 @@ export const GET = withErrorHandling(async (request) => {
         const description = getLocalized(event.description as LocalizedField, locale);
         const recipientEmail = decryptPII(reg.email);
         // Il link dell'email e' anche la prova che l'indirizzo e' di chi lo
-        // apre (lib/events/registration-link).
+        // apre (lib/events/registration-link), quando l'iscrizione all'evento
+        // non e' aperta.
         const joinUrl = registrationJoinUrl({
           baseUrl,
           slug: event.slug,
@@ -129,7 +131,7 @@ export const GET = withErrorHandling(async (request) => {
           accessToken: reg.accessToken,
           locale,
           viaEmailEntry: true,
-          bindsIdentity: !settings.publicRegistrationEnabled,
+          bindsIdentity: !publicRegistrationFor(event, settings.publicRegistrationEnabled),
         });
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
 

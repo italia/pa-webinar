@@ -275,8 +275,8 @@ Get these ready before the first install. The first item is the one that surpris
 - **External Secrets Operator**, only with `secrets.mode: external`.
 - **An SMTP relay.** Without it no email is ever delivered: no registration confirmation, reminder,
   date-change notice, post-event follow-up, staff sign-in link or verification link for a data-subject
-  request ([Email delivery](configuration/email.md)). Event invitations are not emailed at all: with
-  public registration off, they only decide who may register.
+  request ([Email delivery](configuration/email.md)). Event invitations are not emailed at all: when
+  registration is by invitation only, they only decide who may register.
 - **Object storage**, only to record events or upload materials ([Object storage](configuration/storage.md)).
   An evaluation works without it. Staff browsers upload videos straight to it, so the bucket or container
   must allow `PUT` from the portal's origin (CORS), and an S3-compatible endpoint must be an HTTPS address

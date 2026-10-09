@@ -54,6 +54,7 @@ export const CREATED_EVENT_FIELDS = [
   'permissionMatrix',
 
   // regole di iscrizione
+  'accessMode',
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',

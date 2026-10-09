@@ -48,6 +48,8 @@ export function validateStep(
     if (descriptionDef.length < EVENT_DESCRIPTION_MIN_LENGTH) {
       errs[`description.${defaultLocale}`] = 'required';
     }
+  }
+  if (step === 'schedule') {
     try {
       const start = new Date(form.startsAt);
       const end = new Date(form.endsAt);
@@ -67,16 +69,21 @@ export function validateStep(
       errs['maxParticipants'] = 'outOfRange';
     }
   }
-  if (step === 'permissions') {
+  if (step === 'review') {
     // La traduzione automatica senza lingue target non produce nulla:
-    // richiediamo almeno una lingua. (Errore mostrato nel passo Permessi.)
+    // richiediamo almeno una lingua. Le lingue si scelgono nel riepilogo (e
+    // nelle impostazioni avanzate, alla registrazione).
     // Letti come li legge la pipeline: un valore vecchio scritto a mano
     // ("english", "en;fr") non conta come lingua.
-    if (form.aiTranslationEnabled && parseLocaleList(form.aiTargetLocales).length === 0) {
+    // Conta solo una traduzione che parte davvero: senza registrazione o senza
+    // trascrizione l'interruttore resta nel modulo ma non si salva (e le
+    // lingue non si vedono).
+    const traduce = form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
+    if (traduce && parseLocaleList(form.aiTargetLocales).length === 0) {
       errs['aiTargetLocales'] = 'required';
     }
   }
-  if (step === 'review') {
+  if (step === 'advanced') {
     // Gli stessi limiti del server: un valore fuori misura (arrivato da un
     // template) farebbe fallire il salvataggio senza dire dove.
     const giorni = form.dataRetentionDays;
@@ -87,15 +94,25 @@ export function validateStep(
   return errs;
 }
 
+/** Un indirizzo email plausibile: la stessa regola per il pulsante
+ *  «Pubblica», per il campo che lo chiede e per l'elenco di cio' che manca. */
+export function emailValida(email: string | null | undefined): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email ?? '').trim());
+}
+
+/** Il nome dell'organizzatore principale basta per pubblicare. */
+export function nomeOrganizzatoreValido(nome: string | null | undefined): boolean {
+  return (nome ?? '').trim().length >= 2;
+}
+
 export function validatePublish(form: WizardForm): Record<string, string> {
   const errs: Record<string, string> = {};
-  const email = (form.moderatorEmail ?? '').trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errs['moderatorEmail'] = 'required';
-  }
-  const name = (form.moderatorName ?? '').trim();
-  if (name.length < 2) {
+  // Nell'ordine della pagina: prima il nome, poi l'email.
+  if (!nomeOrganizzatoreValido(form.moderatorName)) {
     errs['moderatorName'] = 'required';
+  }
+  if (!emailValida(form.moderatorEmail)) {
+    errs['moderatorEmail'] = 'required';
   }
   return errs;
 }
@@ -106,12 +123,12 @@ export function validatePublish(form: WizardForm): Record<string, string> {
  * messaggio, altrimenti «controlla i campi evidenziati» non indica niente.
  */
 const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
-  ['startsAt', 'base'],
-  ['endsAt', 'base'],
-  ['maxParticipants', 'base'],
-  ['aiTargetLocales', 'permissions'],
-  ['gdprTemplateId', 'review'],
-  ['dataRetentionDays', 'review'],
+  ['startsAt', 'schedule'],
+  ['endsAt', 'schedule'],
+  ['maxParticipants', 'schedule'],
+  ['aiTargetLocales', 'review'],
+  ['gdprTemplateId', 'advanced'],
+  ['dataRetentionDays', 'advanced'],
   ['moderatorName', 'invites'],
   ['moderatorEmail', 'invites'],
   ['moderatorOrganization', 'invites'],
@@ -177,4 +194,38 @@ export function mapServerIssues(details: unknown, defaultLocale: string): Server
     step: STEP_KEYS.find((k) => steps.has(k)) ?? null,
     unmapped,
   };
+}
+
+/** Un campo che manca, e il passo in cui si compila. */
+export interface CampoMancante {
+  key: string;
+  step: StepKey;
+  /** Serve per salvare anche una bozza, o solo per pubblicare. */
+  perPubblicare: boolean;
+}
+
+/**
+ * Tutto cio' che manca, nell'ordine del wizard: lo dicono la barra dei passi
+ * («Da completare») e il riepilogo («Per pubblicare manca ancora»), prima di
+ * premere un pulsante.
+ */
+export function campiMancanti(
+  form: WizardForm,
+  defaultLocale: string,
+  retentionMax: number = MAX_RETENTION_DAYS,
+  /** Si pubblica da qui (creazione): contano anche i dati che servono solo
+   *  per pubblicare. In modifica si aggiorna e basta. */
+  conPubblicazione = true,
+): CampoMancante[] {
+  const out: CampoMancante[] = [];
+  for (const step of STEP_KEYS) {
+    for (const key of Object.keys(validateStep(step, form, defaultLocale, retentionMax))) {
+      out.push({ key, step, perPubblicare: false });
+    }
+  }
+  for (const key of conPubblicazione ? Object.keys(validatePublish(form)) : []) {
+    out.push({ key, step: INLINE_FIELDS.get(key) ?? 'invites', perPubblicare: true });
+  }
+  const ordine = (k: StepKey) => STEP_KEYS.indexOf(k);
+  return out.sort((a, b) => ordine(a.step) - ordine(b.step));
 }

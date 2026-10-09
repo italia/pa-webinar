@@ -108,6 +108,8 @@ interface Props {
   /** In creazione: senza scelte, dopo l'evento si propone il questionario
    *  di feedback predefinito, e va detto. */
   defaultFeedbackHint?: boolean;
+  /** Dentro una sezione delle impostazioni avanzate, che ha gia' il titolo. */
+  incorporato?: boolean;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -132,6 +134,7 @@ export default function Step4Content({
   submitting,
   staffLocked = false,
   defaultFeedbackHint = false,
+  incorporato = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
   const [templates, setTemplates] = useState<TemplateRow[]>([]);
@@ -170,9 +173,11 @@ export default function Step4Content({
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
-        {t('heading')}
-      </h2>
+      {!incorporato && (
+        <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('heading')}
+        </h2>
+      )}
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
         {t('intro')}
       </p>
