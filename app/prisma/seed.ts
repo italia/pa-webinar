@@ -33,7 +33,7 @@ async function main() {
     {
       name: 'Webinar pubblico',
       description:
-        "Per una grande platea, anche di centinaia di persone: moderatori e relatori in video con la condivisione dello schermo, il pubblico ascolta e partecipa con chat, domande (Q&A), sondaggi e scaletta. La registrazione parte da sola; dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
+        "Per una grande platea, anche di centinaia di persone: moderatori e relatori in video con la condivisione dello schermo, il pubblico ascolta e partecipa con chat, domande (Q&A), sondaggi e agenda. La registrazione parte da sola; dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
       icon: 'it-presentation',
       qaEnabled: true,
       chatEnabled: true,
