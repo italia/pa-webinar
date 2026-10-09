@@ -5741,16 +5741,35 @@ button.live-time-strip__rec {
   margin-top: 1rem;
 }
 
-.wr-link {
+// «Pagina dell'evento» e «Condividi»: due pulsanti gemelli, a pillola.
+.wr-link,
+.wr-share .live-share-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.88rem;
+  min-height: 34px;
+  padding: 0 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1;
   color: #0066cc;
   text-decoration: none;
+  background: #fff;
+  border: 1px solid #0066cc !important;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 
-  &:hover { text-decoration: underline; }
+  svg { flex-shrink: 0; }
+
+  &:hover,
+  &:focus-visible,
+  &.is-open {
+    color: #fff;
+    background: #0066cc;
+    text-decoration: none;
+  }
+
+  &:hover { transform: translateY(-1px); }
 }
 
 // «Condividi» nella sala d'attesa: il fumetto si apre verso destra, dentro la
@@ -5769,23 +5788,6 @@ button.live-time-strip__rec {
   }
 }
 
-// «Condividi» nella sala d'attesa: su sfondo chiaro, contorno blu.
-.wr-share .live-share-btn {
-  min-height: 34px;
-  padding: 0 0.9rem;
-  font-weight: 600;
-  border: 1px solid #0066cc !important;
-  border-radius: 999px;
-  background: #fff;
-  color: #0066cc;
-
-  &:hover,
-  &:focus,
-  &.is-open {
-    background: #0066cc;
-    color: #fff;
-  }
-}
 
 // Il nome: se manca lampeggia di blu (non di rosso), e dopo un tentativo
 // insiste in ambra.
@@ -6354,6 +6356,8 @@ button.live-time-strip__rec {
   .av-check__bg-thumb,
   .wr-piazza-card,
   .wr-piazza-card__go,
+  .wr-link,
+  .wr-share .live-share-btn,
   .wr-netiquette summary::after {
     transition: none !important;
   }
