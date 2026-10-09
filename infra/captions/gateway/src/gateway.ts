@@ -5,8 +5,10 @@
  * Una conferenza è una WebSocket aperta dal bridge. Ogni sorgente audio
  * (un partecipante che parla) diventa una voce: il suo Opus si decodifica a
  * 16 kHz mono, va al motore in una sessione dedicata, e il testo torna al
- * bridge come sottotitolo. Il bridge non manda i pacchetti di silenzio:
- * quando una voce tace oltre `pauseGapMs` la frase si chiude (commit del
+ * bridge come sottotitolo. Al motore va solo il parlato: con il microfono
+ * aperto il bridge manda audio anche nelle pause, e la voce si riconosce
+ * sull'energia del segnale (vad.ts). Quando una voce tace oltre
+ * `pauseGapMs`, in silenzio o senza pacchetti, la frase si chiude (commit del
  * motore) e il sottotitolo diventa definitivo.
  *
  * Le sessioni del motore sono limitate: oltre il limite restano senza
@@ -22,6 +24,7 @@ import type { Config } from './config.js';
 import type { ContextProvider, RoomContext } from './context.js';
 import { EngineSession } from './engine.js';
 import { LoadGovernor, type LoadSnapshot } from './load.js';
+import { VoiceDetector } from './vad.js';
 import {
   endpointFromTag,
   parseEvent,
@@ -38,12 +41,14 @@ const MAX_BUFFER_SECONDS = 3;
 /** Se il motore non conferma la fine della frase entro questo tempo, la si chiude comunque. */
 const ENGINE_RETRY_MS = 2000;
 /**
- * Silenzio premesso a ogni tratto. Il bridge non manda i pacchetti di
- * silenzio, quindi dopo una pausa la voce arriva "a freddo"; se il parlato
- * comincia nei primi millisecondi, il modello perde la prima parola e per
- * tutta la frase anche maiuscole e punteggiatura (misurato: 25 ms bastano).
+ * Silenzio premesso a ogni tratto. Al motore non arrivano le pause, quindi
+ * dopo una pausa la voce arriva "a freddo"; se il parlato comincia nei primi
+ * millisecondi, il modello perde la prima parola e per tutta la frase anche
+ * maiuscole e punteggiatura (misurato: 25 ms bastano).
  */
 const LEAD_IN = Buffer.alloc(Math.round(0.3 * 16000) * 2);
+/** L'audio appena prima della soglia: contiene l'attacco della prima sillaba. */
+const PRE_ROLL_SECONDS = 0.3;
 const MAX_SOCKET_BUFFER = 1 << 20;
 
 interface Stream {
@@ -56,11 +61,20 @@ interface Stream {
   waiting: Array<{ timestamp: number; payload: Uint8Array }>;
   engine: EngineSession | null;
   opening: boolean;
+  /** La frase è finita mentre la sessione si apriva: si chiude appena il motore ha il suo audio. */
+  endAfterOpen: boolean;
   buffered: Buffer[];
   bufferedSeconds: number;
   retryAt: number;
   assembler: CaptionAssembler;
-  lastPacketAt: number;
+  /** L'ultima volta che la voce ha parlato: decide chi perde la sessione del motore. */
+  lastVoiceAt: number;
+  vad: VoiceDetector;
+  /** Dentro una frase: dal primo frame di voce alla pausa che la chiude. */
+  inSpeech: boolean;
+  silenceSeconds: number;
+  preRoll: Buffer[];
+  preRollSeconds: number;
   lastRtp: number | null;
   lastTicks: number;
   speaking: boolean;
@@ -186,6 +200,7 @@ export class Conference {
       waiting: [],
       engine: null,
       opening: false,
+      endAfterOpen: false,
       buffered: [],
       bufferedSeconds: 0,
       retryAt: 0,
@@ -194,7 +209,15 @@ export class Conference {
         maxChars: this.gateway.config.maxCaptionChars,
         rewrite: (t) => this.rewrite(t),
       }),
-      lastPacketAt: 0,
+      lastVoiceAt: 0,
+      vad: new VoiceDetector({
+        minDbfs: this.gateway.config.vadMinDbfs,
+        marginDb: this.gateway.config.vadMarginDb,
+      }),
+      inSpeech: false,
+      silenceSeconds: 0,
+      preRoll: [],
+      preRollSeconds: 0,
       lastRtp: null,
       lastTicks: 0,
       speaking: false,
@@ -246,9 +269,6 @@ export class Conference {
       stream = this.newStream(tag, endpointFromTag(tag), 2);
       this.streams.set(tag, stream);
     }
-    const now = this.gateway.now();
-    stream.lastPacketAt = now;
-
     if (!this.enabled || !this.gateway.accepting()) {
       if (stream.engine) this.stopEngine(stream, 'paused');
       return;
@@ -286,8 +306,41 @@ export class Conference {
     stream.lastTicks = ticks;
     chunks.push(toPcm16(decoded.channelData, decoded.samplesDecoded));
 
-    for (const pcm of chunks) this.feed(stream, pcm);
+    for (const pcm of chunks) this.onPcm(stream, pcm);
     this.armGapTimer(stream);
+  }
+
+  /**
+   * Al motore va solo il parlato, con un po' di audio prima (l'attacco) e la
+   * pausa che chiude la frase. Il silenzio di un microfono aperto non costa
+   * CPU e non tiene occupata una sessione.
+   */
+  private onPcm(stream: Stream, pcm: Buffer): void {
+    const seconds = pcm.length / 2 / OUT_RATE;
+    if (stream.vad.push(pcm)) {
+      stream.lastVoiceAt = this.gateway.now();
+      stream.silenceSeconds = 0;
+      if (!stream.inSpeech) {
+        stream.inSpeech = true;
+        for (const before of stream.preRoll) this.feed(stream, before);
+        stream.preRoll = [];
+        stream.preRollSeconds = 0;
+      }
+      this.feed(stream, pcm);
+      return;
+    }
+    if (stream.inSpeech) {
+      this.feed(stream, pcm);
+      stream.silenceSeconds += seconds;
+      if (stream.silenceSeconds * 1000 >= this.gateway.config.pauseGapMs) this.endUtterance(stream);
+      return;
+    }
+    stream.preRoll.push(pcm);
+    stream.preRollSeconds += seconds;
+    while (stream.preRollSeconds > PRE_ROLL_SECONDS && stream.preRoll.length > 1) {
+      const dropped = stream.preRoll.shift();
+      stream.preRollSeconds -= (dropped?.length ?? 0) / 2 / OUT_RATE;
+    }
   }
 
   private feed(stream: Stream, pcm: Buffer): void {
@@ -348,12 +401,15 @@ export class Conference {
       await session.open();
     } catch (err) {
       stream.opening = false;
+      stream.endAfterOpen = false;
       stream.retryAt = this.gateway.now() + ENGINE_RETRY_MS;
       this.gateway.released();
       this.gateway.engineFailed((err as Error).message);
       return;
     }
     stream.opening = false;
+    const endNow = stream.endAfterOpen;
+    stream.endAfterOpen = false;
     this.gateway.engineOpened();
     if (this.closed || !this.gateway.accepting()) {
       session.close('closed');
@@ -365,9 +421,10 @@ export class Conference {
     if (stream.buffered.length > 0) stream.speaking = true;
     stream.buffered = [];
     stream.bufferedSeconds = 0;
+    if (endNow) this.endUtterance(stream);
   }
 
-  /** Senza pacchetti per `pauseGapMs` la voce ha smesso di parlare: si chiude la frase. */
+  /** Senza pacchetti per `pauseGapMs` (microfono spento, o silenzio scartato dal client) la frase si chiude. */
   private armGapTimer(stream: Stream): void {
     if (stream.gapTimer) clearTimeout(stream.gapTimer);
     stream.gapTimer = setTimeout(() => {
@@ -377,6 +434,13 @@ export class Conference {
   }
 
   private endUtterance(stream: Stream): void {
+    stream.inSpeech = false;
+    stream.silenceSeconds = 0;
+    if (stream.opening) {
+      // La frase è nel buffer: si chiude appena il motore l'ha ricevuta.
+      if (stream.buffered.length > 0) stream.endAfterOpen = true;
+      return;
+    }
     stream.buffered = [];
     stream.bufferedSeconds = 0;
     if (!stream.engine || !stream.speaking) return;
@@ -400,11 +464,11 @@ export class Conference {
     engine?.close(reason);
   }
 
-  /** Chiude le sessioni delle voci zitte da più di `idleMs`. */
+  /** Chiude le sessioni delle voci zitte da più di `idleMs`, anche con il microfono aperto. */
   sweepIdle(idleMs: number): void {
     const now = this.gateway.now();
     for (const stream of this.streams.values()) {
-      if (stream.engine && now - stream.lastPacketAt > idleMs) this.stopEngine(stream, 'idle');
+      if (stream.engine && !stream.inSpeech && now - stream.lastVoiceAt > idleMs) this.stopEngine(stream, 'idle');
     }
   }
 
@@ -572,10 +636,12 @@ export class Gateway {
    * sopra, la ottiene al posto della voce zitta da più tempo, se ce n'è una
    * che non parla da almeno `pauseGapMs`.
    */
-  admit(stream: { lastPacketAt: number }, _conference: Conference): boolean {
+  admit(stream: { lastVoiceAt: number }, _conference: Conference): boolean {
     if (!this.accepting()) return false;
     if (this.activeEngines() < this.snapshot.streamLimit) return true;
-    const victim = this.leastRecent((s) => s !== stream && this.now() - s.lastPacketAt >= this.config.pauseGapMs);
+    const victim = this.leastRecent(
+      (s) => s !== stream && !s.inSpeech && this.now() - s.lastVoiceAt >= this.config.pauseGapMs,
+    );
     if (!victim) return false;
     victim.conference.stopEngine(victim.stream, 'evicted');
     return true;
@@ -588,7 +654,7 @@ export class Gateway {
     for (const conference of this.conferences) {
       for (const stream of conference.streamsList()) {
         if (!stream.engine || !filter(stream)) continue;
-        if (!best || stream.lastPacketAt < best.stream.lastPacketAt) best = { conference, stream };
+        if (!best || stream.lastVoiceAt < best.stream.lastVoiceAt) best = { conference, stream };
       }
     }
     return best;

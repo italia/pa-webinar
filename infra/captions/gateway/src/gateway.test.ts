@@ -1,7 +1,8 @@
 /**
  * Il gateway per intero, su WebSocket vere: un finto bridge manda audio
- * Opus (frame di silenzio da 20 ms), un finto motore risponde con frammenti
- * di testo, e il bridge deve ricevere i sottotitoli provvisori e definitivi.
+ * Opus (frame da 20 ms di tono e di silenzio), un finto motore risponde con
+ * frammenti di testo, e il bridge deve ricevere i sottotitoli provvisori e
+ * definitivi.
  */
 
 import { createServer, type Server } from 'node:http';
@@ -16,6 +17,8 @@ import { Gateway } from './gateway.js';
 import { createGatewayServer } from './server.js';
 
 const SILENCE = '+P/+'; // frame Opus CELT di silenzio, 20 ms
+// Frame Opus da 20 ms di un tono a circa -37 dBFS: per il gateway è voce.
+const VOICE = 'fAgCXubTyWb7YM/cWg7k3aFGaniRSI6U04F/kNYJdJJlll6aF9Jf+yQaNLHr9YPGQgt+XYqmzzq5FPUw6n3bvDLx5zjwbvPpDAyLa3Uz//Y=';
 
 interface EngineSessionLog {
   ws: WebSocket;
@@ -125,9 +128,13 @@ async function bridge(port: number, path = '/transcribe/meet-1?room=stanza', tok
           start: { tag, mediaFormat: { encoding: 'opus', sampleRate: 48000, channels: 2 }, customParameters: { endpointId } },
         }),
       ),
-    media: (tag: string, frames: number) => {
+    /** Parlato (tono e brevi vuoti alternati, come le sillabe) o silenzio di un microfono aperto. */
+    media: (tag: string, frames: number, kind: 'speech' | 'silence' = 'speech') => {
       for (let i = 0; i < frames; i++) {
-        ws.send(JSON.stringify({ event: 'media', sequenceNumber: '1', media: { tag, chunk: '1', timestamp: String(ts), payload: SILENCE } }));
+        // Dopo un tono il primo frame di silenzio decodifica ancora la coda del
+        // suono: il vuoto tra due "sillabe" è lungo due frame.
+        const payload = kind === 'speech' && i % 3 === 0 ? VOICE : SILENCE;
+        ws.send(JSON.stringify({ event: 'media', sequenceNumber: '1', media: { tag, chunk: '1', timestamp: String(ts), payload } }));
         ts += 960;
       }
     },
@@ -168,6 +175,28 @@ describe('gateway', () => {
     const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
     expect(final.transcript[0]?.text).toBe('Buongiorno a tutti.');
     expect(final.message_id).toBe(first?.message_id);
+  });
+
+  it('con il microfono aperto la pausa chiude la frase, e il silenzio non va al motore', async () => {
+    const engine = await fakeEngine();
+    const { port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url, CAPTIONS_PAUSE_GAP_MS: '150' });
+    const b = await bridge(port);
+    b.start('ff-1', 'ff');
+    // Solo silenzio: nessuna sessione del motore.
+    b.media('ff-1', 50, 'silence');
+    await new Promise((r) => setTimeout(r, 100));
+    expect(engine.sessions).toHaveLength(0);
+
+    // Parlato, poi il bridge continua a mandare silenzio senza interruzioni.
+    b.media('ff-1', 10);
+    b.media('ff-1', 40, 'silence');
+    const session = await waitFor(() => engine.sessions[0]?.commits === 1 && engine.sessions[0]);
+    // Al motore: silenzio iniziale, l'attacco, il parlato e la pausa che chiude, non i 40 frame.
+    const frame = 320 * 2;
+    expect(session.pcmBytes).toBeGreaterThanOrEqual(10 * frame);
+    expect(session.pcmBytes).toBeLessThanOrEqual(4800 * 2 + (15 + 10 + 9) * frame);
+    const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
+    expect(final.transcript[0]?.text).toBe('Buongiorno a tutti.');
   });
 
   it('un testo definitivo che arriva dopo la scadenza non riapre la frase già chiusa', async () => {

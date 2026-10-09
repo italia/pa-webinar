@@ -43,6 +43,10 @@ export interface Config {
   finishTimeoutMs: number;
   /** Ogni quanto si rilegge il contesto della stanza (un sesto, con i sottotitoli spenti). */
   contextRefreshMs: number;
+  /** Livello sotto il quale l'audio non è mai voce (dBFS). */
+  vadMinDbfs: number;
+  /** Quanto la voce deve stare sopra il rumore di fondo (dB). */
+  vadMarginDb: number;
 }
 
 function num(env: NodeJS.ProcessEnv, key: string, fallback: number, min = 0): number {
@@ -86,5 +90,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     maxPauseMs: num(env, 'CAPTIONS_MAX_PAUSE_MS', 600_000, 1000),
     finishTimeoutMs: num(env, 'CAPTIONS_FINISH_TIMEOUT_MS', 3000, 100),
     contextRefreshMs: num(env, 'CAPTIONS_CONTEXT_REFRESH_MS', 30_000, 100),
+    vadMinDbfs: num(env, 'CAPTIONS_VAD_MIN_DBFS', -55, -100),
+    vadMarginDb: num(env, 'CAPTIONS_VAD_MARGIN_DB', 10),
   };
 }
