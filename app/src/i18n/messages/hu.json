@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "A használt link már nem érvényes. Az esemény véget ért: alább megtalálja a felvételt és az anyagokat.",
       "speakers": "Előadók",
       "organizer": "Szervező",
+      "peopleTitle": "Szervezők és előadók",
+      "organizedBy": "Szervező",
+      "peopleOrganizers": "Szervezők",
+      "peopleModerators": "Moderálás",
       "chatNotSaved": "A csevegés üzenetei az esemény végén nem kerülnek mentésre.",
       "qaPostEvent": "Kérdések és válaszok az eseményről",
       "peakParticipants": "Csúcs: {count} résztvevő",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Ki mit tehet",
-        "intro": "Jogosultsági mátrix: válassza ki minden funkcióhoz, ki használhatja. A moderátorok mindig mindent megtehetnek.",
+        "intro": "Mit tehet az egyes szerepek. A résztvevőkről Ön dönt; a többi szerep megkapja, ami a vezetéshez vagy az előadáshoz kell.",
         "featureCol": "Funkció",
         "role": {
-          "GUEST": "Vendég",
+          "GUEST": "Résztvevő",
           "SPEAKER": "Előadó",
           "MODERATOR": "Moderátor"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Felvétel",
         "roomFeaturesHeading": "A terem funkciói",
-        "aiPipelineOff": "Az AI-utómunka (átirat, összefoglaló, fordítások) nincs bekapcsolva ezen a telepítésen."
+        "aiPipelineOff": "Az AI-utómunka (átirat, összefoglaló, fordítások) nincs bekapcsolva ezen a telepítésen.",
+        "rolesHeading": "Az esemény szerepei",
+        "roleModeratorColumn": "Szervező és moderátor",
+        "roleInfo": {
+          "organizer": {
+            "name": "Szervező",
+            "desc": "Moderátorként vezeti a termet, és a szervezők között szerepel. A fő szervező hozzáadja és eltávolítja a többi személyt."
+          },
+          "moderator": {
+            "name": "Moderátor",
+            "desc": "Vezeti a termet: szót ad és elvesz, némít, kezeli a kérdéseket, szavazásokat és a felvételt."
+          },
+          "speaker": {
+            "name": "Előadó",
+            "desc": "Beszél, használja a kamerát és megosztja a képernyőt; nem moderál."
+          },
+          "guest": {
+            "name": "Résztvevő",
+            "desc": "Követi az eseményt, és úgy vesz részt, ahogy az alábbi táblázatban dönt."
+          }
+        }
       },
       "step3": {
         "heading": "Személyek és meghívók",
-        "intro": "Adjon hozzá szervezőket (az oldalon megjelennek), moderátorokat, előadókat és meghívott vendégeket.",
-        "organizersHeading": "Szervezők",
-        "organizersHelp": "Az eseményt szervező szervezetek: a név, a weboldal és a logó megjelenik a nyilvános oldalon.",
+        "intro": "Ki szervez, ki vezeti az eseményt és ki ad elő, a szervezeteikkel; aztán szükség esetén a meghívottak.",
+        "organizersHeading": "Szervező intézmények",
+        "organizersHelp": "Az eseményt szervező intézmények: a név, a weboldal és a logó megjelenik a nyilvános oldalon. Nem kell egyezniük a személyek szervezeteivel.",
         "organizerName": "A szervezet neve",
         "organizerWebsite": "Webhely",
         "organizerLogo": "A szervező logója",
         "organizerRequired": "A szervezet nevének megadása kötelező.",
-        "moderatorsHeading": "Moderátorok",
-        "moderatorsHelp": "A moderátorok az esemény során kezelhetik a munkamenetet és vezérelhetik a jogosultságokat.",
-        "moderatorName": "Név",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "A név és az e-mail cím megadása kötelező.",
-        "speakersHeading": "Előadók",
-        "speakersHelp": "E-mailben személyes linket kapnak, amellyel beszélhetnek, használhatják a kamerát és megoszthatják a képernyőt, moderátori jogok nélkül.",
-        "speakerName": "Név",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "A név és az e-mail cím megadása kötelező.",
         "invitationsHeading": "Meghívók",
-        "invitationsHelp": "A meghívott személyek listája. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg velük. Ha a nyilvános regisztráció ki van kapcsolva, csak ezek a címek regisztrálhatnak, a személyes belépési hivatkozás pedig a regisztráció után e-mailben érkezik.",
         "invitationName": "Név (opcionális)",
         "invitationEmail": "E-mail",
         "add": "Hozzáadás",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "vagy adja hozzá kézzel",
         "removeItem": "{name} eltávolítása",
         "invitationsStaffOnly": "A meghívókat az esemény munkatársai kezelik.",
-        "pickSkipped": "Néhány személy már szerepelt a listán, vagy nem volt érvényes címe, ezért nem lett hozzáadva."
+        "pickSkipped": "Néhány személy már szerepelt a listán, vagy nem volt érvényes címe, ezért nem lett hozzáadva.",
+        "primaryHeading": "Fő szervező",
+        "primaryHelp": "E-mailben megkapja az esemény fő hivatkozását: vezeti a termet, és hozzáadja vagy eltávolítja a többi személyt. A név és az e-mail a közzétételhez kell, a piszkozathoz nem.",
+        "primaryPrefilled": "A fő szervező Ön, a fiókja nevével és e-mail-címével. Ha az eseményt más vezeti, itt adja meg az adatait: a hivatkozást ő kapja meg.",
+        "primaryNameRequired": "Adja meg a fő szervező nevét.",
+        "primaryEmailRequired": "Adja meg a fő szervező érvényes e-mail-címét.",
+        "linksOnPublish": "A személyes hivatkozásokat közzétételkor e-mailben küldjük; amíg az esemény piszkozat, másolja ki őket az oldaláról.",
+        "personName": "Név",
+        "personEmail": "E-mail",
+        "peopleHeading": "Az esemény személyei",
+        "peopleHelp": "Szervezők, moderátorok és előadók. Mindenki saját hivatkozást kap, hogy a szerepével lépjen be; hogy melyik szerep mit tehet, az „Engedélyek” lépés mutatja.",
+        "personRole": "Szerep",
+        "roleOrganizer": "Szervező",
+        "roleModerator": "Moderátor",
+        "roleSpeaker": "Előadó",
+        "roleHelp": {
+          "organizer": "Moderátorként vezeti a termet, és a szervezők között szerepel.",
+          "moderator": "Vezeti a termet: szót ad, kezeli a kérdéseket, szavazásokat és a felvételt.",
+          "speaker": "Beszél, használja a kamerát és megosztja a képernyőt, moderálási jogok nélkül."
+        },
+        "personOrganization": "Intézmény vagy szervezet",
+        "personOrganizationHelp": "A személy szervezete: eltérhet az eseményt szervezőtől.",
+        "personLogo": "A szervezet logója",
+        "personLogoAdd": "A szervezet logójának hozzáadása",
+        "personLogoChange": "A szervezet logójának módosítása",
+        "personPublic": "Megjelenítés a nyilvános oldalon",
+        "personRequired": "A név és az e-mail kötelező.",
+        "invitationsHelpOpen": "Nem kötelező: az Ön által meghívottak listája. A regisztráció nyitott, így közzététel után bárki regisztrálhat, meghívott vagy sem. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg.",
+        "invitationsHelpRestricted": "A regisztráció korlátozott: csak a listán szereplő címek regisztrálhatnak. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg; a belépési hivatkozás a regisztráció után e-mailben érkezik.",
+        "logoExternal": "A nyilvános oldal csak az erre a platformra feltöltött logókat mutatja: más webhelyről származó logó nem jelenik meg.",
+        "primaryProfileInvalid": "Ellenőrizze a szervezetet és a logó címét."
       },
       "step4": {
         "heading": "Tartalmak és anyagok",
@@ -878,7 +921,6 @@
           "schedule": "Naptár",
           "recurrence": "Ismétlődés",
           "maxParticipants": "Várt résztvevők",
-          "organizers": "Szervezők",
           "speakers": "Előadók",
           "invitations": "Meghívók",
           "materials": "Anyagok",
@@ -888,7 +930,12 @@
           "recordingManual": "Bekapcsolva — kézi indítás",
           "recordingOff": "Kikapcsolva",
           "multitrack": "Résztvevőnkénti felvétel",
-          "multitrackOn": "Bekapcsolva – kifejezett hozzájárulást igényel a regisztrációkor"
+          "multitrackOn": "Bekapcsolva – kifejezett hozzájárulást igényel a regisztrációkor",
+          "organizingEntities": "Szervező intézmények",
+          "primaryOrganizer": "Fő szervező",
+          "primaryMissing": "A közzétételhez meg kell adni a „Személyek” lépésben",
+          "organizersPeople": "További szervezők",
+          "moderators": "Moderátorok"
         },
         "noRecurrence": "Egyszeri esemény",
         "gdprHeading": "Adatvédelem és adatmegőrzés",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Egyedi szöveg használata —",
         "gdprTemplateUnknown": "A kiválasztott adatvédelmi sablon már nem létezik: válasszon másikat, vagy térjen vissza az egyéni szöveghez",
         "privacyText": "Adatvédelmi tájékoztató (szöveg)",
-        "moderatorHeading": "Moderátor elérhetősége",
-        "moderatorPublishHint": "Az esemény közzétételéhez a név és az e-mail-cím megadása kötelező (ezek szükségesek a moderátori linkhez és a visszaigazoló e-mailhez). Piszkozatként való mentéshez nem kötelezőek.",
-        "moderatorPrefilled": "Ön a fő moderátor, a fiókja nevével és e-mail-címével. Ha az eseményt más moderálja, adja meg itt az adatait: a kezeléshez szükséges hivatkozást ő kapja meg.",
-        "moderatorLinkNote": "Ez a személy az esemény fő moderátora: e-mailben privát linket kap az esemény kezeléséhez (felvétel indítása, kérdések moderálása, szavazások indítása…). Ez nem azonos a „Személyek” lépésben hozzáadott társmoderátorokkal, akik mind saját linket kapnak.",
-        "moderatorRequired": "Adja meg a moderátor nevét",
-        "moderatorEmailRequired": "Adja meg a moderátor érvényes e-mail-címét",
-        "moderatorName": "Név",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Becsült kapacitás",
         "featuresHeading": "Konfiguráció összefoglalása",
         "privacyDoc": "Adatvédelmi dokumentum (PDF vagy hivatkozás)",
         "privacyDocHelp": "Töltsön fel egy PDF-et vagy illesszen be egy alternatív adatvédelmi tájékoztató URL-jét. Felülírja a GDPR-sablont, ha be van állítva.",
         "privacyTextHelp": "A regisztrációs űrlapon megjelenő rövid szöveg; kiegészítheti vagy helyettesítheti a GDPR-sablont.",
         "technicalDetails": "Műszaki részletek: kapacitás és erőforrások",
-        "retentionRange": "Adjon meg 1 és {max} közötti napszámot.",
-        "linksOnPublish": "A személyes linkeket (fő moderátor, társmoderátorok és előadók) e-mailben küldjük el, amikor az esemény megjelenik. Amíg piszkozat, másolja ki őket az esemény oldaláról."
+        "retentionRange": "Adjon meg 1 és {max} közötti napszámot."
       },
       "validationFailed": "Folytatás előtt ellenőrizze a kiemelt mezőket.",
       "partialFailure": "Az esemény létrejött, de néhány elem nem lett elmentve: {items}. Ezeket az esemény oldaláról adhatja hozzá.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Társmoderátorok és előadók",
-      "intro": "Adj hozzá társmoderátorokat és előadókat egyéni varázslinkkel.",
+      "title": "Szervezők, moderátorok és előadók",
+      "intro": "Adjon hozzá szervezőket, moderátorokat és előadókat, mindegyiket saját hivatkozással.",
       "introHint": "Mindenkinek saját, a teremben látható neve és tokenje van, amely a fő linktől függetlenül visszavonható. Az előadók mikrofont, kamerát és képernyőmegosztást kapnak, de nem moderálhatnak (kidobás, mindenki némítása, felvétel).",
       "add": "Személy hozzáadása",
       "name": "A teremben látható név",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "E-mail előkészítése neki: {name}",
       "prepareEmailSubject": "Az Ön linkje ehhez: „{title}”",
       "prepareEmailBody": "Kedves {name}!\n\nItt a személyes linkje ehhez: „{title}”:\n{link}\n\nA link csak Önnek szól: ne továbbítsa és ne ossza meg.",
-      "draftNote": "Az esemény piszkozat: a linkeket e-mailben küldjük el, amikor megjelenik. Addig innen másolhatja ki őket."
+      "draftNote": "Az esemény piszkozat: a linkeket e-mailben küldjük el, amikor megjelenik. Addig innen másolhatja ki őket.",
+      "roleOrganizer": "Szervező",
+      "roleOrganizerHint": "Moderátorként moderál, és az esemény szervezői között szerepel.",
+      "organization": "Intézmény vagy szervezet (nem kötelező)",
+      "publicListed": "Megjelenítés a nyilvános oldalon",
+      "onPublicPage": "A nyilvános oldalon"
     },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",

@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Odkaz, který jste použili, už není platný. Událost skončila: níže najdete záznam a materiály.",
       "speakers": "Přednášející",
       "organizer": "Organizátor",
+      "peopleTitle": "Pořadatelé a řečníci",
+      "organizedBy": "Pořádá",
+      "peopleOrganizers": "Pořadatelé",
+      "peopleModerators": "Moderování",
       "chatNotSaved": "Zprávy z chatu nejsou po skončení události uchovávány.",
       "qaPostEvent": "Otázky a odpovědi z události",
       "peakParticipants": "Špička: {count} účastníků",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kdo může co dělat",
-        "intro": "Matice oprávnění: pro každou funkci vyberte, kdo ji může používat. Moderátoři mohou vždy vše.",
+        "intro": "Co může každá role. Pro účastníky volíte vy; ostatní role mají, co potřebují k moderování nebo vystoupení.",
         "featureCol": "Funkce",
         "role": {
-          "GUEST": "Host",
+          "GUEST": "Účastník",
           "SPEAKER": "Řečník",
           "MODERATOR": "Moderátor"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Záznam",
         "roomFeaturesHeading": "Funkce místnosti",
-        "aiPipelineOff": "AI postprodukce (přepis, shrnutí, překlady) není v této instalaci zapnutá."
+        "aiPipelineOff": "AI postprodukce (přepis, shrnutí, překlady) není v této instalaci zapnutá.",
+        "rolesHeading": "Role v akci",
+        "roleModeratorColumn": "Pořadatel a moderátor",
+        "roleInfo": {
+          "organizer": {
+            "name": "Pořadatel",
+            "desc": "Vede místnost jako moderátor a je uveden mezi pořadateli. Hlavní pořadatel přidává a odebírá ostatní osoby."
+          },
+          "moderator": {
+            "name": "Moderátor",
+            "desc": "Vede místnost: uděluje a odebírá slovo, ztlumuje, spravuje dotazy, ankety a nahrávání."
+          },
+          "speaker": {
+            "name": "Řečník",
+            "desc": "Mluví, používá kameru a sdílí obrazovku; nemoderuje."
+          },
+          "guest": {
+            "name": "Účastník",
+            "desc": "Sleduje akci a zapojuje se tak, jak určíte v tabulce níže."
+          }
+        }
       },
       "step3": {
         "heading": "Osoby a pozvánky",
-        "intro": "Přidejte organizátory (zobrazí se na stránce), moderátory, řečníky a pozvané hosty.",
-        "organizersHeading": "Organizátoři",
-        "organizersHelp": "Organizace, které událost pořádají: název, web a logo se zobrazí na veřejné stránce.",
+        "intro": "Kdo pořádá, kdo moderuje a kdo mluví, s jejich organizacemi; poté případně pozvaní hosté.",
+        "organizersHeading": "Pořádající organizace",
+        "organizersHelp": "Organizace, které akci pořádají: název, web a logo se zobrazí na veřejné stránce. Nemusí se shodovat s organizacemi osob.",
         "organizerName": "Název organizace",
         "organizerWebsite": "Webové stránky",
         "organizerLogo": "Logo pořadatele",
         "organizerRequired": "Název organizace je povinný.",
-        "moderatorsHeading": "Moderátoři",
-        "moderatorsHelp": "Moderátoři mohou řídit relaci a ovládat oprávnění během události.",
-        "moderatorName": "Jméno",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "Jméno a e-mail jsou povinné.",
-        "speakersHeading": "Řečníci",
-        "speakersHelp": "E-mailem dostanou osobní odkaz, aby mohli mluvit, používat kameru a sdílet obrazovku, bez oprávnění moderátora.",
-        "speakerName": "Jméno",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "Jméno a e-mail jsou povinné.",
         "invitationsHeading": "Pozvánky",
-        "invitationsHelp": "Seznam pozvaných osob. Platforma pozvánky neposílá: odkaz na událost jim sdílejte sami. Když je veřejná registrace vypnutá, mohou se zaregistrovat jen tyto adresy a osobní odkaz pro vstup přijde e-mailem po registraci.",
         "invitationName": "Jméno (volitelné)",
         "invitationEmail": "E-mail",
         "add": "Přidat",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "nebo přidejte ručně",
         "removeItem": "Odstranit {name}",
         "invitationsStaffOnly": "Pozvánky spravuje tým události.",
-        "pickSkipped": "Některé osoby už byly uvedeny nebo neměly platnou adresu, a nebyly přidány."
+        "pickSkipped": "Některé osoby už byly uvedeny nebo neměly platnou adresu, a nebyly přidány.",
+        "primaryHeading": "Hlavní pořadatel",
+        "primaryHelp": "Dostane e-mailem hlavní odkaz akce: vede místnost a přidává nebo odebírá ostatní osoby. Jméno a e-mail jsou nutné ke zveřejnění, ne pro koncept.",
+        "primaryPrefilled": "Hlavním pořadatelem jste vy, se jménem a e-mailem svého účtu. Pokud akci vede někdo jiný, zadejte sem jeho údaje: odkaz dostane on.",
+        "primaryNameRequired": "Zadejte jméno hlavního pořadatele.",
+        "primaryEmailRequired": "Zadejte platný e-mail hlavního pořadatele.",
+        "linksOnPublish": "Osobní odkazy se odešlou e-mailem při zveřejnění; dokud je akce konceptem, zkopírujte je z její stránky.",
+        "personName": "Jméno",
+        "personEmail": "E-mail",
+        "peopleHeading": "Osoby akce",
+        "peopleHelp": "Pořadatelé, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup se svou rolí; co která role může, ukazuje krok „Oprávnění“.",
+        "personRole": "Role",
+        "roleOrganizer": "Pořadatel",
+        "roleModerator": "Moderátor",
+        "roleSpeaker": "Řečník",
+        "roleHelp": {
+          "organizer": "Vede místnost jako moderátor a je uveden mezi pořadateli.",
+          "moderator": "Vede místnost: uděluje slovo, spravuje dotazy, ankety a nahrávání.",
+          "speaker": "Mluví, používá kameru a sdílí obrazovku, bez moderátorských pravomocí."
+        },
+        "personOrganization": "Organizace",
+        "personOrganizationHelp": "Organizace osoby: může se lišit od té, která akci pořádá.",
+        "personLogo": "Logo organizace",
+        "personLogoAdd": "Přidat logo organizace",
+        "personLogoChange": "Změnit logo organizace",
+        "personPublic": "Zobrazit na veřejné stránce",
+        "personRequired": "Jméno a e-mail jsou povinné.",
+        "invitationsHelpOpen": "Volitelné: seznam lidí, které zvete. Registrace je otevřená, takže po zveřejnění se může registrovat kdokoli, pozvaný i nepozvaný. Platforma pozvánky neposílá: odkaz na akci sdílejte sami.",
+        "invitationsHelpRestricted": "Registrace je omezená: registrovat se mohou jen adresy z tohoto seznamu. Platforma pozvánky neposílá: odkaz na akci sdílejte sami; odkaz pro vstup přijde e-mailem po registraci.",
+        "logoExternal": "Veřejná stránka zobrazuje jen loga nahraná na tuto platformu: logo z jiného webu se nezobrazí.",
+        "primaryProfileInvalid": "Zkontrolujte organizaci a adresu loga."
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -878,7 +921,6 @@
           "schedule": "Kalendář",
           "recurrence": "Opakování",
           "maxParticipants": "Očekávaní účastníci",
-          "organizers": "Organizátoři",
           "speakers": "Řečníci",
           "invitations": "Pozvánky",
           "materials": "Materiály",
@@ -888,7 +930,12 @@
           "recordingManual": "Zapnuto — ruční spuštění",
           "recordingOff": "Vypnuto",
           "multitrack": "Nahrávání po jednotlivých účastnících",
-          "multitrackOn": "Zapnuto — vyžaduje výslovný souhlas při registraci"
+          "multitrackOn": "Zapnuto — vyžaduje výslovný souhlas při registraci",
+          "organizingEntities": "Pořádající organizace",
+          "primaryOrganizer": "Hlavní pořadatel",
+          "primaryMissing": "Pro zveřejnění je třeba ho uvést v kroku „Osoby“",
+          "organizersPeople": "Další pořadatelé",
+          "moderators": "Moderátoři"
         },
         "noRecurrence": "Jednorázová událost",
         "gdprHeading": "Soukromí a uchovávání dat",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Použít vlastní text —",
         "gdprTemplateUnknown": "Vybraná šablona informací o ochraně osobních údajů již neexistuje: vyberte jinou nebo se vraťte k vlastnímu textu",
         "privacyText": "Informace o ochraně osobních údajů (text)",
-        "moderatorHeading": "Kontakt moderátora",
-        "moderatorPublishHint": "Ke zveřejnění události jsou jméno a e-mail povinné (slouží pro odkaz moderátora a potvrzovací e-mail). Pro uložení konceptu potřeba nejsou.",
-        "moderatorPrefilled": "Hlavním moderátorem jste vy, se jménem a e-mailem z vašeho účtu. Pokud událost moderuje někdo jiný, zadejte sem jeho údaje: odkaz pro správu dostane on.",
-        "moderatorLinkNote": "Tato osoba je hlavním moderátorem události: e-mailem obdrží soukromý odkaz pro její řízení (spuštění nahrávání, moderování otázek, spouštění anket…). Liší se od spolumoderátorů přidaných v kroku „Lidé“, z nichž každý dostane vlastní odkaz.",
-        "moderatorRequired": "Zadejte jméno moderátora",
-        "moderatorEmailRequired": "Zadejte platný e-mail moderátora",
-        "moderatorName": "Jméno",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Odhadovaná kapacita",
         "featuresHeading": "Souhrn konfigurace",
         "privacyDoc": "Dokument s informacemi o ochraně (PDF nebo odkaz)",
         "privacyDocHelp": "Nahrajte PDF nebo vložte URL alternativního textu. Přepíše šablonu GDPR, pokud existuje.",
         "privacyTextHelp": "Stručný text zobrazený v registračním formuláři; může doplňovat nebo nahradit šablonu GDPR.",
         "technicalDetails": "Technické podrobnosti: kapacita a prostředky",
-        "retentionRange": "Zadejte počet dní mezi 1 a {max}.",
-        "linksOnPublish": "Osobní odkazy (hlavní moderátor, spolumoderátoři a řečníci) se odešlou e-mailem, když je událost zveřejněna. Dokud je to koncept, zkopírujte je ze stránky události."
+        "retentionRange": "Zadejte počet dní mezi 1 a {max}."
       },
       "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole.",
       "partialFailure": "Událost byla vytvořena, ale některé položky se neuložily: {items}. Můžete je doplnit na stránce události.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Spolumoderátoři a řečníci",
-      "intro": "Přidejte spolumoderátory a řečníky s individuálními magickými odkazy.",
+      "title": "Pořadatelé, moderátoři a řečníci",
+      "intro": "Přidejte pořadatele, moderátory a řečníky, každého s vlastním odkazem.",
       "introHint": "Každá osoba má vlastní jméno viditelné v místnosti a token, který lze zrušit nezávisle na hlavním odkazu. Řečníci mají mikrofon, kameru a sdílení obrazovky, ale nemohou moderovat (vyhodit, ztlumit všechny, nahrávat).",
       "add": "Přidat osobu",
       "name": "Jméno viditelné v místnosti",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Připravit e-mail pro: {name}",
       "prepareEmailSubject": "Váš odkaz na „{title}“",
       "prepareEmailBody": "Dobrý den, {name},\n\nzde je váš osobní odkaz na „{title}“:\n{link}\n\nOdkaz je jen pro vás: nepřeposílejte ho ani ho nesdílejte.",
-      "draftNote": "Událost je koncept: odkazy se odešlou e-mailem po jejím zveřejnění. Mezitím je můžete zkopírovat odsud."
+      "draftNote": "Událost je koncept: odkazy se odešlou e-mailem po jejím zveřejnění. Mezitím je můžete zkopírovat odsud.",
+      "roleOrganizer": "Pořadatel",
+      "roleOrganizerHint": "Moderuje jako moderátor a je uveden mezi pořadateli akce.",
+      "organization": "Organizace (volitelné)",
+      "publicListed": "Zobrazit na veřejné stránce",
+      "onPublicPage": "Na veřejné stránce"
     },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",

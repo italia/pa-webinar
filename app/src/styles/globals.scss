@@ -4557,6 +4557,94 @@ html.live-call-immersive body {
   color: #a1112e;
 }
 
+// Pagina pubblica: chi organizza e chi interviene.
+.event-people {
+  padding: 1rem 1.25rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.event-people__group + .event-people__group {
+  margin-top: 1rem;
+}
+
+.event-people__label {
+  margin: 0 0 0.5rem;
+  color: #455b71;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.event-people__orgs,
+.event-people__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event-org,
+.event-person {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.event-org__logo {
+  max-width: 120px;
+  max-height: 48px;
+  object-fit: contain;
+}
+
+.event-person__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.event-org__initials,
+.event-person__initials {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 102, 204, 0.1);
+  color: #004d99;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.event-org__name {
+  font-weight: 600;
+}
+
+.event-person__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.event-person__name {
+  font-weight: 600;
+  color: #17324d;
+}
+
+.event-person__org {
+  color: #5a6772;
+  font-size: 0.85rem;
+}
+
 .registration-when {
   display: flex;
   align-items: center;
@@ -7348,6 +7436,53 @@ html.live-resizing .live-sidebar-resizer::after {
 
 .wizard-group__body {
   padding: 1rem;
+}
+
+// ── Ruoli dell'evento nel passo «Permessi» del wizard
+.wizard-roles {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #f5f7fb;
+}
+
+.wizard-roles__list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.wizard-roles__item {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) 1fr;
+  gap: 0.75rem;
+
+  dt {
+    font-weight: 600;
+    color: var(--app-text);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #3d4955;
+  }
+
+  @media (max-width: 575.98px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+// ── Elenco delle persone nel passo «Persone»
+.wizard-person__logo > summary {
+  cursor: pointer;
+  color: var(--app-primary);
+}
+
+.wizard-group--static {
+  > .wizard-group__body {
+    padding: 1rem;
+  }
 }
 
 // ── Sezioni tecniche chiuse del wizard (capacita', risorse)

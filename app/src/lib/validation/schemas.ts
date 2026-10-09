@@ -74,6 +74,10 @@ export const eventBaseSchema = z.object({
   coverImageUrl: z.string().url().nullable().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
+  // L'organizzatore principale nella pagina pubblica (vedi lib/events/public-people).
+  moderatorOrganization: z.string().trim().max(200).nullable().optional(),
+  moderatorOrganizationLogoUrl: z.string().url().max(2048).nullable().optional(),
+  moderatorPublicListed: z.boolean().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),

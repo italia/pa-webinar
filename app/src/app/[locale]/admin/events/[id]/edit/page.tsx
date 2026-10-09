@@ -239,6 +239,9 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       privacyPolicyUrl: event.privacyPolicyUrl,
       moderatorName: event.moderatorName,
       moderatorEmail: tryDecryptPII(event.moderatorEmail),
+      moderatorOrganization: event.moderatorOrganization,
+      moderatorOrganizationLogoUrl: event.moderatorOrganizationLogoUrl,
+      moderatorPublicListed: event.moderatorPublicListed,
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
@@ -252,6 +255,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       email: tryDecryptPII(m.email),
       role: m.role as 'MODERATOR' | 'SPEAKER',
       personId: null,
+      organizer: m.organizer,
+      organization: m.organization,
+      organizationLogoUrl: m.organizationLogoUrl,
+      publicListed: m.publicListed,
     })),
     invitations: event.invitations.map((i) => ({
       id: i.id,
@@ -295,6 +302,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         mode="edit"
         initialStep={initialStep}
         canUseRubrica={session?.role === 'admin'}
+        publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}

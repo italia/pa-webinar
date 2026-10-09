@@ -1,9 +1,11 @@
 /**
- * I passi del wizard dell'evento, in ordine. Stanno qui (e non nel wizard)
+ * I passi del wizard dell'evento, in ordine: prima chi partecipa con un ruolo
+ * (`invites`, il passo «Persone»), poi che cosa può fare ciascun ruolo
+ * (`permissions`). Stanno qui (e non nel wizard)
  * perche' li usano anche gli indirizzi della modifica (`?step=`) e le pagine
  * del server che li leggono.
  */
-export const WIZARD_STEPS = ['base', 'permissions', 'invites', 'content', 'review'] as const;
+export const WIZARD_STEPS = ['base', 'invites', 'permissions', 'content', 'review'] as const;
 export type WizardStep = (typeof WIZARD_STEPS)[number];
 
 /** Un valore arrivato da un indirizzo e' un passo del wizard? */

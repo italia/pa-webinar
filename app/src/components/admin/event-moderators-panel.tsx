@@ -8,6 +8,7 @@ import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
 import { mailtoHref } from '@/lib/email/mailto';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import type { PersonRole } from '@/lib/events/grant-profile';
 
 type GrantRole = 'MODERATOR' | 'SPEAKER';
 
@@ -16,6 +17,9 @@ interface ModeratorRow {
   name: string;
   email: string | null;
   role: GrantRole;
+  organizer: boolean;
+  organization: string | null;
+  publicListed: boolean;
   token: string;
   createdAt: string;
   revokedAt: string | null;
@@ -51,7 +55,10 @@ export default function EventModeratorsPanel({
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<GrantRole>('MODERATOR');
+  const [role, setRole] = useState<PersonRole>('moderator');
+  const [organization, setOrganization] = useState('');
+  // Spento di default: pubblicare nome ed ente è una scelta per ogni persona.
+  const [publicListed, setPublicListed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -92,7 +99,10 @@ export default function EventModeratorsPanel({
           body: JSON.stringify({
             name: name.trim(),
             email: email.trim() || undefined,
-            role,
+            role: role === 'speaker' ? 'SPEAKER' : 'MODERATOR',
+            organizer: role === 'organizer',
+            organization: organization.trim() || null,
+            publicListed,
           }),
         });
         if (!res.ok) {
@@ -101,14 +111,16 @@ export default function EventModeratorsPanel({
         }
         setName('');
         setEmail('');
-        setRole('MODERATOR');
+        setRole('moderator');
+        setOrganization('');
+        setPublicListed(false);
         setShowForm(false);
         await fetchRows();
       } finally {
         setSubmitting(false);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, email, role, eventId, moderatorToken, fetchRows, t],
+    }, [name, email, role, organization, publicListed, eventId, moderatorToken, fetchRows, t],
   );
 
   const handleRevoke = useCallback(
@@ -208,14 +220,41 @@ export default function EventModeratorsPanel({
               id="co-mod-role"
               className="form-select"
               value={role}
-              onChange={(e) => setRole(e.target.value as GrantRole)}
+              onChange={(e) => setRole(e.target.value as PersonRole)}
             >
-              <option value="MODERATOR">{t('roleModerator')}</option>
-              <option value="SPEAKER">{t('roleSpeaker')}</option>
+              <option value="organizer">{t('roleOrganizer')}</option>
+              <option value="moderator">{t('roleModerator')}</option>
+              <option value="speaker">{t('roleSpeaker')}</option>
             </select>
             <div className="text-muted mt-1" style={{ fontSize: '0.78rem' }}>
-              {role === 'SPEAKER' ? t('roleSpeakerHint') : t('roleModeratorHint')}
+              {role === 'speaker'
+                ? t('roleSpeakerHint')
+                : role === 'organizer'
+                  ? t('roleOrganizerHint')
+                  : t('roleModeratorHint')}
             </div>
+          </div>
+          <div className="mb-2">
+            <Label htmlFor="co-mod-org">{t('organization')}</Label>
+            <Input
+              id="co-mod-org"
+              type="text"
+              maxLength={200}
+              value={organization}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOrganization(e.target.value)}
+            />
+          </div>
+          <div className="form-check mb-3">
+            <input
+              id="co-mod-public"
+              type="checkbox"
+              className="form-check-input"
+              checked={publicListed}
+              onChange={(e) => setPublicListed(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="co-mod-public">
+              {t('publicListed')}
+            </label>
           </div>
           <div className="d-flex gap-2">
             <Button color="primary" size="sm" type="submit" disabled={submitting || name.trim().length < 2}>
@@ -265,17 +304,26 @@ export default function EventModeratorsPanel({
                         color: row.role === 'SPEAKER' ? '#A66300' : '#0759A9',
                       }}
                     >
-                      {row.role === 'SPEAKER' ? t('roleSpeaker') : t('roleModerator')}
+                      {row.role === 'SPEAKER'
+                        ? t('roleSpeaker')
+                        : row.organizer
+                          ? t('roleOrganizer')
+                          : t('roleModerator')}
                     </Badge>
+                    {row.publicListed && !revoked && (
+                      <Badge color="" pill style={{ fontSize: '0.68rem', background: '#E6F4EA', color: '#1B6B2F' }}>
+                        {t('onPublicPage')}
+                      </Badge>
+                    )}
                     {revoked && (
                       <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                         {t('revoked')}
                       </Badge>
                     )}
                   </div>
-                  {row.email && (
+                  {(row.email || row.organization) && (
                     <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                      {row.email}
+                      {[row.email, row.organization].filter(Boolean).join(' · ')}
                     </div>
                   )}
                   {!revoked && (

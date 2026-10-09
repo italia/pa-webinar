@@ -7,6 +7,8 @@
  * salvataggio che deve riprovarla — si verificano richiesta per richiesta.
  */
 
+import { differenzaProfilo, profiloSalvato } from '@/lib/events/grant-profile';
+
 import { questionnaireChanged } from './questionnaire-diff';
 import type { AdhocQuestionDraft, QuestionnaireBlock } from './step-4-content';
 import type { InitialEventShape, WizardForm } from './wizard-shell';
@@ -355,20 +357,60 @@ export async function fanoutEditDiff(
     initial.organizers = initial.organizers.filter((x) => x.id !== o.id);
   }
 
-  // EventModerators (MODERATOR + SPEAKER roles share one table)
-  const modKey = (
-    m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' },
-  ) => `${m.role}|${(m.email ?? '').toLowerCase()}`;
-  const initialModByKey = new Map(
-    initial.eventModerators.map((m) => [modKey(m), m]),
-  );
-  const currentMods: Array<{ email: string; role: 'MODERATOR' | 'SPEAKER'; name: string }> = [
-    ...form.moderators.map((m) => ({ email: m.email, role: 'MODERATOR' as const, name: m.name })),
-    ...form.speakers.map((s) => ({ email: s.email, role: 'SPEAKER' as const, name: s.name })),
+  // Le persone (concessioni MODERATOR e SPEAKER, una tabella sola). Una
+  // persona già salvata si riconosce dall'id della sua concessione, non
+  // dall'indirizzo: le concessioni senza email (dal pannello dell'evento)
+  // avrebbero tutte la stessa chiave. Una persona nuova si riconosce da ruolo
+  // ed email, che il wizard chiede e non ripete: serve al salvataggio che
+  // riprova, quando la concessione creata al primo giro è già nello scatto.
+  type Concessione = (typeof initial.eventModerators)[number];
+  const chiave = (m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' }) =>
+    `${m.role}|${(m.email ?? '').toLowerCase()}`;
+  const correnti = [
+    ...form.moderators.map((m) => ({ ...m, role: 'MODERATOR' as const })),
+    ...form.speakers.map((m) => ({ ...m, organizer: false, role: 'SPEAKER' as const })),
   ];
-  const currentModKeys = new Set(currentMods.map(modKey));
-  for (const m of currentMods) {
-    if (initialModByKey.has(modKey(m))) continue;
+  // Le concessioni da tenere: quelle che una persona del modulo usa ancora.
+  const tenute = new Set<string>();
+  const trova = (pred: (g: Concessione) => boolean) =>
+    initial.eventModerators.find((g) => !tenute.has(g.id) && pred(g));
+
+  for (const c of correnti) {
+    const salvata = c.grantId ? initial.eventModerators.find((g) => g.id === c.grantId) : undefined;
+    // La concessione con cui la persona entra ora: la sua, se il ruolo è lo
+    // stesso; quella che la sostituisce, se un salvataggio precedente ha
+    // già cambiato il ruolo; per una persona nuova, quella creata al giro
+    // prima.
+    const attuale =
+      salvata && salvata.role === c.role
+        ? salvata
+        : salvata
+          ? trova((g) => g.replaces === salvata.id && g.role === c.role)
+          : c.email
+            ? trova((g) => !g.replaces && chiave(g) === chiave(c))
+            : undefined;
+    if (attuale) {
+      tenute.add(attuale.id);
+      // Il link resta: cambia solo il profilo (ente, logo, organizzatore,
+      // pagina pubblica).
+      const profilo = differenzaProfilo(attuale, c);
+      if (!profilo) continue;
+      const aggiornato = await fanoutFetch(
+        report,
+        'moderators',
+        `/api/events/${eventId}/moderators/${attuale.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', ...auth },
+          body: JSON.stringify(profilo),
+        },
+      );
+      if (aggiornato.outcome === 'ok') Object.assign(attuale, profilo);
+      continue;
+    }
+    // Una persona nuova, o un cambio fra moderatore e relatore: serve una
+    // concessione nuova, con un link nuovo.
+    const profilo = profiloSalvato(c);
     const creato = await fanoutFetch(
       report,
       'moderators',
@@ -376,21 +418,34 @@ export async function fanoutEditDiff(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...auth },
-        body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
+        body: JSON.stringify({
+          name: c.name,
+          // Una concessione senza indirizzo resta senza: la stringa vuota
+          // non è un'email e farebbe rifiutare la richiesta.
+          email: c.email || undefined,
+          role: c.role,
+          ...profilo,
+        }),
       },
     );
     if (creato.body?.id) {
       initial.eventModerators.push({
         id: creato.body.id,
-        name: m.name,
-        email: m.email,
-        role: m.role,
+        name: c.name,
+        email: c.email || null,
+        role: c.role,
         personId: null,
+        ...profilo,
+        ...(salvata && { replaces: salvata.id }),
       });
+      tenute.add(creato.body.id);
+    } else if (salvata) {
+      // Il cambio di ruolo non è riuscito: la persona tiene il link che ha.
+      tenute.add(salvata.id);
     }
   }
-  for (const m of initial.eventModerators) {
-    if (currentModKeys.has(modKey(m))) continue;
+  for (const m of [...initial.eventModerators]) {
+    if (tenute.has(m.id)) continue;
     // Una revoca: finche' non riesce, il collegamento della persona resta
     // valido. Non entra fra le risorse generiche ma nell'elenco nominativo,
     // che il wizard mostra per nome.

@@ -85,6 +85,11 @@ model Event {
   moderatorToken String  @unique @map("moderator_token") // UUID for magic link
   moderatorName  String? @map("moderator_name")
   moderatorEmail String? @map("moderator_email")
+  // L'organizzatore principale nella pagina pubblica: il suo ente, il logo e
+  // se presentarlo. Spento di default, come per le altre persone.
+  moderatorOrganization        String? @map("moderator_organization")
+  moderatorOrganizationLogoUrl String? @map("moderator_organization_logo_url")
+  moderatorPublicListed        Boolean @default(false) @map("moderator_public_listed")
 
   // Optional join password. When set, guests visiting /live without a
   // valid accessToken or matching password are redirected to a password
@@ -349,6 +354,17 @@ model EventModerator {
   email String?
 
   role EventModeratorRole @default(MODERATOR)
+
+  // Organizzatore: un moderatore che organizza l'evento. In sala conduce come
+  // un moderatore; la pagina pubblica lo presenta fra chi organizza.
+  organizer Boolean @default(false) @map("organizer")
+  // Ente di appartenenza della persona e suo logo: possono essere diversi
+  // dall'ente che organizza l'evento (EventOrganizer).
+  organization        String? @map("organization")
+  organizationLogoUrl String? @map("organization_logo_url")
+  // La persona compare nella pagina pubblica dell'evento. Spento di default:
+  // nome ed ente si pubblicano solo per scelta di chi compila, per ognuno.
+  publicListed Boolean @default(false) @map("public_listed")
 
   // Per-grant magic link token. Still UUID so `randomUUID()` from
   // crypto can generate it safely.

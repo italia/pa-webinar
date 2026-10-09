@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Uporabljena povezava ni več veljavna. Dogodek je končan: spodaj najdete posnetek in gradiva.",
       "speakers": "Govorci",
       "organizer": "Organizator",
+      "peopleTitle": "Organizatorji in govorniki",
+      "organizedBy": "Organizira",
+      "peopleOrganizers": "Organizatorji",
+      "peopleModerators": "Vodenje",
       "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
       "qaPostEvent": "Vprašanja in odgovori z dogodka",
       "peakParticipants": "Vrh: {count} udeležencev",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kdo lahko kaj počne",
-        "intro": "Matrika dovoljenj: za vsako funkcijo izberite, kdo jo lahko uporablja. Moderatorji lahko vedno počnejo vse.",
+        "intro": "Kaj lahko počne vsaka vloga. Za udeležence izberete vi; druge vloge imajo, kar potrebujejo za vodenje ali govor.",
         "featureCol": "Funkcionalnost",
         "role": {
-          "GUEST": "Gost",
+          "GUEST": "Udeleženec",
           "SPEAKER": "Govornik",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Snemanje",
         "roomFeaturesHeading": "Funkcije sobe",
-        "aiPipelineOff": "Poprodukcija z UI (prepis, povzetek, prevodi) v tej namestitvi ni vklopljena."
+        "aiPipelineOff": "Poprodukcija z UI (prepis, povzetek, prevodi) v tej namestitvi ni vklopljena.",
+        "rolesHeading": "Vloge dogodka",
+        "roleModeratorColumn": "Organizator in moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizator",
+            "desc": "Vodi sobo kot moderator in je predstavljen med organizatorji. Glavni organizator dodaja in odstranjuje druge osebe."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Vodi sobo: daje in odvzema besedo, utiša, upravlja vprašanja, ankete in snemanje."
+          },
+          "speaker": {
+            "name": "Govornik",
+            "desc": "Govori, uporablja kamero in deli zaslon; ne moderira."
+          },
+          "guest": {
+            "name": "Udeleženec",
+            "desc": "Spremlja dogodek in sodeluje, kot določite v spodnji tabeli."
+          }
+        }
       },
       "step3": {
         "heading": "Osebe in vabila",
-        "intro": "Dodajte organizatorje (prikazani na strani), moderatorje, govornike in povabljene goste.",
-        "organizersHeading": "Organizatorji",
-        "organizersHelp": "Organizacije, ki organizirajo dogodek: ime, spletno mesto in logotip so prikazani na javni strani.",
+        "intro": "Kdo organizira, kdo vodi in kdo govori, z njihovimi organizacijami; nato po potrebi povabljeni.",
+        "organizersHeading": "Organizatorske ustanove",
+        "organizersHelp": "Ustanove, ki prirejajo dogodek: ime, spletno mesto in logotip so prikazani na javni strani. Ni nujno, da so enake organizacijam oseb.",
         "organizerName": "Ime organizacije",
         "organizerWebsite": "Spletna stran",
         "organizerLogo": "Logotip organizatorja",
         "organizerRequired": "Ime organizacije je obvezno.",
-        "moderatorsHeading": "Moderatorji",
-        "moderatorsHelp": "Moderatorji lahko upravljajo sejo in nadzorujejo dovoljenja med dogodkom.",
-        "moderatorName": "Ime",
-        "moderatorEmail": "E-pošta",
-        "moderatorRequired": "Ime in e-pošta sta obvezna.",
-        "speakersHeading": "Govorniki",
-        "speakersHelp": "Po e-pošti prejmejo osebno povezavo za govor, uporabo kamere in deljenje zaslona, brez pooblastil moderatorja.",
-        "speakerName": "Ime",
-        "speakerEmail": "E-pošta",
-        "speakerRequired": "Ime in e-pošta sta obvezna.",
         "invitationsHeading": "Vabila",
-        "invitationsHelp": "Seznam povabljenih oseb. Platforma ne pošilja vabil: povezavo do dogodka delite sami. Ko je javna registracija izklopljena, se lahko registrirajo le ti naslovi, osebna povezava za vstop pa po registraciji prispe po e-pošti.",
         "invitationName": "Ime (neobvezno)",
         "invitationEmail": "E-pošta",
         "add": "Dodaj",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "ali dodajte ročno",
         "removeItem": "Odstrani {name}",
         "invitationsStaffOnly": "Vabila upravlja osebje dogodka.",
-        "pickSkipped": "Nekatere osebe so že bile na seznamu ali niso imele veljavnega naslova, zato niso bile dodane."
+        "pickSkipped": "Nekatere osebe so že bile na seznamu ali niso imele veljavnega naslova, zato niso bile dodane.",
+        "primaryHeading": "Glavni organizator",
+        "primaryHelp": "Po e-pošti prejme glavno povezavo dogodka: vodi sobo ter dodaja ali odstranjuje druge osebe. Ime in e-pošta sta potrebna za objavo, ne za osnutek.",
+        "primaryPrefilled": "Glavni organizator ste vi, z imenom in e-pošto svojega računa. Če dogodek vodi kdo drug, tukaj vnesite njegove podatke: povezava bo poslana njemu.",
+        "primaryNameRequired": "Vnesite ime glavnega organizatorja.",
+        "primaryEmailRequired": "Vnesite veljaven e-poštni naslov glavnega organizatorja.",
+        "linksOnPublish": "Osebne povezave se pošljejo po e-pošti ob objavi; dokler je dogodek osnutek, jih kopirajte z njegove strani.",
+        "personName": "Ime",
+        "personEmail": "E-pošta",
+        "peopleHeading": "Osebe dogodka",
+        "peopleHelp": "Organizatorji, moderatorji in govorniki. Vsak prejme svojo povezavo za vstop s svojo vlogo; kaj lahko počne vsaka vloga, prikazuje korak »Dovoljenja«.",
+        "personRole": "Vloga",
+        "roleOrganizer": "Organizator",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Govornik",
+        "roleHelp": {
+          "organizer": "Vodi sobo kot moderator in je predstavljen med organizatorji.",
+          "moderator": "Vodi sobo: daje besedo, upravlja vprašanja, ankete in snemanje.",
+          "speaker": "Govori, uporablja kamero in deli zaslon, brez pooblastil moderatorja."
+        },
+        "personOrganization": "Ustanova ali organizacija",
+        "personOrganizationHelp": "Organizacija osebe: lahko je drugačna od tiste, ki prireja dogodek.",
+        "personLogo": "Logotip organizacije",
+        "personLogoAdd": "Dodaj logotip organizacije",
+        "personLogoChange": "Spremeni logotip organizacije",
+        "personPublic": "Prikaži na javni strani",
+        "personRequired": "Ime in e-pošta sta obvezna.",
+        "invitationsHelpOpen": "Neobvezno: seznam oseb, ki jih povabite. Prijava je odprta, zato se po objavi lahko prijavi kdorkoli, povabljen ali ne. Platforma ne pošilja vabil: povezavo do dogodka delite sami.",
+        "invitationsHelpRestricted": "Prijava je omejena: prijavijo se lahko samo naslovi s tega seznama. Platforma ne pošilja vabil: povezavo do dogodka delite sami; povezava za vstop pride po e-pošti po prijavi.",
+        "logoExternal": "Javna stran prikazuje samo logotipe, naložene na to platformo: logotip z drugega spletnega mesta ne bo prikazan.",
+        "primaryProfileInvalid": "Preverite organizacijo in naslov logotipa."
       },
       "step4": {
         "heading": "Vsebine in gradiva",
@@ -878,7 +921,6 @@
           "schedule": "Koledar",
           "recurrence": "Ponovitev",
           "maxParticipants": "Pričakovani udeleženci",
-          "organizers": "Organizatorji",
           "speakers": "Govorniki",
           "invitations": "Vabila",
           "materials": "Gradiva",
@@ -888,7 +930,12 @@
           "recordingManual": "Vključeno — ročni zagon",
           "recordingOff": "Izključeno",
           "multitrack": "Snemanje po udeležencih",
-          "multitrackOn": "Vklopljeno — zahteva izrecno soglasje ob prijavi"
+          "multitrackOn": "Vklopljeno — zahteva izrecno soglasje ob prijavi",
+          "organizingEntities": "Organizatorske ustanove",
+          "primaryOrganizer": "Glavni organizator",
+          "primaryMissing": "Za objavo ga je treba navesti v koraku »Osebe«",
+          "organizersPeople": "Drugi organizatorji",
+          "moderators": "Moderatorji"
         },
         "noRecurrence": "Enkraten dogodek",
         "gdprHeading": "Zasebnost in hramba podatkov",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Uporabi prilagojeno besedilo —",
         "gdprTemplateUnknown": "Izbrana predloga obvestila o zasebnosti ne obstaja več: izberite drugo ali se vrnite k besedilu po meri",
         "privacyText": "Obvestilo o zasebnosti (besedilo)",
-        "moderatorHeading": "Stik moderatorja",
-        "moderatorPublishHint": "Ime in e-naslov sta za objavo dogodka obvezna (uporabita se za moderatorsko povezavo in potrditveno e-sporočilo). Za shranjevanje kot osnutek nista potrebna.",
-        "moderatorPrefilled": "Glavni moderator ste vi, z imenom in e-pošto svojega računa. Če dogodek moderira druga oseba, tukaj vpišite njene podatke: povezava za upravljanje bo poslana njej.",
-        "moderatorLinkNote": "Ta oseba je glavni moderator dogodka: po e-pošti prejme zasebno povezavo za upravljanje dogodka (začetek snemanja, moderiranje vprašanj, zagon anket …). To ni isto kot somoderatorji, dodani v koraku »Osebe«, od katerih vsak prejme svojo povezavo.",
-        "moderatorRequired": "Vnesite ime moderatorja",
-        "moderatorEmailRequired": "Vnesite veljaven e-naslov moderatorja",
-        "moderatorName": "Ime",
-        "moderatorEmail": "E-pošta",
         "capacityHeading": "Ocenjena zmogljivost",
         "featuresHeading": "Povzetek konfiguracije",
         "privacyDoc": "Dokument obvestila (PDF ali povezava)",
         "privacyDocHelp": "Naložite PDF ali prilepite URL nadomestnega obvestila. Prepiše predlogo GDPR, če je nastavljena.",
         "privacyTextHelp": "Kratko besedilo, prikazano v prijavnem obrazcu; lahko dopolni ali nadomesti predlogo GDPR.",
         "technicalDetails": "Tehnične podrobnosti: zmogljivost in viri",
-        "retentionRange": "Vnesite število dni med 1 in {max}.",
-        "linksOnPublish": "Osebne povezave (glavni moderator, somoderatorji in govorniki) se pošljejo po e-pošti, ko je dogodek objavljen. Dokler je osnutek, jih kopirajte s strani dogodka."
+        "retentionRange": "Vnesite število dni med 1 in {max}."
       },
       "validationFailed": "Pred nadaljevanjem preverite označena polja.",
       "partialFailure": "Dogodek je ustvarjen, vendar nekateri elementi niso bili shranjeni: {items}. Dodate jih lahko na strani dogodka.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Somoderatorji in govorci",
-      "intro": "Dodajte somoderatorje in govorce z individualnimi magic-link povezavami.",
+      "title": "Organizatorji, moderatorji in govorniki",
+      "intro": "Dodajte organizatorje, moderatorje in govornike, vsakega s svojo povezavo.",
       "introHint": "Vsaka oseba ima svoje prikazno ime v sobi in žeton, ki ga je mogoče preklicati neodvisno od glavne povezave. Govorci imajo mikrofon, video in deljenje zaslona, vendar ne morejo moderirati (odstranitev, utišanje vseh, snemanje).",
       "add": "Dodaj osebo",
       "name": "Prikazno ime v sobi",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Pripravi e-pošto za: {name}",
       "prepareEmailSubject": "Vaša povezava za »{title}«",
       "prepareEmailBody": "Pozdravljeni, {name},\n\ntu je vaša osebna povezava za »{title}«:\n{link}\n\nPovezava je samo za vas: ne posredujte je in je ne delite.",
-      "draftNote": "Dogodek je osnutek: povezave se pošljejo po e-pošti, ko je objavljen. Medtem jih lahko kopirate od tukaj."
+      "draftNote": "Dogodek je osnutek: povezave se pošljejo po e-pošti, ko je objavljen. Medtem jih lahko kopirate od tukaj.",
+      "roleOrganizer": "Organizator",
+      "roleOrganizerHint": "Moderira kot moderator in je predstavljen med organizatorji dogodka.",
+      "organization": "Ustanova ali organizacija (neobvezno)",
+      "publicListed": "Prikaži na javni strani",
+      "onPublicPage": "Na javni strani"
     },
     "gdprAuditLog": {
       "title": "Dnevnik GDPR",

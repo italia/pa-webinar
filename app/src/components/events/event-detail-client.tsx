@@ -7,6 +7,8 @@ import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
+import { initials } from '@/lib/utils/speaker-palette';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
@@ -64,6 +66,9 @@ interface EventData {
   privacyPolicyUrl: string | null;
   speakersInfo: Record<string, string> | null;
   organizerName: string | null;
+  /** Gli enti che organizzano e le persone pubblicate (lib/events/public-people). */
+  organizers?: EntePubblico[];
+  people?: PersonaPubblica[];
   imageUrl: string | null;
   peakParticipants?: number;
   postEventPublic?: boolean;
@@ -506,7 +511,9 @@ export default function EventDetailClient({
                 </div>
               </div>
             </Col>
-            {speakers && (
+            {/* I campi di testo libero restano per gli eventi che non hanno
+                persone o enti strutturati. */}
+            {speakers && !event.people?.some((p) => p.role === 'speaker') && (
               <Col xs={12} md="auto">
                 <div className="d-flex align-items-center">
                   <div
@@ -533,7 +540,7 @@ export default function EventDetailClient({
                 </div>
               </Col>
             )}
-            {event.organizerName && (
+            {event.organizerName && !(event.organizers && event.organizers.length > 0) && (
               <Col xs={12} md="auto">
                 <div className="d-flex align-items-center">
                   <div
@@ -560,6 +567,8 @@ export default function EventDetailClient({
           </Row>
         </div>
       </div>
+
+      <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
 
       {/* ─── Content + Sidebar ─── */}
       <Row>
@@ -1055,5 +1064,76 @@ function PostEventSidebar({
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Chi organizza e chi interviene: gli enti, con logo e sito, e le persone
+ * pubblicate, ciascuna con il proprio ente. L'ente di una persona può essere
+ * diverso da quello che organizza l'evento.
+ */
+function EventPeople({ organizers, people }: { organizers: EntePubblico[]; people: PersonaPubblica[] }) {
+  const t = useTranslations('events');
+  if (organizers.length === 0 && people.length === 0) return null;
+  const gruppi: Array<{ role: PersonaPubblica['role']; label: string }> = [
+    { role: 'organizer', label: t('detail.peopleOrganizers') },
+    { role: 'moderator', label: t('detail.peopleModerators') },
+    { role: 'speaker', label: t('detail.speakers') },
+  ];
+  return (
+    <section className="event-people mb-4" aria-labelledby="event-people-title">
+      <h2 id="event-people-title" className="h5 fw-bold mb-3">
+        {t('detail.peopleTitle')}
+      </h2>
+      {organizers.length > 0 && (
+        <div className="event-people__group">
+          <h3 className="event-people__label">{t('detail.organizedBy')}</h3>
+          <ul className="event-people__orgs">
+            {organizers.map((o, i) => (
+              <li key={`${i}-${o.name}`} className="event-org">
+                {o.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={o.logoUrl} alt="" className="event-org__logo" />
+                ) : (
+                  <span className="event-org__initials" aria-hidden="true">{initials(o.name)}</span>
+                )}
+                {o.websiteUrl ? (
+                  <a href={o.websiteUrl} target="_blank" rel="noopener noreferrer" className="event-org__name">
+                    {o.name}
+                  </a>
+                ) : (
+                  <span className="event-org__name">{o.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {gruppi.map(({ role, label }) => {
+        const chi = people.filter((p) => p.role === role);
+        if (chi.length === 0) return null;
+        return (
+          <div key={role} className="event-people__group">
+            <h3 className="event-people__label">{label}</h3>
+            <ul className="event-people__list">
+              {chi.map((p, i) => (
+                <li key={`${p.name}-${i}`} className="event-person">
+                  {p.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.logoUrl} alt="" className="event-person__logo" />
+                  ) : (
+                    <span className="event-person__initials" aria-hidden="true">{initials(p.name)}</span>
+                  )}
+                  <span className="event-person__who">
+                    <span className="event-person__name">{p.name}</span>
+                    {p.organization && <span className="event-person__org">{p.organization}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </section>
   );
 }

@@ -274,7 +274,7 @@ The owner page for every detail below is
   returns `isPerPersonIdentity`, the per-person check. The seat table is in
   [Seats and people](../architecture/identity-and-access.md#seats-and-people).
 - **Grants.** `POST /api/events/{id}/moderators` creates a grant, from the event wizard or from
-  **Co-moderators and speakers** on the event page. `DELETE /api/events/{id}/moderators/{modId}` sets
+  **Organizers, moderators and speakers** on the event page. `DELETE /api/events/{id}/moderators/{modId}` sets
   `revokedAt` and calls `invalidateModeratorCache`, which clears only the local pod's cache. Other
   replicas wait for `MODERATOR_CACHE_TTL_MS`. No route removes a holder from a running conference.
   Duplication (`POST /api/admin/events/{id}/duplicate`) issues fresh tokens.
@@ -285,7 +285,7 @@ The owner page for every detail below is
   [Lifecycle](../architecture/identity-and-access.md#lifecycle).
 - **Where links are copied.** Staff copy the primary link from **Event links** on the event page.
   Administrators can also copy it from the **Moderators** page, which lists events that are not
-  drafts. Each grant link is copied with **Copy link** under **Co-moderators and speakers**. In the
+  drafts. Each grant link is copied with **Copy link** under **Organizers, moderators and speakers**. In the
   live room, **Show moderator link** reveals the link the moderator entered with.
 - **Link warnings.** The texts are the i18n keys `admin.links.warning`, `live.share.moderatorWarning`
   and `admin.moderators.searchHelp`.

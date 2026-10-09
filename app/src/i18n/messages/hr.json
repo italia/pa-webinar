@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Poveznica koju si upotrijebio više nije važeća. Događaj je završio: u nastavku možeš pronaći snimku i materijale.",
       "speakers": "Govornici",
       "organizer": "Organizator",
+      "peopleTitle": "Organizatori i govornici",
+      "organizedBy": "Organizira",
+      "peopleOrganizers": "Organizatori",
+      "peopleModerators": "Moderiranje",
       "chatNotSaved": "Poruke iz chata ne čuvaju se nakon završetka događaja.",
       "qaPostEvent": "Pitanja i odgovori s događaja",
       "peakParticipants": "Vrh: {count} sudionika",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Tko što može",
-        "intro": "Matrica dozvola: za svaku funkciju odaberite tko je može koristiti. Moderatori uvijek mogu sve.",
+        "intro": "Što može svaka uloga. Za sudionike birate vi; ostale uloge imaju ono što im treba za vođenje ili govor.",
         "featureCol": "Funkcionalnost",
         "role": {
-          "GUEST": "Gost",
+          "GUEST": "Sudionik",
           "SPEAKER": "Govornik",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Snimanje",
         "roomFeaturesHeading": "Funkcije sobe",
-        "aiPipelineOff": "AI postprodukcija (transkripcija, sažetak, prijevodi) nije uključena u ovoj instalaciji."
+        "aiPipelineOff": "AI postprodukcija (transkripcija, sažetak, prijevodi) nije uključena u ovoj instalaciji.",
+        "rolesHeading": "Uloge događaja",
+        "roleModeratorColumn": "Organizator i moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizator",
+            "desc": "Vodi sobu kao moderator i prikazan je među organizatorima. Glavni organizator dodaje i uklanja ostale osobe."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Vodi sobu: daje i oduzima riječ, utišava, upravlja pitanjima, anketama i snimanjem."
+          },
+          "speaker": {
+            "name": "Govornik",
+            "desc": "Govori, koristi kameru i dijeli zaslon; ne moderira."
+          },
+          "guest": {
+            "name": "Sudionik",
+            "desc": "Prati događaj i sudjeluje kako odlučite u tablici ispod."
+          }
+        }
       },
       "step3": {
         "heading": "Osobe i pozivnice",
-        "intro": "Dodajte organizatore (prikazani na stranici), moderatore, govornike i pozvane goste.",
-        "organizersHeading": "Organizatori",
-        "organizersHelp": "Organizacije koje organiziraju događaj: naziv, web-mjesto i logotip prikazuju se na javnoj stranici.",
+        "intro": "Tko organizira, tko vodi i tko govori, s njihovim organizacijama; zatim, po potrebi, pozvani.",
+        "organizersHeading": "Organizatorske ustanove",
+        "organizersHelp": "Ustanove koje promiču događaj: naziv, web-stranica i logotip prikazuju se na javnoj stranici. Ne moraju se podudarati s organizacijama osoba.",
         "organizerName": "Naziv organizacije",
         "organizerWebsite": "Mrežno mjesto",
         "organizerLogo": "Logotip organizatora",
         "organizerRequired": "Naziv organizacije je obavezan.",
-        "moderatorsHeading": "Moderatori",
-        "moderatorsHelp": "Moderatori mogu upravljati sesijom i kontrolirati dozvole tijekom događaja.",
-        "moderatorName": "Ime",
-        "moderatorEmail": "E-pošta",
-        "moderatorRequired": "Ime i e-pošta su obavezni.",
-        "speakersHeading": "Govornici",
-        "speakersHelp": "E-poštom dobivaju osobnu poveznicu za govor, korištenje kamere i dijeljenje zaslona, bez ovlasti moderatora.",
-        "speakerName": "Ime",
-        "speakerEmail": "E-pošta",
-        "speakerRequired": "Ime i e-pošta su obavezni.",
         "invitationsHeading": "Pozivnice",
-        "invitationsHelp": "Popis pozvanih osoba. Platforma ne šalje pozivnice: sami podijelite poveznicu na događaj. Kad je javna registracija isključena, mogu se registrirati samo ove adrese, a osobna poveznica za ulazak stiže e-poštom nakon registracije.",
         "invitationName": "Ime (neobavezno)",
         "invitationEmail": "E-pošta",
         "add": "Dodaj",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "ili dodajte ručno",
         "removeItem": "Ukloni {name}",
         "invitationsStaffOnly": "Pozivnicama upravlja osoblje događaja.",
-        "pickSkipped": "Neke osobe već su bile navedene ili nisu imale valjanu adresu, pa nisu dodane."
+        "pickSkipped": "Neke osobe već su bile navedene ili nisu imale valjanu adresu, pa nisu dodane.",
+        "primaryHeading": "Glavni organizator",
+        "primaryHelp": "Prima e-poštom glavnu poveznicu događaja: vodi sobu te dodaje ili uklanja ostale osobe. Ime i e-pošta potrebni su za objavu, ne za skicu.",
+        "primaryPrefilled": "Glavni organizator ste vi, s imenom i e-poštom svog računa. Ako događaj vodi druga osoba, ovdje upišite njezine podatke: poveznica će stići njoj.",
+        "primaryNameRequired": "Unesite ime glavnog organizatora.",
+        "primaryEmailRequired": "Unesite valjanu e-poštu glavnog organizatora.",
+        "linksOnPublish": "Osobne poveznice šalju se e-poštom pri objavi; dok je događaj skica, kopirajte ih s njegove stranice.",
+        "personName": "Ime",
+        "personEmail": "E-pošta",
+        "peopleHeading": "Osobe događaja",
+        "peopleHelp": "Organizatori, moderatori i govornici. Svatko dobiva vlastitu poveznicu za ulazak sa svojom ulogom; što svaka uloga može prikazuje korak „Dopuštenja”.",
+        "personRole": "Uloga",
+        "roleOrganizer": "Organizator",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Govornik",
+        "roleHelp": {
+          "organizer": "Vodi sobu kao moderator i prikazan je među organizatorima.",
+          "moderator": "Vodi sobu: daje riječ, upravlja pitanjima, anketama i snimanjem.",
+          "speaker": "Govori, koristi kameru i dijeli zaslon, bez ovlasti moderiranja."
+        },
+        "personOrganization": "Ustanova ili organizacija",
+        "personOrganizationHelp": "Organizacija osobe: može se razlikovati od one koja organizira događaj.",
+        "personLogo": "Logotip organizacije",
+        "personLogoAdd": "Dodaj logotip organizacije",
+        "personLogoChange": "Promijeni logotip organizacije",
+        "personPublic": "Prikaži na javnoj stranici",
+        "personRequired": "Ime i e-pošta su obavezni.",
+        "invitationsHelpOpen": "Neobavezno: popis osoba koje pozivate. Prijava je otvorena, pa se nakon objave može prijaviti bilo tko, pozvan ili ne. Platforma ne šalje pozivnice: sami podijelite poveznicu događaja.",
+        "invitationsHelpRestricted": "Prijava je ograničena: prijaviti se mogu samo adrese s ovog popisa. Platforma ne šalje pozivnice: sami podijelite poveznicu događaja; poveznica za ulazak stiže e-poštom nakon prijave.",
+        "logoExternal": "Javna stranica prikazuje samo logotipe prenesene na ovu platformu: logotip s druge stranice neće se prikazati.",
+        "primaryProfileInvalid": "Provjerite organizaciju i adresu logotipa."
       },
       "step4": {
         "heading": "Sadržaj i materijali",
@@ -878,7 +921,6 @@
           "schedule": "Raspored",
           "recurrence": "Ponavljanje",
           "maxParticipants": "Očekivani sudionici",
-          "organizers": "Organizatori",
           "speakers": "Govornici",
           "invitations": "Pozivnice",
           "materials": "Materijali",
@@ -888,7 +930,12 @@
           "recordingManual": "Aktivno — ručno pokretanje",
           "recordingOff": "Nije aktivno",
           "multitrack": "Snimanje po sudioniku",
-          "multitrackOn": "Uključeno — zahtijeva izričit pristanak pri prijavi"
+          "multitrackOn": "Uključeno — zahtijeva izričit pristanak pri prijavi",
+          "organizingEntities": "Organizatorske ustanove",
+          "primaryOrganizer": "Glavni organizator",
+          "primaryMissing": "Za objavu treba ga navesti u koraku „Osobe”",
+          "organizersPeople": "Ostali organizatori",
+          "moderators": "Moderatori"
         },
         "noRecurrence": "Jednokratni događaj",
         "gdprHeading": "Privatnost i čuvanje podataka",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Koristi prilagođeni tekst —",
         "gdprTemplateUnknown": "Odabrani predložak obavijesti o privatnosti više ne postoji: odaberite drugi ili se vratite na prilagođeni tekst",
         "privacyText": "Obavijest o privatnosti (tekst)",
-        "moderatorHeading": "Kontakt moderatora",
-        "moderatorPublishHint": "Ime i e-adresa obvezni su za objavu događaja (koriste se za moderatorsku poveznicu i e-poruku s potvrdom). Za spremanje kao skica nisu potrebni.",
-        "moderatorPrefilled": "Glavni moderator ste vi, s imenom i e-poštom svojeg računa. Ako događaj moderira druga osoba, upišite ovdje njezine podatke: poveznica za upravljanje stići će njoj.",
-        "moderatorLinkNote": "Ova je osoba glavni moderator događaja: e-poštom prima privatnu poveznicu za upravljanje njime (pokretanje snimanja, moderiranje pitanja, pokretanje anketa…). To se razlikuje od sumoderatora dodanih u koraku »Osobe«, od kojih svaki dobiva vlastitu poveznicu.",
-        "moderatorRequired": "Unesi ime moderatora",
-        "moderatorEmailRequired": "Unesi važeću e-adresu moderatora",
-        "moderatorName": "Ime",
-        "moderatorEmail": "E-pošta",
         "capacityHeading": "Procijenjeni kapacitet",
         "featuresHeading": "Sažetak konfiguracije",
         "privacyDoc": "Dokument obavijesti (PDF ili poveznica)",
         "privacyDocHelp": "Učitajte PDF ili zalijepite URL alternativne obavijesti. Ako je postavljeno, nadjačava GDPR predložak.",
         "privacyTextHelp": "Sažeti tekst prikazan u obrascu za prijavu; može nadopuniti ili zamijeniti GDPR predložak.",
         "technicalDetails": "Tehnički detalji: kapacitet i resursi",
-        "retentionRange": "Unesite broj dana između 1 i {max}.",
-        "linksOnPublish": "Osobne poveznice (glavni moderator, sumoderatori i govornici) šalju se e-poštom kada se događaj objavi. Dok je skica, kopirajte ih sa stranice događaja."
+        "retentionRange": "Unesite broj dana između 1 i {max}."
       },
       "validationFailed": "Provjerite istaknuta polja prije nastavka.",
       "partialFailure": "Događaj je stvoren, ali neke stavke nisu spremljene: {items}. Možeš ih dodati sa stranice događaja.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Sumoderatori i govornici",
-      "intro": "Dodajte sumoderatore i govornike s pojedinačnim magičnim poveznicama.",
+      "title": "Organizatori, moderatori i govornici",
+      "intro": "Dodajte organizatore, moderatore i govornike, svakoga s vlastitom poveznicom.",
       "introHint": "Svaka osoba ima vlastito ime vidljivo u sobi i token koji se može opozvati neovisno o glavnoj poveznici. Govornici imaju mikrofon, kameru i dijeljenje zaslona, ali ne mogu moderirati (izbaciti, utišati sve, snimati).",
       "add": "Dodaj osobu",
       "name": "Ime vidljivo u sobi",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Pripremi e-poruku za: {name}",
       "prepareEmailSubject": "Vaša poveznica za „{title}”",
       "prepareEmailBody": "Pozdrav, {name},\n\nevo vaše osobne poveznice za „{title}”:\n{link}\n\nPoveznica je samo za vas: nemojte je prosljeđivati ni dijeliti.",
-      "draftNote": "Događaj je skica: poveznice se šalju e-poštom kada se objavi. U međuvremenu ih možete kopirati odavde."
+      "draftNote": "Događaj je skica: poveznice se šalju e-poštom kada se objavi. U međuvremenu ih možete kopirati odavde.",
+      "roleOrganizer": "Organizator",
+      "roleOrganizerHint": "Moderira kao moderator i prikazan je među organizatorima događaja.",
+      "organization": "Ustanova ili organizacija (neobavezno)",
+      "publicListed": "Prikaži na javnoj stranici",
+      "onPublicPage": "Na javnoj stranici"
     },
     "gdprAuditLog": {
       "title": "GDPR zapisnik",

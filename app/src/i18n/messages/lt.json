@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Jūsų naudota nuoroda nebegalioja. Renginys baigėsi: žemiau rasite įrašą ir medžiagą.",
       "speakers": "Pranešėjai",
       "organizer": "Organizatorius",
+      "peopleTitle": "Organizatoriai ir pranešėjai",
+      "organizedBy": "Organizuoja",
+      "peopleOrganizers": "Organizatoriai",
+      "peopleModerators": "Vedėjai",
       "chatNotSaved": "Pokalbių pranešimai nėra saugomi po renginio pabaigos.",
       "qaPostEvent": "Klausimai ir atsakymai iš renginio",
       "peakParticipants": "Pikas: {count} dalyvių",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kas ką gali daryti",
-        "intro": "Leidimų matrica: pasirinkite, kas gali naudotis kiekviena funkcija. Moderatoriai visada gali viską.",
+        "intro": "Ką gali kiekvienas vaidmuo. Dalyviams renkatės jūs; kiti vaidmenys turi tai, ko reikia vesti ar kalbėti.",
         "featureCol": "Funkcija",
         "role": {
-          "GUEST": "Svečias",
+          "GUEST": "Dalyvis",
           "SPEAKER": "Pranešėjas",
           "MODERATOR": "Moderatorius"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Įrašymas",
         "roomFeaturesHeading": "Salės funkcijos",
-        "aiPipelineOff": "DI pogamyba (transkripcija, santrauka, vertimai) šiame diegime neįjungta."
+        "aiPipelineOff": "DI pogamyba (transkripcija, santrauka, vertimai) šiame diegime neįjungta.",
+        "rolesHeading": "Renginio vaidmenys",
+        "roleModeratorColumn": "Organizatorius ir moderatorius",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizatorius",
+            "desc": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Pagrindinis organizatorius prideda ir pašalina kitus asmenis."
+          },
+          "moderator": {
+            "name": "Moderatorius",
+            "desc": "Veda kambarį: suteikia ir atima žodį, nutildo, valdo klausimus, apklausas ir įrašymą."
+          },
+          "speaker": {
+            "name": "Pranešėjas",
+            "desc": "Kalba, naudoja kamerą ir bendrina ekraną; nemoderuoja."
+          },
+          "guest": {
+            "name": "Dalyvis",
+            "desc": "Stebi renginį ir dalyvauja taip, kaip nuspręsite toliau esančioje lentelėje."
+          }
+        }
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
-        "intro": "Pridėkite organizatorius (rodomi puslapyje), moderatorius, pranešėjus ir pakviestus svečius.",
-        "organizersHeading": "Organizatoriai",
-        "organizersHelp": "Renginį organizuojančios organizacijos: pavadinimas, svetainė ir logotipas rodomi viešame puslapyje.",
+        "intro": "Kas organizuoja, kas veda ir kas kalba, su jų organizacijomis; tada, jei reikia, pakviestieji.",
+        "organizersHeading": "Organizuojančios institucijos",
+        "organizersHelp": "Renginį organizuojančios institucijos: pavadinimas, svetainė ir logotipas rodomi viešame puslapyje. Jos neprivalo sutapti su asmenų organizacijomis.",
         "organizerName": "Organizacijos pavadinimas",
         "organizerWebsite": "Svetainė",
         "organizerLogo": "Organizatoriaus logotipas",
         "organizerRequired": "Organizacijos pavadinimas privalomas.",
-        "moderatorsHeading": "Moderatoriai",
-        "moderatorsHelp": "Moderatoriai gali valdyti sesiją ir leidimus renginio metu.",
-        "moderatorName": "Vardas",
-        "moderatorEmail": "El. paštas",
-        "moderatorRequired": "Vardas ir el. paštas yra privalomi.",
-        "speakersHeading": "Pranešėjai",
-        "speakersHelp": "El. paštu gauna asmeninę nuorodą kalbėti, naudoti kamerą ir bendrinti ekraną, be moderatoriaus teisių.",
-        "speakerName": "Vardas",
-        "speakerEmail": "El. paštas",
-        "speakerRequired": "Vardas ir el. paštas yra privalomi.",
         "invitationsHeading": "Kvietimai",
-        "invitationsHelp": "Pakviestų asmenų sąrašas. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys. Kai viešoji registracija išjungta, užsiregistruoti gali tik šie adresai, o asmeninė prisijungimo nuoroda po registracijos atsiunčiama el. paštu.",
         "invitationName": "Vardas (neprivaloma)",
         "invitationEmail": "El. paštas",
         "add": "Pridėti",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "arba pridėti rankiniu būdu",
         "removeItem": "Pašalinti {name}",
         "invitationsStaffOnly": "Kvietimus tvarko renginio komanda.",
-        "pickSkipped": "Kai kurie asmenys jau buvo sąraše arba neturėjo galiojančio adreso, todėl nebuvo pridėti."
+        "pickSkipped": "Kai kurie asmenys jau buvo sąraše arba neturėjo galiojančio adreso, todėl nebuvo pridėti.",
+        "primaryHeading": "Pagrindinis organizatorius",
+        "primaryHelp": "El. paštu gauna pagrindinę renginio nuorodą: veda kambarį ir prideda ar pašalina kitus asmenis. Vardas ir el. paštas reikalingi paskelbti, ne juodraščiui.",
+        "primaryPrefilled": "Pagrindinis organizatorius esate jūs, su savo paskyros vardu ir el. paštu. Jei renginį veda kitas asmuo, čia įrašykite jo duomenis: nuoroda bus išsiųsta jam.",
+        "primaryNameRequired": "Įveskite pagrindinio organizatoriaus vardą.",
+        "primaryEmailRequired": "Įveskite galiojantį pagrindinio organizatoriaus el. paštą.",
+        "linksOnPublish": "Asmeninės nuorodos išsiunčiamos el. paštu paskelbus; kol renginys yra juodraštis, nukopijuokite jas iš jo puslapio.",
+        "personName": "Vardas",
+        "personEmail": "El. paštas",
+        "peopleHeading": "Renginio asmenys",
+        "peopleHelp": "Organizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą prisijungti su savo vaidmeniu; ką gali kiekvienas vaidmuo, rodo žingsnis „Leidimai“.",
+        "personRole": "Vaidmuo",
+        "roleOrganizer": "Organizatorius",
+        "roleModerator": "Moderatorius",
+        "roleSpeaker": "Pranešėjas",
+        "roleHelp": {
+          "organizer": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių.",
+          "moderator": "Veda kambarį: suteikia žodį, valdo klausimus, apklausas ir įrašymą.",
+          "speaker": "Kalba, naudoja kamerą ir bendrina ekraną, be moderavimo teisių."
+        },
+        "personOrganization": "Institucija ar organizacija",
+        "personOrganizationHelp": "Asmens organizacija: ji gali skirtis nuo renginį organizuojančios.",
+        "personLogo": "Organizacijos logotipas",
+        "personLogoAdd": "Pridėti organizacijos logotipą",
+        "personLogoChange": "Keisti organizacijos logotipą",
+        "personPublic": "Rodyti viešame puslapyje",
+        "personRequired": "Vardas ir el. paštas privalomi.",
+        "invitationsHelpOpen": "Neprivaloma: jūsų kviečiamų asmenų sąrašas. Registracija atvira, todėl paskelbus gali registruotis bet kas, pakviestas ar ne. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys.",
+        "invitationsHelpRestricted": "Registracija ribota: registruotis gali tik šio sąrašo adresai. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys; įėjimo nuoroda atkeliauja el. paštu po registracijos.",
+        "logoExternal": "Viešame puslapyje rodomi tik į šią platformą įkelti logotipai: logotipas iš kitos svetainės nebus rodomas.",
+        "primaryProfileInvalid": "Patikrinkite organizaciją ir logotipo adresą."
       },
       "step4": {
         "heading": "Turinys ir medžiaga",
@@ -878,7 +921,6 @@
           "schedule": "Kalendorius",
           "recurrence": "Pasikartojimas",
           "maxParticipants": "Numatoma dalyvių",
-          "organizers": "Organizatoriai",
           "speakers": "Pranešėjai",
           "invitations": "Kvietimai",
           "materials": "Medžiaga",
@@ -888,7 +930,12 @@
           "recordingManual": "Įjungtas — rankinis paleidimas",
           "recordingOff": "Neaktyvus",
           "multitrack": "Atskirų dalyvių įrašymas",
-          "multitrackOn": "Įjungta – registruojantis būtinas aiškus sutikimas"
+          "multitrackOn": "Įjungta – registruojantis būtinas aiškus sutikimas",
+          "organizingEntities": "Organizuojančios institucijos",
+          "primaryOrganizer": "Pagrindinis organizatorius",
+          "primaryMissing": "Norodykite žingsnyje „Asmenys“, kad paskelbtumėte",
+          "organizersPeople": "Kiti organizatoriai",
+          "moderators": "Moderatoriai"
         },
         "noRecurrence": "Vienkartinis renginys",
         "gdprHeading": "Privatumas ir duomenų saugojimas",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Naudoti pritaikytą tekstą —",
         "gdprTemplateUnknown": "Pasirinkto informacijos apie privatumą šablono nebėra: pasirinkite kitą arba grįžkite prie pasirinktinio teksto",
         "privacyText": "Privatumo informacija (tekstas)",
-        "moderatorHeading": "Moderatoriaus kontaktas",
-        "moderatorPublishHint": "Norint paskelbti renginį, privaloma nurodyti vardą ir el. pašto adresą (jie reikalingi moderatoriaus nuorodai ir patvirtinimo laiškui). Išsaugant juodraštį jų nereikia.",
-        "moderatorPrefilled": "Pagrindinis moderatorius esate jūs, su savo paskyros vardu ir el. paštu. Jei renginį moderuoja kitas asmuo, įveskite čia jo duomenis: valdymo nuoroda bus išsiųsta jam.",
-        "moderatorLinkNote": "Šis asmuo yra pagrindinis renginio moderatorius: el. paštu jis gaus privačią nuorodą renginiui valdyti (pradėti įrašymą, moderuoti klausimus, paleisti apklausas…). Tai skiriasi nuo bendramoderatorių, pridėtų žingsnyje „Žmonės“ – kiekvienas jų gauna savo nuorodą.",
-        "moderatorRequired": "Įveskite moderatoriaus vardą",
-        "moderatorEmailRequired": "Įveskite galiojantį moderatoriaus el. pašto adresą",
-        "moderatorName": "Vardas",
-        "moderatorEmail": "El. paštas",
         "capacityHeading": "Numatoma talpa",
         "featuresHeading": "Konfigūracijos santrauka",
         "privacyDoc": "Informacijos dokumentas (PDF arba nuoroda)",
         "privacyDocHelp": "Įkelkite PDF arba įklijuokite alternatyvios privatumo informacijos URL. Pakeičia GDPR/BDAR šabloną, jei nustatyta.",
         "privacyTextHelp": "Trumpas tekstas, rodomas registracijos formoje; gali papildyti arba pakeisti GDPR/BDAR šabloną.",
         "technicalDetails": "Techninė informacija: talpa ir ištekliai",
-        "retentionRange": "Įveskite dienų skaičių nuo 1 iki {max}.",
-        "linksOnPublish": "Asmeninės nuorodos (pagrindiniam moderatoriui, pagalbiniams moderatoriams ir pranešėjams) išsiunčiamos el. paštu, kai renginys paskelbiamas. Kol tai juodraštis, nukopijuokite jas iš renginio puslapio."
+        "retentionRange": "Įveskite dienų skaičių nuo 1 iki {max}."
       },
       "validationFailed": "Patikrinkite paryškintus laukus prieš tęsdami.",
       "partialFailure": "Renginys sukurtas, tačiau kai kurie elementai neišsaugoti: {items}. Galite juos pridėti renginio puslapyje.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Antriniai moderatoriai ir pranešėjai",
-      "intro": "Pridėkite antrinius moderatorius ir pranešėjus su individualiomis magiškomis nuorodomis.",
+      "title": "Organizatoriai, moderatoriai ir pranešėjai",
+      "intro": "Pridėkite organizatorius, moderatorius ir pranešėjus, kiekvieną su sava nuoroda.",
       "introHint": "Kiekvienas asmuo salėje turi matomą vardą ir savo žetoną, kurį galima atšaukti nepriklausomai nuo pagrindinės nuorodos. Pranešėjai gali naudoti mikrofoną, kamerą ir bendrinti ekraną, bet negali moderuoti (pašalinti, nutildyti visus, įrašyti).",
       "add": "Pridėti asmenį",
       "name": "Salėje matomas vardas",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Paruošti el. laišką: {name}",
       "prepareEmailSubject": "Jūsų nuoroda į „{title}“",
       "prepareEmailBody": "Sveiki, {name},\n\nštai jūsų asmeninė nuoroda į „{title}“:\n{link}\n\nNuoroda skirta tik jums: jos nepersiųskite ir nesidalykite.",
-      "draftNote": "Renginys yra juodraštis: nuorodos išsiunčiamos el. paštu, kai jis paskelbiamas. Tuo tarpu galite jas nukopijuoti iš čia."
+      "draftNote": "Renginys yra juodraštis: nuorodos išsiunčiamos el. paštu, kai jis paskelbiamas. Tuo tarpu galite jas nukopijuoti iš čia.",
+      "roleOrganizer": "Organizatorius",
+      "roleOrganizerHint": "Moderuoja kaip moderatorius ir pristatomas tarp renginio organizatorių.",
+      "organization": "Institucija ar organizacija (neprivaloma)",
+      "publicListed": "Rodyti viešame puslapyje",
+      "onPublicPage": "Viešame puslapyje"
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",

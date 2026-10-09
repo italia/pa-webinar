@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "De link die u hebt gebruikt is niet meer geldig. Het evenement is afgelopen: hieronder vindt u de opname en het materiaal.",
       "speakers": "Sprekers",
       "organizer": "Organisator",
+      "peopleTitle": "Organisatoren en sprekers",
+      "organizedBy": "Georganiseerd door",
+      "peopleOrganizers": "Organisatoren",
+      "peopleModerators": "Presentatie",
       "chatNotSaved": "Chatberichten worden niet opgeslagen na afloop van het evenement.",
       "qaPostEvent": "Vragen en antwoorden van het evenement",
       "peakParticipants": "Piek: {count} deelnemers",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Wie mag wat",
-        "intro": "Rechtenmatrix: kies per functie wie hem mag gebruiken. Moderatoren kunnen altijd alles.",
+        "intro": "Wat elke rol mag. Voor deelnemers kiest u; de andere rollen hebben wat ze nodig hebben om te presenteren of te spreken.",
         "featureCol": "Functie",
         "role": {
-          "GUEST": "Gast",
+          "GUEST": "Deelnemer",
           "SPEAKER": "Spreker",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Opname",
         "roomFeaturesHeading": "Functies van de zaal",
-        "aiPipelineOff": "AI-nabewerking (transcriptie, samenvatting, vertalingen) is niet ingeschakeld op deze installatie."
+        "aiPipelineOff": "AI-nabewerking (transcriptie, samenvatting, vertalingen) is niet ingeschakeld op deze installatie.",
+        "rolesHeading": "Rollen van het evenement",
+        "roleModeratorColumn": "Organisator en moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organisator",
+            "desc": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. De hoofdorganisator voegt de andere personen toe en verwijdert ze."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Leidt de ruimte: geeft en ontneemt het woord, dempt, beheert vragen, peilingen en opname."
+          },
+          "speaker": {
+            "name": "Spreker",
+            "desc": "Spreekt, gebruikt de camera en deelt het scherm; modereert niet."
+          },
+          "guest": {
+            "name": "Deelnemer",
+            "desc": "Volgt het evenement en doet mee zoals u in de tabel hieronder bepaalt."
+          }
+        }
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
-        "intro": "Voeg organisatoren (zichtbaar op de pagina), moderatoren, sprekers en uitgenodigde gasten toe.",
-        "organizersHeading": "Organisatoren",
-        "organizersHelp": "De organisaties achter het evenement: naam, website en logo verschijnen op de openbare pagina.",
+        "intro": "Wie organiseert, wie presenteert en wie spreekt, met hun organisaties; daarna, indien nodig, de genodigden.",
+        "organizersHeading": "Organiserende instanties",
+        "organizersHelp": "De organisaties achter het evenement: naam, website en logo verschijnen op de openbare pagina. Ze hoeven niet overeen te komen met de organisaties van de personen.",
         "organizerName": "Naam van de organisatie",
         "organizerWebsite": "Website",
         "organizerLogo": "Logo van de organisator",
         "organizerRequired": "De naam van de organisatie is verplicht.",
-        "moderatorsHeading": "Moderatoren",
-        "moderatorsHelp": "Moderatoren kunnen de sessie beheren en de rechten tijdens het evenement aanpassen.",
-        "moderatorName": "Naam",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "Naam en e-mail zijn verplicht.",
-        "speakersHeading": "Sprekers",
-        "speakersHelp": "Ze krijgen per e-mail een persoonlijke link om te spreken, hun camera te gebruiken en hun scherm te delen, zonder moderatorrechten.",
-        "speakerName": "Naam",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "Naam en e-mail zijn verplicht.",
         "invitationsHeading": "Uitnodigingen",
-        "invitationsHelp": "Lijst van uitgenodigde personen. Het platform verstuurt geen uitnodigingen: deel de link naar het evenement zelf. Als publieke inschrijving uitstaat, kunnen alleen deze adressen zich inschrijven, en de persoonlijke deelnamelink komt na de inschrijving per e-mail.",
         "invitationName": "Naam (optioneel)",
         "invitationEmail": "E-mail",
         "add": "Toevoegen",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "of handmatig toevoegen",
         "removeItem": "{name} verwijderen",
         "invitationsStaffOnly": "De uitnodigingen worden beheerd door het team van het evenement.",
-        "pickSkipped": "Sommige personen stonden al in de lijst of hadden geen geldig adres en zijn niet toegevoegd."
+        "pickSkipped": "Sommige personen stonden al in de lijst of hadden geen geldig adres en zijn niet toegevoegd.",
+        "primaryHeading": "Hoofdorganisator",
+        "primaryHelp": "Ontvangt de hoofdlink van het evenement per e-mail: leidt de ruimte en voegt de andere personen toe of verwijdert ze. Naam en e-mail zijn nodig om te publiceren, niet voor een concept.",
+        "primaryPrefilled": "De hoofdorganisator bent u, met de naam en het e-mailadres van uw account. Leidt iemand anders het evenement, vul dan hier diens gegevens in: de link gaat naar die persoon.",
+        "primaryNameRequired": "Vul de naam van de hoofdorganisator in.",
+        "primaryEmailRequired": "Vul een geldig e-mailadres van de hoofdorganisator in.",
+        "linksOnPublish": "Persoonlijke links worden bij publicatie per e-mail verstuurd; zolang het evenement een concept is, kopieert u ze van de pagina.",
+        "personName": "Naam",
+        "personEmail": "E-mail",
+        "peopleHeading": "Personen van het evenement",
+        "peopleHelp": "Organisatoren, moderatoren en sprekers. Ieder krijgt een eigen link om met de eigen rol deel te nemen; wat elke rol mag, staat in de stap ‘Rechten’.",
+        "personRole": "Rol",
+        "roleOrganizer": "Organisator",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Spreker",
+        "roleHelp": {
+          "organizer": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld.",
+          "moderator": "Leidt de ruimte: geeft het woord, beheert vragen, peilingen en opname.",
+          "speaker": "Spreekt, gebruikt de camera en deelt het scherm, zonder moderatierechten."
+        },
+        "personOrganization": "Organisatie",
+        "personOrganizationHelp": "De organisatie van de persoon: die kan verschillen van de organiserende.",
+        "personLogo": "Logo van de organisatie",
+        "personLogoAdd": "Logo van de organisatie toevoegen",
+        "personLogoChange": "Logo van de organisatie wijzigen",
+        "personPublic": "Tonen op de openbare pagina",
+        "personRequired": "Naam en e-mail zijn verplicht.",
+        "invitationsHelpOpen": "Optioneel: de lijst van personen die u uitnodigt. De inschrijving is open, dus na publicatie kan iedereen zich inschrijven, uitgenodigd of niet. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf.",
+        "invitationsHelpRestricted": "De inschrijving is beperkt: alleen de adressen op deze lijst kunnen zich inschrijven. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf; de link om binnen te komen volgt na inschrijving per e-mail.",
+        "logoExternal": "De openbare pagina toont alleen logo's die naar dit platform zijn geüpload: een logo van een andere website wordt niet getoond.",
+        "primaryProfileInvalid": "Controleer de organisatie en het adres van het logo."
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -878,7 +921,6 @@
           "schedule": "Agenda",
           "recurrence": "Herhaling",
           "maxParticipants": "Verwachte deelnemers",
-          "organizers": "Organisatoren",
           "speakers": "Sprekers",
           "invitations": "Uitnodigingen",
           "materials": "Materialen",
@@ -888,7 +930,12 @@
           "recordingManual": "Aan — handmatige start",
           "recordingOff": "Niet actief",
           "multitrack": "Opname per deelnemer",
-          "multitrackOn": "Aan — vereist uitdrukkelijke toestemming bij de registratie"
+          "multitrackOn": "Aan — vereist uitdrukkelijke toestemming bij de registratie",
+          "organizingEntities": "Organiserende instanties",
+          "primaryOrganizer": "Hoofdorganisator",
+          "primaryMissing": "Op te geven in de stap ‘Personen’ om te publiceren",
+          "organizersPeople": "Andere organisatoren",
+          "moderators": "Moderatoren"
         },
         "noRecurrence": "Eenmalig evenement",
         "gdprHeading": "Privacy en bewaring van gegevens",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Aangepaste tekst gebruiken —",
         "gdprTemplateUnknown": "Het gekozen sjabloon voor de privacyverklaring bestaat niet meer: kies een ander sjabloon of ga terug naar de aangepaste tekst",
         "privacyText": "Privacyverklaring (tekst)",
-        "moderatorHeading": "Contact moderator",
-        "moderatorPublishHint": "Naam en e-mailadres zijn verplicht om het evenement te publiceren (ze worden gebruikt voor de moderatorlink en de bevestigingsmail). Om als concept op te slaan zijn ze niet vereist.",
-        "moderatorPrefilled": "U bent de hoofdmoderator, met de naam en het e-mailadres van uw account. Als iemand anders het evenement modereert, vul dan hier diens gegevens in: de link om het te beheren gaat naar die persoon.",
-        "moderatorLinkNote": "Deze persoon is de hoofdmoderator van het evenement: hij of zij ontvangt per e-mail een privélink om het te beheren (opname starten, vragen modereren, peilingen starten…). Dit is iets anders dan de comoderatoren die in de stap “Personen” worden toegevoegd; die krijgen elk hun eigen link.",
-        "moderatorRequired": "Voer de naam van de moderator in",
-        "moderatorEmailRequired": "Voer een geldig e-mailadres van de moderator in",
-        "moderatorName": "Naam",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Geschatte capaciteit",
         "featuresHeading": "Configuratie-overzicht",
         "privacyDoc": "Privacydocument (PDF of link)",
         "privacyDocHelp": "Upload een PDF of plak de URL van een vervangende privacyverklaring. Vervangt het AVG-sjabloon indien aanwezig.",
         "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen.",
         "technicalDetails": "Technische details: capaciteit en middelen",
-        "retentionRange": "Voer een aantal dagen in tussen 1 en {max}.",
-        "linksOnPublish": "De persoonlijke links (hoofdmoderator, co-moderatoren en sprekers) worden per e-mail verstuurd zodra het evenement wordt gepubliceerd. Zolang het een concept is, kopieert u ze van de pagina van het evenement."
+        "retentionRange": "Voer een aantal dagen in tussen 1 en {max}."
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderators en sprekers",
-      "intro": "Voeg co-moderators en sprekers toe met individuele magic links.",
+      "title": "Organisatoren, moderatoren en sprekers",
+      "intro": "Voeg organisatoren, moderatoren en sprekers toe, elk met een eigen link.",
       "introHint": "Elke persoon heeft een zichtbare naam in de ruimte en een token dat onafhankelijk van de hoofdlink kan worden ingetrokken. Sprekers krijgen microfoon, camera en schermdeling, maar kunnen niet modereren (verwijderen, iedereen dempen, opnemen).",
       "add": "Persoon toevoegen",
       "name": "Zichtbare naam in de ruimte",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "E-mail voorbereiden voor {name}",
       "prepareEmailSubject": "Uw link voor ‘{title}’",
       "prepareEmailBody": "Hallo {name},\n\nhier is uw persoonlijke link voor ‘{title}’:\n{link}\n\nDe link is alleen voor u: stuur hem niet door en deel hem niet.",
-      "draftNote": "Het evenement is een concept: de links worden per e-mail verstuurd zodra het wordt gepubliceerd. Tot dan kunt u ze hier kopiëren."
+      "draftNote": "Het evenement is een concept: de links worden per e-mail verstuurd zodra het wordt gepubliceerd. Tot dan kunt u ze hier kopiëren.",
+      "roleOrganizer": "Organisator",
+      "roleOrganizerHint": "Modereert als een moderator en wordt bij de organisatoren van het evenement vermeld.",
+      "organization": "Organisatie (optioneel)",
+      "publicListed": "Tonen op de openbare pagina",
+      "onPublicPage": "Op de openbare pagina"
     },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",

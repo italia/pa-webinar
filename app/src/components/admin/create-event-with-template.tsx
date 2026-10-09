@@ -74,6 +74,8 @@ interface Props {
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
   defaultModerator?: { name: string; email: string } | null;
+  /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
+  publicRegistrationEnabled?: boolean;
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
   initialInstant?: boolean;
@@ -97,6 +99,7 @@ export default function CreateEventWithTemplate({
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   defaultModerator = null,
+  publicRegistrationEnabled = true,
   initialInstant = false,
 }: Props) {
   const t = useTranslations('admin.templates');
@@ -203,6 +206,7 @@ export default function CreateEventWithTemplate({
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       defaultModerator={defaultModerator}
+      publicRegistrationEnabled={publicRegistrationEnabled}
     />
   );
 }

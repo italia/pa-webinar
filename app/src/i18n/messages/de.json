@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Der von Ihnen verwendete Link ist nicht mehr gültig. Die Veranstaltung ist beendet: Unten finden Sie die Aufzeichnung und die Materialien.",
       "speakers": "Referierende",
       "organizer": "Veranstalter",
+      "peopleTitle": "Veranstalter und Mitwirkende",
+      "organizedBy": "Veranstaltet von",
+      "peopleOrganizers": "Veranstalter",
+      "peopleModerators": "Moderation",
       "chatNotSaved": "Chat-Nachrichten werden nach Ende der Veranstaltung nicht gespeichert.",
       "qaPostEvent": "Q&A aus der Veranstaltung",
       "peakParticipants": "Höchstwert: {count} Teilnehmende",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Wer darf was",
-        "intro": "Berechtigungsmatrix: wählen Sie für jede Funktion aus, wer sie nutzen darf. Moderatoren dürfen immer alles.",
+        "intro": "Was jede Rolle darf. Für Teilnehmende entscheiden Sie; die anderen Rollen haben, was sie zum Leiten oder Sprechen brauchen.",
         "featureCol": "Funktion",
         "role": {
-          "GUEST": "Gast",
+          "GUEST": "Teilnehmende",
           "SPEAKER": "Referent/in",
           "MODERATOR": "Moderator/in"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Aufzeichnung",
         "roomFeaturesHeading": "Funktionen des Raums",
-        "aiPipelineOff": "Die KI-Nachbearbeitung (Transkription, Zusammenfassung, Übersetzungen) ist in dieser Installation nicht aktiviert."
+        "aiPipelineOff": "Die KI-Nachbearbeitung (Transkription, Zusammenfassung, Übersetzungen) ist in dieser Installation nicht aktiviert.",
+        "rolesHeading": "Rollen der Veranstaltung",
+        "roleModeratorColumn": "Veranstalter und Moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Veranstalter",
+            "desc": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt. Der Hauptveranstalter fügt die anderen Personen hinzu oder entfernt sie."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Leitet den Raum: erteilt und entzieht das Wort, schaltet stumm, verwaltet Fragen, Umfragen und Aufzeichnung."
+          },
+          "speaker": {
+            "name": "Referent",
+            "desc": "Spricht, nutzt die Kamera und teilt den Bildschirm; moderiert nicht."
+          },
+          "guest": {
+            "name": "Teilnehmende",
+            "desc": "Verfolgt die Veranstaltung und beteiligt sich so, wie Sie es in der Tabelle unten festlegen."
+          }
+        }
       },
       "step3": {
         "heading": "Personen und Einladungen",
-        "intro": "Fügen Sie Veranstalter (auf der Seite sichtbar), Moderatoren, Referenten und eingeladene Gäste hinzu.",
-        "organizersHeading": "Veranstalter",
-        "organizersHelp": "Die Organisationen, die die Veranstaltung ausrichten: Name, Website und Logo erscheinen auf der öffentlichen Seite.",
+        "intro": "Wer veranstaltet, wer moderiert und wer spricht, mit ihren Organisationen; danach bei Bedarf die eingeladenen Gäste.",
+        "organizersHeading": "Veranstaltende Organisationen",
+        "organizersHelp": "Die Organisationen, die die Veranstaltung ausrichten: Name, Website und Logo erscheinen auf der öffentlichen Seite. Sie müssen nicht mit den Organisationen der Personen übereinstimmen.",
         "organizerName": "Name der Organisation",
         "organizerWebsite": "Website",
         "organizerLogo": "Logo des Veranstalters",
         "organizerRequired": "Der Name der Organisation ist erforderlich.",
-        "moderatorsHeading": "Moderatoren",
-        "moderatorsHelp": "Moderatoren können die Sitzung verwalten und Berechtigungen während des Events steuern.",
-        "moderatorName": "Name",
-        "moderatorEmail": "E-Mail",
-        "moderatorRequired": "Name und E-Mail sind erforderlich.",
-        "speakersHeading": "Referenten",
-        "speakersHelp": "Sie erhalten per E-Mail einen persönlichen Link, um zu sprechen, die Kamera zu nutzen und den Bildschirm zu teilen, ohne Moderationsrechte.",
-        "speakerName": "Name",
-        "speakerEmail": "E-Mail",
-        "speakerRequired": "Name und E-Mail sind erforderlich.",
         "invitationsHeading": "Einladungen",
-        "invitationsHelp": "Liste der eingeladenen Personen. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst. Ist die öffentliche Registrierung deaktiviert, können sich nur diese Adressen registrieren, und der persönliche Teilnahmelink kommt nach der Registrierung per E-Mail.",
         "invitationName": "Name (optional)",
         "invitationEmail": "E-Mail",
         "add": "Hinzufügen",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "oder manuell hinzufügen",
         "removeItem": "{name} entfernen",
         "invitationsStaffOnly": "Die Einladungen verwaltet das Team der Veranstaltung.",
-        "pickSkipped": "Einige Personen waren bereits aufgeführt oder hatten keine gültige Adresse und wurden nicht hinzugefügt."
+        "pickSkipped": "Einige Personen waren bereits aufgeführt oder hatten keine gültige Adresse und wurden nicht hinzugefügt.",
+        "primaryHeading": "Hauptveranstalter",
+        "primaryHelp": "Erhält den Hauptlink der Veranstaltung per E-Mail: leitet den Raum und fügt die anderen Personen hinzu oder entfernt sie. Name und E-Mail sind zum Veröffentlichen nötig, nicht für einen Entwurf.",
+        "primaryPrefilled": "Hauptveranstalter sind Sie, mit Name und E-Mail Ihres Kontos. Leitet eine andere Person die Veranstaltung, geben Sie hier deren Daten ein: Der Link geht an sie.",
+        "primaryNameRequired": "Geben Sie den Namen des Hauptveranstalters ein.",
+        "primaryEmailRequired": "Geben Sie eine gültige E-Mail des Hauptveranstalters ein.",
+        "linksOnPublish": "Persönliche Links werden bei der Veröffentlichung per E-Mail verschickt; solange die Veranstaltung ein Entwurf ist, kopieren Sie sie von ihrer Seite.",
+        "personName": "Name",
+        "personEmail": "E-Mail",
+        "peopleHeading": "Personen der Veranstaltung",
+        "peopleHelp": "Veranstalter, Moderatoren und Referenten. Jede Person erhält einen eigenen Link, um mit ihrer Rolle teilzunehmen; was jede Rolle darf, zeigt der Schritt „Berechtigungen“.",
+        "personRole": "Rolle",
+        "roleOrganizer": "Veranstalter",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Referent",
+        "roleHelp": {
+          "organizer": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt.",
+          "moderator": "Leitet den Raum: erteilt das Wort, verwaltet Fragen, Umfragen und Aufzeichnung.",
+          "speaker": "Spricht, nutzt die Kamera und teilt den Bildschirm, ohne Moderationsrechte."
+        },
+        "personOrganization": "Organisation",
+        "personOrganizationHelp": "Die Organisation der Person: Sie kann eine andere sein als die veranstaltende.",
+        "personLogo": "Logo der Organisation",
+        "personLogoAdd": "Logo der Organisation hinzufügen",
+        "personLogoChange": "Logo der Organisation ändern",
+        "personPublic": "Auf der öffentlichen Seite zeigen",
+        "personRequired": "Name und E-Mail sind erforderlich.",
+        "invitationsHelpOpen": "Optional: die Liste der Personen, die Sie einladen. Die Anmeldung ist offen, nach der Veröffentlichung kann sich also jede Person anmelden, ob eingeladen oder nicht. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst.",
+        "invitationsHelpRestricted": "Die Anmeldung ist beschränkt: Nur die Adressen dieser Liste können sich anmelden. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst; der Link zum Eintreten kommt nach der Anmeldung per E-Mail.",
+        "logoExternal": "Die öffentliche Seite zeigt nur auf diese Plattform hochgeladene Logos: Ein Logo von einer anderen Website wird nicht angezeigt.",
+        "primaryProfileInvalid": "Prüfen Sie die Organisation und die Adresse des Logos."
       },
       "step4": {
         "heading": "Inhalte und Materialien",
@@ -878,7 +921,6 @@
           "schedule": "Zeitplan",
           "recurrence": "Wiederholung",
           "maxParticipants": "Erwartete Teilnehmende",
-          "organizers": "Veranstalter",
           "speakers": "Referenten",
           "invitations": "Einladungen",
           "materials": "Materialien",
@@ -888,7 +930,12 @@
           "recordingManual": "Aktiv — manueller Start",
           "recordingOff": "Nicht aktiv",
           "multitrack": "Aufzeichnung pro Teilnehmer",
-          "multitrackOn": "Aktiv — erfordert ausdrückliche Einwilligung bei der Anmeldung"
+          "multitrackOn": "Aktiv — erfordert ausdrückliche Einwilligung bei der Anmeldung",
+          "organizingEntities": "Veranstaltende Organisationen",
+          "primaryOrganizer": "Hauptveranstalter",
+          "primaryMissing": "Zum Veröffentlichen im Schritt „Personen“ angeben",
+          "organizersPeople": "Weitere Veranstalter",
+          "moderators": "Moderatoren"
         },
         "noRecurrence": "Einzelner Termin",
         "gdprHeading": "Datenschutz und Datenaufbewahrung",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Eigenen Text verwenden —",
         "gdprTemplateUnknown": "Die gewählte Vorlage für die Datenschutzhinweise existiert nicht mehr: Wählen Sie eine andere oder kehren Sie zum individuellen Text zurück",
         "privacyText": "Datenschutzhinweis (Text)",
-        "moderatorHeading": "Moderator-Kontakt",
-        "moderatorPublishHint": "Name und E-Mail-Adresse sind erforderlich, um die Veranstaltung zu veröffentlichen (sie werden für den Moderator-Link und die Bestätigungs-E-Mail benötigt). Zum Speichern als Entwurf sind sie nicht erforderlich.",
-        "moderatorPrefilled": "Sie sind die Hauptmoderation, mit Name und E-Mail Ihres Kontos. Wenn eine andere Person die Veranstaltung moderiert, geben Sie hier deren Daten ein: Der Link zur Verwaltung geht an sie.",
-        "moderatorLinkNote": "Diese Person ist der Hauptmoderator der Veranstaltung: Sie erhält per E-Mail einen privaten Link zur Verwaltung (Aufzeichnung starten, Fragen moderieren, Umfragen starten …). Das ist etwas anderes als die Co-Moderatoren, die im Schritt „Personen“ hinzugefügt werden und jeweils einen eigenen Link erhalten.",
-        "moderatorRequired": "Geben Sie den Namen des Moderators ein",
-        "moderatorEmailRequired": "Geben Sie eine gültige E-Mail-Adresse des Moderators ein",
-        "moderatorName": "Name",
-        "moderatorEmail": "E-Mail",
         "capacityHeading": "Geschätzte Kapazität",
         "featuresHeading": "Konfigurationsübersicht",
         "privacyDoc": "Datenschutzdokument (PDF oder Link)",
         "privacyDocHelp": "Laden Sie ein PDF hoch oder fügen Sie die URL eines alternativen Datenschutzhinweises ein. Überschreibt die GDPR-Vorlage, falls vorhanden.",
         "privacyTextHelp": "Kurztext, der im Anmeldeformular angezeigt wird; kann die GDPR-Vorlage ergänzen oder ersetzen.",
         "technicalDetails": "Technische Details: Kapazität und Ressourcen",
-        "retentionRange": "Geben Sie eine Anzahl von Tagen zwischen 1 und {max} ein.",
-        "linksOnPublish": "Die persönlichen Links (Hauptmoderation, Ko-Moderation und Referenten) werden per E-Mail verschickt, sobald die Veranstaltung veröffentlicht wird. Solange sie ein Entwurf ist, kopieren Sie sie von der Seite der Veranstaltung."
+        "retentionRange": "Geben Sie eine Anzahl von Tagen zwischen 1 und {max} ein."
       },
       "validationFailed": "Bitte prüfen Sie die markierten Felder, bevor Sie fortfahren.",
       "partialFailure": "Veranstaltung erstellt, einige Elemente wurden jedoch nicht gespeichert: {items}. Sie können sie über die Seite der Veranstaltung hinzufügen.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-Moderatoren und Referenten",
-      "intro": "Fügen Sie Co-Moderatoren und Referenten mit individuellen Magic-Links hinzu.",
+      "title": "Veranstalter, Moderatoren und Referenten",
+      "intro": "Fügen Sie Veranstalter, Moderatoren und Referenten hinzu, jeweils mit eigenem Link.",
       "introHint": "Jede Person hat einen im Raum sichtbaren Namen und ein Token, das unabhängig vom Hauptlink widerrufen werden kann. Referenten erhalten Mikrofon, Kamera und Bildschirmfreigabe, können aber nicht moderieren (Teilnehmer entfernen, alle stummschalten, Aufzeichnung).",
       "add": "Person hinzufügen",
       "name": "Im Raum sichtbarer Name",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "E-Mail für {name} vorbereiten",
       "prepareEmailSubject": "Ihr Link für „{title}“",
       "prepareEmailBody": "Hallo {name},\n\nhier ist Ihr persönlicher Link für „{title}“:\n{link}\n\nDer Link ist nur für Sie: Bitte nicht weiterleiten oder teilen.",
-      "draftNote": "Die Veranstaltung ist ein Entwurf: Die Links werden per E-Mail verschickt, sobald sie veröffentlicht wird. Bis dahin können Sie sie hier kopieren."
+      "draftNote": "Die Veranstaltung ist ein Entwurf: Die Links werden per E-Mail verschickt, sobald sie veröffentlicht wird. Bis dahin können Sie sie hier kopieren.",
+      "roleOrganizer": "Veranstalter",
+      "roleOrganizerHint": "Moderiert wie ein Moderator und wird unter den Veranstaltern aufgeführt.",
+      "organization": "Organisation (optional)",
+      "publicListed": "Auf der öffentlichen Seite zeigen",
+      "onPublicPage": "Auf der öffentlichen Seite"
     },
     "gdprAuditLog": {
       "title": "GDPR-Protokoll",

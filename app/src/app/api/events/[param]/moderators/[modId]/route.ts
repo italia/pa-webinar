@@ -1,5 +1,10 @@
 /**
- * Revoke (soft-delete) or hard-delete a co-moderator entry.
+ * Revoke (soft-delete) or hard-delete a co-moderator entry, or update the
+ * person's public profile.
+ *
+ *   PATCH  — ente, logo, organizzatore, presenza nella pagina pubblica
+ *            (lib/events/grant-profile). Nome, email e ruolo non cambiano:
+ *            si revoca e si aggiunge di nuovo, perché il link è della persona.
  *
  *   DELETE — sets `revokedAt` so the token stops being accepted. We
  *            don't hard-delete the row so the event management page
@@ -8,9 +13,13 @@
  *            window elapses.
  */
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { EventModeratorRole } from '@prisma/client';
+
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
-import { AppError, ForbiddenError, UnauthorizedError } from '@/lib/errors';
+import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { tryDecryptPII } from '@/lib/crypto/pii';
+import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
 import {
   constantTimeEqual,
   extractModeratorToken,
@@ -22,8 +31,8 @@ export const dynamic = 'force-dynamic';
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export const DELETE = withErrorHandling(async (request, context) => {
-  const { param, modId } = await context.params;
+/** L'evento e la concessione, se chi chiama ha il link principale. */
+async function caricaConcessione(request: Request, param: string, modId: string) {
   const token = extractModeratorToken(request);
   if (!token) throw new UnauthorizedError('Moderator token required');
 
@@ -37,13 +46,52 @@ export const DELETE = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
   if (!constantTimeEqual(event.moderatorToken, token)) {
-    throw new ForbiddenError('Only the primary moderator can revoke co-moderators');
+    throw new ForbiddenError('Only the primary moderator can manage co-moderators');
   }
 
   const mod = await prisma.eventModerator.findUnique({ where: { id: modId } });
   if (!mod || mod.eventId !== event.id) {
     throw new AppError('Co-moderator not found', 404, 'NOT_FOUND');
   }
+  return { event, mod };
+}
+
+export const PATCH = withErrorHandling(async (request, context) => {
+  const { param, modId } = await context.params;
+  const { mod } = await caricaConcessione(request, param, modId);
+
+  const parsed = grantProfileSchema.safeParse(await parseJsonBody(request));
+  if (!parsed.success) {
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+    );
+  }
+  if (parsed.data.organizer && mod.role !== EventModeratorRole.MODERATOR) {
+    throw new ValidationError('Validation failed', [
+      { path: ['organizer'], message: 'Only a moderator can be an organizer' },
+    ]);
+  }
+
+  const updated = await prisma.eventModerator.update({
+    where: { id: mod.id },
+    data: grantProfileData(parsed.data),
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      organizationLogoUrl: true,
+      publicListed: true,
+    },
+  });
+  return Response.json({ ...updated, name: tryDecryptPII(updated.name) ?? updated.name });
+});
+
+export const DELETE = withErrorHandling(async (request, context) => {
+  const { param, modId } = await context.params;
+  const { event, mod } = await caricaConcessione(request, param, modId);
 
   const updated = await prisma.eventModerator.update({
     where: { id: modId },

@@ -205,7 +205,7 @@ limitation (Art. 5(1)(b) and Art. 5(1)(e)). Only stable profile fields carry ove
 | Opt-out page and API | `app/src/app/[locale]/rubrica/opt-out/page.tsx` and `app/src/app/api/rubrica/opt-out/route.ts` |
 | Retention job | `app/src/app/api/cron/rubrica-retention/route.ts`. Chart template `infra/helm/pa-webinar/templates/cronjob-rubrica-retention.yaml`, with the keys `cronjobs.rubricaRetention.enabled` and `cronjobs.rubricaRetention.schedule` in `infra/helm/pa-webinar/values.yaml` |
 | Administration | **Address book** (`/admin/rubrica` and `/admin/rubrica/{id}`), backed by `GET /api/admin/rubrica`, `GET /api/admin/rubrica/{id}` and `DELETE /api/admin/rubrica/{id}` |
-| Picker | `app/src/components/admin/rubrica-picker.tsx`, used in step 3 (**People**) of the event wizard |
+| Picker | `app/src/components/admin/rubrica-picker.tsx`, used in the **People** step of the event wizard |
 
 ### What a registration does to the record
 

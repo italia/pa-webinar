@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Det link, du har brugt, er ikke længere gyldigt. Arrangementet er afsluttet: nedenfor finder du optagelsen og materialerne.",
       "speakers": "Talere",
       "organizer": "Arrangør",
+      "peopleTitle": "Arrangører og talere",
+      "organizedBy": "Arrangeret af",
+      "peopleOrganizers": "Arrangører",
+      "peopleModerators": "Værter",
       "chatNotSaved": "Chatbeskeder gemmes ikke efter begivenhedens afslutning.",
       "qaPostEvent": "Q&A fra begivenheden",
       "peakParticipants": "Højeste antal: {count} deltagere",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
-        "intro": "Tilladelsesmatrix: vælg for hver funktion, hvem der må bruge den. Moderatorer må altid alt.",
+        "intro": "Hvad hver rolle kan. For deltagerne vælger du; de andre roller har det, de skal bruge for at lede eller tale.",
         "featureCol": "Funktion",
         "role": {
-          "GUEST": "Gæst",
+          "GUEST": "Deltager",
           "SPEAKER": "Oplægsholder",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Optagelse",
         "roomFeaturesHeading": "Funktioner i mødelokalet",
-        "aiPipelineOff": "AI-efterbehandling (transskription, resumé, oversættelser) er ikke slået til på denne installation."
+        "aiPipelineOff": "AI-efterbehandling (transskription, resumé, oversættelser) er ikke slået til på denne installation.",
+        "rolesHeading": "Arrangementets roller",
+        "roleModeratorColumn": "Arrangør og moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Arrangør",
+            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Hovedarrangøren tilføjer og fjerner de andre personer."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Leder rummet: giver og tager ordet, slår lyden fra, styrer spørgsmål, afstemninger og optagelse."
+          },
+          "speaker": {
+            "name": "Taler",
+            "desc": "Taler, bruger kameraet og deler skærmen; modererer ikke."
+          },
+          "guest": {
+            "name": "Deltager",
+            "desc": "Følger arrangementet og deltager, som du bestemmer i tabellen nedenfor."
+          }
+        }
       },
       "step3": {
         "heading": "Personer og invitationer",
-        "intro": "Tilføj arrangører (vises på siden), moderatorer, oplægsholdere og inviterede gæster.",
-        "organizersHeading": "Arrangører",
-        "organizersHelp": "De organisationer, der står bag begivenheden: navn, websted og logo vises på den offentlige side.",
+        "intro": "Hvem der arrangerer, hvem der er vært, og hvem der taler, med deres organisationer; derefter eventuelt de inviterede.",
+        "organizersHeading": "Arrangerende organisationer",
+        "organizersHelp": "Organisationerne bag arrangementet: navn, websted og logo vises på den offentlige side. De behøver ikke at være de samme som personernes organisationer.",
         "organizerName": "Organisationens navn",
         "organizerWebsite": "Websted",
         "organizerLogo": "Arrangørens logo",
         "organizerRequired": "Organisationens navn skal udfyldes.",
-        "moderatorsHeading": "Moderatorer",
-        "moderatorsHelp": "Moderatorer kan styre sessionen og kontrollere tilladelser under arrangementet.",
-        "moderatorName": "Navn",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "Navn og e-mail er påkrævet.",
-        "speakersHeading": "Oplægsholdere",
-        "speakersHelp": "De modtager et personligt link pr. e-mail, så de kan tale, bruge kamera og dele skærm, uden moderatorrettigheder.",
-        "speakerName": "Navn",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "Navn og e-mail er påkrævet.",
         "invitationsHeading": "Invitationer",
-        "invitationsHelp": "Liste over inviterede personer. Platformen sender ikke invitationer: del selv linket til arrangementet med dem. Når offentlig registrering er slået fra, kan kun disse adresser tilmelde sig, og det personlige link til at deltage kommer med e-mail efter tilmeldingen.",
         "invitationName": "Navn (valgfrit)",
         "invitationEmail": "E-mail",
         "add": "Tilføj",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "eller tilføj manuelt",
         "removeItem": "Fjern {name}",
         "invitationsStaffOnly": "Invitationerne administreres af begivenhedens personale.",
-        "pickSkipped": "Nogle personer var allerede på listen eller havde ingen gyldig adresse og blev ikke tilføjet."
+        "pickSkipped": "Nogle personer var allerede på listen eller havde ingen gyldig adresse og blev ikke tilføjet.",
+        "primaryHeading": "Hovedarrangør",
+        "primaryHelp": "Modtager arrangementets hovedlink på e-mail: leder rummet og tilføjer eller fjerner de andre personer. Navn og e-mail kræves for at offentliggøre, ikke for en kladde.",
+        "primaryPrefilled": "Du er hovedarrangør med din kontos navn og e-mail. Hvis en anden leder arrangementet, så indtast vedkommendes oplysninger her: linket går til vedkommende.",
+        "primaryNameRequired": "Indtast hovedarrangørens navn.",
+        "primaryEmailRequired": "Indtast en gyldig e-mail for hovedarrangøren.",
+        "linksOnPublish": "Personlige links sendes på e-mail ved offentliggørelse; så længe arrangementet er en kladde, kopieres de fra dets side.",
+        "personName": "Navn",
+        "personEmail": "E-mail",
+        "peopleHeading": "Arrangementets personer",
+        "peopleHelp": "Arrangører, moderatorer og talere. Hver får sit eget link til at deltage med sin rolle; hvad hver rolle kan, vises i trinnet “Tilladelser”.",
+        "personRole": "Rolle",
+        "roleOrganizer": "Arrangør",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Taler",
+        "roleHelp": {
+          "organizer": "Leder rummet som en moderator og præsenteres blandt arrangørerne.",
+          "moderator": "Leder rummet: giver ordet, styrer spørgsmål, afstemninger og optagelse.",
+          "speaker": "Taler, bruger kameraet og deler skærmen uden moderatorrettigheder."
+        },
+        "personOrganization": "Organisation",
+        "personOrganizationHelp": "Personens organisation: den kan være en anden end den, der arrangerer.",
+        "personLogo": "Organisationens logo",
+        "personLogoAdd": "Tilføj organisationens logo",
+        "personLogoChange": "Skift organisationens logo",
+        "personPublic": "Vis på den offentlige side",
+        "personRequired": "Navn og e-mail er påkrævet.",
+        "invitationsHelpOpen": "Valgfrit: listen over de personer, du inviterer. Tilmeldingen er åben, så efter offentliggørelse kan alle tilmelde sig, inviteret eller ej. Platformen sender ingen invitationer: del selv linket til arrangementet.",
+        "invitationsHelpRestricted": "Tilmeldingen er begrænset: kun adresserne på denne liste kan tilmelde sig. Platformen sender ingen invitationer: del selv linket til arrangementet; linket til at deltage kommer på e-mail efter tilmelding.",
+        "logoExternal": "Den offentlige side viser kun logoer, der er uploadet til denne platform: et logo fra et andet websted vises ikke.",
+        "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse."
       },
       "step4": {
         "heading": "Indhold og materialer",
@@ -878,7 +921,6 @@
           "schedule": "Tidsplan",
           "recurrence": "Gentagelse",
           "maxParticipants": "Forventede deltagere",
-          "organizers": "Arrangører",
           "speakers": "Oplægsholdere",
           "invitations": "Invitationer",
           "materials": "Materialer",
@@ -888,7 +930,12 @@
           "recordingManual": "Til — manuel start",
           "recordingOff": "Fra",
           "multitrack": "Optagelse pr. deltager",
-          "multitrackOn": "Slået til — kræver udtrykkeligt samtykke ved tilmeldingen"
+          "multitrackOn": "Slået til — kræver udtrykkeligt samtykke ved tilmeldingen",
+          "organizingEntities": "Arrangerende organisationer",
+          "primaryOrganizer": "Hovedarrangør",
+          "primaryMissing": "Skal angives i trinnet “Personer” for at offentliggøre",
+          "organizersPeople": "Andre arrangører",
+          "moderators": "Moderatorer"
         },
         "noRecurrence": "Enkeltstående arrangement",
         "gdprHeading": "Privatliv og opbevaring af data",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Brug brugerdefineret tekst —",
         "gdprTemplateUnknown": "Den valgte skabelon til privatlivsoplysninger findes ikke længere: vælg en anden, eller gå tilbage til tilpasset tekst",
         "privacyText": "Privatlivserklæring (tekst)",
-        "moderatorHeading": "Moderatorkontakt",
-        "moderatorPublishHint": "Navn og e-mail er obligatoriske for at udgive arrangementet (de bruges til moderatorlinket og bekræftelsesmailen). De er ikke påkrævet for at gemme som kladde.",
-        "moderatorPrefilled": "Du er hovedmoderator med navn og e-mail fra din konto. Hvis en anden modererer begivenheden, så skriv vedkommendes oplysninger her: linket til at styre den sendes til vedkommende.",
-        "moderatorLinkNote": "Denne person er arrangementets primære moderator: vedkommende modtager et privat link pr. e-mail til at styre det (starte optagelsen, moderere spørgsmål, sætte afstemninger i gang …). Det er noget andet end de medmoderatorer, der tilføjes i trinnet »Personer«, som hver får deres eget link.",
-        "moderatorRequired": "Indtast moderatorens navn",
-        "moderatorEmailRequired": "Indtast en gyldig e-mailadresse på moderatoren",
-        "moderatorName": "Navn",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Estimeret kapacitet",
         "featuresHeading": "Konfigurationsoversigt",
         "privacyDoc": "Privatlivsdokument (PDF eller link)",
         "privacyDocHelp": "Upload en PDF eller indsæt en URL til en alternativ erklæring. Tilsidesætter GDPR-skabelonen, hvis den er angivet.",
         "privacyTextHelp": "Kort tekst, der vises i tilmeldingsformularen; kan supplere eller erstatte GDPR-skabelonen.",
         "technicalDetails": "Tekniske detaljer: kapacitet og ressourcer",
-        "retentionRange": "Angiv et antal dage mellem 1 og {max}.",
-        "linksOnPublish": "Personlige links (primær moderator, medmoderatorer og oplægsholdere) sendes pr. e-mail, når begivenheden offentliggøres. Mens den er en kladde, kan du kopiere dem fra begivenhedens side."
+        "retentionRange": "Angiv et antal dage mellem 1 og {max}."
       },
       "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter.",
       "partialFailure": "Arrangementet blev oprettet, men nogle elementer blev ikke gemt: {items}. Du kan tilføje dem fra arrangementets side.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Medmoderatorer og talere",
-      "intro": "Tilføj medmoderatorer og talere med individuelle magiske links.",
+      "title": "Arrangører, moderatorer og talere",
+      "intro": "Tilføj arrangører, moderatorer og talere, hver med sit eget link.",
       "introHint": "Hver person har sit eget synlige navn i rummet og et token, der kan tilbagekaldes uafhængigt af hovedlinket. Talere får mikrofon, kamera og skærmdeling, men kan ikke moderere (smide ud, afbryde lyd for alle, optage).",
       "add": "Tilføj person",
       "name": "Navn synligt i rummet",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Forbered en e-mail til {name}",
       "prepareEmailSubject": "Dit link til »{title}«",
       "prepareEmailBody": "Hej {name},\n\nher er dit personlige link til »{title}«:\n{link}\n\nLinket er kun til dig: videresend eller del det ikke.",
-      "draftNote": "Begivenheden er en kladde: links sendes pr. e-mail, når den offentliggøres. Indtil da kan du kopiere dem herfra."
+      "draftNote": "Begivenheden er en kladde: links sendes pr. e-mail, når den offentliggøres. Indtil da kan du kopiere dem herfra.",
+      "roleOrganizer": "Arrangør",
+      "roleOrganizerHint": "Modererer som en moderator og præsenteres blandt arrangementets arrangører.",
+      "organization": "Organisation (valgfrit)",
+      "publicListed": "Vis på den offentlige side",
+      "onPublicPage": "På den offentlige side"
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",

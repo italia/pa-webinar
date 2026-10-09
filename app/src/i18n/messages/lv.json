@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Izmantotā saite vairs nav derīga. Pasākums ir noslēdzies: zemāk atrodams ieraksts un materiāli.",
       "speakers": "Referenti",
       "organizer": "Organizators",
+      "peopleTitle": "Organizatori un runātāji",
+      "organizedBy": "Organizē",
+      "peopleOrganizers": "Organizatori",
+      "peopleModerators": "Vadītāji",
       "chatNotSaved": "Tērzēšanas ziņojumi netiek saglabāti pēc pasākuma beigām.",
       "qaPostEvent": "Jautājumi un atbildes no pasākuma",
       "peakParticipants": "Maksimums: {count} dalībnieki",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kurš ko var darīt",
-        "intro": "Atļauju matrica: izvēlieties, kas katru funkciju var izmantot. Moderatori vienmēr var visu.",
+        "intro": "Ko var darīt katra loma. Dalībniekiem izvēlaties jūs; pārējām lomām ir viss vajadzīgais, lai vadītu vai runātu.",
         "featureCol": "Funkcionalitāte",
         "role": {
-          "GUEST": "Viesis",
+          "GUEST": "Dalībnieks",
           "SPEAKER": "Runātājs",
           "MODERATOR": "Moderators"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Ierakstīšana",
         "roomFeaturesHeading": "Telpas funkcijas",
-        "aiPipelineOff": "MI pēcapstrāde (transkripcija, kopsavilkums, tulkojumi) šajā instalācijā nav ieslēgta."
+        "aiPipelineOff": "MI pēcapstrāde (transkripcija, kopsavilkums, tulkojumi) šajā instalācijā nav ieslēgta.",
+        "rolesHeading": "Pasākuma lomas",
+        "roleModeratorColumn": "Organizators un moderators",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizators",
+            "desc": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Galvenais organizators pievieno un noņem pārējās personas."
+          },
+          "moderator": {
+            "name": "Moderators",
+            "desc": "Vada telpu: dod un atņem vārdu, izslēdz skaņu, pārvalda jautājumus, aptaujas un ierakstīšanu."
+          },
+          "speaker": {
+            "name": "Runātājs",
+            "desc": "Runā, izmanto kameru un kopīgo ekrānu; nemoderē."
+          },
+          "guest": {
+            "name": "Dalībnieks",
+            "desc": "Seko pasākumam un piedalās tā, kā nolemjat tabulā zemāk."
+          }
+        }
       },
       "step3": {
         "heading": "Personas un ielūgumi",
-        "intro": "Pievienojiet organizatorus (rāda lapā), moderatorus, runātājus un uzaicinātos viesus.",
-        "organizersHeading": "Organizatori",
-        "organizersHelp": "Organizācijas, kas rīko pasākumu: nosaukums, vietne un logotips tiek rādīti publiskajā lapā.",
+        "intro": "Kas organizē, kas vada un kas uzstājas, ar viņu organizācijām; pēc tam, ja vajag, uzaicinātie.",
+        "organizersHeading": "Organizējošās iestādes",
+        "organizersHelp": "Iestādes, kas organizē pasākumu: nosaukums, tīmekļa vietne un logotips tiek rādīti publiskajā lapā. Tām nav jāsakrīt ar personu organizācijām.",
         "organizerName": "Organizācijas nosaukums",
         "organizerWebsite": "Tīmekļa vietne",
         "organizerLogo": "Organizatora logotips",
         "organizerRequired": "Organizācijas nosaukums ir obligāts.",
-        "moderatorsHeading": "Moderatori",
-        "moderatorsHelp": "Moderatori var pārvaldīt sesiju un kontrolēt atļaujas pasākuma laikā.",
-        "moderatorName": "Vārds",
-        "moderatorEmail": "E-pasts",
-        "moderatorRequired": "Vārds un e-pasts ir obligāti.",
-        "speakersHeading": "Runātāji",
-        "speakersHelp": "Pa e-pastu saņem personisku saiti, lai runātu, izmantotu kameru un kopīgotu ekrānu, bez moderatora tiesībām.",
-        "speakerName": "Vārds",
-        "speakerEmail": "E-pasts",
-        "speakerRequired": "Vārds un e-pasts ir obligāti.",
         "invitationsHeading": "Ielūgumi",
-        "invitationsHelp": "Uzaicināto personu saraksts. Platforma uzaicinājumus nesūta: pasākuma saiti kopīgojiet paši. Ja publiskā reģistrācija ir izslēgta, reģistrēties var tikai šīs adreses, un personīgā pievienošanās saite pēc reģistrācijas pienāk pa e-pastu.",
         "invitationName": "Vārds (neobligāts)",
         "invitationEmail": "E-pasts",
         "add": "Pievienot",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "vai pievienot manuāli",
         "removeItem": "Noņemt {name}",
         "invitationsStaffOnly": "Ielūgumus pārvalda pasākuma komanda.",
-        "pickSkipped": "Dažas personas jau bija sarakstā vai tām nebija derīgas adreses, tāpēc tās netika pievienotas."
+        "pickSkipped": "Dažas personas jau bija sarakstā vai tām nebija derīgas adreses, tāpēc tās netika pievienotas.",
+        "primaryHeading": "Galvenais organizators",
+        "primaryHelp": "Saņem pa e-pastu pasākuma galveno saiti: vada telpu un pievieno vai noņem pārējās personas. Vārds un e-pasts vajadzīgi publicēšanai, ne melnrakstam.",
+        "primaryPrefilled": "Galvenais organizators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu vada cita persona, ierakstiet šeit tās datus: saite tiks nosūtīta tai.",
+        "primaryNameRequired": "Ievadiet galvenā organizatora vārdu.",
+        "primaryEmailRequired": "Ievadiet derīgu galvenā organizatora e-pastu.",
+        "linksOnPublish": "Personīgās saites tiek nosūtītas pa e-pastu publicējot; kamēr pasākums ir melnraksts, kopējiet tās no tā lapas.",
+        "personName": "Vārds",
+        "personEmail": "E-pasts",
+        "peopleHeading": "Pasākuma personas",
+        "peopleHelp": "Organizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko katra loma var darīt, parāda solis “Atļaujas”.",
+        "personRole": "Loma",
+        "roleOrganizer": "Organizators",
+        "roleModerator": "Moderators",
+        "roleSpeaker": "Runātājs",
+        "roleHelp": {
+          "organizer": "Vada telpu kā moderators un ir norādīts starp organizatoriem.",
+          "moderator": "Vada telpu: dod vārdu, pārvalda jautājumus, aptaujas un ierakstīšanu.",
+          "speaker": "Runā, izmanto kameru un kopīgo ekrānu bez moderēšanas tiesībām."
+        },
+        "personOrganization": "Iestāde vai organizācija",
+        "personOrganizationHelp": "Personas organizācija: tā var atšķirties no tās, kas organizē pasākumu.",
+        "personLogo": "Organizācijas logotips",
+        "personLogoAdd": "Pievienot organizācijas logotipu",
+        "personLogoChange": "Mainīt organizācijas logotipu",
+        "personPublic": "Rādīt publiskajā lapā",
+        "personRequired": "Vārds un e-pasts ir obligāti.",
+        "invitationsHelpOpen": "Pēc izvēles: jūsu uzaicināto personu saraksts. Reģistrācija ir atvērta, tāpēc pēc publicēšanas var reģistrēties ikviens, uzaicināts vai nē. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši.",
+        "invitationsHelpRestricted": "Reģistrācija ir ierobežota: reģistrēties var tikai šī saraksta adreses. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši; ieejas saite pienāk pa e-pastu pēc reģistrācijas.",
+        "logoExternal": "Publiskajā lapā redzami tikai šajā platformā augšupielādēti logotipi: logotips no citas vietnes netiks rādīts.",
+        "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi."
       },
       "step4": {
         "heading": "Saturs un materiāli",
@@ -878,7 +921,6 @@
           "schedule": "Kalendārs",
           "recurrence": "Atkārtošanās",
           "maxParticipants": "Sagaidāmie dalībnieki",
-          "organizers": "Organizatori",
           "speakers": "Runātāji",
           "invitations": "Ielūgumi",
           "materials": "Materiāli",
@@ -888,7 +930,12 @@
           "recordingManual": "Ieslēgta — manuāla sākšana",
           "recordingOff": "Izslēgta",
           "multitrack": "Ieraksts katram dalībniekam",
-          "multitrackOn": "Ieslēgts — nepieciešama skaidra piekrišana reģistrācijas laikā"
+          "multitrackOn": "Ieslēgts — nepieciešama skaidra piekrišana reģistrācijas laikā",
+          "organizingEntities": "Organizējošās iestādes",
+          "primaryOrganizer": "Galvenais organizators",
+          "primaryMissing": "Lai publicētu, jānorāda solī “Personas”",
+          "organizersPeople": "Citi organizatori",
+          "moderators": "Moderatori"
         },
         "noRecurrence": "Vienreizējs pasākums",
         "gdprHeading": "Privātums un datu glabāšana",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Izmantot pielāgotu tekstu —",
         "gdprTemplateUnknown": "Izvēlētā privātuma paziņojuma veidne vairs nepastāv: izvēlieties citu vai atgriezieties pie pielāgotā teksta",
         "privacyText": "Privātuma paziņojums (teksts)",
-        "moderatorHeading": "Moderatora kontakts",
-        "moderatorPublishHint": "Lai publicētu pasākumu, ir obligāti jānorāda vārds un e-pasta adrese (tie nepieciešami moderatora saitei un apstiprinājuma e-pastam). Saglabāšanai kā melnrakstam tie nav nepieciešami.",
-        "moderatorPrefilled": "Galvenais moderators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu moderē cita persona, ievadiet šeit tās datus: pārvaldības saite tiks nosūtīta tai.",
-        "moderatorLinkNote": "Šī persona ir pasākuma galvenais moderators un pa e-pastu saņems privātu saiti pasākuma vadīšanai (sākt ierakstīšanu, moderēt jautājumus, palaist aptaujas…). Tas atšķiras no līdzmoderatoriem, kas pievienoti solī „Cilvēki“, — katrs no viņiem saņem savu saiti.",
-        "moderatorRequired": "Ievadiet moderatora vārdu",
-        "moderatorEmailRequired": "Ievadiet derīgu moderatora e-pasta adresi",
-        "moderatorName": "Vārds",
-        "moderatorEmail": "E-pasts",
         "capacityHeading": "Aplēstā kapacitāte",
         "featuresHeading": "Konfigurācijas kopsavilkums",
         "privacyDoc": "Privātuma paziņojuma dokuments (PDF vai saite)",
         "privacyDocHelp": "Augšupielādējiet PDF vai ielīmējiet alternatīva privātuma paziņojuma URL. Pārraksta VDAR veidni, ja iestatīts.",
         "privacyTextHelp": "Īss teksts, kas tiek rādīts reģistrācijas formā; var papildināt vai aizstāt VDAR veidni.",
         "technicalDetails": "Tehniskā informācija: ietilpība un resursi",
-        "retentionRange": "Ievadiet dienu skaitu no 1 līdz {max}.",
-        "linksOnPublish": "Personiskās saites (galvenajam moderatoram, līdzmoderatoriem un runātājiem) tiek nosūtītas pa e-pastu, kad pasākums tiek publicēts. Kamēr tas ir melnraksts, nokopējiet tās no pasākuma lapas."
+        "retentionRange": "Ievadiet dienu skaitu no 1 līdz {max}."
       },
       "validationFailed": "Pirms turpināt, pārbaudiet izceltos laukus.",
       "partialFailure": "Pasākums ir izveidots, taču dažus elementus neizdevās saglabāt: {items}. Tos varat pievienot pasākuma lapā.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Līdzmoderatori un runātāji",
-      "intro": "Pievienojiet līdzmoderatorus un runātājus ar individuālām maģiskajām saitēm.",
+      "title": "Organizatori, moderatori un runātāji",
+      "intro": "Pievienojiet organizatorus, moderatorus un runātājus, katru ar savu saiti.",
       "introHint": "Katrai personai zālē ir redzams vārds un žetons, ko var atsaukt neatkarīgi no galvenās saites. Runātājiem ir mikrofons, kamera un ekrāna koplietošana, bet viņi nevar moderēt (izmest, izslēgt skaņu visiem, ierakstīt).",
       "add": "Pievienot personu",
       "name": "Zālē redzamais vārds",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Sagatavot e-pastu: {name}",
       "prepareEmailSubject": "Jūsu saite uz “{title}”",
       "prepareEmailBody": "Sveiki, {name}!\n\nŠeit ir jūsu personīgā saite uz “{title}”:\n{link}\n\nSaite ir tikai jums: nepārsūtiet un nekopīgojiet to.",
-      "draftNote": "Pasākums ir melnraksts: saites tiek nosūtītas pa e-pastu, kad tas tiek publicēts. Pa to laiku varat tās nokopēt šeit."
+      "draftNote": "Pasākums ir melnraksts: saites tiek nosūtītas pa e-pastu, kad tas tiek publicēts. Pa to laiku varat tās nokopēt šeit.",
+      "roleOrganizer": "Organizators",
+      "roleOrganizerHint": "Moderē kā moderators un ir norādīts starp pasākuma organizatoriem.",
+      "organization": "Iestāde vai organizācija (pēc izvēles)",
+      "publicListed": "Rādīt publiskajā lapā",
+      "onPublicPage": "Publiskajā lapā"
     },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",

@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Le lien que vous avez utilisé n'est plus valide. L'événement est terminé : vous trouverez ci-dessous l'enregistrement et les documents.",
       "speakers": "Intervenants",
       "organizer": "Organisateur",
+      "peopleTitle": "Organisateurs et intervenants",
+      "organizedBy": "Organisé par",
+      "peopleOrganizers": "Organisateurs",
+      "peopleModerators": "Animation",
       "chatNotSaved": "Les messages du chat ne sont pas conservés après la fin de l'événement.",
       "qaPostEvent": "Q&A de l'événement",
       "peakParticipants": "Pic : {count} participants",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Qui peut faire quoi",
-        "intro": "Matrice des permissions : choisissez pour chaque fonctionnalité qui peut l'utiliser. Les modérateurs peuvent toujours tout faire.",
+        "intro": "Ce que peut faire chaque rôle. Pour les participants, vous choisissez ; les autres rôles ont ce qu'il leur faut pour animer ou intervenir.",
         "featureCol": "Fonctionnalité",
         "role": {
-          "GUEST": "Invité",
+          "GUEST": "Participant",
           "SPEAKER": "Intervenant",
           "MODERATOR": "Modérateur"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Enregistrement",
         "roomFeaturesHeading": "Fonctions de la salle",
-        "aiPipelineOff": "La post-production IA (transcription, synthèse, traductions) n'est pas activée sur cette installation."
+        "aiPipelineOff": "La post-production IA (transcription, synthèse, traductions) n'est pas activée sur cette installation.",
+        "rolesHeading": "Les rôles de l'événement",
+        "roleModeratorColumn": "Organisateur et modérateur",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organisateur",
+            "desc": "Anime la salle comme un modérateur et figure parmi les organisateurs. L'organisateur principal ajoute et retire les autres personnes."
+          },
+          "moderator": {
+            "name": "Modérateur",
+            "desc": "Anime la salle : donne et retire la parole, coupe les micros, gère questions, sondages et enregistrement."
+          },
+          "speaker": {
+            "name": "Intervenant",
+            "desc": "Parle, utilise la caméra et partage l'écran ; ne modère pas."
+          },
+          "guest": {
+            "name": "Participant",
+            "desc": "Suit l'événement et interagit comme vous le décidez dans le tableau ci-dessous."
+          }
+        }
       },
       "step3": {
         "heading": "Personnes et invitations",
-        "intro": "Ajoutez des organisateurs (affichés sur la page), des modérateurs, des intervenants et des invités.",
-        "organizersHeading": "Organisateurs",
-        "organizersHelp": "Les organisations qui organisent l'événement : le nom, le site et le logo apparaissent sur la page publique.",
+        "intro": "Qui organise, qui anime et qui intervient, avec leurs organisations ; puis, si besoin, les invités.",
+        "organizersHeading": "Organismes organisateurs",
+        "organizersHelp": "Les organismes qui portent l'événement : nom, site et logo apparaissent sur la page publique. Ils ne doivent pas forcément correspondre aux organisations des personnes.",
         "organizerName": "Nom de l'organisation",
         "organizerWebsite": "Site web",
         "organizerLogo": "Logo de l'organisateur",
         "organizerRequired": "Le nom de l'organisation est obligatoire.",
-        "moderatorsHeading": "Modérateurs",
-        "moderatorsHelp": "Les modérateurs peuvent gérer la session et contrôler les permissions pendant l'événement.",
-        "moderatorName": "Nom",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "Le nom et l'e-mail sont obligatoires.",
-        "speakersHeading": "Intervenants",
-        "speakersHelp": "Ils reçoivent par e-mail un lien personnel pour parler, utiliser leur caméra et partager leur écran, sans pouvoirs de modération.",
-        "speakerName": "Nom",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "Le nom et l'e-mail sont obligatoires.",
         "invitationsHeading": "Invitations",
-        "invitationsHelp": "Liste des personnes invitées. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement. Lorsque l'inscription publique est désactivée, seules ces adresses peuvent s'inscrire, et le lien personnel pour entrer arrive par e-mail après l'inscription.",
         "invitationName": "Nom (facultatif)",
         "invitationEmail": "E-mail",
         "add": "Ajouter",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "ou ajouter manuellement",
         "removeItem": "Supprimer {name}",
         "invitationsStaffOnly": "Les invitations sont gérées par l'équipe de l'événement.",
-        "pickSkipped": "Certaines personnes figuraient déjà dans la liste ou n'avaient pas d'adresse valide, et n'ont pas été ajoutées."
+        "pickSkipped": "Certaines personnes figuraient déjà dans la liste ou n'avaient pas d'adresse valide, et n'ont pas été ajoutées.",
+        "primaryHeading": "Organisateur principal",
+        "primaryHelp": "Reçoit par e-mail le lien principal de l'événement : anime la salle et ajoute ou retire les autres personnes. Le nom et l'e-mail sont requis pour publier, pas pour un brouillon.",
+        "primaryPrefilled": "L'organisateur principal, c'est vous, avec le nom et l'e-mail de votre compte. Si quelqu'un d'autre anime l'événement, saisissez ici ses coordonnées : le lien lui sera envoyé.",
+        "primaryNameRequired": "Saisissez le nom de l'organisateur principal.",
+        "primaryEmailRequired": "Saisissez un e-mail valide pour l'organisateur principal.",
+        "linksOnPublish": "Les liens personnels partent par e-mail à la publication ; tant que l'événement est un brouillon, copiez-les depuis sa page.",
+        "personName": "Nom",
+        "personEmail": "E-mail",
+        "peopleHeading": "Personnes de l'événement",
+        "peopleHelp": "Organisateurs, modérateurs et intervenants. Chacun reçoit son propre lien pour entrer avec son rôle ; ce que peut faire chaque rôle est indiqué à l'étape « Autorisations ».",
+        "personRole": "Rôle",
+        "roleOrganizer": "Organisateur",
+        "roleModerator": "Modérateur",
+        "roleSpeaker": "Intervenant",
+        "roleHelp": {
+          "organizer": "Anime la salle comme un modérateur et figure parmi les organisateurs.",
+          "moderator": "Anime la salle : donne la parole, gère questions, sondages et enregistrement.",
+          "speaker": "Parle, utilise la caméra et partage l'écran, sans pouvoirs de modération."
+        },
+        "personOrganization": "Organisme ou organisation",
+        "personOrganizationHelp": "L'organisation de la personne : elle peut différer de celle qui organise l'événement.",
+        "personLogo": "Logo de l'organisation",
+        "personLogoAdd": "Ajouter le logo de l'organisation",
+        "personLogoChange": "Changer le logo de l'organisation",
+        "personPublic": "Afficher sur la page publique",
+        "personRequired": "Le nom et l'e-mail sont obligatoires.",
+        "invitationsHelpOpen": "Facultatif : la liste des personnes que vous invitez. L'inscription est ouverte : après la publication, tout le monde peut s'inscrire, invité ou non. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement.",
+        "invitationsHelpRestricted": "L'inscription est restreinte : seules les adresses de cette liste peuvent s'inscrire. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement ; le lien pour entrer arrive par e-mail après l'inscription.",
+        "logoExternal": "La page publique n'affiche que les logos téléversés sur cette plateforme : un logo provenant d'un autre site ne s'affichera pas.",
+        "primaryProfileInvalid": "Vérifiez l'organisation et l'adresse du logo."
       },
       "step4": {
         "heading": "Contenus et ressources",
@@ -878,7 +921,6 @@
           "schedule": "Calendrier",
           "recurrence": "Récurrence",
           "maxParticipants": "Participants attendus",
-          "organizers": "Organisateurs",
           "speakers": "Intervenants",
           "invitations": "Invitations",
           "materials": "Ressources",
@@ -888,7 +930,12 @@
           "recordingManual": "Activé — démarrage manuel",
           "recordingOff": "Désactivé",
           "multitrack": "Enregistrement par participant",
-          "multitrackOn": "Activé — nécessite un consentement explicite à l'inscription"
+          "multitrackOn": "Activé — nécessite un consentement explicite à l'inscription",
+          "organizingEntities": "Organismes organisateurs",
+          "primaryOrganizer": "Organisateur principal",
+          "primaryMissing": "À indiquer à l'étape « Personnes » pour publier",
+          "organizersPeople": "Autres organisateurs",
+          "moderators": "Modérateurs"
         },
         "noRecurrence": "Événement unique",
         "gdprHeading": "Confidentialité et conservation des données",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Utiliser un texte personnalisé —",
         "gdprTemplateUnknown": "Le modèle de politique de confidentialité sélectionné n'existe plus : choisissez-en un autre ou revenez au texte personnalisé",
         "privacyText": "Notice de confidentialité (texte)",
-        "moderatorHeading": "Contact modérateur",
-        "moderatorPublishHint": "Le nom et l'e-mail sont obligatoires pour publier l'événement (ils servent au lien modérateur et à l'e-mail de confirmation). Ils ne sont pas requis pour enregistrer un brouillon.",
-        "moderatorPrefilled": "Vous êtes le modérateur principal, avec le nom et l’e-mail de votre compte. Si une autre personne modère l’événement, saisissez ses coordonnées ici : le lien pour le gérer lui sera envoyé.",
-        "moderatorLinkNote": "Cette personne est le modérateur principal de l'événement : elle recevra par e-mail un lien privé pour le gérer (lancer l'enregistrement, modérer les questions, lancer des sondages…). Ce lien est différent de celui des co-modérateurs ajoutés à l'étape « Personnes », qui reçoivent chacun le leur.",
-        "moderatorRequired": "Saisissez le nom du modérateur",
-        "moderatorEmailRequired": "Saisissez une adresse e-mail valide pour le modérateur",
-        "moderatorName": "Nom",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Capacité estimée",
         "featuresHeading": "Synthèse de la configuration",
         "privacyDoc": "Document de notice (PDF ou lien)",
         "privacyDocHelp": "Téléversez un PDF ou collez l'URL d'une notice alternative. Remplace le modèle RGPD lorsqu'il est défini.",
         "privacyTextHelp": "Texte synthétique affiché dans le formulaire d'inscription ; peut compléter ou remplacer le modèle RGPD.",
         "technicalDetails": "Détails techniques : capacité et ressources",
-        "retentionRange": "Saisissez un nombre de jours entre 1 et {max}.",
-        "linksOnPublish": "Les liens personnels (modérateur principal, co-modérateurs et intervenants) sont envoyés par e-mail lorsque l'événement est publié. Tant qu'il s'agit d'un brouillon, copiez-les depuis la page de l'événement."
+        "retentionRange": "Saisissez un nombre de jours entre 1 et {max}."
       },
       "validationFailed": "Veuillez vérifier les champs en surbrillance avant de poursuivre.",
       "partialFailure": "Événement créé, mais certains éléments n'ont pas été enregistrés : {items}. Vous pouvez les ajouter depuis la page de l'événement.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-modérateurs et intervenants",
-      "intro": "Ajoutez des co-modérateurs et intervenants avec des liens magiques individuels.",
+      "title": "Organisateurs, modérateurs et intervenants",
+      "intro": "Ajoutez organisateurs, modérateurs et intervenants, chacun avec son propre lien.",
       "introHint": "Chaque personne a son propre nom visible dans la salle et un jeton révocable indépendamment du lien principal. Les intervenants disposent du micro, de la caméra et du partage d'écran mais ne peuvent pas modérer (exclure, couper le son de tous, enregistrer).",
       "add": "Ajouter une personne",
       "name": "Nom visible dans la salle",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Préparer un e-mail pour {name}",
       "prepareEmailSubject": "Votre lien pour « {title} »",
       "prepareEmailBody": "Bonjour {name},\n\nvoici votre lien personnel pour « {title} » :\n{link}\n\nCe lien est pour vous seul : ne le transférez pas et ne le partagez pas.",
-      "draftNote": "L'événement est un brouillon : les liens sont envoyés par e-mail lors de sa publication. En attendant, vous pouvez les copier ici."
+      "draftNote": "L'événement est un brouillon : les liens sont envoyés par e-mail lors de sa publication. En attendant, vous pouvez les copier ici.",
+      "roleOrganizer": "Organisateur",
+      "roleOrganizerHint": "Modère comme un modérateur et figure parmi les organisateurs de l'événement.",
+      "organization": "Organisme ou organisation (facultatif)",
+      "publicListed": "Afficher sur la page publique",
+      "onPublicPage": "Sur la page publique"
     },
     "gdprAuditLog": {
       "title": "Journal GDPR",

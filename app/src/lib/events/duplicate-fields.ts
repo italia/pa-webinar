@@ -16,6 +16,8 @@
  * inherits".
  */
 
+import { coerceMatrix } from '@/lib/utils/permission-matrix';
+
 /** Columns copied verbatim from the source event. */
 export const DUPLICATED_EVENT_FIELDS = [
   // content & schedule (dates may be overridden by the caller)
@@ -54,6 +56,8 @@ export const DUPLICATED_EVENT_FIELDS = [
   // people & branding
   'moderatorName',
   'moderatorEmail',
+  'moderatorOrganization',
+  'moderatorOrganizationLogoUrl',
   'organizerName',
   'speakersInfo',
   'imageUrl',
@@ -131,6 +135,9 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   postEventRecap: 'generated from the occurrence that ran',
   postEventRecapAt: 'generated from the occurrence that ran',
   postEventEmailSentAt: 'send state of the occurrence that ran',
+  moderatorPublicListed:
+    'publishing the lead organizer on the public page is a choice made for each event: ' +
+    'the copy starts unpublished, like every person on it',
 };
 
 /**
@@ -152,6 +159,14 @@ export function duplicatedConfig<T extends Record<string, unknown>>(
     if (value === undefined) continue;
     if (value === null && JSON_FIELDS.has(field)) continue;
     out[field] = value;
+  }
+  // La matrice si salva normalizzata, come in ogni altra scrittura: una
+  // sorgente salvata prima della regola avrebbe la colonna dei relatori
+  // diversa da quella che il wizard mostra.
+  if (out.permissionMatrix !== undefined) {
+    const matrice = coerceMatrix(out.permissionMatrix);
+    if (matrice) out.permissionMatrix = matrice;
+    else delete out.permissionMatrix;
   }
   return out;
 }

@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Il link che hai usato non è più valido. L'evento è concluso: qui sotto trovi la registrazione e i materiali.",
       "speakers": "Relatori",
       "organizer": "Organizzatore",
+      "peopleTitle": "Chi organizza e interviene",
+      "organizedBy": "Organizzato da",
+      "peopleOrganizers": "Organizzatori",
+      "peopleModerators": "Conduzione",
       "chatNotSaved": "I messaggi della chat non vengono salvati dopo la fine dell'evento.",
       "qaPostEvent": "Domande e risposte dall'evento",
       "peakParticipants": "Picco: {count} partecipanti",
@@ -883,10 +887,10 @@
       },
       "step2": {
         "heading": "Chi può fare cosa",
-        "intro": "Matrice dei permessi: scegli per ogni funzione chi può usarla. I moderatori possono sempre tutto.",
+        "intro": "Che cosa può fare ciascun ruolo. Per i partecipanti scegli tu; gli altri ruoli hanno ciò che serve loro per condurre o parlare.",
         "featureCol": "Funzionalità",
         "role": {
-          "GUEST": "Ospite",
+          "GUEST": "Partecipante",
           "SPEAKER": "Relatore",
           "MODERATOR": "Moderatore"
         },
@@ -918,29 +922,38 @@
         },
         "recordingHeading": "Registrazione",
         "roomFeaturesHeading": "Funzioni della stanza",
-        "aiPipelineOff": "La post-produzione AI (trascrizione, sintesi, traduzioni) non è attiva su questa installazione."
+        "aiPipelineOff": "La post-produzione AI (trascrizione, sintesi, traduzioni) non è attiva su questa installazione.",
+        "rolesHeading": "I ruoli dell'evento",
+        "roleModeratorColumn": "Organizzatore e moderatore",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizzatore",
+            "desc": "Conduce la sala come un moderatore ed è presentato fra chi organizza. L'organizzatore principale aggiunge e toglie le altre persone."
+          },
+          "moderator": {
+            "name": "Moderatore",
+            "desc": "Conduce la sala: dà e toglie la parola, silenzia, gestisce domande, sondaggi e registrazione."
+          },
+          "speaker": {
+            "name": "Relatore",
+            "desc": "Parla, usa la webcam e condivide lo schermo; non modera."
+          },
+          "guest": {
+            "name": "Partecipante",
+            "desc": "Segue l'evento e interagisce come decidi nella tabella qui sotto."
+          }
+        }
       },
       "step3": {
         "heading": "Persone e inviti",
-        "intro": "Aggiungi organizzatori (mostrati sulla pagina), moderatori, relatori e ospiti invitati.",
-        "organizersHeading": "Organizzatori",
-        "organizersHelp": "Gli enti che organizzano l'evento: nome, sito e logo compaiono nella pagina pubblica.",
+        "intro": "Chi organizza, chi conduce e chi parla, con i loro enti; poi, se servono, gli invitati.",
+        "organizersHeading": "Enti organizzatori",
+        "organizersHelp": "Gli enti che promuovono l'evento: nome, sito e logo compaiono nella pagina pubblica. Non devono coincidere con gli enti delle persone.",
         "organizerName": "Nome dell'ente",
         "organizerWebsite": "Sito web",
         "organizerLogo": "Logo organizzatore",
         "organizerRequired": "Il nome dell'ente è obbligatorio.",
-        "moderatorsHeading": "Moderatori",
-        "moderatorsHelp": "Co-moderatori aggiuntivi: ognuno riceve un proprio link per gestire la sessione e i permessi durante l'evento. Il moderatore principale (contatto obbligatorio) si imposta nell'ultimo step, «Riepilogo».",
-        "moderatorName": "Nome",
-        "moderatorEmail": "Email",
-        "moderatorRequired": "Nome ed email sono obbligatori.",
-        "speakersHeading": "Relatori",
-        "speakersHelp": "Ricevono via email un link personale per parlare, usare la webcam e condividere lo schermo, senza poteri di moderazione.",
-        "speakerName": "Nome",
-        "speakerEmail": "Email",
-        "speakerRequired": "Nome ed email sono obbligatori.",
         "invitationsHeading": "Inviti",
-        "invitationsHelp": "Elenco delle persone invitate. La piattaforma non invia inviti: condividi tu il link dell'evento. Con la registrazione pubblica disattivata possono registrarsi solo questi indirizzi, e il link personale per entrare arriva via email dopo la registrazione.",
         "invitationName": "Nome (facoltativo)",
         "invitationEmail": "Email",
         "add": "Aggiungi",
@@ -951,7 +964,37 @@
         "rubricaOrAdd": "oppure aggiungi manualmente",
         "removeItem": "Rimuovi {name}",
         "invitationsStaffOnly": "Gli inviti li gestisce lo staff dell'evento.",
-        "pickSkipped": "Alcune persone erano già presenti, o senza un indirizzo valido, e non sono state aggiunte."
+        "pickSkipped": "Alcune persone erano già presenti, o senza un indirizzo valido, e non sono state aggiunte.",
+        "primaryHeading": "Organizzatore principale",
+        "primaryHelp": "Riceve per email il link principale dell'evento: conduce la sala e aggiunge o toglie le altre persone. Nome ed email servono per pubblicare, non per la bozza.",
+        "primaryPrefilled": "L'organizzatore principale sei tu, con il nome e l'email del tuo account. Se l'evento lo conduce un'altra persona, scrivi qui i suoi dati: il link arriverà a lei.",
+        "primaryNameRequired": "Inserisci il nome dell'organizzatore principale.",
+        "primaryEmailRequired": "Inserisci un'email valida dell'organizzatore principale.",
+        "linksOnPublish": "I link personali partono per email alla pubblicazione; finché l'evento è una bozza si copiano dalla sua pagina.",
+        "personName": "Nome",
+        "personEmail": "Email",
+        "peopleHeading": "Persone dell'evento",
+        "peopleHelp": "Organizzatori, moderatori e relatori. Ognuno riceve un proprio link per entrare con il suo ruolo; che cosa può fare ogni ruolo lo dice il passo «Permessi».",
+        "personRole": "Ruolo",
+        "roleOrganizer": "Organizzatore",
+        "roleModerator": "Moderatore",
+        "roleSpeaker": "Relatore",
+        "roleHelp": {
+          "organizer": "Conduce la sala come un moderatore ed è presentato fra chi organizza.",
+          "moderator": "Conduce la sala: dà la parola, gestisce domande, sondaggi e registrazione.",
+          "speaker": "Parla, usa la webcam e condivide lo schermo, senza poteri di moderazione."
+        },
+        "personOrganization": "Ente o organizzazione",
+        "personOrganizationHelp": "L'ente della persona: può essere diverso da quello che organizza l'evento.",
+        "personLogo": "Logo dell'ente",
+        "personLogoAdd": "Aggiungi il logo dell'ente",
+        "personLogoChange": "Cambia il logo dell'ente",
+        "personPublic": "Mostra nella pagina pubblica",
+        "personRequired": "Nome ed email sono obbligatori.",
+        "invitationsHelpOpen": "Facoltativo: l'elenco di chi inviti tu. L'iscrizione è aperta, quindi dopo la pubblicazione chiunque può iscriversi, invitato o no. La piattaforma non manda inviti: condividi tu il link dell'evento.",
+        "invitationsHelpRestricted": "L'iscrizione è riservata: possono iscriversi solo gli indirizzi di questo elenco. La piattaforma non manda inviti: condividi tu il link dell'evento; il link per entrare arriva per email dopo l'iscrizione.",
+        "logoExternal": "Nella pagina pubblica compaiono solo i loghi caricati su questa piattaforma: un logo da un altro sito non si vedrà.",
+        "primaryProfileInvalid": "Controlla l'ente e l'indirizzo del logo."
       },
       "step4": {
         "heading": "Contenuti e materiali",
@@ -1002,7 +1045,6 @@
           "schedule": "Calendario",
           "recurrence": "Ricorrenza",
           "maxParticipants": "Partecipanti attesi",
-          "organizers": "Organizzatori",
           "speakers": "Relatori",
           "invitations": "Inviti",
           "materials": "Materiali",
@@ -1012,7 +1054,12 @@
           "recordingManual": "Attiva — avvio manuale",
           "recordingOff": "Non attiva",
           "multitrack": "Registrazione per-partecipante",
-          "multitrackOn": "Attiva — richiede consenso esplicito in registrazione"
+          "multitrackOn": "Attiva — richiede consenso esplicito in registrazione",
+          "organizingEntities": "Enti organizzatori",
+          "primaryOrganizer": "Organizzatore principale",
+          "primaryMissing": "Da indicare nel passo «Persone» per pubblicare",
+          "organizersPeople": "Altri organizzatori",
+          "moderators": "Moderatori"
         },
         "noRecurrence": "Evento singolo",
         "gdprHeading": "Privacy e conservazione dati",
@@ -1022,22 +1069,13 @@
         "gdprTemplateNone": "— Usa testo personalizzato —",
         "gdprTemplateUnknown": "Il modello di informativa scelto non esiste più: scegline un altro o torna al testo personalizzato",
         "privacyText": "Informativa privacy (testo)",
-        "moderatorHeading": "Moderatore principale",
-        "moderatorPublishHint": "Nome ed email sono obbligatori per pubblicare l'evento (servono per il link moderatore e l'email di conferma). Per salvare come bozza non sono richiesti.",
-        "moderatorPrefilled": "Il moderatore principale sei tu, con il nome e l'email del tuo account. Se l'evento lo modera un'altra persona, scrivi qui i suoi dati: il link per gestirlo arriverà a lei.",
-        "moderatorLinkNote": "Questa persona è il moderatore principale dell'evento: riceverà via email un link privato per gestirlo (avviare la registrazione, moderare le domande, lanciare sondaggi…). È diverso dai co-moderatori aggiunti nello step «Persone», che ricevono ciascuno il proprio link.",
-        "moderatorRequired": "Inserisci il nome del moderatore",
-        "moderatorEmailRequired": "Inserisci un'email valida del moderatore",
-        "moderatorName": "Nome",
-        "moderatorEmail": "Email",
         "capacityHeading": "Capacità stimata",
         "featuresHeading": "Configurazione sintetica",
         "privacyDoc": "Documento informativa (PDF o link)",
         "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
         "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR.",
         "technicalDetails": "Dettagli tecnici: capacità e risorse",
-        "retentionRange": "Inserisci un numero di giorni fra 1 e {max}.",
-        "linksOnPublish": "I link personali (moderatore principale, co-moderatori e relatori) partono per email quando l'evento viene pubblicato. Finché è una bozza si copiano dalla pagina dell'evento."
+        "retentionRange": "Inserisci un numero di giorni fra 1 e {max}."
       },
       "validationFailed": "Controlla i campi evidenziati prima di procedere.",
       "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
@@ -1582,8 +1620,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderatori e relatori",
-      "intro": "Aggiungi co-moderatori e relatori con magic-link individuali.",
+      "title": "Organizzatori, moderatori e relatori",
+      "intro": "Aggiungi organizzatori, moderatori e relatori, ognuno con il proprio link.",
       "introHint": "Ogni persona ha un nome visibile in sala e un token revocabile indipendentemente dal link principale. I relatori hanno microfono, video e condivisione schermo ma non possono moderare (kick, muta-tutti, registrazione).",
       "add": "Aggiungi persona",
       "name": "Nome visibile in sala",
@@ -1608,7 +1646,12 @@
       "prepareEmailFor": "Prepara un'email per {name}",
       "prepareEmailSubject": "Il tuo link per «{title}»",
       "prepareEmailBody": "Ciao {name},\n\necco il tuo link personale per «{title}»:\n{link}\n\nIl link è solo per te: non inoltrarlo e non condividerlo.",
-      "draftNote": "L'evento è una bozza: i link partono per email quando viene pubblicato. Intanto puoi copiarli da qui."
+      "draftNote": "L'evento è una bozza: i link partono per email quando viene pubblicato. Intanto puoi copiarli da qui.",
+      "roleOrganizer": "Organizzatore",
+      "roleOrganizerHint": "Modera come un moderatore ed è presentato fra chi organizza l'evento.",
+      "organization": "Ente o organizzazione (facoltativo)",
+      "publicListed": "Mostra nella pagina pubblica",
+      "onPublicPage": "Nella pagina pubblica"
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",

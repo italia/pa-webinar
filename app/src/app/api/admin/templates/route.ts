@@ -48,9 +48,9 @@ const templateSchema = z.object({
   descriptionTemplate: z.record(z.string()).nullish(),
   defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
-  // Role×feature permission matrix (see lib/utils/permission-matrix.ts).
-  // Optional; when set it pre-seeds step 2 of the wizard directly. When
-  // absent, the wizard projects the boolean toggles above into a matrix.
+  // Matrice ruolo × funzione (lib/utils/permission-matrix.ts). Facoltativa:
+  // se c'è, precompila il passo «Permessi» del wizard; se manca, il wizard la
+  // ricava dai permessi qui sopra.
   permissionMatrix: z.record(z.string(), z.array(z.string())).nullish(),
   sortOrder: z.number().int().optional(),
 });

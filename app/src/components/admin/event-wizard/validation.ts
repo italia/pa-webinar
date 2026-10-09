@@ -24,8 +24,9 @@ export type StepKey = WizardStep;
  *
  * Valgono anche per «Salva come bozza»: la creazione salva sempre una bozza e
  * lo schema del server e' lo stesso per bozza e pubblicazione, quindi titolo,
- * date e descrizione servono comunque. La bozza rinuncia solo al contatto del
- * moderatore principale (`validatePublish`), come dice il passo Riepilogo.
+ * date e descrizione servono comunque. La bozza rinuncia solo al contatto
+ * dell'organizzatore principale (`validatePublish`), come dice il passo
+ * Persone.
  */
 export function validateStep(
   step: StepKey,
@@ -68,7 +69,7 @@ export function validateStep(
   }
   if (step === 'permissions') {
     // La traduzione automatica senza lingue target non produce nulla:
-    // richiediamo almeno una lingua. (Errore mostrato nello step 2.)
+    // richiediamo almeno una lingua. (Errore mostrato nel passo Permessi.)
     // Letti come li legge la pipeline: un valore vecchio scritto a mano
     // ("english", "en;fr") non conta come lingua.
     if (form.aiTranslationEnabled && parseLocaleList(form.aiTargetLocales).length === 0) {
@@ -111,8 +112,10 @@ const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['aiTargetLocales', 'permissions'],
   ['gdprTemplateId', 'review'],
   ['dataRetentionDays', 'review'],
-  ['moderatorName', 'review'],
-  ['moderatorEmail', 'review'],
+  ['moderatorName', 'invites'],
+  ['moderatorEmail', 'invites'],
+  ['moderatorOrganization', 'invites'],
+  ['moderatorOrganizationLogoUrl', 'invites'],
 ]);
 
 /** Campi multilingua: il passo 1 li evidenzia nella lingua predefinita. */

@@ -81,9 +81,12 @@ durable credential.
 
 **Named grant** (`EventModerator`, role `MODERATOR` or `SPEAKER`): a
 per-person access grant to one event, with its own magic-link token, that can
-be revoked on its own (`revokedAt`). Co-moderators and speakers added in the
-wizard's **People** step each receive one. The table is `event_moderators`
-even though it also holds speakers.
+be revoked on its own (`revokedAt`). Organizers, moderators and speakers added
+in the wizard's **People** step each receive one, with their organization and
+whether the public page lists them (`publicListed`). An *event organizer* is a
+`MODERATOR` grant with `organizer` set: same powers in the room, listed among
+the organizers. The table is `event_moderators` even though it also holds
+speakers.
 [Identity, access and tokens](architecture/identity-and-access.md)
 
 **One-time sign-in link**: the emailed, single-use link a staff account uses
@@ -95,7 +98,8 @@ to enter the administration area (`StaffLoginToken`).
 creates events and manages only its own (`Event.createdById`), with no access
 to installation settings, the address book or other events' data. Do not
 confuse it with the *co-organizing organizations* listed on an event page
-(`EventOrganizer`, wizard step **People**, section **Organizers**): those are
+(`EventOrganizer`, wizard step **People**, section **Organizing entities**), or
+with an event's organizer grants (see *Named grant*): the entities are
 display metadata only (name, logo, website), with no access rights, no link
 and no email. [ADR-014](adr/014-organizer-role.md),
 [From creation to recap](architecture/event-journey.md)
@@ -223,7 +227,7 @@ editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
 **Event wizard**: the five-step form that creates or edits an event:
-**Basics**, **Permissions**, **People**, **Content** and **Review**.
+**Basics**, **People**, **Permissions**, **Content** and **Review**.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -266,8 +270,10 @@ can link an occurrence to the first event of its series through
 
 **Permission matrix** (`permissionMatrix`, wizard step **Permissions**): the
 role-by-feature table (chat, Q&A, microphone, camera, screen share, recording
-control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Moderators can
-always do everything.
+control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
+`GUEST` column is chosen and applied: moderators can always do everything,
+and speakers always have microphone, camera and screen; the other columns
+are normalized to that on every write.
 [From creation to recap](architecture/event-journey.md#the-five-wizard-steps)
 
 **Questionnaire** (`EventQuestionnaire`, UI **Questionnaires**): questions
@@ -964,8 +970,8 @@ these docs and the code use *organizer*.
 |---|---|---|
 | Template eventi | **Event templates** | event template (`EventTemplate`) |
 | Base | **Basics** | event wizard, step 1 |
-| Permessi | **Permissions** | event wizard, step 2 (permission matrix) |
-| Persone | **People** | event wizard, step 3 |
+| Persone | **People** | event wizard, step 2 |
+| Permessi | **Permissions** | event wizard, step 3 (roles and permission matrix) |
 | Contenuti | **Content** | event wizard, step 4 |
 | Riepilogo | **Review** | event wizard, step 5 |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |

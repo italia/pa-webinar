@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Käyttämäsi linkki ei ole enää voimassa. Tapahtuma on päättynyt: alta löydät tallenteen ja materiaalit.",
       "speakers": "Puhujat",
       "organizer": "Järjestäjä",
+      "peopleTitle": "Järjestäjät ja puhujat",
+      "organizedBy": "Järjestäjä",
+      "peopleOrganizers": "Järjestäjät",
+      "peopleModerators": "Juontajat",
       "chatNotSaved": "Chat-viestejä ei tallenneta tapahtuman päätyttyä.",
       "qaPostEvent": "Q&A tapahtumasta",
       "peakParticipants": "Huippu: {count} osallistujaa",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
-        "intro": "Oikeusmatriisi: valitse kullekin toiminnolle, ketkä saavat käyttää sitä. Moderaattoreilla on aina kaikki oikeudet.",
+        "intro": "Mitä kukin rooli voi tehdä. Osallistujien osalta valitset sinä; muilla rooleilla on se, mitä ne tarvitsevat juontamiseen tai puhumiseen.",
         "featureCol": "Toiminto",
         "role": {
-          "GUEST": "Vieras",
+          "GUEST": "Osallistuja",
           "SPEAKER": "Puhuja",
           "MODERATOR": "Moderaattori"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Tallennus",
         "roomFeaturesHeading": "Huoneen toiminnot",
-        "aiPipelineOff": "Tekoälyjälkikäsittely (litterointi, tiivistelmä, käännökset) ei ole käytössä tässä asennuksessa."
+        "aiPipelineOff": "Tekoälyjälkikäsittely (litterointi, tiivistelmä, käännökset) ei ole käytössä tässä asennuksessa.",
+        "rolesHeading": "Tapahtuman roolit",
+        "roleModeratorColumn": "Järjestäjä ja moderaattori",
+        "roleInfo": {
+          "organizer": {
+            "name": "Järjestäjä",
+            "desc": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Pääjärjestäjä lisää ja poistaa muita henkilöitä."
+          },
+          "moderator": {
+            "name": "Moderaattori",
+            "desc": "Johtaa huonetta: antaa ja ottaa puheenvuoron, mykistää, hallitsee kysymyksiä, kyselyjä ja tallennusta."
+          },
+          "speaker": {
+            "name": "Puhuja",
+            "desc": "Puhuu, käyttää kameraa ja jakaa näyttöä; ei moderoi."
+          },
+          "guest": {
+            "name": "Osallistuja",
+            "desc": "Seuraa tapahtumaa ja osallistuu niin kuin alla olevassa taulukossa päätät."
+          }
+        }
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
-        "intro": "Lisää järjestäjät (näkyvät sivulla), moderaattorit, puhujat ja kutsutut vieraat.",
-        "organizersHeading": "Järjestäjät",
-        "organizersHelp": "Tapahtuman järjestävät organisaatiot: nimi, verkkosivusto ja logo näkyvät julkisella sivulla.",
+        "intro": "Kuka järjestää, kuka juontaa ja kuka puhuu organisaatioineen; sitten tarvittaessa kutsutut.",
+        "organizersHeading": "Järjestävät organisaatiot",
+        "organizersHelp": "Tapahtuman järjestävät organisaatiot: nimi, verkkosivusto ja logo näkyvät julkisella sivulla. Niiden ei tarvitse olla samat kuin henkilöiden organisaatiot.",
         "organizerName": "Organisaation nimi",
         "organizerWebsite": "Verkkosivusto",
         "organizerLogo": "Järjestäjän logo",
         "organizerRequired": "Organisaation nimi on pakollinen.",
-        "moderatorsHeading": "Moderaattorit",
-        "moderatorsHelp": "Moderaattorit voivat hallita istuntoa ja oikeuksia tapahtuman aikana.",
-        "moderatorName": "Nimi",
-        "moderatorEmail": "Sähköposti",
-        "moderatorRequired": "Nimi ja sähköposti ovat pakollisia.",
-        "speakersHeading": "Puhujat",
-        "speakersHelp": "He saavat sähköpostitse henkilökohtaisen linkin, jolla he voivat puhua, käyttää kameraa ja jakaa näyttönsä ilman moderointioikeuksia.",
-        "speakerName": "Nimi",
-        "speakerEmail": "Sähköposti",
-        "speakerRequired": "Nimi ja sähköposti ovat pakollisia.",
         "invitationsHeading": "Kutsut",
-        "invitationsHelp": "Luettelo kutsutuista. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse. Kun julkinen rekisteröityminen on pois käytöstä, vain nämä osoitteet voivat rekisteröityä, ja henkilökohtainen liittymislinkki tulee sähköpostitse rekisteröitymisen jälkeen.",
         "invitationName": "Nimi (valinnainen)",
         "invitationEmail": "Sähköposti",
         "add": "Lisää",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "tai lisää manuaalisesti",
         "removeItem": "Poista {name}",
         "invitationsStaffOnly": "Kutsuja hallinnoi tapahtuman henkilökunta.",
-        "pickSkipped": "Osa henkilöistä oli jo luettelossa tai heillä ei ollut kelvollista osoitetta, joten heitä ei lisätty."
+        "pickSkipped": "Osa henkilöistä oli jo luettelossa tai heillä ei ollut kelvollista osoitetta, joten heitä ei lisätty.",
+        "primaryHeading": "Pääjärjestäjä",
+        "primaryHelp": "Saa tapahtuman päälinkin sähköpostilla: johtaa huonetta ja lisää tai poistaa muita henkilöitä. Nimi ja sähköposti tarvitaan julkaisuun, ei luonnokseen.",
+        "primaryPrefilled": "Pääjärjestäjä olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa johtaa joku muu, kirjoita tähän hänen tietonsa: linkki menee hänelle.",
+        "primaryNameRequired": "Kirjoita pääjärjestäjän nimi.",
+        "primaryEmailRequired": "Kirjoita pääjärjestäjän kelvollinen sähköposti.",
+        "linksOnPublish": "Henkilökohtaiset linkit lähetetään sähköpostilla julkaisun yhteydessä; niin kauan kuin tapahtuma on luonnos, kopioi ne sen sivulta.",
+        "personName": "Nimi",
+        "personEmail": "Sähköposti",
+        "peopleHeading": "Tapahtuman henkilöt",
+        "peopleHelp": "Järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin osallistuakseen roolissaan; mitä kukin rooli voi tehdä, näkyy vaiheessa ”Oikeudet”.",
+        "personRole": "Rooli",
+        "roleOrganizer": "Järjestäjä",
+        "roleModerator": "Moderaattori",
+        "roleSpeaker": "Puhuja",
+        "roleHelp": {
+          "organizer": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa.",
+          "moderator": "Johtaa huonetta: antaa puheenvuoron, hallitsee kysymyksiä, kyselyjä ja tallennusta.",
+          "speaker": "Puhuu, käyttää kameraa ja jakaa näyttöä ilman moderointioikeuksia."
+        },
+        "personOrganization": "Organisaatio",
+        "personOrganizationHelp": "Henkilön organisaatio: se voi olla eri kuin tapahtuman järjestäjä.",
+        "personLogo": "Organisaation logo",
+        "personLogoAdd": "Lisää organisaation logo",
+        "personLogoChange": "Vaihda organisaation logo",
+        "personPublic": "Näytä julkisella sivulla",
+        "personRequired": "Nimi ja sähköposti ovat pakollisia.",
+        "invitationsHelpOpen": "Valinnainen: luettelo kutsumistasi henkilöistä. Ilmoittautuminen on avoin, joten julkaisun jälkeen kuka tahansa voi ilmoittautua, kutsuttu tai ei. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse.",
+        "invitationsHelpRestricted": "Ilmoittautuminen on rajattu: vain tämän luettelon osoitteet voivat ilmoittautua. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse; liittymislinkki tulee sähköpostilla ilmoittautumisen jälkeen.",
+        "logoExternal": "Julkisella sivulla näkyvät vain tälle alustalle ladatut logot: toiselta sivustolta tuleva logo ei näy.",
+        "primaryProfileInvalid": "Tarkista organisaatio ja logon osoite."
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -878,7 +921,6 @@
           "schedule": "Aikataulu",
           "recurrence": "Toistuvuus",
           "maxParticipants": "Odotetut osallistujat",
-          "organizers": "Järjestäjät",
           "speakers": "Puhujat",
           "invitations": "Kutsut",
           "materials": "Materiaalit",
@@ -888,7 +930,12 @@
           "recordingManual": "Käytössä — manuaalinen aloitus",
           "recordingOff": "Pois käytöstä",
           "multitrack": "Osallistujakohtainen tallennus",
-          "multitrackOn": "Käytössä — edellyttää nimenomaista suostumusta ilmoittautumisen yhteydessä"
+          "multitrackOn": "Käytössä — edellyttää nimenomaista suostumusta ilmoittautumisen yhteydessä",
+          "organizingEntities": "Järjestävät organisaatiot",
+          "primaryOrganizer": "Pääjärjestäjä",
+          "primaryMissing": "Määritettävä vaiheessa ”Henkilöt” julkaisua varten",
+          "organizersPeople": "Muut järjestäjät",
+          "moderators": "Moderaattorit"
         },
         "noRecurrence": "Yksittäinen tapahtuma",
         "gdprHeading": "Yksityisyys ja tietojen säilytys",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Käytä mukautettua tekstiä —",
         "gdprTemplateUnknown": "Valittua tietosuojaseloste-mallia ei enää ole: valitse toinen tai palaa mukautettuun tekstiin",
         "privacyText": "Tietosuojaseloste (teksti)",
-        "moderatorHeading": "Moderaattorin yhteystiedot",
-        "moderatorPublishHint": "Nimi ja sähköpostiosoite ovat pakollisia tapahtuman julkaisemiseksi (niitä tarvitaan moderaattorilinkkiin ja vahvistussähköpostiin). Luonnoksena tallentamiseen niitä ei vaadita.",
-        "moderatorPrefilled": "Päämoderaattori olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa moderoi joku muu, kirjoita tähän hänen tietonsa: hallintalinkki lähetetään hänelle.",
-        "moderatorLinkNote": "Tämä henkilö on tapahtuman päämoderaattori: hän saa sähköpostitse yksityisen linkin tapahtuman hallintaan (tallennuksen aloitus, kysymysten moderointi, kyselyjen käynnistys…). Tämä on eri asia kuin Henkilöt-vaiheessa lisätyt apumoderaattorit, jotka saavat kukin oman linkkinsä.",
-        "moderatorRequired": "Anna moderaattorin nimi",
-        "moderatorEmailRequired": "Anna moderaattorin kelvollinen sähköpostiosoite",
-        "moderatorName": "Nimi",
-        "moderatorEmail": "Sähköposti",
         "capacityHeading": "Arvioitu kapasiteetti",
         "featuresHeading": "Kokoonpanon yhteenveto",
         "privacyDoc": "Tietosuojaseloste-dokumentti (PDF tai linkki)",
         "privacyDocHelp": "Lataa PDF tai liitä vaihtoehtoisen tietosuojaselosteen URL. Korvaa GDPR-mallin, jos asetettu.",
         "privacyTextHelp": "Lyhyt teksti, joka näytetään ilmoittautumislomakkeessa; voi täydentää tai korvata GDPR-mallin.",
         "technicalDetails": "Tekniset tiedot: kapasiteetti ja resurssit",
-        "retentionRange": "Anna päivien määrä väliltä 1–{max}.",
-        "linksOnPublish": "Henkilökohtaiset linkit (päämoderaattori, apumoderaattorit ja puhujat) lähetetään sähköpostitse, kun tapahtuma julkaistaan. Kun se on luonnos, kopioi ne tapahtuman sivulta."
+        "retentionRange": "Anna päivien määrä väliltä 1–{max}."
       },
       "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
       "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Apumoderaattorit ja puhujat",
-      "intro": "Lisää apumoderaattoreita ja puhujia yksilöllisillä maagisilla linkeillä.",
+      "title": "Järjestäjät, moderaattorit ja puhujat",
+      "intro": "Lisää järjestäjät, moderaattorit ja puhujat, kukin omalla linkillään.",
       "introHint": "Jokaisella henkilöllä on oma näkyvä nimi huoneessa ja tunnus, jonka voi perua pääsylinkistä riippumatta. Puhujilla on mikrofoni, kamera ja näytön jako, mutta he eivät voi moderoida (poistaa, mykistää kaikkia, tallentaa).",
       "add": "Lisää henkilö",
       "name": "Huoneessa näkyvä nimi",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Valmistele sähköposti henkilölle {name}",
       "prepareEmailSubject": "Linkkisi tapahtumaan ”{title}”",
       "prepareEmailBody": "Hei {name},\n\ntässä on henkilökohtainen linkkisi tapahtumaan ”{title}”:\n{link}\n\nLinkki on vain sinulle: älä välitä tai jaa sitä.",
-      "draftNote": "Tapahtuma on luonnos: linkit lähetetään sähköpostitse, kun se julkaistaan. Sitä ennen voit kopioida ne täältä."
+      "draftNote": "Tapahtuma on luonnos: linkit lähetetään sähköpostitse, kun se julkaistaan. Sitä ennen voit kopioida ne täältä.",
+      "roleOrganizer": "Järjestäjä",
+      "roleOrganizerHint": "Moderoi kuten moderaattori ja esitetään tapahtuman järjestäjien joukossa.",
+      "organization": "Organisaatio (valinnainen)",
+      "publicListed": "Näytä julkisella sivulla",
+      "onPublicPage": "Julkisella sivulla"
     },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",

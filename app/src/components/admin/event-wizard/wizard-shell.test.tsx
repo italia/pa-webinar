@@ -149,9 +149,10 @@ describe('creazione — descrizione mancante', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
 
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
     await press(button(w.publish));
 
     expect(alertText()).toBe(w.validationFailed);
@@ -190,9 +191,10 @@ describe('creazione — descrizione mancante', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
 
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
     await press(button(w.publish));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -241,10 +243,13 @@ describe('modifica — revoca di un co-moderatore', () => {
       privacyPolicyUrl: null,
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario@example.org',
+      moderatorOrganization: null,
+      moderatorOrganizationLogoUrl: null,
+      moderatorPublicListed: false,
     },
     organizers: [],
     eventModerators: [
-      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null },
+      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
     ],
     invitations: [],
     materials: [],
@@ -387,7 +392,7 @@ describe('modifica — salvataggio da un passo intermedio', () => {
   });
 });
 
-describe('passo 2 — lavagna', () => {
+describe('passo Permessi — lavagna', () => {
   function interruttoreLavagna(): HTMLInputElement {
     const el = container.querySelector<HTMLInputElement>(
       `input[aria-label="${messages.admin.form.whiteboardEnabled}"]`,
@@ -453,9 +458,10 @@ describe('creazione — pubblicazione non riuscita', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
     return press(button(w.publish));
   }
 
@@ -518,9 +524,10 @@ describe('creazione — dove si arriva', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
   }
 
   beforeEach(() => {
@@ -595,7 +602,7 @@ describe('validazione — il fuoco va al campo da correggere', () => {
     expect(alertText()).toBe('');
   });
 
-  it('«Pubblica» senza moderatore principale: fuoco sul primo campo mancante', async () => {
+  it('«Pubblica» senza organizzatore principale: porta al passo Persone, fuoco sul primo campo mancante', async () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
@@ -604,7 +611,7 @@ describe('validazione — il fuoco va al campo da correggere', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     const attivo = document.activeElement as HTMLElement;
-    expect(attivo.id).toBe('rev-mod-name');
+    expect(attivo.id).toBe('wiz-primary-name');
     expect(attivo.getAttribute('aria-invalid')).toBe('true');
   });
 });
@@ -622,14 +629,15 @@ describe('creazione — risorse non salvate', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('sp-name'), 'Relatore 1');
-    type(byId<HTMLInputElement>('sp-email'), 'relatore@example.org');
-    // «Aggiungi» del blocco dei relatori: quello che segue il loro campo email.
-    const bloccoRelatori = byId('sp-email').closest('.row') ?? container;
-    await press(button(w.step3.add, bloccoRelatori));
+    // Il ruolo proposto per una persona nuova è «Relatore».
+    type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
+    type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
+    // «Aggiungi» del modulo delle persone: quello che segue il suo campo email.
+    const bloccoPersone = byId('person-email').closest('.row') ?? container;
+    await press(button(w.step3.add, bloccoPersone));
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
     await press(button(w.saveDraft));
 
     expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
@@ -651,9 +659,10 @@ describe('creazione — risorse non salvate', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
-    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
     await press(button(w.publish));
 
     const salvato = JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}');
@@ -676,9 +685,9 @@ describe('creazione — risorse non salvate', () => {
       type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
       type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
       goToStep(w.steps.invites);
-      type(byId<HTMLInputElement>('sp-name'), 'Relatore 1');
-      type(byId<HTMLInputElement>('sp-email'), 'relatore@example.org');
-      await press(button(w.step3.add, byId('sp-email').closest('.row') ?? container));
+      type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
+      type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
+      await press(button(w.step3.add, byId('person-email').closest('.row') ?? container));
       goToStep(w.steps.review);
       await press(button(w.saveDraft));
     } finally {

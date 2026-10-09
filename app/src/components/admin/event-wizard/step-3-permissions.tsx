@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * Step 2 — Permissions matrix.
+ * Passo «Permessi»: i ruoli dell'evento e la tabella ruolo × funzione.
  *
- * A role×feature grid. Each cell is a checkbox: "can this role do this?".
- * The MODERATOR column is always disabled-checked (invariant: moderators can
- * do everything). Recording control is treated as a feature in the matrix
- * but also gated by the top-level `recordingEnabled` toggle — when recording
- * is off, the row is hidden.
+ * Si sceglie solo per i partecipanti: la colonna dei moderatori è sempre
+ * accesa, quella dei relatori mostra ciò che hanno in sala, e la matrice si
+ * salva normalizzata allo stesso modo (withRoleInvariants). Il comando della
+ * registrazione è una riga della tabella, nascosta quando la registrazione è
+ * spenta.
  */
 
 import { useTranslations } from 'next-intl';
@@ -17,13 +17,13 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
-  withModeratorInvariant,
+  withRoleInvariants,
   type EventRole,
   type EventFeature,
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 
-export interface Step2Value {
+export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
@@ -49,8 +49,8 @@ export interface Step2Value {
 }
 
 interface Props {
-  value: Step2Value;
-  onChange: (patch: Partial<Step2Value>) => void;
+  value: StepPermissionsValue;
+  onChange: (patch: Partial<StepPermissionsValue>) => void;
   fieldErrors?: Record<string, string>;
   /**
    * Se l'installazione ha il servizio della lavagna di Jitsi. Senza, la sala
@@ -75,7 +75,21 @@ interface Props {
   editing?: boolean;
 }
 
-export default function Step2Permissions({
+/**
+ * Il valore di una cella che non si sceglie, o null per quelle dei
+ * partecipanti. In sala i moderatori possono tutto; i relatori hanno sempre
+ * microfono, video e schermo, vedono chat e domande come i partecipanti e non
+ * comandano la registrazione.
+ */
+function cellaFissa(feature: EventFeature, role: EventRole, matrix: PermissionMatrix): boolean | null {
+  if (role === 'MODERATOR') return true;
+  if (role !== 'SPEAKER') return null;
+  if (feature === 'mic' || feature === 'video' || feature === 'share') return true;
+  if (feature === 'recording_control') return false;
+  return matrix[feature]?.includes('GUEST') ?? false;
+}
+
+export default function StepPermissions({
   value,
   onChange,
   fieldErrors = {},
@@ -96,7 +110,7 @@ export default function Step2Permissions({
       ...value.permissionMatrix,
       [feature]: Array.from(current) as EventRole[],
     };
-    onChange({ permissionMatrix: withModeratorInvariant(next) });
+    onChange({ permissionMatrix: withRoleInvariants(next) });
   };
 
   const visibleFeatures = EVENT_FEATURES.filter(
@@ -108,9 +122,24 @@ export default function Step2Permissions({
       <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
-      <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
+      <p className="text-secondary mb-3" style={{ fontSize: '0.9rem' }}>
         {t('intro')}
       </p>
+
+      {/* I ruoli, dal più ampio: chi li ha lo decide il passo «Persone». */}
+      <section className="wizard-roles mb-4" aria-labelledby="wiz-roles-title">
+        <h3 id="wiz-roles-title" className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+          {t('rolesHeading')}
+        </h3>
+        <dl className="wizard-roles__list mb-0">
+          {(['organizer', 'moderator', 'speaker', 'guest'] as const).map((r) => (
+            <div key={r} className="wizard-roles__item">
+              <dt>{t(`roleInfo.${r}.name`)}</dt>
+              <dd>{t(`roleInfo.${r}.desc`)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <div className="table-responsive mb-4">
         <table
@@ -124,7 +153,7 @@ export default function Step2Permissions({
               </th>
               {EVENT_ROLES.map((role) => (
                 <th scope="col" key={role} className="text-center">
-                  {t(`role.${role}`)}
+                  {role === 'MODERATOR' ? t('roleModeratorColumn') : t(`role.${role}`)}
                 </th>
               ))}
             </tr>
@@ -141,17 +170,20 @@ export default function Step2Permissions({
                   </div>
                 </th>
                 {EVENT_ROLES.map((role) => {
-                  const isModerator = role === 'MODERATOR';
-                  const checked = value.permissionMatrix[feature]?.includes(role) ?? false;
+                  // Si sceglie solo per i partecipanti: relatori e moderatori
+                  // hanno ciò che il ruolo dà loro in sala (cellaFissa).
+                  const fissa = cellaFissa(feature, role, value.permissionMatrix);
+                  const checked = fissa ?? value.permissionMatrix[feature]?.includes(role) ?? false;
+                  const ruolo = role === 'MODERATOR' ? t('roleModeratorColumn') : t(`role.${role}`);
                   return (
                     <td key={role} className="text-center">
                       <input
                         type="checkbox"
                         className="form-check-input"
-                        checked={isModerator ? true : checked}
-                        disabled={isModerator}
+                        checked={checked}
+                        disabled={fissa !== null}
                         onChange={(e) => setCell(feature, role, e.target.checked)}
-                        aria-label={`${t(`feature.${feature}.label`)} — ${t(`role.${role}`)}`}
+                        aria-label={`${t(`feature.${feature}.label`)} — ${ruolo}`}
                       />
                     </td>
                   );

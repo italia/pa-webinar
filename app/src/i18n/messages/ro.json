@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Linkul pe care l-ați folosit nu mai este valid. Evenimentul s-a încheiat: mai jos găsiți înregistrarea și materialele.",
       "speakers": "Vorbitori",
       "organizer": "Organizator",
+      "peopleTitle": "Organizatori și vorbitori",
+      "organizedBy": "Organizat de",
+      "peopleOrganizers": "Organizatori",
+      "peopleModerators": "Moderare",
       "chatNotSaved": "Mesajele din chat nu sunt salvate după încheierea evenimentului.",
       "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
       "peakParticipants": "Vârf: {count} participanți",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Cine ce poate face",
-        "intro": "Matricea permisiunilor: alegeți pentru fiecare funcție cine o poate utiliza. Moderatorii pot face întotdeauna totul.",
+        "intro": "Ce poate face fiecare rol. Pentru participanți alegi tu; celelalte roluri au ce le trebuie ca să conducă sau să vorbească.",
         "featureCol": "Funcționalitate",
         "role": {
-          "GUEST": "Invitat",
+          "GUEST": "Participant",
           "SPEAKER": "Vorbitor",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Înregistrare",
         "roomFeaturesHeading": "Funcțiile sălii",
-        "aiPipelineOff": "Postproducția AI (transcriere, rezumat, traduceri) nu este activată pe această instalare."
+        "aiPipelineOff": "Postproducția AI (transcriere, rezumat, traduceri) nu este activată pe această instalare.",
+        "rolesHeading": "Rolurile evenimentului",
+        "roleModeratorColumn": "Organizator și moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizator",
+            "desc": "Conduce sala ca un moderator și apare printre organizatori. Organizatorul principal adaugă și elimină celelalte persoane."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Conduce sala: dă și ia cuvântul, oprește sunetul, gestionează întrebări, sondaje și înregistrarea."
+          },
+          "speaker": {
+            "name": "Vorbitor",
+            "desc": "Vorbește, folosește camera și partajează ecranul; nu moderează."
+          },
+          "guest": {
+            "name": "Participant",
+            "desc": "Urmărește evenimentul și interacționează cum decizi în tabelul de mai jos."
+          }
+        }
       },
       "step3": {
         "heading": "Persoane și invitații",
-        "intro": "Adăugați organizatori (afișați pe pagină), moderatori, vorbitori și invitați.",
-        "organizersHeading": "Organizatori",
-        "organizersHelp": "Organizațiile care organizează evenimentul: numele, site-ul și logoul apar pe pagina publică.",
+        "intro": "Cine organizează, cine moderează și cine vorbește, cu organizațiile lor; apoi, dacă e nevoie, invitații.",
+        "organizersHeading": "Instituții organizatoare",
+        "organizersHelp": "Instituțiile care promovează evenimentul: numele, site-ul și sigla apar pe pagina publică. Nu trebuie să coincidă cu organizațiile persoanelor.",
         "organizerName": "Numele organizației",
         "organizerWebsite": "Site web",
         "organizerLogo": "Logoul organizatorului",
         "organizerRequired": "Numele organizației este obligatoriu.",
-        "moderatorsHeading": "Moderatori",
-        "moderatorsHelp": "Moderatorii pot gestiona sesiunea și pot controla permisiunile în timpul evenimentului.",
-        "moderatorName": "Nume",
-        "moderatorEmail": "E-mail",
-        "moderatorRequired": "Numele și e-mailul sunt obligatorii.",
-        "speakersHeading": "Vorbitori",
-        "speakersHelp": "Primesc prin e-mail un link personal pentru a vorbi, a folosi camera și a partaja ecranul, fără drepturi de moderare.",
-        "speakerName": "Nume",
-        "speakerEmail": "E-mail",
-        "speakerRequired": "Numele și e-mailul sunt obligatorii.",
         "invitationsHeading": "Invitații",
-        "invitationsHelp": "Lista persoanelor invitate. Platforma nu trimite invitații: distribuie tu linkul evenimentului. Cu înregistrarea publică dezactivată, se pot înregistra doar aceste adrese, iar linkul personal de acces sosește prin e-mail după înregistrare.",
         "invitationName": "Nume (opțional)",
         "invitationEmail": "E-mail",
         "add": "Adăugați",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "sau adăugați manual",
         "removeItem": "Eliminați {name}",
         "invitationsStaffOnly": "Invitațiile sunt gestionate de echipa evenimentului.",
-        "pickSkipped": "Unele persoane erau deja în listă sau nu aveau o adresă validă și nu au fost adăugate."
+        "pickSkipped": "Unele persoane erau deja în listă sau nu aveau o adresă validă și nu au fost adăugate.",
+        "primaryHeading": "Organizator principal",
+        "primaryHelp": "Primește pe e-mail linkul principal al evenimentului: conduce sala și adaugă sau elimină celelalte persoane. Numele și e-mailul sunt necesare pentru publicare, nu pentru o ciornă.",
+        "primaryPrefilled": "Organizatorul principal ești tu, cu numele și e-mailul contului tău. Dacă evenimentul este condus de altă persoană, introdu aici datele ei: linkul va ajunge la ea.",
+        "primaryNameRequired": "Introdu numele organizatorului principal.",
+        "primaryEmailRequired": "Introdu un e-mail valid al organizatorului principal.",
+        "linksOnPublish": "Linkurile personale pleacă pe e-mail la publicare; cât timp evenimentul e ciornă, copiază-le de pe pagina lui.",
+        "personName": "Nume",
+        "personEmail": "E-mail",
+        "peopleHeading": "Persoanele evenimentului",
+        "peopleHelp": "Organizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol arată pasul „Permisiuni”.",
+        "personRole": "Rol",
+        "roleOrganizer": "Organizator",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Vorbitor",
+        "roleHelp": {
+          "organizer": "Conduce sala ca un moderator și apare printre organizatori.",
+          "moderator": "Conduce sala: dă cuvântul, gestionează întrebări, sondaje și înregistrarea.",
+          "speaker": "Vorbește, folosește camera și partajează ecranul, fără puteri de moderare."
+        },
+        "personOrganization": "Instituție sau organizație",
+        "personOrganizationHelp": "Organizația persoanei: poate fi diferită de cea care organizează evenimentul.",
+        "personLogo": "Sigla organizației",
+        "personLogoAdd": "Adaugă sigla organizației",
+        "personLogoChange": "Schimbă sigla organizației",
+        "personPublic": "Afișează pe pagina publică",
+        "personRequired": "Numele și e-mailul sunt obligatorii.",
+        "invitationsHelpOpen": "Opțional: lista persoanelor pe care le inviți. Înscrierea este deschisă, deci după publicare se poate înscrie oricine, invitat sau nu. Platforma nu trimite invitații: distribuie tu linkul evenimentului.",
+        "invitationsHelpRestricted": "Înscrierea este restricționată: se pot înscrie doar adresele din această listă. Platforma nu trimite invitații: distribuie tu linkul evenimentului; linkul de intrare vine pe e-mail după înscriere.",
+        "logoExternal": "Pagina publică afișează doar siglele încărcate pe această platformă: o siglă de pe alt site nu va apărea.",
+        "primaryProfileInvalid": "Verifică organizația și adresa siglei."
       },
       "step4": {
         "heading": "Conținut și materiale",
@@ -878,7 +921,6 @@
           "schedule": "Calendar",
           "recurrence": "Recurență",
           "maxParticipants": "Participanți așteptați",
-          "organizers": "Organizatori",
           "speakers": "Vorbitori",
           "invitations": "Invitații",
           "materials": "Materiale",
@@ -888,7 +930,12 @@
           "recordingManual": "Activă — pornire manuală",
           "recordingOff": "Inactivă",
           "multitrack": "Înregistrare pe participant",
-          "multitrackOn": "Activată — necesită consimțământ explicit la înscriere"
+          "multitrackOn": "Activată — necesită consimțământ explicit la înscriere",
+          "organizingEntities": "Instituții organizatoare",
+          "primaryOrganizer": "Organizator principal",
+          "primaryMissing": "De indicat la pasul „Persoane” pentru publicare",
+          "organizersPeople": "Alți organizatori",
+          "moderators": "Moderatori"
         },
         "noRecurrence": "Eveniment unic",
         "gdprHeading": "Confidențialitate și păstrarea datelor",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Folosiți text personalizat —",
         "gdprTemplateUnknown": "Modelul de notă de informare privind confidențialitatea ales nu mai există: alegeți altul sau reveniți la textul personalizat",
         "privacyText": "Notă de informare privind confidențialitatea (text)",
-        "moderatorHeading": "Contact moderator",
-        "moderatorPublishHint": "Numele și adresa de e-mail sunt obligatorii pentru publicarea evenimentului (sunt folosite pentru linkul de moderator și e-mailul de confirmare). Pentru salvarea ca ciornă nu sunt necesare.",
-        "moderatorPrefilled": "Moderatorul principal sunteți dumneavoastră, cu numele și emailul contului. Dacă evenimentul este moderat de altă persoană, introduceți aici datele acesteia: linkul de administrare va ajunge la ea.",
-        "moderatorLinkNote": "Această persoană este moderatorul principal al evenimentului: primește prin e-mail un link privat pentru a-l gestiona (pornirea înregistrării, moderarea întrebărilor, lansarea sondajelor…). Este diferit de co-moderatorii adăugați la pasul „Persoane”, care primesc fiecare propriul link.",
-        "moderatorRequired": "Introduceți numele moderatorului",
-        "moderatorEmailRequired": "Introduceți o adresă de e-mail validă a moderatorului",
-        "moderatorName": "Nume",
-        "moderatorEmail": "E-mail",
         "capacityHeading": "Capacitate estimată",
         "featuresHeading": "Configurație sintetică",
         "privacyDoc": "Document notă de informare (PDF sau link)",
         "privacyDocHelp": "Încărcați un PDF sau lipiți URL-ul unei note de informare alternative. Suprascrie șablonul RGPD dacă este setat.",
         "privacyTextHelp": "Text sintetic afișat în formularul de înregistrare; poate completa sau înlocui șablonul RGPD.",
         "technicalDetails": "Detalii tehnice: capacitate și resurse",
-        "retentionRange": "Introduceți un număr de zile între 1 și {max}.",
-        "linksOnPublish": "Linkurile personale (moderator principal, comoderatori și vorbitori) se trimit prin e-mail când evenimentul este publicat. Cât timp este ciornă, copiați-le de pe pagina evenimentului."
+        "retentionRange": "Introduceți un număr de zile între 1 și {max}."
       },
       "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
       "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderatori și vorbitori",
-      "intro": "Adăugați co-moderatori și vorbitori cu magic-link-uri individuale.",
+      "title": "Organizatori, moderatori și vorbitori",
+      "intro": "Adaugă organizatori, moderatori și vorbitori, fiecare cu propriul link.",
       "introHint": "Fiecare persoană are un nume afișat propriu în sală și un token care poate fi revocat independent de linkul principal. Vorbitorii au microfon, video și partajare de ecran, dar nu pot modera (excludere, dezactivare audio general, înregistrare).",
       "add": "Adăugați persoană",
       "name": "Nume afișat în sală",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Pregătiți un e-mail pentru {name}",
       "prepareEmailSubject": "Linkul dvs. pentru „{title}”",
       "prepareEmailBody": "Bună ziua, {name},\n\niată linkul dvs. personal pentru „{title}”:\n{link}\n\nLinkul este doar pentru dvs.: nu îl redirecționați și nu îl distribuiți.",
-      "draftNote": "Evenimentul este o ciornă: linkurile se trimit prin e-mail când este publicat. Până atunci le puteți copia de aici."
+      "draftNote": "Evenimentul este o ciornă: linkurile se trimit prin e-mail când este publicat. Până atunci le puteți copia de aici.",
+      "roleOrganizer": "Organizator",
+      "roleOrganizerHint": "Moderează ca un moderator și apare printre organizatorii evenimentului.",
+      "organization": "Instituție sau organizație (opțional)",
+      "publicListed": "Afișează pe pagina publică",
+      "onPublicPage": "Pe pagina publică"
     },
     "gdprAuditLog": {
       "title": "Registru GDPR",

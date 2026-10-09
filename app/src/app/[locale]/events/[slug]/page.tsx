@@ -4,6 +4,15 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { tryDecryptPII } from '@/lib/crypto/pii';
+import {
+  logoPubblico,
+  ordinaPersone,
+  ruoloPubblico,
+  sitoPubblico,
+  type EntePubblico,
+  type PersonaPubblica,
+} from '@/lib/events/public-people';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
@@ -111,6 +120,22 @@ export default async function EventDetailPage({
     include: {
       _count: { select: { registrations: true } },
       tagLinks: { include: { tag: true } },
+      organizers: {
+        orderBy: { sortOrder: 'asc' },
+        select: { name: true, logoUrl: true, websiteUrl: true },
+      },
+      // Solo chi è stato scelto per la pagina pubblica, e con un accesso ancora
+      // valido.
+      additionalMods: {
+        where: { publicListed: true, revokedAt: null },
+        select: {
+          name: true,
+          role: true,
+          organizer: true,
+          organization: true,
+          organizationLogoUrl: true,
+        },
+      },
     },
   });
 
@@ -150,6 +175,32 @@ export default async function EventDetailPage({
   const description = getLocalized(event.description as LocalizedField, locale);
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
+  // Chi organizza e chi interviene (lib/events/public-people).
+  const enti: EntePubblico[] = event.organizers.map((o) => ({
+    name: o.name,
+    logoUrl: logoPubblico(o.logoUrl),
+    websiteUrl: sitoPubblico(o.websiteUrl),
+  }));
+  const persone: PersonaPubblica[] = ordinaPersone([
+    // L'organizzatore principale, se chi compila ha scelto di presentarlo.
+    ...(event.moderatorPublicListed && event.moderatorName
+      ? [
+          {
+            name: event.moderatorName,
+            role: 'organizer' as const,
+            organization: event.moderatorOrganization,
+            logoUrl: logoPubblico(event.moderatorOrganizationLogoUrl),
+          },
+        ]
+      : []),
+    ...event.additionalMods.map((m) => ({
+      name: tryDecryptPII(m.name) ?? m.name,
+      role: ruoloPubblico(m),
+      organization: m.organization,
+      logoUrl: logoPubblico(m.organizationLogoUrl),
+    })),
+  ]);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -166,11 +217,25 @@ export default async function EventDetailPage({
       '@type': 'VirtualLocation',
       url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
     },
-    organizer: {
-      '@type': 'Organization',
-      name: settings.organizationName || 'PA Webinar',
-      url: settings.organizationUrl || '',
-    },
+    organizer:
+      enti.length > 0
+        ? enti.map((e) => ({ '@type': 'Organization', name: e.name, ...(e.websiteUrl ? { url: e.websiteUrl } : {}) }))
+        : {
+            '@type': 'Organization',
+            name: settings.organizationName || 'PA Webinar',
+            url: settings.organizationUrl || '',
+          },
+    ...(persone.some((p) => p.role === 'speaker')
+      ? {
+          performer: persone
+            .filter((p) => p.role === 'speaker')
+            .map((p) => ({
+              '@type': 'Person',
+              name: p.name,
+              ...(p.organization ? { affiliation: { '@type': 'Organization', name: p.organization } } : {}),
+            })),
+        }
+      : {}),
     maximumAttendeeCapacity: event.maxParticipants,
     remainingAttendeeCapacity: event.maxParticipants - event._count.registrations,
   };
@@ -362,6 +427,8 @@ export default async function EventDetailPage({
     privacyPolicyUrl: event.privacyPolicyUrl,
     speakersInfo: event.speakersInfo as Record<string, string> | null,
     organizerName: event.organizerName,
+    organizers: enti,
+    people: persone,
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,

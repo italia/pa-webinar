@@ -416,6 +416,15 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.moderatorEmail !== undefined && {
         moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       }),
+      ...(data.moderatorOrganization !== undefined && {
+        moderatorOrganization: data.moderatorOrganization || null,
+      }),
+      ...(data.moderatorOrganizationLogoUrl !== undefined && {
+        moderatorOrganizationLogoUrl: data.moderatorOrganizationLogoUrl || null,
+      }),
+      ...(data.moderatorPublicListed !== undefined && {
+        moderatorPublicListed: data.moderatorPublicListed,
+      }),
       ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),

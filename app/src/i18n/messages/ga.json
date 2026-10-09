@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Níl an nasc a d'úsáid tú bailí a thuilleadh. Tá deireadh leis an imeacht: gheobhaidh tú an taifeadadh agus na hábhair thíos.",
       "speakers": "Cainteoirí",
       "organizer": "Eagraí",
+      "peopleTitle": "Eagraithe agus cainteoirí",
+      "organizedBy": "Eagraithe ag",
+      "peopleOrganizers": "Eagraithe",
+      "peopleModerators": "Óstaigh",
       "chatNotSaved": "Ní shábháiltear teachtaireachtaí comhrá tar éis deireadh an imeachta.",
       "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
       "peakParticipants": "Buaicphointe: {count} rannpháirtí",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
-        "intro": "Maitrís ceadanna: roghnaigh do gach feidhm cé atá in ann í a úsáid. Is féidir leis na modhnóirí gach rud a dhéanamh i gcónaí.",
+        "intro": "Cad is féidir le gach ról a dhéanamh. Is tusa a roghnaíonn do na rannpháirtithe; tá ag na róil eile a bhfuil de dhíth orthu le hóstáil nó le labhairt.",
         "featureCol": "Feidhm",
         "role": {
-          "GUEST": "Aoi",
+          "GUEST": "Rannpháirtí",
           "SPEAKER": "Cainteoir",
           "MODERATOR": "Modhnóir"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Taifeadadh",
         "roomFeaturesHeading": "Gnéithe an tseomra",
-        "aiPipelineOff": "Níl iarléiriú AI (tras-scríobh, achoimre, aistriúcháin) ar siúl ar an tsuiteáil seo."
+        "aiPipelineOff": "Níl iarléiriú AI (tras-scríobh, achoimre, aistriúcháin) ar siúl ar an tsuiteáil seo.",
+        "rolesHeading": "Róil an imeachta",
+        "roleModeratorColumn": "Eagraí agus modhnóir",
+        "roleInfo": {
+          "organizer": {
+            "name": "Eagraí",
+            "desc": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Cuireann an príomh-eagraí na daoine eile leis agus baineann sé iad."
+          },
+          "moderator": {
+            "name": "Modhnóir",
+            "desc": "Óstálann sé an seomra: tugann agus baineann sé an t-urlár, balbhaíonn sé, bainistíonn sé ceisteanna, pobalbhreitheanna agus taifeadadh."
+          },
+          "speaker": {
+            "name": "Cainteoir",
+            "desc": "Labhraíonn sé, úsáideann sé an ceamara agus roinneann sé an scáileán; ní mhodhnaíonn sé."
+          },
+          "guest": {
+            "name": "Rannpháirtí",
+            "desc": "Leanann sé an imeacht agus glacann sé páirt mar a shocraíonn tú sa tábla thíos."
+          }
+        }
       },
       "step3": {
         "heading": "Daoine agus cuirí",
-        "intro": "Cuir eagraithe (taispeánta ar an leathanach), modhnóirí, cainteoirí agus aíonna cuireadh leis.",
-        "organizersHeading": "Eagraithe",
-        "organizersHelp": "Na heagraíochtaí atá ag eagrú an imeachta: feictear an t-ainm, an suíomh gréasáin agus an lógó ar an leathanach poiblí.",
+        "intro": "Cé a eagraíonn, cé a óstálann agus cé a labhraíonn, lena n-eagraíochtaí; ansin, más gá, na haíonna.",
+        "organizersHeading": "Eagraíochtaí eagraithe",
+        "organizersHelp": "Na heagraíochtaí a chuireann an imeacht chun cinn: taispeántar ainm, suíomh agus lógó ar an leathanach poiblí. Ní gá dóibh a bheith mar an gcéanna le heagraíochtaí na ndaoine.",
         "organizerName": "Ainm na heagraíochta",
         "organizerWebsite": "Suíomh gréasáin",
         "organizerLogo": "Lógó an eagraí",
         "organizerRequired": "Tá ainm na heagraíochta riachtanach.",
-        "moderatorsHeading": "Modhnóirí",
-        "moderatorsHelp": "Is féidir le modhnóirí an seisiún a bhainistiú agus na ceadanna a rialú le linn an imeachta.",
-        "moderatorName": "Ainm",
-        "moderatorEmail": "Ríomhphost",
-        "moderatorRequired": "Tá ainm agus ríomhphost riachtanach.",
-        "speakersHeading": "Cainteoirí",
-        "speakersHelp": "Faigheann siad nasc pearsanta trí ríomhphost chun labhairt, an ceamara a úsáid agus an scáileán a roinnt, gan cumhachtaí modhnóra.",
-        "speakerName": "Ainm",
-        "speakerEmail": "Ríomhphost",
-        "speakerRequired": "Tá ainm agus ríomhphost riachtanach.",
         "invitationsHeading": "Cuirí",
-        "invitationsHelp": "Liosta na ndaoine a bhfuil cuireadh acu. Ní sheolann an t-ardán cuirí: roinn féin nasc an imeachta leo. Nuair atá an clárú poiblí múchta, ní féidir ach leis na seoltaí seo clárú, agus seoltar an nasc pearsanta chun dul isteach trí ríomhphost tar éis an chlárúcháin.",
         "invitationName": "Ainm (roghnach)",
         "invitationEmail": "Ríomhphost",
         "add": "Cuir leis",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "nó cuir isteach de láimh é",
         "removeItem": "Bain {name}",
         "invitationsStaffOnly": "Is í foireann an imeachta a bhainistíonn na cuirí.",
-        "pickSkipped": "Bhí daoine áirithe ar an liosta cheana nó ní raibh seoladh bailí acu, agus níor cuireadh leis iad."
+        "pickSkipped": "Bhí daoine áirithe ar an liosta cheana nó ní raibh seoladh bailí acu, agus níor cuireadh leis iad.",
+        "primaryHeading": "Príomh-eagraí",
+        "primaryHelp": "Faigheann sé príomhnasc an imeachta trí ríomhphost: óstálann sé an seomra agus cuireann sé na daoine eile leis nó baineann sé iad. Tá ainm agus ríomhphost riachtanach chun foilsiú, ní le haghaidh dréachta.",
+        "primaryPrefilled": "Is tusa an príomh-eagraí, le hainm agus ríomhphost do chuntais. Má reáchtálann duine eile an imeacht, cuir a s(h)onraí isteach anseo: rachaidh an nasc chuige/chuici.",
+        "primaryNameRequired": "Cuir isteach ainm an phríomh-eagraí.",
+        "primaryEmailRequired": "Cuir isteach ríomhphost bailí don phríomh-eagraí.",
+        "linksOnPublish": "Seoltar naisc phearsanta trí ríomhphost nuair a fhoilsítear an imeacht; fad is dréacht é, cóipeáil iad óna leathanach.",
+        "personName": "Ainm",
+        "personEmail": "Ríomhphost",
+        "peopleHeading": "Daoine an imeachta",
+        "peopleHelp": "Eagraithe, modhnóirí agus cainteoirí. Faigheann gach duine a nasc féin le dul isteach lena ról; taispeántar sa chéim “Ceadanna” cad is féidir le gach ról a dhéanamh.",
+        "personRole": "Ról",
+        "roleOrganizer": "Eagraí",
+        "roleModerator": "Modhnóir",
+        "roleSpeaker": "Cainteoir",
+        "roleHelp": {
+          "organizer": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe.",
+          "moderator": "Óstálann sé an seomra: tugann sé an t-urlár, bainistíonn sé ceisteanna, pobalbhreitheanna agus taifeadadh.",
+          "speaker": "Labhraíonn sé, úsáideann sé an ceamara agus roinneann sé an scáileán, gan cumhachtaí modhnóireachta."
+        },
+        "personOrganization": "Eagraíocht",
+        "personOrganizationHelp": "Eagraíocht an duine: féadfaidh sí a bheith difriúil ón eagraíocht a eagraíonn an imeacht.",
+        "personLogo": "Lógó na heagraíochta",
+        "personLogoAdd": "Cuir lógó na heagraíochta leis",
+        "personLogoChange": "Athraigh lógó na heagraíochta",
+        "personPublic": "Taispeáin ar an leathanach poiblí",
+        "personRequired": "Tá ainm agus ríomhphost riachtanach.",
+        "invitationsHelpOpen": "Roghnach: liosta na ndaoine a thugann tú cuireadh dóibh. Tá an clárú oscailte, mar sin tar éis an fhoilsithe is féidir le duine ar bith clárú, cuireadh nó gan chuireadh. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin.",
+        "invitationsHelpRestricted": "Tá an clárú srianta: ní féidir ach leis na seoltaí ar an liosta seo clárú. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin; tagann an nasc le dul isteach trí ríomhphost tar éis clárú.",
+        "logoExternal": "Ní thaispeánann an leathanach poiblí ach lógónna a uaslódáladh chuig an ardán seo: ní thaispeánfar lógó ó shuíomh eile.",
+        "primaryProfileInvalid": "Seiceáil an eagraíocht agus seoladh an lógó."
       },
       "step4": {
         "heading": "Ábhar agus áiseanna",
@@ -878,7 +921,6 @@
           "schedule": "Sceideal",
           "recurrence": "Athrá",
           "maxParticipants": "Rannpháirtithe a bhfuiltear ag súil leo",
-          "organizers": "Eagraithe",
           "speakers": "Cainteoirí",
           "invitations": "Cuirí",
           "materials": "Áiseanna",
@@ -888,7 +930,12 @@
           "recordingManual": "Ar siúl — tús de láimh",
           "recordingOff": "As",
           "multitrack": "Taifeadadh de réir rannpháirtí",
-          "multitrackOn": "Ar siúl — teastaíonn toiliú follasach tráth an chláraithe"
+          "multitrackOn": "Ar siúl — teastaíonn toiliú follasach tráth an chláraithe",
+          "organizingEntities": "Eagraíochtaí eagraithe",
+          "primaryOrganizer": "Príomh-eagraí",
+          "primaryMissing": "Le socrú sa chéim “Daoine” chun foilsiú",
+          "organizersPeople": "Eagraithe eile",
+          "moderators": "Modhnóirí"
         },
         "noRecurrence": "Imeacht aonuaire",
         "gdprHeading": "Príobháideachas agus coinneáil sonraí",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Úsáid téacs saincheaptha —",
         "gdprTemplateUnknown": "Níl an teimpléad fógra príobháideachais a roghnaíodh ann a thuilleadh: roghnaigh ceann eile nó fill ar an téacs saincheaptha",
         "privacyText": "Fógra príobháideachais (téacs)",
-        "moderatorHeading": "Teagmháil mhodhnóra",
-        "moderatorPublishHint": "Tá an t-ainm agus an ríomhphost riachtanach chun an t-imeacht a fhoilsiú (úsáidtear iad don nasc modhnóra agus don ríomhphost deimhnithe). Níl siad riachtanach chun é a shábháil mar dhréacht.",
-        "moderatorPrefilled": "Is sibhse an príomh-mhodhnóir, le hainm agus ríomhphost bhur gcuntais. Más duine eile a mhodhnóidh an t-imeacht, cuirigí sonraí an duine sin anseo: is chuig an duine sin a rachaidh an nasc chun é a bhainistiú.",
-        "moderatorLinkNote": "Is é an duine seo príomh-mhodhnóir an imeachta: gheobhaidh sé nasc príobháideach le ríomhphost chun é a bhainistiú (taifeadadh a thosú, ceisteanna a mhodhnú, pobalbhreitheanna a sheoladh…). Tá sé sin difriúil ó na comhmhodhnóirí a chuirtear leis sa chéim “Daoine”, a fhaigheann a nasc féin an duine.",
-        "moderatorRequired": "Cuir isteach ainm an mhodhnóra",
-        "moderatorEmailRequired": "Cuir isteach seoladh ríomhphoist bailí don mhodhnóir",
-        "moderatorName": "Ainm",
-        "moderatorEmail": "Ríomhphost",
         "capacityHeading": "Acmhainn mheasta",
         "featuresHeading": "Achoimre cumraíochta",
         "privacyDoc": "Doiciméad fógra príobháideachais (PDF nó nasc)",
         "privacyDocHelp": "Uaslódáil PDF nó greamaigh URL fógra príobháideachais ionadúil. Sáraíonn sé an teimpléad GDPR má tá ceann ann.",
         "privacyTextHelp": "Téacs gairid taispeánta ar fhoirm an chlárúcháin; is féidir leis an teimpléad GDPR a chomhlánú nó a athrú.",
         "technicalDetails": "Sonraí teicniúla: toilleadh agus acmhainní",
-        "retentionRange": "Cuirigí isteach líon laethanta idir 1 agus {max}.",
-        "linksOnPublish": "Seoltar na naisc phearsanta (príomh-mhodhnóir, comh-mhodhnóirí agus cainteoirí) trí ríomhphost nuair a fhoilsítear an t-imeacht. Fad is dréacht é, cóipeálaigí iad ó leathanach an imeachta."
+        "retentionRange": "Cuirigí isteach líon laethanta idir 1 agus {max}."
       },
       "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
       "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Comhmhodhnóirí agus cainteoirí",
-      "intro": "Cuir comhmhodhnóirí agus cainteoirí leis trí naisc dhraíochta ar leith.",
+      "title": "Eagraithe, modhnóirí agus cainteoirí",
+      "intro": "Cuir eagraithe, modhnóirí agus cainteoirí leis, gach duine lena nasc féin.",
       "introHint": "Tá ainm ar leith ag gach duine sa seomra agus comhartha is féidir a chúlghairm go neamhspleách ón bpríomhnasc. Tá micreafón, ceamara agus comhroinnt scáileáin ag cainteoirí ach ní féidir leo modhnóireacht a dhéanamh (ciceáil amach, gach duine a chiúiniú, taifeadadh).",
       "add": "Cuir duine leis",
       "name": "Ainm infheicthe sa seomra",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Ullmhaigh ríomhphost do {name}",
       "prepareEmailSubject": "Do nasc do “{title}”",
       "prepareEmailBody": "Dia duit {name},\n\nseo do nasc pearsanta do “{title}”:\n{link}\n\nIs duitse amháin an nasc seo: ná seol ar aghaidh é agus ná roinn é.",
-      "draftNote": "Is dréacht é an t-imeacht: seoltar na naisc trí ríomhphost nuair a fhoilseofar é. Idir an dá linn is féidir libh iad a chóipeáil anseo."
+      "draftNote": "Is dréacht é an t-imeacht: seoltar na naisc trí ríomhphost nuair a fhoilseofar é. Idir an dá linn is féidir libh iad a chóipeáil anseo.",
+      "roleOrganizer": "Eagraí",
+      "roleOrganizerHint": "Modhnaíonn sé mar mhodhnóir agus léirítear é i measc eagraithe an imeachta.",
+      "organization": "Eagraíocht (roghnach)",
+      "publicListed": "Taispeáin ar an leathanach poiblí",
+      "onPublicPage": "Ar an leathanach poiblí"
     },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",

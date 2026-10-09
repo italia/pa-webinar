@@ -83,7 +83,14 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     // in mano un accesso che le era stato tolto. È una regola di sicurezza, non
     // un dettaglio della query: un test la verifica.
     where: { revokedAt: null },
-    select: { name: true, email: true, role: true },
+    select: {
+      name: true,
+      email: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      organizationLogoUrl: true,
+    },
   },
   agendaItems: {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
@@ -191,6 +198,13 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
         name: m.name,
         email: m.email,
         role: m.role,
+        // Ruolo ed ente seguono la persona; la pubblicazione no: presentare
+        // qualcuno nella pagina pubblica è una scelta per ogni evento, e la
+        // copia parte senza.
+        organizer: m.organizer,
+        organization: m.organization,
+        organizationLogoUrl: m.organizationLogoUrl,
+        publicListed: false,
         // Il token NON si eredita mai: è la credenziale con cui si entra in
         // sala da moderatore. Riusarlo darebbe al vecchio link il controllo
         // della stanza nuova — ed è la stessa regola già applicata al token

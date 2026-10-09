@@ -49,14 +49,14 @@ interface Props {
   defaultLocale: string;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   fieldErrors?: Record<string, string>;
-  /** L'email con cui il wizard ha precompilato il moderatore principale (chi
-   *  crea l'evento): finche' resta quella, la pagina lo dice. */
-  prefilledModeratorEmail?: string | null;
   /** Il massimo per la conservazione: piu' alto del normale solo in modifica,
    *  per un evento gia' salvato cosi'. */
   retentionMax?: number;
-  /** In creazione: dire che i link partono alla pubblicazione. */
-  showLinksOnPublish?: boolean;
+}
+
+/** I nomi di un elenco di persone, o un trattino. */
+function nomi(persone: Array<{ name: string }>): string {
+  return persone.length > 0 ? persone.map((p) => p.name).join(', ') : '—';
 }
 
 export default function Step5Review({
@@ -67,9 +67,7 @@ export default function Step5Review({
   defaultLocale,
   gdprTemplates,
   fieldErrors = {},
-  prefilledModeratorEmail = null,
   retentionMax = MAX_RETENTION_DAYS,
-  showLinksOnPublish = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
@@ -133,20 +131,34 @@ export default function Step5Review({
             value={String(form.maxParticipants)}
           />
           <SummaryItem
-            label={t('summary.organizers')}
+            label={t('summary.organizingEntities')}
             value={
               form.organizers.length > 0
                 ? form.organizers.map((o) => o.name).join(', ')
                 : '—'
             }
           />
+          {/* Chi conduce: l'organizzatore principale (il link condiviso) e le
+              persone con un link proprio. Si cambiano dal passo «Persone». */}
+          <SummaryItem
+            label={t('summary.primaryOrganizer')}
+            value={
+              form.moderatorName?.trim()
+                ? `${form.moderatorName.trim()}${form.moderatorEmail?.trim() ? ` (${form.moderatorEmail.trim()})` : ''}`
+                : t('summary.primaryMissing')
+            }
+          />
+          <SummaryItem
+            label={t('summary.organizersPeople')}
+            value={nomi(form.moderators.filter((m) => m.organizer))}
+          />
+          <SummaryItem
+            label={t('summary.moderators')}
+            value={nomi(form.moderators.filter((m) => !m.organizer))}
+          />
           <SummaryItem
             label={t('summary.speakers')}
-            value={
-              form.speakers.length > 0
-                ? form.speakers.map((s) => s.name).join(', ')
-                : '—'
-            }
+            value={nomi(form.speakers)}
           />
           <SummaryItem
             label={t('summary.invitations')}
@@ -178,70 +190,6 @@ export default function Step5Review({
           )}
         </div>
       </div>
-
-      {/* Primary moderator: name+email are required to publish. This person
-          receives the moderator magic link (ADR-003) — distinct from the
-          additional co-moderators added in the People step. */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('moderatorHeading')}
-        </h3>
-        <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
-          {t('moderatorPublishHint')}
-        </p>
-        {/* Precompilato con chi crea l'evento: se lo modera un'altra persona,
-            il link deve arrivare a lei, non a chi lo ha preparato. */}
-        {prefilledModeratorEmail &&
-          (form.moderatorEmail ?? '').trim().toLowerCase() === prefilledModeratorEmail.trim().toLowerCase() && (
-            <div className="alert alert-warning py-2 mb-3" role="note" style={{ fontSize: '0.85rem' }}>
-              {t('moderatorPrefilled')}
-            </div>
-          )}
-        <div
-          className="p-2 mb-3 rounded"
-          style={{
-            background: 'rgba(0,102,204,0.08)',
-            border: '1px solid rgba(0,102,204,0.25)',
-            color: 'var(--app-text)',
-            fontSize: '0.82rem',
-          }}
-        >
-          {t('moderatorLinkNote')}
-          {showLinksOnPublish && <> {t('linksOnPublish')}</>}
-        </div>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-name">
-              {t('moderatorName')}
-            </label>
-            <input
-              id="rev-mod-name"
-              type="text"
-              className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
-              value={form.moderatorName ?? ''}
-              onChange={(e) => onChange({ moderatorName: e.target.value })}
-            />
-            {fieldErrors.moderatorName && (
-              <div className="invalid-feedback d-block">{t('moderatorRequired')}</div>
-            )}
-          </div>
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-email">
-              {t('moderatorEmail')}
-            </label>
-            <input
-              id="rev-mod-email"
-              type="email"
-              className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
-              value={form.moderatorEmail ?? ''}
-              onChange={(e) => onChange({ moderatorEmail: e.target.value })}
-            />
-            {fieldErrors.moderatorEmail && (
-              <div className="invalid-feedback d-block">{t('moderatorEmailRequired')}</div>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* GDPR / retention */}
       <section className="mb-4">

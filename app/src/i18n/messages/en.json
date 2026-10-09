@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "The link you used is no longer valid. The event has ended: you can find the recording and materials below.",
       "speakers": "Speakers",
       "organizer": "Organizer",
+      "peopleTitle": "Organizers and speakers",
+      "organizedBy": "Organized by",
+      "peopleOrganizers": "Organizers",
+      "peopleModerators": "Hosts",
       "chatNotSaved": "Chat messages are not saved after the event ends.",
       "qaPostEvent": "Q&A from the event",
       "peakParticipants": "Peak: {count} participants",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Who can do what",
-        "intro": "Permission matrix: pick which roles can use each feature. Moderators can always do everything.",
+        "intro": "What each role can do. You choose for participants; the other roles have what they need to host or speak.",
         "featureCol": "Feature",
         "role": {
-          "GUEST": "Guest",
+          "GUEST": "Participant",
           "SPEAKER": "Speaker",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Recording",
         "roomFeaturesHeading": "Room features",
-        "aiPipelineOff": "AI post-production (transcription, summary, translations) is not enabled on this installation."
+        "aiPipelineOff": "AI post-production (transcription, summary, translations) is not enabled on this installation.",
+        "rolesHeading": "Event roles",
+        "roleModeratorColumn": "Organizer and moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizer",
+            "desc": "Hosts the room like a moderator and is presented among the organizers. The lead organizer adds and removes the other people."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Hosts the room: gives and takes the floor, mutes, manages questions, polls and recording."
+          },
+          "speaker": {
+            "name": "Speaker",
+            "desc": "Speaks, uses the camera and shares the screen; does not moderate."
+          },
+          "guest": {
+            "name": "Participant",
+            "desc": "Follows the event and interacts as you decide in the table below."
+          }
+        }
       },
       "step3": {
         "heading": "People and invites",
-        "intro": "Add organizers (shown on the page), moderators, speakers, and invited guests.",
-        "organizersHeading": "Organizers",
-        "organizersHelp": "The organizations running the event: name, website and logo appear on the public page.",
+        "intro": "Who organizes, who hosts and who speaks, with their organizations; then, if needed, the invited guests.",
+        "organizersHeading": "Organizing entities",
+        "organizersHelp": "The organizations promoting the event: name, website and logo appear on the public page. They need not match the people's organizations.",
         "organizerName": "Organization name",
         "organizerWebsite": "Website",
         "organizerLogo": "Organizer logo",
         "organizerRequired": "The organization name is required.",
-        "moderatorsHeading": "Moderators",
-        "moderatorsHelp": "Additional co-moderators: each receives their own link to manage the session and permissions during the event. The primary moderator (required contact) is set in the last step, “Review”.",
-        "moderatorName": "Name",
-        "moderatorEmail": "Email",
-        "moderatorRequired": "Name and email are required.",
-        "speakersHeading": "Speakers",
-        "speakersHelp": "They receive a personal link by email to speak, use their camera and share their screen, without moderation powers.",
-        "speakerName": "Name",
-        "speakerEmail": "Email",
-        "speakerRequired": "Name and email are required.",
         "invitationsHeading": "Invitations",
-        "invitationsHelp": "List of invited people. The platform does not send invitations: share the event link with them yourself. With public registration off, only these addresses can register, and the personal link to enter arrives by email after registering.",
         "invitationName": "Name (optional)",
         "invitationEmail": "Email",
         "add": "Add",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "or add manually",
         "removeItem": "Remove {name}",
         "invitationsStaffOnly": "Invitations are managed by the event staff.",
-        "pickSkipped": "Some people were already listed, or had no valid address, and were not added."
+        "pickSkipped": "Some people were already listed, or had no valid address, and were not added.",
+        "primaryHeading": "Lead organizer",
+        "primaryHelp": "Receives the event's main link by email: hosts the room and adds or removes the other people. Name and email are required to publish, not for a draft.",
+        "primaryPrefilled": "You are the lead organizer, with your account's name and email. If someone else runs the event, enter their details here: the link will go to them.",
+        "primaryNameRequired": "Enter the lead organizer's name.",
+        "primaryEmailRequired": "Enter a valid email for the lead organizer.",
+        "linksOnPublish": "Personal links are emailed when the event is published; while it is a draft, copy them from its page.",
+        "personName": "Name",
+        "personEmail": "Email",
+        "peopleHeading": "Event people",
+        "peopleHelp": "Organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is shown in the “Permissions” step.",
+        "personRole": "Role",
+        "roleOrganizer": "Organizer",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Speaker",
+        "roleHelp": {
+          "organizer": "Hosts the room like a moderator and is presented among the organizers.",
+          "moderator": "Hosts the room: gives the floor, manages questions, polls and recording.",
+          "speaker": "Speaks, uses the camera and shares the screen, without moderation powers."
+        },
+        "personOrganization": "Organization",
+        "personOrganizationHelp": "The person's organization: it can differ from the one organizing the event.",
+        "personLogo": "Organization logo",
+        "personLogoAdd": "Add the organization logo",
+        "personLogoChange": "Change the organization logo",
+        "personPublic": "Show on the public page",
+        "personRequired": "Name and email are required.",
+        "invitationsHelpOpen": "Optional: the list of people you invite. Registration is open, so after publication anyone can register, invited or not. The platform sends no invitations: share the event link yourself.",
+        "invitationsHelpRestricted": "Registration is restricted: only the addresses in this list can register. The platform sends no invitations: share the event link yourself; the link to enter arrives by email after registering.",
+        "logoExternal": "The public page shows only logos uploaded to this platform: a logo from another website will not be shown.",
+        "primaryProfileInvalid": "Check the organization and the logo address."
       },
       "step4": {
         "heading": "Content and materials",
@@ -878,7 +921,6 @@
           "schedule": "Schedule",
           "recurrence": "Recurrence",
           "maxParticipants": "Expected participants",
-          "organizers": "Organizers",
           "speakers": "Speakers",
           "invitations": "Invitations",
           "materials": "Materials",
@@ -888,7 +930,12 @@
           "recordingManual": "On — manual start",
           "recordingOff": "Off",
           "multitrack": "Per-participant recording",
-          "multitrackOn": "On — requires explicit consent at registration"
+          "multitrackOn": "On — requires explicit consent at registration",
+          "organizingEntities": "Organizing entities",
+          "primaryOrganizer": "Lead organizer",
+          "primaryMissing": "To be set in the “People” step to publish",
+          "organizersPeople": "Other organizers",
+          "moderators": "Moderators"
         },
         "noRecurrence": "One-off event",
         "gdprHeading": "Privacy and data retention",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Use custom text —",
         "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
         "privacyText": "Privacy notice (text)",
-        "moderatorHeading": "Primary moderator",
-        "moderatorPublishHint": "Name and email are required to publish the event (used for the moderator link and confirmation email). Not required to save as draft.",
-        "moderatorPrefilled": "You are the primary moderator, with your account's name and email. If someone else moderates the event, enter their details here: the link to manage it will go to them.",
-        "moderatorLinkNote": "This person is the event's primary moderator: they receive a private link by email to manage it (start recording, moderate questions, launch polls…). This is different from the co-moderators added in the People step, who each get their own link.",
-        "moderatorRequired": "Enter the moderator name",
-        "moderatorEmailRequired": "Enter a valid moderator email",
-        "moderatorName": "Name",
-        "moderatorEmail": "Email",
         "capacityHeading": "Estimated capacity",
         "featuresHeading": "Configuration summary",
         "privacyDoc": "Privacy notice document (PDF or link)",
         "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
         "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template.",
         "technicalDetails": "Technical details: capacity and resources",
-        "retentionRange": "Enter a number of days between 1 and {max}.",
-        "linksOnPublish": "Personal links (primary moderator, co-moderators and speakers) are emailed when the event is published. While it is a draft, copy them from the event page."
+        "retentionRange": "Enter a number of days between 1 and {max}."
       },
       "validationFailed": "Please review the highlighted fields before continuing.",
       "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderators and speakers",
-      "intro": "Add co-moderators and speakers with individual magic-links.",
+      "title": "Organizers, moderators and speakers",
+      "intro": "Add organizers, moderators and speakers, each with their own link.",
       "introHint": "Each person has their own display name in the room and a token that can be revoked independently. Speakers get mic, camera and screen share but can't moderate (kick, mute-all, recording).",
       "add": "Add person",
       "name": "Name visible in room",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Prepare an email for {name}",
       "prepareEmailSubject": "Your link for “{title}”",
       "prepareEmailBody": "Hello {name},\n\nhere is your personal link for “{title}”:\n{link}\n\nThe link is for you only: do not forward or share it.",
-      "draftNote": "The event is a draft: links are emailed when it is published. Meanwhile you can copy them from here."
+      "draftNote": "The event is a draft: links are emailed when it is published. Meanwhile you can copy them from here.",
+      "roleOrganizer": "Organizer",
+      "roleOrganizerHint": "Moderates like a moderator and is presented among the event's organizers.",
+      "organization": "Organization (optional)",
+      "publicListed": "Show on the public page",
+      "onPublicPage": "On the public page"
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",

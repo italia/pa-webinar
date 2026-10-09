@@ -83,3 +83,45 @@ describe('POST /api/events/[param]/moderators — link by email', () => {
     expect(sendGrantModeratorLink).not.toHaveBeenCalled();
   });
 });
+
+describe('POST /api/events/[param]/moderators — profilo della persona', () => {
+  it("salva ente, logo, organizzatore e presenza nella pagina pubblica", async () => {
+    const res = await POST(
+      post({
+        name: 'Organizzatrice 1',
+        email: 'org@example.test',
+        role: 'MODERATOR',
+        organizer: true,
+        organization: 'Ente di esempio',
+        organizationLogoUrl: 'https://portale.example.test/api/assets/images/logo.png',
+        publicListed: true,
+      }) as never,
+      ctx as never,
+    );
+    expect(res.status).toBe(201);
+    const data = db.eventModerator.create.mock.calls[0]![0].data;
+    expect(data).toMatchObject({
+      role: 'MODERATOR',
+      organizer: true,
+      organization: 'Ente di esempio',
+      organizationLogoUrl: 'https://portale.example.test/api/assets/images/logo.png',
+      publicListed: true,
+    });
+  });
+
+  it('rifiuta un relatore segnato come organizzatore', async () => {
+    const res = await POST(
+      post({ name: 'Relatore 1', role: 'SPEAKER', organizer: true }) as never,
+      ctx as never,
+    );
+    expect(res.status).toBe(422);
+    expect(db.eventModerator.create).not.toHaveBeenCalled();
+  });
+
+  it('senza profilo, la persona resta fuori dalla pagina pubblica', async () => {
+    await POST(post({ name: 'Moderatore 1', role: 'MODERATOR' }) as never, ctx as never);
+    const data = db.eventModerator.create.mock.calls[0]![0].data;
+    expect(data.publicListed).toBeUndefined();
+    expect(data.organizer).toBeUndefined();
+  });
+});

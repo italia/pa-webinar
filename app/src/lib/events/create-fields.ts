@@ -100,6 +100,9 @@ export const CREATED_EVENT_FIELDS = [
   'organizerName',
   'moderatorName',
   'moderatorEmail',
+  'moderatorOrganization',
+  'moderatorOrganizationLogoUrl',
+  'moderatorPublicListed',
 
   // serie
   'recurrenceRule',

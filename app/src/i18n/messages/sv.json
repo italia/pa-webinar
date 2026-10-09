@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Länken du använde gäller inte längre. Evenemanget är avslutat: nedan hittar du inspelningen och materialet.",
       "speakers": "Talare",
       "organizer": "Arrangör",
+      "peopleTitle": "Arrangörer och talare",
+      "organizedBy": "Arrangeras av",
+      "peopleOrganizers": "Arrangörer",
+      "peopleModerators": "Värdar",
       "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
       "qaPostEvent": "Q&A från evenemanget",
       "peakParticipants": "Toppantal: {count} deltagare",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Vem får göra vad",
-        "intro": "Behörighetsmatris: välj för varje funktion vilka som får använda den. Moderatorer får alltid göra allt.",
+        "intro": "Vad varje roll får göra. För deltagarna väljer du; de andra rollerna har det de behöver för att leda eller tala.",
         "featureCol": "Funktion",
         "role": {
-          "GUEST": "Gäst",
+          "GUEST": "Deltagare",
           "SPEAKER": "Talare",
           "MODERATOR": "Moderator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Inspelning",
         "roomFeaturesHeading": "Rummets funktioner",
-        "aiPipelineOff": "AI-efterbearbetning (transkribering, sammanfattning, översättningar) är inte aktiverad i den här installationen."
+        "aiPipelineOff": "AI-efterbearbetning (transkribering, sammanfattning, översättningar) är inte aktiverad i den här installationen.",
+        "rolesHeading": "Evenemangets roller",
+        "roleModeratorColumn": "Arrangör och moderator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Arrangör",
+            "desc": "Leder rummet som en moderator och presenteras bland arrangörerna. Huvudarrangören lägger till och tar bort de andra personerna."
+          },
+          "moderator": {
+            "name": "Moderator",
+            "desc": "Leder rummet: ger och tar ordet, stänger av ljud, hanterar frågor, omröstningar och inspelning."
+          },
+          "speaker": {
+            "name": "Talare",
+            "desc": "Talar, använder kameran och delar skärmen; modererar inte."
+          },
+          "guest": {
+            "name": "Deltagare",
+            "desc": "Följer evenemanget och deltar så som du bestämmer i tabellen nedan."
+          }
+        }
       },
       "step3": {
         "heading": "Personer och inbjudningar",
-        "intro": "Lägg till arrangörer (visas på sidan), moderatorer, talare och inbjudna gäster.",
-        "organizersHeading": "Arrangörer",
-        "organizersHelp": "Organisationerna bakom evenemanget: namn, webbplats och logotyp visas på den offentliga sidan.",
+        "intro": "Vem som arrangerar, vem som leder och vem som talar, med sina organisationer; sedan vid behov de inbjudna.",
+        "organizersHeading": "Arrangerande organisationer",
+        "organizersHelp": "Organisationerna bakom evenemanget: namn, webbplats och logotyp visas på den offentliga sidan. De behöver inte vara samma som personernas organisationer.",
         "organizerName": "Organisationens namn",
         "organizerWebsite": "Webbplats",
         "organizerLogo": "Arrangörens logotyp",
         "organizerRequired": "Organisationens namn måste anges.",
-        "moderatorsHeading": "Moderatorer",
-        "moderatorsHelp": "Moderatorer kan styra sessionen och kontrollera behörigheter under evenemanget.",
-        "moderatorName": "Namn",
-        "moderatorEmail": "E-post",
-        "moderatorRequired": "Namn och e-post är obligatoriska.",
-        "speakersHeading": "Talare",
-        "speakersHelp": "De får en personlig länk via e-post för att tala, använda kameran och dela skärmen, utan moderatorbehörighet.",
-        "speakerName": "Namn",
-        "speakerEmail": "E-post",
-        "speakerRequired": "Namn och e-post är obligatoriska.",
         "invitationsHeading": "Inbjudningar",
-        "invitationsHelp": "Lista över inbjudna personer. Plattformen skickar inga inbjudningar: dela länken till evenemanget själv. När offentlig registrering är avstängd kan bara dessa adresser registrera sig, och den personliga länken för att delta kommer via e-post efter registreringen.",
         "invitationName": "Namn (valfritt)",
         "invitationEmail": "E-post",
         "add": "Lägg till",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "eller lägg till manuellt",
         "removeItem": "Ta bort {name}",
         "invitationsStaffOnly": "Inbjudningarna hanteras av evenemangets personal.",
-        "pickSkipped": "Några personer fanns redan i listan eller saknade en giltig adress och lades inte till."
+        "pickSkipped": "Några personer fanns redan i listan eller saknade en giltig adress och lades inte till.",
+        "primaryHeading": "Huvudarrangör",
+        "primaryHelp": "Får evenemangets huvudlänk via e-post: leder rummet och lägger till eller tar bort de andra personerna. Namn och e-post krävs för att publicera, inte för ett utkast.",
+        "primaryPrefilled": "Huvudarrangör är du, med kontots namn och e-post. Om någon annan leder evenemanget, ange personens uppgifter här: länken går till hen.",
+        "primaryNameRequired": "Ange huvudarrangörens namn.",
+        "primaryEmailRequired": "Ange en giltig e-postadress för huvudarrangören.",
+        "linksOnPublish": "Personliga länkar skickas via e-post vid publicering; så länge evenemanget är ett utkast kopierar du dem från dess sida.",
+        "personName": "Namn",
+        "personEmail": "E-post",
+        "peopleHeading": "Evenemangets personer",
+        "peopleHelp": "Arrangörer, moderatorer och talare. Var och en får en egen länk för att delta med sin roll; vad varje roll får göra visas i steget ”Behörigheter”.",
+        "personRole": "Roll",
+        "roleOrganizer": "Arrangör",
+        "roleModerator": "Moderator",
+        "roleSpeaker": "Talare",
+        "roleHelp": {
+          "organizer": "Leder rummet som en moderator och presenteras bland arrangörerna.",
+          "moderator": "Leder rummet: ger ordet, hanterar frågor, omröstningar och inspelning.",
+          "speaker": "Talar, använder kameran och delar skärmen, utan modereringsbehörighet."
+        },
+        "personOrganization": "Organisation",
+        "personOrganizationHelp": "Personens organisation: den kan skilja sig från den som arrangerar.",
+        "personLogo": "Organisationens logotyp",
+        "personLogoAdd": "Lägg till organisationens logotyp",
+        "personLogoChange": "Byt organisationens logotyp",
+        "personPublic": "Visa på den offentliga sidan",
+        "personRequired": "Namn och e-post krävs.",
+        "invitationsHelpOpen": "Valfritt: listan över de personer du bjuder in. Anmälan är öppen, så efter publicering kan vem som helst anmäla sig, inbjuden eller inte. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget.",
+        "invitationsHelpRestricted": "Anmälan är begränsad: endast adresserna i den här listan kan anmäla sig. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget; länken för att delta kommer via e-post efter anmälan.",
+        "logoExternal": "Den offentliga sidan visar bara logotyper som laddats upp till den här plattformen: en logotyp från en annan webbplats visas inte.",
+        "primaryProfileInvalid": "Kontrollera organisationen och logotypens adress."
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -878,7 +921,6 @@
           "schedule": "Schema",
           "recurrence": "Återkommande",
           "maxParticipants": "Förväntade deltagare",
-          "organizers": "Arrangörer",
           "speakers": "Talare",
           "invitations": "Inbjudningar",
           "materials": "Material",
@@ -888,7 +930,12 @@
           "recordingManual": "På — manuell start",
           "recordingOff": "Av",
           "multitrack": "Inspelning per deltagare",
-          "multitrackOn": "På – kräver uttryckligt samtycke vid anmälan"
+          "multitrackOn": "På – kräver uttryckligt samtycke vid anmälan",
+          "organizingEntities": "Arrangerande organisationer",
+          "primaryOrganizer": "Huvudarrangör",
+          "primaryMissing": "Ska anges i steget ”Personer” för att publicera",
+          "organizersPeople": "Andra arrangörer",
+          "moderators": "Moderatorer"
         },
         "noRecurrence": "Engångsevenemang",
         "gdprHeading": "Integritet och datalagring",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Använd anpassad text —",
         "gdprTemplateUnknown": "Den valda mallen för integritetsmeddelandet finns inte längre: välj en annan eller gå tillbaka till anpassad text",
         "privacyText": "Integritetspolicy (text)",
-        "moderatorHeading": "Moderatorkontakt",
-        "moderatorPublishHint": "Namn och e-postadress krävs för att publicera evenemanget (de används för moderatorlänken och bekräftelsemejlet). De krävs inte för att spara som utkast.",
-        "moderatorPrefilled": "Du är huvudmoderator, med namn och e-post från ditt konto. Om någon annan modererar evenemanget, skriv in deras uppgifter här: länken för att hantera det skickas till dem.",
-        "moderatorLinkNote": "Den här personen är evenemangets huvudmoderator: hen får en privat länk via e-post för att sköta det (starta inspelningen, moderera frågorna, starta omröstningar …). Det är något annat än de medmoderatorer som läggs till i steget Personer, som var och en får sin egen länk.",
-        "moderatorRequired": "Ange moderatorns namn",
-        "moderatorEmailRequired": "Ange en giltig e-postadress till moderatorn",
-        "moderatorName": "Namn",
-        "moderatorEmail": "E-post",
         "capacityHeading": "Uppskattad kapacitet",
         "featuresHeading": "Konfigurationssammanfattning",
         "privacyDoc": "Integritetspolicydokument (PDF eller länk)",
         "privacyDocHelp": "Ladda upp en PDF eller klistra in URL:en till en alternativ integritetspolicy. Ersätter GDPR-mallen om angiven.",
         "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen.",
         "technicalDetails": "Tekniska detaljer: kapacitet och resurser",
-        "retentionRange": "Ange ett antal dagar mellan 1 och {max}.",
-        "linksOnPublish": "De personliga länkarna (huvudmoderator, medmoderatorer och talare) skickas via e-post när evenemanget publiceras. Så länge det är ett utkast kopierar du dem från evenemangets sida."
+        "retentionRange": "Ange ett antal dagar mellan 1 och {max}."
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Moderatorer och talare",
-      "intro": "Lägg till extra moderatorer och talare med individuella magiska länkar.",
+      "title": "Arrangörer, moderatorer och talare",
+      "intro": "Lägg till arrangörer, moderatorer och talare, var och en med sin egen länk.",
       "introHint": "Varje person har ett eget visningsnamn i rummet och en token som kan återkallas oberoende av huvudlänken. Talare får mikrofon, kamera och skärmdelning men kan inte moderera (kasta ut, tysta alla, spela in).",
       "add": "Lägg till person",
       "name": "Namn som visas i rummet",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Förbered ett e-postmeddelande till {name}",
       "prepareEmailSubject": "Din länk till ”{title}”",
       "prepareEmailBody": "Hej {name},\n\nhär är din personliga länk till ”{title}”:\n{link}\n\nLänken är bara för dig: vidarebefordra eller dela den inte.",
-      "draftNote": "Evenemanget är ett utkast: länkarna skickas via e-post när det publiceras. Under tiden kan du kopiera dem härifrån."
+      "draftNote": "Evenemanget är ett utkast: länkarna skickas via e-post när det publiceras. Under tiden kan du kopiera dem härifrån.",
+      "roleOrganizer": "Arrangör",
+      "roleOrganizerHint": "Modererar som en moderator och presenteras bland evenemangets arrangörer.",
+      "organization": "Organisation (valfritt)",
+      "publicListed": "Visa på den offentliga sidan",
+      "onPublicPage": "På den offentliga sidan"
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",

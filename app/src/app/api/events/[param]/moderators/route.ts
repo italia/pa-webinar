@@ -23,6 +23,7 @@ import { encryptPII, encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { adminRequestLocale, sendGrantModeratorLink } from '@/lib/email/moderator-link';
 import { getSettings } from '@/lib/settings';
+import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -30,11 +31,17 @@ export const dynamic = 'force-dynamic';
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const addModeratorSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email().optional(),
-  role: z.nativeEnum(EventModeratorRole).optional(),
-});
+const addModeratorSchema = z
+  .object({
+    name: z.string().min(2).max(100),
+    email: z.string().email().optional(),
+    role: z.nativeEnum(EventModeratorRole).optional(),
+  })
+  .merge(grantProfileSchema)
+  .refine((d) => !d.organizer || (d.role ?? EventModeratorRole.MODERATOR) === EventModeratorRole.MODERATOR, {
+    message: 'Only a moderator can be an organizer',
+    path: ['organizer'],
+  });
 
 async function requirePrimary(eventIdOrSlug: string, token: string) {
   const where = UUID_RE.test(eventIdOrSlug)
@@ -65,6 +72,10 @@ export const GET = withErrorHandling(async (request, context) => {
       name: true,
       email: true,
       role: true,
+      organizer: true,
+      organization: true,
+      organizationLogoUrl: true,
+      publicListed: true,
       token: true,
       createdAt: true,
       revokedAt: true,
@@ -111,6 +122,7 @@ export const POST = withErrorHandling(async (request, context) => {
       name: encryptPII(parsed.data.name),
       email: encryptPIIOrNull(parsed.data.email),
       role: parsed.data.role ?? EventModeratorRole.MODERATOR,
+      ...grantProfileData(parsed.data),
       token: randomUUID(),
     },
   });

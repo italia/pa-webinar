@@ -30,8 +30,22 @@ function fullSource(): DuplicateSource {
       { name: 'Ente A', logoUrl: null, websiteUrl: 'https://esempio.gov.it', sortOrder: 0 },
     ],
     additionalMods: [
-      { name: 'cifrato:nome', email: 'cifrato:email', role: 'MODERATOR' },
-      { name: 'cifrato:nome2', email: null, role: 'SPEAKER' },
+      {
+        name: 'cifrato:nome',
+        email: 'cifrato:email',
+        role: 'MODERATOR',
+        organizer: true,
+        organization: 'Ente B',
+        organizationLogoUrl: '/api/assets/images/b.png',
+      },
+      {
+        name: 'cifrato:nome2',
+        email: null,
+        role: 'SPEAKER',
+        organizer: false,
+        organization: null,
+        organizationLogoUrl: null,
+      },
     ],
     agendaItems: [
       { label: 'Apertura', sortOrder: 0, plannedMinutes: 10 },
@@ -122,6 +136,18 @@ describe('classificazione delle relazioni di Event', () => {
 });
 
 describe('duplicatedRelations', () => {
+  it('copia ruolo ed ente delle persone, non la pubblicazione', () => {
+    const out = duplicatedRelations(fullSource());
+    const created = out.additionalMods?.create as Record<string, unknown>[];
+    expect(created[0]).toMatchObject({
+      organizer: true,
+      organization: 'Ente B',
+      organizationLogoUrl: '/api/assets/images/b.png',
+      publicListed: false,
+    });
+    expect(created[1]).toMatchObject({ organizer: false, publicListed: false });
+  });
+
   it('non eredita MAI il token dei co-moderatori: è una credenziale', () => {
     const out = duplicatedRelations(fullSource());
     const created = out.additionalMods?.create as { token: string }[];

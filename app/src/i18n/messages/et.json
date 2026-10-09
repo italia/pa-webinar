@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Kasutatud link ei kehti enam. Sündmus on lõppenud: allpool leiad salvestise ja materjalid.",
       "speakers": "Esinejad",
       "organizer": "Korraldaja",
+      "peopleTitle": "Korraldajad ja esinejad",
+      "organizedBy": "Korraldaja",
+      "peopleOrganizers": "Korraldajad",
+      "peopleModerators": "Juhtimine",
       "chatNotSaved": "Vestlussõnumeid ei salvestata pärast ürituse lõppu.",
       "qaPostEvent": "Ürituse küsimused ja vastused",
       "peakParticipants": "Tipp: {count} osalejat",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Kes mida saab teha",
-        "intro": "Õiguste maatriks: valige iga funktsiooni jaoks, kes seda kasutada saab. Moderaatoritel on alati kõik õigused.",
+        "intro": "Mida iga roll teha saab. Osalejate puhul valite teie; teistel rollidel on olemas, mida juhtimiseks või esinemiseks vaja.",
         "featureCol": "Funktsioon",
         "role": {
-          "GUEST": "Külaline",
+          "GUEST": "Osaleja",
           "SPEAKER": "Esineja",
           "MODERATOR": "Moderaator"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Salvestus",
         "roomFeaturesHeading": "Ruumi funktsioonid",
-        "aiPipelineOff": "AI järeltöötlus (transkriptsioon, kokkuvõte, tõlked) ei ole selles paigalduses sisse lülitatud."
+        "aiPipelineOff": "AI järeltöötlus (transkriptsioon, kokkuvõte, tõlked) ei ole selles paigalduses sisse lülitatud.",
+        "rolesHeading": "Ürituse rollid",
+        "roleModeratorColumn": "Korraldaja ja moderaator",
+        "roleInfo": {
+          "organizer": {
+            "name": "Korraldaja",
+            "desc": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Peakorraldaja lisab ja eemaldab teisi inimesi."
+          },
+          "moderator": {
+            "name": "Moderaator",
+            "desc": "Juhib ruumi: annab ja võtab sõna, vaigistab, haldab küsimusi, küsitlusi ja salvestamist."
+          },
+          "speaker": {
+            "name": "Esineja",
+            "desc": "Räägib, kasutab kaamerat ja jagab ekraani; ei modereeri."
+          },
+          "guest": {
+            "name": "Osaleja",
+            "desc": "Jälgib üritust ja osaleb nii, nagu allolevas tabelis otsustate."
+          }
+        }
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
-        "intro": "Lisage korraldajad (kuvatakse lehel), moderaatorid, esinejad ja kutsutud külalised.",
-        "organizersHeading": "Korraldajad",
-        "organizersHelp": "Ürituse korraldajad: nimi, veebisait ja logo kuvatakse avalikul lehel.",
+        "intro": "Kes korraldab, kes juhib ja kes esineb, koos oma organisatsioonidega; seejärel vajadusel kutsutud.",
+        "organizersHeading": "Korraldavad asutused",
+        "organizersHelp": "Üritust korraldavad asutused: nimi, veebisait ja logo kuvatakse avalikul lehel. Need ei pea kattuma inimeste organisatsioonidega.",
         "organizerName": "Organisatsiooni nimi",
         "organizerWebsite": "Veebileht",
         "organizerLogo": "Korraldaja logo",
         "organizerRequired": "Organisatsiooni nimi on kohustuslik.",
-        "moderatorsHeading": "Moderaatorid",
-        "moderatorsHelp": "Moderaatorid saavad sündmuse ajal sessiooni hallata ja õigusi juhtida.",
-        "moderatorName": "Nimi",
-        "moderatorEmail": "E-post",
-        "moderatorRequired": "Nimi ja e-post on kohustuslikud.",
-        "speakersHeading": "Esinejad",
-        "speakersHelp": "Nad saavad e-postiga isikliku lingi, et rääkida, kasutada kaamerat ja jagada ekraani, ilma moderaatori õigusteta.",
-        "speakerName": "Nimi",
-        "speakerEmail": "E-post",
-        "speakerRequired": "Nimi ja e-post on kohustuslikud.",
         "invitationsHeading": "Kutsed",
-        "invitationsHelp": "Kutsutud isikute nimekiri. Platvorm kutseid ei saada: jaga sündmuse linki ise. Kui avalik registreerumine on välja lülitatud, saavad registreeruda ainult need aadressid ning isiklik sisenemislink saabub pärast registreerumist e-postiga.",
         "invitationName": "Nimi (valikuline)",
         "invitationEmail": "E-post",
         "add": "Lisa",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "või lisa käsitsi",
         "removeItem": "Eemalda {name}",
         "invitationsStaffOnly": "Kutseid haldab ürituse meeskond.",
-        "pickSkipped": "Mõned inimesed olid juba loendis või neil polnud kehtivat aadressi ja neid ei lisatud."
+        "pickSkipped": "Mõned inimesed olid juba loendis või neil polnud kehtivat aadressi ja neid ei lisatud.",
+        "primaryHeading": "Peakorraldaja",
+        "primaryHelp": "Saab e-postiga ürituse peamise lingi: juhib ruumi ning lisab või eemaldab teisi inimesi. Nimi ja e-post on vajalikud avaldamiseks, mitte mustandi jaoks.",
+        "primaryPrefilled": "Peakorraldaja olete teie, oma konto nime ja e-postiga. Kui üritust juhib keegi teine, sisestage siia tema andmed: link läheb temale.",
+        "primaryNameRequired": "Sisestage peakorraldaja nimi.",
+        "primaryEmailRequired": "Sisestage peakorraldaja kehtiv e-post.",
+        "linksOnPublish": "Isiklikud lingid saadetakse e-postiga avaldamisel; kuni üritus on mustand, kopeerige need selle lehelt.",
+        "personName": "Nimi",
+        "personEmail": "E-post",
+        "peopleHeading": "Ürituse inimesed",
+        "peopleHelp": "Korraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rollis; mida iga roll teha saab, näitab samm „Õigused“.",
+        "personRole": "Roll",
+        "roleOrganizer": "Korraldaja",
+        "roleModerator": "Moderaator",
+        "roleSpeaker": "Esineja",
+        "roleHelp": {
+          "organizer": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas.",
+          "moderator": "Juhib ruumi: annab sõna, haldab küsimusi, küsitlusi ja salvestamist.",
+          "speaker": "Räägib, kasutab kaamerat ja jagab ekraani, ilma moderaatori volitusteta."
+        },
+        "personOrganization": "Asutus või organisatsioon",
+        "personOrganizationHelp": "Isiku organisatsioon: see võib erineda üritust korraldavast.",
+        "personLogo": "Organisatsiooni logo",
+        "personLogoAdd": "Lisa organisatsiooni logo",
+        "personLogoChange": "Muuda organisatsiooni logo",
+        "personPublic": "Näita avalikul lehel",
+        "personRequired": "Nimi ja e-post on kohustuslikud.",
+        "invitationsHelpOpen": "Valikuline: nende inimeste loend, keda kutsute. Registreerimine on avatud, nii et pärast avaldamist võib registreeruda igaüks, kutsutud või mitte. Platvorm kutseid ei saada: jagage ürituse linki ise.",
+        "invitationsHelpRestricted": "Registreerimine on piiratud: registreeruda saavad ainult selle loendi aadressid. Platvorm kutseid ei saada: jagage ürituse linki ise; sisenemislink saabub e-postiga pärast registreerimist.",
+        "logoExternal": "Avalikul lehel kuvatakse ainult sellele platvormile üles laaditud logosid: teiselt saidilt pärit logo ei kuvata.",
+        "primaryProfileInvalid": "Kontrollige organisatsiooni ja logo aadressi."
       },
       "step4": {
         "heading": "Sisu ja materjalid",
@@ -878,7 +921,6 @@
           "schedule": "Ajakava",
           "recurrence": "Kordumine",
           "maxParticipants": "Eeldatavad osalejad",
-          "organizers": "Korraldajad",
           "speakers": "Esinejad",
           "invitations": "Kutsed",
           "materials": "Materjalid",
@@ -888,7 +930,12 @@
           "recordingManual": "Sees — käsitsi käivitus",
           "recordingOff": "Väljas",
           "multitrack": "Osalejapõhine salvestamine",
-          "multitrackOn": "Sees – nõuab registreerumisel selgesõnalist nõusolekut"
+          "multitrackOn": "Sees – nõuab registreerumisel selgesõnalist nõusolekut",
+          "organizingEntities": "Korraldavad asutused",
+          "primaryOrganizer": "Peakorraldaja",
+          "primaryMissing": "Avaldamiseks tuleb määrata sammus „Inimesed“",
+          "organizersPeople": "Teised korraldajad",
+          "moderators": "Moderaatorid"
         },
         "noRecurrence": "Üksiksündmus",
         "gdprHeading": "Privaatsus ja andmete säilitamine",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Kasuta kohandatud teksti —",
         "gdprTemplateUnknown": "Valitud privaatsusteabe malli ei ole enam olemas: vali mõni muu või naase kohandatud teksti juurde",
         "privacyText": "Privaatsusteave (tekst)",
-        "moderatorHeading": "Moderaatori kontakt",
-        "moderatorPublishHint": "Sündmuse avaldamiseks on nimi ja e-posti aadress kohustuslikud (neid kasutatakse moderaatori lingi ja kinnituskirja jaoks). Mustandina salvestamiseks neid ei nõuta.",
-        "moderatorPrefilled": "Peamoderaator olete teie, oma konto nime ja e-postiga. Kui üritust modereerib keegi teine, sisestage siia tema andmed: haldamise link saadetakse talle.",
-        "moderatorLinkNote": "See inimene on sündmuse peamoderaator: ta saab e-postiga privaatse lingi sündmuse haldamiseks (salvestamise käivitamine, küsimuste modereerimine, küsitluste käivitamine…). See erineb sammus „Inimesed“ lisatud kaasmoderaatoritest, kes saavad igaüks oma lingi.",
-        "moderatorRequired": "Sisesta moderaatori nimi",
-        "moderatorEmailRequired": "Sisesta moderaatori kehtiv e-posti aadress",
-        "moderatorName": "Nimi",
-        "moderatorEmail": "E-post",
         "capacityHeading": "Hinnanguline mahutavus",
         "featuresHeading": "Konfiguratsiooni kokkuvõte",
         "privacyDoc": "Privaatsusteabe dokument (PDF või link)",
         "privacyDocHelp": "Laadige üles PDF või kleepige asendava teabe URL. Olemasolul kirjutab IKÜM-i malli üle.",
         "privacyTextHelp": "Lühike tekst, mis kuvatakse registreerimisvormil; võib täiendada või asendada IKÜM-i malli.",
         "technicalDetails": "Tehnilised üksikasjad: mahutavus ja ressursid",
-        "retentionRange": "Sisestage päevade arv vahemikus 1 kuni {max}.",
-        "linksOnPublish": "Isiklikud lingid (peamoderaator, kaasmoderaatorid ja esinejad) saadetakse e-postiga, kui üritus avaldatakse. Kuni see on mustand, kopeerige need ürituse lehelt."
+        "retentionRange": "Sisestage päevade arv vahemikus 1 kuni {max}."
       },
       "validationFailed": "Enne jätkamist kontrollige esiletõstetud välju.",
       "partialFailure": "Sündmus loodi, kuid mõnda elementi ei salvestatud: {items}. Saad need lisada sündmuse lehelt.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Kaasmoderaatorid ja esinejad",
-      "intro": "Lisa kaasmoderaatoreid ja esinejaid individuaalsete võlulinkidega.",
+      "title": "Korraldajad, moderaatorid ja esinejad",
+      "intro": "Lisage korraldajad, moderaatorid ja esinejad, igaüks oma lingiga.",
       "introHint": "Igal inimesel on ruumis nähtav nimi ja tokkel, mida saab põhilingist sõltumatult kehtetuks tunnistada. Esinejatel on mikrofon, kaamera ja ekraani jagamine, kuid nad ei saa modereerida (eemaldada, kõiki vaigistada, salvestada).",
       "add": "Lisa isik",
       "name": "Ruumis nähtav nimi",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Koosta e-kiri: {name}",
       "prepareEmailSubject": "Teie link sündmusele „{title}“",
       "prepareEmailBody": "Tere, {name}!\n\nSiin on teie isiklik link sündmusele „{title}“:\n{link}\n\nLink on ainult teile: ärge edastage ega jagage seda.",
-      "draftNote": "Üritus on mustand: lingid saadetakse e-postiga, kui see avaldatakse. Seni saate need siit kopeerida."
+      "draftNote": "Üritus on mustand: lingid saadetakse e-postiga, kui see avaldatakse. Seni saate need siit kopeerida.",
+      "roleOrganizer": "Korraldaja",
+      "roleOrganizerHint": "Modereerib nagu moderaator ja on esitatud ürituse korraldajate seas.",
+      "organization": "Asutus või organisatsioon (valikuline)",
+      "publicListed": "Näita avalikul lehel",
+      "onPublicPage": "Avalikul lehel"
     },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",

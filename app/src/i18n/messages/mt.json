@@ -156,6 +156,10 @@
       "invalidTokenBodyEnded": "Il-link li użajt m'għadux validu. L-avveniment intemm: hawn taħt issib ir-reġistrazzjoni u l-materjali.",
       "speakers": "Kelliema",
       "organizer": "Organizzatur",
+      "peopleTitle": "Organizzaturi u kelliema",
+      "organizedBy": "Organizzat minn",
+      "peopleOrganizers": "Organizzaturi",
+      "peopleModerators": "Moderazzjoni",
       "chatNotSaved": "Il-messaġġi taċ-chat ma jiġux issejvjati wara li jintemm l-avveniment.",
       "qaPostEvent": "Q&A mill-avveniment",
       "peakParticipants": "Qofol: {count} parteċipant",
@@ -759,10 +763,10 @@
       },
       "step2": {
         "heading": "Min jista' jagħmel xiex",
-        "intro": "Matriċi tal-permessi: agħżel għal kull funzjoni min jista' jużaha. Il-moderaturi dejjem jistgħu jagħmlu kollox.",
+        "intro": "X'jista' jagħmel kull rwol. Għall-parteċipanti tagħżel int; ir-rwoli l-oħra għandhom dak li jeħtieġu biex imexxu jew jitkellmu.",
         "featureCol": "Funzjonalità",
         "role": {
-          "GUEST": "Mistieden",
+          "GUEST": "Parteċipant",
           "SPEAKER": "Kelliem",
           "MODERATOR": "Moderatur"
         },
@@ -794,29 +798,38 @@
         },
         "recordingHeading": "Rekording",
         "roomFeaturesHeading": "Funzjonijiet tal-kamra",
-        "aiPipelineOff": "Il-post-produzzjoni AI (traskrizzjoni, sommarju, traduzzjonijiet) mhijiex attiva f'din l-installazzjoni."
+        "aiPipelineOff": "Il-post-produzzjoni AI (traskrizzjoni, sommarju, traduzzjonijiet) mhijiex attiva f'din l-installazzjoni.",
+        "rolesHeading": "Ir-rwoli tal-avveniment",
+        "roleModeratorColumn": "Organizzatur u moderatur",
+        "roleInfo": {
+          "organizer": {
+            "name": "Organizzatur",
+            "desc": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. L-organizzatur ewlieni jżid u jneħħi lill-persuni l-oħra."
+          },
+          "moderator": {
+            "name": "Moderatur",
+            "desc": "Imexxi l-kamra: jagħti u jneħħi l-kelma, isikket, jimmaniġġja mistoqsijiet, stħarriġ u reġistrazzjoni."
+          },
+          "speaker": {
+            "name": "Kelliem",
+            "desc": "Jitkellem, juża l-kamera u jaqsam l-iskrin; ma jimmoderax."
+          },
+          "guest": {
+            "name": "Parteċipant",
+            "desc": "Isegwi l-avveniment u jipparteċipa kif tiddeċiedi fit-tabella hawn taħt."
+          }
+        }
       },
       "step3": {
         "heading": "Persuni u stediniet",
-        "intro": "Żid organizzaturi (jintwerew fuq il-paġna), moderaturi, kelliema u mistednin imsejħa.",
-        "organizersHeading": "Organizzaturi",
-        "organizersHelp": "L-organizzazzjonijiet li qed jorganizzaw l-avveniment: l-isem, is-sit u l-logo jidhru fil-paġna pubblika.",
+        "intro": "Min jorganizza, min imexxi u min jitkellem, bl-organizzazzjonijiet tagħhom; imbagħad, jekk meħtieġ, il-mistednin.",
+        "organizersHeading": "Entitajiet organizzaturi",
+        "organizersHelp": "L-entitajiet li jippromwovu l-avveniment: l-isem, is-sit u l-logo jidhru fil-paġna pubblika. M'għandhomx għalfejn ikunu l-istess bħall-organizzazzjonijiet tal-persuni.",
         "organizerName": "Isem l-organizzazzjoni",
         "organizerWebsite": "Sit web",
         "organizerLogo": "Logo tal-organizzatur",
         "organizerRequired": "L-isem tal-organizzazzjoni huwa meħtieġ.",
-        "moderatorsHeading": "Moderaturi",
-        "moderatorsHelp": "Il-moderaturi jistgħu jamministraw is-sessjoni u jikkontrollaw il-permessi matul l-avveniment.",
-        "moderatorName": "Isem",
-        "moderatorEmail": "Email",
-        "moderatorRequired": "L-isem u l-email huma obbligatorji.",
-        "speakersHeading": "Kelliema",
-        "speakersHelp": "Jirċievu link personali bl-email biex jitkellmu, jużaw il-kamera u jaqsmu l-iskrin, mingħajr setgħat ta' moderazzjoni.",
-        "speakerName": "Isem",
-        "speakerEmail": "Email",
-        "speakerRequired": "L-isem u l-email huma obbligatorji.",
         "invitationsHeading": "Stediniet",
-        "invitationsHelp": "Lista tal-persuni mistiedna. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment. Meta r-reġistrazzjoni pubblika tkun mitfija, jistgħu jirreġistraw biss dawn l-indirizzi, u l-link personali biex tidħol jasal bl-email wara r-reġistrazzjoni.",
         "invitationName": "Isem (fakultattiv)",
         "invitationEmail": "Email",
         "add": "Żid",
@@ -827,7 +840,37 @@
         "rubricaOrAdd": "jew żid manwalment",
         "removeItem": "Neħħi {name}",
         "invitationsStaffOnly": "L-istediniet jimmaniġġjahom l-istaff tal-avveniment.",
-        "pickSkipped": "Xi persuni kienu diġà fil-lista jew ma kellhomx indirizz validu, u ma żdidux."
+        "pickSkipped": "Xi persuni kienu diġà fil-lista jew ma kellhomx indirizz validu, u ma żdidux.",
+        "primaryHeading": "Organizzatur ewlieni",
+        "primaryHelp": "Jirċievi bl-email il-link ewlieni tal-avveniment: imexxi l-kamra u jżid jew ineħħi lill-persuni l-oħra. L-isem u l-email huma meħtieġa biex tippubblika, mhux għal abbozz.",
+        "primaryPrefilled": "L-organizzatur ewlieni int, bl-isem u l-email tal-kont tiegħek. Jekk persuna oħra tmexxi l-avveniment, daħħal id-dettalji tagħha hawn: il-link jasal għandha.",
+        "primaryNameRequired": "Daħħal l-isem tal-organizzatur ewlieni.",
+        "primaryEmailRequired": "Daħħal email validu tal-organizzatur ewlieni.",
+        "linksOnPublish": "Il-links personali jintbagħtu bl-email meta l-avveniment jiġi ppubblikat; sakemm ikun abbozz, ikkopjahom mill-paġna tiegħu.",
+        "personName": "Isem",
+        "personEmail": "Email",
+        "peopleHeading": "Persuni tal-avveniment",
+        "peopleHelp": "Organizzaturi, moderaturi u kelliema. Kull wieħed jirċievi l-link tiegħu biex jidħol bir-rwol tiegħu; x'jista' jagħmel kull rwol jidher fil-pass “Permessi”.",
+        "personRole": "Rwol",
+        "roleOrganizer": "Organizzatur",
+        "roleModerator": "Moderatur",
+        "roleSpeaker": "Kelliem",
+        "roleHelp": {
+          "organizer": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi.",
+          "moderator": "Imexxi l-kamra: jagħti l-kelma, jimmaniġġja mistoqsijiet, stħarriġ u reġistrazzjoni.",
+          "speaker": "Jitkellem, juża l-kamera u jaqsam l-iskrin, mingħajr setgħat ta' moderazzjoni."
+        },
+        "personOrganization": "Entità jew organizzazzjoni",
+        "personOrganizationHelp": "L-organizzazzjoni tal-persuna: tista' tkun differenti minn dik li torganizza l-avveniment.",
+        "personLogo": "Logo tal-organizzazzjoni",
+        "personLogoAdd": "Żid il-logo tal-organizzazzjoni",
+        "personLogoChange": "Biddel il-logo tal-organizzazzjoni",
+        "personPublic": "Uri fil-paġna pubblika",
+        "personRequired": "L-isem u l-email huma obbligatorji.",
+        "invitationsHelpOpen": "Fakultattiv: il-lista tal-persuni li tistieden int. Ir-reġistrazzjoni hija miftuħa, allura wara l-pubblikazzjoni kulħadd jista' jirreġistra, mistieden jew le. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment.",
+        "invitationsHelpRestricted": "Ir-reġistrazzjoni hija ristretta: jistgħu jirreġistraw biss l-indirizzi f'din il-lista. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment; il-link biex tidħol jasal bl-email wara r-reġistrazzjoni.",
+        "logoExternal": "Il-paġna pubblika turi biss logos imtella' fuq din il-pjattaforma: logo minn sit ieħor mhux se jidher.",
+        "primaryProfileInvalid": "Iċċekkja l-organizzazzjoni u l-indirizz tal-logo."
       },
       "step4": {
         "heading": "Kontenut u materjali",
@@ -878,7 +921,6 @@
           "schedule": "Kalendarju",
           "recurrence": "Rikorrenza",
           "maxParticipants": "Parteċipanti mistennija",
-          "organizers": "Organizzaturi",
           "speakers": "Kelliema",
           "invitations": "Stediniet",
           "materials": "Materjali",
@@ -888,7 +930,12 @@
           "recordingManual": "Attiv — bidu manwali",
           "recordingOff": "Mhux attiv",
           "multitrack": "Reġistrazzjoni għal kull parteċipant",
-          "multitrackOn": "Attiva — teħtieġ kunsens espliċitu mar-reġistrazzjoni"
+          "multitrackOn": "Attiva — teħtieġ kunsens espliċitu mar-reġistrazzjoni",
+          "organizingEntities": "Entitajiet organizzaturi",
+          "primaryOrganizer": "Organizzatur ewlieni",
+          "primaryMissing": "Irid jiġi ssettjat fil-pass “Persuni” biex tippubblika",
+          "organizersPeople": "Organizzaturi oħra",
+          "moderators": "Moderaturi"
         },
         "noRecurrence": "Avveniment uniku",
         "gdprHeading": "Privatezza u żamma tad-data",
@@ -898,22 +945,13 @@
         "gdprTemplateNone": "— Uża test personalizzat —",
         "gdprTemplateUnknown": "It-template tal-avviż ta' privatezza magħżul ma għadux jeżisti: agħżel ieħor jew erġa' lura għat-test personalizzat",
         "privacyText": "Avviż tal-privatezza (test)",
-        "moderatorHeading": "Kuntatt moderatur",
-        "moderatorPublishHint": "L-isem u l-email huma obbligatorji biex tippubblika l-avveniment (jintużaw għal-link tal-moderatur u għall-email ta' konferma). Mhumiex meħtieġa biex tissalva bħala abbozz.",
-        "moderatorPrefilled": "Il-moderatur prinċipali int, bl-isem u l-email tal-kont tiegħek. Jekk l-avveniment jimmoderah persuna oħra, ikteb hawn id-dettalji tagħha: il-link biex jiġi ġestit jasal għandha.",
-        "moderatorLinkNote": "Din il-persuna hija l-moderatur prinċipali tal-avveniment: tirċievi bl-email link privat biex tmexxih (tibda r-reġistrazzjoni, timmodera l-mistoqsijiet, tniedi stħarriġ…). Dan huwa differenti mill-ko-moderaturi miżjuda fil-pass «Persuni», li kull wieħed jirċievi l-link tiegħu.",
-        "moderatorRequired": "Daħħal l-isem tal-moderatur",
-        "moderatorEmailRequired": "Daħħal email valida tal-moderatur",
-        "moderatorName": "Isem",
-        "moderatorEmail": "Email",
         "capacityHeading": "Kapaċità stmata",
         "featuresHeading": "Konfigurazzjoni sintetika",
         "privacyDoc": "Dokument tal-avviż (PDF jew link)",
         "privacyDocHelp": "Tella' PDF jew waħħal URL ta' avviż sostituttiv. Jissostitwixxi t-template GDPR jekk preżenti.",
         "privacyTextHelp": "Test qasir muri fil-formola tal-irreġistrazzjoni; jista' jikkomplementa jew jissostitwixxi t-template GDPR.",
         "technicalDetails": "Dettalji tekniċi: kapaċità u riżorsi",
-        "retentionRange": "Daħħal numru ta' jiem bejn 1 u {max}.",
-        "linksOnPublish": "Il-links personali (moderatur prinċipali, ko-moderaturi u kelliema) jintbagħtu bl-email meta l-avveniment jiġi ppubblikat. Sakemm ikun abbozz, ikkopjahom mill-paġna tal-avveniment."
+        "retentionRange": "Daħħal numru ta' jiem bejn 1 u {max}."
       },
       "validationFailed": "Iċċekkja l-oqsma evidenzjati qabel tipproċedi.",
       "partialFailure": "L-avveniment inħoloq, imma xi elementi ma ġewx salvati: {items}. Tista' żżidhom mill-paġna tal-avveniment.",
@@ -1458,8 +1496,8 @@
       }
     },
     "coModerators": {
-      "title": "Ko-moderaturi u kelliema",
-      "intro": "Żid ko-moderaturi u kelliema b'magic-links individwali.",
+      "title": "Organizzaturi, moderaturi u kelliema",
+      "intro": "Żid organizzaturi, moderaturi u kelliema, kull wieħed bil-link tiegħu.",
       "introHint": "Kull persuna għandha isem viżibbli fil-kamra u token li jista' jiġi revokat indipendentement mil-link prinċipali. Il-kelliema għandhom mikrofonu, kamera u qsim tal-iskrin iżda ma jistgħux jimmoderaw (keċċu, issilenzjaw lil kulħadd, reġistraw).",
       "add": "Żid persuna",
       "name": "Isem viżibbli fil-kamra",
@@ -1484,7 +1522,12 @@
       "prepareEmailFor": "Ipprepara email għal {name}",
       "prepareEmailSubject": "Il-link tiegħek għal “{title}”",
       "prepareEmailBody": "Bonġu {name},\n\nhawn hu l-link personali tiegħek għal “{title}”:\n{link}\n\nIl-link huwa għalik biss: tgħaddihx u taqsmux.",
-      "draftNote": "L-avveniment huwa abbozz: il-links jintbagħtu bl-email meta jiġi ppubblikat. Sadanittant tista' tikkopjahom minn hawn."
+      "draftNote": "L-avveniment huwa abbozz: il-links jintbagħtu bl-email meta jiġi ppubblikat. Sadanittant tista' tikkopjahom minn hawn.",
+      "roleOrganizer": "Organizzatur",
+      "roleOrganizerHint": "Jimmodera bħal moderatur u jidher fost l-organizzaturi tal-avveniment.",
+      "organization": "Entità jew organizzazzjoni (fakultattiv)",
+      "publicListed": "Uri fil-paġna pubblika",
+      "onPublicPage": "Fil-paġna pubblika"
     },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",

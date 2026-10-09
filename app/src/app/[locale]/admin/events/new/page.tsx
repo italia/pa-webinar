@@ -127,6 +127,7 @@ export default async function CreateEventPage({
         defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={30}
         canUseRubrica={session.role === 'admin'}
+        publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         jvbSizingConfig={{
           cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
           receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
@@ -142,7 +143,7 @@ export default async function CreateEventPage({
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
         siteDefaultVideoQuality={siteSettings.videoQuality}
         // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts): il
-        // passo 2 offre la lavagna solo se l'installazione ne ha il servizio.
+        // passo Permessi offre la lavagna solo se l'installazione ne ha il servizio.
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}

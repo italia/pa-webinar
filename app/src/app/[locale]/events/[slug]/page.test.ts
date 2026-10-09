@@ -88,6 +88,8 @@ function eventRow(over: Record<string, unknown> = {}) {
     maxParticipants: 100,
     _count: { registrations: 0 },
     tagLinks: [],
+    organizers: [],
+    additionalMods: [],
     recordingPublished: false,
     recordingUrl: null,
     youtubeUrl: null,
@@ -319,5 +321,58 @@ describe('scheda dell’evento — invito al questionario post-evento', () => {
     const props = await clientProps();
     expect(props.hasPostEventQuestionnaire).toBe(false);
     expect(mockedQuestionnaire).not.toHaveBeenCalled();
+  });
+});
+
+describe('scheda dell’evento — chi organizza e interviene', () => {
+  it('chiede solo le persone da pubblicare e con un accesso valido', async () => {
+    mockedEvent.mockResolvedValue(eventRow());
+    await clientProps();
+    const args = mockedEvent.mock.calls[0]![0] as {
+      include: { additionalMods: { where: Record<string, unknown> } };
+    };
+    expect(args.include.additionalMods.where).toEqual({ publicListed: true, revokedAt: null });
+  });
+
+  it('passa enti e persone al client, con i ruoli e senza loghi esterni', async () => {
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        organizers: [
+          { name: 'Ente organizzatore', logoUrl: 'https://cdn.example.com/logo.png', websiteUrl: 'https://ente.example.gov.it' },
+        ],
+        additionalMods: [
+          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: 'Ente 2', organizationLogoUrl: '/api/assets/images/l.png' },
+          { name: 'Organizzatore 1', role: 'MODERATOR', organizer: true, organization: null, organizationLogoUrl: null },
+        ],
+      }),
+    );
+    const props = await clientProps();
+    const event = props.event as { organizers: unknown; people: unknown };
+    expect(event.organizers).toEqual([
+      { name: 'Ente organizzatore', logoUrl: null, websiteUrl: 'https://ente.example.gov.it/' },
+    ]);
+    expect(event.people).toEqual([
+      { name: 'Organizzatore 1', role: 'organizer', organization: null, logoUrl: null },
+      { name: 'Relatore 1', role: 'speaker', organization: 'Ente 2', logoUrl: '/api/assets/images/l.png' },
+    ]);
+  });
+
+  it("l'organizzatore principale compare solo se scelto, fra chi organizza", async () => {
+    mockedEvent.mockResolvedValue(
+      eventRow({ moderatorName: 'Contatto 1', moderatorOrganization: 'Ente 1', moderatorPublicListed: false }),
+    );
+    expect(((await clientProps()).event as { people: unknown[] }).people).toEqual([]);
+
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        moderatorName: 'Contatto 1',
+        moderatorOrganization: 'Ente 1',
+        moderatorOrganizationLogoUrl: null,
+        moderatorPublicListed: true,
+      }),
+    );
+    expect(((await clientProps()).event as { people: unknown[] }).people).toEqual([
+      { name: 'Contatto 1', role: 'organizer', organization: 'Ente 1', logoUrl: null },
+    ]);
   });
 });

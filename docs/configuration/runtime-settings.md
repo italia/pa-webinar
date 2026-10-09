@@ -220,7 +220,7 @@ a whiteboard backend on the Jitsi side. The portal shows its **Whiteboard** butt
 to export the whiteboard only when the app environment sets `NEXT_PUBLIC_WHITEBOARD_ENABLED=true`
 for the whole installation. The live room reads that variable at request time, so a change needs a
 pod restart, not a new image. The same value drives the administration forms: when it is not `true`,
-the whiteboard switch of the event wizard (step 2) and of the event-template form cannot be switched
+the whiteboard switch of the event wizard (**Permissions** step) and of the event-template form cannot be switched
 on and says why, while a value already on can still be switched off. The chart installs no whiteboard
 server: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that
 combination with the variable has not been tested (see the

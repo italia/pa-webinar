@@ -1,19 +1,20 @@
 'use client';
 
 /**
- * 5-step event creation wizard.
+ * Il wizard dell'evento, in cinque passi:
  *
- *   1. Base          — title, description, cover, dates, recurrence, tags,
- *                       waiting-room audio
- *   2. Permissions   — role×feature matrix + recording auto-start
- *   3. Invites       — organizers (display only), speakers (access grant),
- *                       guests (pre-registration)
- *   4. Content       — materials + Q&A presets + questionnaires
- *   5. Review        — GDPR/retention, load diagram, draft/publish
+ *   1. Base        — titolo, descrizione, copertina, date, ricorrenza,
+ *                    categorie, audio della sala d'attesa
+ *   2. Persone     — organizzatore principale, enti organizzatori, persone
+ *                    con ruolo ed ente (concessioni), invitati
+ *   3. Permessi    — i ruoli, la matrice ruolo × funzione, registrazione
+ *   4. Contenuti   — materiali e questionari
+ *   5. Riepilogo   — informativa e conservazione, capacità, bozza o
+ *                    pubblicazione
  *
- * The steps share a single form state (`WizardForm`) which, on submit,
- * is POSTed to /api/events. After create, the step 3 invites/organizers
- * are pushed to their respective side-APIs (event has an id at that point).
+ * I passi condividono un solo stato (`WizardForm`), che alla conferma va a
+ * /api/events. Dopo la creazione, enti, persone e invitati vanno alle loro
+ * API (l'evento a quel punto ha un id).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,6 +22,7 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
+import { profiloSalvato } from '@/lib/events/grant-profile';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
@@ -40,8 +42,8 @@ import { RubricaAccessContext } from '../rubrica-picker';
 import { fanoutEditDiff, materialPayload, newFanoutReport, submitQuestionnaire } from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import Step1Base, { type Step1Value } from './step-1-base';
-import Step2Permissions, { type Step2Value } from './step-2-permissions';
-import Step3Invites, { type Step3Value } from './step-3-invites';
+import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
+import StepPeople, { type StepPeopleValue } from './step-2-people';
 import Step4Content, {
   type Step4Value,
   type QuestionnaireBlock,
@@ -110,11 +112,11 @@ export interface WizardProps {
   siteDefaultVideoQuality: VideoQualityPreset;
   /** Se l'installazione ha il servizio della lavagna di Jitsi
    *  (`resolveWhiteboardInfraReady`, letto dalla pagina server). Senza, la
-   *  sala non mostra la lavagna e il passo 2 non la offre. */
+   *  sala non mostra la lavagna e il passo Permessi non la offre. */
   whiteboardInfraReady: boolean;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
-  /** La post-produzione AI e' accesa sull'installazione: spenta, il passo 2
+  /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
    *  non ne propone le funzioni. */
   aiPipelineEnabled?: boolean;
   /** In modifica: il passo da cui partire (i link «Modifica» della pagina
@@ -123,6 +125,9 @@ export interface WizardProps {
   /** Il moderatore principale di partenza di un evento nuovo: chi lo crea,
    *  quando entra con un account nominale. */
   defaultModerator?: { name: string; email: string } | null;
+  /** L'iscrizione pubblica dell'installazione (SiteSetting): dice che cosa
+   *  vuol dire l'elenco degli invitati nel passo «Persone». */
+  publicRegistrationEnabled?: boolean;
   /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
    *  /api/events/:id on submit, and redirects to the admin detail page.
    *  When `'create'` (default), it POSTs to /api/events and falls into the
@@ -187,6 +192,9 @@ export interface InitialEventShape {
     privacyPolicyUrl: string | null;
     moderatorName: string | null;
     moderatorEmail: string | null;
+    moderatorOrganization: string | null;
+    moderatorOrganizationLogoUrl: string | null;
+    moderatorPublicListed: boolean;
   };
   /** Each organizer with its DB id so we can DELETE on removal. */
   organizers: Array<{
@@ -195,14 +203,20 @@ export interface InitialEventShape {
     logoUrl: string | null;
     websiteUrl: string | null;
   }>;
-  /** EventModerator rows (both MODERATOR and SPEAKER roles). Used to
-   *  populate both the moderators and speakers lists in step 3. */
+  /** Le concessioni (ruoli MODERATOR e SPEAKER): riempiono l'elenco delle
+   *  persone del passo «Persone». */
   eventModerators: Array<{
     id: string;
     name: string;
     email: string | null;
     role: 'MODERATOR' | 'SPEAKER';
     personId: string | null;
+    organizer: boolean;
+    organization: string | null;
+    organizationLogoUrl: string | null;
+    publicListed: boolean;
+    /** La concessione creata per un cambio di ruolo, al posto di questa. */
+    replaces?: string;
   }>;
   invitations: Array<{
     id: string;
@@ -234,13 +248,18 @@ export interface Step5ReviewFields {
   gdprTemplateId: string | null;
   privacyPolicyText: string;
   privacyPolicyUrl: string | null;
+  /** L'organizzatore principale (passo «Persone»): riceve il link condiviso. */
   moderatorName: string;
   moderatorEmail: string;
+  /** Il suo ente e se la pagina pubblica lo presenta fra chi organizza. */
+  moderatorOrganization: string | null;
+  moderatorOrganizationLogoUrl: string | null;
+  moderatorPublicListed: boolean;
 }
 
 export type WizardForm = Step1Value &
-  Step2Value &
-  Step3Value &
+  StepPermissionsValue &
+  StepPeopleValue &
   Step4Value &
   Step5ReviewFields;
 
@@ -306,8 +325,8 @@ export default function EventWizard(props: WizardProps) {
         : null);
     if (mode === 'edit' && initialEvent) {
       const ev = initialEvent.event;
-      // Prefer the stored matrix; if absent (older events), project from
-      // the legacy booleans so step 2 reflects the effective state.
+      // La matrice salvata; se manca (eventi più vecchi), la si ricava dai
+      // permessi singoli, così il passo «Permessi» mostra lo stato effettivo.
       const matrix: PermissionMatrix =
         (ev.permissionMatrix && coerceMatrix(ev.permissionMatrix)) ??
         matrixFromToggles({
@@ -343,7 +362,7 @@ export default function EventWizard(props: WizardProps) {
         videoQuality: ev.videoQuality,
         expectedSenderRatioPct: ev.expectedSenderRatioPct,
 
-        // Step 2
+        // Passo Permessi
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
         agendaEnabled: ev.agendaEnabled ?? false,
@@ -359,7 +378,7 @@ export default function EventWizard(props: WizardProps) {
         aiTargetLocales: lingueDiPartenza(ev.aiTranslationEnabled, ev.aiTargetLocales),
         expectedSpeakers: ev.expectedSpeakers ?? null,
 
-        // Step 3 — seed lists from related entities.
+        // Passo Persone — elenchi dalle entità collegate.
         organizers: initialEvent.organizers.map((o) => ({
           name: o.name,
           logoUrl: o.logoUrl,
@@ -368,16 +387,25 @@ export default function EventWizard(props: WizardProps) {
         moderators: initialEvent.eventModerators
           .filter((m) => m.role === 'MODERATOR')
           .map((m) => ({
+            grantId: m.id,
             name: m.name,
             email: m.email ?? '',
             personId: m.personId,
+            organizer: m.organizer,
+            organization: m.organization,
+            organizationLogoUrl: m.organizationLogoUrl,
+            publicListed: m.publicListed,
           })),
         speakers: initialEvent.eventModerators
           .filter((m) => m.role === 'SPEAKER')
           .map((m) => ({
+            grantId: m.id,
             name: m.name,
             email: m.email ?? '',
             personId: m.personId,
+            organization: m.organization,
+            organizationLogoUrl: m.organizationLogoUrl,
+            publicListed: m.publicListed,
           })),
         invitations: initialEvent.invitations.map((i) => ({
           name: i.name,
@@ -413,17 +441,18 @@ export default function EventWizard(props: WizardProps) {
         privacyPolicyUrl: ev.privacyPolicyUrl,
         moderatorName: ev.moderatorName ?? '',
         moderatorEmail: ev.moderatorEmail ?? '',
+        moderatorOrganization: ev.moderatorOrganization ?? null,
+        moderatorOrganizationLogoUrl: ev.moderatorOrganizationLogoUrl ?? null,
+        moderatorPublicListed: ev.moderatorPublicListed ?? false,
       } satisfies WizardForm;
     }
 
     const tpl = props.template;
     const conAi = (tpl?.recordingEnabled ?? false) && (props.aiPipelineEnabled ?? true);
-    // Seed the permission matrix from the template. Prefer the template's
-    // stored matrix; if it has none (the common case — templates only persist
-    // the legacy boolean toggles), PROJECT those booleans into the matrix so
-    // the template's permission choices actually reach step 2. Falling back to
-    // defaultMatrix() here (the old behaviour) silently dropped every
-    // template's permissions — "come se non si potessero scegliere".
+    // La matrice dal modello: quella salvata, se c'è; altrimenti (il caso
+    // comune: i modelli salvano i permessi singoli) la si ricava da quelli,
+    // perché le scelte del modello arrivino al passo «Permessi». Ripiegare su
+    // defaultMatrix() perderebbe in silenzio i permessi di ogni modello.
     const matrix: PermissionMatrix = tpl
       ? ((tpl.permissionMatrix && coerceMatrix(tpl.permissionMatrix)) ??
           matrixFromToggles({
@@ -461,7 +490,7 @@ export default function EventWizard(props: WizardProps) {
       videoQuality: null,
       expectedSenderRatioPct: null,
 
-      // Step 2
+      // Passo Permessi
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       agendaEnabled: tpl?.agendaEnabled ?? false,
@@ -503,7 +532,7 @@ export default function EventWizard(props: WizardProps) {
       aiTargetLocales: lingueDiPartenza(conAi && tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
-      // Step 3
+      // Passo Persone
       organizers: [],
       moderators: [],
       speakers: [],
@@ -530,6 +559,9 @@ export default function EventWizard(props: WizardProps) {
       privacyPolicyUrl: null,
       moderatorName: props.defaultModerator?.name ?? '',
       moderatorEmail: props.defaultModerator?.email ?? '',
+      moderatorOrganization: null,
+      moderatorOrganizationLogoUrl: null,
+      moderatorPublicListed: false,
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.template, mode, initialEvent]);
@@ -821,18 +853,16 @@ export default function EventWizard(props: WizardProps) {
         fuocoRichiestoRef.current = true;
         setFieldErrors(aggregated);
         showError(t('validationFailed'));
-        // Jump to the first failing step. Gli errori di validatePublish
+        // Al primo passo con un errore. Gli errori di validatePublish
         // (moderatorName/moderatorEmail) non sono coperti da validateStep e
-        // i campi vivono nello step 'review': se solo quelli falliscono,
-        // portiamo l'utente lì (altrimenti il messaggio resta senza campo
-        // evidenziato visibile).
-        const firstFailing = STEP_KEYS.find((k) =>
-          Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length > 0,
+        // i campi stanno nel passo «Persone»: se falliscono, contano come
+        // suoi (altrimenti il messaggio resta senza campo evidenziato).
+        const firstFailing = STEP_KEYS.find(
+          (k) =>
+            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length > 0 ||
+            (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail)),
         );
         if (firstFailing) setActiveStep(firstFailing);
-        else if (aggregated.moderatorName || aggregated.moderatorEmail) {
-          setActiveStep('review');
-        }
         return;
       }
       setSubmitting(true);
@@ -936,6 +966,9 @@ export default function EventWizard(props: WizardProps) {
             form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
+          moderatorOrganization: form.moderatorOrganization?.trim() || null,
+          moderatorOrganizationLogoUrl: form.moderatorOrganizationLogoUrl?.trim() || null,
+          moderatorPublicListed: !!form.moderatorPublicListed,
         };
 
         // ── Edit mode: PUT the event, diff-based fan-out, then redirect
@@ -1062,7 +1095,7 @@ export default function EventWizard(props: WizardProps) {
           if (!ok) failed.add('invitations');
         }
 
-        // 3) Moderators (EventModerator rows, MODERATOR role)
+        // 3) Organizzatori e moderatori (EventModerator, ruolo MODERATOR)
         for (const mod of form.moderators) {
           const ok = await fetch(`/api/events/${created.id}/moderators`, {
             method: 'POST',
@@ -1074,6 +1107,7 @@ export default function EventWizard(props: WizardProps) {
               name: mod.name,
               email: mod.email,
               role: 'MODERATOR',
+              ...profiloSalvato(mod),
             }),
           })
             .then((r) => r.ok)
@@ -1093,6 +1127,7 @@ export default function EventWizard(props: WizardProps) {
               name: sp.name,
               email: sp.email,
               role: 'SPEAKER',
+              ...profiloSalvato({ ...sp, organizer: false }),
             }),
           })
             .then((r) => r.ok)
@@ -1295,7 +1330,7 @@ export default function EventWizard(props: WizardProps) {
           />
         )}
         {activeStep === 'permissions' && (
-          <Step2Permissions
+          <StepPermissions
             value={form}
             onChange={updateForm}
             fieldErrors={fieldErrors}
@@ -1308,11 +1343,22 @@ export default function EventWizard(props: WizardProps) {
         )}
         {activeStep === 'invites' && (
           <RubricaAccessContext.Provider value={props.canUseRubrica ?? false}>
-            <Step3Invites
+            <StepPeople
               value={form}
               onChange={updateForm}
               invitationsLocked={viaToken !== null}
-              primaryModeratorEmail={form.moderatorEmail}
+              primary={{
+                name: form.moderatorName ?? '',
+                email: form.moderatorEmail ?? '',
+                organization: form.moderatorOrganization ?? null,
+                organizationLogoUrl: form.moderatorOrganizationLogoUrl ?? null,
+                publicListed: !!form.moderatorPublicListed,
+              }}
+              onPrimaryChange={updateForm}
+              fieldErrors={fieldErrors}
+              prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
+              showLinksOnPublish={mode === 'create' || initialEvent?.event.status === 'DRAFT'}
+              publicRegistrationEnabled={props.publicRegistrationEnabled ?? true}
             />
           </RubricaAccessContext.Provider>
         )}
@@ -1335,9 +1381,7 @@ export default function EventWizard(props: WizardProps) {
             defaultLocale={props.defaultLocale}
             gdprTemplates={props.gdprTemplates}
             fieldErrors={fieldErrors}
-            prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
             retentionMax={retentionMax}
-            showLinksOnPublish={mode === 'create' || initialEvent?.event.status === 'DRAFT'}
           />
         )}
       </div>

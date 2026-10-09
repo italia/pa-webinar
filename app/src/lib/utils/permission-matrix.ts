@@ -59,6 +59,31 @@ export function withModeratorInvariant(matrix: PermissionMatrix): PermissionMatr
 }
 
 /**
+ * La matrice come la sala la applica: i moderatori possono tutto; i relatori
+ * hanno sempre microfono, video e schermo, vedono chat e domande come i
+ * partecipanti e non comandano la registrazione. Si sceglie solo la colonna
+ * dei partecipanti (GUEST): normalizzare le altre in scrittura tiene il dato
+ * salvato uguale a quello che il wizard mostra.
+ */
+export function withRoleInvariants(matrix: PermissionMatrix): PermissionMatrix {
+  const base = withModeratorInvariant(matrix);
+  const out = {} as PermissionMatrix;
+  for (const feature of EVENT_FEATURES) {
+    const roles = new Set(base[feature]);
+    const relatore =
+      feature === 'mic' || feature === 'video' || feature === 'share'
+        ? true
+        : feature === 'recording_control'
+          ? false
+          : roles.has('GUEST');
+    if (relatore) roles.add('SPEAKER');
+    else roles.delete('SPEAKER');
+    out[feature] = Array.from(roles).sort() as EventRole[];
+  }
+  return out;
+}
+
+/**
  * Build a matrix from the legacy boolean toggles. This is what we use
  * when opening the wizard on an event that was created before the matrix
  * existed — the UI shows the equivalent matrix, and saving the wizard
@@ -71,7 +96,7 @@ export function matrixFromToggles(toggles: {
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
 }): PermissionMatrix {
-  return withModeratorInvariant({
+  return withRoleInvariants({
     qa: toggles.qaEnabled
       ? ['GUEST', 'SPEAKER', 'MODERATOR']
       : ['SPEAKER', 'MODERATOR'],
@@ -138,5 +163,5 @@ export function coerceMatrix(input: unknown): PermissionMatrix | null {
       (r): r is EventRole => typeof r === 'string' && (EVENT_ROLES as readonly string[]).includes(r),
     );
   }
-  return withModeratorInvariant(out);
+  return withRoleInvariants(out);
 }
