@@ -110,6 +110,21 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Gli sfondi virtuali si scelgono anche dal pulsante degli sfondi di Jitsi,
+  // che li elenca dal documento di branding e li scarica con fetch() dalla
+  // propria origine: senza questi header il browser blocca la lettura.
+  async headers() {
+    return [
+      {
+        source: '/images/virtual-backgrounds/:file*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+    ];
+  },
+
   webpack(config, { webpack, dev, isServer }) {
     // Dev doesn't minify, so there's nothing to repair there; the server and
     // edge compilations emit no client stylesheet at all.

@@ -4364,7 +4364,11 @@
       "ufficio-chiaro": "Light office",
       "blu-istituzionale": "Institutional blue",
       "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "grafite": "Graphite",
+      "studio": "Studio",
+      "onde-blu": "Blue waves",
+      "aurora": "Aurora",
+      "luci-soffuse": "Soft lights"
     }
   },
   "garden": {

@@ -4364,7 +4364,11 @@
       "ufficio-chiaro": "Jasne biuro",
       "blu-istituzionale": "Niebieski instytucjonalny",
       "verde-salvia": "Szałwiowa zieleń",
-      "grafite": "Grafitowy"
+      "grafite": "Grafitowy",
+      "studio": "Studio",
+      "onde-blu": "Niebieskie fale",
+      "aurora": "Zorza",
+      "luci-soffuse": "Miękkie światła"
     }
   },
   "garden": {

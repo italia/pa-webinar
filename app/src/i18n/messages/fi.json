@@ -4364,7 +4364,11 @@
       "ufficio-chiaro": "Vaalea toimisto",
       "blu-istituzionale": "Virallinen sininen",
       "verde-salvia": "Salvianvihreä",
-      "grafite": "Grafiitti"
+      "grafite": "Grafiitti",
+      "studio": "Studio",
+      "onde-blu": "Siniset aallot",
+      "aurora": "Revontulet",
+      "luci-soffuse": "Pehmeät valot"
     }
   },
   "garden": {

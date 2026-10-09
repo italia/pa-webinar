@@ -341,9 +341,9 @@ The bundled track's source and license are recorded in
 
 ## Virtual backgrounds
 
-The backgrounds offered in the waiting room are a catalog in code (`SFONDI_VIRTUALI` in
-`app/src/lib/jitsi/virtual-background.ts`), not a runtime setting. They are abstract gradients
-bundled with the app. They follow the repository license, so no attribution is needed. To offer an
+The backgrounds offered in the waiting room, and in Jitsi's own backgrounds dialog inside the room,
+are a catalog in code (`SFONDI_VIRTUALI` in `app/src/lib/jitsi/virtual-background.ts`), not a runtime
+setting. They are abstract gradients and soft light effects bundled with the app. They follow the repository license, so no attribution is needed. To offer an
 organization's own backgrounds:
 
 1. add the images to the app;

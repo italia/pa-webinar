@@ -9,6 +9,7 @@ import {
   JITSI_SURFACE_STRONG,
   JITSI_TILE_BACKGROUND,
 } from '@/lib/jitsi/branding';
+import { SFONDI_VIRTUALI } from '@/lib/jitsi/virtual-background';
 
 const CORS_HEADERS = {
   'Cache-Control': 'public, s-maxage=300',
@@ -26,6 +27,14 @@ export async function OPTIONS() {
 
 export async function GET() {
   const settings = await getSettings();
+  // Gli sfondi della piattaforma nel pulsante degli sfondi di Jitsi, al posto
+  // delle foto predefinite: indirizzi assoluti, perché la conferenza sta su
+  // un'altra origine (che li legge grazie agli header CORS di next.config).
+  // Senza l'indirizzo pubblico del portale restano quelli di Jitsi.
+  const origine = appBaseUrl()?.origin;
+  const virtualBackgrounds = origine
+    ? SFONDI_VIRTUALI.flatMap((s) => (s.url ? [`${origine}${s.url}`] : []))
+    : undefined;
 
   return Response.json(
     {
@@ -55,6 +64,7 @@ export async function GET() {
       // compare nemmeno quello predefinito del server Jitsi.
       logoImageUrl: settings.jitsiWatermarkUrl || settings.logoUrl || '',
       avatarBackgrounds: JITSI_AVATAR_BACKGROUNDS,
+      ...(virtualBackgrounds ? { virtualBackgrounds } : {}),
       // Guardato: un NEXT_PUBLIC_APP_URL senza schema faceva 500 questa route.
       inviteDomain: appBaseUrl()?.hostname ?? '',
     },

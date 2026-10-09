@@ -378,6 +378,14 @@ boundary, `JitsiRoom` applies it with `setVirtualBackground`:
   background in storage the portal cannot reach;
 - a background changed later from Jitsi's own button is not overwritten when the camera is toggled.
 
+Jitsi's own backgrounds dialog offers the same catalog. The branding document lists its images as
+absolute URLs under `virtualBackgrounds`, which replaces Jitsi's stock photos; Jitsi downloads the
+chosen image with `fetch()` from the conference origin, so `app/next.config.ts` serves
+`/images/virtual-backgrounds/` with `Access-Control-Allow-Origin: *`. Without `NEXT_PUBLIC_APP_URL` the
+list is left out and Jitsi keeps its photos. Blur and uploading one's own image stay available there.
+Jitsi names a branded background only through its own translation keys, so in that dialog the
+platform's backgrounds have no tooltip or screen-reader name; the waiting room's picker names them.
+
 Blur is not available from outside the iframe (see [Limits of the boundary](#limits-of-the-boundary)).
 
 ### Reactions, whiteboard and instant calls
@@ -705,7 +713,9 @@ Building, bumping and verifying the image step by step is covered in
     separately. Jitsi's white text and icons keep a contrast of at least 4.5:1 on every one of these
     surfaces. The document also returns `avatarBackgrounds`, colors for initials avatars that stay
     readable on the blue; `logoImageUrl`, the watermark or logo an administrator set (**Watermark
-    URL**, then **Custom logo URL**), empty otherwise; and `logoClickUrl` and `inviteDomain`. The
+    URL**, then **Custom logo URL**), empty otherwise; `virtualBackgrounds`, the platform's
+    backgrounds as absolute URLs (see [Virtual backgrounds](#virtual-backgrounds)); and `logoClickUrl`
+    and `inviteDomain`. The
     colors are constants in `app/src/lib/jitsi/branding.ts`. Jitsi reads the document only when its
     web server points at it. In the chart, `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL` is `null`
     by default, because the chart does not know the portal's address: set it to the portal's own

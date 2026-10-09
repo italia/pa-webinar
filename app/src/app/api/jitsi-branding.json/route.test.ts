@@ -7,6 +7,7 @@ const impostazioni = vi.hoisted(() => ({
 vi.mock('@/lib/settings', () => ({ getSettings: async () => impostazioni.valore }));
 
 import { jitsiInterfaceConfigOverwrite } from '@/lib/jitsi/config';
+import { SFONDI_VIRTUALI } from '@/lib/jitsi/virtual-background';
 
 import { GET } from './route';
 
@@ -20,6 +21,26 @@ describe('GET /api/jitsi-branding.json', () => {
     expect(body.customTheme.palette.thumbnailBackground).toBe(body.customTheme.palette.ui02);
     // Nessun avatar con le iniziali dello stesso colore della scena.
     expect(body.avatarBackgrounds).not.toContain(body.backgroundColor);
+  });
+
+  it('gli sfondi della piattaforma, con indirizzi assoluti, nel pulsante degli sfondi di Jitsi', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://webinar.ente.example/');
+    try {
+      const body = await (await GET()).json();
+      const attesi = SFONDI_VIRTUALI.filter((s) => s.url).map((s) => `https://webinar.ente.example${s.url}`);
+      expect(body.virtualBackgrounds).toEqual(attesi);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('senza l’indirizzo pubblico del portale, restano gli sfondi di Jitsi', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
+    try {
+      expect('virtualBackgrounds' in (await (await GET()).json())).toBe(false);
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it('senza un logo scelto, nessun logo: nemmeno quello predefinito del server Jitsi', async () => {

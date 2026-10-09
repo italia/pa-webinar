@@ -36,6 +36,10 @@ export const SFONDI_VIRTUALI: readonly SfondoVirtuale[] = [
   { id: 'blu-istituzionale', url: '/images/virtual-backgrounds/blu-istituzionale.jpg' },
   { id: 'verde-salvia', url: '/images/virtual-backgrounds/verde-salvia.jpg' },
   { id: 'grafite', url: '/images/virtual-backgrounds/grafite.jpg' },
+  { id: 'studio', url: '/images/virtual-backgrounds/studio.jpg' },
+  { id: 'onde-blu', url: '/images/virtual-backgrounds/onde-blu.jpg' },
+  { id: 'aurora', url: '/images/virtual-backgrounds/aurora.jpg' },
+  { id: 'luci-soffuse', url: '/images/virtual-backgrounds/luci-soffuse.jpg' },
 ] as const;
 
 export const SFONDO_PREDEFINITO = 'nessuno';
