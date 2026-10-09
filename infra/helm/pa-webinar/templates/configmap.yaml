@@ -81,4 +81,12 @@ data:
   JICOFO_HEALTH_URL: {{ include "pa-webinar.jicofoHealthUrl" . | quote }}
   {{- end }}
   {{- end }}
+  {{- /*
+    Il servizio dei sottotitoli live (templates/captions.yaml): il portale ne
+    legge lo stato per la pagina di stato e, dalla presenza della variabile,
+    sa che i sottotitoli sono installati.
+  */}}
+  {{- if and (include "pa-webinar.captionsEnabled" .) (not (hasKey $env "CAPTIONS_STATUS_URL")) }}
+  CAPTIONS_STATUS_URL: {{ include "pa-webinar.captionsStatusUrl" . | quote }}
+  {{- end }}
 {{- include "pa-webinar.validateJitsiRoles" . }}

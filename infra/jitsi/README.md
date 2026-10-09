@@ -10,6 +10,7 @@ pieces sit on the Jitsi boundary.
 |---|---|---|
 | `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | The Docker Compose stack, from this folder, and the Helm chart, from an identical copy in `infra/helm/pa-webinar/files/prosody-plugins/` |
 | `prosody-plugins/mod_pa_media_lock.lua` | A Prosody MUC module that switches on Jitsi's audio, video and screen-share moderation when the event does not grant them to participants | The same two places, the same way |
+| `prosody-plugins/mod_pa_captions.lua` | A Prosody MUC module that marks every new room as open to bridge transcription, for live captions | The same two places, the same way |
 | `jibri-finalize.sh` | A standalone Jibri finalize script | Nothing in the repository. The chart ships a different script, `infra/helm/pa-webinar/files/jibri-finalize.sh` |
 | `web/custom-interface_config.js`, `web/custom-config.js` | Interface and config overrides that hide the Jitsi logo and links over the call | The Docker Compose stack, which mounts them into the `jitsi-web` container; the image appends them to the configuration it generates at startup. On Kubernetes the same settings go in the web component's custom configs of the deployment values |
 
@@ -92,13 +93,13 @@ The module logs every switch-on, admission and removal at `info` level.
 
 **Docker Compose.** `docker-compose.yml` mounts `infra/jitsi/prosody-plugins/` read-only at
 `/prosody-plugins-custom` in the `prosody` service and sets
-`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock`. On the `jicofo` service it
+`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions`. On the `jicofo` service it
 turns off Jicofo's authentication (`JICOFO_ENABLE_AUTH=false`) and the auto-owner rule
 (`ENABLE_AUTO_OWNER=false`), as the chart does.
 
 **Helm chart.** The chart's `values.yaml` sets the wiring by default, on every profile:
 
-- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock`;
+- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions`;
 - `jitsi-meet.prosody.extraVolumes` and `extraVolumeMounts`, which mount the ConfigMap
   `pa-webinar-prosody-plugins` at `/prosody-plugins-custom`. The chart renders that ConfigMap from its
   copies of the modules in `infra/helm/pa-webinar/files/prosody-plugins/`;
@@ -134,6 +135,30 @@ from the direct invite link:
 
 Recording was not part of the check: the simple profile has no Jibri. Jibri starts a recording only for
 a moderator, and the portal moderator is one.
+
+## The live captions module
+
+`mod_pa_captions` makes rooms eligible for Jitsi's bridge transcription, which the live captions
+service in `infra/captions/` uses. It acts only when Prosody's environment has
+`PA_CAPTIONS_ENABLED=true`; otherwise it logs that captions are off and does nothing.
+
+On `muc-room-created`, at priority -2 (after the stock room metadata component creates the room's
+metadata), it writes two keys into the metadata of every room except the health-check room:
+
+| Key | Why |
+|---|---|
+| `asyncTranscription: true` | Jicofo asks the bridge to stream audio to the transcription service only for rooms that carry it. Recent Jitsi versions refuse this key when a client sets it, moderators included, so only a server module can |
+| `transcription.urlParams.room` | The room name. From `stable-10978` Jicofo appends these parameters to the transcription WebSocket address, so the captions service knows which event the audio belongs to and asks the portal for its language and vocabulary. Earlier versions ignore it, and the service falls back to its default language |
+
+The metadata alone transcribes nothing: transcription starts when a moderator turns captions on in the
+room (`recording.isTranscribingEnabled`), and stops when they turn them off.
+
+The module is wired like the other two. With the Helm chart, `global.captions.enabled` sets
+`PA_CAPTIONS_ENABLED` for Prosody and, for Jicofo, the transcription address
+(`jicofo.transcription.url-template`, passed as a JVM option in `JAVA_TOOL_OPTIONS`), and renders the
+captions service; the render stops when captions are on and `XMPP_MUC_MODULES` lacks `pa_captions`. In
+Docker Compose the same settings come from the `CAPTIONS_*` variables described in `.env.example`, with
+the `captions` profile.
 
 ## The Jibri finalize scripts
 

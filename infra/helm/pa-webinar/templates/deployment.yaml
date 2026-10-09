@@ -6,6 +6,7 @@
 {{- include "pa-webinar.validateSite" . }}
 {{- include "pa-webinar.validateConferenceIngress" . }}
 {{- include "pa-webinar.validateBackup" . }}
+{{- include "pa-webinar.validateCaptions" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

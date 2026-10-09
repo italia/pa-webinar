@@ -520,6 +520,16 @@ networkPolicy:
     httpsExcept:
       - 169.254.0.0/16
 
+  # I pod dei sottotitoli live (global.captions) hanno una policy propria,
+  # `<fullname>-captions`: entrano i bridge e il portale sulla 8080, escono
+  # DNS, il portale e HTTPS (lo scaricamento del modello, con le eccezioni di
+  # egress.httpsExcept). Regole in più, aggiunte così come sono scritte: per
+  # esempio un mirror del modello dentro il cluster, o un bridge in
+  # hostNetwork, che arriva con l'indirizzo del nodo (ipBlock).
+  captions:
+    extraIngressRules: []
+    extraEgressRules: []
+
 # ── ServiceAccount ───────────────────────────────────────────
 
 serviceAccount:
@@ -952,8 +962,14 @@ jitsi-meet:
       # `jicofo.extraEnvs` più sotto. `pa_media_lock`, anch'esso del progetto,
       # blocca sul bridge microfono, videocamera e schermo dei partecipanti
       # quando l'evento non li concede: senza, il limite vive solo nella barra
-      # della sala. Per aggiungere moduli, tieni questi tre.
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock
+      # della sala. `pa_captions`, del progetto, rende le stanze trascrivibili
+      # per i sottotitoli live (global.captions): con i sottotitoli spenti il
+      # modulo resta caricato e non fa niente. Per aggiungere moduli, tieni
+      # questi quattro.
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions
+      # Accende pa_captions. Segue global.captions.enabled: è il sottochart a
+      # rendere questo valore, e vede solo `global`.
+      PA_CAPTIONS_ENABLED: '{{ if dig "captions" "enabled" false (.Values.global | default dict) }}true{{ else }}false{{ end }}'
     # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
     # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
     # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se
@@ -1004,6 +1020,18 @@ jitsi-meet:
     extraEnvs:
       JICOFO_ENABLE_AUTH: "false"
       ENABLE_AUTO_OWNER: "false"
+      # Sottotitoli live (global.captions): l'indirizzo del servizio a cui il
+      # bridge manda l'audio quando un moderatore li accende, e il segreto
+      # che presenta nell'header X-Captions-Token. L'immagine di Jicofo non
+      # ha variabili per queste chiavi, e un file in sola lettura montato in
+      # /config la blocca all'avvio: passano come proprietà della JVM, che
+      # legge JAVA_TOOL_OPTIONS da sola. Le opzioni sono separate da spazi,
+      # quindi nessun valore può contenerne. Il valore passa da `tpl` nel
+      # sottochart: `{{MEETING_ID}}` va scritto con le virgolette qui sotto
+      # perché arrivi letterale a Jicofo, che lo sostituisce. Il Service
+      # `<release>-captions` è quello di templates/captions.yaml. Con i
+      # sottotitoli spenti il valore è vuoto.
+      JAVA_TOOL_OPTIONS: '{{ $c := dig "captions" dict (.Values.global | default dict) | default dict }}{{ if dig "enabled" false $c }}-Djicofo.transcription.url-template=ws://{{ .Release.Name }}-captions:8080/transcribe/{{ "{{" }}MEETING_ID{{ "}}" }}{{ with dig "bridgeToken" "" $c }} -Djicofo.transcription.http-headers.X-Captions-Token={{ . }}{{ end }}{{ end }}'
     # Solo richieste, nessun limite: senza, lo scheduler non vede Jicofo e,
     # quando il nodo resta senza memoria, Jicofo, Prosody e la parte web sono
     # i primi processi uccisi, e la conferenza cade. Valori misurati a riposo
@@ -1192,6 +1220,118 @@ jitsi-meet:
         - secretName: jitsi-tls
           hosts:
             - jitsi.videocall.example.com
+
+# ── Sottotitoli live ─────────────────────────────────────────
+# Trascrizione in diretta di chi parla, sullo schermo di chi segue. È la
+# trascrizione "dal bridge" di Jitsi: quando un moderatore accende i
+# sottotitoli dalla sala, Jicofo chiede al bridge di mandare l'audio di ogni
+# voce al servizio `<release>-captions`, che lo trascrive con un modello
+# locale e rimanda il testo. L'audio non esce dal cluster: il modello si
+# scarica all'avvio del pod e gira sulla CPU, senza GPU.
+#
+# Il servizio è un pod con due contenitori: il gateway (riceve l'audio dal
+# bridge, chiede al portale lingua e vocabolario dell'evento, rimanda il
+# testo) e il motore (NeMo-Speech.cpp), che ascolta solo su 127.0.0.1 e lo
+# raggiunge solo il gateway. Si rende solo con la conferenza del chart
+# (jitsi.enabled).
+#
+# Con lo scaler dei bridge (jitsi.mode=full e jvbScaler.enabled) le repliche
+# le porta lo scaler, quando il portale le indica nella sua risposta
+# (`captionsDesired`): il chart non le scrive, e all'installazione sono una.
+# Senza scaler resta una replica sempre accesa.
+#
+# L'aggiornamento che accende o spegne i sottotitoli cambia la configurazione
+# di Prosody e di Jicofo, che ripartono: va fatto a sale vuote, come ogni
+# cambio della conferenza. Un aggiornamento con --reuse-values da una
+# versione precedente non prende questi valori predefiniti, e i sottotitoli
+# restano spenti finché non li passi.
+global:
+  captions:
+    # Unico interruttore. Lo leggono questo chart (il servizio, l'indirizzo
+    # per il portale, le NetworkPolicy) e il sottochart della conferenza (il
+    # modulo di Prosody, l'indirizzo in Jicofo), che dei valori di questo
+    # chart vede solo `global`.
+    enabled: true
+    # Segreto condiviso fra Jicofo e il gateway: il bridge lo presenta
+    # nell'header X-Captions-Token quando apre la connessione. Vuoto = il
+    # gateway accetta ogni connessione (e lo scrive nel log), e a filtrare
+    # resta la NetworkPolicy. Solo lettere, cifre e `._~+/=-`: viaggia fra le
+    # opzioni della JVM di Jicofo, separate da spazi. Finisce nel ConfigMap di
+    # Jicofo, non in un Secret: tiene fuori gli altri pod del cluster, non chi
+    # legge i ConfigMap del namespace. Per generarlo: openssl rand -hex 24
+    bridgeToken: ""
+
+captions:
+  gateway:
+    # Vuoto: `<app.image.repository>-captions-gateway` con il tag dell'app.
+    image: ""
+    imagePullPolicy: IfNotPresent
+    # Il gateway decodifica l'audio e smista testo: poco, anche con tutte le
+    # voci attive. Il lavoro pesante è del motore.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  engine:
+    # Vuoto: `<app.image.repository>-captions-engine` con il tag dell'app.
+    # La stessa immagine scarica il modello (initContainer).
+    image: ""
+    imagePullPolicy: IfNotPresent
+    # Thread di calcolo del motore. Con 4 thread e blocchi da 320 ms il banco
+    # di prova (infra/captions/bench) regge circa quattro voci insieme in
+    # tempo reale. Oltre, il gateway si protegge da solo: prima riduce le voci
+    # trascritte, poi, se il ritardo continua a crescere, sospende la
+    # trascrizione e riprova dopo una pausa. Il limite di CPU qui sotto va
+    # tenuto almeno pari ai thread.
+    threads: 4
+    # Contesto destro del modello, in passi da 80 ms: 3 vuol dire blocchi da
+    # 320 ms. Più alto, il testo è più preciso ma arriva più tardi; più basso,
+    # il contrario. Valori ammessi: 0, 1, 3, 6, 13.
+    rightContext: 3
+    # Il modello resta tutto in memoria, e la CPU sale con le voci attive fino
+    # ai thread. Un limite di CPU sotto i thread rallenta ogni voce invece di
+    # rifiutarne qualcuna.
+    resources:
+      requests:
+        cpu: "1"
+        memory: 1500Mi
+      limits:
+        cpu: "4"
+        memory: 2Gi
+  # Il modello, scaricato a ogni avvio del pod in un volume temporaneo (circa
+  # 750 MB) e verificato con l'impronta: un'impronta diversa ferma il pod
+  # prima che il motore parta. L'indirizzo è a revisione fissa su Hugging
+  # Face; senza accesso a Internet, un mirror interno con lo stesso file
+  # (stessa impronta). Lo scaricamento è l'unico motivo per cui il pod esce
+  # sulla porta 443.
+  model:
+    url: "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/resolve/ea30d66debe3740a08b573244286791d423d6b3e/nemotron-3.5-asr-streaming-0.6b.q8_0.gguf"
+    sha256: "3fc991d3badad7277c11030a7519832cddaf2057aafed6d4b25147e953a070b1"
+  # Il volume dove scaricare il modello, come voce `volumes` di un pod senza
+  # nome (es. `persistentVolumeClaim: { claimName: captions-model }`). Vuoto:
+  # un volume temporaneo, e il modello si riscarica a ogni avvio, cioè a ogni
+  # evento quando lo scaler spegne il servizio fra un evento e l'altro. Con un
+  # volume persistente il pod si aggiorna fermando prima il vecchio
+  # (strategia Recreate), perché di solito il volume si monta da un pod alla
+  # volta.
+  modelVolume: {}
+  # Voci trascritte insieme al massimo: oltre, le meno recenti restano senza
+  # sottotitoli. Dimensiona anche il motore (una sessione per voce), quindi
+  # va tenuto vicino ai thread.
+  maxStreams: 4
+  # Lingua di chi parla quando il portale non ne indica una per l'evento.
+  language: it-IT
+  # Peso del vocabolario dell'evento (glossario, relatori, ente). Sopra 1 il
+  # motore comincia a scrivere termini che nessuno ha detto.
+  boost: 0.5
+  # Vuoti: quelli dell'app. Mentre qualcuno parla il motore usa la CPU di
+  # continuo: non metterlo sui nodi dei bridge, che hanno la precedenza (un
+  # pacchetto audio perso pesa più di un sottotitolo in ritardo).
+  nodeSelector: {}
+  tolerations: []
 
 # ── Registrazione composita (Jibri) ──────────────────────────
 # Non esiste un blocco `recording:` in questo chart: nessun template lo

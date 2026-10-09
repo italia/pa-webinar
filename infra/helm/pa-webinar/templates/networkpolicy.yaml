@@ -27,8 +27,10 @@
 # do the Jibri pods when Jibri is enabled (end-of-recording upload).
 #
 # Egress is limited to DNS, PostgreSQL, Redis, the in-cluster Jitsi
-# components, the recorder controller, the ingress controller (for the
-# portal's own public hostnames), SMTP and HTTPS.
+# components, the recorder controller, the live captions service, the
+# ingress controller (for the portal's own public hostnames), SMTP and
+# HTTPS. The captions pods carry their own labels and have their own policy
+# (at the end of this file).
 #
 # CNI requirement: the cluster must enforce NetworkPolicy (Azure NPM,
 # Calico or Cilium on AKS, Dataplane V2 on GKE, the VPC CNI network
@@ -102,6 +104,18 @@ spec:
         - protocol: TCP
           port: {{ $appPort }}
     {{- end }}
+    {{- if include "pa-webinar.captionsEnabled" . }}
+    # Il servizio dei sottotitoli chiede al portale lingua e vocabolario
+    # della stanza (CAPTIONS_CONTEXT_URL). I suoi pod hanno etichette
+    # proprie: la regola qui sopra, sui pod della release, non li comprende.
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.captionsSelectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    {{- end }}
     {{- if $np.ingress.allowMonitoring }}
     # Prometheus scrape (ServiceMonitor). The metrics endpoint is
     # auth-gated at the application layer.
@@ -164,6 +178,17 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.recorder.controller.port | default 8080 }}
+    {{- end }}
+    {{- if include "pa-webinar.captionsEnabled" . }}
+    # Il servizio dei sottotitoli: il portale ne legge lo stato
+    # (CAPTIONS_STATUS_URL).
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.captionsSelectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 8080
     {{- end }}
     {{- $ic := $np.egress.ingressController | default dict }}
     {{- if and (dig "enabled" false $ic) $np.ingress.fromNamespaceSelectors (dig "ports" list $ic) }}
@@ -289,5 +314,95 @@ spec:
       ports:
         - protocol: TCP
           port: 2222
+{{- end }}
+{{- if include "pa-webinar.captionsEnabled" . }}
+---
+# ─────────────────────────────────────────────────────────────
+# Pod dei sottotitoli live (templates/captions.yaml).
+#
+# Entrano solo i bridge della release, che mandano l'audio, e il portale, che
+# legge lo stato: entrambi sulla 8080. Il motore ascolta su 127.0.0.1 e non
+# riceve niente da fuori del pod. Escono verso DNS, il portale (lingua e
+# vocabolario della stanza) e HTTPS, per scaricare il modello all'avvio.
+#
+# I bridge sono riconosciuti dalle etichette del sottochart: un bridge in
+# hostNetwork (jitsi-meet.jvb.useHostNetwork) si presenta con l'indirizzo
+# del nodo, che nessun selettore di pod riconosce, e va ammesso con una
+# regola ipBlock in networkPolicy.captions.extraIngressRules.
+# ─────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-captions
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: captions
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "pa-webinar.captionsSelectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ (dig "nameOverride" "" $jm | default "jitsi-meet") | trunc 63 | trimSuffix "-" | quote }}
+              app.kubernetes.io/instance: {{ .Release.Name | quote }}
+              app.kubernetes.io/component: jvb
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.selectorLabels" . | nindent 14 }}
+              {{- if $componente }}
+              app.kubernetes.io/component: {{ $componente | quote }}
+              {{- else }}
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: DoesNotExist
+              {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8080
+    {{- with (dig "captions" "extraIngressRules" list $np | default list) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  egress:
+    - to:
+        {{- toYaml (dig "dns" "to" list $np.egress) | nindent 8 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.selectorLabels" . | nindent 14 }}
+              {{- if $componente }}
+              app.kubernetes.io/component: {{ $componente | quote }}
+              {{- else }}
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: DoesNotExist
+              {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    # Lo scaricamento del modello (captions.model.url). Un mirror nel cluster
+    # o su un'altra porta: networkPolicy.captions.extraEgressRules.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            {{- with $np.egress.httpsExcept }}
+            except:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- with (dig "captions" "extraEgressRules" list $np | default list) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}
 {{- end }}

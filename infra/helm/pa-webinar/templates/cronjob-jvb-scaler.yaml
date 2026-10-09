@@ -234,6 +234,19 @@ spec:
                     JIBRI_PARAM="&jibriReplicas=${JIBRI_CURRENT}"
                   fi
 
+                  # ── Sottotitoli live: deployment e repliche ──
+                  # Si legge prima della chiamata e si scala dopo, come Jibri.
+                  # Assente se i sottotitoli sono spenti (global.captions).
+                  CAPTIONS_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
+                    -l "app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=captions" \
+                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                  CAPTIONS_CURRENT=""
+                  if [ -n "$CAPTIONS_DEPLOY" ]; then
+                    CAPTIONS_CURRENT=$(kubectl get deployment "$CAPTIONS_DEPLOY" \
+                      -n {{ .Release.Namespace }} -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+                    CAPTIONS_CURRENT=${CAPTIONS_CURRENT:-0}
+                  fi
+
                   # ── Phase 1: Predictive — query the app API ───────
                   # Forward spec/ready replica counts + aggregated traffic so the
                   # API persists an authoritative snapshot to Redis. The public
@@ -281,6 +294,26 @@ spec:
                       fi
                     else
                       log "Jibri: deployment/statefulset not found — skipping"
+                    fi
+                  fi
+
+                  # ── Sottotitoli live ───────────────────────────────
+                  # Solo se il portale lo indica: un portale che non conosce
+                  # captionsDesired lascia il servizio come l'ha messo il chart.
+                  CAPTIONS_DESIRED=$(echo "$RESPONSE" | grep -o '"captionsDesired":[0-9]*' | grep -o '[0-9]*' || echo "")
+                  # Con i sottotitoli spenti il Deployment non c'è, e la richiesta
+                  # di zero repliche non va segnalata a ogni giro.
+                  if [ -n "$CAPTIONS_DESIRED" ]; then
+                    if [ -n "$CAPTIONS_DEPLOY" ]; then
+                      if [ "$CAPTIONS_DESIRED" != "$CAPTIONS_CURRENT" ]; then
+                        log "Scaling captions ($CAPTIONS_DEPLOY) from $CAPTIONS_CURRENT to $CAPTIONS_DESIRED"
+                        kubectl scale deployment "$CAPTIONS_DEPLOY" \
+                          -n {{ .Release.Namespace }} --replicas="$CAPTIONS_DESIRED"
+                      else
+                        log "Captions: no change ($CAPTIONS_CURRENT replicas)"
+                      fi
+                    elif [ "$CAPTIONS_DESIRED" != "0" ]; then
+                      log "Captions: $CAPTIONS_DESIRED replicas requested but no deployment found (global.captions.enabled?) — skipping"
                     fi
                   fi
               env:
