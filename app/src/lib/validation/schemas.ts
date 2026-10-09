@@ -543,6 +543,8 @@ export const questionItemSchema = z.object({
 export const createQuestionTemplateSchema = z.object({
   name: z.string().min(2).max(120),
   description: z.string().max(500).nullable().optional(),
+  /** Dove il modello si propone: null = prima e dopo l'evento. */
+  usage: z.enum(QUESTIONNAIRE_PLACEMENTS).nullable().optional(),
   sortOrder: z.number().int().min(0).default(0),
   items: z.array(questionItemSchema).default([]),
 });

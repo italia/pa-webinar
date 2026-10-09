@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Spara utkast och gå till enkäthantering",
         "none": "— Ingen —",
         "staffOnly": "Enkäter och material hanteras av evenemangets personal: med moderatorlänken ser du dem på evenemangets sida.",
-        "postDefaultHint": "Om du inte väljer något erbjuds enkäten ”{name}” efter evenemanget."
+        "postDefaultHint": "Om du inte väljer något erbjuds enkäten ”{name}” efter evenemanget.",
+        "preHelp": "Frågor till dem som anmäler sig, före evenemanget: profil, förväntningar, ämnen. Det är inte återkopplingen.",
+        "postHelp": "Återkopplingen i slutet av evenemanget: hur det gick, kvalitet, innehåll.",
+        "templatesNoneForMoment": "Ingen mall för det här tillfället: bibliotekets mallar är för det andra. Lägg till frågorna för det här evenemanget nedan."
       },
       "step5": {
         "heading": "Sammanfattning och publicering",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Ta bort mall",
       "deleteMessage": "Ta bort ”{name}”? Enkäter som använder den: {count}.",
       "invalid": "Enkäten är ogiltig: varje fråga behöver sin italienska text och en flervalsfråga minst två alternativ.",
-      "inUse": "Mallen används fortfarande av enkäter: ta bort den från dem innan du tar bort den."
+      "inUse": "Mallen används fortfarande av enkäter: ta bort den från dem innan du tar bort den.",
+      "usage": "När den erbjuds",
+      "usagePost": "Efter evenemanget (återkoppling)",
+      "usagePre": "Före evenemanget (anmälan)",
+      "usageAny": "Före och efter evenemanget",
+      "usageHelp": "Mallen erbjuds bara i enkäten för det tillfället: återkoppling är meningsfull efter evenemanget, frågor om deltagarna vid anmälan.",
+      "usagePostShort": "Efter evenemanget",
+      "usagePreShort": "Vid anmälan",
+      "usageAnyShort": "Före och efter",
+      "usageSystem": "Det är systemets mall för återkoppling: den erbjuds alltid efter evenemanget."
     },
     "videoPlayer": {
       "unavailable": "Videon är inte tillgänglig",

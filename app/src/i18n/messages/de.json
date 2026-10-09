@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Entwurf speichern und zur Fragebogen-Verwaltung",
         "none": "— Keiner —",
         "staffOnly": "Fragebögen und Materialien verwaltet das Team der Veranstaltung: Mit dem Moderationslink sehen Sie sie auf der Seite der Veranstaltung.",
-        "postDefaultHint": "Wenn Sie nichts auswählen, wird nach der Veranstaltung der Fragebogen „{name}“ angeboten."
+        "postDefaultHint": "Wenn Sie nichts auswählen, wird nach der Veranstaltung der Fragebogen „{name}“ angeboten.",
+        "preHelp": "Fragen an die Anmeldenden vor der Veranstaltung: Profil, Erwartungen, gewünschte Themen. Das ist nicht das Feedback.",
+        "postHelp": "Das Feedback am Ende der Veranstaltung: wie es lief, Qualität, Inhalte.",
+        "templatesNoneForMoment": "Keine Vorlage für diesen Zeitpunkt: Die Vorlagen der Bibliothek sind für den anderen. Fügen Sie die Fragen für diese Veranstaltung unten hinzu."
       },
       "step5": {
         "heading": "Übersicht und Veröffentlichung",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Vorlage löschen",
       "deleteMessage": "„{name}“ löschen? Fragebögen, die sie verwenden: {count}.",
       "invalid": "Der Fragebogen ist ungültig: Jede Frage braucht ihren italienischen Text und eine Auswahlfrage mindestens zwei Optionen.",
-      "inUse": "Die Vorlage wird noch von Fragebögen verwendet: Entfernen Sie sie dort, bevor Sie sie löschen."
+      "inUse": "Die Vorlage wird noch von Fragebögen verwendet: Entfernen Sie sie dort, bevor Sie sie löschen.",
+      "usage": "Wann sie angeboten wird",
+      "usagePost": "Nach der Veranstaltung (Feedback)",
+      "usagePre": "Vor der Veranstaltung (Anmeldung)",
+      "usageAny": "Vor und nach der Veranstaltung",
+      "usageHelp": "Die Vorlage wird nur im Fragebogen für diesen Zeitpunkt angeboten: Feedback ist nach der Veranstaltung sinnvoll, Fragen zu den Teilnehmenden bei der Anmeldung.",
+      "usagePostShort": "Nach der Veranstaltung",
+      "usagePreShort": "Bei der Anmeldung",
+      "usageAnyShort": "Vorher und nachher",
+      "usageSystem": "Das ist die Feedback-Vorlage des Systems: Sie wird immer nach der Veranstaltung angeboten."
     },
     "videoPlayer": {
       "unavailable": "Video nicht verfügbar",

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Save draft and go to questionnaire management",
         "none": "— None —",
         "staffOnly": "Questionnaires and materials are managed by the event staff: with the moderator link you can see them on the event page.",
-        "postDefaultHint": "If you choose nothing, the “{name}” questionnaire is offered after the event."
+        "postDefaultHint": "If you choose nothing, the “{name}” questionnaire is offered after the event.",
+        "preHelp": "Questions for people registering, before the event: profile, expectations, topics to cover. This is not the feedback.",
+        "postHelp": "The feedback, asked at the end of the event: how it went, quality, content.",
+        "templatesNoneForMoment": "No template for this moment: the library's templates are for the other one. Add the questions for this event below."
       },
       "step5": {
         "heading": "Review and publish",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Delete template",
       "deleteMessage": "Delete “{name}”? Questionnaires using it: {count}.",
       "invalid": "The questionnaire is not valid: each question needs its Italian text and, for a choice question, at least two options.",
-      "inUse": "The template is still used by some questionnaires: remove it from them before deleting it."
+      "inUse": "The template is still used by some questionnaires: remove it from them before deleting it.",
+      "usage": "When it is offered",
+      "usagePost": "After the event (feedback)",
+      "usagePre": "Before the event (registration)",
+      "usageAny": "Before and after the event",
+      "usageHelp": "The template is offered only in the questionnaire for that moment: feedback makes sense after the event, questions about participants at registration.",
+      "usagePostShort": "After the event",
+      "usagePreShort": "At registration",
+      "usageAnyShort": "Before and after",
+      "usageSystem": "This is the system feedback template: it is always offered after the event."
     },
     "videoPlayer": {
       "unavailable": "Video unavailable",

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Salvați ciorna și mergeți la gestionarea chestionarelor",
         "none": "— Niciunul —",
         "staffOnly": "Chestionarele și materialele sunt gestionate de echipa evenimentului: cu linkul de moderator le vedeți pe pagina evenimentului.",
-        "postDefaultHint": "Dacă nu alegeți nimic, după eveniment se propune chestionarul „{name}”."
+        "postDefaultHint": "Dacă nu alegeți nimic, după eveniment se propune chestionarul „{name}”.",
+        "preHelp": "Întrebări pentru cei care se înscriu, înainte de eveniment: profil, așteptări, teme. Nu este feedbackul.",
+        "postHelp": "Feedbackul, cerut la sfârșitul evenimentului: cum a fost, calitatea, conținutul.",
+        "templatesNoneForMoment": "Niciun șablon pentru acest moment: cele din bibliotecă sunt pentru celălalt. Adaugă mai jos întrebările pentru acest eveniment."
       },
       "step5": {
         "heading": "Rezumat și publicare",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Ștergeți șablonul",
       "deleteMessage": "Ștergeți „{name}”? Chestionare care îl folosesc: {count}.",
       "invalid": "Chestionarul nu este valid: fiecare întrebare are nevoie de textul în italiană și, dacă este cu variante, de cel puțin două opțiuni.",
-      "inUse": "Șablonul este încă folosit de unele chestionare: eliminați-l din ele înainte de a-l șterge."
+      "inUse": "Șablonul este încă folosit de unele chestionare: eliminați-l din ele înainte de a-l șterge.",
+      "usage": "Când este propus",
+      "usagePost": "După eveniment (feedback)",
+      "usagePre": "Înainte de eveniment (înscriere)",
+      "usageAny": "Înainte și după eveniment",
+      "usageHelp": "Șablonul este propus doar în chestionarul acelui moment: feedbackul are sens după eveniment, întrebările despre participanți la înscriere.",
+      "usagePostShort": "După eveniment",
+      "usagePreShort": "La înscriere",
+      "usageAnyShort": "Înainte și după",
+      "usageSystem": "Este șablonul de feedback al sistemului: se propune întotdeauna după eveniment."
     },
     "videoPlayer": {
       "unavailable": "Videoclip indisponibil",

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Įrašyti juodraštį ir eiti į klausimynų valdymą",
         "none": "— Nė vieno —",
         "staffOnly": "Klausimynus ir medžiagą tvarko renginio komanda: su moderatoriaus nuoroda juos matote renginio puslapyje.",
-        "postDefaultHint": "Jei nieko nepasirinksite, po renginio bus pasiūlytas klausimynas „{name}“."
+        "postDefaultHint": "Jei nieko nepasirinksite, po renginio bus pasiūlytas klausimynas „{name}“.",
+        "preHelp": "Klausimai besiregistruojantiems prieš renginį: profilis, lūkesčiai, temos. Tai ne atsiliepimai.",
+        "postHelp": "Atsiliepimai renginio pabaigoje: kaip sekėsi, kokybė, turinys.",
+        "templatesNoneForMoment": "Šiam momentui šablono nėra: bibliotekos šablonai skirti kitam. Šio renginio klausimus pridėkite žemiau."
       },
       "step5": {
         "heading": "Santrauka ir paskelbimas",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Ištrinti šabloną",
       "deleteMessage": "Ištrinti „{name}“? Jį naudojantys klausimynai: {count}.",
       "invalid": "Klausimynas netinkamas: kiekvienam klausimui reikia teksto italų kalba, o pasirinkimo klausimui – bent dviejų parinkčių.",
-      "inUse": "Šabloną dar naudoja klausimynai: prieš ištrindami pašalinkite jį iš jų."
+      "inUse": "Šabloną dar naudoja klausimynai: prieš ištrindami pašalinkite jį iš jų.",
+      "usage": "Kada siūloma",
+      "usagePost": "Po renginio (atsiliepimai)",
+      "usagePre": "Prieš renginį (registracija)",
+      "usageAny": "Prieš renginį ir po jo",
+      "usageHelp": "Šablonas siūlomas tik to momento klausimyne: atsiliepimai prasmingi po renginio, klausimai apie dalyvius – registruojantis.",
+      "usagePostShort": "Po renginio",
+      "usagePreShort": "Registruojantis",
+      "usageAnyShort": "Prieš ir po",
+      "usageSystem": "Tai sistemos atsiliepimų šablonas: jis visada siūlomas po renginio."
     },
     "videoPlayer": {
       "unavailable": "Vaizdo įrašas nepasiekiamas",

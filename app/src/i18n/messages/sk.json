@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Uložiť koncept a prejsť na správu dotazníkov",
         "none": "— Žiadny —",
         "staffOnly": "Dotazníky a materiály spravuje tím udalosti: s odkazom moderátora ich uvidíte na stránke udalosti.",
-        "postDefaultHint": "Ak nič nevyberiete, po udalosti sa ponúkne dotazník „{name}“."
+        "postDefaultHint": "Ak nič nevyberiete, po udalosti sa ponúkne dotazník „{name}“.",
+        "preHelp": "Otázky pre registrujúcich sa pred podujatím: profil, očakávania, témy. Nejde o spätnú väzbu.",
+        "postHelp": "Spätná väzba na konci podujatia: ako prebehlo, kvalita, obsah.",
+        "templatesNoneForMoment": "Pre tento okamih nie je žiadna šablóna: šablóny v knižnici sú pre ten druhý. Otázky pre toto podujatie pridajte nižšie."
       },
       "step5": {
         "heading": "Súhrn a zverejnenie",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Zmazať šablónu",
       "deleteMessage": "Zmazať „{name}“? Dotazníky, ktoré ju používajú: {count}.",
       "invalid": "Dotazník nie je platný: každá otázka potrebuje text v taliančine a otázka s výberom aspoň dve možnosti.",
-      "inUse": "Šablónu ešte používajú niektoré dotazníky: pred zmazaním ju z nich odstráňte."
+      "inUse": "Šablónu ešte používajú niektoré dotazníky: pred zmazaním ju z nich odstráňte.",
+      "usage": "Kedy sa ponúka",
+      "usagePost": "Po podujatí (spätná väzba)",
+      "usagePre": "Pred podujatím (registrácia)",
+      "usageAny": "Pred podujatím aj po ňom",
+      "usageHelp": "Šablóna sa ponúka len v dotazníku pre daný okamih: spätná väzba má zmysel po podujatí, otázky o účastníkoch pri registrácii.",
+      "usagePostShort": "Po podujatí",
+      "usagePreShort": "Pri registrácii",
+      "usageAnyShort": "Pred aj po",
+      "usageSystem": "Je to systémová šablóna spätnej väzby: ponúka sa vždy po podujatí."
     },
     "videoPlayer": {
       "unavailable": "Video nie je k dispozícii",

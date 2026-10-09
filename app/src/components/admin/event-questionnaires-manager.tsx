@@ -16,8 +16,14 @@ import { useTranslations } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import {
+  USAGE_SHORT_KEY,
+  isForOtherMoment,
+  templatesFor,
+  type QuestionnaireMoment,
+} from '@/lib/questionnaires/template-usage';
 
-type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
+type Placement = QuestionnaireMoment;
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
@@ -48,6 +54,7 @@ interface TemplateOption {
   id: string;
   name: string;
   itemCount: number;
+  usage: QuestionnaireMoment | null;
 }
 
 interface PlacementState {
@@ -62,6 +69,9 @@ interface PlacementState {
   required: boolean;
   allowEdit: boolean;
   selectedTemplateIds: string[];
+  /** I modelli salvati all'ultimo caricamento: restano in elenco anche se
+   *  sono per l'altro momento, così togliere la spunta non li fa sparire. */
+  savedTemplateIds: string[];
   adhoc: AdhocItemDraft[];
   responseCount: number;
   saving: boolean;
@@ -78,6 +88,7 @@ const EMPTY_PLACEMENT: PlacementState = {
   required: false,
   allowEdit: false,
   selectedTemplateIds: [],
+  savedTemplateIds: [],
   adhoc: [],
   responseCount: 0,
   saving: false,
@@ -100,11 +111,14 @@ export default function EventQuestionnairesManager({ eventId }: { eventId: strin
       fetch(`/api/admin/events/${eventId}/questionnaires`, { cache: 'no-store' }),
     ]);
     const tpls = tplsRes.ok ? (await tplsRes.json()).rows : [];
-    setTemplates(tpls.map((r: { id: string; name: string; itemCount: number }) => ({
-      id: r.id,
-      name: r.name,
-      itemCount: r.itemCount,
-    })));
+    setTemplates(
+      tpls.map((r: { id: string; name: string; itemCount: number; usage?: QuestionnaireMoment | null }) => ({
+        id: r.id,
+        name: r.name,
+        itemCount: r.itemCount,
+        usage: r.usage ?? null,
+      })),
+    );
 
     const existing: { rows: PlacementResponse[] } = existingRes.ok
       ? await existingRes.json()
@@ -124,6 +138,7 @@ export default function EventQuestionnairesManager({ eventId }: { eventId: strin
           required: match.required,
           allowEdit: match.allowEdit,
           selectedTemplateIds: match.templates.map((t) => t.id),
+          savedTemplateIds: match.templates.map((t) => t.id),
           adhoc: match.adhocItems.map(adhocFromServer),
           responseCount: match.responseCount,
         });
@@ -225,6 +240,10 @@ function PlacementCard({
   const tw = useTranslations('admin.wizard.step4');
   const tc = useTranslations('common');
   const confirm = useConfirm();
+  const proposti = templatesFor(placement, templates, [
+    ...state.savedTemplateIds,
+    ...state.selectedTemplateIds,
+  ]);
   const locked = state.responseCount > 0;
 
   const save = async () => {
@@ -428,11 +447,13 @@ function PlacementCard({
 
             <div className="mb-3">
               <div className="form-label" id={`tpls-${placement}`}>{t('libraryTemplates')}</div>
-              {templates.length === 0 ? (
-                <div className="text-muted small">{tw('templatesEmpty')}</div>
+              {proposti.length === 0 ? (
+                <div className="text-muted small">
+                  {templates.length === 0 ? tw('templatesEmpty') : tw('templatesNoneForMoment')}
+                </div>
               ) : (
                 <div className="d-flex flex-column gap-1">
-                  {templates.map((tpl) => (
+                  {proposti.map((tpl) => (
                     <div key={tpl.id} className="form-check">
                       <input
                         id={`tpl-${placement}-${tpl.id}`}
@@ -451,6 +472,9 @@ function PlacementCard({
                       <label className="form-check-label" htmlFor={`tpl-${placement}-${tpl.id}`}>
                         {tpl.name}{' '}
                         <span className="text-muted small">· {t('templateItems', { count: tpl.itemCount })}</span>
+                        {isForOtherMoment(placement, tpl.usage) && tpl.usage && (
+                          <span className="text-muted small"> · {tq(USAGE_SHORT_KEY[tpl.usage])}</span>
+                        )}
                       </label>
                     </div>
                   ))}

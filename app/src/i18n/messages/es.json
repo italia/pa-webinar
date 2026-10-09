@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Guardar borrador e ir a la gestión de cuestionarios",
         "none": "— Ninguno —",
         "staffOnly": "Los cuestionarios y los materiales los gestiona el equipo del evento: con el enlace de moderador puede verlos en la página del evento.",
-        "postDefaultHint": "Si no elige nada, después del evento se ofrece el cuestionario «{name}»."
+        "postDefaultHint": "Si no elige nada, después del evento se ofrece el cuestionario «{name}».",
+        "preHelp": "Preguntas para quien se inscribe, antes del evento: perfil, expectativas, temas a tratar. No es la opinión.",
+        "postHelp": "La opinión, pedida al final del evento: cómo ha ido, la calidad, los contenidos.",
+        "templatesNoneForMoment": "Ninguna plantilla para este momento: las de la biblioteca son para el otro. Añade abajo las preguntas para este evento."
       },
       "step5": {
         "heading": "Resumen y publicación",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Eliminar plantilla",
       "deleteMessage": "¿Eliminar «{name}»? Cuestionarios que la usan: {count}.",
       "invalid": "El cuestionario no es válido: cada pregunta necesita su texto en italiano y, si es de elección, al menos dos opciones.",
-      "inUse": "La plantilla aún la usan algunos cuestionarios: quítela de ellos antes de eliminarla."
+      "inUse": "La plantilla aún la usan algunos cuestionarios: quítela de ellos antes de eliminarla.",
+      "usage": "Cuándo se ofrece",
+      "usagePost": "Después del evento (opinión)",
+      "usagePre": "Antes del evento (inscripción)",
+      "usageAny": "Antes y después del evento",
+      "usageHelp": "La plantilla solo se ofrece en el cuestionario de ese momento: la opinión tiene sentido después del evento; las preguntas sobre quien participa, al inscribirse.",
+      "usagePostShort": "Después del evento",
+      "usagePreShort": "Al inscribirse",
+      "usageAnyShort": "Antes y después",
+      "usageSystem": "Es la plantilla de opinión del sistema: se ofrece siempre después del evento."
     },
     "videoPlayer": {
       "unavailable": "Vídeo no disponible",

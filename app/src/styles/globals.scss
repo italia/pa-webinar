@@ -7485,6 +7485,13 @@ html.live-resizing .live-sidebar-resizer::after {
   }
 }
 
+// ── Libreria delle domande: il momento in cui si propone un modello
+.question-template__usage {
+  background: #eef2f6;
+  color: #3d4955;
+  font-size: 0.7rem;
+}
+
 // ── Sezioni tecniche chiuse del wizard (capacita', risorse)
 .wizard-tech {
   summary {

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Gem kladde og gå til spørgeskemaer",
         "none": "— Ingen —",
         "staffOnly": "Spørgeskemaer og materialer administreres af begivenhedens personale: med moderatorlinket kan du se dem på begivenhedens side.",
-        "postDefaultHint": "Hvis du ikke vælger noget, tilbydes spørgeskemaet »{name}« efter begivenheden."
+        "postDefaultHint": "Hvis du ikke vælger noget, tilbydes spørgeskemaet »{name}« efter begivenheden.",
+        "preHelp": "Spørgsmål til dem, der tilmelder sig, før arrangementet: profil, forventninger, emner. Det er ikke feedback.",
+        "postHelp": "Feedback, der spørges om ved arrangementets afslutning: hvordan det gik, kvalitet, indhold.",
+        "templatesNoneForMoment": "Ingen skabelon til dette tidspunkt: bibliotekets skabeloner er til det andet. Tilføj spørgsmålene til dette arrangement nedenfor."
       },
       "step5": {
         "heading": "Oversigt og udgivelse",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Slet skabelon",
       "deleteMessage": "Slet »{name}«? Spørgeskemaer, der bruger den: {count}.",
       "invalid": "Spørgeskemaet er ugyldigt: hvert spørgsmål skal have italiensk tekst, og et valgspørgsmål mindst to valgmuligheder.",
-      "inUse": "Skabelonen bruges stadig af nogle spørgeskemaer: fjern den fra dem, før du sletter den."
+      "inUse": "Skabelonen bruges stadig af nogle spørgeskemaer: fjern den fra dem, før du sletter den.",
+      "usage": "Hvornår den tilbydes",
+      "usagePost": "Efter arrangementet (feedback)",
+      "usagePre": "Før arrangementet (tilmelding)",
+      "usageAny": "Før og efter arrangementet",
+      "usageHelp": "Skabelonen tilbydes kun i spørgeskemaet for det tidspunkt: feedback giver mening efter arrangementet, spørgsmål om deltagerne ved tilmelding.",
+      "usagePostShort": "Efter arrangementet",
+      "usagePreShort": "Ved tilmelding",
+      "usageAnyShort": "Før og efter",
+      "usageSystem": "Det er systemets feedbackskabelon: den tilbydes altid efter arrangementet."
     },
     "videoPlayer": {
       "unavailable": "Videoen er ikke tilgængelig",

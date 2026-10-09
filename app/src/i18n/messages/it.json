@@ -1035,7 +1035,10 @@
         "saveDraftAndGoQuestionnaires": "Salva bozza e vai a gestione questionari",
         "none": "— Nessuno —",
         "staffOnly": "Questionari e materiali li gestisce lo staff dell'evento: con il link del moderatore si vedono nella pagina dell'evento.",
-        "postDefaultHint": "Se non scegli nulla, dopo l'evento si propone il questionario «{name}»."
+        "postDefaultHint": "Se non scegli nulla, dopo l'evento si propone il questionario «{name}».",
+        "preHelp": "Domande per chi si iscrive, prima dell'evento: profilo, aspettative, temi da trattare. Non è il feedback.",
+        "postHelp": "Il feedback, chiesto alla fine dell'evento: com'è andata, la qualità, i contenuti.",
+        "templatesNoneForMoment": "Nessun modello per questo momento: quelli della libreria sono per l'altro. Aggiungi qui sotto le domande per questo evento."
       },
       "step5": {
         "heading": "Riepilogo e pubblicazione",
@@ -3093,7 +3096,16 @@
       "deleteTitle": "Elimina modello",
       "deleteMessage": "Eliminare «{name}»? Questionari che lo usano: {count}.",
       "invalid": "Il questionario non è valido: ogni domanda ha bisogno del testo in italiano e, se è a scelta, di almeno due opzioni.",
-      "inUse": "Il modello è ancora usato da alcuni questionari: toglilo da quei questionari prima di eliminarlo."
+      "inUse": "Il modello è ancora usato da alcuni questionari: toglilo da quei questionari prima di eliminarlo.",
+      "usage": "Quando si propone",
+      "usagePost": "Dopo l'evento (feedback)",
+      "usagePre": "Prima dell'evento (iscrizione)",
+      "usageAny": "Prima e dopo l'evento",
+      "usageHelp": "Il modello si propone solo nel questionario di quel momento: il feedback ha senso dopo l'evento, le domande su chi partecipa all'iscrizione.",
+      "usagePostShort": "Dopo l'evento",
+      "usagePreShort": "All'iscrizione",
+      "usageAnyShort": "Prima e dopo",
+      "usageSystem": "È il modello di sistema per il feedback: si propone sempre dopo l'evento."
     },
     "videoPlayer": {
       "unavailable": "Video non disponibile",

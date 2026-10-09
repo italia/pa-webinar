@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Piszkozat mentése és tovább a kérdőívek kezeléséhez",
         "none": "— Nincs —",
         "staffOnly": "A kérdőíveket és az anyagokat az esemény munkatársai kezelik: a moderátori linkkel az esemény oldalán láthatja őket.",
-        "postDefaultHint": "Ha nem választ semmit, az esemény után a(z) „{name}” kérdőív jelenik meg."
+        "postDefaultHint": "Ha nem választ semmit, az esemény után a(z) „{name}” kérdőív jelenik meg.",
+        "preHelp": "Kérdések a regisztrálóknak az esemény előtt: profil, elvárások, témák. Ez nem a visszajelzés.",
+        "postHelp": "A visszajelzés az esemény végén: hogyan sikerült, minőség, tartalom.",
+        "templatesNoneForMoment": "Ehhez az időponthoz nincs sablon: a könyvtár sablonjai a másikhoz valók. Az esemény kérdéseit alább adja hozzá."
       },
       "step5": {
         "heading": "Összefoglaló és közzététel",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Sablon törlése",
       "deleteMessage": "Törli a következőt: „{name}”? Az azt használó kérdőívek: {count}.",
       "invalid": "A kérdőív nem érvényes: minden kérdésnek kell olasz szöveg, a feleletválasztósaknak pedig legalább két lehetőség.",
-      "inUse": "A sablont még használják kérdőívek: törlés előtt távolítsa el belőlük."
+      "inUse": "A sablont még használják kérdőívek: törlés előtt távolítsa el belőlük.",
+      "usage": "Mikor ajánlja fel",
+      "usagePost": "Az esemény után (visszajelzés)",
+      "usagePre": "Az esemény előtt (regisztráció)",
+      "usageAny": "Az esemény előtt és után",
+      "usageHelp": "A sablont csak az adott időpont kérdőívében ajánlja fel: a visszajelzésnek az esemény után van értelme, a résztvevőkre vonatkozó kérdéseknek a regisztrációkor.",
+      "usagePostShort": "Az esemény után",
+      "usagePreShort": "Regisztrációkor",
+      "usageAnyShort": "Előtte és utána",
+      "usageSystem": "Ez a rendszer visszajelzési sablonja: mindig az esemény után kínálja fel."
     },
     "videoPlayer": {
       "unavailable": "A videó nem érhető el",

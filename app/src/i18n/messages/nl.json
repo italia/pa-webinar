@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Concept opslaan en naar vragenlijstbeheer",
         "none": "— Geen —",
         "staffOnly": "Vragenlijsten en materialen worden beheerd door het team van het evenement: met de moderatorlink ziet u ze op de pagina van het evenement.",
-        "postDefaultHint": "Als u niets kiest, wordt na het evenement de vragenlijst ‘{name}’ aangeboden."
+        "postDefaultHint": "Als u niets kiest, wordt na het evenement de vragenlijst ‘{name}’ aangeboden.",
+        "preHelp": "Vragen voor wie zich inschrijft, voor het evenement: profiel, verwachtingen, onderwerpen. Dit is niet de feedback.",
+        "postHelp": "De feedback aan het einde van het evenement: hoe het ging, kwaliteit, inhoud.",
+        "templatesNoneForMoment": "Geen sjabloon voor dit moment: de sjablonen in de bibliotheek zijn voor het andere. Voeg hieronder de vragen voor dit evenement toe."
       },
       "step5": {
         "heading": "Overzicht en publicatie",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Sjabloon verwijderen",
       "deleteMessage": "‘{name}’ verwijderen? Vragenlijsten die het gebruiken: {count}.",
       "invalid": "De vragenlijst is ongeldig: elke vraag heeft een Italiaanse tekst nodig en een keuzevraag minstens twee opties.",
-      "inUse": "Het sjabloon wordt nog gebruikt door vragenlijsten: haal het daar eerst weg voordat u het verwijdert."
+      "inUse": "Het sjabloon wordt nog gebruikt door vragenlijsten: haal het daar eerst weg voordat u het verwijdert.",
+      "usage": "Wanneer het wordt aangeboden",
+      "usagePost": "Na het evenement (feedback)",
+      "usagePre": "Voor het evenement (inschrijving)",
+      "usageAny": "Voor en na het evenement",
+      "usageHelp": "Het sjabloon wordt alleen aangeboden in de vragenlijst voor dat moment: feedback is zinvol na het evenement, vragen over deelnemers bij de inschrijving.",
+      "usagePostShort": "Na het evenement",
+      "usagePreShort": "Bij inschrijving",
+      "usageAnyShort": "Voor en na",
+      "usageSystem": "Dit is het feedbacksjabloon van het systeem: het wordt altijd na het evenement aangeboden."
     },
     "videoPlayer": {
       "unavailable": "Video niet beschikbaar",

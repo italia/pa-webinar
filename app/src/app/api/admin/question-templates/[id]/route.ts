@@ -51,6 +51,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       description: tpl.description,
       isSystem: tpl.isSystem,
       sortOrder: tpl.sortOrder,
+      usage: tpl.usage,
       usedByQuestionnaires: tpl._count.questionnaires,
       items: tpl.items,
       createdAt: tpl.createdAt.toISOString(),
@@ -88,6 +89,14 @@ export const PUT = withErrorHandling(async (request, context) => {
       throw new AppError('Template not found', 404, 'NOT_FOUND');
     }
 
+    // Il modello di sistema resta del suo momento: il feedback predefinito
+    // (lib/feedback/default-questionnaire) lo aggancia sempre dopo l'evento.
+    if (existing.isSystem && data.usage !== undefined && data.usage !== existing.usage) {
+      throw new ValidationError('Validation failed', [
+        { path: ['usage'], message: 'The moment of a system template cannot be changed' },
+      ]);
+    }
+
     const itemsWrite = data.items !== undefined
       ? shapeTemplateItemsWrite(data.items, existing.items.map((i) => i.id))
       : null;
@@ -98,6 +107,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.description !== undefined && { description: data.description }),
         ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+        ...(data.usage !== undefined && { usage: data.usage }),
         ...(itemsWrite && {
           items: {
             ...(itemsWrite.deleteIds.length > 0 && {

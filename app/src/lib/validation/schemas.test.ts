@@ -13,6 +13,8 @@ import {
   pollVoteSchema,
   createInstantCallSchema,
   VALID_OFFSETS,
+  createQuestionTemplateSchema,
+  updateQuestionTemplateSchema,
 } from './schemas';
 
 // ── Helpers ─────────────────────────────────────────────────
@@ -694,5 +696,26 @@ describe('updateEventSchema privacyPolicyUrl', () => {
   it('still rejects a value that is not a URL', () => {
     const result = updateEventSchema.safeParse({ privacyPolicyUrl: 'not-a-url' });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('createQuestionTemplateSchema — quando si propone', () => {
+  it('accetta prima, dopo o nessuna indicazione', () => {
+    for (const usage of ['PRE_REGISTRATION', 'POST_EVENT', null, undefined]) {
+      expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage }).success).toBe(true);
+    }
+  });
+
+  it('rifiuta un momento sconosciuto', () => {
+    expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage: 'DURING' }).success).toBe(false);
+  });
+
+  it("l'aggiornamento può cambiare solo il momento", () => {
+    const r = updateQuestionTemplateSchema.safeParse({ usage: 'POST_EVENT' });
+    expect(r.success && r.data.usage).toBe('POST_EVENT');
+    // Senza le domande e l'ordine, l'aggiornamento non li tocca: un valore
+    // predefinito qui cancellerebbe tutte le domande del modello.
+    expect(r.success && r.data.items).toBeUndefined();
+    expect(r.success && r.data.sortOrder).toBeUndefined();
   });
 });

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Ssejvja l-abbozz u mur għall-amministrazzjoni tal-kwestjonarji",
         "none": "— L-ebda —",
         "staffOnly": "Il-kwestjonarji u l-materjali jimmaniġġjahom l-istaff tal-avveniment: bil-link tal-moderatur tarahom fil-paġna tal-avveniment.",
-        "postDefaultHint": "Jekk ma tagħżel xejn, wara l-avveniment jiġi offrut il-kwestjonarju “{name}”."
+        "postDefaultHint": "Jekk ma tagħżel xejn, wara l-avveniment jiġi offrut il-kwestjonarju “{name}”.",
+        "preHelp": "Mistoqsijiet għal min jirreġistra, qabel l-avveniment: profil, aspettattivi, suġġetti. Mhuwiex ir-rispons.",
+        "postHelp": "Ir-rispons, mitlub fl-aħħar tal-avveniment: kif mar, il-kwalità, il-kontenut.",
+        "templatesNoneForMoment": "L-ebda mudell għal dan il-mument: dawk tal-librerija huma għall-ieħor. Żid il-mistoqsijiet għal dan l-avveniment hawn taħt."
       },
       "step5": {
         "heading": "Sommarju u pubblikazzjoni",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Ħassar it-template",
       "deleteMessage": "Tħassar “{name}”? Kwestjonarji li jużawh: {count}.",
       "invalid": "Il-kwestjonarju mhuwiex validu: kull mistoqsija teħtieġ it-test bit-Taljan u, jekk hija ta' għażla, mill-inqas żewġ għażliet.",
-      "inUse": "It-template għadu jintuża minn xi kwestjonarji: neħħih minnhom qabel ma tħassru."
+      "inUse": "It-template għadu jintuża minn xi kwestjonarji: neħħih minnhom qabel ma tħassru.",
+      "usage": "Meta jiġi offrut",
+      "usagePost": "Wara l-avveniment (rispons)",
+      "usagePre": "Qabel l-avveniment (reġistrazzjoni)",
+      "usageAny": "Qabel u wara l-avveniment",
+      "usageHelp": "Il-mudell jiġi offrut biss fil-kwestjonarju ta' dak il-mument: ir-rispons jagħmel sens wara l-avveniment, il-mistoqsijiet dwar il-parteċipanti fir-reġistrazzjoni.",
+      "usagePostShort": "Wara l-avveniment",
+      "usagePreShort": "Fir-reġistrazzjoni",
+      "usageAnyShort": "Qabel u wara",
+      "usageSystem": "Dan huwa l-mudell tas-sistema għar-rispons: dejjem jiġi offrut wara l-avveniment."
     },
     "videoPlayer": {
       "unavailable": "Il-vidjo mhuwiex disponibbli",

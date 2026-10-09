@@ -281,7 +281,8 @@ attached to an event, either inside the registration form (`PRE_REGISTRATION`)
 or as the end-of-event rating, in the room and on the post-event page
 (`POST_EVENT`). A questionnaire is built from
 reusable question templates (`QuestionTemplate`) plus questions specific to
-the event. [From creation to recap](architecture/event-journey.md)
+the event. A template is offered before the event, after it, or both
+(`usage`). [From creation to recap](architecture/event-journey.md)
 
 **Recurrence rule** (`recurrenceRule`, wizard field **Recurrence**): an RFC
 5545 RRULE describing an event's cadence. It proposes dates; nothing schedules

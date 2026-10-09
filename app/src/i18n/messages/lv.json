@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Saglabāt melnrakstu un doties uz anketu pārvaldību",
         "none": "— Nav —",
         "staffOnly": "Anketas un materiālus pārvalda pasākuma komanda: ar moderatora saiti tos varat redzēt pasākuma lapā.",
-        "postDefaultHint": "Ja neko neizvēlaties, pēc pasākuma tiek piedāvāta anketa “{name}”."
+        "postDefaultHint": "Ja neko neizvēlaties, pēc pasākuma tiek piedāvāta anketa “{name}”.",
+        "preHelp": "Jautājumi reģistrētājiem pirms pasākuma: profils, gaidas, tēmas. Tās nav atsauksmes.",
+        "postHelp": "Atsauksmes pasākuma beigās: kā gāja, kvalitāte, saturs.",
+        "templatesNoneForMoment": "Šim brīdim nav veidnes: bibliotēkas veidnes ir otram. Šī pasākuma jautājumus pievienojiet zemāk."
       },
       "step5": {
         "heading": "Kopsavilkums un publicēšana",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Dzēst veidni",
       "deleteMessage": "Dzēst “{name}”? Anketas, kas to izmanto: {count}.",
       "invalid": "Anketa nav derīga: katram jautājumam vajag tekstu itāļu valodā, bet izvēles jautājumam – vismaz divas iespējas.",
-      "inUse": "Veidni vēl izmanto dažas anketas: pirms dzēšanas noņemiet to no tām."
+      "inUse": "Veidni vēl izmanto dažas anketas: pirms dzēšanas noņemiet to no tām.",
+      "usage": "Kad to piedāvā",
+      "usagePost": "Pēc pasākuma (atsauksmes)",
+      "usagePre": "Pirms pasākuma (reģistrācija)",
+      "usageAny": "Pirms un pēc pasākuma",
+      "usageHelp": "Veidne tiek piedāvāta tikai tā brīža anketā: atsauksmes ir jēgpilnas pēc pasākuma, jautājumi par dalībniekiem — reģistrējoties.",
+      "usagePostShort": "Pēc pasākuma",
+      "usagePreShort": "Reģistrējoties",
+      "usageAnyShort": "Pirms un pēc",
+      "usageSystem": "Šī ir sistēmas atsauksmju veidne: to vienmēr piedāvā pēc pasākuma."
     },
     "videoPlayer": {
       "unavailable": "Video nav pieejams",

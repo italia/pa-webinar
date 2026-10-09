@@ -14,6 +14,12 @@ import { useTranslations } from 'next-intl';
 
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
+import {
+  USAGE_SHORT_KEY,
+  isForOtherMoment,
+  templatesFor,
+  type QuestionnaireMoment,
+} from '@/lib/questionnaires/template-usage';
 
 export interface MaterialDraft {
   title: string;
@@ -86,6 +92,7 @@ interface TemplateRow {
   name: string;
   description: string | null;
   itemCount?: number;
+  usage?: QuestionnaireMoment | null;
 }
 
 interface Props {
@@ -226,7 +233,9 @@ function QuestionnairesSection({
 
       <PlacementBlock
         heading={t('preHeading')}
+        help={t('preHelp')}
         idPrefix="pre"
+        moment="PRE_REGISTRATION"
         templates={templates}
         value={value.preEventQuestionnaire}
         onChange={(next) => onChange({ preEventQuestionnaire: next })}
@@ -234,7 +243,9 @@ function QuestionnairesSection({
 
       <PlacementBlock
         heading={t('postHeading')}
+        help={t('postHelp')}
         idPrefix="post"
+        moment="POST_EVENT"
         templates={templates}
         value={value.postEventQuestionnaire}
         onChange={(next) => onChange({ postEventQuestionnaire: next })}
@@ -264,14 +275,20 @@ function QuestionnairesSection({
 
 function PlacementBlock({
   heading,
+  help,
   idPrefix,
-  templates,
+  moment,
+  templates: libreria,
   value,
   onChange,
   emptyHint,
 }: {
   heading: string;
+  /** A che cosa serve il questionario di questo momento. */
+  help: string;
   idPrefix: string;
+  moment: QuestionnaireMoment;
+  /** L'intera libreria: il blocco propone quelli di questo momento. */
   templates: TemplateRow[];
   value: QuestionnaireBlock;
   onChange: (next: QuestionnaireBlock) => void;
@@ -279,6 +296,12 @@ function PlacementBlock({
   emptyHint?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  const tq = useTranslations('admin.questionTemplates');
+  // I modelli scelti quando il blocco si è aperto restano in elenco anche se
+  // sono per l'altro momento: togliendo la spunta non spariscono, e si può
+  // rimetterla.
+  const [sceltiAllInizio] = useState(() => value.templateIds);
+  const templates = templatesFor(moment, libreria, [...sceltiAllInizio, ...value.templateIds]);
 
   const toggleTemplate = (id: string) => {
     const next = value.templateIds.includes(id)
@@ -313,16 +336,26 @@ function PlacementBlock({
       className="border rounded p-3 mb-3 bg-white"
       style={{ borderColor: '#e8e8e8' }}
     >
-      <h4 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+      <h4 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
         {heading}
       </h4>
+      <p id={`${idPrefix}-tpl-help`} className="text-secondary small mb-3">
+        {help}
+      </p>
 
-      <div className="mb-3" role="group" aria-labelledby={`${idPrefix}-tpl-label`}>
+      <div
+        className="mb-3"
+        role="group"
+        aria-labelledby={`${idPrefix}-tpl-label`}
+        aria-describedby={`${idPrefix}-tpl-help`}
+      >
         <div id={`${idPrefix}-tpl-label`} className="form-label">
           {t('templatesLabel')}
         </div>
         {templates.length === 0 ? (
-          <p className="text-secondary small mb-0">{t('templatesEmpty')}</p>
+          <p className="text-secondary small mb-0">
+            {libreria.length === 0 ? t('templatesEmpty') : t('templatesNoneForMoment')}
+          </p>
         ) : (
           <div className="d-flex flex-wrap gap-2">
             {templates.map((tpl) => {
@@ -339,6 +372,11 @@ function PlacementBlock({
                   {active ? '✓ ' : ''}
                   {tpl.name}
                   {typeof tpl.itemCount === 'number' ? ` (${tpl.itemCount})` : ''}
+                  {isForOtherMoment(moment, tpl.usage) && tpl.usage && (
+                    <span className="ms-1 fw-normal">
+                      · {tq(USAGE_SHORT_KEY[tpl.usage])}
+                    </span>
+                  )}
                 </button>
               );
             })}

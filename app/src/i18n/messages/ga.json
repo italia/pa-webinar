@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Sábháil dréacht agus téigh chuig bainistíocht ceistneoirí",
         "none": "— Gan ceann ar bith —",
         "staffOnly": "Is í foireann an imeachta a bhainistíonn na ceistneoirí agus na háiseanna: le nasc an mhodhnóra feicfidh sibh iad ar leathanach an imeachta.",
-        "postDefaultHint": "Mura roghnaíonn sibh aon rud, tairgtear an ceistneoir “{name}” tar éis an imeachta."
+        "postDefaultHint": "Mura roghnaíonn sibh aon rud, tairgtear an ceistneoir “{name}” tar éis an imeachta.",
+        "preHelp": "Ceisteanna do lucht cláraithe, roimh an imeacht: próifíl, ionchais, ábhair. Ní hé seo an t-aiseolas.",
+        "postHelp": "An t-aiseolas, a iarrtar ag deireadh an imeachta: conas a d'éirigh leis, an caighdeán, an t-ábhar.",
+        "templatesNoneForMoment": "Níl teimpléad ar bith don uair seo: is don cheann eile teimpléid na leabharlainne. Cuir ceisteanna an imeachta seo leis thíos."
       },
       "step5": {
         "heading": "Achoimre agus foilsiú",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Scrios an teimpléad",
       "deleteMessage": "An scriosfar “{name}”? Ceistneoirí a úsáideann é: {count}.",
       "invalid": "Níl an ceistneoir bailí: teastaíonn téacs Iodáilise ó gach ceist agus, más ceist roghnaithe í, dhá rogha ar a laghad.",
-      "inUse": "Tá an teimpléad fós in úsáid ag ceistneoirí: bainigí de na ceistneoirí sin é sula scriosfaidh sibh é."
+      "inUse": "Tá an teimpléad fós in úsáid ag ceistneoirí: bainigí de na ceistneoirí sin é sula scriosfaidh sibh é.",
+      "usage": "Cathain a thairgtear é",
+      "usagePost": "Tar éis an imeachta (aiseolas)",
+      "usagePre": "Roimh an imeacht (clárú)",
+      "usageAny": "Roimh an imeacht agus ina dhiaidh",
+      "usageHelp": "Ní thairgtear an teimpléad ach i gceistneoir na huaire sin: tá ciall le haiseolas tar éis an imeachta, agus le ceisteanna faoi na rannpháirtithe ag am an chláraithe.",
+      "usagePostShort": "Tar éis an imeachta",
+      "usagePreShort": "Ag am an chláraithe",
+      "usageAnyShort": "Roimh agus ina dhiaidh",
+      "usageSystem": "Is é seo teimpléad aiseolais an chórais: tairgtear é i gcónaí tar éis an imeachta."
     },
     "videoPlayer": {
       "unavailable": "Níl an físeán ar fáil",

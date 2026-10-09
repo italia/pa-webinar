@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Spremi nacrt i idi na upravljanje upitnicima",
         "none": "— Nijedan —",
         "staffOnly": "Upitnicima i materijalima upravlja osoblje događaja: s poveznicom moderatora vidite ih na stranici događaja.",
-        "postDefaultHint": "Ako ništa ne odaberete, nakon događaja nudi se upitnik „{name}”."
+        "postDefaultHint": "Ako ništa ne odaberete, nakon događaja nudi se upitnik „{name}”.",
+        "preHelp": "Pitanja za one koji se prijavljuju, prije događaja: profil, očekivanja, teme. To nisu povratne informacije.",
+        "postHelp": "Povratne informacije na kraju događaja: kako je prošlo, kvaliteta, sadržaj.",
+        "templatesNoneForMoment": "Nema predloška za ovaj trenutak: predlošci iz knjižnice su za drugi. Pitanja za ovaj događaj dodajte ispod."
       },
       "step5": {
         "heading": "Sažetak i objava",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Izbriši predložak",
       "deleteMessage": "Izbrisati „{name}”? Upitnici koji ga koriste: {count}.",
       "invalid": "Upitnik nije valjan: svako pitanje treba tekst na talijanskom, a pitanje s izborom barem dvije opcije.",
-      "inUse": "Predložak još koriste neki upitnici: uklonite ga iz njih prije brisanja."
+      "inUse": "Predložak još koriste neki upitnici: uklonite ga iz njih prije brisanja.",
+      "usage": "Kada se nudi",
+      "usagePost": "Nakon događaja (povratne informacije)",
+      "usagePre": "Prije događaja (prijava)",
+      "usageAny": "Prije i nakon događaja",
+      "usageHelp": "Predložak se nudi samo u upitniku za taj trenutak: povratne informacije imaju smisla nakon događaja, pitanja o sudionicima pri prijavi.",
+      "usagePostShort": "Nakon događaja",
+      "usagePreShort": "Pri prijavi",
+      "usageAnyShort": "Prije i nakon",
+      "usageSystem": "Ovo je sustavni predložak za povratne informacije: uvijek se nudi nakon događaja."
     },
     "videoPlayer": {
       "unavailable": "Videozapis nije dostupan",

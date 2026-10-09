@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Shrani osnutek in pojdi na upravljanje vprašalnikov",
         "none": "— Brez —",
         "staffOnly": "Vprašalnike in gradiva upravlja osebje dogodka: s povezavo moderatorja jih vidite na strani dogodka.",
-        "postDefaultHint": "Če ničesar ne izberete, se po dogodku ponudi vprašalnik »{name}«."
+        "postDefaultHint": "Če ničesar ne izberete, se po dogodku ponudi vprašalnik »{name}«.",
+        "preHelp": "Vprašanja za tiste, ki se prijavijo, pred dogodkom: profil, pričakovanja, teme. To niso povratne informacije.",
+        "postHelp": "Povratne informacije ob koncu dogodka: kako je šlo, kakovost, vsebina.",
+        "templatesNoneForMoment": "Za ta trenutek ni predloge: predloge v knjižnici so za drugega. Vprašanja za ta dogodek dodajte spodaj."
       },
       "step5": {
         "heading": "Povzetek in objava",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Izbriši predlogo",
       "deleteMessage": "Izbrisati »{name}«? Vprašalniki, ki jo uporabljajo: {count}.",
       "invalid": "Vprašalnik ni veljaven: vsako vprašanje potrebuje besedilo v italijanščini, vprašanje z izbiro pa vsaj dve možnosti.",
-      "inUse": "Predlogo še uporabljajo nekateri vprašalniki: pred brisanjem jo odstranite iz njih."
+      "inUse": "Predlogo še uporabljajo nekateri vprašalniki: pred brisanjem jo odstranite iz njih.",
+      "usage": "Kdaj se ponudi",
+      "usagePost": "Po dogodku (povratne informacije)",
+      "usagePre": "Pred dogodkom (prijava)",
+      "usageAny": "Pred dogodkom in po njem",
+      "usageHelp": "Predloga se ponudi samo v vprašalniku za tisti trenutek: povratne informacije so smiselne po dogodku, vprašanja o udeležencih ob prijavi.",
+      "usagePostShort": "Po dogodku",
+      "usagePreShort": "Ob prijavi",
+      "usageAnyShort": "Pred in po",
+      "usageSystem": "To je sistemska predloga za povratne informacije: vedno se ponudi po dogodku."
     },
     "videoPlayer": {
       "unavailable": "Videoposnetek ni na voljo",

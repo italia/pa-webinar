@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Salvesta mustand ja mine küsimustike haldusesse",
         "none": "— Pole —",
         "staffOnly": "Küsimustikke ja materjale haldab ürituse meeskond: moderaatori lingiga näete neid ürituse lehel.",
-        "postDefaultHint": "Kui te midagi ei vali, pakutakse pärast üritust küsimustikku „{name}“."
+        "postDefaultHint": "Kui te midagi ei vali, pakutakse pärast üritust küsimustikku „{name}“.",
+        "preHelp": "Küsimused registreerujatele enne üritust: profiil, ootused, teemad. See ei ole tagasiside.",
+        "postHelp": "Tagasiside ürituse lõpus: kuidas läks, kvaliteet, sisu.",
+        "templatesNoneForMoment": "Selle hetke jaoks malli pole: kogu mallid on teise jaoks. Lisage selle ürituse küsimused allpool."
       },
       "step5": {
         "heading": "Ülevaade ja avaldamine",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Kustuta mall",
       "deleteMessage": "Kas kustutada „{name}“? Seda kasutavaid küsimustikke: {count}.",
       "invalid": "Küsimustik ei sobi: igal küsimusel peab olema itaaliakeelne tekst ja valikküsimusel vähemalt kaks valikut.",
-      "inUse": "Malli kasutavad veel mõned küsimustikud: eemaldage see neist enne kustutamist."
+      "inUse": "Malli kasutavad veel mõned küsimustikud: eemaldage see neist enne kustutamist.",
+      "usage": "Millal seda pakutakse",
+      "usagePost": "Pärast üritust (tagasiside)",
+      "usagePre": "Enne üritust (registreerimine)",
+      "usageAny": "Enne ja pärast üritust",
+      "usageHelp": "Malli pakutakse ainult selle hetke küsimustikus: tagasiside on mõttekas pärast üritust, küsimused osalejate kohta registreerimisel.",
+      "usagePostShort": "Pärast üritust",
+      "usagePreShort": "Registreerimisel",
+      "usageAnyShort": "Enne ja pärast",
+      "usageSystem": "See on süsteemi tagasisidemall: seda pakutakse alati pärast üritust."
     },
     "videoPlayer": {
       "unavailable": "Video pole saadaval",

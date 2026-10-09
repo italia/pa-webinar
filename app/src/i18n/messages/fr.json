@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Enregistrer le brouillon et accéder à la gestion des questionnaires",
         "none": "— Aucun —",
         "staffOnly": "Les questionnaires et les ressources sont gérés par l'équipe de l'événement : avec le lien du modérateur, vous les voyez sur la page de l'événement.",
-        "postDefaultHint": "Si vous ne choisissez rien, le questionnaire « {name} » est proposé après l'événement."
+        "postDefaultHint": "Si vous ne choisissez rien, le questionnaire « {name} » est proposé après l'événement.",
+        "preHelp": "Questions pour les inscrits, avant l'événement : profil, attentes, sujets à traiter. Ce n'est pas l'avis.",
+        "postHelp": "L'avis, demandé à la fin de l'événement : comment ça s'est passé, la qualité, les contenus.",
+        "templatesNoneForMoment": "Aucun modèle pour ce moment : ceux de la bibliothèque sont pour l'autre. Ajoutez ci-dessous les questions pour cet événement."
       },
       "step5": {
         "heading": "Récapitulatif et publication",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Supprimer le modèle",
       "deleteMessage": "Supprimer « {name} » ? Questionnaires qui l'utilisent : {count}.",
       "invalid": "Le questionnaire n'est pas valide : chaque question a besoin de son texte en italien et, si c'est une question à choix, d'au moins deux options.",
-      "inUse": "Le modèle est encore utilisé par des questionnaires : retirez-le de ceux-ci avant de le supprimer."
+      "inUse": "Le modèle est encore utilisé par des questionnaires : retirez-le de ceux-ci avant de le supprimer.",
+      "usage": "Quand il est proposé",
+      "usagePost": "Après l'événement (avis)",
+      "usagePre": "Avant l'événement (inscription)",
+      "usageAny": "Avant et après l'événement",
+      "usageHelp": "Le modèle n'est proposé que dans le questionnaire de ce moment : l'avis a du sens après l'événement, les questions sur les participants à l'inscription.",
+      "usagePostShort": "Après l'événement",
+      "usagePreShort": "À l'inscription",
+      "usageAnyShort": "Avant et après",
+      "usageSystem": "C'est le modèle d'avis du système : il est toujours proposé après l'événement."
     },
     "videoPlayer": {
       "unavailable": "Vidéo indisponible",

@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Zapisz wersję roboczą i przejdź do zarządzania kwestionariuszami",
         "none": "— Brak —",
         "staffOnly": "Kwestionariuszami i materiałami zarządza zespół wydarzenia: z linkiem moderatora zobaczysz je na stronie wydarzenia.",
-        "postDefaultHint": "Jeśli nic nie wybierzesz, po wydarzeniu zostanie zaproponowany kwestionariusz „{name}”."
+        "postDefaultHint": "Jeśli nic nie wybierzesz, po wydarzeniu zostanie zaproponowany kwestionariusz „{name}”.",
+        "preHelp": "Pytania do rejestrujących się przed wydarzeniem: profil, oczekiwania, tematy. To nie są opinie.",
+        "postHelp": "Opinie zbierane na koniec wydarzenia: jak poszło, jakość, treści.",
+        "templatesNoneForMoment": "Brak szablonu na ten moment: szablony w bibliotece są na ten drugi. Dodaj poniżej pytania do tego wydarzenia."
       },
       "step5": {
         "heading": "Podsumowanie i publikacja",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Usuń szablon",
       "deleteMessage": "Usunąć „{name}”? Kwestionariusze, które go używają: {count}.",
       "invalid": "Kwestionariusz jest nieprawidłowy: każde pytanie wymaga tekstu po włosku, a pytanie wyboru co najmniej dwóch opcji.",
-      "inUse": "Szablon jest nadal używany przez kwestionariusze: usuń go z nich przed usunięciem."
+      "inUse": "Szablon jest nadal używany przez kwestionariusze: usuń go z nich przed usunięciem.",
+      "usage": "Kiedy jest proponowany",
+      "usagePost": "Po wydarzeniu (opinie)",
+      "usagePre": "Przed wydarzeniem (rejestracja)",
+      "usageAny": "Przed wydarzeniem i po nim",
+      "usageHelp": "Szablon jest proponowany tylko w ankiecie na ten moment: opinie mają sens po wydarzeniu, pytania o uczestników przy rejestracji.",
+      "usagePostShort": "Po wydarzeniu",
+      "usagePreShort": "Przy rejestracji",
+      "usageAnyShort": "Przed i po",
+      "usageSystem": "To systemowy szablon opinii: jest zawsze proponowany po wydarzeniu."
     },
     "videoPlayer": {
       "unavailable": "Wideo niedostępne",

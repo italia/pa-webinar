@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Uložit koncept a přejít na správu dotazníků",
         "none": "— Žádný —",
         "staffOnly": "Dotazníky a materiály spravuje tým události: s odkazem moderátora je uvidíte na stránce události.",
-        "postDefaultHint": "Pokud nic nevyberete, po události se nabídne dotazník „{name}“."
+        "postDefaultHint": "Pokud nic nevyberete, po události se nabídne dotazník „{name}“.",
+        "preHelp": "Otázky pro registrující se před akcí: profil, očekávání, témata. Nejde o zpětnou vazbu.",
+        "postHelp": "Zpětná vazba na konci akce: jak proběhla, kvalita, obsah.",
+        "templatesNoneForMoment": "Pro tento okamžik není žádná šablona: šablony v knihovně jsou pro ten druhý. Otázky pro tuto akci přidejte níže."
       },
       "step5": {
         "heading": "Souhrn a publikování",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Smazat šablonu",
       "deleteMessage": "Smazat „{name}“? Dotazníky, které ji používají: {count}.",
       "invalid": "Dotazník není platný: každá otázka potřebuje text v italštině a otázka s výběrem alespoň dvě možnosti.",
-      "inUse": "Šablonu stále používají některé dotazníky: před smazáním ji z nich odeberte."
+      "inUse": "Šablonu stále používají některé dotazníky: před smazáním ji z nich odeberte.",
+      "usage": "Kdy se nabízí",
+      "usagePost": "Po akci (zpětná vazba)",
+      "usagePre": "Před akcí (registrace)",
+      "usageAny": "Před akcí i po ní",
+      "usageHelp": "Šablona se nabízí jen v dotazníku pro daný okamžik: zpětná vazba má smysl po akci, otázky na účastníky při registraci.",
+      "usagePostShort": "Po akci",
+      "usagePreShort": "Při registraci",
+      "usageAnyShort": "Před i po",
+      "usageSystem": "Je to systémová šablona zpětné vazby: nabízí se vždy po akci."
     },
     "videoPlayer": {
       "unavailable": "Video není k dispozici",

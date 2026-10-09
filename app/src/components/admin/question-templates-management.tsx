@@ -19,6 +19,7 @@ import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { USAGE_SHORT_KEY, type TemplateUsage } from '@/lib/questionnaires/template-usage';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
@@ -49,6 +50,7 @@ interface TemplateRow {
   description: string | null;
   isSystem: boolean;
   sortOrder: number;
+  usage: TemplateUsage;
   itemCount: number;
   usedByQuestionnaires: number;
 }
@@ -92,6 +94,7 @@ export default function QuestionTemplatesManagement() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
+  const [usage, setUsage] = useState<TemplateUsage>(null);
   const [items, setItems] = useState<ItemDraft[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +120,7 @@ export default function QuestionTemplatesManagement() {
     setName('');
     setDescription('');
     setSortOrder(0);
+    setUsage(null);
     setItems([]);
     setError(null);
   };
@@ -136,6 +140,7 @@ export default function QuestionTemplatesManagement() {
     setName(d.name);
     setDescription(d.description ?? '');
     setSortOrder(d.sortOrder);
+    setUsage(d.usage ?? null);
     setItems(
       d.items.map((i) => ({
         id: i.id,
@@ -225,6 +230,7 @@ export default function QuestionTemplatesManagement() {
         name: name.trim(),
         description: description.trim() || null,
         sortOrder,
+        usage,
         items: payloadItems,
       };
 
@@ -254,7 +260,7 @@ export default function QuestionTemplatesManagement() {
       setSaving(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, description, sortOrder, items, editingId, fetchRows, t, tc]);
+  }, [name, description, sortOrder, usage, items, editingId, fetchRows, t, tc]);
 
   const handleDelete = useCallback(
     async (row: TemplateRow) => {
@@ -278,6 +284,9 @@ export default function QuestionTemplatesManagement() {
   );
 
   const editing = editingId !== null;
+  // Il momento del modello di sistema non si cambia: il feedback predefinito
+  // lo aggancia sempre dopo l'evento.
+  const editingSystem = editing && rows.some((r) => r.id === editingId && r.isSystem);
 
   return (
     <div>
@@ -320,6 +329,29 @@ export default function QuestionTemplatesManagement() {
                 value={description}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
               />
+            </div>
+
+            <div className="mb-3" style={{ maxWidth: 420 }}>
+              <label className="form-label" htmlFor="tpl-usage">
+                {t('usage')}
+              </label>
+              <select
+                id="tpl-usage"
+                className="form-select"
+                value={usage ?? 'ANY'}
+                aria-describedby="tpl-usage-help"
+                disabled={editingSystem}
+                onChange={(e) =>
+                  setUsage(e.target.value === 'ANY' ? null : (e.target.value as Exclude<TemplateUsage, null>))
+                }
+              >
+                <option value="PRE_REGISTRATION">{t('usagePre')}</option>
+                <option value="POST_EVENT">{t('usagePost')}</option>
+                <option value="ANY">{t('usageAny')}</option>
+              </select>
+              <small id="tpl-usage-help" className="form-text">
+                {editingSystem ? t('usageSystem') : t('usageHelp')}
+              </small>
             </div>
 
             <div className="mb-3" style={{ maxWidth: 160 }}>
@@ -533,6 +565,10 @@ export default function QuestionTemplatesManagement() {
                           {t('system')}
                         </Badge>
                       )}
+                      <Badge color="" pill className="question-template__usage">
+                        <span className="visually-hidden">{t('usage')}: </span>
+                        {t(USAGE_SHORT_KEY[row.usage ?? 'ANY'])}
+                      </Badge>
                     </div>
                     {row.description && (
                       <div className="text-secondary" style={{ fontSize: '0.85rem' }}>

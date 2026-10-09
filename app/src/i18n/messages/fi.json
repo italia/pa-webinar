@@ -911,7 +911,10 @@
         "saveDraftAndGoQuestionnaires": "Tallenna luonnos ja siirry kyselyiden hallintaan",
         "none": "— Ei valittu —",
         "staffOnly": "Kyselyjä ja materiaaleja hallinnoi tapahtuman henkilökunta: moderaattorin linkillä näet ne tapahtuman sivulla.",
-        "postDefaultHint": "Jos et valitse mitään, tapahtuman jälkeen tarjotaan kysely ”{name}”."
+        "postDefaultHint": "Jos et valitse mitään, tapahtuman jälkeen tarjotaan kysely ”{name}”.",
+        "preHelp": "Kysymykset ilmoittautujille ennen tapahtumaa: profiili, odotukset, käsiteltävät aiheet. Tämä ei ole palaute.",
+        "postHelp": "Palaute tapahtuman lopussa: miten meni, laatu, sisältö.",
+        "templatesNoneForMoment": "Tälle hetkelle ei ole mallia: kirjaston mallit ovat toista varten. Lisää tämän tapahtuman kysymykset alle."
       },
       "step5": {
         "heading": "Yhteenveto ja julkaisu",
@@ -2969,7 +2972,16 @@
       "deleteTitle": "Poista malli",
       "deleteMessage": "Poistetaanko ”{name}”? Mallia käyttäviä kyselyjä: {count}.",
       "invalid": "Kysely ei kelpaa: jokainen kysymys tarvitsee italiankielisen tekstin ja valintakysymys vähintään kaksi vaihtoehtoa.",
-      "inUse": "Mallia käyttävät vielä jotkin kyselyt: poista se niistä ennen poistamista."
+      "inUse": "Mallia käyttävät vielä jotkin kyselyt: poista se niistä ennen poistamista.",
+      "usage": "Milloin sitä tarjotaan",
+      "usagePost": "Tapahtuman jälkeen (palaute)",
+      "usagePre": "Ennen tapahtumaa (ilmoittautuminen)",
+      "usageAny": "Ennen ja jälkeen tapahtuman",
+      "usageHelp": "Mallia tarjotaan vain sen hetken kyselyssä: palaute on järkevää tapahtuman jälkeen, osallistujia koskevat kysymykset ilmoittautuessa.",
+      "usagePostShort": "Tapahtuman jälkeen",
+      "usagePreShort": "Ilmoittautuessa",
+      "usageAnyShort": "Ennen ja jälkeen",
+      "usageSystem": "Tämä on järjestelmän palautemalli: sitä tarjotaan aina tapahtuman jälkeen."
     },
     "videoPlayer": {
       "unavailable": "Video ei ole saatavilla",
