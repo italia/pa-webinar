@@ -564,7 +564,17 @@
       "endHelp": "Fecha a sala para todos e marca o evento como concluído. Não pode ser anulado.",
       "timerHeading": "Temporizador das intervenções"
     },
-    "closingNotice": "{minutes, plural, =0 {A sala está a fechar.} one {A sala fecha automaticamente dentro de # minuto.} other {A sala fecha automaticamente dentro de # minutos.}}"
+    "closingNotice": "{minutes, plural, =0 {A sala está a fechar.} one {A sala fecha automaticamente dentro de # minuto.} other {A sala fecha automaticamente dentro de # minutos.}}",
+    "captions": {
+      "region": "Legendas",
+      "unknownSpeaker": "Participante",
+      "paused": "Legendas em pausa: o serviço está sobrecarregado e será retomado sozinho.",
+      "unavailable": "As legendas não estão disponíveis neste momento.",
+      "show": "Mostrar legendas",
+      "hide": "Ocultar legendas",
+      "toggle": "Legendas automáticas",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Os e-mails partem de um endereço no-reply: sem isto, quem responder não chega a ninguém.",
         "avatarTitle": "Imagens dos participantes",
         "gravatarEnabled": "Utilizar o Gravatar quando estiver disponível",
-        "gravatarEnabledHelp": "Quem se inscreveu com um e-mail que tem um Gravatar vê-lo-á como imagem na sala; para todos os outros ficam as iniciais geradas pela plataforma. A imagem passa pelo nosso servidor, pelo que o navegador dos participantes não contacta o gravatar.com — mas a plataforma sim: deve ser declarado na política de privacidade."
+        "gravatarEnabledHelp": "Quem se inscreveu com um e-mail que tem um Gravatar vê-lo-á como imagem na sala; para todos os outros ficam as iniciais geradas pela plataforma. A imagem passa pelo nosso servidor, pelo que o navegador dos participantes não contacta o gravatar.com — mas a plataforma sim: deve ser declarado na política de privacidade.",
+        "liveCaptionsTitle": "Legendas em direto",
+        "liveCaptionsEnabled": "Legendas automáticas nas videochamadas",
+        "liveCaptionsEnabledHelp": "A voz de quem fala é transcrita em tempo real por um serviço que funciona na infraestrutura da plataforma, sem serviços externos, e o texto não é guardado. Estão ativas em todos os eventos; quem modera pode desativá-las durante o evento. Sem o serviço instalado, esta opção não tem efeito."
       },
       "errors": {
         "invalid": "As definições não foram guardadas: um valor não é válido. Verifique os campos alterados e tente novamente.",
@@ -3690,7 +3703,8 @@
       "jvb": "Ponte de vídeo",
       "jibri": "Gravação de vídeo",
       "smtp": "Serviço de email",
-      "postprod": "Pipeline de IA pós-evento"
+      "postprod": "Pipeline de IA pós-evento",
+      "captions": "Legendas em direto"
     },
     "descriptions": {
       "app": "O sítio web onde acede aos eventos",
@@ -3702,7 +3716,8 @@
       "jvb": "Transmite áudio e vídeo aos participantes",
       "jibri": "Grava sessões de vídeo dos eventos",
       "smtp": "Envia emails de confirmação e lembretes",
-      "postprod": "Transcreve, resume e traduz as gravações com modelos de IA no cluster (GPU NVIDIA A100). Só é ativada quando um evento ativa as funcionalidades de IA."
+      "postprod": "Transcreve, resume e traduz as gravações com modelos de IA no cluster (GPU NVIDIA A100). Só é ativada quando um evento ativa as funcionalidades de IA.",
+      "captions": "Transcreve em tempo real quem fala e envia as legendas para a sala através do bridge."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Tarefas de pós-produção em fila — o nó GPU está a arrancar (arranque a frio ~3 min).",
         "standby": "Pipeline de IA ativa mas em espera: nenhuma gravação para processar. O nó GPU está desligado para poupar energia.",
         "degraded": "Uma ou mais tarefas de IA falharam nas últimas 24 h. Consulte /admin/postprod para mais detalhes."
+      },
+      "captions": {
+        "disabled": "As legendas em direto estão desativadas nas definições da instância.",
+        "standby": "O serviço de legendas está em espera: arranca quando um evento com legendas entra em direto.",
+        "starting": "O serviço de legendas está a arrancar para um evento em direto.",
+        "operational": "As legendas em direto estão a funcionar.",
+        "degraded": "O serviço de legendas está sob carga: transcreve menos vozes ao mesmo tempo.",
+        "paused": "O serviço de legendas pausou devido a sobrecarga e será retomado sozinho.",
+        "unavailable": "O serviço de legendas não responde."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Um evento com gravação ativa aguarda pelo Jibri há mais do que o tempo limite: a sessão não está a ser gravada.",
       "smtp": "Não serão enviados emails de confirmação de inscrição nem lembretes.",
       "postprodDegraded": "As transcrições e os resumos de algumas gravações recentes não foram gerados. As gravações de vídeo continuam disponíveis.",
-      "jvbDown": "Os participantes não recebem áudio nem vídeo."
+      "jvbDown": "Os participantes não recebem áudio nem vídeo.",
+      "captionsPaused": "As legendas faltam na sala durante algum tempo; o áudio e o vídeo não são afetados.",
+      "captionsDown": "Não aparecem legendas na sala; o áudio e o vídeo funcionam normalmente."
     },
     "overallVerdicts": {
       "operational": "Todos os serviços estão a funcionar corretamente. A plataforma está totalmente operacional.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Pedidos/s",
       "podUptime": "Uptime do pod"
     },
-    "probeDetail": "Resultado da verificação"
+    "probeDetail": "Resultado da verificação",
+    "connCaptions": "Áudio e legendas"
   },
   "feedback": {
     "title": "Como avalia este evento?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Uma nevada",
         "secretWell": "Três desejos no poço: uma surpresa para o seu personagem"
       }
-    }
+    },
+    "captionsNoticeTitle": "Legendas automáticas",
+    "captionsNotice": "Durante a transmissão em direto, a voz de quem fala é transcrita em tempo real para mostrar legendas. A transcrição é feita nos servidores que alojam a plataforma e o texto não é guardado. As legendas podem ser ocultadas com o botão CC."
   },
   "recording": {
     "management": "Gravação de vídeo",

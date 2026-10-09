@@ -177,6 +177,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
+      ...(data.liveCaptionsEnabled !== undefined && {
+        liveCaptionsEnabled: data.liveCaptionsEnabled,
+      }),
       moderatorName: data.moderatorName,
       moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       moderatorOrganization: data.moderatorOrganization || null,

@@ -37,6 +37,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'chatEnabled',
   'whiteboardEnabled',
   'wordCloudEnabled',
+  'liveCaptionsEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',

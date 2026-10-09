@@ -70,6 +70,7 @@ function leggiStato(eventId: string): Promise<StatoLive | null> {
         chatEnabled: true,
         agendaEnabled: true,
         wordCloudEnabled: true,
+        liveCaptionsEnabled: true,
         recordingEnabled: true,
       },
     })
@@ -111,6 +112,7 @@ export async function GET(
       chatEnabled: true,
       agendaEnabled: true,
       wordCloudEnabled: true,
+      liveCaptionsEnabled: true,
       recordingEnabled: true,
     },
   });

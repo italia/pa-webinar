@@ -251,6 +251,12 @@ export interface JitsiJwtFeatures {
   livestreaming: boolean;
   'screen-sharing': boolean;
   'outbound-call': boolean;
+  /**
+   * Avviare e fermare la trascrizione dei sottotitoli live. Il client Jitsi
+   * scrive i metadati di stanza che la accendono solo se il token lo concede:
+   * lo fa la sala del portale per conto del moderatore (useCaptionsControl).
+   */
+  transcription: boolean;
 }
 
 export const participantFeatures: JitsiJwtFeatures = {
@@ -258,6 +264,7 @@ export const participantFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 export const moderatorFeatures: JitsiJwtFeatures = {
@@ -265,6 +272,7 @@ export const moderatorFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: true,
 };
 
 /**
@@ -278,6 +286,7 @@ export const speakerFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 /**

@@ -1318,6 +1318,25 @@ function FeaturesTab({ settings, updateField }: TabProps) {
       </Row>
 
       <hr className="my-4" />
+      <h3 className="h5 mb-3">{t('liveCaptionsTitle')}</h3>
+      <Row>
+        <Col md={12}>
+          <FormGroup check className="mb-3">
+            <Input
+              id="liveCaptionsEnabled"
+              type="checkbox"
+              checked={settings.liveCaptionsEnabled ?? true}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('liveCaptionsEnabled', e.target.checked)
+              }
+            />
+            <Label check htmlFor="liveCaptionsEnabled">{t('liveCaptionsEnabled')}</Label>
+            <div><small className="text-muted">{t('liveCaptionsEnabledHelp')}</small></div>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
       <h3 className="h5 mb-3">{t('emailSenderTitle')}</h3>
       <p className="text-muted small mb-3">{t('emailSenderHelp')}</p>
       <Row>

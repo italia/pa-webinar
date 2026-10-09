@@ -564,7 +564,17 @@
       "endHelp": "Cierra la sala para todos y marca el evento como finalizado. No se puede deshacer.",
       "timerHeading": "Temporizador de intervenciones"
     },
-    "closingNotice": "{minutes, plural, =0 {La sala se está cerrando.} one {La sala se cierra automáticamente dentro de # minuto.} other {La sala se cierra automáticamente dentro de # minutos.}}"
+    "closingNotice": "{minutes, plural, =0 {La sala se está cerrando.} one {La sala se cierra automáticamente dentro de # minuto.} other {La sala se cierra automáticamente dentro de # minutos.}}",
+    "captions": {
+      "region": "Subtítulos",
+      "unknownSpeaker": "Participante",
+      "paused": "Subtítulos en pausa: el servicio está sobrecargado y se reanudará por sí solo.",
+      "unavailable": "Los subtítulos no están disponibles en este momento.",
+      "show": "Mostrar subtítulos",
+      "hide": "Ocultar subtítulos",
+      "toggle": "Subtítulos automáticos",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Preguntas y Respuestas",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Los correos salen de una dirección no-reply: sin esto, quien responda no llega a nadie.",
         "avatarTitle": "Imágenes de los participantes",
         "gravatarEnabled": "Usar Gravatar cuando esté disponible",
-        "gravatarEnabledHelp": "Quien se haya inscrito con un correo que tenga un Gravatar lo verá como imagen en la sala; para el resto se mantienen las iniciales generadas por la plataforma. La imagen pasa por nuestro servidor, así que el navegador de los participantes no contacta con gravatar.com, pero la plataforma sí: hay que declararlo en la información sobre privacidad."
+        "gravatarEnabledHelp": "Quien se haya inscrito con un correo que tenga un Gravatar lo verá como imagen en la sala; para el resto se mantienen las iniciales generadas por la plataforma. La imagen pasa por nuestro servidor, así que el navegador de los participantes no contacta con gravatar.com, pero la plataforma sí: hay que declararlo en la información sobre privacidad.",
+        "liveCaptionsTitle": "Subtítulos en directo",
+        "liveCaptionsEnabled": "Subtítulos automáticos en las videollamadas",
+        "liveCaptionsEnabledHelp": "La voz de quien habla se transcribe en tiempo real mediante un servicio que funciona en la infraestructura de la plataforma, sin servicios externos, y el texto no se conserva. Están activos en todos los eventos; quien modera puede desactivarlos durante el evento. Sin el servicio instalado, esta opción no tiene efecto."
       },
       "errors": {
         "invalid": "La configuración no se ha guardado: un valor no es válido. Revisa los campos modificados y vuelve a intentarlo.",
@@ -3690,7 +3703,8 @@
       "jvb": "Puente de vídeo",
       "jibri": "Grabación de vídeo",
       "smtp": "Servicio de correo electrónico",
-      "postprod": "Pipeline de IA posevento"
+      "postprod": "Pipeline de IA posevento",
+      "captions": "Subtítulos en directo"
     },
     "descriptions": {
       "app": "El sitio web donde se accede a los eventos",
@@ -3702,7 +3716,8 @@
       "jvb": "Transmite audio y vídeo a los participantes",
       "jibri": "Graba las sesiones de vídeo de los eventos",
       "smtp": "Envía los correos de confirmación y los recordatorios",
-      "postprod": "Transcribe, resume y traduce las grabaciones con modelos de IA en el clúster (GPU NVIDIA A100). Se activa solo cuando un evento habilita las funciones de IA."
+      "postprod": "Transcribe, resume y traduce las grabaciones con modelos de IA en el clúster (GPU NVIDIA A100). Se activa solo cuando un evento habilita las funciones de IA.",
+      "captions": "Transcribe en tiempo real a quien habla y envía los subtítulos a la sala a través del bridge."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Trabajos de posproducción en cola: el nodo GPU se está arrancando (arranque en frío ~3 min).",
         "standby": "Pipeline de IA activo pero en espera: no hay grabaciones que procesar. El nodo GPU está apagado para ahorrar energía.",
         "degraded": "Uno o más trabajos de IA han fallado en las últimas 24 h. Consulta /admin/postprod para ver los detalles."
+      },
+      "captions": {
+        "disabled": "Los subtítulos en directo están desactivados en la configuración de la instancia.",
+        "standby": "El servicio de subtítulos está en espera: se inicia cuando un evento con subtítulos pasa a directo.",
+        "starting": "El servicio de subtítulos se está iniciando para un evento en directo.",
+        "operational": "Los subtítulos en directo funcionan.",
+        "degraded": "El servicio de subtítulos está bajo carga: transcribe menos voces a la vez.",
+        "paused": "El servicio de subtítulos se ha pausado por sobrecarga y se reanudará por sí solo.",
+        "unavailable": "El servicio de subtítulos no responde."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Un evento con grabación activa espera Jibri desde hace más del timeout: la sesión no se está grabando.",
       "smtp": "Los correos de confirmación de inscripción y los recordatorios no se enviarán.",
       "postprodDegraded": "Las transcripciones y las actas de algunas grabaciones recientes no se han generado. Las grabaciones de vídeo siguen estando disponibles.",
-      "jvbDown": "Los participantes no reciben audio ni vídeo."
+      "jvbDown": "Los participantes no reciben audio ni vídeo.",
+      "captionsPaused": "Faltan los subtítulos en la sala durante un tiempo; el audio y el vídeo no se ven afectados.",
+      "captionsDown": "No aparecen subtítulos en la sala; el audio y el vídeo funcionan con normalidad."
     },
     "overallVerdicts": {
       "operational": "Todos los servicios funcionan correctamente. La plataforma está plenamente operativa.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Solicitudes/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Resultado de la comprobación"
+    "probeDetail": "Resultado de la comprobación",
+    "connCaptions": "Audio y subtítulos"
   },
   "feedback": {
     "title": "¿Cómo valora este evento?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Una nevada",
         "secretWell": "Tres deseos en el pozo: una sorpresa para su personaje"
       }
-    }
+    },
+    "captionsNoticeTitle": "Subtítulos automáticos",
+    "captionsNotice": "Durante la emisión en directo, la voz de quien habla se transcribe en tiempo real para mostrar subtítulos. La transcripción se realiza en los servidores que alojan la plataforma y el texto no se conserva. Los subtítulos se pueden ocultar con el botón CC."
   },
   "recording": {
     "management": "Grabación de vídeo",

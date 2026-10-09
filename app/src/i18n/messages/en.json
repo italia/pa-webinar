@@ -564,7 +564,17 @@
       "endHelp": "Closes the room for everyone and marks the event as ended. This cannot be undone.",
       "timerHeading": "Talk timer"
     },
-    "closingNotice": "{minutes, plural, =0 {The room is closing.} one {The room closes automatically in # minute.} other {The room closes automatically in # minutes.}}"
+    "closingNotice": "{minutes, plural, =0 {The room is closing.} one {The room closes automatically in # minute.} other {The room closes automatically in # minutes.}}",
+    "captions": {
+      "region": "Captions",
+      "unknownSpeaker": "Participant",
+      "paused": "Captions paused: the service is overloaded and will resume on its own.",
+      "unavailable": "Captions are unavailable right now.",
+      "show": "Show captions",
+      "hide": "Hide captions",
+      "toggle": "Automatic captions",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody.",
         "avatarTitle": "Participant pictures",
         "gravatarEnabled": "Use Gravatar when available",
-        "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice."
+        "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice.",
+        "liveCaptionsTitle": "Live captions",
+        "liveCaptionsEnabled": "Automatic captions in video calls",
+        "liveCaptionsEnabledHelp": "The voice of whoever is speaking is transcribed in real time by a service that runs in the platform's own infrastructure, with no external services, and the text is not kept. Captions are on in every event; moderators can turn them off during the event. Without the service installed, this option has no effect."
       },
       "errors": {
         "invalid": "The settings were not saved: a value is not valid. Check the fields you changed and try again.",
@@ -3690,7 +3703,8 @@
       "jvb": "Video bridge",
       "jibri": "Video recording",
       "smtp": "Email service",
-      "postprod": "Post-event AI pipeline"
+      "postprod": "Post-event AI pipeline",
+      "captions": "Live captions"
     },
     "descriptions": {
       "app": "The website where you access events",
@@ -3702,7 +3716,8 @@
       "jvb": "Transmits audio and video to participants",
       "jibri": "Records video sessions of events",
       "smtp": "Sends confirmation emails and reminders",
-      "postprod": "Transcribes, summarises and translates recordings using in-cluster AI models (NVIDIA A100 GPU). Activates only when an event opts into AI features."
+      "postprod": "Transcribes, summarises and translates recordings using in-cluster AI models (NVIDIA A100 GPU). Activates only when an event opts into AI features.",
+      "captions": "Transcribes speakers in real time and sends the captions to the room through the bridge."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Postprod jobs queued — the GPU node is starting up (cold-start ~3 min).",
         "standby": "AI pipeline enabled but idle: no recordings to process. The GPU node is powered down to save energy.",
         "degraded": "One or more AI jobs failed in the last 24h. Check /admin/postprod for details."
+      },
+      "captions": {
+        "disabled": "Live captions are turned off in the instance settings.",
+        "standby": "The captions service is on standby: it starts when an event with captions goes live.",
+        "starting": "The captions service is starting for a live event.",
+        "operational": "Live captions are working.",
+        "degraded": "The captions service is under load: it transcribes fewer voices at the same time.",
+        "paused": "The captions service paused itself because of overload and will resume on its own.",
+        "unavailable": "The captions service is not responding."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "An event with recording enabled has been waiting for Jibri past the timeout: the session is not being recorded.",
       "smtp": "Registration confirmation emails and reminders will not be sent.",
       "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available.",
-      "jvbDown": "Participants receive no audio or video."
+      "jvbDown": "Participants receive no audio or video.",
+      "captionsPaused": "Captions are missing in the room for a while; audio and video are not affected.",
+      "captionsDown": "No captions appear in the room; audio and video work normally."
     },
     "overallVerdicts": {
       "operational": "All services are working correctly. The platform is fully operational.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Requests/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Check result"
+    "probeDetail": "Check result",
+    "connCaptions": "Audio and captions"
   },
   "feedback": {
     "title": "How would you rate this event?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "A snowfall",
         "secretWell": "Three wishes at the well: a surprise for your character"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatic captions",
+    "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the CC button."
   },
   "recording": {
     "management": "Video recording",

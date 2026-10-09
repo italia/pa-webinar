@@ -65,6 +65,10 @@ describe('Jitsi config exports', () => {
 
   it('moderator features have recording enabled', () => {
     expect(moderatorFeatures.recording).toBe(true);
+    // I sottotitoli live li accende la sala per conto di chi modera: solo il
+    // suo token concede di scrivere nei metadati della stanza.
+    expect(moderatorFeatures.transcription).toBe(true);
+    expect(participantFeatures.transcription).toBe(false);
   });
 
   it('both feature sets have screen-sharing enabled', () => {

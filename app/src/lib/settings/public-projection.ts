@@ -50,6 +50,9 @@ export const PUBLIC_SETTING_FIELDS = [
   'emailFromName',
   // Sapere SE l'istanza usa Gravatar non rivela nulla di nessuno.
   'gravatarEnabled',
+  // Che la sala mostri i sottotitoli live lo vede chiunque entri: lo dice
+  // anche l'avviso della sala d'attesa.
+  'liveCaptionsEnabled',
   'defaultLocale', 'availableLocales', 'localeNames', 'translationOverrides',
   'jvbInactiveGraceMinutes', 'jvbPreScaleMinutes', 'waitingRoomLeadMinutes',
   'jvbEmptyCloseMinutes', 'reactionsMode',

@@ -20,7 +20,7 @@ import { PresentationTimerControls } from './presentation-timer';
  */
 
 export interface FunzioneSala {
-  key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled' | 'wordCloudEnabled';
+  key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled' | 'wordCloudEnabled' | 'liveCaptionsEnabled';
   label: string;
   on: boolean;
 }

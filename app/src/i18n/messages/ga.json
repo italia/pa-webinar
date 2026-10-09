@@ -564,7 +564,17 @@
       "endHelp": "Dúnann sé an seomra do chách agus marcálann sé an imeacht mar críochnaithe. Ní féidir é a chealú.",
       "timerHeading": "Amadóir na gcaintí"
     },
-    "closingNotice": "{minutes, plural, =0 {Tá an seomra ag dúnadh.} one {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} two {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} few {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} many {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} other {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.}}"
+    "closingNotice": "{minutes, plural, =0 {Tá an seomra ag dúnadh.} one {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} two {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} few {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} many {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} other {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.}}",
+    "captions": {
+      "region": "Fotheidil",
+      "unknownSpeaker": "Rannpháirtí",
+      "paused": "Fotheidil curtha ar sos: tá an tseirbhís faoi ró-ualach agus leanfaidh sí ar aghaidh léi féin.",
+      "unavailable": "Níl fotheidil ar fáil faoi láthair.",
+      "show": "Taispeáin fotheidil",
+      "hide": "Folaigh fotheidil",
+      "toggle": "Fotheidil uathoibríocha",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Seoltar na ríomhphoist ó sheoladh nach nglactar le freagraí air: gan é seo, ní shroicheann freagra aon duine.",
         "avatarTitle": "Pictiúir na rannpháirtithe",
         "gravatarEnabled": "Úsáid Gravatar nuair atá sé ar fáil",
-        "gravatarEnabledHelp": "Taispeánfar an Gravatar sa seomra do dhaoine a chláraigh le seoladh ríomhphoist a bhfuil Gravatar aige; coinníonn gach duine eile na ceannlitreacha a chruthaíonn an t-ardán. Faightear an íomhá trínár bhfreastalaí féin, agus mar sin ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com — ach déanann an t-ardán: caithfear é sin a lua i bhfógra príobháideachais an tsuímh."
+        "gravatarEnabledHelp": "Taispeánfar an Gravatar sa seomra do dhaoine a chláraigh le seoladh ríomhphoist a bhfuil Gravatar aige; coinníonn gach duine eile na ceannlitreacha a chruthaíonn an t-ardán. Faightear an íomhá trínár bhfreastalaí féin, agus mar sin ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com — ach déanann an t-ardán: caithfear é sin a lua i bhfógra príobháideachais an tsuímh.",
+        "liveCaptionsTitle": "Fotheidil bheo",
+        "liveCaptionsEnabled": "Fotheidil uathoibríocha i nglaonna físe",
+        "liveCaptionsEnabledHelp": "Tras-scríobhann seirbhís a ritheann i mbonneagar an ardáin féin guth an duine atá ag labhairt i bhfíor-am, gan seirbhísí seachtracha, agus ní choinnítear an téacs. Bíonn na fotheidil ar siúl i ngach imeacht; is féidir le modhnóirí iad a mhúchadh le linn an imeachta. Gan an tseirbhís a bheith suiteáilte, níl aon éifeacht ag an rogha seo. Ní thras-scríobhann an tsamhail an Ghaeilge go hiontaofa fós."
       },
       "errors": {
         "invalid": "Níor sábháladh na socruithe: tá luach neamhbhailí. Seiceáil na réimsí a d'athraigh tú agus bain triail eile as.",
@@ -3690,7 +3703,8 @@
       "jvb": "Droichead físeáin",
       "jibri": "Taifeadadh físeáin",
       "smtp": "Seirbhís ríomhphoist",
-      "postprod": "Píblíne AI iarimeachta"
+      "postprod": "Píblíne AI iarimeachta",
+      "captions": "Fotheidil bheo"
     },
     "descriptions": {
       "app": "An suíomh gréasáin ina n-aimsíonn sibh imeachtaí",
@@ -3702,7 +3716,8 @@
       "jvb": "Tarchuireann fuaim agus físeán chuig rannpháirtithe",
       "jibri": "Taifeadann seisiúin físe d'imeachtaí",
       "smtp": "Seolann ríomhphoist deimhnithe agus meabhrúcháin",
-      "postprod": "Tras-scríobhann, achoimríonn agus aistríonn sé na taifeadtaí le samhlacha AI sa bhraisle (GPU NVIDIA A100). Ní ghníomhachtaítear é ach amháin nuair a roghnaíonn imeacht na gnéithe AI."
+      "postprod": "Tras-scríobhann, achoimríonn agus aistríonn sé na taifeadtaí le samhlacha AI sa bhraisle (GPU NVIDIA A100). Ní ghníomhachtaítear é ach amháin nuair a roghnaíonn imeacht na gnéithe AI.",
+      "captions": "Tras-scríobhann sí na cainteoirí i bhfíor-am agus seolann sí na fotheidil chuig an seomra tríd an droichead."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Jabanna iarléirithe i scuaine — tá an nód GPU ag tosú (fuartosú ~3 nóim.).",
         "standby": "Píblíne AI cumasaithe ach díomhaoin: níl aon taifeadadh le próiseáil. Tá an nód GPU múchta chun fuinneamh a shábháil.",
         "degraded": "Theip ar jab AI amháin nó níos mó le 24 uair anuas. Seiceáil /admin/postprod le haghaidh sonraí."
+      },
+      "captions": {
+        "disabled": "Tá na fotheidil bheo múchta i socruithe an cháis.",
+        "standby": "Tá seirbhís na bhfotheideal ar fuireachas: tosaíonn sí nuair a théann imeacht le fotheidil beo.",
+        "starting": "Tá seirbhís na bhfotheideal ag tosú d'imeacht beo.",
+        "operational": "Tá na fotheidil bheo ag obair.",
+        "degraded": "Tá seirbhís na bhfotheideal faoi ualach: tras-scríobhann sí níos lú guthanna ag an am céanna.",
+        "paused": "Chuir seirbhís na bhfotheideal í féin ar sos de bharr ró-ualaigh agus leanfaidh sí ar aghaidh léi féin.",
+        "unavailable": "Níl seirbhís na bhfotheideal ag freagairt."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Tá imeacht le taifeadadh gníomhach ag fanacht ar Jibri thar an teorainn ama: níl an seisiún á thaifeadadh.",
       "smtp": "Ní sheolfar ríomhphoist deimhnithe clárúcháin ná meabhrúcháin.",
       "postprodDegraded": "Níor cruthaíodh na tras-scríbhinní ná na hachoimrí do roinnt taifeadtaí le déanaí. Tá na taifeadtaí físe ar fáil mar sin féin.",
-      "jvbDown": "Ní fhaigheann rannpháirtithe fuaim ná físeán."
+      "jvbDown": "Ní fhaigheann rannpháirtithe fuaim ná físeán.",
+      "captionsPaused": "Tá na fotheidil in easnamh sa seomra ar feadh tamaill; níl tionchar ar fhuaim ná ar fhís.",
+      "captionsDown": "Ní thaispeántar aon fhotheidil sa seomra; oibríonn fuaim agus físeán mar is gnách."
     },
     "overallVerdicts": {
       "operational": "Tá gach seirbhís ag obair i gceart. Tá an t-ardán ag feidhmiú go hiomlán.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Iarratais/s",
       "podUptime": "Aimsir pod"
     },
-    "probeDetail": "Toradh an tseiceála"
+    "probeDetail": "Toradh an tseiceála",
+    "connCaptions": "Fuaim agus fotheidil"
   },
   "feedback": {
     "title": "Conas a mheasann sibh an t-imeacht seo?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Titim sneachta",
         "secretWell": "Trí ghuí ag an tobar: iontas do do charachtar"
       }
-    }
+    },
+    "captionsNoticeTitle": "Fotheidil uathoibríocha",
+    "captionsNotice": "Le linn an tseisiúin bheo, tras-scríobhtar guth an duine atá ag labhairt i bhfíor-am chun fotheidil a thaispeáint. Déantar an tras-scríobh ar na freastalaithe a óstálann an t-ardán agus ní choinnítear an téacs. Is féidir na fotheidil a fholú leis an gcnaipe CC."
   },
   "recording": {
     "management": "Taifeadadh físe",

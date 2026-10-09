@@ -42,6 +42,7 @@ export const CREATED_EVENT_FIELDS = [
   'chatEnabled',
   'whiteboardEnabled',
   'wordCloudEnabled',
+  'liveCaptionsEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',

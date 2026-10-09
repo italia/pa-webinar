@@ -86,6 +86,8 @@ export const updateSettingsSchema = z.object({
   supportEmail: z.string().email().nullish(),
   // Nome mittente mostrato in posta; stringa vuota = torna al default.
   gravatarEnabled: z.boolean().optional(),
+  // Sottotitoli live nell'istanza (ADR-018): interruttore generale.
+  liveCaptionsEnabled: z.boolean().optional(),
   emailFromName: z.string().max(100).nullish(),
   emailReplyTo: z.string().email().nullish(),
   availableLocales: z.array(z.string().min(2).max(5)).optional(),

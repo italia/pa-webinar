@@ -564,7 +564,17 @@
       "endHelp": "Ferme la salle pour tous et marque l'événement comme terminé. Action irréversible.",
       "timerHeading": "Minuteur des interventions"
     },
-    "closingNotice": "{minutes, plural, =0 {La salle se ferme.} one {La salle se ferme automatiquement dans # minute.} other {La salle se ferme automatiquement dans # minutes.}}"
+    "closingNotice": "{minutes, plural, =0 {La salle se ferme.} one {La salle se ferme automatiquement dans # minute.} other {La salle se ferme automatiquement dans # minutes.}}",
+    "captions": {
+      "region": "Sous-titres",
+      "unknownSpeaker": "Participant",
+      "paused": "Sous-titres en pause : le service est surchargé et reprendra de lui-même.",
+      "unavailable": "Sous-titres indisponibles pour le moment.",
+      "show": "Afficher les sous-titres",
+      "hide": "Masquer les sous-titres",
+      "toggle": "Sous-titres automatiques",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Questions et Réponses",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Les e-mails partent d'une adresse no-reply : sans cette adresse, les réponses n'atteignent personne.",
         "avatarTitle": "Images des participants",
         "gravatarEnabled": "Utiliser Gravatar lorsqu'il est disponible",
-        "gravatarEnabledHelp": "Les personnes inscrites avec une adresse e-mail associée à un Gravatar le verront s'afficher comme image dans la salle ; pour toutes les autres, les initiales générées par la plateforme sont conservées. L'image transite par notre propre serveur : le navigateur des participants ne contacte donc jamais gravatar.com — mais la plateforme, si : cela doit être déclaré dans votre politique de confidentialité."
+        "gravatarEnabledHelp": "Les personnes inscrites avec une adresse e-mail associée à un Gravatar le verront s'afficher comme image dans la salle ; pour toutes les autres, les initiales générées par la plateforme sont conservées. L'image transite par notre propre serveur : le navigateur des participants ne contacte donc jamais gravatar.com — mais la plateforme, si : cela doit être déclaré dans votre politique de confidentialité.",
+        "liveCaptionsTitle": "Sous-titres en direct",
+        "liveCaptionsEnabled": "Sous-titres automatiques dans les visioconférences",
+        "liveCaptionsEnabledHelp": "La voix de la personne qui parle est transcrite en temps réel par un service qui fonctionne dans l'infrastructure de la plateforme, sans service externe, et le texte n'est pas conservé. Les sous-titres sont actifs dans tous les événements ; les modérateurs peuvent les désactiver pendant l'événement. Sans le service installé, cette option est sans effet."
       },
       "errors": {
         "invalid": "Les paramètres n'ont pas été enregistrés : une valeur n'est pas valide. Vérifiez les champs modifiés et réessayez.",
@@ -3690,7 +3703,8 @@
       "jvb": "Pont vidéo",
       "jibri": "Enregistrement vidéo",
       "smtp": "Service e-mail",
-      "postprod": "Chaîne de traitement IA post-événement"
+      "postprod": "Chaîne de traitement IA post-événement",
+      "captions": "Sous-titres en direct"
     },
     "descriptions": {
       "app": "Le site web où vous accédez aux événements",
@@ -3702,7 +3716,8 @@
       "jvb": "Transmet l'audio et la vidéo aux participants",
       "jibri": "Enregistre les sessions vidéo des événements",
       "smtp": "Envoie les e-mails de confirmation et les rappels",
-      "postprod": "Transcrit, résume et traduit les enregistrements avec des modèles IA dans le cluster (GPU NVIDIA A100). Ne s'active que lorsqu'un événement active les fonctionnalités IA."
+      "postprod": "Transcrit, résume et traduit les enregistrements avec des modèles IA dans le cluster (GPU NVIDIA A100). Ne s'active que lorsqu'un événement active les fonctionnalités IA.",
+      "captions": "Transcrit en temps réel les personnes qui parlent et envoie les sous-titres à la salle via le bridge."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Tâches de post-production en file — le nœud GPU démarre (démarrage à froid ~3 min).",
         "standby": "Chaîne de traitement IA activée mais en attente : aucun enregistrement à traiter. Le nœud GPU est éteint pour économiser l'énergie.",
         "degraded": "Une ou plusieurs tâches IA ont échoué au cours des dernières 24 h. Consultez /admin/postprod pour les détails."
+      },
+      "captions": {
+        "disabled": "Les sous-titres en direct sont désactivés dans les paramètres de l'instance.",
+        "standby": "Le service de sous-titres est en veille : il démarre quand un événement avec sous-titres passe en direct.",
+        "starting": "Le service de sous-titres démarre pour un événement en direct.",
+        "operational": "Les sous-titres en direct fonctionnent.",
+        "degraded": "Le service de sous-titres est chargé : il transcrit moins de voix en même temps.",
+        "paused": "Le service de sous-titres s'est mis en pause pour cause de surcharge et reprendra de lui-même.",
+        "unavailable": "Le service de sous-titres ne répond pas."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Un événement avec enregistrement actif attend Jibri depuis plus longtemps que le délai : la session n'est pas enregistrée.",
       "smtp": "Les e-mails de confirmation d'inscription et les rappels ne seront pas envoyés.",
       "postprodDegraded": "Les transcriptions et les comptes rendus de certains enregistrements récents n'ont pas été générés. Les enregistrements vidéo restent disponibles.",
-      "jvbDown": "Les participants ne reçoivent ni audio ni vidéo."
+      "jvbDown": "Les participants ne reçoivent ni audio ni vidéo.",
+      "captionsPaused": "Les sous-titres manquent un moment dans la salle ; l'audio et la vidéo ne sont pas affectés.",
+      "captionsDown": "Aucun sous-titre n'apparaît dans la salle ; l'audio et la vidéo fonctionnent normalement."
     },
     "overallVerdicts": {
       "operational": "Tous les services fonctionnent correctement. La plateforme est pleinement opérationnelle.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Requêtes/s",
       "podUptime": "Uptime pod"
     },
-    "probeDetail": "Résultat de la vérification"
+    "probeDetail": "Résultat de la vérification",
+    "connCaptions": "Audio et sous-titres"
   },
   "feedback": {
     "title": "Comment évaluez-vous cet événement ?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Une chute de neige",
         "secretWell": "Trois vœux au puits : une surprise pour votre personnage"
       }
-    }
+    },
+    "captionsNoticeTitle": "Sous-titres automatiques",
+    "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton CC."
   },
   "recording": {
     "management": "Enregistrement vidéo",

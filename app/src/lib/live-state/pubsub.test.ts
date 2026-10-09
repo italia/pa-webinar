@@ -53,6 +53,7 @@ const FLAGS: LiveEnvelope = {
     chatEnabled: true,
     agendaEnabled: true,
     wordCloudEnabled: false,
+    liveCaptionsEnabled: true,
     recordingEnabled: false,
   },
   ts: '2026-07-27T10:00:00.000Z',

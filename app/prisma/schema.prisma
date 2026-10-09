@@ -62,6 +62,11 @@ model Event {
   // sempre-attiva (poco usata; in prospettiva sostituita da una sintesi AI).
   // Attivabile dal moderatore durante l'evento (barra funzioni).
   wordCloudEnabled Boolean @default(false) @map("word_cloud_enabled")
+  // Sottotitoli live (ADR-018): trascrizione in streaming nel cluster, attiva
+  // di default. Il moderatore la spegne e la riaccende durante l'evento. Vale
+  // solo se l'istanza ha i sottotitoli attivi (SiteSetting.liveCaptionsEnabled)
+  // e il servizio è installato (CAPTIONS_STATUS_URL).
+  liveCaptionsEnabled Boolean @default(true) @map("live_captions_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -1306,6 +1311,10 @@ model SiteSetting {
   // va dichiarata nell'informativa. Con il flag spento restano gli avatar con
   // le iniziali generati da noi.
   gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
+
+  // Sottotitoli live (ADR-018): interruttore dell'istanza, attivo di default.
+  // Spento, nessun evento li avvia, qualunque sia la sua impostazione.
+  liveCaptionsEnabled Boolean @default(true) @map("live_captions_enabled")
 
   emailFromName String? @map("email_from_name")
   // Optional Reply-To. The From address is a no-reply relay, so without this a

@@ -564,7 +564,17 @@
       "endHelp": "Zapre sobo za vse in označi dogodek kot končan. Tega ni mogoče razveljaviti.",
       "timerHeading": "Časovnik govorov"
     },
-    "closingNotice": "{minutes, plural, =0 {Soba se zapira.} one {Soba se samodejno zapre čez # minuto.} two {Soba se samodejno zapre čez # minuti.} few {Soba se samodejno zapre čez # minute.} other {Soba se samodejno zapre čez # minut.}}"
+    "closingNotice": "{minutes, plural, =0 {Soba se zapira.} one {Soba se samodejno zapre čez # minuto.} two {Soba se samodejno zapre čez # minuti.} few {Soba se samodejno zapre čez # minute.} other {Soba se samodejno zapre čez # minut.}}",
+    "captions": {
+      "region": "Podnapisi",
+      "unknownSpeaker": "Udeleženec",
+      "paused": "Podnapisi so začasno ustavljeni: storitev je preobremenjena in bo nadaljevala sama.",
+      "unavailable": "Podnapisi trenutno niso na voljo.",
+      "show": "Prikaži podnapise",
+      "hide": "Skrij podnapise",
+      "toggle": "Samodejni podnapisi",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "E-sporočila prihajajo z naslova, ki ne sprejema odgovorov: brez tega odgovor ne doseže nikogar.",
         "avatarTitle": "Slike udeležencev",
         "gravatarEnabled": "Uporabi Gravatar, kadar je na voljo",
-        "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti."
+        "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti.",
+        "liveCaptionsTitle": "Podnapisi v živo",
+        "liveCaptionsEnabled": "Samodejni podnapisi v videoklicih",
+        "liveCaptionsEnabledHelp": "Glas govorca sproti prepisuje storitev, ki teče v lastni infrastrukturi platforme, brez zunanjih storitev, besedilo pa se ne hrani. Podnapisi so vklopljeni na vseh dogodkih; moderatorji jih lahko med dogodkom izklopijo. Brez nameščene storitve ta možnost nima učinka. Slovenščine model še ne prepisuje zanesljivo."
       },
       "errors": {
         "invalid": "Nastavitve niso bile shranjene: ena od vrednosti ni veljavna. Preverite spremenjena polja in poskusite znova.",
@@ -3690,7 +3703,8 @@
       "jvb": "Video most",
       "jibri": "Video snemanje",
       "smtp": "E-poštna storitev",
-      "postprod": "Cevovod AI po dogodku"
+      "postprod": "Cevovod AI po dogodku",
+      "captions": "Podnapisi v živo"
     },
     "descriptions": {
       "app": "Spletna stran, kjer dostopate do dogodkov",
@@ -3702,7 +3716,8 @@
       "jvb": "Prenaša zvok in video udeležencem",
       "jibri": "Snema video seje dogodkov",
       "smtp": "Pošilja potrditvena e-sporočila in opomnike",
-      "postprod": "Posnetke prepiše, povzame in prevede z modeli AI v gruči (GPU NVIDIA A100). Vklopi se le, kadar dogodek uporablja funkcije AI."
+      "postprod": "Posnetke prepiše, povzame in prevede z modeli AI v gruči (GPU NVIDIA A100). Vklopi se le, kadar dogodek uporablja funkcije AI.",
+      "captions": "Sproti prepisuje govorce in prek bridga pošilja podnapise v sobo."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Opravila postprodukcije so v čakalni vrsti — vozlišče GPU se zaganja (hladni zagon ~3 min).",
         "standby": "Cevovod AI je vklopljen, a nedejaven: ni posnetkov za obdelavo. Vozlišče GPU je izklopljeno zaradi varčevanja z energijo.",
         "degraded": "Eno ali več opravil AI je v zadnjih 24 urah spodletelo. Podrobnosti preverite na /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Podnapisi v živo so izklopljeni v nastavitvah primerka.",
+        "standby": "Storitev podnapisov je v pripravljenosti: zažene se, ko se dogodek s podnapisi začne v živo.",
+        "starting": "Storitev podnapisov se zaganja za dogodek v živo.",
+        "operational": "Podnapisi v živo delujejo.",
+        "degraded": "Storitev podnapisov je obremenjena: hkrati prepisuje manj glasov.",
+        "paused": "Storitev podnapisov se je zaradi preobremenitve ustavila in bo nadaljevala sama.",
+        "unavailable": "Storitev podnapisov se ne odziva."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Dogodek z aktivnim snemanjem čaka Jibri dlje od časovne omejitve: seja se ne snema.",
       "smtp": "Potrditvena e-sporočila in opomniki za registracijo ne bodo poslani.",
       "postprodDegraded": "Prepisi in zapisniki za nekatere nedavne posnetke niso bili ustvarjeni. Videoposnetki so kljub temu na voljo.",
-      "jvbDown": "Udeleženci ne prejemajo zvoka in slike."
+      "jvbDown": "Udeleženci ne prejemajo zvoka in slike.",
+      "captionsPaused": "V sobi nekaj časa ni podnapisov; zvok in slika nista prizadeta.",
+      "captionsDown": "V sobi se podnapisi ne prikazujejo; zvok in slika delujeta normalno."
     },
     "overallVerdicts": {
       "operational": "Vse storitve delujejo pravilno. Platforma je v celoti operativna.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Zahtevki/s",
       "podUptime": "Čas delovanja poda"
     },
-    "probeDetail": "Rezultat preverjanja"
+    "probeDetail": "Rezultat preverjanja",
+    "connCaptions": "Zvok in podnapisi"
   },
   "feedback": {
     "title": "Kako ocenjujete ta dogodek?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Sneženje",
         "secretWell": "Tri želje ob vodnjaku: presenečenje za vaš lik"
       }
-    }
+    },
+    "captionsNoticeTitle": "Samodejni podnapisi",
+    "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom CC."
   },
   "recording": {
     "management": "Video posnetek",

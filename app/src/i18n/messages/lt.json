@@ -564,7 +564,17 @@
       "endHelp": "Uždaro kambarį visiems ir pažymi renginį kaip baigtą. Atšaukti negalima.",
       "timerHeading": "Pranešimų laikmatis"
     },
-    "closingNotice": "{minutes, plural, =0 {Kambarys užsidaro.} one {Kambarys automatiškai užsidarys po # minutės.} few {Kambarys automatiškai užsidarys po # minučių.} many {Kambarys automatiškai užsidarys po # minutės.} other {Kambarys automatiškai užsidarys po # minučių.}}"
+    "closingNotice": "{minutes, plural, =0 {Kambarys užsidaro.} one {Kambarys automatiškai užsidarys po # minutės.} few {Kambarys automatiškai užsidarys po # minučių.} many {Kambarys automatiškai užsidarys po # minutės.} other {Kambarys automatiškai užsidarys po # minučių.}}",
+    "captions": {
+      "region": "Subtitrai",
+      "unknownSpeaker": "Dalyvis",
+      "paused": "Subtitrai pristabdyti: paslauga perkrauta ir atnaujins darbą pati.",
+      "unavailable": "Subtitrai šiuo metu nepasiekiami.",
+      "show": "Rodyti subtitrus",
+      "hide": "Slėpti subtitrus",
+      "toggle": "Automatiniai subtitrai",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "Laiškai siunčiami iš adreso, į kurį atsakyti negalima: be šio nustatymo atsakymas nieko nepasieks.",
         "avatarTitle": "Dalyvių nuotraukos",
         "gravatarEnabled": "Naudoti Gravatar, kai jis yra",
-        "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime."
+        "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime.",
+        "liveCaptionsTitle": "Tiesioginiai subtitrai",
+        "liveCaptionsEnabled": "Automatiniai subtitrai vaizdo skambučiuose",
+        "liveCaptionsEnabledHelp": "Kalbančiojo balsą realiuoju laiku transkribuoja paslauga, veikianti pačios platformos infrastruktūroje, be išorinių paslaugų, o tekstas nesaugomas. Subtitrai įjungti visuose renginiuose; moderatoriai gali juos išjungti renginio metu. Neįdiegus paslaugos ši parinktis neveikia. Lietuvių kalbos modelis kol kas patikimai netranskribuoja."
       },
       "errors": {
         "invalid": "Nustatymai neišsaugoti: viena reikšmė netinkama. Patikrinkite pakeistus laukus ir bandykite dar kartą.",
@@ -3690,7 +3703,8 @@
       "jvb": "Vaizdo tiltas",
       "jibri": "Vaizdo įrašymas",
       "smtp": "El. pašto paslauga",
-      "postprod": "DI grandinė po renginio"
+      "postprod": "DI grandinė po renginio",
+      "captions": "Tiesioginiai subtitrai"
     },
     "descriptions": {
       "app": "Svetainė, kurioje pasiekiate renginius",
@@ -3702,7 +3716,8 @@
       "jvb": "Perduoda garsą ir vaizdą dalyviams",
       "jibri": "Įrašo renginių vaizdo sesijas",
       "smtp": "Siunčia patvirtinimo el. laiškus ir priminimus",
-      "postprod": "Transkribuoja, apibendrina ir verčia įrašus naudodama klasteryje veikiančius DI modelius (NVIDIA A100 GPU). Įsijungia tik tada, kai renginyje įjungiamos DI funkcijos."
+      "postprod": "Transkribuoja, apibendrina ir verčia įrašus naudodama klasteryje veikiančius DI modelius (NVIDIA A100 GPU). Įsijungia tik tada, kai renginyje įjungiamos DI funkcijos.",
+      "captions": "Realiuoju laiku transkribuoja kalbėtojus ir per bridge siunčia subtitrus į salę."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Postprodukcijos užduotys laukia eilėje – GPU mazgas paleidžiamas (šaltas startas ~3 min.).",
         "standby": "DI grandinė įjungta, bet laukia: apdoroti įrašų nėra. GPU mazgas išjungtas taupant energiją.",
         "degraded": "Per pastarąsias 24 val. nepavyko įvykdyti vienos ar kelių DI užduočių. Išsamiau žr. /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Tiesioginiai subtitrai išjungti egzemplioriaus nustatymuose.",
+        "standby": "Subtitrų paslauga laukia: ji paleidžiama, kai renginys su subtitrais pradedamas transliuoti tiesiogiai.",
+        "starting": "Subtitrų paslauga paleidžiama tiesioginiam renginiui.",
+        "operational": "Tiesioginiai subtitrai veikia.",
+        "degraded": "Subtitrų paslauga apkrauta: ji vienu metu transkribuoja mažiau balsų.",
+        "paused": "Subtitrų paslauga dėl perkrovos sustabdė darbą ir atnaujins jį pati.",
+        "unavailable": "Subtitrų paslauga neatsako."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Renginys su aktyviu įrašymu laukia Jibri ilgiau nei laikas: sesija neįrašoma.",
       "smtp": "Registracijos patvirtinimo el. laiškai ir priminimai nebus siunčiami.",
       "postprodDegraded": "Kai kurių naujausių įrašų transkripcijos ir santraukos nebuvo sukurtos. Vaizdo įrašai vis tiek pasiekiami.",
-      "jvbDown": "Dalyviai negauna nei garso, nei vaizdo."
+      "jvbDown": "Dalyviai negauna nei garso, nei vaizdo.",
+      "captionsPaused": "Salėje kurį laiką nėra subtitrų; garsui ir vaizdui tai neturi įtakos.",
+      "captionsDown": "Salėje subtitrai nerodomi; garsas ir vaizdas veikia įprastai."
     },
     "overallVerdicts": {
       "operational": "Visos paslaugos veikia teisingai. Platforma visiškai veikia.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Užklausos/s",
       "podUptime": "Pod veikimas"
     },
-    "probeDetail": "Patikros rezultatas"
+    "probeDetail": "Patikros rezultatas",
+    "connCaptions": "Garsas ir subtitrai"
   },
   "feedback": {
     "title": "Kaip vertinate šį renginį?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Snygis",
         "secretWell": "Trys norai prie šulinio: staigmena jūsų veikėjui"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatiniai subtitrai",
+    "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti mygtuku CC."
   },
   "recording": {
     "management": "Vaizdo įrašas",

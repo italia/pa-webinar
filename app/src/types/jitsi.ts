@@ -77,6 +77,25 @@ export interface JitsiEventMap {
   screenSharingStatusChanged: [{ id: string; on: boolean }];
   incomingMessage: [JitsiChatMessage];
   outgoingMessage: [JitsiChatMessage];
+  /** Un frammento dei sottotitoli live, arrivato dal bridge. Lo ricevono tutti
+   *  i client, anche con i sottotitoli nativi di Jitsi nascosti. L'IFrame API
+   *  lo consegna dentro `data`. */
+  transcriptionChunkReceived: [{ data?: JitsiTranscriptionChunk }];
+}
+
+/**
+ * Un frammento dei sottotitoli live come lo inoltra l'IFrame API: il testo
+ * intero della frase finora, in `final` quando è definitivo, altrimenti in
+ * `stable` o `unstable`. `participant.id` è l'endpoint di chi parla; il nome,
+ * se c'è, non è affidabile (il servizio non lo conosce).
+ */
+export interface JitsiTranscriptionChunk {
+  messageID: string;
+  language?: string;
+  participant?: { id?: string; name?: string; avatarUrl?: string };
+  final?: string;
+  stable?: string;
+  unstable?: string;
 }
 
 export type JitsiEventName = keyof JitsiEventMap;
@@ -109,6 +128,10 @@ export interface JitsiMeetExternalAPI {
   /** Set a remote participant's playback volume for the LOCAL user only
    *  (0 = muted … 1 = 100%). Does not affect what other participants hear. */
   executeCommand(command: 'setParticipantVolume', participantId: string, level: number): void;
+  /** Accende o spegne la trascrizione dei sottotitoli live (chi modera, con la
+   *  feature `transcription` nel token). `displaySubtitles` mostra o nasconde
+   *  i sottotitoli nativi di Jitsi: la sala usa i propri. */
+  executeCommand(command: 'setSubtitles', enabled: boolean, displaySubtitles?: boolean, language?: string | null): void;
   executeCommand(command: string, ...args: unknown[]): void;
 
   // Event listeners

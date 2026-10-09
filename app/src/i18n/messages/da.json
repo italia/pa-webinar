@@ -564,7 +564,17 @@
       "endHelp": "Lukker rummet for alle og markerer arrangementet som afsluttet. Kan ikke fortrydes.",
       "timerHeading": "Timer for indlæg"
     },
-    "closingNotice": "{minutes, plural, =0 {Rummet lukker.} one {Rummet lukker automatisk om # minut.} other {Rummet lukker automatisk om # minutter.}}"
+    "closingNotice": "{minutes, plural, =0 {Rummet lukker.} one {Rummet lukker automatisk om # minut.} other {Rummet lukker automatisk om # minutter.}}",
+    "captions": {
+      "region": "Undertekster",
+      "unknownSpeaker": "Deltager",
+      "paused": "Undertekster sat på pause: tjenesten er overbelastet og fortsætter af sig selv.",
+      "unavailable": "Undertekster er ikke tilgængelige lige nu.",
+      "show": "Vis undertekster",
+      "hide": "Skjul undertekster",
+      "toggle": "Automatiske undertekster",
+      "button": "CC"
+    }
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -1814,7 +1824,10 @@
         "emailReplyToHelp": "E-mailene sendes fra en no-reply-adresse: uden denne når svarene ikke frem til nogen.",
         "avatarTitle": "Deltagernes billeder",
         "gravatarEnabled": "Brug Gravatar, når det er muligt",
-        "gravatarEnabledHelp": "Deltagere, der har tilmeldt sig med en e-mail, der har en Gravatar, får den vist som billede i mødelokalet; for alle andre bruges de initialer, platformen genererer. Billedet hentes via vores egen server, så deltagernes browser kontakter aldrig gravatar.com — men det gør platformen: det skal fremgå af privatlivspolitikken."
+        "gravatarEnabledHelp": "Deltagere, der har tilmeldt sig med en e-mail, der har en Gravatar, får den vist som billede i mødelokalet; for alle andre bruges de initialer, platformen genererer. Billedet hentes via vores egen server, så deltagernes browser kontakter aldrig gravatar.com — men det gør platformen: det skal fremgå af privatlivspolitikken.",
+        "liveCaptionsTitle": "Liveundertekster",
+        "liveCaptionsEnabled": "Automatiske undertekster i videoopkald",
+        "liveCaptionsEnabledHelp": "Stemmen hos den, der taler, transskriberes i realtid af en tjeneste, der kører i platformens egen infrastruktur, uden eksterne tjenester, og teksten gemmes ikke. Underteksterne er slået til i alle arrangementer; moderatorer kan slå dem fra under arrangementet. Uden installeret tjeneste har indstillingen ingen virkning."
       },
       "errors": {
         "invalid": "Indstillingerne blev ikke gemt: en værdi er ugyldig. Kontroller de ændrede felter, og prøv igen.",
@@ -3690,7 +3703,8 @@
       "jvb": "Videobro",
       "jibri": "Videooptagelse",
       "smtp": "E-mailtjeneste",
-      "postprod": "AI-pipeline efter arrangementet"
+      "postprod": "AI-pipeline efter arrangementet",
+      "captions": "Liveundertekster"
     },
     "descriptions": {
       "app": "Hjemmesiden, hvor du tilgår begivenheder",
@@ -3702,7 +3716,8 @@
       "jvb": "Overfører lyd og video til deltagere",
       "jibri": "Optager videosessioner af begivenheder",
       "smtp": "Sender bekræftelsesmails og påmindelser",
-      "postprod": "Transskriberer, opsummerer og oversætter optagelserne med AI-modeller i klyngen (NVIDIA A100 GPU). Aktiveres kun, når et arrangement vælger AI-funktionerne til."
+      "postprod": "Transskriberer, opsummerer og oversætter optagelserne med AI-modeller i klyngen (NVIDIA A100 GPU). Aktiveres kun, når et arrangement vælger AI-funktionerne til.",
+      "captions": "Transskriberer talere i realtid og sender underteksterne til rummet via bridgen."
     },
     "verdicts": {
       "app": {
@@ -3766,6 +3781,15 @@
         "scaling": "Efterbehandlingsjob i kø — GPU-noden er ved at starte op (koldstart ca. 3 min.).",
         "standby": "AI-pipelinen er slået til, men afventer: ingen optagelser at behandle. GPU-noden er slukket for at spare energi.",
         "degraded": "Et eller flere AI-job er mislykkedes inden for de seneste 24 timer. Se /admin/postprod for detaljer."
+      },
+      "captions": {
+        "disabled": "Liveundertekster er slået fra i instansens indstillinger.",
+        "standby": "Undertekstjenesten er på standby: den starter, når et arrangement med undertekster går live.",
+        "starting": "Undertekstjenesten starter for et igangværende arrangement.",
+        "operational": "Liveunderteksterne virker.",
+        "degraded": "Undertekstjenesten er belastet: den transskriberer færre stemmer på samme tid.",
+        "paused": "Undertekstjenesten har sat sig selv på pause på grund af overbelastning og fortsætter af sig selv.",
+        "unavailable": "Undertekstjenesten svarer ikke."
       }
     },
     "impacts": {
@@ -3780,7 +3804,9 @@
       "jibriStale": "Et arrangement med optagelse aktiveret venter på Jibri ud over timeout: sessionen optages ikke.",
       "smtp": "Bekræftelsesmails og påmindelser vil ikke blive sendt.",
       "postprodDegraded": "Transskriptionerne og resuméerne for nogle nylige optagelser blev ikke genereret. Videooptagelserne er stadig tilgængelige.",
-      "jvbDown": "Deltagerne modtager hverken lyd eller video."
+      "jvbDown": "Deltagerne modtager hverken lyd eller video.",
+      "captionsPaused": "Underteksterne mangler et stykke tid i rummet; lyd og video påvirkes ikke.",
+      "captionsDown": "Der vises ingen undertekster i rummet; lyd og video virker normalt."
     },
     "overallVerdicts": {
       "operational": "Alle tjenester fungerer korrekt. Platformen er fuldt operationel.",
@@ -3823,7 +3849,8 @@
       "requestRate": "Anmodninger/s",
       "podUptime": "Pod-oppetid"
     },
-    "probeDetail": "Resultat af kontrollen"
+    "probeDetail": "Resultat af kontrollen",
+    "connCaptions": "Lyd og undertekster"
   },
   "feedback": {
     "title": "Hvordan vurderer du denne begivenhed?",
@@ -4426,7 +4453,9 @@
         "secretSnow": "Snefald",
         "secretWell": "Tre ønsker ved brønden: en overraskelse til din figur"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatiske undertekster",
+    "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med knappen CC."
   },
   "recording": {
     "management": "Videooptagelse",
