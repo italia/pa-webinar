@@ -481,3 +481,57 @@ describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
     expect(calls('DELETE', '/moderators/')).toEqual([]);
   });
 });
+
+/**
+ * Un questionario con risposte non si svuota dal wizard: la DELETE
+ * cancellerebbe anche le risposte, che il passo mostra in sola lettura.
+ */
+describe('fanoutEditDiff — questionari con risposte', () => {
+  const conQuestionario = (risposte: number): InitialEventShape => ({
+    ...snapshot(),
+    organizers: [],
+    eventModerators: [],
+    invitations: [],
+    materials: [],
+    postEventQuestionnaire: { templateIds: ['tpl-1'], adhocQuestions: [] },
+    questionnaireResponses: { pre: 0, post: risposte },
+  });
+
+  it('con risposte, svuotarlo non manda nessuna richiesta', async () => {
+    respond(() => json(200, {}));
+
+    const report = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), conQuestionario(4), 'it');
+
+    expect(calls('DELETE', '/questionnaires/')).toHaveLength(0);
+    expect(calls('PUT', '/questionnaires/')).toHaveLength(0);
+    expect(report.failed).toEqual([]);
+  });
+
+  it('le risposte arrivate a wizard aperto: il rifiuto si dice una volta e non si ripete', async () => {
+    respond((url, init) =>
+      init.method === 'DELETE' && url.includes('/questionnaires/')
+        ? json(409, { error: 'The questionnaire has responses: confirm to delete them too.', code: 'HAS_RESPONSES' })
+        : json(200, {}),
+    );
+    const initial = conQuestionario(0);
+
+    const primo = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), initial, 'it');
+    expect(primo.failed).toEqual(['questionnaires']);
+    expect(initial.questionnaireResponses?.post).toBe(1);
+
+    fetchMock.mockClear();
+    const secondo = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), initial, 'it');
+    expect(calls('DELETE', '/questionnaires/')).toHaveLength(0);
+    expect(secondo.failed).toEqual([]);
+  });
+
+  it('senza risposte, svuotarlo lo elimina come prima', async () => {
+    respond(() => json(200, { deleted: true }));
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), conQuestionario(0), 'it');
+
+    const eliminazioni = calls('DELETE', '/questionnaires/');
+    expect(eliminazioni).toHaveLength(1);
+    expect(eliminazioni[0]![0]).toBe(`/api/admin/events/${EVENT_ID}/questionnaires/POST_EVENT`);
+  });
+});

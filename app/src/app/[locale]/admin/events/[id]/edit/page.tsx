@@ -12,6 +12,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
@@ -146,6 +147,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           include: {
             templates: { orderBy: { sortOrder: 'asc' } },
             adhocItems: { orderBy: { sortOrder: 'asc' } },
+            _count: { select: { responses: true } },
           },
         },
       },
@@ -228,6 +230,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       agendaEnabled: event.agendaEnabled,
       wordCloudEnabled: event.wordCloudEnabled,
       whiteboardEnabled: event.whiteboardEnabled,
+      liveCaptionsEnabled: event.liveCaptionsEnabled,
       autoStartRecording: event.autoStartRecording,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
@@ -289,6 +292,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     })),
     preEventQuestionnaire: preBlock,
     postEventQuestionnaire: postBlock,
+    questionnaireResponses: {
+      pre: pre?._count.responses ?? 0,
+      post: post?._count.responses ?? 0,
+    },
   };
 
   return (
@@ -345,6 +352,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
       />

@@ -53,7 +53,7 @@ Jitsi treats transcription as a kind of recording: when it starts or stops, ever
 |---|---|---|---|
 | Installation | Helm: `global.captions.enabled` | `true` | Renders the captions pod, the Prosody module setting and Jicofo's URL template, and gives the portal `CAPTIONS_STATUS_URL`. Without it the portal never tries to start captions. |
 | Instance | **Settings → Features → Live captions** (`SiteSetting.liveCaptionsEnabled`) | on | Off, no event starts captions and the scaler keeps the service at zero. On, the scaler keeps it up while any event is live or starting, also when a moderator turns captions off in the room, so that turning them back on is immediate. |
-| Event | `Event.liveCaptionsEnabled`, switched live from the control room | on | Off, the room's moderators stop the transcription. |
+| Event | `Event.liveCaptionsEnabled`: **Automatic captions** in the event wizard (advanced settings, room features) and in event templates, and switched live from the control room | on | Off, the room's moderators stop the transcription. The wizard and the templates show the switch only where captions are available on the instance. |
 | Viewer | **Captions** button in the Jitsi toolbar | shown | Hides the captions for that viewer only; the icon is crossed out while they are hidden, and the choice is kept in the browser. |
 
 Captions start only when a moderator is in the room: speakers and participants cannot start them.
@@ -130,4 +130,3 @@ While captions are on, the voice of everyone who speaks is processed by the serv
 - **Language.** The model transcribes 18 of the 24 interface languages; for Greek, Irish, Latvian, Lithuanian, Maltese and Slovenian the service falls back to automatic detection, which does not transcribe them reliably.
 - **Room name on older Jitsi.** Before stable-10978 the bridge does not pass the room name: the service uses the instance's language and glossary, and cannot tell which event a room belongs to.
 - **Accuracy is measured on read speech.** Spontaneous speech in a meeting, with overlapping voices and poor microphones, is harder; the accuracy in real events is still to be measured.
-- **The event setting is not in the event wizard yet.** It defaults to on and is switched from the control room during the event.

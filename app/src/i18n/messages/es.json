@@ -950,7 +950,9 @@
         "postDefaultHint": "Si no elige nada, después del evento se ofrece el cuestionario «{name}».",
         "preHelp": "Preguntas para quien se inscribe, antes del evento: perfil, expectativas, temas a tratar. No es la opinión.",
         "postHelp": "La opinión, pedida al final del evento: cómo ha ido, la calidad, los contenidos.",
-        "templatesNoneForMoment": "Ninguna plantilla para este momento: las de la biblioteca son para el otro. Añade abajo las preguntas para este evento."
+        "templatesNoneForMoment": "Ninguna plantilla para este momento: las de la biblioteca son para el otro. Añade abajo las preguntas para este evento.",
+        "lockedWithResponses": "Respuestas recogidas: {count}. Para no perderlas, el cuestionario no se modifica aquí: para cambiarlo o eliminarlo, use la gestión de cuestionarios del evento, que pide confirmación.",
+        "lockedGoToQuestionnaires": "Ir a los cuestionarios"
       },
       "step5": {
         "heading": "Resumen y publicación",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "El moderador hace una pregunta y cada persona responde con una sola palabra: las respuestas forman una nube que se actualiza en directo, y las palabras más escritas se hacen más grandes. Útil para romper el hielo o recoger una impresión en pocos segundos.",
       "whiteboardEnabled": "Pizarra compartida",
       "whiteboardEnabledDesc": "Activa la pizarra colaborativa nativa (Excalidraw): los moderadores pueden abrirla desde la barra de herramientas durante el evento. Requiere el servicio de pizarra de la instalación; donde está disponible, siempre está activa en las llamadas instantáneas.",
+      "liveCaptionsEnabled": "Subtítulos automáticos",
+      "liveCaptionsEnabledDesc": "Lo que dicen los ponentes aparece bajo el vídeo, transcrito en tiempo real: ayuda a quien no oye o sigue con dificultad. Quien modera también puede desactivarlos durante el directo desde la pestaña «Regiduría», y cada persona puede ocultarlos para sí.",
       "autoStartRecording": "Iniciar la grabación automáticamente",
       "autoStartRecordingDesc": "Al iniciar el evento, la grabación arranca por sí sola (sin pedir confirmación al moderador). Así los rezagados encontrarán el reproductor ya disponible.",
       "aiSectionHeading": "Posproducción automática",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Quien se haya inscrito con un correo que tenga un Gravatar lo verá como imagen en la sala; para el resto se mantienen las iniciales generadas por la plataforma. La imagen pasa por nuestro servidor, así que el navegador de los participantes no contacta con gravatar.com, pero la plataforma sí: hay que declararlo en la información sobre privacidad.",
         "liveCaptionsTitle": "Subtítulos en directo",
         "liveCaptionsEnabled": "Subtítulos automáticos en las videollamadas",
-        "liveCaptionsEnabledHelp": "La voz de quien habla se transcribe en tiempo real mediante un servicio que funciona en la infraestructura de la plataforma, sin servicios externos, y el texto no se conserva. Están activos en todos los eventos; quien modera puede desactivarlos durante el evento. Sin el servicio instalado, esta opción no tiene efecto."
+        "liveCaptionsEnabledHelp": "La voz de quien habla se transcribe en tiempo real mediante un servicio que funciona en la infraestructura de la plataforma, sin servicios externos, y el texto no se conserva. Están activos por defecto en cada evento: se pueden desactivar para un evento concreto en su configuración, y quien modera también puede desactivarlos durante el directo. Sin el servicio instalado, esta opción no tiene efecto."
       },
       "errors": {
         "invalid": "La configuración no se ha guardado: un valor no es válido. Revisa los campos modificados y vuelve a intentarlo.",

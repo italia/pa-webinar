@@ -950,7 +950,9 @@
         "postDefaultHint": "Če ničesar ne izberete, se po dogodku ponudi vprašalnik »{name}«.",
         "preHelp": "Vprašanja za tiste, ki se prijavijo, pred dogodkom: profil, pričakovanja, teme. To niso povratne informacije.",
         "postHelp": "Povratne informacije ob koncu dogodka: kako je šlo, kakovost, vsebina.",
-        "templatesNoneForMoment": "Za ta trenutek ni predloge: predloge v knjižnici so za drugega. Vprašanja za ta dogodek dodajte spodaj."
+        "templatesNoneForMoment": "Za ta trenutek ni predloge: predloge v knjižnici so za drugega. Vprašanja za ta dogodek dodajte spodaj.",
+        "lockedWithResponses": "Zbrani odgovori: {count}. Da se ne izgubijo, vprašalnika tukaj ni mogoče spreminjati: za spremembo ali izbris uporabite upravljanje vprašalnikov dogodka, ki zahteva potrditev.",
+        "lockedGoToQuestionnaires": "Pojdi na vprašalnike"
       },
       "step5": {
         "heading": "Povzetek in objava",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderator postavi vprašanje in vsak odgovori z eno samo besedo: odgovori sestavijo oblak, ki se posodablja v živo, najpogostejše besede pa postanejo večje. Uporabno za prebijanje ledu ali hitro zbiranje vtisov.",
       "whiteboardEnabled": "Deljena tabla",
       "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Zahteva storitev table v namestitvi; kjer je na voljo, je pri takojšnjih klicih vedno vklopljena.",
+      "liveCaptionsEnabled": "Samodejni podnapisi",
+      "liveCaptionsEnabledDesc": "Kar govorijo govorci, se prikaže pod videom, prepisano v realnem času: pomaga tistim, ki ne slišijo ali težko sledijo. Moderatorji jih lahko izklopijo tudi med prenosom v živo na zavihku »Režija«, vsak pa jih lahko skrije zase.",
       "autoStartRecording": "Samodejno začni snemanje",
       "autoStartRecordingDesc": "Ob začetku dogodka se snemanje začne samodejno (brez vprašanja moderatorju). Tako poznejši udeleženci takoj najdejo razpoložljiv predvajalnik.",
       "aiSectionHeading": "Samodejna postprodukcija",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti.",
         "liveCaptionsTitle": "Podnapisi v živo",
         "liveCaptionsEnabled": "Samodejni podnapisi v videoklicih",
-        "liveCaptionsEnabledHelp": "Glas govorca sproti prepisuje storitev, ki teče v lastni infrastrukturi platforme, brez zunanjih storitev, besedilo pa se ne hrani. Podnapisi so vklopljeni na vseh dogodkih; moderatorji jih lahko med dogodkom izklopijo. Brez nameščene storitve ta možnost nima učinka. Slovenščine model še ne prepisuje zanesljivo."
+        "liveCaptionsEnabledHelp": "Glas govorca sproti prepisuje storitev, ki teče v lastni infrastrukturi platforme, brez zunanjih storitev, besedilo pa se ne hrani. Podnapisi so privzeto vklopljeni na vsakem dogodku: za posamezen dogodek jih je mogoče izklopiti v njegovih nastavitvah, moderatorji pa jih lahko izklopijo tudi med prenosom v živo. Brez nameščene storitve ta možnost nima učinka. Slovenščine model še ne prepisuje zanesljivo."
       },
       "errors": {
         "invalid": "Nastavitve niso bile shranjene: ena od vrednosti ni veljavna. Preverite spremenjena polja in poskusite znova.",

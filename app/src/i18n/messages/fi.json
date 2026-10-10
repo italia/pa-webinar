@@ -950,7 +950,9 @@
         "postDefaultHint": "Jos et valitse mitään, tapahtuman jälkeen tarjotaan kysely ”{name}”.",
         "preHelp": "Kysymykset ilmoittautujille ennen tapahtumaa: profiili, odotukset, käsiteltävät aiheet. Tämä ei ole palaute.",
         "postHelp": "Palaute tapahtuman lopussa: miten meni, laatu, sisältö.",
-        "templatesNoneForMoment": "Tälle hetkelle ei ole mallia: kirjaston mallit ovat toista varten. Lisää tämän tapahtuman kysymykset alle."
+        "templatesNoneForMoment": "Tälle hetkelle ei ole mallia: kirjaston mallit ovat toista varten. Lisää tämän tapahtuman kysymykset alle.",
+        "lockedWithResponses": "Kerättyjä vastauksia: {count}. Jotta ne eivät katoa, kyselyä ei voi muuttaa täällä: muuta tai poista se tapahtuman kyselyiden hallinnassa, joka pyytää vahvistuksen.",
+        "lockedGoToQuestionnaires": "Siirry kyselyihin"
       },
       "step5": {
         "heading": "Yhteenveto ja julkaisu",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderaattori esittää kysymyksen ja jokainen vastaa yhdellä sanalla: vastaukset muodostavat pilven, joka päivittyy reaaliajassa, ja yleisimmät sanat kasvavat. Hyvä jään murtamiseen tai tunnelman keräämiseen muutamassa sekunnissa.",
       "whiteboardEnabled": "Jaettu piirtotaulu",
       "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Edellyttää asennuksen piirtotaulupalvelua; kun se on käytettävissä, piirtotaulu on aina käytössä pikapuheluissa.",
+      "liveCaptionsEnabled": "Automaattiset tekstitykset",
+      "liveCaptionsEnabledDesc": "Puhujien puhe näkyy videon alla reaaliajassa litteroituna: se auttaa niitä, jotka eivät kuule tai joiden on vaikea seurata. Moderaattorit voivat poistaa tekstityksen käytöstä myös suoran lähetyksen aikana Ohjaamo-välilehdeltä, ja jokainen voi piilottaa sen itseltään.",
       "autoStartRecording": "Aloita tallennus automaattisesti",
       "autoStartRecordingDesc": "Tapahtuman alkaessa tallennus käynnistyy itsestään (moderaattorilta ei pyydetä vahvistusta). Näin myöhässä tulijat löytävät catch-up-toistimen heti käytettävissä.",
       "aiSectionHeading": "Automaattinen jälkituotanto",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Osallistujat, jotka ilmoittautuivat Gravatariin liitetyllä sähköpostiosoitteella, näkyvät huoneessa kuvallaan; muilla säilyvät alustan luomat nimikirjaimet. Kuva haetaan oman palvelimemme kautta, joten osallistujien selaimet eivät ota yhteyttä gravatar.comiin — mutta alusta ottaa: tämä on mainittava tietosuojaselosteessa.",
         "liveCaptionsTitle": "Reaaliaikainen tekstitys",
         "liveCaptionsEnabled": "Automaattinen tekstitys videopuheluissa",
-        "liveCaptionsEnabledHelp": "Puhujan ääni litteroidaan reaaliaikaisesti palvelulla, joka toimii alustan omassa infrastruktuurissa ilman ulkoisia palveluja, eikä tekstiä tallenneta. Tekstitys on käytössä kaikissa tapahtumissa; moderaattorit voivat poistaa sen käytöstä tapahtuman aikana. Ilman asennettua palvelua asetuksella ei ole vaikutusta."
+        "liveCaptionsEnabledHelp": "Puhujan ääni litteroidaan reaaliaikaisesti palvelulla, joka toimii alustan omassa infrastruktuurissa ilman ulkoisia palveluja, eikä tekstiä tallenneta. Tekstitys on oletuksena käytössä jokaisessa tapahtumassa: yksittäisessä tapahtumassa sen voi poistaa käytöstä tapahtuman asetuksista, ja moderaattorit voivat poistaa sen käytöstä myös suoran lähetyksen aikana. Ilman asennettua palvelua asetuksella ei ole vaikutusta."
       },
       "errors": {
         "invalid": "Asetuksia ei tallennettu: arvo ei kelpaa. Tarkista muuttamasi kentät ja yritä uudelleen.",

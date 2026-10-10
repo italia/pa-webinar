@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -246,13 +247,10 @@ export const POST = withErrorHandling(async (request) => {
   // Attach tags (if the wizard provided slugs). Silently drops unknown
   // slugs — admins curate the tag list via /api/admin/tags separately.
   if (data.tagSlugs && data.tagSlugs.length > 0) {
-    const tags = await prisma.tag.findMany({
-      where: { slug: { in: data.tagSlugs } },
-      select: { id: true },
-    });
-    if (tags.length > 0) {
+    const tagIds = await tagIdsFromSlugs(prisma, data.tagSlugs);
+    if (tagIds.length > 0) {
       await prisma.eventTagLink.createMany({
-        data: tags.map((t) => ({ eventId: event.id, tagId: t.id })),
+        data: tagIds.map((tagId) => ({ eventId: event.id, tagId })),
         skipDuplicates: true,
       });
     }

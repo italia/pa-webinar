@@ -55,6 +55,8 @@ interface Props {
   mancanti?: CampoMancante[];
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
+  /** I sottotitoli live ci sono nell'installazione. */
+  liveCaptionsAvailable?: boolean;
   /** La lingua dell'evento: non si offre come lingua di traduzione. */
   eventLocale?: string;
   /** C'e' un avviso di capacita': lo si dice, e porta alle impostazioni. */
@@ -83,6 +85,7 @@ export default function Step5Review({
   onVaiAlCampo,
   mancanti = [],
   aiPipelineEnabled = true,
+  liveCaptionsAvailable = false,
   eventLocale,
   capacityWarning = false,
   sopratitolo = false,
@@ -145,6 +148,7 @@ export default function Step5Review({
     form.agendaEnabled && tForm('agendaEnabled'),
     form.wordCloudEnabled && tForm('wordCloudEnabled'),
     form.whiteboardEnabled && tForm('whiteboardEnabled'),
+    liveCaptionsAvailable && form.liveCaptionsEnabled && tForm('liveCaptionsEnabled'),
   ].filter((x): x is string => !!x);
   const traduce =
     form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;

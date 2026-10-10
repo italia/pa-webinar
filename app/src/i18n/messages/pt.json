@@ -950,7 +950,9 @@
         "postDefaultHint": "Se não escolher nada, após o evento é proposto o questionário «{name}».",
         "preHelp": "Perguntas para quem se inscreve, antes do evento: perfil, expectativas, temas. Não é o feedback.",
         "postHelp": "O feedback, pedido no fim do evento: como correu, a qualidade, os conteúdos.",
-        "templatesNoneForMoment": "Nenhum modelo para este momento: os da biblioteca são para o outro. Adicione abaixo as perguntas para este evento."
+        "templatesNoneForMoment": "Nenhum modelo para este momento: os da biblioteca são para o outro. Adicione abaixo as perguntas para este evento.",
+        "lockedWithResponses": "Respostas recolhidas: {count}. Para não as perder, o questionário não se altera aqui: para o alterar ou eliminar, use a gestão de questionários do evento, que pede confirmação.",
+        "lockedGoToQuestionnaires": "Ir para os questionários"
       },
       "step5": {
         "heading": "Resumo e publicação",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "O moderador faz uma pergunta e cada pessoa responde com uma só palavra: as respostas formam uma nuvem atualizada em direto, e as palavras mais escritas ficam maiores. Útil para quebrar o gelo ou recolher uma impressão em poucos segundos.",
       "whiteboardEnabled": "Quadro branco partilhado",
       "whiteboardEnabledDesc": "Ativa o quadro branco colaborativo nativo (Excalidraw): os moderadores podem abri-lo a partir da barra de ferramentas durante o evento. Requer o serviço de quadro branco da instalação; onde existe, está sempre ativo nas chamadas instantâneas.",
+      "liveCaptionsEnabled": "Legendas automáticas",
+      "liveCaptionsEnabledDesc": "O que os oradores dizem aparece por baixo do vídeo, transcrito em tempo real: ajuda quem não ouve ou tem dificuldade em acompanhar. Quem modera também as pode desativar durante o direto no separador «Régie», e cada pessoa pode ocultá-las para si.",
       "autoStartRecording": "Iniciar a gravação automaticamente",
       "autoStartRecordingDesc": "No início do evento, a gravação começa automaticamente (sem pedir confirmação ao moderador). Assim, eventuais retardatários encontram já o leitor disponível.",
       "aiSectionHeading": "Pós-produção automática",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Quem se inscreveu com um e-mail que tem um Gravatar vê-lo-á como imagem na sala; para todos os outros ficam as iniciais geradas pela plataforma. A imagem passa pelo nosso servidor, pelo que o navegador dos participantes não contacta o gravatar.com — mas a plataforma sim: deve ser declarado na política de privacidade.",
         "liveCaptionsTitle": "Legendas em direto",
         "liveCaptionsEnabled": "Legendas automáticas nas videochamadas",
-        "liveCaptionsEnabledHelp": "A voz de quem fala é transcrita em tempo real por um serviço que funciona na infraestrutura da plataforma, sem serviços externos, e o texto não é guardado. Estão ativas em todos os eventos; quem modera pode desativá-las durante o evento. Sem o serviço instalado, esta opção não tem efeito."
+        "liveCaptionsEnabledHelp": "A voz de quem fala é transcrita em tempo real por um serviço que funciona na infraestrutura da plataforma, sem serviços externos, e o texto não é guardado. Estão ativas por predefinição em cada evento: podem ser desativadas para um evento nas respetivas definições, e quem modera também as pode desativar durante o direto. Sem o serviço instalado, esta opção não tem efeito."
       },
       "errors": {
         "invalid": "As definições não foram guardadas: um valor não é válido. Verifique os campos alterados e tente novamente.",

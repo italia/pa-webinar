@@ -1,8 +1,10 @@
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { getSettings } from '@/lib/settings';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import TemplateManagement from '@/components/admin/template-management';
 import AdminPageHeader from '@/components/admin/admin-page-header';
@@ -19,9 +21,10 @@ export default async function TemplatesPage() {
 
   const t = await getTranslations('admin.templates');
 
-  const templates = await prisma.eventTemplate.findMany({
-    orderBy: { sortOrder: 'asc' },
-  });
+  const [templates, settings] = await Promise.all([
+    prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
+    getSettings(),
+  ]);
 
   const serialized = templates.map((tpl) => ({
     ...tpl,
@@ -40,6 +43,7 @@ export default async function TemplatesPage() {
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        liveCaptionsAvailable={liveCaptionsAvailable(settings)}
       />
     </div>
   );

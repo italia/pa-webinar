@@ -34,6 +34,8 @@ export interface StepPermissionsValue {
   wordCloudEnabled: boolean;
   /** Lavagna condivisa (whiteboard Excalidraw nativa) opt-in. */
   whiteboardEnabled: boolean;
+  /** Sottotitoli live: accesi di default, si spengono qui o dalla Regia. */
+  liveCaptionsEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
@@ -60,6 +62,9 @@ interface Props {
    * da un modello o da un evento precedente.
    */
   whiteboardInfraReady: boolean;
+  /** I sottotitoli live ci sono nell'installazione: senza, l'interruttore
+   *  non si mostra (non c'e' niente da accendere). */
+  liveCaptionsAvailable?: boolean;
   /** Le lingue di traduzione predefinite dell'istanza (`en,fr,es,de`):
    *  si spuntano da sole quando si accende la traduzione. */
   defaultTargetLocales?: string | null;
@@ -125,6 +130,7 @@ export default function StepPermissions({
   onChange,
   fieldErrors = {},
   whiteboardInfraReady,
+  liveCaptionsAvailable = false,
   defaultTargetLocales = null,
   eventLocale,
   aiPipelineEnabled = true,
@@ -285,6 +291,24 @@ export default function StepPermissions({
             onChange={() => onChange({ whiteboardEnabled: !value.whiteboardEnabled })}
           />
         </div>
+        {liveCaptionsAvailable && (
+          <div className="py-2 d-flex justify-content-between align-items-start">
+            <div className="me-3">
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {tAdmin('form.liveCaptionsEnabled')}
+              </div>
+              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                {tAdmin('form.liveCaptionsEnabledDesc')}
+              </div>
+            </div>
+            <ToggleSwitch
+              label=""
+              ariaLabel={tAdmin('form.liveCaptionsEnabled')}
+              checked={value.liveCaptionsEnabled}
+              onChange={() => onChange({ liveCaptionsEnabled: !value.liveCaptionsEnabled })}
+            />
+          </div>
+        )}
       </section>
 
       </div>

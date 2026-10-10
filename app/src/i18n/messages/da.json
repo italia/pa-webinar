@@ -950,7 +950,9 @@
         "postDefaultHint": "Hvis du ikke vælger noget, tilbydes spørgeskemaet »{name}« efter begivenheden.",
         "preHelp": "Spørgsmål til dem, der tilmelder sig, før arrangementet: profil, forventninger, emner. Det er ikke feedback.",
         "postHelp": "Feedback, der spørges om ved arrangementets afslutning: hvordan det gik, kvalitet, indhold.",
-        "templatesNoneForMoment": "Ingen skabelon til dette tidspunkt: bibliotekets skabeloner er til det andet. Tilføj spørgsmålene til dette arrangement nedenfor."
+        "templatesNoneForMoment": "Ingen skabelon til dette tidspunkt: bibliotekets skabeloner er til det andet. Tilføj spørgsmålene til dette arrangement nedenfor.",
+        "lockedWithResponses": "Indsamlede svar: {count}. For at de ikke går tabt, kan spørgeskemaet ikke ændres her: brug arrangementets spørgeskemaer, som beder om bekræftelse, hvis du vil ændre eller slette det.",
+        "lockedGoToQuestionnaires": "Gå til spørgeskemaer"
       },
       "step5": {
         "heading": "Oversigt og udgivelse",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderatoren stiller et spørgsmål, og alle svarer med ét enkelt ord: svarene danner en sky, der opdateres live, og de hyppigste ord bliver større. Godt til at bryde isen eller indsamle et indtryk på få sekunder.",
       "whiteboardEnabled": "Delt whiteboard",
       "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Kræver installationens whiteboard-tjeneste; hvor den findes, er det altid slået til ved øjeblikkelige opkald.",
+      "liveCaptionsEnabled": "Automatiske undertekster",
+      "liveCaptionsEnabledDesc": "Det, talerne siger, vises under videoen, transskriberet i realtid: det hjælper dem, der ikke kan høre eller har svært ved at følge med. Moderatorer kan også slå dem fra under livebegivenheden på fanen »Styring«, og alle kan skjule dem for sig selv.",
       "autoStartRecording": "Start optagelsen automatisk",
       "autoStartRecordingDesc": "Når arrangementet starter, går optagelsen i gang af sig selv (uden at spørge moderatoren). På den måde finder evt. forsinkede deltagere afspilleren klar.",
       "aiSectionHeading": "Automatisk efterbehandling",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Deltagere, der har tilmeldt sig med en e-mail, der har en Gravatar, får den vist som billede i mødelokalet; for alle andre bruges de initialer, platformen genererer. Billedet hentes via vores egen server, så deltagernes browser kontakter aldrig gravatar.com — men det gør platformen: det skal fremgå af privatlivspolitikken.",
         "liveCaptionsTitle": "Liveundertekster",
         "liveCaptionsEnabled": "Automatiske undertekster i videoopkald",
-        "liveCaptionsEnabledHelp": "Stemmen hos den, der taler, transskriberes i realtid af en tjeneste, der kører i platformens egen infrastruktur, uden eksterne tjenester, og teksten gemmes ikke. Underteksterne er slået til i alle arrangementer; moderatorer kan slå dem fra under arrangementet. Uden installeret tjeneste har indstillingen ingen virkning."
+        "liveCaptionsEnabledHelp": "Stemmen hos den, der taler, transskriberes i realtid af en tjeneste, der kører i platformens egen infrastruktur, uden eksterne tjenester, og teksten gemmes ikke. Underteksterne er som standard slået til i alle arrangementer: de kan slås fra for et enkelt arrangement i dets indstillinger, og moderatorer kan også slå dem fra under livebegivenheden. Uden installeret tjeneste har indstillingen ingen virkning."
       },
       "errors": {
         "invalid": "Indstillingerne blev ikke gemt: en værdi er ugyldig. Kontroller de ændrede felter, og prøv igen.",

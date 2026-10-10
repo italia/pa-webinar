@@ -950,7 +950,9 @@
         "postDefaultHint": "Ha nem választ semmit, az esemény után a(z) „{name}” kérdőív jelenik meg.",
         "preHelp": "Kérdések a regisztrálóknak az esemény előtt: profil, elvárások, témák. Ez nem a visszajelzés.",
         "postHelp": "A visszajelzés az esemény végén: hogyan sikerült, minőség, tartalom.",
-        "templatesNoneForMoment": "Ehhez az időponthoz nincs sablon: a könyvtár sablonjai a másikhoz valók. Az esemény kérdéseit alább adja hozzá."
+        "templatesNoneForMoment": "Ehhez az időponthoz nincs sablon: a könyvtár sablonjai a másikhoz valók. Az esemény kérdéseit alább adja hozzá.",
+        "lockedWithResponses": "Összegyűjtött válaszok: {count}. Hogy ne vesszenek el, a kérdőív itt nem módosítható: a módosításhoz vagy törléshez használja az esemény kérdőíveinek kezelését, amely megerősítést kér.",
+        "lockedGoToQuestionnaires": "Tovább a kérdőívekhez"
       },
       "step5": {
         "heading": "Összefoglaló és közzététel",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "A moderátor feltesz egy kérdést, és mindenki egyetlen szóval válaszol: a válaszokból élőben frissülő felhő lesz, a leggyakoribb szavak pedig nagyobbak lesznek. Hasznos a jég megtöréséhez vagy egy benyomás gyors összegyűjtéséhez.",
       "whiteboardEnabled": "Megosztott tábla",
       "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. A telepítés táblaszolgáltatását igényli; ahol elérhető, az azonnali hívásokban mindig aktív.",
+      "liveCaptionsEnabled": "Automatikus feliratok",
+      "liveCaptionsEnabledDesc": "Az előadók szavai valós időben átírva jelennek meg a videó alatt: segít azoknak, akik nem hallanak vagy nehezen követik. A moderátorok az élő adás közben is kikapcsolhatják a „Rendezés” lapon, és bárki elrejtheti a saját nézetében.",
       "autoStartRecording": "Felvétel automatikus indítása",
       "autoStartRecordingDesc": "Az esemény kezdetekor a felvétel automatikusan elindul (a moderátortól nem kér megerősítést). Így a később csatlakozók azonnal elérhető lejátszót találnak.",
       "aiSectionHeading": "Automatikus utómunka",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Aki olyan e-mail-címmel regisztrált, amelyhez tartozik Gravatar, azt fogja képként látni a teremben; mindenki másnál a platform által generált kezdőbetűk maradnak. A kép a saját kiszolgálónkon keresztül érkezik, így a résztvevők böngészője nem lép kapcsolatba a gravatar.com oldallal – a platform viszont igen: ezt fel kell tüntetni az adatvédelmi tájékoztatóban.",
         "liveCaptionsTitle": "Élő feliratok",
         "liveCaptionsEnabled": "Automatikus feliratok a videohívásokban",
-        "liveCaptionsEnabledHelp": "A beszélő hangját valós időben egy olyan szolgáltatás írja át, amely a platform saját infrastruktúrájában fut, külső szolgáltatások nélkül, a szöveget pedig nem őrizzük meg. A feliratok minden eseményen be vannak kapcsolva; a moderátorok az esemény alatt kikapcsolhatják őket. Telepített szolgáltatás nélkül ennek a beállításnak nincs hatása."
+        "liveCaptionsEnabledHelp": "A beszélő hangját valós időben egy olyan szolgáltatás írja át, amely a platform saját infrastruktúrájában fut, külső szolgáltatások nélkül, a szöveget pedig nem őrizzük meg. A feliratok alapértelmezés szerint minden eseményen be vannak kapcsolva: egy adott eseménynél annak beállításaiban kapcsolhatók ki, a moderátorok pedig az élő adás közben is kikapcsolhatják őket. Telepített szolgáltatás nélkül ennek a beállításnak nincs hatása."
       },
       "errors": {
         "invalid": "A beállítások nem lettek mentve: egy érték érvénytelen. Ellenőrizze a módosított mezőket, és próbálja újra.",

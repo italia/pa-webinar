@@ -66,7 +66,11 @@ import StepPeople, {
   SezioneIscrizione,
   type StepPeopleValue,
 } from './step-2-people';
-import Step4Content, { type Step4Value, type QuestionnaireBlock } from './step-4-content';
+import Step4Content, {
+  type QuestionnaireBlock,
+  type QuestionnaireResponseCounts,
+  type Step4Value,
+} from './step-4-content';
 import Step5Review from './step-5-review';
 import AdvancedSettings, {
   SezioneDati,
@@ -93,6 +97,7 @@ export interface WizardTemplatePreset {
   agendaEnabled?: boolean;
   wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
+  liveCaptionsEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -149,6 +154,10 @@ export interface WizardProps {
    *  (`resolveWhiteboardInfraReady`, letto dalla pagina server). Senza, la
    *  sala non mostra la lavagna e il passo Permessi non la offre. */
   whiteboardInfraReady: boolean;
+  /** I sottotitoli live ci sono nell'installazione: accesi nelle
+   *  impostazioni e con il servizio installato (lib/captions/availability).
+   *  Senza, l'interruttore dell'evento non si mostra. */
+  liveCaptionsAvailable?: boolean;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -219,6 +228,7 @@ export interface InitialEventShape {
     agendaEnabled?: boolean | null;
     wordCloudEnabled?: boolean | null;
     whiteboardEnabled?: boolean | null;
+    liveCaptionsEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
@@ -288,6 +298,9 @@ export interface InitialEventShape {
   }>;
   preEventQuestionnaire: QuestionnaireBlock | null;
   postEventQuestionnaire: QuestionnaireBlock | null;
+  /** Le risposte gia' raccolte dai due questionari: con risposte, il wizard
+   *  non li cambia ne' li svuota (vedi edit-fanout). */
+  questionnaireResponses?: QuestionnaireResponseCounts;
 }
 
 export interface Step5ReviewFields {
@@ -327,6 +340,9 @@ export default function EventWizard(props: WizardProps) {
 
   const mode: 'create' | 'edit' = props.mode ?? 'create';
   const viaToken = props.viaToken ?? null;
+  // Le etichette le cambia lo staff dell'evento: con un link di conduzione il
+  // passo non le propone (e il salvataggio non le manda).
+  const etichette = viaToken !== null ? [] : props.availableTags;
   const initialEvent = props.initialEvent;
   // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
   // pubblicazioni in libreria) si puo' modificare senza toccarla: in quel caso
@@ -346,6 +362,12 @@ export default function EventWizard(props: WizardProps) {
   if (initialEvent && snapshotRef.current === null) {
     snapshotRef.current = structuredClone(initialEvent);
   }
+  // Le risposte dei questionari come le conosce l'ultimo salvataggio: un
+  // rifiuto per risposte arrivate a wizard aperto rende subito il blocco di
+  // sola lettura, invece di lasciarlo modificabile senza effetto.
+  const [risposteQuestionari, setRisposteQuestionari] = useState(
+    initialEvent?.questionnaireResponses,
+  );
 
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
@@ -417,6 +439,7 @@ export default function EventWizard(props: WizardProps) {
         agendaEnabled: ev.agendaEnabled ?? false,
         wordCloudEnabled: ev.wordCloudEnabled ?? false,
         whiteboardEnabled: ev.whiteboardEnabled ?? false,
+        liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
@@ -554,6 +577,8 @@ export default function EventWizard(props: WizardProps) {
       agendaEnabled: tpl?.agendaEnabled ?? false,
       wordCloudEnabled: tpl?.wordCloudEnabled ?? false,
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
+      // Accesi finche' un modello non li spegne, come sugli eventi.
+      liveCaptionsEnabled: tpl?.liveCaptionsEnabled ?? true,
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
@@ -944,11 +969,16 @@ export default function EventWizard(props: WizardProps) {
     // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
     // Chi entra con un link di conduzione non cambia chi partecipa (lo
     // decide lo staff): una bozza che lo cambiava non lo riporta.
+    // Un questionario che ha gia' risposte non si cambia da qui: la bozza non
+    // ne riporta una versione modificata, che il salvataggio non scriverebbe.
+    const risposte = initialEvent?.questionnaireResponses;
     if (salvata)
       setForm((prima) => ({
         ...prima,
         ...salvata.form,
         ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
+        ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
+        ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
       }));
     // La bozza della versione precedente, ripresa, vive ora sotto la chiave
     // di questo formato.
@@ -958,7 +988,7 @@ export default function EventWizard(props: WizardProps) {
       /* ignore */
     }
     setDraftAvailable(false);
-  }, [draftKey, viaToken]);
+  }, [draftKey, viaToken, initialEvent]);
   const dismissDraft = useCallback(() => {
     try {
       const salvata = savedDraftRef.current;
@@ -1185,7 +1215,7 @@ export default function EventWizard(props: WizardProps) {
           coverImageUrl: form.coverImageUrl,
           imageUrl: form.imageUrl ?? undefined,
           waitingRoomAudioUrl: form.waitingRoomAudioUrl ?? undefined,
-          tagSlugs: form.tagSlugs,
+          tagSlugs: viaToken !== null ? undefined : form.tagSlugs,
           recurrenceRule: form.recurrenceRule,
           parseTitleKicker: form.parseTitleKicker,
           waitingRoomEngine: form.waitingRoomEngine,
@@ -1203,6 +1233,7 @@ export default function EventWizard(props: WizardProps) {
           agendaEnabled: form.agendaEnabled,
           wordCloudEnabled: form.wordCloudEnabled,
           whiteboardEnabled: form.whiteboardEnabled,
+          liveCaptionsEnabled: form.liveCaptionsEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 
           // Postprod AI — subordinate al recording (server-side resta
@@ -1306,6 +1337,7 @@ export default function EventWizard(props: WizardProps) {
             snapshotRef.current ?? initialEvent,
             props.defaultLocale
           );
+          setRisposteQuestionari((snapshotRef.current ?? initialEvent).questionnaireResponses);
 
           // Non si cancella la bozza e non si naviga via: il testo digitato
           // deve restare recuperabile, altrimenti l'avviso direbbe di
@@ -1726,7 +1758,7 @@ export default function EventWizard(props: WizardProps) {
             onChange={updateForm}
             enabledLocales={props.enabledLocales}
             defaultLocale={props.defaultLocale}
-            availableTags={props.availableTags}
+            availableTags={etichette}
             fieldErrors={fieldErrors}
             siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
             siteDefaultVideoQuality={props.siteDefaultVideoQuality}
@@ -1782,6 +1814,7 @@ export default function EventWizard(props: WizardProps) {
             onVaiAlCampo={vaiAlCampo}
             mancanti={mancanti}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
+            liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
             eventLocale={SOURCE_LANGUAGE_FALLBACK}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
@@ -1810,6 +1843,7 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
+                  liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
                   defaultTargetLocales={props.defaultTargetLocales}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
                   eventLocale={SOURCE_LANGUAGE_FALLBACK}
@@ -1843,6 +1877,8 @@ export default function EventWizard(props: WizardProps) {
                   submitting={submitting}
                   staffLocked={viaToken !== null}
                   defaultFeedbackHint={mode === 'create'}
+                  responseCounts={risposteQuestionari}
+                  eventId={initialEvent?.id}
                 />
               ),
               room: (
@@ -1852,7 +1888,7 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   enabledLocales={props.enabledLocales}
                   defaultLocale={props.defaultLocale}
-                  availableTags={props.availableTags}
+                  availableTags={etichette}
                   fieldErrors={fieldErrors}
                   siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
                   siteDefaultVideoQuality={props.siteDefaultVideoQuality}

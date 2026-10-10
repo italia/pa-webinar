@@ -44,6 +44,7 @@ interface TemplatePreset {
   agendaEnabled?: boolean;
   wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
+  liveCaptionsEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -78,6 +79,8 @@ interface Props {
   siteDefaultParseTitleKicker: boolean;
   siteDefaultVideoQuality: VideoQualityPreset;
   whiteboardInfraReady: boolean;
+  /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
+  liveCaptionsAvailable?: boolean;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -108,6 +111,7 @@ export default function CreateEventWithTemplate({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   whiteboardInfraReady,
+  liveCaptionsAvailable = false,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   defaultModerator = null,
@@ -163,6 +167,7 @@ export default function CreateEventWithTemplate({
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
       siteDefaultVideoQuality={siteDefaultVideoQuality}
       whiteboardInfraReady={whiteboardInfraReady}
+      liveCaptionsAvailable={liveCaptionsAvailable}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       defaultModerator={defaultModerator}
@@ -260,6 +265,7 @@ export default function CreateEventWithTemplate({
           initial={decodificaFormato(scegliParam)}
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
           aiPipelineEnabled={aiPipelineEnabled}
+          liveCaptionsAvailable={liveCaptionsAvailable}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
         >
           {templates.length > 0 && (

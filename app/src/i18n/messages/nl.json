@@ -950,7 +950,9 @@
         "postDefaultHint": "Als u niets kiest, wordt na het evenement de vragenlijst ‘{name}’ aangeboden.",
         "preHelp": "Vragen voor wie zich inschrijft, voor het evenement: profiel, verwachtingen, onderwerpen. Dit is niet de feedback.",
         "postHelp": "De feedback aan het einde van het evenement: hoe het ging, kwaliteit, inhoud.",
-        "templatesNoneForMoment": "Geen sjabloon voor dit moment: de sjablonen in de bibliotheek zijn voor het andere. Voeg hieronder de vragen voor dit evenement toe."
+        "templatesNoneForMoment": "Geen sjabloon voor dit moment: de sjablonen in de bibliotheek zijn voor het andere. Voeg hieronder de vragen voor dit evenement toe.",
+        "lockedWithResponses": "Verzamelde antwoorden: {count}. Om ze niet kwijt te raken, kan de vragenlijst hier niet worden gewijzigd: gebruik het vragenlijstbeheer van het evenement, dat om bevestiging vraagt, om hem te wijzigen of te verwijderen.",
+        "lockedGoToQuestionnaires": "Naar de vragenlijsten"
       },
       "step5": {
         "heading": "Overzicht en publicatie",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "De moderator stelt een vraag en iedereen antwoordt met één woord: de antwoorden vormen een wolk die live wordt bijgewerkt, en de meest geschreven woorden worden groter. Handig om het ijs te breken of in een paar seconden een indruk te verzamelen.",
       "whiteboardEnabled": "Gedeeld whiteboard",
       "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Vereist de whiteboarddienst van de installatie; waar die beschikbaar is, is het bij directe calls altijd actief.",
+      "liveCaptionsEnabled": "Automatische ondertiteling",
+      "liveCaptionsEnabledDesc": "Wat sprekers zeggen verschijnt onder de video, in realtime getranscribeerd: dat helpt wie niet hoort of moeilijk kan volgen. Moderatoren kunnen de ondertiteling ook tijdens de livesessie uitzetten via het tabblad ‘Regie’, en iedereen kan haar voor zichzelf verbergen.",
       "autoStartRecording": "Opname automatisch starten",
       "autoStartRecordingDesc": "Bij de start van het evenement begint de opname vanzelf (zonder bevestiging te vragen aan de moderator). Zo vinden eventuele laatkomers de speler direct beschikbaar.",
       "aiSectionHeading": "Automatische postproductie",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld.",
         "liveCaptionsTitle": "Live-ondertiteling",
         "liveCaptionsEnabled": "Automatische ondertiteling in videogesprekken",
-        "liveCaptionsEnabledHelp": "De stem van wie spreekt wordt in realtime getranscribeerd door een dienst die in de eigen infrastructuur van het platform draait, zonder externe diensten, en de tekst wordt niet bewaard. De ondertiteling staat aan in elk evenement; moderatoren kunnen haar tijdens het evenement uitzetten. Zonder geïnstalleerde dienst heeft deze optie geen effect."
+        "liveCaptionsEnabledHelp": "De stem van wie spreekt wordt in realtime getranscribeerd door een dienst die in de eigen infrastructuur van het platform draait, zonder externe diensten, en de tekst wordt niet bewaard. De ondertiteling staat standaard aan in elk evenement: voor één evenement kan ze in de instellingen ervan worden uitgezet, en moderatoren kunnen haar ook tijdens de livesessie uitzetten. Zonder geïnstalleerde dienst heeft deze optie geen effect."
       },
       "errors": {
         "invalid": "De instellingen zijn niet opgeslagen: een waarde is ongeldig. Controleer de gewijzigde velden en probeer het opnieuw.",

@@ -317,9 +317,11 @@ function PlacementCard({
       danger: true,
     });
     if (!ok) return;
-    const res = await fetch(`/api/admin/events/${eventId}/questionnaires/${placement}`, {
-      method: 'DELETE',
-    });
+    // Dopo la conferma, che dice che si cancellano anche le risposte.
+    const res = await fetch(
+      `/api/admin/events/${eventId}/questionnaires/${placement}?withResponses=1`,
+      { method: 'DELETE' },
+    );
     if (res.ok) {
       setState({ ...EMPTY_PLACEMENT });
       onRefresh();

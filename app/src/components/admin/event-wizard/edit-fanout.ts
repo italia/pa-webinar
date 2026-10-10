@@ -70,9 +70,9 @@ export async function submitQuestionnaire(
   placement: Placement,
   block: QuestionnaireBlock,
   defaultLocale: string,
-): Promise<void> {
+): Promise<FanoutResult | null> {
   if (block.templateIds.length === 0 && block.adhocQuestions.length === 0) {
-    return;
+    return null;
   }
   // Questi quattro campi il wizard non li mostra. Per un questionario che
   // esiste già si rimandano indietro quelli che ha: scrivere i predefiniti
@@ -90,7 +90,7 @@ export async function submitQuestionnaire(
       mapAdhocToApi(q, i, defaultLocale),
     ),
   };
-  await fanoutFetch(
+  return fanoutFetch(
     report,
     'questionnaires',
     `/api/admin/events/${eventId}/questionnaires/${placement}`,
@@ -109,6 +109,14 @@ export async function submitQuestionnaire(
  * don't write at all (it would reset what the wizard doesn't show); emptied →
  * DELETE, because the PUT ignores an empty body and the removal would be
  * swallowed silently; otherwise → the usual upsert.
+ *
+ * Un questionario che aveva gia' risposte all'apertura non si scrive mai da
+ * qui: il passo lo mostra in sola lettura, ma una bozza ripresa potrebbe
+ * portarne una versione modificata, e svuotarlo cancellerebbe le risposte.
+ * Se le risposte arrivano dopo l'apertura, il server rifiuta la DELETE senza
+ * conferma (e la PUT) con 409: il rifiuto finisce nel resoconto, e
+ * `onHasResponses` lo segna nello scatto, cosi' i salvataggi successivi non
+ * ripetono la richiesta che fallirebbe di nuovo.
  */
 async function saveQuestionnaire(
   report: FanoutReport,
@@ -117,14 +125,18 @@ async function saveQuestionnaire(
   block: QuestionnaireBlock,
   initial: QuestionnaireBlock | null,
   defaultLocale: string,
+  initialResponses: number,
+  onHasResponses: () => void,
 ): Promise<void> {
+  if (initialResponses > 0) return;
   if (!questionnaireChanged(block, initial)) return;
 
   const emptied =
     block.templateIds.length === 0 && block.adhocQuestions.length === 0;
+  let esito: FanoutResult | null;
   if (emptied) {
     if (!initial) return;
-    await fanoutFetch(
+    esito = await fanoutFetch(
       report,
       'questionnaires',
       `/api/admin/events/${eventId}/questionnaires/${placement}`,
@@ -133,10 +145,10 @@ async function saveQuestionnaire(
       // lo stato desiderato, non un errore da mostrare.
       [404],
     );
-    return;
+  } else {
+    esito = await submitQuestionnaire(report, eventId, placement, block, defaultLocale);
   }
-
-  await submitQuestionnaire(report, eventId, placement, block, defaultLocale);
+  if (esito?.outcome === 'failed' && esito.status === 409) onHasResponses();
 }
 
 // ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
@@ -227,6 +239,8 @@ export type FanoutOutcome = 'ok' | 'already' | 'failed';
 
 interface FanoutResult {
   outcome: FanoutOutcome;
+  /** Lo stato HTTP della risposta; null se la rete e' caduta. */
+  status: number | null;
   /** Il corpo di una risposta riuscita: porta l'id della riga appena creata. */
   body: { id?: string } | null;
   /** Il motivo del rifiuto, quando `failed`. */
@@ -245,16 +259,21 @@ async function fanoutRequest(
       // nata, che va registrato nello scatto perche' un secondo salvataggio
       // non la ricrei, e perche' resti cancellabile nella stessa sessione.
       const body = (await res.json().catch(() => null)) as { id?: string } | null;
-      return { outcome: 'ok', body, reason: null };
+      return { outcome: 'ok', status: res.status, body, reason: null };
     }
     if (alreadyStatuses.includes(res.status)) {
-      return { outcome: 'already', body: null, reason: null };
+      return { outcome: 'already', status: res.status, body: null, reason: null };
     }
     const body = (await res.json().catch(() => ({}))) as { error?: string };
-    return { outcome: 'failed', body: null, reason: body.error ?? `HTTP ${res.status}` };
+    return {
+      outcome: 'failed',
+      status: res.status,
+      body: null,
+      reason: body.error ?? `HTTP ${res.status}`,
+    };
   } catch {
     // Rete caduta: la risorsa non e' salvata, e va detto comunque.
-    return { outcome: 'failed', body: null, reason: null };
+    return { outcome: 'failed', status: null, body: null, reason: null };
   }
 }
 
@@ -543,6 +562,15 @@ export async function fanoutEditDiff(
     initial.materials = initial.materials.filter((x) => x.id !== m.id);
   }
 
+  // Un rifiuto per risposte arrivate nel frattempo: lo scatto lo ricorda.
+  const segnaRisposte = (momento: 'pre' | 'post') => {
+    initial.questionnaireResponses = {
+      pre: initial.questionnaireResponses?.pre ?? 0,
+      post: initial.questionnaireResponses?.post ?? 0,
+      [momento]: Math.max(1, initial.questionnaireResponses?.[momento] ?? 0),
+    };
+  };
+
   // Questionnaires — PUT is idempotent (replaces templates + adhoc items);
   // a rejection (e.g. 409 once responses exist) lands in the report like the
   // other resources.
@@ -558,6 +586,8 @@ export async function fanoutEditDiff(
     form.preEventQuestionnaire,
     initial.preEventQuestionnaire,
     defaultLocale,
+    initial.questionnaireResponses?.pre ?? 0,
+    () => segnaRisposte('pre'),
   );
   await saveQuestionnaire(
     report,
@@ -566,6 +596,8 @@ export async function fanoutEditDiff(
     form.postEventQuestionnaire,
     initial.postEventQuestionnaire,
     defaultLocale,
+    initial.questionnaireResponses?.post ?? 0,
+    () => segnaRisposte('post'),
   );
 
   return report;

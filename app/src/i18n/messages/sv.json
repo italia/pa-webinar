@@ -950,7 +950,9 @@
         "postDefaultHint": "Om du inte väljer något erbjuds enkäten ”{name}” efter evenemanget.",
         "preHelp": "Frågor till dem som anmäler sig, före evenemanget: profil, förväntningar, ämnen. Det är inte återkopplingen.",
         "postHelp": "Återkopplingen i slutet av evenemanget: hur det gick, kvalitet, innehåll.",
-        "templatesNoneForMoment": "Ingen mall för det här tillfället: bibliotekets mallar är för det andra. Lägg till frågorna för det här evenemanget nedan."
+        "templatesNoneForMoment": "Ingen mall för det här tillfället: bibliotekets mallar är för det andra. Lägg till frågorna för det här evenemanget nedan.",
+        "lockedWithResponses": "Insamlade svar: {count}. För att de inte ska gå förlorade kan enkäten inte ändras här: använd evenemangets enkäthantering, som ber om bekräftelse, för att ändra eller ta bort den.",
+        "lockedGoToQuestionnaires": "Gå till enkäterna"
       },
       "step5": {
         "heading": "Sammanfattning och publicering",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderatorn ställer en fråga och alla svarar med ett enda ord: svaren bildar ett moln som uppdateras live, och de vanligaste orden blir större. Bra för att bryta isen eller samla ett intryck på några sekunder.",
       "whiteboardEnabled": "Delad whiteboard",
       "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Kräver installationens whiteboardtjänst; där den finns är den alltid på i snabbsamtal.",
+      "liveCaptionsEnabled": "Automatisk textning",
+      "liveCaptionsEnabledDesc": "Det talarna säger visas under videon, transkriberat i realtid: det hjälper den som inte hör eller har svårt att följa med. Moderatorer kan också stänga av textningen under livesändningen på fliken ”Kontroll”, och var och en kan dölja den för sig själv.",
       "autoStartRecording": "Starta inspelningen automatiskt",
       "autoStartRecordingDesc": "När evenemanget startar börjar inspelningen av sig själv (utan att fråga moderatorn). Eventuella sena anslutare hittar då redan en spelare tillgänglig.",
       "aiSectionHeading": "Automatisk efterproduktion",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn.",
         "liveCaptionsTitle": "Direktundertexter",
         "liveCaptionsEnabled": "Automatiska undertexter i videosamtal",
-        "liveCaptionsEnabledHelp": "Rösten hos den som talar transkriberas i realtid av en tjänst som körs i plattformens egen infrastruktur, utan externa tjänster, och texten sparas inte. Undertexterna är på i alla evenemang; moderatorer kan stänga av dem under evenemanget. Utan installerad tjänst har alternativet ingen effekt."
+        "liveCaptionsEnabledHelp": "Rösten hos den som talar transkriberas i realtid av en tjänst som körs i plattformens egen infrastruktur, utan externa tjänster, och texten sparas inte. Undertexterna är som standard på i alla evenemang: de kan stängas av för ett enskilt evenemang i dess inställningar, och moderatorer kan också stänga av dem under livesändningen. Utan installerad tjänst har alternativet ingen effekt."
       },
       "errors": {
         "invalid": "Inställningarna sparades inte: ett värde är ogiltigt. Kontrollera de ändrade fälten och försök igen.",

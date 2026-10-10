@@ -7,6 +7,7 @@ import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import AdminPageHeader from '@/components/admin/admin-page-header';
@@ -80,6 +81,7 @@ export default async function CreateEventPage({
         agendaEnabled: selectedTemplate.agendaEnabled,
         wordCloudEnabled: selectedTemplate.wordCloudEnabled,
         whiteboardEnabled: selectedTemplate.whiteboardEnabled,
+        liveCaptionsEnabled: selectedTemplate.liveCaptionsEnabled,
         waitingRoomEngine: selectedTemplate.waitingRoomEngine,
         participantsCanUnmute: selectedTemplate.participantsCanUnmute,
         participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
@@ -149,6 +151,7 @@ export default async function CreateEventPage({
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         defaultModerator={moderatoreDiPartenza}

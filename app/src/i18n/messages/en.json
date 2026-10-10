@@ -950,7 +950,9 @@
         "postDefaultHint": "If you choose nothing, the “{name}” questionnaire is offered after the event.",
         "preHelp": "Questions for people registering, before the event: profile, expectations, topics to cover. This is not the feedback.",
         "postHelp": "The feedback, asked at the end of the event: how it went, quality, content.",
-        "templatesNoneForMoment": "No template for this moment: the library's templates are for the other one. Add the questions for this event below."
+        "templatesNoneForMoment": "No template for this moment: the library's templates are for the other one. Add the questions for this event below.",
+        "lockedWithResponses": "Responses collected: {count}. So that they are not lost, the questionnaire cannot be changed here: to change or delete it, use the event's questionnaire management, which asks for confirmation.",
+        "lockedGoToQuestionnaires": "Go to questionnaires"
       },
       "step5": {
         "heading": "Review and publish",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "The moderator asks a question and everyone answers with a single word: the answers form a cloud that updates live, and the most common words grow larger. Useful to break the ice or gather an impression in a few seconds.",
       "whiteboardEnabled": "Shared whiteboard",
       "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Requires the installation's whiteboard service; where it is available, it is always on for instant calls.",
+      "liveCaptionsEnabled": "Automatic captions",
+      "liveCaptionsEnabledDesc": "What speakers say appears under the video, transcribed in real time: it helps people who cannot hear or find it hard to follow. Moderators can also turn captions off during the live event from the “Control” tab, and anyone can hide them for themselves.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice.",
         "liveCaptionsTitle": "Live captions",
         "liveCaptionsEnabled": "Automatic captions in video calls",
-        "liveCaptionsEnabledHelp": "The voice of whoever is speaking is transcribed in real time by a service that runs in the platform's own infrastructure, with no external services, and the text is not kept. Captions are on in every event; moderators can turn them off during the event. Without the service installed, this option has no effect."
+        "liveCaptionsEnabledHelp": "The voice of whoever is speaking is transcribed in real time by a service that runs in the platform's own infrastructure, with no external services, and the text is not kept. Captions are on by default in every event: they can be turned off for a single event in its settings, and moderators can also turn them off during the live event. Without the service installed, this option has no effect."
       },
       "errors": {
         "invalid": "The settings were not saved: a value is not valid. Check the fields you changed and try again.",

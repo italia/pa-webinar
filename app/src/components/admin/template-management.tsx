@@ -30,6 +30,7 @@ interface SerializedTemplate {
   agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -58,6 +59,9 @@ interface TemplateManagementProps {
   /** Se l'installazione ha il servizio della lavagna di Jitsi: senza, il
    *  modello non la offre (vedi lib/jitsi/whiteboard.ts). */
   whiteboardInfraReady: boolean;
+  /** Se l'installazione ha i sottotitoli live (lib/captions/availability):
+   *  senza, il modello non li propone. */
+  liveCaptionsAvailable: boolean;
 }
 
 interface EditingTemplate {
@@ -69,6 +73,7 @@ interface EditingTemplate {
   agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  liveCaptionsEnabled: boolean;
   postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -106,6 +111,8 @@ const DEFAULT_NEW: EditingTemplate = {
   agendaEnabled: false,
   wordCloudEnabled: false,
   whiteboardEnabled: false,
+  // Come sugli eventi: i sottotitoli sono accesi finche' non li si spegne.
+  liveCaptionsEnabled: true,
   postEventPublic: true,
   waitingRoomEngine: null,
   recordingEnabled: false,
@@ -130,6 +137,7 @@ const DEFAULT_NEW: EditingTemplate = {
 export default function TemplateManagement({
   templates: initialTemplates,
   whiteboardInfraReady,
+  liveCaptionsAvailable,
 }: TemplateManagementProps) {
   const t = useTranslations('admin.templates');
   const tc = useTranslations('common');
@@ -157,6 +165,7 @@ export default function TemplateManagement({
       agendaEnabled: tpl.agendaEnabled,
       wordCloudEnabled: tpl.wordCloudEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
+      liveCaptionsEnabled: tpl.liveCaptionsEnabled,
       postEventPublic: tpl.postEventPublic,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
@@ -320,6 +329,7 @@ export default function TemplateManagement({
               t={t}
               tc={tc}
               whiteboardInfraReady={whiteboardInfraReady}
+              liveCaptionsAvailable={liveCaptionsAvailable}
             />
           </CardBody>
         </Card>
@@ -343,6 +353,7 @@ export default function TemplateManagement({
                     t={t}
                     tc={tc}
                     whiteboardInfraReady={whiteboardInfraReady}
+                    liveCaptionsAvailable={liveCaptionsAvailable}
                   />
                 </CardBody>
               </Card>
@@ -457,6 +468,7 @@ function TemplateForm({
   t,
   tc,
   whiteboardInfraReady,
+  liveCaptionsAvailable,
 }: {
   form: EditingTemplate;
   setField: <K extends keyof EditingTemplate>(
@@ -469,6 +481,7 @@ function TemplateForm({
   t: ReturnType<typeof useTranslations>;
   tc: ReturnType<typeof useTranslations>;
   whiteboardInfraReady: boolean;
+  liveCaptionsAvailable: boolean;
 }) {
   // Etichette già esistenti del form evento: stessi flag, stessi nomi.
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
@@ -600,6 +613,7 @@ function TemplateForm({
             ['agendaEnabled', ta('agendaEnabled')],
             ['wordCloudEnabled', ta('wordCloudEnabled')],
             ['whiteboardEnabled', t('whiteboardLabel')],
+            ['liveCaptionsEnabled', ta('liveCaptionsEnabled')],
             ['recordingEnabled', t('recordingLabel')],
             ['participantsCanUnmute', t('unmute')],
             ['participantsCanStartVideo', t('video')],
@@ -616,7 +630,10 @@ function TemplateForm({
             ['retainParticipantTracks', ta('retainParticipantTracks')],
             ['postEventPublic', t('postEventPublic')],
           ] as const
-        ).map(([key, label]) => {
+        )
+          // Senza il servizio dei sottotitoli non c'e' niente da scegliere.
+          .filter(([key]) => key !== 'liveCaptionsEnabled' || liveCaptionsAvailable)
+          .map(([key, label]) => {
           // La lavagna senza il servizio dell'installazione non comparirebbe
           // in sala: non si accende, e la riga dice perche'. Resta spegnibile
           // per togliere un valore gia' salvato.

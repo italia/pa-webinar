@@ -6,6 +6,10 @@
  *          edit once responses exist (admins must DELETE to reset) so
  *          respondents don't silently lose answers when items are removed.
  * DELETE — remove the questionnaire; cascades to responses and answers.
+ *
+ * Con risposte la DELETE vuole `?withResponses=1`: la manda la pagina dei
+ * questionari dopo la conferma, mai il salvataggio del wizard, cosi' svuotare
+ * il modulo non cancella le risposte.
  */
 
 import { cookies } from 'next/headers';
@@ -223,21 +227,43 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   const q = await prisma.eventQuestionnaire.findUnique({
     where: { eventId_placement: { eventId: id, placement } },
-    select: { id: true, _count: { select: { responses: true } } },
+    select: { id: true },
   });
   if (!q) throw new NotFoundError('EventQuestionnaire');
-
-  await prisma.eventQuestionnaire.delete({ where: { id: q.id } });
+  // Le risposte si cancellano solo quando chi elimina lo ha confermato. Il
+  // conteggio si fa a riga bloccata: FOR UPDATE aspetta le risposte in corso
+  // di scrittura (il controllo della chiave esterna tiene la riga in KEY
+  // SHARE) e ferma le nuove finche' la decisione non e' presa, quindi una
+  // risposta arrivata un attimo prima viene contata, non cancellata.
+  const conRisposte = new URL(request.url).searchParams.get('withResponses') === '1';
+  const esito = await prisma.$transaction(async (tx) => {
+    const [riga] = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT id::text AS id FROM event_questionnaires WHERE id = ${q.id}::uuid FOR UPDATE`;
+    if (!riga) return { trovato: false, risposte: 0, cancellato: false };
+    const risposte = await tx.questionnaireResponse.count({ where: { questionnaireId: q.id } });
+    if (risposte > 0 && !conRisposte) return { trovato: true, risposte, cancellato: false };
+    await tx.eventQuestionnaire.delete({ where: { id: q.id } });
+    return { trovato: true, risposte, cancellato: true };
+  });
+  // Gia' eliminato da un'altra richiesta fra la lettura e il blocco.
+  if (!esito.trovato) throw new NotFoundError('EventQuestionnaire');
+  if (!esito.cancellato) {
+    throw new AppError(
+      'The questionnaire has responses: confirm to delete them too.',
+      409,
+      'HAS_RESPONSES',
+    );
+  }
 
   await logAdminAction({
     request,
     action: 'EVENT_QUESTIONNAIRE_DELETE',
     target: q.id,
-    details: { eventId: id, placement, deletedResponses: q._count.responses },
+    details: { eventId: id, placement, deletedResponses: esito.risposte },
   });
 
   return Response.json({
     deleted: true,
-    deletedResponses: q._count.responses,
+    deletedResponses: esito.risposte,
   });
 });

@@ -950,7 +950,9 @@
         "postDefaultHint": "Kui te midagi ei vali, pakutakse pärast üritust küsimustikku „{name}“.",
         "preHelp": "Küsimused registreerujatele enne üritust: profiil, ootused, teemad. See ei ole tagasiside.",
         "postHelp": "Tagasiside ürituse lõpus: kuidas läks, kvaliteet, sisu.",
-        "templatesNoneForMoment": "Selle hetke jaoks malli pole: kogu mallid on teise jaoks. Lisage selle ürituse küsimused allpool."
+        "templatesNoneForMoment": "Selle hetke jaoks malli pole: kogu mallid on teise jaoks. Lisage selle ürituse küsimused allpool.",
+        "lockedWithResponses": "Kogutud vastuseid: {count}. Et need ei kaoks, ei saa küsimustikku siin muuta: selle muutmiseks või kustutamiseks kasutage ürituse küsimustike haldust, mis küsib kinnitust.",
+        "lockedGoToQuestionnaires": "Mine küsimustike juurde"
       },
       "step5": {
         "heading": "Ülevaade ja avaldamine",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderaator esitab küsimuse ja igaüks vastab ühe sõnaga: vastustest moodustub pilv, mis uueneb reaalajas, ja kõige sagedamad sõnad muutuvad suuremaks. Sobib jää murdmiseks või mõne sekundiga muljete kogumiseks.",
       "whiteboardEnabled": "Jagatud tahvel",
       "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Nõuab paigalduse tahvliteenust; kus see on olemas, on tahvel kiirkõnedes alati sees.",
+      "liveCaptionsEnabled": "Automaatsed subtiitrid",
+      "liveCaptionsEnabledDesc": "Kõnelejate jutt ilmub video alla reaalajas transkribeerituna: see aitab neid, kes ei kuule või kellel on raske jälgida. Moderaatorid saavad need otseülekande ajal välja lülitada ka vahekaardil „Juhtpult“ ja igaüks saab need enda jaoks peita.",
       "autoStartRecording": "Käivita salvestus automaatselt",
       "autoStartRecordingDesc": "Sündmuse alguses käivitub salvestus iseseisvalt (moderaatorilt kinnitust ei küsita). Hilinejad leiavad kohe järelejõudmismängija saadaval.",
       "aiSectionHeading": "Automaatne järeltöötlus",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Osalejad, kes registreerusid e-posti aadressiga, millel on Gravatar, näevad seda ruumis pildina; kõigil teistel jäävad platvormi loodud initsiaalid. Pilt tuuakse läbi meie enda serveri, seega osalejate brauserid ei võta ühendust saidiga gravatar.com – küll aga teeb seda platvorm: märgi see privaatsusteatesse.",
         "liveCaptionsTitle": "Otsesubtiitrid",
         "liveCaptionsEnabled": "Automaatsed subtiitrid videokõnedes",
-        "liveCaptionsEnabledHelp": "Kõneleja häält transkribeerib reaalajas teenus, mis töötab platvormi enda taristus ilma väliste teenusteta, ja teksti ei säilitata. Subtiitrid on sisse lülitatud kõigil üritustel; moderaatorid saavad need ürituse ajal välja lülitada. Ilma paigaldatud teenuseta ei ole sellel valikul mõju."
+        "liveCaptionsEnabledHelp": "Kõneleja häält transkribeerib reaalajas teenus, mis töötab platvormi enda taristus ilma väliste teenusteta, ja teksti ei säilitata. Subtiitrid on vaikimisi sisse lülitatud igal üritusel: üksiku ürituse jaoks saab need välja lülitada selle seadetes ja moderaatorid saavad need välja lülitada ka otseülekande ajal. Ilma paigaldatud teenuseta ei ole sellel valikul mõju."
       },
       "errors": {
         "invalid": "Seadeid ei salvestatud: üks väärtus on vigane. Kontrollige muudetud välju ja proovige uuesti.",

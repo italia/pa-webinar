@@ -950,7 +950,9 @@
         "postDefaultHint": "Ja neko neizvēlaties, pēc pasākuma tiek piedāvāta anketa “{name}”.",
         "preHelp": "Jautājumi reģistrētājiem pirms pasākuma: profils, gaidas, tēmas. Tās nav atsauksmes.",
         "postHelp": "Atsauksmes pasākuma beigās: kā gāja, kvalitāte, saturs.",
-        "templatesNoneForMoment": "Šim brīdim nav veidnes: bibliotēkas veidnes ir otram. Šī pasākuma jautājumus pievienojiet zemāk."
+        "templatesNoneForMoment": "Šim brīdim nav veidnes: bibliotēkas veidnes ir otram. Šī pasākuma jautājumus pievienojiet zemāk.",
+        "lockedWithResponses": "Savāktās atbildes: {count}. Lai tās nezaudētu, anketu šeit nevar mainīt: lai to mainītu vai dzēstu, izmantojiet pasākuma anketu pārvaldību, kas prasa apstiprinājumu.",
+        "lockedGoToQuestionnaires": "Doties uz anketām"
       },
       "step5": {
         "heading": "Kopsavilkums un publicēšana",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderators uzdod jautājumu, un katrs atbild ar vienu vārdu: atbildes veido mākoni, kas atjaunojas tiešsaistē, un biežākie vārdi kļūst lielāki. Noder, lai lauztu ledu vai dažās sekundēs savāktu iespaidus.",
       "whiteboardEnabled": "Koplietojamā tāfele",
       "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Nepieciešams instalācijas tāfeles pakalpojums; kur tas ir pieejams, tūlītējos zvanos tāfele ir vienmēr ieslēgta.",
+      "liveCaptionsEnabled": "Automātiskie subtitri",
+      "liveCaptionsEnabledDesc": "Runātāju teiktais parādās zem video, transkribēts reāllaikā: tas palīdz tiem, kas nedzird vai kam grūti sekot. Moderatori tos var izslēgt arī tiešraides laikā cilnē “Vadība”, un ikviens tos var paslēpt sev.",
       "autoStartRecording": "Sākt ierakstīšanu automātiski",
       "autoStartRecordingDesc": "Pasākuma sākumā ieraksts sākas pats (moderatoram netiek prasīts apstiprinājums). Vēlīni dalībnieki uzreiz atrod pieejamu atskaņotāju.",
       "aiSectionHeading": "Automātiskā pēcapstrāde",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Tie, kas reģistrējušies ar e-pasta adresi, kurai ir Gravatar, telpā redzēs to kā attēlu; pārējiem paliek platformas ģenerētie iniciāļi. Attēls tiek ielādēts caur mūsu serveri, tāpēc dalībnieku pārlūkprogrammas nesazinās ar gravatar.com — taču platforma to dara: tas ir jānorāda privātuma paziņojumā.",
         "liveCaptionsTitle": "Tiešraides subtitri",
         "liveCaptionsEnabled": "Automātiskie subtitri videozvanos",
-        "liveCaptionsEnabledHelp": "Runātāja balsi reāllaikā transkribē pakalpojums, kas darbojas pašas platformas infrastruktūrā, bez ārējiem pakalpojumiem, un teksts netiek saglabāts. Subtitri ir ieslēgti visos pasākumos; moderatori tos var izslēgt pasākuma laikā. Bez instalēta pakalpojuma šai opcijai nav ietekmes. Latviešu valodu modelis vēl netranskribē uzticami."
+        "liveCaptionsEnabledHelp": "Runātāja balsi reāllaikā transkribē pakalpojums, kas darbojas pašas platformas infrastruktūrā, bez ārējiem pakalpojumiem, un teksts netiek saglabāts. Subtitri pēc noklusējuma ir ieslēgti katrā pasākumā: atsevišķam pasākumam tos var izslēgt tā iestatījumos, un moderatori tos var izslēgt arī tiešraides laikā. Bez instalēta pakalpojuma šai opcijai nav ietekmes. Latviešu valodu modelis vēl netranskribē uzticami."
       },
       "errors": {
         "invalid": "Iestatījumi netika saglabāti: kāda vērtība nav derīga. Pārbaudiet mainītos laukus un mēģiniet vēlreiz.",
