@@ -16,6 +16,8 @@
  * config points at it (DYNAMIC_BRANDING_URL). See lib/jitsi/branding.
  */
 
+import { CAPTIONS_BUTTON_ID } from '@/lib/captions/toolbar-button';
+
 import { JITSI_STAGE_BACKGROUND } from './branding';
 
 /**
@@ -145,7 +147,31 @@ export const jitsiConfigOverwrite = {
   // Overridden per role at instantiation
   toolbarButtons: baseToolbarButtons as string[],
 
+  // La barra principale: al massimo otto pulsanti, in quest'ordine; il resto
+  // va nel menu «…» («security», gli sfondi, la lavagna). Jitsi sceglie
+  // l'elenco con tanti pulsanti quanti ne entrano nella larghezza della sala
+  // e lo abbina per lunghezza alle sue soglie (da 8 a 2: le lunghezze devono
+  // restare queste); senza elenchi da 9 e da 10, le due soglie più larghe
+  // non valgono e la barra non supera gli otto. Due regole di Jitsi da
+  // ricordare: i posti che restano liberi li riempie con altri pulsanti, e
+  // un menu «…» con un solo pulsante non lo apre, lo rimette nella barra.
+  // Un pulsante personalizzato che non compare qui finisce sempre nel menu.
+  mainToolbarButtons: [
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID],
+    ['microphone', 'camera'],
+  ] as string[][],
+
   notifications: [] as string[],
+
+  // Il nome di chi è sul palco lo disegna la sala (components/live/stage-name),
+  // con il suo stile e nella stessa colonna dei sottotitoli: quello di Jitsi
+  // finiva sotto di loro.
+  hideDominantSpeakerBadge: true,
   disableReactions: true,
 
   // Keep a raised hand UP until the user lowers it or a moderator handles
@@ -251,6 +277,12 @@ export interface JitsiJwtFeatures {
   livestreaming: boolean;
   'screen-sharing': boolean;
   'outbound-call': boolean;
+  /**
+   * Avviare e fermare la trascrizione dei sottotitoli live. Il client Jitsi
+   * scrive i metadati di stanza che la accendono solo se il token lo concede:
+   * lo fa la sala del portale per conto del moderatore (useCaptionsControl).
+   */
+  transcription: boolean;
 }
 
 export const participantFeatures: JitsiJwtFeatures = {
@@ -258,6 +290,7 @@ export const participantFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 export const moderatorFeatures: JitsiJwtFeatures = {
@@ -265,6 +298,7 @@ export const moderatorFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: true,
 };
 
 /**
@@ -278,6 +312,7 @@ export const speakerFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 /**

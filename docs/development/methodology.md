@@ -178,7 +178,7 @@ These three commands cover the `app` workspace only. If you touched one of the a
 | If you changed | Also run |
 |---|---|
 | `lobby/` | `npm run lobby:typecheck`. The lobby has no unit tests, so the type check is its only gate. |
-| `infra/recorder/` or `infra/recorder-controller/` | In that folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`. Both packages sit outside the npm workspaces. |
+| `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/` | In that folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`. These packages sit outside the npm workspaces. |
 | `infra/ai/worker/` | In that folder: `pip install -r requirements-test.txt`, then `python -m pytest -q`. The tests cover pure logic and need no GPU. |
 | `infra/helm/` | `./scripts/validate-chart.sh`. No other local check looks at the chart. |
 | Dependencies | `npm run license:report`, then commit `license-report.json` together with `package-lock.json` |
@@ -201,7 +201,7 @@ Run every command from the repository root unless the table says otherwise.
 |---|---|---|
 | Lint & Typecheck | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | Never |
 | Unit Tests | `npm run test:coverage --workspace=app`. **Not** `npm run test`: only the coverage run enforces the thresholds. | Never |
-| Unit Tests (recorder, controller) | In `infra/recorder/` and in `infra/recorder-controller/`: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Nothing changed in either folder |
+| Unit Tests (recorder, controller) | In `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Nothing changed in those folders |
 | Typecheck (lobby) | `npm run lobby:typecheck`, which runs the same `tsc --noEmit` as `npx tsc --noEmit -p lobby/tsconfig.json` | Nothing changed in `lobby/` |
 | Helm Chart | `./scripts/validate-chart.sh`. The second step, `kubectl apply --dry-run=server`, needs a cluster (see below). | Nothing changed in `infra/helm/` |
 | Unit Tests (worker AI) | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Nothing changed in `infra/ai/worker/` |

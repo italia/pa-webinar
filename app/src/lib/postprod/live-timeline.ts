@@ -134,6 +134,7 @@ const FEATURE_NAMES: Record<LiveFlagField, string> = {
   chatEnabled: 'chat',
   wordCloudEnabled: '«In una parola»',
   agendaEnabled: 'agenda',
+  liveCaptionsEnabled: 'sottotitoli',
   recordingEnabled: 'registrazione',
 };
 

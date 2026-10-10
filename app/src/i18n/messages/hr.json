@@ -564,7 +564,16 @@
       "endHelp": "Zatvara sobu za sve i označava događaj završenim. Ne može se poništiti.",
       "timerHeading": "Mjerač izlaganja"
     },
-    "closingNotice": "{minutes, plural, =0 {Soba se zatvara.} one {Soba se automatski zatvara za # minutu.} few {Soba se automatski zatvara za # minute.} other {Soba se automatski zatvara za # minuta.}}"
+    "closingNotice": "{minutes, plural, =0 {Soba se zatvara.} one {Soba se automatski zatvara za # minutu.} few {Soba se automatski zatvara za # minute.} other {Soba se automatski zatvara za # minuta.}}",
+    "captions": {
+      "region": "Titlovi",
+      "unknownSpeaker": "Sudionik",
+      "paused": "Titlovi su pauzirani: usluga je preopterećena i nastavit će sama.",
+      "unavailable": "Titlovi trenutačno nisu dostupni.",
+      "show": "Prikaži titlove",
+      "hide": "Sakrij titlove",
+      "toggle": "Automatski titlovi"
+    }
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-poruke stižu s no-reply adrese: bez ovoga odgovor ne stiže nikome.",
         "avatarTitle": "Slike sudionika",
         "gravatarEnabled": "Koristi Gravatar kada je dostupan",
-        "gravatarEnabledHelp": "Tko se prijavio e-adresom koja ima Gravatar vidjet će ga kao sliku u sobi; svima ostalima ostaju inicijali koje generira platforma. Slika se dohvaća preko našeg poslužitelja pa preglednici sudionika ne kontaktiraju gravatar.com — ali platforma da: to treba navesti u izjavi o privatnosti."
+        "gravatarEnabledHelp": "Tko se prijavio e-adresom koja ima Gravatar vidjet će ga kao sliku u sobi; svima ostalima ostaju inicijali koje generira platforma. Slika se dohvaća preko našeg poslužitelja pa preglednici sudionika ne kontaktiraju gravatar.com — ali platforma da: to treba navesti u izjavi o privatnosti.",
+        "liveCaptionsTitle": "Titlovi uživo",
+        "liveCaptionsEnabled": "Automatski titlovi u videopozivima",
+        "liveCaptionsEnabledHelp": "Glas osobe koja govori transkribira u stvarnom vremenu usluga koja radi u vlastitoj infrastrukturi platforme, bez vanjskih usluga, a tekst se ne čuva. Titlovi su uključeni na svim događanjima; moderatori ih mogu isključiti tijekom događanja. Bez instalirane usluge ova opcija nema učinka."
       },
       "errors": {
         "invalid": "Postavke nisu spremljene: jedna vrijednost nije valjana. Provjerite izmijenjena polja i pokušajte ponovno.",
@@ -3815,7 +3827,8 @@
       "jvb": "Video most",
       "jibri": "Video snimanje",
       "smtp": "Usluga e-pošte",
-      "postprod": "AI pipeline nakon događaja"
+      "postprod": "AI pipeline nakon događaja",
+      "captions": "Titlovi uživo"
     },
     "descriptions": {
       "app": "Web stranica na kojoj pristupate događajima",
@@ -3827,7 +3840,8 @@
       "jvb": "Prenosi zvuk i video sudionicima",
       "jibri": "Snima video sesije događaja",
       "smtp": "Šalje potvrdne e-poruke i podsjetnike",
-      "postprod": "Transkribira, sažima i prevodi snimke pomoću AI modela u klasteru (GPU NVIDIA A100). Aktivira se samo kada događaj uključi AI funkcije."
+      "postprod": "Transkribira, sažima i prevodi snimke pomoću AI modela u klasteru (GPU NVIDIA A100). Aktivira se samo kada događaj uključi AI funkcije.",
+      "captions": "Transkribira govornike u stvarnom vremenu i šalje titlove u sobu putem bridgea."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Poslovi postprodukcije su u redu čekanja — GPU čvor se pokreće (hladno pokretanje ~3 min).",
         "standby": "AI pipeline je uključen, ali miruje: nema snimaka za obradu. GPU čvor je ugašen radi uštede energije.",
         "degraded": "Jedan ili više AI poslova nije uspjelo u posljednja 24 h. Pojedinosti provjeri na /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Titlovi uživo isključeni su u postavkama instance.",
+        "standby": "Usluga titlova je u pripravnosti: pokreće se kada događanje s titlovima krene uživo.",
+        "starting": "Usluga titlova pokreće se za događanje uživo.",
+        "operational": "Titlovi uživo rade.",
+        "degraded": "Usluga titlova je opterećena: istodobno transkribira manje glasova.",
+        "paused": "Usluga titlova pauzirala se zbog preopterećenja i nastavit će sama.",
+        "unavailable": "Usluga titlova ne odgovara."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Događaj s aktivnim snimanjem čeka Jibri preko vremenskog ograničenja: sesija se ne snima.",
       "smtp": "Potvrdne e-poruke i podsjetnici za registraciju neće biti poslani.",
       "postprodDegraded": "Transkripti i zapisnici za neke nedavne snimke nisu izrađeni. Videosnimke su i dalje dostupne.",
-      "jvbDown": "Sudionici ne primaju zvuk ni sliku."
+      "jvbDown": "Sudionici ne primaju zvuk ni sliku.",
+      "captionsPaused": "U sobi neko vrijeme nema titlova; zvuk i slika nisu pogođeni.",
+      "captionsDown": "U sobi se ne prikazuju titlovi; zvuk i slika rade normalno."
     },
     "overallVerdicts": {
       "operational": "Sve usluge rade ispravno. Platforma je potpuno operativna.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Zahtjeva/s",
       "podUptime": "Uptime poda"
     },
-    "probeDetail": "Rezultat provjere"
+    "probeDetail": "Rezultat provjere",
+    "connCaptions": "Zvuk i titlovi"
   },
   "feedback": {
     "title": "Kako ocjenjujete ovaj događaj?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Snijeg",
         "secretWell": "Tri želje kod bunara: iznenađenje za vaš lik"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatski titlovi",
+    "captionsNotice": "Tijekom prijenosa uživo glas osobe koja govori transkribira se u stvarnom vremenu kako bi se prikazivali titlovi. Transkripcija se odvija na poslužiteljima na kojima radi platforma, a tekst se ne čuva. Titlovi se mogu sakriti gumbom za titlove na traci poziva."
   },
   "recording": {
     "management": "Video snimka",

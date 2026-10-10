@@ -71,9 +71,10 @@ translated subtitles are `TRANSLATION_VTT`.
 - **Voice cloning.** Dubbing uses catalog synthetic voices only. The pipeline
   does not analyze, store or reproduce a participant's voice to synthesize
   speech.
-- **Live captions.** Everything runs after the event on the finished
-  recording. Live subtitles would need a streaming speech-recognition engine
-  next to the conference ([Roadmap](ROADMAP.md#further-out)).
+- **Live captions.** Everything here runs after the event on the finished
+  recording. Captions during the event are a separate service, a streaming
+  recognizer on CPU next to the conference ([Live captions](architecture/live-captions.md)).
+  It shares this pipeline's glossary and its sovereignty rule, not its queue.
 
 ## Data sovereignty
 
@@ -1792,8 +1793,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
 - **No post-production on a single VM**, and without `postprod.enabled` no
   job deletes per-participant tracks
   ([Scheduled and background jobs](architecture/background-jobs.md)).
-- **No live captions** and **no full-text search** in transcripts
-  ([Roadmap](ROADMAP.md)).
+- **No full-text search** in transcripts ([Roadmap](ROADMAP.md)). Captions
+  during the event are not part of this pipeline: see
+  [Live captions](architecture/live-captions.md).
 
 ## Related pages
 

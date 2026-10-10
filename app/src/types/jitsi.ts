@@ -65,7 +65,14 @@ export interface JitsiEventMap {
   audioMuteStatusChanged: [{ muted: boolean }];
   videoMuteStatusChanged: [{ muted: boolean }];
   raiseHandUpdated: [{ id: string; handRaised: number }];
-  recordingStatusChanged: [{ on: boolean; mode: string }];
+  /** Lo manda anche l'avvio e l'arresto della trascrizione (`transcription`
+   *  valorizzato): `on` resta lo stato della registrazione vera. */
+  recordingStatusChanged: [{ on: boolean; mode: string; transcription?: boolean }];
+  /** Chi è sul palco (il video grande), o la sua visibilità, è cambiato.
+   *  Senza argomenti: chi c'è lo dice `_getOnStageParticipant()`. */
+  largeVideoChanged: [];
+  /** Clic su un pulsante personalizzato della barra (`customToolbarButtons`). */
+  toolbarButtonClicked: [{ key: string; preventExecution?: boolean }];
   audioModerationChanged: [{ enabled: boolean }];
   videoModerationChanged: [{ enabled: boolean }];
   moderationStatusChanged: [{ enabled: boolean; mediaType: string }];
@@ -77,6 +84,25 @@ export interface JitsiEventMap {
   screenSharingStatusChanged: [{ id: string; on: boolean }];
   incomingMessage: [JitsiChatMessage];
   outgoingMessage: [JitsiChatMessage];
+  /** Un frammento dei sottotitoli live, arrivato dal bridge. Lo ricevono tutti
+   *  i client, anche con i sottotitoli nativi di Jitsi nascosti. L'IFrame API
+   *  lo consegna dentro `data`. */
+  transcriptionChunkReceived: [{ data?: JitsiTranscriptionChunk }];
+}
+
+/**
+ * Un frammento dei sottotitoli live come lo inoltra l'IFrame API: il testo
+ * intero della frase finora, in `final` quando è definitivo, altrimenti in
+ * `stable` o `unstable`. `participant.id` è l'endpoint di chi parla; il nome,
+ * se c'è, non è affidabile (il servizio non lo conosce).
+ */
+export interface JitsiTranscriptionChunk {
+  messageID: string;
+  language?: string;
+  participant?: { id?: string; name?: string; avatarUrl?: string };
+  final?: string;
+  stable?: string;
+  unstable?: string;
 }
 
 export type JitsiEventName = keyof JitsiEventMap;
@@ -109,7 +135,17 @@ export interface JitsiMeetExternalAPI {
   /** Set a remote participant's playback volume for the LOCAL user only
    *  (0 = muted … 1 = 100%). Does not affect what other participants hear. */
   executeCommand(command: 'setParticipantVolume', participantId: string, level: number): void;
+  /** Accende o spegne la trascrizione dei sottotitoli live (chi modera, con la
+   *  feature `transcription` nel token). `displaySubtitles` mostra o nasconde
+   *  i sottotitoli nativi di Jitsi: la sala usa i propri. */
+  executeCommand(command: 'setSubtitles', enabled: boolean, displaySubtitles?: boolean, language?: string | null): void;
+  /** Cambia la configurazione della sala dal vivo: per la sala, i pulsanti personalizzati della barra. */
+  executeCommand(command: 'overwriteConfig', config: Record<string, unknown>): void;
   executeCommand(command: string, ...args: unknown[]): void;
+
+  /** Chi è sul palco (il video grande). Metodo dell'IFrame API senza
+   *  documentazione pubblica, usato dalle app di Jitsi: può mancare. */
+  _getOnStageParticipant?(): string | undefined;
 
   // Event listeners
   addListener<E extends JitsiEventName>(

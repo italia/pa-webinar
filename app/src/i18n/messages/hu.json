@@ -564,7 +564,16 @@
       "endHelp": "Mindenkinek bezárja a termet, és befejezettnek jelöli az eseményt. Nem vonható vissza.",
       "timerHeading": "Felszólalások időzítője"
     },
-    "closingNotice": "{minutes, plural, =0 {A terem bezár.} one {A terem # perc múlva automatikusan bezár.} other {A terem # perc múlva automatikusan bezár.}}"
+    "closingNotice": "{minutes, plural, =0 {A terem bezár.} one {A terem # perc múlva automatikusan bezár.} other {A terem # perc múlva automatikusan bezár.}}",
+    "captions": {
+      "region": "Feliratok",
+      "unknownSpeaker": "Résztvevő",
+      "paused": "A feliratozás szünetel: a szolgáltatás túlterhelt, és magától folytatja.",
+      "unavailable": "A feliratok jelenleg nem érhetők el.",
+      "show": "Feliratok megjelenítése",
+      "hide": "Feliratok elrejtése",
+      "toggle": "Automatikus feliratok"
+    }
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "Az e-mailek egy no-reply címről érkeznek: enélkül a válasz senkihez sem jut el.",
         "avatarTitle": "A résztvevők képei",
         "gravatarEnabled": "Gravatar használata, ha elérhető",
-        "gravatarEnabledHelp": "Aki olyan e-mail-címmel regisztrált, amelyhez tartozik Gravatar, azt fogja képként látni a teremben; mindenki másnál a platform által generált kezdőbetűk maradnak. A kép a saját kiszolgálónkon keresztül érkezik, így a résztvevők böngészője nem lép kapcsolatba a gravatar.com oldallal – a platform viszont igen: ezt fel kell tüntetni az adatvédelmi tájékoztatóban."
+        "gravatarEnabledHelp": "Aki olyan e-mail-címmel regisztrált, amelyhez tartozik Gravatar, azt fogja képként látni a teremben; mindenki másnál a platform által generált kezdőbetűk maradnak. A kép a saját kiszolgálónkon keresztül érkezik, így a résztvevők böngészője nem lép kapcsolatba a gravatar.com oldallal – a platform viszont igen: ezt fel kell tüntetni az adatvédelmi tájékoztatóban.",
+        "liveCaptionsTitle": "Élő feliratok",
+        "liveCaptionsEnabled": "Automatikus feliratok a videohívásokban",
+        "liveCaptionsEnabledHelp": "A beszélő hangját valós időben egy olyan szolgáltatás írja át, amely a platform saját infrastruktúrájában fut, külső szolgáltatások nélkül, a szöveget pedig nem őrizzük meg. A feliratok minden eseményen be vannak kapcsolva; a moderátorok az esemény alatt kikapcsolhatják őket. Telepített szolgáltatás nélkül ennek a beállításnak nincs hatása."
       },
       "errors": {
         "invalid": "A beállítások nem lettek mentve: egy érték érvénytelen. Ellenőrizze a módosított mezőket, és próbálja újra.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videóhíd",
       "jibri": "Videófelvétel",
       "smtp": "E-mail szolgáltatás",
-      "postprod": "Esemény utáni AI pipeline"
+      "postprod": "Esemény utáni AI pipeline",
+      "captions": "Élő feliratok"
     },
     "descriptions": {
       "app": "A weboldal, ahol az eseményekhez hozzáfér",
@@ -3827,7 +3840,8 @@
       "jvb": "Hangot és videót továbbít a résztvevőknek",
       "jibri": "Az események videófelvételeit készíti",
       "smtp": "Visszaigazoló e-maileket és emlékeztetőket küld",
-      "postprod": "A felvételeket fürtön belüli AI modellekkel (NVIDIA A100 GPU) írja át, foglalja össze és fordítja le. Csak akkor lép működésbe, ha egy esemény bekapcsolja az AI-funkciókat."
+      "postprod": "A felvételeket fürtön belüli AI modellekkel (NVIDIA A100 GPU) írja át, foglalja össze és fordítja le. Csak akkor lép működésbe, ha egy esemény bekapcsolja az AI-funkciókat.",
+      "captions": "Valós időben átírja a beszélőket, és a bridge-en keresztül elküldi a feliratokat a terembe."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Utómunka-feladatok állnak sorban – a GPU-csomópont éppen indul (hidegindítás kb. 3 perc).",
         "standby": "Az AI pipeline be van kapcsolva, de tétlen: nincs feldolgozandó felvétel. A GPU-csomópont energiatakarékosságból ki van kapcsolva.",
         "degraded": "Az elmúlt 24 órában egy vagy több AI-feladat meghiúsult. A részletekért nézze meg az /admin/postprod oldalt."
+      },
+      "captions": {
+        "disabled": "Az élő feliratok ki vannak kapcsolva a példány beállításaiban.",
+        "standby": "A feliratszolgáltatás készenlétben van: akkor indul el, amikor egy feliratozott esemény élőben indul.",
+        "starting": "A feliratszolgáltatás indul egy élő esemény számára.",
+        "operational": "Az élő feliratok működnek.",
+        "degraded": "A feliratszolgáltatás terhelés alatt áll: egyszerre kevesebb hangot ír át.",
+        "paused": "A feliratszolgáltatás túlterhelés miatt szünetelteti magát, és magától folytatja.",
+        "unavailable": "A feliratszolgáltatás nem válaszol."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Egy aktív felvétellel rendelkező esemény az időkorláton túl várja a Jibrit: a munkamenet nem kerül rögzítésre.",
       "smtp": "A regisztrációs visszaigazoló e-mailek és emlékeztetők nem kerülnek elküldésre.",
       "postprodDegraded": "Néhány friss felvételhez nem készült átirat és összefoglaló. A videofelvételek továbbra is elérhetők.",
-      "jvbDown": "A résztvevők nem kapnak hangot és képet."
+      "jvbDown": "A résztvevők nem kapnak hangot és képet.",
+      "captionsPaused": "A teremben egy ideig hiányoznak a feliratok; a hangot és a képet ez nem érinti.",
+      "captionsDown": "A teremben nem jelennek meg feliratok; a hang és a kép rendesen működik."
     },
     "overallVerdicts": {
       "operational": "Minden szolgáltatás megfelelően működik. A platform teljesen üzemképes.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Kérések/mp",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Az ellenőrzés eredménye"
+    "probeDetail": "Az ellenőrzés eredménye",
+    "connCaptions": "Hang és feliratok"
   },
   "feedback": {
     "title": "Hogyan értékeli ezt az eseményt?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Havazás",
         "secretWell": "Három kívánság a kútnál: meglepetés a figurájának"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatikus feliratok",
+    "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a hívás eszköztárának feliratgombjával elrejthetők."
   },
   "recording": {
     "management": "Videofelvétel",

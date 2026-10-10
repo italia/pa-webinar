@@ -824,6 +824,7 @@ builds ([Registry access](install/README.md#registry-access-to-the-published-ima
 | `ghcr.io/italia/pa-webinar` | Migration init container | `X.Y.Z-migrate` and `vX.Y.Z-migrate` per release. Releases published before both forms existed carry only `vX.Y.Z-migrate` ([Migration image tags](development/ci-and-release.md#migration-image-tags)). From the development branch, `dev-migrate` and `dev-migrate-<sha>` |
 | `ghcr.io/italia/pa-webinar-jitsi-web` | Jitsi web with the noise-suppression patch | One immutable tag per patch revision, named after the Jitsi release it patches (`stable-<jitsi-release>-rnnoise`, with a suffix for later revisions on the same release). The chart's default can lag behind the latest published tag: pin the one you pull ([Web image and pull secrets](DEPLOYMENT.md#web-image-and-pull-secrets)) |
 | `ghcr.io/italia/pa-webinar-recorder`, `-recorder-controller`, `-postprod-worker` | Per-participant recorder, its controller, AI post-production | The release version from 0.13.0, which the chart uses when the image value is empty (it takes the app image's tag); the floating `:dev` and an immutable `:dev-<sha>` from the development branch |
+| `ghcr.io/italia/pa-webinar-captions-gateway`, `-captions-engine` | Live captions: the gateway and the speech engine (the model is downloaded at pod start, not in the image) | The release version from the first release that includes them, which the chart uses when `captions.gateway.image` and `captions.engine.image` are empty; `:dev` and `:dev-<sha>` from the development branch |
 | `ghcr.io/italia/pa-webinar-postprod-worker-cpu` | AI post-production without a GPU (summaries, translations, archive), a light image | The release version from the first release that includes it, and `:dev`, `:dev-<sha>`; with `postprod.worker.image` set and this one not, the chart uses the GPU worker's image ([Upgrades](operations/upgrades.md#making-the-dev-components-roll-back)) |
 
 The development tags are for evaluation, as in the minikube guide; an
@@ -843,8 +844,8 @@ docker build --target builder -t pa-webinar:local-migrate .        # migrations 
 
 The browser-facing settings (`NEXT_PUBLIC_*`) are read at runtime, so one image
 serves any host name. The other components build from their own folders:
-`infra/recorder`, `infra/recorder-controller`, and `infra/ai` with
-`Dockerfile.worker`. Local builds on other architectures were not tested.
+`infra/recorder`, `infra/recorder-controller`, `infra/captions/gateway`,
+`infra/captions/engine`, and `infra/ai` with `Dockerfile.worker`. Local builds on other architectures were not tested.
 
 To serve Jitsi web without credentials, use the standard image and drop the
 pull secrets:

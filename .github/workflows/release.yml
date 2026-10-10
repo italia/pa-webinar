@@ -233,6 +233,16 @@ jobs:
             context: ./infra/ai
             file: ./infra/ai/Dockerfile.worker-cpu
             cache: dev-postprod-worker-cpu
+          # Sottotitoli live: il gateway e il motore (che scarica il modello
+          # all'avvio del pod, non lo contiene).
+          - name: captions-gateway
+            context: ./infra/captions/gateway
+            file: ./infra/captions/gateway/Dockerfile
+            cache: release-captions-gateway
+          - name: captions-engine
+            context: ./infra/captions/engine
+            file: ./infra/captions/engine/Dockerfile
+            cache: release-captions-engine
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 

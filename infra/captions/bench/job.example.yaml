@@ -1,0 +1,102 @@
+# Banco di prova dei sottotitoli live su un nodo del cluster.
+#
+# Misura quante voci simultanee regge il budget di CPU del container
+# (resources.limits.cpu) sul tipo di macchina vero. Gli script arrivano da
+# una ConfigMap, l'immagine è quella ufficiale di Python: non serve
+# costruire né pubblicare nulla.
+#
+#   kubectl -n <namespace> create configmap captions-bench \
+#     --from-file=infra/captions/bench/
+#   kubectl -n <namespace> apply -f infra/captions/bench/job.example.yaml
+#   kubectl -n <namespace> logs -f job/captions-bench
+#
+# Attenzione:
+# - il pool del bridge scala da zero: il Job accende un nodo, che si paga
+#   finché resta acceso;
+# - non lanciarlo mentre c'è un evento in diretta: sullo stesso nodo il
+#   banco toglie CPU al bridge, ed è proprio ciò che sta misurando;
+# - il pod scarica il motore (~7 MB), il modello (~740 MB) e il corpus
+#   FLEURS (~660 MB) da GitHub e da Hugging Face: serve l'uscita verso
+#   Internet.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: captions-bench
+  namespace: <namespace>
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    spec:
+      restartPolicy: Never
+      # Pool del bridge; per il pool di Jibri usare workload=jitsi-jibri.
+      nodeSelector:
+        workload: jitsi-jvb
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: jitsi-jvb
+          effect: NoSchedule
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bench
+          image: mirror.gcr.io/library/python:3.12-slim-bookworm
+          command: ["bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              python -m venv /work/venv
+              /work/venv/bin/pip install --quiet -r /opt/bench/requirements.txt
+              cp -L /opt/bench/*.py /opt/bench/run.sh /work/
+              BENCH_PYTHON=/work/venv/bin/python bash /work/run.sh
+              # Il report è anche nei log; i dati grezzi restano qui finché
+              # il pod esiste: kubectl cp <pod>:/work/results ./results
+              sleep "${BENCH_KEEP_SECONDS:-600}"
+          env:
+            - name: BENCH_WORK
+              value: /work
+            - name: HOME
+              value: /work
+            - name: BENCH_PROFILE
+              value: full
+            - name: BENCH_SESSIONS
+              value: "1,2,4,8,12,16"
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          # Il budget da provare: richieste e limiti uguali (QoS Guaranteed),
+          # come avrebbe il servizio vero. Ripetere il Job per ogni budget.
+          resources:
+            requests:
+              cpu: "4"
+              memory: 3Gi
+            limits:
+              cpu: "4"
+              memory: 3Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: work
+              mountPath: /work
+            - name: scripts
+              mountPath: /opt/bench
+              readOnly: true
+      volumes:
+        - name: work
+          emptyDir:
+            sizeLimit: 5Gi
+        - name: scripts
+          configMap:
+            name: captions-bench

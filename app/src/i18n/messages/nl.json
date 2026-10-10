@@ -564,7 +564,16 @@
       "endHelp": "Sluit de ruimte voor iedereen en markeert het evenement als afgelopen. Kan niet ongedaan worden gemaakt.",
       "timerHeading": "Timer voor bijdragen"
     },
-    "closingNotice": "{minutes, plural, =0 {De ruimte wordt gesloten.} one {De ruimte sluit automatisch over # minuut.} other {De ruimte sluit automatisch over # minuten.}}"
+    "closingNotice": "{minutes, plural, =0 {De ruimte wordt gesloten.} one {De ruimte sluit automatisch over # minuut.} other {De ruimte sluit automatisch over # minuten.}}",
+    "captions": {
+      "region": "Ondertiteling",
+      "unknownSpeaker": "Deelnemer",
+      "paused": "Ondertiteling gepauzeerd: de dienst is overbelast en gaat vanzelf verder.",
+      "unavailable": "Ondertiteling is op dit moment niet beschikbaar.",
+      "show": "Ondertiteling tonen",
+      "hide": "Ondertiteling verbergen",
+      "toggle": "Automatische ondertiteling"
+    }
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "De e-mails komen van een no-reply-adres: zonder dit adres komt een antwoord bij niemand terecht.",
         "avatarTitle": "Afbeeldingen van de deelnemers",
         "gravatarEnabled": "Gravatar gebruiken wanneer beschikbaar",
-        "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld."
+        "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld.",
+        "liveCaptionsTitle": "Live-ondertiteling",
+        "liveCaptionsEnabled": "Automatische ondertiteling in videogesprekken",
+        "liveCaptionsEnabledHelp": "De stem van wie spreekt wordt in realtime getranscribeerd door een dienst die in de eigen infrastructuur van het platform draait, zonder externe diensten, en de tekst wordt niet bewaard. De ondertiteling staat aan in elk evenement; moderatoren kunnen haar tijdens het evenement uitzetten. Zonder geïnstalleerde dienst heeft deze optie geen effect."
       },
       "errors": {
         "invalid": "De instellingen zijn niet opgeslagen: een waarde is ongeldig. Controleer de gewijzigde velden en probeer het opnieuw.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videobridge",
       "jibri": "Video-opname",
       "smtp": "E-maildienst",
-      "postprod": "AI-pijplijn na het evenement"
+      "postprod": "AI-pijplijn na het evenement",
+      "captions": "Live-ondertiteling"
     },
     "descriptions": {
       "app": "De website waar u toegang krijgt tot evenementen",
@@ -3827,7 +3840,8 @@
       "jvb": "Verzendt audio en video naar deelnemers",
       "jibri": "Neemt videosessies van evenementen op",
       "smtp": "Verstuurt bevestigingsmails en herinneringen",
-      "postprod": "Transcribeert, vat samen en vertaalt de opnamen met AI-modellen in het cluster (NVIDIA A100-GPU). Wordt alleen actief wanneer een evenement de AI-functies inschakelt."
+      "postprod": "Transcribeert, vat samen en vertaalt de opnamen met AI-modellen in het cluster (NVIDIA A100-GPU). Wordt alleen actief wanneer een evenement de AI-functies inschakelt.",
+      "captions": "Transcribeert sprekers in realtime en stuurt de ondertiteling via de bridge naar de zaal."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Postprod-jobs in de wachtrij — de GPU-node start op (koude start ~3 min).",
         "standby": "AI-pijplijn actief maar in afwachting: geen opnamen te verwerken. De GPU-node is uitgeschakeld om energie te besparen.",
         "degraded": "Een of meer AI-jobs zijn in de afgelopen 24 uur mislukt. Raadpleeg /admin/postprod voor details."
+      },
+      "captions": {
+        "disabled": "Live-ondertiteling staat uit in de instellingen van de instantie.",
+        "standby": "De ondertitelingsdienst staat stand-by: hij start wanneer een evenement met ondertiteling live gaat.",
+        "starting": "De ondertitelingsdienst start voor een live evenement.",
+        "operational": "Live-ondertiteling werkt.",
+        "degraded": "De ondertitelingsdienst is zwaar belast: hij transcribeert minder stemmen tegelijk.",
+        "paused": "De ondertitelingsdienst heeft zichzelf gepauzeerd wegens overbelasting en gaat vanzelf verder.",
+        "unavailable": "De ondertitelingsdienst reageert niet."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Een evenement met actieve opname wacht langer dan de timeout op Jibri: de sessie wordt niet opgenomen.",
       "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd.",
       "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar.",
-      "jvbDown": "Deelnemers ontvangen geen audio of video."
+      "jvbDown": "Deelnemers ontvangen geen audio of video.",
+      "captionsPaused": "In de zaal ontbreekt de ondertiteling een tijdje; audio en video worden niet beïnvloed.",
+      "captionsDown": "In de zaal verschijnt geen ondertiteling; audio en video werken normaal."
     },
     "overallVerdicts": {
       "operational": "Alle diensten werken correct. Het platform is volledig operationeel.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Verzoeken/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Resultaat van de controle"
+    "probeDetail": "Resultaat van de controle",
+    "connCaptions": "Audio en ondertiteling"
   },
   "feedback": {
     "title": "Hoe beoordeelt u dit evenement?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Sneeuwval",
         "secretWell": "Drie wensen bij de put: een verrassing voor uw personage"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatische ondertiteling",
+    "captionsNotice": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertiteling te tonen. De transcriptie gebeurt op de servers die het platform hosten en de tekst wordt niet bewaard. De ondertiteling kan worden verborgen met de ondertitelingsknop in de balk van het gesprek."
   },
   "recording": {
     "management": "Video-opname",

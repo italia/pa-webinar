@@ -702,6 +702,118 @@ button.live-time-strip__rec {
   gap: 0.5rem;
 }
 
+// Sottotitoli live sopra il video (ADR-018), con i colori della sala: fondo
+// blu scuro del brand quasi pieno, perché il testo resti leggibile su
+// qualunque video (bianco su #17324D, contrasto oltre 12:1), Titillium Web
+// semibold, il nome di chi parla in un'etichetta blu primario. Il riquadro
+// non intercetta i clic, che restano al video e alla barra di Jitsi, dove sta
+// il pulsante per nasconderli.
+// La colonna in basso sul video: sottotitoli, poi il nome di chi è sul palco
+// (components/live/stage-name), sopra la barra dei comandi di Jitsi.
+.live-stage-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5.5rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  // Lontano dalla colonna delle miniature di Jitsi a destra, e centrato.
+  padding: 0 8.5rem;
+  pointer-events: none;
+  font-family: 'Titillium Web', Geneva, Tahoma, sans-serif;
+}
+
+@media (max-width: 767.98px) {
+  .live-stage-bottom {
+    padding: 0 1rem;
+  }
+}
+
+.live-captions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  max-width: 100%;
+}
+
+.live-stage-name {
+  max-width: min(24rem, 100%);
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(23, 50, 77, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-captions__box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: min(56rem, 100%);
+  padding: 0.5rem 1rem 0.5625rem;
+  border-left: 4px solid var(--app-primary);
+  border-radius: 4px;
+  background: rgba(23, 50, 77, 0.94);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: clamp(1.0625rem, 1.7vw, 1.4375rem);
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.live-captions__line {
+  margin: 0;
+}
+
+.live-captions__speaker {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 4px;
+  background: var(--app-primary);
+  color: #fff;
+  font-size: 0.6875em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  vertical-align: 0.15em;
+}
+
+.live-captions__notice {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-left: 4px solid #cc7a00;
+  border-radius: 4px;
+  background: rgba(23, 50, 77, 0.94);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 575.98px) {
+  .live-stage-bottom {
+    bottom: 4.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .live-captions__box {
+    padding: 0.375rem 0.75rem;
+  }
+}
+
 // Ancillary flex-children stacked above the main video area. Without
 // `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
 // these banners and eat into their legibility.

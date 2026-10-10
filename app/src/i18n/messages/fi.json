@@ -564,7 +564,16 @@
       "endHelp": "Sulkee huoneen kaikilta ja merkitsee tapahtuman päättyneeksi. Ei voi perua.",
       "timerHeading": "Puheenvuorojen ajastin"
     },
-    "closingNotice": "{minutes, plural, =0 {Huone sulkeutuu.} one {Huone sulkeutuu automaattisesti # minuutin kuluttua.} other {Huone sulkeutuu automaattisesti # minuutin kuluttua.}}"
+    "closingNotice": "{minutes, plural, =0 {Huone sulkeutuu.} one {Huone sulkeutuu automaattisesti # minuutin kuluttua.} other {Huone sulkeutuu automaattisesti # minuutin kuluttua.}}",
+    "captions": {
+      "region": "Tekstitys",
+      "unknownSpeaker": "Osallistuja",
+      "paused": "Tekstitys keskeytetty: palvelu on ylikuormittunut ja jatkaa itsestään.",
+      "unavailable": "Tekstitys ei ole juuri nyt käytettävissä.",
+      "show": "Näytä tekstitys",
+      "hide": "Piilota tekstitys",
+      "toggle": "Automaattinen tekstitys"
+    }
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "Sähköpostit lähtevät no-reply-osoitteesta: ilman tätä vastaus ei tavoita ketään.",
         "avatarTitle": "Osallistujien kuvat",
         "gravatarEnabled": "Käytä Gravataria, kun se on saatavilla",
-        "gravatarEnabledHelp": "Osallistujat, jotka ilmoittautuivat Gravatariin liitetyllä sähköpostiosoitteella, näkyvät huoneessa kuvallaan; muilla säilyvät alustan luomat nimikirjaimet. Kuva haetaan oman palvelimemme kautta, joten osallistujien selaimet eivät ota yhteyttä gravatar.comiin — mutta alusta ottaa: tämä on mainittava tietosuojaselosteessa."
+        "gravatarEnabledHelp": "Osallistujat, jotka ilmoittautuivat Gravatariin liitetyllä sähköpostiosoitteella, näkyvät huoneessa kuvallaan; muilla säilyvät alustan luomat nimikirjaimet. Kuva haetaan oman palvelimemme kautta, joten osallistujien selaimet eivät ota yhteyttä gravatar.comiin — mutta alusta ottaa: tämä on mainittava tietosuojaselosteessa.",
+        "liveCaptionsTitle": "Reaaliaikainen tekstitys",
+        "liveCaptionsEnabled": "Automaattinen tekstitys videopuheluissa",
+        "liveCaptionsEnabledHelp": "Puhujan ääni litteroidaan reaaliaikaisesti palvelulla, joka toimii alustan omassa infrastruktuurissa ilman ulkoisia palveluja, eikä tekstiä tallenneta. Tekstitys on käytössä kaikissa tapahtumissa; moderaattorit voivat poistaa sen käytöstä tapahtuman aikana. Ilman asennettua palvelua asetuksella ei ole vaikutusta."
       },
       "errors": {
         "invalid": "Asetuksia ei tallennettu: arvo ei kelpaa. Tarkista muuttamasi kentät ja yritä uudelleen.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videosilta",
       "jibri": "Videotallennus",
       "smtp": "Sähköpostipalvelu",
-      "postprod": "Tapahtuman jälkeinen tekoälyputki"
+      "postprod": "Tapahtuman jälkeinen tekoälyputki",
+      "captions": "Reaaliaikainen tekstitys"
     },
     "descriptions": {
       "app": "Verkkosivusto, jolla pääset tapahtumiin",
@@ -3827,7 +3840,8 @@
       "jvb": "Välittää ääntä ja videota osallistujille",
       "jibri": "Tallentaa tapahtumien videoistunnot",
       "smtp": "Lähettää vahvistusviestit ja muistutukset",
-      "postprod": "Litteroi, tiivistää ja kääntää tallenteet klusterissa toimivilla tekoälymalleilla (NVIDIA A100 -GPU). Aktivoituu vain, kun tapahtumassa otetaan tekoälytoiminnot käyttöön."
+      "postprod": "Litteroi, tiivistää ja kääntää tallenteet klusterissa toimivilla tekoälymalleilla (NVIDIA A100 -GPU). Aktivoituu vain, kun tapahtumassa otetaan tekoälytoiminnot käyttöön.",
+      "captions": "Litteroi puhujat reaaliaikaisesti ja lähettää tekstityksen saliin bridgen kautta."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Jälkituotantotöitä on jonossa — GPU-solmu käynnistyy (kylmäkäynnistys ~3 min).",
         "standby": "Tekoälyputki on käytössä mutta odottaa: käsiteltäviä tallenteita ei ole. GPU-solmu on sammutettu energian säästämiseksi.",
         "degraded": "Yksi tai useampi tekoälytyö epäonnistui viimeisen 24 tunnin aikana. Tarkista tiedot osoitteesta /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Reaaliaikainen tekstitys on poistettu käytöstä instanssin asetuksissa.",
+        "standby": "Tekstityspalvelu on valmiustilassa: se käynnistyy, kun tekstitystä käyttävä tapahtuma alkaa.",
+        "starting": "Tekstityspalvelu käynnistyy käynnissä olevaa tapahtumaa varten.",
+        "operational": "Reaaliaikainen tekstitys toimii.",
+        "degraded": "Tekstityspalvelu on kuormitettu: se litteroi vähemmän ääniä samanaikaisesti.",
+        "paused": "Tekstityspalvelu keskeytti itsensä ylikuormituksen vuoksi ja jatkaa itsestään.",
+        "unavailable": "Tekstityspalvelu ei vastaa."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Tapahtuma, jossa tallennus on käytössä, odottaa Jibriä yli aikakatkaisun: istuntoa ei tallenneta.",
       "smtp": "Vahvistusviestejä ja muistutuksia ei lähetetä.",
       "postprodDegraded": "Joidenkin viimeaikaisten tallenteiden litterointeja ja yhteenvetoja ei luotu. Videotallenteet ovat kuitenkin saatavilla.",
-      "jvbDown": "Osallistujat eivät saa ääntä eikä kuvaa."
+      "jvbDown": "Osallistujat eivät saa ääntä eikä kuvaa.",
+      "captionsPaused": "Salista puuttuu tekstitys hetken aikaa; ääni ja video toimivat ennallaan.",
+      "captionsDown": "Saliin ei tule tekstitystä; ääni ja video toimivat normaalisti."
     },
     "overallVerdicts": {
       "operational": "Kaikki palvelut toimivat oikein. Alusta on täysin toiminnassa.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Pyynnöt/s",
       "podUptime": "Podin käyttöaika"
     },
-    "probeDetail": "Tarkistuksen tulos"
+    "probeDetail": "Tarkistuksen tulos",
+    "connCaptions": "Ääni ja tekstitys"
   },
   "feedback": {
     "title": "Miten arvioisit tämän tapahtuman?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Lumisade",
         "secretWell": "Kolme toivetta kaivolla: yllätys hahmollesi"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automaattinen tekstitys",
+    "captionsNotice": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliaikaisesti tekstityksen näyttämiseksi. Litterointi tehdään alustaa ylläpitävillä palvelimilla, eikä tekstiä tallenneta. Tekstityksen voi piilottaa puhelun työkalurivin tekstityspainikkeella."
   },
   "recording": {
     "management": "Videotallenne",

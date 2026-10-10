@@ -44,8 +44,12 @@ import PostEventFeedback from '@/components/live/post-event-feedback';
 import PresentationTimerBar from '@/components/live/presentation-timer';
 import LiveTimeStrip from '@/components/live/live-time-strip';
 import ClosingNotice from '@/components/live/closing-notice';
+import LiveCaptions from '@/components/live/live-captions';
+import StageName from '@/components/live/stage-name';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
+import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
+import { primaryLanguageCode } from '@/lib/captions/vocabulary';
 import { TimerInterventiSync, useScartoOrologio } from '@/hooks/use-presentation-timer';
 import { usePresenze } from '@/hooks/use-presence';
 import ReactionBar from '@/components/live/reaction-bar';
@@ -133,6 +137,14 @@ interface EventInfo {
   /** Testo custom per-locale dell'informativa AI (SiteSetting); null →
    *  la WaitingRoom usa il fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** Sottotitoli live disponibili nell'istanza: accesi dall'amministrazione e
+   *  servizio installato (lib/captions/availability). */
+  liveCaptionsAvailable?: boolean;
+  /** Il flag dell'evento all'apertura della pagina; dal vivo vale quello dei
+   *  flag della sala, che chi modera può cambiare. */
+  liveCaptionsEnabled?: boolean;
+  /** La lingua predefinita dell'istanza, la stessa con cui il servizio trascrive. */
+  liveCaptionsLanguage?: string;
   /** L'evento registra una traccia audio separata per partecipante →
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
@@ -1088,6 +1100,10 @@ export default function LiveEventClient({
       const prima = registrazioneVistaRef.current;
       registrazioneVistaRef.current = recording;
       if (prima === recording) return;
+      // «Ferma» senza aver mai visto «accesa» non è un cambio: Jitsi manda lo
+      // stato anche quando si accende o spegne la trascrizione dei
+      // sottotitoli, con la registrazione mai partita.
+      if (prima === null && !recording) return;
       // Il primo stato visto appena entrati e' com'era gia': non un cambio,
       // salvo che l'avvio l'abbia chiesto questo browser.
       const entrato = entratoAlleRef.current;
@@ -1366,6 +1382,25 @@ export default function LiveEventClient({
     faseRegistratore: recorderPhase,
     onAvvioRichiesto: segnaAvvioChiesto,
   });
+  // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
+  // dal vivo, arriva con gli altri flag della sala (canale push o polling,
+  // stessa voce della barra laterale). Chi modera li accende nella stanza.
+  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean }>(
+    event.liveCaptionsAvailable ? `/api/events/${event.slug}/flags` : null,
+    (url: string) => fetch(url).then((r) => r.json()),
+    { refreshInterval: pushLive ? 0 : 15000 },
+  );
+  const sottotitoliAccesi =
+    !!event.liveCaptionsAvailable &&
+    (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
+  useCaptionsControl({
+    api: jitsiApi,
+    attivo: conduce && !!event.liveCaptionsAvailable,
+    accesi: sottotitoliAccesi,
+    // Solo un'etichetta per Jitsi: la lingua parlata la sceglie il servizio,
+    // dalla lingua predefinita dell'istanza, e qui si usa la stessa.
+    lingua: primaryLanguageCode(event.liveCaptionsLanguage),
+  });
   // L'ora d'avvio della registrazione secondo il server (la cronologia della
   // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
   // Si chiede finché la registrazione è in corso e il server non la sa. Una
@@ -1507,6 +1542,7 @@ export default function LiveEventClient({
             timezone: event.timezone,
             aiPostprodEnabled: event.aiPostprodEnabled,
             aiConsentDisclosure: event.aiConsentDisclosure,
+            liveCaptions: !!event.liveCaptionsAvailable && (event.liveCaptionsEnabled ?? true),
             multitrackRecordingEnabled: event.multitrackRecordingEnabled,
             riepilogo: event.riepilogo,
           }}
@@ -1855,6 +1891,8 @@ export default function LiveEventClient({
               whiteboardInfraReady={whiteboardInfraReady}
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
+              liveCaptions={Boolean(event.liveCaptionsAvailable)}
+              liveCaptionsOn={sottotitoliAccesi}
               rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
@@ -1866,6 +1904,15 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
+            {/* Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
+                la barra di Jitsi: impilati, non si coprono mai. Montata da
+                subito e solo nascosta sotto l'avviso di avvio del bridge:
+                deve ascoltare la sala già dall'ingresso, che è l'evento che
+                fa sparire quell'avviso. */}
+            <div className="live-stage-bottom" hidden={showJvbOverlay}>
+              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              <StageName api={jitsiApi} />
+            </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
             {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}
@@ -1887,6 +1934,8 @@ export default function LiveEventClient({
           qaEnabled={event.qaEnabled}
           chatEnabled={event.chatEnabled}
           agendaEnabled={event.agendaEnabled}
+          liveCaptionsAvailable={!!event.liveCaptionsAvailable}
+          liveCaptionsEnabled={event.liveCaptionsEnabled ?? true}
           whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
           jitsiApi={jitsiApi}
@@ -2069,6 +2118,10 @@ interface LiveSidebarProps {
   qaEnabled: boolean;
   chatEnabled: boolean;
   agendaEnabled: boolean;
+  /** Sottotitoli live disponibili nell'istanza: la Regia mostra l'interruttore. */
+  liveCaptionsAvailable: boolean;
+  /** Il flag dei sottotitoli all'apertura, finché non arrivano i flag dal vivo. */
+  liveCaptionsEnabled: boolean;
   /** Whiteboard is enabled for this call → show the "not saved" reminder. */
   whiteboardEnabled: boolean;
   /** …and the installation actually serves it (see LiveEventClientProps). */
@@ -2112,6 +2165,8 @@ function LiveSidebar({
   qaEnabled,
   chatEnabled,
   agendaEnabled,
+  liveCaptionsAvailable,
+  liveCaptionsEnabled,
   whiteboardEnabled,
   whiteboardInfraReady,
   jitsiApi,
@@ -2137,6 +2192,7 @@ function LiveSidebar({
     chatEnabled: boolean;
     agendaEnabled: boolean;
     wordCloudEnabled: boolean;
+    liveCaptionsEnabled: boolean;
     recordingEnabled: boolean;
   }>(
     `/api/events/${eventSlug}/flags`,
@@ -2152,6 +2208,7 @@ function LiveSidebar({
   // flags poll reports it enabled (no per-event prop → safe default false, so
   // it never flashes on before the real value loads).
   const effWordCloud = liveFlags?.wordCloudEnabled ?? false;
+  const effCaptions = liveFlags?.liveCaptionsEnabled ?? liveCaptionsEnabled;
   const showChat = effChat !== false;
 
   // Toggle di una funzione durante l'evento (moderatore): PUT del flag +
@@ -2159,7 +2216,7 @@ function LiveSidebar({
   // poll (15s).
   const toggleFeature = useCallback(
     async (
-      key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled' | 'wordCloudEnabled',
+      key: FunzioneSala['key'],
       current: boolean,
     ) => {
       await mutateFlags((cur) => (cur ? { ...cur, [key]: !current } : cur), {
@@ -2194,6 +2251,9 @@ function LiveSidebar({
     { key: 'chatEnabled', label: t('sidebarTabChat'), on: effChat },
     { key: 'agendaEnabled', label: t('liveToggleAgenda'), on: effAgenda },
     { key: 'wordCloudEnabled', label: t('sidebarTabWordcloud'), on: effWordCloud },
+    ...(liveCaptionsAvailable
+      ? [{ key: 'liveCaptionsEnabled' as const, label: t('captions.toggle'), on: effCaptions }]
+      : []),
   ];
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     // Chat is the primary channel: prefer it as the initial

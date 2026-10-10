@@ -259,6 +259,13 @@ export const GET = withErrorHandling(async (request) => {
   }
   const jibriDesired = needsRecording || jibriHold ? 1 : 0;
 
+  // Sottotitoli live (ADR-018): il servizio resta acceso finché c'è un evento
+  // in diretta, o in avvio, e l'istanza non li ha spenti, anche se chi modera
+  // li ha spenti in sala: riaccenderli deve essere immediato, e un servizio
+  // fermo deve prima scaricare il modello e caricarlo. Si accende con il
+  // bridge, nel pre-riscaldamento. Fermo, non usa CPU.
+  const captionsDesired = settings.liveCaptionsEnabled !== false && billableEvents.length > 0 ? 1 : 0;
+
   // Forensic log line: one structured summary per tick so we can
   // reconstruct which events moved between states and why (replica
   // churn during overlapping live events has been a source of
@@ -348,6 +355,7 @@ export const GET = withErrorHandling(async (request) => {
     desired,
     jibriDesired,
     jibriHold,
+    captionsDesired,
     predictiveDesired,
     reactiveAdjustment,
     stressLevel: effectiveStress,

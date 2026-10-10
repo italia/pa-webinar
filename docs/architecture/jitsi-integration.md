@@ -251,9 +251,21 @@ Moderators get a larger set of buttons than other participants.
 Jitsi's own participants pane and mute-everyone are left out on purpose: the roster, muting, the
 audio and video locks and the raised hands live in one place, the drawer's **Participants** panel.
 
-On top of these, `JitsiRoom` adds `reactions` when the reactions mode is native, and `whiteboard` for
+On top of these, `JitsiRoom` adds `reactions` when the reactions mode is native, `whiteboard` for
 moderators on desktop when the event has opted in and the installation declares the whiteboard
-service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`).
+service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), and the live captions button when captions are available
+([Live captions](live-captions.md)).
+
+The main bar holds at most eight buttons, in the order set by `mainToolbarButtons` in
+`app/src/lib/jitsi/config.ts`: microphone, camera, screen sharing, raised hand, reactions, captions,
+tile view and settings. The others, `security`, the backgrounds and the whiteboard among them, go to
+the **…** menu. Jitsi matches each list to a width threshold by its length, fills any free place
+with another button, and puts a lone overflowing button back in the bar, so the lists keep these
+lengths.
+
+The name of the person on stage is drawn by the room (`app/src/components/live/stage-name.tsx`) in
+the room's style, under the live captions, instead of Jitsi's own label (`hideDominantSpeakerBadge`),
+which sat in the same place as the captions.
 
 What is deliberately missing, for every role:
 

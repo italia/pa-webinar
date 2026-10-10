@@ -26,6 +26,7 @@ import {
   fetchJibriHealth,
   loadJvbDemand,
 } from '@/lib/status/bridge';
+import { CAPTIONS_NODE_STATUS, getCaptionsStatus, type CaptionsStatus } from '@/lib/status/captions';
 import { activeOrUpcomingWhere, activeStatusWhere } from '@/lib/status/event-activity';
 import { getJitsiHealth, type JitsiComponentHealth } from '@/lib/status/jitsi-health';
 import { upSelector } from '@/lib/status/prometheus-selectors';
@@ -884,6 +885,40 @@ export const GET = withErrorHandling(async () => {
         failedJobs: counts.FAILED,
         failed24h,
         artifactRetentionDays: settings.aiArtifactRetentionDays,
+      },
+    });
+  }
+
+  // Sottotitoli live (ADR-018): il nodo c'è solo dove il servizio è
+  // installato. Spento dall'amministrazione, o fermo perché nessun evento in
+  // diretta li usa, è «in attesa»; sospeso per sovraccarico è degradato.
+  const captions: CaptionsStatus = await getCaptionsStatus(settings).catch(
+    (): CaptionsStatus => ({ state: 'unavailable' }),
+  );
+  if (captions.state !== 'not_installed') {
+    const captionsNodeStatus: ServiceStatus = CAPTIONS_NODE_STATUS[captions.state];
+    services.push({
+      id: 'captions',
+      name: 'infraMap.services.captions',
+      technicalName: 'Live captions (NeMo-Speech.cpp, CPU)',
+      description: 'infraMap.descriptions.captions',
+      status: captionsNodeStatus,
+      verdict: `infraMap.verdicts.captions.${captions.state}`,
+      impact:
+        captions.state === 'paused'
+          ? 'infraMap.impacts.captionsPaused'
+          : captions.state === 'unavailable'
+            ? 'infraMap.impacts.captionsDown'
+            : null,
+      // Le repliche non le sa: il servizio riporta voci, non pod.
+      replicas: { running: null, desired: null, max: null },
+      ports: [{ name: 'captions', port: 8080, protocol: 'TCP' }],
+      metadata: {
+        state: captions.state,
+        activeStreams: captions.activeStreams ?? null,
+        maxStreams: captions.maxStreams ?? null,
+        lagP95Ms: captions.lagP95Ms ?? null,
+        pausedUntil: captions.pausedUntil ?? null,
       },
     });
   }

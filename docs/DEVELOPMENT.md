@@ -116,6 +116,7 @@ To act as a moderator of a demo event, open one of the moderator links that the 
 | `cron` | `curlimages/curl` | none | Calls four `/api/cron/*` routes of `app` with the `x-api-key` header |
 | `db-migrate` (profile `setup`) | The `builder` stage of the root `Dockerfile` | none | One-shot: `prisma migrate deploy`, then the seed |
 | `recorder-controller` (profile `recorder`) | Built from `infra/recorder-controller/` | none | Starts one recorder bot container per recording (the per-participant recording path) through the Docker socket |
+| `captions-model`, `captions-engine`, `captions-gateway` (profile `captions`) | Built from `infra/captions/engine/` and `infra/captions/gateway/` | none | Live captions: downloads the model into a volume (about 750 MB, once), runs the speech engine and the gateway the bridge streams audio to. Needs the `CAPTIONS_*` variables in `.env` (see `.env.example`) |
 
 A few details matter when something does not work:
 
@@ -418,6 +419,12 @@ To run the pair against the local stack, start the `recorder` profile (`docker c
 - as shipped, the profile does not complete a recording: the bot needs more settings, a reachable Jitsi host with a trusted certificate and a recordings store. The list is in [Setting up recording](operations/recording-setup.md#docker-compose-the-recorder-profile).
 
 Component details are in [`infra/recorder/README.md`](../infra/recorder/README.md) and [`infra/recorder-controller/README.md`](../infra/recorder-controller/README.md). The mechanism is described in [Recording](architecture/recording.md).
+
+### Live captions
+
+`infra/captions/gateway/` is a separate npm project with its own lockfile, tested like the recorder packages. The speech engine is measured by `infra/captions/bench/` ([README](../infra/captions/bench/README.md)), not unit-tested.
+
+To run captions against the local stack, uncomment the three `CAPTIONS_*` lines in `.env` (they are in `.env.example`) and start the profile: `docker compose --profile captions up --build -d`. If `prosody`, `jicofo` and `app` were already running, recreate them so they read the new variables. Then, in a room entered from a moderator link with a working microphone, captions appear over the video after a second or two. `docker compose logs captions-gateway` shows conferences connecting and the load state; it never shows the text. How the pieces fit is in [Live captions](architecture/live-captions.md).
 
 ### AI post-production worker
 

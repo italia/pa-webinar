@@ -564,7 +564,16 @@
       "endHelp": "Închide sala pentru toți și marchează evenimentul ca încheiat. Nu se poate anula.",
       "timerHeading": "Cronometrul intervențiilor"
     },
-    "closingNotice": "{minutes, plural, =0 {Sala se închide.} one {Sala se închide automat în # minut.} few {Sala se închide automat în # minute.} other {Sala se închide automat în # de minute.}}"
+    "closingNotice": "{minutes, plural, =0 {Sala se închide.} one {Sala se închide automat în # minut.} few {Sala se închide automat în # minute.} other {Sala se închide automat în # de minute.}}",
+    "captions": {
+      "region": "Subtitrări",
+      "unknownSpeaker": "Participant",
+      "paused": "Subtitrările sunt întrerupte: serviciul este supraîncărcat și își va relua singur activitatea.",
+      "unavailable": "Subtitrările nu sunt disponibile în acest moment.",
+      "show": "Afișează subtitrările",
+      "hide": "Ascunde subtitrările",
+      "toggle": "Subtitrări automate"
+    }
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-mailurile pleacă de la o adresă no-reply: fără aceasta, cine răspunde nu ajunge la nimeni.",
         "avatarTitle": "Imaginile participanților",
         "gravatarEnabled": "Folosește Gravatar când este disponibil",
-        "gravatarEnabledHelp": "Cei care s-au înscris cu o adresă de e-mail asociată unui Gravatar îl vor vedea ca imagine în sală; pentru toți ceilalți rămân inițialele generate de platformă. Imaginea trece prin serverul nostru, deci browserul participanților nu contactează gravatar.com — dar platforma o face: acest lucru trebuie declarat în nota de informare privind confidențialitatea."
+        "gravatarEnabledHelp": "Cei care s-au înscris cu o adresă de e-mail asociată unui Gravatar îl vor vedea ca imagine în sală; pentru toți ceilalți rămân inițialele generate de platformă. Imaginea trece prin serverul nostru, deci browserul participanților nu contactează gravatar.com — dar platforma o face: acest lucru trebuie declarat în nota de informare privind confidențialitatea.",
+        "liveCaptionsTitle": "Subtitrări în direct",
+        "liveCaptionsEnabled": "Subtitrări automate în apelurile video",
+        "liveCaptionsEnabledHelp": "Vocea celui care vorbește este transcrisă în timp real de un serviciu care rulează în infrastructura proprie a platformei, fără servicii externe, iar textul nu este păstrat. Subtitrările sunt active la toate evenimentele; moderatorii le pot dezactiva în timpul evenimentului. Fără serviciul instalat, această opțiune nu are efect."
       },
       "errors": {
         "invalid": "Setările nu au fost salvate: o valoare nu este validă. Verificați câmpurile modificate și încercați din nou.",
@@ -3815,7 +3827,8 @@
       "jvb": "Punte video",
       "jibri": "Înregistrare video",
       "smtp": "Serviciu email",
-      "postprod": "Pipeline AI post-eveniment"
+      "postprod": "Pipeline AI post-eveniment",
+      "captions": "Subtitrări în direct"
     },
     "descriptions": {
       "app": "Site-ul web de unde accesați evenimentele",
@@ -3827,7 +3840,8 @@
       "jvb": "Transmite audio și video către participanți",
       "jibri": "Înregistrează sesiunile video ale evenimentelor",
       "smtp": "Trimite emailuri de confirmare și mementouri",
-      "postprod": "Transcrie, rezumă și traduce înregistrările cu modele AI în cluster (GPU NVIDIA A100). Se activează doar când un eveniment optează pentru funcțiile AI."
+      "postprod": "Transcrie, rezumă și traduce înregistrările cu modele AI în cluster (GPU NVIDIA A100). Se activează doar când un eveniment optează pentru funcțiile AI.",
+      "captions": "Transcrie în timp real vorbitorii și trimite subtitrările în sală prin bridge."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Joburi de post-producție în coadă — nodul GPU pornește (cold-start ~3 min).",
         "standby": "Pipeline AI activ, dar în așteptare: nicio înregistrare de procesat. Nodul GPU este oprit pentru economie de energie.",
         "degraded": "Unul sau mai multe joburi AI au eșuat în ultimele 24 h. Verificați /admin/postprod pentru detalii."
+      },
+      "captions": {
+        "disabled": "Subtitrările în direct sunt dezactivate în setările instanței.",
+        "standby": "Serviciul de subtitrare este în așteptare: pornește când un eveniment cu subtitrări intră în direct.",
+        "starting": "Serviciul de subtitrare pornește pentru un eveniment în direct.",
+        "operational": "Subtitrările în direct funcționează.",
+        "degraded": "Serviciul de subtitrare este încărcat: transcrie mai puține voci în același timp.",
+        "paused": "Serviciul de subtitrare s-a întrerupt din cauza supraîncărcării și își va relua singur activitatea.",
+        "unavailable": "Serviciul de subtitrare nu răspunde."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Un eveniment cu înregistrare activă așteaptă Jibri peste timeout: sesiunea nu este înregistrată.",
       "smtp": "Emailurile de confirmare a înregistrării și mementourile nu vor fi trimise.",
       "postprodDegraded": "Transcrierile și rezumatele pentru unele înregistrări recente nu au fost generate. Înregistrările video rămân disponibile.",
-      "jvbDown": "Participanții nu primesc nici audio, nici video."
+      "jvbDown": "Participanții nu primesc nici audio, nici video.",
+      "captionsPaused": "Subtitrările lipsesc din sală pentru o vreme; sunetul și imaginea nu sunt afectate.",
+      "captionsDown": "În sală nu apar subtitrări; sunetul și imaginea funcționează normal."
     },
     "overallVerdicts": {
       "operational": "Toate serviciile funcționează corect. Platforma este complet operațională.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Cereri/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Rezultatul verificării"
+    "probeDetail": "Rezultatul verificării",
+    "connCaptions": "Audio și subtitrări"
   },
   "feedback": {
     "title": "Cum evaluați acest eveniment?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "O ninsoare",
         "secretWell": "Trei dorințe la fântână: o surpriză pentru personaj"
       }
-    }
+    },
+    "captionsNoticeTitle": "Subtitrări automate",
+    "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul pentru subtitrări din bara apelului."
   },
   "recording": {
     "management": "Înregistrare video",

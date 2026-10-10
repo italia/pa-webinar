@@ -564,7 +564,16 @@
       "endHelp": "Chiude la sala per tutti e porta l'evento a concluso. Non si torna indietro.",
       "timerHeading": "Timer degli interventi"
     },
-    "closingNotice": "{minutes, plural, =0 {La sala si sta chiudendo.} one {La sala si chiude automaticamente fra # minuto.} other {La sala si chiude automaticamente fra # minuti.}}"
+    "closingNotice": "{minutes, plural, =0 {La sala si sta chiudendo.} one {La sala si chiude automaticamente fra # minuto.} other {La sala si chiude automaticamente fra # minuti.}}",
+    "captions": {
+      "region": "Sottotitoli",
+      "unknownSpeaker": "Partecipante",
+      "paused": "Sottotitoli sospesi: il servizio è sovraccarico e riprenderà da solo.",
+      "unavailable": "Sottotitoli non disponibili in questo momento.",
+      "show": "Mostra i sottotitoli",
+      "hide": "Nascondi i sottotitoli",
+      "toggle": "Sottotitoli automatici"
+    }
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -2014,7 +2023,10 @@
         "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno.",
         "avatarTitle": "Immagini dei partecipanti",
         "gravatarEnabled": "Usa Gravatar quando disponibile",
-        "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala; per tutti gli altri restano le iniziali generate dalla piattaforma. L'immagine passa dal nostro server, quindi il browser dei partecipanti non contatta gravatar.com — ma la piattaforma sì: va dichiarato nell'informativa privacy."
+        "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala; per tutti gli altri restano le iniziali generate dalla piattaforma. L'immagine passa dal nostro server, quindi il browser dei partecipanti non contatta gravatar.com — ma la piattaforma sì: va dichiarato nell'informativa privacy.",
+        "liveCaptionsTitle": "Sottotitoli live",
+        "liveCaptionsEnabled": "Sottotitoli automatici nelle videochiamate",
+        "liveCaptionsEnabledHelp": "La voce di chi parla viene trascritta in tempo reale da un servizio che gira nell'infrastruttura della piattaforma, senza servizi esterni, e il testo non viene conservato. Sono attivi in tutti gli eventi; chi modera può spegnerli durante l'evento. Senza il servizio installato l'opzione non ha effetto."
       },
       "errors": {
         "invalid": "Le impostazioni non sono state salvate: un valore non è valido. Controlla i campi modificati e riprova.",
@@ -3815,7 +3827,8 @@
       "jvb": "Ponte video",
       "jibri": "Registrazione video",
       "smtp": "Servizio email",
-      "postprod": "Pipeline AI post-evento"
+      "postprod": "Pipeline AI post-evento",
+      "captions": "Sottotitoli live"
     },
     "descriptions": {
       "app": "Il sito web dove si accede agli eventi",
@@ -3827,7 +3840,8 @@
       "jvb": "Trasmette audio e video ai partecipanti",
       "jibri": "Registra le sessioni video degli eventi",
       "smtp": "Invia email di conferma e promemoria",
-      "postprod": "Trascrive, riassume e traduce le registrazioni con modelli AI in cluster (GPU NVIDIA A100). Si attiva solo quando un evento abilita le feature AI."
+      "postprod": "Trascrive, riassume e traduce le registrazioni con modelli AI in cluster (GPU NVIDIA A100). Si attiva solo quando un evento abilita le feature AI.",
+      "captions": "Trascrive in tempo reale chi parla e manda i sottotitoli alla sala attraverso il bridge."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Job postprod in coda — il nodo GPU si sta avviando (cold-start ~3 min).",
         "standby": "Pipeline AI attiva ma in attesa: nessuna registrazione da processare. Il nodo GPU è spento per risparmio energetico.",
         "degraded": "Uno o più job AI sono falliti nelle ultime 24h. Controllare /admin/postprod per dettagli."
+      },
+      "captions": {
+        "disabled": "I sottotitoli live sono spenti nelle impostazioni dell'istanza.",
+        "standby": "Il servizio dei sottotitoli è in attesa: si accende quando un evento con i sottotitoli va in diretta.",
+        "starting": "Il servizio dei sottotitoli si sta avviando per un evento in diretta.",
+        "operational": "I sottotitoli live funzionano.",
+        "degraded": "Il servizio dei sottotitoli è sotto carico: trascrive meno voci contemporaneamente.",
+        "paused": "Il servizio dei sottotitoli si è sospeso per sovraccarico e riprenderà da solo.",
+        "unavailable": "Il servizio dei sottotitoli non risponde."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Un evento con registrazione attiva attende Jibri da più del timeout: la sessione non viene registrata.",
       "smtp": "Le email di conferma registrazione e i promemoria non verranno inviati.",
       "postprodDegraded": "Le trascrizioni e i verbali per alcune registrazioni recenti non sono stati generati. Le registrazioni video sono comunque disponibili.",
-      "jvbDown": "I partecipanti non ricevono audio e video."
+      "jvbDown": "I partecipanti non ricevono audio e video.",
+      "captionsPaused": "In sala i sottotitoli mancano per un po'; audio e video non sono toccati.",
+      "captionsDown": "In sala non compaiono i sottotitoli; audio e video funzionano normalmente."
     },
     "overallVerdicts": {
       "operational": "Tutti i servizi funzionano correttamente. La piattaforma è pienamente operativa.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Richieste/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Esito della verifica"
+    "probeDetail": "Esito della verifica",
+    "connCaptions": "Audio e sottotitoli"
   },
   "feedback": {
     "title": "Come valuti questo evento?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Una nevicata",
         "secretWell": "Tre desideri al pozzo: una sorpresa per il personaggio"
       }
-    }
+    },
+    "captionsNoticeTitle": "Sottotitoli automatici",
+    "captionsNotice": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli. La trascrizione avviene sui server che ospitano la piattaforma e il testo non viene conservato. I sottotitoli si possono nascondere con il pulsante dei sottotitoli nella barra della chiamata."
   },
   "recording": {
     "management": "Registrazione video",

@@ -564,7 +564,16 @@
       "endHelp": "Aizver telpu visiem un atzīmē pasākumu kā beigušos. To nevar atsaukt.",
       "timerHeading": "Uzstāšanos taimeris"
     },
-    "closingNotice": "{minutes, plural, =0 {Telpa tiek aizvērta.} zero {Telpa automātiski aizvērsies pēc # minūtēm.} one {Telpa automātiski aizvērsies pēc # minūtes.} other {Telpa automātiski aizvērsies pēc # minūtēm.}}"
+    "closingNotice": "{minutes, plural, =0 {Telpa tiek aizvērta.} zero {Telpa automātiski aizvērsies pēc # minūtēm.} one {Telpa automātiski aizvērsies pēc # minūtes.} other {Telpa automātiski aizvērsies pēc # minūtēm.}}",
+    "captions": {
+      "region": "Subtitri",
+      "unknownSpeaker": "Dalībnieks",
+      "paused": "Subtitri ir apturēti: pakalpojums ir pārslogots un atsāks darbu pats.",
+      "unavailable": "Subtitri pašlaik nav pieejami.",
+      "show": "Rādīt subtitrus",
+      "hide": "Paslēpt subtitrus",
+      "toggle": "Automātiskie subtitri"
+    }
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-pasti tiek sūtīti no adreses, uz kuru nevar atbildēt: bez šī iestatījuma atbilde nesasniegs nevienu.",
         "avatarTitle": "Dalībnieku attēli",
         "gravatarEnabled": "Izmantot Gravatar, kad tas ir pieejams",
-        "gravatarEnabledHelp": "Tie, kas reģistrējušies ar e-pasta adresi, kurai ir Gravatar, telpā redzēs to kā attēlu; pārējiem paliek platformas ģenerētie iniciāļi. Attēls tiek ielādēts caur mūsu serveri, tāpēc dalībnieku pārlūkprogrammas nesazinās ar gravatar.com — taču platforma to dara: tas ir jānorāda privātuma paziņojumā."
+        "gravatarEnabledHelp": "Tie, kas reģistrējušies ar e-pasta adresi, kurai ir Gravatar, telpā redzēs to kā attēlu; pārējiem paliek platformas ģenerētie iniciāļi. Attēls tiek ielādēts caur mūsu serveri, tāpēc dalībnieku pārlūkprogrammas nesazinās ar gravatar.com — taču platforma to dara: tas ir jānorāda privātuma paziņojumā.",
+        "liveCaptionsTitle": "Tiešraides subtitri",
+        "liveCaptionsEnabled": "Automātiskie subtitri videozvanos",
+        "liveCaptionsEnabledHelp": "Runātāja balsi reāllaikā transkribē pakalpojums, kas darbojas pašas platformas infrastruktūrā, bez ārējiem pakalpojumiem, un teksts netiek saglabāts. Subtitri ir ieslēgti visos pasākumos; moderatori tos var izslēgt pasākuma laikā. Bez instalēta pakalpojuma šai opcijai nav ietekmes. Latviešu valodu modelis vēl netranskribē uzticami."
       },
       "errors": {
         "invalid": "Iestatījumi netika saglabāti: kāda vērtība nav derīga. Pārbaudiet mainītos laukus un mēģiniet vēlreiz.",
@@ -3815,7 +3827,8 @@
       "jvb": "Video tilts",
       "jibri": "Video ierakstīšana",
       "smtp": "E-pasta pakalpojums",
-      "postprod": "Pēcpasākuma MI konveijers"
+      "postprod": "Pēcpasākuma MI konveijers",
+      "captions": "Tiešraides subtitri"
     },
     "descriptions": {
       "app": "Tīmekļa vietne, kurā piekļūstat pasākumiem",
@@ -3827,7 +3840,8 @@
       "jvb": "Pārraida audio un video dalībniekiem",
       "jibri": "Ieraksta pasākumu video sesijas",
       "smtp": "Nosūta apstiprinājuma e-pastus un atgādinājumus",
-      "postprod": "Transkribē, apkopo un tulko ierakstus, izmantojot klasterī izvietotus MI modeļus (NVIDIA A100 GPU). Aktivizējas tikai tad, kad pasākumā tiek izmantotas MI funkcijas."
+      "postprod": "Transkribē, apkopo un tulko ierakstus, izmantojot klasterī izvietotus MI modeļus (NVIDIA A100 GPU). Aktivizējas tikai tad, kad pasākumā tiek izmantotas MI funkcijas.",
+      "captions": "Reāllaikā transkribē runātājus un caur bridge nosūta subtitrus uz zāli."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Pēcapstrādes darbi ir rindā — GPU mezgls tiek startēts (aukstais starts ~3 min).",
         "standby": "MI konveijers ir ieslēgts, bet gaida: nav ierakstu, ko apstrādāt. GPU mezgls ir izslēgts, lai taupītu enerģiju.",
         "degraded": "Pēdējo 24 h laikā ir neizdevies viens vai vairāki MI darbi. Sīkāku informāciju skatiet /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Tiešraides subtitri ir izslēgti instances iestatījumos.",
+        "standby": "Subtitru pakalpojums ir gaidstāvē: tas sāk darboties, kad pasākums ar subtitriem sāk tiešraidi.",
+        "starting": "Subtitru pakalpojums sāk darboties tiešraides pasākumam.",
+        "operational": "Tiešraides subtitri darbojas.",
+        "degraded": "Subtitru pakalpojums ir noslogots: tas vienlaikus transkribē mazāk balsu.",
+        "paused": "Subtitru pakalpojums pārslodzes dēļ ir apturējis darbu un atsāks to pats.",
+        "unavailable": "Subtitru pakalpojums neatbild."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Pasākums ar aktīvu ierakstīšanu gaida Jibri ilgāk par noildzi: sesija netiek ierakstīta.",
       "smtp": "Reģistrācijas apstiprinājuma e-pasti un atgādinājumi netiks nosūtīti.",
       "postprodDegraded": "Dažiem nesenajiem ierakstiem netika izveidotas transkripcijas un protokoli. Video ieraksti joprojām ir pieejami.",
-      "jvbDown": "Dalībnieki nesaņem ne audio, ne video."
+      "jvbDown": "Dalībnieki nesaņem ne audio, ne video.",
+      "captionsPaused": "Zālē kādu laiku nav subtitru; skaņa un attēls netiek ietekmēti.",
+      "captionsDown": "Zālē netiek rādīti subtitri; skaņa un attēls darbojas normāli."
     },
     "overallVerdicts": {
       "operational": "Visi pakalpojumi darbojas pareizi. Platforma ir pilnībā funkcionāla.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Pieprasījumi/s",
       "podUptime": "Pod darbības laiks"
     },
-    "probeDetail": "Pārbaudes rezultāts"
+    "probeDetail": "Pārbaudes rezultāts",
+    "connCaptions": "Audio un subtitri"
   },
   "feedback": {
     "title": "Kā jūs vērtējat šo pasākumu?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Sniegs",
         "secretWell": "Trīs vēlēšanās pie akas: pārsteigums Jūsu tēlam"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automātiskie subtitri",
+    "captionsNotice": "Tiešraides laikā runātāja balss reāllaikā tiek transkribēta, lai rādītu subtitrus. Transkribēšana notiek serveros, kuros darbojas platforma, un teksts netiek saglabāts. Subtitrus var paslēpt ar subtitru pogu zvana rīkjoslā."
   },
   "recording": {
     "management": "Video ieraksts",

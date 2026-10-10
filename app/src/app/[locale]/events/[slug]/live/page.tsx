@@ -6,6 +6,7 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
 import { informativaEvento } from '@/lib/events/privacy-notice';
@@ -127,6 +128,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       event.aiSummaryEnabled ||
       event.aiTranslationEnabled ||
       event.aiDubbingEnabled);
+  // Sottotitoli live (ADR-018): servizio installato e acceso nell'istanza.
+  // Se l'evento li vuole, lo dice il suo flag, che il moderatore cambia dal vivo.
+  const captionsAvailable = liveCaptionsAvailable(settings);
   const aiConsentDisclosure =
     ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ??
     null;
@@ -209,6 +213,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             effectiveGraceMinutes:
               event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
             aiPostprodEnabled,
+            liveCaptionsAvailable: captionsAvailable,
+            liveCaptionsEnabled: event.liveCaptionsEnabled,
+            liveCaptionsLanguage: settings.defaultLocale,
             aiConsentDisclosure,
             multitrackRecordingEnabled: isInstant
               ? false
@@ -352,6 +359,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         effectiveGraceMinutes:
           event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
         aiPostprodEnabled,
+        liveCaptionsAvailable: captionsAvailable,
+        liveCaptionsEnabled: event.liveCaptionsEnabled,
+        liveCaptionsLanguage: settings.defaultLocale,
         aiConsentDisclosure,
         multitrackRecordingEnabled: event.multitrackRecordingEnabled,
       }}

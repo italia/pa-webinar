@@ -564,7 +564,16 @@
       "endHelp": "Sulgeb ruumi kõigile ja märgib ürituse lõppenuks. Seda ei saa tagasi võtta.",
       "timerHeading": "Ettekannete taimer"
     },
-    "closingNotice": "{minutes, plural, =0 {Ruum sulgub.} one {Ruum sulgub automaatselt # minuti pärast.} other {Ruum sulgub automaatselt # minuti pärast.}}"
+    "closingNotice": "{minutes, plural, =0 {Ruum sulgub.} one {Ruum sulgub automaatselt # minuti pärast.} other {Ruum sulgub automaatselt # minuti pärast.}}",
+    "captions": {
+      "region": "Subtiitrid",
+      "unknownSpeaker": "Osaleja",
+      "paused": "Subtiitrid on peatatud: teenus on üle koormatud ja jätkab ise.",
+      "unavailable": "Subtiitrid ei ole praegu saadaval.",
+      "show": "Näita subtiitreid",
+      "hide": "Peida subtiitrid",
+      "toggle": "Automaatsed subtiitrid"
+    }
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-kirjad saadetakse no-reply aadressilt: ilma selleta ei jõua vastus kellenigi.",
         "avatarTitle": "Osalejate pildid",
         "gravatarEnabled": "Kasuta Gravatari, kui see on olemas",
-        "gravatarEnabledHelp": "Osalejad, kes registreerusid e-posti aadressiga, millel on Gravatar, näevad seda ruumis pildina; kõigil teistel jäävad platvormi loodud initsiaalid. Pilt tuuakse läbi meie enda serveri, seega osalejate brauserid ei võta ühendust saidiga gravatar.com – küll aga teeb seda platvorm: märgi see privaatsusteatesse."
+        "gravatarEnabledHelp": "Osalejad, kes registreerusid e-posti aadressiga, millel on Gravatar, näevad seda ruumis pildina; kõigil teistel jäävad platvormi loodud initsiaalid. Pilt tuuakse läbi meie enda serveri, seega osalejate brauserid ei võta ühendust saidiga gravatar.com – küll aga teeb seda platvorm: märgi see privaatsusteatesse.",
+        "liveCaptionsTitle": "Otsesubtiitrid",
+        "liveCaptionsEnabled": "Automaatsed subtiitrid videokõnedes",
+        "liveCaptionsEnabledHelp": "Kõneleja häält transkribeerib reaalajas teenus, mis töötab platvormi enda taristus ilma väliste teenusteta, ja teksti ei säilitata. Subtiitrid on sisse lülitatud kõigil üritustel; moderaatorid saavad need ürituse ajal välja lülitada. Ilma paigaldatud teenuseta ei ole sellel valikul mõju."
       },
       "errors": {
         "invalid": "Seadeid ei salvestatud: üks väärtus on vigane. Kontrollige muudetud välju ja proovige uuesti.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videosild",
       "jibri": "Videosalvestus",
       "smtp": "E-posti teenus",
-      "postprod": "Sündmusejärgne AI töövoog"
+      "postprod": "Sündmusejärgne AI töövoog",
+      "captions": "Otsesubtiitrid"
     },
     "descriptions": {
       "app": "Veebileht, kust pääsete sündmustele ligi",
@@ -3827,7 +3840,8 @@
       "jvb": "Edastab heli ja videot osalejatele",
       "jibri": "Salvestab sündmuste videoseansse",
       "smtp": "Saadab kinnitusmeile ja meeldetuletusi",
-      "postprod": "Transkribeerib, võtab kokku ja tõlgib salvestisi klastrisiseste AI mudelitega (NVIDIA A100 GPU). Aktiveerub ainult siis, kui sündmus kasutab AI funktsioone."
+      "postprod": "Transkribeerib, võtab kokku ja tõlgib salvestisi klastrisiseste AI mudelitega (NVIDIA A100 GPU). Aktiveerub ainult siis, kui sündmus kasutab AI funktsioone.",
+      "captions": "Transkribeerib kõnelejaid reaalajas ja saadab subtiitrid bridge'i kaudu saali."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Järeltöötluse tööd on järjekorras – GPU-sõlm käivitub (külmkäivitus ~3 min).",
         "standby": "AI töövoog on sees, kuid ootel: töödelda pole ühtegi salvestist. GPU-sõlm on energia säästmiseks välja lülitatud.",
         "degraded": "Viimase 24 tunni jooksul ebaõnnestus üks või mitu AI tööd. Üksikasjad leiad aadressilt /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Otsesubtiitrid on eksemplari seadetes välja lülitatud.",
+        "standby": "Subtiitriteenus on ootel: see käivitub, kui subtiitritega üritus läheb otse-eetrisse.",
+        "starting": "Subtiitriteenus käivitub käimasoleva ürituse jaoks.",
+        "operational": "Otsesubtiitrid töötavad.",
+        "degraded": "Subtiitriteenus on koormatud: see transkribeerib korraga vähem hääli.",
+        "paused": "Subtiitriteenus peatas end ülekoormuse tõttu ja jätkab ise.",
+        "unavailable": "Subtiitriteenus ei vasta."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Aktiivse salvestusega sündmus ootab Jibrit kauem kui ajalimiit: sessiooni ei salvestata.",
       "smtp": "Registreerimise kinnitusmeile ja meeldetuletusi ei saadeta.",
       "postprodDegraded": "Mõne hiljutise salvestise transkriptsioone ja kokkuvõtteid ei loodud. Videosalvestised on siiski saadaval.",
-      "jvbDown": "Osalejad ei saa heli ega videot."
+      "jvbDown": "Osalejad ei saa heli ega videot.",
+      "captionsPaused": "Saalis puuduvad mõnda aega subtiitrid; heli ja video ei ole mõjutatud.",
+      "captionsDown": "Saalis subtiitreid ei kuvata; heli ja video töötavad tavapäraselt."
     },
     "overallVerdicts": {
       "operational": "Kõik teenused töötavad korrektselt. Platvorm on täielikult töökorras.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Päringud/s",
       "podUptime": "Podi töötamisaeg"
     },
-    "probeDetail": "Kontrolli tulemus"
+    "probeDetail": "Kontrolli tulemus",
+    "connCaptions": "Heli ja subtiitrid"
   },
   "feedback": {
     "title": "Kuidas hindate seda üritust?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Lumesadu",
         "secretWell": "Kolm soovi kaevu juures: üllatus su tegelasele"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automaatsed subtiitrid",
+    "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita kõne tööriistariba subtiitrite nupuga."
   },
   "recording": {
     "management": "Videosalvestis",

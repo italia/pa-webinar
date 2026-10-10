@@ -41,8 +41,9 @@ ADR-001 to ADR-010 record the platform's founding decisions. Later records take 
 | [015](015-named-administrators.md) | Named administrators alongside the instance key | Accepted | Extends [014](014-organizer-role.md) and, through it, [009](009-admin-session.md) | [Identity, access and tokens](../architecture/identity-and-access.md) |
 | [016](016-in-cluster-ai-postproduction.md) | In-cluster AI post-production | Accepted | Builds on [006](006-recording-and-storage.md) and [013](013-multitrack-speaker-attribution.md); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split | [AI post-production](../POSTPROD.md) |
 | [017](017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point | Accepted | The one sanctioned exception to [001](001-jitsi-iframe-api.md)'s rule against modifying Jitsi | [Jitsi integration](../architecture/jitsi-integration.md), [component README](../../infra/jitsi-web-patched/README.md) |
+| [018](018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge | Accepted | Respects [001](001-jitsi-iframe-api.md) (IFrame API command and event, server-side configuration); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split and [016](016-in-cluster-ai-postproduction.md)'s sovereignty rule and glossary | [Live captions](../architecture/live-captions.md) |
 
-"Accepted" means that the decision is in force. It does not mean that the component runs by default. Several accepted decisions govern optional parts that an installation turns on. In `infra/helm/pa-webinar/values.yaml`, these keys default to `false`: `jvbScaler.enabled` (ADR-007), `jitsi-meet.jibri.enabled` (the composite path of ADR-006), `recorder.enabled` (ADR-013) and `postprod.enabled` (ADR-016).
+"Accepted" means that the decision is in force. It does not mean that the component runs by default. Several accepted decisions govern optional parts that an installation turns on. In `infra/helm/pa-webinar/values.yaml`, these keys default to `false`: `jvbScaler.enabled` (ADR-007), `jitsi-meet.jibri.enabled` (the composite path of ADR-006), `recorder.enabled` (ADR-013) and `postprod.enabled` (ADR-016). Live captions (ADR-018) are the exception: `global.captions.enabled` defaults to `true`.
 
 ### How the decisions relate
 
@@ -62,6 +63,7 @@ flowchart LR
     A006["006 · Media<br/>Recording paths and<br/>storage abstraction"]:::media
     A013["013 · Media<br/>Multitrack recording"]:::media
     A016["016 · AI<br/>In-cluster<br/>post-production"]:::job
+    A018["018 · AI<br/>Live captions"]:::job
     A005["005 · Realtime<br/>Live interaction<br/>in the portal"]:::portal
     A012["012 · Realtime<br/>Optional 2D square"]:::portal
     A010["010 · Platform<br/>SiteSetting singleton"]:::portal
@@ -79,6 +81,9 @@ flowchart LR
     A006 -->|"recordings and storage<br/>it processes"| A016
     A013 -->|"per-speaker tracks"| A016
     A007 -->|"same split: portal decides,<br/>CronJob applies"| A016
+    A007 -->|"same split: portal decides,<br/>CronJob applies"| A018
+    A016 -->|"sovereignty rule,<br/>shared glossary"| A018
+    A001 -->|"command and event<br/>of the IFrame API"| A018
     A005 -->|"presence kept in Redis,<br/>polled over HTTP"| A012
     A010 -->|"active languages<br/>set at runtime"| A008
 

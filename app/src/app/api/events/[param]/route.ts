@@ -520,6 +520,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
+      ...(data.liveCaptionsEnabled !== undefined && {
+        liveCaptionsEnabled: data.liveCaptionsEnabled,
+      }),
       ...(data.whiteboardEnabled !== undefined && {
         whiteboardEnabled: data.whiteboardEnabled,
       }),

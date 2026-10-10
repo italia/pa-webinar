@@ -19,6 +19,7 @@ import {
   compareForStatusList,
   RUNNING_STATUSES,
 } from '@/lib/status/event-activity';
+import { CAPTIONS_COMPONENT_STATUS, getCaptionsStatus, type CaptionsState } from '@/lib/status/captions';
 import { getJitsiHealth, type JitsiComponentHealth } from '@/lib/status/jitsi-health';
 import { cachedProbe } from '@/lib/status/probes';
 import { statusDataVisible } from '@/lib/status-page';
@@ -81,6 +82,8 @@ interface SystemStatus {
     // A non-zero pending count is surfaced as a status-page warning so
     // the operator knows the reconcile cron is producing data.
     orphanRecordingsPending: number;
+    /** Sottotitoli live (lib/status/captions): `not_installed` senza il servizio. */
+    captionsStatus: CaptionsState;
   };
   upcomingEvents: {
     title: string;
@@ -600,7 +603,7 @@ async function computeStatus(locale: ReturnType<typeof resolveLocale>): Promise<
   const now = new Date();
   const { recordingEventIds, recordingStale } = await recordingContext(now, provisioningTimeoutMinutes);
 
-  const [db, jitsiHealth, smtp, redisHealth, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
+  const [db, jitsiHealth, smtp, redisHealth, jvb, jibriResult, orphanRecordingsPendingCount, captions] = await Promise.all([
     checkDatabase(),
     getJitsiHealth(),
     checkSmtp(),
@@ -608,6 +611,7 @@ async function computeStatus(locale: ReturnType<typeof resolveLocale>): Promise<
     getJvbStatus(settings, provisioningTimeoutMinutes),
     getJibriStatus(recordingEventIds, recordingStale, provisioningTimeoutMinutes, now),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
+    getCaptionsStatus(settings).catch(() => ({ state: 'unavailable' as const })),
   ]);
 
   const app: ComponentStatus = { name: 'app', status: 'operational' };
@@ -617,6 +621,11 @@ async function computeStatus(locale: ReturnType<typeof resolveLocale>): Promise<
   const jicofo = jitsiComponent('jicofo', jitsiHealth.jicofo);
 
   const components = [app, db, jitsi, prosody, jicofo, jvb.component, jibri, smtp, redisHealth];
+  // I sottotitoli sono un aiuto, non la sala: un loro guasto degrada lo stato
+  // generale, non lo porta a «interruzione».
+  if (captions.state !== 'not_installed') {
+    components.push({ name: 'captions', status: CAPTIONS_COMPONENT_STATUS[captions.state], details: captions.state });
+  }
 
   const hasOutage = components.some((c) => c.status === 'outage');
   const hasDegraded = components.some((c) => c.status === 'degraded');
@@ -698,6 +707,7 @@ async function computeStatus(locale: ReturnType<typeof resolveLocale>): Promise<
         (recordingStale || jibriResult.jibriStatus === 'failed') &&
         jibriResult.running === 0,
       orphanRecordingsPending: orphanRecordingsPendingCount,
+      captionsStatus: captions.state,
     },
     upcomingEvents: upcomingEvents.map((e) => ({
       title: getLocalized(e.title as LocalizedField, locale),

@@ -30,6 +30,7 @@ const STATUS_BG: Record<string, string> = {
 };
 
 const SERVICE_ICONS: Record<string, string> = {
+  captions: 'M4 5h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V7a2 2 0 012-2zm0 2v10h16V7H4zm2 6h5v2H6v-2zm7 0h5v2h-5v-2zm-7-3h12v2H6v-2z',
   app: 'M4 4h16v12H4V4zm2 2v8h12V6H6zm1 10h10v2H7v-2z',
   database: 'M12 2C7.58 2 4 3.34 4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5c0-1.66-3.58-3-8-3zm6 16c0 .88-2.13 2-6 2s-6-1.12-6-2v-2.74C7.53 16.02 9.6 16.5 12 16.5s4.47-.48 6-1.24V18zM6 12.26C7.53 13.02 9.6 13.5 12 13.5s4.47-.48 6-1.24V15c0 .88-2.13 2-6 2s-6-1.12-6-2v-2.74zM6 7.26C7.53 8.02 9.6 8.5 12 8.5s4.47-.48 6-1.24V10c0 .88-2.13 2-6 2s-6-1.12-6-2V7.26zM12 6c3.87 0 6-1.12 6-1s-2.13-1-6-1-6 .12-6 1 2.13 1 6 1z',
   'jitsi-web': 'M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z',
@@ -72,6 +73,9 @@ const LAYOUT: Record<string, Pos> = {
   // produce. Linea verticale jibri→postprod dà subito al lettore la
   // semantica del flusso (recording → trascrizione/sintesi).
   postprod:    { x: 680, y: 550 },
+  // Accanto al bridge, che gli manda l'audio di chi parla: i sottotitoli
+  // tornano ai partecipanti dallo stesso bridge.
+  captions:    { x: 990, y: 380 },
 };
 
 const FIXED_POS: Record<string, Pos> = {
@@ -114,6 +118,8 @@ const CONNECTIONS: ConnDef[] = [
   // automaticamente queste edge se i nodi mancano.
   { from: 'jibri', to: 'postprod', labelKey: 'connPostprod', dashed: true },
   { from: 'postprod', to: 'storage', labelKey: 'connUpload', dashed: true },
+  // Sottotitoli live: presente solo dove il servizio è installato.
+  { from: 'jvb', to: 'captions', labelKey: 'connCaptions', dashed: true },
 ];
 
 function pos(id: string): Pos {

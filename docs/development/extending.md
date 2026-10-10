@@ -505,7 +505,7 @@ Several rules are encoded as guard tests: they fail when a step of a recipe is s
 | The Helm chart | A new check in `scripts/validate-chart.sh` for a new kind of mistake | `./scripts/validate-chart.sh`; the **Helm Chart** job in CI |
 | Release notes | None | `app/src/content/changelog/changelog.test.ts` |
 | `lobby/` | None required | `npm run lobby:typecheck` |
-| `infra/recorder/`, `infra/recorder-controller/` | Unit tests in the component | From the component's directory: `npx tsc --noEmit -p tsconfig.json && npm test` |
+| `infra/recorder/`, `infra/recorder-controller/`, `infra/captions/gateway/` | Unit tests in the component | From the component's directory: `npx tsc --noEmit -p tsconfig.json && npm test` |
 
 Some things cannot be tested headless: audio in a real call, the canvas of the waiting-room square, and delivery to real inboxes. For those, say in the pull request what you checked by hand. The Playwright smoke tests in `app/e2e/` cover the path up to the waiting room and one design-system check. They do not enter the conference. CI runs them without blocking on them, so run them locally when you change the join flow, and test the live room by hand ([Manual checklist for live-room changes](testing.md#manual-checklist-for-live-room-changes)).
 

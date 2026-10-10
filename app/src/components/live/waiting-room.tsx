@@ -123,6 +123,9 @@ interface WaitingRoomEvent {
   aiPostprodEnabled?: boolean;
   /** Testo custom per-locale dell'informativa AI; vuoto/null → fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** In sala ci saranno i sottotitoli live: l'audio di chi parla viene
+   *  trascritto mentre parla (ADR-018). Solo un avviso: nulla viene salvato. */
+  liveCaptions?: boolean;
   /** L'evento registra una traccia audio separata per partecipante:
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
@@ -1028,6 +1031,25 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
+  // Avviso dei sottotitoli live: chi parla in sala viene trascritto in tempo
+  // reale, nel cluster dell'ente, e il testo non viene conservato. Non chiede
+  // un consenso: è trasparenza su un trattamento in corso, come l'avviso AI.
+  const captionsNoticeBlock = event.liveCaptions && !isEnded ? (
+    <div className="wr-info">
+      <span className="wr-info__icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="M7 15h4M13 15h4M7 11h10" />
+        </svg>
+      </span>
+      <span>
+        <span className="wr-info__title">{t('captionsNoticeTitle')}</span>
+        {t('captionsNotice')}
+      </span>
+    </div>
+  ) : null;
+
   // I consensi da dare prima di entrare: alla registrazione dell'evento, per
   // chi non l'ha dato all'iscrizione, e alla traccia audio per partecipante.
   // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
@@ -1907,6 +1929,7 @@ export default function WaitingRoom({
                 )}
 
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
+                {captionsNoticeBlock && <div className="mb-3">{captionsNoticeBlock}</div>}
                 <div className="mb-3">{netiquetteBlock}</div>
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 

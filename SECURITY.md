@@ -110,6 +110,7 @@ The maintainers do not operate other administrations' installations and cannot p
 | Helm chart, including the scripts and configuration it mounts | `infra/helm/pa-webinar/` | Chart package attached to each GitHub Release |
 | Recorder bot | `infra/recorder/` | `ghcr.io/italia/pa-webinar-recorder` |
 | Recorder controller | `infra/recorder-controller/` | `ghcr.io/italia/pa-webinar-recorder-controller` |
+| Live captions gateway and engine | `infra/captions/gateway/`, `infra/captions/engine/` | `ghcr.io/italia/pa-webinar-captions-gateway`, `ghcr.io/italia/pa-webinar-captions-engine` |
 | AI post-production worker | `infra/ai/worker/` | `ghcr.io/italia/pa-webinar-postprod-worker` and, without a GPU, `ghcr.io/italia/pa-webinar-postprod-worker-cpu` |
 | Patched jitsi/web image (the patches applied to the upstream bundle) | `infra/jitsi-web-patched/` | `ghcr.io/italia/pa-webinar-jitsi-web` |
 | Jitsi extras: the custom Prosody module used by the Docker Compose stack, and a Jibri finalize script | `infra/jitsi/` | Not published separately |
@@ -219,9 +220,9 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 
 `.github/dependabot.yml` checks for updates every week. It is the authoritative list of what is covered:
 
-- **npm:** the root workspaces, the app, the recorder and the recorder controller.
+- **npm:** the root workspaces, the app, the recorder, the recorder controller and the live captions gateway.
 - **pip:** the AI post-production worker.
-- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder and recorder-controller bases, and the build-only `node` stage of the patched jitsi/web image. The app, worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
+- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway and captions engine bases, and the build-only `node` stage of the patched jitsi/web image. The app, worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
 - **GitHub Actions:** every action used by the workflows.
 - **Not covered:** the Helm subchart versions in `infra/helm/pa-webinar/Chart.lock`, and the image references in the chart's values.
 

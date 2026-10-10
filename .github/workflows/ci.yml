@@ -73,13 +73,17 @@ jobs:
   # test gia' scritti — recorder, recorder-controller — e 7 pytest del worker AI
   # non venivano eseguiti da NESSUNO: potevano essere rossi da mesi senza che
   # nulla lo segnalasse. Sono test gia' pagati; qui si limitano a girare.
+  # Il gateway dei sottotitoli live sta fuori dai workspace per la stessa
+  # ragione: gira con la sua immagine e il suo package-lock. Il nome del job
+  # resta quello di prima: se un controllo obbligatorio del ramo protetto lo
+  # cita, un nome nuovo lo lascerebbe in attesa di un job che non c'è più.
   test-infra-node:
     name: Unit Tests (recorder, controller)
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     strategy:
       fail-fast: false
       matrix:
-        pkg: [recorder, recorder-controller]
+        pkg: [recorder, recorder-controller, captions/gateway]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4

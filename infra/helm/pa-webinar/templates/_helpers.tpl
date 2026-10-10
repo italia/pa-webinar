@@ -474,6 +474,49 @@ di stato. Ciascuno si può imporre con il valore corrispondente in `jitsi.*`.
 {{- end }}
 
 {{/*
+Sottotitoli live (global.captions): il servizio si rende solo con la
+conferenza del chart, perché è Jicofo del sottochart a mandargli l'audio.
+`dig`, perché con un aggiornamento --reuse-values da una versione
+precedente `global.captions` non c'è: i sottotitoli restano spenti.
+Restituisce "true" oppure niente.
+*/}}
+{{- define "pa-webinar.captionsEnabled" -}}
+{{- if and .Values.jitsi.enabled (dig "captions" "enabled" false (.Values.global | default dict)) -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Nome del Service dei sottotitoli. Lo scrive anche il sottochart della
+conferenza, nell'indirizzo che Jicofo dà al bridge (values.yaml,
+jitsi-meet.jicofo.extraEnvs.JAVA_TOOL_OPTIONS): da lì si vede solo il nome
+della release, quindi il nome non dipende da fullnameOverride.
+*/}}
+{{- define "pa-webinar.captionsServiceName" -}}
+{{- printf "%s-captions" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Etichette dei pod dei sottotitoli: diverse da selectorLabels, come per la
+copia del database, così il Service, il PodDisruptionBudget e lo spread
+dell'applicazione non li contano fra i suoi pod. La NetworkPolicy del
+portale li ammette con una regola propria.
+*/}}
+{{- define "pa-webinar.captionsSelectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-captions" (include "pa-webinar.name" .) | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: captions
+{{- end }}
+
+{{/*
+Indirizzo della pagina di stato del servizio dei sottotitoli, per il portale
+(CAPTIONS_STATUS_URL): nome completo del Service, come per le altre sonde.
+*/}}
+{{- define "pa-webinar.captionsStatusUrl" -}}
+{{- printf "http://%s:8080/status" (include "pa-webinar.inClusterHost" (dict "nome" (include "pa-webinar.captionsServiceName" .) "root" .)) -}}
+{{- end }}
+
+{{/*
 Autorità di certificazione in più per l'applicazione (app.extraCaCerts): un
 Secret o un ConfigMap già presente nel namespace, di cui si monta una sola
 chiave in sola lettura, indicata a Node con NODE_EXTRA_CA_CERTS. Serve a chi ha

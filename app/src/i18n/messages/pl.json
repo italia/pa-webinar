@@ -564,7 +564,16 @@
       "endHelp": "Zamyka salę dla wszystkich i oznacza wydarzenie jako zakończone. Nie można cofnąć.",
       "timerHeading": "Minutnik wystąpień"
     },
-    "closingNotice": "{minutes, plural, =0 {Sala się zamyka.} one {Sala zamknie się automatycznie za # minutę.} few {Sala zamknie się automatycznie za # minuty.} many {Sala zamknie się automatycznie za # minut.} other {Sala zamknie się automatycznie za # minuty.}}"
+    "closingNotice": "{minutes, plural, =0 {Sala się zamyka.} one {Sala zamknie się automatycznie za # minutę.} few {Sala zamknie się automatycznie za # minuty.} many {Sala zamknie się automatycznie za # minut.} other {Sala zamknie się automatycznie za # minuty.}}",
+    "captions": {
+      "region": "Napisy",
+      "unknownSpeaker": "Uczestnik",
+      "paused": "Napisy wstrzymane: usługa jest przeciążona i wznowi działanie sama.",
+      "unavailable": "Napisy są w tej chwili niedostępne.",
+      "show": "Pokaż napisy",
+      "hide": "Ukryj napisy",
+      "toggle": "Napisy automatyczne"
+    }
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-maile wychodzą z adresu no-reply: bez tego odpowiedź nie dotrze do nikogo.",
         "avatarTitle": "Zdjęcia uczestników",
         "gravatarEnabled": "Używaj Gravatara, gdy jest dostępny",
-        "gravatarEnabledHelp": "Osoby, które zarejestrowały się adresem e-mail powiązanym z Gravatarem, zobaczą go jako zdjęcie w sali; pozostali zachowają inicjały generowane przez platformę. Obraz jest pobierany przez nasz serwer, więc przeglądarki uczestników nie łączą się z gravatar.com — ale platforma tak: należy to zadeklarować w informacji o ochronie prywatności."
+        "gravatarEnabledHelp": "Osoby, które zarejestrowały się adresem e-mail powiązanym z Gravatarem, zobaczą go jako zdjęcie w sali; pozostali zachowają inicjały generowane przez platformę. Obraz jest pobierany przez nasz serwer, więc przeglądarki uczestników nie łączą się z gravatar.com — ale platforma tak: należy to zadeklarować w informacji o ochronie prywatności.",
+        "liveCaptionsTitle": "Napisy na żywo",
+        "liveCaptionsEnabled": "Napisy automatyczne w wideorozmowach",
+        "liveCaptionsEnabledHelp": "Głos osoby mówiącej jest transkrybowany w czasie rzeczywistym przez usługę działającą we własnej infrastrukturze platformy, bez usług zewnętrznych, a tekst nie jest przechowywany. Napisy są włączone w każdym wydarzeniu; moderatorzy mogą je wyłączyć w trakcie wydarzenia. Bez zainstalowanej usługi ta opcja nie działa."
       },
       "errors": {
         "invalid": "Ustawienia nie zostały zapisane: jedna z wartości jest nieprawidłowa. Sprawdź zmienione pola i spróbuj ponownie.",
@@ -3815,7 +3827,8 @@
       "jvb": "Most wideo",
       "jibri": "Nagrywanie wideo",
       "smtp": "Usługa e-mail",
-      "postprod": "Potok AI po wydarzeniu"
+      "postprod": "Potok AI po wydarzeniu",
+      "captions": "Napisy na żywo"
     },
     "descriptions": {
       "app": "Strona internetowa, na której uzyskujesz dostęp do wydarzeń",
@@ -3827,7 +3840,8 @@
       "jvb": "Przesyła audio i wideo do uczestników",
       "jibri": "Nagrywa sesje wideo wydarzeń",
       "smtp": "Wysyła e-maile z potwierdzeniami i przypomnienia",
-      "postprod": "Transkrybuje, streszcza i tłumaczy nagrania przy użyciu modeli AI w klastrze (GPU NVIDIA A100). Uruchamia się tylko wtedy, gdy wydarzenie włączy funkcje AI."
+      "postprod": "Transkrybuje, streszcza i tłumaczy nagrania przy użyciu modeli AI w klastrze (GPU NVIDIA A100). Uruchamia się tylko wtedy, gdy wydarzenie włączy funkcje AI.",
+      "captions": "Transkrybuje mówiących w czasie rzeczywistym i przesyła napisy do sali przez bridge."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Zadania postprodukcji w kolejce — węzeł GPU się uruchamia (zimny start ok. 3 min).",
         "standby": "Potok AI włączony, ale bezczynny: brak nagrań do przetworzenia. Węzeł GPU jest wyłączony, aby oszczędzać energię.",
         "degraded": "W ciągu ostatnich 24 h co najmniej jedno zadanie AI nie powiodło się. Sprawdź szczegóły w /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Napisy na żywo są wyłączone w ustawieniach instancji.",
+        "standby": "Usługa napisów czeka w gotowości: uruchamia się, gdy wydarzenie z napisami rozpoczyna transmisję na żywo.",
+        "starting": "Usługa napisów uruchamia się dla wydarzenia na żywo.",
+        "operational": "Napisy na żywo działają.",
+        "degraded": "Usługa napisów jest obciążona: transkrybuje mniej głosów jednocześnie.",
+        "paused": "Usługa napisów wstrzymała się z powodu przeciążenia i wznowi działanie sama.",
+        "unavailable": "Usługa napisów nie odpowiada."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Wydarzenie z aktywnym nagrywaniem czeka na Jibri dłużej niż limit czasu: sesja nie jest nagrywana.",
       "smtp": "E-maile z potwierdzeniami rejestracji i przypomnienia nie będą wysyłane.",
       "postprodDegraded": "Transkrypcje i podsumowania niektórych ostatnich nagrań nie zostały wygenerowane. Nagrania wideo są nadal dostępne.",
-      "jvbDown": "Uczestnicy nie otrzymują dźwięku ani obrazu."
+      "jvbDown": "Uczestnicy nie otrzymują dźwięku ani obrazu.",
+      "captionsPaused": "W sali przez chwilę brakuje napisów; dźwięk i obraz działają bez zmian.",
+      "captionsDown": "W sali nie pojawiają się napisy; dźwięk i obraz działają normalnie."
     },
     "overallVerdicts": {
       "operational": "Wszystkie usługi działają prawidłowo. Platforma jest w pełni operacyjna.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Żądania/s",
       "podUptime": "Uptime poda"
     },
-    "probeDetail": "Wynik sprawdzenia"
+    "probeDetail": "Wynik sprawdzenia",
+    "connCaptions": "Dźwięk i napisy"
   },
   "feedback": {
     "title": "Jak oceniasz to wydarzenie?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Opady śniegu",
         "secretWell": "Trzy życzenia przy studni: niespodzianka dla twojej postaci"
       }
-    }
+    },
+    "captionsNoticeTitle": "Napisy automatyczne",
+    "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem napisów na pasku połączenia."
   },
   "recording": {
     "management": "Nagranie wideo",

@@ -564,7 +564,16 @@
       "endHelp": "Tagħlaq il-kamra għal kulħadd u timmarka l-avveniment bħala lest. Ma tistax titreġġa' lura.",
       "timerHeading": "Timer tal-interventi"
     },
-    "closingNotice": "{minutes, plural, =0 {Il-kamra qed tingħalaq.} one {Il-kamra tingħalaq awtomatikament fi # minuta.} few {Il-kamra tingħalaq awtomatikament fi # minuti.} many {Il-kamra tingħalaq awtomatikament fi # minuti.} other {Il-kamra tingħalaq awtomatikament fi # minuti.}}"
+    "closingNotice": "{minutes, plural, =0 {Il-kamra qed tingħalaq.} one {Il-kamra tingħalaq awtomatikament fi # minuta.} few {Il-kamra tingħalaq awtomatikament fi # minuti.} many {Il-kamra tingħalaq awtomatikament fi # minuti.} other {Il-kamra tingħalaq awtomatikament fi # minuti.}}",
+    "captions": {
+      "region": "Sottotitoli",
+      "unknownSpeaker": "Parteċipant",
+      "paused": "Is-sottotitoli huma waqfa: is-servizz huwa mgħobbi żżejjed u se jkompli waħdu.",
+      "unavailable": "Is-sottotitoli mhumiex disponibbli bħalissa.",
+      "show": "Uri s-sottotitoli",
+      "hide": "Aħbi s-sottotitoli",
+      "toggle": "Sottotitoli awtomatiċi"
+    }
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "L-emails jitilqu minn indirizz no-reply: mingħajr dan, min iwieġeb ma jasal għand ħadd.",
         "avatarTitle": "Stampi tal-parteċipanti",
         "gravatarEnabled": "Uża Gravatar meta jkun disponibbli",
-        "gravatarEnabledHelp": "Min irreġistra b'email li għandha Gravatar jarah bħala stampa fil-kamra; għall-oħrajn jibqgħu l-inizjali ġġenerati mill-pjattaforma. L-istampa tgħaddi mis-server tagħna, għalhekk il-browser tal-parteċipanti qatt ma jikkuntattja lil gravatar.com — imma l-pjattaforma iva: dan irid jiġi ddikjarat fl-avviż tal-privatezza."
+        "gravatarEnabledHelp": "Min irreġistra b'email li għandha Gravatar jarah bħala stampa fil-kamra; għall-oħrajn jibqgħu l-inizjali ġġenerati mill-pjattaforma. L-istampa tgħaddi mis-server tagħna, għalhekk il-browser tal-parteċipanti qatt ma jikkuntattja lil gravatar.com — imma l-pjattaforma iva: dan irid jiġi ddikjarat fl-avviż tal-privatezza.",
+        "liveCaptionsTitle": "Sottotitoli diretti",
+        "liveCaptionsEnabled": "Sottotitoli awtomatiċi fis-sejħiet bil-vidjo",
+        "liveCaptionsEnabledHelp": "Il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali minn servizz li jaħdem fl-infrastruttura tal-pjattaforma stess, mingħajr servizzi esterni, u t-test ma jinżammx. Is-sottotitoli huma attivi f'kull avveniment; il-moderaturi jistgħu jitfuhom matul l-avveniment. Mingħajr is-servizz installat, din l-għażla m'għandha l-ebda effett. Il-mudell għadu ma jittraskrivix il-Malti b'mod affidabbli."
       },
       "errors": {
         "invalid": "L-issettjar ma ġewx issejvjati: valur mhux validu. Iċċekkja l-oqsma li biddilt u erġa' pprova.",
@@ -3815,7 +3827,8 @@
       "jvb": "Pont tal-vidjo",
       "jibri": "Reġistrazzjoni tal-vidjo",
       "smtp": "Servizz tal-email",
-      "postprod": "Pipeline tal-AI ta' wara l-avveniment"
+      "postprod": "Pipeline tal-AI ta' wara l-avveniment",
+      "captions": "Sottotitoli diretti"
     },
     "descriptions": {
       "app": "Is-sit fejn taċċessa l-avvenimenti",
@@ -3827,7 +3840,8 @@
       "jvb": "Jittrażmetti l-awdjo u l-vidjo lill-parteċipanti",
       "jibri": "Jirreġistra s-sessjonijiet tal-vidjo tal-avvenimenti",
       "smtp": "Jibgħat emails ta' konferma u tfakkiriet",
-      "postprod": "Tittraskrivi, tissommarizza u tittraduċi r-reġistrazzjonijiet b'mudelli tal-AI fil-cluster (GPU NVIDIA A100). Tattiva ruħha biss meta avveniment jagħżel il-funzjonijiet tal-AI."
+      "postprod": "Tittraskrivi, tissommarizza u tittraduċi r-reġistrazzjonijiet b'mudelli tal-AI fil-cluster (GPU NVIDIA A100). Tattiva ruħha biss meta avveniment jagħżel il-funzjonijiet tal-AI.",
+      "captions": "Jittraskrivi lil min jitkellem f'ħin reali u jibgħat is-sottotitoli lis-sala permezz tal-bridge."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Xogħlijiet tal-postprod fil-kju — in-node tal-GPU qed jibda (cold-start ~3 min).",
         "standby": "Il-pipeline tal-AI attiva imma fl-istennija: l-ebda reġistrazzjoni x'tiġi pproċessata. In-node tal-GPU huwa mitfi biex tiġi ffrankata l-enerġija.",
         "degraded": "Xogħol tal-AI wieħed jew aktar falla fl-aħħar 24 siegħa. Iċċekkja /admin/postprod għad-dettalji."
+      },
+      "captions": {
+        "disabled": "Is-sottotitoli diretti huma mitfija fis-settings tal-istanza.",
+        "standby": "Is-servizz tas-sottotitoli qiegħed lest: jibda meta avveniment bis-sottotitoli jmur dirett.",
+        "starting": "Is-servizz tas-sottotitoli qed jibda għal avveniment dirett.",
+        "operational": "Is-sottotitoli diretti qed jaħdmu.",
+        "degraded": "Is-servizz tas-sottotitoli huwa mgħobbi: jittraskrivi inqas vuċijiet fl-istess ħin.",
+        "paused": "Is-servizz tas-sottotitoli waqaf minħabba tagħbija żejda u se jkompli waħdu.",
+        "unavailable": "Is-servizz tas-sottotitoli mhux qed iwieġeb."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Wieħed avveniment ma' reġistrazzjoni attiva attendu Jibri minn aktar tal-timeout: il-sessjoni mhux vienu reġistrata.",
       "smtp": "L-emails ta' konferma tar-reġistrazzjoni u t-tfakkiriet mhux se jintbagħtu.",
       "postprodDegraded": "It-traskrizzjonijiet u s-sommarji ta' xi reġistrazzjonijiet reċenti ma ġewx iġġenerati. Ir-reġistrazzjonijiet tal-vidjow xorta huma disponibbli.",
-      "jvbDown": "Il-parteċipanti ma jirċievu la awdjo u lanqas vidjo."
+      "jvbDown": "Il-parteċipanti ma jirċievu la awdjo u lanqas vidjo.",
+      "captionsPaused": "Fis-sala s-sottotitoli huma nieqsa għal ftit żmien; l-awdjo u l-vidjo mhumiex affettwati.",
+      "captionsDown": "Fis-sala ma jidhrux sottotitoli; l-awdjo u l-vidjo jaħdmu b'mod normali."
     },
     "overallVerdicts": {
       "operational": "Is-servizzi kollha qed jaħdmu korrettament. Il-pjattaforma hija kompletament operattiva.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Richieste/s",
       "podUptime": "Pod uptime"
     },
-    "probeDetail": "Riżultat tal-verifika"
+    "probeDetail": "Riżultat tal-verifika",
+    "connCaptions": "Awdjo u sottotitoli"
   },
   "feedback": {
     "title": "Kif tevalwa dan l-avveniment?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Borra",
         "secretWell": "Tliet xewqat fil-bir: sorpriża għall-karattru tiegħek"
       }
-    }
+    },
+    "captionsNoticeTitle": "Sottotitoli awtomatiċi",
+    "captionsNotice": "Waqt ix-xandira diretta, il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli. It-traskrizzjoni ssir fuq is-servers li jospitaw il-pjattaforma u t-test ma jinżammx. Is-sottotitoli jistgħu jinħbew bil-buttuna tas-sottotitoli fil-bar tas-sejħa."
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

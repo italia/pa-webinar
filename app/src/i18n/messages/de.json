@@ -564,7 +564,16 @@
       "endHelp": "Schließt den Raum für alle und markiert die Veranstaltung als beendet. Nicht rückgängig zu machen.",
       "timerHeading": "Timer für Beiträge"
     },
-    "closingNotice": "{minutes, plural, =0 {Der Raum wird geschlossen.} one {Der Raum schließt automatisch in # Minute.} other {Der Raum schließt automatisch in # Minuten.}}"
+    "closingNotice": "{minutes, plural, =0 {Der Raum wird geschlossen.} one {Der Raum schließt automatisch in # Minute.} other {Der Raum schließt automatisch in # Minuten.}}",
+    "captions": {
+      "region": "Untertitel",
+      "unknownSpeaker": "Teilnehmende Person",
+      "paused": "Untertitel pausiert: Der Dienst ist überlastet und setzt von selbst wieder ein.",
+      "unavailable": "Untertitel sind derzeit nicht verfügbar.",
+      "show": "Untertitel einblenden",
+      "hide": "Untertitel ausblenden",
+      "toggle": "Automatische Untertitel"
+    }
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "Die E-Mails werden von einer No-Reply-Adresse versendet: Ohne diese Angabe erreicht eine Antwort niemanden.",
         "avatarTitle": "Bilder der Teilnehmer",
         "gravatarEnabled": "Gravatar verwenden, wenn verfügbar",
-        "gravatarEnabledHelp": "Wer sich mit einer E-Mail-Adresse angemeldet hat, zu der es einen Gravatar gibt, wird im Raum mit diesem Bild angezeigt; für alle anderen bleiben die von der Plattform erzeugten Initialen. Das Bild läuft über unseren Server, der Browser der Teilnehmer kontaktiert also nicht gravatar.com — die Plattform hingegen schon: Das muss in der Datenschutzerklärung angegeben werden."
+        "gravatarEnabledHelp": "Wer sich mit einer E-Mail-Adresse angemeldet hat, zu der es einen Gravatar gibt, wird im Raum mit diesem Bild angezeigt; für alle anderen bleiben die von der Plattform erzeugten Initialen. Das Bild läuft über unseren Server, der Browser der Teilnehmer kontaktiert also nicht gravatar.com — die Plattform hingegen schon: Das muss in der Datenschutzerklärung angegeben werden.",
+        "liveCaptionsTitle": "Live-Untertitel",
+        "liveCaptionsEnabled": "Automatische Untertitel in Videokonferenzen",
+        "liveCaptionsEnabledHelp": "Die Stimme der sprechenden Person wird in Echtzeit von einem Dienst in der eigenen Infrastruktur der Plattform transkribiert, ohne externe Dienste, und der Text wird nicht gespeichert. Die Untertitel sind in jeder Veranstaltung aktiv; Moderierende können sie während der Veranstaltung ausschalten. Ohne installierten Dienst hat diese Option keine Wirkung."
       },
       "errors": {
         "invalid": "Die Einstellungen wurden nicht gespeichert: Ein Wert ist ungültig. Prüfen Sie die geänderten Felder und versuchen Sie es erneut.",
@@ -3815,7 +3827,8 @@
       "jvb": "Video-Bridge",
       "jibri": "Videoaufzeichnung",
       "smtp": "E-Mail-Dienst",
-      "postprod": "KI-Pipeline nach der Veranstaltung"
+      "postprod": "KI-Pipeline nach der Veranstaltung",
+      "captions": "Live-Untertitel"
     },
     "descriptions": {
       "app": "Die Website, über die Sie auf Veranstaltungen zugreifen",
@@ -3827,7 +3840,8 @@
       "jvb": "Überträgt Audio und Video an die Teilnehmer",
       "jibri": "Zeichnet Videositzungen von Veranstaltungen auf",
       "smtp": "Versendet Bestätigungs-E-Mails und Erinnerungen",
-      "postprod": "Transkribiert, fasst zusammen und übersetzt die Aufzeichnungen mit KI-Modellen im Cluster (NVIDIA A100 GPU). Wird nur aktiv, wenn eine Veranstaltung die KI-Funktionen nutzt."
+      "postprod": "Transkribiert, fasst zusammen und übersetzt die Aufzeichnungen mit KI-Modellen im Cluster (NVIDIA A100 GPU). Wird nur aktiv, wenn eine Veranstaltung die KI-Funktionen nutzt.",
+      "captions": "Transkribiert Sprechende in Echtzeit und sendet die Untertitel über die Bridge in den Raum."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Postprod-Jobs in der Warteschlange — der GPU-Knoten startet gerade (Cold-Start ca. 3 Min.).",
         "standby": "KI-Pipeline aktiv, aber im Leerlauf: keine Aufzeichnung zu verarbeiten. Der GPU-Knoten ist zur Energieeinsparung ausgeschaltet.",
         "degraded": "In den letzten 24 Stunden sind ein oder mehrere KI-Jobs fehlgeschlagen. Details unter /admin/postprod prüfen."
+      },
+      "captions": {
+        "disabled": "Live-Untertitel sind in den Instanzeinstellungen ausgeschaltet.",
+        "standby": "Der Untertiteldienst ist in Bereitschaft: Er startet, sobald eine Veranstaltung mit Untertiteln live geht.",
+        "starting": "Der Untertiteldienst startet für eine laufende Veranstaltung.",
+        "operational": "Live-Untertitel funktionieren.",
+        "degraded": "Der Untertiteldienst ist ausgelastet: Er transkribiert weniger Stimmen gleichzeitig.",
+        "paused": "Der Untertiteldienst hat sich wegen Überlastung pausiert und setzt von selbst wieder ein.",
+        "unavailable": "Der Untertiteldienst antwortet nicht."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Ein Event mit aktiver Aufzeichnung wartet länger als das Timeout auf Jibri: Die Sitzung wird nicht aufgezeichnet.",
       "smtp": "Bestätigungs-E-Mails für Anmeldungen und Erinnerungen werden nicht gesendet.",
       "postprodDegraded": "Für einige der jüngsten Aufzeichnungen wurden Transkripte und Zusammenfassungen nicht erzeugt. Die Videoaufzeichnungen sind dennoch verfügbar.",
-      "jvbDown": "Die Teilnehmenden erhalten weder Audio noch Video."
+      "jvbDown": "Die Teilnehmenden erhalten weder Audio noch Video.",
+      "captionsPaused": "Im Raum fehlen vorübergehend die Untertitel; Audio und Video sind nicht betroffen.",
+      "captionsDown": "Im Raum erscheinen keine Untertitel; Audio und Video funktionieren normal."
     },
     "overallVerdicts": {
       "operational": "Alle Dienste funktionieren korrekt. Die Plattform ist voll betriebsbereit.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Anfragen/s",
       "podUptime": "Pod-Uptime"
     },
-    "probeDetail": "Ergebnis der Prüfung"
+    "probeDetail": "Ergebnis der Prüfung",
+    "connCaptions": "Audio und Untertitel"
   },
   "feedback": {
     "title": "Wie bewerten Sie diese Veranstaltung?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Schneefall",
         "secretWell": "Drei Wünsche am Brunnen: eine Überraschung für Ihre Figur"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatische Untertitel",
+    "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Leiste des Anrufs ausblenden."
   },
   "recording": {
     "management": "Videoaufzeichnung",

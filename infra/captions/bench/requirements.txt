@@ -1,0 +1,3 @@
+# Unica dipendenza del banco di prova: il client WebSocket della prova in
+# tempo reale. Il resto usa solo la libreria standard.
+websockets==15.0.1

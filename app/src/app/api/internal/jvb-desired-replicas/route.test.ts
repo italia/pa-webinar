@@ -245,3 +245,37 @@ describe('repliche di Jibri', () => {
     expect(mocks.fetchJibriHealth).not.toHaveBeenCalled();
   });
 });
+
+describe('sottotitoli live: una replica del servizio finché c’è un evento in diretta', () => {
+  const evento = (liveCaptionsEnabled: boolean) => ({
+    id: 'e1', status: 'LIVE', startsAt: new Date(), endsAt: new Date(Date.now() + 3_600_000),
+    provisioningStartedAt: new Date(), maxParticipants: 50, expectedSenderRatioPct: null,
+    participantsCanStartVideo: false, recordingEnabled: false, liveCaptionsEnabled,
+  });
+
+  it('evento in diretta con i sottotitoli: una replica', async () => {
+    mocks.findMany.mockResolvedValue([evento(true)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(1);
+  });
+
+  it('spenti in sala dal moderatore: il servizio resta acceso, per riaccenderli subito', async () => {
+    mocks.findMany.mockResolvedValue([evento(false)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(1);
+  });
+
+  it('nessun evento in diretta: zero', async () => {
+    mocks.findMany.mockResolvedValue([]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(0);
+  });
+
+  it("spenti nell'istanza: zero anche con un evento che li vuole", async () => {
+    const { getSettings } = await import('@/lib/settings');
+    vi.mocked(getSettings).mockResolvedValueOnce({
+      jvbInactiveGraceMinutes: 45, jvbPreScaleMinutes: 15, jvbEmptyCloseMinutes: -1,
+      eventGracePeriodMinutes: 15, eventOvertimeEmptyMinutes: 20,
+      jvbStressWarnPercent: 50, jvbStressCriticalPercent: 70, liveCaptionsEnabled: false,
+    } as unknown as Awaited<ReturnType<typeof getSettings>>);
+    mocks.findMany.mockResolvedValue([evento(true)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(0);
+  });
+});

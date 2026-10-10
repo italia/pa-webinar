@@ -30,6 +30,7 @@ export const GET = withErrorHandling(async (request, context) => {
       chatEnabled: true,
       agendaEnabled: true,
       wordCloudEnabled: true,
+      liveCaptionsEnabled: true,
       recordingEnabled: true,
     },
   });

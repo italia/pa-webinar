@@ -564,7 +564,16 @@
       "endHelp": "Zatvorí miestnosť pre všetkých a označí podujatie ako ukončené. Nedá sa vrátiť.",
       "timerHeading": "Časovač vystúpení"
     },
-    "closingNotice": "{minutes, plural, =0 {Miestnosť sa zatvára.} one {Miestnosť sa automaticky zatvorí o # minútu.} few {Miestnosť sa automaticky zatvorí o # minúty.} many {Miestnosť sa automaticky zatvorí o # minúty.} other {Miestnosť sa automaticky zatvorí o # minút.}}"
+    "closingNotice": "{minutes, plural, =0 {Miestnosť sa zatvára.} one {Miestnosť sa automaticky zatvorí o # minútu.} few {Miestnosť sa automaticky zatvorí o # minúty.} many {Miestnosť sa automaticky zatvorí o # minúty.} other {Miestnosť sa automaticky zatvorí o # minút.}}",
+    "captions": {
+      "region": "Titulky",
+      "unknownSpeaker": "Účastník",
+      "paused": "Titulky sú pozastavené: služba je preťažená a obnoví sa sama.",
+      "unavailable": "Titulky momentálne nie sú k dispozícii.",
+      "show": "Zobraziť titulky",
+      "hide": "Skryť titulky",
+      "toggle": "Automatické titulky"
+    }
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "E-maily odchádzajú z adresy no-reply: bez tohto údaja sa odpoveď nedostane k nikomu.",
         "avatarTitle": "Obrázky účastníkov",
         "gravatarEnabled": "Použiť Gravatar, keď je k dispozícii",
-        "gravatarEnabledHelp": "Účastníci, ktorí sa zaregistrovali e-mailom s Gravatarom, ho v miestnosti uvidia ako obrázok; ostatným zostanú iniciály generované platformou. Obrázok sa načítava cez náš server, takže prehliadače účastníkov gravatar.com nikdy nekontaktujú — platforma áno: uveďte to vo svojich zásadách ochrany osobných údajov."
+        "gravatarEnabledHelp": "Účastníci, ktorí sa zaregistrovali e-mailom s Gravatarom, ho v miestnosti uvidia ako obrázok; ostatným zostanú iniciály generované platformou. Obrázok sa načítava cez náš server, takže prehliadače účastníkov gravatar.com nikdy nekontaktujú — platforma áno: uveďte to vo svojich zásadách ochrany osobných údajov.",
+        "liveCaptionsTitle": "Živé titulky",
+        "liveCaptionsEnabled": "Automatické titulky vo videohovoroch",
+        "liveCaptionsEnabledHelp": "Hlas toho, kto hovorí, sa prepisuje v reálnom čase službou, ktorá beží vo vlastnej infraštruktúre platformy, bez externých služieb, a text sa neuchováva. Titulky sú zapnuté vo všetkých podujatiach; moderátori ich môžu počas podujatia vypnúť. Bez nainštalovanej služby nemá táto možnosť žiadny účinok."
       },
       "errors": {
         "invalid": "Nastavenia sa neuložili: jedna hodnota nie je platná. Skontrolujte zmenené polia a skúste to znova.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videomost",
       "jibri": "Videozáznam",
       "smtp": "E-mailová služba",
-      "postprod": "AI pipeline po podujatí"
+      "postprod": "AI pipeline po podujatí",
+      "captions": "Živé titulky"
     },
     "descriptions": {
       "app": "Webová stránka, kde pristupujete k udalostiam",
@@ -3827,7 +3840,8 @@
       "jvb": "Prenáša zvuk a video účastníkom",
       "jibri": "Nahráva video relácie udalostí",
       "smtp": "Odosiela potvrdzujúce e-maily a upozornenia",
-      "postprod": "Prepisuje, zhŕňa a prekladá nahrávky pomocou AI modelov v klastri (GPU NVIDIA A100). Aktivuje sa len vtedy, keď podujatie zapne funkcie AI."
+      "postprod": "Prepisuje, zhŕňa a prekladá nahrávky pomocou AI modelov v klastri (GPU NVIDIA A100). Aktivuje sa len vtedy, keď podujatie zapne funkcie AI.",
+      "captions": "Prepisuje rečníkov v reálnom čase a posiela titulky do miestnosti cez bridge."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Úlohy postprodukcie sú vo fronte — GPU uzol sa spúšťa (studený štart ~3 min).",
         "standby": "AI pipeline je zapnutá, ale nečinná: nie sú žiadne nahrávky na spracovanie. GPU uzol je vypnutý kvôli úspore energie.",
         "degraded": "Za posledných 24 h zlyhala jedna alebo viac AI úloh. Podrobnosti nájdete v /admin/postprod."
+      },
+      "captions": {
+        "disabled": "Živé titulky sú vypnuté v nastaveniach inštancie.",
+        "standby": "Služba titulkov je v pohotovosti: spustí sa, keď podujatie s titulkami začne živé vysielanie.",
+        "starting": "Služba titulkov sa spúšťa pre prebiehajúce podujatie.",
+        "operational": "Živé titulky fungujú.",
+        "degraded": "Služba titulkov je vyťažená: prepisuje menej hlasov súčasne.",
+        "paused": "Služba titulkov sa pre preťaženie pozastavila a obnoví sa sama.",
+        "unavailable": "Služba titulkov neodpovedá."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Podujatie s aktívnym záznamom čaká na Jibri dlhšie než timeout: relácia nie je zaznamenávaná.",
       "smtp": "Potvrdzujúce e-maily registrácií a upozornenia nebudú odosielané.",
       "postprodDegraded": "Prepisy a zápisy pre niektoré nedávne nahrávky neboli vygenerované. Videonahrávky sú naďalej k dispozícii.",
-      "jvbDown": "Účastníci nedostávajú zvuk ani obraz."
+      "jvbDown": "Účastníci nedostávajú zvuk ani obraz.",
+      "captionsPaused": "V miestnosti chvíľu chýbajú titulky; zvuk a obraz nie sú dotknuté.",
+      "captionsDown": "V miestnosti sa nezobrazujú titulky; zvuk a obraz fungujú normálne."
     },
     "overallVerdicts": {
       "operational": "Všetky služby fungujú správne. Platforma je plne funkčná.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Požiadavky/s",
       "podUptime": "Uptime podu"
     },
-    "probeDetail": "Výsledok kontroly"
+    "probeDetail": "Výsledok kontroly",
+    "connCaptions": "Zvuk a titulky"
   },
   "feedback": {
     "title": "Ako hodnotíte túto udalosť?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Sneženie",
         "secretWell": "Tri želania pri studni: prekvapenie pre vašu postavu"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatické titulky",
+    "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom titulkov na lište hovoru."
   },
   "recording": {
     "management": "Videozáznam",

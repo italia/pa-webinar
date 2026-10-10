@@ -97,6 +97,7 @@ profili=(
   "semplice-backup:$CHART/examples/values-simple.yaml"
   "k3s-componenti:$CHART/examples/values-simple.yaml"
   "k3s-addon:$CHART/examples/values-simple.yaml"
+  "sottotitoli-spenti:$CHART/examples/values-full.yaml"
 )
 
 # Il file di una singola installazione k3s come lo scrive chi la automatizza:
@@ -260,6 +261,14 @@ argomenti_profilo() {
       printf '%s\n' -f "$CHART/examples/values-k3s.yaml" \
         -f "$CHART/examples/values-k3s-storage.yaml" -f "$CHART/examples/values-k3s-turn.yaml" \
         -f "$OUT/sito-k3s.yaml" -f "$OUT/addon-storage.yaml" -f "$OUT/addon-turn.yaml" ;;
+    # Il profilo completo con il segreto fra Jicofo e il gateway dei
+    # sottotitoli: deve arrivare uguale a entrambi.
+    completo)
+      printf '%s\n' --set global.captions.bridgeToken=segreto-di-prova ;;
+    # I sottotitoli live spenti sul profilo completo, con la NetworkPolicy:
+    # niente servizio, niente indirizzo in Jicofo, niente regole verso di lui.
+    sottotitoli-spenti)
+      printf '%s\n' --set global.captions.enabled=false --set networkPolicy.enabled=true ;;
     # La copia del database su un volume già presente, senza NetworkPolicy.
     semplice-backup)
       printf '%s\n' --set backup.enabled=true --set backup.persistence.existingClaim=copie-db --set backup.retention=3 ;;
@@ -269,7 +278,7 @@ argomenti_profilo() {
 # I moduli Prosody del progetto esistono in due copie: quella che monta lo
 # stack Docker Compose e quella che il chart mette nel proprio ConfigMap (un
 # chart non legge file fuori dalla sua cartella). Devono restare identiche.
-for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua; do
+for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua mod_pa_captions.lua; do
   if ! cmp -s "infra/jitsi/prosody-plugins/$modulo" "$CHART/files/prosody-plugins/$modulo"; then
     errore "infra/jitsi/prosody-plugins/$modulo e $CHART/files/prosody-plugins/$modulo sono diversi: aggiorna la copia del chart"
   fi
@@ -584,6 +593,47 @@ for pol in docs:
         if "Egress" in (spec.get("policyTypes") or []):
             print(f"la NetworkPolicy {nome} limita l'uscita di Jibri, che apre le sue connessioni verso Prosody, la conferenza e lo storage")
         continue
+    # La policy dei sottotitoli live: entrano solo i bridge della release
+    # (l'audio) e l'applicazione (lo stato), sulla 8080; escono DNS,
+    # l'applicazione (il contesto della stanza) e HTTPS (il modello).
+    if (pol["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "captions":
+        for t, n, m in carichi:
+            sel = seleziona(selettore, etichette(m))
+            dei_sottotitoli = etichette(m).get("app.kubernetes.io/component") == "captions"
+            if dei_sottotitoli and not sel:
+                print(f"la NetworkPolicy {nome} non seleziona {t}/{n}")
+            if sel and not dei_sottotitoli:
+                print(f"la NetworkPolicy {nome} seleziona anche {t}/{n}")
+        if not any(t == "Deployment" and etichette(m).get("app.kubernetes.io/component") == "captions" for t, n, m in carichi):
+            print(f"la NetworkPolicy {nome} è resa ma il servizio dei sottotitoli no")
+        istanza_c = (selettore.get("matchLabels") or {}).get("app.kubernetes.io/instance")
+        regole = spec.get("ingress") or []
+        if any(not r.get("from") for r in regole):
+            print(f"la NetworkPolicy {nome} ha una regola di ingresso senza sorgente: i sottotitoli resterebbero aperti a tutti")
+        porte = {p.get("port") for r in regole for p in r.get("ports") or []}
+        if porte != {8080}:
+            print(f"la NetworkPolicy {nome} dovrebbe ammettere solo la porta 8080, non {sorted(porte)}")
+        for t, n, m in carichi:
+            et = etichette(m)
+            if et.get("app.kubernetes.io/component") == "jvb" and et.get("app.kubernetes.io/instance") == istanza_c \
+                    and not any(ammette(r, et, 8080) for r in regole):
+                print(f"{t}/{n}: il bridge non raggiungerebbe i sottotitoli, la NetworkPolicy {nome} non lo ammette sulla 8080")
+        app_c = next((m for t, n, m in carichi if t == "Deployment"
+                      and "app.kubernetes.io/component" not in etichette(m)
+                      and etichette(m).get("app.kubernetes.io/name") == "pa-webinar"), None)
+        if app_c is not None and not any(ammette(r, etichette(app_c), 8080) for r in regole):
+            print(f"la NetworkPolicy {nome} non lascia all'applicazione lo stato dei sottotitoli (8080)")
+        uscite = spec.get("egress") or []
+        porte_u = {p.get("port") for r in uscite for p in r.get("ports") or []}
+        if not {53, 3000, 443} <= porte_u:
+            print(f"la NetworkPolicy {nome} dovrebbe lasciar uscire DNS, l'applicazione e HTTPS (53, 3000, 443), non {sorted(porte_u)}")
+        if app_c is not None and not any(
+                any(p.get("port") == 3000 for p in r.get("ports") or [])
+                and any("podSelector" in d and "namespaceSelector" not in d and seleziona(d["podSelector"] or {}, etichette(app_c))
+                        for d in r.get("to") or [])
+                for r in uscite):
+            print(f"la NetworkPolicy {nome} non lascia ai sottotitoli il contesto della stanza chiesto all'applicazione (3000)")
+        continue
     if not any(t == "Deployment" and n == nome and seleziona(selettore, etichette(m)) for t, n, m in carichi):
         print(f"la NetworkPolicy {nome} non seleziona il Deployment dell'applicazione, che resterebbe senza restrizioni")
     for tipo, n, modello in carichi:
@@ -596,7 +646,8 @@ for pol in docs:
         et = etichette(modello)
         cron = tipo == "CronJob" and seleziona(della_release, et)
         jibri = et.get("app.kubernetes.io/component") == "jibri" and et.get("app.kubernetes.io/instance") == istanza
-        if not (cron or jibri):
+        sottotitoli = et.get("app.kubernetes.io/component") == "captions" and et.get("app.kubernetes.io/instance") == istanza
+        if not (cron or jibri or sottotitoli):
             continue
         if not any(ammette(r, et, 3000) for r in spec.get("ingress") or []):
             print(f"{tipo}/{n} non raggiungerebbe l'applicazione: la NetworkPolicy {nome} non lo ammette sulla porta 3000")
@@ -611,6 +662,10 @@ if del_chart_np:
                if (d["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "backup"]
     if copie and not coperte:
         print(f"NetworkPolicy accesa ma nessuna policy per i pod della copia del database ({', '.join(sorted(copie))})")
+    sottotitoli = {n for t, n, m in carichi if etichette(m).get("app.kubernetes.io/component") == "captions"}
+    if sottotitoli and not any((d["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "captions"
+                               for d in del_chart_np):
+        print(f"NetworkPolicy accesa ma nessuna policy per i pod dei sottotitoli ({', '.join(sorted(sottotitoli))})")
 
 # Lo scaler dei bridge con un nome esplicito deve trovare quel Deployment:
 # altrimenti legge zero repliche, `kubectl scale` fallisce e con
@@ -752,7 +807,7 @@ def uscita_ammessa(et, porta):
 
 
 interni = ["JVB_HEALTH_URL", "JIBRI_HEALTH_URL", "JITSI_WEB_INTERNAL_URL",
-           "PROSODY_INTERNAL_URL", "JICOFO_HEALTH_URL"]
+           "PROSODY_INTERNAL_URL", "JICOFO_HEALTH_URL", "CAPTIONS_STATUS_URL"]
 for chiave in interni:
     url = variabili.get(chiave)
     if not url:
@@ -906,6 +961,7 @@ if comune is not None and jicofo is not None and prosody is not None:
         agganci = {
             "token_affiliation_custom": "muc-occupant-pre-join",
             "pa_media_lock": "muc-occupant-joined",
+            "pa_captions": "muc-room-created",
         }
         sts = next((d for d in docs if d.get("kind") == "StatefulSet" and d["metadata"]["name"].endswith("-prosody")), None)
         for nome, aggancio in agganci.items():
@@ -925,6 +981,89 @@ if comune is not None and jicofo is not None and prosody is not None:
                             ok = True
             if not ok:
                 print(f"Prosody carica {nome} ma nessun ConfigMap reso lo monta in /prosody-plugins-custom")
+
+# Il Service dell'applicazione seleziona i pod per nome e istanza e manda il
+# traffico alla porta `http`: un altro pod con quelle etichette e una porta
+# con quel nome finirebbe fra gli indirizzi del portale, e una richiesta ogni
+# tanto risponderebbe qualcun altro.
+if servizio_app:
+    for t, n, m in pod_di(servizi[servizio_app]):
+        if n == nome_app:
+            continue
+        if any(cp.get("name") == "http" for c in (m.get("spec") or {}).get("containers") or [] for cp in c.get("ports") or []):
+            print(f"{t}/{n} ha una porta chiamata http ed è selezionato dal Service {servizio_app}: riceverebbe richieste del portale")
+
+# Sottotitoli live: il servizio, l'indirizzo che Jicofo dà al bridge, il
+# modulo di Prosody e l'indirizzo dello stato per il portale vanno insieme.
+# Uno senza gli altri non è un errore di installazione: è un moderatore che
+# accende i sottotitoli e non vede niente.
+sottotitoli = [(t, n, m, spec) for t, n, m, spec in carichi if t == "Deployment"
+               and ((m.get("metadata") or {}).get("labels") or {}).get("app.kubernetes.io/component") == "captions"]
+opzioni = str((jicofo or {}).get("JAVA_TOOL_OPTIONS", "")).split() if jicofo is not None else []
+modello_url = next((o.split("=", 1)[1] for o in opzioni if o.startswith("-Djicofo.transcription.url-template=")), None)
+intestazione = next((o.split("=", 1)[1] for o in opzioni if o.startswith("-Djicofo.transcription.http-headers.X-Captions-Token=")), None)
+moduli_p = [x.strip() for x in str((prosody or {}).get("XMPP_MUC_MODULES", "")).split(",") if x.strip()]
+if len(sottotitoli) > 1:
+    print(f"{len(sottotitoli)} Deployment dei sottotitoli resi invece di uno")
+if sottotitoli:
+    _, nome_s, modello_s, spec_s = sottotitoli[0]
+    ps = modello_s.get("spec") or {}
+    if jicofo is not None:
+        trovato = re.match(r"^ws://([a-z0-9-]+):(\d+)/transcribe/\{\{MEETING_ID\}\}$", modello_url or "")
+        if not trovato:
+            print(f"Jicofo non ha l'indirizzo dei sottotitoli in JAVA_TOOL_OPTIONS (url-template {modello_url!r}): il bridge non saprebbe dove mandare l'audio")
+        else:
+            svc = servizi.get(trovato.group(1))
+            if svc is None:
+                print(f"Jicofo manda l'audio al Service {trovato.group(1)!r}, che non è reso")
+            elif not any(n == nome_s for _, n, _ in pod_di(svc)):
+                print(f"il Service {trovato.group(1)} non seleziona {nome_s}")
+            elif not porta_pod(svc, int(trovato.group(2)), modello_s):
+                print(f"il Service {trovato.group(1)} non espone la porta {trovato.group(2)} dei sottotitoli")
+    if prosody is not None:
+        if str(prosody.get("PA_CAPTIONS_ENABLED")) != "true":
+            print(f"i sottotitoli sono resi ma Prosody ha PA_CAPTIONS_ENABLED={prosody.get('PA_CAPTIONS_ENABLED')!r}: le stanze non sarebbero trascrivibili")
+        if "pa_captions" not in moduli_p:
+            print("i sottotitoli sono resi ma Prosody non carica pa_captions")
+    if not variabili.get("CAPTIONS_STATUS_URL"):
+        print("i sottotitoli sono resi ma l'applicazione non ha CAPTIONS_STATUS_URL")
+    gw = next((c for c in ps.get("containers") or [] if c.get("name") == "gateway"), {})
+    amb = {e["name"]: e for e in gw.get("env") or []}
+    if (amb.get("CAPTIONS_AUTH_TOKEN") or {}).get("value") != intestazione:
+        print("il segreto dei sottotitoli non è lo stesso nel gateway (CAPTIONS_AUTH_TOKEN) e in Jicofo (X-Captions-Token): il gateway rifiuterebbe il bridge")
+    contesto = str((amb.get("CAPTIONS_CONTEXT_URL") or {}).get("value", ""))
+    porta_app = (servizi.get(nome_app) or {}).get("spec", {}).get("ports", [{}])[0].get("port")
+    if contesto != f"http://{nome_app}:{porta_app}/api/internal/captions/context":
+        print(f"CAPTIONS_CONTEXT_URL è {contesto!r}: il Service dell'applicazione risponde a http://{nome_app}:{porta_app}")
+    rif = ((amb.get("CAPTIONS_CONTEXT_TOKEN") or {}).get("valueFrom") or {}).get("secretKeyRef") or {}
+    segreto_app = next((f.get("secretRef", {}).get("name") for f in contenitore.get("envFrom") or [] if f.get("secretRef")), None)
+    if rif.get("name") != segreto_app or rif.get("key") != "CRON_API_KEY":
+        print(f"CAPTIONS_CONTEXT_TOKEN non arriva da CRON_API_KEY del Secret dell'applicazione ({segreto_app!r}): il portale rifiuterebbe le richieste del gateway")
+    scarica = next((c for c in ps.get("initContainers") or [] if c.get("name") == "fetch-model"), None)
+    if scarica is None:
+        print(f"{nome_s}: nessun initContainer fetch-model, il motore partirebbe senza modello")
+    else:
+        amb_f = {e["name"]: str(e.get("value", "")) for e in scarica.get("env") or []}
+        if not re.match(r"^[0-9a-f]{64}$", amb_f.get("CAPTIONS_MODEL_SHA256", "")):
+            print(f"{nome_s}: CAPTIONS_MODEL_SHA256 non è un'impronta SHA-256")
+    if not (ps.get("securityContext") or {}).get("runAsNonRoot"):
+        print(f"{nome_s}: il pod non è dichiarato senza privilegi (runAsNonRoot)")
+    for c in (ps.get("containers") or []) + (ps.get("initContainers") or []):
+        csc = c.get("securityContext") or {}
+        if not (csc.get("readOnlyRootFilesystem") and csc.get("allowPrivilegeEscalation") is False):
+            print(f"{nome_s}/{c.get('name')}: il contenitore non ha il filesystem in sola lettura senza escalation di privilegi")
+    scaler_s = f"{nome_app}-jvb-scaler" in {n for t, n, _, _ in carichi if t == "CronJob"}
+    if scaler_s and "replicas" in spec_s:
+        print(f"{nome_s} scrive le repliche ({spec_s['replicas']}) ma lo scaler le porta: ogni aggiornamento le rimetterebbe al valore del chart")
+    if not scaler_s and spec_s.get("replicas") != 1:
+        print(f"{nome_s}: senza scaler serve una replica fissa, non {spec_s.get('replicas')!r}")
+else:
+    if modello_url or intestazione:
+        print("i sottotitoli non sono resi ma Jicofo ha ancora l'indirizzo del servizio in JAVA_TOOL_OPTIONS")
+    if prosody is not None and str(prosody.get("PA_CAPTIONS_ENABLED")) == "true":
+        print("i sottotitoli non sono resi ma Prosody ha PA_CAPTIONS_ENABLED=true")
+    if variabili.get("CAPTIONS_STATUS_URL"):
+        print(f"i sottotitoli non sono resi ma l'applicazione ha CAPTIONS_STATUS_URL ({variabili['CAPTIONS_STATUS_URL']})")
 
 # Autorità di certificazione in più: il file indicato a Node deve esistere nel
 # volume montato.
@@ -1361,6 +1500,18 @@ deve_fallire "modulo dei ruoli richiesto ma non montato" "/prosody-plugins-custo
   --set 'jitsi-meet.prosody.extraVolumeMounts=null'
 deve_fallire "modulo dei ruoli senza il blocco di microfono e video" "pa_media_lock" \
   --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=token_affiliation\,token_affiliation_custom'
+deve_fallire "sottotitoli accesi senza il modulo di Prosody" "pa_captions" \
+  --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=token_affiliation\,token_affiliation_custom\,pa_media_lock'
+deve_fallire "impronta del modello dei sottotitoli malformata" "captions.model.sha256" \
+  --set captions.model.sha256=abc
+deve_fallire "modello dei sottotitoli senza indirizzo" "captions.model.url" \
+  --set captions.model.url=
+deve_fallire "segreto dei sottotitoli con uno spazio" "global.captions.bridgeToken" \
+  --set 'global.captions.bridgeToken=due parole'
+deve_fallire "contesto destro del motore non ammesso" "captions.engine.rightContext" \
+  --set captions.engine.rightContext=2
+deve_fallire "opzioni della JVM di Jicofo senza l'indirizzo dei sottotitoli" "JAVA_TOOL_OPTIONS" \
+  --set-string 'jitsi-meet.jicofo.extraEnvs.JAVA_TOOL_OPTIONS=-Xss1m'
 deve_fallire "script di fine registrazione montato due volte" "_finalize_sh" \
   --set jitsi-meet.jibri.enabled=true --set-string 'jitsi-meet.jibri.custom.other._finalize_sh=#!/bin/sh'
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del

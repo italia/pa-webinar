@@ -56,6 +56,7 @@ export const LIVE_FLAG_FIELDS = [
   'chatEnabled',
   'agendaEnabled',
   'wordCloudEnabled',
+  'liveCaptionsEnabled',
   'recordingEnabled',
 ] as const;
 

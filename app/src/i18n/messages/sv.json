@@ -564,7 +564,16 @@
       "endHelp": "Stänger rummet för alla och markerar evenemanget som avslutat. Kan inte ångras.",
       "timerHeading": "Timer för inlägg"
     },
-    "closingNotice": "{minutes, plural, =0 {Rummet stängs.} one {Rummet stängs automatiskt om # minut.} other {Rummet stängs automatiskt om # minuter.}}"
+    "closingNotice": "{minutes, plural, =0 {Rummet stängs.} one {Rummet stängs automatiskt om # minut.} other {Rummet stängs automatiskt om # minuter.}}",
+    "captions": {
+      "region": "Undertexter",
+      "unknownSpeaker": "Deltagare",
+      "paused": "Undertexterna är pausade: tjänsten är överbelastad och fortsätter av sig själv.",
+      "unavailable": "Undertexter är inte tillgängliga just nu.",
+      "show": "Visa undertexter",
+      "hide": "Dölj undertexter",
+      "toggle": "Automatiska undertexter"
+    }
   },
   "qa": {
     "title": "Frågor och svar",
@@ -1890,7 +1899,10 @@
         "emailReplyToHelp": "Mejlen skickas från en no-reply-adress: utan detta når svaren ingen.",
         "avatarTitle": "Deltagarnas bilder",
         "gravatarEnabled": "Använd Gravatar när det finns",
-        "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn."
+        "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn.",
+        "liveCaptionsTitle": "Direktundertexter",
+        "liveCaptionsEnabled": "Automatiska undertexter i videosamtal",
+        "liveCaptionsEnabledHelp": "Rösten hos den som talar transkriberas i realtid av en tjänst som körs i plattformens egen infrastruktur, utan externa tjänster, och texten sparas inte. Undertexterna är på i alla evenemang; moderatorer kan stänga av dem under evenemanget. Utan installerad tjänst har alternativet ingen effekt."
       },
       "errors": {
         "invalid": "Inställningarna sparades inte: ett värde är ogiltigt. Kontrollera de ändrade fälten och försök igen.",
@@ -3815,7 +3827,8 @@
       "jvb": "Videobrygga",
       "jibri": "Videoinspelning",
       "smtp": "E-posttjänst",
-      "postprod": "AI-pipeline efter evenemanget"
+      "postprod": "AI-pipeline efter evenemanget",
+      "captions": "Direktundertexter"
     },
     "descriptions": {
       "app": "Webbplatsen där du kommer åt evenemang",
@@ -3827,7 +3840,8 @@
       "jvb": "Överför ljud och video till deltagare",
       "jibri": "Spelar in videosessioner av evenemang",
       "smtp": "Skickar bekräftelsemeddelanden och påminnelser",
-      "postprod": "Transkriberar, sammanfattar och översätter inspelningar med AI-modeller i klustret (NVIDIA A100-GPU). Aktiveras bara när ett evenemang använder AI-funktionerna."
+      "postprod": "Transkriberar, sammanfattar och översätter inspelningar med AI-modeller i klustret (NVIDIA A100-GPU). Aktiveras bara när ett evenemang använder AI-funktionerna.",
+      "captions": "Transkriberar talare i realtid och skickar undertexterna till rummet via bridgen."
     },
     "verdicts": {
       "app": {
@@ -3891,6 +3905,15 @@
         "scaling": "Postprod-jobb i kö – GPU-noden startar upp (kallstart ca 3 min).",
         "standby": "AI-pipelinen är aktiverad men vilande: inga inspelningar att bearbeta. GPU-noden är avstängd för att spara energi.",
         "degraded": "Ett eller flera AI-jobb har misslyckats de senaste 24 timmarna. Kontrollera /admin/postprod för detaljer."
+      },
+      "captions": {
+        "disabled": "Direktundertexter är avstängda i instansens inställningar.",
+        "standby": "Undertexttjänsten står i beredskap: den startar när ett evenemang med undertexter går live.",
+        "starting": "Undertexttjänsten startar för ett pågående evenemang.",
+        "operational": "Direktundertexterna fungerar.",
+        "degraded": "Undertexttjänsten är belastad: den transkriberar färre röster samtidigt.",
+        "paused": "Undertexttjänsten har pausat sig på grund av överbelastning och fortsätter av sig själv.",
+        "unavailable": "Undertexttjänsten svarar inte."
       }
     },
     "impacts": {
@@ -3905,7 +3928,9 @@
       "jibriStale": "Ett evenemang med aktiv inspelning väntar på Jibri längre än timeouten: sessionen spelas inte in.",
       "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte.",
       "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga.",
-      "jvbDown": "Deltagarna får varken ljud eller video."
+      "jvbDown": "Deltagarna får varken ljud eller video.",
+      "captionsPaused": "Undertexterna saknas en stund i rummet; ljud och video påverkas inte.",
+      "captionsDown": "Inga undertexter visas i rummet; ljud och video fungerar normalt."
     },
     "overallVerdicts": {
       "operational": "Alla tjänster fungerar korrekt. Plattformen är fullt operativ.",
@@ -3948,7 +3973,8 @@
       "requestRate": "Förfrågningar/s",
       "podUptime": "Pod-drifttid"
     },
-    "probeDetail": "Resultat av kontrollen"
+    "probeDetail": "Resultat av kontrollen",
+    "connCaptions": "Ljud och undertexter"
   },
   "feedback": {
     "title": "Hur bedömer du detta evenemang?",
@@ -4551,7 +4577,9 @@
         "secretSnow": "Snöfall",
         "secretWell": "Tre önskningar vid brunnen: en överraskning till din figur"
       }
-    }
+    },
+    "captionsNoticeTitle": "Automatiska undertexter",
+    "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med undertextknappen i samtalets verktygsfält."
   },
   "recording": {
     "management": "Videoinspelning",
