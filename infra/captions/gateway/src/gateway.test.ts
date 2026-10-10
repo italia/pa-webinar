@@ -25,6 +25,8 @@ interface EngineSessionLog {
   update: Record<string, unknown> | null;
   pcmBytes: number;
   commits: number;
+  /** Byte ricevuti a ogni commit, nell'ordine. */
+  commitsAt: number[];
 }
 
 const cleanups: Array<() => Promise<void> | void> = [];
@@ -52,12 +54,12 @@ async function waitFor<T>(fn: () => T | undefined | null | false, timeoutMs = 30
   }
 }
 
-async function fakeEngine(transcript = 'Buongiorno a tutti.', completedDelayMs = 0) {
+async function fakeEngine(transcript = 'Buongiorno a tutti.', completedDelayMs = 0, updateDelayMs = 0, rejectFirst = 0) {
   const wss = new WebSocketServer({ port: 0, host: '127.0.0.1' });
   const port = await listen(wss);
   const sessions: EngineSessionLog[] = [];
   wss.on('connection', (ws) => {
-    const log: EngineSessionLog = { ws, update: null, pcmBytes: 0, commits: 0 };
+    const log: EngineSessionLog = { ws, update: null, pcmBytes: 0, commits: 0, commitsAt: [] };
     sessions.push(log);
     ws.send(JSON.stringify({ type: 'session.created' }));
     ws.on('message', (data, isBinary) => {
@@ -68,9 +70,14 @@ async function fakeEngine(transcript = 'Buongiorno a tutti.', completedDelayMs =
       const ev = JSON.parse(data.toString()) as { type: string; session?: Record<string, unknown> };
       if (ev.type === 'session.update') {
         log.update = ev.session ?? null;
-        ws.send(JSON.stringify({ type: 'session.updated' }));
+        if (sessions.length <= rejectFirst) {
+          ws.send(JSON.stringify({ type: 'error', error: { message: 'rifiutata' } }));
+          return;
+        }
+        setTimeout(() => ws.send(JSON.stringify({ type: 'session.updated' })), updateDelayMs);
       } else if (ev.type === 'input_audio_buffer.commit') {
         log.commits += 1;
+        log.commitsAt.push(log.pcmBytes);
         setTimeout(() => {
           ws.send(JSON.stringify({ type: 'conversation.item.input_audio_transcription.completed', transcript }));
           ws.send(JSON.stringify({ type: 'input_audio_buffer.committed' }));
@@ -128,12 +135,15 @@ async function bridge(port: number, path = '/transcribe/meet-1?room=stanza', tok
           start: { tag, mediaFormat: { encoding: 'opus', sampleRate: 48000, channels: 2 }, customParameters: { endpointId } },
         }),
       ),
-    /** Parlato (tono e brevi vuoti alternati, come le sillabe) o silenzio di un microfono aperto. */
+    /**
+     * Parlato o silenzio di un microfono aperto. Il parlato è fatto di
+     * "sillabe" di tono da 80 ms separate da 40 ms di vuoto, e comincia con il
+     * vuoto: la voce si riconosce sopra il rumore di fondo, e un tono costante
+     * per il gateway è rumore.
+     */
     media: (tag: string, frames: number, kind: 'speech' | 'silence' = 'speech') => {
       for (let i = 0; i < frames; i++) {
-        // Dopo un tono il primo frame di silenzio decodifica ancora la coda del
-        // suono: il vuoto tra due "sillabe" è lungo due frame.
-        const payload = kind === 'speech' && i % 3 === 0 ? VOICE : SILENCE;
+        const payload = kind === 'speech' && i % 6 >= 2 ? VOICE : SILENCE;
         ws.send(JSON.stringify({ event: 'media', sequenceNumber: '1', media: { tag, chunk: '1', timestamp: String(ts), payload } }));
         ts += 960;
       }
@@ -197,6 +207,55 @@ describe('gateway', () => {
     expect(session.pcmBytes).toBeLessThanOrEqual(4800 * 2 + (15 + 10 + 9) * frame);
     const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
     expect(final.transcript[0]?.text).toBe('Buongiorno a tutti.');
+  });
+
+  it('frasi finite mentre la sessione si apre si chiudono ciascuna al suo punto', async () => {
+    const engine = await fakeEngine('Buongiorno a tutti.', 0, 400);
+    const { port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url, CAPTIONS_PAUSE_GAP_MS: '150' });
+    const b = await bridge(port);
+    b.start('hh-1', 'hh');
+    // Frase A, la sua pausa e la frase B, poi più nulla: tutto mentre la sessione si apre.
+    b.media('hh-1', 10);
+    b.media('hh-1', 10, 'silence');
+    b.media('hh-1', 6);
+    const session = await waitFor(() => engine.sessions[0]?.commits === 2 && engine.sessions[0], 3000);
+    // A si chiude dopo il suo audio e prima di quello di B, che si chiude per ultimo.
+    const [a, bEnd] = session.commitsAt;
+    expect(a).toBeGreaterThan(0);
+    expect(bEnd).toBeGreaterThan(a ?? 0);
+    expect(bEnd).toBe(session.pcmBytes);
+  });
+
+  it('se la sessione non si apre, l\'audio in attesa non finisce davanti alla frase dopo', async () => {
+    // Il motore rifiuta la prima sessione e accetta la seconda; la pausa lunga
+    // tiene fuori il timer dei pacchetti, che svuoterebbe il buffer da sé.
+    const engine = await fakeEngine('Buongiorno a tutti.', 0, 0, 1);
+    const { port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url, CAPTIONS_PAUSE_GAP_MS: '5000' });
+    const b = await bridge(port);
+    b.start('ii-1', 'ii');
+    b.media('ii-1', 10);
+    await waitFor(() => engine.sessions[0]?.update);
+    // Dopo l'attesa prima di riprovare, la frase dopo apre la seconda sessione.
+    await new Promise((r) => setTimeout(r, 2200));
+    b.media('ii-1', 10);
+    const second = await waitFor(() => engine.sessions[1]?.update && engine.sessions[1], 3000);
+    await new Promise((r) => setTimeout(r, 200));
+    // Il silenzio d'avvio e i dieci frame della seconda frase, non quelli della prima.
+    expect(second.pcmBytes).toBe(4800 * 2 + 10 * 320 * 2);
+  }, 10_000);
+
+  it('un suono isolato o un rumore costante non aprono una sessione del motore', async () => {
+    const engine = await fakeEngine();
+    const { port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url });
+    const b = await bridge(port);
+    b.start('gg-1', 'gg');
+    // Un microfono che entra con un rumore costante: il primo frame supera la
+    // soglia assoluta (il rumore di fondo non è ancora noto), gli altri no.
+    for (let i = 0; i < 30; i++) {
+      b.send({ event: 'media', sequenceNumber: '1', media: { tag: 'gg-1', chunk: '1', timestamp: String(i * 960), payload: VOICE } });
+    }
+    await new Promise((r) => setTimeout(r, 300));
+    expect(engine.sessions).toHaveLength(0);
   });
 
   it('un testo definitivo che arriva dopo la scadenza non riapre la frase già chiusa', async () => {
@@ -302,19 +361,19 @@ describe('gateway', () => {
     const { gateway, port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url, CAPTIONS_MAX_STREAMS: '1' });
     const b = await bridge(port);
     b.start('aa-1', 'aa');
-    b.media('aa-1', 3);
+    b.media('aa-1', 8);
     await waitFor(() => engine.sessions[0]?.update);
     expect(gateway.status().activeStreams).toBe(1);
 
     // La seconda voce parla subito: la prima non è ancora zitta, resta lei.
     b.start('bb-1', 'bb');
-    b.media('bb-1', 3);
+    b.media('bb-1', 8);
     await new Promise((r) => setTimeout(r, 50));
     expect(engine.sessions).toHaveLength(1);
 
     // Dopo la pausa la prima è zitta: la seconda le subentra.
     await new Promise((r) => setTimeout(r, 200));
-    b.media('bb-1', 3);
+    b.media('bb-1', 8);
     await waitFor(() => engine.sessions[1]?.update);
     await waitFor(() => engine.sessions[0]?.ws.readyState === WebSocket.CLOSED);
     expect(gateway.status()).toMatchObject({ activeStreams: 1, maxStreams: 1, conferences: 1 });

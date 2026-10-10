@@ -56,6 +56,14 @@ describe('VoiceDetector', () => {
     expect(vad.push(frame(0.2))).toBe(true);
   });
 
+  it('senza pause nella finestra la soglia non sale sopra la voce sommessa', () => {
+    const vad = new VoiceDetector(options);
+    // Solo parlato forte, nessun silenzio: il "rumore di fondo" è -23 dBFS.
+    for (let i = 0; i < 100; i++) vad.push(frame(0.1));
+    expect(vad.threshold()).toBe(-35);
+    expect(vad.push(frame(0.03))).toBe(true);
+  });
+
   it('il parlato con vuoti tra le parole resta voce anche quando è lungo', () => {
     const vad = new VoiceDetector(options);
     // Quattro frame di parola e uno di vuoto, per sei secondi: nessun tratto

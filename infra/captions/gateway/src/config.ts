@@ -49,11 +49,11 @@ export interface Config {
   vadMarginDb: number;
 }
 
-function num(env: NodeJS.ProcessEnv, key: string, fallback: number, min = 0): number {
+function num(env: NodeJS.ProcessEnv, key: string, fallback: number, min = 0, max = Infinity): number {
   const raw = env[key];
   if (raw === undefined || raw.trim() === '') return fallback;
   const value = Number(raw);
-  if (!Number.isFinite(value) || value < min) {
+  if (!Number.isFinite(value) || value < min || value > max) {
     throw new Error(`${key} non valido: ${raw}`);
   }
   return value;
@@ -90,7 +90,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     maxPauseMs: num(env, 'CAPTIONS_MAX_PAUSE_MS', 600_000, 1000),
     finishTimeoutMs: num(env, 'CAPTIONS_FINISH_TIMEOUT_MS', 3000, 100),
     contextRefreshMs: num(env, 'CAPTIONS_CONTEXT_REFRESH_MS', 30_000, 100),
-    vadMinDbfs: num(env, 'CAPTIONS_VAD_MIN_DBFS', -55, -100),
+    // Oltre i -20 dBFS nessuna voce supererebbe la soglia: un valore così (il
+    // segno meno dimenticato, uno zero di troppo) spegnerebbe i sottotitoli
+    // senza errori.
+    vadMinDbfs: num(env, 'CAPTIONS_VAD_MIN_DBFS', -55, -100, -20),
     vadMarginDb: num(env, 'CAPTIONS_VAD_MARGIN_DB', 10),
   };
 }

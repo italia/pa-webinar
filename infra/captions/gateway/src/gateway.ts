@@ -49,6 +49,19 @@ const ENGINE_RETRY_MS = 2000;
 const LEAD_IN = Buffer.alloc(Math.round(0.3 * 16000) * 2);
 /** L'audio appena prima della soglia: contiene l'attacco della prima sillaba. */
 const PRE_ROLL_SECONDS = 0.3;
+/**
+ * Voce continua che apre una frase. Un frame isolato sopra soglia (lo
+ * scatto di un rumore, il primo frame di un microfono che entra con un
+ * ventilatore acceso, quando il rumore di fondo non è ancora noto) non
+ * apre una sessione del motore: il motore, sul solo rumore, inventa parole.
+ */
+const ONSET_SECONDS = 0.06;
+/**
+ * Nel buffer di una sessione che si sta aprendo segna dove una frase è
+ * finita: aperta la sessione, lì si chiude la frase, e l'audio che segue è
+ * già la frase successiva.
+ */
+const COMMIT = Symbol('commit');
 const MAX_SOCKET_BUFFER = 1 << 20;
 
 interface Stream {
@@ -61,9 +74,8 @@ interface Stream {
   waiting: Array<{ timestamp: number; payload: Uint8Array }>;
   engine: EngineSession | null;
   opening: boolean;
-  /** La frase è finita mentre la sessione si apriva: si chiude appena il motore ha il suo audio. */
-  endAfterOpen: boolean;
-  buffered: Buffer[];
+  /** Audio in attesa della sessione del motore, con i segni di fine frase. */
+  buffered: Array<Buffer | typeof COMMIT>;
   bufferedSeconds: number;
   retryAt: number;
   assembler: CaptionAssembler;
@@ -73,6 +85,8 @@ interface Stream {
   /** Dentro una frase: dal primo frame di voce alla pausa che la chiude. */
   inSpeech: boolean;
   silenceSeconds: number;
+  /** Voce continua prima dell'inizio di una frase (vedi ONSET_SECONDS). */
+  voicedSeconds: number;
   preRoll: Buffer[];
   preRollSeconds: number;
   lastRtp: number | null;
@@ -200,7 +214,6 @@ export class Conference {
       waiting: [],
       engine: null,
       opening: false,
-      endAfterOpen: false,
       buffered: [],
       bufferedSeconds: 0,
       retryAt: 0,
@@ -216,6 +229,7 @@ export class Conference {
       }),
       inSpeech: false,
       silenceSeconds: 0,
+      voicedSeconds: 0,
       preRoll: [],
       preRollSeconds: 0,
       lastRtp: null,
@@ -271,6 +285,7 @@ export class Conference {
     }
     if (!this.enabled || !this.gateway.accepting()) {
       if (stream.engine) this.stopEngine(stream, 'paused');
+      this.resetSpeech(stream);
       return;
     }
 
@@ -295,18 +310,17 @@ export class Conference {
     if (decoded.samplesDecoded === 0) return;
     const ticks = Math.round((decoded.samplesDecoded / OUT_RATE) * RTP_RATE);
 
-    const chunks: Buffer[] = [];
     if (stream.lastRtp !== null) {
       const gapMs = ((timestamp - stream.lastRtp - stream.lastTicks) / RTP_RATE) * 1000;
       if (gapMs > 0 && gapMs <= this.gateway.config.fillGapMs) {
-        chunks.push(Buffer.alloc(Math.round((gapMs / 1000) * OUT_RATE) * 2));
+        // Silenzio di riempimento: non è un ascolto del microfono, e non
+        // entra nella stima del rumore di fondo.
+        this.onSilence(stream, Buffer.alloc(Math.round((gapMs / 1000) * OUT_RATE) * 2));
       }
     }
     stream.lastRtp = timestamp;
     stream.lastTicks = ticks;
-    chunks.push(toPcm16(decoded.channelData, decoded.samplesDecoded));
-
-    for (const pcm of chunks) this.onPcm(stream, pcm);
+    this.onPcm(stream, toPcm16(decoded.channelData, decoded.samplesDecoded));
     this.armGapTimer(stream);
   }
 
@@ -317,30 +331,68 @@ export class Conference {
    */
   private onPcm(stream: Stream, pcm: Buffer): void {
     const seconds = pcm.length / 2 / OUT_RATE;
-    if (stream.vad.push(pcm)) {
+    if (!stream.vad.push(pcm)) {
+      this.onSilence(stream, pcm);
+      return;
+    }
+    stream.silenceSeconds = 0;
+    if (stream.inSpeech) {
+      // Solo il parlato vero tiene viva la sessione: un rumore che non apre
+      // una frase non deve proteggerla dalla chiusura né dalla sostituzione.
       stream.lastVoiceAt = this.gateway.now();
-      stream.silenceSeconds = 0;
-      if (!stream.inSpeech) {
-        stream.inSpeech = true;
-        for (const before of stream.preRoll) this.feed(stream, before);
-        stream.preRoll = [];
-        stream.preRollSeconds = 0;
-      }
       this.feed(stream, pcm);
       return;
     }
+    // Prima dell'inizio della frase la voce resta nell'attacco, finché non
+    // dura abbastanza da essere parlato e non un rumore isolato.
+    stream.voicedSeconds += seconds;
+    this.keepPreRoll(stream, pcm);
+    if (stream.voicedSeconds < ONSET_SECONDS) return;
+    stream.inSpeech = true;
+    stream.voicedSeconds = 0;
+    stream.lastVoiceAt = this.gateway.now();
+    const attacco = stream.preRoll;
+    stream.preRoll = [];
+    stream.preRollSeconds = 0;
+    for (const before of attacco) this.feed(stream, before);
+  }
+
+  /** Audio senza voce: dentro una frase va al motore e conta per la pausa, fuori resta nell'attacco. */
+  private onSilence(stream: Stream, pcm: Buffer): void {
+    // La voce che apre una frase deve essere continua: anche un buco nei
+    // pacchetti la interrompe.
+    stream.voicedSeconds = 0;
     if (stream.inSpeech) {
       this.feed(stream, pcm);
-      stream.silenceSeconds += seconds;
+      stream.silenceSeconds += pcm.length / 2 / OUT_RATE;
       if (stream.silenceSeconds * 1000 >= this.gateway.config.pauseGapMs) this.endUtterance(stream);
       return;
     }
+    this.keepPreRoll(stream, pcm);
+  }
+
+  private keepPreRoll(stream: Stream, pcm: Buffer): void {
     stream.preRoll.push(pcm);
-    stream.preRollSeconds += seconds;
+    stream.preRollSeconds += pcm.length / 2 / OUT_RATE;
     while (stream.preRollSeconds > PRE_ROLL_SECONDS && stream.preRoll.length > 1) {
       const dropped = stream.preRoll.shift();
       stream.preRollSeconds -= (dropped?.length ?? 0) / 2 / OUT_RATE;
     }
+  }
+
+  /**
+   * Trascrizione sospesa o spenta: si dimentica la frase in corso. Alla
+   * ripresa nulla di quello che è stato detto prima deve finire nel primo
+   * sottotitolo.
+   */
+  resetSpeech(stream: Stream): void {
+    stream.inSpeech = false;
+    stream.silenceSeconds = 0;
+    stream.voicedSeconds = 0;
+    stream.preRoll = [];
+    stream.preRollSeconds = 0;
+    stream.buffered = [];
+    stream.bufferedSeconds = 0;
   }
 
   private feed(stream: Stream, pcm: Buffer): void {
@@ -358,7 +410,7 @@ export class Conference {
     stream.bufferedSeconds += pcm.length / 2 / OUT_RATE;
     while (stream.bufferedSeconds > MAX_BUFFER_SECONDS && stream.buffered.length > 0) {
       const dropped = stream.buffered.shift();
-      stream.bufferedSeconds -= (dropped?.length ?? 0) / 2 / OUT_RATE;
+      if (dropped && dropped !== COMMIT) stream.bufferedSeconds -= dropped.length / 2 / OUT_RATE;
     }
     if (!stream.opening && this.gateway.now() >= stream.retryAt && this.gateway.admit(stream, this)) {
       void this.openEngine(stream);
@@ -401,27 +453,32 @@ export class Conference {
       await session.open();
     } catch (err) {
       stream.opening = false;
-      stream.endAfterOpen = false;
+      // L'audio in attesa resta senza motore: tenerlo lo farebbe ripartire
+      // davanti alla frase successiva.
+      stream.buffered = [];
+      stream.bufferedSeconds = 0;
       stream.retryAt = this.gateway.now() + ENGINE_RETRY_MS;
       this.gateway.released();
       this.gateway.engineFailed((err as Error).message);
       return;
     }
     stream.opening = false;
-    const endNow = stream.endAfterOpen;
-    stream.endAfterOpen = false;
     this.gateway.engineOpened();
+    const attesa = stream.buffered;
+    stream.buffered = [];
+    stream.bufferedSeconds = 0;
     if (this.closed || !this.gateway.accepting()) {
       session.close('closed');
       return;
     }
     stream.engine = session;
     stream.leadIn = true;
-    for (const pcm of stream.buffered) this.feed(stream, pcm);
-    if (stream.buffered.length > 0) stream.speaking = true;
-    stream.buffered = [];
-    stream.bufferedSeconds = 0;
-    if (endNow) this.endUtterance(stream);
+    // L'audio arrivato mentre la sessione si apriva, nell'ordine: dove una
+    // frase è finita, la si chiude; quello che segue è già la successiva.
+    for (const item of attesa) {
+      if (item === COMMIT) this.commitSentence(stream);
+      else this.feed(stream, item);
+    }
   }
 
   /** Senza pacchetti per `pauseGapMs` (microfono spento, o silenzio scartato dal client) la frase si chiude. */
@@ -436,13 +493,20 @@ export class Conference {
   private endUtterance(stream: Stream): void {
     stream.inSpeech = false;
     stream.silenceSeconds = 0;
+    stream.voicedSeconds = 0;
     if (stream.opening) {
-      // La frase è nel buffer: si chiude appena il motore l'ha ricevuta.
-      if (stream.buffered.length > 0) stream.endAfterOpen = true;
+      // La frase è nel buffer: la si chiude quando il motore l'ha ricevuta.
+      const last = stream.buffered[stream.buffered.length - 1];
+      if (last !== undefined && last !== COMMIT) stream.buffered.push(COMMIT);
       return;
     }
     stream.buffered = [];
     stream.bufferedSeconds = 0;
+    this.commitSentence(stream);
+  }
+
+  /** Chiude sul motore la frase che ha ricevuto; il testo definitivo arriva con `completed`. */
+  private commitSentence(stream: Stream): void {
     if (!stream.engine || !stream.speaking) return;
     stream.speaking = false;
     stream.engine.commit();
@@ -685,7 +749,12 @@ export class Gateway {
       );
     }
     if (!this.accepting()) {
-      for (const c of this.conferences) for (const s of c.streamsList()) if (s.engine) c.stopEngine(s, 'paused');
+      for (const c of this.conferences) {
+        for (const s of c.streamsList()) {
+          if (s.engine) c.stopEngine(s, 'paused');
+          c.resetSpeech(s);
+        }
+      }
     } else {
       // Limite ridotto: si chiudono le sessioni in eccesso, partendo dalle voci zitte da più tempo.
       let excess = this.activeEngines() - this.snapshot.streamLimit;
