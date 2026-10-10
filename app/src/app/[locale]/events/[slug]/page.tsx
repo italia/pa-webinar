@@ -17,8 +17,14 @@ import EventDetailClient from '@/components/events/event-detail-client';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { openGraphImages, twitterImageCard } from '@/lib/seo';
+import {
+  anteprimaEvento,
+  firmaPersone,
+  immagineAnteprima,
+  versioniLinguistiche,
+} from '@/lib/events/share-metadata';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { markdownToPlainText } from '@/lib/utils/markdown-text';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 export const revalidate = 30;
@@ -35,63 +41,30 @@ export async function generateMetadata({
   const locale = await getLocale();
   const settings = await (await import('@/lib/settings')).getSettings();
 
-  const event = await prisma.event.findUnique({ where: { slug } });
+  const event = await prisma.event.findUnique({
+    where: { slug },
+    include: PERSONE_PUBBLICHE_INCLUDE,
+  });
   // Come la pagina: un evento non pubblico non espone titolo, descrizione
   // e immagine nemmeno nei metadati della risposta «non trovato».
   if (!event || !isEventPageVisible(event)) return { robots: { index: false } };
 
-  const title = getLocalized(event.title as LocalizedField, locale);
-  const description = getLocalized(event.description as LocalizedField, locale);
-
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
-  // Assoluta: i servizi che mostrano le anteprime leggono il tag senza avere
-  // un'origine su cui risolvere un percorso relativo. Porta con se' il momento
-  // dell'ultima modifica perche' quei servizi tengono in cache l'immagine per
-  // INDIRIZZO, anche per giorni: senza, correggere un titolo o sostituire la
-  // locandina la mattina dell'evento non cambierebbe nulla di cio' che vede
-  // chi riceve il link. Lo slug si codifica: da qui in poi e' un indirizzo con
-  // una parte di interrogazione, e un carattere speciale se la mangerebbe.
-  const scheda = settings.ogCardEnabled
-    ? `${baseUrl}/api/og/event/${encodeURIComponent(slug)}` +
-      `?locale=${locale}&v=${event.updatedAt.getTime()}`
-    : null;
+  // Titolo, descrizione in testo semplice e immagine (scheda composta dal
+  // server o copertina): gli stessi del link della sala e dell'iscrizione.
+  const anteprima = anteprimaEvento(
+    { ...event, firmaPersone: firmaPersone(event) },
+    settings,
+    locale,
+    `/events/${slug}`,
+  );
 
   return {
-    title,
-    description: description.slice(0, 160),
-    // Immagine dell'anteprima: la scheda composta dal server quando
-    // l'amministrazione la vuole (titolo, data e relatori DENTRO l'immagine,
-    // che e' l'unica cosa che molte applicazioni mostrano di un link), oppure
-    // il comportamento storico: la copertina dell'evento se c'è (è la più
-    // pertinente per un link condiviso), altrimenti il logo di default. Va
-    // messa QUI e non ereditata dal layout: Next sostituisce l'openGraph per
-    // segmento, non lo fonde (vedi lib/seo). La copertina 16:9 (`coverImageUrl`)
-    // vince sulla generica, come ovunque nell'app; `settings.seoImage` non entra
-    // qui di proposito: è l'immagine del SITO, quella dell'evento è più
-    // pertinente per un link condiviso.
-    openGraph: {
-      title,
-      description: description.slice(0, 160),
-      url: pageUrl,
-      type: 'website',
-      locale: locale === 'en' ? 'en_GB' : 'it_IT',
-      siteName: settings.siteName || 'PA Webinar',
-      images: scheda
-        ? [{ url: scheda, width: 1200, height: 630 }]
-        : openGraphImages(event.coverImageUrl ?? event.imageUrl),
-    },
-    twitter: twitterImageCard(
-      title,
-      description.slice(0, 160),
-      scheda ?? event.coverImageUrl ?? event.imageUrl,
-    ),
+    ...anteprima,
     alternates: {
       canonical: pageUrl,
-      languages: {
-        it: localizedUrl(baseUrl, `/events/${slug}`, 'it'),
-        en: localizedUrl(baseUrl, `/events/${slug}`, 'en'),
-      },
+      languages: versioniLinguistiche(`/events/${slug}`, settings.availableLocales),
     },
   };
 }
@@ -152,8 +125,15 @@ export default async function EventDetailPage({
   const registrationOpen = isEventOpenForRegistration(event);
 
   const title = getLocalized(event.title as LocalizedField, locale);
-  const description = getLocalized(event.description as LocalizedField, locale);
+  // I dati strutturati sono testo: la descrizione senza la sintassi Markdown.
+  const description = markdownToPlainText(getLocalized(event.description as LocalizedField, locale));
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+  // La stessa immagine dell'anteprima dei link, come indirizzo assoluto.
+  const immagine = immagineAnteprima(
+    { ...event, firmaPersone: firmaPersone(event) },
+    settings,
+    locale,
+  ).url;
 
   // Chi organizza e chi interviene (lib/events/public-people).
   const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
@@ -166,10 +146,10 @@ export default async function EventDetailPage({
     startDate: event.startsAt.toISOString(),
     endDate: event.endsAt.toISOString(),
     eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-    eventStatus:
-      event.status === 'ENDED'
-        ? 'https://schema.org/EventCancelled'
-        : 'https://schema.org/EventScheduled',
+    // Un evento concluso non e' annullato: lo dicono le date. La piattaforma
+    // non ha uno stato «annullato», quindi l'evento e' sempre in programma.
+    eventStatus: 'https://schema.org/EventScheduled',
+    ...(immagine ? { image: [immagine.startsWith('/') ? `${baseUrl}${immagine}` : immagine] } : {}),
     location: {
       '@type': 'VirtualLocation',
       url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),

@@ -7,6 +7,7 @@
 import ical, { ICalCalendarMethod } from 'ical-generator';
 
 import { appBaseUrl } from '@/lib/env';
+import { markdownToPlainText } from '@/lib/utils/markdown-text';
 
 export interface EventICalInput {
   /** Id dell'evento: con l'host del portale forma l'UID, uguale in ogni file. */
@@ -105,7 +106,8 @@ export function generateEventICal(input: EventICalInput): string {
     start: input.startsAt,
     end: input.endsAt,
     summary: input.title,
-    description: input.description,
+    // La descrizione e' scritta in Markdown: il calendario mostra testo.
+    description: markdownToPlainText(input.description, { paragrafi: true }),
     url: input.url,
     organizer: {
       name: input.organizerName,

@@ -117,3 +117,32 @@ describe('generateIcsDownloadUrl', () => {
     expect(url).toBe('http://localhost:3000/api/events/test-event/calendar.ics');
   });
 });
+
+describe('descrizione nei link del calendario', () => {
+  it('il Markdown della descrizione non arriva al calendario', () => {
+    const url = new URL(
+      generateGoogleCalendarUrl({ ...baseInput, description: 'Con **Relatore 1**.' }),
+    );
+    expect(url.searchParams.get('details')).toBe(`Con Relatore 1.\n\n${baseInput.joinUrl}`);
+  });
+
+  it('senza descrizione resta il link per entrare', () => {
+    const url = new URL(generateOutlookCalendarUrl({ ...baseInput, description: '' }));
+    expect(url.searchParams.get('body')).toBe(baseInput.joinUrl);
+  });
+});
+
+describe('descrizione lunga nei link del calendario', () => {
+  it('si taglia dopo aver tolto il Markdown, su una parola', () => {
+    const lunga = `Vedi [le slide](https://example.org/${'percorso/'.repeat(40)}) e ${'parola '.repeat(80)}`;
+    const url = new URL(
+      generateGoogleCalendarUrl({ ...baseInput, description: lunga, descriptionMax: 120 }),
+    );
+    const dettagli = url.searchParams.get('details') ?? '';
+    const testo = dettagli.split('\n\n')[0] ?? '';
+    expect(testo.startsWith('Vedi le slide e parola')).toBe(true);
+    expect(testo.endsWith('parola…')).toBe(true);
+    expect(testo.length).toBeLessThanOrEqual(121);
+    expect(dettagli).not.toContain('example.org');
+  });
+});

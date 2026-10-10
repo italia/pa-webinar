@@ -13,7 +13,7 @@ import { getSettings } from '@/lib/settings';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
-import { titoloEventoPubblico } from '@/lib/events/meta-title';
+import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -24,9 +24,16 @@ export async function generateMetadata({
 }: RegistrationPageProps): Promise<Metadata> {
   const { slug } = await params;
   const t = await getTranslations('registration');
-  const titolo = await titoloEventoPubblico(slug, isEventOpenForRegistration);
+  // Il link dell'iscrizione si condivide come quello dell'evento: stessa
+  // anteprima, con il titolo della pagina.
+  const anteprima = await anteprimaEventoPubblico(
+    slug,
+    `/events/${slug}/registration`,
+    isEventOpenForRegistration,
+  );
   return {
-    title: titolo ? `${t('title')}: ${titolo}` : t('title'),
+    ...(anteprima ?? {}),
+    title: anteprima ? `${t('title')}: ${anteprima.title}` : t('title'),
     robots: { index: false },
   };
 }
