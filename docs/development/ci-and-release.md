@@ -14,7 +14,7 @@ Other pages own the neighboring topics:
 - **`ci.yml` is the gate on the way to `main`.** It runs on pull requests into `main`, on pushes to `main` and on manual dispatch. It does not run on `dev`. A red run stops a merge by project rule, not by anything in the workflow files (see [What a red check blocks](#what-a-red-check-blocks)).
 - **`dev.yml` publishes development images** on every push to `dev`: moving `:dev` tags plus an immutable `:dev-<sha>` per build. No SBOM, chart or GitHub Release comes out of it.
 - **`release.yml` publishes a release** when a `vX.Y.Z` tag is pushed: the app and migration images, an SPDX SBOM, the packaged Helm chart and a GitHub Release.
-- **Three components have no numbered releases.** The recorder bot, the recorder controller and the AI post-production worker are published only from `dev`. The patched Jitsi web image has its own workflow and its own tags.
+- **Auxiliary images follow the release.** The recorder bot, the recorder controller, the AI post-production workers and the captions gateway and engine are published as `:dev` from `dev` and with the release version from `release.yml`; the chart derives their tag from the app's. The patched Jitsi web image has its own workflow and its own tags.
 - **Published images are never scanned.** Trivy scans the repository and a local build of the app image in `ci.yml`, never what reaches the registry (see [What is not scanned](#what-is-not-scanned)).
 - **CI builds and never deploys.** No workflow applies anything to a cluster.
 
