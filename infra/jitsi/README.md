@@ -123,6 +123,10 @@ What to know when you change it:
   drop. Schedule it outside events.
 - A later change to the module file does not restart Prosody: the new file reaches the pod, and
   Prosody loads it at its next start. Restart the Prosody StatefulSet when no call is running.
+- After Prosody restarts, restart Jicofo by scaling its Deployment to 0 and back to 1, not with
+  `kubectl rollout restart`: a rolling restart runs the old and the new Jicofo side by side with
+  the same XMPP identity, the new one is disconnected ("Replaced by new connection") and
+  conferences do not start until it is restarted again.
 
 **Checked in the lab** on minikube with the simple profile, with two browsers using lib-jitsi-meet and
 tokens issued by the portal, in both join orders, and through the portal's room with a guest who joined

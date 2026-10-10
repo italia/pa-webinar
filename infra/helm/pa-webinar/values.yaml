@@ -979,7 +979,10 @@ jitsi-meet:
       # spento e il portale non sa di chi è ogni voce: la trascrizione dai
       # sottotitoli non tiene niente e il registratore multitraccia non
       # registra nessuno.
-      PA_PORTAL_URL: '{{ if contains "pa-webinar" .Release.Name }}http://{{ .Release.Name }}:3000{{ else }}http://{{ .Release.Name }}-pa-webinar:3000{{ end }}'
+      # Il nome completo del Service (<servizio>.<namespace>.svc.<dominio>, con
+      # il dominio di global.clusterDomain): il resolver di Prosody non usa i
+      # domini di ricerca del pod, e il nome breve non si risolverebbe.
+      PA_PORTAL_URL: '{{ $servizio := ternary .Release.Name (printf "%s-pa-webinar" .Release.Name) (contains "pa-webinar" .Release.Name) }}{{ $dominio := .Values.global.clusterDomain }}http://{{ $servizio }}{{ if $dominio }}.{{ .Release.Namespace }}.svc.{{ $dominio }}{{ end }}:3000'
     # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
     # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
     # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se
