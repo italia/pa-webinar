@@ -486,7 +486,7 @@ flowchart LR
 
   JIT["Jicofo, JVB,<br/>Jibri, coturn"]:::media
   PROS["Prosody"]:::media
-  JOBS["CronJobs, scaler,<br/>recorder, controller"]:::job
+  JOBS["CronJobs, scaler,<br/>recorder, controller,<br/>captions service"]:::job
   APP["App + db-migrate"]:::portal
   RD[("Redis")]:::data
   PG[("PostgreSQL")]:::data
@@ -560,7 +560,7 @@ verify. Prosody needs the same signing secret as the portal, and the same app ID
 
 | Prosody side | Must equal (application Secret) |
 |---|---|
-| One of: `jitsi-meet.prosody.jwt.existingSecretName` (a Secret with the key `JWT_APP_SECRET`); `jitsi-meet.prosody.jwt.secret` inline; or a `jitsi-meet.prosody.extraSecrets` entry named `JWT_APP_SECRET` that reads `JITSI_JWT_SECRET` from the application Secret, so there is one value to rotate. Never both `secret` and `existingSecretName`. A plain `JWT_APP_SECRET` value in `jitsi-meet.prosody.extraEnvs` or `jitsi-meet.extraCommonEnvs` also works, but the latter lands in the ConfigMap that every Jitsi component loads: prefer a Secret | `JITSI_JWT_SECRET` |
+| One of: `jitsi-meet.prosody.jwt.existingSecretName` (a Secret with the key `JWT_APP_SECRET`); `jitsi-meet.prosody.jwt.secret` inline; or a `jitsi-meet.prosody.extraSecrets` entry named `JWT_APP_SECRET` that reads `JITSI_JWT_SECRET` from the application Secret, so there is one value to rotate. Never both `secret` and `existingSecretName`. A plain `JWT_APP_SECRET` value in `jitsi-meet.prosody.extraEnvs` or `jitsi-meet.extraCommonEnvs` also works, but the latter lands in the ConfigMap that every Jitsi component loads: prefer a Secret. Prosody's occupants module also signs its notifications to the portal with a key derived from this secret ([Jitsi extras](../infra/jitsi/README.md#the-occupants-module)) | `JITSI_JWT_SECRET` |
 | `jitsi-meet.prosody.extraEnvs.JWT_APP_ID` (default `pa_webinar`) | `JITSI_JWT_APP_ID` |
 | `jitsi-meet.prosody.extraEnvs.JWT_ACCEPTED_ISSUERS` (default `pa-webinar`) | `JITSI_JWT_ISSUER` |
 | `jitsi-meet.prosody.extraEnvs.JWT_ACCEPTED_AUDIENCES` (default `jitsi`) | `JITSI_JWT_AUDIENCE` |
@@ -1205,6 +1205,10 @@ The policy allows:
     pods do not carry them (see below);
   - from the Jibri pods, when `jitsi-meet.jibri.enabled` is on, for the finalize script's calls at the
     end of a recording;
+  - from the Prosody pods, when `jitsi.enabled` is on, for the occupants module's notifications
+    ([Jitsi extras](../infra/jitsi/README.md#the-occupants-module));
+  - from the live captions pods, when captions are enabled, for the room context and the sentences of
+    the transcript from captions;
   - from the monitoring namespace (`monitoringNamespaceSelector`), when `allowMonitoring` is on;
   - from anything in `networkPolicy.ingress.extraRules`.
 - **Egress**:

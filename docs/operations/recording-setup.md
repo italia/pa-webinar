@@ -65,7 +65,7 @@ flowchart LR
         direction LR
         Q2{"One audio track<br/>per participant?"}
         V2["Chart values<br/>recorder.enabled: true<br/>recorder.controller.enabled: true<br/>postprod.enabled: true"]
-        P2["Prerequisite<br/>event: recording + Automatic transcription<br/>+ Per-participant recording<br/>separate per-track consent<br/>sensitive voice data"]
+        P2["Prerequisite<br/>event: recording + Automatic transcription<br/>+ Per-participant recording<br/>optional consent checked per track<br/>Prosody module pa_occupants<br/>sensitive voice data"]
         Q3{"Hide the bot<br/>from the room?"}
         V3["Chart values<br/>recorder.hiddenDomain<br/>recorder.xmppSecretName"]
         P3["Prerequisite<br/>Prosody token_verification_allowlist<br/>for the single recorder account<br/>pinned recorder password<br/>jitsi-meet.jibri.enabled: true"]
@@ -335,9 +335,20 @@ A bot starts only when all of these hold:
 
 The controller does not check storage. To upload its tracks the bot needs
 [recording storage](#recording-storage) on the app; without it the tracks
-cannot be uploaded and are lost with the bot's pod. Registrants of such an
-event must give a separate consent to per-track recording; registration is
-refused without it.
+cannot be uploaded and are lost with the bot's pod.
+
+The bot records only the voices of people who consented to the transcription
+of what they say: an optional box at registration and in the waiting room,
+asked of everyone, moderators included. Before recording a track it asks the
+portal, which knows whose voice it is only because Prosody's `mod_pa_occupants`
+reports who joins with which token. The chart loads that module and gives it
+the portal's address by default; it signs its reports with the conference
+token secret that Prosody already has
+([Jitsi extras](../../infra/jitsi/README.md#the-occupants-module)), and the
+render stops when `recorder.enabled` is on but `XMPP_MUC_MODULES` does not load
+`pa_occupants`. With an external Jitsi that does not load the module, the bot
+records no track at all
+([Consent gates](../architecture/recording.md#consent-gates)).
 
 Turn AI post-production on together with the recorder (`postprod.enabled: true`
 and, in the site settings, **Post-event pipeline active**). The tracks exist
@@ -484,7 +495,11 @@ kubectl -n pa-webinar logs job/<recorder-job-name> --tail=100
 ```
 
 The bot's log starts with the work order it claimed and, after the event, reports
-how many tracks the manifest contains. With the hidden domain configured, the
+how many tracks the manifest contains. A voice without consent shows up as
+`TRACK_SKIPPED pid=<endpoint>`. When the portal does not know an endpoint, the
+bot also logs a warning that names `mod_pa_occupants`: if that happens for every
+voice, check that Prosody reports occupants (`room_occupants` gets rows when
+people join). With the hidden domain configured, the
 bot must not appear in the Jitsi participant list.
 
 If the bot is visible or never appears, see
@@ -628,9 +643,9 @@ one hour at 1 Mbps is about 450 MB.
   screen: slides and a few talking heads compress far better than full-motion
   video. Measure it with a test recording of a typical event, for example at an
   average of 1.5 Mbps an hour takes about 675 MB.
-- **Per-participant tracks.** Each bot records every remote audio track as Opus
-  at 32 kbps (`infra/recorder/src/capture.ts`), about 14 MB per participant per
-  hour of recording.
+- **Per-participant tracks.** Each bot records the remote audio track of every
+  participant who consented as Opus at 32 kbps (`infra/recorder/src/capture.ts`),
+  about 14 MB per participant per hour of recording.
 - **AI outputs** (transcripts, subtitles, summaries) are small next to the
   media. Dubbing adds an audio file per target language and, when the
   optional `DUBBED_VIDEO` is produced, a copy of the video with that audio

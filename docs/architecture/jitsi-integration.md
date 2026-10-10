@@ -42,7 +42,7 @@ flowchart LR
   end
   subgraph MID["Jitsi server configuration"]
     L3["3. JWT authentication<br/>Prosody verifies portal-signed tokens"]:::job
-    L4["4. Prosody module<br/>room role taken from the token"]:::job
+    L4["4. Prosody modules<br/>room role, media lock,<br/>captions, occupants"]:::job
   end
   subgraph HIGH["Most invasive: modified Jitsi artifact"]
     L5["5. Patched web bundle<br/>three fixes, located by shape"]:::risk
@@ -62,13 +62,13 @@ flowchart LR
 | IFrame API | `app/src/components/jitsi/jitsi-room.tsx` (the only consumer of IFrame API events, passed to the room as callbacks) | [Embedding through the IFrame API](#embedding-through-the-iframe-api) |
 | Config overrides | `app/src/lib/jitsi/config.ts` | [Configuration applied to every room](#configuration-applied-to-every-room) |
 | JWT authentication | `app/src/lib/auth/jwt.ts` (signing), Prosody environment (verification) | [Authentication bridge](#authentication-bridge-the-prosody-side) |
-| Prosody module | `infra/jitsi/prosody-plugins/mod_token_affiliation_custom.lua` | [Prosody extensions](#prosody-extensions) |
+| Prosody modules | `infra/jitsi/prosody-plugins/` (`mod_token_affiliation_custom`, `mod_pa_media_lock`, `mod_pa_captions`, `mod_pa_occupants`) | [Prosody extensions](#prosody-extensions) |
 | Patched web bundle | `infra/jitsi-web-patched/` | [The patched web image](#the-patched-web-image) |
 
 ### What is never done
 
 - **No fork of the Jitsi source.** Server-side behavior changes only through the configuration that the
-  official Jitsi images expose, plus one Prosody module that Jitsi's plugin mechanism loads.
+  official Jitsi images expose, plus the project's Prosody modules that Jitsi's plugin mechanism loads.
 - **No `lib-jitsi-meet` in the portal.** The portal talks to Jitsi only through the IFrame API. The only
   code that uses `lib-jitsi-meet` directly is the recorder bot (`infra/recorder`) and test harnesses
   such as `scripts/load-test/coherence-bots.mjs`.
@@ -601,7 +601,8 @@ owner is present. For roles to come from the token, three pieces work together:
 jitsi-meet:
   prosody:
     extraEnvs:
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants
+      PA_PORTAL_URL: http://<fullname>:3000   # for pa_occupants
     extraVolumes:          # the ConfigMap pa-webinar-prosody-plugins, rendered by the chart
     extraVolumeMounts:     # mounted read-only at /prosody-plugins-custom
   jicofo:
@@ -619,14 +620,41 @@ per namespace. The first upgrade to a chart with this wiring restarts Prosody an
 ([Upgrades and rollback](../operations/upgrades.md)).
 
 **Docker Compose** mounts `infra/jitsi/prosody-plugins/` into the Prosody container at
-`/prosody-plugins-custom`, enables the three modules, and turns off Jicofo's authentication and its
-auto-owner rule, as the chart does.
+`/prosody-plugins-custom`, enables the project's modules, gives `pa_occupants` the portal's address, and
+turns off Jicofo's authentication and its auto-owner rule, as the chart does.
 
 The wiring, and what was checked on a lab cluster (moderator links as moderators, registrants and
 guests as participants whoever joins first, a participant's mute or kick of the moderator refused), are
 in [Jitsi extras](../../infra/jitsi/README.md#where-it-is-loaded). Recording through Jibri was not part
 of that check. The portal decides separately who sees its moderator controls, and its per-role
 configuration of Jitsi's interface is applied in the browser, so it is not an access control.
+
+### Who is in the room
+
+The captions service and the multitrack recorder see each voice only by its bridge endpoint. To honor
+each person's consent, the portal has to know which token stands behind an endpoint. The project's
+module `mod_pa_occupants` tells it: on `muc-occupant-joined` and `muc-occupant-left` it posts the room,
+the meeting id, the endpoint (the resource of the occupant's nickname) and the seat of the token
+(`context.user.id`) to `POST /api/internal/jitsi/occupants`, with the send time, signed with a key
+derived from the conference token secret. It sends no name or address, and skips occupants without a
+token and Jicofo. The portal finds the event by room name, exact first, then ignoring case, and keeps
+the rows (`room_occupants`) for every event when live captions are available and on for the instance,
+whatever the event's own captions switch, and for every event with per-participant recording, so that
+people who joined before captions or the transcript were turned on are still attributed; otherwise it
+keeps nothing. It uses the rows to decide, voice by voice, whether
+the transcript from captions keeps a sentence and whether the recorder records a track
+([Live captions](live-captions.md#transcript-from-captions), [Recording](recording.md#consent-gates)).
+
+The module acts only when Prosody has `PA_PORTAL_URL`, which the chart builds from the release name,
+and `JWT_APP_SECRET`, the secret with which Prosody already verifies the portal's tokens. The signature
+is an HMAC-SHA256 of the request body, in the `x-pa-signature` header, keyed with an HMAC-SHA256 of the
+secret over the label `pa-occupants`, so a signature cannot serve as a conference token. The portal
+checks it with `JITSI_JWT_SECRET` and refuses a notification whose send time (`ts`) is more than 300
+seconds away from its own clock (`app/src/lib/auth/prosody-signature.ts`). Prosody therefore holds no
+portal key of its own. Without the module, as with an external Jitsi that does not load it, the
+transcript from captions keeps no text and the recorder records no track; the chart refuses to render
+`recorder.enabled` when `XMPP_MUC_MODULES` lacks `pa_occupants`. Details are in
+[Jitsi extras](../../infra/jitsi/README.md#the-occupants-module).
 
 ### The hidden domain for the recorder bot
 
@@ -877,6 +905,9 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    (the room's `av_moderation` state and the shape of its messages): in a room of an event that grants
    participants nothing, check that a guest who forces the microphone on is not heard, that a speaker is
    heard, and that Jicofo's log reads `Moderation for AUDIO ... was enabled by focus`.
+   `mod_pa_occupants` reads the session field `jitsi_meet_context_user`, the occupant's nickname and
+   the room's `meetingId`: in a room of an event, check that a row appears in `room_occupants` for each
+   person who joins, with the seat of their token, and that Prosody logs no `Occupanti:` warning.
 5. **Check the configuration keys and API surface the app relies on.** Toolbar button names, the nested
    `raisedHands.disableRemoveRaisedHandOnFocus`, `disableSelfView`, the IFrame API commands and events
    in the tables above, and the roster shape of `getParticipantsInfo()` (`app/src/lib/jitsi/participants.ts`
