@@ -250,7 +250,6 @@
       "organizationRequired": "Jekk jogħġbok daħħal l-entità tiegħek",
       "consentRequired": "Il-kunsens għall-ipproċessar tad-dejta huwa obbligatorju",
       "recordingConsentRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju għal dan l-avveniment",
-      "multitrackConsentRequired": "Il-kunsens għar-reġistrazzjoni tat-traċċa awdjo tiegħek huwa obbligatorju għal dan l-avveniment",
       "eventFull": "L-avveniment laħaq in-numru massimu ta' parteċipanti",
       "generic": "Żball waqt ir-reġistrazzjoni. Jekk jogħġbok erġa' pprova."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Teħtieġ is-servizz tal-whiteboard tal-installazzjoni; fejn ikun disponibbli, hija dejjem attiva fis-sejħiet istantanji.",
       "liveCaptionsEnabled": "Sottotitoli awtomatiċi",
       "liveCaptionsEnabledDesc": "Dak li jgħidu l-kelliema jidher taħt il-vidjo, traskritt f'ħin reali: jgħin lil min ma jismax jew isibha diffiċli jsegwi. Il-moderaturi jistgħu jitfuhom ukoll waqt l-avveniment dirett mit-tab “Kontroll”, u kulħadd jista' jaħbihom għalih innifsu.",
+      "captionsTranscriptEnabled": "Traskrizzjoni mis-sottotitoli",
+      "captionsTranscriptEnabledDesc": "Is-sentenzi ta' min jagħti l-kunsens jinżammu b'isimhom u, meta jispiċċa l-avveniment, isiru t-traskrizzjoni tiegħu, anke mingħajr reġistrazzjoni jew ipproċessar bl-IA. Min ma jagħtix il-kunsens jidher biss fis-sottotitoli diretti.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
       "autoStartRecordingDesc": "Al momento tal-bidu tal-avveniment il-reġistrazzjoni partu da sola (senza chiederu ikkonferma lill-moderatur). Hekk eventuali ritardatari trovano diġà il player disponibbli.",
       "aiSectionHeading": "Post-produzzjoni awtomatika",
@@ -2686,6 +2687,13 @@
       "editFailed": "Il-bidliet ma setgħux jiġu salvati (HTTP {code})",
       "editFailedDetail": "Il-bidliet ma setgħux jiġu salvati: {message}",
       "editMediaError": "L-awdjo tar-reġistrazzjoni ma setax jitgħabba: ir-riproduzzjoni mhijiex disponibbli. Xorta tista' tikkoreġi t-test u l-kelliema ta' kull segment.",
+      "editNoMedia": "Traskrizzjoni mibnija mis-sottotitoli diretti: m'hemmx awdjo x'tindaqq.",
+      "captionsSource": "mis-sottotitoli diretti",
+      "captionsRebuild": "Aġġorna mis-sottotitoli",
+      "captionsRebuildDone": "It-traskrizzjoni ġiet aġġornata mis-sottotitoli.",
+      "captionsRebuildKept": "It-traskrizzjoni ġiet ikkoreġuta bl-idejn jew ġejja mill-IA: ma ġietx sostitwita.",
+      "captionsRebuildNone": "Xejn x'jiġi aġġornat: m'hemmx sentenzi salvati jew il-perjodu taż-żamma tad-data tal-avveniment intemm.",
+      "captionsRebuildAiRunning": "L-ipproċessar tal-IA qed jittraskrivi l-vidjo: it-traskrizzjoni tiegħu se tieħu post dik mis-sottotitoli.",
       "summaryLoadError": "Is-sommarju ma setax jinġieb.",
       "summaryLoading": "Qed jitgħabba s-sommarju…",
       "summaryEmptyProcessing": "Is-sommarju tal-AI għadu mhux lest: l-ipproċessar għaddej. Aġġorna l-paġna fi ftit minuti.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Il-paġna tibqa' tidher, iżda jistgħu jirreġistraw biss il-mistednin; mingħajr reġistrazzjoni ma tidħolx"
       },
       "previewInvitation": "Jistgħu jirreġistraw biss dawk li tistieden; ħadd ma jidħol mingħajr reġistrazzjoni."
+    },
+    "captionsTranscript": {
+      "title": "Traskrizzjoni mis-sottotitoli",
+      "intro": "Is-sentenzi tas-sottotitoli ta' min ta l-kunsens għat-traskrizzjoni tal-interventi tiegħu jsiru t-traskrizzjoni tal-avveniment, anke mingħajr reġistrazzjoni u mingħajr ipproċessar tal-IA.",
+      "stats": "Sentenzi salvati: {saved} · vuċijiet: {voices} · sentenzi mhux salvati, mingħajr kunsens: {skipped}",
+      "none": "It-traskrizzjoni għadha ma nbnietx: tinbena waħedha wara t-tmiem tal-avveniment, jew tista' tibniha issa.",
+      "empty": "L-ebda sentenza ma ġiet salvata: ħadd ma tkellem bil-kunsens għat-traskrizzjoni.",
+      "fromCaptions": "Traskrizzjoni mibnija mis-sottotitoli.",
+      "fromAi": "Hemm traskrizzjoni mill-ipproċessar tal-IA: għandha prijorità fuq dik mis-sottotitoli.",
+      "revised": "It-traskrizzjoni ġiet ikkoreġuta bl-idejn: l-aġġornament mis-sottotitoli ma jissostitwihiex.",
+      "build": "Ibni t-traskrizzjoni",
+      "rebuild": "Aġġorna mis-sottotitoli",
+      "openEditor": "Iftaħ fl-editur",
+      "publish": "Ippubblika t-traskrizzjoni fil-paġna tal-avveniment",
+      "publishDesc": "Tista' tinqara anke mingħajr vidjo. Irrevedi l-ewwel: is-sottotitoli awtomatiċi jista' jkollhom żbalji.",
+      "publishWithVideo": "Il-vidjo ppubblikat diġà juriha; din l-għażla żżommha viżibbli anke jekk il-vidjo jiġi rtirat.",
+      "built": "It-traskrizzjoni ġiet aġġornata.",
+      "kept": "It-traskrizzjoni ġiet ikkoreġuta bl-idejn jew ġejja mill-IA: ma ġietx sostitwita.",
+      "failed": "L-operazzjoni ma rnexxietx.",
+      "loadFailed": "Ma kienx possibbli li jitgħabba l-istat tat-traskrizzjoni.",
+      "expired": "Il-perjodu taż-żamma tad-data tal-avveniment intemm: it-traskrizzjoni ma terġax tinbena.",
+      "aiRunning": "L-ipproċessar tal-IA qed jittraskrivi l-vidjo: it-traskrizzjoni tiegħu se tieħu post dik mis-sottotitoli."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Nagħti l-kunsens tiegħi għar-reġistrazzjoni tal-awdjo/vidjo ta' dan l-avveniment",
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
       "recordingNotice": "L-avveniment qed jiġi rrekordjat (awdjo u vidjo). Qed tipparteċipa mingħajr mikrofonu jew kamera: ir-reġistrazzjoni ma fihiex il-vuċi jew l-immaġni tiegħek, sakemm min jikkonduċi ma jagħtikx il-kelma.",
-      "multitrack": "Nagħti l-kunsens għar-reġistrazzjoni ta' traċċa awdjo separata tal-vuċi tiegħi, unikament biex it-traskrizzjoni tiġi attribwita korrettament lil kull kelliem. It-traċċa hija temporanja u titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi l-vuċi tiegħi.",
-      "multitrackRequired": "Il-kunsens għar-reġistrazzjoni tat-traċċa awdjo tiegħek huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
+      "multitrack": "Nagħti l-kunsens li l-interventi tiegħi jiġu traskritti, b'ismi, għar-rapport tal-avveniment. Jekk l-avveniment jirreġistra korsa tal-awdjo separata għal kull persuna, leħni jiġi rreġistrat għal dan l-iskop biss u l-korsa titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi leħni.",
+      "multitrackOptional": "Huwa fakultattiv: jekk ma tagħtix il-kunsens xorta tista' tipparteċipa, iżda leħnek ma jiġix irreġistrat u l-interventi tiegħek ma jidħlux fit-traskrizzjoni.",
       "stayInTouch": "Irrid nirċievi informazzjoni dwar l-avvenimenti li ġejjin u nkun miżjud fil-ktieb tal-indirizzi, biex inkun mistieden għal avvenimenti simili",
       "stayInTouchHelp": "Kunsens fakultattiv (art. 6.1.a GDPR). Tista' tirtirah meta trid bil-link \"Neħħini mill-ktieb tal-indirizzi\" fl-emails li tirċievi. L-isem u l-organizzazzjoni huma dawk ta' din ir-reġistrazzjoni."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Sommarju",
     "aiBadgeLabel": "Kontenut iġġenerat bl-AI",
     "aiBadgeBody": "It-traskrizzjoni u s-sommarju huma prodotti awtomatikament mill-pipeline tal-AI fil-cluster. Jista' jkun fihom żbalji; il-vidjow jibqa' s-sors awtorevoli.",
+    "captionsBadgeBody": "It-traskrizzjoni ġejja mis-sottotitoli awtomatiċi tad-diretta u tinkludi biss l-interventi ta' min ta l-kunsens. Jista' jkun fiha żbalji.",
     "revisedByPerson": "It-test ġie rivedut minn persuna wara li ġie ġġenerat awtomatikament.",
     "searchPlaceholder": "Fittex fit-traskrizzjoni…",
     "searchLabel": "Fittex fit-traskrizzjoni",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Uri l-pjazza",
     "aiNoticeTitle": "Ipproċessar bl-IA wara l-avveniment",
     "aiNotice": "Fl-aħħar, ir-reġistrazzjoni tiġi pproċessata b'għodod ta' intelliġenza artifiċjali biex jinħolqu traskrizzjoni, sommarju u eventwali traduzzjonijiet u doppjaġġi. Ir-riżultati jistgħu jkun fihom impreċiżjonijiet; il-vidjo jibqa' s-sors awtorevoli.",
-    "multitrackConsentTitle": "Reġistrazzjoni għal kull parteċipant",
-    "multitrackConsentRequired": "Trid taċċetta r-reġistrazzjoni tat-traċċa awdjo tiegħek biex tidħol",
+    "multitrackConsentTitle": "Traskrizzjoni tal-interventi tiegħek",
     "recordingConsentTitle": "Reġistrazzjoni tal-avveniment",
     "recordingConsentIntro": "L-avveniment qed jiġi rreġistrat (awdjo u vidjo). Jekk titkellem, ir-reġistrazzjoni fiha leħnek, l-immaġni tiegħek u dak li taqsam fuq l-iskrin.",
     "recordingConsentRequired": "Biex tidħol hemm bżonn il-kunsens tiegħek għar-reġistrazzjoni.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Sottotitoli awtomatiċi",
-    "captionsNotice": "Waqt ix-xandira diretta, il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli. It-traskrizzjoni ssir fuq is-servers li jospitaw il-pjattaforma u t-test ma jinżammx. Is-sottotitoli jistgħu jinħbew bil-buttuna tas-sottotitoli fil-bar tas-sejħa."
+    "captionsNotice": "Waqt ix-xandira diretta, il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli. It-traskrizzjoni ssir fuq is-servers li jospitaw il-pjattaforma u t-test ma jinżammx. Is-sottotitoli jistgħu jinħbew bil-buttuna tas-sottotitoli fil-bar tas-sejħa.",
+    "captionsNoticeTranscript": "Matul id-diretta, il-vuċi ta' min qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli, fuq is-servers li jospitaw il-pjattaforma. It-test jinżamm, bl-isem, biss għal min ta l-kunsens għat-traskrizzjoni tal-interventi tiegħu, u jsir it-traskrizzjoni tal-avveniment. Is-sottotitoli jistgħu jinħbew bil-buttuna tas-sottotitoli fil-barra tas-sejħa."
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

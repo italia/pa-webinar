@@ -13,7 +13,7 @@
  */
 
 /** Cio' che, a sala aperta, trattiene ancora dall'entrare: un campo del modulo. */
-export type BloccoModulo = 'name' | 'email' | 'recording' | 'consent';
+export type BloccoModulo = 'name' | 'email' | 'recording';
 
 export interface StatoIngressoInput {
   /** L'evento e' avviato (LIVE). */
@@ -26,8 +26,6 @@ export interface StatoIngressoInput {
   recordingRequired: boolean;
   recordingConsent: boolean;
   /** Serve il consenso alla registrazione per partecipante. */
-  multitrackRequired: boolean;
-  multitrackConsent: boolean;
   /** C'e' stato un tentativo d'ingresso (pulsante, cancello della piazza). */
   ingressoTentato: boolean;
   /** Il nome e' quello definitivo: il browser ha gia' restituito quello
@@ -58,9 +56,7 @@ export function statoIngresso(i: StatoIngressoInput): StatoIngresso {
       ? 'email'
       : i.recordingRequired && !i.recordingConsent
         ? 'recording'
-        : i.multitrackRequired && !i.multitrackConsent
-          ? 'consent'
-          : null;
+        : null;
   const ingressoAperto = i.canEnterLive && i.ingressoConsentito;
   // Prima che la sala apra — conto alla rovescia, sala in preparazione —
   // chiedere il nome sarebbe un errore segnalato a chi non ha ancora niente

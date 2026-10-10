@@ -474,6 +474,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
+      ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
@@ -526,6 +527,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       }),
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
+      }),
+      ...(data.captionsTranscriptEnabled !== undefined && {
+        captionsTranscriptEnabled: data.captionsTranscriptEnabled,
       }),
       ...(data.liveCaptionsEnabled !== undefined && {
         liveCaptionsEnabled: data.liveCaptionsEnabled,

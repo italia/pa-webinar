@@ -250,7 +250,6 @@
       "organizationRequired": "Introduza o seu organismo de pertença",
       "consentRequired": "O consentimento para o tratamento de dados é obrigatório",
       "recordingConsentRequired": "O consentimento para a gravação é obrigatório para este evento",
-      "multitrackConsentRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório neste evento",
       "eventFull": "O evento atingiu o número máximo de participantes",
       "generic": "Erro durante a inscrição. Tente novamente."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Ativa o quadro branco colaborativo nativo (Excalidraw): os moderadores podem abri-lo a partir da barra de ferramentas durante o evento. Requer o serviço de quadro branco da instalação; onde existe, está sempre ativo nas chamadas instantâneas.",
       "liveCaptionsEnabled": "Legendas automáticas",
       "liveCaptionsEnabledDesc": "O que os oradores dizem aparece por baixo do vídeo, transcrito em tempo real: ajuda quem não ouve ou tem dificuldade em acompanhar. Quem modera também as pode desativar durante o direto no separador «Régie», e cada pessoa pode ocultá-las para si.",
+      "captionsTranscriptEnabled": "Transcrição a partir das legendas",
+      "captionsTranscriptEnabledDesc": "As frases de quem dá consentimento são guardadas com o seu nome e, no fim do evento, tornam-se a sua transcrição, mesmo sem gravação nem processamento por IA. Quem não dá consentimento aparece apenas nas legendas em direto.",
       "autoStartRecording": "Iniciar a gravação automaticamente",
       "autoStartRecordingDesc": "No início do evento, a gravação começa automaticamente (sem pedir confirmação ao moderador). Assim, eventuais retardatários encontram já o leitor disponível.",
       "aiSectionHeading": "Pós-produção automática",
@@ -2686,6 +2687,13 @@
       "editFailed": "Não foi possível guardar (HTTP {code})",
       "editFailedDetail": "Não foi possível guardar: {message}",
       "editMediaError": "Não foi possível carregar o áudio da gravação: a reprodução não está disponível. Ainda assim, pode corrigir o texto e os oradores dos segmentos.",
+      "editNoMedia": "Transcrição criada a partir das legendas em direto: não há áudio para reproduzir.",
+      "captionsSource": "das legendas em direto",
+      "captionsRebuild": "Atualizar a partir das legendas",
+      "captionsRebuildDone": "Transcrição atualizada a partir das legendas.",
+      "captionsRebuildKept": "A transcrição foi corrigida à mão ou vem da IA: não foi substituída.",
+      "captionsRebuildNone": "Nada para atualizar: não há frases guardadas ou o prazo de conservação dos dados do evento terminou.",
+      "captionsRebuildAiRunning": "O processamento de IA está a transcrever o vídeo: a sua transcrição substituirá a das legendas.",
       "summaryLoadError": "Não foi possível carregar o resumo.",
       "summaryLoading": "A carregar o resumo…",
       "summaryEmptyProcessing": "O resumo de IA ainda não está pronto: o processamento está em curso. Atualize a página dentro de alguns minutos.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "A página continua visível, mas só os convidados se podem inscrever; sem inscrição não se entra"
       },
       "previewInvitation": "Só as pessoas que convidar se podem inscrever; ninguém entra sem inscrição."
+    },
+    "captionsTranscript": {
+      "title": "Transcrição das legendas",
+      "intro": "As frases das legendas de quem aceitou a transcrição das suas intervenções tornam-se a transcrição do evento, mesmo sem gravação e sem processamento de IA.",
+      "stats": "Frases guardadas: {saved} · vozes: {voices} · frases não guardadas, sem consentimento: {skipped}",
+      "none": "Transcrição ainda não criada: cria-se sozinha após o fim do evento, ou pode criá-la agora.",
+      "empty": "Nenhuma frase guardada: ninguém falou com consentimento para a transcrição.",
+      "fromCaptions": "Transcrição criada a partir das legendas.",
+      "fromAi": "Existe uma transcrição do processamento de IA: tem prioridade sobre a das legendas.",
+      "revised": "Transcrição corrigida à mão: atualizá-la a partir das legendas não a substitui.",
+      "build": "Criar a transcrição",
+      "rebuild": "Atualizar a partir das legendas",
+      "openEditor": "Abrir no editor",
+      "publish": "Publicar a transcrição na página do evento",
+      "publishDesc": "Pode ser lida também sem vídeo. Reveja-a primeiro: as legendas automáticas podem conter erros.",
+      "publishWithVideo": "O vídeo publicado já a mostra; esta opção mantém-na visível mesmo que o vídeo seja retirado.",
+      "built": "Transcrição atualizada.",
+      "kept": "A transcrição foi corrigida à mão ou vem da IA: não foi substituída.",
+      "failed": "A operação falhou.",
+      "loadFailed": "Não foi possível carregar o estado da transcrição.",
+      "expired": "O prazo de conservação dos dados do evento terminou: a transcrição não é recriada.",
+      "aiRunning": "O processamento de IA está a transcrever o vídeo: a sua transcrição substituirá a das legendas."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Autorizo a gravação áudio/vídeo do evento",
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
       "recordingNotice": "O evento é gravado (áudio e vídeo). Participa sem microfone nem câmara: a gravação não contém a sua voz nem a sua imagem, salvo se quem modera lhe der a palavra.",
-      "multitrack": "Consinto a gravação de uma faixa de áudio separada da minha voz, com o único objetivo de atribuir corretamente a transcrição a cada pessoa que fala. A faixa é temporária e eliminada após a transcrição; não é usada para identificar nem reproduzir a minha voz.",
-      "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento",
+      "multitrack": "Dou o meu consentimento para que as minhas intervenções sejam transcritas, com o meu nome, para o relatório do evento. Se o evento gravar uma faixa áudio separada para cada pessoa, a minha voz é gravada apenas para este fim e a faixa é eliminada após a transcrição; não é usada para identificar ou reproduzir a minha voz.",
+      "multitrackOptional": "É opcional: se não der o seu consentimento, pode participar na mesma, mas a sua voz não é gravada e as suas intervenções não entram na transcrição.",
       "stayInTouch": "Quero receber informações sobre os próximos eventos e ser incluído no livro de endereços, para ser convidado para eventos semelhantes",
       "stayInTouchHelp": "Consentimento facultativo (art. 6.1.a RGPD). Pode retirá-lo a qualquer momento através da ligação «Remover-me do livro de endereços» nos e-mails que receber. O nome e a organização são os desta inscrição."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Resumo",
     "aiBadgeLabel": "Conteúdo gerado por IA",
     "aiBadgeBody": "A transcrição e o resumo são produzidos automaticamente pela pipeline de IA no cluster. Podem conter erros; o vídeo continua a ser a fonte autorizada.",
+    "captionsBadgeBody": "A transcrição vem das legendas automáticas do direto e inclui apenas as intervenções de quem deu o seu consentimento. Pode conter erros.",
     "revisedByPerson": "O texto foi revisto por uma pessoa depois de gerado automaticamente.",
     "searchPlaceholder": "Pesquisar na transcrição…",
     "searchLabel": "Pesquisar na transcrição",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Mostrar a praça",
     "aiNoticeTitle": "Processamento por IA depois do evento",
     "aiNotice": "No final, a gravação será processada por ferramentas de inteligência artificial para gerar transcrição, resumo e eventuais traduções e dobragens. Os resultados podem conter imprecisões; o vídeo continua a ser a fonte autoritativa.",
-    "multitrackConsentTitle": "Gravação por participante",
-    "multitrackConsentRequired": "Tem de aceitar a gravação da sua faixa de áudio para entrar",
+    "multitrackConsentTitle": "Transcrição das suas intervenções",
     "recordingConsentTitle": "Gravação do evento",
     "recordingConsentIntro": "Este evento é gravado (áudio e vídeo). Se intervier, a gravação contém a sua voz, a sua imagem e o que partilhar no ecrã.",
     "recordingConsentRequired": "Para entrar é necessário o seu consentimento para a gravação.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Legendas automáticas",
-    "captionsNotice": "Durante a transmissão em direto, a voz de quem fala é transcrita em tempo real para mostrar legendas. A transcrição é feita nos servidores que alojam a plataforma e o texto não é guardado. As legendas podem ser ocultadas com o botão das legendas na barra da chamada."
+    "captionsNotice": "Durante a transmissão em direto, a voz de quem fala é transcrita em tempo real para mostrar legendas. A transcrição é feita nos servidores que alojam a plataforma e o texto não é guardado. As legendas podem ser ocultadas com o botão das legendas na barra da chamada.",
+    "captionsNoticeTranscript": "Durante o direto, a voz de quem fala é transcrita em tempo real para mostrar as legendas, nos servidores que alojam a plataforma. O texto é conservado, com o nome, apenas para quem aceitou a transcrição das suas intervenções, e torna-se a transcrição do evento. As legendas podem ser ocultadas com o botão das legendas na barra da chamada."
   },
   "recording": {
     "management": "Gravação de vídeo",

@@ -250,7 +250,6 @@
       "organizationRequired": "Lūdzu, ievadiet savu organizāciju",
       "consentRequired": "Piekrišana datu apstrādei ir obligāta",
       "recordingConsentRequired": "Šim pasākumam nepieciešama piekrišana ierakstīšanai",
-      "multitrackConsentRequired": "Šajā pasākumā ir obligāta piekrišana jūsu audio celiņa ierakstīšanai",
       "eventFull": "Pasākums ir sasniedzis maksimālo dalībnieku skaitu",
       "generic": "Reģistrācijas kļūda. Lūdzu, mēģiniet vēlreiz."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Nepieciešams instalācijas tāfeles pakalpojums; kur tas ir pieejams, tūlītējos zvanos tāfele ir vienmēr ieslēgta.",
       "liveCaptionsEnabled": "Automātiskie subtitri",
       "liveCaptionsEnabledDesc": "Runātāju teiktais parādās zem video, transkribēts reāllaikā: tas palīdz tiem, kas nedzird vai kam grūti sekot. Moderatori tos var izslēgt arī tiešraides laikā cilnē “Vadība”, un ikviens tos var paslēpt sev.",
+      "captionsTranscriptEnabled": "Atšifrējums no subtitriem",
+      "captionsTranscriptEnabledDesc": "To cilvēku teikumi, kuri piekrīt, tiek saglabāti ar viņu vārdu un pēc pasākuma kļūst par tā atšifrējumu, arī bez ieraksta vai MI apstrādes. Tie, kuri nepiekrīt, redzami tikai tiešraides subtitros.",
       "autoStartRecording": "Sākt ierakstīšanu automātiski",
       "autoStartRecordingDesc": "Pasākuma sākumā ieraksts sākas pats (moderatoram netiek prasīts apstiprinājums). Vēlīni dalībnieki uzreiz atrod pieejamu atskaņotāju.",
       "aiSectionHeading": "Automātiskā pēcapstrāde",
@@ -2686,6 +2687,13 @@
       "editFailed": "Saglabāšana neizdevās (HTTP {code})",
       "editFailedDetail": "Saglabāšana neizdevās: {message}",
       "editMediaError": "Neizdevās ielādēt ieraksta audio: atskaņošana nav pieejama. Segmentu tekstu un runātājus joprojām varat labot.",
+      "editNoMedia": "Atšifrējums no tiešraides subtitriem: nav audio, ko atskaņot.",
+      "captionsSource": "no tiešraides subtitriem",
+      "captionsRebuild": "Atjaunināt no subtitriem",
+      "captionsRebuildDone": "Atšifrējums atjaunināts no subtitriem.",
+      "captionsRebuildKept": "Atšifrējums ir labots manuāli vai iegūts ar MI: tas netika aizstāts.",
+      "captionsRebuildNone": "Nav ko atjaunināt: nav saglabātu teikumu vai pasākuma datu glabāšanas laiks ir beidzies.",
+      "captionsRebuildAiRunning": "MI apstrāde atšifrē video: tās atšifrējums aizstās atšifrējumu no subtitriem.",
       "summaryLoadError": "Neizdevās ielādēt kopsavilkumu.",
       "summaryLoading": "Notiek kopsavilkuma ielāde…",
       "summaryEmptyProcessing": "MI kopsavilkums vēl nav gatavs: notiek apstrāde. Atsvaidziniet lapu pēc dažām minūtēm.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai uzaicinātie; bez reģistrācijas iekļūt nevar"
       },
       "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā."
+    },
+    "captionsTranscript": {
+      "title": "Atšifrējums no subtitriem",
+      "intro": "To cilvēku subtitru teikumi, kuri piekrita savu runu atšifrēšanai, kļūst par pasākuma atšifrējumu arī bez ieraksta un bez MI apstrādes.",
+      "stats": "Saglabātie teikumi: {saved} · balsis: {voices} · nesaglabātie teikumi, bez piekrišanas: {skipped}",
+      "none": "Atšifrējums vēl nav izveidots: tas izveidojas pats pēc pasākuma beigām, vai varat to izveidot tagad.",
+      "empty": "Nav saglabātu teikumu: neviens nerunāja ar piekrišanu atšifrēšanai.",
+      "fromCaptions": "Atšifrējums izveidots no subtitriem.",
+      "fromAi": "Ir MI apstrādes atšifrējums: tam ir prioritāte pār atšifrējumu no subtitriem.",
+      "revised": "Atšifrējums ir labots manuāli: atjaunināšana no subtitriem to neaizstāj.",
+      "build": "Izveidot atšifrējumu",
+      "rebuild": "Atjaunināt no subtitriem",
+      "openEditor": "Atvērt redaktorā",
+      "publish": "Publicēt atšifrējumu pasākuma lapā",
+      "publishDesc": "To var lasīt arī bez video. Vispirms to pārskatiet: automātiskajos subtitros var būt kļūdas.",
+      "publishWithVideo": "Publicētais video to jau rāda; šī izvēle to saglabā redzamu arī tad, ja video tiek atsaukts.",
+      "built": "Atšifrējums atjaunināts.",
+      "kept": "Atšifrējums ir labots manuāli vai iegūts ar MI: tas netika aizstāts.",
+      "failed": "Darbība neizdevās.",
+      "loadFailed": "Neizdevās ielādēt atšifrējuma statusu.",
+      "expired": "Pasākuma datu glabāšanas laiks ir beidzies: atšifrējums netiek veidots no jauna.",
+      "aiRunning": "MI apstrāde atšifrē video: tās atšifrējums aizstās atšifrējumu no subtitriem."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
       "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
-      "multitrack": "Piekrītu, ka manas balss ieraksts tiek veikts atsevišķā audio celiņā vienīgi ar mērķi pareizi attiecināt atšifrējumu uz katru runātāju. Celiņš ir pagaidu un pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atskaņošanai.",
-      "multitrackRequired": "Piekrišana jūsu audio celiņa ierakstīšanai ir obligāta, lai piedalītos šajā pasākumā",
+      "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
+      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā varat piedalīties, bet jūsu balss netiek ierakstīta un jūsu teiktais neietilpst atšifrējumā.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Kopsavilkums",
     "aiBadgeLabel": "MI ģenerēts saturs",
     "aiBadgeBody": "Transkripciju un kopsavilkumu automātiski izveido klasterī izvietotais MI konveijers. Tajos var būt kļūdas; autoritatīvais avots ir video.",
+    "captionsBadgeBody": "Atšifrējums ir no tiešraides automātiskajiem subtitriem un ietver tikai to cilvēku runas, kuri devuši piekrišanu. Tajā var būt kļūdas.",
     "revisedByPerson": "Tekstu pēc automātiskās ģenerēšanas ir pārskatījis cilvēks.",
     "searchPlaceholder": "Meklēt transkripcijā…",
     "searchLabel": "Meklēt transkripcijā",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Rādīt laukumu",
     "aiNoticeTitle": "MI apstrāde pēc pasākuma",
     "aiNotice": "Beigās ieraksts tiks apstrādāts ar mākslīgā intelekta rīkiem, lai izveidotu atšifrējumu, kopsavilkumu un iespējamos tulkojumus un dublējumus. Rezultāti var saturēt neprecizitātes; video paliek noteicošais avots.",
-    "multitrackConsentTitle": "Ieraksts pa dalībniekiem",
-    "multitrackConsentRequired": "Lai ienāktu, jums jāpiekrīt savas audio celiņa ierakstīšanai",
+    "multitrackConsentTitle": "Jūsu uzstāšanos atšifrējums",
     "recordingConsentTitle": "Pasākuma ieraksts",
     "recordingConsentIntro": "Pasākums tiek ierakstīts (audio un video). Ja jūs uzstājaties, ierakstā ir jūsu balss, jūsu attēls un tas, ko kopīgojat ekrānā.",
     "recordingConsentRequired": "Lai ienāktu, nepieciešama jūsu piekrišana ierakstam.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automātiskie subtitri",
-    "captionsNotice": "Tiešraides laikā runātāja balss reāllaikā tiek transkribēta, lai rādītu subtitrus. Transkribēšana notiek serveros, kuros darbojas platforma, un teksts netiek saglabāts. Subtitrus var paslēpt ar subtitru pogu zvana rīkjoslā."
+    "captionsNotice": "Tiešraides laikā runātāja balss reāllaikā tiek transkribēta, lai rādītu subtitrus. Transkribēšana notiek serveros, kuros darbojas platforma, un teksts netiek saglabāts. Subtitrus var paslēpt ar subtitru pogu zvana rīkjoslā.",
+    "captionsNoticeTranscript": "Tiešraides laikā runātāja balss reāllaikā tiek atšifrēta, lai rādītu subtitrus, serveros, kuros mitinās platforma. Teksts ar vārdu tiek saglabāts tikai tiem, kuri piekrita savu runu atšifrēšanai, un tas kļūst par pasākuma atšifrējumu. Subtitrus var paslēpt ar subtitru pogu zvana joslā."
   },
   "recording": {
     "management": "Video ieraksts",

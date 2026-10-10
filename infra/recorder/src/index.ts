@@ -20,6 +20,7 @@ import { captureRoom, type CaptureConfig } from './capture.js';
 import { buildManifest, type ManifestTrack } from './manifest.js';
 import { localTrackFilename } from './paths.js';
 import { claimWorkOrder } from './claim.js';
+import { makeConsentCheck } from './consent.js';
 import {
   PresignStorageProvider,
   uploadRecording,
@@ -152,6 +153,12 @@ export async function main(): Promise<void> {
     idleTimeoutSec: env.idleTimeoutSec,
     initialGraceSec: env.initialGraceSec,
     maxDurationSec: env.maxDurationSec,
+    // Si registra solo la voce di chi ha dato il consenso (consent.ts).
+    consentCheck: makeConsentCheck({
+      portalUrl: env.portalUrl,
+      cronApiKey: env.cronApiKey,
+      eventId: wo.eventId,
+    }),
   };
 
   // ── 3. Cattura WebRTC (blocca fino a fine evento) ──

@@ -250,7 +250,6 @@
       "organizationRequired": "Unesite svoju ustanovu",
       "consentRequired": "Pristanak na obradu podataka je obvezan",
       "recordingConsentRequired": "Pristanak na snimanje je obvezan za ovaj događaj",
-      "multitrackConsentRequired": "Za ovaj je događaj obvezan pristanak na snimanje tvoje zvučne trake",
       "eventFull": "Događaj je dosegnuo maksimalan broj sudionika",
       "generic": "Pogreška pri prijavi. Molimo pokušajte ponovno."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Omogućuje ugrađenu zajedničku ploču (Excalidraw): moderatori je tijekom događaja mogu otvoriti s alatne trake. Zahtijeva uslugu ploče u instalaciji; gdje postoji, uvijek je uključena u trenutačnim pozivima.",
       "liveCaptionsEnabled": "Automatski titlovi",
       "liveCaptionsEnabledDesc": "Ono što govornici kažu pojavljuje se ispod videozapisa, transkribirano u stvarnom vremenu: pomaže onima koji ne čuju ili teško prate. Moderatori ih mogu isključiti i tijekom prijenosa uživo na kartici „Režija”, a svatko ih može sakriti za sebe.",
+      "captionsTranscriptEnabled": "Transkript iz titlova",
+      "captionsTranscriptEnabledDesc": "Rečenice onih koji daju privolu spremaju se s njihovim imenom i nakon događanja postaju njegov transkript, čak i bez snimke ili obrade umjetnom inteligencijom. Oni koji ne daju privolu pojavljuju se samo u titlovima uživo.",
       "autoStartRecording": "Automatski pokreni snimanje",
       "autoStartRecordingDesc": "U trenutku početka događaja snimanje se pokreće samostalno (bez traženja potvrde od moderatora). Tako kasniji pridošli korisnici odmah pronalaze player.",
       "aiSectionHeading": "Automatska postprodukcija",
@@ -2686,6 +2687,13 @@
       "editFailed": "Spremanje nije uspjelo (HTTP {code})",
       "editFailedDetail": "Spremanje nije uspjelo: {message}",
       "editMediaError": "Zvuk snimke nije moguće učitati: reprodukcija nije dostupna. Ipak možeš ispraviti tekst i govornike pojedinih segmenata.",
+      "editNoMedia": "Transkript izrađen iz titlova uživo: nema zvuka za reprodukciju.",
+      "captionsSource": "iz titlova uživo",
+      "captionsRebuild": "Ažuriraj iz titlova",
+      "captionsRebuildDone": "Transkript je ažuriran iz titlova.",
+      "captionsRebuildKept": "Transkript je ručno ispravljen ili dolazi od umjetne inteligencije: nije zamijenjen.",
+      "captionsRebuildNone": "Nema ništa za ažurirati: nema spremljenih rečenica ili je razdoblje čuvanja podataka događaja isteklo.",
+      "captionsRebuildAiRunning": "Obrada umjetnom inteligencijom transkribira videozapis: njezin će transkript zamijeniti onaj iz titlova.",
       "summaryLoadError": "Sažetak nije moguće učitati.",
       "summaryLoading": "Učitavanje sažetka…",
       "summaryEmptyProcessing": "AI sažetak još nije spreman: obrada je u tijeku. Osvježi stranicu za nekoliko minuta.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Stranica ostaje vidljiva, ali prijaviti se mogu samo pozvani; bez prijave nema ulaska"
       },
       "previewInvitation": "Prijaviti se mogu samo osobe koje pozovete; nitko ne ulazi bez prijave."
+    },
+    "captionsTranscript": {
+      "title": "Transkript iz titlova",
+      "intro": "Rečenice iz titlova osoba koje su pristale na transkripciju svojih izlaganja postaju transkript događaja, čak i bez snimke i bez obrade umjetnom inteligencijom.",
+      "stats": "Spremljene rečenice: {saved} · glasovi: {voices} · nespremljene rečenice, bez privole: {skipped}",
+      "none": "Transkript još nije izrađen: izradit će se sam nakon završetka događaja, ili ga možete izraditi sada.",
+      "empty": "Nema spremljenih rečenica: nitko nije govorio s privolom za transkripciju.",
+      "fromCaptions": "Transkript izrađen iz titlova.",
+      "fromAi": "Postoji transkript iz obrade umjetnom inteligencijom: ima prednost pred onim iz titlova.",
+      "revised": "Transkript je ručno ispravljen: ažuriranje iz titlova ne zamjenjuje ga.",
+      "build": "Izradi transkript",
+      "rebuild": "Ažuriraj iz titlova",
+      "openEditor": "Otvori u uređivaču",
+      "publish": "Objavi transkript na stranici događaja",
+      "publishDesc": "Može se čitati i bez videozapisa. Najprije ga pregledajte: automatski titlovi mogu sadržavati pogreške.",
+      "publishWithVideo": "Objavljeni videozapis ga već prikazuje; ovaj izbor zadržava ga vidljivim čak i ako se videozapis povuče.",
+      "built": "Transkript je ažuriran.",
+      "kept": "Transkript je ručno ispravljen ili dolazi od umjetne inteligencije: nije zamijenjen.",
+      "failed": "Radnja nije uspjela.",
+      "loadFailed": "Nije moguće učitati stanje transkripta.",
+      "expired": "Razdoblje čuvanja podataka događaja je isteklo: transkript se ne izrađuje ponovno.",
+      "aiRunning": "Obrada umjetnom inteligencijom transkribira videozapis: njezin će transkript zamijeniti onaj iz titlova."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Pristajem na audio/video snimanje događaja",
       "recordingRequired": "Pristanak na snimanje je obvezan za sudjelovanje u ovom događaju",
       "recordingNotice": "Događaj se snima (zvuk i video). Sudjeluješ bez mikrofona i kamere: snimka ne sadrži tvoj glas ni tvoju sliku, osim ako ti voditelj ne da riječ.",
-      "multitrack": "Pristajem na snimanje zasebne zvučne snimke svojega glasa isključivo radi ispravnog pripisivanja transkripta pojedinim govornicima. Snimka je privremena i briše se nakon transkripcije; ne koristi se za identifikaciju ni reprodukciju mojega glasa.",
-      "multitrackRequired": "Pristanak na snimanje vaše zvučne snimke obvezan je za sudjelovanje na ovom događaju",
+      "multitrack": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događanju. Ako događanje snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se briše nakon transkripcije; ne koristi se za prepoznavanje ili oponašanje mog glasa.",
+      "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaš se glas ne snima i vaša izlaganja ne ulaze u transkript.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
       "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Sažetak",
     "aiBadgeLabel": "Sadržaj generiran AI-jem",
     "aiBadgeBody": "Transkript i sažetak automatski izrađuje AI pipeline u klasteru. Mogu sadržavati pogreške; videozapis ostaje mjerodavan izvor.",
+    "captionsBadgeBody": "Transkript potječe iz automatskih titlova prijenosa uživo i sadrži samo izlaganja osoba koje su dale privolu. Može sadržavati pogreške.",
     "revisedByPerson": "Tekst je nakon automatskog generiranja pregledala osoba.",
     "searchPlaceholder": "Pretraži transkript…",
     "searchLabel": "Pretraži transkript",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Prikaži trg",
     "aiNoticeTitle": "Obrada umjetnom inteligencijom nakon događaja",
     "aiNotice": "Na kraju će snimka biti obrađena alatima umjetne inteligencije radi izrade transkripta, sažetka te mogućih prijevoda i sinkronizacija. Rezultati mogu sadržavati netočnosti; mjerodavan ostaje videozapis.",
-    "multitrackConsentTitle": "Snimanje po sudioniku",
-    "multitrackConsentRequired": "Za ulazak morate pristati na snimanje svoje zvučne snimke",
+    "multitrackConsentTitle": "Transkript vaših izlaganja",
     "recordingConsentTitle": "Snimanje događaja",
     "recordingConsentIntro": "Događaj se snima (zvuk i slika). Ako se javite za riječ, snimka sadrži vaš glas, vaš lik i ono što dijelite na zaslonu.",
     "recordingConsentRequired": "Za ulazak je potrebna vaša privola za snimanje.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatski titlovi",
-    "captionsNotice": "Tijekom prijenosa uživo glas osobe koja govori transkribira se u stvarnom vremenu kako bi se prikazivali titlovi. Transkripcija se odvija na poslužiteljima na kojima radi platforma, a tekst se ne čuva. Titlovi se mogu sakriti gumbom za titlove na traci poziva."
+    "captionsNotice": "Tijekom prijenosa uživo glas osobe koja govori transkribira se u stvarnom vremenu kako bi se prikazivali titlovi. Transkripcija se odvija na poslužiteljima na kojima radi platforma, a tekst se ne čuva. Titlovi se mogu sakriti gumbom za titlove na traci poziva.",
+    "captionsNoticeTranscript": "Tijekom prijenosa uživo glas govornika transkribira se u stvarnom vremenu radi prikaza titlova, na poslužiteljima koji hostiraju platformu. Tekst se čuva, s imenom, samo za osobe koje su pristale na transkripciju svojih izlaganja i postaje transkript događaja. Titlovi se mogu sakriti gumbom za titlove na traci poziva."
   },
   "recording": {
     "management": "Video snimka",

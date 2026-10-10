@@ -74,6 +74,11 @@ export interface CaptureConfig {
   initialGraceSec?: number;
   /** Hard cap di durata della cattura (safety). Default 4h. */
   maxDurationSec?: number;
+  /**
+   * Se registrare la voce di un endpoint: il consenso della persona, chiesto
+   * al portale (consent.ts). Senza, si registra ogni traccia remota.
+   */
+  consentCheck?: (endpointId: string) => Promise<boolean>;
 }
 
 /**
@@ -254,6 +259,10 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       joinedConference = true;
     });
     await page.exposeFunction('logFromPage', (msg: string) => console.log('[page]', msg));
+    // Il consenso della persona, voce per voce, prima di registrarla.
+    await page.exposeFunction('paConsenso', async (endpointId: string) =>
+      config.consentCheck ? config.consentCheck(endpointId) : true,
+    );
 
     // Stessa origin di lib-jitsi-meet (CSP/CORS): carichiamo la pagina del
     // dominio Jitsi e iniettiamo lo script lib-jitsi-meet servito da lì.
@@ -407,6 +416,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       string,
       { rec: any; key: string; sinkEl?: any; srcNode?: any; destNode?: any }
     >();
+    // Le tracce tolte: un'aggiunta in attesa del consenso non le riapre.
+    const rimosse = new Set<string>();
     // Contatore monotono per generare un trackFileId univoco per sessione,
     // robusto a due TRACK_ADDED nello stesso ms (Date.now() poteva collidere).
     let trackSeq = 0;
@@ -510,6 +521,22 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
       const pid: string = track.getParticipantId?.() ?? 'unknown';
+      // Solo chi ha dato il consenso alla trascrizione dei propri interventi:
+      // chi non l'ha dato partecipa, ma la sua voce non finisce in un file.
+      const trackId: string | undefined = track.getId?.();
+      const consenso = await (w.paConsenso ? w.paConsenso(pid) : Promise.resolve(true)).catch(() => false);
+      if (!consenso) {
+        log(`TRACK_SKIPPED pid=${pid}: nessun consenso`);
+        return;
+      }
+      // La risposta puo' arrivare dopo qualche secondo: nel frattempo la
+      // traccia puo' essere stata tolta (uscita, microfono rimesso a posto) o
+      // la registrazione finita. Un recorder aperto adesso non si chiuderebbe
+      // piu'.
+      if (finishing || (trackId && rimosse.has(trackId)) || track.getTrack?.()?.readyState === 'ended') {
+        log(`TRACK_SKIPPED pid=${pid}: traccia gia' chiusa`);
+        return;
+      }
       const name: string | null =
         conference?.getParticipantById?.(pid)?.getDisplayName?.() ?? null;
       // trackFileId univoco per sessione: rejoin/unmute → file distinto.
@@ -626,6 +653,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
 
     const onTrackRemoved = (track: any) => {
       const id = track.getId?.();
+      // Ricordata per chi sta ancora aspettando il consenso (onTrackAdded).
+      if (id) rimosse.add(id);
       const entry = id ? recorders.get(id) : undefined;
       if (entry) {
         try {

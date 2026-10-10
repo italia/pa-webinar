@@ -52,6 +52,8 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   invitations: 'un invito è un’azione verso una persona, non configurazione: la copia nasce in bozza e gli inviti si mandano quando la data è confermata',
   multitrackConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
   recordingConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
+  roomOccupants: 'chi era in sala in QUELL’occorrenza: dato della diretta, non configurazione',
+  captionSegments: 'frasi dette in QUELL’occorrenza, per la sua trascrizione: non si copiano',
 
   // Vita dell'evento.
   questions: 'domande poste durante quell’evento',

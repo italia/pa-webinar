@@ -13,8 +13,6 @@ const base: StatoIngressoInput = {
   emailValid: true,
   recordingRequired: false,
   recordingConsent: false,
-  multitrackRequired: false,
-  multitrackConsent: false,
   ingressoTentato: false,
   nomeNoto: true,
 };
@@ -62,8 +60,8 @@ describe('statoIngresso — nome mancante', () => {
     const s = stato({
       nameValid: false,
       emailValid: false,
-      multitrackRequired: true,
-      multitrackConsent: false,
+      recordingRequired: true,
+      recordingConsent: false,
     });
     expect(s.bloccoModulo).toBe('name');
   });
@@ -106,28 +104,11 @@ describe('statoIngresso — email e consenso', () => {
     expect(s.nomeDaChiedere).toBe(false);
   });
 
-  it('consenso alla registrazione per partecipante mancante: blocca', () => {
-    const s = stato({ multitrackRequired: true, multitrackConsent: false });
-    expect(s.canEnter).toBe(false);
-    expect(s.bloccoModulo).toBe('consent');
-  });
-
-  it('consenso dato: si entra', () => {
-    expect(stato({ multitrackRequired: true, multitrackConsent: true }).canEnter).toBe(true);
-  });
-
   it('consenso alla registrazione dell\'evento mancante: blocca, e il pulsante lo spiega', () => {
     const s = stato({ recordingRequired: true, recordingConsent: false });
     expect(s.canEnter).toBe(false);
     expect(s.bloccoModulo).toBe('recording');
     expect(s.bloccoSpiegato).toBe('recording');
-  });
-
-  it('i due consensi nell\'ordine della pagina: prima la registrazione, poi la traccia', () => {
-    const entrambi = { recordingRequired: true, multitrackRequired: true, multitrackConsent: false };
-    expect(stato({ ...entrambi, recordingConsent: false }).bloccoModulo).toBe('recording');
-    expect(stato({ ...entrambi, recordingConsent: true }).bloccoModulo).toBe('consent');
-    expect(stato({ ...entrambi, recordingConsent: true, multitrackConsent: true }).canEnter).toBe(true);
   });
 
   it('consenso alla registrazione non richiesto (gia\' dato all\'iscrizione): si entra senza spunta', () => {
@@ -156,7 +137,7 @@ describe('annuncioApertura', () => {
 
   it('sala appena aperta con consenso mancante: annuncia l\'apertura', () => {
     expect(
-      annuncioApertura({ appenaAperta: true, canEnter: false, bloccoModulo: 'consent' }),
+      annuncioApertura({ appenaAperta: true, canEnter: false, bloccoModulo: 'recording' }),
     ).toBe('roomOpen');
   });
 });

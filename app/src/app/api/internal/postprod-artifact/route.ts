@@ -29,6 +29,7 @@ import { Prisma } from '@prisma/client';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { ValidationError, NotFoundError } from '@/lib/errors';
+import { bloccaTrascrizioneEvento, CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import {
   artifactPath,
@@ -105,6 +106,10 @@ export const POST = withErrorHandling(async (request) => {
   );
 
   await prisma.$transaction(async (tx) => {
+    // In fila con la costruzione della trascrizione dai sottotitoli dello
+    // stesso evento (lib/captions/transcript): nessuna delle due scrive
+    // accanto all'altra.
+    if (parsed.type === 'TRANSCRIPT_JSON') await bloccaTrascrizioneEvento(tx, job.recording.eventId);
     // We can't use upsert() here: the composite unique
     // `recordingId_type_language` doesn't accept a NULL `language` in its
     // `where` input (Prisma throws PrismaClientValidationError), and
@@ -119,8 +124,29 @@ export const POST = withErrorHandling(async (request) => {
         language: parsed.language,
       },
       orderBy: { createdAt: 'desc' },
-      select: { id: true },
+      select: { id: true, modelId: true },
     });
+    // La trascrizione AI prende il posto di quella dai sottotitoli live: i
+    // parlanti di quella (con i nomi di chi aveva acconsentito) non sono le
+    // voci della diarization, che usa le stesse etichette SPEAKER_xx. Si
+    // tolgono prima di scrivere quelli nuovi, o un nome finirebbe su una voce
+    // che non e' la sua.
+    if (parsed.type === 'TRANSCRIPT_JSON' && existing?.modelId === CAPTIONS_TRANSCRIPT_MODEL) {
+      await tx.speaker.deleteMany({ where: { recordingId: job.recording.id } });
+    }
+    // Arrivata la trascrizione AI, quella dai sottotitoli su una registrazione
+    // senza file (fatta mentre il video non c'era) non serve piu' e la
+    // oscurerebbe: se ne va, salvo che qualcuno l'abbia corretta a mano.
+    if (parsed.type === 'TRANSCRIPT_JSON') {
+      await tx.recording.deleteMany({
+        where: {
+          eventId: job.recording.eventId,
+          blobKey: '',
+          id: { not: job.recording.id },
+          artifacts: { none: { type: 'TRANSCRIPT_JSON', revisedAt: { not: null } } },
+        },
+      });
+    }
     const writeData = {
       jobId: job.id,
       blobKey: parsed.blobKey,

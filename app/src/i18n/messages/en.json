@@ -250,7 +250,6 @@
       "organizationRequired": "Please enter your organization",
       "consentRequired": "Consent to data processing is required",
       "recordingConsentRequired": "Recording consent is required for this event",
-      "multitrackConsentRequired": "Consent to recording your audio track is required for this event",
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Requires the installation's whiteboard service; where it is available, it is always on for instant calls.",
       "liveCaptionsEnabled": "Automatic captions",
       "liveCaptionsEnabledDesc": "What speakers say appears under the video, transcribed in real time: it helps people who cannot hear or find it hard to follow. Moderators can also turn captions off during the live event from the “Control” tab, and anyone can hide them for themselves.",
+      "captionsTranscriptEnabled": "Transcript from captions",
+      "captionsTranscriptEnabledDesc": "The sentences of people who consent are kept with their name and, when the event ends, become the event's transcript, even without a recording or AI processing. People who do not consent appear only in the live captions.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
@@ -2686,6 +2687,13 @@
       "editFailed": "Save failed (HTTP {code})",
       "editFailedDetail": "Save failed: {message}",
       "editMediaError": "Could not load the recording's audio: playback is unavailable. You can still correct the text and speakers of each segment.",
+      "editNoMedia": "Transcript built from the live captions: there is no audio to play.",
+      "captionsSource": "from the live captions",
+      "captionsRebuild": "Update from captions",
+      "captionsRebuildDone": "Transcript updated from the captions.",
+      "captionsRebuildKept": "The transcript was corrected by hand or comes from AI: it was not replaced.",
+      "captionsRebuildNone": "Nothing to update: there are no saved sentences or the event's data retention period has ended.",
+      "captionsRebuildAiRunning": "The AI pipeline is transcribing the video: its transcript will take the place of the one from captions.",
       "summaryLoadError": "Could not load the summary.",
       "summaryLoading": "Loading summary…",
       "summaryEmptyProcessing": "The AI summary isn't ready yet: processing is in progress. Refresh the page in a few minutes.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "The page stays visible, but only invitees can register; without registering, nobody gets in"
       },
       "previewInvitation": "Only the people you invite can register; nobody gets in without registering."
+    },
+    "captionsTranscript": {
+      "title": "Transcript from captions",
+      "intro": "The caption sentences of people who agreed to the transcription of what they say become the event transcript, even without a recording and without the AI pipeline.",
+      "stats": "Saved sentences: {saved} · voices: {voices} · sentences not saved, no consent: {skipped}",
+      "none": "Transcript not built yet: it builds itself after the event ends, or you can build it now.",
+      "empty": "No sentences saved: nobody spoke with consent to transcription.",
+      "fromCaptions": "Transcript built from the captions.",
+      "fromAi": "There is an AI pipeline transcript: it takes precedence over the one from captions.",
+      "revised": "Transcript corrected by hand: updating it from the captions does not replace it.",
+      "build": "Build the transcript",
+      "rebuild": "Update from captions",
+      "openEditor": "Open in the editor",
+      "publish": "Publish the transcript on the event page",
+      "publishDesc": "It can be read even without a video. Review it first: automatic captions can contain errors.",
+      "publishWithVideo": "The published video already shows it; this choice keeps it visible even if the video is withdrawn.",
+      "built": "Transcript updated.",
+      "kept": "The transcript was corrected by hand or comes from AI: it was not replaced.",
+      "failed": "The operation failed.",
+      "loadFailed": "Unable to load the transcript status.",
+      "expired": "The event's data retention period has ended: the transcript is not rebuilt.",
+      "aiRunning": "The AI pipeline is transcribing the video: its transcript will take the place of the one from captions."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "I consent to the audio/video recording of this event",
       "recordingRequired": "Recording consent is required to participate in this event",
       "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
-      "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
-      "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
+      "multitrack": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is deleted after transcription; it is not used to identify or reproduce my voice.",
+      "multitrackOptional": "This is optional: if you do not consent you can still take part, but your voice is not recorded and what you say is not included in the transcript.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
       "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Summary",
     "aiBadgeLabel": "AI-generated content",
     "aiBadgeBody": "Transcript and summary are produced automatically by the in-cluster AI pipeline. They may contain errors; the video remains the authoritative source.",
+    "captionsBadgeBody": "The transcript comes from the live event's automatic captions and includes only the contributions of people who gave their consent. It may contain errors.",
     "revisedByPerson": "The text was reviewed by a person after it was generated automatically.",
     "searchPlaceholder": "Search transcript…",
     "searchLabel": "Search transcript",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Show the square",
     "aiNoticeTitle": "AI processing after the event",
     "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
-    "multitrackConsentTitle": "Per-participant recording",
-    "multitrackConsentRequired": "You must accept the recording of your audio track to enter",
+    "multitrackConsentTitle": "Transcript of what you say",
     "recordingConsentTitle": "Event recording",
     "recordingConsentIntro": "This event is recorded (audio and video). If you speak, the recording contains your voice, your image and whatever you share on screen.",
     "recordingConsentRequired": "Your consent to the recording is required to enter.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatic captions",
-    "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the captions button in the call's toolbar."
+    "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the captions button in the call's toolbar.",
+    "captionsNoticeTranscript": "During the live session, the speaker's voice is transcribed in real time to show captions, on the servers that host the platform. The text is kept, with the name, only for people who consented to the transcription of what they say, and becomes the event transcript. Captions can be hidden with the captions button in the call toolbar."
   },
   "recording": {
     "management": "Video recording",

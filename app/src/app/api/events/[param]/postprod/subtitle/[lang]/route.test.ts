@@ -5,13 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * art. 50): un blocco NOTE nel file e l'intestazione X-AI-Generated.
  */
 vi.mock('@/lib/db', () => ({ prisma: { postprodArtifact: { findFirst: vi.fn() } } }));
-vi.mock('@/lib/ai/access', () => ({ assertPostprodAccessible: vi.fn(async () => ({ eventId: 'e1' })) }));
+vi.mock('@/lib/ai/access', () => ({ assertPostprodAccessible: vi.fn(async () => ({ eventId: 'e1', ambito: 'tutto', soloSottotitoli: false })) }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (s: string) => s || null }));
 vi.mock('@/lib/storage/postprod', () => ({
   isPostprodStorageConfigured: () => false,
   presignArtifactDownload: vi.fn(),
 }));
 
+import { assertPostprodAccessible } from '@/lib/ai/access';
 import { prisma } from '@/lib/db';
 
 import { GET } from './route';
@@ -38,5 +39,16 @@ describe('GET subtitle', () => {
     findFirst.mockResolvedValue({ id: 'a', blobKey: 'k', inlineBody: VTT, mimeType: 'text/vtt', revisedAt: null, original: { id: 'o' } });
     const body = await (await GET(new Request('https://x.test/s') as never, ctx as never)).text();
     expect(body).toContain('ai-revision:');
+  });
+
+  it('non li serve se e\u0300 pubblicata la sola trascrizione', async () => {
+    vi.mocked(assertPostprodAccessible).mockResolvedValueOnce({
+      eventId: 'e1',
+      ambito: 'trascrizione',
+      soloSottotitoli: false,
+    });
+    const res = await GET(new Request('https://x.test/s') as never, ctx as never);
+    expect(res.status).toBe(404);
+    expect(findFirst).not.toHaveBeenCalled();
   });
 });

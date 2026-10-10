@@ -60,7 +60,8 @@ interface TranscriptResponse {
   segments: EditableSegment[];
   speakers: RosterEntry[];
   waveform: Waveform | null;
-  mediaUrl: string;
+  /** Null per la trascrizione dai sottotitoli live: non c'e' audio. */
+  mediaUrl: string | null;
   /** False when no TRANSCRIPT_JSON exists yet (pipeline not run / still
    *  processing) — distinct from an existing transcript with 0 segments. */
   hasTranscript: boolean;

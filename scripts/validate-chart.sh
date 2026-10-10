@@ -278,7 +278,7 @@ argomenti_profilo() {
 # I moduli Prosody del progetto esistono in due copie: quella che monta lo
 # stack Docker Compose e quella che il chart mette nel proprio ConfigMap (un
 # chart non legge file fuori dalla sua cartella). Devono restare identiche.
-for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua mod_pa_captions.lua; do
+for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua mod_pa_captions.lua mod_pa_occupants.lua; do
   if ! cmp -s "infra/jitsi/prosody-plugins/$modulo" "$CHART/files/prosody-plugins/$modulo"; then
     errore "infra/jitsi/prosody-plugins/$modulo e $CHART/files/prosody-plugins/$modulo sono diversi: aggiorna la copia del chart"
   fi
@@ -962,6 +962,7 @@ if comune is not None and jicofo is not None and prosody is not None:
             "token_affiliation_custom": "muc-occupant-pre-join",
             "pa_media_lock": "muc-occupant-joined",
             "pa_captions": "muc-room-created",
+            "pa_occupants": "muc-occupant-joined",
         }
         sts = next((d for d in docs if d.get("kind") == "StatefulSet" and d["metadata"]["name"].endswith("-prosody")), None)
         for nome, aggancio in agganci.items():

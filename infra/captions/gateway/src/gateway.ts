@@ -24,6 +24,7 @@ import type { Config } from './config.js';
 import type { ContextProvider, RoomContext } from './context.js';
 import { EngineSession } from './engine.js';
 import { LoadGovernor, type LoadSnapshot } from './load.js';
+import { TranscriptSink } from './transcript.js';
 import { VoiceDetector } from './vad.js';
 import {
   endpointFromTag,
@@ -105,6 +106,8 @@ interface Stream {
   interimTimer: NodeJS.Timeout | null;
   pendingInterim: CaptionUpdate | null;
   lastInterimAt: number;
+  /** Quando e' cominciato il pezzo di frase che il prossimo testo definitivo chiude. */
+  segmentStartedAt: number | null;
 }
 
 export interface GatewayStatus extends LoadSnapshot {
@@ -154,7 +157,7 @@ export class Conference {
    * cui sono nate; le correzioni valgono subito.
    */
   private async loadContext(): Promise<void> {
-    const context = await this.gateway.contexts.get(this.room);
+    const context = await this.gateway.contexts.get(this.room, this.meetingId);
     if (this.closed) return;
     this.context = context;
     this.rewrite = makeRewriter(context.aliases);
@@ -241,6 +244,7 @@ export class Conference {
       interimTimer: null,
       pendingInterim: null,
       lastInterimAt: 0,
+      segmentStartedAt: null,
     };
   }
 
@@ -351,6 +355,7 @@ export class Conference {
     stream.inSpeech = true;
     stream.voicedSeconds = 0;
     stream.lastVoiceAt = this.gateway.now();
+    stream.segmentStartedAt ??= stream.lastVoiceAt;
     const attacco = stream.preRoll;
     stream.preRoll = [];
     stream.preRollSeconds = 0;
@@ -545,6 +550,7 @@ export class Conference {
           stream.interimTimer = null;
         }
         this.sendResult(stream, update);
+        this.keepForTranscript(stream, update);
         continue;
       }
       const now = this.gateway.now();
@@ -565,6 +571,24 @@ export class Conference {
         }, Math.max(0, wait));
       }
     }
+  }
+
+  /** La frase definitiva va al portale, se l'evento tiene la trascrizione. */
+  private keepForTranscript(stream: Stream, update: CaptionUpdate): void {
+    const now = this.gateway.now();
+    const startedAt = stream.segmentStartedAt ?? now;
+    // Il pezzo successivo della stessa frase comincia qui; fuori da una frase
+    // lo apre la prossima voce.
+    stream.segmentStartedAt = stream.inSpeech ? now : null;
+    if (!update.text || this.context?.transcript !== true) return;
+    this.gateway.transcripts.add({ room: this.room, meetingId: this.meetingId }, {
+      messageId: update.messageId,
+      endpointId: stream.endpointId,
+      text: update.text,
+      language: primaryLanguage(this.language),
+      startedAt: new Date(startedAt).toISOString(),
+      endedAt: new Date(now).toISOString(),
+    });
   }
 
   private sendResult(stream: Stream, update: CaptionUpdate): void {
@@ -621,6 +645,7 @@ export class Gateway {
     readonly config: Config,
     readonly contexts: ContextProvider,
     readonly now: () => number = Date.now,
+    readonly transcripts: TranscriptSink = new TranscriptSink({ url: null, token: null }),
   ) {
     this.governor = new LoadGovernor({
       maxStreams: config.maxStreams,

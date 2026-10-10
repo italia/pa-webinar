@@ -279,9 +279,13 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     return POST(request as unknown as NextRequest, { params: Promise.resolve({ param: SLUG }) });
   }
 
-  it('solo ascolto: niente consenso alla registrazione, la traccia audio resta obbligatoria', async () => {
+  it('solo ascolto: niente consenso alla registrazione, la trascrizione si chiede ma e\' facoltativa', async () => {
     evento({});
-    expect((await iscrivitiCon({})).status).toBe(422);
+    const senza = await iscrivitiCon({});
+    expect(senza.status).toBe(201);
+    expect((tx.registration.create.mock.calls[0]?.[0]?.data as Record<string, unknown>).consentMultitrack).toBe(false);
+    tx.registration.create.mockClear();
+    tx.gdprAuditLog.create.mockClear();
     const res = await iscrivitiCon({ consentMultitrack: true });
     expect(res.status).toBe(201);
     const data = tx.registration.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
@@ -293,10 +297,10 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     expect(audit.recordingConsentRequired).toBe(false);
   });
 
-  it('con il microfono concesso entrambi i consensi sono obbligatori', async () => {
+  it('con il microfono concesso la registrazione e\' obbligatoria, la trascrizione no', async () => {
     evento({ participantsCanUnmute: true });
     expect((await iscrivitiCon({})).status).toBe(422);
-    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(422);
+    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
     const ok = await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
     expect(ok.status).toBe(201);
   });

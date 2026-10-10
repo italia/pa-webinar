@@ -8,7 +8,9 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
+import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import {
@@ -48,12 +50,23 @@ interface ConsensiSalvati {
 }
 
 async function registraConsensi(
-  event: { id: string; recordingEnabled: boolean; multitrackRecordingEnabled: boolean },
+  event: {
+    id: string;
+    recordingEnabled: boolean;
+    multitrackRecordingEnabled: boolean;
+    liveCaptionsEnabled: boolean;
+    captionsTranscriptEnabled: boolean;
+  },
   data: { recordingConsent?: boolean; multitrackConsent?: boolean; locale?: string },
   posto: { jitsiUserId: string; displayName: string; registrationId?: string },
 ): Promise<ConsensiSalvati> {
   const registrazione = event.recordingEnabled && data.recordingConsent === true;
-  const tracce = event.multitrackRecordingEnabled && data.multitrackConsent === true;
+  // La trascrizione dei propri interventi: la traccia audio per persona o la
+  // trascrizione dai sottotitoli. La prova serve al registratore e alla
+  // trascrizione per sapere, voce per voce, chi l'ha data (lib/captions/room).
+  const trascrizione =
+    event.multitrackRecordingEnabled || captionsTranscriptActive(event, await getSettings());
+  const tracce = trascrizione && data.multitrackConsent === true;
   if (!registrazione && !tracce) return { recording: false, multitrack: false };
   const { registrationId } = posto;
   const prova = () => ({
@@ -83,13 +96,24 @@ async function registraConsensi(
       ),
     tracce &&
       alMeglio('multitrack', async () => {
+        // Una prova per iscrizione e per testo: chi l'aveva data con il testo
+        // precedente (la sola traccia audio) e la ridà con quello attuale ne
+        // ha una nuova accanto, e quella di prima resta come era.
         const gia = registrationId
           ? await prisma.multitrackConsent.findFirst({
-              where: { eventId: event.id, registrationId },
+              where: {
+                eventId: event.id,
+                registrationId,
+                textVersion: { gte: VERSIONE_TESTO_TRASCRIZIONE },
+              },
               select: { id: true },
             })
           : null;
-        if (!gia) await prisma.multitrackConsent.create({ data: prova() });
+        if (!gia) {
+          await prisma.multitrackConsent.create({
+            data: { ...prova(), textVersion: VERSIONE_TESTO_TRASCRIZIONE },
+          });
+        }
       }),
   ]);
   return { recording, multitrack };

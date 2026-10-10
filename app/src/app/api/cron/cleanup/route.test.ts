@@ -42,6 +42,11 @@ vi.mock('@/lib/db', () => ({
     eventReminder: { deleteMany: vi.fn() },
     multitrackConsent: { deleteMany: vi.fn() },
     recordingConsent: { deleteMany: vi.fn() },
+    roomOccupant: { deleteMany: vi.fn() },
+    captionSegment: { deleteMany: vi.fn() },
+    recording: { findMany: vi.fn(), deleteMany: vi.fn() },
+    postprodArtifact: { deleteMany: vi.fn() },
+    speaker: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
@@ -113,6 +118,11 @@ const db = prisma as unknown as {
   $executeRaw: Mock;
   multitrackConsent: { deleteMany: Mock };
   recordingConsent: { deleteMany: Mock };
+  roomOccupant: { deleteMany: Mock };
+  captionSegment: { deleteMany: Mock };
+  recording: { findMany: Mock; deleteMany: Mock };
+  postprodArtifact: { deleteMany: Mock };
+  speaker: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };
@@ -144,6 +154,7 @@ function endedEvent(over: Partial<Record<string, unknown>> = {}) {
     recordingUrl: null,
     tempRecordingUrl: null,
     recordingPublished: false,
+    transcriptPublished: false,
     _count: { registrations: 0, questions: 0, polls: 0 },
     ...over,
   };
@@ -491,6 +502,47 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.callSession.findMany).not.toHaveBeenCalled();
   });
 
+  it('fase 3: toglie la trascrizione dai sottotitoli non pubblicata', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.recording.findMany.mockResolvedValue([
+      { id: 'rec-solo-sottotitoli', blobKey: '' },
+      { id: 'rec-video', blobKey: 'recordings/evt-vecchio/a.mp4' },
+    ]);
+
+    await runCleanup();
+
+    expect(db.recording.findMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', artifacts: { some: { modelId: 'live-captions' } } },
+      select: { id: true, blobKey: true },
+    });
+    // La registrazione senza file se ne va tutta, a cascata.
+    expect(db.recording.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['rec-solo-sottotitoli'] } },
+    });
+    // Da quella con il video si tolgono solo la trascrizione e i parlanti.
+    expect(db.postprodArtifact.deleteMany).toHaveBeenCalledWith({
+      where: { recordingId: { in: ['rec-video'] }, modelId: 'live-captions' },
+    });
+    expect(db.speaker.deleteMany).toHaveBeenCalledWith({
+      where: { recordingId: { in: ['rec-video'] } },
+    });
+  });
+
+  it('fase 3: la trascrizione pubblicata, con il video o da sola, resta', async () => {
+    stubEventQueries({
+      ended: [
+        endedEvent({ id: 'evt-trascrizione', transcriptPublished: true }),
+        endedEvent({ id: 'evt-video', slug: 'video', recordingPublished: true }),
+      ],
+    });
+
+    await runCleanup();
+
+    expect(db.recording.findMany).not.toHaveBeenCalled();
+    expect(db.recording.deleteMany).not.toHaveBeenCalled();
+    expect(db.postprodArtifact.deleteMany).not.toHaveBeenCalled();
+  });
+
   it('fase 3: cancella i dati delle persone dell’evento scaduto', async () => {
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
 
@@ -518,6 +570,8 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.eventReminder.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.multitrackConsent.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.recordingConsent.deleteMany).toHaveBeenCalledWith(byEvent);
+    expect(db.roomOccupant.deleteMany).toHaveBeenCalledWith(byEvent);
+    expect(db.captionSegment.deleteMany).toHaveBeenCalledWith(byEvent);
     // Le reazioni live e quelle agli argomenti dell'agenda sono di una
     // persona, e la loro cascade non scatta (vedi il test sulla chat).
     expect(db.reaction.deleteMany).toHaveBeenCalledWith(byEvent);

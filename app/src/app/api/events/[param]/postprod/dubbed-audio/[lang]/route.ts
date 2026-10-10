@@ -26,7 +26,10 @@ export const GET = withErrorHandling(async (_request, context) => {
     context as { params: Promise<{ param: string; lang: string }> }
   ).params);
 
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito } = await assertPostprodAccessible(slug);
+  // Sottotitoli e doppiaggio accompagnano il video pubblicato, con la pipeline
+  // AI accesa (lib/ai/access).
+  if (ambito !== 'tutto') throw new NotFoundError('Postprod');
 
   const artifact = await prisma.postprodArtifact.findFirst({
     where: {

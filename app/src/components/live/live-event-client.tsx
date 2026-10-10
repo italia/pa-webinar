@@ -148,6 +148,8 @@ interface EventInfo {
   /** L'evento registra una traccia audio separata per partecipante →
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
+  /** La trascrizione dai sottotitoli e' attiva: si chiede il consenso. */
+  captionsTranscript?: boolean;
 }
 
 interface WatermarkSettings {
@@ -1544,6 +1546,7 @@ export default function LiveEventClient({
             aiConsentDisclosure: event.aiConsentDisclosure,
             liveCaptions: !!event.liveCaptionsAvailable && (event.liveCaptionsEnabled ?? true),
             multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+            captionsTranscript: event.captionsTranscript,
             riepilogo: event.riepilogo,
           }}
           presenze={presenze}
@@ -1567,13 +1570,11 @@ export default function LiveEventClient({
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
           onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}
-          // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
-          // prestato alla registrazione, o il moderatore (è chi ha configurato
-          // e controlla la registrazione). Gli speaker NO: non controllano la
-          // registrazione e la loro traccia audio isolata è esattamente il dato
-          // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
-          // il consenso come ogni altro partecipante.
-          multitrackConsentExempt={isModerator || hasMultitrackConsent || consensiRegistrati.tracce}
+          // La trascrizione dei propri interventi si chiede a tutti, anche a
+          // chi conduce e a chi interviene: e' facoltativa, e decide se la loro
+          // voce si registra e si trascrive. Non la si richiede a chi l'ha gia'
+          // data (all'iscrizione, o in sala in questa visita della pagina).
+          multitrackConsentExempt={hasMultitrackConsent || consensiRegistrati.tracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
           recordingConsentText={event.recordingConsentText}

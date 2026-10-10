@@ -27,6 +27,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
 import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
+import { costruisciTrascrizioniMancanti } from '@/lib/captions/transcript';
 import { notifyPublishedRecordings } from '@/lib/events/recording-notify';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
@@ -244,6 +245,13 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // La trascrizione dai sottotitoli degli eventi appena conclusi: prima del
+  // riepilogo, cosi' la pagina dopo l'evento la ha gia'.
+  const captionsTranscripts = await costruisciTrascrizioniMancanti(now).catch((err) => {
+    console.error('[cron/reminders] captions transcripts failed', err instanceof Error ? err.message : err);
+    return 0;
+  });
+
   // Post-event follow-up emails (opt-in). Same cadence as reminders, so no
   // dedicated CronJob is needed; the helper is idempotent (claims each event
   // before sending).
@@ -265,6 +273,7 @@ export const GET = withErrorHandling(async (request) => {
 
   return Response.json({
     ok: true,
+    captionsTranscripts,
     remindersProcessed,
     emailsSent,
     emailsFailed,

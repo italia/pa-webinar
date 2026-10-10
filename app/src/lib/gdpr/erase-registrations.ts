@@ -11,6 +11,7 @@
  * allegati e reazioni, e le email accodate per quelle iscrizioni.
  */
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
+import { bloccaTrascrizioneEvento, togliPersoneDalleTrascrizioni } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 
 export interface ErasureCounts {
@@ -57,6 +58,26 @@ export async function eraseRegistrations(
     // Le reazioni della persona ai messaggi altrui: quelle ai suoi messaggi
     // se ne vanno per cascata con i messaggi.
     await tx.chatMessageReaction.deleteMany({ where: { senderId: { in: chatSenderIds } } });
+    // La trascrizione gia' costruita dai sottotitoli: le frasi e il nome della
+    // persona se ne vanno anche da li' (lib/captions/transcript).
+    const eventi = await tx.registration.findMany({
+      where: { id: { in: registrationIds } },
+      select: { eventId: true },
+      distinct: ['eventId'],
+    });
+    // In fila con le costruzioni della trascrizione degli stessi eventi: una
+    // costruzione gia' partita non rimette le frasi appena tolte.
+    const idEventi = eventi.map((e) => e.eventId).sort();
+    for (const id of idEventi) await bloccaTrascrizioneEvento(tx, id);
+    await togliPersoneDalleTrascrizioni(tx, idEventi, registrationIds);
+    // Le frasi dei sottotitoli salvate per la trascrizione e i posti in sala:
+    // il posto della conferenza e' `reg-<id>-<suffisso>`, l'unico legame con
+    // l'iscrizione.
+    const postiInSala = registrationIds.map((id) => ({ seatId: { startsWith: `reg-${id}-` } }));
+    if (postiInSala.length > 0) {
+      await tx.captionSegment.deleteMany({ where: { OR: postiInSala } });
+      await tx.roomOccupant.deleteMany({ where: { OR: postiInSala } });
+    }
     // Le email accodate per queste iscrizioni (conferma, promemoria, cambio
     // data, riepilogo) contengono indirizzo e link personali: il solo aggancio
     // e' l'id dell'iscrizione nei metadati. Anche quelle non ancora partite:

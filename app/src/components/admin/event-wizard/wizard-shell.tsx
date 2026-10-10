@@ -98,6 +98,7 @@ export interface WizardTemplatePreset {
   wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
   liveCaptionsEnabled?: boolean;
+  captionsTranscriptEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -229,6 +230,7 @@ export interface InitialEventShape {
     wordCloudEnabled?: boolean | null;
     whiteboardEnabled?: boolean | null;
     liveCaptionsEnabled?: boolean | null;
+    captionsTranscriptEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
@@ -440,6 +442,7 @@ export default function EventWizard(props: WizardProps) {
         wordCloudEnabled: ev.wordCloudEnabled ?? false,
         whiteboardEnabled: ev.whiteboardEnabled ?? false,
         liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
+        captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
@@ -579,6 +582,7 @@ export default function EventWizard(props: WizardProps) {
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
       // Accesi finche' un modello non li spegne, come sugli eventi.
       liveCaptionsEnabled: tpl?.liveCaptionsEnabled ?? true,
+      captionsTranscriptEnabled: tpl?.captionsTranscriptEnabled ?? false,
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
@@ -1234,6 +1238,8 @@ export default function EventWizard(props: WizardProps) {
           wordCloudEnabled: form.wordCloudEnabled,
           whiteboardEnabled: form.whiteboardEnabled,
           liveCaptionsEnabled: form.liveCaptionsEnabled,
+          // Senza sottotitoli non c'e' niente da trascrivere.
+          captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 
           // Postprod AI — subordinate al recording (server-side resta

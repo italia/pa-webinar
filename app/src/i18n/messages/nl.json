@@ -250,7 +250,6 @@
       "organizationRequired": "Voer uw organisatie in",
       "consentRequired": "Toestemming voor gegevensverwerking is vereist",
       "recordingConsentRequired": "Toestemming voor opname is vereist voor dit evenement",
-      "multitrackConsentRequired": "Toestemming voor het opnemen van uw audiospoor is verplicht voor dit evenement",
       "eventFull": "Het evenement heeft het maximale aantal deelnemers bereikt",
       "generic": "Fout bij inschrijving. Probeer het opnieuw."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Vereist de whiteboarddienst van de installatie; waar die beschikbaar is, is het bij directe calls altijd actief.",
       "liveCaptionsEnabled": "Automatische ondertiteling",
       "liveCaptionsEnabledDesc": "Wat sprekers zeggen verschijnt onder de video, in realtime getranscribeerd: dat helpt wie niet hoort of moeilijk kan volgen. Moderatoren kunnen de ondertiteling ook tijdens de livesessie uitzetten via het tabblad ‘Regie’, en iedereen kan haar voor zichzelf verbergen.",
+      "captionsTranscriptEnabled": "Transcriptie uit de ondertiteling",
+      "captionsTranscriptEnabledDesc": "De zinnen van wie toestemming geeft, worden met hun naam bewaard en vormen na afloop de transcriptie van het evenement, ook zonder opname of AI-verwerking. Wie geen toestemming geeft, staat alleen in de live-ondertiteling.",
       "autoStartRecording": "Opname automatisch starten",
       "autoStartRecordingDesc": "Bij de start van het evenement begint de opname vanzelf (zonder bevestiging te vragen aan de moderator). Zo vinden eventuele laatkomers de speler direct beschikbaar.",
       "aiSectionHeading": "Automatische postproductie",
@@ -2686,6 +2687,13 @@
       "editFailed": "Opslaan mislukt (HTTP {code})",
       "editFailedDetail": "Opslaan mislukt: {message}",
       "editMediaError": "Kan de audio van de opname niet laden: afspelen is niet beschikbaar. U kunt de tekst en de sprekers van de segmenten wel corrigeren.",
+      "editNoMedia": "Transcriptie opgebouwd uit de live-ondertiteling: er is geen audio om af te spelen.",
+      "captionsSource": "uit de live-ondertiteling",
+      "captionsRebuild": "Bijwerken uit de ondertiteling",
+      "captionsRebuildDone": "Transcriptie bijgewerkt uit de ondertiteling.",
+      "captionsRebuildKept": "De transcriptie is met de hand verbeterd of komt van AI: ze is niet vervangen.",
+      "captionsRebuildNone": "Niets bij te werken: er zijn geen opgeslagen zinnen of de bewaartermijn van de gegevens van het evenement is verstreken.",
+      "captionsRebuildAiRunning": "De AI-verwerking transcribeert de video: haar transcriptie komt in de plaats van die uit de ondertiteling.",
       "summaryLoadError": "Kan de samenvatting niet laden.",
       "summaryLoading": "Samenvatting laden…",
       "summaryEmptyProcessing": "De AI-samenvatting is nog niet klaar: de verwerking is bezig. Vernieuw de pagina over een paar minuten.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "De pagina blijft zichtbaar, maar alleen genodigden kunnen zich aanmelden; zonder aanmelding kom je er niet in"
       },
       "previewInvitation": "Alleen wie je uitnodigt kan zich aanmelden; zonder aanmelding komt niemand binnen."
+    },
+    "captionsTranscript": {
+      "title": "Transcriptie uit ondertiteling",
+      "intro": "De ondertitelzinnen van wie heeft ingestemd met de transcriptie van de eigen bijdragen worden de transcriptie van het evenement, ook zonder opname en zonder AI-verwerking.",
+      "stats": "Opgeslagen zinnen: {saved} · stemmen: {voices} · niet opgeslagen zinnen, zonder toestemming: {skipped}",
+      "none": "Transcriptie nog niet opgebouwd: die wordt vanzelf opgebouwd na afloop van het evenement, of u bouwt hem nu.",
+      "empty": "Geen zinnen opgeslagen: niemand sprak met toestemming voor transcriptie.",
+      "fromCaptions": "Transcriptie opgebouwd uit de ondertiteling.",
+      "fromAi": "Er is een transcriptie van de AI-verwerking: die gaat voor op die uit de ondertiteling.",
+      "revised": "Transcriptie met de hand verbeterd: bijwerken uit de ondertiteling vervangt haar niet.",
+      "build": "Transcriptie opbouwen",
+      "rebuild": "Bijwerken uit de ondertiteling",
+      "openEditor": "Openen in de editor",
+      "publish": "Transcriptie publiceren op de evenementpagina",
+      "publishDesc": "Ze is ook zonder video te lezen. Lees haar eerst na: automatische ondertiteling kan fouten bevatten.",
+      "publishWithVideo": "De gepubliceerde video toont haar al; deze keuze houdt haar zichtbaar, ook als de video wordt ingetrokken.",
+      "built": "Transcriptie bijgewerkt.",
+      "kept": "De transcriptie is met de hand verbeterd of komt van AI: ze is niet vervangen.",
+      "failed": "De bewerking is mislukt.",
+      "loadFailed": "De status van de transcriptie kon niet worden geladen.",
+      "expired": "De bewaartermijn van de gegevens van het evenement is verstreken: de transcriptie wordt niet opnieuw opgebouwd.",
+      "aiRunning": "De AI-verwerking transcribeert de video: haar transcriptie komt in de plaats van die uit de ondertiteling."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Ik stem in met de audio-/video-opname van het evenement",
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
-      "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
-      "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen",
+      "multitrack": "Ik geef toestemming om mijn bijdragen met mijn naam te transcriberen voor het verslag van het evenement. Als het evenement voor elke persoon een apart audiospoor opneemt, wordt mijn stem alleen daarvoor opgenomen en wordt het spoor na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te herkennen of na te bootsen.",
+      "multitrackOptional": "Dit is vrijwillig: zonder toestemming kunt u gewoon deelnemen, maar uw stem wordt niet opgenomen en uw bijdragen komen niet in de transcriptie.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
       "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Samenvatting",
     "aiBadgeLabel": "Door AI gegenereerde inhoud",
     "aiBadgeBody": "De transcriptie en de samenvatting worden automatisch geproduceerd door de AI-pijplijn in het cluster. Ze kunnen fouten bevatten; de video blijft de gezaghebbende bron.",
+    "captionsBadgeBody": "De transcriptie komt uit de automatische ondertiteling van de livesessie en bevat alleen de bijdragen van wie toestemming heeft gegeven. Ze kan fouten bevatten.",
     "revisedByPerson": "De tekst is na de automatische generatie door een persoon nagekeken.",
     "searchPlaceholder": "Zoek in de transcriptie…",
     "searchLabel": "Zoek in de transcriptie",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Toon het plein",
     "aiNoticeTitle": "AI-verwerking na het evenement",
     "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
-    "multitrackConsentTitle": "Opname per deelnemer",
-    "multitrackConsentRequired": "Je moet instemmen met de opname van je audiospoor om binnen te komen",
+    "multitrackConsentTitle": "Transcriptie van uw bijdragen",
     "recordingConsentTitle": "Opname van het evenement",
     "recordingConsentIntro": "Dit evenement wordt opgenomen (audio en video). Als je het woord neemt, bevat de opname je stem, je beeld en wat je op het scherm deelt.",
     "recordingConsentRequired": "Om binnen te komen is je toestemming voor de opname nodig.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatische ondertiteling",
-    "captionsNotice": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertiteling te tonen. De transcriptie gebeurt op de servers die het platform hosten en de tekst wordt niet bewaard. De ondertiteling kan worden verborgen met de ondertitelingsknop in de balk van het gesprek."
+    "captionsNotice": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertiteling te tonen. De transcriptie gebeurt op de servers die het platform hosten en de tekst wordt niet bewaard. De ondertiteling kan worden verborgen met de ondertitelingsknop in de balk van het gesprek.",
+    "captionsNoticeTranscript": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertitels te tonen, op de servers die het platform hosten. De tekst wordt met naam alleen bewaard voor wie heeft ingestemd met de transcriptie van de eigen bijdragen, en wordt de transcriptie van het evenement. De ondertiteling kan worden verborgen met de ondertitelknop in de gespreksbalk."
   },
   "recording": {
     "management": "Video-opname",

@@ -129,6 +129,8 @@ interface WaitingRoomEvent {
   /** L'evento registra una traccia audio separata per partecipante:
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
+  /** La trascrizione dai sottotitoli e' attiva: si chiede il consenso. */
+  captionsTranscript?: boolean;
   /** Descrizione, enti e persone, come sulla pagina pubblica. */
   riepilogo?: RiepilogoSala;
 }
@@ -239,14 +241,14 @@ const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
   email: 'waiting-email',
   recording: 'waiting-recording-consent',
-  consent: 'waiting-multitrack-consent',
 };
+/** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
+const CAMPO_TRASCRIZIONE = 'waiting-multitrack-consent';
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
   email: 'waiting-email-invalid',
   recording: 'waiting-recording-consent-required',
-  consent: 'waiting-multitrack-consent-required',
 };
 
 /** Le due colonne della sala d'attesa: nella piazza quella con la chat viene
@@ -448,11 +450,15 @@ export default function WaitingRoom({
   const nameValid = trimmedName.length >= 2;
   const trimmedEmail = email.trim();
   const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
-  // Consenso multitrack: se l'evento registra una traccia per partecipante
-  // (audio isolato, dato quasi-biometrico — ADR-013/GDPR art.9), l'ingresso è
-  // gated da un consenso esplicito. Niente consenso → niente ingresso.
-  const multitrackRequired =
-    !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
+  // La trascrizione dei propri interventi, con il proprio nome: si chiede se
+  // l'evento registra una traccia audio per persona (ADR-013) o tiene la
+  // trascrizione dai sottotitoli. E' facoltativa e non ferma l'ingresso: chi
+  // non la da' entra, ma la sua voce non si registra ne' si trascrive (lo
+  // decide il server, voce per voce).
+  const trascrizioneChiesta =
+    (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) &&
+    !isEnded &&
+    !multitrackConsentExempt;
   // Il consenso alla registrazione dell'evento, se va chiesto qui. Non ferma
   // la piazza: il cancello passa dallo stesso controllo del pulsante, che
   // porta alla casella.
@@ -460,7 +466,7 @@ export default function WaitingRoom({
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
-  const canPlay = !isEnded && !classicView && !multitrackRequired;
+  const canPlay = !isEnded && !classicView;
   // La piazza non è una pagina diversa: è questa pagina, ridisposta accanto
   // alla scena. Un albero solo, quindi quello che c'è nella sala d'attesa c'è
   // anche nella piazza, e aprendo e chiudendo la piazza React non smonta
@@ -529,8 +535,6 @@ export default function WaitingRoom({
       emailValid,
       recordingRequired,
       recordingConsent,
-      multitrackRequired,
-      multitrackConsent,
       ingressoTentato,
       nomeNoto,
     });
@@ -722,7 +726,7 @@ export default function WaitingRoom({
     onEnterLive(trimmedName, {
       ...devicePrefs,
       ...(recordingRequired && recordingConsent ? { recordingConsent: true } : {}),
-      ...(multitrackRequired && multitrackConsent ? { multitrackConsent: true } : {}),
+      ...(trascrizioneChiesta && multitrackConsent ? { multitrackConsent: true } : {}),
     });
   }, [
     canEnter,
@@ -733,7 +737,7 @@ export default function WaitingRoom({
     devicePrefs,
     recordingRequired,
     recordingConsent,
-    multitrackRequired,
+    trascrizioneChiesta,
     multitrackConsent,
   ]);
 
@@ -1045,7 +1049,7 @@ export default function WaitingRoom({
       </span>
       <span>
         <span className="wr-info__title">{t('captionsNoticeTitle')}</span>
-        {t('captionsNotice')}
+        {event.captionsTranscript ? t('captionsNoticeTranscript') : t('captionsNotice')}
       </span>
     </div>
   ) : null;
@@ -1082,7 +1086,7 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
-  const consensiBlock = recordingRequired || multitrackRequired ? (
+  const consensiBlock = recordingRequired || trascrizioneChiesta ? (
     <section className="wr-consensi" aria-labelledby="wr-consensi-title">
       <h2 className="wr-consensi__title" id="wr-consensi-title">
         {recordingRequired ? t('recordingConsentTitle') : t('multitrackConsentTitle')}
@@ -1112,7 +1116,7 @@ export default function WaitingRoom({
           )}
         </>
       )}
-      {multitrackRequired && (
+      {trascrizioneChiesta && (
         <div className={recordingRequired ? 'mt-3' : undefined}>
           {/* Con entrambi i consensi, quello alla traccia audio ha il suo
               titolo: e' un consenso a parte, non un dettaglio dell'altro. */}
@@ -1123,20 +1127,18 @@ export default function WaitingRoom({
             <input
               className="form-check-input"
               type="checkbox"
-              id={CAMPO_DEL_BLOCCO.consent}
+              id={CAMPO_TRASCRIZIONE}
               checked={multitrackConsent}
               onChange={(e) => setMultitrackConsent(e.target.checked)}
-              aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
+              aria-describedby={`${CAMPO_TRASCRIZIONE}-nota`}
             />
-            <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.consent}>
+            <label className="form-check-label" htmlFor={CAMPO_TRASCRIZIONE}>
               {tGdpr('multitrack')}
             </label>
           </div>
-          {!multitrackConsent && (
-            <div id={MESSAGGIO_DEL_BLOCCO.consent} className="wr-consensi__nota">
-              {t('multitrackConsentRequired')}
-            </div>
-          )}
+          <div id={`${CAMPO_TRASCRIZIONE}-nota`} className="wr-consensi__nota">
+            {tGdpr('multitrackOptional')}
+          </div>
         </div>
       )}
       {informativa}
@@ -1912,7 +1914,7 @@ export default function WaitingRoom({
 
                 {/* Re-show the game box after it was hidden (accessibility /
                     touch default). Only when the game is actually available. */}
-                {!isEnded && !multitrackRequired && classicView && (
+                {!isEnded && classicView && (
                   <div className="text-center mb-3">
                     <Button
                       color="primary"

@@ -231,6 +231,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       wordCloudEnabled: event.wordCloudEnabled,
       whiteboardEnabled: event.whiteboardEnabled,
       liveCaptionsEnabled: event.liveCaptionsEnabled,
+      captionsTranscriptEnabled: event.captionsTranscriptEnabled,
       autoStartRecording: event.autoStartRecording,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,

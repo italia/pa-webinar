@@ -105,7 +105,9 @@ export default async function EventManagePage({
       organizers: { orderBy: { sortOrder: 'asc' } },
       additionalMods: { orderBy: { createdAt: 'asc' } },
       questionnaires: true,
-      _count: { select: { registrations: true, recordings: true } },
+      // Le registrazioni con un file: quella «solo sottotitoli» non ha niente
+      // da dare alla pipeline AI.
+      _count: { select: { registrations: true, recordings: { where: { blobKey: { not: '' } } } } },
     },
   });
 
@@ -160,6 +162,7 @@ export default async function EventManagePage({
     // Gated separately from recordingUrl: an externally/manually-set recordingUrl
     // has no Recording row, so "Generate AI" would 404.
     hasRecordingRow: event._count.recordings > 0,
+    captionsTranscriptEnabled: event.captionsTranscriptEnabled,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
     postEventShowQA: event.postEventShowQA,

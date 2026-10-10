@@ -29,6 +29,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { assertPostprodAccessible } from '@/lib/ai/access';
+import { registrazionePubblica } from '@/lib/captions/transcript';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,17 +125,18 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // Access policy: same as the sibling transcript / subtitle endpoints
   // (kill-switch + recordingPublished + postEventPublic + window).
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(slug);
+  // La sintesi accompagna il video pubblicato, con la pipeline AI accesa.
+  if (fmt === 'summary.md' && ambito !== 'tutto') throw new NotFoundError('Summary');
 
   const url = new URL(request.url);
   const requestedLang = (url.searchParams.get('lang') ?? '').toLowerCase().trim();
 
-  const recording = await prisma.recording.findFirst({
-    where: {
-      eventId,
-      status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] },
-    },
-    orderBy: { createdAt: 'desc' },
+  // Prima la trascrizione AI, poi quella dai sottotitoli (lib/captions/transcript).
+  const scelta = await registrazionePubblica(eventId, soloSottotitoli);
+  if (!scelta) throw new NotFoundError('Transcript');
+  const recording = await prisma.recording.findUnique({
+    where: { id: scelta },
     select: {
       id: true,
       sourceLanguage: true,
@@ -202,7 +204,9 @@ export const GET = withErrorHandling(async (request, context) => {
   let effectiveLang = recording.sourceLanguage ?? lang;
   let revised = false;
 
-  if (!requestedLang || requestedLang === recording.sourceLanguage) {
+  // Senza la lingua della registrazione (la scrive la pipeline AI), la
+  // trascrizione si serve nella sua lingua, qualunque sia quella chiesta.
+  if (!requestedLang || !recording.sourceLanguage || requestedLang === recording.sourceLanguage) {
     const json = recording.artifacts.find((a) => a.type === 'TRANSCRIPT_JSON');
     revised = !!json?.revisedAt || !!json?.original;
     if (json?.inlineBody) {
@@ -211,12 +215,16 @@ export const GET = withErrorHandling(async (request, context) => {
         try {
           const parsed = JSON.parse(decoded) as TranscriptJson;
           segments = parsed.segments ?? [];
+          // Il nome del file dice la lingua del testo, non quella chiesta.
+          effectiveLang = recording.sourceLanguage ?? parsed.language ?? effectiveLang;
         } catch {
           // fall through — vuoto produce 404
         }
       }
     }
   } else {
+    // Le traduzioni accompagnano il video pubblicato (lib/ai/access).
+    if (ambito !== 'tutto') throw new NotFoundError('Transcript');
     // Parsing VTT della lingua tradotta. Cattura solo cue-blocks
     // base; sufficient per il nostro formato Piper/whisper.
     const vtt = recording.artifacts.find(

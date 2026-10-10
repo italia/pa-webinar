@@ -9,6 +9,7 @@ import { loadConfig } from './config.js';
 import { ContextProvider } from './context.js';
 import { Gateway } from './gateway.js';
 import { createGatewayServer } from './server.js';
+import { segmentsUrl, TranscriptSink } from './transcript.js';
 
 const config = loadConfig();
 if (!config.authToken) {
@@ -21,6 +22,11 @@ const gateway = new Gateway(
     url: config.contextUrl,
     token: config.contextToken,
     defaultLanguage: config.defaultLanguage,
+  }),
+  Date.now,
+  new TranscriptSink({
+    url: segmentsUrl(config.segmentsUrl, config.contextUrl),
+    token: config.contextToken,
   }),
 );
 gateway.start();
@@ -35,7 +41,8 @@ server.listen(config.port, () => {
 function shutdown(signal: string): void {
   console.log(`[captions] ${signal}: chiusura`);
   gateway.stop();
-  server.close(() => process.exit(0));
+  // Le frasi ancora in coda partono prima di chiudere.
+  void gateway.transcripts.flush().finally(() => server.close(() => process.exit(0)));
   setTimeout(() => process.exit(0), 5000).unref();
 }
 

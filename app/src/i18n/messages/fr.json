@@ -250,7 +250,6 @@
       "organizationRequired": "Veuillez saisir votre organisme",
       "consentRequired": "Le consentement au traitement des données est obligatoire",
       "recordingConsentRequired": "Le consentement à l'enregistrement est obligatoire pour cet événement",
-      "multitrackConsentRequired": "Le consentement à l'enregistrement de votre piste audio est obligatoire pour cet événement",
       "eventFull": "L'événement a atteint le nombre maximum de participants",
       "generic": "Erreur lors de l'inscription. Veuillez réessayer."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Active le tableau blanc collaboratif natif (Excalidraw) : les modérateurs peuvent l'ouvrir depuis la barre d'outils pendant l'événement. Nécessite le service de tableau blanc de l'installation ; lorsqu'il est disponible, il est toujours actif dans les appels instantanés.",
       "liveCaptionsEnabled": "Sous-titres automatiques",
       "liveCaptionsEnabledDesc": "Les propos des intervenants s'affichent sous la vidéo, transcrits en temps réel : cela aide les personnes qui n'entendent pas ou ont du mal à suivre. Les modérateurs peuvent aussi les désactiver pendant le direct depuis l'onglet « Régie », et chacun peut les masquer pour soi.",
+      "captionsTranscriptEnabled": "Transcription à partir des sous-titres",
+      "captionsTranscriptEnabledDesc": "Les phrases des personnes qui y consentent sont conservées avec leur nom et, à la fin de l'événement, deviennent sa transcription, même sans enregistrement ni traitement par IA. Les personnes qui n'y consentent pas n'apparaissent que dans les sous-titres en direct.",
       "autoStartRecording": "Démarrer l'enregistrement automatiquement",
       "autoStartRecordingDesc": "Au début de l'événement, l'enregistrement démarre tout seul (sans demander confirmation au modérateur). Ainsi, les retardataires trouvent déjà le lecteur de rattrapage disponible.",
       "aiSectionHeading": "Post-production automatique",
@@ -2686,6 +2687,13 @@
       "editFailed": "Échec de l'enregistrement (HTTP {code})",
       "editFailedDetail": "Échec de la sauvegarde : {message}",
       "editMediaError": "Impossible de charger l'audio de l'enregistrement : la lecture n'est pas disponible. Vous pouvez tout de même corriger le texte et les locuteurs de chaque segment.",
+      "editNoMedia": "Transcription construite à partir des sous-titres en direct : il n'y a pas d'audio à lire.",
+      "captionsSource": "depuis les sous-titres en direct",
+      "captionsRebuild": "Mettre à jour depuis les sous-titres",
+      "captionsRebuildDone": "Transcription mise à jour depuis les sous-titres.",
+      "captionsRebuildKept": "La transcription a été corrigée à la main ou provient de l'IA : elle n'a pas été remplacée.",
+      "captionsRebuildNone": "Rien à mettre à jour : aucune phrase enregistrée, ou la durée de conservation des données de l'événement est terminée.",
+      "captionsRebuildAiRunning": "Le traitement IA transcrit la vidéo : sa transcription remplacera celle des sous-titres.",
       "summaryLoadError": "Impossible de charger la synthèse.",
       "summaryLoading": "Chargement de la synthèse…",
       "summaryEmptyProcessing": "La synthèse IA n'est pas encore prête : le traitement est en cours. Actualisez la page dans quelques minutes.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "La page reste visible, mais seuls les invités peuvent s'inscrire ; sans inscription, on n'entre pas"
       },
       "previewInvitation": "Seules les personnes invitées peuvent s'inscrire ; personne n'entre sans inscription."
+    },
+    "captionsTranscript": {
+      "title": "Transcription depuis les sous-titres",
+      "intro": "Les phrases des sous-titres des personnes qui ont accepté la transcription de leurs interventions deviennent la transcription de l'événement, même sans enregistrement et sans traitement IA.",
+      "stats": "Phrases enregistrées : {saved} · voix : {voices} · phrases non enregistrées, sans consentement : {skipped}",
+      "none": "Transcription pas encore construite : elle se construit seule après la fin de l'événement, ou vous pouvez la construire maintenant.",
+      "empty": "Aucune phrase enregistrée : personne n'a parlé avec le consentement à la transcription.",
+      "fromCaptions": "Transcription construite à partir des sous-titres.",
+      "fromAi": "Il existe une transcription issue du traitement IA : elle prévaut sur celle des sous-titres.",
+      "revised": "Transcription corrigée à la main : la mettre à jour depuis les sous-titres ne la remplace pas.",
+      "build": "Construire la transcription",
+      "rebuild": "Mettre à jour depuis les sous-titres",
+      "openEditor": "Ouvrir dans l'éditeur",
+      "publish": "Publier la transcription sur la page de l'événement",
+      "publishDesc": "Elle se lit aussi sans vidéo. Relisez-la d'abord : les sous-titres automatiques peuvent contenir des erreurs.",
+      "publishWithVideo": "La vidéo publiée l'affiche déjà ; ce choix la garde visible même si la vidéo est retirée.",
+      "built": "Transcription mise à jour.",
+      "kept": "La transcription a été corrigée à la main ou provient de l'IA : elle n'a pas été remplacée.",
+      "failed": "L'opération a échoué.",
+      "loadFailed": "Impossible de charger l'état de la transcription.",
+      "expired": "La durée de conservation des données de l'événement est terminée : la transcription n'est pas reconstruite.",
+      "aiRunning": "Le traitement IA transcrit la vidéo : sa transcription remplacera celle des sous-titres."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Je consens à l'enregistrement audio/vidéo de cet événement",
       "recordingRequired": "Le consentement à l'enregistrement est obligatoire pour participer à cet événement",
       "recordingNotice": "L'événement est enregistré (audio et vidéo). Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si l'animateur vous donne la parole.",
-      "multitrack": "Je consens à l'enregistrement d'une piste audio distincte de ma voix, à seule fin d'attribuer correctement la transcription à chaque intervenant. La piste est temporaire et supprimée après la transcription ; elle n'est pas utilisée pour identifier ni reproduire ma voix.",
-      "multitrackRequired": "Le consentement à l'enregistrement de votre piste audio est obligatoire pour participer à cet événement",
+      "multitrack": "J'accepte que mes interventions soient transcrites, avec mon nom, pour le compte rendu de l'événement. Si l'événement enregistre une piste audio distincte pour chaque personne, ma voix est enregistrée à cette seule fin et la piste est supprimée après la transcription ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
+      "multitrackOptional": "C'est facultatif : si vous ne donnez pas votre accord, vous participez quand même, mais votre voix n'est pas enregistrée et vos interventions n'entrent pas dans la transcription.",
       "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
       "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Synthèse",
     "aiBadgeLabel": "Contenu généré par IA",
     "aiBadgeBody": "La transcription et la synthèse sont produites automatiquement par la chaîne de traitement IA dans le cluster. Elles peuvent contenir des erreurs ; la vidéo reste la source de référence.",
+    "captionsBadgeBody": "La transcription provient des sous-titres automatiques du direct et ne reprend que les interventions des personnes qui ont donné leur consentement. Elle peut contenir des erreurs.",
     "revisedByPerson": "Le texte a été relu par une personne après sa génération automatique.",
     "searchPlaceholder": "Rechercher dans la transcription…",
     "searchLabel": "Rechercher dans la transcription",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Afficher la place",
     "aiNoticeTitle": "Traitement par IA après l'événement",
     "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour produire une transcription, une synthèse et d'éventuelles traductions et doublages. Ces contenus peuvent comporter des imprécisions ; la vidéo reste la source faisant foi.",
-    "multitrackConsentTitle": "Enregistrement par participant",
-    "multitrackConsentRequired": "Vous devez accepter l'enregistrement de votre piste audio pour entrer",
+    "multitrackConsentTitle": "Transcription de vos interventions",
     "recordingConsentTitle": "Enregistrement de l'événement",
     "recordingConsentIntro": "Cet événement est enregistré (audio et vidéo). Si vous intervenez, l'enregistrement contient votre voix, votre image et ce que vous partagez à l'écran.",
     "recordingConsentRequired": "Votre consentement à l'enregistrement est nécessaire pour entrer.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Sous-titres automatiques",
-    "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre de l'appel."
+    "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre de l'appel.",
+    "captionsNoticeTranscript": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres, sur les serveurs qui hébergent la plateforme. Le texte n'est conservé, avec le nom, que pour les personnes qui ont accepté la transcription de leurs interventions, et devient la transcription de l'événement. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre d'appel."
   },
   "recording": {
     "management": "Enregistrement vidéo",

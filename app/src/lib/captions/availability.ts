@@ -12,3 +12,15 @@ export function captionsInstalled(): boolean {
 export function liveCaptionsAvailable(settings: { liveCaptionsEnabled?: boolean | null }): boolean {
   return settings.liveCaptionsEnabled !== false && captionsInstalled();
 }
+
+/**
+ * L'evento tiene davvero la trascrizione dai sottotitoli: l'ha scelta, ha i
+ * sottotitoli accesi, e l'istanza li ha. Solo allora si chiede il consenso
+ * alla trascrizione dei propri interventi per questo motivo.
+ */
+export function captionsTranscriptActive(
+  event: { liveCaptionsEnabled?: boolean | null; captionsTranscriptEnabled?: boolean | null },
+  settings: { liveCaptionsEnabled?: boolean | null },
+): boolean {
+  return !!event.captionsTranscriptEnabled && event.liveCaptionsEnabled !== false && liveCaptionsAvailable(settings);
+}
