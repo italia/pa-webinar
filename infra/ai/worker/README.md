@@ -37,21 +37,24 @@ flowchart TD
   kind -- "SUMMARIZE<br/>TRANSLATE" --> llm["run_summarize<br/>run_translate"]
   kind -- "DUB<br/>ARCHIVE" --> media["run_dub<br/>run_archive"]
   kind -- "SUBTITLE" --> noop["no-op"]
+  kind -- "REPORT" --> report["run_report"]
+  report --> deliver["POST the report<br/>to the portal"]
+  deliver --> done
   asr --> out["for each output:<br/>PUT to its upload target,<br/>then register_artifact"]
   llm --> out
   media --> out
   out --> done["progress DONE<br/>exit 0"]
   noop --> done
   kind -. "unknown kind" .-> failed["progress FAILED {error}<br/>exit 1"]
-  asr & llm & media & out -. "raises" .-> failed
+  asr & llm & media & out & report -. "raises" .-> failed
   classDef step fill:#E6F0FA,stroke:#0066CC,color:#17324D
   classDef handler fill:#E0F5F5,stroke:#00A3A3,color:#17324D
   classDef check fill:#FFF4E5,stroke:#CC7A00,color:#17324D
   classDef ok fill:#E6F4EE,stroke:#008055,color:#17324D
   classDef bad fill:#FDECEF,stroke:#D1344C,color:#17324D
   classDef neutral fill:#EEF1F4,stroke:#5C6F82,color:#17324D
-  class claim,running,out step
-  class asr,llm,media handler
+  class claim,running,out,deliver step
+  class asr,llm,media,report handler
   class kind check
   class done ok
   class failed,crash bad
@@ -89,7 +92,14 @@ the schema together.
 
 - **`kind` and `payload`.** The payload carries `sourceLanguage` and, for
   `TRANSLATE` and `DUB`, `targetLanguage`. For `SUMMARIZE` it also carries
-  the event's `agenda` when the event uses one.
+  the event's `agenda` when the event uses one. For `REPORT` it carries the
+  `eventId` and the `targetLanguages` of the event report.
+- **`reportInput`.** `REPORT` only: everything the event report is written
+  from, gathered by the portal at claim time (event, people, agenda,
+  transcript lines, chat without names, questions, polls, words, feedback
+  and the platform's figures). A `REPORT` job has no media, inputs or upload
+  targets: the worker sends the report to `POST /api/internal/event-report`
+  ([The event report](../../../docs/POSTPROD.md#the-event-report)).
 - **`sourceDownloadUrl`.** A presigned GET for the recording's composite
   media.
 - **`inputs[]`.** Presigned GETs for dependencies, each with a `role`:

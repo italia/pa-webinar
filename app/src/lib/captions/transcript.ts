@@ -434,10 +434,14 @@ export async function costruisciTrascrizioneDaiSottotitoli(eventId: string): Pro
  * altrimenti l'ultima con la post-produzione conclusa. Con la pipeline AI
  * spenta, solo quella dai sottotitoli.
  */
-export async function registrazionePubblica(eventId: string, soloSottotitoli: boolean): Promise<string | null> {
+export async function registrazionePubblica(
+  eventId: string,
+  soloSottotitoli: boolean,
+  db: Prisma.TransactionClient | typeof prisma = prisma,
+): Promise<string | null> {
   const fatta = { status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] as RecordingStatus[] } };
   if (!soloSottotitoli) {
-    const ai = await prisma.recording.findFirst({
+    const ai = await db.recording.findFirst({
       where: {
         eventId,
         ...fatta,
@@ -453,14 +457,14 @@ export async function registrazionePubblica(eventId: string, soloSottotitoli: bo
     });
     if (ai) return ai.id;
   }
-  const dai = await prisma.recording.findFirst({
+  const dai = await db.recording.findFirst({
     where: { eventId, artifacts: { some: { type: 'TRANSCRIPT_JSON', modelId: CAPTIONS_TRANSCRIPT_MODEL } } },
     // A pari, quella con il video (blobKey non vuota) prima.
     orderBy: [{ blobKey: 'desc' }, { createdAt: 'desc' }],
     select: { id: true },
   });
   if (dai || soloSottotitoli) return dai?.id ?? null;
-  const conclusa = await prisma.recording.findFirst({
+  const conclusa = await db.recording.findFirst({
     where: { eventId, ...fatta },
     orderBy: { createdAt: 'desc' },
     select: { id: true },

@@ -484,6 +484,16 @@ In the administration area, staff can:
 
 The pipeline is described in [AI post-production](POSTPROD.md), and the decision in [ADR-016](adr/016-in-cluster-ai-postproduction.md).
 
+### AI event report
+
+*Optional*, per event, where the AI pipeline is on. A report for those who were not there and for those who want to look back:
+
+- Staff request it from the **AI event report** panel of the **After the event** tab, usually once the ratings are in, and can regenerate it. It needs an ended event still within its data retention; the panel lists the material available and the languages to translate into.
+- The language model writes the text in the cluster: summary, highlights, the topics explained (with the minute they started, the level of agreement and the positions in favour, concerns and questions), a concept map, agreement and disagreement, what participants gained, their feedback, open questions and next steps. It reads the transcript, the chat without names, the questions, the published polls, the words, the agenda reactions and the ratings. Every figure and chart comes from the platform, not from the model.
+- Staff read it in a preview and publish it with **Show the report on the event page**; a regenerated report must be published again. The public page then shows it after the video, with participation figures and charts over time, the agenda's agree and disagree bars, the polls, the rating distributions and a concept map that can be explored with the keyboard. It is shown in the page's language when it was translated, otherwise in the event's language with a note.
+
+How it works: [AI post-production](POSTPROD.md#the-event-report).
+
 ### Feedback
 
 The end-of-event rating is the event's post-event questionnaire. Every event, instant calls included, gets the platform's generic feedback questionnaire when it is created with feedback collection on; organizers can change it or remove it. The room asks for it as described in [Leaving](#leaving), and the concluded event page offers it too while it shows feedback. Organizers see the answers without the respondent's name, and the form says so.

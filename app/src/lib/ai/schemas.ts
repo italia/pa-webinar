@@ -123,6 +123,19 @@ export const archivePayloadSchema = z.object({
 });
 
 /**
+ * Il resoconto dell'evento (lib/report). Gli ingressi li raccoglie il claim,
+ * al momento: qui solo l'evento, le lingue chiede lo staff, e i numeri
+ * calcolati al claim (`metrics`), che il risultato rilegge di qui e non dal
+ * worker.
+ */
+export const reportPayloadSchema = z.object({
+  eventId: uuidSchema,
+  sourceLanguage: languageCodeSchema,
+  targetLanguages: z.array(languageCodeSchema).max(24).default([]),
+  metrics: z.unknown().optional(),
+});
+
+/**
  * Discriminated union over all known kinds. Use it to validate a row
  * before handing it to a worker:
  *
@@ -139,6 +152,7 @@ export const postprodJobPayloadSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('SUBTITLE'), payload: subtitlePayloadSchema }),
   z.object({ kind: z.literal('DUB'), payload: dubPayloadSchema }),
   z.object({ kind: z.literal('ARCHIVE'), payload: archivePayloadSchema }),
+  z.object({ kind: z.literal('REPORT'), payload: reportPayloadSchema }),
 ]);
 
 export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
@@ -152,8 +166,9 @@ export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
  */
 export const claimResponseSchema = z.object({
   jobId: uuidSchema,
-  recordingId: uuidSchema,
-  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB', 'ARCHIVE']),
+  // Nullo per il resoconto dell'evento (REPORT), che non ha registrazione.
+  recordingId: uuidSchema.nullable(),
+  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB', 'ARCHIVE', 'REPORT']),
   payload: z.unknown(), // narrowed via postprodJobPayloadSchema downstream
   attempts: z.number().int().min(0),
   leaseExpiresAt: z.string().datetime(),

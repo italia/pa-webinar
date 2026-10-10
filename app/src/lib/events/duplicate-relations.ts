@@ -65,6 +65,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   callSessions: 'sessioni della call che si è svolta',
   gdprAuditLogs: 'registro delle cancellazioni: appartiene alla riga che le ha subite',
   recordings: 'artefatti prodotti da quell’occorrenza',
+  reportJobs: 'lavori del resoconto di quell’occorrenza, che resta suo',
 
   // Casi discutibili, esclusi con motivo esplicito.
   polls: 'un sondaggio nasce quando lo si lancia e porta con sé i voti; copiare le sole domande sarebbe una funzione a parte (modelli di sondaggio), non una duplicazione',

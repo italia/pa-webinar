@@ -19,6 +19,7 @@ import VideoPlayer, {
 import PostEventTabs from '@/components/events/post-event-tabs';
 import MaterialList from '@/components/materials/material-list';
 import PostEventRecap from '@/components/events/post-event-recap';
+import PostEventReport from '@/components/events/report/post-event-report';
 import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
@@ -32,6 +33,7 @@ import MiniTranscript from '@/components/events/mini-transcript';
 import BookmarksPanel from '@/components/events/bookmarks-panel';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
+import type { ReportView } from '@/lib/report/types';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
@@ -146,6 +148,8 @@ interface EventDetailClientProps {
   guestEntryOpen?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
+  /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
+  report?: ReportView | null;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -183,6 +187,7 @@ export default function EventDetailClient({
   registrationOpen,
   guestEntryOpen = true,
   hasPostEventQuestionnaire = false,
+  report = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tr = useTranslations('registration');
@@ -617,7 +622,7 @@ export default function EventDetailClient({
           )}
           {isEnded && event.recordingUrl && (
             <div className="mb-4">
-              <div ref={playerAnchorRef} style={{ position: 'relative' }}>
+              <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
                 <VideoPlayer
                   ref={playerRef}
                   src={`/api/events/${event.slug}/recording`}
@@ -693,6 +698,12 @@ export default function EventDetailClient({
             </div>
           )}
           {/* // TODO v0.5.0: Live catch-up player with HLS */}
+
+          {/* Il resoconto dell'evento, pubblicato dallo staff: dopo il video,
+              prima della descrizione. */}
+          {isEnded && report && (
+            <PostEventReport report={report} playerRef={playerRef} hasVideo={!!event.recordingUrl} />
+          )}
 
           <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('detail.description')}

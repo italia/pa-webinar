@@ -3171,6 +3171,42 @@
       "loadFailed": "Stav přepisu nelze načíst.",
       "expired": "Doba uchovávání údajů akce skončila: přepis se znovu nevytváří.",
       "aiRunning": "Zpracování AI přepisuje video: jeho přepis nahradí přepis z titulků."
+    },
+    "eventReport": {
+      "title": "Zpráva AI z akce",
+      "intro": "Zpráva pro ty, kdo nebyli přítomni, i k opakovanému čtení: shrnutí, vysvětlená témata, mapa pojmů, shoda a neshoda, účast a hodnocení, s grafy vypočtenými platformou. Píše ji jazykový model platformy na jejích vlastních serverech.",
+      "afterFeedback": "Vytvořte ji po shromáždění hodnocení účastníků: zahrnou se ta, která do té doby dorazila. Lze ji vytvořit znovu.",
+      "requirementsTitle": "Požadavky",
+      "reqEnded": "Akce skončila",
+      "reqAi": "Zpracování AI zapnuté v nastavení",
+      "reqRetention": "Údaje akce dostupné do {date}",
+      "reqExpired": "Uchovávání údajů skončilo {date}: chat, reakce a docházka již nejsou k dispozici",
+      "inputsTitle": "Dostupné podklady",
+      "inputTranscript": "Přepis",
+      "inputNoTranscript": "Bez přepisu",
+      "inputChat": "{count, plural, one {# zpráva v chatu} few {# zprávy v chatu} many {# zprávy v chatu} other {# zpráv v chatu}}",
+      "inputQuestions": "{count, plural, one {# otázka} few {# otázky} many {# otázky} other {# otázek}}",
+      "inputPolls": "{count, plural, one {# zveřejněná anketa} few {# zveřejněné ankety} many {# zveřejněné ankety} other {# zveřejněných anket}}",
+      "inputWords": "{count, plural, one {# slovo} few {# slova} many {# slova} other {# slov}}",
+      "inputFeedback": "{count, plural, one {# hodnocení} few {# hodnocení} many {# hodnocení} other {# hodnocení}}",
+      "inputAgenda": "{count, plural, one {# reakce na program} few {# reakce na program} many {# reakce na program} other {# reakcí na program}}",
+      "languagesTitle": "Jazyky: {language} a překlady",
+      "targetLanguages": "Přeložit zprávu také do:",
+      "generate": "Vytvořit zprávu",
+      "regenerate": "Vytvořit zprávu znovu",
+      "confirmRegenerate": "Nová zpráva nahradí stávající a zůstane skrytá, dokud ji znovu nezveřejníte.",
+      "requested": "Zpráva vyžádána: bude hotová za několik minut.",
+      "failed": "Operace se nezdařila.",
+      "loadFailed": "Stav zprávy nelze načíst.",
+      "statusQueued": "Ve frontě.",
+      "statusRunning": "Připravuje se: model píše zprávu.",
+      "statusFailed": "Nezdařilo se: {error}",
+      "statusDone": "Vytvořeno {date}.",
+      "publish": "Zobrazit zprávu na stránce akce",
+      "publishDesc": "Před zveřejněním ji zkontrolujte: text napsal model umělé inteligence. Znovu vytvořenou zprávu je třeba znovu zveřejnit.",
+      "preview": "Náhled",
+      "hidePreview": "Skrýt náhled",
+      "previewLanguage": "Jazyk"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Upozornit přihlášené, až bude záznam zveřejněn",
     "recordingNotifyHelp": "Jediný e-mail, jakmile je záznam (nebo externí video) viditelný na veřejné stránce akce. Dostanou ho ti, kdo jsou stále přihlášeni: po uplynutí doby uchování už nikdo.",
-    "recordingNotifySent": "Upozornění odesláno {date}."
+    "recordingNotifySent": "Upozornění odesláno {date}.",
+    "report": {
+      "title": "Zpráva z akce",
+      "generatedAt": "Vytvořeno {date}",
+      "translated": "automatický překlad z originálu v jazyce: {language}",
+      "languageFallback": "Zpráva není k dispozici ve vašem jazyce: zobrazuje se v jazyce: {language}.",
+      "sections": {
+        "highlights": "Stručně",
+        "numbers": "Účast v číslech",
+        "timeline": "Účast v čase",
+        "topics": "Témata",
+        "map": "Mapa pojmů",
+        "consensus": "Shoda a neshoda",
+        "polls": "Ankety",
+        "feedback": "Hodnocení účastníků",
+        "benefits": "Co si účastníci odnesli",
+        "openQuestions": "Otevřené otázky",
+        "nextSteps": "Další kroky",
+        "summary": "Přečíst celou zprávu"
+      },
+      "metrics": {
+        "peak": "Lidé v sále ve špičce",
+        "joined": "Přítomní",
+        "ofRegistered": "{pct} % přihlášených",
+        "active": "Aktivně se zapojili",
+        "ofPresent": "{pct} % přítomných",
+        "interactions": "Interakce",
+        "rating": "Průměrné hodnocení",
+        "responses": "{count, plural, one {# odpověď} few {# odpovědi} many {# odpovědi} other {# odpovědí}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Otázky",
+        "polls": "Ankety",
+        "words": "Slova",
+        "reactions": "Reakce"
+      },
+      "timelineDesc": "Interakce po {minutes} minutách od začátku akce",
+      "timeFromStart": "Od začátku",
+      "peak": "Nejživější okamžik: {label} od začátku.",
+      "agreement": {
+        "high": "Široká shoda",
+        "mixed": "Rozdělené názory",
+        "low": "Malá shoda",
+        "unknown": "Shodu nelze posoudit"
+      },
+      "goTo": "Přejít na {time}",
+      "stance": {
+        "support": "Pro",
+        "concern": "Výhrady",
+        "question": "Otázka"
+      },
+      "mapDesc": "Mapa pojmů akce: témata kolem názvu, propojená s pojmy, aktéry a výsledky.",
+      "kind": {
+        "topic": "Téma",
+        "concept": "Pojem",
+        "actor": "Aktér",
+        "outcome": "Výsledek"
+      },
+      "agendaReactions": "Reakce účastníků na body programu",
+      "agree": "Souhlasím",
+      "disagree": "Nesouhlasím",
+      "agreements": "Body shody",
+      "disagreements": "Body neshody",
+      "votes": "{count, plural, one {# hlas} few {# hlasy} many {# hlasu} other {# hlasů}}",
+      "average": "průměr {value} z {max}",
+      "strengths": "Silné stránky",
+      "improvements": "Ke zlepšení",
+      "quotes": "Z komentářů",
+      "aiNotice": "Text napsal model umělé inteligence z přepisu, chatu, otázek, anket a hodnocení a tým jej před zveřejněním zkontroloval. Čísla a grafy počítá platforma. Může obsahovat nepřesnosti."
+    }
   },
   "provisioning": {
     "loading": "Načítání",

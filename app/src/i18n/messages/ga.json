@@ -3171,6 +3171,42 @@
       "loadFailed": "Níorbh fhéidir stádas na tras-scríbhinne a lódáil.",
       "expired": "Tá tréimhse choinneála shonraí an imeachta thart: ní thógtar an tras-scríbhinn arís.",
       "aiRunning": "Tá an phróiseáil IS ag tras-scríobh an fhíseáin: tiocfaidh a tras-scríbhinn in áit na tras-scríbhinne ó na fotheidil."
+    },
+    "eventReport": {
+      "title": "Tuarascáil IS ar an imeacht",
+      "intro": "Tuarascáil dóibh siúd nach raibh i láthair agus le haghaidh athléite: achoimre, ábhair mínithe, léarscáil choincheap, comhaontú agus easaontú, rannpháirtíocht agus measúnuithe, le graif arna ríomh ag an ardán. Is í samhail teanga an ardáin a scríobhann í, ar fhreastalaithe an ardáin féin.",
+      "afterFeedback": "Cruthaigh í tar éis measúnuithe na rannpháirtithe a bhailiú: cuirtear san áireamh na cinn a fuarthas go dtí sin. Is féidir í a chruthú arís.",
+      "requirementsTitle": "Riachtanais",
+      "reqEnded": "Tá an t-imeacht thart",
+      "reqAi": "Próiseáil IS cumasaithe sna socruithe",
+      "reqRetention": "Sonraí an imeachta ar fáil go dtí {date}",
+      "reqExpired": "Tháinig deireadh le coinneáil na sonraí ar {date}: níl an comhrá, na himoibrithe ná an tinreamh ar fáil a thuilleadh",
+      "inputsTitle": "Ábhar atá ar fáil",
+      "inputTranscript": "Tras-scríbhinn",
+      "inputNoTranscript": "Gan tras-scríbhinn",
+      "inputChat": "{count, plural, one {# teachtaireacht chomhrá} two {# theachtaireacht chomhrá} few {# theachtaireacht chomhrá} many {# dteachtaireacht chomhrá} other {# teachtaireacht chomhrá}}",
+      "inputQuestions": "{count, plural, one {# cheist} two {# cheist} few {# cheist} many {# gceist} other {# ceist}}",
+      "inputPolls": "{count, plural, one {# phobalbhreith foilsithe} two {# phobalbhreith foilsithe} few {# phobalbhreith foilsithe} many {# bpobalbhreith foilsithe} other {# pobalbhreith foilsithe}}",
+      "inputWords": "{count, plural, one {# fhocal} two {# fhocal} few {# fhocal} many {# bhfocal} other {# focal}}",
+      "inputFeedback": "{count, plural, one {# mheasúnú} two {# mheasúnú} few {# mheasúnú} many {# measúnú} other {# measúnú}}",
+      "inputAgenda": "{count, plural, one {# imoibriú ar an gclár oibre} two {# imoibriú ar an gclár oibre} few {# imoibriú ar an gclár oibre} many {# n-imoibriú ar an gclár oibre} other {# imoibriú ar an gclár oibre}}",
+      "languagesTitle": "Teangacha: {language} agus aistriúcháin",
+      "targetLanguages": "Aistrigh an tuarascáil chomh maith go:",
+      "generate": "Cruthaigh an tuarascáil",
+      "regenerate": "Cruthaigh an tuarascáil arís",
+      "confirmRegenerate": "Tagann an tuarascáil nua in áit na tuarascála reatha agus fanann sí i bhfolach go dtí go bhfoilsíonn tú arís í.",
+      "requested": "Iarradh an tuarascáil: beidh sí réidh i gceann cúpla nóiméad.",
+      "failed": "Theip ar an oibríocht.",
+      "loadFailed": "Níorbh fhéidir stádas na tuarascála a lódáil.",
+      "statusQueued": "Sa scuaine.",
+      "statusRunning": "Á hullmhú: tá an tsamhail ag scríobh na tuarascála.",
+      "statusFailed": "Theip uirthi: {error}",
+      "statusDone": "Cruthaithe ar {date}.",
+      "publish": "Taispeáin an tuarascáil ar leathanach an imeachta",
+      "publishDesc": "Athbhreithnigh í sula bhfoilsíonn tú í: is samhail intleachta saorga a scríobh an téacs. Ní mór tuarascáil a cruthaíodh arís a fhoilsiú arís.",
+      "preview": "Réamhamharc",
+      "hidePreview": "Folaigh an réamhamharc",
+      "previewLanguage": "Teanga"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Cuir in iúl do na rannpháirtithe cláraithe nuair a fhoilsítear an taifeadadh",
     "recordingNotifyHelp": "Ríomhphost amháin, nuair a bhíonn an taifeadadh (nó an físeán seachtrach) le feiceáil ar leathanach poiblí an imeachta. Sroicheann sé na daoine atá fós cláraithe: tar éis na tréimhse coinneála ní chuirtear in iúl d'aon duine.",
-    "recordingNotifySent": "Fógra seolta ar {date}."
+    "recordingNotifySent": "Fógra seolta ar {date}.",
+    "report": {
+      "title": "Tuarascáil ar an imeacht",
+      "generatedAt": "Cruthaithe ar {date}",
+      "translated": "aistriúchán uathoibríoch ón mbunleagan i {language}",
+      "languageFallback": "Níl an tuarascáil ar fáil i do theanga: taispeántar í i {language}.",
+      "sections": {
+        "highlights": "Go hachomair",
+        "numbers": "An rannpháirtíocht i bhfigiúirí",
+        "timeline": "An rannpháirtíocht le himeacht ama",
+        "topics": "Na hábhair",
+        "map": "Léarscáil choincheap",
+        "consensus": "Comhaontú agus easaontú",
+        "polls": "Pobalbhreitheanna",
+        "feedback": "Measúnuithe na rannpháirtithe",
+        "benefits": "Cad a ghnóthaigh na rannpháirtithe",
+        "openQuestions": "Ceisteanna oscailte",
+        "nextSteps": "Na chéad chéimeanna eile",
+        "summary": "Léigh an tuarascáil iomlán"
+      },
+      "metrics": {
+        "peak": "Daoine sa seomra ag an mbuaicphointe",
+        "joined": "I láthair",
+        "ofRegistered": "{pct}% díobh siúd a chláraigh",
+        "active": "Ghlac páirt ghníomhach",
+        "ofPresent": "{pct}% díobh siúd i láthair",
+        "interactions": "Idirghníomhaíochtaí",
+        "rating": "Meánmheasúnú",
+        "responses": "{count, plural, one {# freagra} two {# fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}"
+      },
+      "series": {
+        "chat": "Comhrá",
+        "questions": "Ceisteanna",
+        "polls": "Pobalbhreitheanna",
+        "words": "Focail",
+        "reactions": "Imoibrithe"
+      },
+      "timelineDesc": "Idirghníomhaíochtaí gach {minutes} nóiméad ó thús an imeachta",
+      "timeFromStart": "Ón tús",
+      "peak": "An tráth ba ghníomhaí: {label} ón tús.",
+      "agreement": {
+        "high": "Comhaontú leathan",
+        "mixed": "Tuairimí roinnte",
+        "low": "Beagán comhaontaithe",
+        "unknown": "Ní féidir an comhaontú a mheas"
+      },
+      "goTo": "Téigh go {time}",
+      "stance": {
+        "support": "Ar a shon",
+        "concern": "Imní",
+        "question": "Ceist"
+      },
+      "mapDesc": "Léarscáil choincheap an imeachta: na hábhair timpeall an teidil, nasctha le coincheapa, gníomhaithe agus torthaí.",
+      "kind": {
+        "topic": "Ábhar",
+        "concept": "Coincheap",
+        "actor": "Gníomhaí",
+        "outcome": "Toradh"
+      },
+      "agendaReactions": "Imoibrithe na rannpháirtithe ar mhíreanna an chláir oibre",
+      "agree": "Aontaím",
+      "disagree": "Ní aontaím",
+      "agreements": "Pointí comhaontaithe",
+      "disagreements": "Pointí easaontaithe",
+      "votes": "{count, plural, one {# vóta} two {# vóta} few {# vóta} many {# vóta} other {# vóta}}",
+      "average": "meán {value} as {max}",
+      "strengths": "Láidreachtaí",
+      "improvements": "Le feabhsú",
+      "quotes": "Ó na tráchtanna",
+      "aiNotice": "Is samhail intleachta saorga a scríobh an téacs ón tras-scríbhinn, ón gcomhrá, ó na ceisteanna, ó na pobalbhreitheanna agus ó na measúnuithe, agus rinne an fhoireann athbhreithniú air sular foilsíodh é. Is é an t-ardán a ríomhann na figiúirí agus na graif. D'fhéadfadh míchruinneas a bheith ann."
+    }
   },
   "provisioning": {
     "loading": "Á luchtú",

@@ -15,7 +15,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useConfirm } from '@/components/ui/confirm-dialog';
@@ -52,6 +52,7 @@ import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CaptionsTranscriptPanel from './captions-transcript-panel';
+import EventReportPanel from './event-report-panel';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -1258,6 +1259,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tfb = useTranslations('admin.feedbackPanel');
   const tg = useTranslations('admin.glossary');
   const tct = useTranslations('admin.captionsTranscript');
+  const trp = useTranslations('admin.eventReport');
+  const locale = useLocale();
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
@@ -1344,6 +1347,16 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         <H>{tfb('title')}</H>
         <EventFeedbackPanel eventId={event.id} token={viaToken} />
       </div>
+
+      {/* Il resoconto dell'evento: dopo le valutazioni, che ne fanno parte.
+          Lo chiede lo staff (accende il modello linguistico), non chi arriva
+          con il link del moderatore. */}
+      {!viaToken && (
+        <div className="mb-4">
+          <H>{trp('title')}</H>
+          <EventReportPanel eventId={event.id} locale={locale} />
+        </div>
+      )}
 
       {/* CTA prominente verso la gestione AI completa del video:
           trascrizione (testo + diarization), sintesi, traduzioni.

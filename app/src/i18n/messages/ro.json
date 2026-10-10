@@ -3171,6 +3171,42 @@
       "loadFailed": "Starea transcrierii nu a putut fi încărcată.",
       "expired": "Perioada de păstrare a datelor evenimentului s-a încheiat: transcrierea nu se mai reconstruiește.",
       "aiRunning": "Procesarea AI transcrie videoclipul: transcrierea ei o va înlocui pe cea din subtitrări."
+    },
+    "eventReport": {
+      "title": "Raportul AI al evenimentului",
+      "intro": "Un raport pentru cei care nu au fost prezenți și pentru recitire: rezumat, teme explicate, harta conceptelor, acord și dezacord, participare și evaluări, cu grafice calculate de platformă. Îl scrie modelul de limbaj al platformei, pe propriile servere.",
+      "afterFeedback": "Generează-l după ce colectezi evaluările participanților: sunt incluse cele primite până atunci. Poate fi generat din nou.",
+      "requirementsTitle": "Cerințe",
+      "reqEnded": "Eveniment încheiat",
+      "reqAi": "Procesarea AI activată în setări",
+      "reqRetention": "Datele evenimentului disponibile până la {date}",
+      "reqExpired": "Păstrarea datelor s-a încheiat la {date}: chatul, reacțiile și prezențele nu mai sunt disponibile",
+      "inputsTitle": "Material disponibil",
+      "inputTranscript": "Transcriere",
+      "inputNoTranscript": "Nicio transcriere",
+      "inputChat": "{count, plural, one {# mesaj în chat} few {# mesaje în chat} other {# de mesaje în chat}}",
+      "inputQuestions": "{count, plural, one {# întrebare} few {# întrebări} other {# de întrebări}}",
+      "inputPolls": "{count, plural, one {# sondaj publicat} few {# sondaje publicate} other {# de sondaje publicate}}",
+      "inputWords": "{count, plural, one {# cuvânt} few {# cuvinte} other {# de cuvinte}}",
+      "inputFeedback": "{count, plural, one {# evaluare} few {# evaluări} other {# de evaluări}}",
+      "inputAgenda": "{count, plural, one {# reacție la ordinea de zi} few {# reacții la ordinea de zi} other {# de reacții la ordinea de zi}}",
+      "languagesTitle": "Limbi: {language} și traduceri",
+      "targetLanguages": "Tradu raportul și în:",
+      "generate": "Generează raportul",
+      "regenerate": "Generează din nou raportul",
+      "confirmRegenerate": "Noul raport îl înlocuiește pe cel actual și rămâne ascuns până când îl publici din nou.",
+      "requested": "Raport solicitat: va fi gata în câteva minute.",
+      "failed": "Operațiunea a eșuat.",
+      "loadFailed": "Starea raportului nu a putut fi încărcată.",
+      "statusQueued": "În coadă.",
+      "statusRunning": "În pregătire: modelul scrie raportul.",
+      "statusFailed": "Nu a reușit: {error}",
+      "statusDone": "Generat la {date}.",
+      "publish": "Afișează raportul pe pagina evenimentului",
+      "publishDesc": "Revizuiește-l înainte de publicare: textul este scris de un model de inteligență artificială. Un raport generat din nou trebuie publicat din nou.",
+      "preview": "Previzualizare",
+      "hidePreview": "Ascunde previzualizarea",
+      "previewLanguage": "Limba"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Anunță înscrișii când înregistrarea este publicată",
     "recordingNotifyHelp": "Un singur e-mail, când înregistrarea (sau videoclipul extern) este vizibilă pe pagina publică a evenimentului. Ajunge la cei încă înscriși: după perioada de păstrare nu este anunțat nimeni.",
-    "recordingNotifySent": "Anunț trimis pe {date}."
+    "recordingNotifySent": "Anunț trimis pe {date}.",
+    "report": {
+      "title": "Raportul evenimentului",
+      "generatedAt": "Generat la {date}",
+      "translated": "traducere automată din originalul în {language}",
+      "languageFallback": "Raportul nu este disponibil în limba ta: este afișat în {language}.",
+      "sections": {
+        "highlights": "Pe scurt",
+        "numbers": "Participarea în cifre",
+        "timeline": "Participarea în timp",
+        "topics": "Temele",
+        "map": "Harta conceptelor",
+        "consensus": "Acord și dezacord",
+        "polls": "Sondaje",
+        "feedback": "Evaluările participanților",
+        "benefits": "Ce au câștigat participanții",
+        "openQuestions": "Întrebări deschise",
+        "nextSteps": "Pașii următori",
+        "summary": "Citește raportul complet"
+      },
+      "metrics": {
+        "peak": "Persoane în sală la vârf",
+        "joined": "Prezenți",
+        "ofRegistered": "{pct}% dintre înscriși",
+        "active": "Au participat activ",
+        "ofPresent": "{pct}% dintre prezenți",
+        "interactions": "Interacțiuni",
+        "rating": "Evaluare medie",
+        "responses": "{count, plural, one {# răspuns} few {# răspunsuri} other {# de răspunsuri}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Întrebări",
+        "polls": "Sondaje",
+        "words": "Cuvinte",
+        "reactions": "Reacții"
+      },
+      "timelineDesc": "Interacțiuni la fiecare {minutes} minute de la începutul evenimentului",
+      "timeFromStart": "De la început",
+      "peak": "Momentul cel mai activ: {label} de la început.",
+      "agreement": {
+        "high": "Acord larg",
+        "mixed": "Opinii împărțite",
+        "low": "Acord redus",
+        "unknown": "Acordul nu poate fi evaluat"
+      },
+      "goTo": "Mergi la {time}",
+      "stance": {
+        "support": "Pentru",
+        "concern": "Rezerve",
+        "question": "Întrebare"
+      },
+      "mapDesc": "Harta conceptelor evenimentului: temele în jurul titlului, legate de concepte, actori și rezultate.",
+      "kind": {
+        "topic": "Temă",
+        "concept": "Concept",
+        "actor": "Actor",
+        "outcome": "Rezultat"
+      },
+      "agendaReactions": "Reacțiile participanților la punctele de pe ordinea de zi",
+      "agree": "De acord",
+      "disagree": "Nu sunt de acord",
+      "agreements": "Puncte de acord",
+      "disagreements": "Puncte de dezacord",
+      "votes": "{count, plural, one {# vot} few {# voturi} other {# de voturi}}",
+      "average": "medie {value} din {max}",
+      "strengths": "Puncte forte",
+      "improvements": "De îmbunătățit",
+      "quotes": "Din comentarii",
+      "aiNotice": "Textul este scris de un model de inteligență artificială pe baza transcrierii, a chatului, a întrebărilor, a sondajelor și a evaluărilor, iar echipa l-a revizuit înainte de publicare. Cifrele și graficele sunt calculate de platformă. Poate conține inexactități."
+    }
   },
   "provisioning": {
     "loading": "Se încarcă",

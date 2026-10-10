@@ -3171,6 +3171,42 @@
       "loadFailed": "Udskriftens status kunne ikke indlæses.",
       "expired": "Opbevaringsperioden for arrangementets data er udløbet: udskriften bygges ikke igen.",
       "aiRunning": "AI-behandlingen transskriberer videoen: dens udskrift træder i stedet for den fra underteksterne."
+    },
+    "eventReport": {
+      "title": "AI-referat af arrangementet",
+      "intro": "Et referat til dem, der ikke var med, og til genlæsning: resumé, forklarede emner, begrebskort, enighed og uenighed, deltagelse og vurderinger, med diagrammer beregnet af platformen. Det skrives af platformens sprogmodel på dens egne servere.",
+      "afterFeedback": "Opret det, når deltagernes vurderinger er indsamlet: de modtagne indtil da kommer med. Det kan oprettes igen.",
+      "requirementsTitle": "Krav",
+      "reqEnded": "Arrangementet er slut",
+      "reqAi": "AI-behandling slået til i indstillingerne",
+      "reqRetention": "Arrangementets data er tilgængelige indtil {date}",
+      "reqExpired": "Opbevaringen af data sluttede {date}: chat, reaktioner og fremmøde er ikke længere tilgængelige",
+      "inputsTitle": "Tilgængeligt materiale",
+      "inputTranscript": "Udskrift",
+      "inputNoTranscript": "Ingen udskrift",
+      "inputChat": "{count, plural, one {# chatbesked} other {# chatbeskeder}}",
+      "inputQuestions": "{count, plural, one {# spørgsmål} other {# spørgsmål}}",
+      "inputPolls": "{count, plural, one {# offentliggjort afstemning} other {# offentliggjorte afstemninger}}",
+      "inputWords": "{count, plural, one {# ord} other {# ord}}",
+      "inputFeedback": "{count, plural, one {# vurdering} other {# vurderinger}}",
+      "inputAgenda": "{count, plural, one {# reaktion på dagsordenen} other {# reaktioner på dagsordenen}}",
+      "languagesTitle": "Sprog: {language} og oversættelser",
+      "targetLanguages": "Oversæt også referatet til:",
+      "generate": "Opret referat",
+      "regenerate": "Opret referat igen",
+      "confirmRegenerate": "Det nye referat erstatter det nuværende og forbliver skjult, indtil du offentliggør det igen.",
+      "requested": "Referat bestilt: det er klar om få minutter.",
+      "failed": "Handlingen mislykkedes.",
+      "loadFailed": "Referatets status kunne ikke indlæses.",
+      "statusQueued": "I kø.",
+      "statusRunning": "Under udarbejdelse: modellen skriver referatet.",
+      "statusFailed": "Mislykkedes: {error}",
+      "statusDone": "Oprettet {date}.",
+      "publish": "Vis referatet på arrangementets side",
+      "publishDesc": "Gennemlæs det før offentliggørelse: teksten er skrevet af en AI-model. Et nyoprettet referat skal offentliggøres igen.",
+      "preview": "Forhåndsvisning",
+      "hidePreview": "Skjul forhåndsvisning",
+      "previewLanguage": "Sprog"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Giv tilmeldte besked, når optagelsen er offentliggjort",
     "recordingNotifyHelp": "Én e-mail, når optagelsen (eller den eksterne video) er synlig på arrangementets offentlige side. Den når dem, der stadig er tilmeldt: efter opbevaringsperioden får ingen besked.",
-    "recordingNotifySent": "Besked sendt {date}."
+    "recordingNotifySent": "Besked sendt {date}.",
+    "report": {
+      "title": "Referat af arrangementet",
+      "generatedAt": "Oprettet {date}",
+      "translated": "automatisk oversættelse fra originalen på {language}",
+      "languageFallback": "Referatet findes ikke på dit sprog: det vises på {language}.",
+      "sections": {
+        "highlights": "Kort fortalt",
+        "numbers": "Deltagelsen i tal",
+        "timeline": "Deltagelsen over tid",
+        "topics": "Emnerne",
+        "map": "Begrebskort",
+        "consensus": "Enighed og uenighed",
+        "polls": "Afstemninger",
+        "feedback": "Deltagernes vurderinger",
+        "benefits": "Hvad deltagerne fik ud af det",
+        "openQuestions": "Åbne spørgsmål",
+        "nextSteps": "Næste skridt",
+        "summary": "Læs hele referatet"
+      },
+      "metrics": {
+        "peak": "Personer i salen på toppunktet",
+        "joined": "Til stede",
+        "ofRegistered": "{pct} % af de tilmeldte",
+        "active": "Deltog aktivt",
+        "ofPresent": "{pct} % af de fremmødte",
+        "interactions": "Interaktioner",
+        "rating": "Gennemsnitlig vurdering",
+        "responses": "{count, plural, one {# svar} other {# svar}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Spørgsmål",
+        "polls": "Afstemninger",
+        "words": "Ord",
+        "reactions": "Reaktioner"
+      },
+      "timelineDesc": "Interaktioner for hvert {minutes}. minut fra arrangementets start",
+      "timeFromStart": "Fra start",
+      "peak": "Det mest aktive øjeblik: {label} efter start.",
+      "agreement": {
+        "high": "Bred enighed",
+        "mixed": "Delte meninger",
+        "low": "Lidt enighed",
+        "unknown": "Enighed kan ikke vurderes"
+      },
+      "goTo": "Gå til {time}",
+      "stance": {
+        "support": "For",
+        "concern": "Betænkelighed",
+        "question": "Spørgsmål"
+      },
+      "mapDesc": "Begrebskort over arrangementet: emnerne rundt om titlen, forbundet med begreber, aktører og resultater.",
+      "kind": {
+        "topic": "Emne",
+        "concept": "Begreb",
+        "actor": "Aktør",
+        "outcome": "Resultat"
+      },
+      "agendaReactions": "Deltagernes reaktioner på dagsordenens punkter",
+      "agree": "Enig",
+      "disagree": "Uenig",
+      "agreements": "Punkter med enighed",
+      "disagreements": "Punkter med uenighed",
+      "votes": "{count, plural, one {# stemme} other {# stemmer}}",
+      "average": "gennemsnit {value} ud af {max}",
+      "strengths": "Styrker",
+      "improvements": "Kan forbedres",
+      "quotes": "Fra kommentarerne",
+      "aiNotice": "Teksten er skrevet af en AI-model ud fra udskriften, chatten, spørgsmålene, afstemningerne og vurderingerne, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Den kan indeholde unøjagtigheder."
+    }
   },
   "provisioning": {
     "loading": "Indlæser",

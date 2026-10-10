@@ -36,6 +36,7 @@ need the transparency facts. Related pages:
 [Provisioning a GPU node pool](#provisioning-a-gpu-node-pool) ·
 [Administration](#administration) ·
 [Public experience](#public-experience) ·
+[The event report](#the-event-report) ·
 [Transparency (AI Act Article 50)](#transparency-ai-act-article-50) ·
 [Observability](#observability) ·
 [Local development and tests](#local-development-and-tests) ·
@@ -48,6 +49,8 @@ Every output is a `PostprodArtifact` row that points to one file in object
 storage. `PostprodArtifactType` in `app/prisma/schema.prisma` is the
 authoritative list. The one exception is the transcript built from live
 captions (see below), which is not produced by this pipeline and has no file.
+The event report (`REPORT`) produces no artifact at all: its result is stored
+on the event ([The event report](#the-event-report)).
 
 | Artifact type | Produced by | Language | Contents | Where it is used |
 |---|---|---|---|---|
@@ -196,6 +199,7 @@ there is work: the GPU node pool scales to zero between runs.
 | **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. | detected |
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
+| **Generate the report** (event page, **After the event** tab) | `POST /api/admin/events/<id>/report` enqueues one `REPORT` job for an ended event within its data retention ([The event report](#the-event-report)). | none |
 
 Every path goes through `app/src/lib/ai/enqueue.ts`, and every path is gated
 by the site-wide switch `aiPipelineEnabled`: the automatic paths do nothing
@@ -262,6 +266,9 @@ flowchart TD
   are no target languages, so there is no dubbing either.
 - **`ARCHIVE`** is never part of a full enqueue. An administrator starts it,
   and it depends on the job that produced the current `TRANSCRIPT_JSON`.
+- **`REPORT`** is never part of a full enqueue either, and depends on no job:
+  staff request it, and it reads whatever transcript and summary exist when it
+  is claimed.
 - **Optional extras.** `WAVEFORM_JSON` (from `TRANSCRIBE`) and `DUBBED_VIDEO`
   (from `DUB`) get upload targets but are not part of the job's expected
   artifacts. They are best-effort: failing to produce them never fails the
@@ -277,6 +284,7 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 | `TRANSLATE` | `TRANSCRIPT_JSON`; the source-language `SUMMARY_JSON` when it exists | `speakerNames` |
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
 | `ARCHIVE` | The composite MP4; each unpurged track; the source `TRANSCRIPT_VTT` when it exists | none |
+| `REPORT` | No file: the portal gathers the event's material and figures at claim time (`reportInput`) | The language model's endpoint and the glossary ([The event report](#the-event-report)) |
 
 ## Queue semantics
 
@@ -417,7 +425,8 @@ A job whose dependency failed is never runnable and stays `PENDING`.
 `POSTPROD_QUEUED` while its jobs run. A recording without media, created to
 hold a transcript from live captions, is created `POSTPROD_DONE` and never
 enters the queue; a transcript from captions added to an existing recording
-leaves its status as it is.
+leaves its status as it is. A `REPORT` job belongs to the event, not to a
+recording, so it changes no recording's status.
 
 Both checks cover the jobs of every run, not only the latest:
 
@@ -496,7 +505,7 @@ image:
 | Template | Takes | Runs on |
 |---|---|---|
 | `<fullname>-postprod-worker` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`, `DUB` | the GPU pool, with a whole GPU and tens of GB of memory |
-| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
+| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE`, `REPORT` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
 
 Summaries and translations get their text from vLLM, which has its own GPU,
 and the archive remuxes without re-encoding. The CPU worker runs the same code
@@ -918,7 +927,11 @@ for their fields; deletion and retention are described in
 The transcript from live captions is built from two tables outside this
 pipeline, `caption_segments` (`CaptionSegment`) and `room_occupants`
 (`RoomOccupant`), described in
-[Live captions](architecture/live-captions.md#transcript-from-captions).
+[Live captions](architecture/live-captions.md#transcript-from-captions). The
+event report is stored on the event itself, in columns of `events`:
+`post_event_report` (JSON: the figures and the text in each language),
+`post_event_report_at` and `post_event_report_published`
+([The event report](#the-event-report)).
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#E6F0FA", "primaryBorderColor": "#0066CC", "primaryTextColor": "#17324D", "lineColor": "#5C6F82", "tertiaryColor": "#F7F9FB", "edgeLabelBackground": "#FFFFFF"}}}%%
@@ -1270,7 +1283,7 @@ holds the defaults quoted here. Chart-wide keys are in
 | `worker.hfTokenSecret.name`, `.key` | empty, `HF_TOKEN` | Hugging Face token; set the name (see the [checklist](#operational-checklist)) |
 | `worker.extraEnv` | empty | Extra worker environment, for example `AUDIOSEAL_CACHE_DIR` or `LLM_CONNECT_WAIT_S` |
 | `worker.gpu.enabled`, `.count` | `true`, `1` | GPU request and limit |
-| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations and archives to it |
+| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations, archives and event reports to it |
 | `worker.cpu.image` | empty: `worker.image` when that is set, otherwise `<app.image.repository>-postprod-worker-cpu` with the app image's tag | The CPU worker's light image. Set it whenever you set `worker.image`, or the CPU worker pulls the GPU worker's large image |
 | `worker.cpu.extraEnv` | empty | Environment of the CPU worker, for example `LLM_CONNECT_WAIT_S`; `worker.extraEnv` and the Hugging Face token reach only the GPU worker |
 | `worker.cpu.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Placement of the CPU worker |
@@ -1542,10 +1555,117 @@ On the event page:
   overlap, copies a link to a moment, and offers the downloads under
   **Download**. It shares the player's `<video>` element through a ref.
 
+## The event report
+
+Staff can ask for an AI report of the event: a text for those who were not
+there and for those who want to look back, set beside the platform's own
+figures and charts. It is a job of kind `REPORT` in the same queue, but staff
+request it by hand, it reads much more than the recording, and its result
+lives on the event, not on a recording (`app/src/lib/report/`,
+`infra/ai/worker/report.py`).
+
+**Requesting it.** The **AI event report** panel of the event's **After the
+event** tab (`app/src/components/admin/event-report-panel.tsx`) shows the
+requirements, the material available (transcript, chat messages, questions,
+published polls, words, ratings, reactions to the agenda) and the languages,
+and offers **Generate the report** or **Regenerate the report**. It is meant
+for after the ratings are in: those received up to the claim are included.
+Behind it is `/api/admin/events/<id>/report`, for the staff who manage the
+event (administrators, and organizers for their own events):
+
+| Method | Does |
+|---|---|
+| `GET` | The stored report, whether it is published, the last `REPORT` job, the requirements, the counts of available material and the languages |
+| `POST` | Queues a `REPORT` job (`202`, audit `EVENT_REPORT_REQUESTED`), with optional `targetLanguages`; by default the event's AI target languages (`aiTargetLocales`), without the source language. One at a time per event: while a job is pending or running, it answers `200` with that job |
+| `PUT` | `{ published }`: shows or hides the report on the event page (audit `EVENT_REPORT_PUBLISHED` or `EVENT_REPORT_WITHDRAWN`) |
+
+A request needs an `ENDED` event, the site switch on, and the event's data
+retention not yet over, because chat, reactions to the agenda and attendance
+are deleted at retention; otherwise `POST` answers `409`.
+
+**The job.** Unlike the other jobs it belongs to the event
+(`PostprodJob.eventId`), not to a recording (`recordingId` is empty): an
+event without a recording still has chat, polls and ratings, and nothing done
+to a recording (cancelling its post-production, replacing or deleting it)
+touches the report. It goes to the CPU worker (`AI_WORKER_KINDS` includes
+`REPORT` in the chart) and counts in the orchestrator's demand, so vLLM
+starts on demand as for a summary. It produces no artifact and changes no
+recording's status. The worker reports progress after each step, so a long
+transcript summarised in many chunks keeps its lease.
+
+**Inputs.** The portal gathers them when the job is claimed
+(`app/src/lib/report/input.ts`):
+
+- the event's title, description, and public organizations and people;
+- the agenda, with the agree and disagree count of each item;
+- the transcript the public page would show, from AI or from live captions,
+  with the speaker names given by staff or by those who consented, one line
+  per turn with its minute (long turns split), up to a length cap; the worker
+  first summarises a long transcript in chunks, so
+  that the final request fits the model's context;
+- the existing summary;
+- the chat without names, only role and time, as a sample of at most 400
+  messages spread over the event;
+- up to 40 Q&A questions with their written answers, without authors;
+- published polls, and word-cloud words;
+- the post-event questionnaire (Likert averages and up to 100 open comments,
+  without authors) and the older star ratings;
+- the platform's figures.
+
+The figures (`app/src/lib/report/metrics.ts`) are built on the same
+statistics as the **Statistics** tab (`app/src/lib/analytics/event-stats.ts`);
+questions count both those asked in chat and those of the separate Q&A.
+The portal computes them and stores them in the job's payload; the model only
+comments on them, and no number in the report comes from the model.
+
+**Writing.** The worker asks the language model, at the OpenAI-compatible
+endpoint of the claim (vLLM in the cluster), for a JSON report: title,
+abstract, summary, highlights, topics (explanation, key points, start minute,
+level of agreement, positions in favour, concerns and questions), a concept
+map (topics, concepts, actors and outcomes, with labelled links), agreement
+and disagreement, participation, benefits, feedback (strengths, things to
+improve, short voices from the comments in the model's own words), open
+questions and next steps. The prompt asks for facts from the inputs only,
+names only of the event's listed people and of named speakers, no attribution
+of chat or comment sentences to anyone, comments always reworded, and no
+personal data. The portal also removes any email address and phone number
+from the text it receives, keeping amounts, years, dates and public codes
+such as a CIG or a VAT number. The report is then translated into each
+requested language, with the glossary; a translation that fails leaves that
+language out. The worker posts the result to `POST /api/internal/event-report`
+(`x-api-key`), which normalises the text (`app/src/lib/report/normalize.ts`),
+joins it to the figures from the job, and freezes it on the event
+(`Event.postEventReport`, `postEventReportAt`) unpublished.
+
+**Publishing.** Staff read the report in the panel's preview, in each
+language, and publish it with **Show the report on the event page**
+(`Event.postEventReportPublished`); a regenerated report stays hidden until it
+is published again. The public event page shows it for an `ENDED` event whose
+post-event page is visible, after the video and before the description, in
+the page's language when there is a translation, otherwise in the event's
+language with a note (`app/src/lib/report/view.ts`,
+`app/src/components/events/report/`). A section appears only when it has
+content: header with the abstract and the AI notice, highlights,
+participation figures, a stacked chart of participation over time, the
+topics (with **Go to** a minute when there is a video), the concept map,
+agreement and disagreement with diverging bars for the agenda items, polls,
+the distribution of each Likert question, benefits, open questions, next
+steps and the full text. The charts are SVG and HTML drawn by the page, each
+with a table of its data for screen readers, and no chart library is loaded.
+The concept map's nodes take the keyboard focus and highlight their links,
+and a hidden list repeats the map for screen readers.
+
+**Retention.** The stored report is aggregate: counts and averages, the texts
+of published polls, of the most voted questions and of the words, which the
+recap also keeps, and the model's text, which is instructed to avoid personal
+data. Like the recap, it stays with the event after the cleanup deletes the
+data it came from, and goes only with the event; duplicating an event does
+not copy it ([Privacy and data protection](GDPR.md)).
+
 ## Transparency (AI Act Article 50)
 
 Article 50 of the EU AI Act requires that people know when content is
-generated by AI. The pipeline marks its outputs in six ways:
+generated by AI. The pipeline marks its outputs in these ways:
 
 - **In the data.** Every `PostprodArtifact` has `isSynthetic = true`, a
   transcript included, and records the producing component in `modelId` and
@@ -1587,6 +1707,10 @@ generated by AI. The pipeline marks its outputs in six ways:
 - **Before the event.** When the site switch is on and the event uses any AI
   option, the waiting room shows the notice from **AI notice in the waiting
   room**.
+- **In the event report.** The published report says that its text is
+  written by an artificial intelligence model and that staff reviewed it
+  before publishing; the figures and charts beside it are computed by the
+  platform ([The event report](#the-event-report)).
 
 The legal analysis (bases, voice data, retention, the difference between
 transcription and biometric identification) is in

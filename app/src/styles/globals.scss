@@ -10659,3 +10659,301 @@ html.live-resizing .live-sidebar-resizer::after {
 .permission-matrix .form-check-input:not(:checked) {
   border-color: #5a768a;
 }
+
+// ── Resoconto dell'evento (components/events/report) ──
+.report {
+  border: 1px solid #d6e3f1;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 1.5rem;
+  color: var(--app-text);
+
+  @media (max-width: 575.98px) {
+    padding: 1rem;
+  }
+}
+
+.report-header {
+  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #e3e9ef;
+}
+
+.report-kicker {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-primary);
+}
+
+.report-section {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e3e9ef;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  h3 {
+    color: var(--app-text);
+  }
+}
+
+.report-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+
+  li {
+    position: relative;
+    padding: 0.6rem 0.75rem 0.6rem 2rem;
+    background: #f5f9ff;
+    border-radius: 8px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0.8rem;
+      top: 1.05rem;
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: var(--app-primary);
+    }
+  }
+}
+
+.report-list {
+  padding-left: 1.2rem;
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.report-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.report-figure {
+  border: 1px solid #e3e9ef;
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: #f5f7fb;
+}
+
+.report-figure-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--app-primary);
+}
+
+.report-figure-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.report-figure-note {
+  font-size: 0.8rem;
+  color: var(--app-muted);
+}
+
+.report-legend-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.report-topics {
+  list-style: none;
+  counter-reset: tema;
+  padding: 0;
+  margin: 0;
+}
+
+.report-topic {
+  counter-increment: tema;
+  position: relative;
+  padding: 0.25rem 0 1rem 2.5rem;
+
+  &::before {
+    content: counter(tema);
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: var(--app-primary);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.report-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 0 0.5rem;
+  background: #ffffff;
+}
+
+.report-seek {
+  font-size: 0.85rem;
+}
+
+.report-positions {
+  list-style: none;
+  padding: 0;
+}
+
+.report-position {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.report-position-icon {
+  flex: 0 0 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.report-position-support .report-position-icon {
+  background: #008758;
+}
+
+.report-position-concern .report-position-icon {
+  background: #d9364f;
+}
+
+.report-position-question .report-position-icon {
+  background: #5c6f82;
+}
+
+.report-bar-track {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: #e3e9ef;
+  overflow: hidden;
+  margin-top: 0.2rem;
+}
+
+.report-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.report-diverging-head,
+.report-diverging-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(8rem, 1.2fr) 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.report-diverging-head {
+  margin-bottom: 0.25rem;
+
+  span:first-child {
+    text-align: right;
+  }
+}
+
+.report-diverging-row {
+  margin-bottom: 0.4rem;
+}
+
+.report-diverging-side {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  div {
+    height: 0.8rem;
+    border-radius: 4px;
+    min-width: 2px;
+  }
+}
+
+.report-diverging-left {
+  justify-content: flex-end;
+}
+
+.report-diverging-label {
+  text-align: center;
+  line-height: 1.2;
+}
+
+.report-stack {
+  display: flex;
+  height: 1.6rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e3e9ef;
+}
+
+.report-stack-part {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #17324d;
+}
+
+.report-quote {
+  border-left: 3px solid var(--app-primary);
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  margin: 0 0 0.5rem;
+  font-style: italic;
+}
+
+.report-map {
+  background: #fbfcfe;
+  border: 1px solid #e3e9ef;
+  border-radius: 10px;
+}
+
+// I concetti della mappa: il focus si vede con l'anello disegnato nell'SVG.
+.report-map-node {
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.report-full summary {
+  cursor: pointer;
+  color: var(--app-primary);
+}
+
+.report-notice {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #f5f7fb;
+  color: var(--app-muted);
+}

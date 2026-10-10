@@ -3171,6 +3171,42 @@
       "loadFailed": "Litteroinnin tilaa ei voitu ladata.",
       "expired": "Tapahtuman tietojen säilytysaika on päättynyt: litterointia ei koota uudelleen.",
       "aiRunning": "Tekoälykäsittely litteroi videota: sen litterointi korvaa tekstityksestä kootun."
+    },
+    "eventReport": {
+      "title": "Tapahtuman tekoälyraportti",
+      "intro": "Raportti niille, jotka eivät olleet paikalla, ja jälkikäteen luettavaksi: yhteenveto, selitetyt aiheet, käsitekartta, yksimielisyys ja erimielisyys, osallistuminen ja arviot sekä alustan laskemat kaaviot. Sen kirjoittaa alustan kielimalli alustan omilla palvelimilla.",
+      "afterFeedback": "Luo se, kun osallistujien arviot on kerätty: siihen mennessä saapuneet otetaan mukaan. Sen voi luoda uudelleen.",
+      "requirementsTitle": "Edellytykset",
+      "reqEnded": "Tapahtuma on päättynyt",
+      "reqAi": "Tekoälykäsittely käytössä asetuksissa",
+      "reqRetention": "Tapahtuman tiedot saatavilla {date} asti",
+      "reqExpired": "Tietojen säilytys päättyi {date}: chat, reaktiot ja läsnäolot eivät ole enää saatavilla",
+      "inputsTitle": "Käytettävissä oleva aineisto",
+      "inputTranscript": "Litterointi",
+      "inputNoTranscript": "Ei litterointia",
+      "inputChat": "{count, plural, one {# chat-viesti} other {# chat-viestiä}}",
+      "inputQuestions": "{count, plural, one {# kysymys} other {# kysymystä}}",
+      "inputPolls": "{count, plural, one {# julkaistu kysely} other {# julkaistua kyselyä}}",
+      "inputWords": "{count, plural, one {# sana} other {# sanaa}}",
+      "inputFeedback": "{count, plural, one {# arvio} other {# arviota}}",
+      "inputAgenda": "{count, plural, one {# reaktio esityslistaan} other {# reaktiota esityslistaan}}",
+      "languagesTitle": "Kielet: {language} ja käännökset",
+      "targetLanguages": "Käännä raportti myös kielille:",
+      "generate": "Luo raportti",
+      "regenerate": "Luo raportti uudelleen",
+      "confirmRegenerate": "Uusi raportti korvaa nykyisen ja pysyy piilossa, kunnes julkaiset sen uudelleen.",
+      "requested": "Raportti pyydetty: se on valmis muutaman minuutin kuluttua.",
+      "failed": "Toiminto epäonnistui.",
+      "loadFailed": "Raportin tilaa ei voitu ladata.",
+      "statusQueued": "Jonossa.",
+      "statusRunning": "Valmisteilla: malli kirjoittaa raporttia.",
+      "statusFailed": "Epäonnistui: {error}",
+      "statusDone": "Luotu {date}.",
+      "publish": "Näytä raportti tapahtuman sivulla",
+      "publishDesc": "Tarkista se ennen julkaisua: tekstin on kirjoittanut tekoälymalli. Uudelleen luotu raportti on julkaistava uudelleen.",
+      "preview": "Esikatselu",
+      "hidePreview": "Piilota esikatselu",
+      "previewLanguage": "Kieli"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Ilmoita osallistujille, kun tallenne julkaistaan",
     "recordingNotifyHelp": "Yksi sähköposti, kun tallenne (tai ulkoinen video) näkyy tapahtuman julkisella sivulla. Se tavoittaa vielä ilmoittautuneet: säilytysajan jälkeen ketään ei ilmoiteta.",
-    "recordingNotifySent": "Ilmoitus lähetetty {date}."
+    "recordingNotifySent": "Ilmoitus lähetetty {date}.",
+    "report": {
+      "title": "Tapahtuman raportti",
+      "generatedAt": "Luotu {date}",
+      "translated": "automaattinen käännös alkuperäisestä ({language})",
+      "languageFallback": "Raporttia ei ole saatavilla kielelläsi: se näytetään kielellä {language}.",
+      "sections": {
+        "highlights": "Lyhyesti",
+        "numbers": "Osallistuminen lukuina",
+        "timeline": "Osallistuminen ajan mittaan",
+        "topics": "Aiheet",
+        "map": "Käsitekartta",
+        "consensus": "Yksimielisyys ja erimielisyys",
+        "polls": "Kyselyt",
+        "feedback": "Osallistujien arviot",
+        "benefits": "Mitä osallistujat saivat",
+        "openQuestions": "Avoimet kysymykset",
+        "nextSteps": "Seuraavat vaiheet",
+        "summary": "Lue koko raportti"
+      },
+      "metrics": {
+        "peak": "Ihmisiä salissa huippuhetkellä",
+        "joined": "Paikalla",
+        "ofRegistered": "{pct} % ilmoittautuneista",
+        "active": "Osallistui aktiivisesti",
+        "ofPresent": "{pct} % paikallaolijoista",
+        "interactions": "Vuorovaikutukset",
+        "rating": "Keskimääräinen arvio",
+        "responses": "{count, plural, one {# vastaus} other {# vastausta}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Kysymykset",
+        "polls": "Kyselyt",
+        "words": "Sanat",
+        "reactions": "Reaktiot"
+      },
+      "timelineDesc": "Vuorovaikutukset {minutes} minuutin välein tapahtuman alusta",
+      "timeFromStart": "Alusta",
+      "peak": "Vilkkain hetki: {label} alusta.",
+      "agreement": {
+        "high": "Laaja yksimielisyys",
+        "mixed": "Jakautuneet näkemykset",
+        "low": "Vähän yksimielisyyttä",
+        "unknown": "Yksimielisyyttä ei voi arvioida"
+      },
+      "goTo": "Siirry kohtaan {time}",
+      "stance": {
+        "support": "Puolesta",
+        "concern": "Epäilys",
+        "question": "Kysymys"
+      },
+      "mapDesc": "Tapahtuman käsitekartta: aiheet otsikon ympärillä, yhdistettyinä käsitteisiin, toimijoihin ja tuloksiin.",
+      "kind": {
+        "topic": "Aihe",
+        "concept": "Käsite",
+        "actor": "Toimija",
+        "outcome": "Tulos"
+      },
+      "agendaReactions": "Osallistujien reaktiot esityslistan kohtiin",
+      "agree": "Samaa mieltä",
+      "disagree": "Eri mieltä",
+      "agreements": "Yksimielisyyden kohdat",
+      "disagreements": "Erimielisyyden kohdat",
+      "votes": "{count, plural, one {# ääni} other {# ääntä}}",
+      "average": "keskiarvo {value} / {max}",
+      "strengths": "Vahvuudet",
+      "improvements": "Parannettavaa",
+      "quotes": "Kommenteista",
+      "aiNotice": "Tekstin on kirjoittanut tekoälymalli litteroinnin, chatin, kysymysten, kyselyjen ja arvioiden pohjalta, ja tiimi on tarkistanut sen ennen julkaisua. Luvut ja kaaviot laskee alusta. Se voi sisältää epätarkkuuksia."
+    }
   },
   "provisioning": {
     "loading": "Ladataan",

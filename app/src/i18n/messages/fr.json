@@ -3171,6 +3171,42 @@
       "loadFailed": "Impossible de charger l'état de la transcription.",
       "expired": "La durée de conservation des données de l'événement est terminée : la transcription n'est pas reconstruite.",
       "aiRunning": "Le traitement IA transcrit la vidéo : sa transcription remplacera celle des sous-titres."
+    },
+    "eventReport": {
+      "title": "Compte rendu IA de l'événement",
+      "intro": "Un compte rendu pour ceux qui n'étaient pas là et pour ceux qui veulent relire : synthèse, sujets expliqués, carte des concepts, accord et désaccord, participation et évaluations, avec des graphiques calculés par la plateforme. Il est rédigé par le modèle de langage de la plateforme, sur ses propres serveurs.",
+      "afterFeedback": "Générez-le après avoir recueilli les évaluations des participants : celles reçues jusqu'à ce moment y sont incluses. Il peut être régénéré.",
+      "requirementsTitle": "Conditions",
+      "reqEnded": "Événement terminé",
+      "reqAi": "Traitement IA activé dans les paramètres",
+      "reqRetention": "Données de l'événement disponibles jusqu'au {date}",
+      "reqExpired": "Conservation des données terminée le {date} : chat, réactions et présences ne sont plus disponibles",
+      "inputsTitle": "Matériel disponible",
+      "inputTranscript": "Transcription",
+      "inputNoTranscript": "Aucune transcription",
+      "inputChat": "{count, plural, one {# message dans le chat} other {# messages dans le chat}}",
+      "inputQuestions": "{count, plural, one {# question} other {# questions}}",
+      "inputPolls": "{count, plural, one {# sondage publié} other {# sondages publiés}}",
+      "inputWords": "{count, plural, one {# mot} other {# mots}}",
+      "inputFeedback": "{count, plural, one {# évaluation} other {# évaluations}}",
+      "inputAgenda": "{count, plural, one {# réaction à l'ordre du jour} other {# réactions à l'ordre du jour}}",
+      "languagesTitle": "Langues : {language} et traductions",
+      "targetLanguages": "Traduire aussi le compte rendu en :",
+      "generate": "Générer le compte rendu",
+      "regenerate": "Régénérer le compte rendu",
+      "confirmRegenerate": "Le nouveau compte rendu remplace l'actuel et reste masqué jusqu'à ce que vous le publiiez à nouveau.",
+      "requested": "Compte rendu demandé : il sera prêt dans quelques minutes.",
+      "failed": "L'opération a échoué.",
+      "loadFailed": "Impossible de charger l'état du compte rendu.",
+      "statusQueued": "En file d'attente.",
+      "statusRunning": "En préparation : le modèle rédige le compte rendu.",
+      "statusFailed": "Échec : {error}",
+      "statusDone": "Généré le {date}.",
+      "publish": "Afficher le compte rendu sur la page de l'événement",
+      "publishDesc": "Relisez-le avant de le publier : le texte est rédigé par un modèle d'intelligence artificielle. Un compte rendu régénéré doit être publié à nouveau.",
+      "preview": "Aperçu",
+      "hidePreview": "Masquer l'aperçu",
+      "previewLanguage": "Langue"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Prévenir les inscrits quand l'enregistrement est publié",
     "recordingNotifyHelp": "Un seul e-mail, quand l'enregistrement (ou la vidéo externe) est visible sur la page publique de l'événement. Il atteint les personnes encore inscrites : après la durée de conservation, personne n'est prévenu.",
-    "recordingNotifySent": "Avis envoyé le {date}."
+    "recordingNotifySent": "Avis envoyé le {date}.",
+    "report": {
+      "title": "Compte rendu de l'événement",
+      "generatedAt": "Généré le {date}",
+      "translated": "traduction automatique de l'original en {language}",
+      "languageFallback": "Le compte rendu n'est pas disponible dans votre langue : il est affiché en {language}.",
+      "sections": {
+        "highlights": "En bref",
+        "numbers": "La participation en chiffres",
+        "timeline": "La participation dans le temps",
+        "topics": "Les sujets",
+        "map": "Carte des concepts",
+        "consensus": "Accord et désaccord",
+        "polls": "Sondages",
+        "feedback": "Les évaluations des participants",
+        "benefits": "Ce que les participants en retirent",
+        "openQuestions": "Questions ouvertes",
+        "nextSteps": "Prochaines étapes",
+        "summary": "Lire le compte rendu complet"
+      },
+      "metrics": {
+        "peak": "Personnes présentes au pic",
+        "joined": "Présents",
+        "ofRegistered": "{pct} % des inscrits",
+        "active": "Ont participé activement",
+        "ofPresent": "{pct} % des présents",
+        "interactions": "Interactions",
+        "rating": "Note moyenne",
+        "responses": "{count, plural, one {# réponse} other {# réponses}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Questions",
+        "polls": "Sondages",
+        "words": "Mots",
+        "reactions": "Réactions"
+      },
+      "timelineDesc": "Interactions toutes les {minutes} minutes depuis le début de l'événement",
+      "timeFromStart": "Depuis le début",
+      "peak": "Le moment le plus actif : {label} après le début.",
+      "agreement": {
+        "high": "Large accord",
+        "mixed": "Avis partagés",
+        "low": "Peu d'accord",
+        "unknown": "Accord non mesurable"
+      },
+      "goTo": "Aller à {time}",
+      "stance": {
+        "support": "Pour",
+        "concern": "Réserve",
+        "question": "Question"
+      },
+      "mapDesc": "Carte des concepts de l'événement : les sujets autour du titre, reliés aux concepts, acteurs et résultats.",
+      "kind": {
+        "topic": "Sujet",
+        "concept": "Concept",
+        "actor": "Acteur",
+        "outcome": "Résultat"
+      },
+      "agendaReactions": "Les réactions des participants aux points de l'ordre du jour",
+      "agree": "D'accord",
+      "disagree": "Pas d'accord",
+      "agreements": "Points d'accord",
+      "disagreements": "Points de désaccord",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "average": "moyenne {value} sur {max}",
+      "strengths": "Points forts",
+      "improvements": "À améliorer",
+      "quotes": "Extraits des commentaires",
+      "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, du chat, des questions, des sondages et des évaluations, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
+    }
   },
   "provisioning": {
     "loading": "Chargement",

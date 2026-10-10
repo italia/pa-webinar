@@ -3171,6 +3171,42 @@
       "loadFailed": "Neizdevās ielādēt atšifrējuma statusu.",
       "expired": "Pasākuma datu glabāšanas laiks ir beidzies: atšifrējums netiek veidots no jauna.",
       "aiRunning": "MI apstrāde atšifrē video: tās atšifrējums aizstās atšifrējumu no subtitriem."
+    },
+    "eventReport": {
+      "title": "Pasākuma MI pārskats",
+      "intro": "Pārskats tiem, kas nepiedalījās, un vēlākai lasīšanai: kopsavilkums, izskaidrotas tēmas, jēdzienu karte, vienprātība un nesaskaņas, dalība un vērtējumi ar platformas aprēķinātiem grafikiem. To raksta platformas valodas modelis platformas pašas serveros.",
+      "afterFeedback": "Izveidojiet to pēc dalībnieku vērtējumu savākšanas: tiek iekļauti līdz tam saņemtie. To var izveidot atkārtoti.",
+      "requirementsTitle": "Prasības",
+      "reqEnded": "Pasākums ir beidzies",
+      "reqAi": "MI apstrāde ieslēgta iestatījumos",
+      "reqRetention": "Pasākuma dati pieejami līdz {date}",
+      "reqExpired": "Datu glabāšana beidzās {date}: tērzēšana, reakcijas un apmeklējums vairs nav pieejami",
+      "inputsTitle": "Pieejamie materiāli",
+      "inputTranscript": "Atšifrējums",
+      "inputNoTranscript": "Nav atšifrējuma",
+      "inputChat": "{count, plural, zero {# tērzēšanas ziņojumu} one {# tērzēšanas ziņojums} other {# tērzēšanas ziņojumi}}",
+      "inputQuestions": "{count, plural, zero {# jautājumu} one {# jautājums} other {# jautājumi}}",
+      "inputPolls": "{count, plural, zero {# publicētu aptauju} one {# publicēta aptauja} other {# publicētas aptaujas}}",
+      "inputWords": "{count, plural, zero {# vārdu} one {# vārds} other {# vārdi}}",
+      "inputFeedback": "{count, plural, zero {# vērtējumu} one {# vērtējums} other {# vērtējumi}}",
+      "inputAgenda": "{count, plural, zero {# reakciju uz darba kārtību} one {# reakcija uz darba kārtību} other {# reakcijas uz darba kārtību}}",
+      "languagesTitle": "Valodas: {language} un tulkojumi",
+      "targetLanguages": "Tulkot pārskatu arī:",
+      "generate": "Izveidot pārskatu",
+      "regenerate": "Izveidot pārskatu vēlreiz",
+      "confirmRegenerate": "Jaunais pārskats aizstāj pašreizējo un paliek paslēpts, līdz to publicējat vēlreiz.",
+      "requested": "Pārskats pieprasīts: tas būs gatavs pēc dažām minūtēm.",
+      "failed": "Darbība neizdevās.",
+      "loadFailed": "Neizdevās ielādēt pārskata statusu.",
+      "statusQueued": "Rindā.",
+      "statusRunning": "Sagatavošanā: modelis raksta pārskatu.",
+      "statusFailed": "Neizdevās: {error}",
+      "statusDone": "Izveidots {date}.",
+      "publish": "Rādīt pārskatu pasākuma lapā",
+      "publishDesc": "Pirms publicēšanas pārskatiet to: tekstu uzrakstījis mākslīgā intelekta modelis. Atkārtoti izveidots pārskats jāpublicē vēlreiz.",
+      "preview": "Priekšskatījums",
+      "hidePreview": "Paslēpt priekšskatījumu",
+      "previewLanguage": "Valoda"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Paziņot reģistrētajiem, kad ieraksts ir publicēts",
     "recordingNotifyHelp": "Viens e-pasts, kad ieraksts (vai ārējais video) ir redzams pasākuma publiskajā lapā. Tas sasniedz tos, kas vēl ir reģistrēti: pēc glabāšanas termiņa neviens netiek informēts.",
-    "recordingNotifySent": "Paziņojums nosūtīts {date}."
+    "recordingNotifySent": "Paziņojums nosūtīts {date}.",
+    "report": {
+      "title": "Pasākuma pārskats",
+      "generatedAt": "Izveidots {date}",
+      "translated": "automātisks tulkojums no oriģināla ({language})",
+      "languageFallback": "Pārskats nav pieejams jūsu valodā: tas tiek rādīts valodā {language}.",
+      "sections": {
+        "highlights": "Īsumā",
+        "numbers": "Dalība skaitļos",
+        "timeline": "Dalība laikā",
+        "topics": "Tēmas",
+        "map": "Jēdzienu karte",
+        "consensus": "Vienprātība un nesaskaņas",
+        "polls": "Aptaujas",
+        "feedback": "Dalībnieku vērtējumi",
+        "benefits": "Ko ieguva dalībnieki",
+        "openQuestions": "Atklātie jautājumi",
+        "nextSteps": "Nākamie soļi",
+        "summary": "Lasīt visu pārskatu"
+      },
+      "metrics": {
+        "peak": "Cilvēki zālē maksimumā",
+        "joined": "Klātesošie",
+        "ofRegistered": "{pct}% no reģistrētajiem",
+        "active": "Aktīvi piedalījās",
+        "ofPresent": "{pct}% no klātesošajiem",
+        "interactions": "Mijiedarbības",
+        "rating": "Vidējais vērtējums",
+        "responses": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}"
+      },
+      "series": {
+        "chat": "Tērzēšana",
+        "questions": "Jautājumi",
+        "polls": "Aptaujas",
+        "words": "Vārdi",
+        "reactions": "Reakcijas"
+      },
+      "timelineDesc": "Mijiedarbības ik pēc {minutes} minūtēm no pasākuma sākuma",
+      "timeFromStart": "No sākuma",
+      "peak": "Aktīvākais brīdis: {label} no sākuma.",
+      "agreement": {
+        "high": "Plaša vienprātība",
+        "mixed": "Dalīti viedokļi",
+        "low": "Maza vienprātība",
+        "unknown": "Vienprātību nevar novērtēt"
+      },
+      "goTo": "Pāriet uz {time}",
+      "stance": {
+        "support": "Par",
+        "concern": "Šaubas",
+        "question": "Jautājums"
+      },
+      "mapDesc": "Pasākuma jēdzienu karte: tēmas ap nosaukumu, saistītas ar jēdzieniem, dalībniekiem un rezultātiem.",
+      "kind": {
+        "topic": "Tēma",
+        "concept": "Jēdziens",
+        "actor": "Dalībnieks",
+        "outcome": "Rezultāts"
+      },
+      "agendaReactions": "Dalībnieku reakcijas uz darba kārtības punktiem",
+      "agree": "Piekrītu",
+      "disagree": "Nepiekrītu",
+      "agreements": "Vienprātības punkti",
+      "disagreements": "Nesaskaņu punkti",
+      "votes": "{count, plural, zero {# balsu} one {# balss} other {# balsis}}",
+      "average": "vidēji {value} no {max}",
+      "strengths": "Stiprās puses",
+      "improvements": "Uzlabojamais",
+      "quotes": "No komentāriem",
+      "aiNotice": "Tekstu uzrakstījis mākslīgā intelekta modelis, izmantojot atšifrējumu, tērzēšanu, jautājumus, aptaujas un vērtējumus, un komanda to pārskatīja pirms publicēšanas. Skaitļus un grafikus aprēķina platforma. Tas var saturēt neprecizitātes."
+    }
   },
   "provisioning": {
     "loading": "Ielādē",

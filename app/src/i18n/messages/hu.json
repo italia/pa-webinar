@@ -3171,6 +3171,42 @@
       "loadFailed": "Az átirat állapota nem tölthető be.",
       "expired": "Az esemény adatainak megőrzési ideje lejárt: az átirat nem készül el újra.",
       "aiRunning": "Az MI-feldolgozás átírja a videót: az átirata a feliratokból készült helyére kerül."
+    },
+    "eventReport": {
+      "title": "MI-beszámoló az eseményről",
+      "intro": "Beszámoló azoknak, akik nem voltak jelen, és újraolvasáshoz: összefoglaló, elmagyarázott témák, fogalomtérkép, egyetértés és nézeteltérés, részvétel és értékelések, a platform által számított grafikonokkal. A platform nyelvi modellje írja, a saját szerverein.",
+      "afterFeedback": "A résztvevők értékeléseinek összegyűjtése után készítse el: az addig beérkezettek kerülnek bele. Újra elkészíthető.",
+      "requirementsTitle": "Feltételek",
+      "reqEnded": "Az esemény véget ért",
+      "reqAi": "MI-feldolgozás bekapcsolva a beállításokban",
+      "reqRetention": "Az esemény adatai elérhetők eddig: {date}",
+      "reqExpired": "Az adatmegőrzés véget ért ekkor: {date}; a csevegés, a reakciók és a jelenlét már nem érhető el",
+      "inputsTitle": "Rendelkezésre álló anyag",
+      "inputTranscript": "Átirat",
+      "inputNoTranscript": "Nincs átirat",
+      "inputChat": "{count, plural, one {# csevegőüzenet} other {# csevegőüzenet}}",
+      "inputQuestions": "{count, plural, one {# kérdés} other {# kérdés}}",
+      "inputPolls": "{count, plural, one {# közzétett szavazás} other {# közzétett szavazás}}",
+      "inputWords": "{count, plural, one {# szó} other {# szó}}",
+      "inputFeedback": "{count, plural, one {# értékelés} other {# értékelés}}",
+      "inputAgenda": "{count, plural, one {# reakció a napirendre} other {# reakció a napirendre}}",
+      "languagesTitle": "Nyelvek: {language} és fordítások",
+      "targetLanguages": "A beszámoló fordítása erre is:",
+      "generate": "Beszámoló készítése",
+      "regenerate": "Beszámoló újrakészítése",
+      "confirmRegenerate": "Az új beszámoló felváltja a jelenlegit, és rejtve marad, amíg újra közzé nem teszi.",
+      "requested": "Beszámoló kérve: néhány perc múlva elkészül.",
+      "failed": "A művelet nem sikerült.",
+      "loadFailed": "A beszámoló állapota nem tölthető be.",
+      "statusQueued": "Sorban áll.",
+      "statusRunning": "Készül: a modell írja a beszámolót.",
+      "statusFailed": "Nem sikerült: {error}",
+      "statusDone": "Elkészült: {date}.",
+      "publish": "A beszámoló megjelenítése az esemény oldalán",
+      "publishDesc": "Közzététel előtt nézze át: a szöveget mesterségesintelligencia-modell írta. Az újrakészített beszámolót újra közzé kell tenni.",
+      "preview": "Előnézet",
+      "hidePreview": "Előnézet elrejtése",
+      "previewLanguage": "Nyelv"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Értesítés a jelentkezőknek, amikor a felvétel megjelenik",
     "recordingNotifyHelp": "Egyetlen e-mail, amikor a felvétel (vagy a külső videó) látható az esemény nyilvános oldalán. A még jelentkezettekhez jut el: a megőrzési idő után senkihez.",
-    "recordingNotifySent": "Értesítés elküldve: {date}."
+    "recordingNotifySent": "Értesítés elküldve: {date}.",
+    "report": {
+      "title": "Beszámoló az eseményről",
+      "generatedAt": "Készült: {date}",
+      "translated": "automatikus fordítás az eredetiből ({language})",
+      "languageFallback": "A beszámoló nem érhető el az Ön nyelvén: {language} nyelven jelenik meg.",
+      "sections": {
+        "highlights": "Röviden",
+        "numbers": "A részvétel számokban",
+        "timeline": "A részvétel időben",
+        "topics": "A témák",
+        "map": "Fogalomtérkép",
+        "consensus": "Egyetértés és nézeteltérés",
+        "polls": "Szavazások",
+        "feedback": "A résztvevők értékelései",
+        "benefits": "Mit nyertek a résztvevők",
+        "openQuestions": "Nyitott kérdések",
+        "nextSteps": "Következő lépések",
+        "summary": "A teljes beszámoló elolvasása"
+      },
+      "metrics": {
+        "peak": "Résztvevők a csúcsponton",
+        "joined": "Jelen voltak",
+        "ofRegistered": "a regisztráltak {pct}%-a",
+        "active": "Aktívan részt vettek",
+        "ofPresent": "a jelenlévők {pct}%-a",
+        "interactions": "Interakciók",
+        "rating": "Átlagos értékelés",
+        "responses": "{count, plural, one {# válasz} other {# válasz}}"
+      },
+      "series": {
+        "chat": "Csevegés",
+        "questions": "Kérdések",
+        "polls": "Szavazások",
+        "words": "Szavak",
+        "reactions": "Reakciók"
+      },
+      "timelineDesc": "Interakciók {minutes} percenként az esemény kezdetétől",
+      "timeFromStart": "A kezdettől",
+      "peak": "A legaktívabb pillanat: {label} a kezdettől.",
+      "agreement": {
+        "high": "Széles egyetértés",
+        "mixed": "Megosztott vélemények",
+        "low": "Kevés egyetértés",
+        "unknown": "Az egyetértés nem mérhető"
+      },
+      "goTo": "Ugrás ide: {time}",
+      "stance": {
+        "support": "Mellette",
+        "concern": "Aggály",
+        "question": "Kérdés"
+      },
+      "mapDesc": "Az esemény fogalomtérképe: a témák a cím körül, fogalmakhoz, szereplőkhöz és eredményekhez kapcsolva.",
+      "kind": {
+        "topic": "Téma",
+        "concept": "Fogalom",
+        "actor": "Szereplő",
+        "outcome": "Eredmény"
+      },
+      "agendaReactions": "A résztvevők reakciói a napirendi pontokra",
+      "agree": "Egyetért",
+      "disagree": "Nem ért egyet",
+      "agreements": "Egyetértési pontok",
+      "disagreements": "Vitás pontok",
+      "votes": "{count, plural, one {# szavazat} other {# szavazat}}",
+      "average": "átlag: {value} / {max}",
+      "strengths": "Erősségek",
+      "improvements": "Fejlesztendő",
+      "quotes": "A hozzászólásokból",
+      "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a csevegés, a kérdések, a szavazások és az értékelések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
+    }
   },
   "provisioning": {
     "loading": "Betöltés",

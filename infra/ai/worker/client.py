@@ -72,7 +72,8 @@ class ClaimResponse(BaseModel):
 
     claimed: bool = True
     jobId: str
-    recordingId: str
+    # Nullo per il resoconto dell'evento (REPORT), che non ha registrazione.
+    recordingId: Optional[str] = None
     kind: str
     payload: Dict[str, Any]
     attempts: int
@@ -85,6 +86,8 @@ class ClaimResponse(BaseModel):
     # pre-mapping (fallback al label).
     speakerNames: Dict[str, str] = Field(default_factory=dict)
     providerHints: ProviderHints
+    # Lavoro REPORT: gli ingressi del resoconto raccolti dal portale al claim.
+    reportInput: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -223,6 +226,23 @@ class AppClient:
         if watermark_type is not None:
             payload["watermarkType"] = watermark_type
         r = self._client.post("/api/internal/postprod-artifact", json=payload)
+        r.raise_for_status()
+
+    def deliver_report(
+        self,
+        *,
+        job_id: str,
+        narratives: Dict[str, Dict[str, Any]],
+        model_id: Optional[str],
+        model_version: Optional[str] = None,
+    ) -> None:
+        """Consegna il resoconto dell'evento (lavoro REPORT): il testo per lingua."""
+        payload: Dict[str, Any] = {"jobId": job_id, "narratives": narratives}
+        if model_id is not None:
+            payload["modelId"] = model_id
+        if model_version is not None:
+            payload["modelVersion"] = model_version
+        r = self._client.post("/api/internal/event-report", json=payload)
         r.raise_for_status()
 
 

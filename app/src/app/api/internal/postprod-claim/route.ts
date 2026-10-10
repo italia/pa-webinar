@@ -37,6 +37,7 @@ import {
   expectedArtifactsForJob,
   postprodJobPayloadSchema,
 } from '@/lib/ai';
+import type { reportPayloadSchema } from '@/lib/ai/schemas';
 import {
   resolveAsrProvider,
   resolveLlmProvider,
@@ -48,6 +49,9 @@ import {
 } from '@/lib/storage/postprod';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { postprodJobAttemptsTotal } from '@/lib/metrics';
+import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
+import { ingressoResoconto } from '@/lib/report/input';
+import { metricheResoconto } from '@/lib/report/metrics';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,8 +67,9 @@ const claimRequestSchema = z.object({
 
 interface ClaimedRow {
   id: string;
-  recording_id: string;
-  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE';
+  /** Nullo per il resoconto dell'evento (REPORT). */
+  recording_id: string | null;
+  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE' | 'REPORT';
   payload: unknown;
   attempts: number;
   next_attempt_at: Date;
@@ -145,6 +150,16 @@ export const POST = withErrorHandling(async (request) => {
     throw new ValidationError(
       `postprod_job ${row.id} has malformed payload: ${parsed.error.message}`,
     );
+  }
+
+  // Il resoconto dell'evento non scarica media ne' carica file: gli ingressi
+  // si raccolgono adesso (lib/report), i numeri restano nel lavoro e il
+  // risultato torna alla rotta del resoconto.
+  if (parsed.data.kind === 'REPORT') {
+    return rispostaResoconto(row, parsed.data.payload, leaseUntil);
+  }
+  if (!row.recording_id) {
+    throw new ValidationError(`postprod_job ${row.id} (${row.kind}) has no recording`);
   }
 
   // Fetch Recording + Event for provider routing + source path.
@@ -594,3 +609,61 @@ export const POST = withErrorHandling(async (request) => {
     { status: 200 },
   );
 });
+
+/** Il claim di un lavoro REPORT: gli ingressi del resoconto e il modello da usare. */
+async function rispostaResoconto(
+  row: ClaimedRow,
+  payload: z.infer<typeof reportPayloadSchema>,
+  leaseUntil: Date
+): Promise<Response> {
+  // Le valutazioni servono ai numeri e al testo: si leggono una volta.
+  const valutazioni = await buildEventFeedbackReport(payload.eventId);
+  const metrics = await metricheResoconto(
+    payload.eventId,
+    payload.sourceLanguage,
+    valutazioni
+  );
+  const reportInput = metrics
+    ? await ingressoResoconto(
+        payload.eventId,
+        payload.sourceLanguage,
+        metrics,
+        valutazioni
+      )
+    : null;
+  if (!metrics || !reportInput) throw new NotFoundError('Event');
+  // I numeri restano nel lavoro: il risultato li rilegge di qui, non dal worker.
+  await prisma.postprodJob.update({
+    where: { id: row.id },
+    data: { payload: { ...payload, metrics } as unknown as Prisma.InputJsonValue },
+  });
+  const siteSettings = await prisma.siteSetting.findUnique({
+    where: { id: 'singleton' },
+    select: { aiLlmProvider: true },
+  });
+  const llm = resolveLlmProvider({ siteProvider: siteSettings?.aiLlmProvider ?? 'vllm' });
+  const glossary = await glossaryForEvent(payload.eventId);
+  return Response.json({
+    claimed: true,
+    jobId: row.id,
+    recordingId: row.recording_id,
+    kind: row.kind,
+    payload: {
+      eventId: payload.eventId,
+      sourceLanguage: payload.sourceLanguage,
+      targetLanguages: payload.targetLanguages,
+    },
+    attempts: row.attempts,
+    leaseExpiresAt: leaseUntil.toISOString(),
+    sourceDownloadUrl: '',
+    uploadTargets: {},
+    inputs: [],
+    reportInput,
+    providerHints: {
+      llmProvider: llm.provider,
+      llmBaseUrl: llm.baseUrl,
+      llmModelId: llm.modelId,
+      glossary: glossaryHints(glossary),
+    },
+  });
+}

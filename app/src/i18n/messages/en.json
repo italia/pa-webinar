@@ -3171,6 +3171,42 @@
       "loadFailed": "Unable to load the transcript status.",
       "expired": "The event's data retention period has ended: the transcript is not rebuilt.",
       "aiRunning": "The AI pipeline is transcribing the video: its transcript will take the place of the one from captions."
+    },
+    "eventReport": {
+      "title": "AI event report",
+      "intro": "A report for those who were not there and for those who want to look back: summary, explained topics, concept map, agreement and disagreement, participation and ratings, with charts computed by the platform. It is written by the platform's language model, on its own servers.",
+      "afterFeedback": "Generate it after collecting the participants' ratings: those received up to that moment are included. It can be regenerated.",
+      "requirementsTitle": "Requirements",
+      "reqEnded": "Event ended",
+      "reqAi": "AI processing enabled in the settings",
+      "reqRetention": "Event data available until {date}",
+      "reqExpired": "Data retention ended on {date}: chat, reactions and attendance are no longer available",
+      "inputsTitle": "Available material",
+      "inputTranscript": "Transcript",
+      "inputNoTranscript": "No transcript",
+      "inputChat": "{count, plural, one {# chat message} other {# chat messages}}",
+      "inputQuestions": "{count, plural, one {# question} other {# questions}}",
+      "inputPolls": "{count, plural, one {# published poll} other {# published polls}}",
+      "inputWords": "{count, plural, one {# word} other {# words}}",
+      "inputFeedback": "{count, plural, one {# rating} other {# ratings}}",
+      "inputAgenda": "{count, plural, one {# reaction to the agenda} other {# reactions to the agenda}}",
+      "languagesTitle": "Languages: {language} and translations",
+      "targetLanguages": "Also translate the report into:",
+      "generate": "Generate the report",
+      "regenerate": "Regenerate the report",
+      "confirmRegenerate": "The new report replaces the current one and stays hidden until you publish it again.",
+      "requested": "Report requested: it will be ready in a few minutes.",
+      "failed": "The operation failed.",
+      "loadFailed": "Unable to load the report status.",
+      "statusQueued": "Queued.",
+      "statusRunning": "In progress: the model is writing the report.",
+      "statusFailed": "Failed: {error}",
+      "statusDone": "Generated on {date}.",
+      "publish": "Show the report on the event page",
+      "publishDesc": "Review it before publishing: the text is written by an artificial intelligence model. A regenerated report must be published again.",
+      "preview": "Preview",
+      "hidePreview": "Hide preview",
+      "previewLanguage": "Language"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Notify registrants when the recording is published",
     "recordingNotifyHelp": "A single email, sent when the recording (or external video) is visible on the event's public page. It reaches whoever is still registered: after the data retention period nobody is notified.",
-    "recordingNotifySent": "Notice sent on {date}."
+    "recordingNotifySent": "Notice sent on {date}.",
+    "report": {
+      "title": "Event report",
+      "generatedAt": "Generated on {date}",
+      "translated": "automatic translation from the original in {language}",
+      "languageFallback": "The report is not available in your language: it is shown in {language}.",
+      "sections": {
+        "highlights": "In brief",
+        "numbers": "Participation in numbers",
+        "timeline": "Participation over time",
+        "topics": "The topics",
+        "map": "Concept map",
+        "consensus": "Agreement and disagreement",
+        "polls": "Polls",
+        "feedback": "What participants said",
+        "benefits": "What participants gained",
+        "openQuestions": "Open questions",
+        "nextSteps": "Next steps",
+        "summary": "Read the full report"
+      },
+      "metrics": {
+        "peak": "People in the room at peak",
+        "joined": "Attended",
+        "ofRegistered": "{pct}% of those registered",
+        "active": "Took an active part",
+        "ofPresent": "{pct}% of those present",
+        "interactions": "Interactions",
+        "rating": "Average rating",
+        "responses": "{count, plural, one {# response} other {# responses}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Questions",
+        "polls": "Polls",
+        "words": "Words",
+        "reactions": "Reactions"
+      },
+      "timelineDesc": "Interactions every {minutes} minutes from the start of the event",
+      "timeFromStart": "From the start",
+      "peak": "The most active moment: {label} from the start.",
+      "agreement": {
+        "high": "Broad agreement",
+        "mixed": "Divided opinions",
+        "low": "Little agreement",
+        "unknown": "Agreement not measurable"
+      },
+      "goTo": "Go to {time}",
+      "stance": {
+        "support": "In favour",
+        "concern": "Concern",
+        "question": "Question"
+      },
+      "mapDesc": "Concept map of the event: the topics around the title, linked to concepts, actors and outcomes.",
+      "kind": {
+        "topic": "Topic",
+        "concept": "Concept",
+        "actor": "Actor",
+        "outcome": "Outcome"
+      },
+      "agendaReactions": "How participants reacted to the agenda items",
+      "agree": "Agree",
+      "disagree": "Disagree",
+      "agreements": "Points of agreement",
+      "disagreements": "Points of disagreement",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "average": "average {value} out of {max}",
+      "strengths": "Strengths",
+      "improvements": "To improve",
+      "quotes": "From the comments",
+      "aiNotice": "The text is written by an artificial intelligence model from the transcript, chat, questions, polls and ratings, and the staff reviewed it before publishing. The numbers and charts are computed by the platform. It may contain inaccuracies."
+    }
   },
   "provisioning": {
     "loading": "Loading",

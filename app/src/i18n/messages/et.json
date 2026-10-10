@@ -3171,6 +3171,42 @@
       "loadFailed": "Transkriptsiooni olekut ei õnnestunud laadida.",
       "expired": "Ürituse andmete säilitamisaeg on lõppenud: transkriptsiooni uuesti ei koostata.",
       "aiRunning": "Tehisintellekti töötlus transkribeerib videot: selle transkriptsioon asendab subtiitritest koostatu."
+    },
+    "eventReport": {
+      "title": "Ürituse tehisintellekti ülevaade",
+      "intro": "Ülevaade neile, kes ei olnud kohal, ja hilisemaks lugemiseks: kokkuvõte, selgitatud teemad, mõistekaart, üksmeel ja lahkarvamused, osalemine ja hinnangud koos platvormi arvutatud graafikutega. Selle kirjutab platvormi keelemudel platvormi enda serverites.",
+      "afterFeedback": "Koosta see pärast osalejate hinnangute kogumist: kaasatakse selleks ajaks saabunud. Seda saab uuesti koostada.",
+      "requirementsTitle": "Nõuded",
+      "reqEnded": "Üritus on lõppenud",
+      "reqAi": "Tehisintellekti töötlus on seadetes sisse lülitatud",
+      "reqRetention": "Ürituse andmed on saadaval kuni {date}",
+      "reqExpired": "Andmete säilitamine lõppes {date}: vestlus, reaktsioonid ja kohalolek pole enam saadaval",
+      "inputsTitle": "Saadaolev materjal",
+      "inputTranscript": "Transkriptsioon",
+      "inputNoTranscript": "Transkriptsioon puudub",
+      "inputChat": "{count, plural, one {# vestlussõnum} other {# vestlussõnumit}}",
+      "inputQuestions": "{count, plural, one {# küsimus} other {# küsimust}}",
+      "inputPolls": "{count, plural, one {# avaldatud küsitlus} other {# avaldatud küsitlust}}",
+      "inputWords": "{count, plural, one {# sõna} other {# sõna}}",
+      "inputFeedback": "{count, plural, one {# hinnang} other {# hinnangut}}",
+      "inputAgenda": "{count, plural, one {# reaktsioon päevakorrale} other {# reaktsiooni päevakorrale}}",
+      "languagesTitle": "Keeled: {language} ja tõlked",
+      "targetLanguages": "Tõlgi ülevaade ka keeltesse:",
+      "generate": "Koosta ülevaade",
+      "regenerate": "Koosta ülevaade uuesti",
+      "confirmRegenerate": "Uus ülevaade asendab praeguse ja jääb peidetuks, kuni selle uuesti avaldate.",
+      "requested": "Ülevaade tellitud: see on valmis mõne minuti pärast.",
+      "failed": "Toiming ebaõnnestus.",
+      "loadFailed": "Ülevaate olekut ei õnnestunud laadida.",
+      "statusQueued": "Järjekorras.",
+      "statusRunning": "Koostamisel: mudel kirjutab ülevaadet.",
+      "statusFailed": "Ebaõnnestus: {error}",
+      "statusDone": "Koostatud {date}.",
+      "publish": "Näita ülevaadet ürituse lehel",
+      "publishDesc": "Vaadake see enne avaldamist üle: teksti on kirjutanud tehisintellekti mudel. Uuesti koostatud ülevaade tuleb uuesti avaldada.",
+      "preview": "Eelvaade",
+      "hidePreview": "Peida eelvaade",
+      "previewLanguage": "Keel"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Teavita registreerunuid, kui salvestis avaldatakse",
     "recordingNotifyHelp": "Üks e-kiri, kui salvestis (või väline video) on ürituse avalikul lehel nähtav. See jõuab nendeni, kes on veel registreeritud: pärast säilitusaega kedagi ei teavitata.",
-    "recordingNotifySent": "Teade saadetud {date}."
+    "recordingNotifySent": "Teade saadetud {date}.",
+    "report": {
+      "title": "Ürituse ülevaade",
+      "generatedAt": "Koostatud {date}",
+      "translated": "masintõlge originaalist ({language})",
+      "languageFallback": "Ülevaade pole teie keeles saadaval: seda näidatakse keeles {language}.",
+      "sections": {
+        "highlights": "Lühidalt",
+        "numbers": "Osalemine numbrites",
+        "timeline": "Osalemine ajas",
+        "topics": "Teemad",
+        "map": "Mõistekaart",
+        "consensus": "Üksmeel ja lahkarvamused",
+        "polls": "Küsitlused",
+        "feedback": "Osalejate hinnangud",
+        "benefits": "Mida osalejad said",
+        "openQuestions": "Lahtised küsimused",
+        "nextSteps": "Järgmised sammud",
+        "summary": "Loe kogu ülevaadet"
+      },
+      "metrics": {
+        "peak": "Inimesi saalis tipphetkel",
+        "joined": "Kohal",
+        "ofRegistered": "{pct}% registreerunutest",
+        "active": "Osalesid aktiivselt",
+        "ofPresent": "{pct}% kohalolijatest",
+        "interactions": "Interaktsioonid",
+        "rating": "Keskmine hinnang",
+        "responses": "{count, plural, one {# vastus} other {# vastust}}"
+      },
+      "series": {
+        "chat": "Vestlus",
+        "questions": "Küsimused",
+        "polls": "Küsitlused",
+        "words": "Sõnad",
+        "reactions": "Reaktsioonid"
+      },
+      "timelineDesc": "Interaktsioonid iga {minutes} minuti järel ürituse algusest",
+      "timeFromStart": "Algusest",
+      "peak": "Kõige elavam hetk: {label} algusest.",
+      "agreement": {
+        "high": "Lai üksmeel",
+        "mixed": "Jagatud arvamused",
+        "low": "Vähe üksmeelt",
+        "unknown": "Üksmeelt ei saa hinnata"
+      },
+      "goTo": "Mine kohta {time}",
+      "stance": {
+        "support": "Poolt",
+        "concern": "Kahtlus",
+        "question": "Küsimus"
+      },
+      "mapDesc": "Ürituse mõistekaart: teemad pealkirja ümber, seotud mõistete, osaliste ja tulemustega.",
+      "kind": {
+        "topic": "Teema",
+        "concept": "Mõiste",
+        "actor": "Osaline",
+        "outcome": "Tulemus"
+      },
+      "agendaReactions": "Osalejate reaktsioonid päevakorrapunktidele",
+      "agree": "Nõus",
+      "disagree": "Ei ole nõus",
+      "agreements": "Üksmeele kohad",
+      "disagreements": "Lahkarvamuse kohad",
+      "votes": "{count, plural, one {# hääl} other {# häält}}",
+      "average": "keskmine {value} / {max}",
+      "strengths": "Tugevused",
+      "improvements": "Parandada",
+      "quotes": "Kommentaaridest",
+      "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, vestluse, küsimuste, küsitluste ja hinnangute põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
+    }
   },
   "provisioning": {
     "loading": "Laadimine",
