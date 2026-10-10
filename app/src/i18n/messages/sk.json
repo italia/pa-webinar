@@ -250,7 +250,6 @@
       "organizationRequired": "Zadajte svoju organizáciu",
       "consentRequired": "Súhlas so spracovaním údajov je povinný",
       "recordingConsentRequired": "Súhlas s nahrávaním je pre túto udalosť povinný",
-      "multitrackConsentRequired": "Súhlas s nahrávaním vašej zvukovej stopy je pri tomto podujatí povinný",
       "eventFull": "Udalosť dosiahla maximálny počet účastníkov",
       "generic": "Chyba pri registrácii. Skúste to znova."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Zapne natívnu spoločnú tabuľu (Excalidraw): moderátori ju môžu počas podujatia otvoriť z panela nástrojov. Vyžaduje službu tabule v inštalácii; kde je k dispozícii, je pri okamžitých hovoroch vždy zapnutá.",
       "liveCaptionsEnabled": "Automatické titulky",
       "liveCaptionsEnabledDesc": "To, čo hovoria rečníci, sa zobrazuje pod videom, prepísané v reálnom čase: pomáha tým, ktorí nepočujú alebo ťažko sledujú. Moderátori ich môžu vypnúť aj počas priameho prenosu na karte „Réžia“ a každý si ich môže skryť pre seba.",
+      "captionsTranscriptEnabled": "Prepis z titulkov",
+      "captionsTranscriptEnabledDesc": "Vety tých, ktorí dajú súhlas, sa uložia s ich menom a po skončení podujatia sa stanú jeho prepisom, aj bez záznamu či spracovania umelou inteligenciou. Kto súhlas nedá, zostane len v živých titulkoch.",
       "autoStartRecording": "Spustiť záznam automaticky",
       "autoStartRecordingDesc": "Pri začiatku podujatia sa záznam spustí sám (bez požiadania moderátora o potvrdenie). Tak prípadní oneskorenci nájdu prehrávač okamžite dostupný.",
       "aiSectionHeading": "Automatická postprodukcia",
@@ -2686,6 +2687,13 @@
       "editFailed": "Uloženie zlyhalo (HTTP {code})",
       "editFailedDetail": "Uloženie zlyhalo: {message}",
       "editMediaError": "Zvuk nahrávky sa nepodarilo načítať: prehrávanie nie je k dispozícii. Text a hovoriacich v jednotlivých segmentoch však môžete opraviť.",
+      "editNoMedia": "Prepis vytvorený zo živých titulkov: nie je k dispozícii žiadny zvuk na prehratie.",
+      "captionsSource": "zo živých titulkov",
+      "captionsRebuild": "Aktualizovať z titulkov",
+      "captionsRebuildDone": "Prepis bol aktualizovaný z titulkov.",
+      "captionsRebuildKept": "Prepis bol ručne opravený alebo pochádza z AI: nebol nahradený.",
+      "captionsRebuildNone": "Nie je čo aktualizovať: nie sú uložené žiadne vety alebo doba uchovávania údajov podujatia skončila.",
+      "captionsRebuildAiRunning": "Spracovanie AI prepisuje video: jeho prepis nahradí prepis z titulkov.",
       "summaryLoadError": "Zhrnutie sa nepodarilo načítať.",
       "summaryLoading": "Načítava sa zhrnutie…",
       "summaryEmptyProcessing": "AI zhrnutie ešte nie je pripravené: prebieha spracovanie. Obnovte stránku o niekoľko minút.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Stránka zostáva viditeľná, ale prihlásiť sa môžu len pozvaní; bez prihlášky sa dnu nedostanete"
       },
       "previewInvitation": "Prihlásiť sa môžu len vami pozvaní; bez prihlášky sa nikto nedostane dnu."
+    },
+    "captionsTranscript": {
+      "title": "Prepis z titulkov",
+      "intro": "Vety z titulkov ľudí, ktorí súhlasili s prepisom svojich vystúpení, sa stávajú prepisom podujatia, aj bez záznamu a bez spracovania AI.",
+      "stats": "Uložené vety: {saved} · hlasy: {voices} · neuložené vety, bez súhlasu: {skipped}",
+      "none": "Prepis ešte nie je vytvorený: vytvorí sa sám po skončení podujatia, alebo ho môžete vytvoriť hneď.",
+      "empty": "Žiadne uložené vety: nikto nehovoril so súhlasom s prepisom.",
+      "fromCaptions": "Prepis vytvorený z titulkov.",
+      "fromAi": "Existuje prepis zo spracovania AI: má prednosť pred prepisom z titulkov.",
+      "revised": "Prepis bol ručne opravený: aktualizácia z titulkov ho nenahradí.",
+      "build": "Vytvoriť prepis",
+      "rebuild": "Aktualizovať z titulkov",
+      "openEditor": "Otvoriť v editore",
+      "publish": "Zverejniť prepis na stránke podujatia",
+      "publishDesc": "Dá sa čítať aj bez videa. Najprv ho skontrolujte: automatické titulky môžu obsahovať chyby.",
+      "publishWithVideo": "Zverejnené video ho už zobrazuje; táto voľba ho ponechá viditeľný, aj keď video bude stiahnuté.",
+      "built": "Prepis bol aktualizovaný.",
+      "kept": "Prepis bol ručne opravený alebo pochádza z AI: nebol nahradený.",
+      "failed": "Operácia zlyhala.",
+      "loadFailed": "Stav prepisu sa nepodarilo načítať.",
+      "expired": "Doba uchovávania údajov podujatia skončila: prepis sa znova nevytvára.",
+      "aiRunning": "Spracovanie AI prepisuje video: jeho prepis nahradí prepis z titulkov."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Súhlasím s audio/video záznamom tejto udalosti",
       "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
       "recordingNotice": "Podujatie sa nahráva (zvuk a video). Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátor neudelí slovo.",
-      "multitrack": "Súhlasím s nahrávaním samostatnej zvukovej stopy svojho hlasu výhradne na účel správneho priradenia prepisu jednotlivým hovoriacim. Stopa je dočasná a po prepise sa maže; nepoužíva sa na identifikáciu ani reprodukciu môjho hlasu.",
-      "multitrackRequired": "Súhlas s nahrávaním vašej zvukovej stopy je na účasť na tomto podujatí povinný",
+      "multitrack": "Súhlasím s prepisom svojich príspevkov so svojím menom na účely správy z podujatia. Ak podujatie nahráva samostatnú zvukovú stopu každej osoby, môj hlas sa nahráva iba na tento účel a stopa sa po prepise vymaže; nepoužíva sa na identifikáciu ani napodobnenie môjho hlasu.",
+      "multitrackOptional": "Je to dobrovoľné: ak súhlas nedáte, môžete sa aj tak zúčastniť, ale váš hlas sa nenahráva a vaše príspevky nebudú v prepise.",
       "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
       "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Zhrnutie",
     "aiBadgeLabel": "Obsah vygenerovaný AI",
     "aiBadgeBody": "Prepis a zhrnutie vytvára automaticky AI pipeline v klastri. Môžu obsahovať chyby; smerodajným zdrojom zostáva video.",
+    "captionsBadgeBody": "Prepis pochádza z automatických titulkov živého prenosu a obsahuje len vystúpenia ľudí, ktorí dali súhlas. Môže obsahovať chyby.",
     "revisedByPerson": "Text po automatickom vygenerovaní skontroloval človek.",
     "searchPlaceholder": "Hľadať v prepise…",
     "searchLabel": "Hľadať v prepise",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Zobraziť námestie",
     "aiNoticeTitle": "Spracovanie umelou inteligenciou po podujatí",
     "aiNotice": "Po skončení bude nahrávka spracovaná nástrojmi umelej inteligencie, aby vznikol prepis, zhrnutie a prípadné preklady a dabing. Výstupy môžu obsahovať nepresnosti; záväzným zdrojom zostáva video.",
-    "multitrackConsentTitle": "Nahrávanie po účastníkoch",
-    "multitrackConsentRequired": "Na vstup musíte súhlasiť s nahrávaním svojej zvukovej stopy",
+    "multitrackConsentTitle": "Prepis vašich príspevkov",
     "recordingConsentTitle": "Záznam podujatia",
     "recordingConsentIntro": "Podujatie sa nahráva (zvuk aj obraz). Ak vystúpite, záznam obsahuje váš hlas, vašu podobu a to, čo zdieľate na obrazovke.",
     "recordingConsentRequired": "Na vstup je potrebný váš súhlas so záznamom.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatické titulky",
-    "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom titulkov na lište hovoru."
+    "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom titulkov na lište hovoru.",
+    "captionsNoticeTranscript": "Počas živého prenosu sa hlas rečníka prepisuje v reálnom čase na zobrazenie titulkov, na serveroch, ktoré platformu hostia. Text sa uchováva, s menom, len pri ľuďoch, ktorí súhlasili s prepisom svojich vystúpení, a stáva sa prepisom podujatia. Titulky možno skryť tlačidlom titulkov na lište hovoru."
   },
   "recording": {
     "management": "Videozáznam",

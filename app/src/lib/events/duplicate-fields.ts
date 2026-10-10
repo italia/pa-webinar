@@ -38,6 +38,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'whiteboardEnabled',
   'wordCloudEnabled',
   'liveCaptionsEnabled',
+  'captionsTranscriptEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',
@@ -131,6 +132,7 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
     'an absolute deadline set for the previous occurrence, normally already past ' +
     '— inheriting it would make the copy\'s post-event page 404 the moment it ends',
   recordingPublished: 'artefact of the occurrence that ran',
+  transcriptPublished: 'artefact of the occurrence that ran: the copy has its own transcript to review',
   recordingPublishedAt: 'artefact of the occurrence that ran',
   recordingNotifiedAt: 'artefact of the occurrence that ran: the copy has its own recording to announce',
   recordingDuration: 'artefact of the occurrence that ran',

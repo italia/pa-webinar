@@ -187,24 +187,30 @@ describe('sala d\'attesa — nome mancante a sala aperta', () => {
 });
 
 describe('sala d\'attesa — gli altri campi che trattengono', () => {
-  it('senza consenso alla registrazione per partecipante non si entra', () => {
+  it('la trascrizione dei propri interventi si chiede ma non ferma l\'ingresso', () => {
     render({
       role: 'participant',
       defaultName: 'Relatore 1',
       event: { ...eventoLive, multitrackRecordingEnabled: true },
     });
-    const entra = pulsante(t.joinNowBtn);
-    expect(entra.getAttribute('aria-describedby')).toBe('waiting-multitrack-consent-required');
-
-    premi(entra);
-    expect(onEnterLive).not.toHaveBeenCalled();
     const consenso = $<HTMLInputElement>('#waiting-multitrack-consent')!;
-    expect(document.activeElement).toBe(consenso);
+    expect(consenso.checked).toBe(false);
+    expect(document.body.textContent).toContain(messages.gdpr.consent.multitrackOptional);
 
-    premi(consenso);
+    // Senza spunta si entra lo stesso, e senza consenso.
     premi(pulsante(t.joinNowBtn));
-    expect(onEnterLive).toHaveBeenCalledTimes(1);
-    // Il consenso viaggia con l'ingresso: il server ne conserva la prova.
+    expect(onEnterLive).toHaveBeenLastCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('con la spunta il consenso viaggia con l\'ingresso, anche per chi modera', () => {
+    render({
+      role: 'moderator',
+      defaultName: 'Relatore 1',
+      event: { ...eventoLive, captionsTranscript: true },
+    });
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    // Il server ne conserva la prova, e decide voce per voce.
     expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
       cameraOn: false,
       micOn: false,
@@ -393,7 +399,7 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
     expect(link?.getAttribute('href')).toBe('/it/privacy');
   });
 
-  it('con la registrazione per partecipante si chiedono entrambi, nell\'ordine', () => {
+  it('con la registrazione per partecipante si chiedono entrambi: solo la registrazione ferma', () => {
     render({
       event: { ...evento, multitrackRecordingEnabled: true },
       defaultName: 'Relatore 1',
@@ -402,8 +408,6 @@ describe('sala d\'attesa — consenso alla registrazione', () => {
     premi(pulsante(t.joinNowBtn));
     expect(document.activeElement).toBe($('#waiting-recording-consent'));
     premi($<HTMLInputElement>('#waiting-recording-consent')!);
-    premi(pulsante(t.joinNowBtn));
-    expect(document.activeElement).toBe($('#waiting-multitrack-consent'));
     premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
     premi(pulsante(t.joinNowBtn));
     expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {

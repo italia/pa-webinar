@@ -4,9 +4,10 @@ import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
-import { liveCaptionsAvailable } from '@/lib/captions/availability';
+import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
 import { informativaEvento } from '@/lib/events/privacy-notice';
@@ -222,6 +223,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             multitrackRecordingEnabled: isInstant
               ? false
               : event.multitrackRecordingEnabled,
+            captionsTranscript: captionsTranscriptActive(event, settings),
           }}
           token=""
           isModerator={false}
@@ -267,7 +269,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
-      select: { id: true, displayName: true, eventId: true, consentRecording: true, consentMultitrack: true },
+      select: {
+        id: true,
+        displayName: true,
+        eventId: true,
+        consentRecording: true,
+        consentMultitrack: true,
+        consentMultitrackVersion: true,
+      },
     });
 
     if (!registration || registration.eventId !== event.id) {
@@ -302,18 +311,25 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // e' iscritto prima che l'evento registrasse): la prova sta legata
     // all'iscrizione solo nel browser che si e' iscritto.
     const prove = { eventId: event.id, registrationId: registration.id };
+    // Per la trascrizione dai sottotitoli vale solo il consenso dato con il
+    // testo che la comprende (lib/registration/consents): a chi aveva dato
+    // quello per la sola traccia audio si richiede.
+    const versioneMinima = captionsTranscriptActive(event, settings) ? VERSIONE_TESTO_TRASCRIZIONE : 1;
+    const datoAllIscrizione =
+      registration.consentMultitrack === true &&
+      (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
     const [proveTracce, proveRegistrazione] = ownsToken
       ? await Promise.all([
-          registration.consentMultitrack !== true && event.multitrackRecordingEnabled
-            ? prisma.multitrackConsent.count({ where: prove })
+          !datoAllIscrizione &&
+          (event.multitrackRecordingEnabled || captionsTranscriptActive(event, settings))
+            ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
           registration.consentRecording !== true && event.recordingEnabled
             ? prisma.recordingConsent.count({ where: prove })
             : 0,
         ])
       : [0, 0];
-    hasMultitrackConsent =
-      ownsToken && (registration.consentMultitrack === true || proveTracce > 0);
+    hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
     hasRecordingConsent =
       ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
   }
@@ -366,6 +382,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         liveCaptionsLanguage: settings.defaultLocale,
         aiConsentDisclosure,
         multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+        captionsTranscript: captionsTranscriptActive(event, settings),
       }}
       token={token}
       isModerator={isModerator}

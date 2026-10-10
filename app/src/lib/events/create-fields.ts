@@ -43,6 +43,7 @@ export const CREATED_EVENT_FIELDS = [
   'whiteboardEnabled',
   'wordCloudEnabled',
   'liveCaptionsEnabled',
+  'captionsTranscriptEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',

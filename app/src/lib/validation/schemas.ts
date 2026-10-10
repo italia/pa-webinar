@@ -152,6 +152,7 @@ export const eventBaseSchema = z.object({
   whiteboardEnabled: z.boolean().optional(),
   // Sottotitoli live (ADR-018): attivi di default, li cambia anche chi modera dal vivo.
   liveCaptionsEnabled: z.boolean().optional(),
+  captionsTranscriptEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
@@ -170,6 +171,7 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
   recordingPublished: z.boolean().optional(),
+  transcriptPublished: z.boolean().optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: z.string().url().nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),

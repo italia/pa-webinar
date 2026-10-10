@@ -316,8 +316,10 @@ square: static, accessible and complete. A participant's choice of it is
 remembered. [The waiting room and the square](architecture/waiting-room.md)
 
 **Consent gate**: the part of the waiting room that blocks entry until
-required consents are given, such as consent to per-participant recording
-when an event uses it.
+required consents are given, such as the recording consent when an event
+records. The transcription consent, asked when an event records
+per-participant audio or keeps a transcript from captions, is optional and
+blocks nothing.
 [The waiting room and the square](architecture/waiting-room.md)
 
 **Device check**: the camera preview, microphone level and speaker test in

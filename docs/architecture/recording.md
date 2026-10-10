@@ -51,7 +51,7 @@ flowchart LR
     direction TB
     L(["Event LIVE with recording,<br/>AI transcript, multitrack"]):::actor --> C["Recorder controller"]:::job
     C --> B["Recorder bot<br/>optional, off by default"]:::job
-    B --> TR["One Opus track per<br/>participant + tracks.json"]:::data
+    B --> TR["One Opus track per<br/>consenting participant<br/>+ tracks.json"]:::data
   end
 
   CONF --> J
@@ -83,16 +83,33 @@ options that were weighed.
 
 ## Consent gates
 
-Both capture paths rely on consent that the portal collects before a person
-reaches the conference; neither filters what it records. `Event.recordingEnabled`
-adds a recording consent to registration and, when the installation can record
-(Jibri is expected, or `RECORDER_CONTROLLER_URL` is set:
-`app/src/lib/recording/availability.ts`), a notice in the waiting room and,
-for whoever has not consented at registration, a waiting-room gate;
-`Event.multitrackRecordingEnabled` adds `consentMultitrack` and a waiting-room
-gate of its own. Holders of moderator and speaker links skip the recording gate, yet
-the recorder captures every remote audio track, theirs included. The consent
-model and exact texts are in [GDPR](../GDPR.md#consent-model), the gate in
+The two capture paths treat consent differently.
+
+- **Composite video.** `Event.recordingEnabled` adds a recording consent to
+  registration and, when the installation can record (Jibri is expected, or
+  `RECORDER_CONTROLLER_URL` is set: `app/src/lib/recording/availability.ts`), a
+  notice in the waiting room and, for whoever has not consented at
+  registration, a waiting-room gate. Holders of moderator and speaker links
+  skip that gate. Jibri records the conference as it is: the consent is
+  collected before entry, not applied to the video.
+- **Per-participant audio.** `Event.multitrackRecordingEnabled` adds the
+  optional consent to the transcription of one's own contributions
+  (`consentMultitrack` at registration, a box in the waiting room for everyone
+  who has not given it, moderators and speakers included, stored as
+  `MultitrackConsent` for the conference seat). It never blocks entry. The
+  recorder applies it to each track: before recording one, it asks the portal
+  (`GET /api/internal/recorder/consent?eventId=…&endpoint=…`), which maps the
+  track's bridge endpoint to the token seat that Prosody reported
+  (`mod_pa_occupants`, [Jitsi integration](jitsi-integration.md#who-is-in-the-room))
+  and the seat to the consent. A track without consent is not recorded. The
+  recorder accepts a consent given with any version of its text, all of which
+  cover the audio track (`MultitrackConsent.textVersion`,
+  `Registration.consentMultitrackVersion`).
+
+The same consent decides what the transcript from live captions keeps
+([Live captions](live-captions.md#transcript-from-captions)). The consent
+model and exact texts are in [GDPR](../GDPR.md#consent-model), the waiting
+room's boxes in
 [The waiting room](waiting-room.md#consent-and-transparency-notices), and the
 gaps under [Known limitations](#known-limitations).
 
@@ -353,8 +370,19 @@ so bridge-channel settings match those of real clients.
   reachability to the bridge's media port through its host candidates (in a
   cluster, the JVB pod or node address) rather than the public TURN relay.
   NetworkPolicies and single-VM setups must allow that path.
+- **Consent per track.** When a remote audio track arrives, the bot asks the
+  portal whether the person behind its endpoint consented
+  (`infra/recorder/src/consent.ts`). A refusal is asked again after 3 and 10
+  seconds, because Prosody may report the join a moment after the track
+  arrives; a portal that does not answer counts as a refusal. When the portal
+  still does not know the endpoint after the retries (it answers
+  `{ record: false, reason: 'unknown' }`), the bot logs a warning that names
+  `mod_pa_occupants`. A track without consent is skipped and logged as
+  `TRACK_SKIPPED`, with the endpoint id only. After the wait, the bot checks
+  again that the track was not removed and the capture has not finished
+  before it starts recording.
 - **One recorder per remote audio track.** For each remote audio track it
-  builds an audio-only stream, plays it through a hidden `<audio>` element,
+  records, it builds an audio-only stream, plays it through a hidden `<audio>` element,
   routes it through WebAudio, and records it with a `MediaRecorder`
   (`audio/webm;codecs=opus`, 32 kbps, 3-second chunks streamed to Node and
   appended to a file). The container starts a PulseAudio null sink so that
@@ -482,7 +510,7 @@ subchart sets to `hidden.<xmpp domain>`, for example `hidden.meet.jitsi`). Each
 Jitsi client compares the domain of a participant's real JID with
 `config.hiddenDomain` and drops matching participants before they reach its
 state: no tile, no list entry, no join notification, not counted. Hiding the
-bot does not hide the recording: the consent gates still apply.
+bot does not change what it records: every track still goes through the consent check.
 
 With `recorder.hiddenDomain` set, the recorder Job receives `JITSI_XMPP_DOMAIN`,
 `JITSI_XMPP_USER` and `JITSI_XMPP_PASSWORD` (from the Secret named in
@@ -722,9 +750,9 @@ described in [Recordings, voice data and AI outputs](../privacy/recordings-and-a
 
 | Job | What it does to recordings |
 |---|---|
-| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, and clears the participant lists of its call sessions. |
+| `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, clears the participant lists of its call sessions, and, unless the video or the transcript is published, deletes the transcript from captions (with the whole recording when it holds nothing else). |
 | `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. In the chart it exists only when `postprod.enabled` is true. |
-| `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for a published video it purges only the tracks. See [AI post-production](../POSTPROD.md). |
+| `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for an event whose video is published it purges only the tracks, and for one whose transcript alone is published it keeps only the transcript. See [AI post-production](../POSTPROD.md). |
 | `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
 
 Schedules, Helm keys and what breaks when a job does not run are in
@@ -739,7 +767,9 @@ Schedules, Helm keys and what breaks when a job does not run are in
 | Both | `TRANSCRIBE_MULTITRACK`; the MP4 is attached to the same `Recording`, where the archive job finds it | The manifest ingest (the webhook enqueues nothing) |
 
 Enqueueing snapshots the event's AI flags onto the recording and does nothing
-while the site-wide AI pipeline switch is off. On demand, an `ARCHIVE` job can
+while the site-wide AI pipeline switch is off, or for a recording whose
+transcript from live captions was corrected by hand, which an AI transcript
+would replace ([Live captions](live-captions.md#transcript-from-captions)). On demand, an `ARCHIVE` job can
 mux the composite video, the retained per-participant tracks (labeled with
 names) and the subtitles into one MKV, available to administrators and the
 event's organizer from the administration area, never through a moderator
@@ -775,6 +805,13 @@ link or publicly. From here on, the pipeline is described in
   per-participant tracks** is on.
 - **Instant calls.** Guests joining an instant call are not asked for the
   recording consent, although the moderator can record.
+- **Per-track consent needs Prosody's occupants module.** The portal learns
+  which seat stands behind an endpoint only from `mod_pa_occupants`. Without
+  it, as with an external Jitsi that does not load it, the recorder records no
+  track at all; the chart refuses to render `recorder.enabled` when
+  `XMPP_MUC_MODULES` does not load `pa_occupants`. A track whose seat the
+  portal still does not know after the last retry is skipped for its whole
+  session.
 - **Recording indicator.** Only Jibri raises the in-room **Recording in
   progress** banner.
 - **One composite recording at a time.** The JVB scaler asks for at most one

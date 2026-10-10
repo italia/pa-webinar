@@ -400,7 +400,7 @@ With registration open to anyone, `POST /api/events/{slug}/registrations` create
 The cookie does three jobs:
 
 - **Return without the link.** A registrant who comes back to `/live` without `?token=`, for example after a refresh, from a bookmark or through the event page, is recognized from the cookie instead of being sent to register again. On a password-protected event the password check comes first: see [Password-protected events](#password-protected-events).
-- **Identity binding.** Only the browser that holds a cookie with the same token receives the registrant's name, avatar, recording consent and per-participant recording consent. A personal link opened in another browser still admits the person, but they must type a name. In Jitsi they join as a guest with a fresh `guest-` identity and a 2-hour token. In the chat they occupy the registrant's seat under the typed name.
+- **Identity binding.** Only the browser that holds a cookie with the same token receives the registrant's name, avatar, recording consent and transcription consent (`consentMultitrack`). A personal link opened in another browser still admits the person, but they must type a name. In Jitsi they join as a guest with a fresh `guest-` identity and a 2-hour token. In the chat they occupy the registrant's seat under the typed name.
 - **Proof of the address.** Filling in the form proves nothing about the address typed in it. The cookie also carries `ev: true` (email verified) when the entry link from an email set it. Only a cookie with the same token and that claim lets the browser see, upload or remove the address's profile photo, and only then does the conference token carry the photo ([Avatars](#avatars)).
 
 **Resend my access link** (`POST /api/events/{slug}/registrations/resend`) sends the confirmation again, in the language of the registration. It always gives the same answer, so it cannot be used to find out who registered.
@@ -468,7 +468,7 @@ The portal signs every conference token. Prosody verifies it and derives the par
 | Claim | Meaning |
 |---|---|
 | `context.user.name`, `displayName` | The display name. `name` is the canonical field. `displayName` covers modules that read the other one |
-| `context.user.id` | A per-join session identifier (prefixes below), unique for each entry |
+| `context.user.id` | A per-join session identifier (prefixes below), unique for each entry. Prosody's `mod_pa_occupants` reports it to the portal with the person's bridge endpoint, so that the multitrack recorder and the transcript from captions can follow each person's consent ([Who is in the room](jitsi-integration.md#who-is-in-the-room)) |
 | `context.user.avatar` | A data-URI SVG with initials, generated locally, or a link to the portal: the person's uploaded photo (`/api/avatar/photo/{id}`) or the `/api/avatar` Gravatar proxy (see [Avatars](#avatars)) |
 | `context.user.affiliation`, `moderator` and the top-level copies | `owner`/`true` for moderators, `member`/`false` for everyone else |
 | `context.features` | `recording` is true for moderators only. `screen-sharing` is true for everyone. `livestreaming` and `outbound-call` are false for everyone (`app/src/lib/jitsi/config.ts`) |
@@ -519,7 +519,8 @@ The shared primary link and guests have no email address, so they always show in
 
 | Credential | Presented as | Accepted by | Used by |
 |---|---|---|---|
-| `CRON_API_KEY` | `x-api-key` header | `/api/cron/*` and `/api/internal/*`, through `assertCronApiKey` in `app/src/lib/auth/cron.ts` | The chart's CronJobs or the Compose `cron` service, the JVB scaler, the recorder controller, the recorder bot, the AI post-production worker, the Jibri finalize script |
+| `CRON_API_KEY` | `x-api-key` header | `/api/cron/*` and `/api/internal/*`, through `assertCronApiKey` in `app/src/lib/auth/cron.ts` | The chart's CronJobs or the Compose `cron` service, the JVB scaler, the recorder controller, the recorder bot, the AI post-production worker, the Jibri finalize script, the live captions gateway (`CAPTIONS_CONTEXT_TOKEN`) |
+| A signature derived from `JITSI_JWT_SECRET` (Prosody's `JWT_APP_SECRET`) | `x-pa-signature` header: the hex HMAC-SHA256 of the body, keyed with the HMAC-SHA256 of the secret over the label `pa-occupants`; the body carries its send time (`ts`) | `POST /api/internal/jitsi/occupants`, through `verificaFirmaProsody` in `app/src/lib/auth/prosody-signature.ts`, which refuses a send time more than 300 seconds off. Without the header, the route takes `CRON_API_KEY` like the other internal routes | Prosody's occupants module (`mod_pa_occupants`), see [Who is in the room](jitsi-integration.md#who-is-in-the-room) |
 | `CRON_API_KEY` | `Authorization: Bearer` | `GET /api/metrics` ([Monitoring and health](../operations/monitoring.md)) and `POST /api/webhooks/recording` | Prometheus scraping, the Jibri finalize script |
 | `RECORDING_WEBHOOK_SECRET` | `X-Webhook-Signature: sha256=<hex>`, an HMAC-SHA256 of the raw body | `POST /api/webhooks/recording`, in addition to the bearer | The Jibri finalize script |
 | Hidden-domain recorder account (XMPP user and password from the Secret named in `recorder.xmppSecretName`, keys `recorder.xmppSecretUserKey` and `recorder.xmppSecretPasswordKey`) | SASL sign-in to Prosody on `recorder.hiddenDomain` | Prosody, not the portal | The recorder bot, only when `recorder.hiddenDomain` is set. See [Recording](recording.md#the-invisible-bot-hidden-prosody-domain) and [Setting up recording](../operations/recording-setup.md#make-the-bot-invisible) |

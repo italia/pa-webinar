@@ -250,7 +250,6 @@
       "organizationRequired": "Indtast venligst din organisation",
       "consentRequired": "Samtykke til databehandling er påkrævet",
       "recordingConsentRequired": "Samtykke til optagelse er påkrævet for denne begivenhed",
-      "multitrackConsentRequired": "Samtykke til optagelse af dit eget lydspor er obligatorisk for dette arrangement",
       "eventFull": "Begivenheden har nået det maksimale antal deltagere",
       "generic": "Fejl ved tilmelding. Prøv venligst igen."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Kræver installationens whiteboard-tjeneste; hvor den findes, er det altid slået til ved øjeblikkelige opkald.",
       "liveCaptionsEnabled": "Automatiske undertekster",
       "liveCaptionsEnabledDesc": "Det, talerne siger, vises under videoen, transskriberet i realtid: det hjælper dem, der ikke kan høre eller har svært ved at følge med. Moderatorer kan også slå dem fra under livebegivenheden på fanen »Styring«, og alle kan skjule dem for sig selv.",
+      "captionsTranscriptEnabled": "Udskrift fra underteksterne",
+      "captionsTranscriptEnabledDesc": "Sætningerne fra dem, der giver samtykke, gemmes med deres navn og bliver efter arrangementet til dets udskrift, også uden optagelse eller AI-behandling. Dem, der ikke giver samtykke, findes kun i de direkte undertekster.",
       "autoStartRecording": "Start optagelsen automatisk",
       "autoStartRecordingDesc": "Når arrangementet starter, går optagelsen i gang af sig selv (uden at spørge moderatoren). På den måde finder evt. forsinkede deltagere afspilleren klar.",
       "aiSectionHeading": "Automatisk efterbehandling",
@@ -2686,6 +2687,13 @@
       "editFailed": "Lagringen mislykkedes (HTTP {code})",
       "editFailedDetail": "Lagringen mislykkedes: {message}",
       "editMediaError": "Optagelsens lyd kunne ikke indlæses: afspilning er ikke tilgængelig. Du kan stadig rette teksten og talerne i segmenterne.",
+      "editNoMedia": "Udskrift bygget ud fra de direkte undertekster: der er ingen lyd at afspille.",
+      "captionsSource": "fra de direkte undertekster",
+      "captionsRebuild": "Opdater fra underteksterne",
+      "captionsRebuildDone": "Udskriften er opdateret fra underteksterne.",
+      "captionsRebuildKept": "Udskriften er rettet manuelt eller kommer fra AI: den er ikke erstattet.",
+      "captionsRebuildNone": "Intet at opdatere: der er ingen gemte sætninger, eller opbevaringsperioden for arrangementets data er udløbet.",
+      "captionsRebuildAiRunning": "AI-behandlingen transskriberer videoen: dens udskrift træder i stedet for den fra underteksterne.",
       "summaryLoadError": "Resuméet kunne ikke indlæses.",
       "summaryLoading": "Indlæser resuméet…",
       "summaryEmptyProcessing": "AI-resuméet er ikke klar endnu: behandlingen er i gang. Opdatér siden om et par minutter.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Siden forbliver synlig, men kun inviterede kan tilmelde sig; uden tilmelding kommer man ikke ind"
       },
       "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding."
+    },
+    "captionsTranscript": {
+      "title": "Udskrift fra undertekster",
+      "intro": "Undertekstsætningerne fra dem, der har givet samtykke til udskrift af deres indlæg, bliver til arrangementets udskrift, også uden optagelse og uden AI-behandling.",
+      "stats": "Gemte sætninger: {saved} · stemmer: {voices} · sætninger ikke gemt, uden samtykke: {skipped}",
+      "none": "Udskriften er ikke bygget endnu: den bygges automatisk efter arrangementets afslutning, eller du kan bygge den nu.",
+      "empty": "Ingen gemte sætninger: ingen har talt med samtykke til udskrift.",
+      "fromCaptions": "Udskrift bygget ud fra underteksterne.",
+      "fromAi": "Der findes en udskrift fra AI-behandlingen: den har forrang for den fra underteksterne.",
+      "revised": "Udskriften er rettet manuelt: en opdatering fra underteksterne erstatter den ikke.",
+      "build": "Byg udskriften",
+      "rebuild": "Opdater fra underteksterne",
+      "openEditor": "Åbn i editoren",
+      "publish": "Offentliggør udskriften på arrangementets side",
+      "publishDesc": "Den kan læses også uden video. Gennemse den først: automatiske undertekster kan indeholde fejl.",
+      "publishWithVideo": "Den offentliggjorte video viser den allerede; dette valg holder den synlig, selv hvis videoen trækkes tilbage.",
+      "built": "Udskriften er opdateret.",
+      "kept": "Udskriften er rettet manuelt eller kommer fra AI: den er ikke erstattet.",
+      "failed": "Handlingen mislykkedes.",
+      "loadFailed": "Udskriftens status kunne ikke indlæses.",
+      "expired": "Opbevaringsperioden for arrangementets data er udløbet: udskriften bygges ikke igen.",
+      "aiRunning": "AI-behandlingen transskriberer videoen: dens udskrift træder i stedet for den fra underteksterne."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
-      "multitrack": "Jeg samtykker til optagelse af et separat lydspor med min stemme, alene med det formål at tilskrive transskriptionen den rette taler. Sporet er midlertidigt og slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
-      "multitrackRequired": "Samtykke til optagelse af dit lydspor er påkrævet for at deltage i denne begivenhed",
+      "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
+      "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, kan du stadig deltage, men din stemme optages ikke, og dine indlæg kommer ikke med i udskriften.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
       "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Resumé",
     "aiBadgeLabel": "AI-genereret indhold",
     "aiBadgeBody": "Transskriptionen og resuméet produceres automatisk af AI-pipelinen i klyngen. De kan indeholde fejl; videoen er fortsat den autoritative kilde.",
+    "captionsBadgeBody": "Udskriften kommer fra direkte-arrangementets automatiske undertekster og indeholder kun indlæg fra dem, der har givet samtykke. Den kan indeholde fejl.",
     "revisedByPerson": "Teksten er blevet gennemgået af en person efter den automatiske generering.",
     "searchPlaceholder": "Søg i transskriptionen…",
     "searchLabel": "Søg i transskriptionen",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Vis pladsen",
     "aiNoticeTitle": "AI-behandling efter begivenheden",
     "aiNotice": "Når det er slut, behandles optagelsen af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
-    "multitrackConsentTitle": "Optagelse pr. deltager",
-    "multitrackConsentRequired": "Du skal acceptere optagelsen af dit lydspor for at komme ind",
+    "multitrackConsentTitle": "Udskrift af dine indlæg",
     "recordingConsentTitle": "Optagelse af arrangementet",
     "recordingConsentIntro": "Arrangementet optages (lyd og video). Hvis du tager ordet, indeholder optagelsen din stemme, dit billede og det, du deler på skærmen.",
     "recordingConsentRequired": "Dit samtykke til optagelsen er påkrævet for at komme ind.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatiske undertekster",
-    "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med undertekstknappen i opkaldets værktøjslinje."
+    "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med undertekstknappen i opkaldets værktøjslinje.",
+    "captionsNoticeTranscript": "Under direkte-sessionen transskriberes talerens stemme i realtid for at vise undertekster, på de servere, der hoster platformen. Teksten gemmes, med navn, kun for dem, der har givet samtykke til udskrift af deres indlæg, og bliver arrangementets udskrift. Underteksterne kan skjules med undertekstknappen i opkaldsbjælken."
   },
   "recording": {
     "management": "Videooptagelse",

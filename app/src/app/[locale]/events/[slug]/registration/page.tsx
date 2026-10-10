@@ -10,6 +10,7 @@ import { Icon } from '@/components/ui/icon';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
+import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
@@ -128,6 +129,7 @@ export default async function RegistrationPage({
             privacyPolicyText={privacyText}
             recordingEnabled={event.recordingEnabled}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
+            captionsTranscript={captionsTranscriptActive(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}
             participantsCanShareScreen={event.participantsCanShareScreen}

@@ -24,6 +24,7 @@ import {
   staffInactiveDeactivateDays,
 } from '@/lib/gdpr/log-retention';
 import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
+import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
@@ -186,6 +187,7 @@ export const GET = withErrorHandling(async (request) => {
       recordingUrl: true,
       tempRecordingUrl: true,
       recordingPublished: true,
+      transcriptPublished: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
@@ -320,6 +322,45 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Chi era in sala (endpoint e posto della conferenza) e le frasi dei
+        // sottotitoli salvate per la trascrizione.
+        const roomOccupantsDeleted = await tx.roomOccupant.deleteMany({
+          where: { eventId: evt.id },
+        });
+        const captionSegmentsDeleted = await tx.captionSegment.deleteMany({
+          where: { eventId: evt.id },
+        });
+
+        // La trascrizione costruita da quelle frasi porta nomi e parole: se
+        // ne va qui, salvo che sia pubblicata (con il video o da sola). La
+        // pulizia della post-produzione la toglierebbe solo dove quella gira.
+        // La registrazione «solo sottotitoli» non ha altro contenuto: va via
+        // tutta (lavoro, artefatti, testi originali e parlanti a cascata);
+        // da una registrazione con il video si tolgono la trascrizione e i
+        // suoi parlanti.
+        let captionsTranscriptsDeleted = 0;
+        if (!evt.recordingPublished && !evt.transcriptPublished) {
+          const conSottotitoli = await tx.recording.findMany({
+            where: {
+              eventId: evt.id,
+              artifacts: { some: { modelId: CAPTIONS_TRANSCRIPT_MODEL } },
+            },
+            select: { id: true, blobKey: true },
+          });
+          const soloSottotitoli = conSottotitoli.filter((r) => r.blobKey === '').map((r) => r.id);
+          const conVideo = conSottotitoli.filter((r) => r.blobKey !== '').map((r) => r.id);
+          if (soloSottotitoli.length > 0) {
+            await tx.recording.deleteMany({ where: { id: { in: soloSottotitoli } } });
+          }
+          if (conVideo.length > 0) {
+            await tx.postprodArtifact.deleteMany({
+              where: { recordingId: { in: conVideo }, modelId: CAPTIONS_TRANSCRIPT_MODEL },
+            });
+            await tx.speaker.deleteMany({ where: { recordingId: { in: conVideo } } });
+          }
+          captionsTranscriptsDeleted = conSottotitoli.length;
+        }
+
         const registrationsDeleted = await tx.registration.deleteMany({
           where: { eventId: evt.id },
         });
@@ -419,6 +460,9 @@ export const GET = withErrorHandling(async (request) => {
           registrations: registrationsDeleted.count,
           multitrackConsents: multitrackConsentsDeleted.count,
           recordingConsents: recordingConsentsDeleted.count,
+          roomOccupants: roomOccupantsDeleted.count,
+          captionSegments: captionSegmentsDeleted.count,
+          captionsTranscripts: captionsTranscriptsDeleted,
           chatMessages: chatMessagesDeleted.count,
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,

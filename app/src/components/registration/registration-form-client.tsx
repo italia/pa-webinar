@@ -30,6 +30,8 @@ interface RegistrationFormClientProps {
   privacyPolicyText?: string;
   recordingEnabled?: boolean;
   multitrackRecordingEnabled?: boolean;
+  /** La trascrizione dai sottotitoli e' attiva (lib/captions/availability). */
+  captionsTranscript?: boolean;
   /** Cosa l'evento concede ai partecipanti: decide quali consensi chiedere
    *  (lib/registration/consents). */
   participantsCanUnmute?: boolean;
@@ -63,6 +65,7 @@ export default function RegistrationFormClient({
   privacyPolicyText,
   recordingEnabled = false,
   multitrackRecordingEnabled = false,
+  captionsTranscript = false,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   participantsCanShareScreen = false,
@@ -93,6 +96,7 @@ export default function RegistrationFormClient({
   const richiesti = consensiRichiesti({
     recordingEnabled,
     multitrackRecordingEnabled,
+    captionsTranscript,
     participantsCanUnmute,
     participantsCanStartVideo,
     participantsCanShareScreen,
@@ -184,9 +188,6 @@ export default function RegistrationFormClient({
     // Consensi obbligatori secondo il formato dell'evento.
     if (richiesti.registrazione && !consentRecording) {
       fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
-    }
-    if (richiesti.tracce && !consentMultitrack) {
-      fieldErrors.consentMultitrack = 'registration.errors.multitrackConsentRequired';
     }
 
     if (Object.keys(fieldErrors).length > 0) {
@@ -798,31 +799,25 @@ export default function RegistrationFormClient({
           <p className="registration-consents__notice mb-3">{tg('consent.recordingNotice')}</p>
         )}
 
-        {/* ── Traccia audio per persona (ADR-013): sempre, se l'evento la
-            registra, anche per chi parte senza microfono e riceve la parola ── */}
+        {/* ── Trascrizione dei propri interventi (traccia audio per persona o
+            sottotitoli salvati): facoltativa, chi non la da' partecipa lo
+            stesso, ma la sua voce non si registra ne' si trascrive ── */}
         {richiesti.tracce && (
           <FormGroup check className="mb-3">
             <Input
               type="checkbox"
               id="consentMultitrack"
-              aria-invalid={errors.consentMultitrack ? true : undefined}
-              aria-required="true"
-              aria-describedby={errors.consentMultitrack ? 'consentMultitrackError' : undefined}
+              aria-describedby="consentMultitrackNota"
               checked={consentMultitrack}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setConsentMultitrack(e.target.checked);
-                pulisciErrore('consentMultitrack');
-              }}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentMultitrack(e.target.checked)}
             />
             <Label for="consentMultitrack" check>
               {tg('consent.multitrack')}{' '}
-              <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+              <span className="consent-mark">{t('optionalMark')}</span>
             </Label>
-            {errors.consentMultitrack && (
-              <div id="consentMultitrackError" className="text-danger small mt-1">
-                {tg('consent.multitrackRequired')}
-              </div>
-            )}
+            <div id="consentMultitrackNota" className="text-secondary small mt-1">
+              {tg('consent.multitrackOptional')}
+            </div>
           </FormGroup>
         )}
 

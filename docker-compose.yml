@@ -171,11 +171,15 @@ services:
       - JWT_TOKEN_AUTH_MODULE=token_verification
       - ENABLE_GUESTS=0
       - GLOBAL_MODULES=token_verification
-      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions
+      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants
       # Sottotitoli live: con "true" il modulo pa_captions rende le stanze
       # trascrivibili. Va insieme al profilo "captions" e a CAPTIONS_JICOFO_OPTS
       # (vedi .env.example).
       - PA_CAPTIONS_ENABLED=${CAPTIONS_ENABLED:-false}
+      # Chi c'e' nella conferenza, per il portale (mod_pa_occupants): serve a
+      # tenere la trascrizione e l'audio solo di chi ha dato il consenso. Le
+      # notifiche sono firmate con JWT_APP_SECRET, lo stesso segreto del portale.
+      - PA_PORTAL_URL=http://app:3000
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi

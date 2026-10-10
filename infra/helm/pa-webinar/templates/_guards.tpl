@@ -306,13 +306,16 @@ Tre incoerenze si vedono solo in sala, e qui diventano errori di resa:
 {{- fail "jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH è \"false\" ma Prosody non assegna i ruoli dal token: jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non contiene token_affiliation. Nessuno sarebbe moderatore nella sala, e il moderatore del portale non potrebbe silenziare né espellere nessuno. Rimetti in XMPP_MUC_MODULES token_affiliation,token_affiliation_custom (più i tuoi moduli), come in values.yaml." -}}
 {{- end -}}
 {{- $delProgetto := list -}}
-{{- range (list "token_affiliation_custom" "pa_media_lock" "pa_captions") -}}
+{{- range (list "token_affiliation_custom" "pa_media_lock" "pa_captions" "pa_occupants") -}}
 {{- if has . $moduli -}}
 {{- $delProgetto = append $delProgetto . -}}
 {{- end -}}
 {{- end -}}
 {{- if and (has "token_affiliation_custom" $moduli) (not (has "pa_media_lock" $moduli)) -}}
 {{- fail "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES carica token_affiliation_custom ma non pa_media_lock: i limiti di microfono, videocamera e schermo che un evento imposta ai partecipanti varrebbero solo nella barra della sala, e chi apre la sala fuori dal portale li riaccenderebbe. Aggiungi pa_media_lock a XMPP_MUC_MODULES, come in values.yaml. Succede anche con helm upgrade --reuse-values da una versione precedente, che conserva la lista vecchia." -}}
+{{- end -}}
+{{- if and .Values.recorder.enabled (not (has "pa_occupants" $moduli)) -}}
+{{- fail "recorder.enabled è vero ma jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non carica pa_occupants: il registratore multitraccia registra solo la voce di chi ha dato il consenso, e senza il modulo il portale non sa di chi è ogni voce, quindi non registrerebbe nessuno. Aggiungi pa_occupants a XMPP_MUC_MODULES, come in values.yaml. Succede anche con helm upgrade --reuse-values da una versione precedente, che conserva la lista vecchia." -}}
 {{- end -}}
 {{- if and (include "pa-webinar.captionsEnabled" .) (not (has "pa_captions" $moduli)) -}}
 {{- fail "global.captions.enabled è vero ma jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non carica pa_captions: le stanze non si dichiarerebbero trascrivibili, e i sottotitoli accesi da un moderatore non partirebbero mai, senza errori nella sala. Aggiungi pa_captions a XMPP_MUC_MODULES, come in values.yaml, oppure spegni i sottotitoli con global.captions.enabled: false." -}}

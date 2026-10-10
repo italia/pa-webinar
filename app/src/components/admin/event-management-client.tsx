@@ -51,6 +51,7 @@ import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
+import CaptionsTranscriptPanel from './captions-transcript-panel';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -160,6 +161,8 @@ interface EventData {
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
+  /** L'evento salva le frasi dei sottotitoli per la trascrizione. */
+  captionsTranscriptEnabled: boolean;
   postEventPublic: boolean; postEventPublicUntil: string | null;
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
@@ -1254,6 +1257,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const t = useTranslations('admin');
   const tfb = useTranslations('admin.feedbackPanel');
   const tg = useTranslations('admin.glossary');
+  const tct = useTranslations('admin.captionsTranscript');
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
@@ -1398,6 +1402,19 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           </div>
         )}
       </div>
+
+      {/* La trascrizione dai sottotitoli live, se l'evento la tiene: si legge
+          e si pubblica anche senza video e senza pipeline AI. */}
+      {event.captionsTranscriptEnabled && (
+        <div className="mb-4">
+          <H>{tct('title')}</H>
+          <CaptionsTranscriptPanel
+            eventId={event.id}
+            moderatorToken={event.moderatorToken}
+            isEnded={isEnded}
+          />
+        </div>
+      )}
 
       {/* Il glossario dell'evento: termini e sigle per trascrizione, traduzioni
           e doppiaggio, in aggiunta a quelli dell'istanza. Serve anche prima

@@ -15,6 +15,7 @@ import { loadConfig } from './config.js';
 import { ContextProvider } from './context.js';
 import { Gateway } from './gateway.js';
 import { createGatewayServer } from './server.js';
+import { TranscriptSink } from './transcript.js';
 
 const SILENCE = '+P/+'; // frame Opus CELT di silenzio, 20 ms
 // Frame Opus da 20 ms di un tono a circa -37 dBFS: per il gateway è voce.
@@ -100,6 +101,8 @@ async function startGateway(env: Record<string, string>, contextUrl?: string) {
   const gateway = new Gateway(
     config,
     new ContextProvider({ url: config.contextUrl, token: config.contextToken, defaultLanguage: config.defaultLanguage }),
+    Date.now,
+    new TranscriptSink({ url: config.segmentsUrl, token: config.contextToken, flushMs: 50 }),
   );
   const server = createGatewayServer(gateway);
   const port = await listen(server);
@@ -297,6 +300,54 @@ describe('gateway', () => {
     b.media('dd-1', 5);
     await waitFor(() => engine.sessions[0]?.update, 3000);
   }, 10_000);
+
+  it('le frasi definitive vanno al portale solo se l\'evento tiene la trascrizione', async () => {
+    const engine = await fakeEngine('Buongiorno a tutti.');
+    let transcript = true;
+    const ricevuti: Array<{ room: string; segments: Array<Record<string, string>> }> = [];
+    const ctx = createServer((req, res) => {
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', (c) => (body += c));
+        req.on('end', () => {
+          ricevuti.push(JSON.parse(body));
+          res.writeHead(204).end();
+        });
+        return;
+      }
+      res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ enabled: true, transcript }));
+    });
+    const ctxPort = await listen(ctx);
+    cleanups.push(() => new Promise<void>((r) => ctx.close(() => r())));
+    const { port } = await startGateway(
+      {
+        CAPTIONS_ENGINE_URL: engine.url,
+        CAPTIONS_SEGMENTS_URL: `http://127.0.0.1:${ctxPort}/captions/segments`,
+        CAPTIONS_CONTEXT_REFRESH_MS: '600',
+      },
+      `http://127.0.0.1:${ctxPort}/captions/context`,
+    );
+    const b = await bridge(port, '/transcribe/meet-1?room=stanza-evento');
+    b.start('ab-1', 'ab');
+    b.media('ab-1', 30);
+    b.media('ab-1', 20, 'silence');
+    const arrivati = await waitFor(() => ricevuti[0], 4000);
+    expect(arrivati.room).toBe('stanza-evento');
+    expect((arrivati as unknown as { meetingId: string }).meetingId).toBe('meet-1');
+    const [segmento] = arrivati.segments;
+    expect(segmento).toMatchObject({ endpointId: 'ab', text: 'Buongiorno a tutti.', language: 'it' });
+    expect(Date.parse(segmento!.endedAt)).toBeGreaterThanOrEqual(Date.parse(segmento!.startedAt));
+
+    // Senza trascrizione nell'evento le frasi restano solo sottotitoli.
+    transcript = false;
+    await new Promise((r) => setTimeout(r, 4300));
+    const prima = ricevuti.length;
+    b.media('ab-1', 30);
+    b.media('ab-1', 20, 'silence');
+    await waitFor(() => engine.sessions.some((s) => s.commits > 0) && results(b.received).filter((r) => !r.is_interim).length >= 2, 4000);
+    await new Promise((r) => setTimeout(r, 300));
+    expect(ricevuti.length).toBe(prima);
+  }, 15_000);
 
   it('risponde ai ping del bridge', async () => {
     const engine = await fakeEngine();

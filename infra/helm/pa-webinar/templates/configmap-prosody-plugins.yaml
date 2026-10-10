@@ -8,6 +8,10 @@ Moduli Prosody del progetto, montati in /prosody-plugins-custom dal volume che
     concede microfono, videocamera o schermo ai partecipanti.
   - mod_pa_captions rende le stanze trascrivibili per i sottotitoli live, se
     Prosody ha PA_CAPTIONS_ENABLED=true (global.captions.enabled).
+  - mod_pa_occupants dice al portale chi c'e' in sala (endpoint del bridge e
+    posto del token), perche' trascrizione e registrazione della voce seguano
+    il consenso di ciascuno: si accende con PA_PORTAL_URL, e firma le
+    notifiche con il segreto dei token della conferenza.
 
 I file sono copie di infra/jitsi/prosody-plugins/, la cartella che monta lo
 stack Docker Compose: un chart non legge file fuori dalla propria cartella.
@@ -32,4 +36,6 @@ data:
     {{- .Files.Get "files/prosody-plugins/mod_pa_media_lock.lua" | nindent 4 }}
   mod_pa_captions.lua: |
     {{- .Files.Get "files/prosody-plugins/mod_pa_captions.lua" | nindent 4 }}
+  mod_pa_occupants.lua: |
+    {{- .Files.Get "files/prosody-plugins/mod_pa_occupants.lua" | nindent 4 }}
 {{- end }}

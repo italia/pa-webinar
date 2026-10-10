@@ -250,7 +250,6 @@
       "organizationRequired": "Palun sisestage oma organisatsioon",
       "consentRequired": "Nõusolek andmetöötluseks on kohustuslik",
       "recordingConsentRequired": "Selle ürituse jaoks on salvestamise nõusolek kohustuslik",
-      "multitrackConsentRequired": "Sellel sündmusel on nõusolek sinu heliraja salvestamiseks kohustuslik",
       "eventFull": "Üritus on saavutanud osalejate maksimaalse arvu",
       "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Nõuab paigalduse tahvliteenust; kus see on olemas, on tahvel kiirkõnedes alati sees.",
       "liveCaptionsEnabled": "Automaatsed subtiitrid",
       "liveCaptionsEnabledDesc": "Kõnelejate jutt ilmub video alla reaalajas transkribeerituna: see aitab neid, kes ei kuule või kellel on raske jälgida. Moderaatorid saavad need otseülekande ajal välja lülitada ka vahekaardil „Juhtpult“ ja igaüks saab need enda jaoks peita.",
+      "captionsTranscriptEnabled": "Transkriptsioon subtiitritest",
+      "captionsTranscriptEnabledDesc": "Nõusoleku andnud inimeste laused salvestatakse koos nimega ja ürituse lõpus saab neist ürituse transkriptsioon, ka ilma salvestise ja tehisintellekti töötluseta. Need, kes nõusolekut ei anna, on ainult otsesubtiitrites.",
       "autoStartRecording": "Käivita salvestus automaatselt",
       "autoStartRecordingDesc": "Sündmuse alguses käivitub salvestus iseseisvalt (moderaatorilt kinnitust ei küsita). Hilinejad leiavad kohe järelejõudmismängija saadaval.",
       "aiSectionHeading": "Automaatne järeltöötlus",
@@ -2686,6 +2687,13 @@
       "editFailed": "Salvestamine ebaõnnestus (HTTP {code})",
       "editFailedDetail": "Salvestamine ebaõnnestus: {message}",
       "editMediaError": "Salvestise heli ei õnnestunud laadida: taasesitus pole saadaval. Lõikude teksti ja kõnelejaid saad siiski parandada.",
+      "editNoMedia": "Otsesubtiitritest koostatud transkriptsioon: esitatavat heli ei ole.",
+      "captionsSource": "otsesubtiitritest",
+      "captionsRebuild": "Uuenda subtiitritest",
+      "captionsRebuildDone": "Transkriptsioon uuendati subtiitritest.",
+      "captionsRebuildKept": "Transkriptsiooni on käsitsi parandatud või see pärineb tehisintellektilt: seda ei asendatud.",
+      "captionsRebuildNone": "Pole midagi uuendada: salvestatud lauseid pole või ürituse andmete säilitamisaeg on lõppenud.",
+      "captionsRebuildAiRunning": "Tehisintellekti töötlus transkribeerib videot: selle transkriptsioon asendab subtiitritest koostatu.",
       "summaryLoadError": "Kokkuvõtet ei õnnestunud laadida.",
       "summaryLoading": "Kokkuvõtte laadimine…",
       "summaryEmptyProcessing": "AI kokkuvõte ei ole veel valmis: töötlus käib. Värskenda lehte mõne minuti pärast.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult kutsutud; registreerimata sisse ei pääse"
       },
       "previewInvitation": "Registreeruda saavad ainult sinu kutsutud; registreerimata ei pääse keegi sisse."
+    },
+    "captionsTranscript": {
+      "title": "Transkriptsioon subtiitritest",
+      "intro": "Nende inimeste subtiitrilaused, kes nõustusid oma sõnavõttude transkribeerimisega, saavad ürituse transkriptsiooniks ka ilma salvestuse ja tehisintellekti töötluseta.",
+      "stats": "Salvestatud laused: {saved} · hääled: {voices} · salvestamata laused, nõusolekuta: {skipped}",
+      "none": "Transkriptsiooni pole veel koostatud: see koostatakse ise pärast ürituse lõppu või saate selle kohe koostada.",
+      "empty": "Salvestatud lauseid pole: keegi ei rääkinud transkribeerimise nõusolekuga.",
+      "fromCaptions": "Transkriptsioon koostati subtiitritest.",
+      "fromAi": "Olemas on tehisintellekti töötluse transkriptsioon: see on subtiitritest koostatu ees eelisjärjekorras.",
+      "revised": "Transkriptsiooni on käsitsi parandatud: subtiitritest uuendamine seda ei asenda.",
+      "build": "Koosta transkriptsioon",
+      "rebuild": "Uuenda subtiitritest",
+      "openEditor": "Ava redaktoris",
+      "publish": "Avalda transkriptsioon ürituse lehel",
+      "publishDesc": "Seda saab lugeda ka ilma videota. Vaadake see enne üle: automaatsubtiitrites võib olla vigu.",
+      "publishWithVideo": "Avaldatud video juba näitab seda; see valik hoiab selle nähtaval ka siis, kui video eemaldatakse.",
+      "built": "Transkriptsioon uuendati.",
+      "kept": "Transkriptsiooni on käsitsi parandatud või see pärineb tehisintellektilt: seda ei asendatud.",
+      "failed": "Toiming ebaõnnestus.",
+      "loadFailed": "Transkriptsiooni olekut ei õnnestunud laadida.",
+      "expired": "Ürituse andmete säilitamisaeg on lõppenud: transkriptsiooni uuesti ei koostata.",
+      "aiRunning": "Tehisintellekti töötlus transkribeerib videot: selle transkriptsioon asendab subtiitritest koostatu."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Nõustun selle ürituse heli-/videosalvestamisega",
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
       "recordingNotice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, välja arvatud juhul, kui moderaator annab teile sõna.",
-      "multitrack": "Nõustun oma hääle salvestamisega eraldi helirajale ainsa eesmärgiga omistada transkriptsioon õigesti igale kõnelejale. Rada on ajutine ja kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
-      "multitrackRequired": "Nõusolek sinu heliraja salvestamiseks on sellel sündmusel osalemiseks kohustuslik",
+      "multitrack": "Nõustun, et minu sõnavõtud transkribeeritakse koos minu nimega ürituse kokkuvõtte jaoks. Kui üritus salvestab iga inimese jaoks eraldi helirea, salvestatakse minu häält ainult sel eesmärgil ja helirida kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
+      "multitrackOptional": "See on vabatahtlik: kui te ei nõustu, saate siiski osaleda, kuid teie häält ei salvestata ja teie sõnavõtud ei jõua transkriptsiooni.",
       "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
       "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Kokkuvõte",
     "aiBadgeLabel": "AI loodud sisu",
     "aiBadgeBody": "Transkriptsiooni ja kokkuvõtte koostab automaatselt klastrisisene AI töövoog. Need võivad sisaldada vigu; autoriteetne allikas on video.",
+    "captionsBadgeBody": "Transkriptsioon pärineb otseülekande automaatsubtiitritest ja sisaldab ainult nende sõnavõtte, kes andsid nõusoleku. Selles võib olla vigu.",
     "revisedByPerson": "Inimene on teksti pärast automaatset loomist üle vaadanud.",
     "searchPlaceholder": "Otsi transkriptsioonist…",
     "searchLabel": "Otsi transkriptsioonist",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Näita väljakut",
     "aiNoticeTitle": "Tehisintellekti töötlus pärast sündmust",
     "aiNotice": "Lõpus töödeldakse salvestist tehisintellekti tööriistadega, et luua transkriptsioon, kokkuvõte ning võimalikud tõlked ja dubleeringud. Tulemused võivad sisaldada ebatäpsusi; video jääb autoriteetseks allikaks.",
-    "multitrackConsentTitle": "Osalejapõhine salvestamine",
-    "multitrackConsentRequired": "Sisenemiseks pead nõustuma oma helirea salvestamisega",
+    "multitrackConsentTitle": "Teie sõnavõttude transkriptsioon",
     "recordingConsentTitle": "Ürituse salvestamine",
     "recordingConsentIntro": "Üritus salvestatakse (heli ja video). Kui sõna võtad, sisaldab salvestis sinu häält, sinu kujutist ja seda, mida ekraanil jagad.",
     "recordingConsentRequired": "Sisenemiseks on vaja sinu nõusolekut salvestamiseks.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automaatsed subtiitrid",
-    "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita kõne tööriistariba subtiitrite nupuga."
+    "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita kõne tööriistariba subtiitrite nupuga.",
+    "captionsNoticeTranscript": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas subtiitrite näitamiseks platvormi majutavates serverites. Tekst säilitatakse koos nimega ainult nende puhul, kes nõustusid oma sõnavõttude transkribeerimisega, ja sellest saab ürituse transkriptsioon. Subtiitrid saab peita kõneriba subtiitrite nupuga."
   },
   "recording": {
     "management": "Videosalvestis",

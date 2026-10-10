@@ -250,7 +250,6 @@
       "organizationRequired": "Adja meg a szervezetét",
       "consentRequired": "Az adatkezeléshez való hozzájárulás kötelező",
       "recordingConsentRequired": "A felvételhez való hozzájárulás ehhez az eseményhez kötelező",
-      "multitrackConsentRequired": "Ezen az eseményen kötelező hozzájárulni a saját hangsáv rögzítéséhez",
       "eventFull": "Az esemény elérte a maximális résztvevőszámot",
       "generic": "Hiba a regisztráció során. Próbálja újra."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. A telepítés táblaszolgáltatását igényli; ahol elérhető, az azonnali hívásokban mindig aktív.",
       "liveCaptionsEnabled": "Automatikus feliratok",
       "liveCaptionsEnabledDesc": "Az előadók szavai valós időben átírva jelennek meg a videó alatt: segít azoknak, akik nem hallanak vagy nehezen követik. A moderátorok az élő adás közben is kikapcsolhatják a „Rendezés” lapon, és bárki elrejtheti a saját nézetében.",
+      "captionsTranscriptEnabled": "Átirat a feliratokból",
+      "captionsTranscriptEnabledDesc": "A hozzájárulást adók mondatai a nevükkel együtt elmentődnek, és az esemény végén az esemény átiratává válnak, felvétel vagy MI-feldolgozás nélkül is. Aki nem járul hozzá, csak az élő feliratokban jelenik meg.",
       "autoStartRecording": "Felvétel automatikus indítása",
       "autoStartRecordingDesc": "Az esemény kezdetekor a felvétel automatikusan elindul (a moderátortól nem kér megerősítést). Így a később csatlakozók azonnal elérhető lejátszót találnak.",
       "aiSectionHeading": "Automatikus utómunka",
@@ -2686,6 +2687,13 @@
       "editFailed": "A mentés nem sikerült (HTTP {code})",
       "editFailedDetail": "A mentés nem sikerült: {message}",
       "editMediaError": "A felvétel hangját nem sikerült betölteni: a lejátszás nem érhető el. A szakaszok szövegét és beszélőit ettől függetlenül javíthatja.",
+      "editNoMedia": "Az élő feliratokból készült átirat: nincs lejátszható hang.",
+      "captionsSource": "az élő feliratokból",
+      "captionsRebuild": "Frissítés a feliratokból",
+      "captionsRebuildDone": "Az átirat frissült a feliratokból.",
+      "captionsRebuildKept": "Az átiratot kézzel javították, vagy MI-ből származik: nem lett lecserélve.",
+      "captionsRebuildNone": "Nincs mit frissíteni: nincsenek mentett mondatok, vagy az esemény adatainak megőrzési ideje lejárt.",
+      "captionsRebuildAiRunning": "Az MI-feldolgozás átírja a videót: az átirata a feliratokból készült helyére kerül.",
       "summaryLoadError": "Az összefoglalót nem sikerült betölteni.",
       "summaryLoading": "Összefoglaló betöltése…",
       "summaryEmptyProcessing": "Az AI-összefoglaló még nem áll készen: a feldolgozás folyamatban van. Frissítse az oldalt néhány perc múlva.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Az oldal látható marad, de csak a meghívottak regisztrálhatnak; regisztráció nélkül nincs belépés"
       },
       "previewInvitation": "Csak az Ön által meghívottak regisztrálhatnak; regisztráció nélkül senki sem lép be."
+    },
+    "captionsTranscript": {
+      "title": "Átirat a feliratokból",
+      "intro": "Azok feliratmondatai, akik hozzájárultak felszólalásaik átírásához, az esemény átiratává válnak, felvétel és MI-feldolgozás nélkül is.",
+      "stats": "Mentett mondatok: {saved} · hangok: {voices} · nem mentett mondatok, hozzájárulás nélkül: {skipped}",
+      "none": "Az átirat még nem készült el: az esemény vége után magától elkészül, vagy most is elkészítheti.",
+      "empty": "Nincs mentett mondat: senki sem beszélt az átíráshoz való hozzájárulással.",
+      "fromCaptions": "Az átirat a feliratokból készült.",
+      "fromAi": "Van MI-feldolgozásból származó átirat: ez elsőbbséget élvez a feliratokból készülttel szemben.",
+      "revised": "Az átiratot kézzel javították: a feliratokból való frissítés nem cseréli le.",
+      "build": "Átirat elkészítése",
+      "rebuild": "Frissítés a feliratokból",
+      "openEditor": "Megnyitás a szerkesztőben",
+      "publish": "Az átirat közzététele az esemény oldalán",
+      "publishDesc": "Videó nélkül is olvasható. Előbb nézze át: az automatikus feliratok hibákat tartalmazhatnak.",
+      "publishWithVideo": "A közzétett videó már megjeleníti; ez a beállítás akkor is láthatóan tartja, ha a videót visszavonják.",
+      "built": "Az átirat frissült.",
+      "kept": "Az átiratot kézzel javították, vagy MI-ből származik: nem lett lecserélve.",
+      "failed": "A művelet nem sikerült.",
+      "loadFailed": "Az átirat állapota nem tölthető be.",
+      "expired": "Az esemény adatainak megőrzési ideje lejárt: az átirat nem készül el újra.",
+      "aiRunning": "Az MI-feldolgozás átírja a videót: az átirata a feliratokból készült helyére kerül."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
       "recordingNotice": "Az eseményről felvétel készül (hang és kép). Mikrofon és kamera nélkül veszel részt: a felvétel nem tartalmazza a hangodat és a képedet, kivéve, ha a házigazda szót ad neked.",
-      "multitrack": "Hozzájárulok a hangom külön hangsávon történő rögzítéséhez, kizárólag abból a célból, hogy az átirat helyesen legyen az egyes beszélőkhöz rendelve. A sáv ideiglenes, és az átirat elkészülte után törlésre kerül; nem használják a hangom azonosítására vagy visszajátszására.",
-      "multitrackRequired": "A hangsávod rögzítéséhez adott hozzájárulás kötelező az eseményen való részvételhez",
+      "multitrack": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sáv az átírás után törlődik; nem használják a hangom azonosítására vagy utánzására.",
+      "multitrackOptional": "Ez nem kötelező: ha nem járul hozzá, ugyanúgy részt vehet, de a hangját nem rögzítik, és a felszólalásai nem kerülnek az átiratba.",
       "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
       "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Összefoglaló",
     "aiBadgeLabel": "AI által generált tartalom",
     "aiBadgeBody": "Az átiratot és az összefoglalót automatikusan a fürtön belüli AI pipeline készíti. Hibákat tartalmazhatnak; a hiteles forrás továbbra is a videó.",
+    "captionsBadgeBody": "Az átirat az élő esemény automatikus feliratiból származik, és csak a hozzájárulást adók felszólalásait tartalmazza. Hibákat tartalmazhat.",
     "revisedByPerson": "A szöveget az automatikus előállítás után egy személy átnézte.",
     "searchPlaceholder": "Keresés az átiratban…",
     "searchLabel": "Keresés az átiratban",
@@ -4358,8 +4389,7 @@
     "backToGarden": "A tér megjelenítése",
     "aiNoticeTitle": "MI-feldolgozás az esemény után",
     "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozzák fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
-    "multitrackConsentTitle": "Résztvevőnkénti rögzítés",
-    "multitrackConsentRequired": "A belépéshez el kell fogadnod a saját hangsávod rögzítését",
+    "multitrackConsentTitle": "Felszólalásai átirata",
     "recordingConsentTitle": "Az esemény felvétele",
     "recordingConsentIntro": "Az eseményről felvétel készül (hang és kép). Ha felszólal, a felvétel tartalmazza a hangját, a képmását és azt, amit a képernyőn megoszt.",
     "recordingConsentRequired": "A belépéshez a felvételhez való hozzájárulása szükséges.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatikus feliratok",
-    "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a hívás eszköztárának feliratgombjával elrejthetők."
+    "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a hívás eszköztárának feliratgombjával elrejthetők.",
+    "captionsNoticeTranscript": "Az élő adás alatt a beszélő hangját valós időben átírjuk a feliratok megjelenítéséhez, a platformot üzemeltető szervereken. A szöveget névvel együtt csak azoknál őrizzük meg, akik hozzájárultak felszólalásaik átírásához, és ez lesz az esemény átirata. A feliratok a hívássáv feliratgombjával elrejthetők."
   },
   "recording": {
     "management": "Videofelvétel",

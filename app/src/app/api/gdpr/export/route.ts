@@ -150,6 +150,19 @@ export const GET = withErrorHandling(async (request) => {
     });
   }
 
+  // Le frasi dei sottotitoli salvate per la trascrizione: il posto della
+  // conferenza e' `reg-<id>-<suffisso>`, l'unico legame con l'iscrizione.
+  const frasi =
+    registrations.length > 0
+      ? await prisma.captionSegment.findMany({
+          where: {
+            OR: registrations.map((r) => ({ eventId: r.eventId, seatId: { startsWith: `reg-${r.id}-` } })),
+          },
+          select: { seatId: true, text: true, startedAt: true },
+          orderBy: { startedAt: 'asc' },
+        })
+      : [];
+
   const result = registrations.map((r) => {
     let decryptedEmail: string | null = null;
     try {
@@ -199,6 +212,12 @@ export const GET = withErrorHandling(async (request) => {
         optionIndex: v.optionIndex,
         createdAt: v.createdAt.toISOString(),
       })),
+      liveTranscript: frasi
+        .filter((f) => f.seatId?.startsWith(`reg-${r.id}-`))
+        .map((f) => ({
+          at: f.startedAt.toISOString(),
+          text: f.text ? (tryDecryptPII(f.text) ?? null) : null,
+        })),
     };
   });
 

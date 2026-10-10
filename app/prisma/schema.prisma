@@ -67,6 +67,17 @@ model Event {
   // solo se l'istanza ha i sottotitoli attivi (SiteSetting.liveCaptionsEnabled)
   // e il servizio è installato (CAPTIONS_STATUS_URL).
   liveCaptionsEnabled Boolean @default(true) @map("live_captions_enabled")
+  // La trascrizione dell'evento costruita dai sottotitoli live: le frasi di
+  // chi ha dato il consenso alla trascrizione dei propri interventi si
+  // salvano (testo e nome cifrati, CaptionSegment) e a fine evento diventano
+  // la trascrizione della sessione, anche senza registrazione e senza la
+  // pipeline AI. Spenta di default.
+  captionsTranscriptEnabled Boolean @default(false) @map("captions_transcript_enabled")
+  // La trascrizione si legge nella pagina dell'evento anche senza il video
+  // pubblicato (per esempio quella dai sottotitoli, che un video non ce l'ha).
+  // Con il video pubblicato la trascrizione lo accompagna comunque. Decisione
+  // dello staff dopo l'evento: spenta di default.
+  transcriptPublished Boolean @default(false) @map("transcript_published")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -328,6 +339,8 @@ model Event {
 
   multitrackConsents MultitrackConsent[]
   recordingConsents  RecordingConsent[]
+  roomOccupants      RoomOccupant[]
+  captionSegments    CaptionSegment[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -767,6 +780,11 @@ model Registration {
   // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
   // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
   consentMultitrack           Boolean? @map("consent_multitrack")
+  // Il testo con cui e' stato dato (lib/registration/consents,
+  // VERSIONE_TESTO_TRASCRIZIONE). Null per i consensi dati prima che il testo
+  // comprendesse la trascrizione dei propri interventi con il nome: valgono
+  // per la traccia audio, non per la trascrizione dai sottotitoli.
+  consentMultitrackVersion    Int?     @map("consent_multitrack_version")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
@@ -2477,6 +2495,10 @@ model MultitrackConsent {
   registrationId String?  @map("registration_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
+  // Il testo con cui e' stato dato: le prove scritte prima che il testo
+  // comprendesse la trascrizione con il nome hanno 1 (vedi
+  // Registration.consentMultitrackVersion).
+  textVersion    Int      @default(2) @map("text_version")
 
   event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
@@ -2484,6 +2506,61 @@ model MultitrackConsent {
   @@index([eventId])
   @@index([registrationId])
   @@map("multitrack_consents")
+}
+
+// Chi e' in sala: per ogni occupante della conferenza entrato con un token,
+// l'endpoint del bridge (lo stesso id con cui il bridge manda l'audio ai
+// sottotitoli e al registratore) e il posto del token (`context.user.id` del
+// JWT). Lo scrive Prosody (mod_pa_occupants) a ogni ingresso e uscita. Serve
+// a decidere, voce per voce, se salvare la trascrizione o registrare l'audio
+// secondo il consenso della persona. Dato personale (il posto rimanda a
+// un'iscrizione): la pulizia GDPR lo cancella alla scadenza dell'evento.
+model RoomOccupant {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId    String    @map("event_id") @db.Uuid
+  endpointId String    @map("endpoint_id") @db.VarChar(64)
+  seatId     String    @map("seat_id") @db.VarChar(80)
+  // L'id della riunione (Jicofo): e' l'unica cosa che il servizio dei
+  // sottotitoli riceve dal bridge su ogni versione di Jitsi, e da qui risale
+  // all'evento.
+  meetingId  String?   @map("meeting_id") @db.VarChar(64)
+  joinedAt   DateTime  @map("joined_at")
+  leftAt     DateTime? @map("left_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, endpointId])
+  @@index([eventId, seatId])
+  @@index([meetingId])
+  @@map("room_occupants")
+}
+
+// Una frase dei sottotitoli live, salvata per la trascrizione dell'evento
+// (Event.captionsTranscriptEnabled). Di chi ha dato il consenso alla
+// trascrizione dei propri interventi si tengono nome e testo, cifrati; di chi
+// non l'ha dato resta solo che in quel momento qualcuno ha parlato. La pulizia
+// GDPR la cancella alla scadenza dell'evento.
+model CaptionSegment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  // L'id della frase dato dal servizio dei sottotitoli: rende idempotente il
+  // nuovo invio di una frase gia' salvata.
+  messageId   String   @map("message_id") @db.VarChar(80)
+  endpointId  String   @map("endpoint_id") @db.VarChar(64)
+  // Null quando chi parla non ha dato il consenso (o non e' riconosciuto).
+  seatId      String?  @map("seat_id") @db.VarChar(80)
+  speakerName String?  @map("speaker_name")
+  text        String?
+  language    String?  @db.VarChar(8)
+  startedAt   DateTime @map("started_at")
+  endedAt     DateTime @map("ended_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, messageId])
+  @@index([eventId, startedAt])
+  @@map("caption_segments")
 }
 
 // Il consenso alla registrazione dell'evento dato in sala d'attesa da chi non

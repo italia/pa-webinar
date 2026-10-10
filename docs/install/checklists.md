@@ -488,7 +488,7 @@ mode, change the Secret and restart the portal
 | Key | Rotate | What else |
 |---|---|---|
 | `ADMIN_API_KEY` | Yes, whenever it may have leaked | New sign-ins with the instance key need the new value; sessions continue |
-| `CRON_API_KEY` | Yes | The scheduled jobs read it at their next run. Restart the recorder controller if it runs, and update the ServiceMonitor's bearer if you use one |
+| `CRON_API_KEY` | Yes | The scheduled jobs read it at their next run. Restart the recorder controller if it runs and the live captions service, and update the ServiceMonitor's bearer if you use one |
 | `SMTP_PASSWORD` and the other SMTP settings | Yes | On k3s, a new file with `--smtp-file` |
 | `JITSI_JWT_SECRET` | Yes, outside events | Both Secrets take it from the same line. Then restart Prosody, which drops the calls in progress: `kubectl -n pa-webinar rollout restart statefulset/pa-webinar-jitsi-meet-prosody` |
 | Object storage keys | Yes, at your provider; not scripted for Garage | Restart the portal |

@@ -25,8 +25,9 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,9 +60,19 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await prisma.$transaction(async (tx) => {
     const recording = await tx.recording.findUnique({
       where: { id },
-      select: { id: true, eventId: true },
+      select: { id: true, eventId: true, blobKey: true },
     });
     if (!recording) throw new NotFoundError('Recording');
+    if (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id)) {
+      throw new ConflictError(
+        'The transcript from the live captions on this recording was corrected by hand: the AI transcription would replace it and the corrections would be lost.',
+      );
+    }
+    if (registrazioneSoloSottotitoli(recording)) {
+      throw new ValidationError(
+        'This recording has no media: its transcript comes from the live captions.',
+      );
+    }
 
     // Flip the AI flags FIRST, same transaction, so the live read inside
     // enqueuePostprodForRecording (which no-ops when aiTranscriptEnabled is

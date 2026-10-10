@@ -19,6 +19,7 @@ import { deriveIdempotencyKey } from './idempotency';
 import { parseTargetLocales } from './providers';
 import { SOURCE_LANGUAGE_FALLBACK } from './target-locales';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
+import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 
 export interface EnqueueOptions {
   recordingId: string;
@@ -75,6 +76,13 @@ export async function enqueuePostprodForRecording(
 
   if (!recording) {
     throw new Error(`recording not found: ${opts.recordingId}`);
+  }
+  // Una registrazione «solo sottotitoli» non ha un file da trascrivere, e una
+  // trascrizione dai sottotitoli corretta a mano non si sostituisce: la
+  // trascrizione AI la cancellerebbe (chi avvia la pipeline a mano lo sa
+  // prima, dalle rotte rerun e generate-ai).
+  if (registrazioneSoloSottotitoli(recording) || (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id))) {
+    return { enqueued: 0, skippedExisting: 0, jobIds: [] };
   }
   if (!recording.event.aiTranscriptEnabled) {
     // Without transcription nothing else can run. Silently no-op so

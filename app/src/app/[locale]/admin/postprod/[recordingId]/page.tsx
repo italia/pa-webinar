@@ -38,6 +38,7 @@ export default async function RecordingManagePage({ params }: PageProps) {
       sourceLanguage: true,
       createdAt: true,
       eventId: true,
+      blobKey: true,
       event: { select: { title: true, slug: true } },
     },
   });
@@ -58,6 +59,9 @@ export default async function RecordingManagePage({ params }: PageProps) {
       durationSec={recording.durationSec}
       sourceLanguage={recording.sourceLanguage ?? 'it'}
       createdAt={recording.createdAt.toISOString()}
+      // Senza file: la trascrizione e' quella dei sottotitoli live.
+      soloSottotitoli={recording.blobKey === ''}
+      eventId={recording.eventId}
     />
   );
 }

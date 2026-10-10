@@ -56,6 +56,7 @@ const permessi = (patch: Partial<StepPermissionsValue> = {}): StepPermissionsVal
   wordCloudEnabled: false,
   whiteboardEnabled: false,
   liveCaptionsEnabled: true,
+  captionsTranscriptEnabled: false,
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,

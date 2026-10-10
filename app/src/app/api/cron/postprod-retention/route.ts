@@ -90,6 +90,9 @@ async function purgeRecordingArtifacts(
     select: { id: true, blobKey: true },
   });
   for (const a of artifacts) {
+    // Gli artefatti tenuti solo nel database (trascrizione dai sottotitoli)
+    // non hanno un file da cancellare.
+    if (!a.blobKey) continue;
     try {
       await deletePostprodBlob(a.blobKey);
       blobsDeleted += 1;
@@ -210,9 +213,12 @@ export const GET = withErrorHandling(async (request) => {
       // library-listed-but-unpublished recording is invisible, so it correctly
       // falls through here and gets fully purged. Pass 3 below still minimizes
       // the raw tracks of the exempted (published) recordings.
+      // Lo stesso vale per la trascrizione pubblicata senza il video
+      // (transcriptPublished): resta finche' resta pubblicata.
       event: {
         status: { in: ['ENDED', 'ARCHIVED'] },
         recordingPublished: false,
+        transcriptPublished: false,
       },
     },
     select: {
@@ -236,6 +242,60 @@ export const GET = withErrorHandling(async (request) => {
     eventBoundRecordings += 1;
   }
 
+  // Pubblicata la sola trascrizione (transcriptPublished, video no): resta il
+  // testo che si legge nella pagina dell'evento, il resto se ne va alla
+  // scadenza come per un video non pubblicato. Solo le registrazioni che hanno
+  // ancora altro: il giro si esaurisce da solo.
+  let transcriptOnlyRecordings = 0;
+  const transcriptOnlyCandidates = await prisma.recording.findMany({
+    where: {
+      retentionUntil: null,
+      artifacts: { some: { type: { not: 'TRANSCRIPT_JSON' } } },
+      event: {
+        status: { in: ['ENDED', 'ARCHIVED'] },
+        recordingPublished: false,
+        transcriptPublished: true,
+      },
+    },
+    select: {
+      id: true,
+      event: { select: { endsAt: true, dataRetentionDays: true } },
+    },
+    take: 50,
+  });
+  for (const rec of transcriptOnlyCandidates) {
+    if (!rec.event) continue;
+    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
+    if (expiry >= now.getTime()) continue;
+    if (await hasActivePostprodJob(rec.id)) {
+      deferredActiveJob += 1;
+      continue;
+    }
+    const altri = await prisma.postprodArtifact.findMany({
+      where: { recordingId: rec.id, type: { not: 'TRANSCRIPT_JSON' } },
+      select: { id: true, blobKey: true },
+    });
+    for (const a of altri) {
+      if (!a.blobKey) continue;
+      try {
+        await deletePostprodBlob(a.blobKey);
+        blobsDeleted += 1;
+      } catch (err) {
+        blobsFailed += 1;
+        console.warn('[postprod-retention] blob delete failed', {
+          key: a.blobKey,
+          err: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+    // I testi originali conservati se ne vanno a cascata con i loro artefatti.
+    const del = await prisma.postprodArtifact.deleteMany({
+      where: { id: { in: altri.map((a) => a.id) } },
+    });
+    artifactsDeleted += del.count;
+    transcriptOnlyRecordings += 1;
+  }
+
   // Published recordings are exempt from the artifact purge above (their
   // subtitles/transcript are the video's accessibility layer). But their RAW
   // per-participant track audio is never a public asset and still must be
@@ -253,7 +313,7 @@ export const GET = withErrorHandling(async (request) => {
       tracks: { some: {} },
       event: {
         status: { in: ['ENDED', 'ARCHIVED'] },
-        recordingPublished: true,
+        OR: [{ recordingPublished: true }, { transcriptPublished: true }],
       },
     },
     select: {
@@ -295,6 +355,7 @@ export const GET = withErrorHandling(async (request) => {
       take: 200,
     });
     for (const a of old) {
+      if (!a.blobKey) continue;
       try {
         await deletePostprodBlob(a.blobKey);
         globalBlobsDeleted += 1;
@@ -315,6 +376,7 @@ export const GET = withErrorHandling(async (request) => {
     ok: true,
     expiredRecordings: expired.length,
     eventBoundRecordings,
+    transcriptOnlyRecordings,
     publishedTracksPurged,
     deferredActiveJob,
     blobsDeleted,

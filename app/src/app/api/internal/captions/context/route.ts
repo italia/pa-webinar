@@ -13,6 +13,7 @@
 import { glossaryForEvent, listGlossary } from '@/lib/ai/glossary';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
+import { eventoDellaConferenza } from '@/lib/captions/room';
 import { aliasRules, asrLanguage, buildPhrases, type CaptionsContext } from '@/lib/captions/vocabulary';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
@@ -29,14 +30,19 @@ export const GET = withErrorHandling(async (request) => {
     return Response.json({ enabled: false, language, phrases: [], aliases: [] } satisfies CaptionsContext);
   }
 
-  const room = new URL(request.url).searchParams.get('room')?.trim() || null;
-  const event = room
-    ? await prisma.event.findFirst({
-        // Jitsi porta i nomi delle stanze in minuscolo.
-        where: { jitsiRoomName: { equals: room, mode: 'insensitive' } },
+  const params = new URL(request.url).searchParams;
+  const room = params.get('room')?.trim() || null;
+  const meetingId = params.get('meetingId')?.trim() || null;
+  // La stanza, quando il bridge la passa; altrimenti l'id della riunione, che
+  // Prosody ha legato all'evento (lib/captions/room).
+  const trovato = await eventoDellaConferenza({ room, meetingId });
+  const event = trovato
+    ? await prisma.event.findUnique({
+        where: { id: trovato.id },
         select: {
           id: true,
           liveCaptionsEnabled: true,
+          captionsTranscriptEnabled: true,
           organizerName: true,
           moderatorName: true,
           organizers: { select: { name: true }, orderBy: { sortOrder: 'asc' } },
@@ -58,6 +64,7 @@ export const GET = withErrorHandling(async (request) => {
   const glossary = await glossaryForEvent(event.id);
   const context: CaptionsContext = {
     enabled: event.liveCaptionsEnabled,
+    transcript: event.liveCaptionsEnabled && event.captionsTranscriptEnabled,
     language,
     // Prima i termini del glossario, poi enti e persone: con il limite di
     // frasi, quelle che contano di più restano.

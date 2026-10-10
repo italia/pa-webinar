@@ -250,7 +250,6 @@
       "organizationRequired": "Proszę podać instytucję",
       "consentRequired": "Zgoda na przetwarzanie danych jest wymagana",
       "recordingConsentRequired": "Zgoda na nagrywanie jest wymagana dla tego wydarzenia",
-      "multitrackConsentRequired": "Zgoda na nagrywanie własnej ścieżki audio jest wymagana dla tego wydarzenia",
       "eventFull": "Wydarzenie osiągnęło maksymalną liczbę uczestników",
       "generic": "Błąd podczas rejestracji. Proszę spróbować ponownie."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Wymaga usługi tablicy w instalacji; tam, gdzie jest dostępna, w połączeniach natychmiastowych jest zawsze aktywna.",
       "liveCaptionsEnabled": "Automatyczne napisy",
       "liveCaptionsEnabledDesc": "To, co mówią prelegenci, pojawia się pod wideo, transkrybowane w czasie rzeczywistym: pomaga osobom, które nie słyszą lub mają trudność z nadążaniem. Moderatorzy mogą je wyłączyć także w trakcie transmisji na karcie „Reżyserka”, a każdy może je ukryć dla siebie.",
+      "captionsTranscriptEnabled": "Transkrypcja z napisów",
+      "captionsTranscriptEnabledDesc": "Zdania osób, które wyrażą zgodę, są zapisywane z ich imieniem i po zakończeniu wydarzenia stają się jego transkrypcją, nawet bez nagrania i przetwarzania przez AI. Osoby, które nie wyrażą zgody, pojawiają się tylko w napisach na żywo.",
       "autoStartRecording": "Uruchom nagrywanie automatycznie",
       "autoStartRecordingDesc": "W momencie rozpoczęcia wydarzenia nagrywanie startuje samo (bez pytania moderatora o potwierdzenie). Dzięki temu spóźnialscy od razu znajdą dostępny odtwarzacz.",
       "aiSectionHeading": "Automatyczna postprodukcja",
@@ -2686,6 +2687,13 @@
       "editFailed": "Zapis nie powiódł się (HTTP {code})",
       "editFailedDetail": "Zapis nie powiódł się: {message}",
       "editMediaError": "Nie można wczytać dźwięku nagrania: odtwarzanie jest niedostępne. Nadal możesz poprawiać tekst i mówców w poszczególnych segmentach.",
+      "editNoMedia": "Transkrypcja utworzona z napisów na żywo: nie ma dźwięku do odtworzenia.",
+      "captionsSource": "z napisów na żywo",
+      "captionsRebuild": "Zaktualizuj z napisów",
+      "captionsRebuildDone": "Transkrypcję zaktualizowano z napisów.",
+      "captionsRebuildKept": "Transkrypcja została poprawiona ręcznie lub pochodzi z AI: nie została zastąpiona.",
+      "captionsRebuildNone": "Nie ma czego aktualizować: brak zapisanych zdań lub okres przechowywania danych wydarzenia dobiegł końca.",
+      "captionsRebuildAiRunning": "Przetwarzanie AI transkrybuje wideo: jego transkrypcja zastąpi tę z napisów.",
       "summaryLoadError": "Nie można wczytać podsumowania.",
       "summaryLoading": "Wczytywanie podsumowania…",
       "summaryEmptyProcessing": "Podsumowanie AI nie jest jeszcze gotowe: trwa przetwarzanie. Odśwież stronę za kilka minut.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Strona pozostaje widoczna, ale zapisać mogą się tylko zaproszeni; bez zapisu nie da się wejść"
       },
       "previewInvitation": "Zapisać mogą się tylko osoby, które zaprosisz; nikt nie wejdzie bez zapisu."
+    },
+    "captionsTranscript": {
+      "title": "Transkrypcja z napisów",
+      "intro": "Zdania z napisów osób, które zgodziły się na transkrypcję swoich wystąpień, stają się transkrypcją wydarzenia, nawet bez nagrania i bez przetwarzania AI.",
+      "stats": "Zapisane zdania: {saved} · głosy: {voices} · niezapisane zdania, bez zgody: {skipped}",
+      "none": "Transkrypcja jeszcze nie powstała: utworzy się sama po zakończeniu wydarzenia lub możesz ją utworzyć teraz.",
+      "empty": "Brak zapisanych zdań: nikt nie mówił ze zgodą na transkrypcję.",
+      "fromCaptions": "Transkrypcja utworzona z napisów.",
+      "fromAi": "Istnieje transkrypcja z przetwarzania AI: ma pierwszeństwo przed transkrypcją z napisów.",
+      "revised": "Transkrypcja poprawiona ręcznie: aktualizacja z napisów jej nie zastępuje.",
+      "build": "Utwórz transkrypcję",
+      "rebuild": "Zaktualizuj z napisów",
+      "openEditor": "Otwórz w edytorze",
+      "publish": "Opublikuj transkrypcję na stronie wydarzenia",
+      "publishDesc": "Można ją czytać także bez wideo. Najpierw ją przejrzyj: automatyczne napisy mogą zawierać błędy.",
+      "publishWithVideo": "Opublikowane wideo już ją pokazuje; ten wybór zachowuje ją widoczną, nawet jeśli wideo zostanie wycofane.",
+      "built": "Transkrypcja zaktualizowana.",
+      "kept": "Transkrypcja została poprawiona ręcznie lub pochodzi z AI: nie została zastąpiona.",
+      "failed": "Operacja nie powiodła się.",
+      "loadFailed": "Nie można wczytać stanu transkrypcji.",
+      "expired": "Okres przechowywania danych wydarzenia dobiegł końca: transkrypcja nie jest tworzona ponownie.",
+      "aiRunning": "Przetwarzanie AI transkrybuje wideo: jego transkrypcja zastąpi tę z napisów."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Wyrażam zgodę na nagrywanie audio/wideo wydarzenia",
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
       "recordingNotice": "Wydarzenie jest nagrywane (dźwięk i obraz). Uczestniczysz bez mikrofonu i kamery: nagranie nie zawiera Twojego głosu ani wizerunku, chyba że prowadzący udzieli Ci głosu.",
-      "multitrack": "Wyrażam zgodę na nagranie osobnej ścieżki dźwiękowej mojego głosu wyłącznie w celu prawidłowego przypisania transkrypcji do osób mówiących. Ścieżka jest tymczasowa i usuwana po transkrypcji; nie służy do identyfikacji ani odtwarzania mojego głosu.",
-      "multitrackRequired": "Zgoda na nagrywanie Twojej ścieżki dźwiękowej jest wymagana, aby uczestniczyć w tym wydarzeniu",
+      "multitrack": "Zgadzam się na transkrypcję moich wypowiedzi wraz z moim imieniem na potrzeby sprawozdania z wydarzenia. Jeśli wydarzenie nagrywa osobną ścieżkę dźwiękową dla każdej osoby, mój głos jest nagrywany wyłącznie w tym celu, a ścieżka jest usuwana po transkrypcji; nie służy do rozpoznawania ani odtwarzania mojego głosu.",
+      "multitrackOptional": "To dobrowolne: jeśli nie wyrazisz zgody, nadal możesz uczestniczyć, ale twój głos nie jest nagrywany, a twoje wypowiedzi nie trafiają do transkrypcji.",
       "stayInTouch": "Chcę otrzymywać informacje o nadchodzących wydarzeniach i zostać dodany do książki adresowej, aby otrzymywać zaproszenia na podobne wydarzenia",
       "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Podsumowanie",
     "aiBadgeLabel": "Treść wygenerowana przez AI",
     "aiBadgeBody": "Transkrypcja i podsumowanie powstają automatycznie w potoku AI działającym w klastrze. Mogą zawierać błędy; źródłem miarodajnym pozostaje nagranie.",
+    "captionsBadgeBody": "Transkrypcja pochodzi z automatycznych napisów transmisji na żywo i obejmuje tylko wystąpienia osób, które wyraziły zgodę. Może zawierać błędy.",
     "revisedByPerson": "Tekst został sprawdzony przez człowieka po automatycznym wygenerowaniu.",
     "searchPlaceholder": "Szukaj w transkrypcji…",
     "searchLabel": "Szukaj w transkrypcji",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Pokaż plac",
     "aiNoticeTitle": "Przetwarzanie przez SI po wydarzeniu",
     "aiNotice": "Po zakończeniu nagranie zostanie przetworzone narzędziami sztucznej inteligencji w celu utworzenia transkrypcji, streszczenia oraz ewentualnych tłumaczeń i dubbingu. Wyniki mogą zawierać nieścisłości; źródłem rozstrzygającym pozostaje nagranie wideo.",
-    "multitrackConsentTitle": "Nagrywanie na uczestnika",
-    "multitrackConsentRequired": "Aby wejść, musisz zgodzić się na nagrywanie swojej ścieżki dźwiękowej",
+    "multitrackConsentTitle": "Transkrypcja twoich wypowiedzi",
     "recordingConsentTitle": "Nagrywanie wydarzenia",
     "recordingConsentIntro": "To wydarzenie jest nagrywane (dźwięk i obraz). Jeśli zabierzesz głos, nagranie będzie zawierać Twój głos, Twój wizerunek i to, co udostępnisz na ekranie.",
     "recordingConsentRequired": "Aby wejść, potrzebna jest Twoja zgoda na nagrywanie.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Napisy automatyczne",
-    "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem napisów na pasku połączenia."
+    "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem napisów na pasku połączenia.",
+    "captionsNoticeTranscript": "Podczas transmisji na żywo głos mówcy jest transkrybowany w czasie rzeczywistym w celu wyświetlania napisów, na serwerach obsługujących platformę. Tekst jest przechowywany, wraz z imieniem, tylko w przypadku osób, które zgodziły się na transkrypcję swoich wystąpień, i staje się transkrypcją wydarzenia. Napisy można ukryć przyciskiem napisów na pasku połączenia."
   },
   "recording": {
     "management": "Nagranie wideo",

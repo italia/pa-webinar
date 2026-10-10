@@ -250,7 +250,6 @@
       "organizationRequired": "Syötä organisaatiosi",
       "consentRequired": "Suostumus tietojenkäsittelyyn on pakollinen",
       "recordingConsentRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan",
-      "multitrackConsentRequired": "Suostumus oman ääniraitasi tallentamiseen on pakollinen tässä tapahtumassa",
       "eventFull": "Tapahtuman osallistujamäärä on täynnä",
       "generic": "Virhe ilmoittautumisessa. Yritä uudelleen."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Edellyttää asennuksen piirtotaulupalvelua; kun se on käytettävissä, piirtotaulu on aina käytössä pikapuheluissa.",
       "liveCaptionsEnabled": "Automaattiset tekstitykset",
       "liveCaptionsEnabledDesc": "Puhujien puhe näkyy videon alla reaaliajassa litteroituna: se auttaa niitä, jotka eivät kuule tai joiden on vaikea seurata. Moderaattorit voivat poistaa tekstityksen käytöstä myös suoran lähetyksen aikana Ohjaamo-välilehdeltä, ja jokainen voi piilottaa sen itseltään.",
+      "captionsTranscriptEnabled": "Litterointi tekstityksestä",
+      "captionsTranscriptEnabledDesc": "Suostumuksen antaneiden lauseet tallennetaan heidän nimellään, ja tapahtuman päätyttyä niistä tulee tapahtuman litterointi, myös ilman tallennetta tai tekoälykäsittelyä. Suostumusta antamattomat näkyvät vain suorassa tekstityksessä.",
       "autoStartRecording": "Aloita tallennus automaattisesti",
       "autoStartRecordingDesc": "Tapahtuman alkaessa tallennus käynnistyy itsestään (moderaattorilta ei pyydetä vahvistusta). Näin myöhässä tulijat löytävät catch-up-toistimen heti käytettävissä.",
       "aiSectionHeading": "Automaattinen jälkituotanto",
@@ -2686,6 +2687,13 @@
       "editFailed": "Tallennus epäonnistui (HTTP {code})",
       "editFailedDetail": "Tallennus epäonnistui: {message}",
       "editMediaError": "Tallenteen ääntä ei voitu ladata: toisto ei ole käytettävissä. Voit silti korjata segmenttien tekstiä ja puhujia.",
+      "editNoMedia": "Suorasta tekstityksestä koottu litterointi: toistettavaa ääntä ei ole.",
+      "captionsSource": "suorasta tekstityksestä",
+      "captionsRebuild": "Päivitä tekstityksestä",
+      "captionsRebuildDone": "Litterointi päivitettiin tekstityksestä.",
+      "captionsRebuildKept": "Litterointia on korjattu käsin tai se on tekoälyn tuottama: sitä ei korvattu.",
+      "captionsRebuildNone": "Ei päivitettävää: tallennettuja lauseita ei ole tai tapahtuman tietojen säilytysaika on päättynyt.",
+      "captionsRebuildAiRunning": "Tekoälykäsittely litteroi videota: sen litterointi korvaa tekstityksestä kootun.",
       "summaryLoadError": "Yhteenvetoa ei voitu ladata.",
       "summaryLoading": "Ladataan yhteenvetoa…",
       "summaryEmptyProcessing": "Tekoälyn yhteenveto ei ole vielä valmis: käsittely on käynnissä. Päivitä sivu muutaman minuutin kuluttua.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Sivu pysyy näkyvissä, mutta vain kutsutut voivat ilmoittautua; ilman ilmoittautumista ei pääse sisään"
       },
       "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta."
+    },
+    "captionsTranscript": {
+      "title": "Litterointi tekstityksestä",
+      "intro": "Niiden henkilöiden tekstityslauseet, jotka suostuivat puheenvuorojensa litterointiin, muodostavat tapahtuman litteroinnin myös ilman tallennetta ja tekoälykäsittelyä.",
+      "stats": "Tallennetut lauseet: {saved} · äänet: {voices} · tallentamattomat lauseet, ei suostumusta: {skipped}",
+      "none": "Litterointia ei ole vielä koottu: se kootaan itsestään tapahtuman päätyttyä, tai voit koota sen nyt.",
+      "empty": "Ei tallennettuja lauseita: kukaan ei puhunut litterointisuostumuksella.",
+      "fromCaptions": "Litterointi koottu tekstityksestä.",
+      "fromAi": "Tekoälykäsittelyn litterointi on olemassa: se on etusijalla tekstityksestä koottuun nähden.",
+      "revised": "Litterointia on korjattu käsin: päivitys tekstityksestä ei korvaa sitä.",
+      "build": "Kokoa litterointi",
+      "rebuild": "Päivitä tekstityksestä",
+      "openEditor": "Avaa editorissa",
+      "publish": "Julkaise litterointi tapahtuman sivulla",
+      "publishDesc": "Sen voi lukea myös ilman videota. Tarkista se ensin: automaattinen tekstitys voi sisältää virheitä.",
+      "publishWithVideo": "Julkaistu video näyttää sen jo; tämä valinta pitää sen näkyvissä, vaikka video poistettaisiin.",
+      "built": "Litterointi päivitetty.",
+      "kept": "Litterointia on korjattu käsin tai se on tekoälyn tuottama: sitä ei korvattu.",
+      "failed": "Toiminto epäonnistui.",
+      "loadFailed": "Litteroinnin tilaa ei voitu ladata.",
+      "expired": "Tapahtuman tietojen säilytysaika on päättynyt: litterointia ei koota uudelleen.",
+      "aiRunning": "Tekoälykäsittely litteroi videota: sen litterointi korvaa tekstityksestä kootun."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Suostun tämän tapahtuman ääni-/videotallennukseen",
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
       "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
-      "multitrack": "Suostun siihen, että ääneni tallennetaan erilliselle ääniraidalle yksinomaan siksi, että litterointi kohdistetaan oikein kullekin puhujalle. Raita on väliaikainen ja poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai toistamiseen.",
-      "multitrackRequired": "Suostumus ääniraitasi tallentamiseen on pakollinen tähän tapahtumaan osallistumiseksi",
+      "multitrack": "Annan suostumukseni siihen, että puheenvuoroni litteroidaan nimelläni tapahtuman yhteenvetoa varten. Jos tapahtuma tallentaa jokaisesta henkilöstä erillisen ääniraidan, ääneni tallennetaan vain tätä tarkoitusta varten ja raita poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai jäljittelemiseen.",
+      "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, voit silti osallistua, mutta ääntäsi ei tallenneta eivätkä puheenvuorosi tule litterointiin.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
       "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Yhteenveto",
     "aiBadgeLabel": "Tekoälyn luomaa sisältöä",
     "aiBadgeBody": "Litterointi ja yhteenveto tuotetaan automaattisesti klusterissa toimivalla tekoälyputkella. Ne voivat sisältää virheitä; video on edelleen ensisijainen lähde.",
+    "captionsBadgeBody": "Litterointi on peräisin suoran lähetyksen automaattisesta tekstityksestä ja sisältää vain suostumuksen antaneiden puheenvuorot. Se voi sisältää virheitä.",
     "revisedByPerson": "Ihminen on tarkistanut tekstin automaattisen tuottamisen jälkeen.",
     "searchPlaceholder": "Hae litteroinnista…",
     "searchLabel": "Hae litteroinnista",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Näytä aukio",
     "aiNoticeTitle": "Tekoälykäsittely tapahtuman jälkeen",
     "aiNotice": "Lopuksi tallenne käsitellään tekoälytyökaluilla litteroinnin, tiivistelmän sekä mahdollisten käännösten ja dubbausten tuottamiseksi. Tulokset voivat sisältää epätarkkuuksia; video on edelleen ratkaiseva lähde.",
-    "multitrackConsentTitle": "Osallistujakohtainen tallennus",
-    "multitrackConsentRequired": "Sinun on hyväksyttävä ääniraitasi tallennus päästäksesi sisään",
+    "multitrackConsentTitle": "Puheenvuorojesi litterointi",
     "recordingConsentTitle": "Tapahtuman tallenne",
     "recordingConsentIntro": "Tapahtuma tallennetaan (ääni ja kuva). Jos käytät puheenvuoron, tallenteessa on äänesi, kuvasi ja se, mitä jaat näytöllä.",
     "recordingConsentRequired": "Sisäänpääsy edellyttää suostumustasi tallentamiseen.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automaattinen tekstitys",
-    "captionsNotice": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliaikaisesti tekstityksen näyttämiseksi. Litterointi tehdään alustaa ylläpitävillä palvelimilla, eikä tekstiä tallenneta. Tekstityksen voi piilottaa puhelun työkalurivin tekstityspainikkeella."
+    "captionsNotice": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliaikaisesti tekstityksen näyttämiseksi. Litterointi tehdään alustaa ylläpitävillä palvelimilla, eikä tekstiä tallenneta. Tekstityksen voi piilottaa puhelun työkalurivin tekstityspainikkeella.",
+    "captionsNoticeTranscript": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliajassa tekstityksen näyttämiseksi alustaa ylläpitävillä palvelimilla. Teksti säilytetään nimen kanssa vain niiltä, jotka suostuivat puheenvuorojensa litterointiin, ja siitä tulee tapahtuman litterointi. Tekstityksen voi piilottaa puhelupalkin tekstityspainikkeella."
   },
   "recording": {
     "management": "Videotallenne",

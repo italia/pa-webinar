@@ -75,6 +75,8 @@ interface TranscriptResponse {
   /** Se una persona ha corretto il testo dopo la generazione automatica: la
    *  trascrizione, e le lingue delle sintesi rivedute. */
   revised?: { transcript: boolean; summaries: string[] };
+  /** 'live-captions': la trascrizione viene dai sottotitoli della diretta. */
+  source?: 'ai' | 'live-captions';
 }
 
 /**
@@ -564,7 +566,8 @@ export default function TranscriptPanel({
         className="postprod-panel__badge alert alert-info py-2 small mb-3"
         role="note"
       >
-        <strong>{t('aiBadgeLabel')}</strong> · {t('aiBadgeBody')}
+        <strong>{t('aiBadgeLabel')}</strong> ·{' '}
+        {tab !== 'summary' && data.source === 'live-captions' ? t('captionsBadgeBody') : t('aiBadgeBody')}
         {(tab === 'summary'
           ? !!summaryLang && !!data.revised?.summaries.includes(summaryLang)
           : !!data.revised?.transcript) && <> {t('revisedByPerson')}</>}
@@ -640,15 +643,19 @@ export default function TranscriptPanel({
                 >
                   {t('downloadTranscriptSrt')}
                 </a>
-                <a
-                  role="menuitem"
-                  className="postprod-download__item"
-                  href={`/api/events/${eventSlug}/postprod/subtitle/${downloadLang}`}
-                  download={`subtitles.${downloadLang}.vtt`}
-                  onClick={() => setShowDownload(false)}
-                >
-                  {t('downloadTranscriptVtt')}
-                </a>
+                {/* Il file dei sottotitoli esiste solo se la pipeline l'ha
+                    prodotto: la trascrizione dai sottotitoli live non ce l'ha. */}
+                {data.subtitleTracks.includes(downloadLang) && (
+                  <a
+                    role="menuitem"
+                    className="postprod-download__item"
+                    href={`/api/events/${eventSlug}/postprod/subtitle/${downloadLang}`}
+                    download={`subtitles.${downloadLang}.vtt`}
+                    onClick={() => setShowDownload(false)}
+                  >
+                    {t('downloadTranscriptVtt')}
+                  </a>
+                )}
                 {summaryLang && (
                   <a
                     role="menuitem"

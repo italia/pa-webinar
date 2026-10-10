@@ -30,6 +30,8 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   MultitrackConsent: 'prova del consenso alla registrazione per partecipante: nome cifrato e posto nella conferenza',
   RecordingConsent: 'prova del consenso alla registrazione dato in sala d’attesa: nome cifrato e posto nella conferenza',
   CallSession: 'ripulita, non cancellata: si azzerano le colonne con PII e restano i numeri aggregati',
+  RoomOccupant: 'chi era in sala: endpoint del bridge e posto della conferenza, che rimanda a un’iscrizione',
+  CaptionSegment: 'frasi dei sottotitoli salvate per la trascrizione: nome e testo cifrati di chi ha acconsentito; la trascrizione costruita resta sulla registrazione, con la sua retention',
 };
 
 /**

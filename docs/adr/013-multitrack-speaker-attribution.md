@@ -75,7 +75,8 @@ The decision sets these boundaries:
 - **Optional at two levels.** `recorder.enabled` (with `recorder.controller.enabled`) controls the
   installation. For each event, `multitrackRecordingEnabled` (**Per-participant recording (high
   accuracy)**) takes effect only together with `recordingEnabled` and `aiTranscriptEnabled`.
-- **A consent of its own**, separate from the recording consent.
+- **A consent of its own**, separate from the recording consent, optional, and checked for each track
+  before it is recorded.
 - **Tracks are intermediate input.** They are never public, and they are deleted after transcription
   unless the event keeps them.
 - **Audio only.** The bot publishes nothing and records no video.
@@ -151,8 +152,11 @@ browser also measures `atMs` from its own join, not from the start of the record
   portal refuses to transcribe a recording whose tracks are all silent: it marks the recording
   `POSTPROD_FAILED` instead (`app/src/lib/ai/track-silence.ts`).
 - **More personal data.** An isolated voice per person, mitigated by consent, encryption of names and
-  early deletion, but still real. The waiting-room consent leaves no stored record, and moderators are
-  recorded without a gate.
+  early deletion, but still real. Only the voices of people who consented are recorded, moderators
+  included.
+- **A dependency on Prosody.** The bot knows each track only by its bridge endpoint; the portal learns
+  which token seat stands behind an endpoint from the project's Prosody module `mod_pa_occupants`.
+  Without that module, as with an external Jitsi that does not load it, the bot records no track.
 - **A shared machine key.** The bot and the controller hold `CRON_API_KEY`, which authorizes every
   internal and scheduled endpoint. The controller's role can create Jobs, and a Job can mount any Secret in
   the release namespace. On Docker, the socket is root-equivalent on the host.
@@ -175,7 +179,7 @@ browser also measures `atMs` from its own join, not from the start of the record
 ### A. A receive-only recorder bot (chosen)
 
 A bot joins the conference as a participant that publishes nothing. It subscribes to every remote audio
-track and writes one audio file per participant. Each file is labeled with the identity that Jitsi
+track and writes one audio file per participant who consented. Each file is labeled with the identity that Jitsi
 already has. After the event, the bot uploads the files and a manifest. The worker transcribes each
 track on its own, without diarization, and merges the segments on a common timeline.
 
@@ -374,18 +378,31 @@ The privacy view, including legal bases and retention regimes, is owned by
 [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md). This section and the three that
 follow record what the decision requires and where the code enforces it.
 
-- **At registration.** When `multitrackRecordingEnabled` is on, the registration API rejects a
-  registration without `consentMultitrack`. The answer is stored on `Registration.consentMultitrack`,
-  which is null for events without per-participant recording.
-- **In the waiting room.** The consent checkbox in the **Per-participant recording** box must be ticked
-  before entry. A registrant who consented at registration and opens the room in the same browser is not
-  asked again. That browser is the one that holds the signed event-access cookie. Moderators are exempt.
-  Speakers (named grants with role `SPEAKER`) and guests must tick the box.
-- **What the gates are.** They are admission gates, not a filter on tracks. The bot records every remote
-  audio track, including those of the exempt moderators. The waiting-room tick is checked in the browser
-  only. It is not stored, and the room-token route (`/api/events/[param]/jitsi/token`) does not check it.
-  Jitsi's in-room recording indicator follows Jibri only, so a capture made only by the recorder does not
-  raise it.
+The consent is the transcription of one's own contributions, with one's name. It is optional and never
+blocks entry; the same consent also decides what the transcript from live captions keeps
+([ADR-018](018-live-captions.md)).
+
+- **At registration.** When `multitrackRecordingEnabled` is on, or the event keeps a transcript from
+  live captions, the form shows an optional box. The answer is stored on `Registration.consentMultitrack`
+  (`false` when the box is left unticked), which is null for events that do not ask.
+- **In the waiting room.** The box, under **Transcript of what you say**, is shown to everyone who has
+  not given the consent, moderators and speakers included, and entry does not wait for it. A registrant
+  who consented at registration and opens the room in the same browser is not asked again. That browser
+  is the one that holds the signed event-access cookie. A tick is stored as proof for the conference
+  seat (`MultitrackConsent`) when the room-token route (`/api/events/[param]/jitsi/token`) issues the
+  token.
+- **At capture.** Before recording a remote audio track, the bot asks the portal
+  (`GET /api/internal/recorder/consent`, `infra/recorder/src/consent.ts`). The portal finds the token
+  seat behind the track's endpoint, as reported by Prosody (`mod_pa_occupants`), and the consent of that
+  seat: the registration's, or the waiting-room proof. Without consent, or when the portal does not
+  answer or does not know the endpoint, the track is skipped. Because Prosody can report a join a moment
+  after the track arrives, a refusal is asked again after a few seconds before the track is skipped, and
+  an endpoint still unknown then is logged with a warning that names `mod_pa_occupants`. The recorder
+  accepts a consent given with any version of the text (`Registration.consentMultitrackVersion`,
+  `MultitrackConsent.textVersion`), since every version covers the audio track; the transcript from
+  live captions counts only the current one.
+- **The in-room indicator.** Jitsi's recording indicator follows Jibri only, so a capture made only by the
+  recorder does not raise it.
 
 ### Consent snapshot
 
@@ -427,7 +444,7 @@ stateDiagram-v2
     state "Audio deleted by the orphan sweep<br/>row kept, audioPurgedAt not set" as Swept
     state "Row deleted" as Gone
 
-    [*] --> Local: consent gates passed, bot captures
+    [*] --> Local: consent checked for the track, bot captures
     Local --> Stored: upload with one signed URL per object, then manifest ingest
     Stored --> Transcribed: worker reads the track through a signed URL
     Transcribed --> Purged: multitrack-purge, default
@@ -486,8 +503,8 @@ hidden-domain login, it runs the whole capture again with the JWT, and it stays 
 the event. The condition, "never joined", is checked after the capture ends. A room that simply stayed
 empty is therefore not retried, and a disconnection in the middle of the event does not make the bot
 reappear as a visible participant. A bot that never joins with either method exits with an error, so the
-unit fails and is retried. Hiding the bot does not hide the recording: the consent gates apply
-regardless.
+unit fails and is retried. Hiding the bot does not change what it records: the consent check applies
+to every track either way.
 
 ### Timeouts and limits
 

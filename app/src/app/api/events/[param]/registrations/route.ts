@@ -20,8 +20,9 @@ import { upsertPersonOnRegistration } from '@/lib/persons';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { isInvited, publicRegistrationFor } from '@/lib/events/registration-access';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
-import { consensiRichiesti } from '@/lib/registration/consents';
+import { consensiRichiesti, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
+import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
   buildEventAccessSetCookie,
@@ -95,16 +96,17 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // I consensi obbligatori dipendono dal formato dell'evento: la stessa regola
   // del modulo (lib/registration/consents).
-  const richiesti = consensiRichiesti(event);
+  const richiesti = consensiRichiesti({
+    ...event,
+    captionsTranscript: captionsTranscriptActive(event, await getSettings()),
+  });
   if (richiesti.registrazione && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
   }
 
-  // ADR-013 Fase 5 — la traccia audio per persona chiede un consenso esplicito
-  // separato (PII sensibile), ogni volta che l'evento la registra.
-  if (richiesti.tracce && consentMultitrack !== true) {
-    throw new ValidationError('Validation failed', [{ path: ['consentMultitrack'], message: 'registration.errors.multitrackConsentRequired' }]);
-  }
+  // La trascrizione dei propri interventi (traccia audio per persona o
+  // sottotitoli salvati) e' facoltativa: senza, ci si iscrive lo stesso e la
+  // voce non si registra ne' si trascrive (lib/captions/room).
 
   // L'ente, quando l'evento lo chiede: la regola del modulo vale anche per chi
   // chiama la rotta direttamente. Ruolo e tipo di ente restano facoltativi.
@@ -161,6 +163,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentTimestamp: new Date(),
         consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
         consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
+        consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         locale: pageLocale,
         accessToken,
@@ -181,6 +184,7 @@ export const POST = withErrorHandling(async (request, context) => {
           // consenso alla registrazione (altrimenti l'iscrizione informa).
           recordingConsentRequired: richiesti.registrazione,
           consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
+          consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
           consentAddressBook: consentAddressBook === true,
         }),

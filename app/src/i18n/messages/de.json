@@ -250,7 +250,6 @@
       "organizationRequired": "Bitte geben Sie Ihre Organisation ein",
       "consentRequired": "Die Einwilligung zur Datenverarbeitung ist erforderlich",
       "recordingConsentRequired": "Die Einwilligung zur Aufzeichnung ist für diese Veranstaltung erforderlich",
-      "multitrackConsentRequired": "Für diese Veranstaltung ist die Einwilligung in die Aufzeichnung Ihrer Audiospur verpflichtend",
       "eventFull": "Die maximale Teilnehmerzahl für diese Veranstaltung wurde erreicht",
       "generic": "Fehler bei der Anmeldung. Bitte versuchen Sie es erneut."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Aktiviert das native kollaborative Whiteboard (Excalidraw): Moderatoren können es während der Veranstaltung über die Symbolleiste öffnen. Erfordert den Whiteboard-Dienst der Installation; wo er vorhanden ist, ist es bei Sofortkonferenzen immer aktiv.",
       "liveCaptionsEnabled": "Automatische Untertitel",
       "liveCaptionsEnabledDesc": "Was die Sprechenden sagen, erscheint in Echtzeit transkribiert unter dem Video: Das hilft allen, die nicht hören oder schwer folgen können. Moderierende können die Untertitel auch während der Live-Veranstaltung im Tab „Regie“ ausschalten, und alle können sie für sich ausblenden.",
+      "captionsTranscriptEnabled": "Transkript aus den Untertiteln",
+      "captionsTranscriptEnabledDesc": "Die Sätze der Personen, die einwilligen, werden mit ihrem Namen gespeichert und nach der Veranstaltung zu ihrem Transkript, auch ohne Aufzeichnung oder KI-Verarbeitung. Wer nicht einwilligt, erscheint nur in den Live-Untertiteln.",
       "autoStartRecording": "Aufzeichnung automatisch starten",
       "autoStartRecordingDesc": "Beim Eventstart beginnt die Aufzeichnung automatisch (ohne Rückfrage an die Moderation). Spät Hinzukommende finden so sofort einen Player vor.",
       "aiSectionHeading": "Automatische Nachbearbeitung",
@@ -2686,6 +2687,13 @@
       "editFailed": "Speichern fehlgeschlagen (HTTP {code})",
       "editFailedDetail": "Speichern fehlgeschlagen: {message}",
       "editMediaError": "Das Audio der Aufzeichnung konnte nicht geladen werden: Die Wiedergabe ist nicht verfügbar. Sie können Text und Sprecher der Segmente dennoch korrigieren.",
+      "editNoMedia": "Transkript aus den Live-Untertiteln: Es gibt keinen Ton zum Abspielen.",
+      "captionsSource": "aus den Live-Untertiteln",
+      "captionsRebuild": "Aus den Untertiteln aktualisieren",
+      "captionsRebuildDone": "Transkript aus den Untertiteln aktualisiert.",
+      "captionsRebuildKept": "Das Transkript wurde von Hand korrigiert oder stammt aus der KI: Es wurde nicht ersetzt.",
+      "captionsRebuildNone": "Nichts zu aktualisieren: Es gibt keine gespeicherten Sätze, oder die Aufbewahrungsfrist für die Daten der Veranstaltung ist abgelaufen.",
+      "captionsRebuildAiRunning": "Die KI-Verarbeitung transkribiert das Video: Ihr Transkript ersetzt das aus den Untertiteln.",
       "summaryLoadError": "Die Zusammenfassung konnte nicht geladen werden.",
       "summaryLoading": "Zusammenfassung wird geladen…",
       "summaryEmptyProcessing": "Die KI-Zusammenfassung ist noch nicht fertig: Die Verarbeitung läuft. Aktualisieren Sie die Seite in einigen Minuten.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Die Seite bleibt sichtbar, aber anmelden können sich nur Eingeladene; ohne Anmeldung kein Zutritt"
       },
       "previewInvitation": "Nur Eingeladene können sich anmelden; ohne Anmeldung kommt niemand hinein."
+    },
+    "captionsTranscript": {
+      "title": "Transkript aus Untertiteln",
+      "intro": "Die Untertitelsätze der Personen, die der Transkription ihrer Wortbeiträge zugestimmt haben, werden zum Transkript der Veranstaltung, auch ohne Aufzeichnung und ohne KI-Verarbeitung.",
+      "stats": "Gespeicherte Sätze: {saved} · Stimmen: {voices} · nicht gespeicherte Sätze, ohne Einwilligung: {skipped}",
+      "none": "Transkript noch nicht erstellt: Es entsteht nach dem Ende der Veranstaltung von selbst, oder Sie erstellen es jetzt.",
+      "empty": "Keine Sätze gespeichert: Niemand hat mit Einwilligung zur Transkription gesprochen.",
+      "fromCaptions": "Transkript aus den Untertiteln erstellt.",
+      "fromAi": "Es gibt ein Transkript aus der KI-Verarbeitung: Es hat Vorrang vor dem aus den Untertiteln.",
+      "revised": "Transkript von Hand korrigiert: Eine Aktualisierung aus den Untertiteln ersetzt es nicht.",
+      "build": "Transkript erstellen",
+      "rebuild": "Aus den Untertiteln aktualisieren",
+      "openEditor": "Im Editor öffnen",
+      "publish": "Transkript auf der Veranstaltungsseite veröffentlichen",
+      "publishDesc": "Es ist auch ohne Video lesbar. Prüfen Sie es vorher: Automatische Untertitel können Fehler enthalten.",
+      "publishWithVideo": "Das veröffentlichte Video zeigt es bereits; diese Wahl hält es sichtbar, auch wenn das Video zurückgezogen wird.",
+      "built": "Transkript aktualisiert.",
+      "kept": "Das Transkript wurde von Hand korrigiert oder stammt aus der KI: Es wurde nicht ersetzt.",
+      "failed": "Der Vorgang ist fehlgeschlagen.",
+      "loadFailed": "Der Status des Transkripts konnte nicht geladen werden.",
+      "expired": "Die Aufbewahrungsfrist für die Daten der Veranstaltung ist abgelaufen: Das Transkript wird nicht neu erstellt.",
+      "aiRunning": "Die KI-Verarbeitung transkribiert das Video: Ihr Transkript ersetzt das aus den Untertiteln."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Ich stimme der Audio-/Videoaufzeichnung dieser Veranstaltung zu",
       "recordingRequired": "Die Einwilligung zur Aufzeichnung ist für die Teilnahme an dieser Veranstaltung erforderlich",
       "recordingNotice": "Die Veranstaltung wird aufgezeichnet (Ton und Bild). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihre Stimme noch Ihr Bild, es sei denn, die Moderation erteilt Ihnen das Wort.",
-      "multitrack": "Ich willige in die Aufzeichnung einer separaten Tonspur meiner Stimme ein, allein zu dem Zweck, das Transkript den Sprechenden korrekt zuzuordnen. Die Spur ist temporär und wird nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder wiederzugeben.",
-      "multitrackRequired": "Die Einwilligung in die Aufzeichnung Ihrer Tonspur ist für die Teilnahme an dieser Veranstaltung erforderlich",
+      "multitrack": "Ich willige ein, dass meine Wortbeiträge mit meinem Namen für den Bericht der Veranstaltung transkribiert werden. Zeichnet die Veranstaltung für jede Person eine eigene Tonspur auf, wird meine Stimme nur zu diesem Zweck aufgezeichnet und die Spur nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder nachzubilden.",
+      "multitrackOptional": "Das ist freiwillig: Ohne Einwilligung können Sie trotzdem teilnehmen, aber Ihre Stimme wird nicht aufgezeichnet und Ihre Beiträge kommen nicht ins Transkript.",
       "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
       "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Zusammenfassung",
     "aiBadgeLabel": "Von KI erzeugter Inhalt",
     "aiBadgeBody": "Transkript und Zusammenfassung werden automatisch von der KI-Pipeline im Cluster erzeugt. Sie können Fehler enthalten; maßgebliche Quelle bleibt das Video.",
+    "captionsBadgeBody": "Das Transkript stammt aus den automatischen Untertiteln der Live-Veranstaltung und enthält nur die Beiträge von Personen, die eingewilligt haben. Es kann Fehler enthalten.",
     "revisedByPerson": "Der Text wurde nach der automatischen Erstellung von einer Person überarbeitet.",
     "searchPlaceholder": "Im Transkript suchen…",
     "searchLabel": "Im Transkript suchen",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Platz anzeigen",
     "aiNoticeTitle": "KI-Verarbeitung nach der Veranstaltung",
     "aiNotice": "Nach dem Ende wird die Aufzeichnung von KI-Werkzeugen verarbeitet, um Transkript, Zusammenfassung sowie eventuelle Übersetzungen und Synchronisationen zu erstellen. Die Ergebnisse können Ungenauigkeiten enthalten; maßgeblich bleibt das Video.",
-    "multitrackConsentTitle": "Aufzeichnung pro Teilnehmende",
-    "multitrackConsentRequired": "Sie müssen der Aufzeichnung Ihrer Tonspur zustimmen, um beizutreten",
+    "multitrackConsentTitle": "Transkript Ihrer Beiträge",
     "recordingConsentTitle": "Aufzeichnung der Veranstaltung",
     "recordingConsentIntro": "Diese Veranstaltung wird aufgezeichnet (Ton und Bild). Wenn Sie sich zu Wort melden, enthält die Aufzeichnung Ihre Stimme, Ihr Bild und alles, was Sie auf dem Bildschirm teilen.",
     "recordingConsentRequired": "Zum Beitreten ist Ihre Zustimmung zur Aufzeichnung erforderlich.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatische Untertitel",
-    "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Leiste des Anrufs ausblenden."
+    "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Leiste des Anrufs ausblenden.",
+    "captionsNoticeTranscript": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen – auf den Servern, die die Plattform hosten. Der Text wird mit Namen nur für Personen gespeichert, die der Transkription ihrer Wortbeiträge zugestimmt haben, und wird zum Transkript der Veranstaltung. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Anrufleiste ausblenden."
   },
   "recording": {
     "management": "Videoaufzeichnung",

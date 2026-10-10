@@ -54,7 +54,8 @@ export default function TranscriptTimeline({
   controlsRef,
   onActiveIndexChange,
 }: {
-  mediaUrl: string;
+  /** Null per la trascrizione dai sottotitoli live: non c'e' audio. */
+  mediaUrl: string | null;
   waveform: Waveform | null;
   segments: TimelineSegment[];
   durationSec: number | null;
@@ -198,6 +199,9 @@ export default function TranscriptTimeline({
           style={{ width: '100%', height: HEIGHT, display: 'block' }}
         />
       </div>
+      {!mediaUrl ? (
+        <p className="small text-secondary mb-0 mt-1">{t('editNoMedia')}</p>
+      ) : (
       <div className="d-flex align-items-center gap-2 mt-1">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption -- raw recording playback, captions live in the transcript itself */}
         <audio
@@ -218,6 +222,7 @@ export default function TranscriptTimeline({
           {fmt(current)} / {fmt(duration)}
         </span>
       </div>
+      )}
       {mediaError && (
         <p className="small text-warning mb-0 mt-1">{t('editMediaError')}</p>
       )}

@@ -36,6 +36,8 @@ export interface StepPermissionsValue {
   whiteboardEnabled: boolean;
   /** Sottotitoli live: accesi di default, si spengono qui o dalla Regia. */
   liveCaptionsEnabled: boolean;
+  /** La trascrizione dell'evento costruita dai sottotitoli (chi acconsente). */
+  captionsTranscriptEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
@@ -306,6 +308,26 @@ export default function StepPermissions({
               ariaLabel={tAdmin('form.liveCaptionsEnabled')}
               checked={value.liveCaptionsEnabled}
               onChange={() => onChange({ liveCaptionsEnabled: !value.liveCaptionsEnabled })}
+            />
+          </div>
+        )}
+        {liveCaptionsAvailable && value.liveCaptionsEnabled && (
+          <div className="py-2 ps-3 d-flex justify-content-between align-items-start">
+            <div className="me-3">
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {tAdmin('form.captionsTranscriptEnabled')}
+              </div>
+              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                {tAdmin('form.captionsTranscriptEnabledDesc')}
+              </div>
+            </div>
+            <ToggleSwitch
+              label=""
+              ariaLabel={tAdmin('form.captionsTranscriptEnabled')}
+              checked={value.captionsTranscriptEnabled}
+              onChange={() =>
+                onChange({ captionsTranscriptEnabled: !value.captionsTranscriptEnabled })
+              }
             />
           </div>
         )}

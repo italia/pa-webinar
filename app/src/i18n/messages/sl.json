@@ -250,7 +250,6 @@
       "organizationRequired": "Vnesite svojo organizacijo",
       "consentRequired": "Soglasje z obdelavo podatkov je obvezno",
       "recordingConsentRequired": "Soglasje s snemanjem je obvezno za ta dogodek",
-      "multitrackConsentRequired": "Za ta dogodek je soglasje k snemanju vaše zvočne sledi obvezno",
       "eventFull": "Dogodek je dosegel največje število udeležencev",
       "generic": "Napaka pri prijavi. Prosimo, poskusite znova."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Zahteva storitev table v namestitvi; kjer je na voljo, je pri takojšnjih klicih vedno vklopljena.",
       "liveCaptionsEnabled": "Samodejni podnapisi",
       "liveCaptionsEnabledDesc": "Kar govorijo govorci, se prikaže pod videom, prepisano v realnem času: pomaga tistim, ki ne slišijo ali težko sledijo. Moderatorji jih lahko izklopijo tudi med prenosom v živo na zavihku »Režija«, vsak pa jih lahko skrije zase.",
+      "captionsTranscriptEnabled": "Prepis iz podnapisov",
+      "captionsTranscriptEnabledDesc": "Stavki tistih, ki dajo privolitev, se shranijo z njihovim imenom in po koncu dogodka postanejo njegov prepis, tudi brez posnetka ali obdelave z UI. Tisti, ki privolitve ne dajo, so le v podnapisih v živo.",
       "autoStartRecording": "Samodejno začni snemanje",
       "autoStartRecordingDesc": "Ob začetku dogodka se snemanje začne samodejno (brez vprašanja moderatorju). Tako poznejši udeleženci takoj najdejo razpoložljiv predvajalnik.",
       "aiSectionHeading": "Samodejna postprodukcija",
@@ -2686,6 +2687,13 @@
       "editFailed": "Shranjevanje ni uspelo (HTTP {code})",
       "editFailedDetail": "Shranjevanje ni uspelo: {message}",
       "editMediaError": "Zvoka posnetka ni bilo mogoče naložiti: predvajanje ni na voljo. Besedilo in govorce odsekov lahko kljub temu popravite.",
+      "editNoMedia": "Prepis, sestavljen iz podnapisov v živo: ni zvoka za predvajanje.",
+      "captionsSource": "iz podnapisov v živo",
+      "captionsRebuild": "Posodobi iz podnapisov",
+      "captionsRebuildDone": "Prepis je posodobljen iz podnapisov.",
+      "captionsRebuildKept": "Prepis je bil ročno popravljen ali prihaja iz UI: ni bil zamenjan.",
+      "captionsRebuildNone": "Ni česa posodobiti: ni shranjenih stavkov ali pa se je obdobje hrambe podatkov dogodka izteklo.",
+      "captionsRebuildAiRunning": "Obdelava z UI prepisuje video: njen prepis bo nadomestil prepis iz podnapisov.",
       "summaryLoadError": "Povzetka ni bilo mogoče naložiti.",
       "summaryLoading": "Nalaganje povzetka…",
       "summaryEmptyProcessing": "Povzetek AI še ni pripravljen: obdelava poteka. Osvežite stran čez nekaj minut.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Stran ostane vidna, a prijavijo se lahko samo povabljeni; brez prijave ni vstopa"
       },
       "previewInvitation": "Prijavijo se lahko samo tisti, ki jih povabite; brez prijave nihče ne vstopi."
+    },
+    "captionsTranscript": {
+      "title": "Prepis iz podnapisov",
+      "intro": "Stavki iz podnapisov oseb, ki so privolile v prepis svojih govorov, postanejo prepis dogodka, tudi brez posnetka in brez obdelave z UI.",
+      "stats": "Shranjeni stavki: {saved} · glasovi: {voices} · neshranjeni stavki, brez privolitve: {skipped}",
+      "none": "Prepis še ni sestavljen: sestavi se sam po koncu dogodka, ali pa ga sestavite zdaj.",
+      "empty": "Ni shranjenih stavkov: nihče ni govoril s privolitvijo v prepis.",
+      "fromCaptions": "Prepis, sestavljen iz podnapisov.",
+      "fromAi": "Obstaja prepis iz obdelave z UI: ima prednost pred prepisom iz podnapisov.",
+      "revised": "Prepis je bil ročno popravljen: posodobitev iz podnapisov ga ne nadomesti.",
+      "build": "Sestavi prepis",
+      "rebuild": "Posodobi iz podnapisov",
+      "openEditor": "Odpri v urejevalniku",
+      "publish": "Objavi prepis na strani dogodka",
+      "publishDesc": "Bere se tudi brez videa. Najprej ga preglejte: samodejni podnapisi lahko vsebujejo napake.",
+      "publishWithVideo": "Objavljeni video ga že prikazuje; ta izbira ga ohrani viden, tudi če se video umakne.",
+      "built": "Prepis je posodobljen.",
+      "kept": "Prepis je bil ročno popravljen ali prihaja iz UI: ni bil zamenjan.",
+      "failed": "Dejanje ni uspelo.",
+      "loadFailed": "Stanja prepisa ni bilo mogoče naložiti.",
+      "expired": "Obdobje hrambe podatkov dogodka se je izteklo: prepis se ne sestavi znova.",
+      "aiRunning": "Obdelava z UI prepisuje video: njen prepis bo nadomestil prepis iz podnapisov."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Soglašam z avdio/video snemanjem dogodka",
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
       "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
-      "multitrack": "Soglašam s snemanjem ločene zvočne sledi svojega glasu izključno za namen pravilnega pripisa prepisa posameznim govorcem. Sled je začasna in se po prepisu izbriše; ne uporablja se za prepoznavo ali predvajanje mojega glasu.",
-      "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno",
+      "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
+      "multitrackOptional": "Ni obvezno: če ne privolite, lahko vseeno sodelujete, vendar se vaš glas ne snema in vaši prispevki niso v prepisu.",
       "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
       "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Povzetek",
     "aiBadgeLabel": "Vsebina, ustvarjena z AI",
     "aiBadgeBody": "Prepis in povzetek samodejno ustvari cevovod AI v gruči. Lahko vsebujeta napake; videoposnetek ostaja verodostojni vir.",
+    "captionsBadgeBody": "Prepis izhaja iz samodejnih podnapisov prenosa v živo in vsebuje le govore oseb, ki so dale privolitev. Lahko vsebuje napake.",
     "revisedByPerson": "Besedilo je po samodejnem nastanku pregledala oseba.",
     "searchPlaceholder": "Iskanje po prepisu…",
     "searchLabel": "Iskanje po prepisu",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Prikaži trg",
     "aiNoticeTitle": "Obdelava z UI po dogodku",
     "aiNotice": "Ob koncu bo posnetek obdelan z orodji umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
-    "multitrackConsentTitle": "Snemanje po udeležencih",
-    "multitrackConsentRequired": "Za vstop morate privoliti v snemanje svoje zvočne sledi",
+    "multitrackConsentTitle": "Prepis vaših prispevkov",
     "recordingConsentTitle": "Snemanje dogodka",
     "recordingConsentIntro": "Dogodek se snema (zvok in slika). Če spregovorite, posnetek vsebuje vaš glas, vašo podobo in to, kar delite na zaslonu.",
     "recordingConsentRequired": "Za vstop je potrebno vaše soglasje s snemanjem.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Samodejni podnapisi",
-    "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom za podnapise v vrstici klica."
+    "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom za podnapise v vrstici klica.",
+    "captionsNoticeTranscript": "Med prenosom v živo se glas govorca sproti prepisuje za prikaz podnapisov, na strežnikih, ki gostijo platformo. Besedilo se z imenom ohrani le za osebe, ki so privolile v prepis svojih govorov, in postane prepis dogodka. Podnapise lahko skrijete z gumbom za podnapise v vrstici klica."
   },
   "recording": {
     "management": "Video posnetek",

@@ -16,6 +16,7 @@ export interface Config {
   engineHealthUrl: string;
   /** Rotta interna del portale che dà lingua e vocabolario di una stanza. */
   contextUrl: string | null;
+  segmentsUrl: string | null;
   contextToken: string | null;
   defaultLanguage: string;
   /** Peso del vocabolario dell'evento: sopra 1 il motore scrive termini mai detti. */
@@ -76,6 +77,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       str(env, 'CAPTIONS_ENGINE_HEALTH_URL') ?? `http://127.0.0.1:${enginePort}/v1/models`,
     contextUrl: str(env, 'CAPTIONS_CONTEXT_URL'),
     contextToken: str(env, 'CAPTIONS_CONTEXT_TOKEN'),
+    // Dove mandare le frasi per la trascrizione dell'evento; vuoto: accanto
+    // all'indirizzo del contesto (…/captions/segments).
+    segmentsUrl: str(env, 'CAPTIONS_SEGMENTS_URL'),
     defaultLanguage: str(env, 'CAPTIONS_LANGUAGE') ?? 'it-IT',
     boost: num(env, 'CAPTIONS_BOOST', 0.5),
     maxStreams: num(env, 'CAPTIONS_MAX_STREAMS', 4, 1),

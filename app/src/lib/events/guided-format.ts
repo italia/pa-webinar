@@ -80,6 +80,9 @@ export function presetDaFormato(f: FormatoGuidato, nome: string, sitoAperto = tr
     wordCloudEnabled: true,
     whiteboardEnabled: false,
     liveCaptionsEnabled: true,
+    // Chi registra tiene anche la trascrizione dai sottotitoli: c'e' subito a
+    // fine evento, anche senza la pipeline AI, e quella AI la sostituisce.
+    captionsTranscriptEnabled: registra,
     participantsCanUnmute: tutti,
     participantsCanStartVideo: tutti,
     participantsCanShareScreen: tutti,

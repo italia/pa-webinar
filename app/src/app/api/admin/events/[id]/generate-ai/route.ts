@@ -23,8 +23,9 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,12 +56,24 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await prisma.$transaction(async (tx) => {
     // Latest recording for the event (an event can have multiple CallSessions,
     // hence multiple Recordings — pick the most recent, same as the postprod list).
+    // Quella con il file: la registrazione «solo sottotitoli» non ha niente da
+    // trascrivere.
     const recording = await tx.recording.findFirst({
-      where: { eventId: id },
+      where: { eventId: id, blobKey: { not: '' } },
       orderBy: { createdAt: 'desc' },
-      select: { id: true },
+      select: { id: true, blobKey: true },
     });
     if (!recording) throw new NotFoundError('Recording');
+    if (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id)) {
+      throw new ConflictError(
+        'The transcript from the live captions on this recording was corrected by hand: the AI transcription would replace it and the corrections would be lost.',
+      );
+    }
+    if (registrazioneSoloSottotitoli(recording)) {
+      throw new ValidationError(
+        'The latest recording has no media: its transcript comes from the live captions.',
+      );
+    }
 
     // Flip the AI flags FIRST, in the same transaction, so the live flag read
     // inside enqueuePostprodForRecording (which no-ops when aiTranscriptEnabled

@@ -250,7 +250,6 @@
       "organizationRequired": "Įveskite savo organizaciją",
       "consentRequired": "Sutikimas dėl duomenų tvarkymo yra privalomas",
       "recordingConsentRequired": "Šiam renginiui būtinas sutikimas dėl įrašymo",
-      "multitrackConsentRequired": "Šiame renginyje būtina sutikti, kad būtų įrašomas jūsų garso takelis",
       "eventFull": "Renginys pasiekė maksimalų dalyvių skaičių",
       "generic": "Registracijos klaida. Bandykite dar kartą."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Reikalinga diegimo lentos paslauga; kur ji yra, momentiniuose skambučiuose lenta visada įjungta.",
       "liveCaptionsEnabled": "Automatiniai subtitrai",
       "liveCaptionsEnabledDesc": "Tai, ką sako kalbėtojai, rodoma po vaizdo įrašu, transkribuojama realiuoju laiku: tai padeda negirdintiems ar sunkiai sekantiems. Moderatoriai gali juos išjungti ir tiesioginės transliacijos metu skirtuke „Valdymas“, o kiekvienas gali juos paslėpti sau.",
+      "captionsTranscriptEnabled": "Stenograma iš subtitrų",
+      "captionsTranscriptEnabledDesc": "Sutikimą davusių žmonių sakiniai išsaugomi su jų vardu ir renginiui pasibaigus tampa jo stenograma, net be įrašo ar dirbtinio intelekto apdorojimo. Sutikimo nedavę žmonės matomi tik tiesioginiuose subtitruose.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",
       "autoStartRecordingDesc": "Renginiui prasidėjus, įrašymas paleidžiamas savaime (moderatoriaus neklausiama). Vėluojantieji iš karto randa prieinamą grotuvą.",
       "aiSectionHeading": "Automatinis apdorojimas po renginio",
@@ -2686,6 +2687,13 @@
       "editFailed": "Nepavyko išsaugoti (HTTP {code})",
       "editFailedDetail": "Nepavyko išsaugoti: {message}",
       "editMediaError": "Nepavyko įkelti įrašo garso: atkūrimas nepasiekiamas. Vis tiek galite taisyti segmentų tekstą ir kalbėtojus.",
+      "editNoMedia": "Stenograma, sudaryta iš tiesioginių subtitrų: nėra garso, kurį būtų galima paleisti.",
+      "captionsSource": "iš tiesioginių subtitrų",
+      "captionsRebuild": "Atnaujinti iš subtitrų",
+      "captionsRebuildDone": "Stenograma atnaujinta iš subtitrų.",
+      "captionsRebuildKept": "Stenograma buvo pataisyta ranka arba gauta iš DI: ji nepakeista.",
+      "captionsRebuildNone": "Nėra ką atnaujinti: nėra išsaugotų sakinių arba renginio duomenų saugojimo laikotarpis baigėsi.",
+      "captionsRebuildAiRunning": "DI apdorojimas stenografuoja vaizdo įrašą: jo stenograma pakeis stenogramą iš subtitrų.",
       "summaryLoadError": "Nepavyko įkelti santraukos.",
       "summaryLoading": "Įkeliama santrauka…",
       "summaryEmptyProcessing": "DI santrauka dar neparengta: vyksta apdorojimas. Atnaujinkite puslapį po kelių minučių.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik pakviestieji; neužsiregistravus patekti negalima"
       },
       "previewInvitation": "Registruotis gali tik jūsų pakviesti; niekas nepateks neužsiregistravęs."
+    },
+    "captionsTranscript": {
+      "title": "Stenograma iš subtitrų",
+      "intro": "Subtitrų sakiniai tų žmonių, kurie sutiko, kad jų pasisakymai būtų stenografuojami, tampa renginio stenograma net ir be įrašo bei be DI apdorojimo.",
+      "stats": "Išsaugoti sakiniai: {saved} · balsai: {voices} · neišsaugoti sakiniai, be sutikimo: {skipped}",
+      "none": "Stenograma dar nesudaryta: ji susidaro pati pasibaigus renginiui, arba galite ją sudaryti dabar.",
+      "empty": "Nėra išsaugotų sakinių: niekas nekalbėjo su sutikimu stenografuoti.",
+      "fromCaptions": "Stenograma sudaryta iš subtitrų.",
+      "fromAi": "Yra DI apdorojimo stenograma: ji turi pirmenybę prieš stenogramą iš subtitrų.",
+      "revised": "Stenograma pataisyta ranka: atnaujinimas iš subtitrų jos nepakeičia.",
+      "build": "Sudaryti stenogramą",
+      "rebuild": "Atnaujinti iš subtitrų",
+      "openEditor": "Atidaryti redaktoriuje",
+      "publish": "Skelbti stenogramą renginio puslapyje",
+      "publishDesc": "Ją galima skaityti ir be vaizdo įrašo. Pirmiausia peržiūrėkite: automatiniuose subtitruose gali būti klaidų.",
+      "publishWithVideo": "Paskelbtas vaizdo įrašas ją jau rodo; šis pasirinkimas palieka ją matomą, net jei vaizdo įrašas bus atšauktas.",
+      "built": "Stenograma atnaujinta.",
+      "kept": "Stenograma buvo pataisyta ranka arba gauta iš DI: ji nepakeista.",
+      "failed": "Operacija nepavyko.",
+      "loadFailed": "Nepavyko įkelti stenogramos būsenos.",
+      "expired": "Renginio duomenų saugojimo laikotarpis baigėsi: stenograma iš naujo nesudaroma.",
+      "aiRunning": "DI apdorojimas stenografuoja vaizdo įrašą: jo stenograma pakeis stenogramą iš subtitrų."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Sutinku su šio renginio garso/vaizdo įrašymu",
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
       "recordingNotice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nebus jūsų balso ar atvaizdo, nebent vedėjas suteiks jums žodį.",
-      "multitrack": "Sutinku, kad mano balsas būtų įrašomas atskiru garso takeliu vien tam, kad transkripcija būtų teisingai priskirta kiekvienam kalbėtojui. Takelis yra laikinas ir po transkripcijos ištrinamas; jis nenaudojamas mano balsui atpažinti ar atkurti.",
-      "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje",
+      "multitrack": "Sutinku, kad mano pasisakymai būtų transkribuoti su mano vardu renginio ataskaitai. Jei renginyje kiekvienam asmeniui įrašomas atskiras garso takelis, mano balsas įrašomas tik šiuo tikslu, o takelis ištrinamas po transkribavimo; jis nenaudojamas mano balsui atpažinti ar atkurti.",
+      "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek galite dalyvauti, tačiau jūsų balsas neįrašomas, o jūsų pasisakymai nepatenka į stenogramą.",
       "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
       "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Santrauka",
     "aiBadgeLabel": "DI sugeneruotas turinys",
     "aiBadgeBody": "Transkripciją ir santrauką automatiškai parengia klasteryje veikianti DI grandinė. Juose gali būti klaidų; autoritetingas šaltinis lieka vaizdo įrašas.",
+    "captionsBadgeBody": "Stenograma sudaryta iš tiesioginio renginio automatinių subtitrų ir apima tik sutikimą davusių žmonių pasisakymus. Joje gali būti klaidų.",
     "revisedByPerson": "Tekstą po automatinio sugeneravimo peržiūrėjo žmogus.",
     "searchPlaceholder": "Ieškoti transkripcijoje…",
     "searchLabel": "Ieškoti transkripcijoje",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Rodyti aikštę",
     "aiNoticeTitle": "DI apdorojimas po renginio",
     "aiNotice": "Pabaigoje įrašas bus apdorotas dirbtinio intelekto įrankiais, kad būtų sukurtas transkriptas, santrauka ir galimi vertimai bei įgarsinimai. Rezultatuose gali pasitaikyti netikslumų; vaizdo įrašas lieka autoritetingas šaltinis.",
-    "multitrackConsentTitle": "Įrašymas pagal dalyvį",
-    "multitrackConsentRequired": "Kad įeitumėte, turite sutikti su savo garso takelio įrašymu",
+    "multitrackConsentTitle": "Jūsų pasisakymų stenograma",
     "recordingConsentTitle": "Renginio įrašas",
     "recordingConsentIntro": "Renginys įrašomas (garsas ir vaizdas). Jei kalbate, įraše bus jūsų balsas, atvaizdas ir tai, ką bendrinate ekrane.",
     "recordingConsentRequired": "Norint įeiti, reikia jūsų sutikimo įrašyti.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatiniai subtitrai",
-    "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti subtitrų mygtuku skambučio juostoje."
+    "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti subtitrų mygtuku skambučio juostoje.",
+    "captionsNoticeTranscript": "Tiesioginio renginio metu kalbėtojo balsas realiuoju laiku stenografuojamas subtitrams rodyti platformą talpinančiuose serveriuose. Tekstas su vardu saugomas tik tų žmonių, kurie sutiko, kad jų pasisakymai būtų stenografuojami, ir tampa renginio stenograma. Subtitrus galima paslėpti skambučio juostos subtitrų mygtuku."
   },
   "recording": {
     "management": "Vaizdo įrašas",

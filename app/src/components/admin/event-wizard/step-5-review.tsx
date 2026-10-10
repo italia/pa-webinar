@@ -149,6 +149,10 @@ export default function Step5Review({
     form.wordCloudEnabled && tForm('wordCloudEnabled'),
     form.whiteboardEnabled && tForm('whiteboardEnabled'),
     liveCaptionsAvailable && form.liveCaptionsEnabled && tForm('liveCaptionsEnabled'),
+    liveCaptionsAvailable &&
+      form.liveCaptionsEnabled &&
+      form.captionsTranscriptEnabled &&
+      tForm('captionsTranscriptEnabled'),
   ].filter((x): x is string => !!x);
   const traduce =
     form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;

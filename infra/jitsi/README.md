@@ -11,6 +11,7 @@ pieces sit on the Jitsi boundary.
 | `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | The Docker Compose stack, from this folder, and the Helm chart, from an identical copy in `infra/helm/pa-webinar/files/prosody-plugins/` |
 | `prosody-plugins/mod_pa_media_lock.lua` | A Prosody MUC module that switches on Jitsi's audio, video and screen-share moderation when the event does not grant them to participants | The same two places, the same way |
 | `prosody-plugins/mod_pa_captions.lua` | A Prosody MUC module that marks every new room as open to bridge transcription, for live captions | The same two places, the same way |
+| `prosody-plugins/mod_pa_occupants.lua` | A Prosody MUC module that tells the portal which token seat stands behind each bridge endpoint, so that the transcript from captions and the multitrack recorder follow each person's consent | The same two places, the same way |
 | `jibri-finalize.sh` | A standalone Jibri finalize script | Nothing in the repository. The chart ships a different script, `infra/helm/pa-webinar/files/jibri-finalize.sh` |
 | `web/custom-interface_config.js`, `web/custom-config.js` | Interface and config overrides that hide the Jitsi logo and links over the call | The Docker Compose stack, which mounts them into the `jitsi-web` container; the image appends them to the configuration it generates at startup. On Kubernetes the same settings go in the web component's custom configs of the deployment values |
 
@@ -93,13 +94,15 @@ The module logs every switch-on, admission and removal at `info` level.
 
 **Docker Compose.** `docker-compose.yml` mounts `infra/jitsi/prosody-plugins/` read-only at
 `/prosody-plugins-custom` in the `prosody` service and sets
-`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions`. On the `jicofo` service it
+`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants`, with
+`PA_PORTAL_URL` for the occupants module. On the `jicofo` service it
 turns off Jicofo's authentication (`JICOFO_ENABLE_AUTH=false`) and the auto-owner rule
 (`ENABLE_AUTO_OWNER=false`), as the chart does.
 
 **Helm chart.** The chart's `values.yaml` sets the wiring by default, on every profile:
 
-- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions`;
+- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants`,
+  and `PA_PORTAL_URL` for the occupants module;
 - `jitsi-meet.prosody.extraVolumes` and `extraVolumeMounts`, which mount the ConfigMap
   `pa-webinar-prosody-plugins` at `/prosody-plugins-custom`. The chart renders that ConfigMap from its
   copies of the modules in `infra/helm/pa-webinar/files/prosody-plugins/`;
@@ -148,17 +151,75 @@ metadata), it writes two keys into the metadata of every room except the health-
 | Key | Why |
 |---|---|
 | `asyncTranscription: true` | Jicofo asks the bridge to stream audio to the transcription service only for rooms that carry it. Recent Jitsi versions refuse this key when a client sets it, moderators included, so only a server module can |
-| `transcription.urlParams.room` | The room name. From `stable-10978` Jicofo appends these parameters to the transcription WebSocket address, so the captions service knows which event the audio belongs to and asks the portal for its language and vocabulary. Earlier versions ignore it, and the service falls back to its default language |
+| `transcription.urlParams.room` | The room name. From `stable-10978` Jicofo appends these parameters to the transcription WebSocket address, so the captions service knows which event the audio belongs to and asks the portal for its language and vocabulary. Earlier versions ignore it: the portal then finds the event from the meeting id that the [occupants module](#the-occupants-module) reported, and without that module the service falls back to its default language |
 
 The metadata alone transcribes nothing: transcription starts when a moderator turns captions on in the
 room (`recording.isTranscribingEnabled`), and stops when they turn them off.
 
-The module is wired like the other two. With the Helm chart, `global.captions.enabled` sets
+The module is wired like the others. With the Helm chart, `global.captions.enabled` sets
 `PA_CAPTIONS_ENABLED` for Prosody and, for Jicofo, the transcription address
 (`jicofo.transcription.url-template`, passed as a JVM option in `JAVA_TOOL_OPTIONS`), and renders the
 captions service; the render stops when captions are on and `XMPP_MUC_MODULES` lacks `pa_captions`. In
 Docker Compose the same settings come from the `CAPTIONS_*` variables described in `.env.example`, with
 the `captions` profile.
+
+## The occupants module
+
+`mod_pa_occupants` tells the portal who is in a conference. The captions service and the multitrack
+recorder know each voice only by its bridge endpoint; the module lets the portal map an endpoint to the
+seat of the token that entered with it, and so to that person's consent to the transcription of what
+they say ([Live captions](../../docs/architecture/live-captions.md#transcript-from-captions)).
+
+On `muc-occupant-joined` and `muc-occupant-left`, for every room except the health-check room, it posts
+a JSON body to `POST <PA_PORTAL_URL>/api/internal/jitsi/occupants`:
+
+| Field | Value |
+|---|---|
+| `room` | The room name |
+| `meetingId` | The room's meeting id, which the captions service receives from the bridge on every Jitsi version |
+| `endpointId` | The resource of the occupant's nickname in the room: the id the bridge uses for that person's audio |
+| `seatId` | `context.user.id` of the token |
+| `action` | `joined` or `left` |
+| `ts` | The send time, in seconds |
+
+The header `x-pa-signature` carries the hex HMAC-SHA256 of the raw body. Its key is derived from
+`JWT_APP_SECRET`, the conference token secret Prosody already holds: the HMAC-SHA256 of that secret over
+the label `pa-occupants`, so a signature cannot serve as a conference token. The portal recomputes it
+with `JITSI_JWT_SECRET`, which has the same value, and refuses the notification (`401`) when the
+signature does not match or `ts` is more than 300 seconds away from its clock
+(`app/src/lib/auth/prosody-signature.ts`). Without the header, the route accepts the portal's internal
+key in `x-api-key`, like the other internal routes.
+
+It sends no name and no address. An occupant without a token context, such as a component that signs in
+with a password, is not reported, and neither is Jicofo (`focus`). The request does not wait for an
+answer; a status other than `200` or `204` is logged at `warn` level with the prefix `Occupanti:`. The
+portal finds the event by room name, exact first, then ignoring case, and stores the notification for
+every event when live captions are available and on for the instance (the captions service installed
+and the site setting on), whatever the event's own captions switch, and for every event with
+per-participant recording; the meeting id also lets the captions service's requests find the event.
+Otherwise, and for a room that belongs to no event, it stores nothing.
+
+The module acts only when Prosody's environment has both `PA_PORTAL_URL` (the portal's internal address)
+and `JWT_APP_SECRET`; otherwise it logs that at start and does nothing. Without it, the transcript from captions keeps no text and the multitrack recorder records no
+track, because the portal cannot tell whose voice is whose.
+
+The module is wired like the others, with one addition, the portal's address:
+
+- **Helm chart.** `jitsi-meet.prosody.extraEnvs.PA_PORTAL_URL` points at the portal's Service, built from
+  the release name. With the chart's NetworkPolicy on, the application's policy admits the Prosody pods
+  on the app port ([NetworkPolicy](../../docs/DEPLOYMENT.md#networkpolicy)).
+- **Docker Compose.** The `prosody` service sets `PA_PORTAL_URL=http://app:3000`.
+
+The signing secret needs no wiring of its own: `JWT_APP_SECRET` must already equal the portal's
+`JITSI_JWT_SECRET` for anyone to enter a room
+([The Prosody JWT secret](../../docs/DEPLOYMENT.md#the-prosody-jwt-secret)). Rotating it, outside events,
+also rotates the signing key.
+
+The render stops when `XMPP_MUC_MODULES` lists `pa_occupants` and nothing is mounted at
+`/prosody-plugins-custom`, and when `recorder.enabled` is on but `XMPP_MUC_MODULES` lacks `pa_occupants`,
+because the recorder would then record nobody. An upgrade with `--reuse-values` keeps the previous
+list, so it stops there when that list lacks the module. `scripts/validate-chart.sh` also checks that the
+mounted ConfigMap carries the module with its hook.
 
 ## The Jibri finalize scripts
 
@@ -245,6 +306,11 @@ of the [Jitsi upgrade checklist](../../docs/architecture/jitsi-integration.md#ji
   Wherever the module is loaded, check that Prosody logs `Set affiliation to ...` on each join. Then
   repeat the checks listed under **Checked in the lab** above, with the moderator link and with a
   guest.
+- **Occupants module.** `mod_pa_occupants` relies on the `muc-occupant-joined` and `muc-occupant-left`
+  hooks, the session field `jitsi_meet_context_user`, the meeting id that the stock meeting-id module
+  keeps in the room's data (`room._data.meetingId`), the occupant's nickname resource being the bridge
+  endpoint id, `net.http` and `util.hashes`. In a room of an event, check that `room_occupants` gets a row for each
+  person who joins, with their token's seat, and that Prosody logs no `Occupanti:` warning.
 - **Finalize script.** The chart's script relies on:
   - the subchart's finalize path (`/config/finalize.sh` through `JIBRI_FINALIZE_RECORDING_SCRIPT_PATH`)
     and its `jitsi-meet.jibri.custom.other._finalize_sh` slot;

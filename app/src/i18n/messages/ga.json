@@ -250,7 +250,6 @@
       "organizationRequired": "Cuir isteach bhur n-eagraíocht, le bhur dtoil",
       "consentRequired": "Tá toiliú le próiseáil sonraí riachtanach",
       "recordingConsentRequired": "Tá toiliú leis an taifeadadh riachtanach don imeacht seo",
-      "multitrackConsentRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach don imeacht seo",
       "eventFull": "Tá uaslíon na rannpháirtithe sroichte ag an imeacht",
       "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Teastaíonn seirbhís chlár bán na suiteála; nuair atá sí ar fáil, bíonn sé ar siúl i gcónaí i nglaonna láithreacha.",
       "liveCaptionsEnabled": "Fotheidil uathoibríocha",
       "liveCaptionsEnabledDesc": "Taispeántar an méid a deir na cainteoirí faoin bhfíseán, tras-scríofa i bhfíor-am: cabhraíonn sé leo siúd nach gcloiseann nó a mbíonn deacracht acu leanúint. Is féidir le modhnóirí iad a mhúchadh le linn an imeachta bheo freisin ón gcluaisín “Rialú”, agus is féidir le gach duine iad a fholú dóibh féin.",
+      "captionsTranscriptEnabled": "Tras-scríbhinn ó na fotheidil",
+      "captionsTranscriptEnabledDesc": "Coinnítear abairtí na ndaoine a thugann toiliú lena n-ainm agus, nuair a chríochnaíonn an t-imeacht, déantar tras-scríbhinn an imeachta díobh, fiú gan taifeadadh ná próiseáil IS. Ní fheictear iad siúd nach dtugann toiliú ach sna fotheidil bheo.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
       "autoStartRecordingDesc": "Nuair a thosaíonn an t-imeacht, tosaíonn an taifeadadh leis féin (ní iarrtar deimhniú ón modhnóir). Mar sin aimseoidh daoine déanacha seinnteoir ar fáil láithreach.",
       "aiSectionHeading": "Iarléiriú uathoibríoch",
@@ -2686,6 +2687,13 @@
       "editFailed": "Theip ar an sábháil (HTTP {code})",
       "editFailedDetail": "Theip ar an sábháil: {message}",
       "editMediaError": "Níorbh fhéidir fuaim an taifeadta a lódáil: níl an athsheinm ar fáil. Is féidir leat téacs agus cainteoirí na míreanna a cheartú mar sin féin.",
+      "editNoMedia": "Tras-scríbhinn a tógadh ó na fotheidil bheo: níl aon fhuaim le seinm.",
+      "captionsSource": "ó na fotheidil bheo",
+      "captionsRebuild": "Nuashonraigh ó na fotheidil",
+      "captionsRebuildDone": "Nuashonraíodh an tras-scríbhinn ó na fotheidil.",
+      "captionsRebuildKept": "Ceartaíodh an tras-scríbhinn de láimh nó tá sí ón IS: níor cuireadh ceann eile ina háit.",
+      "captionsRebuildNone": "Níl aon rud le nuashonrú: níl aon abairtí sábháilte nó tá tréimhse choinneála shonraí an imeachta thart.",
+      "captionsRebuildAiRunning": "Tá an phróiseáil IS ag tras-scríobh an fhíseáin: tiocfaidh a tras-scríbhinn in áit na tras-scríbhinne ó na fotheidil.",
       "summaryLoadError": "Níorbh fhéidir an achoimre a lódáil.",
       "summaryLoading": "Achoimre á lódáil…",
       "summaryEmptyProcessing": "Níl an achoimre AI réidh fós: tá an phróiseáil ar siúl. Athlódáil an leathanach i gceann cúpla nóiméad.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine a fuair cuireadh clárú; gan clárú ní féidir dul isteach"
       },
       "previewInvitation": "Ní féidir ach leis na daoine a dtugann tú cuireadh dóibh clárú; ní théann aon duine isteach gan clárú."
+    },
+    "captionsTranscript": {
+      "title": "Tras-scríbhinn ó fhotheidil",
+      "intro": "Déantar tras-scríbhinn an imeachta d'abairtí fotheideal na ndaoine a thoiligh go ndéanfaí a gcuid cainte a thras-scríobh, fiú gan taifeadadh agus gan próiseáil IS.",
+      "stats": "Abairtí sábháilte: {saved} · guthanna: {voices} · abairtí nár sábháladh, gan toiliú: {skipped}",
+      "none": "Níor tógadh an tras-scríbhinn fós: tógtar í léi féin tar éis don imeacht críochnú, nó is féidir leat í a thógáil anois.",
+      "empty": "Níor sábháladh aon abairt: níor labhair aon duine le toiliú don tras-scríobh.",
+      "fromCaptions": "Tras-scríbhinn a tógadh ó na fotheidil.",
+      "fromAi": "Tá tras-scríbhinn ón bpróiseáil IS ann: tá tosaíocht aici ar an gceann ó na fotheidil.",
+      "revised": "Ceartaíodh an tras-scríbhinn de láimh: ní chuireann nuashonrú ó na fotheidil ceann eile ina háit.",
+      "build": "Tóg an tras-scríbhinn",
+      "rebuild": "Nuashonraigh ó na fotheidil",
+      "openEditor": "Oscail san eagarthóir",
+      "publish": "Foilsigh an tras-scríbhinn ar leathanach an imeachta",
+      "publishDesc": "Is féidir í a léamh fiú gan físeán. Athléigh í ar dtús: d'fhéadfadh botúin a bheith i bhfotheidil uathoibríocha.",
+      "publishWithVideo": "Taispeánann an físeán foilsithe í cheana; coinníonn an rogha seo le feiceáil í fiú má tharraingítear siar an físeán.",
+      "built": "Nuashonraíodh an tras-scríbhinn.",
+      "kept": "Ceartaíodh an tras-scríbhinn de láimh nó tá sí ón IS: níor cuireadh ceann eile ina háit.",
+      "failed": "Theip ar an oibríocht.",
+      "loadFailed": "Níorbh fhéidir stádas na tras-scríbhinne a lódáil.",
+      "expired": "Tá tréimhse choinneála shonraí an imeachta thart: ní thógtar an tras-scríbhinn arís.",
+      "aiRunning": "Tá an phróiseáil IS ag tras-scríobh an fhíseáin: tiocfaidh a tras-scríbhinn in áit na tras-scríbhinne ó na fotheidil."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Toilím le taifeadadh fuaime/físe an imeachta seo",
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
       "recordingNotice": "Taifeadtar an t-imeacht (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: níl do ghuth ná d'íomhá sa taifeadadh, ach amháin má thugann an t-óstach an t-urlár duit.",
-      "multitrack": "Toilím le taifeadadh rian fuaime ar leith de mo ghuth, chun na críche amháin an tras-scríbhinn a chur i leith gach cainteora i gceart. Tá an rian sealadach agus scriostar é tar éis na tras-scríbhinne; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
-      "multitrackRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach chun páirt a ghlacadh san imeacht seo",
+      "multitrack": "Toilím go ndéanfar tras-scríobh ar mo chuid cainte, le m'ainm, do thuarascáil an imeachta. Má thaifeadann an t-imeacht rian fuaime ar leith do gach duine, ní thaifeadtar mo ghuth ach chun na críche sin agus scriostar an rian tar éis an tras-scríofa; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
+      "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, is féidir leat páirt a ghlacadh fós, ach ní thaifeadtar do ghuth agus ní chuirtear do chuid cainte sa tras-scríbhinn.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
       "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Achoimre",
     "aiBadgeLabel": "Ábhar cruthaithe ag AI",
     "aiBadgeBody": "Cruthaíonn an phíblíne AI sa bhraisle an tras-scríbhinn agus an achoimre go huathoibríoch. D'fhéadfadh earráidí a bheith iontu; is é an físeán an fhoinse údarásach i gcónaí.",
+    "captionsBadgeBody": "Tagann an tras-scríbhinn ó fhotheidil uathoibríocha an imeachta bheo agus níl inti ach cainteanna na ndaoine a thug toiliú. D'fhéadfadh botúin a bheith inti.",
     "revisedByPerson": "D'athbhreithnigh duine an téacs tar éis é a ghiniúint go huathoibríoch.",
     "searchPlaceholder": "Cuardaigh sa tras-scríbhinn…",
     "searchLabel": "Cuardaigh sa tras-scríbhinn",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Taispeáin an chearnóg",
     "aiNoticeTitle": "Próiseáil le IS tar éis an imeachta",
     "aiNotice": "Ag an deireadh, déanfar an taifeadadh a phróiseáil le huirlisí intleachta saorga chun tras-scríbhinn, achoimre agus aistriúcháin nó fuaimniú a chruthú. D'fhéadfadh míchruinneas a bheith sna torthaí; is é an físeán an fhoinse údarásach i gcónaí.",
-    "multitrackConsentTitle": "Taifeadadh de réir rannpháirtí",
-    "multitrackConsentRequired": "Caithfidh tú glacadh le taifeadadh do rian fuaime chun dul isteach",
+    "multitrackConsentTitle": "Tras-scríbhinn ar do chuid cainte",
     "recordingConsentTitle": "Taifeadadh na hócáide",
     "recordingConsentIntro": "Tá an ócáid á taifeadadh (fuaim agus físeán). Má labhraíonn tú, beidh do ghuth, d'íomhá agus a roinneann tú ar an scáileán sa taifeadadh.",
     "recordingConsentRequired": "Tá do thoiliú leis an taifeadadh ag teastáil chun dul isteach.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Fotheidil uathoibríocha",
-    "captionsNotice": "Le linn an tseisiúin bheo, tras-scríobhtar guth an duine atá ag labhairt i bhfíor-am chun fotheidil a thaispeáint. Déantar an tras-scríobh ar na freastalaithe a óstálann an t-ardán agus ní choinnítear an téacs. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao."
+    "captionsNotice": "Le linn an tseisiúin bheo, tras-scríobhtar guth an duine atá ag labhairt i bhfíor-am chun fotheidil a thaispeáint. Déantar an tras-scríobh ar na freastalaithe a óstálann an t-ardán agus ní choinnítear an téacs. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao.",
+    "captionsNoticeTranscript": "Le linn an tseisiúin bheo, déantar guth an chainteora a thras-scríobh i bhfíor-am chun fotheidil a thaispeáint, ar na freastalaithe a óstálann an t-ardán. Ní choinnítear an téacs, leis an ainm, ach do na daoine a thoiligh go ndéanfaí a gcuid cainte a thras-scríobh, agus is é tras-scríbhinn an imeachta é. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao."
   },
   "recording": {
     "management": "Taifeadadh físe",

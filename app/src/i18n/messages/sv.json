@@ -250,7 +250,6 @@
       "organizationRequired": "Ange din organisation",
       "consentRequired": "Samtycke till databehandling krävs",
       "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
-      "multitrackConsentRequired": "Samtycke till inspelning av ditt ljudspår är obligatoriskt för det här evenemanget",
       "eventFull": "Evenemanget har nått maximalt antal deltagare",
       "generic": "Fel vid anmälan. Försök igen."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Kräver installationens whiteboardtjänst; där den finns är den alltid på i snabbsamtal.",
       "liveCaptionsEnabled": "Automatisk textning",
       "liveCaptionsEnabledDesc": "Det talarna säger visas under videon, transkriberat i realtid: det hjälper den som inte hör eller har svårt att följa med. Moderatorer kan också stänga av textningen under livesändningen på fliken ”Kontroll”, och var och en kan dölja den för sig själv.",
+      "captionsTranscriptEnabled": "Transkription från textningen",
+      "captionsTranscriptEnabledDesc": "Meningarna från dem som samtycker sparas med deras namn och blir efter evenemanget dess transkription, även utan inspelning eller AI-bearbetning. Den som inte samtycker finns bara i livetextningen.",
       "autoStartRecording": "Starta inspelningen automatiskt",
       "autoStartRecordingDesc": "När evenemanget startar börjar inspelningen av sig själv (utan att fråga moderatorn). Eventuella sena anslutare hittar då redan en spelare tillgänglig.",
       "aiSectionHeading": "Automatisk efterproduktion",
@@ -2686,6 +2687,13 @@
       "editFailed": "Sparandet misslyckades (HTTP {code})",
       "editFailedDetail": "Sparandet misslyckades: {message}",
       "editMediaError": "Det gick inte att läsa in inspelningens ljud: uppspelning är inte tillgänglig. Du kan ändå rätta texten och talarna i segmenten.",
+      "editNoMedia": "Transkription byggd från livetextningen: det finns inget ljud att spela upp.",
+      "captionsSource": "från livetextningen",
+      "captionsRebuild": "Uppdatera från textningen",
+      "captionsRebuildDone": "Transkriptionen uppdaterades från textningen.",
+      "captionsRebuildKept": "Transkriptionen har rättats för hand eller kommer från AI: den ersattes inte.",
+      "captionsRebuildNone": "Inget att uppdatera: det finns inga sparade meningar eller så har lagringstiden för evenemangets data löpt ut.",
+      "captionsRebuildAiRunning": "AI-bearbetningen transkriberar videon: dess transkription ersätter den från textningen.",
       "summaryLoadError": "Det gick inte att läsa in sammanfattningen.",
       "summaryLoading": "Läser in sammanfattningen…",
       "summaryEmptyProcessing": "AI-sammanfattningen är inte klar ännu: bearbetningen pågår. Uppdatera sidan om några minuter.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Sidan förblir synlig, men bara inbjudna kan anmäla sig; utan anmälan kommer man inte in"
       },
       "previewInvitation": "Bara de du bjuder in kan anmäla sig; ingen kommer in utan anmälan."
+    },
+    "captionsTranscript": {
+      "title": "Transkription från textning",
+      "intro": "Textningsmeningarna från dem som har samtyckt till transkription av sina inlägg blir evenemangets transkription, även utan inspelning och utan AI-bearbetning.",
+      "stats": "Sparade meningar: {saved} · röster: {voices} · meningar som inte sparats, utan samtycke: {skipped}",
+      "none": "Transkriptionen är inte byggd än: den byggs av sig själv när evenemanget är slut, eller så kan du bygga den nu.",
+      "empty": "Inga sparade meningar: ingen talade med samtycke till transkription.",
+      "fromCaptions": "Transkription byggd från textningen.",
+      "fromAi": "Det finns en transkription från AI-bearbetningen: den har företräde framför den från textningen.",
+      "revised": "Transkriptionen har rättats för hand: en uppdatering från textningen ersätter den inte.",
+      "build": "Bygg transkriptionen",
+      "rebuild": "Uppdatera från textningen",
+      "openEditor": "Öppna i redigeraren",
+      "publish": "Publicera transkriptionen på evenemangets sida",
+      "publishDesc": "Den kan läsas även utan video. Granska den först: automatisk textning kan innehålla fel.",
+      "publishWithVideo": "Den publicerade videon visar den redan; detta val håller den synlig även om videon dras tillbaka.",
+      "built": "Transkriptionen uppdaterades.",
+      "kept": "Transkriptionen har rättats för hand eller kommer från AI: den ersattes inte.",
+      "failed": "Åtgärden misslyckades.",
+      "loadFailed": "Det gick inte att läsa in transkriptionens status.",
+      "expired": "Lagringstiden för evenemangets data har löpt ut: transkriptionen byggs inte om.",
+      "aiRunning": "AI-bearbetningen transkriberar videon: dess transkription ersätter den från textningen."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
       "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
-      "multitrack": "Jag samtycker till inspelning av ett separat ljudspår med min röst, enbart för att transkriptionen ska kunna tillskrivas rätt talare. Spåret är tillfälligt och raderas efter transkriptionen; det används inte för att identifiera eller återge min röst.",
-      "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang",
+      "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
+      "multitrackOptional": "Det är frivilligt: om du inte samtycker kan du ändå delta, men din röst spelas inte in och dina inlägg kommer inte med i transkriptionen.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
       "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Sammanfattning",
     "aiBadgeLabel": "AI-genererat innehåll",
     "aiBadgeBody": "Transkription och sammanfattning tas fram automatiskt av AI-pipelinen i klustret. De kan innehålla fel; videon förblir den auktoritativa källan.",
+    "captionsBadgeBody": "Transkriptionen kommer från direktsändningens automatiska textning och innehåller bara inlägg från dem som har gett sitt samtycke. Den kan innehålla fel.",
     "revisedByPerson": "Texten har granskats av en person efter den automatiska genereringen.",
     "searchPlaceholder": "Sök i transkriptionen…",
     "searchLabel": "Sök i transkriptionen",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Visa torget",
     "aiNoticeTitle": "AI-bearbetning efter evenemanget",
     "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
-    "multitrackConsentTitle": "Inspelning per deltagare",
-    "multitrackConsentRequired": "Du måste godkänna inspelningen av ditt ljudspår för att komma in",
+    "multitrackConsentTitle": "Transkription av dina inlägg",
     "recordingConsentTitle": "Inspelning av evenemanget",
     "recordingConsentIntro": "Evenemanget spelas in (ljud och bild). Om du tar ordet innehåller inspelningen din röst, din bild och det du delar på skärmen.",
     "recordingConsentRequired": "Ditt samtycke till inspelningen krävs för att komma in.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Automatiska undertexter",
-    "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med undertextknappen i samtalets verktygsfält."
+    "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med undertextknappen i samtalets verktygsfält.",
+    "captionsNoticeTranscript": "Under direktsändningen transkriberas talarens röst i realtid för att visa textning, på de servrar som är värdar för plattformen. Texten sparas, med namn, bara för dem som samtyckt till transkription av sina inlägg och blir evenemangets transkription. Textningen kan döljas med textningsknappen i samtalsfältet."
   },
   "recording": {
     "management": "Videoinspelning",

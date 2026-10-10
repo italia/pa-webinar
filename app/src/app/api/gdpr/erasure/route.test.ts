@@ -13,7 +13,10 @@ const tx = {
   chatMessage: { deleteMany: vi.fn() },
   wordCloudSubmission: { deleteMany: vi.fn() },
   chatMessageReaction: { deleteMany: vi.fn() },
-  registration: { deleteMany: vi.fn() },
+  captionSegment: { deleteMany: vi.fn() },
+  roomOccupant: { deleteMany: vi.fn() },
+  registration: { deleteMany: vi.fn(), findMany: vi.fn() },
+  postprodArtifact: { findMany: vi.fn() },
   $executeRaw: vi.fn(),
 };
 const invalidate = vi.hoisted(() => vi.fn());
@@ -80,7 +83,11 @@ beforeEach(() => {
   tx.chatMessage.deleteMany.mockResolvedValue({ count: 3 });
   tx.wordCloudSubmission.deleteMany.mockResolvedValue({ count: 2 });
   tx.chatMessageReaction.deleteMany.mockResolvedValue({ count: 0 });
+  tx.captionSegment.deleteMany.mockResolvedValue({ count: 0 });
+  tx.roomOccupant.deleteMany.mockResolvedValue({ count: 0 });
   tx.registration.deleteMany.mockResolvedValue({ count: 1 });
+  tx.registration.findMany.mockResolvedValue([{ eventId: 'ev-1' }]);
+  tx.postprodArtifact.findMany.mockResolvedValue([]);
   tx.$executeRaw.mockResolvedValue(2);
 });
 
@@ -121,10 +128,24 @@ describe('POST /api/gdpr/erasure', () => {
     expect(tx.chatMessageReaction.deleteMany).toHaveBeenCalledWith({
       where: { senderId: { in: ['reg-r1', 'reg-r2'] } },
     });
+    // Le frasi dei sottotitoli e i posti in sala: il posto e' reg-<id>-<suffisso>.
+    const postiInSala = { OR: [{ seatId: { startsWith: 'reg-r1-' } }, { seatId: { startsWith: 'reg-r2-' } }] };
+    expect(tx.captionSegment.deleteMany).toHaveBeenCalledWith({ where: postiInSala });
+    // E dalla trascrizione gia' costruita dai sottotitoli degli eventi della persona.
+    expect(tx.postprodArtifact.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ modelId: 'live-captions', recording: { eventId: { in: ['ev-1'] } } }),
+      }),
+    );
+    expect(tx.roomOccupant.deleteMany).toHaveBeenCalledWith({ where: postiInSala });
     // Le parole di «In una parola» non hanno una chiave verso l'iscrizione:
     // la cascata non le porta via, e dopo la conservazione restano.
     expect(tx.wordCloudSubmission.deleteMany).toHaveBeenCalledWith({ where: { registrationId: ids } });
-    expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
+    // Il lock della trascrizione dell'evento, poi le email accodate.
+    expect(tx.$executeRaw).toHaveBeenCalledTimes(2);
+    const sql = (n: number) => (tx.$executeRaw.mock.calls[n]![0] as TemplateStringsArray).join('?');
+    expect(sql(0)).toContain('pg_advisory_xact_lock');
+    expect(sql(1)).toContain('DELETE FROM email_outbox');
     expect(tx.registration.deleteMany).toHaveBeenCalledWith({ where: { id: ids } });
     expect(db.gdprAuditLog.create).toHaveBeenCalledTimes(2);
   });

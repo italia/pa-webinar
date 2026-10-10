@@ -180,6 +180,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
+      ...(data.captionsTranscriptEnabled !== undefined && {
+        captionsTranscriptEnabled: data.captionsTranscriptEnabled,
+      }),
       ...(data.liveCaptionsEnabled !== undefined && {
         liveCaptionsEnabled: data.liveCaptionsEnabled,
       }),

@@ -250,7 +250,6 @@
       "organizationRequired": "Introduceți instituția de apartenență",
       "consentRequired": "Consimțământul pentru prelucrarea datelor este obligatoriu",
       "recordingConsentRequired": "Consimțământul pentru înregistrarea video este obligatoriu pentru acest eveniment",
-      "multitrackConsentRequired": "Consimțământul pentru înregistrarea pistei dumneavoastră audio este obligatoriu pentru acest eveniment",
       "eventFull": "Evenimentul a atins numărul maxim de participanți",
       "generic": "Eroare la înscriere. Vă rugăm să reîncercați."
     }
@@ -1477,6 +1476,8 @@
       "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Necesită serviciul de tablă al instalării; acolo unde există, este întotdeauna activă în apelurile instantanee.",
       "liveCaptionsEnabled": "Subtitrări automate",
       "liveCaptionsEnabledDesc": "Ce spun vorbitorii apare sub video, transcris în timp real: ajută persoanele care nu aud sau urmăresc cu greu. Moderatorii le pot dezactiva și în timpul transmisiunii live din fila „Regie”, iar fiecare le poate ascunde pentru sine.",
+      "captionsTranscriptEnabled": "Transcriere din subtitrări",
+      "captionsTranscriptEnabledDesc": "Frazele celor care își dau consimțământul se păstrează cu numele lor și, la finalul evenimentului, devin transcrierea acestuia, chiar și fără înregistrare sau procesare AI. Cei care nu își dau consimțământul apar doar în subtitrările live.",
       "autoStartRecording": "Porniți înregistrarea automat",
       "autoStartRecordingDesc": "La începutul evenimentului, înregistrarea pornește singură (fără a cere confirmare moderatorului). Astfel eventualii întârziați găsesc deja player-ul disponibil.",
       "aiSectionHeading": "Post-producție automată",
@@ -2686,6 +2687,13 @@
       "editFailed": "Salvarea a eșuat (HTTP {code})",
       "editFailedDetail": "Salvarea a eșuat: {message}",
       "editMediaError": "Audio-ul înregistrării nu a putut fi încărcat: redarea nu este disponibilă. Puteți totuși corecta textul și vorbitorii segmentelor.",
+      "editNoMedia": "Transcriere construită din subtitrările live: nu există audio de redat.",
+      "captionsSource": "din subtitrările live",
+      "captionsRebuild": "Actualizează din subtitrări",
+      "captionsRebuildDone": "Transcrierea a fost actualizată din subtitrări.",
+      "captionsRebuildKept": "Transcrierea a fost corectată manual sau provine din AI: nu a fost înlocuită.",
+      "captionsRebuildNone": "Nimic de actualizat: nu există fraze salvate sau perioada de păstrare a datelor evenimentului s-a încheiat.",
+      "captionsRebuildAiRunning": "Procesarea AI transcrie videoclipul: transcrierea ei o va înlocui pe cea din subtitrări.",
       "summaryLoadError": "Rezumatul nu a putut fi încărcat.",
       "summaryLoading": "Se încarcă rezumatul…",
       "summaryEmptyProcessing": "Rezumatul AI nu este încă pregătit: procesarea este în curs. Reîmprospătați pagina peste câteva minute.",
@@ -3141,6 +3149,28 @@
         "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar invitații; fără înscriere nu se intră"
       },
       "previewInvitation": "Se pot înscrie doar persoanele invitate de tine; nimeni nu intră fără înscriere."
+    },
+    "captionsTranscript": {
+      "title": "Transcriere din subtitrări",
+      "intro": "Frazele din subtitrări ale celor care au fost de acord cu transcrierea intervențiilor lor devin transcrierea evenimentului, chiar și fără înregistrare și fără procesare AI.",
+      "stats": "Fraze salvate: {saved} · voci: {voices} · fraze nesalvate, fără consimțământ: {skipped}",
+      "none": "Transcrierea nu a fost încă construită: se construiește singură după încheierea evenimentului, sau o puteți construi acum.",
+      "empty": "Nicio frază salvată: nimeni nu a vorbit cu consimțământ pentru transcriere.",
+      "fromCaptions": "Transcriere construită din subtitrări.",
+      "fromAi": "Există o transcriere din procesarea AI: are prioritate față de cea din subtitrări.",
+      "revised": "Transcriere corectată manual: actualizarea din subtitrări nu o înlocuiește.",
+      "build": "Construiește transcrierea",
+      "rebuild": "Actualizează din subtitrări",
+      "openEditor": "Deschide în editor",
+      "publish": "Publică transcrierea pe pagina evenimentului",
+      "publishDesc": "Se poate citi și fără video. Revizuiți-o mai întâi: subtitrările automate pot conține erori.",
+      "publishWithVideo": "Videoclipul publicat o afișează deja; această opțiune o păstrează vizibilă chiar dacă videoclipul este retras.",
+      "built": "Transcriere actualizată.",
+      "kept": "Transcrierea a fost corectată manual sau provine din AI: nu a fost înlocuită.",
+      "failed": "Operațiunea a eșuat.",
+      "loadFailed": "Starea transcrierii nu a putut fi încărcată.",
+      "expired": "Perioada de păstrare a datelor evenimentului s-a încheiat: transcrierea nu se mai reconstruiește.",
+      "aiRunning": "Procesarea AI transcrie videoclipul: transcrierea ei o va înlocui pe cea din subtitrări."
     }
   },
   "email": {
@@ -3438,8 +3468,8 @@
       "recording": "Consimt la înregistrarea audio/video a evenimentului",
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
       "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
-      "multitrack": "Consimt la înregistrarea unei piste audio separate a vocii mele, exclusiv în scopul atribuirii corecte a transcrierii fiecărui vorbitor. Pista este temporară și ștearsă după transcriere; nu este folosită pentru a identifica sau reproduce vocea mea.",
-      "multitrackRequired": "Consimțământul pentru înregistrarea pistei tale audio este obligatoriu pentru a participa la acest eveniment",
+      "multitrack": "Sunt de acord ca intervențiile mele să fie transcrise, cu numele meu, pentru raportul evenimentului. Dacă evenimentul înregistrează o pistă audio separată pentru fiecare persoană, vocea mea este înregistrată numai în acest scop, iar pista se șterge după transcriere; nu este folosită pentru a-mi identifica sau reproduce vocea.",
+      "multitrackOptional": "Este opțional: dacă nu vă dați consimțământul, participați oricum, dar vocea dvs. nu este înregistrată, iar intervențiile dvs. nu intră în transcriere.",
       "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
       "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere."
     },
@@ -4172,6 +4202,7 @@
     "tabSummary": "Rezumat",
     "aiBadgeLabel": "Conținut generat de AI",
     "aiBadgeBody": "Transcrierea și rezumatul sunt produse automat de pipeline-ul AI în cluster. Pot conține erori; videoul rămâne sursa de referință.",
+    "captionsBadgeBody": "Transcrierea provine din subtitrările automate ale transmisiunii live și include doar intervențiile celor care și-au dat consimțământul. Poate conține erori.",
     "revisedByPerson": "Textul a fost revizuit de o persoană după generarea automată.",
     "searchPlaceholder": "Caută în transcriere…",
     "searchLabel": "Caută în transcriere",
@@ -4358,8 +4389,7 @@
     "backToGarden": "Arată piața",
     "aiNoticeTitle": "Procesare cu IA după eveniment",
     "aiNotice": "La final, înregistrarea va fi procesată cu instrumente de inteligență artificială pentru a genera transcriere, rezumat și eventuale traduceri și dublaje. Rezultatele pot conține inexactități; înregistrarea video rămâne sursa de referință.",
-    "multitrackConsentTitle": "Înregistrare per participant",
-    "multitrackConsentRequired": "Trebuie să accepți înregistrarea pistei tale audio pentru a intra",
+    "multitrackConsentTitle": "Transcrierea intervențiilor dvs.",
     "recordingConsentTitle": "Înregistrarea evenimentului",
     "recordingConsentIntro": "Evenimentul este înregistrat (audio și video). Dacă intervii, înregistrarea conține vocea ta, imaginea ta și ce partajezi pe ecran.",
     "recordingConsentRequired": "Pentru a intra este nevoie de consimțământul tău pentru înregistrare.",
@@ -4583,7 +4613,8 @@
       }
     },
     "captionsNoticeTitle": "Subtitrări automate",
-    "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul pentru subtitrări din bara apelului."
+    "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul pentru subtitrări din bara apelului.",
+    "captionsNoticeTranscript": "În timpul transmisiunii live, vocea vorbitorului este transcrisă în timp real pentru a afișa subtitrările, pe serverele care găzduiesc platforma. Textul se păstrează, cu numele, doar pentru cei care au fost de acord cu transcrierea intervențiilor lor și devine transcrierea evenimentului. Subtitrările pot fi ascunse cu butonul de subtitrări din bara apelului."
   },
   "recording": {
     "management": "Înregistrare video",

@@ -318,9 +318,9 @@ This is the security view: what each secret protects, what a leak gives an attac
 |---|---|---|---|
 | `APP_SECRET` | Signs `admin_session`, `event_access_*` and `join_granted_*` (HS256). Keys the email hash | Mint an administrator session and any event cookie. Test guessed addresses against stored hashes | Portal |
 | `PII_ENCRYPTION_KEY` | Personal fields and the Gravatar reference | Read every encrypted field in a copy of the database | Portal |
-| `JITSI_JWT_SECRET` (Prosody's `JWT_APP_SECRET`) | Jitsi JWTs | Join any conference, with any role claim | Portal, Prosody |
+| `JITSI_JWT_SECRET` (Prosody's `JWT_APP_SECRET`) | Jitsi JWTs, and, through a derived key, the signature of Prosody's occupants notifications | Join any conference, with any role claim. Report forged occupants to the portal, which decides whose voice is recorded and transcribed | Portal, Prosody |
 | `ADMIN_API_KEY` | Sign-in with the instance API key | Sign in as an administrator | Portal |
-| `CRON_API_KEY` | `/api/internal/*`, `/api/cron/*`, `/api/metrics`, the recording webhook | Run scheduled and internal operations, claim recordings (which returns a Jitsi token for the room), obtain presigned storage URLs and read metrics, from the internet through the default ingress | Portal, every job, JVB scaler, recorder controller and bot, AI orchestrator and worker, Jibri, Prometheus |
+| `CRON_API_KEY` | `/api/internal/*`, `/api/cron/*`, `/api/metrics`, the recording webhook | Run scheduled and internal operations, claim recordings (which returns a Jitsi token for the room), obtain presigned storage URLs and read metrics, from the internet through the default ingress | Portal, every job, JVB scaler, recorder controller and bot, AI orchestrator and worker, Jibri, Prometheus, the live captions gateway |
 | `RECORDING_WEBHOOK_SECRET` | Recording webhook signatures | Sign forged webhook bodies (the cron key is still required) | Portal, Jibri |
 | `DATABASE_URL` and the PostgreSQL passwords | The database | Read and write every row. Encrypted fields stay encrypted | Portal and its migration container, PostgreSQL |
 | Redis password | Redis | Read live chat and presence in plaintext, and inject messages into live streams | Portal, Redis |
@@ -489,6 +489,8 @@ The other pods of the release are deliberately not selected: the scheduled jobs,
   - the ingress controller's namespaces (`networkPolicy.ingress.fromNamespaceSelectors`) and `networkPolicy.ingress.fromPodSelectors`. When both lists are empty, any source may reach the port;
   - every pod that carries the release's selector labels, which admits the scheduled jobs, the scaler, the controller and the AI jobs;
   - the Jibri pods, when Jibri is enabled, for the end-of-recording upload;
+  - the Prosody pods, when the chart installs Jitsi (`jitsi.enabled`), for the occupants module's signed notifications;
+  - the live captions pods, when captions are enabled, for the room context and the transcript sentences;
   - the monitoring namespace, when `networkPolicy.ingress.allowMonitoring` is on (the default);
   - any rule in `networkPolicy.ingress.extraRules`.
 - **Egress** is allowed for:

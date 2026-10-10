@@ -7,12 +7,19 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
+  occupante: vi.fn(),
   glossaryForEvent: vi.fn(),
   listGlossary: vi.fn(),
   settings: { liveCaptionsEnabled: true, defaultLocale: 'it' } as Record<string, unknown>,
 }));
 
-vi.mock('@/lib/db', () => ({ prisma: { event: { findFirst: mocks.findFirst } } }));
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    // La stanza trova l'evento (findFirst), poi se ne leggono i dettagli (findUnique).
+    event: { findFirst: mocks.findFirst, findUnique: mocks.findFirst },
+    roomOccupant: { findFirst: mocks.occupante },
+  },
+}));
 vi.mock('@/lib/ai/glossary', () => ({
   glossaryForEvent: mocks.glossaryForEvent,
   listGlossary: mocks.listGlossary,
@@ -66,6 +73,36 @@ describe('GET /api/internal/captions/context', () => {
     }
   });
 
+  it("senza stanza l'evento si trova dall'id della riunione", async () => {
+    mocks.occupante.mockResolvedValue({ event: { id: 'e1', liveCaptionsEnabled: true, captionsTranscriptEnabled: true } });
+    mocks.findFirst.mockResolvedValue({
+      id: 'e1',
+      liveCaptionsEnabled: true,
+      captionsTranscriptEnabled: true,
+      organizerName: null,
+      moderatorName: null,
+      organizers: [],
+      additionalMods: [],
+    });
+    const body = await (await chiama('?meetingId=riunione-1')).json();
+    expect(mocks.occupante).toHaveBeenCalledWith(expect.objectContaining({ where: { meetingId: 'riunione-1' } }));
+    expect(body).toMatchObject({ enabled: true, transcript: true });
+  });
+
+  it("con la trascrizione dai sottotitoli il servizio manda le frasi al portale", async () => {
+    mocks.findFirst.mockResolvedValue({
+      id: 'e1',
+      liveCaptionsEnabled: true,
+      captionsTranscriptEnabled: true,
+      organizerName: null,
+      moderatorName: null,
+      organizers: [],
+      additionalMods: [],
+    });
+    const body = await (await chiama('?room=stanza')).json();
+    expect(body).toMatchObject({ enabled: true, transcript: true });
+  });
+
   it("stanza di un evento: glossario dell'evento, enti e persone, e il suo interruttore", async () => {
     mocks.findFirst.mockResolvedValue({
       id: 'e1',
@@ -76,11 +113,13 @@ describe('GET /api/internal/captions/context', () => {
       additionalMods: [{ name: 'cifrato' }],
     });
     const body = await (await chiama('?room=Stanza-UUID')).json();
+    // Prima il nome esatto, sull'indice unico.
     expect(mocks.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { jitsiRoomName: { equals: 'Stanza-UUID', mode: 'insensitive' } } }),
+      expect.objectContaining({ where: { jitsiRoomName: 'Stanza-UUID' } }),
     );
     expect(body).toEqual({
       enabled: false,
+      transcript: false,
       language: 'it-IT',
       phrases: ['SPID', 'PagoPA', 'Ente di prova', 'Ente partner', 'Relatore 1', 'chiaro:cifrato'],
       aliases: [

@@ -56,6 +56,8 @@ interface EventData {
   registrationCount: number;
   status: string;
   recordingUrl: string | null;
+  /** La trascrizione si legge anche senza il video pubblicato. */
+  transcriptPublished?: boolean;
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
@@ -260,11 +262,11 @@ export default function EventDetailClient({
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
-  // o non ha recording pubblicata — niente trascrizione da mostrare.
+  // o non ha ne' il video ne' la sola trascrizione pubblicati.
   // L'endpoint 404 quando postprod non è abilitato per l'evento; in
   // quel caso lasciamo lo state null e il player gira "nudo".
   useEffect(() => {
-    if (!isEnded || !event.recordingUrl) return;
+    if (!isEnded || (!event.recordingUrl && !event.transcriptPublished)) return;
     let cancelled = false;
     fetch(`/api/events/${event.slug}/postprod/transcript`, { credentials: 'include' })
       .then(async (r) => {
@@ -318,7 +320,10 @@ export default function EventDetailClient({
         setPostprodMeta({
           subtitleTracks: meta.subtitles.length > 0 ? meta.subtitles : undefined,
           audioTracks: meta.audio.length > 0 ? meta.audio : undefined,
-          transcriptAvailable: meta.subtitles.length > 0 || meta.audio.length > 0,
+          // Anche la sola trascrizione, senza sottotitoli del video (quella
+          // dai sottotitoli live di un evento senza registrazione).
+          transcriptAvailable:
+            meta.subtitles.length > 0 || meta.audio.length > 0 || meta.segmentsLite.length > 0,
           summariesStructured:
             meta.summariesStructured && Object.keys(meta.summariesStructured).length > 0
               ? meta.summariesStructured
@@ -335,7 +340,7 @@ export default function EventDetailClient({
     return () => {
       cancelled = true;
     };
-  }, [isEnded, event.recordingUrl, event.slug]);
+  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug]);
 
   return (
     <div className="container py-5">

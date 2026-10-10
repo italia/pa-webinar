@@ -18,6 +18,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { assertPostprodAccessible } from '@/lib/ai/access';
 import { LOWCONF_AVG_LOGPROB } from '@/lib/ai/reliability';
 import { alignDiarizationToSpeakers } from '@/lib/ai/speaker-align';
+import { CAPTIONS_TRANSCRIPT_MODEL, registrazionePubblica } from '@/lib/captions/transcript';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,11 +48,13 @@ interface TranscriptJson {
 export const GET = withErrorHandling(async (_request, context) => {
   const { param: slug } = (await (context as { params: Promise<{ param: string }> }).params);
 
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(slug);
 
-  const recording = await prisma.recording.findFirst({
-    where: { eventId, status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] } },
-    orderBy: { createdAt: 'desc' },
+  // Prima la trascrizione AI, poi quella dai sottotitoli (lib/captions/transcript).
+  const scelta = await registrazionePubblica(eventId, soloSottotitoli);
+  if (!scelta) throw new NotFoundError('Transcript');
+  const recording = await prisma.recording.findUnique({
+    where: { id: scelta },
     select: {
       id: true,
       sourceLanguage: true,
@@ -77,6 +80,7 @@ export const GET = withErrorHandling(async (_request, context) => {
           inlineBody: true,
           blobKey: true,
           revisedAt: true,
+          modelId: true,
           original: { select: { id: true } },
         },
       },
@@ -93,6 +97,13 @@ export const GET = withErrorHandling(async (_request, context) => {
     },
   });
   if (!recording) throw new NotFoundError('Transcript');
+  // Pubblicata la sola trascrizione (o pipeline spenta): niente sintesi,
+  // traduzioni, sottotitoli e doppiaggio, che accompagnano il video.
+  if (ambito !== 'tutto') {
+    recording.artifacts = recording.artifacts.filter(
+      (a) => a.type === 'TRANSCRIPT_JSON' && a.language === null,
+    );
+  }
 
   const transcriptJson = recording.artifacts.find(
     (a) => a.type === 'TRANSCRIPT_JSON',
@@ -242,6 +253,9 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   return Response.json({
     aiGenerated: true,
+    // Da dove viene la trascrizione: la pipeline AI o i sottotitoli automatici
+    // della diretta (lib/captions/transcript), che il pannello dichiara diversi.
+    source: transcriptJson?.modelId === CAPTIONS_TRANSCRIPT_MODEL ? 'live-captions' : 'ai',
     revised: {
       transcript: !!transcriptJson?.revisedAt || !!transcriptJson?.original,
       summaries: [...new Set(revisedSummaries)],

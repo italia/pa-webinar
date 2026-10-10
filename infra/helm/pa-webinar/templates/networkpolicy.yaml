@@ -104,6 +104,20 @@ spec:
         - protocol: TCP
           port: {{ $appPort }}
     {{- end }}
+    {{- if .Values.jitsi.enabled }}
+    # Prosody: il modulo pa_occupants dice al portale chi entra ed esce dalla
+    # sala (PA_PORTAL_URL), perché trascrizione e registrazione per persona
+    # seguano il consenso di ciascuno.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ (dig "nameOverride" "" $jm | default "jitsi-meet") | trunc 63 | trimSuffix "-" | quote }}
+              app.kubernetes.io/instance: {{ .Release.Name | quote }}
+              app.kubernetes.io/component: prosody
+      ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    {{- end }}
     {{- if include "pa-webinar.captionsEnabled" . }}
     # Il servizio dei sottotitoli chiede al portale lingua e vocabolario
     # della stanza (CAPTIONS_CONTEXT_URL). I suoi pod hanno etichette

@@ -46,7 +46,8 @@ need the transparency facts. Related pages:
 
 Every output is a `PostprodArtifact` row that points to one file in object
 storage. `PostprodArtifactType` in `app/prisma/schema.prisma` is the
-authoritative list.
+authoritative list. The one exception is the transcript built from live
+captions (see below), which is not produced by this pipeline and has no file.
 
 | Artifact type | Produced by | Language | Contents | Where it is used |
 |---|---|---|---|---|
@@ -75,6 +76,38 @@ translated subtitles are `TRANSLATION_VTT`.
   recording. Captions during the event are a separate service, a streaming
   recognizer on CPU next to the conference ([Live captions](architecture/live-captions.md)).
   It shares this pipeline's glossary and its sovereignty rule, not its queue.
+
+**The transcript from live captions.** An event with **Transcript from
+captions** gets a transcript without this pipeline and without a GPU: after
+the event, the caption sentences of the people who consented become a
+`TRANSCRIPT_JSON` artifact with `modelId` `live-captions`, in the same shape
+as the pipeline's, kept only in the database (`inlineBody`, empty `blobKey`).
+It goes on the event's recording with media (a file, or per-participant
+tracks once their manifest has given the media start), timed from the same
+zero this pipeline uses (`recordingTimeZero`); when the event has none, on a
+recording without media (empty `blobKey`, status `POSTPROD_DONE`). It moves to
+the recording with media when that arrives later. A recording with media and
+no source language gets the transcript's. While this pipeline is transcribing
+a recording of the event, nothing is built or moved (`ai-in-corso`); if the
+job fails, a later pass builds it. The editor, the speaker names, the erasure
+mode, the `.txt` and `.srt` downloads and the event page use it like an AI
+transcript ([Public experience](#public-experience) has the conditions); no
+subtitle track, summary or translation is made from it, so the **Download**
+menu offers no `.vtt`. It is never built while any recording of the event
+carries an AI transcript or one corrected by hand: the builder checks, and
+reads the sentences, under a per-event database lock, which the registration
+of an AI transcript and an erasure request for the same event also take.
+
+A later run of this pipeline on the same recording replaces it: when the AI
+transcript is registered, the speaker labels of the transcript from captions,
+with their names, are deleted before the AI's are written, and the event's
+recordings without media whose transcript from captions was not corrected by
+hand are deleted (`app/src/app/api/internal/postprod-artifact/route.ts`).
+Because an AI transcript would also discard manual corrections, the automatic
+enqueue does nothing, and **Generate AI** and **Re-run** answer `409`, for a
+recording whose transcript from captions was corrected by hand. How it is
+built and who decides what it keeps:
+[Live captions](architecture/live-captions.md#transcript-from-captions).
 
 ## Data sovereignty
 
@@ -159,14 +192,20 @@ there is work: the GPU node pool scales to zero between runs.
 | Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. | `TRANSCRIBE` |
 | Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. | `TRANSCRIBE_MULTITRACK` |
 | **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives. The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
-| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording. | detected |
+| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. | detected |
 | **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. | detected |
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
 
 Every path goes through `app/src/lib/ai/enqueue.ts`, and every path is gated
 by the site-wide switch `aiPipelineEnabled`: the automatic paths do nothing
-while it is off, and the admin routes answer with an error. "Detected" means
+while it is off, and the admin routes answer with an error. A recording
+without media, which only carries a transcript from live captions, is never
+queued: the enqueue does nothing for it, and **Generate AI** (both routes) and
+**Re-run** answer `400`. On a recording whose transcript from live captions
+was corrected by hand, the automatic paths (recording webhook, track manifest,
+lifecycle) do nothing and the admin routes answer `409`. The event page counts only recordings with a media
+file when it decides whether to offer **Generate AI now**. "Detected" means
 that the root job is `TRANSCRIBE_MULTITRACK` when the recording's key is the
 multitrack placeholder or the recording has any `RecordingTrack` rows, and
 `TRANSCRIBE` otherwise.
@@ -375,7 +414,10 @@ A job whose dependency failed is never runnable and stays `PENDING`.
 | `ARCHIVED` | The retention job purged the recording's artifacts. |
 
 `POSTPROD_RUNNING` exists in the enum but no code sets it: a recording stays
-`POSTPROD_QUEUED` while its jobs run.
+`POSTPROD_QUEUED` while its jobs run. A recording without media, created to
+hold a transcript from live captions, is created `POSTPROD_DONE` and never
+enters the queue; a transcript from captions added to an existing recording
+leaves its status as it is.
 
 Both checks cover the jobs of every run, not only the latest:
 
@@ -873,6 +915,11 @@ for their fields; deletion and retention are described in
 | `speakers` (`Speaker`) | One speaker label per recording: display name in plain text, optional link to an address-book `Person`, total speaking time |
 | `glossary_terms` (`GlossaryTerm`) | The [glossary](#glossary): instance terms (no event) and event terms, each with its forms to correct, reading, pronunciations, fixed translations and meaning |
 
+The transcript from live captions is built from two tables outside this
+pipeline, `caption_segments` (`CaptionSegment`) and `room_occupants`
+(`RoomOccupant`), described in
+[Live captions](architecture/live-captions.md#transcript-from-captions).
+
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#E6F0FA", "primaryBorderColor": "#0066CC", "primaryTextColor": "#17324D", "lineColor": "#5C6F82", "tertiaryColor": "#F7F9FB", "edgeLabelBackground": "#FFFFFF"}}}%%
 erDiagram
@@ -887,7 +934,7 @@ erDiagram
 
   RECORDING {
     uuid id PK
-    string blobKey "composite MP4 or multitrack placeholder"
+    string blobKey "composite MP4, multitrack placeholder, or empty for a transcript from captions"
     RecordingStatus status
     int runCount "storage run folder"
     jsonb consentSnapshot "event AI flags at enqueue"
@@ -1270,12 +1317,12 @@ this table gives only their effect on the pipeline.
 
 | Field | UI label | Effect on the pipeline |
 |---|---|---|
-| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off. It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
+| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
 | `aiAsrProvider`, `aiLlmProvider`, `aiTtsEngine` | **Transcription engine**, **Summary and translation engine**, **Dubbing engine** | One allowed value each ([Data sovereignty](#data-sovereignty)) |
 | `aiDefaultTargetLocales` | **Default translation languages** | Target languages ticked in the wizard when translation is turned on, and used for events without their own (`en,fr,es,de` on a new installation) |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
-| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
+| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime; with only the transcript published, the transcript stays while published and the other outputs follow the event's retention. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
 | `aiConsentDisclosure` | **AI notice in the waiting room** | Per-language notice text; empty uses the built-in text |
 
 ### Per-event settings
@@ -1289,7 +1336,7 @@ language) and per-participant recording.
 | Field | UI label | Effect |
 |---|---|---|
 | `aiTranscriptEnabled` | **Automatic transcription** | Required for everything else. Turning it off in the wizard also turns off summary, translation, dubbing and per-participant recording. |
-| `multitrackRecordingEnabled` | **Per-participant recording (high accuracy)** | Records one track per participant, with each participant's explicit consent ([Recording](architecture/recording.md)) |
+| `multitrackRecordingEnabled` | **Per-participant recording (high accuracy)** | Records one track per participant who consented to the transcription of what they say; the voices of the others are not recorded and do not appear in the transcript ([Recording](architecture/recording.md#consent-gates)) |
 | `retainParticipantTracks` | **Keep per-participant tracks** | Keeps the tracks after transcription, for per-speaker playback and the archive |
 | `aiSummaryEnabled` | **Summary and chapters** | Adds `SUMMARIZE` |
 | `aiTranslationEnabled` | **Translation into other languages** | Adds `TRANSLATE` for each target language |
@@ -1362,7 +1409,13 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 - **Transcript** is the editor: each segment with its speaker, a waveform
   when `WAVEFORM_JSON` exists, and playback of the source media through a
   short-lived signed URL. The speaker roster maps each label to a free-text
-  name or, for administrators only, to a person in the address book.
+  name or, for administrators only, to a person in the address book. A
+  recording without media, which carries only a transcript from live
+  captions, has no player: the editor says so, and the page offers **Update
+  from captions** instead of **Generate AI** and **Re-run**. It rebuilds the
+  transcript from the stored sentences, unless the transcript was corrected by
+  hand or the event's data retention has ended; when the rebuild moves the
+  transcript to the recording with video, the page goes to that recording.
 - **Summary** edits the Markdown and structured summary of each language.
 - **Translations** shows the translated languages and adds new ones.
 - **Archive** plays each retained participant track in sync with the video,
@@ -1375,8 +1428,8 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 
 | Action | What it does | Audit action |
 |---|---|---|
-| **Generate AI** | Turns on transcription and summary for the event and enqueues. The recording page shows it only for `READY` recordings; the event page's **Generate AI now** is always shown once the event has ended and has a recording. Repeating it on a finished run leaves the recording `POSTPROD_QUEUED` ([Idempotency and runs](#idempotency-and-runs)). | `POSTPROD_RERUN` |
-| **Re-run** | New run: bumps `runCount`, sets `POSTPROD_QUEUED`, enqueues a full graph. Refused while the event has transcription off. | `POSTPROD_RERUN` |
+| **Generate AI** | Turns on transcription and summary for the event and enqueues. The recording page shows it only for `READY` recordings; the event page's **Generate AI now** is always shown once the event has ended and has a recording. Repeating it on a finished run leaves the recording `POSTPROD_QUEUED` ([Idempotency and runs](#idempotency-and-runs)). Refused with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
+| **Re-run** | New run: bumps `runCount`, sets `POSTPROD_QUEUED`, enqueues a full graph. Refused while the event has transcription off, and with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
 | **Cancel** | Marks every `PENDING`, `CLAIMED` and `RUNNING` job of the recording `FAILED` (`cancelled by admin`) and the recording `POSTPROD_FAILED` | `POSTPROD_CANCEL` |
 | **Add language** | One `TRANSLATE` job for a language other than the source, plus `DUB` if dubbing is on. The tab offers the languages enabled on the site that are not yet translated. Needs an existing `TRANSCRIPT_JSON`. | `POSTPROD_TRANSLATE_ADD` |
 | **Generate archive** | One `ARCHIVE` job. Needs unpurged tracks and the composite MP4. | `POSTPROD_ARCHIVE` |
@@ -1419,25 +1472,48 @@ certain**. The data-subject rights flow is described in
 
 ## Public experience
 
-AI outputs are public only for a recording that is published. Every public
-endpoint under `/api/events/<slug>/postprod/` answers `404` unless all of
-these hold (`app/src/lib/ai/access.ts`):
+AI outputs are public only for a recording that is published, and a
+transcript also when it is published on its own. Every public endpoint under
+`/api/events/<slug>/postprod/` answers `404` unless all of these hold
+(`app/src/lib/ai/access.ts`):
 
-- the site switch `aiPipelineEnabled` is on;
-- the event exists and `recordingPublished` is true;
+- the site switch `aiPipelineEnabled` is on, or the event keeps a transcript
+  from live captions (`captionsTranscriptEnabled`);
+- the event exists and its video (`recordingPublished`) or its transcript
+  (`transcriptPublished`, set from the **Transcript from captions** panel) is
+  published;
 - the post-event page is public (`postEventPublic`) and, when set,
   `postEventPublicUntil` has not passed.
 
 The same `404` covers every case, so the endpoints do not reveal why an
 output is unavailable.
 
+What passes the gate depends on its scope (`ambito` in `access.ts`):
+
+- **Everything** when the video is published and the site switch is on: the
+  transcript, subtitles, summaries, translations and dubbing.
+- **The transcript only** when only the transcript is published, or the site
+  switch is off: the transcript text in its source language. The transcript
+  response carries no summaries, subtitle tracks or dubbed audio; the subtitle
+  and dubbed-audio endpoints answer `404`; the downloads serve `transcript.txt`
+  and `transcript.srt` in the source language and nothing else. With the site
+  switch off, only a transcript built from live captions is served, never an
+  AI transcript.
+
 A fourth condition applies to the transcript and the downloads: they come
-from the most recent of the event's recordings whose status is
-`POSTPROD_DONE` or `POSTPROD_PARTIAL`. The event page builds its subtitle and
-audio menus, its summary card and its transcript tab from the transcript
-response. For an event with one recording, all of them are therefore hidden
-while that recording is `POSTPROD_QUEUED` (a run in progress),
-`POSTPROD_FAILED` (after **Cancel**) or `ARCHIVED`. The subtitle and dubbed-audio endpoints
+from one recording of the event, chosen in this order
+(`registrazionePubblica` in `app/src/lib/captions/transcript.ts`): the latest
+recording with an AI transcript and status `POSTPROD_DONE` or
+`POSTPROD_PARTIAL`; else the recording with a transcript from live captions,
+the one with video first; else the latest recording with one of those two
+statuses. With the site switch off, only the recording with a transcript from
+live captions. The transcript response
+says where the text comes from (`source`: `ai` or `live-captions`). The event
+page builds its subtitle and audio menus, its summary card and its transcript
+tab from the transcript response. For an event with one recording, all of
+them are therefore hidden while that recording is `POSTPROD_QUEUED` (a run in
+progress), `POSTPROD_FAILED` (after **Cancel**) or `ARCHIVED`, unless it
+carries a transcript from live captions. The subtitle and dubbed-audio endpoints
 themselves serve the newest matching artifact of the event whatever the
 recording's status, but the page does not link them then. How an event reaches that state is described in
 [From creation to recap](architecture/event-journey.md).
@@ -1447,7 +1523,7 @@ recording's status, but the page does not link them then. How an event reaches t
 | `GET …/postprod/transcript` | Segments with display names, low-confidence flags, the available subtitle languages, the summaries of each language and the public `pipelineSnapshot` |
 | `GET …/postprod/subtitle/<lang>` | The WebVTT file: inline from the database when it has an inline copy, otherwise a `302` to a signed storage URL |
 | `GET …/postprod/dubbed-audio/<lang>` | A `302` to a signed URL of the `.m4a` file |
-| `GET …/postprod/download/<file>` | `transcript.txt`, `transcript.srt` and `summary.md` as attachments, with `?lang=`. Any other file name answers `400`; the **Download** menu's `.vtt` link points to `…/postprod/subtitle/<lang>` |
+| `GET …/postprod/download/<file>` | `transcript.txt`, `transcript.srt` and `summary.md` as attachments, with `?lang=`. When the recording has no source language, which a recording without media may lack, the transcript is served in its own language whatever `?lang=` asks. File names carry the language the content is actually in. Any other file name answers `400`; the **Download** menu's `.vtt` link, shown only when a subtitle file exists for the language, points to `…/postprod/subtitle/<lang>` |
 
 On the event page:
 
@@ -1475,13 +1551,17 @@ generated by AI. The pipeline marks its outputs in six ways:
   transcript included, and records the producing component in `modelId` and
   `modelVersion`. Per-participant transcripts record `multitrack`, so the
   provenance panel shows that value as the speech-recognition model; the
-  archive records `archive-mux`, and the waveform records none.
+  archive records `archive-mux`, the transcript from live captions
+  `live-captions`, and the waveform records none.
 - **In the interface.** The transcript and summary carry the badge
   **AI-generated content**, with the text "Transcript and summary are
   produced automatically by the in-cluster AI pipeline. They may contain
   errors; the video remains the authoritative source." The disclaimer is part
-  of the interface, not of the summary file. Dubbed audio shows the synthetic
-  voice banner.
+  of the interface, not of the summary file. A transcript from live captions
+  carries the same badge with its own text: "The transcript comes from the
+  live event's automatic captions and includes only the contributions of
+  people who gave their consent. It may contain errors." Dubbed audio shows
+  the synthetic voice banner.
 - **In the files.** The portal marks every output it serves, when it serves
   it (`app/src/lib/ai/marking.ts`), so outputs produced before this marking
   carry it too, and the stored files the worker reads back stay unchanged:
@@ -1770,10 +1850,13 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   of a run finishes by registering an artifact; a run whose last job fails,
   or that never completes, keeps the previous snapshot. Its LLM vendor and license are fixed values
   ([Choosing another model](#choosing-another-model)).
-- **Consent is per event.** `Registration` has columns for per-person consent
-  to transcription, summary and translation, but nothing writes or reads them.
-  `consentSnapshot` is a record of the event's flags, not a gate
-  ([Snapshots](#snapshots)).
+- **Consent to AI processing is per event.** `Registration` has columns for
+  per-person consent to transcription, summary and translation, but nothing
+  writes or reads them. `consentSnapshot` is a record of the event's flags,
+  not a gate ([Snapshots](#snapshots)). The only per-person consent is the
+  transcription of one's own contributions, which decides which tracks the
+  recorder records and what the transcript from live captions keeps; a
+  composite recording is transcribed whole.
 - **Corrections do not reach derived outputs.** Translations, summaries and
   dubbing cannot be regenerated from an edited transcript without discarding
   the edits.

@@ -43,6 +43,8 @@ owner:
 | Site privacy page, `/<locale>/privacy`, linked from the footer as **Privacy policy** | Your site-wide text, or the built-in generic text | **Settings** > **General** > **Pages** > **Privacy policy** |
 | Waiting room | **This event is being recorded.** when recording is enabled and the installation can record (Jibri, or the per-participant recorder), or the registration form's information notice for a listen-only event; an **AI processing after the event** notice when AI post-production applies | Event flags; **Settings** > **General** > **Post-event AI pipeline** > **AI notice in the waiting room** |
 | Waiting room, before entering | For whoever has not given it at registration (guests, registrants on another browser), the recording consent box under **Event recording**, with the event's notice next to it: the same text or link as the registration form | Built-in text (`waiting.recordingConsentIntro`), or the event's `recordingConsentText` |
+| Waiting room, before entering | For whoever has not given it (moderators and speakers included), the optional transcription box under **Transcript of what you say**, when the event records per-participant audio or keeps a transcript from captions | Built-in texts `gdpr.consent.multitrack` and `gdpr.consent.multitrackOptional` |
+| Waiting room, live captions | That speech is transcribed in real time for the captions, and whether the text is kept: not at all, or with the name for the people who consented | Built-in texts `waiting.captionsNotice` and `waiting.captionsNoticeTranscript`; the event's **Automatic captions** and **Transcript from captions** |
 | During the call | A **Recording in progress** banner for everyone while a recording runs | Automatic |
 
 The event page does not link the event's notice. Guests, where they are
@@ -152,7 +154,7 @@ language with **Settings** > **Languages** > **Custom translations**.
 |---|---|---|---|
 | Participation | Always, with a statistical purpose appended when organization fields are on | Yes | `registration.gdprConsent`, `registration.gdprConsentProfiling` |
 | Audio and video recording | When `recordingEnabled` is on and participants may use the microphone, camera or screen. Otherwise the form shows an information notice instead of a box, and so does the live room's dialog | Yes | `gdpr.consent.recording`; the notice is `gdpr.consent.recordingNotice` |
-| Per-participant audio track | When `multitrackRecordingEnabled` is on, also for listen-only events | Yes | `gdpr.consent.multitrack` |
+| Transcription of the person's contributions, with their name | When `multitrackRecordingEnabled` is on, also for listen-only events, or when the event keeps a transcript from captions (`captionsTranscriptEnabled`, with captions available) | No: whoever leaves it unticked takes part, but is neither recorded on a track of their own nor kept in the transcript | `gdpr.consent.multitrack`, with the note `gdpr.consent.multitrackOptional` |
 | Upcoming events and address book | Always, one box for being contacted about upcoming events: it sets both `consentFutureCommunications` and the address-book opt-in, and the address-book withdrawal link revokes both | No | `gdpr.consent.stayInTouch`, `gdpr.consent.stayInTouchHelp`; see [Address book](#address-book) |
 
 The form groups the boxes under **Consents** and marks each one **required** or **optional**. Rules in
@@ -182,6 +184,7 @@ flowchart LR
     PUB["Published video<br/><code>recordingPublished</code> · <code>libraryListed</code><br/>publications"]:::flag
     AI["AI post-production<br/><code>aiTranscriptEnabled</code> … <code>aiDubbingEnabled</code><br/>+ <code>aiPipelineEnabled</code>"]:::flag
     VOICE["Per-participant audio<br/><code>multitrackRecordingEnabled</code><br/>+ <code>retainParticipantTracks</code>"]:::flag
+    CAP["Live captions<br/><code>liveCaptionsEnabled</code><br/>+ <code>captionsTranscriptEnabled</code>"]:::flag
     THIRD["Gravatar<br/><code>gravatarEnabled</code>"]:::flag
   end
   style PORTAL fill:#F7F9FB,stroke:#0066CC,color:#17324D
@@ -197,6 +200,7 @@ flowchart LR
     N_PUB["Public disclosure<br/>and how long it lasts"]:::mid
     N_AI["AI outputs: purpose, accuracy,<br/>AI Act transparency"]:::high
     N_VOICE["Isolated voice: separate consent,<br/>minimization, deletion"]:::high
+    N_CAP["Real-time transcription,<br/>a kept transcript: consent,<br/>names, publication"]:::mid
     N_THIRD["Extra recipient,<br/>transfer outside the EU"]:::high
   end
   style NOTICE fill:#F7F9FB,stroke:#5C6F82,color:#17324D
@@ -210,6 +214,7 @@ flowchart LR
   PUB --> N_PUB
   AI --> N_AI
   VOICE --> N_VOICE
+  CAP --> N_CAP
   THIRD --> N_THIRD
 ```
 
@@ -234,7 +239,10 @@ feature on and what the notice should say about it.
 | The square | Offered in the waiting room; the waiting-room engine sets only the starting view ([Engines](../architecture/waiting-room.md#engines-classic-view-and-the-square)) | Display name and position, visible to others waiting who have access to the room (people who only know the address see positions without names), expiring seconds after the last update ([Presence](../architecture/waiting-room.md#presence)) |
 | Raised hands and call analytics | Always; shown in the event's **Statistics** tab | Attendance, who spoke when and who raised a hand, per call session |
 | Composite recording | `recordingEnabled` | Video and mixed audio of the conference, shared screens included |
-| Per-participant audio | `multitrackRecordingEnabled` | One isolated voice track per participant, labeled with a name |
+| Per-participant audio | `multitrackRecordingEnabled` | One isolated voice track per participant who consented to the transcription of what they say, labeled with a name; nobody else's voice is recorded on a track of its own |
+| Live captions | `liveCaptionsEnabled` on the instance and on the event, where the installation runs the captions service; on by default | The voice of everyone who speaks is transcribed in real time inside the installation, and every participant sees the captions with the speaker's name. Without a transcript from captions no text is kept |
+| Transcript from captions | `captionsTranscriptEnabled` per event, off by default; the new-event questions turn it on for events that can be recorded | The sentences of the people who consented, with their name, become the event's transcript, which staff can correct and publish on the event page; for everyone else only the times of their sentences are kept |
+| Who is in the room | Every event, where the installation runs live captions and **Automatic captions in video calls** is on, whatever the event's own captions switch; events with per-participant recording. In both cases where Prosody loads the project's occupants module (the chart and Docker Compose do) | Which conference seat stands behind each voice on the bridge, with join and leave times and no names. It lets the recorder and the transcript from captions honor each person's consent, also for people who joined before the transcript was turned on, and is deleted at the event's retention. For other events, nothing |
 | AI outputs | `aiPipelineEnabled` and the event's AI flags | Transcript with speaker labels, summary, translations, subtitles, dubbed audio. Staff can map a speaker label to a name or an address-book entry |
 | Address book | The optional box on every registration form | See [Address book](#address-book) |
 | Invitations | Staff add them in the event wizard. The platform sends no invitation email | The invitee's name and email. When an event is open only to invitees (**Only people you invite**, or **Public registration enabled** off for an event without a choice of its own), the list decides who may register, and the personal join link reaches the registrant only by email |
@@ -263,10 +271,11 @@ Check each row against the basis you rely on.
 | Registering and joining | Requires the participation box, whose default label speaks of consent | If you rely on a public task (Art. 6(1)(e)) rather than consent, change the label (`registration.gdprConsent`). The box stays mandatory |
 | Organization data | Appends a statistical purpose to the participation box | State the statistical purpose and who sees the data (**Sign-ups** and its CSV export) |
 | Recording | Requires the recording box at registration and shows the **Recording consent** screen to registrants and guests | Moderators and speakers entering by magic link see neither: collect their agreement outside the platform |
-| Per-participant audio | Requires a separate box at registration, and again in the waiting room for anyone who has not given it, speakers included | Moderators are exempt from the waiting-room box. The waiting-room tick is not recorded; only the registration box is stored (`consentMultitrack`) |
+| Per-participant audio and the transcript from captions | Asks for one separate, optional box at registration and again in the waiting room of anyone who has not given it, moderators and speakers included. Records, and keeps in the transcript, only the voices of those who tick it | Both answers are stored, with the version of the text they were given to: the registration box (`consentMultitrack`, `consentMultitrackVersion`) and the waiting-room tick for the conference seat (`MultitrackConsent`). The transcript from captions counts only the current version, so people who consented to an earlier text are asked again. Say that refusing changes nothing else about taking part. The version is set in the code (`app/src/lib/registration/consents.ts`): a custom translation of the box does not change it, so keep its purpose |
 | Future communications | Records the choice and shows it in **Sign-ups** and its CSV export. Nothing in the platform sends mail based on it | Describe the channel you use, or change the label if you do not use it |
 | Recording notice | On by default per event: once, when the event's recording or external video is visible on its public page, emails every registration the event still keeps, with the event page link. It does not depend on the future-communications box, and nobody is notified once retention has deleted the registrations | State it as part of the registration's purpose, or turn **Notify registrants when the recording is published** off on the event before it is sent |
 | Address book | Separate optional consent | See [Address book](#address-book) |
+| Live captions | Shows a notice in the waiting room. Showing the captions asks for no consent | State the purpose, typically accessibility of the live event, and that nothing is kept unless the event keeps a transcript from captions |
 | AI post-production | Shows a notice in the waiting room. It asks for no consent | Choose a basis that does not depend on per-person consent, or collect consent outside the platform |
 | Event analytics | Attendance, speaking time and raised hands per participant, shown pseudonymously by default | State the purpose, typically running and evaluating the event |
 | Material open count | Counts the openings and downloads of each material, in the room and on the event page, as one number per material shown only to moderators. Nothing records who opened what; the IP address of a caller without a valid room token is held in memory for 10 minutes only to avoid counting the same click twice | State the purpose, typically evaluating which materials the audience uses |
@@ -282,7 +291,7 @@ Check each row against the basis you rely on.
 | Your monitoring and logging stack | Always | Ingress, load balancer, Jitsi and TURN logs, which usually contain IP addresses ([Monitoring and health](../operations/monitoring.md)) |
 | Staff | Always | Administrators see everything and can export sign-ups as CSV; organizers see their own events; moderators see what happens in their room, including, in the participants panel, the name and email address given at registration or on a named grant for each person in the call. Speakers do not see these |
 | Other participants | Always | Display names and avatars in the room, chat and Q&A authors, and the chat download. People in the square who have access to the room see each other's display names and positions. Registrants receive the primary moderator's name and email address as the organizer of the calendar file attached to their confirmation, reminder and date-change emails |
-| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a published recording and its AI outputs, publications, and the event recap |
+| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a published recording and its AI outputs, a published transcript from captions with its speakers' names, publications, and the event recap |
 
 AI post-production has no external recipient. Every engine the application
 accepts runs inside the installation's cluster (`app/src/lib/ai/providers.ts`),
@@ -317,7 +326,9 @@ What each job deletes is in the
 | Earlier recordings of the same event | Not deleted by retention: each new recording replaces the one the event points to, and the older ones stay referenced by their call session | Delete them from **Video recordings** or from the event's sessions |
 | Temporary recording | `TEMP_RECORDING_TTL_MS` in `app/src/lib/gdpr/cleanup-selection.ts` | Not configurable |
 | Per-participant audio | Transcription, or the event's retention when tracks are kept | **Keep per-participant tracks**, wizard advanced settings, **Recording and AI**; details in [Recordings, voice data and AI outputs](recordings-and-ai.md#retention-regimes) |
-| AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
+| AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is. With only the transcript published, the transcript stays while published and the other outputs go at the event's retention | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
+| Caption sentences and the record of who was in the room | The event's retention | As event personal data |
+| Transcript from captions | The event's retention, deleted by the cleanup job on every installation, unless the event's video or transcript is published; then for as long as either stays published | **Publish the transcript on the event page** in the event's **Transcript from captions** panel, and the recording's publication |
 | Event record and recap | Nothing deletes them. After its retention the event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
 | Address book | `retentionMonths` after the person's last registration (default in `app/prisma/schema.prisma`, not editable in the administration area); opted-out entries at the next run | Delete entries under **Address book** |
 | Profile photos | Kept while a registration with the same email address exists, at any event; then deleted once 30 days have passed since the photo last changed (`app/src/app/api/cron/cleanup/route.ts`). Self-service erasure deletes it | Not configurable. The person can remove it in the waiting room |
@@ -344,7 +355,9 @@ Your notice should state at least:
   is published. A published recording plays on the concluded event page and, if
   listed, in the **Video library**. Its AI outputs are public when the AI
   pipeline is on, the recording is published and the event page is visible
-  after the end (`app/src/lib/ai/access.ts`). When the recording or an
+  after the end (`app/src/lib/ai/access.ts`). A transcript can also be
+  published on its own, without a video: then only its text in the source
+  language is public, without summaries, translations, subtitles or dubbing. When the recording or an
   external video becomes visible there, the event's registrants receive one
   email about it, unless the event turns the notice off
   ([Recording notice](../architecture/email.md#recording-notice)).
@@ -353,8 +366,17 @@ Your notice should state at least:
   unless **Publish in the video library now** is unticked, and have no deletion
   date. Speakers' images and voices in them stay public until someone sets one.
 - **Per-participant audio.** Its purpose (attributing the transcript), the
-  separate mandatory consent, deletion after transcription, and the longer
-  retention when tracks are kept.
+  separate, optional consent, that only the voices of those who give it are
+  recorded, deletion after transcription, and the longer retention when tracks
+  are kept.
+- **Live captions and the transcript from captions.** That speech is
+  transcribed in real time inside the installation to show captions to
+  everyone. When an event keeps a transcript from captions: that the text and
+  name of the people who consent are stored and become the event's transcript,
+  that the others' words are not kept, that staff may correct and publish it
+  on the event page, that erasure of a registration removes the person from
+  it, and how long it is kept
+  ([Recordings, voice data and AI outputs](recordings-and-ai.md#transcript-from-live-captions)).
 - **AI processing.** Which outputs are produced (transcript, summary,
   translations, subtitles, dubbing with synthetic catalog voices, never cloned
   voices), that everything runs inside the installation, that outputs can be

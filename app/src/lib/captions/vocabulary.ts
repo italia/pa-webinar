@@ -74,6 +74,9 @@ export function aliasRules(glossary: GlossaryEntry[]): Array<{ term: string; ali
 
 export interface CaptionsContext {
   enabled: boolean;
+  /** L'evento tiene la trascrizione dai sottotitoli: il servizio manda al
+   *  portale le frasi definitive (Event.captionsTranscriptEnabled). */
+  transcript?: boolean;
   language: string;
   phrases: string[];
   aliases: Array<{ term: string; aliases: string[] }>;

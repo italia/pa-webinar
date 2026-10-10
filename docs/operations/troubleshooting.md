@@ -404,7 +404,7 @@ When the target does not appear at all, `metrics.serviceMonitor.additionalLabels
 
 **Cause.** The chart's policy (`templates/networkpolicy.yaml`) selects only the app pods: the pods of the release that carry no `app.kubernetes.io/component` label. The scheduled jobs, the JVB scaler, the config-reload hook, the recorder controller and the post-production orchestrator and worker are not selected, so their own traffic is not restricted.
 
-- **Into the app (port 3000)** it admits the namespaces in `networkPolicy.ingress.fromNamespaceSelectors` and the pods in `fromPodSelectors` (any source when both lists are empty), every pod that carries the release's selector labels, the Jibri pods of the same release when Jibri is enabled, and the monitoring namespace while `allowMonitoring` is on.
+- **Into the app (port 3000)** it admits the namespaces in `networkPolicy.ingress.fromNamespaceSelectors` and the pods in `fromPodSelectors` (any source when both lists are empty), every pod that carries the release's selector labels, the Jibri pods of the same release when Jibri is enabled, its Prosody pods when the chart installs Jitsi, the live captions pods when captions are enabled, and the monitoring namespace while `allowMonitoring` is on.
 - **Out of the app** it allows DNS, PostgreSQL, Redis, the in-cluster Jitsi pods on 5222, 5280, 8080 and 2222 (`networkPolicy.egress.jitsi`), the recorder controller, the ingress controller's namespaces on 443 and 8443 (`networkPolicy.egress.ingressController`), SMTP, and TCP 443 anywhere except the link-local metadata range.
 
 Every path outside these rules is blocked. The keys are described in [DEPLOYMENT.md](../DEPLOYMENT.md#networkpolicy).

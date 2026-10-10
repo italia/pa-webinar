@@ -375,8 +375,8 @@ event are:
 The values of the other limits are in [Reference limits](architecture/security.md#reference-limits).
 
 A registration test sends a JSON body with `displayName`, `email` and `consentGiven: true`. Add
-`consentRecording: true` when the event records and `consentMultitrack: true` when it has
-per-participant recording; without them the call answers `422`. The event must be open for registration.
+`consentRecording: true` when the event records; without it the call answers `422`. `consentMultitrack`
+is optional. The event must be open for registration.
 With registration open to anyone (the event's `accessMode` `OPEN`, or `publicRegistrationEnabled` in
 site settings for an event without a choice), an accepted call answers `201` with `accessToken` and
 `joinUrl` and sets the `event_access_<eventId>` cookie. With invitation-only registration, every valid

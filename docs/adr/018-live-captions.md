@@ -43,6 +43,16 @@ The gateway measures, on every fragment, how far the text lags behind the audio.
 
 The service asks the portal for the room's context: language, and the vocabulary that post-production already uses (glossary terms of the instance and of the event, organizers, moderators and speakers). The vocabulary biases recognition through the engine's word boosting at a low weight, and the glossary's known misspellings are corrected in the text. The bench measured why the weight is low: at the weight the engine's documentation calls typical, boosting wrote glossary terms where nobody had said them.
 
+### The text is kept only when the event asks, and only for those who consent
+
+By default the captions are not stored anywhere. An event can opt in to a transcript built from its captions (`Event.captionsTranscriptEnabled`, off by default), which needs neither a recording nor AI post-production. Then:
+
+- **Consent decides, voice by voice, on the server.** The transcription of one's own contributions is a separate, optional consent, never pre-ticked, asked at registration and in the waiting room of everyone, moderators and speakers included. It reuses the per-participant recording consent of [ADR-013](013-multitrack-speaker-attribution.md) (`Registration.consentMultitrack`, `MultitrackConsent`), so one answer governs both what the recorder records and what the transcript keeps. The consent text carries a version, stored with each answer: the transcript counts only answers given to the text that names the transcription with one's name, while the recorder also accepts the earlier text, which covered the audio track. Refusing it does not keep anyone out of the room.
+- **The seat in the signed token identifies the voice, not a typed name.** The gateway knows only the bridge endpoint. A Prosody module of the project (`mod_pa_occupants`) tells the portal which token seat (`context.user.id`) stands behind each endpoint, and the portal maps the seat to the consent. The gateway still sends every final sentence; the portal stores text and name, encrypted, only for consenting seats, and for every other voice a row with the times alone.
+- **The transcript is an ordinary post-production artifact.** After the event the sentences become a `TRANSCRIPT_JSON` with the model id `live-captions`, on the event's recording or on a recording without media created for it, so the transcript editor, the downloads and the event page use it as they use an AI transcript. It never replaces an AI transcript or one corrected by hand; a later AI transcript replaces it. Its publication on the event page is a separate staff decision (`Event.transcriptPublished`), and publishing the transcript alone makes public only its text, not the AI outputs that accompany a published video.
+
+The flow and the data are described in [Live captions: transcript from captions](../architecture/live-captions.md#transcript-from-captions).
+
 ### The scaler starts it with the events
 
 With the bridge scaler on, the captions service runs only while an event is live or starting, like Jibri ([ADR-007](007-jvb-scale-to-zero.md)): the portal says how many replicas it wants, and the scaler's CronJob applies it. It stays up for the whole event even when a moderator turns captions off, so that turning them back on is immediate; idle, it uses no CPU. Without the scaler it runs all the time.
@@ -55,15 +65,18 @@ With the bridge scaler on, the captions service runs only while an event is live
 - **Jitsi's native caption overlay.** It cannot show who is speaking, because the service does not know names; it also cannot be styled or made accessible the way the room is.
 - **Running the engine on the GPU pool.** The pool scales from zero for batch jobs; keeping a GPU up for the length of every event costs far more than the CPU the measurement asks for.
 - **Running on Jibri's node.** Jibri exists only for recorded events, and its browser and encoder already compete for that CPU.
+- **Storing every sentence and filtering when the transcript is built.** The text of people who did not consent would sit in the database until then; deciding at the time of storage keeps it out altogether.
+- **Matching voices by the name shown in the room.** A display name is typed by the person and proves nothing; the token seat is signed by the portal.
 
 ## Consequences
 
-- A new deployable, two new images (`captions-gateway`, `captions-engine`) and a new Prosody module. The model's weights are downloaded at pod start and are not redistributed in the project's images.
-- Captions depend on Jitsi stable-10710 or later. The room name reaches the service only from stable-10978; on earlier releases the service uses the instance's language and glossary.
+- A new deployable, two new images (`captions-gateway`, `captions-engine`) and two new Prosody modules (`mod_pa_captions`, `mod_pa_occupants`). The model's weights are downloaded at pod start and are not redistributed in the project's images.
+- Captions depend on Jitsi stable-10710 or later. The room name reaches the service only from stable-10978; on earlier releases the portal finds the event from the meeting id that `mod_pa_occupants` reported, and without that module the service uses the instance's language and glossary.
 - Every client receives every caption through the bridge; the room decides what to show.
-- Speech of everyone who speaks is processed while captions are on. Nothing is stored, and the waiting room says so; see [Privacy and data protection](../GDPR.md).
+- Speech of everyone who speaks is processed while captions are on. Without the transcript from captions nothing is stored, and the waiting room says so. With it, the text and name of those who consented are stored, encrypted, until the event's retention, and so is the transcript built from them unless staff publish it, or the video; erasure of a registration removes the person from it. The waiting room says that the text is kept. See [Privacy and data protection](../GDPR.md).
+- Prosody signs its occupant reports with a key derived from the conference token secret it already shares with the portal, so it holds no other portal credential. Without the module, or with an external Jitsi that does not load it, no transcript text is kept and the multitrack recorder records no track.
 - Captions depend on a moderator being in the room to turn them on. Before Jitsi stable-10978, Jicofo puts a conference on the bridge only from two participants, so a moderator alone in the room is captioned once someone else joins.
 - Numbers come out in words: the engine has no Italian inverse text normalization.
 - Sizing depends on the CPU. The gateway's load governance turns an undersized pod into fewer captioned speakers or a visible pause, never into delayed audio or video.
 
-See [Live captions](../architecture/live-captions.md) for how it works and how to size it.
+See [Live captions](../architecture/live-captions.md) for how it works, how the transcript is built and how to size it.

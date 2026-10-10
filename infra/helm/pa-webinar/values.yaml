@@ -964,12 +964,22 @@ jitsi-meet:
       # quando l'evento non li concede: senza, il limite vive solo nella barra
       # della sala. `pa_captions`, del progetto, rende le stanze trascrivibili
       # per i sottotitoli live (global.captions): con i sottotitoli spenti il
-      # modulo resta caricato e non fa niente. Per aggiungere moduli, tieni
-      # questi quattro.
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions
+      # modulo resta caricato e non fa niente. `pa_occupants`, del progetto,
+      # dice al portale chi c'è in sala, perché la trascrizione dai
+      # sottotitoli e il registratore multitraccia tengano solo la voce di chi
+      # ha dato il consenso. Per aggiungere moduli, tieni questi cinque.
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants
       # Accende pa_captions. Segue global.captions.enabled: è il sottochart a
       # rendere questo valore, e vede solo `global`.
       PA_CAPTIONS_ENABLED: '{{ if dig "captions" "enabled" false (.Values.global | default dict) }}true{{ else }}false{{ end }}'
+      # Dove pa_occupants trova il portale (lo stesso indirizzo interno che
+      # usa Jibri). Le notifiche sono firmate con il segreto dei token della
+      # conferenza (JWT_APP_SECRET, qui sotto in `jwt`), che il portale
+      # conosce già: nessuna chiave in più. Senza indirizzo il modulo resta
+      # spento e il portale non sa di chi è ogni voce: la trascrizione dai
+      # sottotitoli non tiene niente e il registratore multitraccia non
+      # registra nessuno.
+      PA_PORTAL_URL: '{{ if contains "pa-webinar" .Release.Name }}http://{{ .Release.Name }}:3000{{ else }}http://{{ .Release.Name }}-pa-webinar:3000{{ end }}'
     # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
     # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
     # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se

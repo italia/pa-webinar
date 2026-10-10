@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
-import { Link, percorso } from '@/i18n/navigation';
+import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 
@@ -42,7 +42,12 @@ export default function RecordingManageClient({
   durationSec,
   sourceLanguage,
   createdAt,
+  soloSottotitoli = false,
+  eventId,
 }: {
+  /** La registrazione non ha un file: la trascrizione viene dai sottotitoli live. */
+  soloSottotitoli?: boolean;
+  eventId?: string;
   recordingId: string;
   eventTitle: string;
   eventSlug: string | null;
@@ -58,6 +63,41 @@ export default function RecordingManageClient({
   const [tab, setTab] = useState<TabKey>('overview');
   const [rerunning, setRerunning] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [aggiornando, setAggiornando] = useState(false);
+  const router = useRouter();
+
+  // La trascrizione dai sottotitoli si ricostruisce dalle frasi salvate: non
+  // c'e' un file da trascrivere di nuovo.
+  async function aggiornaDaiSottotitoli(): Promise<void> {
+    if (!eventId) return;
+    setAggiornando(true);
+    try {
+      const r = await fetch(`/api/admin/events/${eventId}/captions-transcript`, { method: 'POST' });
+      const esito = (await r.json().catch(() => null)) as { stato?: string; recordingId?: string } | null;
+      if (!r.ok) {
+        toast.error(t('rerunFailed', { code: r.status }));
+      } else if (esito?.stato === 'gia-trascritta') {
+        toast.info(t('captionsRebuildKept'));
+      } else if (esito?.stato === 'ai-in-corso') {
+        toast.info(t('captionsRebuildAiRunning'));
+      } else if (esito?.stato === 'scritta') {
+        toast.success(t('captionsRebuildDone'));
+        // Arrivato il video, la trascrizione si sposta sulla sua registrazione
+        // e questa, senza file, non c'e' piu': si va dove sta adesso.
+        if (esito.recordingId && esito.recordingId !== recordingId) {
+          router.replace(percorso(`/admin/postprod/${esito.recordingId}`));
+        } else {
+          window.location.reload();
+        }
+      } else {
+        toast.info(t('captionsRebuildNone'));
+      }
+    } catch {
+      toast.error(t('rerunFailed', { code: 0 }));
+    } finally {
+      setAggiornando(false);
+    }
+  }
 
   async function rerun(): Promise<void> {
     const ok = await confirm({
@@ -168,6 +208,7 @@ export default function RecordingManageClient({
             <span className={`badge ${statusBadgeClass(status)}`}>{recordingStatusLabel(status, t)}</span>
             <span>· {t('manageDuration')}: {fmtDuration(durationSec)}</span>
             <span>· {t('manageSource')}: {sourceLanguage}</span>
+            {soloSottotitoli && <span>· {t('captionsSource')}</span>}
             <span>· {format.dateTime(new Date(createdAt), { dateStyle: 'short', timeStyle: 'medium' })}</span>
           </div>
         </div>
@@ -181,7 +222,17 @@ export default function RecordingManageClient({
               {t('manageOpenPublic')}
             </Link>
           )}
-          {status === 'READY' && (
+          {soloSottotitoli ? (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary"
+              disabled={aggiornando}
+              onClick={() => void aggiornaDaiSottotitoli()}
+            >
+              {aggiornando ? '…' : t('captionsRebuild')}
+            </button>
+          ) : null}
+          {!soloSottotitoli && status === 'READY' && (
             <button
               type="button"
               className="btn btn-sm btn-primary"
@@ -191,14 +242,16 @@ export default function RecordingManageClient({
               {generating ? '…' : t('generateAi')}
             </button>
           )}
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            disabled={rerunning}
-            onClick={() => void rerun()}
-          >
-            {rerunning ? '…' : t('rerun')}
-          </button>
+          {!soloSottotitoli && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary"
+              disabled={rerunning}
+              onClick={() => void rerun()}
+            >
+              {rerunning ? '…' : t('rerun')}
+            </button>
+          )}
         </div>
       </div>
 

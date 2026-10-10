@@ -5,14 +5,17 @@
  *
  * Il bridge non dice a quale evento appartiene l'audio: il nome della stanza
  * arriva come parametro dell'URL quando Prosody lo mette nei metadati (da
- * stable-10978). Senza stanza, o se il portale non risponde, valgono i
- * default: sottotitoli attivi, lingua dell'istanza, nessun vocabolario.
+ * stable-10978), e l'id della riunione c'e' sempre; il portale risale
+ * all'evento dall'uno o dall'altro. Se non lo trova, o non risponde, valgono
+ * i default: sottotitoli attivi, lingua dell'istanza, nessun vocabolario.
  */
 
 import type { AliasRule } from './captions.js';
 
 export interface RoomContext {
   enabled: boolean;
+  /** L'evento tiene la trascrizione dai sottotitoli: le frasi vanno al portale. */
+  transcript: boolean;
   language: string;
   phrases: string[];
   aliases: AliasRule[];
@@ -51,6 +54,7 @@ export function parseContext(body: unknown, fallbackLanguage: string): RoomConte
   }
   return {
     enabled: data.enabled !== false,
+    transcript: data.transcript === true,
     language:
       typeof data.language === 'string' && /^[a-z]{2,3}(-[A-Z]{2})?$|^auto$/.test(data.language)
         ? data.language
@@ -74,13 +78,13 @@ export class ContextProvider {
   ) {}
 
   private defaults(): RoomContext {
-    return { enabled: true, language: this.opts.defaultLanguage, phrases: [], aliases: [] };
+    return { enabled: true, transcript: false, language: this.opts.defaultLanguage, phrases: [], aliases: [] };
   }
 
-  async get(room: string | null): Promise<RoomContext> {
+  async get(room: string | null, meetingId: string | null = null): Promise<RoomContext> {
     if (!this.opts.url) return this.defaults();
     const now = (this.opts.now ?? Date.now)();
-    const key = room ?? '';
+    const key = `${room ?? ''}|${meetingId ?? ''}`;
     const hit = this.cache.get(key);
     if (hit && now - hit.at < CACHE_MS) return hit.value;
 
@@ -88,6 +92,7 @@ export class ContextProvider {
     try {
       const url = new URL(this.opts.url);
       if (room) url.searchParams.set('room', room);
+      if (meetingId) url.searchParams.set('meetingId', meetingId);
       const res = await fetch(url, {
         // Le rotte interne del portale si autenticano con `x-api-key` (lib/auth/cron.ts).
         headers: this.opts.token ? { 'x-api-key': this.opts.token } : {},
