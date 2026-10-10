@@ -950,7 +950,9 @@
         "postDefaultHint": "Jei nieko nepasirinksite, po renginio bus pasiūlytas klausimynas „{name}“.",
         "preHelp": "Klausimai besiregistruojantiems prieš renginį: profilis, lūkesčiai, temos. Tai ne atsiliepimai.",
         "postHelp": "Atsiliepimai renginio pabaigoje: kaip sekėsi, kokybė, turinys.",
-        "templatesNoneForMoment": "Šiam momentui šablono nėra: bibliotekos šablonai skirti kitam. Šio renginio klausimus pridėkite žemiau."
+        "templatesNoneForMoment": "Šiam momentui šablono nėra: bibliotekos šablonai skirti kitam. Šio renginio klausimus pridėkite žemiau.",
+        "lockedWithResponses": "Surinkti atsakymai: {count}. Kad jie nebūtų prarasti, klausimyno čia keisti negalima: norėdami jį pakeisti ar ištrinti, naudokite renginio klausimynų valdymą, kuris paprašys patvirtinimo.",
+        "lockedGoToQuestionnaires": "Eiti į klausimynus"
       },
       "step5": {
         "heading": "Santrauka ir paskelbimas",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderatorius užduoda klausimą ir kiekvienas atsako vienu žodžiu: atsakymai sudaro debesį, kuris atnaujinamas tiesiogiai, o dažniausi žodžiai tampa didesni. Naudinga pralaužti ledus ar per kelias sekundes surinkti įspūdžius.",
       "whiteboardEnabled": "Bendra lenta",
       "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Reikalinga diegimo lentos paslauga; kur ji yra, momentiniuose skambučiuose lenta visada įjungta.",
+      "liveCaptionsEnabled": "Automatiniai subtitrai",
+      "liveCaptionsEnabledDesc": "Tai, ką sako kalbėtojai, rodoma po vaizdo įrašu, transkribuojama realiuoju laiku: tai padeda negirdintiems ar sunkiai sekantiems. Moderatoriai gali juos išjungti ir tiesioginės transliacijos metu skirtuke „Valdymas“, o kiekvienas gali juos paslėpti sau.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",
       "autoStartRecordingDesc": "Renginiui prasidėjus, įrašymas paleidžiamas savaime (moderatoriaus neklausiama). Vėluojantieji iš karto randa prieinamą grotuvą.",
       "aiSectionHeading": "Automatinis apdorojimas po renginio",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime.",
         "liveCaptionsTitle": "Tiesioginiai subtitrai",
         "liveCaptionsEnabled": "Automatiniai subtitrai vaizdo skambučiuose",
-        "liveCaptionsEnabledHelp": "Kalbančiojo balsą realiuoju laiku transkribuoja paslauga, veikianti pačios platformos infrastruktūroje, be išorinių paslaugų, o tekstas nesaugomas. Subtitrai įjungti visuose renginiuose; moderatoriai gali juos išjungti renginio metu. Neįdiegus paslaugos ši parinktis neveikia. Lietuvių kalbos modelis kol kas patikimai netranskribuoja."
+        "liveCaptionsEnabledHelp": "Kalbančiojo balsą realiuoju laiku transkribuoja paslauga, veikianti pačios platformos infrastruktūroje, be išorinių paslaugų, o tekstas nesaugomas. Subtitrai pagal numatytuosius nustatymus įjungti kiekviename renginyje: atskiram renginiui juos galima išjungti jo nustatymuose, o moderatoriai gali juos išjungti ir tiesioginės transliacijos metu. Neįdiegus paslaugos ši parinktis neveikia. Lietuvių kalbos modelis kol kas patikimai netranskribuoja."
       },
       "errors": {
         "invalid": "Nustatymai neišsaugoti: viena reikšmė netinkama. Patikrinkite pakeistus laukus ir bandykite dar kartą.",

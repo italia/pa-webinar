@@ -950,7 +950,9 @@
         "postDefaultHint": "Ak nič nevyberiete, po udalosti sa ponúkne dotazník „{name}“.",
         "preHelp": "Otázky pre registrujúcich sa pred podujatím: profil, očakávania, témy. Nejde o spätnú väzbu.",
         "postHelp": "Spätná väzba na konci podujatia: ako prebehlo, kvalita, obsah.",
-        "templatesNoneForMoment": "Pre tento okamih nie je žiadna šablóna: šablóny v knižnici sú pre ten druhý. Otázky pre toto podujatie pridajte nižšie."
+        "templatesNoneForMoment": "Pre tento okamih nie je žiadna šablóna: šablóny v knižnici sú pre ten druhý. Otázky pre toto podujatie pridajte nižšie.",
+        "lockedWithResponses": "Zozbierané odpovede: {count}. Aby sa nestratili, dotazník tu nemožno meniť: ak ho chcete zmeniť alebo zmazať, použite správu dotazníkov podujatia, ktorá si vyžiada potvrdenie.",
+        "lockedGoToQuestionnaires": "Prejsť na dotazníky"
       },
       "step5": {
         "heading": "Súhrn a zverejnenie",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderátor položí otázku a každý odpovie jediným slovom: odpovede vytvoria oblak, ktorý sa aktualizuje naživo, a najčastejšie slová sa zväčšujú. Hodí sa na prelomenie ľadov alebo rýchly zber dojmov.",
       "whiteboardEnabled": "Zdieľaná tabuľa",
       "whiteboardEnabledDesc": "Zapne natívnu spoločnú tabuľu (Excalidraw): moderátori ju môžu počas podujatia otvoriť z panela nástrojov. Vyžaduje službu tabule v inštalácii; kde je k dispozícii, je pri okamžitých hovoroch vždy zapnutá.",
+      "liveCaptionsEnabled": "Automatické titulky",
+      "liveCaptionsEnabledDesc": "To, čo hovoria rečníci, sa zobrazuje pod videom, prepísané v reálnom čase: pomáha tým, ktorí nepočujú alebo ťažko sledujú. Moderátori ich môžu vypnúť aj počas priameho prenosu na karte „Réžia“ a každý si ich môže skryť pre seba.",
       "autoStartRecording": "Spustiť záznam automaticky",
       "autoStartRecordingDesc": "Pri začiatku podujatia sa záznam spustí sám (bez požiadania moderátora o potvrdenie). Tak prípadní oneskorenci nájdu prehrávač okamžite dostupný.",
       "aiSectionHeading": "Automatická postprodukcia",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Účastníci, ktorí sa zaregistrovali e-mailom s Gravatarom, ho v miestnosti uvidia ako obrázok; ostatným zostanú iniciály generované platformou. Obrázok sa načítava cez náš server, takže prehliadače účastníkov gravatar.com nikdy nekontaktujú — platforma áno: uveďte to vo svojich zásadách ochrany osobných údajov.",
         "liveCaptionsTitle": "Živé titulky",
         "liveCaptionsEnabled": "Automatické titulky vo videohovoroch",
-        "liveCaptionsEnabledHelp": "Hlas toho, kto hovorí, sa prepisuje v reálnom čase službou, ktorá beží vo vlastnej infraštruktúre platformy, bez externých služieb, a text sa neuchováva. Titulky sú zapnuté vo všetkých podujatiach; moderátori ich môžu počas podujatia vypnúť. Bez nainštalovanej služby nemá táto možnosť žiadny účinok."
+        "liveCaptionsEnabledHelp": "Hlas toho, kto hovorí, sa prepisuje v reálnom čase službou, ktorá beží vo vlastnej infraštruktúre platformy, bez externých služieb, a text sa neuchováva. Titulky sú predvolene zapnuté v každom podujatí: pre jednotlivé podujatie ich možno vypnúť v jeho nastaveniach a moderátori ich môžu vypnúť aj počas priameho prenosu. Bez nainštalovanej služby nemá táto možnosť žiadny účinok."
       },
       "errors": {
         "invalid": "Nastavenia sa neuložili: jedna hodnota nie je platná. Skontrolujte zmenené polia a skúste to znova.",

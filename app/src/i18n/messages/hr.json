@@ -950,7 +950,9 @@
         "postDefaultHint": "Ako ništa ne odaberete, nakon događaja nudi se upitnik „{name}”.",
         "preHelp": "Pitanja za one koji se prijavljuju, prije događaja: profil, očekivanja, teme. To nisu povratne informacije.",
         "postHelp": "Povratne informacije na kraju događaja: kako je prošlo, kvaliteta, sadržaj.",
-        "templatesNoneForMoment": "Nema predloška za ovaj trenutak: predlošci iz knjižnice su za drugi. Pitanja za ovaj događaj dodajte ispod."
+        "templatesNoneForMoment": "Nema predloška za ovaj trenutak: predlošci iz knjižnice su za drugi. Pitanja za ovaj događaj dodajte ispod.",
+        "lockedWithResponses": "Prikupljeni odgovori: {count}. Da se ne izgube, upitnik se ovdje ne može mijenjati: za izmjenu ili brisanje koristite upravljanje upitnicima događanja, koje traži potvrdu.",
+        "lockedGoToQuestionnaires": "Idi na upitnike"
       },
       "step5": {
         "heading": "Sažetak i objava",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderator postavi pitanje i svatko odgovori jednom riječju: odgovori čine oblak koji se ažurira uživo, a najčešće riječi postaju veće. Korisno za razbijanje leda ili brzo prikupljanje dojmova.",
       "whiteboardEnabled": "Zajednička ploča",
       "whiteboardEnabledDesc": "Omogućuje ugrađenu zajedničku ploču (Excalidraw): moderatori je tijekom događaja mogu otvoriti s alatne trake. Zahtijeva uslugu ploče u instalaciji; gdje postoji, uvijek je uključena u trenutačnim pozivima.",
+      "liveCaptionsEnabled": "Automatski titlovi",
+      "liveCaptionsEnabledDesc": "Ono što govornici kažu pojavljuje se ispod videozapisa, transkribirano u stvarnom vremenu: pomaže onima koji ne čuju ili teško prate. Moderatori ih mogu isključiti i tijekom prijenosa uživo na kartici „Režija”, a svatko ih može sakriti za sebe.",
       "autoStartRecording": "Automatski pokreni snimanje",
       "autoStartRecordingDesc": "U trenutku početka događaja snimanje se pokreće samostalno (bez traženja potvrde od moderatora). Tako kasniji pridošli korisnici odmah pronalaze player.",
       "aiSectionHeading": "Automatska postprodukcija",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Tko se prijavio e-adresom koja ima Gravatar vidjet će ga kao sliku u sobi; svima ostalima ostaju inicijali koje generira platforma. Slika se dohvaća preko našeg poslužitelja pa preglednici sudionika ne kontaktiraju gravatar.com — ali platforma da: to treba navesti u izjavi o privatnosti.",
         "liveCaptionsTitle": "Titlovi uživo",
         "liveCaptionsEnabled": "Automatski titlovi u videopozivima",
-        "liveCaptionsEnabledHelp": "Glas osobe koja govori transkribira u stvarnom vremenu usluga koja radi u vlastitoj infrastrukturi platforme, bez vanjskih usluga, a tekst se ne čuva. Titlovi su uključeni na svim događanjima; moderatori ih mogu isključiti tijekom događanja. Bez instalirane usluge ova opcija nema učinka."
+        "liveCaptionsEnabledHelp": "Glas osobe koja govori transkribira u stvarnom vremenu usluga koja radi u vlastitoj infrastrukturi platforme, bez vanjskih usluga, a tekst se ne čuva. Titlovi su prema zadanim postavkama uključeni na svakom događanju: za pojedino događanje mogu se isključiti u njegovim postavkama, a moderatori ih mogu isključiti i tijekom prijenosa uživo. Bez instalirane usluge ova opcija nema učinka."
       },
       "errors": {
         "invalid": "Postavke nisu spremljene: jedna vrijednost nije valjana. Provjerite izmijenjena polja i pokušajte ponovno.",

@@ -950,7 +950,9 @@
         "postDefaultHint": "Wenn Sie nichts auswählen, wird nach der Veranstaltung der Fragebogen „{name}“ angeboten.",
         "preHelp": "Fragen an die Anmeldenden vor der Veranstaltung: Profil, Erwartungen, gewünschte Themen. Das ist nicht das Feedback.",
         "postHelp": "Das Feedback am Ende der Veranstaltung: wie es lief, Qualität, Inhalte.",
-        "templatesNoneForMoment": "Keine Vorlage für diesen Zeitpunkt: Die Vorlagen der Bibliothek sind für den anderen. Fügen Sie die Fragen für diese Veranstaltung unten hinzu."
+        "templatesNoneForMoment": "Keine Vorlage für diesen Zeitpunkt: Die Vorlagen der Bibliothek sind für den anderen. Fügen Sie die Fragen für diese Veranstaltung unten hinzu.",
+        "lockedWithResponses": "Gesammelte Antworten: {count}. Damit sie nicht verloren gehen, lässt sich der Fragebogen hier nicht ändern: Zum Ändern oder Löschen nutzen Sie die Fragebogen-Verwaltung der Veranstaltung, die um Bestätigung bittet.",
+        "lockedGoToQuestionnaires": "Zu den Fragebögen"
       },
       "step5": {
         "heading": "Übersicht und Veröffentlichung",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Die Moderation stellt eine Frage und alle antworten mit einem einzigen Wort: Die Antworten bilden eine Wolke, die sich live aktualisiert, und die häufigsten Wörter werden größer. Gut zum Aufwärmen oder um in Sekunden ein Stimmungsbild einzuholen.",
       "whiteboardEnabled": "Gemeinsames Whiteboard",
       "whiteboardEnabledDesc": "Aktiviert das native kollaborative Whiteboard (Excalidraw): Moderatoren können es während der Veranstaltung über die Symbolleiste öffnen. Erfordert den Whiteboard-Dienst der Installation; wo er vorhanden ist, ist es bei Sofortkonferenzen immer aktiv.",
+      "liveCaptionsEnabled": "Automatische Untertitel",
+      "liveCaptionsEnabledDesc": "Was die Sprechenden sagen, erscheint in Echtzeit transkribiert unter dem Video: Das hilft allen, die nicht hören oder schwer folgen können. Moderierende können die Untertitel auch während der Live-Veranstaltung im Tab „Regie“ ausschalten, und alle können sie für sich ausblenden.",
       "autoStartRecording": "Aufzeichnung automatisch starten",
       "autoStartRecordingDesc": "Beim Eventstart beginnt die Aufzeichnung automatisch (ohne Rückfrage an die Moderation). Spät Hinzukommende finden so sofort einen Player vor.",
       "aiSectionHeading": "Automatische Nachbearbeitung",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Wer sich mit einer E-Mail-Adresse angemeldet hat, zu der es einen Gravatar gibt, wird im Raum mit diesem Bild angezeigt; für alle anderen bleiben die von der Plattform erzeugten Initialen. Das Bild läuft über unseren Server, der Browser der Teilnehmer kontaktiert also nicht gravatar.com — die Plattform hingegen schon: Das muss in der Datenschutzerklärung angegeben werden.",
         "liveCaptionsTitle": "Live-Untertitel",
         "liveCaptionsEnabled": "Automatische Untertitel in Videokonferenzen",
-        "liveCaptionsEnabledHelp": "Die Stimme der sprechenden Person wird in Echtzeit von einem Dienst in der eigenen Infrastruktur der Plattform transkribiert, ohne externe Dienste, und der Text wird nicht gespeichert. Die Untertitel sind in jeder Veranstaltung aktiv; Moderierende können sie während der Veranstaltung ausschalten. Ohne installierten Dienst hat diese Option keine Wirkung."
+        "liveCaptionsEnabledHelp": "Die Stimme der sprechenden Person wird in Echtzeit von einem Dienst in der eigenen Infrastruktur der Plattform transkribiert, ohne externe Dienste, und der Text wird nicht gespeichert. Die Untertitel sind standardmäßig in jeder Veranstaltung aktiv: Für eine einzelne Veranstaltung lassen sie sich in deren Einstellungen ausschalten, und Moderierende können sie auch während der Live-Veranstaltung ausschalten. Ohne installierten Dienst hat diese Option keine Wirkung."
       },
       "errors": {
         "invalid": "Die Einstellungen wurden nicht gespeichert: Ein Wert ist ungültig. Prüfen Sie die geänderten Felder und versuchen Sie es erneut.",

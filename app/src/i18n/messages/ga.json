@@ -950,7 +950,9 @@
         "postDefaultHint": "Mura roghnaíonn sibh aon rud, tairgtear an ceistneoir “{name}” tar éis an imeachta.",
         "preHelp": "Ceisteanna do lucht cláraithe, roimh an imeacht: próifíl, ionchais, ábhair. Ní hé seo an t-aiseolas.",
         "postHelp": "An t-aiseolas, a iarrtar ag deireadh an imeachta: conas a d'éirigh leis, an caighdeán, an t-ábhar.",
-        "templatesNoneForMoment": "Níl teimpléad ar bith don uair seo: is don cheann eile teimpléid na leabharlainne. Cuir ceisteanna an imeachta seo leis thíos."
+        "templatesNoneForMoment": "Níl teimpléad ar bith don uair seo: is don cheann eile teimpléid na leabharlainne. Cuir ceisteanna an imeachta seo leis thíos.",
+        "lockedWithResponses": "Freagraí bailithe: {count}. Ionas nach gcaillfear iad, ní féidir an ceistneoir a athrú anseo: chun é a athrú nó a scriosadh, úsáid bainistíocht ceistneoirí an imeachta, a iarrann deimhniú.",
+        "lockedGoToQuestionnaires": "Téigh chuig na ceistneoirí"
       },
       "step5": {
         "heading": "Achoimre agus foilsiú",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Cuireann an modhnóir ceist agus freagraíonn gach duine le focal amháin: cruthaíonn na freagraí scamall a nuashonraítear beo, agus éiríonn na focail is coitianta níos mó. Úsáideach chun an t-oighear a bhriseadh nó chun tuairim a bhailiú i gceann cúpla soicind.",
       "whiteboardEnabled": "Clár bán comhroinnte",
       "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Teastaíonn seirbhís chlár bán na suiteála; nuair atá sí ar fáil, bíonn sé ar siúl i gcónaí i nglaonna láithreacha.",
+      "liveCaptionsEnabled": "Fotheidil uathoibríocha",
+      "liveCaptionsEnabledDesc": "Taispeántar an méid a deir na cainteoirí faoin bhfíseán, tras-scríofa i bhfíor-am: cabhraíonn sé leo siúd nach gcloiseann nó a mbíonn deacracht acu leanúint. Is féidir le modhnóirí iad a mhúchadh le linn an imeachta bheo freisin ón gcluaisín “Rialú”, agus is féidir le gach duine iad a fholú dóibh féin.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
       "autoStartRecordingDesc": "Nuair a thosaíonn an t-imeacht, tosaíonn an taifeadadh leis féin (ní iarrtar deimhniú ón modhnóir). Mar sin aimseoidh daoine déanacha seinnteoir ar fáil láithreach.",
       "aiSectionHeading": "Iarléiriú uathoibríoch",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Taispeánfar an Gravatar sa seomra do dhaoine a chláraigh le seoladh ríomhphoist a bhfuil Gravatar aige; coinníonn gach duine eile na ceannlitreacha a chruthaíonn an t-ardán. Faightear an íomhá trínár bhfreastalaí féin, agus mar sin ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com — ach déanann an t-ardán: caithfear é sin a lua i bhfógra príobháideachais an tsuímh.",
         "liveCaptionsTitle": "Fotheidil bheo",
         "liveCaptionsEnabled": "Fotheidil uathoibríocha i nglaonna físe",
-        "liveCaptionsEnabledHelp": "Tras-scríobhann seirbhís a ritheann i mbonneagar an ardáin féin guth an duine atá ag labhairt i bhfíor-am, gan seirbhísí seachtracha, agus ní choinnítear an téacs. Bíonn na fotheidil ar siúl i ngach imeacht; is féidir le modhnóirí iad a mhúchadh le linn an imeachta. Gan an tseirbhís a bheith suiteáilte, níl aon éifeacht ag an rogha seo. Ní thras-scríobhann an tsamhail an Ghaeilge go hiontaofa fós."
+        "liveCaptionsEnabledHelp": "Tras-scríobhann seirbhís a ritheann i mbonneagar an ardáin féin guth an duine atá ag labhairt i bhfíor-am, gan seirbhísí seachtracha, agus ní choinnítear an téacs. Bíonn na fotheidil ar siúl de réir réamhshocraithe i ngach imeacht: is féidir iad a mhúchadh d'imeacht ar leith ina shocruithe, agus is féidir le modhnóirí iad a mhúchadh le linn an imeachta bheo freisin. Gan an tseirbhís a bheith suiteáilte, níl aon éifeacht ag an rogha seo. Ní thras-scríobhann an tsamhail an Ghaeilge go hiontaofa fós."
       },
       "errors": {
         "invalid": "Níor sábháladh na socruithe: tá luach neamhbhailí. Seiceáil na réimsí a d'athraigh tú agus bain triail eile as.",

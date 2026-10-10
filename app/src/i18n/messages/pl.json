@@ -950,7 +950,9 @@
         "postDefaultHint": "Jeśli nic nie wybierzesz, po wydarzeniu zostanie zaproponowany kwestionariusz „{name}”.",
         "preHelp": "Pytania do rejestrujących się przed wydarzeniem: profil, oczekiwania, tematy. To nie są opinie.",
         "postHelp": "Opinie zbierane na koniec wydarzenia: jak poszło, jakość, treści.",
-        "templatesNoneForMoment": "Brak szablonu na ten moment: szablony w bibliotece są na ten drugi. Dodaj poniżej pytania do tego wydarzenia."
+        "templatesNoneForMoment": "Brak szablonu na ten moment: szablony w bibliotece są na ten drugi. Dodaj poniżej pytania do tego wydarzenia.",
+        "lockedWithResponses": "Zebrane odpowiedzi: {count}. Aby ich nie utracić, kwestionariusza nie można tu zmieniać: aby go zmienić lub usunąć, użyj zarządzania kwestionariuszami wydarzenia, które prosi o potwierdzenie.",
+        "lockedGoToQuestionnaires": "Przejdź do kwestionariuszy"
       },
       "step5": {
         "heading": "Podsumowanie i publikacja",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderator zadaje pytanie, a każdy odpowiada jednym słowem: odpowiedzi tworzą chmurę aktualizowaną na żywo, a najczęstsze słowa stają się większe. Przydatne na przełamanie lodów lub szybkie zebranie wrażeń.",
       "whiteboardEnabled": "Tablica współdzielona",
       "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Wymaga usługi tablicy w instalacji; tam, gdzie jest dostępna, w połączeniach natychmiastowych jest zawsze aktywna.",
+      "liveCaptionsEnabled": "Automatyczne napisy",
+      "liveCaptionsEnabledDesc": "To, co mówią prelegenci, pojawia się pod wideo, transkrybowane w czasie rzeczywistym: pomaga osobom, które nie słyszą lub mają trudność z nadążaniem. Moderatorzy mogą je wyłączyć także w trakcie transmisji na karcie „Reżyserka”, a każdy może je ukryć dla siebie.",
       "autoStartRecording": "Uruchom nagrywanie automatycznie",
       "autoStartRecordingDesc": "W momencie rozpoczęcia wydarzenia nagrywanie startuje samo (bez pytania moderatora o potwierdzenie). Dzięki temu spóźnialscy od razu znajdą dostępny odtwarzacz.",
       "aiSectionHeading": "Automatyczna postprodukcja",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Osoby, które zarejestrowały się adresem e-mail powiązanym z Gravatarem, zobaczą go jako zdjęcie w sali; pozostali zachowają inicjały generowane przez platformę. Obraz jest pobierany przez nasz serwer, więc przeglądarki uczestników nie łączą się z gravatar.com — ale platforma tak: należy to zadeklarować w informacji o ochronie prywatności.",
         "liveCaptionsTitle": "Napisy na żywo",
         "liveCaptionsEnabled": "Napisy automatyczne w wideorozmowach",
-        "liveCaptionsEnabledHelp": "Głos osoby mówiącej jest transkrybowany w czasie rzeczywistym przez usługę działającą we własnej infrastrukturze platformy, bez usług zewnętrznych, a tekst nie jest przechowywany. Napisy są włączone w każdym wydarzeniu; moderatorzy mogą je wyłączyć w trakcie wydarzenia. Bez zainstalowanej usługi ta opcja nie działa."
+        "liveCaptionsEnabledHelp": "Głos osoby mówiącej jest transkrybowany w czasie rzeczywistym przez usługę działającą we własnej infrastrukturze platformy, bez usług zewnętrznych, a tekst nie jest przechowywany. Napisy są domyślnie włączone w każdym wydarzeniu: dla pojedynczego wydarzenia można je wyłączyć w jego ustawieniach, a moderatorzy mogą je wyłączyć także w trakcie transmisji. Bez zainstalowanej usługi ta opcja nie działa."
       },
       "errors": {
         "invalid": "Ustawienia nie zostały zapisane: jedna z wartości jest nieprawidłowa. Sprawdź zmienione pola i spróbuj ponownie.",

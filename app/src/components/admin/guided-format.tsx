@@ -135,6 +135,7 @@ export default function GuidedFormat({
   initial,
   onContinue,
   aiPipelineEnabled = true,
+  liveCaptionsAvailable = false,
   accessoPredefinito = 'tutti',
   children,
 }: {
@@ -145,6 +146,8 @@ export default function GuidedFormat({
   /** Con la post-produzione AI spenta, la registrazione non promette
    *  trascrizione e sintesi. */
   aiPipelineEnabled?: boolean;
+  /** I sottotitoli live ci sono nell'installazione: ogni formato li accende. */
+  liveCaptionsAvailable?: boolean;
   /** Sotto le domande: i modelli salvati. */
   children?: React.ReactNode;
 }) {
@@ -167,6 +170,7 @@ export default function GuidedFormat({
     tp('feature.qa.label'),
     tForm('agendaEnabled'),
     tForm('wordCloudEnabled'),
+    ...(liveCaptionsAvailable ? [tForm('liveCaptionsEnabled')] : []),
   ];
 
   return (

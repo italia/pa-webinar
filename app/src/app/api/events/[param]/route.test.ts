@@ -59,6 +59,8 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn(), update: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
+    tag: { findMany: vi.fn() },
+    eventTagLink: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
     $transaction: vi.fn(),
   },
@@ -79,6 +81,12 @@ const mocked = prisma as unknown as {
     update: ReturnType<typeof vi.fn>;
   };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
+  tag: { findMany: ReturnType<typeof vi.fn> };
+  eventTagLink: {
+    findMany: ReturnType<typeof vi.fn>;
+    deleteMany: ReturnType<typeof vi.fn>;
+    createMany: ReturnType<typeof vi.fn>;
+  };
   $transaction: ReturnType<typeof vi.fn>;
 };
 
@@ -325,6 +333,87 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
       await conStato(attuale, { status: 'LIVE' });
       expect(datiScritti().status).toBe('LIVE');
     }
+  });
+});
+
+describe('PUT /api/events/[param] — tag', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    staff.requireEventManager.mockResolvedValue(undefined);
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+    );
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-a' }]);
+  });
+
+  it("l'elenco cambiato sostituisce le etichette, insieme all'evento", async () => {
+    mocked.tag.findMany.mockResolvedValue([
+      { id: 'tag-a', slug: 'a' },
+      { id: 'tag-b', slug: 'b' },
+    ]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['a', 'b', 'sparito'] }), contesto as never);
+
+    expect(r.status).toBe(200);
+    expect(staff.requireEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
+    expect(mocked.$transaction).toHaveBeenCalledTimes(1);
+    expect(mocked.tag.findMany).toHaveBeenCalledWith({
+      where: { slug: { in: ['a', 'b', 'sparito'] } },
+      select: { id: true, slug: true },
+    });
+    // Nel registro le etichette scritte davvero, non quelle chieste.
+    const { logAdminAction } = await import('@/lib/audit/admin-audit');
+    expect(vi.mocked(logAdminAction)).toHaveBeenCalledWith(
+      expect.objectContaining({ details: expect.objectContaining({ tags: ['a', 'b'] }) }),
+    );
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.createMany).toHaveBeenCalledWith({
+      data: [
+        { eventId: EVENT_ID, tagId: 'tag-a' },
+        { eventId: EVENT_ID, tagId: 'tag-b' },
+      ],
+      skipDuplicates: true,
+    });
+  });
+
+  it('un elenco vuoto toglie tutte le etichette', async () => {
+    await PUT(richiesta({ tagSlugs: [] }), contesto as never);
+
+    expect(mocked.tag.findMany).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.createMany).not.toHaveBeenCalled();
+  });
+
+  it('le stesse etichette, in un altro ordine, non si riscrivono', async () => {
+    mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-b' }, { tagId: 'tag-a' }]);
+    mocked.tag.findMany.mockResolvedValue([{ id: 'tag-a' }, { id: 'tag-b' }]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['a', 'b'] }), contesto as never);
+
+    expect(r.status).toBe(200);
+    expect(staff.requireEventManager).not.toHaveBeenCalled();
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('con il solo link di conduzione non si cambiano', async () => {
+    staff.requireEventManager.mockRejectedValue(new UnauthorizedError());
+    mocked.tag.findMany.mockResolvedValue([{ id: 'tag-b' }]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['b'] }), contesto as never);
+
+    expect(r.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('una modifica parziale non tocca le etichette', async () => {
+    await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+
+    expect(mocked.eventTagLink.findMany).not.toHaveBeenCalled();
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    expect(mocked.event.update).toHaveBeenCalledTimes(1);
   });
 });
 

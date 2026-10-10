@@ -15,6 +15,7 @@ import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
+import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
@@ -225,17 +226,23 @@ export const PUT = withErrorHandling(async (request, context) => {
   // a cui si lega: un link di conduzione (condiviso, inoltrato, o di un
   // co-moderatore) non apre ne' chiude l'iscrizione.
   if (data.accessMode !== undefined && data.accessMode !== event.accessMode) {
-    try {
-      await requireEventManager(await cookies(), eventId);
-    } catch (err) {
-      // Senza una sessione dello staff che gestisce l'evento: 403. Altri
-      // errori (la banca dati) restano quello che sono.
-      if (err instanceof UnauthorizedError || err instanceof ForbiddenError) {
-        throw new ForbiddenError('Only the event staff can change who can take part');
-      }
-      throw err;
+    await soloStaffDellEvento(eventId, 'Only the event staff can change who can take part');
+  }
+
+  // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
+  // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
+  // l'evento, come chi partecipa (un link di conduzione no). Una modifica
+  // parziale (la sala, un flag) non le manda e non le tocca.
+  let nuoveEtichette: Array<{ id: string; slug: string }> | null = null;
+  if (data.tagSlugs !== undefined) {
+    const nuove = await resolveTags(prisma, data.tagSlugs);
+    const ids = nuove.map((tag) => tag.id);
+    if (!sameTagIds(ids, await eventTagIds(prisma, eventId))) {
+      await soloStaffDellEvento(eventId, 'Only the event staff can change the tags');
+      nuoveEtichette = nuove;
     }
   }
+  const tagIds = nuoveEtichette?.map((tag) => tag.id) ?? null;
 
   // Il modello dell'informativa è una chiave esterna: un id inesistente
   // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
@@ -548,13 +555,15 @@ export const PUT = withErrorHandling(async (request, context) => {
     nextStatus !== event.status &&
     (event.status === 'LIVE' ||
       (!isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED')));
-  const updated = closesSessions
-    ? await prisma.$transaction(async (tx) => {
-        const aggiornato = await tx.event.update(updateArgs);
-        await closeOpenSessions(tx, [eventId], new Date());
-        return aggiornato;
-      })
-    : await prisma.event.update(updateArgs);
+  const updated =
+    closesSessions || tagIds !== null
+      ? await prisma.$transaction(async (tx) => {
+          const aggiornato = await tx.event.update(updateArgs);
+          if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
+          if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
+          return aggiornato;
+        })
+      : await prisma.event.update(updateArgs);
 
   if (dateChanged && event.status === 'PUBLISHED') {
     // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
@@ -610,7 +619,11 @@ export const PUT = withErrorHandling(async (request, context) => {
     request,
     action: 'EVENT_UPDATE',
     target: eventId,
-    details: { fields: Object.keys(data), dateChanged },
+    details: {
+      fields: Object.keys(data),
+      dateChanged,
+      ...(nuoveEtichette !== null && { tags: nuoveEtichette.map((tag) => tag.slug) }),
+    },
   });
 
   return Response.json({
@@ -623,6 +636,22 @@ export const PUT = withErrorHandling(async (request, context) => {
     ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
   });
 });
+
+/**
+ * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di
+ * conduzione (condiviso, inoltrato o di un co-moderatore): senza quella
+ * sessione 403. Altri errori (la banca dati) restano quello che sono.
+ */
+async function soloStaffDellEvento(eventId: string, messaggio: string): Promise<void> {
+  try {
+    await requireEventManager(await cookies(), eventId);
+  } catch (err) {
+    if (err instanceof UnauthorizedError || err instanceof ForbiddenError) {
+      throw new ForbiddenError(messaggio);
+    }
+    throw err;
+  }
+}
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
 

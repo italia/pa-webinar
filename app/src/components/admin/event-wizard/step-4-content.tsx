@@ -12,6 +12,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { Link, percorso } from '@/i18n/navigation';
+
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
 import {
@@ -81,6 +83,12 @@ export interface QuestionnaireBlock {
   original?: QuestionnaireOriginal;
 }
 
+/** Le risposte gia' raccolte da un questionario esistente, per momento. */
+export interface QuestionnaireResponseCounts {
+  pre: number;
+  post: number;
+}
+
 export interface Step4Value {
   preEventQuestionnaire: QuestionnaireBlock;
   postEventQuestionnaire: QuestionnaireBlock;
@@ -110,6 +118,12 @@ interface Props {
   defaultFeedbackHint?: boolean;
   /** Dentro una sezione delle impostazioni avanzate, che ha gia' il titolo. */
   incorporato?: boolean;
+  /** In modifica: le risposte gia' raccolte. Un questionario che ne ha non si
+   *  cambia ne' si svuota da qui (si perderebbero): lo si fa dalla pagina dei
+   *  questionari dell'evento, che chiede conferma e dice quante sono. */
+  responseCounts?: QuestionnaireResponseCounts;
+  /** In modifica: l'evento, per portare alla pagina dei suoi questionari. */
+  eventId?: string;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -135,6 +149,8 @@ export default function Step4Content({
   staffLocked = false,
   defaultFeedbackHint = false,
   incorporato = false,
+  responseCounts,
+  eventId,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
   const [templates, setTemplates] = useState<TemplateRow[]>([]);
@@ -195,6 +211,8 @@ export default function Step4Content({
             onSaveAndNavigate={handleSaveAndNavigate}
             savingDraft={savingDraft || submitting === true}
             defaultFeedbackHint={defaultFeedbackHint}
+            responseCounts={responseCounts}
+            eventId={eventId}
           />
 
           <MaterialsSection
@@ -216,6 +234,8 @@ function QuestionnairesSection({
   onSaveAndNavigate,
   savingDraft,
   defaultFeedbackHint,
+  responseCounts,
+  eventId,
 }: {
   value: Step4Value;
   onChange: (patch: Partial<Step4Value>) => void;
@@ -223,6 +243,8 @@ function QuestionnairesSection({
   onSaveAndNavigate?: () => void | Promise<void>;
   savingDraft: boolean;
   defaultFeedbackHint: boolean;
+  responseCounts?: QuestionnaireResponseCounts;
+  eventId?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');
   const tc = useTranslations('common');
@@ -244,6 +266,8 @@ function QuestionnairesSection({
         templates={templates}
         value={value.preEventQuestionnaire}
         onChange={(next) => onChange({ preEventQuestionnaire: next })}
+        responseCount={responseCounts?.pre ?? 0}
+        eventId={eventId}
       />
 
       <PlacementBlock
@@ -254,6 +278,8 @@ function QuestionnairesSection({
         templates={templates}
         value={value.postEventQuestionnaire}
         onChange={(next) => onChange({ postEventQuestionnaire: next })}
+        responseCount={responseCounts?.post ?? 0}
+        eventId={eventId}
         emptyHint={
           defaultFeedbackHint &&
           templates.some((tpl) => tpl.name === FEEDBACK_GENERIC_TEMPLATE_NAME)
@@ -287,6 +313,8 @@ function PlacementBlock({
   value,
   onChange,
   emptyHint,
+  responseCount = 0,
+  eventId,
 }: {
   heading: string;
   /** A che cosa serve il questionario di questo momento. */
@@ -298,6 +326,64 @@ function PlacementBlock({
   value: QuestionnaireBlock;
   onChange: (next: QuestionnaireBlock) => void;
   /** Detto quando non e' scelto nulla. */
+  emptyHint?: string;
+  /** Le risposte gia' raccolte: con almeno una il blocco si legge soltanto. */
+  responseCount?: number;
+  eventId?: string;
+}) {
+  const t = useTranslations('admin.wizard.step4');
+  if (responseCount > 0) {
+    return (
+      <div className="border rounded p-3 mb-3 bg-white" style={{ borderColor: '#e8e8e8' }}>
+        <h4 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+          {heading}
+        </h4>
+        <p className="text-secondary small mb-2">{help}</p>
+        <div className="alert alert-info mb-0" role="note">
+          {t('lockedWithResponses', { count: responseCount })}
+          {eventId && (
+            <>
+              {' '}
+              <Link href={percorso(`/admin/events/${eventId}/questionnaires`)}>
+                {t('lockedGoToQuestionnaires')}
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <PlacementEditor
+      heading={heading}
+      help={help}
+      idPrefix={idPrefix}
+      moment={moment}
+      templates={libreria}
+      value={value}
+      onChange={onChange}
+      emptyHint={emptyHint}
+    />
+  );
+}
+
+function PlacementEditor({
+  heading,
+  help,
+  idPrefix,
+  moment,
+  templates: libreria,
+  value,
+  onChange,
+  emptyHint,
+}: {
+  heading: string;
+  help: string;
+  idPrefix: string;
+  moment: QuestionnaireMoment;
+  templates: TemplateRow[];
+  value: QuestionnaireBlock;
+  onChange: (next: QuestionnaireBlock) => void;
   emptyHint?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');

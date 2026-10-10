@@ -950,7 +950,9 @@
         "postDefaultHint": "Si vous ne choisissez rien, le questionnaire « {name} » est proposé après l'événement.",
         "preHelp": "Questions pour les inscrits, avant l'événement : profil, attentes, sujets à traiter. Ce n'est pas l'avis.",
         "postHelp": "L'avis, demandé à la fin de l'événement : comment ça s'est passé, la qualité, les contenus.",
-        "templatesNoneForMoment": "Aucun modèle pour ce moment : ceux de la bibliothèque sont pour l'autre. Ajoutez ci-dessous les questions pour cet événement."
+        "templatesNoneForMoment": "Aucun modèle pour ce moment : ceux de la bibliothèque sont pour l'autre. Ajoutez ci-dessous les questions pour cet événement.",
+        "lockedWithResponses": "Réponses recueillies : {count}. Pour ne pas les perdre, le questionnaire ne se modifie pas ici : pour le changer ou le supprimer, utilisez la gestion des questionnaires de l'événement, qui demande une confirmation.",
+        "lockedGoToQuestionnaires": "Aller aux questionnaires"
       },
       "step5": {
         "heading": "Récapitulatif et publication",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Le modérateur pose une question et chacun répond par un seul mot : les réponses forment un nuage mis à jour en direct, et les mots les plus écrits grandissent. Utile pour briser la glace ou recueillir une impression en quelques secondes.",
       "whiteboardEnabled": "Tableau blanc partagé",
       "whiteboardEnabledDesc": "Active le tableau blanc collaboratif natif (Excalidraw) : les modérateurs peuvent l'ouvrir depuis la barre d'outils pendant l'événement. Nécessite le service de tableau blanc de l'installation ; lorsqu'il est disponible, il est toujours actif dans les appels instantanés.",
+      "liveCaptionsEnabled": "Sous-titres automatiques",
+      "liveCaptionsEnabledDesc": "Les propos des intervenants s'affichent sous la vidéo, transcrits en temps réel : cela aide les personnes qui n'entendent pas ou ont du mal à suivre. Les modérateurs peuvent aussi les désactiver pendant le direct depuis l'onglet « Régie », et chacun peut les masquer pour soi.",
       "autoStartRecording": "Démarrer l'enregistrement automatiquement",
       "autoStartRecordingDesc": "Au début de l'événement, l'enregistrement démarre tout seul (sans demander confirmation au modérateur). Ainsi, les retardataires trouvent déjà le lecteur de rattrapage disponible.",
       "aiSectionHeading": "Post-production automatique",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Les personnes inscrites avec une adresse e-mail associée à un Gravatar le verront s'afficher comme image dans la salle ; pour toutes les autres, les initiales générées par la plateforme sont conservées. L'image transite par notre propre serveur : le navigateur des participants ne contacte donc jamais gravatar.com — mais la plateforme, si : cela doit être déclaré dans votre politique de confidentialité.",
         "liveCaptionsTitle": "Sous-titres en direct",
         "liveCaptionsEnabled": "Sous-titres automatiques dans les visioconférences",
-        "liveCaptionsEnabledHelp": "La voix de la personne qui parle est transcrite en temps réel par un service qui fonctionne dans l'infrastructure de la plateforme, sans service externe, et le texte n'est pas conservé. Les sous-titres sont actifs dans tous les événements ; les modérateurs peuvent les désactiver pendant l'événement. Sans le service installé, cette option est sans effet."
+        "liveCaptionsEnabledHelp": "La voix de la personne qui parle est transcrite en temps réel par un service qui fonctionne dans l'infrastructure de la plateforme, sans service externe, et le texte n'est pas conservé. Les sous-titres sont activés par défaut dans chaque événement : on peut les désactiver pour un événement dans ses paramètres, et les modérateurs peuvent aussi les désactiver pendant le direct. Sans le service installé, cette option est sans effet."
       },
       "errors": {
         "invalid": "Les paramètres n'ont pas été enregistrés : une valeur n'est pas valide. Vérifiez les champs modifiés et réessayez.",

@@ -950,7 +950,9 @@
         "postDefaultHint": "Dacă nu alegeți nimic, după eveniment se propune chestionarul „{name}”.",
         "preHelp": "Întrebări pentru cei care se înscriu, înainte de eveniment: profil, așteptări, teme. Nu este feedbackul.",
         "postHelp": "Feedbackul, cerut la sfârșitul evenimentului: cum a fost, calitatea, conținutul.",
-        "templatesNoneForMoment": "Niciun șablon pentru acest moment: cele din bibliotecă sunt pentru celălalt. Adaugă mai jos întrebările pentru acest eveniment."
+        "templatesNoneForMoment": "Niciun șablon pentru acest moment: cele din bibliotecă sunt pentru celălalt. Adaugă mai jos întrebările pentru acest eveniment.",
+        "lockedWithResponses": "Răspunsuri colectate: {count}. Pentru a nu le pierde, chestionarul nu se modifică aici: pentru a-l schimba sau șterge, folosiți gestionarea chestionarelor evenimentului, care cere confirmare.",
+        "lockedGoToQuestionnaires": "Mergeți la chestionare"
       },
       "step5": {
         "heading": "Rezumat și publicare",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Moderatorul pune o întrebare și fiecare răspunde cu un singur cuvânt: răspunsurile formează un nor actualizat în direct, iar cuvintele cele mai scrise devin mai mari. Util pentru a sparge gheața sau a culege o impresie în câteva secunde.",
       "whiteboardEnabled": "Tablă partajată",
       "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Necesită serviciul de tablă al instalării; acolo unde există, este întotdeauna activă în apelurile instantanee.",
+      "liveCaptionsEnabled": "Subtitrări automate",
+      "liveCaptionsEnabledDesc": "Ce spun vorbitorii apare sub video, transcris în timp real: ajută persoanele care nu aud sau urmăresc cu greu. Moderatorii le pot dezactiva și în timpul transmisiunii live din fila „Regie”, iar fiecare le poate ascunde pentru sine.",
       "autoStartRecording": "Porniți înregistrarea automat",
       "autoStartRecordingDesc": "La începutul evenimentului, înregistrarea pornește singură (fără a cere confirmare moderatorului). Astfel eventualii întârziați găsesc deja player-ul disponibil.",
       "aiSectionHeading": "Post-producție automată",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Cei care s-au înscris cu o adresă de e-mail asociată unui Gravatar îl vor vedea ca imagine în sală; pentru toți ceilalți rămân inițialele generate de platformă. Imaginea trece prin serverul nostru, deci browserul participanților nu contactează gravatar.com — dar platforma o face: acest lucru trebuie declarat în nota de informare privind confidențialitatea.",
         "liveCaptionsTitle": "Subtitrări în direct",
         "liveCaptionsEnabled": "Subtitrări automate în apelurile video",
-        "liveCaptionsEnabledHelp": "Vocea celui care vorbește este transcrisă în timp real de un serviciu care rulează în infrastructura proprie a platformei, fără servicii externe, iar textul nu este păstrat. Subtitrările sunt active la toate evenimentele; moderatorii le pot dezactiva în timpul evenimentului. Fără serviciul instalat, această opțiune nu are efect."
+        "liveCaptionsEnabledHelp": "Vocea celui care vorbește este transcrisă în timp real de un serviciu care rulează în infrastructura proprie a platformei, fără servicii externe, iar textul nu este păstrat. Subtitrările sunt active implicit la fiecare eveniment: pot fi dezactivate pentru un singur eveniment din setările acestuia, iar moderatorii le pot dezactiva și în timpul transmisiunii live. Fără serviciul instalat, această opțiune nu are efect."
       },
       "errors": {
         "invalid": "Setările nu au fost salvate: o valoare nu este validă. Verificați câmpurile modificate și încercați din nou.",

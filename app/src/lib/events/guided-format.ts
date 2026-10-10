@@ -79,6 +79,7 @@ export function presetDaFormato(f: FormatoGuidato, nome: string, sitoAperto = tr
     agendaEnabled: true,
     wordCloudEnabled: true,
     whiteboardEnabled: false,
+    liveCaptionsEnabled: true,
     participantsCanUnmute: tutti,
     participantsCanStartVideo: tutti,
     participantsCanShareScreen: tutti,

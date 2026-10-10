@@ -950,7 +950,9 @@
         "postDefaultHint": "Jekk ma tagħżel xejn, wara l-avveniment jiġi offrut il-kwestjonarju “{name}”.",
         "preHelp": "Mistoqsijiet għal min jirreġistra, qabel l-avveniment: profil, aspettattivi, suġġetti. Mhuwiex ir-rispons.",
         "postHelp": "Ir-rispons, mitlub fl-aħħar tal-avveniment: kif mar, il-kwalità, il-kontenut.",
-        "templatesNoneForMoment": "L-ebda mudell għal dan il-mument: dawk tal-librerija huma għall-ieħor. Żid il-mistoqsijiet għal dan l-avveniment hawn taħt."
+        "templatesNoneForMoment": "L-ebda mudell għal dan il-mument: dawk tal-librerija huma għall-ieħor. Żid il-mistoqsijiet għal dan l-avveniment hawn taħt.",
+        "lockedWithResponses": "Tweġibiet miġbura: {count}. Biex ma jintilfux, il-kwestjonarju ma jinbidilx hawn: biex tbiddlu jew tħassru, uża l-amministrazzjoni tal-kwestjonarji tal-avveniment, li titlob konferma.",
+        "lockedGoToQuestionnaires": "Mur għall-kwestjonarji"
       },
       "step5": {
         "heading": "Sommarju u pubblikazzjoni",
@@ -1473,6 +1475,8 @@
       "wordCloudEnabledDesc": "Il-moderatur jistaqsi mistoqsija u kulħadd iwieġeb b'kelma waħda: it-tweġibiet jiffurmaw sħaba li tiġi aġġornata live, u l-aktar kliem frekwenti jikber. Utli biex tkisser is-silġ jew tiġbor impressjoni fi ftit sekondi.",
       "whiteboardEnabled": "Whiteboard kondiviża",
       "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Teħtieġ is-servizz tal-whiteboard tal-installazzjoni; fejn ikun disponibbli, hija dejjem attiva fis-sejħiet istantanji.",
+      "liveCaptionsEnabled": "Sottotitoli awtomatiċi",
+      "liveCaptionsEnabledDesc": "Dak li jgħidu l-kelliema jidher taħt il-vidjo, traskritt f'ħin reali: jgħin lil min ma jismax jew isibha diffiċli jsegwi. Il-moderaturi jistgħu jitfuhom ukoll waqt l-avveniment dirett mit-tab “Kontroll”, u kulħadd jista' jaħbihom għalih innifsu.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
       "autoStartRecordingDesc": "Al momento tal-bidu tal-avveniment il-reġistrazzjoni partu da sola (senza chiederu ikkonferma lill-moderatur). Hekk eventuali ritardatari trovano diġà il player disponibbli.",
       "aiSectionHeading": "Post-produzzjoni awtomatika",
@@ -1902,7 +1906,7 @@
         "gravatarEnabledHelp": "Min irreġistra b'email li għandha Gravatar jarah bħala stampa fil-kamra; għall-oħrajn jibqgħu l-inizjali ġġenerati mill-pjattaforma. L-istampa tgħaddi mis-server tagħna, għalhekk il-browser tal-parteċipanti qatt ma jikkuntattja lil gravatar.com — imma l-pjattaforma iva: dan irid jiġi ddikjarat fl-avviż tal-privatezza.",
         "liveCaptionsTitle": "Sottotitoli diretti",
         "liveCaptionsEnabled": "Sottotitoli awtomatiċi fis-sejħiet bil-vidjo",
-        "liveCaptionsEnabledHelp": "Il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali minn servizz li jaħdem fl-infrastruttura tal-pjattaforma stess, mingħajr servizzi esterni, u t-test ma jinżammx. Is-sottotitoli huma attivi f'kull avveniment; il-moderaturi jistgħu jitfuhom matul l-avveniment. Mingħajr is-servizz installat, din l-għażla m'għandha l-ebda effett. Il-mudell għadu ma jittraskrivix il-Malti b'mod affidabbli."
+        "liveCaptionsEnabledHelp": "Il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali minn servizz li jaħdem fl-infrastruttura tal-pjattaforma stess, mingħajr servizzi esterni, u t-test ma jinżammx. Is-sottotitoli huma attivi b'mod awtomatiku f'kull avveniment: jistgħu jintfew għal avveniment wieħed fis-settings tiegħu, u l-moderaturi jistgħu jitfuhom ukoll waqt l-avveniment dirett. Mingħajr is-servizz installat, din l-għażla m'għandha l-ebda effett. Il-mudell għadu ma jittraskrivix il-Malti b'mod affidabbli."
       },
       "errors": {
         "invalid": "L-issettjar ma ġewx issejvjati: valur mhux validu. Iċċekkja l-oqsma li biddilt u erġa' pprova.",
