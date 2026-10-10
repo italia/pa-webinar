@@ -196,6 +196,6 @@ spec:
        col tag dell'app. */}}
 {{- $cpuImage := $cpu.image | default $w.image | default (include "pa-webinar.auxImage" (list . "" "postprod-worker-cpu")) }}
 ---
-{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE" "REPORT") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
 {{- end }}
 {{- end }}

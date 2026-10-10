@@ -110,7 +110,9 @@ export const POST = withErrorHandling(async (request) => {
       },
     });
 
-    if (terminal) {
+    // Il resoconto dell'evento non ha registrazione: il suo fallimento non
+    // cambia lo stato di nessuna.
+    if (terminal && job.recordingId) {
       // Propagate to recording status: if any job for this recording
       // is FAILED, the recording is marked PARTIAL (some artifacts
       // may still be ok) or FAILED (no artifacts produced). We pick
@@ -120,6 +122,8 @@ export const POST = withErrorHandling(async (request) => {
         where: { id: job.recordingId },
         data: { status: 'POSTPROD_PARTIAL' },
       });
+    }
+    if (terminal) {
       postprodJobsCompletedTotal.labels(job.kind, 'FAILED').inc();
       if (job.startedAt) {
         const secs = (Date.now() - job.startedAt.getTime()) / 1000;

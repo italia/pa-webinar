@@ -549,6 +549,39 @@ where the rule is enforced. See
   it) see everything in the administration area. That includes raw
   diarization labels, retained tracks and the archive.
 
+### The event report
+
+Staff can request an AI report of the event from the **After the event** tab
+once the event has ended, within its data retention and with the site-wide AI
+switch on ([AI post-production](../POSTPROD.md#the-event-report)).
+
+- **What the model reads.** Inside the installation, when the job is claimed:
+  the event's description and its public organizations and people; the
+  transcript the public page would show, with its speaker names; the chat
+  text without names, as a sample of at most 400 messages; the Q&A questions
+  and answers without authors; published polls; word-cloud words; the
+  post-event questionnaire's averages and open comments without authors, and
+  the older star ratings; the agenda's agree and disagree counts; the
+  platform's figures.
+- **What is stored.** On the event (`Event.postEventReport`): the figures the
+  platform computed (counts, averages, distributions, the texts of published
+  polls, of the most voted questions and of the most frequent words) and the
+  model's text in each requested language. The model is instructed to state
+  only facts from the inputs, to name only the event's listed people and
+  named speakers, to attribute no chat or comment sentence to anyone and to
+  avoid personal data; its feedback section rewords the comments in its own
+  words, without authors. The portal removes email addresses and phone
+  numbers from the model's text before storing it.
+- **Review and publication.** A new or regenerated report is not public.
+  Staff review it in a preview and publish it on the event page; the page
+  says that the text is written by an AI model from the event's material and
+  reviewed by staff, and that the figures come from the platform.
+- **Retention.** The report is not an output of a recording, so the
+  post-production purges do not touch it. Like the event recap, it stays with
+  the event after the event's retention, and goes only when the event is
+  deleted. Self-service erasure does not reach it: staff withdraw it from the
+  page or regenerate it when a request concerns it.
+
 ## Retention regimes
 
 Three kinds of data follow different clocks:
@@ -845,6 +878,7 @@ privacy notice states the actual basis.
 | Per-participant track | Art. 6(1)(a): explicit consent, separate from the recording consent, optional, checked for each track before it is recorded | `Registration.consentMultitrack`, deleted with the registration at the event's retention. A `CONSENT_RECORDED` entry in the GDPR audit log, with the flags but no identity, which is kept. Waiting-room ticks are stored for the conference seat (`MultitrackConsent`) and deleted at the event's retention |
 | Transcript from captions: keeping a person's sentences with their name | Art. 6(1)(a): the same consent, given to the current version of its text | The same records, with the version of the text each consent was given to. Each stored sentence carries the conference seat whose consent allowed it (`CaptionSegment.seatId`) |
 | Keeping tracks beyond transcription | The same consent, plus the privacy notice | Only the event flag. `consentSnapshot` does not include **Keep per-participant tracks** or dubbing |
+| The AI event report | The basis of AI post-production; staff decide whether to publish it | `AdminAuditLog` entries `EVENT_REPORT_REQUESTED`, `EVENT_REPORT_PUBLISHED` and `EVENT_REPORT_WITHDRAWN`. The report records the model that wrote it |
 | Per-participant AI choices (transcript, summary, translation) | Art. 6(1)(a), granular | `Registration.aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation` exist in the schema, but no code reads or writes them, and no screen asks for them |
 
 Points for the controller's assessment:

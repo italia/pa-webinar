@@ -35,6 +35,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/[id]/duplicate/route.ts': 'proprio evento; la copia e’ sua',
   'api/admin/events/[id]/feedback/route.ts': 'valutazioni del proprio evento, senza nomi',
   'api/admin/events/[id]/captions-transcript/route.ts': 'proprio evento',
+  'api/admin/events/[id]/report/route.ts': 'proprio evento',
   'api/admin/events/[id]/generate-ai/route.ts': 'proprio evento',
   'api/admin/events/[id]/glossary/route.ts': 'glossario della post-produzione del proprio evento',
   'api/admin/glossary/route.ts': 'glossario comune della post-produzione: chi organizza lo legge e lo arricchisce',

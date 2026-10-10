@@ -18,6 +18,7 @@ export const POSTPROD_JOB_KINDS = [
   'SUBTITLE',
   'DUB',
   'ARCHIVE',
+  'REPORT',
 ] as const;
 export type PostprodJobKind = (typeof POSTPROD_JOB_KINDS)[number];
 

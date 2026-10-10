@@ -3295,6 +3295,42 @@
       "loadFailed": "Impossibile caricare lo stato della trascrizione.",
       "expired": "La conservazione dei dati dell'evento è finita: la trascrizione non si ricostruisce.",
       "aiRunning": "La pipeline AI sta trascrivendo il video: la sua trascrizione prenderà il posto di quella dai sottotitoli."
+    },
+    "eventReport": {
+      "title": "Resoconto AI dell'evento",
+      "intro": "Un resoconto per chi non c'era e per chi vuole rileggere: sintesi, argomenti spiegati, mappa dei concetti, accordo e disaccordo, partecipazione e valutazioni, con grafici calcolati dalla piattaforma. Lo scrive il modello linguistico della piattaforma, sui suoi server.",
+      "afterFeedback": "Generalo dopo aver raccolto le valutazioni dei partecipanti: entrano nel resoconto quelle arrivate fino a quel momento. Si può rigenerare.",
+      "requirementsTitle": "Requisiti",
+      "reqEnded": "Evento concluso",
+      "reqAi": "Elaborazione AI attiva nelle impostazioni",
+      "reqRetention": "Dati dell'evento disponibili fino al {date}",
+      "reqExpired": "Conservazione dei dati finita il {date}: chat, reazioni e presenze non ci sono più",
+      "inputsTitle": "Materiale disponibile",
+      "inputTranscript": "Trascrizione",
+      "inputNoTranscript": "Nessuna trascrizione",
+      "inputChat": "{count, plural, one {# messaggio in chat} other {# messaggi in chat}}",
+      "inputQuestions": "{count, plural, one {# domanda} other {# domande}}",
+      "inputPolls": "{count, plural, one {# sondaggio pubblicato} other {# sondaggi pubblicati}}",
+      "inputWords": "{count, plural, one {# parola} other {# parole}}",
+      "inputFeedback": "{count, plural, one {# valutazione} other {# valutazioni}}",
+      "inputAgenda": "{count, plural, one {# reazione all'agenda} other {# reazioni all'agenda}}",
+      "languagesTitle": "Lingue: {language} e traduzioni",
+      "targetLanguages": "Traduci il resoconto anche in:",
+      "generate": "Genera il resoconto",
+      "regenerate": "Rigenera il resoconto",
+      "confirmRegenerate": "Il nuovo resoconto sostituisce quello attuale e resta nascosto finché non lo pubblichi di nuovo.",
+      "requested": "Resoconto richiesto: sarà pronto tra qualche minuto.",
+      "failed": "Operazione non riuscita.",
+      "loadFailed": "Impossibile caricare lo stato del resoconto.",
+      "statusQueued": "In coda.",
+      "statusRunning": "In preparazione: il modello sta scrivendo il resoconto.",
+      "statusFailed": "Non riuscito: {error}",
+      "statusDone": "Generato il {date}.",
+      "publish": "Mostra il resoconto nella pagina dell'evento",
+      "publishDesc": "Rileggilo prima di pubblicarlo: il testo è scritto da un modello di intelligenza artificiale. Un resoconto rigenerato va pubblicato di nuovo.",
+      "preview": "Anteprima",
+      "hidePreview": "Nascondi l'anteprima",
+      "previewLanguage": "Lingua"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Avvisa gli iscritti quando la registrazione è pubblicata",
     "recordingNotifyHelp": "Un'email sola, quando la registrazione (o il video esterno) è visibile sulla pagina pubblica dell'evento. Arriva a chi è ancora iscritto: dopo la conservazione dei dati non avvisa nessuno.",
-    "recordingNotifySent": "Avviso inviato il {date}."
+    "recordingNotifySent": "Avviso inviato il {date}.",
+    "report": {
+      "title": "Resoconto dell'evento",
+      "generatedAt": "Generato il {date}",
+      "translated": "traduzione automatica dall'originale in {language}",
+      "languageFallback": "Il resoconto non è disponibile nella tua lingua: è mostrato in {language}.",
+      "sections": {
+        "highlights": "In breve",
+        "numbers": "La partecipazione in numeri",
+        "timeline": "La partecipazione nel tempo",
+        "topics": "Gli argomenti",
+        "map": "Mappa dei concetti",
+        "consensus": "Accordo e disaccordo",
+        "polls": "Sondaggi",
+        "feedback": "Le valutazioni dei partecipanti",
+        "benefits": "Che cosa ne ricava chi ha partecipato",
+        "openQuestions": "Domande aperte",
+        "nextSteps": "Prossimi passi",
+        "summary": "Leggi il resoconto per esteso"
+      },
+      "metrics": {
+        "peak": "Persone in sala al picco",
+        "joined": "Presenti",
+        "ofRegistered": "{pct}% degli iscritti",
+        "active": "Hanno partecipato attivamente",
+        "ofPresent": "{pct}% dei presenti",
+        "interactions": "Interazioni",
+        "rating": "Valutazione media",
+        "responses": "{count, plural, one {# risposta} other {# risposte}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Domande",
+        "polls": "Sondaggi",
+        "words": "Parole",
+        "reactions": "Reazioni"
+      },
+      "timelineDesc": "Interazioni ogni {minutes} minuti dall'inizio dell'evento",
+      "timeFromStart": "Dall'inizio",
+      "peak": "Il momento più partecipato: {label} dall'inizio.",
+      "agreement": {
+        "high": "Ampio accordo",
+        "mixed": "Opinioni divise",
+        "low": "Poco accordo",
+        "unknown": "Accordo non valutabile"
+      },
+      "goTo": "Vai al minuto {time}",
+      "stance": {
+        "support": "A favore",
+        "concern": "Perplessità",
+        "question": "Domanda"
+      },
+      "mapDesc": "Mappa dei concetti dell'evento: i temi attorno al titolo, collegati a concetti, soggetti ed esiti.",
+      "kind": {
+        "topic": "Tema",
+        "concept": "Concetto",
+        "actor": "Soggetto",
+        "outcome": "Esito"
+      },
+      "agendaReactions": "Le reazioni dei partecipanti ai punti dell'agenda",
+      "agree": "D'accordo",
+      "disagree": "Non d'accordo",
+      "agreements": "Punti di accordo",
+      "disagreements": "Punti di disaccordo",
+      "votes": "{count, plural, one {# voto} other {# voti}}",
+      "average": "media {value} su {max}",
+      "strengths": "Punti di forza",
+      "improvements": "Da migliorare",
+      "quotes": "Dai commenti",
+      "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, chat, domande, sondaggi e valutazioni, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
+    }
   },
   "provisioning": {
     "loading": "Caricamento",

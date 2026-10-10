@@ -3171,6 +3171,42 @@
       "loadFailed": "Ma kienx possibbli li jitgħabba l-istat tat-traskrizzjoni.",
       "expired": "Il-perjodu taż-żamma tad-data tal-avveniment intemm: it-traskrizzjoni ma terġax tinbena.",
       "aiRunning": "L-ipproċessar tal-IA qed jittraskrivi l-vidjo: it-traskrizzjoni tiegħu se tieħu post dik mis-sottotitoli."
+    },
+    "eventReport": {
+      "title": "Rapport tal-IA tal-avveniment",
+      "intro": "Rapport għal min ma kienx hemm u għal min irid jerġa' jaqra: sommarju, suġġetti spjegati, mappa tal-kunċetti, qbil u nuqqas ta' qbil, parteċipazzjoni u evalwazzjonijiet, b'graffs ikkalkulati mill-pjattaforma. Jiktbu l-mudell lingwistiku tal-pjattaforma, fuq is-servers tagħha stess.",
+      "afterFeedback": "Iġġenerah wara li tiġbor l-evalwazzjonijiet tal-parteċipanti: jiddaħħlu dawk riċevuti sa dak il-mument. Jista' jerġa' jiġi ġġenerat.",
+      "requirementsTitle": "Rekwiżiti",
+      "reqEnded": "L-avveniment intemm",
+      "reqAi": "L-ipproċessar tal-IA attivat fis-settings",
+      "reqRetention": "Id-data tal-avveniment disponibbli sal-{date}",
+      "reqExpired": "Iż-żamma tad-data ntemmet fil-{date}: iċ-chat, ir-reazzjonijiet u l-preżenzi m'għadhomx disponibbli",
+      "inputsTitle": "Materjal disponibbli",
+      "inputTranscript": "Traskrizzjoni",
+      "inputNoTranscript": "L-ebda traskrizzjoni",
+      "inputChat": "{count, plural, one {# messaġġ fiċ-chat} other {# messaġġi fiċ-chat}}",
+      "inputQuestions": "{count, plural, one {# mistoqsija} other {# mistoqsijiet}}",
+      "inputPolls": "{count, plural, one {# stħarriġ ippubblikat} other {# stħarriġiet ippubblikati}}",
+      "inputWords": "{count, plural, one {# kelma} other {# kliem}}",
+      "inputFeedback": "{count, plural, one {# evalwazzjoni} other {# evalwazzjonijiet}}",
+      "inputAgenda": "{count, plural, one {# reazzjoni għall-aġenda} other {# reazzjonijiet għall-aġenda}}",
+      "languagesTitle": "Lingwi: {language} u traduzzjonijiet",
+      "targetLanguages": "Ittraduċi r-rapport ukoll għal:",
+      "generate": "Iġġenera r-rapport",
+      "regenerate": "Erġa' iġġenera r-rapport",
+      "confirmRegenerate": "Ir-rapport il-ġdid jieħu post dak attwali u jibqa' moħbi sakemm terġa' tippubblikah.",
+      "requested": "Ir-rapport intalab: se jkun lest fi ftit minuti.",
+      "failed": "L-operazzjoni ma rnexxietx.",
+      "loadFailed": "Ma kienx possibbli li jitgħabba l-istat tar-rapport.",
+      "statusQueued": "Fil-kju.",
+      "statusRunning": "Qed jitħejja: il-mudell qed jikteb ir-rapport.",
+      "statusFailed": "Ma rnexxiex: {error}",
+      "statusDone": "Iġġenerat fil-{date}.",
+      "publish": "Uri r-rapport fil-paġna tal-avveniment",
+      "publishDesc": "Irrevedih qabel tippubblikah: it-test inkiteb minn mudell tal-intelliġenza artifiċjali. Rapport iġġenerat mill-ġdid għandu jerġa' jiġi ppubblikat.",
+      "preview": "Previżjoni",
+      "hidePreview": "Aħbi l-previżjoni",
+      "previewLanguage": "Lingwa"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Avża lill-irreġistrati meta r-reġistrazzjoni tiġi ppubblikata",
     "recordingNotifyHelp": "Email waħda biss, meta r-reġistrazzjoni (jew il-vidjo estern) tidher fil-paġna pubblika tal-avveniment. Tasal għand min għadu rreġistrat: wara l-perjodu taż-żamma ħadd ma jiġi avżat.",
-    "recordingNotifySent": "Avviż mibgħut fl-{date}."
+    "recordingNotifySent": "Avviż mibgħut fl-{date}.",
+    "report": {
+      "title": "Rapport tal-avveniment",
+      "generatedAt": "Iġġenerat fil-{date}",
+      "translated": "traduzzjoni awtomatika mill-oriġinal bil-{language}",
+      "languageFallback": "Ir-rapport mhuwiex disponibbli bil-lingwa tiegħek: qed jintwera bil-{language}.",
+      "sections": {
+        "highlights": "Fil-qosor",
+        "numbers": "Il-parteċipazzjoni f'numri",
+        "timeline": "Il-parteċipazzjoni maż-żmien",
+        "topics": "Is-suġġetti",
+        "map": "Mappa tal-kunċetti",
+        "consensus": "Qbil u nuqqas ta' qbil",
+        "polls": "Stħarriġ",
+        "feedback": "L-evalwazzjonijiet tal-parteċipanti",
+        "benefits": "X'kisbu l-parteċipanti",
+        "openQuestions": "Mistoqsijiet miftuħa",
+        "nextSteps": "Il-passi li jmiss",
+        "summary": "Aqra r-rapport sħiħ"
+      },
+      "metrics": {
+        "peak": "Nies fis-sala fl-ogħla mument",
+        "joined": "Preżenti",
+        "ofRegistered": "{pct}% ta' dawk irreġistrati",
+        "active": "Ipparteċipaw b'mod attiv",
+        "ofPresent": "{pct}% ta' dawk preżenti",
+        "interactions": "Interazzjonijiet",
+        "rating": "Evalwazzjoni medja",
+        "responses": "{count, plural, one {# tweġiba} other {# tweġibiet}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Mistoqsijiet",
+        "polls": "Stħarriġ",
+        "words": "Kliem",
+        "reactions": "Reazzjonijiet"
+      },
+      "timelineDesc": "Interazzjonijiet kull {minutes} minuti mill-bidu tal-avveniment",
+      "timeFromStart": "Mill-bidu",
+      "peak": "L-iktar mument attiv: {label} mill-bidu.",
+      "agreement": {
+        "high": "Qbil wiesa'",
+        "mixed": "Opinjonijiet maqsuma",
+        "low": "Ftit qbil",
+        "unknown": "Il-qbil ma jistax jitkejjel"
+      },
+      "goTo": "Mur għal {time}",
+      "stance": {
+        "support": "Favur",
+        "concern": "Riżervi",
+        "question": "Mistoqsija"
+      },
+      "mapDesc": "Mappa tal-kunċetti tal-avveniment: is-suġġetti madwar it-titlu, marbuta ma' kunċetti, atturi u riżultati.",
+      "kind": {
+        "topic": "Suġġett",
+        "concept": "Kunċett",
+        "actor": "Attur",
+        "outcome": "Riżultat"
+      },
+      "agendaReactions": "Ir-reazzjonijiet tal-parteċipanti għall-punti tal-aġenda",
+      "agree": "Naqbel",
+      "disagree": "Ma naqbilx",
+      "agreements": "Punti ta' qbil",
+      "disagreements": "Punti ta' nuqqas ta' qbil",
+      "votes": "{count, plural, one {# vot} other {# voti}}",
+      "average": "medja {value} minn {max}",
+      "strengths": "Punti b'saħħithom",
+      "improvements": "X'għandu jitjieb",
+      "quotes": "Mill-kummenti",
+      "aiNotice": "It-test inkiteb minn mudell tal-intelliġenza artifiċjali abbażi tat-traskrizzjoni, taċ-chat, tal-mistoqsijiet, tal-istħarriġ u tal-evalwazzjonijiet, u t-tim irreveda qabel il-pubblikazzjoni. In-numri u l-graffs jikkalkulahom il-pjattaforma. Jista' jkun fih ineżattezzi."
+    }
   },
   "provisioning": {
     "loading": "Caricament",

@@ -141,6 +141,9 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   tempRecordingStartedAt: 'artefact of the occurrence that ran',
   postEventRecap: 'generated from the occurrence that ran',
   postEventRecapAt: 'generated from the occurrence that ran',
+  postEventReport: 'generated from the occurrence that ran',
+  postEventReportAt: 'generated from the occurrence that ran',
+  postEventReportPublished: 'a decision about the occurrence that ran',
   postEventEmailSentAt: 'send state of the occurrence that ran',
   moderatorPublicListed:
     'publishing the lead organizer on the public page is a choice made for each event: ' +

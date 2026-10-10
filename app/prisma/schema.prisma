@@ -209,6 +209,19 @@ model Event {
   postEventRecap   Json?     @map("post_event_recap")
   postEventRecapAt DateTime? @map("post_event_recap_at")
 
+  // Il resoconto dell'evento (lib/report): i numeri calcolati dal portale e il
+  // testo scritto dal modello linguistico, nella lingua dell'evento e nelle
+  // sue traduzioni. Lo genera lo staff a mano dopo l'evento (anche dopo i
+  // feedback) e resta qui, come il riepilogo, quando la pulizia toglie i dati
+  // da cui viene. Si vede nella pagina dell'evento solo se lo staff lo
+  // pubblica.
+  postEventReport          Json?         @map("post_event_report")
+  postEventReportAt        DateTime?     @map("post_event_report_at")
+  postEventReportPublished Boolean       @default(false) @map("post_event_report_published")
+  // I lavori del resoconto (PostprodJob di tipo REPORT): sono dell'evento,
+  // non di una registrazione.
+  reportJobs               PostprodJob[]
+
   // Post-event follow-up email (opt-in per event). When enabled, the reminders
   // cron sends a thank-you + recap/feedback email to registrants and a recap
   // to the moderator once the event has ENDED. `postEventEmailSentAt` guards
@@ -2031,6 +2044,10 @@ enum PostprodJobKind {
   // Richiede Event.retainParticipantTracks (le tracce devono essere
   // ancora presenti, non purgate). Vedi infra/ai/worker/archive.py.
   ARCHIVE
+  // Il resoconto dell'evento (lib/report): sintesi, argomenti, mappa
+  // concettuale, consenso e dissenso, partecipazione, valutazioni. Lo avvia
+  // lo staff dopo l'evento; il risultato si congela su Event.postEventReport.
+  REPORT
 }
 
 enum PostprodJobStatus {
@@ -2238,8 +2255,11 @@ model GlossaryTerm {
 }
 
 model PostprodJob {
-  id          String @id @default(uuid()) @db.Uuid
-  recordingId String @map("recording_id") @db.Uuid
+  id          String  @id @default(uuid()) @db.Uuid
+  // La registrazione di cui e' un passo; nulla solo per il resoconto
+  // dell'evento (REPORT), che e' dell'evento (`eventId`).
+  recordingId String? @map("recording_id") @db.Uuid
+  eventId     String? @map("event_id") @db.Uuid
 
   kind    PostprodJobKind
   // Free-form params validated by lib/ai Zod schemas at enqueue +
@@ -2275,13 +2295,15 @@ model PostprodJob {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  recording  Recording          @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  recording  Recording?         @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  event      Event?             @relation(fields: [eventId], references: [id], onDelete: Cascade)
   dependsOn  PostprodJob?       @relation("PostprodJobDeps", fields: [dependsOnId], references: [id], onDelete: SetNull)
   dependents PostprodJob[]      @relation("PostprodJobDeps")
   artifacts  PostprodArtifact[]
 
   @@index([status, nextAttemptAt])
   @@index([recordingId])
+  @@index([eventId, kind])
   @@map("postprod_jobs")
 }
 

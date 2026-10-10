@@ -3171,6 +3171,42 @@
       "loadFailed": "Stanja prepisa ni bilo mogoče naložiti.",
       "expired": "Obdobje hrambe podatkov dogodka se je izteklo: prepis se ne sestavi znova.",
       "aiRunning": "Obdelava z UI prepisuje video: njen prepis bo nadomestil prepis iz podnapisov."
+    },
+    "eventReport": {
+      "title": "Poročilo UI o dogodku",
+      "intro": "Poročilo za tiste, ki jih ni bilo, in za ponovno branje: povzetek, razložene teme, pojmovni zemljevid, soglasje in nesoglasje, udeležba in ocene, z grafi, ki jih izračuna platforma. Napiše ga jezikovni model platforme na njenih lastnih strežnikih.",
+      "afterFeedback": "Ustvarite ga, ko zberete ocene udeležencev: vključene bodo tiste, prejete do takrat. Lahko ga ustvarite znova.",
+      "requirementsTitle": "Pogoji",
+      "reqEnded": "Dogodek je končan",
+      "reqAi": "Obdelava UI je vklopljena v nastavitvah",
+      "reqRetention": "Podatki dogodka so na voljo do {date}",
+      "reqExpired": "Hramba podatkov se je končala {date}: klepet, odzivi in prisotnost niso več na voljo",
+      "inputsTitle": "Razpoložljivo gradivo",
+      "inputTranscript": "Prepis",
+      "inputNoTranscript": "Ni prepisa",
+      "inputChat": "{count, plural, one {# sporočilo v klepetu} two {# sporočili v klepetu} few {# sporočila v klepetu} other {# sporočil v klepetu}}",
+      "inputQuestions": "{count, plural, one {# vprašanje} two {# vprašanji} few {# vprašanja} other {# vprašanj}}",
+      "inputPolls": "{count, plural, one {# objavljena anketa} two {# objavljeni anketi} few {# objavljene ankete} other {# objavljenih anket}}",
+      "inputWords": "{count, plural, one {# beseda} two {# besedi} few {# besede} other {# besed}}",
+      "inputFeedback": "{count, plural, one {# ocena} two {# oceni} few {# ocene} other {# ocen}}",
+      "inputAgenda": "{count, plural, one {# odziv na dnevni red} two {# odziva na dnevni red} few {# odzivi na dnevni red} other {# odzivov na dnevni red}}",
+      "languagesTitle": "Jeziki: {language} in prevodi",
+      "targetLanguages": "Poročilo prevedi tudi v:",
+      "generate": "Ustvari poročilo",
+      "regenerate": "Ponovno ustvari poročilo",
+      "confirmRegenerate": "Novo poročilo nadomesti trenutno in ostane skrito, dokler ga ponovno ne objavite.",
+      "requested": "Poročilo zahtevano: pripravljeno bo v nekaj minutah.",
+      "failed": "Dejanje ni uspelo.",
+      "loadFailed": "Stanja poročila ni bilo mogoče naložiti.",
+      "statusQueued": "V čakalni vrsti.",
+      "statusRunning": "V pripravi: model piše poročilo.",
+      "statusFailed": "Ni uspelo: {error}",
+      "statusDone": "Ustvarjeno {date}.",
+      "publish": "Prikaži poročilo na strani dogodka",
+      "publishDesc": "Pred objavo ga preberite: besedilo je napisal model umetne inteligence. Ponovno ustvarjeno poročilo je treba znova objaviti.",
+      "preview": "Predogled",
+      "hidePreview": "Skrij predogled",
+      "previewLanguage": "Jezik"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Obvesti prijavljene, ko je posnetek objavljen",
     "recordingNotifyHelp": "Eno samo sporočilo, ko je posnetek (ali zunanji video) viden na javni strani dogodka. Dobijo ga še prijavljeni: po izteku hrambe nihče.",
-    "recordingNotifySent": "Obvestilo poslano {date}."
+    "recordingNotifySent": "Obvestilo poslano {date}.",
+    "report": {
+      "title": "Poročilo o dogodku",
+      "generatedAt": "Ustvarjeno {date}",
+      "translated": "samodejni prevod izvirnika v jeziku: {language}",
+      "languageFallback": "Poročilo ni na voljo v vašem jeziku: prikazano je v jeziku: {language}.",
+      "sections": {
+        "highlights": "Na kratko",
+        "numbers": "Udeležba v številkah",
+        "timeline": "Udeležba skozi čas",
+        "topics": "Teme",
+        "map": "Pojmovni zemljevid",
+        "consensus": "Soglasje in nesoglasje",
+        "polls": "Ankete",
+        "feedback": "Ocene udeležencev",
+        "benefits": "Kaj so udeleženci pridobili",
+        "openQuestions": "Odprta vprašanja",
+        "nextSteps": "Naslednji koraki",
+        "summary": "Preberite celotno poročilo"
+      },
+      "metrics": {
+        "peak": "Ljudje v dvorani na vrhuncu",
+        "joined": "Prisotni",
+        "ofRegistered": "{pct} % prijavljenih",
+        "active": "Dejavno sodelovali",
+        "ofPresent": "{pct} % prisotnih",
+        "interactions": "Interakcije",
+        "rating": "Povprečna ocena",
+        "responses": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}"
+      },
+      "series": {
+        "chat": "Klepet",
+        "questions": "Vprašanja",
+        "polls": "Ankete",
+        "words": "Besede",
+        "reactions": "Odzivi"
+      },
+      "timelineDesc": "Interakcije na vsakih {minutes} minut od začetka dogodka",
+      "timeFromStart": "Od začetka",
+      "peak": "Najživahnejši trenutek: {label} od začetka.",
+      "agreement": {
+        "high": "Široko soglasje",
+        "mixed": "Deljena mnenja",
+        "low": "Malo soglasja",
+        "unknown": "Soglasja ni mogoče oceniti"
+      },
+      "goTo": "Pojdi na {time}",
+      "stance": {
+        "support": "Za",
+        "concern": "Pomisleki",
+        "question": "Vprašanje"
+      },
+      "mapDesc": "Pojmovni zemljevid dogodka: teme okrog naslova, povezane s pojmi, akterji in izidi.",
+      "kind": {
+        "topic": "Tema",
+        "concept": "Pojem",
+        "actor": "Akter",
+        "outcome": "Izid"
+      },
+      "agendaReactions": "Odzivi udeležencev na točke dnevnega reda",
+      "agree": "Se strinjam",
+      "disagree": "Se ne strinjam",
+      "agreements": "Točke soglasja",
+      "disagreements": "Točke nesoglasja",
+      "votes": "{count, plural, one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
+      "average": "povprečje {value} od {max}",
+      "strengths": "Prednosti",
+      "improvements": "Za izboljšanje",
+      "quotes": "Iz komentarjev",
+      "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, klepeta, vprašanj, anket in ocen, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
+    }
   },
   "provisioning": {
     "loading": "Nalaganje",

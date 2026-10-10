@@ -3171,6 +3171,42 @@
       "loadFailed": "Stav prepisu sa nepodarilo načítať.",
       "expired": "Doba uchovávania údajov podujatia skončila: prepis sa znova nevytvára.",
       "aiRunning": "Spracovanie AI prepisuje video: jeho prepis nahradí prepis z titulkov."
+    },
+    "eventReport": {
+      "title": "Správa AI z podujatia",
+      "intro": "Správa pre tých, ktorí neboli prítomní, aj na opätovné prečítanie: zhrnutie, vysvetlené témy, mapa pojmov, zhoda a nezhoda, účasť a hodnotenia, s grafmi, ktoré vypočíta platforma. Píše ju jazykový model platformy na jej vlastných serveroch.",
+      "afterFeedback": "Vytvorte ju po zozbieraní hodnotení účastníkov: zahrnú sa tie, ktoré dovtedy prišli. Možno ju vytvoriť znova.",
+      "requirementsTitle": "Požiadavky",
+      "reqEnded": "Podujatie skončilo",
+      "reqAi": "Spracovanie AI zapnuté v nastaveniach",
+      "reqRetention": "Údaje podujatia dostupné do {date}",
+      "reqExpired": "Uchovávanie údajov skončilo {date}: chat, reakcie a účasť už nie sú k dispozícii",
+      "inputsTitle": "Dostupné podklady",
+      "inputTranscript": "Prepis",
+      "inputNoTranscript": "Bez prepisu",
+      "inputChat": "{count, plural, one {# správa v chate} few {# správy v chate} many {# správy v chate} other {# správ v chate}}",
+      "inputQuestions": "{count, plural, one {# otázka} few {# otázky} many {# otázky} other {# otázok}}",
+      "inputPolls": "{count, plural, one {# zverejnená anketa} few {# zverejnené ankety} many {# zverejnené ankety} other {# zverejnených ankiet}}",
+      "inputWords": "{count, plural, one {# slovo} few {# slová} many {# slova} other {# slov}}",
+      "inputFeedback": "{count, plural, one {# hodnotenie} few {# hodnotenia} many {# hodnotenia} other {# hodnotení}}",
+      "inputAgenda": "{count, plural, one {# reakcia na program} few {# reakcie na program} many {# reakcie na program} other {# reakcií na program}}",
+      "languagesTitle": "Jazyky: {language} a preklady",
+      "targetLanguages": "Preložiť správu aj do:",
+      "generate": "Vytvoriť správu",
+      "regenerate": "Vytvoriť správu znova",
+      "confirmRegenerate": "Nová správa nahradí súčasnú a zostane skrytá, kým ju znova nezverejníte.",
+      "requested": "Správa vyžiadaná: bude hotová o niekoľko minút.",
+      "failed": "Operácia zlyhala.",
+      "loadFailed": "Stav správy sa nepodarilo načítať.",
+      "statusQueued": "V poradí.",
+      "statusRunning": "Pripravuje sa: model píše správu.",
+      "statusFailed": "Nepodarilo sa: {error}",
+      "statusDone": "Vytvorené {date}.",
+      "publish": "Zobraziť správu na stránke podujatia",
+      "publishDesc": "Pred zverejnením ju skontrolujte: text napísal model umelej inteligencie. Znova vytvorenú správu treba znova zverejniť.",
+      "preview": "Náhľad",
+      "hidePreview": "Skryť náhľad",
+      "previewLanguage": "Jazyk"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Upozorniť prihlásených, keď bude záznam zverejnený",
     "recordingNotifyHelp": "Jediný e-mail, keď je záznam (alebo externé video) viditeľný na verejnej stránke podujatia. Dostanú ho tí, ktorí sú stále prihlásení: po uplynutí doby uchovávania už nikto.",
-    "recordingNotifySent": "Upozornenie odoslané {date}."
+    "recordingNotifySent": "Upozornenie odoslané {date}.",
+    "report": {
+      "title": "Správa z podujatia",
+      "generatedAt": "Vytvorené {date}",
+      "translated": "automatický preklad z originálu v jazyku: {language}",
+      "languageFallback": "Správa nie je dostupná vo vašom jazyku: zobrazuje sa v jazyku: {language}.",
+      "sections": {
+        "highlights": "Stručne",
+        "numbers": "Účasť v číslach",
+        "timeline": "Účasť v čase",
+        "topics": "Témy",
+        "map": "Mapa pojmov",
+        "consensus": "Zhoda a nezhoda",
+        "polls": "Ankety",
+        "feedback": "Hodnotenia účastníkov",
+        "benefits": "Čo si účastníci odniesli",
+        "openQuestions": "Otvorené otázky",
+        "nextSteps": "Ďalšie kroky",
+        "summary": "Prečítať celú správu"
+      },
+      "metrics": {
+        "peak": "Ľudia v sále vo vrchole",
+        "joined": "Prítomní",
+        "ofRegistered": "{pct} % prihlásených",
+        "active": "Aktívne sa zapojili",
+        "ofPresent": "{pct} % prítomných",
+        "interactions": "Interakcie",
+        "rating": "Priemerné hodnotenie",
+        "responses": "{count, plural, one {# odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Otázky",
+        "polls": "Ankety",
+        "words": "Slová",
+        "reactions": "Reakcie"
+      },
+      "timelineDesc": "Interakcie po {minutes} minútach od začiatku podujatia",
+      "timeFromStart": "Od začiatku",
+      "peak": "Najživší okamih: {label} od začiatku.",
+      "agreement": {
+        "high": "Široká zhoda",
+        "mixed": "Rozdelené názory",
+        "low": "Malá zhoda",
+        "unknown": "Zhodu nemožno posúdiť"
+      },
+      "goTo": "Prejsť na {time}",
+      "stance": {
+        "support": "Za",
+        "concern": "Výhrady",
+        "question": "Otázka"
+      },
+      "mapDesc": "Mapa pojmov podujatia: témy okolo názvu, prepojené s pojmami, aktérmi a výsledkami.",
+      "kind": {
+        "topic": "Téma",
+        "concept": "Pojem",
+        "actor": "Aktér",
+        "outcome": "Výsledok"
+      },
+      "agendaReactions": "Reakcie účastníkov na body programu",
+      "agree": "Súhlasím",
+      "disagree": "Nesúhlasím",
+      "agreements": "Body zhody",
+      "disagreements": "Body nezhody",
+      "votes": "{count, plural, one {# hlas} few {# hlasy} many {# hlasu} other {# hlasov}}",
+      "average": "priemer {value} z {max}",
+      "strengths": "Silné stránky",
+      "improvements": "Na zlepšenie",
+      "quotes": "Z komentárov",
+      "aiNotice": "Text napísal model umelej inteligencie z prepisu, chatu, otázok, ankiet a hodnotení a tím ho pred zverejnením skontroloval. Čísla a grafy počíta platforma. Môže obsahovať nepresnosti."
+    }
   },
   "provisioning": {
     "loading": "Načítava sa",

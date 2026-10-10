@@ -3171,6 +3171,42 @@
       "loadFailed": "Nepavyko įkelti stenogramos būsenos.",
       "expired": "Renginio duomenų saugojimo laikotarpis baigėsi: stenograma iš naujo nesudaroma.",
       "aiRunning": "DI apdorojimas stenografuoja vaizdo įrašą: jo stenograma pakeis stenogramą iš subtitrų."
+    },
+    "eventReport": {
+      "title": "Renginio DI ataskaita",
+      "intro": "Ataskaita tiems, kurie nedalyvavo, ir pakartotiniam skaitymui: santrauka, paaiškintos temos, sąvokų žemėlapis, sutarimas ir nesutarimas, dalyvavimas ir vertinimai su platformos apskaičiuotomis diagramomis. Ją rašo platformos kalbos modelis platformos serveriuose.",
+      "afterFeedback": "Sukurkite ją surinkę dalyvių vertinimus: įtraukiami iki to laiko gauti. Ją galima sukurti iš naujo.",
+      "requirementsTitle": "Reikalavimai",
+      "reqEnded": "Renginys baigėsi",
+      "reqAi": "DI apdorojimas įjungtas nustatymuose",
+      "reqRetention": "Renginio duomenys pasiekiami iki {date}",
+      "reqExpired": "Duomenų saugojimas baigėsi {date}: pokalbis, reakcijos ir dalyvavimas nebepasiekiami",
+      "inputsTitle": "Turima medžiaga",
+      "inputTranscript": "Stenograma",
+      "inputNoTranscript": "Stenogramos nėra",
+      "inputChat": "{count, plural, one {# pokalbio žinutė} few {# pokalbio žinutės} many {# pokalbio žinutės} other {# pokalbio žinučių}}",
+      "inputQuestions": "{count, plural, one {# klausimas} few {# klausimai} many {# klausimo} other {# klausimų}}",
+      "inputPolls": "{count, plural, one {# paskelbta apklausa} few {# paskelbtos apklausos} many {# paskelbtos apklausos} other {# paskelbtų apklausų}}",
+      "inputWords": "{count, plural, one {# žodis} few {# žodžiai} many {# žodžio} other {# žodžių}}",
+      "inputFeedback": "{count, plural, one {# vertinimas} few {# vertinimai} many {# vertinimo} other {# vertinimų}}",
+      "inputAgenda": "{count, plural, one {# reakcija į darbotvarkę} few {# reakcijos į darbotvarkę} many {# reakcijos į darbotvarkę} other {# reakcijų į darbotvarkę}}",
+      "languagesTitle": "Kalbos: {language} ir vertimai",
+      "targetLanguages": "Ataskaitą išversti ir į:",
+      "generate": "Sukurti ataskaitą",
+      "regenerate": "Sukurti ataskaitą iš naujo",
+      "confirmRegenerate": "Nauja ataskaita pakeičia dabartinę ir lieka paslėpta, kol jos vėl nepaskelbsite.",
+      "requested": "Ataskaita užsakyta: ji bus parengta po kelių minučių.",
+      "failed": "Operacija nepavyko.",
+      "loadFailed": "Nepavyko įkelti ataskaitos būsenos.",
+      "statusQueued": "Eilėje.",
+      "statusRunning": "Rengiama: modelis rašo ataskaitą.",
+      "statusFailed": "Nepavyko: {error}",
+      "statusDone": "Sukurta {date}.",
+      "publish": "Rodyti ataskaitą renginio puslapyje",
+      "publishDesc": "Prieš skelbdami ją peržiūrėkite: tekstą parašė dirbtinio intelekto modelis. Iš naujo sukurtą ataskaitą reikia paskelbti iš naujo.",
+      "preview": "Peržiūra",
+      "hidePreview": "Slėpti peržiūrą",
+      "previewLanguage": "Kalba"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Pranešti užsiregistravusiems, kai įrašas paskelbtas",
     "recordingNotifyHelp": "Vienas el. laiškas, kai įrašas (ar išorinis vaizdo įrašas) matomas viešame renginio puslapyje. Jis pasiekia vis dar užsiregistravusius: pasibaigus saugojimo laikotarpiui niekam nepranešama.",
-    "recordingNotifySent": "Pranešimas išsiųstas {date}."
+    "recordingNotifySent": "Pranešimas išsiųstas {date}.",
+    "report": {
+      "title": "Renginio ataskaita",
+      "generatedAt": "Sukurta {date}",
+      "translated": "automatinis vertimas iš originalo ({language})",
+      "languageFallback": "Ataskaita jūsų kalba nepasiekiama: ji rodoma kalba {language}.",
+      "sections": {
+        "highlights": "Trumpai",
+        "numbers": "Dalyvavimas skaičiais",
+        "timeline": "Dalyvavimas laike",
+        "topics": "Temos",
+        "map": "Sąvokų žemėlapis",
+        "consensus": "Sutarimas ir nesutarimas",
+        "polls": "Apklausos",
+        "feedback": "Dalyvių vertinimai",
+        "benefits": "Ką gavo dalyviai",
+        "openQuestions": "Atviri klausimai",
+        "nextSteps": "Tolesni žingsniai",
+        "summary": "Skaityti visą ataskaitą"
+      },
+      "metrics": {
+        "peak": "Žmonės salėje piko metu",
+        "joined": "Dalyvavo",
+        "ofRegistered": "{pct} % užsiregistravusių",
+        "active": "Aktyviai dalyvavo",
+        "ofPresent": "{pct} % dalyvavusių",
+        "interactions": "Sąveikos",
+        "rating": "Vidutinis vertinimas",
+        "responses": "{count, plural, one {# atsakymas} few {# atsakymai} many {# atsakymo} other {# atsakymų}}"
+      },
+      "series": {
+        "chat": "Pokalbis",
+        "questions": "Klausimai",
+        "polls": "Apklausos",
+        "words": "Žodžiai",
+        "reactions": "Reakcijos"
+      },
+      "timelineDesc": "Sąveikos kas {minutes} min. nuo renginio pradžios",
+      "timeFromStart": "Nuo pradžios",
+      "peak": "Aktyviausia akimirka: {label} nuo pradžios.",
+      "agreement": {
+        "high": "Platus sutarimas",
+        "mixed": "Nuomonės išsiskyrė",
+        "low": "Mažai sutarimo",
+        "unknown": "Sutarimo įvertinti negalima"
+      },
+      "goTo": "Pereiti į {time}",
+      "stance": {
+        "support": "Už",
+        "concern": "Abejonės",
+        "question": "Klausimas"
+      },
+      "mapDesc": "Renginio sąvokų žemėlapis: temos aplink pavadinimą, susietos su sąvokomis, veikėjais ir rezultatais.",
+      "kind": {
+        "topic": "Tema",
+        "concept": "Sąvoka",
+        "actor": "Veikėjas",
+        "outcome": "Rezultatas"
+      },
+      "agendaReactions": "Dalyvių reakcijos į darbotvarkės punktus",
+      "agree": "Sutinku",
+      "disagree": "Nesutinku",
+      "agreements": "Sutarimo punktai",
+      "disagreements": "Nesutarimo punktai",
+      "votes": "{count, plural, one {# balsas} few {# balsai} many {# balso} other {# balsų}}",
+      "average": "vidurkis {value} iš {max}",
+      "strengths": "Stipriosios pusės",
+      "improvements": "Tobulintina",
+      "quotes": "Iš komentarų",
+      "aiNotice": "Tekstą parašė dirbtinio intelekto modelis pagal stenogramą, pokalbį, klausimus, apklausas ir vertinimus, o komanda jį peržiūrėjo prieš paskelbiant. Skaičius ir diagramas apskaičiuoja platforma. Jame gali būti netikslumų."
+    }
   },
   "provisioning": {
     "loading": "Įkeliama",

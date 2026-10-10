@@ -3171,6 +3171,42 @@
       "loadFailed": "Der Status des Transkripts konnte nicht geladen werden.",
       "expired": "Die Aufbewahrungsfrist für die Daten der Veranstaltung ist abgelaufen: Das Transkript wird nicht neu erstellt.",
       "aiRunning": "Die KI-Verarbeitung transkribiert das Video: Ihr Transkript ersetzt das aus den Untertiteln."
+    },
+    "eventReport": {
+      "title": "KI-Bericht zur Veranstaltung",
+      "intro": "Ein Bericht für alle, die nicht dabei waren, und zum Nachlesen: Zusammenfassung, erklärte Themen, Begriffskarte, Zustimmung und Ablehnung, Beteiligung und Bewertungen, mit Diagrammen der Plattform. Er wird vom Sprachmodell der Plattform auf ihren eigenen Servern geschrieben.",
+      "afterFeedback": "Erstellen Sie ihn, nachdem die Bewertungen der Teilnehmenden eingegangen sind: Die bis dahin eingegangenen fließen ein. Er kann neu erstellt werden.",
+      "requirementsTitle": "Voraussetzungen",
+      "reqEnded": "Veranstaltung beendet",
+      "reqAi": "KI-Verarbeitung in den Einstellungen aktiviert",
+      "reqRetention": "Daten der Veranstaltung verfügbar bis {date}",
+      "reqExpired": "Aufbewahrung der Daten am {date} beendet: Chat, Reaktionen und Anwesenheiten sind nicht mehr verfügbar",
+      "inputsTitle": "Verfügbares Material",
+      "inputTranscript": "Transkript",
+      "inputNoTranscript": "Kein Transkript",
+      "inputChat": "{count, plural, one {# Chatnachricht} other {# Chatnachrichten}}",
+      "inputQuestions": "{count, plural, one {# Frage} other {# Fragen}}",
+      "inputPolls": "{count, plural, one {# veröffentlichte Umfrage} other {# veröffentlichte Umfragen}}",
+      "inputWords": "{count, plural, one {# Wort} other {# Wörter}}",
+      "inputFeedback": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+      "inputAgenda": "{count, plural, one {# Reaktion auf die Tagesordnung} other {# Reaktionen auf die Tagesordnung}}",
+      "languagesTitle": "Sprachen: {language} und Übersetzungen",
+      "targetLanguages": "Den Bericht auch übersetzen in:",
+      "generate": "Bericht erstellen",
+      "regenerate": "Bericht neu erstellen",
+      "confirmRegenerate": "Der neue Bericht ersetzt den aktuellen und bleibt verborgen, bis Sie ihn erneut veröffentlichen.",
+      "requested": "Bericht angefordert: Er ist in wenigen Minuten fertig.",
+      "failed": "Der Vorgang ist fehlgeschlagen.",
+      "loadFailed": "Der Status des Berichts konnte nicht geladen werden.",
+      "statusQueued": "In der Warteschlange.",
+      "statusRunning": "In Arbeit: Das Modell schreibt den Bericht.",
+      "statusFailed": "Fehlgeschlagen: {error}",
+      "statusDone": "Erstellt am {date}.",
+      "publish": "Bericht auf der Veranstaltungsseite anzeigen",
+      "publishDesc": "Prüfen Sie ihn vor der Veröffentlichung: Der Text stammt von einem KI-Modell. Ein neu erstellter Bericht muss erneut veröffentlicht werden.",
+      "preview": "Vorschau",
+      "hidePreview": "Vorschau ausblenden",
+      "previewLanguage": "Sprache"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Angemeldete benachrichtigen, wenn die Aufzeichnung veröffentlicht ist",
     "recordingNotifyHelp": "Eine einzige E-Mail, sobald die Aufzeichnung (oder das externe Video) auf der öffentlichen Seite sichtbar ist. Sie erreicht alle, die noch angemeldet sind: nach Ablauf der Aufbewahrungsfrist wird niemand mehr benachrichtigt.",
-    "recordingNotifySent": "Benachrichtigung gesendet am {date}."
+    "recordingNotifySent": "Benachrichtigung gesendet am {date}.",
+    "report": {
+      "title": "Bericht zur Veranstaltung",
+      "generatedAt": "Erstellt am {date}",
+      "translated": "automatische Übersetzung aus dem Original auf {language}",
+      "languageFallback": "Der Bericht ist in Ihrer Sprache nicht verfügbar: Er wird auf {language} angezeigt.",
+      "sections": {
+        "highlights": "Kurz gefasst",
+        "numbers": "Die Beteiligung in Zahlen",
+        "timeline": "Die Beteiligung im Zeitverlauf",
+        "topics": "Die Themen",
+        "map": "Begriffskarte",
+        "consensus": "Zustimmung und Ablehnung",
+        "polls": "Umfragen",
+        "feedback": "Die Bewertungen der Teilnehmenden",
+        "benefits": "Was die Teilnehmenden mitnehmen",
+        "openQuestions": "Offene Fragen",
+        "nextSteps": "Nächste Schritte",
+        "summary": "Den vollständigen Bericht lesen"
+      },
+      "metrics": {
+        "peak": "Personen im Raum zur Spitzenzeit",
+        "joined": "Anwesend",
+        "ofRegistered": "{pct} % der Angemeldeten",
+        "active": "Haben sich aktiv beteiligt",
+        "ofPresent": "{pct} % der Anwesenden",
+        "interactions": "Interaktionen",
+        "rating": "Durchschnittliche Bewertung",
+        "responses": "{count, plural, one {# Antwort} other {# Antworten}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Fragen",
+        "polls": "Umfragen",
+        "words": "Wörter",
+        "reactions": "Reaktionen"
+      },
+      "timelineDesc": "Interaktionen alle {minutes} Minuten seit Beginn der Veranstaltung",
+      "timeFromStart": "Seit Beginn",
+      "peak": "Der aktivste Moment: {label} nach Beginn.",
+      "agreement": {
+        "high": "Breite Zustimmung",
+        "mixed": "Geteilte Meinungen",
+        "low": "Wenig Zustimmung",
+        "unknown": "Zustimmung nicht messbar"
+      },
+      "goTo": "Zu {time} springen",
+      "stance": {
+        "support": "Dafür",
+        "concern": "Bedenken",
+        "question": "Frage"
+      },
+      "mapDesc": "Begriffskarte der Veranstaltung: die Themen rund um den Titel, verbunden mit Begriffen, Akteuren und Ergebnissen.",
+      "kind": {
+        "topic": "Thema",
+        "concept": "Begriff",
+        "actor": "Akteur",
+        "outcome": "Ergebnis"
+      },
+      "agendaReactions": "Die Reaktionen der Teilnehmenden auf die Tagesordnungspunkte",
+      "agree": "Zustimmung",
+      "disagree": "Ablehnung",
+      "agreements": "Punkte der Übereinstimmung",
+      "disagreements": "Strittige Punkte",
+      "votes": "{count, plural, one {# Stimme} other {# Stimmen}}",
+      "average": "Durchschnitt {value} von {max}",
+      "strengths": "Stärken",
+      "improvements": "Verbesserungsbedarf",
+      "quotes": "Aus den Kommentaren",
+      "aiNotice": "Der Text wurde von einem KI-Modell aus Transkript, Chat, Fragen, Umfragen und Bewertungen verfasst und vor der Veröffentlichung vom Team geprüft. Zahlen und Diagramme berechnet die Plattform. Er kann Ungenauigkeiten enthalten."
+    }
   },
   "provisioning": {
     "loading": "Wird geladen",

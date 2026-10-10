@@ -55,13 +55,16 @@ export const POST = withErrorHandling(async (request) => {
   const body = (await request.json()) as unknown;
   const parsed = artifactRegisterSchema.parse(body);
 
-  const job = await prisma.postprodJob.findUnique({
+  const trovato = await prisma.postprodJob.findUnique({
     where: { id: parsed.jobId },
     include: {
       recording: { select: { id: true, eventId: true, runCount: true, sourceLanguage: true } },
     },
   });
-  if (!job) throw new NotFoundError('PostprodJob');
+  if (!trovato) throw new NotFoundError('PostprodJob');
+  // Il resoconto dell'evento (REPORT) non ha registrazione ne' artefatti.
+  if (!trovato.recording) throw new ValidationError('This job has no recording to attach artifacts to');
+  const job = { ...trovato, recording: trovato.recording };
 
   // Re-derive the canonical blob key for this (recording, type, language)
   // and check that the worker uploaded to exactly that path. Anything

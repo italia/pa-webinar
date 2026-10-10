@@ -3171,6 +3171,42 @@
       "loadFailed": "Nije moguće učitati stanje transkripta.",
       "expired": "Razdoblje čuvanja podataka događaja je isteklo: transkript se ne izrađuje ponovno.",
       "aiRunning": "Obrada umjetnom inteligencijom transkribira videozapis: njezin će transkript zamijeniti onaj iz titlova."
+    },
+    "eventReport": {
+      "title": "AI izvješće o događaju",
+      "intro": "Izvješće za one koji nisu bili prisutni i za ponovno čitanje: sažetak, objašnjene teme, karta pojmova, slaganje i neslaganje, sudjelovanje i ocjene, s grafikonima koje izračunava platforma. Piše ga jezični model platforme na njezinim vlastitim poslužiteljima.",
+      "afterFeedback": "Izradite ga nakon prikupljanja ocjena sudionika: uključuju se one primljene do tog trenutka. Može se izraditi ponovno.",
+      "requirementsTitle": "Uvjeti",
+      "reqEnded": "Događaj je završio",
+      "reqAi": "AI obrada uključena u postavkama",
+      "reqRetention": "Podaci događaja dostupni do {date}",
+      "reqExpired": "Čuvanje podataka završilo je {date}: chat, reakcije i prisutnost više nisu dostupni",
+      "inputsTitle": "Dostupni materijali",
+      "inputTranscript": "Transkript",
+      "inputNoTranscript": "Nema transkripta",
+      "inputChat": "{count, plural, one {# poruka u chatu} few {# poruke u chatu} other {# poruka u chatu}}",
+      "inputQuestions": "{count, plural, one {# pitanje} few {# pitanja} other {# pitanja}}",
+      "inputPolls": "{count, plural, one {# objavljena anketa} few {# objavljene ankete} other {# objavljenih anketa}}",
+      "inputWords": "{count, plural, one {# riječ} few {# riječi} other {# riječi}}",
+      "inputFeedback": "{count, plural, one {# ocjena} few {# ocjene} other {# ocjena}}",
+      "inputAgenda": "{count, plural, one {# reakcija na dnevni red} few {# reakcije na dnevni red} other {# reakcija na dnevni red}}",
+      "languagesTitle": "Jezici: {language} i prijevodi",
+      "targetLanguages": "Prevedi izvješće i na:",
+      "generate": "Izradi izvješće",
+      "regenerate": "Ponovno izradi izvješće",
+      "confirmRegenerate": "Novo izvješće zamjenjuje trenutačno i ostaje skriveno dok ga ponovno ne objavite.",
+      "requested": "Izvješće zatraženo: bit će spremno za nekoliko minuta.",
+      "failed": "Radnja nije uspjela.",
+      "loadFailed": "Nije moguće učitati stanje izvješća.",
+      "statusQueued": "U redu čekanja.",
+      "statusRunning": "U pripremi: model piše izvješće.",
+      "statusFailed": "Nije uspjelo: {error}",
+      "statusDone": "Izrađeno {date}.",
+      "publish": "Prikaži izvješće na stranici događaja",
+      "publishDesc": "Pregledajte ga prije objave: tekst je napisao model umjetne inteligencije. Ponovno izrađeno izvješće treba ponovno objaviti.",
+      "preview": "Pregled",
+      "hidePreview": "Sakrij pregled",
+      "previewLanguage": "Jezik"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Obavijesti prijavljene kad snimka bude objavljena",
     "recordingNotifyHelp": "Jedna poruka e-pošte, kad je snimka (ili vanjski video) vidljiva na javnoj stranici događaja. Stiže onima koji su još prijavljeni: nakon razdoblja čuvanja nitko nije obaviješten.",
-    "recordingNotifySent": "Obavijest poslana {date}."
+    "recordingNotifySent": "Obavijest poslana {date}.",
+    "report": {
+      "title": "Izvješće o događaju",
+      "generatedAt": "Izrađeno {date}",
+      "translated": "automatski prijevod izvornika na jeziku: {language}",
+      "languageFallback": "Izvješće nije dostupno na vašem jeziku: prikazano je na jeziku: {language}.",
+      "sections": {
+        "highlights": "Ukratko",
+        "numbers": "Sudjelovanje u brojkama",
+        "timeline": "Sudjelovanje kroz vrijeme",
+        "topics": "Teme",
+        "map": "Karta pojmova",
+        "consensus": "Slaganje i neslaganje",
+        "polls": "Ankete",
+        "feedback": "Ocjene sudionika",
+        "benefits": "Što su sudionici dobili",
+        "openQuestions": "Otvorena pitanja",
+        "nextSteps": "Sljedeći koraci",
+        "summary": "Pročitajte cijelo izvješće"
+      },
+      "metrics": {
+        "peak": "Osobe u dvorani na vrhuncu",
+        "joined": "Prisutni",
+        "ofRegistered": "{pct} % prijavljenih",
+        "active": "Aktivno sudjelovali",
+        "ofPresent": "{pct} % prisutnih",
+        "interactions": "Interakcije",
+        "rating": "Prosječna ocjena",
+        "responses": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Pitanja",
+        "polls": "Ankete",
+        "words": "Riječi",
+        "reactions": "Reakcije"
+      },
+      "timelineDesc": "Interakcije svakih {minutes} minuta od početka događaja",
+      "timeFromStart": "Od početka",
+      "peak": "Najživlji trenutak: {label} od početka.",
+      "agreement": {
+        "high": "Široko slaganje",
+        "mixed": "Podijeljena mišljenja",
+        "low": "Malo slaganja",
+        "unknown": "Slaganje nije mjerljivo"
+      },
+      "goTo": "Idi na {time}",
+      "stance": {
+        "support": "Za",
+        "concern": "Zadrške",
+        "question": "Pitanje"
+      },
+      "mapDesc": "Karta pojmova događaja: teme oko naslova, povezane s pojmovima, dionicima i ishodima.",
+      "kind": {
+        "topic": "Tema",
+        "concept": "Pojam",
+        "actor": "Dionik",
+        "outcome": "Ishod"
+      },
+      "agendaReactions": "Reakcije sudionika na točke dnevnog reda",
+      "agree": "Slažem se",
+      "disagree": "Ne slažem se",
+      "agreements": "Točke slaganja",
+      "disagreements": "Točke neslaganja",
+      "votes": "{count, plural, one {# glas} few {# glasa} other {# glasova}}",
+      "average": "prosjek {value} od {max}",
+      "strengths": "Prednosti",
+      "improvements": "Za poboljšanje",
+      "quotes": "Iz komentara",
+      "aiNotice": "Tekst je napisao model umjetne inteligencije na temelju transkripta, chata, pitanja, anketa i ocjena, a tim ga je pregledao prije objave. Brojke i grafikone izračunava platforma. Može sadržavati netočnosti."
+    }
   },
   "provisioning": {
     "loading": "Učitavanje",

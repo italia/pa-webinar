@@ -602,7 +602,7 @@ jitsi-meet:
   prosody:
     extraEnvs:
       XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants
-      PA_PORTAL_URL: http://<fullname>:3000   # for pa_occupants
+      PA_PORTAL_URL: http://<fullname>.<namespace>.svc.<clusterDomain>:3000   # for pa_occupants
     extraVolumes:          # the ConfigMap pa-webinar-prosody-plugins, rendered by the chart
     extraVolumeMounts:     # mounted read-only at /prosody-plugins-custom
   jicofo:
@@ -645,7 +645,8 @@ keeps nothing. It uses the rows to decide, voice by voice, whether
 the transcript from captions keeps a sentence and whether the recorder records a track
 ([Live captions](live-captions.md#transcript-from-captions), [Recording](recording.md#consent-gates)).
 
-The module acts only when Prosody has `PA_PORTAL_URL`, which the chart builds from the release name,
+The module acts only when Prosody has `PA_PORTAL_URL`, which the chart sets to the portal Service's full
+name (Prosody's resolver does not use the pod's search domains),
 and `JWT_APP_SECRET`, the secret with which Prosody already verifies the portal's tokens. The signature
 is an HMAC-SHA256 of the request body, in the `x-pa-signature` header, keyed with an HMAC-SHA256 of the
 secret over the label `pa-occupants`, so a signature cannot serve as a conference token. The portal

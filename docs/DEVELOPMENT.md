@@ -224,7 +224,7 @@ Legend:
 
 Three capabilities are not part of the Compose stack and are impractical on a typical workstation:
 
-- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it. GPU node pools are covered in [Node pools](INFRASTRUCTURE.md#node-pools), the pipeline in [AI post-production](POSTPROD.md).
+- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it, and the AI event report, which needs only a language model, can run against the local stack ([AI post-production worker](#ai-post-production-worker)). GPU node pools are covered in [Node pools](INFRASTRUCTURE.md#node-pools), the pipeline in [AI post-production](POSTPROD.md).
 - **JVB scale-to-zero** is only useful where nodes are billed by use and a cluster autoscaler can remove them. On a single machine the bridge is already running.
 - **Jibri** needs the ALSA loopback kernel module on its host and elevated container privileges: the Jitsi subchart adds the `SYS_ADMIN` capability. A developer workstation is rarely prepared for either. Without a cluster, the recording path is the per-participant recorder, with the limits linked above ([Recording](architecture/recording.md)).
 
@@ -431,6 +431,21 @@ To run captions against the local stack, uncomment the three `CAPTIONS_*` lines 
 The worker in `infra/ai/worker/` is a Python package. Its unit tests need no GPU. No test loads a model: the heavy libraries (torch, WhisperX, pyannote) are imported only inside the functions that use them, and the tests do not call those functions. The commands and what the suite covers are in [Testing: AI worker](development/testing.md#ai-worker).
 
 `WORKER_STUB=1` (`postprod.worker.stub` in the chart) replaces speech recognition, the language model and speech synthesis with canned outputs. It exercises the claim, upload and register loop without a GPU, but the worker still needs a portal (`APP_INTERNAL_URL`, `CRON_API_KEY`), a queued job and a recordings store. In practice, stub mode is useful in a test cluster rather than in Compose.
+
+The AI event report (`REPORT`) needs no GPU of its own and no media, only a language model, so it can run against the local stack with any OpenAI-compatible server that answers `/chat/completions` with JSON output (`response_format`). Use test data only:
+
+1. In the app's environment set `AI_VLLM_BASE_URL` to the server's base URL, as the worker will reach it (it ends in `/v1`), and `AI_VLLM_MODEL_ID` to the model it serves. The portal hands both to the worker when the job is claimed.
+2. In the site settings, turn on **Post-event pipeline active**. On an ended event within its data retention, request the report from the **AI event report** panel of the **After the event** tab.
+3. From `infra/ai`, install `worker/requirements-cpu.txt` and run the worker without a GPU for that kind only. It claims one job, runs it and exits:
+
+   ```bash
+   cd infra/ai
+   pip install -r worker/requirements-cpu.txt
+   AI_WORKER_KINDS=REPORT APP_INTERNAL_URL=http://localhost:3000 CRON_API_KEY=<the app's CRON_API_KEY> \
+     python -m worker.cpu
+   ```
+
+The report arrives unpublished on the event, and the panel shows a preview. How the job works is in [AI post-production](POSTPROD.md#the-event-report).
 
 `infra/ai/local-out/` holds a development tool that runs the pipeline stages off-cluster on a workstation with an NVIDIA GPU and writes the results straight into a database. It bypasses the portal's encryption. Read its [README](../infra/ai/local-out/README.md) before you use it, and never point it at real data. See also [`infra/ai/worker/README.md`](../infra/ai/worker/README.md) and [AI post-production](POSTPROD.md).
 

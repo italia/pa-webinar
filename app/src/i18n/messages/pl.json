@@ -3171,6 +3171,42 @@
       "loadFailed": "Nie można wczytać stanu transkrypcji.",
       "expired": "Okres przechowywania danych wydarzenia dobiegł końca: transkrypcja nie jest tworzona ponownie.",
       "aiRunning": "Przetwarzanie AI transkrybuje wideo: jego transkrypcja zastąpi tę z napisów."
+    },
+    "eventReport": {
+      "title": "Sprawozdanie AI z wydarzenia",
+      "intro": "Sprawozdanie dla tych, których nie było, i do ponownej lektury: streszczenie, wyjaśnione tematy, mapa pojęć, zgoda i niezgoda, udział i oceny, z wykresami obliczonymi przez platformę. Pisze je model językowy platformy, na jej własnych serwerach.",
+      "afterFeedback": "Wygeneruj je po zebraniu ocen uczestników: uwzględnione zostaną te otrzymane do tego momentu. Można je wygenerować ponownie.",
+      "requirementsTitle": "Wymagania",
+      "reqEnded": "Wydarzenie zakończone",
+      "reqAi": "Przetwarzanie AI włączone w ustawieniach",
+      "reqRetention": "Dane wydarzenia dostępne do {date}",
+      "reqExpired": "Okres przechowywania danych zakończył się {date}: czat, reakcje i obecności nie są już dostępne",
+      "inputsTitle": "Dostępne materiały",
+      "inputTranscript": "Transkrypcja",
+      "inputNoTranscript": "Brak transkrypcji",
+      "inputChat": "{count, plural, one {# wiadomość na czacie} few {# wiadomości na czacie} many {# wiadomości na czacie} other {# wiadomości na czacie}}",
+      "inputQuestions": "{count, plural, one {# pytanie} few {# pytania} many {# pytań} other {# pytania}}",
+      "inputPolls": "{count, plural, one {# opublikowana ankieta} few {# opublikowane ankiety} many {# opublikowanych ankiet} other {# opublikowanej ankiety}}",
+      "inputWords": "{count, plural, one {# słowo} few {# słowa} many {# słów} other {# słowa}}",
+      "inputFeedback": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}",
+      "inputAgenda": "{count, plural, one {# reakcja na program} few {# reakcje na program} many {# reakcji na program} other {# reakcji na program}}",
+      "languagesTitle": "Języki: {language} i tłumaczenia",
+      "targetLanguages": "Przetłumacz sprawozdanie także na:",
+      "generate": "Wygeneruj sprawozdanie",
+      "regenerate": "Wygeneruj sprawozdanie ponownie",
+      "confirmRegenerate": "Nowe sprawozdanie zastąpi obecne i pozostanie ukryte, dopóki nie opublikujesz go ponownie.",
+      "requested": "Zlecono sprawozdanie: będzie gotowe za kilka minut.",
+      "failed": "Operacja nie powiodła się.",
+      "loadFailed": "Nie można wczytać stanu sprawozdania.",
+      "statusQueued": "W kolejce.",
+      "statusRunning": "W przygotowaniu: model pisze sprawozdanie.",
+      "statusFailed": "Nie powiodło się: {error}",
+      "statusDone": "Wygenerowano {date}.",
+      "publish": "Pokaż sprawozdanie na stronie wydarzenia",
+      "publishDesc": "Przejrzyj je przed publikacją: tekst napisał model sztucznej inteligencji. Ponownie wygenerowane sprawozdanie trzeba opublikować jeszcze raz.",
+      "preview": "Podgląd",
+      "hidePreview": "Ukryj podgląd",
+      "previewLanguage": "Język"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Powiadom zapisanych, gdy nagranie zostanie opublikowane",
     "recordingNotifyHelp": "Jeden e-mail, gdy nagranie (lub zewnętrzne wideo) jest widoczne na publicznej stronie wydarzenia. Trafia do osób wciąż zapisanych: po okresie przechowywania nikt nie jest powiadamiany.",
-    "recordingNotifySent": "Powiadomienie wysłane {date}."
+    "recordingNotifySent": "Powiadomienie wysłane {date}.",
+    "report": {
+      "title": "Sprawozdanie z wydarzenia",
+      "generatedAt": "Wygenerowano {date}",
+      "translated": "tłumaczenie automatyczne z oryginału w języku: {language}",
+      "languageFallback": "Sprawozdanie nie jest dostępne w Twoim języku: jest wyświetlane w języku: {language}.",
+      "sections": {
+        "highlights": "W skrócie",
+        "numbers": "Udział w liczbach",
+        "timeline": "Udział w czasie",
+        "topics": "Tematy",
+        "map": "Mapa pojęć",
+        "consensus": "Zgoda i niezgoda",
+        "polls": "Ankiety",
+        "feedback": "Oceny uczestników",
+        "benefits": "Co zyskali uczestnicy",
+        "openQuestions": "Otwarte pytania",
+        "nextSteps": "Kolejne kroki",
+        "summary": "Przeczytaj pełne sprawozdanie"
+      },
+      "metrics": {
+        "peak": "Osoby na sali w szczycie",
+        "joined": "Obecni",
+        "ofRegistered": "{pct}% zarejestrowanych",
+        "active": "Aktywnie uczestniczyli",
+        "ofPresent": "{pct}% obecnych",
+        "interactions": "Interakcje",
+        "rating": "Średnia ocena",
+        "responses": "{count, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} other {# odpowiedzi}}"
+      },
+      "series": {
+        "chat": "Czat",
+        "questions": "Pytania",
+        "polls": "Ankiety",
+        "words": "Słowa",
+        "reactions": "Reakcje"
+      },
+      "timelineDesc": "Interakcje co {minutes} min od początku wydarzenia",
+      "timeFromStart": "Od początku",
+      "peak": "Najbardziej aktywny moment: {label} od początku.",
+      "agreement": {
+        "high": "Szeroka zgoda",
+        "mixed": "Podzielone opinie",
+        "low": "Niewielka zgoda",
+        "unknown": "Zgody nie da się ocenić"
+      },
+      "goTo": "Przejdź do {time}",
+      "stance": {
+        "support": "Za",
+        "concern": "Wątpliwości",
+        "question": "Pytanie"
+      },
+      "mapDesc": "Mapa pojęć wydarzenia: tematy wokół tytułu, połączone z pojęciami, podmiotami i rezultatami.",
+      "kind": {
+        "topic": "Temat",
+        "concept": "Pojęcie",
+        "actor": "Podmiot",
+        "outcome": "Rezultat"
+      },
+      "agendaReactions": "Reakcje uczestników na punkty programu",
+      "agree": "Zgadzam się",
+      "disagree": "Nie zgadzam się",
+      "agreements": "Punkty zgody",
+      "disagreements": "Punkty niezgody",
+      "votes": "{count, plural, one {# głos} few {# głosy} many {# głosów} other {# głosu}}",
+      "average": "średnio {value} na {max}",
+      "strengths": "Mocne strony",
+      "improvements": "Do poprawy",
+      "quotes": "Z komentarzy",
+      "aiNotice": "Tekst napisał model sztucznej inteligencji na podstawie transkrypcji, czatu, pytań, ankiet i ocen, a zespół przejrzał go przed publikacją. Liczby i wykresy oblicza platforma. Może zawierać nieścisłości."
+    }
   },
   "provisioning": {
     "loading": "Ładowanie",

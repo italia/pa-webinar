@@ -3171,6 +3171,42 @@
       "loadFailed": "De status van de transcriptie kon niet worden geladen.",
       "expired": "De bewaartermijn van de gegevens van het evenement is verstreken: de transcriptie wordt niet opnieuw opgebouwd.",
       "aiRunning": "De AI-verwerking transcribeert de video: haar transcriptie komt in de plaats van die uit de ondertiteling."
+    },
+    "eventReport": {
+      "title": "AI-verslag van het evenement",
+      "intro": "Een verslag voor wie er niet bij was en voor wie wil teruglezen: samenvatting, uitgelegde onderwerpen, begrippenkaart, eensgezindheid en onenigheid, deelname en beoordelingen, met grafieken die het platform berekent. Het wordt geschreven door het taalmodel van het platform, op de eigen servers.",
+      "afterFeedback": "Maak het nadat de beoordelingen van de deelnemers binnen zijn: die tot dan toe zijn ontvangen, worden meegenomen. Het kan opnieuw worden gemaakt.",
+      "requirementsTitle": "Voorwaarden",
+      "reqEnded": "Evenement afgelopen",
+      "reqAi": "AI-verwerking ingeschakeld in de instellingen",
+      "reqRetention": "Gegevens van het evenement beschikbaar tot {date}",
+      "reqExpired": "Bewaartermijn van de gegevens verstreken op {date}: chat, reacties en aanwezigheid zijn niet meer beschikbaar",
+      "inputsTitle": "Beschikbaar materiaal",
+      "inputTranscript": "Transcriptie",
+      "inputNoTranscript": "Geen transcriptie",
+      "inputChat": "{count, plural, one {# chatbericht} other {# chatberichten}}",
+      "inputQuestions": "{count, plural, one {# vraag} other {# vragen}}",
+      "inputPolls": "{count, plural, one {# gepubliceerde peiling} other {# gepubliceerde peilingen}}",
+      "inputWords": "{count, plural, one {# woord} other {# woorden}}",
+      "inputFeedback": "{count, plural, one {# beoordeling} other {# beoordelingen}}",
+      "inputAgenda": "{count, plural, one {# reactie op de agenda} other {# reacties op de agenda}}",
+      "languagesTitle": "Talen: {language} en vertalingen",
+      "targetLanguages": "Vertaal het verslag ook in:",
+      "generate": "Verslag maken",
+      "regenerate": "Verslag opnieuw maken",
+      "confirmRegenerate": "Het nieuwe verslag vervangt het huidige en blijft verborgen tot u het opnieuw publiceert.",
+      "requested": "Verslag aangevraagd: het is over enkele minuten klaar.",
+      "failed": "De bewerking is mislukt.",
+      "loadFailed": "De status van het verslag kon niet worden geladen.",
+      "statusQueued": "In de wachtrij.",
+      "statusRunning": "Bezig: het model schrijft het verslag.",
+      "statusFailed": "Mislukt: {error}",
+      "statusDone": "Gemaakt op {date}.",
+      "publish": "Toon het verslag op de evenementpagina",
+      "publishDesc": "Lees het na voordat u het publiceert: de tekst is geschreven door een AI-model. Een opnieuw gemaakt verslag moet opnieuw worden gepubliceerd.",
+      "preview": "Voorbeeld",
+      "hidePreview": "Voorbeeld verbergen",
+      "previewLanguage": "Taal"
     }
   },
   "email": {
@@ -4675,7 +4711,77 @@
     },
     "recordingNotify": "Ingeschrevenen waarschuwen wanneer de opname is gepubliceerd",
     "recordingNotifyHelp": "Eén e-mail, wanneer de opname (of externe video) zichtbaar is op de openbare pagina van het evenement. Hij bereikt wie nog ingeschreven is: na de bewaartermijn wordt niemand meer gewaarschuwd.",
-    "recordingNotifySent": "Bericht verzonden op {date}."
+    "recordingNotifySent": "Bericht verzonden op {date}.",
+    "report": {
+      "title": "Verslag van het evenement",
+      "generatedAt": "Gemaakt op {date}",
+      "translated": "automatische vertaling van het origineel in het {language}",
+      "languageFallback": "Het verslag is niet beschikbaar in uw taal: het wordt getoond in het {language}.",
+      "sections": {
+        "highlights": "In het kort",
+        "numbers": "Deelname in cijfers",
+        "timeline": "Deelname in de tijd",
+        "topics": "De onderwerpen",
+        "map": "Begrippenkaart",
+        "consensus": "Eensgezindheid en onenigheid",
+        "polls": "Peilingen",
+        "feedback": "Wat deelnemers ervan vonden",
+        "benefits": "Wat deelnemers eraan hebben",
+        "openQuestions": "Open vragen",
+        "nextSteps": "Volgende stappen",
+        "summary": "Lees het volledige verslag"
+      },
+      "metrics": {
+        "peak": "Mensen in de zaal op het piekmoment",
+        "joined": "Aanwezig",
+        "ofRegistered": "{pct}% van de ingeschrevenen",
+        "active": "Namen actief deel",
+        "ofPresent": "{pct}% van de aanwezigen",
+        "interactions": "Interacties",
+        "rating": "Gemiddelde beoordeling",
+        "responses": "{count, plural, one {# antwoord} other {# antwoorden}}"
+      },
+      "series": {
+        "chat": "Chat",
+        "questions": "Vragen",
+        "polls": "Peilingen",
+        "words": "Woorden",
+        "reactions": "Reacties"
+      },
+      "timelineDesc": "Interacties per {minutes} minuten vanaf het begin van het evenement",
+      "timeFromStart": "Vanaf het begin",
+      "peak": "Het drukste moment: {label} na het begin.",
+      "agreement": {
+        "high": "Brede eensgezindheid",
+        "mixed": "Verdeelde meningen",
+        "low": "Weinig eensgezindheid",
+        "unknown": "Eensgezindheid niet meetbaar"
+      },
+      "goTo": "Ga naar {time}",
+      "stance": {
+        "support": "Voor",
+        "concern": "Bedenking",
+        "question": "Vraag"
+      },
+      "mapDesc": "Begrippenkaart van het evenement: de onderwerpen rond de titel, verbonden met begrippen, actoren en resultaten.",
+      "kind": {
+        "topic": "Onderwerp",
+        "concept": "Begrip",
+        "actor": "Actor",
+        "outcome": "Resultaat"
+      },
+      "agendaReactions": "Hoe deelnemers reageerden op de agendapunten",
+      "agree": "Eens",
+      "disagree": "Oneens",
+      "agreements": "Punten van overeenstemming",
+      "disagreements": "Punten van onenigheid",
+      "votes": "{count, plural, one {# stem} other {# stemmen}}",
+      "average": "gemiddeld {value} van {max}",
+      "strengths": "Sterke punten",
+      "improvements": "Te verbeteren",
+      "quotes": "Uit de opmerkingen",
+      "aiNotice": "De tekst is geschreven door een AI-model op basis van de transcriptie, de chat, de vragen, de peilingen en de beoordelingen, en het team heeft hem voor publicatie nagelezen. De cijfers en grafieken berekent het platform. Hij kan onnauwkeurigheden bevatten."
+    }
   },
   "provisioning": {
     "loading": "Laden",

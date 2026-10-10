@@ -244,6 +244,7 @@ feature on and what the notice should say about it.
 | Transcript from captions | `captionsTranscriptEnabled` per event, off by default; the new-event questions turn it on for events that can be recorded | The sentences of the people who consented, with their name, become the event's transcript, which staff can correct and publish on the event page; for everyone else only the times of their sentences are kept |
 | Who is in the room | Every event, where the installation runs live captions and **Automatic captions in video calls** is on, whatever the event's own captions switch; events with per-participant recording. In both cases where Prosody loads the project's occupants module (the chart and Docker Compose do) | Which conference seat stands behind each voice on the bridge, with join and leave times and no names. It lets the recorder and the transcript from captions honor each person's consent, also for people who joined before the transcript was turned on, and is deleted at the event's retention. For other events, nothing |
 | AI outputs | `aiPipelineEnabled` and the event's AI flags | Transcript with speaker labels, summary, translations, subtitles, dubbed audio. Staff can map a speaker label to a name or an address-book entry |
+| AI event report | Requested by staff after the event, with `aiPipelineEnabled` on | A language model inside the installation reads the transcript, the chat without names, questions, polls, words and the post-event comments, and writes a report beside the platform's figures. It rewords comments, without authors. It is public only after staff review and publish it, and it stays with the event after its retention |
 | Address book | The optional box on every registration form | See [Address book](#address-book) |
 | Invitations | Staff add them in the event wizard. The platform sends no invitation email | The invitee's name and email. When an event is open only to invitees (**Only people you invite**, or **Public registration enabled** off for an event without a choice of its own), the list decides who may register, and the personal join link reaches the registrant only by email |
 | Moderators and speakers | Event wizard and named grants | The primary moderator's name and email, which registrants receive (see [Recipients and processors](#recipients-and-processors)); named grants; the public speaker list |
@@ -291,7 +292,7 @@ Check each row against the basis you rely on.
 | Your monitoring and logging stack | Always | Ingress, load balancer, Jitsi and TURN logs, which usually contain IP addresses ([Monitoring and health](../operations/monitoring.md)) |
 | Staff | Always | Administrators see everything and can export sign-ups as CSV; organizers see their own events; moderators see what happens in their room, including, in the participants panel, the name and email address given at registration or on a named grant for each person in the call. Speakers do not see these |
 | Other participants | Always | Display names and avatars in the room, chat and Q&A authors, and the chat download. People in the square who have access to the room see each other's display names and positions. Registrants receive the primary moderator's name and email address as the organizer of the calendar file attached to their confirmation, reminder and date-change emails |
-| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a published recording and its AI outputs, a published transcript from captions with its speakers' names, publications, and the event recap |
+| The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a published recording and its AI outputs, a published transcript from captions with its speakers' names, a published AI event report, publications, and the event recap |
 
 AI post-production has no external recipient. Every engine the application
 accepts runs inside the installation's cluster (`app/src/lib/ai/providers.ts`),
@@ -329,7 +330,7 @@ What each job deletes is in the
 | AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is. With only the transcript published, the transcript stays while published and the other outputs go at the event's retention | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
 | Caption sentences and the record of who was in the room | The event's retention | As event personal data |
 | Transcript from captions | The event's retention, deleted by the cleanup job on every installation, unless the event's video or transcript is published; then for as long as either stays published | **Publish the transcript on the event page** in the event's **Transcript from captions** panel, and the recording's publication |
-| Event record and recap | Nothing deletes them. After its retention the event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
+| Event record, recap and AI event report | Nothing deletes them. After its retention the event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
 | Address book | `retentionMonths` after the person's last registration (default in `app/prisma/schema.prisma`, not editable in the administration area); opted-out entries at the next run | Delete entries under **Address book** |
 | Profile photos | Kept while a registration with the same email address exists, at any event; then deleted once 30 days have passed since the photo last changed (`app/src/app/api/cron/cleanup/route.ts`). Self-service erasure deletes it | Not configurable. The person can remove it in the waiting room |
 | Staff accounts | The account stays until an administrator deletes it. Used or expired sign-in links are swept by the daily cleanup (`app/src/app/api/cron/cleanup/route.ts`) | **Staff and access** > **Staff accounts** |
@@ -377,6 +378,11 @@ Your notice should state at least:
   on the event page, that erasure of a registration removes the person from
   it, and how long it is kept
   ([Recordings, voice data and AI outputs](recordings-and-ai.md#transcript-from-live-captions)).
+- **The AI event report.** That staff may have an AI model write a report
+  of the event from the transcript, the chat without names, questions, polls
+  and ratings, that it is reviewed before publication, and that it stays with
+  the event after its retention
+  ([Recordings, voice data and AI outputs](recordings-and-ai.md#the-event-report)).
 - **AI processing.** Which outputs are produced (transcript, summary,
   translations, subtitles, dubbing with synthetic catalog voices, never cloned
   voices), that everything runs inside the installation, that outputs can be

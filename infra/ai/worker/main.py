@@ -37,6 +37,7 @@ from . import client as cli
 from . import glossary as glmod
 from . import llm as llmmod
 from . import multitrack as mtmod
+from . import report as repmod
 from . import transcribe as tr
 from . import tts as ttsmod
 from . import vtt as vttmod
@@ -801,6 +802,45 @@ def run_archive(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         )
 
 
+def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
+    """Il resoconto dell'evento: il testo nella lingua dell'evento e nelle
+    lingue chieste, consegnato al portale che lo unisce ai numeri."""
+    inp = job.reportInput
+    if not inp:
+        raise RuntimeError("REPORT without reportInput")
+    hints = job.providerHints
+    app.progress(job.jobId, "RUNNING", percent=10.0, message="writing report")
+    sorgente = job.payload.get("sourceLanguage") or inp.get("language") or "it"
+    inp = {**inp, "language": sorgente}
+    resoconto = repmod.genera_resoconto(
+        inp,
+        base_url=hints.llmBaseUrl,
+        model_id=hints.llmModelId,
+        avanzamento=lambda pct, msg: app.progress(job.jobId, "RUNNING", percent=pct, message=msg),
+    )
+    narrative: Dict[str, Dict[str, Any]] = {sorgente: resoconto}
+    destinazioni = [l for l in (job.payload.get("targetLanguages") or []) if l != sorgente]
+    glossario = glmod.parse(hints.glossary)
+    for i, lingua in enumerate(destinazioni):
+        app.progress(
+            job.jobId,
+            "RUNNING",
+            percent=60.0 + 35.0 * i / max(1, len(destinazioni)),
+            message=f"translating report to {lingua}",
+        )
+        try:
+            tradotto = repmod.traduci_resoconto(
+                resoconto, lingua, base_url=hints.llmBaseUrl, model_id=hints.llmModelId, glossario=glossario
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            # Una traduzione mancata non butta via il resoconto.
+            log.warning("report translation to %s failed: %s", lingua, e)
+            tradotto = None
+        if tradotto:
+            narrative[lingua] = tradotto
+    app.deliver_report(job_id=job.jobId, narratives=narrative, model_id=hints.llmModelId)
+
+
 def run_one() -> int:
     with cli.AppClient() as app:
         job = app.claim()
@@ -830,6 +870,8 @@ def run_one() -> int:
                 run_dub(app, job)
             elif job.kind == "ARCHIVE":
                 run_archive(app, job)
+            elif job.kind == "REPORT":
+                run_report(app, job)
             elif job.kind == "SUBTITLE":
                 # SUBTITLE is satisfied by TRANSCRIBE today (it emits
                 # the source-lang VTT). If we ever decouple them this

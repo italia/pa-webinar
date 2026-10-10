@@ -6,6 +6,7 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { vistaResoconto } from '@/lib/report/view';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
@@ -398,6 +399,7 @@ export default async function EventDetailPage({
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
+        report={vistaResoconto(event, locale)}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}
