@@ -209,9 +209,11 @@ track, because the portal cannot tell whose voice is whose.
 
 The module is wired like the others, with one addition, the portal's address:
 
-- **Helm chart.** `jitsi-meet.prosody.extraEnvs.PA_PORTAL_URL` points at the portal's Service, built from
-  the release name. With the chart's NetworkPolicy on, the application's policy admits the Prosody pods
-  on the app port ([NetworkPolicy](../../docs/DEPLOYMENT.md#networkpolicy)).
+- **Helm chart.** `jitsi-meet.prosody.extraEnvs.PA_PORTAL_URL` points at the portal's Service by its full
+  name, `<fullname>.<namespace>.svc.<global.clusterDomain>`, because Prosody's resolver does not use the
+  pod's search domains; with `global.clusterDomain` empty it is the short name. With the chart's
+  NetworkPolicy on, the application's policy admits the Prosody pods on the app port
+  ([NetworkPolicy](../../docs/DEPLOYMENT.md#networkpolicy)).
 - **Docker Compose.** The `prosody` service sets `PA_PORTAL_URL=http://app:3000`.
 
 The signing secret needs no wiring of its own: `JWT_APP_SECRET` must already equal the portal's
