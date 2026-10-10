@@ -97,6 +97,50 @@ describe('contenutoScheda', () => {
     expect(c.data).toContain('2026');
   });
 
+  it('un relatore per riga diventa una riga sola, con i nomi separati', () => {
+    const c = contenutoScheda(
+      evento({ speakersInfo: { it: 'Relatore 1\n- Relatore 2\n\n3. Relatore 3' } }),
+      impostazioni(),
+      'it',
+    );
+    expect(c.relatori).toBe('Relatore 1 · Relatore 2 · Relatore 3');
+  });
+
+  it('i relatori pubblicati e gli enti dell’evento vincono sul testo libero', () => {
+    const c = contenutoScheda(
+      evento({
+        relatoriPubblici: ['Persona A', 'Persona B'],
+        enti: ['Ente A', 'Ente B'],
+        organizerName: 'Scritto a mano',
+      }),
+      impostazioni(),
+      'it',
+    );
+    expect(c.relatori).toBe('Persona A · Persona B');
+    expect(c.ente).toBe('Ente A · Ente B');
+  });
+
+  it('con la convenzione attiva il sopratitolo si separa dal titolo', () => {
+    const titolo = { it: 'Ciclo di incontri | Il riuso del software' };
+    const acceso = contenutoScheda(evento({ title: titolo }), impostazioni({ parseTitleKicker: true }), 'it');
+    expect(acceso.sopratitolo).toBe('Ciclo di incontri');
+    expect(acceso.titolo).toBe('Il riuso del software');
+    // L'evento puo' spegnerla anche se il sito la usa.
+    const spento = contenutoScheda(
+      evento({ title: titolo, parseTitleKicker: false }),
+      impostazioni({ parseTitleKicker: true }),
+      'it',
+    );
+    expect(spento.sopratitolo).toBe('');
+    expect(spento.titolo).toBe('Ciclo di incontri | Il riuso del software');
+  });
+
+  it('l’ora e’ quella del fuso dell’evento', () => {
+    const c = contenutoScheda(evento({ timezone: 'Europe/London' }), impostazioni(), 'it');
+    // Le 08:30 UTC a Londra in settembre sono le 09:30.
+    expect(c.data).toContain('09:30');
+  });
+
   it('senza relatori la riga resta vuota invece di stampare un segnaposto', () => {
     const c = contenutoScheda(evento({ speakersInfo: {} }), impostazioni(), 'it');
     expect(c.relatori).toBe('');

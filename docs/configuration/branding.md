@@ -195,17 +195,26 @@ The **SEO** tab sets how the site appears in search results and in link previews
 - **SEO title** and **SEO description** (`seoTitle`, `seoDescription`) are the default title and
   description of pages that do not set their own. **Open Graph image** (`seoImage`) is the default
   preview image. Without it, the bundled `/images/logo/og-image.png` is used.
-- **Shared link preview** controls event links. With **Generate the preview** on (`ogCardEnabled`),
-  an event page advertises a card that the server draws, served by `/api/og/event/<slug>`. The card
-  is filled with **Primary color**, carries the PA Webinar mark, and prints the event title inside the
-  image. Switches choose what else goes in: **Poster as background**, **Date and time** (in the site's
-  default timezone), **Speakers** and **Organisation** (the event's organizer name,
-  `Event.organizerName`, when set, otherwise **Organization name**). With the card off, the preview
-  is the event's cover image, or the bundled `/images/logo/og-image.png` when the event has none.
+- **Shared link preview** controls event links: the event page, the link to enter the room
+  (`/events/<slug>/live`) and the registration page share the same preview, with the event's title
+  and its description as plain text (Markdown syntax removed, cut at about 160 characters). Links
+  to an event whose page is not public (a draft, an instant call, a concluded event whose page is
+  off) keep the site's default preview. With **Generate the preview** on (`ogCardEnabled`), the
+  preview image is a card that the server draws, served by `/api/og/event/<slug>`. The card is
+  filled with **Primary color**, carries the PA Webinar mark, and prints the event title inside the
+  image; when the title uses the kicker convention (**Kicker | Title**), the kicker goes above it.
+  Switches choose what else goes in: **Poster as background**, **Date and time** (in the event's
+  timezone), **Speakers** (the published speakers of the event, otherwise the free-text speakers,
+  one name per line) and **Organisation** (the event's organizing bodies, otherwise its organizer
+  name, `Event.organizerName`, otherwise **Organization name**). With the card off, the preview is
+  the event's cover image, or the bundled `/images/logo/og-image.png` when the event has none.
   **Open Graph image** is not used for event links.
 
-The card's URL changes whenever the event is edited, so preview services that cache images by address
-pick up a corrected title or poster.
+The card's URL changes whenever the event is edited or its published speakers and organizing bodies
+change, so preview services that cache images by address pick up a corrected title, poster or list of
+people, and a name removed from the event, also on an erasure request, does not stay in new previews.
+The same plain-text description, with paragraphs and lists kept, goes into the calendar file and the
+add-to-calendar links.
 
 ## Wording: translation overrides
 

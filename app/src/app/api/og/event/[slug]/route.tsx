@@ -15,6 +15,7 @@
  * pagina deve poter scegliere fra questa scheda e l'immagine grezza a seconda
  * dell'impostazione, e per farlo le serve un indirizzo da nominare.
  */
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -25,7 +26,9 @@ import { prisma } from '@/lib/db';
 import { appBaseUrl } from '@/lib/env';
 import { NotFoundError, RateLimitError } from '@/lib/errors';
 import { isEventPageVisible } from '@/lib/events/visibility';
-import { contenutoScheda, origineLocandina } from '@/lib/og-card';
+import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { tryDecryptPII } from '@/lib/crypto/pii';
+import { accorcia, contenutoScheda, origineLocandina } from '@/lib/og-card';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { getSettings } from '@/lib/settings';
 import { locales, defaultLocale } from '@/i18n/config';
@@ -211,6 +214,14 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventPublic: true,
       postEventPublicUntil: true,
       updatedAt: true,
+      timezone: true,
+      parseTitleKicker: true,
+      // Enti e persone come li mostra la pagina pubblica.
+      moderatorName: true,
+      moderatorPublicListed: true,
+      moderatorOrganization: true,
+      moderatorOrganizationLogoUrl: true,
+      ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });
   // Stesso giudizio della pagina: un evento che non ha una scheda pubblica non
@@ -225,17 +236,44 @@ export const GET = withErrorHandling(async (request, context) => {
   // nuove condivisioni tornano alla locandina.
   if (!settings.ogCardEnabled) throw new NotFoundError('Event');
 
-  const chiave = `${slug}|${locale}|${event.updatedAt.getTime()}|${settings.updatedAt.getTime()}`;
-  const gia = SCHEDE.get(chiave);
-  if (gia) return rispostaPng(gia, 'HIT');
-
-  const { titolo, ente, data, relatori, colore: primario } = contenutoScheda(
-    event,
+  const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
+  const { titolo, sopratitolo, ente, data, relatori, colore: primario } = contenutoScheda(
+    {
+      ...event,
+      enti: enti.map((e) => e.name),
+      relatoriPubblici: persone.filter((p) => p.role === 'speaker').map((p) => p.name),
+    },
     settings,
     locale,
   );
+  // Sopra il titolo, in piccolo: chi organizza e il sopratitolo dell'evento,
+  // su una riga sola (piu' lunga salirebbe sopra il marchio).
+  const sopra = accorcia([ente, sopratitolo].filter((x) => x !== '').join(' · '), 90);
+  const posterRaw = event.coverImageUrl ?? event.imageUrl ?? null;
+
+  // La chiave e' cio' che la scheda mostra, non solo l'ultima modifica
+  // dell'evento: enti e persone cambiano senza toccarlo, e un nome tolto (o
+  // cancellato su richiesta) non deve restare in un'immagine gia' disegnata.
+  const chiave = createHash('sha256')
+    .update(
+      JSON.stringify([
+        slug,
+        locale,
+        settings.updatedAt.getTime(),
+        titolo,
+        sopra,
+        data,
+        relatori,
+        primario,
+        posterRaw,
+      ]),
+    )
+    .digest('hex');
+  const gia = SCHEDE.get(chiave);
+  if (gia) return rispostaPng(gia, 'HIT');
+
   const locandina = settings.ogShowPoster
-    ? await locandinaInline(event.coverImageUrl ?? event.imageUrl ?? null)
+    ? await locandinaInline(posterRaw)
     : null;
 
   const [regular, semibold, bold, segno] = await Promise.all([
@@ -322,7 +360,7 @@ export const GET = withErrorHandling(async (request, context) => {
             gap: 16,
           }}
         >
-          {ente !== '' && (
+          {sopra !== '' && (
             <div
               style={{
                 display: 'flex',
@@ -333,7 +371,7 @@ export const GET = withErrorHandling(async (request, context) => {
                 opacity: 0.92,
               }}
             >
-              {ente}
+              {sopra}
             </div>
           )}
 

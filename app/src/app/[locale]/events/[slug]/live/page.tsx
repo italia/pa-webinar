@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { titoloEventoPubblico } from '@/lib/events/meta-title';
+import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
@@ -34,8 +34,10 @@ interface LivePageProps {
 
 export async function generateMetadata({ params }: LivePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const titolo = await titoloEventoPubblico(slug);
-  return { ...(titolo ? { title: titolo } : {}), robots: { index: false } };
+  // Il link per entrare e' quello che si condivide di piu': chi lo riceve
+  // vede l'anteprima dell'evento, non quella generica del sito.
+  const anteprima = await anteprimaEventoPubblico(slug, `/events/${slug}/live`);
+  return { ...(anteprima ?? {}), robots: { index: false } };
 }
 
 export default async function LivePage({ params, searchParams }: LivePageProps) {

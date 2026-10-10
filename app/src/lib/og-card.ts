@@ -8,6 +8,7 @@
  * fanno fallire niente. Qui si puo' guardare senza disegnare.
  */
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled, splitTitleKicker } from '@/lib/utils/title-kicker';
 
 /** Oltre questa lunghezza il titolo non ci sta in tre righe leggibili. */
 const MAX_TITOLO = 110;
@@ -19,6 +20,15 @@ export interface EventoScheda {
   startsAt: Date;
   speakersInfo: unknown;
   organizerName: string | null;
+  /** Il fuso dell'evento: l'ora della scheda e' quella che legge chi partecipa. */
+  timezone?: string | null;
+  /** La convenzione «sopratitolo | titolo» per questo evento (null: quella del sito). */
+  parseTitleKicker?: boolean | null;
+  /** I relatori pubblicati (lib/events/public-people): come nella pagina,
+   *  vincono sul testo libero dei relatori. */
+  relatoriPubblici?: readonly string[];
+  /** Gli enti che organizzano, in ordine: vincono sull'organizzatore scritto a mano. */
+  enti?: readonly string[];
 }
 
 export interface ImpostazioniScheda {
@@ -28,10 +38,14 @@ export interface ImpostazioniScheda {
   organizationName: string;
   defaultTimezone: string;
   primaryColor: string;
+  /** La convenzione «sopratitolo | titolo» del sito. */
+  parseTitleKicker?: boolean;
 }
 
 export interface ContenutoScheda {
   titolo: string;
+  /** La parte del titolo prima di «|», quando la convenzione e' attiva. */
+  sopratitolo: string;
   ente: string;
   data: string;
   relatori: string;
@@ -54,16 +68,27 @@ export function contenutoScheda(
   impostazioni: ImpostazioniScheda,
   locale: string,
 ): ContenutoScheda {
-  const titolo = accorcia(getLocalized(evento.title as LocalizedField, locale), MAX_TITOLO);
+  const { kicker, main } = splitTitleKicker(
+    getLocalized(evento.title as LocalizedField, locale),
+    resolveKickerEnabled(evento, impostazioni.parseTitleKicker ?? false),
+  );
+  const titolo = accorcia(main, MAX_TITOLO);
+  const sopratitolo = kicker ? accorcia(kicker, MAX_RELATORI) : '';
 
-  const relatori = impostazioni.ogShowSpeakers
-    ? accorcia(getLocalized(evento.speakersInfo as LocalizedField, locale), MAX_RELATORI)
-    : '';
+  // Un nome per voce, separati: la scheda e' una riga sola, e gli a capo del
+  // testo libero diventerebbero spazi che fondono i nomi.
+  const nomi = evento.relatoriPubblici?.length
+    ? [...evento.relatoriPubblici]
+    : righe(getLocalized(evento.speakersInfo as LocalizedField, locale));
+  const relatori = impostazioni.ogShowSpeakers ? accorcia(nomi.join(' · '), MAX_RELATORI) : '';
 
-  // L'organizzatore dell'evento e' piu' preciso del nome dell'ente quando c'e':
-  // una serie ospitata da un'altra struttura va attribuita a quella.
+  // Gli enti dell'evento, poi l'organizzatore scritto a mano, poi l'ente del
+  // sito: il piu' preciso che c'e' (una serie ospitata da un'altra struttura
+  // va attribuita a quella).
   const ente = impostazioni.ogShowOrganization
-    ? (evento.organizerName?.trim() || impostazioni.organizationName.trim())
+    ? evento.enti?.length
+      ? accorcia(evento.enti.join(' · '), MAX_RELATORI)
+      : evento.organizerName?.trim() || impostazioni.organizationName.trim()
     : '';
 
   let data = '';
@@ -72,7 +97,7 @@ export function contenutoScheda(
       data = new Intl.DateTimeFormat(locale, {
         dateStyle: 'full',
         timeStyle: 'short',
-        timeZone: impostazioni.defaultTimezone || 'Europe/Rome',
+        timeZone: evento.timezone || impostazioni.defaultTimezone || 'Europe/Rome',
       }).format(evento.startsAt);
     } catch {
       // Un fuso o una lingua non riconosciuti non devono far saltare
@@ -89,7 +114,15 @@ export function contenutoScheda(
     ? impostazioni.primaryColor
     : '#0066CC';
 
-  return { titolo, ente, data, relatori, colore };
+  return { titolo, sopratitolo, ente, data, relatori, colore };
+}
+
+/** Le righe di un testo libero, senza i segni di un elenco. */
+function righe(testo: string): string[] {
+  return testo
+    .split(/\r?\n/)
+    .map((r) => r.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, '').trim())
+    .filter((r) => r !== '');
 }
 
 /** Dove andare a prendere la locandina, una volta deciso che si puo'. */
