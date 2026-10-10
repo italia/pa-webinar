@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Napisy automatyczne",
-    "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem CC."
+    "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem napisów na pasku połączenia."
   },
   "recording": {
     "management": "Nagranie wideo",

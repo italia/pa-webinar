@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Samodejni podnapisi",
-    "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom CC."
+    "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom za podnapise v vrstici klica."
   },
   "recording": {
     "management": "Video posnetek",

@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatiske undertekster",
-    "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med knappen CC."
+    "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med undertekstknappen i opkaldets værktøjslinje."
   },
   "recording": {
     "management": "Videooptagelse",

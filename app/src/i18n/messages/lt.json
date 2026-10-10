@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatiniai subtitrai",
-    "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti mygtuku CC."
+    "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti subtitrų mygtuku skambučio juostoje."
   },
   "recording": {
     "management": "Vaizdo įrašas",

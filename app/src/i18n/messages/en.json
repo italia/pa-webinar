@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatic captions",
-    "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the CC button."
+    "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the captions button in the call's toolbar."
   },
   "recording": {
     "management": "Video recording",

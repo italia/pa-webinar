@@ -80,6 +80,20 @@ describe('StageName', () => {
     expect(nome()).toBeNull();
   });
 
+  it('una sala nuova riparte da zero, senza il palco né la griglia di prima', () => {
+    const vecchia = fakeApi({ aa: 'Ospite di prova', me: 'Moderatore' });
+    act(() => root.render(<StageName api={vecchia.api} />));
+    act(() => vecchia.emit('videoConferenceJoined', { id: 'me' }));
+    act(() => vecchia.onStage('aa'));
+    act(() => vecchia.emit('tileViewChanged', { enabled: true }));
+    const nuova = fakeApi({ bb: 'Relatore 1', me2: 'Moderatore' });
+    act(() => root.render(<StageName api={nuova.api} />));
+    expect(nome()).toBeNull();
+    act(() => nuova.emit('videoConferenceJoined', { id: 'me2' }));
+    act(() => nuova.onStage('bb'));
+    expect(nome()).toBe('Relatore 1');
+  });
+
   it('toglie i propri ascoltatori', () => {
     const { api, listeners } = fakeApi({});
     act(() => root.render(<StageName api={api} />));

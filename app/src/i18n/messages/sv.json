@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatiska undertexter",
-    "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med knappen CC."
+    "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med undertextknappen i samtalets verktygsfält."
   },
   "recording": {
     "management": "Videoinspelning",

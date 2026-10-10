@@ -21,6 +21,10 @@ export default function StageName({ api }: { api: JitsiMeetExternalAPI | null })
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
+    // Una sala nuova (riconnessione) riparte da zero: palco, id e vista.
+    setStageId(null);
+    setLocalId(null);
+    setTileView(false);
     if (!api) return;
     // L'evento non porta l'id: lo dà l'API, che lo tiene da quando la sala
     // gliel'ha riferito.

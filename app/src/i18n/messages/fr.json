@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Sous-titres automatiques",
-    "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton CC."
+    "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre de l'appel."
   },
   "recording": {
     "management": "Enregistrement vidéo",

@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Sottotitoli awtomatiċi",
-    "captionsNotice": "Waqt ix-xandira diretta, il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli. It-traskrizzjoni ssir fuq is-servers li jospitaw il-pjattaforma u t-test ma jinżammx. Is-sottotitoli jistgħu jinħbew bil-buttuna CC."
+    "captionsNotice": "Waqt ix-xandira diretta, il-vuċi ta' min ikun qed jitkellem tiġi traskritta f'ħin reali biex jintwerew is-sottotitoli. It-traskrizzjoni ssir fuq is-servers li jospitaw il-pjattaforma u t-test ma jinżammx. Is-sottotitoli jistgħu jinħbew bil-buttuna tas-sottotitoli fil-bar tas-sejħa."
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

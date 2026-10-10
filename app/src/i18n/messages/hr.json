@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatski titlovi",
-    "captionsNotice": "Tijekom prijenosa uživo glas osobe koja govori transkribira se u stvarnom vremenu kako bi se prikazivali titlovi. Transkripcija se odvija na poslužiteljima na kojima radi platforma, a tekst se ne čuva. Titlovi se mogu sakriti gumbom CC."
+    "captionsNotice": "Tijekom prijenosa uživo glas osobe koja govori transkribira se u stvarnom vremenu kako bi se prikazivali titlovi. Transkripcija se odvija na poslužiteljima na kojima radi platforma, a tekst se ne čuva. Titlovi se mogu sakriti gumbom za titlove na traci poziva."
   },
   "recording": {
     "management": "Video snimka",

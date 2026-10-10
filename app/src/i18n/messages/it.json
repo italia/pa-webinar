@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Sottotitoli automatici",
-    "captionsNotice": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli. La trascrizione avviene sui server che ospitano la piattaforma e il testo non viene conservato. I sottotitoli si possono nascondere con il pulsante CC."
+    "captionsNotice": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli. La trascrizione avviene sui server che ospitano la piattaforma e il testo non viene conservato. I sottotitoli si possono nascondere con il pulsante dei sottotitoli nella barra della chiamata."
   },
   "recording": {
     "management": "Registrazione video",

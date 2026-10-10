@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatikus feliratok",
-    "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a CC gombbal elrejthetők."
+    "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a hívás eszköztárának feliratgombjával elrejthetők."
   },
   "recording": {
     "management": "Videofelvétel",

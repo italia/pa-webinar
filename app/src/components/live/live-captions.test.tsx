@@ -102,7 +102,9 @@ describe('LiveCaptions', () => {
     render(<LiveCaptions api={api} active />);
     act(() => emit('transcriptionChunkReceived', chunk({ messageID: 'm1', stable: 'Testo' })));
     const pulsante = () =>
-      (raw.executeCommand.mock.calls.filter((c) => c[0] === 'overwriteConfig').at(-1)?.[1] as {
+      (raw.executeCommand.mock.calls
+        .filter((c) => c[0] === 'overwriteConfig' && 'customToolbarButtons' in (c[1] as object))
+        .at(-1)?.[1] as {
         customToolbarButtons: Array<{ id: string; text: string; icon: string }>;
       }).customToolbarButtons;
     expect(pulsante()).toEqual([expect.objectContaining({ id: 'pa-captions', text: 'Nascondi i sottotitoli' })]);
@@ -117,12 +119,32 @@ describe('LiveCaptions', () => {
     expect(window.localStorage.getItem('pawebinar.captions.visible')).toBe('0');
     // Jitsi ridisegna il pulsante solo se lo si toglie e lo si rimette.
     expect(pulsante()).toEqual([]);
-    act(() => vi.advanceTimersByTime(100));
+    act(() => vi.advanceTimersByTime(300));
     vi.useRealTimers();
     expect(pulsante()).toEqual([expect.objectContaining({ id: 'pa-captions', text: 'Mostra i sottotitoli' })]);
     // Senza nome noto, un'etichetta generica.
     act(() => emit('toolbarButtonClicked', { key: 'pa-captions' }));
     expect(container.querySelector('.live-captions__speaker')?.textContent).toBe('Partecipante');
+  });
+
+  it('accesi, Jitsi smette di annunciare la trascrizione come registrazione, e non ricomincia allo spegnimento', () => {
+    const { api, raw } = fakeApi();
+    render(<LiveCaptions api={api} active />);
+    const suoni = () => raw.executeCommand.mock.calls.filter((c) => (c[1] as { disabledSounds?: unknown })?.disabledSounds);
+    expect(suoni()).toEqual([['overwriteConfig', { disabledSounds: ['RECORDING_ON_SOUND', 'RECORDING_OFF_SOUND'] }]]);
+    render(<LiveCaptions api={api} active={false} />);
+    render(<LiveCaptions api={api} active />);
+    expect(suoni()).toHaveLength(1);
+  });
+
+  it('con i sottotitoli nascosti in passato, il pulsante arriva subito barrato', () => {
+    window.localStorage.setItem('pawebinar.captions.visible', '0');
+    const { api, raw } = fakeApi();
+    render(<LiveCaptions api={api} active />);
+    const pulsanti = raw.executeCommand.mock.calls
+      .filter((c) => c[0] === 'overwriteConfig' && 'customToolbarButtons' in (c[1] as object))
+      .map((c) => (c[1] as { customToolbarButtons: Array<{ text: string }> }).customToolbarButtons[0]?.text);
+    expect(pulsanti).toEqual(['Mostra i sottotitoli']);
   });
 
   it('spenti per l’evento, il pulsante esce dalla barra', () => {

@@ -7,14 +7,20 @@ import useSWR from 'swr';
 import { applyChunk, prune, type CaptionLine } from '@/lib/captions/caption-lines';
 import {
   CAPTIONS_BUTTON_ID,
+  CAPTIONS_DISABLED_SOUNDS,
   captionsToolbarButton,
   readCaptionsVisible,
   writeCaptionsVisible,
 } from '@/lib/captions/toolbar-button';
 import type { JitsiMeetExternalAPI, JitsiTranscriptionChunk } from '@/types/jitsi';
 
-/** Tra togliere il pulsante dalla barra e rimetterlo: Jitsi deve aver ridisegnato la barra senza. */
-const REMOUNT_DELAY_MS = 60;
+/**
+ * Tra togliere il pulsante dalla barra e rimetterlo. I due comandi arrivano a
+ * Jitsi come messaggi separati e ciascuno ridisegna la barra; l'attesa copre
+ * un iframe impegnato, che altrimenti li elaborerebbe insieme e lascerebbe il
+ * pulsante vecchio fino al clic successivo.
+ */
+const REMOUNT_DELAY_MS = 250;
 
 /** Stato del servizio come lo riporta la pagina di stato (null = non noto). */
 export type CaptionsServiceState = 'operational' | 'degraded' | 'paused' | 'unavailable' | null;
@@ -51,12 +57,11 @@ export default function LiveCaptions({
   );
   const serviceState = servizio?.state ?? null;
   const [lines, setLines] = useState<CaptionLine[]>([]);
-  const [visible, setVisible] = useState(true);
+  // La scelta salvata va letta subito: il primo aggiornamento del pulsante
+  // nella barra deve già avere lo stato giusto. Sul server vale «visibili»,
+  // e senza frasi da mostrare la pagina è la stessa.
+  const [visible, setVisible] = useState(readCaptionsVisible);
   const [announcement, setAnnouncement] = useState('');
-
-  useEffect(() => {
-    setVisible(readCaptionsVisible());
-  }, []);
 
   // Il pulsante nella barra di Jitsi: c'è solo con i sottotitoli accesi, e
   // icona e testo dicono che cosa fa il clic. Jitsi (stable-10741) aggiorna la
@@ -65,7 +70,8 @@ export default function LiveCaptions({
   // prezzo: chi lo usa da tastiera perde il fuoco sul pulsante dopo il clic.
   const show = t('show');
   const hide = t('hide');
-  const montato = useRef(false);
+  // La sala su cui il pulsante è già montato: una sala nuova (riconnessione) lo riceve da capo.
+  const montatoSu = useRef<JitsiMeetExternalAPI | null>(null);
   useEffect(() => {
     if (!api) return;
     const imposta = (buttons: unknown[]) => {
@@ -77,19 +83,33 @@ export default function LiveCaptions({
     };
     if (!active) {
       imposta([]);
-      montato.current = false;
+      montatoSu.current = null;
       return;
     }
     const button = captionsToolbarButton(visible, { show, hide });
-    if (!montato.current) {
+    if (montatoSu.current !== api) {
       imposta([button]);
-      montato.current = true;
+      montatoSu.current = api;
       return;
     }
     imposta([]);
     const timer = window.setTimeout(() => imposta([button]), REMOUNT_DELAY_MS);
     return () => window.clearTimeout(timer);
   }, [api, active, visible, show, hide]);
+
+  // Accesi a sala già aperta: da qui in poi Jitsi non annuncia la
+  // trascrizione come registrazione. Non si ripristina allo spegnimento, che
+  // farebbe sentire «recording off» a tutti.
+  const suoniToltiSu = useRef<JitsiMeetExternalAPI | null>(null);
+  useEffect(() => {
+    if (!api || !active || suoniToltiSu.current === api) return;
+    suoniToltiSu.current = api;
+    try {
+      api.executeCommand('overwriteConfig', { disabledSounds: [...CAPTIONS_DISABLED_SOUNDS] });
+    } catch {
+      // Una versione di Jitsi senza il comando: restano gli annunci.
+    }
+  }, [api, active]);
 
   useEffect(() => {
     if (!api || !active) return;

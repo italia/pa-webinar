@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automātiskie subtitri",
-    "captionsNotice": "Tiešraides laikā runātāja balss reāllaikā tiek transkribēta, lai rādītu subtitrus. Transkribēšana notiek serveros, kuros darbojas platforma, un teksts netiek saglabāts. Subtitrus var paslēpt ar pogu CC."
+    "captionsNotice": "Tiešraides laikā runātāja balss reāllaikā tiek transkribēta, lai rādītu subtitrus. Transkribēšana notiek serveros, kuros darbojas platforma, un teksts netiek saglabāts. Subtitrus var paslēpt ar subtitru pogu zvana rīkjoslā."
   },
   "recording": {
     "management": "Video ieraksts",

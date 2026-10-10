@@ -1892,6 +1892,7 @@ export default function LiveEventClient({
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
               liveCaptions={Boolean(event.liveCaptionsAvailable)}
+              liveCaptionsOn={sottotitoliAccesi}
               rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
@@ -1903,14 +1904,15 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
-            {!showJvbOverlay && (
-              // Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
-              // la barra di Jitsi: impilati, non si coprono mai.
-              <div className="live-stage-bottom">
-                <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
-                <StageName api={jitsiApi} />
-              </div>
-            )}
+            {/* Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
+                la barra di Jitsi: impilati, non si coprono mai. Montata da
+                subito e solo nascosta sotto l'avviso di avvio del bridge:
+                deve ascoltare la sala già dall'ingresso, che è l'evento che
+                fa sparire quell'avviso. */}
+            <div className="live-stage-bottom" hidden={showJvbOverlay}>
+              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              <StageName api={jitsiApi} />
+            </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
             {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}

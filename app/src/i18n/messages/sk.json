@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatické titulky",
-    "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom CC."
+    "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom titulkov na lište hovoru."
   },
   "recording": {
     "management": "Videozáznam",

@@ -720,9 +720,16 @@ button.live-time-strip__rec {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 0 1rem;
+  // Lontano dalla colonna delle miniature di Jitsi a destra, e centrato.
+  padding: 0 8.5rem;
   pointer-events: none;
   font-family: 'Titillium Web', Geneva, Tahoma, sans-serif;
+}
+
+@media (max-width: 767.98px) {
+  .live-stage-bottom {
+    padding: 0 1rem;
+  }
 }
 
 .live-captions {

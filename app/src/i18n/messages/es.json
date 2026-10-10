@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Subtítulos automáticos",
-    "captionsNotice": "Durante la emisión en directo, la voz de quien habla se transcribe en tiempo real para mostrar subtítulos. La transcripción se realiza en los servidores que alojan la plataforma y el texto no se conserva. Los subtítulos se pueden ocultar con el botón CC."
+    "captionsNotice": "Durante la emisión en directo, la voz de quien habla se transcribe en tiempo real para mostrar subtítulos. La transcripción se realiza en los servidores que alojan la plataforma y el texto no se conserva. Los subtítulos se pueden ocultar con el botón de subtítulos de la barra de la llamada."
   },
   "recording": {
     "management": "Grabación de vídeo",

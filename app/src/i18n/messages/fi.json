@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automaattinen tekstitys",
-    "captionsNotice": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliaikaisesti tekstityksen näyttämiseksi. Litterointi tehdään alustaa ylläpitävillä palvelimilla, eikä tekstiä tallenneta. Tekstityksen voi piilottaa CC-painikkeella."
+    "captionsNotice": "Suoran lähetyksen aikana puhujan ääni litteroidaan reaaliaikaisesti tekstityksen näyttämiseksi. Litterointi tehdään alustaa ylläpitävillä palvelimilla, eikä tekstiä tallenneta. Tekstityksen voi piilottaa puhelun työkalurivin tekstityspainikkeella."
   },
   "recording": {
     "management": "Videotallenne",

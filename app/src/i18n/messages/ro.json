@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Subtitrări automate",
-    "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul CC."
+    "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul pentru subtitrări din bara apelului."
   },
   "recording": {
     "management": "Înregistrare video",

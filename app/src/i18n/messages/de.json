@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatische Untertitel",
-    "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Schaltfläche CC ausblenden."
+    "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Leiste des Anrufs ausblenden."
   },
   "recording": {
     "management": "Videoaufzeichnung",

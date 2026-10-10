@@ -10,6 +10,13 @@
 
 export const CAPTIONS_BUTTON_ID = 'pa-captions';
 
+/**
+ * Gli annunci vocali di registrazione che Jitsi fa sentire anche quando si
+ * accende o si spegne la sola trascrizione: tolti dove i sottotitoli sono
+ * accesi (vedi JitsiRoom).
+ */
+export const CAPTIONS_DISABLED_SOUNDS: readonly string[] = ['RECORDING_ON_SOUND', 'RECORDING_OFF_SOUND'];
+
 const STORAGE_KEY = 'pawebinar.captions.visible';
 
 /** La scelta di chi guarda, ricordata nel browser; senza scelta, visibili. */

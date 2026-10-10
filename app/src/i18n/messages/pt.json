@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Legendas automáticas",
-    "captionsNotice": "Durante a transmissão em direto, a voz de quem fala é transcrita em tempo real para mostrar legendas. A transcrição é feita nos servidores que alojam a plataforma e o texto não é guardado. As legendas podem ser ocultadas com o botão CC."
+    "captionsNotice": "Durante a transmissão em direto, a voz de quem fala é transcrita em tempo real para mostrar legendas. A transcrição é feita nos servidores que alojam a plataforma e o texto não é guardado. As legendas podem ser ocultadas com o botão das legendas na barra da chamada."
   },
   "recording": {
     "management": "Gravação de vídeo",

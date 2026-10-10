@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automatische ondertiteling",
-    "captionsNotice": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertiteling te tonen. De transcriptie gebeurt op de servers die het platform hosten en de tekst wordt niet bewaard. De ondertiteling kan worden verborgen met de knop CC."
+    "captionsNotice": "Tijdens de livesessie wordt de stem van wie spreekt in realtime getranscribeerd om ondertiteling te tonen. De transcriptie gebeurt op de servers die het platform hosten en de tekst wordt niet bewaard. De ondertiteling kan worden verborgen met de ondertitelingsknop in de balk van het gesprek."
   },
   "recording": {
     "management": "Video-opname",

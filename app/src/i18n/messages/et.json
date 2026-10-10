@@ -4579,7 +4579,7 @@
       }
     },
     "captionsNoticeTitle": "Automaatsed subtiitrid",
-    "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita nupuga CC."
+    "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita kõne tööriistariba subtiitrite nupuga."
   },
   "recording": {
     "management": "Videosalvestis",
