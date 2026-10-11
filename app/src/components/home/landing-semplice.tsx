@@ -12,7 +12,7 @@
  */
 import { getTranslations } from 'next-intl/server';
 
-import EventListClient from '@/components/events/event-list-client';
+import EventList from '@/components/events/event-list';
 import SvgIcon from '@/components/home/svg-icon';
 import type { EventoHome } from '@/components/home/landing-istituzionale';
 import { Link, percorso } from '@/i18n/navigation';
@@ -129,7 +129,7 @@ export default async function LandingSemplice({
                 <SvgIcon id="it-arrow-right" className="icon-sm icon-primary" size={18} />
               </Link>
             </div>
-            <EventListClient events={upcoming} parseTitleKicker={parseTitleKicker} />
+            <EventList events={upcoming} parseTitleKicker={parseTitleKicker} />
           </div>
         </section>
       )}

@@ -69,7 +69,10 @@
     "requiredField": "Kötelező mező",
     "errorGeneric": "Hiba történt. Kérjük, próbálja újra.",
     "selectAll": "Összes kijelölése",
-    "deselectAll": "Kijelölés megszüntetése"
+    "deselectAll": "Kijelölés megszüntetése",
+    "durationMinutes": "{minutes, plural, one {# perc} other {# perc}}",
+    "durationHours": "{hours, plural, one {# óra} other {# óra}}",
+    "durationHoursMinutes": "{hours, plural, one {# óra} other {# óra}} {minutes, plural, one {# perc} other {# perc}}"
   },
   "markdown": {
     "edit": "Írás",
@@ -103,7 +106,6 @@
     "noPast": "Nincsenek korábbi események",
     "wordCloudTitle": "Egy szóval",
     "card": {
-      "publicEvent": "Nyilvános esemény",
       "readMore": "Részletek",
       "liveNow": "Éppen zajlik",
       "spotsAvailable": "{count} szabad hely",
@@ -132,7 +134,6 @@
       "title": "Esemény részletei",
       "date": "Dátum és időpont",
       "duration": "Időtartam",
-      "durationHours": "{hours} ó {minutes} perc",
       "timezone": "Időzóna",
       "description": "Leírás",
       "participants": "Résztvevők",
@@ -151,7 +152,6 @@
       "noRecording": "Ehhez az eseményhez nem érhető el videofelvétel.",
       "watchRecording": "Felvétel megtekintése",
       "backToEvents": "Vissza az eseményekhez",
-      "alreadyRegisteredEnter": "Már regisztrált? Belépés a terembe",
       "invalidTokenTitle": "A hozzáférési link már nem érvényes",
       "invalidTokenBody": "A használt link érvénytelen vagy lejárt. Ha regisztrált, keresse meg a személyes linkjét a visszaigazoló e-mailben, vagy regisztráljon újra alább.",
       "invalidTokenBodyEnded": "A használt link már nem érvényes. Az esemény véget ért: alább megtalálja a felvételt és az anyagokat.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics fájl letöltése"
       },
-      "registrationEnded": "Az esemény véget ért: a regisztráció lezárult."
+      "registrationEnded": "Az esemény véget ért: a regisztráció lezárult.",
+      "joinAsGuest": "Csatlakozás vendégként",
+      "registeredUseEmailLink": "Már jelentkezett? Lépjen be az e-mailben kapott személyes linkkel.",
+      "willBeRecorded": "Az eseményt rögzítik."
     },
     "manage": {
       "toggleChat": "Csevegés",
@@ -187,7 +190,8 @@
       "LIVE": "Éppen zajlik",
       "IDLE": "Szüneteltetve",
       "ENDED": "Befejezve",
-      "ARCHIVED": "Archiválva"
+      "ARCHIVED": "Archiválva",
+      "UPCOMING": "Tervezett"
     },
     "list": {
       "filterByTag": "Szűrés kategória szerint",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Szűrők visszaállítása",
       "noResults": "Egy esemény sem felel meg a szűrőknek.",
       "resultsCount": "{count, plural, =0 {Nincs esemény} one {# esemény} other {# esemény}}",
-      "durationMinutes": "{minutes} perc",
-      "durationHoursMinutes": "{hours} óra {minutes} perc",
       "menu": {
         "actionsFor": "Műveletek: „{title}”",
         "manage": "Kezelés",
@@ -4402,7 +4404,8 @@
       "honestHint": "Szokásos várakozás: egy percnél kevesebb, ha az infrastruktúra már meleg, első indításnál 3–5 perc. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést.",
       "elapsed": "{time} óta készül",
       "scheduled": "A terem a kezdési időpontban nyílik meg",
-      "scheduledDetail": "Vagy korábban, amikor a szervező elindítja az eseményt. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést."
+      "scheduledDetail": "Vagy korábban, amikor a szervező elindítja az eseményt. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést.",
+      "slow": "A szokásosnál tovább tart. A terem magától megnyílik, amint elkészül: ha néhány percen belül nem történik meg, szóljon a szervezőknek."
     },
     "exitWaiting": "Kilépés a váróteremből",
     "warmingUp": "Terem előkészítése",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "A hívás röviden",
     "summaryWhen": "Mikor",
-    "durationHours": "{hours, plural, one {# óra} other {# óra}}",
-    "durationHoursMinutes": "{hours, plural, one {# óra} other {# óra}} {minutes, plural, one {# perc} other {# perc}}",
-    "durationMinutes": "{minutes, plural, one {# perc} other {# perc}}",
     "summaryRecording": "Felvétel",
     "readMore": "Tovább",
     "readLess": "Kevesebb",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Automatikus feliratok",
     "captionsNotice": "Az élő adás alatt a beszélő hangját valós időben átírjuk, hogy feliratok jelenjenek meg. Az átírás a platformot működtető szervereken történik, a szöveget nem őrizzük meg. A feliratok a hívás eszköztárának feliratgombjával elrejthetők.",
-    "captionsNoticeTranscript": "Az élő adás alatt a beszélő hangját valós időben átírjuk a feliratok megjelenítéséhez, a platformot üzemeltető szervereken. A szöveget névvel együtt csak azoknál őrizzük meg, akik hozzájárultak felszólalásaik átírásához, és ez lesz az esemény átirata. A feliratok a hívássáv feliratgombjával elrejthetők."
+    "captionsNoticeTranscript": "Az élő adás alatt a beszélő hangját valós időben átírjuk a feliratok megjelenítéséhez, a platformot üzemeltető szervereken. A szöveget névvel együtt csak azoknál őrizzük meg, akik hozzájárultak felszólalásaik átírásához, és ez lesz az esemény átirata. A feliratok a hívássáv feliratgombjával elrejthetők.",
+    "countdownDays": "{days}n",
+    "waitingForStartButton": "Várakozás az indításra",
+    "countdownHours": "{hours} ó",
+    "countdownMinutes": "{minutes} p",
+    "countdownSeconds": "{seconds} mp"
   },
   "recording": {
     "management": "Videofelvétel",

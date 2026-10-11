@@ -506,6 +506,102 @@ describe('sala d\'attesa — ciclo di vita', () => {
     },
   );
 
+  it('passata l\'ora d\'inizio non dice «Apertura alle …»: aspetta l\'avvio', () => {
+    render({ event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-5), endsAt: oraPiu(55) } });
+    expect(() => pulsante('Apertura alle')).toThrow();
+    expect(pulsante(t.waitingForStartButton).disabled).toBe(true);
+  });
+
+  it('chi modera ha «Avvia evento», non un «Apertura alle …» spento', () => {
+    render({
+      event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(30), endsAt: oraPiu(90) },
+      role: 'moderator',
+      onStartEvent: avvio,
+    });
+    expect(pulsante(t.startEventButton).disabled).toBe(false);
+    expect(() => pulsante('Apertura alle')).toThrow();
+  });
+
+  it('dopo «Avvia evento» chi modera entra senza un secondo clic', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    expect(onEnterLive).not.toHaveBeenCalled();
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    expect(onEnterLive.mock.calls[0]?.[0]).toBe('Moderatore 1');
+  });
+
+  it('dopo «Avvia evento» non entra da solo se il ponte non e\' pronto', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio, jvbReady: false });
+    expect(onEnterLive).not.toHaveBeenCalled();
+  });
+
+  it('dopo «Avvia evento» non entra da solo se la domanda sulla trascrizione e\' da vedere', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    const conTrascrizione: Evento = { ...pubblicato, captionsTranscript: true };
+    render({ event: conTrascrizione, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...conTrascrizione, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio });
+    expect(onEnterLive).not.toHaveBeenCalled();
+  });
+
+  it('se la sala diventa LIVE prima della risposta dell\'avvio, entra lo stesso', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    let risolvi: () => void = () => {};
+    const avvioLento = vi.fn(() => new Promise<void>((r) => { risolvi = r; }));
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvioLento });
+    act(() => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvioLento });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      risolvi();
+    });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+  });
+
+  it('passata l\'ora d\'inizio, un\'accensione lunga si dice, senza un «Riprova» che non farebbe niente', () => {
+    const ora = Date.now();
+    render({
+      event: { ...inPreparazione, startsAt: oraPiu(-8) },
+      warmup: {
+        phase: 'starting',
+        startedAt: new Date(ora - 7 * 60_000).toISOString(),
+        serverTime: new Date(ora).toISOString(),
+      },
+    });
+    expect(container.textContent).toContain(t.warmup.slow);
+    expect(Array.from(container.querySelectorAll('button')).some((b) => b.textContent?.includes('Riprova'))).toBe(false);
+  });
+
+  it('una sala preparata prima dell\'inizio non e\' «lenta»', () => {
+    const ora = Date.now();
+    render({
+      event: { ...inPreparazione, startsAt: oraPiu(5), endsAt: oraPiu(65) },
+      warmup: {
+        phase: 'starting',
+        startedAt: new Date(ora - 10 * 60_000).toISOString(),
+        serverTime: new Date(ora).toISOString(),
+      },
+    });
+    expect(container.textContent).not.toContain(t.warmup.slow);
+  });
+
   it('prima della fine resta l\'attesa di sempre', () => {
     render({
       event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-5), endsAt: oraPiu(55) },

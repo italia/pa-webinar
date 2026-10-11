@@ -69,7 +69,10 @@
     "requiredField": "Obligatoriskt fält",
     "errorGeneric": "Ett fel uppstod. Försök igen.",
     "selectAll": "Markera alla",
-    "deselectAll": "Avmarkera alla"
+    "deselectAll": "Avmarkera alla",
+    "durationMinutes": "{minutes, plural, one {# minut} other {# minuter}}",
+    "durationHours": "{hours, plural, one {# timme} other {# timmar}}",
+    "durationHoursMinutes": "{hours, plural, one {# timme} other {# timmar}} och {minutes, plural, one {# minut} other {# minuter}}"
   },
   "markdown": {
     "edit": "Skriv",
@@ -103,7 +106,6 @@
     "noPast": "Inga tidigare evenemang",
     "wordCloudTitle": "Med ett ord",
     "card": {
-      "publicEvent": "Offentligt evenemang",
       "readMore": "Läs mer",
       "liveNow": "Pågår nu",
       "spotsAvailable": "{count} platser lediga",
@@ -132,7 +134,6 @@
       "title": "Evenemangsdetaljer",
       "date": "Datum och tid",
       "duration": "Längd",
-      "durationHours": "{hours} tim {minutes} min",
       "timezone": "Tidszon",
       "description": "Beskrivning",
       "participants": "Deltagare",
@@ -151,7 +152,6 @@
       "noRecording": "Videoinspelning är inte tillgänglig för detta evenemang.",
       "watchRecording": "Se inspelningen",
       "backToEvents": "Tillbaka till evenemang",
-      "alreadyRegisteredEnter": "Redan anmäld? Gå in i rummet",
       "invalidTokenTitle": "Åtkomstlänken gäller inte längre",
       "invalidTokenBody": "Länken du använde är ogiltig eller har gått ut. Om du har anmält dig, leta upp din personliga länk i bekräftelsemejlet, eller anmäl dig igen nedan.",
       "invalidTokenBodyEnded": "Länken du använde gäller inte längre. Evenemanget är avslutat: nedan hittar du inspelningen och materialet.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Kalender",
         "downloadIcs": "Ladda ned .ics-fil"
       },
-      "registrationEnded": "Evenemanget är avslutat: anmälan är stängd."
+      "registrationEnded": "Evenemanget är avslutat: anmälan är stängd.",
+      "joinAsGuest": "Delta som gäst",
+      "registeredUseEmailLink": "Redan anmäld? Använd den personliga länken i ditt e-postmeddelande.",
+      "willBeRecorded": "Evenemanget spelas in."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -187,7 +190,8 @@
       "LIVE": "Pågår",
       "IDLE": "Pausad",
       "ENDED": "Avslutat",
-      "ARCHIVED": "Arkiverat"
+      "ARCHIVED": "Arkiverat",
+      "UPCOMING": "Kommande"
     },
     "list": {
       "filterByTag": "Filtrera efter kategori",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Nollställ filter",
       "noResults": "Inga evenemang matchar filtren.",
       "resultsCount": "{count, plural, =0 {Inga evenemang} one {# evenemang} other {# evenemang}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours} tim {minutes} min",
       "menu": {
         "actionsFor": "Åtgärder för ”{title}”",
         "manage": "Hantera",
@@ -4402,7 +4404,8 @@
       "honestHint": "Vanlig väntetid: under en minut om infrastrukturen redan är varm, 3–5 minuter vid första starten. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
       "elapsed": "förbereds sedan {time}",
       "scheduled": "Rummet öppnas vid starttiden",
-      "scheduledDetail": "Eller tidigare, när arrangören startar evenemanget. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten."
+      "scheduledDetail": "Eller tidigare, när arrangören startar evenemanget. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
+      "slow": "Det tar längre tid än vanligt. Rummet öppnas av sig självt när det är klart: om det inte sker inom några minuter, meddela arrangörerna."
     },
     "exitWaiting": "Lämna väntrummet",
     "warmingUp": "Rummet förbereds",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Samtalet i korthet",
     "summaryWhen": "När",
-    "durationHours": "{hours, plural, one {# timme} other {# timmar}}",
-    "durationHoursMinutes": "{hours, plural, one {# timme} other {# timmar}} och {minutes, plural, one {# minut} other {# minuter}}",
-    "durationMinutes": "{minutes, plural, one {# minut} other {# minuter}}",
     "summaryRecording": "Inspelning",
     "readMore": "Läs mer",
     "readLess": "Visa mindre",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Automatiska undertexter",
     "captionsNotice": "Under direktsändningen transkriberas rösten hos den som talar i realtid för att visa undertexter. Transkriberingen sker på de servrar som driver plattformen och texten sparas inte. Undertexterna kan döljas med undertextknappen i samtalets verktygsfält.",
-    "captionsNoticeTranscript": "Under direktsändningen transkriberas talarens röst i realtid för att visa textning, på de servrar som är värdar för plattformen. Texten sparas, med namn, bara för dem som samtyckt till transkription av sina inlägg och blir evenemangets transkription. Textningen kan döljas med textningsknappen i samtalsfältet."
+    "captionsNoticeTranscript": "Under direktsändningen transkriberas talarens röst i realtid för att visa textning, på de servrar som är värdar för plattformen. Texten sparas, med namn, bara för dem som samtyckt till transkription av sina inlägg och blir evenemangets transkription. Textningen kan döljas med textningsknappen i samtalsfältet.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Väntar på start",
+    "countdownHours": "{hours} h",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Videoinspelning",

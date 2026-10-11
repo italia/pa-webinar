@@ -69,7 +69,10 @@
     "requiredField": "Privalomas laukas",
     "errorGeneric": "Įvyko klaida. Bandykite dar kartą.",
     "selectAll": "Pažymėti visus",
-    "deselectAll": "Atžymėti visus"
+    "deselectAll": "Atžymėti visus",
+    "durationMinutes": "{minutes, plural, one {# minutė} few {# minutės} other {# minučių}}",
+    "durationHours": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}}",
+    "durationHoursMinutes": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}} ir {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}"
   },
   "markdown": {
     "edit": "Rašyti",
@@ -103,7 +106,6 @@
     "noPast": "Praėjusių renginių nėra",
     "wordCloudTitle": "Vienu žodžiu",
     "card": {
-      "publicEvent": "Viešas renginys",
       "readMore": "Sužinoti daugiau",
       "liveNow": "Vyksta dabar",
       "spotsAvailable": "{count} laisvų vietų",
@@ -132,7 +134,6 @@
       "title": "Renginio informacija",
       "date": "Data ir laikas",
       "duration": "Trukmė",
-      "durationHours": "{hours} val. {minutes} min.",
       "timezone": "Laiko juosta",
       "description": "Aprašymas",
       "participants": "Dalyviai",
@@ -151,7 +152,6 @@
       "noRecording": "Šio renginio vaizdo įrašas neprieinamas.",
       "watchRecording": "Žiūrėti įrašą",
       "backToEvents": "Grįžti prie renginių",
-      "alreadyRegisteredEnter": "Jau užsiregistravote? Įeikite į salę",
       "invalidTokenTitle": "Prisijungimo nuoroda nebegalioja",
       "invalidTokenBody": "Jūsų naudota nuoroda neteisinga arba nebegalioja. Jei užsiregistravote, patikrinkite patvirtinimo laišką – jame rasite asmeninę nuorodą; arba užsiregistruokite dar kartą žemiau.",
       "invalidTokenBodyEnded": "Jūsų naudota nuoroda nebegalioja. Renginys baigėsi: žemiau rasite įrašą ir medžiagą.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo kalendorius",
         "downloadIcs": "Atsisiųsti .ics failą"
       },
-      "registrationEnded": "Renginys baigėsi: registracija uždaryta."
+      "registrationEnded": "Renginys baigėsi: registracija uždaryta.",
+      "joinAsGuest": "Prisijungti kaip svečiui",
+      "registeredUseEmailLink": "Jau užsiregistravote? Prisijunkite asmenine nuoroda iš el. laiško.",
+      "willBeRecorded": "Renginys bus įrašomas."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -187,7 +190,8 @@
       "LIVE": "Vyksta",
       "IDLE": "Pristabdyta",
       "ENDED": "Pasibaigė",
-      "ARCHIVED": "Archyvuotas"
+      "ARCHIVED": "Archyvuotas",
+      "UPCOMING": "Numatytas"
     },
     "list": {
       "filterByTag": "Filtruoti pagal kategoriją",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Atstatyti filtrus",
       "noResults": "Nė vienas renginys neatitinka filtrų.",
       "resultsCount": "{count, plural, =0 {Renginių nėra} one {# renginys} other {# renginiai}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours} val. {minutes} min",
       "menu": {
         "actionsFor": "Veiksmai: „{title}“",
         "manage": "Tvarkyti",
@@ -4402,7 +4404,8 @@
       "honestHint": "Įprastas laukimas: mažiau nei minutė, jei infrastruktūra jau įšilusi, 3–5 minutės pirmo paleidimo metu. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
       "elapsed": "ruošiama jau {time}",
       "scheduled": "Salė atsidaro pradžios metu",
-      "scheduledDetail": "Arba anksčiau, kai organizatorius pradeda renginį. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais."
+      "scheduledDetail": "Arba anksčiau, kai organizatorius pradeda renginį. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
+      "slow": "Tai užtrunka ilgiau nei įprastai. Kambarys atsidarys pats, kai tik bus paruoštas: jei to neįvyks per kelias minutes, praneškite organizatoriams."
     },
     "exitWaiting": "Išeiti iš laukiamojo",
     "warmingUp": "Salė ruošiama",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Skambutis trumpai",
     "summaryWhen": "Kada",
-    "durationHours": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}}",
-    "durationHoursMinutes": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}} ir {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}",
-    "durationMinutes": "{minutes, plural, one {# minutė} few {# minutės} other {# minučių}}",
     "summaryRecording": "Įrašymas",
     "readMore": "Skaityti daugiau",
     "readLess": "Rodyti mažiau",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Automatiniai subtitrai",
     "captionsNotice": "Tiesioginės transliacijos metu kalbančiojo balsas realiuoju laiku transkribuojamas, kad būtų rodomi subtitrai. Transkribuojama serveriuose, kuriuose veikia platforma, o tekstas nesaugomas. Subtitrus galima paslėpti subtitrų mygtuku skambučio juostoje.",
-    "captionsNoticeTranscript": "Tiesioginio renginio metu kalbėtojo balsas realiuoju laiku stenografuojamas subtitrams rodyti platformą talpinančiuose serveriuose. Tekstas su vardu saugomas tik tų žmonių, kurie sutiko, kad jų pasisakymai būtų stenografuojami, ir tampa renginio stenograma. Subtitrus galima paslėpti skambučio juostos subtitrų mygtuku."
+    "captionsNoticeTranscript": "Tiesioginio renginio metu kalbėtojo balsas realiuoju laiku stenografuojamas subtitrams rodyti platformą talpinančiuose serveriuose. Tekstas su vardu saugomas tik tų žmonių, kurie sutiko, kad jų pasisakymai būtų stenografuojami, ir tampa renginio stenograma. Subtitrus galima paslėpti skambučio juostos subtitrų mygtuku.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Laukiama pradžios",
+    "countdownHours": "{hours} val.",
+    "countdownMinutes": "{minutes} min.",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Vaizdo įrašas",

@@ -69,7 +69,10 @@
     "requiredField": "Pflichtfeld",
     "errorGeneric": "Es ist ein Fehler aufgetreten. Bitte erneut versuchen.",
     "selectAll": "Alle auswählen",
-    "deselectAll": "Auswahl aufheben"
+    "deselectAll": "Auswahl aufheben",
+    "durationMinutes": "{minutes, plural, one {# Minute} other {# Minuten}}",
+    "durationHours": "{hours, plural, one {# Stunde} other {# Stunden}}",
+    "durationHoursMinutes": "{hours, plural, one {# Stunde} other {# Stunden}} und {minutes, plural, one {# Minute} other {# Minuten}}"
   },
   "markdown": {
     "edit": "Schreiben",
@@ -103,7 +106,6 @@
     "noPast": "Keine vergangenen Veranstaltungen",
     "wordCloudTitle": "In einem Wort",
     "card": {
-      "publicEvent": "Öffentliche Veranstaltung",
       "readMore": "Mehr erfahren",
       "liveNow": "Jetzt live",
       "spotsAvailable": "{count} Plätze verfügbar",
@@ -132,7 +134,6 @@
       "title": "Veranstaltungsdetails",
       "date": "Datum und Uhrzeit",
       "duration": "Dauer",
-      "durationHours": "{hours} Std. {minutes} Min.",
       "timezone": "Zeitzone",
       "description": "Beschreibung",
       "participants": "Teilnehmende",
@@ -151,7 +152,6 @@
       "noRecording": "Für diese Veranstaltung ist keine Videoaufzeichnung verfügbar.",
       "watchRecording": "Aufzeichnung ansehen",
       "backToEvents": "Zurück zu Veranstaltungen",
-      "alreadyRegisteredEnter": "Bereits angemeldet? Zum Raum",
       "invalidTokenTitle": "Zugangslink nicht mehr gültig",
       "invalidTokenBody": "Der von Ihnen verwendete Link ist ungültig oder abgelaufen. Wenn Sie sich angemeldet haben, finden Sie Ihren persönlichen Link in der Bestätigungs-E-Mail; andernfalls melden Sie sich unten erneut an.",
       "invalidTokenBodyEnded": "Der von Ihnen verwendete Link ist nicht mehr gültig. Die Veranstaltung ist beendet: Unten finden Sie die Aufzeichnung und die Materialien.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics-Datei herunterladen"
       },
-      "registrationEnded": "Die Veranstaltung ist beendet: Die Anmeldung ist geschlossen."
+      "registrationEnded": "Die Veranstaltung ist beendet: Die Anmeldung ist geschlossen.",
+      "joinAsGuest": "Als Gast teilnehmen",
+      "registeredUseEmailLink": "Bereits angemeldet? Nutzen Sie den persönlichen Link aus Ihrer E-Mail.",
+      "willBeRecorded": "Die Veranstaltung wird aufgezeichnet."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "Läuft",
       "IDLE": "Pausiert",
       "ENDED": "Beendet",
-      "ARCHIVED": "Archiviert"
+      "ARCHIVED": "Archiviert",
+      "UPCOMING": "Geplant"
     },
     "list": {
       "filterByTag": "Nach Kategorie filtern",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Filter zurücksetzen",
       "noResults": "Keine Events entsprechen den Filtern.",
       "resultsCount": "{count, plural, =0 {Keine Events} one {# Event} other {# Events}}",
-      "durationMinutes": "{minutes} Min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Aktionen für „{title}“",
         "manage": "Verwalten",
@@ -4402,7 +4404,8 @@
       "honestHint": "Übliche Wartezeit: unter einer Minute, wenn die Infrastruktur bereits warm ist, 3–5 Minuten beim ersten Start. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen.",
       "elapsed": "seit {time} in Vorbereitung",
       "scheduled": "Der Raum öffnet zur Startzeit",
-      "scheduledDetail": "Oder früher, wenn die Organisation die Veranstaltung startet. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen."
+      "scheduledDetail": "Oder früher, wenn die Organisation die Veranstaltung startet. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen.",
+      "slow": "Es dauert länger als üblich. Der Raum öffnet sich von selbst, sobald er bereit ist: Falls nicht innerhalb weniger Minuten, informieren Sie die Organisation."
     },
     "exitWaiting": "Warteraum verlassen",
     "warmingUp": "Raum wird vorbereitet",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Der Termin im Überblick",
     "summaryWhen": "Wann",
-    "durationHours": "{hours, plural, one {# Stunde} other {# Stunden}}",
-    "durationHoursMinutes": "{hours, plural, one {# Stunde} other {# Stunden}} und {minutes, plural, one {# Minute} other {# Minuten}}",
-    "durationMinutes": "{minutes, plural, one {# Minute} other {# Minuten}}",
     "summaryRecording": "Aufzeichnung",
     "readMore": "Weiterlesen",
     "readLess": "Weniger anzeigen",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Automatische Untertitel",
     "captionsNotice": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen. Die Transkription läuft auf den Servern, die die Plattform hosten, und der Text wird nicht gespeichert. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Leiste des Anrufs ausblenden.",
-    "captionsNoticeTranscript": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen – auf den Servern, die die Plattform hosten. Der Text wird mit Namen nur für Personen gespeichert, die der Transkription ihrer Wortbeiträge zugestimmt haben, und wird zum Transkript der Veranstaltung. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Anrufleiste ausblenden."
+    "captionsNoticeTranscript": "Während der Live-Sitzung wird die Stimme der sprechenden Person in Echtzeit transkribiert, um Untertitel anzuzeigen – auf den Servern, die die Plattform hosten. Der Text wird mit Namen nur für Personen gespeichert, die der Transkription ihrer Wortbeiträge zugestimmt haben, und wird zum Transkript der Veranstaltung. Die Untertitel lassen sich mit der Untertitel-Schaltfläche in der Anrufleiste ausblenden.",
+    "countdownDays": "{days}T",
+    "waitingForStartButton": "Warten auf den Start",
+    "countdownHours": "{hours} Std.",
+    "countdownMinutes": "{minutes} Min.",
+    "countdownSeconds": "{seconds} Sek."
   },
   "recording": {
     "management": "Videoaufzeichnung",

@@ -69,7 +69,10 @@
     "requiredField": "Pole wymagane",
     "errorGeneric": "Wystąpił błąd. Proszę spróbować ponownie.",
     "selectAll": "Zaznacz wszystkie",
-    "deselectAll": "Odznacz wszystkie"
+    "deselectAll": "Odznacz wszystkie",
+    "durationMinutes": "{minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}",
+    "durationHours": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}}",
+    "durationHoursMinutes": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}} i {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}"
   },
   "markdown": {
     "edit": "Edytuj",
@@ -103,7 +106,6 @@
     "noPast": "Brak minionych wydarzeń",
     "wordCloudTitle": "Jednym słowem",
     "card": {
-      "publicEvent": "Wydarzenie publiczne",
       "readMore": "Dowiedz się więcej",
       "liveNow": "Na żywo",
       "spotsAvailable": "{count} dostępnych miejsc",
@@ -132,7 +134,6 @@
       "title": "Szczegóły wydarzenia",
       "date": "Data i godzina",
       "duration": "Czas trwania",
-      "durationHours": "{hours} godz. {minutes} min",
       "timezone": "Strefa czasowa",
       "description": "Opis",
       "participants": "Uczestnicy",
@@ -151,7 +152,6 @@
       "noRecording": "Nagranie wideo nie jest dostępne dla tego wydarzenia.",
       "watchRecording": "Obejrzyj nagranie",
       "backToEvents": "Powrót do wydarzeń",
-      "alreadyRegisteredEnter": "Masz już rejestrację? Wejdź do sali",
       "invalidTokenTitle": "Link dostępu nie jest już ważny",
       "invalidTokenBody": "Użyty link jest nieprawidłowy lub wygasł. Jeśli rejestracja została dokonana, sprawdź swój osobisty link w e-mailu potwierdzającym albo zarejestruj się ponownie poniżej.",
       "invalidTokenBodyEnded": "Użyty link nie jest już ważny. Wydarzenie zostało zakończone: poniżej znajdziesz nagranie i materiały.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Pobierz plik .ics"
       },
-      "registrationEnded": "Wydarzenie zakończyło się: rejestracja jest zamknięta."
+      "registrationEnded": "Wydarzenie zakończyło się: rejestracja jest zamknięta.",
+      "joinAsGuest": "Dołącz jako gość",
+      "registeredUseEmailLink": "Masz już zapis? Wejdź przez osobisty link z e-maila.",
+      "willBeRecorded": "Wydarzenie będzie nagrywane."
     },
     "manage": {
       "toggleChat": "Czat",
@@ -187,7 +190,8 @@
       "LIVE": "Na żywo",
       "IDLE": "Wstrzymane",
       "ENDED": "Zakończone",
-      "ARCHIVED": "Zarchiwizowane"
+      "ARCHIVED": "Zarchiwizowane",
+      "UPCOMING": "Zaplanowane"
     },
     "list": {
       "filterByTag": "Filtruj według kategorii",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Wyczyść filtry",
       "noResults": "Brak wydarzeń pasujących do filtrów.",
       "resultsCount": "{count, plural, =0 {Brak wydarzeń} one {# wydarzenie} few {# wydarzenia} many {# wydarzeń} other {# wydarzeń}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}g {minutes}min",
       "menu": {
         "actionsFor": "Działania dla „{title}”",
         "manage": "Zarządzaj",
@@ -4402,7 +4404,8 @@
       "honestHint": "Typowe oczekiwanie: poniżej minuty, jeśli infrastruktura jest już rozgrzana, 3–5 minut przy pierwszym uruchomieniu. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu.",
       "elapsed": "w przygotowaniu od {time}",
       "scheduled": "Sala otworzy się o godzinie rozpoczęcia",
-      "scheduledDetail": "Albo wcześniej, gdy organizator uruchomi wydarzenie. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu."
+      "scheduledDetail": "Albo wcześniej, gdy organizator uruchomi wydarzenie. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu.",
+      "slow": "Trwa to dłużej niż zwykle. Sala otworzy się sama, gdy będzie gotowa: jeśli nie stanie się to w ciągu kilku minut, powiadom organizatorów."
     },
     "exitWaiting": "Opuść poczekalnię",
     "warmingUp": "Sala w przygotowaniu",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Połączenie w skrócie",
     "summaryWhen": "Kiedy",
-    "durationHours": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}}",
-    "durationHoursMinutes": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}} i {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}",
-    "durationMinutes": "{minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}",
     "summaryRecording": "Nagranie",
     "readMore": "Czytaj dalej",
     "readLess": "Pokaż mniej",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Napisy automatyczne",
     "captionsNotice": "Podczas transmisji na żywo głos osoby mówiącej jest transkrybowany w czasie rzeczywistym, aby wyświetlać napisy. Transkrypcja odbywa się na serwerach, na których działa platforma, a tekst nie jest przechowywany. Napisy można ukryć przyciskiem napisów na pasku połączenia.",
-    "captionsNoticeTranscript": "Podczas transmisji na żywo głos mówcy jest transkrybowany w czasie rzeczywistym w celu wyświetlania napisów, na serwerach obsługujących platformę. Tekst jest przechowywany, wraz z imieniem, tylko w przypadku osób, które zgodziły się na transkrypcję swoich wystąpień, i staje się transkrypcją wydarzenia. Napisy można ukryć przyciskiem napisów na pasku połączenia."
+    "captionsNoticeTranscript": "Podczas transmisji na żywo głos mówcy jest transkrybowany w czasie rzeczywistym w celu wyświetlania napisów, na serwerach obsługujących platformę. Tekst jest przechowywany, wraz z imieniem, tylko w przypadku osób, które zgodziły się na transkrypcję swoich wystąpień, i staje się transkrypcją wydarzenia. Napisy można ukryć przyciskiem napisów na pasku połączenia.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Oczekiwanie na rozpoczęcie",
+    "countdownHours": "{hours} godz.",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Nagranie wideo",

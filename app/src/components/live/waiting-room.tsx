@@ -14,6 +14,7 @@ import {
 } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import { canStartManually } from '@/lib/events/lifecycle';
@@ -244,6 +245,9 @@ const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
 };
 /** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
 const CAMPO_TRASCRIZIONE = 'waiting-multitrack-consent';
+// Oltre questo tempo l'accensione e' piu' lunga del solito (3-5 minuti alla
+// prima accensione): lo si dice.
+const LUNGA_ACCENSIONE_S = 6 * 60;
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
@@ -282,6 +286,7 @@ export default function WaitingRoom({
   const te = useTranslations('events');
   const tc = useTranslations('common');
   const tGdpr = useTranslations('gdpr.consent');
+  const durata = useDurataTesto();
   const tReg = useTranslations('registration');
   const format = useFormatter();
 
@@ -631,16 +636,16 @@ export default function WaitingRoom({
       const minutes = Math.floor((diff % 3_600_000) / 60_000);
       const seconds = Math.floor((diff % 60_000) / 1000);
       const parts: string[] = [];
-      if (days > 0) parts.push(`${days}g`);
-      if (hours > 0) parts.push(`${String(hours).padStart(2, '0')}h`);
-      parts.push(`${String(minutes).padStart(2, '0')}m`);
-      parts.push(`${String(seconds).padStart(2, '0')}s`);
+      if (days > 0) parts.push(t('countdownDays', { days }));
+      if (hours > 0) parts.push(t('countdownHours', { hours: String(hours).padStart(2, '0') }));
+      parts.push(t('countdownMinutes', { minutes: String(minutes).padStart(2, '0') }));
+      parts.push(t('countdownSeconds', { seconds: String(seconds).padStart(2, '0') }));
       setCountdown(parts.join('  '));
     };
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isPublished, startsAtMs, endsAtMs]);
+  }, [isPublished, startsAtMs, endsAtMs, t]);
 
   // «Non si è tenuto»: vale per ogni stato da cui l'evento si potrebbe ancora
   // avviare (vedi canStartManually), non solo per PUBLISHED.
@@ -680,17 +685,32 @@ export default function WaitingRoom({
     return () => clearTimeout(id);
   }, [liveCountdown]);
 
+  // Chi avvia l'evento ci entra: dopo «Avvia evento» un secondo clic su
+  // «Entra» non serve a niente. E' uno stato, non un ref, e lo si accende
+  // prima di aspettare la risposta: la sala puo' diventare LIVE (dal giro del
+  // ciclo di vita) prima che la risposta arrivi.
+  // L'istante del clic: l'ingresso automatico vale per due minuti, poi resta
+  // il pulsante (una sala che si apre molto dopo non deve spostare chi nel
+  // frattempo fa altro).
+  const [entraDopoAvvio, setEntraDopoAvvio] = useState<number | null>(null);
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
     setStartingEvent(true);
     setStartError('');
+    setEntraDopoAvvio(Date.now());
     try {
       await onStartEvent();
     } catch {
+      setEntraDopoAvvio(null);
       setStartError(t('startEventError'));
       setStartingEvent(false);
     }
   }, [onStartEvent, t]);
+  // Il pulsante «Avvia evento» torna premibile a ogni cambio di stato: se la
+  // sala si ferma (IDLE) e chi modera e' ancora qui, deve poterla riavviare.
+  useEffect(() => {
+    setStartingEvent(false);
+  }, [event.status]);
 
   // Un tentativo con il modulo incompleto: si dice cosa manca e si porta la
   // persona li'. Falso se il modulo e' a posto (a trattenere e' la sala).
@@ -739,6 +759,47 @@ export default function WaitingRoom({
     recordingConsent,
     trascrizioneChiesta,
     multitrackConsent,
+  ]);
+
+  // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
+  // il clic, che e' il momento giusto per guardare cosa manca:
+  // - un campo da completare (nome, email, consenso): lo si segnala;
+  // - la domanda facoltativa sulla trascrizione non ancora spuntata: entrare
+  //   da soli la salterebbe, e la voce di chi conduce resterebbe fuori;
+  // - il ponte video ancora in accensione: si aspetta, fino a due minuti dal
+  //   clic; dopo l'ingresso e' un'offerta, non una spinta (vedi sopra);
+  // - la piazza aperta: lì si entra dal cancello, che ha il suo percorso.
+  useEffect(() => {
+    if (entraDopoAvvio === null || !canEnterLive) return;
+    if (piazzaOpen || Date.now() - entraDopoAvvio > 120_000) {
+      setEntraDopoAvvio(null);
+      return;
+    }
+    if (bloccoModulo) {
+      setEntraDopoAvvio(null);
+      segnalaCampoMancante();
+      return;
+    }
+    if (trascrizioneChiesta && !multitrackConsent) {
+      setEntraDopoAvvio(null);
+      return;
+    }
+    if (!salaAperta) return;
+    if (canEnter) {
+      setEntraDopoAvvio(null);
+      handleEnterLive();
+    }
+  }, [
+    entraDopoAvvio,
+    canEnterLive,
+    piazzaOpen,
+    bloccoModulo,
+    trascrizioneChiesta,
+    multitrackConsent,
+    salaAperta,
+    canEnter,
+    handleEnterLive,
+    segnalaCampoMancante,
   ]);
 
   // Entry triggered from INSIDE the Phaser game (walking the avatar into the
@@ -1263,6 +1324,15 @@ export default function WaitingRoom({
                     ? t('warmup.almostReadyDetail')
                     : t('warmup.honestHint')}
               </div>
+              {/* Oltre il tempo tipico della prima accensione, e passata l'ora
+                  d'inizio (prima e' una sala preparata in anticipo, non lenta):
+                  lo si dice, con l'unica cosa utile da fare. Niente «Riprova»:
+                  da qui non c'e' niente da rilanciare. */}
+              {(warmup?.phase === 'starting' || warmup?.phase === 'queued') &&
+                (warmupElapsed ?? 0) >= LUNGA_ACCENSIONE_S &&
+                Date.now() - startsAtMs >= LUNGA_ACCENSIONE_S * 1000 && (
+                <div className="mt-2 fw-semibold">{t('warmup.slow')}</div>
+              )}
             </div>
           </div>
         </div>
@@ -1270,51 +1340,7 @@ export default function WaitingRoom({
     </>
   );
 
-  // Primary CTA (non-ended): start (moderator) / enter live / warming-up /
-  // scheduled-opening disabled state, plus optional catch-up.
-  const liveCueActive = canEnterLive && liveCountdown !== null;
-  const primaryCta = (
-    <div className="d-grid gap-2">
-      {startError && (
-        <Alert color="danger" className="mb-0" style={{ fontSize: '0.85rem' }}>
-          {startError}
-        </Alert>
-      )}
-      {liveCueActive && (
-        <div
-          className="waiting-countdown waiting-countdown--open"
-          role="status"
-          aria-live="assertive"
-        >
-          <div className="waiting-countdown__label">{t('roomOpen')}</div>
-          <div className="waiting-countdown__value">{liveCountdown}</div>
-        </div>
-      )}
-      {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
-          scaler è fermo, o non c'è), il moderatore deve poterla aprire lui.
-          Non oltre la fine: l'evento non si è tenuto. */}
-      {canStartManually(event.status) && !notHeld && isModerator && onStartEvent && (
-        <Button
-          color="success"
-          size="lg"
-          className="fw-semibold"
-          onClick={handleStartEvent}
-          disabled={startingEvent}
-        >
-          {startingEvent ? (
-            <>
-              <Spinner active small className="me-2" />
-              {t('startingEvent')}
-            </>
-          ) : (
-            <>
-              <Icon icon="it-video" size="sm" color="white" className="me-2" />
-              {t('startEventButton')}
-            </>
-          )}
-        </Button>
-      )}
-      {canEnterLive && !ingressoConsentito ? (
+  const azioneIngresso = canEnterLive && !ingressoConsentito ? (
         // Entrare prima che il ponte video esista significa arrivare in una
         // stanza che non c'e': si resta qui, e lo si dice. Passato il minuto
         // si torna al pulsante normale — si entra, senza pero' promettere che
@@ -1385,12 +1411,77 @@ export default function WaitingRoom({
           <Spinner active small className="me-2" />
           {t('warmingUpButton')}
         </Button>
+      ) : isModerator && onStartEvent ? null : startingSoon ? (
+        // Passata l'ora d'inizio «Apertura alle …» indicherebbe un'ora gia'
+        // passata: si dice che si aspetta l'avvio. Chi modera non vede ne'
+        // l'uno ne' l'altro: ha «Avvia evento».
+        <Button color="primary" size="lg" className="fw-semibold" disabled>
+          <Spinner active small className="me-2" />
+          {t('waitingForStartButton')}
+        </Button>
       ) : (
         <Button color="primary" size="lg" className="fw-semibold" disabled>
           <Icon icon="it-clock" size="sm" color="white" className="me-2" />
           {t('openingAt', { time: startTimeLabel })}
         </Button>
+      );
+
+  // Primary CTA (non-ended): start (moderator) / enter live / warming-up /
+  // scheduled-opening disabled state, plus optional catch-up.
+  const liveCueActive = canEnterLive && liveCountdown !== null;
+  // Tre blocchi fratelli, figli diretti del corpo della scheda: il blocco
+  // d'ingresso si attacca al fondo dello schermo (sticky), e un elemento
+  // sticky si muove solo dentro il suo contenitore — dentro un riquadro
+  // piccolo non si muoverebbe affatto.
+  const primaryCta = (
+    <>
+    <div className="d-grid gap-2">
+      {startError && (
+        <Alert color="danger" className="mb-0" style={{ fontSize: '0.85rem' }}>
+          {startError}
+        </Alert>
       )}
+      {liveCueActive && (
+        <div
+          className="waiting-countdown waiting-countdown--open"
+          role="status"
+          aria-live="assertive"
+        >
+          <div className="waiting-countdown__label">{t('roomOpen')}</div>
+          <div className="waiting-countdown__value">{liveCountdown}</div>
+        </div>
+      )}
+      {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
+          scaler è fermo, o non c'è), il moderatore deve poterla aprire lui.
+          Non oltre la fine: l'evento non si è tenuto. */}
+      {canStartManually(event.status) && !notHeld && isModerator && onStartEvent && (
+        <Button
+          color="success"
+          size="lg"
+          className="fw-semibold"
+          onClick={handleStartEvent}
+          disabled={startingEvent}
+        >
+          {startingEvent ? (
+            <>
+              <Spinner active small className="me-2" />
+              {t('startingEvent')}
+            </>
+          ) : (
+            <>
+              <Icon icon="it-video" size="sm" color="white" className="me-2" />
+              {t('startEventButton')}
+            </>
+          )}
+        </Button>
+      )}
+    </div>
+      {/* Su telefono l'azione d'ingresso (e solo lei) resta attaccata al
+          fondo dello schermo mentre si scorre la scheda. */}
+      {azioneIngresso && (
+        <div className={`d-grid gap-2 mt-2${piazzaOpen ? '' : ' wr-cta-dock'}`}>{azioneIngresso}</div>
+      )}
+    <div className="d-grid gap-2 mt-2 mb-3">
       {event.tempRecordingUrl && (
         <Button
           color="success"
@@ -1417,6 +1508,7 @@ export default function WaitingRoom({
         </Link>
       )}
     </div>
+    </>
   );
 
   // ── Unified DSI shell (default for every state) ──
@@ -1442,15 +1534,7 @@ export default function WaitingRoom({
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
   // ── Il riepilogo: quando, chi organizza, chi conduce e chi interviene, la
   // registrazione, di cosa si parla; e i link da condividere.
-  const durataMin = Math.max(0, Math.round((endsAtMs - startsAtMs) / 60_000));
-  const ore = Math.floor(durataMin / 60);
-  const minuti = durataMin % 60;
-  const durataTesto =
-    ore === 0
-      ? t('durationMinutes', { minutes: minuti })
-      : minuti === 0
-        ? t('durationHours', { hours: ore })
-        : t('durationHoursMinutes', { hours: ore, minutes: minuti });
+  const durataTesto = durata(startsAtMs, endsAtMs);
   const enti = event.riepilogo?.enti ?? [];
   const persone = event.riepilogo?.persone ?? [];
   const conduzione = persone.filter((p) => p.role !== 'speaker');
@@ -1902,7 +1986,7 @@ export default function WaitingRoom({
                 ) : (
                   <>
                     {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
-                    <div className="mb-3">{primaryCta}</div>
+                    {primaryCta}
                   </>
                 )}
 

@@ -69,7 +69,10 @@
     "requiredField": "Obvezno polje",
     "errorGeneric": "Prišlo je do napake. Poskusite znova.",
     "selectAll": "Izberite vse",
-    "deselectAll": "Odznačite vse"
+    "deselectAll": "Odznačite vse",
+    "durationMinutes": "{minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
+    "durationHours": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}}",
+    "durationHoursMinutes": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}} in {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}"
   },
   "markdown": {
     "edit": "Napišite",
@@ -103,7 +106,6 @@
     "noPast": "Ni preteklih dogodkov",
     "wordCloudTitle": "Z eno besedo",
     "card": {
-      "publicEvent": "Javni dogodek",
       "readMore": "Več informacij",
       "liveNow": "V živo",
       "spotsAvailable": "{count} prostih mest",
@@ -132,7 +134,6 @@
       "title": "Podrobnosti dogodka",
       "date": "Datum in ura",
       "duration": "Trajanje",
-      "durationHours": "{hours} h {minutes} min",
       "timezone": "Časovni pas",
       "description": "Opis",
       "participants": "Udeleženci",
@@ -151,7 +152,6 @@
       "noRecording": "Video posnetek za ta dogodek ni na voljo.",
       "watchRecording": "Oglejte si posnetek",
       "backToEvents": "Nazaj na dogodke",
-      "alreadyRegisteredEnter": "Ste že prijavljeni? Vstopite v sobo",
       "invalidTokenTitle": "Povezava za dostop ni več veljavna",
       "invalidTokenBody": "Uporabljena povezava ni veljavna ali pa je potekla. Če ste se prijavili, poiščite svojo osebno povezavo v potrditvenem e-sporočilu ali pa se znova prijavite spodaj.",
       "invalidTokenBodyEnded": "Uporabljena povezava ni več veljavna. Dogodek je končan: spodaj najdete posnetek in gradiva.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Prenesi datoteko .ics"
       },
-      "registrationEnded": "Dogodek se je zaključil: prijave so zaprte."
+      "registrationEnded": "Dogodek se je zaključil: prijave so zaprte.",
+      "joinAsGuest": "Pridruži se kot gost",
+      "registeredUseEmailLink": "Ste že prijavljeni? Vstopite z osebno povezavo iz e-pošte.",
+      "willBeRecorded": "Dogodek bo posnet."
     },
     "manage": {
       "toggleChat": "Klepet",
@@ -187,7 +190,8 @@
       "LIVE": "V živo",
       "IDLE": "Na premoru",
       "ENDED": "Zaključeno",
-      "ARCHIVED": "Arhivirano"
+      "ARCHIVED": "Arhivirano",
+      "UPCOMING": "Načrtovano"
     },
     "list": {
       "filterByTag": "Filtriraj po kategoriji",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Ponastavi filtre",
       "noResults": "Noben dogodek ne ustreza filtrom.",
       "resultsCount": "{count, plural, =0 {Brez dogodkov} one {# dogodek} two {# dogodka} few {# dogodki} other {# dogodkov}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours} h {minutes} min",
       "menu": {
         "actionsFor": "Dejanja za »{title}«",
         "manage": "Upravljaj",
@@ -4402,7 +4404,8 @@
       "honestHint": "Običajno čakanje: manj kot minuto, če je infrastruktura že ogreta, 3–5 minut ob prvem zagonu. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
       "elapsed": "v pripravi že {time}",
       "scheduled": "Dvorana se odpre ob začetku",
-      "scheduledDetail": "Ali prej, ko organizator zažene dogodek. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet."
+      "scheduledDetail": "Ali prej, ko organizator zažene dogodek. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
+      "slow": "Traja dlje kot običajno. Soba se odpre sama, ko je pripravljena: če se to ne zgodi v nekaj minutah, obvestite organizatorje."
     },
     "exitWaiting": "Zapusti čakalnico",
     "warmingUp": "Soba se pripravlja",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Klic na kratko",
     "summaryWhen": "Kdaj",
-    "durationHours": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}}",
-    "durationHoursMinutes": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}} in {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
-    "durationMinutes": "{minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
     "summaryRecording": "Snemanje",
     "readMore": "Preberi več",
     "readLess": "Prikaži manj",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Samodejni podnapisi",
     "captionsNotice": "Med prenosom v živo se glas govorca sproti prepisuje, da se prikazujejo podnapisi. Prepis poteka na strežnikih, ki gostijo platformo, besedilo pa se ne hrani. Podnapise je mogoče skriti z gumbom za podnapise v vrstici klica.",
-    "captionsNoticeTranscript": "Med prenosom v živo se glas govorca sproti prepisuje za prikaz podnapisov, na strežnikih, ki gostijo platformo. Besedilo se z imenom ohrani le za osebe, ki so privolile v prepis svojih govorov, in postane prepis dogodka. Podnapise lahko skrijete z gumbom za podnapise v vrstici klica."
+    "captionsNoticeTranscript": "Med prenosom v živo se glas govorca sproti prepisuje za prikaz podnapisov, na strežnikih, ki gostijo platformo. Besedilo se z imenom ohrani le za osebe, ki so privolile v prepis svojih govorov, in postane prepis dogodka. Podnapise lahko skrijete z gumbom za podnapise v vrstici klica.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Čakanje na začetek",
+    "countdownHours": "{hours} h",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Video posnetek",

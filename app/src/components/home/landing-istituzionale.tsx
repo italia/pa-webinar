@@ -13,7 +13,7 @@
  */
 import { getTranslations } from 'next-intl/server';
 
-import EventListClient from '@/components/events/event-list-client';
+import EventList from '@/components/events/event-list';
 import SvgIcon from '@/components/home/svg-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -143,7 +143,7 @@ export default async function LandingIstituzionale({
                 <SvgIcon id="it-arrow-right" className="icon-sm icon-primary" size={18} />
               </Link>
             </div>
-            <EventListClient events={altri} parseTitleKicker={parseTitleKicker} />
+            <EventList events={altri} parseTitleKicker={parseTitleKicker} />
           </div>
         </section>
       )}

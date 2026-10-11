@@ -11,6 +11,7 @@ import {
   ModalHeader,
 } from 'design-react-kit';
 
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
@@ -114,6 +115,7 @@ export default function AdminDashboardClient({
   const format = useFormatter();
   const t = useTranslations('admin');
   const tList = useTranslations('admin.eventsList');
+  const durata = useDurataTesto();
   const tc = useTranslations('common');
   const toast = useToast();
   const te = useTranslations('events');
@@ -490,12 +492,6 @@ export default function AdminDashboardClient({
             const title = getLocalized(event.title, locale);
             const startsAt = new Date(event.startsAt);
             const endsAt = new Date(event.endsAt);
-            const durationMin = Math.max(
-              0,
-              Math.round((endsAt.getTime() - startsAt.getTime()) / 60000),
-            );
-            const hours = Math.floor(durationMin / 60);
-            const minutes = durationMin % 60;
             const isLive = event.status === 'LIVE';
             const isEnded = event.status === 'ENDED';
             const isInstant = event.eventType === 'INSTANT';
@@ -710,12 +706,7 @@ export default function AdminDashboardClient({
                       <li className="d-flex align-items-center gap-2 mb-1">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                         <span>
-                          {hours > 0
-                            ? tList('durationHoursMinutes', {
-                                hours,
-                                minutes,
-                              })
-                            : tList('durationMinutes', { minutes })}
+                          {durata(startsAt, endsAt)}
                         </span>
                       </li>
                       {event.organizerName && (

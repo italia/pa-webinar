@@ -69,7 +69,10 @@
     "requiredField": "Champ obligatoire",
     "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
     "selectAll": "Tout sélectionner",
-    "deselectAll": "Tout désélectionner"
+    "deselectAll": "Tout désélectionner",
+    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
+    "durationHours": "{hours, plural, one {# heure} other {# heures}}",
+    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}"
   },
   "markdown": {
     "edit": "Écrire",
@@ -103,7 +106,6 @@
     "noPast": "Aucun événement passé",
     "wordCloudTitle": "En un mot",
     "card": {
-      "publicEvent": "Événement public",
       "readMore": "En savoir plus",
       "liveNow": "En direct",
       "spotsAvailable": "{count} places disponibles",
@@ -132,7 +134,6 @@
       "title": "Détails de l'événement",
       "date": "Date et heure",
       "duration": "Durée",
-      "durationHours": "{hours} h {minutes} min",
       "timezone": "Fuseau horaire",
       "description": "Description",
       "participants": "Participants",
@@ -151,7 +152,6 @@
       "noRecording": "L'enregistrement vidéo n'est pas disponible pour cet événement.",
       "watchRecording": "Voir l'enregistrement",
       "backToEvents": "Retour aux événements",
-      "alreadyRegisteredEnter": "Déjà inscrit ? Entrez dans la salle",
       "invalidTokenTitle": "Ce lien d'accès n'est plus valide",
       "invalidTokenBody": "Le lien que vous avez utilisé n'est pas valide ou a expiré. Si vous vous êtes inscrit, consultez l'e-mail de confirmation pour retrouver votre lien personnel, ou inscrivez-vous à nouveau ci-dessous.",
       "invalidTokenBodyEnded": "Le lien que vous avez utilisé n'est plus valide. L'événement est terminé : vous trouverez ci-dessous l'enregistrement et les documents.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Télécharger le fichier .ics"
       },
-      "registrationEnded": "L'événement est terminé : les inscriptions sont closes."
+      "registrationEnded": "L'événement est terminé : les inscriptions sont closes.",
+      "joinAsGuest": "Participer en tant qu'invité",
+      "registeredUseEmailLink": "Déjà inscrit ? Entrez avec le lien personnel reçu par e-mail.",
+      "willBeRecorded": "L'événement sera enregistré."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "En direct",
       "IDLE": "En pause",
       "ENDED": "Terminé",
-      "ARCHIVED": "Archivé"
+      "ARCHIVED": "Archivé",
+      "UPCOMING": "À venir"
     },
     "list": {
       "filterByTag": "Filtrer par catégorie",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Réinitialiser les filtres",
       "noResults": "Aucun événement ne correspond aux filtres.",
       "resultsCount": "{count, plural, =0 {Aucun événement} one {# événement} other {# événements}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Actions pour « {title} »",
         "manage": "Gérer",
@@ -4402,7 +4404,8 @@
       "honestHint": "Attente habituelle : moins d'une minute si l'infrastructure est déjà chaude, 3 à 5 minutes au premier démarrage. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation.",
       "elapsed": "en préparation depuis {time}",
       "scheduled": "La salle ouvre à l'heure de début",
-      "scheduledDetail": "Ou plus tôt, lorsque l'organisation démarre l'événement. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation."
+      "scheduledDetail": "Ou plus tôt, lorsque l'organisation démarre l'événement. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation.",
+      "slow": "Cela prend plus de temps que d'habitude. La salle s'ouvre d'elle-même dès qu'elle est prête : si ce n'est pas le cas d'ici quelques minutes, prévenez les organisateurs."
     },
     "exitWaiting": "Quitter la salle d'attente",
     "warmingUp": "Salle en préparation",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "L'appel en bref",
     "summaryWhen": "Quand",
-    "durationHours": "{hours, plural, one {# heure} other {# heures}}",
-    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}",
-    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "summaryRecording": "Enregistrement",
     "readMore": "Lire la suite",
     "readLess": "Afficher moins",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Sous-titres automatiques",
     "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre de l'appel.",
-    "captionsNoticeTranscript": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres, sur les serveurs qui hébergent la plateforme. Le texte n'est conservé, avec le nom, que pour les personnes qui ont accepté la transcription de leurs interventions, et devient la transcription de l'événement. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre d'appel."
+    "captionsNoticeTranscript": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres, sur les serveurs qui hébergent la plateforme. Le texte n'est conservé, avec le nom, que pour les personnes qui ont accepté la transcription de leurs interventions, et devient la transcription de l'événement. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre d'appel.",
+    "countdownDays": "{days}j",
+    "waitingForStartButton": "En attente du lancement",
+    "countdownHours": "{hours}h",
+    "countdownMinutes": "{minutes}min",
+    "countdownSeconds": "{seconds}s"
   },
   "recording": {
     "management": "Enregistrement vidéo",

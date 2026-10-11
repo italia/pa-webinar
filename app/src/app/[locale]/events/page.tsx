@@ -7,7 +7,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getSettings } from '@/lib/settings';
 import { isUpcomingPublicEvent, publicEventStatusWhere } from '@/lib/events/visibility';
-import EventListClient from '@/components/events/event-list-client';
+import EventList from '@/components/events/event-list';
 
 export const revalidate = 60;
 
@@ -96,7 +96,7 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
             <p className="text-muted mb-0">{t('noUpcoming')}</p>
           </div>
         ) : (
-          <EventListClient events={upcoming} parseTitleKicker={settings.parseTitleKicker} />
+          <EventList events={upcoming} parseTitleKicker={settings.parseTitleKicker} />
         )}
       </section>
 
@@ -108,7 +108,7 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
           >
             {t('past')}
           </h2>
-          <EventListClient events={past} muted parseTitleKicker={settings.parseTitleKicker} />
+          <EventList events={past} muted parseTitleKicker={settings.parseTitleKicker} />
         </section>
       )}
     </div>

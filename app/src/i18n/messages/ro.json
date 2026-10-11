@@ -69,7 +69,10 @@
     "requiredField": "Câmp obligatoriu",
     "errorGeneric": "S-a produs o eroare. Încercați din nou.",
     "selectAll": "Selectați tot",
-    "deselectAll": "Deselectați tot"
+    "deselectAll": "Deselectați tot",
+    "durationMinutes": "{minutes, plural, one {# minut} few {# minute} other {# de minute}}",
+    "durationHours": "{hours, plural, one {# oră} few {# ore} other {# de ore}}",
+    "durationHoursMinutes": "{hours, plural, one {# oră} few {# ore} other {# de ore}} și {minutes, plural, one {# minut} few {# minute} other {# de minute}}"
   },
   "markdown": {
     "edit": "Scrieți",
@@ -103,7 +106,6 @@
     "noPast": "Niciun eveniment anterior",
     "wordCloudTitle": "Într-un cuvânt",
     "card": {
-      "publicEvent": "Eveniment public",
       "readMore": "Aflați mai multe",
       "liveNow": "În desfășurare",
       "spotsAvailable": "{count} locuri disponibile",
@@ -132,7 +134,6 @@
       "title": "Detalii eveniment",
       "date": "Data și ora",
       "duration": "Durată",
-      "durationHours": "{hours}h {minutes}min",
       "timezone": "Fus orar",
       "description": "Descriere",
       "participants": "Participanți",
@@ -151,7 +152,6 @@
       "noRecording": "Înregistrarea video nu este disponibilă pentru acest eveniment.",
       "watchRecording": "Vizionați înregistrarea",
       "backToEvents": "Înapoi la evenimente",
-      "alreadyRegisteredEnter": "V-ați înscris deja? Intrați în sală",
       "invalidTokenTitle": "Linkul de acces nu mai este valid",
       "invalidTokenBody": "Linkul pe care l-ați folosit nu este valid sau a expirat. Dacă v-ați înscris, căutați linkul personal în e-mailul de confirmare sau înscrieți-vă din nou mai jos.",
       "invalidTokenBodyEnded": "Linkul pe care l-ați folosit nu mai este valid. Evenimentul s-a încheiat: mai jos găsiți înregistrarea și materialele.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Descărcați fișierul .ics"
       },
-      "registrationEnded": "Evenimentul s-a încheiat: înregistrarea este închisă."
+      "registrationEnded": "Evenimentul s-a încheiat: înregistrarea este închisă.",
+      "joinAsGuest": "Participă ca invitat",
+      "registeredUseEmailLink": "Te-ai înscris deja? Intră cu linkul personal primit pe e-mail.",
+      "willBeRecorded": "Evenimentul va fi înregistrat."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "În desfășurare",
       "IDLE": "În pauză",
       "ENDED": "Încheiat",
-      "ARCHIVED": "Arhivat"
+      "ARCHIVED": "Arhivat",
+      "UPCOMING": "Programat"
     },
     "list": {
       "filterByTag": "Filtrare după categorie",
@@ -2404,8 +2408,6 @@
       "resetFilters": "Resetați filtrele",
       "noResults": "Niciun eveniment nu corespunde filtrelor.",
       "resultsCount": "{count, plural, =0 {Niciun eveniment} one {# eveniment} other {# evenimente}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Acțiuni pentru „{title}”",
         "manage": "Gestionează",
@@ -4402,7 +4404,8 @@
       "honestHint": "Așteptare obișnuită: sub un minut dacă infrastructura este deja caldă, 3–5 minute la prima pornire. Între timp poți verifica camera și microfonul sau folosi conversația.",
       "elapsed": "în pregătire de {time}",
       "scheduled": "Sala se deschide la ora de început",
-      "scheduledDetail": "Sau mai devreme, când organizatorul pornește evenimentul. Între timp poți verifica camera și microfonul sau folosi conversația."
+      "scheduledDetail": "Sau mai devreme, când organizatorul pornește evenimentul. Între timp poți verifica camera și microfonul sau folosi conversația.",
+      "slow": "Durează mai mult decât de obicei. Sala se deschide singură imediat ce este gata: dacă nu se întâmplă în câteva minute, anunță organizatorii."
     },
     "exitWaiting": "Ieși din sala de așteptare",
     "warmingUp": "Sala se pregătește",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "Apelul pe scurt",
     "summaryWhen": "Când",
-    "durationHours": "{hours, plural, one {# oră} few {# ore} other {# de ore}}",
-    "durationHoursMinutes": "{hours, plural, one {# oră} few {# ore} other {# de ore}} și {minutes, plural, one {# minut} few {# minute} other {# de minute}}",
-    "durationMinutes": "{minutes, plural, one {# minut} few {# minute} other {# de minute}}",
     "summaryRecording": "Înregistrare",
     "readMore": "Citește mai mult",
     "readLess": "Arată mai puțin",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Subtitrări automate",
     "captionsNotice": "În timpul transmisiunii în direct, vocea celui care vorbește este transcrisă în timp real pentru a afișa subtitrări. Transcrierea are loc pe serverele care găzduiesc platforma, iar textul nu este păstrat. Subtitrările pot fi ascunse cu butonul pentru subtitrări din bara apelului.",
-    "captionsNoticeTranscript": "În timpul transmisiunii live, vocea vorbitorului este transcrisă în timp real pentru a afișa subtitrările, pe serverele care găzduiesc platforma. Textul se păstrează, cu numele, doar pentru cei care au fost de acord cu transcrierea intervențiilor lor și devine transcrierea evenimentului. Subtitrările pot fi ascunse cu butonul de subtitrări din bara apelului."
+    "captionsNoticeTranscript": "În timpul transmisiunii live, vocea vorbitorului este transcrisă în timp real pentru a afișa subtitrările, pe serverele care găzduiesc platforma. Textul se păstrează, cu numele, doar pentru cei care au fost de acord cu transcrierea intervențiilor lor și devine transcrierea evenimentului. Subtitrările pot fi ascunse cu butonul de subtitrări din bara apelului.",
+    "countdownDays": "{days}z",
+    "waitingForStartButton": "Se așteaptă începerea",
+    "countdownHours": "{hours} h",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Înregistrare video",

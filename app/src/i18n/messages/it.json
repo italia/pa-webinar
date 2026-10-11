@@ -69,7 +69,10 @@
     "requiredField": "Campo obbligatorio",
     "errorGeneric": "Si è verificato un errore. Riprova.",
     "selectAll": "Seleziona tutti",
-    "deselectAll": "Deseleziona tutti"
+    "deselectAll": "Deseleziona tutti",
+    "durationMinutes": "{minutes, plural, one {# minuto} other {# minuti}}",
+    "durationHours": "{hours, plural, one {# ora} other {# ore}}",
+    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}"
   },
   "markdown": {
     "edit": "Scrivi",
@@ -103,7 +106,6 @@
     "noPast": "Nessun evento passato",
     "wordCloudTitle": "In una parola",
     "card": {
-      "publicEvent": "Evento pubblico",
       "readMore": "Scopri di più",
       "liveNow": "In corso",
       "spotsAvailable": "{count} posti disponibili",
@@ -132,7 +134,6 @@
       "title": "Dettaglio evento",
       "date": "Data e ora",
       "duration": "Durata",
-      "durationHours": "{hours}h {minutes}min",
       "timezone": "Fuso orario",
       "description": "Descrizione",
       "participants": "Partecipanti",
@@ -151,7 +152,6 @@
       "noRecording": "La registrazione video non è disponibile per questo evento.",
       "watchRecording": "Guarda la registrazione",
       "backToEvents": "Torna agli eventi",
-      "alreadyRegisteredEnter": "Sei già iscritto? Entra nella sala",
       "invalidTokenTitle": "Link di accesso non più valido",
       "invalidTokenBody": "Il link che hai usato non è valido o è scaduto. Se ti sei iscritto, controlla l'email di conferma per il tuo link personale, oppure registrati di nuovo qui sotto.",
       "invalidTokenBodyEnded": "Il link che hai usato non è più valido. L'evento è concluso: qui sotto trovi la registrazione e i materiali.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Scarica file .ics"
       },
-      "registrationEnded": "L'evento è terminato: la registrazione è chiusa."
+      "registrationEnded": "L'evento è terminato: la registrazione è chiusa.",
+      "joinAsGuest": "Partecipa come ospite",
+      "registeredUseEmailLink": "Ti sei iscritto? Entra con il link personale che hai ricevuto via email.",
+      "willBeRecorded": "L'evento sarà registrato."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "In corso",
       "IDLE": "In pausa",
       "ENDED": "Concluso",
-      "ARCHIVED": "Archiviato"
+      "ARCHIVED": "Archiviato",
+      "UPCOMING": "In programma"
     },
     "list": {
       "filterByTag": "Filtra per categoria",
@@ -2528,8 +2532,6 @@
       "resetFilters": "Reset filtri",
       "noResults": "Nessun evento corrisponde ai filtri.",
       "resultsCount": "{count, plural, =0 {Nessun evento} one {# evento} other {# eventi}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Azioni per «{title}»",
         "manage": "Gestisci",
@@ -4402,7 +4404,8 @@
       "honestHint": "Tempo tipico: meno di un minuto se l'infrastruttura è già calda, 3–5 minuti alla prima accensione. Nel frattempo puoi controllare camera e microfono o usare la chat.",
       "elapsed": "in preparazione da {time}",
       "scheduled": "La sala si apre all'orario d'inizio",
-      "scheduledDetail": "Oppure prima, quando l'organizzatore avvia l'evento. Nel frattempo puoi controllare camera e microfono o usare la chat."
+      "scheduledDetail": "Oppure prima, quando l'organizzatore avvia l'evento. Nel frattempo puoi controllare camera e microfono o usare la chat.",
+      "slow": "Ci sta mettendo più del solito. La sala si apre da sola appena è pronta: se non succede entro qualche minuto, avvisa chi organizza."
     },
     "exitWaiting": "Esci dalla sala d'attesa",
     "warmingUp": "Sala in allestimento",
@@ -4484,9 +4487,6 @@
     },
     "summaryTitle": "La chiamata in breve",
     "summaryWhen": "Quando",
-    "durationHours": "{hours, plural, one {# ora} other {# ore}}",
-    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}",
-    "durationMinutes": "{minutes, plural, one {# minuto} other {# minuti}}",
     "summaryRecording": "Registrazione",
     "readMore": "Leggi tutto",
     "readLess": "Mostra meno",
@@ -4662,7 +4662,12 @@
     },
     "captionsNoticeTitle": "Sottotitoli automatici",
     "captionsNotice": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli. La trascrizione avviene sui server che ospitano la piattaforma e il testo non viene conservato. I sottotitoli si possono nascondere con il pulsante dei sottotitoli nella barra della chiamata.",
-    "captionsNoticeTranscript": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli, sui server che ospitano la piattaforma. Il testo si conserva, con il nome, solo per chi ha dato il consenso alla trascrizione dei propri interventi, e diventa la trascrizione dell'evento. I sottotitoli si possono nascondere con il pulsante dei sottotitoli nella barra della chiamata."
+    "captionsNoticeTranscript": "Durante la diretta la voce di chi parla viene trascritta in tempo reale per mostrare i sottotitoli, sui server che ospitano la piattaforma. Il testo si conserva, con il nome, solo per chi ha dato il consenso alla trascrizione dei propri interventi, e diventa la trascrizione dell'evento. I sottotitoli si possono nascondere con il pulsante dei sottotitoli nella barra della chiamata.",
+    "countdownDays": "{days}g",
+    "waitingForStartButton": "In attesa dell'avvio",
+    "countdownHours": "{hours}h",
+    "countdownMinutes": "{minutes}m",
+    "countdownSeconds": "{seconds}s"
   },
   "recording": {
     "management": "Registrazione video",
