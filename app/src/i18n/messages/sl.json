@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderira kot moderator in je predstavljen med organizatorji dogodka. Z računom osebja z istim e-poštnim naslovom upravlja tudi dogodek.",
       "organization": "Ustanova ali organizacija (neobvezno)",
       "publicListed": "Prikaži na javni strani",
-      "onPublicPage": "Na javni strani"
+      "onPublicPage": "Na javni strani",
+      "resend": "Znova pošlji povezavo",
+      "resendDone": "Povezava znova poslana: {name}.",
+      "resendTooMany": "Preveč pošiljanj v kratkem času: poskusite znova čez nekaj minut.",
+      "resendFailed": "Pošiljanje ni uspelo. Poskusite znova."
     },
     "gdprAuditLog": {
       "title": "Dnevnik GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Izbrisati dogodek?",
         "deleteMessage": "»{title}« in vsi njegovi podatki bodo izbrisani. Dejanja ni mogoče razveljaviti.",
         "deleted": "Dogodek izbrisan",
-        "failed": "Dejanje ni uspelo. Poskusite znova."
+        "failed": "Dejanje ni uspelo. Poskusite znova.",
+        "enterRoom": "Vstopi v sobo"
       },
       "instantBadge": "Hitri klic",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} two {# moderatorja} few {# moderatorji} other {# moderatorjev}} · {speakers, plural, one {# govornik} two {# govornika} few {# govorniki} other {# govornikov}}",
       "postEventSummary": "{connected} povezanih · {registered} prijav",
-      "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}"
+      "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}",
+      "sortUpcoming": "Najprej prihajajoči",
+      "todayTitle": "Danes in v teku"
     },
     "tags": {
       "subtitle": "Ustvarite, urejajte in izbrišite oznake za razvrščanje in filtriranje javnih dogodkov.",
@@ -2510,7 +2517,8 @@
         "people": "Osebe",
         "content": "Vsebine",
         "analytics": "Statistika",
-        "afterEvent": "Po dogodku"
+        "afterEvent": "Po dogodku",
+        "label": "Razdelki dogodka"
       },
       "toggles": {
         "unmute": "Udeleženci lahko govorijo",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova.",
       "capacitySection": "Zmogljivost in infrastruktura",
       "capacitySubtitle": "Dimenzionirano za približno {max} pričakovanih udeležencev",
-      "publishBlockedLive": "Dogodek že poteka",
-      "publishBlockedEnded": "Dogodek se je končal",
       "created": {
         "publishedTitle": "Dogodek objavljen",
         "draftTitle": "Osnutek shranjen",
@@ -2565,7 +2571,8 @@
         "unsaved": "Ni shranjeno: {items}. Dodate jih lahko na tej strani.",
         "copyParticipantLink": "Kopiraj povezavo za udeležence",
         "sendToSpeakers": "Povezave moderatorjev in govorcev",
-        "close": "Zapri povzetek"
+        "close": "Zapri povzetek",
+        "publishNow": "Objavi zdaj"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Predogled",
       "hidePreview": "Skrij predogled",
       "previewLanguage": "Jezik"
+    },
+    "endEvent": "Končaj dogodek",
+    "endEventConfirmTitle": "Končam dogodek za vse?",
+    "endEventConfirmMessage": "Vsi v sobi bodo videli zaključek. Stran po dogodku sledi izbiram v »Po dogodku«.",
+    "endEventSuccess": "Dogodek je končan.",
+    "endEventFailed": "Dogodka ni bilo mogoče končati. Poskusite znova.",
+    "archive": "Arhiviraj",
+    "archiveConfirmTitle": "Arhiviram dogodek?",
+    "archiveConfirmMessage": "Javna stran ne bo več vidna. Podatki ostanejo do konca obdobja hrambe, dogodek pa lahko kadar koli odstranite iz arhiva.",
+    "archiveSuccess": "Dogodek je arhiviran.",
+    "archiveFailed": "Dogodka ni bilo mogoče arhivirati. Poskusite znova.",
+    "endEventPagePublic": "Trenutno je nastavljena kot javna.",
+    "endEventPagePrivate": "Trenutno je nastavljena kot zasebna.",
+    "unarchive": "Odstrani iz arhiva",
+    "unarchiveSuccess": "Dogodek je odstranjen iz arhiva.",
+    "unarchiveFailed": "Dogodka ni bilo mogoče odstraniti iz arhiva. Poskusite znova.",
+    "invitationsPanel": {
+      "title": "Povabljeni",
+      "edit": "Uredi povabljene",
+      "introInvitationOnly": "Dogodek je samo za povabljene: prijavijo se lahko le te osebe, z naslovom, na katerega so bile povabljene.",
+      "introOpen": "Prijava je odprta za vse: tu so osebe, ki ste jih povabili, in ali so se že prijavile.",
+      "loadError": "Povabljenih ni bilo mogoče naložiti.",
+      "empty": "Ni povabljenih.",
+      "emptyInvitationOnly": "Še ni povabljenih: dokler je seznam prazen, se nihče ne more prijaviti.",
+      "registeredCount": "Prijavljeni: {registered} od {total}",
+      "name": "Ime",
+      "email": "E-pošta",
+      "status": "Stanje",
+      "roleSpeaker": "Govorec",
+      "registered": "Prijavljen",
+      "notRegistered": "Še ni prijavljen",
+      "organizersTitle": "Organizatorske ustanove",
+      "organizersEdit": "Uredi ustanove",
+      "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Obvestila",
     "addReminder": "Dodaj obvestilo",
     "removeReminder": "Odstrani",
-    "maxReminders": "Največ 5 obvestil na dogodek.",
+    "maxReminders": "Največ {max} obvestil na dogodek.",
     "selectPreset": "Izberite kdaj...",
     "sentStatus": "{count} poslanih",
     "notSent": "Ni poslano",
@@ -3526,7 +3567,17 @@
       "1hour": "1 uro pred",
       "30min": "30 minut pred",
       "15min": "15 minut pred"
-    }
+    },
+    "edit": "Uredi",
+    "editDone": "Zapri",
+    "editLegend": "Kdaj obvestiti prijavljene",
+    "alreadySent": "že poslano",
+    "alreadyPassed": "čas je minil",
+    "saveFailed": "Spremembe ni bilo mogoče shraniti. Poskusite znova.",
+    "errorSent": "To obvestilo je že bilo poslano: ostane kot zapis o tem, kaj je bilo poslano.",
+    "errorPassed": "Ta trenutek je že minil: obvestilo ne bi bilo nikoli poslano.",
+    "errorChanged": "Seznam se je spremenil: zdaj je posodobljen.",
+    "limitReached": "omejitev dosežena"
   },
   "gdpr": {
     "consent": {

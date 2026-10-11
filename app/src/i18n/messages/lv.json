@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderē kā moderators un ir norādīts starp pasākuma organizatoriem. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu.",
       "organization": "Iestāde vai organizācija (pēc izvēles)",
       "publicListed": "Rādīt publiskajā lapā",
-      "onPublicPage": "Publiskajā lapā"
+      "onPublicPage": "Publiskajā lapā",
+      "resend": "Nosūtīt saiti vēlreiz",
+      "resendDone": "Saite vēlreiz nosūtīta: {name}.",
+      "resendTooMany": "Pārāk daudz sūtījumu īsā laikā: mēģiniet vēlreiz pēc dažām minūtēm.",
+      "resendFailed": "Neizdevās nosūtīt. Mēģiniet vēlreiz."
     },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Dzēst pasākumu?",
         "deleteMessage": "“{title}” un visi tā dati tiks dzēsti. Šo darbību nevar atsaukt.",
         "deleted": "Pasākums dzēsts",
-        "failed": "Darbība neizdevās. Mēģiniet vēlreiz."
+        "failed": "Darbība neizdevās. Mēģiniet vēlreiz.",
+        "enterRoom": "Ieiet telpā"
       },
       "instantBadge": "Ātrais zvans",
       "moderatorsSpeakers": "{mods, plural, zero {# moderatoru} one {# moderators} other {# moderatori}} · {speakers, plural, zero {# runātāju} one {# runātājs} other {# runātāji}}",
       "postEventSummary": "{connected} pievienojušies · {registered} reģistrēti",
-      "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}"
+      "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}",
+      "sortUpcoming": "Gaidāmie vispirms",
+      "todayTitle": "Šodien un notiek"
     },
     "tags": {
       "subtitle": "Izveidojiet, rediģējiet un dzēsiet tagus, ko izmanto publisko pasākumu klasificēšanai un filtrēšanai.",
@@ -2510,7 +2517,8 @@
         "people": "Personas",
         "content": "Saturs",
         "analytics": "Statistika",
-        "afterEvent": "Pēc pasākuma"
+        "afterEvent": "Pēc pasākuma",
+        "label": "Pasākuma sadaļas"
       },
       "toggles": {
         "unmute": "Dalībnieki var ieslēgt mikrofonu",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz.",
       "capacitySection": "Ietilpība un infrastruktūra",
       "capacitySubtitle": "Paredzēts aptuveni {max} gaidāmajiem dalībniekiem",
-      "publishBlockedLive": "Pasākums jau norisinās",
-      "publishBlockedEnded": "Pasākums ir beidzies",
       "created": {
         "publishedTitle": "Pasākums publicēts",
         "draftTitle": "Melnraksts saglabāts",
@@ -2565,7 +2571,8 @@
         "unsaved": "Nav saglabāti: {items}. Varat tos pievienot šajā lapā.",
         "copyParticipantLink": "Kopēt dalībnieku saiti",
         "sendToSpeakers": "Moderatoru un runātāju saites",
-        "close": "Aizvērt kopsavilkumu"
+        "close": "Aizvērt kopsavilkumu",
+        "publishNow": "Publicēt tūlīt"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Priekšskatījums",
       "hidePreview": "Paslēpt priekšskatījumu",
       "previewLanguage": "Valoda"
+    },
+    "endEvent": "Beigt pasākumu",
+    "endEventConfirmTitle": "Beigt pasākumu visiem?",
+    "endEventConfirmMessage": "Visi telpā redzēs noslēgumu. Lapa pēc pasākuma seko izvēlēm sadaļā “Pēc pasākuma”.",
+    "endEventSuccess": "Pasākums beigts.",
+    "endEventFailed": "Pasākumu neizdevās beigt. Mēģiniet vēlreiz.",
+    "archive": "Arhivēt",
+    "archiveConfirmTitle": "Arhivēt pasākumu?",
+    "archiveConfirmMessage": "Publiskā lapa vairs nebūs redzama. Dati paliek līdz glabāšanas termiņa beigām, un pasākumu jebkurā laikā varat izņemt no arhīva.",
+    "archiveSuccess": "Pasākums arhivēts.",
+    "archiveFailed": "Pasākumu neizdevās arhivēt. Mēģiniet vēlreiz.",
+    "endEventPagePublic": "Pašlaik tā ir iestatīta kā publiska.",
+    "endEventPagePrivate": "Pašlaik tā ir iestatīta kā privāta.",
+    "unarchive": "Izņemt no arhīva",
+    "unarchiveSuccess": "Pasākums izņemts no arhīva.",
+    "unarchiveFailed": "Pasākumu neizdevās izņemt no arhīva. Mēģiniet vēlreiz.",
+    "invitationsPanel": {
+      "title": "Uzaicinātie",
+      "edit": "Rediģēt uzaicinātos",
+      "introInvitationOnly": "Pasākums ir tikai ar uzaicinājumu: reģistrēties var tikai šīs personas ar adresi, uz kuru tās tika uzaicinātas.",
+      "introOpen": "Reģistrācija ir atvērta visiem: šeit ir jūsu uzaicinātās personas un informācija, vai tās jau ir reģistrējušās.",
+      "loadError": "Neizdevās ielādēt uzaicinātos.",
+      "empty": "Nav uzaicināto.",
+      "emptyInvitationOnly": "Vēl nav uzaicināto: kamēr saraksts ir tukšs, neviens nevar reģistrēties.",
+      "registeredCount": "Reģistrējušies: {registered} no {total}",
+      "name": "Vārds",
+      "email": "E-pasts",
+      "status": "Statuss",
+      "roleSpeaker": "Runātājs",
+      "registered": "Reģistrējies",
+      "notRegistered": "Vēl nav reģistrējies",
+      "organizersTitle": "Rīkotājiestādes",
+      "organizersEdit": "Rediģēt iestādes",
+      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Paziņojumi",
     "addReminder": "Pievienot atgādinājumu",
     "removeReminder": "Noņemt",
-    "maxReminders": "Maksimāli 5 atgādinājumi pasākumam.",
+    "maxReminders": "Maksimāli {max} atgādinājumi pasākumam.",
     "selectPreset": "Izvēlieties laiku...",
     "sentStatus": "{count} nosūtīti",
     "notSent": "Nav nosūtīts",
@@ -3526,7 +3567,17 @@
       "1hour": "1 stundu iepriekš",
       "30min": "30 minūtes iepriekš",
       "15min": "15 minūtes iepriekš"
-    }
+    },
+    "edit": "Rediģēt",
+    "editDone": "Aizvērt",
+    "editLegend": "Kad paziņot reģistrētajiem",
+    "alreadySent": "jau nosūtīts",
+    "alreadyPassed": "laiks ir pagājis",
+    "saveFailed": "Izmaiņas neizdevās saglabāt. Mēģiniet vēlreiz.",
+    "errorSent": "Šis paziņojums jau ir nosūtīts: tas paliek kā liecība par nosūtīto.",
+    "errorPassed": "Šis brīdis jau ir pagājis: paziņojums nekad netiktu nosūtīts.",
+    "errorChanged": "Saraksts bija mainījies: tagad tas ir atjaunināts.",
+    "limitReached": "ierobežojums sasniegts"
   },
   "gdpr": {
     "consent": {

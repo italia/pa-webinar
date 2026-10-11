@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modère comme un modérateur et figure parmi les organisateurs de l'événement. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement.",
       "organization": "Organisme ou organisation (facultatif)",
       "publicListed": "Afficher sur la page publique",
-      "onPublicPage": "Sur la page publique"
+      "onPublicPage": "Sur la page publique",
+      "resend": "Renvoyer le lien",
+      "resendDone": "Lien renvoyé à {name}.",
+      "resendTooMany": "Trop d'envois rapprochés : veuillez réessayer dans quelques minutes.",
+      "resendFailed": "Échec de l'envoi. Veuillez réessayer."
     },
     "gdprAuditLog": {
       "title": "Journal GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Supprimer l’événement ?",
         "deleteMessage": "« {title} » et toutes ses données seront supprimés. Cette action est irréversible.",
         "deleted": "Événement supprimé",
-        "failed": "L’opération a échoué. Veuillez réessayer."
+        "failed": "L’opération a échoué. Veuillez réessayer.",
+        "enterRoom": "Entrer dans la salle"
       },
       "instantBadge": "Appel instantané",
       "moderatorsSpeakers": "{mods, plural, one {# modérateur} other {# modérateurs}} · {speakers, plural, one {# intervenant} other {# intervenants}}",
       "postEventSummary": "{connected} connectés · {registered} inscriptions",
-      "registeredCount": "{count, plural, =0 {Aucune inscription} one {1 inscription} other {# inscriptions}}"
+      "registeredCount": "{count, plural, =0 {Aucune inscription} one {1 inscription} other {# inscriptions}}",
+      "sortUpcoming": "Prochains d'abord",
+      "todayTitle": "Aujourd'hui et en cours"
     },
     "tags": {
       "subtitle": "Créez, modifiez et supprimez les tags utilisés pour classer et filtrer les événements publics.",
@@ -2510,7 +2517,8 @@
         "people": "Personnes",
         "content": "Contenus",
         "analytics": "Statistiques",
-        "afterEvent": "Après l’événement"
+        "afterEvent": "Après l’événement",
+        "label": "Sections de l’événement"
       },
       "toggles": {
         "unmute": "Les participants peuvent prendre la parole",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Échec de la duplication. Veuillez réessayer.",
       "capacitySection": "Capacité et infrastructure",
       "capacitySubtitle": "Dimensionné pour environ {max} participants attendus",
-      "publishBlockedLive": "L’événement est déjà en cours",
-      "publishBlockedEnded": "L’événement est terminé",
       "created": {
         "publishedTitle": "Événement publié",
         "draftTitle": "Brouillon enregistré",
@@ -2565,7 +2571,8 @@
         "unsaved": "Non enregistrés : {items}. Vous pouvez les ajouter depuis cette page.",
         "copyParticipantLink": "Copier le lien pour les participants",
         "sendToSpeakers": "Liens des modérateurs et des intervenants",
-        "close": "Fermer le récapitulatif"
+        "close": "Fermer le récapitulatif",
+        "publishNow": "Publier maintenant"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Aperçu",
       "hidePreview": "Masquer l'aperçu",
       "previewLanguage": "Langue"
+    },
+    "endEvent": "Terminer l'événement",
+    "endEventConfirmTitle": "Terminer l'événement pour tout le monde ?",
+    "endEventConfirmMessage": "Les personnes dans la salle verront la clôture. La page après l'événement suit les choix de « Après l’événement ».",
+    "endEventSuccess": "Événement terminé.",
+    "endEventFailed": "Impossible de terminer l'événement. Réessayez.",
+    "archive": "Archiver",
+    "archiveConfirmTitle": "Archiver l'événement ?",
+    "archiveConfirmMessage": "La page publique ne sera plus visible. Les données sont conservées jusqu'à la fin de la durée de conservation, et vous pouvez retirer l'événement des archives à tout moment.",
+    "archiveSuccess": "Événement archivé.",
+    "archiveFailed": "Impossible d'archiver l'événement. Réessayez.",
+    "endEventPagePublic": "Elle est actuellement publique.",
+    "endEventPagePrivate": "Elle est actuellement privée.",
+    "unarchive": "Retirer des archives",
+    "unarchiveSuccess": "Événement retiré des archives.",
+    "unarchiveFailed": "Impossible de retirer l'événement des archives. Réessayez.",
+    "invitationsPanel": {
+      "title": "Invités",
+      "edit": "Modifier les invités",
+      "introInvitationOnly": "L'événement est sur invitation : seules ces personnes peuvent s'inscrire, avec l'adresse à laquelle elles ont été invitées.",
+      "introOpen": "L'inscription est ouverte à tous : voici les personnes que vous avez invitées et si elles se sont déjà inscrites.",
+      "loadError": "Impossible de charger les invités.",
+      "empty": "Aucun invité.",
+      "emptyInvitationOnly": "Aucun invité pour l'instant : tant que la liste est vide, personne ne peut s'inscrire.",
+      "registeredCount": "Inscrits : {registered} sur {total}",
+      "name": "Nom",
+      "email": "E-mail",
+      "status": "Statut",
+      "roleSpeaker": "Intervenant",
+      "registered": "Inscrit",
+      "notRegistered": "Pas encore inscrit",
+      "organizersTitle": "Organismes organisateurs",
+      "organizersEdit": "Modifier les organismes",
+      "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Notifications",
     "addReminder": "Ajouter un rappel",
     "removeReminder": "Supprimer",
-    "maxReminders": "Maximum 5 rappels par événement.",
+    "maxReminders": "Maximum {max} rappels par événement.",
     "selectPreset": "Sélectionnez quand...",
     "sentStatus": "{count} envoyés",
     "notSent": "Non envoyé",
@@ -3526,7 +3567,17 @@
       "1hour": "1 heure avant",
       "30min": "30 minutes avant",
       "15min": "15 minutes avant"
-    }
+    },
+    "edit": "Modifier",
+    "editDone": "Fermer",
+    "editLegend": "Quand notifier les personnes inscrites",
+    "alreadySent": "déjà envoyé",
+    "alreadyPassed": "heure passée",
+    "saveFailed": "Modification impossible. Veuillez réessayer.",
+    "errorSent": "Cette notification est déjà partie : elle reste, comme trace de ce qui a été envoyé.",
+    "errorPassed": "Ce moment est déjà passé : la notification ne partirait jamais.",
+    "errorChanged": "La liste avait changé : elle est maintenant à jour.",
+    "limitReached": "limite atteinte"
   },
   "gdpr": {
     "consent": {

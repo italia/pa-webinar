@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje ako moderátor a je uvedený medzi organizátormi podujatia. S účtom personálu s rovnakým e-mailom podujatie aj spravuje.",
       "organization": "Inštitúcia alebo organizácia (voliteľné)",
       "publicListed": "Zobraziť na verejnej stránke",
-      "onPublicPage": "Na verejnej stránke"
+      "onPublicPage": "Na verejnej stránke",
+      "resend": "Znova poslať odkaz",
+      "resendDone": "Odkaz znova odoslaný: {name}.",
+      "resendTooMany": "Príliš veľa odoslaní v krátkom čase: skúste znova o pár minút.",
+      "resendFailed": "Odoslanie sa nepodarilo. Skúste znova."
     },
     "gdprAuditLog": {
       "title": "Auditný protokol GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Odstrániť podujatie?",
         "deleteMessage": "„{title}“ a všetky jeho údaje budú odstránené. Túto akciu nemožno vrátiť.",
         "deleted": "Podujatie odstránené",
-        "failed": "Operácia zlyhala. Skúste to znova."
+        "failed": "Operácia zlyhala. Skúste to znova.",
+        "enterRoom": "Vstúpiť do miestnosti"
       },
       "instantBadge": "Rýchly hovor",
       "moderatorsSpeakers": "{mods, plural, one {# moderátor} few {# moderátori} many {# moderátora} other {# moderátorov}} · {speakers, plural, one {# rečník} few {# rečníci} many {# rečníka} other {# rečníkov}}",
       "postEventSummary": "{connected} pripojených · {registered} registrácií",
-      "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}"
+      "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}",
+      "sortUpcoming": "Najbližšie najprv",
+      "todayTitle": "Dnes a práve prebieha"
     },
     "tags": {
       "subtitle": "Vytvárajte, upravujte a odstraňujte tagy používané na klasifikáciu a filtrovanie verejných podujatí.",
@@ -2510,7 +2517,8 @@
         "people": "Osoby",
         "content": "Obsah",
         "analytics": "Štatistiky",
-        "afterEvent": "Po podujatí"
+        "afterEvent": "Po podujatí",
+        "label": "Časti udalosti"
       },
       "toggles": {
         "unmute": "Účastníci môžu hovoriť",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova.",
       "capacitySection": "Kapacita a infraštruktúra",
       "capacitySubtitle": "Dimenzované pre približne {max} očakávaných účastníkov",
-      "publishBlockedLive": "Podujatie už prebieha",
-      "publishBlockedEnded": "Podujatie sa skončilo",
       "created": {
         "publishedTitle": "Udalosť zverejnená",
         "draftTitle": "Koncept uložený",
@@ -2565,7 +2571,8 @@
         "unsaved": "Neuložené: {items}. Môžete ich pridať na tejto stránke.",
         "copyParticipantLink": "Kopírovať odkaz pre účastníkov",
         "sendToSpeakers": "Odkazy moderátorov a rečníkov",
-        "close": "Zavrieť súhrn"
+        "close": "Zavrieť súhrn",
+        "publishNow": "Zverejniť teraz"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Náhľad",
       "hidePreview": "Skryť náhľad",
       "previewLanguage": "Jazyk"
+    },
+    "endEvent": "Ukončiť podujatie",
+    "endEventConfirmTitle": "Ukončiť podujatie pre všetkých?",
+    "endEventConfirmMessage": "Všetci v miestnosti uvidia ukončenie. Stránka po podujatí sa riadi voľbami v „Po podujatí“.",
+    "endEventSuccess": "Podujatie ukončené.",
+    "endEventFailed": "Podujatie sa nepodarilo ukončiť. Skúste to znova.",
+    "archive": "Archivovať",
+    "archiveConfirmTitle": "Archivovať podujatie?",
+    "archiveConfirmMessage": "Verejná stránka už nebude viditeľná. Údaje zostanú do konca doby uchovávania a podujatie môžete kedykoľvek vybrať z archívu.",
+    "archiveSuccess": "Podujatie archivované.",
+    "archiveFailed": "Podujatie sa nepodarilo archivovať. Skúste to znova.",
+    "endEventPagePublic": "Teraz je nastavená ako verejná.",
+    "endEventPagePrivate": "Teraz je nastavená ako súkromná.",
+    "unarchive": "Vybrať z archívu",
+    "unarchiveSuccess": "Podujatie vybraté z archívu.",
+    "unarchiveFailed": "Podujatie sa nepodarilo vybrať z archívu. Skúste to znova.",
+    "invitationsPanel": {
+      "title": "Pozvaní",
+      "edit": "Upraviť pozvaných",
+      "introInvitationOnly": "Udalosť je len pre pozvaných: prihlásiť sa môžu iba tieto osoby, s adresou, na ktorú boli pozvané.",
+      "introOpen": "Prihlásenie je otvorené pre všetkých: tu sú osoby, ktoré ste pozvali, a či sa už prihlásili.",
+      "loadError": "Pozvaných sa nepodarilo načítať.",
+      "empty": "Žiadni pozvaní.",
+      "emptyInvitationOnly": "Zatiaľ žiadni pozvaní: kým je zoznam prázdny, nikto sa nemôže prihlásiť.",
+      "registeredCount": "Prihlásení: {registered} z {total}",
+      "name": "Meno",
+      "email": "E-mail",
+      "status": "Stav",
+      "roleSpeaker": "Rečník",
+      "registered": "Prihlásený",
+      "notRegistered": "Ešte neprihlásený",
+      "organizersTitle": "Organizujúce inštitúcie",
+      "organizersEdit": "Upraviť inštitúcie",
+      "organizersEmpty": "Nie je uvedená žiadna inštitúcia: verejná stránka neukazuje, kto organizuje."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Upozornenia",
     "addReminder": "Pridať upozornenie",
     "removeReminder": "Odstrániť",
-    "maxReminders": "Maximálne 5 upozornení na udalosť.",
+    "maxReminders": "Maximálne {max} upozornení na udalosť.",
     "selectPreset": "Vyberte kedy...",
     "sentStatus": "{count} odoslaných",
     "notSent": "Neodoslané",
@@ -3526,7 +3567,17 @@
       "1hour": "1 hodinu vopred",
       "30min": "30 minút vopred",
       "15min": "15 minút vopred"
-    }
+    },
+    "edit": "Upraviť",
+    "editDone": "Zavrieť",
+    "editLegend": "Kedy upozorniť prihlásených",
+    "alreadySent": "už odoslané",
+    "alreadyPassed": "čas uplynul",
+    "saveFailed": "Zmenu sa nepodarilo uložiť. Skúste znova.",
+    "errorSent": "Toto upozornenie už bolo odoslané: zostáva ako záznam o tom, čo sa odoslalo.",
+    "errorPassed": "Ten okamih už uplynul: upozornenie by sa nikdy neodoslalo.",
+    "errorChanged": "Zoznam sa zmenil: teraz je aktuálny.",
+    "limitReached": "limit dosiahnutý"
   },
   "gdpr": {
     "consent": {

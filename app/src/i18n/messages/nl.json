@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modereert als een moderator en wordt bij de organisatoren van het evenement vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement.",
       "organization": "Organisatie (optioneel)",
       "publicListed": "Tonen op de openbare pagina",
-      "onPublicPage": "Op de openbare pagina"
+      "onPublicPage": "Op de openbare pagina",
+      "resend": "Link opnieuw sturen",
+      "resendDone": "Link opnieuw gestuurd naar {name}.",
+      "resendTooMany": "Te veel verzendingen kort na elkaar: probeer het over een paar minuten opnieuw.",
+      "resendFailed": "Verzenden mislukt. Probeer het opnieuw."
     },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Evenement verwijderen?",
         "deleteMessage": "‘{title}’ en alle bijbehorende gegevens worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
         "deleted": "Evenement verwijderd",
-        "failed": "De bewerking is mislukt. Probeer het opnieuw."
+        "failed": "De bewerking is mislukt. Probeer het opnieuw.",
+        "enterRoom": "De zaal binnengaan"
       },
       "instantBadge": "Directe oproep",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatoren}} · {speakers, plural, one {# spreker} other {# sprekers}}",
       "postEventSummary": "{connected} verbonden · {registered} aanmeldingen",
-      "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}"
+      "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}",
+      "sortUpcoming": "Komende eerst",
+      "todayTitle": "Vandaag en bezig"
     },
     "tags": {
       "subtitle": "Tags maken, bewerken en verwijderen die worden gebruikt om openbare evenementen te classificeren en te filteren.",
@@ -2510,7 +2517,8 @@
         "people": "Personen",
         "content": "Inhoud",
         "analytics": "Statistieken",
-        "afterEvent": "Na het evenement"
+        "afterEvent": "Na het evenement",
+        "label": "Onderdelen van het evenement"
       },
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
       "capacitySection": "Capaciteit en infrastructuur",
       "capacitySubtitle": "Gedimensioneerd voor ongeveer {max} verwachte deelnemers",
-      "publishBlockedLive": "Het evenement is al bezig",
-      "publishBlockedEnded": "Het evenement is afgelopen",
       "created": {
         "publishedTitle": "Evenement gepubliceerd",
         "draftTitle": "Concept opgeslagen",
@@ -2565,7 +2571,8 @@
         "unsaved": "Niet opgeslagen: {items}. U kunt ze op deze pagina toevoegen.",
         "copyParticipantLink": "Link voor deelnemers kopiëren",
         "sendToSpeakers": "Links voor moderatoren en sprekers",
-        "close": "Overzicht sluiten"
+        "close": "Overzicht sluiten",
+        "publishNow": "Nu publiceren"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Voorbeeld",
       "hidePreview": "Voorbeeld verbergen",
       "previewLanguage": "Taal"
+    },
+    "endEvent": "Evenement beëindigen",
+    "endEventConfirmTitle": "Het evenement voor iedereen beëindigen?",
+    "endEventConfirmMessage": "Iedereen in de zaal ziet de afsluiting. De pagina na het evenement volgt de keuzes bij ‘Na het evenement’.",
+    "endEventSuccess": "Evenement beëindigd.",
+    "endEventFailed": "Het evenement kon niet worden beëindigd. Probeer het opnieuw.",
+    "archive": "Archiveren",
+    "archiveConfirmTitle": "Het evenement archiveren?",
+    "archiveConfirmMessage": "De openbare pagina is dan niet meer zichtbaar. De gegevens blijven tot het einde van de bewaartermijn, en je kunt het evenement altijd weer uit het archief halen.",
+    "archiveSuccess": "Evenement gearchiveerd.",
+    "archiveFailed": "Het evenement kon niet worden gearchiveerd. Probeer het opnieuw.",
+    "endEventPagePublic": "Die staat nu op openbaar.",
+    "endEventPagePrivate": "Die staat nu op privé.",
+    "unarchive": "Uit het archief halen",
+    "unarchiveSuccess": "Evenement uit het archief gehaald.",
+    "unarchiveFailed": "Het evenement kon niet uit het archief worden gehaald. Probeer het opnieuw.",
+    "invitationsPanel": {
+      "title": "Genodigden",
+      "edit": "Genodigden bewerken",
+      "introInvitationOnly": "Het evenement is alleen op uitnodiging: alleen deze personen kunnen zich aanmelden, met het adres waarmee ze zijn uitgenodigd.",
+      "introOpen": "Aanmelden staat open voor iedereen: hier staan de personen die u hebt uitgenodigd en of ze zich al hebben aangemeld.",
+      "loadError": "Genodigden konden niet worden geladen.",
+      "empty": "Geen genodigden.",
+      "emptyInvitationOnly": "Nog geen genodigden: zolang de lijst leeg is, kan niemand zich aanmelden.",
+      "registeredCount": "Aangemeld: {registered} van {total}",
+      "name": "Naam",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Spreker",
+      "registered": "Aangemeld",
+      "notRegistered": "Nog niet aangemeld",
+      "organizersTitle": "Organiserende instanties",
+      "organizersEdit": "Instanties bewerken",
+      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Meldingen",
     "addReminder": "Melding toevoegen",
     "removeReminder": "Verwijderen",
-    "maxReminders": "Maximaal 5 meldingen per evenement.",
+    "maxReminders": "Maximaal {max} meldingen per evenement.",
     "selectPreset": "Selecteer wanneer...",
     "sentStatus": "{count} verzonden",
     "notSent": "Niet verzonden",
@@ -3526,7 +3567,17 @@
       "1hour": "1 uur van tevoren",
       "30min": "30 minuten van tevoren",
       "15min": "15 minuten van tevoren"
-    }
+    },
+    "edit": "Bewerken",
+    "editDone": "Sluiten",
+    "editLegend": "Wanneer aangemelde personen een melding krijgen",
+    "alreadySent": "al verzonden",
+    "alreadyPassed": "tijdstip verstreken",
+    "saveFailed": "Wijziging niet opgeslagen. Probeer het opnieuw.",
+    "errorSent": "Deze melding is al verstuurd: ze blijft staan als bewijs van wat is verzonden.",
+    "errorPassed": "Dat moment is al voorbij: de melding zou nooit worden verstuurd.",
+    "errorChanged": "De lijst was gewijzigd: hij is nu bijgewerkt.",
+    "limitReached": "limiet bereikt"
   },
   "gdpr": {
     "consent": {

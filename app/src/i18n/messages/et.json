@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modereerib nagu moderaator ja on esitatud ürituse korraldajate seas. Sama e-postiga töötajakontoga haldab ta ka üritust.",
       "organization": "Asutus või organisatsioon (valikuline)",
       "publicListed": "Näita avalikul lehel",
-      "onPublicPage": "Avalikul lehel"
+      "onPublicPage": "Avalikul lehel",
+      "resend": "Saada link uuesti",
+      "resendDone": "Link saadeti uuesti kasutajale {name}.",
+      "resendTooMany": "Liiga palju saatmisi lühikese aja jooksul: proovi mõne minuti pärast uuesti.",
+      "resendFailed": "Saatmine ebaõnnestus. Proovi uuesti."
     },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Kas kustutada üritus?",
         "deleteMessage": "„{title}“ ja kõik selle andmed kustutatakse. Seda ei saa tagasi võtta.",
         "deleted": "Üritus kustutatud",
-        "failed": "Toiming ebaõnnestus. Proovige uuesti."
+        "failed": "Toiming ebaõnnestus. Proovige uuesti.",
+        "enterRoom": "Sisene ruumi"
       },
       "instantBadge": "Kiirkõne",
       "moderatorsSpeakers": "{mods, plural, one {# moderaator} other {# moderaatorit}} · {speakers, plural, one {# esineja} other {# esinejat}}",
       "postEventSummary": "{connected} liitunud · {registered} registreeringut",
-      "registeredCount": "{count, plural, =0 {Registreeringuid pole} one {1 registreering} other {# registreeringut}}"
+      "registeredCount": "{count, plural, =0 {Registreeringuid pole} one {1 registreering} other {# registreeringut}}",
+      "sortUpcoming": "Eelseisvad enne",
+      "todayTitle": "Täna ja käimas"
     },
     "tags": {
       "subtitle": "Looge, muutke ja kustutage silte avalike sündmuste klassifitseerimiseks ja filtreerimiseks.",
@@ -2510,7 +2517,8 @@
         "people": "Inimesed",
         "content": "Sisu",
         "analytics": "Statistika",
-        "afterEvent": "Pärast sündmust"
+        "afterEvent": "Pärast sündmust",
+        "label": "Ürituse jaotised"
       },
       "toggles": {
         "unmute": "Osalejad saavad rääkida",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti.",
       "capacitySection": "Maht ja taristu",
       "capacitySubtitle": "Mõõdetud umbes {max} oodatud osalejale",
-      "publishBlockedLive": "Sündmus on juba käimas",
-      "publishBlockedEnded": "Sündmus on lõppenud",
       "created": {
         "publishedTitle": "Sündmus avaldatud",
         "draftTitle": "Mustand salvestatud",
@@ -2565,7 +2571,8 @@
         "unsaved": "Salvestamata: {items}. Saate need sellel lehel lisada.",
         "copyParticipantLink": "Kopeeri osalejate link",
         "sendToSpeakers": "Moderaatorite ja esinejate lingid",
-        "close": "Sulge kokkuvõte"
+        "close": "Sulge kokkuvõte",
+        "publishNow": "Avalda kohe"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Eelvaade",
       "hidePreview": "Peida eelvaade",
       "previewLanguage": "Keel"
+    },
+    "endEvent": "Lõpeta üritus",
+    "endEventConfirmTitle": "Kas lõpetada üritus kõigile?",
+    "endEventConfirmMessage": "Kõik ruumis näevad lõpetamist. Ürituse järgne leht järgib valikuid jaotises „Pärast sündmust“.",
+    "endEventSuccess": "Üritus lõpetatud.",
+    "endEventFailed": "Üritust ei õnnestunud lõpetada. Proovi uuesti.",
+    "archive": "Arhiveeri",
+    "archiveConfirmTitle": "Kas arhiveerida üritus?",
+    "archiveConfirmMessage": "Avalik leht ei ole enam nähtav. Andmed jäävad alles säilitusaja lõpuni ja ürituse saad igal ajal arhiivist välja võtta.",
+    "archiveSuccess": "Üritus arhiveeritud.",
+    "archiveFailed": "Üritust ei õnnestunud arhiveerida. Proovi uuesti.",
+    "endEventPagePublic": "Praegu on see avalik.",
+    "endEventPagePrivate": "Praegu on see privaatne.",
+    "unarchive": "Võta arhiivist välja",
+    "unarchiveSuccess": "Üritus võeti arhiivist välja.",
+    "unarchiveFailed": "Üritust ei õnnestunud arhiivist välja võtta. Proovi uuesti.",
+    "invitationsPanel": {
+      "title": "Kutsutud",
+      "edit": "Muuda kutsutuid",
+      "introInvitationOnly": "Üritus on ainult kutsetega: registreeruda saavad ainult need inimesed, aadressiga, millega nad kutsuti.",
+      "introOpen": "Registreerumine on kõigile avatud: siin on sinu kutsutud inimesed ja kas nad on juba registreerunud.",
+      "loadError": "Kutsutute laadimine ebaõnnestus.",
+      "empty": "Kutsutuid pole.",
+      "emptyInvitationOnly": "Kutsutuid veel pole: kuni nimekiri on tühi, ei saa keegi registreeruda.",
+      "registeredCount": "Registreerunud: {registered}/{total}",
+      "name": "Nimi",
+      "email": "E-post",
+      "status": "Olek",
+      "roleSpeaker": "Esineja",
+      "registered": "Registreerunud",
+      "notRegistered": "Pole veel registreerunud",
+      "organizersTitle": "Korraldavad asutused",
+      "organizersEdit": "Muuda asutusi",
+      "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Teavitused",
     "addReminder": "Lisa meeldetuletus",
     "removeReminder": "Eemalda",
-    "maxReminders": "Maksimaalselt 5 meeldetuletust ürituse kohta.",
+    "maxReminders": "Maksimaalselt {max} meeldetuletust ürituse kohta.",
     "selectPreset": "Valige aeg...",
     "sentStatus": "{count} saadetud",
     "notSent": "Saatmata",
@@ -3526,7 +3567,17 @@
       "1hour": "1 tund enne",
       "30min": "30 minutit enne",
       "15min": "15 minutit enne"
-    }
+    },
+    "edit": "Muuda",
+    "editDone": "Sulge",
+    "editLegend": "Millal registreerunutele teada anda",
+    "alreadySent": "juba saadetud",
+    "alreadyPassed": "aeg on möödas",
+    "saveFailed": "Muudatust ei saanud salvestada. Proovi uuesti.",
+    "errorSent": "See teavitus on juba saadetud: see jääb alles kui märge saadetust.",
+    "errorPassed": "See hetk on juba möödas: teavitust ei saadetaks kunagi.",
+    "errorChanged": "Nimekiri oli muutunud: nüüd on see ajakohane.",
+    "limitReached": "piir täis"
   },
   "gdpr": {
     "consent": {

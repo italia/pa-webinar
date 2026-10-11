@@ -768,7 +768,7 @@
     "title": "Notifiche",
     "addReminder": "Aggiungi notifica",
     "removeReminder": "Rimuovi",
-    "maxReminders": "Massimo 5 notifiche per evento.",
+    "maxReminders": "Massimo {max} notifiche per evento.",
     "selectPreset": "Seleziona quando...",
     "sentStatus": "{count} inviate",
     "notSent": "Non inviata",
@@ -782,7 +782,17 @@
       "1hour": "1 ora prima",
       "30min": "30 minuti prima",
       "15min": "15 minuti prima"
-    }
+    },
+    "edit": "Modifica",
+    "editDone": "Chiudi",
+    "editLegend": "Quando mandare una notifica a chi è iscritto",
+    "alreadySent": "già inviata",
+    "alreadyPassed": "orario passato",
+    "saveFailed": "Modifica non riuscita. Riprova.",
+    "errorSent": "Questa notifica è già partita: resta, come traccia di cosa è stato mandato.",
+    "errorPassed": "Quel momento è già passato: la notifica non partirebbe.",
+    "errorChanged": "L'elenco era cambiato: ora è aggiornato.",
+    "limitReached": "limite raggiunto"
   },
   "admin": {
     "accessDenied": {
@@ -1789,7 +1799,11 @@
       "roleOrganizerHint": "Modera come un moderatore ed è presentato fra chi organizza l'evento. Con un account dello staff con la stessa email, gestisce anche l'evento.",
       "organization": "Ente o organizzazione (facoltativo)",
       "publicListed": "Mostra nella pagina pubblica",
-      "onPublicPage": "Nella pagina pubblica"
+      "onPublicPage": "Nella pagina pubblica",
+      "resend": "Reinvia link",
+      "resendDone": "Link reinviato a {name}.",
+      "resendTooMany": "Troppi invii ravvicinati: riprova fra qualche minuto.",
+      "resendFailed": "Invio non riuscito. Riprova."
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",
@@ -2569,12 +2583,15 @@
         "deleteTitle": "Eliminare l'evento?",
         "deleteMessage": "«{title}» e tutti i suoi dati verranno eliminati. L'operazione non si può annullare.",
         "deleted": "Evento eliminato",
-        "failed": "Operazione non riuscita. Riprova."
+        "failed": "Operazione non riuscita. Riprova.",
+        "enterRoom": "Entra in sala"
       },
       "instantBadge": "Chiamata rapida",
       "moderatorsSpeakers": "{mods, plural, one {# moderatore} other {# moderatori}} · {speakers, plural, one {# relatore} other {# relatori}}",
       "postEventSummary": "{connected} connessi · {registered} iscritti",
-      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}"
+      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}",
+      "sortUpcoming": "Prossimi prima",
+      "todayTitle": "Oggi e in corso"
     },
     "tags": {
       "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",
@@ -2635,7 +2652,8 @@
         "people": "Persone",
         "content": "Contenuti",
         "analytics": "Statistiche",
-        "afterEvent": "Dopo l’evento"
+        "afterEvent": "Dopo l’evento",
+        "label": "Sezioni dell’evento"
       },
       "toggles": {
         "unmute": "Partecipanti possono parlare",
@@ -2678,8 +2696,6 @@
       "duplicateNextError": "Duplicazione non riuscita. Riprova.",
       "capacitySection": "Capacità e infrastruttura",
       "capacitySubtitle": "Dimensionato per circa {max} partecipanti attesi",
-      "publishBlockedLive": "L’evento è già in corso",
-      "publishBlockedEnded": "L’evento è concluso",
       "created": {
         "publishedTitle": "Evento pubblicato",
         "draftTitle": "Bozza salvata",
@@ -2690,7 +2706,8 @@
         "unsaved": "Non sono stati salvati: {items}. Puoi aggiungerli da questa pagina.",
         "copyParticipantLink": "Copia il link per i partecipanti",
         "sendToSpeakers": "Link di moderatori e relatori",
-        "close": "Chiudi il riepilogo"
+        "close": "Chiudi il riepilogo",
+        "publishNow": "Pubblica ora"
       }
     },
     "rubrica": {
@@ -3360,6 +3377,40 @@
       "preview": "Anteprima",
       "hidePreview": "Nascondi l'anteprima",
       "previewLanguage": "Lingua"
+    },
+    "endEvent": "Termina evento",
+    "endEventConfirmTitle": "Terminare l'evento per tutti?",
+    "endEventConfirmMessage": "Chi è in sala vedrà la chiusura. La pagina dopo l'evento segue le scelte di «Dopo l’evento».",
+    "endEventSuccess": "Evento terminato.",
+    "endEventFailed": "Non è stato possibile terminare l'evento. Riprova.",
+    "archive": "Archivia",
+    "archiveConfirmTitle": "Archiviare l'evento?",
+    "archiveConfirmMessage": "La pagina pubblica non sarà più visibile. I dati restano fino alla scadenza della conservazione, e puoi togliere l'evento dall'archivio quando vuoi.",
+    "archiveSuccess": "Evento archiviato.",
+    "archiveFailed": "Non è stato possibile archiviare l'evento. Riprova.",
+    "endEventPagePublic": "Ora è impostata come pubblica.",
+    "endEventPagePrivate": "Ora è impostata come privata.",
+    "unarchive": "Togli dall'archivio",
+    "unarchiveSuccess": "Evento tolto dall'archivio.",
+    "unarchiveFailed": "Non è stato possibile togliere l'evento dall'archivio. Riprova.",
+    "invitationsPanel": {
+      "title": "Invitati",
+      "edit": "Modifica gli invitati",
+      "introInvitationOnly": "L'evento è solo su invito: possono iscriversi soltanto queste persone, con l'indirizzo con cui sono state invitate.",
+      "introOpen": "L'iscrizione è aperta a tutti: qui ci sono le persone che hai invitato e se si sono già iscritte.",
+      "loadError": "Impossibile caricare gli invitati.",
+      "empty": "Nessun invitato.",
+      "emptyInvitationOnly": "Nessun invitato ancora: finché l'elenco è vuoto, nessuno può iscriversi.",
+      "registeredCount": "Iscritti: {registered} su {total}",
+      "name": "Nome",
+      "email": "Email",
+      "status": "Stato",
+      "roleSpeaker": "Relatore",
+      "registered": "Iscritto",
+      "notRegistered": "Non ancora iscritto",
+      "organizersTitle": "Enti organizzatori",
+      "organizersEdit": "Modifica gli enti",
+      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
     }
   },
   "email": {

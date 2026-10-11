@@ -140,6 +140,7 @@ export default async function EventsListPage({
       ) : (
         <AdminDashboardClient
           events={events}
+          renderedAt={Date.now()}
           token={token}
           availableTags={availableTags}
           siteDefaultParseTitleKicker={settings.parseTitleKicker}

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderează ca un moderator și apare printre organizatorii evenimentului. Cu un cont de personal pe același e-mail, gestionează și evenimentul.",
       "organization": "Instituție sau organizație (opțional)",
       "publicListed": "Afișează pe pagina publică",
-      "onPublicPage": "Pe pagina publică"
+      "onPublicPage": "Pe pagina publică",
+      "resend": "Retrimite linkul",
+      "resendDone": "Link retrimis către {name}.",
+      "resendTooMany": "Prea multe trimiteri într-un timp scurt: încercați din nou peste câteva minute.",
+      "resendFailed": "Trimiterea a eșuat. Încercați din nou."
     },
     "gdprAuditLog": {
       "title": "Registru GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Ștergi evenimentul?",
         "deleteMessage": "„{title}” și toate datele sale vor fi șterse. Operațiunea nu poate fi anulată.",
         "deleted": "Eveniment șters",
-        "failed": "Operațiunea a eșuat. Încearcă din nou."
+        "failed": "Operațiunea a eșuat. Încearcă din nou.",
+        "enterRoom": "Intră în sală"
       },
       "instantBadge": "Apel rapid",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} few {# moderatori} other {# de moderatori}} · {speakers, plural, one {# vorbitor} few {# vorbitori} other {# de vorbitori}}",
       "postEventSummary": "{connected} conectați · {registered} înscrieri",
-      "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}"
+      "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}",
+      "sortUpcoming": "Cele viitoare întâi",
+      "todayTitle": "Azi și în desfășurare"
     },
     "tags": {
       "subtitle": "Creați, modificați și ștergeți etichetele folosite pentru clasificarea și filtrarea evenimentelor publice.",
@@ -2510,7 +2517,8 @@
         "people": "Persoane",
         "content": "Conținut",
         "analytics": "Statistici",
-        "afterEvent": "După eveniment"
+        "afterEvent": "După eveniment",
+        "label": "Secțiunile evenimentului"
       },
       "toggles": {
         "unmute": "Participanții pot vorbi",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Duplicarea nu a reușit. Încercați din nou.",
       "capacitySection": "Capacitate și infrastructură",
       "capacitySubtitle": "Dimensionat pentru aproximativ {max} participanți așteptați",
-      "publishBlockedLive": "Evenimentul este deja în desfășurare",
-      "publishBlockedEnded": "Evenimentul s-a încheiat",
       "created": {
         "publishedTitle": "Eveniment publicat",
         "draftTitle": "Ciornă salvată",
@@ -2565,7 +2571,8 @@
         "unsaved": "Nu au fost salvate: {items}. Le puteți adăuga din această pagină.",
         "copyParticipantLink": "Copiați linkul pentru participanți",
         "sendToSpeakers": "Linkurile moderatorilor și ale vorbitorilor",
-        "close": "Închideți rezumatul"
+        "close": "Închideți rezumatul",
+        "publishNow": "Publică acum"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Previzualizare",
       "hidePreview": "Ascunde previzualizarea",
       "previewLanguage": "Limba"
+    },
+    "endEvent": "Încheie evenimentul",
+    "endEventConfirmTitle": "Închei evenimentul pentru toți?",
+    "endEventConfirmMessage": "Cei din sală vor vedea închiderea. Pagina de după eveniment urmează alegerile din „După eveniment”.",
+    "endEventSuccess": "Eveniment încheiat.",
+    "endEventFailed": "Evenimentul nu a putut fi încheiat. Încearcă din nou.",
+    "archive": "Arhivează",
+    "archiveConfirmTitle": "Arhivezi evenimentul?",
+    "archiveConfirmMessage": "Pagina publică nu va mai fi vizibilă. Datele rămân până la sfârșitul perioadei de păstrare, iar evenimentul îl poți scoate din arhivă oricând.",
+    "archiveSuccess": "Eveniment arhivat.",
+    "archiveFailed": "Evenimentul nu a putut fi arhivat. Încearcă din nou.",
+    "endEventPagePublic": "Acum este setată ca publică.",
+    "endEventPagePrivate": "Acum este setată ca privată.",
+    "unarchive": "Scoate din arhivă",
+    "unarchiveSuccess": "Eveniment scos din arhivă.",
+    "unarchiveFailed": "Evenimentul nu a putut fi scos din arhivă. Încearcă din nou.",
+    "invitationsPanel": {
+      "title": "Invitați",
+      "edit": "Editează invitații",
+      "introInvitationOnly": "Evenimentul este doar pe bază de invitație: se pot înscrie numai aceste persoane, cu adresa cu care au fost invitate.",
+      "introOpen": "Înscrierea este deschisă tuturor: aici sunt persoanele pe care le-ați invitat și dacă s-au înscris deja.",
+      "loadError": "Invitații nu au putut fi încărcați.",
+      "empty": "Niciun invitat.",
+      "emptyInvitationOnly": "Încă niciun invitat: cât timp lista este goală, nimeni nu se poate înscrie.",
+      "registeredCount": "Înscriși: {registered} din {total}",
+      "name": "Nume",
+      "email": "E-mail",
+      "status": "Stare",
+      "roleSpeaker": "Vorbitor",
+      "registered": "Înscris",
+      "notRegistered": "Încă neînscris",
+      "organizersTitle": "Instituții organizatoare",
+      "organizersEdit": "Editează instituțiile",
+      "organizersEmpty": "Nicio instituție indicată: pagina publică nu arată cine organizează."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Notificări",
     "addReminder": "Adăugați notificare",
     "removeReminder": "Eliminați",
-    "maxReminders": "Maxim 5 notificări per eveniment.",
+    "maxReminders": "Maxim {max} notificări per eveniment.",
     "selectPreset": "Selectați când...",
     "sentStatus": "{count} trimise",
     "notSent": "Netrimisă",
@@ -3526,7 +3567,17 @@
       "1hour": "Cu 1 oră înainte",
       "30min": "Cu 30 de minute înainte",
       "15min": "Cu 15 minute înainte"
-    }
+    },
+    "edit": "Editează",
+    "editDone": "Închide",
+    "editLegend": "Când se notifică persoanele înscrise",
+    "alreadySent": "deja trimisă",
+    "alreadyPassed": "ora a trecut",
+    "saveFailed": "Modificarea nu a putut fi salvată. Încercați din nou.",
+    "errorSent": "Această notificare a fost deja trimisă: rămâne, ca evidență a ceea ce s-a trimis.",
+    "errorPassed": "Acel moment a trecut deja: notificarea nu ar mai fi trimisă.",
+    "errorChanged": "Lista se schimbase: acum este actualizată.",
+    "limitReached": "limită atinsă"
   },
   "gdpr": {
     "consent": {

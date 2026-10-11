@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Badge, Button, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/components/ui/toast';
 import { SkeletonLines } from '@/components/ui/skeleton';
 import { mailtoHref } from '@/lib/email/mailto';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -35,6 +36,9 @@ interface Props {
   locale: string;
   /** Evento in bozza: i link per email partono alla pubblicazione. */
   isDraft?: boolean;
+  /** «Reinvia link»: il portale manda i link per email (evento pubblicato e
+   *  non concluso). */
+  canResend?: boolean;
 }
 
 export default function EventModeratorsPanel({
@@ -45,8 +49,10 @@ export default function EventModeratorsPanel({
   baseUrl,
   locale,
   isDraft = false,
+  canResend = false,
 }: Props) {
   const t = useTranslations('admin.coModerators');
+  const toast = useToast();
   const tc = useTranslations('common');
   const confirm = useConfirm();
 
@@ -139,6 +145,32 @@ export default function EventModeratorsPanel({
       if (res.ok) fetchRows();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [eventId, moderatorToken, fetchRows, t, confirm],
+  );
+
+  // «Reinvia link»: l'email con il link personale, di nuovo, a chi l'ha
+  // persa. Il server la rimette in coda (non in bozza, non a una concessione
+  // revocata o senza indirizzo, al massimo tre volte ogni dieci minuti).
+  const [reinviando, setReinviando] = useState<string | null>(null);
+  const handleResend = useCallback(
+    async (row: ModeratorRow) => {
+      setReinviando(row.id);
+      try {
+        const res = await fetch(`/api/events/${eventId}/moderators/${row.id}`, {
+          method: 'POST',
+          headers: authHeader,
+        });
+        if (res.ok) {
+          toast.success(t('resendDone', { name: row.name }));
+        } else {
+          toast.error(res.status === 429 ? t('resendTooMany') : t('resendFailed'));
+        }
+      } catch {
+        toast.error(t('resendFailed'));
+      } finally {
+        setReinviando(null);
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [eventId, moderatorToken, t, toast],
   );
 
   // Indirizzo con i segmenti nella lingua della pagina (`/it/eventi/…`): un
@@ -361,6 +393,22 @@ export default function EventModeratorsPanel({
                       >
                         {t('prepareEmail')}
                       </a>
+                      {/* Il link parte dal portale solo a evento pubblicato e non
+                          concluso, e solo a chi ha un indirizzo. Il nome sta
+                          in un testo nascosto, dopo quello visibile: chi usa
+                          la voce dice «Reinvia link» e lo trova. */}
+                      {row.email && canResend && (
+                        <Button
+                          color="secondary"
+                          outline
+                          size="xs"
+                          onClick={() => handleResend(row)}
+                          disabled={reinviando === row.id}
+                        >
+                          {t('resend')}
+                          <span className="visually-hidden">{`: ${row.name}`}</span>
+                        </Button>
+                      )}
                       <Button
                         color="danger"
                         outline

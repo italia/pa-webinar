@@ -39,6 +39,8 @@ import {
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { canStartManually } from '@/lib/events/lifecycle';
 import { materialAuthorName } from '@/lib/events/material-author';
+import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
+import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -50,6 +52,8 @@ import EventAnalyticsPanel from './event-analytics-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
+import EventInvitationsPanel from './event-invitations-panel';
+import EventRemindersEditor from './event-reminders-editor';
 import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
@@ -247,9 +251,17 @@ export default function EventManagementClient({
     const t = setInterval(() => setAdesso(Date.now()), 60_000);
     return () => clearInterval(t);
   }, []);
+  // I promemoria come li modifica la scheda delle notifiche (si salvano
+  // uno per uno, senza ricaricare la pagina). Se la pagina si aggiorna dal
+  // server (router.refresh), l'elenco segue.
+  const [elencoPromemoria, setElencoPromemoria] = useState(event.reminders);
+  useEffect(() => {
+    setElencoPromemoria(event.reminders);
+  }, [event.reminders]);
+  const [modificaPromemoria, setModificaPromemoria] = useState(false);
   // Promemoria e iscrizioni nella forma che usa il cron, per dire di ogni
   // promemoria non spedito se partira' (lib/email/reminder-status).
-  const promemoria = event.reminders.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+  const promemoria = elencoPromemoria.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
   const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
@@ -257,10 +269,21 @@ export default function EventManagementClient({
   // fine evento: si apre quella invece della panoramica, gia' dal primo
   // rendering, e anche quando l'indirizzo cambia restando sulla pagina.
   const tabRichiesta = eventAdminTab(useSearchParams().get('tab'));
-  const [activeTab, setActiveTab] = useState<TabId>(tabRichiesta ?? 'panoramica');
+  // A evento concluso (o archiviato) si apre «Dopo l'evento»: e' li' che
+  // c'e' da fare.
+  const [activeTab, setActiveTab] = useState<TabId>(
+    tabRichiesta ?? (event.status === 'ENDED' || event.status === 'ARCHIVED' ? 'dopo' : 'panoramica'),
+  );
   useEffect(() => {
     if (tabRichiesta) setActiveTab(tabRichiesta);
   }, [tabRichiesta]);
+  // La scheda scelta resta nell'indirizzo (`?tab=`): un ricaricamento o un
+  // link copiato riaprono quella. Si sostituisce la voce della cronologia,
+  // senza aggiungerne una per scheda.
+  const scegliScheda = useCallback((tab: TabId) => {
+    setActiveTab(tab);
+    aggiornaQuery((params) => params.set('tab', tab));
+  }, []);
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
@@ -273,13 +296,7 @@ export default function EventManagementClient({
     const params = new URLSearchParams(window.location.search);
     if (params.get('created') !== '1') return;
     setAppenaCreato(readCreation(event.id));
-    params.delete('created');
-    const resto = params.toString();
-    window.history.replaceState(
-      window.history.state,
-      '',
-      `${window.location.pathname}${resto ? `?${resto}` : ''}${window.location.hash}`,
-    );
+    aggiornaQuery((p) => p.delete('created'));
   }, [event.id]);
   const chiudiRiepilogo = () => {
     forgetCreation(event.id);
@@ -328,6 +345,7 @@ export default function EventManagementClient({
   // client devono disegnare gli stessi pulsanti.
   const istante = adesso ?? renderedAt;
   const isInstant = event.eventType === 'INSTANT';
+  const promemoriaModificabili = !isInstant && (status === 'DRAFT' || status === 'PUBLISHED');
   const eventoOra = { ...event, status, ...paginaPostEvento };
   const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
   const entraModeratore = moderatorRoomOpen(eventoOra, istante);
@@ -402,6 +420,78 @@ export default function EventManagementClient({
       toast.error(t('startEventFailed'));
     } finally { setUpdating(false); }
   }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
+
+  // «Termina evento» da qui: la stessa fine di «Termina per tutti» in sala.
+  // Chi e' in sala vede la chiusura; la pagina dopo l'evento segue le scelte
+  // di «Dopo l'evento», dove si va subito.
+  const endEvent = useCallback(async () => {
+    // La pagina dopo l'evento segue la scelta gia' fatta in «Dopo l'evento»:
+    // la conferma dice quale, prima, non dopo.
+    const ok = await confirm({
+      title: t('endEventConfirmTitle'),
+      message: `${t('endEventConfirmMessage')} ${
+        paginaPostEvento.postEventPublic ? t('endEventPagePublic') : t('endEventPagePrivate')
+      }`,
+      confirmLabel: t('endEvent'),
+      cancelLabel: tc('cancel'),
+      danger: true,
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      scegliScheda('dopo');
+      setFeedback(t('endEventSuccess'));
+    } catch {
+      toast.error(t('endEventFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, paginaPostEvento.postEventPublic, t, tc, confirm, toast, scegliScheda]);
+
+  // «Archivia» a evento concluso (solo lo staff: e' la stessa azione
+  // dell'elenco): la pagina pubblica sparisce, i dati restano fino alla
+  // scadenza della conservazione.
+  const archiveEvent = useCallback(async () => {
+    const ok = await confirm({
+      title: t('archiveConfirmTitle'),
+      message: t('archiveConfirmMessage'),
+      confirmLabel: t('archive'),
+      cancelLabel: tc('cancel'),
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      const res = await fetch('/api/admin/events/bulk-archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [event.id] }),
+      });
+      // La rotta risponde 200 anche quando non archivia niente (l'evento non
+      // e' piu' nel perimetro di chi chiede): conta il numero, non lo stato.
+      const esito = res.ok ? ((await res.json().catch(() => ({}))) as { archived?: number }) : null;
+      if (esito && (esito.archived ?? 0) > 0) {
+        setStatus('ARCHIVED');
+        setFeedback(t('archiveSuccess'));
+      } else {
+        toast.error(t('archiveFailed'));
+      }
+    } catch {
+      toast.error(t('archiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, t, tc, confirm, toast]);
+
+  // Dall'archivio si torna a evento concluso: la pagina pubblica torna a
+  // seguire le scelte di «Dopo l'evento».
+  const unarchiveEvent = useCallback(async () => {
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      setFeedback(t('unarchiveSuccess'));
+    } catch {
+      toast.error(t('unarchiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, t, toast]);
 
   // Dopo l'eliminazione: lo staff torna all'elenco; chi ha solo il link del
   // moderatore non ha un'area admin, e va alla home del portale.
@@ -491,8 +581,10 @@ export default function EventManagementClient({
           publishFailed={appenaCreato.publishFailed}
           unsaved={appenaCreato.unsaved}
           shareUrl={condivisione ? localizedUrl(baseUrl, condivisione.path, locale) : null}
+          onPublish={status === 'DRAFT' ? togglePublish : undefined}
+          publishing={updating}
           onPeople={() => {
-            setActiveTab('persone');
+            scegliScheda('persone');
             tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
           onClose={chiudiRiepilogo}
@@ -619,7 +711,7 @@ export default function EventManagementClient({
       )}
 
       {status === 'LIVE' && (
-        <div className="mb-3 p-3 rounded d-flex align-items-center justify-content-between gap-3 flex-wrap"
+        <div className="mb-3 p-3 rounded"
              style={{ background: '#e8f0fe', color: C_INK, border: `1px solid ${C_PRIMARY}40` }}>
           <div className="d-flex align-items-center gap-2">
             <span style={{ color: C_PRIMARY }}><Svg name="video" /></span>
@@ -632,24 +724,24 @@ export default function EventManagementClient({
               </span>
             )}
           </div>
-          <Link href={percorso(liveModeratorUrl)} className="btn btn-primary btn-sm"
-                style={{ fontSize: '0.84rem' }}>
-            {t('joinAsModeratorBtn')}
-          </Link>
         </div>
       )}
 
       {/* ═══ Body ═══ */}
-      {/* Su schermo stretto la colonna con stato e azioni viene prima del
-          contenuto della scheda: sono le cose per cui si apre questa pagina, e
-          in coda costerebbero un'intera scorsa. Su schermo largo torna a
-          destra, nell'ordine di lettura. */}
-      <div className="row g-4">
-        <div className="col-lg-8 order-2 order-lg-1">
+      {/* Su schermo largo le schede a sinistra e, a destra, le azioni e il
+          riepilogo, che restano in vista. Su telefono prima le azioni dello
+          stato (le cose per cui si apre questa pagina), poi le schede, in fondo
+          il riepilogo: la colonna intera in cima spingeva le schede mille pixel
+          piu' giu'. La griglia e' in globals.scss (.event-manage). */}
+      <div className="event-manage">
+        <div className="event-manage__main">
           <div ref={tabsRef}>
-            <TabNav active={activeTab} onChange={setActiveTab} t={td} />
+            <TabNav active={activeTab} onChange={scegliScheda} t={td} />
           </div>
-          <div className="p-4" style={CARD}>
+          {/* Un pannello solo, che cambia contenuto con la scheda: tutte le
+              schede lo controllano, e porta il nome di quella attiva. */}
+          <div className="p-4" style={CARD} role="tabpanel" id="event-tabpanel"
+               aria-labelledby={`event-tab-${activeTab}`} tabIndex={0}>
             {activeTab === 'panoramica' && (
               <OverviewTab
                 event={event}
@@ -670,7 +762,9 @@ export default function EventManagementClient({
             )}
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
-                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'} />
+                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'}
+                         linksMailable={!['DRAFT', 'ENDED', 'ARCHIVED'].includes(status)}
+                         editPeopleHref={editUrlAt('invites')} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
@@ -684,8 +778,100 @@ export default function EventManagementClient({
         </div>
 
         {/* ═══ Sidebar ═══ */}
-        <div className="col-lg-4 order-1 order-lg-2">
-          <div style={{ position: 'sticky', top: 20 }}>
+        <div className="event-manage__side">
+          <div className="event-manage__actions">
+            {/* Actions */}
+            <div className="p-4 mb-0 mb-lg-3" style={CARD}>
+              <div className="d-grid gap-2">
+                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
+                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
+                    organizza. */}
+                {canStartManually(status) && (
+                  <button type="button"
+                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
+                          onClick={startEvent} disabled={updating}>
+                    <Svg name="video" size={14} /> {t('startEvent')}
+                  </button>
+                )}
+                {/* Un'azione principale per stato: in bozza pubblicare, in
+                    diretta terminare, a evento concluso archiviare. Le altre
+                    restano, in secondo piano. */}
+                {status === 'DRAFT' && (
+                  <button type="button"
+                          className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('publish')}
+                  </button>
+                )}
+                {status === 'LIVE' && (
+                  <button type="button"
+                          className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
+                          onClick={endEvent} disabled={updating}>
+                    {t('endEvent')}
+                  </button>
+                )}
+                {status === 'ENDED' && !viaToken && (
+                  <button type="button"
+                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
+                          onClick={archiveEvent} disabled={updating}>
+                    {t('archive')}
+                  </button>
+                )}
+                {status === 'ARCHIVED' && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={unarchiveEvent} disabled={updating}>
+                    {t('unarchive')}
+                  </button>
+                )}
+                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
+                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
+                <Link href={percorso(editUrl)}
+                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
+                  <Svg name="pencil" size={14} /> {td('editEvent')}
+                </Link>
+                {status === 'PUBLISHED' && (
+                  <button type="button" className="btn btn-outline-warning"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('unpublish')}
+                  </button>
+                )}
+                {/* Solo quando la pagina esiste: in bozza, archiviato o per
+                    una chiamata rapida in corso l'indirizzo risponde «non
+                    trovato». */}
+                {publicPageVisible && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                    <Svg name="external" size={14} /> {t('openPublicPage')}
+                  </a>
+                )}
+                {/* Duplicare crea un evento dello staff: con il solo link del
+                    moderatore la rotta risponde 401. Una chiamata rapida non
+                    ha una «prossima occorrenza». */}
+                {!viaToken && !isInstant && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={duplicateAsNext}
+                          disabled={duplicating}
+                          title={td('duplicateNextHint')}>
+                    <Svg name="copy" size={14} />
+                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
+                  </button>
+                )}
+                {/* In diretta ci sono persone in sala: prima si termina. */}
+                {status !== 'LIVE' && (
+                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
+                                    onDeleted={handleDeleted} />
+                )}
+              </div>
+              {duplicateError && (
+                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
+                  {duplicateError}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="event-manage__summary">
             {/* KPI */}
             <div className="p-4 mb-3" style={CARD}>
               <div className="mb-1" style={EYEBROW}>{td('sidebar.registrations')}</div>
@@ -718,12 +904,23 @@ export default function EventManagementClient({
 
             {/* Reminders */}
             <div className="p-4 mb-3" style={CARD}>
-              <div className="mb-2" style={EYEBROW}>{tr('title')}</div>
-              {event.reminders.length === 0 ? (
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <div style={EYEBROW}>{tr('title')}</div>
+                {/* Si scelgono prima dell'evento: in diretta o dopo non
+                    partirebbero; una chiamata rapida non ne manda. */}
+                {promemoriaModificabili && (
+                  <button type="button" className="btn btn-link btn-sm p-0"
+                          aria-expanded={modificaPromemoria} aria-controls="modifica-promemoria"
+                          onClick={() => setModificaPromemoria((v) => !v)}>
+                    {modificaPromemoria ? tr('editDone') : tr('edit')}
+                  </button>
+                )}
+              </div>
+              {elencoPromemoria.length === 0 ? (
                 <div style={CAPTION}>{td('sidebar.noReminders')}</div>
               ) : (
                 <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
-                  {event.reminders.map((r) => {
+                  {elencoPromemoria.map((r) => {
                     const sent = r.sentCount > 0;
                     // «Non inviata» da solo non distingue «deve ancora partire»
                     // da «non partira' piu'»: lo stato viene dalle stesse
@@ -749,7 +946,14 @@ export default function EventManagementClient({
                         <span aria-hidden="true"
                               style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                                        background: sent ? C_SUCCESS : '#CED4DA' }} />
-                        <span className="flex-grow-1">{r.label}</span>
+                        {/* Il nome nella lingua di chi guarda: l'etichetta
+                            del database e' quella scritta alla creazione. */}
+                        <span className="flex-grow-1">
+                          {(() => {
+                            const chiave = reminderPresetKey(r.offsetMinutes);
+                            return chiave ? tr(`presets.${chiave}`) : r.label;
+                          })()}
+                        </span>
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
                           {sent
                             ? tr('sentStatus', { count: r.sentCount })
@@ -773,6 +977,18 @@ export default function EventManagementClient({
                   })}
                 </ul>
               )}
+              {/* Sempre nella pagina finche' si puo' modificare (il pulsante lo
+                  controlla), nascosto quando e' chiuso: un salvataggio in
+                  corso finisce anche se lo si chiude. Cambiato lo stato
+                  (avviato, archiviato) sparisce con il pulsante. */}
+              {promemoriaModificabili && (
+                <div id="modifica-promemoria" hidden={!modificaPromemoria}>
+                  <EventRemindersEditor eventSlug={event.slug} moderatorToken={event.moderatorToken}
+                                        startsAt={event.startsAt} reminders={elencoPromemoria}
+                                        aperto={modificaPromemoria}
+                                        onChange={setElencoPromemoria} />
+                </div>
+              )}
             </div>
 
             {/* Tags recap */}
@@ -788,83 +1004,34 @@ export default function EventManagementClient({
                 </div>
               </div>
             )}
-
-            {/* Actions */}
-            <div className="p-4 mb-3" style={CARD}>
-              <div className="d-grid gap-2">
-                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
-                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
-                    organizza. */}
-                {canStartManually(status) && (
-                  <button type="button"
-                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
-                          onClick={startEvent} disabled={updating}>
-                    <Svg name="video" size={14} /> {t('startEvent')}
-                  </button>
-                )}
-                <Link href={percorso(editUrl)}
-                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
-                  <Svg name="pencil" size={14} /> {td('editEvent')}
-                </Link>
-                <button type="button"
-                        className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
-                        onClick={togglePublish}
-                        disabled={updating || status === 'LIVE' || status === 'ENDED'}
-                        // Un pulsante spento che non si spiega e' un vicolo
-                        // cieco: chi lo trova grigio non sa se sta sbagliando
-                        // qualcosa o se e' il momento sbagliato.
-                        title={
-                          status === 'LIVE'
-                            ? td('publishBlockedLive')
-                            : status === 'ENDED'
-                              ? td('publishBlockedEnded')
-                              : undefined
-                        }>
-                  {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
-                </button>
-                {(status === 'LIVE' || status === 'ENDED') && (
-                  <div className="text-center mt-1" style={CAPTION}>
-                    {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
-                  </div>
-                )}
-                {/* Solo quando la pagina esiste: in bozza, archiviato o per
-                    una chiamata rapida in corso l'indirizzo risponde «non
-                    trovato». */}
-                {publicPageVisible && (
-                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
-                    <Svg name="external" size={14} /> {t('openPublicPage')}
-                  </a>
-                )}
-                {/* Duplicare crea un evento dello staff: con il solo link del
-                    moderatore la rotta risponde 401. */}
-                {!viaToken && (
-                  <button type="button"
-                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                          onClick={duplicateAsNext}
-                          disabled={duplicating}
-                          title={td('duplicateNextHint')}>
-                    <Svg name="copy" size={14} />
-                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
-                  </button>
-                )}
-                {/* In diretta ci sono persone in sala: prima si termina. */}
-                {status !== 'LIVE' && (
-                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
-                                    onDeleted={handleDeleted} />
-                )}
-              </div>
-              {duplicateError && (
-                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
-                  {duplicateError}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+/**
+ * Cambia i parametri dell'indirizzo senza ricaricare e senza una voce nuova
+ * nella cronologia. Lo stato passato e' `null`: con quello corrente (che
+ * porta il segno interno di Next) il router salterebbe la sincronizzazione,
+ * `useSearchParams` resterebbe indietro e il primo `router.refresh()`
+ * rimetterebbe l'indirizzo vecchio. Safari lancia un errore oltre cento
+ * sostituzioni ravvicinate: l'indirizzo e' un di piu', la pagina va avanti.
+ */
+function aggiornaQuery(cambia: (params: URLSearchParams) => void) {
+  const params = new URLSearchParams(window.location.search);
+  cambia(params);
+  const query = params.toString();
+  try {
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+    );
+  } catch {
+    // Limite del browser alle sostituzioni: resta l'indirizzo di prima.
+  }
 }
 
 // ── TabNav ──
@@ -880,16 +1047,46 @@ function TabNav({ active, onChange, t }: {
     { id: 'dopo', icon: 'video', key: 'tabs.afterEvent' },
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
   ];
+  // Da tastiera, come le schede del sistema: Tab entra sulla scheda attiva
+  // ed esce verso il pannello, le frecce (e Inizio, Fine) spostano il fuoco
+  // da una scheda all'altra, Invio o Spazio la aprono. Aprire a ogni freccia
+  // caricherebbe (con le sue richieste) ogni scheda attraversata.
+  const pulsanti = useRef(new Map<TabId, HTMLButtonElement>());
+  const vaiA = (indice: number) => {
+    const scheda = tabs[(indice + tabs.length) % tabs.length]!;
+    pulsanti.current.get(scheda.id)?.focus();
+  };
   return (
     // Su uno schermo stretto le schede scorrono invece di uscire dalla pagina.
-    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" style={{ borderBottom: 'none' }}>
-      {tabs.map((tab) => {
+    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" aria-label={t('tabs.label')}
+        style={{ borderBottom: 'none' }}>
+      {tabs.map((tab, indice) => {
         const isActive = active === tab.id;
         return (
           <li key={tab.id} className="nav-item" role="presentation">
             <button type="button" role="tab" aria-selected={isActive}
+                    id={`event-tab-${tab.id}`} aria-controls="event-tabpanel"
+                    tabIndex={isActive ? 0 : -1}
+                    ref={(el) => {
+                      if (el) pulsanti.current.set(tab.id, el);
+                      else pulsanti.current.delete(tab.id);
+                    }}
                     className="nav-link d-inline-flex align-items-center gap-2"
                     onClick={() => onChange(tab.id)}
+                    onKeyDown={(e) => {
+                      // Con un modificatore e' una scorciatoia del browser
+                      // (Alt+freccia torna indietro): non la si tocca.
+                      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+                      const passo: Record<string, number> = {
+                        ArrowRight: indice + 1,
+                        ArrowLeft: indice - 1,
+                        Home: 0,
+                        End: tabs.length - 1,
+                      };
+                      if (!(e.key in passo)) return;
+                      e.preventDefault();
+                      vaiA(passo[e.key]!);
+                    }}
                     style={{
                       background: isActive ? '#fff' : 'transparent',
                       color: isActive ? C_PRIMARY : C_MUTED,
@@ -1063,10 +1260,14 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft, linksMailable, editPeopleHref }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
   /** In bozza i link di co-moderatori e relatori partono alla pubblicazione. */
   isDraft: boolean;
+  /** Il portale manda i link per email (non in bozza, non a evento finito). */
+  linksMailable: boolean;
+  /** La modifica sul passo «Persone» del wizard: enti e invitati. */
+  editPeopleHref: string;
   /** Correzione e cancellazione delle iscrizioni: solo con una sessione dello
    *  staff, non con il solo link del moderatore. */
   canEditRegistrations: boolean;
@@ -1085,13 +1286,59 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
 
   return (
     <>
+      {/* Gli enti che organizzano, come li vede la pagina pubblica. */}
+      <section className="mb-4" aria-labelledby="enti-titolo">
+        <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <h2 id="enti-titolo" className="fw-semibold mb-0" style={{ color: C_INK, fontSize: '1rem' }}>
+            {t('invitationsPanel.organizersTitle')}
+          </h2>
+          <Link href={percorso(editPeopleHref)} className="btn btn-outline-primary btn-sm">
+            {t('invitationsPanel.organizersEdit')}
+          </Link>
+        </div>
+        {event.organizers.length === 0 ? (
+          <p className="mb-0" style={{ color: C_MUTED, fontSize: '0.9rem' }}>{t('invitationsPanel.organizersEmpty')}</p>
+        ) : (
+          <ul className="list-unstyled d-flex flex-wrap gap-3 mb-0">
+            {/* Con gli stessi filtri della pagina pubblica: solo loghi serviti
+                dall'app (niente richieste a siti terzi), solo siti http(s). */}
+            {event.organizers.map((o) => {
+              const logo = logoPubblico(o.logoUrl);
+              const sito = sitoPubblico(o.websiteUrl);
+              return (
+                <li key={o.id} className="d-flex align-items-center gap-2 px-3 py-2" style={CARD}>
+                  {logo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={logo} alt="" style={{ height: 28, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />
+                  )}
+                  {sito ? (
+                    <a href={sito} target="_blank" rel="noopener noreferrer">{o.name}</a>
+                  ) : (
+                    <span>{o.name}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       <div className="mb-4">
         <H>{t('coModerators.title')}</H>
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
                               eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
-                              baseUrl={baseUrl} locale={locale} isDraft={isDraft} />
+                              baseUrl={baseUrl} locale={locale} isDraft={isDraft}
+                              canResend={linksMailable} />
       </div>
+
+      {/* Gli invitati: la rotta e' dello staff, non del link del moderatore. */}
+      {canEditRegistrations && (
+        <div className="mb-4">
+          <EventInvitationsPanel eventId={event.id} invitationOnly={!event.registrationOpen}
+                                 editHref={editPeopleHref} />
+        </div>
+      )}
 
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -1335,8 +1582,33 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     }
   }, [event.id, td, tApi]);
 
+  // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
+  // evento concluso e' la prima cosa da fare, e sta in cima.
+  const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
+  const bloccoRegistrazione = (
+      <div className="mb-4">
+        <H>{td('recordingSection')}</H>
+        <RecordingManagement
+          event={{
+            id: event.id, slug: event.slug, status,
+            recordingEnabled: event.recordingEnabled,
+            recordingUrl: event.recordingUrl,
+            tempRecordingUrl: event.tempRecordingUrl,
+            tempRecordingStartedAt: event.tempRecordingStartedAt,
+            recordingPublished: event.recordingPublished,
+            recordingPublishedAt: event.recordingPublishedAt,
+            recordingFileSize: event.recordingFileSize,
+            recordingDuration: event.recordingDuration,
+            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            moderatorToken: event.moderatorToken,
+          }}
+        />
+      </div>
+  );
+
   return (
     <>
+      {registrazioneInCima && bloccoRegistrazione}
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
@@ -1465,25 +1737,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         <GlossaryManager apiBase={`/api/admin/events/${event.id}/glossary`} token={viaToken} scope="event" />
       </div>
 
-      {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}
-      <div className="mb-4">
-        <H>{td('recordingSection')}</H>
-        <RecordingManagement
-          event={{
-            id: event.id, slug: event.slug, status,
-            recordingEnabled: event.recordingEnabled,
-            recordingUrl: event.recordingUrl,
-            tempRecordingUrl: event.tempRecordingUrl,
-            tempRecordingStartedAt: event.tempRecordingStartedAt,
-            recordingPublished: event.recordingPublished,
-            recordingPublishedAt: event.recordingPublishedAt,
-            recordingFileSize: event.recordingFileSize,
-            recordingDuration: event.recordingDuration,
-            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
-            moderatorToken: event.moderatorToken,
-          }}
-        />
-      </div>
+      {!registrazioneInCima && bloccoRegistrazione}
 
       {/* Le sessioni sono il registro di cio' che e' successo in sala: chi si
           e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
@@ -1563,6 +1817,8 @@ function CreatedSummary({
   publishFailed,
   unsaved,
   shareUrl,
+  onPublish,
+  publishing = false,
   onPeople,
   onClose,
 }: {
@@ -1570,6 +1826,9 @@ function CreatedSummary({
   publishFailed: boolean;
   unsaved: CreationOutcome['unsaved'];
   shareUrl: string | null;
+  /** In bozza: pubblicare da qui, senza cercare il pulsante. */
+  onPublish?: () => void;
+  publishing?: boolean;
   onPeople: () => void;
   onClose: () => void;
 }) {
@@ -1590,6 +1849,11 @@ function CreatedSummary({
           <p className="mb-2">{testo}</p>
           {mancanti && <p className="mb-2">{tc('unsaved', { items: mancanti })}</p>}
           <div className="d-flex flex-wrap gap-2 align-items-center">
+            {onPublish && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={onPublish} disabled={publishing}>
+                {tc('publishNow')}
+              </button>
+            )}
             {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
             <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
               {tc('sendToSpeakers')}

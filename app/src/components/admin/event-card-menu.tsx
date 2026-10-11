@@ -7,6 +7,7 @@ import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { eventAdminPath } from '@/lib/events/admin-links';
+import { moderatorRoomOpen } from '@/lib/events/participant-entry';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -27,6 +28,7 @@ export interface EventCardMenuEvent {
   status: string;
   eventType: string;
   moderatorToken: string;
+  endsAt: string;
 }
 
 export default function EventCardMenu({
@@ -202,6 +204,21 @@ export default function EventCardMenu({
             border: '1px solid #d9dadb',
           }}
         >
+          {/* Con la sala aperta, entrare e' la prima cosa che si cerca: la
+              stessa regola della pagina di gestione (moderatorRoomOpen). Un
+              pulsante, non un link: l'indirizzo porta il token del
+              moderatore, che passandoci sopra si vedrebbe. */}
+          {['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status) && moderatorRoomOpen(event) && (
+            <li>
+              <button
+                type="button"
+                className={voce}
+                onClick={() => router.push(percorso(`/events/${event.slug}/live?token=${event.moderatorToken}`))}
+              >
+                {t('enterRoom')}
+              </button>
+            </li>
+          )}
           <li>
             <Link
               className={voce}

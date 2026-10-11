@@ -59,11 +59,39 @@ export const GET = withErrorHandling(async (_request, context) => {
     orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
   });
 
+  // Chi fra gli invitati si e' gia' iscritto: per l'impronta dell'indirizzo,
+  // la stessa delle iscrizioni (con l'accesso «solo invitati» e' la domanda
+  // che chi organizza si fa). Gli inviti di prima della cifratura non hanno
+  // l'impronta: si calcola dall'indirizzo, che e' ancora in chiaro.
+  const impronte = rows.map((r) => {
+    if (r.emailHash) return r.emailHash;
+    const indirizzo = tryDecryptPII(r.email)?.trim();
+    return indirizzo ? hashEmail(indirizzo) : null;
+  });
+  const daCercare = impronte.filter((h): h is string => !!h);
+  const iscritte = new Set(
+    daCercare.length > 0
+      ? (
+          await prisma.registration.findMany({
+            where: { eventId: event.id, emailHash: { in: daCercare } },
+            select: { emailHash: true },
+          })
+        ).map((r) => r.emailHash)
+      : [],
+  );
+
+  // Solo i campi che servono: l'impronta e il link d'iscrizione dell'invito
+  // restano sul server.
   return Response.json({
-    rows: rows.map((r) => ({
-      ...r,
+    rows: rows.map((r, i) => ({
+      id: r.id,
+      eventId: r.eventId,
+      personId: r.personId,
+      role: r.role,
       name: tryDecryptPII(r.name),
       email: tryDecryptPII(r.email),
+      createdAt: r.createdAt,
+      registered: iscritte.has(impronte[i] ?? ''),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.
       person: conRubrica && r.person

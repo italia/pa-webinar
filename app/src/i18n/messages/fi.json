@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderoi kuten moderaattori ja esitetään tapahtuman järjestäjien joukossa. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa.",
       "organization": "Organisaatio (valinnainen)",
       "publicListed": "Näytä julkisella sivulla",
-      "onPublicPage": "Julkisella sivulla"
+      "onPublicPage": "Julkisella sivulla",
+      "resend": "Lähetä linkki uudelleen",
+      "resendDone": "Linkki lähetetty uudelleen henkilölle {name}.",
+      "resendTooMany": "Liian monta lähetystä lyhyessä ajassa: yritä uudelleen muutaman minuutin kuluttua.",
+      "resendFailed": "Lähetys epäonnistui. Yritä uudelleen."
     },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Poistetaanko tapahtuma?",
         "deleteMessage": "”{title}” ja kaikki sen tiedot poistetaan. Toimintoa ei voi perua.",
         "deleted": "Tapahtuma poistettu",
-        "failed": "Toiminto epäonnistui. Yritä uudelleen."
+        "failed": "Toiminto epäonnistui. Yritä uudelleen.",
+        "enterRoom": "Siirry huoneeseen"
       },
       "instantBadge": "Pikapuhelu",
       "moderatorsSpeakers": "{mods, plural, one {# moderaattori} other {# moderaattoria}} · {speakers, plural, one {# puhuja} other {# puhujaa}}",
       "postEventSummary": "{connected} liittyi · {registered} ilmoittautunutta",
-      "registeredCount": "{count, plural, =0 {Ei ilmoittautumisia} one {1 ilmoittautuminen} other {# ilmoittautumista}}"
+      "registeredCount": "{count, plural, =0 {Ei ilmoittautumisia} one {1 ilmoittautuminen} other {# ilmoittautumista}}",
+      "sortUpcoming": "Tulevat ensin",
+      "todayTitle": "Tänään ja käynnissä"
     },
     "tags": {
       "subtitle": "Luo, muokkaa ja poista tageja, joilla luokitellaan ja suodatetaan julkisia tapahtumia.",
@@ -2510,7 +2517,8 @@
         "people": "Henkilöt",
         "content": "Sisältö",
         "analytics": "Tilastot",
-        "afterEvent": "Tapahtuman jälkeen"
+        "afterEvent": "Tapahtuman jälkeen",
+        "label": "Tapahtuman osiot"
       },
       "toggles": {
         "unmute": "Osallistujat voivat avata mikrofonin",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen.",
       "capacitySection": "Kapasiteetti ja infrastruktuuri",
       "capacitySubtitle": "Mitoitettu noin {max} odotetulle osallistujalle",
-      "publishBlockedLive": "Tapahtuma on jo käynnissä",
-      "publishBlockedEnded": "Tapahtuma on päättynyt",
       "created": {
         "publishedTitle": "Tapahtuma julkaistu",
         "draftTitle": "Luonnos tallennettu",
@@ -2565,7 +2571,8 @@
         "unsaved": "Ei tallennettu: {items}. Voit lisätä ne tältä sivulta.",
         "copyParticipantLink": "Kopioi osallistujien linkki",
         "sendToSpeakers": "Moderaattorien ja puhujien linkit",
-        "close": "Sulje yhteenveto"
+        "close": "Sulje yhteenveto",
+        "publishNow": "Julkaise nyt"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Esikatselu",
       "hidePreview": "Piilota esikatselu",
       "previewLanguage": "Kieli"
+    },
+    "endEvent": "Päätä tapahtuma",
+    "endEventConfirmTitle": "Päätetäänkö tapahtuma kaikilta?",
+    "endEventConfirmMessage": "Kaikki huoneessa näkevät lopetuksen. Tapahtuman jälkeinen sivu noudattaa kohdan ”Tapahtuman jälkeen” valintoja.",
+    "endEventSuccess": "Tapahtuma päätetty.",
+    "endEventFailed": "Tapahtumaa ei voitu päättää. Yritä uudelleen.",
+    "archive": "Arkistoi",
+    "archiveConfirmTitle": "Arkistoidaanko tapahtuma?",
+    "archiveConfirmMessage": "Julkinen sivu ei ole enää näkyvissä. Tiedot säilyvät säilytysajan loppuun, ja voit poistaa tapahtuman arkistosta milloin tahansa.",
+    "archiveSuccess": "Tapahtuma arkistoitu.",
+    "archiveFailed": "Tapahtumaa ei voitu arkistoida. Yritä uudelleen.",
+    "endEventPagePublic": "Se on nyt asetettu julkiseksi.",
+    "endEventPagePrivate": "Se on nyt asetettu yksityiseksi.",
+    "unarchive": "Poista arkistosta",
+    "unarchiveSuccess": "Tapahtuma poistettu arkistosta.",
+    "unarchiveFailed": "Tapahtumaa ei voitu poistaa arkistosta. Yritä uudelleen.",
+    "invitationsPanel": {
+      "title": "Kutsutut",
+      "edit": "Muokkaa kutsuttuja",
+      "introInvitationOnly": "Tapahtuma on vain kutsutuille: vain nämä henkilöt voivat ilmoittautua sillä osoitteella, jolla heidät kutsuttiin.",
+      "introOpen": "Ilmoittautuminen on avoin kaikille: tässä ovat kutsumasi henkilöt ja tieto siitä, ovatko he jo ilmoittautuneet.",
+      "loadError": "Kutsuttujen lataaminen epäonnistui.",
+      "empty": "Ei kutsuttuja.",
+      "emptyInvitationOnly": "Ei vielä kutsuttuja: niin kauan kuin luettelo on tyhjä, kukaan ei voi ilmoittautua.",
+      "registeredCount": "Ilmoittautuneet: {registered}/{total}",
+      "name": "Nimi",
+      "email": "Sähköposti",
+      "status": "Tila",
+      "roleSpeaker": "Puhuja",
+      "registered": "Ilmoittautunut",
+      "notRegistered": "Ei vielä ilmoittautunut",
+      "organizersTitle": "Järjestävät organisaatiot",
+      "organizersEdit": "Muokkaa organisaatioita",
+      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Muistutukset",
     "addReminder": "Lisää muistutus",
     "removeReminder": "Poista",
-    "maxReminders": "Enintään 5 muistutusta tapahtumaa kohti.",
+    "maxReminders": "Enintään {max} muistutusta tapahtumaa kohti.",
     "selectPreset": "Valitse aika...",
     "sentStatus": "{count} lähetetty",
     "notSent": "Ei lähetetty",
@@ -3526,7 +3567,17 @@
       "1hour": "1 tunti ennen",
       "30min": "30 minuuttia ennen",
       "15min": "15 minuuttia ennen"
-    }
+    },
+    "edit": "Muokkaa",
+    "editDone": "Sulje",
+    "editLegend": "Milloin ilmoittautuneille lähetetään muistutus",
+    "alreadySent": "jo lähetetty",
+    "alreadyPassed": "aika on mennyt",
+    "saveFailed": "Muutosta ei voitu tallentaa. Yritä uudelleen.",
+    "errorSent": "Tämä muistutus on jo lähetetty: se säilyy merkintänä lähetetystä.",
+    "errorPassed": "Se hetki on jo mennyt: muistutusta ei koskaan lähetettäisi.",
+    "errorChanged": "Luettelo oli muuttunut: se on nyt ajan tasalla.",
+    "limitReached": "raja täynnä"
   },
   "gdpr": {
     "consent": {

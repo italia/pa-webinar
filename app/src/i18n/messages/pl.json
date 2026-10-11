@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje jak moderator i jest przedstawiany wśród organizatorów wydarzenia. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem.",
       "organization": "Instytucja lub organizacja (opcjonalnie)",
       "publicListed": "Pokaż na stronie publicznej",
-      "onPublicPage": "Na stronie publicznej"
+      "onPublicPage": "Na stronie publicznej",
+      "resend": "Wyślij link ponownie",
+      "resendDone": "Link wysłany ponownie do: {name}.",
+      "resendTooMany": "Zbyt wiele wysyłek w krótkim czasie: spróbuj ponownie za kilka minut.",
+      "resendFailed": "Wysyłka nie powiodła się. Spróbuj ponownie."
     },
     "gdprAuditLog": {
       "title": "Rejestr GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Usunąć wydarzenie?",
         "deleteMessage": "„{title}” i wszystkie jego dane zostaną usunięte. Tej operacji nie można cofnąć.",
         "deleted": "Wydarzenie usunięte",
-        "failed": "Operacja nie powiodła się. Spróbuj ponownie."
+        "failed": "Operacja nie powiodła się. Spróbuj ponownie.",
+        "enterRoom": "Wejdź do sali"
       },
       "instantBadge": "Szybkie połączenie",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} few {# moderatorzy} many {# moderatorów} other {# moderatora}} · {speakers, plural, one {# prelegent} few {# prelegenci} many {# prelegentów} other {# prelegenta}}",
       "postEventSummary": "{connected} dołączonych · {registered} rejestracji",
-      "registeredCount": "{count, plural, =0 {Brak rejestracji} one {1 rejestracja} few {# rejestracje} many {# rejestracji} other {# rejestracji}}"
+      "registeredCount": "{count, plural, =0 {Brak rejestracji} one {1 rejestracja} few {# rejestracje} many {# rejestracji} other {# rejestracji}}",
+      "sortUpcoming": "Najbliższe najpierw",
+      "todayTitle": "Dziś i w toku"
     },
     "tags": {
       "subtitle": "Twórz, edytuj i usuwaj tagi używane do klasyfikacji i filtrowania wydarzeń publicznych.",
@@ -2510,7 +2517,8 @@
         "people": "Osoby",
         "content": "Treści",
         "analytics": "Statystyki",
-        "afterEvent": "Po wydarzeniu"
+        "afterEvent": "Po wydarzeniu",
+        "label": "Sekcje wydarzenia"
       },
       "toggles": {
         "unmute": "Uczestnicy mogą włączyć mikrofon",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Nie udało się powielić. Spróbuj ponownie.",
       "capacitySection": "Pojemność i infrastruktura",
       "capacitySubtitle": "Przygotowane na około {max} przewidywanych uczestników",
-      "publishBlockedLive": "Wydarzenie już trwa",
-      "publishBlockedEnded": "Wydarzenie się zakończyło",
       "created": {
         "publishedTitle": "Wydarzenie opublikowane",
         "draftTitle": "Szkic zapisany",
@@ -2565,7 +2571,8 @@
         "unsaved": "Nie zapisano: {items}. Możesz je dodać na tej stronie.",
         "copyParticipantLink": "Kopiuj link dla uczestników",
         "sendToSpeakers": "Linki moderatorów i prelegentów",
-        "close": "Zamknij podsumowanie"
+        "close": "Zamknij podsumowanie",
+        "publishNow": "Opublikuj teraz"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Podgląd",
       "hidePreview": "Ukryj podgląd",
       "previewLanguage": "Język"
+    },
+    "endEvent": "Zakończ wydarzenie",
+    "endEventConfirmTitle": "Zakończyć wydarzenie dla wszystkich?",
+    "endEventConfirmMessage": "Wszyscy w sali zobaczą zakończenie. Strona po wydarzeniu działa zgodnie z wyborami w „Po wydarzeniu”.",
+    "endEventSuccess": "Wydarzenie zakończone.",
+    "endEventFailed": "Nie udało się zakończyć wydarzenia. Spróbuj ponownie.",
+    "archive": "Archiwizuj",
+    "archiveConfirmTitle": "Zarchiwizować wydarzenie?",
+    "archiveConfirmMessage": "Strona publiczna przestanie być widoczna. Dane zostają do końca okresu przechowywania, a wydarzenie możesz w każdej chwili przywrócić z archiwum.",
+    "archiveSuccess": "Wydarzenie zarchiwizowane.",
+    "archiveFailed": "Nie udało się zarchiwizować wydarzenia. Spróbuj ponownie.",
+    "endEventPagePublic": "Obecnie jest ustawiona jako publiczna.",
+    "endEventPagePrivate": "Obecnie jest ustawiona jako prywatna.",
+    "unarchive": "Przywróć z archiwum",
+    "unarchiveSuccess": "Wydarzenie przywrócone z archiwum.",
+    "unarchiveFailed": "Nie udało się przywrócić wydarzenia z archiwum. Spróbuj ponownie.",
+    "invitationsPanel": {
+      "title": "Zaproszeni",
+      "edit": "Edytuj zaproszonych",
+      "introInvitationOnly": "Wydarzenie jest tylko dla zaproszonych: zapisać się mogą wyłącznie te osoby, podając adres, na który zostały zaproszone.",
+      "introOpen": "Zapisy są otwarte dla wszystkich: oto osoby, które zaprosiłeś, i informacja, czy już się zapisały.",
+      "loadError": "Nie udało się wczytać zaproszonych.",
+      "empty": "Brak zaproszonych.",
+      "emptyInvitationOnly": "Brak zaproszonych: dopóki lista jest pusta, nikt nie może się zapisać.",
+      "registeredCount": "Zapisani: {registered} z {total}",
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Prelegent",
+      "registered": "Zapisany",
+      "notRegistered": "Jeszcze niezapisany",
+      "organizersTitle": "Instytucje organizujące",
+      "organizersEdit": "Edytuj instytucje",
+      "organizersEmpty": "Nie podano instytucji: strona publiczna nie pokazuje, kto organizuje."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Powiadomienia",
     "addReminder": "Dodaj powiadomienie",
     "removeReminder": "Usuń",
-    "maxReminders": "Maksymalnie 5 powiadomień na wydarzenie.",
+    "maxReminders": "Maksymalnie {max} powiadomień na wydarzenie.",
     "selectPreset": "Wybierz kiedy...",
     "sentStatus": "{count} wysłanych",
     "notSent": "Nie wysłano",
@@ -3526,7 +3567,17 @@
       "1hour": "1 godzinę wcześniej",
       "30min": "30 minut wcześniej",
       "15min": "15 minut wcześniej"
-    }
+    },
+    "edit": "Edytuj",
+    "editDone": "Zamknij",
+    "editLegend": "Kiedy powiadomić zapisane osoby",
+    "alreadySent": "już wysłane",
+    "alreadyPassed": "czas minął",
+    "saveFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie.",
+    "errorSent": "To powiadomienie zostało już wysłane: zostaje jako ślad tego, co wysłano.",
+    "errorPassed": "Ten moment już minął: powiadomienie nigdy by nie wyszło.",
+    "errorChanged": "Lista się zmieniła: teraz jest aktualna.",
+    "limitReached": "osiągnięto limit"
   },
   "gdpr": {
     "consent": {

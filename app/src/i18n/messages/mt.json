@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Jimmodera bħal moderatur u jidher fost l-organizzaturi tal-avveniment. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment.",
       "organization": "Entità jew organizzazzjoni (fakultattiv)",
       "publicListed": "Uri fil-paġna pubblika",
-      "onPublicPage": "Fil-paġna pubblika"
+      "onPublicPage": "Fil-paġna pubblika",
+      "resend": "Erġa' ibgħat il-link",
+      "resendDone": "Il-link intbagħat mill-ġdid lil {name}.",
+      "resendTooMany": "Wisq invjijiet f'ħin qasir: erġa' pprova fi ftit minuti.",
+      "resendFailed": "L-invjar ma rnexxiex. Erġa' pprova."
     },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Tħassar l-avveniment?",
         "deleteMessage": "“{title}” u d-data kollha tiegħu se jitħassru. Din l-azzjoni ma tistax titreġġa’ lura.",
         "deleted": "Avveniment imħassar",
-        "failed": "L-operazzjoni ma rnexxietx. Erġa’ pprova."
+        "failed": "L-operazzjoni ma rnexxietx. Erġa’ pprova.",
+        "enterRoom": "Idħol fil-kamra"
       },
       "instantBadge": "Sejħa rapida",
       "moderatorsSpeakers": "{mods, plural, one {# moderatur} other {# moderaturi}} · {speakers, plural, one {# kelliem} other {# kelliema}}",
       "postEventSummary": "{connected} konnessi · {registered} reġistrazzjonijiet",
-      "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}"
+      "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}",
+      "sortUpcoming": "Dawk li ġejjin l-ewwel",
+      "todayTitle": "Illum u għaddejjin"
     },
     "tags": {
       "subtitle": "Crea, tbiddel ed ħassar il-tag usati għal classificaru u filtraru gli avvenimenti pubbliċi.",
@@ -2510,7 +2517,8 @@
         "people": "Persuni",
         "content": "Kontenut",
         "analytics": "Statistiċi",
-        "afterEvent": "Wara l-avveniment"
+        "afterEvent": "Wara l-avveniment",
+        "label": "Taqsimiet tal-avveniment"
       },
       "toggles": {
         "unmute": "Parteċipanti poshuma parlare",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Id-duplikazzjoni ma rnexxietx. Erġa' pprova.",
       "capacitySection": "Kapaċità u infrastruttura",
       "capacitySubtitle": "Iddimensjonat għal madwar {max} parteċipant mistenni",
-      "publishBlockedLive": "L-avveniment diġà għaddej",
-      "publishBlockedEnded": "L-avveniment intemm",
       "created": {
         "publishedTitle": "Avveniment ippubblikat",
         "draftTitle": "Abbozz issejvjat",
@@ -2565,7 +2571,8 @@
         "unsaved": "Ma ġewx issejvjati: {items}. Tista' żżidhom minn din il-paġna.",
         "copyParticipantLink": "Ikkopja l-link għall-parteċipanti",
         "sendToSpeakers": "Links tal-moderaturi u tal-kelliema",
-        "close": "Agħlaq is-sommarju"
+        "close": "Agħlaq is-sommarju",
+        "publishNow": "Ippubblika issa"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Previżjoni",
       "hidePreview": "Aħbi l-previżjoni",
       "previewLanguage": "Lingwa"
+    },
+    "endEvent": "Temm l-avveniment",
+    "endEventConfirmTitle": "Ittemm l-avveniment għal kulħadd?",
+    "endEventConfirmMessage": "Kulħadd fil-kamra se jara l-għeluq. Il-paġna ta' wara l-avveniment issegwi l-għażliet f'«Wara l-avveniment».",
+    "endEventSuccess": "L-avveniment intemm.",
+    "endEventFailed": "L-avveniment ma setax jintemm. Erġa' pprova.",
+    "archive": "Arkivja",
+    "archiveConfirmTitle": "Tarkivja l-avveniment?",
+    "archiveConfirmMessage": "Il-paġna pubblika ma tibqax viżibbli. Id-data tibqa' sal-aħħar tal-perjodu taż-żamma, u tista' toħroġ l-avveniment mill-arkivju meta trid.",
+    "archiveSuccess": "L-avveniment ġie arkivjat.",
+    "archiveFailed": "L-avveniment ma setax jiġi arkivjat. Erġa' pprova.",
+    "endEventPagePublic": "Bħalissa hija ssettjata bħala pubblika.",
+    "endEventPagePrivate": "Bħalissa hija ssettjata bħala privata.",
+    "unarchive": "Oħroġ mill-arkivju",
+    "unarchiveSuccess": "L-avveniment inħareġ mill-arkivju.",
+    "unarchiveFailed": "L-avveniment ma setax jinħareġ mill-arkivju. Erġa' pprova.",
+    "invitationsPanel": {
+      "title": "Mistiedna",
+      "edit": "Editja l-mistiedna",
+      "introInvitationOnly": "L-avveniment huwa b'invit biss: jistgħu jirreġistraw biss dawn il-persuni, bl-indirizz li bih ġew mistiedna.",
+      "introOpen": "Ir-reġistrazzjoni hija miftuħa għal kulħadd: hawnhekk hemm il-persuni li stedint u jekk diġà rreġistrawx.",
+      "loadError": "Ma setgħux jitgħabbew il-mistiedna.",
+      "empty": "L-ebda mistieden.",
+      "emptyInvitationOnly": "Għad m'hemm l-ebda mistieden: sakemm il-lista tkun vojta, ħadd ma jista' jirreġistra.",
+      "registeredCount": "Irreġistrati: {registered} minn {total}",
+      "name": "Isem",
+      "email": "Email",
+      "status": "Status",
+      "roleSpeaker": "Kelliem",
+      "registered": "Irreġistrat",
+      "notRegistered": "Għadu mhux irreġistrat",
+      "organizersTitle": "Entitajiet organizzaturi",
+      "organizersEdit": "Editja l-entitajiet",
+      "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Notifiki",
     "addReminder": "Żid tfakkira",
     "removeReminder": "Neħħi",
-    "maxReminders": "Massimu 5 tfakkiriet għal kull avveniment.",
+    "maxReminders": "Massimu {max} tfakkiriet għal kull avveniment.",
     "selectPreset": "Agħżel meta...",
     "sentStatus": "{count} mibgħuta",
     "notSent": "Mhux mibgħuta",
@@ -3526,7 +3567,17 @@
       "1hour": "Siegħa qabel",
       "30min": "30 minuta qabel",
       "15min": "15-il minuta qabel"
-    }
+    },
+    "edit": "Editja",
+    "editDone": "Agħlaq",
+    "editLegend": "Meta tinnotifika lill-persuni rreġistrati",
+    "alreadySent": "diġà mibgħuta",
+    "alreadyPassed": "il-ħin għadda",
+    "saveFailed": "Il-bidla ma setgħetx tiġi ssejvjata. Erġa' pprova.",
+    "errorSent": "Din in-notifika diġà ntbagħtet: tibqa', bħala rekord ta' x'intbagħat.",
+    "errorPassed": "Dak il-mument diġà għadda: in-notifika qatt ma tintbagħat.",
+    "errorChanged": "Il-lista kienet inbidlet: issa hija aġġornata.",
+    "limitReached": "il-limitu ntlaħaq"
   },
   "gdpr": {
     "consent": {

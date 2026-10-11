@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modhnaíonn sé mar mhodhnóir agus léirítear é i measc eagraithe an imeachta. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin.",
       "organization": "Eagraíocht (roghnach)",
       "publicListed": "Taispeáin ar an leathanach poiblí",
-      "onPublicPage": "Ar an leathanach poiblí"
+      "onPublicPage": "Ar an leathanach poiblí",
+      "resend": "Seol an nasc arís",
+      "resendDone": "Seoladh an nasc arís chuig {name}.",
+      "resendTooMany": "An iomarca seoltaí in achar gearr: déan iarracht arís i gceann cúpla nóiméad.",
+      "resendFailed": "Níorbh fhéidir é a sheoladh. Déan iarracht arís."
     },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "An imeacht a scriosadh?",
         "deleteMessage": "Scriosfar “{title}” agus a chuid sonraí go léir. Ní féidir é seo a chealú.",
         "deleted": "Imeacht scriosta",
-        "failed": "Theip ar an oibríocht. Bain triail eile as."
+        "failed": "Theip ar an oibríocht. Bain triail eile as.",
+        "enterRoom": "Téigh isteach sa seomra"
       },
       "instantBadge": "Glao tapa",
       "moderatorsSpeakers": "{mods, plural, one {# modhnóir} other {# modhnóirí}} · {speakers, plural, one {# cainteoir} other {# cainteoirí}}",
       "postEventSummary": "{connected} ceangailte · {registered} cláruithe",
-      "registeredCount": "{count, plural, =0 {Aon chlárúchán} one {1 chlárúchán} other {# clárúchán}}"
+      "registeredCount": "{count, plural, =0 {Aon chlárúchán} one {1 chlárúchán} other {# clárúchán}}",
+      "sortUpcoming": "Na cinn atá le teacht ar dtús",
+      "todayTitle": "Inniu agus ar siúl"
     },
     "tags": {
       "subtitle": "Cruthaigh, cuir in eagar agus scrios na clibeanna a úsáidtear chun imeachtaí poiblí a aicmiú agus a scagadh.",
@@ -2510,7 +2517,8 @@
         "people": "Daoine",
         "content": "Ábhar",
         "analytics": "Staitisticí",
-        "afterEvent": "Tar éis an imeachta"
+        "afterEvent": "Tar éis an imeachta",
+        "label": "Ranna an imeachta"
       },
       "toggles": {
         "unmute": "Is féidir le rannpháirtithe labhairt",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as.",
       "capacitySection": "Toilleadh agus bonneagar",
       "capacitySubtitle": "Tomhaiste do thart ar {max} rannpháirtí a bhfuiltear ag súil leo",
-      "publishBlockedLive": "Tá an t-imeacht ar siúl cheana féin",
-      "publishBlockedEnded": "Tá an t-imeacht thart",
       "created": {
         "publishedTitle": "Imeacht foilsithe",
         "draftTitle": "Dréacht sábháilte",
@@ -2565,7 +2571,8 @@
         "unsaved": "Níor sábháladh: {items}. Is féidir leat iad a chur leis ón leathanach seo.",
         "copyParticipantLink": "Cóipeáil an nasc do na rannpháirtithe",
         "sendToSpeakers": "Naisc na modhnóirí agus na gcainteoirí",
-        "close": "Dún an achoimre"
+        "close": "Dún an achoimre",
+        "publishNow": "Foilsigh anois"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Réamhamharc",
       "hidePreview": "Folaigh an réamhamharc",
       "previewLanguage": "Teanga"
+    },
+    "endEvent": "Cuir deireadh leis an ócáid",
+    "endEventConfirmTitle": "Deireadh a chur leis an ócáid do chách?",
+    "endEventConfirmMessage": "Feicfidh gach duine sa seomra an dúnadh. Leanann an leathanach i ndiaidh na hócáide na roghanna in «Tar éis an imeachta».",
+    "endEventSuccess": "Cuireadh deireadh leis an ócáid.",
+    "endEventFailed": "Níorbh fhéidir deireadh a chur leis an ócáid. Bain triail eile as.",
+    "archive": "Cartlannaigh",
+    "archiveConfirmTitle": "An ócáid a chartlannú?",
+    "archiveConfirmMessage": "Ní bheidh an leathanach poiblí le feiceáil a thuilleadh. Fanann na sonraí go deireadh na tréimhse coinneála, agus is féidir leat an ócáid a bhaint den chartlann am ar bith.",
+    "archiveSuccess": "Cartlannaíodh an ócáid.",
+    "archiveFailed": "Níorbh fhéidir an ócáid a chartlannú. Bain triail eile as.",
+    "endEventPagePublic": "Tá sé socraithe mar phoiblí faoi láthair.",
+    "endEventPagePrivate": "Tá sé socraithe mar phríobháideach faoi láthair.",
+    "unarchive": "Bain den chartlann",
+    "unarchiveSuccess": "Baineadh an ócáid den chartlann.",
+    "unarchiveFailed": "Níorbh fhéidir an ócáid a bhaint den chartlann. Bain triail eile as.",
+    "invitationsPanel": {
+      "title": "Daoine a tugadh cuireadh dóibh",
+      "edit": "Cuir na cuirí in eagar",
+      "introInvitationOnly": "Is ar chuireadh amháin atá an t-imeacht: ní féidir ach leis na daoine seo clárú, leis an seoladh lenar tugadh cuireadh dóibh.",
+      "introOpen": "Tá an clárú oscailte do chách: seo iad na daoine ar thug tú cuireadh dóibh agus an bhfuil siad cláraithe cheana.",
+      "loadError": "Níorbh fhéidir na cuirí a lódáil.",
+      "empty": "Níl aon chuireadh ann.",
+      "emptyInvitationOnly": "Níl aon chuireadh ann fós: fad is atá an liosta folamh, ní féidir le duine ar bith clárú.",
+      "registeredCount": "Cláraithe: {registered} as {total}",
+      "name": "Ainm",
+      "email": "Ríomhphost",
+      "status": "Stádas",
+      "roleSpeaker": "Cainteoir",
+      "registered": "Cláraithe",
+      "notRegistered": "Gan clárú fós",
+      "organizersTitle": "Comhlachtaí eagraithe",
+      "organizersEdit": "Cuir na comhlachtaí in eagar",
+      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Fógraí",
     "addReminder": "Cuir meabhrúchán leis",
     "removeReminder": "Bain",
-    "maxReminders": "Uasmhéid 5 mheabhrúchán in aghaidh an imeachta.",
+    "maxReminders": "Uasmhéid {max} mheabhrúchán in aghaidh an imeachta.",
     "selectPreset": "Roghnaigh cathain...",
     "sentStatus": "{count} seolta",
     "notSent": "Gan seoladh",
@@ -3526,7 +3567,17 @@
       "1hour": "1 uair roimhe",
       "30min": "30 nóiméad roimhe",
       "15min": "15 nóiméad roimhe"
-    }
+    },
+    "edit": "Cuir in eagar",
+    "editDone": "Dún",
+    "editLegend": "Cathain is ceart fógra a sheoladh chuig na daoine cláraithe",
+    "alreadySent": "seolta cheana",
+    "alreadyPassed": "tá an t-am caite",
+    "saveFailed": "Níorbh fhéidir an t-athrú a shábháil. Déan iarracht arís.",
+    "errorSent": "Seoladh an fógra seo cheana: fanann sé, mar thaifead ar a seoladh.",
+    "errorPassed": "Tá an nóiméad sin caite cheana: ní sheolfaí an fógra choíche.",
+    "errorChanged": "Bhí an liosta athraithe: tá sé cothrom le dáta anois.",
+    "limitReached": "teorainn bainte amach"
   },
   "gdpr": {
     "consent": {

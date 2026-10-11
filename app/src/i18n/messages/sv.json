@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modererar som en moderator och presenteras bland evenemangets arrangörer. Med ett personalkonto med samma e-post hanterar personen även evenemanget.",
       "organization": "Organisation (valfritt)",
       "publicListed": "Visa på den offentliga sidan",
-      "onPublicPage": "På den offentliga sidan"
+      "onPublicPage": "På den offentliga sidan",
+      "resend": "Skicka länken igen",
+      "resendDone": "Länken har skickats igen till {name}.",
+      "resendTooMany": "För många utskick på kort tid: försök igen om några minuter.",
+      "resendFailed": "Det gick inte att skicka. Försök igen."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Ta bort evenemanget?",
         "deleteMessage": "”{title}” och alla dess data tas bort. Det går inte att ångra.",
         "deleted": "Evenemanget borttaget",
-        "failed": "Åtgärden misslyckades. Försök igen."
+        "failed": "Åtgärden misslyckades. Försök igen.",
+        "enterRoom": "Gå in i rummet"
       },
       "instantBadge": "Snabbsamtal",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatorer}} · {speakers, plural, one {# talare} other {# talare}}",
       "postEventSummary": "{connected} anslöt · {registered} anmälda",
-      "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}"
+      "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}",
+      "sortUpcoming": "Kommande först",
+      "todayTitle": "I dag och pågående"
     },
     "tags": {
       "subtitle": "Skapa, redigera och radera taggar som används för att klassificera och filtrera publika evenemang.",
@@ -2510,7 +2517,8 @@
         "people": "Personer",
         "content": "Innehåll",
         "analytics": "Statistik",
-        "afterEvent": "Efter evenemanget"
+        "afterEvent": "Efter evenemanget",
+        "label": "Evenemangets delar"
       },
       "toggles": {
         "unmute": "Deltagare får tala",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Dupliceringen misslyckades. Försök igen.",
       "capacitySection": "Kapacitet och infrastruktur",
       "capacitySubtitle": "Dimensionerat för omkring {max} förväntade deltagare",
-      "publishBlockedLive": "Evenemanget pågår redan",
-      "publishBlockedEnded": "Evenemanget är avslutat",
       "created": {
         "publishedTitle": "Evenemanget publicerat",
         "draftTitle": "Utkast sparat",
@@ -2565,7 +2571,8 @@
         "unsaved": "Inte sparade: {items}. Du kan lägga till dem från den här sidan.",
         "copyParticipantLink": "Kopiera länken för deltagare",
         "sendToSpeakers": "Länkar för moderatorer och talare",
-        "close": "Stäng sammanfattningen"
+        "close": "Stäng sammanfattningen",
+        "publishNow": "Publicera nu"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Förhandsvisning",
       "hidePreview": "Dölj förhandsvisning",
       "previewLanguage": "Språk"
+    },
+    "endEvent": "Avsluta evenemang",
+    "endEventConfirmTitle": "Avsluta evenemanget för alla?",
+    "endEventConfirmMessage": "Alla i rummet ser avslutningen. Sidan efter evenemanget följer valen under ”Efter evenemanget”.",
+    "endEventSuccess": "Evenemanget har avslutats.",
+    "endEventFailed": "Evenemanget kunde inte avslutas. Försök igen.",
+    "archive": "Arkivera",
+    "archiveConfirmTitle": "Arkivera evenemanget?",
+    "archiveConfirmMessage": "Den offentliga sidan syns inte längre. Uppgifterna finns kvar tills lagringstiden går ut, och du kan ta ut evenemanget ur arkivet när du vill.",
+    "archiveSuccess": "Evenemanget har arkiverats.",
+    "archiveFailed": "Evenemanget kunde inte arkiveras. Försök igen.",
+    "endEventPagePublic": "Den är just nu inställd som offentlig.",
+    "endEventPagePrivate": "Den är just nu inställd som privat.",
+    "unarchive": "Ta ut ur arkivet",
+    "unarchiveSuccess": "Evenemanget har tagits ut ur arkivet.",
+    "unarchiveFailed": "Evenemanget kunde inte tas ut ur arkivet. Försök igen.",
+    "invitationsPanel": {
+      "title": "Inbjudna",
+      "edit": "Redigera inbjudna",
+      "introInvitationOnly": "Evenemanget är endast för inbjudna: bara dessa personer kan anmäla sig, med den adress de bjöds in med.",
+      "introOpen": "Anmälan är öppen för alla: här finns de personer du har bjudit in och om de redan har anmält sig.",
+      "loadError": "Det gick inte att läsa in de inbjudna.",
+      "empty": "Inga inbjudna.",
+      "emptyInvitationOnly": "Inga inbjudna ännu: så länge listan är tom kan ingen anmäla sig.",
+      "registeredCount": "Anmälda: {registered} av {total}",
+      "name": "Namn",
+      "email": "E-post",
+      "status": "Status",
+      "roleSpeaker": "Talare",
+      "registered": "Anmäld",
+      "notRegistered": "Inte anmäld ännu",
+      "organizersTitle": "Arrangerande organisationer",
+      "organizersEdit": "Redigera organisationer",
+      "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Påminnelser",
     "addReminder": "Lägg till påminnelse",
     "removeReminder": "Ta bort",
-    "maxReminders": "Max 5 påminnelser per evenemang.",
+    "maxReminders": "Max {max} påminnelser per evenemang.",
     "selectPreset": "Välj när...",
     "sentStatus": "{count} skickade",
     "notSent": "Ej skickad",
@@ -3526,7 +3567,17 @@
       "1hour": "1 timme innan",
       "30min": "30 minuter innan",
       "15min": "15 minuter innan"
-    }
+    },
+    "edit": "Redigera",
+    "editDone": "Stäng",
+    "editLegend": "När anmälda ska få en påminnelse",
+    "alreadySent": "redan skickad",
+    "alreadyPassed": "tiden har passerat",
+    "saveFailed": "Det gick inte att spara ändringen. Försök igen.",
+    "errorSent": "Den här påminnelsen har redan skickats: den finns kvar som underlag för vad som skickades.",
+    "errorPassed": "Den tidpunkten har redan passerat: påminnelsen skulle aldrig skickas.",
+    "errorChanged": "Listan hade ändrats: den är nu uppdaterad.",
+    "limitReached": "gränsen nådd"
   },
   "gdpr": {
     "consent": {

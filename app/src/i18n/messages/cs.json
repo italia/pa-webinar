@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje jako moderátor a je uveden mezi pořadateli akce. S účtem personálu se stejným e-mailem akci také spravuje.",
       "organization": "Organizace (volitelné)",
       "publicListed": "Zobrazit na veřejné stránce",
-      "onPublicPage": "Na veřejné stránce"
+      "onPublicPage": "Na veřejné stránce",
+      "resend": "Znovu poslat odkaz",
+      "resendDone": "Odkaz znovu odeslán: {name}.",
+      "resendTooMany": "Příliš mnoho odeslání v krátké době: zkuste to prosím za pár minut.",
+      "resendFailed": "Odeslání se nezdařilo. Zkuste to prosím znovu."
     },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Smazat událost?",
         "deleteMessage": "„{title}“ a všechna její data budou smazána. Tuto akci nelze vrátit.",
         "deleted": "Událost smazána",
-        "failed": "Operace se nezdařila. Zkuste to znovu."
+        "failed": "Operace se nezdařila. Zkuste to znovu.",
+        "enterRoom": "Vstoupit do místnosti"
       },
       "instantBadge": "Rychlý hovor",
       "moderatorsSpeakers": "{mods, plural, one {# moderátor} few {# moderátoři} many {# moderátoru} other {# moderátorů}} · {speakers, plural, one {# řečník} few {# řečníci} many {# řečníku} other {# řečníků}}",
       "postEventSummary": "{connected} připojených · {registered} registrací",
-      "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}"
+      "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}",
+      "sortUpcoming": "Nejbližší nejdřív",
+      "todayTitle": "Dnes a právě probíhá"
     },
     "tags": {
       "subtitle": "Vytvářejte, upravujte a mažte štítky používané pro klasifikaci a filtrování veřejných událostí.",
@@ -2510,7 +2517,8 @@
         "people": "Osoby",
         "content": "Obsah",
         "analytics": "Statistiky",
-        "afterEvent": "Po události"
+        "afterEvent": "Po události",
+        "label": "Části události"
       },
       "toggles": {
         "unmute": "Účastníci mohou mluvit",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu.",
       "capacitySection": "Kapacita a infrastruktura",
       "capacitySubtitle": "Dimenzováno pro přibližně {max} očekávaných účastníků",
-      "publishBlockedLive": "Událost už probíhá",
-      "publishBlockedEnded": "Událost skončila",
       "created": {
         "publishedTitle": "Událost zveřejněna",
         "draftTitle": "Koncept uložen",
@@ -2565,7 +2571,8 @@
         "unsaved": "Neuloženo: {items}. Můžete je přidat na této stránce.",
         "copyParticipantLink": "Kopírovat odkaz pro účastníky",
         "sendToSpeakers": "Odkazy moderátorů a řečníků",
-        "close": "Zavřít souhrn"
+        "close": "Zavřít souhrn",
+        "publishNow": "Zveřejnit hned"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Náhled",
       "hidePreview": "Skrýt náhled",
       "previewLanguage": "Jazyk"
+    },
+    "endEvent": "Ukončit akci",
+    "endEventConfirmTitle": "Ukončit akci pro všechny?",
+    "endEventConfirmMessage": "Všichni v místnosti uvidí ukončení. Stránka po akci se řídí volbami v „Po události“.",
+    "endEventSuccess": "Akce ukončena.",
+    "endEventFailed": "Akci se nepodařilo ukončit. Zkuste to znovu.",
+    "archive": "Archivovat",
+    "archiveConfirmTitle": "Archivovat akci?",
+    "archiveConfirmMessage": "Veřejná stránka už nebude vidět. Data zůstanou do konce doby uchování a akci můžete kdykoli vyjmout z archivu.",
+    "archiveSuccess": "Akce archivována.",
+    "archiveFailed": "Akci se nepodařilo archivovat. Zkuste to znovu.",
+    "endEventPagePublic": "Nyní je nastavená jako veřejná.",
+    "endEventPagePrivate": "Nyní je nastavená jako soukromá.",
+    "unarchive": "Vyjmout z archivu",
+    "unarchiveSuccess": "Akce vyjmuta z archivu.",
+    "unarchiveFailed": "Akci se nepodařilo vyjmout z archivu. Zkuste to znovu.",
+    "invitationsPanel": {
+      "title": "Pozvaní",
+      "edit": "Upravit pozvané",
+      "introInvitationOnly": "Událost je pouze pro pozvané: přihlásit se mohou jen tyto osoby, s adresou, na kterou byly pozvány.",
+      "introOpen": "Přihlášení je otevřené všem: zde jsou osoby, které jste pozvali, a zda se už přihlásily.",
+      "loadError": "Pozvané se nepodařilo načíst.",
+      "empty": "Žádní pozvaní.",
+      "emptyInvitationOnly": "Zatím žádní pozvaní: dokud je seznam prázdný, nikdo se nemůže přihlásit.",
+      "registeredCount": "Přihlášeno: {registered} z {total}",
+      "name": "Jméno",
+      "email": "E-mail",
+      "status": "Stav",
+      "roleSpeaker": "Řečník",
+      "registered": "Přihlášen",
+      "notRegistered": "Dosud nepřihlášen",
+      "organizersTitle": "Pořádající instituce",
+      "organizersEdit": "Upravit instituce",
+      "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Upozornění",
     "addReminder": "Přidat upozornění",
     "removeReminder": "Odebrat",
-    "maxReminders": "Maximálně 5 upozornění na událost.",
+    "maxReminders": "Maximálně {max} upozornění na událost.",
     "selectPreset": "Vyberte kdy...",
     "sentStatus": "{count} odesláno",
     "notSent": "Neodesláno",
@@ -3526,7 +3567,17 @@
       "1hour": "1 hodinu předem",
       "30min": "30 minut předem",
       "15min": "15 minut předem"
-    }
+    },
+    "edit": "Upravit",
+    "editDone": "Zavřít",
+    "editLegend": "Kdy upozornit přihlášené",
+    "alreadySent": "již odesláno",
+    "alreadyPassed": "čas uplynul",
+    "saveFailed": "Změnu se nepodařilo uložit. Zkuste to prosím znovu.",
+    "errorSent": "Toto upozornění už bylo odesláno: zůstává jako záznam o tom, co se odeslalo.",
+    "errorPassed": "Ten okamžik už uplynul: upozornění by se nikdy neodeslalo.",
+    "errorChanged": "Seznam se změnil: nyní je aktuální.",
+    "limitReached": "limit dosažen"
   },
   "gdpr": {
     "consent": {

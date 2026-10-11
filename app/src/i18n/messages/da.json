@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modererer som en moderator og præsenteres blandt arrangementets arrangører. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet.",
       "organization": "Organisation (valgfrit)",
       "publicListed": "Vis på den offentlige side",
-      "onPublicPage": "På den offentlige side"
+      "onPublicPage": "På den offentlige side",
+      "resend": "Send link igen",
+      "resendDone": "Link sendt igen til {name}.",
+      "resendTooMany": "For mange afsendelser på kort tid: prøv igen om et par minutter.",
+      "resendFailed": "Afsendelsen mislykkedes. Prøv igen."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Slet arrangementet?",
         "deleteMessage": "»{title}« og alle tilhørende data slettes. Det kan ikke fortrydes.",
         "deleted": "Arrangement slettet",
-        "failed": "Handlingen mislykkedes. Prøv igen."
+        "failed": "Handlingen mislykkedes. Prøv igen.",
+        "enterRoom": "Gå ind i rummet"
       },
       "instantBadge": "Hurtigopkald",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatorer}} · {speakers, plural, one {# oplægsholder} other {# oplægsholdere}}",
       "postEventSummary": "{connected} tilsluttede · {registered} tilmeldinger",
-      "registeredCount": "{count, plural, =0 {Ingen tilmeldinger} one {1 tilmelding} other {# tilmeldinger}}"
+      "registeredCount": "{count, plural, =0 {Ingen tilmeldinger} one {1 tilmelding} other {# tilmeldinger}}",
+      "sortUpcoming": "Kommende først",
+      "todayTitle": "I dag og i gang"
     },
     "tags": {
       "subtitle": "Opret, rediger og slet de tags, der bruges til at klassificere og filtrere offentlige arrangementer.",
@@ -2510,7 +2517,8 @@
         "people": "Personer",
         "content": "Indhold",
         "analytics": "Statistik",
-        "afterEvent": "Efter begivenheden"
+        "afterEvent": "Efter begivenheden",
+        "label": "Begivenhedens sektioner"
       },
       "toggles": {
         "unmute": "Deltagere kan slå mikrofonen til",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Dubleringen mislykkedes. Prøv igen.",
       "capacitySection": "Kapacitet og infrastruktur",
       "capacitySubtitle": "Dimensioneret til ca. {max} forventede deltagere",
-      "publishBlockedLive": "Begivenheden er allerede i gang",
-      "publishBlockedEnded": "Begivenheden er afsluttet",
       "created": {
         "publishedTitle": "Arrangement offentliggjort",
         "draftTitle": "Kladde gemt",
@@ -2565,7 +2571,8 @@
         "unsaved": "Ikke gemt: {items}. Du kan tilføje dem fra denne side.",
         "copyParticipantLink": "Kopiér linket til deltagerne",
         "sendToSpeakers": "Links til moderatorer og talere",
-        "close": "Luk oversigten"
+        "close": "Luk oversigten",
+        "publishNow": "Offentliggør nu"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Forhåndsvisning",
       "hidePreview": "Skjul forhåndsvisning",
       "previewLanguage": "Sprog"
+    },
+    "endEvent": "Afslut arrangement",
+    "endEventConfirmTitle": "Afslut arrangementet for alle?",
+    "endEventConfirmMessage": "Alle i rummet ser afslutningen. Siden efter arrangementet følger valgene under »Efter begivenheden«.",
+    "endEventSuccess": "Arrangementet er afsluttet.",
+    "endEventFailed": "Arrangementet kunne ikke afsluttes. Prøv igen.",
+    "archive": "Arkivér",
+    "archiveConfirmTitle": "Arkivér arrangementet?",
+    "archiveConfirmMessage": "Den offentlige side vil ikke længere være synlig. Dataene bevares til opbevaringsperioden udløber, og du kan til enhver tid fjerne arrangementet fra arkivet.",
+    "archiveSuccess": "Arrangementet er arkiveret.",
+    "archiveFailed": "Arrangementet kunne ikke arkiveres. Prøv igen.",
+    "endEventPagePublic": "Den er lige nu sat til offentlig.",
+    "endEventPagePrivate": "Den er lige nu sat til privat.",
+    "unarchive": "Fjern fra arkivet",
+    "unarchiveSuccess": "Arrangementet er fjernet fra arkivet.",
+    "unarchiveFailed": "Arrangementet kunne ikke fjernes fra arkivet. Prøv igen.",
+    "invitationsPanel": {
+      "title": "Inviterede",
+      "edit": "Rediger inviterede",
+      "introInvitationOnly": "Begivenheden er kun for inviterede: kun disse personer kan tilmelde sig med den adresse, de blev inviteret med.",
+      "introOpen": "Tilmeldingen er åben for alle: her er de personer, du har inviteret, og om de allerede har tilmeldt sig.",
+      "loadError": "Kunne ikke indlæse de inviterede.",
+      "empty": "Ingen inviterede.",
+      "emptyInvitationOnly": "Ingen inviterede endnu: så længe listen er tom, kan ingen tilmelde sig.",
+      "registeredCount": "Tilmeldt: {registered} af {total}",
+      "name": "Navn",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Taler",
+      "registered": "Tilmeldt",
+      "notRegistered": "Endnu ikke tilmeldt",
+      "organizersTitle": "Arrangerende organisationer",
+      "organizersEdit": "Rediger organisationer",
+      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Påmindelser",
     "addReminder": "Tilføj påmindelse",
     "removeReminder": "Fjern",
-    "maxReminders": "Maks. 5 påmindelser pr. begivenhed.",
+    "maxReminders": "Maks. {max} påmindelser pr. begivenhed.",
     "selectPreset": "Vælg hvornår...",
     "sentStatus": "{count} sendt",
     "notSent": "Ikke sendt",
@@ -3526,7 +3567,17 @@
       "1hour": "1 time før",
       "30min": "30 minutter før",
       "15min": "15 minutter før"
-    }
+    },
+    "edit": "Rediger",
+    "editDone": "Luk",
+    "editLegend": "Hvornår tilmeldte får besked",
+    "alreadySent": "allerede sendt",
+    "alreadyPassed": "tidspunktet er passeret",
+    "saveFailed": "Ændringen kunne ikke gemmes. Prøv igen.",
+    "errorSent": "Denne påmindelse er allerede sendt: den bliver stående som registrering af, hvad der blev sendt.",
+    "errorPassed": "Det tidspunkt er allerede passeret: påmindelsen ville aldrig blive sendt.",
+    "errorChanged": "Listen var ændret: den er nu opdateret.",
+    "limitReached": "grænsen er nået"
   },
   "gdpr": {
     "consent": {

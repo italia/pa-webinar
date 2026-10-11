@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderates like a moderator and is presented among the event's organizers. With a staff account under the same email, they also manage the event.",
       "organization": "Organization (optional)",
       "publicListed": "Show on the public page",
-      "onPublicPage": "On the public page"
+      "onPublicPage": "On the public page",
+      "resend": "Resend link",
+      "resendDone": "Link resent to {name}.",
+      "resendTooMany": "Too many sends in a short time: try again in a few minutes.",
+      "resendFailed": "Sending failed. Please retry."
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Delete the event?",
         "deleteMessage": "“{title}” and all its data will be deleted. This cannot be undone.",
         "deleted": "Event deleted",
-        "failed": "The operation failed. Please try again."
+        "failed": "The operation failed. Please try again.",
+        "enterRoom": "Enter the room"
       },
       "instantBadge": "Instant call",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderators}} · {speakers, plural, one {# speaker} other {# speakers}}",
       "postEventSummary": "{connected} joined · {registered} registered",
-      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
+      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}",
+      "sortUpcoming": "Upcoming first",
+      "todayTitle": "Today and live"
     },
     "tags": {
       "subtitle": "Create, edit and delete the tags used to classify and filter public events.",
@@ -2510,7 +2517,8 @@
         "people": "People",
         "content": "Content",
         "analytics": "Statistics",
-        "afterEvent": "After the event"
+        "afterEvent": "After the event",
+        "label": "Event sections"
       },
       "toggles": {
         "unmute": "Participants can unmute",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Could not duplicate. Please try again.",
       "capacitySection": "Capacity and infrastructure",
       "capacitySubtitle": "Sized for about {max} expected participants",
-      "publishBlockedLive": "The event is already under way",
-      "publishBlockedEnded": "The event has ended",
       "created": {
         "publishedTitle": "Event published",
         "draftTitle": "Draft saved",
@@ -2565,7 +2571,8 @@
         "unsaved": "Not saved: {items}. You can add them from this page.",
         "copyParticipantLink": "Copy the participant link",
         "sendToSpeakers": "Moderator and speaker links",
-        "close": "Close the summary"
+        "close": "Close the summary",
+        "publishNow": "Publish now"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Preview",
       "hidePreview": "Hide preview",
       "previewLanguage": "Language"
+    },
+    "endEvent": "End event",
+    "endEventConfirmTitle": "End the event for everyone?",
+    "endEventConfirmMessage": "Everyone in the room will see it close. The after-event page follows the choices in «After the event».",
+    "endEventSuccess": "Event ended.",
+    "endEventFailed": "The event could not be ended. Try again.",
+    "archive": "Archive",
+    "archiveConfirmTitle": "Archive the event?",
+    "archiveConfirmMessage": "The public page will no longer be visible. The data stays until the retention period ends, and you can remove the event from the archive at any time.",
+    "archiveSuccess": "Event archived.",
+    "archiveFailed": "The event could not be archived. Try again.",
+    "endEventPagePublic": "It is currently set to public.",
+    "endEventPagePrivate": "It is currently set to private.",
+    "unarchive": "Remove from archive",
+    "unarchiveSuccess": "Event removed from the archive.",
+    "unarchiveFailed": "The event could not be removed from the archive. Try again.",
+    "invitationsPanel": {
+      "title": "Invitees",
+      "edit": "Edit invitees",
+      "introInvitationOnly": "This event is invitation-only: only these people can sign up, with the address they were invited with.",
+      "introOpen": "Sign-up is open to everyone: here are the people you invited and whether they have already signed up.",
+      "loadError": "Couldn't load the invitees.",
+      "empty": "No invitees.",
+      "emptyInvitationOnly": "No invitees yet: while the list is empty, nobody can sign up.",
+      "registeredCount": "Signed up: {registered} of {total}",
+      "name": "Name",
+      "email": "Email",
+      "status": "Status",
+      "roleSpeaker": "Speaker",
+      "registered": "Signed up",
+      "notRegistered": "Not signed up yet",
+      "organizersTitle": "Organizing bodies",
+      "organizersEdit": "Edit organizers",
+      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Notifications",
     "addReminder": "Add reminder",
     "removeReminder": "Remove",
-    "maxReminders": "Maximum 5 reminders per event.",
+    "maxReminders": "Maximum {max} reminders per event.",
     "selectPreset": "Select when...",
     "sentStatus": "{count} sent",
     "notSent": "Not sent",
@@ -3526,7 +3567,17 @@
       "1hour": "1 hour before",
       "30min": "30 minutes before",
       "15min": "15 minutes before"
-    }
+    },
+    "edit": "Edit",
+    "editDone": "Close",
+    "editLegend": "When to notify people who signed up",
+    "alreadySent": "already sent",
+    "alreadyPassed": "time has passed",
+    "saveFailed": "Couldn't save the change. Please retry.",
+    "errorSent": "This notification has already gone out: it stays, as the record of what was sent.",
+    "errorPassed": "That moment has already passed: the notification would never go out.",
+    "errorChanged": "The list had changed: it is now up to date.",
+    "limitReached": "limit reached"
   },
   "gdpr": {
     "consent": {

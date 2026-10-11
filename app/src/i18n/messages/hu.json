@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderátorként moderál, és az esemény szervezői között szerepel. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli.",
       "organization": "Intézmény vagy szervezet (nem kötelező)",
       "publicListed": "Megjelenítés a nyilvános oldalon",
-      "onPublicPage": "A nyilvános oldalon"
+      "onPublicPage": "A nyilvános oldalon",
+      "resend": "Link újraküldése",
+      "resendDone": "Link újraküldve neki: {name}.",
+      "resendTooMany": "Túl sok küldés rövid idő alatt: próbáld újra néhány perc múlva.",
+      "resendFailed": "A küldés nem sikerült. Próbáld újra."
     },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Törli az eseményt?",
         "deleteMessage": "A(z) „{title}” és minden adata törlődik. A művelet nem vonható vissza.",
         "deleted": "Esemény törölve",
-        "failed": "A művelet nem sikerült. Próbálja újra."
+        "failed": "A művelet nem sikerült. Próbálja újra.",
+        "enterRoom": "Belépés a terembe"
       },
       "instantBadge": "Azonnali hívás",
       "moderatorsSpeakers": "{mods, plural, other {# moderátor}} · {speakers, plural, other {# előadó}}",
       "postEventSummary": "{connected} csatlakozott · {registered} regisztráció",
-      "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}"
+      "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}",
+      "sortUpcoming": "Közelgők elöl",
+      "todayTitle": "Ma és folyamatban"
     },
     "tags": {
       "subtitle": "A nyilvános események osztályozására és szűrésére használt címkék létrehozása, szerkesztése és törlése.",
@@ -2510,7 +2517,8 @@
         "people": "Személyek",
         "content": "Tartalmak",
         "analytics": "Statisztikák",
-        "afterEvent": "Az esemény után"
+        "afterEvent": "Az esemény után",
+        "label": "Az esemény részei"
       },
       "toggles": {
         "unmute": "A résztvevők beszélhetnek",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "A másolás nem sikerült. Próbálja újra.",
       "capacitySection": "Kapacitás és infrastruktúra",
       "capacitySubtitle": "Körülbelül {max} várható résztvevőre méretezve",
-      "publishBlockedLive": "Az esemény már zajlik",
-      "publishBlockedEnded": "Az esemény véget ért",
       "created": {
         "publishedTitle": "Esemény közzétéve",
         "draftTitle": "Piszkozat mentve",
@@ -2565,7 +2571,8 @@
         "unsaved": "Nincs mentve: {items}. Ezen az oldalon hozzáadhatja őket.",
         "copyParticipantLink": "Résztvevői link másolása",
         "sendToSpeakers": "Moderátorok és előadók linkjei",
-        "close": "Összefoglaló bezárása"
+        "close": "Összefoglaló bezárása",
+        "publishNow": "Közzététel most"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Előnézet",
       "hidePreview": "Előnézet elrejtése",
       "previewLanguage": "Nyelv"
+    },
+    "endEvent": "Esemény befejezése",
+    "endEventConfirmTitle": "Befejezi az eseményt mindenkinek?",
+    "endEventConfirmMessage": "A teremben mindenki látja a zárást. Az esemény utáni oldal az „Az esemény után” beállításait követi.",
+    "endEventSuccess": "Az esemény befejeződött.",
+    "endEventFailed": "Az eseményt nem sikerült befejezni. Próbálja újra.",
+    "archive": "Archiválás",
+    "archiveConfirmTitle": "Archiválja az eseményt?",
+    "archiveConfirmMessage": "A nyilvános oldal többé nem lesz látható. Az adatok a megőrzési idő végéig megmaradnak, és az eseményt bármikor kiveheti az archívumból.",
+    "archiveSuccess": "Az esemény archiválva.",
+    "archiveFailed": "Az eseményt nem sikerült archiválni. Próbálja újra.",
+    "endEventPagePublic": "Jelenleg nyilvánosra van állítva.",
+    "endEventPagePrivate": "Jelenleg privátra van állítva.",
+    "unarchive": "Kivétel az archívumból",
+    "unarchiveSuccess": "Az esemény kikerült az archívumból.",
+    "unarchiveFailed": "Az eseményt nem sikerült kivenni az archívumból. Próbálja újra.",
+    "invitationsPanel": {
+      "title": "Meghívottak",
+      "edit": "Meghívottak szerkesztése",
+      "introInvitationOnly": "Az esemény csak meghívottaknak szól: csak ezek a személyek jelentkezhetnek, azzal a címmel, amelyre a meghívót kapták.",
+      "introOpen": "A jelentkezés mindenki előtt nyitva áll: itt láthatod a meghívott személyeket, és hogy jelentkeztek-e már.",
+      "loadError": "Nem sikerült betölteni a meghívottakat.",
+      "empty": "Nincs meghívott.",
+      "emptyInvitationOnly": "Még nincs meghívott: amíg a lista üres, senki sem jelentkezhet.",
+      "registeredCount": "Jelentkezett: {registered} / {total}",
+      "name": "Név",
+      "email": "E-mail",
+      "status": "Állapot",
+      "roleSpeaker": "Előadó",
+      "registered": "Jelentkezett",
+      "notRegistered": "Még nem jelentkezett",
+      "organizersTitle": "Szervező intézmények",
+      "organizersEdit": "Intézmények szerkesztése",
+      "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Értesítések",
     "addReminder": "Értesítés hozzáadása",
     "removeReminder": "Eltávolítás",
-    "maxReminders": "Eseményenként legfeljebb 5 értesítés.",
+    "maxReminders": "Eseményenként legfeljebb {max} értesítés.",
     "selectPreset": "Válasszon időpontot...",
     "sentStatus": "{count} elküldve",
     "notSent": "Nem küldve",
@@ -3526,7 +3567,17 @@
       "1hour": "1 órával korábban",
       "30min": "30 perccel korábban",
       "15min": "15 perccel korábban"
-    }
+    },
+    "edit": "Szerkesztés",
+    "editDone": "Bezárás",
+    "editLegend": "Mikor kapjanak értesítést a jelentkezők",
+    "alreadySent": "már elküldve",
+    "alreadyPassed": "az időpont elmúlt",
+    "saveFailed": "A módosítást nem sikerült menteni. Próbáld újra.",
+    "errorSent": "Ez az értesítés már kiment: megmarad, a kiküldés nyomaként.",
+    "errorPassed": "Ez az időpont már elmúlt: az értesítés soha nem menne ki.",
+    "errorChanged": "A lista megváltozott: most már naprakész.",
+    "limitReached": "korlát elérve"
   },
   "gdpr": {
     "consent": {

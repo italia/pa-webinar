@@ -107,9 +107,10 @@ async function apri(page: Page, pulsante: ReturnType<Page['locator']>, gesto: ()
   await expect(pulsante).toHaveAttribute('aria-expanded', 'true');
 }
 
-/** La scheda visibile piu' in basso, e fra quelle la piu' a destra. */
+/** La scheda visibile piu' in basso, e fra quelle la piu' a destra. Solo
+ *  eventi a calendario: il menu di una chiamata rapida non ha «Duplica». */
 async function schedaInBassoADestra(page: Page) {
-  const schede = page.locator('.event-card');
+  const schede = page.locator('.event-card[data-event-type="scheduled"]');
   const vista = page.viewportSize()!;
   let scelta = 0;
   let migliore = { bottom: -1, right: -1 };

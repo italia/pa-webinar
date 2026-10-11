@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuoja kaip moderatorius ir pristatomas tarp renginio organizatorių. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį.",
       "organization": "Institucija ar organizacija (neprivaloma)",
       "publicListed": "Rodyti viešame puslapyje",
-      "onPublicPage": "Viešame puslapyje"
+      "onPublicPage": "Viešame puslapyje",
+      "resend": "Siųsti nuorodą dar kartą",
+      "resendDone": "Nuoroda dar kartą išsiųsta: {name}.",
+      "resendTooMany": "Per daug siuntimų per trumpą laiką: bandykite dar kartą po kelių minučių.",
+      "resendFailed": "Nepavyko išsiųsti. Bandykite dar kartą."
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
@@ -2444,12 +2448,15 @@
         "deleteTitle": "Ištrinti renginį?",
         "deleteMessage": "„{title}“ ir visi jo duomenys bus ištrinti. Šio veiksmo atšaukti negalima.",
         "deleted": "Renginys ištrintas",
-        "failed": "Veiksmas nepavyko. Bandykite dar kartą."
+        "failed": "Veiksmas nepavyko. Bandykite dar kartą.",
+        "enterRoom": "Įeiti į kambarį"
       },
       "instantBadge": "Greitasis skambutis",
       "moderatorsSpeakers": "{mods, plural, one {# moderatorius} few {# moderatoriai} many {# moderatoriaus} other {# moderatorių}} · {speakers, plural, one {# pranešėjas} few {# pranešėjai} many {# pranešėjo} other {# pranešėjų}}",
       "postEventSummary": "{connected} prisijungę · {registered} registracijų",
-      "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}"
+      "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}",
+      "sortUpcoming": "Artimiausi pirmiau",
+      "todayTitle": "Šiandien ir vykstantys"
     },
     "tags": {
       "subtitle": "Kurkite, redaguokite ir pašalinkite žymas, naudojamas viešųjų renginių klasifikavimui ir filtravimui.",
@@ -2510,7 +2517,8 @@
         "people": "Asmenys",
         "content": "Turinys",
         "analytics": "Statistika",
-        "afterEvent": "Po renginio"
+        "afterEvent": "Po renginio",
+        "label": "Renginio skiltys"
       },
       "toggles": {
         "unmute": "Dalyviai gali kalbėti",
@@ -2553,8 +2561,6 @@
       "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą.",
       "capacitySection": "Talpa ir infrastruktūra",
       "capacitySubtitle": "Pritaikyta maždaug {max} numatomiems dalyviams",
-      "publishBlockedLive": "Renginys jau vyksta",
-      "publishBlockedEnded": "Renginys baigėsi",
       "created": {
         "publishedTitle": "Renginys paskelbtas",
         "draftTitle": "Juodraštis išsaugotas",
@@ -2565,7 +2571,8 @@
         "unsaved": "Neišsaugota: {items}. Galite juos pridėti šiame puslapyje.",
         "copyParticipantLink": "Kopijuoti nuorodą dalyviams",
         "sendToSpeakers": "Moderatorių ir pranešėjų nuorodos",
-        "close": "Uždaryti santrauką"
+        "close": "Uždaryti santrauką",
+        "publishNow": "Skelbti dabar"
       }
     },
     "rubrica": {
@@ -3235,6 +3242,40 @@
       "preview": "Peržiūra",
       "hidePreview": "Slėpti peržiūrą",
       "previewLanguage": "Kalba"
+    },
+    "endEvent": "Baigti renginį",
+    "endEventConfirmTitle": "Baigti renginį visiems?",
+    "endEventConfirmMessage": "Visi kambaryje pamatys pabaigą. Puslapis po renginio atitinka pasirinkimus skiltyje „Po renginio“.",
+    "endEventSuccess": "Renginys baigtas.",
+    "endEventFailed": "Nepavyko baigti renginio. Bandykite dar kartą.",
+    "archive": "Archyvuoti",
+    "archiveConfirmTitle": "Archyvuoti renginį?",
+    "archiveConfirmMessage": "Viešas puslapis nebebus matomas. Duomenys lieka iki saugojimo laikotarpio pabaigos, o renginį galite bet kada išimti iš archyvo.",
+    "archiveSuccess": "Renginys archyvuotas.",
+    "archiveFailed": "Nepavyko archyvuoti renginio. Bandykite dar kartą.",
+    "endEventPagePublic": "Šiuo metu jis nustatytas kaip viešas.",
+    "endEventPagePrivate": "Šiuo metu jis nustatytas kaip privatus.",
+    "unarchive": "Išimti iš archyvo",
+    "unarchiveSuccess": "Renginys išimtas iš archyvo.",
+    "unarchiveFailed": "Nepavyko išimti renginio iš archyvo. Bandykite dar kartą.",
+    "invitationsPanel": {
+      "title": "Pakviestieji",
+      "edit": "Redaguoti pakviestuosius",
+      "introInvitationOnly": "Renginys tik su kvietimais: registruotis gali tik šie asmenys, nurodę adresą, kuriuo buvo pakviesti.",
+      "introOpen": "Registracija atvira visiems: čia matote savo pakviestus asmenis ir ar jie jau užsiregistravo.",
+      "loadError": "Nepavyko įkelti pakviestųjų.",
+      "empty": "Pakviestųjų nėra.",
+      "emptyInvitationOnly": "Pakviestųjų dar nėra: kol sąrašas tuščias, niekas negali registruotis.",
+      "registeredCount": "Užsiregistravo: {registered} iš {total}",
+      "name": "Vardas",
+      "email": "El. paštas",
+      "status": "Būsena",
+      "roleSpeaker": "Pranešėjas",
+      "registered": "Užsiregistravo",
+      "notRegistered": "Dar neužsiregistravo",
+      "organizersTitle": "Organizuojančios institucijos",
+      "organizersEdit": "Redaguoti institucijas",
+      "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja."
     }
   },
   "email": {
@@ -3512,7 +3553,7 @@
     "title": "Pranešimai",
     "addReminder": "Pridėti priminimą",
     "removeReminder": "Pašalinti",
-    "maxReminders": "Daugiausiai 5 priminimai vienam renginiui.",
+    "maxReminders": "Daugiausiai {max} priminimai vienam renginiui.",
     "selectPreset": "Pasirinkite laiką...",
     "sentStatus": "{count} išsiųsta",
     "notSent": "Neišsiųsta",
@@ -3526,7 +3567,17 @@
       "1hour": "Prieš 1 valandą",
       "30min": "Prieš 30 minučių",
       "15min": "Prieš 15 minučių"
-    }
+    },
+    "edit": "Redaguoti",
+    "editDone": "Uždaryti",
+    "editLegend": "Kada pranešti užsiregistravusiems",
+    "alreadySent": "jau išsiųsta",
+    "alreadyPassed": "laikas praėjo",
+    "saveFailed": "Pakeitimo išsaugoti nepavyko. Bandykite dar kartą.",
+    "errorSent": "Šis pranešimas jau išsiųstas: jis lieka kaip išsiuntimo įrašas.",
+    "errorPassed": "Tas laikas jau praėjo: pranešimas niekada nebūtų išsiųstas.",
+    "errorChanged": "Sąrašas buvo pasikeitęs: dabar jis atnaujintas.",
+    "limitReached": "pasiekta riba"
   },
   "gdpr": {
     "consent": {
