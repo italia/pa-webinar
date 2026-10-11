@@ -189,6 +189,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             status: event.status,
             eventType: event.eventType,
             postEventPublic: event.postEventPublic,
+            postEventShow: {
+          recap: event.postEventShowRecap,
+          qa: event.postEventShowQA,
+          polls: event.postEventShowPolls,
+          wordCloud: event.postEventShowWordCloud,
+          materials: event.postEventShowMaterials,
+          feedback: event.postEventShowFeedback,
+        },
             libraryListed: event.libraryListed,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
             autoStartRecording: isInstant ? false : event.autoStartRecording,
@@ -266,6 +274,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   let hasMultitrackConsent = false;
   // Lo stesso per il consenso alla registrazione dell'evento.
   let hasRecordingConsent = false;
+  // L'iscritto e' gia' entrato in sala (anche in una visita precedente): la
+  // valutazione di fine evento gli si puo' proporre anche senza il token
+  // della sala di questa pagina.
+  let iscrizioneEntrata = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
@@ -276,6 +288,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         consentRecording: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
+        joinedAt: true,
       },
     });
 
@@ -332,6 +345,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
     hasRecordingConsent =
       ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
+    // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
+    // di chi l'ha ricevuto.
+    iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
@@ -350,6 +366,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         eventType: event.eventType,
         guestEntryOpen: guestAccessAllowed(event, settings.guestAccessEnabled),
         postEventPublic: event.postEventPublic,
+        postEventShow: {
+          recap: event.postEventShowRecap,
+          qa: event.postEventShowQA,
+          polls: event.postEventShowPolls,
+          wordCloud: event.postEventShowWordCloud,
+          materials: event.postEventShowMaterials,
+          feedback: event.postEventShowFeedback,
+        },
         libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
         autoStartRecording: event.autoStartRecording,
@@ -391,6 +415,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isGuest={false}
       hasMultitrackConsent={hasMultitrackConsent}
       hasRecordingConsent={hasRecordingConsent}
+      registrationJoined={iscrizioneEntrata}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —

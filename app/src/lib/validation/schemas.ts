@@ -444,9 +444,13 @@ export const createFeedbackSchema = z.object({
   comment: z.string().max(500).optional(),
   accessToken: z.string().min(1).optional(),
   guestId: z.string().min(1).optional(),
+  /** Il token della sala ricevuto entrando: prova la presenza di chi non e' iscritto. */
+  roomToken: z.string().min(1).max(4096).optional(),
+  /** Il link della valutazione dell'email di ringraziamento (lib/feedback/rating-link). */
+  ratingToken: z.string().min(1).max(512).optional(),
 }).refine(
-  (data) => data.accessToken || data.guestId,
-  { message: 'Either accessToken or guestId is required' },
+  (data) => data.accessToken || data.guestId || data.roomToken || data.ratingToken,
+  { message: 'Either accessToken, guestId, roomToken or ratingToken is required' },
 );
 
 export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;
@@ -597,9 +601,13 @@ export const submitQuestionnaireResponseSchema = z.object({
   accessToken: z.string().min(1).optional(),
   guestId: z.string().min(1).optional(),
   respondentName: z.string().max(120).optional(),
+  /** Il token della sala ricevuto entrando: prova la presenza di chi non e' iscritto. */
+  roomToken: z.string().min(1).max(4096).optional(),
+  /** Il link della valutazione dell'email di ringraziamento (lib/feedback/rating-link). */
+  ratingToken: z.string().min(1).max(512).optional(),
 }).refine(
-  (data) => data.accessToken || data.guestId,
-  { message: 'Either accessToken or guestId is required' },
+  (data) => data.accessToken || data.guestId || data.roomToken || data.ratingToken,
+  { message: 'Either accessToken, guestId, roomToken or ratingToken is required' },
 );
 
 export type SubmitQuestionnaireResponseInput = z.infer<typeof submitQuestionnaireResponseSchema>;

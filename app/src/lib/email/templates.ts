@@ -651,6 +651,8 @@ interface PostEventParticipantInput {
   organizationFooter?: string;
   /** Vedi EmailTemplateInput.addressBookOptOutUrl. */
   addressBookOptOutUrl?: string | null;
+  /** Invita a valutare (chi e' entrato in sala). Falso: solo il riepilogo. */
+  inviteRating?: boolean;
 }
 
 interface PostEventModeratorInput extends PostEventParticipantInput {
@@ -667,6 +669,10 @@ const postEventCopy: Record<
     participantHeading: string;
     participantIntro: (title: string) => string;
     participantCta: string;
+    /** Per chi non e' entrato in sala: il riepilogo, senza promettere una
+     *  valutazione che non potrebbe dare. */
+    participantIntroRecapOnly: (title: string) => string;
+    participantCtaRecapOnly: string;
     moderatorSubject: (title: string) => string;
     moderatorHeading: string;
     moderatorIntro: (title: string) => string;
@@ -681,6 +687,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Grazie per aver partecipato a "${t}". Sulla pagina dell'evento trovi il riepilogo e puoi lasciare un feedback.`,
     participantCta: 'Vedi il riepilogo e lascia un feedback',
+    participantIntroRecapOnly: (t) => `L'evento "${t}" è concluso. Sulla pagina dell'evento trovi il riepilogo.`,
+    participantCtaRecapOnly: 'Vedi il riepilogo',
     moderatorSubject: (t) => `Evento concluso: ${t}`,
     moderatorHeading: 'Il tuo evento è concluso',
     moderatorIntro: (t) => `L'evento "${t}" è concluso. Ecco un riepilogo sintetico.`,
@@ -694,6 +702,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Thanks for attending "${t}". You'll find the recap and a feedback form on the event page.`,
     participantCta: 'See the recap and leave feedback',
+    participantIntroRecapOnly: (t) => `The event "${t}" has ended. You'll find the recap on the event page.`,
+    participantCtaRecapOnly: 'See the recap',
     moderatorSubject: (t) => `Event concluded: ${t}`,
     moderatorHeading: 'Your event has ended',
     moderatorIntro: (t) => `The event "${t}" has ended. Here's a short recap.`,
@@ -707,6 +717,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Merci d’avoir participé à « ${t} ». Sur la page de l’événement, vous trouverez le récapitulatif et pourrez laisser votre avis.`,
     participantCta: 'Voir le récapitulatif et donner votre avis',
+    participantIntroRecapOnly: (t) => `L’événement « ${t} » est terminé. Vous trouverez le récapitulatif sur la page de l’événement.`,
+    participantCtaRecapOnly: 'Voir le récapitulatif',
     moderatorSubject: (t) => `Événement terminé : ${t}`,
     moderatorHeading: 'Votre événement est terminé',
     moderatorIntro: (t) => `L’événement « ${t} » est terminé. Voici un bref récapitulatif.`,
@@ -720,6 +732,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Vielen Dank für Ihre Teilnahme an „${t}“. Auf der Seite der Veranstaltung finden Sie die Zusammenfassung und können eine Rückmeldung geben.`,
     participantCta: 'Zusammenfassung ansehen und Rückmeldung geben',
+    participantIntroRecapOnly: (t) => `Die Veranstaltung „${t}“ ist beendet. Die Zusammenfassung finden Sie auf der Seite der Veranstaltung.`,
+    participantCtaRecapOnly: 'Zusammenfassung ansehen',
     moderatorSubject: (t) => `Veranstaltung beendet: ${t}`,
     moderatorHeading: 'Ihre Veranstaltung ist beendet',
     moderatorIntro: (t) => `Die Veranstaltung „${t}“ ist beendet. Hier eine kurze Zusammenfassung.`,
@@ -733,6 +747,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Gracias por participar en «${t}». En la página del evento encontrará el resumen y podrá dejar su opinión.`,
     participantCta: 'Ver el resumen y dejar su opinión',
+    participantIntroRecapOnly: (t) => `El evento «${t}» ha finalizado. En la página del evento encontrará el resumen.`,
+    participantCtaRecapOnly: 'Ver el resumen',
     moderatorSubject: (t) => `Evento finalizado: ${t}`,
     moderatorHeading: 'Su evento ha finalizado',
     moderatorIntro: (t) => `El evento «${t}» ha finalizado. A continuación, un breve resumen.`,
@@ -751,9 +767,12 @@ export function postEventParticipantEmail(input: PostEventParticipantInput): {
   const base = copy[input.locale];
   const footer = input.organizationFooter || base.footer;
   const subject = c.participantSubject(input.eventTitle);
+  const valuta = input.inviteRating !== false;
+  const intro = valuta ? c.participantIntro(input.eventTitle) : c.participantIntroRecapOnly(input.eventTitle);
+  const cta = valuta ? c.participantCta : c.participantCtaRecapOnly;
   const body = `
-<p style="margin:0 0 16px;">${escapeHtml(c.participantIntro(input.eventTitle))}</p>
-${ctaButton(c.participantCta, input.eventPageUrl)}`;
+<p style="margin:0 0 16px;">${escapeHtml(intro)}</p>
+${ctaButton(cta, input.eventPageUrl)}`;
   // Solo per chi e' in rubrica: la nota su come uscirne e il link firmato.
   const optOutHtml = input.addressBookOptOutUrl
     ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
@@ -768,9 +787,9 @@ ${ctaButton(c.participantCta, input.eventPageUrl)}`;
   const text = [
     c.participantHeading,
     '',
-    c.participantIntro(input.eventTitle),
+    intro,
     '',
-    `${c.participantCta}: ${input.eventPageUrl}`,
+    `${cta}: ${input.eventPageUrl}`,
     '',
     footer,
     ...(input.addressBookOptOutUrl

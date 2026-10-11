@@ -29,6 +29,17 @@ vi.mock('@/lib/rate-limit', () => ({
 vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: vi.fn((v: string) => (v.startsWith('cifrato:') ? v.slice('cifrato:'.length) : null)),
 }));
+// La regola «solo chi ha partecipato» ha i suoi test (lib/feedback/participation);
+// qui si verifica che la rotta la chieda e ne rispetti l'esito.
+const partecipazione = vi.hoisted(() => ({
+  identita: vi.fn(
+    async (opts: { iscrizione: { id: string } | null }): Promise<{ registrationId: string | null; chiaveOspite: string | null }> => ({
+      registrationId: opts.iscrizione?.id ?? null,
+      chiaveOspite: opts.iscrizione ? null : 'posto:ospite-abc',
+    }),
+  ),
+}));
+vi.mock('@/lib/feedback/participation', () => ({ identitaPerValutazione: partecipazione.identita }));
 vi.mock('@/lib/questionnaires', async (importOriginal) => ({
   // La validazione delle risposte resta quella vera: e' parte del contratto.
   ...(await importOriginal<typeof QuestionnairesModule>()),
@@ -43,7 +54,7 @@ import { findEventQuestionnaireByPlacement, submitResponse } from '@/lib/questio
 import { POST } from './route';
 
 // Concluso da poco, entro la conservazione dei suoi dati.
-const RECENTE = { endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30 };
+const RECENTE = { endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30, jitsiRoomName: 'stanza-di-prova' };
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRegistration = prisma.registration.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedFind = vi.mocked(findEventQuestionnaireByPlacement);
@@ -112,6 +123,42 @@ beforeEach(() => {
     eventId: EVENT_ID,
     emailHash: EMAIL_HASH,
     displayName: 'cifrato:Partecipante 1',
+    joinedAt: new Date(),
+  });
+});
+
+describe('POST …/POST_EVENT/responses — solo chi ha partecipato', () => {
+  it('chiede chi valuta con tutte le prove: iscrizione, link della valutazione, token della sala', async () => {
+    await POST(
+      ...post('POST_EVENT', { accessToken: 'TOKEN_ISCRIZIONE', roomToken: 'jwt-sala', ratingToken: 'link-valutazione' }),
+    );
+    expect(partecipazione.identita).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      roomName: 'stanza-di-prova',
+      iscrizione: { id: REG_ID, joinedAt: expect.any(Date) },
+      ratingToken: 'link-valutazione',
+      tokenSala: 'jwt-sala',
+    });
+  });
+
+  it('la risposta va all\'identita\' decisa dalla regola, non all\'id del browser', async () => {
+    partecipazione.identita.mockResolvedValueOnce({ registrationId: null, chiaveOspite: 'posto:ospite-abc' });
+    await POST(...post('POST_EVENT', { guestId: 'guest-1', roomToken: 'jwt-sala' }));
+    expect(inviato()).toMatchObject({ registrationId: null, guestId: 'posto:ospite-abc' });
+  });
+
+  it('un ospite senza prova: 403 NOT_A_PARTICIPANT, nessuna risposta salvata', async () => {
+    const { AppError } = await import('@/lib/errors');
+    partecipazione.identita.mockRejectedValueOnce(new AppError('no', 403, 'NOT_A_PARTICIPANT'));
+    const res = await POST(...post('POST_EVENT', { guestId: 'guest-1' }));
+    expect(res.status).toBe(403);
+    expect((await res.json()).code).toBe('NOT_A_PARTICIPANT');
+    expect(mockedSubmit).not.toHaveBeenCalled();
+  });
+
+  it('il questionario d\'iscrizione non la chiede', async () => {
+    await POST(...post('PRE_REGISTRATION', { guestId: 'guest-1', respondentName: 'Ospite 1' }));
+    expect(partecipazione.identita).not.toHaveBeenCalled();
   });
 });
 
@@ -171,12 +218,12 @@ describe('POST …/POST_EVENT/responses — senza nome', () => {
     });
   });
 
-  it('chi non e’ iscritto: l’identificativo del browser, e il nome digitato non si salva', async () => {
-    await POST(...post('POST_EVENT', { guestId: 'guest-1', respondentName: 'Nome digitato' }));
+  it('chi non e’ iscritto: il posto in sala, e il nome digitato non si salva', async () => {
+    await POST(...post('POST_EVENT', { guestId: 'guest-1', respondentName: 'Nome digitato', roomToken: 'jwt-sala' }));
 
     expect(inviato()).toMatchObject({
       registrationId: null,
-      guestId: 'guest-1',
+      guestId: 'posto:ospite-abc',
       respondentName: null,
       respondentEmailHash: null,
     });

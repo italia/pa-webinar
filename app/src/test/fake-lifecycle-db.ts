@@ -112,6 +112,15 @@ export class FakeLifecycleDb {
     },
   };
 
+  /** I sondaggi rimasti aperti che la fine di un evento chiude: si registra
+   *  solo la scrittura, il giro non li legge. */
+  poll = {
+    updateMany: async (args: { where?: unknown; data: unknown }) => {
+      this.writes.push({ model: 'poll', op: 'updateMany', where: args.where, data: args.data });
+      return { count: 0 };
+    },
+  };
+
   callSession = {
     findMany: async (args: {
       where?: Where;

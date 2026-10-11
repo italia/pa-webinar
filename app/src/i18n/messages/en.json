@@ -69,7 +69,10 @@
     "requiredField": "Required field",
     "errorGeneric": "An error occurred. Please try again.",
     "selectAll": "Select all",
-    "deselectAll": "Deselect all"
+    "deselectAll": "Deselect all",
+    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
+    "durationHours": "{hours, plural, one {# hour} other {# hours}}",
+    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}"
   },
   "markdown": {
     "edit": "Write",
@@ -103,7 +106,6 @@
     "noPast": "No past events",
     "wordCloudTitle": "In one word",
     "card": {
-      "publicEvent": "Public event",
       "readMore": "Read more",
       "liveNow": "Live now",
       "spotsAvailable": "{count} spots available",
@@ -132,7 +134,6 @@
       "title": "Event details",
       "date": "Date and time",
       "duration": "Duration",
-      "durationHours": "{hours}h {minutes}min",
       "timezone": "Timezone",
       "description": "Description",
       "participants": "Participants",
@@ -151,7 +152,6 @@
       "noRecording": "Video recording is not available for this event.",
       "watchRecording": "Watch recording",
       "backToEvents": "Back to events",
-      "alreadyRegisteredEnter": "Already registered? Enter the room",
       "invalidTokenTitle": "Access link no longer valid",
       "invalidTokenBody": "The link you used is invalid or has expired. If you registered, check your confirmation email for your personal link, or register again below.",
       "invalidTokenBodyEnded": "The link you used is no longer valid. The event has ended: you can find the recording and materials below.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics file"
       },
-      "registrationEnded": "The event has ended: registration is closed."
+      "registrationEnded": "The event has ended: registration is closed.",
+      "joinAsGuest": "Join as a guest",
+      "registeredUseEmailLink": "Already registered? Use the personal link you received by email.",
+      "willBeRecorded": "The event will be recorded."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "Live",
       "IDLE": "Paused",
       "ENDED": "Ended",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "UPCOMING": "Upcoming"
     },
     "list": {
       "filterByTag": "Filter by tag",
@@ -298,14 +302,23 @@
       "title": "Event destiny",
       "body": "You're about to end the event for everyone. What should happen to it once concluded?",
       "public": "Keep it public",
-      "publicHelp": "The concluded event page stays visible with recap, Q&A, polls, materials and feedback.",
       "library": "Publish to the library",
       "libraryHelp": "As above, and also show the event in the public video library (requires a published recording or a YouTube video).",
       "archive": "Archive (private)",
       "archiveHelp": "The page of the ended event will not be visible to the public. The data is kept until the retention period ends, then deleted.",
       "genAi": "Generate AI transcript and summary from the recording (once processing finishes)",
       "back": "Back",
-      "confirm": "End event"
+      "confirm": "End event",
+      "publicHelpList": "The ended event's page stays visible and, where there are any, shows {sections}.",
+      "publicHelpNone": "The ended event's page stays visible, with its title and description.",
+      "sections": {
+        "recap": "the recap",
+        "qa": "the Q&A questions",
+        "polls": "the published polls",
+        "wordCloud": "the word cloud",
+        "materials": "the materials",
+        "feedback": "the ratings"
+      }
     },
     "eventNotStarted": "The event has not started yet",
     "eventStartsAt": "The event will start on {date} at {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Delete message",
       "mentionedYou": "Mentioned you",
       "mentionEmpty": "Nobody to mention yet: people appear here once they write in the chat or join the room.",
-      "mentionNoMatch": "Nobody with this name."
+      "mentionNoMatch": "Nobody with this name.",
+      "logLabel": "Chat messages",
+      "loadingHistory": "Loading messages…",
+      "historyFailed": "The messages could not be loaded.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# new message} other {# new messages}}",
+      "announceAttachment": "sent an attachment"
     },
     "role": {
       "moderator": "Moderator",
@@ -562,7 +581,9 @@
       "timerHelp": "A countdown for whoever is speaking: you can show it to the whole room.",
       "eventHeading": "Event",
       "endHelp": "Closes the room for everyone and marks the event as ended. This cannot be undone.",
-      "timerHeading": "Talk timer"
+      "timerHeading": "Talk timer",
+      "turnOffConfirm": "Turn off «{feature}» for everyone?",
+      "turnOff": "Turn off"
     },
     "closingNotice": "{minutes, plural, =0 {The room is closing.} one {The room closes automatically in # minute.} other {The room closes automatically in # minutes.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Reset filters",
       "noResults": "No events match the filters.",
       "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Actions for “{title}”",
         "manage": "Manage",
@@ -3413,7 +3432,8 @@
       "generic": "Error creating the poll",
       "vote": "Vote not recorded. Try again.",
       "alreadyVoted": "You have already voted in this poll.",
-      "action": "The action failed. Please try again."
+      "action": "The action failed. Please try again.",
+      "closed": "The poll is closed."
     },
     "participation": "{votes, plural, one {# vote} other {# votes}} out of {present} present",
     "participationLabel": "Poll participation",
@@ -4086,7 +4106,7 @@
     "cancel": "Cancel",
     "noActiveRound": "No question is open right now.",
     "noWords": "Waiting for the first words...",
-    "wordsSubmitted": "{count} words submitted",
+    "wordsSubmitted": "{count, plural, =0 {No words sent} one {# word sent} other {# words sent}}",
     "timeRemaining": "Time remaining",
     "errors": {
       "send": "Word not sent. Please try again.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Typical wait: under a minute when the infrastructure is warm, 3–5 minutes on a cold start. Meanwhile you can check your camera and microphone or use the chat.",
       "elapsed": "preparing for {time}",
       "scheduled": "The room opens at the start time",
-      "scheduledDetail": "Or earlier, when the organizer starts the event. Meanwhile you can check your camera and microphone or use the chat."
+      "scheduledDetail": "Or earlier, when the organizer starts the event. Meanwhile you can check your camera and microphone or use the chat.",
+      "slow": "It's taking longer than usual. The room opens by itself as soon as it's ready: if it doesn't within a few minutes, let the organizers know."
     },
     "exitWaiting": "Leave the waiting room",
     "warmingUp": "Room warming up",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "The call at a glance",
     "summaryWhen": "When",
-    "durationHours": "{hours, plural, one {# hour} other {# hours}}",
-    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}",
-    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "summaryRecording": "Recording",
     "readMore": "Read more",
     "readLess": "Show less",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Automatic captions",
     "captionsNotice": "During the live session, the voice of whoever is speaking is transcribed in real time to show captions. Transcription runs on the servers that host the platform and the text is not kept. Captions can be hidden with the captions button in the call's toolbar.",
-    "captionsNoticeTranscript": "During the live session, the speaker's voice is transcribed in real time to show captions, on the servers that host the platform. The text is kept, with the name, only for people who consented to the transcription of what they say, and becomes the event transcript. Captions can be hidden with the captions button in the call toolbar."
+    "captionsNoticeTranscript": "During the live session, the speaker's voice is transcribed in real time to show captions, on the servers that host the platform. The text is kept, with the name, only for people who consented to the transcription of what they say, and becomes the event transcript. Captions can be hidden with the captions button in the call toolbar.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Waiting for the start",
+    "countdownHours": "{hours}h",
+    "countdownMinutes": "{minutes}m",
+    "countdownSeconds": "{seconds}s"
   },
   "recording": {
     "management": "Video recording",
@@ -4719,7 +4742,8 @@
       "materials": "Materials",
       "polls": "Polls",
       "feedback": "Feedback",
-      "transcript": "AI transcript"
+      "transcript": "AI transcript",
+      "ratingsCount": "{count, plural, one {# rating} other {# ratings}}"
     },
     "recordingNotify": "Notify registrants when the recording is published",
     "recordingNotifyHelp": "A single email, sent when the recording (or external video) is visible on the event's public page. It reaches whoever is still registered: after the data retention period nobody is notified.",
@@ -4893,7 +4917,8 @@
     "no": "No",
     "scaleValue": "{value} of {max}",
     "answerOne": "Answer at least one question to send.",
-    "pageTitle": "Questionnaire"
+    "pageTitle": "Questionnaire",
+    "onlyParticipants": "Only people who took part in the event can rate it."
   },
   "notFound": {
     "title": "Page not found",

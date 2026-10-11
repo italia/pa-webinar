@@ -186,7 +186,7 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
   - A confirmation with the personal link and an `.ics` file.
   - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them: up to five per event, chosen from presets between **7 days before** and **15 minutes before**.
   - A notice when the date of a published event changes.
-  - An *optional* thank-you email after the event, with a recap and a feedback link.
+  - An *optional* thank-you email after the event, with a recap and, for those who entered the room, a rating link.
   - A notice when the event's recording, or its external video, becomes visible on the event page. It is on by default and can be turned off per event.
 
   Emails are written in the registrant's language when copy exists for it, and in English otherwise. See [Email and calendar](architecture/email.md).
@@ -321,9 +321,9 @@ Below 992 px, the layout is a full-screen video with a floating control bar, and
 **Leave room** takes participants out, to a screen that says the event is still in progress and offers **Rejoin**. Moderators get a choice:
 
 - **Just leave.** The call goes on for everyone else. The leaving screen reminds the moderator that the event stays open until someone chooses **End for everyone**.
-- **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
+- **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**, and says which sections the ended page will show for this event. Polls still open are closed when the event ends, and no poll can be created or reopened afterwards. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
 
-When the event ends, however it ends, the closing screen asks everyone except moderators for the end-of-event rating, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead, which offers **Leave a rating** without waiting for the end. The rating is asked once per visit, whether it is answered or skipped.
+When the event ends, however it ends, the closing screen asks everyone except moderators for the end-of-event rating, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead, which offers **Leave a rating** without waiting for the end. The rating is asked once per visit, whether it is answered or skipped. Only people who took part can rate. A registrant who entered the room rates once, with their registration. Someone who entered without registering presents the room token they received on entry, which the portal signed for that room, and rates once per entry: they are anonymous, and re-entering gives a new seat. Moderators do not rate. The public page of an ended event offers the rating only to a registrant who entered the room, recognized by the rating link in the thank-you email (a signed link that serves only to rate) or by the access cookie of the browser they registered from; everyone else rates in the room, at the end. The thank-you email invites to rate only those who entered the room; the others receive the recap.
 
 Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configuration reference](CONFIGURATION.md) · [From creation to recap: the event journey](architecture/event-journey.md).
 

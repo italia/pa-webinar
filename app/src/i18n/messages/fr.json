@@ -69,7 +69,10 @@
     "requiredField": "Champ obligatoire",
     "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
     "selectAll": "Tout sélectionner",
-    "deselectAll": "Tout désélectionner"
+    "deselectAll": "Tout désélectionner",
+    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
+    "durationHours": "{hours, plural, one {# heure} other {# heures}}",
+    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}"
   },
   "markdown": {
     "edit": "Écrire",
@@ -103,7 +106,6 @@
     "noPast": "Aucun événement passé",
     "wordCloudTitle": "En un mot",
     "card": {
-      "publicEvent": "Événement public",
       "readMore": "En savoir plus",
       "liveNow": "En direct",
       "spotsAvailable": "{count} places disponibles",
@@ -132,7 +134,6 @@
       "title": "Détails de l'événement",
       "date": "Date et heure",
       "duration": "Durée",
-      "durationHours": "{hours} h {minutes} min",
       "timezone": "Fuseau horaire",
       "description": "Description",
       "participants": "Participants",
@@ -151,7 +152,6 @@
       "noRecording": "L'enregistrement vidéo n'est pas disponible pour cet événement.",
       "watchRecording": "Voir l'enregistrement",
       "backToEvents": "Retour aux événements",
-      "alreadyRegisteredEnter": "Déjà inscrit ? Entrez dans la salle",
       "invalidTokenTitle": "Ce lien d'accès n'est plus valide",
       "invalidTokenBody": "Le lien que vous avez utilisé n'est pas valide ou a expiré. Si vous vous êtes inscrit, consultez l'e-mail de confirmation pour retrouver votre lien personnel, ou inscrivez-vous à nouveau ci-dessous.",
       "invalidTokenBodyEnded": "Le lien que vous avez utilisé n'est plus valide. L'événement est terminé : vous trouverez ci-dessous l'enregistrement et les documents.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Télécharger le fichier .ics"
       },
-      "registrationEnded": "L'événement est terminé : les inscriptions sont closes."
+      "registrationEnded": "L'événement est terminé : les inscriptions sont closes.",
+      "joinAsGuest": "Participer en tant qu'invité",
+      "registeredUseEmailLink": "Déjà inscrit ? Entrez avec le lien personnel reçu par e-mail.",
+      "willBeRecorded": "L'événement sera enregistré."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "En direct",
       "IDLE": "En pause",
       "ENDED": "Terminé",
-      "ARCHIVED": "Archivé"
+      "ARCHIVED": "Archivé",
+      "UPCOMING": "À venir"
     },
     "list": {
       "filterByTag": "Filtrer par catégorie",
@@ -298,14 +302,23 @@
       "title": "Devenir de l'événement",
       "body": "Vous êtes sur le point de terminer l'événement pour tout le monde. Que doit-il devenir une fois terminé ?",
       "public": "Garder public",
-      "publicHelp": "La page de l'événement terminé reste visible avec le récapitulatif, les questions, les sondages, les documents et les avis.",
       "library": "Publier dans la vidéothèque",
       "libraryHelp": "Comme ci-dessus, et affiche en plus l'événement dans la vidéothèque publique (nécessite un enregistrement publié ou une vidéo YouTube).",
       "archive": "Archiver (privé)",
       "archiveHelp": "La page de l'événement terminé ne sera pas visible du public. Les données sont conservées jusqu'à la fin de la durée de conservation, puis supprimées.",
       "genAi": "Générer la transcription et la synthèse IA à partir de l'enregistrement (à la fin du traitement)",
       "back": "Retour",
-      "confirm": "Terminer l'événement"
+      "confirm": "Terminer l'événement",
+      "publicHelpList": "La page de l'événement terminé reste visible et, s'il y en a, affiche {sections}.",
+      "publicHelpNone": "La page de l'événement terminé reste visible, avec son titre et sa description.",
+      "sections": {
+        "recap": "le récapitulatif",
+        "qa": "les questions du Q&R",
+        "polls": "les sondages publiés",
+        "wordCloud": "le nuage de mots",
+        "materials": "les documents",
+        "feedback": "les évaluations"
+      }
     },
     "eventNotStarted": "L'événement n'a pas encore commencé",
     "eventStartsAt": "L'événement commencera le {date} à {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Supprimer le message",
       "mentionedYou": "Vous a mentionné",
       "mentionEmpty": "Personne à mentionner pour l'instant : ici apparaissent celles et ceux qui écrivent dans le chat ou sont dans la salle.",
-      "mentionNoMatch": "Personne avec ce nom."
+      "mentionNoMatch": "Personne avec ce nom.",
+      "logLabel": "Messages du chat",
+      "loadingHistory": "Chargement des messages…",
+      "historyFailed": "Impossible de charger les messages.",
+      "announceMessage": "{name} : {text}",
+      "announceMessages": "{count, plural, one {# nouveau message} other {# nouveaux messages}}",
+      "announceAttachment": "a envoyé une pièce jointe"
     },
     "role": {
       "moderator": "Modérateur",
@@ -562,7 +581,9 @@
       "timerHelp": "Un compte à rebours pour la personne qui parle : vous pouvez l'afficher à toute la salle.",
       "eventHeading": "Événement",
       "endHelp": "Ferme la salle pour tous et marque l'événement comme terminé. Action irréversible.",
-      "timerHeading": "Minuteur des interventions"
+      "timerHeading": "Minuteur des interventions",
+      "turnOffConfirm": "Désactiver « {feature} » pour tout le monde ?",
+      "turnOff": "Désactiver"
     },
     "closingNotice": "{minutes, plural, =0 {La salle se ferme.} one {La salle se ferme automatiquement dans # minute.} other {La salle se ferme automatiquement dans # minutes.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Réinitialiser les filtres",
       "noResults": "Aucun événement ne correspond aux filtres.",
       "resultsCount": "{count, plural, =0 {Aucun événement} one {# événement} other {# événements}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Actions pour « {title} »",
         "manage": "Gérer",
@@ -3413,7 +3432,8 @@
       "generic": "Erreur lors de la création du sondage",
       "vote": "Vote non enregistré. Veuillez réessayer.",
       "alreadyVoted": "Vous avez déjà voté dans ce sondage.",
-      "action": "L'action a échoué. Veuillez réessayer."
+      "action": "L'action a échoué. Veuillez réessayer.",
+      "closed": "Le sondage est clos."
     },
     "participation": "{votes, plural, one {# vote} other {# votes}} sur {present} présents",
     "participationLabel": "Participation au sondage",
@@ -4086,7 +4106,7 @@
     "cancel": "Annuler",
     "noActiveRound": "Aucune question ouverte pour le moment.",
     "noWords": "En attente des premiers mots...",
-    "wordsSubmitted": "{count} mots soumis",
+    "wordsSubmitted": "{count, plural, =0 {Aucun mot envoyé} one {# mot envoyé} other {# mots envoyés}}",
     "timeRemaining": "Temps restant",
     "errors": {
       "send": "Mot non envoyé. Veuillez réessayer.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Attente habituelle : moins d'une minute si l'infrastructure est déjà chaude, 3 à 5 minutes au premier démarrage. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation.",
       "elapsed": "en préparation depuis {time}",
       "scheduled": "La salle ouvre à l'heure de début",
-      "scheduledDetail": "Ou plus tôt, lorsque l'organisation démarre l'événement. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation."
+      "scheduledDetail": "Ou plus tôt, lorsque l'organisation démarre l'événement. En attendant, vous pouvez vérifier caméra et micro ou utiliser la conversation.",
+      "slow": "Cela prend plus de temps que d'habitude. La salle s'ouvre d'elle-même dès qu'elle est prête : si ce n'est pas le cas d'ici quelques minutes, prévenez les organisateurs."
     },
     "exitWaiting": "Quitter la salle d'attente",
     "warmingUp": "Salle en préparation",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "L'appel en bref",
     "summaryWhen": "Quand",
-    "durationHours": "{hours, plural, one {# heure} other {# heures}}",
-    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}",
-    "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "summaryRecording": "Enregistrement",
     "readMore": "Lire la suite",
     "readLess": "Afficher moins",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Sous-titres automatiques",
     "captionsNotice": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres. La transcription s'effectue sur les serveurs qui hébergent la plateforme et le texte n'est pas conservé. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre de l'appel.",
-    "captionsNoticeTranscript": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres, sur les serveurs qui hébergent la plateforme. Le texte n'est conservé, avec le nom, que pour les personnes qui ont accepté la transcription de leurs interventions, et devient la transcription de l'événement. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre d'appel."
+    "captionsNoticeTranscript": "Pendant le direct, la voix de la personne qui parle est transcrite en temps réel pour afficher les sous-titres, sur les serveurs qui hébergent la plateforme. Le texte n'est conservé, avec le nom, que pour les personnes qui ont accepté la transcription de leurs interventions, et devient la transcription de l'événement. Les sous-titres peuvent être masqués avec le bouton des sous-titres dans la barre d'appel.",
+    "countdownDays": "{days}j",
+    "waitingForStartButton": "En attente du lancement",
+    "countdownHours": "{hours}h",
+    "countdownMinutes": "{minutes}min",
+    "countdownSeconds": "{seconds}s"
   },
   "recording": {
     "management": "Enregistrement vidéo",
@@ -4719,7 +4742,8 @@
       "materials": "Documents",
       "polls": "Sondages",
       "feedback": "Retours",
-      "transcript": "Transcription IA"
+      "transcript": "Transcription IA",
+      "ratingsCount": "{count, plural, one {# évaluation} other {# évaluations}}"
     },
     "recordingNotify": "Prévenir les inscrits quand l'enregistrement est publié",
     "recordingNotifyHelp": "Un seul e-mail, quand l'enregistrement (ou la vidéo externe) est visible sur la page publique de l'événement. Il atteint les personnes encore inscrites : après la durée de conservation, personne n'est prévenu.",
@@ -4893,7 +4917,8 @@
     "no": "Non",
     "scaleValue": "{value} sur {max}",
     "answerOne": "Répondez à au moins une question pour envoyer.",
-    "pageTitle": "Questionnaire"
+    "pageTitle": "Questionnaire",
+    "onlyParticipants": "L'évaluation est réservée aux personnes ayant participé à l'événement."
   },
   "notFound": {
     "title": "Page introuvable",

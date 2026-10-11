@@ -53,8 +53,12 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new NotFoundError('Poll');
   }
 
-  if (poll.status !== 'OPEN') {
-    throw new ConflictError('Poll is closed');
+  // A evento concluso un sondaggio rimasto aperto e' chiuso: nessuno lo ha
+  // chiuso a mano, ma la sala non c'e' piu'.
+  // Un codice suo: «chiuso» e «hai gia' votato» sono entrambi 409, e chi vota
+  // deve sapere quale dei due.
+  if (poll.status !== 'OPEN' || event.status === 'ENDED' || event.status === 'ARCHIVED') {
+    throw new AppError('Poll is closed', 409, 'POLL_CLOSED');
   }
 
   const options = poll.options as string[];

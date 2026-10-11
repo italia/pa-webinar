@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
-import EventListClient from '@/components/events/event-list-client';
+import EventList from '@/components/events/event-list';
 import LandingIstituzionale from '@/components/home/landing-istituzionale';
 import LandingSemplice from '@/components/home/landing-semplice';
 
@@ -162,7 +162,7 @@ async function EventsSection({
             <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
           </div>
         ) : (
-          <EventListClient events={upcoming} parseTitleKicker={parseTitleKicker} />
+          <EventList events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
       </div>
     </section>
@@ -192,7 +192,7 @@ async function EventsListHome({
             <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
           </div>
         ) : (
-          <EventListClient events={upcoming} parseTitleKicker={parseTitleKicker} />
+          <EventList events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
         <div className="text-center mt-4">
           <Link href="/events" className="btn btn-primary btn-lg">

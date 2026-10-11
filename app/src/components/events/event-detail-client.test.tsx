@@ -82,6 +82,7 @@ function disegna(props: {
   hasRoomAccess?: boolean;
   invalidToken?: boolean;
   hasPostEventQuestionnaire?: boolean;
+  feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
 }) {
   act(() => {
     root.render(
@@ -176,13 +177,23 @@ describe('scheda pubblica — invito al questionario post-evento', () => {
       endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
     });
 
-  it('compare quando l’evento ha un questionario', () => {
+  it('compare quando l’evento ha un questionario, a chi ha partecipato', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      hasPostEventQuestionnaire: true,
+      feedbackProof: { accessToken: 'TOKEN_ISCRIZIONE' },
+    });
+    expect(container.querySelector('[data-testid="invito-questionario"]')).not.toBeNull();
+  });
+
+  it('a chi il server non riconosce come partecipante non compare: verrebbe rifiutato all’invio', () => {
     disegna({
       event: concluso(),
       registrationOpen: false,
       hasPostEventQuestionnaire: true,
     });
-    expect(container.querySelector('[data-testid="invito-questionario"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="invito-questionario"]')).toBeNull();
   });
 
   it('senza questionario non compare', () => {
@@ -199,6 +210,7 @@ describe('scheda pubblica — invito al questionario post-evento', () => {
       event: { ...concluso(), postEventShowFeedback: false },
       registrationOpen: false,
       hasPostEventQuestionnaire: true,
+      feedbackProof: { accessToken: 'TOKEN_ISCRIZIONE' },
     });
     expect(container.querySelector('[data-testid="invito-questionario"]')).toBeNull();
   });
@@ -207,5 +219,28 @@ describe('scheda pubblica — invito al questionario post-evento', () => {
     disegna({ event: concluso(), registrationOpen: false });
     expect(container.textContent).not.toContain(detail.registrationEnded);
     expect(container.textContent).toContain(detail.eventEnded);
+  });
+});
+
+describe('scheda pubblica — stato e ingresso leggibili', () => {
+  it('un evento pubblicato è «In programma», con la durata in parole', () => {
+    disegna({ event: evento(), registrationOpen: true });
+    expect(container.textContent).toContain(messages.events.status.UPCOMING);
+    expect(container.textContent).not.toContain(messages.events.status.PUBLISHED);
+    expect(container.textContent).toContain('2 ore');
+  });
+
+  it('in diretta si offre di entrare come ospite, accanto all’iscrizione', () => {
+    disegna({ event: evento({ status: 'LIVE', startsAt: new Date(Date.now() - HOUR).toISOString() }), registrationOpen: true });
+    expect(link(`/events/${SLUG}/live`)?.textContent).toContain(detail.joinAsGuest);
+    expect(container.textContent).toContain(detail.registeredUseEmailLink);
+    expect(link(`/events/${SLUG}/registration`)?.textContent).toContain(detail.registerAndJoin);
+  });
+
+  it('dice prima che l’evento sarà registrato', () => {
+    disegna({ event: evento({ recordingEnabled: true }), registrationOpen: true });
+    expect(container.textContent).toContain(detail.willBeRecorded);
+    disegna({ event: evento({ recordingEnabled: false }), registrationOpen: true });
+    expect(container.textContent).not.toContain(detail.willBeRecorded);
   });
 });

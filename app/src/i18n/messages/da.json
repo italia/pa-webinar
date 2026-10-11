@@ -69,7 +69,10 @@
     "requiredField": "Obligatorisk felt",
     "errorGeneric": "Der opstod en fejl. Prøv igen.",
     "selectAll": "Vælg alle",
-    "deselectAll": "Fravælg alle"
+    "deselectAll": "Fravælg alle",
+    "durationMinutes": "{minutes, plural, one {# minut} other {# minutter}}",
+    "durationHours": "{hours, plural, one {# time} other {# timer}}",
+    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}"
   },
   "markdown": {
     "edit": "Skriv",
@@ -103,7 +106,6 @@
     "noPast": "Ingen tidligere begivenheder",
     "wordCloudTitle": "Med ét ord",
     "card": {
-      "publicEvent": "Offentlig begivenhed",
       "readMore": "Læs mere",
       "liveNow": "Live nu",
       "spotsAvailable": "{count} pladser ledige",
@@ -132,7 +134,6 @@
       "title": "Begivenhedsdetaljer",
       "date": "Dato og klokkeslæt",
       "duration": "Varighed",
-      "durationHours": "{hours}t {minutes}min",
       "timezone": "Tidszone",
       "description": "Beskrivelse",
       "participants": "Deltagere",
@@ -151,7 +152,6 @@
       "noRecording": "Videooptagelse er ikke tilgængelig for denne begivenhed.",
       "watchRecording": "Se optagelsen",
       "backToEvents": "Tilbage til begivenheder",
-      "alreadyRegisteredEnter": "Allerede tilmeldt? Gå ind i mødelokalet",
       "invalidTokenTitle": "Adgangslinket er ikke længere gyldigt",
       "invalidTokenBody": "Det link, du har brugt, er ugyldigt eller udløbet. Hvis du er tilmeldt, kan du finde dit personlige link i bekræftelsesmailen — eller tilmelde dig igen nedenfor.",
       "invalidTokenBodyEnded": "Det link, du har brugt, er ikke længere gyldigt. Arrangementet er afsluttet: nedenfor finder du optagelsen og materialerne.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics-fil"
       },
-      "registrationEnded": "Begivenheden er afsluttet: tilmeldingen er lukket."
+      "registrationEnded": "Begivenheden er afsluttet: tilmeldingen er lukket.",
+      "joinAsGuest": "Deltag som gæst",
+      "registeredUseEmailLink": "Allerede tilmeldt? Brug det personlige link fra din e-mail.",
+      "willBeRecorded": "Arrangementet bliver optaget."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "I gang",
       "IDLE": "På pause",
       "ENDED": "Afsluttet",
-      "ARCHIVED": "Arkiveret"
+      "ARCHIVED": "Arkiveret",
+      "UPCOMING": "Kommende"
     },
     "list": {
       "filterByTag": "Filtrér efter kategori",
@@ -298,14 +302,23 @@
       "title": "Arrangementets skæbne",
       "body": "Du er ved at afslutte arrangementet for alle. Hvad skal der ske med det, når det er slut?",
       "public": "Behold det offentligt",
-      "publicHelp": "Siden for det afsluttede arrangement forbliver synlig med opsummering, spørgsmål, afstemninger, materialer og feedback.",
       "library": "Udgiv i biblioteket",
       "libraryHelp": "Som ovenfor, og vis desuden arrangementet i det offentlige videobibliotek (kræver en udgivet optagelse eller en YouTube-video).",
       "archive": "Arkivér (privat)",
       "archiveHelp": "Siden for det afsluttede arrangement vil ikke være synlig for offentligheden. Dataene opbevares, indtil opbevaringsperioden udløber, og slettes derefter.",
       "genAi": "Generér AI-transskription og -resumé ud fra optagelsen (når behandlingen er færdig)",
       "back": "Tilbage",
-      "confirm": "Afslut arrangementet"
+      "confirm": "Afslut arrangementet",
+      "publicHelpList": "Siden for det afsluttede arrangement forbliver synlig og viser, hvis de findes, {sections}.",
+      "publicHelpNone": "Siden for det afsluttede arrangement forbliver synlig, med titel og beskrivelse.",
+      "sections": {
+        "recap": "opsummeringen",
+        "qa": "spørgsmålene fra Q&A",
+        "polls": "de offentliggjorte afstemninger",
+        "wordCloud": "ordskyen",
+        "materials": "materialerne",
+        "feedback": "bedømmelserne"
+      }
     },
     "eventNotStarted": "Begivenheden er endnu ikke startet",
     "eventStartsAt": "Begivenheden starter den {date} kl. {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Slet beskeden",
       "mentionedYou": "Nævnte dig",
       "mentionEmpty": "Ingen at nævne endnu: her vises dem, der skriver i chatten eller er i rummet.",
-      "mentionNoMatch": "Ingen med dette navn."
+      "mentionNoMatch": "Ingen med dette navn.",
+      "logLabel": "Chatbeskeder",
+      "loadingHistory": "Indlæser beskeder…",
+      "historyFailed": "Beskederne kunne ikke indlæses.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# ny besked} other {# nye beskeder}}",
+      "announceAttachment": "har sendt en vedhæftet fil"
     },
     "role": {
       "moderator": "Moderator",
@@ -562,7 +581,9 @@
       "timerHelp": "En nedtælling til den, der taler: du kan vise den for hele rummet.",
       "eventHeading": "Arrangement",
       "endHelp": "Lukker rummet for alle og markerer arrangementet som afsluttet. Kan ikke fortrydes.",
-      "timerHeading": "Timer for indlæg"
+      "timerHeading": "Timer for indlæg",
+      "turnOffConfirm": "Slå »{feature}« fra for alle?",
+      "turnOff": "Slå fra"
     },
     "closingNotice": "{minutes, plural, =0 {Rummet lukker.} one {Rummet lukker automatisk om # minut.} other {Rummet lukker automatisk om # minutter.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Nulstil filtre",
       "noResults": "Ingen arrangementer matcher filtrene.",
       "resultsCount": "{count, plural, =0 {Ingen arrangementer} one {# arrangement} other {# arrangementer}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}t {minutes} min",
       "menu": {
         "actionsFor": "Handlinger for »{title}«",
         "manage": "Administrer",
@@ -3413,7 +3432,8 @@
       "generic": "Fejl ved oprettelse af afstemning",
       "vote": "Stemmen blev ikke registreret. Prøv igen.",
       "alreadyVoted": "Du har allerede stemt i denne afstemning.",
-      "action": "Handlingen mislykkedes. Prøv igen."
+      "action": "Handlingen mislykkedes. Prøv igen.",
+      "closed": "Afstemningen er lukket."
     },
     "participation": "{votes, plural, one {# stemme} other {# stemmer}} ud af {present} til stede",
     "participationLabel": "Deltagelse i afstemningen",
@@ -4086,7 +4106,7 @@
     "cancel": "Annuller",
     "noActiveRound": "Der er ikke noget åbent spørgsmål lige nu.",
     "noWords": "Venter på de første ord...",
-    "wordsSubmitted": "{count} ord indsendt",
+    "wordsSubmitted": "{count, plural, =0 {Ingen ord sendt} one {# ord sendt} other {# ord sendt}}",
     "timeRemaining": "Tid tilbage",
     "errors": {
       "send": "Ordet blev ikke sendt. Prøv igen.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Sædvanlig ventetid: under et minut hvis infrastrukturen allerede er varm, 3–5 minutter ved første opstart. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
       "elapsed": "under forberedelse i {time}",
       "scheduled": "Rummet åbner på starttidspunktet",
-      "scheduledDetail": "Eller tidligere, når arrangøren starter begivenheden. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten."
+      "scheduledDetail": "Eller tidligere, når arrangøren starter begivenheden. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
+      "slow": "Det tager længere tid end normalt. Rummet åbner af sig selv, så snart det er klar: Sker det ikke inden for få minutter, så giv arrangørerne besked."
     },
     "exitWaiting": "Forlad venteværelset",
     "warmingUp": "Lokalet klargøres",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "Opkaldet kort fortalt",
     "summaryWhen": "Hvornår",
-    "durationHours": "{hours, plural, one {# time} other {# timer}}",
-    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}",
-    "durationMinutes": "{minutes, plural, one {# minut} other {# minutter}}",
     "summaryRecording": "Optagelse",
     "readMore": "Læs mere",
     "readLess": "Vis mindre",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Automatiske undertekster",
     "captionsNotice": "Under livesessionen bliver stemmen hos den, der taler, transskriberet i realtid for at vise undertekster. Transskriptionen foregår på de servere, der hoster platformen, og teksten gemmes ikke. Underteksterne kan skjules med undertekstknappen i opkaldets værktøjslinje.",
-    "captionsNoticeTranscript": "Under direkte-sessionen transskriberes talerens stemme i realtid for at vise undertekster, på de servere, der hoster platformen. Teksten gemmes, med navn, kun for dem, der har givet samtykke til udskrift af deres indlæg, og bliver arrangementets udskrift. Underteksterne kan skjules med undertekstknappen i opkaldsbjælken."
+    "captionsNoticeTranscript": "Under direkte-sessionen transskriberes talerens stemme i realtid for at vise undertekster, på de servere, der hoster platformen. Teksten gemmes, med navn, kun for dem, der har givet samtykke til udskrift af deres indlæg, og bliver arrangementets udskrift. Underteksterne kan skjules med undertekstknappen i opkaldsbjælken.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Venter på start",
+    "countdownHours": "{hours} t",
+    "countdownMinutes": "{minutes} m",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Videooptagelse",
@@ -4719,7 +4742,8 @@
       "materials": "Materialer",
       "polls": "Afstemninger",
       "feedback": "Feedback",
-      "transcript": "AI-transskription"
+      "transcript": "AI-transskription",
+      "ratingsCount": "{count, plural, one {# bedømmelse} other {# bedømmelser}}"
     },
     "recordingNotify": "Giv tilmeldte besked, når optagelsen er offentliggjort",
     "recordingNotifyHelp": "Én e-mail, når optagelsen (eller den eksterne video) er synlig på arrangementets offentlige side. Den når dem, der stadig er tilmeldt: efter opbevaringsperioden får ingen besked.",
@@ -4893,7 +4917,8 @@
     "no": "Nej",
     "scaleValue": "{value} af {max}",
     "answerOne": "Besvar mindst ét spørgsmål for at sende.",
-    "pageTitle": "Spørgeskema"
+    "pageTitle": "Spørgeskema",
+    "onlyParticipants": "Kun de, der deltog i arrangementet, kan bedømme det."
   },
   "notFound": {
     "title": "Siden blev ikke fundet",

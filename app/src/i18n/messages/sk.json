@@ -69,7 +69,10 @@
     "requiredField": "Povinné pole",
     "errorGeneric": "Vyskytla sa chyba. Skúste to znova.",
     "selectAll": "Vybrať všetko",
-    "deselectAll": "Zrušiť výber"
+    "deselectAll": "Zrušiť výber",
+    "durationMinutes": "{minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
+    "durationHours": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}}",
+    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}"
   },
   "markdown": {
     "edit": "Písať",
@@ -103,7 +106,6 @@
     "noPast": "Žiadne minulé udalosti",
     "wordCloudTitle": "Jedným slovom",
     "card": {
-      "publicEvent": "Verejná udalosť",
       "readMore": "Zistiť viac",
       "liveNow": "Práve prebieha",
       "spotsAvailable": "{count} voľných miest",
@@ -132,7 +134,6 @@
       "title": "Detail udalosti",
       "date": "Dátum a čas",
       "duration": "Trvanie",
-      "durationHours": "{hours} h {minutes} min",
       "timezone": "Časové pásmo",
       "description": "Popis",
       "participants": "Účastníci",
@@ -151,7 +152,6 @@
       "noRecording": "Videozáznam nie je pre túto udalosť k dispozícii.",
       "watchRecording": "Prehrať záznam",
       "backToEvents": "Späť na udalosti",
-      "alreadyRegisteredEnter": "Už ste zaregistrovaní? Vstúpte do miestnosti",
       "invalidTokenTitle": "Prístupový odkaz už nie je platný",
       "invalidTokenBody": "Odkaz, ktorý ste použili, je neplatný alebo mu vypršala platnosť. Ak ste sa zaregistrovali, nájdite svoj osobný odkaz v potvrdzovacom e-maile alebo sa zaregistrujte znova nižšie.",
       "invalidTokenBodyEnded": "Odkaz, ktorý ste použili, už nie je platný. Podujatie sa skončilo: nižšie nájdete nahrávku a materiály.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Stiahnuť súbor .ics"
       },
-      "registrationEnded": "Udalosť sa skončila: registrácia je uzavretá."
+      "registrationEnded": "Udalosť sa skončila: registrácia je uzavretá.",
+      "joinAsGuest": "Pripojiť sa ako hosť",
+      "registeredUseEmailLink": "Už ste prihlásení? Vstúpte cez osobný odkaz z e-mailu.",
+      "willBeRecorded": "Podujatie bude nahrávané."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -187,7 +190,8 @@
       "LIVE": "Práve prebieha",
       "IDLE": "Pozastavené",
       "ENDED": "Ukončené",
-      "ARCHIVED": "Archivované"
+      "ARCHIVED": "Archivované",
+      "UPCOMING": "Plánované"
     },
     "list": {
       "filterByTag": "Filtrovať podľa kategórie",
@@ -298,14 +302,23 @@
       "title": "Osud podujatia",
       "body": "Chystáte sa ukončiť podujatie pre všetkých. Čo sa s ním má stať po skončení?",
       "public": "Ponechať verejné",
-      "publicHelp": "Stránka skončeného podujatia zostane viditeľná so zhrnutím, otázkami, anketami, materiálmi a spätnou väzbou.",
       "library": "Publikovať do knižnice",
       "libraryHelp": "Ako vyššie a navyše zobrazí podujatie vo verejnej videoknižnici (vyžaduje publikovanú nahrávku alebo video na YouTube).",
       "archive": "Archivovať (súkromné)",
       "archiveHelp": "Stránka skončeného podujatia nebude verejne viditeľná. Údaje sa uchovávajú do konca doby uchovávania a potom sa vymažú.",
       "genAi": "Vygenerovať prepis a zhrnutie pomocou AI z nahrávky (po dokončení spracovania)",
       "back": "Späť",
-      "confirm": "Ukončiť podujatie"
+      "confirm": "Ukončiť podujatie",
+      "publicHelpList": "Stránka skončeného podujatia zostáva viditeľná a, ak existujú, zobrazuje {sections}.",
+      "publicHelpNone": "Stránka skončeného podujatia zostáva viditeľná, s názvom a popisom.",
+      "sections": {
+        "recap": "zhrnutie",
+        "qa": "otázky z Q&A",
+        "polls": "zverejnené ankety",
+        "wordCloud": "slovný mrak",
+        "materials": "materiály",
+        "feedback": "hodnotenia"
+      }
     },
     "eventNotStarted": "Udalosť ešte nezačala",
     "eventStartsAt": "Udalosť začne {date} o {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Odstrániť správu",
       "mentionedYou": "Spomenul(a) vás",
       "mentionEmpty": "Zatiaľ nie je koho spomenúť: zobrazia sa tu tí, čo píšu do chatu alebo sú v miestnosti.",
-      "mentionNoMatch": "Nikto s týmto menom."
+      "mentionNoMatch": "Nikto s týmto menom.",
+      "logLabel": "Správy chatu",
+      "loadingHistory": "Načítavajú sa správy…",
+      "historyFailed": "Správy sa nepodarilo načítať.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nová správa} few {# nové správy} many {# novej správy} other {# nových správ}}",
+      "announceAttachment": "poslal(a) prílohu"
     },
     "role": {
       "moderator": "Moderátor",
@@ -562,7 +581,9 @@
       "timerHelp": "Odpočet pre rečníka: môžete ho ukázať celej miestnosti.",
       "eventHeading": "Podujatie",
       "endHelp": "Zatvorí miestnosť pre všetkých a označí podujatie ako ukončené. Nedá sa vrátiť.",
-      "timerHeading": "Časovač vystúpení"
+      "timerHeading": "Časovač vystúpení",
+      "turnOffConfirm": "Vypnúť „{feature}“ pre všetkých?",
+      "turnOff": "Vypnúť"
     },
     "closingNotice": "{minutes, plural, =0 {Miestnosť sa zatvára.} one {Miestnosť sa automaticky zatvorí o # minútu.} few {Miestnosť sa automaticky zatvorí o # minúty.} many {Miestnosť sa automaticky zatvorí o # minúty.} other {Miestnosť sa automaticky zatvorí o # minút.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Vynulovať filtre",
       "noResults": "Žiadne podujatia nezodpovedajú filtrom.",
       "resultsCount": "{count, plural, =0 {Žiadne podujatie} one {# podujatie} other {# podujatí}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Akcie pre „{title}“",
         "manage": "Spravovať",
@@ -3413,7 +3432,8 @@
       "generic": "Chyba pri vytváraní ankety",
       "vote": "Hlas nebol zaznamenaný. Skúste to znova.",
       "alreadyVoted": "V tejto ankete ste už hlasovali.",
-      "action": "Akcia zlyhala. Skúste to znova."
+      "action": "Akcia zlyhala. Skúste to znova.",
+      "closed": "Anketa je uzavretá."
     },
     "participation": "{votes, plural, one {# hlas} few {# hlasy} other {# hlasov}} z {present} prítomných",
     "participationLabel": "Účasť v ankete",
@@ -4086,7 +4106,7 @@
     "cancel": "Zrušiť",
     "noActiveRound": "Momentálne nie je otvorená žiadna otázka.",
     "noWords": "Čakáme na prvé slová...",
-    "wordsSubmitted": "{count} odoslaných slov",
+    "wordsSubmitted": "{count, plural, =0 {Žiadne odoslané slovo} one {# odoslané slovo} few {# odoslané slová} many {# odoslaného slova} other {# odoslaných slov}}",
     "timeRemaining": "Zostávajúci čas",
     "errors": {
       "send": "Slovo sa neodoslalo. Skúste to znova.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Zvyčajné čakanie: menej ako minúta, ak je infraštruktúra zohriata, 3–5 minút pri prvom spustení. Zatiaľ si môžete skontrolovať kameru a mikrofón alebo použiť chat.",
       "elapsed": "pripravuje sa {time}",
       "scheduled": "Miestnosť sa otvorí v čase začiatku",
-      "scheduledDetail": "Alebo skôr, keď organizátor podujatie spustí. Zatiaľ si môžete skontrolovať kameru a mikrofón alebo použiť chat."
+      "scheduledDetail": "Alebo skôr, keď organizátor podujatie spustí. Zatiaľ si môžete skontrolovať kameru a mikrofón alebo použiť chat.",
+      "slow": "Trvá to dlhšie ako zvyčajne. Miestnosť sa otvorí sama, keď bude pripravená: ak sa to nestane do niekoľkých minút, dajte vedieť organizátorom."
     },
     "exitWaiting": "Opustiť čakáreň",
     "warmingUp": "Miestnosť sa pripravuje",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "Hovor v skratke",
     "summaryWhen": "Kedy",
-    "durationHours": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}}",
-    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
-    "durationMinutes": "{minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
     "summaryRecording": "Záznam",
     "readMore": "Čítať ďalej",
     "readLess": "Zobraziť menej",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Automatické titulky",
     "captionsNotice": "Počas živého vysielania sa hlas toho, kto hovorí, prepisuje v reálnom čase, aby sa zobrazovali titulky. Prepis prebieha na serveroch, ktoré hostia platformu, a text sa neuchováva. Titulky možno skryť tlačidlom titulkov na lište hovoru.",
-    "captionsNoticeTranscript": "Počas živého prenosu sa hlas rečníka prepisuje v reálnom čase na zobrazenie titulkov, na serveroch, ktoré platformu hostia. Text sa uchováva, s menom, len pri ľuďoch, ktorí súhlasili s prepisom svojich vystúpení, a stáva sa prepisom podujatia. Titulky možno skryť tlačidlom titulkov na lište hovoru."
+    "captionsNoticeTranscript": "Počas živého prenosu sa hlas rečníka prepisuje v reálnom čase na zobrazenie titulkov, na serveroch, ktoré platformu hostia. Text sa uchováva, s menom, len pri ľuďoch, ktorí súhlasili s prepisom svojich vystúpení, a stáva sa prepisom podujatia. Titulky možno skryť tlačidlom titulkov na lište hovoru.",
+    "countdownDays": "{days}d",
+    "waitingForStartButton": "Čaká sa na začiatok",
+    "countdownHours": "{hours} h",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Videozáznam",
@@ -4719,7 +4742,8 @@
       "materials": "Materiály",
       "polls": "Ankety",
       "feedback": "Spätná väzba",
-      "transcript": "AI prepis"
+      "transcript": "AI prepis",
+      "ratingsCount": "{count, plural, one {# hodnotenie} few {# hodnotenia} many {# hodnotení} other {# hodnotení}}"
     },
     "recordingNotify": "Upozorniť prihlásených, keď bude záznam zverejnený",
     "recordingNotifyHelp": "Jediný e-mail, keď je záznam (alebo externé video) viditeľný na verejnej stránke podujatia. Dostanú ho tí, ktorí sú stále prihlásení: po uplynutí doby uchovávania už nikto.",
@@ -4893,7 +4917,8 @@
     "no": "Nie",
     "scaleValue": "{value} z {max}",
     "answerOne": "Na odoslanie odpovedzte aspoň na jednu otázku.",
-    "pageTitle": "Dotazník"
+    "pageTitle": "Dotazník",
+    "onlyParticipants": "Hodnotiť môžu len tí, ktorí sa podujatia zúčastnili."
   },
   "notFound": {
     "title": "Stránka sa nenašla",

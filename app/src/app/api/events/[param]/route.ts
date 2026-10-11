@@ -15,6 +15,7 @@ import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
+import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
@@ -559,11 +560,16 @@ export const PUT = withErrorHandling(async (request, context) => {
     nextStatus !== event.status &&
     (event.status === 'LIVE' ||
       (!isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED')));
+  // Concluso o archiviato da uno stato non terminale: i sondaggi rimasti
+  // aperti si chiudono nella stessa transazione (lib/events/close-polls).
+  const closesPolls =
+    nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
   const updated =
-    closesSessions || tagIds !== null
+    closesSessions || closesPolls || tagIds !== null
       ? await prisma.$transaction(async (tx) => {
           const aggiornato = await tx.event.update(updateArgs);
           if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
+          if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
           if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
           return aggiornato;
         })

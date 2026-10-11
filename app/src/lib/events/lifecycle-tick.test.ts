@@ -146,6 +146,15 @@ describe('giro a bridge fisso — chiusura', () => {
     expect(db.status('prov')).toBe('ENDED');
     expect(r.transitions.toEnded).toBe(2);
     expect(publish.publishEventStatus).toHaveBeenCalledWith('pub', 'ENDED');
+    // I sondaggi rimasti aperti si chiudono con la fine.
+    expect(db.writes).toContainEqual(
+      expect.objectContaining({
+        model: 'poll',
+        op: 'updateMany',
+        where: { eventId: { in: expect.arrayContaining(['pub', 'prov']) }, status: 'OPEN' },
+        data: expect.objectContaining({ status: 'CLOSED' }),
+      }),
+    );
   });
 
   it('una sala LIVE occupata termina al tetto del fuori orario, e ne chiude la sessione', async () => {

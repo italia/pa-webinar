@@ -7,6 +7,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { ValidationError } from '@/lib/errors';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
+import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,11 +39,9 @@ export const POST = withErrorHandling(async (request) => {
   const result = await prisma.$transaction(async (tx) => {
     const targets = await tx.event.findMany({ where, select: { id: true, status: true } });
     const archived = await tx.event.updateMany({ where, data: { status: 'ARCHIVED' } });
-    await closeOpenSessions(
-      tx,
-      targets.filter((e) => e.status !== 'ENDED' && e.status !== 'ARCHIVED').map((e) => e.id),
-      new Date(),
-    );
+    const daChiudere = targets.filter((e) => e.status !== 'ENDED' && e.status !== 'ARCHIVED').map((e) => e.id);
+    await closeOpenSessions(tx, daChiudere, new Date());
+    await chiudiSondaggiAperti(tx, daChiudere, new Date());
     return archived;
   });
 

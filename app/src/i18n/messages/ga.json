@@ -69,7 +69,10 @@
     "requiredField": "Réimse riachtanach",
     "errorGeneric": "Tharla earráid. Bain triail eile as.",
     "selectAll": "Roghnaigh gach ceann",
-    "deselectAll": "Díroghnaigh gach ceann"
+    "deselectAll": "Díroghnaigh gach ceann",
+    "durationMinutes": "{minutes, plural, one {# nóiméad} other {# nóiméad}}",
+    "durationHours": "{hours, plural, one {# uair an chloig} other {# uair an chloig}}",
+    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}"
   },
   "markdown": {
     "edit": "Scríobh",
@@ -103,7 +106,6 @@
     "noPast": "Níl aon imeacht roimhe seo",
     "wordCloudTitle": "In aon fhocal amháin",
     "card": {
-      "publicEvent": "Imeacht poiblí",
       "readMore": "Tuilleadh eolais",
       "liveNow": "Beo anois",
       "spotsAvailable": "{count} áit ar fáil",
@@ -132,7 +134,6 @@
       "title": "Sonraí an imeachta",
       "date": "Dáta agus am",
       "duration": "Fad",
-      "durationHours": "{hours}u {minutes}nóim",
       "timezone": "Crios ama",
       "description": "Cur síos",
       "participants": "Rannpháirtithe",
@@ -151,7 +152,6 @@
       "noRecording": "Níl taifeadadh físe ar fáil don imeacht seo.",
       "watchRecording": "Féach ar an taifeadadh",
       "backToEvents": "Ar ais go dtí na himeachtaí",
-      "alreadyRegisteredEnter": "Cláraithe cheana? Téigh isteach sa seomra",
       "invalidTokenTitle": "Níl an nasc rochtana bailí a thuilleadh",
       "invalidTokenBody": "Níl an nasc a d'úsáid tú bailí nó tá sé imithe in éag. Má chláraigh tú, féach ar an ríomhphost deimhnithe le do nasc pearsanta a fháil, nó cláraigh arís thíos.",
       "invalidTokenBodyEnded": "Níl an nasc a d'úsáid tú bailí a thuilleadh. Tá deireadh leis an imeacht: gheobhaidh tú an taifeadadh agus na hábhair thíos.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Íoslódáil comhad .ics"
       },
-      "registrationEnded": "Tá an t-imeacht críochnaithe: tá an clárú dúnta."
+      "registrationEnded": "Tá an t-imeacht críochnaithe: tá an clárú dúnta.",
+      "joinAsGuest": "Glac páirt mar aoi",
+      "registeredUseEmailLink": "Cláraithe cheana? Úsáid an nasc pearsanta a fuair tú i ríomhphost.",
+      "willBeRecorded": "Taifeadfar an ócáid."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -187,7 +190,8 @@
       "LIVE": "Beo",
       "IDLE": "Ar sos",
       "ENDED": "Críochnaithe",
-      "ARCHIVED": "Cartlannaithe"
+      "ARCHIVED": "Cartlannaithe",
+      "UPCOMING": "Le teacht"
     },
     "list": {
       "filterByTag": "Scag de réir catagóire",
@@ -298,14 +302,23 @@
       "title": "Cinniúint an imeachta",
       "body": "Tá tú ar tí deireadh a chur leis an imeacht do chách. Cad ba cheart tarlú dó nuair a bheidh sé thart?",
       "public": "Coinnigh poiblí é",
-      "publicHelp": "Fanfaidh leathanach an imeachta chríochnaithe le feiceáil, le hachoimre, ceisteanna, pobalbhreitheanna, ábhair agus aiseolas.",
       "library": "Foilsigh sa leabharlann",
       "libraryHelp": "Mar atá thuas, agus taispeántar an t-imeacht sa leabharlann físeán poiblí freisin (teastaíonn taifeadadh foilsithe nó físeán YouTube).",
       "archive": "Cuir i gcartlann (príobháideach)",
       "archiveHelp": "Ní bheidh leathanach na hócáide críochnaithe le feiceáil ag an bpobal. Coinnítear na sonraí go deireadh na tréimhse coinneála, ansin scriostar iad.",
       "genAi": "Cruthaigh tras-scríbhinn agus achoimre AI ón taifeadadh (nuair a bheidh an phróiseáil críochnaithe)",
       "back": "Ar ais",
-      "confirm": "Cuir deireadh leis an imeacht"
+      "confirm": "Cuir deireadh leis an imeacht",
+      "publicHelpList": "Fanann leathanach na hócáide críochnaithe le feiceáil agus, má tá siad ann, taispeánann sé {sections}.",
+      "publicHelpNone": "Fanann leathanach na hócáide críochnaithe le feiceáil, lena teideal agus a cur síos.",
+      "sections": {
+        "recap": "an achoimre",
+        "qa": "ceisteanna an Q&A",
+        "polls": "na pobalbhreitheanna foilsithe",
+        "wordCloud": "an scamall focal",
+        "materials": "na hábhair",
+        "feedback": "na rátálacha"
+      }
     },
     "eventNotStarted": "Níor thosaigh an t-imeacht fós",
     "eventStartsAt": "Tosóidh an t-imeacht ar {date} ag {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Scrios an teachtaireacht",
       "mentionedYou": "Luaigh sé/sí thú",
       "mentionEmpty": "Níl aon duine le lua fós: taispeántar anseo na daoine a scríobhann sa chomhrá nó atá sa seomra.",
-      "mentionNoMatch": "Níl aon duine leis an ainm seo."
+      "mentionNoMatch": "Níl aon duine leis an ainm seo.",
+      "logLabel": "Teachtaireachtaí comhrá",
+      "loadingHistory": "Teachtaireachtaí á lódáil…",
+      "historyFailed": "Níorbh fhéidir na teachtaireachtaí a lódáil.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# teachtaireacht nua} other {# teachtaireacht nua}}",
+      "announceAttachment": "sheol ceangaltán"
     },
     "role": {
       "moderator": "Modhnóir",
@@ -562,7 +581,9 @@
       "timerHelp": "Comhaireamh síos don chainteoir: is féidir é a thaispeáint don seomra ar fad.",
       "eventHeading": "Imeacht",
       "endHelp": "Dúnann sé an seomra do chách agus marcálann sé an imeacht mar críochnaithe. Ní féidir é a chealú.",
-      "timerHeading": "Amadóir na gcaintí"
+      "timerHeading": "Amadóir na gcaintí",
+      "turnOffConfirm": "An bhfuil tú ag iarraidh «{feature}» a mhúchadh do chách?",
+      "turnOff": "Múch"
     },
     "closingNotice": "{minutes, plural, =0 {Tá an seomra ag dúnadh.} one {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} two {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} few {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} many {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} other {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Athshocraigh scagairí",
       "noResults": "Níl aon imeacht ag teacht leis na scagairí.",
       "resultsCount": "{count, plural, =0 {Aon imeacht} one {# imeacht} other {# imeacht}}",
-      "durationMinutes": "{minutes} nóim",
-      "durationHoursMinutes": "{hours}u {minutes}nóim",
       "menu": {
         "actionsFor": "Gníomhartha do “{title}”",
         "manage": "Bainistigh",
@@ -3413,7 +3432,8 @@
       "generic": "Earráid agus an phobalbhreith á cruthú",
       "vote": "Níor taifeadadh an vóta. Bain triail eile as.",
       "alreadyVoted": "Tá vóta caite agaibh sa phobalbhreith seo cheana.",
-      "action": "Theip ar an ngníomh. Bain triail eile as."
+      "action": "Theip ar an ngníomh. Bain triail eile as.",
+      "closed": "Tá an phobalbhreith dúnta."
     },
     "participation": "{votes, plural, one {# vóta} other {# vóta}} as {present} i láthair",
     "participationLabel": "Rannpháirtíocht sa phobalbhreith",
@@ -4086,7 +4106,7 @@
     "cancel": "Cealaigh",
     "noActiveRound": "Níl aon cheist oscailte faoi láthair.",
     "noWords": "Ag fanacht leis na chéad fhocail...",
-    "wordsSubmitted": "{count} focal seolta",
+    "wordsSubmitted": "{count, plural, =0 {Níor seoladh aon fhocal} one {# fhocal seolta} other {# focal seolta}}",
     "timeRemaining": "Am fágtha",
     "errors": {
       "send": "Níor seoladh an focal. Bain triail eile as.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Gnáthfhanacht: faoi bhun nóiméid má tá an bonneagar te cheana, 3–5 nóiméad ag an gcéad tosú. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
       "elapsed": "á ullmhú le {time}",
       "scheduled": "Osclaíonn an seomra ag an am tosaigh",
-      "scheduledDetail": "Nó níos luaithe, nuair a thosaíonn an t-eagraí an t-imeacht. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid."
+      "scheduledDetail": "Nó níos luaithe, nuair a thosaíonn an t-eagraí an t-imeacht. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
+      "slow": "Tá sé ag tógáil níos faide ná mar is gnách. Osclaíonn an seomra leis féin a luaithe a bhíonn sé réidh: mura dtarlaíonn sé laistigh de chúpla nóiméad, cuir in iúl do na heagraithe é."
     },
     "exitWaiting": "Fág an seomra feithimh",
     "warmingUp": "Seomra á ullmhú",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "An glao go hachomair",
     "summaryWhen": "Cathain",
-    "durationHours": "{hours, plural, one {# uair an chloig} other {# uair an chloig}}",
-    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}",
-    "durationMinutes": "{minutes, plural, one {# nóiméad} other {# nóiméad}}",
     "summaryRecording": "Taifeadadh",
     "readMore": "Léigh tuilleadh",
     "readLess": "Taispeáin níos lú",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Fotheidil uathoibríocha",
     "captionsNotice": "Le linn an tseisiúin bheo, tras-scríobhtar guth an duine atá ag labhairt i bhfíor-am chun fotheidil a thaispeáint. Déantar an tras-scríobh ar na freastalaithe a óstálann an t-ardán agus ní choinnítear an téacs. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao.",
-    "captionsNoticeTranscript": "Le linn an tseisiúin bheo, déantar guth an chainteora a thras-scríobh i bhfíor-am chun fotheidil a thaispeáint, ar na freastalaithe a óstálann an t-ardán. Ní choinnítear an téacs, leis an ainm, ach do na daoine a thoiligh go ndéanfaí a gcuid cainte a thras-scríobh, agus is é tras-scríbhinn an imeachta é. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao."
+    "captionsNoticeTranscript": "Le linn an tseisiúin bheo, déantar guth an chainteora a thras-scríobh i bhfíor-am chun fotheidil a thaispeáint, ar na freastalaithe a óstálann an t-ardán. Ní choinnítear an téacs, leis an ainm, ach do na daoine a thoiligh go ndéanfaí a gcuid cainte a thras-scríobh, agus is é tras-scríbhinn an imeachta é. Is féidir na fotheidil a fholú leis an gcnaipe fotheideal i mbarra an ghlao.",
+    "countdownDays": "{days}l",
+    "waitingForStartButton": "Ag fanacht leis an tús",
+    "countdownHours": "{hours}u",
+    "countdownMinutes": "{minutes}n",
+    "countdownSeconds": "{seconds}s"
   },
   "recording": {
     "management": "Taifeadadh físe",
@@ -4719,7 +4742,8 @@
       "materials": "Ábhair",
       "polls": "Pobalbhreitheanna",
       "feedback": "Aiseolas",
-      "transcript": "Tras-scríbhinn AI"
+      "transcript": "Tras-scríbhinn AI",
+      "ratingsCount": "{count, plural, one {# rátáil} other {# rátáil}}"
     },
     "recordingNotify": "Cuir in iúl do na rannpháirtithe cláraithe nuair a fhoilsítear an taifeadadh",
     "recordingNotifyHelp": "Ríomhphost amháin, nuair a bhíonn an taifeadadh (nó an físeán seachtrach) le feiceáil ar leathanach poiblí an imeachta. Sroicheann sé na daoine atá fós cláraithe: tar éis na tréimhse coinneála ní chuirtear in iúl d'aon duine.",
@@ -4893,7 +4917,8 @@
     "no": "Níl",
     "scaleValue": "{value} as {max}",
     "answerOne": "Freagair ceist amháin ar a laghad chun é a sheoladh.",
-    "pageTitle": "Ceistneoir"
+    "pageTitle": "Ceistneoir",
+    "onlyParticipants": "Ní féidir ach leo siúd a ghlac páirt san ócáid í a rátáil."
   },
   "notFound": {
     "title": "Níor aimsíodh an leathanach",

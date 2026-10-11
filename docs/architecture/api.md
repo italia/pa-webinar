@@ -275,6 +275,7 @@ Errors are JSON:
 | `RateLimitError` | 429 | `RATE_LIMIT` | Sends `Retry-After` in seconds when the route knows the window |
 | `AppError(message, status, code)` | Any | Route-defined | For example, `503 SERVICE_UNAVAILABLE` from `/api/health` when the database is unreachable |
 | Post-production routes | 409, 422 | `AI_PIPELINE_DISABLED`, `AI_DISABLED_FOR_EVENT`, `TRANSCRIPT_CORRECTED`, `RECORDING_WITHOUT_MEDIA`, `NO_PARTICIPANT_TRACKS`, `SUMMARY_MISSING`, `SOURCE_TRANSCRIPT_MISSING`, `SAME_LANGUAGE` | Conditions that the person can fix, each with its own message in the administration (`app/src/lib/api-error-message.ts`) |
+| Rating and poll routes | 403, 409 | `NOT_A_PARTICIPANT`, `POLL_CLOSED` | A post-event rating from someone who did not take part (see `app/src/lib/feedback/participation.ts`); a vote, creation or reopening on a poll that is closed or whose event has ended |
 | Anything else | 500 | `INTERNAL_ERROR` | Generic message. The error is logged on the server |
 
 The classes are in `app/src/lib/errors.ts`. The response carries `details` only for `VALIDATION_ERROR`, or for any `AppError` when `NODE_ENV=development`. `error` is meant for developers. It is sometimes a sentence, sometimes a short key such as `invalid_key` or `invalid_link`, and some validation messages are i18n keys that the portal translates. Clients should branch on the HTTP status and on `code`, never on `error`.

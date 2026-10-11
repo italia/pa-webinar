@@ -26,6 +26,7 @@
 import type { EventStatus, SiteSetting } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
+import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import {
   shouldCloseAbandonedInstantCall,
   shouldDemoteLiveToIdle,
@@ -325,6 +326,7 @@ async function scalerTransitions(
       });
       counts.liveEmptyClosed = r.count;
       await closeOpenSessions(tx, closedIds, now);
+      await chiudiSondaggiAperti(tx, closedIds, now);
       changes.push(...closedIds.map((id) => ({ id, status: 'ENDED' as const })));
     }
   }
@@ -388,6 +390,7 @@ async function scalerTransitions(
   counts.toEnded = r3a.count;
   if (endedByTimeoutCandidates.length > 0) {
     await closeOpenSessions(tx, endedByTimeoutCandidates.map((e) => e.id), now);
+    await chiudiSondaggiAperti(tx, endedByTimeoutCandidates.map((e) => e.id), now);
     changes.push(
       ...endedByTimeoutCandidates.map((e) => ({ id: e.id, status: 'ENDED' as const })),
     );
@@ -448,6 +451,7 @@ async function scalerTransitions(
     });
     counts.toEnded += r3b.count;
     await closeOpenSessions(tx, toEndIds, now);
+    await chiudiSondaggiAperti(tx, toEndIds, now);
     changes.push(...toEndIds.map((id) => ({ id, status: 'ENDED' as const })));
   }
 
@@ -543,6 +547,7 @@ async function fixedTransitions(
     });
     const endedIds = ended.map((e) => e.id);
     await closeOpenSessions(tx, endedIds, now);
+    await chiudiSondaggiAperti(tx, endedIds, now);
     changes.push(...endedIds.map((id) => ({ id, status: 'ENDED' as const })));
     return endedIds.length;
   };

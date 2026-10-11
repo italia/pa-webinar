@@ -5,6 +5,7 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
@@ -148,6 +149,10 @@ interface EventDetailClientProps {
   guestEntryOpen?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
+  /** La prova di chi ha partecipato, se il server l'ha riconosciuta (link
+   *  personale o link della valutazione): con questa la pagina offre la
+   *  valutazione di fine evento. */
+  feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
   /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
   report?: ReportView | null;
 }
@@ -187,9 +192,11 @@ export default function EventDetailClient({
   registrationOpen,
   guestEntryOpen = true,
   hasPostEventQuestionnaire = false,
+  feedbackProof = null,
   report = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
+  const durata = useDurataTesto();
   const tr = useTranslations('registration');
   const tl = useTranslations('live');
   const svegliaPonte = () => {
@@ -243,9 +250,7 @@ export default function EventDetailClient({
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
-  const durationMs = endsAt.getTime() - startsAt.getTime();
-  const durationHours = Math.floor(durationMs / 3_600_000);
-  const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
+  const durataTesto = durata(startsAt, endsAt);
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
@@ -373,7 +378,10 @@ export default function EventDetailClient({
       )}
 
       {isEnded && (
-        <Alert color="info" className="mb-4">
+        // Un'informazione, non un allarme: l'Alert del kit impone
+        // role="alert", che la farebbe leggere d'urgenza all'apertura della
+        // pagina. Stesso aspetto, ruolo giusto.
+        <div className="alert alert-info mb-4" role="status">
           {t('detail.eventHeldOn', {
             date: format.dateTime(startsAt, {
               weekday: 'long',
@@ -382,7 +390,7 @@ export default function EventDetailClient({
               year: 'numeric',
             }),
           })}
-        </Alert>
+        </div>
       )}
 
       {/* ─── Event header: cover + hero in one cohesive card ─── */}
@@ -424,7 +432,9 @@ export default function EventDetailClient({
           }}
         >
           <div className="d-flex align-items-center gap-2 mb-3">
-            <StatusPill status={publicStatus} />
+            {/* In diretta basta il segnale «In corso» con il punto: due
+                etichette uguali una accanto all'altra non dicono di piu'. */}
+            {!isLive && <StatusPill status={publicStatus} />}
             {isLive && (
               <Badge
                 color="success"
@@ -512,10 +522,7 @@ export default function EventDetailClient({
                       minute: '2-digit',
                     })}
                     {' · '}
-                    {t('detail.durationHours', {
-                      hours: durationHours,
-                      minutes: durationMinutes,
-                    })}
+                    {durataTesto}
                   </div>
                 </div>
               </div>
@@ -801,12 +808,18 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Invito al questionario post-evento: solo se l'evento ne ha uno
-              (lo dice il server). */}
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno e
+              solo a chi ha partecipato, con la sua iscrizione (lo dice il
+              server): a chiunque altro il modulo verrebbe rifiutato all'invio. */}
           {isEnded &&
             event.postEventShowFeedback !== false &&
-            hasPostEventQuestionnaire && (
-              <PostEventFeedbackInvite eventSlug={event.slug} />
+            hasPostEventQuestionnaire &&
+            feedbackProof && (
+              <PostEventFeedbackInvite
+                eventSlug={event.slug}
+                accessToken={feedbackProof.accessToken}
+                ratingToken={feedbackProof.ratingToken}
+              />
             )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
@@ -924,18 +937,34 @@ export default function EventDetailClient({
                         </Button>
                       </Link>
                     ) : (
-                      <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+                      // In diretta si entra anche senza iscrizione: lo si
+                      // offre come scelta, non come domanda a chi e' iscritto.
+                      // /live riconosce chi ha gia' il posto da questo
+                      // dispositivo; chi si e' iscritto da un altro usa il
+                      // link dell'email.
+                      <>
                         <Link
                           href={percorso(`/events/${event.slug}/live`)}
-                          className="text-decoration-none fw-semibold text-primary"
                           onMouseDown={svegliaPonte}
+                          className="d-block mt-2"
                         >
-                          {t('detail.alreadyRegisteredEnter')}
+                          <Button color="primary" outline size="lg" className="w-100 fw-semibold" tag="span">
+                            {t('detail.joinAsGuest')}
+                          </Button>
                         </Link>
-                      </p>
+                        <p className="text-muted text-center mt-2 mb-0" style={{ fontSize: '0.82rem' }}>
+                          {t('detail.registeredUseEmailLink')}
+                        </p>
+                      </>
                     )
                   )}
 
+                  {event.recordingEnabled && (
+                    <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      <Icon icon="it-video" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
+                      <span>{t('detail.willBeRecorded')}</span>
+                    </p>
+                  )}
                   {event.chatEnabled && (
                     <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
                       <Icon icon="it-info-circle" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
@@ -983,7 +1012,11 @@ function StatusPill({ status }: { status: string }) {
       className="px-2 py-1 fw-semibold"
       style={{ fontSize: '0.72rem', backgroundColor: c.bg, color: c.fg }}
     >
-      {t(status as 'DRAFT' | 'PUBLISHED' | 'LIVE' | 'ENDED' | 'ARCHIVED')}
+      {/* Per il pubblico un evento pubblicato e' un evento «in programma»:
+          «Pubblicato» e' una parola di chi lo gestisce. */}
+      {status === 'PUBLISHED'
+        ? t('UPCOMING')
+        : t(status as 'DRAFT' | 'LIVE' | 'ENDED' | 'ARCHIVED')}
     </Badge>
   );
 }

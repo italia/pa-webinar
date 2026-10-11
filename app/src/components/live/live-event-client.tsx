@@ -19,6 +19,7 @@ import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { messaggioErroreApi } from '@/lib/api-error-message';
+import { sezioniDopoEvento, type SezioneDopoEvento } from '@/lib/events/post-event-sections';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   faseRegistratoreStabile,
@@ -125,6 +126,8 @@ interface EventInfo {
    *  "Destino evento" default so ending the call never silently overrides a
    *  pre-configured private (postEventPublic=false) or library setting. */
   postEventPublic?: boolean;
+  /** Le sezioni che chi organizza mostra a evento concluso (Event.postEventShow*). */
+  postEventShow?: Record<SezioneDopoEvento, boolean>;
   libraryListed?: boolean;
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
@@ -178,6 +181,9 @@ interface LiveEventClientProps {
   /** Lo stesso per il consenso alla registrazione dell'evento: dato
    *  all'iscrizione, o in sala d'attesa a un ingresso precedente. */
   hasRecordingConsent?: boolean;
+  /** L'iscrizione risulta entrata in sala (Registration.joinedAt): la
+   *  valutazione si propone anche senza il token della sala di questa pagina. */
+  registrationJoined?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -289,6 +295,7 @@ export default function LiveEventClient({
   isGuest = false,
   hasMultitrackConsent = false,
   hasRecordingConsent = false,
+  registrationJoined = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -314,6 +321,12 @@ export default function LiveEventClient({
   const { pushLive } = useLiveState(event.slug);
   const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
+  // L'ultimo token della sala ricevuto: le credenziali si azzerano a ogni
+  // riconnessione, la prova di essere entrati resta (per la valutazione).
+  const [tokenSala, setTokenSala] = useState<string | null>(null);
+  useEffect(() => {
+    if (credentials?.jwt) setTokenSala(credentials.jwt);
+  }, [credentials?.jwt]);
   const [participantCount, setParticipantCount] = useState(0);
   // Mirror of participantCount for the peak reporter's interval: reading it
   // from a ref keeps the 30s timer from being torn down and restarted on every
@@ -848,6 +861,18 @@ export default function LiveEventClient({
   // pre-selected option preserves the admin's intent: confirming without
   // touching it must never flip a private event public, nor drop it from a
   // library it was set to appear in.
+  // Cosa resterà visibile scegliendo «Mantieni pubblico»: le sezioni che
+  // chi organizza mostra a evento concluso, come le applica la pagina («se ce
+  // ne sono»: una sezione senza contenuto non compare).
+  const sezioniDopo = event.postEventShow ? sezioniDopoEvento(event.postEventShow) : [];
+  const cosaResta =
+    sezioniDopo.length > 0
+      ? t('endDestino.publicHelpList', {
+          sections: new Intl.ListFormat(locale, { type: 'conjunction' }).format(
+            sezioniDopo.map((s) => t(`endDestino.sections.${s}`)),
+          ),
+        })
+      : t('endDestino.publicHelpNone');
   const [endDestino, setEndDestino] = useState<'public' | 'library' | 'archive'>(
     event.libraryListed
       ? 'library'
@@ -1496,12 +1521,18 @@ export default function LiveEventClient({
   // di phase='ready', quindi il questionario non appariva mai a fine call e il
   // bottone in sala d'attesa era morto.
   // Chi risponde: l'iscrizione, se c'e'; altrimenti l'identificativo stabile
-  // del browser (ospiti e relatori, che un'iscrizione non ce l'hanno). Chi
-  // modera non valuta l'evento che conduce.
-  const feedbackIdentity = registeredAccessToken
-    ? { accessToken: registeredAccessToken }
-    : { guestId };
-  const askFeedback = !isModerator && event.feedbackEnabled !== false;
+  // del browser (ospiti e relatori, che un'iscrizione non ce l'hanno). Con
+  // la risposta va il token della sala ricevuto entrando: per chi non e'
+  // iscritto e' la prova di aver partecipato (lib/feedback/participation).
+  // Chi modera non valuta l'evento che conduce; chi non e' iscritto e non e'
+  // entrato da questa pagina non ha niente da provare, e la valutazione non
+  // gli si propone.
+  const feedbackIdentity = {
+    ...(registeredAccessToken ? { accessToken: registeredAccessToken } : { guestId }),
+    ...(tokenSala ? { roomToken: tokenSala } : {}),
+  };
+  const askFeedback =
+    !isModerator && event.feedbackEnabled !== false && (!!tokenSala || (!!registeredAccessToken && registrationJoined));
   const feedbackModal = showFeedback && askFeedback ? (
     <PostEventFeedback
       eventSlug={event.slug}
@@ -2066,7 +2097,9 @@ export default function LiveEventClient({
                 />
                 <span>
                   <span className="fw-semibold d-block">{t(`endDestino.${opt}`)}</span>
-                  <small className="text-muted">{t(`endDestino.${opt}Help`)}</small>
+                  <small className="text-muted">
+                    {opt === 'public' ? cosaResta : t(`endDestino.${opt}Help`)}
+                  </small>
                 </span>
               </label>
             ))}
@@ -2794,6 +2827,50 @@ function LiveSidebar({
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
+  // Una novità vera (un sondaggio in più da votare, una nuova domanda di «In
+  // una parola», materiali nuovi, domande nuove) si dice anche a voce, una
+  // volta: il pallino lo vede solo chi guarda. Si parte dai segnali, non dai
+  // pallini, che spariscono e tornano cambiando scheda. Nei primi secondi si
+  // registra solo quello che c'e' gia' (i dati arrivano dopo il primo disegno).
+  const [annuncioNovita, setAnnuncioNovita] = useState('');
+  const montataAlle = useRef<number | null>(null);
+  const segnaliPrima = useRef<{ sondaggi: number; giro: string | null; materiali: boolean; domande: boolean } | null>(null);
+  const codaNovita = useRef<string[]>([]);
+  const timerNovita = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(
+    () => () => {
+      for (const id of timerNovita.current) clearTimeout(id);
+    },
+    [],
+  );
+  const giroAperto = giroParole?.active && giroParole.id ? giroParole.id : null;
+  useEffect(() => {
+    const ora = { sondaggi: pollsUnvoted, giro: giroAperto, materiali: materialsNew, domande: qaNews };
+    const prima = segnaliPrima.current;
+    segnaliPrima.current = ora;
+    if (montataAlle.current === null) montataAlle.current = Date.now();
+    if (!prima || Date.now() - montataAlle.current < 3000) return;
+    const nuove: string[] = [];
+    if (ora.sondaggi > prima.sondaggi) nuove.push(t('sidebarTabPollsOpen'));
+    if (ora.giro && ora.giro !== prima.giro) nuove.push(t('sidebarTabWordcloudNew'));
+    if (ora.materiali && !prima.materiali) nuove.push(t('sidebarTabMaterialsNew'));
+    if (ora.domande && !prima.domande) nuove.push(t('sidebarTabQaNew'));
+    if (nuove.length === 0) return;
+    // In coda, non al posto di quelle gia' in attesa: due novita' ravvicinate
+    // si dicono insieme.
+    const vuota = codaNovita.current.length === 0;
+    codaNovita.current.push(...nuove);
+    if (!vuota) return;
+    timerNovita.current.push(
+      setTimeout(() => {
+        const testo = codaNovita.current.join('. ');
+        codaNovita.current = [];
+        setAnnuncioNovita('');
+        timerNovita.current.push(setTimeout(() => setAnnuncioNovita(testo), 50));
+      }, 300),
+    );
+  }, [pollsUnvoted, giroAperto, materialsNew, qaNews, t]);
+
   // If the moderator turns off the active tab's feature mid-event (e.g.
   // disables Q&A), that tab drops out of visibleTabs — without this the drawer
   // header/body would render blank. Fall back to the first still-visible tab.
@@ -2877,12 +2954,11 @@ function LiveSidebar({
             {tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral' && tab.dotLabel && (
               <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
-            {tab.dot && (
-              <span
-                className="live-floating-btn__dot"
-                aria-label={tab.dotLabel}
-                title={tab.dotLabel}
-              />
+            {tab.dot && <span className="live-floating-btn__dot" aria-hidden="true" title={tab.dotLabel} />}
+            {/* Un aria-label su uno span non si legge: il testo entra nel nome
+                del pulsante. */}
+            {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+              <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
           </button>
         );
@@ -2895,6 +2971,12 @@ function LiveSidebar({
       {/* Floating control bar — portaled into the video wrapper so it
           overlays the Jitsi iframe and scales with the video. */}
       {slot && createPortal(floatingBar, slot)}
+
+      {/* Fuori dal pannello laterale, che sul telefono chiuso e' inerte: la
+          novita' si dice proprio a chi guarda il video. */}
+      <p className="visually-hidden" role="status">
+        {annuncioNovita}
+      </p>
 
       {chatPreview && (
         <div
@@ -3048,6 +3130,11 @@ function LiveSidebar({
                   </span>
                 )}
                 {tab.dot && <span className="live-sidebar-tab__dot" aria-hidden="true" />}
+                {/* Il pallino da solo non arriva a chi usa un lettore di
+                    schermo: il suo testo entra nel nome della scheda. */}
+                {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+                  <span className="visually-hidden"> {tab.dotLabel}</span>
+                )}
               </button>
             );
           })}

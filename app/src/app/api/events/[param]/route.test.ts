@@ -52,6 +52,8 @@ const { sessioni } = vi.hoisted(() => ({
   sessioni: { closeOpenSessions: vi.fn(async () => 0) },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
+const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
+vi.mock('@/lib/events/close-polls', () => sondaggi);
 
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 
@@ -308,6 +310,12 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
     expect(r.status).toBe(200);
     expect(mocked.$transaction).toHaveBeenCalledTimes(1);
     expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+    // Solo verso una fine i sondaggi aperti si chiudono (DRAFT non e' una fine).
+    if (nuovo === 'ENDED') {
+      expect(sondaggi.chiudiSondaggiAperti).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+    } else {
+      expect(sondaggi.chiudiSondaggiAperti).not.toHaveBeenCalled();
+    }
   });
 
   it.each([

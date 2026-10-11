@@ -648,6 +648,24 @@ button.live-time-strip__rec {
   list-style: none;
 }
 
+// Conferma sul posto prima di spegnere una funzione in diretta.
+.control-room__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-left: 3px solid #a1112e;
+  background: #fdf1f3;
+  color: #17324d;
+  font-size: 0.82rem;
+
+  span {
+    flex: 1 1 100%;
+  }
+}
+
 .control-room .toggles label {
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
@@ -5943,6 +5961,29 @@ button.live-time-strip__rec {
 .wr-cta {
   position: relative;
   display: grid;
+}
+
+// Su telefono il pulsante d'ingresso sta sotto nome, fotocamera e consensi:
+// resta attaccato al fondo dello schermo finche' la scheda scorre, da bordo a
+// bordo (il corpo della scheda ha 1.5rem di margine interno su telefono).
+// Mentre si scrive in un campo torna al suo posto: con la tastiera aperta
+// coprirebbe proprio il campo.
+@media (max-width: 767.98px) {
+  .wr-cta-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #fff;
+    box-shadow: 0 -6px 12px -8px rgba(23, 50, 77, 0.35);
+  }
+
+  .wr-card:has(input:not([type='checkbox']):not([type='radio']):focus, textarea:focus) .wr-cta-dock {
+    position: static;
+    box-shadow: none;
+  }
 }
 
 .wr-cta--go::after {

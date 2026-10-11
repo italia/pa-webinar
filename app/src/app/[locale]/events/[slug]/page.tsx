@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { verifyRatingToken } from '@/lib/feedback/rating-link';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
 import { vistaResoconto } from '@/lib/report/view';
@@ -32,7 +33,7 @@ export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ invalidToken?: string }>;
+  searchParams?: Promise<{ invalidToken?: string; valuta?: string }>;
 }
 
 export async function generateMetadata({
@@ -78,7 +79,8 @@ export default async function EventDetailPage({
   // Letti lato server (la route è già dynamic per il cookies() del layout):
   // un useSearchParams() nel client senza <Suspense> è un build breaker
   // latente il giorno in cui la route torna statica.
-  const invalidToken = (await searchParams)?.invalidToken === '1';
+  const parametri = await searchParams;
+  const invalidToken = parametri?.invalidToken === '1';
   const locale = await getLocale();
   const settings = await getSettings();
 
@@ -211,6 +213,7 @@ export default async function EventDetailPage({
   // L'invito al questionario post-evento compare solo se l'evento ne ha uno:
   // senza, il modulo chiederebbe al server un questionario che non c'è.
   let hasPostEventQuestionnaire = false;
+  let feedbackProof: { accessToken?: string; ratingToken?: string } | null = null;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -284,6 +287,33 @@ export default async function EventDetailPage({
     ]);
 
     hasPostEventQuestionnaire = !!postEventQuestionnaire;
+
+    // La valutazione dalla pagina pubblica: solo per un iscritto entrato in
+    // sala, riconosciuto dal link della valutazione dell'email di
+    // ringraziamento (?valuta=, lib/feedback/rating-link) o dal cookie
+    // d'accesso del browser con cui si e' iscritto. Chi e' entrato da ospite
+    // valuta in sala, alla fine (lib/feedback/participation).
+    if (hasPostEventQuestionnaire) {
+      const dalLink =
+        typeof parametri?.valuta === 'string' ? verifyRatingToken(parametri.valuta, event.id) : null;
+      if (dalLink) {
+        const iscrizione = await prisma.registration.findUnique({
+          where: { id: dalLink },
+          select: { eventId: true, joinedAt: true },
+        });
+        if (iscrizione?.eventId === event.id && iscrizione.joinedAt) feedbackProof = { ratingToken: parametri!.valuta! };
+      }
+      const candidato = feedbackProof
+        ? null
+        : await verifyEventAccess(event.id, cookieStore.get(eventAccessCookieName(event.id))?.value);
+      if (candidato) {
+        const iscrizione = await prisma.registration.findUnique({
+          where: { accessToken: candidato },
+          select: { eventId: true, joinedAt: true },
+        });
+        if (iscrizione?.eventId === event.id && iscrizione.joinedAt) feedbackProof = { accessToken: candidato };
+      }
+    }
 
     eventMaterials = materialsRaw.map((m) => ({
       id: m.id,
@@ -399,6 +429,7 @@ export default async function EventDetailPage({
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
+        feedbackProof={feedbackProof}
         report={vistaResoconto(event, locale)}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}

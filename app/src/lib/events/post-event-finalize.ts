@@ -13,6 +13,7 @@
  */
 
 import { lingueIscrizione } from '@/lib/email/lingua';
+import { issueRatingToken } from '@/lib/feedback/rating-link';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
@@ -28,6 +29,17 @@ import { localizedUrl } from '@/lib/utils/localized-url';
 // Don't retroactively email events that ended long before the opt-in was
 // flipped on: only finalize events that ended within this window.
 const MAX_AGE_DAYS = 7;
+
+function linkPaginaEvento(
+  baseUrl: string,
+  event: { id: string; slug: string },
+  pagina: string,
+  reg: { id: string; joinedAt: Date | null },
+): string {
+  const pagina_ = localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
+  const token = reg.joinedAt ? issueRatingToken(event.id, reg.id) : null;
+  return token ? `${pagina_}?valuta=${encodeURIComponent(token)}` : pagina_;
+}
 
 export async function finalizePostEventEmails(opts: {
   now: Date;
@@ -81,6 +93,7 @@ export async function finalizePostEventEmails(opts: {
         id: true,
         email: true,
         locale: true,
+        joinedAt: true,
         // Chi e' in rubrica riceve anche qui il link per uscirne.
         person: { select: { id: true, optedInToAddressBook: true } },
       },
@@ -94,7 +107,12 @@ export async function finalizePostEventEmails(opts: {
         const mail = postEventParticipantEmail({
           locale: testi,
           eventTitle: getLocalized(event.title as LocalizedField, pagina),
-          eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
+          // Chi e' entrato in sala riceve il link della valutazione: un token
+          // che serve solo a quello (lib/feedback/rating-link), non il token
+          // d'iscrizione. Gli altri ricevono il riepilogo, senza la promessa
+          // di una valutazione che non potrebbero dare.
+          eventPageUrl: linkPaginaEvento(baseUrl, event, pagina, reg),
+          inviteRating: !!reg.joinedAt,
           siteName,
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, pagina),
         });

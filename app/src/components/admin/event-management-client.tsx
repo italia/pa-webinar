@@ -19,6 +19,7 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
@@ -231,7 +232,7 @@ export default function EventManagementClient({
   const td = useTranslations('admin.eventDetail');
   const tReg = useTranslations('admin.registrations');
   const orgTypeLabel = useOrgTypeLabel();
-  const te = useTranslations('events');
+  const durata = useDurataTesto();
   const tr = useTranslations('reminders');
   const format = useFormatter();
   const tc = useTranslations('common');
@@ -300,9 +301,7 @@ export default function EventManagementClient({
   const description = getLocalized(event.description, locale);
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
-  const durationMs = endsAt.getTime() - startsAt.getTime();
-  const durationHours = Math.floor(durationMs / 3_600_000);
-  const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
+  const durataTesto = durata(startsAt, endsAt);
 
   // Gli indirizzi che si copiano e si condividono: nella forma che il router
   // riconosce direttamente, senza passare da una redirezione.
@@ -538,7 +537,7 @@ export default function EventManagementClient({
                 {format.dateTime(endsAt, { hour: '2-digit', minute: '2-digit' })}
               </span>
               <span>·</span>
-              <span>{te('detail.durationHours', { hours: durationHours, minutes: durationMinutes })}</span>
+              <span>{durataTesto}</span>
               <span>·</span>
               <span>{event.timezone}</span>
             </div>

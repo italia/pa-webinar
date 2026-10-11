@@ -34,6 +34,7 @@ import {
   submitQuestionnaireResponseSchema,
 } from '@/lib/validation/schemas';
 import { feedbackOpen } from '@/lib/feedback/default-questionnaire';
+import { identitaPerValutazione } from '@/lib/feedback/participation';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,7 +63,14 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({
     where: UUID_RE.test(param) ? { id: param } : { slug: param },
-    select: { id: true, status: true, feedbackEnabled: true, endsAt: true, dataRetentionDays: true },
+    select: {
+      id: true,
+      status: true,
+      feedbackEnabled: true,
+      endsAt: true,
+      dataRetentionDays: true,
+      jitsiRoomName: true,
+    },
   });
   if (!event) throw new NotFoundError('Event');
   // La valutazione si da' durante l'evento o dopo, finche' l'evento non e'
@@ -82,16 +90,17 @@ export const POST = withErrorHandling(async (request, context) => {
       parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
-  const { answers, accessToken, guestId, respondentName } = parsed.data;
+  const { answers, accessToken, guestId, respondentName, roomToken, ratingToken } = parsed.data;
 
   let registrationId: string | null = null;
   let respondentEmailHash: string | null = null;
   let nameFromRegistration: string | null = null;
+  let joinedAt: Date | null = null;
 
   if (accessToken) {
     const reg = await prisma.registration.findUnique({
       where: { accessToken },
-      select: { id: true, eventId: true, emailHash: true, displayName: true },
+      select: { id: true, eventId: true, emailHash: true, displayName: true, joinedAt: true },
     });
     if (!reg || reg.eventId !== event.id) {
       throw new ForbiddenError('Invalid access token');
@@ -99,6 +108,22 @@ export const POST = withErrorHandling(async (request, context) => {
     registrationId = reg.id;
     respondentEmailHash = reg.emailHash;
     nameFromRegistration = tryDecryptPII(reg.displayName) ?? reg.displayName;
+    joinedAt = reg.joinedAt;
+  }
+
+  // La valutazione di fine evento: solo da chi ha partecipato, una risposta
+  // a testa (lib/feedback/participation). L'id scelto dal browser non conta.
+  let chiaveOspite: string | null = guestId ?? null;
+  if (placement === 'POST_EVENT') {
+    const chi = await identitaPerValutazione({
+      eventId: event.id,
+      roomName: event.jitsiRoomName,
+      iscrizione: registrationId ? { id: registrationId, joinedAt } : null,
+      ratingToken,
+      tokenSala: roomToken,
+    });
+    registrationId = chi.registrationId;
+    chiaveOspite = chi.chiaveOspite;
   }
 
   const normalized = validateAnswers(q, answers);
@@ -106,7 +131,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await submitResponse({
     questionnaire: q,
     registrationId,
-    guestId: guestId ?? null,
+    guestId: chiaveOspite,
     // La valutazione di fine evento arriva a chi organizza senza il nome di
     // chi risponde (lo dice la sala): nome e hash dell'email non si salvano.
     // L'iscrizione resta collegata solo per tenere una risposta a testa.

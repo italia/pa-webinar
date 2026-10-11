@@ -69,7 +69,10 @@
     "requiredField": "Kohustuslik väli",
     "errorGeneric": "Tekkis viga. Palun proovige uuesti.",
     "selectAll": "Vali kõik",
-    "deselectAll": "Tühista kõik"
+    "deselectAll": "Tühista kõik",
+    "durationMinutes": "{minutes, plural, one {# minut} other {# minutit}}",
+    "durationHours": "{hours, plural, one {# tund} other {# tundi}}",
+    "durationHoursMinutes": "{hours, plural, one {# tund} other {# tundi}} ja {minutes, plural, one {# minut} other {# minutit}}"
   },
   "markdown": {
     "edit": "Kirjuta",
@@ -103,7 +106,6 @@
     "noPast": "Möödunud üritusi pole",
     "wordCloudTitle": "Ühe sõnaga",
     "card": {
-      "publicEvent": "Avalik üritus",
       "readMore": "Loe lähemalt",
       "liveNow": "Toimub praegu",
       "spotsAvailable": "{count} vaba kohta",
@@ -132,7 +134,6 @@
       "title": "Ürituse üksikasjad",
       "date": "Kuupäev ja kellaaeg",
       "duration": "Kestus",
-      "durationHours": "{hours} t {minutes} min",
       "timezone": "Ajavöönd",
       "description": "Kirjeldus",
       "participants": "Osalejad",
@@ -151,7 +152,6 @@
       "noRecording": "Selle ürituse videosalvestis pole saadaval.",
       "watchRecording": "Vaata salvestist",
       "backToEvents": "Tagasi ürituste juurde",
-      "alreadyRegisteredEnter": "Oled juba registreerunud? Sisene ruumi",
       "invalidTokenTitle": "Ligipääsulink ei kehti enam",
       "invalidTokenBody": "Kasutatud link on vigane või aegunud. Kui oled registreerunud, otsi oma isiklik link kinnituskirjast või registreeru allpool uuesti.",
       "invalidTokenBodyEnded": "Kasutatud link ei kehti enam. Sündmus on lõppenud: allpool leiad salvestise ja materjalid.",
@@ -171,7 +171,10 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Laadi alla .ics fail"
       },
-      "registrationEnded": "Üritus on lõppenud: registreerumine on suletud."
+      "registrationEnded": "Üritus on lõppenud: registreerumine on suletud.",
+      "joinAsGuest": "Liitu külalisena",
+      "registeredUseEmailLink": "Juba registreerunud? Kasuta e-kirjas saadud isiklikku linki.",
+      "willBeRecorded": "Üritus salvestatakse."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -187,7 +190,8 @@
       "LIVE": "Toimub",
       "IDLE": "Pausil",
       "ENDED": "Lõppenud",
-      "ARCHIVED": "Arhiveeritud"
+      "ARCHIVED": "Arhiveeritud",
+      "UPCOMING": "Tulemas"
     },
     "list": {
       "filterByTag": "Filtreeri kategooria järgi",
@@ -298,14 +302,23 @@
       "title": "Sündmuse saatus",
       "body": "Oled lõpetamas sündmust kõigi jaoks. Mis peaks sellega pärast lõppu juhtuma?",
       "public": "Jäta avalikuks",
-      "publicHelp": "Lõppenud sündmuse leht jääb nähtavaks koos kokkuvõtte, küsimuste, küsitluste, materjalide ja tagasisidega.",
       "library": "Avalda videokogus",
       "libraryHelp": "Nagu ülal, lisaks kuvatakse sündmust avalikus videokogus (eeldab avaldatud salvestist või YouTube'i videot).",
       "archive": "Arhiveeri (privaatne)",
       "archiveHelp": "Lõppenud ürituse leht ei ole avalikkusele nähtav. Andmeid säilitatakse säilitusaja lõpuni ja seejärel need kustutatakse.",
       "genAi": "Loo salvestisest AI transkriptsioon ja kokkuvõte (kui töötlus on lõppenud)",
       "back": "Tagasi",
-      "confirm": "Lõpeta sündmus"
+      "confirm": "Lõpeta sündmus",
+      "publicHelpList": "Lõppenud ürituse leht jääb nähtavaks ja näitab, kui need on olemas, {sections}.",
+      "publicHelpNone": "Lõppenud ürituse leht jääb nähtavaks koos pealkirja ja kirjeldusega.",
+      "sections": {
+        "recap": "kokkuvõtet",
+        "qa": "küsimusi ja vastuseid",
+        "polls": "avaldatud küsitlusi",
+        "wordCloud": "sõnapilve",
+        "materials": "materjale",
+        "feedback": "hinnanguid"
+      }
     },
     "eventNotStarted": "Üritus ei ole veel alanud",
     "eventStartsAt": "Üritus algab {date} kell {time}",
@@ -419,7 +432,13 @@
       "deleteOwn": "Kustuta sõnum",
       "mentionedYou": "Mainis sind",
       "mentionEmpty": "Kedagi pole veel mainida: siia ilmuvad need, kes kirjutavad vestlusesse või on ruumis.",
-      "mentionNoMatch": "Selle nimega pole kedagi."
+      "mentionNoMatch": "Selle nimega pole kedagi.",
+      "logLabel": "Vestluse sõnumid",
+      "loadingHistory": "Sõnumite laadimine…",
+      "historyFailed": "Sõnumeid ei õnnestunud laadida.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# uus sõnum} other {# uut sõnumit}}",
+      "announceAttachment": "saatis manuse"
     },
     "role": {
       "moderator": "Moderaator",
@@ -562,7 +581,9 @@
       "timerHelp": "Pöördloendus esinejale: saad seda näidata kogu ruumile.",
       "eventHeading": "Üritus",
       "endHelp": "Sulgeb ruumi kõigile ja märgib ürituse lõppenuks. Seda ei saa tagasi võtta.",
-      "timerHeading": "Ettekannete taimer"
+      "timerHeading": "Ettekannete taimer",
+      "turnOffConfirm": "Kas lülitada „{feature}“ kõigile välja?",
+      "turnOff": "Lülita välja"
     },
     "closingNotice": "{minutes, plural, =0 {Ruum sulgub.} one {Ruum sulgub automaatselt # minuti pärast.} other {Ruum sulgub automaatselt # minuti pärast.}}",
     "captions": {
@@ -2404,8 +2425,6 @@
       "resetFilters": "Lähtesta filtrid",
       "noResults": "Filtritele vastavaid sündmusi pole.",
       "resultsCount": "{count, plural, =0 {Sündmusi pole} one {# sündmus} other {# sündmust}}",
-      "durationMinutes": "{minutes} min",
-      "durationHoursMinutes": "{hours}h {minutes}min",
       "menu": {
         "actionsFor": "Toimingud: „{title}“",
         "manage": "Halda",
@@ -3413,7 +3432,8 @@
       "generic": "Viga küsitluse loomisel",
       "vote": "Häält ei salvestatud. Proovige uuesti.",
       "alreadyVoted": "Olete selles küsitluses juba hääletanud.",
-      "action": "Toiming ebaõnnestus. Proovi uuesti."
+      "action": "Toiming ebaõnnestus. Proovi uuesti.",
+      "closed": "Küsitlus on suletud."
     },
     "participation": "{votes, plural, one {# hääl} other {# häält}} {present} kohalviibijast",
     "participationLabel": "Küsitluses osalemine",
@@ -4086,7 +4106,7 @@
     "cancel": "Tühista",
     "noActiveRound": "Praegu ei ole ühtegi avatud küsimust.",
     "noWords": "Ootame esimesi sõnu...",
-    "wordsSubmitted": "{count} sõna saadetud",
+    "wordsSubmitted": "{count, plural, =0 {Ühtegi sõna pole saadetud} one {# sõna saadetud} other {# sõna saadetud}}",
     "timeRemaining": "Jäänud aega",
     "errors": {
       "send": "Sõna ei saadetud. Proovige uuesti.",
@@ -4402,7 +4422,8 @@
       "honestHint": "Tavaline ootus: alla minuti, kui taristu on juba soe, 3–5 minutit esmakäivitusel. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
       "elapsed": "ettevalmistuses {time}",
       "scheduled": "Ruum avaneb algusajal",
-      "scheduledDetail": "Või varem, kui korraldaja sündmuse käivitab. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust."
+      "scheduledDetail": "Või varem, kui korraldaja sündmuse käivitab. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
+      "slow": "See võtab tavalisest kauem aega. Ruum avaneb ise kohe, kui on valmis: kui seda ei juhtu mõne minuti jooksul, anna korraldajatele teada."
     },
     "exitWaiting": "Lahku ooteruumist",
     "warmingUp": "Ruum valmistub",
@@ -4484,9 +4505,6 @@
     },
     "summaryTitle": "Kõne lühidalt",
     "summaryWhen": "Millal",
-    "durationHours": "{hours, plural, one {# tund} other {# tundi}}",
-    "durationHoursMinutes": "{hours, plural, one {# tund} other {# tundi}} ja {minutes, plural, one {# minut} other {# minutit}}",
-    "durationMinutes": "{minutes, plural, one {# minut} other {# minutit}}",
     "summaryRecording": "Salvestus",
     "readMore": "Loe edasi",
     "readLess": "Näita vähem",
@@ -4662,7 +4680,12 @@
     },
     "captionsNoticeTitle": "Automaatsed subtiitrid",
     "captionsNotice": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas, et näidata subtiitreid. Transkribeerimine toimub platvormi majutavates serverites ja teksti ei säilitata. Subtiitrid saab peita kõne tööriistariba subtiitrite nupuga.",
-    "captionsNoticeTranscript": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas subtiitrite näitamiseks platvormi majutavates serverites. Tekst säilitatakse koos nimega ainult nende puhul, kes nõustusid oma sõnavõttude transkribeerimisega, ja sellest saab ürituse transkriptsioon. Subtiitrid saab peita kõneriba subtiitrite nupuga."
+    "captionsNoticeTranscript": "Otseülekande ajal transkribeeritakse kõneleja häält reaalajas subtiitrite näitamiseks platvormi majutavates serverites. Tekst säilitatakse koos nimega ainult nende puhul, kes nõustusid oma sõnavõttude transkribeerimisega, ja sellest saab ürituse transkriptsioon. Subtiitrid saab peita kõneriba subtiitrite nupuga.",
+    "countdownDays": "{days}p",
+    "waitingForStartButton": "Ootame algust",
+    "countdownHours": "{hours} t",
+    "countdownMinutes": "{minutes} min",
+    "countdownSeconds": "{seconds} s"
   },
   "recording": {
     "management": "Videosalvestis",
@@ -4719,7 +4742,8 @@
       "materials": "Materjalid",
       "polls": "Küsitlused",
       "feedback": "Tagasiside",
-      "transcript": "AI transkriptsioon"
+      "transcript": "AI transkriptsioon",
+      "ratingsCount": "{count, plural, one {# hinnang} other {# hinnangut}}"
     },
     "recordingNotify": "Teavita registreerunuid, kui salvestis avaldatakse",
     "recordingNotifyHelp": "Üks e-kiri, kui salvestis (või väline video) on ürituse avalikul lehel nähtav. See jõuab nendeni, kes on veel registreeritud: pärast säilitusaega kedagi ei teavitata.",
@@ -4893,7 +4917,8 @@
     "no": "Ei",
     "scaleValue": "{value}/{max}",
     "answerOne": "Saatmiseks vasta vähemalt ühele küsimusele.",
-    "pageTitle": "Küsimustik"
+    "pageTitle": "Küsimustik",
+    "onlyParticipants": "Üritust saavad hinnata ainult selles osalenud inimesed."
   },
   "notFound": {
     "title": "Lehte ei leitud",

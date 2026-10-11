@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'design-react-kit';
 
@@ -60,9 +60,32 @@ export default function ControlRoomPanel({
   eventSlug,
 }: ControlRoomPanelProps) {
   const t = useTranslations('live.controlRoom');
+  const tc = useTranslations('common');
+  // La funzione che si sta per spegnere, in attesa della conferma. Se nel
+  // frattempo la spegne qualcun altro, la domanda non ha piu' senso e si
+  // chiude: altrimenti ricomparirebbe alla prossima accensione.
+  const [daSpegnere, setDaSpegnere] = useState<FunzioneSala['key'] | null>(null);
+  const daSpegnereAccesa = funzioni.some((f) => f.key === daSpegnere && f.on);
+  // Il fuoco va sulla domanda quando si apre, e torna all'interruttore quando
+  // si chiude: chi usa la tastiera non resta su un elemento sparito.
+  const vociRef = useRef(new Map<FunzioneSala['key'], HTMLLIElement>());
+  const confermaRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (daSpegnere) confermaRef.current?.focus();
+  }, [daSpegnere]);
+  const chiudiConferma = useCallback((key: FunzioneSala['key']) => {
+    setDaSpegnere(null);
+    setTimeout(() => vociRef.current.get(key)?.querySelector<HTMLElement>('input, [role="switch"]')?.focus(), 0);
+  }, []);
+  useEffect(() => {
+    if (!daSpegnere || daSpegnereAccesa) return;
+    // Spenta da un altro: la domanda si chiude, e se il fuoco era li' torna
+    // all'interruttore.
+    if (confermaRef.current?.contains(document.activeElement)) chiudiConferma(daSpegnere);
+    else setDaSpegnere(null);
+  }, [daSpegnere, daSpegnereAccesa, chiudiConferma]);
   const tl = useTranslations('live');
   const tm = useTranslations('live.moderator');
-  const tc = useTranslations('common');
 
   const [confermaStop, setConfermaStop] = useState(false);
   const [chiusuraAperta, setChiusuraAperta] = useState(false);
@@ -184,8 +207,53 @@ export default function ControlRoomPanel({
         <p className="control-room__help">{t('featuresHelp')}</p>
         <ul className="control-room__switches">
           {funzioni.map((f) => (
-            <li key={f.key}>
-              <ToggleSwitch label={f.label} checked={f.on} onChange={() => onToggleFunzione(f.key, f.on)} />
+            <li
+              key={f.key}
+              ref={(el) => {
+                if (el) vociRef.current.set(f.key, el);
+                else vociRef.current.delete(f.key);
+              }}
+            >
+              {/* Accendere e' immediato. Spegnere in diretta chiede conferma,
+                  sul posto: toglie la funzione a tutti, e un tocco sbagliato
+                  chiuderebbe la chat o le domande mentre la gente scrive. */}
+              <ToggleSwitch
+                label={f.label}
+                checked={f.on}
+                onChange={() => (f.on ? setDaSpegnere(f.key) : onToggleFunzione(f.key, f.on))}
+              />
+              {daSpegnere === f.key && f.on && (
+                <div
+                  className="control-room__confirm"
+                  role="alertdialog"
+                  aria-labelledby={`spegni-${f.key}`}
+                  tabIndex={-1}
+                  ref={confermaRef}
+                  onKeyDown={(e) => {
+                    // Esc annulla la domanda e basta: senza fermarlo, chiuderebbe
+                    // anche il pannello laterale.
+                    if (e.key === 'Escape') {
+                      e.stopPropagation();
+                      chiudiConferma(f.key);
+                    }
+                  }}
+                >
+                  <span id={`spegni-${f.key}`}>{t('turnOffConfirm', { feature: f.label })}</span>
+                  <Button
+                    color="danger"
+                    size="xs"
+                    onClick={() => {
+                      chiudiConferma(f.key);
+                      onToggleFunzione(f.key, f.on);
+                    }}
+                  >
+                    {t('turnOff')}
+                  </Button>
+                  <Button color="secondary" outline size="xs" onClick={() => chiudiConferma(f.key)}>
+                    {tc('cancel')}
+                  </Button>
+                </div>
+              )}
             </li>
           ))}
         </ul>

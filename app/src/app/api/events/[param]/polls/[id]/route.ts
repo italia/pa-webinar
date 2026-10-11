@@ -2,6 +2,7 @@ import { type PollStatus } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
+  AppError,
   NotFoundError,
   UnauthorizedError,
   ForbiddenError,
@@ -64,6 +65,12 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   if (!poll || poll.eventId !== event.id) {
     throw new NotFoundError('Poll');
+  }
+
+  // A evento concluso un sondaggio non si riapre: la sala non c'e' piu' e il
+  // voto lo rifiuterebbe. Pubblicarne i risultati, invece, si puo'.
+  if (parsed.data.status === 'OPEN' && (event.status === 'ENDED' || event.status === 'ARCHIVED')) {
+    throw new AppError('Poll is closed', 409, 'POLL_CLOSED');
   }
 
   const updated = await prisma.poll.update({
