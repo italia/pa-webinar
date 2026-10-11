@@ -2444,12 +2444,15 @@
         "deleteTitle": "Ștergi evenimentul?",
         "deleteMessage": "„{title}” și toate datele sale vor fi șterse. Operațiunea nu poate fi anulată.",
         "deleted": "Eveniment șters",
-        "failed": "Operațiunea a eșuat. Încearcă din nou."
+        "failed": "Operațiunea a eșuat. Încearcă din nou.",
+        "enterRoom": "Intră în sală"
       },
       "instantBadge": "Apel rapid",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} few {# moderatori} other {# de moderatori}} · {speakers, plural, one {# vorbitor} few {# vorbitori} other {# de vorbitori}}",
       "postEventSummary": "{connected} conectați · {registered} înscrieri",
-      "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}"
+      "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}",
+      "sortUpcoming": "Cele viitoare întâi",
+      "todayTitle": "Azi și în desfășurare"
     },
     "tags": {
       "subtitle": "Creați, modificați și ștergeți etichetele folosite pentru clasificarea și filtrarea evenimentelor publice.",

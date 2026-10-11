@@ -2444,12 +2444,15 @@
         "deleteTitle": "Törli az eseményt?",
         "deleteMessage": "A(z) „{title}” és minden adata törlődik. A művelet nem vonható vissza.",
         "deleted": "Esemény törölve",
-        "failed": "A művelet nem sikerült. Próbálja újra."
+        "failed": "A művelet nem sikerült. Próbálja újra.",
+        "enterRoom": "Belépés a terembe"
       },
       "instantBadge": "Azonnali hívás",
       "moderatorsSpeakers": "{mods, plural, other {# moderátor}} · {speakers, plural, other {# előadó}}",
       "postEventSummary": "{connected} csatlakozott · {registered} regisztráció",
-      "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}"
+      "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}",
+      "sortUpcoming": "Közelgők elöl",
+      "todayTitle": "Ma és folyamatban"
     },
     "tags": {
       "subtitle": "A nyilvános események osztályozására és szűrésére használt címkék létrehozása, szerkesztése és törlése.",

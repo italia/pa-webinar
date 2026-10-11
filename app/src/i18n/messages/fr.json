@@ -2444,12 +2444,15 @@
         "deleteTitle": "Supprimer l’événement ?",
         "deleteMessage": "« {title} » et toutes ses données seront supprimés. Cette action est irréversible.",
         "deleted": "Événement supprimé",
-        "failed": "L’opération a échoué. Veuillez réessayer."
+        "failed": "L’opération a échoué. Veuillez réessayer.",
+        "enterRoom": "Entrer dans la salle"
       },
       "instantBadge": "Appel instantané",
       "moderatorsSpeakers": "{mods, plural, one {# modérateur} other {# modérateurs}} · {speakers, plural, one {# intervenant} other {# intervenants}}",
       "postEventSummary": "{connected} connectés · {registered} inscriptions",
-      "registeredCount": "{count, plural, =0 {Aucune inscription} one {1 inscription} other {# inscriptions}}"
+      "registeredCount": "{count, plural, =0 {Aucune inscription} one {1 inscription} other {# inscriptions}}",
+      "sortUpcoming": "Prochains d'abord",
+      "todayTitle": "Aujourd'hui et en cours"
     },
     "tags": {
       "subtitle": "Créez, modifiez et supprimez les tags utilisés pour classer et filtrer les événements publics.",

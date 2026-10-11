@@ -2444,12 +2444,15 @@
         "deleteTitle": "Odstrániť podujatie?",
         "deleteMessage": "„{title}“ a všetky jeho údaje budú odstránené. Túto akciu nemožno vrátiť.",
         "deleted": "Podujatie odstránené",
-        "failed": "Operácia zlyhala. Skúste to znova."
+        "failed": "Operácia zlyhala. Skúste to znova.",
+        "enterRoom": "Vstúpiť do miestnosti"
       },
       "instantBadge": "Rýchly hovor",
       "moderatorsSpeakers": "{mods, plural, one {# moderátor} few {# moderátori} many {# moderátora} other {# moderátorov}} · {speakers, plural, one {# rečník} few {# rečníci} many {# rečníka} other {# rečníkov}}",
       "postEventSummary": "{connected} pripojených · {registered} registrácií",
-      "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}"
+      "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}",
+      "sortUpcoming": "Najbližšie najprv",
+      "todayTitle": "Dnes a práve prebieha"
     },
     "tags": {
       "subtitle": "Vytvárajte, upravujte a odstraňujte tagy používané na klasifikáciu a filtrovanie verejných podujatí.",

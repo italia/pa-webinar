@@ -2444,12 +2444,15 @@
         "deleteTitle": "Да се изтрие ли събитието?",
         "deleteMessage": "„{title}“ и всички негови данни ще бъдат изтрити. Действието е необратимо.",
         "deleted": "Събитието е изтрито",
-        "failed": "Операцията не бе успешна. Опитайте отново."
+        "failed": "Операцията не бе успешна. Опитайте отново.",
+        "enterRoom": "Влез в залата"
       },
       "instantBadge": "Бърз разговор",
       "moderatorsSpeakers": "{mods, plural, one {# модератор} other {# модератори}} · {speakers, plural, one {# лектор} other {# лектори}}",
       "postEventSummary": "{connected} свързани · {registered} регистрации",
-      "registeredCount": "{count, plural, =0 {Няма регистрации} one {1 регистрация} other {# регистрации}}"
+      "registeredCount": "{count, plural, =0 {Няма регистрации} one {1 регистрация} other {# регистрации}}",
+      "sortUpcoming": "Предстоящите първо",
+      "todayTitle": "Днес и в ход"
     },
     "tags": {
       "subtitle": "Създавайте, редактирайте и изтривайте таговете за класифициране и филтриране на публични събития.",

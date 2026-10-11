@@ -2444,12 +2444,15 @@
         "deleteTitle": "Veranstaltung löschen?",
         "deleteMessage": "„{title}“ und alle zugehörigen Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
         "deleted": "Veranstaltung gelöscht",
-        "failed": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen."
+        "failed": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen.",
+        "enterRoom": "Raum betreten"
       },
       "instantBadge": "Sofortanruf",
       "moderatorsSpeakers": "{mods, plural, one {# Moderator} other {# Moderatoren}} · {speakers, plural, one {# Referent} other {# Referenten}}",
       "postEventSummary": "{connected} beigetreten · {registered} angemeldet",
-      "registeredCount": "{count, plural, =0 {Keine Anmeldungen} one {1 Anmeldung} other {# Anmeldungen}}"
+      "registeredCount": "{count, plural, =0 {Keine Anmeldungen} one {1 Anmeldung} other {# Anmeldungen}}",
+      "sortUpcoming": "Anstehende zuerst",
+      "todayTitle": "Heute und laufend"
     },
     "tags": {
       "subtitle": "Erstellen, bearbeiten und löschen Sie die Tags zum Klassifizieren und Filtern öffentlicher Events.",

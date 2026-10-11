@@ -2444,12 +2444,15 @@
         "deleteTitle": "Eliminar o evento?",
         "deleteMessage": "«{title}» e todos os seus dados serão eliminados. Esta ação não pode ser anulada.",
         "deleted": "Evento eliminado",
-        "failed": "A operação falhou. Tente novamente."
+        "failed": "A operação falhou. Tente novamente.",
+        "enterRoom": "Entrar na sala"
       },
       "instantBadge": "Chamada rápida",
       "moderatorsSpeakers": "{mods, plural, one {# moderador} other {# moderadores}} · {speakers, plural, one {# orador} other {# oradores}}",
       "postEventSummary": "{connected} ligados · {registered} inscrições",
-      "registeredCount": "{count, plural, =0 {Nenhuma inscrição} one {1 inscrição} other {# inscrições}}"
+      "registeredCount": "{count, plural, =0 {Nenhuma inscrição} one {1 inscrição} other {# inscrições}}",
+      "sortUpcoming": "Próximos primeiro",
+      "todayTitle": "Hoje e a decorrer"
     },
     "tags": {
       "subtitle": "Crie, edite e elimine as etiquetas usadas para classificar e filtrar os eventos públicos.",

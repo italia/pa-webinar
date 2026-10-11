@@ -2444,12 +2444,15 @@
         "deleteTitle": "Tħassar l-avveniment?",
         "deleteMessage": "“{title}” u d-data kollha tiegħu se jitħassru. Din l-azzjoni ma tistax titreġġa’ lura.",
         "deleted": "Avveniment imħassar",
-        "failed": "L-operazzjoni ma rnexxietx. Erġa’ pprova."
+        "failed": "L-operazzjoni ma rnexxietx. Erġa’ pprova.",
+        "enterRoom": "Idħol fil-kamra"
       },
       "instantBadge": "Sejħa rapida",
       "moderatorsSpeakers": "{mods, plural, one {# moderatur} other {# moderaturi}} · {speakers, plural, one {# kelliem} other {# kelliema}}",
       "postEventSummary": "{connected} konnessi · {registered} reġistrazzjonijiet",
-      "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}"
+      "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}",
+      "sortUpcoming": "Dawk li ġejjin l-ewwel",
+      "todayTitle": "Illum u għaddejjin"
     },
     "tags": {
       "subtitle": "Crea, tbiddel ed ħassar il-tag usati għal classificaru u filtraru gli avvenimenti pubbliċi.",

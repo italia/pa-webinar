@@ -2444,12 +2444,15 @@
         "deleteTitle": "Dzēst pasākumu?",
         "deleteMessage": "“{title}” un visi tā dati tiks dzēsti. Šo darbību nevar atsaukt.",
         "deleted": "Pasākums dzēsts",
-        "failed": "Darbība neizdevās. Mēģiniet vēlreiz."
+        "failed": "Darbība neizdevās. Mēģiniet vēlreiz.",
+        "enterRoom": "Ieiet telpā"
       },
       "instantBadge": "Ātrais zvans",
       "moderatorsSpeakers": "{mods, plural, zero {# moderatoru} one {# moderators} other {# moderatori}} · {speakers, plural, zero {# runātāju} one {# runātājs} other {# runātāji}}",
       "postEventSummary": "{connected} pievienojušies · {registered} reģistrēti",
-      "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}"
+      "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}",
+      "sortUpcoming": "Gaidāmie vispirms",
+      "todayTitle": "Šodien un notiek"
     },
     "tags": {
       "subtitle": "Izveidojiet, rediģējiet un dzēsiet tagus, ko izmanto publisko pasākumu klasificēšanai un filtrēšanai.",

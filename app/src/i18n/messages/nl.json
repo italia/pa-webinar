@@ -2444,12 +2444,15 @@
         "deleteTitle": "Evenement verwijderen?",
         "deleteMessage": "‘{title}’ en alle bijbehorende gegevens worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
         "deleted": "Evenement verwijderd",
-        "failed": "De bewerking is mislukt. Probeer het opnieuw."
+        "failed": "De bewerking is mislukt. Probeer het opnieuw.",
+        "enterRoom": "De zaal binnengaan"
       },
       "instantBadge": "Directe oproep",
       "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatoren}} · {speakers, plural, one {# spreker} other {# sprekers}}",
       "postEventSummary": "{connected} verbonden · {registered} aanmeldingen",
-      "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}"
+      "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}",
+      "sortUpcoming": "Komende eerst",
+      "todayTitle": "Vandaag en bezig"
     },
     "tags": {
       "subtitle": "Tags maken, bewerken en verwijderen die worden gebruikt om openbare evenementen te classificeren en te filteren.",

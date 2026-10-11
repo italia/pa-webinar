@@ -2569,12 +2569,15 @@
         "deleteTitle": "Eliminare l'evento?",
         "deleteMessage": "«{title}» e tutti i suoi dati verranno eliminati. L'operazione non si può annullare.",
         "deleted": "Evento eliminato",
-        "failed": "Operazione non riuscita. Riprova."
+        "failed": "Operazione non riuscita. Riprova.",
+        "enterRoom": "Entra in sala"
       },
       "instantBadge": "Chiamata rapida",
       "moderatorsSpeakers": "{mods, plural, one {# moderatore} other {# moderatori}} · {speakers, plural, one {# relatore} other {# relatori}}",
       "postEventSummary": "{connected} connessi · {registered} iscritti",
-      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}"
+      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}",
+      "sortUpcoming": "Prossimi prima",
+      "todayTitle": "Oggi e in corso"
     },
     "tags": {
       "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",

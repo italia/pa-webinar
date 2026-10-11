@@ -2444,12 +2444,15 @@
         "deleteTitle": "Smazat událost?",
         "deleteMessage": "„{title}“ a všechna její data budou smazána. Tuto akci nelze vrátit.",
         "deleted": "Událost smazána",
-        "failed": "Operace se nezdařila. Zkuste to znovu."
+        "failed": "Operace se nezdařila. Zkuste to znovu.",
+        "enterRoom": "Vstoupit do místnosti"
       },
       "instantBadge": "Rychlý hovor",
       "moderatorsSpeakers": "{mods, plural, one {# moderátor} few {# moderátoři} many {# moderátoru} other {# moderátorů}} · {speakers, plural, one {# řečník} few {# řečníci} many {# řečníku} other {# řečníků}}",
       "postEventSummary": "{connected} připojených · {registered} registrací",
-      "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}"
+      "registeredCount": "{count, plural, =0 {Žádné registrace} one {1 registrace} few {# registrace} other {# registrací}}",
+      "sortUpcoming": "Nejbližší nejdřív",
+      "todayTitle": "Dnes a právě probíhá"
     },
     "tags": {
       "subtitle": "Vytvářejte, upravujte a mažte štítky používané pro klasifikaci a filtrování veřejných událostí.",

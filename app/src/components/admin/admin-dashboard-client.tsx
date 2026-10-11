@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useMemo, useDeferredValue } from 'react';
+import { useState, useCallback, useEffect, useMemo, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale, useFormatter } from 'next-intl';
+import { useTranslations, useLocale, useFormatter, useTimeZone } from 'next-intl';
 import {
   Button,
   Modal,
@@ -12,7 +12,8 @@ import {
 } from 'design-react-kit';
 
 import { useDurataTesto } from '@/hooks/use-durata-testo';
-import { Link, percorso } from '@/i18n/navigation';
+import { Link, percorso, useRouter as useRouterLocale } from '@/i18n/navigation';
+import { moderatorRoomOpen } from '@/lib/events/participant-entry';
 import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -52,6 +53,9 @@ interface EventSummary {
 
 interface AdminDashboardClientProps {
   events: EventSummary[];
+  /** L'istante del disegno sul server: ordine e «oggi» coincidono fra server
+   *  e primo disegno del browser, poi si aggiornano ogni pochi minuti. */
+  renderedAt?: number;
   token?: string;
   availableTags: TagSummary[];
   siteDefaultParseTitleKicker: boolean;
@@ -75,9 +79,27 @@ const STATUSES = [
   'ARCHIVED',
 ] as const;
 
-type SortKey = 'startsAsc' | 'startsDesc' | 'createdDesc' | 'titleAsc';
+type SortKey = 'upcomingFirst' | 'startsAsc' | 'startsDesc' | 'createdDesc' | 'titleAsc';
 
-const DEFAULT_SORT: SortKey = 'createdDesc';
+/** Prima quello che e' in corso, poi i prossimi in ordine di data, poi i
+ *  passati dal piu' recente: l'ordine di chi lavora sugli eventi. */
+const DEFAULT_SORT: SortKey = 'upcomingFirst';
+
+/** Gli stati di una sala aperta o che si sta aprendo. */
+const IN_CORSO = new Set(['LIVE', 'PROVISIONING', 'IDLE']);
+
+/** Una sala in corso davvero: lo stato, e la stanza ancora apribile (un
+ *  evento rimasto in pausa dopo la fine non e' «in corso»). */
+function salaInCorso(e: { status: string; endsAt: string }, adesso: number): boolean {
+  return IN_CORSO.has(e.status) && moderatorRoomOpen(e, adesso);
+}
+
+/** In corso (0), da svolgere o in svolgimento secondo l'orario (1), passato
+ *  (2): conta la data, non lo stato — una bozza vecchia e' nel passato. */
+function gruppoPerData(e: { status: string; endsAt: string }, adesso: number): number {
+  if (salaInCorso(e, adesso)) return 0;
+  return Date.parse(e.endsAt) >= adesso ? 1 : 2;
+}
 /** Tutti gli eventi tranne gli archiviati: la lista di lavoro di tutti i giorni. */
 const DEFAULT_STATUS_FILTER = 'NOT_ARCHIVED';
 type BulkAction = 'delete' | 'archive' | null;
@@ -107,6 +129,7 @@ function monogram(title: string): string {
 
 export default function AdminDashboardClient({
   events,
+  renderedAt,
   token,
   availableTags,
   siteDefaultParseTitleKicker,
@@ -121,6 +144,14 @@ export default function AdminDashboardClient({
   const te = useTranslations('events');
   const tStatus = useTranslations('events.status');
   const router = useRouter();
+  const routerLocale = useRouterLocale();
+  // «Adesso» per l'ordine e per «oggi»: lo stesso istante sul server e al
+  // primo disegno, poi aggiornato ogni cinque minuti (la pagina resta aperta).
+  const [adesso, setAdesso] = useState(() => renderedAt ?? Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setAdesso(Date.now()), 5 * 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Bulk state
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -131,8 +162,8 @@ export default function AdminDashboardClient({
   // Filter state
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
-  // Predefiniti: gli ultimi creati in cima, gli archiviati fuori dalla vista
-  // (restano a un filtro di distanza).
+  // Predefiniti: prima quello che e' in corso, poi i prossimi, poi i passati;
+  // gli archiviati fuori dalla vista (restano a un filtro di distanza).
   // Se nascondere gli archiviati lascerebbe la lista vuota (il link di un solo
   // evento archiviato, o un elenco di soli archiviati) si parte da «Tutti».
   const defaultStatusFilter =
@@ -202,6 +233,15 @@ export default function AdminDashboardClient({
 
     list = [...list];
     switch (sort) {
+      case 'upcomingFirst':
+        list.sort((a, b) => {
+          const ga = gruppoPerData(a, adesso);
+          const gb = gruppoPerData(b, adesso);
+          if (ga !== gb) return ga - gb;
+          // I passati dal piu' recente; gli altri dal piu' vicino.
+          return ga === 2 ? b.startsAt.localeCompare(a.startsAt) : a.startsAt.localeCompare(b.startsAt);
+        });
+        break;
       case 'startsAsc':
         list.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
         break;
@@ -220,7 +260,29 @@ export default function AdminDashboardClient({
         break;
     }
     return list;
-  }, [events, deferredSearch, statusFilter, tagFilter, sort, locale]);
+  }, [events, deferredSearch, statusFilter, tagFilter, sort, locale, adesso]);
+
+  // «Oggi e in corso»: le sale aperte e gli eventi di oggi, con l'ingresso a
+  // portata. «Oggi» e' nel fuso del sito, lo stesso degli orari mostrati. Con
+  // un filtro attivo il blocco non c'e': direbbe altro dalla lista filtrata.
+  const fuso = useTimeZone();
+  const giorno = useMemo(() => {
+    const f = new Intl.DateTimeFormat('en-CA', { timeZone: fuso, year: 'numeric', month: '2-digit', day: '2-digit' });
+    return (istante: number) => f.format(istante);
+  }, [fuso]);
+  const oggiEInCorso = useMemo(() => {
+    if (hasActiveFilters) return [];
+    const oggi = giorno(adesso);
+    return events
+      .filter(
+        (e) =>
+          salaInCorso(e, adesso) ||
+          (e.status === 'PUBLISHED' &&
+            giorno(Date.parse(e.startsAt)) === oggi &&
+            Date.parse(e.endsAt) >= adesso),
+      )
+      .sort((a, b) => gruppoPerData(a, adesso) - gruppoPerData(b, adesso) || a.startsAt.localeCompare(b.startsAt));
+  }, [events, adesso, giorno, hasActiveFilters]);
 
   // Bulk helpers operate on the currently filtered list
   const toggleOne = useCallback((id: string) => {
@@ -363,6 +425,7 @@ export default function AdminDashboardClient({
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
             >
+              <option value="upcomingFirst">{tList('sortUpcoming')}</option>
               <option value="createdDesc">{tList('sortCreatedDesc')}</option>
               <option value="startsAsc">{tList('sortStartsAsc')}</option>
               <option value="startsDesc">{tList('sortStartsDesc')}</option>
@@ -479,6 +542,43 @@ export default function AdminDashboardClient({
         )}
       </div>
 
+      {oggiEInCorso.length > 0 && (
+        <section className="mb-4 p-3 rounded-3" style={{ background: '#F0F7FF', border: '1px solid #CFE3FA' }}
+                 aria-labelledby="oggi-e-in-corso">
+          <h2 id="oggi-e-in-corso" className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+            {tList('todayTitle')}
+          </h2>
+          <ul className="list-unstyled mb-0 d-grid gap-2">
+            {oggiEInCorso.map((event) => (
+              <li key={event.id} className="d-flex flex-wrap align-items-center gap-2 justify-content-between">
+                <span className="d-flex align-items-center gap-2 flex-wrap">
+                  <StatusBadge status={event.status} />
+                  <span className="fw-semibold">{getLocalized(event.title, locale)}</span>
+                  <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+                    {format.dateTime(new Date(event.startsAt), { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </span>
+                <span className="d-flex gap-2">
+                  {/* Un pulsante, non un link: l'indirizzo della sala porta il
+                      token del moderatore, che non deve comparire passandoci
+                      sopra (in una condivisione dello schermo). */}
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => routerLocale.push(percorso(`/events/${event.slug}/live?token=${event.moderatorToken}`))}
+                  >
+                    {tList('menu.enterRoom')}
+                  </button>
+                  <Link href={percorso(eventAdminPath(event.id, { viaToken: token }))} className="btn btn-outline-primary btn-sm">
+                    {tList('menu.manage')}
+                  </Link>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {filteredEvents.length === 0 ? (
         <div
           className="text-center py-5 px-4 rounded-3"
@@ -512,6 +612,7 @@ export default function AdminDashboardClient({
               <div key={event.id} className="col-12 col-md-6 col-lg-4">
                 <div
                   className="event-card h-100 position-relative d-flex flex-column"
+                  data-event-type={isInstant ? 'instant' : 'scheduled'}
                   style={{
                     borderRadius: 8,
                     border: '1px solid #e8e8e8',
@@ -768,6 +869,7 @@ export default function AdminDashboardClient({
                             status: event.status,
                             eventType: event.eventType ?? 'SCHEDULED',
                             moderatorToken: token ?? event.moderatorToken,
+                            endsAt: event.endsAt,
                           }}
                           viaToken={token}
                         />
