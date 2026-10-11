@@ -432,7 +432,13 @@
       "deleteOwn": "Șterge mesajul",
       "mentionedYou": "V-a menționat",
       "mentionEmpty": "Încă nu e nimeni de menționat: aici apar cei care scriu în chat sau sunt în sală.",
-      "mentionNoMatch": "Nimeni cu acest nume."
+      "mentionNoMatch": "Nimeni cu acest nume.",
+      "logLabel": "Mesajele din chat",
+      "loadingHistory": "Se încarcă mesajele…",
+      "historyFailed": "Mesajele nu au putut fi încărcate.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# mesaj nou} few {# mesaje noi} other {# de mesaje noi}}",
+      "announceAttachment": "a trimis un atașament"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "O numărătoare inversă pentru vorbitor: o poți arăta întregii săli.",
       "eventHeading": "Eveniment",
       "endHelp": "Închide sala pentru toți și marchează evenimentul ca încheiat. Nu se poate anula.",
-      "timerHeading": "Cronometrul intervențiilor"
+      "timerHeading": "Cronometrul intervențiilor",
+      "turnOffConfirm": "Oprești „{feature}” pentru toți?",
+      "turnOff": "Oprește"
     },
     "closingNotice": "{minutes, plural, =0 {Sala se închide.} one {Sala se închide automat în # minut.} few {Sala se închide automat în # minute.} other {Sala se închide automat în # de minute.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Anulați",
     "noActiveRound": "Nu există nicio întrebare deschisă în acest moment.",
     "noWords": "Se așteaptă primele cuvinte...",
-    "wordsSubmitted": "{count} cuvinte trimise",
+    "wordsSubmitted": "{count, plural, =0 {Niciun cuvânt trimis} one {# cuvânt trimis} few {# cuvinte trimise} other {# de cuvinte trimise}}",
     "timeRemaining": "Timp rămas",
     "errors": {
       "send": "Cuvântul nu a fost trimis. Reîncercați.",

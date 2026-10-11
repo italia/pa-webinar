@@ -432,7 +432,13 @@
       "deleteOwn": "Ħassar il-messaġġ",
       "mentionedYou": "Semmiek",
       "mentionEmpty": "Għad m'hemm ħadd x'issemmi: hawn jidhru dawk li jiktbu fiċ-chat jew li jinsabu fil-kamra.",
-      "mentionNoMatch": "Ħadd b'dan l-isem."
+      "mentionNoMatch": "Ħadd b'dan l-isem.",
+      "logLabel": "Messaġġi taċ-chat",
+      "loadingHistory": "Qed jitgħabbew il-messaġġi…",
+      "historyFailed": "Il-messaġġi ma setgħux jitgħabbew.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# messaġġ ġdid} other {# messaġġi ġodda}}",
+      "announceAttachment": "bagħat attachment"
     },
     "role": {
       "moderator": "Moderatur",
@@ -575,7 +581,9 @@
       "timerHelp": "Għadd lura għal min qed jitkellem: tista' turih lill-kamra kollha.",
       "eventHeading": "Avveniment",
       "endHelp": "Tagħlaq il-kamra għal kulħadd u timmarka l-avveniment bħala lest. Ma tistax titreġġa' lura.",
-      "timerHeading": "Timer tal-interventi"
+      "timerHeading": "Timer tal-interventi",
+      "turnOffConfirm": "Titfi «{feature}» għal kulħadd?",
+      "turnOff": "Itfi"
     },
     "closingNotice": "{minutes, plural, =0 {Il-kamra qed tingħalaq.} one {Il-kamra tingħalaq awtomatikament fi # minuta.} few {Il-kamra tingħalaq awtomatikament fi # minuti.} many {Il-kamra tingħalaq awtomatikament fi # minuti.} other {Il-kamra tingħalaq awtomatikament fi # minuti.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Ikkanċella",
     "noActiveRound": "M'hemm l-ebda mistoqsija miftuħa bħalissa.",
     "noWords": "Qed nistennew l-ewwel kliem...",
-    "wordsSubmitted": "{count} kliem mibgħuta",
+    "wordsSubmitted": "{count, plural, =0 {Ebda kelma mibgħuta} one {# kelma mibgħuta} other {# kliem mibgħut}}",
     "timeRemaining": "Ħin li fadal",
     "errors": {
       "send": "Il-kelma ma ntbagħtitx. Erġa' pprova.",

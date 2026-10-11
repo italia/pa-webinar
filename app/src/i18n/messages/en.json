@@ -432,7 +432,13 @@
       "deleteOwn": "Delete message",
       "mentionedYou": "Mentioned you",
       "mentionEmpty": "Nobody to mention yet: people appear here once they write in the chat or join the room.",
-      "mentionNoMatch": "Nobody with this name."
+      "mentionNoMatch": "Nobody with this name.",
+      "logLabel": "Chat messages",
+      "loadingHistory": "Loading messages…",
+      "historyFailed": "The messages could not be loaded.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# new message} other {# new messages}}",
+      "announceAttachment": "sent an attachment"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "A countdown for whoever is speaking: you can show it to the whole room.",
       "eventHeading": "Event",
       "endHelp": "Closes the room for everyone and marks the event as ended. This cannot be undone.",
-      "timerHeading": "Talk timer"
+      "timerHeading": "Talk timer",
+      "turnOffConfirm": "Turn off «{feature}» for everyone?",
+      "turnOff": "Turn off"
     },
     "closingNotice": "{minutes, plural, =0 {The room is closing.} one {The room closes automatically in # minute.} other {The room closes automatically in # minutes.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Cancel",
     "noActiveRound": "No question is open right now.",
     "noWords": "Waiting for the first words...",
-    "wordsSubmitted": "{count} words submitted",
+    "wordsSubmitted": "{count, plural, =0 {No words sent} one {# word sent} other {# words sent}}",
     "timeRemaining": "Time remaining",
     "errors": {
       "send": "Word not sent. Please try again.",

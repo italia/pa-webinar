@@ -432,7 +432,13 @@
       "deleteOwn": "Dzēst ziņu",
       "mentionedYou": "Jūs pieminēja",
       "mentionEmpty": "Pagaidām nav neviena, ko pieminēt: šeit parādās tie, kas raksta tērzēšanā vai ir telpā.",
-      "mentionNoMatch": "Nav neviena ar šo vārdu."
+      "mentionNoMatch": "Nav neviena ar šo vārdu.",
+      "logLabel": "Tērzēšanas ziņas",
+      "loadingHistory": "Ielādē ziņas…",
+      "historyFailed": "Ziņas neizdevās ielādēt.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, zero {# jaunu ziņu} one {# jauna ziņa} other {# jaunas ziņas}}",
+      "announceAttachment": "nosūtīja pielikumu"
     },
     "role": {
       "moderator": "Moderators",
@@ -575,7 +581,9 @@
       "timerHelp": "Atpakaļskaitīšana runātājam: varat to parādīt visai telpai.",
       "eventHeading": "Pasākums",
       "endHelp": "Aizver telpu visiem un atzīmē pasākumu kā beigušos. To nevar atsaukt.",
-      "timerHeading": "Uzstāšanos taimeris"
+      "timerHeading": "Uzstāšanos taimeris",
+      "turnOffConfirm": "Vai izslēgt “{feature}” visiem?",
+      "turnOff": "Izslēgt"
     },
     "closingNotice": "{minutes, plural, =0 {Telpa tiek aizvērta.} zero {Telpa automātiski aizvērsies pēc # minūtēm.} one {Telpa automātiski aizvērsies pēc # minūtes.} other {Telpa automātiski aizvērsies pēc # minūtēm.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Atcelt",
     "noActiveRound": "Pašlaik nav neviena atvērta jautājuma.",
     "noWords": "Gaidām pirmos vārdus...",
-    "wordsSubmitted": "{count} vārdi iesniegti",
+    "wordsSubmitted": "{count, plural, =0 {Nav nosūtītu vārdu} zero {# nosūtītu vārdu} one {# nosūtīts vārds} other {# nosūtīti vārdi}}",
     "timeRemaining": "Atlikušais laiks",
     "errors": {
       "send": "Vārds netika nosūtīts. Mēģiniet vēlreiz.",

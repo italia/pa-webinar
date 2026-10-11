@@ -432,7 +432,13 @@
       "deleteOwn": "Radera meddelandet",
       "mentionedYou": "Nämnde dig",
       "mentionEmpty": "Ingen att nämna än: här visas de som skriver i chatten eller är i rummet.",
-      "mentionNoMatch": "Ingen med det namnet."
+      "mentionNoMatch": "Ingen med det namnet.",
+      "logLabel": "Chattmeddelanden",
+      "loadingHistory": "Läser in meddelanden…",
+      "historyFailed": "Meddelandena kunde inte läsas in.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nytt meddelande} other {# nya meddelanden}}",
+      "announceAttachment": "skickade en bilaga"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "En nedräkning för den som talar: du kan visa den för hela rummet.",
       "eventHeading": "Evenemang",
       "endHelp": "Stänger rummet för alla och markerar evenemanget som avslutat. Kan inte ångras.",
-      "timerHeading": "Timer för inlägg"
+      "timerHeading": "Timer för inlägg",
+      "turnOffConfirm": "Stänga av ”{feature}” för alla?",
+      "turnOff": "Stäng av"
     },
     "closingNotice": "{minutes, plural, =0 {Rummet stängs.} one {Rummet stängs automatiskt om # minut.} other {Rummet stängs automatiskt om # minuter.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Avbryt",
     "noActiveRound": "Det finns ingen öppen fråga just nu.",
     "noWords": "Väntar på de första orden...",
-    "wordsSubmitted": "{count} ord inskickade",
+    "wordsSubmitted": "{count, plural, =0 {Inga ord skickade} one {# ord skickat} other {# ord skickade}}",
     "timeRemaining": "Tid kvar",
     "errors": {
       "send": "Ordet skickades inte. Försök igen.",

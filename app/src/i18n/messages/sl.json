@@ -432,7 +432,13 @@
       "deleteOwn": "Izbriši sporočilo",
       "mentionedYou": "Vas je omenil(a)",
       "mentionEmpty": "Zaenkrat ni nikogar za omembo: tukaj se prikažejo tisti, ki pišejo v klepet ali so v sobi.",
-      "mentionNoMatch": "Nikogar s tem imenom."
+      "mentionNoMatch": "Nikogar s tem imenom.",
+      "logLabel": "Sporočila klepeta",
+      "loadingHistory": "Nalaganje sporočil …",
+      "historyFailed": "Sporočil ni bilo mogoče naložiti.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# novo sporočilo} two {# novi sporočili} few {# nova sporočila} other {# novih sporočil}}",
+      "announceAttachment": "je poslal(a) prilogo"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "Odštevanje za govorca: lahko ga pokažete vsej sobi.",
       "eventHeading": "Dogodek",
       "endHelp": "Zapre sobo za vse in označi dogodek kot končan. Tega ni mogoče razveljaviti.",
-      "timerHeading": "Časovnik govorov"
+      "timerHeading": "Časovnik govorov",
+      "turnOffConfirm": "Izklopim »{feature}« za vse?",
+      "turnOff": "Izklopi"
     },
     "closingNotice": "{minutes, plural, =0 {Soba se zapira.} one {Soba se samodejno zapre čez # minuto.} two {Soba se samodejno zapre čez # minuti.} few {Soba se samodejno zapre čez # minute.} other {Soba se samodejno zapre čez # minut.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Prekliči",
     "noActiveRound": "Trenutno ni odprtega vprašanja.",
     "noWords": "Čakamo na prve besede...",
-    "wordsSubmitted": "{count} besed poslanih",
+    "wordsSubmitted": "{count, plural, =0 {Nobena beseda ni poslana} one {# poslana beseda} two {# poslani besedi} few {# poslane besede} other {# poslanih besed}}",
     "timeRemaining": "Preostali čas",
     "errors": {
       "send": "Beseda ni bila poslana. Poskusite znova.",

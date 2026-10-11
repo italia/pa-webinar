@@ -432,7 +432,13 @@
       "deleteOwn": "Poista viesti",
       "mentionedYou": "Mainitsi sinut",
       "mentionEmpty": "Ei vielä ketään mainittavaa: tässä näkyvät ne, jotka kirjoittavat keskusteluun tai ovat huoneessa.",
-      "mentionNoMatch": "Ei ketään tällä nimellä."
+      "mentionNoMatch": "Ei ketään tällä nimellä.",
+      "logLabel": "Keskustelun viestit",
+      "loadingHistory": "Ladataan viestejä…",
+      "historyFailed": "Viestejä ei voitu ladata.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# uusi viesti} other {# uutta viestiä}}",
+      "announceAttachment": "lähetti liitteen"
     },
     "role": {
       "moderator": "Moderaattori",
@@ -575,7 +581,9 @@
       "timerHelp": "Lähtölaskenta puhujalle: voit näyttää sen koko huoneelle.",
       "eventHeading": "Tapahtuma",
       "endHelp": "Sulkee huoneen kaikilta ja merkitsee tapahtuman päättyneeksi. Ei voi perua.",
-      "timerHeading": "Puheenvuorojen ajastin"
+      "timerHeading": "Puheenvuorojen ajastin",
+      "turnOffConfirm": "Poistetaanko ”{feature}” käytöstä kaikilta?",
+      "turnOff": "Poista käytöstä"
     },
     "closingNotice": "{minutes, plural, =0 {Huone sulkeutuu.} one {Huone sulkeutuu automaattisesti # minuutin kuluttua.} other {Huone sulkeutuu automaattisesti # minuutin kuluttua.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Peruuta",
     "noActiveRound": "Tällä hetkellä ei ole avoimia kysymyksiä.",
     "noWords": "Odotetaan ensimmäisiä sanoja...",
-    "wordsSubmitted": "{count} sanaa lähetetty",
+    "wordsSubmitted": "{count, plural, =0 {Ei lähetettyjä sanoja} one {# sana lähetetty} other {# sanaa lähetetty}}",
     "timeRemaining": "Aikaa jäljellä",
     "errors": {
       "send": "Sanaa ei lähetetty. Yritä uudelleen.",

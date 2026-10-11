@@ -432,7 +432,13 @@
       "deleteOwn": "Ištrinti žinutę",
       "mentionedYou": "Jus paminėjo",
       "mentionEmpty": "Kol kas nėra ką paminėti: čia rodomi tie, kurie rašo pokalbyje arba yra kambaryje.",
-      "mentionNoMatch": "Nėra nė vieno tokiu vardu."
+      "mentionNoMatch": "Nėra nė vieno tokiu vardu.",
+      "logLabel": "Pokalbio žinutės",
+      "loadingHistory": "Įkeliamos žinutės…",
+      "historyFailed": "Nepavyko įkelti žinučių.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nauja žinutė} few {# naujos žinutės} many {# naujos žinutės} other {# naujų žinučių}}",
+      "announceAttachment": "atsiuntė priedą"
     },
     "role": {
       "moderator": "Moderatorius",
@@ -575,7 +581,9 @@
       "timerHelp": "Atgalinis skaičiavimas kalbančiajam: galite jį parodyti visam kambariui.",
       "eventHeading": "Renginys",
       "endHelp": "Uždaro kambarį visiems ir pažymi renginį kaip baigtą. Atšaukti negalima.",
-      "timerHeading": "Pranešimų laikmatis"
+      "timerHeading": "Pranešimų laikmatis",
+      "turnOffConfirm": "Išjungti „{feature}“ visiems?",
+      "turnOff": "Išjungti"
     },
     "closingNotice": "{minutes, plural, =0 {Kambarys užsidaro.} one {Kambarys automatiškai užsidarys po # minutės.} few {Kambarys automatiškai užsidarys po # minučių.} many {Kambarys automatiškai užsidarys po # minutės.} other {Kambarys automatiškai užsidarys po # minučių.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Atšaukti",
     "noActiveRound": "Šiuo metu nėra atvirų klausimų.",
     "noWords": "Laukiama pirmųjų žodžių...",
-    "wordsSubmitted": "{count} žodžių pateikta",
+    "wordsSubmitted": "{count, plural, =0 {Neišsiųsta nė vieno žodžio} one {Išsiųstas # žodis} few {Išsiųsti # žodžiai} many {Išsiųsta # žodžio} other {Išsiųsta # žodžių}}",
     "timeRemaining": "Liko laiko",
     "errors": {
       "send": "Žodis neišsiųstas. Bandykite dar kartą.",

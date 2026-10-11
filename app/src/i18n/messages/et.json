@@ -432,7 +432,13 @@
       "deleteOwn": "Kustuta sõnum",
       "mentionedYou": "Mainis sind",
       "mentionEmpty": "Kedagi pole veel mainida: siia ilmuvad need, kes kirjutavad vestlusesse või on ruumis.",
-      "mentionNoMatch": "Selle nimega pole kedagi."
+      "mentionNoMatch": "Selle nimega pole kedagi.",
+      "logLabel": "Vestluse sõnumid",
+      "loadingHistory": "Sõnumite laadimine…",
+      "historyFailed": "Sõnumeid ei õnnestunud laadida.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# uus sõnum} other {# uut sõnumit}}",
+      "announceAttachment": "saatis manuse"
     },
     "role": {
       "moderator": "Moderaator",
@@ -575,7 +581,9 @@
       "timerHelp": "Pöördloendus esinejale: saad seda näidata kogu ruumile.",
       "eventHeading": "Üritus",
       "endHelp": "Sulgeb ruumi kõigile ja märgib ürituse lõppenuks. Seda ei saa tagasi võtta.",
-      "timerHeading": "Ettekannete taimer"
+      "timerHeading": "Ettekannete taimer",
+      "turnOffConfirm": "Kas lülitada „{feature}“ kõigile välja?",
+      "turnOff": "Lülita välja"
     },
     "closingNotice": "{minutes, plural, =0 {Ruum sulgub.} one {Ruum sulgub automaatselt # minuti pärast.} other {Ruum sulgub automaatselt # minuti pärast.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Tühista",
     "noActiveRound": "Praegu ei ole ühtegi avatud küsimust.",
     "noWords": "Ootame esimesi sõnu...",
-    "wordsSubmitted": "{count} sõna saadetud",
+    "wordsSubmitted": "{count, plural, =0 {Ühtegi sõna pole saadetud} one {# sõna saadetud} other {# sõna saadetud}}",
     "timeRemaining": "Jäänud aega",
     "errors": {
       "send": "Sõna ei saadetud. Proovige uuesti.",

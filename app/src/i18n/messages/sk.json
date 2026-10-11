@@ -432,7 +432,13 @@
       "deleteOwn": "Odstrániť správu",
       "mentionedYou": "Spomenul(a) vás",
       "mentionEmpty": "Zatiaľ nie je koho spomenúť: zobrazia sa tu tí, čo píšu do chatu alebo sú v miestnosti.",
-      "mentionNoMatch": "Nikto s týmto menom."
+      "mentionNoMatch": "Nikto s týmto menom.",
+      "logLabel": "Správy chatu",
+      "loadingHistory": "Načítavajú sa správy…",
+      "historyFailed": "Správy sa nepodarilo načítať.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nová správa} few {# nové správy} many {# novej správy} other {# nových správ}}",
+      "announceAttachment": "poslal(a) prílohu"
     },
     "role": {
       "moderator": "Moderátor",
@@ -575,7 +581,9 @@
       "timerHelp": "Odpočet pre rečníka: môžete ho ukázať celej miestnosti.",
       "eventHeading": "Podujatie",
       "endHelp": "Zatvorí miestnosť pre všetkých a označí podujatie ako ukončené. Nedá sa vrátiť.",
-      "timerHeading": "Časovač vystúpení"
+      "timerHeading": "Časovač vystúpení",
+      "turnOffConfirm": "Vypnúť „{feature}“ pre všetkých?",
+      "turnOff": "Vypnúť"
     },
     "closingNotice": "{minutes, plural, =0 {Miestnosť sa zatvára.} one {Miestnosť sa automaticky zatvorí o # minútu.} few {Miestnosť sa automaticky zatvorí o # minúty.} many {Miestnosť sa automaticky zatvorí o # minúty.} other {Miestnosť sa automaticky zatvorí o # minút.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Zrušiť",
     "noActiveRound": "Momentálne nie je otvorená žiadna otázka.",
     "noWords": "Čakáme na prvé slová...",
-    "wordsSubmitted": "{count} odoslaných slov",
+    "wordsSubmitted": "{count, plural, =0 {Žiadne odoslané slovo} one {# odoslané slovo} few {# odoslané slová} many {# odoslaného slova} other {# odoslaných slov}}",
     "timeRemaining": "Zostávajúci čas",
     "errors": {
       "send": "Slovo sa neodoslalo. Skúste to znova.",

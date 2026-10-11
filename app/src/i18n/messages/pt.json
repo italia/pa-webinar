@@ -432,7 +432,13 @@
       "deleteOwn": "Eliminar a mensagem",
       "mentionedYou": "Mencionou-o",
       "mentionEmpty": "Ainda ninguém para mencionar: aqui aparece quem escreve no chat ou está na sala.",
-      "mentionNoMatch": "Ninguém com este nome."
+      "mentionNoMatch": "Ninguém com este nome.",
+      "logLabel": "Mensagens do chat",
+      "loadingHistory": "A carregar mensagens…",
+      "historyFailed": "Não foi possível carregar as mensagens.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# mensagem nova} other {# mensagens novas}}",
+      "announceAttachment": "enviou um anexo"
     },
     "role": {
       "moderator": "Moderador",
@@ -575,7 +581,9 @@
       "timerHelp": "Uma contagem decrescente para quem fala: pode mostrá-la a toda a sala.",
       "eventHeading": "Evento",
       "endHelp": "Fecha a sala para todos e marca o evento como concluído. Não pode ser anulado.",
-      "timerHeading": "Temporizador das intervenções"
+      "timerHeading": "Temporizador das intervenções",
+      "turnOffConfirm": "Desligar «{feature}» para todos?",
+      "turnOff": "Desligar"
     },
     "closingNotice": "{minutes, plural, =0 {A sala está a fechar.} one {A sala fecha automaticamente dentro de # minuto.} other {A sala fecha automaticamente dentro de # minutos.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Cancelar",
     "noActiveRound": "Não há nenhuma pergunta aberta neste momento.",
     "noWords": "À espera das primeiras palavras...",
-    "wordsSubmitted": "{count} palavras enviadas",
+    "wordsSubmitted": "{count, plural, =0 {Nenhuma palavra enviada} one {# palavra enviada} other {# palavras enviadas}}",
     "timeRemaining": "Tempo restante",
     "errors": {
       "send": "Palavra não enviada. Tente novamente.",

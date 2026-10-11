@@ -432,7 +432,13 @@
       "deleteOwn": "Supprimer le message",
       "mentionedYou": "Vous a mentionné",
       "mentionEmpty": "Personne à mentionner pour l'instant : ici apparaissent celles et ceux qui écrivent dans le chat ou sont dans la salle.",
-      "mentionNoMatch": "Personne avec ce nom."
+      "mentionNoMatch": "Personne avec ce nom.",
+      "logLabel": "Messages du chat",
+      "loadingHistory": "Chargement des messages…",
+      "historyFailed": "Impossible de charger les messages.",
+      "announceMessage": "{name} : {text}",
+      "announceMessages": "{count, plural, one {# nouveau message} other {# nouveaux messages}}",
+      "announceAttachment": "a envoyé une pièce jointe"
     },
     "role": {
       "moderator": "Modérateur",
@@ -575,7 +581,9 @@
       "timerHelp": "Un compte à rebours pour la personne qui parle : vous pouvez l'afficher à toute la salle.",
       "eventHeading": "Événement",
       "endHelp": "Ferme la salle pour tous et marque l'événement comme terminé. Action irréversible.",
-      "timerHeading": "Minuteur des interventions"
+      "timerHeading": "Minuteur des interventions",
+      "turnOffConfirm": "Désactiver « {feature} » pour tout le monde ?",
+      "turnOff": "Désactiver"
     },
     "closingNotice": "{minutes, plural, =0 {La salle se ferme.} one {La salle se ferme automatiquement dans # minute.} other {La salle se ferme automatiquement dans # minutes.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Annuler",
     "noActiveRound": "Aucune question ouverte pour le moment.",
     "noWords": "En attente des premiers mots...",
-    "wordsSubmitted": "{count} mots soumis",
+    "wordsSubmitted": "{count, plural, =0 {Aucun mot envoyé} one {# mot envoyé} other {# mots envoyés}}",
     "timeRemaining": "Temps restant",
     "errors": {
       "send": "Mot non envoyé. Veuillez réessayer.",

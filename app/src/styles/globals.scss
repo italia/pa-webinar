@@ -648,6 +648,24 @@ button.live-time-strip__rec {
   list-style: none;
 }
 
+// Conferma sul posto prima di spegnere una funzione in diretta.
+.control-room__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-left: 3px solid #a1112e;
+  background: #fdf1f3;
+  color: #17324d;
+  font-size: 0.82rem;
+
+  span {
+    flex: 1 1 100%;
+  }
+}
+
 .control-room .toggles label {
   margin-bottom: 0.25rem;
   font-size: 0.9rem;

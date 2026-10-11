@@ -432,7 +432,13 @@
       "deleteOwn": "Nachricht löschen",
       "mentionedYou": "Hat dich erwähnt",
       "mentionEmpty": "Noch niemand zum Erwähnen: Hier erscheint, wer im Chat schreibt oder im Raum ist.",
-      "mentionNoMatch": "Niemand mit diesem Namen."
+      "mentionNoMatch": "Niemand mit diesem Namen.",
+      "logLabel": "Chatnachrichten",
+      "loadingHistory": "Nachrichten werden geladen…",
+      "historyFailed": "Die Nachrichten konnten nicht geladen werden.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# neue Nachricht} other {# neue Nachrichten}}",
+      "announceAttachment": "hat einen Anhang gesendet"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "Ein Countdown für die sprechende Person: Sie können ihn dem ganzen Raum zeigen.",
       "eventHeading": "Veranstaltung",
       "endHelp": "Schließt den Raum für alle und markiert die Veranstaltung als beendet. Nicht rückgängig zu machen.",
-      "timerHeading": "Timer für Beiträge"
+      "timerHeading": "Timer für Beiträge",
+      "turnOffConfirm": "„{feature}“ für alle ausschalten?",
+      "turnOff": "Ausschalten"
     },
     "closingNotice": "{minutes, plural, =0 {Der Raum wird geschlossen.} one {Der Raum schließt automatisch in # Minute.} other {Der Raum schließt automatisch in # Minuten.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Abbrechen",
     "noActiveRound": "Gerade ist keine Frage offen.",
     "noWords": "Warten auf die ersten Wörter...",
-    "wordsSubmitted": "{count} Wörter eingereicht",
+    "wordsSubmitted": "{count, plural, =0 {Keine Wörter gesendet} one {# Wort gesendet} other {# Wörter gesendet}}",
     "timeRemaining": "Verbleibende Zeit",
     "errors": {
       "send": "Wort nicht gesendet. Bitte versuchen Sie es erneut.",

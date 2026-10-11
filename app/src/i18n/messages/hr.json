@@ -432,7 +432,13 @@
       "deleteOwn": "Izbriši poruku",
       "mentionedYou": "Spomenuo/la vas je",
       "mentionEmpty": "Još nema koga spomenuti: ovdje se pojavljuju oni koji pišu u chatu ili su u sobi.",
-      "mentionNoMatch": "Nema nikoga s tim imenom."
+      "mentionNoMatch": "Nema nikoga s tim imenom.",
+      "logLabel": "Poruke chata",
+      "loadingHistory": "Učitavanje poruka…",
+      "historyFailed": "Poruke se nisu mogle učitati.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nova poruka} few {# nove poruke} other {# novih poruka}}",
+      "announceAttachment": "je poslao/la privitak"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "Odbrojavanje za govornika: možete ga prikazati cijeloj sobi.",
       "eventHeading": "Događaj",
       "endHelp": "Zatvara sobu za sve i označava događaj završenim. Ne može se poništiti.",
-      "timerHeading": "Mjerač izlaganja"
+      "timerHeading": "Mjerač izlaganja",
+      "turnOffConfirm": "Isključiti „{feature}” za sve?",
+      "turnOff": "Isključi"
     },
     "closingNotice": "{minutes, plural, =0 {Soba se zatvara.} one {Soba se automatski zatvara za # minutu.} few {Soba se automatski zatvara za # minute.} other {Soba se automatski zatvara za # minuta.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Odustani",
     "noActiveRound": "Trenutačno nema otvorenih pitanja.",
     "noWords": "Čekamo prve riječi...",
-    "wordsSubmitted": "{count} riječi poslano",
+    "wordsSubmitted": "{count, plural, =0 {Nijedna riječ nije poslana} one {# poslana riječ} few {# poslane riječi} other {# poslanih riječi}}",
     "timeRemaining": "Preostalo vrijeme",
     "errors": {
       "send": "Riječ nije poslana. Pokušajte ponovno.",

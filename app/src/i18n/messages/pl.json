@@ -432,7 +432,13 @@
       "deleteOwn": "Usuń wiadomość",
       "mentionedYou": "Wspomniał(a) o tobie",
       "mentionEmpty": "Na razie nie ma kogo wspomnieć: tu pojawiają się osoby piszące na czacie lub obecne w sali.",
-      "mentionNoMatch": "Nikt o tym imieniu."
+      "mentionNoMatch": "Nikt o tym imieniu.",
+      "logLabel": "Wiadomości czatu",
+      "loadingHistory": "Wczytywanie wiadomości…",
+      "historyFailed": "Nie udało się wczytać wiadomości.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nowa wiadomość} few {# nowe wiadomości} many {# nowych wiadomości} other {# nowej wiadomości}}",
+      "announceAttachment": "wysłał(a) załącznik"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "Odliczanie dla mówcy: możesz pokazać je całej sali.",
       "eventHeading": "Wydarzenie",
       "endHelp": "Zamyka salę dla wszystkich i oznacza wydarzenie jako zakończone. Nie można cofnąć.",
-      "timerHeading": "Minutnik wystąpień"
+      "timerHeading": "Minutnik wystąpień",
+      "turnOffConfirm": "Wyłączyć „{feature}” dla wszystkich?",
+      "turnOff": "Wyłącz"
     },
     "closingNotice": "{minutes, plural, =0 {Sala się zamyka.} one {Sala zamknie się automatycznie za # minutę.} few {Sala zamknie się automatycznie za # minuty.} many {Sala zamknie się automatycznie za # minut.} other {Sala zamknie się automatycznie za # minuty.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Anuluj",
     "noActiveRound": "W tej chwili nie ma otwartego pytania.",
     "noWords": "Oczekiwanie na pierwsze słowa...",
-    "wordsSubmitted": "{count} przesłanych słów",
+    "wordsSubmitted": "{count, plural, =0 {Nie wysłano żadnego słowa} one {Wysłano # słowo} few {Wysłano # słowa} many {Wysłano # słów} other {Wysłano # słowa}}",
     "timeRemaining": "Pozostały czas",
     "errors": {
       "send": "Nie wysłano słowa. Spróbuj ponownie.",

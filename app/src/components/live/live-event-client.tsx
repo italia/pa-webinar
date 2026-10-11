@@ -2827,6 +2827,50 @@ function LiveSidebar({
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
+  // Una novità vera (un sondaggio in più da votare, una nuova domanda di «In
+  // una parola», materiali nuovi, domande nuove) si dice anche a voce, una
+  // volta: il pallino lo vede solo chi guarda. Si parte dai segnali, non dai
+  // pallini, che spariscono e tornano cambiando scheda. Nei primi secondi si
+  // registra solo quello che c'e' gia' (i dati arrivano dopo il primo disegno).
+  const [annuncioNovita, setAnnuncioNovita] = useState('');
+  const montataAlle = useRef<number | null>(null);
+  const segnaliPrima = useRef<{ sondaggi: number; giro: string | null; materiali: boolean; domande: boolean } | null>(null);
+  const codaNovita = useRef<string[]>([]);
+  const timerNovita = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(
+    () => () => {
+      for (const id of timerNovita.current) clearTimeout(id);
+    },
+    [],
+  );
+  const giroAperto = giroParole?.active && giroParole.id ? giroParole.id : null;
+  useEffect(() => {
+    const ora = { sondaggi: pollsUnvoted, giro: giroAperto, materiali: materialsNew, domande: qaNews };
+    const prima = segnaliPrima.current;
+    segnaliPrima.current = ora;
+    if (montataAlle.current === null) montataAlle.current = Date.now();
+    if (!prima || Date.now() - montataAlle.current < 3000) return;
+    const nuove: string[] = [];
+    if (ora.sondaggi > prima.sondaggi) nuove.push(t('sidebarTabPollsOpen'));
+    if (ora.giro && ora.giro !== prima.giro) nuove.push(t('sidebarTabWordcloudNew'));
+    if (ora.materiali && !prima.materiali) nuove.push(t('sidebarTabMaterialsNew'));
+    if (ora.domande && !prima.domande) nuove.push(t('sidebarTabQaNew'));
+    if (nuove.length === 0) return;
+    // In coda, non al posto di quelle gia' in attesa: due novita' ravvicinate
+    // si dicono insieme.
+    const vuota = codaNovita.current.length === 0;
+    codaNovita.current.push(...nuove);
+    if (!vuota) return;
+    timerNovita.current.push(
+      setTimeout(() => {
+        const testo = codaNovita.current.join('. ');
+        codaNovita.current = [];
+        setAnnuncioNovita('');
+        timerNovita.current.push(setTimeout(() => setAnnuncioNovita(testo), 50));
+      }, 300),
+    );
+  }, [pollsUnvoted, giroAperto, materialsNew, qaNews, t]);
+
   // If the moderator turns off the active tab's feature mid-event (e.g.
   // disables Q&A), that tab drops out of visibleTabs — without this the drawer
   // header/body would render blank. Fall back to the first still-visible tab.
@@ -2910,12 +2954,11 @@ function LiveSidebar({
             {tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral' && tab.dotLabel && (
               <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
-            {tab.dot && (
-              <span
-                className="live-floating-btn__dot"
-                aria-label={tab.dotLabel}
-                title={tab.dotLabel}
-              />
+            {tab.dot && <span className="live-floating-btn__dot" aria-hidden="true" title={tab.dotLabel} />}
+            {/* Un aria-label su uno span non si legge: il testo entra nel nome
+                del pulsante. */}
+            {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+              <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
           </button>
         );
@@ -2928,6 +2971,12 @@ function LiveSidebar({
       {/* Floating control bar — portaled into the video wrapper so it
           overlays the Jitsi iframe and scales with the video. */}
       {slot && createPortal(floatingBar, slot)}
+
+      {/* Fuori dal pannello laterale, che sul telefono chiuso e' inerte: la
+          novita' si dice proprio a chi guarda il video. */}
+      <p className="visually-hidden" role="status">
+        {annuncioNovita}
+      </p>
 
       {chatPreview && (
         <div
@@ -3081,6 +3130,11 @@ function LiveSidebar({
                   </span>
                 )}
                 {tab.dot && <span className="live-sidebar-tab__dot" aria-hidden="true" />}
+                {/* Il pallino da solo non arriva a chi usa un lettore di
+                    schermo: il suo testo entra nel nome della scheda. */}
+                {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+                  <span className="visually-hidden"> {tab.dotLabel}</span>
+                )}
               </button>
             );
           })}

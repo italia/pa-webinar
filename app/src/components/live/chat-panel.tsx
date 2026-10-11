@@ -509,6 +509,43 @@ export default function ChatPanel({
     onMessaggioRimossoRef.current?.(id);
   }, []);
 
+  // L'annuncio dei messaggi nuovi per i lettori di schermo: uno da solo si
+  // legge con il nome, piu' messaggi ravvicinati diventano «N nuovi
+  // messaggi». Prima si svuota la regione, poi si scrive: due annunci uguali
+  // di fila altrimenti non si sentirebbero.
+  const [annuncioMessaggi, setAnnuncioMessaggi] = useState('');
+  const codaAnnunci = useRef<Array<{ nome: string; testo: string }>>([]);
+  const timerAnnunci = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerScrittura = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timerAnnunci.current) clearTimeout(timerAnnunci.current);
+      if (timerScrittura.current) clearTimeout(timerScrittura.current);
+    },
+    [],
+  );
+  const annunciaMessaggio = useCallback(
+    (nome: string, testo: string) => {
+      codaAnnunci.current.push({ nome, testo });
+      if (timerAnnunci.current) return;
+      timerAnnunci.current = setTimeout(() => {
+        const coda = codaAnnunci.current;
+        codaAnnunci.current = [];
+        timerAnnunci.current = null;
+        // Chi nel frattempo e' passato a un'altra scheda non sente la chat.
+        if (!activeRef.current) return;
+        const primo = coda[0];
+        const frase =
+          coda.length === 1 && primo
+            ? t('announceMessage', { name: primo.nome, text: primo.testo })
+            : t('announceMessages', { count: coda.length });
+        setAnnuncioMessaggi('');
+        timerScrittura.current = setTimeout(() => setAnnuncioMessaggi(frase), 50);
+      }, 1500);
+    },
+    [t],
+  );
+
   const upsertMessage = useCallback((
     msg: ChatMessage,
     opts?: {
@@ -549,6 +586,9 @@ export default function ChatPanel({
     // A schermo quando la chat e' il pannello in vista (il contenitore lo dice
     // con `active`): altrimenti conta come non letto.
     const onScreen = activeRef.current;
+    if (!isOwn && onScreen && opts?.origine !== 'recupero') {
+      annunciaMessaggio(msg.senderName, msg.text?.trim() || (msg.attachment ? t('announceAttachment') : ''));
+    }
     if (!isOwn) alertFor(msg, { mentionsMe, repliesToMe, onScreen });
     // Solo messaggi appena arrivati: la prima lettura dello storico (fino a 200
     // messaggi) non deve diventare una raffica di anteprime.
@@ -592,7 +632,7 @@ export default function ChatPanel({
       // la pillola «nuovi messaggi».
       if (!isOwn && !isAtBottomRef.current) setNewBelow((n) => n + 1);
     }
-  }, [displayName, setUnread, setUnreadMentions, alertFor]);
+  }, [displayName, setUnread, setUnreadMentions, alertFor, annunciaMessaggio, t]);
 
   useEffect(() => {
     if (active) {
@@ -717,12 +757,18 @@ export default function ChatPanel({
     }
   }, [eventSlug, token, myReactions, t, refreshReactions]);
 
-  // 1. Initial history load.
+  // 1. Initial history load. Lo stato del caricamento tiene distinti «sto
+  // caricando», «non sono riuscito» (con «Riprova») e «non c'e' ancora
+  // nessun messaggio»: mostrare «Scrivi per primo!» mentre la storia arriva
+  // dice a chi legge una cosa falsa.
+  const [storico, setStorico] = useState<'caricamento' | 'pronto' | 'errore'>('caricamento');
+  const [tentativoStorico, setTentativoStorico] = useState(0);
   useEffect(() => {
     // Guard, not just a dependency: without it, setting the flag inside this
     // effect would immediately re-trigger it and spin.
     if (readDenied) return;
     let cancelled = false;
+    setStorico((s) => (s === 'pronto' ? s : 'caricamento'));
     (async () => {
       try {
         const res = await fetch(`/api/events/${eventSlug}/chat?limit=200`, {
@@ -730,7 +776,13 @@ export default function ChatPanel({
           ...(readHeaders ? { headers: readHeaders } : {}),
         });
         if (res.status === 403 && !cancelled) setReadDenied(true);
-        if (!res.ok || cancelled) return;
+        if (cancelled) return;
+        if (!res.ok) {
+          // Un recupero gia' riuscito vale: un errore che arriva dopo non
+          // toglie la chat a chi la sta gia' leggendo.
+          if (res.status !== 403) setStorico((s) => (s === 'pronto' ? s : 'errore'));
+          return;
+        }
         const data = (await res.json()) as ChatHistoryResponse;
         setAttachmentsEnabled(data.attachmentsEnabled === true);
         const mine: Record<string, Set<string>> = {};
@@ -746,10 +798,14 @@ export default function ChatPanel({
         const last = data.messages[data.messages.length - 1];
         if (last) lastReadIdRef.current = last.id;
         setMessages(data.messages);
-      } catch { /* soft fail; SSE will still open */ }
+        setStorico('pronto');
+      } catch {
+        // L'SSE si apre comunque; intanto si offre di riprovare.
+        if (!cancelled) setStorico((s) => (s === 'pronto' ? s : 'errore'));
+      }
     })();
     return () => { cancelled = true; };
-  }, [eventSlug, readHeaders, readDenied]);
+  }, [eventSlug, readHeaders, readDenied, tentativoStorico]);
 
   // 2. SSE stream for live updates + polling fallback.
   //
@@ -804,6 +860,9 @@ export default function ChatPanel({
         if (!res.ok) return 0;
         const data = (await res.json()) as ChatHistoryResponse;
         setAttachmentsEnabled(data.attachmentsEnabled === true);
+        // Una lettura riuscita vale come storia caricata: se il primo
+        // caricamento era fallito, «Riprova» non serve piu'.
+        setStorico('pronto');
         // Count messages the stream never delivered (still unseen) BEFORE upsert
         // marks them seen. A non-zero count on the POLL path means the SSE is
         // buffered, not merely quiet.
@@ -1435,12 +1494,36 @@ export default function ChatPanel({
           )}
         </div>
       )}
+      {/* I messaggi nuovi li dice ad alta voce la regione qui sotto, uno per
+          uno o a gruppi: una lista «live» leggerebbe anche le reazioni, i
+          pulsanti e i campi che compaiono dentro i messaggi. */}
+      <p className="visually-hidden" role="status">
+        {annuncioMessaggi}
+      </p>
       <div
         ref={listRef}
         className="chat-panel__messages flex-grow-1"
         onScroll={handleScroll}
+        aria-label={t('logLabel')}
+        role="region"
       >
-        {messages.length === 0 ? (
+        {messages.length === 0 && !readDenied && storico === 'caricamento' ? (
+          // Solo da vedere: annunciarlo a ogni nuovo tentativo sarebbe rumore.
+          <div className="chat-panel__empty">
+            <p>{t('loadingHistory')}</p>
+          </div>
+        ) : messages.length === 0 && !readDenied && storico === 'errore' ? (
+          <div className="chat-panel__empty" role="status">
+            <p>{t('historyFailed')}</p>
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setTentativoStorico((n) => n + 1)}
+            >
+              {tc('retry')}
+            </button>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="chat-panel__empty">
             <span className={`chat-panel__empty-badge${readDenied ? ' is-locked' : ''}`} aria-hidden="true">
               <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" />

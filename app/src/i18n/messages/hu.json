@@ -432,7 +432,13 @@
       "deleteOwn": "Üzenet törlése",
       "mentionedYou": "Megemlített téged",
       "mentionEmpty": "Még nincs kit megemlíteni: itt jelennek meg, akik írnak a csevegésben vagy a teremben vannak.",
-      "mentionNoMatch": "Nincs ilyen nevű személy."
+      "mentionNoMatch": "Nincs ilyen nevű személy.",
+      "logLabel": "Csevegőüzenetek",
+      "loadingHistory": "Üzenetek betöltése…",
+      "historyFailed": "Az üzeneteket nem sikerült betölteni.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# új üzenet} other {# új üzenet}}",
+      "announceAttachment": "mellékletet küldött"
     },
     "role": {
       "moderator": "Moderátor",
@@ -575,7 +581,9 @@
       "timerHelp": "Visszaszámlálás az előadónak: az egész teremnek megmutathatja.",
       "eventHeading": "Esemény",
       "endHelp": "Mindenkinek bezárja a termet, és befejezettnek jelöli az eseményt. Nem vonható vissza.",
-      "timerHeading": "Felszólalások időzítője"
+      "timerHeading": "Felszólalások időzítője",
+      "turnOffConfirm": "Kikapcsolja mindenkinek: „{feature}”?",
+      "turnOff": "Kikapcsolás"
     },
     "closingNotice": "{minutes, plural, =0 {A terem bezár.} one {A terem # perc múlva automatikusan bezár.} other {A terem # perc múlva automatikusan bezár.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Mégse",
     "noActiveRound": "Jelenleg nincs nyitott kérdés.",
     "noWords": "Várunk az első szavakra...",
-    "wordsSubmitted": "{count} beküldött szó",
+    "wordsSubmitted": "{count, plural, =0 {Nincs elküldött szó} one {# elküldött szó} other {# elküldött szó}}",
     "timeRemaining": "Hátralévő idő",
     "errors": {
       "send": "A szó nem lett elküldve. Próbálja újra.",

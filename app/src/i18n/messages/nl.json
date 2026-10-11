@@ -432,7 +432,13 @@
       "deleteOwn": "Bericht verwijderen",
       "mentionedYou": "Heeft je genoemd",
       "mentionEmpty": "Nog niemand om te noemen: hier verschijnen wie in de chat schrijft of in de zaal is.",
-      "mentionNoMatch": "Niemand met deze naam."
+      "mentionNoMatch": "Niemand met deze naam.",
+      "logLabel": "Chatberichten",
+      "loadingHistory": "Berichten laden…",
+      "historyFailed": "De berichten konden niet worden geladen.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# nieuw bericht} other {# nieuwe berichten}}",
+      "announceAttachment": "heeft een bijlage gestuurd"
     },
     "role": {
       "moderator": "Moderator",
@@ -575,7 +581,9 @@
       "timerHelp": "Een aftelling voor wie spreekt: je kunt hem aan de hele ruimte tonen.",
       "eventHeading": "Evenement",
       "endHelp": "Sluit de ruimte voor iedereen en markeert het evenement als afgelopen. Kan niet ongedaan worden gemaakt.",
-      "timerHeading": "Timer voor bijdragen"
+      "timerHeading": "Timer voor bijdragen",
+      "turnOffConfirm": "‘{feature}’ voor iedereen uitzetten?",
+      "turnOff": "Uitzetten"
     },
     "closingNotice": "{minutes, plural, =0 {De ruimte wordt gesloten.} one {De ruimte sluit automatisch over # minuut.} other {De ruimte sluit automatisch over # minuten.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Annuleren",
     "noActiveRound": "Er is op dit moment geen open vraag.",
     "noWords": "Wachten op de eerste woorden...",
-    "wordsSubmitted": "{count} woorden ingediend",
+    "wordsSubmitted": "{count, plural, =0 {Geen woorden verzonden} one {# woord verzonden} other {# woorden verzonden}}",
     "timeRemaining": "Resterende tijd",
     "errors": {
       "send": "Woord niet verzonden. Probeer het opnieuw.",

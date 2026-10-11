@@ -432,7 +432,13 @@
       "deleteOwn": "Scrios an teachtaireacht",
       "mentionedYou": "Luaigh sé/sí thú",
       "mentionEmpty": "Níl aon duine le lua fós: taispeántar anseo na daoine a scríobhann sa chomhrá nó atá sa seomra.",
-      "mentionNoMatch": "Níl aon duine leis an ainm seo."
+      "mentionNoMatch": "Níl aon duine leis an ainm seo.",
+      "logLabel": "Teachtaireachtaí comhrá",
+      "loadingHistory": "Teachtaireachtaí á lódáil…",
+      "historyFailed": "Níorbh fhéidir na teachtaireachtaí a lódáil.",
+      "announceMessage": "{name}: {text}",
+      "announceMessages": "{count, plural, one {# teachtaireacht nua} other {# teachtaireacht nua}}",
+      "announceAttachment": "sheol ceangaltán"
     },
     "role": {
       "moderator": "Modhnóir",
@@ -575,7 +581,9 @@
       "timerHelp": "Comhaireamh síos don chainteoir: is féidir é a thaispeáint don seomra ar fad.",
       "eventHeading": "Imeacht",
       "endHelp": "Dúnann sé an seomra do chách agus marcálann sé an imeacht mar críochnaithe. Ní féidir é a chealú.",
-      "timerHeading": "Amadóir na gcaintí"
+      "timerHeading": "Amadóir na gcaintí",
+      "turnOffConfirm": "An bhfuil tú ag iarraidh «{feature}» a mhúchadh do chách?",
+      "turnOff": "Múch"
     },
     "closingNotice": "{minutes, plural, =0 {Tá an seomra ag dúnadh.} one {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} two {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} few {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} many {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} other {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.}}",
     "captions": {
@@ -4098,7 +4106,7 @@
     "cancel": "Cealaigh",
     "noActiveRound": "Níl aon cheist oscailte faoi láthair.",
     "noWords": "Ag fanacht leis na chéad fhocail...",
-    "wordsSubmitted": "{count} focal seolta",
+    "wordsSubmitted": "{count, plural, =0 {Níor seoladh aon fhocal} one {# fhocal seolta} other {# focal seolta}}",
     "timeRemaining": "Am fágtha",
     "errors": {
       "send": "Níor seoladh an focal. Bain triail eile as.",
