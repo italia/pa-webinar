@@ -2678,8 +2678,6 @@
       "duplicateNextError": "Duplicazione non riuscita. Riprova.",
       "capacitySection": "Capacità e infrastruttura",
       "capacitySubtitle": "Dimensionato per circa {max} partecipanti attesi",
-      "publishBlockedLive": "L’evento è già in corso",
-      "publishBlockedEnded": "L’evento è concluso",
       "created": {
         "publishedTitle": "Evento pubblicato",
         "draftTitle": "Bozza salvata",
@@ -2690,7 +2688,8 @@
         "unsaved": "Non sono stati salvati: {items}. Puoi aggiungerli da questa pagina.",
         "copyParticipantLink": "Copia il link per i partecipanti",
         "sendToSpeakers": "Link di moderatori e relatori",
-        "close": "Chiudi il riepilogo"
+        "close": "Chiudi il riepilogo",
+        "publishNow": "Pubblica ora"
       }
     },
     "rubrica": {
@@ -3360,7 +3359,22 @@
       "preview": "Anteprima",
       "hidePreview": "Nascondi l'anteprima",
       "previewLanguage": "Lingua"
-    }
+    },
+    "endEvent": "Termina evento",
+    "endEventConfirmTitle": "Terminare l'evento per tutti?",
+    "endEventConfirmMessage": "Chi è in sala vedrà la chiusura. La pagina dopo l'evento segue le scelte di «Dopo l’evento».",
+    "endEventSuccess": "Evento terminato.",
+    "endEventFailed": "Non è stato possibile terminare l'evento. Riprova.",
+    "archive": "Archivia",
+    "archiveConfirmTitle": "Archiviare l'evento?",
+    "archiveConfirmMessage": "La pagina pubblica non sarà più visibile. I dati restano fino alla scadenza della conservazione, e puoi togliere l'evento dall'archivio quando vuoi.",
+    "archiveSuccess": "Evento archiviato.",
+    "archiveFailed": "Non è stato possibile archiviare l'evento. Riprova.",
+    "endEventPagePublic": "Ora è impostata come pubblica.",
+    "endEventPagePrivate": "Ora è impostata come privata.",
+    "unarchive": "Togli dall'archivio",
+    "unarchiveSuccess": "Evento tolto dall'archivio.",
+    "unarchiveFailed": "Non è stato possibile togliere l'evento dall'archivio. Riprova."
   },
   "email": {
     "confirmationSubject": "Conferma registrazione: {eventTitle}",

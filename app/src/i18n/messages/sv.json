@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Dupliceringen misslyckades. Försök igen.",
       "capacitySection": "Kapacitet och infrastruktur",
       "capacitySubtitle": "Dimensionerat för omkring {max} förväntade deltagare",
-      "publishBlockedLive": "Evenemanget pågår redan",
-      "publishBlockedEnded": "Evenemanget är avslutat",
       "created": {
         "publishedTitle": "Evenemanget publicerat",
         "draftTitle": "Utkast sparat",
@@ -2565,7 +2563,8 @@
         "unsaved": "Inte sparade: {items}. Du kan lägga till dem från den här sidan.",
         "copyParticipantLink": "Kopiera länken för deltagare",
         "sendToSpeakers": "Länkar för moderatorer och talare",
-        "close": "Stäng sammanfattningen"
+        "close": "Stäng sammanfattningen",
+        "publishNow": "Publicera nu"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Förhandsvisning",
       "hidePreview": "Dölj förhandsvisning",
       "previewLanguage": "Språk"
-    }
+    },
+    "endEvent": "Avsluta evenemang",
+    "endEventConfirmTitle": "Avsluta evenemanget för alla?",
+    "endEventConfirmMessage": "Alla i rummet ser avslutningen. Sidan efter evenemanget följer valen under ”Efter evenemanget”.",
+    "endEventSuccess": "Evenemanget har avslutats.",
+    "endEventFailed": "Evenemanget kunde inte avslutas. Försök igen.",
+    "archive": "Arkivera",
+    "archiveConfirmTitle": "Arkivera evenemanget?",
+    "archiveConfirmMessage": "Den offentliga sidan syns inte längre. Uppgifterna finns kvar tills lagringstiden går ut, och du kan ta ut evenemanget ur arkivet när du vill.",
+    "archiveSuccess": "Evenemanget har arkiverats.",
+    "archiveFailed": "Evenemanget kunde inte arkiveras. Försök igen.",
+    "endEventPagePublic": "Den är just nu inställd som offentlig.",
+    "endEventPagePrivate": "Den är just nu inställd som privat.",
+    "unarchive": "Ta ut ur arkivet",
+    "unarchiveSuccess": "Evenemanget har tagits ut ur arkivet.",
+    "unarchiveFailed": "Evenemanget kunde inte tas ut ur arkivet. Försök igen."
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",

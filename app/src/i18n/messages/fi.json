@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen.",
       "capacitySection": "Kapasiteetti ja infrastruktuuri",
       "capacitySubtitle": "Mitoitettu noin {max} odotetulle osallistujalle",
-      "publishBlockedLive": "Tapahtuma on jo käynnissä",
-      "publishBlockedEnded": "Tapahtuma on päättynyt",
       "created": {
         "publishedTitle": "Tapahtuma julkaistu",
         "draftTitle": "Luonnos tallennettu",
@@ -2565,7 +2563,8 @@
         "unsaved": "Ei tallennettu: {items}. Voit lisätä ne tältä sivulta.",
         "copyParticipantLink": "Kopioi osallistujien linkki",
         "sendToSpeakers": "Moderaattorien ja puhujien linkit",
-        "close": "Sulje yhteenveto"
+        "close": "Sulje yhteenveto",
+        "publishNow": "Julkaise nyt"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Esikatselu",
       "hidePreview": "Piilota esikatselu",
       "previewLanguage": "Kieli"
-    }
+    },
+    "endEvent": "Päätä tapahtuma",
+    "endEventConfirmTitle": "Päätetäänkö tapahtuma kaikilta?",
+    "endEventConfirmMessage": "Kaikki huoneessa näkevät lopetuksen. Tapahtuman jälkeinen sivu noudattaa kohdan ”Tapahtuman jälkeen” valintoja.",
+    "endEventSuccess": "Tapahtuma päätetty.",
+    "endEventFailed": "Tapahtumaa ei voitu päättää. Yritä uudelleen.",
+    "archive": "Arkistoi",
+    "archiveConfirmTitle": "Arkistoidaanko tapahtuma?",
+    "archiveConfirmMessage": "Julkinen sivu ei ole enää näkyvissä. Tiedot säilyvät säilytysajan loppuun, ja voit poistaa tapahtuman arkistosta milloin tahansa.",
+    "archiveSuccess": "Tapahtuma arkistoitu.",
+    "archiveFailed": "Tapahtumaa ei voitu arkistoida. Yritä uudelleen.",
+    "endEventPagePublic": "Se on nyt asetettu julkiseksi.",
+    "endEventPagePrivate": "Se on nyt asetettu yksityiseksi.",
+    "unarchive": "Poista arkistosta",
+    "unarchiveSuccess": "Tapahtuma poistettu arkistosta.",
+    "unarchiveFailed": "Tapahtumaa ei voitu poistaa arkistosta. Yritä uudelleen."
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",

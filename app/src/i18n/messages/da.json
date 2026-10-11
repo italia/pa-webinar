@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Dubleringen mislykkedes. Prøv igen.",
       "capacitySection": "Kapacitet og infrastruktur",
       "capacitySubtitle": "Dimensioneret til ca. {max} forventede deltagere",
-      "publishBlockedLive": "Begivenheden er allerede i gang",
-      "publishBlockedEnded": "Begivenheden er afsluttet",
       "created": {
         "publishedTitle": "Arrangement offentliggjort",
         "draftTitle": "Kladde gemt",
@@ -2565,7 +2563,8 @@
         "unsaved": "Ikke gemt: {items}. Du kan tilføje dem fra denne side.",
         "copyParticipantLink": "Kopiér linket til deltagerne",
         "sendToSpeakers": "Links til moderatorer og talere",
-        "close": "Luk oversigten"
+        "close": "Luk oversigten",
+        "publishNow": "Offentliggør nu"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Forhåndsvisning",
       "hidePreview": "Skjul forhåndsvisning",
       "previewLanguage": "Sprog"
-    }
+    },
+    "endEvent": "Afslut arrangement",
+    "endEventConfirmTitle": "Afslut arrangementet for alle?",
+    "endEventConfirmMessage": "Alle i rummet ser afslutningen. Siden efter arrangementet følger valgene under »Efter begivenheden«.",
+    "endEventSuccess": "Arrangementet er afsluttet.",
+    "endEventFailed": "Arrangementet kunne ikke afsluttes. Prøv igen.",
+    "archive": "Arkivér",
+    "archiveConfirmTitle": "Arkivér arrangementet?",
+    "archiveConfirmMessage": "Den offentlige side vil ikke længere være synlig. Dataene bevares til opbevaringsperioden udløber, og du kan til enhver tid fjerne arrangementet fra arkivet.",
+    "archiveSuccess": "Arrangementet er arkiveret.",
+    "archiveFailed": "Arrangementet kunne ikke arkiveres. Prøv igen.",
+    "endEventPagePublic": "Den er lige nu sat til offentlig.",
+    "endEventPagePrivate": "Den er lige nu sat til privat.",
+    "unarchive": "Fjern fra arkivet",
+    "unarchiveSuccess": "Arrangementet er fjernet fra arkivet.",
+    "unarchiveFailed": "Arrangementet kunne ikke fjernes fra arkivet. Prøv igen."
   },
   "email": {
     "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",

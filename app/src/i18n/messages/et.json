@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti.",
       "capacitySection": "Maht ja taristu",
       "capacitySubtitle": "Mõõdetud umbes {max} oodatud osalejale",
-      "publishBlockedLive": "Sündmus on juba käimas",
-      "publishBlockedEnded": "Sündmus on lõppenud",
       "created": {
         "publishedTitle": "Sündmus avaldatud",
         "draftTitle": "Mustand salvestatud",
@@ -2565,7 +2563,8 @@
         "unsaved": "Salvestamata: {items}. Saate need sellel lehel lisada.",
         "copyParticipantLink": "Kopeeri osalejate link",
         "sendToSpeakers": "Moderaatorite ja esinejate lingid",
-        "close": "Sulge kokkuvõte"
+        "close": "Sulge kokkuvõte",
+        "publishNow": "Avalda kohe"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Eelvaade",
       "hidePreview": "Peida eelvaade",
       "previewLanguage": "Keel"
-    }
+    },
+    "endEvent": "Lõpeta üritus",
+    "endEventConfirmTitle": "Kas lõpetada üritus kõigile?",
+    "endEventConfirmMessage": "Kõik ruumis näevad lõpetamist. Ürituse järgne leht järgib valikuid jaotises „Pärast sündmust“.",
+    "endEventSuccess": "Üritus lõpetatud.",
+    "endEventFailed": "Üritust ei õnnestunud lõpetada. Proovi uuesti.",
+    "archive": "Arhiveeri",
+    "archiveConfirmTitle": "Kas arhiveerida üritus?",
+    "archiveConfirmMessage": "Avalik leht ei ole enam nähtav. Andmed jäävad alles säilitusaja lõpuni ja ürituse saad igal ajal arhiivist välja võtta.",
+    "archiveSuccess": "Üritus arhiveeritud.",
+    "archiveFailed": "Üritust ei õnnestunud arhiveerida. Proovi uuesti.",
+    "endEventPagePublic": "Praegu on see avalik.",
+    "endEventPagePrivate": "Praegu on see privaatne.",
+    "unarchive": "Võta arhiivist välja",
+    "unarchiveSuccess": "Üritus võeti arhiivist välja.",
+    "unarchiveFailed": "Üritust ei õnnestunud arhiivist välja võtta. Proovi uuesti."
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",

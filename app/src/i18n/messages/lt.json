@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą.",
       "capacitySection": "Talpa ir infrastruktūra",
       "capacitySubtitle": "Pritaikyta maždaug {max} numatomiems dalyviams",
-      "publishBlockedLive": "Renginys jau vyksta",
-      "publishBlockedEnded": "Renginys baigėsi",
       "created": {
         "publishedTitle": "Renginys paskelbtas",
         "draftTitle": "Juodraštis išsaugotas",
@@ -2565,7 +2563,8 @@
         "unsaved": "Neišsaugota: {items}. Galite juos pridėti šiame puslapyje.",
         "copyParticipantLink": "Kopijuoti nuorodą dalyviams",
         "sendToSpeakers": "Moderatorių ir pranešėjų nuorodos",
-        "close": "Uždaryti santrauką"
+        "close": "Uždaryti santrauką",
+        "publishNow": "Skelbti dabar"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Peržiūra",
       "hidePreview": "Slėpti peržiūrą",
       "previewLanguage": "Kalba"
-    }
+    },
+    "endEvent": "Baigti renginį",
+    "endEventConfirmTitle": "Baigti renginį visiems?",
+    "endEventConfirmMessage": "Visi kambaryje pamatys pabaigą. Puslapis po renginio atitinka pasirinkimus skiltyje „Po renginio“.",
+    "endEventSuccess": "Renginys baigtas.",
+    "endEventFailed": "Nepavyko baigti renginio. Bandykite dar kartą.",
+    "archive": "Archyvuoti",
+    "archiveConfirmTitle": "Archyvuoti renginį?",
+    "archiveConfirmMessage": "Viešas puslapis nebebus matomas. Duomenys lieka iki saugojimo laikotarpio pabaigos, o renginį galite bet kada išimti iš archyvo.",
+    "archiveSuccess": "Renginys archyvuotas.",
+    "archiveFailed": "Nepavyko archyvuoti renginio. Bandykite dar kartą.",
+    "endEventPagePublic": "Šiuo metu jis nustatytas kaip viešas.",
+    "endEventPagePrivate": "Šiuo metu jis nustatytas kaip privatus.",
+    "unarchive": "Išimti iš archyvo",
+    "unarchiveSuccess": "Renginys išimtas iš archyvo.",
+    "unarchiveFailed": "Nepavyko išimti renginio iš archyvo. Bandykite dar kartą."
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",

@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Duplizieren fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "capacitySection": "Kapazität und Infrastruktur",
       "capacitySubtitle": "Ausgelegt für etwa {max} erwartete Teilnehmende",
-      "publishBlockedLive": "Die Veranstaltung läuft bereits",
-      "publishBlockedEnded": "Die Veranstaltung ist beendet",
       "created": {
         "publishedTitle": "Veranstaltung veröffentlicht",
         "draftTitle": "Entwurf gespeichert",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nicht gespeichert: {items}. Sie können sie auf dieser Seite hinzufügen.",
         "copyParticipantLink": "Link für Teilnehmende kopieren",
         "sendToSpeakers": "Links für Moderierende und Vortragende",
-        "close": "Zusammenfassung schließen"
+        "close": "Zusammenfassung schließen",
+        "publishNow": "Jetzt veröffentlichen"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Vorschau",
       "hidePreview": "Vorschau ausblenden",
       "previewLanguage": "Sprache"
-    }
+    },
+    "endEvent": "Veranstaltung beenden",
+    "endEventConfirmTitle": "Veranstaltung für alle beenden?",
+    "endEventConfirmMessage": "Alle im Raum sehen das Ende. Die Seite nach der Veranstaltung folgt den Einstellungen unter „Nach der Veranstaltung“.",
+    "endEventSuccess": "Veranstaltung beendet.",
+    "endEventFailed": "Die Veranstaltung konnte nicht beendet werden. Versuchen Sie es erneut.",
+    "archive": "Archivieren",
+    "archiveConfirmTitle": "Veranstaltung archivieren?",
+    "archiveConfirmMessage": "Die öffentliche Seite ist dann nicht mehr sichtbar. Die Daten bleiben bis zum Ende der Aufbewahrungsfrist erhalten, und Sie können die Veranstaltung jederzeit aus dem Archiv holen.",
+    "archiveSuccess": "Veranstaltung archiviert.",
+    "archiveFailed": "Die Veranstaltung konnte nicht archiviert werden. Versuchen Sie es erneut.",
+    "endEventPagePublic": "Sie ist derzeit öffentlich.",
+    "endEventPagePrivate": "Sie ist derzeit privat.",
+    "unarchive": "Aus dem Archiv holen",
+    "unarchiveSuccess": "Veranstaltung aus dem Archiv geholt.",
+    "unarchiveFailed": "Die Veranstaltung konnte nicht aus dem Archiv geholt werden. Versuchen Sie es erneut."
   },
   "email": {
     "confirmationSubject": "Anmeldebestätigung: {eventTitle}",

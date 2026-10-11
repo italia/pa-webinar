@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Dupliciranje nije uspjelo. Pokušaj ponovno.",
       "capacitySection": "Kapacitet i infrastruktura",
       "capacitySubtitle": "Dimenzionirano za oko {max} očekivanih sudionika",
-      "publishBlockedLive": "Događaj je već u tijeku",
-      "publishBlockedEnded": "Događaj je završio",
       "created": {
         "publishedTitle": "Događaj objavljen",
         "draftTitle": "Skica spremljena",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nije spremljeno: {items}. Možete ih dodati na ovoj stranici.",
         "copyParticipantLink": "Kopiraj poveznicu za sudionike",
         "sendToSpeakers": "Poveznice moderatora i govornika",
-        "close": "Zatvori sažetak"
+        "close": "Zatvori sažetak",
+        "publishNow": "Objavi sada"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Pregled",
       "hidePreview": "Sakrij pregled",
       "previewLanguage": "Jezik"
-    }
+    },
+    "endEvent": "Završi događaj",
+    "endEventConfirmTitle": "Završiti događaj za sve?",
+    "endEventConfirmMessage": "Svi u sobi vidjet će zatvaranje. Stranica nakon događaja slijedi izbore u „Nakon događaja”.",
+    "endEventSuccess": "Događaj je završen.",
+    "endEventFailed": "Događaj nije moguće završiti. Pokušajte ponovno.",
+    "archive": "Arhiviraj",
+    "archiveConfirmTitle": "Arhivirati događaj?",
+    "archiveConfirmMessage": "Javna stranica više neće biti vidljiva. Podaci ostaju do kraja razdoblja čuvanja, a događaj možete izvaditi iz arhive kad god želite.",
+    "archiveSuccess": "Događaj je arhiviran.",
+    "archiveFailed": "Događaj nije moguće arhivirati. Pokušajte ponovno.",
+    "endEventPagePublic": "Trenutno je postavljena kao javna.",
+    "endEventPagePrivate": "Trenutno je postavljena kao privatna.",
+    "unarchive": "Izvadi iz arhive",
+    "unarchiveSuccess": "Događaj je izvađen iz arhive.",
+    "unarchiveFailed": "Događaj nije moguće izvaditi iz arhive. Pokušajte ponovno."
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",

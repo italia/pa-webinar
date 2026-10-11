@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
       "capacitySection": "Capaciteit en infrastructuur",
       "capacitySubtitle": "Gedimensioneerd voor ongeveer {max} verwachte deelnemers",
-      "publishBlockedLive": "Het evenement is al bezig",
-      "publishBlockedEnded": "Het evenement is afgelopen",
       "created": {
         "publishedTitle": "Evenement gepubliceerd",
         "draftTitle": "Concept opgeslagen",
@@ -2565,7 +2563,8 @@
         "unsaved": "Niet opgeslagen: {items}. U kunt ze op deze pagina toevoegen.",
         "copyParticipantLink": "Link voor deelnemers kopiëren",
         "sendToSpeakers": "Links voor moderatoren en sprekers",
-        "close": "Overzicht sluiten"
+        "close": "Overzicht sluiten",
+        "publishNow": "Nu publiceren"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Voorbeeld",
       "hidePreview": "Voorbeeld verbergen",
       "previewLanguage": "Taal"
-    }
+    },
+    "endEvent": "Evenement beëindigen",
+    "endEventConfirmTitle": "Het evenement voor iedereen beëindigen?",
+    "endEventConfirmMessage": "Iedereen in de zaal ziet de afsluiting. De pagina na het evenement volgt de keuzes bij ‘Na het evenement’.",
+    "endEventSuccess": "Evenement beëindigd.",
+    "endEventFailed": "Het evenement kon niet worden beëindigd. Probeer het opnieuw.",
+    "archive": "Archiveren",
+    "archiveConfirmTitle": "Het evenement archiveren?",
+    "archiveConfirmMessage": "De openbare pagina is dan niet meer zichtbaar. De gegevens blijven tot het einde van de bewaartermijn, en je kunt het evenement altijd weer uit het archief halen.",
+    "archiveSuccess": "Evenement gearchiveerd.",
+    "archiveFailed": "Het evenement kon niet worden gearchiveerd. Probeer het opnieuw.",
+    "endEventPagePublic": "Die staat nu op openbaar.",
+    "endEventPagePrivate": "Die staat nu op privé.",
+    "unarchive": "Uit het archief halen",
+    "unarchiveSuccess": "Evenement uit het archief gehaald.",
+    "unarchiveFailed": "Het evenement kon niet uit het archief worden gehaald. Probeer het opnieuw."
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",

@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Duplicarea nu a reușit. Încercați din nou.",
       "capacitySection": "Capacitate și infrastructură",
       "capacitySubtitle": "Dimensionat pentru aproximativ {max} participanți așteptați",
-      "publishBlockedLive": "Evenimentul este deja în desfășurare",
-      "publishBlockedEnded": "Evenimentul s-a încheiat",
       "created": {
         "publishedTitle": "Eveniment publicat",
         "draftTitle": "Ciornă salvată",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nu au fost salvate: {items}. Le puteți adăuga din această pagină.",
         "copyParticipantLink": "Copiați linkul pentru participanți",
         "sendToSpeakers": "Linkurile moderatorilor și ale vorbitorilor",
-        "close": "Închideți rezumatul"
+        "close": "Închideți rezumatul",
+        "publishNow": "Publică acum"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Previzualizare",
       "hidePreview": "Ascunde previzualizarea",
       "previewLanguage": "Limba"
-    }
+    },
+    "endEvent": "Încheie evenimentul",
+    "endEventConfirmTitle": "Închei evenimentul pentru toți?",
+    "endEventConfirmMessage": "Cei din sală vor vedea închiderea. Pagina de după eveniment urmează alegerile din „După eveniment”.",
+    "endEventSuccess": "Eveniment încheiat.",
+    "endEventFailed": "Evenimentul nu a putut fi încheiat. Încearcă din nou.",
+    "archive": "Arhivează",
+    "archiveConfirmTitle": "Arhivezi evenimentul?",
+    "archiveConfirmMessage": "Pagina publică nu va mai fi vizibilă. Datele rămân până la sfârșitul perioadei de păstrare, iar evenimentul îl poți scoate din arhivă oricând.",
+    "archiveSuccess": "Eveniment arhivat.",
+    "archiveFailed": "Evenimentul nu a putut fi arhivat. Încearcă din nou.",
+    "endEventPagePublic": "Acum este setată ca publică.",
+    "endEventPagePrivate": "Acum este setată ca privată.",
+    "unarchive": "Scoate din arhivă",
+    "unarchiveSuccess": "Eveniment scos din arhivă.",
+    "unarchiveFailed": "Evenimentul nu a putut fi scos din arhivă. Încearcă din nou."
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",

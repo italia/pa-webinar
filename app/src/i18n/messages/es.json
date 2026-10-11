@@ -2553,8 +2553,6 @@
       "duplicateNextError": "No se ha podido duplicar. Inténtalo de nuevo.",
       "capacitySection": "Capacidad e infraestructura",
       "capacitySubtitle": "Dimensionado para unos {max} participantes previstos",
-      "publishBlockedLive": "El evento ya está en curso",
-      "publishBlockedEnded": "El evento ha terminado",
       "created": {
         "publishedTitle": "Evento publicado",
         "draftTitle": "Borrador guardado",
@@ -2565,7 +2563,8 @@
         "unsaved": "No se han guardado: {items}. Puedes añadirlos desde esta página.",
         "copyParticipantLink": "Copiar el enlace para los participantes",
         "sendToSpeakers": "Enlaces de moderadores y ponentes",
-        "close": "Cerrar el resumen"
+        "close": "Cerrar el resumen",
+        "publishNow": "Publicar ahora"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Vista previa",
       "hidePreview": "Ocultar la vista previa",
       "previewLanguage": "Idioma"
-    }
+    },
+    "endEvent": "Finalizar evento",
+    "endEventConfirmTitle": "¿Finalizar el evento para todos?",
+    "endEventConfirmMessage": "Quienes estén en la sala verán el cierre. La página posterior al evento sigue lo elegido en «Después del evento».",
+    "endEventSuccess": "Evento finalizado.",
+    "endEventFailed": "No se ha podido finalizar el evento. Inténtalo de nuevo.",
+    "archive": "Archivar",
+    "archiveConfirmTitle": "¿Archivar el evento?",
+    "archiveConfirmMessage": "La página pública dejará de ser visible. Los datos se conservan hasta que termine el plazo de conservación, y puedes sacar el evento del archivo cuando quieras.",
+    "archiveSuccess": "Evento archivado.",
+    "archiveFailed": "No se ha podido archivar el evento. Inténtalo de nuevo.",
+    "endEventPagePublic": "Ahora está configurada como pública.",
+    "endEventPagePrivate": "Ahora está configurada como privada.",
+    "unarchive": "Sacar del archivo",
+    "unarchiveSuccess": "Evento sacado del archivo.",
+    "unarchiveFailed": "No se ha podido sacar el evento del archivo. Inténtalo de nuevo."
   },
   "email": {
     "confirmationSubject": "Confirmación de inscripción: {eventTitle}",

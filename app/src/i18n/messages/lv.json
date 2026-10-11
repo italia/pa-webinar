@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz.",
       "capacitySection": "Ietilpība un infrastruktūra",
       "capacitySubtitle": "Paredzēts aptuveni {max} gaidāmajiem dalībniekiem",
-      "publishBlockedLive": "Pasākums jau norisinās",
-      "publishBlockedEnded": "Pasākums ir beidzies",
       "created": {
         "publishedTitle": "Pasākums publicēts",
         "draftTitle": "Melnraksts saglabāts",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nav saglabāti: {items}. Varat tos pievienot šajā lapā.",
         "copyParticipantLink": "Kopēt dalībnieku saiti",
         "sendToSpeakers": "Moderatoru un runātāju saites",
-        "close": "Aizvērt kopsavilkumu"
+        "close": "Aizvērt kopsavilkumu",
+        "publishNow": "Publicēt tūlīt"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Priekšskatījums",
       "hidePreview": "Paslēpt priekšskatījumu",
       "previewLanguage": "Valoda"
-    }
+    },
+    "endEvent": "Beigt pasākumu",
+    "endEventConfirmTitle": "Beigt pasākumu visiem?",
+    "endEventConfirmMessage": "Visi telpā redzēs noslēgumu. Lapa pēc pasākuma seko izvēlēm sadaļā “Pēc pasākuma”.",
+    "endEventSuccess": "Pasākums beigts.",
+    "endEventFailed": "Pasākumu neizdevās beigt. Mēģiniet vēlreiz.",
+    "archive": "Arhivēt",
+    "archiveConfirmTitle": "Arhivēt pasākumu?",
+    "archiveConfirmMessage": "Publiskā lapa vairs nebūs redzama. Dati paliek līdz glabāšanas termiņa beigām, un pasākumu jebkurā laikā varat izņemt no arhīva.",
+    "archiveSuccess": "Pasākums arhivēts.",
+    "archiveFailed": "Pasākumu neizdevās arhivēt. Mēģiniet vēlreiz.",
+    "endEventPagePublic": "Pašlaik tā ir iestatīta kā publiska.",
+    "endEventPagePrivate": "Pašlaik tā ir iestatīta kā privāta.",
+    "unarchive": "Izņemt no arhīva",
+    "unarchiveSuccess": "Pasākums izņemts no arhīva.",
+    "unarchiveFailed": "Pasākumu neizdevās izņemt no arhīva. Mēģiniet vēlreiz."
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",

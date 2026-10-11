@@ -9,7 +9,7 @@
 export async function impostaStatoEvento(
   eventId: string,
   moderatorToken: string,
-  status: 'DRAFT' | 'PUBLISHED' | 'LIVE',
+  status: 'DRAFT' | 'PUBLISHED' | 'LIVE' | 'ENDED',
 ): Promise<void> {
   const res = await fetch(`/api/events/${eventId}`, {
     method: 'PUT',

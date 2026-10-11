@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Não foi possível duplicar. Tente novamente.",
       "capacitySection": "Capacidade e infraestrutura",
       "capacitySubtitle": "Dimensionado para cerca de {max} participantes previstos",
-      "publishBlockedLive": "O evento já está a decorrer",
-      "publishBlockedEnded": "O evento terminou",
       "created": {
         "publishedTitle": "Evento publicado",
         "draftTitle": "Rascunho guardado",
@@ -2565,7 +2563,8 @@
         "unsaved": "Não foram guardados: {items}. Pode adicioná-los a partir desta página.",
         "copyParticipantLink": "Copiar a ligação para os participantes",
         "sendToSpeakers": "Ligações de moderadores e oradores",
-        "close": "Fechar o resumo"
+        "close": "Fechar o resumo",
+        "publishNow": "Publicar agora"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Pré-visualização",
       "hidePreview": "Ocultar a pré-visualização",
       "previewLanguage": "Idioma"
-    }
+    },
+    "endEvent": "Terminar evento",
+    "endEventConfirmTitle": "Terminar o evento para todos?",
+    "endEventConfirmMessage": "Quem está na sala verá o encerramento. A página após o evento segue as escolhas em «Depois do evento».",
+    "endEventSuccess": "Evento terminado.",
+    "endEventFailed": "Não foi possível terminar o evento. Tente novamente.",
+    "archive": "Arquivar",
+    "archiveConfirmTitle": "Arquivar o evento?",
+    "archiveConfirmMessage": "A página pública deixará de estar visível. Os dados ficam até ao fim do período de conservação, e pode retirar o evento do arquivo quando quiser.",
+    "archiveSuccess": "Evento arquivado.",
+    "archiveFailed": "Não foi possível arquivar o evento. Tente novamente.",
+    "endEventPagePublic": "Neste momento está definida como pública.",
+    "endEventPagePrivate": "Neste momento está definida como privada.",
+    "unarchive": "Retirar do arquivo",
+    "unarchiveSuccess": "Evento retirado do arquivo.",
+    "unarchiveFailed": "Não foi possível retirar o evento do arquivo. Tente novamente."
   },
   "email": {
     "confirmationSubject": "Inscrição confirmada: {eventTitle}",

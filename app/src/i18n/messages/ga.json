@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as.",
       "capacitySection": "Toilleadh agus bonneagar",
       "capacitySubtitle": "Tomhaiste do thart ar {max} rannpháirtí a bhfuiltear ag súil leo",
-      "publishBlockedLive": "Tá an t-imeacht ar siúl cheana féin",
-      "publishBlockedEnded": "Tá an t-imeacht thart",
       "created": {
         "publishedTitle": "Imeacht foilsithe",
         "draftTitle": "Dréacht sábháilte",
@@ -2565,7 +2563,8 @@
         "unsaved": "Níor sábháladh: {items}. Is féidir leat iad a chur leis ón leathanach seo.",
         "copyParticipantLink": "Cóipeáil an nasc do na rannpháirtithe",
         "sendToSpeakers": "Naisc na modhnóirí agus na gcainteoirí",
-        "close": "Dún an achoimre"
+        "close": "Dún an achoimre",
+        "publishNow": "Foilsigh anois"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Réamhamharc",
       "hidePreview": "Folaigh an réamhamharc",
       "previewLanguage": "Teanga"
-    }
+    },
+    "endEvent": "Cuir deireadh leis an ócáid",
+    "endEventConfirmTitle": "Deireadh a chur leis an ócáid do chách?",
+    "endEventConfirmMessage": "Feicfidh gach duine sa seomra an dúnadh. Leanann an leathanach i ndiaidh na hócáide na roghanna in «Tar éis an imeachta».",
+    "endEventSuccess": "Cuireadh deireadh leis an ócáid.",
+    "endEventFailed": "Níorbh fhéidir deireadh a chur leis an ócáid. Bain triail eile as.",
+    "archive": "Cartlannaigh",
+    "archiveConfirmTitle": "An ócáid a chartlannú?",
+    "archiveConfirmMessage": "Ní bheidh an leathanach poiblí le feiceáil a thuilleadh. Fanann na sonraí go deireadh na tréimhse coinneála, agus is féidir leat an ócáid a bhaint den chartlann am ar bith.",
+    "archiveSuccess": "Cartlannaíodh an ócáid.",
+    "archiveFailed": "Níorbh fhéidir an ócáid a chartlannú. Bain triail eile as.",
+    "endEventPagePublic": "Tá sé socraithe mar phoiblí faoi láthair.",
+    "endEventPagePrivate": "Tá sé socraithe mar phríobháideach faoi láthair.",
+    "unarchive": "Bain den chartlann",
+    "unarchiveSuccess": "Baineadh an ócáid den chartlann.",
+    "unarchiveFailed": "Níorbh fhéidir an ócáid a bhaint den chartlann. Bain triail eile as."
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",

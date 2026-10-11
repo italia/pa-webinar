@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Id-duplikazzjoni ma rnexxietx. Erġa' pprova.",
       "capacitySection": "Kapaċità u infrastruttura",
       "capacitySubtitle": "Iddimensjonat għal madwar {max} parteċipant mistenni",
-      "publishBlockedLive": "L-avveniment diġà għaddej",
-      "publishBlockedEnded": "L-avveniment intemm",
       "created": {
         "publishedTitle": "Avveniment ippubblikat",
         "draftTitle": "Abbozz issejvjat",
@@ -2565,7 +2563,8 @@
         "unsaved": "Ma ġewx issejvjati: {items}. Tista' żżidhom minn din il-paġna.",
         "copyParticipantLink": "Ikkopja l-link għall-parteċipanti",
         "sendToSpeakers": "Links tal-moderaturi u tal-kelliema",
-        "close": "Agħlaq is-sommarju"
+        "close": "Agħlaq is-sommarju",
+        "publishNow": "Ippubblika issa"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Previżjoni",
       "hidePreview": "Aħbi l-previżjoni",
       "previewLanguage": "Lingwa"
-    }
+    },
+    "endEvent": "Temm l-avveniment",
+    "endEventConfirmTitle": "Ittemm l-avveniment għal kulħadd?",
+    "endEventConfirmMessage": "Kulħadd fil-kamra se jara l-għeluq. Il-paġna ta' wara l-avveniment issegwi l-għażliet f'«Wara l-avveniment».",
+    "endEventSuccess": "L-avveniment intemm.",
+    "endEventFailed": "L-avveniment ma setax jintemm. Erġa' pprova.",
+    "archive": "Arkivja",
+    "archiveConfirmTitle": "Tarkivja l-avveniment?",
+    "archiveConfirmMessage": "Il-paġna pubblika ma tibqax viżibbli. Id-data tibqa' sal-aħħar tal-perjodu taż-żamma, u tista' toħroġ l-avveniment mill-arkivju meta trid.",
+    "archiveSuccess": "L-avveniment ġie arkivjat.",
+    "archiveFailed": "L-avveniment ma setax jiġi arkivjat. Erġa' pprova.",
+    "endEventPagePublic": "Bħalissa hija ssettjata bħala pubblika.",
+    "endEventPagePrivate": "Bħalissa hija ssettjata bħala privata.",
+    "unarchive": "Oħroġ mill-arkivju",
+    "unarchiveSuccess": "L-avveniment inħareġ mill-arkivju.",
+    "unarchiveFailed": "L-avveniment ma setax jinħareġ mill-arkivju. Erġa' pprova."
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",

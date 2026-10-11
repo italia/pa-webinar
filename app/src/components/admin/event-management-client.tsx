@@ -257,7 +257,11 @@ export default function EventManagementClient({
   // fine evento: si apre quella invece della panoramica, gia' dal primo
   // rendering, e anche quando l'indirizzo cambia restando sulla pagina.
   const tabRichiesta = eventAdminTab(useSearchParams().get('tab'));
-  const [activeTab, setActiveTab] = useState<TabId>(tabRichiesta ?? 'panoramica');
+  // A evento concluso (o archiviato) si apre «Dopo l'evento»: e' li' che
+  // c'e' da fare.
+  const [activeTab, setActiveTab] = useState<TabId>(
+    tabRichiesta ?? (event.status === 'ENDED' || event.status === 'ARCHIVED' ? 'dopo' : 'panoramica'),
+  );
   useEffect(() => {
     if (tabRichiesta) setActiveTab(tabRichiesta);
   }, [tabRichiesta]);
@@ -403,6 +407,78 @@ export default function EventManagementClient({
     } finally { setUpdating(false); }
   }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
 
+  // «Termina evento» da qui: la stessa fine di «Termina per tutti» in sala.
+  // Chi e' in sala vede la chiusura; la pagina dopo l'evento segue le scelte
+  // di «Dopo l'evento», dove si va subito.
+  const endEvent = useCallback(async () => {
+    // La pagina dopo l'evento segue la scelta gia' fatta in «Dopo l'evento»:
+    // la conferma dice quale, prima, non dopo.
+    const ok = await confirm({
+      title: t('endEventConfirmTitle'),
+      message: `${t('endEventConfirmMessage')} ${
+        paginaPostEvento.postEventPublic ? t('endEventPagePublic') : t('endEventPagePrivate')
+      }`,
+      confirmLabel: t('endEvent'),
+      cancelLabel: tc('cancel'),
+      danger: true,
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      setActiveTab('dopo');
+      setFeedback(t('endEventSuccess'));
+    } catch {
+      toast.error(t('endEventFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, paginaPostEvento.postEventPublic, t, tc, confirm, toast]);
+
+  // «Archivia» a evento concluso (solo lo staff: e' la stessa azione
+  // dell'elenco): la pagina pubblica sparisce, i dati restano fino alla
+  // scadenza della conservazione.
+  const archiveEvent = useCallback(async () => {
+    const ok = await confirm({
+      title: t('archiveConfirmTitle'),
+      message: t('archiveConfirmMessage'),
+      confirmLabel: t('archive'),
+      cancelLabel: tc('cancel'),
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      const res = await fetch('/api/admin/events/bulk-archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [event.id] }),
+      });
+      // La rotta risponde 200 anche quando non archivia niente (l'evento non
+      // e' piu' nel perimetro di chi chiede): conta il numero, non lo stato.
+      const esito = res.ok ? ((await res.json().catch(() => ({}))) as { archived?: number }) : null;
+      if (esito && (esito.archived ?? 0) > 0) {
+        setStatus('ARCHIVED');
+        setFeedback(t('archiveSuccess'));
+      } else {
+        toast.error(t('archiveFailed'));
+      }
+    } catch {
+      toast.error(t('archiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, t, tc, confirm, toast]);
+
+  // Dall'archivio si torna a evento concluso: la pagina pubblica torna a
+  // seguire le scelte di «Dopo l'evento».
+  const unarchiveEvent = useCallback(async () => {
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      setFeedback(t('unarchiveSuccess'));
+    } catch {
+      toast.error(t('unarchiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, t, toast]);
+
   // Dopo l'eliminazione: lo staff torna all'elenco; chi ha solo il link del
   // moderatore non ha un'area admin, e va alla home del portale.
   const handleDeleted = useCallback(() => {
@@ -491,6 +567,8 @@ export default function EventManagementClient({
           publishFailed={appenaCreato.publishFailed}
           unsaved={appenaCreato.unsaved}
           shareUrl={condivisione ? localizedUrl(baseUrl, condivisione.path, locale) : null}
+          onPublish={status === 'DRAFT' ? togglePublish : undefined}
+          publishing={updating}
           onPeople={() => {
             setActiveTab('persone');
             tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -619,7 +697,7 @@ export default function EventManagementClient({
       )}
 
       {status === 'LIVE' && (
-        <div className="mb-3 p-3 rounded d-flex align-items-center justify-content-between gap-3 flex-wrap"
+        <div className="mb-3 p-3 rounded"
              style={{ background: '#e8f0fe', color: C_INK, border: `1px solid ${C_PRIMARY}40` }}>
           <div className="d-flex align-items-center gap-2">
             <span style={{ color: C_PRIMARY }}><Svg name="video" /></span>
@@ -632,10 +710,6 @@ export default function EventManagementClient({
               </span>
             )}
           </div>
-          <Link href={percorso(liveModeratorUrl)} className="btn btn-primary btn-sm"
-                style={{ fontSize: '0.84rem' }}>
-            {t('joinAsModeratorBtn')}
-          </Link>
         </div>
       )}
 
@@ -802,30 +876,48 @@ export default function EventManagementClient({
                     <Svg name="video" size={14} /> {t('startEvent')}
                   </button>
                 )}
+                {/* Un'azione principale per stato: in bozza pubblicare, in
+                    diretta terminare, a evento concluso archiviare. Le altre
+                    restano, in secondo piano. */}
+                {status === 'DRAFT' && (
+                  <button type="button"
+                          className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('publish')}
+                  </button>
+                )}
+                {status === 'LIVE' && (
+                  <button type="button"
+                          className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
+                          onClick={endEvent} disabled={updating}>
+                    {t('endEvent')}
+                  </button>
+                )}
+                {status === 'ENDED' && !viaToken && (
+                  <button type="button"
+                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
+                          onClick={archiveEvent} disabled={updating}>
+                    {t('archive')}
+                  </button>
+                )}
+                {status === 'ARCHIVED' && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={unarchiveEvent} disabled={updating}>
+                    {t('unarchive')}
+                  </button>
+                )}
+                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
+                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
                 <Link href={percorso(editUrl)}
-                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
+                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
                   <Svg name="pencil" size={14} /> {td('editEvent')}
                 </Link>
-                <button type="button"
-                        className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
-                        onClick={togglePublish}
-                        disabled={updating || status === 'LIVE' || status === 'ENDED'}
-                        // Un pulsante spento che non si spiega e' un vicolo
-                        // cieco: chi lo trova grigio non sa se sta sbagliando
-                        // qualcosa o se e' il momento sbagliato.
-                        title={
-                          status === 'LIVE'
-                            ? td('publishBlockedLive')
-                            : status === 'ENDED'
-                              ? td('publishBlockedEnded')
-                              : undefined
-                        }>
-                  {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
-                </button>
-                {(status === 'LIVE' || status === 'ENDED') && (
-                  <div className="text-center mt-1" style={CAPTION}>
-                    {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
-                  </div>
+                {status === 'PUBLISHED' && (
+                  <button type="button" className="btn btn-outline-warning"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('unpublish')}
+                  </button>
                 )}
                 {/* Solo quando la pagina esiste: in bozza, archiviato o per
                     una chiamata rapida in corso l'indirizzo risponde «non
@@ -837,8 +929,9 @@ export default function EventManagementClient({
                   </a>
                 )}
                 {/* Duplicare crea un evento dello staff: con il solo link del
-                    moderatore la rotta risponde 401. */}
-                {!viaToken && (
+                    moderatore la rotta risponde 401. Una chiamata rapida non
+                    ha una «prossima occorrenza». */}
+                {!viaToken && !isInstant && (
                   <button type="button"
                           className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
                           onClick={duplicateAsNext}
@@ -1335,8 +1428,33 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     }
   }, [event.id, td, tApi]);
 
+  // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
+  // evento concluso e' la prima cosa da fare, e sta in cima.
+  const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
+  const bloccoRegistrazione = (
+      <div className="mb-4">
+        <H>{td('recordingSection')}</H>
+        <RecordingManagement
+          event={{
+            id: event.id, slug: event.slug, status,
+            recordingEnabled: event.recordingEnabled,
+            recordingUrl: event.recordingUrl,
+            tempRecordingUrl: event.tempRecordingUrl,
+            tempRecordingStartedAt: event.tempRecordingStartedAt,
+            recordingPublished: event.recordingPublished,
+            recordingPublishedAt: event.recordingPublishedAt,
+            recordingFileSize: event.recordingFileSize,
+            recordingDuration: event.recordingDuration,
+            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            moderatorToken: event.moderatorToken,
+          }}
+        />
+      </div>
+  );
+
   return (
     <>
+      {registrazioneInCima && bloccoRegistrazione}
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
@@ -1465,25 +1583,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         <GlossaryManager apiBase={`/api/admin/events/${event.id}/glossary`} token={viaToken} scope="event" />
       </div>
 
-      {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}
-      <div className="mb-4">
-        <H>{td('recordingSection')}</H>
-        <RecordingManagement
-          event={{
-            id: event.id, slug: event.slug, status,
-            recordingEnabled: event.recordingEnabled,
-            recordingUrl: event.recordingUrl,
-            tempRecordingUrl: event.tempRecordingUrl,
-            tempRecordingStartedAt: event.tempRecordingStartedAt,
-            recordingPublished: event.recordingPublished,
-            recordingPublishedAt: event.recordingPublishedAt,
-            recordingFileSize: event.recordingFileSize,
-            recordingDuration: event.recordingDuration,
-            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
-            moderatorToken: event.moderatorToken,
-          }}
-        />
-      </div>
+      {!registrazioneInCima && bloccoRegistrazione}
 
       {/* Le sessioni sono il registro di cio' che e' successo in sala: chi si
           e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
@@ -1563,6 +1663,8 @@ function CreatedSummary({
   publishFailed,
   unsaved,
   shareUrl,
+  onPublish,
+  publishing = false,
   onPeople,
   onClose,
 }: {
@@ -1570,6 +1672,9 @@ function CreatedSummary({
   publishFailed: boolean;
   unsaved: CreationOutcome['unsaved'];
   shareUrl: string | null;
+  /** In bozza: pubblicare da qui, senza cercare il pulsante. */
+  onPublish?: () => void;
+  publishing?: boolean;
   onPeople: () => void;
   onClose: () => void;
 }) {
@@ -1590,6 +1695,11 @@ function CreatedSummary({
           <p className="mb-2">{testo}</p>
           {mancanti && <p className="mb-2">{tc('unsaved', { items: mancanti })}</p>}
           <div className="d-flex flex-wrap gap-2 align-items-center">
+            {onPublish && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={onPublish} disabled={publishing}>
+                {tc('publishNow')}
+              </button>
+            )}
             {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
             <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
               {tc('sendToSpeakers')}

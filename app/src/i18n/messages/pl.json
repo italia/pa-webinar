@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Nie udało się powielić. Spróbuj ponownie.",
       "capacitySection": "Pojemność i infrastruktura",
       "capacitySubtitle": "Przygotowane na około {max} przewidywanych uczestników",
-      "publishBlockedLive": "Wydarzenie już trwa",
-      "publishBlockedEnded": "Wydarzenie się zakończyło",
       "created": {
         "publishedTitle": "Wydarzenie opublikowane",
         "draftTitle": "Szkic zapisany",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nie zapisano: {items}. Możesz je dodać na tej stronie.",
         "copyParticipantLink": "Kopiuj link dla uczestników",
         "sendToSpeakers": "Linki moderatorów i prelegentów",
-        "close": "Zamknij podsumowanie"
+        "close": "Zamknij podsumowanie",
+        "publishNow": "Opublikuj teraz"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Podgląd",
       "hidePreview": "Ukryj podgląd",
       "previewLanguage": "Język"
-    }
+    },
+    "endEvent": "Zakończ wydarzenie",
+    "endEventConfirmTitle": "Zakończyć wydarzenie dla wszystkich?",
+    "endEventConfirmMessage": "Wszyscy w sali zobaczą zakończenie. Strona po wydarzeniu działa zgodnie z wyborami w „Po wydarzeniu”.",
+    "endEventSuccess": "Wydarzenie zakończone.",
+    "endEventFailed": "Nie udało się zakończyć wydarzenia. Spróbuj ponownie.",
+    "archive": "Archiwizuj",
+    "archiveConfirmTitle": "Zarchiwizować wydarzenie?",
+    "archiveConfirmMessage": "Strona publiczna przestanie być widoczna. Dane zostają do końca okresu przechowywania, a wydarzenie możesz w każdej chwili przywrócić z archiwum.",
+    "archiveSuccess": "Wydarzenie zarchiwizowane.",
+    "archiveFailed": "Nie udało się zarchiwizować wydarzenia. Spróbuj ponownie.",
+    "endEventPagePublic": "Obecnie jest ustawiona jako publiczna.",
+    "endEventPagePrivate": "Obecnie jest ustawiona jako prywatna.",
+    "unarchive": "Przywróć z archiwum",
+    "unarchiveSuccess": "Wydarzenie przywrócone z archiwum.",
+    "unarchiveFailed": "Nie udało się przywrócić wydarzenia z archiwum. Spróbuj ponownie."
   },
   "email": {
     "confirmationSubject": "Potwierdzenie rejestracji: {eventTitle}",

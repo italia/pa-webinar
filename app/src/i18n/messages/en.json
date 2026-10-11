@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Could not duplicate. Please try again.",
       "capacitySection": "Capacity and infrastructure",
       "capacitySubtitle": "Sized for about {max} expected participants",
-      "publishBlockedLive": "The event is already under way",
-      "publishBlockedEnded": "The event has ended",
       "created": {
         "publishedTitle": "Event published",
         "draftTitle": "Draft saved",
@@ -2565,7 +2563,8 @@
         "unsaved": "Not saved: {items}. You can add them from this page.",
         "copyParticipantLink": "Copy the participant link",
         "sendToSpeakers": "Moderator and speaker links",
-        "close": "Close the summary"
+        "close": "Close the summary",
+        "publishNow": "Publish now"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Preview",
       "hidePreview": "Hide preview",
       "previewLanguage": "Language"
-    }
+    },
+    "endEvent": "End event",
+    "endEventConfirmTitle": "End the event for everyone?",
+    "endEventConfirmMessage": "Everyone in the room will see it close. The after-event page follows the choices in «After the event».",
+    "endEventSuccess": "Event ended.",
+    "endEventFailed": "The event could not be ended. Try again.",
+    "archive": "Archive",
+    "archiveConfirmTitle": "Archive the event?",
+    "archiveConfirmMessage": "The public page will no longer be visible. The data stays until the retention period ends, and you can remove the event from the archive at any time.",
+    "archiveSuccess": "Event archived.",
+    "archiveFailed": "The event could not be archived. Try again.",
+    "endEventPagePublic": "It is currently set to public.",
+    "endEventPagePrivate": "It is currently set to private.",
+    "unarchive": "Remove from archive",
+    "unarchiveSuccess": "Event removed from the archive.",
+    "unarchiveFailed": "The event could not be removed from the archive. Try again."
   },
   "email": {
     "confirmationSubject": "Registration confirmed: {eventTitle}",

@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Échec de la duplication. Veuillez réessayer.",
       "capacitySection": "Capacité et infrastructure",
       "capacitySubtitle": "Dimensionné pour environ {max} participants attendus",
-      "publishBlockedLive": "L’événement est déjà en cours",
-      "publishBlockedEnded": "L’événement est terminé",
       "created": {
         "publishedTitle": "Événement publié",
         "draftTitle": "Brouillon enregistré",
@@ -2565,7 +2563,8 @@
         "unsaved": "Non enregistrés : {items}. Vous pouvez les ajouter depuis cette page.",
         "copyParticipantLink": "Copier le lien pour les participants",
         "sendToSpeakers": "Liens des modérateurs et des intervenants",
-        "close": "Fermer le récapitulatif"
+        "close": "Fermer le récapitulatif",
+        "publishNow": "Publier maintenant"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Aperçu",
       "hidePreview": "Masquer l'aperçu",
       "previewLanguage": "Langue"
-    }
+    },
+    "endEvent": "Terminer l'événement",
+    "endEventConfirmTitle": "Terminer l'événement pour tout le monde ?",
+    "endEventConfirmMessage": "Les personnes dans la salle verront la clôture. La page après l'événement suit les choix de « Après l’événement ».",
+    "endEventSuccess": "Événement terminé.",
+    "endEventFailed": "Impossible de terminer l'événement. Réessayez.",
+    "archive": "Archiver",
+    "archiveConfirmTitle": "Archiver l'événement ?",
+    "archiveConfirmMessage": "La page publique ne sera plus visible. Les données sont conservées jusqu'à la fin de la durée de conservation, et vous pouvez retirer l'événement des archives à tout moment.",
+    "archiveSuccess": "Événement archivé.",
+    "archiveFailed": "Impossible d'archiver l'événement. Réessayez.",
+    "endEventPagePublic": "Elle est actuellement publique.",
+    "endEventPagePrivate": "Elle est actuellement privée.",
+    "unarchive": "Retirer des archives",
+    "unarchiveSuccess": "Événement retiré des archives.",
+    "unarchiveFailed": "Impossible de retirer l'événement des archives. Réessayez."
   },
   "email": {
     "confirmationSubject": "Confirmation d'inscription : {eventTitle}",

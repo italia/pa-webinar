@@ -2553,8 +2553,6 @@
       "duplicateNextError": "A másolás nem sikerült. Próbálja újra.",
       "capacitySection": "Kapacitás és infrastruktúra",
       "capacitySubtitle": "Körülbelül {max} várható résztvevőre méretezve",
-      "publishBlockedLive": "Az esemény már zajlik",
-      "publishBlockedEnded": "Az esemény véget ért",
       "created": {
         "publishedTitle": "Esemény közzétéve",
         "draftTitle": "Piszkozat mentve",
@@ -2565,7 +2563,8 @@
         "unsaved": "Nincs mentve: {items}. Ezen az oldalon hozzáadhatja őket.",
         "copyParticipantLink": "Résztvevői link másolása",
         "sendToSpeakers": "Moderátorok és előadók linkjei",
-        "close": "Összefoglaló bezárása"
+        "close": "Összefoglaló bezárása",
+        "publishNow": "Közzététel most"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Előnézet",
       "hidePreview": "Előnézet elrejtése",
       "previewLanguage": "Nyelv"
-    }
+    },
+    "endEvent": "Esemény befejezése",
+    "endEventConfirmTitle": "Befejezi az eseményt mindenkinek?",
+    "endEventConfirmMessage": "A teremben mindenki látja a zárást. Az esemény utáni oldal az „Az esemény után” beállításait követi.",
+    "endEventSuccess": "Az esemény befejeződött.",
+    "endEventFailed": "Az eseményt nem sikerült befejezni. Próbálja újra.",
+    "archive": "Archiválás",
+    "archiveConfirmTitle": "Archiválja az eseményt?",
+    "archiveConfirmMessage": "A nyilvános oldal többé nem lesz látható. Az adatok a megőrzési idő végéig megmaradnak, és az eseményt bármikor kiveheti az archívumból.",
+    "archiveSuccess": "Az esemény archiválva.",
+    "archiveFailed": "Az eseményt nem sikerült archiválni. Próbálja újra.",
+    "endEventPagePublic": "Jelenleg nyilvánosra van állítva.",
+    "endEventPagePrivate": "Jelenleg privátra van állítva.",
+    "unarchive": "Kivétel az archívumból",
+    "unarchiveSuccess": "Az esemény kikerült az archívumból.",
+    "unarchiveFailed": "Az eseményt nem sikerült kivenni az archívumból. Próbálja újra."
   },
   "email": {
     "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",

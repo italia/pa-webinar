@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu.",
       "capacitySection": "Kapacita a infrastruktura",
       "capacitySubtitle": "Dimenzováno pro přibližně {max} očekávaných účastníků",
-      "publishBlockedLive": "Událost už probíhá",
-      "publishBlockedEnded": "Událost skončila",
       "created": {
         "publishedTitle": "Událost zveřejněna",
         "draftTitle": "Koncept uložen",
@@ -2565,7 +2563,8 @@
         "unsaved": "Neuloženo: {items}. Můžete je přidat na této stránce.",
         "copyParticipantLink": "Kopírovat odkaz pro účastníky",
         "sendToSpeakers": "Odkazy moderátorů a řečníků",
-        "close": "Zavřít souhrn"
+        "close": "Zavřít souhrn",
+        "publishNow": "Zveřejnit hned"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Náhled",
       "hidePreview": "Skrýt náhled",
       "previewLanguage": "Jazyk"
-    }
+    },
+    "endEvent": "Ukončit akci",
+    "endEventConfirmTitle": "Ukončit akci pro všechny?",
+    "endEventConfirmMessage": "Všichni v místnosti uvidí ukončení. Stránka po akci se řídí volbami v „Po události“.",
+    "endEventSuccess": "Akce ukončena.",
+    "endEventFailed": "Akci se nepodařilo ukončit. Zkuste to znovu.",
+    "archive": "Archivovat",
+    "archiveConfirmTitle": "Archivovat akci?",
+    "archiveConfirmMessage": "Veřejná stránka už nebude vidět. Data zůstanou do konce doby uchování a akci můžete kdykoli vyjmout z archivu.",
+    "archiveSuccess": "Akce archivována.",
+    "archiveFailed": "Akci se nepodařilo archivovat. Zkuste to znovu.",
+    "endEventPagePublic": "Nyní je nastavená jako veřejná.",
+    "endEventPagePrivate": "Nyní je nastavená jako soukromá.",
+    "unarchive": "Vyjmout z archivu",
+    "unarchiveSuccess": "Akce vyjmuta z archivu.",
+    "unarchiveFailed": "Akci se nepodařilo vyjmout z archivu. Zkuste to znovu."
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",

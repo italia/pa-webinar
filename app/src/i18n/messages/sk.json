@@ -2553,8 +2553,6 @@
       "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova.",
       "capacitySection": "Kapacita a infraštruktúra",
       "capacitySubtitle": "Dimenzované pre približne {max} očakávaných účastníkov",
-      "publishBlockedLive": "Podujatie už prebieha",
-      "publishBlockedEnded": "Podujatie sa skončilo",
       "created": {
         "publishedTitle": "Udalosť zverejnená",
         "draftTitle": "Koncept uložený",
@@ -2565,7 +2563,8 @@
         "unsaved": "Neuložené: {items}. Môžete ich pridať na tejto stránke.",
         "copyParticipantLink": "Kopírovať odkaz pre účastníkov",
         "sendToSpeakers": "Odkazy moderátorov a rečníkov",
-        "close": "Zavrieť súhrn"
+        "close": "Zavrieť súhrn",
+        "publishNow": "Zverejniť teraz"
       }
     },
     "rubrica": {
@@ -3235,7 +3234,22 @@
       "preview": "Náhľad",
       "hidePreview": "Skryť náhľad",
       "previewLanguage": "Jazyk"
-    }
+    },
+    "endEvent": "Ukončiť podujatie",
+    "endEventConfirmTitle": "Ukončiť podujatie pre všetkých?",
+    "endEventConfirmMessage": "Všetci v miestnosti uvidia ukončenie. Stránka po podujatí sa riadi voľbami v „Po podujatí“.",
+    "endEventSuccess": "Podujatie ukončené.",
+    "endEventFailed": "Podujatie sa nepodarilo ukončiť. Skúste to znova.",
+    "archive": "Archivovať",
+    "archiveConfirmTitle": "Archivovať podujatie?",
+    "archiveConfirmMessage": "Verejná stránka už nebude viditeľná. Údaje zostanú do konca doby uchovávania a podujatie môžete kedykoľvek vybrať z archívu.",
+    "archiveSuccess": "Podujatie archivované.",
+    "archiveFailed": "Podujatie sa nepodarilo archivovať. Skúste to znova.",
+    "endEventPagePublic": "Teraz je nastavená ako verejná.",
+    "endEventPagePrivate": "Teraz je nastavená ako súkromná.",
+    "unarchive": "Vybrať z archívu",
+    "unarchiveSuccess": "Podujatie vybraté z archívu.",
+    "unarchiveFailed": "Podujatie sa nepodarilo vybrať z archívu. Skúste to znova."
   },
   "email": {
     "confirmationSubject": "Potvrdenie registrácie: {eventTitle}",
