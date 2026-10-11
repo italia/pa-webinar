@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modereerib nagu moderaator ja on esitatud ürituse korraldajate seas. Sama e-postiga töötajakontoga haldab ta ka üritust.",
       "organization": "Asutus või organisatsioon (valikuline)",
       "publicListed": "Näita avalikul lehel",
-      "onPublicPage": "Avalikul lehel"
+      "onPublicPage": "Avalikul lehel",
+      "resend": "Saada link uuesti",
+      "resendDone": "Link saadeti uuesti kasutajale {name}.",
+      "resendTooMany": "Liiga palju saatmisi lühikese aja jooksul: proovi mõne minuti pärast uuesti.",
+      "resendFailed": "Saatmine ebaõnnestus. Proovi uuesti."
     },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Praegu on see privaatne.",
     "unarchive": "Võta arhiivist välja",
     "unarchiveSuccess": "Üritus võeti arhiivist välja.",
-    "unarchiveFailed": "Üritust ei õnnestunud arhiivist välja võtta. Proovi uuesti."
+    "unarchiveFailed": "Üritust ei õnnestunud arhiivist välja võtta. Proovi uuesti.",
+    "invitationsPanel": {
+      "title": "Kutsutud",
+      "edit": "Muuda kutsutuid",
+      "introInvitationOnly": "Üritus on ainult kutsetega: registreeruda saavad ainult need inimesed, aadressiga, millega nad kutsuti.",
+      "introOpen": "Registreerumine on kõigile avatud: siin on sinu kutsutud inimesed ja kas nad on juba registreerunud.",
+      "loadError": "Kutsutute laadimine ebaõnnestus.",
+      "empty": "Kutsutuid pole.",
+      "emptyInvitationOnly": "Kutsutuid veel pole: kuni nimekiri on tühi, ei saa keegi registreeruda.",
+      "registeredCount": "Registreerunud: {registered}/{total}",
+      "name": "Nimi",
+      "email": "E-post",
+      "status": "Olek",
+      "roleSpeaker": "Esineja",
+      "registered": "Registreerunud",
+      "notRegistered": "Pole veel registreerunud",
+      "organizersTitle": "Korraldavad asutused",
+      "organizersEdit": "Muuda asutusi",
+      "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab."
+    }
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",

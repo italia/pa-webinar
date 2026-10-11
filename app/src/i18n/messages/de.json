@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderiert wie ein Moderator und wird unter den Veranstaltern aufgeführt. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch die Veranstaltung.",
       "organization": "Organisation (optional)",
       "publicListed": "Auf der öffentlichen Seite zeigen",
-      "onPublicPage": "Auf der öffentlichen Seite"
+      "onPublicPage": "Auf der öffentlichen Seite",
+      "resend": "Link erneut senden",
+      "resendDone": "Link erneut an {name} gesendet.",
+      "resendTooMany": "Zu viele Sendungen in kurzer Zeit: Bitte in ein paar Minuten erneut versuchen.",
+      "resendFailed": "Senden fehlgeschlagen. Bitte erneut versuchen."
     },
     "gdprAuditLog": {
       "title": "GDPR-Protokoll",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Sie ist derzeit privat.",
     "unarchive": "Aus dem Archiv holen",
     "unarchiveSuccess": "Veranstaltung aus dem Archiv geholt.",
-    "unarchiveFailed": "Die Veranstaltung konnte nicht aus dem Archiv geholt werden. Versuchen Sie es erneut."
+    "unarchiveFailed": "Die Veranstaltung konnte nicht aus dem Archiv geholt werden. Versuchen Sie es erneut.",
+    "invitationsPanel": {
+      "title": "Eingeladene",
+      "edit": "Eingeladene bearbeiten",
+      "introInvitationOnly": "Die Veranstaltung ist nur auf Einladung: Nur diese Personen können sich anmelden, mit der Adresse, mit der sie eingeladen wurden.",
+      "introOpen": "Die Anmeldung ist für alle offen: Hier stehen die Personen, die Sie eingeladen haben, und ob sie sich bereits angemeldet haben.",
+      "loadError": "Eingeladene konnten nicht geladen werden.",
+      "empty": "Keine Eingeladenen.",
+      "emptyInvitationOnly": "Noch keine Eingeladenen: Solange die Liste leer ist, kann sich niemand anmelden.",
+      "registeredCount": "Angemeldet: {registered} von {total}",
+      "name": "Name",
+      "email": "E-Mail",
+      "status": "Status",
+      "roleSpeaker": "Referent",
+      "registered": "Angemeldet",
+      "notRegistered": "Noch nicht angemeldet",
+      "organizersTitle": "Veranstaltende Organisationen",
+      "organizersEdit": "Organisationen bearbeiten",
+      "organizersEmpty": "Keine Organisation angegeben: Die öffentliche Seite zeigt nicht, wer veranstaltet."
+    }
   },
   "email": {
     "confirmationSubject": "Anmeldebestätigung: {eventTitle}",

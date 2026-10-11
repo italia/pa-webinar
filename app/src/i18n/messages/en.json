@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderates like a moderator and is presented among the event's organizers. With a staff account under the same email, they also manage the event.",
       "organization": "Organization (optional)",
       "publicListed": "Show on the public page",
-      "onPublicPage": "On the public page"
+      "onPublicPage": "On the public page",
+      "resend": "Resend link",
+      "resendDone": "Link resent to {name}.",
+      "resendTooMany": "Too many sends in a short time: try again in a few minutes.",
+      "resendFailed": "Sending failed. Please retry."
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "It is currently set to private.",
     "unarchive": "Remove from archive",
     "unarchiveSuccess": "Event removed from the archive.",
-    "unarchiveFailed": "The event could not be removed from the archive. Try again."
+    "unarchiveFailed": "The event could not be removed from the archive. Try again.",
+    "invitationsPanel": {
+      "title": "Invitees",
+      "edit": "Edit invitees",
+      "introInvitationOnly": "This event is invitation-only: only these people can sign up, with the address they were invited with.",
+      "introOpen": "Sign-up is open to everyone: here are the people you invited and whether they have already signed up.",
+      "loadError": "Couldn't load the invitees.",
+      "empty": "No invitees.",
+      "emptyInvitationOnly": "No invitees yet: while the list is empty, nobody can sign up.",
+      "registeredCount": "Signed up: {registered} of {total}",
+      "name": "Name",
+      "email": "Email",
+      "status": "Status",
+      "roleSpeaker": "Speaker",
+      "registered": "Signed up",
+      "notRegistered": "Not signed up yet",
+      "organizersTitle": "Organizing bodies",
+      "organizersEdit": "Edit organizers",
+      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
+    }
   },
   "email": {
     "confirmationSubject": "Registration confirmed: {eventTitle}",

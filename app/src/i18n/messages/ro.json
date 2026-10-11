@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderează ca un moderator și apare printre organizatorii evenimentului. Cu un cont de personal pe același e-mail, gestionează și evenimentul.",
       "organization": "Instituție sau organizație (opțional)",
       "publicListed": "Afișează pe pagina publică",
-      "onPublicPage": "Pe pagina publică"
+      "onPublicPage": "Pe pagina publică",
+      "resend": "Retrimite linkul",
+      "resendDone": "Link retrimis către {name}.",
+      "resendTooMany": "Prea multe trimiteri într-un timp scurt: încercați din nou peste câteva minute.",
+      "resendFailed": "Trimiterea a eșuat. Încercați din nou."
     },
     "gdprAuditLog": {
       "title": "Registru GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Acum este setată ca privată.",
     "unarchive": "Scoate din arhivă",
     "unarchiveSuccess": "Eveniment scos din arhivă.",
-    "unarchiveFailed": "Evenimentul nu a putut fi scos din arhivă. Încearcă din nou."
+    "unarchiveFailed": "Evenimentul nu a putut fi scos din arhivă. Încearcă din nou.",
+    "invitationsPanel": {
+      "title": "Invitați",
+      "edit": "Editează invitații",
+      "introInvitationOnly": "Evenimentul este doar pe bază de invitație: se pot înscrie numai aceste persoane, cu adresa cu care au fost invitate.",
+      "introOpen": "Înscrierea este deschisă tuturor: aici sunt persoanele pe care le-ați invitat și dacă s-au înscris deja.",
+      "loadError": "Invitații nu au putut fi încărcați.",
+      "empty": "Niciun invitat.",
+      "emptyInvitationOnly": "Încă niciun invitat: cât timp lista este goală, nimeni nu se poate înscrie.",
+      "registeredCount": "Înscriși: {registered} din {total}",
+      "name": "Nume",
+      "email": "E-mail",
+      "status": "Stare",
+      "roleSpeaker": "Vorbitor",
+      "registered": "Înscris",
+      "notRegistered": "Încă neînscris",
+      "organizersTitle": "Instituții organizatoare",
+      "organizersEdit": "Editează instituțiile",
+      "organizersEmpty": "Nicio instituție indicată: pagina publică nu arată cine organizează."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",

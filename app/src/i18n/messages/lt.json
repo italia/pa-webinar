@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuoja kaip moderatorius ir pristatomas tarp renginio organizatorių. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį.",
       "organization": "Institucija ar organizacija (neprivaloma)",
       "publicListed": "Rodyti viešame puslapyje",
-      "onPublicPage": "Viešame puslapyje"
+      "onPublicPage": "Viešame puslapyje",
+      "resend": "Siųsti nuorodą dar kartą",
+      "resendDone": "Nuoroda dar kartą išsiųsta: {name}.",
+      "resendTooMany": "Per daug siuntimų per trumpą laiką: bandykite dar kartą po kelių minučių.",
+      "resendFailed": "Nepavyko išsiųsti. Bandykite dar kartą."
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Šiuo metu jis nustatytas kaip privatus.",
     "unarchive": "Išimti iš archyvo",
     "unarchiveSuccess": "Renginys išimtas iš archyvo.",
-    "unarchiveFailed": "Nepavyko išimti renginio iš archyvo. Bandykite dar kartą."
+    "unarchiveFailed": "Nepavyko išimti renginio iš archyvo. Bandykite dar kartą.",
+    "invitationsPanel": {
+      "title": "Pakviestieji",
+      "edit": "Redaguoti pakviestuosius",
+      "introInvitationOnly": "Renginys tik su kvietimais: registruotis gali tik šie asmenys, nurodę adresą, kuriuo buvo pakviesti.",
+      "introOpen": "Registracija atvira visiems: čia matote savo pakviestus asmenis ir ar jie jau užsiregistravo.",
+      "loadError": "Nepavyko įkelti pakviestųjų.",
+      "empty": "Pakviestųjų nėra.",
+      "emptyInvitationOnly": "Pakviestųjų dar nėra: kol sąrašas tuščias, niekas negali registruotis.",
+      "registeredCount": "Užsiregistravo: {registered} iš {total}",
+      "name": "Vardas",
+      "email": "El. paštas",
+      "status": "Būsena",
+      "roleSpeaker": "Pranešėjas",
+      "registered": "Užsiregistravo",
+      "notRegistered": "Dar neužsiregistravo",
+      "organizersTitle": "Organizuojančios institucijos",
+      "organizersEdit": "Redaguoti institucijas",
+      "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja."
+    }
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",

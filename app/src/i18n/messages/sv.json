@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modererar som en moderator och presenteras bland evenemangets arrangörer. Med ett personalkonto med samma e-post hanterar personen även evenemanget.",
       "organization": "Organisation (valfritt)",
       "publicListed": "Visa på den offentliga sidan",
-      "onPublicPage": "På den offentliga sidan"
+      "onPublicPage": "På den offentliga sidan",
+      "resend": "Skicka länken igen",
+      "resendDone": "Länken har skickats igen till {name}.",
+      "resendTooMany": "För många utskick på kort tid: försök igen om några minuter.",
+      "resendFailed": "Det gick inte att skicka. Försök igen."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Den är just nu inställd som privat.",
     "unarchive": "Ta ut ur arkivet",
     "unarchiveSuccess": "Evenemanget har tagits ut ur arkivet.",
-    "unarchiveFailed": "Evenemanget kunde inte tas ut ur arkivet. Försök igen."
+    "unarchiveFailed": "Evenemanget kunde inte tas ut ur arkivet. Försök igen.",
+    "invitationsPanel": {
+      "title": "Inbjudna",
+      "edit": "Redigera inbjudna",
+      "introInvitationOnly": "Evenemanget är endast för inbjudna: bara dessa personer kan anmäla sig, med den adress de bjöds in med.",
+      "introOpen": "Anmälan är öppen för alla: här finns de personer du har bjudit in och om de redan har anmält sig.",
+      "loadError": "Det gick inte att läsa in de inbjudna.",
+      "empty": "Inga inbjudna.",
+      "emptyInvitationOnly": "Inga inbjudna ännu: så länge listan är tom kan ingen anmäla sig.",
+      "registeredCount": "Anmälda: {registered} av {total}",
+      "name": "Namn",
+      "email": "E-post",
+      "status": "Status",
+      "roleSpeaker": "Talare",
+      "registered": "Anmäld",
+      "notRegistered": "Inte anmäld ännu",
+      "organizersTitle": "Arrangerande organisationer",
+      "organizersEdit": "Redigera organisationer",
+      "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar."
+    }
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",

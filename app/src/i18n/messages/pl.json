@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje jak moderator i jest przedstawiany wśród organizatorów wydarzenia. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem.",
       "organization": "Instytucja lub organizacja (opcjonalnie)",
       "publicListed": "Pokaż na stronie publicznej",
-      "onPublicPage": "Na stronie publicznej"
+      "onPublicPage": "Na stronie publicznej",
+      "resend": "Wyślij link ponownie",
+      "resendDone": "Link wysłany ponownie do: {name}.",
+      "resendTooMany": "Zbyt wiele wysyłek w krótkim czasie: spróbuj ponownie za kilka minut.",
+      "resendFailed": "Wysyłka nie powiodła się. Spróbuj ponownie."
     },
     "gdprAuditLog": {
       "title": "Rejestr GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Obecnie jest ustawiona jako prywatna.",
     "unarchive": "Przywróć z archiwum",
     "unarchiveSuccess": "Wydarzenie przywrócone z archiwum.",
-    "unarchiveFailed": "Nie udało się przywrócić wydarzenia z archiwum. Spróbuj ponownie."
+    "unarchiveFailed": "Nie udało się przywrócić wydarzenia z archiwum. Spróbuj ponownie.",
+    "invitationsPanel": {
+      "title": "Zaproszeni",
+      "edit": "Edytuj zaproszonych",
+      "introInvitationOnly": "Wydarzenie jest tylko dla zaproszonych: zapisać się mogą wyłącznie te osoby, podając adres, na który zostały zaproszone.",
+      "introOpen": "Zapisy są otwarte dla wszystkich: oto osoby, które zaprosiłeś, i informacja, czy już się zapisały.",
+      "loadError": "Nie udało się wczytać zaproszonych.",
+      "empty": "Brak zaproszonych.",
+      "emptyInvitationOnly": "Brak zaproszonych: dopóki lista jest pusta, nikt nie może się zapisać.",
+      "registeredCount": "Zapisani: {registered} z {total}",
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Prelegent",
+      "registered": "Zapisany",
+      "notRegistered": "Jeszcze niezapisany",
+      "organizersTitle": "Instytucje organizujące",
+      "organizersEdit": "Edytuj instytucje",
+      "organizersEmpty": "Nie podano instytucji: strona publiczna nie pokazuje, kto organizuje."
+    }
   },
   "email": {
     "confirmationSubject": "Potwierdzenie rejestracji: {eventTitle}",

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modereert als een moderator en wordt bij de organisatoren van het evenement vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement.",
       "organization": "Organisatie (optioneel)",
       "publicListed": "Tonen op de openbare pagina",
-      "onPublicPage": "Op de openbare pagina"
+      "onPublicPage": "Op de openbare pagina",
+      "resend": "Link opnieuw sturen",
+      "resendDone": "Link opnieuw gestuurd naar {name}.",
+      "resendTooMany": "Te veel verzendingen kort na elkaar: probeer het over een paar minuten opnieuw.",
+      "resendFailed": "Verzenden mislukt. Probeer het opnieuw."
     },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Die staat nu op privé.",
     "unarchive": "Uit het archief halen",
     "unarchiveSuccess": "Evenement uit het archief gehaald.",
-    "unarchiveFailed": "Het evenement kon niet uit het archief worden gehaald. Probeer het opnieuw."
+    "unarchiveFailed": "Het evenement kon niet uit het archief worden gehaald. Probeer het opnieuw.",
+    "invitationsPanel": {
+      "title": "Genodigden",
+      "edit": "Genodigden bewerken",
+      "introInvitationOnly": "Het evenement is alleen op uitnodiging: alleen deze personen kunnen zich aanmelden, met het adres waarmee ze zijn uitgenodigd.",
+      "introOpen": "Aanmelden staat open voor iedereen: hier staan de personen die u hebt uitgenodigd en of ze zich al hebben aangemeld.",
+      "loadError": "Genodigden konden niet worden geladen.",
+      "empty": "Geen genodigden.",
+      "emptyInvitationOnly": "Nog geen genodigden: zolang de lijst leeg is, kan niemand zich aanmelden.",
+      "registeredCount": "Aangemeld: {registered} van {total}",
+      "name": "Naam",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Spreker",
+      "registered": "Aangemeld",
+      "notRegistered": "Nog niet aangemeld",
+      "organizersTitle": "Organiserende instanties",
+      "organizersEdit": "Instanties bewerken",
+      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert."
+    }
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",

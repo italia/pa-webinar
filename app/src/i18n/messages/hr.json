@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderira kao moderator i prikazan je među organizatorima događaja. S računom osoblja s istom e-poštom upravlja i događajem.",
       "organization": "Ustanova ili organizacija (neobavezno)",
       "publicListed": "Prikaži na javnoj stranici",
-      "onPublicPage": "Na javnoj stranici"
+      "onPublicPage": "Na javnoj stranici",
+      "resend": "Ponovno pošalji poveznicu",
+      "resendDone": "Poveznica ponovno poslana: {name}.",
+      "resendTooMany": "Previše slanja u kratkom vremenu: pokušajte ponovno za nekoliko minuta.",
+      "resendFailed": "Slanje nije uspjelo. Pokušajte ponovno."
     },
     "gdprAuditLog": {
       "title": "GDPR zapisnik",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Trenutno je postavljena kao privatna.",
     "unarchive": "Izvadi iz arhive",
     "unarchiveSuccess": "Događaj je izvađen iz arhive.",
-    "unarchiveFailed": "Događaj nije moguće izvaditi iz arhive. Pokušajte ponovno."
+    "unarchiveFailed": "Događaj nije moguće izvaditi iz arhive. Pokušajte ponovno.",
+    "invitationsPanel": {
+      "title": "Pozvani",
+      "edit": "Uredi pozvane",
+      "introInvitationOnly": "Događaj je samo uz pozivnicu: prijaviti se mogu samo ove osobe, s adresom na koju su pozvane.",
+      "introOpen": "Prijava je otvorena svima: ovdje su osobe koje ste pozvali i jesu li se već prijavile.",
+      "loadError": "Pozvane nije moguće učitati.",
+      "empty": "Nema pozvanih.",
+      "emptyInvitationOnly": "Još nema pozvanih: dok je popis prazan, nitko se ne može prijaviti.",
+      "registeredCount": "Prijavljeni: {registered} od {total}",
+      "name": "Ime",
+      "email": "E-pošta",
+      "status": "Stanje",
+      "roleSpeaker": "Govornik",
+      "registered": "Prijavljen",
+      "notRegistered": "Još nije prijavljen",
+      "organizersTitle": "Ustanove organizatori",
+      "organizersEdit": "Uredi ustanove",
+      "organizersEmpty": "Nije navedena nijedna ustanova: javna stranica ne prikazuje tko organizira."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",

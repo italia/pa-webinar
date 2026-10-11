@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modhnaíonn sé mar mhodhnóir agus léirítear é i measc eagraithe an imeachta. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin.",
       "organization": "Eagraíocht (roghnach)",
       "publicListed": "Taispeáin ar an leathanach poiblí",
-      "onPublicPage": "Ar an leathanach poiblí"
+      "onPublicPage": "Ar an leathanach poiblí",
+      "resend": "Seol an nasc arís",
+      "resendDone": "Seoladh an nasc arís chuig {name}.",
+      "resendTooMany": "An iomarca seoltaí in achar gearr: déan iarracht arís i gceann cúpla nóiméad.",
+      "resendFailed": "Níorbh fhéidir é a sheoladh. Déan iarracht arís."
     },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Tá sé socraithe mar phríobháideach faoi láthair.",
     "unarchive": "Bain den chartlann",
     "unarchiveSuccess": "Baineadh an ócáid den chartlann.",
-    "unarchiveFailed": "Níorbh fhéidir an ócáid a bhaint den chartlann. Bain triail eile as."
+    "unarchiveFailed": "Níorbh fhéidir an ócáid a bhaint den chartlann. Bain triail eile as.",
+    "invitationsPanel": {
+      "title": "Daoine a tugadh cuireadh dóibh",
+      "edit": "Cuir na cuirí in eagar",
+      "introInvitationOnly": "Is ar chuireadh amháin atá an t-imeacht: ní féidir ach leis na daoine seo clárú, leis an seoladh lenar tugadh cuireadh dóibh.",
+      "introOpen": "Tá an clárú oscailte do chách: seo iad na daoine ar thug tú cuireadh dóibh agus an bhfuil siad cláraithe cheana.",
+      "loadError": "Níorbh fhéidir na cuirí a lódáil.",
+      "empty": "Níl aon chuireadh ann.",
+      "emptyInvitationOnly": "Níl aon chuireadh ann fós: fad is atá an liosta folamh, ní féidir le duine ar bith clárú.",
+      "registeredCount": "Cláraithe: {registered} as {total}",
+      "name": "Ainm",
+      "email": "Ríomhphost",
+      "status": "Stádas",
+      "roleSpeaker": "Cainteoir",
+      "registered": "Cláraithe",
+      "notRegistered": "Gan clárú fós",
+      "organizersTitle": "Comhlachtaí eagraithe",
+      "organizersEdit": "Cuir na comhlachtaí in eagar",
+      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
+    }
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",

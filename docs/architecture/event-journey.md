@@ -427,6 +427,8 @@ The agenda is the list of topics for the meeting, each with an optional planned 
 
 The event page in the administration area has five tabs: **Overview**, **People**, **Content**, **After the event** and **Statistics**.
 
+The **People** tab lists, in order: the organizing entities, as the public page shows them; the organizers, moderators and speakers, each with **Copy link**, **Prepare email**, **Resend link** and **Revoke**; the invitees, each marked **Signed up** or **Not signed up yet**, with the count; and the registrations. **Resend link** queues the person's link email again (`POST /api/events/{id}/moderators/{modId}`); it is offered only while the platform emails links (the event is published and not concluded) and for grants with an address. Whether an invitee has signed up is decided by the address fingerprint (`hashEmail()`), the same one the registration stores; invitations made before the address was encrypted are compared through the plain address. The organizing entities are shown with the public page's filters: only logos served by the platform, only `http(s)` websites. The invitees need a staff session and are not shown with the primary moderator link alone; the registrations are listed in both cases, but only a staff session corrects or deletes them. **Edit** on the entities and on the invitees opens the wizard at **People**. On an invitation-only event the invitees are the list of who can register, and an empty list is shown as a warning.
+
 ### Ending and choosing the destination
 
 When a moderator chooses **End for everyone**, the **Event destiny** dialog asks what the concluded event becomes, preselecting the current configuration:

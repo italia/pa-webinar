@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modera como un moderador y aparece entre los organizadores del evento. Con una cuenta de personal con el mismo correo, también gestiona el evento.",
       "organization": "Entidad u organización (opcional)",
       "publicListed": "Mostrar en la página pública",
-      "onPublicPage": "En la página pública"
+      "onPublicPage": "En la página pública",
+      "resend": "Reenviar enlace",
+      "resendDone": "Enlace reenviado a {name}.",
+      "resendTooMany": "Demasiados envíos seguidos: inténtalo de nuevo dentro de unos minutos.",
+      "resendFailed": "No se ha podido enviar. Inténtalo de nuevo."
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Ahora está configurada como privada.",
     "unarchive": "Sacar del archivo",
     "unarchiveSuccess": "Evento sacado del archivo.",
-    "unarchiveFailed": "No se ha podido sacar el evento del archivo. Inténtalo de nuevo."
+    "unarchiveFailed": "No se ha podido sacar el evento del archivo. Inténtalo de nuevo.",
+    "invitationsPanel": {
+      "title": "Invitados",
+      "edit": "Editar invitados",
+      "introInvitationOnly": "El evento es solo por invitación: solo estas personas pueden inscribirse, con la dirección con la que se las invitó.",
+      "introOpen": "La inscripción está abierta a todos: aquí están las personas que has invitado y si ya se han inscrito.",
+      "loadError": "No se han podido cargar los invitados.",
+      "empty": "No hay invitados.",
+      "emptyInvitationOnly": "Todavía no hay invitados: mientras la lista esté vacía, nadie puede inscribirse.",
+      "registeredCount": "Inscritos: {registered} de {total}",
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "status": "Estado",
+      "roleSpeaker": "Ponente",
+      "registered": "Inscrito",
+      "notRegistered": "Aún no inscrito",
+      "organizersTitle": "Entidades organizadoras",
+      "organizersEdit": "Editar entidades",
+      "organizersEmpty": "No se ha indicado ninguna entidad: la página pública no muestra quién organiza."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmación de inscripción: {eventTitle}",

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderoi kuten moderaattori ja esitetään tapahtuman järjestäjien joukossa. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa.",
       "organization": "Organisaatio (valinnainen)",
       "publicListed": "Näytä julkisella sivulla",
-      "onPublicPage": "Julkisella sivulla"
+      "onPublicPage": "Julkisella sivulla",
+      "resend": "Lähetä linkki uudelleen",
+      "resendDone": "Linkki lähetetty uudelleen henkilölle {name}.",
+      "resendTooMany": "Liian monta lähetystä lyhyessä ajassa: yritä uudelleen muutaman minuutin kuluttua.",
+      "resendFailed": "Lähetys epäonnistui. Yritä uudelleen."
     },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Se on nyt asetettu yksityiseksi.",
     "unarchive": "Poista arkistosta",
     "unarchiveSuccess": "Tapahtuma poistettu arkistosta.",
-    "unarchiveFailed": "Tapahtumaa ei voitu poistaa arkistosta. Yritä uudelleen."
+    "unarchiveFailed": "Tapahtumaa ei voitu poistaa arkistosta. Yritä uudelleen.",
+    "invitationsPanel": {
+      "title": "Kutsutut",
+      "edit": "Muokkaa kutsuttuja",
+      "introInvitationOnly": "Tapahtuma on vain kutsutuille: vain nämä henkilöt voivat ilmoittautua sillä osoitteella, jolla heidät kutsuttiin.",
+      "introOpen": "Ilmoittautuminen on avoin kaikille: tässä ovat kutsumasi henkilöt ja tieto siitä, ovatko he jo ilmoittautuneet.",
+      "loadError": "Kutsuttujen lataaminen epäonnistui.",
+      "empty": "Ei kutsuttuja.",
+      "emptyInvitationOnly": "Ei vielä kutsuttuja: niin kauan kuin luettelo on tyhjä, kukaan ei voi ilmoittautua.",
+      "registeredCount": "Ilmoittautuneet: {registered}/{total}",
+      "name": "Nimi",
+      "email": "Sähköposti",
+      "status": "Tila",
+      "roleSpeaker": "Puhuja",
+      "registered": "Ilmoittautunut",
+      "notRegistered": "Ei vielä ilmoittautunut",
+      "organizersTitle": "Järjestävät organisaatiot",
+      "organizersEdit": "Muokkaa organisaatioita",
+      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää."
+    }
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",

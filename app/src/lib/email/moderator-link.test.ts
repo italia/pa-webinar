@@ -12,7 +12,7 @@ vi.mock('@/lib/db', () => ({
     emailOutbox: { findUnique: vi.fn(), findMany: vi.fn() },
   },
 }));
-vi.mock('@/lib/email/outbox', () => ({ enqueueEmailOnce: vi.fn() }));
+vi.mock('@/lib/email/outbox', () => ({ enqueueEmailOnce: vi.fn(), enqueueEmail: vi.fn(async () => 'id') }));
 vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ siteName: 'Portale eventi', defaultLocale: 'it' })),
 }));
@@ -23,11 +23,12 @@ vi.mock('@/lib/crypto/pii', async (importOriginal) => ({
 
 import { prisma } from '@/lib/db';
 import { EMAIL_LOCALES } from '@/lib/email/lingua';
-import { enqueueEmailOnce } from '@/lib/email/outbox';
+import { enqueueEmail, enqueueEmailOnce } from '@/lib/email/outbox';
 
 import {
   adminRequestLocale,
   moderatorLinkEmail,
+  resendGrantModeratorLink,
   sendGrantModeratorLink,
   sendGrantModeratorLinks,
   sendPrimaryModeratorLink,
@@ -174,6 +175,31 @@ describe('sendGrantModeratorLink', () => {
     db.eventModerator.findUnique.mockResolvedValue(grantRow({ event: eventRow({ status: 'DRAFT' }) }));
     expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
     expect(mockedEnqueue).not.toHaveBeenCalled();
+  });
+});
+
+describe('resendGrantModeratorLink', () => {
+  const mockedEnqueueAgain = enqueueEmail as unknown as ReturnType<typeof vi.fn>;
+
+  it('se il primo invio non c\'era, prende il suo posto con la sua chiave', async () => {
+    mockedEnqueue.mockResolvedValueOnce(true);
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    expect(mockedEnqueue.mock.calls[0]![0].dedupKey).toBeTruthy();
+    expect(mockedEnqueueAgain).not.toHaveBeenCalled();
+  });
+
+  it('se il primo invio c\'era, accoda di nuovo senza chiave', async () => {
+    mockedEnqueue.mockResolvedValueOnce(false);
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    expect(mockedEnqueueAgain).toHaveBeenCalledTimes(1);
+    const mail = mockedEnqueueAgain.mock.calls[0]![0];
+    expect(mail.dedupKey).toBeUndefined();
+    expect(mail.text).toContain(`token=${GRANT_TOKEN}`);
+  });
+
+  it('un errore del database non esce: risponde falso', async () => {
+    mockedEnqueue.mockRejectedValueOnce(new Error('db down'));
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
   });
 });
 

@@ -10,6 +10,7 @@ import messages from '@/i18n/messages/it.json';
  * non passano dal router, quindi i segmenti si traducono dalla mappa degli
  * indirizzi (`/it/eventi/…`, `/en/events/…`) invece di scriverli a mano.
  */
+vi.mock('@/components/ui/toast', () => ({ useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }) }));
 vi.mock('@/components/ui/confirm-dialog', () => ({
   useConfirm: () => vi.fn(async () => true),
 }));
@@ -22,7 +23,7 @@ const fetchMock = vi.fn();
 let container: HTMLDivElement;
 let root: Root;
 
-async function disegna(locale: string) {
+async function disegna(locale: string, canResend = true) {
   await act(async () => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
@@ -33,6 +34,7 @@ async function disegna(locale: string) {
           eventTitle="Evento di prova"
           baseUrl={BASE}
           locale={locale}
+          canResend={canResend}
         />
       </NextIntlClientProvider>,
     );
@@ -129,3 +131,31 @@ describe('EventModeratorsPanel — «Prepara email»', () => {
     expect(decodeURIComponent(href)).toContain('token=TOKEN_RELATORE');
   });
 });
+
+describe('EventModeratorsPanel — «Reinvia link»', () => {
+  // Il nome accessibile comincia con il testo visibile, poi il nome.
+  const reinvia = (nome: string) =>
+    Array.from(container.querySelectorAll<HTMLButtonElement>('button')).find(
+      (b) => b.textContent === `${messages.admin.coModerators.resend}: ${nome}`,
+    ) ?? null;
+
+  it('rimette in coda il link di quella persona, con il link principale', async () => {
+    await disegna('it');
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ queued: true }), { status: 200 }));
+    await act(async () => {
+      reinvia('Moderatrice 2')!.click();
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/events/evento-1/moderators/g2', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer TOKEN_MODERATORE' },
+    });
+  });
+
+  it('non c\'e\' per chi non ha un indirizzo, ne\' quando il portale non manda i link', async () => {
+    await disegna('it');
+    expect(reinvia('Relatore 1')).toBeNull();
+    await disegna('it', false);
+    expect(reinvia('Moderatrice 2')).toBeNull();
+  });
+});
+

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modère comme un modérateur et figure parmi les organisateurs de l'événement. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement.",
       "organization": "Organisme ou organisation (facultatif)",
       "publicListed": "Afficher sur la page publique",
-      "onPublicPage": "Sur la page publique"
+      "onPublicPage": "Sur la page publique",
+      "resend": "Renvoyer le lien",
+      "resendDone": "Lien renvoyé à {name}.",
+      "resendTooMany": "Trop d'envois rapprochés : veuillez réessayer dans quelques minutes.",
+      "resendFailed": "Échec de l'envoi. Veuillez réessayer."
     },
     "gdprAuditLog": {
       "title": "Journal GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Elle est actuellement privée.",
     "unarchive": "Retirer des archives",
     "unarchiveSuccess": "Événement retiré des archives.",
-    "unarchiveFailed": "Impossible de retirer l'événement des archives. Réessayez."
+    "unarchiveFailed": "Impossible de retirer l'événement des archives. Réessayez.",
+    "invitationsPanel": {
+      "title": "Invités",
+      "edit": "Modifier les invités",
+      "introInvitationOnly": "L'événement est sur invitation : seules ces personnes peuvent s'inscrire, avec l'adresse à laquelle elles ont été invitées.",
+      "introOpen": "L'inscription est ouverte à tous : voici les personnes que vous avez invitées et si elles se sont déjà inscrites.",
+      "loadError": "Impossible de charger les invités.",
+      "empty": "Aucun invité.",
+      "emptyInvitationOnly": "Aucun invité pour l'instant : tant que la liste est vide, personne ne peut s'inscrire.",
+      "registeredCount": "Inscrits : {registered} sur {total}",
+      "name": "Nom",
+      "email": "E-mail",
+      "status": "Statut",
+      "roleSpeaker": "Intervenant",
+      "registered": "Inscrit",
+      "notRegistered": "Pas encore inscrit",
+      "organizersTitle": "Organismes organisateurs",
+      "organizersEdit": "Modifier les organismes",
+      "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmation d'inscription : {eventTitle}",

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modererer som en moderator og præsenteres blandt arrangementets arrangører. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet.",
       "organization": "Organisation (valgfrit)",
       "publicListed": "Vis på den offentlige side",
-      "onPublicPage": "På den offentlige side"
+      "onPublicPage": "På den offentlige side",
+      "resend": "Send link igen",
+      "resendDone": "Link sendt igen til {name}.",
+      "resendTooMany": "For mange afsendelser på kort tid: prøv igen om et par minutter.",
+      "resendFailed": "Afsendelsen mislykkedes. Prøv igen."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Den er lige nu sat til privat.",
     "unarchive": "Fjern fra arkivet",
     "unarchiveSuccess": "Arrangementet er fjernet fra arkivet.",
-    "unarchiveFailed": "Arrangementet kunne ikke fjernes fra arkivet. Prøv igen."
+    "unarchiveFailed": "Arrangementet kunne ikke fjernes fra arkivet. Prøv igen.",
+    "invitationsPanel": {
+      "title": "Inviterede",
+      "edit": "Rediger inviterede",
+      "introInvitationOnly": "Begivenheden er kun for inviterede: kun disse personer kan tilmelde sig med den adresse, de blev inviteret med.",
+      "introOpen": "Tilmeldingen er åben for alle: her er de personer, du har inviteret, og om de allerede har tilmeldt sig.",
+      "loadError": "Kunne ikke indlæse de inviterede.",
+      "empty": "Ingen inviterede.",
+      "emptyInvitationOnly": "Ingen inviterede endnu: så længe listen er tom, kan ingen tilmelde sig.",
+      "registeredCount": "Tilmeldt: {registered} af {total}",
+      "name": "Navn",
+      "email": "E-mail",
+      "status": "Status",
+      "roleSpeaker": "Taler",
+      "registered": "Tilmeldt",
+      "notRegistered": "Endnu ikke tilmeldt",
+      "organizersTitle": "Arrangerende organisationer",
+      "organizersEdit": "Rediger organisationer",
+      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer."
+    }
   },
   "email": {
     "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",

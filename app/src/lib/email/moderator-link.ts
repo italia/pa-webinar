@@ -31,7 +31,7 @@ import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { linguaEmail, linguaPagina, type EmailLocale } from '@/lib/email/lingua';
 import { emailBaseUrl } from '@/lib/email/links';
-import { enqueueEmailOnce } from '@/lib/email/outbox';
+import { enqueueEmail, enqueueEmailOnce } from '@/lib/email/outbox';
 import { escapeHtml } from '@/lib/email/templates';
 import { getSettings } from '@/lib/settings';
 import { formatDate, formatTimeWithZone } from '@/lib/utils/date-format';
@@ -333,7 +333,7 @@ export function adminRequestLocale(request: Request, predefinita?: string | null
 
 /** Stati in cui i link non partono: la bozza (non ancora pubblica) e
  *  l'evento concluso. */
-const NO_SEND_STATUSES = new Set(['DRAFT', 'ENDED', 'ARCHIVED']);
+export const NO_SEND_STATUSES: ReadonlySet<string> = new Set(['DRAFT', 'ENDED', 'ARCHIVED']);
 
 function dedupKeyGrant(eventId: string, grantId: string): string {
   return `moderator-link:${eventId}:grant:${grantId}`;
@@ -484,7 +484,11 @@ async function accodaConcessione(
   grant: GrantRow,
   event: GrantEvent,
   settings: { siteName?: string | null },
-  opts: { locale: string },
+  /** `ancora`: un nuovo invio chiesto da chi gestisce («Reinvia link»). Se
+   *  il primo invio non c'era, questo prende il suo posto (con la sua chiave,
+   *  cosi' un salvataggio successivo non ne accoda un altro); se c'era, si
+   *  accoda senza chiave. */
+  opts: { locale: string; ancora?: boolean },
 ): Promise<boolean> {
   if (grant.revokedAt || NO_SEND_STATUSES.has(event.status)) return false;
   const to = tryDecryptPII(grant.email)?.trim();
@@ -507,14 +511,40 @@ async function accodaConcessione(
     ),
     siteName: settings.siteName || undefined,
   });
-  return enqueueEmailOnce({
+  const messaggio = {
     to,
     subject: mail.subject,
     html: mail.html,
     text: mail.text,
     metadata: { kind: 'moderator-link', role, eventId: event.id, grantId: grant.id },
-    dedupKey: dedupKeyGrant(event.id, grant.id),
-  });
+  };
+  const primo = await enqueueEmailOnce({ ...messaggio, dedupKey: dedupKeyGrant(event.id, grant.id) });
+  if (primo || !opts.ancora) return primo;
+  await enqueueEmail(messaggio);
+  return true;
+}
+
+/**
+ * Di nuovo il link personale di una concessione, quando chi gestisce lo
+ * chiede («Reinvia link»): l'email persa, finita nello spam, cancellata. Non
+ * in bozza (i link partono alla pubblicazione), non a una concessione
+ * revocata o senza indirizzo. Vero se l'email e' in coda.
+ */
+export async function resendGrantModeratorLink(grantId: string, opts: { locale: string }): Promise<boolean> {
+  try {
+    const grant = await prisma.eventModerator.findUnique({
+      where: { id: grantId },
+      select: { ...GRANT_SELECT, event: { select: EVENT_SELECT } },
+    });
+    if (!grant) return false;
+    return await accodaConcessione(grant, grant.event, await getSettings(), { ...opts, ancora: true });
+  } catch (err) {
+    console.error('[email] moderator link not queued', {
+      grantId,
+      error: err instanceof Error ? err.name : 'unknown',
+    });
+    return false;
+  }
 }
 
 /**

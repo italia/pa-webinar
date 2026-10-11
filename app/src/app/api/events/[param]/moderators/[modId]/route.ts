@@ -6,6 +6,12 @@
  *            (lib/events/grant-profile). Nome, email e ruolo non cambiano:
  *            si revoca e si aggiunge di nuovo, perché il link è della persona.
  *
+ *   POST   — «Reinvia link»: rimette in coda l'email con il link personale
+ *            (lib/email/moderator-link resendGrantModeratorLink). Non in
+ *            bozza ne' a evento concluso o archiviato (i link non partono),
+ *            non a una concessione revocata o senza indirizzo; al massimo tre
+ *            email del link ogni dieci minuti per concessione.
+ *
  *   DELETE — sets `revokedAt` so the token stops being accepted. We
  *            don't hard-delete the row so the event management page
  *            can keep showing who previously had access. A real
@@ -17,7 +23,9 @@ import { EventModeratorRole } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
-import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NO_SEND_STATUSES, adminRequestLocale, resendGrantModeratorLink } from '@/lib/email/moderator-link';
+import { getSettings } from '@/lib/settings';
 import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
 import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
@@ -102,6 +110,37 @@ export const PATCH = withErrorHandling(async (request, context) => {
     },
   });
   return Response.json({ ...updated, name: tryDecryptPII(updated.name) ?? updated.name });
+});
+
+export const POST = withErrorHandling(async (request, context) => {
+  const { param, modId } = await context.params;
+  const { event, mod } = await caricaConcessione(request, param, modId);
+  if (event.status === 'DRAFT') {
+    throw new AppError('Links are sent when the event is published', 409, 'EVENT_DRAFT');
+  }
+  if (NO_SEND_STATUSES.has(event.status)) {
+    throw new AppError('The event is over: links are no longer sent', 409, 'EVENT_ENDED');
+  }
+  if (mod.revokedAt) throw new AppError('The grant was revoked', 409, 'GRANT_REVOKED');
+  if (!tryDecryptPII(mod.email)?.trim()) {
+    throw new AppError('The grant has no email address', 422, 'GRANT_NO_EMAIL');
+  }
+  // Il limite conta le email del link gia' in coda (primo invio compreso),
+  // nel database: vale per tutte le repliche, e un tentativo fallito non lo
+  // consuma.
+  const finestra = 10 * 60_000;
+  const recenti = await prisma.emailOutbox.count({
+    where: {
+      createdAt: { gte: new Date(Date.now() - finestra) },
+      metadata: { path: ['grantId'], equals: mod.id },
+    },
+  });
+  if (recenti >= 3) throw new RateLimitError(finestra / 1000);
+
+  const { defaultLocale: predefinita } = await getSettings();
+  const inCoda = await resendGrantModeratorLink(mod.id, { locale: adminRequestLocale(request, predefinita) });
+  if (!inCoda) throw new AppError('The email could not be queued', 500, 'NOT_QUEUED');
+  return Response.json({ queued: true });
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderira kot moderator in je predstavljen med organizatorji dogodka. Z računom osebja z istim e-poštnim naslovom upravlja tudi dogodek.",
       "organization": "Ustanova ali organizacija (neobvezno)",
       "publicListed": "Prikaži na javni strani",
-      "onPublicPage": "Na javni strani"
+      "onPublicPage": "Na javni strani",
+      "resend": "Znova pošlji povezavo",
+      "resendDone": "Povezava znova poslana: {name}.",
+      "resendTooMany": "Preveč pošiljanj v kratkem času: poskusite znova čez nekaj minut.",
+      "resendFailed": "Pošiljanje ni uspelo. Poskusite znova."
     },
     "gdprAuditLog": {
       "title": "Dnevnik GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Trenutno je nastavljena kot zasebna.",
     "unarchive": "Odstrani iz arhiva",
     "unarchiveSuccess": "Dogodek je odstranjen iz arhiva.",
-    "unarchiveFailed": "Dogodka ni bilo mogoče odstraniti iz arhiva. Poskusite znova."
+    "unarchiveFailed": "Dogodka ni bilo mogoče odstraniti iz arhiva. Poskusite znova.",
+    "invitationsPanel": {
+      "title": "Povabljeni",
+      "edit": "Uredi povabljene",
+      "introInvitationOnly": "Dogodek je samo za povabljene: prijavijo se lahko le te osebe, z naslovom, na katerega so bile povabljene.",
+      "introOpen": "Prijava je odprta za vse: tu so osebe, ki ste jih povabili, in ali so se že prijavile.",
+      "loadError": "Povabljenih ni bilo mogoče naložiti.",
+      "empty": "Ni povabljenih.",
+      "emptyInvitationOnly": "Še ni povabljenih: dokler je seznam prazen, se nihče ne more prijaviti.",
+      "registeredCount": "Prijavljeni: {registered} od {total}",
+      "name": "Ime",
+      "email": "E-pošta",
+      "status": "Stanje",
+      "roleSpeaker": "Govorec",
+      "registered": "Prijavljen",
+      "notRegistered": "Še ni prijavljen",
+      "organizersTitle": "Organizatorske ustanove",
+      "organizersEdit": "Uredi ustanove",
+      "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira."
+    }
   },
   "email": {
     "confirmationSubject": "Potrditev prijave: {eventTitle}",

@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Modera como um moderador e é apresentado entre os organizadores do evento. Com uma conta de pessoal com o mesmo e-mail, também gere o evento.",
       "organization": "Entidade ou organização (opcional)",
       "publicListed": "Mostrar na página pública",
-      "onPublicPage": "Na página pública"
+      "onPublicPage": "Na página pública",
+      "resend": "Reenviar ligação",
+      "resendDone": "Ligação reenviada a {name}.",
+      "resendTooMany": "Demasiados envios seguidos: tente novamente dentro de alguns minutos.",
+      "resendFailed": "Não foi possível enviar. Tente novamente."
     },
     "gdprAuditLog": {
       "title": "Registo GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Neste momento está definida como privada.",
     "unarchive": "Retirar do arquivo",
     "unarchiveSuccess": "Evento retirado do arquivo.",
-    "unarchiveFailed": "Não foi possível retirar o evento do arquivo. Tente novamente."
+    "unarchiveFailed": "Não foi possível retirar o evento do arquivo. Tente novamente.",
+    "invitationsPanel": {
+      "title": "Convidados",
+      "edit": "Editar convidados",
+      "introInvitationOnly": "O evento é só por convite: apenas estas pessoas se podem inscrever, com o endereço com que foram convidadas.",
+      "introOpen": "A inscrição está aberta a todos: aqui estão as pessoas que convidou e se já se inscreveram.",
+      "loadError": "Não foi possível carregar os convidados.",
+      "empty": "Nenhum convidado.",
+      "emptyInvitationOnly": "Ainda não há convidados: enquanto a lista estiver vazia, ninguém se pode inscrever.",
+      "registeredCount": "Inscritos: {registered} de {total}",
+      "name": "Nome",
+      "email": "E-mail",
+      "status": "Estado",
+      "roleSpeaker": "Orador",
+      "registered": "Inscrito",
+      "notRegistered": "Ainda não inscrito",
+      "organizersTitle": "Entidades organizadoras",
+      "organizersEdit": "Editar entidades",
+      "organizersEmpty": "Nenhuma entidade indicada: a página pública não mostra quem organiza."
+    }
   },
   "email": {
     "confirmationSubject": "Inscrição confirmada: {eventTitle}",

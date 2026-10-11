@@ -39,6 +39,7 @@ import {
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { canStartManually } from '@/lib/events/lifecycle';
 import { materialAuthorName } from '@/lib/events/material-author';
+import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -50,6 +51,7 @@ import EventAnalyticsPanel from './event-analytics-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
+import EventInvitationsPanel from './event-invitations-panel';
 import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
@@ -744,7 +746,9 @@ export default function EventManagementClient({
             )}
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
-                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'} />
+                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'}
+                         linksMailable={!['DRAFT', 'ENDED', 'ARCHIVED'].includes(status)}
+                         editPeopleHref={editUrlAt('invites')} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
@@ -1156,10 +1160,14 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft, linksMailable, editPeopleHref }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
   /** In bozza i link di co-moderatori e relatori partono alla pubblicazione. */
   isDraft: boolean;
+  /** Il portale manda i link per email (non in bozza, non a evento finito). */
+  linksMailable: boolean;
+  /** La modifica sul passo «Persone» del wizard: enti e invitati. */
+  editPeopleHref: string;
   /** Correzione e cancellazione delle iscrizioni: solo con una sessione dello
    *  staff, non con il solo link del moderatore. */
   canEditRegistrations: boolean;
@@ -1178,13 +1186,59 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
 
   return (
     <>
+      {/* Gli enti che organizzano, come li vede la pagina pubblica. */}
+      <section className="mb-4" aria-labelledby="enti-titolo">
+        <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <h2 id="enti-titolo" className="fw-semibold mb-0" style={{ color: C_INK, fontSize: '1rem' }}>
+            {t('invitationsPanel.organizersTitle')}
+          </h2>
+          <Link href={percorso(editPeopleHref)} className="btn btn-outline-primary btn-sm">
+            {t('invitationsPanel.organizersEdit')}
+          </Link>
+        </div>
+        {event.organizers.length === 0 ? (
+          <p className="mb-0" style={{ color: C_MUTED, fontSize: '0.9rem' }}>{t('invitationsPanel.organizersEmpty')}</p>
+        ) : (
+          <ul className="list-unstyled d-flex flex-wrap gap-3 mb-0">
+            {/* Con gli stessi filtri della pagina pubblica: solo loghi serviti
+                dall'app (niente richieste a siti terzi), solo siti http(s). */}
+            {event.organizers.map((o) => {
+              const logo = logoPubblico(o.logoUrl);
+              const sito = sitoPubblico(o.websiteUrl);
+              return (
+                <li key={o.id} className="d-flex align-items-center gap-2 px-3 py-2" style={CARD}>
+                  {logo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={logo} alt="" style={{ height: 28, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />
+                  )}
+                  {sito ? (
+                    <a href={sito} target="_blank" rel="noopener noreferrer">{o.name}</a>
+                  ) : (
+                    <span>{o.name}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       <div className="mb-4">
         <H>{t('coModerators.title')}</H>
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
                               eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
-                              baseUrl={baseUrl} locale={locale} isDraft={isDraft} />
+                              baseUrl={baseUrl} locale={locale} isDraft={isDraft}
+                              canResend={linksMailable} />
       </div>
+
+      {/* Gli invitati: la rotta e' dello staff, non del link del moderatore. */}
+      {canEditRegistrations && (
+        <div className="mb-4">
+          <EventInvitationsPanel eventId={event.id} invitationOnly={!event.registrationOpen}
+                                 editHref={editPeopleHref} />
+        </div>
+      )}
 
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">

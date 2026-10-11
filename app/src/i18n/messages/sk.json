@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje ako moderátor a je uvedený medzi organizátormi podujatia. S účtom personálu s rovnakým e-mailom podujatie aj spravuje.",
       "organization": "Inštitúcia alebo organizácia (voliteľné)",
       "publicListed": "Zobraziť na verejnej stránke",
-      "onPublicPage": "Na verejnej stránke"
+      "onPublicPage": "Na verejnej stránke",
+      "resend": "Znova poslať odkaz",
+      "resendDone": "Odkaz znova odoslaný: {name}.",
+      "resendTooMany": "Príliš veľa odoslaní v krátkom čase: skúste znova o pár minút.",
+      "resendFailed": "Odoslanie sa nepodarilo. Skúste znova."
     },
     "gdprAuditLog": {
       "title": "Auditný protokol GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Teraz je nastavená ako súkromná.",
     "unarchive": "Vybrať z archívu",
     "unarchiveSuccess": "Podujatie vybraté z archívu.",
-    "unarchiveFailed": "Podujatie sa nepodarilo vybrať z archívu. Skúste to znova."
+    "unarchiveFailed": "Podujatie sa nepodarilo vybrať z archívu. Skúste to znova.",
+    "invitationsPanel": {
+      "title": "Pozvaní",
+      "edit": "Upraviť pozvaných",
+      "introInvitationOnly": "Udalosť je len pre pozvaných: prihlásiť sa môžu iba tieto osoby, s adresou, na ktorú boli pozvané.",
+      "introOpen": "Prihlásenie je otvorené pre všetkých: tu sú osoby, ktoré ste pozvali, a či sa už prihlásili.",
+      "loadError": "Pozvaných sa nepodarilo načítať.",
+      "empty": "Žiadni pozvaní.",
+      "emptyInvitationOnly": "Zatiaľ žiadni pozvaní: kým je zoznam prázdny, nikto sa nemôže prihlásiť.",
+      "registeredCount": "Prihlásení: {registered} z {total}",
+      "name": "Meno",
+      "email": "E-mail",
+      "status": "Stav",
+      "roleSpeaker": "Rečník",
+      "registered": "Prihlásený",
+      "notRegistered": "Ešte neprihlásený",
+      "organizersTitle": "Organizujúce inštitúcie",
+      "organizersEdit": "Upraviť inštitúcie",
+      "organizersEmpty": "Nie je uvedená žiadna inštitúcia: verejná stránka neukazuje, kto organizuje."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrdenie registrácie: {eventTitle}",

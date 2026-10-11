@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderē kā moderators un ir norādīts starp pasākuma organizatoriem. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu.",
       "organization": "Iestāde vai organizācija (pēc izvēles)",
       "publicListed": "Rādīt publiskajā lapā",
-      "onPublicPage": "Publiskajā lapā"
+      "onPublicPage": "Publiskajā lapā",
+      "resend": "Nosūtīt saiti vēlreiz",
+      "resendDone": "Saite vēlreiz nosūtīta: {name}.",
+      "resendTooMany": "Pārāk daudz sūtījumu īsā laikā: mēģiniet vēlreiz pēc dažām minūtēm.",
+      "resendFailed": "Neizdevās nosūtīt. Mēģiniet vēlreiz."
     },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Pašlaik tā ir iestatīta kā privāta.",
     "unarchive": "Izņemt no arhīva",
     "unarchiveSuccess": "Pasākums izņemts no arhīva.",
-    "unarchiveFailed": "Pasākumu neizdevās izņemt no arhīva. Mēģiniet vēlreiz."
+    "unarchiveFailed": "Pasākumu neizdevās izņemt no arhīva. Mēģiniet vēlreiz.",
+    "invitationsPanel": {
+      "title": "Uzaicinātie",
+      "edit": "Rediģēt uzaicinātos",
+      "introInvitationOnly": "Pasākums ir tikai ar uzaicinājumu: reģistrēties var tikai šīs personas ar adresi, uz kuru tās tika uzaicinātas.",
+      "introOpen": "Reģistrācija ir atvērta visiem: šeit ir jūsu uzaicinātās personas un informācija, vai tās jau ir reģistrējušās.",
+      "loadError": "Neizdevās ielādēt uzaicinātos.",
+      "empty": "Nav uzaicināto.",
+      "emptyInvitationOnly": "Vēl nav uzaicināto: kamēr saraksts ir tukšs, neviens nevar reģistrēties.",
+      "registeredCount": "Reģistrējušies: {registered} no {total}",
+      "name": "Vārds",
+      "email": "E-pasts",
+      "status": "Statuss",
+      "roleSpeaker": "Runātājs",
+      "registered": "Reģistrējies",
+      "notRegistered": "Vēl nav reģistrējies",
+      "organizersTitle": "Rīkotājiestādes",
+      "organizersEdit": "Rediģēt iestādes",
+      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko."
+    }
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",

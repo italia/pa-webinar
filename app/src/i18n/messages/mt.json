@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Jimmodera bħal moderatur u jidher fost l-organizzaturi tal-avveniment. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment.",
       "organization": "Entità jew organizzazzjoni (fakultattiv)",
       "publicListed": "Uri fil-paġna pubblika",
-      "onPublicPage": "Fil-paġna pubblika"
+      "onPublicPage": "Fil-paġna pubblika",
+      "resend": "Erġa' ibgħat il-link",
+      "resendDone": "Il-link intbagħat mill-ġdid lil {name}.",
+      "resendTooMany": "Wisq invjijiet f'ħin qasir: erġa' pprova fi ftit minuti.",
+      "resendFailed": "L-invjar ma rnexxiex. Erġa' pprova."
     },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Bħalissa hija ssettjata bħala privata.",
     "unarchive": "Oħroġ mill-arkivju",
     "unarchiveSuccess": "L-avveniment inħareġ mill-arkivju.",
-    "unarchiveFailed": "L-avveniment ma setax jinħareġ mill-arkivju. Erġa' pprova."
+    "unarchiveFailed": "L-avveniment ma setax jinħareġ mill-arkivju. Erġa' pprova.",
+    "invitationsPanel": {
+      "title": "Mistiedna",
+      "edit": "Editja l-mistiedna",
+      "introInvitationOnly": "L-avveniment huwa b'invit biss: jistgħu jirreġistraw biss dawn il-persuni, bl-indirizz li bih ġew mistiedna.",
+      "introOpen": "Ir-reġistrazzjoni hija miftuħa għal kulħadd: hawnhekk hemm il-persuni li stedint u jekk diġà rreġistrawx.",
+      "loadError": "Ma setgħux jitgħabbew il-mistiedna.",
+      "empty": "L-ebda mistieden.",
+      "emptyInvitationOnly": "Għad m'hemm l-ebda mistieden: sakemm il-lista tkun vojta, ħadd ma jista' jirreġistra.",
+      "registeredCount": "Irreġistrati: {registered} minn {total}",
+      "name": "Isem",
+      "email": "Email",
+      "status": "Status",
+      "roleSpeaker": "Kelliem",
+      "registered": "Irreġistrat",
+      "notRegistered": "Għadu mhux irreġistrat",
+      "organizersTitle": "Entitajiet organizzaturi",
+      "organizersEdit": "Editja l-entitajiet",
+      "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza."
+    }
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",

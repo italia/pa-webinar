@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderátorként moderál, és az esemény szervezői között szerepel. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli.",
       "organization": "Intézmény vagy szervezet (nem kötelező)",
       "publicListed": "Megjelenítés a nyilvános oldalon",
-      "onPublicPage": "A nyilvános oldalon"
+      "onPublicPage": "A nyilvános oldalon",
+      "resend": "Link újraküldése",
+      "resendDone": "Link újraküldve neki: {name}.",
+      "resendTooMany": "Túl sok küldés rövid idő alatt: próbáld újra néhány perc múlva.",
+      "resendFailed": "A küldés nem sikerült. Próbáld újra."
     },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Jelenleg privátra van állítva.",
     "unarchive": "Kivétel az archívumból",
     "unarchiveSuccess": "Az esemény kikerült az archívumból.",
-    "unarchiveFailed": "Az eseményt nem sikerült kivenni az archívumból. Próbálja újra."
+    "unarchiveFailed": "Az eseményt nem sikerült kivenni az archívumból. Próbálja újra.",
+    "invitationsPanel": {
+      "title": "Meghívottak",
+      "edit": "Meghívottak szerkesztése",
+      "introInvitationOnly": "Az esemény csak meghívottaknak szól: csak ezek a személyek jelentkezhetnek, azzal a címmel, amelyre a meghívót kapták.",
+      "introOpen": "A jelentkezés mindenki előtt nyitva áll: itt láthatod a meghívott személyeket, és hogy jelentkeztek-e már.",
+      "loadError": "Nem sikerült betölteni a meghívottakat.",
+      "empty": "Nincs meghívott.",
+      "emptyInvitationOnly": "Még nincs meghívott: amíg a lista üres, senki sem jelentkezhet.",
+      "registeredCount": "Jelentkezett: {registered} / {total}",
+      "name": "Név",
+      "email": "E-mail",
+      "status": "Állapot",
+      "roleSpeaker": "Előadó",
+      "registered": "Jelentkezett",
+      "notRegistered": "Még nem jelentkezett",
+      "organizersTitle": "Szervező intézmények",
+      "organizersEdit": "Intézmények szerkesztése",
+      "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi."
+    }
   },
   "email": {
     "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",

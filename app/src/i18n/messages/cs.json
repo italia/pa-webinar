@@ -1664,7 +1664,11 @@
       "roleOrganizerHint": "Moderuje jako moderátor a je uveden mezi pořadateli akce. S účtem personálu se stejným e-mailem akci také spravuje.",
       "organization": "Organizace (volitelné)",
       "publicListed": "Zobrazit na veřejné stránce",
-      "onPublicPage": "Na veřejné stránce"
+      "onPublicPage": "Na veřejné stránce",
+      "resend": "Znovu poslat odkaz",
+      "resendDone": "Odkaz znovu odeslán: {name}.",
+      "resendTooMany": "Příliš mnoho odeslání v krátké době: zkuste to prosím za pár minut.",
+      "resendFailed": "Odeslání se nezdařilo. Zkuste to prosím znovu."
     },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",
@@ -3252,7 +3256,26 @@
     "endEventPagePrivate": "Nyní je nastavená jako soukromá.",
     "unarchive": "Vyjmout z archivu",
     "unarchiveSuccess": "Akce vyjmuta z archivu.",
-    "unarchiveFailed": "Akci se nepodařilo vyjmout z archivu. Zkuste to znovu."
+    "unarchiveFailed": "Akci se nepodařilo vyjmout z archivu. Zkuste to znovu.",
+    "invitationsPanel": {
+      "title": "Pozvaní",
+      "edit": "Upravit pozvané",
+      "introInvitationOnly": "Událost je pouze pro pozvané: přihlásit se mohou jen tyto osoby, s adresou, na kterou byly pozvány.",
+      "introOpen": "Přihlášení je otevřené všem: zde jsou osoby, které jste pozvali, a zda se už přihlásily.",
+      "loadError": "Pozvané se nepodařilo načíst.",
+      "empty": "Žádní pozvaní.",
+      "emptyInvitationOnly": "Zatím žádní pozvaní: dokud je seznam prázdný, nikdo se nemůže přihlásit.",
+      "registeredCount": "Přihlášeno: {registered} z {total}",
+      "name": "Jméno",
+      "email": "E-mail",
+      "status": "Stav",
+      "roleSpeaker": "Řečník",
+      "registered": "Přihlášen",
+      "notRegistered": "Dosud nepřihlášen",
+      "organizersTitle": "Pořádající instituce",
+      "organizersEdit": "Upravit instituce",
+      "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",

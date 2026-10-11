@@ -1789,7 +1789,11 @@
       "roleOrganizerHint": "Modera come un moderatore ed è presentato fra chi organizza l'evento. Con un account dello staff con la stessa email, gestisce anche l'evento.",
       "organization": "Ente o organizzazione (facoltativo)",
       "publicListed": "Mostra nella pagina pubblica",
-      "onPublicPage": "Nella pagina pubblica"
+      "onPublicPage": "Nella pagina pubblica",
+      "resend": "Reinvia link",
+      "resendDone": "Link reinviato a {name}.",
+      "resendTooMany": "Troppi invii ravvicinati: riprova fra qualche minuto.",
+      "resendFailed": "Invio non riuscito. Riprova."
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",
@@ -3377,7 +3381,26 @@
     "endEventPagePrivate": "Ora è impostata come privata.",
     "unarchive": "Togli dall'archivio",
     "unarchiveSuccess": "Evento tolto dall'archivio.",
-    "unarchiveFailed": "Non è stato possibile togliere l'evento dall'archivio. Riprova."
+    "unarchiveFailed": "Non è stato possibile togliere l'evento dall'archivio. Riprova.",
+    "invitationsPanel": {
+      "title": "Invitati",
+      "edit": "Modifica gli invitati",
+      "introInvitationOnly": "L'evento è solo su invito: possono iscriversi soltanto queste persone, con l'indirizzo con cui sono state invitate.",
+      "introOpen": "L'iscrizione è aperta a tutti: qui ci sono le persone che hai invitato e se si sono già iscritte.",
+      "loadError": "Impossibile caricare gli invitati.",
+      "empty": "Nessun invitato.",
+      "emptyInvitationOnly": "Nessun invitato ancora: finché l'elenco è vuoto, nessuno può iscriversi.",
+      "registeredCount": "Iscritti: {registered} su {total}",
+      "name": "Nome",
+      "email": "Email",
+      "status": "Stato",
+      "roleSpeaker": "Relatore",
+      "registered": "Iscritto",
+      "notRegistered": "Non ancora iscritto",
+      "organizersTitle": "Enti organizzatori",
+      "organizersEdit": "Modifica gli enti",
+      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
+    }
   },
   "email": {
     "confirmationSubject": "Conferma registrazione: {eventTitle}",
