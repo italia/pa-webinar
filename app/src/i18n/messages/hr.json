@@ -2517,7 +2517,8 @@
         "people": "Osobe",
         "content": "Sadržaj",
         "analytics": "Statistika",
-        "afterEvent": "Nakon događaja"
+        "afterEvent": "Nakon događaja",
+        "label": "Odjeljci događaja"
       },
       "toggles": {
         "unmute": "Sudionici mogu govoriti",

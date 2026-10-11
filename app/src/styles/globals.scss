@@ -10688,6 +10688,58 @@ html.live-resizing .live-sidebar-resizer::after {
     inset 0 0 0 5px #000 !important;
 }
 
+// La pagina di un evento nell'area di amministrazione. Su schermo largo le
+// schede a sinistra e, a destra, azioni e riepilogo che restano in vista. Su
+// telefono la colonna di destra si scioglie (display: contents) e le sue due
+// parti prendono posto attorno alle schede: prima le azioni dello stato, poi
+// le schede, in fondo il riepilogo.
+.event-manage {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'azioni'
+    'schede'
+    'riepilogo';
+}
+
+.event-manage__main {
+  grid-area: schede;
+  min-width: 0;
+}
+
+.event-manage__side {
+  display: contents;
+}
+
+.event-manage__actions {
+  grid-area: azioni;
+}
+
+.event-manage__summary {
+  grid-area: riepilogo;
+}
+
+@media (min-width: 992px) {
+  .event-manage {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-areas: 'schede laterale';
+    align-items: start;
+  }
+
+  // Resta in vista scorrendo; se e' piu' alta dello schermo scorre da sola,
+  // altrimenti la parte in fondo non si raggiungerebbe fino alla fine della
+  // pagina.
+  .event-manage__side {
+    display: block;
+    grid-area: laterale;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+}
+
 // Le schede della pagina di un evento scorrono in orizzontale sugli schermi
 // stretti invece di allargare la pagina.
 @media (max-width: 767.98px) {

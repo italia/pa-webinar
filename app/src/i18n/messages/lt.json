@@ -2517,7 +2517,8 @@
         "people": "Asmenys",
         "content": "Turinys",
         "analytics": "Statistika",
-        "afterEvent": "Po renginio"
+        "afterEvent": "Po renginio",
+        "label": "Renginio skiltys"
       },
       "toggles": {
         "unmute": "Dalyviai gali kalbėti",

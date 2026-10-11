@@ -2517,7 +2517,8 @@
         "people": "Daoine",
         "content": "Ábhar",
         "analytics": "Staitisticí",
-        "afterEvent": "Tar éis an imeachta"
+        "afterEvent": "Tar éis an imeachta",
+        "label": "Ranna an imeachta"
       },
       "toggles": {
         "unmute": "Is féidir le rannpháirtithe labhairt",

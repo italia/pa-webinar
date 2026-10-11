@@ -2517,7 +2517,8 @@
         "people": "Osebe",
         "content": "Vsebine",
         "analytics": "Statistika",
-        "afterEvent": "Po dogodku"
+        "afterEvent": "Po dogodku",
+        "label": "Razdelki dogodka"
       },
       "toggles": {
         "unmute": "Udeleženci lahko govorijo",

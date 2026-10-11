@@ -2517,7 +2517,8 @@
         "people": "Pessoas",
         "content": "Conteúdos",
         "analytics": "Estatísticas",
-        "afterEvent": "Depois do evento"
+        "afterEvent": "Depois do evento",
+        "label": "Secções do evento"
       },
       "toggles": {
         "unmute": "Participantes podem falar",

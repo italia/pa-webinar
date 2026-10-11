@@ -267,6 +267,13 @@ export default function EventManagementClient({
   useEffect(() => {
     if (tabRichiesta) setActiveTab(tabRichiesta);
   }, [tabRichiesta]);
+  // La scheda scelta resta nell'indirizzo (`?tab=`): un ricaricamento o un
+  // link copiato riaprono quella. Si sostituisce la voce della cronologia,
+  // senza aggiungerne una per scheda.
+  const scegliScheda = useCallback((tab: TabId) => {
+    setActiveTab(tab);
+    aggiornaQuery((params) => params.set('tab', tab));
+  }, []);
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
@@ -279,13 +286,7 @@ export default function EventManagementClient({
     const params = new URLSearchParams(window.location.search);
     if (params.get('created') !== '1') return;
     setAppenaCreato(readCreation(event.id));
-    params.delete('created');
-    const resto = params.toString();
-    window.history.replaceState(
-      window.history.state,
-      '',
-      `${window.location.pathname}${resto ? `?${resto}` : ''}${window.location.hash}`,
-    );
+    aggiornaQuery((p) => p.delete('created'));
   }, [event.id]);
   const chiudiRiepilogo = () => {
     forgetCreation(event.id);
@@ -429,12 +430,12 @@ export default function EventManagementClient({
     try {
       await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
       setStatus('ENDED');
-      setActiveTab('dopo');
+      scegliScheda('dopo');
       setFeedback(t('endEventSuccess'));
     } catch {
       toast.error(t('endEventFailed'));
     } finally { setUpdating(false); }
-  }, [event.id, event.moderatorToken, paginaPostEvento.postEventPublic, t, tc, confirm, toast]);
+  }, [event.id, event.moderatorToken, paginaPostEvento.postEventPublic, t, tc, confirm, toast, scegliScheda]);
 
   // «Archivia» a evento concluso (solo lo staff: e' la stessa azione
   // dell'elenco): la pagina pubblica sparisce, i dati restano fino alla
@@ -572,7 +573,7 @@ export default function EventManagementClient({
           onPublish={status === 'DRAFT' ? togglePublish : undefined}
           publishing={updating}
           onPeople={() => {
-            setActiveTab('persone');
+            scegliScheda('persone');
             tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
           onClose={chiudiRiepilogo}
@@ -716,16 +717,20 @@ export default function EventManagementClient({
       )}
 
       {/* ═══ Body ═══ */}
-      {/* Su schermo stretto la colonna con stato e azioni viene prima del
-          contenuto della scheda: sono le cose per cui si apre questa pagina, e
-          in coda costerebbero un'intera scorsa. Su schermo largo torna a
-          destra, nell'ordine di lettura. */}
-      <div className="row g-4">
-        <div className="col-lg-8 order-2 order-lg-1">
+      {/* Su schermo largo le schede a sinistra e, a destra, le azioni e il
+          riepilogo, che restano in vista. Su telefono prima le azioni dello
+          stato (le cose per cui si apre questa pagina), poi le schede, in fondo
+          il riepilogo: la colonna intera in cima spingeva le schede mille pixel
+          piu' giu'. La griglia e' in globals.scss (.event-manage). */}
+      <div className="event-manage">
+        <div className="event-manage__main">
           <div ref={tabsRef}>
-            <TabNav active={activeTab} onChange={setActiveTab} t={td} />
+            <TabNav active={activeTab} onChange={scegliScheda} t={td} />
           </div>
-          <div className="p-4" style={CARD}>
+          {/* Un pannello solo, che cambia contenuto con la scheda: tutte le
+              schede lo controllano, e porta il nome di quella attiva. */}
+          <div className="p-4" style={CARD} role="tabpanel" id="event-tabpanel"
+               aria-labelledby={`event-tab-${activeTab}`} tabIndex={0}>
             {activeTab === 'panoramica' && (
               <OverviewTab
                 event={event}
@@ -762,8 +767,100 @@ export default function EventManagementClient({
         </div>
 
         {/* ═══ Sidebar ═══ */}
-        <div className="col-lg-4 order-1 order-lg-2">
-          <div style={{ position: 'sticky', top: 20 }}>
+        <div className="event-manage__side">
+          <div className="event-manage__actions">
+            {/* Actions */}
+            <div className="p-4 mb-0 mb-lg-3" style={CARD}>
+              <div className="d-grid gap-2">
+                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
+                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
+                    organizza. */}
+                {canStartManually(status) && (
+                  <button type="button"
+                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
+                          onClick={startEvent} disabled={updating}>
+                    <Svg name="video" size={14} /> {t('startEvent')}
+                  </button>
+                )}
+                {/* Un'azione principale per stato: in bozza pubblicare, in
+                    diretta terminare, a evento concluso archiviare. Le altre
+                    restano, in secondo piano. */}
+                {status === 'DRAFT' && (
+                  <button type="button"
+                          className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('publish')}
+                  </button>
+                )}
+                {status === 'LIVE' && (
+                  <button type="button"
+                          className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
+                          onClick={endEvent} disabled={updating}>
+                    {t('endEvent')}
+                  </button>
+                )}
+                {status === 'ENDED' && !viaToken && (
+                  <button type="button"
+                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
+                          onClick={archiveEvent} disabled={updating}>
+                    {t('archive')}
+                  </button>
+                )}
+                {status === 'ARCHIVED' && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={unarchiveEvent} disabled={updating}>
+                    {t('unarchive')}
+                  </button>
+                )}
+                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
+                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
+                <Link href={percorso(editUrl)}
+                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
+                  <Svg name="pencil" size={14} /> {td('editEvent')}
+                </Link>
+                {status === 'PUBLISHED' && (
+                  <button type="button" className="btn btn-outline-warning"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('unpublish')}
+                  </button>
+                )}
+                {/* Solo quando la pagina esiste: in bozza, archiviato o per
+                    una chiamata rapida in corso l'indirizzo risponde «non
+                    trovato». */}
+                {publicPageVisible && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                    <Svg name="external" size={14} /> {t('openPublicPage')}
+                  </a>
+                )}
+                {/* Duplicare crea un evento dello staff: con il solo link del
+                    moderatore la rotta risponde 401. Una chiamata rapida non
+                    ha una «prossima occorrenza». */}
+                {!viaToken && !isInstant && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={duplicateAsNext}
+                          disabled={duplicating}
+                          title={td('duplicateNextHint')}>
+                    <Svg name="copy" size={14} />
+                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
+                  </button>
+                )}
+                {/* In diretta ci sono persone in sala: prima si termina. */}
+                {status !== 'LIVE' && (
+                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
+                                    onDeleted={handleDeleted} />
+                )}
+              </div>
+              {duplicateError && (
+                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
+                  {duplicateError}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="event-manage__summary">
             {/* KPI */}
             <div className="p-4 mb-3" style={CARD}>
               <div className="mb-1" style={EYEBROW}>{td('sidebar.registrations')}</div>
@@ -866,102 +963,34 @@ export default function EventManagementClient({
                 </div>
               </div>
             )}
-
-            {/* Actions */}
-            <div className="p-4 mb-3" style={CARD}>
-              <div className="d-grid gap-2">
-                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
-                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
-                    organizza. */}
-                {canStartManually(status) && (
-                  <button type="button"
-                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
-                          onClick={startEvent} disabled={updating}>
-                    <Svg name="video" size={14} /> {t('startEvent')}
-                  </button>
-                )}
-                {/* Un'azione principale per stato: in bozza pubblicare, in
-                    diretta terminare, a evento concluso archiviare. Le altre
-                    restano, in secondo piano. */}
-                {status === 'DRAFT' && (
-                  <button type="button"
-                          className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
-                          onClick={togglePublish} disabled={updating}>
-                    {t('publish')}
-                  </button>
-                )}
-                {status === 'LIVE' && (
-                  <button type="button"
-                          className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
-                          onClick={endEvent} disabled={updating}>
-                    {t('endEvent')}
-                  </button>
-                )}
-                {status === 'ENDED' && !viaToken && (
-                  <button type="button"
-                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
-                          onClick={archiveEvent} disabled={updating}>
-                    {t('archive')}
-                  </button>
-                )}
-                {status === 'ARCHIVED' && (
-                  <button type="button"
-                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                          onClick={unarchiveEvent} disabled={updating}>
-                    {t('unarchive')}
-                  </button>
-                )}
-                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
-                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
-                <Link href={percorso(editUrl)}
-                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
-                  <Svg name="pencil" size={14} /> {td('editEvent')}
-                </Link>
-                {status === 'PUBLISHED' && (
-                  <button type="button" className="btn btn-outline-warning"
-                          onClick={togglePublish} disabled={updating}>
-                    {t('unpublish')}
-                  </button>
-                )}
-                {/* Solo quando la pagina esiste: in bozza, archiviato o per
-                    una chiamata rapida in corso l'indirizzo risponde «non
-                    trovato». */}
-                {publicPageVisible && (
-                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
-                    <Svg name="external" size={14} /> {t('openPublicPage')}
-                  </a>
-                )}
-                {/* Duplicare crea un evento dello staff: con il solo link del
-                    moderatore la rotta risponde 401. Una chiamata rapida non
-                    ha una «prossima occorrenza». */}
-                {!viaToken && !isInstant && (
-                  <button type="button"
-                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                          onClick={duplicateAsNext}
-                          disabled={duplicating}
-                          title={td('duplicateNextHint')}>
-                    <Svg name="copy" size={14} />
-                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
-                  </button>
-                )}
-                {/* In diretta ci sono persone in sala: prima si termina. */}
-                {status !== 'LIVE' && (
-                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
-                                    onDeleted={handleDeleted} />
-                )}
-              </div>
-              {duplicateError && (
-                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
-                  {duplicateError}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+/**
+ * Cambia i parametri dell'indirizzo senza ricaricare e senza una voce nuova
+ * nella cronologia. Lo stato passato e' `null`: con quello corrente (che
+ * porta il segno interno di Next) il router salterebbe la sincronizzazione,
+ * `useSearchParams` resterebbe indietro e il primo `router.refresh()`
+ * rimetterebbe l'indirizzo vecchio. Safari lancia un errore oltre cento
+ * sostituzioni ravvicinate: l'indirizzo e' un di piu', la pagina va avanti.
+ */
+function aggiornaQuery(cambia: (params: URLSearchParams) => void) {
+  const params = new URLSearchParams(window.location.search);
+  cambia(params);
+  const query = params.toString();
+  try {
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+    );
+  } catch {
+    // Limite del browser alle sostituzioni: resta l'indirizzo di prima.
+  }
 }
 
 // ── TabNav ──
@@ -977,16 +1006,46 @@ function TabNav({ active, onChange, t }: {
     { id: 'dopo', icon: 'video', key: 'tabs.afterEvent' },
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
   ];
+  // Da tastiera, come le schede del sistema: Tab entra sulla scheda attiva
+  // ed esce verso il pannello, le frecce (e Inizio, Fine) spostano il fuoco
+  // da una scheda all'altra, Invio o Spazio la aprono. Aprire a ogni freccia
+  // caricherebbe (con le sue richieste) ogni scheda attraversata.
+  const pulsanti = useRef(new Map<TabId, HTMLButtonElement>());
+  const vaiA = (indice: number) => {
+    const scheda = tabs[(indice + tabs.length) % tabs.length]!;
+    pulsanti.current.get(scheda.id)?.focus();
+  };
   return (
     // Su uno schermo stretto le schede scorrono invece di uscire dalla pagina.
-    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" style={{ borderBottom: 'none' }}>
-      {tabs.map((tab) => {
+    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" aria-label={t('tabs.label')}
+        style={{ borderBottom: 'none' }}>
+      {tabs.map((tab, indice) => {
         const isActive = active === tab.id;
         return (
           <li key={tab.id} className="nav-item" role="presentation">
             <button type="button" role="tab" aria-selected={isActive}
+                    id={`event-tab-${tab.id}`} aria-controls="event-tabpanel"
+                    tabIndex={isActive ? 0 : -1}
+                    ref={(el) => {
+                      if (el) pulsanti.current.set(tab.id, el);
+                      else pulsanti.current.delete(tab.id);
+                    }}
                     className="nav-link d-inline-flex align-items-center gap-2"
                     onClick={() => onChange(tab.id)}
+                    onKeyDown={(e) => {
+                      // Con un modificatore e' una scorciatoia del browser
+                      // (Alt+freccia torna indietro): non la si tocca.
+                      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+                      const passo: Record<string, number> = {
+                        ArrowRight: indice + 1,
+                        ArrowLeft: indice - 1,
+                        Home: 0,
+                        End: tabs.length - 1,
+                      };
+                      if (!(e.key in passo)) return;
+                      e.preventDefault();
+                      vaiA(passo[e.key]!);
+                    }}
                     style={{
                       background: isActive ? '#fff' : 'transparent',
                       color: isActive ? C_PRIMARY : C_MUTED,

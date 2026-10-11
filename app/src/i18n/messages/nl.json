@@ -2517,7 +2517,8 @@
         "people": "Personen",
         "content": "Inhoud",
         "analytics": "Statistieken",
-        "afterEvent": "Na het evenement"
+        "afterEvent": "Na het evenement",
+        "label": "Onderdelen van het evenement"
       },
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",

@@ -2517,7 +2517,8 @@
         "people": "Persuni",
         "content": "Kontenut",
         "analytics": "Statistiċi",
-        "afterEvent": "Wara l-avveniment"
+        "afterEvent": "Wara l-avveniment",
+        "label": "Taqsimiet tal-avveniment"
       },
       "toggles": {
         "unmute": "Parteċipanti poshuma parlare",

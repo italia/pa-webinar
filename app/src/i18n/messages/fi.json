@@ -2517,7 +2517,8 @@
         "people": "Henkilöt",
         "content": "Sisältö",
         "analytics": "Tilastot",
-        "afterEvent": "Tapahtuman jälkeen"
+        "afterEvent": "Tapahtuman jälkeen",
+        "label": "Tapahtuman osiot"
       },
       "toggles": {
         "unmute": "Osallistujat voivat avata mikrofonin",

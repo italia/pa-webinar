@@ -2517,7 +2517,8 @@
         "people": "Personer",
         "content": "Indhold",
         "analytics": "Statistik",
-        "afterEvent": "Efter begivenheden"
+        "afterEvent": "Efter begivenheden",
+        "label": "Begivenhedens sektioner"
       },
       "toggles": {
         "unmute": "Deltagere kan slå mikrofonen til",

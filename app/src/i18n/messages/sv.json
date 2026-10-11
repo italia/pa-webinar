@@ -2517,7 +2517,8 @@
         "people": "Personer",
         "content": "Innehåll",
         "analytics": "Statistik",
-        "afterEvent": "Efter evenemanget"
+        "afterEvent": "Efter evenemanget",
+        "label": "Evenemangets delar"
       },
       "toggles": {
         "unmute": "Deltagare får tala",

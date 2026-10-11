@@ -2517,7 +2517,8 @@
         "people": "Osoby",
         "content": "Obsah",
         "analytics": "Statistiky",
-        "afterEvent": "Po události"
+        "afterEvent": "Po události",
+        "label": "Části události"
       },
       "toggles": {
         "unmute": "Účastníci mohou mluvit",

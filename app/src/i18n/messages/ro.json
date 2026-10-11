@@ -2517,7 +2517,8 @@
         "people": "Persoane",
         "content": "Conținut",
         "analytics": "Statistici",
-        "afterEvent": "După eveniment"
+        "afterEvent": "După eveniment",
+        "label": "Secțiunile evenimentului"
       },
       "toggles": {
         "unmute": "Participanții pot vorbi",

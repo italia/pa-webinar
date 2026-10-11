@@ -2517,7 +2517,8 @@
         "people": "Személyek",
         "content": "Tartalmak",
         "analytics": "Statisztikák",
-        "afterEvent": "Az esemény után"
+        "afterEvent": "Az esemény után",
+        "label": "Az esemény részei"
       },
       "toggles": {
         "unmute": "A résztvevők beszélhetnek",

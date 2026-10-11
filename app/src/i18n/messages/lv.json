@@ -2517,7 +2517,8 @@
         "people": "Personas",
         "content": "Saturs",
         "analytics": "Statistika",
-        "afterEvent": "Pēc pasākuma"
+        "afterEvent": "Pēc pasākuma",
+        "label": "Pasākuma sadaļas"
       },
       "toggles": {
         "unmute": "Dalībnieki var ieslēgt mikrofonu",

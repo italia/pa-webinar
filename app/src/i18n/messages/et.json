@@ -2517,7 +2517,8 @@
         "people": "Inimesed",
         "content": "Sisu",
         "analytics": "Statistika",
-        "afterEvent": "Pärast sündmust"
+        "afterEvent": "Pärast sündmust",
+        "label": "Ürituse jaotised"
       },
       "toggles": {
         "unmute": "Osalejad saavad rääkida",

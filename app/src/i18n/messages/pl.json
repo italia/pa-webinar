@@ -2517,7 +2517,8 @@
         "people": "Osoby",
         "content": "Treści",
         "analytics": "Statystyki",
-        "afterEvent": "Po wydarzeniu"
+        "afterEvent": "Po wydarzeniu",
+        "label": "Sekcje wydarzenia"
       },
       "toggles": {
         "unmute": "Uczestnicy mogą włączyć mikrofon",
