@@ -201,3 +201,126 @@ def test_genera_resoconto_rinnova_il_lease_a_ogni_pezzo(monkeypatch):
     assert pezzi > 1
     assert len(passi) == pezzi + 1
     assert passi[-1] == (40.0, "writing report")
+
+
+def test_run_report_si_ferma_se_il_lavoro_e_gia_chiuso(monkeypatch):
+    from . import client as cli
+    from . import main
+
+    class App:
+        def __init__(self):
+            self.chiamate = 0
+            self.consegnato = False
+
+        def progress(self, job_id, status, attempt=None, **_):
+            assert attempt == 1
+            self.chiamate += 1
+            # Il secondo passo trova il lavoro consegnato da un altro tentativo.
+            return {"status": "RUNNING"} if self.chiamate == 1 else {"status": "DONE"}
+
+        def deliver_report(self, **_):
+            self.consegnato = True
+
+    monkeypatch.setattr(llmmod, "_stub_enabled", lambda: True)
+    job = cli.ClaimResponse(
+        jobId="j",
+        recordingId=None,
+        kind="REPORT",
+        payload={"eventId": "e", "sourceLanguage": "it", "targetLanguages": ["en"]},
+        attempts=1,
+        leaseExpiresAt="2026-01-01T00:00:00Z",
+        sourceDownloadUrl="",
+        uploadTargets={},
+        inputs=[],
+        reportInput={"language": "it"},
+        providerHints=cli.ProviderHints(),
+    )
+    app = App()
+    with pytest.raises(main.LavoroChiuso):
+        main.run_report(app, job)
+    assert app.consegnato is False
+
+
+def test_run_one_chiude_pulito_se_il_lavoro_e_gia_chiuso(monkeypatch):
+    from . import client as cli
+    from . import main
+
+    stati = []
+
+    class App:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def claim(self):
+            return cli.ClaimResponse(
+                jobId="j",
+                recordingId=None,
+                kind="REPORT",
+                payload={"eventId": "e", "sourceLanguage": "it", "targetLanguages": []},
+                attempts=1,
+                leaseExpiresAt="2026-01-01T00:00:00Z",
+                sourceDownloadUrl="",
+                uploadTargets={},
+                inputs=[],
+                reportInput={"language": "it"},
+                providerHints=cli.ProviderHints(),
+            )
+
+        def progress(self, job_id, status, **_):
+            stati.append(status)
+            return {"status": "RUNNING", "superseded": True} if len(stati) > 1 else {"status": "RUNNING"}
+
+    monkeypatch.setattr(cli, "AppClient", App)
+    assert main.run_one() == 0
+    assert "FAILED" not in stati
+
+
+def test_run_report_consegnato_da_un_altro_tentativo_si_ferma(monkeypatch):
+    from . import client as cli
+    from . import main
+
+    class App:
+        def progress(self, *_a, **_k):
+            return {"status": "RUNNING"}
+
+        def deliver_report(self, **_):
+            return {"ok": False, "superseded": True}
+
+    monkeypatch.setattr(llmmod, "_stub_enabled", lambda: True)
+    job = cli.ClaimResponse(
+        jobId="j",
+        recordingId=None,
+        kind="REPORT",
+        payload={"eventId": "e", "sourceLanguage": "it", "targetLanguages": []},
+        attempts=1,
+        leaseExpiresAt="2026-01-01T00:00:00Z",
+        sourceDownloadUrl="",
+        uploadTargets={},
+        inputs=[],
+        reportInput={"language": "it"},
+        providerHints=cli.ProviderHints(),
+    )
+    with pytest.raises(main.LavoroChiuso):
+        main.run_report(App(), job)
+
+
+def test_deliver_report_manda_il_numero_del_claim_e_restituisce_la_risposta():
+    import httpx
+
+    from . import client as cli
+
+    app = cli.AppClient.__new__(cli.AppClient)
+    app.worker_id = "w"
+    inviati = []
+
+    def risposta(request):
+        inviati.append(json.loads(request.content))
+        return httpx.Response(200, json={"ok": False, "closed": True, "status": "FAILED"})
+
+    app._client = httpx.Client(base_url="http://portale", transport=httpx.MockTransport(risposta))
+    esito = app.deliver_report(job_id="j", narratives={"it": {}}, model_id="m", attempt=2)
+    assert esito["closed"] is True
+    assert inviati[0]["attempt"] == 2

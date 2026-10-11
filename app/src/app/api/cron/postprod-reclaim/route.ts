@@ -64,6 +64,8 @@ export const GET = withErrorHandling(async (request) => {
     UPDATE postprod_jobs
     SET status = 'FAILED',
         completed_at = NOW(),
+        -- Un resoconto fallito non tiene la copia dei suoi numeri.
+        payload = CASE WHEN kind = 'REPORT' THEN payload - 'metrics' ELSE payload END,
         last_error = COALESCE(last_error, 'exceeded max attempts'),
         updated_at = NOW()
     WHERE status = 'PENDING'

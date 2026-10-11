@@ -17,6 +17,8 @@ const r = vi.hoisted(() => ({
 vi.mock('@/lib/feedback/event-feedback-report', () => ({ buildEventFeedbackReport: r.valutazioni }));
 vi.mock('@/lib/report/metrics', () => ({ metricheResoconto: r.metriche }));
 vi.mock('@/lib/report/input', () => ({ ingressoResoconto: r.ingresso }));
+const scrivi = vi.hoisted(() => vi.fn(async () => true));
+vi.mock('@/lib/report/job', () => ({ scriviNumeriResoconto: scrivi }));
 vi.mock('@/lib/ai/glossary', () => ({ glossaryForEvent: vi.fn(async () => []), glossaryHints: () => [] }));
 
 import { prisma } from '@/lib/db';
@@ -99,9 +101,23 @@ describe('POST /api/internal/postprod-claim', () => {
     });
     // Le valutazioni si leggono una volta e servono a numeri e testo.
     expect(r.valutazioni).toHaveBeenCalledOnce();
-    expect(fn(prisma.postprodJob.update).mock.calls[0]![0].data.payload).toMatchObject({
-      eventId,
-      metrics: { version: 1, durationSec: 3600 },
-    });
+    expect(scrivi).toHaveBeenCalledWith('66666666-7777-4888-8999-000000000000', 1, { version: 1, durationSec: 3600 });
   });
+
+  it('un lavoro preso nel frattempo da un claim successivo (o cancellato) non si rifa\'', async () => {
+    fn(prisma.$queryRaw).mockResolvedValueOnce([
+      {
+        id: '66666666-7777-4888-8999-000000000000',
+        recording_id: null,
+        kind: 'REPORT',
+        payload: { eventId: '11111111-2222-4333-8444-555555555555', sourceLanguage: 'it', targetLanguages: [] },
+        attempts: 2,
+        next_attempt_at: new Date(),
+        depends_on_id: null,
+      },
+    ]);
+    scrivi.mockResolvedValueOnce(false);
+    expect((await claim({ workerId: 'w-cpu', kinds: ['REPORT'] })).status).toBe(204);
+  });
+
 });

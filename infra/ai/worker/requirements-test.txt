@@ -2,9 +2,11 @@
 #
 # I moduli sotto test importano torch/whisperx/pyannote solo DENTRO le funzioni,
 # non a livello di modulo: i test non li toccano. Restano solo le due leggere
-# che compaiono in cima — numpy (align, xcorr, merge tracce) e httpx (il client
-# del LLM). Cosi' il job CI non deve tirare ~2 GB di CUDA per verificare che
-# l'allineamento dei sottotitoli non regredisca.
+# che compaiono in cima — numpy (align, xcorr, merge tracce), httpx (il client
+# del LLM) e pydantic (la forma del claim, in client.py, che i test del worker
+# e del resoconto importano). Cosi' il job CI non deve tirare ~2 GB di CUDA
+# per verificare che l'allineamento dei sottotitoli non regredisca.
 numpy<2
 httpx==0.28.1
+pydantic==2.9.2
 pytest

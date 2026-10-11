@@ -802,6 +802,11 @@ def run_archive(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         )
 
 
+class LavoroChiuso(Exception):
+    """Il lavoro e' gia' chiuso o l'ha ripreso un altro worker: ci si ferma
+    senza segnalare un fallimento."""
+
+
 def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
     """Il resoconto dell'evento: il testo nella lingua dell'evento e nelle
     lingue chieste, consegnato al portale che lo unisce ai numeri."""
@@ -809,25 +814,28 @@ def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
     if not inp:
         raise RuntimeError("REPORT without reportInput")
     hints = job.providerHints
-    app.progress(job.jobId, "RUNNING", percent=10.0, message="writing report")
+
+    def passo(percent: float, message: str) -> None:
+        # Se il lavoro e' chiuso o l'ha ripreso un altro worker (dopo un lease
+        # scaduto) non serve continuare a usare il modello.
+        risposta = app.progress(job.jobId, "RUNNING", percent=percent, message=message, attempt=job.attempts) or {}
+        if risposta.get("superseded") or risposta.get("status") in ("DONE", "FAILED"):
+            raise LavoroChiuso(f"report job {risposta.get('status')}, taken over: {bool(risposta.get('superseded'))}")
+
+    passo(10.0, "writing report")
     sorgente = job.payload.get("sourceLanguage") or inp.get("language") or "it"
     inp = {**inp, "language": sorgente}
     resoconto = repmod.genera_resoconto(
         inp,
         base_url=hints.llmBaseUrl,
         model_id=hints.llmModelId,
-        avanzamento=lambda pct, msg: app.progress(job.jobId, "RUNNING", percent=pct, message=msg),
+        avanzamento=passo,
     )
     narrative: Dict[str, Dict[str, Any]] = {sorgente: resoconto}
     destinazioni = [l for l in (job.payload.get("targetLanguages") or []) if l != sorgente]
     glossario = glmod.parse(hints.glossary)
     for i, lingua in enumerate(destinazioni):
-        app.progress(
-            job.jobId,
-            "RUNNING",
-            percent=60.0 + 35.0 * i / max(1, len(destinazioni)),
-            message=f"translating report to {lingua}",
-        )
+        passo(60.0 + 35.0 * i / max(1, len(destinazioni)), f"translating report to {lingua}")
         try:
             tradotto = repmod.traduci_resoconto(
                 resoconto, lingua, base_url=hints.llmBaseUrl, model_id=hints.llmModelId, glossario=glossario
@@ -838,7 +846,12 @@ def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             tradotto = None
         if tradotto:
             narrative[lingua] = tradotto
-    app.deliver_report(job_id=job.jobId, narratives=narrative, model_id=hints.llmModelId)
+    esito = (
+        app.deliver_report(job_id=job.jobId, narratives=narrative, model_id=hints.llmModelId, attempt=job.attempts)
+        or {}
+    )
+    if esito.get("superseded") or esito.get("alreadyDelivered") or esito.get("closed"):
+        raise LavoroChiuso(f"report job not delivered by this attempt: {esito}")
 
 
 def run_one() -> int:
@@ -857,7 +870,7 @@ def run_one() -> int:
         )
 
         try:
-            app.progress(job.jobId, "RUNNING", percent=5.0, message="claimed")
+            app.progress(job.jobId, "RUNNING", percent=5.0, message="claimed", attempt=job.attempts)
             if job.kind == "TRANSCRIBE":
                 run_transcribe(app, job)
             elif job.kind == "TRANSCRIBE_MULTITRACK":
@@ -880,8 +893,11 @@ def run_one() -> int:
             else:
                 raise RuntimeError(f"unknown kind: {job.kind}")
 
-            app.progress(job.jobId, "DONE")
+            app.progress(job.jobId, "DONE", attempt=job.attempts)
             log.info("job %s done", job.jobId)
+            return 0
+        except LavoroChiuso as e:
+            log.info("job %s stopped: %s", job.jobId, e)
             return 0
         except Exception as e:  # pylint: disable=broad-except
             log.exception("job failed: %s", e)
@@ -890,6 +906,7 @@ def run_one() -> int:
                     job.jobId,
                     "FAILED",
                     error=f"{type(e).__name__}: {e}"[:1900],
+                    attempt=job.attempts,
                 )
             except Exception as e2:  # pylint: disable=broad-except
                 log.error("could not report FAILED: %s", e2)

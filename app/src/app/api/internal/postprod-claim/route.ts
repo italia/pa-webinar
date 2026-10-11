@@ -51,6 +51,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { postprodJobAttemptsTotal } from '@/lib/metrics';
 import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
 import { ingressoResoconto } from '@/lib/report/input';
+import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
 
 export const dynamic = 'force-dynamic';
@@ -632,11 +633,10 @@ async function rispostaResoconto(
       )
     : null;
   if (!metrics || !reportInput) throw new NotFoundError('Event');
-  // I numeri restano nel lavoro: il risultato li rilegge di qui, non dal worker.
-  await prisma.postprodJob.update({
-    where: { id: row.id },
-    data: { payload: { ...payload, metrics } as unknown as Prisma.InputJsonValue },
-  });
+  // I numeri restano nel lavoro: la consegna li rilegge di qui, non dal
+  // worker. Se nel frattempo il lavoro e' stato preso da un claim successivo
+  // o cancellato, non si rifa'.
+  if (!(await scriviNumeriResoconto(row.id, row.attempts, metrics))) return new Response(null, { status: 204 });
   const siteSettings = await prisma.siteSetting.findUnique({
     where: { id: 'singleton' },
     select: { aiLlmProvider: true },

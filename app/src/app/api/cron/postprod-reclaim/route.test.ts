@@ -48,4 +48,12 @@ describe('GET /api/cron/postprod-reclaim', () => {
       in: ['r-trascrizione'],
     });
   });
+
+  it('chiudendo un resoconto esaurito ne toglie la copia dei numeri', async () => {
+    db.$queryRaw.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+    await GET(req() as never, ctx);
+    const sql = (db.$queryRaw.mock.calls[1]![0] as string[]).join('?');
+    expect(sql).toContain("payload = CASE WHEN kind = 'REPORT' THEN payload - 'metrics' ELSE payload END");
+  });
+
 });

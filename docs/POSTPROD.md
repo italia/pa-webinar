@@ -1635,7 +1635,17 @@ requested language, with the glossary; a translation that fails leaves that
 language out. The worker posts the result to `POST /api/internal/event-report`
 (`x-api-key`), which normalises the text (`app/src/lib/report/normalize.ts`),
 joins it to the figures from the job, and freezes it on the event
-(`Event.postEventReport`, `postEventReportAt`) unpublished.
+(`Event.postEventReport`, `postEventReportAt`) unpublished. The same
+transaction takes the figures from the job and closes it as done
+(`app/src/lib/report/job.ts`): a `REPORT` job is done only when its report is
+saved, a closed job never reopens, and every closure removes the figures in
+the same update. Every claim increments the job's `attempts`, and the
+worker sends that number back with its progress, failure and delivery: a
+message counts only while the number is still the job's, and the same update
+checks it. If a lease expires and another worker claims the job, the worker
+that lost it learns so from the next answer and stops without reporting a
+failure, so the text and the figures of a report always come from the same
+claim.
 
 **Publishing.** Staff read the report in the panel's preview, in each
 language, and publish it with **Show the report on the event page**

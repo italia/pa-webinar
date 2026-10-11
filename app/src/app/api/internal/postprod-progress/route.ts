@@ -23,6 +23,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { progressPayloadSchema } from '@/lib/ai/schemas';
+import { avanzamentoResoconto } from '@/lib/report/job';
 import {
   postprodJobDurationSeconds,
   postprodJobsCompletedTotal,
@@ -73,6 +74,32 @@ export const POST = withErrorHandling(async (request) => {
   });
   if (!job) throw new NotFoundError('PostprodJob');
 
+  // Fetch the cap from SiteSetting (default 5) so an operator can
+  // tune retries without a code change.
+  const tentativiMassimi = async () =>
+    (
+      await prisma.siteSetting.findUnique({
+        where: { id: 'singleton' },
+        select: { aiJobMaxAttempts: true },
+      })
+    )?.aiJobMaxAttempts ?? 5;
+
+  // Il resoconto dell'evento ha regole sue (lib/report/job): lo conclude solo
+  // la consegna, un lavoro chiuso non si riapre, e vale solo il messaggio del
+  // worker che ha il lease.
+  if (job.kind === 'REPORT') {
+    const { chiusoOra, ...risposta } = await avanzamentoResoconto(job, parsed, {
+      tentativiMassimi,
+      ritardoMs: nextAttemptDelayMs(job.attempts),
+    });
+    if (chiusoOra) {
+      postprodJobsCompletedTotal.labels(job.kind, risposta.status).inc();
+      const secs = job.startedAt ? (Date.now() - job.startedAt.getTime()) / 1000 : 0;
+      if (secs > 0) postprodJobDurationSeconds.labels(job.kind).observe(secs);
+    }
+    return Response.json({ ok: true, ...risposta });
+  }
+
   if (parsed.status === 'RUNNING') {
     await prisma.postprodJob.update({
       where: { id: job.id },
@@ -87,13 +114,7 @@ export const POST = withErrorHandling(async (request) => {
   }
 
   if (parsed.status === 'FAILED') {
-    // Fetch the cap from SiteSetting (default 5) so an operator can
-    // tune retries without a code change.
-    const site = await prisma.siteSetting.findUnique({
-      where: { id: 'singleton' },
-      select: { aiJobMaxAttempts: true },
-    });
-    const maxAttempts = site?.aiJobMaxAttempts ?? 5;
+    const maxAttempts = await tentativiMassimi();
     const terminal = job.attempts >= maxAttempts;
 
     await prisma.postprodJob.update({

@@ -244,6 +244,10 @@ export const progressPayloadSchema = z.object({
   message: z.string().max(500).optional(),
   /** When status=FAILED, the error reason (stored as last_error). */
   error: z.string().max(2_000).optional(),
+  /** Il worker che manda il messaggio (lo stesso del claim). */
+  workerId: z.string().max(200).optional(),
+  /** Il numero del claim (`attempts` della risposta): per il resoconto vale solo quello corrente. */
+  attempt: z.number().int().min(1).optional(),
 });
 
 export type ProgressPayload = z.infer<typeof progressPayloadSchema>;

@@ -167,14 +167,17 @@ export async function accodaResoconto(
  * i numeri calcolati al claim (dal payload del lavoro, non dal worker). Un
  * resoconto nuovo non e' pubblicato finche' lo staff non lo rilegge.
  */
-export async function salvaResoconto(opts: {
-  eventId: string;
-  sourceLanguage: string;
-  metrics: ReportMetrics | null;
-  narratives: Record<string, unknown>;
-  modelId: string | null;
-  modelVersion: string | null;
-}): Promise<StoredReport | null> {
+export async function salvaResoconto(
+  opts: {
+    eventId: string;
+    sourceLanguage: string;
+    metrics: ReportMetrics | null;
+    narratives: Record<string, unknown>;
+    modelId: string | null;
+    modelVersion: string | null;
+  },
+  db: Prisma.TransactionClient | typeof prisma = prisma
+): Promise<StoredReport | null> {
   const narrative: Record<string, ReportNarrative> = {};
   for (const [lingua, grezzo] of Object.entries(opts.narratives)) {
     if (!languageCodeSchema.safeParse(lingua).success) continue;
@@ -190,7 +193,7 @@ export async function salvaResoconto(opts: {
     metrics: opts.metrics,
     narratives: narrative,
   };
-  await prisma.event.update({
+  await db.event.update({
     where: { id: opts.eventId },
     data: {
       postEventReport: resoconto as unknown as Prisma.InputJsonValue,

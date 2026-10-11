@@ -179,8 +179,14 @@ class AppClient:
         percent: Optional[float] = None,
         message: Optional[str] = None,
         error: Optional[str] = None,
-    ) -> None:
-        payload: Dict[str, Any] = {"jobId": job_id, "status": status}
+        attempt: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """La risposta del portale: lo stato del lavoro dopo l'aggiornamento e,
+        per il resoconto, se un claim successivo l'ha ripreso (``superseded``).
+        ``attempt`` e' il numero del claim (``attempts`` della risposta)."""
+        payload: Dict[str, Any] = {"jobId": job_id, "status": status, "workerId": self.worker_id}
+        if attempt is not None:
+            payload["attempt"] = attempt
         if percent is not None:
             payload["percent"] = percent
         if message is not None:
@@ -189,6 +195,11 @@ class AppClient:
             payload["error"] = error
         r = self._client.post("/api/internal/postprod-progress", json=payload)
         r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
 
     def register_artifact(
         self,
@@ -235,15 +246,26 @@ class AppClient:
         narratives: Dict[str, Dict[str, Any]],
         model_id: Optional[str],
         model_version: Optional[str] = None,
-    ) -> None:
-        """Consegna il resoconto dell'evento (lavoro REPORT): il testo per lingua."""
+        attempt: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Consegna il resoconto dell'evento (lavoro REPORT): il testo per lingua.
+        La risposta dice se lo aveva gia' consegnato un altro tentativo
+        (``alreadyDelivered``) o se il lease e' passato a un altro worker
+        (``superseded``) o se il lavoro e' gia' fallito (``closed``)."""
         payload: Dict[str, Any] = {"jobId": job_id, "narratives": narratives}
+        if attempt is not None:
+            payload["attempt"] = attempt
         if model_id is not None:
             payload["modelId"] = model_id
         if model_version is not None:
             payload["modelVersion"] = model_version
         r = self._client.post("/api/internal/event-report", json=payload)
         r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
 
 
 # ---------------------------------------------------------------------------
