@@ -18,6 +18,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   faseRegistratoreStabile,
@@ -74,6 +75,7 @@ import { isHumanParticipant } from '@/lib/jitsi/participants';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
+import { eventAdminPath } from '@/lib/events/admin-links';
 
 interface EventInfo {
   id: string;
@@ -297,6 +299,7 @@ export default function LiveEventClient({
   whiteboardInfraReady = false,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
+  const tApi = useTranslations('apiErrors');
   const tc = useTranslations('common');
   const tf = useTranslations('feedback');
   const router = useRouter();
@@ -684,7 +687,17 @@ export default function LiveEventClient({
         setError(
           data.code === 'GUEST_ACCESS_DISABLED'
             ? t('guestAccessDisabled')
-            : (data.error ?? t('connectionError')),
+            : // Per chi entra, un 401/403/404 vuol dire un link che non vale
+              // (revocato, sbagliato, di un evento cancellato), non permessi o
+              // sessioni come in amministrazione.
+              messaggioErroreApi(res.status, tApi, t('connectionError'), {
+                400: t('invalidToken'),
+                401: t('invalidToken'),
+                403: t('invalidToken'),
+                404: t('invalidToken'),
+                409: t('notOpenNow'),
+                422: t('nameRequired'),
+              }),
         );
         setPhase('error');
         return;
@@ -714,6 +727,7 @@ export default function LiveEventClient({
     initialDisplayName,
     router,
     t,
+    tApi,
     markEnded,
     joinPrefs,
     consensiRegistrati,
@@ -1351,24 +1365,12 @@ export default function LiveEventClient({
 
   // «Termina evento» dalla scheda Regia: stessa fine di «Termina per
   // tutti», segnata prima che l'hangup faccia arrivare `readyToClose`. Chi ha
-  // il link principale passa poi alla gestione dell'evento: il timer sta qui,
-  // nella sala, che resta montata mentre la Regia sparisce con la chiamata.
-  const vaiAllaGestioneRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (vaiAllaGestioneRef.current) clearTimeout(vaiAllaGestioneRef.current);
-    },
-    [],
-  );
+  // il link principale resta sulla schermata di chiusura, che porta i link a
+  // quello che viene dopo (registrazione e resoconto, statistiche).
   const handleEndedFromControls = useCallback(() => {
     userHangupRef.current = true;
     markEnded();
-    if (isPrimaryModerator) {
-      vaiAllaGestioneRef.current = setTimeout(() => {
-        router.push(percorso(`/admin/events/${event.id}?token=${token}`));
-      }, 2000);
-    }
-  }, [markEnded, isPrimaryModerator, router, event.id, token]);
+  }, [markEnded]);
 
   // I comandi della registrazione e il timer degli interventi, montati una
   // volta: la striscia del tempo, la scheda Regia e la fascia del timer per il
@@ -1618,7 +1620,9 @@ export default function LiveEventClient({
           </span>
           <p className="live-exit__event">{exitEventTitle}</p>
           <h1 className="h3 mb-2">{t('eventEnded')}</h1>
-          <p className="live-exit__message">{t('eventEndedMessage')}</p>
+          <p className="live-exit__message">
+            {isPrimaryModerator ? t('eventEndedModerator') : t('eventEndedMessage')}
+          </p>
 
           {/* La valutazione dentro la scheda: comunque sia finita la call
               (fine dall'orario, da chi modera, rete caduta a evento chiuso). */}
@@ -1626,7 +1630,31 @@ export default function LiveEventClient({
             <PostEventFeedback eventSlug={event.slug} {...feedbackIdentity} mode="inline" />
           )}
 
-          <div className="live-exit__actions">{backLink}</div>
+          {/* Chi conduce trova subito quello che serve dopo: i numeri, la
+              registrazione e il resoconto, la pagina pubblica. */}
+          {isPrimaryModerator ? (
+            <div className="live-exit__actions live-exit__actions--column">
+              <Link href={percorso(eventAdminPath(event.id, { viaToken: token, tab: 'dopo' }))}>
+                <Button color="primary" tag="span">
+                  {t('endLinks.after')}
+                </Button>
+              </Link>
+              <Link href={percorso(eventAdminPath(event.id, { viaToken: token, tab: 'statistiche' }))}>
+                <Button color="primary" outline tag="span">
+                  {t('endLinks.stats')}
+                </Button>
+              </Link>
+              {exitHref !== '/' && (
+                <Link href={percorso(exitHref)}>
+                  <Button color="primary" outline tag="span">
+                    {t('endLinks.publicPage')}
+                  </Button>
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="live-exit__actions">{backLink}</div>
+          )}
         </div>
       </div>
     );

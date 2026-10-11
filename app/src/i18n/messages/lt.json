@@ -89,7 +89,8 @@
     "language": "Kalba",
     "switchLanguage": "Pakeisti kalbą",
     "skipToContent": "Pereiti prie turinio",
-    "skipToFooter": "Pereiti prie poraštės"
+    "skipToFooter": "Pereiti prie poraštės",
+    "mainLabel": "Pagrindinė navigacija"
   },
   "header": {
     "followUs": "Sekite mus"
@@ -301,7 +302,7 @@
       "library": "Paskelbti bibliotekoje",
       "libraryHelp": "Kaip pirmiau, o be to renginys rodomas viešoje vaizdo įrašų bibliotekoje (reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo).",
       "archive": "Archyvuoti (privatu)",
-      "archiveHelp": "Pasibaigusio renginio puslapis nebus viešas (404). Duomenys saugomi iki saugojimo termino pabaigos, paskui ištrinami.",
+      "archiveHelp": "Pasibaigusio renginio puslapis nebus matomas viešai. Duomenys saugomi iki saugojimo laikotarpio pabaigos, tada ištrinami.",
       "genAi": "Generuoti DI transkripciją ir santrauką iš įrašo (kai baigsis apdorojimas)",
       "back": "Atgal",
       "confirm": "Užbaigti renginį"
@@ -572,7 +573,15 @@
       "show": "Rodyti subtitrus",
       "hide": "Slėpti subtitrus",
       "toggle": "Automatiniai subtitrai"
-    }
+    },
+    "eventEndedModerator": "Renginys baigėsi. Žemiau rasite statistiką ir, jei renginys buvo įrašytas, įrašą ir ataskaitą.",
+    "endLinks": {
+      "after": "Įrašas ir ataskaita",
+      "stats": "Renginio statistika",
+      "publicPage": "Viešasis renginio puslapis"
+    },
+    "notOpenNow": "Kambarys šiuo metu neatidarytas.",
+    "nameRequired": "Trūksta vardo, kuriuo prisijungsite: grįžkite ir jį įrašykite."
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -1166,7 +1175,7 @@
         "signing": "Ruošiama...",
         "uploading": "Įkeliama {progress}%",
         "uploaded": "Įkėlimas baigtas",
-        "uploadHint": "Palaikomi formatai: MP4, WebM, MOV, M4V. Didžiausias dydis 5 GB. Įkėlimas vyksta tiesiai į saugyklą (Azure Blob), niekas neeina per mūsų serverius.",
+        "uploadHint": "Palaikomi formatai: MP4, WebM, MOV, M4V. Didžiausias dydis 5 GB. Failas keliauja tiesiai į vaizdo įrašų archyvą, nepereidamas per portalą.",
         "step2Title": "2. Publikacijos metaduomenys",
         "titleIt": "Pavadinimas (italų k.)",
         "titleEn": "Pavadinimas (anglų k., neprivaloma)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Neprisijungė",
     "deleteSuccess": "Renginys ištrintas",
     "publishSuccess": "Renginys paskelbtas",
-    "unpublishSuccess": "Renginio paskelbimas atšauktas",
+    "unpublishSuccess": "Paskelbimas atšauktas",
     "startEvent": "Pradėti renginį",
     "startEventSuccess": "Renginys pradėtas! Laukiantys dalyviai bus automatiškai nukreipti.",
     "startEventConfirmTitle": "Pradėti renginį?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maksimalus dalyvių skaičius",
       "expectedParticipants": "Numatomi dalyviai (vertinimas)",
       "expectedParticipantsHint": "Tik vertinimas infrastruktūros dydžio nustatymui. Tai nėra griežta riba: registracijos virš šio skaičiaus priimamos, infrastruktūra automatiškai išsiplečia.",
-      "expectedSenderRatio": "Numatomas siuntėjų santykis",
-      "expectedSenderRatioInherit": "Numatytasis svetainės",
-      "expectedSenderRatioHint": "Dalyvių, turinčių įjungtą mikrofoną ar vaizdo kamerą, procentinė dalis. Klasikinis vebinaras 10–20 %, apskritasis stalas 50–100 %. Palikite tuščią, kad būtų paveldėtas svetainės numatytasis.",
+      "expectedSenderRatio": "Kalbančiųjų dalis",
+      "expectedSenderRatioInherit": "Svetainės reikšmė",
+      "expectedSenderRatioHint": "Dalyvių, kurių mikrofonas ar kamera įjungti, procentas. Klasikinis internetinis seminaras 10-20 %, apskritasis stalas 50-100 %. Palikite tuščią, kad būtų naudojama svetainės reikšmė.",
       "jvbPreview": {
-        "title": "Numatoma JVB talpa",
-        "pod": "JVB pod",
-        "pods": "JVB pod",
-        "senders": "Siuntėjai",
-        "receivers": "Gavėjai",
-        "effectiveRatio": "Faktinis santykis",
-        "inherited": "paveldėtas",
-        "presetLabel": "Šablonas",
+        "title": "Vaizdo tiltų įvertis",
+        "pod": "vaizdo tiltas",
+        "pods": "vaizdo tiltai",
+        "senders": "Su mikrofonu ar kamera",
+        "receivers": "Tik klausosi",
+        "effectiveRatio": "Kalbančiųjų dalis",
+        "inherited": "svetainės reikšmė",
+        "presetLabel": "Profilis",
         "preset": {
           "webinar": "Vebinaras",
           "meeting": "Susitikimas",
-          "workshop": "Praktinis seminaras",
-          "allHands": "Visi siuntėjai"
+          "workshop": "Dirbtuvės",
+          "allHands": "Kalba visi"
         },
-        "clearPreset": "Naudoti svetainės numatytąjį",
-        "atCeiling": "didžiausia riba {max}",
-        "videoDisabled": "Vaizdas išjungtas: visi dalyviai skaičiuojami kaip gavėjai.",
-        "warnInherited": "Esant {participants} dalyvių ir paveldėtam santykiui ({defaultPct} %), vertinimas remiasi svetainės numatytuoju. Dideliems renginiams patartina nustatyti aiškią vertę (vebinaras 5–20 %, susitikimas 30 %, praktinis seminaras 60 %).",
-        "warnCeiling": "Vertinimas pasiekė sukonfigūruotą didžiausią ribą ({max} pod). Jei reali dalyvių ar siuntėjų skaičius viršija vertinimą, tiltai gali persipildyti. Apsvarstykite ribos didinimą arba maxParticipants mažinimą."
+        "clearPreset": "Naudoti svetainės reikšmę",
+        "atCeiling": "daugiausia {max}",
+        "videoDisabled": "Vaizdas išjungtas: visi dalyviai laikomi klausytojais.",
+        "warnInherited": "Su {participants} dalyviais ir svetainės dalimi ({defaultPct} %) įvertis yra apytikslis. Dideliems renginiams verta ją nurodyti: internetinis seminaras 5-20 %, susitikimas 30 %, dirbtuvės 60 %.",
+        "warnCeiling": "Įvertis pasiekė nustatytą maksimumą ({max} vaizdo tiltų). Jei kalbės daugiau žmonių nei tikėtasi, tiltai gali būti perkrauti: apsvarstykite galimybę padidinti ribą arba sumažinti didžiausią dalyvių skaičių."
       },
       "gracePeriod": "Renginio pabaiga (švelnus išėjimas)",
       "gracePeriodInherit": "Naudoti svetainės numatytąjį",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Įkelti esamą įrašą",
-      "subtitle": "Jei jau turite renginio vaizdo failą (pvz., MsTeams įrašą), įkelkite jį čia: jis bus rodomas kaip oficialus įrašas viešajame puslapyje.",
+      "subtitle": "Jei jau turite renginio vaizdo įrašo failą (pavyzdžiui, įrašytą kita platforma), įkelkite jį čia: jis bus rodomas kaip oficialus įrašas viešajame puslapyje.",
       "fileLabel": "Vaizdo failas",
       "upload": "Įkelti ir susieti",
       "signing": "Ruošiama…",
       "uploading": "Įkeliama {progress}%",
       "attaching": "Susiejama su renginiu…",
-      "hint": "Formatai: MP4, WebM, MOV, M4V. Iki 5 GB. Įkėlimas vyksta tiesiai į Azure saugyklą.",
+      "hint": "Formatai: MP4, WebM, MOV, M4V. Iki 5 GB. Failas keliauja tiesiai į vaizdo įrašų archyvą, nepereidamas per portalą.",
       "errors": {
         "fileTooLarge": "Failas viršija 5 GB ribą.",
         "unsupportedType": "Nepalaikomas formatas. Įkelkite MP4, WebM, MOV arba M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Renginys dar nesibaigė: statistika yra dalinė ir atnaujinama realiuoju laiku.",
       "cappedNote": "Labai didelis renginys: dalis rodiklių apskaičiuota pagal imtį (pasiekta eilučių riba).",
       "scoreTitle": "Dėmesio rodiklis",
-      "adminOnly": "tik administratoriams",
+      "adminOnly": "nevieša",
       "scoreProxy": "0–100 indeksas, rodantis, kiek auditorija dalyvavo. Tai netiesioginis dalyvavimo rodiklis, o ne kognityvinio dėmesio matas – vertinkite jį atsižvelgdami į renginio formatą (paskaita ar dirbtuvės), niekada kaip kokybės pažymį.",
       "scoreUnavailable": "Nepakanka duomenų rodikliui apskaičiuoti.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Nepavyko įkelti transkripcijos (HTTP {code}).",
       "editNotReady": "Šiam įrašui transkripcijos dar nėra. Paleiskite (arba paleiskite iš naujo) DI apdorojimą viršuje esančiais valdikliais: transkripcija yra pirmasis žingsnis, paskui čia galėsite ją pataisyti ir sukurti santrauką bei vertimus.",
       "editProcessing": "Vyksta DI apdorojimas: transkripcija čia pasirodys jam pasibaigus. Atnaujinkite puslapį po kelių minučių.",
-      "editSessionExpired": "Administratoriaus sesija baigėsi. Iš naujo įkelkite puslapį ir vėl prisijunkite, kad galėtumėte redaguoti transkripciją.",
+      "editSessionExpired": "Sesija baigėsi. Įkelkite puslapį iš naujo ir prisijunkite, kad galėtumėte redaguoti transkripciją.",
       "editEmpty": "Redaguojamų segmentų nėra",
       "editSpeakerNone": "— nėra —",
       "editSave": "Išsaugoti pakeitimus",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archyvas",
       "manageTabReliability": "Patikimumas",
       "manageLoading": "Įkeliama…",
-      "archivePiiNote": "Atskiri kiekvieno dalyvio garso takeliai yra jautrūs asmens duomenys (atskirtas balsas): šis skyrius prieinamas tik administratoriams ir moderatoriams ir niekada nerodomas viešai.",
+      "archivePiiNote": "Atskiras kiekvieno dalyvio garso takelis yra jautrūs asmens duomenys (išskirtas balsas): šis skyrius skirtas renginį tvarkantiems asmenims ir niekada nėra viešas.",
       "archiveNoTracks": "Šiam įrašui atskirų dalyvių takelių nėra (kelių takelių įrašymas neįjungtas arba takeliai jau ištrinti dėl BDAR duomenų kiekio mažinimo).",
       "archivePlayerTitle": "Perklausa pagal kalbėtoją",
       "archiveAudioHint": "Grotuvo parinkikliu „Garsas“ klausykitės bendro mikso arba atskiro dalyvio takelio sinchroniškai su vaizdu.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Vyksta",
       "ENDED": "Pasibaigė",
       "ARCHIVED": "Archyvuotas"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Dar # renginys} few {Dar # renginiai} many {Dar # renginio} other {Dar # renginių}}",
+    "noEvents": "Šiuo laikotarpiu renginių nėra",
+    "weekShort": "Sav."
   },
   "footer": {
     "privacy": "Privatumo politika",
@@ -4880,12 +4892,29 @@
     "yes": "Taip",
     "no": "Ne",
     "scaleValue": "{value} iš {max}",
-    "answerOne": "Kad išsiųstumėte, atsakykite bent į vieną klausimą."
+    "answerOne": "Kad išsiųstumėte, atsakykite bent į vieną klausimą.",
+    "pageTitle": "Klausimynas"
   },
   "notFound": {
     "title": "Puslapis nerastas",
     "text": "Adresas gali būti neteisingas arba puslapio nebėra.",
     "home": "Į pradžios puslapį",
     "staffArea": "Atgal į uždarą sritį"
+  },
+  "apiErrors": {
+    "unauthorized": "Sesija baigėsi arba prieiga negalioja. Prisijunkite iš naujo ir bandykite dar kartą.",
+    "forbidden": "Neturite teisės atlikti šio veiksmo.",
+    "notFound": "Šio elemento nebėra. Įkelkite puslapį iš naujo.",
+    "tooLarge": "Per didelis: sumažinkite failą arba tekstą ir bandykite dar kartą.",
+    "rateLimited": "Per daug užklausų per trumpą laiką. Palaukite akimirką ir bandykite dar kartą.",
+    "transcriptCorrected": "Transkripcija iš subtitrų buvo pataisyta rankiniu būdu: DI transkripcija ją pakeistų ir pataisymai būtų prarasti.",
+    "aiPipelineDisabled": "DI procesas išjungtas visai svetainei: administratorius gali jį įjungti nustatymuose.",
+    "recordingWithoutMedia": "Šis įrašas neturi vaizdo: jo transkripcija gaunama iš tiesioginių subtitrų.",
+    "noParticipantTracks": "Nėra atskirų dalyvių garso takelių: jie nebuvo įrašyti arba jau ištrinti. Kad jie būtų, prieš renginį įjunkite įrašymą kiekvienam dalyviui.",
+    "summaryMissing": "Šia kalba dar nėra santraukos, kurią būtų galima redaguoti: pirmiausia ją sukurkite.",
+    "storageUnavailable": "Failų įkėlimas šioje diegimo versijoje nepasiekiamas.",
+    "aiDisabledForEvent": "DI šiam renginiui išjungtas: naudokite „Generuoti DI“, kad jį įjungtumėte ir pradėtumėte apdorojimą.",
+    "sourceTranscriptMissing": "Šis įrašas dar netranskribuotas: pirmiausia jį transkribuokite, tada pridėkite vertimą.",
+    "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą."
   }
 }

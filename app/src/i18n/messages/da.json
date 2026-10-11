@@ -89,7 +89,8 @@
     "language": "Sprog",
     "switchLanguage": "Skift sprog",
     "skipToContent": "Gå til indhold",
-    "skipToFooter": "Gå til sidefod"
+    "skipToFooter": "Gå til sidefod",
+    "mainLabel": "Hovednavigation"
   },
   "header": {
     "followUs": "Følg os på"
@@ -301,7 +302,7 @@
       "library": "Udgiv i biblioteket",
       "libraryHelp": "Som ovenfor, og vis desuden arrangementet i det offentlige videobibliotek (kræver en udgivet optagelse eller en YouTube-video).",
       "archive": "Arkivér (privat)",
-      "archiveHelp": "Siden for det afsluttede arrangement bliver ikke offentlig (404). Data gemmes, indtil opbevaringsperioden udløber, og slettes derefter.",
+      "archiveHelp": "Siden for det afsluttede arrangement vil ikke være synlig for offentligheden. Dataene opbevares, indtil opbevaringsperioden udløber, og slettes derefter.",
       "genAi": "Generér AI-transskription og -resumé ud fra optagelsen (når behandlingen er færdig)",
       "back": "Tilbage",
       "confirm": "Afslut arrangementet"
@@ -572,7 +573,15 @@
       "show": "Vis undertekster",
       "hide": "Skjul undertekster",
       "toggle": "Automatiske undertekster"
-    }
+    },
+    "eventEndedModerator": "Arrangementet er slut. Nedenfor finder du statistikken og, hvis det blev optaget, optagelsen og rapporten.",
+    "endLinks": {
+      "after": "Optagelse og rapport",
+      "stats": "Statistik for arrangementet",
+      "publicPage": "Arrangementets offentlige side"
+    },
+    "notOpenNow": "Rummet er ikke åbent lige nu.",
+    "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det."
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -1166,7 +1175,7 @@
         "signing": "Forbereder...",
         "uploading": "Uploader {progress}%",
         "uploaded": "Upload fuldført",
-        "uploadHint": "Understøttede formater: MP4, WebM, MOV, M4V. Maks. størrelse 5 GB. Upload sker direkte til lageret (Azure Blob); intet passerer vores servere.",
+        "uploadHint": "Understøttede formater: MP4, WebM, MOV, M4V. Maksimal størrelse 5 GB. Filen går direkte til videoarkivet uden at passere portalen.",
         "step2Title": "2. Udgivelsens metadata",
         "titleIt": "Titel (italiensk)",
         "titleEn": "Titel (engelsk, valgfri)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Slet begivenhed",
     "deleteConfirm": "Er du sikker på, at du vil slette denne begivenhed? Handlingen kan ikke fortrydes.",
     "publish": "Publicér",
-    "unpublish": "Afpublicér",
+    "unpublish": "Træk udgivelsen tilbage",
     "noToken": "For at administrere begivenheder brug moderatorlinket, du modtog via e-mail.",
     "noEvents": "Ingen begivenheder fundet. Opret din første begivenhed.",
     "eventDetails": "Begivenhedsdetaljer",
@@ -1399,7 +1408,7 @@
     "notJoined": "Deltog ikke",
     "deleteSuccess": "Begivenhed slettet",
     "publishSuccess": "Begivenhed publiceret",
-    "unpublishSuccess": "Begivenhed afpubliceret",
+    "unpublishSuccess": "Arrangement trukket tilbage",
     "startEvent": "Start begivenhed",
     "startEventSuccess": "Begivenhed startet! Ventende deltagere omdirigeres automatisk.",
     "startEventConfirmTitle": "Start begivenheden?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maks. antal deltagere",
       "expectedParticipants": "Forventede deltagere (estimat)",
       "expectedParticipantsHint": "Kun et estimat til dimensionering af infrastrukturen. Det er ikke et loft: tilmeldinger ud over dette tal accepteres, og infrastrukturen skalerer automatisk.",
-      "expectedSenderRatio": "Forventet sender-ratio",
-      "expectedSenderRatioInherit": "Standard for siden",
-      "expectedSenderRatioHint": "Procentdel af deltagere med aktiv mikrofon eller webcam. Klassisk webinar 10-20 %, paneldebat 50-100 %. Lad feltet stå tomt for at arve standardværdien.",
+      "expectedSenderRatio": "Andel der taler",
+      "expectedSenderRatioInherit": "Webstedets værdi",
+      "expectedSenderRatioHint": "Andel af deltagere med aktiv mikrofon eller kamera. Klassisk webinar 10-20 %, rundbordssamtale 50-100 %. Lad stå tomt for at bruge webstedets værdi.",
       "jvbPreview": {
-        "title": "Estimeret JVB-kapacitet",
-        "pod": "JVB-pod",
-        "pods": "JVB-pods",
-        "senders": "Sendere",
-        "receivers": "Modtagere",
-        "effectiveRatio": "Effektiv ratio",
-        "inherited": "arvet",
-        "presetLabel": "Preset",
+        "title": "Skøn over videobroer",
+        "pod": "videobro",
+        "pods": "videobroer",
+        "senders": "Med mikrofon eller kamera",
+        "receivers": "Lytter kun",
+        "effectiveRatio": "Andel der taler",
+        "inherited": "webstedets værdi",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Møde",
           "workshop": "Workshop",
-          "allHands": "Alle som sendere"
+          "allHands": "Alle taler"
         },
-        "clearPreset": "Brug standard for siden",
-        "atCeiling": "maks. grænse {max}",
-        "videoDisabled": "Video deaktiveret: alle deltagere tæller som modtagere.",
-        "warnInherited": "Med {participants} deltagere og arvet ratio ({defaultPct}%) bygger estimatet på sidens standard. Til store arrangementer bør der angives en eksplicit værdi (webinar 5-20 %, møde 30 %, workshop 60 %).",
-        "warnCeiling": "Estimat ved den konfigurerede maksimumsgrænse ({max} pods). Hvis det reelle deltagerantal eller antal sendere overstiger estimatet, kan bridges blive overbelastet. Overvej at hæve grænsen eller sænke maxParticipants."
+        "clearPreset": "Brug webstedets værdi",
+        "atCeiling": "højst {max}",
+        "videoDisabled": "Video slået fra: alle deltagere tæller som lyttere.",
+        "warnInherited": "Med {participants} deltagere og webstedets andel ({defaultPct} %) er skønnet vejledende. Ved store arrangementer er det en god idé at angive den: webinar 5-20 %, møde 30 %, workshop 60 %.",
+        "warnCeiling": "Skønnet ligger på det indstillede maksimum ({max} videobroer). Hvis flere taler end forventet, kan broerne blive overbelastede: overvej at hæve grænsen eller sænke det maksimale antal deltagere."
       },
       "gracePeriod": "Arrangementsafslutning (soft exit)",
       "gracePeriodInherit": "Brug standard for siden",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Upload eksisterende optagelse",
-      "subtitle": "Hvis du allerede har en videofil af arrangementet (f.eks. en MS Teams-optagelse), kan du uploade den her: den vises som den officielle optagelse på den offentlige side.",
+      "subtitle": "Hvis du allerede har en videofil af arrangementet (for eksempel optaget med en anden platform), så upload den her: den vises som den officielle optagelse på den offentlige side.",
       "fileLabel": "Videofil",
       "upload": "Upload og tilknyt",
       "signing": "Forbereder…",
       "uploading": "Uploader {progress}%",
       "attaching": "Tilknytter til arrangementet…",
-      "hint": "Formater: MP4, WebM, MOV, M4V. Maks. 5 GB. Upload sker direkte til Azure-lageret.",
+      "hint": "Formater: MP4, WebM, MOV, M4V. Højst 5 GB. Filen går direkte til videoarkivet uden at passere portalen.",
       "errors": {
         "fileTooLarge": "Filen overstiger grænsen på 5 GB.",
         "unsupportedType": "Filtypen understøttes ikke. Upload en MP4, WebM, MOV eller M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Arrangementet er endnu ikke afsluttet: statistikken er delvis og opdateres i realtid.",
       "cappedNote": "Meget stort arrangement: nogle målinger er beregnet på en stikprøve (grænsen for antal rækker er nået).",
       "scoreTitle": "Opmærksomhedsgrad",
-      "adminOnly": "kun admin",
+      "adminOnly": "ikke offentlig",
       "scoreProxy": "Et indeks fra 0–100 for, hvor deltagende publikum var. Det er en indikator for deltagelse, ikke en måling af kognitiv opmærksomhed — læs det i lyset af formatet (forelæsning vs. workshop), aldrig som en kvalitetskarakter.",
       "scoreUnavailable": "Der er ikke data nok til at beregne graden.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Transskriptionen kunne ikke indlæses (HTTP {code}).",
       "editNotReady": "Der findes endnu ingen transskription for denne optagelse. Start (eller kør igen) AI-behandlingen fra kontrollerne øverst: transskriptionen er første skridt, og derefter kan du rette den her og generere resumé og oversættelser.",
       "editProcessing": "AI-behandlingen er i gang: transskriptionen vises her, når den er færdig. Opdatér siden om et par minutter.",
-      "editSessionExpired": "Admin-sessionen er udløbet. Genindlæs siden, og log ind igen for at redigere transskriptionen.",
+      "editSessionExpired": "Din session er udløbet. Genindlæs siden, og log ind igen for at redigere transskriptionen.",
       "editEmpty": "Ingen segmenter kan redigeres",
       "editSpeakerNone": "— ingen —",
       "editSave": "Gem ændringerne",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arkiv",
       "manageTabReliability": "Pålidelighed",
       "manageLoading": "Indlæser…",
-      "archivePiiNote": "De isolerede lydspor pr. deltager er følsomme personoplysninger (isoleret stemme): dette afsnit er forbeholdt administratorer og moderatorer og vises aldrig offentligt.",
+      "archivePiiNote": "Hver deltagers separate lydspor er følsomme personoplysninger (den isolerede stemme): denne sektion er forbeholdt dem, der administrerer arrangementet, og er aldrig offentlig.",
       "archiveNoTracks": "Der er ingen spor pr. deltager for denne optagelse (flersporsoptagelse er ikke slået til, eller sporene er allerede slettet af hensyn til dataminimering efter GDPR).",
       "archivePlayerTitle": "Gennemlytning pr. taler",
       "archiveAudioHint": "Brug afspillerens »Lyd«-vælger til at lytte til miksningen eller til en enkelt deltagers isolerede spor, synkront med videoen.",
@@ -4140,7 +4149,10 @@
       "LIVE": "I gang",
       "ENDED": "Afsluttet",
       "ARCHIVED": "Arkiveret"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Én begivenhed mere} other {# begivenheder mere}}",
+    "noEvents": "Ingen begivenheder i denne periode",
+    "weekShort": "Uge"
   },
   "footer": {
     "privacy": "Privatlivspolitik",
@@ -4880,12 +4892,29 @@
     "yes": "Ja",
     "no": "Nej",
     "scaleValue": "{value} af {max}",
-    "answerOne": "Besvar mindst ét spørgsmål for at sende."
+    "answerOne": "Besvar mindst ét spørgsmål for at sende.",
+    "pageTitle": "Spørgeskema"
   },
   "notFound": {
     "title": "Siden blev ikke fundet",
     "text": "Adressen kan være forkert, eller siden findes ikke længere.",
     "home": "Gå til forsiden",
     "staffArea": "Tilbage til det lukkede område"
+  },
+  "apiErrors": {
+    "unauthorized": "Din session er udløbet, eller adgangen er ikke gyldig. Log ind igen, og prøv igen.",
+    "forbidden": "Du har ikke tilladelse til denne handling.",
+    "notFound": "Dette element findes ikke længere. Genindlæs siden.",
+    "tooLarge": "For stort: gør filen eller teksten mindre, og prøv igen.",
+    "rateLimited": "For mange forespørgsler på kort tid. Vent et øjeblik, og prøv igen.",
+    "transcriptCorrected": "Transskriptionen fra underteksterne er rettet i hånden: en AI-transskription ville erstatte den, og rettelserne ville gå tabt.",
+    "aiPipelineDisabled": "AI-pipelinen er slået fra for hele webstedet: en administrator kan slå den til i indstillingerne.",
+    "recordingWithoutMedia": "Denne optagelse har ingen video: dens transskription kommer fra liveundertekster.",
+    "noParticipantTracks": "Der er ingen separate lydspor af deltagerne: de blev ikke optaget eller er allerede slettet. Slå optagelse pr. deltager til før arrangementet for at få dem.",
+    "summaryMissing": "Der er endnu ikke et resumé at redigere på dette sprog: generer det først.",
+    "storageUnavailable": "Upload af filer er ikke tilgængelig på denne installation.",
+    "aiDisabledForEvent": "AI er slået fra for dette arrangement: brug »Generér AI« for at slå den til og starte behandlingen.",
+    "sourceTranscriptMissing": "Denne optagelse er endnu ikke transskriberet: transskriber den, før du tilføjer en oversættelse.",
+    "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet."
   }
 }

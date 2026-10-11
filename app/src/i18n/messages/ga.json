@@ -89,7 +89,8 @@
     "language": "Teanga",
     "switchLanguage": "Athraigh teanga",
     "skipToContent": "Téigh go dtí an t-ábhar",
-    "skipToFooter": "Téigh go dtí an buntásc"
+    "skipToFooter": "Téigh go dtí an buntásc",
+    "mainLabel": "Príomh-nascleanúint"
   },
   "header": {
     "followUs": "Lean sinn ar"
@@ -301,7 +302,7 @@
       "library": "Foilsigh sa leabharlann",
       "libraryHelp": "Mar atá thuas, agus taispeántar an t-imeacht sa leabharlann físeán poiblí freisin (teastaíonn taifeadadh foilsithe nó físeán YouTube).",
       "archive": "Cuir i gcartlann (príobháideach)",
-      "archiveHelp": "Ní bheidh leathanach an imeachta chríochnaithe poiblí (404). Coinnítear na sonraí go dtí go rachaidh an tréimhse choinneála in éag, agus scriostar ansin iad.",
+      "archiveHelp": "Ní bheidh leathanach na hócáide críochnaithe le feiceáil ag an bpobal. Coinnítear na sonraí go deireadh na tréimhse coinneála, ansin scriostar iad.",
       "genAi": "Cruthaigh tras-scríbhinn agus achoimre AI ón taifeadadh (nuair a bheidh an phróiseáil críochnaithe)",
       "back": "Ar ais",
       "confirm": "Cuir deireadh leis an imeacht"
@@ -572,7 +573,15 @@
       "show": "Taispeáin fotheidil",
       "hide": "Folaigh fotheidil",
       "toggle": "Fotheidil uathoibríocha"
-    }
+    },
+    "eventEndedModerator": "Tá an ócáid thart. Thíos gheobhaidh tú na staitisticí agus, má taifeadadh an ócáid, an taifeadadh agus an tuarascáil.",
+    "endLinks": {
+      "after": "Taifeadadh agus tuarascáil",
+      "stats": "Staitisticí na hócáide",
+      "publicPage": "Leathanach poiblí na hócáide"
+    },
+    "notOpenNow": "Níl an seomra oscailte faoi láthair.",
+    "nameRequired": "Tá an t-ainm le dul isteach in easnamh: téigh siar agus scríobh é."
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -1166,7 +1175,7 @@
         "signing": "Á ullmhú...",
         "uploading": "Á uaslódáil {progress}%",
         "uploaded": "Uaslódáil críochnaithe",
-        "uploadHint": "Formáidí tacaithe: MP4, WebM, MOV, M4V. Uasmhéid 5 GB. Téann an uaslódáil díreach chuig an stóráil oibiachta (Azure Blob) — ní théann aon rud trínár bhfreastalaithe.",
+        "uploadHint": "Formáidí tacaithe: MP4, WebM, MOV, M4V. Méid uasta 5 GB. Téann an comhad díreach chuig cartlann na bhfíseán, gan dul tríd an tairseach.",
         "step2Title": "2. Meiteashonraí an fhoilseacháin",
         "titleIt": "Teideal (Iodáilis)",
         "titleEn": "Teideal (Béarla, roghnach)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Scrios imeacht",
     "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an t-imeacht seo a scriosadh? Ní féidir an gníomh seo a chealú.",
     "publish": "Foilsigh",
-    "unpublish": "Bain ón bhfoilsiú",
+    "unpublish": "Tarraing siar an foilsiú",
     "noToken": "Chun imeachtaí a bhainistiú, úsáid an nasc modhnóra a fuair sibh ar ríomhphost.",
     "noEvents": "Níor aimsíodh aon imeacht. Cruthaigh bhur gcéad imeacht.",
     "eventDetails": "Sonraí an imeachta",
@@ -1399,7 +1408,7 @@
     "notJoined": "Níor fhreastail",
     "deleteSuccess": "Imeacht scriosta",
     "publishSuccess": "Imeacht foilsithe",
-    "unpublishSuccess": "Imeacht bainte ón bhfoilsiú",
+    "unpublishSuccess": "Imeacht tarraingthe siar",
     "startEvent": "Tosaigh an t-imeacht",
     "startEventSuccess": "Imeacht tosaithe! Atreorófar rannpháirtithe atá ag fanacht go huathoibríoch.",
     "startEventConfirmTitle": "An imeacht a thosú?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Uaslíon rannpháirtithe",
       "expectedParticipants": "Rannpháirtithe ionchais (meastachán)",
       "expectedParticipantsHint": "Meastachán amháin chun an bonneagar a thoiseadh. Ní uasteorainn é seo: glactar le cláruithe os cionn na huimhreach seo agus déantar an bonneagar a scálú go huathoibríoch.",
-      "expectedSenderRatio": "Cóimheas seoltóra ionchais",
-      "expectedSenderRatioInherit": "Réamhshocrú an tsuímh",
-      "expectedSenderRatioHint": "Céatadán na rannpháirtithe a mbeidh mic nó ceamara gréasáin ar siúl acu. Seimineár gréasáin clasaiceach 10-20%, painéal 50-100%. Fág folamh chun réamhshocrú an tsuímh a oidhreacht.",
+      "expectedSenderRatio": "Cion na gcainteoirí",
+      "expectedSenderRatioInherit": "Luach an tsuímh",
+      "expectedSenderRatioHint": "Céatadán na rannpháirtithe a bhfuil micreafón nó ceamara ar siúl acu. Gnáthghréasánaí 10-20%, comhchéim 50-100%. Fág folamh chun luach an tsuímh a úsáid.",
       "jvbPreview": {
-        "title": "Toilleadh JVB measta",
-        "pod": "pod JVB",
-        "pods": "pod JVB",
-        "senders": "Seoltóirí",
-        "receivers": "Glacadóirí",
-        "effectiveRatio": "Cóimheas éifeachtach",
-        "inherited": "oidhreachtach",
-        "presetLabel": "Réamhshocrú",
+        "title": "Meastachán ar dhroichid físe",
+        "pod": "droichead físe",
+        "pods": "droichid físe",
+        "senders": "Le micreafón nó ceamara",
+        "receivers": "Ag éisteacht amháin",
+        "effectiveRatio": "Cion na gcainteoirí",
+        "inherited": "luach an tsuímh",
+        "presetLabel": "Próifíl",
         "preset": {
           "webinar": "Seimineár gréasáin",
           "meeting": "Cruinniú",
           "workshop": "Ceardlann",
-          "allHands": "Gach seoltóir"
+          "allHands": "Labhraíonn gach duine"
         },
-        "clearPreset": "Úsáid réamhshocrú an tsuímh",
-        "atCeiling": "uasteorainn {max}",
-        "videoDisabled": "Físeán díchumasaithe: áirítear gach rannpháirtí mar ghlacadóir.",
-        "warnInherited": "Le {participants} rannpháirtí agus an cóimheas oidhreachtach ({defaultPct}%), tá an meastachán bunaithe ar réamhshocrú an tsuímh. Maidir le himeachtaí móra, is fearr luach sainráite a shocrú (seimineár gréasáin 5-20%, cruinniú 30%, ceardlann 60%).",
-        "warnCeiling": "Meastachán ag an uasteorainn chumraithe ({max} pod). Má sháraíonn an tinreamh nó na seoltóirí iarbhír an meastachán, d'fhéadfadh na droichid a sháithiú. Smaoinigh ar an uasteorainn a ardú nó maxParticipants a ísliú."
+        "clearPreset": "Úsáid luach an tsuímh",
+        "atCeiling": "uasmhéid {max}",
+        "videoDisabled": "Físeán múchta: áirítear gach rannpháirtí mar éisteoir.",
+        "warnInherited": "Le {participants} rannpháirtí agus cion an tsuímh ({defaultPct}%), is meastachán garbh é. D'ócáidí móra is fiú é a shonrú: gréasánaí 5-20%, cruinniú 30%, ceardlann 60%.",
+        "warnCeiling": "Tá an meastachán ag an uasmhéid socraithe ({max} droichead físe). Má labhraíonn níos mó daoine ná mar a bhíothas ag súil leis, d'fhéadfadh na droichid a bheith rólódáilte: smaoinigh ar an teorainn a ardú nó ar líon uasta na rannpháirtithe a laghdú."
       },
       "gracePeriod": "Deireadh imeachta (scor bog)",
       "gracePeriodInherit": "Úsáid réamhshocrú an tsuímh",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Uaslódáil taifeadadh atá ann cheana",
-      "subtitle": "Má tá comhad físe den imeacht agat cheana (m.sh. taifeadadh MsTeams), uaslódáil anseo é: taispeánfar é mar an taifeadadh oifigiúil ar an leathanach poiblí.",
+      "subtitle": "Má tá comhad físe den ócáid agat cheana (mar shampla taifeadta le hardán eile), uaslódáil anseo é: taispeánfar é mar an taifeadadh oifigiúil ar an leathanach poiblí.",
       "fileLabel": "Comhad físe",
       "upload": "Uaslódáil agus ceangail",
       "signing": "Á ullmhú…",
       "uploading": "Á uaslódáil {progress}%",
       "attaching": "Á cheangal leis an imeacht…",
-      "hint": "Formáidí: MP4, WebM, MOV, M4V. Uasmhéid 5 GB. Téann an uaslódáil díreach chuig stóráil Azure.",
+      "hint": "Formáidí: MP4, WebM, MOV, M4V. Suas le 5 GB. Téann an comhad díreach chuig cartlann na bhfíseán, gan dul tríd an tairseach.",
       "errors": {
         "fileTooLarge": "Sáraíonn an comhad an teorainn 5 GB.",
         "unsupportedType": "Formáid neamhthacaithe. Uaslódáil MP4, WebM, MOV nó M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Níl deireadh leis an imeacht fós: tá na staitisticí páirteach agus nuashonraítear i bhfíor-am iad.",
       "cappedNote": "Imeacht an-mhór: ríomhtar roinnt méadrachtaí ar shampla (baineadh amach uasteorainn na sraitheanna).",
       "scoreTitle": "Scór aire",
-      "adminOnly": "riarthóirí amháin",
+      "adminOnly": "neamhphoiblí",
       "scoreProxy": "Innéacs 0–100 ar a rannpháirtí a bhí an lucht féachana. Is ionadaí ar rannpháirtíocht é, ní tomhas ar aire chognaíoch — léigh i gcomhthéacs fhormáid an imeachta é (léacht i gcomparáid le ceardlann), agus ná léigh riamh mar ghrád cáilíochta é.",
       "scoreUnavailable": "Níl go leor sonraí ann chun an scór a ríomh.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Níorbh fhéidir an tras-scríbhinn a lódáil (HTTP {code}).",
       "editNotReady": "Níl aon tras-scríbhinn ar fáil don taifeadadh seo fós. Tosaigh (nó athrith) an phróiseáil AI ó na rialtáin thuas: is é an tras-scríobh an chéad chéim, agus ansin is féidir leat é a cheartú anseo agus an achoimre agus na haistriúcháin a chruthú.",
       "editProcessing": "Próiseáil AI ar siúl: taispeánfar an tras-scríbhinn anseo nuair a bheidh sí críochnaithe. Athlódáil an leathanach i gceann cúpla nóiméad.",
-      "editSessionExpired": "Chuaigh seisiún an riarthóra in éag. Athlódáil an leathanach agus sínigh isteach arís chun an tras-scríbhinn a chur in eagar.",
+      "editSessionExpired": "Tá do sheisiún as feidhm. Athlódáil an leathanach agus logáil isteach arís chun an tras-scríbhinn a chur in eagar.",
       "editEmpty": "Níl aon mhír inathraithe ann",
       "editSpeakerNone": "— ceann ar bith —",
       "editSave": "Sábháil na hathruithe",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Cartlann",
       "manageTabReliability": "Iontaofacht",
       "manageLoading": "Á lódáil…",
-      "archivePiiNote": "Is sonraí pearsanta íogaire iad na rianta fuaime scoite de réir rannpháirtí (guth scoite): tá an chuid seo curtha in áirithe do riarthóirí/modhnóirí agus ní nochtar go poiblí riamh í.",
+      "archivePiiNote": "Is sonraí pearsanta íogaire é rian fuaime ar leith gach rannpháirtí (an guth scoite): tá an chuid seo curtha in áirithe dóibh siúd a bhainistíonn an ócáid agus ní bhíonn sí poiblí riamh.",
       "archiveNoTracks": "Níl aon rian de réir rannpháirtí ar fáil don taifeadadh seo (níl an taifeadadh ilrianach cumasaithe, nó scriosadh na rianta cheana ar mhaithe le híoslaghdú RGCS).",
       "archivePlayerTitle": "Athéisteacht de réir cainteora",
       "archiveAudioHint": "Úsáid roghnóir “Fuaim” an tseinnteora chun éisteacht leis an meascán nó le rian scoite rannpháirtí aonair, sioncronaithe leis an bhfíseán.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Beo",
       "ENDED": "Críochnaithe",
       "ARCHIVED": "Cartlannaithe"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Ócáid amháin eile} other {# ócáid eile}}",
+    "noEvents": "Níl aon ócáid sa tréimhse seo",
+    "weekShort": "Scht."
   },
   "footer": {
     "privacy": "Beartas príobháideachta",
@@ -4880,12 +4892,29 @@
     "yes": "Tá",
     "no": "Níl",
     "scaleValue": "{value} as {max}",
-    "answerOne": "Freagair ceist amháin ar a laghad chun é a sheoladh."
+    "answerOne": "Freagair ceist amháin ar a laghad chun é a sheoladh.",
+    "pageTitle": "Ceistneoir"
   },
   "notFound": {
     "title": "Níor aimsíodh an leathanach",
     "text": "D'fhéadfadh an seoladh a bheith mícheart, nó níl an leathanach ann a thuilleadh.",
     "home": "Téigh go dtí an leathanach baile",
     "staffArea": "Ar ais go dtí an limistéar foirne"
+  },
+  "apiErrors": {
+    "unauthorized": "Tá do sheisiún as feidhm nó níl an rochtain bailí. Logáil isteach arís agus déan iarracht eile.",
+    "forbidden": "Níl cead agat an oibríocht seo a dhéanamh.",
+    "notFound": "Níl an mhír seo ann a thuilleadh. Athlódáil an leathanach.",
+    "tooLarge": "Rómhór: laghdaigh an comhad nó an téacs agus bain triail eile as.",
+    "rateLimited": "An iomarca iarratas in achar gearr. Fan nóiméad agus déan iarracht eile.",
+    "transcriptCorrected": "Ceartaíodh de láimh an tras-scríbhinn ó na fotheidil: chuirfeadh tras-scríbhinn IS ina háit í agus chaillfí na ceartúcháin.",
+    "aiPipelineDisabled": "Tá an píblíne IS múchta don suíomh ar fad: is féidir le riarthóir é a chur ar siúl sna socruithe.",
+    "recordingWithoutMedia": "Níl físeán ag an taifeadadh seo: tagann a thras-scríbhinn ó na fotheidil bheo.",
+    "noParticipantTracks": "Níl rianta fuaime ar leith de na rannpháirtithe ann: níor taifeadadh iad nó scriosadh cheana iad. Chun iad a bheith agat, cuir taifeadadh in aghaidh an rannpháirtí ar siúl roimh an ócáid.",
+    "summaryMissing": "Níl achoimre le cur in eagar sa teanga seo fós: gin í ar dtús.",
+    "storageUnavailable": "Níl uaslódáil comhad ar fáil ar an tsuiteáil seo.",
+    "aiDisabledForEvent": "Tá IS múchta don ócáid seo: úsáid «Cruthaigh AI» chun é a chur ar siúl agus an phróiseáil a thosú.",
+    "sourceTranscriptMissing": "Níl an taifeadadh seo tras-scríofa fós: tras-scríobh é sula gcuirfidh tú aistriúchán leis.",
+    "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile."
   }
 }

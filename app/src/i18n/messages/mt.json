@@ -89,7 +89,8 @@
     "language": "Lingwa",
     "switchLanguage": "Ibdel il-lingwa",
     "skipToContent": "Mur il-kontenut",
-    "skipToFooter": "Mur il-footer"
+    "skipToFooter": "Mur il-footer",
+    "mainLabel": "Navigazzjoni ewlenija"
   },
   "header": {
     "followUs": "Segwina fuq"
@@ -301,7 +302,7 @@
       "library": "Ippubblika fil-librerija",
       "libraryHelp": "Bħal ta' fuq, u barra minn hekk juri l-avveniment fil-librerija pubblika tal-vidjows (teħtieġ reġistrazzjoni ppubblikata jew vidjow YouTube).",
       "archive": "Arkivja (privat)",
-      "archiveHelp": "Il-paġna tal-avveniment mitmum mhux se tkun pubblika (404). Id-data tinżamm sakemm tiskadi ż-żamma, imbagħad titħassar.",
+      "archiveHelp": "Il-paġna tal-avveniment li ntemm mhix se tkun viżibbli għall-pubbliku. Id-data tinżamm sa tmiem il-perjodu taż-żamma, imbagħad titħassar.",
       "genAi": "Iġġenera traskrizzjoni u sommarju bl-AI mir-reġistrazzjoni (meta tintemm l-elaborazzjoni)",
       "back": "Lura",
       "confirm": "Temm l-avveniment"
@@ -572,7 +573,15 @@
       "show": "Uri s-sottotitoli",
       "hide": "Aħbi s-sottotitoli",
       "toggle": "Sottotitoli awtomatiċi"
-    }
+    },
+    "eventEndedModerator": "L-avveniment intemm. Hawn taħt issib l-istatistika u, jekk l-avveniment ġie rreġistrat, ir-reġistrazzjoni u r-rapport.",
+    "endLinks": {
+      "after": "Reġistrazzjoni u rapport",
+      "stats": "Statistika tal-avveniment",
+      "publicPage": "Paġna pubblika tal-avveniment"
+    },
+    "notOpenNow": "Is-sala mhix miftuħa bħalissa.",
+    "nameRequired": "Nieqes l-isem li bih tidħol: mur lura u iktbu."
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -1166,7 +1175,7 @@
         "signing": "Tħejjija...",
         "uploading": "Qed jitla' {progress}%",
         "uploaded": "Caricament komplut",
-        "uploadHint": "Formati appoġġjati: MP4, WebM, MOV, M4V. Daqs massimu 5 GB. Il-caricament isir direttament fl-istorage (Azure Blob); xejn ma jgħaddi mis-servers tagħna.",
+        "uploadHint": "Formati appoġġjati: MP4, WebM, MOV, M4V. Daqs massimu 5 GB. Il-fajl imur dritt fl-arkivju tal-vidjows, mingħajr ma jgħaddi mill-portal.",
         "step2Title": "2. Metadata tal-pubblikazzjoni",
         "titleIt": "Titlu (Taljan)",
         "titleEn": "Titlu (Ingliż, fakultattiv)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Ħassar l-avveniment",
     "deleteConfirm": "Żgur li trid tħassar dan l-avveniment? Din l-azzjoni ma tistax tiġi annullata.",
     "publish": "Ippubblika",
-    "unpublish": "Neħħi mill-pubblikazzjoni",
+    "unpublish": "Irtira l-pubblikazzjoni",
     "noToken": "Biex timmaniġġja l-avvenimenti, uża l-link tal-moderatur li rċivejt bl-email.",
     "noEvents": "L-ebda avvenimenti misjuba. Oħloq l-ewwel avveniment tiegħek.",
     "eventDetails": "Dettalji tal-avveniment",
@@ -1399,7 +1408,7 @@
     "notJoined": "Ma daħalx",
     "deleteSuccess": "Avveniment imħassar",
     "publishSuccess": "Avveniment ippubblikat",
-    "unpublishSuccess": "Avveniment imneħħi mill-pubblikazzjoni",
+    "unpublishSuccess": "Avveniment irtirat",
     "startEvent": "Ibda l-avveniment",
     "startEventSuccess": "Avveniment beda! Il-parteċipanti li qed jistennew se jiġu ridirezzjonati awtomatikament.",
     "startEventConfirmTitle": "Tibda l-avveniment?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Numru massimu ta' parteċipanti",
       "expectedParticipants": "Parteċipanti mistennija (stima)",
       "expectedParticipantsHint": "Biss waħda stima għal il dimensionamento infrastruttura. Mhux huwa wieħed tetto massimo: il-reġistrazzjonijiet oltru din soglia huma aċċettate, l'infra scala fi awtomatiku.",
-      "expectedSenderRatio": "Ratio sender mistenni",
-      "expectedSenderRatioInherit": "Default sito",
-      "expectedSenderRatioHint": "Percentualu di parteċipanti li avrsena mic jew webcam attivi. Webinar classico 10-20%, tavola rotonda 50-100%. Ħalli vuoto għal ereditaru il default tal-sito.",
+      "expectedSenderRatio": "Proporzjon ta' min jitkellem",
+      "expectedSenderRatioInherit": "Valur tas-sit",
+      "expectedSenderRatioHint": "Perċentwal ta' parteċipanti b'mikrofonu jew kamera mixgħula. Webinar klassiku 10-20%, mejda tonda 50-100%. Ħallih vojt biex tuża l-valur tas-sit.",
       "jvbPreview": {
-        "title": "Stima capacità JVB",
-        "pod": "pod JVB",
-        "pods": "pod JVB",
-        "senders": "Sender",
-        "receivers": "Receiver",
-        "effectiveRatio": "Ratio effettivo",
-        "inherited": "ereditato",
-        "presetLabel": "Preset",
+        "title": "Stima tal-pontijiet tal-vidjo",
+        "pod": "pont tal-vidjo",
+        "pods": "pontijiet tal-vidjo",
+        "senders": "B'mikrofonu jew kamera",
+        "receivers": "Jisma' biss",
+        "effectiveRatio": "Proporzjon ta' min jitkellem",
+        "inherited": "valur tas-sit",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
-          "meeting": "Meeting",
+          "meeting": "Laqgħa",
           "workshop": "Workshop",
-          "allHands": "Kollha sender"
+          "allHands": "Jitkellmu kollha"
         },
-        "clearPreset": "Uża default sito",
-        "atCeiling": "limitu max {max}",
-        "videoDisabled": "Vidjo iddiżabilitato: kollha il-parteċipanti contano bħal receiver.",
-        "warnInherited": "Ma' {participants} parteċipanti u ratio ereditato ({defaultPct}%), il-stima si basa sul default ta' sito. Għal avvenimenti grandi convienu impostaru wieħed valsigħat esplicito (webinar 5-20%, meeting 30%, workshop 60%).",
-        "warnCeiling": "Stima lill-limitu massimu configurato ({max} pod). Jekk i parteċipanti reali jew i sender superano il-stima, potrebbero saturarsi il-bridge. Valuta ta' aumentaru il limitu jew ridurru maxParticipants."
+        "clearPreset": "Uża l-valur tas-sit",
+        "atCeiling": "massimu {max}",
+        "videoDisabled": "Vidjo mitfi: il-parteċipanti kollha jgħoddu bħala semmiegħa.",
+        "warnInherited": "B'{participants} parteċipant u l-proporzjon tas-sit ({defaultPct}%), l-istima hija indikattiva. Għal avvenimenti kbar tajjeb li tindikah: webinar 5-20%, laqgħa 30%, workshop 60%.",
+        "warnCeiling": "L-istima hija fil-massimu kkonfigurat ({max} pontijiet tal-vidjo). Jekk jitkellmu aktar nies milli mistenni, il-pontijiet jistgħu jitgħabbew iżżejjed: ikkunsidra li tgħolli l-limitu jew tnaqqas in-numru massimu ta' parteċipanti."
       },
       "gracePeriod": "Tmiem avveniment (soft exit)",
       "gracePeriodInherit": "Uża default sito",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Carica reġistrazzjoni eżistenti",
-      "subtitle": "Jekk hlill- già wieħed fajl vidjo tal-avveniment (es. reġistrazzjoni MsTeams), caricalo qui: se jiġi mostrato bħal reġistrazzjoni uffiċjali sulla paġna pubblica.",
+      "subtitle": "Jekk diġà għandek fajl tal-vidjo tal-avveniment (pereżempju rreġistrat b'pjattaforma oħra), tellgħu hawn: se jintwera bħala r-reġistrazzjoni uffiċjali fil-paġna pubblika.",
       "fileLabel": "Fajl vidjo",
       "upload": "Carica u associa",
       "signing": "Tħejjija…",
       "uploading": "Qed jitla' {progress}%",
       "attaching": "Associazionu lill-avveniment…",
-      "hint": "Formati: MP4, WebM, MOV, M4V. Max 5 GB. L'upload va direttamentità sullo storage Azure.",
+      "hint": "Formati: MP4, WebM, MOV, M4V. Massimu 5 GB. Il-fajl imur dritt fl-arkivju tal-vidjows, mingħajr ma jgħaddi mill-portal.",
       "errors": {
         "fileTooLarge": "Il-fajl jaqbeż il-limitu ta' 5 GB.",
         "unsupportedType": "Format mhux appoġġjat. Tella' MP4, WebM, MOV jew M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "L-avveniment għadu ma ntemmx: l-istatistiċi huma parzjali u jiġu aġġornati f'ħin reali.",
       "cappedNote": "Avveniment kbir ħafna: xi metriċi huma kkalkulati fuq kampjun (intlaħaq il-limitu tar-ringieli).",
       "scoreTitle": "Grad ta' attenzjoni",
-      "adminOnly": "admin biss",
+      "adminOnly": "mhux pubbliku",
       "scoreProxy": "Indiċi 0–100 ta' kemm kienet parteċipattiva l-udjenza. Huwa indikatur indirett tal-parteċipazzjoni, mhux kejl tal-attenzjoni konjittiva — aqrah fil-kuntest tal-format (lezzjoni vs workshop), qatt bħala vot ta' kwalità.",
       "scoreUnavailable": "M'hemmx biżżejjed data biex jiġi kkalkulat il-grad.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "It-traskrizzjoni ma setgħetx tinġieb (HTTP {code}).",
       "editNotReady": "Għad m'hemm l-ebda traskrizzjoni disponibbli għal din ir-reġistrazzjoni. Ibda (jew erġa' ħaddem) l-ipproċessar bl-AI mill-kontrolli ta' fuq: it-traskrizzjoni hija l-ewwel pass, imbagħad minn hawn tkun tista' tikkoreġiha u tiġġenera s-sommarju u t-traduzzjonijiet.",
       "editProcessing": "L-ipproċessar bl-AI għaddej: it-traskrizzjoni tidher hawn meta jintemm. Aġġorna l-paġna fi ftit minuti.",
-      "editSessionExpired": "Is-sessjoni tal-admin skadiet. Erġa' agħbi l-paġna u idħol mill-ġdid biex timmodifika t-traskrizzjoni.",
+      "editSessionExpired": "Is-sessjoni skadiet. Erġa' tella' l-paġna u idħol mill-ġdid biex teditja t-traskrizzjoni.",
       "editEmpty": "L-ebda segment li jista' jiġi mmodifikat",
       "editSpeakerNone": "— ħadd —",
       "editSave": "Salva l-bidliet",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arkivju",
       "manageTabReliability": "Affidabbiltà",
       "manageLoading": "Qed jitgħabba…",
-      "archivePiiNote": "It-traċċi awdjo iżolati ta' kull parteċipant huma data personali sensittiva (vuċi iżolata): din it-taqsima hija riżervata għall-admins u l-moderaturi u qatt ma tiġi esposta pubblikament.",
+      "archivePiiNote": "Il-korsa tal-awdjo separata ta' kull parteċipant hija data personali sensittiva (il-vuċi iżolata): din it-taqsima hija riżervata għal min jamministra l-avveniment u qatt mhi pubblika.",
       "archiveNoTracks": "L-ebda traċċa ta' kull parteċipant mhi disponibbli għal din ir-reġistrazzjoni (ir-reġistrazzjoni b'ħafna traċċi mhijiex attiva, jew it-traċċi diġà tħassru għall-minimizzazzjoni tal-GDPR).",
       "archivePlayerTitle": "Smigħ mill-ġdid għal kull kelliem",
       "archiveAudioHint": "Uża s-selettur “Awdjo” tal-player biex tisma' t-taħlita jew it-traċċa iżolata ta' parteċipant wieħed, sinkronizzata mal-vidjow.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Ħaj",
       "ENDED": "Intemm",
       "ARCHIVED": "Arkivjat"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Avveniment ieħor} other {# avvenimenti oħra}}",
+    "noEvents": "L-ebda avveniment f'dan il-perjodu",
+    "weekShort": "Ġim."
   },
   "footer": {
     "privacy": "Avviż dwar il-privatezza",
@@ -4880,12 +4892,29 @@
     "yes": "Iva",
     "no": "Le",
     "scaleValue": "{value} minn {max}",
-    "answerOne": "Wieġeb mill-inqas mistoqsija waħda biex tibgħat."
+    "answerOne": "Wieġeb mill-inqas mistoqsija waħda biex tibgħat.",
+    "pageTitle": "Kwestjonarju"
   },
   "notFound": {
     "title": "Il-paġna ma nstabitx",
     "text": "L-indirizz jista' jkun ħażin, jew il-paġna ma għadhiex teżisti.",
     "home": "Mur fil-paġna ewlenija",
     "staffArea": "Lura fiż-żona riżervata"
+  },
+  "apiErrors": {
+    "unauthorized": "Is-sessjoni skadiet jew l-aċċess mhuwiex validu. Idħol mill-ġdid u erġa' pprova.",
+    "forbidden": "M'għandekx permess għal din l-operazzjoni.",
+    "notFound": "Dan l-element m'għadux jeżisti. Erġa' tella' l-paġna.",
+    "tooLarge": "Kbir wisq: naqqas il-fajl jew it-test u erġa' pprova.",
+    "rateLimited": "Wisq talbiet f'ħin qasir. Stenna ftit u erġa' pprova.",
+    "transcriptCorrected": "It-traskrizzjoni mis-sottotitli ġiet ikkoreġuta bl-idejn: traskrizzjoni bl-IA tissostitwiha u l-korrezzjonijiet jintilfu.",
+    "aiPipelineDisabled": "Il-pipeline tal-IA hija mitfija għas-sit kollu: amministratur jista' jixgħelha fis-settings.",
+    "recordingWithoutMedia": "Din ir-reġistrazzjoni m'għandhiex vidjo: it-traskrizzjoni tagħha ġejja mis-sottotitoli diretti.",
+    "noParticipantTracks": "M'hemmx korsiet tal-awdjo separati tal-parteċipanti: ma ġewx irreġistrati jew diġà tħassru. Biex ikollok dawn, ixgħel ir-reġistrazzjoni għal kull parteċipant qabel l-avveniment.",
+    "summaryMissing": "Għadu m'hemmx sommarju x'teditja f'din il-lingwa: oħolqu l-ewwel.",
+    "storageUnavailable": "It-tlugħ tal-fajls mhux disponibbli f'din l-installazzjoni.",
+    "aiDisabledForEvent": "L-IA hija mitfija għal dan l-avveniment: uża «Iġġenera l-AI» biex tixgħelha u tibda l-ipproċessar.",
+    "sourceTranscriptMissing": "Din ir-reġistrazzjoni għadha mhix traskritta: ittraskriviha qabel ma żżid traduzzjoni.",
+    "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra."
   }
 }

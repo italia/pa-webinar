@@ -89,7 +89,8 @@
     "language": "Nyelv",
     "switchLanguage": "Nyelv váltása",
     "skipToContent": "Ugrás a tartalomra",
-    "skipToFooter": "Ugrás a láblécre"
+    "skipToFooter": "Ugrás a láblécre",
+    "mainLabel": "Fő navigáció"
   },
   "header": {
     "followUs": "Kövessen minket"
@@ -301,7 +302,7 @@
       "library": "Közzététel a könyvtárban",
       "libraryHelp": "Mint fent, ezenfelül az esemény megjelenik a nyilvános videókönyvtárban is (közzétett felvételt vagy YouTube-videót igényel).",
       "archive": "Archiválás (privát)",
-      "archiveHelp": "A lezárt esemény oldala nem lesz nyilvános (404). Az adatok a megőrzési idő lejártáig megmaradnak, majd törlődnek.",
+      "archiveHelp": "A befejezett esemény oldala nem lesz nyilvánosan látható. Az adatok a megőrzési idő végéig megmaradnak, utána törlődnek.",
       "genAi": "AI-átirat és -összefoglaló készítése a felvételből (a feldolgozás befejeztével)",
       "back": "Vissza",
       "confirm": "Esemény lezárása"
@@ -572,7 +573,15 @@
       "show": "Feliratok megjelenítése",
       "hide": "Feliratok elrejtése",
       "toggle": "Automatikus feliratok"
-    }
+    },
+    "eventEndedModerator": "Az esemény véget ért. Lent megtalálja a statisztikákat, és ha rögzítették, a felvételt és a beszámolót.",
+    "endLinks": {
+      "after": "Felvétel és beszámoló",
+      "stats": "Az esemény statisztikái",
+      "publicPage": "Az esemény nyilvános oldala"
+    },
+    "notOpenNow": "A terem jelenleg nincs nyitva.",
+    "nameRequired": "Hiányzik a név, amellyel belép: lépjen vissza, és írja be."
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -1166,7 +1175,7 @@
         "signing": "Előkészítés...",
         "uploading": "Feltöltés {progress}%",
         "uploaded": "Feltöltés befejezve",
-        "uploadHint": "Támogatott formátumok: MP4, WebM, MOV, M4V. Maximális méret: 5 GB. A feltöltés közvetlenül a tárhelyre (Azure Blob) történik, semmi sem halad át a szervereinken.",
+        "uploadHint": "Támogatott formátumok: MP4, WebM, MOV, M4V. Legnagyobb méret 5 GB. A fájl közvetlenül a videóarchívumba kerül, a portál érintése nélkül.",
         "step2Title": "2. Közzétételi metaadatok",
         "titleIt": "Cím (olasz)",
         "titleEn": "Cím (angol, opcionális)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Nem csatlakozott",
     "deleteSuccess": "Esemény törölve",
     "publishSuccess": "Esemény közzétéve",
-    "unpublishSuccess": "Esemény közzététele visszavonva",
+    "unpublishSuccess": "Közzététel visszavonva",
     "startEvent": "Esemény indítása",
     "startEventSuccess": "Esemény elindítva! A várakozó résztvevők automatikusan átirányításra kerülnek.",
     "startEventConfirmTitle": "Elindítja az eseményt?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Résztvevők maximális száma",
       "expectedParticipants": "Várt résztvevők (becslés)",
       "expectedParticipantsHint": "Csak az infrastruktúra méretezésére szolgáló becslés. Nem felső korlát: az e küszöb feletti regisztrációk is elfogadottak, az infrastruktúra automatikusan skálázódik.",
-      "expectedSenderRatio": "Várt küldői arány",
-      "expectedSenderRatioInherit": "Webhely alapértelmezése",
-      "expectedSenderRatioHint": "Az aktív mikrofonnal vagy webkamerával rendelkező résztvevők aránya. Klasszikus webinárium 10-20%, kerekasztal 50-100%. Hagyja üresen a webhely alapértékének örökléséhez.",
+      "expectedSenderRatio": "Beszélők aránya",
+      "expectedSenderRatioInherit": "A webhely értéke",
+      "expectedSenderRatioHint": "Bekapcsolt mikrofonnal vagy kamerával rendelkező résztvevők aránya. Klasszikus webinárium 10-20%, kerekasztal 50-100%. Hagyja üresen a webhely értékéhez.",
       "jvbPreview": {
-        "title": "Becsült JVB-kapacitás",
-        "pod": "JVB pod",
-        "pods": "JVB pod",
-        "senders": "Küldő",
-        "receivers": "Vevő",
-        "effectiveRatio": "Tényleges arány",
-        "inherited": "öröklött",
-        "presetLabel": "Beállítás",
+        "title": "Videóhidak becslése",
+        "pod": "videóhíd",
+        "pods": "videóhíd",
+        "senders": "Mikrofonnal vagy kamerával",
+        "receivers": "Csak hallgat",
+        "effectiveRatio": "Beszélők aránya",
+        "inherited": "a webhely értéke",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinárium",
-          "meeting": "Értekezlet",
+          "meeting": "Megbeszélés",
           "workshop": "Műhely",
-          "allHands": "Mindenki küldő"
+          "allHands": "Mindenki beszél"
         },
-        "clearPreset": "Webhely alapértelmezésének használata",
-        "atCeiling": "max. korlát {max}",
-        "videoDisabled": "Videó letiltva: minden résztvevő vevőként számít.",
-        "warnInherited": "{participants} résztvevő és örökölt arány ({defaultPct}%) esetén a becslés a webhely alapértékére támaszkodik. Nagy eseményeknél érdemes explicit értéket beállítani (webinárium 5-20%, értekezlet 30%, műhely 60%).",
-        "warnCeiling": "A becslés a beállított maximumon van ({max} pod). Ha a tényleges résztvevők vagy küldők meghaladják a becslést, a bridge-ek telítődhetnek. Fontolja meg a korlát emelését vagy a maxParticipants csökkentését."
+        "clearPreset": "A webhely értékének használata",
+        "atCeiling": "legfeljebb {max}",
+        "videoDisabled": "Videó kikapcsolva: minden résztvevő hallgatónak számít.",
+        "warnInherited": "{participants} résztvevővel és a webhely arányával ({defaultPct}%) a becslés tájékoztató jellegű. Nagy eseményeknél érdemes megadni: webinárium 5-20%, megbeszélés 30%, műhely 60%.",
+        "warnCeiling": "A becslés a beállított maximumon van ({max} videóhíd). Ha a vártnál többen beszélnek, a hidak túlterhelődhetnek: fontolja meg a korlát emelését vagy a résztvevők legnagyobb számának csökkentését."
       },
       "gracePeriod": "Esemény vége (soft exit)",
       "gracePeriodInherit": "Webhely alapértelmezésének használata",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Meglévő felvétel feltöltése",
-      "subtitle": "Ha már rendelkezik az eseményről videofájllal (pl. MsTeams-felvétel), töltse fel itt: a nyilvános oldalon hivatalos felvételként jelenik meg.",
+      "subtitle": "Ha már van videofájlja az eseményről (például más platformon rögzítve), töltse fel ide: hivatalos felvételként jelenik meg a nyilvános oldalon.",
       "fileLabel": "Videofájl",
       "upload": "Feltöltés és hozzárendelés",
       "signing": "Előkészítés…",
       "uploading": "Feltöltés {progress}%",
       "attaching": "Hozzárendelés az eseményhez…",
-      "hint": "Formátumok: MP4, WebM, MOV, M4V. Max. 5 GB. A feltöltés közvetlenül az Azure tárhelyére történik.",
+      "hint": "Formátumok: MP4, WebM, MOV, M4V. Legfeljebb 5 GB. A fájl közvetlenül a videóarchívumba kerül, a portál érintése nélkül.",
       "errors": {
         "fileTooLarge": "A fájl meghaladja az 5 GB-os korlátot.",
         "unsupportedType": "Nem támogatott formátum. Töltsön fel MP4-, WebM-, MOV- vagy M4V-fájlt.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Az esemény még nem ért véget: a statisztikák részlegesek, és valós időben frissülnek.",
       "cappedNote": "Nagyon nagy esemény: egyes mutatók mintán vannak kiszámítva (sorkorlát elérve).",
       "scoreTitle": "Figyelmi mutató",
-      "adminOnly": "csak adminoknak",
+      "adminOnly": "nem nyilvános",
       "scoreProxy": "0–100 közötti index arról, mennyire volt aktív a közönség. Ez a részvétel közelítő mutatója, nem a kognitív figyelem mérőszáma – az esemény formátumának (előadás vagy műhelymunka) tükrében olvassa, soha ne minőségi osztályzatként.",
       "scoreUnavailable": "Nincs elég adat a mutató kiszámításához.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Az átiratot nem sikerült betölteni (HTTP {code}).",
       "editNotReady": "Ehhez a felvételhez még nem érhető el átirat. Indítsa el (vagy indítsa újra) az AI-feldolgozást a fenti vezérlőkkel: az átiratkészítés az első lépés, utána itt javíthatja, majd elkészítheti az összefoglalót és a fordításokat.",
       "editProcessing": "Az AI-feldolgozás folyamatban van: az átirat a végén itt jelenik meg. Frissítse az oldalt néhány perc múlva.",
-      "editSessionExpired": "Az admin munkamenet lejárt. Töltse újra az oldalt, és jelentkezzen be ismét az átirat szerkesztéséhez.",
+      "editSessionExpired": "A munkamenet lejárt. Töltse újra az oldalt, és lépjen be ismét az átirat szerkesztéséhez.",
       "editEmpty": "Nincs szerkeszthető szakasz",
       "editSpeakerNone": "— nincs —",
       "editSave": "Módosítások mentése",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archívum",
       "manageTabReliability": "Megbízhatóság",
       "manageLoading": "Betöltés…",
-      "archivePiiNote": "A résztvevőnkénti elszigetelt hangsávok különleges személyes adatok (elszigetelt hang): ez a szakasz adminoknak és moderátoroknak van fenntartva, és soha nem kerül nyilvánosságra.",
+      "archivePiiNote": "Minden résztvevő külön hangsávja érzékeny személyes adat (az elkülönített hang): ez a rész az esemény kezelőinek van fenntartva, és soha nem nyilvános.",
       "archiveNoTracks": "Ehhez a felvételhez nem érhető el résztvevőnkénti sáv (a többsávos felvétel nincs bekapcsolva, vagy a sávokat a GDPR szerinti adatminimalizálás miatt már törölték).",
       "archivePlayerTitle": "Beszélőnkénti visszahallgatás",
       "archiveAudioHint": "Használja a lejátszó „Hang” választóját, hogy a kevert hangot vagy egyetlen résztvevő elszigetelt sávját hallgassa, a videóval szinkronban.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Éppen zajlik",
       "ENDED": "Befejezve",
       "ARCHIVED": "Archiválva"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Még egy esemény} other {Még # esemény}}",
+    "noEvents": "Ebben az időszakban nincs esemény",
+    "weekShort": "Hét"
   },
   "footer": {
     "privacy": "Adatvédelmi tájékoztató",
@@ -4880,12 +4892,29 @@
     "yes": "Igen",
     "no": "Nem",
     "scaleValue": "{value}/{max}",
-    "answerOne": "A küldéshez válaszolj legalább egy kérdésre."
+    "answerOne": "A küldéshez válaszolj legalább egy kérdésre.",
+    "pageTitle": "Kérdőív"
   },
   "notFound": {
     "title": "Az oldal nem található",
     "text": "Lehet, hogy hibás a cím, vagy az oldal már nem létezik.",
     "home": "Ugrás a kezdőlapra",
     "staffArea": "Vissza a zárt területre"
+  },
+  "apiErrors": {
+    "unauthorized": "A munkamenet lejárt, vagy a hozzáférés érvénytelen. Lépjen be újra, és próbálja meg ismét.",
+    "forbidden": "Nincs jogosultsága ehhez a művelethez.",
+    "notFound": "Ez az elem már nem létezik. Töltse újra az oldalt.",
+    "tooLarge": "Túl nagy: csökkentse a fájlt vagy a szöveget, és próbálja újra.",
+    "rateLimited": "Túl sok kérés rövid idő alatt. Várjon egy kicsit, és próbálja újra.",
+    "transcriptCorrected": "A feliratokból készült átirat kézzel lett javítva: egy MI-átirat lecserélné, és a javítások elvesznének.",
+    "aiPipelineDisabled": "Az MI-folyamat az egész webhelyen ki van kapcsolva: egy adminisztrátor a beállításokban bekapcsolhatja.",
+    "recordingWithoutMedia": "Ennek a felvételnek nincs videója: az átirata az élő feliratokból származik.",
+    "noParticipantTracks": "Nincsenek külön hangsávok a résztvevőkről: nem rögzítették őket, vagy már törölték. Ha szükség van rájuk, az esemény előtt kapcsolja be a résztvevőnkénti felvételt.",
+    "summaryMissing": "Ezen a nyelven még nincs szerkeszthető összefoglaló: előbb hozza létre.",
+    "storageUnavailable": "Ebben a telepítésben a fájlfeltöltés nem érhető el.",
+    "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",
+    "sourceTranscriptMissing": "Ez a felvétel még nincs átírva: előbb írja át, aztán adjon hozzá fordítást.",
+    "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat."
   }
 }

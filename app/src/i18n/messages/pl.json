@@ -89,7 +89,8 @@
     "language": "Język",
     "switchLanguage": "Zmień język",
     "skipToContent": "Przejdź do treści",
-    "skipToFooter": "Przejdź do stopki"
+    "skipToFooter": "Przejdź do stopki",
+    "mainLabel": "Nawigacja główna"
   },
   "header": {
     "followUs": "Obserwuj nas na"
@@ -301,7 +302,7 @@
       "library": "Opublikuj w bibliotece",
       "libraryHelp": "Jak wyżej, a dodatkowo pokazuje wydarzenie w publicznej bibliotece wideo (wymaga opublikowanego nagrania lub filmu YouTube).",
       "archive": "Zarchiwizuj (prywatne)",
-      "archiveHelp": "Strona zakończonego wydarzenia nie będzie publiczna (404). Dane pozostaną do upływu okresu przechowywania, a potem zostaną usunięte.",
+      "archiveHelp": "Strona zakończonego wydarzenia nie będzie widoczna publicznie. Dane są przechowywane do końca okresu przechowywania, a następnie usuwane.",
       "genAi": "Wygeneruj transkrypcję i podsumowanie AI z nagrania (po zakończeniu przetwarzania)",
       "back": "Wstecz",
       "confirm": "Zakończ wydarzenie"
@@ -572,7 +573,15 @@
       "show": "Pokaż napisy",
       "hide": "Ukryj napisy",
       "toggle": "Napisy automatyczne"
-    }
+    },
+    "eventEndedModerator": "Wydarzenie się zakończyło. Poniżej znajdziesz statystyki, a jeśli było nagrywane, także nagranie i sprawozdanie.",
+    "endLinks": {
+      "after": "Nagranie i raport",
+      "stats": "Statystyki wydarzenia",
+      "publicPage": "Strona publiczna wydarzenia"
+    },
+    "notOpenNow": "Sala nie jest teraz otwarta.",
+    "nameRequired": "Brakuje imienia, pod którym chcesz wejść: wróć i je wpisz."
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -1166,7 +1175,7 @@
         "signing": "Przygotowywanie...",
         "uploading": "Przesyłanie {progress}%",
         "uploaded": "Przesyłanie zakończone",
-        "uploadHint": "Obsługiwane formaty: MP4, WebM, MOV, M4V. Maksymalny rozmiar 5 GB. Przesyłanie odbywa się bezpośrednio do magazynu (Azure Blob), nic nie przechodzi przez nasze serwery.",
+        "uploadHint": "Obsługiwane formaty: MP4, WebM, MOV, M4V. Maksymalny rozmiar 5 GB. Plik trafia bezpośrednio do archiwum wideo, bez przechodzenia przez portal.",
         "step2Title": "2. Metadane publikacji",
         "titleIt": "Tytuł (włoski)",
         "titleEn": "Tytuł (angielski, opcjonalnie)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Usuń wydarzenie",
     "deleteConfirm": "Czy na pewno chcesz usunąć to wydarzenie? Tej operacji nie można cofnąć.",
     "publish": "Opublikuj",
-    "unpublish": "Cofnij publikację",
+    "unpublish": "Wycofaj publikację",
     "noToken": "Aby zarządzać wydarzeniami, użyj linku moderatora otrzymanego e-mailem.",
     "noEvents": "Nie znaleziono wydarzeń. Utwórz swoje pierwsze wydarzenie.",
     "eventDetails": "Szczegóły wydarzenia",
@@ -1399,7 +1408,7 @@
     "notJoined": "Nie uczestniczył",
     "deleteSuccess": "Wydarzenie usunięte",
     "publishSuccess": "Wydarzenie opublikowane",
-    "unpublishSuccess": "Publikacja wydarzenia cofnięta",
+    "unpublishSuccess": "Wydarzenie wycofane",
     "startEvent": "Rozpocznij wydarzenie",
     "startEventSuccess": "Wydarzenie rozpoczęte! Oczekujący uczestnicy zostaną automatycznie przekierowani.",
     "startEventConfirmTitle": "Rozpocząć wydarzenie?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maksymalna liczba uczestników",
       "expectedParticipants": "Spodziewani uczestnicy (szacunek)",
       "expectedParticipantsHint": "Tylko szacunek do wymiarowania infrastruktury. Nie jest to twardy limit: rejestracje powyżej tego progu są akceptowane, infrastruktura skaluje się automatycznie.",
-      "expectedSenderRatio": "Oczekiwany współczynnik nadawców",
-      "expectedSenderRatioInherit": "Domyślnie strona",
-      "expectedSenderRatioHint": "Procent uczestników, którzy będą mieli aktywny mikrofon lub kamerę. Klasyczny webinar 10-20%, dyskusja panelowa 50-100%. Pozostaw puste, aby odziedziczyć ustawienie domyślne strony.",
+      "expectedSenderRatio": "Udział mówiących",
+      "expectedSenderRatioInherit": "Wartość serwisu",
+      "expectedSenderRatioHint": "Odsetek uczestników z aktywnym mikrofonem lub kamerą. Klasyczny webinar 10-20%, okrągły stół 50-100%. Pozostaw puste, aby użyć wartości serwisu.",
       "jvbPreview": {
-        "title": "Szacowana pojemność JVB",
-        "pod": "pod JVB",
-        "pods": "pody JVB",
-        "senders": "Nadawcy",
-        "receivers": "Odbiorcy",
-        "effectiveRatio": "Rzeczywisty współczynnik",
-        "inherited": "odziedziczony",
-        "presetLabel": "Predefiniowane",
+        "title": "Szacunek mostów wideo",
+        "pod": "most wideo",
+        "pods": "mosty wideo",
+        "senders": "Z mikrofonem lub kamerą",
+        "receivers": "Tylko słuchający",
+        "effectiveRatio": "Udział mówiących",
+        "inherited": "wartość serwisu",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Spotkanie",
-          "workshop": "Warsztat",
-          "allHands": "Wszyscy nadawcy"
+          "workshop": "Warsztaty",
+          "allHands": "Wszyscy mówią"
         },
-        "clearPreset": "Użyj domyślnego strony",
-        "atCeiling": "limit maks. {max}",
-        "videoDisabled": "Wideo wyłączone: wszyscy uczestnicy są liczeni jako odbiorcy.",
-        "warnInherited": "Przy {participants} uczestnikach i odziedziczonym współczynniku ({defaultPct}%) szacunek opiera się na ustawieniu domyślnym strony. Dla dużych wydarzeń lepiej ustawić wyraźną wartość (webinar 5-20%, spotkanie 30%, warsztat 60%).",
-        "warnCeiling": "Szacunek na granicy maksymalnej skonfigurowanej ({max} podów). Jeśli faktyczna liczba uczestników lub nadawców przekroczy szacunek, mostki mogą się przeciążyć. Rozważ zwiększenie limitu lub zmniejszenie maxParticipants."
+        "clearPreset": "Użyj wartości serwisu",
+        "atCeiling": "maksymalnie {max}",
+        "videoDisabled": "Wideo wyłączone: wszyscy uczestnicy liczą się jako słuchający.",
+        "warnInherited": "Przy {participants} uczestnikach i udziale serwisu ({defaultPct}%) szacunek jest orientacyjny. Przy dużych wydarzeniach warto go podać: webinar 5-20%, spotkanie 30%, warsztaty 60%.",
+        "warnCeiling": "Szacunek osiąga skonfigurowane maksimum ({max} mostów wideo). Jeśli będzie mówić więcej osób niż przewidziano, mosty mogą się przeciążyć: rozważ podniesienie limitu lub zmniejszenie maksymalnej liczby uczestników."
       },
       "gracePeriod": "Koniec wydarzenia (miękkie wyjście)",
       "gracePeriodInherit": "Użyj domyślnego strony",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Prześlij istniejące nagranie",
-      "subtitle": "Jeśli masz już plik wideo z wydarzenia (np. nagranie MsTeams), prześlij go tutaj: zostanie wyświetlony jako oficjalne nagranie na publicznej stronie.",
+      "subtitle": "Jeśli masz już plik wideo z wydarzenia (na przykład nagrany na innej platformie), prześlij go tutaj: zostanie pokazany jako oficjalne nagranie na stronie publicznej.",
       "fileLabel": "Plik wideo",
       "upload": "Prześlij i powiąż",
       "signing": "Przygotowywanie…",
       "uploading": "Przesyłanie {progress}%",
       "attaching": "Powiązywanie z wydarzeniem…",
-      "hint": "Formaty: MP4, WebM, MOV, M4V. Maks. 5 GB. Przesyłanie odbywa się bezpośrednio do magazynu Azure.",
+      "hint": "Formaty: MP4, WebM, MOV, M4V. Maksymalnie 5 GB. Plik trafia bezpośrednio do archiwum wideo, bez przechodzenia przez portal.",
       "errors": {
         "fileTooLarge": "Plik przekracza limit 5 GB.",
         "unsupportedType": "Nieobsługiwany format. Prześlij MP4, WebM, MOV lub M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Wydarzenie jeszcze się nie zakończyło: statystyki są częściowe i aktualizują się na bieżąco.",
       "cappedNote": "Bardzo duże wydarzenie: część wskaźników obliczono na próbce (osiągnięto limit wierszy).",
       "scoreTitle": "Wskaźnik uwagi",
-      "adminOnly": "tylko admin",
+      "adminOnly": "niepubliczne",
       "scoreProxy": "Wskaźnik 0–100 pokazujący, jak bardzo publiczność brała udział. To przybliżenie zaangażowania, a nie miara uwagi poznawczej — odczytuj go w kontekście formatu (wykład a warsztat), nigdy jako ocenę jakości.",
       "scoreUnavailable": "Za mało danych, aby obliczyć wskaźnik.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Nie można wczytać transkrypcji (HTTP {code}).",
       "editNotReady": "Dla tego nagrania nie ma jeszcze transkrypcji. Uruchom (lub uruchom ponownie) przetwarzanie AI z panelu powyżej: transkrypcja jest pierwszym krokiem, a potem będzie ją tu można poprawić oraz wygenerować podsumowanie i tłumaczenia.",
       "editProcessing": "Trwa przetwarzanie AI: transkrypcja pojawi się tutaj po jego zakończeniu. Odśwież stronę za kilka minut.",
-      "editSessionExpired": "Sesja administratora wygasła. Odśwież stronę i zaloguj się ponownie, aby edytować transkrypcję.",
+      "editSessionExpired": "Sesja wygasła. Odśwież stronę i zaloguj się ponownie, aby edytować transkrypcję.",
       "editEmpty": "Brak segmentów do edycji",
       "editSpeakerNone": "— brak —",
       "editSave": "Zapisz zmiany",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archiwum",
       "manageTabReliability": "Wiarygodność",
       "manageLoading": "Wczytywanie…",
-      "archivePiiNote": "Wyizolowane ścieżki audio poszczególnych uczestników to wrażliwe dane osobowe (wyizolowany głos): ta sekcja jest zastrzeżona dla administratorów i moderatorów oraz nigdy nie jest udostępniana publicznie.",
+      "archivePiiNote": "Oddzielna ścieżka dźwiękowa każdego uczestnika to wrażliwe dane osobowe (wyizolowany głos): ta sekcja jest zarezerwowana dla osób zarządzających wydarzeniem i nigdy nie jest publiczna.",
       "archiveNoTracks": "Brak ścieżek poszczególnych uczestników dla tego nagrania (nagrywanie wielościeżkowe nie było włączone albo ścieżki zostały już usunięte w ramach minimalizacji danych zgodnie z RODO).",
       "archivePlayerTitle": "Odsłuch według mówcy",
       "archiveAudioHint": "Użyj w odtwarzaczu selektora „Audio”, aby posłuchać miksu albo wyizolowanej ścieżki pojedynczego uczestnika, zsynchronizowanej z obrazem.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Na żywo",
       "ENDED": "Zakończone",
       "ARCHIVED": "Zarchiwizowane"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Jeszcze jedno wydarzenie} few {Jeszcze # wydarzenia} many {Jeszcze # wydarzeń} other {Jeszcze # wydarzenia}}",
+    "noEvents": "Brak wydarzeń w tym okresie",
+    "weekShort": "Tydz."
   },
   "footer": {
     "privacy": "Polityka prywatności",
@@ -4880,12 +4892,29 @@
     "yes": "Tak",
     "no": "Nie",
     "scaleValue": "{value} z {max}",
-    "answerOne": "Odpowiedz na co najmniej jedno pytanie, aby wysłać."
+    "answerOne": "Odpowiedz na co najmniej jedno pytanie, aby wysłać.",
+    "pageTitle": "Ankieta"
   },
   "notFound": {
     "title": "Nie znaleziono strony",
     "text": "Adres może być błędny albo strona już nie istnieje.",
     "home": "Przejdź do strony głównej",
     "staffArea": "Wróć do strefy zastrzeżonej"
+  },
+  "apiErrors": {
+    "unauthorized": "Sesja wygasła lub dostęp jest nieważny. Zaloguj się ponownie i spróbuj jeszcze raz.",
+    "forbidden": "Nie masz uprawnień do tej operacji.",
+    "notFound": "Ten element już nie istnieje. Odśwież stronę.",
+    "tooLarge": "Za duże: zmniejsz plik lub tekst i spróbuj ponownie.",
+    "rateLimited": "Zbyt wiele żądań w krótkim czasie. Odczekaj chwilę i spróbuj ponownie.",
+    "transcriptCorrected": "Transkrypcja z napisów została poprawiona ręcznie: transkrypcja AI by ją zastąpiła, a poprawki zostałyby utracone.",
+    "aiPipelineDisabled": "Potok AI jest wyłączony dla całego serwisu: administrator może go włączyć w ustawieniach.",
+    "recordingWithoutMedia": "To nagranie nie ma wideo: jego transkrypcja pochodzi z napisów na żywo.",
+    "noParticipantTracks": "Brak oddzielnych ścieżek dźwiękowych uczestników: nie zostały nagrane lub zostały już usunięte. Aby je mieć, włącz nagrywanie dla każdego uczestnika przed wydarzeniem.",
+    "summaryMissing": "W tym języku nie ma jeszcze podsumowania do edycji: najpierw je wygeneruj.",
+    "storageUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji.",
+    "aiDisabledForEvent": "AI jest wyłączona dla tego wydarzenia: użyj „Wygeneruj AI”, aby ją włączyć i uruchomić przetwarzanie.",
+    "sourceTranscriptMissing": "To nagranie nie ma jeszcze transkrypcji: najpierw je przetranskrybuj, potem dodaj tłumaczenie.",
+    "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny."
   }
 }

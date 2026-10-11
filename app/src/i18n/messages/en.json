@@ -89,7 +89,8 @@
     "language": "Language",
     "switchLanguage": "Switch language",
     "skipToContent": "Skip to content",
-    "skipToFooter": "Skip to footer"
+    "skipToFooter": "Skip to footer",
+    "mainLabel": "Main navigation"
   },
   "header": {
     "followUs": "Follow us on"
@@ -301,7 +302,7 @@
       "library": "Publish to the library",
       "libraryHelp": "As above, and also show the event in the public video library (requires a published recording or a YouTube video).",
       "archive": "Archive (private)",
-      "archiveHelp": "The concluded event page won't be public (404). Data is kept until retention expires, then deleted.",
+      "archiveHelp": "The page of the ended event will not be visible to the public. The data is kept until the retention period ends, then deleted.",
       "genAi": "Generate AI transcript and summary from the recording (once processing finishes)",
       "back": "Back",
       "confirm": "End event"
@@ -572,7 +573,15 @@
       "show": "Show captions",
       "hide": "Hide captions",
       "toggle": "Automatic captions"
-    }
+    },
+    "eventEndedModerator": "The event has ended. Below you'll find the statistics and, if the event was recorded, the recording and the report.",
+    "endLinks": {
+      "after": "Recording and report",
+      "stats": "Event statistics",
+      "publicPage": "Public event page"
+    },
+    "notOpenNow": "The room is not open right now.",
+    "nameRequired": "The name to join with is missing: go back and type it."
   },
   "qa": {
     "title": "Questions & Answers",
@@ -1166,7 +1175,7 @@
         "signing": "Preparing…",
         "uploading": "Uploading {progress}%",
         "uploaded": "Upload complete",
-        "uploadHint": "Supported formats: MP4, WebM, MOV, M4V. Max size 5 GB. Upload is direct to object storage (Azure Blob) — nothing passes through our servers.",
+        "uploadHint": "Supported formats: MP4, WebM, MOV, M4V. Maximum size 5 GB. The file goes straight to the video archive, without passing through the portal.",
         "step2Title": "2. Publication metadata",
         "titleIt": "Title (Italian)",
         "titleEn": "Title (English, optional)",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maximum number of participants",
       "expectedParticipants": "Expected participants (estimate)",
       "expectedParticipantsHint": "Just an estimate for infrastructure sizing. This is not a hard cap: registrations beyond this number are accepted and the infra scales automatically.",
-      "expectedSenderRatio": "Expected sender ratio",
-      "expectedSenderRatioInherit": "Site default",
-      "expectedSenderRatioHint": "Percentage of attendees with mic or webcam on. Classic webinar 10-20%, panel 50-100%. Leave empty to inherit the site default.",
+      "expectedSenderRatio": "Share of people speaking",
+      "expectedSenderRatioInherit": "Site value",
+      "expectedSenderRatioHint": "Percentage of participants with an active microphone or camera. Classic webinar 10-20%, round table 50-100%. Leave empty to use the site value.",
       "jvbPreview": {
-        "title": "Estimated JVB capacity",
-        "pod": "JVB pod",
-        "pods": "JVB pods",
-        "senders": "Senders",
-        "receivers": "Receivers",
-        "effectiveRatio": "Effective ratio",
-        "inherited": "inherited",
-        "presetLabel": "Preset",
+        "title": "Video bridge estimate",
+        "pod": "video bridge",
+        "pods": "video bridges",
+        "senders": "With microphone or camera",
+        "receivers": "Listening only",
+        "effectiveRatio": "Share of people speaking",
+        "inherited": "site value",
+        "presetLabel": "Profile",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Meeting",
           "workshop": "Workshop",
-          "allHands": "All senders"
+          "allHands": "Everyone speaks"
         },
-        "clearPreset": "Use site default",
-        "atCeiling": "max {max} cap",
-        "videoDisabled": "Video disabled: all attendees count as receivers.",
-        "warnInherited": "With {participants} attendees and the inherited ratio ({defaultPct}%), the estimate relies on the site default. Large events should set an explicit value (webinar 5-20%, meeting 30%, workshop 60%).",
-        "warnCeiling": "Estimate at the configured max ({max} pods). If real attendance or senders exceed the estimate, bridges may saturate. Consider raising the cap or lowering maxParticipants."
+        "clearPreset": "Use the site value",
+        "atCeiling": "maximum {max}",
+        "videoDisabled": "Video off: all participants count as listening.",
+        "warnInherited": "With {participants} participants and the site's share ({defaultPct}%), the estimate is approximate. For large events it is worth setting it: webinar 5-20%, meeting 30%, workshop 60%.",
+        "warnCeiling": "The estimate is at the configured maximum ({max} video bridges). If more people speak than expected the bridges could saturate: consider raising the limit or lowering the maximum number of participants."
       },
       "gracePeriod": "Event end (soft exit)",
       "gracePeriodInherit": "Use site default",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Upload an existing recording",
-      "subtitle": "Already have a video file of the event (for example a MsTeams recording)? Upload it here — it becomes the official recording on the public page.",
+      "subtitle": "If you already have a video file of the event (for example recorded with another platform), upload it here: it will be shown as the official recording on the public page.",
       "fileLabel": "Video file",
       "upload": "Upload and attach",
       "signing": "Preparing…",
       "uploading": "Uploading {progress}%",
       "attaching": "Attaching to event…",
-      "hint": "Formats: MP4, WebM, MOV, M4V. Max 5 GB. Upload goes straight to Azure Blob storage.",
+      "hint": "Formats: MP4, WebM, MOV, M4V. Up to 5 GB. The file goes straight to the video archive, without passing through the portal.",
       "errors": {
         "fileTooLarge": "File exceeds the 5 GB limit.",
         "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "The event has not ended yet: statistics are partial and update in real time.",
       "cappedNote": "Very large event: some metrics are computed on a sample (row cap reached).",
       "scoreTitle": "Attention score",
-      "adminOnly": "admin only",
+      "adminOnly": "not public",
       "scoreProxy": "A 0–100 index of how participative the audience was. It is a participation proxy, not a measure of cognitive attention — read it with the event format in mind (lecture vs workshop), never as a quality grade.",
       "scoreUnavailable": "Not enough data to compute the score.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Could not load the transcript (HTTP {code}).",
       "editNotReady": "No transcript is available for this recording yet. Start (or re-run) AI processing from the controls above: transcription is the first step, then you can correct it here and generate the summary and translations.",
       "editProcessing": "AI processing in progress: the transcript will appear here when it finishes. Refresh the page in a few minutes.",
-      "editSessionExpired": "Admin session expired. Reload the page and sign in again to edit the transcript.",
+      "editSessionExpired": "Your session has expired. Reload the page and sign in again to edit the transcript.",
       "editEmpty": "No editable segments",
       "editSpeakerNone": "— none —",
       "editSave": "Save changes",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archive",
       "manageTabReliability": "Reliability",
       "manageLoading": "Loading…",
-      "archivePiiNote": "Isolated per-participant audio tracks are sensitive personal data (isolated voice): this section is restricted to admins/moderators and is never publicly exposed.",
+      "archivePiiNote": "The separate audio track of each participant is sensitive personal data (the isolated voice): this section is reserved to whoever manages the event and is never public.",
       "archiveNoTracks": "No per-participant tracks available for this recording (multi-track recording not enabled, or tracks already deleted for GDPR minimization).",
       "archivePlayerTitle": "Per-speaker playback",
       "archiveAudioHint": "Use the player's \"Audio\" selector to listen to the mix or a single participant's isolated track, synced to the video.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Live",
       "ENDED": "Ended",
       "ARCHIVED": "Archived"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {One more event} other {# more events}}",
+    "noEvents": "No events in this period",
+    "weekShort": "Wk"
   },
   "footer": {
     "privacy": "Privacy policy",
@@ -4880,12 +4892,29 @@
     "yes": "Yes",
     "no": "No",
     "scaleValue": "{value} of {max}",
-    "answerOne": "Answer at least one question to send."
+    "answerOne": "Answer at least one question to send.",
+    "pageTitle": "Questionnaire"
   },
   "notFound": {
     "title": "Page not found",
     "text": "The address may be wrong, or the page no longer exists.",
     "home": "Go to the home page",
     "staffArea": "Back to the staff area"
+  },
+  "apiErrors": {
+    "unauthorized": "Your session has expired or the access is not valid. Sign in again and retry.",
+    "forbidden": "You don't have permission for this action.",
+    "notFound": "This item no longer exists. Reload the page.",
+    "tooLarge": "Too large: make the file or the text smaller and try again.",
+    "rateLimited": "Too many requests in a short time. Wait a moment and try again.",
+    "transcriptCorrected": "The transcript from the captions was corrected by hand: an AI transcript would replace it and the corrections would be lost.",
+    "aiPipelineDisabled": "The AI pipeline is off for the whole site: an administrator can turn it on in the settings.",
+    "recordingWithoutMedia": "This recording has no video: its transcript comes from the live captions.",
+    "noParticipantTracks": "There are no separate audio tracks of the participants: they were not recorded or have already been deleted. To have them, turn on per-participant recording before the event.",
+    "summaryMissing": "There is no summary to edit in this language yet: generate it first.",
+    "storageUnavailable": "File uploads are not available on this installation.",
+    "aiDisabledForEvent": "AI is off for this event: use «Generate AI» to turn it on and start the pipeline.",
+    "sourceTranscriptMissing": "This recording has not been transcribed yet: transcribe it before adding a translation.",
+    "sameLanguage": "The chosen language is the recording's original one: pick another."
   }
 }

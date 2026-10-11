@@ -9,7 +9,7 @@ import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/gener
 import { enqueueEmail } from '@/lib/email/outbox';
 import { lingueIscrizione } from '@/lib/email/lingua';
 import { getSettings } from '@/lib/settings';
-import { formatDate, formatTime } from '@/lib/utils/date-format';
+import { formatDate, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -25,7 +25,7 @@ const COPY = {
   it: {
     subject: (title: string) => `Aggiornamento: ${title} — Nuova data`,
     heading: 'Data evento aggiornata',
-    body: 'La data dell\'evento a cui sei registrato è stata modificata.',
+    body: 'La data dell\'evento a cui sei iscritto è stata modificata.',
     newDate: 'Nuova data',
     newTime: 'Nuovo orario',
     linkNote: 'Il tuo link personale per partecipare resta invariato.',
@@ -131,7 +131,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         const title = getLocalized(event.title as LocalizedField, pagina);
         const description = getLocalized(event.description as LocalizedField, pagina);
         const date = formatDate(event.startsAt, testi, event.timezone);
-        const time = formatTime(event.startsAt, testi, event.timezone);
+        const time = formatTimeWithZone(event.startsAt, testi, event.timezone);
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
         // Stesso UID della conferma e SEQUENCE piu' alta (l'evento e' appena
         // stato modificato): il calendario sposta la voce esistente invece di

@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { prisma } from '@/lib/db';
@@ -8,6 +10,13 @@ import { QUESTIONNAIRE_PLACEMENTS } from '@/lib/validation/schemas';
 interface PageProps {
   params: Promise<{ slug: string; placement: string; locale: string }>;
   searchParams: Promise<{ token?: string }>;
+}
+
+// Il titolo resta generico: la pagina si apre da un link con il token, e il
+// titolo della scheda non deve dire di quale evento prima dei controlli.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('questionnaire');
+  return { title: t('pageTitle') };
 }
 
 export default async function PublicQuestionnairePage({ params, searchParams }: PageProps) {

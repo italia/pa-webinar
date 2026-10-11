@@ -34,7 +34,7 @@ import { emailBaseUrl } from '@/lib/email/links';
 import { enqueueEmailOnce } from '@/lib/email/outbox';
 import { escapeHtml } from '@/lib/email/templates';
 import { getSettings } from '@/lib/settings';
-import { formatDate, formatTime } from '@/lib/utils/date-format';
+import { formatDate, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -394,7 +394,7 @@ export async function sendPrimaryModeratorLink(
       name: event.moderatorName,
       eventTitle: getLocalized(event.title as LocalizedField, pagina),
       eventDate: formatDate(event.startsAt, testi, event.timezone),
-      eventTime: formatTime(event.startsAt, testi, event.timezone),
+      eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
       liveUrl: localizedUrl(base, `/events/${event.slug}/live?token=${token}`, pagina),
       manageUrl: localizedUrl(base, `/admin/events/${event.id}?token=${token}`, pagina),
       siteName: settings.siteName || undefined,
@@ -499,7 +499,7 @@ async function accodaConcessione(
     name: tryDecryptPII(grant.name) ?? grant.name,
     eventTitle: getLocalized(event.title as LocalizedField, pagina),
     eventDate: formatDate(event.startsAt, testi, event.timezone),
-    eventTime: formatTime(event.startsAt, testi, event.timezone),
+    eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
     liveUrl: localizedUrl(
       emailBaseUrl(),
       `/events/${event.slug}/live?token=${encodeURIComponent(grant.token)}`,

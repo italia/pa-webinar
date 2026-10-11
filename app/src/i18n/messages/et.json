@@ -89,7 +89,8 @@
     "language": "Keel",
     "switchLanguage": "Vaheta keelt",
     "skipToContent": "Liigu sisuni",
-    "skipToFooter": "Liigu jalusesse"
+    "skipToFooter": "Liigu jalusesse",
+    "mainLabel": "Peanavigeerimine"
   },
   "header": {
     "followUs": "Jälgige meid"
@@ -301,7 +302,7 @@
       "library": "Avalda videokogus",
       "libraryHelp": "Nagu ülal, lisaks kuvatakse sündmust avalikus videokogus (eeldab avaldatud salvestist või YouTube'i videot).",
       "archive": "Arhiveeri (privaatne)",
-      "archiveHelp": "Lõppenud sündmuse leht ei ole avalik (404). Andmeid hoitakse säilitustähtaja lõpuni, seejärel kustutatakse.",
+      "archiveHelp": "Lõppenud ürituse leht ei ole avalikkusele nähtav. Andmeid säilitatakse säilitusaja lõpuni ja seejärel need kustutatakse.",
       "genAi": "Loo salvestisest AI transkriptsioon ja kokkuvõte (kui töötlus on lõppenud)",
       "back": "Tagasi",
       "confirm": "Lõpeta sündmus"
@@ -572,7 +573,15 @@
       "show": "Näita subtiitreid",
       "hide": "Peida subtiitrid",
       "toggle": "Automaatsed subtiitrid"
-    }
+    },
+    "eventEndedModerator": "Üritus on lõppenud. Allpool leiad statistika ja, kui üritus salvestati, salvestuse ja ülevaate.",
+    "endLinks": {
+      "after": "Salvestus ja aruanne",
+      "stats": "Ürituse statistika",
+      "publicPage": "Ürituse avalik leht"
+    },
+    "notOpenNow": "Ruum ei ole praegu avatud.",
+    "nameRequired": "Nimi, millega siseneda, puudub: mine tagasi ja kirjuta see."
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -1166,7 +1175,7 @@
         "signing": "Ettevalmistus...",
         "uploading": "Üleslaadimine {progress}%",
         "uploaded": "Üleslaadimine valmis",
-        "uploadHint": "Toetatud vormingud: MP4, WebM, MOV, M4V. Maksimaalne suurus 5 GB. Üleslaadimine toimub otse salvestusruumi (Azure Blob), miski ei läbi meie servereid.",
+        "uploadHint": "Toetatud vormingud: MP4, WebM, MOV, M4V. Suurim maht 5 GB. Fail läheb otse videoarhiivi, portaalist läbi minemata.",
         "step2Title": "2. Avalduse metaandmed",
         "titleIt": "Pealkiri (itaalia keeles)",
         "titleEn": "Pealkiri (inglise keeles, valikuline)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Ei liitunud",
     "deleteSuccess": "Üritus kustutatud",
     "publishSuccess": "Üritus avaldatud",
-    "unpublishSuccess": "Ürituse avaldamine tühistatud",
+    "unpublishSuccess": "Avaldamine tühistatud",
     "startEvent": "Käivita üritus",
     "startEventSuccess": "Üritus käivitatud! Ootavad osalejad suunatakse automaatselt.",
     "startEventConfirmTitle": "Kas alustada üritust?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Osalejate maksimaalne arv",
       "expectedParticipants": "Eeldatavad osalejad (hinnang)",
       "expectedParticipantsHint": "Ainult hinnang infrastruktuuri mõõtmiseks. See pole kindel ülempiir: registreeringud üle selle arvu aktsepteeritakse ja infrastruktuur skaleerub automaatselt.",
-      "expectedSenderRatio": "Eeldatav saatjate suhe",
-      "expectedSenderRatioInherit": "Saidi vaikeväärtus",
-      "expectedSenderRatioHint": "Osalejate protsent, kellel on aktiivne mikrofon või veebikaamera. Klassikaline veebiseminar 10-20%, ümarlaud 50-100%. Jätke tühjaks, et pärida saidi vaikeväärtus.",
+      "expectedSenderRatio": "Rääkijate osakaal",
+      "expectedSenderRatioInherit": "Saidi väärtus",
+      "expectedSenderRatioHint": "Sisselülitatud mikrofoni või kaameraga osalejate osakaal. Klassikaline veebiseminar 10-20%, ümarlaud 50-100%. Jäta tühjaks, et kasutada saidi väärtust.",
       "jvbPreview": {
-        "title": "JVB hinnanguline mahutavus",
-        "pod": "JVB pod",
-        "pods": "JVB podid",
-        "senders": "Saatjad",
-        "receivers": "Vastuvõtjad",
-        "effectiveRatio": "Tegelik suhe",
-        "inherited": "päritud",
-        "presetLabel": "Eelseadistus",
+        "title": "Videosildade hinnang",
+        "pod": "videosild",
+        "pods": "videosilda",
+        "senders": "Mikrofoni või kaameraga",
+        "receivers": "Ainult kuulab",
+        "effectiveRatio": "Rääkijate osakaal",
+        "inherited": "saidi väärtus",
+        "presetLabel": "Profiil",
         "preset": {
           "webinar": "Veebiseminar",
           "meeting": "Koosolek",
           "workshop": "Töötuba",
-          "allHands": "Kõik saatjad"
+          "allHands": "Kõik räägivad"
         },
-        "clearPreset": "Kasuta saidi vaikeväärtust",
-        "atCeiling": "max piirang {max}",
-        "videoDisabled": "Video keelatud: kõik osalejad loetakse vastuvõtjateks.",
-        "warnInherited": "{participants} osaleja ja päritud suhtega ({defaultPct}%) põhineb hinnang saidi vaikeväärtusel. Suurte sündmuste jaoks tasub määrata selge väärtus (veebiseminar 5-20%, koosolek 30%, töötuba 60%).",
-        "warnCeiling": "Hinnang konfigureeritud maksimaalsel piiril ({max} podi). Kui tegelik osavõtt või saatjad ületavad hinnangu, võivad sillad küllastuda. Kaaluge piirangu tõstmist või maxParticipants vähendamist."
+        "clearPreset": "Kasuta saidi väärtust",
+        "atCeiling": "kuni {max}",
+        "videoDisabled": "Video väljas: kõik osalejad loetakse kuulajateks.",
+        "warnInherited": "{participants} osaleja ja saidi osakaaluga ({defaultPct}%) on hinnang ligikaudne. Suurte ürituste puhul tasub see määrata: veebiseminar 5-20%, koosolek 30%, töötuba 60%.",
+        "warnCeiling": "Hinnang on seadistatud maksimumis ({max} videosilda). Kui räägib oodatust rohkem inimesi, võivad sillad üle koormuda: kaalu piirangu tõstmist või osalejate maksimaalse arvu vähendamist."
       },
       "gracePeriod": "Sündmuse lõpp (pehme väljumine)",
       "gracePeriodInherit": "Kasuta saidi vaikeväärtust",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Lae üles olemasolev salvestus",
-      "subtitle": "Kui teil on juba sündmuse videofail (nt MsTeams salvestus), laadige see siia: see kuvatakse ametliku salvestusena avalikul lehel.",
+      "subtitle": "Kui sul on juba ürituse videofail (näiteks salvestatud teisel platvormil), laadi see siia: seda näidatakse avalikul lehel ametliku salvestusena.",
       "fileLabel": "Videofail",
       "upload": "Lae üles ja seo",
       "signing": "Ettevalmistus…",
       "uploading": "Üleslaadimine {progress}%",
       "attaching": "Sündmusele sidumine…",
-      "hint": "Vormingud: MP4, WebM, MOV, M4V. Max 5 GB. Üleslaadimine läheb otse Azure salvestusruumi.",
+      "hint": "Vormingud: MP4, WebM, MOV, M4V. Kuni 5 GB. Fail läheb otse videoarhiivi, portaalist läbi minemata.",
       "errors": {
         "fileTooLarge": "Fail ületab 5 GB piirangu.",
         "unsupportedType": "Vormingut ei toetata. Laadige MP4, WebM, MOV või M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Sündmus ei ole veel lõppenud: statistika on osaline ja uueneb reaalajas.",
       "cappedNote": "Väga suur sündmus: mõned mõõdikud on arvutatud valimi põhjal (ridade ülempiir saavutatud).",
       "scoreTitle": "Tähelepanu tase",
-      "adminOnly": "ainult administraatorile",
+      "adminOnly": "mitteavalik",
       "scoreProxy": "Indeks 0–100 selle kohta, kui aktiivselt saal osales. See on osaluse kaudne näitaja, mitte kognitiivse tähelepanu mõõdik – loe seda sündmuse vormi kontekstis (loeng vs töötuba), mitte kunagi kvaliteedihindena.",
       "scoreUnavailable": "Taseme arvutamiseks pole piisavalt andmeid.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Transkriptsiooni ei õnnestunud laadida (HTTP {code}).",
       "editNotReady": "Selle salvestise transkriptsioon ei ole veel saadaval. Käivita (või käivita uuesti) AI töötlus ülalolevatest nuppudest: transkribeerimine on esimene samm, seejärel saad seda siin parandada ning luua kokkuvõtte ja tõlked.",
       "editProcessing": "AI töötlus käib: transkriptsioon ilmub siia, kui see valmib. Värskenda lehte mõne minuti pärast.",
-      "editSessionExpired": "Administraatori sessioon on aegunud. Laadi leht uuesti ja logi transkriptsiooni muutmiseks uuesti sisse.",
+      "editSessionExpired": "Seanss on aegunud. Laadi leht uuesti ja logi sisse, et transkriptsiooni muuta.",
       "editEmpty": "Muudetavaid lõike pole",
       "editSpeakerNone": "— puudub —",
       "editSave": "Salvesta muudatused",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arhiiv",
       "manageTabReliability": "Usaldusväärsus",
       "manageLoading": "Laadimine…",
-      "archivePiiNote": "Osalejapõhised eraldatud helirajad on tundlikud isikuandmed (eraldatud hääl): see jaotis on mõeldud ainult administraatoritele ja moderaatoritele ning seda ei avaldata kunagi avalikult.",
+      "archivePiiNote": "Iga osaleja eraldi helirada on tundlik isikuandmestik (eraldatud hääl): see jaotis on reserveeritud ürituse haldajatele ega ole kunagi avalik.",
       "archiveNoTracks": "Selle salvestise jaoks pole osalejapõhiseid helirajasid saadaval (mitmerajaline salvestamine ei olnud sees või on rajad IKÜM-i minimeerimise tõttu juba kustutatud).",
       "archivePlayerTitle": "Kõnelejapõhine taasesitus",
       "archiveAudioHint": "Kasuta pleieri valikut „Heli“, et kuulata videoga sünkroonis kas miksi või ühe osaleja eraldatud helirada.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Toimub",
       "ENDED": "Lõppenud",
       "ARCHIVED": "Arhiveeritud"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Veel üks üritus} other {Veel # üritust}}",
+    "noEvents": "Sellel perioodil üritusi pole",
+    "weekShort": "Näd."
   },
   "footer": {
     "privacy": "Privaatsuspoliitika",
@@ -4880,12 +4892,29 @@
     "yes": "Jah",
     "no": "Ei",
     "scaleValue": "{value}/{max}",
-    "answerOne": "Saatmiseks vasta vähemalt ühele küsimusele."
+    "answerOne": "Saatmiseks vasta vähemalt ühele küsimusele.",
+    "pageTitle": "Küsimustik"
   },
   "notFound": {
     "title": "Lehte ei leitud",
     "text": "Aadress võib olla vale või lehte enam ei ole.",
     "home": "Avalehele",
     "staffArea": "Tagasi suletud alasse"
+  },
+  "apiErrors": {
+    "unauthorized": "Seanss on aegunud või juurdepääs ei kehti. Logi uuesti sisse ja proovi uuesti.",
+    "forbidden": "Sul pole selle toimingu jaoks õigust.",
+    "notFound": "Seda elementi enam ei ole. Laadi leht uuesti.",
+    "tooLarge": "Liiga suur: vähenda faili või teksti ja proovi uuesti.",
+    "rateLimited": "Liiga palju päringuid lühikese aja jooksul. Oota hetk ja proovi uuesti.",
+    "transcriptCorrected": "Subtiitritest tehtud transkriptsiooni on käsitsi parandatud: tehisintellekti transkriptsioon asendaks selle ja parandused läheksid kaotsi.",
+    "aiPipelineDisabled": "Tehisintellekti töövoog on kogu saidil välja lülitatud: administraator saab selle seadetes sisse lülitada.",
+    "recordingWithoutMedia": "Sellel salvestusel pole videot: selle transkriptsioon pärineb otseülekande subtiitritest.",
+    "noParticipantTracks": "Osalejate eraldi helirajad puuduvad: neid ei salvestatud või need on juba kustutatud. Nende saamiseks lülita enne üritust sisse osalejapõhine salvestamine.",
+    "summaryMissing": "Selles keeles pole veel muudetavat kokkuvõtet: loo see kõigepealt.",
+    "storageUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval.",
+    "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",
+    "sourceTranscriptMissing": "Seda salvestust pole veel transkribeeritud: transkribeeri see enne tõlke lisamist.",
+    "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu."
   }
 }

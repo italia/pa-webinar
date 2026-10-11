@@ -19,6 +19,7 @@ import VideoPlayer, {
   type SubtitleTrack,
 } from '@/components/events/video-player';
 import { useToast } from '@/components/ui/toast';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 interface TrackDto {
   id: string;
@@ -40,6 +41,7 @@ interface TracksResponse {
 
 export default function ArchivePanel({ recordingId }: { recordingId: string }) {
   const t = useTranslations('admin.postprod');
+  const tApi = useTranslations('apiErrors');
   const toast = useToast();
   const [data, setData] = useState<TracksResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,8 +124,9 @@ export default function ArchivePanel({ recordingId }: { recordingId: string }) {
         toast.success(t('archiveGenerateOk'));
         await load();
       } else {
-        const body = (await r.json().catch(() => ({}))) as { error?: string };
-        toast.error(body.error ?? t('archiveGenerateErr', { code: r.status }));
+        toast.error(
+          messaggioErroreApi(r.status, tApi, t('archiveGenerateErr', { code: r.status }), {}, await codiceErrore(r)),
+        );
       }
     } catch {
       toast.error(t('archiveGenerateErr', { code: 0 }));

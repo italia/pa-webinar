@@ -9,11 +9,37 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import listPlugin from '@fullcalendar/list';
+import bgLocale from '@fullcalendar/core/locales/bg';
+import csLocale from '@fullcalendar/core/locales/cs';
+import daLocale from '@fullcalendar/core/locales/da';
+import deLocale from '@fullcalendar/core/locales/de';
+import elLocale from '@fullcalendar/core/locales/el';
+import esLocale from '@fullcalendar/core/locales/es';
+import etLocale from '@fullcalendar/core/locales/et';
+import fiLocale from '@fullcalendar/core/locales/fi';
+import frLocale from '@fullcalendar/core/locales/fr';
+import hrLocale from '@fullcalendar/core/locales/hr';
+import huLocale from '@fullcalendar/core/locales/hu';
+import itLocale from '@fullcalendar/core/locales/it';
+import ltLocale from '@fullcalendar/core/locales/lt';
+import lvLocale from '@fullcalendar/core/locales/lv';
+import nlLocale from '@fullcalendar/core/locales/nl';
+import plLocale from '@fullcalendar/core/locales/pl';
+import ptLocale from '@fullcalendar/core/locales/pt';
+import roLocale from '@fullcalendar/core/locales/ro';
+import skLocale from '@fullcalendar/core/locales/sk';
+import slLocale from '@fullcalendar/core/locales/sl';
+import svLocale from '@fullcalendar/core/locales/sv';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventInput, DatesSetArg, EventClickArg } from '@fullcalendar/core';
 
 import { Icon } from '@/components/ui/icon';
 import { useRouter, percorso } from '@/i18n/navigation';
+
+// Le lingue del portale che il calendario conosce (l'inglese e' gia' dentro;
+// irlandese e maltese non ci sono e restano in inglese per giorni e mesi):
+// solo queste, non tutte le oltre cento del pacchetto.
+const LINGUE_CALENDARIO = [bgLocale, csLocale, daLocale, deLocale, elLocale, esLocale, etLocale, fiLocale, frLocale, hrLocale, huLocale, itLocale, ltLocale, lvLocale, nlLocale, plLocale, ptLocale, roLocale, skLocale, slLocale, svLocale];
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   DRAFT: { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-text)' },
@@ -44,6 +70,7 @@ interface EventCalendarProps {
 
 export default function EventCalendar({ mode, initialEvents = [] }: EventCalendarProps) {
   const t = useTranslations('calendar');
+  const tc = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const calendarRef = useRef<FullCalendar>(null);
@@ -206,7 +233,15 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, multiMonthPlugin, listPlugin, interactionPlugin]}
           initialView="dayGridMonth"
+          // I nomi di giorni e mesi vengono dal pacchetto di lingue del
+          // calendario; i testi letti dai lettori di schermo dai nostri.
+          locales={LINGUE_CALENDARIO}
           locale={locale}
+          moreLinkHint={(n: number) => t('moreLinkHint', { count: n })}
+          closeHint={tc('close')}
+          noEventsText={t('noEvents')}
+          weekText={t('weekShort')}
+          weekTextLong={t('views.week')}
           firstDay={1}
           weekNumbers={true}
           weekNumberFormat={{ week: 'numeric' }}
@@ -251,12 +286,11 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
                 )}
                 {status === 'LIVE' && (
                   <span
-                    className="rounded-circle d-inline-block flex-shrink-0"
+                    className="rounded-circle d-inline-block flex-shrink-0 pulse-dot"
                     style={{
                       width: 6,
                       height: 6,
                       backgroundColor: '#008758',
-                      animation: 'pulse-dot 1.5s ease-in-out infinite',
                     }}
                   />
                 )}
@@ -389,11 +423,6 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
 
         .fc-bootstrap-italia .fc-now-indicator-arrow {
           border-color: #CC334D;
-        }
-
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
         }
       `}</style>
     </div>

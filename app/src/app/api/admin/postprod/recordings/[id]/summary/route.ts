@@ -23,7 +23,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { sha256Hex } from '@/lib/ai/transcript-format';
 
@@ -138,8 +138,10 @@ export const PUT = withErrorHandling(async (request, context) => {
       (a) => a.type === mdType && a.language === body.language,
     );
     if (!art) {
-      throw new ValidationError(
+      throw new AppError(
         `Nessun artifact ${mdType} per la lingua ${body.language} (rigenera la pipeline prima)`,
+        422,
+        'SUMMARY_MISSING',
       );
     }
     updates.push({ artifactId: art.id, body: body.md });
@@ -150,8 +152,10 @@ export const PUT = withErrorHandling(async (request, context) => {
       (a) => a.type === 'SUMMARY_JSON' && a.language === body.language,
     );
     if (!art) {
-      throw new ValidationError(
+      throw new AppError(
         `Nessun artifact SUMMARY_JSON per la lingua ${body.language}`,
+        422,
+        'SUMMARY_MISSING',
       );
     }
     updates.push({ artifactId: art.id, body: JSON.stringify(body.structured) });

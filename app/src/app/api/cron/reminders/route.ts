@@ -22,7 +22,7 @@ import {
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
 import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
-import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
@@ -157,7 +157,7 @@ export const GET = withErrorHandling(async (request) => {
           locale: testi,
           eventTitle: title,
           eventDate: formatDate(event.startsAt, testi, event.timezone),
-          eventTime: formatTime(event.startsAt, testi, event.timezone),
+          eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
           eventDuration: formatDuration(event.startsAt, event.endsAt),
           joinUrl,
           eventPageUrl,
@@ -170,6 +170,7 @@ export const GET = withErrorHandling(async (request) => {
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
+          myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', locale),
         };
 
         // Stesso UID della conferma: il promemoria aggiorna la voce di

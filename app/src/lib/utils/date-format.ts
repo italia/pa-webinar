@@ -39,6 +39,19 @@ export function formatTime(date: Date, locale: string, timeZone?: string): strin
 }
 
 /**
+ * L'ora con il fuso («18:00 CEST»): nelle email, che si leggono anche da un
+ * altro paese o con il calendario in un altro fuso.
+ */
+export function formatTimeWithZone(date: Date, locale: string, timeZone?: string): string {
+  return date.toLocaleTimeString(tagRegionale(locale), {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: timeZone ?? DEFAULT_TIMEZONE,
+    timeZoneName: 'short',
+  });
+}
+
+/**
  * Convert a UTC Date to a `datetime-local` input value (YYYY-MM-DDTHH:mm)
  * displayed as wall-clock time in the given IANA timezone.
  */

@@ -8,6 +8,15 @@
  */
 import type { WizardAdvancedSection, WizardStep } from '@/lib/events/wizard-steps';
 
+/** Le schede della pagina di gestione dell'evento. */
+export const EVENT_ADMIN_TABS = ['panoramica', 'persone', 'contenuti', 'dopo', 'statistiche'] as const;
+export type EventAdminTab = (typeof EVENT_ADMIN_TABS)[number];
+
+/** La scheda chiesta dall'indirizzo, se esiste. */
+export function eventAdminTab(valore: string | null | undefined): EventAdminTab | null {
+  return (EVENT_ADMIN_TABS as readonly string[]).includes(valore ?? '') ? (valore as EventAdminTab) : null;
+}
+
 export function eventAdminPath(
   id: string,
   opts: {
@@ -16,6 +25,8 @@ export function eventAdminPath(
     step?: WizardStep | null;
     /** La sezione delle impostazioni avanzate da aprire. */
     section?: WizardAdvancedSection | null;
+    /** La scheda della pagina di gestione da aprire (non per la modifica). */
+    tab?: EventAdminTab | null;
   } = {},
 ): string {
   const base = `/admin/events/${id}${opts.edit ? '/edit' : ''}`;
@@ -23,6 +34,7 @@ export function eventAdminPath(
   // Il passo del wizard da cui partire (solo per la modifica).
   if (opts.edit && opts.step) query.push(`step=${opts.step}`);
   if (opts.edit && opts.step === 'advanced' && opts.section) query.push(`section=${opts.section}`);
+  if (!opts.edit && opts.tab) query.push(`tab=${opts.tab}`);
   if (opts.viaToken) query.push(`token=${encodeURIComponent(opts.viaToken)}`);
   return query.length > 0 ? `${base}?${query.join('&')}` : base;
 }

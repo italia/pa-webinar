@@ -22,6 +22,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
@@ -153,6 +154,7 @@ export default function SummaryEditor({
 }) {
   const t = useTranslations('admin.postprod');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const { data, error, isLoading, mutate } = useSWR<SummaryResponse>(
     `/api/admin/postprod/recordings/${recordingId}/summary`,
     fetcher as (url: string) => Promise<SummaryResponse>,
@@ -279,12 +281,11 @@ export default function SummaryEditor({
       );
       if (!r.ok) {
         // Un rifiuto del server (testo troppo lungo, lingua senza la sua
-        // sintesi) non si risolve riprovando: lo si dice, con il dettaglio.
-        const body = (await r.json().catch(() => ({}))) as { error?: string; message?: string };
-        const dettaglio = body.error ?? body.message ?? '';
+        // sintesi) non si risolve riprovando: lo si dice.
+        const codice = await codiceErrore(r);
         setErrorMsg(
           r.status >= 400 && r.status < 500
-            ? `${t('summarySaveRejected')}${dettaglio ? ` (${dettaglio})` : ''}`
+            ? messaggioErroreApi(r.status, tApi, t('summarySaveRejected'), {}, codice)
             : t('summarySaveFailed'),
         );
         return;
