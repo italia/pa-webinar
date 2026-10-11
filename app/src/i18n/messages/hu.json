@@ -3553,7 +3553,7 @@
     "title": "Értesítések",
     "addReminder": "Értesítés hozzáadása",
     "removeReminder": "Eltávolítás",
-    "maxReminders": "Eseményenként legfeljebb 5 értesítés.",
+    "maxReminders": "Eseményenként legfeljebb {max} értesítés.",
     "selectPreset": "Válasszon időpontot...",
     "sentStatus": "{count} elküldve",
     "notSent": "Nem küldve",
@@ -3567,7 +3567,17 @@
       "1hour": "1 órával korábban",
       "30min": "30 perccel korábban",
       "15min": "15 perccel korábban"
-    }
+    },
+    "edit": "Szerkesztés",
+    "editDone": "Bezárás",
+    "editLegend": "Mikor kapjanak értesítést a jelentkezők",
+    "alreadySent": "már elküldve",
+    "alreadyPassed": "az időpont elmúlt",
+    "saveFailed": "A módosítást nem sikerült menteni. Próbáld újra.",
+    "errorSent": "Ez az értesítés már kiment: megmarad, a kiküldés nyomaként.",
+    "errorPassed": "Ez az időpont már elmúlt: az értesítés soha nem menne ki.",
+    "errorChanged": "A lista megváltozott: most már naprakész.",
+    "limitReached": "korlát elérve"
   },
   "gdpr": {
     "consent": {

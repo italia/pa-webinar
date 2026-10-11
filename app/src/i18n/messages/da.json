@@ -3553,7 +3553,7 @@
     "title": "Påmindelser",
     "addReminder": "Tilføj påmindelse",
     "removeReminder": "Fjern",
-    "maxReminders": "Maks. 5 påmindelser pr. begivenhed.",
+    "maxReminders": "Maks. {max} påmindelser pr. begivenhed.",
     "selectPreset": "Vælg hvornår...",
     "sentStatus": "{count} sendt",
     "notSent": "Ikke sendt",
@@ -3567,7 +3567,17 @@
       "1hour": "1 time før",
       "30min": "30 minutter før",
       "15min": "15 minutter før"
-    }
+    },
+    "edit": "Rediger",
+    "editDone": "Luk",
+    "editLegend": "Hvornår tilmeldte får besked",
+    "alreadySent": "allerede sendt",
+    "alreadyPassed": "tidspunktet er passeret",
+    "saveFailed": "Ændringen kunne ikke gemmes. Prøv igen.",
+    "errorSent": "Denne påmindelse er allerede sendt: den bliver stående som registrering af, hvad der blev sendt.",
+    "errorPassed": "Det tidspunkt er allerede passeret: påmindelsen ville aldrig blive sendt.",
+    "errorChanged": "Listen var ændret: den er nu opdateret.",
+    "limitReached": "grænsen er nået"
   },
   "gdpr": {
     "consent": {

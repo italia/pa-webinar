@@ -3553,7 +3553,7 @@
     "title": "Pranešimai",
     "addReminder": "Pridėti priminimą",
     "removeReminder": "Pašalinti",
-    "maxReminders": "Daugiausiai 5 priminimai vienam renginiui.",
+    "maxReminders": "Daugiausiai {max} priminimai vienam renginiui.",
     "selectPreset": "Pasirinkite laiką...",
     "sentStatus": "{count} išsiųsta",
     "notSent": "Neišsiųsta",
@@ -3567,7 +3567,17 @@
       "1hour": "Prieš 1 valandą",
       "30min": "Prieš 30 minučių",
       "15min": "Prieš 15 minučių"
-    }
+    },
+    "edit": "Redaguoti",
+    "editDone": "Uždaryti",
+    "editLegend": "Kada pranešti užsiregistravusiems",
+    "alreadySent": "jau išsiųsta",
+    "alreadyPassed": "laikas praėjo",
+    "saveFailed": "Pakeitimo išsaugoti nepavyko. Bandykite dar kartą.",
+    "errorSent": "Šis pranešimas jau išsiųstas: jis lieka kaip išsiuntimo įrašas.",
+    "errorPassed": "Tas laikas jau praėjo: pranešimas niekada nebūtų išsiųstas.",
+    "errorChanged": "Sąrašas buvo pasikeitęs: dabar jis atnaujintas.",
+    "limitReached": "pasiekta riba"
   },
   "gdpr": {
     "consent": {

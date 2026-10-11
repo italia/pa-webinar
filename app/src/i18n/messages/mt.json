@@ -3553,7 +3553,7 @@
     "title": "Notifiki",
     "addReminder": "Żid tfakkira",
     "removeReminder": "Neħħi",
-    "maxReminders": "Massimu 5 tfakkiriet għal kull avveniment.",
+    "maxReminders": "Massimu {max} tfakkiriet għal kull avveniment.",
     "selectPreset": "Agħżel meta...",
     "sentStatus": "{count} mibgħuta",
     "notSent": "Mhux mibgħuta",
@@ -3567,7 +3567,17 @@
       "1hour": "Siegħa qabel",
       "30min": "30 minuta qabel",
       "15min": "15-il minuta qabel"
-    }
+    },
+    "edit": "Editja",
+    "editDone": "Agħlaq",
+    "editLegend": "Meta tinnotifika lill-persuni rreġistrati",
+    "alreadySent": "diġà mibgħuta",
+    "alreadyPassed": "il-ħin għadda",
+    "saveFailed": "Il-bidla ma setgħetx tiġi ssejvjata. Erġa' pprova.",
+    "errorSent": "Din in-notifika diġà ntbagħtet: tibqa', bħala rekord ta' x'intbagħat.",
+    "errorPassed": "Dak il-mument diġà għadda: in-notifika qatt ma tintbagħat.",
+    "errorChanged": "Il-lista kienet inbidlet: issa hija aġġornata.",
+    "limitReached": "il-limitu ntlaħaq"
   },
   "gdpr": {
     "consent": {

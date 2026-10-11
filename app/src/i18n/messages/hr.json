@@ -3553,7 +3553,7 @@
     "title": "Obavijesti",
     "addReminder": "Dodaj obavijest",
     "removeReminder": "Ukloni",
-    "maxReminders": "Najviše 5 obavijesti po događaju.",
+    "maxReminders": "Najviše {max} obavijesti po događaju.",
     "selectPreset": "Odaberite kada...",
     "sentStatus": "{count} poslano",
     "notSent": "Nije poslano",
@@ -3567,7 +3567,17 @@
       "1hour": "1 sat prije",
       "30min": "30 minuta prije",
       "15min": "15 minuta prije"
-    }
+    },
+    "edit": "Uredi",
+    "editDone": "Zatvori",
+    "editLegend": "Kada obavijestiti prijavljene",
+    "alreadySent": "već poslano",
+    "alreadyPassed": "vrijeme je prošlo",
+    "saveFailed": "Promjenu nije moguće spremiti. Pokušajte ponovno.",
+    "errorSent": "Ova je obavijest već poslana: ostaje kao zapis o tome što je poslano.",
+    "errorPassed": "Taj je trenutak već prošao: obavijest nikad ne bi bila poslana.",
+    "errorChanged": "Popis se promijenio: sada je ažuran.",
+    "limitReached": "ograničenje dosegnuto"
   },
   "gdpr": {
     "consent": {

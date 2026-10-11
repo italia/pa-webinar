@@ -3553,7 +3553,7 @@
     "title": "Benachrichtigungen",
     "addReminder": "Erinnerung hinzufügen",
     "removeReminder": "Entfernen",
-    "maxReminders": "Maximal 5 Erinnerungen pro Veranstaltung.",
+    "maxReminders": "Maximal {max} Erinnerungen pro Veranstaltung.",
     "selectPreset": "Zeitpunkt auswählen...",
     "sentStatus": "{count} gesendet",
     "notSent": "Nicht gesendet",
@@ -3567,7 +3567,17 @@
       "1hour": "1 Stunde vorher",
       "30min": "30 Minuten vorher",
       "15min": "15 Minuten vorher"
-    }
+    },
+    "edit": "Bearbeiten",
+    "editDone": "Schließen",
+    "editLegend": "Wann Angemeldete benachrichtigt werden",
+    "alreadySent": "bereits gesendet",
+    "alreadyPassed": "Zeitpunkt vorbei",
+    "saveFailed": "Änderung nicht gespeichert. Bitte erneut versuchen.",
+    "errorSent": "Diese Benachrichtigung wurde bereits versendet: Sie bleibt als Nachweis des Versands.",
+    "errorPassed": "Dieser Zeitpunkt ist bereits vorbei: Die Benachrichtigung würde nie versendet.",
+    "errorChanged": "Die Liste hatte sich geändert: Sie ist jetzt aktuell.",
+    "limitReached": "Limit erreicht"
   },
   "gdpr": {
     "consent": {

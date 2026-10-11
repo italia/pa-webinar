@@ -3553,7 +3553,7 @@
     "title": "Meldingen",
     "addReminder": "Melding toevoegen",
     "removeReminder": "Verwijderen",
-    "maxReminders": "Maximaal 5 meldingen per evenement.",
+    "maxReminders": "Maximaal {max} meldingen per evenement.",
     "selectPreset": "Selecteer wanneer...",
     "sentStatus": "{count} verzonden",
     "notSent": "Niet verzonden",
@@ -3567,7 +3567,17 @@
       "1hour": "1 uur van tevoren",
       "30min": "30 minuten van tevoren",
       "15min": "15 minuten van tevoren"
-    }
+    },
+    "edit": "Bewerken",
+    "editDone": "Sluiten",
+    "editLegend": "Wanneer aangemelde personen een melding krijgen",
+    "alreadySent": "al verzonden",
+    "alreadyPassed": "tijdstip verstreken",
+    "saveFailed": "Wijziging niet opgeslagen. Probeer het opnieuw.",
+    "errorSent": "Deze melding is al verstuurd: ze blijft staan als bewijs van wat is verzonden.",
+    "errorPassed": "Dat moment is al voorbij: de melding zou nooit worden verstuurd.",
+    "errorChanged": "De lijst was gewijzigd: hij is nu bijgewerkt.",
+    "limitReached": "limiet bereikt"
   },
   "gdpr": {
     "consent": {

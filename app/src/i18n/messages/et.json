@@ -3553,7 +3553,7 @@
     "title": "Teavitused",
     "addReminder": "Lisa meeldetuletus",
     "removeReminder": "Eemalda",
-    "maxReminders": "Maksimaalselt 5 meeldetuletust ürituse kohta.",
+    "maxReminders": "Maksimaalselt {max} meeldetuletust ürituse kohta.",
     "selectPreset": "Valige aeg...",
     "sentStatus": "{count} saadetud",
     "notSent": "Saatmata",
@@ -3567,7 +3567,17 @@
       "1hour": "1 tund enne",
       "30min": "30 minutit enne",
       "15min": "15 minutit enne"
-    }
+    },
+    "edit": "Muuda",
+    "editDone": "Sulge",
+    "editLegend": "Millal registreerunutele teada anda",
+    "alreadySent": "juba saadetud",
+    "alreadyPassed": "aeg on möödas",
+    "saveFailed": "Muudatust ei saanud salvestada. Proovi uuesti.",
+    "errorSent": "See teavitus on juba saadetud: see jääb alles kui märge saadetust.",
+    "errorPassed": "See hetk on juba möödas: teavitust ei saadetaks kunagi.",
+    "errorChanged": "Nimekiri oli muutunud: nüüd on see ajakohane.",
+    "limitReached": "piir täis"
   },
   "gdpr": {
     "consent": {

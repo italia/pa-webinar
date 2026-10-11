@@ -3553,7 +3553,7 @@
     "title": "Upozornenia",
     "addReminder": "Pridať upozornenie",
     "removeReminder": "Odstrániť",
-    "maxReminders": "Maximálne 5 upozornení na udalosť.",
+    "maxReminders": "Maximálne {max} upozornení na udalosť.",
     "selectPreset": "Vyberte kedy...",
     "sentStatus": "{count} odoslaných",
     "notSent": "Neodoslané",
@@ -3567,7 +3567,17 @@
       "1hour": "1 hodinu vopred",
       "30min": "30 minút vopred",
       "15min": "15 minút vopred"
-    }
+    },
+    "edit": "Upraviť",
+    "editDone": "Zavrieť",
+    "editLegend": "Kedy upozorniť prihlásených",
+    "alreadySent": "už odoslané",
+    "alreadyPassed": "čas uplynul",
+    "saveFailed": "Zmenu sa nepodarilo uložiť. Skúste znova.",
+    "errorSent": "Toto upozornenie už bolo odoslané: zostáva ako záznam o tom, čo sa odoslalo.",
+    "errorPassed": "Ten okamih už uplynul: upozornenie by sa nikdy neodoslalo.",
+    "errorChanged": "Zoznam sa zmenil: teraz je aktuálny.",
+    "limitReached": "limit dosiahnutý"
   },
   "gdpr": {
     "consent": {

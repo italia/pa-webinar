@@ -3553,7 +3553,7 @@
     "title": "Notificări",
     "addReminder": "Adăugați notificare",
     "removeReminder": "Eliminați",
-    "maxReminders": "Maxim 5 notificări per eveniment.",
+    "maxReminders": "Maxim {max} notificări per eveniment.",
     "selectPreset": "Selectați când...",
     "sentStatus": "{count} trimise",
     "notSent": "Netrimisă",
@@ -3567,7 +3567,17 @@
       "1hour": "Cu 1 oră înainte",
       "30min": "Cu 30 de minute înainte",
       "15min": "Cu 15 minute înainte"
-    }
+    },
+    "edit": "Editează",
+    "editDone": "Închide",
+    "editLegend": "Când se notifică persoanele înscrise",
+    "alreadySent": "deja trimisă",
+    "alreadyPassed": "ora a trecut",
+    "saveFailed": "Modificarea nu a putut fi salvată. Încercați din nou.",
+    "errorSent": "Această notificare a fost deja trimisă: rămâne, ca evidență a ceea ce s-a trimis.",
+    "errorPassed": "Acel moment a trecut deja: notificarea nu ar mai fi trimisă.",
+    "errorChanged": "Lista se schimbase: acum este actualizată.",
+    "limitReached": "limită atinsă"
   },
   "gdpr": {
     "consent": {

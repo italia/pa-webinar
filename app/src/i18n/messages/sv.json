@@ -3553,7 +3553,7 @@
     "title": "Påminnelser",
     "addReminder": "Lägg till påminnelse",
     "removeReminder": "Ta bort",
-    "maxReminders": "Max 5 påminnelser per evenemang.",
+    "maxReminders": "Max {max} påminnelser per evenemang.",
     "selectPreset": "Välj när...",
     "sentStatus": "{count} skickade",
     "notSent": "Ej skickad",
@@ -3567,7 +3567,17 @@
       "1hour": "1 timme innan",
       "30min": "30 minuter innan",
       "15min": "15 minuter innan"
-    }
+    },
+    "edit": "Redigera",
+    "editDone": "Stäng",
+    "editLegend": "När anmälda ska få en påminnelse",
+    "alreadySent": "redan skickad",
+    "alreadyPassed": "tiden har passerat",
+    "saveFailed": "Det gick inte att spara ändringen. Försök igen.",
+    "errorSent": "Den här påminnelsen har redan skickats: den finns kvar som underlag för vad som skickades.",
+    "errorPassed": "Den tidpunkten har redan passerat: påminnelsen skulle aldrig skickas.",
+    "errorChanged": "Listan hade ändrats: den är nu uppdaterad.",
+    "limitReached": "gränsen nådd"
   },
   "gdpr": {
     "consent": {

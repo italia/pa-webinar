@@ -40,6 +40,7 @@ import { isEventPageVisible } from '@/lib/events/visibility';
 import { canStartManually } from '@/lib/events/lifecycle';
 import { materialAuthorName } from '@/lib/events/material-author';
 import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
+import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -52,6 +53,7 @@ import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
 import EventInvitationsPanel from './event-invitations-panel';
+import EventRemindersEditor from './event-reminders-editor';
 import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
@@ -249,9 +251,17 @@ export default function EventManagementClient({
     const t = setInterval(() => setAdesso(Date.now()), 60_000);
     return () => clearInterval(t);
   }, []);
+  // I promemoria come li modifica la scheda delle notifiche (si salvano
+  // uno per uno, senza ricaricare la pagina). Se la pagina si aggiorna dal
+  // server (router.refresh), l'elenco segue.
+  const [elencoPromemoria, setElencoPromemoria] = useState(event.reminders);
+  useEffect(() => {
+    setElencoPromemoria(event.reminders);
+  }, [event.reminders]);
+  const [modificaPromemoria, setModificaPromemoria] = useState(false);
   // Promemoria e iscrizioni nella forma che usa il cron, per dire di ogni
   // promemoria non spedito se partira' (lib/email/reminder-status).
-  const promemoria = event.reminders.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+  const promemoria = elencoPromemoria.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
   const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
@@ -335,6 +345,7 @@ export default function EventManagementClient({
   // client devono disegnare gli stessi pulsanti.
   const istante = adesso ?? renderedAt;
   const isInstant = event.eventType === 'INSTANT';
+  const promemoriaModificabili = !isInstant && (status === 'DRAFT' || status === 'PUBLISHED');
   const eventoOra = { ...event, status, ...paginaPostEvento };
   const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
   const entraModeratore = moderatorRoomOpen(eventoOra, istante);
@@ -893,12 +904,23 @@ export default function EventManagementClient({
 
             {/* Reminders */}
             <div className="p-4 mb-3" style={CARD}>
-              <div className="mb-2" style={EYEBROW}>{tr('title')}</div>
-              {event.reminders.length === 0 ? (
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <div style={EYEBROW}>{tr('title')}</div>
+                {/* Si scelgono prima dell'evento: in diretta o dopo non
+                    partirebbero; una chiamata rapida non ne manda. */}
+                {promemoriaModificabili && (
+                  <button type="button" className="btn btn-link btn-sm p-0"
+                          aria-expanded={modificaPromemoria} aria-controls="modifica-promemoria"
+                          onClick={() => setModificaPromemoria((v) => !v)}>
+                    {modificaPromemoria ? tr('editDone') : tr('edit')}
+                  </button>
+                )}
+              </div>
+              {elencoPromemoria.length === 0 ? (
                 <div style={CAPTION}>{td('sidebar.noReminders')}</div>
               ) : (
                 <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
-                  {event.reminders.map((r) => {
+                  {elencoPromemoria.map((r) => {
                     const sent = r.sentCount > 0;
                     // «Non inviata» da solo non distingue «deve ancora partire»
                     // da «non partira' piu'»: lo stato viene dalle stesse
@@ -924,7 +946,14 @@ export default function EventManagementClient({
                         <span aria-hidden="true"
                               style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                                        background: sent ? C_SUCCESS : '#CED4DA' }} />
-                        <span className="flex-grow-1">{r.label}</span>
+                        {/* Il nome nella lingua di chi guarda: l'etichetta
+                            del database e' quella scritta alla creazione. */}
+                        <span className="flex-grow-1">
+                          {(() => {
+                            const chiave = reminderPresetKey(r.offsetMinutes);
+                            return chiave ? tr(`presets.${chiave}`) : r.label;
+                          })()}
+                        </span>
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
                           {sent
                             ? tr('sentStatus', { count: r.sentCount })
@@ -947,6 +976,18 @@ export default function EventManagementClient({
                     );
                   })}
                 </ul>
+              )}
+              {/* Sempre nella pagina finche' si puo' modificare (il pulsante lo
+                  controlla), nascosto quando e' chiuso: un salvataggio in
+                  corso finisce anche se lo si chiude. Cambiato lo stato
+                  (avviato, archiviato) sparisce con il pulsante. */}
+              {promemoriaModificabili && (
+                <div id="modifica-promemoria" hidden={!modificaPromemoria}>
+                  <EventRemindersEditor eventSlug={event.slug} moderatorToken={event.moderatorToken}
+                                        startsAt={event.startsAt} reminders={elencoPromemoria}
+                                        aperto={modificaPromemoria}
+                                        onChange={setElencoPromemoria} />
+                </div>
               )}
             </div>
 

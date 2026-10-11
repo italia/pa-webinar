@@ -3553,7 +3553,7 @@
     "title": "Fógraí",
     "addReminder": "Cuir meabhrúchán leis",
     "removeReminder": "Bain",
-    "maxReminders": "Uasmhéid 5 mheabhrúchán in aghaidh an imeachta.",
+    "maxReminders": "Uasmhéid {max} mheabhrúchán in aghaidh an imeachta.",
     "selectPreset": "Roghnaigh cathain...",
     "sentStatus": "{count} seolta",
     "notSent": "Gan seoladh",
@@ -3567,7 +3567,17 @@
       "1hour": "1 uair roimhe",
       "30min": "30 nóiméad roimhe",
       "15min": "15 nóiméad roimhe"
-    }
+    },
+    "edit": "Cuir in eagar",
+    "editDone": "Dún",
+    "editLegend": "Cathain is ceart fógra a sheoladh chuig na daoine cláraithe",
+    "alreadySent": "seolta cheana",
+    "alreadyPassed": "tá an t-am caite",
+    "saveFailed": "Níorbh fhéidir an t-athrú a shábháil. Déan iarracht arís.",
+    "errorSent": "Seoladh an fógra seo cheana: fanann sé, mar thaifead ar a seoladh.",
+    "errorPassed": "Tá an nóiméad sin caite cheana: ní sheolfaí an fógra choíche.",
+    "errorChanged": "Bhí an liosta athraithe: tá sé cothrom le dáta anois.",
+    "limitReached": "teorainn bainte amach"
   },
   "gdpr": {
     "consent": {

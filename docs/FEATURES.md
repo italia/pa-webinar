@@ -184,7 +184,7 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
 - **Routing after registration.** If the event starts soon, the new registrant goes straight to the waiting room. How soon is set by the `waitingRoomLeadMinutes` site setting. Otherwise they see a confirmation screen with the calendar links. With invitation-only registration they are told to check their email instead.
 - **Emails.**
   - A confirmation with the personal link and an `.ics` file.
-  - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them: up to five per event, chosen from presets between **7 days before** and **15 minutes before**.
+  - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them before the event, with **Edit** in the **Notifications** panel of the event page: up to five per event, chosen from presets between **7 days before** and **15 minutes before**. A reminder already sent stays, and a moment already passed cannot be chosen.
   - A notice when the date of a published event changes.
   - An *optional* thank-you email after the event, with a recap and, for those who entered the room, a rating link.
   - A notice when the event's recording, or its external video, becomes visible on the event page. It is on by default and can be turned off per event.

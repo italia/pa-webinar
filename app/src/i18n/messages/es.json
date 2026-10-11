@@ -3553,7 +3553,7 @@
     "title": "Notificaciones",
     "addReminder": "Añadir recordatorio",
     "removeReminder": "Eliminar",
-    "maxReminders": "Máximo 5 recordatorios por evento.",
+    "maxReminders": "Máximo {max} recordatorios por evento.",
     "selectPreset": "Seleccione cuándo...",
     "sentStatus": "{count} enviados",
     "notSent": "No enviado",
@@ -3567,7 +3567,17 @@
       "1hour": "1 hora antes",
       "30min": "30 minutos antes",
       "15min": "15 minutos antes"
-    }
+    },
+    "edit": "Editar",
+    "editDone": "Cerrar",
+    "editLegend": "Cuándo avisar a las personas inscritas",
+    "alreadySent": "ya enviado",
+    "alreadyPassed": "hora pasada",
+    "saveFailed": "No se ha podido guardar el cambio. Inténtalo de nuevo.",
+    "errorSent": "Esta notificación ya se ha enviado: se queda, como registro de lo enviado.",
+    "errorPassed": "Ese momento ya ha pasado: la notificación nunca se enviaría.",
+    "errorChanged": "La lista había cambiado: ahora está actualizada.",
+    "limitReached": "límite alcanzado"
   },
   "gdpr": {
     "consent": {

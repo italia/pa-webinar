@@ -768,7 +768,7 @@
     "title": "Notifiche",
     "addReminder": "Aggiungi notifica",
     "removeReminder": "Rimuovi",
-    "maxReminders": "Massimo 5 notifiche per evento.",
+    "maxReminders": "Massimo {max} notifiche per evento.",
     "selectPreset": "Seleziona quando...",
     "sentStatus": "{count} inviate",
     "notSent": "Non inviata",
@@ -782,7 +782,17 @@
       "1hour": "1 ora prima",
       "30min": "30 minuti prima",
       "15min": "15 minuti prima"
-    }
+    },
+    "edit": "Modifica",
+    "editDone": "Chiudi",
+    "editLegend": "Quando mandare una notifica a chi è iscritto",
+    "alreadySent": "già inviata",
+    "alreadyPassed": "orario passato",
+    "saveFailed": "Modifica non riuscita. Riprova.",
+    "errorSent": "Questa notifica è già partita: resta, come traccia di cosa è stato mandato.",
+    "errorPassed": "Quel momento è già passato: la notifica non partirebbe.",
+    "errorChanged": "L'elenco era cambiato: ora è aggiornato.",
+    "limitReached": "limite raggiunto"
   },
   "admin": {
     "accessDenied": {

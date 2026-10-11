@@ -3553,7 +3553,7 @@
     "title": "Notifications",
     "addReminder": "Add reminder",
     "removeReminder": "Remove",
-    "maxReminders": "Maximum 5 reminders per event.",
+    "maxReminders": "Maximum {max} reminders per event.",
     "selectPreset": "Select when...",
     "sentStatus": "{count} sent",
     "notSent": "Not sent",
@@ -3567,7 +3567,17 @@
       "1hour": "1 hour before",
       "30min": "30 minutes before",
       "15min": "15 minutes before"
-    }
+    },
+    "edit": "Edit",
+    "editDone": "Close",
+    "editLegend": "When to notify people who signed up",
+    "alreadySent": "already sent",
+    "alreadyPassed": "time has passed",
+    "saveFailed": "Couldn't save the change. Please retry.",
+    "errorSent": "This notification has already gone out: it stays, as the record of what was sent.",
+    "errorPassed": "That moment has already passed: the notification would never go out.",
+    "errorChanged": "The list had changed: it is now up to date.",
+    "limitReached": "limit reached"
   },
   "gdpr": {
     "consent": {

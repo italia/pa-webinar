@@ -3553,7 +3553,7 @@
     "title": "Muistutukset",
     "addReminder": "Lisää muistutus",
     "removeReminder": "Poista",
-    "maxReminders": "Enintään 5 muistutusta tapahtumaa kohti.",
+    "maxReminders": "Enintään {max} muistutusta tapahtumaa kohti.",
     "selectPreset": "Valitse aika...",
     "sentStatus": "{count} lähetetty",
     "notSent": "Ei lähetetty",
@@ -3567,7 +3567,17 @@
       "1hour": "1 tunti ennen",
       "30min": "30 minuuttia ennen",
       "15min": "15 minuuttia ennen"
-    }
+    },
+    "edit": "Muokkaa",
+    "editDone": "Sulje",
+    "editLegend": "Milloin ilmoittautuneille lähetetään muistutus",
+    "alreadySent": "jo lähetetty",
+    "alreadyPassed": "aika on mennyt",
+    "saveFailed": "Muutosta ei voitu tallentaa. Yritä uudelleen.",
+    "errorSent": "Tämä muistutus on jo lähetetty: se säilyy merkintänä lähetetystä.",
+    "errorPassed": "Se hetki on jo mennyt: muistutusta ei koskaan lähetettäisi.",
+    "errorChanged": "Luettelo oli muuttunut: se on nyt ajan tasalla.",
+    "limitReached": "raja täynnä"
   },
   "gdpr": {
     "consent": {

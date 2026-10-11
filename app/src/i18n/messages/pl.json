@@ -3553,7 +3553,7 @@
     "title": "Powiadomienia",
     "addReminder": "Dodaj powiadomienie",
     "removeReminder": "Usuń",
-    "maxReminders": "Maksymalnie 5 powiadomień na wydarzenie.",
+    "maxReminders": "Maksymalnie {max} powiadomień na wydarzenie.",
     "selectPreset": "Wybierz kiedy...",
     "sentStatus": "{count} wysłanych",
     "notSent": "Nie wysłano",
@@ -3567,7 +3567,17 @@
       "1hour": "1 godzinę wcześniej",
       "30min": "30 minut wcześniej",
       "15min": "15 minut wcześniej"
-    }
+    },
+    "edit": "Edytuj",
+    "editDone": "Zamknij",
+    "editLegend": "Kiedy powiadomić zapisane osoby",
+    "alreadySent": "już wysłane",
+    "alreadyPassed": "czas minął",
+    "saveFailed": "Nie udało się zapisać zmiany. Spróbuj ponownie.",
+    "errorSent": "To powiadomienie zostało już wysłane: zostaje jako ślad tego, co wysłano.",
+    "errorPassed": "Ten moment już minął: powiadomienie nigdy by nie wyszło.",
+    "errorChanged": "Lista się zmieniła: teraz jest aktualna.",
+    "limitReached": "osiągnięto limit"
   },
   "gdpr": {
     "consent": {

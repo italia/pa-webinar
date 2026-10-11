@@ -3553,7 +3553,7 @@
     "title": "Paziņojumi",
     "addReminder": "Pievienot atgādinājumu",
     "removeReminder": "Noņemt",
-    "maxReminders": "Maksimāli 5 atgādinājumi pasākumam.",
+    "maxReminders": "Maksimāli {max} atgādinājumi pasākumam.",
     "selectPreset": "Izvēlieties laiku...",
     "sentStatus": "{count} nosūtīti",
     "notSent": "Nav nosūtīts",
@@ -3567,7 +3567,17 @@
       "1hour": "1 stundu iepriekš",
       "30min": "30 minūtes iepriekš",
       "15min": "15 minūtes iepriekš"
-    }
+    },
+    "edit": "Rediģēt",
+    "editDone": "Aizvērt",
+    "editLegend": "Kad paziņot reģistrētajiem",
+    "alreadySent": "jau nosūtīts",
+    "alreadyPassed": "laiks ir pagājis",
+    "saveFailed": "Izmaiņas neizdevās saglabāt. Mēģiniet vēlreiz.",
+    "errorSent": "Šis paziņojums jau ir nosūtīts: tas paliek kā liecība par nosūtīto.",
+    "errorPassed": "Šis brīdis jau ir pagājis: paziņojums nekad netiktu nosūtīts.",
+    "errorChanged": "Saraksts bija mainījies: tagad tas ir atjaunināts.",
+    "limitReached": "ierobežojums sasniegts"
   },
   "gdpr": {
     "consent": {
