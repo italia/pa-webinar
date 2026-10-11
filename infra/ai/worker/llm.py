@@ -65,6 +65,10 @@ Target language: {target}.
 """
 
 
+
+# Quanto si aspetta vLLM al primo avvio (LLM_CONNECT_WAIT_S lo cambia).
+ATTESA_LLM_S = 1200
+
 def _stub_enabled() -> bool:
     return os.environ.get("WORKER_STUB") == "1"
 
@@ -118,9 +122,11 @@ def _chat_completions(
     # vLLM a 0, buttando via il warmup → ciclo infinito (cold-start race).
     # Restando invece in attesa qui, il job resta RUNNING, l'orchestrator
     # mantiene running>0 e vLLM finisce di caricare → la chiamata va a buon
-    # fine. Atteso fino a LLM_CONNECT_WAIT_S (default 12 min); poi propaga.
+    # fine. Atteso fino a LLM_CONNECT_WAIT_S (default 20 min: con il nodo GPU
+    # da accendere e l'immagine da scaricare un avvio da zero ne ha chiesti 19;
+    # resta sotto il lease di 30); poi propaga.
     if connect_wait is None:
-        connect_wait = float(os.environ.get("LLM_CONNECT_WAIT_S", "720"))
+        connect_wait = float(os.environ.get("LLM_CONNECT_WAIT_S", str(ATTESA_LLM_S)))
     deadline = time.monotonic() + connect_wait
     attempt = 0
     while True:
@@ -420,7 +426,7 @@ def correct_transcript_segments(
             # Il primo lotto aspetta il cold-start, ma non oltre il tempo
             # concesso alla correzione.
             connect_wait=(
-                min(float(os.environ.get("LLM_CONNECT_WAIT_S", "720")), max(0.0, deadline - time.monotonic()))
+                min(float(os.environ.get("LLM_CONNECT_WAIT_S", str(ATTESA_LLM_S))), max(0.0, deadline - time.monotonic()))
                 if first
                 else 0.0
             ),

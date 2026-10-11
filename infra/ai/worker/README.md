@@ -246,7 +246,7 @@ module that imported torch, WhisperX or Piper at startup would stop the build.
 | `WORKER_ID` | not set | Defaults to the pod's host name. The portal records it as `leasedBy` |
 | `HF_TOKEN` | chart, from `postprod.worker.hfTokenSecret` | Turns on diarization |
 | `WORKER_STUB` | chart, from `postprod.worker.stub` | [Stub mode](#stub-mode) |
-| `LLM_CONNECT_WAIT_S` | `postprod.worker.extraEnv` | How long an LLM call waits for vLLM. Default 720 seconds in `llm.py` |
+| `LLM_CONNECT_WAIT_S` | `postprod.worker.extraEnv`, `postprod.worker.cpu.extraEnv` | How long an LLM call waits for vLLM. Default 1200 seconds in `llm.py` |
 
 `LLM_CONNECT_WAIT_S` covers connection errors and `503` answers. The wait
 between retries grows by 2 seconds per attempt, up to 15 seconds. Any other

@@ -607,8 +607,10 @@ The worker sends an inline copy for text and JSON files of at most 8 MiB (`INLIN
 
 When vLLM scales from zero it needs several minutes to load weights. A
 `SUMMARIZE` or `TRANSLATE` worker that finds the backend unreachable, or
-answering `503`, keeps retrying for up to `LLM_CONNECT_WAIT_S` seconds (720 by
-default, in `infra/ai/worker/llm.py`) instead of failing. The job stays
+answering `503`, keeps retrying for up to `LLM_CONNECT_WAIT_S` seconds (1200 by
+default, in `infra/ai/worker/llm.py`) instead of failing. A start from zero,
+with the GPU node to provision and the vLLM image to pull, can take close to
+twenty minutes; the wait stays below the job's 30-minute lease. The job stays
 `RUNNING` meanwhile, so the orchestrator keeps vLLM up and the warm-up is not
 wasted. Any other HTTP error fails that attempt at once, and the queue retries
 it with backoff.
@@ -1310,7 +1312,7 @@ Set these through `postprod.worker.extraEnv` unless noted:
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `LLM_CONNECT_WAIT_S` | `720` | How long a worker waits for vLLM to come up |
+| `LLM_CONNECT_WAIT_S` | `1200` | How long a worker waits for vLLM to come up |
 | `LLM_PARALLEL` | `6` | Parallel requests of the transcript correction ([Glossary](#glossary)) |
 | `AI_CORRECTION_MAX_S` | `1200` | Time budget of the transcript correction; lines not corrected by then stay as recognized |
 | `WORKER_DEADLINE_S` | set by the chart to `postprod.worker.activeDeadlineSeconds` | The Job's deadline, so the correction leaves time for the uploads |
