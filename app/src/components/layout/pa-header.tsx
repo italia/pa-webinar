@@ -144,32 +144,35 @@ function CenterHeader({
         )}
         <HeaderRightZone>
           {/* Videoteca e, se pubblico, calendario: su ogni pagina, non solo
-              nel piè di pagina dove nessuno li cercava. */}
-          {LINK_INTESTAZIONE.filter((l) => linkVisibile(l, settings)).map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              // Sotto i 768px resta la sola icona: il nome serve comunque a chi
-              // usa un lettore di schermo.
-              aria-label={tr(l.labelKey)}
-              className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-              style={{ fontSize: '0.9rem' }}
-            >
-              {l.icon && <Icon icon={l.icon} size="sm" color="white" />}
-              <span className="d-none d-md-inline">{tr(l.labelKey)}</span>
-            </Link>
-          ))}
-          {isAdmin && (
-            <Link
-              href="/admin/events"
-              aria-label={t('admin')}
-              className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-              style={{ fontSize: '0.9rem' }}
-            >
-              <Icon icon="it-tool" size="sm" color="white" />
-              <span className="d-none d-md-inline">{t('admin')}</span>
-            </Link>
-          )}
+              nel piè di pagina dove nessuno li cercava. In un <nav>, perche'
+              chi usa un lettore di schermo li trovi tra i punti di riferimento. */}
+          <nav aria-label={t('mainLabel')} className="d-flex align-items-center">
+            {LINK_INTESTAZIONE.filter((l) => linkVisibile(l, settings)).map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                // Sotto i 768px resta la sola icona: il nome serve comunque a chi
+                // usa un lettore di schermo.
+                aria-label={tr(l.labelKey)}
+                className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+                style={{ fontSize: '0.9rem' }}
+              >
+                {l.icon && <Icon icon={l.icon} size="sm" color="white" />}
+                <span className="d-none d-md-inline">{tr(l.labelKey)}</span>
+              </Link>
+            ))}
+            {isAdmin && (
+              <Link
+                href="/admin/events"
+                aria-label={t('admin')}
+                className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+                style={{ fontSize: '0.9rem' }}
+              >
+                <Icon icon="it-tool" size="sm" color="white" />
+                <span className="d-none d-md-inline">{t('admin')}</span>
+              </Link>
+            )}
+          </nav>
         </HeaderRightZone>
       </HeaderContent>
     </Header>

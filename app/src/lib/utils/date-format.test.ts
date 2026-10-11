@@ -4,6 +4,7 @@ import {
   formatDuration,
   formatDate,
   formatTime,
+  formatTimeWithZone,
   toDatetimeLocalInTz,
   fromDatetimeLocalInTz,
 } from './date-format';
@@ -170,5 +171,14 @@ describe('formatDate', () => {
 describe('DEFAULT_TIMEZONE', () => {
   it('is Europe/Rome', () => {
     expect(DEFAULT_TIMEZONE).toBe('Europe/Rome');
+  });
+});
+
+describe('formatTimeWithZone', () => {
+  it("aggiunge il fuso all'ora, per le email", () => {
+    // 16:00 UTC del 15 luglio = 18:00 a Roma, ora legale.
+    const ora = formatTimeWithZone(new Date('2026-07-15T16:00:00Z'), 'it', 'Europe/Rome');
+    expect(ora).toMatch(/^18:00/);
+    expect(ora.length).toBeGreaterThan('18:00'.length);
   });
 });

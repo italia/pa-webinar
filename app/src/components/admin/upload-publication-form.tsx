@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Alert, Button, Card, CardBody, Input, Label, Progress } from 'design-react-kit';
 
 import { useRouter } from '@/i18n/navigation';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import {
   RecordingUploadError,
   uploadRecordingFile,
@@ -24,6 +25,7 @@ interface UploadedBlob {
 export default function UploadPublicationForm() {
   const t = useTranslations('admin.publications.uploadPage');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -153,8 +155,7 @@ export default function UploadPublicationForm() {
           }),
         });
         if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          setError(errData.error ?? t('errors.saveFailed'));
+          setError(messaggioErroreApi(res.status, tApi, t('errors.saveFailed')));
           setPhase('idle');
           return;
         }
@@ -165,7 +166,7 @@ export default function UploadPublicationForm() {
         setPhase('idle');
       }
     },
-    [uploaded, titleIt, titleEn, descriptionIt, startsAt, organizer, speakersIt, coverImageUrl, youtubeUrl, libraryListed, router, t],
+    [uploaded, titleIt, titleEn, descriptionIt, startsAt, organizer, speakersIt, coverImageUrl, youtubeUrl, libraryListed, router, t, tApi],
   );
 
   const fileSizeMB = file ? (file.size / 1024 / 1024).toFixed(1) : null;

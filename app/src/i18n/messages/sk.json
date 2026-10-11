@@ -89,7 +89,8 @@
     "language": "Jazyk",
     "switchLanguage": "Zmeniť jazyk",
     "skipToContent": "Prejsť na obsah",
-    "skipToFooter": "Prejsť na pätu stránky"
+    "skipToFooter": "Prejsť na pätu stránky",
+    "mainLabel": "Hlavná navigácia"
   },
   "header": {
     "followUs": "Sledujte nás na"
@@ -301,7 +302,7 @@
       "library": "Publikovať do knižnice",
       "libraryHelp": "Ako vyššie a navyše zobrazí podujatie vo verejnej videoknižnici (vyžaduje publikovanú nahrávku alebo video na YouTube).",
       "archive": "Archivovať (súkromné)",
-      "archiveHelp": "Stránka skončeného podujatia nebude verejná (404). Údaje sa uchovajú do uplynutia lehoty uchovávania, potom sa vymažú.",
+      "archiveHelp": "Stránka skončeného podujatia nebude verejne viditeľná. Údaje sa uchovávajú do konca doby uchovávania a potom sa vymažú.",
       "genAi": "Vygenerovať prepis a zhrnutie pomocou AI z nahrávky (po dokončení spracovania)",
       "back": "Späť",
       "confirm": "Ukončiť podujatie"
@@ -572,7 +573,15 @@
       "show": "Zobraziť titulky",
       "hide": "Skryť titulky",
       "toggle": "Automatické titulky"
-    }
+    },
+    "eventEndedModerator": "Podujatie sa skončilo. Nižšie nájdete štatistiky, a ak sa nahrávalo, aj záznam a správu.",
+    "endLinks": {
+      "after": "Záznam a správa",
+      "stats": "Štatistiky podujatia",
+      "publicPage": "Verejná stránka podujatia"
+    },
+    "notOpenNow": "Miestnosť teraz nie je otvorená.",
+    "nameRequired": "Chýba meno, pod ktorým sa pripojíte: vráťte sa a napíšte ho."
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -1166,7 +1175,7 @@
         "signing": "Pripravuje sa...",
         "uploading": "Nahrávanie {progress}%",
         "uploaded": "Nahrávanie dokončené",
-        "uploadHint": "Podporované formáty: MP4, WebM, MOV, M4V. Maximálna veľkosť 5 GB. Nahrávanie ide priamo do úložiska (Azure Blob), nič neprechádza našimi servermi.",
+        "uploadHint": "Podporované formáty: MP4, WebM, MOV, M4V. Maximálna veľkosť 5 GB. Súbor ide priamo do archívu videí bez toho, aby prechádzal portálom.",
         "step2Title": "2. Metaúdaje publikácie",
         "titleIt": "Názov (taliansky)",
         "titleEn": "Názov (anglicky, voliteľné)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Zmazať udalosť",
     "deleteConfirm": "Naozaj chcete zmazať túto udalosť? Túto akciu nie je možné vrátiť späť.",
     "publish": "Publikovať",
-    "unpublish": "Zrušiť publikáciu",
+    "unpublish": "Stiahnuť zo zverejnenia",
     "noToken": "Na správu udalostí použite odkaz moderátora, ktorý ste dostali e-mailom.",
     "noEvents": "Nenašli sa žiadne udalosti. Vytvorte svoju prvú udalosť.",
     "eventDetails": "Detail udalosti",
@@ -1399,7 +1408,7 @@
     "notJoined": "Nepripojil/a sa",
     "deleteSuccess": "Udalosť zmazaná",
     "publishSuccess": "Udalosť publikovaná",
-    "unpublishSuccess": "Publikácia udalosti zrušená",
+    "unpublishSuccess": "Podujatie stiahnuté",
     "startEvent": "Začať udalosť",
     "startEventSuccess": "Udalosť začala! Čakajúci účastníci budú automaticky presmerovaní.",
     "startEventConfirmTitle": "Spustiť podujatie?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maximálny počet účastníkov",
       "expectedParticipants": "Očakávaní účastníci (odhad)",
       "expectedParticipantsHint": "Iba odhad pre dimenzovanie infraštruktúry. Toto nie je tvrdý strop: registrácie nad túto hranicu sú akceptované, infraštruktúra škáluje automaticky.",
-      "expectedSenderRatio": "Očakávaný pomer odosielateľov",
-      "expectedSenderRatioInherit": "Predvolené stránky",
-      "expectedSenderRatioHint": "Percento účastníkov, ktorí budú mať aktívny mikrofón alebo webkameru. Klasický webinár 10–20 %, okrúhly stôl 50–100 %. Nechajte prázdne pre prevzatie predvolenej hodnoty stránky.",
+      "expectedSenderRatio": "Podiel hovoriacich",
+      "expectedSenderRatioInherit": "Hodnota webu",
+      "expectedSenderRatioHint": "Percento účastníkov so zapnutým mikrofónom alebo kamerou. Klasický webinár 10-20 %, okrúhly stôl 50-100 %. Nechajte prázdne pre hodnotu webu.",
       "jvbPreview": {
-        "title": "Odhad kapacity JVB",
-        "pod": "Pod JVB",
-        "pods": "JVB pody",
-        "senders": "Odosielatelia",
-        "receivers": "Príjemcovia",
-        "effectiveRatio": "Efektívny pomer",
-        "inherited": "prevzaté",
-        "presetLabel": "Preset",
+        "title": "Odhad video mostov",
+        "pod": "video most",
+        "pods": "video mosty",
+        "senders": "S mikrofónom alebo kamerou",
+        "receivers": "Iba počúva",
+        "effectiveRatio": "Podiel hovoriacich",
+        "inherited": "hodnota webu",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinár",
           "meeting": "Stretnutie",
           "workshop": "Workshop",
-          "allHands": "Všetci odosielatelia"
+          "allHands": "Hovoria všetci"
         },
-        "clearPreset": "Použiť predvolené stránky",
-        "atCeiling": "max limit {max}",
-        "videoDisabled": "Video vypnuté: všetci účastníci sa počítajú ako príjemcovia.",
-        "warnInherited": "S {participants} účastníkmi a prevzatým pomerom ({defaultPct}%) sa odhad opiera o predvolenú hodnotu stránky. Pre veľké podujatia odporúčame nastaviť explicitnú hodnotu (webinár 5–20 %, stretnutie 30 %, workshop 60 %).",
-        "warnCeiling": "Odhad na nakonfigurovanom maximálnom limite ({max} podov). Ak skutoční účastníci alebo odosielatelia prekročia odhad, mosty sa môžu nasýtiť. Zvážte zvýšenie limitu alebo zníženie maxParticipants."
+        "clearPreset": "Použiť hodnotu webu",
+        "atCeiling": "najviac {max}",
+        "videoDisabled": "Video vypnuté: všetci účastníci sa rátajú ako poslucháči.",
+        "warnInherited": "S {participants} účastníkmi a podielom webu ({defaultPct} %) je odhad orientačný. Pri veľkých podujatiach je lepšie ho zadať: webinár 5-20 %, stretnutie 30 %, workshop 60 %.",
+        "warnCeiling": "Odhad je na nastavenom maxime ({max} video mostov). Ak bude hovoriť viac ľudí, ako sa čaká, mosty sa môžu zahltiť: zvážte zvýšenie limitu alebo zníženie maximálneho počtu účastníkov."
       },
       "gracePeriod": "Koniec podujatia (soft exit)",
       "gracePeriodInherit": "Použiť predvolené stránky",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Nahrať existujúci záznam",
-      "subtitle": "Ak už máte video súbor podujatia (napr. záznam z MsTeams), nahrajte ho sem: zobrazí sa ako oficiálny záznam na verejnej stránke.",
+      "subtitle": "Ak už máte videosúbor podujatia (napríklad nahraný na inej platforme), nahrajte ho sem: zobrazí sa ako oficiálny záznam na verejnej stránke.",
       "fileLabel": "Video súbor",
       "upload": "Nahrať a priradiť",
       "signing": "Pripravuje sa…",
       "uploading": "Nahrávanie {progress}%",
       "attaching": "Priraďuje sa k podujatiu…",
-      "hint": "Formáty: MP4, WebM, MOV, M4V. Max 5 GB. Nahrávanie ide priamo do úložiska Azure.",
+      "hint": "Formáty: MP4, WebM, MOV, M4V. Najviac 5 GB. Súbor ide priamo do archívu videí bez toho, aby prechádzal portálom.",
       "errors": {
         "fileTooLarge": "Súbor presahuje limit 5 GB.",
         "unsupportedType": "Nepodporovaný formát. Nahrajte MP4, WebM, MOV alebo M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Podujatie sa ešte neskončilo: štatistiky sú čiastočné a aktualizujú sa v reálnom čase.",
       "cappedNote": "Veľmi veľké podujatie: niektoré metriky sú vypočítané zo vzorky (dosiahol sa limit riadkov).",
       "scoreTitle": "Miera pozornosti",
-      "adminOnly": "len správca",
+      "adminOnly": "neverejné",
       "scoreProxy": "Index 0–100 vyjadrujúci, ako veľmi sa publikum zapájalo. Je to ukazovateľ zapojenia, nie meranie kognitívnej pozornosti — čítajte ho s ohľadom na formát podujatia (prednáška vs. workshop), nikdy nie ako známku kvality.",
       "scoreUnavailable": "Na výpočet miery nie je dosť údajov.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Prepis sa nepodarilo načítať (HTTP {code}).",
       "editNotReady": "Pre túto nahrávku zatiaľ nie je k dispozícii žiadny prepis. Spustite (alebo znova spustite) AI spracovanie z ovládacích prvkov vyššie: prepis je prvý krok, potom ho tu môžete opraviť a vygenerovať zhrnutie a preklady.",
       "editProcessing": "Prebieha AI spracovanie: prepis sa tu zobrazí po jeho skončení. Obnovte stránku o niekoľko minút.",
-      "editSessionExpired": "Platnosť relácie správcu vypršala. Obnovte stránku a znova sa prihláste, aby ste mohli prepis upraviť.",
+      "editSessionExpired": "Relácia vypršala. Načítajte stránku znova a prihláste sa, aby ste mohli upraviť prepis.",
       "editEmpty": "Žiadne upraviteľné segmenty",
       "editSpeakerNone": "— nikto —",
       "editSave": "Uložiť zmeny",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archív",
       "manageTabReliability": "Spoľahlivosť",
       "manageLoading": "Načítava sa…",
-      "archivePiiNote": "Izolované zvukové stopy jednotlivých účastníkov sú citlivé osobné údaje (izolovaný hlas): táto sekcia je vyhradená správcom a moderátorom a nikdy sa nezverejňuje.",
+      "archivePiiNote": "Samostatná zvuková stopa každého účastníka je citlivý osobný údaj (izolovaný hlas): táto sekcia je vyhradená tým, ktorí podujatie spravujú, a nikdy nie je verejná.",
       "archiveNoTracks": "Pre túto nahrávku nie sú k dispozícii žiadne stopy jednotlivých účastníkov (viacstopové nahrávanie nie je zapnuté alebo už boli stopy vymazané z dôvodu minimalizácie údajov podľa GDPR).",
       "archivePlayerTitle": "Prehrávanie po rečníkoch",
       "archiveAudioHint": "Pomocou voliča „Zvuk“ v prehrávači si vypočujete mix alebo izolovanú stopu jedného účastníka synchronizovanú s videom.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Práve prebieha",
       "ENDED": "Ukončené",
       "ARCHIVED": "Archivované"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Ešte jedno podujatie} few {Ešte # podujatia} many {Ešte # podujatia} other {Ešte # podujatí}}",
+    "noEvents": "V tomto období nie sú žiadne podujatia",
+    "weekShort": "Týž."
   },
   "footer": {
     "privacy": "Zásady ochrany osobných údajov",
@@ -4880,12 +4892,29 @@
     "yes": "Áno",
     "no": "Nie",
     "scaleValue": "{value} z {max}",
-    "answerOne": "Na odoslanie odpovedzte aspoň na jednu otázku."
+    "answerOne": "Na odoslanie odpovedzte aspoň na jednu otázku.",
+    "pageTitle": "Dotazník"
   },
   "notFound": {
     "title": "Stránka sa nenašla",
     "text": "Adresa môže byť nesprávna alebo stránka už neexistuje.",
     "home": "Prejsť na úvodnú stránku",
     "staffArea": "Späť do neverejnej časti"
+  },
+  "apiErrors": {
+    "unauthorized": "Relácia vypršala alebo prístup nie je platný. Prihláste sa znova a skúste to znova.",
+    "forbidden": "Na túto operáciu nemáte oprávnenie.",
+    "notFound": "Táto položka už neexistuje. Načítajte stránku znova.",
+    "tooLarge": "Príliš veľké: zmenšite súbor alebo text a skúste to znova.",
+    "rateLimited": "Príliš veľa požiadaviek v krátkom čase. Chvíľu počkajte a skúste to znova.",
+    "transcriptCorrected": "Prepis z titulkov bol ručne opravený: prepis pomocou AI by ho nahradil a opravy by sa stratili.",
+    "aiPipelineDisabled": "Kanál AI je vypnutý pre celý web: správca ho môže zapnúť v nastaveniach.",
+    "recordingWithoutMedia": "Tento záznam nemá video: jeho prepis pochádza zo živých titulkov.",
+    "noParticipantTracks": "Neexistujú samostatné zvukové stopy účastníkov: neboli nahrané alebo už boli vymazané. Ak ich chcete, zapnite pred podujatím nahrávanie po účastníkoch.",
+    "summaryMissing": "V tomto jazyku zatiaľ nie je zhrnutie na úpravu: najprv ho vygenerujte.",
+    "storageUnavailable": "Nahrávanie súborov nie je v tejto inštalácii dostupné.",
+    "aiDisabledForEvent": "AI je pre toto podujatie vypnutá: pomocou „Vygenerovať AI“ ju zapnete a spustíte spracovanie.",
+    "sourceTranscriptMissing": "Tento záznam ešte nie je prepísaný: najprv ho prepíšte, potom pridajte preklad.",
+    "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný."
   }
 }

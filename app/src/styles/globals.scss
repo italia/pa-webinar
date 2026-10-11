@@ -92,6 +92,18 @@
   50% { opacity: 0.3; }
 }
 
+// Il punto che pulsa accanto a «In diretta». Con il movimento ridotto resta
+// fermo: lo stato lo dice gia' il testo accanto.
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+}
+
 // ── Audio equalizer bars ──
 .equalizer-bar {
   width: 4px;
@@ -7307,6 +7319,21 @@ button.live-time-strip__rec {
   justify-content: center;
   gap: 0.75rem;
   margin-top: 2rem;
+}
+
+// A fine evento chi conduce ha tre destinazioni: una sotto l'altra, la prima
+// in evidenza, larghe quanto la scheda su telefono.
+.live-exit__actions--column {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 22rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  a,
+  .btn {
+    width: 100%;
+  }
 }
 
 // ── Avvisi della sala: contatori dei tab e anteprima della chat ──

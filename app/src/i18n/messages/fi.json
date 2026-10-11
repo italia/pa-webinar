@@ -89,7 +89,8 @@
     "language": "Kieli",
     "switchLanguage": "Vaihda kieli",
     "skipToContent": "Siirry sisältöön",
-    "skipToFooter": "Siirry alatunnisteeseen"
+    "skipToFooter": "Siirry alatunnisteeseen",
+    "mainLabel": "Päänavigaatio"
   },
   "header": {
     "followUs": "Seuraa meitä"
@@ -301,7 +302,7 @@
       "library": "Julkaise kirjastoon",
       "libraryHelp": "Kuten yllä, ja lisäksi tapahtuma näytetään julkisessa videokirjastossa (edellyttää julkaistua tallennetta tai YouTube-videota).",
       "archive": "Arkistoi (yksityinen)",
-      "archiveHelp": "Päättyneen tapahtuman sivu ei ole julkinen (404). Tiedot säilytetään säilytysajan päättymiseen asti, minkä jälkeen ne poistetaan.",
+      "archiveHelp": "Päättyneen tapahtuman sivu ei näy yleisölle. Tiedot säilytetään säilytysajan loppuun ja poistetaan sen jälkeen.",
       "genAi": "Luo tallenteesta tekoälyllä litterointi ja yhteenveto (kun käsittely on valmis)",
       "back": "Takaisin",
       "confirm": "Päätä tapahtuma"
@@ -572,7 +573,15 @@
       "show": "Näytä tekstitys",
       "hide": "Piilota tekstitys",
       "toggle": "Automaattinen tekstitys"
-    }
+    },
+    "eventEndedModerator": "Tapahtuma on päättynyt. Alta löydät tilastot ja, jos tapahtuma tallennettiin, tallenteen ja raportin.",
+    "endLinks": {
+      "after": "Tallenne ja raportti",
+      "stats": "Tapahtuman tilastot",
+      "publicPage": "Tapahtuman julkinen sivu"
+    },
+    "notOpenNow": "Huone ei ole juuri nyt auki.",
+    "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se."
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -1166,7 +1175,7 @@
         "signing": "Valmistellaan...",
         "uploading": "Ladataan {progress} %",
         "uploaded": "Lataus valmis",
-        "uploadHint": "Tuetut muodot: MP4, WebM, MOV, M4V. Maksimikoko 5 GB. Lataus tapahtuu suoraan objektitallennukseen (Azure Blob) — mikään ei kulje palvelimiemme kautta.",
+        "uploadHint": "Tuetut muodot: MP4, WebM, MOV, M4V. Enimmäiskoko 5 Gt. Tiedosto menee suoraan videoarkistoon kulkematta portaalin kautta.",
         "step2Title": "2. Julkaisun metatiedot",
         "titleIt": "Otsikko (italia)",
         "titleEn": "Otsikko (englanti, valinnainen)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Poista tapahtuma",
     "deleteConfirm": "Haluatko varmasti poistaa tämän tapahtuman? Toimintoa ei voi perua.",
     "publish": "Julkaise",
-    "unpublish": "Poista julkaisusta",
+    "unpublish": "Peru julkaisu",
     "noToken": "Tapahtumien hallintaan tarvitaan sähköpostilla saatu moderaattorilinkki.",
     "noEvents": "Tapahtumia ei löytynyt. Luo ensimmäinen tapahtumasi.",
     "eventDetails": "Tapahtuman tiedot",
@@ -1399,7 +1408,7 @@
     "notJoined": "Ei osallistunut",
     "deleteSuccess": "Tapahtuma poistettu",
     "publishSuccess": "Tapahtuma julkaistu",
-    "unpublishSuccess": "Tapahtuma poistettu julkaisusta",
+    "unpublishSuccess": "Julkaisu peruttu",
     "startEvent": "Käynnistä tapahtuma",
     "startEventSuccess": "Tapahtuma käynnistetty! Odottavat osallistujat ohjataan automaattisesti.",
     "startEventConfirmTitle": "Aloitetaanko tapahtuma?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Osallistujien enimmäismäärä",
       "expectedParticipants": "Odotetut osallistujat (arvio)",
       "expectedParticipantsHint": "Vain arvio infrastruktuurin mitoitusta varten. Tämä ei ole kova yläraja: tämän rajan ylittävät ilmoittautumiset hyväksytään ja infra skaalautuu automaattisesti.",
-      "expectedSenderRatio": "Odotettu sender-suhde",
-      "expectedSenderRatioInherit": "Sivuston oletus",
-      "expectedSenderRatioHint": "Niiden osallistujien osuus, joilla on mikrofoni tai kamera päällä. Klassinen webinaari 10–20 %, paneelikeskustelu 50–100 %. Jätä tyhjäksi periäksesi sivuston oletuksen.",
+      "expectedSenderRatio": "Puhujien osuus",
+      "expectedSenderRatioInherit": "Sivuston arvo",
+      "expectedSenderRatioHint": "Niiden osallistujien osuus, joiden mikrofoni tai kamera on päällä. Tavallinen webinaari 10-20 %, paneelikeskustelu 50-100 %. Jätä tyhjäksi käyttääksesi sivuston arvoa.",
       "jvbPreview": {
-        "title": "Arvioitu JVB-kapasiteetti",
-        "pod": "JVB-pod",
-        "pods": "JVB-podia",
-        "senders": "Lähettäjät",
-        "receivers": "Vastaanottajat",
-        "effectiveRatio": "Tehollinen suhde",
-        "inherited": "peritty",
-        "presetLabel": "Esiasetus",
+        "title": "Videosiltojen arvio",
+        "pod": "videosilta",
+        "pods": "videosiltaa",
+        "senders": "Mikrofonin tai kameran kanssa",
+        "receivers": "Vain kuuntelee",
+        "effectiveRatio": "Puhujien osuus",
+        "inherited": "sivuston arvo",
+        "presetLabel": "Profiili",
         "preset": {
           "webinar": "Webinaari",
           "meeting": "Kokous",
           "workshop": "Työpaja",
-          "allHands": "Kaikki lähettäjiä"
+          "allHands": "Kaikki puhuvat"
         },
-        "clearPreset": "Käytä sivuston oletusta",
-        "atCeiling": "yläraja {max}",
-        "videoDisabled": "Video poissa käytöstä: kaikki osallistujat lasketaan vastaanottajiksi.",
-        "warnInherited": "{participants} osallistujalla ja peritystä suhteesta ({defaultPct} %) arvio nojaa sivuston oletukseen. Suuriin tapahtumiin kannattaa asettaa eksplisiittinen arvo (webinaari 5–20 %, kokous 30 %, työpaja 60 %).",
-        "warnCeiling": "Arvio osuu konfiguroituun maksimiin ({max} podia). Jos todellinen osallistujamäärä tai lähettäjät ylittävät arvion, sillat saattavat saturoitua. Harkitse rajan nostoa tai maxParticipants-arvon laskua."
+        "clearPreset": "Käytä sivuston arvoa",
+        "atCeiling": "enintään {max}",
+        "videoDisabled": "Video pois: kaikki osallistujat lasketaan kuuntelijoiksi.",
+        "warnInherited": "{participants} osallistujalla ja sivuston osuudella ({defaultPct} %) arvio on suuntaa antava. Suurissa tapahtumissa se kannattaa ilmoittaa: webinaari 5-20 %, kokous 30 %, työpaja 60 %.",
+        "warnCeiling": "Arvio on asetetussa enimmäisarvossa ({max} videosiltaa). Jos odotettua useampi puhuu, sillat voivat ruuhkautua: harkitse rajan nostamista tai osallistujien enimmäismäärän pienentämistä."
       },
       "gracePeriod": "Tapahtuman päättyminen (pehmeä poistuminen)",
       "gracePeriodInherit": "Käytä sivuston oletusta",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Lataa olemassa oleva tallenne",
-      "subtitle": "Onko sinulla jo videotiedosto tapahtumasta (esim. MS Teams -tallenne)? Lataa se tähän — siitä tulee virallinen tallenne julkisella sivulla.",
+      "subtitle": "Jos sinulla on jo videotiedosto tapahtumasta (esimerkiksi toisella alustalla tallennettu), lataa se tähän: se näytetään virallisena tallenteena julkisella sivulla.",
       "fileLabel": "Videotiedosto",
       "upload": "Lataa ja liitä",
       "signing": "Valmistellaan…",
       "uploading": "Ladataan {progress} %",
       "attaching": "Liitetään tapahtumaan…",
-      "hint": "Muodot: MP4, WebM, MOV, M4V. Maks. 5 GB. Lataus tapahtuu suoraan Azure Blob -tallennukseen.",
+      "hint": "Muodot: MP4, WebM, MOV, M4V. Enintään 5 Gt. Tiedosto menee suoraan videoarkistoon kulkematta portaalin kautta.",
       "errors": {
         "fileTooLarge": "Tiedosto ylittää 5 GB:n rajan.",
         "unsupportedType": "Muotoa ei tueta. Lataa MP4-, WebM-, MOV- tai M4V-tiedosto.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Tapahtuma ei ole vielä päättynyt: tilastot ovat osittaisia ja päivittyvät reaaliajassa.",
       "cappedNote": "Erittäin suuri tapahtuma: osa mittareista on laskettu otoksesta (riviraja saavutettu).",
       "scoreTitle": "Tarkkaavaisuuspistemäärä",
-      "adminOnly": "vain ylläpitäjille",
+      "adminOnly": "ei julkinen",
       "scoreProxy": "Indeksi 0–100 siitä, kuinka osallistuvaa yleisö oli. Se on osallistumisen epäsuora mittari, ei kognitiivisen tarkkaavaisuuden mittaus — lue sitä tapahtuman muoto huomioiden (luento vai työpaja), älä koskaan laatuarvosanana.",
       "scoreUnavailable": "Pistemäärän laskemiseen ei ole riittävästi tietoja.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Litterointia ei voitu ladata (HTTP {code}).",
       "editNotReady": "Tälle tallenteelle ei ole vielä litterointia. Käynnistä (tai aja uudelleen) tekoälykäsittely yllä olevista säätimistä: litterointi on ensimmäinen vaihe, minkä jälkeen voit korjata sitä täällä ja luoda yhteenvedon ja käännökset.",
       "editProcessing": "Tekoälykäsittely on käynnissä: litterointi ilmestyy tähän, kun se valmistuu. Päivitä sivu muutaman minuutin kuluttua.",
-      "editSessionExpired": "Ylläpitoistunto on vanhentunut. Lataa sivu uudelleen ja kirjaudu sisään muokataksesi litterointia.",
+      "editSessionExpired": "Istunto on vanhentunut. Lataa sivu uudelleen ja kirjaudu sisään muokataksesi litterointia.",
       "editEmpty": "Ei muokattavia segmenttejä",
       "editSpeakerNone": "— ei ketään —",
       "editSave": "Tallenna muutokset",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arkisto",
       "manageTabReliability": "Luotettavuus",
       "manageLoading": "Ladataan…",
-      "archivePiiNote": "Osallistujakohtaiset eristetyt ääniraidat ovat arkaluonteisia henkilötietoja (eristetty ääni): tämä osio on rajattu ylläpitäjille ja moderaattoreille eikä sitä koskaan näytetä julkisesti.",
+      "archivePiiNote": "Jokaisen osallistujan erillinen ääniraita on arkaluonteinen henkilötieto (eristetty ääni): tämä osio on varattu tapahtuman hallinnoijille eikä ole koskaan julkinen.",
       "archiveNoTracks": "Tälle tallenteelle ei ole saatavilla osallistujakohtaisia raitoja (moniraitatallennus ei ole käytössä tai raidat on jo poistettu GDPR-minimoinnin vuoksi).",
       "archivePlayerTitle": "Puhujakohtainen kuuntelu",
       "archiveAudioHint": "Käytä soittimen ”Ääni”-valitsinta ja kuuntele joko miksausta tai yksittäisen osallistujan eristettyä raitaa videon kanssa synkronoituna.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Käynnissä",
       "ENDED": "Päättynyt",
       "ARCHIVED": "Arkistoitu"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Yksi tapahtuma lisää} other {# tapahtumaa lisää}}",
+    "noEvents": "Ei tapahtumia tällä jaksolla",
+    "weekShort": "Vk"
   },
   "footer": {
     "privacy": "Tietosuojaseloste",
@@ -4880,12 +4892,29 @@
     "yes": "Kyllä",
     "no": "Ei",
     "scaleValue": "{value}/{max}",
-    "answerOne": "Vastaa vähintään yhteen kysymykseen lähettääksesi."
+    "answerOne": "Vastaa vähintään yhteen kysymykseen lähettääksesi.",
+    "pageTitle": "Kysely"
   },
   "notFound": {
     "title": "Sivua ei löytynyt",
     "text": "Osoite voi olla väärä, tai sivua ei enää ole.",
     "home": "Siirry etusivulle",
     "staffArea": "Takaisin suljetulle alueelle"
+  },
+  "apiErrors": {
+    "unauthorized": "Istunto on vanhentunut tai pääsy ei ole voimassa. Kirjaudu uudelleen ja yritä uudestaan.",
+    "forbidden": "Sinulla ei ole oikeutta tähän toimintoon.",
+    "notFound": "Tätä kohdetta ei enää ole. Lataa sivu uudelleen.",
+    "tooLarge": "Liian suuri: pienennä tiedostoa tai tekstiä ja yritä uudelleen.",
+    "rateLimited": "Liian monta pyyntöä lyhyessä ajassa. Odota hetki ja yritä uudelleen.",
+    "transcriptCorrected": "Tekstitysten pohjalta tehty litterointi on korjattu käsin: tekoälyn litterointi korvaisi sen ja korjaukset menetettäisiin.",
+    "aiPipelineDisabled": "Tekoälyputki on pois päältä koko sivustolla: ylläpitäjä voi ottaa sen käyttöön asetuksissa.",
+    "recordingWithoutMedia": "Tässä tallenteessa ei ole videota: sen litterointi tulee suorista tekstityksistä.",
+    "noParticipantTracks": "Osallistujista ei ole erillisiä ääniraitoja: niitä ei tallennettu tai ne on jo poistettu. Jos tarvitset niitä, ota osallistujakohtainen tallennus käyttöön ennen tapahtumaa.",
+    "summaryMissing": "Tällä kielellä ei ole vielä muokattavaa yhteenvetoa: luo se ensin.",
+    "storageUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa.",
+    "aiDisabledForEvent": "Tekoäly on pois päältä tässä tapahtumassa: ota se käyttöön ja käynnistä käsittely painikkeella ”Luo tekoälyllä”.",
+    "sourceTranscriptMissing": "Tätä tallennetta ei ole vielä litteroitu: litteroi se ennen käännöksen lisäämistä.",
+    "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen."
   }
 }

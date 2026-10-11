@@ -130,12 +130,11 @@ export default function EventListClient({
                   {isLive && (
                     <Badge color="success" className="d-inline-flex align-items-center gap-1">
                       <span
-                        className="rounded-circle d-inline-block"
+                        className="rounded-circle d-inline-block pulse-dot"
                         style={{
                           width: 7,
                           height: 7,
                           backgroundColor: '#fff',
-                          animation: 'pulse-dot 1.5s ease-in-out infinite',
                         }}
                       />
                       {t('card.liveNow')}

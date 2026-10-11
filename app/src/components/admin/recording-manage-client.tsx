@@ -16,6 +16,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 import RecordingOverview from './recording-overview';
 import TranscriptEditor from './transcript-editor';
@@ -57,6 +58,7 @@ export default function RecordingManageClient({
   createdAt: string;
 }) {
   const t = useTranslations('admin.postprod');
+  const tApi = useTranslations('apiErrors');
   const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
@@ -128,7 +130,9 @@ export default function RecordingManageClient({
           toast.success(t('manageRerunOk'));
         }
       } else {
-        toast.error(t('rerunFailed', { code: r.status }));
+        toast.error(
+          messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+        );
       }
     } catch {
       toast.error(t('rerunFailed', { code: 0 }));
@@ -177,8 +181,9 @@ export default function RecordingManageClient({
           window.location.reload();
         }
       } else {
-        const data = (await r.json().catch(() => null)) as { error?: string } | null;
-        toast.error(data?.error ?? t('rerunFailed', { code: r.status }));
+        toast.error(
+          messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+        );
       }
     } catch {
       toast.error(t('rerunFailed', { code: 0 }));

@@ -89,7 +89,8 @@
     "language": "Jezik",
     "switchLanguage": "Zamenjaj jezik",
     "skipToContent": "Preskoči na vsebino",
-    "skipToFooter": "Preskoči na nogo"
+    "skipToFooter": "Preskoči na nogo",
+    "mainLabel": "Glavna navigacija"
   },
   "header": {
     "followUs": "Sledite nam na"
@@ -301,7 +302,7 @@
       "library": "Objavi v knjižnici",
       "libraryHelp": "Kot zgoraj, poleg tega pa dogodek prikaže v javni videoknjižnici (zahteva objavljen posnetek ali videoposnetek na YouTubu).",
       "archive": "Arhiviraj (zasebno)",
-      "archiveHelp": "Stran končanega dogodka ne bo javna (404). Podatki se hranijo do izteka roka hrambe, nato se izbrišejo.",
+      "archiveHelp": "Stran končanega dogodka ne bo vidna javnosti. Podatki se hranijo do izteka obdobja hrambe, nato se izbrišejo.",
       "genAi": "Iz posnetka ustvari prepis in povzetek z AI (ko se obdelava konča)",
       "back": "Nazaj",
       "confirm": "Končaj dogodek"
@@ -572,7 +573,15 @@
       "show": "Prikaži podnapise",
       "hide": "Skrij podnapise",
       "toggle": "Samodejni podnapisi"
-    }
+    },
+    "eventEndedModerator": "Dogodek se je končal. Spodaj najdete statistiko in, če je bil posnet, posnetek in poročilo.",
+    "endLinks": {
+      "after": "Posnetek in poročilo",
+      "stats": "Statistika dogodka",
+      "publicPage": "Javna stran dogodka"
+    },
+    "notOpenNow": "Soba trenutno ni odprta.",
+    "nameRequired": "Manjka ime, s katerim boste vstopili: vrnite se in ga vpišite."
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -1166,7 +1175,7 @@
         "signing": "Priprava ...",
         "uploading": "Nalaganje {progress} %",
         "uploaded": "Nalaganje končano",
-        "uploadHint": "Podprti formati: MP4, WebM, MOV, M4V. Največja velikost 5 GB. Nalaganje gre neposredno v shrambo (Azure Blob), nič ne prehaja prek naših strežnikov.",
+        "uploadHint": "Podprti formati: MP4, WebM, MOV, M4V. Največja velikost 5 GB. Datoteka gre neposredno v arhiv videoposnetkov, ne da bi šla skozi portal.",
         "step2Title": "2. Metapodatki objave",
         "titleIt": "Naslov (italijansko)",
         "titleEn": "Naslov (angleško, neobvezno)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Izbriši dogodek",
     "deleteConfirm": "Ali ste prepričani, da želite izbrisati ta dogodek? To dejanje je nepreklicno.",
     "publish": "Objavi",
-    "unpublish": "Umakni iz objave",
+    "unpublish": "Umakni objavo",
     "noToken": "Za upravljanje dogodkov uporabite moderatorsko povezavo, prejeto po e-pošti.",
     "noEvents": "Ni najdenih dogodkov. Ustvarite svoj prvi dogodek.",
     "eventDetails": "Podrobnosti dogodka",
@@ -1399,7 +1408,7 @@
     "notJoined": "Ni se udeležil/a",
     "deleteSuccess": "Dogodek izbrisan",
     "publishSuccess": "Dogodek objavljen",
-    "unpublishSuccess": "Dogodek umaknjen iz objave",
+    "unpublishSuccess": "Dogodek umaknjen",
     "startEvent": "Zaženi dogodek",
     "startEventSuccess": "Dogodek zagnan! Udeleženci v čakalnici bodo samodejno preusmerjeni.",
     "startEventConfirmTitle": "Začeti dogodek?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Največje število udeležencev",
       "expectedParticipants": "Pričakovani udeleženci (ocena)",
       "expectedParticipantsHint": "Le ocena za dimenzioniranje infrastrukture. Ni trda zgornja meja: prijave nad tem pragom so sprejete, infrastruktura se samodejno prilagodi.",
-      "expectedSenderRatio": "Pričakovano razmerje pošiljateljev",
-      "expectedSenderRatioInherit": "Privzeto za stran",
-      "expectedSenderRatioHint": "Odstotek udeležencev z aktivnim mikrofonom ali kamero. Klasičen webinar 10–20 %, okrogla miza 50–100 %. Pustite prazno za prevzem privzete vrednosti strani.",
+      "expectedSenderRatio": "Delež govorcev",
+      "expectedSenderRatioInherit": "Vrednost spletnega mesta",
+      "expectedSenderRatioHint": "Odstotek udeležencev z vklopljenim mikrofonom ali kamero. Klasičen spletni seminar 10-20 %, okrogla miza 50-100 %. Pustite prazno za vrednost spletnega mesta.",
       "jvbPreview": {
-        "title": "Ocenjena zmogljivost JVB",
-        "pod": "pod JVB",
-        "pods": "pod JVB",
-        "senders": "Pošiljatelji",
-        "receivers": "Prejemniki",
-        "effectiveRatio": "Dejansko razmerje",
-        "inherited": "podedovano",
-        "presetLabel": "Prednastavitev",
+        "title": "Ocena video mostov",
+        "pod": "video most",
+        "pods": "video mostovi",
+        "senders": "Z mikrofonom ali kamero",
+        "receivers": "Samo posluša",
+        "effectiveRatio": "Delež govorcev",
+        "inherited": "vrednost spletnega mesta",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Sestanek",
           "workshop": "Delavnica",
-          "allHands": "Vsi pošiljatelji"
+          "allHands": "Govorijo vsi"
         },
-        "clearPreset": "Uporabi privzeto za stran",
-        "atCeiling": "največja meja {max}",
-        "videoDisabled": "Video onemogočen: vsi udeleženci štejejo kot prejemniki.",
-        "warnInherited": "Z {participants} udeleženci in podedovanim razmerjem ({defaultPct} %) ocena temelji na privzeti vrednosti strani. Za velike dogodke priporočamo nastavitev izrecne vrednosti (webinar 5–20 %, sestanek 30 %, delavnica 60 %).",
-        "warnCeiling": "Ocena na konfigurirani zgornji meji ({max} podov). Če dejanska udeležba ali pošiljatelji presežejo oceno, lahko pride do zasičenosti mostov. Razmislite o zvišanju meje ali znižanju maxParticipants."
+        "clearPreset": "Uporabi vrednost spletnega mesta",
+        "atCeiling": "največ {max}",
+        "videoDisabled": "Video izklopljen: vsi udeleženci štejejo kot poslušalci.",
+        "warnInherited": "Pri {participants} udeležencih in deležu spletnega mesta ({defaultPct} %) je ocena okvirna. Pri velikih dogodkih jo je bolje navesti: spletni seminar 5-20 %, sestanek 30 %, delavnica 60 %.",
+        "warnCeiling": "Ocena je na nastavljenem maksimumu ({max} video mostov). Če bo govorilo več ljudi od pričakovanega, se mostovi lahko preobremenijo: razmislite o zvišanju omejitve ali zmanjšanju največjega števila udeležencev."
       },
       "gracePeriod": "Konec dogodka (mehki izhod)",
       "gracePeriodInherit": "Uporabi privzeto za stran",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Naloži obstoječ posnetek",
-      "subtitle": "Če že imate video datoteko dogodka (npr. posnetek MsTeams), jo naložite tu: prikazana bo kot uradni posnetek na javni strani.",
+      "subtitle": "Če že imate videoposnetek dogodka (na primer posnet na drugi platformi), ga naložite tukaj: prikazan bo kot uradni posnetek na javni strani.",
       "fileLabel": "Video datoteka",
       "upload": "Naloži in poveži",
       "signing": "Priprava …",
       "uploading": "Nalaganje {progress} %",
       "attaching": "Povezovanje z dogodkom …",
-      "hint": "Formati: MP4, WebM, MOV, M4V. Največ 5 GB. Nalaganje gre neposredno v shrambo Azure.",
+      "hint": "Formati: MP4, WebM, MOV, M4V. Največ 5 GB. Datoteka gre neposredno v arhiv videoposnetkov, ne da bi šla skozi portal.",
       "errors": {
         "fileTooLarge": "Datoteka presega omejitev 5 GB.",
         "unsupportedType": "Format ni podprt. Naložite MP4, WebM, MOV ali M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Dogodek še ni končan: statistika je delna in se posodablja sproti.",
       "cappedNote": "Zelo velik dogodek: nekatere meritve so izračunane na vzorcu (dosežena je omejitev vrstic).",
       "scoreTitle": "Stopnja pozornosti",
-      "adminOnly": "samo za skrbnike",
+      "adminOnly": "ni javno",
       "scoreProxy": "Indeks 0–100 o tem, kako dejavno je sodelovalo občinstvo. Je posredni kazalnik sodelovanja in ne meri kognitivne pozornosti — berite ga glede na obliko dogodka (predavanje ali delavnica), nikoli kot oceno kakovosti.",
       "scoreUnavailable": "Za izračun stopnje ni dovolj podatkov.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Prepisa ni bilo mogoče naložiti (HTTP {code}).",
       "editNotReady": "Za ta posnetek prepis še ni na voljo. Zaženite (ali znova zaženite) obdelavo z AI s kontrolniki zgoraj: prepis je prvi korak, nato ga boste tukaj lahko popravili ter ustvarili povzetek in prevode.",
       "editProcessing": "Obdelava z AI poteka: prepis se bo prikazal tukaj, ko bo končana. Osvežite stran čez nekaj minut.",
-      "editSessionExpired": "Skrbniška seja je potekla. Znova naložite stran in se ponovno prijavite, da boste lahko uredili prepis.",
+      "editSessionExpired": "Seja je potekla. Znova naložite stran in se prijavite, da uredite prepis.",
       "editEmpty": "Ni odsekov za urejanje",
       "editSpeakerNone": "— brez —",
       "editSave": "Shrani spremembe",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arhiv",
       "manageTabReliability": "Zanesljivost",
       "manageLoading": "Nalaganje…",
-      "archivePiiNote": "Izolirane zvočne sledi posameznih udeležencev so občutljivi osebni podatki (izoliran glas): ta razdelek je namenjen le skrbnikom in moderatorjem in ni nikoli javno dostopen.",
+      "archivePiiNote": "Ločena zvočna sled vsakega udeleženca je občutljiv osebni podatek (izoliran glas): ta razdelek je pridržan tistim, ki upravljajo dogodek, in ni nikoli javen.",
       "archiveNoTracks": "Za ta posnetek ni na voljo nobene sledi posameznih udeležencev (večsledno snemanje ni vklopljeno ali pa so sledi že izbrisane zaradi načela najmanjšega obsega podatkov po GDPR).",
       "archivePlayerTitle": "Poslušanje po govorcih",
       "archiveAudioHint": "Z izbirnikom »Zvok« v predvajalniku poslušajte mešanico ali izolirano sled posameznega udeleženca, sinhrono z videoposnetkom.",
@@ -4140,7 +4149,10 @@
       "LIVE": "V živo",
       "ENDED": "Zaključeno",
       "ARCHIVED": "Arhivirano"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Še # dogodek} two {Še # dogodka} few {Še # dogodki} other {Še # dogodkov}}",
+    "noEvents": "V tem obdobju ni dogodkov",
+    "weekShort": "Ted."
   },
   "footer": {
     "privacy": "Politika zasebnosti",
@@ -4880,12 +4892,29 @@
     "yes": "Da",
     "no": "Ne",
     "scaleValue": "{value} od {max}",
-    "answerOne": "Za pošiljanje odgovorite vsaj na eno vprašanje."
+    "answerOne": "Za pošiljanje odgovorite vsaj na eno vprašanje.",
+    "pageTitle": "Vprašalnik"
   },
   "notFound": {
     "title": "Strani ni mogoče najti",
     "text": "Naslov je morda napačen ali pa stran ne obstaja več.",
     "home": "Na domačo stran",
     "staffArea": "Nazaj v zaprti del"
+  },
+  "apiErrors": {
+    "unauthorized": "Seja je potekla ali dostop ni veljaven. Znova se prijavite in poskusite še enkrat.",
+    "forbidden": "Za to dejanje nimate dovoljenja.",
+    "notFound": "Ta element ne obstaja več. Znova naložite stran.",
+    "tooLarge": "Preveliko: zmanjšajte datoteko ali besedilo in poskusite znova.",
+    "rateLimited": "Preveč zahtev v kratkem času. Počakajte trenutek in poskusite znova.",
+    "transcriptCorrected": "Prepis iz podnapisov je bil popravljen ročno: prepis z UI bi ga zamenjal in popravki bi se izgubili.",
+    "aiPipelineDisabled": "Cevovod UI je izklopljen za celotno spletno mesto: skrbnik ga lahko vklopi v nastavitvah.",
+    "recordingWithoutMedia": "Ta posnetek nima videa: njegov prepis izhaja iz podnapisov v živo.",
+    "noParticipantTracks": "Ni ločenih zvočnih sledi udeležencev: niso bile posnete ali so že izbrisane. Če jih želite, pred dogodkom vklopite snemanje po udeležencih.",
+    "summaryMissing": "V tem jeziku še ni povzetka za urejanje: najprej ga ustvarite.",
+    "storageUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo.",
+    "aiDisabledForEvent": "UI je za ta dogodek izklopljena: z »Ustvari z AI« jo vklopite in zaženete obdelavo.",
+    "sourceTranscriptMissing": "Ta posnetek še ni prepisan: najprej ga prepišite, nato dodajte prevod.",
+    "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega."
   }
 }

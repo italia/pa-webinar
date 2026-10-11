@@ -1,13 +1,15 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as Accodamento from '@/lib/report/enqueue';
+
 const m = vi.hoisted(() => ({ accoda: vi.fn(), evento: vi.fn(), aggiorna: vi.fn(), audit: vi.fn() }));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({ get: () => undefined })) }));
 vi.mock('@/lib/auth/staff-session', () => ({ requireEventManager: vi.fn(async () => ({ role: 'admin' })) }));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: m.audit }));
 vi.mock('@/lib/captions/transcript', () => ({ conservazioneFinita: () => false, registrazionePubblica: vi.fn() }));
 vi.mock('@/lib/report/enqueue', async (orig) => ({
-  ...(await orig<typeof import('@/lib/report/enqueue')>()),
+  ...(await orig<typeof Accodamento>()),
   accodaResoconto: m.accoda,
   ultimoLavoroResoconto: vi.fn(),
 }));

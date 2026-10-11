@@ -89,7 +89,8 @@
     "language": "Limbă",
     "switchLanguage": "Schimbați limba",
     "skipToContent": "Salt la conținut",
-    "skipToFooter": "Salt la subsol"
+    "skipToFooter": "Salt la subsol",
+    "mainLabel": "Navigare principală"
   },
   "header": {
     "followUs": "Urmăriți-ne pe"
@@ -301,7 +302,7 @@
       "library": "Publică în bibliotecă",
       "libraryHelp": "Ca mai sus și, în plus, afișează evenimentul în biblioteca video publică (necesită o înregistrare publicată sau un videoclip YouTube).",
       "archive": "Arhivează (privat)",
-      "archiveHelp": "Pagina evenimentului încheiat nu va fi publică (404). Datele se păstrează până la expirarea perioadei de păstrare, apoi sunt șterse.",
+      "archiveHelp": "Pagina evenimentului încheiat nu va fi vizibilă publicului. Datele se păstrează până la sfârșitul perioadei de păstrare, apoi sunt șterse.",
       "genAi": "Generează transcrierea și rezumatul AI din înregistrare (la finalul procesării)",
       "back": "Înapoi",
       "confirm": "Încheie evenimentul"
@@ -572,7 +573,15 @@
       "show": "Afișează subtitrările",
       "hide": "Ascunde subtitrările",
       "toggle": "Subtitrări automate"
-    }
+    },
+    "eventEndedModerator": "Evenimentul s-a încheiat. Mai jos găsești statisticile și, dacă evenimentul a fost înregistrat, înregistrarea și raportul.",
+    "endLinks": {
+      "after": "Înregistrare și raport",
+      "stats": "Statisticile evenimentului",
+      "publicPage": "Pagina publică a evenimentului"
+    },
+    "notOpenNow": "Sala nu este deschisă în acest moment.",
+    "nameRequired": "Lipsește numele cu care să intri: revino și scrie-l."
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -1166,7 +1175,7 @@
         "signing": "Se pregătește...",
         "uploading": "Încărcare {progress}%",
         "uploaded": "Încărcare finalizată",
-        "uploadHint": "Formate acceptate: MP4, WebM, MOV, M4V. Dimensiune maximă 5 GB. Încărcarea se face direct pe spațiul de stocare (Azure Blob), nimic nu trece prin serverele noastre.",
+        "uploadHint": "Formate acceptate: MP4, WebM, MOV, M4V. Dimensiune maximă 5 GB. Fișierul merge direct în arhiva video, fără să treacă prin portal.",
         "step2Title": "2. Metadate publicație",
         "titleIt": "Titlu (italiană)",
         "titleEn": "Titlu (engleză, opțional)",
@@ -1384,7 +1393,7 @@
     "deleteEvent": "Ștergeți evenimentul",
     "deleteConfirm": "Sigur doriți să ștergeți acest eveniment? Această acțiune este ireversibilă.",
     "publish": "Publicați",
-    "unpublish": "Anulați publicarea",
+    "unpublish": "Retrage publicarea",
     "noToken": "Pentru a gestiona evenimentele, utilizați linkul de moderator primit prin email.",
     "noEvents": "Niciun eveniment găsit. Creați primul dumneavoastră eveniment.",
     "eventDetails": "Detalii eveniment",
@@ -1399,7 +1408,7 @@
     "notJoined": "Nu a participat",
     "deleteSuccess": "Eveniment șters",
     "publishSuccess": "Eveniment publicat",
-    "unpublishSuccess": "Publicare anulată",
+    "unpublishSuccess": "Eveniment retras",
     "startEvent": "Porniți evenimentul",
     "startEventSuccess": "Eveniment pornit! Participanții în așteptare vor fi redirecționați automat.",
     "startEventConfirmTitle": "Porniți evenimentul?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Numărul maxim de participanți",
       "expectedParticipants": "Participanți așteptați (estimare)",
       "expectedParticipantsHint": "Doar o estimare pentru dimensionarea infrastructurii. Nu este un plafon maxim: înscrierile peste această valoare sunt acceptate, infrastructura scalează automat.",
-      "expectedSenderRatio": "Raport sender așteptat",
-      "expectedSenderRatioInherit": "Implicit site",
-      "expectedSenderRatioHint": "Procentul de participanți care vor avea microfonul sau camera web active. Webinar clasic 10-20%, masă rotundă 50-100%. Lăsați gol pentru a moșteni valoarea implicită a site-ului.",
+      "expectedSenderRatio": "Ponderea celor care vorbesc",
+      "expectedSenderRatioInherit": "Valoarea site-ului",
+      "expectedSenderRatioHint": "Procentul participanților cu microfon sau cameră active. Webinar clasic 10-20%, masă rotundă 50-100%. Lasă gol pentru a folosi valoarea site-ului.",
       "jvbPreview": {
-        "title": "Estimare capacitate JVB",
-        "pod": "pod JVB",
-        "pods": "pod-uri JVB",
-        "senders": "Sender",
-        "receivers": "Receiver",
-        "effectiveRatio": "Raport efectiv",
-        "inherited": "moștenit",
-        "presetLabel": "Preset",
+        "title": "Estimarea punților video",
+        "pod": "punte video",
+        "pods": "punți video",
+        "senders": "Cu microfon sau cameră",
+        "receivers": "Doar ascultă",
+        "effectiveRatio": "Ponderea celor care vorbesc",
+        "inherited": "valoarea site-ului",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Întâlnire",
-          "workshop": "Workshop",
-          "allHands": "Toți sender"
+          "workshop": "Atelier",
+          "allHands": "Vorbesc toți"
         },
-        "clearPreset": "Folosiți implicit site",
-        "atCeiling": "limită max {max}",
-        "videoDisabled": "Video dezactivat: toți participanții contează ca receiver.",
-        "warnInherited": "Cu {participants} participanți și raport moștenit ({defaultPct}%), estimarea se bazează pe valoarea implicită a site-ului. Pentru evenimente mari este recomandat să setați o valoare explicită (webinar 5-20%, întâlnire 30%, workshop 60%).",
-        "warnCeiling": "Estimare la limita maximă configurată ({max} pod-uri). Dacă participanții reali sau senderii depășesc estimarea, bridge-urile se pot satura. Luați în considerare creșterea limitei sau reducerea maxParticipants."
+        "clearPreset": "Folosește valoarea site-ului",
+        "atCeiling": "maximum {max}",
+        "videoDisabled": "Video oprit: toți participanții contează ca ascultători.",
+        "warnInherited": "Cu {participants} participanți și ponderea site-ului ({defaultPct}%), estimarea este orientativă. Pentru evenimente mari merită indicată: webinar 5-20%, întâlnire 30%, atelier 60%.",
+        "warnCeiling": "Estimarea este la maximul configurat ({max} punți video). Dacă vorbesc mai multe persoane decât se prevede, punțile se pot satura: ia în calcul creșterea limitei sau reducerea numărului maxim de participanți."
       },
       "gracePeriod": "Sfârșit eveniment (soft exit)",
       "gracePeriodInherit": "Folosiți implicit site",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Încărcați o înregistrare existentă",
-      "subtitle": "Dacă aveți deja un fișier video al evenimentului (de ex. înregistrare MsTeams), încărcați-l aici: va fi afișat ca înregistrare oficială pe pagina publică.",
+      "subtitle": "Dacă ai deja un fișier video al evenimentului (de exemplu înregistrat cu altă platformă), încarcă-l aici: va fi afișat ca înregistrare oficială pe pagina publică.",
       "fileLabel": "Fișier video",
       "upload": "Încărcați și asociați",
       "signing": "Se pregătește…",
       "uploading": "Încărcare {progress}%",
       "attaching": "Se asociază evenimentului…",
-      "hint": "Formate: MP4, WebM, MOV, M4V. Max 5 GB. Încărcarea merge direct pe stocarea Azure.",
+      "hint": "Formate: MP4, WebM, MOV, M4V. Maximum 5 GB. Fișierul merge direct în arhiva video, fără să treacă prin portal.",
       "errors": {
         "fileTooLarge": "Fișierul depășește limita de 5 GB.",
         "unsupportedType": "Format neacceptat. Încărcați un MP4, WebM, MOV sau M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Evenimentul nu s-a încheiat încă: statisticile sunt parțiale și se actualizează în timp real.",
       "cappedNote": "Eveniment foarte mare: unele metrici sunt calculate pe un eșantion (limita de rânduri atinsă).",
       "scoreTitle": "Grad de atenție",
-      "adminOnly": "doar admin",
+      "adminOnly": "nepublic",
       "scoreProxy": "Indice 0–100 al participării sălii. Este un indicator indirect de participare, nu o măsură a atenției cognitive — citiți-l în contextul formatului (curs vs atelier), niciodată ca notă de calitate.",
       "scoreUnavailable": "Date insuficiente pentru calcularea gradului.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Transcrierea nu a putut fi încărcată (HTTP {code}).",
       "editNotReady": "Nu există încă o transcriere pentru această înregistrare. Porniți (sau reluați) procesarea AI din controalele de sus: transcrierea este primul pas, apoi o veți putea corecta aici și genera rezumatul și traducerile.",
       "editProcessing": "Procesare AI în curs: transcrierea va apărea aici la final. Reîmprospătați pagina peste câteva minute.",
-      "editSessionExpired": "Sesiunea de administrator a expirat. Reîncărcați pagina și autentificați-vă din nou pentru a modifica transcrierea.",
+      "editSessionExpired": "Sesiunea a expirat. Reîncarcă pagina și intră din nou pentru a edita transcrierea.",
       "editEmpty": "Niciun segment modificabil",
       "editSpeakerNone": "— niciunul —",
       "editSave": "Salvează modificările",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arhivă",
       "manageTabReliability": "Fiabilitate",
       "manageLoading": "Se încarcă…",
-      "archivePiiNote": "Pistele audio izolate pe participant sunt date personale sensibile (voce izolată): această secțiune este rezervată administratorilor/moderatorilor și nu este niciodată expusă public.",
+      "archivePiiNote": "Pista audio separată a fiecărui participant este o dată personală sensibilă (vocea izolată): această secțiune este rezervată celor care gestionează evenimentul și nu este niciodată publică.",
       "archiveNoTracks": "Nicio pistă pe participant disponibilă pentru această înregistrare (înregistrarea multi-pistă nu este activă sau pistele au fost deja șterse pentru minimizarea GDPR).",
       "archivePlayerTitle": "Reascultare pe vorbitor",
       "archiveAudioHint": "Folosiți selectorul „Audio” al playerului pentru a asculta mixul sau pista izolată a unui singur participant, sincronizat cu videoul.",
@@ -4140,7 +4149,10 @@
       "LIVE": "În desfășurare",
       "ENDED": "Încheiat",
       "ARCHIVED": "Arhivat"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Încă un eveniment} few {Încă # evenimente} other {Încă # de evenimente}}",
+    "noEvents": "Niciun eveniment în această perioadă",
+    "weekShort": "Săpt."
   },
   "footer": {
     "privacy": "Politica de confidențialitate",
@@ -4880,12 +4892,29 @@
     "yes": "Da",
     "no": "Nu",
     "scaleValue": "{value} din {max}",
-    "answerOne": "Răspunde la cel puțin o întrebare pentru a trimite."
+    "answerOne": "Răspunde la cel puțin o întrebare pentru a trimite.",
+    "pageTitle": "Chestionar"
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
     "text": "Este posibil ca adresa să fie greșită sau pagina să nu mai existe.",
     "home": "Mergeți la pagina principală",
     "staffArea": "Înapoi la zona rezervată"
+  },
+  "apiErrors": {
+    "unauthorized": "Sesiunea a expirat sau accesul nu este valid. Intră din nou și reîncearcă.",
+    "forbidden": "Nu ai permisiunea pentru această operațiune.",
+    "notFound": "Acest element nu mai există. Reîncarcă pagina.",
+    "tooLarge": "Prea mare: micșorează fișierul sau textul și încearcă din nou.",
+    "rateLimited": "Prea multe cereri într-un timp scurt. Așteaptă puțin și încearcă din nou.",
+    "transcriptCorrected": "Transcrierea din subtitrări a fost corectată manual: o transcriere AI ar înlocui-o și corecturile s-ar pierde.",
+    "aiPipelineDisabled": "Fluxul AI este oprit pentru tot site-ul: un administrator îl poate porni din setări.",
+    "recordingWithoutMedia": "Această înregistrare nu are video: transcrierea ei provine din subtitrările transmisiei.",
+    "noParticipantTracks": "Nu există piste audio separate ale participanților: nu au fost înregistrate sau au fost deja șterse. Pentru a le avea, activează înregistrarea pe participant înainte de eveniment.",
+    "summaryMissing": "Încă nu există un rezumat de editat în această limbă: generează-l mai întâi.",
+    "storageUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare.",
+    "aiDisabledForEvent": "AI este oprită pentru acest eveniment: folosește „Generează AI” pentru a o porni și a lansa procesarea.",
+    "sourceTranscriptMissing": "Această înregistrare nu este încă transcrisă: transcrie-o înainte de a adăuga o traducere.",
+    "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta."
   }
 }

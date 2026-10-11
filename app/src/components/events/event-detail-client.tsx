@@ -432,12 +432,11 @@ export default function EventDetailClient({
                 style={{ fontSize: '0.75rem' }}
               >
                 <span
-                  className="rounded-circle d-inline-block"
+                  className="rounded-circle d-inline-block pulse-dot"
                   style={{
                     width: 7,
                     height: 7,
                     backgroundColor: '#fff',
-                    animation: 'pulse-dot 1.5s ease-in-out infinite',
                   }}
                 />
                 {t('card.liveNow')}

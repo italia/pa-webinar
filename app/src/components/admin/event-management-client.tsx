@@ -16,14 +16,16 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import { csvText } from '@/lib/utils/csv';
-import { eventAdminPath } from '@/lib/events/admin-links';
+import { eventAdminPath, eventAdminTab, type EventAdminTab } from '@/lib/events/admin-links';
 import type { WizardAdvancedSection, WizardStep } from '@/lib/events/wizard-steps';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
@@ -204,7 +206,7 @@ interface EventManagementClientProps {
 // la striscia scorre in orizzontale e quelle in coda non si sa che esistano.
 // Le impostazioni dell'evento non sono fra queste — si cambiano dal wizard,
 // da «Modifica evento».
-type TabId = 'panoramica' | 'persone' | 'contenuti' | 'dopo' | 'statistiche';
+type TabId = EventAdminTab;
 
 /** Il nome tradotto di un tipo di ente (admin.registrations.orgTypes). */
 function useOrgTypeLabel(): (code: string) => string {
@@ -250,7 +252,14 @@ export default function EventManagementClient({
   const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<TabId>('panoramica');
+  // La scheda chiesta dall'indirizzo (`?tab=dopo`), per esempio dalla sala a
+  // fine evento: si apre quella invece della panoramica, gia' dal primo
+  // rendering, e anche quando l'indirizzo cambia restando sulla pagina.
+  const tabRichiesta = eventAdminTab(useSearchParams().get('tab'));
+  const [activeTab, setActiveTab] = useState<TabId>(tabRichiesta ?? 'panoramica');
+  useEffect(() => {
+    if (tabRichiesta) setActiveTab(tabRichiesta);
+  }, [tabRichiesta]);
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
@@ -335,17 +344,29 @@ export default function EventManagementClient({
   const jvbCount = capacity && typeof capacity.jvbCount === 'number' ? capacity.jvbCount : null;
   const jvbRam = capacity && typeof capacity.jvbRam === 'string' ? capacity.jvbRam : null;
 
+  // Ritirare toglie l'evento dalle pagine pubbliche: si chiede conferma, come
+  // dal menu della scheda nell'elenco, e un errore si vede.
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    if (newStatus === 'DRAFT') {
+      const ok = await confirm({
+        title: t('eventsList.menu.unpublishTitle'),
+        message: t('eventsList.menu.unpublishMessage', { title }),
+        confirmLabel: t('eventsList.menu.unpublish'),
+        cancelLabel: tc('cancel'),
+      });
+      if (!ok) return;
+    }
     setUpdating(true); setFeedback('');
     try {
       await impostaStatoEvento(event.id, event.moderatorToken, newStatus);
       setStatus(newStatus);
       setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
     } catch {
-      // Senza conferma dal server lo stato mostrato resta quello vero.
+      // Lo stato mostrato resta quello vero; l'errore lo si dice.
+      toast.error(t('eventsList.menu.failed'));
     } finally { setUpdating(false); }
-  }, [status, event.id, event.moderatorToken, t]);
+  }, [status, event.id, event.moderatorToken, t, tc, confirm, toast, title]);
 
   const isEarlyStart = startsAt.getTime() > Date.now() + 30 * 60_000;
 
@@ -1260,6 +1281,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tg = useTranslations('admin.glossary');
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
+  const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
@@ -1289,12 +1311,18 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ summary: true }),
       });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-        enqueued?: number;
-      };
+      const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
       if (!res.ok) {
-        setAiGenMsg({ ok: false, text: data.error ?? td('aiGenerateError') });
+        setAiGenMsg({
+          ok: false,
+          text: messaggioErroreApi(
+            res.status,
+            tApi,
+            td('aiGenerateError'),
+            { 404: td('aiGenerateNoRecording') },
+            data.code,
+          ),
+        });
       } else {
         setAiGenMsg({
           ok: true,
@@ -1306,7 +1334,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     } finally {
       setGeneratingAi(false);
     }
-  }, [event.id, td]);
+  }, [event.id, td, tApi]);
 
   return (
     <>

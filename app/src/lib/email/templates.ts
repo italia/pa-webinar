@@ -42,6 +42,8 @@ interface EmailTemplateInput {
    * compare sempre, anche se l'amministrazione ha personalizzato il testo.
    */
   addressBookOptOutUrl?: string | null;
+  /** La pagina «I miei dati», nella lingua della pagina dell'iscrizione. */
+  myDataUrl?: string | null;
 }
 
 interface LocaleCopy {
@@ -57,6 +59,8 @@ interface LocaleCopy {
   joinLabel: string;
   keepNote: string;
   viewEvent: string;
+  /** Il link a «I miei dati»: vedere, correggere o cancellare l'iscrizione. */
+  myData: string;
   addToCalendar: string;
   downloadIcs: string;
   footer: string;
@@ -82,13 +86,13 @@ const copy: Record<Locale, LocaleCopy> = {
     reminderHeading: 'Promemoria evento',
     reminderNote: (offsetMinutes) => {
       if (offsetMinutes >= 1440) {
-        return 'L\u2019evento a cui sei registrato inizia domani. Usa il link qui sotto per accedere.';
+        return 'L\u2019evento a cui sei iscritto inizia domani. Usa il link qui sotto per accedere.';
       }
       if (offsetMinutes >= 60) {
         const hours = Math.round(offsetMinutes / 60);
-        return `L\u2019evento a cui sei registrato inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}. Usa il link qui sotto per accedere.`;
+        return `L\u2019evento a cui sei iscritto inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}. Usa il link qui sotto per accedere.`;
       }
-      return `L\u2019evento a cui sei registrato inizia tra ${offsetMinutes} minuti. Usa il link qui sotto per accedere.`;
+      return `L\u2019evento a cui sei iscritto inizia tra ${offsetMinutes} minuti. Usa il link qui sotto per accedere.`;
     },
     eventLabel: 'Evento',
     dateLabel: 'Data',
@@ -98,13 +102,14 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserva questa email, contiene il tuo link personale per accedere all\u2019evento.',
     viewEvent: 'Visualizza la pagina dell\u2019evento',
+    myData: 'I tuoi dati: vederli, correggerli o cancellare l\u2019iscrizione',
     addToCalendar: 'Aggiungi al tuo calendario:',
     downloadIcs: 'Scarica .ics',
     footer: '',
     unsubscribe:
-      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
+      'Ricevi questa email perch\u00e9 ti sei iscritto all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
     unsubscribeAddressBook:
-      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
+      'Ricevi questa email perch\u00e9 ti sei iscritto all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
     addressBookOptOut: 'Rimuovi i miei dati dalla rubrica',
   },
   en: {
@@ -137,6 +142,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Keep this email \u2014 it contains your personal link to access the event.',
     viewEvent: 'View event page',
+    myData: 'Your data: see it, correct it or cancel your registration',
     addToCalendar: 'Add to your calendar:',
     downloadIcs: 'Download .ics',
     footer: '',
@@ -176,6 +182,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conservez cet e-mail : il contient votre lien personnel pour accéder à l’événement.',
     viewEvent: 'Voir la page de l’événement',
+    myData: 'Vos données : les consulter, les corriger ou annuler l’inscription',
     addToCalendar: 'Ajoutez-le à votre agenda :',
     downloadIcs: 'Télécharger le fichier .ics',
     footer: '',
@@ -215,6 +222,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Bitte bewahren Sie diese E-Mail auf: Sie enthält Ihren persönlichen Link zur Veranstaltung.',
     viewEvent: 'Seite der Veranstaltung anzeigen',
+    myData: 'Ihre Daten: einsehen, berichtigen oder die Anmeldung löschen',
     addToCalendar: 'Zu Ihrem Kalender hinzufügen:',
     downloadIcs: '.ics herunterladen',
     footer: '',
@@ -254,6 +262,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserve este correo electrónico: contiene su enlace personal para acceder al evento.',
     viewEvent: 'Ver la página del evento',
+    myData: 'Tus datos: verlos, corregirlos o cancelar la inscripción',
     addToCalendar: 'Añada el evento a su calendario:',
     downloadIcs: 'Descargar .ics',
     footer: '',
@@ -359,12 +368,8 @@ function detailsTable(
   input: EmailTemplateInput,
 ): string {
   return `<table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;">
-<tr>
-  <td style="padding:8px 12px;font-weight:600;color:#17324d;width:100px;">${c.eventLabel}</td>
-  <td style="padding:8px 12px;">${escapeHtml(input.eventTitle)}</td>
-</tr>
 <tr style="background:#f5f6f7;">
-  <td style="padding:8px 12px;font-weight:600;color:#17324d;">${c.dateLabel}</td>
+  <td style="padding:8px 12px;font-weight:600;color:#17324d;width:100px;">${c.dateLabel}</td>
   <td style="padding:8px 12px;">${escapeHtml(input.eventDate)}</td>
 </tr>
 <tr>
@@ -412,6 +417,17 @@ function addressBookOptOutText(c: LocaleCopy, url: string | null | undefined): s
 /** La nota a pie' di pagina predefinita: per chi e' in rubrica dice come uscirne. */
 function defaultFooterNote(c: LocaleCopy, input: { addressBookOptOutUrl?: string | null }): string {
   return input.addressBookOptOutUrl ? c.unsubscribeAddressBook : c.unsubscribe;
+}
+
+/** Il link a «I miei dati», quando la pagina e' nota. */
+function myDataHtml(c: LocaleCopy, input: EmailTemplateInput): string {
+  return input.myDataUrl
+    ? `\n<p style="margin:8px 0 0;font-size:14px;"><a href="${escapeHtml(input.myDataUrl)}" style="color:#06c;">${c.myData}</a></p>`
+    : '';
+}
+
+function myDataText(c: LocaleCopy, input: EmailTemplateInput): string[] {
+  return input.myDataUrl ? [`${c.myData}: ${input.myDataUrl}`] : [];
 }
 
 function ctaButton(label: string, url: string): string {
@@ -490,7 +506,7 @@ ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
 ${info}
-<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
+<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${myDataHtml(c, input)}`;
 
   return layout(
     escapeHtml(r.heading),
@@ -535,6 +551,7 @@ export function confirmationText(
     '',
     ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
+    ...myDataText(c, input),
     '',
     footerText,
     r.footerNote,
@@ -570,7 +587,7 @@ ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
 ${info}
-<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
+<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${myDataHtml(c, input)}`;
 
   return layout(
     escapeHtml(r.heading),
@@ -615,6 +632,7 @@ export function reminderText(
     '',
     ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
+    ...myDataText(c, input),
     '',
     footerText,
     r.footerNote,

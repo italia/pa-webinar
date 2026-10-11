@@ -89,7 +89,8 @@
     "language": "Taal",
     "switchLanguage": "Taal wijzigen",
     "skipToContent": "Ga naar inhoud",
-    "skipToFooter": "Ga naar footer"
+    "skipToFooter": "Ga naar footer",
+    "mainLabel": "Hoofdnavigatie"
   },
   "header": {
     "followUs": "Volg ons op"
@@ -301,7 +302,7 @@
       "library": "In de bibliotheek publiceren",
       "libraryHelp": "Zoals hierboven, en bovendien wordt het evenement getoond in de openbare videobibliotheek (vereist een gepubliceerde opname of een YouTube-video).",
       "archive": "Archiveren (privé)",
-      "archiveHelp": "De pagina van het afgelopen evenement wordt niet openbaar (404). De gegevens blijven bewaard tot de bewaartermijn verstrijkt en worden daarna verwijderd.",
+      "archiveHelp": "De pagina van het afgelopen evenement is niet zichtbaar voor het publiek. De gegevens blijven bewaard tot het einde van de bewaartermijn en worden daarna verwijderd.",
       "genAi": "AI-transcriptie en -samenvatting genereren uit de opname (zodra de verwerking klaar is)",
       "back": "Terug",
       "confirm": "Evenement beëindigen"
@@ -572,7 +573,15 @@
       "show": "Ondertiteling tonen",
       "hide": "Ondertiteling verbergen",
       "toggle": "Automatische ondertiteling"
-    }
+    },
+    "eventEndedModerator": "Het evenement is afgelopen. Hieronder vind je de statistieken en, als het is opgenomen, de opname en het verslag.",
+    "endLinks": {
+      "after": "Opname en verslag",
+      "stats": "Statistieken van het evenement",
+      "publicPage": "Openbare pagina van het evenement"
+    },
+    "notOpenNow": "De zaal is op dit moment niet open.",
+    "nameRequired": "De naam om mee binnen te komen ontbreekt: ga terug en vul hem in."
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -1166,7 +1175,7 @@
         "signing": "Voorbereiden...",
         "uploading": "Uploaden {progress}%",
         "uploaded": "Upload voltooid",
-        "uploadHint": "Ondersteunde formaten: MP4, WebM, MOV, M4V. Maximumgrootte 5 GB. De upload gaat rechtstreeks naar de objectopslag (Azure Blob), niets passeert onze servers.",
+        "uploadHint": "Ondersteunde formaten: MP4, WebM, MOV, M4V. Maximale grootte 5 GB. Het bestand gaat rechtstreeks naar het videoarchief, zonder via het portaal te gaan.",
         "step2Title": "2. Metadata publicatie",
         "titleIt": "Titel (Italiaans)",
         "titleEn": "Titel (Engels, optioneel)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Niet deelgenomen",
     "deleteSuccess": "Evenement verwijderd",
     "publishSuccess": "Evenement gepubliceerd",
-    "unpublishSuccess": "Publicatie van evenement ingetrokken",
+    "unpublishSuccess": "Evenement ingetrokken",
     "startEvent": "Evenement starten",
     "startEventSuccess": "Evenement gestart! Wachtende deelnemers worden automatisch doorgestuurd.",
     "startEventConfirmTitle": "Evenement starten?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maximaal aantal deelnemers",
       "expectedParticipants": "Verwachte deelnemers (schatting)",
       "expectedParticipantsHint": "Slechts een schatting voor het dimensioneren van de infrastructuur. Geen harde limiet: aanmeldingen boven dit aantal worden geaccepteerd, de infra schaalt automatisch op.",
-      "expectedSenderRatio": "Verwachte sender-ratio",
-      "expectedSenderRatioInherit": "Standaard van de site",
-      "expectedSenderRatioHint": "Percentage deelnemers met microfoon of webcam aan. Klassiek webinar 10-20%, panel 50-100%. Laat leeg om de standaard van de site over te nemen.",
+      "expectedSenderRatio": "Aandeel sprekers",
+      "expectedSenderRatioInherit": "Waarde van de site",
+      "expectedSenderRatioHint": "Percentage deelnemers met actieve microfoon of camera. Klassiek webinar 10-20%, rondetafel 50-100%. Laat leeg om de waarde van de site te gebruiken.",
       "jvbPreview": {
-        "title": "Geschatte JVB-capaciteit",
-        "pod": "JVB-pod",
-        "pods": "JVB-pods",
-        "senders": "Senders",
-        "receivers": "Receivers",
-        "effectiveRatio": "Effectieve ratio",
-        "inherited": "overgenomen",
-        "presetLabel": "Preset",
+        "title": "Schatting van videobruggen",
+        "pod": "videobrug",
+        "pods": "videobruggen",
+        "senders": "Met microfoon of camera",
+        "receivers": "Alleen luisterend",
+        "effectiveRatio": "Aandeel sprekers",
+        "inherited": "waarde van de site",
+        "presetLabel": "Profiel",
         "preset": {
           "webinar": "Webinar",
-          "meeting": "Meeting",
+          "meeting": "Vergadering",
           "workshop": "Workshop",
-          "allHands": "Allen senders"
+          "allHands": "Iedereen spreekt"
         },
-        "clearPreset": "Standaard van de site gebruiken",
-        "atCeiling": "max. limiet {max}",
-        "videoDisabled": "Video uitgeschakeld: alle deelnemers tellen als receivers.",
-        "warnInherited": "Met {participants} deelnemers en de overgenomen ratio ({defaultPct}%) is de schatting gebaseerd op de standaard van de site. Voor grote evenementen is het beter een expliciete waarde in te stellen (webinar 5-20%, meeting 30%, workshop 60%).",
-        "warnCeiling": "Schatting bevindt zich op de geconfigureerde maximumlimiet ({max} pods). Als de werkelijke deelname of senders de schatting overstijgen, kunnen de bridges verzadigd raken. Overweeg de limiet te verhogen of maxParticipants te verlagen."
+        "clearPreset": "Waarde van de site gebruiken",
+        "atCeiling": "maximaal {max}",
+        "videoDisabled": "Video uit: alle deelnemers tellen als luisteraar.",
+        "warnInherited": "Met {participants} deelnemers en het aandeel van de site ({defaultPct}%) is de schatting indicatief. Bij grote evenementen kun je het beter opgeven: webinar 5-20%, vergadering 30%, workshop 60%.",
+        "warnCeiling": "De schatting zit op het ingestelde maximum ({max} videobruggen). Als meer mensen spreken dan verwacht, kunnen de bruggen overbelast raken: overweeg de limiet te verhogen of het maximale aantal deelnemers te verlagen."
       },
       "gracePeriod": "Einde evenement (soft exit)",
       "gracePeriodInherit": "Standaard van de site gebruiken",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Bestaande opname uploaden",
-      "subtitle": "Heeft u al een videobestand van het evenement (bijv. een MS Teams-opname)? Upload het hier: het wordt als officiële opname op de openbare pagina getoond.",
+      "subtitle": "Heb je al een videobestand van het evenement (bijvoorbeeld opgenomen met een ander platform), upload het dan hier: het wordt als officiële opname op de openbare pagina getoond.",
       "fileLabel": "Videobestand",
       "upload": "Uploaden en koppelen",
       "signing": "Voorbereiden…",
       "uploading": "Uploaden {progress}%",
       "attaching": "Koppelen aan evenement…",
-      "hint": "Formaten: MP4, WebM, MOV, M4V. Max. 5 GB. De upload gaat rechtstreeks naar Azure Blob storage.",
+      "hint": "Formaten: MP4, WebM, MOV, M4V. Maximaal 5 GB. Het bestand gaat rechtstreeks naar het videoarchief, zonder via het portaal te gaan.",
       "errors": {
         "fileTooLarge": "Het bestand overschrijdt de limiet van 5 GB.",
         "unsupportedType": "Niet-ondersteund formaat. Upload een MP4, WebM, MOV of M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Het evenement is nog niet afgelopen: de statistieken zijn gedeeltelijk en worden in realtime bijgewerkt.",
       "cappedNote": "Zeer groot evenement: sommige statistieken zijn berekend op basis van een steekproef (rijlimiet bereikt).",
       "scoreTitle": "Aandachtsscore",
-      "adminOnly": "alleen admin",
+      "adminOnly": "niet openbaar",
       "scoreProxy": "Index van 0–100 voor de participatie van de zaal. Het is een indicatie van participatie, geen meting van cognitieve aandacht — lees hem in de context van het format (college versus workshop), nooit als kwaliteitscijfer.",
       "scoreUnavailable": "Onvoldoende gegevens om de score te berekenen.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Kan de transcriptie niet laden (HTTP {code}).",
       "editNotReady": "Er is nog geen transcriptie beschikbaar voor deze opname. Start (of herstart) de AI-verwerking met de knoppen bovenaan: de transcriptie is de eerste stap, daarna kunt u die hier corrigeren en de samenvatting en de vertalingen genereren.",
       "editProcessing": "De AI-verwerking is bezig: de transcriptie verschijnt hier zodra die klaar is. Vernieuw de pagina over een paar minuten.",
-      "editSessionExpired": "Adminsessie verlopen. Herlaad de pagina en meld u opnieuw aan om de transcriptie te bewerken.",
+      "editSessionExpired": "Je sessie is verlopen. Laad de pagina opnieuw en log opnieuw in om de transcriptie te bewerken.",
       "editEmpty": "Geen bewerkbare segmenten",
       "editSpeakerNone": "— geen —",
       "editSave": "Wijzigingen opslaan",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Archief",
       "manageTabReliability": "Betrouwbaarheid",
       "manageLoading": "Laden…",
-      "archivePiiNote": "De geïsoleerde audiosporen per deelnemer zijn gevoelige persoonsgegevens (geïsoleerde stem): dit onderdeel is voorbehouden aan admins/moderatoren en wordt nooit openbaar getoond.",
+      "archivePiiNote": "Het afzonderlijke audiospoor van elke deelnemer is een gevoelig persoonsgegeven (de geïsoleerde stem): dit deel is voorbehouden aan wie het evenement beheert en is nooit openbaar.",
       "archiveNoTracks": "Geen sporen per deelnemer beschikbaar voor deze opname (opname met meerdere sporen niet actief, of sporen al verwijderd wegens AVG-minimalisatie).",
       "archivePlayerTitle": "Terugluisteren per spreker",
       "archiveAudioHint": "Gebruik de keuzeknop “Audio” van de speler om de mix of het geïsoleerde spoor van één deelnemer te beluisteren, synchroon met de video.",
@@ -4140,7 +4149,10 @@
       "LIVE": "LIVE",
       "ENDED": "Afgelopen",
       "ARCHIVED": "Gearchiveerd"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Nog één evenement} other {Nog # evenementen}}",
+    "noEvents": "Geen evenementen in deze periode",
+    "weekShort": "Wk"
   },
   "footer": {
     "privacy": "Privacybeleid",
@@ -4880,12 +4892,29 @@
     "yes": "Ja",
     "no": "Nee",
     "scaleValue": "{value} van {max}",
-    "answerOne": "Beantwoord minstens één vraag om te verzenden."
+    "answerOne": "Beantwoord minstens één vraag om te verzenden.",
+    "pageTitle": "Vragenlijst"
   },
   "notFound": {
     "title": "Pagina niet gevonden",
     "text": "Het adres is misschien onjuist, of de pagina bestaat niet meer.",
     "home": "Naar de startpagina",
     "staffArea": "Terug naar het beheergedeelte"
+  },
+  "apiErrors": {
+    "unauthorized": "Je sessie is verlopen of de toegang is niet geldig. Log opnieuw in en probeer het nog eens.",
+    "forbidden": "Je hebt geen toestemming voor deze handeling.",
+    "notFound": "Dit onderdeel bestaat niet meer. Laad de pagina opnieuw.",
+    "tooLarge": "Te groot: maak het bestand of de tekst kleiner en probeer het opnieuw.",
+    "rateLimited": "Te veel verzoeken in korte tijd. Wacht even en probeer het opnieuw.",
+    "transcriptCorrected": "De transcriptie uit de ondertitels is met de hand gecorrigeerd: een AI-transcriptie zou haar vervangen en de correcties zouden verloren gaan.",
+    "aiPipelineDisabled": "De AI-pijplijn staat uit voor de hele site: een beheerder kan hem aanzetten in de instellingen.",
+    "recordingWithoutMedia": "Deze opname heeft geen video: de transcriptie komt van de live-ondertiteling.",
+    "noParticipantTracks": "Er zijn geen afzonderlijke audiosporen van de deelnemers: ze zijn niet opgenomen of al verwijderd. Zet daarvoor vóór het evenement de opname per deelnemer aan.",
+    "summaryMissing": "Er is in deze taal nog geen samenvatting om te bewerken: genereer die eerst.",
+    "storageUnavailable": "Bestanden uploaden is niet beschikbaar op deze installatie.",
+    "aiDisabledForEvent": "AI staat uit voor dit evenement: gebruik ‘AI genereren’ om het aan te zetten en de verwerking te starten.",
+    "sourceTranscriptMissing": "Deze opname is nog niet getranscribeerd: transcribeer haar voordat je een vertaling toevoegt.",
+    "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere."
   }
 }

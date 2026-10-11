@@ -20,6 +20,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import TranscriptEditor from './transcript-editor';
 import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
@@ -153,6 +154,7 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
 
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const tApi = useTranslations('apiErrors');
   const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
@@ -198,7 +200,9 @@ export default function PostprodDashboard() {
       credentials: 'include',
     });
     if (!r.ok) {
-      toast.error(t('rerunFailed', { code: r.status }));
+      toast.error(
+        messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+      );
       return;
     }
     await mutate();

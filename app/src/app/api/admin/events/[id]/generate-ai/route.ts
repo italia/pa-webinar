@@ -25,7 +25,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
-import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,8 +40,10 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { aiPipelineEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
-    throw new ValidationError(
+    throw new AppError(
       'AI pipeline is currently disabled (SiteSetting.aiPipelineEnabled=false). Enable it in admin settings first.',
+      422,
+      'AI_PIPELINE_DISABLED',
     );
   }
 
@@ -63,15 +65,31 @@ export const POST = withErrorHandling(async (request, context) => {
       orderBy: { createdAt: 'desc' },
       select: { id: true, blobKey: true },
     });
-    if (!recording) throw new NotFoundError('Recording');
+    if (!recording) {
+      // Senza file, ma con la registrazione dei soli sottotitoli: lo si dice,
+      // invece di «nessuna registrazione».
+      const soloSottotitoli = await tx.recording.findFirst({ where: { eventId: id }, select: { id: true } });
+      if (soloSottotitoli) {
+        throw new AppError(
+          'The event has no recording with media: its transcript comes from the live captions.',
+          422,
+          'RECORDING_WITHOUT_MEDIA',
+        );
+      }
+      throw new NotFoundError('Recording');
+    }
     if (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id)) {
-      throw new ConflictError(
+      throw new AppError(
         'The transcript from the live captions on this recording was corrected by hand: the AI transcription would replace it and the corrections would be lost.',
+        409,
+        'TRANSCRIPT_CORRECTED',
       );
     }
     if (registrazioneSoloSottotitoli(recording)) {
-      throw new ValidationError(
+      throw new AppError(
         'The latest recording has no media: its transcript comes from the live captions.',
+        422,
+        'RECORDING_WITHOUT_MEDIA',
       );
     }
 

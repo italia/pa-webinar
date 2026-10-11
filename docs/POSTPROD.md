@@ -1872,7 +1872,7 @@ of the cache layout. Seed again with the
 [seed Job](#seeding-the-models-volume), and add the alignment model for the
 recording's language.
 
-**Summary or translation jobs wait for 12 minutes, then fail with a connection
+**Summary or translation jobs wait for 20 minutes, then fail with a connection
 error.** vLLM is not reachable at the base URL in the claim. Check that the
 Service exists in the release namespace with the expected name, that
 `AI_VLLM_BASE_URL` in `app.env` matches it, and, with autoscaling on, that the

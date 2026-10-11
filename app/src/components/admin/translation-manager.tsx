@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 interface TranslatedLang {
   lang: string;
@@ -53,6 +54,7 @@ export default function TranslationManager({
   onChanged?: () => void;
 }) {
   const t = useTranslations('admin.postprod.tm');
+  const tApi = useTranslations('apiErrors');
   const url = `/api/admin/postprod/recordings/${recordingId}/translations`;
   const { data, error, isLoading, mutate } = useSWR<TranslationsResponse>(url, fetcher);
 
@@ -72,14 +74,9 @@ export default function TranslationManager({
         body: JSON.stringify({ targetLanguage: selected }),
       });
       if (!res.ok) {
-        let msg = `HTTP ${res.status}`;
-        try {
-          const b = (await res.json()) as { error?: string; message?: string };
-          msg = b.error ?? b.message ?? msg;
-        } catch {
-          /* keep */
-        }
-        throw new Error(msg);
+        throw new Error(
+          messaggioErroreApi(res.status, tApi, t('unexpectedError'), {}, await codiceErrore(res)),
+        );
       }
       setSelected('');
       await mutate();

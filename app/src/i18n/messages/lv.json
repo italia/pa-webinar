@@ -89,7 +89,8 @@
     "language": "Valoda",
     "switchLanguage": "Mainīt valodu",
     "skipToContent": "Pāriet uz saturu",
-    "skipToFooter": "Pāriet uz kājeni"
+    "skipToFooter": "Pāriet uz kājeni",
+    "mainLabel": "Galvenā navigācija"
   },
   "header": {
     "followUs": "Sekojiet mums"
@@ -301,7 +302,7 @@
       "library": "Publicēt bibliotēkā",
       "libraryHelp": "Tāpat kā iepriekš, un turklāt pasākums tiek rādīts publiskajā video bibliotēkā (nepieciešams publicēts ieraksts vai YouTube video).",
       "archive": "Arhivēt (privāti)",
-      "archiveHelp": "Noslēgtā pasākuma lapa nebūs publiska (404). Dati tiek glabāti līdz glabāšanas termiņa beigām, pēc tam tie tiek dzēsti.",
+      "archiveHelp": "Beigušās pasākuma lapa nebūs publiski redzama. Dati tiek glabāti līdz glabāšanas termiņa beigām, pēc tam tiek dzēsti.",
       "genAi": "Ģenerēt MI transkripciju un kopsavilkumu no ieraksta (kad apstrāde būs pabeigta)",
       "back": "Atpakaļ",
       "confirm": "Beigt pasākumu"
@@ -572,7 +573,15 @@
       "show": "Rādīt subtitrus",
       "hide": "Paslēpt subtitrus",
       "toggle": "Automātiskie subtitri"
-    }
+    },
+    "eventEndedModerator": "Pasākums ir beidzies. Zemāk atradīsiet statistiku un, ja pasākums tika ierakstīts, ierakstu un pārskatu.",
+    "endLinks": {
+      "after": "Ieraksts un pārskats",
+      "stats": "Pasākuma statistika",
+      "publicPage": "Pasākuma publiskā lapa"
+    },
+    "notOpenNow": "Telpa pašlaik nav atvērta.",
+    "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to."
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -1166,7 +1175,7 @@
         "signing": "Sagatavošana...",
         "uploading": "Augšupielāde {progress}%",
         "uploaded": "Augšupielāde pabeigta",
-        "uploadHint": "Atbalstītie formāti: MP4, WebM, MOV, M4V. Maksimālais izmērs 5 GB. Augšupielāde notiek tieši krātuvē (Azure Blob), nekas neiet caur mūsu serveriem.",
+        "uploadHint": "Atbalstītie formāti: MP4, WebM, MOV, M4V. Maksimālais izmērs 5 GB. Fails nonāk tieši video arhīvā, neejot caur portālu.",
         "step2Title": "2. Publikācijas metadati",
         "titleIt": "Nosaukums (itāļu)",
         "titleEn": "Nosaukums (angļu, neobligāts)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Nepievienojās",
     "deleteSuccess": "Pasākums dzēsts",
     "publishSuccess": "Pasākums publicēts",
-    "unpublishSuccess": "Pasākuma publicēšana atsaukta",
+    "unpublishSuccess": "Publicēšana atsaukta",
     "startEvent": "Sākt pasākumu",
     "startEventSuccess": "Pasākums sākts! Gaidošie dalībnieki tiks automātiski novirzīti.",
     "startEventConfirmTitle": "Sākt pasākumu?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maksimālais dalībnieku skaits",
       "expectedParticipants": "Sagaidāmie dalībnieki (aplēse)",
       "expectedParticipantsHint": "Tikai aplēse infrastruktūras dimensionēšanai. Tas nav stingrs ierobežojums: reģistrācijas virs šī skaitļa tiek pieņemtas, un infrastruktūra mērogojas automātiski.",
-      "expectedSenderRatio": "Sagaidāmā sūtītāju proporcija",
-      "expectedSenderRatioInherit": "Vietnes noklusējums",
-      "expectedSenderRatioHint": "Dalībnieku procents, kuriem būs ieslēgts mikrofons vai kamera. Klasiskais vebinārs 10-20%, paneļdiskusija 50-100%. Atstājiet tukšu, lai mantotu vietnes noklusējumu.",
+      "expectedSenderRatio": "Runātāju īpatsvars",
+      "expectedSenderRatioInherit": "Vietnes vērtība",
+      "expectedSenderRatioHint": "To dalībnieku procents, kuriem ir ieslēgts mikrofons vai kamera. Klasisks vebinārs 10-20%, apaļais galds 50-100%. Atstājiet tukšu, lai izmantotu vietnes vērtību.",
       "jvbPreview": {
-        "title": "Aplēstā JVB kapacitāte",
-        "pod": "JVB pod",
-        "pods": "JVB pod",
-        "senders": "Sūtītāji",
-        "receivers": "Saņēmēji",
-        "effectiveRatio": "Efektīvā proporcija",
-        "inherited": "mantots",
-        "presetLabel": "Sagatave",
+        "title": "Video tiltu novērtējums",
+        "pod": "video tilts",
+        "pods": "video tilti",
+        "senders": "Ar mikrofonu vai kameru",
+        "receivers": "Tikai klausās",
+        "effectiveRatio": "Runātāju īpatsvars",
+        "inherited": "vietnes vērtība",
+        "presetLabel": "Profils",
         "preset": {
           "webinar": "Vebinārs",
           "meeting": "Sanāksme",
           "workshop": "Darbnīca",
-          "allHands": "Visi sūtītāji"
+          "allHands": "Runā visi"
         },
-        "clearPreset": "Izmantot vietnes noklusējumu",
-        "atCeiling": "maks. {max} ierobežojums",
-        "videoDisabled": "Video atspējots: visi dalībnieki tiek skaitīti kā saņēmēji.",
-        "warnInherited": "Ar {participants} dalībniekiem un mantoto proporciju ({defaultPct}%), aplēse balstās uz vietnes noklusējumu. Lieliem pasākumiem ieteicams iestatīt skaidru vērtību (vebinārs 5-20%, sanāksme 30%, darbnīca 60%).",
-        "warnCeiling": "Aplēse pie konfigurētās maksimālās robežas ({max} pod). Ja faktiskā dalība vai sūtītāji pārsniedz aplēsi, tilti var pārslogoties. Apsveriet ierobežojuma palielināšanu vai maxParticipants samazināšanu."
+        "clearPreset": "Izmantot vietnes vērtību",
+        "atCeiling": "ne vairāk kā {max}",
+        "videoDisabled": "Video izslēgts: visi dalībnieki tiek uzskatīti par klausītājiem.",
+        "warnInherited": "Ar {participants} dalībniekiem un vietnes īpatsvaru ({defaultPct}%) novērtējums ir aptuvens. Lieliem pasākumiem to vērts norādīt: vebinārs 5-20%, sanāksme 30%, darbnīca 60%.",
+        "warnCeiling": "Novērtējums ir iestatītajā maksimumā ({max} video tilti). Ja runās vairāk cilvēku nekā gaidīts, tilti var tikt pārslogoti: apsveriet iespēju palielināt ierobežojumu vai samazināt maksimālo dalībnieku skaitu."
       },
       "gracePeriod": "Pasākuma beigas (mīkstā izeja)",
       "gracePeriodInherit": "Izmantot vietnes noklusējumu",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Augšupielādēt esošu ierakstu",
-      "subtitle": "Ja jums jau ir pasākuma video fails (piem., MsTeams ieraksts), augšupielādējiet to šeit: tas tiks rādīts kā oficiālais ieraksts publiskajā lapā.",
+      "subtitle": "Ja jums jau ir pasākuma video fails (piemēram, ierakstīts citā platformā), augšupielādējiet to šeit: tas tiks rādīts kā oficiālais ieraksts publiskajā lapā.",
       "fileLabel": "Video fails",
       "upload": "Augšupielādēt un piesaistīt",
       "signing": "Sagatavošana…",
       "uploading": "Augšupielāde {progress}%",
       "attaching": "Piesaistīšana pasākumam…",
-      "hint": "Formāti: MP4, WebM, MOV, M4V. Maks. 5 GB. Augšupielāde notiek tieši Azure krātuvē.",
+      "hint": "Formāti: MP4, WebM, MOV, M4V. Līdz 5 GB. Fails nonāk tieši video arhīvā, neejot caur portālu.",
       "errors": {
         "fileTooLarge": "Fails pārsniedz 5 GB ierobežojumu.",
         "unsupportedType": "Neatbalstīts formāts. Augšupielādējiet MP4, WebM, MOV vai M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Pasākums vēl nav noslēdzies: statistika ir daļēja un tiek atjaunināta reāllaikā.",
       "cappedNote": "Ļoti liels pasākums: daļa rādītāju aprēķināta no izlases (sasniegts rindu ierobežojums).",
       "scoreTitle": "Uzmanības rādītājs",
-      "adminOnly": "tikai administratoriem",
+      "adminOnly": "nav publisks",
       "scoreProxy": "Indekss no 0 līdz 100, kas rāda, cik aktīva bija auditorija. Tas ir līdzdalības aizstājrādītājs, nevis kognitīvās uzmanības mērs — vērtējiet to pasākuma formāta kontekstā (lekcija vai darbnīca) un nekad kā kvalitātes atzīmi.",
       "scoreUnavailable": "Nepietiek datu, lai aprēķinātu rādītāju.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Neizdevās ielādēt transkripciju (HTTP {code}).",
       "editNotReady": "Šim ierakstam transkripcija vēl nav pieejama. Sāciet (vai palaidiet atkārtoti) MI apstrādi ar vadīklām augšpusē: transkripcija ir pirmais solis, pēc tam šeit varēsiet to izlabot un ģenerēt kopsavilkumu un tulkojumus.",
       "editProcessing": "Notiek MI apstrāde: transkripcija parādīsies šeit, kad tā būs pabeigta. Atsvaidziniet lapu pēc dažām minūtēm.",
-      "editSessionExpired": "Administratora sesijai ir beidzies termiņš. Pārlādējiet lapu un piesakieties vēlreiz, lai rediģētu transkripciju.",
+      "editSessionExpired": "Sesija ir beigusies. Pārlādējiet lapu un piesakieties vēlreiz, lai rediģētu transkripciju.",
       "editEmpty": "Nav rediģējamu segmentu",
       "editSpeakerNone": "— nav —",
       "editSave": "Saglabāt izmaiņas",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arhīvs",
       "manageTabReliability": "Uzticamība",
       "manageLoading": "Notiek ielāde…",
-      "archivePiiNote": "Izolētie audio celiņi katram dalībniekam ir sensitīvi personas dati (izolēta balss): šī sadaļa ir pieejama tikai administratoriem un moderatoriem un nekad netiek publiskota.",
+      "archivePiiNote": "Katra dalībnieka atsevišķais audio ieraksts ir sensitīvi personas dati (izolētā balss): šī sadaļa ir paredzēta tiem, kas pārvalda pasākumu, un nekad nav publiska.",
       "archiveNoTracks": "Šim ierakstam nav pieejams neviens atsevišķa dalībnieka celiņš (vairāku celiņu ierakstīšana nav ieslēgta vai celiņi jau ir dzēsti VDAR datu minimizēšanas dēļ).",
       "archivePlayerTitle": "Atskaņošana pa runātājiem",
       "archiveAudioHint": "Izmantojiet atskaņotāja „Audio“ izvēlni, lai sinhroni ar video klausītos miksējumu vai atsevišķa dalībnieka izolēto celiņu.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Notiek",
       "ENDED": "Beidzies",
       "ARCHIVED": "Arhivēts"
-    }
+    },
+    "moreLinkHint": "{count, plural, zero {Vēl # pasākumi} one {Vēl # pasākums} other {Vēl # pasākumi}}",
+    "noEvents": "Šajā periodā pasākumu nav",
+    "weekShort": "Ned."
   },
   "footer": {
     "privacy": "Privātuma politika",
@@ -4880,12 +4892,29 @@
     "yes": "Jā",
     "no": "Nē",
     "scaleValue": "{value} no {max}",
-    "answerOne": "Lai nosūtītu, atbildi vismaz uz vienu jautājumu."
+    "answerOne": "Lai nosūtītu, atbildi vismaz uz vienu jautājumu.",
+    "pageTitle": "Anketa"
   },
   "notFound": {
     "title": "Lapa nav atrasta",
     "text": "Adrese var būt nepareiza, vai lapa vairs nepastāv.",
     "home": "Uz sākumlapu",
     "staffArea": "Atpakaļ uz slēgto daļu"
+  },
+  "apiErrors": {
+    "unauthorized": "Sesija ir beigusies vai piekļuve nav derīga. Piesakieties vēlreiz un mēģiniet vēlreiz.",
+    "forbidden": "Jums nav atļaujas šai darbībai.",
+    "notFound": "Šis elements vairs nepastāv. Pārlādējiet lapu.",
+    "tooLarge": "Pārāk liels: samaziniet failu vai tekstu un mēģiniet vēlreiz.",
+    "rateLimited": "Pārāk daudz pieprasījumu īsā laikā. Uzgaidiet brīdi un mēģiniet vēlreiz.",
+    "transcriptCorrected": "Transkripcija no subtitriem ir labota manuāli: MI transkripcija to aizstātu, un labojumi tiktu zaudēti.",
+    "aiPipelineDisabled": "MI process ir izslēgts visai vietnei: administrators to var ieslēgt iestatījumos.",
+    "recordingWithoutMedia": "Šim ierakstam nav video: tā transkripcija nāk no tiešraides subtitriem.",
+    "noParticipantTracks": "Nav atsevišķu dalībnieku audio ierakstu: tie netika ierakstīti vai jau ir izdzēsti. Lai tie būtu, pirms pasākuma ieslēdziet ierakstīšanu katram dalībniekam.",
+    "summaryMissing": "Šajā valodā vēl nav kopsavilkuma, ko rediģēt: vispirms to izveidojiet.",
+    "storageUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama.",
+    "aiDisabledForEvent": "MI šim pasākumam ir izslēgts: izmantojiet “Ģenerēt MI”, lai to ieslēgtu un sāktu apstrādi.",
+    "sourceTranscriptMissing": "Šis ieraksts vēl nav transkribēts: vispirms to transkribējiet, tad pievienojiet tulkojumu.",
+    "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu."
   }
 }

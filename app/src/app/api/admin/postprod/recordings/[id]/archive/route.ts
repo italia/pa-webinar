@@ -20,7 +20,7 @@ import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueueArchiveJob } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,8 +34,10 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { aiPipelineEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
-    throw new ValidationError(
+    throw new AppError(
       'AI pipeline is currently disabled (SiteSetting.aiPipelineEnabled=false).',
+      422,
+      'AI_PIPELINE_DISABLED',
     );
   }
 
@@ -59,8 +61,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // senza sottotitoli (subtitle_path è opzionale nel worker), quindi non
   // imponiamo un TRANSCRIPT_JSON qui.
   if (recording._count.tracks === 0) {
-    throw new ValidationError(
+    throw new AppError(
       'No participant tracks available for this recording (none recorded, or already purged). Enable multi-track recording + track retention before the event.',
+      422,
+      'NO_PARTICIPANT_TRACKS',
     );
   }
 

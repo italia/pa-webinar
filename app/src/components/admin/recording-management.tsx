@@ -183,7 +183,7 @@ export default function RecordingManagement({
           </h5>
           {isLive && event.tempRecordingStartedAt && (
             <Badge color="danger" pill className="px-2 py-1">
-              <span className="me-1" style={{ animation: 'pulse-dot 1.5s ease-in-out infinite' }}>●</span>
+              <span className="me-1 pulse-dot" aria-hidden="true">●</span>
               {t('inProgress')}
             </Badge>
           )}

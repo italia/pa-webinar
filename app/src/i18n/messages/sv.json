@@ -89,7 +89,8 @@
     "language": "Språk",
     "switchLanguage": "Byt språk",
     "skipToContent": "Gå till innehåll",
-    "skipToFooter": "Gå till sidfot"
+    "skipToFooter": "Gå till sidfot",
+    "mainLabel": "Huvudnavigering"
   },
   "header": {
     "followUs": "Följ oss på"
@@ -301,7 +302,7 @@
       "library": "Publicera i biblioteket",
       "libraryHelp": "Som ovan, och dessutom visas evenemanget i det publika videobiblioteket (kräver en publicerad inspelning eller en YouTube-video).",
       "archive": "Arkivera (privat)",
-      "archiveHelp": "Sidan för det avslutade evenemanget blir inte publik (404). Uppgifterna sparas tills lagringstiden går ut och raderas sedan.",
+      "archiveHelp": "Sidan för det avslutade evenemanget blir inte synlig för allmänheten. Uppgifterna sparas tills lagringstiden löper ut och raderas sedan.",
       "genAi": "Generera AI-transkription och sammanfattning från inspelningen (när bearbetningen är klar)",
       "back": "Tillbaka",
       "confirm": "Avsluta evenemanget"
@@ -572,7 +573,15 @@
       "show": "Visa undertexter",
       "hide": "Dölj undertexter",
       "toggle": "Automatiska undertexter"
-    }
+    },
+    "eventEndedModerator": "Evenemanget är slut. Nedan hittar du statistiken och, om det spelades in, inspelningen och rapporten.",
+    "endLinks": {
+      "after": "Inspelning och rapport",
+      "stats": "Statistik för evenemanget",
+      "publicPage": "Evenemangets offentliga sida"
+    },
+    "notOpenNow": "Rummet är inte öppet just nu.",
+    "nameRequired": "Namnet du ska ansluta med saknas: gå tillbaka och skriv det."
   },
   "qa": {
     "title": "Frågor och svar",
@@ -1166,7 +1175,7 @@
         "signing": "Förbereder...",
         "uploading": "Laddar upp {progress}%",
         "uploaded": "Uppladdning klar",
-        "uploadHint": "Format som stöds: MP4, WebM, MOV, M4V. Max 5 GB. Uppladdningen sker direkt till objektlagring (Azure Blob), inget passerar våra servrar.",
+        "uploadHint": "Format som stöds: MP4, WebM, MOV, M4V. Maximal storlek 5 GB. Filen går direkt till videoarkivet utan att passera portalen.",
         "step2Title": "2. Publikationsmetadata",
         "titleIt": "Titel (italienska)",
         "titleEn": "Titel (engelska, valfritt)",
@@ -1399,7 +1408,7 @@
     "notJoined": "Deltog inte",
     "deleteSuccess": "Evenemang raderat",
     "publishSuccess": "Evenemang publicerat",
-    "unpublishSuccess": "Evenemang avpublicerat",
+    "unpublishSuccess": "Evenemanget avpublicerat",
     "startEvent": "Starta evenemang",
     "startEventSuccess": "Evenemanget startat! Väntande deltagare omdirigeras automatiskt.",
     "startEventConfirmTitle": "Starta evenemanget?",
@@ -1435,29 +1444,29 @@
       "maxParticipants": "Maximalt antal deltagare",
       "expectedParticipants": "Förväntade deltagare (uppskattning)",
       "expectedParticipantsHint": "Bara en uppskattning för dimensionering av infrastrukturen. Det är inte ett tak: anmälningar utöver detta accepteras och infrastrukturen skalar automatiskt.",
-      "expectedSenderRatio": "Förväntad sender-andel",
-      "expectedSenderRatioInherit": "Webbplatsens standard",
-      "expectedSenderRatioHint": "Andel deltagare med mikrofon eller webbkamera aktiv. Klassiskt webinar 10–20 %, paneldebatt 50–100 %. Lämna tomt för att ärva webbplatsens standard.",
+      "expectedSenderRatio": "Andel som talar",
+      "expectedSenderRatioInherit": "Webbplatsens värde",
+      "expectedSenderRatioHint": "Andel deltagare med aktiv mikrofon eller kamera. Klassiskt webbinarium 10-20 %, rundabordssamtal 50-100 %. Lämna tomt för att använda webbplatsens värde.",
       "jvbPreview": {
-        "title": "Uppskattad JVB-kapacitet",
-        "pod": "JVB-pod",
-        "pods": "JVB-poddar",
-        "senders": "Sender",
-        "receivers": "Mottagare",
-        "effectiveRatio": "Faktisk andel",
-        "inherited": "ärvd",
-        "presetLabel": "Förinställning",
+        "title": "Uppskattning av videobryggor",
+        "pod": "videobrygga",
+        "pods": "videobryggor",
+        "senders": "Med mikrofon eller kamera",
+        "receivers": "Lyssnar bara",
+        "effectiveRatio": "Andel som talar",
+        "inherited": "webbplatsens värde",
+        "presetLabel": "Profil",
         "preset": {
           "webinar": "Webinar",
           "meeting": "Möte",
           "workshop": "Workshop",
-          "allHands": "Alla sender"
+          "allHands": "Alla talar"
         },
-        "clearPreset": "Använd webbplatsens standard",
-        "atCeiling": "max-tak {max}",
-        "videoDisabled": "Video avstängd: alla deltagare räknas som mottagare.",
-        "warnInherited": "Med {participants} deltagare och ärvd andel ({defaultPct}%) bygger uppskattningen på webbplatsens standard. För stora evenemang bör ett explicit värde sättas (webinar 5–20 %, möte 30 %, workshop 60 %).",
-        "warnCeiling": "Uppskattning vid det konfigurerade taket ({max} poddar). Om verkligt antal eller sender överskrider uppskattningen kan bridgarna mättas. Överväg att höja taket eller sänka maxParticipants."
+        "clearPreset": "Använd webbplatsens värde",
+        "atCeiling": "högst {max}",
+        "videoDisabled": "Video avstängd: alla deltagare räknas som lyssnare.",
+        "warnInherited": "Med {participants} deltagare och webbplatsens andel ({defaultPct} %) är uppskattningen ungefärlig. Vid stora evenemang är det bra att ange den: webbinarium 5-20 %, möte 30 %, workshop 60 %.",
+        "warnCeiling": "Uppskattningen ligger på det inställda maxvärdet ({max} videobryggor). Om fler talar än väntat kan bryggorna bli överbelastade: överväg att höja gränsen eller sänka det högsta antalet deltagare."
       },
       "gracePeriod": "Evenemangets slut (mjuk avslutning)",
       "gracePeriodInherit": "Använd webbplatsens standard",
@@ -1587,13 +1596,13 @@
     },
     "recordingUpload": {
       "title": "Ladda upp befintlig inspelning",
-      "subtitle": "Om du redan har en videofil av evenemanget (t.ex. en MS Teams-inspelning), ladda upp den här: den visas som officiell inspelning på den publika sidan.",
+      "subtitle": "Om du redan har en videofil från evenemanget (till exempel inspelad med en annan plattform) laddar du upp den här: den visas som officiell inspelning på den offentliga sidan.",
       "fileLabel": "Videofil",
       "upload": "Ladda upp och koppla",
       "signing": "Förbereder…",
       "uploading": "Laddar upp {progress}%",
       "attaching": "Kopplar till evenemanget…",
-      "hint": "Format: MP4, WebM, MOV, M4V. Max 5 GB. Uppladdningen sker direkt till Azure-lagringen.",
+      "hint": "Format: MP4, WebM, MOV, M4V. Högst 5 GB. Filen går direkt till videoarkivet utan att passera portalen.",
       "errors": {
         "fileTooLarge": "Filen överskrider gränsen på 5 GB.",
         "unsupportedType": "Format som inte stöds. Ladda upp MP4, WebM, MOV eller M4V.",
@@ -2582,7 +2591,7 @@
       "notEndedYet": "Evenemanget är inte avslutat ännu: statistiken är ofullständig och uppdateras i realtid.",
       "cappedNote": "Mycket stort evenemang: vissa mått är beräknade på ett urval (radgränsen har nåtts).",
       "scoreTitle": "Uppmärksamhetsgrad",
-      "adminOnly": "endast admin",
+      "adminOnly": "inte offentligt",
       "scoreProxy": "Ett index 0–100 för hur delaktig publiken var. Det är en indikator på delaktighet, inte ett mått på kognitiv uppmärksamhet – läs det med evenemangets format i åtanke (föreläsning kontra workshop), aldrig som ett kvalitetsbetyg.",
       "scoreUnavailable": "Otillräckliga data för att beräkna graden.",
       "comp": {
@@ -2677,7 +2686,7 @@
       "editLoadError": "Det gick inte att läsa in transkriptionen (HTTP {code}).",
       "editNotReady": "Det finns ingen transkription för den här inspelningen ännu. Starta (eller kör om) AI-bearbetningen från kontrollerna ovan: transkriptionen är första steget, sedan kan du rätta den här och generera sammanfattning och översättningar.",
       "editProcessing": "AI-bearbetning pågår: transkriptionen visas här när den är klar. Uppdatera sidan om några minuter.",
-      "editSessionExpired": "Adminsessionen har gått ut. Ladda om sidan och logga in igen för att redigera transkriptionen.",
+      "editSessionExpired": "Sessionen har gått ut. Ladda om sidan och logga in igen för att redigera transkriptionen.",
       "editEmpty": "Inga redigerbara segment",
       "editSpeakerNone": "— ingen —",
       "editSave": "Spara ändringarna",
@@ -2706,7 +2715,7 @@
       "manageTabArchive": "Arkiv",
       "manageTabReliability": "Tillförlitlighet",
       "manageLoading": "Läser in…",
-      "archivePiiNote": "Isolerade ljudspår per deltagare är känsliga personuppgifter (isolerad röst): det här avsnittet är förbehållet administratörer och moderatorer och visas aldrig publikt.",
+      "archivePiiNote": "Varje deltagares separata ljudspår är känsliga personuppgifter (den isolerade rösten): det här avsnittet är förbehållet dem som hanterar evenemanget och är aldrig offentligt.",
       "archiveNoTracks": "Inga spår per deltagare finns för den här inspelningen (flerspårsinspelning är inte aktiverad, eller så är spåren redan raderade för GDPR-minimering).",
       "archivePlayerTitle": "Uppspelning per talare",
       "archiveAudioHint": "Använd spelarens väljare ”Ljud” för att lyssna på mixen eller på en enskild deltagares isolerade spår, synkroniserat med videon.",
@@ -4140,7 +4149,10 @@
       "LIVE": "Pågår",
       "ENDED": "Avslutat",
       "ARCHIVED": "Arkiverat"
-    }
+    },
+    "moreLinkHint": "{count, plural, one {Ett evenemang till} other {# evenemang till}}",
+    "noEvents": "Inga evenemang under den här perioden",
+    "weekShort": "V."
   },
   "footer": {
     "privacy": "Integritetspolicy",
@@ -4880,12 +4892,29 @@
     "yes": "Ja",
     "no": "Nej",
     "scaleValue": "{value} av {max}",
-    "answerOne": "Svara på minst en fråga för att skicka."
+    "answerOne": "Svara på minst en fråga för att skicka.",
+    "pageTitle": "Enkät"
   },
   "notFound": {
     "title": "Sidan hittades inte",
     "text": "Adressen kan vara fel, eller så finns sidan inte längre.",
     "home": "Gå till startsidan",
     "staffArea": "Tillbaka till det skyddade området"
+  },
+  "apiErrors": {
+    "unauthorized": "Sessionen har gått ut eller åtkomsten är inte giltig. Logga in igen och försök på nytt.",
+    "forbidden": "Du har inte behörighet för den här åtgärden.",
+    "notFound": "Det här objektet finns inte längre. Ladda om sidan.",
+    "tooLarge": "För stort: gör filen eller texten mindre och försök igen.",
+    "rateLimited": "För många förfrågningar på kort tid. Vänta en stund och försök igen.",
+    "transcriptCorrected": "Transkriptionen från undertexterna har rättats för hand: en AI-transkription skulle ersätta den och rättelserna skulle gå förlorade.",
+    "aiPipelineDisabled": "AI-flödet är avstängt för hela webbplatsen: en administratör kan slå på det i inställningarna.",
+    "recordingWithoutMedia": "Den här inspelningen har ingen video: dess transkription kommer från livetextningen.",
+    "noParticipantTracks": "Det finns inga separata ljudspår för deltagarna: de spelades inte in eller har redan raderats. Slå på inspelning per deltagare före evenemanget för att få dem.",
+    "summaryMissing": "Det finns ännu ingen sammanfattning att redigera på det här språket: generera den först.",
+    "storageUnavailable": "Filuppladdning är inte tillgänglig i den här installationen.",
+    "aiDisabledForEvent": "AI är avstängd för det här evenemanget: använd ”Generera AI” för att slå på den och starta bearbetningen.",
+    "sourceTranscriptMissing": "Den här inspelningen är inte transkriberad än: transkribera den innan du lägger till en översättning.",
+    "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat."
   }
 }
