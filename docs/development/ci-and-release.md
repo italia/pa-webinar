@@ -28,7 +28,7 @@ flowchart LR
     pushdev["Push to dev"]:::ext
     toMain["Pull request to main<br/>push to main<br/>manual dispatch"]:::ext
     tag["Tag vX.Y.Z"]:::ext
-    weekly["Weekly schedule<br/>CodeQL: pushes and PRs to main or dev<br/>Scorecard: pushes to main"]:::ext
+    weekly["Weekly schedule<br/>CodeQL: pushes and PRs to main or dev<br/>Scorecard: pushes to main<br/>cache cleanup: manual dispatch"]:::ext
   end
 
   subgraph workflows["Workflow"]
@@ -38,6 +38,7 @@ flowchart LR
     rel["release.yml<br/>the release"]:::job
     codeql["codeql.yml<br/>GitHub-hosted"]:::job
     score["scorecard.yml<br/>self-hosted"]:::job
+    clean["buildcache-cleanup.yml<br/>GitHub-hosted"]:::job
   end
 
   subgraph outputs["What it produces"]
@@ -48,6 +49,7 @@ flowchart LR
     ghrel["GitHub Release<br/>notes, SPDX SBOM,<br/>packaged chart"]:::data
     sec["Security tab (CodeQL)<br/>when code scanning is enabled"]:::ext
     nopub["Nothing published:<br/>Scorecard publication<br/>needs a GitHub-hosted runner"]:::warn
+    pruned["Old untagged versions of<br/>pa-webinar-buildcache deleted"]:::data
   end
 
   pushdev --> dev
@@ -56,6 +58,7 @@ flowchart LR
   tag --> rel
   weekly --> codeql
   weekly --> score
+  weekly --> clean
   dev --> devimg
   jweb --> webimg
   ci --> checks
@@ -63,6 +66,7 @@ flowchart LR
   rel --> ghrel
   codeql --> sec
   score --> nopub
+  clean --> pruned
 
   classDef ext fill:#EEF1F4,stroke:#5C6F82,color:#17324D,stroke-width:2px
   classDef job fill:#E0F5F5,stroke:#00A3A3,color:#17324D,stroke-width:2px
@@ -82,6 +86,7 @@ flowchart LR
 | [`jitsi-web.yml`](../../.github/workflows/jitsi-web.yml) | Pushes to `dev` that change `infra/jitsi-web-patched/` or the workflow itself, manual dispatch | Self-hosted | The patched Jitsi web image | The image was not published |
 | [`codeql.yml`](../../.github/workflows/codeql.yml) | Pushes and pull requests to `main` or `dev`, weekly | GitHub-hosted | Code-scanning results | Nothing: the job is non-blocking |
 | [`scorecard.yml`](../../.github/workflows/scorecard.yml) | Pushes to `main`, weekly | Self-hosted | Nothing, as configured: publication needs a GitHub-hosted runner (see [below](#codeqlyml-and-scorecardyml-code-analysis)) | Nothing: the Scorecard step is non-blocking |
+| [`buildcache-cleanup.yml`](../../.github/workflows/buildcache-cleanup.yml) | Weekly, manual dispatch | GitHub-hosted | Deletes old untagged versions of the layer-cache package (see [below](#buildcache-cleanupyml-pruning-the-layer-cache)) | Old cache versions stay until the next run |
 
 The only GitHub Actions artifact any workflow uploads is the Playwright report of the E2E job. SBOMs and the chart are attached to the GitHub Release instead.
 
@@ -135,7 +140,8 @@ The local command for each job, and when a job may be skipped, are in [CI parity
 - **Change detection covers the whole push.** Each `Detect … changes` job compares the commit before the push (`github.event.before`) with the new head, so a push of several commits, or a merge, is judged on all of its changes. On the first push of a new branch, and on a dispatch, it compares with the previous commit instead.
 - **A newer push cancels an older run.** The workflow uses the concurrency group `dev-build` with `cancel-in-progress`. If push A changes `infra/ai/` and push B arrives before A's worker build finishes, A's run is canceled, and B's change detection sees only B's commits. The worker is then not rebuilt. When that happens, dispatch the workflow with the matching `force_*` input.
 - **A dispatch publishes whatever ref it runs on as `:dev`.** Dispatch it on `dev` unless you intend otherwise.
-- **`no_cache` has no effect.** It is declared as a dispatch input, but as the cache expressions are written (`inputs.no_cache && '' || 'type=gha,…'`), an empty string on the true branch falls through to the cache spec: every job uses its GitHub Actions cache scope whatever the input says. To force a clean build, delete the workflow's caches (the `dev*` scopes) from the repository's Actions caches page, or with `gh cache delete`, before dispatching.
+- **The layer cache lives in the registry,** in its own package, `ghcr.io/italia/pa-webinar-buildcache`, with one tag per image (`app-dev`, `postprod-worker-dev`, and so on); the image packages hold only images. The migration image reuses the `builder` stage the app step has just built. The runners are ephemeral, with an empty Docker at every job, so the remote cache is the only one. It is not the GitHub Actions cache because that has a 10 GB limit per repository, which the CUDA worker alone filled, evicting the others and making every build start from scratch. A cache tag is a cache manifest, not an image: it cannot be pulled or run. A cache error never fails a build (`ignore-error`).
+- **`no_cache` rebuilds from scratch.** A dispatch with `no_cache` builds without reading the cache and writes a fresh one, for when a cached layer is suspected of serving a stale artifact.
 - **The build identity says `dev`.** The app image is built with `NEXT_PUBLIC_BUILD_VERSION=dev`, `NEXT_PUBLIC_BUILD_CHANNEL=dev`, the short SHA and the build date (see [Build identity](#build-identity)).
 - **Not produced here:** SBOMs, a packaged chart, a GitHub Release, image scans.
 
@@ -143,7 +149,7 @@ The local command for each job, and when a job may be skipped, are in [CI parity
 
 `release.yml` runs on every pushed tag that matches `v*`. It does not run lint, tests or scans: it trusts that the tagged commit already passed `ci.yml`. That is why a release is tagged on `main` after the pull request from `dev` has merged (see [Cutting a release](#cutting-a-release)).
 
-The workflow has two jobs:
+The workflow has three jobs:
 
 1. **Build & Push Docker Image.**
    - Builds and pushes the app image. The tags come from `docker/metadata-action`: `X.Y.Z`, `X.Y`, `sha-<sha>` and `latest`. The OCI labels include `org.opencontainers.image.revision`, the full commit SHA.
@@ -153,8 +159,11 @@ The workflow has two jobs:
    - Writes the release notes from `git log` (see [Release notes and the changelog](#release-notes-and-the-changelog)).
    - Creates the GitHub Release with those notes and attaches the SBOM files.
 2. **Package Helm Chart**, after the first job. It builds the subcharts from `Chart.lock` with the same Helm version the `ci.yml` chart job validates with, packages `infra/helm/pa-webinar` with `--version X.Y.Z --app-version X.Y.Z`, and attaches `pa-webinar-X.Y.Z.tgz` to the same GitHub Release. The packaged chart therefore carries the release version whatever `Chart.yaml` says, and it includes its subcharts.
+3. **Build & Push \<component\>**, a matrix job for the auxiliary images: the recorder, the recorder controller, the two post-production workers and the two live-captions components, each as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z` (see [Auxiliary components](#auxiliary-components)).
 
 The app image is built for `linux/amd64` only, and the migration image for the runner's own platform.
+
+The layer cache is in the same package as for `dev.yml`. Each build reads its `<image>-release` tag and the development one (`<image>-dev`), which usually holds the dependencies of the same tree, and writes only `<image>-release`.
 
 **A note on one build argument.** The app image build passes `NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=false`. It has no effect on the served behavior. The application reads that variable at runtime from the pod environment (`getPublicEnv`), and the Dockerfile's final stage does not declare it. Jitsi's advanced noise suppression is set per installation with `app.env.NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE`, as described in [How PA Webinar extends Jitsi Meet](../architecture/jitsi-integration.md#noise-suppression-and-the-patched-image).
 
@@ -173,6 +182,10 @@ Building, bumping and verifying the image step by step is in [infra/jitsi-web-pa
 
 - **CodeQL** analyzes JavaScript and TypeScript with the `security-extended` queries on pushes and pull requests to `main` and `dev`, and weekly. It runs on GitHub-hosted runners and is non-blocking (`continue-on-error`). Results reach the repository's Security tab only when code scanning is enabled in the repository settings. Until then the job still ends green.
 - **OpenSSF Scorecard** runs on pushes to `main` and weekly, on the self-hosted runner. It is configured to publish (`publish_results: true`), but scorecard-action accepts publication only from GitHub-hosted runners. As configured, the publication is rejected, the Scorecard step fails without failing the run (`continue-on-error`), and the upload to the Security tab, which runs only when that step succeeds, is skipped. Results reach OpenSSF and the Security tab only once the job runs on `ubuntu-latest`. The optional `SCORECARD_TOKEN` secret replaces the default token when the organization's settings deny the default one the access it needs.
+
+### `buildcache-cleanup.yml`: pruning the layer cache
+
+Every build rewrites its cache tag, so the previous cache manifest stays in `pa-webinar-buildcache` as a version without a tag, keeping its layers. Every Monday, and on manual dispatch, the workflow deletes the untagged versions of that package older than seven days; it never touches the image packages. Deleting needs the repository to have the Admin role on the package (the package settings, **Manage Actions access**); without it, the workflow reports a warning and does not fail.
 
 ### Dependency updates
 

@@ -1,0 +1,51 @@
+name: Build cache cleanup
+
+# La cache dei layer delle immagini (pacchetto pa-webinar-buildcache, vedi
+# dev.yml) si riscrive a ogni build: il tag passa al nuovo manifest e il
+# precedente resta come versione senza tag, con i suoi layer. Questo workflow
+# toglie le versioni senza tag piu' vecchie di una settimana, solo da quel
+# pacchetto: le immagini non le tocca.
+#
+# Per cancellare, il repository deve avere il ruolo Admin sul pacchetto
+# (impostazioni del pacchetto, "Manage Actions access"). Senza, il workflow
+# lo segnala e non fallisce.
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prune:
+    name: Prune untagged cache versions
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PACKAGE: pa-webinar-buildcache
+      KEEP_DAYS: "7"
+    steps:
+      - name: Delete untagged versions older than KEEP_DAYS
+        run: |
+          set -euo pipefail
+          base="/orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/${PACKAGE}/versions"
+          limite="$(date -u -d "-${KEEP_DAYS} days" +%Y-%m-%dT%H:%M:%SZ)"
+          if ! versioni="$(gh api --paginate "${base}?per_page=100" \
+            --jq ".[] | select((.metadata.container.tags | length) == 0) | select(.updated_at < \"${limite}\") | .id")"; then
+            echo "::warning::Il pacchetto ${PACKAGE} non e' leggibile (non esiste ancora, o mancano i permessi)."
+            exit 0
+          fi
+          cancellate=0
+          for id in ${versioni}; do
+            if gh api -X DELETE "${base}/${id}" > /dev/null; then
+              cancellate=$((cancellate + 1))
+            else
+              echo "::warning::Cancellazione negata: al repository serve il ruolo Admin sul pacchetto ${PACKAGE}."
+              break
+            fi
+          done
+          echo "Versioni senza tag cancellate da ${PACKAGE}: ${cancellate}" >> "$GITHUB_STEP_SUMMARY"

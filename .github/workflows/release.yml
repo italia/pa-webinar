@@ -8,6 +8,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar
+  # La cache dei layer, in un pacchetto a parte (vedi dev.yml).
+  CACHE_IMAGE_NAME: italia/pa-webinar-buildcache
 
 jobs:
   build-and-push:
@@ -65,8 +67,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # La cache dei layer sta nel registro (pacchetto pa-webinar-buildcache,
+          # vedi dev.yml): si legge anche quella di sviluppo, che ha quasi sempre
+          # le dipendenze dello stesso albero, ma si scrive solo la propria.
+          cache-from: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-release
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-release,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
           platforms: linux/amd64
           build-args: |
             NEXT_PUBLIC_BUILD_VERSION=${{ steps.meta.outputs.version }}
@@ -100,7 +107,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}-migrate
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-migrate
-          cache-from: type=gha
+          # Lo stadio `builder` l'ha appena costruito il passo precedente, sullo
+          # stesso builder: si riusa da li'.
 
       - name: Generate Docker SBOM (SPDX)
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
@@ -219,30 +227,23 @@ jobs:
           - name: recorder
             context: ./infra/recorder
             file: ./infra/recorder/Dockerfile
-            cache: release-recorder
           - name: recorder-controller
             context: ./infra/recorder-controller
             file: ./infra/recorder-controller/Dockerfile
-            cache: release-recorder-controller
           - name: postprod-worker
             context: ./infra/ai
             file: ./infra/ai/Dockerfile.worker
-            # Stessa cache del build di sviluppo: il worker cambia di rado.
-            cache: dev-postprod-worker
           - name: postprod-worker-cpu
             context: ./infra/ai
             file: ./infra/ai/Dockerfile.worker-cpu
-            cache: dev-postprod-worker-cpu
           # Sottotitoli live: il gateway e il motore (che scarica il modello
           # all'avvio del pod, non lo contiene).
           - name: captions-gateway
             context: ./infra/captions/gateway
             file: ./infra/captions/gateway/Dockerfile
-            cache: release-captions-gateway
           - name: captions-engine
             context: ./infra/captions/engine
             file: ./infra/captions/engine/Dockerfile
-            cache: release-captions-engine
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -267,8 +268,12 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.name }}:${{ steps.v.outputs.version }}
           platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.cache }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.cache }}
+          # Si legge la cache del rilascio e quella di sviluppo (i worker della
+          # post-produzione cambiano di rado), si scrive solo quella del rilascio.
+          cache-from: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:${{ matrix.name }}-release
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:${{ matrix.name }}-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:${{ matrix.name }}-release,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
           labels: |
             org.opencontainers.image.title=pa-webinar-${{ matrix.name }}
             org.opencontainers.image.source=https://github.com/${{ github.repository }}

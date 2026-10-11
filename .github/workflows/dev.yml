@@ -8,8 +8,17 @@ name: Dev build
 # Full release pipeline is still release.yml (triggered by `v*` tags) and
 # keeps doing the heavy work (SBOM + chart + release notes).
 #
-# Manual dispatch supports `no_cache=true` to force a clean rebuild when
-# layer caching is suspected of serving a stale artifact.
+# Manual dispatch supports `no_cache=true` to rebuild without reading the
+# layer cache (the cache is rewritten) when it is suspected of serving a
+# stale artifact.
+#
+# La cache dei layer sta nel registro, nel pacchetto `pa-webinar-buildcache`
+# (un tag per immagine, `<immagine>-dev`). La cache di GitHub Actions ha un
+# tetto di 10 GB per repository: il worker con la GPU da solo la riempiva e
+# sfrattava le altre, e ogni build ripartiva da zero. I runner sono effimeri
+# (Docker vuoto a ogni job), quindi la cache remota e' l'unica che conta. Un
+# errore della cache non fa fallire la build (`ignore-error`). Con `no_cache`
+# si costruisce senza leggerla, ma la si riscrive.
 #
 # Il job `postprod-worker` builda il container Python con CUDA + WhisperX
 # + pyannote + Piper TTS — è MOLTO più pesante (~22GB) e parte solo se
@@ -26,7 +35,7 @@ on:
   workflow_dispatch:
     inputs:
       no_cache:
-        description: "Disable buildx layer cache (use for cache poisoning emergencies)"
+        description: "Build without reading the layer cache, which is rewritten (for a suspected stale or poisoned cache)"
         type: boolean
         default: false
       force_worker_build:
@@ -53,6 +62,10 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar
+  # La cache dei layer di tutte le immagini, in un pacchetto a parte: un tag
+  # per immagine (`app-dev`, `postprod-worker-dev`, ...), cosi' le pagine dei
+  # pacchetti delle immagini non mostrano tag che non si possono eseguire.
+  CACHE_IMAGE_NAME: italia/pa-webinar-buildcache
   WORKER_IMAGE_NAME: italia/pa-webinar-postprod-worker
   WORKER_CPU_IMAGE_NAME: italia/pa-webinar-postprod-worker-cpu
   RECORDER_IMAGE_NAME: italia/pa-webinar-recorder
@@ -111,10 +124,11 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.app_tags }}
           platforms: linux/amd64
-          # cache-from/to scoped to `dev` so the release workflow's cache
-          # (scope=release) stays isolated and we don't cross-contaminate.
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev' }}
+          # La cache di sviluppo e quella del rilascio (`app-release`)
+          # restano separate.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           build-args: |
             NEXT_PUBLIC_BUILD_VERSION=dev
             NEXT_PUBLIC_BUILD_SHA=${{ steps.tags.outputs.sha_short }}
@@ -134,8 +148,8 @@ jobs:
           target: builder
           tags: ${{ steps.tags.outputs.migrate_tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-migrate' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-migrate' }}
+          # Lo stadio `builder` l'ha appena costruito il passo precedente, sullo
+          # stesso builder: si riusa da li', senza cache propria.
 
       - name: Summary
         run: |
@@ -220,9 +234,10 @@ jobs:
       contents: read
       packages: write
     # Build pesante: il base NGC pytorch image è ~10GB, pyannote+whisperx
-    # tirano modelli da HF al runtime ma il pip install è ~5GB. A freddo fa
-    # ~25-30 min, ma con la cache scaduta e il push dei layer sul runner
-    # in-cluster ha superato i 60: il tetto e' 120.
+    # tirano modelli da HF al runtime ma il pip install è ~5GB. A freddo
+    # (senza cache, o al primo giro dopo un cambio delle dipendenze) supera
+    # i 60 minuti: il tetto e' 120. Con la cache nel registro un cambio del
+    # solo codice ricostruisce l'ultimo layer.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -253,11 +268,10 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.worker_tags }}
           platforms: linux/amd64
-          # Cache GHA scope dedicato — non condividere con l'app che
-          # ha layer diversi e cache-poisoning sarebbe rischioso (un
-          # cambio di pytorch base invaliderebbe layer non legati).
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker' }}
+          # Cache propria del worker, separata da quella dell'app.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-postprod-worker
             org.opencontainers.image.description=Postprod AI worker (WhisperX + pyannote + Piper TTS) for pa-webinar
@@ -322,8 +336,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker-cpu' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker-cpu' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-cpu-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-cpu-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-postprod-worker-cpu
             org.opencontainers.image.description=Postprod AI worker without GPU (summaries, translations, archive) for pa-webinar
@@ -418,8 +433,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.recorder_tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-recorder
             org.opencontainers.image.description=Multi-track per-participant audio recorder (Puppeteer + lib-jitsi-meet) for pa-webinar
@@ -519,8 +535,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder-controller' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder-controller' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-controller-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-controller-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-recorder-controller
             org.opencontainers.image.description=Reconciling operator that orchestrates recorder Jobs/containers (ADR-013) for pa-webinar
@@ -614,8 +631,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-captions-gateway' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-captions-gateway' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-gateway-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-gateway-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-captions-gateway
             org.opencontainers.image.description=Live captions gateway (Jitsi bridge audio to local speech engine) for pa-webinar
@@ -710,8 +728,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-captions-engine' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-captions-engine' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-engine-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-engine-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-captions-engine
             org.opencontainers.image.description=Live captions speech engine (NeMo-Speech.cpp, CPU); the model is downloaded at pod start
