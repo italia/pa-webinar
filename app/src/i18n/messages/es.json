@@ -302,14 +302,23 @@
       "title": "Destino del evento",
       "body": "Estás a punto de terminar el evento para todos. ¿Qué quieres que pase con él una vez concluido?",
       "public": "Mantener público",
-      "publicHelp": "La página del evento concluido sigue visible con el resumen, las preguntas y respuestas, las encuestas, los materiales y el feedback.",
       "library": "Publicar en la biblioteca",
       "libraryHelp": "Igual que arriba y, además, muestra el evento en la biblioteca pública de vídeos (requiere una grabación publicada o un vídeo de YouTube).",
       "archive": "Archivar (privado)",
       "archiveHelp": "La página del evento terminado no será visible al público. Los datos se conservan hasta que vence el plazo de conservación y después se eliminan.",
       "genAi": "Generar la transcripción y el resumen con IA a partir de la grabación (cuando termine el procesamiento)",
       "back": "Atrás",
-      "confirm": "Terminar el evento"
+      "confirm": "Terminar el evento",
+      "publicHelpList": "La página del evento terminado sigue visible y, si los hay, muestra {sections}.",
+      "publicHelpNone": "La página del evento terminado sigue visible, con su título y descripción.",
+      "sections": {
+        "recap": "el resumen",
+        "qa": "las preguntas del turno de preguntas",
+        "polls": "las encuestas publicadas",
+        "wordCloud": "la nube de palabras",
+        "materials": "los materiales",
+        "feedback": "las valoraciones"
+      }
     },
     "eventNotStarted": "El evento aún no ha comenzado",
     "eventStartsAt": "El evento comenzará el {date} a las {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Error al crear la encuesta",
       "vote": "Voto no registrado. Inténtalo de nuevo.",
       "alreadyVoted": "Ya has votado en esta encuesta.",
-      "action": "No se ha podido completar la acción. Inténtalo de nuevo."
+      "action": "No se ha podido completar la acción. Inténtalo de nuevo.",
+      "closed": "La encuesta está cerrada."
     },
     "participation": "{votes, plural, one {# voto} other {# votos}} de {present} presentes",
     "participationLabel": "Participación en la encuesta",
@@ -4724,7 +4734,8 @@
       "materials": "Materiales",
       "polls": "Encuestas",
       "feedback": "Valoraciones",
-      "transcript": "Transcripción con IA"
+      "transcript": "Transcripción con IA",
+      "ratingsCount": "{count, plural, one {# valoración} other {# valoraciones}}"
     },
     "recordingNotify": "Avisar a los inscritos cuando se publique la grabación",
     "recordingNotifyHelp": "Un único correo, cuando la grabación (o el vídeo externo) es visible en la página pública del evento. Llega a quien sigue inscrito: tras el periodo de conservación no se avisa a nadie.",
@@ -4898,7 +4909,8 @@
     "no": "No",
     "scaleValue": "{value} de {max}",
     "answerOne": "Responde al menos a una pregunta para enviar.",
-    "pageTitle": "Cuestionario"
+    "pageTitle": "Cuestionario",
+    "onlyParticipants": "Solo quienes participaron en el evento pueden valorarlo."
   },
   "notFound": {
     "title": "Página no encontrada",

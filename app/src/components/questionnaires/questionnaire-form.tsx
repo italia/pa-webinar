@@ -55,6 +55,11 @@ export interface QuestionnaireFormProps {
   /** One of these is required to identify the respondent. */
   accessToken?: string;
   guestId?: string;
+  /** Il token della sala ricevuto entrando: per la valutazione di fine evento
+   *  prova la presenza di chi non e' iscritto (lib/feedback/participation). */
+  roomToken?: string;
+  /** Il link della valutazione dell'email di ringraziamento (lib/feedback/rating-link). */
+  ratingToken?: string;
   /** Visual variant — 'feedback' renders LIKERT as a star scale. */
   variant?: 'default' | 'feedback';
   /** Hide the questionnaire's own title/description (the caller renders it). */
@@ -78,6 +83,8 @@ export default function QuestionnaireForm({
   placement,
   accessToken,
   guestId,
+  roomToken,
+  ratingToken,
   variant = 'default',
   hideHeader = false,
   submitLabel,
@@ -168,6 +175,8 @@ export default function QuestionnaireForm({
             answers,
             ...(accessToken && { accessToken }),
             ...(guestId && { guestId }),
+            ...(roomToken && { roomToken }),
+            ...(ratingToken && { ratingToken }),
           }),
         }
       );
@@ -184,7 +193,9 @@ export default function QuestionnaireForm({
             ? tq('answersInvalid')
             : err.code === 'ALREADY_SUBMITTED'
               ? tq('alreadySubmitted')
-              : tq('submitFailed'),
+              : err.code === 'NOT_A_PARTICIPANT'
+                ? tq('onlyParticipants')
+                : tq('submitFailed'),
         );
         return;
       }
@@ -195,7 +206,7 @@ export default function QuestionnaireForm({
     } finally {
       setSubmitting(false);
     }
-  }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted, onAlreadySubmitted, tq]);
+  }, [q, values, eventSlug, placement, accessToken, guestId, roomToken, ratingToken, onSubmitted, onAlreadySubmitted, tq]);
 
   if (loading) return <div className="text-muted">{tc('loading')}</div>;
   // Surface a load failure (non-404 error) instead of returning null, which

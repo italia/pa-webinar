@@ -302,14 +302,23 @@
       "title": "Co dalej z wydarzeniem",
       "body": "Za chwilę zakończysz wydarzenie dla wszystkich. Co ma się z nim stać po zakończeniu?",
       "public": "Zachowaj publiczne",
-      "publicHelp": "Strona zakończonego wydarzenia pozostaje widoczna wraz z podsumowaniem, pytaniami i odpowiedziami, ankietami, materiałami i opiniami.",
       "library": "Opublikuj w bibliotece",
       "libraryHelp": "Jak wyżej, a dodatkowo pokazuje wydarzenie w publicznej bibliotece wideo (wymaga opublikowanego nagrania lub filmu YouTube).",
       "archive": "Zarchiwizuj (prywatne)",
       "archiveHelp": "Strona zakończonego wydarzenia nie będzie widoczna publicznie. Dane są przechowywane do końca okresu przechowywania, a następnie usuwane.",
       "genAi": "Wygeneruj transkrypcję i podsumowanie AI z nagrania (po zakończeniu przetwarzania)",
       "back": "Wstecz",
-      "confirm": "Zakończ wydarzenie"
+      "confirm": "Zakończ wydarzenie",
+      "publicHelpList": "Strona zakończonego wydarzenia pozostaje widoczna i, jeśli istnieją, pokazuje {sections}.",
+      "publicHelpNone": "Strona zakończonego wydarzenia pozostaje widoczna, z tytułem i opisem.",
+      "sections": {
+        "recap": "podsumowanie",
+        "qa": "pytania z sesji Q&A",
+        "polls": "opublikowane ankiety",
+        "wordCloud": "chmurę słów",
+        "materials": "materiały",
+        "feedback": "oceny"
+      }
     },
     "eventNotStarted": "Wydarzenie jeszcze się nie rozpoczęło",
     "eventStartsAt": "Wydarzenie rozpocznie się {date} o {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Błąd podczas tworzenia ankiety",
       "vote": "Głos nie został zapisany. Spróbuj ponownie.",
       "alreadyVoted": "Twój głos w tej ankiecie został już oddany.",
-      "action": "Działanie nie powiodło się. Spróbuj ponownie."
+      "action": "Działanie nie powiodło się. Spróbuj ponownie.",
+      "closed": "Ankieta jest zamknięta."
     },
     "participation": "{votes, plural, one {# głos} few {# głosy} many {# głosów} other {# głosu}} z {present} obecnych",
     "participationLabel": "Udział w ankiecie",
@@ -4724,7 +4734,8 @@
       "materials": "Materiały",
       "polls": "Ankiety",
       "feedback": "Opinie",
-      "transcript": "Transkrypcja AI"
+      "transcript": "Transkrypcja AI",
+      "ratingsCount": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}"
     },
     "recordingNotify": "Powiadom zapisanych, gdy nagranie zostanie opublikowane",
     "recordingNotifyHelp": "Jeden e-mail, gdy nagranie (lub zewnętrzne wideo) jest widoczne na publicznej stronie wydarzenia. Trafia do osób wciąż zapisanych: po okresie przechowywania nikt nie jest powiadamiany.",
@@ -4898,7 +4909,8 @@
     "no": "Nie",
     "scaleValue": "{value} z {max}",
     "answerOne": "Odpowiedz na co najmniej jedno pytanie, aby wysłać.",
-    "pageTitle": "Ankieta"
+    "pageTitle": "Ankieta",
+    "onlyParticipants": "Oceniać mogą tylko osoby, które uczestniczyły w wydarzeniu."
   },
   "notFound": {
     "title": "Nie znaleziono strony",

@@ -302,14 +302,23 @@
       "title": "Bestemming van het evenement",
       "body": "U staat op het punt het evenement voor iedereen te beëindigen. Wat moet ermee gebeuren zodra het is afgelopen?",
       "public": "Openbaar houden",
-      "publicHelp": "De pagina van het afgelopen evenement blijft zichtbaar met samenvatting, vragen (Q&A), peilingen, materiaal en feedback.",
       "library": "In de bibliotheek publiceren",
       "libraryHelp": "Zoals hierboven, en bovendien wordt het evenement getoond in de openbare videobibliotheek (vereist een gepubliceerde opname of een YouTube-video).",
       "archive": "Archiveren (privé)",
       "archiveHelp": "De pagina van het afgelopen evenement is niet zichtbaar voor het publiek. De gegevens blijven bewaard tot het einde van de bewaartermijn en worden daarna verwijderd.",
       "genAi": "AI-transcriptie en -samenvatting genereren uit de opname (zodra de verwerking klaar is)",
       "back": "Terug",
-      "confirm": "Evenement beëindigen"
+      "confirm": "Evenement beëindigen",
+      "publicHelpList": "De pagina van het afgelopen evenement blijft zichtbaar en toont, als die er zijn, {sections}.",
+      "publicHelpNone": "De pagina van het afgelopen evenement blijft zichtbaar, met titel en beschrijving.",
+      "sections": {
+        "recap": "de samenvatting",
+        "qa": "de vragen uit de Q&A",
+        "polls": "de gepubliceerde peilingen",
+        "wordCloud": "de woordwolk",
+        "materials": "de materialen",
+        "feedback": "de beoordelingen"
+      }
     },
     "eventNotStarted": "Het evenement is nog niet begonnen",
     "eventStartsAt": "Het evenement begint op {date} om {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Fout bij het aanmaken van de peiling",
       "vote": "Stem niet geregistreerd. Probeer het opnieuw.",
       "alreadyVoted": "U hebt al gestemd in deze peiling.",
-      "action": "De actie is mislukt. Probeer het opnieuw."
+      "action": "De actie is mislukt. Probeer het opnieuw.",
+      "closed": "De peiling is gesloten."
     },
     "participation": "{votes, plural, one {# stem} other {# stemmen}} van {present} aanwezigen",
     "participationLabel": "Deelname aan de peiling",
@@ -4724,7 +4734,8 @@
       "materials": "Materialen",
       "polls": "Peilingen",
       "feedback": "Feedback",
-      "transcript": "AI-transcriptie"
+      "transcript": "AI-transcriptie",
+      "ratingsCount": "{count, plural, one {# beoordeling} other {# beoordelingen}}"
     },
     "recordingNotify": "Ingeschrevenen waarschuwen wanneer de opname is gepubliceerd",
     "recordingNotifyHelp": "Eén e-mail, wanneer de opname (of externe video) zichtbaar is op de openbare pagina van het evenement. Hij bereikt wie nog ingeschreven is: na de bewaartermijn wordt niemand meer gewaarschuwd.",
@@ -4898,7 +4909,8 @@
     "no": "Nee",
     "scaleValue": "{value} van {max}",
     "answerOne": "Beantwoord minstens één vraag om te verzenden.",
-    "pageTitle": "Vragenlijst"
+    "pageTitle": "Vragenlijst",
+    "onlyParticipants": "Alleen wie aan het evenement heeft deelgenomen, kan het beoordelen."
   },
   "notFound": {
     "title": "Pagina niet gevonden",

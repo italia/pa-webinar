@@ -302,14 +302,23 @@
       "title": "Event destiny",
       "body": "You're about to end the event for everyone. What should happen to it once concluded?",
       "public": "Keep it public",
-      "publicHelp": "The concluded event page stays visible with recap, Q&A, polls, materials and feedback.",
       "library": "Publish to the library",
       "libraryHelp": "As above, and also show the event in the public video library (requires a published recording or a YouTube video).",
       "archive": "Archive (private)",
       "archiveHelp": "The page of the ended event will not be visible to the public. The data is kept until the retention period ends, then deleted.",
       "genAi": "Generate AI transcript and summary from the recording (once processing finishes)",
       "back": "Back",
-      "confirm": "End event"
+      "confirm": "End event",
+      "publicHelpList": "The ended event's page stays visible and, where there are any, shows {sections}.",
+      "publicHelpNone": "The ended event's page stays visible, with its title and description.",
+      "sections": {
+        "recap": "the recap",
+        "qa": "the Q&A questions",
+        "polls": "the published polls",
+        "wordCloud": "the word cloud",
+        "materials": "the materials",
+        "feedback": "the ratings"
+      }
     },
     "eventNotStarted": "The event has not started yet",
     "eventStartsAt": "The event will start on {date} at {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Error creating the poll",
       "vote": "Vote not recorded. Try again.",
       "alreadyVoted": "You have already voted in this poll.",
-      "action": "The action failed. Please try again."
+      "action": "The action failed. Please try again.",
+      "closed": "The poll is closed."
     },
     "participation": "{votes, plural, one {# vote} other {# votes}} out of {present} present",
     "participationLabel": "Poll participation",
@@ -4724,7 +4734,8 @@
       "materials": "Materials",
       "polls": "Polls",
       "feedback": "Feedback",
-      "transcript": "AI transcript"
+      "transcript": "AI transcript",
+      "ratingsCount": "{count, plural, one {# rating} other {# ratings}}"
     },
     "recordingNotify": "Notify registrants when the recording is published",
     "recordingNotifyHelp": "A single email, sent when the recording (or external video) is visible on the event's public page. It reaches whoever is still registered: after the data retention period nobody is notified.",
@@ -4898,7 +4909,8 @@
     "no": "No",
     "scaleValue": "{value} of {max}",
     "answerOne": "Answer at least one question to send.",
-    "pageTitle": "Questionnaire"
+    "pageTitle": "Questionnaire",
+    "onlyParticipants": "Only people who took part in the event can rate it."
   },
   "notFound": {
     "title": "Page not found",

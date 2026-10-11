@@ -27,6 +27,8 @@ interface PostEventFeedbackProps {
   accessToken?: string;
   /** Identificativo stabile del browser, per chi non ha un'iscrizione. */
   guestId?: string;
+  /** Il token della sala ricevuto entrando: prova la presenza di chi non e' iscritto. */
+  roomToken?: string;
   mode: 'inline' | 'dialog';
   onClose?: () => void;
 }
@@ -37,6 +39,7 @@ export default function PostEventFeedback({
   eventSlug,
   accessToken,
   guestId,
+  roomToken,
   mode,
   onClose,
 }: PostEventFeedbackProps) {
@@ -127,6 +130,7 @@ export default function PostEventFeedback({
             placement="POST_EVENT"
             accessToken={accessToken}
             guestId={guestId}
+            roomToken={roomToken}
             variant="feedback"
             hideHeader
             submitLabel={t('submit')}

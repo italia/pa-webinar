@@ -302,14 +302,23 @@
       "title": "Destino do evento",
       "body": "Está prestes a terminar o evento para todos. O que pretende fazer com ele depois de concluído?",
       "public": "Manter público",
-      "publicHelp": "A página do evento concluído continua visível com o resumo, as perguntas e respostas, as sondagens, os materiais e o feedback.",
       "library": "Publicar na biblioteca",
       "libraryHelp": "Como acima e, além disso, mostra o evento na biblioteca de vídeos pública (requer uma gravação publicada ou um vídeo do YouTube).",
       "archive": "Arquivar (privado)",
       "archiveHelp": "A página do evento terminado não ficará visível ao público. Os dados são conservados até ao fim do prazo de conservação e depois eliminados.",
       "genAi": "Gerar transcrição e resumo com IA a partir da gravação (no final do processamento)",
       "back": "Voltar",
-      "confirm": "Terminar o evento"
+      "confirm": "Terminar o evento",
+      "publicHelpList": "A página do evento terminado continua visível e, se existirem, mostra {sections}.",
+      "publicHelpNone": "A página do evento terminado continua visível, com o título e a descrição.",
+      "sections": {
+        "recap": "o resumo",
+        "qa": "as perguntas do Q&A",
+        "polls": "as sondagens publicadas",
+        "wordCloud": "a nuvem de palavras",
+        "materials": "os materiais",
+        "feedback": "as avaliações"
+      }
     },
     "eventNotStarted": "O evento ainda não começou",
     "eventStartsAt": "O evento terá início em {date} às {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Erro ao criar a sondagem",
       "vote": "Voto não registado. Tente novamente.",
       "alreadyVoted": "Já votou nesta sondagem.",
-      "action": "A ação falhou. Tente novamente."
+      "action": "A ação falhou. Tente novamente.",
+      "closed": "A sondagem está fechada."
     },
     "participation": "{votes, plural, one {# voto} other {# votos}} de {present} presentes",
     "participationLabel": "Participação na sondagem",
@@ -4724,7 +4734,8 @@
       "materials": "Materiais",
       "polls": "Sondagens",
       "feedback": "Feedback",
-      "transcript": "Transcrição de IA"
+      "transcript": "Transcrição de IA",
+      "ratingsCount": "{count, plural, one {# avaliação} other {# avaliações}}"
     },
     "recordingNotify": "Avisar os inscritos quando a gravação for publicada",
     "recordingNotifyHelp": "Um único e-mail, quando a gravação (ou o vídeo externo) fica visível na página pública do evento. Chega a quem ainda está inscrito: após o período de conservação ninguém é avisado.",
@@ -4898,7 +4909,8 @@
     "no": "Não",
     "scaleValue": "{value} de {max}",
     "answerOne": "Responda a pelo menos uma pergunta para enviar.",
-    "pageTitle": "Questionário"
+    "pageTitle": "Questionário",
+    "onlyParticipants": "Só quem participou no evento o pode avaliar."
   },
   "notFound": {
     "title": "Página não encontrada",

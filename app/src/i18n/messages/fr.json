@@ -302,14 +302,23 @@
       "title": "Devenir de l'événement",
       "body": "Vous êtes sur le point de terminer l'événement pour tout le monde. Que doit-il devenir une fois terminé ?",
       "public": "Garder public",
-      "publicHelp": "La page de l'événement terminé reste visible avec le récapitulatif, les questions, les sondages, les documents et les avis.",
       "library": "Publier dans la vidéothèque",
       "libraryHelp": "Comme ci-dessus, et affiche en plus l'événement dans la vidéothèque publique (nécessite un enregistrement publié ou une vidéo YouTube).",
       "archive": "Archiver (privé)",
       "archiveHelp": "La page de l'événement terminé ne sera pas visible du public. Les données sont conservées jusqu'à la fin de la durée de conservation, puis supprimées.",
       "genAi": "Générer la transcription et la synthèse IA à partir de l'enregistrement (à la fin du traitement)",
       "back": "Retour",
-      "confirm": "Terminer l'événement"
+      "confirm": "Terminer l'événement",
+      "publicHelpList": "La page de l'événement terminé reste visible et, s'il y en a, affiche {sections}.",
+      "publicHelpNone": "La page de l'événement terminé reste visible, avec son titre et sa description.",
+      "sections": {
+        "recap": "le récapitulatif",
+        "qa": "les questions du Q&R",
+        "polls": "les sondages publiés",
+        "wordCloud": "le nuage de mots",
+        "materials": "les documents",
+        "feedback": "les évaluations"
+      }
     },
     "eventNotStarted": "L'événement n'a pas encore commencé",
     "eventStartsAt": "L'événement commencera le {date} à {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Erreur lors de la création du sondage",
       "vote": "Vote non enregistré. Veuillez réessayer.",
       "alreadyVoted": "Vous avez déjà voté dans ce sondage.",
-      "action": "L'action a échoué. Veuillez réessayer."
+      "action": "L'action a échoué. Veuillez réessayer.",
+      "closed": "Le sondage est clos."
     },
     "participation": "{votes, plural, one {# vote} other {# votes}} sur {present} présents",
     "participationLabel": "Participation au sondage",
@@ -4724,7 +4734,8 @@
       "materials": "Documents",
       "polls": "Sondages",
       "feedback": "Retours",
-      "transcript": "Transcription IA"
+      "transcript": "Transcription IA",
+      "ratingsCount": "{count, plural, one {# évaluation} other {# évaluations}}"
     },
     "recordingNotify": "Prévenir les inscrits quand l'enregistrement est publié",
     "recordingNotifyHelp": "Un seul e-mail, quand l'enregistrement (ou la vidéo externe) est visible sur la page publique de l'événement. Il atteint les personnes encore inscrites : après la durée de conservation, personne n'est prévenu.",
@@ -4898,7 +4909,8 @@
     "no": "Non",
     "scaleValue": "{value} sur {max}",
     "answerOne": "Répondez à au moins une question pour envoyer.",
-    "pageTitle": "Questionnaire"
+    "pageTitle": "Questionnaire",
+    "onlyParticipants": "L'évaluation est réservée aux personnes ayant participé à l'événement."
   },
   "notFound": {
     "title": "Page introuvable",

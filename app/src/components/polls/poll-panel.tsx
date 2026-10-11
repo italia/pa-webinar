@@ -131,7 +131,14 @@ export default function PollPanel({
           body: JSON.stringify({ optionIndex, ...identity }),
         });
         if (!res.ok) {
-          setVoteError(res.status === 409 ? t('errors.alreadyVoted') : t('errors.vote'));
+          const corpo = (await res.json().catch(() => ({}))) as { code?: string };
+          setVoteError(
+            corpo.code === 'POLL_CLOSED'
+              ? t('errors.closed')
+              : res.status === 409
+                ? t('errors.alreadyVoted')
+                : t('errors.vote'),
+          );
         }
       } catch {
         setVoteError(t('errors.vote'));
@@ -157,7 +164,10 @@ export default function PollPanel({
           },
           body: JSON.stringify({ status }),
         });
-        if (!res.ok) setVoteError(t('errors.action'));
+        if (!res.ok) {
+          const corpo = (await res.json().catch(() => ({}))) as { code?: string };
+          setVoteError(corpo.code === 'POLL_CLOSED' ? t('errors.closed') : t('errors.action'));
+        }
       } catch {
         setVoteError(t('errors.action'));
       }

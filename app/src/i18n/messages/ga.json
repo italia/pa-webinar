@@ -302,14 +302,23 @@
       "title": "Cinniúint an imeachta",
       "body": "Tá tú ar tí deireadh a chur leis an imeacht do chách. Cad ba cheart tarlú dó nuair a bheidh sé thart?",
       "public": "Coinnigh poiblí é",
-      "publicHelp": "Fanfaidh leathanach an imeachta chríochnaithe le feiceáil, le hachoimre, ceisteanna, pobalbhreitheanna, ábhair agus aiseolas.",
       "library": "Foilsigh sa leabharlann",
       "libraryHelp": "Mar atá thuas, agus taispeántar an t-imeacht sa leabharlann físeán poiblí freisin (teastaíonn taifeadadh foilsithe nó físeán YouTube).",
       "archive": "Cuir i gcartlann (príobháideach)",
       "archiveHelp": "Ní bheidh leathanach na hócáide críochnaithe le feiceáil ag an bpobal. Coinnítear na sonraí go deireadh na tréimhse coinneála, ansin scriostar iad.",
       "genAi": "Cruthaigh tras-scríbhinn agus achoimre AI ón taifeadadh (nuair a bheidh an phróiseáil críochnaithe)",
       "back": "Ar ais",
-      "confirm": "Cuir deireadh leis an imeacht"
+      "confirm": "Cuir deireadh leis an imeacht",
+      "publicHelpList": "Fanann leathanach na hócáide críochnaithe le feiceáil agus, má tá siad ann, taispeánann sé {sections}.",
+      "publicHelpNone": "Fanann leathanach na hócáide críochnaithe le feiceáil, lena teideal agus a cur síos.",
+      "sections": {
+        "recap": "an achoimre",
+        "qa": "ceisteanna an Q&A",
+        "polls": "na pobalbhreitheanna foilsithe",
+        "wordCloud": "an scamall focal",
+        "materials": "na hábhair",
+        "feedback": "na rátálacha"
+      }
     },
     "eventNotStarted": "Níor thosaigh an t-imeacht fós",
     "eventStartsAt": "Tosóidh an t-imeacht ar {date} ag {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Earráid agus an phobalbhreith á cruthú",
       "vote": "Níor taifeadadh an vóta. Bain triail eile as.",
       "alreadyVoted": "Tá vóta caite agaibh sa phobalbhreith seo cheana.",
-      "action": "Theip ar an ngníomh. Bain triail eile as."
+      "action": "Theip ar an ngníomh. Bain triail eile as.",
+      "closed": "Tá an phobalbhreith dúnta."
     },
     "participation": "{votes, plural, one {# vóta} other {# vóta}} as {present} i láthair",
     "participationLabel": "Rannpháirtíocht sa phobalbhreith",
@@ -4724,7 +4734,8 @@
       "materials": "Ábhair",
       "polls": "Pobalbhreitheanna",
       "feedback": "Aiseolas",
-      "transcript": "Tras-scríbhinn AI"
+      "transcript": "Tras-scríbhinn AI",
+      "ratingsCount": "{count, plural, one {# rátáil} other {# rátáil}}"
     },
     "recordingNotify": "Cuir in iúl do na rannpháirtithe cláraithe nuair a fhoilsítear an taifeadadh",
     "recordingNotifyHelp": "Ríomhphost amháin, nuair a bhíonn an taifeadadh (nó an físeán seachtrach) le feiceáil ar leathanach poiblí an imeachta. Sroicheann sé na daoine atá fós cláraithe: tar éis na tréimhse coinneála ní chuirtear in iúl d'aon duine.",
@@ -4898,7 +4909,8 @@
     "no": "Níl",
     "scaleValue": "{value} as {max}",
     "answerOne": "Freagair ceist amháin ar a laghad chun é a sheoladh.",
-    "pageTitle": "Ceistneoir"
+    "pageTitle": "Ceistneoir",
+    "onlyParticipants": "Ní féidir ach leo siúd a ghlac páirt san ócáid í a rátáil."
   },
   "notFound": {
     "title": "Níor aimsíodh an leathanach",

@@ -302,14 +302,23 @@
       "title": "Sudbina događaja",
       "body": "Upravo ćeš završiti događaj za sve. Što želiš da se s njim dogodi nakon završetka?",
       "public": "Zadrži ga javnim",
-      "publicHelp": "Stranica završenog događaja ostaje vidljiva sa sažetkom, pitanjima, anketama, materijalima i povratnim informacijama.",
       "library": "Objavi u videoteci",
       "libraryHelp": "Kao gore, a uz to prikazuje događaj u javnoj videoteci (zahtijeva objavljenu snimku ili YouTube videozapis).",
       "archive": "Arhiviraj (privatno)",
       "archiveHelp": "Stranica završenog događaja neće biti vidljiva javnosti. Podaci se čuvaju do isteka razdoblja čuvanja, a zatim se brišu.",
       "genAi": "Generiraj AI transkript i sažetak iz snimke (po završetku obrade)",
       "back": "Natrag",
-      "confirm": "Završi događaj"
+      "confirm": "Završi događaj",
+      "publicHelpList": "Stranica završenog događaja ostaje vidljiva i, ako postoje, prikazuje {sections}.",
+      "publicHelpNone": "Stranica završenog događaja ostaje vidljiva, s naslovom i opisom.",
+      "sections": {
+        "recap": "sažetak",
+        "qa": "pitanja iz Q&A",
+        "polls": "objavljene ankete",
+        "wordCloud": "oblak riječi",
+        "materials": "materijale",
+        "feedback": "ocjene"
+      }
     },
     "eventNotStarted": "Događaj još nije započeo",
     "eventStartsAt": "Događaj počinje {date} u {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Pogreška pri stvaranju ankete",
       "vote": "Glas nije zabilježen. Pokušajte ponovno.",
       "alreadyVoted": "Već ste glasali u ovoj anketi.",
-      "action": "Radnja nije uspjela. Pokušajte ponovno."
+      "action": "Radnja nije uspjela. Pokušajte ponovno.",
+      "closed": "Anketa je zatvorena."
     },
     "participation": "{votes, plural, one {# glas} few {# glasa} other {# glasova}} od {present} prisutnih",
     "participationLabel": "Sudjelovanje u anketi",
@@ -4724,7 +4734,8 @@
       "materials": "Materijali",
       "polls": "Ankete",
       "feedback": "Povratne informacije",
-      "transcript": "AI transkript"
+      "transcript": "AI transkript",
+      "ratingsCount": "{count, plural, one {# ocjena} few {# ocjene} other {# ocjena}}"
     },
     "recordingNotify": "Obavijesti prijavljene kad snimka bude objavljena",
     "recordingNotifyHelp": "Jedna poruka e-pošte, kad je snimka (ili vanjski video) vidljiva na javnoj stranici događaja. Stiže onima koji su još prijavljeni: nakon razdoblja čuvanja nitko nije obaviješten.",
@@ -4898,7 +4909,8 @@
     "no": "Ne",
     "scaleValue": "{value} od {max}",
     "answerOne": "Za slanje odgovorite barem na jedno pitanje.",
-    "pageTitle": "Upitnik"
+    "pageTitle": "Upitnik",
+    "onlyParticipants": "Ocjenjivati mogu samo oni koji su sudjelovali u događaju."
   },
   "notFound": {
     "title": "Stranica nije pronađena",

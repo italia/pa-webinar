@@ -82,6 +82,7 @@ function disegna(props: {
   hasRoomAccess?: boolean;
   invalidToken?: boolean;
   hasPostEventQuestionnaire?: boolean;
+  feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
 }) {
   act(() => {
     root.render(
@@ -176,13 +177,23 @@ describe('scheda pubblica — invito al questionario post-evento', () => {
       endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
     });
 
-  it('compare quando l’evento ha un questionario', () => {
+  it('compare quando l’evento ha un questionario, a chi ha partecipato', () => {
+    disegna({
+      event: concluso(),
+      registrationOpen: false,
+      hasPostEventQuestionnaire: true,
+      feedbackProof: { accessToken: 'TOKEN_ISCRIZIONE' },
+    });
+    expect(container.querySelector('[data-testid="invito-questionario"]')).not.toBeNull();
+  });
+
+  it('a chi il server non riconosce come partecipante non compare: verrebbe rifiutato all’invio', () => {
     disegna({
       event: concluso(),
       registrationOpen: false,
       hasPostEventQuestionnaire: true,
     });
-    expect(container.querySelector('[data-testid="invito-questionario"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="invito-questionario"]')).toBeNull();
   });
 
   it('senza questionario non compare', () => {
@@ -199,6 +210,7 @@ describe('scheda pubblica — invito al questionario post-evento', () => {
       event: { ...concluso(), postEventShowFeedback: false },
       registrationOpen: false,
       hasPostEventQuestionnaire: true,
+      feedbackProof: { accessToken: 'TOKEN_ISCRIZIONE' },
     });
     expect(container.querySelector('[data-testid="invito-questionario"]')).toBeNull();
   });

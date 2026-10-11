@@ -302,14 +302,23 @@
       "title": "Arrangementets skæbne",
       "body": "Du er ved at afslutte arrangementet for alle. Hvad skal der ske med det, når det er slut?",
       "public": "Behold det offentligt",
-      "publicHelp": "Siden for det afsluttede arrangement forbliver synlig med opsummering, spørgsmål, afstemninger, materialer og feedback.",
       "library": "Udgiv i biblioteket",
       "libraryHelp": "Som ovenfor, og vis desuden arrangementet i det offentlige videobibliotek (kræver en udgivet optagelse eller en YouTube-video).",
       "archive": "Arkivér (privat)",
       "archiveHelp": "Siden for det afsluttede arrangement vil ikke være synlig for offentligheden. Dataene opbevares, indtil opbevaringsperioden udløber, og slettes derefter.",
       "genAi": "Generér AI-transskription og -resumé ud fra optagelsen (når behandlingen er færdig)",
       "back": "Tilbage",
-      "confirm": "Afslut arrangementet"
+      "confirm": "Afslut arrangementet",
+      "publicHelpList": "Siden for det afsluttede arrangement forbliver synlig og viser, hvis de findes, {sections}.",
+      "publicHelpNone": "Siden for det afsluttede arrangement forbliver synlig, med titel og beskrivelse.",
+      "sections": {
+        "recap": "opsummeringen",
+        "qa": "spørgsmålene fra Q&A",
+        "polls": "de offentliggjorte afstemninger",
+        "wordCloud": "ordskyen",
+        "materials": "materialerne",
+        "feedback": "bedømmelserne"
+      }
     },
     "eventNotStarted": "Begivenheden er endnu ikke startet",
     "eventStartsAt": "Begivenheden starter den {date} kl. {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Fejl ved oprettelse af afstemning",
       "vote": "Stemmen blev ikke registreret. Prøv igen.",
       "alreadyVoted": "Du har allerede stemt i denne afstemning.",
-      "action": "Handlingen mislykkedes. Prøv igen."
+      "action": "Handlingen mislykkedes. Prøv igen.",
+      "closed": "Afstemningen er lukket."
     },
     "participation": "{votes, plural, one {# stemme} other {# stemmer}} ud af {present} til stede",
     "participationLabel": "Deltagelse i afstemningen",
@@ -4724,7 +4734,8 @@
       "materials": "Materialer",
       "polls": "Afstemninger",
       "feedback": "Feedback",
-      "transcript": "AI-transskription"
+      "transcript": "AI-transskription",
+      "ratingsCount": "{count, plural, one {# bedømmelse} other {# bedømmelser}}"
     },
     "recordingNotify": "Giv tilmeldte besked, når optagelsen er offentliggjort",
     "recordingNotifyHelp": "Én e-mail, når optagelsen (eller den eksterne video) er synlig på arrangementets offentlige side. Den når dem, der stadig er tilmeldt: efter opbevaringsperioden får ingen besked.",
@@ -4898,7 +4909,8 @@
     "no": "Nej",
     "scaleValue": "{value} af {max}",
     "answerOne": "Besvar mindst ét spørgsmål for at sende.",
-    "pageTitle": "Spørgeskema"
+    "pageTitle": "Spørgeskema",
+    "onlyParticipants": "Kun de, der deltog i arrangementet, kan bedømme det."
   },
   "notFound": {
     "title": "Siden blev ikke fundet",

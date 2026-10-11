@@ -302,14 +302,23 @@
       "title": "Ko darīt ar pasākumu",
       "body": "Jūs gatavojaties beigt pasākumu visiem. Ko ar to darīt pēc noslēgšanas?",
       "public": "Saglabāt publisku",
-      "publicHelp": "Noslēgtā pasākuma lapa paliek redzama ar pārskatu, jautājumiem, aptaujām, materiāliem un atsauksmēm.",
       "library": "Publicēt bibliotēkā",
       "libraryHelp": "Tāpat kā iepriekš, un turklāt pasākums tiek rādīts publiskajā video bibliotēkā (nepieciešams publicēts ieraksts vai YouTube video).",
       "archive": "Arhivēt (privāti)",
       "archiveHelp": "Beigušās pasākuma lapa nebūs publiski redzama. Dati tiek glabāti līdz glabāšanas termiņa beigām, pēc tam tiek dzēsti.",
       "genAi": "Ģenerēt MI transkripciju un kopsavilkumu no ieraksta (kad apstrāde būs pabeigta)",
       "back": "Atpakaļ",
-      "confirm": "Beigt pasākumu"
+      "confirm": "Beigt pasākumu",
+      "publicHelpList": "Beigušā pasākuma lapa paliek redzama un, ja tādi ir, rāda {sections}.",
+      "publicHelpNone": "Beigušā pasākuma lapa paliek redzama ar nosaukumu un aprakstu.",
+      "sections": {
+        "recap": "kopsavilkumu",
+        "qa": "jautājumus un atbildes",
+        "polls": "publicētās aptaujas",
+        "wordCloud": "vārdu mākoni",
+        "materials": "materiālus",
+        "feedback": "vērtējumus"
+      }
     },
     "eventNotStarted": "Pasākums vēl nav sācies",
     "eventStartsAt": "Pasākums sāksies {date} plkst. {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Kļūda, veidojot aptauju",
       "vote": "Balss nav reģistrēta. Mēģiniet vēlreiz.",
       "alreadyVoted": "Jūs jau esat balsojis šajā aptaujā.",
-      "action": "Darbība neizdevās. Mēģiniet vēlreiz."
+      "action": "Darbība neizdevās. Mēģiniet vēlreiz.",
+      "closed": "Aptauja ir slēgta."
     },
     "participation": "{votes, plural, zero {# balsis} one {# balss} other {# balsis}} no {present} klātesošajiem",
     "participationLabel": "Dalība aptaujā",
@@ -4724,7 +4734,8 @@
       "materials": "Materiāli",
       "polls": "Aptaujas",
       "feedback": "Atsauksmes",
-      "transcript": "MI transkripcija"
+      "transcript": "MI transkripcija",
+      "ratingsCount": "{count, plural, zero {# vērtējumu} one {# vērtējums} other {# vērtējumi}}"
     },
     "recordingNotify": "Paziņot reģistrētajiem, kad ieraksts ir publicēts",
     "recordingNotifyHelp": "Viens e-pasts, kad ieraksts (vai ārējais video) ir redzams pasākuma publiskajā lapā. Tas sasniedz tos, kas vēl ir reģistrēti: pēc glabāšanas termiņa neviens netiek informēts.",
@@ -4898,7 +4909,8 @@
     "no": "Nē",
     "scaleValue": "{value} no {max}",
     "answerOne": "Lai nosūtītu, atbildi vismaz uz vienu jautājumu.",
-    "pageTitle": "Anketa"
+    "pageTitle": "Anketa",
+    "onlyParticipants": "Novērtēt var tikai tie, kas piedalījās pasākumā."
   },
   "notFound": {
     "title": "Lapa nav atrasta",

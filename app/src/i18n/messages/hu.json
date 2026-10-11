@@ -302,14 +302,23 @@
       "title": "Az esemény sorsa",
       "body": "Az eseményt mindenki számára lezárja. Mi történjen vele a lezárás után?",
       "public": "Maradjon nyilvános",
-      "publicHelp": "A lezárt esemény oldala látható marad az összegzéssel, a kérdésekkel, a szavazásokkal, az anyagokkal és a visszajelzésekkel.",
       "library": "Közzététel a könyvtárban",
       "libraryHelp": "Mint fent, ezenfelül az esemény megjelenik a nyilvános videókönyvtárban is (közzétett felvételt vagy YouTube-videót igényel).",
       "archive": "Archiválás (privát)",
       "archiveHelp": "A befejezett esemény oldala nem lesz nyilvánosan látható. Az adatok a megőrzési idő végéig megmaradnak, utána törlődnek.",
       "genAi": "AI-átirat és -összefoglaló készítése a felvételből (a feldolgozás befejeztével)",
       "back": "Vissza",
-      "confirm": "Esemény lezárása"
+      "confirm": "Esemény lezárása",
+      "publicHelpList": "A lezárult esemény oldala látható marad, és ha vannak, megjeleníti ezeket: {sections}.",
+      "publicHelpNone": "A lezárult esemény oldala látható marad, címmel és leírással.",
+      "sections": {
+        "recap": "az összefoglaló",
+        "qa": "a kérdések és válaszok",
+        "polls": "a közzétett szavazások",
+        "wordCloud": "a szófelhő",
+        "materials": "az anyagok",
+        "feedback": "az értékelések"
+      }
     },
     "eventNotStarted": "Az esemény még nem kezdődött el",
     "eventStartsAt": "Az esemény {date} napon {time}-kor kezdődik",
@@ -3415,7 +3424,8 @@
       "generic": "Hiba a szavazás létrehozásakor",
       "vote": "A szavazat nem lett rögzítve. Próbálja újra.",
       "alreadyVoted": "Ezen a szavazáson már szavazott.",
-      "action": "A művelet nem sikerült. Próbálja újra."
+      "action": "A művelet nem sikerült. Próbálja újra.",
+      "closed": "A szavazás lezárult."
     },
     "participation": "{votes, plural, one {# szavazat} other {# szavazat}} {present} jelenlévőből",
     "participationLabel": "Részvétel a szavazáson",
@@ -4724,7 +4734,8 @@
       "materials": "Anyagok",
       "polls": "Szavazások",
       "feedback": "Visszajelzés",
-      "transcript": "AI-átirat"
+      "transcript": "AI-átirat",
+      "ratingsCount": "{count, plural, one {# értékelés} other {# értékelés}}"
     },
     "recordingNotify": "Értesítés a jelentkezőknek, amikor a felvétel megjelenik",
     "recordingNotifyHelp": "Egyetlen e-mail, amikor a felvétel (vagy a külső videó) látható az esemény nyilvános oldalán. A még jelentkezettekhez jut el: a megőrzési idő után senkihez.",
@@ -4898,7 +4909,8 @@
     "no": "Nem",
     "scaleValue": "{value}/{max}",
     "answerOne": "A küldéshez válaszolj legalább egy kérdésre.",
-    "pageTitle": "Kérdőív"
+    "pageTitle": "Kérdőív",
+    "onlyParticipants": "Csak azok értékelhetik, akik részt vettek az eseményen."
   },
   "notFound": {
     "title": "Az oldal nem található",

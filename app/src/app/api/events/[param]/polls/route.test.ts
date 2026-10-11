@@ -236,4 +236,11 @@ describe('POST /api/events/[slug]/polls — cronologia della sala', () => {
     expect(res.status).toBe(422);
     expect(recordLiveAction).not.toHaveBeenCalled();
   });
+  it.each(['ENDED', 'ARCHIVED'])('a evento %s non si apre un sondaggio (409)', async (status) => {
+    mockedEvent.mockResolvedValue(eventRow({ status }));
+    const res = await POST(post(corpo), ctx());
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('POLL_CLOSED');
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
 });

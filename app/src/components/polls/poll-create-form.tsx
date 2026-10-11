@@ -79,7 +79,9 @@ export default function PollCreateForm({
         });
 
         if (!res.ok) {
-          setError(t('errors.generic'));
+          // A evento concluso non si aprono sondaggi: riprovare non serve.
+          const corpo = (await res.json().catch(() => ({}))) as { code?: string };
+          setError(corpo.code === 'POLL_CLOSED' ? t('errors.closed') : t('errors.generic'));
           return;
         }
 

@@ -260,6 +260,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
 }
 
 function FeedbackTabContent({ feedback }: { feedback: FeedbackSummary }) {
+  const tTabs = useTranslations('postEvent.tabs');
   const maxCount = Math.max(...feedback.distribution.map((d) => d.count), 1);
 
   return (
@@ -274,7 +275,7 @@ function FeedbackTabContent({ feedback }: { feedback: FeedbackSummary }) {
               {feedback.average.toFixed(1)}/5
             </div>
             <div className="text-muted" style={{ fontSize: '0.85rem' }}>
-              {feedback.count} valutazioni
+              {tTabs('ratingsCount', { count: feedback.count })}
             </div>
           </div>
         )}

@@ -302,14 +302,23 @@
       "title": "Was geschieht mit der Veranstaltung?",
       "body": "Sie sind dabei, die Veranstaltung für alle zu beenden. Was soll danach mit ihr geschehen?",
       "public": "Öffentlich halten",
-      "publicHelp": "Die Seite der beendeten Veranstaltung bleibt sichtbar, mit Zusammenfassung, Q&A, Umfragen, Materialien und Feedback.",
       "library": "In der Mediathek veröffentlichen",
       "libraryHelp": "Wie oben, und zusätzlich erscheint die Veranstaltung in der öffentlichen Mediathek (erfordert eine veröffentlichte Aufzeichnung oder ein YouTube-Video).",
       "archive": "Archivieren (privat)",
       "archiveHelp": "Die Seite der beendeten Veranstaltung ist für die Öffentlichkeit nicht sichtbar. Die Daten bleiben bis zum Ende der Aufbewahrungsfrist erhalten und werden dann gelöscht.",
       "genAi": "Transkript und KI-Zusammenfassung aus der Aufzeichnung erzeugen (nach Abschluss der Verarbeitung)",
       "back": "Zurück",
-      "confirm": "Veranstaltung beenden"
+      "confirm": "Veranstaltung beenden",
+      "publicHelpList": "Die Seite der beendeten Veranstaltung bleibt sichtbar und zeigt, sofern vorhanden, {sections}.",
+      "publicHelpNone": "Die Seite der beendeten Veranstaltung bleibt sichtbar, mit Titel und Beschreibung.",
+      "sections": {
+        "recap": "die Zusammenfassung",
+        "qa": "die Fragen aus dem Q&A",
+        "polls": "die veröffentlichten Umfragen",
+        "wordCloud": "die Wortwolke",
+        "materials": "die Materialien",
+        "feedback": "die Bewertungen"
+      }
     },
     "eventNotStarted": "Die Veranstaltung hat noch nicht begonnen",
     "eventStartsAt": "Die Veranstaltung beginnt am {date} um {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Fehler beim Erstellen der Umfrage",
       "vote": "Stimme nicht erfasst. Bitte versuchen Sie es erneut.",
       "alreadyVoted": "Sie haben an dieser Umfrage bereits teilgenommen.",
-      "action": "Die Aktion ist fehlgeschlagen. Bitte erneut versuchen."
+      "action": "Die Aktion ist fehlgeschlagen. Bitte erneut versuchen.",
+      "closed": "Die Umfrage ist geschlossen."
     },
     "participation": "{votes, plural, one {# Stimme} other {# Stimmen}} von {present} Anwesenden",
     "participationLabel": "Beteiligung an der Umfrage",
@@ -4724,7 +4734,8 @@
       "materials": "Materialien",
       "polls": "Umfragen",
       "feedback": "Feedback",
-      "transcript": "KI-Transkript"
+      "transcript": "KI-Transkript",
+      "ratingsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}"
     },
     "recordingNotify": "Angemeldete benachrichtigen, wenn die Aufzeichnung veröffentlicht ist",
     "recordingNotifyHelp": "Eine einzige E-Mail, sobald die Aufzeichnung (oder das externe Video) auf der öffentlichen Seite sichtbar ist. Sie erreicht alle, die noch angemeldet sind: nach Ablauf der Aufbewahrungsfrist wird niemand mehr benachrichtigt.",
@@ -4898,7 +4909,8 @@
     "no": "Nein",
     "scaleValue": "{value} von {max}",
     "answerOne": "Beantworte mindestens eine Frage, um zu senden.",
-    "pageTitle": "Fragebogen"
+    "pageTitle": "Fragebogen",
+    "onlyParticipants": "Nur wer an der Veranstaltung teilgenommen hat, kann sie bewerten."
   },
   "notFound": {
     "title": "Seite nicht gefunden",

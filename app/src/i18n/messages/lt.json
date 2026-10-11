@@ -302,14 +302,23 @@
       "title": "Renginio likimas",
       "body": "Ketinate užbaigti renginį visiems. Kas su juo turėtų nutikti pasibaigus?",
       "public": "Palikti viešą",
-      "publicHelp": "Pasibaigusio renginio puslapis lieka matomas su suvestine, klausimais, apklausomis, medžiaga ir atsiliepimais.",
       "library": "Paskelbti bibliotekoje",
       "libraryHelp": "Kaip pirmiau, o be to renginys rodomas viešoje vaizdo įrašų bibliotekoje (reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo).",
       "archive": "Archyvuoti (privatu)",
       "archiveHelp": "Pasibaigusio renginio puslapis nebus matomas viešai. Duomenys saugomi iki saugojimo laikotarpio pabaigos, tada ištrinami.",
       "genAi": "Generuoti DI transkripciją ir santrauką iš įrašo (kai baigsis apdorojimas)",
       "back": "Atgal",
-      "confirm": "Užbaigti renginį"
+      "confirm": "Užbaigti renginį",
+      "publicHelpList": "Pasibaigusio renginio puslapis lieka matomas ir, jei yra, rodo {sections}.",
+      "publicHelpNone": "Pasibaigusio renginio puslapis lieka matomas su pavadinimu ir aprašymu.",
+      "sections": {
+        "recap": "santrauką",
+        "qa": "klausimus ir atsakymus",
+        "polls": "paskelbtas apklausas",
+        "wordCloud": "žodžių debesį",
+        "materials": "medžiagą",
+        "feedback": "įvertinimus"
+      }
     },
     "eventNotStarted": "Renginys dar neprasidėjo",
     "eventStartsAt": "Renginys prasidės {date}, {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Klaida kuriant apklausą",
       "vote": "Balsas neužregistruotas. Bandykite dar kartą.",
       "alreadyVoted": "Šioje apklausoje jau balsavote.",
-      "action": "Veiksmas nepavyko. Bandykite dar kartą."
+      "action": "Veiksmas nepavyko. Bandykite dar kartą.",
+      "closed": "Apklausa uždaryta."
     },
     "participation": "{votes, plural, one {# balsas} few {# balsai} other {# balsų}} iš {present} dalyvaujančių",
     "participationLabel": "Dalyvavimas apklausoje",
@@ -4724,7 +4734,8 @@
       "materials": "Medžiaga",
       "polls": "Apklausos",
       "feedback": "Atsiliepimai",
-      "transcript": "DI transkripcija"
+      "transcript": "DI transkripcija",
+      "ratingsCount": "{count, plural, one {# įvertinimas} few {# įvertinimai} many {# įvertinimo} other {# įvertinimų}}"
     },
     "recordingNotify": "Pranešti užsiregistravusiems, kai įrašas paskelbtas",
     "recordingNotifyHelp": "Vienas el. laiškas, kai įrašas (ar išorinis vaizdo įrašas) matomas viešame renginio puslapyje. Jis pasiekia vis dar užsiregistravusius: pasibaigus saugojimo laikotarpiui niekam nepranešama.",
@@ -4898,7 +4909,8 @@
     "no": "Ne",
     "scaleValue": "{value} iš {max}",
     "answerOne": "Kad išsiųstumėte, atsakykite bent į vieną klausimą.",
-    "pageTitle": "Klausimynas"
+    "pageTitle": "Klausimynas",
+    "onlyParticipants": "Įvertinti gali tik renginyje dalyvavę asmenys."
   },
   "notFound": {
     "title": "Puslapis nerastas",

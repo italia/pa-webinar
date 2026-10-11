@@ -302,14 +302,23 @@
       "title": "Usoda dogodka",
       "body": "Dogodek boste končali za vse. Kaj naj se z njim zgodi po zaključku?",
       "public": "Ohrani javno",
-      "publicHelp": "Stran končanega dogodka ostane vidna s povzetkom, vprašanji, anketami, gradivi in povratnimi informacijami.",
       "library": "Objavi v knjižnici",
       "libraryHelp": "Kot zgoraj, poleg tega pa dogodek prikaže v javni videoknjižnici (zahteva objavljen posnetek ali videoposnetek na YouTubu).",
       "archive": "Arhiviraj (zasebno)",
       "archiveHelp": "Stran končanega dogodka ne bo vidna javnosti. Podatki se hranijo do izteka obdobja hrambe, nato se izbrišejo.",
       "genAi": "Iz posnetka ustvari prepis in povzetek z AI (ko se obdelava konča)",
       "back": "Nazaj",
-      "confirm": "Končaj dogodek"
+      "confirm": "Končaj dogodek",
+      "publicHelpList": "Stran končanega dogodka ostane vidna in, če obstajajo, prikazuje {sections}.",
+      "publicHelpNone": "Stran končanega dogodka ostane vidna, z naslovom in opisom.",
+      "sections": {
+        "recap": "povzetek",
+        "qa": "vprašanja iz Q&A",
+        "polls": "objavljene ankete",
+        "wordCloud": "oblak besed",
+        "materials": "gradiva",
+        "feedback": "ocene"
+      }
     },
     "eventNotStarted": "Dogodek se še ni začel",
     "eventStartsAt": "Dogodek se bo začel {date} ob {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Napaka pri ustvarjanju ankete",
       "vote": "Glas ni bil zabeležen. Poskusite znova.",
       "alreadyVoted": "V tej anketi ste že glasovali.",
-      "action": "Dejanje ni uspelo. Poskusite znova."
+      "action": "Dejanje ni uspelo. Poskusite znova.",
+      "closed": "Anketa je zaprta."
     },
     "participation": "{votes, plural, one {# glas} two {# glasova} few {# glasovi} other {# glasov}} od {present} prisotnih",
     "participationLabel": "Sodelovanje v anketi",
@@ -4724,7 +4734,8 @@
       "materials": "Gradiva",
       "polls": "Ankete",
       "feedback": "Povratne informacije",
-      "transcript": "Prepis AI"
+      "transcript": "Prepis AI",
+      "ratingsCount": "{count, plural, one {# ocena} two {# oceni} few {# ocene} other {# ocen}}"
     },
     "recordingNotify": "Obvesti prijavljene, ko je posnetek objavljen",
     "recordingNotifyHelp": "Eno samo sporočilo, ko je posnetek (ali zunanji video) viden na javni strani dogodka. Dobijo ga še prijavljeni: po izteku hrambe nihče.",
@@ -4898,7 +4909,8 @@
     "no": "Ne",
     "scaleValue": "{value} od {max}",
     "answerOne": "Za pošiljanje odgovorite vsaj na eno vprašanje.",
-    "pageTitle": "Vprašalnik"
+    "pageTitle": "Vprašalnik",
+    "onlyParticipants": "Dogodek lahko ocenijo samo tisti, ki so se ga udeležili."
   },
   "notFound": {
     "title": "Strani ni mogoče najti",

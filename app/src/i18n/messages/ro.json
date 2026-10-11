@@ -302,14 +302,23 @@
       "title": "Soarta evenimentului",
       "body": "Sunteți pe cale să încheiați evenimentul pentru toți. Ce doriți să se întâmple cu el după încheiere?",
       "public": "Păstrează-l public",
-      "publicHelp": "Pagina evenimentului încheiat rămâne vizibilă, cu recapitulare, întrebări, sondaje, materiale și feedback.",
       "library": "Publică în bibliotecă",
       "libraryHelp": "Ca mai sus și, în plus, afișează evenimentul în biblioteca video publică (necesită o înregistrare publicată sau un videoclip YouTube).",
       "archive": "Arhivează (privat)",
       "archiveHelp": "Pagina evenimentului încheiat nu va fi vizibilă publicului. Datele se păstrează până la sfârșitul perioadei de păstrare, apoi sunt șterse.",
       "genAi": "Generează transcrierea și rezumatul AI din înregistrare (la finalul procesării)",
       "back": "Înapoi",
-      "confirm": "Încheie evenimentul"
+      "confirm": "Încheie evenimentul",
+      "publicHelpList": "Pagina evenimentului încheiat rămâne vizibilă și, dacă există, afișează {sections}.",
+      "publicHelpNone": "Pagina evenimentului încheiat rămâne vizibilă, cu titlul și descrierea.",
+      "sections": {
+        "recap": "rezumatul",
+        "qa": "întrebările din sesiunea Q&A",
+        "polls": "sondajele publicate",
+        "wordCloud": "norul de cuvinte",
+        "materials": "materialele",
+        "feedback": "evaluările"
+      }
     },
     "eventNotStarted": "Evenimentul nu a început încă",
     "eventStartsAt": "Evenimentul va începe pe {date} la ora {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Eroare la crearea sondajului",
       "vote": "Votul nu a fost înregistrat. Reîncercați.",
       "alreadyVoted": "Ați votat deja în acest sondaj.",
-      "action": "Acțiunea nu a reușit. Încercați din nou."
+      "action": "Acțiunea nu a reușit. Încercați din nou.",
+      "closed": "Sondajul este închis."
     },
     "participation": "{votes, plural, one {# vot} few {# voturi} other {# de voturi}} din {present} prezenți",
     "participationLabel": "Participarea la sondaj",
@@ -4724,7 +4734,8 @@
       "materials": "Materiale",
       "polls": "Sondaje",
       "feedback": "Feedback",
-      "transcript": "Transcriere AI"
+      "transcript": "Transcriere AI",
+      "ratingsCount": "{count, plural, one {# evaluare} few {# evaluări} other {# de evaluări}}"
     },
     "recordingNotify": "Anunță înscrișii când înregistrarea este publicată",
     "recordingNotifyHelp": "Un singur e-mail, când înregistrarea (sau videoclipul extern) este vizibilă pe pagina publică a evenimentului. Ajunge la cei încă înscriși: după perioada de păstrare nu este anunțat nimeni.",
@@ -4898,7 +4909,8 @@
     "no": "Nu",
     "scaleValue": "{value} din {max}",
     "answerOne": "Răspunde la cel puțin o întrebare pentru a trimite.",
-    "pageTitle": "Chestionar"
+    "pageTitle": "Chestionar",
+    "onlyParticipants": "Doar cei care au participat la eveniment îl pot evalua."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",

@@ -302,14 +302,23 @@
       "title": "Osud události",
       "body": "Chystáte se ukončit událost pro všechny. Co se s ní má stát po skončení?",
       "public": "Ponechat veřejnou",
-      "publicHelp": "Stránka ukončené události zůstane viditelná se shrnutím, otázkami, anketami, materiály a zpětnou vazbou.",
       "library": "Publikovat do knihovny",
       "libraryHelp": "Jako výše a navíc se událost zobrazí ve veřejné videoknihovně (vyžaduje publikovaný záznam nebo video na YouTube).",
       "archive": "Archivovat (soukromé)",
       "archiveHelp": "Stránka ukončené akce nebude veřejně viditelná. Data se uchovávají do konce doby uchování a poté se smažou.",
       "genAi": "Vygenerovat přepis a AI shrnutí ze záznamu (po dokončení zpracování)",
       "back": "Zpět",
-      "confirm": "Ukončit událost"
+      "confirm": "Ukončit událost",
+      "publicHelpList": "Stránka skončené akce zůstává viditelná a, pokud existují, ukazuje {sections}.",
+      "publicHelpNone": "Stránka skončené akce zůstává viditelná, s názvem a popisem.",
+      "sections": {
+        "recap": "shrnutí",
+        "qa": "otázky z Q&A",
+        "polls": "zveřejněné ankety",
+        "wordCloud": "slovní mrak",
+        "materials": "materiály",
+        "feedback": "hodnocení"
+      }
     },
     "eventNotStarted": "Událost ještě nezačala",
     "eventStartsAt": "Událost začne {date} v {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Chyba při vytváření ankety",
       "vote": "Hlas nebyl zaznamenán. Zkuste to znovu.",
       "alreadyVoted": "V této anketě jste již hlasovali.",
-      "action": "Akce se nezdařila. Zkuste to znovu."
+      "action": "Akce se nezdařila. Zkuste to znovu.",
+      "closed": "Anketa je uzavřená."
     },
     "participation": "{votes, plural, one {# hlas} few {# hlasy} other {# hlasů}} z {present} přítomných",
     "participationLabel": "Účast v anketě",
@@ -4724,7 +4734,8 @@
       "materials": "Materiály",
       "polls": "Ankety",
       "feedback": "Zpětná vazba",
-      "transcript": "AI přepis"
+      "transcript": "AI přepis",
+      "ratingsCount": "{count, plural, one {# hodnocení} few {# hodnocení} many {# hodnocení} other {# hodnocení}}"
     },
     "recordingNotify": "Upozornit přihlášené, až bude záznam zveřejněn",
     "recordingNotifyHelp": "Jediný e-mail, jakmile je záznam (nebo externí video) viditelný na veřejné stránce akce. Dostanou ho ti, kdo jsou stále přihlášeni: po uplynutí doby uchování už nikdo.",
@@ -4898,7 +4909,8 @@
     "no": "Ne",
     "scaleValue": "{value} z {max}",
     "answerOne": "Pro odeslání odpovězte alespoň na jednu otázku.",
-    "pageTitle": "Dotazník"
+    "pageTitle": "Dotazník",
+    "onlyParticipants": "Hodnotit mohou jen ti, kdo se akce zúčastnili."
   },
   "notFound": {
     "title": "Stránka nenalezena",

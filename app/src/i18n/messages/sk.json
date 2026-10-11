@@ -302,14 +302,23 @@
       "title": "Osud podujatia",
       "body": "Chystáte sa ukončiť podujatie pre všetkých. Čo sa s ním má stať po skončení?",
       "public": "Ponechať verejné",
-      "publicHelp": "Stránka skončeného podujatia zostane viditeľná so zhrnutím, otázkami, anketami, materiálmi a spätnou väzbou.",
       "library": "Publikovať do knižnice",
       "libraryHelp": "Ako vyššie a navyše zobrazí podujatie vo verejnej videoknižnici (vyžaduje publikovanú nahrávku alebo video na YouTube).",
       "archive": "Archivovať (súkromné)",
       "archiveHelp": "Stránka skončeného podujatia nebude verejne viditeľná. Údaje sa uchovávajú do konca doby uchovávania a potom sa vymažú.",
       "genAi": "Vygenerovať prepis a zhrnutie pomocou AI z nahrávky (po dokončení spracovania)",
       "back": "Späť",
-      "confirm": "Ukončiť podujatie"
+      "confirm": "Ukončiť podujatie",
+      "publicHelpList": "Stránka skončeného podujatia zostáva viditeľná a, ak existujú, zobrazuje {sections}.",
+      "publicHelpNone": "Stránka skončeného podujatia zostáva viditeľná, s názvom a popisom.",
+      "sections": {
+        "recap": "zhrnutie",
+        "qa": "otázky z Q&A",
+        "polls": "zverejnené ankety",
+        "wordCloud": "slovný mrak",
+        "materials": "materiály",
+        "feedback": "hodnotenia"
+      }
     },
     "eventNotStarted": "Udalosť ešte nezačala",
     "eventStartsAt": "Udalosť začne {date} o {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Chyba pri vytváraní ankety",
       "vote": "Hlas nebol zaznamenaný. Skúste to znova.",
       "alreadyVoted": "V tejto ankete ste už hlasovali.",
-      "action": "Akcia zlyhala. Skúste to znova."
+      "action": "Akcia zlyhala. Skúste to znova.",
+      "closed": "Anketa je uzavretá."
     },
     "participation": "{votes, plural, one {# hlas} few {# hlasy} other {# hlasov}} z {present} prítomných",
     "participationLabel": "Účasť v ankete",
@@ -4724,7 +4734,8 @@
       "materials": "Materiály",
       "polls": "Ankety",
       "feedback": "Spätná väzba",
-      "transcript": "AI prepis"
+      "transcript": "AI prepis",
+      "ratingsCount": "{count, plural, one {# hodnotenie} few {# hodnotenia} many {# hodnotení} other {# hodnotení}}"
     },
     "recordingNotify": "Upozorniť prihlásených, keď bude záznam zverejnený",
     "recordingNotifyHelp": "Jediný e-mail, keď je záznam (alebo externé video) viditeľný na verejnej stránke podujatia. Dostanú ho tí, ktorí sú stále prihlásení: po uplynutí doby uchovávania už nikto.",
@@ -4898,7 +4909,8 @@
     "no": "Nie",
     "scaleValue": "{value} z {max}",
     "answerOne": "Na odoslanie odpovedzte aspoň na jednu otázku.",
-    "pageTitle": "Dotazník"
+    "pageTitle": "Dotazník",
+    "onlyParticipants": "Hodnotiť môžu len tí, ktorí sa podujatia zúčastnili."
   },
   "notFound": {
     "title": "Stránka sa nenašla",

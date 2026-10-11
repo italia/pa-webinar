@@ -302,14 +302,23 @@
       "title": "Tapahtuman kohtalo",
       "body": "Olet päättämässä tapahtuman kaikilta. Mitä sille tehdään päättymisen jälkeen?",
       "public": "Pidä julkisena",
-      "publicHelp": "Päättyneen tapahtuman sivu pysyy näkyvissä, ja siinä ovat yhteenveto, kysymykset, kyselyt, materiaalit ja palaute.",
       "library": "Julkaise kirjastoon",
       "libraryHelp": "Kuten yllä, ja lisäksi tapahtuma näytetään julkisessa videokirjastossa (edellyttää julkaistua tallennetta tai YouTube-videota).",
       "archive": "Arkistoi (yksityinen)",
       "archiveHelp": "Päättyneen tapahtuman sivu ei näy yleisölle. Tiedot säilytetään säilytysajan loppuun ja poistetaan sen jälkeen.",
       "genAi": "Luo tallenteesta tekoälyllä litterointi ja yhteenveto (kun käsittely on valmis)",
       "back": "Takaisin",
-      "confirm": "Päätä tapahtuma"
+      "confirm": "Päätä tapahtuma",
+      "publicHelpList": "Päättyneen tapahtuman sivu pysyy näkyvissä ja näyttää, jos niitä on, {sections}.",
+      "publicHelpNone": "Päättyneen tapahtuman sivu pysyy näkyvissä otsikon ja kuvauksen kanssa.",
+      "sections": {
+        "recap": "yhteenvedon",
+        "qa": "kysymykset ja vastaukset",
+        "polls": "julkaistut kyselyt",
+        "wordCloud": "sanapilven",
+        "materials": "materiaalit",
+        "feedback": "arviot"
+      }
     },
     "eventNotStarted": "Tapahtuma ei ole vielä alkanut",
     "eventStartsAt": "Tapahtuma alkaa {date} klo {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Virhe kyselyn luomisessa",
       "vote": "Ääntä ei tallennettu. Yritä uudelleen.",
       "alreadyVoted": "Olet jo äänestänyt tässä kyselyssä.",
-      "action": "Toiminto epäonnistui. Yritä uudelleen."
+      "action": "Toiminto epäonnistui. Yritä uudelleen.",
+      "closed": "Kysely on suljettu."
     },
     "participation": "{votes, plural, one {# ääni} other {# ääntä}} / {present} paikalla",
     "participationLabel": "Osallistuminen kyselyyn",
@@ -4724,7 +4734,8 @@
       "materials": "Materiaalit",
       "polls": "Kyselyt",
       "feedback": "Palaute",
-      "transcript": "Tekoälylitterointi"
+      "transcript": "Tekoälylitterointi",
+      "ratingsCount": "{count, plural, one {# arvio} other {# arviota}}"
     },
     "recordingNotify": "Ilmoita osallistujille, kun tallenne julkaistaan",
     "recordingNotifyHelp": "Yksi sähköposti, kun tallenne (tai ulkoinen video) näkyy tapahtuman julkisella sivulla. Se tavoittaa vielä ilmoittautuneet: säilytysajan jälkeen ketään ei ilmoiteta.",
@@ -4898,7 +4909,8 @@
     "no": "Ei",
     "scaleValue": "{value}/{max}",
     "answerOne": "Vastaa vähintään yhteen kysymykseen lähettääksesi.",
-    "pageTitle": "Kysely"
+    "pageTitle": "Kysely",
+    "onlyParticipants": "Vain tapahtumaan osallistuneet voivat arvioida sen."
   },
   "notFound": {
     "title": "Sivua ei löytynyt",

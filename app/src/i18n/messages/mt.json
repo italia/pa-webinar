@@ -302,14 +302,23 @@
       "title": "Destin tal-avveniment",
       "body": "Int wasalt biex ittemm l-avveniment għal kulħadd. X'għandu jsir bih ladarba jintemm?",
       "public": "Żommu pubbliku",
-      "publicHelp": "Il-paġna tal-avveniment mitmum tibqa' viżibbli bil-ġabra fil-qosor, il-mistoqsijiet, l-istħarriġ, il-materjali u l-feedback.",
       "library": "Ippubblika fil-librerija",
       "libraryHelp": "Bħal ta' fuq, u barra minn hekk juri l-avveniment fil-librerija pubblika tal-vidjows (teħtieġ reġistrazzjoni ppubblikata jew vidjow YouTube).",
       "archive": "Arkivja (privat)",
       "archiveHelp": "Il-paġna tal-avveniment li ntemm mhix se tkun viżibbli għall-pubbliku. Id-data tinżamm sa tmiem il-perjodu taż-żamma, imbagħad titħassar.",
       "genAi": "Iġġenera traskrizzjoni u sommarju bl-AI mir-reġistrazzjoni (meta tintemm l-elaborazzjoni)",
       "back": "Lura",
-      "confirm": "Temm l-avveniment"
+      "confirm": "Temm l-avveniment",
+      "publicHelpList": "Il-paġna tal-avveniment li ntemm tibqa' viżibbli u, jekk hemm, turi {sections}.",
+      "publicHelpNone": "Il-paġna tal-avveniment li ntemm tibqa' viżibbli, bit-titlu u d-deskrizzjoni.",
+      "sections": {
+        "recap": "is-sommarju",
+        "qa": "il-mistoqsijiet tal-Q&A",
+        "polls": "l-istħarriġiet ippubblikati",
+        "wordCloud": "is-sħaba tal-kliem",
+        "materials": "il-materjali",
+        "feedback": "l-evalwazzjonijiet"
+      }
     },
     "eventNotStarted": "L-avveniment għadu ma bediex",
     "eventStartsAt": "L-avveniment se jibda nhar {date} fil-{time}",
@@ -3415,7 +3424,8 @@
       "generic": "Żball fil-ħolqien tal-istħarriġa",
       "vote": "Il-vot ma ġiex irreġistrat. Erġa' pprova.",
       "alreadyVoted": "Diġà vvutajt f'dan l-istħarriġ.",
-      "action": "L-azzjoni ma rnexxietx. Erġa' pprova."
+      "action": "L-azzjoni ma rnexxietx. Erġa' pprova.",
+      "closed": "L-istħarriġ huwa magħluq."
     },
     "participation": "{votes, plural, one {# vot} other {# voti}} minn {present} preżenti",
     "participationLabel": "Parteċipazzjoni fl-istħarriġ",
@@ -4724,7 +4734,8 @@
       "materials": "Materjali",
       "polls": "Stħarriġ",
       "feedback": "Feedback",
-      "transcript": "Traskrizzjoni bl-AI"
+      "transcript": "Traskrizzjoni bl-AI",
+      "ratingsCount": "{count, plural, one {# evalwazzjoni} other {# evalwazzjonijiet}}"
     },
     "recordingNotify": "Avża lill-irreġistrati meta r-reġistrazzjoni tiġi ppubblikata",
     "recordingNotifyHelp": "Email waħda biss, meta r-reġistrazzjoni (jew il-vidjo estern) tidher fil-paġna pubblika tal-avveniment. Tasal għand min għadu rreġistrat: wara l-perjodu taż-żamma ħadd ma jiġi avżat.",
@@ -4898,7 +4909,8 @@
     "no": "Le",
     "scaleValue": "{value} minn {max}",
     "answerOne": "Wieġeb mill-inqas mistoqsija waħda biex tibgħat.",
-    "pageTitle": "Kwestjonarju"
+    "pageTitle": "Kwestjonarju",
+    "onlyParticipants": "L-evalwazzjoni hija biss għal min ipparteċipa fl-avveniment."
   },
   "notFound": {
     "title": "Il-paġna ma nstabitx",

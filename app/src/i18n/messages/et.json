@@ -302,14 +302,23 @@
       "title": "Sündmuse saatus",
       "body": "Oled lõpetamas sündmust kõigi jaoks. Mis peaks sellega pärast lõppu juhtuma?",
       "public": "Jäta avalikuks",
-      "publicHelp": "Lõppenud sündmuse leht jääb nähtavaks koos kokkuvõtte, küsimuste, küsitluste, materjalide ja tagasisidega.",
       "library": "Avalda videokogus",
       "libraryHelp": "Nagu ülal, lisaks kuvatakse sündmust avalikus videokogus (eeldab avaldatud salvestist või YouTube'i videot).",
       "archive": "Arhiveeri (privaatne)",
       "archiveHelp": "Lõppenud ürituse leht ei ole avalikkusele nähtav. Andmeid säilitatakse säilitusaja lõpuni ja seejärel need kustutatakse.",
       "genAi": "Loo salvestisest AI transkriptsioon ja kokkuvõte (kui töötlus on lõppenud)",
       "back": "Tagasi",
-      "confirm": "Lõpeta sündmus"
+      "confirm": "Lõpeta sündmus",
+      "publicHelpList": "Lõppenud ürituse leht jääb nähtavaks ja näitab, kui need on olemas, {sections}.",
+      "publicHelpNone": "Lõppenud ürituse leht jääb nähtavaks koos pealkirja ja kirjeldusega.",
+      "sections": {
+        "recap": "kokkuvõtet",
+        "qa": "küsimusi ja vastuseid",
+        "polls": "avaldatud küsitlusi",
+        "wordCloud": "sõnapilve",
+        "materials": "materjale",
+        "feedback": "hinnanguid"
+      }
     },
     "eventNotStarted": "Üritus ei ole veel alanud",
     "eventStartsAt": "Üritus algab {date} kell {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Viga küsitluse loomisel",
       "vote": "Häält ei salvestatud. Proovige uuesti.",
       "alreadyVoted": "Olete selles küsitluses juba hääletanud.",
-      "action": "Toiming ebaõnnestus. Proovi uuesti."
+      "action": "Toiming ebaõnnestus. Proovi uuesti.",
+      "closed": "Küsitlus on suletud."
     },
     "participation": "{votes, plural, one {# hääl} other {# häält}} {present} kohalviibijast",
     "participationLabel": "Küsitluses osalemine",
@@ -4724,7 +4734,8 @@
       "materials": "Materjalid",
       "polls": "Küsitlused",
       "feedback": "Tagasiside",
-      "transcript": "AI transkriptsioon"
+      "transcript": "AI transkriptsioon",
+      "ratingsCount": "{count, plural, one {# hinnang} other {# hinnangut}}"
     },
     "recordingNotify": "Teavita registreerunuid, kui salvestis avaldatakse",
     "recordingNotifyHelp": "Üks e-kiri, kui salvestis (või väline video) on ürituse avalikul lehel nähtav. See jõuab nendeni, kes on veel registreeritud: pärast säilitusaega kedagi ei teavitata.",
@@ -4898,7 +4909,8 @@
     "no": "Ei",
     "scaleValue": "{value}/{max}",
     "answerOne": "Saatmiseks vasta vähemalt ühele küsimusele.",
-    "pageTitle": "Küsimustik"
+    "pageTitle": "Küsimustik",
+    "onlyParticipants": "Üritust saavad hinnata ainult selles osalenud inimesed."
   },
   "notFound": {
     "title": "Lehte ei leitud",

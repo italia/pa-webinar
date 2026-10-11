@@ -36,6 +36,8 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
+const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
+vi.mock('@/lib/events/close-polls', () => sondaggi);
 
 import { prisma } from '@/lib/db';
 
@@ -82,6 +84,7 @@ describe('POST /api/admin/events/bulk-archive — sessioni di chiamata', () => {
       data: { status: 'ARCHIVED' },
     });
     expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [A, C], expect.any(Date));
+    expect(sondaggi.chiudiSondaggiAperti).toHaveBeenCalledWith(prisma, [A, C], expect.any(Date));
   });
 
   it('l\'organizzatore resta nel perimetro dei suoi eventi (propri e co-organizzati)', async () => {

@@ -195,3 +195,14 @@ describe('uscita dalla rubrica nelle email', () => {
     expect(without.html).not.toContain('opt-out');
   });
 });
+
+describe('email di ringraziamento: la valutazione solo a chi e\' entrato', () => {
+  it('chi e\' entrato e\' invitato a valutare, gli altri ricevono il riepilogo', async () => {
+    const { postEventParticipantEmail } = await import('./templates');
+    const base = { locale: 'it' as const, eventTitle: 'Evento', eventPageUrl: 'https://example.gov.it/it/eventi/x' };
+    expect(postEventParticipantEmail(base).text).toContain('feedback');
+    const soloRiepilogo = postEventParticipantEmail({ ...base, inviteRating: false });
+    expect(soloRiepilogo.text).not.toContain('feedback');
+    expect(soloRiepilogo.text).toContain('riepilogo');
+  });
+});

@@ -302,14 +302,23 @@
       "title": "Evenemangets öde",
       "body": "Du är på väg att avsluta evenemanget för alla. Vad ska hända med det när det är slut?",
       "public": "Behåll det publikt",
-      "publicHelp": "Sidan för det avslutade evenemanget förblir synlig med sammanfattning, frågor och svar, omröstningar, material och feedback.",
       "library": "Publicera i biblioteket",
       "libraryHelp": "Som ovan, och dessutom visas evenemanget i det publika videobiblioteket (kräver en publicerad inspelning eller en YouTube-video).",
       "archive": "Arkivera (privat)",
       "archiveHelp": "Sidan för det avslutade evenemanget blir inte synlig för allmänheten. Uppgifterna sparas tills lagringstiden löper ut och raderas sedan.",
       "genAi": "Generera AI-transkription och sammanfattning från inspelningen (när bearbetningen är klar)",
       "back": "Tillbaka",
-      "confirm": "Avsluta evenemanget"
+      "confirm": "Avsluta evenemanget",
+      "publicHelpList": "Sidan för det avslutade evenemanget förblir synlig och visar, om de finns, {sections}.",
+      "publicHelpNone": "Sidan för det avslutade evenemanget förblir synlig, med titel och beskrivning.",
+      "sections": {
+        "recap": "sammanfattningen",
+        "qa": "frågorna från frågestunden",
+        "polls": "de publicerade omröstningarna",
+        "wordCloud": "ordmolnet",
+        "materials": "materialet",
+        "feedback": "betygen"
+      }
     },
     "eventNotStarted": "Evenemanget har inte börjat ännu",
     "eventStartsAt": "Evenemanget börjar den {date} kl. {time}",
@@ -3415,7 +3424,8 @@
       "generic": "Fel vid skapande av omröstning",
       "vote": "Rösten registrerades inte. Försök igen.",
       "alreadyVoted": "Du har redan röstat i den här omröstningen.",
-      "action": "Åtgärden misslyckades. Försök igen."
+      "action": "Åtgärden misslyckades. Försök igen.",
+      "closed": "Omröstningen är stängd."
     },
     "participation": "{votes, plural, one {# röst} other {# röster}} av {present} närvarande",
     "participationLabel": "Deltagande i omröstningen",
@@ -4724,7 +4734,8 @@
       "materials": "Material",
       "polls": "Omröstningar",
       "feedback": "Feedback",
-      "transcript": "AI-transkription"
+      "transcript": "AI-transkription",
+      "ratingsCount": "{count, plural, one {# betyg} other {# betyg}}"
     },
     "recordingNotify": "Meddela anmälda när inspelningen publiceras",
     "recordingNotifyHelp": "Ett enda mejl när inspelningen (eller den externa videon) syns på evenemangets offentliga sida. Det når dem som fortfarande är anmälda: efter lagringstiden meddelas ingen.",
@@ -4898,7 +4909,8 @@
     "no": "Nej",
     "scaleValue": "{value} av {max}",
     "answerOne": "Svara på minst en fråga för att skicka.",
-    "pageTitle": "Enkät"
+    "pageTitle": "Enkät",
+    "onlyParticipants": "Bara de som deltog i evenemanget kan betygsätta det."
   },
   "notFound": {
     "title": "Sidan hittades inte",

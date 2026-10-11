@@ -149,6 +149,10 @@ interface EventDetailClientProps {
   guestEntryOpen?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
+  /** La prova di chi ha partecipato, se il server l'ha riconosciuta (link
+   *  personale o link della valutazione): con questa la pagina offre la
+   *  valutazione di fine evento. */
+  feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
   /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
   report?: ReportView | null;
 }
@@ -188,6 +192,7 @@ export default function EventDetailClient({
   registrationOpen,
   guestEntryOpen = true,
   hasPostEventQuestionnaire = false,
+  feedbackProof = null,
   report = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
@@ -803,12 +808,18 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Invito al questionario post-evento: solo se l'evento ne ha uno
-              (lo dice il server). */}
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno e
+              solo a chi ha partecipato, con la sua iscrizione (lo dice il
+              server): a chiunque altro il modulo verrebbe rifiutato all'invio. */}
           {isEnded &&
             event.postEventShowFeedback !== false &&
-            hasPostEventQuestionnaire && (
-              <PostEventFeedbackInvite eventSlug={event.slug} />
+            hasPostEventQuestionnaire &&
+            feedbackProof && (
+              <PostEventFeedbackInvite
+                eventSlug={event.slug}
+                accessToken={feedbackProof.accessToken}
+                ratingToken={feedbackProof.ratingToken}
+              />
             )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
