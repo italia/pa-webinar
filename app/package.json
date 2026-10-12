@@ -35,7 +35,7 @@
     "@fullcalendar/interaction": "^6.1.21",
     "@fullcalendar/list": "^6.1.21",
     "@fullcalendar/multimonth": "^6.1.21",
-    "@fullcalendar/react": "^6.1.20",
+    "@fullcalendar/react": "^7.1.1",
     "@fullcalendar/timegrid": "^6.1.21",
     "@mediapipe/tasks-vision": "0.10.35",
     "@pa-webinar/lobby": "*",
