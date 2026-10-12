@@ -59,6 +59,15 @@
     "cancel": "Mégse",
     "confirm": "Megerősítés",
     "close": "Bezárás",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kód: {name}",
+      "alt": "QR-kód a(z) „{name}” hivatkozáshoz",
+      "hint": "Olvassa be a telefon kamerájával a hivatkozás megnyitásához.",
+      "download": "Letöltés (SVG)",
+      "error": "A QR-kódot nem sikerült létrehozni. Töltse be újra az oldalt, és próbálja újra; addig is kimásolhatja a hivatkozást."
+    },
     "back": "Vissza",
     "next": "Tovább",
     "send": "Küldés",

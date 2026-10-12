@@ -1181,6 +1181,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
       <div className="mt-4">
         <H>{tl('title')}</H>
         <EventLinksSection
+          slug={event.slug}
           // Senza accesso degli ospiti l'invito diretto non fa entrare
           // nessuno: porta all'iscrizione, come la pagina pubblica. Per una
           // chiamata rapida lo stesso indirizzo e' IL link dei partecipanti,

@@ -59,6 +59,15 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "close": "Fechar",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Código QR: {name}",
+      "alt": "Código QR da ligação «{name}»",
+      "hint": "Aponte a câmara do telemóvel para abrir a ligação.",
+      "download": "Transferir (SVG)",
+      "error": "Não foi possível criar o código QR. Recarregue a página e tente novamente; entretanto, pode copiar a ligação."
+    },
     "back": "Voltar",
     "next": "Seguinte",
     "send": "Enviar",

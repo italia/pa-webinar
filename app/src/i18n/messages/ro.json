@@ -59,6 +59,15 @@
     "cancel": "Anulați",
     "confirm": "Confirmați",
     "close": "Închideți",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Cod QR: {name}",
+      "alt": "Cod QR pentru linkul „{name}”",
+      "hint": "Scanează-l cu camera telefonului pentru a deschide linkul.",
+      "download": "Descarcă (SVG)",
+      "error": "Codul QR nu a putut fi creat. Reîncarcă pagina și încearcă din nou; între timp poți copia linkul."
+    },
     "back": "Înapoi",
     "next": "Înainte",
     "send": "Trimiteți",

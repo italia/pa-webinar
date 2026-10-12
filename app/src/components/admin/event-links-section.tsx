@@ -19,6 +19,8 @@
 import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import LinkQr, { nomeFileQr } from '@/components/ui/link-qr';
+
 interface Riga {
   chiave: 'publicPage' | 'guestJoin' | 'callInvite' | 'moderatorLink';
   url: string;
@@ -35,7 +37,14 @@ function Chiave() {
   );
 }
 
-export default function EventLinksSection({ righe }: { righe: Riga[] }) {
+export default function EventLinksSection({
+  righe,
+  slug,
+}: {
+  righe: Riga[];
+  /** Per il nome dei file dei codici QR. */
+  slug: string;
+}) {
   const t = useTranslations('admin.links');
   // Scoperte una per una: oggi la riga riservata e' una sola, ma il giorno in
   // cui se ne aggiunge un'altra un interruttore unico scoprirebbe anche quella
@@ -111,6 +120,18 @@ export default function EventLinksSection({ righe }: { righe: Riga[] }) {
                 </div>
               </div>
               <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                {/* Il QR solo per i link senza token: chi fotografa lo schermo
+                    non deve portarsi via una credenziale. */}
+                {!r.riservato && (
+                  <LinkQr
+                    url={r.url}
+                    nome={t(`${r.chiave}`)}
+                    nomeFile={nomeFileQr(
+                      slug,
+                      r.chiave === 'publicPage' ? 'pagina' : 'sala',
+                    )}
+                  />
+                )}
                 {r.riservato && (
                   <button
                     type="button"

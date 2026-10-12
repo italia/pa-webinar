@@ -1728,6 +1728,41 @@ button.live-time-strip__rec {
   }
 }
 
+// Il QR accanto a «Copia»: secondario, bianco con il testo blu. Sul telefono
+// resta l'icona, perche' l'indirizzo da controllare abbia spazio.
+.live-share__qr {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0066cc;
+  white-space: nowrap;
+  background: #fff;
+  border: 0;
+  border-left: 1px solid #d9e2ec;
+
+  &:hover {
+    background: #eef4fb;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb400;
+    outline-offset: -2px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .live-share__qr {
+    padding: 0 0.55rem;
+
+    span {
+      display: none;
+    }
+  }
+}
+
 .live-share__copy--danger {
   background: #cc334d;
 
@@ -11076,4 +11111,70 @@ html.live-resizing .live-sidebar-resizer::after {
   border-radius: 8px;
   background: #f5f7fb;
   color: var(--app-muted);
+}
+
+// Il codice QR di un link (components/ui/link-qr): grande, nero su bianco,
+// da proiettare o stampare.
+.link-qr {
+  width: min(560px, 94vw);
+  max-height: 94vh;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+
+  &::backdrop {
+    background: rgba(23, 50, 77, 0.6);
+  }
+}
+
+.link-qr__corpo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.link-qr__titolo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.link-qr__codice {
+  width: min(400px, 70vmin);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.link-qr__link {
+  margin: 0;
+  font-family: var(--bs-font-monospace, monospace);
+  font-size: 0.78rem;
+  color: #33485f;
+  word-break: break-all;
+}
+
+.link-qr__errore {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #a32a3e;
+  background: #fdecee;
+  border-radius: 6px;
+}
+
+.link-qr__aiuto {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5c6f82;
+}
+
+.link-qr__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
 }

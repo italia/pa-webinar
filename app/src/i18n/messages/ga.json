@@ -59,6 +59,15 @@
     "cancel": "Cealaigh",
     "confirm": "Deimhnigh",
     "close": "Dún",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Cód QR: {name}",
+      "alt": "Cód QR don nasc “{name}”",
+      "hint": "Scan é le ceamara an fhóin chun an nasc a oscailt.",
+      "download": "Íoslódáil (SVG)",
+      "error": "Níorbh fhéidir an cód QR a chruthú. Athlódáil an leathanach agus bain triail eile as; idir an dá linn is féidir leat an nasc a chóipeáil."
+    },
     "back": "Ar ais",
     "next": "Ar aghaidh",
     "send": "Seol",

@@ -59,6 +59,15 @@
     "cancel": "Tühista",
     "confirm": "Kinnita",
     "close": "Sulge",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kood: {name}",
+      "alt": "QR-kood lingile „{name}“",
+      "hint": "Skaneeri see telefoni kaameraga, et link avada.",
+      "download": "Laadi alla (SVG)",
+      "error": "QR-koodi ei õnnestunud luua. Laadi leht uuesti ja proovi uuesti; seni saad lingi kopeerida."
+    },
     "back": "Tagasi",
     "next": "Edasi",
     "send": "Saada",

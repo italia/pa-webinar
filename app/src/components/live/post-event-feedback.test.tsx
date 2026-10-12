@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+import { finestraNativa } from '@/test/dialog';
 
 import PostEventFeedback from './post-event-feedback';
 
@@ -61,27 +62,6 @@ function server({ get, post }: { get: () => Response | Promise<Response>; post?:
 
 let container: HTMLDivElement;
 let root: Root;
-
-/** jsdom non apre i <dialog>: showModal e close come nel browser, il tempo del test. */
-function finestraNativa() {
-  const proto = HTMLDialogElement.prototype as unknown as {
-    showModal?: () => void;
-    close?: () => void;
-  };
-  const showModal = vi.fn(function (this: HTMLDialogElement) {
-    this.setAttribute('open', '');
-  });
-  const close = vi.fn(function (this: HTMLDialogElement) {
-    this.removeAttribute('open');
-  });
-  proto.showModal = showModal;
-  proto.close = close;
-  onTestFinished(() => {
-    delete proto.showModal;
-    delete proto.close;
-  });
-  return { showModal, close };
-}
 
 function annuncio(): string | null {
   return container.querySelector('[role="status"]')?.textContent ?? null;

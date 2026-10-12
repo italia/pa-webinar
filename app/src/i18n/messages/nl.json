@@ -59,6 +59,15 @@
     "cancel": "Annuleren",
     "confirm": "Bevestigen",
     "close": "Sluiten",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-code: {name}",
+      "alt": "QR-code voor de link ‘{name}’",
+      "hint": "Scan hem met de camera van je telefoon om de link te openen.",
+      "download": "Downloaden (SVG)",
+      "error": "De QR-code kon niet worden gemaakt. Laad de pagina opnieuw en probeer het nog eens; intussen kun je de link kopiëren."
+    },
     "back": "Terug",
     "next": "Volgende",
     "send": "Verzenden",

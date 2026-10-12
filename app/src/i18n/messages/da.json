@@ -59,6 +59,15 @@
     "cancel": "Annuller",
     "confirm": "Bekræft",
     "close": "Luk",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kode: {name}",
+      "alt": "QR-kode til linket »{name}«",
+      "hint": "Scan den med telefonens kamera for at åbne linket.",
+      "download": "Download (SVG)",
+      "error": "QR-koden kunne ikke oprettes. Genindlæs siden, og prøv igen; i mellemtiden kan du kopiere linket."
+    },
     "back": "Tilbage",
     "next": "Næste",
     "send": "Send",

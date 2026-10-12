@@ -59,6 +59,15 @@
     "cancel": "Avbryt",
     "confirm": "Bekräfta",
     "close": "Stäng",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kod: {name}",
+      "alt": "QR-kod för länken ”{name}”",
+      "hint": "Skanna den med telefonens kamera för att öppna länken.",
+      "download": "Ladda ned (SVG)",
+      "error": "QR-koden kunde inte skapas. Ladda om sidan och försök igen; under tiden kan du kopiera länken."
+    },
     "back": "Tillbaka",
     "next": "Nästa",
     "send": "Skicka",

@@ -59,6 +59,15 @@
     "cancel": "Prekliči",
     "confirm": "Potrdi",
     "close": "Zapri",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Koda QR: {name}",
+      "alt": "Koda QR za povezavo »{name}«",
+      "hint": "Skenirajte jo s kamero telefona, da odprete povezavo.",
+      "download": "Prenesi (SVG)",
+      "error": "Kode QR ni bilo mogoče ustvariti. Znova naložite stran in poskusite znova; medtem lahko kopirate povezavo."
+    },
     "back": "Nazaj",
     "next": "Naprej",
     "send": "Pošlji",
