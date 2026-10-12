@@ -215,6 +215,10 @@ export function expectedArtifactsForJob(
       // Un singolo contenitore MKV multi-traccia, language-agnostico.
       return [{ role: 'archive', type: 'ARCHIVE_MKV', language: null }];
     }
+    case 'REPORT':
+      // Nessun file: il resoconto si consegna alla rotta interna del
+      // resoconto (api/internal/event-report) e si congela sull'evento.
+      return [];
     default: {
       const _exhaustive: never = kind;
       throw new Error(`unknown job kind: ${String(_exhaustive)}`);

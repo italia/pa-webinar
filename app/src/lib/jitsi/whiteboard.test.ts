@@ -87,15 +87,15 @@ describe('cablaggio del flag della lavagna (deve restare a RUNTIME)', () => {
   });
 
   it('LiveEventClient inoltra il flag al pulsante e al promemoria', () => {
-    // Pulsante (ModeratorControls) e promemoria di esportazione (LiveSidebar)
-    // devono comparire insieme: senza una delle due righe il valore arriva dal
-    // server e muore nel componente intermedio.
+    // Pulsante e promemoria di esportazione stanno nella scheda Regia, dentro
+    // la barra laterale: il valore deve arrivare fin lì, altrimenti muore nel
+    // componente intermedio.
     const client = stripComments(fs.readFileSync(LIVE_CLIENT, 'utf8'));
-    expect(jsxElement(client, 'ModeratorControls')).toContain(
-      'whiteboardInfraReady={whiteboardInfraReady}',
-    );
     expect(jsxElement(client, 'LiveSidebar')).toContain(
       'whiteboardInfraReady={whiteboardInfraReady}',
+    );
+    expect(jsxElement(client, 'ControlRoomPanel')).toContain(
+      'lavagna={whiteboardEnabled && whiteboardInfraReady}',
     );
   });
 });
@@ -109,7 +109,7 @@ describe('lavagna in sala solo con il backend', () => {
       'whiteboardInfraReady && (event.whiteboardEnabled || isInstantCall)',
     );
     expect(client).not.toContain('whiteboardEnabled={event.whiteboardEnabled');
-    for (const tag of ['JitsiRoom', 'ModeratorControls', 'LiveSidebar']) {
+    for (const tag of ['JitsiRoom', 'LiveSidebar']) {
       expect(jsxElement(client, tag), tag).toContain('whiteboardEnabled={whiteboardOn}');
     }
     expect(jsxElement(client, 'JitsiRoom')).toContain(

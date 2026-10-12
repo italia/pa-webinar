@@ -25,8 +25,9 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,8 +42,10 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { aiPipelineEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
-    throw new ValidationError(
+    throw new AppError(
       'AI pipeline is currently disabled (SiteSetting.aiPipelineEnabled=false). Enable it in admin settings first.',
+      422,
+      'AI_PIPELINE_DISABLED',
     );
   }
 
@@ -59,9 +62,23 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await prisma.$transaction(async (tx) => {
     const recording = await tx.recording.findUnique({
       where: { id },
-      select: { id: true, eventId: true },
+      select: { id: true, eventId: true, blobKey: true },
     });
     if (!recording) throw new NotFoundError('Recording');
+    if (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id)) {
+      throw new AppError(
+        'The transcript from the live captions on this recording was corrected by hand: the AI transcription would replace it and the corrections would be lost.',
+        409,
+        'TRANSCRIPT_CORRECTED',
+      );
+    }
+    if (registrazioneSoloSottotitoli(recording)) {
+      throw new AppError(
+        'This recording has no media: its transcript comes from the live captions.',
+        422,
+        'RECORDING_WITHOUT_MEDIA',
+      );
+    }
 
     // Flip the AI flags FIRST, same transaction, so the live read inside
     // enqueuePostprodForRecording (which no-ops when aiTranscriptEnabled is

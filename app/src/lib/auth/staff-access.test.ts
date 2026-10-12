@@ -33,13 +33,21 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/instant/route.ts': 'le proprie chiamate rapide',
   'api/admin/events/[id]/analytics/route.ts': 'proprio evento',
   'api/admin/events/[id]/duplicate/route.ts': 'proprio evento; la copia e’ sua',
+  'api/admin/events/[id]/feedback/route.ts': 'valutazioni del proprio evento, senza nomi',
+  'api/admin/events/[id]/captions-transcript/route.ts': 'proprio evento',
+  'api/admin/events/[id]/report/route.ts': 'proprio evento',
   'api/admin/events/[id]/generate-ai/route.ts': 'proprio evento',
+  'api/admin/events/[id]/glossary/route.ts': 'glossario della post-produzione del proprio evento',
+  'api/admin/glossary/route.ts': 'glossario comune della post-produzione: chi organizza lo legge e lo arricchisce',
+  'api/admin/glossary/[id]/route.ts': 'solo le voci del glossario comune aggiunte da chi organizza',
+  'api/admin/events/[id]/glossary/[termId]/route.ts': 'glossario della post-produzione del proprio evento',
   'api/admin/events/[id]/invitations/route.ts': 'proprio evento',
   'api/admin/events/[id]/invitations/[invId]/route.ts': 'proprio evento',
   'api/admin/events/[id]/materials/route.ts': 'proprio evento',
   'api/admin/events/[id]/materials/[materialId]/route.ts': 'proprio evento',
   'api/admin/events/[id]/questionnaires/route.ts': 'proprio evento',
   'api/admin/events/[id]/questionnaires/[placement]/route.ts': 'proprio evento',
+  'api/admin/events/[id]/registrations/[regId]/route.ts': 'rettifica e cancellazione di un’iscrizione a un proprio evento',
   'api/admin/events/[id]/tags/route.ts': 'proprio evento',
   'api/admin/postprod/route.ts': 'registrazioni dei propri eventi',
   'api/admin/postprod/recordings/[id]/archive/route.ts': 'registrazione di un proprio evento',
@@ -111,7 +119,6 @@ describe('pagine dell’amministrazione', () => {
     const ECCEZIONI: Record<string, string> = {
       '[locale]/admin/login/page.tsx': 'la porta d’ingresso',
       '[locale]/admin/access/page.tsx': 'l’atterraggio del link per email',
-      '[locale]/admin/events/[id]/edit/page.tsx': 'si apre solo col token del moderatore',
     };
     const mute = pagine
       .map(rel)

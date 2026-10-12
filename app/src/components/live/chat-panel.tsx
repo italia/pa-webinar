@@ -1,11 +1,39 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
+import ChatNotifyMenu from '@/components/live/chat-notify-menu';
+import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
+import { playChatChime } from '@/lib/chat/chime';
+import { showDesktopNotification } from '@/lib/chat/desktop-notification';
 import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
+import {
+  CHAT_NOTIFY_STORAGE_KEY,
+  DEFAULT_CHAT_NOTIFY_PREFS,
+  DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS,
+  chatAlertFor,
+  chatPreviewFor,
+  parseChatNotifyPrefs,
+  type ChatNotifyPrefs,
+} from '@/lib/chat/notify-prefs';
 import { CHAT_REACTION_EMOJIS } from '@/lib/chat/emoji';
+import {
+  applyTyping,
+  clearTyping,
+  parseTypingPayload,
+  pruneTyping,
+  shouldPing,
+  typingLabel,
+  type TypingState,
+} from '@/lib/chat/typing';
+import {
+  RECENT_EMOJI_KEY,
+  parseRecentEmoji,
+  pushRecentEmoji,
+  searchEmoji,
+} from '@/lib/chat/emoji-catalog';
 import {
   CHAT_ATTACHMENT_MIME,
   CHAT_ATTACHMENT_MAX_BYTES,
@@ -61,6 +89,41 @@ interface ChatPanelProps {
   isModerator?: boolean;
   active?: boolean;
   onUnreadCountChange?: (count: number) => void;
+  /** Un messaggio da mostrare in anteprima nella sala perche' la chat non e'
+   *  sotto gli occhi (lib/chat/notify-prefs#chatPreviewFor). */
+  onPreview?: (preview: ChatPreview) => void;
+  /** Messaggi non letti che nominano chi guarda o gli rispondono: la sala li
+   *  segnala a parte, piu' in vista del semplice conteggio. */
+  onUnreadMentionsChange?: (count: number) => void;
+  /** I nomi delle persone in sala adesso: si possono menzionare anche se non
+   *  hanno ancora scritto. Letto quando si apre l'elenco delle menzioni. */
+  getRoster?: () => string[];
+  /** Ogni messaggio appena arrivato, anche il proprio (non lo storico): la
+   *  piazza lo mostra in un fumetto sopra chi l'ha scritto. */
+  /** `etaMs`: per un messaggio recuperato dopo un'interruzione, quanto è
+   *  vecchio (stimato con l'ora del server); 0 per quelli arrivati in diretta. */
+  onMessaggioNuovo?: (m: { id: string; nome: string; testo: string; mio: boolean }, etaMs: number) => void;
+  /** Un messaggio corretto da chi l'ha scritto: il testo nuovo. */
+  onMessaggioModificato?: (id: string, testo: string) => void;
+  /** Chi sta scrivendo adesso (nomi), a ogni cambio; vuoto quando la chat
+   *  sparisce. */
+  onScrittura?: (nomi: string[]) => void;
+  /** Un messaggio tolto dalla chat (nascosto da un moderatore). */
+  onMessaggioRimosso?: (id: string) => void;
+  /** Cambia quando la pagina sposta il pannello altrove (la sala d'attesa lo
+   *  mette prima, nella piazza): un elenco spostato nel DOM perde lo
+   *  scorrimento, e va rimesso dov'era. */
+  posizione?: string;
+}
+
+/** Quanto basta all'anteprima di un messaggio arrivato a chat chiusa. */
+export interface ChatPreview {
+  id: string;
+  senderName: string;
+  senderKey?: string;
+  text: string;
+  mentionsMe: boolean;
+  repliesToMe: boolean;
 }
 
 interface ChatMessage {
@@ -95,31 +158,15 @@ interface ChatHistoryResponse {
   attachmentsEnabled?: boolean;
 }
 
-// Small static emoji set for the compose-box picker. Plain string
-// literals — no npm dep, server/client render identically (no hydration risk).
-// 16 emojis → 2 rows of 8 in the popover grid.
-const CHAT_EMOJIS = [
-  '👍', '🙏', '👏', '😀', '😂', '😍', '🤔', '😮',
-  '😢', '🎉', '❤️', '🔥', '✅', '👀', '💡', '🚀',
-] as const;
+/** Altezza massima della casella di scrittura (circa otto righe): oltre, scorre. */
+const INPUT_MAX_HEIGHT = 200;
 
-const AVATAR_COLORS = [
-  '#0066CC', '#008758', '#A66300', '#D9364F',
-  '#6A50D3', '#00A8B3', '#B23683', '#73348C',
-];
+/** Oltre quest'eta' un messaggio e' storico, non una novita' da anteprima. */
+const PREVIEW_MAX_AGE_MS = 60_000;
 
-function getAvatarColor(key: string): string {
-  let hash = 0;
-  for (let i = 0; i < key.length; i += 1) {
-    hash = key.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length] ?? '#0066CC';
-}
-
-function formatTime(isoOrDate: string | Date): string {
-  const d = typeof isoOrDate === 'string' ? new Date(isoOrDate) : isoOrDate;
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
+/** Due messaggi di fila della stessa persona entro questo intervallo formano
+ *  un gruppo: nome, ruolo e avatar si mostrano una volta sola. */
+const GROUP_WINDOW_MS = 5 * 60 * 1000;
 
 function humanSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -146,10 +193,34 @@ export default function ChatPanel({
   isModerator = false,
   active = true,
   onUnreadCountChange,
+  onPreview,
+  onUnreadMentionsChange,
+  getRoster,
+  onMessaggioNuovo,
+  onMessaggioModificato,
+  onScrittura,
+  onMessaggioRimosso,
+  posizione,
 }: ChatPanelProps) {
   const t = useTranslations('live.chat');
   const tc = useTranslations('common');
+  const format = useFormatter();
+  // L'ora nella lingua della pagina, non in quella del sistema: i nomi dei mesi
+  // e il formato dell'ora seguono il resto dell'interfaccia.
+  const fmtTime = useCallback(
+    (iso: string) => format.dateTime(new Date(iso), { hour: '2-digit', minute: '2-digit' }),
+    [format],
+  );
+  const fmtFullTime = useCallback(
+    (iso: string) =>
+      format.dateTime(new Date(iso), { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }),
+    [format],
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // I messaggi correnti per chi li legge fuori dal render (la rilettura
+  // completa dopo un'interruzione).
+  const messagesRef = useRef<ChatMessage[]>([]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   // Live-chat transport health, surfaced as an unobtrusive pill.
@@ -173,24 +244,39 @@ export default function ChatPanel({
   const [attachmentsEnabled, setAttachmentsEnabled] = useState(false);
   const canAttach = !isGuest && !!token && attachmentsEnabled;
   const [replyTo, setReplyTo] = useState<ChatReply | null>(null);
-  /**
-   * Chi scrive dichiara che il messaggio è una domanda. Si azzera dopo l'invio:
-   * marcare è un atto per singolo messaggio, non una modalità in cui si resta —
-   * altrimenti si finisce per porre "domande" senza accorgersene.
-   */
-  const [askAsQuestion, setAskAsQuestion] = useState(false);
-  /** Lente: mostra tutti i messaggi oppure solo le domande. */
-  const [lens, setLens] = useState<'all' | 'questions'>('all');
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
   const [attaching, setAttaching] = useState(false);
   const [composeError, setComposeError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const emojiRef = useRef<HTMLDivElement>(null);
+  const [emojiQuery, setEmojiQuery] = useState('');
+  const [recentEmoji, setRecentEmoji] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      setRecentEmoji(parseRecentEmoji(window.localStorage.getItem(RECENT_EMOJI_KEY)));
+    } catch { /* storage non disponibile: nessuna recente */ }
+  }, []);
+  // Il messaggio originale di una risposta, appena raggiunto dal riquadro
+  // citato: si illumina un attimo per farsi trovare.
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const mentionListId = useId();
+  // Chi sta scrivendo (lib/chat/typing): arriva dallo stream come evento a
+  // parte, si spegne da solo dopo qualche secondo o al suo messaggio.
+  const [typing, setTyping] = useState<TypingState>(() => new Map());
+  // La mia chiave di mittente, nota dal primo messaggio inviato: serve a non
+  // mostrarmi come «sta scrivendo» a me stesso.
+  const ownKeyRef = useRef<string | undefined>(undefined);
+  const lastTypingPingRef = useRef(0);
+  const [mentionIndex, setMentionIndex] = useState(0);
+  // Esc chiude l'elenco delle menzioni finche' il testo resta quello.
+  const [mentionDismissedFor, setMentionDismissedFor] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
+  /** Messaggi arrivati mentre la lista era scorsa in alto. */
+  const [newBelow, setNewBelow] = useState(0);
   const lastSeenAtRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
   // Last time an SSE 'message'/'open' fired; the poll watchdog
@@ -203,23 +289,20 @@ export default function ChatPanel({
   const activeRef = useRef(active);
   const onUnreadCountChangeRef = useRef(onUnreadCountChange);
   useEffect(() => { activeRef.current = active; }, [active]);
-  /**
-   * "Il pannello è aperto" non basta più a dire "il messaggio è sotto gli occhi":
-   * con la lente sulle domande la lista mostra un sottoinsieme, quindi un
-   * messaggio normale — anche uno che mi nomina — non è visibile. Chi decide di
-   * tacere una notifica deve saperlo, altrimenti chi è stato nominato non riceve
-   * né riga, né badge, né avviso.
-   */
-  const lensFilteringRef = useRef(false);
-  // Sincronizzato con lo stato della lente: l'handler SSE legge il ref, non lo
-  // stato, per non ricreare la connessione a ogni cambio di filtro.
-  useEffect(() => { lensFilteringRef.current = lens === 'questions'; }, [lens]);
   useEffect(() => { onUnreadCountChangeRef.current = onUnreadCountChange; }, [onUnreadCountChange]);
 
   const setUnread = useCallback((n: number) => {
     if (unreadCountRef.current === n) return;
     unreadCountRef.current = n;
     onUnreadCountChangeRef.current?.(n);
+  }, []);
+  const unreadMentionsRef = useRef(0);
+  const onUnreadMentionsChangeRef = useRef(onUnreadMentionsChange);
+  useEffect(() => { onUnreadMentionsChangeRef.current = onUnreadMentionsChange; }, [onUnreadMentionsChange]);
+  const setUnreadMentions = useCallback((n: number) => {
+    if (unreadMentionsRef.current === n) return;
+    unreadMentionsRef.current = n;
+    onUnreadMentionsChangeRef.current?.(n);
   }, []);
 
   // Ids of messages that name me. A ref holds the set (it is read during render
@@ -232,25 +315,98 @@ export default function ChatPanel({
   const mentionCtxRef = useRef({ displayName, editingId: null as string | null });
   useEffect(() => { mentionCtxRef.current.displayName = displayName; }, [displayName]);
 
-  const notifyMention = useCallback((from: string, text: string) => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    // Only when the chat is not what the user is looking at — a notification for
-    // a message already on screen is pure noise.
-    if (activeRef.current && !lensFilteringRef.current && document.visibilityState === 'visible') return;
+  // ── Avvisi: suono e notifica di sistema (lib/chat/notify-prefs) ──────────
+  // Le preferenze sono di chi guarda e restano nel browser. Lette nell'handler
+  // SSE attraverso un ref: dipenderne ricreerebbe la connessione a ogni scelta.
+  // Chi conduce parte da «tutti i messaggi», il pubblico da «menzioni e
+  // risposte»: una scelta fatta dalla campanella vale per entrambi.
+  const predefinite = isModerator ? DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS : DEFAULT_CHAT_NOTIFY_PREFS;
+  const [notifyPrefs, setNotifyPrefs] = useState<ChatNotifyPrefs>(predefinite);
+  const notifyPrefsRef = useRef(notifyPrefs);
+  useEffect(() => { notifyPrefsRef.current = notifyPrefs; }, [notifyPrefs]);
+  useEffect(() => {
     try {
-      if (Notification.permission !== 'granted') return;
-      const n = new Notification(t('mentionNotificationTitle', { name: from }), {
-        body: text.slice(0, 140),
-        // Same tag: a burst of mentions collapses into one notification instead
-        // of stacking up.
-        tag: 'pa-webinar-chat-mention',
+      setNotifyPrefs(
+        parseChatNotifyPrefs(window.localStorage.getItem(CHAT_NOTIFY_STORAGE_KEY), predefinite),
+      );
+    } catch { /* storage non disponibile: restano le predefinite */ }
+  }, [predefinite]);
+  const onPreviewRef = useRef(onPreview);
+  useEffect(() => { onPreviewRef.current = onPreview; }, [onPreview]);
+  const onMessaggioNuovoRef = useRef(onMessaggioNuovo);
+  useEffect(() => { onMessaggioNuovoRef.current = onMessaggioNuovo; }, [onMessaggioNuovo]);
+  const onMessaggioRimossoRef = useRef(onMessaggioRimosso);
+  useEffect(() => { onMessaggioRimossoRef.current = onMessaggioRimosso; }, [onMessaggioRimosso]);
+  const onMessaggioModificatoRef = useRef(onMessaggioModificato);
+  useEffect(() => { onMessaggioModificatoRef.current = onMessaggioModificato; }, [onMessaggioModificato]);
+  // Dov'era l'elenco, per rimetterlo lì se il pannello viene spostato.
+  const ultimoScrollRef = useRef(0);
+  const updateNotifyPrefs = useCallback((patch: Partial<ChatNotifyPrefs>) => {
+    setNotifyPrefs((cur) => {
+      const next = { ...cur, ...patch };
+      try {
+        window.localStorage.setItem(CHAT_NOTIFY_STORAGE_KEY, JSON.stringify(next));
+      } catch { /* storage non disponibile: la scelta vale finché resta aperta la pagina */ }
+      return next;
+    });
+  }, []);
+  // I miei messaggi: una risposta a uno di questi mi riguarda come una menzione.
+  const ownIdsRef = useRef<Set<string>>(new Set());
+  // Invito ad attivare le notifiche del browser: compare la prima volta che
+  // qualcuno mi nomina o mi risponde e il permesso non e' ancora deciso. Il
+  // permesso si chiede solo con un gesto (il pulsante dell'invito o la
+  // campanella): una richiesta senza gesto i browser la ignorano o la bloccano.
+  const [offerNotify, setOfferNotify] = useState(false);
+  const offerShownRef = useRef(false);
+
+  const alertFor = useCallback(
+    (msg: { senderName: string; text: string }, kind: { mentionsMe: boolean; repliesToMe: boolean; onScreen: boolean }) => {
+      if (typeof window === 'undefined') return;
+      const pageVisible = document.visibilityState === 'visible';
+      // Il fuoco dentro la chiamata (l'iframe) conta come fuoco della pagina.
+      const pageFocused = document.hasFocus();
+      const azione = chatAlertFor({
+        prefs: notifyPrefsRef.current,
+        own: false,
+        mentionsMe: kind.mentionsMe,
+        repliesToMe: kind.repliesToMe,
+        onScreen: kind.onScreen,
+        pageVisible,
+        pageFocused,
       });
-      n.onclick = () => { window.focus(); n.close(); };
-    } catch {
-      // Some browsers throw in insecure contexts or when the user has blocked
-      // notifications at OS level. Never let that break message rendering.
-    }
-  }, [t]);
+      if (azione.sound) playChatChime();
+      if (!('Notification' in window)) return;
+      // L'invito ad attivare le notifiche del browser arriva col primo
+      // messaggio per cui servirebbero a pagina in secondo piano, anche se
+      // adesso la pagina e' in primo piano: chi non esce mai dalla sala
+      // altrimenti non lo vedrebbe mai.
+      const servirebbe = chatAlertFor({
+        prefs: notifyPrefsRef.current,
+        own: false,
+        mentionsMe: kind.mentionsMe,
+        repliesToMe: kind.repliesToMe,
+        onScreen: kind.onScreen,
+        pageVisible: false,
+        pageFocused: false,
+      }).desktop;
+      try {
+        if (servirebbe && Notification.permission === 'default' && !offerShownRef.current) {
+          offerShownRef.current = true;
+          setOfferNotify(true);
+        }
+      } catch {
+        // Permesso illeggibile (contesto non sicuro): nessun invito.
+      }
+      if (!azione.desktop) return;
+      const titolo = kind.mentionsMe
+        ? t('mentionNotificationTitle', { name: msg.senderName })
+        : kind.repliesToMe
+          ? t('replyNotificationTitle', { name: msg.senderName })
+          : t('messageNotificationTitle', { name: msg.senderName });
+      showDesktopNotification(titolo, msg.text, 'pa-webinar-chat');
+    },
+    [t],
+  );
 
   // ── Reazioni e modifica (A3, A6) ──────────────────────────────────────────
   // Le mie reazioni, per messaggio: la tally dal server è solo un conteggio
@@ -262,6 +418,22 @@ export default function ChatPanel({
   // moderatori sullo stesso link condividono l'id, due persone possono
   // condividere il nome.
   const [reactingId, setReactingId] = useState<string | null>(null);
+  // Il selettore aperto si chiude con Esc o con un clic fuori.
+  useEffect(() => {
+    if (!reactingId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setReactingId(null);
+    };
+    const onDown = (e: MouseEvent) => {
+      if (!(e.target as Element | null)?.closest?.('.chat-panel__react-wrap')) setReactingId(null);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [reactingId]);
   const [editingId, setEditingId] = useState<string | null>(null);
   useEffect(() => { mentionCtxRef.current.editingId = editingId; }, [editingId]);
   const [editText, setEditText] = useState('');
@@ -305,20 +477,9 @@ export default function ChatPanel({
 
   // Stessa ragione: l'handler SSE non deve dipendere dall'identità della
   // callback, che cambia a ogni render della traduzione.
-  const notifyMentionRef = useRef(notifyMention);
-  useEffect(() => { notifyMentionRef.current = notifyMention; }, [notifyMention]);
+  const alertForRef = useRef(alertFor);
+  useEffect(() => { alertForRef.current = alertFor; }, [alertFor]);
 
-  const notificationAskedRef = useRef(false);
-  const maybeRequestNotificationPermission = useCallback(() => {
-    if (notificationAskedRef.current) return;
-    notificationAskedRef.current = true;
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    try {
-      if (Notification.permission === 'default') {
-        void Notification.requestPermission().catch(() => { /* denied */ });
-      }
-    } catch { /* some browsers throw in insecure contexts */ }
-  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (listRef.current && isAtBottomRef.current) {
@@ -329,15 +490,71 @@ export default function ChatPanel({
   const handleScroll = useCallback(() => {
     if (!listRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+    ultimoScrollRef.current = scrollTop;
     isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 40;
+    if (isAtBottomRef.current) setNewBelow(0);
+  }, []);
+
+  const jumpToLatest = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    isAtBottomRef.current = true;
+    setNewBelow(0);
   }, []);
 
   // Remove a moderated message (op:'delete') everywhere.
   const removeMessage = useCallback((id: string) => {
     setMessages((prev) => prev.filter((m) => m.id !== id));
+    onMessaggioRimossoRef.current?.(id);
   }, []);
 
-  const upsertMessage = useCallback((msg: ChatMessage, opts?: { advanceWatermark?: boolean }) => {
+  // L'annuncio dei messaggi nuovi per i lettori di schermo: uno da solo si
+  // legge con il nome, piu' messaggi ravvicinati diventano «N nuovi
+  // messaggi». Prima si svuota la regione, poi si scrive: due annunci uguali
+  // di fila altrimenti non si sentirebbero.
+  const [annuncioMessaggi, setAnnuncioMessaggi] = useState('');
+  const codaAnnunci = useRef<Array<{ nome: string; testo: string }>>([]);
+  const timerAnnunci = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerScrittura = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timerAnnunci.current) clearTimeout(timerAnnunci.current);
+      if (timerScrittura.current) clearTimeout(timerScrittura.current);
+    },
+    [],
+  );
+  const annunciaMessaggio = useCallback(
+    (nome: string, testo: string) => {
+      codaAnnunci.current.push({ nome, testo });
+      if (timerAnnunci.current) return;
+      timerAnnunci.current = setTimeout(() => {
+        const coda = codaAnnunci.current;
+        codaAnnunci.current = [];
+        timerAnnunci.current = null;
+        // Chi nel frattempo e' passato a un'altra scheda non sente la chat.
+        if (!activeRef.current) return;
+        const primo = coda[0];
+        const frase =
+          coda.length === 1 && primo
+            ? t('announceMessage', { name: primo.nome, text: primo.testo })
+            : t('announceMessages', { count: coda.length });
+        setAnnuncioMessaggi('');
+        timerScrittura.current = setTimeout(() => setAnnuncioMessaggi(frase), 50);
+      }, 1500);
+    },
+    [t],
+  );
+
+  const upsertMessage = useCallback((
+    msg: ChatMessage,
+    opts?: {
+      advanceWatermark?: boolean;
+      /** Da dove arriva: lo stream in diretta, il recupero dopo
+       *  un'interruzione (o all'apertura), o l'eco del mio invio. */
+      origine?: 'stream' | 'recupero' | 'eco';
+    },
+  ) => {
     if (seenIdsRef.current.has(msg.id)) return;
     seenIdsRef.current.add(msg.id);
     // The optimistic echo of our OWN send (advanceWatermark:false) must NOT move
@@ -350,39 +567,84 @@ export default function ChatPanel({
       lastSeenAtRef.current = msg.createdAt;
     }
     setMessages((prev) => [...prev, msg]);
+    setTyping((prev) => clearTyping(prev, msg.senderKey ?? '', msg.senderName));
 
-    const isOwn = msg.senderName === displayName;
+    // `mine` arriva dal server (e sull'eco del mio invio); sull'envelope SSE non
+    // viaggia, perche' e' per destinatario: allora decide il nome.
+    const isOwn = msg.mine ?? msg.senderName === displayName;
+    if (isOwn) ownIdsRef.current.add(msg.id);
     // Being named in a busy chat used to look like any other message: no sound,
     // no badge, nothing — you found out by scrolling back. Mentions now get
     // their own emphasis in the list and, when the panel is not in front of you,
-    // a browser notification.
-    if (!isOwn && mentionsUser(msg.text, displayName)) {
+    // a sound and a browser notification, as the viewer chose.
+    const mentionsMe = !isOwn && mentionsUser(msg.text, displayName);
+    const repliesToMe = !isOwn && !!msg.replyTo && ownIdsRef.current.has(msg.replyTo.id);
+    if (mentionsMe) {
       mentionedIdsRef.current.add(msg.id);
       setMentionTick((n) => n + 1);
-      notifyMention(msg.senderName, msg.text);
     }
-    // Stesso ragionamento della notifica: con la lente sulle domande un
-    // messaggio normale non è a schermo, quindi conta come non letto — e non va
-    // segnato come letto, altrimenti sparisce senza che nessuno l'abbia visto.
-    const onScreen = activeRef.current && !(lensFilteringRef.current && !msg.isQuestion);
+    // A schermo quando la chat e' il pannello in vista (il contenitore lo dice
+    // con `active`): altrimenti conta come non letto.
+    const onScreen = activeRef.current;
+    if (!isOwn && onScreen && opts?.origine !== 'recupero') {
+      annunciaMessaggio(msg.senderName, msg.text?.trim() || (msg.attachment ? t('announceAttachment') : ''));
+    }
+    if (!isOwn) alertFor(msg, { mentionsMe, repliesToMe, onScreen });
+    // Solo messaggi appena arrivati: la prima lettura dello storico (fino a 200
+    // messaggi) non deve diventare una raffica di anteprime.
+    const appenaArrivato = Date.now() - Date.parse(msg.createdAt) < PREVIEW_MAX_AGE_MS;
+    // Il fumetto nella piazza: ogni messaggio dello stream o del mio invio,
+    // qualunque cosa dica l'orologio di questo computer; uno recuperato solo
+    // se recente, con l'età stimata.
+    const recuperato = opts?.origine === 'recupero';
+    if (!recuperato || appenaArrivato) {
+      onMessaggioNuovoRef.current?.(
+        {
+          id: msg.id,
+          nome: msg.senderName,
+          // Un allegato senza testo resta un fumetto, con la graffetta.
+          testo: msg.text?.trim() || (msg.attachment ? '📎' : ''),
+          mio: isOwn,
+        },
+        recuperato ? Math.max(0, Date.now() - Date.parse(msg.createdAt)) : 0,
+      );
+    }
+    if (
+      !isOwn &&
+      appenaArrivato &&
+      chatPreviewFor({ prefs: notifyPrefsRef.current, own: false, mentionsMe, repliesToMe, onScreen })
+    ) {
+      onPreviewRef.current?.({
+        id: msg.id,
+        senderName: msg.senderName,
+        senderKey: msg.senderKey,
+        text: msg.text,
+        mentionsMe,
+        repliesToMe,
+      });
+    }
     if (!onScreen && !isOwn) {
       setUnread(unreadCountRef.current + 1);
-      maybeRequestNotificationPermission();
+      if (mentionsMe || repliesToMe) setUnreadMentions(unreadMentionsRef.current + 1);
     } else if (onScreen) {
       lastReadIdRef.current = msg.id;
+      // Chat aperta ma lista scorsa in alto: il messaggio non si vede, lo dice
+      // la pillola «nuovi messaggi».
+      if (!isOwn && !isAtBottomRef.current) setNewBelow((n) => n + 1);
     }
-  }, [displayName, setUnread, maybeRequestNotificationPermission, notifyMention]);
+  }, [displayName, setUnread, setUnreadMentions, alertFor, annunciaMessaggio, t]);
 
   useEffect(() => {
     if (active) {
       setUnread(0);
+      setUnreadMentions(0);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last) lastReadIdRef.current = last.id;
         return prev;
       });
     }
-  }, [active, setUnread]);
+  }, [active, setUnread, setUnreadMentions]);
 
   // Read auth. History and the SSE stream carry other attendees' names and
   // messages, so both are token-gated server-side now (lib/chat/read-access);
@@ -495,12 +757,18 @@ export default function ChatPanel({
     }
   }, [eventSlug, token, myReactions, t, refreshReactions]);
 
-  // 1. Initial history load.
+  // 1. Initial history load. Lo stato del caricamento tiene distinti «sto
+  // caricando», «non sono riuscito» (con «Riprova») e «non c'e' ancora
+  // nessun messaggio»: mostrare «Scrivi per primo!» mentre la storia arriva
+  // dice a chi legge una cosa falsa.
+  const [storico, setStorico] = useState<'caricamento' | 'pronto' | 'errore'>('caricamento');
+  const [tentativoStorico, setTentativoStorico] = useState(0);
   useEffect(() => {
     // Guard, not just a dependency: without it, setting the flag inside this
     // effect would immediately re-trigger it and spin.
     if (readDenied) return;
     let cancelled = false;
+    setStorico((s) => (s === 'pronto' ? s : 'caricamento'));
     (async () => {
       try {
         const res = await fetch(`/api/events/${eventSlug}/chat?limit=200`, {
@@ -508,12 +776,19 @@ export default function ChatPanel({
           ...(readHeaders ? { headers: readHeaders } : {}),
         });
         if (res.status === 403 && !cancelled) setReadDenied(true);
-        if (!res.ok || cancelled) return;
+        if (cancelled) return;
+        if (!res.ok) {
+          // Un recupero gia' riuscito vale: un errore che arriva dopo non
+          // toglie la chat a chi la sta gia' leggendo.
+          if (res.status !== 403) setStorico((s) => (s === 'pronto' ? s : 'errore'));
+          return;
+        }
         const data = (await res.json()) as ChatHistoryResponse;
         setAttachmentsEnabled(data.attachmentsEnabled === true);
         const mine: Record<string, Set<string>> = {};
         data.messages.forEach((m) => {
           seenIdsRef.current.add(m.id);
+          if (m.mine) ownIdsRef.current.add(m.id);
           lastSeenAtRef.current = m.createdAt;
           if (m.myReactions?.length) mine[m.id] = new Set(m.myReactions);
         });
@@ -523,10 +798,14 @@ export default function ChatPanel({
         const last = data.messages[data.messages.length - 1];
         if (last) lastReadIdRef.current = last.id;
         setMessages(data.messages);
-      } catch { /* soft fail; SSE will still open */ }
+        setStorico('pronto');
+      } catch {
+        // L'SSE si apre comunque; intanto si offre di riprovare.
+        if (!cancelled) setStorico((s) => (s === 'pronto' ? s : 'errore'));
+      }
     })();
     return () => { cancelled = true; };
-  }, [eventSlug, readHeaders, readDenied]);
+  }, [eventSlug, readHeaders, readDenied, tentativoStorico]);
 
   // 2. SSE stream for live updates + polling fallback.
   //
@@ -581,15 +860,34 @@ export default function ChatPanel({
         if (!res.ok) return 0;
         const data = (await res.json()) as ChatHistoryResponse;
         setAttachmentsEnabled(data.attachmentsEnabled === true);
+        // Una lettura riuscita vale come storia caricata: se il primo
+        // caricamento era fallito, «Riprova» non serve piu'.
+        setStorico('pronto');
         // Count messages the stream never delivered (still unseen) BEFORE upsert
         // marks them seen. A non-zero count on the POLL path means the SSE is
         // buffered, not merely quiet.
         let recovered = 0;
         data.messages.forEach((m) => {
           if (!seenIdsRef.current.has(m.id)) recovered += 1;
-          upsertMessage(m);
+          upsertMessage(m, { origine: 'recupero' });
         });
         if (full) {
+          for (const m of data.messages) {
+            if (m.editedAt) onMessaggioModificatoRef.current?.(m.id, m.text?.trim() ?? '');
+          }
+          // Un messaggio nascosto mentre lo stream era fermo non è più nella
+          // risposta: fra il più vecchio e il più recente letti, quello che
+          // manca è stato nascosto, e va tolto (anche dal suo fumetto).
+          const tempi = data.messages.map((m) => Date.parse(m.createdAt));
+          if (tempi.length > 0) {
+            const presenti = new Set(data.messages.map((m) => m.id));
+            const da = Math.min(...tempi);
+            const a = Math.max(...tempi);
+            for (const m of messagesRef.current) {
+              const t = Date.parse(m.createdAt);
+              if (t >= da && t <= a && !presenti.has(m.id)) removeMessage(m.id);
+            }
+          }
           // upsertMessage ignora per progetto gli id già visti (evita i doppioni
           // dell'eco SSE), quindi la rilettura completa riconcilia a parte il
           // testo, il segno di modifica, i conteggi delle reazioni e lo stato
@@ -644,6 +942,8 @@ export default function ChatPanel({
               m.id === env.id ? { ...m, text: env.text, editedAt: env.editedAt } : m,
             ),
           );
+          onMessaggioModificatoRef.current?.(env.id, env.text?.trim() ?? '');
+
           // Una correzione può AGGIUNGERE una menzione ("scusa @Alex, intendevo
           // le 16"): senza questo, essere nominati in una modifica non avvisa
           // nessuno, a differenza di qualsiasi altro messaggio.
@@ -656,7 +956,11 @@ export default function ChatPanel({
           ) {
             mentionedIdsRef.current.add(env.id);
             setMentionTick((n) => n + 1);
-            notifyMentionRef.current(env.senderName, env.text);
+            alertForRef.current(env, {
+              mentionsMe: true,
+              repliesToMe: false,
+              onScreen: activeRef.current,
+            });
           }
           return;
         }
@@ -679,7 +983,7 @@ export default function ChatPanel({
           );
           return;
         }
-        upsertMessage(env);
+        upsertMessage(env, { origine: 'stream' });
       } catch { /* drop malformed */ }
     };
     const onOpen = () => {
@@ -726,6 +1030,25 @@ export default function ChatPanel({
     };
     document.addEventListener('visibilitychange', onVisible);
 
+    // «Sta scrivendo»: evento con un nome suo, che i client precedenti ignorano.
+    const onTyping = (e: MessageEvent) => {
+      let raw: unknown;
+      try {
+        raw = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      const payload = parseTypingPayload(raw);
+      if (!payload) return;
+      setTyping((prev) =>
+        applyTyping(prev, payload, Date.now(), {
+          key: ownKeyRef.current,
+          name: mentionCtxRef.current.displayName,
+        }),
+      );
+    };
+    es.addEventListener('typing', onTyping);
+
     es.addEventListener('message', onMessage);
     es.addEventListener('open', onOpen);
     es.addEventListener('error', onError);
@@ -733,6 +1056,7 @@ export default function ChatPanel({
       clearInterval(poll);
       document.removeEventListener('visibilitychange', onVisible);
       es.removeEventListener('message', onMessage);
+      es.removeEventListener('typing', onTyping);
       es.removeEventListener('open', onOpen);
       es.removeEventListener('error', onError);
       es.close();
@@ -743,18 +1067,57 @@ export default function ChatPanel({
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // Spostato nel DOM (vedi `posizione`) l'elenco riparte dall'inizio: lo si
+  // rimette in fondo se era in fondo, altrimenti dov'era.
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    if (!el || posizione === undefined) return;
+    el.scrollTop = isAtBottomRef.current ? el.scrollHeight : ultimoScrollRef.current;
+  }, [posizione]);
+
+  // Quando l'elenco cambia misura (si apre la piazza, si stringe la finestra)
+  // chi era in fondo resta in fondo: accorciare il riquadro non sposta lo
+  // scorrimento, e l'ultimo messaggio finirebbe fuori vista.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+      if (isAtBottomRef.current) el.scrollTop = el.scrollHeight;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // ── Mention autocomplete ────────────────────────────────
   // Candidates are the distinct handles of people who have chatted (minus
   // the current user). Cheap, self-contained, no roster prop needed.
+  // Chi e' in sala, letto quando comincia una menzione (non a ogni tasto).
+  const [roster, setRoster] = useState<string[]>([]);
+  const mentionAperta = /(?:^|\s)@(\p{L}[\p{L}\p{N}._-]*)?$/u.test(input);
+  useEffect(() => {
+    if (!mentionAperta || !getRoster) return;
+    try {
+      setRoster(getRoster());
+    } catch {
+      setRoster([]);
+    }
+  }, [mentionAperta, getRoster]);
+
   const mentionCandidates = useMemo(() => {
     const selfHandle = mentionHandle(displayName).toLowerCase();
-    const seen = new Map<string, string>(); // lower → display handle
+    const seen = new Map<string, { handle: string; name: string; key: string }>(); // lower → persona
+    for (const name of roster) {
+      const h = mentionHandle(name);
+      if (h && h.toLowerCase() !== selfHandle) seen.set(h.toLowerCase(), { handle: h, name, key: name });
+    }
     for (const m of messages) {
       const h = mentionHandle(m.senderName);
-      if (h && h.toLowerCase() !== selfHandle) seen.set(h.toLowerCase(), h);
+      if (h && h.toLowerCase() !== selfHandle) {
+        seen.set(h.toLowerCase(), { handle: h, name: m.senderName, key: m.senderKey || m.senderName });
+      }
     }
     return Array.from(seen.values());
-  }, [messages, displayName]);
+  }, [messages, displayName, roster]);
 
   // Active mention query = an "@word" run at the caret (end of input here).
   const mentionQuery = useMemo(() => {
@@ -762,17 +1125,115 @@ export default function ChatPanel({
     return m ? (m[1] ?? '') : null;
   }, [input]);
 
+  // Si cerca sull'handle e su ogni parola del nome: «@bian» trova Giulia Bianchi.
   const mentionSuggestions = useMemo(() => {
-    if (mentionQuery === null) return [];
+    if (mentionQuery === null || mentionDismissedFor === input) return [];
     const q = mentionQuery.toLowerCase();
     return mentionCandidates
-      .filter((h) => h.toLowerCase().startsWith(q))
-      .slice(0, 5);
-  }, [mentionQuery, mentionCandidates]);
+      .filter(
+        (c) =>
+          c.handle.toLowerCase().startsWith(q) ||
+          c.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q)),
+      )
+      .slice(0, 6);
+  }, [mentionQuery, mentionCandidates, mentionDismissedFor, input]);
+
+  useEffect(() => {
+    setMentionIndex(0);
+  }, [mentionQuery]);
 
   const applyMention = useCallback((handle: string) => {
     setInput((prev) => prev.replace(/@(\p{L}[\p{L}\p{N}._-]*)?$/u, `@${handle} `));
     inputRef.current?.focus();
+  }, []);
+
+  // L'elenco delle menzioni è aperto (scrivendo «@…» o con il pulsante).
+  const mentionOpen = mentionQuery !== null && mentionDismissedFor !== input;
+
+  // Il pulsante «@» apre e chiude l'elenco delle persone da menzionare: non
+  // scrive un «@» in più a ogni clic. Aperto con il solo «@», lo richiude
+  // togliendolo; aperto con un nome già iniziato, lo lascia e torna al testo.
+  const startMention = useCallback(() => {
+    setMentionDismissedFor(null);
+    setInput((prev) => {
+      const aperta = /(?:^|\s)@(\p{L}[\p{L}\p{N}._-]*)?$/u.exec(prev);
+      if (aperta) {
+        return aperta[1] ? prev : prev.replace(/\s?@$/u, '');
+      }
+      return prev === '' || /\s$/.test(prev) ? `${prev}@` : `${prev} @`;
+    });
+    requestAnimationFrame(() => {
+      const node = inputRef.current;
+      if (!node) return;
+      node.focus();
+      const end = node.value.length;
+      try { node.setSelectionRange(end, end); } catch { /* noop */ }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (typing.size === 0) return;
+    const timer = setInterval(() => setTyping((prev) => pruneTyping(prev, Date.now())), 1000);
+    return () => clearInterval(timer);
+  }, [typing.size]);
+
+  // Chi sta scrivendo, per chi lo mostra altrove (i puntini nella piazza).
+  const onScritturaRef = useRef(onScrittura);
+  useEffect(() => { onScritturaRef.current = onScrittura; }, [onScrittura]);
+  const nomiCheScrivono = useMemo(
+    () => [...typing.values()].map((e) => e.name).sort().join('\u0000'),
+    [typing],
+  );
+  useEffect(() => {
+    onScritturaRef.current?.(nomiCheScrivono ? nomiCheScrivono.split('\u0000') : []);
+  }, [nomiCheScrivono]);
+  // Quando la chat sparisce (il nome torna troppo corto) nessuno scrive più.
+  useEffect(() => () => onScritturaRef.current?.([]), []);
+
+  const typingText = useMemo(() => {
+    const label = typingLabel([...typing.values()].map((e) => e.name));
+    if (label.kind === 'one') return t('typingOne', { name: label.name });
+    if (label.kind === 'two') return t('typingTwo', { a: label.a, b: label.b });
+    if (label.kind === 'many') return t('typingMany');
+    return '';
+  }, [typing, t]);
+
+  // Dice agli altri che sto scrivendo, al massimo una volta ogni pochi secondi.
+  const segnalaScrittura = useCallback(() => {
+    const now = Date.now();
+    if (!shouldPing(lastTypingPingRef.current, now)) return;
+    lastTypingPingRef.current = now;
+    const body: Record<string, unknown> = {};
+    if (isGuest) body.guestName = displayName;
+    else if (displayName) body.displayNameOverride = displayName;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    // Un avviso effimero: perderne uno (limite, pod precedente) non toglie
+    // niente a nessuno, e non deve disturbare chi scrive.
+    void fetch(`/api/events/${eventSlug}/chat/typing`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    }).catch(() => undefined);
+  }, [eventSlug, token, isGuest, displayName]);
+
+  // La casella cresce con il testo, fino a circa otto righe: un messaggio
+  // lungo si rilegge tutto prima di mandarlo. Oltre, scorre al suo interno.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, INPUT_MAX_HEIGHT)}px`;
+    el.style.overflowY = el.scrollHeight > INPUT_MAX_HEIGHT ? 'auto' : 'hidden';
+  }, [input]);
+
+  // Dal riquadro citato al messaggio originale, se e' fra quelli caricati.
+  const jumpToMessage = useCallback((id: string) => {
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-msg-id="${CSS.escape(id)}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setFlashId(id);
+    window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 1600);
   }, []);
 
   // ── Emoji picker ───────────────────────────────────────
@@ -786,6 +1247,13 @@ export default function ChatPanel({
     const next = input.slice(0, start) + emoji + input.slice(end);
     if (next.length > 2000) return; // mirror the input maxLength / server cap
     setInput(next);
+    setRecentEmoji((cur) => {
+      const recenti = pushRecentEmoji(cur, emoji);
+      try {
+        window.localStorage.setItem(RECENT_EMOJI_KEY, JSON.stringify(recenti));
+      } catch { /* storage non disponibile: valgono finche' resta aperta la pagina */ }
+      return recenti;
+    });
     const caret = start + emoji.length;
     requestAnimationFrame(() => {
       const node = inputRef.current;
@@ -796,8 +1264,13 @@ export default function ChatPanel({
   }, [input]);
 
   useEffect(() => {
-    if (!emojiOpen) return;
+    if (!emojiOpen) {
+      setEmojiQuery('');
+      return;
+    }
     const onDocMouseDown = (e: MouseEvent) => {
+      // Il pulsante che lo apre lo chiude da se': qui solo i clic altrove.
+      if ((e.target as Element | null)?.closest?.('[data-emoji-toggle]')) return;
       if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
         setEmojiOpen(false);
       }
@@ -874,14 +1347,6 @@ export default function ChatPanel({
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if ((!text && !attachment) || sending || attaching) return;
-    // Una domanda deve avere un testo (il server la rifiuta comunque). Senza
-    // questo controllo l'invio riusciva come messaggio normale e il toggle si
-    // spegneva esattamente come dopo una domanda andata a buon fine: chi ha
-    // scritto credeva di essere in coda e non c'era.
-    if (askAsQuestion && !text) {
-      setComposeError(t('questionNeedsText'));
-      return;
-    }
     setSending(true);
     try {
       const body: Record<string, unknown> = {};
@@ -890,7 +1355,6 @@ export default function ChatPanel({
       else if (displayName) body.displayNameOverride = displayName;
       if (replyTo) body.replyToId = replyTo.id;
       if (attachment) body.attachmentToken = attachment.token;
-      if (askAsQuestion && text) body.isQuestion = true;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
@@ -916,6 +1380,17 @@ export default function ChatPanel({
       const created = (await res.json().catch(() => null)) as
         | { id?: string; createdAt?: string; senderKey?: string; canEdit?: boolean }
         | null;
+      if (created?.senderKey) ownKeyRef.current = created.senderKey;
+      lastTypingPingRef.current = 0;
+      // Lo stream è arrivato prima della risposta: il messaggio è già passato,
+      // ma senza `mine` (lo stream non lo porta) e col nome del server. Il
+      // fumetto va comunque sul mio avatar.
+      if (created?.id && seenIdsRef.current.has(created.id)) {
+        onMessaggioNuovoRef.current?.(
+          { id: created.id, nome: displayName, testo: text || (attachment ? '📎' : ''), mio: true },
+          0,
+        );
+      }
       if (created?.id && created.createdAt) {
         upsertMessage({
           id: created.id,
@@ -927,7 +1402,6 @@ export default function ChatPanel({
           isModerator: !!isModerator,
           text,
           createdAt: created.createdAt,
-          ...(askAsQuestion && text ? { isQuestion: true } : {}),
           ...(attachment
             ? {
                 attachment: {
@@ -947,53 +1421,25 @@ export default function ChatPanel({
                 },
               }
             : {}),
-        }, { advanceWatermark: false });
+        }, { advanceWatermark: false, origine: 'eco' });
       }
       setInput('');
       setReplyTo(null);
-      setAskAsQuestion(false);
       setAttachment(null);
       setComposeError(null);
     } finally {
       setSending(false);
     }
-  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, askAsQuestion, upsertMessage, t]);
+  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
 
-  /**
-   * Il moderatore segna una domanda come risposta o la scarta. Come per
-   * hideMessage: NON ottimistico. Un fallimento inghiottito lascerebbe la
-   * domanda aperta per tutti mentre chi modera la crede evasa, e la coda
-   * ripartirebbe da capo al primo rientro di stream.
-   */
-  const setQuestionStatus = useCallback(
-    async (id: string, status: 'ANSWERED' | 'DISMISSED' | null) => {
-      if (!isModerator || !token) return;
-      try {
-        const res = await fetch(`/api/events/${eventSlug}/chat/${id}/question`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ status }),
-        });
-        if (!res.ok) {
-          setComposeError(t('questionStatusFailed'));
-          return;
-        }
-        const data = (await res.json().catch(() => null)) as
-          | { answeredAt?: string | null; dismissedAt?: string | null }
-          | null;
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === id
-              ? { ...m, answeredAt: data?.answeredAt ?? null, dismissedAt: data?.dismissedAt ?? null }
-              : m,
-          ),
-        );
-      } catch {
-        setComposeError(t('questionStatusFailed'));
-      }
-    },
-    [isModerator, token, eventSlug, t],
-  );
+  // Nascondere un messaggio vale per tutti e non si annulla: il primo clic
+  // chiede conferma (il pulsante diventa «Conferma»), il secondo agisce.
+  const [armedHideId, setArmedHideId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!armedHideId) return;
+    const timer = setTimeout(() => setArmedHideId(null), 4000);
+    return () => clearTimeout(timer);
+  }, [armedHideId]);
 
   const hideMessage = useCallback(async (id: string) => {
     if (!isModerator || !token) return;
@@ -1015,12 +1461,6 @@ export default function ChatPanel({
     }
   }, [isModerator, token, eventSlug, removeMessage, t]);
 
-  // La lente è un filtro sui messaggi GIÀ in memoria: nessuna seconda fetch,
-  // nessun secondo stream, nessun parametro nuovo sulla GET (che oggi legge
-  // `limit`/`since` senza validazione: aggiungerci filtri allargherebbe un 500
-  // già esistente).
-  const questionCount = messages.filter((m) => m.isQuestion).length;
-  const visibleMessages = lens === 'questions' ? messages.filter((m) => m.isQuestion) : messages;
 
   return (
     <div className="chat-panel flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
@@ -1028,180 +1468,138 @@ export default function ChatPanel({
           take them away they were, from a participant's side, lost at the end of
           the event. Shown to whoever can read the chat — the download contains
           exactly what they can already fetch, so it adds no exposure. */}
-      {messages.length > 0 && !readDenied && (
+      {!readDenied && (
         <div className="chat-panel__toolbar">
-          <a
-            className="chat-panel__export"
-            href={`/api/events/${eventSlug}/chat/export?format=txt${
-              token ? `&token=${encodeURIComponent(token)}` : ''
-            }`}
-            download
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            {' '}{t('exportChat')}
-          </a>
+          <ChatNotifyMenu prefs={notifyPrefs} onChange={updateNotifyPrefs} />
+          {/* Export (A5). The messages were always persisted, but with no way
+              to take them away they were, from a participant's side, lost at
+              the end of the event. Shown to whoever can read the chat — the
+              download contains exactly what they can already fetch. */}
+          {messages.length > 0 && (
+            <a
+              className="chat-panel__export"
+              href={`/api/events/${eventSlug}/chat/export?format=txt${
+                token ? `&token=${encodeURIComponent(token)}` : ''
+              }`}
+              download
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {' '}{t('exportChat')}
+            </a>
+          )}
         </div>
       )}
-      {/* Lente. Due bottoni con aria-pressed invece di un role="tablist": un
-          tablist vero pretende la navigazione con le frecce e un tabindex
-          mobile, e un tablist a metà è meno accessibile di due bottoni normali,
-          che sono già raggiungibili da tastiera e annunciati con il loro stato.
-          Compare solo quando c'è almeno una domanda: un filtro che non filtra
-          nulla è rumore. */}
-      {/* La condizione include `lens === 'questions'`: se sparisse mentre la
-          lente è attiva (l'unica domanda viene nascosta dal moderatore), il
-          pannello resterebbe vuoto SENZA il bottone per tornare indietro, e
-          l'unica via d'uscita sarebbe ricaricare la pagina — cioè uscire dalla
-          call. La via di ritorno deve esserci sempre. */}
-      {(questionCount > 0 || lens === 'questions') && !readDenied && (
-        <div className="chat-panel__lens" role="group" aria-label={t('lensGroupLabel')}>
-          <button
-            type="button"
-            className={`chat-panel__lens-btn${lens === 'all' ? ' is-active' : ''}`}
-            aria-pressed={lens === 'all'}
-            onClick={() => setLens('all')}
-          >
-            {t('lensAll')}
-          </button>
-          <button
-            type="button"
-            className={`chat-panel__lens-btn${lens === 'questions' ? ' is-active' : ''}`}
-            aria-pressed={lens === 'questions'}
-            onClick={() => setLens('questions')}
-          >
-            {t('lensQuestions', { count: questionCount })}
-          </button>
-        </div>
-      )}
-      {/* La lente filtra i messaggi CARICATI, non l'intera chat: all'ingresso se
-          ne leggono gli ultimi 200. In una sala molto attiva possono quindi
-          esserci domande più vecchie fuori dalla finestra. Il limite è
-          accettabile, il silenzio no: un moderatore che svuota la coda deve
-          sapere se sta guardando tutto. */}
-      {lens === 'questions' && messages.length >= 200 && (
-        <p className="chat-panel__lens-note">{t('lensTruncated')}</p>
-      )}
-      {/* Il cambio di lente non sposta il focus: senza questo annuncio, chi usa
-          uno screen reader preme un bottone e non sa che la lista sotto è
-          cambiata. */}
-      <p className="visually-hidden" role="status" aria-live="polite">
-        {lens === 'questions'
-          ? t('lensAnnounceQuestions', { count: visibleMessages.length })
-          : t('lensAnnounceAll')}
+      {/* I messaggi nuovi li dice ad alta voce la regione qui sotto, uno per
+          uno o a gruppi: una lista «live» leggerebbe anche le reazioni, i
+          pulsanti e i campi che compaiono dentro i messaggi. */}
+      <p className="visually-hidden" role="status">
+        {annuncioMessaggi}
       </p>
       <div
         ref={listRef}
         className="chat-panel__messages flex-grow-1"
         onScroll={handleScroll}
+        aria-label={t('logLabel')}
+        role="region"
       >
-        {visibleMessages.length === 0 ? (
+        {messages.length === 0 && !readDenied && storico === 'caricamento' ? (
+          // Solo da vedere: annunciarlo a ogni nuovo tentativo sarebbe rumore.
           <div className="chat-panel__empty">
-            <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" className="mb-2 text-muted" />
+            <p>{t('loadingHistory')}</p>
+          </div>
+        ) : messages.length === 0 && !readDenied && storico === 'errore' ? (
+          <div className="chat-panel__empty" role="status">
+            <p>{t('historyFailed')}</p>
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setTentativoStorico((n) => n + 1)}
+            >
+              {tc('retry')}
+            </button>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="chat-panel__empty">
+            <span className={`chat-panel__empty-badge${readDenied ? ' is-locked' : ''}`} aria-hidden="true">
+              <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" />
+            </span>
             {/* A refused reader must not be shown the same "no messages yet" as
                 a genuinely quiet room: the panel looks like it works, people
                 keep writing into it, and nobody understands why nothing arrives. */}
             <p>{readDenied ? t('readDenied') : t('empty')}</p>
           </div>
         ) : (
-          visibleMessages.map((m) => {
+          messages.map((m, idx) => {
             // Autorevole dal server; il fallback sul nome serve solo all'eco
             // ottimistica del proprio invio, che non ha ancora fatto il giro.
             const isOwn = m.mine ?? m.senderName === displayName;
-            const color = getAvatarColor(m.senderKey || m.senderName);
-            const initials = m.senderName
-              .split(/\s+/)
-              .map((s) => s[0])
-              .filter(Boolean)
-              .slice(0, 2)
-              .join('')
-              .toUpperCase();
+            // Gruppo: stesso autore, di seguito, a pochi minuti. Nome, ruolo,
+            // avatar e ora si dicono una volta per gruppo; l'ora esatta di
+            // ogni messaggio resta nel suo `title` e accanto alle azioni.
+            const prev = idx > 0 ? messages[idx - 1] : undefined;
+            const continued =
+              !!prev &&
+              (prev.senderKey || prev.senderName) === (m.senderKey || m.senderName) &&
+              (prev.mine ?? prev.senderName === displayName) === isOwn &&
+              prev.isModerator === m.isModerator &&
+              new Date(m.createdAt).getTime() - new Date(prev.createdAt).getTime() < GROUP_WINDOW_MS;
+            const color = avatarColor(m.senderKey || m.senderName);
+            const initials = avatarInitials(m.senderName);
             return (
               <div
                 key={m.id}
-                className={`chat-panel__msg ${isOwn ? 'chat-panel__msg--own' : ''}${
-                  mentionedIdsRef.current.has(m.id) ? ' chat-panel__msg--mention' : ''
+                data-msg-id={m.id}
+                className={`chat-panel__msg${isOwn ? ' chat-panel__msg--own' : ''}${
+                  continued ? ' chat-panel__msg--continued' : ''
+                }${mentionedIdsRef.current.has(m.id) ? ' chat-panel__msg--mention' : ''}${
+                  flashId === m.id ? ' chat-panel__msg--flash' : ''
                 }`}
               >
-                {!isOwn && (
-                  <div
-                    className="chat-panel__avatar"
-                    style={{ backgroundColor: color }}
-                    aria-hidden="true"
-                  >
-                    {initials}
-                  </div>
-                )}
-                <div>
-                  <div className="chat-panel__bubble">
-                    {!isOwn && (
-                      <div className="chat-panel__sender">
-                        {m.senderName}
-                        {m.isModerator && (
-                          <span
-                            className="ms-1"
-                            style={{ fontSize: '0.55rem', color: 'var(--app-primary)' }}
-                            aria-label={t('moderatorBadge')}
-                            title={t('moderatorBadge')}
-                          >
-                            ★
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {/* Marcatura della domanda. Lo stato è TESTO, non solo
-                        colore o icona (WCAG 1.4.1): "Domanda", "Risposta
-                        data", "Non verrà trattata" si leggono anche in bianco
-                        e nero e da uno screen reader. L'icona è SVG inline —
-                        <Icon> di design-react-kit qui produrrebbe un errore di
-                        hydration, essendo questo un componente sempre montato. */}
-                    {m.isQuestion && (
-                      <div className="chat-panel__question-mark">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                             strokeLinejoin="round" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10" />
-                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                          <line x1="12" y1="17" x2="12.01" y2="17" />
-                        </svg>
-                        {' '}
-                        <span>
-                          {/* "Risposta data" è pubblico: è un'informazione utile
-                              a tutta la sala. "Non verrà trattata" no: lo vede
-                              solo chi modera, perché scartare pubblicamente la
-                              domanda di qualcuno davanti a tutti è un'esposizione
-                              gratuita — e il vecchio sottosistema Q&A, non a
-                              caso, le domande scartate non le pubblicava. */}
-                          {m.answeredAt
-                            ? t('questionAnswered')
-                            : m.dismissedAt && isModerator
-                              ? t('questionDismissed')
-                              : t('questionOpen')}
-                        </span>
-                      </div>
+                {!isOwn &&
+                  (continued ? (
+                    <div className="chat-panel__avatar chat-panel__avatar--spacer" aria-hidden="true" />
+                  ) : (
+                    <div
+                      className="chat-panel__avatar"
+                      style={{ backgroundColor: color }}
+                      aria-hidden="true"
+                    >
+                      {initials}
+                    </div>
+                  ))}
+                <div className="chat-panel__col">
+                  {!continued && (
+                    <div className={`chat-panel__head${isOwn ? ' chat-panel__head--own' : ''}`}>
+                      <span className="chat-panel__name">{isOwn ? t('you') : m.senderName}</span>
+                      {m.isModerator && (
+                        <span className="chat-panel__role">{t('moderatorBadge')}</span>
+                      )}
+                      <time className="chat-panel__stamp" dateTime={m.createdAt} title={fmtFullTime(m.createdAt)}>
+                        {fmtTime(m.createdAt)}
+                      </time>
+                    </div>
+                  )}
+                  <div className="chat-panel__bubble" title={fmtFullTime(m.createdAt)}>
+                    {mentionedIdsRef.current.has(m.id) && (
+                      <span className="chat-panel__mention-flag">
+                        <span aria-hidden="true">@</span> {t('mentionedYou')}
+                      </span>
                     )}
                     {m.replyTo && (
-                      <div
+                      <button
+                        type="button"
                         className="chat-panel__reply-quote"
-                        style={{
-                          borderLeft: '3px solid var(--app-primary, #06c)',
-                          padding: '2px 6px',
-                          margin: '0 0 4px',
-                          fontSize: '0.78rem',
-                          opacity: 0.85,
-                          background: 'rgba(0,0,0,0.04)',
-                          borderRadius: 3,
-                        }}
+                        onClick={() => m.replyTo && jumpToMessage(m.replyTo.id)}
+                        title={t('replyJump')}
                       >
-                        <strong>{m.replyTo.senderName}</strong>
-                        <div className="text-truncate" style={{ maxWidth: 220 }}>
-                          {m.replyTo.text}
-                        </div>
-                      </div>
+                        <span className="chat-panel__reply-quote-name">{m.replyTo.senderName}</span>
+                        <span className="chat-panel__reply-quote-text">{m.replyTo.text}</span>
+                      </button>
                     )}
                     {editingId === m.id ? (
                       <div className="d-flex gap-1 align-items-center">
@@ -1230,7 +1628,7 @@ export default function ChatPanel({
                         <div className="chat-panel__text">
                           {renderChatBody(m.text, displayName)}
                           {m.editedAt && (
-                            <span className="chat-panel__edited" title={formatTime(m.editedAt)}>
+                            <span className="chat-panel__edited" title={fmtFullTime(m.editedAt)}>
                               {' '}({t('edited')})
                             </span>
                           )}
@@ -1263,20 +1661,29 @@ export default function ChatPanel({
                       </div>
                     )}
                   </div>
-                  {/* La riga dell'ora fa da ancora al selettore delle reazioni:
-                      e' larga quanto il messaggio e sta dal suo lato, quindi il
-                      selettore si apre dentro la lista (vedi globals.scss). */}
-                  <div className="chat-panel__time chat-panel__time--anchor">
-                    {formatTime(m.createdAt)}
+                  {/* Barra delle azioni: compare sul messaggio al passaggio
+                      del puntatore o al fuoco (sui touch resta sotto). Fa da
+                      ancora al selettore delle reazioni, che si apre verso il
+                      basso e verso l'interno della lista (vedi globals.scss). */}
+                  <div
+                    className={`chat-panel__tools${
+                      reactingId === m.id || armedHideId === m.id ? ' is-open' : ''
+                    }`}
+                  >
+                    {continued && (
+                      <time className="chat-panel__stamp" dateTime={m.createdAt}>
+                        {fmtTime(m.createdAt)}
+                      </time>
+                    )}
                     {!isGuest && token && (
                       <button
                         type="button"
-                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        className="chat-panel__reply-btn btn btn-link p-0"
                         aria-label={t('reply')}
                         title={t('reply')}
                         onClick={() => {
                           setReplyTo({ id: m.id, senderName: m.senderName, text: m.text || '📎' });
-                          inputRef.current?.focus();
+                          requestAnimationFrame(() => inputRef.current?.focus());
                         }}
                       >
                         {/* Inline SVG, not <Icon>: this renders once per message,
@@ -1294,7 +1701,7 @@ export default function ChatPanel({
                     <span className="chat-panel__react-wrap">
                       <button
                         type="button"
-                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        className="chat-panel__reply-btn btn btn-link p-0"
                         aria-label={t('react')}
                         title={t('react')}
                         aria-expanded={reactingId === m.id}
@@ -1327,7 +1734,7 @@ export default function ChatPanel({
                     {m.canEdit && (
                       <button
                         type="button"
-                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        className="chat-panel__reply-btn btn btn-link p-0"
                         aria-label={t('editLabel')}
                         title={t('editLabel')}
                         onClick={() => { setEditingId(m.id); setEditText(m.text); }}
@@ -1340,45 +1747,51 @@ export default function ChatPanel({
                         </svg>
                       </button>
                     )}
-                    {/* Azioni sulla coda delle domande. Sono separate da
-                        "Nascondi": nascondere è moderazione del contenuto e lo
-                        toglie a tutti, segnare una domanda la lascia leggibile
-                        e cambia solo il suo posto nella coda. Il bottone
-                        ripete l'azione già fatta per poterla annullare: chi
-                        modera sbaglia, e un'azione senza ritorno costringe a
-                        nascondere il messaggio per rimediare. */}
-                    {isModerator && token && m.isQuestion && (
-                      <>
+                    {isModerator && token && (() => {
+                      // Sul proprio messaggio e' «elimina»; su quello di un altro e'
+                      // moderazione: «nascondi a tutti». L'effetto e' lo stesso
+                      // (sparisce per chiunque), il nome dice cosa succede.
+                      const etichetta = isOwn ? t('deleteOwn') : t('hideForAll');
+                      const armato = armedHideId === m.id;
+                      return (
                         <button
                           type="button"
-                          className="chat-panel__q-btn btn btn-link p-0 ms-2"
-                          style={{ fontSize: '0.7rem' }}
-                          onClick={() => void setQuestionStatus(m.id, m.answeredAt ? null : 'ANSWERED')}
+                          className={`chat-panel__reply-btn chat-panel__hide-btn btn btn-link p-0${
+                            armato ? ' is-armed' : ''
+                          }`}
+                          aria-label={armato ? `${etichetta}: ${tc('confirm')}` : etichetta}
+                          title={etichetta}
+                          onClick={() => {
+                            if (!armato) {
+                              setArmedHideId(m.id);
+                              return;
+                            }
+                            setArmedHideId(null);
+                            void hideMessage(m.id);
+                          }}
                         >
-                          {m.answeredAt ? t('questionReopen') : t('questionMarkAnswered')}
+                          {isOwn ? (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                 strokeLinejoin="round" aria-hidden="true">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                          ) : (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                 strokeLinejoin="round" aria-hidden="true">
+                              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                              <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                          )}
+                          {armato && <span className="chat-panel__hide-confirm">{tc('confirm')}</span>}
                         </button>
-                        {!m.answeredAt && (
-                          <button
-                            type="button"
-                            className="chat-panel__q-btn btn btn-link p-0 ms-2 text-muted"
-                            style={{ fontSize: '0.7rem' }}
-                            onClick={() => void setQuestionStatus(m.id, m.dismissedAt ? null : 'DISMISSED')}
-                          >
-                            {m.dismissedAt ? t('questionRestore') : t('questionDismiss')}
-                          </button>
-                        )}
-                      </>
-                    )}
-                    {isModerator && token && (
-                      <button
-                        type="button"
-                        className="chat-panel__hide-btn btn btn-link p-0 ms-2 text-danger"
-                        style={{ fontSize: '0.7rem' }}
-                        onClick={() => hideMessage(m.id)}
-                      >
-                        {t('hide')}
-                      </button>
-                    )}
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -1386,24 +1799,79 @@ export default function ChatPanel({
           })
         )}
       </div>
+      {newBelow > 0 && (
+        <div className="chat-panel__new-wrap">
+          <button type="button" className="chat-panel__new-pill" onClick={jumpToLatest}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
+            {t('newMessagesBelow', { count: newBelow })}
+          </button>
+        </div>
+      )}
+
+      {offerNotify && (
+        <div className="chat-panel__offer" role="status">
+          <span>{t('notifyOffer')}</span>
+          <button
+            type="button"
+            className="chat-panel__offer-btn"
+            onClick={() => {
+              setOfferNotify(false);
+              try {
+                void Notification.requestPermission()
+                  .then((esito) => {
+                    if (esito === 'granted') updateNotifyPrefs({ desktop: true });
+                  })
+                  .catch(() => undefined);
+              } catch { /* contesto non sicuro: resta il suono */ }
+            }}
+          >
+            {t('notifyOfferEnable')}
+          </button>
+          <button
+            type="button"
+            className="chat-panel__offer-close"
+            aria-label={tc('close')}
+            title={tc('close')}
+            onClick={() => setOfferNotify(false)}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Reply context bar */}
       {replyTo && (
-        <div
-          className="chat-panel__reply-bar d-flex align-items-center justify-content-between"
-          style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'rgba(0,0,0,0.05)' }}
-        >
-          <span className="text-truncate">
-            {t('replyingTo', { name: replyTo.senderName })}
+        <div className="chat-panel__reply-bar">
+          <svg className="chat-panel__reply-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="9 14 4 9 9 4" />
+            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+          </svg>
+          <span className="chat-panel__reply-bar-body">
+            <span className="chat-panel__reply-bar-title">
+              {t('replyingTo', { name: replyTo.senderName })}
+            </span>
+            <span className="chat-panel__reply-bar-text">{replyTo.text}</span>
           </span>
           <button
             type="button"
-            className="btn btn-link p-0 ms-2"
-            onClick={() => setReplyTo(null)}
+            className="chat-panel__reply-bar-close"
+            onClick={() => {
+              setReplyTo(null);
+              inputRef.current?.focus();
+            }}
             aria-label={t('cancelReply')}
             title={t('cancelReply')}
           >
-            ✕
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       )}
@@ -1435,22 +1903,6 @@ export default function ChatPanel({
         </div>
       )}
 
-      {/* Mention suggestions */}
-      {mentionSuggestions.length > 0 && (
-        <div className="chat-panel__mentions" style={{ padding: '2px 10px' }}>
-          {mentionSuggestions.map((h) => (
-            <button
-              key={h}
-              type="button"
-              className="btn btn-sm btn-outline-primary me-1 mb-1"
-              style={{ fontSize: '0.75rem', padding: '1px 8px' }}
-              onClick={() => applyMention(h)}
-            >
-              @{h}
-            </button>
-          ))}
-        </div>
-      )}
 
       {connStatus !== 'live' && (
         <div
@@ -1482,126 +1934,256 @@ export default function ChatPanel({
         </div>
       )}
 
-      <div className="chat-panel__input-row">
-        {canAttach && (
-          <>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={Array.from(CHAT_ATTACHMENT_MIME).join(',')}
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void uploadFile(f);
-              }}
-            />
-            <button
-              type="button"
-              className="chat-panel__attach-btn btn btn-link p-1"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={attaching || !!attachment || sending}
-              aria-label={t('attach')}
-              title={t('attach')}
-            >
-              {attaching ? (
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                </svg>
-              )}
-            </button>
-          </>
-        )}
-        <div className="chat-panel__emoji" ref={emojiRef}>
-          <button
-            type="button"
-            className="chat-panel__emoji-btn btn btn-link p-1"
-            onClick={() => setEmojiOpen((v) => !v)}
-            disabled={sending}
-            aria-label={t('emojiPicker')}
-            title={t('emojiPicker')}
-            aria-haspopup="true"
-            aria-expanded={emojiOpen}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-              <line x1="9" y1="9" x2="9.01" y2="9" />
-              <line x1="15" y1="9" x2="15.01" y2="9" />
-            </svg>
-          </button>
-          {emojiOpen && (
-            <div className="chat-panel__emoji-pop" role="group" aria-label={t('emojiPicker')}>
-              {CHAT_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  className="chat-panel__emoji-pick"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => insertEmoji(emoji)}
-                  aria-label={emoji}
-                  title={emoji}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+      <div className="chat-panel__composer">
+        <div className="chat-panel__typing">
+          {typingText && (
+            <>
+              <span className="chat-panel__typing-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              {typingText}
+            </>
           )}
         </div>
-        {/* Marcare la domanda è un interruttore per il messaggio che si sta
-            scrivendo, non una modalità in cui si resta: si azzera dopo l'invio.
-            È un <button aria-pressed> e non una checkbox perché sta in una barra
-            di comandi accanto a emoji e allegato e deve comportarsi come loro;
-            lo stato lo annuncia aria-pressed, il significato l'etichetta
-            accessibile. Il segno non è solo colore: cambia anche il bordo. */}
-        <button
-          type="button"
-          className={`chat-panel__ask-btn${askAsQuestion ? ' is-on' : ''}`}
-          aria-pressed={askAsQuestion}
-          aria-label={t('askAsQuestionLabel')}
-          title={t('askAsQuestionLabel')}
-          onClick={() => setAskAsQuestion((v) => !v)}
-          disabled={sending}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        </button>
-        <input
-          ref={inputRef}
-          type="text"
-          className="chat-panel__input"
-          value={input}
-          placeholder={askAsQuestion ? t('placeholderQuestion') : t('placeholder')}
-          onChange={(e) => setInput(e.target.value)}
-          onPaste={onPaste}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
+        {/* Aperto ma vuoto: lo si dice, invece di lasciare un «@» che sembra
+            non fare niente. */}
+        {mentionOpen && mentionSuggestions.length === 0 && (
+          <div className="chat-panel__mention-pop chat-panel__mention-pop--empty" role="status">
+            {mentionQuery ? t('mentionNoMatch') : t('mentionEmpty')}
+          </div>
+        )}
+        {mentionSuggestions.length > 0 && (
+          <ul className="chat-panel__mention-pop" role="listbox" id={mentionListId} aria-label={t('mentionListLabel')}>
+            {mentionSuggestions.map((c, i) => (
+              <li
+                key={c.handle}
+                id={`${mentionListId}-${i}`}
+                role="option"
+                aria-selected={i === mentionIndex}
+                className={`chat-panel__mention-opt${i === mentionIndex ? ' is-active' : ''}`}
+                onMouseDown={(e) => e.preventDefault()}
+                onMouseEnter={() => setMentionIndex(i)}
+                onClick={() => applyMention(c.handle)}
+              >
+                <span
+                  className="chat-panel__mention-avatar"
+                  style={{ backgroundColor: avatarColor(c.key) }}
+                  aria-hidden="true"
+                >
+                  {avatarInitials(c.name)}
+                </span>
+                <span className="chat-panel__mention-name">{c.name}</span>
+                <span className="chat-panel__mention-handle">@{c.handle}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {emojiOpen && (
+          <div className="chat-panel__emoji-pop" role="dialog" aria-label={t('emojiPicker')} ref={emojiRef}>
+            <input
+              type="search"
+              className="chat-panel__emoji-search"
+              placeholder={t('emojiSearch')}
+              aria-label={t('emojiSearch')}
+              value={emojiQuery}
+              autoFocus
+              onChange={(e) => setEmojiQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const first = searchEmoji(emojiQuery)[0];
+                  if (first) insertEmoji(first.emoji);
+                }
+              }}
+            />
+            <div className="chat-panel__emoji-scroll">
+              {!emojiQuery && recentEmoji.length > 0 && (
+                <>
+                  <p className="chat-panel__emoji-section">{t('emojiRecent')}</p>
+                  <div className="chat-panel__emoji-grid">
+                    {recentEmoji.map((emoji) => (
+                      <button
+                        key={`r-${emoji}`}
+                        type="button"
+                        className="chat-panel__emoji-pick"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => insertEmoji(emoji)}
+                        aria-label={emoji}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="chat-panel__emoji-section">{t('emojiAll')}</p>
+                </>
+              )}
+              {(() => {
+                const risultati = searchEmoji(emojiQuery);
+                if (risultati.length === 0) {
+                  return <p className="chat-panel__emoji-empty">{t('emojiNoResults')}</p>;
+                }
+                return (
+                  <div className="chat-panel__emoji-grid">
+                    {risultati.map(({ emoji, keywords }) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className="chat-panel__emoji-pick"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => insertEmoji(emoji)}
+                        aria-label={emoji}
+                        title={keywords.split(' ')[0]}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        <div className="chat-panel__compose-box">
+          <textarea
+            ref={inputRef}
+            rows={1}
+            className="chat-panel__input"
+            value={input}
+            placeholder={t('placeholder')}
+            onChange={(e) => {
+              setInput(e.target.value);
+              if (mentionDismissedFor !== null) setMentionDismissedFor(null);
+              if (e.target.value.trim()) segnalaScrittura();
+            }}
+            onPaste={onPaste}
+            onKeyDown={(e) => {
+              // L'elenco delle menzioni aperto prende frecce, Invio, Tab ed Esc.
+              if (mentionSuggestions.length > 0) {
+                const n = mentionSuggestions.length;
+                if (e.key === 'ArrowDown') { e.preventDefault(); setMentionIndex((i) => (i + 1) % n); return; }
+                if (e.key === 'ArrowUp') { e.preventDefault(); setMentionIndex((i) => (i - 1 + n) % n); return; }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                  e.preventDefault();
+                  const scelta = mentionSuggestions[mentionIndex] ?? mentionSuggestions[0];
+                  if (scelta) applyMention(scelta.handle);
+                  return;
+                }
+                if (e.key === 'Escape') {
+                  // Solo l'elenco: sotto i 992px la sala chiude il cassetto con Esc.
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMentionDismissedFor(input);
+                  return;
+                }
+              }
+              if (e.key === 'Escape' && replyTo) {
+                e.preventDefault();
+                e.stopPropagation();
+                setReplyTo(null);
+                return;
+              }
+              // Invio manda, Maiusc+Invio va a capo. Non durante la composizione
+              // di un carattere (tastiere con accenti, cinese, giapponese).
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            disabled={sending}
+            maxLength={2000}
+            aria-label={t('inputLabel')}
+            aria-controls={mentionSuggestions.length > 0 ? mentionListId : undefined}
+            aria-activedescendant={
+              mentionSuggestions.length > 0 ? `${mentionListId}-${mentionIndex}` : undefined
             }
-          }}
-          disabled={sending}
-          maxLength={2000}
-          aria-label={t('inputLabel')}
-        />
-        <button
-          type="button"
-          className="chat-panel__send-btn"
-          onClick={handleSend}
-          disabled={sending || attaching || (input.trim().length === 0 && !attachment)}
-          aria-label={t('send')}
-          title={t('send')}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
+          />
+          <div className="chat-panel__compose-tools">
+            {canAttach && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={Array.from(CHAT_ATTACHMENT_MIME).join(',')}
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void uploadFile(f);
+                  }}
+                />
+                <button
+                  type="button"
+                  className="chat-panel__tool-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={attaching || !!attachment || sending}
+                  aria-label={t('attach')}
+                  title={t('attach')}
+                >
+                  {attaching ? (
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                  )}
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              className={`chat-panel__tool-btn${emojiOpen ? ' is-on' : ''}`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setEmojiOpen((v) => !v)}
+              disabled={sending}
+              aria-label={t('emojiPicker')}
+              title={t('emojiPicker')}
+              aria-haspopup="dialog"
+              aria-expanded={emojiOpen}
+              data-emoji-toggle=""
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" />
+                <line x1="15" y1="9" x2="15.01" y2="9" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={`chat-panel__tool-btn chat-panel__tool-btn--at${mentionOpen ? ' is-on' : ''}`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={startMention}
+              disabled={sending}
+              aria-expanded={mentionOpen}
+              aria-label={t('mentionButton')}
+              title={t('mentionButton')}
+            >
+              @
+            </button>
+            <span className="chat-panel__compose-spacer" />
+            {input.length > 1800 && (
+              <span className="chat-panel__compose-count" aria-live="polite">
+                {2000 - input.length}
+              </span>
+            )}
+            <button
+              type="button"
+              className="chat-panel__send-btn"
+              onClick={handleSend}
+              disabled={sending || attaching || (input.trim().length === 0 && !attachment)}
+              aria-label={t('send')}
+              title={t('send')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

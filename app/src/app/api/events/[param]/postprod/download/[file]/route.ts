@@ -23,11 +23,13 @@
  * pubblicate, esattamente come il subtitle endpoint.
  */
 
+import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE, markMarkdown, markPlainText } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { assertPostprodAccessible } from '@/lib/ai/access';
+import { registrazionePubblica } from '@/lib/captions/transcript';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,17 +125,18 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // Access policy: same as the sibling transcript / subtitle endpoints
   // (kill-switch + recordingPublished + postEventPublic + window).
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(slug);
+  // La sintesi accompagna il video pubblicato, con la pipeline AI accesa.
+  if (fmt === 'summary.md' && ambito !== 'tutto') throw new NotFoundError('Summary');
 
   const url = new URL(request.url);
   const requestedLang = (url.searchParams.get('lang') ?? '').toLowerCase().trim();
 
-  const recording = await prisma.recording.findFirst({
-    where: {
-      eventId,
-      status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] },
-    },
-    orderBy: { createdAt: 'desc' },
+  // Prima la trascrizione AI, poi quella dai sottotitoli (lib/captions/transcript).
+  const scelta = await registrazionePubblica(eventId, soloSottotitoli);
+  if (!scelta) throw new NotFoundError('Transcript');
+  const recording = await prisma.recording.findUnique({
+    where: { id: scelta },
     select: {
       id: true,
       sourceLanguage: true,
@@ -142,6 +145,10 @@ export const GET = withErrorHandling(async (request, context) => {
           type: true,
           language: true,
           inlineBody: true,
+          // Rivisto da una persona: la data di revisione, o il testo della
+          // macchina conservato alla prima correzione.
+          revisedAt: true,
+          original: { select: { id: true } },
         },
       },
       speakers: {
@@ -178,9 +185,10 @@ export const GET = withErrorHandling(async (request, context) => {
     const body = tryDecryptPII(candidate.inlineBody);
     if (!body) throw new NotFoundError('Summary');
 
-    return new Response(body, {
+    return new Response(markMarkdown(body, { revised: !!candidate.revisedAt || !!candidate.original }), {
       status: 200,
       headers: {
+        [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/markdown; charset=utf-8',
         'content-disposition': `attachment; filename="${safeSlug}-summary.${candidate.language ?? lang}.md"`,
         'cache-control': 'private, max-age=60',
@@ -194,21 +202,29 @@ export const GET = withErrorHandling(async (request, context) => {
   // per la sorgente) — per il txt/srt servono i segmenti puri.
   let segments: Segment[] = [];
   let effectiveLang = recording.sourceLanguage ?? lang;
+  let revised = false;
 
-  if (!requestedLang || requestedLang === recording.sourceLanguage) {
+  // Senza la lingua della registrazione (la scrive la pipeline AI), la
+  // trascrizione si serve nella sua lingua, qualunque sia quella chiesta.
+  if (!requestedLang || !recording.sourceLanguage || requestedLang === recording.sourceLanguage) {
     const json = recording.artifacts.find((a) => a.type === 'TRANSCRIPT_JSON');
+    revised = !!json?.revisedAt || !!json?.original;
     if (json?.inlineBody) {
       const decoded = tryDecryptPII(json.inlineBody);
       if (decoded) {
         try {
           const parsed = JSON.parse(decoded) as TranscriptJson;
           segments = parsed.segments ?? [];
+          // Il nome del file dice la lingua del testo, non quella chiesta.
+          effectiveLang = recording.sourceLanguage ?? parsed.language ?? effectiveLang;
         } catch {
           // fall through — vuoto produce 404
         }
       }
     }
   } else {
+    // Le traduzioni accompagnano il video pubblicato (lib/ai/access).
+    if (ambito !== 'tutto') throw new NotFoundError('Transcript');
     // Parsing VTT della lingua tradotta. Cattura solo cue-blocks
     // base; sufficient per il nostro formato Piper/whisper.
     const vtt = recording.artifacts.find(
@@ -219,6 +235,7 @@ export const GET = withErrorHandling(async (request, context) => {
         a.language === lang,
     );
     const body = vtt?.inlineBody ? tryDecryptPII(vtt.inlineBody) : null;
+    revised = !!vtt?.revisedAt || !!vtt?.original;
     if (body) {
       segments = parseVtt(body);
       effectiveLang = lang;
@@ -228,10 +245,11 @@ export const GET = withErrorHandling(async (request, context) => {
   if (segments.length === 0) throw new NotFoundError('Transcript');
 
   if (fmt === 'transcript.txt') {
-    const body = toTxt(segments, speakerMap);
+    const body = markPlainText(toTxt(segments, speakerMap), { revised });
     return new Response(body, {
       status: 200,
       headers: {
+        [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/plain; charset=utf-8',
         'content-disposition': `attachment; filename="${safeSlug}-transcript.${effectiveLang}.txt"`,
         'cache-control': 'private, max-age=60',
@@ -239,11 +257,12 @@ export const GET = withErrorHandling(async (request, context) => {
     });
   }
 
-  // transcript.srt
+  // transcript.srt — SubRip non ha commenti: la marcatura sta nell'intestazione.
   const body = toSrt(segments, speakerMap);
   return new Response(body, {
     status: 200,
     headers: {
+      [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
       'content-type': 'application/x-subrip; charset=utf-8',
       'content-disposition': `attachment; filename="${safeSlug}-subtitles.${effectiveLang}.srt"`,
       'cache-control': 'private, max-age=60',

@@ -16,6 +16,8 @@ const mocks = vi.hoisted(() => ({
   probeBridge: vi.fn(),
   recordScalerHeartbeat: vi.fn(),
   findMany: vi.fn(),
+  fetchJibriHealth: vi.fn(),
+  count: vi.fn(),
 }));
 
 vi.mock('@/lib/events/lifecycle-tick', async (importOriginal) => {
@@ -30,14 +32,16 @@ vi.mock('@/lib/events/lifecycle-tick', async (importOriginal) => {
 vi.mock('@/lib/events/lifecycle-driver', () => ({
   recordScalerHeartbeat: mocks.recordScalerHeartbeat,
 }));
-vi.mock('@/lib/db', () => ({ prisma: { event: { findMany: mocks.findMany } } }));
+vi.mock('@/lib/db', () => ({ prisma: { event: { findMany: mocks.findMany, count: mocks.count } } }));
 vi.mock('@/lib/redis', () => ({ getRedis: () => null }));
+vi.mock('@/lib/status/bridge', () => ({ fetchJibriHealth: mocks.fetchJibriHealth }));
 vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({
     jvbInactiveGraceMinutes: 45,
     jvbPreScaleMinutes: 15,
     jvbEmptyCloseMinutes: -1,
     eventGracePeriodMinutes: 15,
+    eventOvertimeEmptyMinutes: 20,
     jvbStressWarnPercent: 50,
     jvbStressCriticalPercent: 70,
   })),
@@ -68,6 +72,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.CRON_API_KEY = KEY;
   mocks.findMany.mockResolvedValue([]);
+  mocks.fetchJibriHealth.mockResolvedValue(null);
+  mocks.count.mockResolvedValue(0);
   mocks.probeBridge.mockResolvedValue({ participants: 0, conferences: 0, stressLevel: 0, reachable: true });
   mocks.runLifecycleTick.mockResolvedValue({ transitions: transizioni, changes: [], sessionsRepaired: 0 });
   vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -90,7 +96,13 @@ describe('GET /api/internal/jvb-desired-replicas', () => {
         participants: 7,
         scalerAggregated: true,
         currentReplicas: 2,
-        windows: { inactiveGraceMin: 45, preScaleMin: 15, emptyCloseMin: -1, siteGrace: 15 },
+        windows: {
+          inactiveGraceMin: 45,
+          preScaleMin: 15,
+          emptyCloseMin: -1,
+          siteGrace: 15,
+          overtimeEmptyMin: 20,
+        },
       }),
     );
   });
@@ -138,5 +150,132 @@ describe('GET /api/internal/jvb-desired-replicas', () => {
     expect(r.status).toBe(401);
     expect(mocks.runLifecycleTick).not.toHaveBeenCalled();
     expect(mocks.recordScalerHeartbeat).not.toHaveBeenCalled();
+  });
+});
+
+describe('repliche di Jibri', () => {
+  const URL_ORIGINALE = process.env.JIBRI_HEALTH_URL;
+  beforeEach(() => {
+    process.env.JIBRI_HEALTH_URL = 'http://jibri:2222';
+  });
+  afterEach(() => {
+    process.env.JIBRI_HEALTH_URL = URL_ORIGINALE;
+  });
+
+  it('evento in corso con registrazione: una replica, senza chiedere a Jibri', async () => {
+    mocks.findMany.mockResolvedValue([
+      {
+        id: 'e1', status: 'LIVE', startsAt: new Date(), endsAt: new Date(Date.now() + 3_600_000),
+        provisioningStartedAt: new Date(), maxParticipants: 50, expectedSenderRatioPct: null,
+        participantsCanStartVideo: false, recordingEnabled: true,
+      },
+    ]);
+    const body = await (await chiama()).json();
+    expect(body.jibriDesired).toBe(1);
+    expect(mocks.fetchJibriHealth).not.toHaveBeenCalled();
+  });
+
+  it('nessun evento registrato concluso di recente: zero, senza chiedere a Jibri', async () => {
+    mocks.fetchJibriHealth.mockResolvedValue({ healthy: true, busyStatus: 'BUSY' });
+    const body = await (await chiama()).json();
+    expect(body.jibriDesired).toBe(0);
+    expect(mocks.fetchJibriHealth).not.toHaveBeenCalled();
+  });
+
+  it('evento appena concluso e Jibri occupato (chiude e carica il file): resta acceso', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue({ healthy: true, busyStatus: 'BUSY' });
+    const body = await (await chiama()).json();
+    expect(body.jibriDesired).toBe(1);
+    expect(body.jibriHold).toBe(true);
+  });
+
+  it.each(['IDLE', 'EXPIRED'])('evento appena concluso e Jibri %s: zero', async (stato) => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue({ healthy: true, busyStatus: stato });
+    const body = await (await chiama()).json();
+    expect(body.jibriDesired).toBe(0);
+  });
+
+  it('Jibri che non risponde a zero repliche: non lo si riaccende', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect((await (await chiama('?jibriReplicas=0')).json()).jibriDesired).toBe(0);
+    // uno scaler vecchio non passa le repliche: come a zero
+    expect((await (await chiama()).json()).jibriDesired).toBe(0);
+  });
+
+  it('Jibri acceso e muto dopo un evento registrato: lo si tiene (potrebbe caricare)', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const body = await (await chiama('?jibriReplicas=1')).json();
+    expect(body.jibriDesired).toBe(1);
+    expect(body.jibriHold).toBe(true);
+  });
+
+  it('valori di jibriReplicas non validi o negativi: come zero', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect((await (await chiama('?jibriReplicas=abc')).json()).jibriDesired).toBe(0);
+    expect((await (await chiama('?jibriReplicas=-1')).json()).jibriDesired).toBe(0);
+  });
+
+  it('la risposta della sonda vale piu\' delle repliche: IDLE con Jibri pronto e\' zero', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue({ healthy: true, busyStatus: 'IDLE' });
+    const body = await (await chiama('?jibriReplicas=1')).json();
+    expect(body.jibriDesired).toBe(0);
+  });
+
+  it('fuori dalla finestra dopo la fine: zero anche con Jibri acceso e muto', async () => {
+    mocks.count.mockResolvedValue(0);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    const body = await (await chiama('?jibriReplicas=1')).json();
+    expect(body.jibriDesired).toBe(0);
+  });
+
+  it('installazione senza Jibri: nessuna query e nessuna sonda', async () => {
+    delete process.env.JIBRI_HEALTH_URL;
+    const body = await (await chiama()).json();
+    expect(body.jibriDesired).toBe(0);
+    expect(mocks.count).not.toHaveBeenCalled();
+    expect(mocks.fetchJibriHealth).not.toHaveBeenCalled();
+  });
+});
+
+describe('sottotitoli live: una replica del servizio finché c’è un evento in diretta', () => {
+  const evento = (liveCaptionsEnabled: boolean) => ({
+    id: 'e1', status: 'LIVE', startsAt: new Date(), endsAt: new Date(Date.now() + 3_600_000),
+    provisioningStartedAt: new Date(), maxParticipants: 50, expectedSenderRatioPct: null,
+    participantsCanStartVideo: false, recordingEnabled: false, liveCaptionsEnabled,
+  });
+
+  it('evento in diretta con i sottotitoli: una replica', async () => {
+    mocks.findMany.mockResolvedValue([evento(true)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(1);
+  });
+
+  it('spenti in sala dal moderatore: il servizio resta acceso, per riaccenderli subito', async () => {
+    mocks.findMany.mockResolvedValue([evento(false)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(1);
+  });
+
+  it('nessun evento in diretta: zero', async () => {
+    mocks.findMany.mockResolvedValue([]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(0);
+  });
+
+  it("spenti nell'istanza: zero anche con un evento che li vuole", async () => {
+    const { getSettings } = await import('@/lib/settings');
+    vi.mocked(getSettings).mockResolvedValueOnce({
+      jvbInactiveGraceMinutes: 45, jvbPreScaleMinutes: 15, jvbEmptyCloseMinutes: -1,
+      eventGracePeriodMinutes: 15, eventOvertimeEmptyMinutes: 20,
+      jvbStressWarnPercent: 50, jvbStressCriticalPercent: 70, liveCaptionsEnabled: false,
+    } as unknown as Awaited<ReturnType<typeof getSettings>>);
+    mocks.findMany.mockResolvedValue([evento(true)]);
+    expect((await (await chiama()).json()).captionsDesired).toBe(0);
   });
 });

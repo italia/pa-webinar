@@ -72,9 +72,16 @@ function bodyTooLarge(): AppError {
   return new AppError('Request body too large', 413, 'PAYLOAD_TOO_LARGE');
 }
 
-/** Legge il corpo fermandosi appena supera `maxBytes`: non lo tiene mai tutto. */
-async function readBodyText(body: ReadableStream<Uint8Array>, maxBytes: number): Promise<string> {
-  const reader = body.getReader();
+/**
+ * Legge il corpo fermandosi appena supera `maxBytes`: non lo tiene mai tutto.
+ * Vale anche senza Content-Length (corpo a pezzi): conta i byte mentre
+ * arrivano. Oltre il tetto, 413.
+ */
+export async function readBodyBytes(request: Request, maxBytes: number): Promise<Uint8Array> {
+  const dichiarati = Number(request.headers.get('content-length') ?? Number.NaN);
+  if (Number.isFinite(dichiarati) && dichiarati > maxBytes) throw bodyTooLarge();
+  if (!request.body) return new Uint8Array(await request.arrayBuffer());
+  const reader = request.body.getReader();
   const parti: Uint8Array[] = [];
   let letti = 0;
   for (;;) {
@@ -93,7 +100,7 @@ async function readBodyText(body: ReadableStream<Uint8Array>, maxBytes: number):
     tutto.set(parte, posizione);
     posizione += parte.byteLength;
   }
-  return new TextDecoder().decode(tutto);
+  return tutto;
 }
 
 /**
@@ -105,11 +112,9 @@ export async function parseJsonBody(
   request: Request,
   maxBytes: number = JSON_BODY_MAX_BYTES,
 ): Promise<unknown> {
-  const dichiarati = Number(request.headers.get('content-length') ?? Number.NaN);
-  if (Number.isFinite(dichiarati) && dichiarati > maxBytes) throw bodyTooLarge();
   let testo: string;
   try {
-    testo = request.body ? await readBodyText(request.body, maxBytes) : await request.text();
+    testo = new TextDecoder().decode(await readBodyBytes(request, maxBytes));
   } catch (err) {
     if (err instanceof AppError) throw err;
     throw new AppError('Invalid JSON body', 400, 'INVALID_BODY');

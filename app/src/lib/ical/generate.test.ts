@@ -170,3 +170,15 @@ describe('generateEventICal', () => {
     expect(ics).toContain('Domande e Risposte');
   });
 });
+
+describe('generateEventICal — descrizione', () => {
+  it('la descrizione scritta in Markdown arriva come testo', () => {
+    const ics = generateEventICal({
+      ...baseInput(),
+      description: '## Programma\n\nCon **Relatore 1** e [le slide](https://example.org/slide).',
+    });
+    // Le righe lunghe dell'iCalendar vanno a capo con uno spazio: si riuniscono.
+    const testo = ics.replace(/\r\n /g, '');
+    expect(prop(testo, 'DESCRIPTION')).toBe('Programma\\n\\nCon Relatore 1 e le slide.');
+  });
+});

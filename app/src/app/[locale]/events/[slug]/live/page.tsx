@@ -4,10 +4,13 @@ import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { titoloEventoPubblico } from '@/lib/events/meta-title';
+import { VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
+import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
+import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
+import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -20,6 +23,8 @@ import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
+import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
+import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,8 +35,10 @@ interface LivePageProps {
 
 export async function generateMetadata({ params }: LivePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const titolo = await titoloEventoPubblico(slug);
-  return { ...(titolo ? { title: titolo } : {}), robots: { index: false } };
+  // Il link per entrare e' quello che si condivide di piu': chi lo riceve
+  // vede l'anteprima dell'evento, non quella generica del sito.
+  const anteprima = await anteprimaEventoPubblico(slug, `/events/${slug}/live`);
+  return { ...(anteprima ?? {}), robots: { index: false } };
 }
 
 export default async function LivePage({ params, searchParams }: LivePageProps) {
@@ -43,12 +50,28 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      gdprTemplate: { select: { body: true } },
+      // Per il riepilogo della sala d'attesa: gli stessi enti e le stesse
+      // persone che mostra la pagina pubblica (lib/events/public-people).
+      ...PERSONE_PUBBLICHE_INCLUDE,
+    },
   });
 
   if (!event) {
     notFound();
   }
+
+  // L'informativa privacy accanto al consenso chiesto in sala d'attesa: la
+  // stessa del modulo di iscrizione.
+  const privacy = informativaEvento(event, locale);
+
+  // Il riepilogo della sala d'attesa: descrizione, enti e persone.
+  const riepilogo = {
+    descrizione: getLocalized(event.description as LocalizedField, locale) || null,
+    ...entiEPersonePubblici(event, tryDecryptPII),
+  };
 
   // IDLE / PROVISIONING used to redirect users to a dedicated
   // "Sala in allestimento" spinner. Demo feedback: by the time the
@@ -108,6 +131,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       event.aiSummaryEnabled ||
       event.aiTranslationEnabled ||
       event.aiDubbingEnabled);
+  // Sottotitoli live (ADR-018): servizio installato e acceso nell'istanza.
+  // Se l'evento li vuole, lo dice il suo flag, che il moderatore cambia dal vivo.
+  const captionsAvailable = liveCaptionsAvailable(settings);
   const aiConsentDisclosure =
     ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ??
     null;
@@ -163,6 +189,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             status: event.status,
             eventType: event.eventType,
             postEventPublic: event.postEventPublic,
+            postEventShow: {
+          recap: event.postEventShowRecap,
+          qa: event.postEventShowQA,
+          polls: event.postEventShowPolls,
+          wordCloud: event.postEventShowWordCloud,
+          materials: event.postEventShowMaterials,
+          feedback: event.postEventShowFeedback,
+        },
             libraryListed: event.libraryListed,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
             autoStartRecording: isInstant ? false : event.autoStartRecording,
@@ -176,6 +210,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantsCanShareScreen: event.participantsCanShareScreen,
             organizerName: event.organizerName,
             moderatorName: event.moderatorName,
+            riepilogo,
             imageUrl: event.imageUrl,
             coverImageUrl: event.coverImageUrl,
             maxParticipants: event.maxParticipants,
@@ -183,15 +218,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: isInstant ? null : event.recordingConsentText,
+            privacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
-              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
             aiPostprodEnabled,
+            liveCaptionsAvailable: captionsAvailable,
+            liveCaptionsEnabled: event.liveCaptionsEnabled,
+            liveCaptionsLanguage: settings.defaultLocale,
             aiConsentDisclosure,
             multitrackRecordingEnabled: isInstant
               ? false
               : event.multitrackRecordingEnabled,
+            captionsTranscript: captionsTranscriptActive(event, settings),
           }}
           token=""
           isModerator={false}
@@ -232,10 +272,24 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // Consenso multitrack già prestato alla registrazione → non lo si richiede di
   // nuovo in sala d'attesa (evita il doppio consenso). Vedi WaitingRoom.
   let hasMultitrackConsent = false;
+  // Lo stesso per il consenso alla registrazione dell'evento.
+  let hasRecordingConsent = false;
+  // L'iscritto e' gia' entrato in sala (anche in una visita precedente): la
+  // valutazione di fine evento gli si puo' proporre anche senza il token
+  // della sala di questa pagina.
+  let iscrizioneEntrata = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
-      select: { displayName: true, eventId: true, consentMultitrack: true },
+      select: {
+        id: true,
+        displayName: true,
+        eventId: true,
+        consentRecording: true,
+        consentMultitrack: true,
+        consentMultitrackVersion: true,
+        joinedAt: true,
+      },
     });
 
     if (!registration || registration.eventId !== event.id) {
@@ -266,7 +320,34 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
         : '',
     };
-    hasMultitrackConsent = ownsToken ? (registration.consentMultitrack ?? false) : false;
+    // Dati all'iscrizione, o in sala d'attesa a un ingresso precedente (chi si
+    // e' iscritto prima che l'evento registrasse): la prova sta legata
+    // all'iscrizione solo nel browser che si e' iscritto.
+    const prove = { eventId: event.id, registrationId: registration.id };
+    // Per la trascrizione dai sottotitoli vale solo il consenso dato con il
+    // testo che la comprende (lib/registration/consents): a chi aveva dato
+    // quello per la sola traccia audio si richiede.
+    const versioneMinima = captionsTranscriptActive(event, settings) ? VERSIONE_TESTO_TRASCRIZIONE : 1;
+    const datoAllIscrizione =
+      registration.consentMultitrack === true &&
+      (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
+    const [proveTracce, proveRegistrazione] = ownsToken
+      ? await Promise.all([
+          !datoAllIscrizione &&
+          (event.multitrackRecordingEnabled || captionsTranscriptActive(event, settings))
+            ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
+            : 0,
+          registration.consentRecording !== true && event.recordingEnabled
+            ? prisma.recordingConsent.count({ where: prove })
+            : 0,
+        ])
+      : [0, 0];
+    hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
+    hasRecordingConsent =
+      ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
+    // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
+    // di chi l'ha ricevuto.
+    iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
@@ -285,6 +366,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         eventType: event.eventType,
         guestEntryOpen: guestAccessAllowed(event, settings.guestAccessEnabled),
         postEventPublic: event.postEventPublic,
+        postEventShow: {
+          recap: event.postEventShowRecap,
+          qa: event.postEventShowQA,
+          polls: event.postEventShowPolls,
+          wordCloud: event.postEventShowWordCloud,
+          materials: event.postEventShowMaterials,
+          feedback: event.postEventShowFeedback,
+        },
         libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
         autoStartRecording: event.autoStartRecording,
@@ -298,6 +387,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         participantsCanShareScreen: event.participantsCanShareScreen,
         organizerName: event.organizerName,
         moderatorName: event.moderatorName,
+        riepilogo,
         imageUrl: event.imageUrl,
         coverImageUrl: event.coverImageUrl,
         maxParticipants: event.maxParticipants,
@@ -305,13 +395,18 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
+        privacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:
-          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
         aiPostprodEnabled,
+        liveCaptionsAvailable: captionsAvailable,
+        liveCaptionsEnabled: event.liveCaptionsEnabled,
+        liveCaptionsLanguage: settings.defaultLocale,
         aiConsentDisclosure,
         multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+        captionsTranscript: captionsTranscriptActive(event, settings),
       }}
       token={token}
       isModerator={isModerator}
@@ -319,6 +414,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isSpeaker={isSpeaker}
       isGuest={false}
       hasMultitrackConsent={hasMultitrackConsent}
+      hasRecordingConsent={hasRecordingConsent}
+      registrationJoined={iscrizioneEntrata}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —

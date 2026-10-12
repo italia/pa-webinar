@@ -43,11 +43,12 @@ account that acted. [ADR-015](adr/015-named-administrators.md)
 
 **Guest** (UI **Guest**): a person who joins a live event with only a typed
 name, without registering (seat `guest-…`). Guests enter a scheduled event
-only while it is `LIVE`, and only while the site setting **Guest access
-enabled** is on; an instant call admits them whatever the setting, also while
-it warms up. Two other things share the word: the role `GUEST` on an
-invitation-list entry, and the `GUEST` column of the permission matrix, which
-stands for the whole audience.
+only while it is `LIVE`, only while the site setting **Guest access
+enabled** is on, and never when the event is open only to invitees; an
+instant call admits them whatever the setting, also while it warms up. Two
+other things share the word: the role `GUEST` on an invitation-list entry,
+and the `GUEST` column of the permission matrix, which stands for the whole
+audience.
 [Identity, access and tokens](architecture/identity-and-access.md)
 
 **Instance API key** (`ADMIN_API_KEY`, UI **Sign in with the instance key**):
@@ -81,9 +82,12 @@ durable credential.
 
 **Named grant** (`EventModerator`, role `MODERATOR` or `SPEAKER`): a
 per-person access grant to one event, with its own magic-link token, that can
-be revoked on its own (`revokedAt`). Co-moderators and speakers added in the
-wizard's **People** step each receive one. The table is `event_moderators`
-even though it also holds speakers.
+be revoked on its own (`revokedAt`). Organizers, moderators and speakers added
+in the wizard's **People** step each receive one, with their organization and
+whether the public page lists them (`publicListed`). An *event organizer* is a
+`MODERATOR` grant with `organizer` set: same powers in the room, listed among
+the organizers. The table is `event_moderators` even though it also holds
+speakers.
 [Identity, access and tokens](architecture/identity-and-access.md)
 
 **One-time sign-in link**: the emailed, single-use link a staff account uses
@@ -92,10 +96,12 @@ to enter the administration area (`StaffLoginToken`).
 [ADR-014](adr/014-organizer-role.md)
 
 **Organizer** (staff role `ORGANIZER`, UI **Organiser**): a staff account that
-creates events and manages only its own (`Event.createdById`), with no access
+creates events and manages its own (`Event.createdById`) and those where an
+organizer grant carries its email address, with no access
 to installation settings, the address book or other events' data. Do not
 confuse it with the *co-organizing organizations* listed on an event page
-(`EventOrganizer`, wizard step **People**, section **Organizers**): those are
+(`EventOrganizer`, wizard step **People**, section **Organizing entities**), or
+with an event's organizer grants (see *Named grant*): the entities are
 display metadata only (name, logo, website), with no access rights, no link
 and no email. [ADR-014](adr/014-organizer-role.md),
 [From creation to recap](architecture/event-journey.md)
@@ -122,7 +128,7 @@ transcripts, "speaker label" means something else: see
 [AI post-production](#ai-post-production).
 [ADR-003](adr/003-moderator-magic-links.md)
 
-**Staff account** (`StaffAccount`, admin nav **Accounts**, route
+**Staff account** (`StaffAccount`, admin nav **Staff and access** > **Staff accounts**, route
 `/admin/organizers`): a named, passwordless account with role `ORGANIZER` or
 `ADMIN`. The session re-reads the account on every request, so deactivating it
 takes effect immediately. [ADR-014](adr/014-organizer-role.md)
@@ -152,7 +158,7 @@ state machine and who moves it are in
 | `LIVE` | live | The room admits participants. |
 | `IDLE` | idle | A live room that stayed empty past the inactivity grace, so its bridge can be scaled down (only with the JVB scaler). |
 | `ENDED` | ended | The live part is over; the post-event page takes the place of the room. |
-| `ARCHIVED` | archived | Hidden from every public surface: either the GDPR cleanup archived it after removing personal data at the end of retention, or staff archived it from the event list (an administrator, or an organizer for their own events), which deletes nothing by itself. |
+| `ARCHIVED` | archived | Hidden from every public surface: either staff archived it from the event list (an administrator, or an organizer for their own events), which deletes nothing by itself, or the GDPR cleanup archived an event that was never ended when its retention passed. A concluded event keeps its status at retention. |
 
 **Event type** (`EventType`): `SCHEDULED` for an ordinary event with a
 schedule, `INSTANT` for an instant call, and `LEGACY` for a past recording
@@ -161,10 +167,11 @@ published without any live room, either an uploaded video or a YouTube link
 [From creation to recap](architecture/event-journey.md)
 
 **Grace period** (`gracePeriodMinutes` per event, site default
-`eventGracePeriodMinutes`): the minutes after `endsAt` during which a live
-event stays open before it is closed to `ENDED`. `-1` means no time-based
-close. The close is applied by the JVB scaler; without it, the event stays
-`LIVE` until a moderator ends it.
+`eventGracePeriodMinutes`): the overtime limit, the longest a live event that
+still has people in it stays open after `endsAt` before it is closed to
+`ENDED`. `-1` means no time-based close. A room that has emptied past `endsAt`
+closes earlier, after `eventOvertimeEmptyMinutes`. The close is applied by the
+JVB scaler, or by the lifecycle cron where there is no scaler.
 [Event lifecycle](architecture/event-lifecycle.md#grace-period-and-overtime)
 
 **Inactivity grace** (`jvbInactiveGraceMinutes`): how long a `LIVE` room may
@@ -180,10 +187,12 @@ without it, when a moderator ends it.
 [From creation to recap](architecture/event-journey.md),
 [Event lifecycle](architecture/event-lifecycle.md#instant-calls)
 
-**Overtime**: the part of a live event that runs past `endsAt`, inside the
-grace period. Participants see a notice with the time left, or a note that the
-room stays open while people are connected; only the JVB scaler actually
-closes the room. [Event lifecycle](architecture/event-lifecycle.md#overtime-leaving-and-revival)
+**Overtime**: the part of a live event that runs past `endsAt`. It ends when
+the room has been empty for `eventOvertimeEmptyMinutes`, or at the overtime
+limit (the grace period) while people are still connected. Participants see the
+time left, or a note that the room stays open while people are connected. The
+close is applied by the JVB scaler, or by the lifecycle cron where there is no
+scaler. [Event lifecycle](architecture/event-lifecycle.md#overtime-leaving-and-revival)
 
 **Pre-scaling** (`jvbPreScaleMinutes`): the lead time before `startsAt` at
 which the JVB scaler moves a `PUBLISHED` event to `PROVISIONING` and starts
@@ -219,8 +228,10 @@ retention, description) that pre-fills the event wizard. Every field stays
 editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
-**Event wizard**: the five-step form that creates or edits an event:
-**Basics**, **Permissions**, **People**, **Content** and **Review**.
+**Event wizard**: the form that creates or edits an event, after four
+questions on its format: four steps (**Event**, **When**, **People**,
+**Summary**) and the **Advanced settings** with what the format or template
+has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -232,9 +243,12 @@ separate entity in the data model. [Roadmap](ROADMAP.md)
 **Invitation** (`EventInvitation`, UI **Invitations**): an entry in an
 event's invitation list, staged in the wizard's **People** step with role
 `GUEST` or `SPEAKER` and optionally linked to an address-book person. The
-platform sends no invitation email. With **Public registration enabled** off,
-the list is the set of addresses allowed to register (invitation-only
-registration).
+platform sends no invitation email. Each event chooses who can take part
+(`accessMode`, UI **Who registers**): **Anyone who registers** or **Only
+people you invite**; an event without a choice follows **Public registration
+enabled**. When only invitees can take part, the list is the set of addresses
+allowed to register (invitation-only registration), and an event that chose
+it admits no guests.
 [From creation to recap](architecture/event-journey.md#invitations-and-named-grants)
 
 **Join password** (`joinPasswordHash`): an optional per-event password asked
@@ -261,17 +275,21 @@ can link an occurrence to the first event of its series through
 `recurrenceSeriesId`; the administration UI does not set this link.
 [From creation to recap](architecture/event-journey.md)
 
-**Permission matrix** (`permissionMatrix`, wizard step **Permissions**): the
+**Permission matrix** (`permissionMatrix`, wizard advanced settings, section **Participation and room features**): the
 role-by-feature table (chat, Q&A, microphone, camera, screen share, recording
-control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Moderators can
-always do everything.
+control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
+`GUEST` column is chosen and applied: moderators can always do everything,
+and speakers always have microphone, camera and screen; the other columns
+are normalized to that on every write.
 [From creation to recap](architecture/event-journey.md#the-five-wizard-steps)
 
 **Questionnaire** (`EventQuestionnaire`, UI **Questionnaires**): questions
 attached to an event, either inside the registration form (`PRE_REGISTRATION`)
-or on the post-event page (`POST_EVENT`). A questionnaire is built from
+or as the end-of-event rating, in the room and on the post-event page
+(`POST_EVENT`). A questionnaire is built from
 reusable question templates (`QuestionTemplate`) plus questions specific to
-the event. [From creation to recap](architecture/event-journey.md)
+the event. A template is offered before the event, after it, or both
+(`usage`). [From creation to recap](architecture/event-journey.md)
 
 **Recurrence rule** (`recurrenceRule`, wizard field **Recurrence**): an RFC
 5545 RRULE describing an event's cadence. It proposes dates; nothing schedules
@@ -298,8 +316,10 @@ square: static, accessible and complete. A participant's choice of it is
 remembered. [The waiting room and the square](architecture/waiting-room.md)
 
 **Consent gate**: the part of the waiting room that blocks entry until
-required consents are given, such as consent to per-participant recording
-when an event uses it.
+required consents are given, such as the recording consent when an event
+records. The transcription consent, asked when an event records
+per-participant audio or keeps a transcript from captions, is optional and
+blocks nothing.
 [The waiting room and the square](architecture/waiting-room.md)
 
 **Device check**: the camera preview, microphone level and speaker test in
@@ -333,20 +353,21 @@ bring the square back. `GARDEN` is a legacy value treated as `GAME`.
 **Waiting-room music** (`waitingRoomAudioUrl`, UI **Waiting-room audio
 (optional)**): audio a visitor can switch on in the waiting room while the
 event is `PUBLISHED`. It is offered only when the event has its own audio
-(upload or URL in the wizard's **Basics** step), and nothing plays until the
+(upload or URL in the wizard's advanced settings, **Waiting room and video**), and nothing plays until the
 visitor presses **Enable music**.
 [The waiting room and the square](architecture/waiting-room.md#waiting-room-music)
 
 ### The live room
 
-**Agenda** (`agendaEnabled`, UI **Notes / Checklist**): a checklist of points
-that moderators tick off during the event. Participants can mark agreement or
-disagreement on each point (`AgendaItemReaction`).
+**Agenda** (`agendaEnabled`, UI **Agenda**): the list of topics for the
+meeting. During the event moderators mark each topic in progress, discussed or
+skipped (`AgendaItemStatus`), one in progress at a time, and the room's top bar
+shows the current one. Participants can mark agreement or disagreement on the
+topic in progress (`AgendaItemReaction`).
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Chat** (`ChatMessage`): the room's text chat. Messages are stored in
-PostgreSQL and fanned out through Redis. A message can be marked as a question
-(`isQuestion`) and filtered in a questions view.
+PostgreSQL and fanned out through Redis. Questions go through the Q&A panel.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Control bar and drawer**: the live room's floating buttons over the video,
@@ -376,8 +397,9 @@ questions and upvote them; moderators highlight, answer or dismiss them. It is
 controlled by `qaEnabled` and is distinct from a chat message marked as a
 question. [Live interaction and realtime](architecture/live-interaction.md)
 
-**Raised hand** (UI **Raised hands**): Jitsi's native raise-hand. Moderators
-see the queue of raised hands in the app.
+**Raised hand** (UI **Raised hands**): Jitsi's native raise-hand. Raised hands
+come first in the **Participants** panel, where moderators give the floor or
+lower them.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Reactions** (`reactionsMode`): emoji reactions, either Jitsi's native button
@@ -400,8 +422,10 @@ recording is published. [Recording](architecture/recording.md)
 shared whiteboard. It is enabled per event and needs the whiteboard backend on
 the Jitsi side. [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md)
 
-**Word cloud** (`WordCloudRound`, UI **Word cloud**): a timed round in which
-participants answer a prompt with short words, shown as a cloud.
+**Word cloud** (`WordCloudRound`, UI **In one word**): a round, timed or open
+until a moderator closes it, in which participants answer a question with
+single words, shown as a cloud where each word grows with the number of people
+who wrote it.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 ### After the event
@@ -413,13 +437,17 @@ for attendance, interaction and engagement. The instance-wide page is
 
 **Event recap** (`postEventRecap`, UI **Event recap**): an anonymized,
 aggregate snapshot of an ended event (headcount, top questions, published poll
-results, word-cloud words, feedback average). It is stored so it outlives the
-retention cleanup of the underlying rows.
+results, word-cloud words). It is stored so it outlives the retention cleanup,
+which deletes the registrations and chat messages it counts and quotes. The
+average rating shown with it is read live, and taken from the stored snapshot
+when fewer answers are left than it counted.
 [From creation to recap](architecture/event-journey.md)
 
-**Post-event feedback** (`EventFeedback`): a 1 to 5 rating with an optional
-comment, collected on the post-event page. It is separate from the post-event
-questionnaire. [From creation to recap](architecture/event-journey.md)
+**Post-event feedback** (UI **Feedback**; **Ratings** in the administration
+area): the end-of-event rating, which is the event's post-event questionnaire.
+The room asks for it when the call ends, and organizers see the answers
+without names. Older 1 to 5 star ratings with a comment (`EventFeedback`)
+count in the same average. [From creation to recap](architecture/event-journey.md#ratings)
 
 **Post-event page**: what an event's page becomes once it has `ENDED`:
 recording, recap, Q&A, polls, materials, feedback and AI outputs, each shown
@@ -429,6 +457,12 @@ or hidden per event. [From creation to recap](architecture/event-journey.md)
 published video: scheduled events, instant calls, uploaded archive videos,
 and recordings still waiting to be promoted.
 [From creation to recap](architecture/event-journey.md)
+
+**Recording notice** (`recordingNotifyEnabled`, UI **Notify registrants when
+the recording is published**): the single email that tells an event's
+registrants that its recording, or external video, is visible on the event
+page. On by default, sent once per event.
+[Email and calendar](architecture/email.md#recording-notice)
 
 **Video library** (`/video-library`, UI **Video library**): the public list of
 events whose recordings are published and listed (`libraryListed`).
@@ -842,17 +876,18 @@ transcripts held in the database) are stored encrypted with AES-256-GCM under
 personal data on request, alongside the automatic deletion at the end of
 retention. [Privacy and data protection](GDPR.md)
 
-**GDPR audit log** (`GdprAuditLog`, UI **GDPR audit**): per-event records of
+**GDPR audit log** (`GdprAuditLog`, UI **GDPR log**): per-event records of
 personal-data operations such as consents, exports and deletions. It records
 no actor. [Privacy and data protection](GDPR.md)
 
 **GDPR cleanup**: the scheduled job (`/api/cron/cleanup`; daily in the Helm
 chart, hourly in Compose) that deletes or scrubs personal data of events past
-their retention and marks those events `ARCHIVED`.
+their retention, keeps their live content without names or identifiers, and
+marks `ARCHIVED` only the events that were never ended.
 [Privacy and data protection](GDPR.md)
 
 **Privacy notice** (UI **Privacy policy**) and **privacy notice template**
-(`GdprTemplate`, UI **GDPR templates**): the information text a controller
+(`GdprTemplate`, UI **Privacy notices**): the information text a controller
 gives data subjects, set per installation and per event. Templates let the
 same text be reused across events.
 [Privacy and data protection](GDPR.md)
@@ -862,7 +897,8 @@ controller's behalf, for example an operator or hosting provider that runs the
 installation for a public body.
 [Privacy notice checklist for controllers](privacy/privacy-notice-checklist.md)
 
-**Retention**: how long each kind of personal data is kept before deletion.
+**Retention**: how long each kind of personal data is kept before deletion or
+anonymization.
 Events (`dataRetentionDays`), the address book, recordings, per-participant
 tracks and AI artifacts each follow their own regime.
 [Privacy and data protection](GDPR.md)
@@ -909,7 +945,8 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Amministrazione | **Administration** | administration area |
-| Utenze | **Accounts** | staff accounts (`StaffAccount`) |
+| Staff e accessi | **Staff and access** | admin section for staff accounts and moderator links |
+| Utenze dello staff | **Staff accounts** | staff accounts (`StaffAccount`) |
 | Amministratore | **Administrator** | administrator (`ADMIN`) |
 | Organizzatore | **Organiser** | organizer (`ORGANIZER`) |
 | Organizzatori | **Organizers** | co-organizing organizations (`EventOrganizer`) |
@@ -917,7 +954,7 @@ these docs and the code use *organizer*.
 | Moderatore | **Moderator** | moderator (`MODERATOR`) |
 | Moderatore principale | **Primary moderator** | primary moderator (the event's contact for the moderator link) |
 | Link da moderatore | **Moderator link** | moderator link |
-| Moderatori | **Moderators** | moderator links of all events |
+| Link dei moderatori | **Moderator links** | moderator links of all events |
 | Relatore | **Speaker** | speaker (grant role `SPEAKER`) |
 | Partecipante | **Participant** | participant (a registrant in the room) |
 | Ospite | **Guest** | guest |
@@ -942,16 +979,17 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Template eventi | **Event templates** | event template (`EventTemplate`) |
-| Base | **Basics** | event wizard, step 1 |
-| Permessi | **Permissions** | event wizard, step 2 (permission matrix) |
+| Evento | **Event** | event wizard, step 1 |
+| Quando | **When** | event wizard, step 2 |
 | Persone | **People** | event wizard, step 3 |
-| Contenuti | **Content** | event wizard, step 4 |
-| Riepilogo | **Review** | event wizard, step 5 |
+| Riepilogo | **Summary** | event wizard, step 4 |
+| Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
 | Duplica per la prossima | **Duplicate for next time** | duplicate as the next occurrence |
 | Iscrizioni | **Sign-ups** | registrations (`Registration`) |
 | Registrazione all'evento | **Event registration** | registration (never "recording") |
 | Inviti | **Invitations** | invitations (`EventInvitation`) |
+| Chi si iscrive | **Who registers** | who can take part (`Event.accessMode`) |
 | Notifiche | **Notifications** | reminders (`EventReminder`) |
 | Questionari | **Questionnaires** | questionnaires |
 | Questionario di pre-registrazione | **Pre-registration questionnaire** | pre-registration questionnaire (`PRE_REGISTRATION`) |
@@ -979,10 +1017,10 @@ these docs and the code use *organizer*.
 | Esci solo tu | **Just leave** | Just leave |
 | Domande e Risposte | **Questions & Answers** | Q&A (`Question`) |
 | Sondaggi | **Polls** | polls (`Poll`) |
-| Nuvola di parole | **Word cloud** | word cloud (`WordCloudRound`) |
+| In una parola | **In one word** | word cloud (`WordCloudRound`) |
 | Reazioni | **Reactions** | reactions |
 | Mani alzate | **Raised hands** | raised-hand queue |
-| Note / Checklist | **Notes / Checklist** | agenda (`agendaEnabled`) |
+| Agenda | **Agenda** | agenda (`agendaEnabled`) |
 | Lavagna | **Whiteboard** | whiteboard (`whiteboardEnabled`) |
 | Registrazione in corso | **Recording in progress** | recording (never "registration") |
 | Guarda dall'inizio | **Watch from the start** | temporary recording (catch-up) |
@@ -992,19 +1030,20 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Riepilogo dell'evento | **Event recap** | event recap (`postEventRecap`) |
-| Feedback | **Feedback** | post-event feedback (`EventFeedback`) |
+| Feedback | **Feedback** | post-event feedback (`POST_EVENT` questionnaire) |
+| Valutazioni | **Ratings** | the event's ratings panel (post-event feedback) |
 | Libreria video | **Video library** | video library |
 | Pubblicazioni | **Publications** | publications |
 | Statistiche | **Statistics** | event analytics |
 | Statistiche | **Analytics** | instance-wide analytics |
-| Video & sessioni | **Video & sessions** | recordings and call sessions |
+| Video | **Video** | recordings, AI post-production, glossary and publications (administration menu) |
 
 ### AI post-production
 
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Post-produzione automatica | **Automatic post-production** | AI post-production |
-| Trascrizioni / AI | **Transcripts / AI** | AI post-production (administration list) |
+| Post-produzione AI | **AI post-production** | AI post-production (administration list) |
 | Registrazione per-partecipante | **Per-participant recording** | multitrack recording |
 | Conserva le tracce per-partecipante | **Keep per-participant tracks** | retained per-participant tracks (`retainParticipantTracks`) |
 | Trascrizione | **Transcript** | transcript |
@@ -1031,8 +1070,8 @@ these docs and the code use *organizer*.
 | Sicurezza e trasparenza | **Security and transparency** | security and transparency page (`/security`) |
 | Dichiarazione di accessibilità | **Accessibility statement** | accessibility statement |
 | Informativa privacy | **Privacy policy** | privacy notice |
-| Template GDPR | **GDPR templates** | privacy notice template (`GdprTemplate`) |
-| Audit GDPR | **GDPR audit** | GDPR audit log (`GdprAuditLog`) |
+| Informative privacy | **Privacy notices** | privacy notice template (`GdprTemplate`) |
+| Registro GDPR | **GDPR log** | GDPR audit log (`GdprAuditLog`) |
 
 ## Abbreviations
 

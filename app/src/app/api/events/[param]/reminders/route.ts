@@ -2,11 +2,13 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
   UnauthorizedError,
   ForbiddenError,
-  ConflictError,
+  AppError,
   ValidationError,
 } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
+import { reminderTriggerAt } from '@/lib/email/reminder-plan';
+import { MAX_REMINDERS } from '@/lib/events/reminder-presets';
 import { createReminderSchema, REMINDER_PRESETS } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -60,10 +62,15 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
-  // Max 5 reminders per event
+  // Un momento gia' passato non partirebbe mai (il cron manda solo il
+  // promemoria corrente): si rifiuta invece di salvarlo.
+  if (reminderTriggerAt(event.startsAt, parsed.data.offsetMinutes).getTime() <= Date.now()) {
+    throw new AppError('The moment of this reminder has passed', 409, 'REMINDER_PASSED');
+  }
+
   const count = await prisma.eventReminder.count({ where: { eventId: event.id } });
-  if (count >= 5) {
-    throw new ValidationError('Maximum 5 reminders per event');
+  if (count >= MAX_REMINDERS) {
+    throw new AppError(`Maximum ${MAX_REMINDERS} reminders per event`, 422, 'REMINDER_LIMIT');
   }
 
   // Check for duplicate offset
@@ -71,7 +78,7 @@ export const POST = withErrorHandling(async (request, context) => {
     where: { eventId: event.id, offsetMinutes: parsed.data.offsetMinutes },
   });
   if (existing) {
-    throw new ConflictError('Reminder with this offset already exists');
+    throw new AppError('Reminder with this offset already exists', 409, 'REMINDER_EXISTS');
   }
 
   const preset = REMINDER_PRESETS.find((p) => p.offsetMinutes === parsed.data.offsetMinutes);

@@ -34,8 +34,11 @@ export async function signEventAccess(
   eventId: string,
   accessToken: string,
   ttlSeconds: number,
+  /** Il browser ha aperto il link firmato dell'email (registrations/enter):
+   *  oltre a essersi iscritto, ha provato di leggere quella casella. */
+  opts: { emailVerified?: boolean } = {},
 ): Promise<string> {
-  return new SignJWT({ eventId, token: accessToken })
+  return new SignJWT({ eventId, token: accessToken, ...(opts.emailVerified ? { ev: true } : {}) })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuedAt()
     .setExpirationTime(`${Math.max(MIN_TTL_SECONDS, Math.floor(ttlSeconds))}s`)
@@ -69,13 +72,26 @@ export async function verifyEventAccess(
   eventId: string,
   cookieValue: string | undefined,
 ): Promise<string | null> {
+  return (await readEventAccess(eventId, cookieValue))?.token ?? null;
+}
+
+/**
+ * Come `verifyEventAccess`, con in piu' `emailVerified`: vero solo se il cookie
+ * e' nato dal link firmato dell'email. Iscriversi dal modulo lega il browser
+ * all'iscrizione, ma non prova di possedere l'indirizzo scritto; quel che vale
+ * per l'indirizzo in tutti gli eventi (la foto profilo) chiede questa prova.
+ */
+export async function readEventAccess(
+  eventId: string,
+  cookieValue: string | undefined,
+): Promise<{ token: string; emailVerified: boolean } | null> {
   if (!cookieValue) return null;
   const secret = tryGetAppSecret();
   if (!secret) return null;
   try {
     const { payload } = await jwtVerify(cookieValue, new TextEncoder().encode(secret));
-    if (payload.eventId !== eventId) return null;
-    return typeof payload.token === 'string' ? payload.token : null;
+    if (payload.eventId !== eventId || typeof payload.token !== 'string') return null;
+    return { token: payload.token, emailVerified: payload.ev === true };
   } catch {
     return null;
   }
@@ -94,6 +110,13 @@ export async function verifyEventAccess(
  * new code should call this helper.
  */
 export async function readOwnedEventAccessToken(eventId: string): Promise<string | null> {
+  return (await readOwnedEventAccess(eventId))?.token ?? null;
+}
+
+/** Il cookie dell'evento della richiesta corrente, con la prova dell'email. */
+export async function readOwnedEventAccess(
+  eventId: string,
+): Promise<{ token: string; emailVerified: boolean } | null> {
   const cookieStore = await cookies();
-  return verifyEventAccess(eventId, cookieStore.get(eventAccessCookieName(eventId))?.value);
+  return readEventAccess(eventId, cookieStore.get(eventAccessCookieName(eventId))?.value);
 }

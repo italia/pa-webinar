@@ -20,18 +20,24 @@
  * additionally restrict ingress to the app pod CIDR).
  */
 
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
+import { buildAsrInitialPrompt } from '@/lib/ai/asr-prompt';
+import { glossaryForEvent, glossaryHints } from '@/lib/ai/glossary';
+import { POSTPROD_JOB_KINDS } from '@/lib/ai/job-classes';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { buildLiveTimeline, recordingTimeZero } from '@/lib/postprod/live-timeline';
 import {
   artifactMimeType,
   artifactPath,
   expectedArtifactsForJob,
   postprodJobPayloadSchema,
 } from '@/lib/ai';
+import type { reportPayloadSchema } from '@/lib/ai/schemas';
 import {
   resolveAsrProvider,
   resolveLlmProvider,
@@ -43,57 +49,28 @@ import {
 } from '@/lib/storage/postprod';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { postprodJobAttemptsTotal } from '@/lib/metrics';
+import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
+import { ingressoResoconto } from '@/lib/report/input';
+import { scriviNumeriResoconto } from '@/lib/report/job';
+import { metricheResoconto } from '@/lib/report/metrics';
 
 export const dynamic = 'force-dynamic';
-
-/**
- * Costruisce l'initial_prompt per WhisperX dai metadata dell'evento.
- * Aiuta Whisper a riconoscere nomi propri, sigle, organizzazioni
- * specifiche dell'evento (es. una sigla come "PCM" o il nome di un relatore).
- *
- * Cap a 800 caratteri per stare ben dentro la token-window di Whisper
- * (~224 tokens il modello accetta come prompt iniziale).
- */
-function buildAsrInitialPrompt(event: {
-  title: unknown;
-  organizerName: string | null;
-  speakersInfo: unknown;
-}): string | undefined {
-  const localised = (v: unknown): string | undefined => {
-    if (typeof v === 'string') return v;
-    if (v && typeof v === 'object') {
-      const obj = v as Record<string, unknown>;
-      for (const key of ['it', 'en', 'fr', 'de', 'es']) {
-        const candidate = obj[key];
-        if (typeof candidate === 'string' && candidate.trim()) return candidate;
-      }
-    }
-    return undefined;
-  };
-  const parts: string[] = [];
-  const title = localised(event.title);
-  if (title) parts.push(title.trim());
-  if (event.organizerName) {
-    parts.push(`Organizzato da ${event.organizerName.trim()}.`);
-  }
-  const speakers = localised(event.speakersInfo);
-  if (speakers) parts.push(`Partecipanti e relatori: ${speakers.trim()}.`);
-  const out = parts.join(' ').trim();
-  if (!out) return undefined;
-  return out.length > 800 ? out.slice(0, 800) : out;
-}
 
 const claimRequestSchema = z.object({
   /** Worker pod name — recorded as leased_by for observability. */
   workerId: z.string().min(1).max(120),
   /** Lease horizon, in minutes. Default 30, max 120. */
   leaseMinutes: z.number().int().min(1).max(120).optional(),
+  /** I tipi di job che questo worker sa eseguire (lib/ai/job-classes): un
+   *  worker senza GPU non prende una trascrizione. Assente: tutti. */
+  kinds: z.array(z.enum(POSTPROD_JOB_KINDS)).min(1).max(POSTPROD_JOB_KINDS.length).optional(),
 });
 
 interface ClaimedRow {
   id: string;
-  recording_id: string;
-  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE';
+  /** Nullo per il resoconto dell'evento (REPORT). */
+  recording_id: string | null;
+  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE' | 'REPORT';
   payload: unknown;
   attempts: number;
   next_attempt_at: Date;
@@ -104,7 +81,10 @@ export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
   const body = (await request.json()) as unknown;
-  const { workerId, leaseMinutes } = claimRequestSchema.parse(body);
+  const { workerId, leaseMinutes, kinds } = claimRequestSchema.parse(body);
+  const soloTipi = kinds
+    ? Prisma.sql`AND j.kind::text = ANY(${[...kinds]}::text[])`
+    : Prisma.empty;
   const lease = leaseMinutes ?? 30;
   const leaseUntil = new Date(Date.now() + lease * 60_000);
 
@@ -120,6 +100,7 @@ export const POST = withErrorHandling(async (request) => {
       WHERE j.status = 'PENDING'
         AND j.next_attempt_at <= NOW()
         AND (j.depends_on_id IS NULL OR dep.status = 'DONE')
+        ${soloTipi}
       ORDER BY j.next_attempt_at ASC
       LIMIT 1
       -- Lock ONLY j (the row we claim). Without OF j, Postgres tries to
@@ -172,6 +153,16 @@ export const POST = withErrorHandling(async (request) => {
     );
   }
 
+  // Il resoconto dell'evento non scarica media ne' carica file: gli ingressi
+  // si raccolgono adesso (lib/report), i numeri restano nel lavoro e il
+  // risultato torna alla rotta del resoconto.
+  if (parsed.data.kind === 'REPORT') {
+    return rispostaResoconto(row, parsed.data.payload, leaseUntil);
+  }
+  if (!row.recording_id) {
+    throw new ValidationError(`postprod_job ${row.id} (${row.kind}) has no recording`);
+  }
+
   // Fetch Recording + Event for provider routing + source path.
   const recording = await prisma.recording.findUnique({
     where: { id: row.recording_id },
@@ -189,10 +180,12 @@ export const POST = withErrorHandling(async (request) => {
           // della sintesi (job SUMMARIZE) — vedi più sotto.
           agendaItems: {
             orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-            select: { label: true, completed: true },
+            select: { label: true, completed: true, status: true, plannedMinutes: true },
           },
         },
       },
+      callSession: { select: { endedAt: true } },
+      _count: { select: { tracks: true } },
     },
   });
   if (!recording) throw new NotFoundError('Recording');
@@ -511,14 +504,71 @@ export const POST = withErrorHandling(async (request) => {
     }
   }
 
-  // Per la sintesi: inietta l'agenda (punti + spunte) nel payload, così il
+  // Per la sintesi: inietta l'agenda (punti + stato) nel payload, così il
   // worker la include nel prompt LLM. Funzione opzionale: se non ci sono
-  // item (agenda spenta/vuota) il payload resta invariato e nulla cambia.
+  // item (agenda spenta/vuota) il payload resta senza.
+  // E la cronologia della sala, sulla base dei tempi della trascrizione:
+  // quando si e' aperto un argomento, chiuso un sondaggio, alzata una mano.
   const agenda = recording.event.agendaItems ?? [];
-  const payloadOut =
-    row.kind === 'SUMMARIZE' && agenda.length > 0
-      ? { ...(parsed.data.payload as Record<string, unknown>), agenda }
-      : parsed.data.payload;
+  let payloadOut: unknown = parsed.data.payload;
+  if (row.kind === 'SUMMARIZE') {
+    const multitrack = recording._count.tracks > 0;
+    // Una registrazione composita nasce a file caricato: il suo avvio vero e'
+    // quello che chi modera ha riferito dalla sala, se c'e'. Si cerca dove
+    // deve stare: circa una durata prima della creazione (il caricamento la
+    // sposta in avanti di qualche minuto, mai indietro). Un avvio fuori da
+    // quella finestra e' di un'altra registrazione.
+    const durataMs = (recording.durationSec ?? 0) * 1000;
+    const avviata =
+      multitrack || durataMs <= 0
+        ? null
+        : await prisma.liveAction
+            .findFirst({
+              where: {
+                eventId: recording.event.id,
+                kind: 'recording.started',
+                at: {
+                  gte: new Date(recording.createdAt.getTime() - durataMs - 30 * 60_000),
+                  lte: new Date(recording.createdAt.getTime() - durataMs + 2 * 60_000),
+                },
+              },
+              orderBy: { at: 'desc' },
+              select: { at: true },
+            })
+            .catch(() => null);
+    const { t0, exact } = recordingTimeZero({
+      mediaStartedAt: recording.mediaStartedAt,
+      createdAt: recording.createdAt,
+      durationSec: recording.durationSec,
+      multitrack,
+      journaledStart: avviata?.at ?? null,
+    });
+    // La cronologia arricchisce la sintesi, non la condiziona: se non si
+    // legge, la sintesi parte senza (il job e' gia' preso in carico).
+    let timeline: Awaited<ReturnType<typeof buildLiveTimeline>> | null = null;
+    try {
+      timeline = await buildLiveTimeline({
+        eventId: recording.event.id,
+        t0,
+        exact,
+        // Fino alla fine di questa registrazione, se se ne sa la durata: una
+        // sessione con piu' registrazioni non mescola le loro cronologie.
+        until:
+          durataMs > 0
+            ? new Date(t0.getTime() + durataMs)
+            : (recording.callSession?.endedAt ?? new Date()),
+      });
+    } catch (err) {
+      console.error(`[postprod-claim] job ${row.id}: cronologia della sala non letta`, err);
+    }
+    payloadOut = {
+      ...(parsed.data.payload as Record<string, unknown>),
+      ...(agenda.length > 0 && { agenda }),
+      ...(timeline && (timeline.entries.length > 0 || timeline.chapters.length > 0) && { timeline }),
+    };
+  }
+
+  const glossary = await glossaryForEvent(recording.event.id);
 
   return Response.json(
     {
@@ -542,16 +592,78 @@ export const POST = withErrorHandling(async (request) => {
         asrModelId: asr.modelId,
         ttsVoicesPath: tts.voicesPath,
         // Context-aware quality knobs (TRANSCRIBE job).
-        // - initial_prompt: nomi propri + termini specifici dell'evento.
+        // - initial_prompt: nomi propri + termini specifici dell'evento. Non
+        //   alla multitraccia: le tracce di una persona sono quasi tutte
+        //   silenzio, e su un silenzio Whisper ripete il suggerimento.
         // - expectedSpeakers: forza k nella diarization se admin lo sa.
         ...(row.kind === 'TRANSCRIBE'
           ? {
-              asrInitialPrompt: buildAsrInitialPrompt(recording.event),
+              asrInitialPrompt: buildAsrInitialPrompt(recording.event, glossary),
               expectedSpeakers: recording.event.expectedSpeakers ?? undefined,
             }
           : {}),
+        // Il glossario (lib/ai/glossary): forme della trascrizione,
+        // traduzioni fisse e pronunce del doppiaggio.
+        glossary: glossaryHints(glossary),
       },
     },
     { status: 200 },
   );
 });
+
+/** Il claim di un lavoro REPORT: gli ingressi del resoconto e il modello da usare. */
+async function rispostaResoconto(
+  row: ClaimedRow,
+  payload: z.infer<typeof reportPayloadSchema>,
+  leaseUntil: Date
+): Promise<Response> {
+  // Le valutazioni servono ai numeri e al testo: si leggono una volta.
+  const valutazioni = await buildEventFeedbackReport(payload.eventId);
+  const metrics = await metricheResoconto(
+    payload.eventId,
+    payload.sourceLanguage,
+    valutazioni
+  );
+  const reportInput = metrics
+    ? await ingressoResoconto(
+        payload.eventId,
+        payload.sourceLanguage,
+        metrics,
+        valutazioni
+      )
+    : null;
+  if (!metrics || !reportInput) throw new NotFoundError('Event');
+  // I numeri restano nel lavoro: la consegna li rilegge di qui, non dal
+  // worker. Se nel frattempo il lavoro e' stato preso da un claim successivo
+  // o cancellato, non si rifa'.
+  if (!(await scriviNumeriResoconto(row.id, row.attempts, metrics))) return new Response(null, { status: 204 });
+  const siteSettings = await prisma.siteSetting.findUnique({
+    where: { id: 'singleton' },
+    select: { aiLlmProvider: true },
+  });
+  const llm = resolveLlmProvider({ siteProvider: siteSettings?.aiLlmProvider ?? 'vllm' });
+  const glossary = await glossaryForEvent(payload.eventId);
+  return Response.json({
+    claimed: true,
+    jobId: row.id,
+    recordingId: row.recording_id,
+    kind: row.kind,
+    payload: {
+      eventId: payload.eventId,
+      sourceLanguage: payload.sourceLanguage,
+      targetLanguages: payload.targetLanguages,
+    },
+    attempts: row.attempts,
+    leaseExpiresAt: leaseUntil.toISOString(),
+    sourceDownloadUrl: '',
+    uploadTargets: {},
+    inputs: [],
+    reportInput,
+    providerHints: {
+      llmProvider: llm.provider,
+      llmBaseUrl: llm.baseUrl,
+      llmModelId: llm.modelId,
+      glossary: glossaryHints(glossary),
+    },
+  });
+}

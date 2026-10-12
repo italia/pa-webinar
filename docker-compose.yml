@@ -68,6 +68,10 @@ services:
       # Lo leggono la pagina di stato e il giro del ciclo di vita, che apre
       # la sala solo se il bridge risponde.
       - JVB_HEALTH_URL=http://jvb:8080
+      # Stato del servizio dei sottotitoli live (profilo "captions"). Vuoto =
+      # sottotitoli non installati: si imposta in .env insieme alle altre
+      # variabili CAPTIONS_* (vedi .env.example).
+      - CAPTIONS_STATUS_URL=${CAPTIONS_STATUS_URL:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -136,12 +140,18 @@ services:
       - JWT_ACCEPTED_AUDIENCES=jitsi
       - ENABLE_GUESTS=0
       - PUBLIC_URL=https://localhost:8443
+      # La filigrana e i colori della scena, dal portale (lo legge il browser).
+      - DYNAMIC_BRANDING_URL=${JITSI_BRANDING_URL:-http://localhost:3000/api/jitsi-branding.json}
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_BOSH_URL_BASE=http://prosody:5280
       - JVB_TCP_HARVESTER_DISABLED=true
     volumes:
       - jitsi_web_config:/config
+      # Niente logo di Jitsi sopra la chiamata: l'immagine aggiunge questi due
+      # file alla configurazione che genera all'avvio.
+      - ./infra/jitsi/web/custom-interface_config.js:/config/custom-interface_config.js:ro
+      - ./infra/jitsi/web/custom-config.js:/config/custom-config.js:ro
       - jitsi_web_crontabs:/var/spool/cron/crontabs
       - jitsi_transcripts:/usr/share/jitsi-meet/transcripts
     depends_on:
@@ -161,7 +171,15 @@ services:
       - JWT_TOKEN_AUTH_MODULE=token_verification
       - ENABLE_GUESTS=0
       - GLOBAL_MODULES=token_verification
-      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom
+      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock,pa_captions,pa_occupants
+      # Sottotitoli live: con "true" il modulo pa_captions rende le stanze
+      # trascrivibili. Va insieme al profilo "captions" e a CAPTIONS_JICOFO_OPTS
+      # (vedi .env.example).
+      - PA_CAPTIONS_ENABLED=${CAPTIONS_ENABLED:-false}
+      # Chi c'e' nella conferenza, per il portale (mod_pa_occupants): serve a
+      # tenere la trascrizione e l'audio solo di chi ha dato il consenso. Le
+      # notifiche sono firmate con JWT_APP_SECRET, lo stesso segreto del portale.
+      - PA_PORTAL_URL=http://app:3000
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
@@ -190,16 +208,29 @@ services:
       - JICOFO_AUTH_PASSWORD=jicofo_pass
       - AUTH_TYPE=jwt
       - ENABLE_AUTH=1
+      # Come nel chart: Jicofo senza autenticazione propria non promuove a
+      # moderatore chi entra, e il ruolo resta quello del token (Prosody
+      # rifiuta comunque chi non ha un token valido). Con l'autenticazione
+      # accesa ogni ospite diventava moderatore, e con il ruolo l'ammissione
+      # al microfono nelle sale moderate.
+      - JICOFO_ENABLE_AUTH=false
       - ENABLE_AUTO_OWNER=false
       - JICOFO_ENABLE_AUTO_OWNER=false
       - JICOFO_AUTHENTICATION_TYPE=jwt
-      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=30
+      # Durata con l'unita': Jicofo legge un numero nudo come millisecondi, e
+      # con «30» chiudeva la conferenza prima che il primo partecipante entrasse.
+      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=30 seconds
       - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=0
       - JICOFO_AUTH_LIFETIME=86400
       # API REST sulla 8888 aperta alla rete di compose (di default ascolta
       # solo su 127.0.0.1): la legge la pagina di stato (JICOFO_HEALTH_URL).
       # Nessuna porta pubblicata sull'host.
       - JICOFO_ENABLE_REST=1
+      # Sottotitoli live: l'indirizzo del gateway a cui il bridge manda
+      # l'audio e il segreto che presenta, come proprietà della JVM (Jicofo
+      # non ha variabili per queste chiavi). Il valore, con {{MEETING_ID}}
+      # letterale, è in .env.example; vuoto = nessuna trascrizione.
+      - JAVA_TOOL_OPTIONS=${CAPTIONS_JICOFO_OPTS:-}
     volumes:
       - jitsi_jicofo_config:/config
     depends_on:
@@ -324,6 +355,83 @@ services:
     profiles: ["recorder"]
     restart: unless-stopped
 
+  # ── Sottotitoli live (opt-in: --profile captions) ──────────────────
+  # Lo stesso servizio che il chart rende in un pod: il gateway riceve dal
+  # bridge l'audio di chi parla e lo passa al motore, che lo trascrive con un
+  # modello locale. Il motore condivide la rete del gateway e ascolta solo su
+  # 127.0.0.1, come nel pod; il bridge raggiunge il gateway come
+  # captions-gateway:8080. Per accenderli servono anche le variabili
+  # CAPTIONS_* in .env (vedi .env.example), poi:
+  #   docker compose --profile captions up --build -d
+  # e un riavvio di prosody, jicofo e app se erano già su.
+
+  # Scarica il modello (circa 750 MB) nel volume e ne verifica l'impronta;
+  # se c'è già, esce subito.
+  captions-model:
+    build: ./infra/captions/engine
+    image: pa-webinar-captions-engine:local
+    entrypoint: ["/usr/local/bin/fetch-model.sh"]
+    environment:
+      - CAPTIONS_MODEL_URL=https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/resolve/ea30d66debe3740a08b573244286791d423d6b3e/nemotron-3.5-asr-streaming-0.6b.q8_0.gguf
+      - CAPTIONS_MODEL_SHA256=3fc991d3badad7277c11030a7519832cddaf2057aafed6d4b25147e953a070b1
+      - CAPTIONS_MODEL_PATH=/models/asr.gguf
+    volumes:
+      - captions_models:/models
+    profiles: ["captions"]
+
+  captions-engine:
+    build: ./infra/captions/engine
+    image: pa-webinar-captions-engine:local
+    # Gli stessi argomenti del chart (templates/captions.yaml) per quattro
+    # voci e quattro thread.
+    command:
+      - --asr-model
+      - /models/asr.gguf
+      - --device
+      - cpu
+      - --host
+      - 127.0.0.1
+      - --port
+      - "8090"
+      - --no-ui
+      - --threads
+      - "8"
+      - --read-timeout
+      - "300"
+      - --write-timeout
+      - "300"
+      - --asr.backend.threads
+      - "4"
+      - --asr.streaming.rnnt_right_context
+      - "3"
+      - --asr.batching.state_arena_slots=16
+    network_mode: "service:captions-gateway"
+    volumes:
+      - captions_models:/models:ro
+    depends_on:
+      captions-model:
+        condition: service_completed_successfully
+      captions-gateway:
+        condition: service_started
+    profiles: ["captions"]
+    restart: unless-stopped
+
+  captions-gateway:
+    build: ./infra/captions/gateway
+    image: pa-webinar-captions-gateway:local
+    environment:
+      - PORT=8080
+      - CAPTIONS_ENGINE_PORT=8090
+      # Segreto di sviluppo, pubblico in questo file come gli altri: lo stesso
+      # che CAPTIONS_JICOFO_OPTS fa presentare al bridge.
+      - CAPTIONS_AUTH_TOKEN=dev_captions_token_not_a_secret
+      - CAPTIONS_CONTEXT_URL=http://app:3000/api/internal/captions/context
+      - CAPTIONS_CONTEXT_TOKEN=dev_cron_key_change_in_production
+      - CAPTIONS_LANGUAGE=it-IT
+      - CAPTIONS_MAX_STREAMS=4
+    profiles: ["captions"]
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   jitsi_web_config:
@@ -332,3 +440,4 @@ volumes:
   jitsi_prosody_config:
   jitsi_jicofo_config:
   jitsi_jvb_config:
+  captions_models:

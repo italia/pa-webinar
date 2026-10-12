@@ -170,7 +170,7 @@ What a caller can learn from an error:
 |---|---|---|
 | `/api/events/{param}/chat/stream`, `…/control/stream`, `…/live/stream` | Long-lived SSE streams | The chat stream maps its authorization errors through `errorResponse()` itself. None of the three writes the log line or the metrics |
 | `/api/assets/{…}` | Streams file bytes | Its own plain-text 400, 404 and 502 responses |
-| `/api/avatar`, `/api/jitsi-branding.json`, `/api/openapi.json` | Public, read-only, cacheable | They answer `Access-Control-Allow-Origin: *` |
+| `/api/avatar`, `/api/avatar/photo/{id}`, `/api/jitsi-branding.json`, `/api/openapi.json` | Public, read-only, cacheable | They answer `Access-Control-Allow-Origin: *` |
 | `/api/ready` | Readiness probe | Its 503 body includes the database error message, and the route is reachable through the ingress |
 
 A new route should use the wrapper. The conventions are in [Extending PA Webinar](../development/extending.md).
@@ -181,7 +181,7 @@ PA Webinar has no CSRF tokens. It checks neither `Origin` nor `Referer` on any r
 
 - **Headers the browser never adds on its own.** Seat tokens and machine keys travel in `Authorization` or `x-api-key` headers, which only the page's own script sets. Most routes that read a seat token accept it from `Authorization: Bearer` and, when that header is missing, from `?token=`. The portal's own pages use the query form only on magic-link landing pages and on the chat stream. The shared extractor, `extractModeratorToken()` in `app/src/lib/auth/moderator.ts`, logs a one-time warning when an API call uses it. Either way, a forged request can carry a token only if the attacker already has it.
 - **`SameSite=Lax` on every cookie.** `admin_session`, `event_access_<eventId>` and `join_granted_<eventId>` are all `SameSite=Lax` and `HttpOnly`, and `Secure` in production. Browsers leave them off cross-site subrequests and cross-site `POST`, `PUT` and `DELETE` requests. They do send them on top-level `GET` navigations. Because the attribute is set explicitly, the grace period some browsers grant to cookies without a `SameSite` attribute does not apply. The cookies are listed in the [cookie inventory](identity-and-access.md#cookie-inventory).
-- **No CORS on the API.** API responses carry no CORS headers, except the three public read-only routes above. Another origin can neither read API responses nor get a preflighted request, such as one with a JSON content type, past the browser.
+- **No CORS on the API.** API responses carry no CORS headers, except the four public read-only routes above. Another origin can neither read API responses nor get a preflighted request, such as one with a JSON content type, past the browser.
 
 ```mermaid
 flowchart TB
@@ -207,6 +207,7 @@ What this means in practice:
 
 - **Every host on the portal's registrable domain is inside the boundary.** Browsers decide `SameSite` by the registrable domain, not by the exact host. A page on any host under the same registrable domain is a different origin but the same site, so its requests carry staff and event cookies. A `PUT`, a `DELETE` or a request with a JSON `Content-Type` still needs a CORS preflight, which the API does not answer. Simple requests need none: a form `POST`, or a credentialed `fetch` with a `text/plain` body. `parseJsonBody()` in `app/src/lib/api-handler.ts` parses the body as JSON whatever its `Content-Type`, so such a request reaches cookie-authenticated `POST` mutations, for example `POST /api/events` for staff. In the recommended layout that sibling host includes the conference host. Host nothing there that runs content you do not control.
 - **A cookie-authenticated `GET` must never change state.** This is a rule for developers: top-level cross-site navigations carry `SameSite=Lax` cookies.
+- **The material open count takes only preflighted requests.** `POST /api/events/{slug}/materials/{id}/opened` needs no credential, so a page on another origin could otherwise make its visitors' browsers inflate the count. The route counts only a request that declares `Content-Type: application/json`, which needs a preflight the API does not answer, and answers anything else with `204` without counting ([Materials](live-interaction.md#materials)).
 - **Do not add CORS at the edge.** An ingress or gateway that answers `/api` with a permissive `Access-Control-Allow-Origin` and `Access-Control-Allow-Credentials` would remove the read protection.
 - **Portal pages cannot be framed.** `frame-ancestors 'none'` and `X-Frame-Options: DENY` stop clickjacking. Embedding portal pages in another site is not supported.
 - **Server-side integrations are unaffected.** They authenticate with headers, not cookies. A browser integration on another origin cannot use a staff session at all.
@@ -268,6 +269,7 @@ Two other values reach the page as markup, and both are constrained:
 - **Administration assets.** Images, audio and documents (logos, covers, waiting-room audio, materials) are sent through the portal to `/api/admin/assets/upload-url`. The route checks each file against a per-type MIME allowlist and size cap. It then verifies that the content's magic bytes match the declared type (`contentMatchesDeclaredMime` in `app/src/lib/utils/mime-sniff.ts`). The image allowlist includes SVG, which is why serving forces a download for it (below).
 - **Chat attachments.** Only a moderator, a speaker or a registrant can upload one. Guests cannot. Attachments are limited to images and PDF, checked against their magic bytes, capped at 10 MiB (`app/src/lib/chat/attachments.ts`) and rate-limited per sender.
 - **Event materials uploaded from the room.** A moderator (the primary moderator link or a named `MODERATOR` grant, not a speaker) can upload a file from the room's materials panel through `POST /api/events/{slug}/materials/upload`. The portal receives the file and writes it to storage itself. It applies the same MIME allowlist and magic-byte check as the document asset type (`MATERIAL_FILE_MIME_TYPES` in `app/src/lib/validation/materials.ts`) and caps a file at 25 MiB. It allows 10 uploads per minute per IP address and event, and it refuses a new file once the event holds 50 material files or 500 MiB of them (`MATERIAL_FILES_PER_EVENT_*`). The older route `POST /api/events/{id}/files` still exists and hands out a signed upload URL without inspecting the content, but no page calls it.
+- **Profile photos.** A registrant, in a browser that has opened the entry link from a registration email, can upload one photo from the waiting room through `POST /api/events/{slug}/profile-photo`. Named grants and the shared moderator link cannot: staff choose a grant's address, so holding its link does not prove it. The server reads at most 150,000 bytes of the body as it streams in, accepts only JPEG, PNG and WebP, recognized by their magic bytes (`sniffImageType` in `app/src/lib/profile-photo.ts`), never SVG, and refuses an image larger than 4096×4096 pixels before decoding it. It then re-encodes every upload with sharp as a 256×256 JPEG, first frame only, without metadata (`normalizePhoto`), so what it stores and serves is always an image it produced. The portal loads sharp, a native module, only when it processes an upload. It allows 10 uploads per hour per email address. The photo is stored in the database and served by `/api/avatar/photo/{id}` with the stored type, `X-Content-Type-Options: nosniff` and `Content-Security-Policy: default-src 'none'; sandbox`, so it cannot run as a document. The address is a random UUID, unauthenticated because the conference on another origin loads it, and every participant receives it in the conference ([Avatars](identity-and-access.md#avatars)).
 - **Serving.** `/api/assets/{…}` serves only keys under `assets/`, and refuses `..`, backslashes and absolute paths. It streams each object through a read URL valid for 10 minutes, which it never shows the client. It always sends `X-Content-Type-Options: nosniff`. For SVG, HTML, XML and unknown binary types it forces `Content-Disposition: attachment`, so an uploaded file cannot run as a same-origin document. Chat attachments get `Cache-Control: private, max-age=60`, and other assets are cached as immutable.
 - **No malware scanning.** No component scans uploaded files for malware.
 
@@ -316,9 +318,9 @@ This is the security view: what each secret protects, what a leak gives an attac
 |---|---|---|---|
 | `APP_SECRET` | Signs `admin_session`, `event_access_*` and `join_granted_*` (HS256). Keys the email hash | Mint an administrator session and any event cookie. Test guessed addresses against stored hashes | Portal |
 | `PII_ENCRYPTION_KEY` | Personal fields and the Gravatar reference | Read every encrypted field in a copy of the database | Portal |
-| `JITSI_JWT_SECRET` (Prosody's `JWT_APP_SECRET`) | Jitsi JWTs | Join any conference, with any role claim | Portal, Prosody |
+| `JITSI_JWT_SECRET` (Prosody's `JWT_APP_SECRET`) | Jitsi JWTs, and, through a derived key, the signature of Prosody's occupants notifications | Join any conference, with any role claim. Report forged occupants to the portal, which decides whose voice is recorded and transcribed | Portal, Prosody |
 | `ADMIN_API_KEY` | Sign-in with the instance API key | Sign in as an administrator | Portal |
-| `CRON_API_KEY` | `/api/internal/*`, `/api/cron/*`, `/api/metrics`, the recording webhook | Run scheduled and internal operations, claim recordings (which returns a Jitsi token for the room), obtain presigned storage URLs and read metrics, from the internet through the default ingress | Portal, every job, JVB scaler, recorder controller and bot, AI orchestrator and worker, Jibri, Prometheus |
+| `CRON_API_KEY` | `/api/internal/*`, `/api/cron/*`, `/api/metrics`, the recording webhook | Run scheduled and internal operations, claim recordings (which returns a Jitsi token for the room), obtain presigned storage URLs and read metrics, from the internet through the default ingress | Portal, every job, JVB scaler, recorder controller and bot, AI orchestrator and worker, Jibri, Prometheus, the live captions gateway |
 | `RECORDING_WEBHOOK_SECRET` | Recording webhook signatures | Sign forged webhook bodies (the cron key is still required) | Portal, Jibri |
 | `DATABASE_URL` and the PostgreSQL passwords | The database | Read and write every row. Encrypted fields stay encrypted | Portal and its migration container, PostgreSQL |
 | Redis password | Redis | Read live chat and presence in plaintext, and inject messages into live streams | Portal, Redis |
@@ -368,22 +370,26 @@ The values below come from the route files. To list every call site with its val
 | Staff sign-in link request | `POST /api/staff/login-link` | IP / address with IP / address alone | 5 per minute / 3 per 10 minutes / 20 per hour |
 | Staff sign-in link check | `POST /api/staff/login-link/verify` | IP | 10 per minute |
 | Event and instant-call creation | `POST /api/events`, `POST /api/events/instant` | IP | 5 and 10 per minute |
-| Registration. With public registration off, this call can also resend the link of an address that is already registered | `POST /api/events/{slug}/registrations` | IP | 10 per minute |
+| Registration. With invitation-only registration, this call can also resend the link of an address that is already registered | `POST /api/events/{slug}/registrations` | IP | 10 per minute |
 | Personal link resend | `POST …/registrations/resend` | IP | 5 per minute |
 | Join password | `POST …/verify-password` | IP and event | 10 per minute |
 | Guest Jitsi token, including a personal link opened in another browser | `POST …/jitsi/token` | IP | `GUEST_JWT_RATE_LIMIT_PER_MINUTE`, default 120 per minute |
 | Call session opening | `POST …/sessions` | IP | 30 per minute |
 | Chat message / attachment | `POST …/chat`, `POST …/chat/attachment` | Event and sender | 30 / 10 per minute |
+| Chat typing signal | `POST …/chat/typing` | Event and sender / event | 40 per minute / 10 per second; past the second limit the signal is accepted and not published |
 | Q&A question | `POST …/questions` | Registration, named grant, or the guest's browser id and event (IP when a guest sends no browser id) / IP and event, for guests with a browser id | 1 per 30 seconds / 60 per minute |
 | Q&A upvote | `POST …/questions/{id}/upvote` | IP and event, for browser ids / voter (registration or browser id) | 300 / 10 per minute |
 | Poll vote | `POST …/polls/{id}/vote` | IP and event / voter | 60 / 10 per minute |
+| Profile photo upload | `POST …/profile-photo` | Email hash | 10 per hour |
+| Call seat claim | `POST …/seats` | Hash of the room token | 12 per 10 minutes |
+| Material opening count | `POST …/materials/{id}/opened` | Material and the hash of a room token valid for the event, otherwise material and IP | 1 per 10 minutes; past it the request still answers 204 and is not counted |
 | Square presence ping | `POST …/garden/ping` | IP | 600 per minute |
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
 | Export download, erasure confirmation | `GET /api/gdpr/export`, `POST /api/gdpr/erasure` | IP | 10 per hour |
 | Address-book opt-out | `POST /api/rubrica/opt-out` | IP | 10 per minute |
 | Link-preview image | `GET /api/og/event/{slug}` | IP | 60 per minute |
 
-The entry route of invitation-only registration, `GET …/registrations/enter`, has no rate limit. It answers a valid, an invalid and an unknown token in the same way, with a redirect, and sets its cookie only for a valid signature ([Identity, access and tokens](identity-and-access.md#registrants)).
+The entry route of the registration emails, `GET …/registrations/enter`, has no rate limit. It answers a valid, an invalid and an unknown token in the same way, with a redirect, and sets its cookie only for a valid signature; for a link signed with `proof`, only in the browser that already holds the registration's cookie ([Identity, access and tokens](identity-and-access.md#registrants)).
 
 The guest limit is generous because many participants may join from behind one corporate NAT at the same moment. To change it on the chart, add the variable to `app.env`, which is rendered into the portal's ConfigMap.
 
@@ -391,7 +397,7 @@ The guest limit is generous because many participants may join from behind one c
 
 - **No account enumeration on staff sign-in.** `POST /api/staff/login-link` answers 202 whether or not the address belongs to an active account; only its per-IP limit answers 429. The account lookup happens after the response is sent ([The one-time email link](identity-and-access.md#the-one-time-email-link)).
 - **No registration enumeration on resend.** The resend route answers the same way whether or not the address is registered ([Email and calendar](email.md)).
-- **Guest tokens only while `LIVE`.** A guest receives a Jitsi token only while the event is `LIVE` (`POST …/jitsi/token`). An administrator can turn guest access off for scheduled events (`guestAccessEnabled`, answered with 403 `GUEST_ACCESS_DISABLED`); instant calls stay open to anyone with the link. On a password-protected event, a guest also needs the `join_granted_<eventId>` cookie before a token is issued. Guests cannot upload chat attachments.
+- **Guest tokens only while `LIVE`.** A guest receives a Jitsi token only while the event is `LIVE` (`POST …/jitsi/token`). An administrator can turn guest access off for scheduled events (`guestAccessEnabled`, answered with 403 `GUEST_ACCESS_DISABLED`), and an invitation-only event (`accessMode` `INVITATION`) refuses guests the same way; instant calls stay open to anyone with the link. On a password-protected event, a guest also needs the `join_granted_<eventId>` cookie before a token is issued. Guests cannot upload chat attachments.
 - **Join passwords are hashed.** They are stored as scrypt hashes and never returned by the API ([Hashed secrets and stored tokens](data-model.md#hashed-secrets-and-stored-tokens)).
 - **Ingress limits are the only shared limit.** The chart's default values set no ingress rate limit. `infra/helm/pa-webinar/values-production.yaml` shows one example (`limit-rps`, `limit-burst-multiplier` and `limit-connections`). An ingress limit is the only limit that holds across replicas. Choose its values from real live-room traffic: each participant keeps several long-lived connections open, and a tight limit drops them. Sizing guidance is in [Infrastructure](../INFRASTRUCTURE.md).
 
@@ -483,6 +489,8 @@ The other pods of the release are deliberately not selected: the scheduled jobs,
   - the ingress controller's namespaces (`networkPolicy.ingress.fromNamespaceSelectors`) and `networkPolicy.ingress.fromPodSelectors`. When both lists are empty, any source may reach the port;
   - every pod that carries the release's selector labels, which admits the scheduled jobs, the scaler, the controller and the AI jobs;
   - the Jibri pods, when Jibri is enabled, for the end-of-recording upload;
+  - the Prosody pods, when the chart installs Jitsi (`jitsi.enabled`), for the occupants module's signed notifications;
+  - the live captions pods, when captions are enabled, for the room context and the transcript sentences;
   - the monitoring namespace, when `networkPolicy.ingress.allowMonitoring` is on (the default);
   - any rule in `networkPolicy.ingress.extraRules`.
 - **Egress** is allowed for:

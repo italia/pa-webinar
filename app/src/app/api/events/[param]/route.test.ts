@@ -22,6 +22,9 @@ vi.mock('@/lib/auth/moderator', () => ({
   constantTimeEqual: vi.fn(() => true),
 }));
 
+const staff = vi.hoisted(() => ({ requireEventManager: vi.fn() }));
+vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({})) }));
+vi.mock('@/lib/auth/staff-session', () => staff);
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),
 }));
@@ -49,18 +52,25 @@ const { sessioni } = vi.hoisted(() => ({
   sessioni: { closeOpenSessions: vi.fn(async () => 0) },
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
+const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
+vi.mock('@/lib/events/close-polls', () => sondaggi);
+
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    event: { findUnique: vi.fn(), update: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
+    tag: { findMany: vi.fn() },
+    eventTagLink: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
     $transaction: vi.fn(),
   },
 }));
 
 import { prisma } from '@/lib/db';
-import { AppError } from '@/lib/errors';
+import { AppError, UnauthorizedError } from '@/lib/errors';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { DELETE, PUT } from './route';
 
@@ -71,9 +81,14 @@ const mocked = prisma as unknown as {
   event: {
     findUnique: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
-    delete: ReturnType<typeof vi.fn>;
   };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
+  tag: { findMany: ReturnType<typeof vi.fn> };
+  eventTagLink: {
+    findMany: ReturnType<typeof vi.fn>;
+    deleteMany: ReturnType<typeof vi.fn>;
+    createMany: ReturnType<typeof vi.fn>;
+  };
   $transaction: ReturnType<typeof vi.fn>;
 };
 
@@ -98,6 +113,7 @@ function eventoEsistente(status = 'PUBLISHED') {
     requireOrganization: true,
     requireOrganizationRole: true,
     requireOrganizationType: true,
+    accessMode: null,
     privacyPolicyText: 'Informativa scritta a mano',
     gdprTemplateId: null,
     permissionMatrix: null,
@@ -130,6 +146,7 @@ const MAI_SENZA_INVIO = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'accessMode',
   'privacyPolicyText',
   'gdprTemplateId',
 ] as const;
@@ -161,6 +178,31 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     }
   });
 
+  it("l'avvio automatico della registrazione si puo' spegnere, non accendere", async () => {
+    await PUT(richiesta({ autoStartRecording: true }), contesto as never);
+    expect(datiScritti()).not.toHaveProperty('autoStartRecording');
+
+    mocked.event.update.mockClear();
+    await PUT(richiesta({ autoStartRecording: false }), contesto as never);
+    expect(datiScritti().autoStartRecording).toBe(false);
+  });
+
+  it('risponde anche per un evento con una registrazione Jibri (dimensione BigInt)', async () => {
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        ...eventoEsistente(),
+        recordingFileSize: BigInt(4502766),
+        ...data,
+      }),
+    );
+
+    // Una modifica di fine evento, la piu' comune dopo una registrazione.
+    const res = await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).recordingFileSize).toBe(4502766);
+  });
+
   it('scrive i campi quando sono inviati davvero', async () => {
     await PUT(
       richiesta({
@@ -179,15 +221,38 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(dati.gdprTemplateId).toBe(GDPR_ID);
   });
 
+  it('chi partecipa lo cambia solo lo staff dell evento, non un link di conduzione', async () => {
+    staff.requireEventManager.mockRejectedValueOnce(new UnauthorizedError());
+    const res = await PUT(richiesta({ accessMode: 'OPEN' }), contesto as never);
+    expect(res.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+
+    // Un guasto della banca dati non diventa «solo lo staff»: resta un errore.
+    staff.requireEventManager.mockRejectedValueOnce(new Error('db down'));
+    const guasto = await PUT(richiesta({ accessMode: 'OPEN' }), contesto as never);
+    expect(guasto.status).toBe(500);
+
+    staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
+    await PUT(richiesta({ accessMode: 'INVITATION' }), contesto as never);
+    expect(datiScritti().accessMode).toBe('INVITATION');
+  });
+
+  it('rimandare la scelta che c e gia non chiede lo staff', async () => {
+    await PUT(richiesta({ accessMode: null, requireOrganization: false }), contesto as never);
+    expect(staff.requireEventManager).not.toHaveBeenCalled();
+    expect(datiScritti().requireOrganization).toBe(false);
+  });
+
   it('svuota il testo dell\'informativa quando arriva una stringa vuota', async () => {
-    // È il percorso che usa il wizard quando si sceglie un modello: la
-    // stringa vuota deve arrivare in banca dati, altrimenti il testo scritto
-    // a mano continuerebbe a vincere su una scelta già fatta.
+    // È il percorso che usa il wizard quando si sceglie un modello: il testo
+    // scritto a mano va svuotato, altrimenti continuerebbe a vincere su una
+    // scelta già fatta. Si salva come assente (null), così all'iscrizione si
+    // legge il modello.
     await PUT(richiesta({ privacyPolicyText: '' }), contesto as never);
 
     const dati = datiScritti();
     expect(dati).toHaveProperty('privacyPolicyText');
-    expect(dati.privacyPolicyText).toBe('');
+    expect(dati.privacyPolicyText).toBeNull();
   });
 
   it('rifiuta un testo dell\'informativa nullo', async () => {
@@ -245,6 +310,12 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
     expect(r.status).toBe(200);
     expect(mocked.$transaction).toHaveBeenCalledTimes(1);
     expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+    // Solo verso una fine i sondaggi aperti si chiudono (DRAFT non e' una fine).
+    if (nuovo === 'ENDED') {
+      expect(sondaggi.chiudiSondaggiAperti).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+    } else {
+      expect(sondaggi.chiudiSondaggiAperti).not.toHaveBeenCalled();
+    }
   });
 
   it.each([
@@ -273,10 +344,163 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
   });
 });
 
-describe('DELETE /api/events/[param] — i file dell’evento', () => {
+describe('PUT /api/events/[param] — tag', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocked.event.delete.mockResolvedValue({});
+    staff.requireEventManager.mockResolvedValue(undefined);
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+    );
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-a' }]);
+  });
+
+  it("l'elenco cambiato sostituisce le etichette, insieme all'evento", async () => {
+    mocked.tag.findMany.mockResolvedValue([
+      { id: 'tag-a', slug: 'a' },
+      { id: 'tag-b', slug: 'b' },
+    ]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['a', 'b', 'sparito'] }), contesto as never);
+
+    expect(r.status).toBe(200);
+    expect(staff.requireEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
+    expect(mocked.$transaction).toHaveBeenCalledTimes(1);
+    expect(mocked.tag.findMany).toHaveBeenCalledWith({
+      where: { slug: { in: ['a', 'b', 'sparito'] } },
+      select: { id: true, slug: true },
+    });
+    // Nel registro le etichette scritte davvero, non quelle chieste.
+    const { logAdminAction } = await import('@/lib/audit/admin-audit');
+    expect(vi.mocked(logAdminAction)).toHaveBeenCalledWith(
+      expect.objectContaining({ details: expect.objectContaining({ tags: ['a', 'b'] }) }),
+    );
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.createMany).toHaveBeenCalledWith({
+      data: [
+        { eventId: EVENT_ID, tagId: 'tag-a' },
+        { eventId: EVENT_ID, tagId: 'tag-b' },
+      ],
+      skipDuplicates: true,
+    });
+  });
+
+  it('un elenco vuoto toglie tutte le etichette', async () => {
+    await PUT(richiesta({ tagSlugs: [] }), contesto as never);
+
+    expect(mocked.tag.findMany).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.createMany).not.toHaveBeenCalled();
+  });
+
+  it('le stesse etichette, in un altro ordine, non si riscrivono', async () => {
+    mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-b' }, { tagId: 'tag-a' }]);
+    mocked.tag.findMany.mockResolvedValue([{ id: 'tag-a' }, { id: 'tag-b' }]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['a', 'b'] }), contesto as never);
+
+    expect(r.status).toBe(200);
+    expect(staff.requireEventManager).not.toHaveBeenCalled();
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('con il solo link di conduzione non si cambiano', async () => {
+    staff.requireEventManager.mockRejectedValue(new UnauthorizedError());
+    mocked.tag.findMany.mockResolvedValue([{ id: 'tag-b' }]);
+
+    const r = await PUT(richiesta({ tagSlugs: ['b'] }), contesto as never);
+
+    expect(r.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+    expect(mocked.eventTagLink.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('una modifica parziale non tocca le etichette', async () => {
+    await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+
+    expect(mocked.eventTagLink.findMany).not.toHaveBeenCalled();
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    expect(mocked.event.update).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('PUT /api/events/[param] — cronologia della sala', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+    );
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  });
+
+  async function conEvento(attuale: Record<string, unknown>, corpo: Record<string, unknown>) {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
+      attuale as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+    );
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...attuale, ...data }),
+    );
+    return PUT(richiesta(corpo), contesto as never);
+  }
+
+  it('una funzione accesa dalla sala registra quale e come', async () => {
+    const r = await conEvento(
+      { ...eventoEsistente('LIVE'), qaEnabled: false, wordCloudEnabled: true },
+      { qaEnabled: true, wordCloudEnabled: true },
+    );
+    expect(r.status).toBe(200);
+    // Solo quella cambiata davvero: la seconda era gia' accesa.
+    expect(recordLiveActions).toHaveBeenCalledWith([
+      {
+        eventId: EVENT_ID,
+        kind: 'feature.toggled',
+        actor: 'moderator',
+        data: { feature: 'qaEnabled', enabled: true },
+      },
+    ]);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('«Termina evento» registra la fine', async () => {
+    const r = await conEvento(eventoEsistente('LIVE'), { status: 'ENDED' });
+    expect(r.status).toBe(200);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'event.ended',
+      actor: 'moderator',
+    });
+    expect(recordLiveActions).toHaveBeenCalledWith([]);
+  });
+
+  it('un evento gia’ concluso non finisce una seconda volta', async () => {
+    await conEvento(eventoEsistente('ENDED'), { status: 'ENDED' });
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('una modifica rifiutata non registra niente', async () => {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(null);
+    const r = await PUT(richiesta({ status: 'ENDED', qaEnabled: true }), contesto as never);
+    expect(r.status).toBe(403);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(recordLiveActions).not.toHaveBeenCalled();
+  });
+});
+
+describe('DELETE /api/events/[param] — i file dell’evento', () => {
+  // La transazione con la riga bloccata: lo stato letto li' decide tutto.
+  const tx = {
+    $queryRaw: vi.fn(),
+    event: { delete: vi.fn() },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    tx.$queryRaw.mockResolvedValue([{ status: 'PUBLISHED' }]);
+    tx.event.delete.mockResolvedValue({});
+    mocked.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
     files.removeFilesOfEventsBeingDeleted.mockResolvedValue(1);
   });
 
@@ -287,15 +511,34 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     }) as unknown as NextRequest;
   }
 
-  it('la cascata porta via le righe: i file si cancellano prima', async () => {
+  it('la cascata porta via le righe: i file si cancellano prima, a riga bloccata', async () => {
     const r = await DELETE(cancella(), contesto as never);
 
     expect(r.status).toBe(200);
+    expect(String(tx.$queryRaw.mock.calls[0]![0])).toContain('FOR NO KEY UPDATE');
     expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith({ id: EVENT_ID });
-    expect(mocked.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
+    expect(tx.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
     expect(files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]).toBeLessThan(
-      mocked.event.delete.mock.invocationCallOrder[0]!,
+      tx.event.delete.mock.invocationCallOrder[0]!,
     );
+  });
+
+  it('un evento in diretta non si elimina: 409, nessun file toccato', async () => {
+    tx.$queryRaw.mockResolvedValue([{ status: 'LIVE' }]);
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(409);
+    expect((await r.json()).code).toBe('EVENT_LIVE');
+    expect(files.removeFilesOfEventsBeingDeleted).not.toHaveBeenCalled();
+    expect(tx.event.delete).not.toHaveBeenCalled();
+  });
+
+  it('già eliminato da un’altra richiesta: 404, non «in diretta»', async () => {
+    tx.$queryRaw.mockResolvedValue([]);
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(404);
+    expect(files.removeFilesOfEventsBeingDeleted).not.toHaveBeenCalled();
   });
 
   it('se i file non si cancellano, l’evento resta: 503', async () => {
@@ -305,6 +548,6 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     const r = await DELETE(cancella(), contesto as never);
 
     expect(r.status).toBe(503);
-    expect(mocked.event.delete).not.toHaveBeenCalled();
+    expect(tx.event.delete).not.toHaveBeenCalled();
   });
 });

@@ -104,6 +104,8 @@ export default function LanguageSwitcher() {
                 className="text-white text-uppercase text-decoration-none"
                 style={{ fontSize: '0.85rem', letterSpacing: '0.02em' }}
                 lang={loc}
+                // La sigla da sola («EN») il lettore di schermo la compita.
+                aria-label={localeNames[loc]}
               >
                 {loc}
               </Link>
@@ -148,6 +150,7 @@ export default function LanguageSwitcher() {
       {open && (
         <ul
           id={listId}
+          aria-label={t('language')}
           className="position-absolute list-unstyled py-2 shadow-lg rounded"
           style={{
             right: 0,

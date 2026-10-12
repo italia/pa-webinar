@@ -14,14 +14,20 @@
  * confusion where the wizard and the detail page could disagree.
  */
 
-import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { messaggioErroreApi } from '@/lib/api-error-message';
+import { csvText } from '@/lib/utils/csv';
+import { eventAdminPath, eventAdminTab, type EventAdminTab } from '@/lib/events/admin-links';
+import type { WizardAdvancedSection, WizardStep } from '@/lib/events/wizard-steps';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import {
@@ -33,17 +39,27 @@ import {
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { canStartManually } from '@/lib/events/lifecycle';
 import { materialAuthorName } from '@/lib/events/material-author';
+import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
+import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
+import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
+import EventFeedbackPanel from './event-feedback-panel';
+import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
+import EventInvitationsPanel from './event-invitations-panel';
+import EventRemindersEditor from './event-reminders-editor';
 import EventModeratorsPanel from './event-moderators-panel';
+import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
+import CaptionsTranscriptPanel from './captions-transcript-panel';
+import EventReportPanel from './event-report-panel';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -153,13 +169,20 @@ interface EventData {
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
+  /** L'evento salva le frasi dei sottotitoli per la trascrizione. */
+  captionsTranscriptEnabled: boolean;
   postEventPublic: boolean; postEventPublicUntil: string | null;
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
   postEventShowRecap: boolean;
   postEventShowWordCloud: boolean;
   postEventEmailEnabled: boolean;
+  recordingNotifyEnabled: boolean;
+  recordingNotifiedAt: string | null;
   feedbackEnabled: boolean; recordingConsentText: string | null;
+  accessMode: 'OPEN' | 'INVITATION' | null;
+  /** Si iscrive chiunque (scelta dell'evento, o del sito). */
+  registrationOpen: boolean;
   requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
   moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
   jitsiRoomName: string; dataRetentionDays: number;
@@ -177,6 +200,9 @@ interface EventManagementClientProps {
   /** L'evento ammette chi entra senza iscrizione (lib/events/guest-window):
    *  senza, l'invito diretto porterebbe all'iscrizione e non va offerto. */
   guestEntryOpen?: boolean;
+  /** Il token con cui si e' entrati, se non c'e' una sessione dello staff:
+   *  solo allora i link interni all'area riservata lo portano con se'. */
+  viaToken?: string | null;
   /** L'istante del rendering sul server (ms): vedi `istante` qui sotto. */
   renderedAt: number;
 }
@@ -185,20 +211,13 @@ interface EventManagementClientProps {
 // la striscia scorre in orizzontale e quelle in coda non si sa che esistano.
 // Le impostazioni dell'evento non sono fra queste — si cambiano dal wizard,
 // da «Modifica evento».
-type TabId = 'panoramica' | 'persone' | 'contenuti' | 'dopo' | 'statistiche';
+type TabId = EventAdminTab;
 
-const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
-  MINISTRY: { it: 'Ministero', en: 'Ministry' },
-  AGENCY: { it: 'Agenzia', en: 'Agency' },
-  REGION: { it: 'Regione', en: 'Region' },
-  PROVINCE: { it: 'Provincia', en: 'Province' },
-  MUNICIPALITY: { it: 'Comune', en: 'Municipality' },
-  ASL: { it: 'ASL', en: 'ASL' },
-  UNIVERSITY: { it: 'Università', en: 'University' },
-  PUBLIC_ENTITY: { it: 'Ente pubblico', en: 'Public entity' },
-  IN_HOUSE: { it: 'Società in-house', en: 'In-house company' },
-  OTHER: { it: 'Altro', en: 'Other' },
-};
+/** Il nome tradotto di un tipo di ente (admin.registrations.orgTypes). */
+function useOrgTypeLabel(): (code: string) => string {
+  const t = useTranslations('admin.registrations.orgTypes');
+  return useCallback((code: string) => (t.has(code) ? t(code) : code), [t]);
+}
 
 function tagChipStyle(color: string | null): CSSProperties {
   const base = color ?? C_PRIMARY;
@@ -211,11 +230,13 @@ function tagChipStyle(color: string | null): CSSProperties {
 
 // ── Main component ──
 export default function EventManagementClient({
-  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt,
+  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt, viaToken = null,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
-  const te = useTranslations('events');
+  const tReg = useTranslations('admin.registrations');
+  const orgTypeLabel = useOrgTypeLabel();
+  const durata = useDurataTesto();
   const tr = useTranslations('reminders');
   const format = useFormatter();
   const tc = useTranslations('common');
@@ -230,13 +251,57 @@ export default function EventManagementClient({
     const t = setInterval(() => setAdesso(Date.now()), 60_000);
     return () => clearInterval(t);
   }, []);
+  // I promemoria come li modifica la scheda delle notifiche (si salvano
+  // uno per uno, senza ricaricare la pagina). Se la pagina si aggiorna dal
+  // server (router.refresh), l'elenco segue.
+  const [elencoPromemoria, setElencoPromemoria] = useState(event.reminders);
+  useEffect(() => {
+    setElencoPromemoria(event.reminders);
+  }, [event.reminders]);
+  const [modificaPromemoria, setModificaPromemoria] = useState(false);
   // Promemoria e iscrizioni nella forma che usa il cron, per dire di ogni
   // promemoria non spedito se partira' (lib/email/reminder-status).
-  const promemoria = event.reminders.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+  const promemoria = elencoPromemoria.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
   const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<TabId>('panoramica');
+  // La scheda chiesta dall'indirizzo (`?tab=dopo`), per esempio dalla sala a
+  // fine evento: si apre quella invece della panoramica, gia' dal primo
+  // rendering, e anche quando l'indirizzo cambia restando sulla pagina.
+  const tabRichiesta = eventAdminTab(useSearchParams().get('tab'));
+  // A evento concluso (o archiviato) si apre «Dopo l'evento»: e' li' che
+  // c'e' da fare.
+  const [activeTab, setActiveTab] = useState<TabId>(
+    tabRichiesta ?? (event.status === 'ENDED' || event.status === 'ARCHIVED' ? 'dopo' : 'panoramica'),
+  );
+  useEffect(() => {
+    if (tabRichiesta) setActiveTab(tabRichiesta);
+  }, [tabRichiesta]);
+  // La scheda scelta resta nell'indirizzo (`?tab=`): un ricaricamento o un
+  // link copiato riaprono quella. Si sostituisce la voce della cronologia,
+  // senza aggiungerne una per scheda.
+  const scegliScheda = useCallback((tab: TabId) => {
+    setActiveTab(tab);
+    aggiornaQuery((params) => params.set('tab', tab));
+  }, []);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
+  // l'evento e' pubblicato o in bozza, da' il link per i partecipanti e
+  // elenca le risorse che il wizard non e' riuscito a salvare. Resta finche'
+  // non lo si chiude; il parametro sparisce subito dall'indirizzo, cosi' un
+  // ricaricamento o un segnalibro non lo ripropongono.
+  const [appenaCreato, setAppenaCreato] = useState<CreationOutcome | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('created') !== '1') return;
+    setAppenaCreato(readCreation(event.id));
+    aggiornaQuery((p) => p.delete('created'));
+  }, [event.id]);
+  const chiudiRiepilogo = () => {
+    forgetCreation(event.id);
+    setAppenaCreato(null);
+  };
   const [status, setStatus] = useState(event.status);
   // La pagina post-evento si accende e si spegne dalla scheda «Dopo l'evento»
   // senza ricaricare. Come lo stato, i due campi che la governano vivono qui:
@@ -253,9 +318,7 @@ export default function EventManagementClient({
   const description = getLocalized(event.description, locale);
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
-  const durationMs = endsAt.getTime() - startsAt.getTime();
-  const durationHours = Math.floor(durationMs / 3_600_000);
-  const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
+  const durataTesto = durata(startsAt, endsAt);
 
   // Gli indirizzi che si copiano e si condividono: nella forma che il router
   // riconosce direttamente, senza passare da una redirezione.
@@ -267,7 +330,10 @@ export default function EventManagementClient({
     locale,
   );
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
-  const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
+  const editUrl = eventAdminPath(event.id, { edit: true, viaToken });
+  // La modifica aperta sul passo che riguarda cio' che si sta guardando.
+  const editUrlAt = (step: WizardStep, section?: WizardAdvancedSection) =>
+    eventAdminPath(event.id, { edit: true, viaToken, step, section });
 
   // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
   // conduzione, e da partecipante, dalla stessa porta del pubblico — per
@@ -279,6 +345,7 @@ export default function EventManagementClient({
   // client devono disegnare gli stessi pulsanti.
   const istante = adesso ?? renderedAt;
   const isInstant = event.eventType === 'INSTANT';
+  const promemoriaModificabili = !isInstant && (status === 'DRAFT' || status === 'PUBLISHED');
   const eventoOra = { ...event, status, ...paginaPostEvento };
   const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
   const entraModeratore = moderatorRoomOpen(eventoOra, istante);
@@ -294,17 +361,29 @@ export default function EventManagementClient({
   const jvbCount = capacity && typeof capacity.jvbCount === 'number' ? capacity.jvbCount : null;
   const jvbRam = capacity && typeof capacity.jvbRam === 'string' ? capacity.jvbRam : null;
 
+  // Ritirare toglie l'evento dalle pagine pubbliche: si chiede conferma, come
+  // dal menu della scheda nell'elenco, e un errore si vede.
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    if (newStatus === 'DRAFT') {
+      const ok = await confirm({
+        title: t('eventsList.menu.unpublishTitle'),
+        message: t('eventsList.menu.unpublishMessage', { title }),
+        confirmLabel: t('eventsList.menu.unpublish'),
+        cancelLabel: tc('cancel'),
+      });
+      if (!ok) return;
+    }
     setUpdating(true); setFeedback('');
     try {
       await impostaStatoEvento(event.id, event.moderatorToken, newStatus);
       setStatus(newStatus);
       setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
     } catch {
-      // Senza conferma dal server lo stato mostrato resta quello vero.
+      // Lo stato mostrato resta quello vero; l'errore lo si dice.
+      toast.error(t('eventsList.menu.failed'));
     } finally { setUpdating(false); }
-  }, [status, event.id, event.moderatorToken, t]);
+  }, [status, event.id, event.moderatorToken, t, tc, confirm, toast, title]);
 
   const isEarlyStart = startsAt.getTime() > Date.now() + 30 * 60_000;
 
@@ -342,7 +421,83 @@ export default function EventManagementClient({
     } finally { setUpdating(false); }
   }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
 
-  const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
+  // «Termina evento» da qui: la stessa fine di «Termina per tutti» in sala.
+  // Chi e' in sala vede la chiusura; la pagina dopo l'evento segue le scelte
+  // di «Dopo l'evento», dove si va subito.
+  const endEvent = useCallback(async () => {
+    // La pagina dopo l'evento segue la scelta gia' fatta in «Dopo l'evento»:
+    // la conferma dice quale, prima, non dopo.
+    const ok = await confirm({
+      title: t('endEventConfirmTitle'),
+      message: `${t('endEventConfirmMessage')} ${
+        paginaPostEvento.postEventPublic ? t('endEventPagePublic') : t('endEventPagePrivate')
+      }`,
+      confirmLabel: t('endEvent'),
+      cancelLabel: tc('cancel'),
+      danger: true,
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      scegliScheda('dopo');
+      setFeedback(t('endEventSuccess'));
+    } catch {
+      toast.error(t('endEventFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, paginaPostEvento.postEventPublic, t, tc, confirm, toast, scegliScheda]);
+
+  // «Archivia» a evento concluso (solo lo staff: e' la stessa azione
+  // dell'elenco): la pagina pubblica sparisce, i dati restano fino alla
+  // scadenza della conservazione.
+  const archiveEvent = useCallback(async () => {
+    const ok = await confirm({
+      title: t('archiveConfirmTitle'),
+      message: t('archiveConfirmMessage'),
+      confirmLabel: t('archive'),
+      cancelLabel: tc('cancel'),
+    });
+    if (!ok) return;
+    setUpdating(true); setFeedback('');
+    try {
+      const res = await fetch('/api/admin/events/bulk-archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [event.id] }),
+      });
+      // La rotta risponde 200 anche quando non archivia niente (l'evento non
+      // e' piu' nel perimetro di chi chiede): conta il numero, non lo stato.
+      const esito = res.ok ? ((await res.json().catch(() => ({}))) as { archived?: number }) : null;
+      if (esito && (esito.archived ?? 0) > 0) {
+        setStatus('ARCHIVED');
+        setFeedback(t('archiveSuccess'));
+      } else {
+        toast.error(t('archiveFailed'));
+      }
+    } catch {
+      toast.error(t('archiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, t, tc, confirm, toast]);
+
+  // Dall'archivio si torna a evento concluso: la pagina pubblica torna a
+  // seguire le scelte di «Dopo l'evento».
+  const unarchiveEvent = useCallback(async () => {
+    setUpdating(true); setFeedback('');
+    try {
+      await impostaStatoEvento(event.id, event.moderatorToken, 'ENDED');
+      setStatus('ENDED');
+      setFeedback(t('unarchiveSuccess'));
+    } catch {
+      toast.error(t('unarchiveFailed'));
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, t, toast]);
+
+  // Dopo l'eliminazione: lo staff torna all'elenco; chi ha solo il link del
+  // moderatore non ha un'area admin, e va alla home del portale.
+  const handleDeleted = useCallback(() => {
+    router.push(viaToken ? '/' : '/admin/events');
+  }, [router, viaToken]);
 
   // "Duplica come prossima occorrenza" (docs/architecture/event-journey.md,
   // "Duplicating as the next occurrence"):
@@ -357,13 +512,10 @@ export default function EventManagementClient({
     setDuplicating(true);
     setDuplicateError(null);
     try {
-      // Il token DEVE viaggiare nell'URL: la pagina di modifica risponde
-      // notFound() senza (edit/page.tsx). Senza, il bottone atterrava su un
-      // 404 dopo aver creato davvero l'evento.
+      // Solo lo staff duplica (la rotta chiede la sessione): la copia si apre
+      // con la propria sessione.
       const created = await duplicaComeProssima(event.id);
-      router.push(
-        percorso(`/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`),
-      );
+      router.push(percorso(eventAdminPath(created.id, { edit: true })));
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
@@ -371,24 +523,31 @@ export default function EventManagementClient({
   }, [event.id, router, td]);
 
   const exportCsv = useCallback(() => {
-    const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
+    const headers = [
+      tReg('colName'),
+      tReg('colOrg'),
+      tReg('colRole'),
+      tReg('colOrgType'),
+      tReg('colCreatedAt'),
+      tReg('colJoined'),
+    ];
     const rows = event.registrations.map((r) => [
       r.displayName,
       r.organization ?? '',
       r.organizationRole ?? '',
-      r.organizationType ? (ORG_TYPE_LABELS[r.organizationType]?.[locale as 'it' | 'en'] ?? r.organizationType) : '',
+      r.organizationType ? orgTypeLabel(r.organizationType) : '',
       new Date(r.createdAt).toISOString(),
-      r.joinedAt ? 'Si' : 'No',
+      r.joinedAt ? tReg('yes') : tReg('no'),
     ]);
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+    // Celle neutralizzate contro le formule e separatore «;», come gli altri
+    // CSV dell'amministrazione (lib/utils/csv).
+    const csv = csvText([headers, ...rows.map((row) => row.map(String))]);
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `registrazioni-${event.slug}.csv`; a.click();
     URL.revokeObjectURL(url);
-  }, [event.registrations, event.slug, locale]);
+  }, [event.registrations, event.slug, tReg, orgTypeLabel]);
 
   // Live peak-count poll when LIVE.
   const [liveCount, setLiveCount] = useState<number | null>(null);
@@ -416,14 +575,21 @@ export default function EventManagementClient({
 
   return (
     <>
-      {/* ── Breadcrumb ── */}
-      <div className="mb-3">
-        <Link href="/admin" className="text-decoration-none d-inline-flex align-items-center"
-              style={{ fontSize: '0.9rem', color: C_PRIMARY }}>
-          <span className="me-1"><Svg name="arrow-left" size={14} /></span>
-          {t('title')}
-        </Link>
-      </div>
+      {appenaCreato && (
+        <CreatedSummary
+          published={status === 'PUBLISHED' || status === 'LIVE'}
+          publishFailed={appenaCreato.publishFailed}
+          unsaved={appenaCreato.unsaved}
+          shareUrl={condivisione ? localizedUrl(baseUrl, condivisione.path, locale) : null}
+          onPublish={status === 'DRAFT' ? togglePublish : undefined}
+          publishing={updating}
+          onPeople={() => {
+            scegliScheda('persone');
+            tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          onClose={chiudiRiepilogo}
+        />
+      )}
 
       {/* ═══ Hero ═══ */}
       <div className="p-4 mb-4" style={CARD}>
@@ -463,7 +629,7 @@ export default function EventManagementClient({
                 {format.dateTime(endsAt, { hour: '2-digit', minute: '2-digit' })}
               </span>
               <span>·</span>
-              <span>{te('detail.durationHours', { hours: durationHours, minutes: durationMinutes })}</span>
+              <span>{durataTesto}</span>
               <span>·</span>
               <span>{event.timezone}</span>
             </div>
@@ -545,7 +711,7 @@ export default function EventManagementClient({
       )}
 
       {status === 'LIVE' && (
-        <div className="mb-3 p-3 rounded d-flex align-items-center justify-content-between gap-3 flex-wrap"
+        <div className="mb-3 p-3 rounded"
              style={{ background: '#e8f0fe', color: C_INK, border: `1px solid ${C_PRIMARY}40` }}>
           <div className="d-flex align-items-center gap-2">
             <span style={{ color: C_PRIMARY }}><Svg name="video" /></span>
@@ -558,28 +724,30 @@ export default function EventManagementClient({
               </span>
             )}
           </div>
-          <Link href={percorso(liveModeratorUrl)} className="btn btn-primary btn-sm"
-                style={{ fontSize: '0.84rem' }}>
-            {t('joinAsModeratorBtn')}
-          </Link>
         </div>
       )}
 
       {/* ═══ Body ═══ */}
-      {/* Su schermo stretto la colonna con stato e azioni viene prima del
-          contenuto della scheda: sono le cose per cui si apre questa pagina, e
-          in coda costerebbero un'intera scorsa. Su schermo largo torna a
-          destra, nell'ordine di lettura. */}
-      <div className="row g-4">
-        <div className="col-lg-8 order-2 order-lg-1">
-          <TabNav active={activeTab} onChange={setActiveTab} t={td} />
-          <div className="p-4" style={CARD}>
+      {/* Su schermo largo le schede a sinistra e, a destra, le azioni e il
+          riepilogo, che restano in vista. Su telefono prima le azioni dello
+          stato (le cose per cui si apre questa pagina), poi le schede, in fondo
+          il riepilogo: la colonna intera in cima spingeva le schede mille pixel
+          piu' giu'. La griglia e' in globals.scss (.event-manage). */}
+      <div className="event-manage">
+        <div className="event-manage__main">
+          <div ref={tabsRef}>
+            <TabNav active={activeTab} onChange={scegliScheda} t={td} />
+          </div>
+          {/* Un pannello solo, che cambia contenuto con la scheda: tutte le
+              schede lo controllano, e porta il nome di quella attiva. */}
+          <div className="p-4" style={CARD} role="tabpanel" id="event-tabpanel"
+               aria-labelledby={`event-tab-${activeTab}`} tabIndex={0}>
             {activeTab === 'panoramica' && (
               <OverviewTab
                 event={event}
                 description={description}
                 locale={locale}
-                editUrl={editUrl}
+                editUrlAt={editUrlAt}
                 // Di un evento a calendario la pagina pubblica si offre anche
                 // in bozza, da preparare per quando esce; una chiamata rapida
                 // ne ha una solo a chiamata conclusa, se il post-evento e'
@@ -593,11 +761,14 @@ export default function EventManagementClient({
               />
             )}
             {activeTab === 'persone' && (
-              <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
+              <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
+                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'}
+                         linksMailable={!['DRAFT', 'ENDED', 'ARCHIVED'].includes(status)}
+                         editPeopleHref={editUrlAt('invites')} />
             )}
-            {activeTab === 'contenuti' && <ContentTab event={event} />}
+            {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
-              <PostEventTab event={event} status={status}
+              <PostEventTab event={event} status={status} viaToken={viaToken}
                             paginaPostEvento={paginaPostEvento}
                             onPaginaPostEvento={(patch) =>
                               setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
@@ -607,8 +778,100 @@ export default function EventManagementClient({
         </div>
 
         {/* ═══ Sidebar ═══ */}
-        <div className="col-lg-4 order-1 order-lg-2">
-          <div style={{ position: 'sticky', top: 20 }}>
+        <div className="event-manage__side">
+          <div className="event-manage__actions">
+            {/* Actions */}
+            <div className="p-4 mb-0 mb-lg-3" style={CARD}>
+              <div className="d-grid gap-2">
+                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
+                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
+                    organizza. */}
+                {canStartManually(status) && (
+                  <button type="button"
+                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
+                          onClick={startEvent} disabled={updating}>
+                    <Svg name="video" size={14} /> {t('startEvent')}
+                  </button>
+                )}
+                {/* Un'azione principale per stato: in bozza pubblicare, in
+                    diretta terminare, a evento concluso archiviare. Le altre
+                    restano, in secondo piano. */}
+                {status === 'DRAFT' && (
+                  <button type="button"
+                          className="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('publish')}
+                  </button>
+                )}
+                {status === 'LIVE' && (
+                  <button type="button"
+                          className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2"
+                          onClick={endEvent} disabled={updating}>
+                    {t('endEvent')}
+                  </button>
+                )}
+                {status === 'ENDED' && !viaToken && (
+                  <button type="button"
+                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
+                          onClick={archiveEvent} disabled={updating}>
+                    {t('archive')}
+                  </button>
+                )}
+                {status === 'ARCHIVED' && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={unarchiveEvent} disabled={updating}>
+                    {t('unarchive')}
+                  </button>
+                )}
+                {/* «Modifica» e' l'azione principale solo quando l'avvio non lo
+                    e': lontano dall'inizio, «Avvia evento» e' secondario. */}
+                <Link href={percorso(editUrl)}
+                      className={`btn ${canStartManually(status) && isEarlyStart ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center justify-content-center gap-2`}>
+                  <Svg name="pencil" size={14} /> {td('editEvent')}
+                </Link>
+                {status === 'PUBLISHED' && (
+                  <button type="button" className="btn btn-outline-warning"
+                          onClick={togglePublish} disabled={updating}>
+                    {t('unpublish')}
+                  </button>
+                )}
+                {/* Solo quando la pagina esiste: in bozza, archiviato o per
+                    una chiamata rapida in corso l'indirizzo risponde «non
+                    trovato». */}
+                {publicPageVisible && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                    <Svg name="external" size={14} /> {t('openPublicPage')}
+                  </a>
+                )}
+                {/* Duplicare crea un evento dello staff: con il solo link del
+                    moderatore la rotta risponde 401. Una chiamata rapida non
+                    ha una «prossima occorrenza». */}
+                {!viaToken && !isInstant && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={duplicateAsNext}
+                          disabled={duplicating}
+                          title={td('duplicateNextHint')}>
+                    <Svg name="copy" size={14} />
+                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
+                  </button>
+                )}
+                {/* In diretta ci sono persone in sala: prima si termina. */}
+                {status !== 'LIVE' && (
+                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
+                                    onDeleted={handleDeleted} />
+                )}
+              </div>
+              {duplicateError && (
+                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
+                  {duplicateError}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="event-manage__summary">
             {/* KPI */}
             <div className="p-4 mb-3" style={CARD}>
               <div className="mb-1" style={EYEBROW}>{td('sidebar.registrations')}</div>
@@ -641,12 +904,23 @@ export default function EventManagementClient({
 
             {/* Reminders */}
             <div className="p-4 mb-3" style={CARD}>
-              <div className="mb-2" style={EYEBROW}>{tr('title')}</div>
-              {event.reminders.length === 0 ? (
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <div style={EYEBROW}>{tr('title')}</div>
+                {/* Si scelgono prima dell'evento: in diretta o dopo non
+                    partirebbero; una chiamata rapida non ne manda. */}
+                {promemoriaModificabili && (
+                  <button type="button" className="btn btn-link btn-sm p-0"
+                          aria-expanded={modificaPromemoria} aria-controls="modifica-promemoria"
+                          onClick={() => setModificaPromemoria((v) => !v)}>
+                    {modificaPromemoria ? tr('editDone') : tr('edit')}
+                  </button>
+                )}
+              </div>
+              {elencoPromemoria.length === 0 ? (
                 <div style={CAPTION}>{td('sidebar.noReminders')}</div>
               ) : (
                 <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
-                  {event.reminders.map((r) => {
+                  {elencoPromemoria.map((r) => {
                     const sent = r.sentCount > 0;
                     // «Non inviata» da solo non distingue «deve ancora partire»
                     // da «non partira' piu'»: lo stato viene dalle stesse
@@ -672,7 +946,14 @@ export default function EventManagementClient({
                         <span aria-hidden="true"
                               style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                                        background: sent ? C_SUCCESS : '#CED4DA' }} />
-                        <span className="flex-grow-1">{r.label}</span>
+                        {/* Il nome nella lingua di chi guarda: l'etichetta
+                            del database e' quella scritta alla creazione. */}
+                        <span className="flex-grow-1">
+                          {(() => {
+                            const chiave = reminderPresetKey(r.offsetMinutes);
+                            return chiave ? tr(`presets.${chiave}`) : r.label;
+                          })()}
+                        </span>
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
                           {sent
                             ? tr('sentStatus', { count: r.sentCount })
@@ -696,6 +977,18 @@ export default function EventManagementClient({
                   })}
                 </ul>
               )}
+              {/* Sempre nella pagina finche' si puo' modificare (il pulsante lo
+                  controlla), nascosto quando e' chiuso: un salvataggio in
+                  corso finisce anche se lo si chiude. Cambiato lo stato
+                  (avviato, archiviato) sparisce con il pulsante. */}
+              {promemoriaModificabili && (
+                <div id="modifica-promemoria" hidden={!modificaPromemoria}>
+                  <EventRemindersEditor eventSlug={event.slug} moderatorToken={event.moderatorToken}
+                                        startsAt={event.startsAt} reminders={elencoPromemoria}
+                                        aperto={modificaPromemoria}
+                                        onChange={setElencoPromemoria} />
+                </div>
+              )}
             </div>
 
             {/* Tags recap */}
@@ -711,76 +1004,34 @@ export default function EventManagementClient({
                 </div>
               </div>
             )}
-
-            {/* Actions */}
-            <div className="p-4 mb-3" style={CARD}>
-              <div className="d-grid gap-2">
-                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
-                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
-                    organizza. */}
-                {canStartManually(status) && (
-                  <button type="button"
-                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
-                          onClick={startEvent} disabled={updating}>
-                    <Svg name="video" size={14} /> {t('startEvent')}
-                  </button>
-                )}
-                <Link href={percorso(editUrl)}
-                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
-                  <Svg name="pencil" size={14} /> {td('editEvent')}
-                </Link>
-                <button type="button"
-                        className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
-                        onClick={togglePublish}
-                        disabled={updating || status === 'LIVE' || status === 'ENDED'}
-                        // Un pulsante spento che non si spiega e' un vicolo
-                        // cieco: chi lo trova grigio non sa se sta sbagliando
-                        // qualcosa o se e' il momento sbagliato.
-                        title={
-                          status === 'LIVE'
-                            ? td('publishBlockedLive')
-                            : status === 'ENDED'
-                              ? td('publishBlockedEnded')
-                              : undefined
-                        }>
-                  {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
-                </button>
-                {(status === 'LIVE' || status === 'ENDED') && (
-                  <div className="text-center mt-1" style={CAPTION}>
-                    {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
-                  </div>
-                )}
-                {/* Solo quando la pagina esiste: in bozza, archiviato o per
-                    una chiamata rapida in corso l'indirizzo risponde «non
-                    trovato». */}
-                {publicPageVisible && (
-                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
-                    <Svg name="external" size={14} /> {t('openPublicPage')}
-                  </a>
-                )}
-                <button type="button"
-                        className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                        onClick={duplicateAsNext}
-                        disabled={duplicating}
-                        title={td('duplicateNextHint')}>
-                  <Svg name="copy" size={14} />
-                  {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
-                </button>
-                <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
-                                  onDeleted={handleDeleted} />
-              </div>
-              {duplicateError && (
-                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
-                  {duplicateError}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
     </>
   );
+}
+
+/**
+ * Cambia i parametri dell'indirizzo senza ricaricare e senza una voce nuova
+ * nella cronologia. Lo stato passato e' `null`: con quello corrente (che
+ * porta il segno interno di Next) il router salterebbe la sincronizzazione,
+ * `useSearchParams` resterebbe indietro e il primo `router.refresh()`
+ * rimetterebbe l'indirizzo vecchio. Safari lancia un errore oltre cento
+ * sostituzioni ravvicinate: l'indirizzo e' un di piu', la pagina va avanti.
+ */
+function aggiornaQuery(cambia: (params: URLSearchParams) => void) {
+  const params = new URLSearchParams(window.location.search);
+  cambia(params);
+  const query = params.toString();
+  try {
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+    );
+  } catch {
+    // Limite del browser alle sostituzioni: resta l'indirizzo di prima.
+  }
 }
 
 // ── TabNav ──
@@ -796,15 +1047,46 @@ function TabNav({ active, onChange, t }: {
     { id: 'dopo', icon: 'video', key: 'tabs.afterEvent' },
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
   ];
+  // Da tastiera, come le schede del sistema: Tab entra sulla scheda attiva
+  // ed esce verso il pannello, le frecce (e Inizio, Fine) spostano il fuoco
+  // da una scheda all'altra, Invio o Spazio la aprono. Aprire a ogni freccia
+  // caricherebbe (con le sue richieste) ogni scheda attraversata.
+  const pulsanti = useRef(new Map<TabId, HTMLButtonElement>());
+  const vaiA = (indice: number) => {
+    const scheda = tabs[(indice + tabs.length) % tabs.length]!;
+    pulsanti.current.get(scheda.id)?.focus();
+  };
   return (
-    <ul className="nav nav-tabs mb-0" role="tablist" style={{ borderBottom: 'none' }}>
-      {tabs.map((tab) => {
+    // Su uno schermo stretto le schede scorrono invece di uscire dalla pagina.
+    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" aria-label={t('tabs.label')}
+        style={{ borderBottom: 'none' }}>
+      {tabs.map((tab, indice) => {
         const isActive = active === tab.id;
         return (
           <li key={tab.id} className="nav-item" role="presentation">
             <button type="button" role="tab" aria-selected={isActive}
+                    id={`event-tab-${tab.id}`} aria-controls="event-tabpanel"
+                    tabIndex={isActive ? 0 : -1}
+                    ref={(el) => {
+                      if (el) pulsanti.current.set(tab.id, el);
+                      else pulsanti.current.delete(tab.id);
+                    }}
                     className="nav-link d-inline-flex align-items-center gap-2"
                     onClick={() => onChange(tab.id)}
+                    onKeyDown={(e) => {
+                      // Con un modificatore e' una scorciatoia del browser
+                      // (Alt+freccia torna indietro): non la si tocca.
+                      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+                      const passo: Record<string, number> = {
+                        ArrowRight: indice + 1,
+                        ArrowLeft: indice - 1,
+                        Home: 0,
+                        End: tabs.length - 1,
+                      };
+                      if (!(e.key in passo)) return;
+                      e.preventDefault();
+                      vaiA(passo[e.key]!);
+                    }}
                     style={{
                       background: isActive ? '#fff' : 'transparent',
                       color: isActive ? C_PRIMARY : C_MUTED,
@@ -825,8 +1107,9 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
-  event: EventData; description: string; locale: string; editUrl: string;
+function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
+  event: EventData; description: string; locale: string;
+  editUrlAt: (step: WizardStep, section?: WizardAdvancedSection) => string;
   publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
   instant: boolean;
 }) {
@@ -836,13 +1119,25 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
   const t = useTranslations('admin');
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  const toggles: { label: string; value: boolean }[] = [
+  // Una voce puo' portare dove si cambia, se non e' fra le funzioni della sala.
+  const toggles: { label: string; value: boolean; href?: string }[] = [
     { label: te('manage.toggleChat'), value: event.chatEnabled },
     { label: te('manage.toggleQa'), value: event.qaEnabled },
     { label: te('manage.toggleRecording'), value: event.recordingEnabled },
     { label: td('toggles.unmute'), value: event.participantsCanUnmute },
     { label: td('toggles.video'), value: event.participantsCanStartVideo },
     { label: td('toggles.screenShare'), value: event.participantsCanShareScreen },
+    // Una chiamata rapida non ha iscrizione: il link e' l'invito.
+    // Si cambia nel passo «Persone», non con le funzioni della sala.
+    ...(instant
+      ? []
+      : [
+          {
+            label: td('toggles.openRegistration'),
+            value: event.registrationOpen,
+            href: editUrlAt('invites'),
+          },
+        ]),
   ];
 
   return (
@@ -857,7 +1152,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={percorso(editUrl)}
+          <Link href={percorso(editUrlAt('advanced', 'participation'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -870,7 +1165,11 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
               <span style={{ color: toggle.value ? C_SUCCESS : C_DANGER, flexShrink: 0 }}>
                 <Svg name={toggle.value ? 'check' : 'x'} size={14} />
               </span>
-              <span>{toggle.label}</span>
+              {toggle.href ? (
+                <Link href={percorso(toggle.href)}>{toggle.label}</Link>
+              ) : (
+                <span>{toggle.label}</span>
+              )}
             </div>
           ))}
         </div>
@@ -906,7 +1205,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
           icon="it-lock"
         >
         <div className="d-flex justify-content-end mb-3">
-          <Link href={percorso(editUrl)}
+          <Link href={percorso(editUrlAt('advanced', 'data'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -961,12 +1260,22 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft, linksMailable, editPeopleHref }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
+  /** In bozza i link di co-moderatori e relatori partono alla pubblicazione. */
+  isDraft: boolean;
+  /** Il portale manda i link per email (non in bozza, non a evento finito). */
+  linksMailable: boolean;
+  /** La modifica sul passo «Persone» del wizard: enti e invitati. */
+  editPeopleHref: string;
+  /** Correzione e cancellazione delle iscrizioni: solo con una sessione dello
+   *  staff, non con il solo link del moderatore. */
+  canEditRegistrations: boolean;
 }) {
   const t = useTranslations('admin');
   const te = useTranslations('events');
   const format = useFormatter();
+  const orgTypeLabel = useOrgTypeLabel();
 
   // Aggregated org-type histogram for the intro chip row.
   const orgTypeCounts = event.registrations.reduce<Record<string, number>>((acc, r) => {
@@ -977,12 +1286,59 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
 
   return (
     <>
+      {/* Gli enti che organizzano, come li vede la pagina pubblica. */}
+      <section className="mb-4" aria-labelledby="enti-titolo">
+        <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <h2 id="enti-titolo" className="fw-semibold mb-0" style={{ color: C_INK, fontSize: '1rem' }}>
+            {t('invitationsPanel.organizersTitle')}
+          </h2>
+          <Link href={percorso(editPeopleHref)} className="btn btn-outline-primary btn-sm">
+            {t('invitationsPanel.organizersEdit')}
+          </Link>
+        </div>
+        {event.organizers.length === 0 ? (
+          <p className="mb-0" style={{ color: C_MUTED, fontSize: '0.9rem' }}>{t('invitationsPanel.organizersEmpty')}</p>
+        ) : (
+          <ul className="list-unstyled d-flex flex-wrap gap-3 mb-0">
+            {/* Con gli stessi filtri della pagina pubblica: solo loghi serviti
+                dall'app (niente richieste a siti terzi), solo siti http(s). */}
+            {event.organizers.map((o) => {
+              const logo = logoPubblico(o.logoUrl);
+              const sito = sitoPubblico(o.websiteUrl);
+              return (
+                <li key={o.id} className="d-flex align-items-center gap-2 px-3 py-2" style={CARD}>
+                  {logo && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={logo} alt="" style={{ height: 28, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />
+                  )}
+                  {sito ? (
+                    <a href={sito} target="_blank" rel="noopener noreferrer">{o.name}</a>
+                  ) : (
+                    <span>{o.name}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       <div className="mb-4">
         <H>{t('coModerators.title')}</H>
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
+                              eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
-                              baseUrl={baseUrl} locale={locale} />
+                              baseUrl={baseUrl} locale={locale} isDraft={isDraft}
+                              canResend={linksMailable} />
       </div>
+
+      {/* Gli invitati: la rotta e' dello staff, non del link del moderatore. */}
+      {canEditRegistrations && (
+        <div className="mb-4">
+          <EventInvitationsPanel eventId={event.id} invitationOnly={!event.registrationOpen}
+                                 editHref={editPeopleHref} />
+        </div>
+      )}
 
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -1003,7 +1359,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
           <div className="mb-3 d-flex flex-wrap gap-2">
             {orgTypeEntries.map(([type, count]) => {
               const pct = Math.round((count / event.registrations.length) * 100);
-              const label = ORG_TYPE_LABELS[type]?.[locale as 'it' | 'en'] ?? type;
+              const label = orgTypeLabel(type);
               return (
                 <span key={type} className="px-2 py-1 rounded-pill" style={PILL_MUTED}>
                   {label}: {pct}% ({count})
@@ -1028,13 +1384,16 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
                   {event.requireOrganizationType && <th scope="col">{t('organizationType')}</th>}
                   <th scope="col">{t('registrationDate')}</th>
                   <th scope="col">{t('joined')}</th>
+                  {canEditRegistrations && (
+                    <th scope="col"><span className="visually-hidden">{t('registrationActions.actions')}</span></th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {event.registrations.map((reg, i) => {
                   const joined = !!reg.joinedAt;
                   const typeLabel = reg.organizationType
-                    ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType)
+                    ? orgTypeLabel(reg.organizationType)
                     : '—';
                   return (
                     <tr key={reg.id}>
@@ -1060,6 +1419,11 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
                           {joined ? t('joined') : t('notJoined')}
                         </span>
                       </td>
+                      {canEditRegistrations && (
+                        <td>
+                          <RegistrationRowActions eventId={event.id} registration={reg} />
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -1072,7 +1436,9 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
   );
 }
 
-function ContentTab({ event }: { event: EventData }) {
+/** `staffTools`: le pagine di gestione di materiali e questionari sono dello
+ *  staff; con il solo link del moderatore qui si vedono e basta. */
+function ContentTab({ event, staffTools }: { event: EventData; staffTools: boolean }) {
   const tm = useTranslations('materials');
   // Senza un nome (aggiunto dallo staff, da un co-moderatore, o una parola
   // fissa salvata in passato) la dicitura tradotta: lib/events/material-author.
@@ -1093,10 +1459,12 @@ function ContentTab({ event }: { event: EventData }) {
               ({event.materials.length})
             </span>
           </H>
-          <Link href={percorso(`/admin/events/${event.id}/materials`)}
-                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('manageMaterials')}
-          </Link>
+          {staffTools && (
+            <Link href={percorso(`/admin/events/${event.id}/materials`)}
+                  className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <Svg name="pencil" size={12} /> {td('manageMaterials')}
+            </Link>
+          )}
         </div>
         {event.materials.length === 0 ? (
           <div className="text-center py-3" style={{ color: C_MUTED, fontSize: '0.9rem' }}>
@@ -1133,10 +1501,12 @@ function ContentTab({ event }: { event: EventData }) {
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <H>{td('questionnaires')}</H>
-          <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
-                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
-          </Link>
+          {staffTools && (
+            <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
+                  className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
+            </Link>
+          )}
         </div>
         <div style={{ fontSize: '0.88rem', color: C_MUTED }}>
           {td('questionnaireCount', { count: event.questionnaireCount })}
@@ -1146,13 +1516,19 @@ function ContentTab({ event }: { event: EventData }) {
   );
 }
 
-function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
-  event: EventData; status: string;
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken }: {
+  event: EventData; status: string; viaToken: string | null;
   paginaPostEvento: PostEventVisibility;
   onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
 }) {
   const td = useTranslations('admin.eventDetail');
   const t = useTranslations('admin');
+  const tfb = useTranslations('admin.feedbackPanel');
+  const tg = useTranslations('admin.glossary');
+  const tct = useTranslations('admin.captionsTranscript');
+  const trp = useTranslations('admin.eventReport');
+  const tApi = useTranslations('apiErrors');
+  const locale = useLocale();
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
@@ -1181,12 +1557,18 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ summary: true }),
       });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-        enqueued?: number;
-      };
+      const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
       if (!res.ok) {
-        setAiGenMsg({ ok: false, text: data.error ?? td('aiGenerateError') });
+        setAiGenMsg({
+          ok: false,
+          text: messaggioErroreApi(
+            res.status,
+            tApi,
+            td('aiGenerateError'),
+            { 404: td('aiGenerateNoRecording') },
+            data.code,
+          ),
+        });
       } else {
         setAiGenMsg({
           ok: true,
@@ -1198,10 +1580,35 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
     } finally {
       setGeneratingAi(false);
     }
-  }, [event.id, td]);
+  }, [event.id, td, tApi]);
+
+  // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
+  // evento concluso e' la prima cosa da fare, e sta in cima.
+  const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
+  const bloccoRegistrazione = (
+      <div className="mb-4">
+        <H>{td('recordingSection')}</H>
+        <RecordingManagement
+          event={{
+            id: event.id, slug: event.slug, status,
+            recordingEnabled: event.recordingEnabled,
+            recordingUrl: event.recordingUrl,
+            tempRecordingUrl: event.tempRecordingUrl,
+            tempRecordingStartedAt: event.tempRecordingStartedAt,
+            recordingPublished: event.recordingPublished,
+            recordingPublishedAt: event.recordingPublishedAt,
+            recordingFileSize: event.recordingFileSize,
+            recordingDuration: event.recordingDuration,
+            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            moderatorToken: event.moderatorToken,
+          }}
+        />
+      </div>
+  );
 
   return (
     <>
+      {registrazioneInCima && bloccoRegistrazione}
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
@@ -1225,11 +1632,30 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
             postEventShowRecap: event.postEventShowRecap,
             postEventShowWordCloud: event.postEventShowWordCloud,
             postEventEmailEnabled: event.postEventEmailEnabled,
+            recordingNotifyEnabled: event.recordingNotifyEnabled,
+            recordingNotifiedAt: event.recordingNotifiedAt,
             feedbackEnabled: event.feedbackEnabled,
             dataRetentionDays: event.dataRetentionDays,
           }}
         />
       </div>
+
+      {/* Le valutazioni di chi ha partecipato, subito sotto le regole che le
+          raccolgono e le pubblicano. */}
+      <div className="mb-4">
+        <H>{tfb('title')}</H>
+        <EventFeedbackPanel eventId={event.id} token={viaToken} />
+      </div>
+
+      {/* Il resoconto dell'evento: dopo le valutazioni, che ne fanno parte.
+          Lo chiede lo staff (accende il modello linguistico), non chi arriva
+          con il link del moderatore. */}
+      {!viaToken && (
+        <div className="mb-4">
+          <H>{trp('title')}</H>
+          <EventReportPanel eventId={event.id} locale={locale} />
+        </div>
+      )}
 
       {/* CTA prominente verso la gestione AI completa del video:
           trascrizione (testo + diarization), sintesi, traduzioni.
@@ -1289,25 +1715,29 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
         )}
       </div>
 
-      {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}
+      {/* La trascrizione dai sottotitoli live, se l'evento la tiene: si legge
+          e si pubblica anche senza video e senza pipeline AI. */}
+      {event.captionsTranscriptEnabled && (
+        <div className="mb-4">
+          <H>{tct('title')}</H>
+          <CaptionsTranscriptPanel
+            eventId={event.id}
+            moderatorToken={event.moderatorToken}
+            isEnded={isEnded}
+          />
+        </div>
+      )}
+
+      {/* Il glossario dell'evento: termini e sigle per trascrizione, traduzioni
+          e doppiaggio, in aggiunta a quelli dell'istanza. Serve anche prima
+          della fine: si compila quando si prepara l'evento. */}
       <div className="mb-4">
-        <H>{td('recordingSection')}</H>
-        <RecordingManagement
-          event={{
-            id: event.id, slug: event.slug, status,
-            recordingEnabled: event.recordingEnabled,
-            recordingUrl: event.recordingUrl,
-            tempRecordingUrl: event.tempRecordingUrl,
-            tempRecordingStartedAt: event.tempRecordingStartedAt,
-            recordingPublished: event.recordingPublished,
-            recordingPublishedAt: event.recordingPublishedAt,
-            recordingFileSize: event.recordingFileSize,
-            recordingDuration: event.recordingDuration,
-            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
-            moderatorToken: event.moderatorToken,
-          }}
-        />
+        <H>{tg('eventTitle')}</H>
+        <p style={{ color: C_MUTED, fontSize: '0.9rem', maxWidth: 680 }}>{tg('eventIntro')}</p>
+        <GlossaryManager apiBase={`/api/admin/events/${event.id}/glossary`} token={viaToken} scope="event" />
       </div>
+
+      {!registrazioneInCima && bloccoRegistrazione}
 
       {/* Le sessioni sono il registro di cio' che e' successo in sala: chi si
           e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
@@ -1377,6 +1807,61 @@ function KV({ label, value }: { label: string; value: ReactNode }) {
     <div className="py-3" style={{ borderBottom: '1px solid #f0f0f0' }}>
       <dt className="mb-1" style={EYEBROW}>{label}</dt>
       <dd className="mb-0" style={{ color: C_INK, fontSize: '0.9rem' }}>{value}</dd>
+    </div>
+  );
+}
+
+/** Il riepilogo dell'evento appena creato dal wizard. */
+function CreatedSummary({
+  published,
+  publishFailed,
+  unsaved,
+  shareUrl,
+  onPublish,
+  publishing = false,
+  onPeople,
+  onClose,
+}: {
+  published: boolean;
+  publishFailed: boolean;
+  unsaved: CreationOutcome['unsaved'];
+  shareUrl: string | null;
+  /** In bozza: pubblicare da qui, senza cercare il pulsante. */
+  onPublish?: () => void;
+  publishing?: boolean;
+  onPeople: () => void;
+  onClose: () => void;
+}) {
+  const tc = useTranslations('admin.eventDetail.created');
+  const tw = useTranslations('admin.wizard.resources');
+  const mancanti = unsaved.map((k) => tw(k)).join(', ');
+  // Una pubblicazione chiesta e fallita non e' una bozza voluta.
+  const titolo = published ? tc('publishedTitle') : publishFailed ? tc('publishFailedTitle') : tc('draftTitle');
+  const testo = published ? tc('publishedBody') : publishFailed ? tc('publishFailedBody') : tc('draftBody');
+  return (
+    <div
+      className={`alert ${mancanti || (publishFailed && !published) ? 'alert-warning' : 'alert-success'} mb-4`}
+      role="status"
+    >
+      <div className="d-flex align-items-start gap-3">
+        <div className="flex-grow-1">
+          <p className="fw-semibold mb-1">{titolo}</p>
+          <p className="mb-2">{testo}</p>
+          {mancanti && <p className="mb-2">{tc('unsaved', { items: mancanti })}</p>}
+          <div className="d-flex flex-wrap gap-2 align-items-center">
+            {onPublish && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={onPublish} disabled={publishing}>
+                {tc('publishNow')}
+              </button>
+            )}
+            {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
+            <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
+              {tc('sendToSpeakers')}
+            </button>
+          </div>
+        </div>
+        <button type="button" className="btn-close" aria-label={tc('close')} onClick={onClose} />
+      </div>
     </div>
   );
 }

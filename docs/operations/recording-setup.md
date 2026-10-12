@@ -65,7 +65,7 @@ flowchart LR
         direction LR
         Q2{"One audio track<br/>per participant?"}
         V2["Chart values<br/>recorder.enabled: true<br/>recorder.controller.enabled: true<br/>postprod.enabled: true"]
-        P2["Prerequisite<br/>event: recording + Automatic transcription<br/>+ Per-participant recording<br/>separate per-track consent<br/>sensitive voice data"]
+        P2["Prerequisite<br/>event: recording + Automatic transcription<br/>+ Per-participant recording<br/>optional consent checked per track<br/>Prosody module pa_occupants<br/>sensitive voice data"]
         Q3{"Hide the bot<br/>from the room?"}
         V3["Chart values<br/>recorder.hiddenDomain<br/>recorder.xmppSecretName"]
         P3["Prerequisite<br/>Prosody token_verification_allowlist<br/>for the single recorder account<br/>pinned recorder password<br/>jitsi-meet.jibri.enabled: true"]
@@ -154,30 +154,21 @@ file and calls the recording webhook. Its contract is described in
 [From MP4 to recording](../architecture/recording.md#from-mp4-to-recording-the-finalize-contract).
 
 The chart renders this script from `files/jibri-finalize.sh` as the ConfigMap
-`<fullname>-jibri-finalize` whenever `jitsi.enabled` and
-`jitsi-meet.jibri.enabled` are both true. It does not mount it, and neither
-example profile does. Without the mount the MP4 stays on the Jibri pod's
-volume and the portal never learns about it.
+`pa-webinar-jibri-finalize` whenever `jitsi.enabled` and
+`jitsi-meet.jibri.enabled` are both true, and mounts it there by default
+(`jitsi-meet.jibri.extraVolumes` and `extraVolumeMounts` in the chart's
+`values.yaml`). The name is fixed, so one release per namespace. A chart upgrade
+updates the ConfigMap, and Jibri pods read the new script when they restart.
 
-Mount it through the subchart's `extraVolumes` and `extraVolumeMounts`, and give
-the script the two variables it requires, `APP_INTERNAL_URL` and
-`CRON_API_KEY`:
+What the operator still provides are the variables the script reads:
+`APP_INTERNAL_URL`, `CRON_API_KEY` and, when the portal checks webhook
+signatures, `RECORDING_WEBHOOK_SECRET`:
 
 ```yaml
 jitsi-meet:
   jibri:
     enabled: true
     replicaCount: 1   # 0 in the full profile, where the JVB scaler starts Jibri
-    # The chart's finalize script, mounted where Jibri runs it.
-    extraVolumes:
-      - name: pa-webinar-finalize
-        configMap:
-          name: pa-webinar-jibri-finalize   # <fullname>-jibri-finalize
-          defaultMode: 0755
-    extraVolumeMounts:
-      - name: pa-webinar-finalize
-        mountPath: /config/finalize.sh
-        subPath: finalize.sh
     # Plain settings go to the Jibri ConfigMap.
     extraEnvs:
       APP_INTERNAL_URL: "http://pa-webinar:3000"   # http://<fullname>:<service.port>
@@ -196,20 +187,16 @@ jitsi-meet:
             optional: true
 ```
 
-This mount follows the chart: a chart upgrade updates the ConfigMap, and Jibri
-pods read the new script when they restart.
+`extraEnvs` is a map and merges with the chart's own entries. `extraVolumes` and
+`extraVolumeMounts` are lists: a values file that sets its own replaces the
+chart's, and must repeat the two entries for the script.
 
-The alternative is the subchart's own slot, which also mounts the file at
-`/config/finalize.sh`:
-
-```bash
-helm upgrade pa-webinar infra/helm/pa-webinar -n pa-webinar -f <your-values>.yaml \
-  --set-file jitsi-meet.jibri.custom.other._finalize_sh=infra/helm/pa-webinar/files/jibri-finalize.sh
-```
-
-With this form the script becomes part of the release values. An upgrade with
-`--reuse-values` then keeps the old copy until you pass the file again
-([Upgrades and rollback](upgrades.md)).
+A values file that still carries its own copy in
+`jitsi-meet.jibri.custom.other._finalize_sh` would mount a second file at the
+same path; the chart stops the render and says so. Remove `_finalize_sh` (the
+chart's script is kept up to date with each release and signs the webhook), or,
+to keep your own script, set `extraVolumes` and `extraVolumeMounts` without the
+script's entries.
 
 The script calls `curl`, `jq`, `ffprobe`, `ffmpeg` and, to sign the webhook,
 `openssl`. Check that the Jibri image you run provides them.
@@ -348,9 +335,20 @@ A bot starts only when all of these hold:
 
 The controller does not check storage. To upload its tracks the bot needs
 [recording storage](#recording-storage) on the app; without it the tracks
-cannot be uploaded and are lost with the bot's pod. Registrants of such an
-event must give a separate consent to per-track recording; registration is
-refused without it.
+cannot be uploaded and are lost with the bot's pod.
+
+The bot records only the voices of people who consented to the transcription
+of what they say: an optional box at registration and in the waiting room,
+asked of everyone, moderators included. Before recording a track it asks the
+portal, which knows whose voice it is only because Prosody's `mod_pa_occupants`
+reports who joins with which token. The chart loads that module and gives it
+the portal's address by default; it signs its reports with the conference
+token secret that Prosody already has
+([Jitsi extras](../../infra/jitsi/README.md#the-occupants-module)), and the
+render stops when `recorder.enabled` is on but `XMPP_MUC_MODULES` does not load
+`pa_occupants`. With an external Jitsi that does not load the module, the bot
+records no track at all
+([Consent gates](../architecture/recording.md#consent-gates)).
 
 Turn AI post-production on together with the recorder (`postprod.enabled: true`
 and, in the site settings, **Post-event pipeline active**). The tracks exist
@@ -497,7 +495,11 @@ kubectl -n pa-webinar logs job/<recorder-job-name> --tail=100
 ```
 
 The bot's log starts with the work order it claimed and, after the event, reports
-how many tracks the manifest contains. With the hidden domain configured, the
+how many tracks the manifest contains. A voice without consent shows up as
+`TRACK_SKIPPED pid=<endpoint>`. When the portal does not know an endpoint, the
+bot also logs a warning that names `mod_pa_occupants`: if that happens for every
+voice, check that Prosody reports occupants (`room_occupants` gets rows when
+people join). With the hidden domain configured, the
 bot must not appear in the Jitsi participant list.
 
 If the bot is visible or never appears, see
@@ -629,15 +631,21 @@ Where the Jibri and recorder pods run is covered in
 To estimate the object storage, multiply the average bitrate by the duration:
 one hour at 1 Mbps is about 450 MB.
 
-- **Composite MP4.** The finalize script only re-muxes Jibri's file for
+- **Composite MP4.** The chart records at full quality by default: Jibri
+  captures the room at 1920x1080 (`JIBRI_RECORDING_RESOLUTION`, which also
+  sizes Jibri's virtual screen, so shared slides stay readable) with H.264
+  CRF 20 (`JIBRI_RECORDING_CONSTANT_RATE_FACTOR`; the image default is 25),
+  keeping the lightest encoder preset so the CPU goes to rendering the room.
+  Both are in `jitsi-meet.jibri.extraEnvs`; a lower resolution or a higher
+  CRF gives smaller files. The finalize script only re-muxes Jibri's file for
   streaming (faststart) and does not re-encode it, so the stored size is what
   Jibri's encoder produced. It depends on the resolution and on what is on
   screen: slides and a few talking heads compress far better than full-motion
   video. Measure it with a test recording of a typical event, for example at an
   average of 1.5 Mbps an hour takes about 675 MB.
-- **Per-participant tracks.** Each bot records every remote audio track as Opus
-  at 32 kbps (`infra/recorder/src/capture.ts`), about 14 MB per participant per
-  hour of recording.
+- **Per-participant tracks.** Each bot records the remote audio track of every
+  participant who consented as Opus at 32 kbps (`infra/recorder/src/capture.ts`),
+  about 14 MB per participant per hour of recording.
 - **AI outputs** (transcripts, subtitles, summaries) are small next to the
   media. Dubbing adds an audio file per target language and, when the
   optional `DUBBED_VIDEO` is produced, a copy of the video with that audio

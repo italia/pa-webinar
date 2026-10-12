@@ -134,8 +134,14 @@ All fields are optional. The types and their comments are in `src/lobby/public-t
 
 | Method | Effect |
 |---|---|
-| `setProfile(partial)` | Updates the local name, color or accessories, and does nothing after `destroy()`. Name and color go out only when they change. Accessories go out whenever they are passed. The result is saved in `localStorage`, sent through `presence.setProfile()` and redrawn on the avatar. |
-| `destroy()` | Teardown, safe to call twice. It releases its bus subscriptions and gesture listeners, closes the audio context and removes the overlays. It then asks Phaser to destroy the game with `game.destroy(true)`; Phaser does so on its next frame, stopping the loop and removing the canvas. That destruction emits the scene's `DESTROY` event, not `SHUTDOWN`, so `WorldScene`'s own teardown, registered on `SHUTDOWN`, does not run (see [Known scope and limitations](#known-scope-and-limitations)). Next it calls `presence.disconnect()` and `media.stop()`, clears the bus, removes the two DOM roots and the injected `<style>`, and resets the container's `position` (see [Container requirements](#container-requirements)). |
+| `setProfile(partial)` | Updates the local name, color, accessories, look (`look`, see `avatar/look.ts`) or mood (`umore`, see `umori.ts`), and does nothing after `destroy()`. Only what changes goes out; accessories go out whenever they are passed. The result is saved in `localStorage`, sent through `presence.setProfile()` and redrawn on the avatar. A profile without a look gets a random one. |
+| `ready` | A promise resolved once the scene has started: messages sent before (chat bubbles, typing) would have no listener. |
+| `showChatMessage(name, text, ageMs?, id?, self?)`, `editChatMessage(id, text)`, `clearChatMessage(id)`, `setTyping(names)` | Chat bubbles over the avatars: a new message on its author (or on the local avatar with `self`), a correction, a hidden message, the typing dots. |
+| `emote(type)` | A gesture of the local avatar, as from its key. |
+| `setAudio(on)` | Sound on or off; returns the state. |
+| `azione(id)`, `festa()` | The in-scene effect of an action at a place (`caffe` is a gesture everyone sees, `fontana` and `pozzo` throw a coin), and confetti around the local avatar. |
+| `presenti()`, `umori()` | Who is in the square with their look (the local player first), and how many chose each mood. |
+| `destroy()` | Teardown, safe to call twice. It releases its bus subscriptions and gesture listeners, closes the audio context and removes the overlays. It then asks Phaser to destroy the game with `game.destroy(true)`; Phaser does so on its next frame, stopping the loop and removing the canvas. That destruction emits the scene's `DESTROY` event, not `SHUTDOWN`; `WorldScene` runs its own teardown on either event, once, releasing its key listeners, its `PeerStore` and gate subscriptions, the places and the surprises. Next it calls `presence.disconnect()` and `media.stop()`, clears the bus, removes the two DOM roots and the injected `<style>`, and resets the container's `position` (see [Container requirements](#container-requirements)). |
 
 ### Container requirements
 
@@ -271,7 +277,8 @@ Both build configurations live in `vite.config.ts`, and `--mode lib` selects the
 | Input and motion | `systems/Movement.ts`, `ui/Joystick.ts` | Keyboard and joystick input, integration, collision push-out and world clamping |
 | Peers | `systems/PeerStore.ts`, `systems/AvatarSprite.ts`, `systems/NametagCulling.ts`, `systems/ProximityLinks.ts` | Merge presence and conference into one map. Animate and interpolate avatars. Show names only when near or in the call. Draw dashed lines to nearby peers |
 | Gate | `systems/CountdownGate.ts` | Turns `EventSchedule` into doors, padlock or rope, labels and the bus signals `statusChange`, `canEnter` and `countdown` |
-| Art | `systems/AvatarTextureFactory.ts` | The only place avatar art is drawn |
+| Art | `avatar/` (look, drawing), `systems/AvatarTextureFactory.ts` | The character's look and its flat drawing (pure Canvas 2D, also used by the host page's editor), turned into one texture per look |
+| Places and surprises | `systems/Luoghi.ts`, `systems/Atmosfera.ts`, `umori.ts`, `segreti.ts` | The places where something happens (marker, `luogo` and `interagisci` on the bus), coins and confetti, the mood counts, snow, fireworks and the secret codes |
 | Sound | `systems/AudioSystem.ts` | Procedural Web Audio music and effects |
 | Overlays | `ui/TopBar.ts`, `ui/StatusBadge.ts`, `ui/PersonalizationBar.ts`, `ui/ConfigPanel.ts`, `ui/Onboarding.ts`, `ui/styles.ts`, `ui/dom.ts` | Full-screen chrome and its scoped CSS |
 | Ports and mocks | `ports/`, `mocks/` | Interfaces only, and the harness implementations |
@@ -323,16 +330,16 @@ These design points keep the loop cheap with many peers:
 - **Lifecycle is evented, positions are polled.** `PeerStore` turns join, leave, profile, in-call and emote changes into events, so the scene creates or recycles sprites only when needed. Positions are read in place every frame.
 - **Remote smoothing.** Remote avatars move toward their latest sample with exponential catch-up (`INTERP_RATE`). Short dead reckoning, capped by `DEAD_RECKON_CAP_MS` in `AvatarSprite.ts`, means a stale sample never throws an avatar across the map. The local avatar is authoritative and moves immediately.
 - **Culling and pooling.** Sprites outside the camera view, plus a margin, are not animated. Sprites of peers who leave are parked in a pool and reused.
-- **Shared textures.** `AvatarTextureFactory` caches one texture per appearance (color, accessories, in-call visor). Many peers who share a few colors therefore allocate only a few textures.
+- **Shared textures.** `AvatarTextureFactory` caches one texture per look and in-call visor, with a frame per direction and walking step, painted at twice the world resolution so it stays sharp when the camera zooms in.
 - **Seats.** In-call avatars take amphitheater seats from the map layout. When the seats run out, the scene adds standing spots on the stage.
-- **Camera.** The camera follows the local avatar with a dead zone. Its zoom fits the full world height within fixed limits (`applyCameraZoom` in `WorldScene.ts`), and the player reaches horizontal space by panning.
+- **Camera.** The camera follows the local avatar with a dead zone. In the square its zoom shows about three quarters of the world's height (the whole height on the classic map), within fixed limits (`applyCameraZoom` in `WorldScene.ts`), and the player reaches the rest by walking.
 - **Keys belong to the focused control.** `Movement` listens on `document` in the capture phase. While a text field, button or link has focus, the game ignores every key, so the host page's controls keep working. The host page makes the scene reachable with Tab, so the player can get the keys back.
 
 ### Art seams
 
 The world and the avatars are drawn in code. The default square uses the .italia pastel palette. Art is confined to three places:
 
-- `AvatarTextureFactory.ts` draws avatars into cached textures. `AvatarSprite` only animates a texture key, so replacing the art means replacing the factory.
+- `avatar/disegno.ts` draws the characters and `AvatarTextureFactory.ts` turns them into cached textures. `AvatarSprite` only animates a texture key and its frames, so replacing the art means replacing those two.
 - `buildPiazzaMap()` and `buildPlaceholderMap()` return the same `WorldLayout`, so every system works with either map. A new map, drawn or loaded, must return that contract.
 - `BootScene` is where asset loading would go. `AssetConfig` (`tilemapUrl`, `tilesetUrl`, `avatarSpriteUrl`) is part of the public types, but nothing reads it yet. To load a Tiled map or a sprite sheet, add the `load.*` calls in `BootScene` and a builder that returns `WorldLayout`.
 
@@ -357,7 +364,6 @@ In the app, none of this competes with the room. Embed mode has no device panel,
 - **No proximity audio, video or chat.** The dashed lines between nearby avatars are a visual hint only. There is no realtime server either: presence is a polled HTTP route.
 - **No one appears in the call** in the portal, because presence carries no in-call state (see [Ports and adapter constraints](#ports-and-adapter-constraints)).
 - **Italian-only texts inside the game.** Only the gate labels can be translated, through `labels`. The full-screen chrome, the joystick's accessible name and the map signs drawn by `PiazzaMap.ts` are Italian literals. In embed mode the map signs and the joystick remain. Avatars with an empty name are labeled with the Italian literals `Tu` ("You", your own avatar) and `Ospite` ("Guest", others), and these appear in embed mode too: the app seeds the local name from the page's name field, which stays empty until the page prefills it or the visitor types a name, and the presence adapter sends `Ospite` for an empty name.
-- **Key listeners outlive `destroy()`.** `WorldScene` releases its movement key listeners, its `PeerStore` subscriptions and the gate only on Phaser's scene `SHUTDOWN` event, and destroying the game emits `DESTROY` instead. After `destroy()`, the two capture-phase listeners of `Movement` therefore stay on `document`. Arrow keys, WASD and Space pressed while focus is not on a control still get `preventDefault()`, which blocks keyboard scrolling of the host page, and Space, E and H still call into the destroyed scene. Each mount and destroy cycle adds another pair of listeners. `PeerStore` and the gate also stay subscribed to their ports; the app's presence adapter drops its listeners on `disconnect()`.
 - **Accessibility lives in the host page.** The canvas offers nothing to a screen reader and does not read `prefers-reduced-motion`. The square is acceptable because the page never depends on it. See the [accessibility contract](../docs/architecture/waiting-room.md#accessibility-contract).
 - **Unused options.** `capacityHint` and `assets` are accepted but not read.
 - **No unit tests in this workspace.** The canvas is checked by hand in the harness. The app's presence and schedule adapters have unit tests under `app/src/lib/lobby/`. See [Testing](../docs/development/testing.md#lobby).

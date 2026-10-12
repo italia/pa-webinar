@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import {
   Alert,
   Card,
@@ -36,6 +36,8 @@ interface PostEventConfigProps {
     postEventShowRecap: boolean;
     postEventShowWordCloud: boolean;
     postEventEmailEnabled: boolean;
+    recordingNotifyEnabled: boolean;
+    recordingNotifiedAt: string | null;
     feedbackEnabled: boolean;
     dataRetentionDays: number;
   };
@@ -44,6 +46,7 @@ interface PostEventConfigProps {
 export default function PostEventConfig({ event, onPublicPageChange }: PostEventConfigProps) {
   const t = useTranslations('postEvent');
   const tc = useTranslations('common');
+  const format = useFormatter();
   // Un salvataggio non riuscito: l'interruttore torna com'era e lo si dice.
   const [saveFailed, setSaveFailed] = useState(false);
 
@@ -56,6 +59,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
   const [showRecap, setShowRecap] = useState(event.postEventShowRecap);
   const [showWordCloud, setShowWordCloud] = useState(event.postEventShowWordCloud);
   const [emailEnabled, setEmailEnabled] = useState(event.postEventEmailEnabled);
+  const [recordingNotify, setRecordingNotify] = useState(event.recordingNotifyEnabled);
   const [feedbackActive, setFeedbackActive] = useState(event.feedbackEnabled);
   const [visibilityMode, setVisibilityMode] = useState<'always' | 'until'>(
     event.postEventPublicUntil ? 'until' : 'always',
@@ -190,6 +194,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showQA')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showQA')}
               checked={showQA}
               onChange={() => handleToggle('postEventShowQA', !showQA, setShowQA)}
             />
@@ -199,6 +204,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showMaterials')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showMaterials')}
               checked={showMaterials}
               onChange={() => handleToggle('postEventShowMaterials', !showMaterials, setShowMaterials)}
             />
@@ -208,6 +214,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showPolls')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showPolls')}
               checked={showPolls}
               onChange={() => handleToggle('postEventShowPolls', !showPolls, setShowPolls)}
             />
@@ -262,10 +269,37 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             </small>
           </div>
 
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('recordingNotify')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('recordingNotify')}
+                checked={recordingNotify}
+                // Partito l'avviso, l'interruttore non cambia piu' niente.
+                disabled={!!event.recordingNotifiedAt}
+                onChange={() =>
+                  handleToggle('recordingNotifyEnabled', !recordingNotify, setRecordingNotify)
+                }
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {event.recordingNotifiedAt
+                ? t('recordingNotifySent', {
+                    date: format.dateTime(new Date(event.recordingNotifiedAt), {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    }),
+                  })
+                : t('recordingNotifyHelp')}
+            </small>
+          </div>
+
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('feedbackEnabled')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('feedbackEnabled')}
               checked={feedbackActive}
               onChange={() => handleToggle('feedbackEnabled', !feedbackActive, setFeedbackActive)}
             />

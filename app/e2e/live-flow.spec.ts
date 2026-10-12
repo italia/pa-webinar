@@ -208,7 +208,7 @@ test.describe('Registration → waiting room (one-step access)', () => {
     // Previously this fell through to errors.generic (the client matched a
     // `already_registered` error string the API never sent). Now it shows
     // the dedicated message and offers to re-send the access link.
-    await expect(page.getByText(/sei già registrato/i)).toBeVisible({
+    await expect(page.getByText(/sei già iscritto/i)).toBeVisible({
       timeout: 10_000,
     });
     await expect(

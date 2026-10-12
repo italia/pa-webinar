@@ -143,8 +143,9 @@ async function putToSignedUrl(
   const headers: Record<string, string> = {
     'Content-Type': input.contentType,
   };
-  // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233).
-  if (url.includes('blob.core.windows.net')) {
+  // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233). Si
+  // guarda l'host, non una sottostringa dell'indirizzo intero.
+  if (new URL(url).hostname.endsWith('.blob.core.windows.net')) {
     headers['x-ms-blob-type'] = 'BlockBlob';
   }
   const res = await fetchImpl(url, {
@@ -369,6 +370,9 @@ export interface IngestBody {
   eventId: string;
   recordingId: string;
   tracks: IngestTrack[];
+  /** t0 della registrazione (epoch ms): il portale lo usa come zero dei
+   *  tempi della trascrizione e della cronologia della sala. */
+  recordingStartedAtMs?: number;
 }
 
 /**
@@ -382,6 +386,7 @@ export function buildIngestBody(
   return {
     eventId: manifest.eventId,
     recordingId: manifest.recordingId,
+    ...(manifest.recordingStartedAtMs > 0 && { recordingStartedAtMs: manifest.recordingStartedAtMs }),
     tracks: manifest.tracks.map((t) => ({
       participantId: t.participantId,
       displayName: t.displayName,

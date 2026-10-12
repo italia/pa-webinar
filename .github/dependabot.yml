@@ -136,6 +136,25 @@ updates:
   - dependency-name: typescript
     update-types:
     - version-update:semver-major
+# Il gateway dei sottotitoli live: fuori dai workspace npm come il recorder,
+# con un package-lock proprio.
+- package-ecosystem: npm
+  directory: /infra/captions/gateway
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 5
+  labels:
+  - dependencies
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+  ignore:
+  - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
 # Il worker della pipeline AI. Lo stack CUDA (torch/whisperx/numpy) e' pinnato
 # a mano e self-consistent: i major qui vanno provati su GPU, mai automatici.
 - package-ecosystem: pip
@@ -199,6 +218,29 @@ updates:
   - dependency-name: node
     update-types:
     - version-update:semver-major
+- package-ecosystem: docker
+  directory: /infra/captions/gateway
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+  ignore:
+  - dependency-name: node
+    update-types:
+    - version-update:semver-major
+# Il motore dei sottotitoli: Dependabot aggiorna l'immagine di base. Versione
+# e impronta del motore sono fissate a mano nel Dockerfile, e cambiarle vuol
+# dire rifare il banco di prova (infra/captions/bench).
+- package-ecosystem: docker
+  directory: /infra/captions/engine
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
 - package-ecosystem: docker
   directory: /infra/ai
   schedule:

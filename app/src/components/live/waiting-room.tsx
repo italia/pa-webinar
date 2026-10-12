@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
-  Badge,
   Button,
   Card,
   CardBody,
@@ -15,6 +14,7 @@ import {
 } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import { canStartManually } from '@/lib/events/lifecycle';
@@ -23,12 +23,19 @@ import {
   statoIngresso,
   type BloccoModulo,
 } from '@/lib/waiting-room/entry-state';
+import ProfilePhotoField from '@/components/live/profile-photo-field';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
 import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
+import LiveShareButton from '@/components/live/live-share-button';
+import { MarkdownRenderer } from '@/components/ui/markdown';
+import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
+import type { Presenze } from '@/lib/live/presence';
+import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
+import type { DatiBacheca, MostraGalleria } from '@/components/live/garden/piazza-luoghi';
 
 // Experimental Phaser lobby engine (opt-in via `?engine=phaser`). Loaded
 // client-only so Phaser never enters the main bundle or runs on the server.
@@ -67,9 +74,8 @@ class PhaserLobbyBoundary extends Component<
  * Unified waiting-room / front-door for the live event page.
  *
  * This is the ONE screen every first-time arrival sees (guest, registered
- * participant, moderator, speaker) no matter the event status. It replaces
- * the previous fork between `GuestJoinForm`, `PreJoinScreen` and the
- * scenario-specific waiting room, consolidating:
+ * participant, moderator, speaker) no matter the event status. It
+ * consolidates:
  *   - cover image / hero
  *   - name input (always editable, prefilled where we know it)
  *   - netiquette reminder
@@ -77,12 +83,12 @@ class PhaserLobbyBoundary extends Component<
  *   - countdown (PUBLISHED only)
  *   - catch-up recording (whenever tempRecordingUrl is set — no 5min gate)
  *   - chat preview while LIVE
+ *   - the recording consents still to give, with the event's privacy notice
  *   - primary CTA: enter, start (moderator), watch recording, feedback
  *
- * All the heavy lifting (JWT fetch, consent flow, pre-join transitions)
- * stays in the parent `LiveEventClient` — the waiting room is a pure
- * presentation surface that calls two callbacks: `onEnterLive(name)` and
- * `onStartEvent()`.
+ * The JWT fetch, and the choice of which consents to ask, stay in the parent
+ * `LiveEventClient`: the waiting room presents, and reports back through
+ * `onEnterLive(name, prefs)` and `onStartEvent()`.
  */
 
 interface WaitingRoomEvent {
@@ -118,9 +124,24 @@ interface WaitingRoomEvent {
   aiPostprodEnabled?: boolean;
   /** Testo custom per-locale dell'informativa AI; vuoto/null → fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** In sala ci saranno i sottotitoli live: l'audio di chi parla viene
+   *  trascritto mentre parla (ADR-018). Solo un avviso: nulla viene salvato. */
+  liveCaptions?: boolean;
   /** L'evento registra una traccia audio separata per partecipante:
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
+  /** La trascrizione dai sottotitoli e' attiva: si chiede il consenso. */
+  captionsTranscript?: boolean;
+  /** Descrizione, enti e persone, come sulla pagina pubblica. */
+  riepilogo?: RiepilogoSala;
+}
+
+/** Il riepilogo della chiamata: descrizione (Markdown), enti e persone
+ *  pubblicate (lib/events/public-people). */
+export interface RiepilogoSala {
+  descrizione: string | null;
+  enti: EntePubblico[];
+  persone: PersonaPubblica[];
 }
 
 export interface WaitingRoomJoinPrefs {
@@ -128,6 +149,12 @@ export interface WaitingRoomJoinPrefs {
   cameraOn: boolean;
   /** Whether the user wants their microphone on when they land in Jitsi. */
   micOn: boolean;
+  /** Consenso alla registrazione dell'evento dato qui: il server lo registra
+   *  come prova quando rilascia il JWT. */
+  recordingConsent?: boolean;
+  /** Consenso alla registrazione per partecipante dato qui: il server lo
+   *  registra come prova quando rilascia il JWT. */
+  multitrackConsent?: boolean;
 }
 
 /** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
@@ -146,11 +173,19 @@ export interface WaitingRoomWarmup {
 
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
-  participantCount: number;
+  /** Quanti sono in diretta e quanti in sala d'attesa (null = non si sa). */
+  presenze?: Presenze | null;
+  /** I link da condividere (pulsante «Condividi»). */
+  condivisione?: {
+    locale: string;
+    moderatorToken?: string;
+    hasPublicPage: boolean;
+    hasCallLink: boolean;
+  };
   role: 'moderator' | 'participant' | 'guest';
-  /** Fotocamera e microfono accesi all'ingresso (moderatori e relatori);
-   *  chi partecipa entra spento e li accende quando vuole intervenire. */
-  devicesOnByDefault?: boolean;
+  /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
+   *  a parte da quella di chi assiste. Per tutti partono spenti. */
+  conduce?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
@@ -172,6 +207,18 @@ interface WaitingRoomProps {
    *  dato che il gate protegge. Evita il doppio consenso e riabilita il
    *  minigioco. */
   multitrackConsentExempt?: boolean;
+  /** Va chiesto qui il consenso alla registrazione dell'evento: chi partecipa
+   *  puo' accendere microfono, videocamera o schermo e non l'ha dato
+   *  all'iscrizione (ospite dal link della sala, iscritto da un altro
+   *  browser, iscritto prima che la registrazione fosse attivata). */
+  recordingConsentRequired?: boolean;
+  /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
+   *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
+  recordingListenOnly?: boolean;
+  /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
+  recordingConsentText?: string | null;
+  /** L'informativa privacy dell'evento, accanto al consenso. */
+  privacy?: { url: string; testo?: string };
   /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
    *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
   chatToken?: string;
@@ -194,20 +241,32 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
   email: 'waiting-email',
-  consent: 'waiting-multitrack-consent',
+  recording: 'waiting-recording-consent',
 };
+/** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
+const CAMPO_TRASCRIZIONE = 'waiting-multitrack-consent';
+// Oltre questo tempo l'accensione e' piu' lunga del solito (3-5 minuti alla
+// prima accensione): lo si dice.
+const LUNGA_ACCENSIONE_S = 6 * 60;
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
   email: 'waiting-email-invalid',
-  consent: 'waiting-multitrack-consent-required',
+  recording: 'waiting-recording-consent-required',
 };
+
+/** Le due colonne della sala d'attesa: nella piazza quella con la chat viene
+ *  prima. */
+function inOrdine<T>(colonne: T[], chatPrima: boolean): T[] {
+  return chatPrima ? [...colonne].reverse() : colonne;
+}
 
 export default function WaitingRoom({
   event,
-  participantCount,
+  presenze = null,
+  condivisione,
   role,
-  devicesOnByDefault = false,
+  conduce = false,
   jvbReady,
   defaultName,
   onEnterLive,
@@ -216,12 +275,19 @@ export default function WaitingRoom({
   warmup = null,
   exitHref,
   multitrackConsentExempt = false,
+  recordingConsentRequired = false,
+  recordingListenOnly = false,
+  recordingConsentText = null,
+  privacy,
   chatToken = '',
   eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
+  const te = useTranslations('events');
   const tc = useTranslations('common');
   const tGdpr = useTranslations('gdpr.consent');
+  const durata = useDurataTesto();
+  const tReg = useTranslations('registration');
   const format = useFormatter();
 
   const [countdown, setCountdown] = useState('');
@@ -247,13 +313,40 @@ export default function WaitingRoom({
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
-  // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
+  // La piazza si apre su richiesta: vedi il commento su piazzaCard.
   const [gameOpen, setGameOpen] = useState(false);
+  // La chat dell'evento vista dalla piazza (fumetti, puntini, correzioni):
+  // passa dal ponte, non dallo stato, vedi lib/lobby/chat-bridge.
+  const [ponteChat] = useState(() => new PonteChatPiazza());
+  // Fotocamera e microfono partono spenti: li accende chi vuole provarli (o
+  // li ritrova come li aveva lasciati), e lo dice DeviceCheck.
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: devicesOnByDefault,
-    micOn: devicesOnByDefault,
+    cameraOn: false,
+    micOn: false,
   });
+  // La descrizione si apre per intero solo se richiesto, e il comando c'è
+  // solo se il testo è davvero più lungo dello spazio.
+  const [descrizioneAperta, setDescrizioneAperta] = useState(false);
+  const [descrizioneLunga, setDescrizioneLunga] = useState(false);
+  const descrizioneRef = useRef<HTMLDivElement>(null);
+  const descrizioneContenutoRef = useRef<HTMLDivElement>(null);
+  // Si osserva il CONTENUTO, non il riquadro tagliato: un'immagine o un
+  // carattere che arriva dopo allunga il testo senza cambiare il riquadro.
+  useEffect(() => {
+    const riquadro = descrizioneRef.current;
+    const contenuto = descrizioneContenutoRef.current;
+    if (!riquadro || !contenuto || descrizioneAperta) return;
+    const misura = () => setDescrizioneLunga(contenuto.offsetHeight > riquadro.clientHeight + 2);
+    misura();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(misura) : null;
+    ro?.observe(contenuto);
+    return () => ro?.disconnect();
+  }, [descrizioneAperta, event.riepilogo?.descrizione]);
   const [startError, setStartError] = useState('');
+  // Consenso alla registrazione dell'evento, per chi non l'ha dato
+  // all'iscrizione.
+  const [recordingConsent, setRecordingConsent] = useState(false);
+  const [informativaAperta, setInformativaAperta] = useState(false);
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
   const [multitrackConsent, setMultitrackConsent] = useState(false);
   // "La sala è aperta" cue: a short 3→2→1 countdown shown to a waiting
@@ -362,15 +455,28 @@ export default function WaitingRoom({
   const nameValid = trimmedName.length >= 2;
   const trimmedEmail = email.trim();
   const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
-  // Consenso multitrack: se l'evento registra una traccia per partecipante
-  // (audio isolato, dato quasi-biometrico — ADR-013/GDPR art.9), l'ingresso è
-  // gated da un consenso esplicito. Niente consenso → niente ingresso.
-  const multitrackRequired =
-    !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
+  // La trascrizione dei propri interventi, con il proprio nome: si chiede se
+  // l'evento registra una traccia audio per persona (ADR-013) o tiene la
+  // trascrizione dai sottotitoli. E' facoltativa e non ferma l'ingresso: chi
+  // non la da' entra, ma la sua voce non si registra ne' si trascrive (lo
+  // decide il server, voce per voce).
+  const trascrizioneChiesta =
+    (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) &&
+    !isEnded &&
+    !multitrackConsentExempt;
+  // Il consenso alla registrazione dell'evento, se va chiesto qui. Non ferma
+  // la piazza: il cancello passa dallo stesso controllo del pulsante, che
+  // porta alla casella.
+  const recordingRequired = recordingConsentRequired && !isEnded;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
-  const canPlay = !isEnded && !classicView && !multitrackRequired;
+  const canPlay = !isEnded && !classicView;
+  // La piazza non è una pagina diversa: è questa pagina, ridisposta accanto
+  // alla scena. Un albero solo, quindi quello che c'è nella sala d'attesa c'è
+  // anche nella piazza, e aprendo e chiudendo la piazza React non smonta
+  // nulla: l'anteprima della fotocamera resta accesa e la bozza in chat resta.
+  const piazzaOpen = canPlay && gameOpen;
 
   // La sala e' pronta quando il ponte video c'e'. Si blocca SOLO su «si sta
   // accendendo adesso»: gli altri valori — nessuno lo ha chiesto, sonda muta,
@@ -432,8 +538,8 @@ export default function WaitingRoom({
       ingressoConsentito,
       nameValid,
       emailValid,
-      multitrackRequired,
-      multitrackConsent,
+      recordingRequired,
+      recordingConsent,
       ingressoTentato,
       nomeNoto,
     });
@@ -530,16 +636,16 @@ export default function WaitingRoom({
       const minutes = Math.floor((diff % 3_600_000) / 60_000);
       const seconds = Math.floor((diff % 60_000) / 1000);
       const parts: string[] = [];
-      if (days > 0) parts.push(`${days}g`);
-      if (hours > 0) parts.push(`${String(hours).padStart(2, '0')}h`);
-      parts.push(`${String(minutes).padStart(2, '0')}m`);
-      parts.push(`${String(seconds).padStart(2, '0')}s`);
+      if (days > 0) parts.push(t('countdownDays', { days }));
+      if (hours > 0) parts.push(t('countdownHours', { hours: String(hours).padStart(2, '0') }));
+      parts.push(t('countdownMinutes', { minutes: String(minutes).padStart(2, '0') }));
+      parts.push(t('countdownSeconds', { seconds: String(seconds).padStart(2, '0') }));
       setCountdown(parts.join('  '));
     };
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isPublished, startsAtMs, endsAtMs]);
+  }, [isPublished, startsAtMs, endsAtMs, t]);
 
   // «Non si è tenuto»: vale per ogni stato da cui l'evento si potrebbe ancora
   // avviare (vedi canStartManually), non solo per PUBLISHED.
@@ -579,17 +685,32 @@ export default function WaitingRoom({
     return () => clearTimeout(id);
   }, [liveCountdown]);
 
+  // Chi avvia l'evento ci entra: dopo «Avvia evento» un secondo clic su
+  // «Entra» non serve a niente. E' uno stato, non un ref, e lo si accende
+  // prima di aspettare la risposta: la sala puo' diventare LIVE (dal giro del
+  // ciclo di vita) prima che la risposta arrivi.
+  // L'istante del clic: l'ingresso automatico vale per due minuti, poi resta
+  // il pulsante (una sala che si apre molto dopo non deve spostare chi nel
+  // frattempo fa altro).
+  const [entraDopoAvvio, setEntraDopoAvvio] = useState<number | null>(null);
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
     setStartingEvent(true);
     setStartError('');
+    setEntraDopoAvvio(Date.now());
     try {
       await onStartEvent();
     } catch {
+      setEntraDopoAvvio(null);
       setStartError(t('startEventError'));
       setStartingEvent(false);
     }
   }, [onStartEvent, t]);
+  // Il pulsante «Avvia evento» torna premibile a ogni cambio di stato: se la
+  // sala si ferma (IDLE) e chi modera e' ancora qui, deve poterla riavviare.
+  useEffect(() => {
+    setStartingEvent(false);
+  }, [event.status]);
 
   // Un tentativo con il modulo incompleto: si dice cosa manca e si porta la
   // persona li'. Falso se il modulo e' a posto (a trattenere e' la sala).
@@ -622,8 +743,64 @@ export default function WaitingRoom({
         /* ignore */
       }
     }
-    onEnterLive(trimmedName, devicePrefs);
-  }, [canEnter, segnalaCampoMancante, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+    onEnterLive(trimmedName, {
+      ...devicePrefs,
+      ...(recordingRequired && recordingConsent ? { recordingConsent: true } : {}),
+      ...(trascrizioneChiesta && multitrackConsent ? { multitrackConsent: true } : {}),
+    });
+  }, [
+    canEnter,
+    segnalaCampoMancante,
+    onEnterLive,
+    trimmedName,
+    trimmedEmail,
+    devicePrefs,
+    recordingRequired,
+    recordingConsent,
+    trascrizioneChiesta,
+    multitrackConsent,
+  ]);
+
+  // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
+  // il clic, che e' il momento giusto per guardare cosa manca:
+  // - un campo da completare (nome, email, consenso): lo si segnala;
+  // - la domanda facoltativa sulla trascrizione non ancora spuntata: entrare
+  //   da soli la salterebbe, e la voce di chi conduce resterebbe fuori;
+  // - il ponte video ancora in accensione: si aspetta, fino a due minuti dal
+  //   clic; dopo l'ingresso e' un'offerta, non una spinta (vedi sopra);
+  // - la piazza aperta: lì si entra dal cancello, che ha il suo percorso.
+  useEffect(() => {
+    if (entraDopoAvvio === null || !canEnterLive) return;
+    if (piazzaOpen || Date.now() - entraDopoAvvio > 120_000) {
+      setEntraDopoAvvio(null);
+      return;
+    }
+    if (bloccoModulo) {
+      setEntraDopoAvvio(null);
+      segnalaCampoMancante();
+      return;
+    }
+    if (trascrizioneChiesta && !multitrackConsent) {
+      setEntraDopoAvvio(null);
+      return;
+    }
+    if (!salaAperta) return;
+    if (canEnter) {
+      setEntraDopoAvvio(null);
+      handleEnterLive();
+    }
+  }, [
+    entraDopoAvvio,
+    canEnterLive,
+    piazzaOpen,
+    bloccoModulo,
+    trascrizioneChiesta,
+    multitrackConsent,
+    salaAperta,
+    canEnter,
+    handleEnterLive,
+    segnalaCampoMancante,
+  ]);
 
   // Entry triggered from INSIDE the Phaser game (walking the avatar into the
   // open gate). It funnels through the SAME validated handleEnterLive as the
@@ -665,9 +842,6 @@ export default function WaitingRoom({
   const gameDialogRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
-  /** L'invito alla piazza mostrato mentre la sala si prepara: quando si entra
-   *  di li', e' li' che il fuoco deve tornare uscendo. */
-  const piazzaAttesaRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
   useEffect(() => {
     if (!gameOpen) {
@@ -675,7 +849,7 @@ export default function WaitingRoom({
         returnFocusRef.current = false;
         // L'invito, se c'è ancora; passando alla versione classica sparisce, e
         // allora il posto giusto è il pulsante che riporta indietro.
-        (inviteRef.current ?? piazzaAttesaRef.current ?? classicToggleRef.current)?.focus();
+        (inviteRef.current ?? classicToggleRef.current)?.focus();
       }
       return;
     }
@@ -690,6 +864,10 @@ export default function WaitingRoom({
       // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
       // dei controlli è pieno di campi, e sono gli stessi della pagina.
       const el = e.target as HTMLElement | null;
+      // Esc con una finestra aperta sopra la piazza (l'editor del
+      // personaggio, la bacheca…) chiude la finestra, non la piazza: anche
+      // quando il fuoco è ricaduto sul corpo della pagina.
+      if (document.querySelector('dialog[open]')) return;
       if (
         el &&
         (/^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable)
@@ -750,9 +928,6 @@ export default function WaitingRoom({
   }
 
   // ── Unified waiting-room layout ───────────────────────────────────
-  const organizerLine = [event.speakers, event.organizerName]
-    .filter((v): v is string => !!v && v.length > 0)
-    .join(' · ');
 
   const startTimeLabel = format.dateTime(new Date(event.startsAt), {
     hour: '2-digit',
@@ -821,7 +996,10 @@ export default function WaitingRoom({
         minLength={2}
         maxLength={100}
         autoComplete="name"
-        valid={nomeSegnalato ? false : undefined}
+        // Niente rosso: un nome che manca è una cosa da fare, non un errore.
+        // Il campo lampeggia (vedi .wr-name-field--empty), e dopo un
+        // tentativo lo dice anche ai lettori di schermo.
+        className={nomeSegnalato ? 'wr-name-input--attention' : undefined}
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
@@ -833,14 +1011,13 @@ export default function WaitingRoom({
       {nomeDaChiedere && (
         <div
           id={MESSAGGIO_DEL_BLOCCO.name}
-          className="d-flex align-items-start rounded-2 px-2 py-1 mt-2"
-          style={
-            nomeSegnalato
-              ? { fontSize: '0.85rem', color: '#A1112E', background: '#FDF0F2', border: '1px solid #E8A3B0' }
-              : { fontSize: '0.85rem', color: '#6B4400', background: '#FFF8E6', border: '1px solid #E0C97A' }
-          }
+          className={`wr-name-hint${nomeSegnalato ? ' wr-name-hint--insist' : ''}`}
         >
-          <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
           <span>{t('nameRequiredToEnter')}</span>
         </div>
       )}
@@ -876,36 +1053,24 @@ export default function WaitingRoom({
   );
 
   const deviceCheckField = (
-    <DeviceCheck
-      compact
-      defaultOn={devicesOnByDefault}
-      onStateChange={handleDeviceStateChange}
-    />
+    <DeviceCheck conduce={conduce} onStateChange={handleDeviceStateChange} />
   );
 
+  // Le buone pratiche si aprono a richiesta: chi le conosce non le rilegge.
   const netiquetteBlock = (
-    <div className="waiting-netiquette rounded-3 p-3" style={{ backgroundColor: '#F5F7FA' }}>
-      <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}>
-        <Icon icon="it-info-circle" size="xs" className="me-1" />
+    <details className="wr-netiquette">
+      <summary>
+        <Icon icon="it-info-circle" size="xs" className="me-2" />
         {t('netiquetteTitle')}
-      </div>
-      <ul className="mb-0 ps-3" style={{ fontSize: '0.85rem', color: '#455B71' }}>
+      </summary>
+      <ul>
         <li>{t('netiquetteBullet1')}</li>
         <li>{t('netiquetteBullet2')}</li>
         <li>{t('netiquetteBullet3')}</li>
         <li>{t('netiquetteBullet4')}</li>
       </ul>
-    </div>
+    </details>
   );
-
-  // NIENTE <Icon> dentro <Alert>: Bootstrap Italia disegna già un'icona via
-  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone.
-  // Solo testo, come aiNoticeBlock.
-  const recordingNoticeBlock = event.recordingEnabled && !isEnded ? (
-    <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
-      {t('recordingNotice')}
-    </Alert>
-  ) : null;
 
   // Informativa AI in sala d'attesa: mostrata quando l'evento usa la
   // pipeline AI post-evento. Testo custom dell'admin (per-locale) con
@@ -916,83 +1081,160 @@ export default function WaitingRoom({
       ? event.aiConsentDisclosure
       : t('aiNotice');
   const aiNoticeBlock = event.aiPostprodEnabled && !isEnded ? (
-    <Alert color="info" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
-      <span className="fw-semibold d-block mb-1">{t('aiNoticeTitle')}</span>
-      {aiConsentText}
-    </Alert>
+    <div className="wr-info">
+      <span className="wr-info__icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z" />
+          <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+        </svg>
+      </span>
+      <span>
+        <span className="wr-info__title">{t('aiNoticeTitle')}</span>
+        {aiConsentText}
+      </span>
+    </div>
   ) : null;
 
-  // Consenso esplicito alla registrazione per-partecipante (multitrack):
-  // hard-gate. Senza la spunta, `canEnter` è false e il CTA non fa entrare —
-  // premerlo porta il fuoco sulla casella. Non è un <Alert> (serve un input +
-  // evita l'icona ::before).
-  const multitrackConsentBlock = multitrackRequired ? (
-    <div
-      className="rounded-3 p-3 text-start"
-      style={{ background: '#FFF8E6', border: '1px solid #E0C97A' }}
-    >
-      <div
-        className="fw-semibold mb-2"
-        style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
-      >
-        {t('multitrackConsentTitle')}
-      </div>
-      <div className="form-check mb-0">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="waiting-multitrack-consent"
-          checked={multitrackConsent}
-          onChange={(e) => setMultitrackConsent(e.target.checked)}
-          aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
-        />
-        <label
-          className="form-check-label"
-          htmlFor="waiting-multitrack-consent"
-          style={{ fontSize: '0.84rem', color: '#455B71' }}
-        >
-          {tGdpr('multitrack')}
-        </label>
-      </div>
-      {!multitrackConsent && (
-        <div
-          id={MESSAGGIO_DEL_BLOCCO.consent}
-          className="small text-muted mt-2"
-          style={{ fontSize: '0.78rem' }}
-        >
-          {t('multitrackConsentRequired')}
-        </div>
+  // Avviso dei sottotitoli live: chi parla in sala viene trascritto in tempo
+  // reale, nel cluster dell'ente, e il testo non viene conservato. Non chiede
+  // un consenso: è trasparenza su un trattamento in corso, come l'avviso AI.
+  const captionsNoticeBlock = event.liveCaptions && !isEnded ? (
+    <div className="wr-info">
+      <span className="wr-info__icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <path d="M7 15h4M13 15h4M7 11h10" />
+        </svg>
+      </span>
+      <span>
+        <span className="wr-info__title">{t('captionsNoticeTitle')}</span>
+        {event.captionsTranscript ? t('captionsNoticeTranscript') : t('captionsNotice')}
+      </span>
+    </div>
+  ) : null;
+
+  // I consensi da dare prima di entrare: alla registrazione dell'evento, per
+  // chi non l'ha dato all'iscrizione, e alla traccia audio per partecipante.
+  // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
+  // sulla casella. Non è un <Alert>: serve un input, e l'icona ::before
+  // finirebbe sopra il testo.
+  const informativa = privacy ? (
+    <div className="wr-consensi__privacy">
+      {privacy.testo ? (
+        <>
+          <button
+            type="button"
+            className="btn btn-link p-0 wr-consensi__link"
+            aria-expanded={informativaAperta}
+            aria-controls="wr-consensi-informativa"
+            onClick={() => setInformativaAperta((v) => !v)}
+          >
+            {tReg('gdprLink')}
+          </button>
+          {informativaAperta && (
+            <div className="wr-consensi__informativa" id="wr-consensi-informativa">
+              {privacy.testo}
+            </div>
+          )}
+        </>
+      ) : (
+        <a className="wr-consensi__link" href={privacy.url} target="_blank" rel="noopener noreferrer">
+          {tReg('gdprLink')}
+        </a>
       )}
     </div>
   ) : null;
 
+  const consensiBlock = recordingRequired || trascrizioneChiesta ? (
+    <section className="wr-consensi" aria-labelledby="wr-consensi-title">
+      <h2 className="wr-consensi__title" id="wr-consensi-title">
+        {recordingRequired ? t('recordingConsentTitle') : t('multitrackConsentTitle')}
+      </h2>
+      {recordingRequired && (
+        <>
+          <p className="wr-consensi__intro">
+            {recordingConsentText?.trim() || t('recordingConsentIntro')}
+          </p>
+          <div className="form-check mb-0">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={CAMPO_DEL_BLOCCO.recording}
+              checked={recordingConsent}
+              onChange={(e) => setRecordingConsent(e.target.checked)}
+              aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
+            />
+            <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.recording}>
+              {tGdpr('recording')}
+            </label>
+          </div>
+          {!recordingConsent && (
+            <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
+              {t('recordingConsentRequired')}
+            </div>
+          )}
+        </>
+      )}
+      {trascrizioneChiesta && (
+        <div className={recordingRequired ? 'mt-3' : undefined}>
+          {/* Con entrambi i consensi, quello alla traccia audio ha il suo
+              titolo: e' un consenso a parte, non un dettaglio dell'altro. */}
+          {recordingRequired && (
+            <h3 className="wr-consensi__title">{t('multitrackConsentTitle')}</h3>
+          )}
+          <div className="form-check mb-0">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={CAMPO_TRASCRIZIONE}
+              checked={multitrackConsent}
+              onChange={(e) => setMultitrackConsent(e.target.checked)}
+              aria-describedby={`${CAMPO_TRASCRIZIONE}-nota`}
+            />
+            <label className="form-check-label" htmlFor={CAMPO_TRASCRIZIONE}>
+              {tGdpr('multitrack')}
+            </label>
+          </div>
+          <div id={`${CAMPO_TRASCRIZIONE}-nota`} className="wr-consensi__nota">
+            {tGdpr('multitrackOptional')}
+          </div>
+        </div>
+      )}
+      {informativa}
+    </section>
+  ) : null;
+
   const chatPreviewBlock = showChatPreview ? (
-    <div className="waiting-chat-preview rounded-3 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
-      <div className="px-3 py-2" style={{ backgroundColor: '#F5F7FA' }}>
-        <div className="fw-semibold" style={{ color: 'var(--app-text)', fontSize: '0.85rem' }}>
-          <Icon icon="it-comment" size="xs" className="me-1" />
-          {t('chatPreviewTitle')}
-        </div>
-        <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-          {t('chatPreviewHint')}
-        </div>
+    <div className="wr-chat">
+      <div className="wr-chat__head">
+        <span className="wr-chat__icon" aria-hidden="true">
+          <Icon icon="it-comment" size="sm" />
+        </span>
+        <span>
+          <span className="wr-chat__title">{t('chatPreviewTitle')}</span>
+          <span className="wr-chat__hint">{t('chatPreviewHint')}</span>
+        </span>
       </div>
       {nameValid ? (
-        <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
+        <div className="wr-chat__body">
           <ChatPanel
             eventSlug={event.slug}
             token={chatToken}
             displayName={trimmedName}
             isGuest={!chatToken}
+            onMessaggioNuovo={ponteChat.messaggio}
+            onMessaggioModificato={ponteChat.modificato}
+            onMessaggioRimosso={ponteChat.rimosso}
+            onScrittura={ponteChat.scrittura}
+            posizione={piazzaOpen ? 'piazza' : 'sala'}
           />
         </div>
       ) : (
-        <div
-          className="d-flex flex-column align-items-center justify-content-center text-center p-4"
-          style={{ height: 220, backgroundColor: '#F5F7FA', color: 'var(--app-muted)' }}
-        >
+        <div className="wr-chat__locked">
           <Icon icon="it-lock" size="sm" className="mb-2" />
-          <div style={{ fontSize: '0.85rem' }}>{t('chatLockedMessage')}</div>
+          <div>{t('chatLockedMessage')}</div>
         </div>
       )}
     </div>
@@ -1012,7 +1254,7 @@ export default function WaitingRoom({
   // styled divs — NOT <Alert> — because Bootstrap Italia's .alert draws an
   // icon via ::before (reserved padding-left:4em) and the leading <Spinner>
   // would collide with it. The div
-  // owns its own spinner+border layout, like multitrackConsentBlock.
+  // owns its own spinner+border layout, like consensiBlock.
   const statusBanners = (
     <>
       {isLive && jvbReady === false && (
@@ -1082,6 +1324,15 @@ export default function WaitingRoom({
                     ? t('warmup.almostReadyDetail')
                     : t('warmup.honestHint')}
               </div>
+              {/* Oltre il tempo tipico della prima accensione, e passata l'ora
+                  d'inizio (prima e' una sala preparata in anticipo, non lenta):
+                  lo si dice, con l'unica cosa utile da fare. Niente «Riprova»:
+                  da qui non c'e' niente da rilanciare. */}
+              {(warmup?.phase === 'starting' || warmup?.phase === 'queued') &&
+                (warmupElapsed ?? 0) >= LUNGA_ACCENSIONE_S &&
+                Date.now() - startsAtMs >= LUNGA_ACCENSIONE_S * 1000 && (
+                <div className="mt-2 fw-semibold">{t('warmup.slow')}</div>
+              )}
             </div>
           </div>
         </div>
@@ -1089,10 +1340,101 @@ export default function WaitingRoom({
     </>
   );
 
+  const azioneIngresso = canEnterLive && !ingressoConsentito ? (
+        // Entrare prima che il ponte video esista significa arrivare in una
+        // stanza che non c'e': si resta qui, e lo si dice. Passato il minuto
+        // si torna al pulsante normale — si entra, senza pero' promettere che
+        // dall'altra parte ci sia qualcuno.
+        <>
+          <Button color="primary" size="lg" className="fw-semibold" disabled>
+            <Spinner active small className="me-2" />
+            {t('roomNotReadyButton')}
+          </Button>
+        </>
+      ) : canEnterLive ? (
+        <>
+          {/* Il colore e il battito non arrivano a chi non guarda lo schermo, e
+              l'etichetta che cambia dentro un pulsante non a fuoco non viene
+              letta: l'apertura va detta a voce, qui. */}
+          <p className="visually-hidden" role="status">
+            {annuncio ? t(annuncio) : ''}
+          </p>
+          {/* Il campo del nome sta sopra l'anteprima della fotocamera: chi
+              guarda il pulsante spesso non lo vede. Il motivo lo si ripete qui
+              per gli occhi; il lettore di schermo lo riceve una volta sola,
+              come descrizione del pulsante. Il consenso non serve ripeterlo:
+              il suo riquadro sta subito sopra. */}
+          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
+            <p
+              className="d-flex align-items-start justify-content-center text-center mb-0"
+              // Il nome mancante è una cosa da fare (ambra), l'email sbagliata
+              // un errore (rosso).
+              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' ? '#6B4400' : '#A1112E' }}
+              aria-hidden="true"
+            >
+              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
+            </p>
+          )}
+          {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
+              porta sul campo. Resta spento solo cio' che non dipende dalla
+              persona — la sala che si prepara, l'ora d'apertura. */}
+          {/* Quando si può entrare davvero (sala aperta, modulo a posto) il
+              pulsante lo dice da solo: verde, con un alone che respira, un
+              riflesso che passa e la freccia che indica. Il richiamo sta su
+              uno strato suo (.wr-cta::after), così l'anello di focus da
+              tastiera resta visibile. */}
+          <div className={`wr-cta${canEnter ? ' wr-cta--go' : ''}`}>
+            <Button
+              color={canEnter ? 'success' : 'primary'}
+              size="lg"
+              className="fw-semibold wr-cta__btn"
+              onClick={handleEnterLive}
+              aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
+            >
+              <Icon icon="it-video" size="sm" color="white" className="me-2" />
+              {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
+              {canEnter && (
+                <span className="wr-cta__arrow" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              )}
+            </Button>
+          </div>
+        </>
+      ) : isWarmingUp ? (
+        <Button color="primary" size="lg" className="fw-semibold" disabled>
+          <Spinner active small className="me-2" />
+          {t('warmingUpButton')}
+        </Button>
+      ) : isModerator && onStartEvent ? null : startingSoon ? (
+        // Passata l'ora d'inizio «Apertura alle …» indicherebbe un'ora gia'
+        // passata: si dice che si aspetta l'avvio. Chi modera non vede ne'
+        // l'uno ne' l'altro: ha «Avvia evento».
+        <Button color="primary" size="lg" className="fw-semibold" disabled>
+          <Spinner active small className="me-2" />
+          {t('waitingForStartButton')}
+        </Button>
+      ) : (
+        <Button color="primary" size="lg" className="fw-semibold" disabled>
+          <Icon icon="it-clock" size="sm" color="white" className="me-2" />
+          {t('openingAt', { time: startTimeLabel })}
+        </Button>
+      );
+
   // Primary CTA (non-ended): start (moderator) / enter live / warming-up /
   // scheduled-opening disabled state, plus optional catch-up.
   const liveCueActive = canEnterLive && liveCountdown !== null;
+  // Tre blocchi fratelli, figli diretti del corpo della scheda: il blocco
+  // d'ingresso si attacca al fondo dello schermo (sticky), e un elemento
+  // sticky si muove solo dentro il suo contenitore — dentro un riquadro
+  // piccolo non si muoverebbe affatto.
   const primaryCta = (
+    <>
     <div className="d-grid gap-2">
       {startError && (
         <Alert color="danger" className="mb-0" style={{ fontSize: '0.85rem' }}>
@@ -1101,15 +1443,12 @@ export default function WaitingRoom({
       )}
       {liveCueActive && (
         <div
-          className="text-center rounded-3 p-2"
+          className="waiting-countdown waiting-countdown--open"
           role="status"
           aria-live="assertive"
-          style={{ background: 'linear-gradient(135deg, #008758, #00592f)', color: '#fff' }}
         >
-          <div className="small text-uppercase fw-semibold opacity-75">
-            {t('roomOpen')}
-          </div>
-          <div className="display-6 fw-bold font-monospace lh-1">{liveCountdown}</div>
+          <div className="waiting-countdown__label">{t('roomOpen')}</div>
+          <div className="waiting-countdown__value">{liveCountdown}</div>
         </div>
       )}
       {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
@@ -1136,77 +1475,13 @@ export default function WaitingRoom({
           )}
         </Button>
       )}
-      {canEnterLive && !ingressoConsentito ? (
-        // Entrare prima che il ponte video esista significa arrivare in una
-        // stanza che non c'e': si resta qui, e lo si dice. Passato il minuto
-        // si torna al pulsante normale — si entra, senza pero' promettere che
-        // dall'altra parte ci sia qualcuno.
-        <>
-          <Button color="primary" size="lg" className="fw-semibold" disabled>
-            <Spinner active small className="me-2" />
-            {t('roomNotReadyButton')}
-          </Button>
-          {canPlay && !gameOpen && (
-            <Button
-              color="primary"
-              outline
-              className="fw-semibold"
-              innerRef={piazzaAttesaRef}
-              onClick={() => setGameOpen(true)}
-            >
-              <span className="me-2" aria-hidden="true">🌿</span>
-              {t('roomNotReadyPiazza')}
-            </Button>
-          )}
-        </>
-      ) : canEnterLive ? (
-        <>
-          {/* Il colore e il battito non arrivano a chi non guarda lo schermo, e
-              l'etichetta che cambia dentro un pulsante non a fuoco non viene
-              letta: l'apertura va detta a voce, qui. */}
-          <p className="visually-hidden" role="status">
-            {annuncio ? t(annuncio) : ''}
-          </p>
-          {/* Il campo del nome sta sopra l'anteprima della fotocamera: chi
-              guarda il pulsante spesso non lo vede. Il motivo lo si ripete qui
-              per gli occhi; il lettore di schermo lo riceve una volta sola,
-              come descrizione del pulsante. Il consenso non serve ripeterlo:
-              il suo riquadro sta subito sopra. */}
-          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
-            <p
-              className="d-flex align-items-start justify-content-center text-center mb-0"
-              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' && !nomeSegnalato ? '#6B4400' : '#A1112E' }}
-              aria-hidden="true"
-            >
-              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
-              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
-            </p>
-          )}
-          {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
-              porta sul campo. Resta spento solo cio' che non dipende dalla
-              persona — la sala che si prepara, l'ora d'apertura. */}
-          <Button
-            color={evidenziaCta ? 'success' : 'primary'}
-            size="lg"
-            className={`fw-semibold${evidenziaCta ? ' wr-cta-pronta' : ''}`}
-            onClick={handleEnterLive}
-            aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
-          >
-            <Icon icon="it-video" size="sm" color="white" className="me-2" />
-            {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
-          </Button>
-        </>
-      ) : isWarmingUp ? (
-        <Button color="primary" size="lg" className="fw-semibold" disabled>
-          <Spinner active small className="me-2" />
-          {t('warmingUpButton')}
-        </Button>
-      ) : (
-        <Button color="primary" size="lg" className="fw-semibold" disabled>
-          <Icon icon="it-clock" size="sm" color="white" className="me-2" />
-          {t('openingAt', { time: startTimeLabel })}
-        </Button>
+    </div>
+      {/* Su telefono l'azione d'ingresso (e solo lei) resta attaccata al
+          fondo dello schermo mentre si scorre la scheda. */}
+      {azioneIngresso && (
+        <div className={`d-grid gap-2 mt-2${piazzaOpen ? '' : ' wr-cta-dock'}`}>{azioneIngresso}</div>
       )}
+    <div className="d-grid gap-2 mt-2 mb-3">
       {event.tempRecordingUrl && (
         <Button
           color="success"
@@ -1215,7 +1490,7 @@ export default function WaitingRoom({
           className="fw-semibold"
           onClick={() => setWatchingCatchUp(true)}
         >
-          <span className="me-2">⏪</span>
+          <Icon icon="it-restore" size="sm" color="success" className="me-2" />
           {t('watchCatchup')}
         </Button>
       )}
@@ -1233,6 +1508,7 @@ export default function WaitingRoom({
         </Link>
       )}
     </div>
+    </>
   );
 
   // ── Unified DSI shell (default for every state) ──
@@ -1251,24 +1527,47 @@ export default function WaitingRoom({
   // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
   // controlli, ingresso in call — e un'uscita che riporta qui.
 
-  // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
-  // alla scena. Il primo tentativo duplicava i controlli in un pannello
-  // dedicato, e ogni cosa lasciata fuori dalla copia diventava un difetto —
-  // l'email mancante bloccava in silenzio un ospite, l'informativa su
-  // registrazione e AI spariva proprio dalla schermata in cui si preme "Entra".
-  // Tenendo un albero solo, quel genere di dimenticanza non è più possibile:
-  // quello che c'è nella sala d'attesa c'è anche nella piazza, per costruzione.
-  //
-  // Ed è anche il motivo per cui l'anteprima della fotocamera non si spegne e
-  // la bozza in chat non si perde entrando e uscendo: React non smonta nulla,
-  // cambia solo il vestito.
-  const piazzaOpen = canPlay && gameOpen;
-
   // `hostOwnsEntry` spegne la chrome interna della lobby (onboarding, top bar,
   // pannello dispositivi). Senza, il gioco ne mostra una propria: in italiano
   // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
   // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
+  // ── Il riepilogo: quando, chi organizza, chi conduce e chi interviene, la
+  // registrazione, di cosa si parla; e i link da condividere.
+  const durataTesto = durata(startsAtMs, endsAtMs);
+  const enti = event.riepilogo?.enti ?? [];
+  const persone = event.riepilogo?.persone ?? [];
+  const conduzione = persone.filter((p) => p.role !== 'speaker');
+  const relatori = persone.filter((p) => p.role === 'speaker');
+  const nomiPersone = (lista: PersonaPubblica[]) =>
+    lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
+  const descrizione = event.riepilogo?.descrizione?.trim() || null;
+  // La bacheca della piazza: le stesse informazioni del riepilogo.
+  const bacheca: DatiBacheca = {
+    titolo: event.title,
+    voci: [
+      { etichetta: t('summaryWhen'), valore: `${dateLabel} · ${startTimeLabel} – ${endTimeLabel} (${durataTesto})` },
+      ...(enti.length > 0 || event.organizerName
+        ? [{ etichetta: te('detail.organizedBy'), valore: enti.length > 0 ? enti.map((e) => e.name).join(', ') : (event.organizerName ?? '') }]
+        : []),
+      ...(conduzione.length > 0 ? [{ etichetta: te('detail.peopleModerators'), valore: nomiPersone(conduzione) }] : []),
+      ...(relatori.length > 0 || event.speakers
+        ? [{ etichetta: te('detail.speakers'), valore: relatori.length > 0 ? nomiPersone(relatori) : (event.speakers ?? '') }]
+        : []),
+    ],
+    descrizione,
+  };
+  // La galleria della piazza espone le immagini dell'evento e i loghi di chi
+  // lo organizza.
+  const mostra: MostraGalleria = {
+    immagini: [event.coverImageUrl, event.imageUrl]
+      .filter((src, i, tutte): src is string => !!src && tutte.indexOf(src) === i)
+      .map((src) => ({ src, alt: event.title })),
+    loghi: enti
+      .filter((e): e is EntePubblico & { logoUrl: string } => !!e.logoUrl)
+      .map((e) => ({ src: e.logoUrl, alt: e.name })),
+  };
+
   const piazzaStage = piazzaOpen ? (
     <PhaserLobbyBoundary onError={goClassic}>
       {/* La scena è raggiungibile col Tab, non solo col mouse: il gioco cede i
@@ -1284,11 +1583,15 @@ export default function WaitingRoom({
         <PhaserLobby
           hostOwnsEntry
           eventSlug={event.slug}
+          accessToken={chatToken}
           displayName={trimmedName}
           status={event.status}
           startsAtMs={startsAtMs}
           isHost={isModerator}
           salaPronta={salaPronta}
+          ponteChat={ponteChat}
+          bacheca={bacheca}
+          mostra={mostra}
           onEnterLive={handleGameEnter}
           onExitClassic={goClassic}
         />
@@ -1341,37 +1644,206 @@ export default function WaitingRoom({
     </PhaserLobbyBoundary>
   ) : null;
 
-  // Il riquadro laterale ora ospita solo la chat: aspettare insieme agli altri
-  // non era la parte che stava in mezzo.
-  const asideBox = chatPreviewBlock ? (
-    <Card className="wr-aside shadow-sm border-0">
-      <div className="wr-aside__head">
-        <span className="fw-semibold">{t('whileYouWait')}</span>
-      </div>
-      <div className="wr-aside__body">{chatPreviewBlock}</div>
-    </Card>
-  ) : null;
-
-  // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
-  // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
-  // che parte addosso a chi è arrivato per prepararsi.
-  // L'invito alla piazza: uno solo per schermata. Finche' si resta in attesa la
-  // proposta sta gia' sotto al pulsante d'ingresso, dove serve — qui sarebbe la
-  // stessa cosa detta due volte.
-  const gameInvite = canPlay && !gameOpen && ingressoConsentito ? (
-    <button
-      type="button"
-      className="wr-game-invite"
-      ref={inviteRef}
-      onClick={() => setGameOpen(true)}
-    >
-      <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
-      <span>
-        <span className="wr-game-invite__title">{t('enterGardenTitle')}</span>
-        <span className="wr-game-invite__hint">{t('enterGardenHint')}</span>
+  // La colonna laterale: la chat dell'evento a tutta altezza e, sotto, la
+  // piazza come POSTO ALTERNATIVO dove aspettare (quando l'evento la prevede):
+  // non un passaggio da fare prima di entrare.
+  const piazzaCard = canPlay && !gameOpen ? (
+    <button type="button" className="wr-piazza-card" ref={inviteRef} onClick={() => setGameOpen(true)}>
+      <span className="wr-piazza-card__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="56" height="56">
+          <rect x="2" y="2" width="60" height="60" rx="16" fill="#e3f0fc" />
+          <path d="M8 46c10-6 18-6 24 0s16 6 24 0v12H8z" fill="#bfe3d0" />
+          <circle cx="18" cy="24" r="7" fill="#66b98f" />
+          <rect x="17" y="30" width="2" height="8" fill="#5a7d6a" />
+          <circle cx="46" cy="22" r="6" fill="#66b98f" />
+          <rect x="45" y="27" width="2" height="8" fill="#5a7d6a" />
+          <circle cx="32" cy="38" r="5" fill="#0066cc" />
+          <circle cx="32" cy="31" r="3.2" fill="#ffcc80" />
+          <circle cx="40" cy="44" r="4" fill="#d9364f" />
+          <circle cx="40" cy="38.5" r="2.6" fill="#ffcc80" />
+        </svg>
+      </span>
+      <span className="wr-piazza-card__text">
+        <span className="wr-piazza-card__kicker">{t('piazzaAltKicker')}</span>
+        <span className="wr-piazza-card__title">{t('enterGardenTitle')}</span>
+        <span className="wr-piazza-card__hint">{t('enterGardenHint')}</span>
+      </span>
+      <span className="wr-piazza-card__go" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
       </span>
     </button>
   ) : null;
+
+  const asideBox = chatPreviewBlock || piazzaCard ? (
+    <aside className="wr-aside" aria-labelledby="wr-aside-title">
+      <h2 className="wr-aside__title" id="wr-aside-title">{t('whileYouWait')}</h2>
+      {chatPreviewBlock}
+      {piazzaCard}
+    </aside>
+  ) : null;
+
+  const statusBadge = isLive ? (
+    <span className="wr-status wr-status--live">
+      <span className="wr-status__dot" aria-hidden="true" />
+      {t('eventLive')}
+    </span>
+  ) : isEnded ? (
+    <span className="wr-status wr-status--ended">
+      {notHeld ? t('notHeldBadge') : t('endedTitle')}
+    </span>
+  ) : null;
+
+  // Chi c'è: in diretta (solo a evento avviato) e in sala d'attesa. Non è una
+  // regione che si annuncia: cambierebbe ogni quindici secondi.
+  const presenzeBlock = !isEnded && presenze ? (
+    <div className="wr-presence" aria-label={t('presenceTitle')} role="group">
+      {isLive && (
+        <span className="wr-presence__item wr-presence__item--live" key={`d-${presenze.inDiretta}`}>
+          <span className="wr-presence__dot" aria-hidden="true" />
+          {t('presenceLive', { count: presenze.inDiretta })}
+        </span>
+      )}
+      <span className="wr-presence__item" key={`a-${presenze.inAttesa}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        {t('presenceWaiting', { count: presenze.inAttesa })}
+      </span>
+    </div>
+  ) : null;
+
+
+  const fatto = (chiave: string, icona: ReactNode, etichetta: string, valore: ReactNode, sotto?: ReactNode) => (
+    <li className="wr-fact" key={chiave}>
+      <span className="wr-fact__icon" aria-hidden="true">{icona}</span>
+      <span className="wr-fact__body">
+        <span className="wr-fact__label">{etichetta}</span>
+        <span className="wr-fact__value">{valore}</span>
+        {sotto && <span className="wr-fact__sub">{sotto}</span>}
+      </span>
+    </li>
+  );
+  const svg = (children: ReactNode) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  );
+  const fatti: ReactNode[] = [
+    fatto(
+      'quando',
+      svg(<><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>),
+      t('summaryWhen'),
+      `${dateLabel} · ${startTimeLabel} – ${endTimeLabel}`,
+      durataTesto,
+    ),
+  ];
+  if (enti.length > 0 || event.organizerName) {
+    fatti.push(
+      fatto(
+        'enti',
+        svg(<><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M9 21v-6h6v6" /></>),
+        te('detail.organizedBy'),
+        enti.length > 0 ? enti.map((e) => e.name).join(', ') : event.organizerName,
+      ),
+    );
+  }
+  // Solo chi l'organizzazione ha scelto di pubblicare, come sulla pagina
+  // dell'evento: il nome del moderatore non pubblicato resta riservato.
+  if (conduzione.length > 0) {
+    fatti.push(
+      fatto(
+        'conduzione',
+        svg(<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>),
+        te('detail.peopleModerators'),
+        nomiPersone(conduzione),
+      ),
+    );
+  }
+  if (relatori.length > 0 || event.speakers) {
+    fatti.push(
+      fatto(
+        'relatori',
+        svg(<><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0 0 14 0" /><line x1="12" y1="17" x2="12" y2="22" /></>),
+        te('detail.speakers'),
+        relatori.length > 0 ? nomiPersone(relatori) : event.speakers,
+      ),
+    );
+  }
+  // La registrazione è un'informazione, non un allarme.
+  if (event.recordingEnabled && !isEnded) {
+    fatti.push(
+      fatto(
+        'registrazione',
+        <span className="wr-fact__rec" />,
+        t('summaryRecording'),
+        recordingListenOnly ? tGdpr('recordingNotice') : t('recordingNotice'),
+      ),
+    );
+  }
+
+  const linkPaginaEvento =
+    condivisione?.hasPublicPage && eventType !== 'INSTANT' ? (
+      <Link href={percorso(`/events/${event.slug}`)} className="wr-link">
+        {svg(<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>)}
+        {t('eventPageLink')}
+      </Link>
+    ) : null;
+
+  const riepilogoBlock = (
+    <section className="wr-summary" aria-labelledby="wr-summary-title">
+      <h2 className="wr-section-title" id="wr-summary-title">{t('summaryTitle')}</h2>
+      <ul className="wr-facts">{fatti}</ul>
+      {descrizione && (
+        <div className="wr-about">
+          <div
+            ref={descrizioneRef}
+            className={`wr-about__text${descrizioneAperta ? '' : ' is-clamped'}${descrizioneLunga ? '' : ' is-short'}`}
+            id="wr-about-text"
+          >
+            <div ref={descrizioneContenutoRef}>
+              <MarkdownRenderer content={descrizione} />
+            </div>
+          </div>
+          {(descrizioneLunga || descrizioneAperta) && (
+          <button
+            type="button"
+            className="wr-about__toggle"
+            aria-expanded={descrizioneAperta}
+            aria-controls="wr-about-text"
+            onClick={() => setDescrizioneAperta((v) => !v)}
+          >
+            {descrizioneAperta ? t('readLess') : t('readMore')}
+          </button>
+          )}
+        </div>
+      )}
+      {(linkPaginaEvento || condivisione) && (
+        <div className="wr-summary__links">
+          {linkPaginaEvento}
+          {condivisione && !isEnded && (
+            <span className="wr-share">
+              <LiveShareButton
+                slug={event.slug}
+                locale={condivisione.locale}
+                moderatorToken={condivisione.moderatorToken}
+                hasPublicPage={condivisione.hasPublicPage}
+                hasCallLink={condivisione.hasCallLink}
+              />
+            </span>
+          )}
+        </div>
+      )}
+    </section>
+  );
 
   return (
     <div
@@ -1382,10 +1854,8 @@ export default function WaitingRoom({
       // fuori gioco. Qui non lo è: il guscio copre la finestra, ma
       // l'intestazione e il piè di pagina del sito restano raggiungibili col
       // Tab, e stanno FUORI da questo componente — da qui non si possono
-      // rendere inerti. Una trappola del fuoco l'avrebbe reso vero; la mia
-      // sbagliava in tre modi, e una trappola rotta intrappola davvero. Meglio
-      // annunciare quello che questa cosa è: una parte di pagina, con un nome.
-      // Esc la chiude comunque.
+      // rendere inerti. Annunciamo quello che questa cosa è: una parte di
+      // pagina, con un nome. Esc la chiude comunque.
       {...(piazzaOpen
         ? { role: 'region' as const, 'aria-label': t('gardenDialogLabel') }
         : {})}
@@ -1395,89 +1865,50 @@ export default function WaitingRoom({
           aprendo e chiudendo la piazza — niente smontaggi, niente fotocamera
           riacquisita, niente bozze perse. */}
       {piazzaStage}
-      <div className="container py-4 py-md-5">
+      <div className="container py-4 py-md-5 wr-page">
         <div className="row g-4 justify-content-center">
-          <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>
-            <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
-              <div
-                className="waiting-hero"
-                style={{
-                  height: 160,
-                  background: heroUrl
-                    ? `url("${heroUrl}") center/cover no-repeat`
-                    : 'linear-gradient(135deg, #0066CC, #004080)',
-                  position: 'relative',
-                }}
-                aria-hidden={!heroUrl}
-              >
-                {isLive && (
-                  <Badge color="danger" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem' }}>
-                    <span className="me-1">●</span>
-                    {t('eventLive')}
-                  </Badge>
-                )}
-                {isEnded && (
-                  <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
-                    {notHeld ? t('notHeldBadge') : t('endedTitle')}
-                  </Badge>
-                )}
-              </div>
+          {/* Nella piazza la colonna con la chat viene prima, nel DOM e non
+              solo a vista, così l'ordine del Tab segue quello che si vede.
+              Le chiavi fanno spostare le due colonne senza smontarle: la
+              fotocamera e la bozza in chat restano. */}
+          {inOrdine([
+          <div key="card" className={asideBox ? 'col-lg-7' : 'col-lg-8 col-xl-7'}>
+            <Card
+              className={`waiting-card wr-card shadow-sm border-0${heroUrl ? '' : ' waiting-card--plain'}`}
+            >
+              {/* La fascia c'e' solo se c'e' un'immagine da mostrare. */}
+              {heroUrl && (
+                <div
+                  className="waiting-hero"
+                  style={{ background: `url("${heroUrl}") center/cover no-repeat` }}
+                >
+                  {statusBadge && <div className="waiting-hero__badge">{statusBadge}</div>}
+                </div>
+              )}
 
               <CardBody className="p-4 p-md-5">
+                {!heroUrl && statusBadge && <div className="mb-3 wr-reveal">{statusBadge}</div>}
                 <EventTitle
                   title={event.title}
                   kickerEnabled={event.parseTitleKicker ?? false}
                   as="h1"
-                  className="h4 fw-bold mb-2"
+                  className="h3 fw-bold mb-3 wr-reveal"
                   style={{ color: 'var(--app-text)' }}
                 />
 
-                {organizerLine && (
-                  <p className="text-muted mb-2" style={{ fontSize: '0.9rem' }}>{organizerLine}</p>
-                )}
-
-                {event.moderatorName && (
-                  <p className="text-muted mb-2" style={{ fontSize: '0.85rem' }}>
-                    <Icon icon="it-user" size="xs" className="me-1" />
-                    {t('moderatedBy', { name: event.moderatorName })}
-                  </p>
-                )}
-
-                <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                  <Icon icon="it-calendar" size="xs" className="me-1" />
-                  {dateLabel}
-                  {' · '}
-                  {startTimeLabel} – {endTimeLabel}
-                </div>
-
-                {participantCount > 0 && (
-                  <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                    <Icon icon="it-user" size="xs" className="me-1" />
-                    {isLive
-                      ? t('connectedParticipants', { count: participantCount })
-                      : t('peopleWaiting', { count: participantCount })}
-                  </div>
-                )}
+                {presenzeBlock && <div className="mb-3 wr-reveal">{presenzeBlock}</div>}
 
                 {isPublished && countdown && (
-                  <div
-                    className={`rounded-3 p-3 mb-4 text-center${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}
-                    style={{ background: 'linear-gradient(135deg, #0066CC, #004080)', color: '#fff' }}
-                  >
-                    <div className="small text-uppercase mb-1 opacity-75">{t('startsIn')}</div>
-                    <div className="display-6 fw-bold font-monospace">{countdown}</div>
+                  <div className={`waiting-countdown mb-4${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}>
+                    <div className="waiting-countdown__label">{t('startsIn')}</div>
+                    <div className="waiting-countdown__value">{countdown}</div>
                   </div>
                 )}
 
                 {/* "Sta per iniziare, attendi l'organizzatore": non al moderatore —
                     l'organizzatore è lui, e ha accanto il bottone "Avvia evento". */}
                 {isPublished && startingSoon && !isModerator && (
-                  <div
-                    className="rounded-3 p-3 mb-4 text-center d-flex align-items-center justify-content-center"
-                    role="status"
-                    aria-live="polite"
-                    style={{ background: 'var(--app-emphasis-bg, #eef4fb)', color: 'var(--app-text)' }}
-                  >
+                  <div className="wr-soon mb-4" role="status" aria-live="polite">
                     <Spinner active small className="me-2" />
                     <span className="fw-semibold">{t('startingSoon')}</span>
                   </div>
@@ -1487,19 +1918,32 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
+                <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
+
                 {/* Da http:// il browser nega microfono e videocamera: lo si dice
                     qui, con l'indirizzo sicuro, invece di una prova dei
                     dispositivi che chiede un permesso impossibile. */}
                 {!isEnded && <InsecureContextNotice className="mb-3" />}
-                {!isEnded && <div className="mb-3">{nameField}</div>}
-                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
-                    per moderatori/speaker è irrilevante). Il valore non è ancora
-                    inviato al server: campo di cortesia locale finché non c'è un
-                    consumer reale del follow-up. */}
-                {!isEnded && isGuest && (
-                  <div className="mb-3">{emailField}</div>
+                {!isEnded && (
+                  <div
+                    className={`wr-name-field mb-3${
+                      nomeNoto && !nameValid ? ' wr-name-field--empty' : ''
+                    }${nomeSegnalato ? ' wr-name-field--insist' : ''}`}
+                  >
+                    {nameField}
+                  </div>
                 )}
-                {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
+                {/* La foto al posto delle iniziali: solo per chi ha un'email
+                    dietro al token (lo dice il server). */}
+                {!isEnded && chatToken && (
+                  <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
+                )}
+                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
+                    per moderatori/speaker è irrilevante). */}
+                {!isEnded && isGuest && (
+                  <div className="mb-4 wr-email-field">{emailField}</div>
+                )}
+                {!isEnded && <div className="mb-4">{deviceCheckField}</div>}
 
                 {isPublished && !notHeld && event.waitingRoomAudioUrl && (
                   <div className="mb-4 d-flex justify-content-center">
@@ -1541,10 +1985,8 @@ export default function WaitingRoom({
                   </div>
                 ) : (
                   <>
-                    {multitrackConsentBlock && (
-                      <div className="mb-3">{multitrackConsentBlock}</div>
-                    )}
-                    <div className="mb-3">{primaryCta}</div>
+                    {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
+                    {primaryCta}
                   </>
                 )}
 
@@ -1556,7 +1998,7 @@ export default function WaitingRoom({
 
                 {/* Re-show the game box after it was hidden (accessibility /
                     touch default). Only when the game is actually available. */}
-                {!isEnded && !multitrackRequired && classicView && (
+                {!isEnded && classicView && (
                   <div className="text-center mb-3">
                     <Button
                       color="primary"
@@ -1572,10 +2014,9 @@ export default function WaitingRoom({
                   </div>
                 )}
 
-                {gameInvite && <div className="mb-3">{gameInvite}</div>}
-                <div className="mb-3">{netiquetteBlock}</div>
-                {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
+                {captionsNoticeBlock && <div className="mb-3">{captionsNoticeBlock}</div>}
+                <div className="mb-3">{netiquetteBlock}</div>
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
                 {isPublished && !notHeld && !isModerator && (
@@ -1586,9 +2027,9 @@ export default function WaitingRoom({
                 )}
               </CardBody>
             </Card>
-          </div>
-
-          {asideBox && <div className="col-lg-5 col-xl-5">{asideBox}</div>}
+          </div>,
+          asideBox ? <div key="aside" className="col-lg-5">{asideBox}</div> : null,
+          ], piazzaOpen)}
         </div>
       </div>
     </div>

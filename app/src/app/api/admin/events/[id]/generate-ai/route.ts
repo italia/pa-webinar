@@ -23,14 +23,15 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
 
   // Master kill-switch first, so we never flip flags then leave nothing enqueued.
@@ -39,8 +40,10 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { aiPipelineEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
-    throw new ValidationError(
+    throw new AppError(
       'AI pipeline is currently disabled (SiteSetting.aiPipelineEnabled=false). Enable it in admin settings first.',
+      422,
+      'AI_PIPELINE_DISABLED',
     );
   }
 
@@ -55,12 +58,40 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await prisma.$transaction(async (tx) => {
     // Latest recording for the event (an event can have multiple CallSessions,
     // hence multiple Recordings — pick the most recent, same as the postprod list).
+    // Quella con il file: la registrazione «solo sottotitoli» non ha niente da
+    // trascrivere.
     const recording = await tx.recording.findFirst({
-      where: { eventId: id },
+      where: { eventId: id, blobKey: { not: '' } },
       orderBy: { createdAt: 'desc' },
-      select: { id: true },
+      select: { id: true, blobKey: true },
     });
-    if (!recording) throw new NotFoundError('Recording');
+    if (!recording) {
+      // Senza file, ma con la registrazione dei soli sottotitoli: lo si dice,
+      // invece di «nessuna registrazione».
+      const soloSottotitoli = await tx.recording.findFirst({ where: { eventId: id }, select: { id: true } });
+      if (soloSottotitoli) {
+        throw new AppError(
+          'The event has no recording with media: its transcript comes from the live captions.',
+          422,
+          'RECORDING_WITHOUT_MEDIA',
+        );
+      }
+      throw new NotFoundError('Recording');
+    }
+    if (await trascrizioneCorrettaDaiSottotitoli(tx, recording.id)) {
+      throw new AppError(
+        'The transcript from the live captions on this recording was corrected by hand: the AI transcription would replace it and the corrections would be lost.',
+        409,
+        'TRANSCRIPT_CORRECTED',
+      );
+    }
+    if (registrazioneSoloSottotitoli(recording)) {
+      throw new AppError(
+        'The latest recording has no media: its transcript comes from the live captions.',
+        422,
+        'RECORDING_WITHOUT_MEDIA',
+      );
+    }
 
     // Flip the AI flags FIRST, in the same transaction, so the live flag read
     // inside enqueuePostprodForRecording (which no-ops when aiTranscriptEnabled

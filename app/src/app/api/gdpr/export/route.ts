@@ -76,11 +76,64 @@ export const GET = withErrorHandling(async (request) => {
           },
         },
       },
+      // Le prove del consenso alla registrazione per partecipante date in sala
+      // d'attesa: quando e in quale lingua (il nome e' quello dell'iscrizione).
+      multitrackConsents: {
+        select: { consentedAt: true, locale: true },
+        orderBy: { consentedAt: 'asc' },
+      },
+      // Lo stesso per il consenso alla registrazione dell'evento dato in sala
+      // d'attesa da chi non l'aveva dato all'iscrizione.
+      recordingConsents: {
+        select: { consentedAt: true, locale: true },
+        orderBy: { consentedAt: 'asc' },
+      },
     },
   });
 
+  // La foto profilo e' legata all'indirizzo, non a un'iscrizione: c'e' anche
+  // quando le iscrizioni sono gia' state cancellate (la pulizia la tiene un
+  // po' di piu'), e per chi ha solo una concessione nominale.
+  const foto = await prisma.profilePhoto.findUnique({
+    where: { emailHash },
+    select: { contentType: true, bytes: true, createdAt: true },
+  });
+  const profilePhoto = foto
+    ? {
+        uploadedAt: foto.createdAt.toISOString(),
+        dataUrl: `data:${foto.contentType};base64,${Buffer.from(foto.bytes).toString('base64')}`,
+      }
+    : null;
+
+  // Le concessioni nominali (organizzatore, moderatore, relatore) con lo
+  // stesso indirizzo. A quelle nate prima dell'impronta la pulizia
+  // giornaliera la aggiunge (lib/events/grant-email-hash).
+  const concessioni = await prisma.eventModerator.findMany({
+    where: { emailHash },
+    select: {
+      name: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      publicListed: true,
+      createdAt: true,
+      revokedAt: true,
+      event: { select: { title: true, startsAt: true } },
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+  const grants = concessioni.map((g) => ({
+    name: tryDecryptPII(g.name) ?? g.name,
+    role: g.role === 'SPEAKER' ? 'speaker' : g.organizer ? 'organizer' : 'moderator',
+    organization: g.organization,
+    shownOnPublicPage: g.publicListed,
+    createdAt: g.createdAt.toISOString(),
+    revokedAt: g.revokedAt?.toISOString() ?? null,
+    event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },
+  }));
+
   if (registrations.length === 0) {
-    return Response.json({ data: [] });
+    return Response.json({ data: [], profilePhoto, grants });
   }
 
   // Audit one row per distinct event, recording only an emailHash prefix
@@ -96,6 +149,19 @@ export const GET = withErrorHandling(async (request) => {
       },
     });
   }
+
+  // Le frasi dei sottotitoli salvate per la trascrizione: il posto della
+  // conferenza e' `reg-<id>-<suffisso>`, l'unico legame con l'iscrizione.
+  const frasi =
+    registrations.length > 0
+      ? await prisma.captionSegment.findMany({
+          where: {
+            OR: registrations.map((r) => ({ eventId: r.eventId, seatId: { startsWith: `reg-${r.id}-` } })),
+          },
+          select: { seatId: true, text: true, startedAt: true },
+          orderBy: { startedAt: 'asc' },
+        })
+      : [];
 
   const result = registrations.map((r) => {
     let decryptedEmail: string | null = null;
@@ -121,6 +187,14 @@ export const GET = withErrorHandling(async (request) => {
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),
         joinedAt: r.joinedAt?.toISOString() ?? null,
+        multitrackConsentsInRoom: (r.multitrackConsents ?? []).map((c) => ({
+          consentedAt: c.consentedAt.toISOString(),
+          locale: c.locale,
+        })),
+        recordingConsentsInRoom: (r.recordingConsents ?? []).map((c) => ({
+          consentedAt: c.consentedAt.toISOString(),
+          locale: c.locale,
+        })),
       },
       event: {
         title: r.event.title,
@@ -138,8 +212,14 @@ export const GET = withErrorHandling(async (request) => {
         optionIndex: v.optionIndex,
         createdAt: v.createdAt.toISOString(),
       })),
+      liveTranscript: frasi
+        .filter((f) => f.seatId?.startsWith(`reg-${r.id}-`))
+        .map((f) => ({
+          at: f.startedAt.toISOString(),
+          text: f.text ? (tryDecryptPII(f.text) ?? null) : null,
+        })),
     };
   });
 
-  return Response.json({ data: result });
+  return Response.json({ data: result, profilePhoto, grants });
 });

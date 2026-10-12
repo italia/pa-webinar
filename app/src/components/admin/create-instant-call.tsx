@@ -6,10 +6,12 @@ import { Button, Input, FormGroup, Label, Alert, Spinner } from 'design-react-ki
 
 import { Icon } from '@/components/ui/icon';
 import { useRouter, percorso } from '@/i18n/navigation';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 
 export default function CreateInstantCall() {
   const t = useTranslations('admin.instantCall');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const router = useRouter();
 
   const [title, setTitle] = useState('');
@@ -48,8 +50,7 @@ export default function CreateInstantCall() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? tc('error'));
+        setError(messaggioErroreApi(res.status, tApi, tc('error')));
         setLoading(false);
         return;
       }

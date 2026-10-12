@@ -57,6 +57,21 @@ describe('wordSubmitErrorKey — perché la parola non è entrata', () => {
     expect(await wordSubmitErrorKey(res)).toBe('errors.limit');
   });
 
+  it('parola ripetuta, parola tolta e parola senza lettere hanno messaggi loro', async () => {
+    expect(await wordSubmitErrorKey(Response.json({ code: 'WORD_DUPLICATE' }, { status: 409 }))).toBe(
+      'errors.duplicate',
+    );
+    expect(await wordSubmitErrorKey(Response.json({ code: 'WORD_REMOVED' }, { status: 409 }))).toBe(
+      'errors.removed',
+    );
+    expect(await wordSubmitErrorKey(Response.json({ code: 'WORD_INVALID' }, { status: 422 }))).toBe(
+      'errors.invalid',
+    );
+    expect(await wordSubmitErrorKey(Response.json({ code: 'VALIDATION_ERROR' }, { status: 422 }))).toBe(
+      'errors.send',
+    );
+  });
+
   it('ogni altra 409 è il giro chiuso', async () => {
     expect(await wordSubmitErrorKey(Response.json({ code: 'CONFLICT' }, { status: 409 }))).toBe(
       'errors.closed',

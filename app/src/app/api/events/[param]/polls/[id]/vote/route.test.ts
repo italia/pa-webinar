@@ -145,10 +145,12 @@ describe('POST .../polls/[id]/vote — con quale identità si vota', () => {
 
   it('fuori dalla finestra della sala un anonimo non vota', async () => {
     // Senza questo, chi conosce lo slug voterebbe su un sondaggio rimasto
-    // aperto in un evento che non è più in diretta.
+    // aperto in un evento che non è più in diretta. A evento concluso il
+    // sondaggio è chiuso per tutti, iscritti compresi: 409, prima ancora
+    // della regola di lettura.
     mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
     const res = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(409);
     expect(mockedCreate).not.toHaveBeenCalled();
   });
 
@@ -187,5 +189,15 @@ describe('POST .../polls/[id]/vote — con quale identità si vota', () => {
     });
     const res = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
     expect(res.status).toBe(409);
+  });
+});
+
+describe('POST .../polls/[id]/vote — a evento concluso', () => {
+  it.each(['ENDED', 'ARCHIVED'])('evento %s: un sondaggio rimasto aperto non accetta voti, nemmeno da un iscritto (409)', async (status) => {
+    mockedEvent.mockResolvedValue(eventRow({ status }));
+    mockedRegistration.mockResolvedValue({ id: 'reg-1', eventId: EVENT_ID });
+    const res = await POST(vote({ optionIndex: 1, accessToken: 'TOKEN_ISCRIZIONE' }), ctx());
+    expect(res.status).toBe(409);
+    expect(mockedCreate).not.toHaveBeenCalled();
   });
 });

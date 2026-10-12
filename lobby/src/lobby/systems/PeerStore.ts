@@ -120,6 +120,8 @@ export class PeerStore {
     m.name = p.name;
     m.color = p.color;
     m.accessories = p.accessories;
+    m.look = p.look;
+    m.umore = p.umore;
     this.onEvent({ type: 'profile', peer: m });
   }
 

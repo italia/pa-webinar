@@ -14,6 +14,7 @@ import { resolveLocale } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { ensurePostEventQuestionnaire } from '@/lib/feedback/default-questionnaire';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,10 +100,10 @@ export const POST = withErrorHandling(async (request) => {
       // can match this event. Without it, lastActiveAt stays null and the
       // call lingers LIVE until the cosmetic endsAt upper bound kicks in.
       lastActiveAt: now,
-      // Instant calls don't auto-close on endsAt — close on inactivity
-      // instead (~45min after the last participant leaves, per the
-      // scaler's inactiveGraceMinutes default). This decouples the
-      // cosmetic "ends at" from the actual lifecycle.
+      // Le chiamate istantanee non si chiudono per orario: senza tetto del
+      // fuori orario, si chiudono quando restano vuote (in pausa prima del
+      // loro endsAt, che è solo un segnaposto; chiuse dopo
+      // eventOvertimeEmptyMinutes oltre).
       gracePeriodMinutes: -1,
       // Align with the scheduled-event flow where the PUBLISHED→PROVISIONING
       // transition stamps this field. For instant calls we skip that state
@@ -125,6 +126,14 @@ export const POST = withErrorHandling(async (request) => {
           : null,
     },
   });
+
+  // La valutazione di fine chiamata, come per ogni evento: il questionario
+  // predefinito. Senza, a fine chiamata non si chiederebbe niente.
+  try {
+    await ensurePostEventQuestionnaire(event.id);
+  } catch {
+    // Non blocca la chiamata: si puo' aggiungere dalla pagina dell'evento.
+  }
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);

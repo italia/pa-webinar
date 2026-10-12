@@ -1,6 +1,8 @@
-{{- if .Values.postprod.enabled }}
+{{- if or .Values.postprod.enabled .Values.recorder.enabled }}
 # ADR-013 Fase 5 — purge frequente delle tracce audio per-partecipante
-# dopo la trascrizione (minimizzazione GDPR). Cancella i blob e marca
+# dopo la trascrizione (minimizzazione GDPR), e alla scadenza dei dati
+# dell'evento per le tracce mai trascritte: serve anche a un'installazione
+# che registra senza post-produzione AI. Cancella i blob e marca
 # RecordingTrack.audioPurgedAt. Vedi /api/cron/multitrack-purge.
 apiVersion: batch/v1
 kind: CronJob

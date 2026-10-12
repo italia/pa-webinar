@@ -23,6 +23,7 @@ import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
 
@@ -62,6 +63,15 @@ export const DELETE = withErrorHandling(async (request, context) => {
         console.error('[chat moderation] attachment delete failed:', err);
       }
     }
+
+    // Cronologia della sala: solo che un messaggio e' stato nascosto, mai
+    // il suo testo ne' chi l'aveva scritto.
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'chat.hidden',
+      actor: 'moderator',
+      data: { messageId: message.id },
+    });
   }
 
   // Tell every connected client to remove it live. Non-essential envelope

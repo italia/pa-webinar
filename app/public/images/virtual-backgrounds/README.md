@@ -1,7 +1,8 @@
 # Virtual backgrounds
 
 This folder holds the virtual backgrounds that ship with PA Webinar. People choose one in the waiting
-room's device check, and the live room applies it when they enter the conference.
+room's device check, and the live room applies it when they enter the conference. Inside the room, the
+same catalog replaces Jitsi's stock photos in Jitsi's own backgrounds dialog.
 
 ## What they are
 
@@ -10,13 +11,20 @@ room's device check, and the live room applies it when they enter the conference
   **No background** option. It has no image, and it is the default.
 - **The picker.** The device check (`app/src/components/live/device-check.tsx`) shows the list as
   thumbnails under **Virtual background**, in catalog order. The display name of each background is
-  its tooltip and its screen-reader label.
+  its tooltip and its screen-reader label. The camera preview shows the chosen background behind the
+  person, cut out in the browser (see
+  [Device check and virtual backgrounds](../../../../docs/architecture/waiting-room.md#device-check-and-virtual-backgrounds)).
 - **The stored choice.** The browser keeps the chosen entry's `id` in local storage, under
   `paw_sfondo_virtuale`. That stored value is why an `id` must stay stable (see
   [Removing or renaming a background](#removing-or-renaming-a-background)). When the browser blocks
   local storage, the picker still works, but the person enters the room with no background.
 - **On entry.** The room fetches the chosen image and hands it to the conference as a data URI. The
   size rule under [Format](#format) follows from this.
+- **In Jitsi's backgrounds dialog.** The branding document (`/api/jitsi-branding.json`) lists every
+  image of the catalog as an absolute URL under `virtualBackgrounds`, so Jitsi shows them instead of
+  its own photos. Jitsi downloads the chosen one with `fetch()` from the conference origin, so
+  `app/next.config.ts` serves this folder with `Access-Control-Allow-Origin: *`. Without
+  `NEXT_PUBLIC_APP_URL` the document leaves the list out and Jitsi keeps its own photos.
 
 How the choice reaches the conference, and what the remote command cannot do, are covered in
 [Virtual backgrounds](../../../../docs/architecture/jitsi-integration.md#virtual-backgrounds) on the
@@ -26,7 +34,7 @@ on the waiting-room page.
 
 ## Provenance and license
 
-The images are abstract gradients made for this repository. They contain no photographs, no logos
+The images are abstract gradients and soft light effects made for this repository. They contain no photographs, no logos
 and no third-party content. They are covered by the repository's license, the European Union Public
 Licence (EUPL-1.2), and carry no attribution requirements of their own. They are recorded under
 [Bundled assets](../../../../THIRD-PARTY-LICENSES.md#bundled-assets) in the third-party licenses page.

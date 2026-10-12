@@ -85,6 +85,8 @@ export const GET = withErrorHandling(async (request, context) => {
     id: string;
     authorName: string;
     text: string;
+    /** La risposta scritta da chi conduce, se c'e'. */
+    answerText: string | null;
     status: string;
     upvoteCount: number;
     createdAt: string;
@@ -119,6 +121,7 @@ export const GET = withErrorHandling(async (request, context) => {
       id: q.id,
       authorName: q.authorName,
       text: q.text,
+      answerText: q.answerText,
       status: q.status,
       upvoteCount: q.upvoteCount,
       createdAt: q.createdAt.toISOString(),
@@ -302,6 +305,7 @@ export const POST = withErrorHandling(async (request, context) => {
       id: question.id,
       authorName: question.authorName,
       text: question.text,
+      answerText: null,
       status: question.status,
       upvoteCount: question.upvoteCount,
       hasUpvoted: false,

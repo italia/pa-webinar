@@ -2,11 +2,12 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
-import { canManageEvent } from '@/lib/auth/staff-session';
+import { puoGestire } from '@/lib/auth/staff-session';
 import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingManageClient from '@/components/admin/recording-manage-client';
+import { adminPageMetadata } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,10 @@ interface PageProps {
  * diarization), sintesi AI e traduzioni in un unico posto. Linkata da
  * lista registrazioni, dettaglio evento e dashboard postprod.
  */
+export function generateMetadata() {
+  return adminPageMetadata('/admin/postprod/[recordingId]');
+}
+
 export default async function RecordingManagePage({ params }: PageProps) {
   const locale = await getLocale();
   const session = await staffOLogin(locale);
@@ -33,12 +38,13 @@ export default async function RecordingManagePage({ params }: PageProps) {
       sourceLanguage: true,
       createdAt: true,
       eventId: true,
-      event: { select: { title: true, slug: true, createdById: true } },
+      blobKey: true,
+      event: { select: { title: true, slug: true } },
     },
   });
   if (!recording) notFound();
   // La registrazione e' dell'evento: la gestisce chi gestisce l'evento.
-  if (!canManageEvent(session, { createdById: recording.event?.createdById ?? null })) {
+  if (!(await puoGestire(session, recording.eventId))) {
     return <AccessDenied />;
   }
 
@@ -53,6 +59,9 @@ export default async function RecordingManagePage({ params }: PageProps) {
       durationSec={recording.durationSec}
       sourceLanguage={recording.sourceLanguage ?? 'it'}
       createdAt={recording.createdAt.toISOString()}
+      // Senza file: la trascrizione e' quella dei sottotitoli live.
+      soloSottotitoli={recording.blobKey === ''}
+      eventId={recording.eventId}
     />
   );
 }

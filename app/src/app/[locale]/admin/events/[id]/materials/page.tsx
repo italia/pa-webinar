@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 
@@ -10,7 +9,8 @@ import { puoGestire } from '@/lib/auth/staff-session';
 import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
-import { localizedPath } from '@/lib/utils/localized-url';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -18,6 +18,17 @@ interface PageProps {
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]/materials', id, { token, conToken: false });
+}
 
 export default async function EventMaterialsAdminPage({ params }: PageProps) {
   const { id } = await params;
@@ -39,7 +50,6 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
   if (!(await puoGestire(session, event.id))) return <AccessDenied />;
 
   const t = await getTranslations('admin.materials');
-  const tCommon = await getTranslations('common');
 
   const titleMap = event.title as Record<string, string>;
   const eventTitle = getLocalized(titleMap as LocalizedField, locale) || event.slug;
@@ -66,18 +76,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <Link
-          href={localizedPath(`/admin/events/${event.id}`, locale)}
-          className="text-decoration-none small"
-        >
-          ← {tCommon('back')}
-        </Link>
-        <h1 className="fw-bold mb-1 mt-2" style={{ color: 'var(--app-text)' }}>
-          {t('title')} — {eventTitle}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={`${t('title')} — ${eventTitle}`} subtitle={t('subtitle')} />
 
       <EventMaterialsManager
         eventId={event.id}

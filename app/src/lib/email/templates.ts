@@ -42,6 +42,8 @@ interface EmailTemplateInput {
    * compare sempre, anche se l'amministrazione ha personalizzato il testo.
    */
   addressBookOptOutUrl?: string | null;
+  /** La pagina «I miei dati», nella lingua della pagina dell'iscrizione. */
+  myDataUrl?: string | null;
 }
 
 interface LocaleCopy {
@@ -57,6 +59,8 @@ interface LocaleCopy {
   joinLabel: string;
   keepNote: string;
   viewEvent: string;
+  /** Il link a «I miei dati»: vedere, correggere o cancellare l'iscrizione. */
+  myData: string;
   addToCalendar: string;
   downloadIcs: string;
   footer: string;
@@ -82,13 +86,13 @@ const copy: Record<Locale, LocaleCopy> = {
     reminderHeading: 'Promemoria evento',
     reminderNote: (offsetMinutes) => {
       if (offsetMinutes >= 1440) {
-        return 'L\u2019evento a cui sei registrato inizia domani. Usa il link qui sotto per accedere.';
+        return 'L\u2019evento a cui sei iscritto inizia domani. Usa il link qui sotto per accedere.';
       }
       if (offsetMinutes >= 60) {
         const hours = Math.round(offsetMinutes / 60);
-        return `L\u2019evento a cui sei registrato inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}. Usa il link qui sotto per accedere.`;
+        return `L\u2019evento a cui sei iscritto inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}. Usa il link qui sotto per accedere.`;
       }
-      return `L\u2019evento a cui sei registrato inizia tra ${offsetMinutes} minuti. Usa il link qui sotto per accedere.`;
+      return `L\u2019evento a cui sei iscritto inizia tra ${offsetMinutes} minuti. Usa il link qui sotto per accedere.`;
     },
     eventLabel: 'Evento',
     dateLabel: 'Data',
@@ -98,13 +102,14 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserva questa email, contiene il tuo link personale per accedere all\u2019evento.',
     viewEvent: 'Visualizza la pagina dell\u2019evento',
+    myData: 'I tuoi dati: vederli, correggerli o cancellare l\u2019iscrizione',
     addToCalendar: 'Aggiungi al tuo calendario:',
     downloadIcs: 'Scarica .ics',
     footer: '',
     unsubscribe:
-      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
+      'Ricevi questa email perch\u00e9 ti sei iscritto all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
     unsubscribeAddressBook:
-      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
+      'Ricevi questa email perch\u00e9 ti sei iscritto all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
     addressBookOptOut: 'Rimuovi i miei dati dalla rubrica',
   },
   en: {
@@ -137,6 +142,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Keep this email \u2014 it contains your personal link to access the event.',
     viewEvent: 'View event page',
+    myData: 'Your data: see it, correct it or cancel your registration',
     addToCalendar: 'Add to your calendar:',
     downloadIcs: 'Download .ics',
     footer: '',
@@ -176,6 +182,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conservez cet e-mail : il contient votre lien personnel pour accéder à l’événement.',
     viewEvent: 'Voir la page de l’événement',
+    myData: 'Vos données : les consulter, les corriger ou annuler l’inscription',
     addToCalendar: 'Ajoutez-le à votre agenda :',
     downloadIcs: 'Télécharger le fichier .ics',
     footer: '',
@@ -215,6 +222,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Bitte bewahren Sie diese E-Mail auf: Sie enthält Ihren persönlichen Link zur Veranstaltung.',
     viewEvent: 'Seite der Veranstaltung anzeigen',
+    myData: 'Ihre Daten: einsehen, berichtigen oder die Anmeldung löschen',
     addToCalendar: 'Zu Ihrem Kalender hinzufügen:',
     downloadIcs: '.ics herunterladen',
     footer: '',
@@ -254,6 +262,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserve este correo electrónico: contiene su enlace personal para acceder al evento.',
     viewEvent: 'Ver la página del evento',
+    myData: 'Tus datos: verlos, corregirlos o cancelar la inscripción',
     addToCalendar: 'Añada el evento a su calendario:',
     downloadIcs: 'Descargar .ics',
     footer: '',
@@ -359,12 +368,8 @@ function detailsTable(
   input: EmailTemplateInput,
 ): string {
   return `<table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;">
-<tr>
-  <td style="padding:8px 12px;font-weight:600;color:#17324d;width:100px;">${c.eventLabel}</td>
-  <td style="padding:8px 12px;">${escapeHtml(input.eventTitle)}</td>
-</tr>
 <tr style="background:#f5f6f7;">
-  <td style="padding:8px 12px;font-weight:600;color:#17324d;">${c.dateLabel}</td>
+  <td style="padding:8px 12px;font-weight:600;color:#17324d;width:100px;">${c.dateLabel}</td>
   <td style="padding:8px 12px;">${escapeHtml(input.eventDate)}</td>
 </tr>
 <tr>
@@ -412,6 +417,17 @@ function addressBookOptOutText(c: LocaleCopy, url: string | null | undefined): s
 /** La nota a pie' di pagina predefinita: per chi e' in rubrica dice come uscirne. */
 function defaultFooterNote(c: LocaleCopy, input: { addressBookOptOutUrl?: string | null }): string {
   return input.addressBookOptOutUrl ? c.unsubscribeAddressBook : c.unsubscribe;
+}
+
+/** Il link a «I miei dati», quando la pagina e' nota. */
+function myDataHtml(c: LocaleCopy, input: EmailTemplateInput): string {
+  return input.myDataUrl
+    ? `\n<p style="margin:8px 0 0;font-size:14px;"><a href="${escapeHtml(input.myDataUrl)}" style="color:#06c;">${c.myData}</a></p>`
+    : '';
+}
+
+function myDataText(c: LocaleCopy, input: EmailTemplateInput): string[] {
+  return input.myDataUrl ? [`${c.myData}: ${input.myDataUrl}`] : [];
 }
 
 function ctaButton(label: string, url: string): string {
@@ -490,7 +506,7 @@ ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
 ${info}
-<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
+<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${myDataHtml(c, input)}`;
 
   return layout(
     escapeHtml(r.heading),
@@ -535,6 +551,7 @@ export function confirmationText(
     '',
     ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
+    ...myDataText(c, input),
     '',
     footerText,
     r.footerNote,
@@ -570,7 +587,7 @@ ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
 ${info}
-<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
+<p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>${myDataHtml(c, input)}`;
 
   return layout(
     escapeHtml(r.heading),
@@ -615,6 +632,7 @@ export function reminderText(
     '',
     ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
+    ...myDataText(c, input),
     '',
     footerText,
     r.footerNote,
@@ -633,6 +651,8 @@ interface PostEventParticipantInput {
   organizationFooter?: string;
   /** Vedi EmailTemplateInput.addressBookOptOutUrl. */
   addressBookOptOutUrl?: string | null;
+  /** Invita a valutare (chi e' entrato in sala). Falso: solo il riepilogo. */
+  inviteRating?: boolean;
 }
 
 interface PostEventModeratorInput extends PostEventParticipantInput {
@@ -649,6 +669,10 @@ const postEventCopy: Record<
     participantHeading: string;
     participantIntro: (title: string) => string;
     participantCta: string;
+    /** Per chi non e' entrato in sala: il riepilogo, senza promettere una
+     *  valutazione che non potrebbe dare. */
+    participantIntroRecapOnly: (title: string) => string;
+    participantCtaRecapOnly: string;
     moderatorSubject: (title: string) => string;
     moderatorHeading: string;
     moderatorIntro: (title: string) => string;
@@ -663,6 +687,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Grazie per aver partecipato a "${t}". Sulla pagina dell'evento trovi il riepilogo e puoi lasciare un feedback.`,
     participantCta: 'Vedi il riepilogo e lascia un feedback',
+    participantIntroRecapOnly: (t) => `L'evento "${t}" è concluso. Sulla pagina dell'evento trovi il riepilogo.`,
+    participantCtaRecapOnly: 'Vedi il riepilogo',
     moderatorSubject: (t) => `Evento concluso: ${t}`,
     moderatorHeading: 'Il tuo evento è concluso',
     moderatorIntro: (t) => `L'evento "${t}" è concluso. Ecco un riepilogo sintetico.`,
@@ -676,6 +702,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Thanks for attending "${t}". You'll find the recap and a feedback form on the event page.`,
     participantCta: 'See the recap and leave feedback',
+    participantIntroRecapOnly: (t) => `The event "${t}" has ended. You'll find the recap on the event page.`,
+    participantCtaRecapOnly: 'See the recap',
     moderatorSubject: (t) => `Event concluded: ${t}`,
     moderatorHeading: 'Your event has ended',
     moderatorIntro: (t) => `The event "${t}" has ended. Here's a short recap.`,
@@ -689,6 +717,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Merci d’avoir participé à « ${t} ». Sur la page de l’événement, vous trouverez le récapitulatif et pourrez laisser votre avis.`,
     participantCta: 'Voir le récapitulatif et donner votre avis',
+    participantIntroRecapOnly: (t) => `L’événement « ${t} » est terminé. Vous trouverez le récapitulatif sur la page de l’événement.`,
+    participantCtaRecapOnly: 'Voir le récapitulatif',
     moderatorSubject: (t) => `Événement terminé : ${t}`,
     moderatorHeading: 'Votre événement est terminé',
     moderatorIntro: (t) => `L’événement « ${t} » est terminé. Voici un bref récapitulatif.`,
@@ -702,6 +732,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Vielen Dank für Ihre Teilnahme an „${t}“. Auf der Seite der Veranstaltung finden Sie die Zusammenfassung und können eine Rückmeldung geben.`,
     participantCta: 'Zusammenfassung ansehen und Rückmeldung geben',
+    participantIntroRecapOnly: (t) => `Die Veranstaltung „${t}“ ist beendet. Die Zusammenfassung finden Sie auf der Seite der Veranstaltung.`,
+    participantCtaRecapOnly: 'Zusammenfassung ansehen',
     moderatorSubject: (t) => `Veranstaltung beendet: ${t}`,
     moderatorHeading: 'Ihre Veranstaltung ist beendet',
     moderatorIntro: (t) => `Die Veranstaltung „${t}“ ist beendet. Hier eine kurze Zusammenfassung.`,
@@ -715,6 +747,8 @@ const postEventCopy: Record<
     participantIntro: (t) =>
       `Gracias por participar en «${t}». En la página del evento encontrará el resumen y podrá dejar su opinión.`,
     participantCta: 'Ver el resumen y dejar su opinión',
+    participantIntroRecapOnly: (t) => `El evento «${t}» ha finalizado. En la página del evento encontrará el resumen.`,
+    participantCtaRecapOnly: 'Ver el resumen',
     moderatorSubject: (t) => `Evento finalizado: ${t}`,
     moderatorHeading: 'Su evento ha finalizado',
     moderatorIntro: (t) => `El evento «${t}» ha finalizado. A continuación, un breve resumen.`,
@@ -733,9 +767,12 @@ export function postEventParticipantEmail(input: PostEventParticipantInput): {
   const base = copy[input.locale];
   const footer = input.organizationFooter || base.footer;
   const subject = c.participantSubject(input.eventTitle);
+  const valuta = input.inviteRating !== false;
+  const intro = valuta ? c.participantIntro(input.eventTitle) : c.participantIntroRecapOnly(input.eventTitle);
+  const cta = valuta ? c.participantCta : c.participantCtaRecapOnly;
   const body = `
-<p style="margin:0 0 16px;">${escapeHtml(c.participantIntro(input.eventTitle))}</p>
-${ctaButton(c.participantCta, input.eventPageUrl)}`;
+<p style="margin:0 0 16px;">${escapeHtml(intro)}</p>
+${ctaButton(cta, input.eventPageUrl)}`;
   // Solo per chi e' in rubrica: la nota su come uscirne e il link firmato.
   const optOutHtml = input.addressBookOptOutUrl
     ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
@@ -750,9 +787,80 @@ ${ctaButton(c.participantCta, input.eventPageUrl)}`;
   const text = [
     c.participantHeading,
     '',
-    c.participantIntro(input.eventTitle),
+    intro,
     '',
-    `${c.participantCta}: ${input.eventPageUrl}`,
+    `${cta}: ${input.eventPageUrl}`,
+    '',
+    footer,
+    ...(input.addressBookOptOutUrl
+      ? [base.unsubscribeAddressBook, ...addressBookOptOutText(base, input.addressBookOptOutUrl)]
+      : []),
+  ].join('\n');
+  return { subject, html, text };
+}
+
+// ── Registrazione pubblicata ──
+// L'avviso a chi si era iscritto quando la registrazione diventa visibile sulla
+// pagina pubblica dell'evento (lib/events/recording-notify). Una volta sola.
+
+const recordingCopy: Record<
+  Locale,
+  { subject: (t: string) => string; heading: string; intro: (t: string) => string; cta: string }
+> = {
+  it: {
+    subject: (t) => `È disponibile la registrazione: ${t}`,
+    heading: 'La registrazione è disponibile',
+    intro: (t) => `La registrazione di "${t}" è pubblicata sulla pagina dell'evento: puoi rivederla quando vuoi, insieme ai materiali condivisi.`,
+    cta: 'Guarda la registrazione',
+  },
+  en: {
+    subject: (t) => `The recording is available: ${t}`,
+    heading: 'The recording is available',
+    intro: (t) => `The recording of "${t}" is published on the event page: you can watch it whenever you like, together with the shared materials.`,
+    cta: 'Watch the recording',
+  },
+  fr: {
+    subject: (t) => `L'enregistrement est disponible : ${t}`,
+    heading: "L'enregistrement est disponible",
+    intro: (t) => `L'enregistrement de « ${t} » est publié sur la page de l'événement : vous pouvez le revoir quand vous voulez, avec les documents partagés.`,
+    cta: "Voir l'enregistrement",
+  },
+  de: {
+    subject: (t) => `Die Aufzeichnung ist verfügbar: ${t}`,
+    heading: 'Die Aufzeichnung ist verfügbar',
+    intro: (t) => `Die Aufzeichnung von „${t}“ ist auf der Veranstaltungsseite veröffentlicht: Du kannst sie jederzeit ansehen, zusammen mit den geteilten Materialien.`,
+    cta: 'Aufzeichnung ansehen',
+  },
+  es: {
+    subject: (t) => `La grabación está disponible: ${t}`,
+    heading: 'La grabación está disponible',
+    intro: (t) => `La grabación de «${t}» está publicada en la página del evento: puedes verla cuando quieras, junto con los materiales compartidos.`,
+    cta: 'Ver la grabación',
+  },
+};
+
+export function recordingPublishedEmail(input: PostEventParticipantInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = recordingCopy[input.locale];
+  const base = copy[input.locale];
+  const footer = input.organizationFooter || base.footer;
+  const subject = c.subject(input.eventTitle);
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.intro(input.eventTitle))}</p>
+${ctaButton(c.cta, input.eventPageUrl)}`;
+  const optOutHtml = input.addressBookOptOutUrl
+    ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
+    : '';
+  const html = layout(escapeHtml(c.heading), body, `${footer}${optOutHtml}`, input.locale, input.siteName);
+  const text = [
+    c.heading,
+    '',
+    c.intro(input.eventTitle),
+    '',
+    `${c.cta}: ${input.eventPageUrl}`,
     '',
     footer,
     ...(input.addressBookOptOutUrl

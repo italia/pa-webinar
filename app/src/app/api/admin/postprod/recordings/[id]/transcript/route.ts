@@ -69,6 +69,8 @@ async function loadRecording(id: string) {
     where: { id },
     select: {
       id: true,
+      // Vuoto per la trascrizione dai sottotitoli live: nessun audio da servire.
+      blobKey: true,
       // La conservazione dell'originale è per-evento tanto quanto
       // per-registrazione: la pulizia dei dati lavora anche per evento.
       eventId: true,
@@ -131,7 +133,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       segments: [],
       speakers: [],
       waveform: null,
-      mediaUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
+      mediaUrl: recording.blobKey ? `/api/admin/postprod/recordings/${recording.id}/media` : null,
       hasTranscript: false,
     });
   }
@@ -201,7 +203,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     waveform,
     // Same-origin endpoint that 302s to a short-lived signed URL of the
     // source media, so the editor can play audio + drive the playhead.
-    mediaUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
+    mediaUrl: recording.blobKey ? `/api/admin/postprod/recordings/${recording.id}/media` : null,
     hasTranscript: true,
     // Stato della versione originale: quando è stata conservata, quale modello
     // l'ha prodotta, e se è confrontabile riga per riga.
@@ -471,11 +473,10 @@ export const PUT = withErrorHandling(async (request, context) => {
   // cancellazione nella banca dati è già avvenuta e non si annulla.
   let archivioAggiornato = true;
   if (redactOriginal && redazioniApplicate > 0) {
-    archivioAggiornato = await rewritePostprodBlob(
-      jsonArtifact.blobKey,
-      newJsonBody,
-      jsonArtifact.mimeType,
-    );
+    // La trascrizione dai sottotitoli live non ha un file nell'archivio.
+    archivioAggiornato = jsonArtifact.blobKey
+      ? await rewritePostprodBlob(jsonArtifact.blobKey, newJsonBody, jsonArtifact.mimeType)
+      : true;
     if (vttArtifact) {
       const ok = await rewritePostprodBlob(vttArtifact.blobKey, newVttBody, vttArtifact.mimeType);
       archivioAggiornato = archivioAggiornato && ok;

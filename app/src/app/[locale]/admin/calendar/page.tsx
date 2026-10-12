@@ -2,8 +2,14 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
 import EventCalendar from '@/components/calendar/event-calendar-lazy';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/calendar');
+}
 
 export default async function AdminCalendarPage() {
   // Aperta allo staff: gli eventi li filtra la rotta del calendario (ADR-014).
@@ -11,13 +17,8 @@ export default async function AdminCalendarPage() {
   const t = await getTranslations('calendar');
 
   return (
-    <div className="container py-4">
-      <div className="mb-4">
-        <h1 className="h3 fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+    <div className="container py-5">
+      <AdminPageHeader title={await adminPageTitle('/admin/calendar')} subtitle={t('subtitle')} />
       <EventCalendar mode="admin" />
     </div>
   );

@@ -62,6 +62,15 @@ function urlDellaChiave(chiave: unknown): string | null {
 }
 
 /**
+ * Vero se la chiave SWR e' una di quelle che un avviso del pannello fa
+ * rileggere. Chi vuole leggere lo stesso indirizzo senza seguire gli avvisi
+ * usa una chiave che non comincia con l'URL (hooks/use-qa-alerts).
+ */
+export function isPanelKey(chiave: unknown, eventSlug: string, panel: PokeablePanel): boolean {
+  return urlDellaChiave(chiave)?.startsWith(prefissoChiave(eventSlug, panel)) === true;
+}
+
+/**
  * Il canale è uno solo per sala, ma a doverlo sapere sono i pannelli, che
  * stanno diversi livelli più in basso. Passare una prop lungo tutta la catena
  * avrebbe toccato ogni componente in mezzo senza che a nessuno serva.
@@ -100,11 +109,10 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
 
   const rinfresca = useCallback(
     (panel: PokeablePanel) => {
-      const prefisso = prefissoChiave(eventSlug, panel);
       const esegui = () => {
         ultimoRinfrescoRef.current[panel] = Date.now();
         delete codaRef.current[panel];
-        void globalMutate((chiave) => urlDellaChiave(chiave)?.startsWith(prefisso) === true);
+        void globalMutate((chiave) => isPanelKey(chiave, eventSlug, panel));
       };
 
       // Già in coda: l'avviso appena arrivato è coperto da quella rilettura.

@@ -160,9 +160,10 @@ reaches a room the next time it is opened ([ADR-001](001-jitsi-iframe-api.md#wha
   reaction bar live in the memory of one app process, so with several replicas two browsers can see different
   values, and a pod restart resets them
   ([known limitations](../architecture/live-interaction.md#known-limitations)).
-- **Every interaction model enters the GDPR cleanup explicitly.** The GDPR cleanup archives an event instead of
-  deleting it, so foreign-key cascades never fire for the events it processes. The cleanup therefore deletes
-  each interaction table by name, and a guard test (`app/src/lib/gdpr/cleanup-coverage.test.ts`) fails when a
+- **Every interaction model enters the GDPR cleanup explicitly.** The GDPR cleanup keeps an event instead of
+  deleting it, so foreign-key cascades never fire for the events it processes. The cleanup therefore handles
+  each interaction table by name, deleting its rows or removing the identities from those that stay with the
+  event, and a guard test (`app/src/lib/gdpr/cleanup-coverage.test.ts`) fails when a
   model with an `eventId` column is not classified in `app/src/lib/gdpr/cleanup-coverage.ts`. A model that
   points to a blob must delete the blob too ([GDPR](../GDPR.md#rules-for-developers)).
 - **Jitsi's own chat is not fully gone.** Removing the chat button does not remove private messages from the

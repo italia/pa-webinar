@@ -41,6 +41,16 @@ export interface LobbyContext {
   setProfile(p: Partial<PlayerProfile>): void;
 }
 
+/** Un messaggio della chat da mostrare in un fumetto. `self`: è mio, va sul
+ *  mio avatar qualunque nome mostri la chat. */
+export interface ChatBubble {
+  name: string;
+  text: string;
+  ageMs?: number;
+  id?: string;
+  self?: boolean;
+}
+
 export const CONTEXT_KEY = 'lobbyContext';
 
 export function getContext(scene: Phaser.Scene): LobbyContext {

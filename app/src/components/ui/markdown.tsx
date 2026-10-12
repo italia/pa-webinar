@@ -141,11 +141,13 @@ export function MarkdownEditor({
     <div className="markdown-editor">
       <div className="d-flex align-items-center justify-content-between mb-1">
         {label && <label htmlFor={id} className="form-label mb-0">{label}</label>}
-        <div className="btn-group btn-group-sm" role="tablist">
+        {/* Due pulsanti a stato (non schede): quello attivo e' premuto. */}
+        <div className="btn-group btn-group-sm" role="group" aria-label={label}>
           <button
             type="button"
             className={`btn btn-sm ${preview ? 'btn-outline-secondary' : 'btn-secondary'}`}
             onClick={() => setPreview(false)}
+            aria-pressed={!preview}
           >
             {t('edit')}
           </button>
@@ -154,6 +156,7 @@ export function MarkdownEditor({
             className={`btn btn-sm ${preview ? 'btn-secondary' : 'btn-outline-secondary'}`}
             onClick={() => setPreview(true)}
             disabled={!value}
+            aria-pressed={preview}
           >
             {t('preview')}
           </button>

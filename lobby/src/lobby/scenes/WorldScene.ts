@@ -2,9 +2,13 @@ import * as Phaser from 'phaser';
 
 import { busOn } from '../bus';
 import { PRESENCE_INTERVAL_MS } from '../constants';
-import { getContext, type LobbyContext } from '../context';
+import { getContext, type ChatBubble, type LobbyContext } from '../context';
 import type { DeviceSelection, EmoteType, Facing } from '../ports/types';
 import { AvatarSprite } from '../systems/AvatarSprite';
+import { Atmosfera } from '../systems/Atmosfera';
+import { contaUmori, eUmore, UMORE_GLIFO, UMORI, type Umore } from '../umori';
+import { Luoghi } from '../systems/Luoghi';
+import { lookDi, type AvatarLook } from '../avatar/look';
 import { CountdownGate } from '../systems/CountdownGate';
 import { applyNametagCulling, type CullEntry } from '../systems/NametagCulling';
 import { PeerStore, type MergedPeer, type PeerStoreEvent } from '../systems/PeerStore';
@@ -25,6 +29,10 @@ export class WorldScene extends Phaser.Scene {
   private store!: PeerStore;
   private links!: ProximityLinks;
   private gate!: CountdownGate;
+  private luoghi: Luoghi | null = null;
+  private atmosfera: Atmosfera | null = null;
+  private cartelloUmori: Phaser.GameObjects.Text[] = [];
+  private ultimiUmori = '';
 
   private readonly sprites = new Map<string, AvatarSprite>();
   private readonly pool: AvatarSprite[] = [];
@@ -48,6 +56,7 @@ export class WorldScene extends Phaser.Scene {
   private localSeat: { x: number; y: number } | null = null;
 
   private readonly busUnsubs: (() => void)[] = [];
+  private ultimoStato: string | null = null;
 
   constructor() {
     super('World');
@@ -66,7 +75,7 @@ export class WorldScene extends Phaser.Scene {
     if (useClassic) cam.setBackgroundColor('#26344a');
     this.layout = useClassic
       ? buildPlaceholderMap(this, world)
-      : buildPiazzaMap(this, world);
+      : buildPiazzaMap(this, world, this.ctx.config.labels);
     this.initialSeatCount = this.layout.seats.length;
     this.freeSeats = this.layout.seats.map((_, i) => i).reverse();
 
@@ -94,7 +103,13 @@ export class WorldScene extends Phaser.Scene {
         }
       },
       onEmote: (type) => this.localEmote(type),
+      onInteract: () => {
+        const luogo = this.luoghi?.vicino;
+        if (luogo && !this.localInCall) this.ctx.bus.emit('interagisci', luogo.id);
+      },
     });
+    if (this.layout.luoghi?.length) this.luoghi = new Luoghi(this, this.layout.luoghi, this.ctx.bus);
+    if (this.ctx.config.map !== 'classic') this.atmosfera = new Atmosfera(this, this.layout, this.ctx.bus);
 
     this.links = new ProximityLinks(this);
     this.gate = new CountdownGate(
@@ -114,6 +129,9 @@ export class WorldScene extends Phaser.Scene {
     this.store.start();
     for (const peer of this.store.values()) this.onPeerEvent({ type: 'add', peer });
 
+    // Lo stato di partenza: il jingle suona solo a un'apertura vera.
+    this.ultimoStato = this.ctx.schedule.getStatus();
+
     // UI → scene wiring.
     this.busUnsubs.push(
       busOn(this.ctx.bus, 'profileChange', () => this.local.setProfile(this.ctx.getProfile())),
@@ -125,11 +143,40 @@ export class WorldScene extends Phaser.Scene {
       // quando il cancello si apre non genera nessun fronte, e le porte si
       // aprivano su un ingresso che non partiva. Qui si chiude quel buco —
       // l'apertura stessa vale come arrivo al cancello.
-      busOn(this.ctx.bus, 'statusChange', () => this.chiediIngressoSeAlCancello()),
+      busOn(this.ctx.bus, 'statusChange', (s) => {
+        this.chiediIngressoSeAlCancello();
+        // Il cancello che si apre si sente, una volta.
+        if (s === 'live' && this.ultimoStato !== 'live') {
+          this.ctx.audio.gateOpen();
+          this.atmosfera?.fuochi();
+        }
+        this.ultimoStato = s;
+      }),
+      busOn(this.ctx.bus, 'chatMessage', (m) => this.fumetto(m)),
+      busOn(this.ctx.bus, 'chatClear', (id) => {
+        this.local.clearMessage(id);
+        for (const s of this.sprites.values()) s.clearMessage(id);
+      }),
+      busOn(this.ctx.bus, 'chatEdit', ({ id, text }) => {
+        this.local.editMessage(id, text);
+        for (const s of this.sprites.values()) s.editMessage(id, text);
+      }),
+      busOn(this.ctx.bus, 'chatTyping', (nomi) => this.scrivono(nomi)),
+      busOn(this.ctx.bus, 'azione', (id) => this.azione(id)),
+      busOn(this.ctx.bus, 'festa', () => {
+        this.luoghi?.festa(this.localPos.x, this.localPos.y);
+        this.ctx.audio.festa();
+      }),
     );
 
     this.scale.on('resize', this.applyCameraZoom, this);
+    // `game.destroy()` emette DESTROY, non SHUTDOWN: le pulizie (ascoltatori
+    // sul documento compresi) devono girare in tutti e due i casi, una volta.
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
+    this.events.once(Phaser.Scenes.Events.DESTROY, () => this.teardown());
+    // Il cartello dell'umore legge chi è in piazza: dopo che la scena li conosce.
+    this.creaCartelloUmori();
+    this.ctx.bus.emit('sceneReady');
   }
 
   // ── per-frame ──
@@ -146,6 +193,7 @@ export class WorldScene extends Phaser.Scene {
       this.localPos.y = r.y;
       this.local.setLocal(r.x, r.y, r.facing, r.moving);
       this.emitGateZone(r.x, r.y);
+      this.luoghi?.update(r.x, r.y);
       this.throttledMove(delta, r.x, r.y, r.facing);
       this.ctx.audio.footstep(delta, r.moving);
     } else if (this.localSeat) {
@@ -335,10 +383,130 @@ export class WorldScene extends Phaser.Scene {
     return [...this.layout.staticColliders, this.layout.gateBar];
   }
 
+  /** Un'azione chiesta dalla pagina, con il suo effetto nella scena. */
+  private azione(id: string): void {
+    if (this.localInCall) return;
+    const luogo = this.layout.luoghi?.find((l) => l.id === id);
+    if (!luogo) return;
+    if (id === 'caffe') {
+      this.localEmote('caffe');
+    } else if (id === 'fontana' || id === 'pozzo') {
+      this.luoghi?.moneta(this.localPos, luogo);
+      this.ctx.audio.moneta();
+    }
+  }
+
+  /** Quanti per ciascun umore, fra chi è in piazza (io compreso). */
+  umori(): Record<Umore, number> {
+    // Se il servizio di presenza li conta lui (e allora non dice l'umore dei
+    // singoli), valgono i suoi conteggi; altrimenti si contano qui.
+    const daServizio = this.ctx.presence.getUmori?.();
+    if (daServizio) {
+      const conti = contaUmori([]);
+      for (const u of UMORI) conti[u] = Math.max(0, Math.floor(Number(daServizio[u]) || 0));
+      return conti;
+    }
+    const lista: (Umore | null | undefined)[] = [this.ctx.getProfile().umore];
+    for (const peer of this.store.values()) lista.push(eUmore(peer.umore) ? peer.umore : null);
+    return contaUmori(lista);
+  }
+
+  /** Il cartello dell'umore accanto al laboratorio: solo i conteggi. */
+  private creaCartelloUmori(): void {
+    const lab = this.layout.luoghi?.find((l) => l.id === 'laboratorio');
+    if (!lab) return;
+    const x = lab.x + 205;
+    const y = lab.y - 110;
+    const g = this.add.graphics().setDepth(y + 60);
+    g.fillStyle(0x17324d, 0.1);
+    g.fillEllipse(x, y + 60, 90, 16);
+    g.fillStyle(0x17324d, 1);
+    g.fillRect(x - 3, y + 20, 6, 40);
+    g.fillStyle(0xffffff, 1);
+    g.fillRoundedRect(x - 56, y - 30, 112, 56, 10);
+    g.lineStyle(2, 0x17324d, 1);
+    g.strokeRoundedRect(x - 56, y - 30, 112, 56, 10);
+    UMORI.forEach((u, i) => {
+      const t = this.add
+        .text(x - 26 + (i % 2) * 52, y - 16 + Math.floor(i / 2) * 26, `${UMORE_GLIFO[u]} 0`, {
+          fontFamily: 'Titillium Web, system-ui, sans-serif',
+          fontSize: '15px',
+          fontStyle: 'bold',
+          color: '#17324d',
+        })
+        .setOrigin(0.5)
+        .setDepth(y + 61);
+      this.cartelloUmori.push(t);
+    });
+    this.time.addEvent({ delay: 1000, loop: true, callback: () => this.aggiornaCartelloUmori() });
+    this.aggiornaCartelloUmori();
+  }
+
+  private aggiornaCartelloUmori(): void {
+    const conti = this.umori();
+    const firma = UMORI.map((u) => conti[u]).join(',');
+    if (firma === this.ultimiUmori) return;
+    this.ultimiUmori = firma;
+    UMORI.forEach((u, i) => this.cartelloUmori[i]?.setText(`${UMORE_GLIFO[u]} ${conti[u]}`));
+  }
+
+  /** Chi c'è in piazza adesso: io per primo, poi gli altri. */
+  presenti(): { nome: string; look: AvatarLook; io: boolean }[] {
+    const io = this.ctx.getProfile();
+    const lista = [{ nome: io.name, look: lookDi(io), io: true }];
+    for (const peer of this.store.values()) {
+      lista.push({ nome: peer.name, look: lookDi(peer), io: false });
+    }
+    return lista;
+  }
+
   private localEmote(type: EmoteType): void {
     this.local.showEmote(type, performance.now());
     this.ctx.presence.emote(type);
-    this.ctx.audio.emote();
+    this.ctx.audio.emote(type);
+  }
+
+  // ── chat: fumetti e puntini ──
+  // Chi ha scritto si riconosce dal nome mostrato, lo stesso in chat e in
+  // piazza; se due persone hanno lo stesso nome, il fumetto compare su
+  // entrambe.
+  private avatarDi(nome: string): AvatarSprite[] {
+    const chiave = normalizzaNome(nome);
+    if (!chiave) return [];
+    const trovati: AvatarSprite[] = [];
+    if (normalizzaNome(this.ctx.getProfile().name) === chiave) trovati.push(this.local);
+    for (const peer of this.store.values()) {
+      if (normalizzaNome(peer.name) !== chiave) continue;
+      const sprite = this.sprites.get(peer.id);
+      if (sprite) trovati.push(sprite);
+    }
+    return trovati;
+  }
+
+  private fumetto(m: ChatBubble, suono = true): void {
+    // Il mio messaggio va sul mio avatar, qualunque nome mostri la chat.
+    const avatar = m.self ? [this.local] : this.avatarDi(m.name);
+    if (avatar.length === 0) return;
+    const ora = performance.now();
+    // Al caffè si chiacchiera: se ci sono sia chi scrive sia chi legge, il
+    // fumetto resta di più.
+    const caffe = this.layout.luoghi?.find((l) => l.id === 'caffe');
+    const alCaffe = (x: number, y: number): boolean =>
+      !!caffe && Math.hypot(x - caffe.x, y - caffe.y) < caffe.raggio * 1.6;
+    const ioAlCaffe = alCaffe(this.localPos.x, this.localPos.y);
+    for (const a of avatar) a.say(m.text, ora, m.ageMs ?? 0, m.id ?? null, ioAlCaffe && alCaffe(a.x, a.y));
+    // Il «pop» solo se il fumetto si vede.
+    if (suono && avatar.some((a) => !a.isCulled)) this.ctx.audio.pop();
+  }
+
+  private scrivono(nomi: string[]): void {
+    // Un nome vuoto non deve accendere i puntini di tutti gli anonimi.
+    const chiavi = new Set(nomi.map(normalizzaNome).filter(Boolean));
+    const io = normalizzaNome(this.ctx.getProfile().name);
+    this.local.setTyping(!!io && chiavi.has(io));
+    for (const peer of this.store.values()) {
+      this.sprites.get(peer.id)?.setTyping(chiavi.has(normalizzaNome(peer.name)));
+    }
   }
 
   private throttledMove(delta: number, x: number, y: number, facing: Facing): void {
@@ -414,20 +582,34 @@ export class WorldScene extends Phaser.Scene {
     // Show more of the piazza (smaller avatars/props): frame the FULL world
     // height and pan horizontally. We no longer force the world to fill the
     // viewport — a calm pastel margin reads better than a zoomed-in slice.
-    const DESIRED_VIEW_H = world.h;
+    // Nella piazza si guarda un po' più da vicino (circa tre quarti
+    // dell'altezza del mondo): i personaggi e i loro vestiti si riconoscono,
+    // e la telecamera segue il proprio. La mappa classica mostra tutto.
+    const piazza = this.ctx.config.map !== 'classic';
+    const DESIRED_VIEW_H = piazza ? Math.round(world.h * 0.72) : world.h;
     let zoom = vh / DESIRED_VIEW_H;
     zoom = Math.min(1.2, Math.max(0.42, zoom));
     this.cameras.main.setZoom(zoom);
   };
 
+  private smontata = false;
+
   private teardown(): void {
+    if (this.smontata) return;
+    this.smontata = true;
     this.scale.off('resize', this.applyCameraZoom, this);
+    this.luoghi?.destroy();
+    this.atmosfera?.destroy();
     for (const u of this.busUnsubs) u();
     this.busUnsubs.length = 0;
     this.movement.destroy();
     this.store.stop();
     this.gate.destroy();
   }
+}
+
+function normalizzaNome(nome: string): string {
+  return nome.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
 
 function rectContainsMargin(
@@ -443,3 +625,4 @@ function rectContainsMargin(
     y <= view.bottom + margin
   );
 }
+

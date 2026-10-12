@@ -48,9 +48,19 @@ export const MATERIAL_FILE_MAX_BYTES = 25 * 1024 * 1024;
 export const MATERIAL_FILES_PER_EVENT_MAX = 50;
 export const MATERIAL_FILES_PER_EVENT_MAX_BYTES = 500 * 1024 * 1024;
 
+/**
+ * L'indirizzo di un materiale: solo http e https. Un materiale e' un link
+ * cliccato da chi partecipa, e `javascript:` o `data:` non ci devono stare
+ * nemmeno quando l'interfaccia li renderebbe innocui.
+ */
+export const materialUrlSchema = z
+  .string()
+  .url()
+  .refine((v) => /^https?:\/\//i.test(v), { message: 'Only http and https addresses' });
+
 export const materialBaseSchema = z.object({
   title: z.string().min(1).max(300),
-  url: z.string().url(),
+  url: materialUrlSchema,
   description: z.string().max(500).nullable().optional(),
   type: z.enum(MATERIAL_TYPES).default('LINK'),
   fileName: z.string().max(500).nullable().optional(),
@@ -68,3 +78,23 @@ export const updateMaterialAdminSchema = materialBaseSchema.partial();
 
 export type CreateMaterialAdminInput = z.infer<typeof createMaterialAdminSchema>;
 export type UpdateMaterialAdminInput = z.infer<typeof updateMaterialAdminSchema>;
+
+/**
+ * Cosa chi conduce può cambiare di un materiale dalla sala
+ * (PATCH /api/events/[param]/materials/[id]): titolo, descrizione e fase,
+ * con gli stessi limiti della creazione. L'indirizzo no: per un file punta al
+ * blob caricato, e un link sbagliato si toglie e si aggiunge di nuovo.
+ * Almeno un campo; una descrizione vuota (o null) la toglie.
+ */
+export const updateMaterialRoomSchema = z
+  .object({
+    title: z.string().trim().min(1).max(300).optional(),
+    description: z.string().trim().max(500).nullable().optional(),
+    visibility: z.enum(MATERIAL_VISIBILITIES).optional(),
+  })
+  .strict()
+  .refine((v) => v.title !== undefined || v.description !== undefined || v.visibility !== undefined, {
+    message: 'Nothing to update',
+  });
+
+export type UpdateMaterialRoomInput = z.infer<typeof updateMaterialRoomSchema>;

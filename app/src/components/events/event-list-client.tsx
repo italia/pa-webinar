@@ -40,9 +40,11 @@ interface EventItem {
   /** Per-event override for the kicker parse. Null = inherit site default. */
   parseTitleKicker?: boolean | null;
   tags?: EventTag[];
+  /** La descrizione come testo semplice, preparata sul server (event-list.tsx). */
+  descrizioneTesto?: string;
 }
 
-interface EventListClientProps {
+export interface EventListClientProps {
   events: EventItem[];
   muted?: boolean;
   /** Site-wide default for the kicker parse, used when an event has no override. */
@@ -79,7 +81,10 @@ export default function EventListClient({
     <Row className="g-4">
       {events.map((event) => {
         const title = getLocalized(event.title, locale);
-        const desc = getLocalized(event.description as LocalizedField, locale);
+        // La descrizione e' in Markdown: nella scheda va il testo, non la
+        // sintassi. La prepara il server (event-list.tsx), cosi' il lettore
+        // Markdown non arriva nel browser.
+        const desc = event.descrizioneTesto ?? '';
         const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
         const isLive = event.status === 'LIVE';
         const isEnded = event.status === 'ENDED';
@@ -100,7 +105,7 @@ export default function EventListClient({
         return (
           <Col key={event.id} xs={12} md={6} lg={4}>
             <Card
-              className={`event-card h-100 mb-0${muted ? ' opacity-75' : ''}`}
+              className="event-card h-100 mb-0"
               style={{
                 borderTop: `4px solid ${borderColor}`,
                 borderRadius: 8,
@@ -123,19 +128,18 @@ export default function EventListClient({
                 />
               )}
               <CardBody className="d-flex flex-column p-4">
+                {/* Solo cio' che distingue la scheda: che l'evento e' pubblico
+                    lo dice gia' l'elenco in cui sta. */}
+                {(isLive || (isEnded && muted)) && (
                 <div className="mb-3">
-                  <Badge color="primary" className="me-2">
-                    {t('card.publicEvent')}
-                  </Badge>
                   {isLive && (
                     <Badge color="success" className="d-inline-flex align-items-center gap-1">
                       <span
-                        className="rounded-circle d-inline-block"
+                        className="rounded-circle d-inline-block pulse-dot"
                         style={{
                           width: 7,
                           height: 7,
                           backgroundColor: '#fff',
-                          animation: 'pulse-dot 1.5s ease-in-out infinite',
                         }}
                       />
                       {t('card.liveNow')}
@@ -145,6 +149,7 @@ export default function EventListClient({
                     <Badge color="secondary">{t('card.ended')}</Badge>
                   )}
                 </div>
+                )}
 
                 <EventTitle
                   title={title}

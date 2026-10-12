@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db';
 import { timerActionSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
+import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,9 @@ interface TimerState {
 function getTimerKey(eventId: string): string {
   return `timer:${eventId}`;
 }
+
+/** Quanto resta visibile «Tempo scaduto» prima che il timer si spenga. */
+const SCADUTO_VISIBILE_MS = 30_000;
 
 function resolveRemaining(state: TimerState): number {
   if (!state.active || !state.startedAt) return state.remaining;
@@ -64,8 +68,13 @@ export const POST = withErrorHandling(async (request, context) => {
   const { action, duration, visible } = parsed.data;
   const key = getTimerKey(event.id);
   let state = getCached<TimerState>(key);
+  // Il conto alla rovescia stava correndo? Pausa e azzeramento finiscono
+  // nella cronologia solo se fermano davvero qualcosa.
+  const correvaPrima =
+    !!state && state.active && !!state.startedAt && !state.pausedAt && resolveRemaining(state) > 0;
 
   const TTL = 7200_000;
+  let ripreso = false;
 
   switch (action) {
     case 'start': {
@@ -78,6 +87,13 @@ export const POST = withErrorHandling(async (request, context) => {
         startedAt: Date.now(),
         pausedAt: null,
       };
+      break;
+    }
+    case 'resume': {
+      if (state && state.active && state.pausedAt) {
+        state = { ...state, startedAt: Date.now(), pausedAt: null };
+        ripreso = true;
+      }
       break;
     }
     case 'pause': {
@@ -118,6 +134,24 @@ export const POST = withErrorHandling(async (request, context) => {
     setCache(key, state, TTL);
   }
 
+  if (action === 'start' && state) {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'timer.started',
+      actor: 'moderator',
+      data: { durationSec: state.duration },
+    });
+  } else if (ripreso && state) {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'timer.started',
+      actor: 'moderator',
+      data: { durationSec: state.duration, resumed: true },
+    });
+  } else if ((action === 'pause' || action === 'reset') && correvaPrima) {
+    await recordLiveAction({ eventId: event.id, kind: 'timer.stopped', actor: 'moderator' });
+  }
+
   const remaining = state ? resolveRemaining(state) : 0;
 
   return Response.json({
@@ -126,6 +160,7 @@ export const POST = withErrorHandling(async (request, context) => {
     remaining: Math.round(remaining),
     visible: state?.visible ?? false,
     paused: state?.pausedAt !== null && state?.pausedAt !== undefined,
+    serverNow: new Date().toISOString(),
   });
 });
 
@@ -149,13 +184,17 @@ export const GET = withErrorHandling(async (_request, context) => {
       remaining: 0,
       visible: false,
       paused: false,
+      serverNow: new Date().toISOString(),
     });
   }
 
   const remaining = resolveRemaining(state);
 
-  // Auto-expire
-  if (state.active && remaining <= 0) {
+  // Allo zero il timer resta acceso ancora un po', così «Tempo scaduto» si
+  // vede anche da chi in quel momento guardava altrove; poi si spegne.
+  const scadutoAlle =
+    state.active && state.startedAt && !state.pausedAt ? state.startedAt + state.remaining * 1000 : null;
+  if (state.active && remaining <= 0 && (scadutoAlle === null || Date.now() - scadutoAlle >= SCADUTO_VISIBILE_MS)) {
     state.active = false;
     state.remaining = 0;
     state.startedAt = null;
@@ -168,5 +207,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     remaining: Math.round(Math.max(0, remaining)),
     visible: state.visible,
     paused: state.pausedAt !== null && state.pausedAt !== undefined,
+    // L'ora del server: la sala ne ricava lo scarto del proprio orologio.
+    serverNow: new Date().toISOString(),
   });
 });

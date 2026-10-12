@@ -58,13 +58,15 @@ describe('closeOpenSessions', () => {
   });
 });
 
+const LIMITS = { siteGraceMinutes: 60, overtimeEmptyMinutes: 20 };
+
 describe('staleSessionCloseTime', () => {
   const base = {
     startedAt: at(-120),
     endsAt: at(-60),
     lastActiveAt: null,
     gracePeriodMinutes: null,
-    siteGraceMinutes: 15,
+    limits: LIMITS,
     now: NOW,
   };
 
@@ -72,8 +74,14 @@ describe('staleSessionCloseTime', () => {
     expect(staleSessionCloseTime({ ...base, updatedAt: at(-70) })).toEqual(at(-70));
   });
 
-  it('una modifica successiva non va oltre la fine programmata più la grace', () => {
-    expect(staleSessionCloseTime({ ...base, updatedAt: at(-5) })).toEqual(at(-45));
+  it('una modifica successiva non va oltre la fine programmata più la finestra della sala vuota', () => {
+    expect(staleSessionCloseTime({ ...base, updatedAt: at(-5) })).toEqual(at(-40));
+  });
+
+  it('un tetto del fuori orario più corto della finestra della sala vuota vince', () => {
+    expect(
+      staleSessionCloseTime({ ...base, updatedAt: at(-5), gracePeriodMinutes: 15 }),
+    ).toEqual(at(-45));
   });
 
   it('un\'attività più tarda sposta il limite', () => {
@@ -115,18 +123,18 @@ describe('closeSessionsOfEndedEvents', () => {
     db.addSession({ id: 's2', eventId: 'archiviato', startedAt: at(-100) });
     db.addSession({ id: 's3', eventId: 'vivo', startedAt: at(-100) });
 
-    const n = await closeSessionsOfEndedEvents(tx(db), NOW, 15);
+    const n = await closeSessionsOfEndedEvents(tx(db), NOW, LIMITS);
 
     expect(n).toBe(2);
     expect(db.session('s1')?.endedAt).toEqual(at(-50));
-    expect(db.session('s2')?.endedAt).toEqual(at(-45));
+    expect(db.session('s2')?.endedAt).toEqual(at(-40));
     expect(db.session('s3')?.endedAt).toBeNull();
   });
 
   it('senza niente da riparare non scrive', async () => {
     const db = new FakeLifecycleDb(() => NOW);
     db.addEvent({ id: 'finito', status: 'ENDED' });
-    expect(await closeSessionsOfEndedEvents(tx(db), NOW, 15)).toBe(0);
+    expect(await closeSessionsOfEndedEvents(tx(db), NOW, LIMITS)).toBe(0);
     expect(db.writes).toEqual([]);
   });
 });
@@ -137,7 +145,7 @@ describe('closeStaleSessions', () => {
     db.addEvent({ id: 'incagliato', status: 'LIVE', endsAt: at(-600), gracePeriodMinutes: 0, updatedAt: at(-500) });
     db.addSession({ id: 's', eventId: 'incagliato', startedAt: at(-660) });
 
-    expect(await closeStaleSessions(tx(db), ['incagliato'], NOW, 15)).toBe(1);
+    expect(await closeStaleSessions(tx(db), ['incagliato'], NOW, LIMITS)).toBe(1);
     expect(db.session('s')).toMatchObject({ endedAt: at(-600), duration: 3600 });
   });
 });

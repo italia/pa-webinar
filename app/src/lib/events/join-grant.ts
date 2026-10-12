@@ -24,7 +24,10 @@ export async function hasJoinGrant(eventId: string): Promise<boolean> {
   try {
     const secret = new TextEncoder().encode(appSecret);
     const { payload } = await jwtVerify(cookie, secret);
-    return payload.eventId === eventId;
+    // Solo il permesso dato dalla password (verify-password lo firma con
+    // role 'guest'): un altro cookie firmato con lo stesso segreto e con lo
+    // stesso evento, come quello d'accesso dell'iscrizione, non vale.
+    return payload.eventId === eventId && payload.role === 'guest';
   } catch {
     return false;
   }

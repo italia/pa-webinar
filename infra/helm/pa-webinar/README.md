@@ -1,6 +1,6 @@
 # PA Webinar Helm chart
 
-This chart installs [PA Webinar](https://github.com/italia/pa-webinar), the open-source webinar and virtual-event platform for Italian public administrations (PA). A release always contains the portal, a Next.js application whose pods apply database migrations in the `db-migrate` init container, and, by default, its scheduled jobs (`cronjobs.*.enabled`). Values control the rest: Jitsi Meet through the `jitsi-meet` subchart (web, Prosody, Jicofo, Jitsi Videobridge (JVB), and optionally Jibri and coturn), PostgreSQL and Redis through Bitnami subcharts, the JVB scaler, the recorder bot for per-participant recording and the recorder controller, the AI post-production jobs, a NetworkPolicy and Prometheus Operator resources.
+This chart installs [PA Webinar](https://github.com/italia/pa-webinar), the open-source webinar and virtual-event platform for Italian public administrations (PA). A release always contains the portal, a Next.js application whose pods apply database migrations in the `db-migrate` init container, and, by default, its scheduled jobs (`cronjobs.*.enabled`). Values control the rest: Jitsi Meet through the `jitsi-meet` subchart (web, Prosody, Jicofo, Jitsi Videobridge (JVB), and optionally Jibri and coturn), PostgreSQL and Redis through Bitnami subcharts, the JVB scaler, the recorder bot for per-participant recording and the recorder controller, the live captions service (`global.captions`), the AI post-production jobs, a NetworkPolicy and Prometheus Operator resources.
 
 ## Dependencies
 

@@ -28,6 +28,25 @@ interface Props {
   ratioRequiredAboveParticipants?: number;
 }
 
+/** Gli avvisi che l'anteprima mostrera': chi la tiene in una sezione
+ *  ripiegata la apre quando ce n'e' uno. */
+export function capacityWarnings({
+  maxParticipants,
+  senderRatioPct,
+  videoEnabled,
+  defaultSenderRatioPct,
+  sizingConfig,
+  ratioRequiredAboveParticipants = 100,
+}: Omit<Props, 'onSenderRatioChange'>): { atCeiling: boolean; shouldWarnInherited: boolean } {
+  const effectiveRatio = videoEnabled ? (senderRatioPct ?? defaultSenderRatioPct) : 0;
+  const pods = jvbsForEvent(Math.max(0, maxParticipants), effectiveRatio, videoEnabled, sizingConfig);
+  return {
+    atCeiling: pods >= sizingConfig.maxReplicas && maxParticipants > 0,
+    shouldWarnInherited:
+      senderRatioPct === null && videoEnabled && maxParticipants >= ratioRequiredAboveParticipants,
+  };
+}
+
 export default function JvbCapacityPreview({
   maxParticipants,
   senderRatioPct,

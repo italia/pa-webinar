@@ -2,8 +2,14 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import PublicationsDashboard from '@/components/admin/publications-dashboard';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/publications');
+}
 
 export default async function PublicationsPage() {
   const locale = await getLocale();
@@ -14,14 +20,7 @@ export default async function PublicationsPage() {
 
   return (
     <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
-        <div>
-          <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-            {t('title')}
-          </h1>
-          <p className="text-secondary mb-0">{t('subtitle')}</p>
-        </div>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/publications')} subtitle={t('subtitle')} />
       <PublicationsDashboard />
     </div>
   );

@@ -27,7 +27,7 @@ that reuses the platform, because the people who administer an installation chan
 `StaffRole` is `ORGANIZER` or `ADMIN`, with `ORGANIZER` as the default (`app/prisma/schema.prisma`).
 An `ADMIN` account signs in exactly like an organizer, with a one-time sign-in link sent to its email
 address and no password. It has the same powers as the key: site settings, every event and its data,
-the address book, the **GDPR audit** page and the staff accounts themselves.
+the address book, the **GDPR log** page and the staff accounts themselves.
 
 Administrators manage staff accounts on the **Accounts** page (`/admin/organizers`, titled **Staff
 accounts**). There they create an account with either role, promote an organizer, demote an

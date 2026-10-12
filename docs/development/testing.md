@@ -12,7 +12,7 @@ Run every command from the repository root unless a row or block says otherwise.
 |---|---|---|---|---|
 | Lint and type check | ESLint rules and TypeScript `strict` for the `app` workspace | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | Nothing | **Lint & Typecheck** |
 | App unit and guard tests | The Vitest suite under `app/src/` | `npm run test --workspace=app` (also `test:watch`, `test:coverage`) | Nothing: no database, Redis or Jitsi | **Unit Tests**, with the coverage thresholds |
-| Recorder bot and recorder controller | Pure logic of `infra/recorder` and `infra/recorder-controller` | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
+| Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
 | AI worker | Pure logic of the post-production worker | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Python. No GPU, no models | **Unit Tests (worker AI)** |
 | Helm chart | The chart renders on every profile and meets the installation invariants | `./scripts/validate-chart.sh` | Helm, `python3` with PyYAML, `openssl`, the subcharts | **Helm Chart**, plus a server-side dry run on kind |
@@ -167,7 +167,7 @@ The job is `continue-on-error`, because the stack pulls several images from Dock
 
 ### Recorder bot and controller
 
-`infra/recorder` is the headless-Chrome bot. `infra/recorder-controller` is the reconciling controller that starts it. They are standalone npm packages with their own lockfiles, outside the npm workspaces, so run `npm ci` in each folder before its first test run.
+`infra/recorder` is the headless-Chrome bot. `infra/recorder-controller` is the reconciling controller that starts it. They are standalone npm packages with their own lockfiles, outside the npm workspaces, so run `npm ci` in each folder before its first test run. The live captions gateway, `infra/captions/gateway`, is another such package, tested the same way; the speech engine it drives is measured, not unit-tested, by `infra/captions/bench`.
 
 The tests cover pure logic:
 

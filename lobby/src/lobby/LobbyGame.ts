@@ -3,13 +3,15 @@ import * as Phaser from 'phaser';
 import { busOn, createBus, type LobbyBus } from './bus';
 import { DEFAULT_CAPACITY, DEFAULT_WORLD } from './constants';
 import { CONTEXT_KEY, type LobbyContext, type ResolvedConfig } from './context';
-import type { PlayerProfile } from './ports/types';
+import type { EmoteType, PlayerProfile } from './ports/types';
 import { DEFAULT_GATE_LABELS, type LobbyConfig, type LobbyDeps } from './public-types';
 import { BootScene } from './scenes/BootScene';
 import { WorldScene } from './scenes/WorldScene';
 import { lobbyStorage } from './storage';
 import { AudioSystem } from './systems/AudioSystem';
 import { AVATAR_COLORS } from './systems/AvatarTextureFactory';
+import { contaUmori, type Umore } from './umori';
+import { CAPPELLI, lookCasuale, lookDaVecchio, normalizzaLook, stessoLook, type AvatarLook } from './avatar/look';
 import { ConfigPanel } from './ui/ConfigPanel';
 import { Joystick } from './ui/Joystick';
 import { Onboarding } from './ui/Onboarding';
@@ -42,12 +44,19 @@ export class LobbyGame {
   private readonly busUnsubs: (() => void)[] = [];
   private gestureUnsub: (() => void) | null = null;
   private destroyed = false;
+  /** Si risolve quando la scena è partita (Phaser parte in modo asincrono):
+   *  da lì in poi gli eventi del bus hanno chi li ascolta. */
+  readonly ready: Promise<void>;
+  private segnalaPronta: () => void = () => undefined;
 
   constructor(
     private readonly container: HTMLElement,
     config: LobbyConfig,
     private readonly deps: LobbyDeps,
   ) {
+    this.ready = new Promise<void>((risolvi) => {
+      this.segnalaPronta = risolvi;
+    });
     const resolved: ResolvedConfig = {
       worldSize: config.worldSize ?? { ...DEFAULT_WORLD },
       capacityHint: config.capacityHint ?? DEFAULT_CAPACITY,
@@ -61,6 +70,12 @@ export class LobbyGame {
     this.onExitToClassic = config.onExitToClassic;
     this.profile = this.buildInitialProfile(config.initialProfile);
     this.bus = createBus();
+    // Prima di creare il gioco: la scena può partire in qualsiasi momento.
+    this.busUnsubs.push(
+      busOn(this.bus, 'sceneReady', () => this.segnalaPronta()),
+      busOn(this.bus, 'luogo', (id) => config.onLuogo?.(id)),
+      busOn(this.bus, 'interagisci', (id) => config.onInteragisci?.(id)),
+    );
     this.audio = new AudioSystem();
 
     // ── DOM scaffolding ──
@@ -142,14 +157,20 @@ export class LobbyGame {
     );
     this.bus.emit('audioState', this.audio.isEnabled());
 
-    // Resume audio on the first user gesture (autoplay policy).
-    const resumeAudio = (): void => this.audio.resume();
-    document.addEventListener('pointerdown', resumeAudio, { once: true });
-    document.addEventListener('keydown', resumeAudio, { once: true });
-    this.gestureUnsub = () => {
-      document.removeEventListener('pointerdown', resumeAudio);
-      document.removeEventListener('keydown', resumeAudio);
+    // L'audio parte solo dopo un gesto della persona. Si riprova a ogni gesto
+    // finché il contesto non è davvero in funzione: col tocco, su un
+    // telefono, il primo `pointerdown` non basta al browser (conta il
+    // rilascio, o il clic).
+    const GESTI_AUDIO = ['pointerup', 'touchend', 'click', 'keydown'] as const;
+    const resumeAudio = (): void => {
+      this.audio.resume();
+      if (this.audio.inFunzione()) togli();
     };
+    const togli = (): void => {
+      for (const ev of GESTI_AUDIO) document.removeEventListener(ev, resumeAudio, true);
+    };
+    for (const ev of GESTI_AUDIO) document.addEventListener(ev, resumeAudio, true);
+    this.gestureUnsub = togli;
   }
 
   setProfile(p: Partial<PlayerProfile>): void {
@@ -167,15 +188,98 @@ export class LobbyGame {
       this.profile.accessories = { ...this.profile.accessories, ...p.accessories };
       delta.accessories = { ...this.profile.accessories };
     }
+    if (p.umore !== undefined && p.umore !== (this.profile.umore ?? null)) {
+      this.profile.umore = p.umore;
+      delta.umore = p.umore;
+    }
+    if (p.look !== undefined) {
+      const look = normalizzaLook(p.look);
+      if (!this.profile.look || !stessoLook(look, this.profile.look)) {
+        this.profile.look = look;
+        delta.look = look;
+      }
+    } else if (delta.color !== undefined || delta.accessories !== undefined) {
+      // La barra dei colori della piazza da sola cambia maglia, caschetto e
+      // occhiali: l'aspetto li segue.
+      const { helmet = false, glasses = false } = this.profile.accessories;
+      const base = this.profile.look ?? lookDaVecchio(this.profile.color, helmet, glasses);
+      const caschetto = CAPPELLI.indexOf('caschetto');
+      this.profile.look = {
+        ...base,
+        coloreMaglia: lookDaVecchio(this.profile.color, false, false).coloreMaglia,
+        cappello: helmet ? caschetto : base.cappello === caschetto ? 0 : base.cappello,
+        occhiali: glasses ? 1 : base.occhiali === 1 ? 0 : base.occhiali,
+      };
+      delta.look = this.profile.look;
+    }
     if (Object.keys(delta).length === 0) return;
 
     lobbyStorage.setProfile({
       name: this.profile.name,
       color: this.profile.color,
       accessories: this.profile.accessories,
+      ...(this.profile.look ? { look: this.profile.look } : {}),
     });
     this.deps.presence.setProfile(delta);
     this.bus.emit('profileChange', delta);
+  }
+
+  // La chat: chi ospita la piazza aspetta `ready` prima di mandarla (il bus
+  // non conserva gli eventi che nessuno ascolta) e tiene lui i messaggi
+  // recenti per chi apre la piazza dopo.
+  showChatMessage(name: string, text: string, ageMs = 0, id?: string, self = false): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatMessage', { name, text, ageMs, id, self });
+  }
+
+  clearChatMessage(id: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatClear', id);
+  }
+
+  editChatMessage(id: string, text: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatEdit', { id, text });
+  }
+
+  setTyping(names: string[]): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatTyping', names);
+  }
+
+  emote(type: EmoteType): void {
+    if (this.destroyed) return;
+    this.bus.emit('emote', type);
+  }
+
+  azione(id: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('azione', id);
+  }
+
+  festa(): void {
+    if (this.destroyed) return;
+    this.bus.emit('festa');
+  }
+
+  /** Quanti per ciascun umore, fra chi è in piazza (io compreso). */
+  umori(): Record<Umore, number> {
+    if (this.destroyed) return contaUmori([]);
+    const scena = this.game.scene.getScene('World') as WorldScene | null;
+    return scena?.sys.isActive() ? scena.umori() : contaUmori([this.profile.umore]);
+  }
+
+  presenti(): { nome: string; look: AvatarLook; io: boolean }[] {
+    if (this.destroyed) return [];
+    const scena = this.game.scene.getScene('World') as WorldScene | null;
+    return scena?.sys.isActive() ? scena.presenti() : [];
+  }
+
+  setAudio(on: boolean): boolean {
+    if (this.destroyed) return false;
+    const stato = this.audio.setEnabled(on);
+    this.bus.emit('audioState', stato);
+    return stato;
   }
 
   destroy(): void {
@@ -224,6 +328,8 @@ export class LobbyGame {
       name: this.profile.name,
       color: this.profile.color,
       accessories: { ...this.profile.accessories },
+      ...(this.profile.look ? { look: { ...this.profile.look } } : {}),
+      umore: this.profile.umore ?? null,
     };
   }
 
@@ -237,6 +343,9 @@ export class LobbyGame {
         helmet: seed?.accessories?.helmet ?? persisted?.accessories?.helmet ?? false,
         glasses: seed?.accessories?.glasses ?? persisted?.accessories?.glasses ?? false,
       },
+      // Senza un aspetto scelto, uno a caso: in piazza non si è mai tutti
+      // uguali.
+      look: seed?.look || persisted?.look ? normalizzaLook(seed?.look ?? persisted?.look) : lookCasuale(),
     };
   }
 }
@@ -250,7 +359,8 @@ function injectStyles(): HTMLStyleElement {
 }
 
 function genId(): string {
-  const c = globalThis.crypto as Crypto | undefined;
-  if (c && typeof c.randomUUID === 'function') return `self_${c.randomUUID().slice(0, 8)}`;
-  return `self_${Math.random().toString(36).slice(2, 10)}`;
+  // getRandomValues c'e' anche fuori da HTTPS, dove manca randomUUID: niente
+  // ripiego su Math.random. Otto caratteri esadecimali, come prima.
+  const b = globalThis.crypto.getRandomValues(new Uint8Array(4));
+  return `self_${Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('')}`;
 }

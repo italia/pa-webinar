@@ -30,11 +30,33 @@ function fullSource(): DuplicateSource {
       { name: 'Ente A', logoUrl: null, websiteUrl: 'https://esempio.gov.it', sortOrder: 0 },
     ],
     additionalMods: [
-      { name: 'cifrato:nome', email: 'cifrato:email', role: 'MODERATOR' },
-      { name: 'cifrato:nome2', email: null, role: 'SPEAKER' },
+      {
+        name: 'cifrato:nome',
+        email: 'cifrato:email',
+        emailHash: 'impronta',
+        role: 'MODERATOR',
+        organizer: true,
+        organization: 'Ente B',
+        organizationLogoUrl: '/api/assets/images/b.png',
+      },
+      {
+        name: 'cifrato:nome2',
+        email: null,
+        emailHash: null,
+        role: 'SPEAKER',
+        organizer: false,
+        organization: null,
+        organizationLogoUrl: null,
+      },
     ],
-    agendaItems: [{ label: 'Apertura', sortOrder: 0 }],
+    agendaItems: [
+      { label: 'Apertura', sortOrder: 0, plannedMinutes: 10 },
+      { label: 'Domande', sortOrder: 1, plannedMinutes: null },
+    ],
     reminders: [{ offsetMinutes: 1440, label: 'Un giorno prima' }],
+    glossaryTerms: [
+      { term: 'ACN', aliases: ['a ci enne'], reading: 'spell', spoken: {}, translations: { en: 'ACN' }, note: 'Agenzia' },
+    ],
     questionnaires: [
       {
         placement: 'POST_EVENT',
@@ -106,14 +128,28 @@ describe('classificazione delle relazioni di Event', () => {
     expect(DUPLICATE_SOURCE_INCLUDE.additionalMods.where).toEqual({ revokedAt: null });
   });
 
-  it('non legge lo stato di esecuzione della scaletta', () => {
+  it('non legge lo stato di esecuzione dell’agenda', () => {
     const selected = Object.keys(DUPLICATE_SOURCE_INCLUDE.agendaItems.select);
     expect(selected).not.toContain('completed');
     expect(selected).not.toContain('completedAt');
+    expect(selected).not.toContain('status');
+    expect(selected).not.toContain('startedAt');
   });
 });
 
 describe('duplicatedRelations', () => {
+  it('copia ruolo ed ente delle persone, non la pubblicazione', () => {
+    const out = duplicatedRelations(fullSource());
+    const created = out.additionalMods?.create as Record<string, unknown>[];
+    expect(created[0]).toMatchObject({
+      organizer: true,
+      organization: 'Ente B',
+      organizationLogoUrl: '/api/assets/images/b.png',
+      publicListed: false,
+    });
+    expect(created[1]).toMatchObject({ organizer: false, publicListed: false });
+  });
+
   it('non eredita MAI il token dei co-moderatori: è una credenziale', () => {
     const out = duplicatedRelations(fullSource());
     const created = out.additionalMods?.create as { token: string }[];
@@ -126,10 +162,11 @@ describe('duplicatedRelations', () => {
     expect(new Set(tokens).size).toBe(2);
   });
 
-  it('copia la scaletta ma non il suo stato di esecuzione', () => {
+  it('copia l’agenda ma non il suo stato di esecuzione', () => {
     const out = duplicatedRelations(fullSource());
     const items = out.agendaItems?.create as Record<string, unknown>[];
-    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0 });
+    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0, plannedMinutes: 10 });
+    expect(items[1]).toEqual({ label: 'Domande', sortOrder: 1 });
     expect(items[0]?.completed).toBeUndefined();
     expect(items[0]?.completedAt).toBeUndefined();
   });
@@ -164,6 +201,7 @@ describe('duplicatedRelations', () => {
       agendaItems: [],
       reminders: [],
       questionnaires: [],
+      glossaryTerms: [],
     };
     expect(duplicatedRelations(empty)).toEqual({});
   });
@@ -175,6 +213,10 @@ describe('duplicatedRelations', () => {
       { name: 'Ente A', logoUrl: null, websiteUrl: 'https://esempio.gov.it', sortOrder: 0 },
     ]);
     expect(out.reminders?.create).toEqual([{ offsetMinutes: 1440, label: 'Un giorno prima' }]);
+    // Il glossario dell'evento si eredita: le sigle di una serie si ripetono.
+    expect(out.glossaryTerms?.create).toEqual([
+      { term: 'ACN', aliases: ['a ci enne'], reading: 'spell', spoken: {}, translations: { en: 'ACN' }, note: 'Agenzia' },
+    ]);
     const q = (out.questionnaires?.create as Record<string, unknown>[])[0]!;
     expect(q.placement).toBe('POST_EVENT');
     expect(q.templates).toEqual({ create: [{ templateId: 'tpl-1', sortOrder: 0 }] });

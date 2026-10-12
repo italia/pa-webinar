@@ -232,5 +232,13 @@ export const POST = withErrorHandling(async (request) => {
     target: event.id,
   });
 
-  return Response.json(event, { status: 201 });
+  // BigInt: JSON.stringify non lo sa scrivere. Esce come numero, come nella
+  // GET di un evento.
+  return Response.json(
+    {
+      ...event,
+      recordingFileSize: event.recordingFileSize === null ? null : Number(event.recordingFileSize),
+    },
+    { status: 201 },
+  );
 });

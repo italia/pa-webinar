@@ -5,6 +5,7 @@ import {
   registrationJoinUrl,
   signRegistrationEntry,
   verifyRegistrationEntry,
+  verifyRegistrationProof,
 } from './registration-link';
 
 const EVENT_ID = '11111111-1111-4111-8111-111111111111';
@@ -60,11 +61,29 @@ describe('registrationJoinUrl', () => {
         accessToken: TOKEN,
         locale: 'en',
         viaEmailEntry: true,
+        bindsIdentity: true,
       }),
     );
     expect(url.origin + url.pathname).toBe(`${BASE}/api/events/evento/registrations/enter`);
     expect(url.searchParams.get('token')).toBe(TOKEN);
     expect(url.searchParams.get('lang')).toBe('en');
     expect(verifyRegistrationEntry(EVENT_ID, TOKEN, url.searchParams.get('sig') ?? '')).toBe(true);
+    expect(url.searchParams.get('proof')).toBeNull();
+  });
+
+  it("iscrizione pubblica: la firma che prova l'indirizzo, non quella che lega", () => {
+    const url = new URL(
+      registrationJoinUrl({
+        baseUrl: BASE,
+        slug: 'evento',
+        eventId: EVENT_ID,
+        accessToken: TOKEN,
+        locale: 'it',
+        viaEmailEntry: true,
+      }),
+    );
+    expect(url.searchParams.get('sig')).toBeNull();
+    expect(verifyRegistrationProof(EVENT_ID, TOKEN, url.searchParams.get('proof') ?? '')).toBe(true);
+    expect(verifyRegistrationEntry(EVENT_ID, TOKEN, url.searchParams.get('proof') ?? '')).toBe(false);
   });
 });

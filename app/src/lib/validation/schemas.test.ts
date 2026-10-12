@@ -4,7 +4,7 @@ import {
   updateEventSchema,
   createRegistrationSchema,
   createQuestionSchema,
-  updateQuestionStatusSchema,
+  updateQuestionSchema,
   jitsiTokenRequestSchema,
   createMaterialSchema,
   createReminderSchema,
@@ -13,6 +13,8 @@ import {
   pollVoteSchema,
   createInstantCallSchema,
   VALID_OFFSETS,
+  createQuestionTemplateSchema,
+  updateQuestionTemplateSchema,
 } from './schemas';
 
 // ── Helpers ─────────────────────────────────────────────────
@@ -56,6 +58,15 @@ describe('createEventSchema', () => {
       dataRetentionDays: 60,
     });
     expect(result.success).toBe(true);
+  });
+
+  it('treats an empty privacy text as no text, so the GDPR template applies', () => {
+    const vuoto = createEventSchema.safeParse({ ...validEvent(), privacyPolicyText: '  ' });
+    expect(vuoto.success && vuoto.data.privacyPolicyText).toBeNull();
+    const assente = updateEventSchema.safeParse({});
+    expect(assente.success && assente.data.privacyPolicyText).toBeUndefined();
+    const testo = updateEventSchema.safeParse({ privacyPolicyText: 'Informativa' });
+    expect(testo.success && testo.data.privacyPolicyText).toBe('Informativa');
   });
 
   it('rejects missing title', () => {
@@ -395,20 +406,37 @@ describe('createQuestionSchema', () => {
   });
 });
 
-// ── updateQuestionStatusSchema ──────────────────────────────
+// ── updateQuestionSchema ──────────────────────────────
 
-describe('updateQuestionStatusSchema', () => {
+describe('updateQuestionSchema', () => {
   it.each(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED'])(
     'accepts status "%s"',
     (status) => {
-      const result = updateQuestionStatusSchema.safeParse({ status });
+      const result = updateQuestionSchema.safeParse({ status });
       expect(result.success).toBe(true);
     },
   );
 
   it('rejects invalid status', () => {
-    const result = updateQuestionStatusSchema.safeParse({ status: 'OPEN' });
+    const result = updateQuestionSchema.safeParse({ status: 'OPEN' });
     expect(result.success).toBe(false);
+  });
+
+  it('accetta una risposta da sola, ripulita dagli spazi', () => {
+    const result = updateQuestionSchema.safeParse({ answer: '  Sì, entro giugno.  ' });
+    expect(result.success && result.data.answer).toBe('Sì, entro giugno.');
+  });
+
+  it('accetta null per togliere la risposta', () => {
+    expect(updateQuestionSchema.safeParse({ answer: null }).success).toBe(true);
+  });
+
+  it('rifiuta una richiesta senza stato e senza risposta', () => {
+    expect(updateQuestionSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('rifiuta una risposta oltre i 2000 caratteri', () => {
+    expect(updateQuestionSchema.safeParse({ answer: 'x'.repeat(2001) }).success).toBe(false);
   });
 });
 
@@ -668,5 +696,26 @@ describe('updateEventSchema privacyPolicyUrl', () => {
   it('still rejects a value that is not a URL', () => {
     const result = updateEventSchema.safeParse({ privacyPolicyUrl: 'not-a-url' });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('createQuestionTemplateSchema — quando si propone', () => {
+  it('accetta prima, dopo o nessuna indicazione', () => {
+    for (const usage of ['PRE_REGISTRATION', 'POST_EVENT', null, undefined]) {
+      expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage }).success).toBe(true);
+    }
+  });
+
+  it('rifiuta un momento sconosciuto', () => {
+    expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage: 'DURING' }).success).toBe(false);
+  });
+
+  it("l'aggiornamento può cambiare solo il momento", () => {
+    const r = updateQuestionTemplateSchema.safeParse({ usage: 'POST_EVENT' });
+    expect(r.success && r.data.usage).toBe('POST_EVENT');
+    // Senza le domande e l'ordine, l'aggiornamento non li tocca: un valore
+    // predefinito qui cancellerebbe tutte le domande del modello.
+    expect(r.success && r.data.items).toBeUndefined();
+    expect(r.success && r.data.sortOrder).toBeUndefined();
   });
 });

@@ -17,6 +17,7 @@ import {
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
+import { CAPTIONS_DISABLED_SOUNDS, captionsToolbarButton, readCaptionsVisible } from '@/lib/captions/toolbar-button';
 import {
   dataUriSfondo,
   leggiSfondo,
@@ -63,6 +64,13 @@ interface JitsiRoomProps {
    *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
    *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
+  /** Sottotitoli live disponibili (servizio installato, istanza accesa). */
+  liveCaptions?: boolean;
+  /** Sottotitoli accesi per l'evento: con questi all'apertura della sala, il
+   *  pulsante è già nella barra e Jitsi non annuncia la trascrizione come
+   *  registrazione (vedi sotto). Letto solo all'avvio della sala; dopo, li
+   *  aggiorna LiveCaptions. */
+  liveCaptionsOn?: boolean;
   /** Se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
    *  (rnnoise) di Jitsi e la ri-spegne per tutta la call; se false la accende
    *  a ogni unmute. La soppressione WebRTC di base (AEC/NS/AGC) resta accesa
@@ -101,6 +109,9 @@ type LoadState = 'loading' | 'ready' | 'error' | 'unreachable';
 
 const DEFAULT_WATERMARK_URL = '/images/default-watermark.svg';
 
+/** Dopo quanto, senza il segnale d'ingresso, si mostra comunque la chiamata. */
+const JOIN_REVEAL_AFTER_MS = 30_000;
+
 const POSITION_STYLES: Record<string, React.CSSProperties> = {
   'bottom-left': { bottom: 16, left: 16 },
   'bottom-right': { bottom: 16, right: 16 },
@@ -124,6 +135,8 @@ export default function JitsiRoom({
   whiteboardInfraReady = false,
   videoQuality,
   reactionsMode = 'NATIVE',
+  liveCaptions = false,
+  liveCaptionsOn = false,
   // Default spento (= rnnoise forzata OFF): un chiamante che dimentica la prop
   // deve ricadere sul comportamento sicuro, non su quello da validare.
   rnnoiseEnforceOff = true,
@@ -155,6 +168,20 @@ export default function JitsiRoom({
     setAttempt((n) => n + 1);
   };
 
+  // La chiamata resta nascosta finche' Jitsi non dice «sei dentro», per non
+  // mostrarne il caricamento. Ma se quel segnale non arriva (token rifiutato,
+  // sala d'attesa di Jitsi, permessi del browser in sospeso) la copertura
+  // diventava uno spinner eterno sopra l'unica cosa che spiega il problema:
+  // dopo un'attesa ragionevole si scopre la chiamata cosi' com'e'.
+  const [revealedWhileLoading, setRevealedWhileLoading] = useState(false);
+  useEffect(() => {
+    setRevealedWhileLoading(false);
+    if (loadState !== 'loading') return;
+    const timer = setTimeout(() => setRevealedWhileLoading(true), JOIN_REVEAL_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [loadState, attempt]);
+  const frameVisible = loadState === 'ready' || (loadState === 'loading' && revealedWhileLoading);
+
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
   const onReadyToCloseRef = useRef(onReadyToClose);
@@ -177,6 +204,10 @@ export default function JitsiRoom({
   // react to resize: flipping the toolbar mid-call would require
   // reinitialising the iframe (disconnecting the user).
   const isMobileRef = useRef<boolean>(false);
+  // Sottotitoli accesi: letto solo all'avvio della sala, cambiarlo non deve
+  // ricreare l'iframe.
+  const liveCaptionsOnRef = useRef(liveCaptionsOn);
+  useEffect(() => { liveCaptionsOnRef.current = liveCaptionsOn; }, [liveCaptionsOn]);
 
   // ADR-013 Fase 0 — buffer della timeline dominant-speaker. Accumuliamo i
   // cambi e li inviamo in batch (debounce + flush all'unload) all'ingest
@@ -192,7 +223,7 @@ export default function JitsiRoom({
   // schema di batching del dominant speaker: accumula e invia in batch a
   // `/api/events/[slug]/hand-raises`. Condivide `speakerT0Ref` come t0.
   // Nessuna PII: solo l'endpoint id opaco della PROPRIA sessione (self-report).
-  const handRaiseBufferRef = useRef<Array<{ participantId: string; raised: boolean }>>([]);
+  const handRaiseBufferRef = useRef<Array<{ participantId: string; raised: boolean; atEpochMs: number }>>([]);
   const handRaiseFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Endpoint id locale (dal `videoConferenceJoined`): serve a segnalare SOLO le
   // nostre alzate di mano, dato che l'evento arriva in broadcast a ogni client.
@@ -228,7 +259,7 @@ export default function JitsiRoom({
     // override the static defaults in `jitsiConfigOverwrite`.
     Object.assign(extraConfig, resolveVideoQualityConfig(videoQuality, { isMobile: isMobileRef.current }));
 
-    // Moderators need the participants-pane "rimuovi utente" (kick) to
+    // Moderators need the tile menu's "rimuovi utente" (kick) to
     // actually fire — the global default has `disableKick: true` to hide
     // the button from participants, so we flip it back on per-instance.
     // `disableGrantModerator` stays true: grant is driven by JWT, not UI.
@@ -302,6 +333,22 @@ export default function JitsiRoom({
       }
     }
 
+    // Sottotitoli live (ADR-018). Il pulsante sta nella barra di Jitsi, con i
+    // comandi della chiamata; lo aggiorna e ne ascolta il clic LiveCaptions.
+    //
+    // Jitsi tratta la trascrizione come una registrazione e, a ogni accensione
+    // e spegnimento, fa sentire a tutti l'annuncio vocale «Recording is
+    // on/off»: falso, perché nulla viene registrato. Gli annunci si tolgono
+    // solo dove i sottotitoli sono accesi (qui all'avvio, LiveCaptions quando
+    // si accendono dopo): per una registrazione vera, mentre la trascrizione
+    // è accesa Jitsi li salta già da sé, e la sala mostra il proprio avviso.
+    if (liveCaptions && liveCaptionsOnRef.current) {
+      extraConfig.customToolbarButtons = [
+        captionsToolbarButton(readCaptionsVisible(), { show: t('captions.show'), hide: t('captions.hide') }),
+      ];
+      extraConfig.disabledSounds = [...CAPTIONS_DISABLED_SOUNDS];
+    }
+
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
 
     // Invio JSON best-effort condiviso dagli ingest live (dominant-speaker e
@@ -350,7 +397,13 @@ export default function JitsiRoom({
       const buf = handRaiseBufferRef.current;
       if (!slug || buf.length === 0) return;
       const events = buf.splice(0, 2000);
-      sendJson(`/api/events/${encodeURIComponent(slug)}/hand-raises`, JSON.stringify({ events }), useBeacon);
+      // L'ora di invio fa riportare al server ogni alzata alla sua ora
+      // (lib/live/actions, serverTimeOf): la cronologia ha una base sola.
+      sendJson(
+        `/api/events/${encodeURIComponent(slug)}/hand-raises`,
+        JSON.stringify({ events, sentAt: Date.now() }),
+        useBeacon,
+      );
     }
 
     function scheduleHandRaiseFlush() {
@@ -585,8 +638,14 @@ export default function JitsiRoom({
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
         // cambio accumuliamo `{ atMs, participantId, displayName }`; l'invio
         // è batchato (debounce 10s) o al pagehide/leave.
+        // Il cambio di chi parla arriva identico a TUTTI i client: se lo
+        // mandassero tutti, ogni cambio diventerebbe una scrittura per persona
+        // in sala sulla stessa riga (lettura e riscrittura dell'intero log).
+        // Lo riferisce solo chi modera, che in sala c'e' per tutto l'evento:
+        // senza un moderatore in sala la cronologia non si registra.
         api.addListener('dominantSpeakerChanged', (evt: { id: string }) => {
           if (disposedRef.current || !eventSlugRef.current || !evt?.id) return;
+          if (role !== 'moderator') return;
           let name: string | undefined;
           try {
             name = api.getDisplayName?.(evt.id) || undefined;
@@ -612,6 +671,7 @@ export default function JitsiRoom({
           handRaiseBufferRef.current.push({
             participantId: evt.id,
             raised: evt.handRaised > 0,
+            atEpochMs: Date.now(),
           });
           scheduleHandRaiseFlush();
         });
@@ -680,7 +740,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">
@@ -693,7 +753,7 @@ export default function JitsiRoom({
         </div>
       ) : (
         <>
-          {loadState === 'loading' && (
+          {loadState === 'loading' && !revealedWhileLoading && (
             <div className="position-absolute top-50 start-50 translate-middle text-center">
               <Spinner active double />
               <p className="mt-3 text-white-50">{t('connecting')}</p>
@@ -741,7 +801,7 @@ export default function JitsiRoom({
         style={{
           width: '100%',
           height: '100%',
-          opacity: loadState === 'ready' ? 1 : 0,
+          opacity: frameVisible ? 1 : 0,
           transition: 'opacity 0.3s ease',
         }}
       />

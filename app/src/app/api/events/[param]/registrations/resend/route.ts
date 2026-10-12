@@ -7,6 +7,7 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { getSettings } from '@/lib/settings';
 import { defaultLocale } from '@/i18n/config';
 import { linguaDaIntestazione, linguaPagina } from '@/lib/email/lingua';
@@ -38,7 +39,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    select: { id: true },
+    select: { id: true, accessMode: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -70,8 +71,9 @@ export const POST = withErrorHandling(async (request, context) => {
       linguaPagina(typeof body.locale === 'string' ? body.locale : null) ??
       linguaDaIntestazione(request.headers.get('Accept-Language')) ??
       defaultLocale;
-    // Con l'iscrizione pubblica spenta il link dell'email e' anche la prova
-    // d'identita' (lib/events/registration-link); gli eventi di calendario
+    // Con l'iscrizione non aperta (per l'evento o per il sito) il link
+    // dell'email e' anche la prova d'identita' (lib/events/registration-link);
+    // gli eventi di calendario
     // hanno comunque quello della sala.
     const link = {
       baseUrl,
@@ -82,7 +84,8 @@ export const POST = withErrorHandling(async (request, context) => {
     };
     const joinUrl = registrationJoinUrl({
       ...link,
-      viaEmailEntry: !(await getSettings()).publicRegistrationEnabled,
+      viaEmailEntry: true,
+      bindsIdentity: !publicRegistrationFor(event, (await getSettings()).publicRegistrationEnabled),
     });
     const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 

@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
+import { REMINDER_PRESETS } from '@/lib/events/reminder-presets';
+
 import {
   EVENT_DESCRIPTION_MIN_LENGTH,
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from './event-description';
+import { MATERIAL_VISIBILITIES, materialUrlSchema } from './materials';
+import { MAX_RETENTION_DAYS } from './retention';
 
 // ── Event Schemas ────────────────────────────────────
 
@@ -43,12 +47,21 @@ export const eventBaseSchema = z.object({
   participantsCanUnmute: z.boolean().default(false),
   participantsCanStartVideo: z.boolean().default(false),
   participantsCanShareScreen: z.boolean().default(false),
+  // Chi partecipa: chiunque si iscrive (OPEN) o solo gli invitati
+  // (INVITATION); null = come dice il sito (lib/events/registration-access).
+  accessMode: z.enum(['OPEN', 'INVITATION']).nullable().optional(),
   requireOrganization: z.boolean().default(false),
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
-  dataRetentionDays: z.number().int().min(1).max(365).default(30),
+  dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
   privacyPolicyUrl: z.string().url().optional(),
-  privacyPolicyText: z.string().max(10000).optional(),
+  // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
+  // all'iscrizione si mostra quella del template GDPR scelto.
+  privacyPolicyText: z
+    .string()
+    .max(10000)
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v.trim() ? v : null)),
   gdprTemplateId: z.string().uuid().nullable().optional(),
   /** Cleartext join password. Server hashes and stores in `join_password_hash`.
    *  Empty string clears the password (sets the column back to NULL). */
@@ -66,6 +79,10 @@ export const eventBaseSchema = z.object({
   coverImageUrl: z.string().url().nullable().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
+  // L'organizzatore principale nella pagina pubblica (vedi lib/events/public-people).
+  moderatorOrganization: z.string().trim().max(200).nullable().optional(),
+  moderatorOrganizationLogoUrl: z.string().url().max(2048).nullable().optional(),
+  moderatorPublicListed: z.boolean().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
@@ -83,7 +100,11 @@ export const eventBaseSchema = z.object({
   postEventShowRecap: z.boolean().default(true),
   postEventShowWordCloud: z.boolean().default(true),
   postEventEmailEnabled: z.boolean().default(false),
+  // Avviso agli iscritti quando la registrazione diventa visibile.
+  recordingNotifyEnabled: z.boolean().default(true),
   feedbackEnabled: z.boolean().default(true),
+  /** La spiegazione sopra la casella del consenso alla registrazione in sala
+   *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
@@ -131,6 +152,9 @@ export const eventBaseSchema = z.object({
   agendaEnabled: z.boolean().optional(),
   wordCloudEnabled: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
+  // Sottotitoli live (ADR-018): attivi di default, li cambia anche chi modera dal vivo.
+  liveCaptionsEnabled: z.boolean().optional(),
+  captionsTranscriptEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
@@ -149,6 +173,7 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
   recordingPublished: z.boolean().optional(),
+  transcriptPublished: z.boolean().optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: z.string().url().nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
@@ -297,9 +322,19 @@ export const createQuestionSchema = z.object({
   guestId: z.string().trim().min(1).max(100).optional(),
 });
 
-export const updateQuestionStatusSchema = z.object({
-  status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']),
-});
+/**
+ * Il moderatore cambia lo stato di una domanda, ne scrive la risposta, o tutte
+ * e due le cose. Una risposta vuota (o null) toglie quella scritta.
+ */
+export const QUESTION_ANSWER_MAX = 2000;
+export const updateQuestionSchema = z
+  .object({
+    status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']).optional(),
+    answer: z.string().trim().max(QUESTION_ANSWER_MAX).nullable().optional(),
+  })
+  .refine((v) => v.status !== undefined || v.answer !== undefined, {
+    message: 'status or answer required',
+  });
 
 /**
  * Il pollice in su a una domanda. L'identità è una sola, come nel voto dei
@@ -316,7 +351,7 @@ export const upvoteQuestionSchema = z.object({
 });
 
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
-export type UpdateQuestionStatusInput = z.infer<typeof updateQuestionStatusSchema>;
+export type UpdateQuestionInput = z.infer<typeof updateQuestionSchema>;
 
 // ── Jitsi Token Schema ───────────────────────────────
 
@@ -325,6 +360,13 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.string().uuid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
+  /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
+   *  non l'aveva dato all'iscrizione. */
+  recordingConsent: z.boolean().optional(),
+  /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
+  multitrackConsent: z.boolean().optional(),
+  /** Lingua della pagina in cui il consenso e' stato dato. */
+  locale: z.string().min(2).max(8).optional(),
 }).refine(
   (data) => data.accessToken ?? data.moderatorToken ?? data.guestName,
   { message: 'Either accessToken, moderatorToken, or guestName is required' },
@@ -365,25 +407,20 @@ export type PollVoteInput = z.infer<typeof pollVoteSchema>;
 
 export const createMaterialSchema = z.object({
   title: z.string().min(1).max(300),
-  url: z.string().url(),
+  url: materialUrlSchema,
   description: z.string().max(500).optional(),
+  // Quando il pubblico lo vede (lib/events/material-visibility). Facoltativa:
+  // senza, il predefinito ALWAYS («in sala e dopo l'evento»).
+  visibility: z.enum(MATERIAL_VISIBILITIES).optional(),
 });
 
 export type CreateMaterialInput = z.infer<typeof createMaterialSchema>;
 
 // ── Reminder Schemas ───────────────────────────────────
 
-export const REMINDER_PRESETS = [
-  { offsetMinutes: 10080, labelIt: '7 giorni prima', labelEn: '7 days before' },
-  { offsetMinutes: 4320, labelIt: '3 giorni prima', labelEn: '3 days before' },
-  { offsetMinutes: 1440, labelIt: '1 giorno prima', labelEn: '1 day before' },
-  { offsetMinutes: 720, labelIt: '12 ore prima', labelEn: '12 hours before' },
-  { offsetMinutes: 360, labelIt: '6 ore prima', labelEn: '6 hours before' },
-  { offsetMinutes: 180, labelIt: '3 ore prima', labelEn: '3 hours before' },
-  { offsetMinutes: 60, labelIt: '1 ora prima', labelEn: '1 hour before' },
-  { offsetMinutes: 30, labelIt: '30 minuti prima', labelEn: '30 minutes before' },
-  { offsetMinutes: 15, labelIt: '15 minuti prima', labelEn: '15 minutes before' },
-] as const;
+// L'elenco dei momenti sta in lib/events/reminder-presets, che usa anche la
+// pagina dell'evento (senza zod).
+export { REMINDER_PRESETS };
 
 export const VALID_OFFSETS: number[] = REMINDER_PRESETS.map((p) => p.offsetMinutes);
 
@@ -401,9 +438,13 @@ export const createFeedbackSchema = z.object({
   comment: z.string().max(500).optional(),
   accessToken: z.string().min(1).optional(),
   guestId: z.string().min(1).optional(),
+  /** Il token della sala ricevuto entrando: prova la presenza di chi non e' iscritto. */
+  roomToken: z.string().min(1).max(4096).optional(),
+  /** Il link della valutazione dell'email di ringraziamento (lib/feedback/rating-link). */
+  ratingToken: z.string().min(1).max(512).optional(),
 }).refine(
-  (data) => data.accessToken || data.guestId,
-  { message: 'Either accessToken or guestId is required' },
+  (data) => data.accessToken || data.guestId || data.roomToken || data.ratingToken,
+  { message: 'Either accessToken, guestId, roomToken or ratingToken is required' },
 );
 
 export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;
@@ -412,7 +453,8 @@ export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;
 
 export const createWordCloudRoundSchema = z.object({
   prompt: z.string().min(3).max(200),
-  duration: z.number().int().min(30).max(300).default(120),
+  // Secondi; 0 = resta aperta finche' il moderatore non la chiude.
+  duration: z.union([z.literal(0), z.number().int().min(30).max(300)]).default(120),
 });
 
 export const submitWordCloudSchema = z.object({
@@ -437,7 +479,9 @@ export const timerActionSchema = z.object({
   // 'visibility' toggles only the show-to-all flag WITHOUT restarting the
   // countdown — start/pause/reset rebuild the timer state, so the eye toggle
   // must use this instead (was using 'start' and silently restarting).
-  action: z.enum(['start', 'pause', 'reset', 'visibility']),
+  // 'resume' riparte dalla pausa tenendo la durata impostata: con 'start' il
+  // tempo rimasto diventava la nuova durata (e sotto i 10 secondi era rifiutato).
+  action: z.enum(['start', 'pause', 'resume', 'reset', 'visibility']),
   duration: z.number().int().min(10).max(7200).optional(),
   visible: z.boolean().optional(),
 });
@@ -511,6 +555,8 @@ export const questionItemSchema = z.object({
 export const createQuestionTemplateSchema = z.object({
   name: z.string().min(2).max(120),
   description: z.string().max(500).nullable().optional(),
+  /** Dove il modello si propone: null = prima e dopo l'evento. */
+  usage: z.enum(QUESTIONNAIRE_PLACEMENTS).nullable().optional(),
   sortOrder: z.number().int().min(0).default(0),
   items: z.array(questionItemSchema).default([]),
 });
@@ -549,9 +595,13 @@ export const submitQuestionnaireResponseSchema = z.object({
   accessToken: z.string().min(1).optional(),
   guestId: z.string().min(1).optional(),
   respondentName: z.string().max(120).optional(),
+  /** Il token della sala ricevuto entrando: prova la presenza di chi non e' iscritto. */
+  roomToken: z.string().min(1).max(4096).optional(),
+  /** Il link della valutazione dell'email di ringraziamento (lib/feedback/rating-link). */
+  ratingToken: z.string().min(1).max(512).optional(),
 }).refine(
-  (data) => data.accessToken || data.guestId,
-  { message: 'Either accessToken or guestId is required' },
+  (data) => data.accessToken || data.guestId || data.roomToken || data.ratingToken,
+  { message: 'Either accessToken, guestId, roomToken or ratingToken is required' },
 );
 
 export type SubmitQuestionnaireResponseInput = z.infer<typeof submitQuestionnaireResponseSchema>;

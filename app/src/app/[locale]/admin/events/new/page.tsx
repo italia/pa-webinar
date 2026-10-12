@@ -1,17 +1,24 @@
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
-import { Link } from '@/i18n/navigation';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 interface CreateEventPageProps {
-  searchParams: Promise<{ template?: string }>;
+  searchParams: Promise<{ template?: string; instant?: string; formato?: string; scegli?: string }>;
+}
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/events/new');
 }
 
 export default async function CreateEventPage({
@@ -19,8 +26,7 @@ export default async function CreateEventPage({
 }: CreateEventPageProps) {
   // Creare eventi e' il mestiere dell'organizzatore (ADR-014).
   const session = await staffOLogin(await getLocale());
-  const t = await getTranslations('admin');
-  const { template: templateId } = await searchParams;
+  const { template: templateId, instant, formato, scegli } = await searchParams;
 
   const [templates, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
@@ -31,6 +37,19 @@ export default async function CreateEventPage({
       select: { id: true, name: true, isDefault: true },
     }),
   ]);
+
+  // Chi crea l'evento da un account nominale ne e' il moderatore principale
+  // di partenza: nome ed email gia' scritti, si cambiano se serve. Con la
+  // chiave dell'istanza non c'e' un account, e i campi restano vuoti.
+  const account = session.accountId
+    ? await prisma.staffAccount.findUnique({
+        where: { id: session.accountId },
+        select: { name: true, email: true },
+      })
+    : null;
+  const moderatoreDiPartenza = account
+    ? { name: tryDecryptPII(account.name) ?? '', email: tryDecryptPII(account.email) ?? '' }
+    : null;
 
   const selectedTemplate = templateId
     ? templates.find((tpl) => tpl.id === templateId) ?? null
@@ -62,6 +81,7 @@ export default async function CreateEventPage({
         agendaEnabled: selectedTemplate.agendaEnabled,
         wordCloudEnabled: selectedTemplate.wordCloudEnabled,
         whiteboardEnabled: selectedTemplate.whiteboardEnabled,
+        liveCaptionsEnabled: selectedTemplate.liveCaptionsEnabled,
         waitingRoomEngine: selectedTemplate.waitingRoomEngine,
         participantsCanUnmute: selectedTemplate.participantsCanUnmute,
         participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
@@ -86,40 +106,18 @@ export default async function CreateEventPage({
           (selectedTemplate.descriptionTemplate as Record<string, string> | null) ?? null,
         defaultRetentionDays: selectedTemplate.defaultRetentionDays,
         defaultExpectedSpeakers: selectedTemplate.defaultExpectedSpeakers,
+        postEventPublic: selectedTemplate.postEventPublic,
       }
     : null;
 
   return (
     <div className="container py-5">
-      <div className="mb-2">
-        <Link
-          href="/admin/events"
-          className="text-decoration-none d-inline-flex align-items-center text-primary"
-          style={{ fontSize: '0.9rem' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-          {t('title')}
-        </Link>
-      </div>
-
-      <h1 className="fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
-        {t('createEvent')}
-      </h1>
-
-      <div
-        className="p-4 rounded mb-4"
-        style={{
-          backgroundColor: '#F5F7FB',
-          borderLeft: '4px solid #0066CC',
-          borderRadius: 8,
-        }}
-      >
-        <p className="mb-0 fw-semibold" style={{ color: 'var(--app-text)' }}>
-          {t('createEventExplanation')}
-        </p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/events/new')} />
 
       <CreateEventWithTemplate
+        initialInstant={instant === '1'}
+        formatoParam={formato ?? null}
+        scegliParam={scegli ?? null}
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
         siteTimezone={siteSettings.defaultTimezone}
@@ -133,6 +131,7 @@ export default async function CreateEventPage({
         defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={30}
         canUseRubrica={session.role === 'admin'}
+        publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         jvbSizingConfig={{
           cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
           receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
@@ -148,10 +147,14 @@ export default async function CreateEventPage({
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
         siteDefaultVideoQuality={siteSettings.videoQuality}
         // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts): il
-        // passo 2 offre la lavagna solo se l'installazione ne ha il servizio.
+        // passo Permessi offre la lavagna solo se l'installazione ne ha il servizio.
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
+        defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
+        aiPipelineEnabled={siteSettings.aiPipelineEnabled}
+        defaultModerator={moderatoreDiPartenza}
       />
     </div>
   );

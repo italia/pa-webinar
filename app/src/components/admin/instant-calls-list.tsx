@@ -19,6 +19,8 @@ import { Icon } from '@/components/ui/icon';
 import { GlyphIcon } from '@/components/ui/glyph-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import CopyButton from '@/components/admin/copy-button';
+import { useToast } from '@/components/ui/toast';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 interface InstantCallRow {
@@ -152,6 +154,8 @@ export default function InstantCallsList({
   const t = useTranslations('admin.instantCalls');
   const tc = useTranslations('common');
   const tl = useTranslations('admin.links');
+  const ta = useTranslations('admin');
+  const toast = useToast();
   const fmt = useFormatter();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -268,7 +272,7 @@ export default function InstantCallsList({
       setCreateOpen(false);
       setNewTitle('');
       setNewModerator('');
-      router.push(localizedPath(`/admin/events/${data.id}?token=${data.moderatorToken}`, locale));
+      router.push(localizedPath(eventAdminPath(data.id), locale));
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -285,17 +289,19 @@ export default function InstantCallsList({
         body: JSON.stringify({ ids: Array.from(selected) }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setError(body.error?.message ?? tc('errorGeneric'));
+        setError(tc('errorGeneric'));
         return;
       }
+      const { skippedLive = 0 } = (await res.json().catch(() => ({}))) as { skippedLive?: number };
       setDeleteOpen(false);
       setSelected(new Set());
+      // Il modale si e' chiuso: l'avviso va in una notifica, non nel suo corpo.
+      if (skippedLive > 0) toast.info(ta('bulkDeleteSkippedLive', { count: skippedLive }));
       refresh();
     } finally {
       setSubmitting(false);
     }
-  }, [selected, tc, refresh]);
+  }, [selected, tc, ta, toast, refresh]);
 
   const selectedCount = useMemo(() => selected.size, [selected]);
 
@@ -312,6 +318,7 @@ export default function InstantCallsList({
           color: #fff;
           padding: 24px 28px;
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
@@ -376,9 +383,10 @@ export default function InstantCallsList({
         <CardBody className="p-3">
           <div className="row g-2 align-items-end">
             <div className="col-md-4">
-              <label className="form-label small text-muted mb-1">{t('filters.search')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-q">{t('filters.search')}</label>
               <div className="position-relative">
                 <Input
+                  id="ic-q"
                   type="text"
                   value={filters.q}
                   onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))}
@@ -387,24 +395,27 @@ export default function InstantCallsList({
               </div>
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.from')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-from">{t('filters.from')}</label>
               <Input
+                id="ic-from"
                 type="date"
                 value={filters.from}
                 onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.to')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-to">{t('filters.to')}</label>
               <Input
+                id="ic-to"
                 type="date"
                 value={filters.to}
                 onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.status')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-status">{t('filters.status')}</label>
               <select
+                id="ic-status"
                 className="form-select"
                 value={filters.status}
                 onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as StatusFilter }))}
@@ -417,8 +428,9 @@ export default function InstantCallsList({
               </select>
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.recording')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-rec">{t('filters.recording')}</label>
               <select
+                id="ic-rec"
                 className="form-select"
                 value={filters.hasRec}
                 onChange={(e) => setFilters((f) => ({ ...f, hasRec: e.target.value as HasRecFilter }))}
@@ -502,7 +514,7 @@ export default function InstantCallsList({
                       />
                     </div>
                     <Link
-                      href={percorso(`/admin/events/${call.id}?token=${call.moderatorToken}`)}
+                      href={percorso(eventAdminPath(call.id))}
                       className="text-decoration-none flex-grow-1"
                     >
                       <div className="d-flex justify-content-between align-items-start">

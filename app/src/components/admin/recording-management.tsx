@@ -183,7 +183,7 @@ export default function RecordingManagement({
           </h5>
           {isLive && event.tempRecordingStartedAt && (
             <Badge color="danger" pill className="px-2 py-1">
-              <span className="me-1" style={{ animation: 'pulse-dot 1.5s ease-in-out infinite' }}>●</span>
+              <span className="me-1 pulse-dot" aria-hidden="true">●</span>
               {t('inProgress')}
             </Badge>
           )}
@@ -208,11 +208,10 @@ export default function RecordingManagement({
         {/* Recording available (post-event) */}
         {!isLive && hasRecording && (
           <>
-            <Alert color="success" className="py-2 px-3 mb-3">
-              <div className="d-flex align-items-center">
-                <Icon icon="it-video" className="me-2" />
-                <span className="fw-semibold">{t('available')}</span>
-              </div>
+            {/* L'icona la disegna Bootstrap Italia: niente padding orizzontale
+                ridotto, niente seconda icona (globals.scss, .alert). */}
+            <Alert color="success" className="mb-3">
+              <span className="fw-semibold">{t('available')}</span>
             </Alert>
 
             {event.recordingDuration && (
@@ -254,6 +253,7 @@ export default function RecordingManagement({
                 </div>
                 <ToggleSwitch
                   label=""
+                  ariaLabel={t('publish')}
                   checked={published}
                   onChange={handleTogglePublish}
                   disabled={saving}

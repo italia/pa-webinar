@@ -10,9 +10,10 @@
 #      Event + create a CallSession row.
 #   6. Clean up the local recording directory.
 #
-# Required environment (set via jibri.extraEnvs in Helm values):
-#   APP_INTERNAL_URL — e.g. http://<fullname>:3000 (the app Service rendered by the chart)
-#   CRON_API_KEY     — shared secret for the internal endpoint + webhook
+# Required environment (the chart sets both in jitsi-meet.jibri):
+#   APP_INTERNAL_URL — e.g. http://<fullname>:3000 (the app Service rendered by the chart), extraEnvs
+#   CRON_API_KEY     — shared secret for the internal endpoint + webhook, extraSecrets
+# Optional: RECORDING_WEBHOOK_SECRET signs the webhook (extraSecrets).
 #
 # Arguments:
 #   $1 — path to the recording directory (contains the .mp4)

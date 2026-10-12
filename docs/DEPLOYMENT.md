@@ -275,8 +275,8 @@ Get these ready before the first install. The first item is the one that surpris
 - **External Secrets Operator**, only with `secrets.mode: external`.
 - **An SMTP relay.** Without it no email is ever delivered: no registration confirmation, reminder,
   date-change notice, post-event follow-up, staff sign-in link or verification link for a data-subject
-  request ([Email delivery](configuration/email.md)). Event invitations are not emailed at all: with
-  public registration off, they only decide who may register.
+  request ([Email delivery](configuration/email.md)). Event invitations are not emailed at all: when
+  registration is by invitation only, they only decide who may register.
 - **Object storage**, only to record events or upload materials ([Object storage](configuration/storage.md)).
   An evaluation works without it. Staff browsers upload videos straight to it, so the bucket or container
   must allow `PUT` from the portal's origin (CORS), and an S3-compatible endpoint must be an HTTPS address
@@ -334,14 +334,15 @@ jitsi-meet:
 | `site.portalHost` | `NEXT_PUBLIC_APP_URL` (`https://<portalHost>`), the host of the portal Ingress, and the `hosts` of every `ingress.tls` entry that has none |
 | `site.conferenceHost` | `NEXT_PUBLIC_JITSI_DOMAIN`, the host and TLS hosts of the conference Ingress rendered by the chart (`jitsi.conferenceIngress`), the hosts of the conference-root redirect, and the recorder bot's domain |
 | `jitsi-meet.publicURL` | Not derived: it is a value of the Jitsi subchart, which a parent chart cannot fill in. The chart checks it, and the render stops with the line to add when it is not `https://<conferenceHost>` |
+| `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL` | Not derived and not checked, for the same reason: `null` by default, because the chart does not know the portal's address. Set it to `https://<portalHost>/api/jitsi-branding.json`: the participants' browsers fetch the portal's dynamic-branding document from there, so it must be reachable without authentication. Unset, or behind HTTP authentication, the stage keeps the room's blue, but Jitsi's toolbar, menus and tiles keep its dark greys ([Branding limits](architecture/jitsi-integration.md#branding-limits)) |
 
 - **Format.** Lowercase DNS names only: `https://`, a port, a path or uppercase letters stop the render.
   The portal and the conference need two different names.
 - **Explicit keys still work**: `app.env.NEXT_PUBLIC_APP_URL`, `app.env.NEXT_PUBLIC_JITSI_DOMAIN`,
   `ingress.hosts[].host`, `ingress.tls[].hosts`, and `jitsi-meet.web.ingress.hosts` with the subchart's
   Ingress. When `site.*` is set, a key that disagrees with it stops the render. The chart's placeholders
-  (`videocall.example.com`) count as not set; the post-install notes warn while any `example.com` name
-  remains.
+  (`videocall.example.com`) count as not set; the post-install notes warn while an `example.com` name
+  remains in `app.env` or `jitsi-meet.publicURL`.
 - **TURN**, for example `turn.webinar.example.com` (optional), goes in `jitsi-meet.turnHost`. Its DNS
   record points at coturn's address, or, with the k3s add-on, at the ingress node
   ([coturn (TURN and TURNS)](#coturn-turn-and-turns)).
@@ -485,7 +486,7 @@ flowchart LR
 
   JIT["Jicofo, JVB,<br/>Jibri, coturn"]:::media
   PROS["Prosody"]:::media
-  JOBS["CronJobs, scaler,<br/>recorder, controller"]:::job
+  JOBS["CronJobs, scaler,<br/>recorder, controller,<br/>captions service"]:::job
   APP["App + db-migrate"]:::portal
   RD[("Redis")]:::data
   PG[("PostgreSQL")]:::data
@@ -559,7 +560,7 @@ verify. Prosody needs the same signing secret as the portal, and the same app ID
 
 | Prosody side | Must equal (application Secret) |
 |---|---|
-| One of: `jitsi-meet.prosody.jwt.existingSecretName` (a Secret with the key `JWT_APP_SECRET`); `jitsi-meet.prosody.jwt.secret` inline; or a `jitsi-meet.prosody.extraSecrets` entry named `JWT_APP_SECRET` that reads `JITSI_JWT_SECRET` from the application Secret, so there is one value to rotate. Never both `secret` and `existingSecretName`. A plain `JWT_APP_SECRET` value in `jitsi-meet.prosody.extraEnvs` or `jitsi-meet.extraCommonEnvs` also works, but the latter lands in the ConfigMap that every Jitsi component loads: prefer a Secret | `JITSI_JWT_SECRET` |
+| One of: `jitsi-meet.prosody.jwt.existingSecretName` (a Secret with the key `JWT_APP_SECRET`); `jitsi-meet.prosody.jwt.secret` inline; or a `jitsi-meet.prosody.extraSecrets` entry named `JWT_APP_SECRET` that reads `JITSI_JWT_SECRET` from the application Secret, so there is one value to rotate. Never both `secret` and `existingSecretName`. A plain `JWT_APP_SECRET` value in `jitsi-meet.prosody.extraEnvs` or `jitsi-meet.extraCommonEnvs` also works, but the latter lands in the ConfigMap that every Jitsi component loads: prefer a Secret. Prosody's occupants module also signs its notifications to the portal with a key derived from this secret ([Jitsi extras](../infra/jitsi/README.md#the-occupants-module)) | `JITSI_JWT_SECRET` |
 | `jitsi-meet.prosody.extraEnvs.JWT_APP_ID` (default `pa_webinar`) | `JITSI_JWT_APP_ID` |
 | `jitsi-meet.prosody.extraEnvs.JWT_ACCEPTED_ISSUERS` (default `pa-webinar`) | `JITSI_JWT_ISSUER` |
 | `jitsi-meet.prosody.extraEnvs.JWT_ACCEPTED_AUDIENCES` (default `jitsi`) | `JITSI_JWT_AUDIENCE` |
@@ -724,6 +725,8 @@ jitsi:
 jitsi-meet:
   publicURL: "https://meet.webinar.example.com"
   web:
+    extraEnvs:                     # the portal's branding document, read by browsers
+      DYNAMIC_BRANDING_URL: "https://webinar.example.com/api/jitsi-branding.json"
     ingress:                       # the subchart's Ingress: its hosts cannot be derived
       hosts:
         - host: meet.webinar.example.com
@@ -1022,7 +1025,8 @@ open and whether you need TURN is in [Networking](INFRASTRUCTURE.md#networking).
 JWT; the secret is covered in [The Prosody JWT secret](#the-prosody-jwt-secret). The chart's values
 also make the token decide the room role: Prosody loads `token_affiliation` and the project's
 `token_affiliation_custom` module (mounted from the ConfigMap `pa-webinar-prosody-plugins`), and Jicofo
-runs without its own authentication and auto-owner rule. Keep those entries if you set your own
+runs without its own authentication and auto-owner rule. The same ConfigMap carries `pa_media_lock`,
+which enforces on the bridge the participant limits that an event sets. Keep those entries if you set your own
 `jitsi-meet.prosody.extraVolumes`, `extraVolumeMounts` or `XMPP_MUC_MODULES`: the
 `pa-webinar.validateJitsiRoles` guard stops the render otherwise. Details in
 [Server-side role enforcement](architecture/jitsi-integration.md#server-side-role-enforcement).
@@ -1201,6 +1205,10 @@ The policy allows:
     pods do not carry them (see below);
   - from the Jibri pods, when `jitsi-meet.jibri.enabled` is on, for the finalize script's calls at the
     end of a recording;
+  - from the Prosody pods, when `jitsi.enabled` is on, for the occupants module's notifications
+    ([Jitsi extras](../infra/jitsi/README.md#the-occupants-module));
+  - from the live captions pods, when captions are enabled, for the room context and the sentences of
+    the transcript from captions;
   - from the monitoring namespace (`monitoringNamespaceSelector`), when `allowMonitoring` is on;
   - from anything in `networkPolicy.ingress.extraRules`.
 - **Egress**:
@@ -1268,11 +1276,10 @@ The design of network isolation for the whole installation is in
 
 Composite video recording runs on Jibri from the jitsi-meet subchart (`jitsi-meet.jibri.enabled`, on in
 the standard and full profiles; in the full profile the JVB scaler also sets Jibri's replica count). The
-chart renders its finalize script (`files/jibri-finalize.sh`) as the ConfigMap `<fullname>-jibri-finalize`,
-but does not mount it. Jibri runs whatever is at `/config/finalize.sh` after each recording: mount the
-chart's ConfigMap there with `jitsi-meet.jibri.extraVolumes` and `extraVolumeMounts`, or pass the script
-through `jitsi-meet.jibri.custom.other._finalize_sh`, and in both cases give Jibri the `APP_INTERNAL_URL`
-and `CRON_API_KEY` the script needs
+chart renders its finalize script (`files/jibri-finalize.sh`) as the ConfigMap `pa-webinar-jibri-finalize`
+and mounts it at `/config/finalize.sh`, where Jibri runs it after each recording. Give Jibri the
+`APP_INTERNAL_URL`, `CRON_API_KEY` and, if the portal checks signatures, `RECORDING_WEBHOOK_SECRET` the
+script needs; a values file that still sets `jitsi-meet.jibri.custom.other._finalize_sh` stops the render
 ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)). The
 per-participant audio recorder is a separate path (`recorder.enabled`). Which values turn on each path,
 the storage they need and how to verify them: [Setting up recording](operations/recording-setup.md).
@@ -1372,7 +1379,7 @@ check). The options are in its `--help` and in
    kubectl get secret videocall-secrets -n pa-webinar -o jsonpath='{.data.ADMIN_API_KEY}' | base64 -d
    ```
 
-4. **Create a named administrator.** In **Accounts** (`/en/admin/organizers`), under **Add a person**,
+4. **Create a named administrator.** In **Staff and access** > **Staff accounts** (`/en/admin/organizers`), under **Add an account**,
    choose the **Administrator** role and tick **Send the sign-in link now**. From then on, people sign
    in under their own names with a one-time sign-in link sent by email, and the instance API key can
    stay in a safe for emergencies and automation ([ADR-015](adr/015-named-administrators.md)). The link arriving also

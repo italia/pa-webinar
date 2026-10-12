@@ -52,7 +52,10 @@ export default function AddToCalendar({
 
   const input = {
     title,
-    description: description.slice(0, 300),
+    // Si taglia dopo aver tolto il Markdown: un taglio prima finirebbe a
+    // meta' di un link o di un grassetto, e gli indirizzi consumerebbero lo spazio.
+    description,
+    descriptionMax: 300,
     startsAt: new Date(startsAt),
     endsAt: new Date(endsAt),
     // Nella lingua di chi aggiunge l'evento: e' la pagina che aprira'
@@ -80,7 +83,7 @@ export default function AddToCalendar({
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="me-2">📅</span>
+            <Icon icon="it-external-link" size="sm" color="primary" className="me-2" />
             {t('google')}
           </LinkListItem>
           <LinkListItem
@@ -89,7 +92,7 @@ export default function AddToCalendar({
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="me-2">📅</span>
+            <Icon icon="it-external-link" size="sm" color="primary" className="me-2" />
             {t('outlook')}
           </LinkListItem>
           <LinkListItem
@@ -98,7 +101,7 @@ export default function AddToCalendar({
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="me-2">📅</span>
+            <Icon icon="it-external-link" size="sm" color="primary" className="me-2" />
             {t('yahoo')}
           </LinkListItem>
           <LinkListItem divider />
@@ -107,7 +110,7 @@ export default function AddToCalendar({
             href={generateIcsDownloadUrl(slug, baseUrl)}
             download
           >
-            <span className="me-2">⬇️</span>
+            <Icon icon="it-download" size="sm" color="primary" className="me-2" />
             {t('downloadIcs')}
           </LinkListItem>
         </LinkList>

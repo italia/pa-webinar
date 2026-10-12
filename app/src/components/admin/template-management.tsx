@@ -18,6 +18,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
   id: string;
@@ -26,8 +27,11 @@ interface SerializedTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  liveCaptionsEnabled: boolean;
+  postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -55,6 +59,9 @@ interface TemplateManagementProps {
   /** Se l'installazione ha il servizio della lavagna di Jitsi: senza, il
    *  modello non la offre (vedi lib/jitsi/whiteboard.ts). */
   whiteboardInfraReady: boolean;
+  /** Se l'installazione ha i sottotitoli live (lib/captions/availability):
+   *  senza, il modello non li propone. */
+  liveCaptionsAvailable: boolean;
 }
 
 interface EditingTemplate {
@@ -63,8 +70,11 @@ interface EditingTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  liveCaptionsEnabled: boolean;
+  postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -79,6 +89,12 @@ interface EditingTemplate {
   multitrackRecordingEnabled: boolean;
   retainParticipantTracks: boolean;
   descriptionTemplateIt: string;
+  /** Le altre lingue della descrizione, che qui non si modificano: si
+   *  rimandano com'erano finche' l'italiano resta quello, e cadono quando
+   *  l'italiano cambia (sarebbero la traduzione di un testo che non c'e' piu'). */
+  descriptionTemplateOther: Record<string, string>;
+  /** L'italiano com'era all'apertura. */
+  descriptionTemplateItOriginal: string;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
 }
@@ -92,15 +108,19 @@ const DEFAULT_NEW: EditingTemplate = {
   // quando serve.
   qaEnabled: false,
   chatEnabled: true,
+  agendaEnabled: false,
   wordCloudEnabled: false,
   whiteboardEnabled: false,
+  // Come sugli eventi: i sottotitoli sono accesi finche' non li si spegne.
+  liveCaptionsEnabled: true,
+  postEventPublic: true,
   waitingRoomEngine: null,
   recordingEnabled: false,
   participantsCanUnmute: false,
   participantsCanStartVideo: false,
   participantsCanShareScreen: false,
   maxParticipants: 300,
-  defaultDurationMinutes: 120,
+  defaultDurationMinutes: 60,
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,
@@ -108,6 +128,8 @@ const DEFAULT_NEW: EditingTemplate = {
   multitrackRecordingEnabled: false,
   retainParticipantTracks: false,
   descriptionTemplateIt: '',
+  descriptionTemplateOther: {},
+  descriptionTemplateItOriginal: '',
   defaultRetentionDays: null,
   defaultExpectedSpeakers: null,
 };
@@ -115,6 +137,7 @@ const DEFAULT_NEW: EditingTemplate = {
 export default function TemplateManagement({
   templates: initialTemplates,
   whiteboardInfraReady,
+  liveCaptionsAvailable,
 }: TemplateManagementProps) {
   const t = useTranslations('admin.templates');
   const tc = useTranslations('common');
@@ -139,8 +162,11 @@ export default function TemplateManagement({
       icon: tpl.icon,
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
+      agendaEnabled: tpl.agendaEnabled,
       wordCloudEnabled: tpl.wordCloudEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
+      liveCaptionsEnabled: tpl.liveCaptionsEnabled,
+      postEventPublic: tpl.postEventPublic,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
@@ -155,7 +181,16 @@ export default function TemplateManagement({
       multitrackRecordingEnabled: tpl.multitrackRecordingEnabled,
       retainParticipantTracks: tpl.retainParticipantTracks,
       descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
-      defaultRetentionDays: tpl.defaultRetentionDays,
+      descriptionTemplateOther: Object.fromEntries(
+        Object.entries(tpl.descriptionTemplate ?? {}).filter(([k]) => k !== 'it'),
+      ),
+      descriptionTemplateItOriginal: tpl.descriptionTemplate?.it ?? '',
+      // Un valore salvato prima del limite attuale si riporta entro il
+      // massimo: altrimenti il template non si risalverebbe piu'.
+      defaultRetentionDays:
+        tpl.defaultRetentionDays == null
+          ? null
+          : Math.min(tpl.defaultRetentionDays, MAX_RETENTION_DAYS),
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     });
     setEditing(tpl.id);
@@ -168,12 +203,18 @@ export default function TemplateManagement({
     try {
       const isNew = editing === 'new';
       // Mappa il campo UI `descriptionTemplateIt` sul JSON {it} atteso dall'API.
-      const { descriptionTemplateIt, ...rest } = form;
+      const {
+        descriptionTemplateIt,
+        descriptionTemplateOther,
+        descriptionTemplateItOriginal,
+        ...rest
+      } = form;
+      const italiano = descriptionTemplateIt.trim();
+      const altre = italiano === descriptionTemplateItOriginal.trim() ? descriptionTemplateOther : {};
+      const descrizione = { ...altre, ...(italiano ? { it: italiano } : {}) };
       const payload = {
         ...rest,
-        descriptionTemplate: descriptionTemplateIt.trim()
-          ? { it: descriptionTemplateIt.trim() }
-          : null,
+        descriptionTemplate: Object.keys(descrizione).length > 0 ? descrizione : null,
       };
       const body = isNew ? payload : { id: editing, ...payload };
 
@@ -184,8 +225,28 @@ export default function TemplateManagement({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Save failed');
+        // I campi rifiutati, con il nome che hanno nel modulo.
+        const body = (await res.json().catch(() => ({}))) as {
+          details?: Array<{ path?: Array<string | number> }>;
+        };
+        const etichette: Record<string, string> = {
+          name: t('nameLabel'),
+          description: t('descriptionLabel'),
+          maxParticipants: t('maxParticipantsLabel'),
+          defaultDurationMinutes: t('durationLabel'),
+          defaultRetentionDays: t('retentionLabel'),
+          defaultExpectedSpeakers: t('expectedSpeakersLabel'),
+          descriptionTemplate: t('descriptionTemplateLabel'),
+        };
+        const campi = [
+          ...new Set(
+            (body.details ?? [])
+              .map((d) => etichette[String(d.path?.[0] ?? '')])
+              .filter((e): e is string => Boolean(e)),
+          ),
+        ];
+        setError(campi.length > 0 ? t('invalidFields', { fields: campi.join(', ') }) : tc('errorGeneric'));
+        return;
       }
 
       const saved = await res.json();
@@ -200,12 +261,12 @@ export default function TemplateManagement({
         );
       }
       setEditing(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+    } catch {
+      setError(tc('errorGeneric'));
     } finally {
       setSaving(false);
     }
-  }, [editing, form]);
+  }, [editing, form, t, tc]);
 
   const handleDelete = useCallback(async (id: string) => {
     const ok = await confirm({
@@ -219,13 +280,10 @@ export default function TemplateManagement({
       const res = await fetch(`/api/admin/templates?id=${id}`, {
         method: 'DELETE',
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Delete failed');
-      }
+      if (!res.ok) throw new Error(String(res.status));
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+    } catch {
+      setError(tc('errorGeneric'));
     }
   }, [confirm, t, tc]);
 
@@ -271,6 +329,7 @@ export default function TemplateManagement({
               t={t}
               tc={tc}
               whiteboardInfraReady={whiteboardInfraReady}
+              liveCaptionsAvailable={liveCaptionsAvailable}
             />
           </CardBody>
         </Card>
@@ -294,6 +353,7 @@ export default function TemplateManagement({
                     t={t}
                     tc={tc}
                     whiteboardInfraReady={whiteboardInfraReady}
+                    liveCaptionsAvailable={liveCaptionsAvailable}
                   />
                 </CardBody>
               </Card>
@@ -367,7 +427,7 @@ export default function TemplateManagement({
                     </Badge>
                   </div>
                   <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
-                    Max: {tpl.maxParticipants}
+                    {t('maxParticipantsLabel')}: {tpl.maxParticipants}
                   </div>
                   <div className="mt-auto d-flex gap-2">
                     <Button
@@ -408,6 +468,7 @@ function TemplateForm({
   t,
   tc,
   whiteboardInfraReady,
+  liveCaptionsAvailable,
 }: {
   form: EditingTemplate;
   setField: <K extends keyof EditingTemplate>(
@@ -420,6 +481,7 @@ function TemplateForm({
   t: ReturnType<typeof useTranslations>;
   tc: ReturnType<typeof useTranslations>;
   whiteboardInfraReady: boolean;
+  liveCaptionsAvailable: boolean;
 }) {
   // Etichette già esistenti del form evento: stessi flag, stessi nomi.
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
@@ -461,7 +523,7 @@ function TemplateForm({
             setField('maxParticipants', Number(e.target.value) || 0)
           }
           min={2}
-          max={500}
+          max={5000}
         />
       </FormGroup>
 
@@ -497,7 +559,7 @@ function TemplateForm({
             )
           }
           min={1}
-          max={3650}
+          max={MAX_RETENTION_DAYS}
         />
       </FormGroup>
 
@@ -529,6 +591,15 @@ function TemplateForm({
           }
         />
         <small className="form-text text-muted">{t('descriptionTemplateHint')}</small>
+        {/* Le altre lingue non si modificano qui: lo si dice, e si dice che
+            cambiando l'italiano cadono (tradurrebbero un testo che non c'e' piu'). */}
+        {Object.keys(form.descriptionTemplateOther).length > 0 && (
+          <small className="form-text text-muted d-block">
+            {t('descriptionOtherLanguages', {
+              languages: Object.keys(form.descriptionTemplateOther).sort().join(', '),
+            })}
+          </small>
+        )}
       </FormGroup>
 
       <div className="mb-3">
@@ -539,8 +610,10 @@ function TemplateForm({
           [
             ['qaEnabled', 'Q&A'],
             ['chatEnabled', 'Chat'],
+            ['agendaEnabled', ta('agendaEnabled')],
             ['wordCloudEnabled', ta('wordCloudEnabled')],
             ['whiteboardEnabled', t('whiteboardLabel')],
+            ['liveCaptionsEnabled', ta('liveCaptionsEnabled')],
             ['recordingEnabled', t('recordingLabel')],
             ['participantsCanUnmute', t('unmute')],
             ['participantsCanStartVideo', t('video')],
@@ -555,8 +628,12 @@ function TemplateForm({
             ['aiDubbingEnabled', ta('aiDubbingEnabled')],
             ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
             ['retainParticipantTracks', ta('retainParticipantTracks')],
+            ['postEventPublic', t('postEventPublic')],
           ] as const
-        ).map(([key, label]) => {
+        )
+          // Senza il servizio dei sottotitoli non c'e' niente da scegliere.
+          .filter(([key]) => key !== 'liveCaptionsEnabled' || liveCaptionsAvailable)
+          .map(([key, label]) => {
           // La lavagna senza il servizio dell'installazione non comparirebbe
           // in sala: non si accende, e la riga dice perche'. Resta spegnibile
           // per togliere un valore gia' salvato.

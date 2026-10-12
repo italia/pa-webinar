@@ -387,21 +387,24 @@ export default function MonitoringDashboard({
   jvbScalerEnabled,
 }: MonitoringDashboardProps) {
   const t = useTranslations('admin.monitoring');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
   const locale = useLocale();
   const [range, setRange] = useState<Range>('7d');
   const [prom, setProm] = useState<PromSnapshot | null>(null);
   const [live, setLive] = useState<LiveBridgeValues | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Se il caricamento e' fallito: il messaggio mostrato e' quello generico tradotto.
+  const [error, setError] = useState(false);
 
   const fetchAll = useCallback(async () => {
-    setError(null);
+    setError(false);
     try {
       const app = `app="${appLabel}"`;
       const up = uptimeSelector;
       const bucket = `http_request_duration_seconds_bucket{${app}}`;
       const total = `http_requests_total{${app}}`;
+      const total5xx = `http_requests_total{${app},status_code=~"5.."}`;
       const [
         // instant
         uptime24hRes,
@@ -447,7 +450,7 @@ export default function MonitoringDashboard({
         promQuery(`histogram_quantile(0.50, sum by (le) (rate(${bucket}[5m])))`),
         promQuery(`histogram_quantile(0.95, sum by (le) (rate(${bucket}[5m])))`),
         promQuery(`histogram_quantile(0.99, sum by (le) (rate(${bucket}[5m])))`),
-        promQuery(`sum(rate(${total.replace('}', ',status_code=~"5.."}')}[5m])) / clamp_min(sum(rate(${total}[5m])), 0.001)`),
+        promQuery(`sum(rate(${total5xx}[5m])) / clamp_min(sum(rate(${total}[5m])), 0.001)`),
         promQuery(`sum(rate(${total}[5m]))`),
         promQuery(`max(time() - process_start_time_seconds{${app}})`),
         promQuery(`eventi_jvb_participants{${app}}`),
@@ -458,7 +461,7 @@ export default function MonitoringDashboard({
         promRangeQuery(`histogram_quantile(0.95, sum by (le) (rate(${bucket}[5m])))`, range),
         promRangeQuery(`histogram_quantile(0.50, sum by (le) (rate(${bucket}[5m])))`, range),
         promRangeQuery(`histogram_quantile(0.99, sum by (le) (rate(${bucket}[5m])))`, range),
-        promRangeQuery(`sum(rate(${total.replace('}', ',status_code=~"5.."}')}[5m])) / clamp_min(sum(rate(${total}[5m])), 0.001)`, range),
+        promRangeQuery(`sum(rate(${total5xx}[5m])) / clamp_min(sum(rate(${total}[5m])), 0.001)`, range),
         promRangeQuery(`sum(rate(${total}[5m]))`, range),
         promRangeQuery(`eventi_jvb_stress_level{${app}}`, range),
         promRangeQuery(`eventi_jvb_participants{${app}}`, range),
@@ -521,8 +524,8 @@ export default function MonitoringDashboard({
       setAnalytics(analyticsRes);
       // Senza Prometheus i valori attuali del ponte arrivano da /api/status.
       setLive(uptime24hRes.available ? null : await fetchLiveBridgeValues());
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'fetch error');
+    } catch {
+      setError(true);
     }
   }, [range, appLabel, uptimeSelector, locale]);
 
@@ -584,7 +587,7 @@ export default function MonitoringDashboard({
         </div>
       </div>
 
-      {error && <Alert color="danger" className="mb-3">{error}</Alert>}
+      {error && <Alert color="danger" className="mb-3">{tc('errorGeneric')}</Alert>}
       {prom && !prom.available && (
         <Alert color="warning" className="mb-3">{t('prometheusUnavailable')}</Alert>
       )}

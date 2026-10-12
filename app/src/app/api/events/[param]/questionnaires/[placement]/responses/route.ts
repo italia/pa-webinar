@@ -22,7 +22,7 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import {
   findEventQuestionnaireByPlacement,
   submitResponse,
@@ -33,6 +33,8 @@ import {
   QUESTIONNAIRE_PLACEMENTS,
   submitQuestionnaireResponseSchema,
 } from '@/lib/validation/schemas';
+import { feedbackOpen } from '@/lib/feedback/default-questionnaire';
+import { identitaPerValutazione } from '@/lib/feedback/participation';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,16 +52,32 @@ export const POST = withErrorHandling(async (request, context) => {
   const placement = rawPlacement as (typeof QUESTIONNAIRE_PLACEMENTS)[number];
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`questionnaire:${ip}`, { limit: 10, windowMs: 60_000 });
+  // Alla chiusura il questionario arriva a tutti nello stesso momento, e un
+  // ufficio esce su internet da un solo indirizzo: con 10 al minuto chi
+  // rispondeva dopo i primi dieci colleghi perdeva la risposta. Il doppio
+  // invio lo ferma gia' la deduplica per persona.
+  const rl = rateLimit(`questionnaire:${ip}`, { limit: 60, windowMs: 60_000 });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const event = await prisma.event.findUnique({
     where: UUID_RE.test(param) ? { id: param } : { slug: param },
-    select: { id: true },
+    select: {
+      id: true,
+      status: true,
+      feedbackEnabled: true,
+      endsAt: true,
+      dataRetentionDays: true,
+      jitsiRoomName: true,
+    },
   });
   if (!event) throw new NotFoundError('Event');
+  // La valutazione si da' durante l'evento o dopo, finche' l'evento non e'
+  // archiviato, e solo se la raccolta e' accesa.
+  if (placement === 'POST_EVENT' && !feedbackOpen(event)) {
+    throw new ForbiddenError('Feedback is not open for this event');
+  }
 
   const q = await findEventQuestionnaireByPlacement(event.id, placement);
   if (!q) throw new NotFoundError('EventQuestionnaire');
@@ -72,23 +90,40 @@ export const POST = withErrorHandling(async (request, context) => {
       parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
-  const { answers, accessToken, guestId, respondentName } = parsed.data;
+  const { answers, accessToken, guestId, respondentName, roomToken, ratingToken } = parsed.data;
 
   let registrationId: string | null = null;
   let respondentEmailHash: string | null = null;
   let nameFromRegistration: string | null = null;
+  let joinedAt: Date | null = null;
 
   if (accessToken) {
     const reg = await prisma.registration.findUnique({
       where: { accessToken },
-      select: { id: true, eventId: true, email: true, displayName: true },
+      select: { id: true, eventId: true, emailHash: true, displayName: true, joinedAt: true },
     });
     if (!reg || reg.eventId !== event.id) {
       throw new ForbiddenError('Invalid access token');
     }
     registrationId = reg.id;
-    respondentEmailHash = hashEmail(reg.email);
+    respondentEmailHash = reg.emailHash;
     nameFromRegistration = tryDecryptPII(reg.displayName) ?? reg.displayName;
+    joinedAt = reg.joinedAt;
+  }
+
+  // La valutazione di fine evento: solo da chi ha partecipato, una risposta
+  // a testa (lib/feedback/participation). L'id scelto dal browser non conta.
+  let chiaveOspite: string | null = guestId ?? null;
+  if (placement === 'POST_EVENT') {
+    const chi = await identitaPerValutazione({
+      eventId: event.id,
+      roomName: event.jitsiRoomName,
+      iscrizione: registrationId ? { id: registrationId, joinedAt } : null,
+      ratingToken,
+      tokenSala: roomToken,
+    });
+    registrationId = chi.registrationId;
+    chiaveOspite = chi.chiaveOspite;
   }
 
   const normalized = validateAnswers(q, answers);
@@ -96,9 +131,12 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await submitResponse({
     questionnaire: q,
     registrationId,
-    guestId: guestId ?? null,
-    respondentName: nameFromRegistration ?? respondentName ?? null,
-    respondentEmailHash,
+    guestId: chiaveOspite,
+    // La valutazione di fine evento arriva a chi organizza senza il nome di
+    // chi risponde (lo dice la sala): nome e hash dell'email non si salvano.
+    // L'iscrizione resta collegata solo per tenere una risposta a testa.
+    respondentName: placement === 'POST_EVENT' ? null : (nameFromRegistration ?? respondentName ?? null),
+    respondentEmailHash: placement === 'POST_EVENT' ? null : respondentEmailHash,
     answers: normalized,
   });
 

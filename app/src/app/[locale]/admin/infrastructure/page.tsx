@@ -4,6 +4,12 @@ import { soloAdmin } from '@/lib/auth/staff-page';
 import { getInfrastructureInfo } from '@/lib/infrastructure';
 import InfrastructurePanel from '@/components/admin/infrastructure-panel';
 import InfrastructureMap from '@/components/status/infrastructure-map';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/infrastructure');
+}
 
 export default async function InfrastructurePage() {
   const locale = await getLocale();
@@ -16,8 +22,7 @@ export default async function InfrastructurePage() {
 
   return (
     <div className="container py-5">
-      <h1 className="mb-2">{t('title')}</h1>
-      <p className="text-secondary mb-4">{t('subtitle')}</p>
+      <AdminPageHeader title={await adminPageTitle('/admin/infrastructure')} subtitle={t('subtitle')} />
 
       <section className="mb-5">
         <h2 className="h4 fw-semibold mb-3">{tMap('title')}</h2>

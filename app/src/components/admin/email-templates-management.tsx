@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Input, Label } from 'design-react-kit';
 
+import { messaggioErroreApi } from '@/lib/api-error-message';
 import { EMAIL_LOCALES, type EmailLocale } from '@/lib/email/lingua';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
@@ -74,6 +75,7 @@ function rowToDraft(row: TemplateRow | undefined): Draft {
 export default function EmailTemplatesManagement() {
   const t = useTranslations('admin.emailTemplates');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const confirm = useConfirm();
 
   const [rows, setRows] = useState<TemplateRow[]>([]);
@@ -148,8 +150,7 @@ export default function EmailTemplatesManagement() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.error ?? t('errors.saveFailed'));
+        setError(messaggioErroreApi(res.status, tApi, t('errors.saveFailed')));
         return;
       }
       setFlash(t('saved'));
@@ -157,7 +158,7 @@ export default function EmailTemplatesManagement() {
     } finally {
       setSaving(false);
     }
-  }, [draft, selectedKey, selectedLocale, fetchAll, t]);
+  }, [draft, selectedKey, selectedLocale, fetchAll, t, tApi]);
 
   const resetToDefault = useCallback(async () => {
     const ok = await confirm({

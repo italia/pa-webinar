@@ -3,6 +3,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
+import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { getSettings } from '@/lib/settings';
 import {
   absoluteEventImage,
@@ -21,11 +22,13 @@ import {
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
 import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
-import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
 import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
+import { costruisciTrascrizioniMancanti } from '@/lib/captions/transcript';
+import { notifyPublishedRecordings } from '@/lib/events/recording-notify';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
 import { currentReminder } from '@/lib/email/reminder-plan';
@@ -119,15 +122,17 @@ export const GET = withErrorHandling(async (request) => {
         const title = getLocalized(event.title as LocalizedField, locale);
         const description = getLocalized(event.description as LocalizedField, locale);
         const recipientEmail = decryptPII(reg.email);
-        // Con l'iscrizione pubblica spenta il link dell'email e' anche la
-        // prova d'identita' (lib/events/registration-link).
+        // Il link dell'email e' anche la prova che l'indirizzo e' di chi lo
+        // apre (lib/events/registration-link), quando l'iscrizione all'evento
+        // non e' aperta.
         const joinUrl = registrationJoinUrl({
           baseUrl,
           slug: event.slug,
           eventId: event.id,
           accessToken: reg.accessToken,
           locale,
-          viaEmailEntry: !settings.publicRegistrationEnabled,
+          viaEmailEntry: true,
+          bindsIdentity: !publicRegistrationFor(event, settings.publicRegistrationEnabled),
         });
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
 
@@ -152,7 +157,7 @@ export const GET = withErrorHandling(async (request) => {
           locale: testi,
           eventTitle: title,
           eventDate: formatDate(event.startsAt, testi, event.timezone),
-          eventTime: formatTime(event.startsAt, testi, event.timezone),
+          eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
           eventDuration: formatDuration(event.startsAt, event.endsAt),
           joinUrl,
           eventPageUrl,
@@ -165,6 +170,7 @@ export const GET = withErrorHandling(async (request) => {
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
+          myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', locale),
         };
 
         // Stesso UID della conferma: il promemoria aggiorna la voce di
@@ -240,6 +246,13 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // La trascrizione dai sottotitoli degli eventi appena conclusi: prima del
+  // riepilogo, cosi' la pagina dopo l'evento la ha gia'.
+  const captionsTranscripts = await costruisciTrascrizioniMancanti(now).catch((err) => {
+    console.error('[cron/reminders] captions transcripts failed', err instanceof Error ? err.message : err);
+    return 0;
+  });
+
   // Post-event follow-up emails (opt-in). Same cadence as reminders, so no
   // dedicated CronJob is needed; the helper is idempotent (claims each event
   // before sending).
@@ -250,11 +263,22 @@ export const GET = withErrorHandling(async (request) => {
     defaultLocale: settings.defaultLocale,
   });
 
+  // L'avviso che la registrazione e' visibile: stesso giro, stessa prenotazione
+  // per evento prima dell'invio (lib/events/recording-notify).
+  const recordingNotice = await notifyPublishedRecordings({
+    now,
+    baseUrl,
+    siteName: settings.siteName || 'PA Webinar',
+    defaultLocale: settings.defaultLocale,
+  });
+
   return Response.json({
     ok: true,
+    captionsTranscripts,
     remindersProcessed,
     emailsSent,
     emailsFailed,
     postEvent,
+    recordingNotice,
   });
 });

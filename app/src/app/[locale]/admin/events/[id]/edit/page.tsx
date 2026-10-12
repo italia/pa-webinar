@@ -1,15 +1,20 @@
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-import { getStaffSession } from '@/lib/auth/staff-session';
+import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
+import { localizedPath } from '@/lib/utils/localized-url';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
+import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { Link, percorso } from '@/i18n/navigation';
+import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -22,10 +27,12 @@ import {
   coerceMatrix,
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; step?: string | string[]; section?: string | string[] }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -84,13 +91,45 @@ function adhocFromDb(
   };
 }
 
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+}
+
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
-  const { token } = await searchParams;
+  const { token, step, section } = await searchParams;
+  // Il passo da cui partire (dai link «Modifica» della pagina dell'evento),
+  // anche nominato come una volta (`permissions`, `content`).
+  const daIndirizzo = wizardStepFromParam(step);
+  const initialStep = daIndirizzo?.step;
+  const initialSection: WizardAdvancedSection | undefined =
+    (WIZARD_ADVANCED_SECTIONS as readonly string[]).includes(String(section))
+      ? (section as WizardAdvancedSection)
+      : daIndirizzo?.section;
   const t = await getTranslations({ locale, namespace: 'admin' });
+  const tNav = await getTranslations('admin.nav');
 
-  if (!token) notFound();
   if (!UUID_RE.test(id)) notFound();
+
+  // Come la pagina di gestione: lo staff entra con la propria sessione (per
+  // l'organizzatore solo sugli eventi che gestisce, ADR-014) e il token
+  // nell'indirizzo si toglie; chi ha solo il link del moderatore entra col token.
+  const session = await getStaffSession(await cookies());
+  const staffCanManage = session ? await puoGestire(session, id) : false;
+  if (token && staffCanManage) {
+    redirect(localizedPath(eventAdminPath(id, { edit: true, step: initialStep, section: initialSection }), locale));
+  }
+  if (!token) {
+    if (!session) notFound();
+    if (!staffCanManage) return <AccessDenied />;
+  }
 
   const [event, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.event.findUnique({
@@ -108,6 +147,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           include: {
             templates: { orderBy: { sortOrder: 'asc' } },
             adhocItems: { orderBy: { sortOrder: 'asc' } },
+            _count: { select: { responses: true } },
           },
         },
       },
@@ -120,7 +160,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     }),
   ]);
 
-  if (!event || event.moderatorToken !== token) {
+  if (!event || (token && event.moderatorToken !== token)) {
     notFound();
   }
 
@@ -190,6 +230,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       agendaEnabled: event.agendaEnabled,
       wordCloudEnabled: event.wordCloudEnabled,
       whiteboardEnabled: event.whiteboardEnabled,
+      liveCaptionsEnabled: event.liveCaptionsEnabled,
+      captionsTranscriptEnabled: event.captionsTranscriptEnabled,
       autoStartRecording: event.autoStartRecording,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
@@ -199,20 +241,26 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       retainParticipantTracks: event.retainParticipantTracks,
       aiTargetLocales: event.aiTargetLocales,
       expectedSpeakers: event.expectedSpeakers,
+      status: event.status,
       dataRetentionDays: event.dataRetentionDays,
+      postEventPublic: event.postEventPublic,
       gdprTemplateId: event.gdprTemplateId,
       privacyPolicyText: event.privacyPolicyText,
       privacyPolicyUrl: event.privacyPolicyUrl,
       moderatorName: event.moderatorName,
       moderatorEmail: tryDecryptPII(event.moderatorEmail),
+      moderatorOrganization: event.moderatorOrganization,
+      moderatorOrganizationLogoUrl: event.moderatorOrganizationLogoUrl,
+      moderatorPublicListed: event.moderatorPublicListed,
+      eventType: event.eventType,
+      accessMode: event.accessMode,
+      requireOrganization: event.requireOrganization,
+      requireOrganizationRole: event.requireOrganizationRole,
+      requireOrganizationType: event.requireOrganizationType,
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
       name: o.name,
-      // The wizard's OrganizerEntry carries an `organization` string. The
-      // DB model doesn't have a separate "organization" column yet — use
-      // the name as a stand-in so the picker doesn't show an empty field.
-      organization: o.name,
       logoUrl: o.logoUrl,
       websiteUrl: o.websiteUrl,
     })),
@@ -222,6 +270,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       email: tryDecryptPII(m.email),
       role: m.role as 'MODERATOR' | 'SPEAKER',
       personId: null,
+      organizer: m.organizer,
+      organization: m.organization,
+      organizationLogoUrl: m.organizationLogoUrl,
+      publicListed: m.publicListed,
     })),
     invitations: event.invitations.map((i) => ({
       id: i.id,
@@ -241,27 +293,37 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     })),
     preEventQuestionnaire: preBlock,
     postEventQuestionnaire: postBlock,
+    questionnaireResponses: {
+      pre: pre?._count.responses ?? 0,
+      post: post?._count.responses ?? 0,
+    },
   };
 
   return (
     <div className="container py-4">
-      <div className="mb-2">
-        <Link
-          href={percorso(`/admin/events/${id}?token=${token}`)}
-          className="text-decoration-none d-inline-flex align-items-center text-primary"
-          style={{ fontSize: '0.9rem' }}
-        >
-          ← {t('title')}
-        </Link>
-      </div>
+      {/* Lo staff torna indietro con le briciole; chi ha solo il link del
+          moderatore non le ha, e torna alla pagina dell'evento da qui. */}
+      {!staffCanManage && (
+        <div className="mb-2">
+          <Link
+            href={percorso(eventAdminPath(id, { viaToken: token }))}
+            className="text-decoration-none d-inline-flex align-items-center text-primary"
+            style={{ fontSize: '0.9rem' }}
+          >
+            ← {tNav('eventDetail')}
+          </Link>
+        </div>
+      )}
 
-      <h1 className="fw-bold mb-4" style={{ color: 'var(--app-text)' }}>
-        {t('editEvent')}
-      </h1>
+      <AdminPageHeader title={t('editEvent')} />
 
       <EventWizard
         mode="edit"
-        canUseRubrica={(await getStaffSession(await cookies()))?.role === 'admin'}
+        initialStep={initialStep}
+        initialSection={initialSection}
+        canUseRubrica={session?.role === 'admin'}
+        publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
+        viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
         enabledLocales={
@@ -291,6 +353,9 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
+        defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
+        aiPipelineEnabled={siteSettings.aiPipelineEnabled}
       />
     </div>
   );

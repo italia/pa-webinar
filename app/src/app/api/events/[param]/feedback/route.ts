@@ -7,9 +7,11 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { identitaPerValutazione } from '@/lib/feedback/participation';
 import { createFeedbackSchema } from '@/lib/validation/schemas';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +20,11 @@ export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`feedback:${ip}`, { limit: 10, windowMs: 60_000 });
+  // Alla chiusura il questionario arriva a tutti nello stesso momento, e un
+  // ufficio esce su internet da un solo indirizzo: con 10 al minuto chi
+  // rispondeva dopo i primi dieci colleghi perdeva la risposta. Il doppio
+  // invio lo ferma gia' la deduplica per persona.
+  const rl = rateLimit(`feedback:${ip}`, { limit: 60, windowMs: 60_000 });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
@@ -26,7 +32,12 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  if (!['LIVE', 'ENDED'].includes(event.status)) {
+  // Anche qui: oltre la conservazione dei dati dell'evento non si raccoglie
+  // piu' niente (lib/gdpr/cleanup-selection).
+  const aperta =
+    event.status === 'LIVE' ||
+    (event.status === 'ENDED' && !isEventDataRetentionExpired(event, new Date()));
+  if (!aperta) {
     throw new ConflictError('Feedback is only accepted for live or ended events');
   }
 
@@ -36,27 +47,44 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
-  const { rating, comment, accessToken, guestId } = parsed.data;
+  const { rating, comment, accessToken, roomToken, ratingToken } = parsed.data;
 
   let registrationId: string | null = null;
+  let iscrizione: { joinedAt: Date | null } | null = null;
 
   if (accessToken) {
     const reg = await prisma.registration.findUnique({
       where: { accessToken },
-      select: { id: true, eventId: true },
+      select: { id: true, eventId: true, joinedAt: true },
     });
     if (!reg || reg.eventId !== event.id) {
       throw new ForbiddenError('Invalid access token');
     }
     registrationId = reg.id;
+    iscrizione = { joinedAt: reg.joinedAt };
+  }
 
+  // Solo da chi ha partecipato, come il questionario di fine evento, una
+  // risposta a testa (lib/feedback/participation). L'id scelto dal browser
+  // non conta.
+  const chi = await identitaPerValutazione({
+    eventId: event.id,
+    roomName: event.jitsiRoomName,
+    iscrizione: registrationId && iscrizione ? { id: registrationId, joinedAt: iscrizione.joinedAt } : null,
+    ratingToken,
+    tokenSala: roomToken,
+  });
+  registrationId = chi.registrationId;
+  const chiaveOspite = chi.chiaveOspite;
+
+  if (registrationId) {
     const existing = await prisma.eventFeedback.findUnique({
-      where: { eventId_registrationId: { eventId: event.id, registrationId: reg.id } },
+      where: { eventId_registrationId: { eventId: event.id, registrationId } },
     });
     if (existing) throw new ConflictError('Feedback already submitted');
-  } else if (guestId) {
+  } else if (chiaveOspite) {
     const existing = await prisma.eventFeedback.findUnique({
-      where: { eventId_guestId: { eventId: event.id, guestId } },
+      where: { eventId_guestId: { eventId: event.id, guestId: chiaveOspite } },
     });
     if (existing) throw new ConflictError('Feedback already submitted');
   }
@@ -65,7 +93,7 @@ export const POST = withErrorHandling(async (request, context) => {
     data: {
       eventId: event.id,
       registrationId,
-      guestId: guestId || null,
+      guestId: chiaveOspite,
       rating,
       comment: comment || null,
     },

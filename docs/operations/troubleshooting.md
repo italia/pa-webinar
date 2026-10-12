@@ -35,7 +35,7 @@ Labels to select pods:
 | Pods | Selector |
 |---|---|
 | App pods only | `-l 'app.kubernetes.io/instance=pa-webinar,app.kubernetes.io/name=pa-webinar,!app.kubernetes.io/component'` |
-| One job, controller or bot | `-l app.kubernetes.io/component=<value>`, where the value is `cronjob-<job>` for the `curl` jobs and the post-production orchestrator (for example `cronjob-email-outbox`), or `jvb-scaler`, `recorder`, `recorder-controller`, `postprod-worker`, `config-reload` |
+| One job, controller or bot | `-l app.kubernetes.io/component=<value>`, where the value is `cronjob-<job>` for the `curl` jobs and the post-production orchestrator (for example `cronjob-email-outbox`), or `jvb-scaler`, `recorder`, `recorder-controller`, `postprod-worker`, `postprod-worker-cpu`, `config-reload` |
 | One Jitsi component | `-l app.kubernetes.io/component=<web, jvb, prosody, jicofo, jibri or coturn>` |
 
 The app pods and the pods of the chart's CronJobs, controllers and post-production workers share the two labels `app.kubernetes.io/name` and `app.kubernetes.io/instance`; only the extra `app.kubernetes.io/component` label tells them apart. The recorder bot pods are the exception: the recorder controller gives them only `app.kubernetes.io/component: recorder` and the recording and event IDs. The templates of the scheduled CronJobs label the pod template, and a Job created without labels of its own takes them, so both Jobs and pods can be selected by `app.kubernetes.io/component` ([background-jobs.md](../architecture/background-jobs.md#find-a-jobs-runs-and-logs)).
@@ -55,7 +55,7 @@ The app pods and the pods of the chart's CronJobs, controllers and post-producti
 | [502 on administration pages](#502-bad-gateway-on-administration-pages) | Response headers larger than a proxy's buffer | Keep the chart's buffer annotations; raise the buffer of any proxy in front |
 | [Chat or live panels drop after about 60 s](#chat-and-live-panels-drop-after-about-60-seconds) | A proxy buffers the event stream or times out before the 25-second keepalive | Turn off buffering for event streams; lengthen idle timeouts |
 | [Nobody can enter a room](#nobody-can-enter-a-room) | JWT secret, app id, issuer or audience differ between the app and Prosody | Compare both sides, then restart what changed |
-| [Guests cannot join, or the event is stuck in `PROVISIONING`](#guests-cannot-join-or-the-event-is-stuck-in-provisioning) | The event is not `LIVE`: the lifecycle job or the scaler is not running, or the bridge does not answer. Or **Guest access enabled** is off | **Start event**; check the lifecycle job or the scaler; check the site setting |
+| [Guests cannot join, or the event is stuck in `PROVISIONING`](#guests-cannot-join-or-the-event-is-stuck-in-provisioning) | The event is not `LIVE`: the lifecycle job or the scaler is not running, or the bridge does not answer. Or **Guest access enabled** is off, or the event is open only to invitees | **Start event**; check the lifecycle job or the scaler; check the site setting and the event's **Who registers** |
 | [Rooms take minutes to open](#slow-cold-start) | Bridge cold start longer than the pre-scale window, or a bridge pod stuck in `Pending` | Raise **Pre-scale lead time (minutes)**; fix the node pool |
 | [No audio or video](#no-audio-or-video) | UDP 10000 closed, unreachable advertised address, several bridges behind one address, no TURN relay | Follow the decision tree |
 | [The call breaks when a participant leaves](#the-call-breaks-when-a-participant-leaves) | The bridge channel runs over SCTP | Move the bridge channel to the Colibri WebSocket |
@@ -207,7 +207,7 @@ Then restart what you changed, between events: the app (`kubectl -n pa-webinar r
 
 Only a `LIVE` event lets anyone into the conference, and only a `LIVE` event admits guests ([event-lifecycle.md](../architecture/event-lifecycle.md#which-joins-each-status-admits)).
 
-**Symptom: guests are sent to registration.** A guest who opens the room link is redirected to the event's registration page. With **Public registration enabled** off, that page accepts only addresses on the event's invitation list ([Runtime settings](../configuration/runtime-settings.md#public-features)). Registrants and moderators wait in the waiting room at a countdown or at "The event is about to start, please wait for the organizer…".
+**Symptom: guests are sent to registration.** A guest who opens the room link is redirected to the event's registration page. When the event is open only to invitees (its **Who registers** choice, or **Public registration enabled** off for an event without one), that page accepts only addresses on the event's invitation list ([Runtime settings](../configuration/runtime-settings.md#public-features)). Registrants and moderators wait in the waiting room at a countdown or at "The event is about to start, please wait for the organizer…".
 
 - **Cause.** The event is still `PUBLISHED` after its start time. Outside the Helm `full` profile with the JVB scaler, the lifecycle job opens it within a minute of `startsAt` ([Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)). If it does not, either the job is not running (the `<release>-lifecycle` CronJob, or the `cron` service in Docker Compose), or `JVB_HEALTH_URL` is set and the bridge does not answer `/colibri/stats`:
 
@@ -221,8 +221,8 @@ Only a `LIVE` event lets anyone into the conference, and only a `LIVE` event adm
 
 **Symptom: the event is `LIVE`, and guests are still sent to registration.**
 
-- **Cause.** **Guest access enabled** is off in the site settings (**Features** tab). Scheduled events then admit only registrants and moderator or speaker links, and the Jitsi token endpoint refuses guest tokens with `403` and the code `GUEST_ACCESS_DISABLED`. Instant calls stay open to anyone with the link ([Runtime settings](../configuration/runtime-settings.md#public-features)).
-- **Fix.** Turn the setting back on if the event is meant to be open, or send the people concerned the registration link. With **Public registration enabled** off, first add their addresses to the event's invitation list: the platform does not email invitations.
+- **Cause.** **Guest access enabled** is off in the site settings (**Features** tab), or the event is set to **Only people you invite** in the wizard's **People** step (**Who registers**), which admits no guests whatever the site setting. Scheduled events then admit only registrants and moderator or speaker links, and the Jitsi token endpoint refuses guest tokens with `403` and the code `GUEST_ACCESS_DISABLED`. Instant calls stay open to anyone with the link ([Runtime settings](../configuration/runtime-settings.md#public-features)).
+- **Fix.** If guests are meant to get in, turn the site setting back on and, for an event set to **Only people you invite**, choose **Anyone who registers** instead. Otherwise send the people concerned the registration link. When the event is open only to invitees, first add their addresses to the event's invitation list: the platform does not email invitations.
 
 **Symptom: the event is stuck in `PROVISIONING`.** The event does not leave `PROVISIONING`, and the waiting room shows **Room warming up**, or **The room opens at the start time** when no scaler drives the lifecycle. A moderator can open it at any time with **Start event**.
 
@@ -404,7 +404,7 @@ When the target does not appear at all, `metrics.serviceMonitor.additionalLabels
 
 **Cause.** The chart's policy (`templates/networkpolicy.yaml`) selects only the app pods: the pods of the release that carry no `app.kubernetes.io/component` label. The scheduled jobs, the JVB scaler, the config-reload hook, the recorder controller and the post-production orchestrator and worker are not selected, so their own traffic is not restricted.
 
-- **Into the app (port 3000)** it admits the namespaces in `networkPolicy.ingress.fromNamespaceSelectors` and the pods in `fromPodSelectors` (any source when both lists are empty), every pod that carries the release's selector labels, the Jibri pods of the same release when Jibri is enabled, and the monitoring namespace while `allowMonitoring` is on.
+- **Into the app (port 3000)** it admits the namespaces in `networkPolicy.ingress.fromNamespaceSelectors` and the pods in `fromPodSelectors` (any source when both lists are empty), every pod that carries the release's selector labels, the Jibri pods of the same release when Jibri is enabled, its Prosody pods when the chart installs Jitsi, the live captions pods when captions are enabled, and the monitoring namespace while `allowMonitoring` is on.
 - **Out of the app** it allows DNS, PostgreSQL, Redis, the in-cluster Jitsi pods on 5222, 5280, 8080 and 2222 (`networkPolicy.egress.jitsi`), the recorder controller, the ingress controller's namespaces on 443 and 8443 (`networkPolicy.egress.ingressController`), SMTP, and TCP 443 anywhere except the link-local metadata range.
 
 Every path outside these rules is blocked. The keys are described in [DEPLOYMENT.md](../DEPLOYMENT.md#networkpolicy).
@@ -460,12 +460,13 @@ Quick checks before the pipeline's own troubleshooting in [POSTPROD.md](../POSTP
 
 - `postprod.enabled` is `false` by default in `values.yaml`. Without it the chart renders neither the orchestrator nor the worker template.
 - **Post-event pipeline active** (`aiPipelineEnabled`, off by default in `app/prisma/schema.prisma`), under **Site settings** → **Post-event AI pipeline**. While it is off, the orchestrator is told to start nothing.
-- At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), and a failed job waits for its retry delay.
+- At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), with and without a GPU together, and a failed job waits for its retry delay.
+- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`.
 - A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools are covered in [Node pools](../INFRASTRUCTURE.md#node-pools), and quotas in the guide of each managed cloud.
 
 ```bash
 kubectl -n pa-webinar logs -l app.kubernetes.io/component=cronjob-postprod-orchestrator --tail=20
-kubectl -n pa-webinar get pods -l app.kubernetes.io/component=postprod-worker
+kubectl -n pa-webinar get pods -l 'app.kubernetes.io/component in (postprod-worker,postprod-worker-cpu)'
 ```
 
 ## Collecting diagnostics without personal data

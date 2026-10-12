@@ -81,7 +81,8 @@ describe('mapServerIssues', () => {
       ],
       'it',
     );
-    expect(mapped.step).toBe('base');
+    // Le date stanno nel passo «Quando», prima di «Persone» e del riepilogo.
+    expect(mapped.step).toBe('schedule');
     expect(mapped.fieldErrors).toEqual({
       moderatorEmail: 'server',
       aiTargetLocales: 'server',

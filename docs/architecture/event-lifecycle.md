@@ -19,9 +19,9 @@ For organizers and moderators who need to predict when a room opens and closes:
 | Question | Helm `full` profile with the JVB scaler | Any other installation (Docker Compose, Helm `simple` or `standard`, an external Jitsi, bridges scaled by KEDA) |
 |---|---|---|
 | When can people enter? | At the first scaler tick at or after `startsAt` once a bridge answers, or earlier if a moderator pressed **Start event** | At the first lifecycle tick (every minute) at or after `startsAt`, provided the bridge answers when `JVB_HEALTH_URL` is set, or earlier if a moderator pressed **Start event** (instant calls are open from creation) |
-| When does the room close? | At `endsAt` plus the grace period, when a moderator chooses **End for everyone**, or when an open-ended room has been empty long enough | At `endsAt` plus the grace period, when a moderator chooses **End for everyone** or **End event**, or, for an open-ended room past `endsAt` and for an instant call, after `jvbInactiveGraceMinutes` without activity |
+| When does the room close? | Past `endsAt`, once it has been empty for `eventOvertimeEmptyMinutes` or at the overtime limit, or when a moderator chooses **End for everyone** | Past `endsAt`, once it has been empty for `eventOvertimeEmptyMinutes` or at the overtime limit, when a moderator chooses **End for everyone** or **End event**, or, for an instant call before its `endsAt`, after `jvbInactiveGraceMinutes` without activity |
 | What happens during a long break with nobody connected? | Before `endsAt`, the room goes `IDLE` and its bridge is released; the first person to come back wakes it (a few minutes on a cold node) | Nothing: a scheduled room stays `LIVE` until its end, because there is no `IDLE` without the scaler |
-| When is participant data deleted? | After `endsAt` plus the event's retention days, by the cleanup job, whether or not the event was ended | Same |
+| When is participant data deleted? | After `endsAt` plus the event's retention days, by the cleanup job, whether or not the event was ended. The event's live content stays, without names or identifiers | Same |
 
 ## Statuses
 
@@ -32,8 +32,8 @@ For organizers and moderators who need to predict when a room opens and closes:
 | `PROVISIONING` | A bridge is being brought up for the event, set by the scaler's pre-scale or by a wake. Nobody can enter yet. | **Room warming up** banner, or **The room opens at the start time** when the scaler is not driving the lifecycle; entry disabled; **Start event** for moderators |
 | `LIVE` | The room is open. It is the only status in which the waiting room lets anyone into the Jitsi conference and the only one that admits guests. | **Enter now** |
 | `IDLE` | The room was `LIVE`, stayed empty for the inactivity grace and its bridge was scaled to zero. Only the scaler sets it. | As `PROVISIONING`; opening the page wakes the room; **Start event** for moderators |
-| `ENDED` | The event is over. With the scaler, bridges are released on the next tick. The post-event page stays public unless it was turned off (`postEventPublic`, on by default for scheduled events and off for instant calls) or `postEventPublicUntil` has passed. | Closing view: recording and feedback |
-| `ARCHIVED` | Hidden from every public surface. The event row (title, description, dates) is kept as a record; participant data is deleted once retention expires. | Entry disabled with a valid link; without one, a redirect to the event page, which is not public |
+| `ENDED` | The event is over. With the scaler, bridges are released on the next tick. The post-event page stays public unless it was turned off (`postEventPublic`, on by default for scheduled events and off for instant calls) or `postEventPublicUntil` has passed. Retention removes personal data and leaves the status unchanged. | Closing view: recording and feedback |
+| `ARCHIVED` | Hidden from every public surface. Set by staff with bulk archive, or by the cleanup job on an event that was never ended. The event row is kept; personal data is removed once retention expires, as for `ENDED`. | Entry disabled with a valid link; without one, a redirect to the event page, which is not public |
 
 The exact screen for each combination of status, time and bridge readiness, with every label, is described in [waiting-room.md](waiting-room.md#what-each-state-shows).
 
@@ -47,12 +47,12 @@ The rules live in `app/src/lib/events/visibility.ts`.
 |---|---|---|
 | `DRAFT` | No | Closed |
 | `PUBLISHED` | Yes. The home page and the public calendar list it only until `endsAt` | Open until `endsAt` |
-| `LIVE` | Yes, also past `endsAt` (instant calls never get a public page while running) | Open, also past `endsAt`: the grace period and open-ended rooms keep a room legitimately running |
+| `LIVE` | Yes, also past `endsAt` (instant calls never get a public page while running) | Open, also past `endsAt`: the overtime rules keep a room legitimately running while people are in it |
 | `PROVISIONING`, `IDLE` | Scheduled events only, until `endsAt` | Open on the same terms |
 | `ENDED` | Only while the post-event page is enabled (`postEventPublic`) and `postEventPublicUntil`, if set, is in the future | Closed |
 | `ARCHIVED` | No | Closed |
 
-"Open" means open to anyone while the site setting `publicRegistrationEnabled` is on. With it off, only the addresses on the event's invitation list can register, and an event without invitations accepts no new registrations ([Invitation-only registration](event-journey.md#invitation-only-registration)).
+"Open" means open to anyone when the event's `accessMode` is `OPEN`, or when it has no choice and the site setting `publicRegistrationEnabled` is on. Otherwise only the addresses on the event's invitation list can register, and an event without invitations accepts no new registrations ([Invitation-only registration](event-journey.md#invitation-only-registration)).
 
 The home page and the public calendar ask for upcoming events only (`publicEventStatusWhere({ includeEnded: false })`): they list `LIVE` events always and `PUBLISHED`, `PROVISIONING` and `IDLE` events only before `endsAt`. The other listings, the sitemap and the public API list `PUBLISHED` events whatever their `endsAt`. Registration is refused with `409` once a `PUBLISHED` event is past its end, and its registration page answers 404. Its public page shows it as ended, with no registration button, room link or add-to-calendar links: the page asks `isEventOpenForRegistration()` on the server rather than deciding from the status.
 
@@ -88,13 +88,13 @@ stateDiagram-v2
   LIVE --> IDLE : scaler: room empty
   IDLE --> PROVISIONING : wake: someone arrives
   IDLE --> LIVE : moderator: Start event
-  LIVE --> ENDED : moderator: End for everyone<br/>scaler or lifecycle: grace over or inactive
+  LIVE --> ENDED : moderator: End for everyone<br/>scaler or lifecycle: empty past the end, or overtime limit
   PUBLISHED --> ENDED : scaler or lifecycle: endsAt passed
   PROVISIONING --> ENDED : scaler or lifecycle: endsAt passed
   IDLE --> ENDED : scaler or lifecycle: endsAt passed
   ENDED --> LIVE : moderator: revive, start passed
   ENDED --> PUBLISHED : moderator: revive, start ahead
-  ENDED --> ARCHIVED : cleanup: retention over
+  ENDED --> ARCHIVED : staff: bulk Archive
   ARCHIVED --> PUBLISHED : moderator: Publish (management page)
 
   class DRAFT,PUBLISHED human
@@ -104,7 +104,7 @@ stateDiagram-v2
   class ARCHIVED cron
 ```
 
-Blue statuses are set by people, teal ones only by automation, green is the open room, gray is the end of the live phase and amber is the retention hand-off. Instant calls are created directly as `LIVE`. Three actions are left out of the drawing to keep it readable: bulk archive moves any status to `ARCHIVED`, **Publish** on the management page also moves an `IDLE` event to `PUBLISHED`, and the cleanup job archives an event that was never ended once its retention has passed. The lifecycle cron also opens `PROVISIONING` and `IDLE` events it finds, although it never sets either status. The diagram shows the transitions the user interface offers; the events API itself accepts an explicit `DRAFT`, `PUBLISHED`, `LIVE` or `ENDED` from any status (see [Manual transitions](#manual-transitions)). With the scaler there are no `lifecycle:` edges; without it there are no `scaler:` edges, a wake leaves a `PUBLISHED` event unchanged and `IDLE` never occurs: see [Running without the scaler](#running-without-the-scaler).
+Blue statuses are set by people, teal ones only by automation, green is the open room, gray is the end of the live phase and amber is the archive. Instant calls are created directly as `LIVE`. Three actions are left out of the drawing to keep it readable: bulk archive moves any other status to `ARCHIVED` too, **Publish** on the management page also moves an `IDLE` event to `PUBLISHED`, and the cleanup job archives an event that was never ended once its retention has passed. The lifecycle cron also opens `PROVISIONING` and `IDLE` events it finds, although it never sets either status. The diagram shows the transitions the user interface offers; the events API itself accepts an explicit `DRAFT`, `PUBLISHED`, `LIVE` or `ENDED` from any status (see [Manual transitions](#manual-transitions)). With the scaler there are no `lifecycle:` edges; without it there are no `scaler:` edges, a wake leaves a `PUBLISHED` event unchanged and `IDLE` never occurs: see [Running without the scaler](#running-without-the-scaler).
 
 ## Who moves an event
 
@@ -120,7 +120,7 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 | `PUBLISHED` → `DRAFT` | **Unpublish** | Moderator credential | Yes | Yes | Yes |
 | `PROVISIONING`, `IDLE`, `ARCHIVED` → `PUBLISHED` | **Publish** on the management page | Moderator credential | Yes (`ARCHIVED` only) | Yes (`ARCHIVED` only) | Yes |
 | `PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE` | **Start event** on the management page or in the waiting room | Moderator credential | Yes (`PUBLISHED` only) | Yes (`PUBLISHED` only) | Yes |
-| `LIVE` → `ENDED` | **End for everyone** (after **Leave room**) or **End event** in the moderator bar | Moderator credential | Yes | Yes | Yes |
+| `LIVE` → `ENDED` | **End for everyone** (after **Leave room**) or **End event** in the room's **Control** panel | Moderator credential | Yes | Yes | Yes |
 | `ENDED` → `PUBLISHED` or `LIVE` | Saving the event with a future `endsAt` (revival) | Moderator credential | Yes | Yes | Yes |
 | any → `ARCHIVED` | Bulk **Archive** in the event list | Administrator, or organizer for their own events | Yes | Yes | Yes |
 | `PUBLISHED` → `PROVISIONING` | Scaler pre-scale at `startsAt` minus `jvbPreScaleMinutes` | Scaler | No | No | Yes |
@@ -129,12 +129,12 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 | `PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE` | `startsAt` passed and `endsAt` ahead, while the bridge answers `JVB_HEALTH_URL` (or `JVB_HEALTH_URL` is not set) | Lifecycle cron | Yes (the bridge is assumed present) | Yes | No |
 | `LIVE` → `IDLE` | Room empty for `jvbInactiveGraceMinutes`, before `endsAt` | Scaler | No | No | Yes |
 | `IDLE` → `PROVISIONING` | `POST /wake` | Any visitor | Does not occur (no `IDLE`) | Does not occur | Yes |
-| `LIVE` → `ENDED` | `endsAt` plus grace elapsed | Scaler or lifecycle cron | Yes | Yes | Yes |
+| `LIVE` → `ENDED` | Past `endsAt`, at the overtime limit (`endsAt` plus grace, unless grace is `-1`) | Scaler or lifecycle cron | Yes | Yes | Yes |
 | `LIVE` → `ENDED` | Opt-in empty close (`jvbEmptyCloseMinutes`) | Scaler or lifecycle cron | No (no `JVB_HEALTH_URL`) | Yes, if enabled and the bridge answers | Yes, if enabled |
-| `LIVE` → `ENDED` | Open-ended room (grace `-1`) past `endsAt` and without activity for `jvbInactiveGraceMinutes` | Scaler or lifecycle cron | Yes | Yes | Yes |
+| `LIVE` → `ENDED` | Past `endsAt` and without activity for `eventOvertimeEmptyMinutes`, counted from `endsAt` at the earliest, when that silence is reliable | Scaler or lifecycle cron | Yes | Yes | Yes |
 | `LIVE` → `ENDED` | Instant call without activity for `jvbInactiveGraceMinutes`, before its `endsAt` | Lifecycle cron | Yes | Yes | No (the scaler moves it to `IDLE`) |
 | `PUBLISHED`, `PROVISIONING`, `IDLE` → `ENDED` | `endsAt` passed | Scaler or lifecycle cron | Yes | Yes | Yes |
-| `ENDED` → `ARCHIVED`; `PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE` → `ARCHIVED` | Retention expired | Cleanup job | Yes (hourly) | Yes (daily) | Yes (daily) |
+| `PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE` → `ARCHIVED` | Retention expired on an event that was never ended | Cleanup job | Yes (hourly) | Yes (daily) | Yes (daily) |
 
 ### Manual transitions
 
@@ -142,7 +142,7 @@ All manual changes to an existing event's status, except bulk archive, go throug
 
 - **Publish.** The wizard always creates the event as `DRAFT` (`POST /api/events`). If the organizer chose **Publish event**, the wizard then sends a second request that sets `PUBLISHED`. The event card menu offers **Publish** or **Unpublish** only for scheduled events in `DRAFT` or `PUBLISHED`, and toggles between the two. The management page button reads **Unpublish** on a `PUBLISHED` event, which it sends back to `DRAFT`, and **Publish** on any other status, which it sets to `PUBLISHED`. It is disabled only while the event is `LIVE` or `ENDED`, so it also moves `PROVISIONING`, `IDLE` and `ARCHIVED` events to `PUBLISHED`.
 - **Start event.** Shown on the management page and, to moderators only, in the waiting room, while the event is `PUBLISHED`, `PROVISIONING` or `IDLE` (`canStartManually()` in `app/src/lib/events/lifecycle.ts`), in every installation. It sets `LIVE` immediately. When the start is more than 30 minutes away (`app/src/components/admin/event-management-client.tsx`), the management page adds a warning that the video servers may take a couple of minutes to come up. In the `full` profile the scaler moves the event to `PROVISIONING` `jvbPreScaleMinutes` before the start and to `LIVE` by itself at `startsAt`; the button stays available meanwhile. The waiting room shows no **Start event** on a `PUBLISHED` event past its `endsAt`.
-- **End.** A moderator who clicks **Leave room** chooses between **Just leave** (the call continues for everyone else) and **End for everyone**. The latter asks what should happen to the event page afterwards (**Keep it public**, **Publish to the library** or **Archive (private)**, plus an option to generate an AI transcript and summary once the recording is processed) and then sets `ENDED` together with those choices. **Archive (private)** only hides the post-event page: the status is `ENDED`, not `ARCHIVED`. The moderator bar also has an **End event** button that sets `ENDED` after a confirmation, without the follow-up questions.
+- **End.** A moderator who clicks **Leave room** chooses between **Just leave** (the call continues for everyone else) and **End for everyone**. The latter asks what should happen to the event page afterwards (**Keep it public**, **Publish to the library** or **Archive (private)**, plus an option to generate an AI transcript and summary once the recording is processed) and then sets `ENDED` together with those choices. **Archive (private)** only hides the post-event page: the status is `ENDED`, not `ARCHIVED`. The room's **Control** panel also has an **End event** button, set apart at the bottom, that sets `ENDED` after a confirmation, without the follow-up questions.
 - **Revival.** See [Revival](#revival).
 - **Bulk archive.** `POST /api/admin/events/bulk-archive` sets `ARCHIVED` on the selected events whatever their status, restricted to the organizer's own events when the caller is an organizer, and closes the open call sessions of those that were not already `ENDED` or `ARCHIVED`, in the same transaction. It deletes nothing; see [After the event](#after-the-event-hand-off-archiving-and-retention).
 
@@ -184,11 +184,11 @@ The live page calls it once per page load, as soon as the status it shows is `ID
 An instant call is created directly as `LIVE` by `POST /api/events/instant` (staff only). It gets (`app/src/app/api/events/instant/route.ts`):
 
 - `endsAt` four hours after creation, a cosmetic upper bound;
-- `gracePeriodMinutes` set to `-1`, so it never closes on the clock;
+- `gracePeriodMinutes` set to `-1`, so it never closes on the clock while people are in it;
 - `lastActiveAt` and `provisioningStartedAt` stamped at creation, so the inactivity rules have a starting point;
 - `dataRetentionDays` set to 7 and `postEventPublic` off.
 
-With the scaler, an empty instant call goes `IDLE` after the inactivity grace while its `endsAt` is ahead. Past `endsAt` an `IDLE` instant call ends, and a `LIVE` one ends once it has been empty for the inactivity grace. Anyone with the link can wait in the room while it is `LIVE`, `IDLE` or `PROVISIONING`, and enters when it is `LIVE`. Without the scaler an instant call ends after `jvbInactiveGraceMinutes` with no activity, before or after its `endsAt`. Activity means the headcount reports of the clients in the call, plus the bridge's participant count when `JVB_HEALTH_URL` answers (see [Inactivity grace](#inactivity-grace-live-to-idle)).
+With the scaler, an empty instant call goes `IDLE` after the inactivity grace while its `endsAt` is ahead. Past `endsAt` an `IDLE` instant call ends, and a `LIVE` one ends once it has been empty for `eventOvertimeEmptyMinutes`. Anyone with the link can wait in the room while it is `LIVE`, `IDLE` or `PROVISIONING`, and enters when it is `LIVE`. Without the scaler an instant call ends after `jvbInactiveGraceMinutes` with no activity before its `endsAt`, and after `eventOvertimeEmptyMinutes` past it. Activity means the headcount reports of the clients in the call, plus the bridge's participant count when `JVB_HEALTH_URL` answers (see [Inactivity grace](#inactivity-grace-live-to-idle)).
 
 ## Running without the scaler
 
@@ -233,7 +233,7 @@ The fixed tick applies these rules in one database transaction (`app/src/lib/eve
 2. **Opt-in empty close** (`LIVE` → `ENDED`, before `endsAt`). As with the scaler, only when `jvbEmptyCloseMinutes` is not `-1`, and only while `JVB_HEALTH_URL` answers: without a bridge reading there is no proof that a room is empty.
 3. **Abandoned instant calls** (`LIVE` → `ENDED`, before their placeholder `endsAt`). An instant call ends when the latest of `lastActiveAt`, `provisioningStartedAt` and its creation is older than `jvbInactiveGraceMinutes`. A scheduled room before its `endsAt` is never ended for inactivity: an empty scheduled room is a break, and ending it would be final.
 4. **Timeouts** (`PUBLISHED`, `PROVISIONING`, `IDLE` → `ENDED`). An event never opened ends as soon as its `endsAt` has passed.
-5. **Overtime close** (`LIVE` → `ENDED`, past `endsAt`). At `endsAt` plus the grace period, or, for an open-ended room (grace `-1`), once its latest sign of activity is older than `jvbInactiveGraceMinutes` ([Grace period and overtime](#grace-period-and-overtime)).
+5. **Overtime close** (`LIVE` → `ENDED`, past `endsAt`). Once its latest sign of activity is older than `eventOvertimeEmptyMinutes`, when that silence is reliable, and in any case at `endsAt` plus the overtime limit unless the limit is `-1` ([Grace period and overtime](#grace-period-and-overtime)).
 6. **Opening** (`PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE`). Events whose `startsAt` has passed and whose `endsAt` is still ahead, provided the bridge answers `/colibri/stats` at `JVB_HEALTH_URL`. Without `JVB_HEALTH_URL` (an external Jitsi) there is nothing to ask and the bridge is assumed present. `provisioningStartedAt` is stamped, as with the scaler's promotion.
 
 Every event that leaves `LIVE` closes its open call sessions in the same transaction. After the commit, the tick announces each status change on the room's live channel, notifies the recorder controller when it opened a room and `RECORDER_CONTROLLER_URL` is set, and closes the sessions still open on `ENDED` and `ARCHIVED` events. The route answers with the counts of each transition (`liveRefreshed`, `liveEmptyClosed`, `toLive`, `toEnded`), the number of sessions repaired and whether the bridge was probed and answered, and writes one log line per tick that changed something.
@@ -254,8 +254,8 @@ flowchart LR
   D -->|"moderator: Publish"| P
   P -->|"lifecycle: start reached,<br/>bridge answers<br/>moderator: Start event"| L
   P -->|"lifecycle: endsAt passed,<br/>never opened"| E
-  L -->|"lifecycle: endsAt plus grace,<br/>or inactive when open-ended<br/>or an instant call<br/>moderator: End for everyone"| E
-  E -->|"cleanup job after<br/>endsAt plus dataRetentionDays"| A
+  L -->|"lifecycle: empty past endsAt,<br/>or overtime limit,<br/>or an abandoned instant call<br/>moderator: End for everyone"| E
+  E -->|"staff: bulk Archive"| A
 ```
 
 What never happens without the scaler:
@@ -270,7 +270,7 @@ Transitions lag their nominal time by up to one lifecycle interval (one minute).
 Two layers decide whether someone gets into the conference: the waiting room, and the Jitsi token endpoint `POST /api/events/<slug>/jitsi/token`.
 
 - **The waiting room** enables its join button only when the event is `LIVE`, for every role. Moderators reach `LIVE` from `PUBLISHED`, `PROVISIONING` or `IDLE` with **Start event**.
-- **The token endpoint** mints a JWT only when the event is `PUBLISHED` or `LIVE`, and only when the event is `LIVE` for guests without a token. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on (otherwise `403`).
+- **The token endpoint** mints a JWT only when the event is `PUBLISHED` or `LIVE`, and only when the event is `LIVE` for guests without a token. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on and the event is not `INVITATION` (otherwise `403`).
 
 | Status | Moderator or speaker link | Registrant | Guest (no token) |
 |---|---|---|---|
@@ -282,7 +282,7 @@ Two layers decide whether someone gets into the conference: the waiting room, an
 
 When the token endpoint answers `409` to a client that tries to enter or rejoin, the client reads `/lifecycle`: an `ENDED` event takes it to the closing screen, and a `PUBLISHED`, `PROVISIONING` or `IDLE` one back to the waiting room.
 
-A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or, while public registration is off, by the signed entry link in the email. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
+A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or set by an email entry link signed with `sig`, which the emails built while the event's registration is by invitation only carry. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
 
 ## Timing semantics
 
@@ -297,9 +297,9 @@ flowchart TB
   A["PUBLISHED<br/>registration open,<br/>countdown in the waiting room"]:::human
   B["startsAt minus jvbPreScaleMinutes<br/>scaler: PROVISIONING<br/>bridge node starts"]:::auto
   C["startsAt and a bridge answers<br/>scaler: LIVE<br/>everyone can enter"]:::live
-  D["endsAt passed<br/>still LIVE: overtime banner"]:::live
-  E["endsAt plus grace<br/>scaler: ENDED<br/>bridges released"]:::terminal
-  F["endsAt plus dataRetentionDays<br/>cleanup: ARCHIVED<br/>participant data deleted"]:::cron
+  D["endsAt passed<br/>still LIVE: overtime countdown"]:::live
+  E["empty past endsAt, or overtime limit<br/>scaler: ENDED<br/>bridges released"]:::terminal
+  F["endsAt plus dataRetentionDays<br/>cleanup: personal data removed<br/>status stays ENDED"]:::cron
 
   I["IDLE<br/>bridge scaled to zero"]:::auto
   W["PROVISIONING<br/>bridge restarts"]:::auto
@@ -307,7 +307,7 @@ flowchart TB
   A -->|"pre-scale window opens"| B
   B -->|"wait for start"| C
   C -->|"scheduled end"| D
-  D -->|"grace elapses"| E
+  D -->|"room empties, or limit reached"| E
   E -->|"cleanup job"| F
 
   C -.->|"room empty for<br/>jvbInactiveGraceMinutes"| I
@@ -316,7 +316,7 @@ flowchart TB
   I -.->|"scaler: endsAt passed"| E
 ```
 
-A scheduled event in the `full` profile with the scaler: solid arrows are the usual path, dotted arrows the detour a room takes when it empties before its end time. Teal marks statuses that only the scaler and wake set, green the open room, amber the cleanup job. Every automatic step happens on the first tick after its condition becomes true, so transitions lag their nominal time by up to one `jvbScaler.schedule` interval (two minutes by default in `infra/helm/pa-webinar/values.yaml`). Without the scaler the path skips the teal statuses: the lifecycle cron opens the room at `startsAt` and closes it at `endsAt` plus grace, with a lag of up to one lifecycle interval (one minute, `cronjobs.lifecycle.schedule`, and the Compose `cron` service).
+A scheduled event in the `full` profile with the scaler: solid arrows are the usual path, dotted arrows the detour a room takes when it empties before its end time. Teal marks statuses that only the scaler and wake set, green the open room, amber the cleanup job. Every automatic step happens on the first tick after its condition becomes true, so transitions lag their nominal time by up to one `jvbScaler.schedule` interval (two minutes by default in `infra/helm/pa-webinar/values.yaml`). Without the scaler the path skips the teal statuses: the lifecycle cron opens the room at `startsAt` and closes it past `endsAt` by the same two rules, with a lag of up to one lifecycle interval (one minute, `cronjobs.lifecycle.schedule`, and the Compose `cron` service).
 
 ### Lifecycle settings
 
@@ -326,8 +326,9 @@ These `SiteSetting` columns, edited in the administration area without a restart
 |---|---|
 | `jvbPreScaleMinutes` | `PUBLISHED` → `PROVISIONING` by the scaler ([Pre-scale window](#pre-scale-window)); with `waitingRoomLeadMinutes`, how early a visitor can [wake](#wake) a `PUBLISHED` room. Nothing without the scaler |
 | `waitingRoomLeadMinutes` | How early a visitor can [wake](#wake) a `PUBLISHED` room, with the scaler (the larger of the two settings applies) |
-| `jvbInactiveGraceMinutes` | `LIVE` → `IDLE` with the scaler ([Inactivity grace](#inactivity-grace-live-to-idle)); the close of an inactive open-ended room past `endsAt` ([Grace period and overtime](#grace-period-and-overtime)); without the scaler, the close of an abandoned instant call ([Instant calls](#instant-calls)) |
-| `eventGracePeriodMinutes`, overridden per event by `Event.gracePeriodMinutes` | `LIVE` → `ENDED` after `endsAt` ([Grace period and overtime](#grace-period-and-overtime)) |
+| `jvbInactiveGraceMinutes` | `LIVE` → `IDLE` with the scaler ([Inactivity grace](#inactivity-grace-live-to-idle)); without the scaler, the close of an abandoned instant call ([Instant calls](#instant-calls)) |
+| `eventGracePeriodMinutes`, overridden per event by `Event.gracePeriodMinutes` | `LIVE` → `ENDED` after `endsAt` for a room that is still occupied: the overtime limit ([Grace period and overtime](#grace-period-and-overtime)) |
+| `eventOvertimeEmptyMinutes` | `LIVE` → `ENDED` after `endsAt` for a room that has emptied ([Grace period and overtime](#grace-period-and-overtime)) |
 | `jvbEmptyCloseMinutes` | Opt-in `LIVE` → `ENDED` before `endsAt` ([Opt-in empty close](#opt-in-empty-close)); without the scaler, only while `JVB_HEALTH_URL` answers |
 | `jvbProvisioningTimeoutMinutes` | None: a status-page signal only ([The provisioning timeout is only a signal](#the-provisioning-timeout-is-only-a-signal)) |
 
@@ -339,15 +340,18 @@ The pre-scale window exists because a scale-to-zero node pool needs a few minute
 
 ### Grace period and overtime
 
-The effective grace is `Event.gracePeriodMinutes` when set, otherwise `SiteSetting.eventGracePeriodMinutes`.
+A `LIVE` room past its `endsAt` is ended by whichever of two rules fires first:
 
-| Effective grace | Behavior of a `LIVE` room once `endsAt` has passed |
+- **Empty room.** Once its latest sign of activity is older than `SiteSetting.eventOvertimeEmptyMinutes` (default `20`), it is ended to free its bridge. The signs are the same as for the [inactivity grace](#inactivity-grace-live-to-idle), and the rule applies only when the silence is reliable: with the scaler, a reachable bridge and a reliable count (aggregated across pods, or a single replica); without it, the conditions of `inactivityIsReliable()` described there.
+- **Overtime limit.** The effective limit is `Event.gracePeriodMinutes` when set, otherwise `SiteSetting.eventGracePeriodMinutes` (default `60`). It is the longest a room still occupied stays open past `endsAt`.
+
+| Effective limit | Behavior of an occupied `LIVE` room once `endsAt` has passed |
 |---|---|
 | `0` | Ended on the first tick after `endsAt` |
-| `N` > 0 | Stays `LIVE`, with the overtime banner, until `endsAt` plus `N` minutes, then ended whether or not people are still connected |
-| `-1` | Never ended on the clock. Once the room has been empty for `jvbInactiveGraceMinutes` it is ended to free its bridge. With the scaler this reclaim needs a reachable bridge and a reliable count (aggregated across pods, or a single replica). Without it, the lifecycle cron ends the room once its latest sign of activity is older than `jvbInactiveGraceMinutes`, when that silence is reliable (see [Inactivity grace](#inactivity-grace-live-to-idle) for the signs and when they are) |
+| `N` > 0 | Stays `LIVE`, with the overtime countdown, until `endsAt` plus `N` minutes, then ended whether or not people are still connected |
+| `-1` | Never ended on the clock. It is ended only once it has emptied |
 
-The time-based close with a finite grace does not depend on the participant count or on bridge reachability. A room with a finite grace is not reclaimed early when it empties past `endsAt`: it keeps its promised overtime window.
+The limit does not depend on the participant count or on bridge reachability, so it also bounds a room whose emptiness cannot be read. Because the scaler's count is bridge-wide, a room that empties while another event keeps the same bridge busy is not seen as empty: the limit closes it.
 
 `Event.gracePeriodMinutes` accepts `-1` to `240`, or `null` to inherit (`app/src/lib/validation/schemas.ts`). The event wizard does not expose it: it is set through the events API, copied when an event is duplicated, and set to `-1` for instant calls. The site default is edited in the administration settings.
 
@@ -375,15 +379,18 @@ There is no automatic return from `PROVISIONING` to `PUBLISHED`. A `PROVISIONING
 
 ## Overtime, leaving and revival
 
-### The overtime banner
+### The overtime countdown
 
-In the live room, once `endsAt` has passed, participants see a banner computed in the browser from `endsAt` and the effective grace, refreshed every 30 seconds (`app/src/components/live/live-event-client.tsx`):
+In the live room the moderators' time strip shows the time on air against the schedule (`app/src/components/live/live-time-strip.tsx`, with the arithmetic in `app/src/lib/live/event-clock.ts`). It is computed in the browser from `startsAt`, `endsAt` and the effective overtime limit:
 
-- with a finite grace: "The scheduled end time has passed. The event will close automatically in N minutes", then "End time reached. The event is about to close.";
-- with grace `-1`: "The scheduled end time has passed. The event will stay open while participants are connected.";
-- with grace `0`: no banner.
+- before the end, the progress bar fills and the text reads the scheduled end and the minutes left; in the last ten minutes it turns amber;
+- past `endsAt`, the bar is full and moves, and the text reads how long the event has run over and, with a limit, when the room closes on its own ("over time by 12 minutes · closes in 48 minutes"); with a limit of `-1` it says the room stays open while someone is there;
+- in the last ten minutes before the limit it turns red;
+- a screen-reader announcement is made when the phase changes (last minutes, overtime, closing), not at every change of the count.
 
-The banner does not ask the server. The close itself is made by the scaler or the lifecycle cron on its next tick.
+Participants and speakers see no clock: only the **REC** icon while recording, and, in the last ten minutes before the room closes on its own, a notice under the top bar ("The room closes automatically in N minutes", `app/src/components/live/closing-notice.tsx`), announced to screen readers. Instant calls have no scheduled end, so they show neither the progress bar nor the notice.
+
+The countdown does not ask the server, and it shows the overtime limit: a room that empties closes earlier. The close itself is made by the scaler or the lifecycle cron on its next tick.
 
 ### Leaving and ending
 
@@ -411,7 +418,7 @@ A `CallSession` row records a span of real use of a room, independently of recor
 - **Peak headcount.** Clients in the call report the room's participant count every 30 seconds (`app/src/components/live/live-event-client.tsx`) to `POST /api/events/<slug>/analytics/peak`, accepted only while the event is `LIVE`. A client reports only while it is in the conference, and stops on `401`, `403` or `404` and when it leaves. The value is clamped to the event capacity plus a margin and only ever increases; it updates `Event.peakParticipants` and the newest open session. The scaler does not write it. A report with at least one participant also stamps `Event.lastActiveAt`, at most once a minute per event, which is the room's own sign of activity for the inactivity rules.
 - **Live telemetry.** Dominant-speaker changes and raised hands are appended to the newest open session during the call ([live-interaction.md](live-interaction.md); the speaker log also serves speaker attribution, see [recording.md](recording.md)).
 - **Closing.** Every transition out of `LIVE` closes the event's open sessions in the same transaction: the scaler's and the lifecycle cron's, a status change through the events API (including **End for everyone** and **End event**), and bulk archive. So does the GDPR cleanup when it archives an event that was never ended. `endedAt` is the time of the change and `duration` is computed from it (`app/src/lib/events/call-sessions.ts`). If a session never received a peak, it inherits the event's peak. A later wake and rejoin opens a new session, so a room that empties and refills produces several sessions.
-- **Repair.** Every tick of the scaler or the lifecycle cron also closes the sessions still open on `ENDED` and `ARCHIVED` events, for at most 100 events per tick. There, "now" would stretch the duration by days, so the close time is estimated: the event's last update, capped by the latest plausible end of the room (`endsAt` plus the grace, or the last activity if later), and never before the session started (`staleSessionCloseTime()`).
+- **Repair.** Every tick of the scaler or the lifecycle cron also closes the sessions still open on `ENDED` and `ARCHIVED` events, for at most 100 events per tick. There, "now" would stretch the duration by days, so the close time is estimated: the event's last update, capped by the latest plausible end of the room (`endsAt` plus the shorter of the overtime limit and `eventOvertimeEmptyMinutes`, or the last activity if later), and never before the session started (`staleSessionCloseTime()`).
 - **Recording sessions.** The recording finalize webhook creates its own, already closed session together with the `Recording` row. A multitrack event instead gets an open placeholder session as soon as the recorder controller first asks for its desired state while the event is `LIVE`. Because `/sessions` reuses any open session, live clients may attach to that placeholder rather than open a separate one; the scaler's close ends it like any other open session, and the finalize webhook completes it. Details are in [recording.md](recording.md#when-a-recorder-is-wanted).
 
 The GDPR cleanup scrubs the personal data held in sessions (participants, speaker and raised-hand logs) but keeps the rows and their counts ([GDPR.md](../GDPR.md)).
@@ -424,9 +431,9 @@ The GDPR cleanup scrubs the personal data held in sessions (participants, speake
 - **Follow-up emails** are sent at most once per event by the reminders job, for `ENDED` events that opted in (`postEventEmailEnabled`) and whose `endsAt` is within the last seven days (`app/src/lib/events/post-event-finalize.ts`). `ARCHIVED` events are skipped. Events reach `ENDED` by themselves wherever the scaler or the lifecycle cron runs, so no manual end is needed; an event that is never ended gets none ([email.md](email.md), [background-jobs.md](background-jobs.md)).
 - **The recording and AI post-production** start from the recording finalize path, not from the status change ([recording.md](recording.md), [POSTPROD.md](../POSTPROD.md)).
 
-**`ENDED` to `ARCHIVED`.** The GDPR cleanup job (`GET /api/cron/cleanup`) selects `ENDED` and `ARCHIVED` events whose `endsAt` plus `dataRetentionDays` is strictly in the past. For each one it deletes participant data and sets `ARCHIVED` in the same transaction. Retention is counted from `endsAt`, not from the moment the event was ended. The job also selects events that were never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) once the later of `endsAt` and `lastActiveAt`, plus `dataRetentionDays`, has passed: it archives them, closes their open call sessions with the estimated close time and cleans them in the same run. `DRAFT` events are never cleaned: they hold no registrations, and their configuration is what copies inherit. It runs daily in the Helm chart (`cronjobs.cleanup.schedule`, 03:00 by default in `infra/helm/pa-webinar/values.yaml`) and hourly in the Compose `cron` service. `Event.dataRetentionDays` is 30 by default in `app/prisma/schema.prisma` and 7 for instant calls (`app/src/app/api/events/instant/route.ts`). What exactly is deleted, what is kept and why is in [GDPR.md](../GDPR.md).
+**Retention.** The GDPR cleanup job (`GET /api/cron/cleanup`) selects, on every run, the `ENDED` and `ARCHIVED` events whose `endsAt` plus `dataRetentionDays` is strictly in the past, including those it cleaned on an earlier run. For each one it removes the personal data in one transaction; every step is idempotent, so a later run removes only what was written since or left by a failed run, and writes a `DATA_DELETED` audit row only when it removed or anonymized something. The status does not change, so a concluded event stays `ENDED`, and its public page and what that page shows follow its post-event settings. Its live content (Q&A, polls, word cloud, end-of-event answers, materials, agenda, live action journal) stays, without names or registrations, and with browser ids replaced by a per-event pseudonym. Retention is counted from `endsAt`, not from the moment the event was ended. The job also selects events that were never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) once the later of `endsAt` and `lastActiveAt`, plus `dataRetentionDays`, has passed: it archives them, closes their open call sessions with the estimated close time and cleans them in the same run. `DRAFT` events are never cleaned: they hold no registrations, and their configuration is what copies inherit. It runs daily in the Helm chart (`cronjobs.cleanup.schedule`, 03:00 by default in `infra/helm/pa-webinar/values.yaml`) and hourly in the Compose `cron` service. `Event.dataRetentionDays` is 30 by default in `app/prisma/schema.prisma` and 7 for instant calls (`app/src/app/api/events/instant/route.ts`). What exactly is deleted, what is kept and why is in [GDPR.md](../GDPR.md).
 
-**Bulk archive** hides events from every public surface immediately but deletes nothing. Because `ARCHIVED` events are still processed by the cleanup job, their participant data is deleted when retention expires, as for `ENDED` events.
+**Bulk archive** hides events from every public surface immediately but deletes nothing. Because `ARCHIVED` events are still processed by the cleanup job, their personal data is removed when retention expires, as for `ENDED` events.
 
 `ARCHIVED` is not locked: an explicit status change through the events API, including **Publish** on the management page, moves an archived event like any other.
 

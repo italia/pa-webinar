@@ -65,6 +65,10 @@ describe('Jitsi config exports', () => {
 
   it('moderator features have recording enabled', () => {
     expect(moderatorFeatures.recording).toBe(true);
+    // I sottotitoli live li accende la sala per conto di chi modera: solo il
+    // suo token concede di scrivere nei metadati della stanza.
+    expect(moderatorFeatures.transcription).toBe(true);
+    expect(participantFeatures.transcription).toBe(false);
   });
 
   it('both feature sets have screen-sharing enabled', () => {
@@ -100,12 +104,18 @@ describe('Jitsi config exports', () => {
     expect(mobileBaseToolbarButtons).not.toContain('hangup');
   });
 
-  it('mobileModeratorToolbarButtons extends mobile base with participants-pane, no hangup', () => {
+  it('mobileModeratorToolbarButtons è la barra mobile di base, senza hangup', () => {
     for (const btn of mobileBaseToolbarButtons) {
       expect(mobileModeratorToolbarButtons).toContain(btn);
     }
     expect(mobileModeratorToolbarButtons).not.toContain('hangup');
-    expect(mobileModeratorToolbarButtons).toContain('participants-pane');
+  });
+
+  it('chi modera gestisce la sala dalla scheda Partecipanti, non dalla barra di Jitsi', () => {
+    for (const barra of [moderatorToolbarButtons, mobileModeratorToolbarButtons]) {
+      expect(barra).not.toContain('participants-pane');
+      expect(barra).not.toContain('mute-everyone');
+    }
   });
 });
 
@@ -347,5 +357,14 @@ describe('Video quality presets', () => {
     const b = resolveVideoQualityConfig('HIGH');
     expect(a).not.toBe(b);
     expect(a).toEqual(b);
+  });
+});
+
+describe('barra principale di Jitsi', () => {
+  it('al massimo otto pulsanti, un elenco per soglia di larghezza, senza «security» (sta nel menu)', () => {
+    const elenchi = jitsiConfigOverwrite.mainToolbarButtons;
+    expect(elenchi.map((e) => e.length)).toEqual([8, 7, 6, 5, 4, 3, 2]);
+    expect(elenchi.flat()).not.toContain('security');
+    expect(elenchi[0]).toContain('pa-captions');
   });
 });

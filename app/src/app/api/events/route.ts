@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -15,12 +16,10 @@ import { puoGestire, requireStaff } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
-import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
-import { getSettings } from '@/lib/settings';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
-import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
+import { ensurePostEventQuestionnaire } from '@/lib/feedback/default-questionnaire';
 import {
   ALWAYS_PUBLIC_STATUSES,
   WARMUP_STATUSES,
@@ -138,7 +137,8 @@ export const POST = withErrorHandling(async (request) => {
       qaEnabled: effectiveToggles.qaEnabled,
       chatEnabled: effectiveToggles.chatEnabled,
       recordingEnabled: data.recordingEnabled,
-      autoStartRecording: data.autoStartRecording,
+      // La registrazione non parte mai da sola: la avvia chi conduce con REC.
+      autoStartRecording: false,
       participantsCanUnmute: effectiveToggles.participantsCanUnmute,
       participantsCanStartVideo: effectiveToggles.participantsCanStartVideo,
       participantsCanShareScreen: effectiveToggles.participantsCanShareScreen,
@@ -158,6 +158,7 @@ export const POST = withErrorHandling(async (request) => {
       // modo di valorizzare queste colonne era duplicare un evento che le
       // aveva già.
       gdprTemplateId: data.gdprTemplateId ?? null,
+      accessMode: data.accessMode ?? null,
       requireOrganization: data.requireOrganization,
       requireOrganizationRole: data.requireOrganizationRole,
       requireOrganizationType: data.requireOrganizationType,
@@ -165,6 +166,7 @@ export const POST = withErrorHandling(async (request) => {
       postEventShowRecap: data.postEventShowRecap,
       postEventShowWordCloud: data.postEventShowWordCloud,
       postEventEmailEnabled: data.postEventEmailEnabled,
+      recordingNotifyEnabled: data.recordingNotifyEnabled,
       postEventPublicUntil: data.postEventPublicUntil
         ? new Date(data.postEventPublicUntil)
         : null,
@@ -178,8 +180,17 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
+      ...(data.captionsTranscriptEnabled !== undefined && {
+        captionsTranscriptEnabled: data.captionsTranscriptEnabled,
+      }),
+      ...(data.liveCaptionsEnabled !== undefined && {
+        liveCaptionsEnabled: data.liveCaptionsEnabled,
+      }),
       moderatorName: data.moderatorName,
       moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
+      moderatorOrganization: data.moderatorOrganization || null,
+      moderatorOrganizationLogoUrl: data.moderatorOrganizationLogoUrl || null,
+      moderatorPublicListed: data.moderatorPublicListed ?? false,
       speakersInfo: data.speakersInfo,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
@@ -239,13 +250,10 @@ export const POST = withErrorHandling(async (request) => {
   // Attach tags (if the wizard provided slugs). Silently drops unknown
   // slugs — admins curate the tag list via /api/admin/tags separately.
   if (data.tagSlugs && data.tagSlugs.length > 0) {
-    const tags = await prisma.tag.findMany({
-      where: { slug: { in: data.tagSlugs } },
-      select: { id: true },
-    });
-    if (tags.length > 0) {
+    const tagIds = await tagIdsFromSlugs(prisma, data.tagSlugs);
+    if (tagIds.length > 0) {
       await prisma.eventTagLink.createMany({
-        data: tags.map((t) => ({ eventId: event.id, tagId: t.id })),
+        data: tagIds.map((tagId) => ({ eventId: event.id, tagId })),
         skipDuplicates: true,
       });
     }
@@ -258,20 +266,7 @@ export const POST = withErrorHandling(async (request) => {
   // default. Best-effort: a failure here must not fail event creation.
   if (data.feedbackEnabled !== false) {
     try {
-      const generic = await prisma.questionTemplate.findUnique({
-        where: { name: FEEDBACK_GENERIC_TEMPLATE_NAME },
-        select: { id: true },
-      });
-      if (generic) {
-        await prisma.eventQuestionnaire.create({
-          data: {
-            eventId: event.id,
-            placement: 'POST_EVENT',
-            title: { it: 'Il tuo feedback', en: 'Your feedback' },
-            templates: { create: [{ templateId: generic.id, sortOrder: 0 }] },
-          },
-        });
-      }
+      await ensurePostEventQuestionnaire(event.id);
     } catch {
       // Non-fatal: admin can attach the questionnaire from the event page.
     }
@@ -287,16 +282,8 @@ export const POST = withErrorHandling(async (request) => {
     details: { slug: event.slug, fields: Object.keys(data) },
   });
 
-  // Il moderatore principale riceve il suo link personale per email, come
-  // promettono il wizard e la pagina di gestione. Atteso (non in background):
-  // il wizard pubblica subito dopo, e la pubblicazione deve trovare la riga
-  // gia' in coda per non spedire una seconda volta.
-  if (data.moderatorEmail) {
-    const { defaultLocale: predefinita } = await getSettings();
-    await sendPrimaryModeratorLink(event.id, {
-      locale: adminRequestLocale(request, predefinita),
-    });
-  }
+  // Nessun link per email qui: l'evento nasce in bozza, e i link personali
+  // partono alla pubblicazione (PUT /api/events/[param], lib/email/moderator-link).
 
   return Response.json(
     {

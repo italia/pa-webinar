@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { DEFAULT_TIMEZONE } from '@/lib/utils/date-format';
 
 import { locales, type Locale } from './config';
+import { conChiaviRinominate } from './renamed-keys';
 
 type Messages = Record<string, unknown>;
 type LocaleOverrides = Record<string, string>;
@@ -125,7 +126,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   if (overrides && Object.keys(overrides).length > 0) {
     try {
-      messages = applyOverrides(messages, overrides);
+      messages = applyOverrides(messages, conChiaviRinominate(overrides));
     } catch {
       // Bad override payload must never take down the page — keep defaults.
     }

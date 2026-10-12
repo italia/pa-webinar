@@ -12,21 +12,27 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * entrata. L'identità di chi non è iscritto è l'identificativo del browser,
  * come nei sondaggi; il token di sala resta una prova di presenza.
  */
-vi.mock('@/lib/db', () => ({
-  prisma: {
+vi.mock('@/lib/db', () => {
+  const prisma: Record<string, unknown> = {
     event: { findUnique: vi.fn() },
     wordCloudRound: { findUnique: vi.fn(), updateMany: vi.fn() },
-    wordCloudSubmission: { count: vi.fn(), create: vi.fn() },
+    wordCloudSubmission: { create: vi.fn(), findMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
-  },
-}));
+    $executeRaw: vi.fn(async () => 1),
+  };
+  // La transazione lavora sullo stesso oggetto: i controlli restano visibili.
+  prisma.$transaction = vi.fn(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  return { prisma };
+});
 vi.mock('@/lib/cache', () => ({
   getCached: vi.fn(() => null),
   setCache: vi.fn(),
+  deleteCache: vi.fn(),
   deleteCacheByPrefix: vi.fn(),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn(async () => false) }));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
@@ -34,15 +40,23 @@ vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 
 import { POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRound = prisma.wordCloudRound.findUnique as unknown as ReturnType<typeof vi.fn>;
-const mockedCount = prisma.wordCloudSubmission.count as unknown as ReturnType<typeof vi.fn>;
 const mockedCloseRound = prisma.wordCloudRound
   .updateMany as unknown as ReturnType<typeof vi.fn>;
 const mockedCreate = prisma.wordCloudSubmission.create as unknown as ReturnType<typeof vi.fn>;
+// Le righe del giro: quelle tolte (where.hiddenAt) e quelle di chi scrive.
+const mockedFindWord = prisma.wordCloudSubmission
+  .findMany as unknown as ReturnType<typeof vi.fn>;
+/** Le parole gia' mandate da chi scrive in questo giro. */
+const giaMie = (parole: string[]) =>
+  mockedFindWord.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+    args.where.hiddenAt ? [] : parole.map((word) => ({ word })),
+  );
 const mockedRegistration = prisma.registration
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator
@@ -97,9 +111,9 @@ beforeEach(() => {
     duration: 120,
     createdAt: new Date(Date.now() - 10_000),
   });
-  mockedCount.mockResolvedValue(0);
   mockedCloseRound.mockResolvedValue({ count: 1 });
   mockedCreate.mockResolvedValue({});
+  mockedFindWord.mockResolvedValue([]);
   mockedRegistration.mockResolvedValue(null);
   mockedGrant.mockResolvedValue(null);
 });
@@ -221,7 +235,7 @@ describe('POST /api/events/[slug]/wordcloud/[id]/submit — una sala dietro un s
 
 describe('POST /api/events/[slug]/wordcloud/[id]/submit — perché una parola non entra', () => {
   it('oltre la quinta parola il codice lo dice, distinto dal giro chiuso', async () => {
-    mockedCount.mockResolvedValue(5);
+    giaMie(['uno', 'due', 'tre', 'quattro', 'cinque']);
     const res = await POST(submit({ word: 'sesta', guestId: nuovoOspite() }), ctx());
     expect(res.status).toBe(409);
     expect((await res.json()).code).toBe('WORD_LIMIT_REACHED');
@@ -245,17 +259,103 @@ describe('POST /api/events/[slug]/wordcloud/[id]/submit — perché una parola n
     expect(res.status).toBe(422);
     expect(mockedCreate).not.toHaveBeenCalled();
   });
-});
 
-describe('POST /api/events/[slug]/wordcloud/[id]/submit — giro scaduto', () => {
-  beforeEach(() => {
+  it('una parola fatta di soli simboli non entra, con un codice suo', async () => {
+    const res = await POST(submit({ word: '!!!', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(422);
+    expect((await res.json()).code).toBe('WORD_INVALID');
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('si salva nella forma con cui si conta: minuscole, senza punteggiatura ai bordi', async () => {
+    const res = await POST(submit({ word: ' Chiarezza! ', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(201);
+    expect(scritto()?.word).toBe('chiarezza');
+  });
+
+  it('la stessa persona non manda due volte la stessa parola', async () => {
+    const ospite = nuovoOspite();
+    // Anche una riga salvata prima della normalizzazione conta come la stessa.
+    giaMie(['Confronto!']);
+    const res = await POST(submit({ word: 'confronto', guestId: ospite }), ctx());
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('WORD_DUPLICATE');
+    const cercata = mockedFindWord.mock.calls.find(
+      ([a]) => !(a as { where: Record<string, unknown> }).where.hiddenAt,
+    )?.[0] as { where: Record<string, unknown> };
+    expect(cercata.where).toMatchObject({ roundId: ROUND_ID, guestId: ospite });
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('una parola tolta dal moderatore non torna, da nessuno', async () => {
+    mockedFindWord.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+      args.where.hiddenAt ? [{ word: 'Parolaccia!' }] : [],
+    );
+    const res = await POST(submit({ word: 'parolaccia', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('WORD_REMOVED');
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('una domanda senza limite di tempo non scade', async () => {
     mockedRound.mockResolvedValue({
       id: ROUND_ID,
       eventId: EVENT_ID,
       status: 'OPEN',
-      duration: 60,
-      createdAt: new Date(Date.now() - 61_000),
+      duration: 0,
+      createdAt: new Date(Date.now() - 5 * 3600_000),
     });
+    const res = await POST(submit({ word: 'ancora', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCloseRound).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/events/[slug]/wordcloud/[id]/submit — giro scaduto', () => {
+  const creato = new Date(Date.now() - 61_000);
+  beforeEach(() => {
+    mockedRound.mockResolvedValue({
+      id: ROUND_ID,
+      eventId: EVENT_ID,
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: creato,
+    });
+  });
+
+  it('chi lo chiude lo registra all’ora di scadenza, con le parole visibili', async () => {
+    mockedFindWord.mockResolvedValue([
+      { word: 'futuro', guestId: 'g1', registrationId: null },
+      { word: 'Futuro', guestId: null, registrationId: 'r1' },
+      { word: 'dati', guestId: 'g1', registrationId: null },
+    ]);
+    const res = await POST(submit({ word: 'tardi', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(409);
+    expect(mockedFindWord).toHaveBeenCalledWith({
+      where: { roundId: ROUND_ID, hiddenAt: null },
+      select: { word: true, registrationId: true, guestId: true },
+    });
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'wordcloud.closed',
+      actor: 'system',
+      data: {
+        roundId: ROUND_ID,
+        prompt: 'Una parola',
+        words: [
+          { word: 'futuro', count: 2 },
+          { word: 'dati', count: 1 },
+        ],
+      },
+      at: new Date(creato.getTime() + 60_000),
+    });
+  });
+
+  it('se un altro l’ha già chiuso non si registra una seconda volta', async () => {
+    mockedCloseRound.mockResolvedValue({ count: 0 });
+    await POST(submit({ word: 'tardi', guestId: nuovoOspite() }), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 
   it('lo chiude, respinge la parola e lo dice alla sala', async () => {

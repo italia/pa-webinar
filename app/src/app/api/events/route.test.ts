@@ -154,6 +154,16 @@ describe('POST /api/events — persistenza dei campi accettati', () => {
     expect(dati.wordCloudEnabled).toBe(true);
   });
 
+  it('la registrazione non parte mai da sola, anche se la richiesta lo chiede', async () => {
+    await POST(
+      richiesta(corpo({ recordingEnabled: true, autoStartRecording: true })),
+      { params: Promise.resolve({}) } as never,
+    );
+    const dati = datiScritti();
+    expect(dati.recordingEnabled).toBe(true);
+    expect(dati.autoStartRecording).toBe(false);
+  });
+
   it('rifiuta un modello di informativa inesistente senza creare nulla', async () => {
     // Senza la verifica, la chiave esterna fallirebbe con un codice che il
     // gestore degli errori non mappa: un 500 al posto di un errore sul campo.
@@ -191,7 +201,7 @@ describe('POST /api/events — link del moderatore principale', () => {
     );
   });
 
-  it("lo accoda alla creazione, nella lingua della pagina d'amministrazione", async () => {
+  it('non lo accoda alla creazione: l’evento nasce in bozza, il link parte alla pubblicazione', async () => {
     const req = new Request('http://localhost/api/events', {
       method: 'POST',
       headers: {
@@ -202,18 +212,11 @@ describe('POST /api/events — link del moderatore principale', () => {
     }) as unknown as NextRequest;
     const r = await POST(req, { params: Promise.resolve({}) } as never);
     expect(r.status).toBe(201);
-    expect(sendPrimaryModeratorLink).toHaveBeenCalledWith('9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', {
-      locale: 'fr',
-    });
+    expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
     // Il link di gestione nella risposta passa dalla mappa dei percorsi.
     const body = (await r.json()) as { links: { moderatorLink: string } };
     expect(body.links.moderatorLink).toMatch(
       /\/it\/admin\/eventi\/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\?token=/,
     );
-  });
-
-  it('non accoda nulla senza indirizzo del moderatore', async () => {
-    await POST(richiesta(corpo()), { params: Promise.resolve({}) } as never);
-    expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
   });
 });

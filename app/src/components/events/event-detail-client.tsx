@@ -5,8 +5,11 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
+import { initials } from '@/lib/utils/speaker-palette';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
@@ -17,6 +20,7 @@ import VideoPlayer, {
 import PostEventTabs from '@/components/events/post-event-tabs';
 import MaterialList from '@/components/materials/material-list';
 import PostEventRecap from '@/components/events/post-event-recap';
+import PostEventReport from '@/components/events/report/post-event-report';
 import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
@@ -30,12 +34,14 @@ import MiniTranscript from '@/components/events/mini-transcript';
 import BookmarksPanel from '@/components/events/bookmarks-panel';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
+import type { ReportView } from '@/lib/report/types';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
 interface AnsweredQuestion {
   id: string;
   text: string;
+  answerText: string | null;
   authorName: string;
   upvotes: number;
   status: string;
@@ -53,6 +59,8 @@ interface EventData {
   registrationCount: number;
   status: string;
   recordingUrl: string | null;
+  /** La trascrizione si legge anche senza il video pubblicato. */
+  transcriptPublished?: boolean;
   youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
@@ -63,6 +71,9 @@ interface EventData {
   privacyPolicyUrl: string | null;
   speakersInfo: Record<string, string> | null;
   organizerName: string | null;
+  /** Gli enti che organizzano e le persone pubblicate (lib/events/public-people). */
+  organizers?: EntePubblico[];
+  people?: PersonaPubblica[];
   imageUrl: string | null;
   peakParticipants?: number;
   postEventPublic?: boolean;
@@ -138,6 +149,12 @@ interface EventDetailClientProps {
   guestEntryOpen?: boolean;
   /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
   hasPostEventQuestionnaire?: boolean;
+  /** La prova di chi ha partecipato, se il server l'ha riconosciuta (link
+   *  personale o link della valutazione): con questa la pagina offre la
+   *  valutazione di fine evento. */
+  feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
+  /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
+  report?: ReportView | null;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -175,9 +192,23 @@ export default function EventDetailClient({
   registrationOpen,
   guestEntryOpen = true,
   hasPostEventQuestionnaire = false,
+  feedbackProof = null,
+  report = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
+  const durata = useDurataTesto();
   const tr = useTranslations('registration');
+  const tl = useTranslations('live');
+  const svegliaPonte = () => {
+    // 1a: anticipa il risveglio del bridge (JVB) al
+    // momento del click, prima di navigazione + idratazione
+    // di /live — così il pre-warm parte qualche secondo
+    // prima. L'endpoint wake è idempotente e no-op se
+    // l'evento è già LIVE.
+    void fetch(`/api/events/${event.slug}/wake`, {
+      method: 'POST',
+    }).catch(() => {});
+  };
   const tv = useTranslations('video');
   const tm = useTranslations('materials');
   const tPostprod = useTranslations('postprod');
@@ -219,9 +250,7 @@ export default function EventDetailClient({
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
-  const durationMs = endsAt.getTime() - startsAt.getTime();
-  const durationHours = Math.floor(durationMs / 3_600_000);
-  const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
+  const durataTesto = durata(startsAt, endsAt);
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
@@ -243,11 +272,11 @@ export default function EventDetailClient({
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
-  // o non ha recording pubblicata — niente trascrizione da mostrare.
+  // o non ha ne' il video ne' la sola trascrizione pubblicati.
   // L'endpoint 404 quando postprod non è abilitato per l'evento; in
   // quel caso lasciamo lo state null e il player gira "nudo".
   useEffect(() => {
-    if (!isEnded || !event.recordingUrl) return;
+    if (!isEnded || (!event.recordingUrl && !event.transcriptPublished)) return;
     let cancelled = false;
     fetch(`/api/events/${event.slug}/postprod/transcript`, { credentials: 'include' })
       .then(async (r) => {
@@ -301,7 +330,10 @@ export default function EventDetailClient({
         setPostprodMeta({
           subtitleTracks: meta.subtitles.length > 0 ? meta.subtitles : undefined,
           audioTracks: meta.audio.length > 0 ? meta.audio : undefined,
-          transcriptAvailable: meta.subtitles.length > 0 || meta.audio.length > 0,
+          // Anche la sola trascrizione, senza sottotitoli del video (quella
+          // dai sottotitoli live di un evento senza registrazione).
+          transcriptAvailable:
+            meta.subtitles.length > 0 || meta.audio.length > 0 || meta.segmentsLite.length > 0,
           summariesStructured:
             meta.summariesStructured && Object.keys(meta.summariesStructured).length > 0
               ? meta.summariesStructured
@@ -318,7 +350,7 @@ export default function EventDetailClient({
     return () => {
       cancelled = true;
     };
-  }, [isEnded, event.recordingUrl, event.slug]);
+  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug]);
 
   return (
     <div className="container py-5">
@@ -346,7 +378,10 @@ export default function EventDetailClient({
       )}
 
       {isEnded && (
-        <Alert color="info" className="mb-4">
+        // Un'informazione, non un allarme: l'Alert del kit impone
+        // role="alert", che la farebbe leggere d'urgenza all'apertura della
+        // pagina. Stesso aspetto, ruolo giusto.
+        <div className="alert alert-info mb-4" role="status">
           {t('detail.eventHeldOn', {
             date: format.dateTime(startsAt, {
               weekday: 'long',
@@ -355,7 +390,7 @@ export default function EventDetailClient({
               year: 'numeric',
             }),
           })}
-        </Alert>
+        </div>
       )}
 
       {/* ─── Event header: cover + hero in one cohesive card ─── */}
@@ -397,7 +432,9 @@ export default function EventDetailClient({
           }}
         >
           <div className="d-flex align-items-center gap-2 mb-3">
-            <StatusPill status={publicStatus} />
+            {/* In diretta basta il segnale «In corso» con il punto: due
+                etichette uguali una accanto all'altra non dicono di piu'. */}
+            {!isLive && <StatusPill status={publicStatus} />}
             {isLive && (
               <Badge
                 color="success"
@@ -405,12 +442,11 @@ export default function EventDetailClient({
                 style={{ fontSize: '0.75rem' }}
               >
                 <span
-                  className="rounded-circle d-inline-block"
+                  className="rounded-circle d-inline-block pulse-dot"
                   style={{
                     width: 7,
                     height: 7,
                     backgroundColor: '#fff',
-                    animation: 'pulse-dot 1.5s ease-in-out infinite',
                   }}
                 />
                 {t('card.liveNow')}
@@ -486,15 +522,14 @@ export default function EventDetailClient({
                       minute: '2-digit',
                     })}
                     {' · '}
-                    {t('detail.durationHours', {
-                      hours: durationHours,
-                      minutes: durationMinutes,
-                    })}
+                    {durataTesto}
                   </div>
                 </div>
               </div>
             </Col>
-            {speakers && (
+            {/* I campi di testo libero restano per gli eventi che non hanno
+                persone o enti strutturati. */}
+            {speakers && !event.people?.some((p) => p.role === 'speaker') && (
               <Col xs={12} md="auto">
                 <div className="d-flex align-items-center">
                   <div
@@ -511,14 +546,17 @@ export default function EventDetailClient({
                     <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                       {t('detail.speakers')}
                     </div>
-                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                    {/* Un relatore per riga, come li scrive chi crea l'evento:
+                        senza `pre-line` gli a capo sparivano e i nomi si
+                        fondevano in una riga sola. */}
+                    <div className="text-muted" style={{ fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
                       {speakers}
                     </div>
                   </div>
                 </div>
               </Col>
             )}
-            {event.organizerName && (
+            {event.organizerName && !(event.organizers && event.organizers.length > 0) && (
               <Col xs={12} md="auto">
                 <div className="d-flex align-items-center">
                   <div
@@ -545,6 +583,8 @@ export default function EventDetailClient({
           </Row>
         </div>
       </div>
+
+      <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
 
       {/* ─── Content + Sidebar ─── */}
       <Row>
@@ -588,7 +628,7 @@ export default function EventDetailClient({
           )}
           {isEnded && event.recordingUrl && (
             <div className="mb-4">
-              <div ref={playerAnchorRef} style={{ position: 'relative' }}>
+              <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
                 <VideoPlayer
                   ref={playerRef}
                   src={`/api/events/${event.slug}/recording`}
@@ -665,6 +705,12 @@ export default function EventDetailClient({
           )}
           {/* // TODO v0.5.0: Live catch-up player with HLS */}
 
+          {/* Il resoconto dell'evento, pubblicato dallo staff: dopo il video,
+              prima della descrizione. */}
+          {isEnded && report && (
+            <PostEventReport report={report} playerRef={playerRef} hasVideo={!!event.recordingUrl} />
+          )}
+
           <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('detail.description')}
           </h2>
@@ -679,7 +725,7 @@ export default function EventDetailClient({
               <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
                 {tm('title')}
               </h2>
-              <MaterialList materials={materials} />
+              <MaterialList materials={materials} eventSlug={event.slug} />
             </section>
           )}
 
@@ -762,12 +808,18 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Invito al questionario post-evento: solo se l'evento ne ha uno
-              (lo dice il server). */}
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno e
+              solo a chi ha partecipato, con la sua iscrizione (lo dice il
+              server): a chiunque altro il modulo verrebbe rifiutato all'invio. */}
           {isEnded &&
             event.postEventShowFeedback !== false &&
-            hasPostEventQuestionnaire && (
-              <PostEventFeedbackInvite eventSlug={event.slug} />
+            hasPostEventQuestionnaire &&
+            feedbackProof && (
+              <PostEventFeedbackInvite
+                eventSlug={event.slug}
+                accessToken={feedbackProof.accessToken}
+                ratingToken={feedbackProof.ratingToken}
+              />
             )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
@@ -810,7 +862,11 @@ export default function EventDetailClient({
                       agli amministratori nel pannello admin. Il pubblico vede
                       solo il conteggio dei presenti nella sala live. */}
                   {hasRoomAccess && !invalidToken && (
-                    <p className="text-success fw-semibold text-center mb-3" role="status">
+                    <p
+                      className="text-success fw-semibold d-flex align-items-center justify-content-center gap-2 mb-3"
+                      role="status"
+                    >
+                      <Icon icon="it-check-circle" size="sm" color="success" />
                       {t('detail.registered')}
                     </p>
                   )}
@@ -867,30 +923,52 @@ export default function EventDetailClient({
                     // evitare. Con invalidToken (cookie valido ma registrazione
                     // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
                     // link accanto all'alert creerebbe un ping-pong infinito.
-                    <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+                    // Chi ha gia' il posto (cookie firmato) vede il pulsante
+                    // pieno «Entra nella sala»; il link a domanda resta per chi
+                    // si e' iscritto da un altro dispositivo e qui non e' noto.
+                    hasRoomAccess && !invalidToken ? (
                       <Link
                         href={percorso(`/events/${event.slug}/live`)}
-                        className="text-decoration-none fw-semibold text-primary"
-                        onMouseDown={() => {
-                          // 1a: anticipa il risveglio del bridge (JVB) al
-                          // momento del click, prima di navigazione + idratazione
-                          // di /live — così il pre-warm parte qualche secondo
-                          // prima. L'endpoint wake è idempotente e no-op se
-                          // l'evento è già LIVE.
-                          void fetch(`/api/events/${event.slug}/wake`, {
-                            method: 'POST',
-                          }).catch(() => {});
-                        }}
+                        onMouseDown={svegliaPonte}
                       >
-                        {t('detail.alreadyRegisteredEnter')}
+                        <Button color="primary" size="lg" className="w-100 fw-semibold" tag="span">
+                          <Icon icon="it-video" color="white" className="me-2" />
+                          {tl('enterRoom')}
+                        </Button>
                       </Link>
-                    </p>
+                    ) : (
+                      // In diretta si entra anche senza iscrizione: lo si
+                      // offre come scelta, non come domanda a chi e' iscritto.
+                      // /live riconosce chi ha gia' il posto da questo
+                      // dispositivo; chi si e' iscritto da un altro usa il
+                      // link dell'email.
+                      <>
+                        <Link
+                          href={percorso(`/events/${event.slug}/live`)}
+                          onMouseDown={svegliaPonte}
+                          className="d-block mt-2"
+                        >
+                          <Button color="primary" outline size="lg" className="w-100 fw-semibold" tag="span">
+                            {t('detail.joinAsGuest')}
+                          </Button>
+                        </Link>
+                        <p className="text-muted text-center mt-2 mb-0" style={{ fontSize: '0.82rem' }}>
+                          {t('detail.registeredUseEmailLink')}
+                        </p>
+                      </>
+                    )
                   )}
 
+                  {event.recordingEnabled && (
+                    <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      <Icon icon="it-video" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
+                      <span>{t('detail.willBeRecorded')}</span>
+                    </p>
+                  )}
                   {event.chatEnabled && (
-                    <p className="text-muted mt-3 mb-0" style={{ fontSize: '0.82rem' }}>
-                      <Icon icon="it-info-circle" size="xs" className="me-1" />
-                      {t('detail.chatNotSaved')}
+                    <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      <Icon icon="it-info-circle" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
+                      <span>{t('detail.chatNotSaved')}</span>
                     </p>
                   )}
 
@@ -934,7 +1012,11 @@ function StatusPill({ status }: { status: string }) {
       className="px-2 py-1 fw-semibold"
       style={{ fontSize: '0.72rem', backgroundColor: c.bg, color: c.fg }}
     >
-      {t(status as 'DRAFT' | 'PUBLISHED' | 'LIVE' | 'ENDED' | 'ARCHIVED')}
+      {/* Per il pubblico un evento pubblicato e' un evento «in programma»:
+          «Pubblicato» e' una parola di chi lo gestisce. */}
+      {status === 'PUBLISHED'
+        ? t('UPCOMING')
+        : t(status as 'DRAFT' | 'LIVE' | 'ENDED' | 'ARCHIVED')}
     </Badge>
   );
 }
@@ -1030,5 +1112,76 @@ function PostEventSidebar({
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Chi organizza e chi interviene: gli enti, con logo e sito, e le persone
+ * pubblicate, ciascuna con il proprio ente. L'ente di una persona può essere
+ * diverso da quello che organizza l'evento.
+ */
+function EventPeople({ organizers, people }: { organizers: EntePubblico[]; people: PersonaPubblica[] }) {
+  const t = useTranslations('events');
+  if (organizers.length === 0 && people.length === 0) return null;
+  const gruppi: Array<{ role: PersonaPubblica['role']; label: string }> = [
+    { role: 'organizer', label: t('detail.peopleOrganizers') },
+    { role: 'moderator', label: t('detail.peopleModerators') },
+    { role: 'speaker', label: t('detail.speakers') },
+  ];
+  return (
+    <section className="event-people mb-4" aria-labelledby="event-people-title">
+      <h2 id="event-people-title" className="h5 fw-bold mb-3">
+        {t('detail.peopleTitle')}
+      </h2>
+      {organizers.length > 0 && (
+        <div className="event-people__group">
+          <h3 className="event-people__label">{t('detail.organizedBy')}</h3>
+          <ul className="event-people__orgs">
+            {organizers.map((o, i) => (
+              <li key={`${i}-${o.name}`} className="event-org">
+                {o.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={o.logoUrl} alt="" className="event-org__logo" />
+                ) : (
+                  <span className="event-org__initials" aria-hidden="true">{initials(o.name)}</span>
+                )}
+                {o.websiteUrl ? (
+                  <a href={o.websiteUrl} target="_blank" rel="noopener noreferrer" className="event-org__name">
+                    {o.name}
+                  </a>
+                ) : (
+                  <span className="event-org__name">{o.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {gruppi.map(({ role, label }) => {
+        const chi = people.filter((p) => p.role === role);
+        if (chi.length === 0) return null;
+        return (
+          <div key={role} className="event-people__group">
+            <h3 className="event-people__label">{label}</h3>
+            <ul className="event-people__list">
+              {chi.map((p, i) => (
+                <li key={`${p.name}-${i}`} className="event-person">
+                  {p.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.logoUrl} alt="" className="event-person__logo" />
+                  ) : (
+                    <span className="event-person__initials" aria-hidden="true">{initials(p.name)}</span>
+                  )}
+                  <span className="event-person__who">
+                    <span className="event-person__name">{p.name}</span>
+                    {p.organization && <span className="event-person__org">{p.organization}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </section>
   );
 }

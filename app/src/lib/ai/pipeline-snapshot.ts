@@ -79,3 +79,28 @@ export function buildPipelineSnapshot(
     pipelineVersion: process.env.GIT_SHA ?? (getPublicEnv('NEXT_PUBLIC_APP_VERSION') || 'cluster'),
   };
 }
+
+/**
+ * Lo snapshot senza i nomi delle persone: resta la fotografia dei modelli e
+ * delle etichette dei parlanti, non chi erano. Si applica quando gli output AI
+ * di una registrazione vengono eliminati, perche' i nomi non sopravvivano agli
+ * output (e alle righe Speaker) da cui sono stati copiati. Uno snapshot che non
+ * e' un oggetto, o senza parlanti, torna invariato.
+ */
+export function withoutSpeakerNames(snapshot: unknown): unknown {
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) return snapshot;
+  const record = snapshot as Record<string, unknown>;
+  const conNomi = NAMED_ARRAYS.filter((k) => Array.isArray(record[k]));
+  if (conNomi.length === 0) return snapshot;
+  const out: Record<string, unknown> = { ...record };
+  for (const k of conNomi) {
+    out[k] = (record[k] as unknown[]).map((s) =>
+      s && typeof s === 'object' ? { ...(s as Record<string, unknown>), displayName: null } : s,
+    );
+  }
+  return out;
+}
+
+/** Gli elenchi dello snapshot che portano nomi di persone: i parlanti e le voci
+ *  assegnate dal doppiaggio. */
+const NAMED_ARRAYS = ['speakers', 'voiceAssignments'] as const;

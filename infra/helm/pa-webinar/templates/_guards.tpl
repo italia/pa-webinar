@@ -275,15 +275,20 @@ Due pezzi lavorano insieme. Jicofo senza autenticazione propria
 rende moderatore chiunque sia autenticato, cioè ogni partecipante con un token.
 E Prosody con i moduli che assegnano il ruolo dal token (`XMPP_MUC_MODULES`
 con `token_affiliation`, e il modulo del progetto `token_affiliation_custom`).
+Gli altri moduli del progetto, `pa_media_lock` e `pa_captions`, vivono nello
+stesso volume.
 
-Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
+Tre incoerenze si vedono solo in sala, e qui diventano errori di resa:
   - Jicofo senza autenticazione ma Prosody senza i moduli: nessuno sarebbe
     moderatore, e il moderatore del portale non potrebbe silenziare né
     espellere nessuno;
-  - il modulo del progetto richiesto ma non montato in /prosody-plugins-custom:
+  - un modulo del progetto richiesto ma non montato in /prosody-plugins-custom:
     Prosody non lo troverebbe, e lo direbbe solo nel proprio log. Succede a chi
     imposta `prosody.extraVolumes` o `extraVolumeMounts` in un proprio file di
-    valori: sono liste, e sostituiscono quelle del chart.
+    valori: sono liste, e sostituiscono quelle del chart;
+  - i sottotitoli live accesi (global.captions) senza `pa_captions`: le
+    stanze non si dichiarerebbero trascrivibili, e la trascrizione chiesta da
+    un moderatore non partirebbe mai.
 */}}
 {{- define "pa-webinar.validateJitsiRoles" -}}
 {{- if .Values.jitsi.enabled -}}
@@ -300,7 +305,22 @@ Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
 {{- if and (dig "enableAuth" false $jm) (has $authJicofo (list "false" "0")) (not (or (has "token_affiliation" $moduli) (has "token_affiliation_custom" $moduli))) -}}
 {{- fail "jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH è \"false\" ma Prosody non assegna i ruoli dal token: jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non contiene token_affiliation. Nessuno sarebbe moderatore nella sala, e il moderatore del portale non potrebbe silenziare né espellere nessuno. Rimetti in XMPP_MUC_MODULES token_affiliation,token_affiliation_custom (più i tuoi moduli), come in values.yaml." -}}
 {{- end -}}
-{{- if has "token_affiliation_custom" $moduli -}}
+{{- $delProgetto := list -}}
+{{- range (list "token_affiliation_custom" "pa_media_lock" "pa_captions" "pa_occupants") -}}
+{{- if has . $moduli -}}
+{{- $delProgetto = append $delProgetto . -}}
+{{- end -}}
+{{- end -}}
+{{- if and (has "token_affiliation_custom" $moduli) (not (has "pa_media_lock" $moduli)) -}}
+{{- fail "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES carica token_affiliation_custom ma non pa_media_lock: i limiti di microfono, videocamera e schermo che un evento imposta ai partecipanti varrebbero solo nella barra della sala, e chi apre la sala fuori dal portale li riaccenderebbe. Aggiungi pa_media_lock a XMPP_MUC_MODULES, come in values.yaml. Succede anche con helm upgrade --reuse-values da una versione precedente, che conserva la lista vecchia." -}}
+{{- end -}}
+{{- if and .Values.recorder.enabled (not (has "pa_occupants" $moduli)) -}}
+{{- fail "recorder.enabled è vero ma jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non carica pa_occupants: il registratore multitraccia registra solo la voce di chi ha dato il consenso, e senza il modulo il portale non sa di chi è ogni voce, quindi non registrerebbe nessuno. Aggiungi pa_occupants a XMPP_MUC_MODULES, come in values.yaml. Succede anche con helm upgrade --reuse-values da una versione precedente, che conserva la lista vecchia." -}}
+{{- end -}}
+{{- if and (include "pa-webinar.captionsEnabled" .) (not (has "pa_captions" $moduli)) -}}
+{{- fail "global.captions.enabled è vero ma jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non carica pa_captions: le stanze non si dichiarerebbero trascrivibili, e i sottotitoli accesi da un moderatore non partirebbero mai, senza errori nella sala. Aggiungi pa_captions a XMPP_MUC_MODULES, come in values.yaml, oppure spegni i sottotitoli con global.captions.enabled: false." -}}
+{{- end -}}
+{{- if $delProgetto -}}
 {{- $montato := false -}}
 {{- range (dig "extraVolumeMounts" list $prosody | default list) -}}
 {{- if and (kindIs "map" .) (hasPrefix "/prosody-plugins-custom" (toString (index . "mountPath" | default ""))) -}}
@@ -308,7 +328,7 @@ Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
 {{- end -}}
 {{- end -}}
 {{- if not $montato -}}
-{{- fail (printf "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES chiede il modulo token_affiliation_custom, ma nessun volume di Prosody è montato in /prosody-plugins-custom: Prosody non lo troverebbe. Succede quando un file di valori imposta jitsi-meet.prosody.extraVolumes o extraVolumeMounts, che sono liste e sostituiscono quelle del chart: aggiungi alle tue le due voci di values.yaml (il volume dal ConfigMap %s e il suo montaggio in /prosody-plugins-custom), oppure togli token_affiliation_custom da XMPP_MUC_MODULES." (include "pa-webinar.prosodyPluginsConfigMap" .)) -}}
+{{- fail (printf "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES chiede i moduli del progetto %s, ma nessun volume di Prosody è montato in /prosody-plugins-custom: Prosody non li troverebbe. Succede quando un file di valori imposta jitsi-meet.prosody.extraVolumes o extraVolumeMounts, che sono liste e sostituiscono quelle del chart: aggiungi alle tue le due voci di values.yaml (il volume dal ConfigMap %s e il suo montaggio in /prosody-plugins-custom), oppure togli quei moduli da XMPP_MUC_MODULES." (join ", " $delProgetto) (include "pa-webinar.prosodyPluginsConfigMap" .)) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -504,6 +524,67 @@ senza che nessuno lo guardi.
 {{- end -}}
 {{- if not (dig "schedule" "" $b) -}}
 {{- fail "backup.schedule è vuoto: serve un orario in formato cron, per esempio \"30 3 * * *\"." -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- /*
+Sottotitoli live (global.captions, captions.*): valori che, sbagliati, non
+fermano l'installazione ma lasciano il servizio fermo o la conferenza senza
+trascrizione, e lo si scopre quando un moderatore accende i sottotitoli.
+  - il modello: senza indirizzo o con un'impronta malformata lo scaricamento
+    all'avvio del pod fallisce sempre;
+  - il segreto per il bridge: viaggia fra le opzioni della JVM di Jicofo,
+    separate da spazi, e un carattere fuori posto spezzerebbe l'opzione;
+  - le opzioni della JVM di Jicofo: un file di valori che imposta un proprio
+    JAVA_TOOL_OPTIONS sostituisce quello del chart, e con lui l'indirizzo del
+    servizio;
+  - il motore: il contesto destro ha pochi valori ammessi, e servono almeno
+    un thread e una voce.
+*/}}
+{{- define "pa-webinar.validateCaptions" -}}
+{{- if include "pa-webinar.captionsEnabled" . -}}
+{{- $c := .Values.captions | default dict -}}
+{{- $url := toString (dig "model" "url" "" $c | default "") -}}
+{{- if not (regexMatch "^https?://[^[:space:]]+$" $url) -}}
+{{- fail (printf "captions.model.url è %q: serve l'indirizzo http(s) da cui il pod scarica il modello dei sottotitoli (quello di values.yaml, o un mirror interno con lo stesso file). Per installare senza sottotitoli: global.captions.enabled: false." $url) -}}
+{{- end -}}
+{{- $impronta := toString (dig "model" "sha256" "" $c | default "") -}}
+{{- if not (regexMatch "^[0-9a-f]{64}$" $impronta) -}}
+{{- fail (printf "captions.model.sha256 è %q: serve l'impronta SHA-256 del file del modello, 64 caratteri esadecimali minuscoli (sha256sum <file>). Senza, lo scaricamento all'avvio del pod non si può verificare e il servizio dei sottotitoli non parte." $impronta) -}}
+{{- end -}}
+{{- $token := toString (dig "captions" "bridgeToken" "" (.Values.global | default dict) | default "") -}}
+{{- if not (regexMatch "^[A-Za-z0-9._~+/=-]*$" $token) -}}
+{{- fail "global.captions.bridgeToken contiene caratteri non ammessi: solo lettere, cifre e ._~+/=- (per esempio il risultato di openssl rand -hex 24). Viaggia fra le opzioni della JVM di Jicofo, separate da spazi: uno spazio o un apice spezzerebbero l'opzione e il bridge si presenterebbe senza segreto." -}}
+{{- end -}}
+{{- $opzioni := toString (dig "jicofo" "extraEnvs" "JAVA_TOOL_OPTIONS" "" (index .Values "jitsi-meet" | default dict) | default "") -}}
+{{- if not (contains "-Djicofo.transcription.url-template=" $opzioni) -}}
+{{- fail "global.captions.enabled è vero ma jitsi-meet.jicofo.extraEnvs.JAVA_TOOL_OPTIONS non porta l'indirizzo del servizio dei sottotitoli (-Djicofo.transcription.url-template): Jicofo non saprebbe dove far mandare l'audio, e i sottotitoli accesi da un moderatore non partirebbero mai. Un file di valori che imposta JAVA_TOOL_OPTIONS sostituisce il valore del chart: riparti da quello di values.yaml e aggiungi le tue opzioni in fondo, separate da uno spazio." -}}
+{{- end -}}
+{{- $contesto := toString (dig "engine" "rightContext" 3 $c) -}}
+{{- if not (has $contesto (list "0" "1" "3" "6" "13")) -}}
+{{- fail (printf "captions.engine.rightContext è %s: il modello accetta solo 0, 1, 3, 6 o 13 (blocchi da 80, 160, 320, 560 o 1120 ms)." $contesto) -}}
+{{- end -}}
+{{- range $voce := list (list "captions.engine.threads" (dig "engine" "threads" 4 $c)) (list "captions.maxStreams" (dig "maxStreams" 4 $c)) -}}
+{{- if not (regexMatch "^[1-9][0-9]*$" (toString (index $voce 1))) -}}
+{{- fail (printf "%s è %v: serve un intero da 1 in su." (index $voce 0) (index $voce 1)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- /*
+Lo script di fine registrazione di Jibri sta in un posto solo,
+/config/finalize.sh. Il chart lo monta dal proprio ConfigMap; un file di
+valori che porta ancora una propria copia (`jibri.custom.other._finalize_sh`)
+lo monterebbe una seconda volta nello stesso punto, e l'API server
+rifiuterebbe il Deployment. Meglio dirlo qui, con la strada per uscirne.
+*/}}
+{{- define "pa-webinar.validateJibriFinalize" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) -}}
+{{- if and (dig "jibri" "custom" "other" "_finalize_sh" "" $jm) (include "pa-webinar.jibriFinalizePathMounted" .) -}}
+{{- fail (printf "jitsi-meet.jibri.custom.other._finalize_sh porta una copia dello script di fine registrazione, ma il chart monta gia' il proprio (ConfigMap %s) in /config/finalize.sh: due volumi nello stesso punto. Togli _finalize_sh dai tuoi valori (consigliato: lo script del chart firma l'avviso al portale ed e' aggiornato a ogni rilascio), oppure, per tenere il tuo, imposta jitsi-meet.jibri.extraVolumes ed extraVolumeMounts senza la voce dello script." (include "pa-webinar.jibriFinalizeConfigMap" .)) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

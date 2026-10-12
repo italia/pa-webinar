@@ -675,10 +675,10 @@ schedules are in [Scheduled and background jobs](../architecture/background-jobs
 | A moderator hides a chat message | Files | Its attachment, best effort |
 | A moderator removes an uploaded material in the room (`DELETE /api/events/<slug>/materials/<id>` or `DELETE /api/events/<slug>/files`), or staff remove it, replace its file or turn it into a link in the administration area | Files | The material's file, before the row, unless another material still holds the same key in `blobPath` or an event uses the file as its privacy notice (`removeMaterialBlob()` in `app/src/lib/events/material-files.ts`, which touches only material keys). A link to the same URL does not keep the file. When storage does not confirm the deletion, the material stays and the request answers `503` `STORAGE_DELETE_FAILED` |
 | An event is deleted outright (`DELETE /api/events/<id>`, or the bulk delete in the administration area) | Files | The event's uploaded material files and chat attachments, before the rows (`removeFilesOfEventsBeingDeleted()`). When storage does not confirm a deletion, the events stay and the request answers `503` |
-| `cleanup` job (`cronjobs.cleanup`) | Both | Temporary (unpublished) recordings past their lifetime (`TEMP_RECORDING_TTL_MS` in `app/src/lib/gdpr/cleanup-selection.ts`); published recordings past `recordingDeleteAfterDays`; and, when an `ENDED` or `ARCHIVED` event's data retention expires, its uploaded material files (with the rules of a single removal; a material whose file storage does not confirm deleting stays for the next run), chat attachments, temporary recording and unpublished recording. A published recording is exempt from the event-retention pass |
+| `cleanup` job (`cronjobs.cleanup`) | Both | Temporary (unpublished) recordings past their lifetime (`TEMP_RECORDING_TTL_MS` in `app/src/lib/gdpr/cleanup-selection.ts`); published recordings past `recordingDeleteAfterDays`; and, when an event's data retention expires, its chat attachments, temporary recording and unpublished recording. A published recording is exempt from the event-retention pass, and uploaded material files stay with the event until the material or the event is deleted |
 | `recordings-reconcile` job (`cronjobs.recordingsReconcile`) | Recordings | Orphans under `recordings/` (see below): those marked **Delete now**, and the rest after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep** |
 | `multitrack-purge` job (enabled with `postprod.enabled`) | Recordings | Per-participant audio once its multitrack transcription is done and no job still reads it. Tracks of an event with **Keep per-participant tracks** on are left to `postprod-retention` |
-| `postprod-retention` job (`postprod.enabled` and `postprod.retention.enabled`) | Recordings | When the event's data retention, or an override retention date (a recording's own, or `SiteSetting.aiArtifactRetentionDays`), expires: the artifacts under `postprod/` of recordings whose video is not published, and the per-participant audio of every recording. The artifacts of a published video are kept. `deletePostprodBlob()` refuses any key outside `postprod/` |
+| `postprod-retention` job (`postprod.enabled` and `postprod.retention.enabled`) | Recordings | When the event's data retention, or an override retention date (a recording's own, or `SiteSetting.aiArtifactRetentionDays`), expires: the artifacts under `postprod/` of recordings whose video is not published, and the per-participant audio of every recording. The artifacts of a published video are kept; when only the transcript is published, every artifact except the transcript is deleted. `deletePostprodBlob()` refuses any key outside `postprod/` |
 
 The reconcile job lists every object under `recordings/` and records as an
 orphan each one whose name is not referenced by `Event.recordingUrl`,
@@ -706,10 +706,6 @@ Known gaps:
   `recordings/multitrack/` are referenced by none of the fields above, so
   retained tracks and every `tracks.json` go through the orphan sweep (see
   [Recording](../architecture/recording.md#known-limitations)).
-- **Tracks without post-production.** An installation that records
-  per-participant audio but does not run AI post-production never reaches the
-  purge step (see **Participant tracks without the post-production pipeline**
-  in the [roadmap](../ROADMAP.md)).
 - **Backup only for a store in the cluster.** The `--include-storage`
   option of `scripts/backup.sh` and `scripts/restore.sh` covers an object
   store on a volume of the cluster, such as the Garage add-on of one k3s

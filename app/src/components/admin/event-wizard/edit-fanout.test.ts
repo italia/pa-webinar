@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fanoutEditDiff } from './edit-fanout';
+import { differenzaProfilo } from '@/lib/events/grant-profile';
+import { createMaterialAdminSchema } from '@/lib/validation/materials';
+
+import { fanoutEditDiff, materialPayload } from './edit-fanout';
 import type { InitialEventShape, WizardForm } from './wizard-shell';
 
 /**
@@ -22,11 +25,11 @@ function snapshot(): InitialEventShape {
     moderatorToken: TOKEN,
     event: {} as InitialEventShape['event'],
     organizers: [
-      { id: 'org-1', name: 'Ente', organization: 'Ente', logoUrl: null, websiteUrl: null },
+      { id: 'org-1', name: 'Ente', logoUrl: null, websiteUrl: null },
     ],
     eventModerators: [
-      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null },
-      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null },
+      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
+      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
     ],
     invitations: [
       { id: 'inv-1', name: 'Ospite', email: 'ospite@example.org', role: 'GUEST', personId: null },
@@ -218,5 +221,317 @@ describe('fanoutEditDiff — altre cancellazioni', () => {
     const [url, init] = rimozioni[0]!;
     expect(url).toBe(`/api/events/${EVENT_ID}/organizers/org-1`);
     expect(init.headers).toEqual({ Authorization: `Bearer ${TOKEN}` });
+  });
+});
+
+/**
+ * Contratto fra il wizard e l'API dei materiali: la bozza del wizard, passata
+ * da materialPayload, e' accettata dallo schema della rotta cosi' com'e', con
+ * il tipo che l'API conosce.
+ */
+describe('fanoutEditDiff — profilo delle persone', () => {
+  const persone = (patch: Record<string, unknown>) =>
+    ({
+      ...formWithout(),
+      organizers: [{ name: 'Ente', logoUrl: null, websiteUrl: null }],
+      invitations: [{ name: 'Ospite', email: 'ospite@example.org', role: 'GUEST', personId: null }],
+      materials: snapshot().materials.map((m) => ({ ...m, id: undefined })),
+      moderators: [
+        {
+          name: 'Anna Bianchi',
+          email: 'anna@example.org',
+          personId: null,
+          organizer: false,
+          organization: null,
+          organizationLogoUrl: null,
+          publicListed: false,
+          ...patch,
+        },
+      ],
+      speakers: [
+        {
+          name: 'Luca Verdi',
+          email: 'luca@example.org',
+          personId: null,
+          organization: null,
+          organizationLogoUrl: null,
+          publicListed: false,
+        },
+      ],
+    }) as unknown as WizardForm;
+
+  it('un ente o un segno cambiati si salvano con PATCH, senza revocare il link', async () => {
+    respond(() => json(200, {}));
+    const initial = snapshot();
+
+    const report = await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      persone({ organizer: true, organization: 'Ente di esempio', publicListed: true }),
+      initial,
+      'it',
+    );
+
+    expect(calls('DELETE', '/moderators/')).toEqual([]);
+    expect(calls('POST', '/moderators')).toEqual([]);
+    const aggiornamenti = calls('PATCH', '/moderators/');
+    expect(aggiornamenti.map(([url]) => url)).toEqual([`/api/events/${EVENT_ID}/moderators/mod-1`]);
+    expect(JSON.parse(String(aggiornamenti[0]![1].body))).toEqual({
+      organizer: true,
+      organization: 'Ente di esempio',
+      publicListed: true,
+    });
+    expect(report.failed).toEqual([]);
+    // Lo scatto si aggiorna: un secondo salvataggio non ripete la richiesta.
+    fetchMock.mockClear();
+    await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      persone({ organizer: true, organization: 'Ente di esempio', publicListed: true }),
+      initial,
+      'it',
+    );
+    expect(calls('PATCH', '/moderators/')).toEqual([]);
+  });
+
+  it('senza cambi non parte nessuna richiesta per le persone', async () => {
+    respond(() => json(200, {}));
+    await fanoutEditDiff(EVENT_ID, TOKEN, persone({}), snapshot(), 'it');
+    expect(calls('PATCH', '/moderators/')).toEqual([]);
+    expect(calls('POST', '/moderators')).toEqual([]);
+    expect(calls('DELETE', '/moderators/')).toEqual([]);
+  });
+
+  it('un aggiornamento rifiutato finisce fra le risorse non salvate e si riprova', async () => {
+    respond((url, init) => (init.method === 'PATCH' ? json(500, { error: 'Internal error' }) : json(200, {})));
+    const initial = snapshot();
+    const report = await fanoutEditDiff(EVENT_ID, TOKEN, persone({ publicListed: true }), initial, 'it');
+    expect(report.failed).toContain('moderators');
+    expect(initial.eventModerators.find((m) => m.id === 'mod-1')?.publicListed).toBe(false);
+  });
+});
+
+describe('materialPayload', () => {
+  it.each([
+    ['file', 'FILE'],
+    ['link', 'LINK'],
+  ] as const)('una bozza «%s» diventa un materiale %s valido', (tipo, atteso) => {
+    const bozza = {
+      id: 'bozza-1',
+      title: 'Slide della sessione',
+      url: 'https://storage.example.org/assets/documents/slide.pdf',
+      description: null,
+      type: tipo,
+      visibility: 'AFTER' as const,
+    };
+    const parsed = createMaterialAdminSchema.safeParse(materialPayload(bozza));
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.type).toBe(atteso);
+    expect(parsed.success && parsed.data.visibility).toBe('AFTER');
+    expect(materialPayload(bozza)).not.toHaveProperty('id');
+  });
+});
+
+describe('materialPayload — file caricato', () => {
+  it('porta la chiave nello storage e i dati del file; un link no', () => {
+    const file = materialPayload({
+      title: 'Slide',
+      url: 'https://storage.example.org/assets/documents/2026/10/slide.pdf',
+      description: null,
+      type: 'file',
+      visibility: 'ALWAYS',
+      fileName: 'slide.pdf',
+      fileSize: 2048,
+      mimeType: 'application/pdf',
+      blobPath: 'assets/documents/2026/10/slide.pdf',
+    });
+    const parsed = createMaterialAdminSchema.safeParse(file);
+    expect(parsed.success && parsed.data).toMatchObject({
+      type: 'FILE',
+      blobPath: 'assets/documents/2026/10/slide.pdf',
+      fileName: 'slide.pdf',
+      fileSize: 2048,
+      mimeType: 'application/pdf',
+    });
+    const link = materialPayload({
+      title: 'Programma',
+      url: 'https://www.example.org/assets/programma.pdf',
+      description: null,
+      type: 'link',
+      visibility: 'ALWAYS',
+    });
+    expect(link).not.toHaveProperty('blobPath');
+    expect(link.type).toBe('LINK');
+  });
+});
+
+describe('differenzaProfilo', () => {
+  it('una bozza senza profilo non conta come modifica', () => {
+    const salvato = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false };
+    expect(differenzaProfilo(salvato, {})).toBeNull();
+    expect(differenzaProfilo(salvato, { organization: '' })).toBeNull();
+  });
+
+  it('manda solo i campi cambiati', () => {
+    expect(
+      differenzaProfilo(
+        { organizer: false, organization: 'A', organizationLogoUrl: null, publicListed: false },
+        { organizer: false, organization: 'B', organizationLogoUrl: null, publicListed: true },
+      ),
+    ).toEqual({ organization: 'B', publicListed: true });
+  });
+});
+
+describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
+  const senzaEmail = (id: string, name: string) => ({
+    id,
+    name,
+    email: null,
+    role: 'MODERATOR' as const,
+    personId: null,
+    organizer: false,
+    organization: null,
+    organizationLogoUrl: null,
+    publicListed: false,
+  });
+  const voce = (grantId: string, name: string, patch: Record<string, unknown> = {}) => ({
+    grantId,
+    name,
+    email: '',
+    personId: null,
+    organizer: false,
+    organization: null,
+    organizationLogoUrl: null,
+    publicListed: false,
+    ...patch,
+  });
+
+  it('due concessioni senza email: il profilo va a quella giusta', async () => {
+    respond(() => json(200, {}));
+    const initial = { ...snapshot(), eventModerators: [senzaEmail('a', 'A'), senzaEmail('b', 'B')] };
+    const form = {
+      ...formWithout(),
+      moderators: [voce('a', 'A', { publicListed: true }), voce('b', 'B')],
+    } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('PATCH', '/moderators/').map(([url]) => url)).toEqual([`/api/events/${EVENT_ID}/moderators/a`]);
+    expect(calls('DELETE', '/moderators/')).toEqual([]);
+    expect(calls('POST', '/moderators')).toEqual([]);
+  });
+
+  it('un cambio di ruolo senza email crea la concessione nuova e solo dopo revoca la vecchia', async () => {
+    respond((url, init) => (init.method === 'POST' ? json(201, { id: 'nuova' }) : json(200, {})));
+    const initial = { ...snapshot(), eventModerators: [senzaEmail('a', 'A')] };
+    const form = { ...formWithout(), speakers: [voce('a', 'A')] } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    const [post] = calls('POST', '/moderators');
+    const body = JSON.parse(String(post![1].body)) as Record<string, unknown>;
+    expect(body.role).toBe('SPEAKER');
+    expect('email' in body).toBe(false);
+    expect(calls('DELETE', '/moderators/').map(([url]) => url)).toEqual([`/api/events/${EVENT_ID}/moderators/a`]);
+    expect(initial.eventModerators.map((m) => m.id)).toEqual(['nuova']);
+  });
+
+  it('se la concessione nuova non nasce, la vecchia resta', async () => {
+    respond((url, init) => (init.method === 'POST' ? json(422, { error: 'Validation failed' }) : json(200, {})));
+    const initial = { ...snapshot(), eventModerators: [senzaEmail('a', 'A')] };
+    const form = { ...formWithout(), speakers: [voce('a', 'A')] } as unknown as WizardForm;
+
+    const report = await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('DELETE', '/moderators/')).toEqual([]);
+    expect(report.failed).toContain('moderators');
+    expect(initial.eventModerators.map((m) => m.id)).toEqual(['a']);
+  });
+
+  it('riprovando dopo una revoca mancata non crea una seconda concessione', async () => {
+    respond((url, init) =>
+      init.method === 'POST' ? json(201, { id: 'nuova' }) : init.method === 'DELETE' ? json(500, {}) : json(200, {}),
+    );
+    const initial = { ...snapshot(), eventModerators: [senzaEmail('a', 'A')] };
+    const form = { ...formWithout(), speakers: [voce('a', 'A')] } as unknown as WizardForm;
+
+    const primo = await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+    expect(primo.revocationFailed).toEqual(['A']);
+    fetchMock.mockClear();
+    respond(() => json(200, {}));
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('POST', '/moderators')).toEqual([]);
+    expect(calls('DELETE', '/moderators/').map(([url]) => url)).toEqual([`/api/events/${EVENT_ID}/moderators/a`]);
+    expect(initial.eventModerators.map((m) => m.id)).toEqual(['nuova']);
+  });
+
+  it('una bozza vecchia, senza profilo, non cancella il profilo salvato', async () => {
+    respond(() => json(200, {}));
+    const salvata = { ...senzaEmail('a', 'A'), organization: 'Ente', publicListed: true };
+    const initial = { ...snapshot(), eventModerators: [salvata] };
+    const form = {
+      ...formWithout(),
+      moderators: [{ grantId: 'a', name: 'A', email: '', personId: null }],
+    } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('PATCH', '/moderators/')).toEqual([]);
+    expect(calls('DELETE', '/moderators/')).toEqual([]);
+  });
+});
+
+/**
+ * Un questionario con risposte non si svuota dal wizard: la DELETE
+ * cancellerebbe anche le risposte, che il passo mostra in sola lettura.
+ */
+describe('fanoutEditDiff — questionari con risposte', () => {
+  const conQuestionario = (risposte: number): InitialEventShape => ({
+    ...snapshot(),
+    organizers: [],
+    eventModerators: [],
+    invitations: [],
+    materials: [],
+    postEventQuestionnaire: { templateIds: ['tpl-1'], adhocQuestions: [] },
+    questionnaireResponses: { pre: 0, post: risposte },
+  });
+
+  it('con risposte, svuotarlo non manda nessuna richiesta', async () => {
+    respond(() => json(200, {}));
+
+    const report = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), conQuestionario(4), 'it');
+
+    expect(calls('DELETE', '/questionnaires/')).toHaveLength(0);
+    expect(calls('PUT', '/questionnaires/')).toHaveLength(0);
+    expect(report.failed).toEqual([]);
+  });
+
+  it('le risposte arrivate a wizard aperto: il rifiuto si dice una volta e non si ripete', async () => {
+    respond((url, init) =>
+      init.method === 'DELETE' && url.includes('/questionnaires/')
+        ? json(409, { error: 'The questionnaire has responses: confirm to delete them too.', code: 'HAS_RESPONSES' })
+        : json(200, {}),
+    );
+    const initial = conQuestionario(0);
+
+    const primo = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), initial, 'it');
+    expect(primo.failed).toEqual(['questionnaires']);
+    expect(initial.questionnaireResponses?.post).toBe(1);
+
+    fetchMock.mockClear();
+    const secondo = await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), initial, 'it');
+    expect(calls('DELETE', '/questionnaires/')).toHaveLength(0);
+    expect(secondo.failed).toEqual([]);
+  });
+
+  it('senza risposte, svuotarlo lo elimina come prima', async () => {
+    respond(() => json(200, { deleted: true }));
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, formWithout(), conQuestionario(0), 'it');
+
+    const eliminazioni = calls('DELETE', '/questionnaires/');
+    expect(eliminazioni).toHaveLength(1);
+    expect(eliminazioni[0]![0]).toBe(`/api/admin/events/${EVENT_ID}/questionnaires/POST_EVENT`);
   });
 });

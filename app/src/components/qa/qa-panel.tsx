@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+
+import { Icon } from '@/components/ui/icon';
+import { readMyQuestions, rememberMyQuestion } from '@/lib/qa/alerts';
 
 import QuestionForm from './question-form';
 import QuestionList from './question-list';
 
-import { Icon } from '@/components/ui/icon';
 
 interface QAPanelProps {
   eventSlug: string;
@@ -37,68 +39,46 @@ export default function QAPanel({
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
+  // Le domande fatte da questo browser: la lista le segna, e la sala avvisa
+  // quando ricevono risposta (lib/qa/alerts).
+  const [myQuestionIds, setMyQuestionIds] = useState<ReadonlySet<string>>(() => new Set());
+  useEffect(() => {
+    setMyQuestionIds(readMyQuestions(eventSlug));
+  }, [eventSlug]);
 
-  const handleSubmitted = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
+  const handleSubmitted = useCallback(
+    (questionId?: string) => {
+      if (questionId) setMyQuestionIds(rememberMyQuestion(eventSlug, questionId));
+      setRefreshKey((k) => k + 1);
+    },
+    [eventSlug],
+  );
 
   return (
     <div
       className="d-flex flex-column flex-grow-1"
       style={{ width: '100%', minHeight: 0 }}
     >
-        <div className="p-3 border-bottom">
-          <h3 className="h5 mb-0 d-flex align-items-center">
-            <Icon icon="it-comment" className="me-2" />
+        <div className="live-panel-header live-panel-header--bar live-panel-header--stacked">
+          <h3 className="live-panel-header__title">
+            <Icon icon="it-help-circle" size="sm" aria-hidden="true" />
             {t('title')}
           </h3>
-          <p className="text-muted mb-0 mt-1" style={{ fontSize: '0.78rem' }}>
-            {t('qaPersistenceNote')}
-          </p>
+          <p className="live-panel-header__note">{t('qaPersistenceNote')}</p>
         </div>
 
-        <div className="p-3 flex-grow-1" style={{ overflowY: 'auto' }}>
+        <div className="qa-body flex-grow-1">
           {!isModerator && (
-            <>
-              {/* First-time-user CTA. Kept visible even after the first
-                  question is sent so new arrivals still see the prompt. */}
-              <div
-                className="mb-3 p-3 rounded d-flex gap-2 align-items-start"
-                style={{
-                  backgroundColor: '#EAF4FF',
-                  border: '1px solid #CCE0F5',
-                }}
-                role="note"
-              >
-                <div aria-hidden="true" style={{ flexShrink: 0 }}>
-                  <Icon icon="it-comment" size="lg" color="primary" />
-                </div>
-                <div>
-                  <h6 className="mb-1">{t('ctaTitle')}</h6>
-                  <p className="mb-0 small text-secondary">
-                    {t('ctaBody')}
-                  </p>
-                </div>
-              </div>
-
-              <QuestionForm
-                eventSlug={eventSlug}
-                token={token}
-                guestName={guestName}
-                guestId={guestId}
-                onSubmitted={handleSubmitted}
-              />
-            </>
+            <QuestionForm
+              eventSlug={eventSlug}
+              token={token}
+              guestName={guestName}
+              guestId={guestId}
+              onSubmitted={handleSubmitted}
+            />
           )}
 
-          {isModerator && (
-            <div
-              className="mb-3 p-2 rounded small text-muted"
-              style={{ backgroundColor: '#F5F5F5' }}
-            >
-              {t('moderatorHint')}
-            </div>
-          )}
+          {isModerator && <p className="qa-moderator-hint">{t('moderatorHint')}</p>}
 
           <QuestionList
             key={refreshKey}
@@ -107,6 +87,7 @@ export default function QAPanel({
             isModerator={isModerator}
             voterAccessToken={voterAccessToken}
             voterGuestId={voterGuestId}
+            myQuestionIds={myQuestionIds}
           />
         </div>
     </div>

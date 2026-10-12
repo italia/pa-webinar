@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useCallback, useEffect, useId, useRef, type FormEvent } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
-import { materialAuthorName } from '@/lib/events/material-author';
+import { MATERIAL_KIND_ICON, materialKind, titleFromFileName } from '@/lib/materials/file-kind';
 import {
   MATERIAL_FILE_MAX_BYTES,
   MATERIAL_FILE_MIME_TYPES,
@@ -15,30 +15,17 @@ import {
   MATERIAL_FILES_PER_EVENT_MAX_BYTES,
 } from '@/lib/validation/materials';
 
+import MaterialItem, { MaterialVisibilitySelect, useMaterialFormat } from './material-item';
 import {
   checkMaterialFile,
   fetchMaterials,
+  markMaterialOpened,
   materialsListKey,
   uploadMaterialFile,
+  type MaterialPatch,
   type MaterialUploadError,
+  type RoomMaterial,
 } from './material-request';
-
-interface MaterialData {
-  id: string;
-  type: string;
-  title: string;
-  url: string;
-  description: string | null;
-  /** Peso in byte dei file caricati (type FILE); null per i link. */
-  fileSize?: number | null;
-  /** ALWAYS | BEFORE | DURING | AFTER. Il server filtra già per il pubblico;
-   *  al moderatore, che vede tutto, serve a sapere cosa la sala NON vede. */
-  visibility?: string;
-  /** Il nome di chi l'ha aggiunto, o null quando la riga non ne porta uno
-   *  (lib/events/material-author): allora si mostra una dicitura tradotta. */
-  addedBy: string | null;
-  createdAt: string;
-}
 
 interface MaterialPanelProps {
   eventSlug: string;
@@ -48,50 +35,30 @@ interface MaterialPanelProps {
 
 type AddMode = 'link' | 'file';
 
+/** Quali voci mostra l'elenco: tutte, solo i file caricati, solo i link. */
+type MaterialFilter = 'all' | 'file' | 'link';
+
+/**
+ * Da quante voci in su, se ci sono sia file sia link, l'elenco offre il filtro:
+ * con poche voci basta scorrerle, e un filtro sarebbe solo rumore.
+ */
+const FILTER_MIN_ITEMS = 5;
+
+/** Quanto resta armato «Elimina» in attesa della conferma, come nel resto della sala. */
+const DELETE_ARM_MS = 4_000;
+
 /** I limiti in MB da mostrare nei testi, dalle stesse costanti del server. */
 const MAX_MB = Math.round(MATERIAL_FILE_MAX_BYTES / (1024 * 1024));
 const MAX_EVENT_MB = Math.round(MATERIAL_FILES_PER_EVENT_MAX_BYTES / (1024 * 1024));
 
 export default function MaterialPanel({ eventSlug, token, isModerator }: MaterialPanelProps) {
   const t = useTranslations('materials');
-  const tv = useTranslations('admin.materials');
-  const format = useFormatter();
-
-  // Quando il pubblico vede il materiale: chi conduce vede tutto l'elenco, e
-  // ogni voce porta la propria fase. Anche il predefinito (ALWAYS, «in sala e
-  // dopo l'evento»): prima dell'inizio il pubblico e i relatori non lo
-  // vedono, e senza etichetta chi controlla la sala in anticipo non avrebbe
-  // modo di accorgersene.
-  const visibilityLabel = (v: string | undefined): string | null => {
-    if (v === 'ALWAYS') return tv('visibilityAlways');
-    if (v === 'BEFORE') return tv('visibilityBefore');
-    if (v === 'DURING') return tv('visibilityDuring');
-    if (v === 'AFTER') return tv('visibilityAfter');
-    return null;
-  };
-
-  // «Aggiunto da …»: il nome quando la riga ne porta uno, altrimenti una
-  // dicitura nella lingua di chi legge (mai una parola fissa del database).
-  const authorLine = (addedBy: string | null): string => {
-    const name = materialAuthorName(addedBy);
-    return name ? t('addedBy', { name }) : t('addedByStaff');
-  };
-
-  const fileSizeLabel = (bytes: number): string =>
-    bytes >= 1024 * 1024
-      ? format.number(bytes / (1024 * 1024), {
-          style: 'unit',
-          unit: 'megabyte',
-          maximumFractionDigits: 1,
-        })
-      : format.number(Math.max(1, Math.round(bytes / 1024)), {
-          style: 'unit',
-          unit: 'kilobyte',
-        });
+  const tf = useTranslations('materials.filter');
+  const { fileSizeLabel } = useMaterialFormat();
 
   const pushLive = useLivePush();
 
-  const { data, mutate } = useSWR<{ materials: MaterialData[]; uploadsEnabled?: boolean }>(
+  const { data, mutate } = useSWR<{ materials: RoomMaterial[]; uploadsEnabled?: boolean }>(
     // Il token parte per chiunque ne abbia uno (./material-request): al
     // moderatore allarga l'elenco, a tutti apre quello di un evento protetto
     // da password. I contrassegni qui sotto restano di chi conduce.
@@ -111,10 +78,20 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
+  // Quando il pubblico lo vede: il predefinito è quello del server.
+  const [visibility, setVisibility] = useState<string>('ALWAYS');
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileHelpId = useId();
   const [submitting, setSubmitting] = useState(false);
+  // Avanzamento del caricamento (0..1), null quando non si sta caricando.
+  const [progress, setProgress] = useState<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  // Il titolo l'ha proposto il pannello dal nome del file (non l'ha scritto
+  // chi carica): segue il file se lo si cambia o lo si toglie.
+  const titleAutoRef = useRef(false);
+  const fileInputId = useId();
   const [error, setError] = useState('');
   const [titleMissing, setTitleMissing] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -131,7 +108,72 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     formWasOpen.current = showForm;
   }, [showForm]);
 
+  // «Elimina» armato (un solo materiale alla volta): il primo clic arma, il
+  // secondo conferma; da solo si disarma dopo qualche secondo. Armato, lo si
+  // annuncia: il cambio di nome del pulsante che ha il fuoco la maggior parte
+  // dei lettori di schermo non lo legge.
+  const [armedDelete, setArmedDelete] = useState<string | null>(null);
+  const armedAnnouncementRef = useRef('');
+  useEffect(() => {
+    if (!armedDelete) return;
+    const timer = setTimeout(() => {
+      setArmedDelete(null);
+      // Disarmato, la richiesta di conferma non vale più: si toglie, e un
+      // nuovo armo dello stesso materiale si annuncia di nuovo.
+      setAnnouncement((cur) => (cur === armedAnnouncementRef.current ? '' : cur));
+    }, DELETE_ARM_MS);
+    return () => clearTimeout(timer);
+  }, [armedDelete]);
+  // Tolto un materiale, il fuoco non deve cadere in cima alla pagina con la
+  // sua riga: va al titolo della voce seguente, altrimenti al pulsante per
+  // aggiungere, altrimenti al titolo del pannello. Si sposta quando l'elenco
+  // riletto non contiene più la voce tolta.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const focusAfterDeleteRef = useRef<{ deletedId: string; nextId: string | null } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  // Il link appena copiato: la sua icona dice «fatto» per un attimo.
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!copiedId) return;
+    const timer = setTimeout(() => setCopiedId(null), 2_000);
+    return () => clearTimeout(timer);
+  }, [copiedId]);
+  const [filter, setFilter] = useState<MaterialFilter>('all');
+
   const materials = data?.materials ?? [];
+
+  useEffect(() => {
+    const dopo = focusAfterDeleteRef.current;
+    if (!dopo || !data || data.materials.some((x) => x.id === dopo.deletedId)) return;
+    focusAfterDeleteRef.current = null;
+    const riga = dopo.nextId
+      ? Array.from(panelRef.current?.querySelectorAll<HTMLElement>('li[data-material-id]') ?? []).find(
+          (li) => li.dataset.materialId === dopo.nextId,
+        )
+      : undefined;
+    const titolo = riga?.querySelector<HTMLElement>('.material-item__title');
+    if (titolo) {
+      titolo.focus();
+    } else if (addButtonRef.current) {
+      addButtonRef.current.focus();
+    } else if (headingRef.current) {
+      // Il titolo non è un controllo: diventa raggiungibile solo per questo.
+      headingRef.current.setAttribute('tabindex', '-1');
+      headingRef.current.focus();
+    }
+  }, [data]);
+
+  const fileCount = materials.filter((m) => m.type === 'FILE').length;
+  const linkCount = materials.length - fileCount;
+  // Il filtro c'è solo quando serve; quando sparisce (un genere è rimasto
+  // senza voci) l'elenco torna completo, non resta filtrato su un vuoto.
+  const showFilter = fileCount > 0 && linkCount > 0 && materials.length >= FILTER_MIN_ITEMS;
+  const activeFilter: MaterialFilter = showFilter ? filter : 'all';
+  const shown =
+    activeFilter === 'all'
+      ? materials
+      : materials.filter((m) => (m.type === 'FILE') === (activeFilter === 'file'));
   // Il caricamento si offre solo se l'installazione ha uno storage per i file:
   // altrimenti il server risponderebbe 503 a ogni tentativo.
   const uploadsEnabled = data?.uploadsEnabled === true;
@@ -166,11 +208,44 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     setTitle('');
     setUrl('');
     setDescription('');
+    setVisibility('ALWAYS');
     setFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     setError('');
     setTitleMissing(false);
+    setProgress(null);
+    titleAutoRef.current = false;
   }, []);
+
+  /** Un file scelto o trascinato: si controlla subito, e il titolo si propone
+   *  dal nome se chi carica non ne ha scritto uno. */
+  const chooseFile = useCallback(
+    (f: File | null) => {
+      setError('');
+      if (!f) {
+        setFile(null);
+        if (titleAutoRef.current) {
+          setTitle('');
+          titleAutoRef.current = false;
+        }
+        return;
+      }
+      const invalid = checkMaterialFile(f, MATERIAL_FILE_MIME_TYPES, MATERIAL_FILE_MAX_BYTES);
+      if (invalid) {
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setError(uploadErrorMessage(invalid));
+        return;
+      }
+      setFile(f);
+      setTitle((cur) => {
+        if (cur.trim() && !titleAutoRef.current) return cur;
+        titleAutoRef.current = true;
+        return titleFromFileName(f.name);
+      });
+    },
+    [uploadErrorMessage],
+  );
 
   /** Un materiale è entrato: il modulo si chiude, la lista rilegge, lo si dice. */
   const materialAdded = useCallback(() => {
@@ -199,12 +274,23 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
           return;
         }
         setSubmitting(true);
+        setProgress(0);
+        const controller = new AbortController();
+        abortRef.current = controller;
         try {
           const failed = await uploadMaterialFile(eventSlug, token, {
             file,
             title: title.trim(),
             description: description.trim(),
-          });
+            visibility,
+          }, { onProgress: setProgress, signal: controller.signal });
+          if (failed === 'aborted') {
+            setAnnouncement(t('uploadCancelled'));
+            // Se il server aveva gia' ricevuto tutto, il materiale puo' esserci
+            // lo stesso: l'elenco lo dice.
+            void mutate();
+            return;
+          }
           if (failed) {
             setError(uploadErrorMessage(failed));
             return;
@@ -213,7 +299,9 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         } catch {
           setError(t('errors.uploadFailed'));
         } finally {
+          abortRef.current = null;
           setSubmitting(false);
+          setProgress(null);
         }
         return;
       }
@@ -246,6 +334,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             title: title.trim(),
             url: url.trim(),
             description: description.trim() || undefined,
+            visibility,
           }),
         });
 
@@ -261,12 +350,11 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         setSubmitting(false);
       }
     },
-    [fileMode, file, title, url, description, eventSlug, token, t, materialAdded, uploadErrorMessage],
+    [fileMode, file, title, url, description, visibility, eventSlug, token, t, materialAdded, uploadErrorMessage, mutate],
   );
 
   const handleDelete = useCallback(
     async (materialId: string) => {
-      if (!confirm(t('confirmDelete'))) return;
       setListError('');
       setAnnouncement('');
 
@@ -277,9 +365,15 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         });
         // 404: l'ha già tolto qualcun altro (un altro moderatore, l'area
         // admin). Il risultato chiesto c'è: non è un errore.
-        if (res.ok || res.status === 404) setAnnouncement(t('materialDeleted'));
-        else setListError(t('errors.deleteFailed'));
+        if (res.ok || res.status === 404) {
+          setAnnouncement(t('materialDeleted'));
+        } else {
+          // La riga resta, e il fuoco con lei.
+          focusAfterDeleteRef.current = null;
+          setListError(t('errors.deleteFailed'));
+        }
       } catch {
+        focusAfterDeleteRef.current = null;
         setListError(t('errors.deleteFailed'));
       }
       mutate();
@@ -287,11 +381,90 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     [eventSlug, token, t, mutate],
   );
 
+  /** Primo clic: arma e lo annuncia. Secondo, sullo stesso materiale: toglie. */
+  const handleDeleteClick = useCallback(
+    (m: RoomMaterial, nextId: string | null) => {
+      if (armedDelete !== m.id) {
+        const avviso = `${t('deleteMaterial')}: ${m.title}. ${t('confirmDelete')}`;
+        armedAnnouncementRef.current = avviso;
+        setAnnouncement(avviso);
+        setArmedDelete(m.id);
+        return;
+      }
+      setArmedDelete(null);
+      focusAfterDeleteRef.current = { deletedId: m.id, nextId };
+      void handleDelete(m.id);
+    },
+    [armedDelete, handleDelete, t],
+  );
+
+  /** Salva una correzione: null se è andata, altrimenti il messaggio per il modulo. */
+  const handleSave = useCallback(
+    async (materialId: string, patch: MaterialPatch): Promise<string | null> => {
+      setListError('');
+      setAnnouncement('');
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/materials/${materialId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(patch),
+        });
+        if (res.ok) {
+          setEditingId(null);
+          setAnnouncement(t('materialUpdated'));
+          void mutate();
+          return null;
+        }
+        if (res.status === 404) {
+          // Tolto da qualcun altro mentre lo si correggeva: il modulo se ne va
+          // con la riga, e l'errore resta sopra l'elenco.
+          setEditingId(null);
+          setListError(t('errors.updateFailed'));
+          void mutate();
+          return null;
+        }
+        return t('errors.updateFailed');
+      } catch {
+        return t('errors.updateFailed');
+      }
+    },
+    [eventSlug, token, t, mutate],
+  );
+
+  const handleCopy = useCallback(
+    async (m: RoomMaterial) => {
+      setListError('');
+      setAnnouncement('');
+      try {
+        await navigator.clipboard.writeText(m.url);
+        setCopiedId(m.id);
+        setAnnouncement(t('linkCopied'));
+      } catch {
+        // Contesto non sicuro o permesso negato: lo si dice, l'indirizzo resta
+        // raggiungibile dal link stesso.
+        setListError(t('errors.copyFailed'));
+      }
+    },
+    [t],
+  );
+
+  const percent = progress === null ? null : Math.round(progress * 100);
+  const chosenKind = file
+    ? materialKind({ type: 'FILE', mimeType: file.type, fileName: file.name })
+    : null;
+
   return (
-    <div className="p-2">
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6 className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>
+    <div className="material-panel" ref={panelRef}>
+      <div className="live-panel-header">
+        <h6 className="live-panel-header__title" ref={headingRef}>
+          <Icon icon="it-clip" size="sm" aria-hidden="true" />
           {t('title')}
+          {materials.length > 0 && (
+            <span className="live-panel-header__count">{materials.length}</span>
+          )}
         </h6>
         {isModerator && !showForm && (
           <Button
@@ -299,7 +472,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             color="primary"
             outline
             size="xs"
-            className="px-2 py-0"
+            className="px-2 py-1"
             onClick={() => {
               setAnnouncement('');
               setShowForm(true);
@@ -310,38 +483,111 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         )}
       </div>
 
-      {/* Add material form (moderator) */}
+      {/* Modulo di chi conduce: un link o un file */}
       {isModerator && showForm && (
-        <form onSubmit={handleSubmit} className="border rounded p-2 mb-2">
+        <form onSubmit={handleSubmit} className="material-panel__form">
           {uploadsEnabled && (
-            <div className="btn-group w-100 mb-2" role="group" aria-label={t('modeLabel')}>
+            <div className="material-panel__modes" role="group" aria-label={t('modeLabel')}>
               {(['link', 'file'] as const).map((m) => (
                 <button
                   key={m}
                   type="button"
-                  className={`btn btn-xs py-1 ${mode === m ? 'btn-primary' : 'btn-outline-primary'}`}
+                  className={`material-panel__mode${mode === m ? ' is-active' : ''}`}
                   aria-pressed={mode === m}
+                  disabled={submitting}
                   onClick={() => {
                     setMode(m);
                     // Il campo del file si smonta cambiando modo: un file scelto
-                    // prima non deve partire senza che si veda.
-                    setFile(null);
+                    // prima non deve partire senza che si veda (e il titolo
+                    // proposto dal suo nome se ne va con lui).
+                    chooseFile(null);
                     setError('');
                     setTitleMissing(false);
                   }}
                 >
-                  <Icon
-                    icon={m === 'link' ? 'it-link' : 'it-upload'}
-                    size="xs"
-                    color={mode === m ? 'white' : 'primary'}
-                    className="me-1"
-                  />
+                  <Icon icon={m === 'link' ? 'it-link' : 'it-upload'} size="xs" aria-hidden="true" />
                   {m === 'link' ? t('modeLink') : t('modeFile')}
                 </button>
               ))}
             </div>
           )}
-          <div className="mb-1">
+
+          {/* Chiavi distinte: il campo URL è controllato, quello del file no, e
+              React non deve riusare lo stesso <input> passando dall'uno all'altro. */}
+          {fileMode ? (
+            <div key="file" className="mb-2">
+              {/* Il campo vero resta raggiungibile da tastiera (nascosto alla
+                  vista, non al fuoco): l'area qui sotto e' la sua etichetta, un
+                  clic la apre, e il fuoco sul campo la evidenzia. */}
+              <input
+                ref={fileInputRef}
+                id={fileInputId}
+                type="file"
+                className="visually-hidden material-panel__file-input"
+                aria-label={t('fileLabel')}
+                aria-describedby={fileHelpId}
+                accept={MATERIAL_FILE_MIME_TYPES.join(',')}
+                onChange={(e) => chooseFile(e.target.files?.[0] ?? null)}
+              />
+              {file ? (
+                <div className="material-panel__chosen">
+                  <span className={`material-kind material-kind--${chosenKind}`} aria-hidden="true">
+                    <Icon icon={MATERIAL_KIND_ICON[chosenKind ?? 'file']} size="sm" />
+                  </span>
+                  <span className="material-panel__chosen-name" title={file.name}>
+                    {file.name}
+                    <span className="material-panel__meta">{fileSizeLabel(file.size)}</span>
+                  </span>
+                  {!submitting && (
+                    <button
+                      type="button"
+                      className="material-panel__icon-btn"
+                      aria-label={t('removeFile')}
+                      title={t('removeFile')}
+                      onClick={() => chooseFile(null)}
+                    >
+                      <Icon icon="it-close" size="sm" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <label
+                  htmlFor={fileInputId}
+                  className={`material-panel__drop${dragOver ? ' is-over' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    chooseFile(e.dataTransfer.files?.[0] ?? null);
+                  }}
+                >
+                  <Icon icon="it-upload" size="sm" color="primary" aria-hidden="true" />
+                  <span className="material-panel__drop-title">{t('dropzoneTitle')}</span>
+                  <span className="material-panel__drop-choose">{t('dropzoneChoose')}</span>
+                  <span className="material-panel__meta">{t('fileHelp', { maxMb: MAX_MB })}</span>
+                </label>
+              )}
+              <span id={fileHelpId} className="visually-hidden">
+                {t('fileHelp', { maxMb: MAX_MB })}
+              </span>
+            </div>
+          ) : (
+            <div key="url" className="mb-2">
+              <input
+                type="url"
+                className="form-control form-control-sm"
+                placeholder={t('urlLabel')}
+                aria-label={t('urlLabel')}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+            </div>
+          )}
+          <div className="mb-2">
             <input
               ref={titleInputRef}
               type="text"
@@ -353,6 +599,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
+                titleAutoRef.current = false;
                 if (titleMissing) {
                   setTitleMissing(false);
                   setError('');
@@ -361,39 +608,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
               maxLength={300}
             />
           </div>
-          {/* Chiavi distinte: il campo URL è controllato, quello del file no, e
-              React non deve riusare lo stesso <input> passando dall'uno all'altro. */}
-          {fileMode ? (
-            <div key="file" className="mb-1">
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="form-control form-control-sm"
-                aria-label={t('fileLabel')}
-                aria-describedby={fileHelpId}
-                accept={MATERIAL_FILE_MIME_TYPES.join(',')}
-                onChange={(e) => {
-                  setFile(e.target.files?.[0] ?? null);
-                  setError('');
-                }}
-              />
-              <div id={fileHelpId} className="form-text" style={{ fontSize: '0.72rem' }}>
-                {t('fileHelp', { maxMb: MAX_MB })}
-              </div>
-            </div>
-          ) : (
-            <div key="url" className="mb-1">
-              <input
-                type="url"
-                className="form-control form-control-sm"
-                placeholder={t('urlLabel')}
-                aria-label={t('urlLabel')}
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </div>
-          )}
-          <div className="mb-1">
+          <div className="mb-2">
             <input
               type="text"
               className="form-control form-control-sm"
@@ -404,13 +619,29 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
               maxLength={500}
             />
           </div>
+          <MaterialVisibilitySelect value={visibility} onChange={setVisibility} disabled={submitting} />
+          {percent !== null && (
+            <div className="material-panel__progress">
+              <div
+                className="progress"
+                role="progressbar"
+                aria-label={t('uploadProgress', { percent })}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+              >
+                <div className="progress-bar" style={{ width: `${percent}%` }} />
+              </div>
+              <span className="material-panel__meta">{t('uploadProgress', { percent })}</span>
+            </div>
+          )}
           {error && (
-            <div className="text-danger small mb-1" role="alert">
+            <div className="material-panel__error" role="alert">
               {error}
             </div>
           )}
           <div className="d-flex gap-2">
-            <Button color="primary" size="xs" type="submit" disabled={submitting}>
+            <Button color="primary" size="xs" type="submit" disabled={submitting} className="px-3">
               {fileMode
                 ? submitting
                   ? t('uploading')
@@ -419,25 +650,42 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                   ? t('adding')
                   : t('add')}
             </Button>
-            <Button
-              color="secondary"
-              outline
-              size="xs"
-              type="button"
-              disabled={submitting}
-              onClick={() => {
-                resetForm();
-                setShowForm(false);
-              }}
-            >
-              {t('cancel')}
-            </Button>
+            {submitting && fileMode ? (
+              <Button
+                color="secondary"
+                outline
+                size="xs"
+                type="button"
+                className="px-3"
+                // Inviato tutto, il server sta gia' salvando: annullare non
+                // fermerebbe piu' nulla.
+                disabled={progress !== null && progress >= 1}
+                onClick={() => abortRef.current?.abort()}
+              >
+                {t('cancelUpload')}
+              </Button>
+            ) : (
+              <Button
+                color="secondary"
+                outline
+                size="xs"
+                type="button"
+                className="px-3"
+                disabled={submitting}
+                onClick={() => {
+                  resetForm();
+                  setShowForm(false);
+                }}
+              >
+                {t('cancel')}
+              </Button>
+            )}
           </div>
         </form>
       )}
 
       {listError && (
-        <div className="text-danger small mb-2" role="alert">
+        <div className="material-panel__error mb-2" role="alert">
           {listError}
         </div>
       )}
@@ -446,64 +694,63 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         {announcement}
       </div>
 
-      {/* Materials list */}
       {materials.length === 0 ? (
-        <div className="text-center text-muted py-3" style={{ fontSize: '0.85rem' }}>
-          {t('noMaterials')}
+        <div className="live-panel-empty">
+          <span className="live-panel-empty__icon" aria-hidden="true">
+            <Icon icon="it-clip" size="lg" />
+          </span>
+          <p className="live-panel-empty__title">{t('noMaterials')}</p>
+          <p className="live-panel-empty__hint">
+            {isModerator ? t('emptyHintModerator') : t('emptyHintPublic')}
+          </p>
         </div>
       ) : (
-        <div className="d-flex flex-column gap-2">
-          {materials.map((m) => (
-            <div key={m.id} className="border rounded p-2">
-              <div className="d-flex justify-content-between align-items-start">
-                <div style={{ minWidth: 0 }}>
-                  <a
-                    href={m.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-                    style={{ fontSize: '0.85rem', wordBreak: 'break-word' }}
-                  >
-                    <Icon icon={m.type === 'FILE' ? 'it-download' : 'it-external-link'} size="xs" />
-                    {m.title}
-                  </a>
-                  {m.type === 'FILE' && m.fileSize != null && (
-                    <span className="text-muted ms-1" style={{ fontSize: '0.72rem' }}>
-                      {fileSizeLabel(m.fileSize)}
-                    </span>
-                  )}
-                  {m.description && (
-                    <div className="text-muted" style={{ fontSize: '0.78rem' }}>
-                      {m.description}
-                    </div>
-                  )}
-                  {isModerator && visibilityLabel(m.visibility) && (
-                    <span className="badge bg-light text-dark border" style={{ fontSize: '0.68rem' }}>
-                      {visibilityLabel(m.visibility)}
-                    </span>
-                  )}
-                  <div className="text-muted" style={{ fontSize: '0.72rem' }}>
-                    {authorLine(m.addedBy)} ·{' '}
-                    {format.dateTime(new Date(m.createdAt), {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                </div>
-                {isModerator && (
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger border-0 flex-shrink-0 p-1"
-                    onClick={() => handleDelete(m.id)}
-                    aria-label={t('deleteMaterial')}
-                  >
-                    <Icon icon="it-close" size="xs" />
-                  </button>
-                )}
-              </div>
+        <>
+          {showFilter && (
+            <div className="material-panel__filters" role="group" aria-label={tf('label')}>
+              {(
+                [
+                  ['all', tf('all'), materials.length],
+                  ['file', tf('files'), fileCount],
+                  ['link', tf('links'), linkCount],
+                ] as const
+              ).map(([key, label, count]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`material-panel__filter${activeFilter === key ? ' is-active' : ''}`}
+                  aria-pressed={activeFilter === key}
+                  onClick={() => setFilter(key)}
+                >
+                  {label}
+                  <span className="material-panel__filter-count">{count}</span>
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+          <ul className="material-panel__list">
+            {shown.map((m, i) => (
+              <MaterialItem
+                key={m.id}
+                material={m}
+                isModerator={isModerator}
+                onOpen={() => markMaterialOpened(eventSlug, m.id, token || undefined)}
+                deleteArmed={armedDelete === m.id}
+                onDeleteClick={() => handleDeleteClick(m, shown[i + 1]?.id ?? null)}
+                copied={copiedId === m.id}
+                onCopy={() => void handleCopy(m)}
+                editing={editingId === m.id}
+                onEdit={() => {
+                  setArmedDelete(null);
+                  setAnnouncement('');
+                  setEditingId(m.id);
+                }}
+                onCancelEdit={() => setEditingId(null)}
+                onSave={(patch) => handleSave(m.id, patch)}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

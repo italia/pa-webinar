@@ -42,6 +42,8 @@ export const CREATED_EVENT_FIELDS = [
   'chatEnabled',
   'whiteboardEnabled',
   'wordCloudEnabled',
+  'liveCaptionsEnabled',
+  'captionsTranscriptEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',
@@ -54,6 +56,7 @@ export const CREATED_EVENT_FIELDS = [
   'permissionMatrix',
 
   // regole di iscrizione
+  'accessMode',
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
@@ -90,6 +93,7 @@ export const CREATED_EVENT_FIELDS = [
   'postEventShowRecap',
   'postEventShowWordCloud',
   'postEventEmailEnabled',
+  'recordingNotifyEnabled',
 
   // presentazione
   'coverImageUrl',
@@ -99,6 +103,9 @@ export const CREATED_EVENT_FIELDS = [
   'organizerName',
   'moderatorName',
   'moderatorEmail',
+  'moderatorOrganization',
+  'moderatorOrganizationLogoUrl',
+  'moderatorPublicListed',
 
   // serie
   'recurrenceRule',

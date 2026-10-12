@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { recordLiveActions, serverTimeOf } from '@/lib/live/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,11 @@ const MAX_LOG_ENTRIES = 5000;
 const MAX_BATCH = 2000;
 /** Cap difensivo sulla lunghezza dei campi stringa (ids). */
 const MAX_STR = 256;
+/** Alzate scritte nella cronologia della sala per lotto e per evento. */
+const MAX_JOURNAL_PER_BATCH = 20;
+const MAX_JOURNAL_PER_EVENT = 5000;
+/** Alzate scritte nella cronologia per indirizzo ed evento, ogni 5 minuti. */
+const MAX_JOURNAL_PER_IP = 60;
 
 const handRaiseEventSchema = z.object({
   // Opaque Jitsi endpoint id of the raiser's own session (self-reported).
@@ -23,10 +29,15 @@ const handRaiseEventSchema = z.object({
   participantId: z.string().min(1).max(MAX_STR),
   /** true = mano alzata; false = mano abbassata. */
   raised: z.boolean(),
+  /** Ora del fatto sull'orologio del browser: diventa l'ora del server nella
+   *  cronologia della sala (lib/live/actions, serverTimeOf). */
+  atEpochMs: z.number().int().positive().optional(),
 });
 
 const bodySchema = z.object({
   events: z.array(handRaiseEventSchema).min(1).max(MAX_BATCH),
+  /** Ora di invio del lotto sull'orologio del browser. */
+  sentAt: z.number().int().positive().optional(),
 });
 
 /**
@@ -65,7 +76,8 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!parsed.success) {
     throw new ValidationError('Invalid hand-raises payload');
   }
-  const { events } = parsed.data;
+  const { events, sentAt } = parsed.data;
+  const arrivo = Date.now();
 
   // Risolvi evento → CallSession ATTIVA (più recente senza endedAt).
   const event = await prisma.event.findFirst({
@@ -90,10 +102,51 @@ export const POST = withErrorHandling(async (request, context) => {
       CASE
         WHEN jsonb_array_length("hand_raise_log") >= ${MAX_LOG_ENTRIES}
         THEN "hand_raise_log"
-        ELSE "hand_raise_log" || ${JSON.stringify(events)}::jsonb
+        ELSE "hand_raise_log" || ${JSON.stringify(
+          events.map((e) => ({ participantId: e.participantId, raised: e.raised })),
+        )}::jsonb
       END
     WHERE "id" = ${session.id}::uuid
   `;
+
+  // Nella cronologia della sala, all'ora del server e senza l'endpoint: per
+  // la sintesi conta quante mani si alzano e quando, non di chi (le mani
+  // abbassate non servono). L'ingest non ha autenticazione: una mano per
+  // persona a lotto, al massimo MAX_JOURNAL_PER_BATCH, e niente oltre
+  // MAX_JOURNAL_PER_EVENT per evento, cosi' un client che inventa alzate non
+  // gonfia la tabella ne' i conteggi della sintesi oltre misura.
+  // Per indirizzo, al massimo MAX_JOURNAL_PER_IP alzate ogni cinque minuti:
+  // chi le inventa da un indirizzo solo non arriva al tetto per evento, e
+  // non spegne il conteggio delle mani vere per il resto dell'evento.
+  const alzate = new Map<string, Date>();
+  for (const e of events) {
+    if (e.raised && !alzate.has(e.participantId)) {
+      alzate.set(e.participantId, serverTimeOf(e.atEpochMs, sentAt, arrivo));
+    }
+  }
+  const daScrivere = Array.from(alzate.values())
+    .slice(0, MAX_JOURNAL_PER_BATCH)
+    .filter(() => rateLimit(`hand-journal:${ip}:${event.id}`, { limit: MAX_JOURNAL_PER_IP, windowMs: 300_000 }).allowed);
+  if (daScrivere.length > 0) {
+    // Il conteggio e la scrittura non trattengono la risposta: l'alzata e'
+    // gia' nel log della sessione, la cronologia e' in piu'.
+    void (async () => {
+      const gia = await prisma.liveAction.count({
+        where: { eventId: event.id, kind: 'hand.raised' },
+      });
+      if (gia >= MAX_JOURNAL_PER_EVENT) return;
+      await recordLiveActions(
+        daScrivere.slice(0, MAX_JOURNAL_PER_EVENT - gia).map((at) => ({
+          eventId: event.id,
+          kind: 'hand.raised' as const,
+          actor: 'participant' as const,
+          at,
+        })),
+      );
+    })().catch((err: unknown) => {
+      console.error('[hand-raises] cronologia della sala non scritta', err);
+    });
+  }
 
   return NextResponse.json({ ok: true, stored: events.length }, { status: 201 });
 });

@@ -10,11 +10,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * il tasto emote torna a essere un no-op, solo spostato di un livello), e che
  * un client che quel campo non lo conosce continui a essere accettato.
  *
- * Si stubbano solo DB e Redis: schema, guardie di stato e mappatura del peer
- * girano davvero — è lì che vive il rischio.
+ * Si stubbano DB, Redis e la regola d'accesso alla sala (che ha i suoi test):
+ * schema, guardie di stato, mappatura del peer e oscuramento dei nomi girano
+ * davvero — è lì che vive il rischio.
  */
 vi.mock('@/lib/db', () => ({
   prisma: { event: { findFirst: vi.fn() } },
+}));
+vi.mock('@/lib/events/panel-read-access', () => ({
+  authorizePanelRead: vi.fn(),
+  PANEL_READ_EVENT_SELECT: { id: true, status: true },
+}));
+vi.mock('@/lib/auth/moderator', () => ({
+  extractModeratorToken: (r: Request) =>
+    r.headers.get('authorization')?.replace(/^Bearer /, '') || null,
 }));
 vi.mock('@/lib/garden/pubsub', () => ({
   publishGardenPing: vi.fn(),
@@ -23,6 +32,8 @@ vi.mock('@/lib/garden/pubsub', () => ({
 }));
 
 import { prisma } from '@/lib/db';
+import { ForbiddenError, UnauthorizedError } from '@/lib/errors';
+import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { publishGardenPing, listGardenPeers } from '@/lib/garden/pubsub';
 
 import { POST } from './route';
@@ -30,6 +41,7 @@ import { POST } from './route';
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedPublish = publishGardenPing as unknown as ReturnType<typeof vi.fn>;
 const mockedList = listGardenPeers as unknown as ReturnType<typeof vi.fn>;
+const mockedAccess = authorizePanelRead as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
 const SLUG = 'evento-di-prova';
@@ -52,7 +64,7 @@ const ctx = (param = SLUG) => ({ params: Promise.resolve({ param }) });
 
 let ipCounter = 0;
 
-function pingRequest(body: Record<string, unknown>): NextRequest {
+function pingRequest(body: Record<string, unknown>, token?: string): NextRequest {
   // Un IP diverso per richiesta: il rate limit della rotta è per IP e ha stato
   // di processo, quindi condividerlo legherebbe fra loro test indipendenti.
   ipCounter += 1;
@@ -61,6 +73,7 @@ function pingRequest(body: Record<string, unknown>): NextRequest {
     headers: {
       'content-type': 'application/json',
       'x-forwarded-for': `203.0.113.${ipCounter}`,
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
   }) as unknown as NextRequest;
@@ -78,6 +91,72 @@ beforeEach(() => {
   ipCounter = 0;
   mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'LIVE' });
   mockedList.mockResolvedValue([]);
+  mockedAccess.mockResolvedValue({ kind: 'guest', registrationId: null, isModerator: false });
+});
+
+describe('POST /api/events/[param]/garden/ping — chi vede i nomi', () => {
+  const presente = { ...legacyPing(), userId: 'altro-utente-0001', displayName: 'Carla' };
+
+  it('a chi non ha accesso alla sala mostra le posizioni senza nomi, e non lo scrive', async () => {
+    mockedAccess.mockRejectedValueOnce(new UnauthorizedError('Token required'));
+    mockedList.mockResolvedValueOnce([presente]);
+
+    const res = await POST(pingRequest(legacyPing()), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish).not.toHaveBeenCalled();
+    const body = (await res.json()) as { peers: Array<{ displayName: string }>; anonymous?: boolean };
+    expect(body.anonymous).toBe(true);
+    expect(body.peers).toHaveLength(1);
+    expect(body.peers[0]!.displayName).toBe('');
+  });
+
+  it('a chi non ha accesso non dà gli identificativi veri, ma opachi e stabili', async () => {
+    mockedAccess.mockRejectedValue(new UnauthorizedError('Token required'));
+    mockedList.mockResolvedValue([presente]);
+
+    const primo = (await (await POST(pingRequest(legacyPing()), ctx())).json()) as {
+      peers: Array<{ userId: string }>;
+    };
+    const secondo = (await (await POST(pingRequest(legacyPing()), ctx())).json()) as {
+      peers: Array<{ userId: string }>;
+    };
+
+    expect(primo.peers[0]!.userId).not.toBe(presente.userId);
+    expect(primo.peers[0]!.userId).toMatch(/^anon_/);
+    expect(secondo.peers[0]!.userId).toBe(primo.peers[0]!.userId);
+  });
+
+  it('a chi ha accesso mostra i nomi e lo mette nella piazza', async () => {
+    mockedList.mockResolvedValueOnce([presente]);
+
+    const res = await POST(pingRequest(legacyPing(), 'token-iscrizione-1'), ctx());
+
+    expect(mockedPublish).toHaveBeenCalledTimes(1);
+    const body = (await res.json()) as { peers: Array<{ displayName: string }> };
+    expect(body.peers[0]!.displayName).toBe('Carla');
+  });
+
+  it('decide una volta per token, non a ogni ping', async () => {
+    mockedAccess.mockRejectedValueOnce(new ForbiddenError('Invalid token for this event'));
+
+    await POST(pingRequest(legacyPing(), 'token-che-non-risolve'), ctx());
+    const res = await POST(pingRequest(legacyPing(), 'token-che-non-risolve'), ctx());
+
+    expect(mockedAccess).toHaveBeenCalledTimes(1);
+    expect(((await res.json()) as { anonymous?: boolean }).anonymous).toBe(true);
+    expect(mockedPublish).not.toHaveBeenCalled();
+  });
+
+  it('un errore del database non diventa un rifiuto', async () => {
+    mockedAccess.mockRejectedValueOnce(new Error('connection refused'));
+    const errore = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const res = await POST(pingRequest(legacyPing(), 'token-db-giu'), ctx());
+
+    expect(res.status).toBe(500);
+    errore.mockRestore();
+  });
 });
 
 describe('POST /api/events/[param]/garden/ping — canale emote', () => {
@@ -99,14 +178,32 @@ describe('POST /api/events/[param]/garden/ping — canale emote', () => {
     expect(publishedPeer()).not.toHaveProperty('emote');
   });
 
-  it('rifiuta un’emote che non esiste, senza scriverla', async () => {
-    // Il campo è relayato così com'è fino agli altri client: quello che entra
-    // qui è quello che loro renderizzano, quindi il set va chiuso sul bordo.
+  it('scarta un gesto che non conosce, ma tiene la posizione', async () => {
+    // Quello che il server ripete è quello che gli altri mostrano: un gesto
+    // fuori elenco non arriva a nessuno. Ma il ping resta valido, perché un
+    // client più nuovo (durante un aggiornamento) non perda la posizione.
     const body = { ...legacyPing(), emote: { type: 'rickroll', at: 1 } };
+    const res = await POST(pingRequest(body), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish).toHaveBeenCalledTimes(1);
+    expect(mockedPublish.mock.calls[0]?.[1]).not.toHaveProperty('emote');
+  });
+
+  it('rifiuta un gesto con un nome troppo lungo', async () => {
+    const body = { ...legacyPing(), emote: { type: 'x'.repeat(17), at: 1 } };
     const res = await POST(pingRequest(body), ctx());
 
     expect(res.status).toBe(400);
     expect(mockedPublish).not.toHaveBeenCalled();
+  });
+
+  it.each(['wave', 'heart', 'clap', 'laugh', 'idea'])('ripete il gesto %s', async (tipo) => {
+    const body = { ...legacyPing(), emote: { type: tipo, at: 7 } };
+    const res = await POST(pingRequest(body), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish.mock.calls[0]?.[1]).toMatchObject({ emote: { type: tipo, at: 7 } });
   });
 
   it('distingue una snapshot mancante da un giardino vuoto', async () => {
@@ -148,5 +245,28 @@ describe('POST /api/events/[param]/garden/ping — canale emote', () => {
 
     expect(res.status).toBe(400);
     expect(mockedPublish).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/events/[param]/garden/ping — umore della piazza', () => {
+  it('ripete un umore dell’elenco', async () => {
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'curioso' }), ctx());
+    expect(res.status).toBe(200);
+    expect(publishedPeer().umore).toBe('curioso');
+  });
+
+  it('scarta un umore sconosciuto, ma tiene la posizione', async () => {
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'arrabbiato' }), ctx());
+    expect(res.status).toBe(200);
+    expect(publishedPeer()).not.toHaveProperty('umore');
+  });
+
+  it('risponde con i conteggi, mai con l’umore di qualcuno', async () => {
+    const con = (userId: string, umore?: string) => ({ ...legacyPing(), userId, displayName: userId, updatedAt: 1, ...(umore ? { umore } : {}) });
+    mockedList.mockResolvedValueOnce([con('a', 'felice'), con('b', 'felice'), con('c', 'carico'), con('d')]);
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'felice' }), ctx());
+    const body = (await res.json()) as { peers: Record<string, unknown>[]; umori: Record<string, number> };
+    expect(body.umori).toEqual({ felice: 2, curioso: 0, assonnato: 0, carico: 1 });
+    for (const p of body.peers) expect(p).not.toHaveProperty('umore');
   });
 });

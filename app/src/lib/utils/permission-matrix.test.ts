@@ -7,6 +7,7 @@ import {
   matrixFromToggles,
   togglesFromMatrix,
   withModeratorInvariant,
+  withRoleInvariants,
 } from './permission-matrix';
 
 describe('permission-matrix', () => {
@@ -99,5 +100,35 @@ describe('permission-matrix', () => {
     expect(m!.qa).toContain('GUEST');
     expect(m!.chat).toEqual(['MODERATOR']);
     expect(m!.recording_control).toEqual(['MODERATOR']);
+  });
+});
+
+describe('withRoleInvariants', () => {
+  it('la colonna dei relatori segue la sala, qualunque cosa arrivi', () => {
+    const m = withRoleInvariants({
+      chat: ['MODERATOR', 'SPEAKER'],
+      qa: ['GUEST'],
+      mic: [],
+      video: ['GUEST'],
+      share: [],
+      recording_control: ['SPEAKER'],
+    });
+    expect(m.chat).toEqual(['MODERATOR']);
+    expect(m.qa).toEqual(['GUEST', 'MODERATOR', 'SPEAKER']);
+    expect(m.mic).toEqual(['MODERATOR', 'SPEAKER']);
+    expect(m.video).toEqual(['GUEST', 'MODERATOR', 'SPEAKER']);
+    expect(m.share).toEqual(['MODERATOR', 'SPEAKER']);
+    expect(m.recording_control).toEqual(['MODERATOR']);
+  });
+
+  it('i permessi dei partecipanti non cambiano', () => {
+    const toggles = {
+      qaEnabled: false,
+      chatEnabled: true,
+      participantsCanUnmute: true,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+    };
+    expect(togglesFromMatrix(withRoleInvariants(matrixFromToggles(toggles)))).toEqual(toggles);
   });
 });

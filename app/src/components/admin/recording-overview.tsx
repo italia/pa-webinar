@@ -18,7 +18,7 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { useTranslations, useLocale } from 'next-intl';
+import { useFormatter, useTranslations, useLocale } from 'next-intl';
 
 import { SkeletonLines } from '@/components/ui/skeleton';
 import PipelineProvenance, {
@@ -122,6 +122,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
 export default function RecordingOverview({ recordingId }: { recordingId: string }) {
   const t = useTranslations('admin.postprod.ov');
   const locale = useLocale();
+  const format = useFormatter();
   const { data, error, isLoading, mutate } = useSWR<Details>(
     `/api/admin/postprod/recordings/${recordingId}/details`,
     fetcher,
@@ -130,8 +131,9 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
   const [showFiles, setShowFiles] = useState(false);
 
   if (isLoading) return <SkeletonLines lines={8} loadingLabel={t('tab')} />;
-  if (error) return <div className="alert alert-info small mb-0" role="status">{t('processing')}</div>;
-  if (!data) return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
+  // La rotta risponde 200 per ogni registrazione che esiste, anche in
+  // elaborazione: un errore e' un errore, non un'elaborazione in corso.
+  if (error || !data) return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
 
   const { recording: r, participants, tracks, jobs, artifacts, storageFiles, llm, dubbedAudio, speakers } = data;
   const slug = r.eventSlug;
@@ -164,7 +166,7 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
         <Kpi label={t('kpiTracks')} value={String(tracks.count)} sub={tracks.purged > 0 ? `${tracks.purged} ${t('trackPurged')}` : undefined} />
         <Kpi label={t('kpiLanguages')} value={String(langs.length)} sub={langs.map((l) => l.toUpperCase()).join(' · ')} />
         <Kpi label={t('kpiArtifacts')} value={String(artifacts.length)} />
-        <Kpi label={t('kpiProcessed')} value={new Date(r.updatedAt).toLocaleDateString(locale)} sub={`${t('run')} #${r.runCount}`} />
+        <Kpi label={t('kpiProcessed')} value={format.dateTime(new Date(r.updatedAt), { dateStyle: 'short' })} sub={`${t('run')} #${r.runCount}`} />
       </div>
 
       {/* ── Timeline job ──────────────────────────────────── */}

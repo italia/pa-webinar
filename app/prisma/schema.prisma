@@ -34,11 +34,13 @@ model Event {
   // Percentage (0-100). Null inherits SiteSetting.defaultSenderRatioPct.
   expectedSenderRatioPct Int? @map("expected_sender_ratio_pct")
 
-  // Soft exit / grace period in minutes past endsAt before the scaler
-  // transitions LIVE → ENDED. Null inherits SiteSetting.eventGracePeriodMinutes.
-  //   0    → hard close at endsAt (legacy behaviour)
-  //   N>0  → show "event in overtime" banner, close at endsAt+N
-  //   -1   → never auto-close on endsAt; let the inactivity cleanup cron decide
+  // Tetto del fuori orario per una sala ancora occupata, in minuti dopo
+  // endsAt. Null eredita SiteSetting.eventGracePeriodMinutes.
+  //   0    → chiusura a endsAt
+  //   N>0  → chiusura a endsAt+N anche con persone dentro
+  //   -1   → nessun tetto: la chiude solo il vuoto (eventOvertimeEmptyMinutes)
+  // Una sala vuota oltre endsAt si chiude comunque dopo
+  // SiteSetting.eventOvertimeEmptyMinutes.
   gracePeriodMinutes Int? @map("grace_period_minutes")
 
   // Jitsi room configuration
@@ -60,6 +62,22 @@ model Event {
   // sempre-attiva (poco usata; in prospettiva sostituita da una sintesi AI).
   // Attivabile dal moderatore durante l'evento (barra funzioni).
   wordCloudEnabled Boolean @default(false) @map("word_cloud_enabled")
+  // Sottotitoli live (ADR-018): trascrizione in streaming nel cluster, attiva
+  // di default. Il moderatore la spegne e la riaccende durante l'evento. Vale
+  // solo se l'istanza ha i sottotitoli attivi (SiteSetting.liveCaptionsEnabled)
+  // e il servizio è installato (CAPTIONS_STATUS_URL).
+  liveCaptionsEnabled Boolean @default(true) @map("live_captions_enabled")
+  // La trascrizione dell'evento costruita dai sottotitoli live: le frasi di
+  // chi ha dato il consenso alla trascrizione dei propri interventi si
+  // salvano (testo e nome cifrati, CaptionSegment) e a fine evento diventano
+  // la trascrizione della sessione, anche senza registrazione e senza la
+  // pipeline AI. Spenta di default.
+  captionsTranscriptEnabled Boolean @default(false) @map("captions_transcript_enabled")
+  // La trascrizione si legge nella pagina dell'evento anche senza il video
+  // pubblicato (per esempio quella dai sottotitoli, che un video non ce l'ha).
+  // Con il video pubblicato la trascrizione lo accompagna comunque. Decisione
+  // dello staff dopo l'evento: spenta di default.
+  transcriptPublished Boolean @default(false) @map("transcript_published")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -74,6 +92,12 @@ model Event {
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
 
+  // Chi puo' partecipare: OPEN si iscrive chiunque; INVITATION solo gli
+  // invitati (EventInvitation), e nessuno entra da ospite senza iscriversi.
+  // NULL = come dice il sito (SiteSetting.publicRegistrationEnabled e
+  // guestAccessEnabled). Vedi lib/events/registration-access.
+  accessMode EventAccessMode? @map("access_mode")
+
   // Registration profiling toggles
   requireOrganization     Boolean @default(false) @map("require_organization")
   requireOrganizationRole Boolean @default(false) @map("require_organization_role")
@@ -83,6 +107,11 @@ model Event {
   moderatorToken String  @unique @map("moderator_token") // UUID for magic link
   moderatorName  String? @map("moderator_name")
   moderatorEmail String? @map("moderator_email")
+  // L'organizzatore principale nella pagina pubblica: il suo ente, il logo e
+  // se presentarlo. Spento di default, come per le altre persone.
+  moderatorOrganization        String? @map("moderator_organization")
+  moderatorOrganizationLogoUrl String? @map("moderator_organization_logo_url")
+  moderatorPublicListed        Boolean @default(false) @map("moderator_public_listed")
 
   // Optional join password. When set, guests visiting /live without a
   // valid accessToken or matching password are redirected to a password
@@ -134,6 +163,11 @@ model Event {
   recordingUrl             String?   @map("recording_url")
   recordingPublished       Boolean   @default(false) @map("recording_published")
   recordingPublishedAt     DateTime? @map("recording_published_at")
+  // Avviso agli iscritti quando la registrazione diventa visibile sulla pagina
+  // pubblica (lib/events/recording-notify): acceso di predefinito, parte una
+  // volta sola; `recordingNotifiedAt` e' quando e' partito.
+  recordingNotifyEnabled   Boolean   @default(true) @map("recording_notify_enabled")
+  recordingNotifiedAt      DateTime? @map("recording_notified_at")
   recordingFileSize        BigInt?   @map("recording_file_size")
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
@@ -175,6 +209,19 @@ model Event {
   postEventRecap   Json?     @map("post_event_recap")
   postEventRecapAt DateTime? @map("post_event_recap_at")
 
+  // Il resoconto dell'evento (lib/report): i numeri calcolati dal portale e il
+  // testo scritto dal modello linguistico, nella lingua dell'evento e nelle
+  // sue traduzioni. Lo genera lo staff a mano dopo l'evento (anche dopo i
+  // feedback) e resta qui, come il riepilogo, quando la pulizia toglie i dati
+  // da cui viene. Si vede nella pagina dell'evento solo se lo staff lo
+  // pubblica.
+  postEventReport          Json?         @map("post_event_report")
+  postEventReportAt        DateTime?     @map("post_event_report_at")
+  postEventReportPublished Boolean       @default(false) @map("post_event_report_published")
+  // I lavori del resoconto (PostprodJob di tipo REPORT): sono dell'evento,
+  // non di una registrazione.
+  reportJobs               PostprodJob[]
+
   // Post-event follow-up email (opt-in per event). When enabled, the reminders
   // cron sends a thank-you + recap/feedback email to registrants and a recap
   // to the moderator once the event has ENDED. `postEventEmailSentAt` guards
@@ -182,7 +229,9 @@ model Event {
   postEventEmailEnabled Boolean   @default(false) @map("post_event_email_enabled")
   postEventEmailSentAt  DateTime? @map("post_event_email_sent_at")
 
-  // GDPR recording consent
+  // La spiegazione sopra la casella del consenso alla registrazione, in sala
+  // d'attesa, al posto di quella predefinita: dice cosa si registra e perche'.
+  // Il consenso lo da' la casella, non l'ingresso.
   recordingConsentText String? @map("recording_consent_text") @db.Text
 
   // Analytics
@@ -246,6 +295,7 @@ model Event {
   gdprAuditLogs   GdprAuditLog[]
   feedback        EventFeedback[]
   wordCloudRounds WordCloudRound[]
+  liveActions     LiveAction[]
   callSessions    CallSession[]
   additionalMods  EventModerator[]
   organizers      EventOrganizer[]
@@ -255,6 +305,7 @@ model Event {
   liveReactions   Reaction[]
   questionnaires  EventQuestionnaire[]
   recordings      Recording[]
+  glossaryTerms   GlossaryTerm[]
 
   // ── Postprod AI feature flags (per-event) ─────────────────────
   // When true, the postprod pipeline produces a transcript / summary /
@@ -298,6 +349,11 @@ model Event {
 
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.
+
+  multitrackConsents MultitrackConsent[]
+  recordingConsents  RecordingConsent[]
+  roomOccupants      RoomOccupant[]
+  captionSegments    CaptionSegment[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -336,8 +392,23 @@ model EventModerator {
 
   name  String
   email String?
+  // Impronta dell'indirizzo (hashEmail, come StaffAccount.emailHash): un
+  // account dello staff con lo stesso indirizzo, se la concessione è da
+  // organizzatore, gestisce l'evento come chi l'ha creato.
+  emailHash String? @map("email_hash") @db.VarChar(64)
 
   role EventModeratorRole @default(MODERATOR)
+
+  // Organizzatore: un moderatore che organizza l'evento. In sala conduce come
+  // un moderatore; la pagina pubblica lo presenta fra chi organizza.
+  organizer Boolean @default(false) @map("organizer")
+  // Ente di appartenenza della persona e suo logo: possono essere diversi
+  // dall'ente che organizza l'evento (EventOrganizer).
+  organization        String? @map("organization")
+  organizationLogoUrl String? @map("organization_logo_url")
+  // La persona compare nella pagina pubblica dell'evento. Spento di default:
+  // nome ed ente si pubblicano solo per scelta di chi compila, per ognuno.
+  publicListed Boolean @default(false) @map("public_listed")
 
   // Per-grant magic link token. Still UUID so `randomUUID()` from
   // crypto can generate it safely.
@@ -349,6 +420,7 @@ model EventModerator {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
+  @@index([emailHash])
   @@map("event_moderators")
 }
 
@@ -721,6 +793,11 @@ model Registration {
   // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
   // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
   consentMultitrack           Boolean? @map("consent_multitrack")
+  // Il testo con cui e' stato dato (lib/registration/consents,
+  // VERSIONE_TESTO_TRASCRIZIONE). Null per i consensi dati prima che il testo
+  // comprendesse la trascrizione dei propri interventi con il nome: valgono
+  // per la traccia audio, non per la trascrizione dai sottotitoli.
+  consentMultitrackVersion    Int?     @map("consent_multitrack_version")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
@@ -763,6 +840,8 @@ model Registration {
   remindersSent          ReminderSent[]
   feedback               EventFeedback[]
   questionnaireResponses QuestionnaireResponse[]
+  multitrackConsents     MultitrackConsent[]
+  recordingConsents      RecordingConsent[]
 
   @@unique([eventId, emailHash])
   @@index([personId])
@@ -782,6 +861,8 @@ model Question {
 
   authorName String @map("author_name")
   text       String @db.VarChar(500)
+  // Risposta scritta da chi conduce, visibile a tutti sotto la domanda.
+  answerText String? @map("answer_text") @db.VarChar(2000)
 
   status      QuestionStatus @default(PENDING)
   upvoteCount Int            @default(0) @map("upvote_count") // denormalized
@@ -895,16 +976,32 @@ model EventAgendaItem {
   eventId   String  @map("event_id") @db.Uuid
   label     String  @db.VarChar(500)
   sortOrder Int     @default(0) @map("sort_order")
+  // Tenuto allineato a `status` (vero solo per DONE): lo leggono la sintesi
+  // della post-produzione e i client della versione precedente.
   completed Boolean @default(false)
+  // Lo stato dell'argomento nella scaletta. Uno solo alla volta e' CURRENT.
+  status    AgendaItemStatus @default(PENDING)
 
   createdAt   DateTime  @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
+  // Quando l'argomento e' passato «in corso»: la sala mostra da quanto.
+  startedAt   DateTime? @map("started_at")
+  // Quanto dovrebbe durare, se chi conduce lo ha detto: il moderatore vede
+  // quando si va oltre.
+  plannedMinutes Int?   @map("planned_minutes")
 
   event     Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reactions AgendaItemReaction[]
 
   @@index([eventId])
   @@map("event_agenda_items")
+}
+
+enum AgendaItemStatus {
+  PENDING // da discutere
+  CURRENT // in corso
+  DONE // discusso
+  SKIPPED // saltato
 }
 
 // Assenso/dissenso dei partecipanti su un singolo punto d'agenda (audience
@@ -940,7 +1037,7 @@ model AgendaItemReaction {
 /// timestamp are stored, for post-event counts and the engagement timeline
 /// (createdAt is absolute → placeable on the same axis as chat/Q&A). Distinct
 /// from AgendaItemReaction (agenda 👍/👎 audience pulse). Deleted by the cleanup
-/// cron for archived events.
+/// cron when the event's retention expires.
 model Reaction {
   id        String   @id @default(uuid()) @db.Uuid
   eventId   String   @map("event_id") @db.Uuid
@@ -972,6 +1069,10 @@ model EventMaterial {
 
   // Visibility control
   visibility String @default("ALWAYS") @map("visibility") // ALWAYS, BEFORE, DURING, AFTER
+  // Quante volte è stato aperto (link) o scaricato (file) da chi lo vedeva
+  // nell'elenco: conteggio indicativo, senza alcun dato su chi l'ha aperto.
+  // Lo leggono solo chi conduce la sala e lo staff.
+  openCount Int @default(0) @map("open_count")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1072,8 +1173,9 @@ model EventTemplate {
   description String? @db.Text
   icon        String  @default("it-video")
 
-  // Chat primaria, Q&A opt-in: per default la sala ha solo la chat.
-  // allineato a defaultMatrix() e ai template di sistema.
+  // Chat primaria, Q&A opt-in: per default la sala ha solo la chat, come
+  // defaultMatrix(). I template di sistema accendono la Q&A dove serve (la
+  // grande platea).
   qaEnabled                  Boolean @default(false) @map("qa_enabled")
   chatEnabled                Boolean @default(true) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
@@ -1088,6 +1190,9 @@ model EventTemplate {
   // Pre-attiva la lavagna condivisa (Event.whiteboardEnabled) per gli eventi
   // creati da questo template. Modificabile nel wizard (step 2).
   whiteboardEnabled          Boolean @default(false) @map("whiteboard_enabled")
+  // I sottotitoli live (Event.liveCaptionsEnabled) per gli eventi creati da
+  // questo modello. Accesi come sull'evento: si spengono qui o nel wizard.
+  liveCaptionsEnabled        Boolean @default(true) @map("live_captions_enabled")
   // Motore sala d'attesa pre-popolato nel wizard (Event.waitingRoomEngine).
   // Nullable: null = usa il default del sito (SiteSetting.waitingRoomEngine).
   waitingRoomEngine          WaitingRoomEngine? @map("waiting_room_engine")
@@ -1111,9 +1216,11 @@ model EventTemplate {
   // questo si perdevano a ogni evento nuovo: chi crea una serie ricorrente
   // riattivava a mano la traccia per-partecipante e le lingue, e quando se ne
   // dimenticava lo scopriva a evento finito — senza audio isolato, quindi senza
-  // trascrizione né sintesi. I default sono gli stessi di `Event`: un template
-  // che pre-accende la registrazione per partecipante sarebbe una raccolta di
-  // dati personali attivata retroattivamente su tutte le righe esistenti.
+  // trascrizione né sintesi. I default delle colonne sono gli stessi di
+  // `Event`: un default acceso pre-attiverebbe la registrazione per
+  // partecipante su tutte le righe esistenti. Sono i template di sistema che
+  // registrano ad accenderla, esplicitamente (migrazione
+  // 20261007233000_template_scenarios).
   aiDubbingEnabled           Boolean @default(false) @map("ai_dubbing_enabled")
   multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
   retainParticipantTracks    Boolean @default(false) @map("retain_participant_tracks")
@@ -1131,6 +1238,10 @@ model EventTemplate {
   // Mirrors Event.permissionMatrix: when set, the role×feature matrix
   // is applied on new-event creation instead of the boolean toggles.
   permissionMatrix Json? @map("permission_matrix") @db.JsonB
+
+  // La pagina dopo l'evento (Event.postEventPublic) e' pubblica? Una riunione
+  // di lavoro non lo e': il template lo decide per gli eventi che crea.
+  postEventPublic Boolean @default(true) @map("post_event_public")
 
   isSystem  Boolean  @default(false) @map("is_system")
   sortOrder Int      @default(0) @map("sort_order")
@@ -1241,6 +1352,10 @@ model SiteSetting {
   // le iniziali generati da noi.
   gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
 
+  // Sottotitoli live (ADR-018): interruttore dell'istanza, attivo di default.
+  // Spento, nessun evento li avvia, qualunque sia la sua impostazione.
+  liveCaptionsEnabled Boolean @default(true) @map("live_captions_enabled")
+
   emailFromName String? @map("email_from_name")
   // Optional Reply-To. The From address is a no-reply relay, so without this a
   // reply from an attendee goes nowhere.
@@ -1267,8 +1382,8 @@ model SiteSetting {
   // Empty-conference authoritative close. Minuti che una sala
   // LIVE che HA avuto traffico può restare vuota prima che lo scaler la porti
   // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
-  // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalla grace di
-  // overtime post-endsAt (eventGracePeriodMinutes/15m).
+  // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalle regole del
+  // fuori orario post-endsAt (eventGracePeriodMinutes, eventOvertimeEmptyMinutes).
   //   -1  → disabilitato (default)
   //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
   //   N>0 → chiudi dopo N minuti di sala COMPLETAMENTE vuota (moderatore incluso)
@@ -1329,12 +1444,16 @@ model SiteSetting {
   // call con tutti i partecipanti attivi, 10% per keynote).
   defaultSenderRatioPct Int @default(30) @map("default_sender_ratio_pct")
 
-  // Soft exit: minuti di "overtime" concessi dopo endsAt prima di chiudere
-  // la call. Mostrato come banner non invasivo ai partecipanti.
-  //   0    → chiusura dura a endsAt (vecchio comportamento)
-  //   N>0  → grace di N min, poi cleanup chiude la call
-  //   -1   → non chiudere automaticamente, lascia al cleanup di inattività
-  eventGracePeriodMinutes Int @default(15) @map("event_grace_period_minutes")
+  // Fuori orario: tetto in minuti dopo endsAt per una sala ancora OCCUPATA.
+  // Mostrato ai partecipanti come conto alla rovescia.
+  //   0    → chiusura a endsAt
+  //   N>0  → chiusura a endsAt+N anche con persone dentro
+  //   -1   → nessun tetto: la sala si chiude solo quando si svuota
+  eventGracePeriodMinutes Int @default(60) @map("event_grace_period_minutes")
+  // Fuori orario: minuti di sala VUOTA dopo cui una sala oltre endsAt si
+  // chiude, qualunque sia il tetto. Serve un conteggio affidabile del bridge;
+  // senza, vale solo il tetto.
+  eventOvertimeEmptyMinutes Int @default(20) @map("event_overtime_empty_minutes")
 
   // ── Postprod AI pipeline ──────────────────────────────────────
   // Master kill-switch: when false, the orchestrator skips creating
@@ -1344,7 +1463,7 @@ model SiteSetting {
   aiPipelineEnabled       Boolean @default(false) @map("ai_pipeline_enabled")
   // Default target locales for translation when Event.aiTargetLocales
   // is null. Comma-separated ISO-639-1.
-  aiDefaultTargetLocales  String  @default("en,fr") @map("ai_default_target_locales")
+  aiDefaultTargetLocales  String  @default("en,fr,es,de") @map("ai_default_target_locales")
   // Provider routing — "vllm" or "ovh" (pluggable). The actual
   // endpoint URLs / secrets live in env vars (see lib/ai/providers).
   aiLlmProvider           String  @default("vllm") @map("ai_llm_provider")
@@ -1434,6 +1553,12 @@ enum HomePageMode {
   CUSTOM
 }
 
+// Chi puo' partecipare a un evento (Event.accessMode).
+enum EventAccessMode {
+  OPEN // iscrizione aperta a chiunque
+  INVITATION // solo gli invitati, niente ingresso da ospite
+}
+
 // Engine della sala d'attesa (pre-join). Vedi SiteSetting.waitingRoomEngine
 // (default sito) e Event.waitingRoomEngine (override per-evento).
 enum WaitingRoomEngine {
@@ -1500,6 +1625,10 @@ model WordCloudSubmission {
   guestId        String?  @map("guest_id")
   word           String   @db.VarChar(30)
   createdAt      DateTime @default(now()) @map("created_at")
+  // Tolta dal moderatore: fuori dalla nuvola e dal riepilogo, e la stessa
+  // parola non si puo' piu' inviare in quel giro. La riga resta, cosi' conta
+  // ancora nel limite di invii di chi l'aveva scritta.
+  hiddenAt       DateTime? @map("hidden_at")
 
   // Relations
   round WordCloudRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
@@ -1572,8 +1701,9 @@ model CallSession {
 // (tracked via a nanoid stored in a short-lived cookie, same pattern
 // used by PollVote and WordCloudSubmission).
 //
-// Fase A is strictly per-event: responses scadono con la retention
-// dell'evento. La deduplica cross-evento dei campi profilo stabili è
+// Fase A is strictly per-event: alla retention dell'evento le risposte
+// chieste all'iscrizione si cancellano, quelle di fine evento restano senza
+// identita'. La deduplica cross-evento dei campi profilo stabili è
 // parte di fase B (ADR-011 — Person + rubrica).
 
 enum QuestionItemType {
@@ -1596,6 +1726,8 @@ model QuestionTemplate {
   // System templates (seeded) cannot be deleted, only cloned.
   isSystem    Boolean @default(false) @map("is_system")
   sortOrder   Int     @default(0) @map("sort_order")
+  // Dove si propone: prima (iscrizione), dopo l'evento, o null = entrambi.
+  usage       QuestionnairePlacement? @map("usage")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1663,7 +1795,7 @@ model EventQuestionnaire {
   required Boolean @default(false)
 
   // Whether respondents can change their answers after first submit
-  // (until the event retention deletes them). Default false — once
+  // (until the event retention removes their identity). Default false — once
   // submitted, the response is frozen.
   allowEdit Boolean @default(false) @map("allow_edit")
 
@@ -1912,6 +2044,10 @@ enum PostprodJobKind {
   // Richiede Event.retainParticipantTracks (le tracce devono essere
   // ancora presenti, non purgate). Vedi infra/ai/worker/archive.py.
   ARCHIVE
+  // Il resoconto dell'evento (lib/report): sintesi, argomenti, mappa
+  // concettuale, consenso e dissenso, partecipazione, valutazioni. Lo avvia
+  // lo staff dopo l'evento; il risultato si congela su Event.postEventReport.
+  REPORT
 }
 
 enum PostprodJobStatus {
@@ -2013,6 +2149,10 @@ model Recording {
   // postprod-retention cron. Null = follow event retention.
   retentionUntil DateTime? @map("retention_until")
 
+  // Ora assoluta (server) del primo fotogramma registrato: lo zero dei tempi
+  // della trascrizione. La manda il registratore multitraccia col manifest;
+  // senza, la cronologia della sala usa createdAt come zero approssimato.
+  mediaStartedAt DateTime? @map("media_started_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -2076,9 +2216,50 @@ model RecordingTrack {
   @@map("recording_tracks")
 }
 
+/// Una voce del glossario della post-produzione AI: come un termine si
+/// scrive, come lo rende chi trascrive, come si pronuncia nel doppiaggio e
+/// come si traduce. Senza evento vale per tutta l'istanza; con l'evento solo
+/// per quello, e su un termine uguale vince la voce dell'evento.
+/// Vedi lib/ai/glossary.ts e infra/ai/worker/glossary.py.
+model GlossaryTerm {
+  id           String   @id @default(uuid()) @db.Uuid
+  eventId      String?  @map("event_id") @db.Uuid
+  /// La forma scritta, quella che finisce in trascrizioni e sottotitoli.
+  term         String   @db.VarChar(80)
+  /// Come puo' arrivare dalla trascrizione automatica ("a bi ci"):
+  /// diventa `term`.
+  aliases      String[] @default([])
+  /// Come si legge quando manca una pronuncia: "auto" (decide la sintesi
+  /// vocale), "spell" (lettera per lettera), "word" (come una parola).
+  reading      String   @default("auto") @db.VarChar(8)
+  /// Pronuncia per lingua nel doppiaggio ({"it": "a bi ci"}); "*" per
+  /// tutte le lingue.
+  spoken       Json     @default("{}") @db.JsonB
+  /// Traduzione fissa per lingua ({"en": "AI"}); senza, il termine resta
+  /// com'e' in ogni lingua.
+  translations Json     @default("{}") @db.JsonB
+  /// Il significato, dato come contesto al modello che corregge e traduce.
+  note         String?  @db.VarChar(300)
+  /// Chi ha aggiunto una voce dell'istanza: chi organizza modifica solo le
+  /// proprie, l'amministrazione tutte. Null per le voci precaricate, per
+  /// quelle aggiunte con la chiave dell'istanza e per quelle degli eventi.
+  createdById  String?  @map("created_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  event     Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdBy StaffAccount? @relation("GlossaryTermCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([eventId])
+  @@map("glossary_terms")
+}
+
 model PostprodJob {
-  id          String @id @default(uuid()) @db.Uuid
-  recordingId String @map("recording_id") @db.Uuid
+  id          String  @id @default(uuid()) @db.Uuid
+  // La registrazione di cui e' un passo; nulla solo per il resoconto
+  // dell'evento (REPORT), che e' dell'evento (`eventId`).
+  recordingId String? @map("recording_id") @db.Uuid
+  eventId     String? @map("event_id") @db.Uuid
 
   kind    PostprodJobKind
   // Free-form params validated by lib/ai Zod schemas at enqueue +
@@ -2114,13 +2295,15 @@ model PostprodJob {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  recording  Recording          @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  recording  Recording?         @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  event      Event?             @relation(fields: [eventId], references: [id], onDelete: Cascade)
   dependsOn  PostprodJob?       @relation("PostprodJobDeps", fields: [dependsOnId], references: [id], onDelete: SetNull)
   dependents PostprodJob[]      @relation("PostprodJobDeps")
   artifacts  PostprodArtifact[]
 
   @@index([status, nextAttemptAt])
   @@index([recordingId])
+  @@index([eventId, kind])
   @@map("postprod_jobs")
 }
 
@@ -2288,9 +2471,14 @@ model StaffAccount {
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now()) @map("created_at")
   lastLoginAt DateTime? @map("last_login_at")
+  // Quando un amministratore ha riattivato l'account: la disattivazione per
+  // inattivita' (pulizia GDPR) conta anche da qui, altrimenti lo spegnerebbe
+  // di nuovo al giro dopo.
+  reactivatedAt DateTime? @map("reactivated_at")
 
-  events      Event[]           @relation("EventCreatedBy")
-  loginTokens StaffLoginToken[]
+  events        Event[]           @relation("EventCreatedBy")
+  loginTokens   StaffLoginToken[]
+  glossaryTerms GlossaryTerm[]    @relation("GlossaryTermCreatedBy")
 
   @@map("staff_accounts")
 }
@@ -2309,4 +2497,161 @@ model StaffLoginToken {
 
   @@index([accountId], map: "staff_login_tokens_account_id_idx")
   @@map("staff_login_tokens")
+}
+
+// Prova del consenso alla registrazione per partecipante (ADR-013) dato nella
+// sala d'attesa da chi non l'aveva dato all'iscrizione: ospiti, relatori,
+// iscritti entrati da un altro dispositivo o da un link inoltrato (art. 7.1
+// GDPR: il titolare deve poter dimostrare il consenso). Chi (posto nella
+// conferenza e nome mostrato, cifrato), quando, in quale lingua.
+// Dato personale: la pulizia GDPR lo cancella alla scadenza dell'evento, e la
+// cancellazione su richiesta lo porta via con l'iscrizione.
+model MultitrackConsent {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  // Il `context.user.id` del JWT della conferenza: il posto a cui il
+  // consenso si riferisce.
+  jitsiUserId    String   @map("jitsi_user_id") @db.VarChar(80)
+  // Nome mostrato in sala, cifrato (encryptPII).
+  displayName    String   @map("display_name")
+  registrationId String?  @map("registration_id") @db.Uuid
+  locale         String?  @db.VarChar(8)
+  consentedAt    DateTime @default(now()) @map("consented_at")
+  // Il testo con cui e' stato dato: le prove scritte prima che il testo
+  // comprendesse la trascrizione con il nome hanno 1 (vedi
+  // Registration.consentMultitrackVersion).
+  textVersion    Int      @default(2) @map("text_version")
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([registrationId])
+  @@map("multitrack_consents")
+}
+
+// Chi e' in sala: per ogni occupante della conferenza entrato con un token,
+// l'endpoint del bridge (lo stesso id con cui il bridge manda l'audio ai
+// sottotitoli e al registratore) e il posto del token (`context.user.id` del
+// JWT). Lo scrive Prosody (mod_pa_occupants) a ogni ingresso e uscita. Serve
+// a decidere, voce per voce, se salvare la trascrizione o registrare l'audio
+// secondo il consenso della persona. Dato personale (il posto rimanda a
+// un'iscrizione): la pulizia GDPR lo cancella alla scadenza dell'evento.
+model RoomOccupant {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId    String    @map("event_id") @db.Uuid
+  endpointId String    @map("endpoint_id") @db.VarChar(64)
+  seatId     String    @map("seat_id") @db.VarChar(80)
+  // L'id della riunione (Jicofo): e' l'unica cosa che il servizio dei
+  // sottotitoli riceve dal bridge su ogni versione di Jitsi, e da qui risale
+  // all'evento.
+  meetingId  String?   @map("meeting_id") @db.VarChar(64)
+  joinedAt   DateTime  @map("joined_at")
+  leftAt     DateTime? @map("left_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, endpointId])
+  @@index([eventId, seatId])
+  @@index([meetingId])
+  @@map("room_occupants")
+}
+
+// Una frase dei sottotitoli live, salvata per la trascrizione dell'evento
+// (Event.captionsTranscriptEnabled). Di chi ha dato il consenso alla
+// trascrizione dei propri interventi si tengono nome e testo, cifrati; di chi
+// non l'ha dato resta solo che in quel momento qualcuno ha parlato. La pulizia
+// GDPR la cancella alla scadenza dell'evento.
+model CaptionSegment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  // L'id della frase dato dal servizio dei sottotitoli: rende idempotente il
+  // nuovo invio di una frase gia' salvata.
+  messageId   String   @map("message_id") @db.VarChar(80)
+  endpointId  String   @map("endpoint_id") @db.VarChar(64)
+  // Null quando chi parla non ha dato il consenso (o non e' riconosciuto).
+  seatId      String?  @map("seat_id") @db.VarChar(80)
+  speakerName String?  @map("speaker_name")
+  text        String?
+  language    String?  @db.VarChar(8)
+  startedAt   DateTime @map("started_at")
+  endedAt     DateTime @map("ended_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, messageId])
+  @@index([eventId, startedAt])
+  @@map("caption_segments")
+}
+
+// Il consenso alla registrazione dell'evento dato in sala d'attesa da chi non
+// lo ha dato all'iscrizione: chi entra dal link della sala senza iscriversi,
+// chi apre il proprio link da un altro browser, chi si e' iscritto prima che
+// la registrazione fosse attivata. E' la prova del consenso (art. 7.1 GDPR);
+// quello dato all'iscrizione sta in `Registration.consentRecording`.
+model RecordingConsent {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  // Il `context.user.id` del JWT della conferenza: il posto a cui il
+  // consenso si riferisce.
+  jitsiUserId    String   @map("jitsi_user_id") @db.VarChar(80)
+  // Nome mostrato in sala, cifrato (encryptPII).
+  displayName    String   @map("display_name")
+  registrationId String?  @map("registration_id") @db.Uuid
+  locale         String?  @db.VarChar(8)
+  consentedAt    DateTime @default(now()) @map("consented_at")
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  // Una prova per iscrizione: due richieste insieme (due schede, un
+  // rientro mentre la prima e' in volo) non la raddoppiano. Gli ospiti non
+  // hanno iscrizione (NULL), e il vincolo non li tocca.
+  @@unique([eventId, registrationId])
+  @@index([registrationId])
+  @@map("recording_consents")
+}
+
+// La cronologia della sala: un'azione dal vivo per riga (un argomento della
+// scaletta avviato, un sondaggio chiuso, una funzione accesa, una mano
+// alzata...), con l'ora del server come unica base dei tempi. La
+// post-produzione la legge accanto alla trascrizione (lib/postprod/
+// live-timeline.ts). Scrive lib/live/actions.ts.
+model LiveAction {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId String   @map("event_id") @db.Uuid
+  // Ora del server dell'azione: la base dei tempi comune a tutta la sala.
+  at      DateTime @default(now()) @map("at")
+  kind    String   @db.VarChar(64)
+  // Il ruolo di chi l'ha fatta, mai la persona: moderator, speaker,
+  // participant, guest, system.
+  actor   String?  @db.VarChar(16)
+  // I dettagli: id e testi di chi conduce (argomenti, domande dei sondaggi),
+  // conteggi; mai nomi o dati di chi partecipa.
+  data    Json     @default("{}") @db.JsonB
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, at])
+  @@map("live_actions")
+}
+
+// La foto che una persona ha scelto di mostrare in sala (riquadro della
+// chiamata, elenco dei partecipanti), legata all'email tramite il suo hash, mai
+// l'indirizzo: torna negli eventi successivi a cui si iscrive con la stessa
+// email, dopo averne aperto il link. La carica e la toglie lei dalla sala
+// d'attesa; la cancellano anche «I miei dati» e il cleanup, quando di
+// quell'email non resta nessuna iscrizione. Piccola per costruzione (il
+// server la ricodifica in JPEG 256x256 senza metadati), quindi sta qui e non
+// nello storage dei file. Ogni foto nuova e' una riga nuova, con un id nuovo.
+model ProfilePhoto {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  emailHash   String   @unique @map("email_hash")
+  contentType String   @map("content_type") @db.VarChar(32)
+  bytes       Bytes
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("profile_photos")
 }

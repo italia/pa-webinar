@@ -12,15 +12,17 @@
  * primary view is a table; clicking a row expands the details inline.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import TranscriptEditor from './transcript-editor';
+import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
@@ -91,28 +93,6 @@ interface ListResponse {
   rows: RecordingRow[];
 }
 
-function statusVariant(status: string): string {
-  switch (status) {
-    case 'POSTPROD_DONE':
-    case 'DONE':
-      return 'bg-success';
-    case 'POSTPROD_FAILED':
-    case 'FAILED':
-      return 'bg-danger';
-    case 'POSTPROD_PARTIAL':
-      return 'bg-warning text-dark';
-    case 'POSTPROD_RUNNING':
-    case 'RUNNING':
-    case 'CLAIMED':
-      return 'bg-info text-dark';
-    case 'POSTPROD_QUEUED':
-    case 'PENDING':
-      return 'bg-secondary';
-    default:
-      return 'bg-light text-dark';
-  }
-}
-
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return '–';
   const m = Math.floor(seconds / 60);
@@ -126,6 +106,7 @@ function formatDuration(seconds: number | null): string {
  * tradotte, waveform. Più informativo del semplice conteggio.
  */
 function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
+  const t = useTranslations('admin.postprod');
   const has = (t: string) => artifacts.some((a) => a.type === t);
   const translated = Array.from(
     new Set(
@@ -157,17 +138,24 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
   }
   return (
     <div className="d-flex flex-wrap gap-1">
-      {pill(has('TRANSCRIPT_JSON'), 'Trascr.', 'Trascrizione')}
-      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), 'Sintesi', 'Sintesi')}
-      {pill(translated.length > 0, `Trad. ${translated.length || ''}`.trim(), `Traduzioni: ${translated.join(', ') || 'nessuna'}`)}
-      {dubbed.length > 0 && pill(true, `Doppi. ${dubbed.length}`, `Doppiaggio: ${dubbed.join(', ')}`)}
-      {has('WAVEFORM_JSON') && pill(true, 'Waveform', 'Waveform')}
+      {pill(has('TRANSCRIPT_JSON'), t('badgeTranscript'), t('badgeTranscript'))}
+      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), t('badgeSummary'), t('badgeSummary'))}
+      {pill(
+        translated.length > 0,
+        t('badgeTranslations', { count: translated.length }),
+        translated.length > 0 ? `${t('badgeTranslationsTitle')}: ${translated.join(', ')}` : t('badgeTranslationsNone'),
+      )}
+      {dubbed.length > 0 &&
+        pill(true, t('badgeDubbing', { count: dubbed.length }), `${t('badgeDubbingTitle')}: ${dubbed.join(', ')}`)}
+      {has('WAVEFORM_JSON') && pill(true, t('badgeWaveform'), t('badgeWaveform'))}
     </div>
   );
 }
 
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const tApi = useTranslations('apiErrors');
+  const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -212,7 +200,9 @@ export default function PostprodDashboard() {
       credentials: 'include',
     });
     if (!r.ok) {
-      toast.error(t('rerunFailed', { code: r.status }));
+      toast.error(
+        messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+      );
       return;
     }
     await mutate();
@@ -309,9 +299,8 @@ export default function PostprodDashboard() {
               const isExpanded = expanded === row.id;
               const doneJobs = row.jobs.filter((j) => j.status === 'DONE').length;
               return (
-                <>
+                <Fragment key={row.id}>
                   <tr
-                    key={row.id}
                     data-recording={row.id}
                     onClick={() => setExpanded(isExpanded ? null : row.id)}
                     style={{ cursor: 'pointer' }}
@@ -320,11 +309,11 @@ export default function PostprodDashboard() {
                       <div className="fw-semibold">{row.eventTitle}</div>
                       <code className="small text-muted">{row.eventSlug}</code>
                     </td>
-                    <td>{new Date(row.createdAt).toLocaleString()}</td>
+                    <td>{format.dateTime(new Date(row.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
                     <td>{formatDuration(row.durationSec)}</td>
                     <td>
-                      <span className={`badge ${statusVariant(row.status)}`}>
-                        {row.status}
+                      <span className={`badge ${statusBadgeClass(row.status)}`}>
+                        {recordingStatusLabel(row.status, t)}
                       </span>
                     </td>
                     <td>
@@ -377,7 +366,7 @@ export default function PostprodDashboard() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
             {data && data.rows.length === 0 && (
@@ -427,7 +416,7 @@ function RecordingDetails({
           <ul className="list-unstyled mb-0">
             {row.jobs.map((j) => (
               <li key={j.id} className="mb-1">
-                <span className={`badge me-2 ${statusVariant(j.status)}`}>
+                <span className={`badge me-2 ${statusBadgeClass(j.status)}`}>
                   {j.status}
                 </span>
                 <code>{j.kind}</code>

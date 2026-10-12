@@ -11,7 +11,9 @@
  *
  *   1. L'evento ammette ospiti? Per un evento a calendario lo decide
  *      l'amministrazione (`SiteSetting.guestAccessEnabled`): spento, si entra
- *      solo con un token — iscrizione, link di conduzione. Una chiamata rapida
+ *      solo con un token — iscrizione, link di conduzione. Un evento solo su
+ *      invito (`Event.accessMode` = `INVITATION`) non ne ammette comunque:
+ *      altrimenti chi non è invitato entrerebbe senza iscriversi. Una chiamata rapida
  *      non ha iscrizione: il link È l'invito, e resta aperta a chi lo riceve
  *      qualunque sia l'impostazione, altrimenti non ci entrerebbe nessuno.
  *   2. La stanza è aperta adesso? Una chiamata rapida si apre già in
@@ -23,15 +25,17 @@
 
 /** L'evento ammette chi arriva senza token, stato a parte (domanda 1). */
 export function guestAccessAllowed(
-  event: { eventType: string },
+  event: { eventType: string; accessMode: string | null },
   guestAccessEnabled: boolean,
 ): boolean {
-  return event.eventType === 'INSTANT' || guestAccessEnabled;
+  if (event.eventType === 'INSTANT') return true;
+  if (event.accessMode === 'INVITATION') return false;
+  return guestAccessEnabled;
 }
 
 /** La stanza è aperta adesso a chi arriva senza token (domande 1 e 2). */
 export function guestWindowOpen(
-  event: { status: string; eventType: string },
+  event: { status: string; eventType: string; accessMode: string | null },
   guestAccessEnabled: boolean,
 ): boolean {
   if (!guestAccessAllowed(event, guestAccessEnabled)) return false;

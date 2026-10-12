@@ -2,8 +2,14 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import GdprAuditDashboard from '@/components/admin/gdpr-audit-dashboard';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/gdpr-audit');
+}
 
 export default async function GdprAuditPage() {
   const locale = await getLocale();
@@ -14,12 +20,7 @@ export default async function GdprAuditPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/gdpr-audit')} subtitle={t('subtitle')} />
       <GdprAuditDashboard />
     </div>
   );

@@ -71,6 +71,7 @@ spec:
                   APP_URL="{{ include "pa-webinar.internalUrl" . }}"
                   NS="{{ .Release.Namespace }}"
                   WORKER_TPL="{{ include "pa-webinar.fullname" . }}-postprod-worker"
+                  CPU_WORKER_TPL="{{ include "pa-webinar.fullname" . }}-postprod-worker-cpu"
 
                   # ── 1. Query desired count from the app ──────────
                   RESPONSE=$(curl -sf {{ include "pa-webinar.cronCurlRetry" . }} \
@@ -85,6 +86,12 @@ spec:
                   ENABLED=$(echo "$RESPONSE" | grep -o '"pipelineEnabled":\(true\|false\)' | grep -o 'true\|false')
                   DESIRED=$(echo "$RESPONSE" | grep -o '"desired":[0-9]*' | grep -o '[0-9]*' || echo "0")
                   RUNNABLE=$(echo "$RESPONSE" | grep -o '"runnable":[0-9]*' | grep -o '[0-9]*' || echo "0")
+                  # Le due misure per worker con e senza GPU; un'app che non le
+                  # manda vale come «tutto al worker con la GPU».
+                  DESIRED_GPU=$(echo "$RESPONSE" | grep -o '"desiredGpu":[0-9]*' | grep -o '[0-9]*' || true)
+                  DESIRED_CPU=$(echo "$RESPONSE" | grep -o '"desiredCpu":[0-9]*' | grep -o '[0-9]*' || true)
+                  [ -z "$DESIRED_GPU" ] && DESIRED_GPU=$DESIRED
+                  [ -z "$DESIRED_CPU" ] && DESIRED_CPU=0
 
                   if [ "$ENABLED" != "true" ]; then
                     log "pipeline disabled — nothing to do"
@@ -100,12 +107,25 @@ spec:
                   # match — risultato: l'orchestrator vedeva
                   # ACTIVE=0 ogni tick e creava un worker in più ogni
                   # minuto finché GPU non disponibile.
-                  ACTIVE=$(kubectl get jobs -n "$NS" \
-                    -l "app.kubernetes.io/component=postprod-worker" \
-                    -o jsonpath='{range .items[*]}{.status.active}{"\n"}{end}' 2>/dev/null \
-                    | awk 'NF{s+=$1} END {print s+0}')
-                  ACTIVE=${ACTIVE:-0}
-                  log "active workers=$ACTIVE desired=$DESIRED runnable=$RUNNABLE"
+                  active_of() {
+                    kubectl get jobs -n "$NS" \
+                      -l "app.kubernetes.io/component=$1" \
+                      -o jsonpath='{range .items[*]}{.status.active}{"\n"}{end}' 2>/dev/null \
+                      | awk 'NF{s+=$1} END {print s+0}'
+                  }
+                  ACTIVE_GPU=$(active_of postprod-worker)
+                  ACTIVE_GPU=${ACTIVE_GPU:-0}
+{{- if (.Values.postprod.worker.cpu | default dict).enabled }}
+                  ACTIVE_CPU=$(active_of postprod-worker-cpu)
+                  ACTIVE_CPU=${ACTIVE_CPU:-0}
+{{- else }}
+                  # Senza worker CPU il worker con la GPU fa tutto.
+                  ACTIVE_CPU=0
+                  DESIRED_GPU=$DESIRED
+                  DESIRED_CPU=0
+{{- end }}
+                  ACTIVE=$((ACTIVE_GPU + ACTIVE_CPU))
+                  log "active workers gpu=$ACTIVE_GPU cpu=$ACTIVE_CPU desired gpu=$DESIRED_GPU cpu=$DESIRED_CPU runnable=$RUNNABLE"
 {{- if .Values.postprod.vllm.autoscale }}
 
                   # ── 1b. vLLM on-demand ───────────────────────────
@@ -130,24 +150,30 @@ spec:
                   fi
 {{- end }}
 
-                  NEEDED=$((DESIRED - ACTIVE))
-                  if [ "$NEEDED" -le 0 ]; then
-                    log "no new workers needed"
-                    exit 0
-                  fi
-
-                  # ── 3. Spawn N worker Jobs from the template ─────
-                  # The template lives as a CronJob (suspended) in the
+                  # ── 3. Spawn worker Jobs from the templates ──────
+                  # The templates live as CronJobs (suspended) in the
                   # cluster so we can use `kubectl create job
                   # --from=cronjob/...`. This gives us nodeSelector +
                   # tolerations + resource limits for free.
-                  for i in $(seq 1 "$NEEDED"); do
-                    JOB_NAME="${WORKER_TPL}-$(date -u +%s)-$i"
-                    log "creating worker job: $JOB_NAME"
-                    kubectl create job -n "$NS" "$JOB_NAME" \
-                      --from=cronjob/"$WORKER_TPL" \
-                      || log "failed to create $JOB_NAME"
-                  done
+                  spawn() {
+                    TPL="$1"; N="$2"
+                    for i in $(seq 1 "$N"); do
+                      JOB_NAME="${TPL}-$(date -u +%s)-$i"
+                      log "creating worker job: $JOB_NAME"
+                      kubectl create job -n "$NS" "$JOB_NAME" \
+                        --from=cronjob/"$TPL" \
+                        || log "failed to create $JOB_NAME"
+                    done
+                  }
+                  NEEDED_GPU=$((DESIRED_GPU - ACTIVE_GPU))
+                  NEEDED_CPU=$((DESIRED_CPU - ACTIVE_CPU))
+                  if [ "$NEEDED_GPU" -le 0 ] && [ "$NEEDED_CPU" -le 0 ]; then
+                    log "no new workers needed"
+                    exit 0
+                  fi
+                  [ "$NEEDED_GPU" -gt 0 ] && spawn "$WORKER_TPL" "$NEEDED_GPU"
+                  [ "$NEEDED_CPU" -gt 0 ] && spawn "$CPU_WORKER_TPL" "$NEEDED_CPU"
+                  exit 0
               env:
                 - name: CRON_API_KEY
                   valueFrom:

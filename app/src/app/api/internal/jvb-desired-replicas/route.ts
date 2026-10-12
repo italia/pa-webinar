@@ -55,8 +55,12 @@ import {
 import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
+import { fetchJibriHealth } from '@/lib/status/bridge';
 
 export const dynamic = 'force-dynamic';
+
+/** Per quanto, dopo la fine di un evento registrato, Jibri occupato resta acceso. */
+const JIBRI_HOLD_MINUTES = 120;
 
 const MAX_REPLICAS = jvbMaxReplicasFromEnv();
 
@@ -93,8 +97,15 @@ export const GET = withErrorHandling(async (request) => {
   // `current` (spec.replicas) and `ready` (status.readyReplicas) so we can
   // persist an authoritative snapshot for the public status page. Parse
   // defensively: if the caller is an older scaler image, fall back to null.
-  const currentReplicas = numParam('current') !== null ? Math.trunc(numParam('current')!) : null;
-  const readyReplicas = numParam('ready') !== null ? Math.trunc(numParam('ready')!) : null;
+  const intParam = (name: string): number | null => {
+    const v = numParam(name);
+    return v === null ? null : Math.trunc(v);
+  };
+  const currentReplicas = intParam('current');
+  const readyReplicas = intParam('ready');
+  // Le repliche di Jibri pronte, se lo scaler le passa (gli scaler piu'
+  // vecchi no: null).
+  const jibriReplicas = intParam('jibriReplicas');
 
   // The scaler also aggregates `/colibri/stats` across ALL JVB pods (it has
   // `pods/exec` RBAC). A single Service-LB fetch from this pod would only
@@ -212,9 +223,48 @@ export const GET = withErrorHandling(async (request) => {
     MAX_REPLICAS,
   );
 
-  // Jibri: 1 replica only if a currently-billable event has recording on.
+  // Jibri: 1 replica se un evento in corso ha la registrazione accesa. Alla
+  // fine dell'evento Jibri resta in sala finche' non si svuota, poi chiude il
+  // file e lo carica: spegnerlo in quel momento interrompe il caricamento e il
+  // video va perso. Per questo, entro JIBRI_HOLD_MINUTES dalla fine di un
+  // evento con registrazione, resta acceso finche' risponde di essere occupato
+  // (BUSY). Passata la finestra si spegne comunque: un Jibri bloccato non
+  // tiene acceso il nodo per sempre. Se la sonda non risponde (installazione
+  // con l'API di salute irraggiungibile) lo si tiene finche' ha repliche,
+  // entro la stessa finestra: perdere un video costa piu' di un Jibri acceso
+  // a vuoto. A zero repliche no: trattenerlo lo riaccenderebbe a ogni giro.
+  // La finestra parte dall'ultima scrittura sull'evento (non c'e' un orario
+  // di chiusura): una modifica successiva la allunga.
   const needsRecording = billableEvents.some((e) => e.recordingEnabled);
-  const jibriDesired = needsRecording ? 1 : 0;
+  let jibriHold = false;
+  if (!needsRecording && process.env.JIBRI_HEALTH_URL) {
+    const appenaConclusi = await prisma.event.count({
+      where: {
+        recordingEnabled: true,
+        status: 'ENDED',
+        updatedAt: { gte: new Date(now.getTime() - JIBRI_HOLD_MINUTES * 60_000) },
+      },
+    });
+    if (appenaConclusi > 0) {
+      const health = await fetchJibriHealth();
+      jibriHold = health ? health.busyStatus === 'BUSY' : (jibriReplicas ?? 0) > 0;
+      if (!health) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[jvb-scaler] Jibri non risponde dopo un evento registrato (repliche: ${jibriReplicas ?? '?'}): ` +
+            (jibriHold ? 'lo si tiene acceso' : 'non lo si trattiene'),
+        );
+      }
+    }
+  }
+  const jibriDesired = needsRecording || jibriHold ? 1 : 0;
+
+  // Sottotitoli live (ADR-018): il servizio resta acceso finché c'è un evento
+  // in diretta, o in avvio, e l'istanza non li ha spenti, anche se chi modera
+  // li ha spenti in sala: riaccenderli deve essere immediato, e un servizio
+  // fermo deve prima scaricare il modello e caricarlo. Si accende con il
+  // bridge, nel pre-riscaldamento. Fermo, non usa CPU.
+  const captionsDesired = settings.liveCaptionsEnabled !== false && billableEvents.length > 0 ? 1 : 0;
 
   // Forensic log line: one structured summary per tick so we can
   // reconstruct which events moved between states and why (replica
@@ -227,7 +277,7 @@ export const GET = withErrorHandling(async (request) => {
     transitions.toEnded > 0 ||
     transitions.publishedToProvisioning > 0 ||
     transitions.provisioningToLive > 0;
-  if (hasTransitions || billableEvents.length > 0) {
+  if (hasTransitions || billableEvents.length > 0 || jibriHold) {
     // eslint-disable-next-line no-console
     console.log(
       `[jvb-scaler] tick ${now.toISOString()} ` +
@@ -237,6 +287,7 @@ export const GET = withErrorHandling(async (request) => {
         `jvbParticipants=${participants} conferences=${conferences} ` +
         `aggregated=${scalerAggregated} pollSuccesses=${pollSuccesses ?? 0} ` +
         `pollFailures=${pollFailures ?? 0} ` +
+        `jibriDesired=${jibriDesired} jibriHold=${jibriHold} ` +
         `transitions=${JSON.stringify(transitions)}`,
     );
   }
@@ -303,6 +354,8 @@ export const GET = withErrorHandling(async (request) => {
   return Response.json({
     desired,
     jibriDesired,
+    jibriHold,
+    captionsDesired,
     predictiveDesired,
     reactiveAdjustment,
     stressLevel: effectiveStress,

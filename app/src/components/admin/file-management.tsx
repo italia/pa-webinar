@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 import {
   Alert,
   Button,
@@ -48,6 +49,7 @@ export default function FileManagement({
 }: FileManagementProps) {
   const t = useTranslations('admin.files');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const confirm = useConfirm();
 
   const [files, setFiles] = useState<FileMaterial[]>(initialFiles);
@@ -82,8 +84,7 @@ export default function FileManagement({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Upload failed');
+        throw new Error(messaggioErroreApi(res.status, tApi, tc('error'), {}, await codiceErrore(res)));
       }
 
       const { material, uploadUrl, uploadHeaders } = (await res.json()) as {
@@ -104,7 +105,7 @@ export default function FileManagement({
       });
 
       if (!uploadRes.ok) {
-        throw new Error('Failed to upload file to storage');
+        throw new Error(tc('error'));
       }
 
       setFiles((prev) => [material, ...prev]);
@@ -112,11 +113,11 @@ export default function FileManagement({
       setUploadTitle('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+      setError(e instanceof Error ? e.message : tc('error'));
     } finally {
       setUploading(false);
     }
-  }, [eventId, moderatorToken, uploadTitle, uploadVisibility]);
+  }, [eventId, moderatorToken, uploadTitle, uploadVisibility, tApi, tc]);
 
   const handleDelete = useCallback(
     async (materialId: string) => {
@@ -136,15 +137,14 @@ export default function FileManagement({
           },
         );
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error ?? 'Delete failed');
+          throw new Error(messaggioErroreApi(res.status, tApi, tc('error'), {}, await codiceErrore(res)));
         }
         setFiles((prev) => prev.filter((f) => f.id !== materialId));
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Error');
+        setError(e instanceof Error ? e.message : tc('error'));
       }
     },
-    [eventId, moderatorToken, t, tc, confirm],
+    [eventId, moderatorToken, t, tc, tApi, confirm],
   );
 
   const visibilityLabel = (v: string) => {

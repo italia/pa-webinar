@@ -82,7 +82,7 @@ git diff --exit-code license-report.json
 
 When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Before you push, run the second step locally to confirm that the report is current. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
 
-**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Dependabot updates under `infra/recorder/` and `infra/recorder-controller/`, and to the AI worker's Python requirements, are not covered by any license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
+**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`, and to the AI worker's Python requirements, are not covered by any license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
 
 ### Limits of the automated check
 
@@ -189,8 +189,11 @@ Publishing or redistributing an image distributes everything inside it. Base ima
 | kubectl | `bitnami/kubectl`, pinned by digest in `kubectlImage` in `values.yaml`, the default for `jvbScaler.image`, `postprod.orchestrator.image` and `configReloadHook.image` | Kubernetes: Apache-2.0 | |
 | curl | `curlimages/curl`: the CronJob images in `values.yaml` and the `cron` service in `docker-compose.yml` | curl license (MIT-style) | |
 | Recorder bot | `ghcr.io/italia/pa-webinar-recorder`, on `node:22-bookworm-slim` | Puppeteer: Apache-2.0. Chrome for Testing, downloaded by Puppeteer at build time: **to verify**. | The bot's own npm tree, with its own lockfile, is not in the report. |
+| Live captions gateway | `ghcr.io/italia/pa-webinar-captions-gateway`, on `node:22-bookworm-slim` | npm dependencies: `ws` (MIT) and `opus-decoder` (MIT, a WebAssembly build of libopus, BSD-3-Clause, with `@wasm-audio-decoders/common`, MIT). | Own lockfile, not in the report. |
+| Live captions engine | `ghcr.io/italia/pa-webinar-captions-engine`, on `debian:bookworm-slim`, with the NeMo-Speech.cpp CPU release downloaded at build time and checked by SHA-256 | NeMo-Speech.cpp: Apache-2.0 for NVIDIA-authored code; its bundled third-party components (llama.cpp and ggml: MIT; the GNU OpenMP and C++ runtime libraries: GPL with the GCC Runtime Library Exception) keep their own terms. | The model is not in the image. See [AI stack and model weights](#ai-stack-and-model-weights). |
 | Recorder controller | `ghcr.io/italia/pa-webinar-recorder-controller`, on `node:22-bookworm-slim` | npm dependencies are permissive, for example `@kubernetes/client-node` and `dockerode` (both Apache-2.0). | Own lockfile, not in the report. |
 | AI post-production worker | `ghcr.io/italia/pa-webinar-postprod-worker`, on `nvcr.io/nvidia/pytorch` (NVIDIA NGC), with cuDNN 8 from `nvidia-cudnn-cu12` | NVIDIA container and cuDNN terms: **to verify** for redistribution. ffmpeg: Ubuntu package. | See [AI stack and model weights](#ai-stack-and-model-weights). |
+| AI post-production worker without a GPU | `ghcr.io/italia/pa-webinar-postprod-worker-cpu`, on `python:3.12-alpine` | Python packages: `httpx` (BSD-3-Clause), `pydantic` (MIT), `numpy` (BSD-3-Clause). ffmpeg: Alpine package, built with GPL components (for example x264), so the image carries GPL-licensed binaries. | Same code as the GPU worker; `infra/ai/worker/requirements-cpu.txt`. |
 | vLLM | Not in the chart. The operator deploys it; [docs/POSTPROD.md](docs/POSTPROD.md) shows an example based on `vllm/vllm-openai`. | Apache-2.0 | |
 | Mailpit | `axllent/mailpit:latest`, in `docker-compose.yml` only | MIT | A local mail catcher. Not part of the Helm chart. |
 | Load-test tooling | Built locally from `scripts/load-test/Dockerfile` on `maven:3.9-eclipse-temurin-17`, plus the Selenium Grid images in `scripts/load-test/` | Temurin: GPL-2.0 with Classpath Exception. Google Chrome stable: Google's terms. jitsi-meet-torture and Selenium: Apache-2.0. | CI does not publish these images. They are for testing only. |
@@ -234,6 +237,15 @@ No Python counterpart of `license-report.json` exists. `infra/ai/worker/requirem
 | `audioseal` and the `audioseal_wm_16bits` weights | Inaudible watermark on dubbed audio | MIT (PyPI metadata, `facebook/audioseal` model card) | The weights are not read from `/models`: `torch.hub` fetches them from huggingface.co unless they are seeded under `AUDIOSEAL_CACHE_DIR` (see above). |
 | torch, torchaudio, torchvision, transformers, numpy, httpx, pydantic, webvtt-py, onnxruntime | Runtime libraries | Permissive (BSD-style, Apache-2.0, MIT) | Confirm them with a listing from the built image. |
 
+### Live captions model
+
+The [live captions](docs/architecture/live-captions.md) engine runs `nvidia/nemotron-3.5-asr-streaming-0.6b` in its Q8_0 GGUF form, at the revision and SHA-256 set in `captions.model` in `infra/helm/pa-webinar/values.yaml`. The weights are not in any image the project publishes: an init container downloads them when the pod starts, from Hugging Face or from a mirror the operator sets, and whoever installs the service accepts the model terms.
+
+| Component | Role | License and source | Notes |
+|---|---|---|---|
+| `nvidia/nemotron-3.5-asr-streaming-0.6b` | Streaming speech recognition for live captions | OpenMDW-1.1 (model card), stated as ready for commercial use | Trained on NVIDIA proprietary data and public sets (Granary, Multilingual LibriSpeech, Common Voice, FLEURS, VoxPopuli, Europarl-ASR), per the model card. |
+| FLEURS, Italian test split | Speech used by the benchmark in `infra/captions/bench/` only, downloaded at run time | CC-BY-4.0 (dataset card) | Not part of any image or installation. |
+
 ### Piper voices
 
 The `rhasspy/piper-voices` repository declares MIT. Each voice's `MODEL_CARD` names the dataset that the voice was trained on and that dataset's license. Most voices are fine-tuned from the US English `lessac` voice, so the question about `lessac` reaches them too.
@@ -256,7 +268,9 @@ The baked voices are listed in `infra/ai/Dockerfile.worker`. The worker builds i
 |---|---|---|---|
 | Titillium Web, Roboto Mono and Lora fonts | `app/public/fonts/` | SIL Open Font License 1.1, per the license URL in each bundled file's metadata | The copyright notices travel inside each file's `name` table. The OFL also requires the license text to travel with the fonts, and the folder does not contain it. Lora carries the Reserved Font Name "Lora". See [app/public/fonts/README.md](app/public/fonts/README.md). |
 | Waiting-room music | `app/public/audio/waiting-room-default.mp3` | Pixabay Content License | Not under EUPL. The Pixabay license forbids distributing content "on a Standalone basis". **To verify** whether shipping the unmodified file in the public repository and in the image is covered. The waiting room plays it only for an event whose `waitingRoomAudioUrl` points at it; an event without its own audio shows no music toggle. See [app/public/audio/README.md](app/public/audio/README.md). |
-| Virtual backgrounds | `app/public/images/virtual-backgrounds/` | Repository license (EUPL-1.2) | Abstract gradients made for the repository. See [the README](app/public/images/virtual-backgrounds/README.md). |
+| Virtual backgrounds | `app/public/images/virtual-backgrounds/` | Repository license (EUPL-1.2) | Abstract gradients and light effects made for the repository. See [the README](app/public/images/virtual-backgrounds/README.md). |
+| Selfie segmentation model | `app/public/models/selfie-segmentation/selfie_segmenter_landscape.tflite` | Apache-2.0 (model card), text in the folder's `LICENSE` | MediaPipe's landscape selfie model, used by the waiting room's background preview in the browser. Trained on Google's own images, which are not distributed. See [its README](app/public/models/selfie-segmentation/README.md). |
+| Background-preview engine | `app/public/vendor/mediapipe/`, copied from `@mediapipe/tasks-vision` at install time by the app's `copy-vision` script (and by the `Dockerfile`); not committed | Apache-2.0 | Covered by the `@mediapipe/tasks-vision` entry in the report. |
 | Icon sprite | `app/public/svg/sprites.svg`, generated from `bootstrap-italia` at install time by the app's `copy-sprites` script (and by the `Dockerfile` in the image); not committed | BSD-3-Clause | Covered by the `bootstrap-italia` entry in the report. |
 | Logo and default watermark | `app/public/images/logo/`, `app/public/images/default-watermark.svg` | Project artwork | The repository states no separate license or trademark policy for them. |
 | The square (waiting room) | `lobby/` | Repository license (EUPL-1.2) | The lobby draws its avatars and scenery in code and bundles no third-party art. |

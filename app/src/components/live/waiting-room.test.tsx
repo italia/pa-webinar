@@ -66,7 +66,6 @@ function albero(props: Partial<Props> = {}) {
     <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
       <WaitingRoom
         event={eventoLive}
-        participantCount={0}
         role="guest"
         jvbReady
         defaultName=""
@@ -144,7 +143,9 @@ describe('sala d\'attesa — nome mancante a sala aperta', () => {
     premi(entra);
     expect(onEnterLive).not.toHaveBeenCalled();
     expect(nome.getAttribute('aria-invalid')).toBe('true');
-    expect(nome.classList.contains('is-invalid')).toBe(true);
+    // Il richiamo non è rosso: il campo insiste, senza lo stile d'errore.
+    expect(nome.classList.contains('is-invalid')).toBe(false);
+    expect(nome.closest('.wr-name-field')?.classList.contains('wr-name-field--insist')).toBe(true);
     expect(document.activeElement).toBe(nome);
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
   });
@@ -186,24 +187,35 @@ describe('sala d\'attesa — nome mancante a sala aperta', () => {
 });
 
 describe('sala d\'attesa — gli altri campi che trattengono', () => {
-  it('senza consenso alla registrazione per partecipante non si entra', () => {
+  it('la trascrizione dei propri interventi si chiede ma non ferma l\'ingresso', () => {
     render({
       role: 'participant',
       defaultName: 'Relatore 1',
       event: { ...eventoLive, multitrackRecordingEnabled: true },
     });
-    const entra = pulsante(t.joinNowBtn);
-    expect(entra.getAttribute('aria-describedby')).toBe('waiting-multitrack-consent-required');
-
-    premi(entra);
-    expect(onEnterLive).not.toHaveBeenCalled();
     const consenso = $<HTMLInputElement>('#waiting-multitrack-consent')!;
-    expect(document.activeElement).toBe(consenso);
+    expect(consenso.checked).toBe(false);
+    expect(document.body.textContent).toContain(messages.gdpr.consent.multitrackOptional);
 
-    premi(consenso);
+    // Senza spunta si entra lo stesso, e senza consenso.
     premi(pulsante(t.joinNowBtn));
-    expect(onEnterLive).toHaveBeenCalledTimes(1);
-    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+    expect(onEnterLive).toHaveBeenLastCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('con la spunta il consenso viaggia con l\'ingresso, anche per chi modera', () => {
+    render({
+      role: 'moderator',
+      defaultName: 'Relatore 1',
+      event: { ...eventoLive, captionsTranscript: true },
+    });
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    // Il server ne conserva la prova, e decide voce per voce.
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      multitrackConsent: true,
+    });
   });
 
   it('chi non deve dare il consenso entra senza la casella', () => {
@@ -319,6 +331,106 @@ describe('sala d\'attesa — avviso di registrazione', () => {
     render({ event: { ...eventoLive, recordingEnabled: false } });
     expect(container.textContent).not.toContain(t.recordingNotice);
   });
+
+  it('di solo ascolto informa e non chiede niente', () => {
+    render({ event: { ...eventoLive, recordingEnabled: true }, recordingListenOnly: true });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingNotice);
+    expect($('#waiting-recording-consent')).toBeNull();
+  });
+});
+
+describe('sala d\'attesa — consenso alla registrazione', () => {
+  const evento: Evento = { ...eventoLive, recordingEnabled: true };
+
+  it('chi non l\'ha dato all\'iscrizione lo da\' qui: senza la spunta non si entra', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true });
+    expect(container.textContent).toContain(t.recordingConsentIntro);
+    const entra = pulsante(t.joinNowBtn);
+    expect(entra.getAttribute('aria-describedby')).toBe('waiting-recording-consent-required');
+
+    premi(entra);
+    expect(onEnterLive).not.toHaveBeenCalled();
+    const consenso = $<HTMLInputElement>('#waiting-recording-consent')!;
+    expect(document.activeElement).toBe(consenso);
+
+    premi(consenso);
+    premi(pulsante(t.joinNowBtn));
+    // Il consenso viaggia con l'ingresso: il server ne conserva la prova.
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+    });
+  });
+
+  it('chi l\'ha gia\' dato entra con un clic, senza casella', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: false });
+    expect($('#waiting-recording-consent')).toBeNull();
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('il testo scelto per l\'evento prende il posto di quello predefinito', () => {
+    render({
+      event: evento,
+      recordingConsentRequired: true,
+      recordingConsentText: 'Testo dell\'ente sulla registrazione.',
+    });
+    expect(container.textContent).toContain('Testo dell\'ente sulla registrazione.');
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
+  });
+
+  it('accanto al consenso c\'e\' l\'informativa: il testo dell\'evento si apre sul posto', () => {
+    render({
+      event: evento,
+      recordingConsentRequired: true,
+      privacy: { url: '/it/privacy', testo: 'Informativa dell\'evento.' },
+    });
+    expect(container.textContent).not.toContain('Informativa dell\'evento.');
+    premi(pulsante(messages.registration.gdprLink));
+    expect(container.textContent).toContain('Informativa dell\'evento.');
+  });
+
+  it('senza testo dell\'evento l\'informativa e\' un link', () => {
+    render({ event: evento, recordingConsentRequired: true, privacy: { url: '/it/privacy' } });
+    const link = Array.from(container.querySelectorAll<HTMLAnchorElement>('a')).find(
+      (a) => a.textContent === messages.registration.gdprLink,
+    );
+    expect(link?.getAttribute('href')).toBe('/it/privacy');
+  });
+
+  it('con la registrazione per partecipante si chiedono entrambi: solo la registrazione ferma', () => {
+    render({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      defaultName: 'Relatore 1',
+      recordingConsentRequired: true,
+    });
+    premi(pulsante(t.joinNowBtn));
+    expect(document.activeElement).toBe($('#waiting-recording-consent'));
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+      multitrackConsent: true,
+    });
+  });
+
+  it('il consenso non chiude la piazza: il cancello porta alla casella', () => {
+    render({
+      event: { ...evento, waitingRoomEngine: 'GAME' },
+      defaultName: 'Relatore 1',
+      recordingConsentRequired: true,
+    });
+    premi(pulsante(t.enterGardenTitle));
+    act(() => {
+      expect(() => piazza.onEnterLive?.('', { cameraOn: false, micOn: false })).toThrow();
+    });
+    expect(onEnterLive).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe($('#waiting-recording-consent'));
+  });
 });
 
 /**
@@ -393,6 +505,102 @@ describe('sala d\'attesa — ciclo di vita', () => {
       expect(() => pulsante(t.startEventButton)).toThrow();
     },
   );
+
+  it('passata l\'ora d\'inizio non dice «Apertura alle …»: aspetta l\'avvio', () => {
+    render({ event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-5), endsAt: oraPiu(55) } });
+    expect(() => pulsante('Apertura alle')).toThrow();
+    expect(pulsante(t.waitingForStartButton).disabled).toBe(true);
+  });
+
+  it('chi modera ha «Avvia evento», non un «Apertura alle …» spento', () => {
+    render({
+      event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(30), endsAt: oraPiu(90) },
+      role: 'moderator',
+      onStartEvent: avvio,
+    });
+    expect(pulsante(t.startEventButton).disabled).toBe(false);
+    expect(() => pulsante('Apertura alle')).toThrow();
+  });
+
+  it('dopo «Avvia evento» chi modera entra senza un secondo clic', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    expect(onEnterLive).not.toHaveBeenCalled();
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    expect(onEnterLive.mock.calls[0]?.[0]).toBe('Moderatore 1');
+  });
+
+  it('dopo «Avvia evento» non entra da solo se il ponte non e\' pronto', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio, jvbReady: false });
+    expect(onEnterLive).not.toHaveBeenCalled();
+  });
+
+  it('dopo «Avvia evento» non entra da solo se la domanda sulla trascrizione e\' da vedere', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    const conTrascrizione: Evento = { ...pubblicato, captionsTranscript: true };
+    render({ event: conTrascrizione, role: 'moderator', onStartEvent: avvio });
+    await act(async () => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...conTrascrizione, status: 'LIVE' }, role: 'moderator', onStartEvent: avvio });
+    expect(onEnterLive).not.toHaveBeenCalled();
+  });
+
+  it('se la sala diventa LIVE prima della risposta dell\'avvio, entra lo stesso', async () => {
+    const pubblicato: Evento = { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-1), endsAt: oraPiu(59) };
+    window.localStorage.setItem('pawebinar.participant.name', 'Moderatore 1');
+    let risolvi: () => void = () => {};
+    const avvioLento = vi.fn(() => new Promise<void>((r) => { risolvi = r; }));
+    render({ event: pubblicato, role: 'moderator', onStartEvent: avvioLento });
+    act(() => {
+      pulsante(t.startEventButton).click();
+    });
+    render({ event: { ...pubblicato, status: 'LIVE' }, role: 'moderator', onStartEvent: avvioLento });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      risolvi();
+    });
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
+  });
+
+  it('passata l\'ora d\'inizio, un\'accensione lunga si dice, senza un «Riprova» che non farebbe niente', () => {
+    const ora = Date.now();
+    render({
+      event: { ...inPreparazione, startsAt: oraPiu(-8) },
+      warmup: {
+        phase: 'starting',
+        startedAt: new Date(ora - 7 * 60_000).toISOString(),
+        serverTime: new Date(ora).toISOString(),
+      },
+    });
+    expect(container.textContent).toContain(t.warmup.slow);
+    expect(Array.from(container.querySelectorAll('button')).some((b) => b.textContent?.includes('Riprova'))).toBe(false);
+  });
+
+  it('una sala preparata prima dell\'inizio non e\' «lenta»', () => {
+    const ora = Date.now();
+    render({
+      event: { ...inPreparazione, startsAt: oraPiu(5), endsAt: oraPiu(65) },
+      warmup: {
+        phase: 'starting',
+        startedAt: new Date(ora - 10 * 60_000).toISOString(),
+        serverTime: new Date(ora).toISOString(),
+      },
+    });
+    expect(container.textContent).not.toContain(t.warmup.slow);
+  });
 
   it('prima della fine resta l\'attesa di sempre', () => {
     render({

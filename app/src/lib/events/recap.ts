@@ -17,6 +17,9 @@ import type { Prisma } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { countWordsByPerson } from '@/lib/wordcloud/normalize';
+import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
@@ -169,18 +172,13 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       orderBy: { createdAt: 'asc' },
       include: { votes: { select: { optionIndex: true } } },
     }),
-    prisma.wordCloudSubmission.groupBy({
-      by: ['word'],
-      where: { round: { eventId } },
-      _count: { word: true },
-      orderBy: { _count: { word: 'desc' } },
-      take: MAX_WORDS,
+    // Le parole si contano come nella nuvola: persone, non invii, sulla
+    // forma normalizzata. Le parole tolte dal moderatore restano fuori.
+    prisma.wordCloudSubmission.findMany({
+      where: { round: { eventId }, hiddenAt: null },
+      select: { word: true, registrationId: true, guestId: true, roundId: true },
     }),
-    prisma.eventFeedback.aggregate({
-      where: { eventId },
-      _avg: { rating: true },
-      _count: true,
-    }),
+    getFeedbackSummary(eventId),
     // Domande poste in chat. Le scartate NON entrano nell'archivio pubblico —
     // stessa regola del Q&A storico, che pubblicava solo ANSWERED/HIGHLIGHTED:
     // un archivio che mostra "questa non verrà trattata" espone chi ha chiesto.
@@ -196,6 +194,8 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       },
     }),
   ]);
+
+
 
   const recapPolls: RecapPoll[] = polls.map((p) => {
     const optionTexts = Array.isArray(p.options) ? (p.options as string[]) : [];
@@ -233,10 +233,10 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
     topQuestions: questions.map((q) => ({ text: q.text, upvotes: q.upvoteCount })),
     chatQuestions: recapChatQuestions,
     polls: recapPolls,
-    topWords: words.map((w) => ({ word: w.word, count: w._count.word })),
+    topWords: countWordsByPerson(words).slice(0, MAX_WORDS),
     feedback: {
-      average: feedback._avg.rating ?? null,
-      count: feedback._count,
+      average: feedback.average,
+      count: feedback.count,
     },
   };
 }
@@ -255,6 +255,8 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
       eventType: true,
       postEventRecap: true,
       postEventRecapAt: true,
+      endsAt: true,
+      dataRetentionDays: true,
     },
   });
   if (!event) return null;
@@ -265,6 +267,10 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
   if (event.status !== 'ENDED' || event.eventType === 'LEGACY') return null;
 
   const recap = await buildRecap(eventId);
+  // Oltre la conservazione dei dati iscrizioni e chat non ci sono piu': un
+  // riepilogo fatto adesso direbbe zero iscritti. Si mostra, ma non si
+  // congela.
+  if (isEventDataRetentionExpired(event, new Date())) return recap;
   await prisma.event.updateMany({
     where: { id: eventId, postEventRecapAt: null },
     data: {

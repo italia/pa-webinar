@@ -9,6 +9,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { coerceMatrix } from '@/lib/utils/permission-matrix';
 
 const templateSchema = z.object({
@@ -21,13 +22,17 @@ const templateSchema = z.object({
   autoStartRecording: z.boolean().optional(),
   agendaEnabled: z.boolean().optional(),
   wordCloudEnabled: z.boolean().optional(),
+  // La pagina dopo l'evento e' pubblica? (Event.postEventPublic)
+  postEventPublic: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
+  // I sottotitoli live degli eventi creati dal modello (Event.liveCaptionsEnabled).
+  liveCaptionsEnabled: z.boolean().optional(),
   // Motore sala d'attesa pre-popolato nel wizard. null = default sito.
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullish(),
   participantsCanUnmute: z.boolean().optional(),
   participantsCanStartVideo: z.boolean().optional(),
   participantsCanShareScreen: z.boolean().optional(),
-  maxParticipants: z.number().int().min(2).max(500).optional(),
+  maxParticipants: z.number().int().min(2).max(5000).optional(),
   // Default wizard (semplificazione utenti meno esperti): pre-popolano i
   // campi alla creazione, restano modificabili.
   defaultDurationMinutes: z.number().int().min(5).max(1440).nullish(),
@@ -43,11 +48,11 @@ const templateSchema = z.object({
   // Elenco di lingue separate da virgola; null = eredita dal sito.
   aiTargetLocales: z.string().max(200).nullish(),
   descriptionTemplate: z.record(z.string()).nullish(),
-  defaultRetentionDays: z.number().int().min(1).max(3650).nullish(),
+  defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
-  // Role×feature permission matrix (see lib/utils/permission-matrix.ts).
-  // Optional; when set it pre-seeds step 2 of the wizard directly. When
-  // absent, the wizard projects the boolean toggles above into a matrix.
+  // Matrice ruolo × funzione (lib/utils/permission-matrix.ts). Facoltativa:
+  // se c'è, precompila il passo «Permessi» del wizard; se manca, il wizard la
+  // ricava dai permessi qui sopra.
   permissionMatrix: z.record(z.string(), z.array(z.string())).nullish(),
   sortOrder: z.number().int().optional(),
 });
@@ -66,6 +71,8 @@ function toTemplateData<
   const { descriptionTemplate, permissionMatrix, ...rest } = d;
   return {
     ...rest,
+    // Un modello non avvia mai la registrazione da solo: la avvia chi conduce.
+    ...('autoStartRecording' in rest && { autoStartRecording: false }),
     ...(descriptionTemplate !== undefined && {
       descriptionTemplate:
         descriptionTemplate === null ? Prisma.DbNull : descriptionTemplate,
@@ -95,8 +102,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await parseJsonBody(request);
   const result = templateSchema.safeParse(body);
   if (!result.success) {
+    // Con i campi: l'editor dice quale correggere.
     throw new ValidationError(
-      result.error.issues.map((i) => i.message).join(', '),
+      'Validation failed',
+      result.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
 
@@ -136,8 +145,10 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
 
   const result = templateSchema.partial().safeParse(data);
   if (!result.success) {
+    // Con i campi: l'editor dice quale correggere.
     throw new ValidationError(
-      result.error.issues.map((i) => i.message).join(', '),
+      'Validation failed',
+      result.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
 

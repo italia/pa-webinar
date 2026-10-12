@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Badge } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 
@@ -21,6 +21,9 @@ interface PollData {
 interface PollCardProps {
   poll: PollData;
   isModerator: boolean;
+  /** Persone in sala adesso (bot di registrazione escluso), se note: la
+   *  partecipazione si misura su di loro. */
+  presentCount?: number;
   onVote: (pollId: string, optionIndex: number) => void;
   onStatusChange: (pollId: string, status: string) => void;
   onDelete: (pollId: string) => void;
@@ -29,11 +32,13 @@ interface PollCardProps {
 export default function PollCard({
   poll,
   isModerator,
+  presentCount,
   onVote,
   onStatusChange,
   onDelete,
 }: PollCardProps) {
   const t = useTranslations('polls');
+  const tc = useTranslations('common');
 
   const isOpen = poll.status === 'OPEN';
   const isClosed = poll.status === 'CLOSED';
@@ -44,152 +49,201 @@ export default function PollCard({
   const canVote = isOpen && !poll.hasVoted;
   const showResults = poll.optionCounts !== null;
 
+  // Eliminare non si annulla: il primo clic chiede conferma.
+  const [confermaElimina, setConfermaElimina] = useState(false);
+  useEffect(() => {
+    if (!confermaElimina) return;
+    const timer = setTimeout(() => setConfermaElimina(false), 4000);
+    return () => clearTimeout(timer);
+  }, [confermaElimina]);
+
+  // La risposta in testa si distingue (stesso blu, pieno); le altre nella
+  // tinta chiara dello stesso blu. A parità restano in testa tutte.
+  const counts = poll.optionCounts ?? [];
+  const massimo = counts.length > 0 ? Math.max(...counts) : 0;
+
+  // Partecipazione: chi ha votato rispetto a chi c'e'. Senza il numero dei
+  // presenti, o quando i voti li superano (ha votato anche chi poi e' uscito),
+  // si dice solo quanti voti: «11 voti su 2 presenti» non vorrebbe dire niente.
+  const presenti =
+    presentCount && presentCount > 0 && poll.totalVotes <= presentCount ? presentCount : null;
+  const quota = presenti ? Math.round((poll.totalVotes / presenti) * 100) : null;
+
   return (
-    <div className={`border rounded p-2 ${isPublished ? 'border-primary bg-primary bg-opacity-10' : ''}`}>
-      <div className="d-flex justify-content-between align-items-start mb-2">
-        <div className="fw-semibold small">{poll.question}</div>
-        <Badge
-          color={isOpen ? 'success' : isClosed ? 'warning' : 'primary'}
-          pill
-          className="ms-2 flex-shrink-0"
-          style={{ fontSize: '0.68rem' }}
-        >
+    <article className={`poll-card${isOpen ? ' poll-card--open' : ''}`}>
+      <header className="poll-card__head">
+        <span className={`poll-status poll-status--${poll.status.toLowerCase()}`}>
+          {isOpen && <span className="poll-status__dot" aria-hidden="true" />}
           {t(`status.${poll.status}`)}
-        </Badge>
-      </div>
+        </span>
+        {poll.hasVoted && (
+          <span className="poll-card__voted">
+            <Icon icon="it-check" size="xs" />
+            {t('voted')}
+          </span>
+        )}
+      </header>
 
-      <div className="d-flex flex-column gap-1">
-        {poll.options.map((option, idx) => {
-          const count = showResults ? (poll.optionCounts?.[idx] ?? 0) : 0;
-          const pct = showResults && poll.totalVotes > 0
-            ? Math.round((count / poll.totalVotes) * 100)
-            : 0;
-          const isVoted = poll.votedOptionIndex === idx;
+      <h4 className="poll-card__question">{poll.question}</h4>
 
-          // Chi vede i risultati mentre il voto è aperto — il moderatore —
-          // vota SULLA riga dei risultati: sostituirla con un pulsante nudo
-          // gli toglierebbe di sotto il conteggio dal vivo, che è il motivo
-          // per cui sta guardando il pannello.
-          const resultRow = (
-            <div
-              className="position-relative rounded overflow-hidden"
-              style={{
-                backgroundColor: '#f0f0f0',
-                fontSize: '0.82rem',
-                minHeight: 28,
-              }}
+      {canVote && !showResults ? (
+        // Chi deve ancora votare vede le risposte da scegliere, non i numeri.
+        <div className="poll-choices" role="group" aria-label={poll.question}>
+          {poll.options.map((option, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className="poll-choice"
+              onClick={() => onVote(poll.id, idx)}
             >
-              {showResults && (
-                <div
-                  className="position-absolute top-0 start-0 h-100"
-                  style={{
-                    width: `${pct}%`,
-                    backgroundColor: isVoted ? '#0066CC' : '#B0C4DE',
-                    opacity: 0.3,
-                    transition: 'width 0.3s',
-                  }}
-                />
-              )}
-              <div className="position-relative d-flex justify-content-between align-items-center px-2 py-1">
-                <span className={isVoted ? 'fw-semibold' : ''}>
-                  {isVoted && <Icon icon="it-check" size="xs" className="me-1" />}
-                  {option}
-                </span>
-                {showResults && (
-                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-                    {pct}% ({count})
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-
-          return (
-            <div key={idx}>
-              {canVote && !showResults ? (
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline-primary w-100 text-start py-1 px-2"
-                  onClick={() => onVote(poll.id, idx)}
-                  style={{ fontSize: '0.82rem' }}
-                >
-                  {option}
-                </button>
-              ) : canVote ? (
-                <button
-                  type="button"
-                  className="w-100 text-start p-0 border-0 bg-transparent"
-                  onClick={() => onVote(poll.id, idx)}
-                >
-                  {resultRow}
-                </button>
-              ) : (
-                resultRow
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {showResults && (
-        <div className="text-muted mt-1" style={{ fontSize: '0.72rem' }}>
-          {t('totalVotes', { count: poll.totalVotes })}
+              <span className="poll-choice__radio" aria-hidden="true" />
+              <span className="poll-choice__text">{option}</span>
+            </button>
+          ))}
         </div>
+      ) : showResults ? (
+        <ul className="poll-results">
+          {poll.options.map((option, idx) => {
+            const count = counts[idx] ?? 0;
+            const pct = poll.totalVotes > 0 ? Math.round((count / poll.totalVotes) * 100) : 0;
+            const inTesta = count > 0 && count === massimo;
+            const mio = poll.votedOptionIndex === idx;
+            // Chi vede i risultati mentre il voto è aperto — il moderatore —
+            // vota SULLA riga dei risultati: sostituirla con un pulsante nudo
+            // gli toglierebbe il conteggio dal vivo, che è il motivo per cui
+            // sta guardando il pannello.
+            const riga = (
+              <>
+                <span className="poll-result__label">
+                  <span className="poll-result__text">{option}</span>
+                  {mio && (
+                    <span className="poll-result__mine">
+                      <Icon icon="it-check" size="xs" />
+                      {t('yourVote')}
+                    </span>
+                  )}
+                  <span className="poll-result__value">
+                    <strong>{pct}%</strong> · {count}
+                  </span>
+                </span>
+                <span className="poll-result__track" aria-hidden="true">
+                  <span
+                    className={`poll-result__bar${inTesta ? ' is-leading' : ''}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </span>
+              </>
+            );
+            return (
+              <li key={idx} className="poll-result">
+                {canVote ? (
+                  <button
+                    type="button"
+                    className="poll-result__vote"
+                    onClick={() => onVote(poll.id, idx)}
+                  >
+                    {riga}
+                  </button>
+                ) : (
+                  riga
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : poll.hasVoted ? (
+        // Ha votato e i risultati non sono ancora pubblici.
+        <p className="poll-card__waiting">{t('resultsHidden')}</p>
+      ) : (
+        // Non ha votato e non puo' piu' farlo (voto chiuso, risultati non
+        // pubblicati): le risposte restano leggibili, senza dire «registrato».
+        <>
+          <ul className="poll-choices poll-choices--static" aria-label={poll.question}>
+            {poll.options.map((option, idx) => (
+              <li key={idx} className="poll-choice">
+                <span className="poll-choice__radio" aria-hidden="true" />
+                <span className="poll-choice__text">{option}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="poll-card__waiting">{t('closedNoVote')}</p>
+        </>
       )}
 
-      {poll.hasVoted && isOpen && (
-        <div className="text-success mt-1" style={{ fontSize: '0.72rem' }}>
-          <Icon icon="it-check" size="xs" className="me-1" />
-          {t('voted')}
+      {showResults && (
+        <div className="poll-participation">
+          <span className="poll-participation__label">
+            {presenti
+              ? t('participation', { votes: poll.totalVotes, present: presenti })
+              : t('totalVotes', { count: poll.totalVotes })}
+            {quota !== null && <strong> · {quota}%</strong>}
+          </span>
+          {quota !== null && (
+            <span
+              className="poll-participation__meter"
+              role="meter"
+              aria-label={t('participationLabel')}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={quota}
+            >
+              <span style={{ width: `${quota}%` }} />
+            </span>
+          )}
         </div>
       )}
 
       {isModerator && (
-        <div className="d-flex gap-1 mt-2">
+        <footer className="poll-card__actions">
           {isOpen && (
-            <Button
-              color="warning"
-              outline
-              size="xs"
-              className="px-2 py-0"
+            <button
+              type="button"
+              className="poll-action"
               onClick={() => onStatusChange(poll.id, 'CLOSED')}
             >
+              <Icon icon="it-locked" size="xs" />
               {t('closePoll')}
-            </Button>
+            </button>
           )}
           {isClosed && (
-            <Button
-              color="primary"
-              outline
-              size="xs"
-              className="px-2 py-0"
+            <button
+              type="button"
+              className="poll-action poll-action--primary"
               onClick={() => onStatusChange(poll.id, 'PUBLISHED')}
             >
+              <Icon icon="it-chart-line" size="xs" />
               {t('publishResults')}
-            </Button>
+            </button>
           )}
           {(isClosed || isPublished) && (
-            <Button
-              color="success"
-              outline
-              size="xs"
-              className="px-2 py-0"
+            <button
+              type="button"
+              className="poll-action"
               onClick={() => onStatusChange(poll.id, 'OPEN')}
             >
+              <Icon icon="it-unlocked" size="xs" />
               {t('reopenPoll')}
-            </Button>
+            </button>
           )}
-          <Button
-            color="danger"
-            outline
-            size="xs"
-            className="px-2 py-0"
-            onClick={() => onDelete(poll.id)}
+          <button
+            type="button"
+            className={`poll-action poll-action--delete${confermaElimina ? ' is-armed' : ''}`}
+            aria-label={confermaElimina ? `${t('deletePoll')}: ${tc('confirm')}` : t('deletePoll')}
+            title={t('deletePoll')}
+            onClick={() => {
+              if (!confermaElimina) {
+                setConfermaElimina(true);
+                return;
+              }
+              setConfermaElimina(false);
+              onDelete(poll.id);
+            }}
           >
-            <Icon icon="it-close" size="xs" />
-          </Button>
-        </div>
+            <Icon icon="it-delete" size="xs" />
+            {confermaElimina && tc('confirm')}
+          </button>
+        </footer>
       )}
-    </div>
+    </article>
   );
 }

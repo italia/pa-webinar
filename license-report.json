@@ -541,7 +541,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/lovell/colour"
   },
-  "@img/sharp-wasm32@0.35.4": {
+  "@img/sharp-wasm32@0.35.5": {
     "licenses": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
     "repository": "https://github.com/lovell/sharp",
     "publisher": "Lovell Fuller",
@@ -606,6 +606,10 @@
     "repository": "https://github.com/jridgewell/sourcemaps",
     "publisher": "Justin Ridgewell",
     "email": "justin@ridgewell.name"
+  },
+  "@mediapipe/tasks-vision@0.10.35": {
+    "licenses": "Apache-2.0",
+    "publisher": "mediapipe@google.com"
   },
   "@next/env@15.5.25": {
     "licenses": "MIT",
@@ -2767,7 +2771,7 @@
     "publisher": "Sergey Rubanov",
     "email": "chi187@gmail.com"
   },
-  "nodemailer@9.1.1": {
+  "nodemailer@10.0.13": {
     "licenses": "MIT-0",
     "repository": "https://github.com/nodemailer/nodemailer",
     "publisher": "Andris Reinman"
@@ -3278,7 +3282,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "sharp@0.35.4": {
+  "sharp@0.35.5": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/lovell/sharp",
     "publisher": "Lovell Fuller",
@@ -3340,7 +3344,7 @@
     "publisher": "Ben Coe",
     "email": "ben@npmjs.com"
   },
-  "source-map-js@1.2.1": {
+  "source-map-js@1.2.2": {
     "licenses": "BSD-3-Clause",
     "repository": "https://github.com/7rulnik/source-map-js",
     "publisher": "Valentin 7rulnik Semirulnik",

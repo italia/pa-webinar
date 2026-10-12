@@ -111,7 +111,7 @@ npx tsc --noEmit --project app/tsconfig.json
 npm run test --workspace=app
 ```
 
-They cover the `app` workspace only. Changes to `lobby/`, `infra/recorder/`, `infra/recorder-controller/`, `infra/ai/worker/`, `infra/helm/`, dependencies, `app/prisma/schema.prisma` or interface strings each need an extra check. The commands are in [Local gates before every commit](docs/development/methodology.md#local-gates-before-every-commit).
+They cover the `app` workspace only. Changes to `lobby/`, `infra/recorder/`, `infra/recorder-controller/`, `infra/captions/gateway/`, `infra/ai/worker/`, `infra/helm/`, dependencies, `app/prisma/schema.prisma` or interface strings each need an extra check. The commands are in [Local gates before every commit](docs/development/methodology.md#local-gates-before-every-commit).
 
 **Before you push, and before you open or update the pull request**, run the checks CI runs on the way to `main`, because nothing runs them on `dev`:
 

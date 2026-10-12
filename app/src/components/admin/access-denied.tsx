@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation';
  * Cosa vede una persona dello staff su una pagina che il suo ruolo non
  * apre. Non un rinvio al login — ci e' gia' entrata, e rimandarla li'
  * sarebbe un giro senza uscita — ma una spiegazione e la strada per tornare
- * ai propri eventi.
+ * agli eventi che gestisce.
  */
 export default async function AccessDenied() {
   const t = await getTranslations('admin.accessDenied');

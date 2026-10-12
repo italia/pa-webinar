@@ -1,0 +1,264 @@
+{{- if include "pa-webinar.captionsEnabled" . }}
+{{- $c := .Values.captions | default dict }}
+{{- $gw := dig "gateway" dict $c | default dict }}
+{{- $en := dig "engine" dict $c | default dict }}
+{{- $modello := dig "model" dict $c | default dict }}
+{{- $voci := int (dig "maxStreams" 4 $c) }}
+{{- $thread := int (dig "threads" 4 $en) }}
+{{- $token := toString (dig "captions" "bridgeToken" "" (.Values.global | default dict) | default "") }}
+{{- $immagineMotore := include "pa-webinar.auxImage" (list . (dig "image" "" $en) "captions-engine") }}
+{{- $nodi := dig "nodeSelector" dict $c | default .Values.app.nodeSelector }}
+{{- $tolleranze := dig "tolerations" list $c | default .Values.app.tolerations }}
+{{- $volumeModello := dig "modelVolume" dict $c | default dict }}
+# ─────────────────────────────────────────────────────────────
+# Sottotitoli live (global.captions, values.yaml).
+#
+# Il Service lo chiama il bridge, all'indirizzo che Jicofo gli dà
+# (ws://<release>-captions:8080/transcribe/<id della conferenza>), e lo
+# interroga il portale per la pagina di stato (CAPTIONS_STATUS_URL). La porta
+# non si chiama `http`: il nome resta del portale.
+# ─────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pa-webinar.captionsServiceName" . }}
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: captions
+spec:
+  selector:
+    {{- include "pa-webinar.captionsSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: captions
+      port: 8080
+      targetPort: captions
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-captions
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: captions
+spec:
+  {{- /*
+    Con lo scaler dei bridge le repliche le porta lui (captionsDesired nella
+    risposta del portale): scritte qui, ogni aggiornamento le riporterebbe al
+    valore del chart, accendendo il servizio a sale vuote o spegnendolo a
+    evento in corso. Senza scaler, una replica sempre accesa.
+  */}}
+  {{- if not (include "pa-webinar.jvbScalerRendered" .) }}
+  replicas: 1
+  {{- end }}
+  # La replica nuova parte prima che la vecchia si fermi: i sottotitoli non
+  # si interrompono durante un aggiornamento, al prezzo di un pod in più per
+  # il tempo dello scaricamento del modello.
+  strategy:
+    {{- if $volumeModello }}
+    # Un volume per il modello di solito si monta da un solo pod alla volta
+    # (ReadWriteOnce): il pod nuovo parte quando il vecchio è uscito.
+    type: Recreate
+    {{- else }}
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+    {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pa-webinar.captionsSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pa-webinar.captionsSelectorLabels" . | nindent 8 }}
+    spec:
+      # Nessuna API di Kubernetes da chiamare, e nessuna variabile dei
+      # Service del namespace nell'ambiente: il gateway legge la propria
+      # configurazione da variabili CAPTIONS_*.
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      {{- with .Values.app.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $nodi }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $tolleranze }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # Scarica il modello e ne verifica l'impronta: un file diverso ferma
+        # il pod prima che il motore parta.
+        - name: fetch-model
+          image: {{ $immagineMotore }}
+          imagePullPolicy: {{ dig "imagePullPolicy" "IfNotPresent" $en | default "IfNotPresent" }}
+          command: ["/usr/local/bin/fetch-model.sh"]
+          env:
+            - name: CAPTIONS_MODEL_URL
+              value: {{ dig "url" "" $modello | quote }}
+            - name: CAPTIONS_MODEL_SHA256
+              value: {{ dig "sha256" "" $modello | quote }}
+            - name: CAPTIONS_MODEL_PATH
+              value: /models/asr.gguf
+          securityContext:
+            runAsUser: 10001
+            runAsGroup: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        # Il motore: ascolta solo su 127.0.0.1, lo raggiunge solo il gateway.
+        - name: engine
+          image: {{ $immagineMotore }}
+          imagePullPolicy: {{ dig "imagePullPolicy" "IfNotPresent" $en | default "IfNotPresent" }}
+          args:
+            - --asr-model
+            - /models/asr.gguf
+            - --device
+            - cpu
+            - --host
+            - 127.0.0.1
+            - --port
+            - "8090"
+            - --no-ui
+            # Ogni voce occupa una connessione del server per tutta la sua
+            # durata: il pool deve superare le voci, altrimenti le ultime
+            # restano in coda.
+            - --threads
+            - {{ add $voci 4 | quote }}
+            # Le connessioni restano aperte anche nelle pause di chi parla:
+            # i tempi di attesa del server sono quelli del banco di prova.
+            - --read-timeout
+            - "300"
+            - --write-timeout
+            - "300"
+            - --asr.backend.threads
+            - {{ $thread | quote }}
+            - --asr.streaming.rnnt_right_context
+            - {{ dig "rightContext" 3 $en | toString | quote }}
+            # Gli slot di stato del batching: almeno uno per voce.
+            - {{ printf "--asr.batching.state_arena_slots=%d" (max 16 $voci) | quote }}
+          securityContext:
+            runAsUser: 10001
+            runAsGroup: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          # Il modello si carica in qualche secondo, di più su un nodo carico:
+          # la sonda di avvio aspetta fino a cinque minuti prima che quella di
+          # vita cominci.
+          startupProbe:
+            exec:
+              command: ["curl", "-sf", "--max-time", "3", "http://127.0.0.1:8090/v1/models"]
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            exec:
+              command: ["curl", "-sf", "--max-time", "4", "http://127.0.0.1:8090/v1/models"]
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml (dig "resources" dict $en | default dict) | nindent 12 }}
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+        # Il gateway: riceve l'audio dal bridge, lo passa al motore e rimanda
+        # il testo.
+        - name: gateway
+          image: {{ include "pa-webinar.auxImage" (list . (dig "image" "" $gw) "captions-gateway") }}
+          imagePullPolicy: {{ dig "imagePullPolicy" "IfNotPresent" $gw | default "IfNotPresent" }}
+          ports:
+            - name: captions
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: CAPTIONS_ENGINE_PORT
+              value: "8090"
+            {{- if $token }}
+            # Lo stesso valore che Jicofo fa presentare al bridge.
+            - name: CAPTIONS_AUTH_TOKEN
+              value: {{ $token | quote }}
+            {{- end }}
+            # Lingua e vocabolario della stanza, chiesti al portale.
+            - name: CAPTIONS_CONTEXT_URL
+              value: {{ printf "%s/api/internal/captions/context" (include "pa-webinar.internalUrl" .) | quote }}
+            - name: CAPTIONS_CONTEXT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pa-webinar.secretName" . }}
+                  key: CRON_API_KEY
+            - name: CAPTIONS_LANGUAGE
+              value: {{ dig "language" "it-IT" $c | toString | quote }}
+            - name: CAPTIONS_MAX_STREAMS
+              value: {{ $voci | quote }}
+            - name: CAPTIONS_BOOST
+              value: {{ dig "boost" 0.5 $c | toString | quote }}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          # Pronto quando il processo risponde, non quando risponde il motore:
+          # il pod entra nel Service solo dopo che il motore è partito (la sua
+          # sonda di avvio), e se poi il motore cade il gateway resta
+          # raggiungibile e lo dice su /status ("unavailable"), invece di
+          # sparire dal Service e far credere la pagina di stato in avvio.
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: captions
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: captions
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+          resources:
+            {{- toYaml (dig "resources" dict $gw | default dict) | nindent 12 }}
+      volumes:
+        # Il modello (circa 750 MB): senza `captions.modelVolume` si riscarica
+        # a ogni avvio del pod; con un volume che sopravvive al pod, lo
+        # scaricamento si salta quando il file c'è già con l'impronta giusta.
+        - name: models
+          {{- if $volumeModello }}
+          {{- toYaml $volumeModello | nindent 10 }}
+          {{- else }}
+          emptyDir:
+            sizeLimit: 1Gi
+          {{- end }}
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+{{- end }}

@@ -97,157 +97,166 @@ describe('shouldEndLiveEvent — grace period', () => {
   });
 });
 
-describe('shouldReclaimEmptyOvertime — reclaim JVB from an emptied OPEN-ENDED overtime call', () => {
-  // inactiveCutoff = now - 45min. "alive until" older than the cutoff ⇒ empty
-  // for the whole grace ⇒ reclaim (if open-ended AND the count is reliable).
-  // endsAt is always in the past for an overtime call.
-  const cutoff = minutes(-45);
+describe('shouldReclaimEmptyOvertime — sala vuota oltre la fine', () => {
+  // emptyCutoff = now - 20min: «viva fino a» più vecchio del limite ⇒ vuota da
+  // tutta la finestra ⇒ si chiude (se il conteggio è affidabile). endsAt è
+  // sempre nel passato per una sala fuori orario.
+  const cutoff = minutes(-20);
   const pastEnd = minutes(-90);
-  // Open-ended defaults reused across the "reclaim applies" cases.
-  const openEnded = { gracePeriodMinutes: -1, siteGraceMinutes: 15 };
 
-  it('reclaims when the room has been empty past the inactivity grace', () => {
-    // grace=-1 overtime call, last traffic 60min ago → free the bridge.
+  it('chiude una sala vuota da più della finestra', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
-      lastActiveAt: minutes(-60),
+      lastActiveAt: minutes(-30),
       provisioningStartedAt: minutes(-120),
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(true);
   });
 
-  it('does NOT reclaim while the room still had recent traffic', () => {
-    // Active overtime call (someone present 10min ago) → never kicked.
+  it('non chiude una sala con traffico recente', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
-      lastActiveAt: minutes(-10),
+      lastActiveAt: minutes(-5),
       provisioningStartedAt: minutes(-120),
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(false);
   });
 
-  it('does NOT reclaim at the exact cutoff boundary (needs to be strictly older)', () => {
+  it('non chiude esattamente sul limite (serve essere strettamente più vecchi)', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
-      lastActiveAt: minutes(-45),
+      lastActiveAt: minutes(-20),
       provisioningStartedAt: null,
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(false);
   });
 
-  it('falls back to provisioningStartedAt when nobody ever joined', () => {
-    // lastActiveAt null (no join) but LIVE since 90min ago → reclaim.
+  it('ripiega su provisioningStartedAt quando nessuno è mai entrato', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
       lastActiveAt: null,
       provisioningStartedAt: minutes(-90),
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(true);
   });
 
-  it('uses the MOST RECENT signal — a fresh reprovision protects a room whose lastActiveAt is stale (/wake race)', () => {
-    // Event was active at -60 (lastActiveAt=-60, stale) but was just
-    // reprovisioned via /wake at -5 (provisioningStartedAt=-5). Preferring the
-    // stale lastActiveAt would terminally close the room people just rejoined;
-    // the fresh provision wins the max → NOT reclaimed.
+  it('usa il segno di vita PIÙ RECENTE: una riapertura fresca protegge una sala con lastActiveAt vecchio', () => {
+    // Dopo un /wake lastActiveAt resta al valore di prima della pausa: se
+    // vincesse, la sala in cui le persone sono appena rientrate si chiuderebbe.
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
       lastActiveAt: minutes(-60),
       provisioningStartedAt: minutes(-5),
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(false);
   });
 
-  it('falls back to endsAt when BOTH timestamps are null (phantom LIVE row), reclaiming an abandoned forced-LIVE room', () => {
-    // A "Start now" room forced to LIVE (no provisioningStartedAt) that nobody
-    // joined (lastActiveAt null), now 90min past endsAt → reclaim via endsAt.
+  it('senza nessun segno di vita ripiega su endsAt (riga LIVE fantasma)', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
       lastActiveAt: null,
       provisioningStartedAt: null,
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(true);
   });
 
-  it('does NOT reclaim a both-null room that only just passed endsAt', () => {
-    // endsAt only 10min ago → within the inactivity grace → keep alive.
+  it('una pausa cominciata prima della fine ha comunque la sua finestra dopo la fine', () => {
+    // Vuota da 25 minuti, ma la fine è passata da 10: il conto parte da endsAt.
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
+      lastActiveAt: minutes(-25),
+      provisioningStartedAt: null,
+      endsAt: minutes(-10),
+      emptyCutoff: cutoff,
+      canReclaimEmpty: true,
+    })).toBe(false);
+    expect(shouldReclaimEmptyOvertime({
+      lastActiveAt: minutes(-45),
+      provisioningStartedAt: null,
+      endsAt: minutes(-21),
+      emptyCutoff: cutoff,
+      canReclaimEmpty: true,
+    })).toBe(true);
+  });
+
+  it('senza segni di vita non chiude una sala appena oltre la fine', () => {
+    expect(shouldReclaimEmptyOvertime({
       lastActiveAt: null,
       provisioningStartedAt: null,
       endsAt: minutes(-10),
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: true,
     })).toBe(false);
   });
 
-  it('NEVER reclaims when the count is unreliable (bridge blip / multi-replica)', () => {
-    // Even a long-stale lastActiveAt must not eject the room when we cannot
-    // trust the reading — the emptiness might be a probe artefact, not real.
+  it('MAI con un conteggio inaffidabile (bridge che non risponde, più repliche)', () => {
     expect(shouldReclaimEmptyOvertime({
-      ...openEnded,
       lastActiveAt: minutes(-600),
       provisioningStartedAt: minutes(-600),
       endsAt: pastEnd,
-      inactiveCutoff: cutoff,
+      emptyCutoff: cutoff,
       canReclaimEmpty: false,
     })).toBe(false);
   });
+});
 
-  it('does NOT reclaim a FINITE-grace room, even long-empty — that would shorten the promised window', () => {
-    // grace=90 workshop, empty for 60min past endsAt. shouldEndLiveEvent (grace
-    // path) still keeps it open until endsAt+90; reclaim must NOT close it early.
-    expect(shouldReclaimEmptyOvertime({
-      gracePeriodMinutes: 90,
-      siteGraceMinutes: 15,
-      lastActiveAt: minutes(-60),
-      provisioningStartedAt: minutes(-120),
-      endsAt: pastEnd,
-      inactiveCutoff: cutoff,
-      canReclaimEmpty: true,
-    })).toBe(false);
+describe('fuori orario — le due regole insieme', () => {
+  // La sala occupata si chiude al tetto (60 di sito), quella vuota dopo 20
+  // minuti senza nessuno: vince la prima che scatta.
+  const endsAt = minutes(-30);
+  const closes = (o: {
+    now?: Date;
+    lastActiveAt: Date | null;
+    grace: number | null;
+    site?: number;
+    reliable?: boolean;
+  }) => {
+    const now = o.now ?? NOW;
+    return (
+      shouldEndLiveEvent({
+        endsAt,
+        gracePeriodMinutes: o.grace,
+        siteGraceMinutes: o.site ?? 60,
+        now,
+      }) ||
+      shouldReclaimEmptyOvertime({
+        lastActiveAt: o.lastActiveAt,
+        provisioningStartedAt: minutes(-120),
+        endsAt,
+        emptyCutoff: new Date(now.getTime() - 20 * 60_000),
+        canReclaimEmpty: o.reliable ?? true,
+      })
+    );
+  };
+
+  it('una sala occupata 30 minuti oltre la fine resta aperta', () => {
+    expect(closes({ lastActiveAt: minutes(-1), grace: null })).toBe(false);
   });
 
-  it('does NOT reclaim a grace=0 room (hard close is the grace path\'s job)', () => {
-    expect(shouldReclaimEmptyOvertime({
-      gracePeriodMinutes: 0,
-      siteGraceMinutes: 15,
-      lastActiveAt: minutes(-600),
-      provisioningStartedAt: minutes(-600),
-      endsAt: pastEnd,
-      inactiveCutoff: cutoff,
-      canReclaimEmpty: true,
-    })).toBe(false);
+  it('una sala occupata si chiude al tetto di sito (60 minuti)', () => {
+    expect(closes({ now: minutes(30), lastActiveAt: minutes(29), grace: null })).toBe(true);
   });
 
-  it('inherits site default grace: null override + site=-1 → reclaims; null + site=15 → does not', () => {
-    const base = {
-      lastActiveAt: minutes(-60),
-      provisioningStartedAt: minutes(-120),
-      endsAt: pastEnd,
-      inactiveCutoff: cutoff,
-      canReclaimEmpty: true,
-    };
-    // Site globally open-ended → an empty overtime room is reclaimed.
-    expect(shouldReclaimEmptyOvertime({
-      ...base, gracePeriodMinutes: null, siteGraceMinutes: -1,
-    })).toBe(true);
-    // Site finite → the room is time-bounded by the grace path, not reclaimed.
-    expect(shouldReclaimEmptyOvertime({
-      ...base, gracePeriodMinutes: null, siteGraceMinutes: 15,
-    })).toBe(false);
+  it('una sala vuota da 25 minuti si chiude anche prima del tetto', () => {
+    expect(closes({ lastActiveAt: minutes(-25), grace: null })).toBe(true);
+  });
+
+  it('con tetto -1 una sala occupata non si chiude mai per orario', () => {
+    expect(closes({ now: minutes(600), lastActiveAt: minutes(599), grace: -1 })).toBe(false);
+  });
+
+  it('con tetto -1 una sala vuota si chiude dopo 20 minuti', () => {
+    expect(closes({ lastActiveAt: minutes(-21), grace: -1 })).toBe(true);
+  });
+
+  it('con un conteggio inaffidabile vale solo il tetto', () => {
+    expect(closes({ lastActiveAt: minutes(-25), grace: null, reliable: false })).toBe(false);
+    expect(closes({ now: minutes(31), lastActiveAt: minutes(-25), grace: null, reliable: false })).toBe(true);
   });
 });
 

@@ -9,6 +9,7 @@
  * e non lo proxiamo per non trasformare l'app in un transcoder.
  */
 
+import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
@@ -25,7 +26,10 @@ export const GET = withErrorHandling(async (_request, context) => {
     context as { params: Promise<{ param: string; lang: string }> }
   ).params);
 
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito } = await assertPostprodAccessible(slug);
+  // Sottotitoli e doppiaggio accompagnano il video pubblicato, con la pipeline
+  // AI accesa (lib/ai/access).
+  if (ambito !== 'tutto') throw new NotFoundError('Postprod');
 
   const artifact = await prisma.postprodArtifact.findFirst({
     where: {
@@ -44,5 +48,10 @@ export const GET = withErrorHandling(async (_request, context) => {
     blobKey: artifact.blobKey,
     expiresInMinutes: 60,
   });
-  return Response.redirect(url, 302);
+  // Il file porta la filigrana audio (AudioSeal); la risposta lo dichiara.
+  // `Response.redirect` ha intestazioni immutabili: la si costruisce a mano.
+  return new Response(null, {
+    status: 302,
+    headers: { Location: url, [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE },
+  });
 });

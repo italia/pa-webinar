@@ -19,6 +19,7 @@
 
 import type { Prisma } from '@prisma/client';
 
+import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE, markVtt } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
@@ -37,7 +38,10 @@ const ALLOWED_TYPES = [
 export const GET = withErrorHandling(async (request, context) => {
   const { param: slug, lang } = (await (context as { params: Promise<{ param: string; lang: string }> }).params);
 
-  const { eventId } = await assertPostprodAccessible(slug);
+  const { eventId, ambito } = await assertPostprodAccessible(slug);
+  // Sottotitoli e doppiaggio accompagnano il video pubblicato, con la pipeline
+  // AI accesa (lib/ai/access).
+  if (ambito !== 'tutto') throw new NotFoundError('Postprod');
 
   const artifact = await prisma.postprodArtifact.findFirst({
     where: {
@@ -46,15 +50,23 @@ export const GET = withErrorHandling(async (request, context) => {
       recording: { eventId },
     },
     orderBy: { createdAt: 'desc' },
-    select: { id: true, blobKey: true, inlineBody: true, mimeType: true },
+    select: {
+      id: true,
+      blobKey: true,
+      inlineBody: true,
+      mimeType: true,
+      revisedAt: true,
+      original: { select: { id: true } },
+    },
   });
   if (!artifact) throw new NotFoundError('Subtitle');
 
   const cached = tryDecryptPII(artifact.inlineBody ?? '');
   if (cached) {
-    return new Response(cached, {
+    return new Response(markVtt(cached, { revised: !!artifact.revisedAt || !!artifact.original }), {
       status: 200,
       headers: {
+        [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/vtt; charset=utf-8',
         // Subtitles are small + immutable per run; let the browser
         // cache them for the live session. The blobKey already

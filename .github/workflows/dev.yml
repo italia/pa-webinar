@@ -8,8 +8,17 @@ name: Dev build
 # Full release pipeline is still release.yml (triggered by `v*` tags) and
 # keeps doing the heavy work (SBOM + chart + release notes).
 #
-# Manual dispatch supports `no_cache=true` to force a clean rebuild when
-# layer caching is suspected of serving a stale artifact.
+# Manual dispatch supports `no_cache=true` to rebuild without reading the
+# layer cache (the cache is rewritten) when it is suspected of serving a
+# stale artifact.
+#
+# La cache dei layer sta nel registro, nel pacchetto `pa-webinar-buildcache`
+# (un tag per immagine, `<immagine>-dev`). La cache di GitHub Actions ha un
+# tetto di 10 GB per repository: il worker con la GPU da solo la riempiva e
+# sfrattava le altre, e ogni build ripartiva da zero. I runner sono effimeri
+# (Docker vuoto a ogni job), quindi la cache remota e' l'unica che conta. Un
+# errore della cache non fa fallire la build (`ignore-error`). Con `no_cache`
+# si costruisce senza leggerla, ma la si riscrive.
 #
 # Il job `postprod-worker` builda il container Python con CUDA + WhisperX
 # + pyannote + Piper TTS — è MOLTO più pesante (~22GB) e parte solo se
@@ -26,7 +35,7 @@ on:
   workflow_dispatch:
     inputs:
       no_cache:
-        description: "Disable buildx layer cache (use for cache poisoning emergencies)"
+        description: "Build without reading the layer cache, which is rewritten (for a suspected stale or poisoned cache)"
         type: boolean
         default: false
       force_worker_build:
@@ -41,13 +50,28 @@ on:
         description: "Forza il build del recorder-controller anche se infra/recorder-controller/ non è cambiato"
         type: boolean
         default: false
+      force_captions_gateway_build:
+        description: "Forza il build del gateway dei sottotitoli anche se infra/captions/gateway/ non è cambiato"
+        type: boolean
+        default: false
+      force_captions_engine_build:
+        description: "Forza il build del motore dei sottotitoli anche se infra/captions/engine/ non è cambiato"
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar
+  # La cache dei layer di tutte le immagini, in un pacchetto a parte: un tag
+  # per immagine (`app-dev`, `postprod-worker-dev`, ...), cosi' le pagine dei
+  # pacchetti delle immagini non mostrano tag che non si possono eseguire.
+  CACHE_IMAGE_NAME: italia/pa-webinar-buildcache
   WORKER_IMAGE_NAME: italia/pa-webinar-postprod-worker
+  WORKER_CPU_IMAGE_NAME: italia/pa-webinar-postprod-worker-cpu
   RECORDER_IMAGE_NAME: italia/pa-webinar-recorder
   RECORDER_CONTROLLER_IMAGE_NAME: italia/pa-webinar-recorder-controller
+  CAPTIONS_GATEWAY_IMAGE_NAME: italia/pa-webinar-captions-gateway
+  CAPTIONS_ENGINE_IMAGE_NAME: italia/pa-webinar-captions-engine
 
 concurrency:
   # Cancel in-flight dev builds when a new push lands — we only care about
@@ -100,10 +124,11 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.app_tags }}
           platforms: linux/amd64
-          # cache-from/to scoped to `dev` so the release workflow's cache
-          # (scope=release) stays isolated and we don't cross-contaminate.
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev' }}
+          # La cache di sviluppo e quella del rilascio (`app-release`)
+          # restano separate.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:app-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           build-args: |
             NEXT_PUBLIC_BUILD_VERSION=dev
             NEXT_PUBLIC_BUILD_SHA=${{ steps.tags.outputs.sha_short }}
@@ -123,8 +148,8 @@ jobs:
           target: builder
           tags: ${{ steps.tags.outputs.migrate_tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-migrate' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-migrate' }}
+          # Lo stadio `builder` l'ha appena costruito il passo precedente, sullo
+          # stesso builder: si riusa da li', senza cache propria.
 
       - name: Summary
         run: |
@@ -209,9 +234,11 @@ jobs:
       contents: read
       packages: write
     # Build pesante: il base NGC pytorch image è ~10GB, pyannote+whisperx
-    # tirano modelli da HF al runtime ma il pip install è ~5GB. 60 min
-    # è un buffer ampio (cold senza cache fa ~25-30 min).
-    timeout-minutes: 60
+    # tirano modelli da HF al runtime ma il pip install è ~5GB. A freddo
+    # (senza cache, o al primo giro dopo un cambio delle dipendenze) supera
+    # i 60 minuti: il tetto e' 120. Con la cache nel registro un cambio del
+    # solo codice ricostruisce l'ultimo layer.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -241,11 +268,10 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.worker_tags }}
           platforms: linux/amd64
-          # Cache GHA scope dedicato — non condividere con l'app che
-          # ha layer diversi e cache-poisoning sarebbe rischioso (un
-          # cambio di pytorch base invaliderebbe layer non legati).
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker' }}
+          # Cache propria del worker, separata da quella dell'app.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-postprod-worker
             org.opencontainers.image.description=Postprod AI worker (WhisperX + pyannote + Piper TTS) for pa-webinar
@@ -267,6 +293,58 @@ jobs:
           echo '# Per forzare un re-pull dei nodi GPU già allocati:' >> "$GITHUB_STEP_SUMMARY"
           echo 'kubectl -n <namespace> delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # Il worker senza GPU (sintesi, traduzioni, archivio): stesso codice del
+  # worker, immagine leggera senza CUDA (infra/ai/Dockerfile.worker-cpu). Job
+  # a parte: un build CUDA lento o fallito non deve fermare questa immagine,
+  # che si costruisce in un minuto.
+  build-worker-cpu:
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Postprod CPU Worker Image
+    needs: detect-worker-changes
+    if: needs.detect-worker-changes.outputs.worker_changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          echo "tags=${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev-$SHA_SHORT" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push CPU worker image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/ai
+          file: ./infra/ai/Dockerfile.worker-cpu
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-cpu-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:postprod-worker-cpu-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-postprod-worker-cpu
+            org.opencontainers.image.description=Postprod AI worker without GPU (summaries, translations, archive) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
 
   # ── Recorder multi-track (ADR-013, Fase 3) ────────────────────────────
   # Bot headless-Chrome (Puppeteer + lib-jitsi-meet) che registra una
@@ -355,8 +433,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.recorder_tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-recorder
             org.opencontainers.image.description=Multi-track per-participant audio recorder (Puppeteer + lib-jitsi-meet) for pa-webinar
@@ -456,8 +535,9 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder-controller' }}
-          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder-controller' }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-controller-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:recorder-controller-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
           labels: |
             org.opencontainers.image.title=pa-webinar-recorder-controller
             org.opencontainers.image.description=Reconciling operator that orchestrates recorder Jobs/containers (ADR-013) for pa-webinar
@@ -472,3 +552,196 @@ jobs:
           echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
           echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
           echo '| recorder-controller | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Captions Gateway ──
+  # Gateway dei sottotitoli live (Node, niente modelli): builda solo se
+  # `infra/captions/gateway/` è cambiato, o force_captions_gateway_build=true.
+  detect-captions-gateway-changes:
+    name: Detect captions-gateway changes
+    runs-on: arc-runner-pa-webinar
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
+      - name: Filter changed files
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.force_captions_gateway_build }}" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Intervallo del PUSH, non ultimo commit (vedi i job del recorder).
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
+          if echo "$CHANGED" | grep -qE '^infra/captions/gateway/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-captions-gateway:
+    # Niente artefatti di build: la quota di Actions e' dell'organizzazione
+    # (vedi build-and-push).
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Captions Gateway Image
+    needs: detect-captions-gateway-changes
+    if: needs.detect-captions-gateway-changes.outputs.changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          {
+            echo "sha_short=$SHA_SHORT"
+            echo "tags=${{ env.REGISTRY }}/${{ env.CAPTIONS_GATEWAY_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.CAPTIONS_GATEWAY_IMAGE_NAME }}:dev-$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push captions-gateway image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/captions/gateway
+          file: ./infra/captions/gateway/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-gateway-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-gateway-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-captions-gateway
+            org.opencontainers.image.description=Live captions gateway (Jitsi bridge audio to local speech engine) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
+
+      - name: Summary
+        run: |
+          echo "### Captions Gateway image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| captions-gateway | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Captions Engine ──
+  # Motore dei sottotitoli live (NeMo-Speech.cpp per CPU): l'immagine porta
+  # il binario, non il modello, che il pod scarica all'avvio. Builda solo se
+  # `infra/captions/engine/` è cambiato, o force_captions_engine_build=true.
+  detect-captions-engine-changes:
+    name: Detect captions-engine changes
+    runs-on: arc-runner-pa-webinar
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
+      - name: Filter changed files
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.force_captions_engine_build }}" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Intervallo del PUSH, non ultimo commit (vedi i job del recorder).
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
+          if echo "$CHANGED" | grep -qE '^infra/captions/engine/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-captions-engine:
+    # Niente artefatti di build: la quota di Actions e' dell'organizzazione
+    # (vedi build-and-push).
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Captions Engine Image
+    needs: detect-captions-engine-changes
+    if: needs.detect-captions-engine-changes.outputs.changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          {
+            echo "sha_short=$SHA_SHORT"
+            echo "tags=${{ env.REGISTRY }}/${{ env.CAPTIONS_ENGINE_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.CAPTIONS_ENGINE_IMAGE_NAME }}:dev-$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push captions-engine image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/captions/engine
+          file: ./infra/captions/engine/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-engine-dev
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.CACHE_IMAGE_NAME }}:captions-engine-dev,mode=max,image-manifest=true,oci-mediatypes=true,ignore-error=true
+          no-cache: ${{ inputs.no_cache == true }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-captions-engine
+            org.opencontainers.image.description=Live captions speech engine (NeMo-Speech.cpp, CPU); the model is downloaded at pod start
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
+
+      - name: Summary
+        run: |
+          echo "### Captions Engine image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| captions-engine | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"

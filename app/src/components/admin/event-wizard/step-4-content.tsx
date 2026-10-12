@@ -12,7 +12,16 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { Link, percorso } from '@/i18n/navigation';
+
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
+import {
+  USAGE_SHORT_KEY,
+  isForOtherMoment,
+  templatesFor,
+  type QuestionnaireMoment,
+} from '@/lib/questionnaires/template-usage';
 
 export interface MaterialDraft {
   title: string;
@@ -20,6 +29,12 @@ export interface MaterialDraft {
   description?: string | null;
   type: 'file' | 'link';
   visibility: 'BEFORE' | 'DURING' | 'AFTER' | 'ALWAYS';
+  /** Solo per un file caricato: la chiave nello storage (la pulizia la usa
+   *  per cancellarlo), il nome, la dimensione e il tipo. */
+  fileName?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
+  blobPath?: string | null;
 }
 
 export type AdhocQuestionType =
@@ -68,6 +83,12 @@ export interface QuestionnaireBlock {
   original?: QuestionnaireOriginal;
 }
 
+/** Le risposte gia' raccolte da un questionario esistente, per momento. */
+export interface QuestionnaireResponseCounts {
+  pre: number;
+  post: number;
+}
+
 export interface Step4Value {
   preEventQuestionnaire: QuestionnaireBlock;
   postEventQuestionnaire: QuestionnaireBlock;
@@ -79,13 +100,30 @@ interface TemplateRow {
   name: string;
   description: string | null;
   itemCount?: number;
+  usage?: QuestionnaireMoment | null;
 }
 
 interface Props {
   value: Step4Value;
   onChange: (patch: Partial<Step4Value>) => void;
-  onSaveDraftAndNavigate: (destination: string) => Promise<void>;
+  /** Solo in creazione: salva la bozza e apre la gestione completa dei
+   *  questionari. In modifica la pagina dell'evento ci porta gia'. */
+  onSaveDraftAndNavigate?: (destination: string) => Promise<void>;
   submitting?: boolean;
+  /** Con il solo link del moderatore questionari e materiali li gestisce lo
+   *  staff: si vedono, non si modificano. */
+  staffLocked?: boolean;
+  /** In creazione: senza scelte, dopo l'evento si propone il questionario
+   *  di feedback predefinito, e va detto. */
+  defaultFeedbackHint?: boolean;
+  /** Dentro una sezione delle impostazioni avanzate, che ha gia' il titolo. */
+  incorporato?: boolean;
+  /** In modifica: le risposte gia' raccolte. Un questionario che ne ha non si
+   *  cambia ne' si svuota da qui (si perderebbero): lo si fa dalla pagina dei
+   *  questionari dell'evento, che chiede conferma e dice quante sono. */
+  responseCounts?: QuestionnaireResponseCounts;
+  /** In modifica: l'evento, per portare alla pagina dei suoi questionari. */
+  eventId?: string;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -108,12 +146,19 @@ export default function Step4Content({
   onChange,
   onSaveDraftAndNavigate,
   submitting,
+  staffLocked = false,
+  defaultFeedbackHint = false,
+  incorporato = false,
+  responseCounts,
+  eventId,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
   const [templates, setTemplates] = useState<TemplateRow[]>([]);
   const [savingDraft, setSavingDraft] = useState(false);
 
   useEffect(() => {
+    // La libreria dei modelli la legge solo lo staff.
+    if (staffLocked) return;
     let cancelled = false;
     fetch('/api/admin/question-templates', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : { rows: [] }))
@@ -127,40 +172,55 @@ export default function Step4Content({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [staffLocked]);
 
-  const handleSaveAndNavigate = async () => {
-    setSavingDraft(true);
-    try {
-      // The destination is resolved inside the shell (needs the created id);
-      // we pass a sentinel that the shell will rewrite after creation.
-      await onSaveDraftAndNavigate('__questionnaires__');
-    } finally {
-      setSavingDraft(false);
-    }
-  };
+  const handleSaveAndNavigate = onSaveDraftAndNavigate
+    ? async () => {
+        setSavingDraft(true);
+        try {
+          // The destination is resolved inside the shell (needs the created id);
+          // we pass a sentinel that the shell will rewrite after creation.
+          await onSaveDraftAndNavigate('__questionnaires__');
+        } finally {
+          setSavingDraft(false);
+        }
+      }
+    : undefined;
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
-        {t('heading')}
-      </h2>
+      {!incorporato && (
+        <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('heading')}
+        </h2>
+      )}
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
         {t('intro')}
       </p>
 
-      <QuestionnairesSection
-        value={value}
-        onChange={onChange}
-        templates={templates}
-        onSaveAndNavigate={handleSaveAndNavigate}
-        savingDraft={savingDraft || submitting === true}
-      />
+      {staffLocked ? (
+        <div className="alert alert-info" role="note">
+          {t('staffOnly')}
+        </div>
+      ) : (
+        <>
+          <QuestionnairesSection
+            value={value}
+            onChange={onChange}
+            templates={templates}
+            onSaveAndNavigate={handleSaveAndNavigate}
+            savingDraft={savingDraft || submitting === true}
+            defaultFeedbackHint={defaultFeedbackHint}
+            responseCounts={responseCounts}
+            eventId={eventId}
+          />
 
-      <MaterialsSection
-        value={value.materials}
-        onChange={(next) => onChange({ materials: next })}
-      />
+          <MaterialsSection
+            value={value.materials}
+            onChange={(next) => onChange({ materials: next })}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -173,14 +233,21 @@ function QuestionnairesSection({
   templates,
   onSaveAndNavigate,
   savingDraft,
+  defaultFeedbackHint,
+  responseCounts,
+  eventId,
 }: {
   value: Step4Value;
   onChange: (patch: Partial<Step4Value>) => void;
   templates: TemplateRow[];
-  onSaveAndNavigate: () => void | Promise<void>;
+  onSaveAndNavigate?: () => void | Promise<void>;
   savingDraft: boolean;
+  defaultFeedbackHint: boolean;
+  responseCounts?: QuestionnaireResponseCounts;
+  eventId?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  const tc = useTranslations('common');
 
   return (
     <section className="mb-4">
@@ -193,48 +260,139 @@ function QuestionnairesSection({
 
       <PlacementBlock
         heading={t('preHeading')}
+        help={t('preHelp')}
         idPrefix="pre"
+        moment="PRE_REGISTRATION"
         templates={templates}
         value={value.preEventQuestionnaire}
         onChange={(next) => onChange({ preEventQuestionnaire: next })}
+        responseCount={responseCounts?.pre ?? 0}
+        eventId={eventId}
       />
 
       <PlacementBlock
         heading={t('postHeading')}
+        help={t('postHelp')}
         idPrefix="post"
+        moment="POST_EVENT"
         templates={templates}
         value={value.postEventQuestionnaire}
         onChange={(next) => onChange({ postEventQuestionnaire: next })}
+        responseCount={responseCounts?.post ?? 0}
+        eventId={eventId}
+        emptyHint={
+          defaultFeedbackHint &&
+          templates.some((tpl) => tpl.name === FEEDBACK_GENERIC_TEMPLATE_NAME)
+            ? t('postDefaultHint', { name: FEEDBACK_GENERIC_TEMPLATE_NAME })
+            : undefined
+        }
       />
 
-      <div className="d-flex justify-content-end mb-2">
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={() => void onSaveAndNavigate()}
-          disabled={savingDraft}
-        >
-          {savingDraft ? '...' : t('saveDraftAndGoQuestionnaires')}
-        </button>
-      </div>
+      {onSaveAndNavigate && (
+        <div className="d-flex justify-content-end mb-2">
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            onClick={() => void onSaveAndNavigate()}
+            disabled={savingDraft}
+          >
+            {savingDraft ? tc('saving') : t('saveDraftAndGoQuestionnaires')}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
 function PlacementBlock({
   heading,
+  help,
   idPrefix,
-  templates,
+  moment,
+  templates: libreria,
   value,
   onChange,
+  emptyHint,
+  responseCount = 0,
+  eventId,
 }: {
   heading: string;
+  /** A che cosa serve il questionario di questo momento. */
+  help: string;
   idPrefix: string;
+  moment: QuestionnaireMoment;
+  /** L'intera libreria: il blocco propone quelli di questo momento. */
   templates: TemplateRow[];
   value: QuestionnaireBlock;
   onChange: (next: QuestionnaireBlock) => void;
+  /** Detto quando non e' scelto nulla. */
+  emptyHint?: string;
+  /** Le risposte gia' raccolte: con almeno una il blocco si legge soltanto. */
+  responseCount?: number;
+  eventId?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  if (responseCount > 0) {
+    return (
+      <div className="border rounded p-3 mb-3 bg-white" style={{ borderColor: '#e8e8e8' }}>
+        <h4 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+          {heading}
+        </h4>
+        <p className="text-secondary small mb-2">{help}</p>
+        <div className="alert alert-info mb-0" role="note">
+          {t('lockedWithResponses', { count: responseCount })}
+          {eventId && (
+            <>
+              {' '}
+              <Link href={percorso(`/admin/events/${eventId}/questionnaires`)}>
+                {t('lockedGoToQuestionnaires')}
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <PlacementEditor
+      heading={heading}
+      help={help}
+      idPrefix={idPrefix}
+      moment={moment}
+      templates={libreria}
+      value={value}
+      onChange={onChange}
+      emptyHint={emptyHint}
+    />
+  );
+}
+
+function PlacementEditor({
+  heading,
+  help,
+  idPrefix,
+  moment,
+  templates: libreria,
+  value,
+  onChange,
+  emptyHint,
+}: {
+  heading: string;
+  help: string;
+  idPrefix: string;
+  moment: QuestionnaireMoment;
+  templates: TemplateRow[];
+  value: QuestionnaireBlock;
+  onChange: (next: QuestionnaireBlock) => void;
+  emptyHint?: string;
+}) {
+  const t = useTranslations('admin.wizard.step4');
+  const tq = useTranslations('admin.questionTemplates');
+  // I modelli scelti quando il blocco si è aperto restano in elenco anche se
+  // sono per l'altro momento: togliendo la spunta non spariscono, e si può
+  // rimetterla.
+  const [sceltiAllInizio] = useState(() => value.templateIds);
+  const templates = templatesFor(moment, libreria, [...sceltiAllInizio, ...value.templateIds]);
 
   const toggleTemplate = (id: string) => {
     const next = value.templateIds.includes(id)
@@ -269,16 +427,26 @@ function PlacementBlock({
       className="border rounded p-3 mb-3 bg-white"
       style={{ borderColor: '#e8e8e8' }}
     >
-      <h4 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+      <h4 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
         {heading}
       </h4>
+      <p id={`${idPrefix}-tpl-help`} className="text-secondary small mb-3">
+        {help}
+      </p>
 
-      <div className="mb-3">
-        <label className="form-label">{t('templatesLabel')}</label>
+      <div
+        className="mb-3"
+        role="group"
+        aria-labelledby={`${idPrefix}-tpl-label`}
+        aria-describedby={`${idPrefix}-tpl-help`}
+      >
+        <div id={`${idPrefix}-tpl-label`} className="form-label">
+          {t('templatesLabel')}
+        </div>
         {templates.length === 0 ? (
-          <div className="alert alert-info py-2 mb-0" role="status">
-            <small>{t('templatesEmpty')}</small>
-          </div>
+          <p className="text-secondary small mb-0">
+            {libreria.length === 0 ? t('templatesEmpty') : t('templatesNoneForMoment')}
+          </p>
         ) : (
           <div className="d-flex flex-wrap gap-2">
             {templates.map((tpl) => {
@@ -295,15 +463,25 @@ function PlacementBlock({
                   {active ? '✓ ' : ''}
                   {tpl.name}
                   {typeof tpl.itemCount === 'number' ? ` (${tpl.itemCount})` : ''}
+                  {isForOtherMoment(moment, tpl.usage) && tpl.usage && (
+                    <span className="ms-1 fw-normal">
+                      · {tq(USAGE_SHORT_KEY[tpl.usage])}
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
         )}
+        {emptyHint &&
+          value.templateIds.length === 0 &&
+          value.adhocQuestions.length === 0 && (
+            <p className="text-secondary small mt-2 mb-0">{emptyHint}</p>
+          )}
       </div>
 
       <div>
-        <label className="form-label mb-2">{t('adhocLabel')}</label>
+        <div className="form-label mb-2">{t('adhocLabel')}</div>
 
         {value.adhocQuestions.length > 0 && (
           <ul className="list-unstyled mb-2">
@@ -611,12 +789,30 @@ function MaterialsSection({
             label={t('materialUrl')}
             assetType="document"
             value={draft.url || null}
+            // Un indirizzo scritto e' un link; un file e' tale solo se lo si
+            // e' caricato qui (onUpload, che arriva dopo onChange). Dedurlo
+            // dall'indirizzo («/assets/») scambiava per file i link esterni.
             onChange={(next) =>
-              setDraft({
-                ...draft,
+              setDraft((d) => ({
+                ...d,
                 url: next ?? '',
-                type: next && next.includes('/assets/') ? 'file' : 'link',
-              })
+                type: 'link',
+                fileName: null,
+                fileSize: null,
+                mimeType: null,
+                blobPath: null,
+              }))
+            }
+            onUpload={(meta) =>
+              setDraft((d) => ({
+                ...d,
+                url: meta.url,
+                type: 'file',
+                fileName: meta.filename,
+                fileSize: meta.size,
+                mimeType: meta.mime,
+                blobPath: meta.key,
+              }))
             }
           />
         </div>

@@ -5,14 +5,15 @@
  *   - la SALA non e' pronta (evento non avviato, ponte video che si accende):
  *     non dipende dalla persona, e il pulsante resta spento con il suo stato
  *     (conto alla rovescia, «la sala si sta preparando»);
- *   - il MODULO e' incompleto (nome, email, consenso alla registrazione per
- *     partecipante): dipende dalla persona, e va detto cosa manca e dove.
+ *   - il MODULO e' incompleto (nome, email, consenso alla registrazione
+ *     dell'evento o a quella per partecipante): dipende dalla persona, e va
+ *     detto cosa manca e dove.
  *
  * Pura, cosi' la regola si verifica senza montare il componente.
  */
 
 /** Cio' che, a sala aperta, trattiene ancora dall'entrare: un campo del modulo. */
-export type BloccoModulo = 'name' | 'email' | 'consent';
+export type BloccoModulo = 'name' | 'email' | 'recording';
 
 export interface StatoIngressoInput {
   /** L'evento e' avviato (LIVE). */
@@ -21,9 +22,10 @@ export interface StatoIngressoInput {
   ingressoConsentito: boolean;
   nameValid: boolean;
   emailValid: boolean;
+  /** Serve il consenso alla registrazione dell'evento (non dato all'iscrizione). */
+  recordingRequired: boolean;
+  recordingConsent: boolean;
   /** Serve il consenso alla registrazione per partecipante. */
-  multitrackRequired: boolean;
-  multitrackConsent: boolean;
   /** C'e' stato un tentativo d'ingresso (pulsante, cancello della piazza). */
   ingressoTentato: boolean;
   /** Il nome e' quello definitivo: il browser ha gia' restituito quello
@@ -52,8 +54,8 @@ export function statoIngresso(i: StatoIngressoInput): StatoIngresso {
     ? 'name'
     : !i.emailValid
       ? 'email'
-      : i.multitrackRequired && !i.multitrackConsent
-        ? 'consent'
+      : i.recordingRequired && !i.recordingConsent
+        ? 'recording'
         : null;
   const ingressoAperto = i.canEnterLive && i.ingressoConsentito;
   // Prima che la sala apra — conto alla rovescia, sala in preparazione —

@@ -239,7 +239,7 @@ describe('POST /materials/upload — il file', () => {
       fileSize: BigInt(PDF.byteLength),
       mimeType: 'application/pdf',
       blobPath: key,
-      // Come il predefinito dell'area admin e dei link aggiunti in sala.
+      // Senza scelta, come il predefinito dell'area admin e dei link aggiunti in sala.
       visibility: 'ALWAYS',
     });
     // URL assoluto servito dall'app, come quello dell'area admin.
@@ -250,6 +250,19 @@ describe('POST /materials/upload — il file', () => {
     expect(body).toMatchObject({ type: 'FILE', fileSize: PDF.byteLength, visibility: 'ALWAYS' });
     // Il percorso interno dello storage resta sul server.
     expect(body).not.toHaveProperty('blobPath');
+  });
+
+  it('la fase scelta in sala arriva alla riga', async () => {
+    const res = await POST(await upload({ fields: { visibility: 'AFTER' } }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ visibility: 'AFTER' });
+  });
+
+  it('una fase sconosciuta: 422, nessun file scritto', async () => {
+    const res = await POST(await upload({ fields: { visibility: 'SEMPRE' } }), ctx());
+    expect(res.status).toBe(422);
+    expect(storage.current!.put).not.toHaveBeenCalled();
+    expect(mockedCreate).not.toHaveBeenCalled();
   });
 
   it('usa l’origine pubblica configurata', async () => {

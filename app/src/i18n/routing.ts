@@ -80,6 +80,7 @@ export const routing = defineRouting({
     '/admin/postprod': { it: '/admin/post-produzione', en: '/admin/postprod' },
     '/admin/postprod/[recordingId]': { it: '/admin/post-produzione/[recordingId]', en: '/admin/postprod/[recordingId]' },
     '/admin/settings/tags': { it: '/admin/impostazioni/tag', en: '/admin/settings/tags' },
+    '/admin/glossary': { it: '/admin/glossario', en: '/admin/glossary' },
     '/admin/settings/email-templates': { it: '/admin/impostazioni/modelli-email', en: '/admin/settings/email-templates' },
   },
 });

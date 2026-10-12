@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
@@ -10,8 +11,12 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
+import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
+import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
+import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
@@ -22,11 +27,16 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
-import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import {
+  adminRequestLocale,
+  sendGrantModeratorLinks,
+  sendPrimaryModeratorLink,
+} from '@/lib/email/moderator-link';
 import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 
@@ -213,6 +223,28 @@ export const PUT = withErrorHandling(async (request, context) => {
     delete (data as Record<string, unknown>).moderatorEmail;
   }
 
+  // Chi partecipa lo decide lo staff dell'evento, come l'elenco degli invitati
+  // a cui si lega: un link di conduzione (condiviso, inoltrato, o di un
+  // co-moderatore) non apre ne' chiude l'iscrizione.
+  if (data.accessMode !== undefined && data.accessMode !== event.accessMode) {
+    await soloStaffDellEvento(eventId, 'Only the event staff can change who can take part');
+  }
+
+  // Le etichette le manda il wizard a ogni salvataggio, l'elenco intero: si
+  // scrivono solo se sono cambiate, e le cambia lo staff che gestisce
+  // l'evento, come chi partecipa (un link di conduzione no). Una modifica
+  // parziale (la sala, un flag) non le manda e non le tocca.
+  let nuoveEtichette: Array<{ id: string; slug: string }> | null = null;
+  if (data.tagSlugs !== undefined) {
+    const nuove = await resolveTags(prisma, data.tagSlugs);
+    const ids = nuove.map((tag) => tag.id);
+    if (!sameTagIds(ids, await eventTagIds(prisma, eventId))) {
+      await soloStaffDellEvento(eventId, 'Only the event staff can change the tags');
+      nuoveEtichette = nuove;
+    }
+  }
+  const tagIds = nuoveEtichette?.map((tag) => tag.id) ?? null;
+
   // Il modello dell'informativa è una chiave esterna: un id inesistente
   // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
   // al posto di un errore sul campo.
@@ -367,8 +399,11 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
       }),
-      ...(data.autoStartRecording !== undefined && {
-        autoStartRecording: data.autoStartRecording,
+      // L'avvio automatico si puo' solo spegnere: la registrazione la avvia
+      // chi conduce con REC (un evento salvato prima lo tiene finche' non lo
+      // si spegne).
+      ...(data.autoStartRecording === false && {
+        autoStartRecording: false,
       }),
       ...(avToggles.participantsCanUnmute !== undefined && {
         participantsCanUnmute: avToggles.participantsCanUnmute,
@@ -395,6 +430,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.gdprTemplateId !== undefined && {
         gdprTemplateId: data.gdprTemplateId,
       }),
+      ...(data.accessMode !== undefined && { accessMode: data.accessMode }),
       ...(data.requireOrganization !== undefined && {
         requireOrganization: data.requireOrganization,
       }),
@@ -410,6 +446,15 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.moderatorEmail !== undefined && {
         moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       }),
+      ...(data.moderatorOrganization !== undefined && {
+        moderatorOrganization: data.moderatorOrganization || null,
+      }),
+      ...(data.moderatorOrganizationLogoUrl !== undefined && {
+        moderatorOrganizationLogoUrl: data.moderatorOrganizationLogoUrl || null,
+      }),
+      ...(data.moderatorPublicListed !== undefined && {
+        moderatorPublicListed: data.moderatorPublicListed,
+      }),
       ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
@@ -423,12 +468,14 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.postEventShowRecap !== undefined && { postEventShowRecap: data.postEventShowRecap }),
       ...(data.postEventShowWordCloud !== undefined && { postEventShowWordCloud: data.postEventShowWordCloud }),
       ...(data.postEventEmailEnabled !== undefined && { postEventEmailEnabled: data.postEventEmailEnabled }),
+      ...(data.recordingNotifyEnabled !== undefined && { recordingNotifyEnabled: data.recordingNotifyEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
+      ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
@@ -482,6 +529,12 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),
+      ...(data.captionsTranscriptEnabled !== undefined && {
+        captionsTranscriptEnabled: data.captionsTranscriptEnabled,
+      }),
+      ...(data.liveCaptionsEnabled !== undefined && {
+        liveCaptionsEnabled: data.liveCaptionsEnabled,
+      }),
       ...(data.whiteboardEnabled !== undefined && {
         whiteboardEnabled: data.whiteboardEnabled,
       }),
@@ -507,33 +560,46 @@ export const PUT = withErrorHandling(async (request, context) => {
     nextStatus !== event.status &&
     (event.status === 'LIVE' ||
       (!isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED')));
-  const updated = closesSessions
-    ? await prisma.$transaction(async (tx) => {
-        const aggiornato = await tx.event.update(updateArgs);
-        await closeOpenSessions(tx, [eventId], new Date());
-        return aggiornato;
-      })
-    : await prisma.event.update(updateArgs);
+  // Concluso o archiviato da uno stato non terminale: i sondaggi rimasti
+  // aperti si chiudono nella stessa transazione (lib/events/close-polls).
+  const closesPolls =
+    nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
+  const updated =
+    closesSessions || closesPolls || tagIds !== null
+      ? await prisma.$transaction(async (tx) => {
+          const aggiornato = await tx.event.update(updateArgs);
+          if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
+          if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
+          if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
+          return aggiornato;
+        })
+      : await prisma.event.update(updateArgs);
 
   if (dateChanged && event.status === 'PUBLISHED') {
     // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
     sendDateChangeNotifications({ eventId });
   }
 
-  // Il link personale del moderatore principale: alla pubblicazione, o quando
-  // cambia l'indirizzo. Una volta sola per indirizzo (vedi moderator-link):
-  // ripubblicare o risalvare dal wizard non rispedisce.
+  // I link personali: alla pubblicazione (o all'uscita dalla bozza) partono
+  // quello del moderatore principale e quelli delle concessioni create in
+  // bozza; un indirizzo del principale cambiato riceve il suo. Una volta sola
+  // per indirizzo e per concessione (vedi moderator-link): ripubblicare o
+  // risalvare dal wizard non rispedisce, e una bozza non spedisce niente.
   const moderatorEmailChanged =
     data.moderatorEmail !== undefined &&
     (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
-  if (
+  const pubblicato =
     (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
-    moderatorEmailChanged
-  ) {
+    (event.status === 'DRAFT' && updated.status !== 'DRAFT');
+  // Un salvataggio completo dal wizard (porta il titolo) di un evento non in
+  // bozza ritenta i link delle concessioni che non erano andati in coda: e'
+  // una lettura della coda, e non rispedisce quelli partiti.
+  const salvataggioCompleto = data.title !== undefined && updated.status !== 'DRAFT';
+  if (pubblicato || moderatorEmailChanged || salvataggioCompleto) {
     const { defaultLocale: predefinita } = await getSettings();
-    await sendPrimaryModeratorLink(eventId, {
-      locale: adminRequestLocale(request, predefinita),
-    });
+    const locale = adminRequestLocale(request, predefinita);
+    if (pubblicato || moderatorEmailChanged) await sendPrimaryModeratorLink(eventId, { locale });
+    if (pubblicato || salvataggioCompleto) await sendGrantModeratorLinks(eventId, { locale });
   }
 
   // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il
@@ -544,21 +610,64 @@ export const PUT = withErrorHandling(async (request, context) => {
     publishEventStatus(eventId, updated.status);
   }
 
+  // Cronologia della sala: le funzioni accese o spente (solo quelle cambiate
+  // davvero, per la stessa ragione dell'avviso qui sopra) e la fine
+  // dell'evento decisa da chi conduce.
+  await recordLiveActions(
+    LIVE_FLAG_FIELDS.filter((campo) => event[campo] !== updated[campo]).map((campo) => ({
+      eventId,
+      kind: 'feature.toggled' as const,
+      actor: 'moderator' as const,
+      data: { feature: campo, enabled: updated[campo] },
+    })),
+  );
+  if (updated.status === 'ENDED' && event.status !== 'ENDED') {
+    await recordLiveAction({ eventId, kind: 'event.ended', actor: 'moderator' });
+  }
+
   await logAdminAction({
     request,
     action: 'EVENT_UPDATE',
     target: eventId,
-    details: { fields: Object.keys(data), dateChanged },
+    details: {
+      fields: Object.keys(data),
+      dateChanged,
+      ...(nuoveEtichette !== null && { tags: nuoveEtichette.map((tag) => tag.slug) }),
+    },
   });
 
   return Response.json({
     ...updated,
+    // BigInt: JSON.stringify non lo sa scrivere, e un evento registrato con
+    // Jibri ne ha uno. Esce come numero, come nella GET dello stesso evento.
+    recordingFileSize:
+      updated.recordingFileSize === null ? null : Number(updated.recordingFileSize),
     dateChanged,
     ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
   });
 });
 
+/**
+ * Un campo che decide lo staff che gestisce l'evento, non chi ha un link di
+ * conduzione (condiviso, inoltrato o di un co-moderatore): senza quella
+ * sessione 403. Altri errori (la banca dati) restano quello che sono.
+ */
+async function soloStaffDellEvento(eventId: string, messaggio: string): Promise<void> {
+  try {
+    await requireEventManager(await cookies(), eventId);
+  } catch (err) {
+    if (err instanceof UnauthorizedError || err instanceof ForbiddenError) {
+      throw new ForbiddenError(messaggio);
+    }
+    throw err;
+  }
+}
+
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
+
+/** Quanto puo' durare un'eliminazione: i file nello storage si cancellano uno a
+ *  uno, a riga bloccata. */
+const DELETE_TIMEOUT_MS = 60_000;
 
 export const DELETE = withErrorHandling(async (request, context) => {
   const { param: eventId } = await context.params;
@@ -572,12 +681,28 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   const event = await verifyModeratorToken(eventId, token);
   if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
-
-  // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
-  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
-  // blob cancellare. Se lo storage non risponde l'evento resta (503).
-  await removeFilesOfEventsBeingDeleted({ id: eventId });
-  await prisma.event.delete({ where: { id: eventId } });
+  // Un evento in diretta ha persone in sala: prima si termina, poi si elimina.
+  // La riga resta bloccata finche' file e riga se ne vanno: un cambio di stato
+  // nel frattempo (la sala che parte) aspetta, e la decisione presa qui vale
+  // per tutta l'operazione. FOR NO KEY UPDATE blocca gli UPDATE dell'evento
+  // ma non le scritture sulle righe figlie.
+  await prisma.$transaction(
+    async (tx) => {
+      const [riga] = await tx.$queryRaw<Array<{ status: string }>>`
+        SELECT status::text AS status FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
+      // Gia' eliminato da un'altra richiesta (un doppio clic).
+      if (!riga) throw new NotFoundError('Event');
+      if (riga.status === 'LIVE') {
+        throw new AppError('A live event cannot be deleted: end it first', 409, 'EVENT_LIVE');
+      }
+      // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
+      // prima: la cascata porta via le righe, e dopo nessuno saprebbe più
+      // quali blob cancellare. Se lo storage non risponde l'evento resta (503).
+      await removeFilesOfEventsBeingDeleted({ id: eventId });
+      await tx.event.delete({ where: { id: eventId } });
+    },
+    { timeout: DELETE_TIMEOUT_MS },
+  );
 
   await logAdminAction({
     request,

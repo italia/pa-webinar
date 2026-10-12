@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
@@ -60,6 +61,10 @@ class ProviderHints(BaseModel):
     # Numero di speaker attesi (dall'Event.expectedSpeakers). Quando
     # valorizzato, il worker forza k nel clustering della diarization.
     expectedSpeakers: Optional[int] = None
+    # Il glossario dell'evento e dell'istanza (app: lib/ai/glossary.ts):
+    # voci {term, aliases, reading, spoken, translations, note}, lette da
+    # glossary.parse.
+    glossary: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class ClaimResponse(BaseModel):
@@ -67,7 +72,8 @@ class ClaimResponse(BaseModel):
 
     claimed: bool = True
     jobId: str
-    recordingId: str
+    # Nullo per il resoconto dell'evento (REPORT), che non ha registrazione.
+    recordingId: Optional[str] = None
     kind: str
     payload: Dict[str, Any]
     attempts: int
@@ -80,11 +86,28 @@ class ClaimResponse(BaseModel):
     # pre-mapping (fallback al label).
     speakerNames: Dict[str, str] = Field(default_factory=dict)
     providerHints: ProviderHints
+    # Lavoro REPORT: gli ingressi del resoconto raccolti dal portale al claim.
+    reportInput: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
 # Client
 # ---------------------------------------------------------------------------
+
+
+def worker_kinds() -> List[str]:
+    """I tipi di job che questo worker esegue, da AI_WORKER_KINDS."""
+    raw = os.environ.get("AI_WORKER_KINDS", "")
+    return [k.strip().upper() for k in raw.split(",") if k.strip()]
+
+
+# I job che hanno bisogno del worker con la GPU (app: lib/ai/job-classes).
+GPU_WORKER_KINDS = frozenset({"TRANSCRIBE", "TRANSCRIBE_MULTITRACK", "DUB"})
+
+
+def cpu_kinds_ok(kinds: List[str]) -> bool:
+    """Un elenco adatto al worker senza GPU: non vuoto, senza job della GPU."""
+    return bool(kinds) and not GPU_WORKER_KINDS.intersection(kinds)
 
 
 class AppClient:
@@ -129,14 +152,20 @@ class AppClient:
     # ------------------------------------------------------------------
 
     def claim(self, lease_minutes: int = 30) -> Optional[ClaimResponse]:
-        """Try to claim a job. Returns None when nothing runnable."""
-        r = self._client.post(
-            "/api/internal/postprod-claim",
-            json={
-                "workerId": self.worker_id,
-                "leaseMinutes": lease_minutes,
-            },
-        )
+        """Try to claim a job. Returns None when nothing runnable.
+
+        Con AI_WORKER_KINDS (tipi separati da virgola) il worker prende solo
+        quei job: il worker senza GPU non prende una trascrizione, quello con
+        la GPU lascia agli altri sintesi e traduzioni. Assente: tutti.
+        """
+        body: Dict[str, Any] = {
+            "workerId": self.worker_id,
+            "leaseMinutes": lease_minutes,
+        }
+        kinds = worker_kinds()
+        if kinds:
+            body["kinds"] = kinds
+        r = self._client.post("/api/internal/postprod-claim", json=body)
         if r.status_code == 204:
             return None
         r.raise_for_status()
@@ -150,8 +179,14 @@ class AppClient:
         percent: Optional[float] = None,
         message: Optional[str] = None,
         error: Optional[str] = None,
-    ) -> None:
-        payload: Dict[str, Any] = {"jobId": job_id, "status": status}
+        attempt: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """La risposta del portale: lo stato del lavoro dopo l'aggiornamento e,
+        per il resoconto, se un claim successivo l'ha ripreso (``superseded``).
+        ``attempt`` e' il numero del claim (``attempts`` della risposta)."""
+        payload: Dict[str, Any] = {"jobId": job_id, "status": status, "workerId": self.worker_id}
+        if attempt is not None:
+            payload["attempt"] = attempt
         if percent is not None:
             payload["percent"] = percent
         if message is not None:
@@ -160,6 +195,11 @@ class AppClient:
             payload["error"] = error
         r = self._client.post("/api/internal/postprod-progress", json=payload)
         r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
 
     def register_artifact(
         self,
@@ -199,6 +239,34 @@ class AppClient:
         r = self._client.post("/api/internal/postprod-artifact", json=payload)
         r.raise_for_status()
 
+    def deliver_report(
+        self,
+        *,
+        job_id: str,
+        narratives: Dict[str, Dict[str, Any]],
+        model_id: Optional[str],
+        model_version: Optional[str] = None,
+        attempt: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Consegna il resoconto dell'evento (lavoro REPORT): il testo per lingua.
+        La risposta dice se lo aveva gia' consegnato un altro tentativo
+        (``alreadyDelivered``) o se il lease e' passato a un altro worker
+        (``superseded``) o se il lavoro e' gia' fallito (``closed``)."""
+        payload: Dict[str, Any] = {"jobId": job_id, "narratives": narratives}
+        if attempt is not None:
+            payload["attempt"] = attempt
+        if model_id is not None:
+            payload["modelId"] = model_id
+        if model_version is not None:
+            payload["modelVersion"] = model_version
+        r = self._client.post("/api/internal/event-report", json=payload)
+        r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
+
 
 # ---------------------------------------------------------------------------
 # Storage IO via presigned URLs
@@ -237,7 +305,8 @@ def _put_headers(url: str, content_type: str) -> Dict[str, str]:
     the extra header), so we only add it for Azure blob endpoints.
     """
     headers = {"content-type": content_type}
-    if "blob.core.windows.net" in url:
+    # Si guarda l'host, non una sottostringa dell'indirizzo intero.
+    if (urlparse(url).hostname or "").endswith(".blob.core.windows.net"):
         headers["x-ms-blob-type"] = "BlockBlob"
     return headers
 

@@ -173,7 +173,7 @@ export default function EventLinksSection({ righe }: { righe: Riga[] }) {
             )}
 
             <div
-              className="mt-2 px-2 py-1 rounded text-truncate"
+              className="mt-2 px-2 py-1 rounded text-truncate position-relative"
               style={{
                 background: '#F1F3F7',
                 fontFamily: 'Roboto Mono, monospace',

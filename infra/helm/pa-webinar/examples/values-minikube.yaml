@@ -150,3 +150,13 @@ ingress:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   # Vedi sopra: i Secret TLS li indica lo script nei valori della macchina.
   tls: []
+
+# Sottotitoli live spenti. Il motore chiede da solo un'intera CPU e 1,5 GiB,
+# che un nodo di valutazione da 2 CPU e 3 GB non ha accanto alla conferenza;
+# lo script non ne costruisce le immagini quando le carica nel nodo, e il
+# modello (circa 750 MB) si scaricherebbe da Internet a ogni avvio del pod.
+# Per provarli su una macchina più grande: global.captions.enabled: true, con
+# le immagini captions-gateway e captions-engine prelevabili dal nodo.
+global:
+  captions:
+    enabled: false

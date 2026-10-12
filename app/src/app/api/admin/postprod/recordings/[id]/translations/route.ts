@@ -25,7 +25,7 @@ import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueueTranslateLanguage } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,8 +116,10 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { aiPipelineEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
-    throw new ValidationError(
+    throw new AppError(
       'AI pipeline is currently disabled (SiteSetting.aiPipelineEnabled=false). Enable it in admin settings before adding a translation.',
+      422,
+      'AI_PIPELINE_DISABLED',
     );
   }
 
@@ -130,8 +132,10 @@ export const POST = withErrorHandling(async (request, context) => {
 
     const sourceLanguage = recording.sourceLanguage ?? 'it';
     if (targetLanguage === sourceLanguage) {
-      throw new ValidationError(
+      throw new AppError(
         'La lingua di destinazione coincide con la lingua sorgente.',
+        422,
+        'SAME_LANGUAGE',
       );
     }
 
@@ -141,8 +145,10 @@ export const POST = withErrorHandling(async (request, context) => {
       select: { id: true },
     });
     if (!transcript) {
-      throw new ValidationError(
+      throw new AppError(
         'Trascrivi prima questa registrazione: manca il transcript sorgente.',
+        422,
+        'SOURCE_TRANSCRIPT_MISSING',
       );
     }
 

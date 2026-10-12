@@ -17,6 +17,7 @@ function ev(over: Partial<ParticipantEntryEvent> = {}): ParticipantEntryEvent {
     slug: 'evento',
     status: 'PUBLISHED',
     eventType: 'SCHEDULED',
+    accessMode: null,
     endsAt: FUTURE,
     postEventPublic: false,
     postEventPublicUntil: null,
@@ -114,10 +115,15 @@ describe('participantEntry — chiamata rapida', () => {
 describe('shareLink e callInviteOpen', () => {
   const INVITE = { kind: 'invite', path: '/events/evento/live' };
 
-  it('evento a calendario: sempre la pagina pubblica, bozza e concluso compresi', () => {
-    for (const status of ['DRAFT', 'PUBLISHED', 'LIVE', 'IDLE', 'ENDED', 'ARCHIVED']) {
+  it('evento a calendario: la pagina pubblica quando esiste, nessun link quando risponderebbe «non trovato»', () => {
+    for (const status of ['PUBLISHED', 'LIVE', 'IDLE']) {
       expect(shareLink(ev({ status }), NOW)).toEqual(PAGE);
       expect(callInviteOpen(ev({ status }), NOW)).toBe(false);
+    }
+    expect(shareLink(ev({ status: 'ENDED', postEventPublic: true }), NOW)).toEqual(PAGE);
+    expect(shareLink(ev({ status: 'ENDED', postEventPublic: false }), NOW)).toBeNull();
+    for (const status of ['DRAFT', 'ARCHIVED']) {
+      expect(shareLink(ev({ status }), NOW)).toBeNull();
     }
   });
 

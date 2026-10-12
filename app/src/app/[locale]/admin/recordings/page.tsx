@@ -5,8 +5,14 @@ import { eventScope } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingsDashboard from '@/components/admin/recordings-dashboard';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/recordings');
+}
 
 export default async function RecordingsPage() {
   const locale = await getLocale();
@@ -32,12 +38,7 @@ export default async function RecordingsPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/recordings')} subtitle={t('subtitle')} />
       <RecordingsDashboard
         events={eventOptions}
         locale={locale}

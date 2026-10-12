@@ -9,6 +9,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * promemoria gia' scattati («inizia domani» a 18 minuti dall'inizio).
  * DB ed effetti collaterali sono stub; la scelta (reminder-plan) gira davvero.
  */
+vi.mock('@/lib/captions/transcript', () => ({
+  costruisciTrascrizioniMancanti: vi.fn(async () => 0),
+}));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
     eventReminder: { findMany: vi.fn() },
@@ -35,6 +39,10 @@ vi.mock('@/lib/events/post-event-finalize', () => ({
     emailsSent: 0,
     emailsFailed: 0,
   })),
+}));
+// L'avviso di registrazione pubblicata ha i suoi test (lib/events/recording-notify).
+vi.mock('@/lib/events/recording-notify', () => ({
+  notifyPublishedRecordings: vi.fn(async () => ({ eventsNotified: 0, emailsQueued: 0, emailsFailed: 0 })),
 }));
 
 import { prisma } from '@/lib/db';

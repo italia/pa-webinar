@@ -147,30 +147,18 @@ await fetch('/api/admin/settings', {
 });
 ```
 
-The same pattern writes `footerLinks` as the array the schema expects, which repairs the
-[footer-links limitation](#known-limitations). For example, with your own titles and paths:
-
-```js
-await fetch('/api/admin/settings', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    footerLinks: [
-      { title: 'Privacy', url: '/privacy', section: 'legal' },
-      { title: 'Accessibility', url: '/accessibility', section: 'legal' },
-    ],
-  }),
-});
-```
-
-A `422` response lists the fields that failed validation. The change is audited like a save from the
+A `422` response lists the fields that failed validation, each with its path, the check that failed
+(`code`, plus `validation`, `type`, `minimum` or `maximum` when they apply). `footerLinks` is an
+array; a JSON string holding an array, as older installations stored it, is accepted and saved as an
+array. Web addresses without a scheme get `https://`. The change is audited like a save from the
 panel.
 
 ## Where each setting is edited
 
-**Site settings** is organized in tabs. The settings landing also links **Language management**,
-**GDPR templates**, **Email templates** and **Tag management**; only the first of these writes to the
-`SiteSetting` row, while the others manage their own tables (`GdprTemplate`, `EmailTemplate`, `Tag`).
+**Site settings** (**Settings → General settings**) is organized in tabs. The **Settings** section
+also holds **Languages**, **Privacy notices**, **Email templates** and **Tags**; only the first of these
+writes to the `SiteSetting` row, while the others manage their own tables (`GdprTemplate`,
+`EmailTemplate`, `Tag`).
 
 | Where | What it holds | Owner page |
 |---|---|---|
@@ -180,10 +168,10 @@ panel.
 | **Home page** tab | Home layout (`homePageMode`), the project section (`homeShowProject`), custom HTML (`customHomeHtml`) | [Branding](branding.md#home-page) |
 | **Pages** tab | **Privacy policy** (the privacy notice) and **Accessibility statement** text per language (`privacyPolicy`, `accessibility`) | [Branding](branding.md#header-footer-and-legal-pages), [privacy and data protection](../GDPR.md) |
 | **Footer** tab | Footer links (`footerLinks`) | [Branding](branding.md#header-footer-and-legal-pages) |
-| **Features** tab | Public switches, contact links, Gravatar, email sender, bridge timing, stress thresholds, waiting-room routing window, reactions mode, status-page polling | This page |
+| **Features** tab | Public switches, contact links, Gravatar, live captions, email sender, bridge timing, stress thresholds, waiting-room routing window, reactions mode, status-page polling | This page |
 | **Infra sizing** tab | Bridge sizing, default sender ratio, default grace period, default video quality | This page and [scaling](../architecture/scaling.md) |
 | **Post-event AI pipeline** tab | Kill switch, engines, default translation languages, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
-| **Language management** page (`/en/admin/settings/languages`) | `defaultLocale`, `availableLocales`, `localeNames`, `translationOverrides` | [Languages and localization](../architecture/i18n.md#runtime-language-settings) |
+| **Languages** page (`/en/admin/settings/languages`) | `defaultLocale`, `availableLocales`, `localeNames`, `translationOverrides` | [Languages and localization](../architecture/i18n.md#runtime-language-settings) |
 | No field in the panel | `orphanRecordingGraceDays` | Set it through `PUT /api/admin/settings` ([writing a field the panel does not show](#writing-a-field-the-panel-does-not-show)), or on a chart installation with `scripts/restore.sh --reset-orphan-grace <days>` ([Restore a backup](../operations/upgrades.md#restore-a-backup)) |
 
 ## Setting groups
@@ -214,25 +202,26 @@ Defaults are those of `app/prisma/schema.prisma`.
 
 | Setting | Label and tab | Default | Effect |
 |---|---|---|---|
-| `calendarPublic` | **Public calendar**, **Features** | `false` | When off, the public calendar page answers 404 and the public calendar feed (`/api/events/calendar`) returns an empty list. The staff calendar is unaffected |
+| `calendarPublic` | **Public calendar**, **Features** | `false` | When on, **Calendar** appears in the header and in the footer. When off, those links disappear, the public calendar page answers 404 and the public calendar feed (`/api/events/calendar`) returns an empty list. The staff calendar is unaffected |
 | `statusPageEnabled` | **Status page enabled**, **Features** | `true` | When off, `/status` answers 404 and is not indexed, the **System status** footer link disappears, and `/api/status/infrastructure`, `/api/status/metrics` and `/api/status/postprod` answer 404 to anyone but an administrator. `/api/status` still answers, because the live room polls it for bridge readiness, but only with the bridge and recorder readiness fields. Administrators keep the full view in the administration area, and the answers they get cannot be cached: `/api/status/metrics` and `/api/status/postprod` send them `Cache-Control: private, no-store`, and `/api/status/infrastructure` always sends `no-store`, so no shared cache serves them to anyone else. See [status endpoints and pages](../operations/monitoring.md#status-endpoints-and-pages) |
 | `parseTitleKicker` | **Editorial title kicker**, **Features** | `false` | Shows the part of a title before `\|` as a small label above it. An event can override it ([branding](branding.md#editorial-title-kicker)) |
 | `gravatarEnabled` | **Use Gravatar when available**, **Features** | `false` | Lets the platform fetch a registrant's Gravatar through its own proxy, so browsers never contact the Gravatar service. Declare it in the privacy notice ([avatars](../architecture/identity-and-access.md#avatars)) |
+| `liveCaptionsEnabled` | **Automatic captions in video calls**, **Features** | `true` | Live captions in every event's room, where the captions service is installed. Off, no event starts them and the scaler keeps the service at zero; on, the service runs while any event is live. Each event can turn them off in the event wizard or during the event, and can keep a transcript built from them (`Event.captionsTranscriptEnabled`), which needs this setting on ([Live captions](../architecture/live-captions.md)) |
 | `reactionsMode` | **Reactions (emoji)**, **Features** | `NATIVE` | `NATIVE` is **Jitsi native (in the toolbar, ephemeral)**; `CUSTOM` is **App custom (left-hand bar, with stats)**. See [reactions](../architecture/live-interaction.md#reactions) |
 | `waitingRoomEngine` | **Waiting room (site default)**, **Branding** | `GARDEN` | The site's default waiting-room engine. `GAME` (**Videogame (Phaser lobby)**) offers the square; `CLASSIC` (**Classic (static)**) starts in the classic view. `GARDEN`, the schema default, is a legacy value that behaves as `GAME`, and the selector shows it as the videogame option. See [engines](../architecture/waiting-room.md#engines-classic-view-and-the-square) |
 | `videoQuality` | **Default quality**, **Infra sizing** | `HIGH` | The default video and audio preset: `SAVE_DATA` (360p), `BALANCED` (540p), `HIGH` (720p) or `MAX` (1080p). Phones are capped at 360p whatever the preset. See [video quality presets](../architecture/jitsi-integration.md#video-quality-presets) |
 | `waitingRoomLeadMinutes` | **Waiting-room routing window (minutes)**, **Features** | `15` | A registration made within this many minutes of the start goes straight to the waiting room. An earlier one gets a confirmation with a calendar link. `0` always shows the confirmation. Accepts 0 to 1440. The value also bounds how early a visitor can wake a room (see [event lifecycle and bridge timing](#event-lifecycle-and-bridge-timing)) |
 | `githubUrl` | **GitHub repository URL**, **Features** | none | The source-code links in the footer, the security and release-notes pages, and the release SBOM viewer. It must have the form `https://github.com/<owner>/<repo>` for the release links to work |
 | `supportEmail` | **Support email**, **Features** | none | The contact address shown in the footer |
-| `guestAccessEnabled` | **Guest access enabled**, **Features** | `true` | When off, visitors without a token cannot join scheduled events: the live page sends them to registration (skipping the join-password step), the Jitsi token endpoint refuses guest tokens with `403` `GUEST_ACCESS_DISABLED`, the chat refuses tokenless readers and writers, and Q&A and polls refuse them too. The administration's **Direct invite (no registration)** link and the room's **Link to join** are hidden for scheduled events. Instant calls stay open to anyone with the link. Registrants and moderator or speaker links are unaffected. See [guests](../architecture/identity-and-access.md#guests) |
-| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
+| `guestAccessEnabled` | **Guest access enabled**, **Features** | `true` | When off, visitors without a token cannot join scheduled events: the live page sends them to registration (skipping the join-password step), the Jitsi token endpoint refuses guest tokens with `403` `GUEST_ACCESS_DISABLED`, the chat refuses tokenless readers and writers, and Q&A and polls refuse them too. The administration's **Direct invite (no registration)** link and the room's **Link to join** are hidden for scheduled events. Instant calls stay open to anyone with the link. Registrants and moderator or speaker links are unaffected. An event open only to invitees (`Event.accessMode` `INVITATION`) never admits guests, whatever this setting; one open to anyone (`OPEN`) follows it. See [guests](../architecture/identity-and-access.md#guests) |
+| `publicRegistrationEnabled` | **Public registration enabled**, **Features** | `true` | The default for events that make no choice of their own (`Event.accessMode` `NULL`); an event's **Who registers** choice overrides it, and the new-event question **Who can take part?** proposes the answer that matches it. When off, only addresses on the event's invitation list (`EventInvitation`) can register. `POST /api/events/{slug}/registrations` then answers `202` with the same body for every address, with no token, link or cookie: an invited address is registered, an already registered address gets its link again, and any other address gets nothing. The personal link arrives only by email. The event's choice, or this setting, is read when each email is built, and a link already sent keeps the behavior it was sent with ([Registrants](../architecture/identity-and-access.md#registrants)). An event with no invitations accepts no new registrations, and its registration page offers only the link resend. Existing registrations, moderator and speaker links, and staff paths are unaffected. For a closed meeting, set the event to **Only people you invite**, which also keeps guests out, or also turn off **Guest access enabled**. See [invitation-only registration](../architecture/event-journey.md#invitation-only-registration) |
 
 The whiteboard has no switch in the site settings. It is an opt-in on each event, and it also needs
 a whiteboard backend on the Jitsi side. The portal shows its **Whiteboard** button and the reminder
 to export the whiteboard only when the app environment sets `NEXT_PUBLIC_WHITEBOARD_ENABLED=true`
 for the whole installation. The live room reads that variable at request time, so a change needs a
 pod restart, not a new image. The same value drives the administration forms: when it is not `true`,
-the whiteboard switch of the event wizard (step 2) and of the event-template form cannot be switched
+the whiteboard switch of the event wizard (advanced settings, **Participation and room features**) and of the event-template form cannot be switched
 on and says why, while a value already on can still be switched off. The chart installs no whiteboard
 server: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that
 combination with the variable has not been tested (see the
@@ -258,9 +247,11 @@ by the lifecycle cron that replaces it everywhere else, Docker Compose included
 ([running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
 Without a scaler:
 
-- `eventGracePeriodMinutes` ends `LIVE` rooms at `endsAt` plus grace, and drives the overtime banner;
-- `jvbInactiveGraceMinutes` ends open-ended rooms past `endsAt`, and instant calls, after that long
-  without activity; there is no `IDLE`;
+- `eventGracePeriodMinutes` ends occupied `LIVE` rooms at `endsAt` plus that limit, and drives the
+  close time shown in the moderators' time strip;
+- `eventOvertimeEmptyMinutes` ends rooms past `endsAt` that have been empty that long, when the
+  silence is reliable;
+- `jvbInactiveGraceMinutes` ends abandoned instant calls before their `endsAt`; there is no `IDLE`;
 - `jvbEmptyCloseMinutes` applies only while `JVB_HEALTH_URL` answers;
 - `jvbPreScaleMinutes` bounds nothing, because `/wake` leaves a `PUBLISHED` event unchanged;
 - `jvbProvisioningTimeoutMinutes` marks no bridge as stale; it still applies to Jibri.
@@ -272,10 +263,11 @@ in [event lifecycle](../architecture/event-lifecycle.md#lifecycle-settings).
 | Setting | Label and tab | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `jvbPreScaleMinutes` | **Pre-scale lead time (minutes)**, **Features** | `15` | 1 to 60 | How long before `startsAt` the scaler starts the bridge ([pre-scale window](../architecture/event-lifecycle.md#pre-scale-window)); the larger of this and `waitingRoomLeadMinutes` bounds how early a visitor can [wake](../architecture/event-lifecycle.md#wake) a room |
-| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`, and before an open-ended room past `endsAt` is ended; without the scaler, also before an abandoned instant call is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
-| `eventGracePeriodMinutes` | **Default grace minutes past endsAt**, **Infra sizing** | `15` | -1 to 240 | Overtime after `endsAt`, where `-1` never ends the room on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
+| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`; without the scaler, before an abandoned instant call is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
+| `eventGracePeriodMinutes` | **Overtime limit while people are in the room (minutes)**, **Infra sizing** | `60` | -1 to 240 | Longest a room still occupied stays open after `endsAt`, where `-1` never ends it on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
+| `eventOvertimeEmptyMinutes` | **Close an empty room after the end (minutes)**, **Infra sizing** | `20` | 5 to 240 | Empty time after which a room past `endsAt` is ended, when the bridge count is reliable ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
 | `jvbEmptyCloseMinutes` | **Empty-room minutes before definitive close**, **Features** | `-1` (off) | -1 to 240 | Opt-in: empty time after which a room that had participants is ended before `endsAt` ([opt-in empty close](../architecture/event-lifecycle.md#opt-in-empty-close)) |
-| `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([moderator control bar](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
+| `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([Control panel](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
 | `statusPollIntervalSeconds` | **Status page poll interval (seconds)**, **Features** | `30` | 5 to 600 | How often the public status page refreshes in the browser |
 | `orphanRecordingGraceDays` | Not in the panel ([set it through the API](#writing-a-field-the-panel-does-not-show)) | `30` | 0 to 365 | Days an unreferenced blob in recording storage waits before the `recordings-reconcile` CronJob deletes it. The job exists only in the chart. `0` turns automatic deletion off; blobs an administrator marks for immediate deletion are still removed ([recordings-reconcile](../architecture/background-jobs.md#recordings-reconcile)) |
 
@@ -329,7 +321,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | Setting | Label | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `aiPipelineEnabled` | **Post-event pipeline active** | `false` | on or off | The kill switch for the whole pipeline (see below) |
-| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr` | text up to 200 characters, read as comma-separated language codes; invalid entries are ignored when jobs are queued | The translation targets of an event that sets none. The recording's source language is always dropped from the list |
+| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | Ticked in the event wizard when translation is turned on, and the translation targets of an event that sets none. The recording's source language is always dropped from the list |
 | `aiAsrProvider` | **Transcription engine** | `whisperx` | `whisperx` only | The transcription engine the worker is told to use |
 | `aiLlmProvider` | **Summary and translation engine** | `vllm` | `vllm` only | The language-model engine, served in the cluster |
 | `aiTtsEngine` | **Dubbing engine** | `piper` | `piper` only | The engine for synthetic dubbing voices |
@@ -363,12 +355,13 @@ included, so a copy keeps inheriting.
 
 | Event column | Falls back to | Values | Where it is set | Pre-filled by a template |
 |---|---|---|---|---|
-| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, **Basics**: **Estimated active share** | No |
+| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **Estimated active share** | No |
+| `accessMode` | `publicRegistrationEnabled`. Guest entry follows `guestAccessEnabled` either way, except that `INVITATION` admits no guests | `null`, `OPEN` or `INVITATION` | New-event question **Who can take part?**; wizard, **People**: **Who registers**, where an event left on `null` keeps following the site until a choice is made | No; the new-event questions set it |
 | `gracePeriodMinutes` | `eventGracePeriodMinutes` | `null` or -1 to 240 | Events API only; the wizard has no field. Instant calls are created with `-1` | No |
-| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Basics**: **Use kicker in title (\| separator)** | No |
-| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, **Basics**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
-| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, **Basics**: **Video/audio quality (this event)** | No |
-| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Permissions** | Yes |
+| `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |
+| `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, advanced settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
+| `videoQuality` | `videoQuality` | `null` or a preset | Wizard, advanced settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
+| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Summary** (**Change languages**) or advanced settings, **Recording and AI** | Yes |
 
 Some event settings have no site-wide counterpart and exist only on the event. They default to off or
 empty in `app/prisma/schema.prisma`:
@@ -382,7 +375,12 @@ empty in `app/prisma/schema.prisma`:
 - live features such as `whiteboardEnabled`, which a template can pre-fill; the wizard and the template
   form offer the whiteboard only when the installation declares the whiteboard service
   (`NEXT_PUBLIC_WHITEBOARD_ENABLED`);
-- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in **Basics**),
+- the transcript from captions, `captionsTranscriptEnabled`, offered in the wizard under **Automatic
+  captions** where captions are available, and its publication on the event page, `transcriptPublished`,
+  set after the event. The transcript takes effect only while captions are on for the event and in this
+  site's `liveCaptionsEnabled`. A template cannot set it; the new-event questions turn it on for events
+  that can be recorded ([Live captions](../architecture/live-captions.md#transcript-from-captions));
+- the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in the wizard's advanced settings, **Waiting room and video**),
   offered only while the event is `PUBLISHED` (see
   [waiting-room music](../architecture/waiting-room.md#waiting-room-music)). There is no site-wide
   default track, and a template cannot set one.
@@ -456,12 +454,6 @@ How each value resolves:
 ## Known limitations
 
 - **`jibriCpuCoresPerPod` has no effect.** It is shown in **Infra sizing** but nothing reads it.
-- **Footer links break the save.** The **Footer** tab sends the links in a form that the settings API
-  rejects, so a save that includes edited footer links fails as a whole (see
-  [branding known limitations](branding.md#known-limitations)). The Docker Compose seed stores the
-  links in the same rejected form, so on a seeded installation every save of **Site settings** fails
-  until `footerLinks` is written as an array through the API, as shown in
-  [writing a field the panel does not show](#writing-a-field-the-panel-does-not-show).
 - **Some help texts in the panel are out of date.** The help for **Empty-room minutes before
   definitive close** gives a default of 15 (the real default is `-1`, off). **Pre-scale lead time
   (minutes)** recommends 10 (the default is 15). **Artifact retention (days)** suggests that a positive

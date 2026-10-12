@@ -18,11 +18,21 @@
  * (shared subscriber connection on the pod) — see lib/chat/pubsub.
  * When the client aborts (tab close, nav away) we detect it via the
  * AbortSignal and unsubscribe to prevent listener leaks.
+ *
+ * Lo stesso stream consegna l'indicatore «sta scrivendo» come
+ * `event: typing` con `data: {"senderKey","senderName"}` e senza `id:`, letto
+ * da un canale Redis a parte (lib/chat/typing-pubsub). Mai come
+ * `event: message`: un client della versione precedente aggiunge alla lista
+ * ogni `message` che riceve, e un evento con un altro nome non lo vede
+ * nemmeno. Senza `id:` l'avviso non sposta il punto di ripresa
+ * (`Last-Event-ID`) dello stream dei messaggi.
  */
 
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { authorizeChatRead } from '@/lib/chat/read-access';
 import { subscribeChat, type ChatEnvelope } from '@/lib/chat/pubsub';
+import type { TypingPayload } from '@/lib/chat/typing';
+import { subscribeTyping } from '@/lib/chat/typing-pubsub';
 import { errorResponse } from '@/lib/errors';
 import { chatSseConnectionsGauge } from '@/lib/metrics';
 
@@ -62,6 +72,7 @@ export async function GET(
 
   const encoder = new TextEncoder();
   let cleanup: (() => void) | null = null;
+  let cleanupTyping: (() => void) | null = null;
   let keepalive: ReturnType<typeof setInterval> | null = null;
 
   const stream = new ReadableStream({
@@ -73,6 +84,17 @@ export async function GET(
         const payload = `id: ${envelope.id}\n` +
           `event: message\n` +
           `data: ${JSON.stringify(envelope)}\n\n`;
+        try {
+          controller.enqueue(encoder.encode(payload));
+        } catch {
+          // Controller already closed (client gone). Ignore.
+        }
+      };
+
+      // Un evento con nome proprio e senza `id:` (vedi l'intestazione).
+      const sendTyping = (typing: TypingPayload) => {
+        const payload = `event: typing\n` +
+          `data: ${JSON.stringify({ senderKey: typing.senderKey, senderName: typing.senderName })}\n\n`;
         try {
           controller.enqueue(encoder.encode(payload));
         } catch {
@@ -94,7 +116,24 @@ export async function GET(
         } catch { /* stream closed */ }
       }, KEEPALIVE_MS);
 
-      cleanup = await subscribeChat(eventId, send);
+      // L'indicatore non trattiene lo stream: la sua iscrizione corre a parte
+      // e, se non riesce, la chat funziona senza.
+      void subscribeTyping(eventId, sendTyping).then(
+        (staccaTyping) => {
+          // Il client se n'e' andato mentre ci si iscriveva: si stacca subito.
+          if (closedOnce) staccaTyping();
+          else cleanupTyping = staccaTyping;
+        },
+        () => {
+          // subscribeTyping non solleva; se accadesse, resta solo la chat.
+        },
+      );
+
+      const staccaChat = await subscribeChat(eventId, send);
+      // Stesso caso per la chat: closed() e' gia' girato e non ha trovato
+      // niente da staccare, quindi lo si fa qui.
+      if (closedOnce) staccaChat();
+      else cleanup = staccaChat;
       chatSseConnectionsGauge.inc({ event_id: eventId });
     },
     cancel() {
@@ -111,6 +150,7 @@ export async function GET(
     if (closedOnce) return;
     closedOnce = true;
     if (cleanup) cleanup();
+    if (cleanupTyping) cleanupTyping();
     if (keepalive) clearInterval(keepalive);
     chatSseConnectionsGauge.dec({ event_id: eventId });
   }

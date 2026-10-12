@@ -177,3 +177,16 @@ jitsi-meet:
     #     operator: Equal
     #     value: jitsi-jvb
     #     effect: NoSchedule
+
+# Sottotitoli live spenti. Il pod scarica il modello da Internet (circa
+# 750 MB) a ogni avvio, e in un'installazione senza accesso esterno resterebbe
+# fermo allo scaricamento, facendo fallire `helm upgrade --wait`. Con un solo
+# nodo, inoltre, il motore usa la stessa CPU del bridge per tutto il tempo in
+# cui qualcuno parla. Per accenderli: global.captions.enabled: true, le
+# immagini captions-gateway e captions-engine fra quelle caricate nel nodo
+# (preload-images.sh list le elenca) e, senza Internet, captions.model.url
+# verso un mirror interno con lo stesso file. Con tre nodi, meglio su un nodo
+# diverso da quello del bridge (captions.nodeSelector).
+global:
+  captions:
+    enabled: false

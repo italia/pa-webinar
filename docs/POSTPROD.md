@@ -36,6 +36,7 @@ need the transparency facts. Related pages:
 [Provisioning a GPU node pool](#provisioning-a-gpu-node-pool) ·
 [Administration](#administration) ·
 [Public experience](#public-experience) ·
+[The event report](#the-event-report) ·
 [Transparency (AI Act Article 50)](#transparency-ai-act-article-50) ·
 [Observability](#observability) ·
 [Local development and tests](#local-development-and-tests) ·
@@ -46,7 +47,10 @@ need the transparency facts. Related pages:
 
 Every output is a `PostprodArtifact` row that points to one file in object
 storage. `PostprodArtifactType` in `app/prisma/schema.prisma` is the
-authoritative list.
+authoritative list. The one exception is the transcript built from live
+captions (see below), which is not produced by this pipeline and has no file.
+The event report (`REPORT`) produces no artifact at all: its result is stored
+on the event ([The event report](#the-event-report)).
 
 | Artifact type | Produced by | Language | Contents | Where it is used |
 |---|---|---|---|---|
@@ -54,7 +58,7 @@ authoritative list.
 | `TRANSCRIPT_VTT` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK` | source | WebVTT subtitles with a `<v>` voice tag per speaker | Player subtitle track; `.vtt` download, served by the subtitle endpoint |
 | `TRANSCRIPT_TXT` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK` | source | Plain text with speaker prefixes | Stored only; the `.txt` download is built from `TRANSCRIPT_JSON` |
 | `WAVEFORM_JSON` | `TRANSCRIBE`, optional | none | Normalized audio peaks | Waveform in the transcript editor |
-| `SUMMARY_JSON` | `SUMMARIZE`; `TRANSLATE` for each target language | source or target | Overall summary, key decisions, action items, topics with a start time | Summary card and topic chips on the post-event page |
+| `SUMMARY_JSON` | `SUMMARIZE`; `TRANSLATE` for each target language | source or target | Overall summary, key decisions, action items, topics with a start time, which follow the agenda's chapters when the event used the agenda | Summary card and topic chips on the post-event page |
 | `SUMMARY_MD` | `SUMMARIZE` | source | Markdown rendered from `SUMMARY_JSON` without a second model call | Summary tab, `.md` download |
 | `TRANSLATION_VTT` | `TRANSLATE` | target | Translated subtitles on the original timings | Player subtitle track |
 | `TRANSLATION_MD` | `TRANSLATE` | target | Markdown of the translated summary | Summary tab in that language |
@@ -71,9 +75,42 @@ translated subtitles are `TRANSLATION_VTT`.
 - **Voice cloning.** Dubbing uses catalog synthetic voices only. The pipeline
   does not analyze, store or reproduce a participant's voice to synthesize
   speech.
-- **Live captions.** Everything runs after the event on the finished
-  recording. Live subtitles would need a streaming speech-recognition engine
-  next to the conference ([Roadmap](ROADMAP.md#further-out)).
+- **Live captions.** Everything here runs after the event on the finished
+  recording. Captions during the event are a separate service, a streaming
+  recognizer on CPU next to the conference ([Live captions](architecture/live-captions.md)).
+  It shares this pipeline's glossary and its sovereignty rule, not its queue.
+
+**The transcript from live captions.** An event with **Transcript from
+captions** gets a transcript without this pipeline and without a GPU: after
+the event, the caption sentences of the people who consented become a
+`TRANSCRIPT_JSON` artifact with `modelId` `live-captions`, in the same shape
+as the pipeline's, kept only in the database (`inlineBody`, empty `blobKey`).
+It goes on the event's recording with media (a file, or per-participant
+tracks once their manifest has given the media start), timed from the same
+zero this pipeline uses (`recordingTimeZero`); when the event has none, on a
+recording without media (empty `blobKey`, status `POSTPROD_DONE`). It moves to
+the recording with media when that arrives later. A recording with media and
+no source language gets the transcript's. While this pipeline is transcribing
+a recording of the event, nothing is built or moved (`ai-in-corso`); if the
+job fails, a later pass builds it. The editor, the speaker names, the erasure
+mode, the `.txt` and `.srt` downloads and the event page use it like an AI
+transcript ([Public experience](#public-experience) has the conditions); no
+subtitle track, summary or translation is made from it, so the **Download**
+menu offers no `.vtt`. It is never built while any recording of the event
+carries an AI transcript or one corrected by hand: the builder checks, and
+reads the sentences, under a per-event database lock, which the registration
+of an AI transcript and an erasure request for the same event also take.
+
+A later run of this pipeline on the same recording replaces it: when the AI
+transcript is registered, the speaker labels of the transcript from captions,
+with their names, are deleted before the AI's are written, and the event's
+recordings without media whose transcript from captions was not corrected by
+hand are deleted (`app/src/app/api/internal/postprod-artifact/route.ts`).
+Because an AI transcript would also discard manual corrections, the automatic
+enqueue does nothing, and **Generate AI** and **Re-run** answer `409`, for a
+recording whose transcript from captions was corrected by hand. How it is
+built and who decides what it keeps:
+[Live captions](architecture/live-captions.md#transcript-from-captions).
 
 ## Data sovereignty
 
@@ -158,14 +195,21 @@ there is work: the GPU node pool scales to zero between runs.
 | Composite recording | Jibri's finalize script calls `POST /api/webhooks/recording` (bearer `CRON_API_KEY`, plus an HMAC signature when `RECORDING_WEBHOOK_SECRET` is set; see [Recording](architecture/recording.md)). The portal creates the `CallSession` and `Recording` rows and enqueues when the event has `aiTranscriptEnabled`. If the event already has a per-participant recording, the webhook only attaches the MP4 to it and enqueues nothing. | `TRANSCRIBE` |
 | Per-participant tracks | The recorder bot calls `POST /api/internal/multitrack-manifest` at the end of the event. The portal stores one `RecordingTrack` per track and enqueues. A silence guard marks the recording `POSTPROD_FAILED` instead when every track is silent. | `TRANSCRIBE_MULTITRACK` |
 | **End for everyone** | The moderator ticks **Generate AI transcript and summary from the recording (once processing finishes)**. The event gets `aiTranscriptEnabled` and `aiSummaryEnabled`, and the webhook enqueues when the recording arrives. The checkbox appears only when the event records, the site switch is on and the event already uses an AI option. | as above |
-| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording. | detected |
+| **Generate AI now** (event page) and **Generate AI** (recording page) | `POST /api/admin/events/<id>/generate-ai` and `POST /api/admin/postprod/recordings/<id>/generate-ai` turn on transcription and summary for the event and enqueue in the same transaction, for a recording that already exists. The event-page route acts on the event's newest recording with a media file. | detected |
 | **Re-run** | `POST /api/admin/postprod/recordings/<id>/rerun` bumps the run counter and enqueues a new run. | detected |
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
+| **Generate the report** (event page, **After the event** tab) | `POST /api/admin/events/<id>/report` enqueues one `REPORT` job for an ended event within its data retention ([The event report](#the-event-report)). | none |
 
 Every path goes through `app/src/lib/ai/enqueue.ts`, and every path is gated
 by the site-wide switch `aiPipelineEnabled`: the automatic paths do nothing
-while it is off, and the admin routes answer with an error. "Detected" means
+while it is off, and the admin routes answer with an error. A recording
+without media, which only carries a transcript from live captions, is never
+queued: the enqueue does nothing for it, and **Generate AI** (both routes) and
+**Re-run** answer `400`. On a recording whose transcript from live captions
+was corrected by hand, the automatic paths (recording webhook, track manifest,
+lifecycle) do nothing and the admin routes answer `409`. The event page counts only recordings with a media
+file when it decides whether to offer **Generate AI now**. "Detected" means
 that the root job is `TRANSCRIBE_MULTITRACK` when the recording's key is the
 multitrack placeholder or the recording has any `RecordingTrack` rows, and
 `TRANSCRIBE` otherwise.
@@ -222,6 +266,9 @@ flowchart TD
   are no target languages, so there is no dubbing either.
 - **`ARCHIVE`** is never part of a full enqueue. An administrator starts it,
   and it depends on the job that produced the current `TRANSCRIPT_JSON`.
+- **`REPORT`** is never part of a full enqueue either, and depends on no job:
+  staff request it, and it reads whatever transcript and summary exist when it
+  is claimed.
 - **Optional extras.** `WAVEFORM_JSON` (from `TRANSCRIBE`) and `DUBBED_VIDEO`
   (from `DUB`) get upload targets but are not part of the job's expected
   artifacts. They are best-effort: failing to produce them never fails the
@@ -233,10 +280,11 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 |---|---|---|
 | `TRANSCRIBE` | The composite MP4 | `asrInitialPrompt` built from the event title, organizer name and speaker information (at most 800 characters); `expectedSpeakers` |
 | `TRANSCRIBE_MULTITRACK` | Each unpurged track, with participant id, decrypted display name and start offset; the composite MP4 when one exists | none |
-| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); agenda items and their checked state, when the event uses the agenda |
+| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); `agenda`, the agenda topics with their status and planned minutes, when the event uses the agenda; `timeline`, the room timeline, when it has entries or chapters ([Room timeline](#room-timeline)) |
 | `TRANSLATE` | `TRANSCRIPT_JSON`; the source-language `SUMMARY_JSON` when it exists | `speakerNames` |
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
 | `ARCHIVE` | The composite MP4; each unpurged track; the source `TRANSCRIPT_VTT` when it exists | none |
+| `REPORT` | No file: the portal gathers the event's material and figures at claim time (`reportInput`) | The language model's endpoint and the glossary ([The event report](#the-event-report)) |
 
 ## Queue semantics
 
@@ -374,7 +422,11 @@ A job whose dependency failed is never runnable and stays `PENDING`.
 | `ARCHIVED` | The retention job purged the recording's artifacts. |
 
 `POSTPROD_RUNNING` exists in the enum but no code sets it: a recording stays
-`POSTPROD_QUEUED` while its jobs run.
+`POSTPROD_QUEUED` while its jobs run. A recording without media, created to
+hold a transcript from live captions, is created `POSTPROD_DONE` and never
+enters the queue; a transcript from captions added to an existing recording
+leaves its status as it is. A `REPORT` job belongs to the event, not to a
+recording, so it changes no recording's status.
 
 Both checks cover the jobs of every run, not only the latest:
 
@@ -396,15 +448,21 @@ piling up. Each run:
 
 1. calls `GET /api/internal/postprod-pending` with `CRON_API_KEY`. The portal
    answers with `pipelineEnabled`, `runnable`, `claimed`, `running`,
-   `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`.
-   While the site switch is off, `desired` is zero and the orchestrator stops
-   here;
-2. counts the active worker Jobs in the release namespace by the label
-   `app.kubernetes.io/component=postprod-worker`;
-3. creates `desired - active` Jobs with
-   `kubectl create job --from=cronjob/<fullname>-postprod-worker`, where
-   `<fullname>` is the chart's full name (`pa-webinar` for a release named
-   `pa-webinar`).
+   `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`,
+   split into `desiredGpu` and `desiredCpu` for the two kinds of worker
+   ([The worker Job](#the-worker-job)). The split keeps the same overall cap
+   and gives transcription and dubbing their share first. While the site
+   switch is off, every count is zero and the orchestrator stops here;
+2. counts the active worker Jobs of each kind in the release namespace, by
+   the labels `app.kubernetes.io/component=postprod-worker` and
+   `app.kubernetes.io/component=postprod-worker-cpu`;
+3. creates the missing Jobs of each kind with
+   `kubectl create job --from=cronjob/<fullname>-postprod-worker` or
+   `--from=cronjob/<fullname>-postprod-worker-cpu`, where `<fullname>` is the
+   chart's full name (`pa-webinar` for a release named `pa-webinar`).
+
+Without the CPU worker (`postprod.worker.cpu.enabled: false`), or with a
+portal that does not send the split, every job goes to the GPU worker.
 
 `RUNNING` jobs are not in `desired`, but their pods are in the active count.
 A new worker therefore starts only when runnable plus claimed jobs outnumber
@@ -441,7 +499,29 @@ kubectl scale deploy -n <namespace> <fullname>-vllm --replicas=0
 ### The worker Job
 
 `templates/cronjob-postprod-worker.yaml` renders the worker as a suspended
-CronJob (`@yearly`, `suspend: true`). Only its pod template matters:
+CronJob (`@yearly`, `suspend: true`), in two variants built from the same
+image:
+
+| Template | Takes | Runs on |
+|---|---|---|
+| `<fullname>-postprod-worker` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`, `DUB` | the GPU pool, with a whole GPU and tens of GB of memory |
+| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE`, `REPORT` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
+
+Summaries and translations get their text from vLLM, which has its own GPU,
+and the archive remuxes without re-encoding. The CPU worker runs the same code
+from a light image, `pa-webinar-postprod-worker-cpu` (`infra/ai/Dockerfile.worker-cpu`:
+Python on Alpine with ffmpeg, `httpx`, `pydantic` and `numpy`, under 300 MB),
+because the GPU worker's image is about 15 GB compressed and would be pulled
+onto every app node that hosts a CPU worker. It mounts no models volume. On the CPU worker, a summary
+therefore starts one GPU node (vLLM) instead of two. Dubbing stays on the GPU
+worker for its memory: Piper runs on the CPU, but the AudioSeal watermark
+processes the whole track at once and needs tens of GB for a long event.
+
+Each worker sends the kinds it takes (`AI_WORKER_KINDS`) when it claims a job.
+The CPU worker starts from its own entry point, `python -m worker.cpu`, which
+refuses to run without a list or with a GPU kind in it. An older worker image
+lacks that module, so a CPU pod pinned to it exits before claiming anything.
+Both variants share the rest of the pod template:
 
 - **One job per pod.** Each Job runs one pod that claims one queue job, runs
   it and exits. `backoffLimit: 0`, because the queue owns retries. Pod
@@ -451,7 +531,9 @@ CronJob (`@yearly`, `suspend: true`). Only its pod template matters:
   finished Jobs.
 - **Placement.** `postprod.worker.nodeSelector` and `tolerations` target the
   GPU node pool (`workload: ai-gpu` in `values.yaml`); `gpu.enabled` requests
-  `nvidia.com/gpu` (`gpu.count`, default 1).
+  `nvidia.com/gpu` (`gpu.count`, default 1). The CPU worker uses
+  `postprod.worker.cpu.nodeSelector` and `tolerations`, or the app's when they
+  are empty.
 - **Hardening.** Non-root user 10001, read-only root file system, all
   capabilities dropped, no service-account token.
 - **Volumes.** `/models` is the PVC named in `postprod.worker.modelsPvc`, or an
@@ -525,8 +607,10 @@ The worker sends an inline copy for text and JSON files of at most 8 MiB (`INLIN
 
 When vLLM scales from zero it needs several minutes to load weights. A
 `SUMMARIZE` or `TRANSLATE` worker that finds the backend unreachable, or
-answering `503`, keeps retrying for up to `LLM_CONNECT_WAIT_S` seconds (720 by
-default, in `infra/ai/worker/llm.py`) instead of failing. The job stays
+answering `503`, keeps retrying for up to `LLM_CONNECT_WAIT_S` seconds (1200 by
+default, in `infra/ai/worker/llm.py`) instead of failing. A start from zero,
+with the GPU node to provision and the vLLM image to pull, can take close to
+twenty minutes; the wait stays below the job's 30-minute lease. The job stays
 `RUNNING` meanwhile, so the orchestrator keeps vLLM up and the warm-up is not
 wasted. Any other HTTP error fails that attempt at once, and the queue retries
 it with backoff.
@@ -548,9 +632,14 @@ Licenses of the models and libraries are listed in
 
 ### Speech recognition
 
-- The portal builds an initial prompt from the event's title, organizer name
-  and speaker information, so that Whisper spells names, acronyms and
-  organizations correctly.
+- The portal builds an initial prompt from the terms of the
+  [glossary](#glossary), the event's first, and the event's title, organizer
+  name and speaker information, so that Whisper spells names, acronyms and
+  organizations correctly. Whisper keeps only the last ~220 tokens of a
+  prompt, so the glossary terms come first and take at most 240 characters,
+  and the title and speakers come last; the whole prompt stays under 800
+  characters. Multitrack transcription gets no prompt: a participant's track
+  is mostly silence, and on silence Whisper tends to repeat the prompt.
 - Segments that Whisper is unsure about are dropped as probable
   hallucinations (average log-probability below -1.0, or no-speech probability
   above 0.6; see the thresholds in `transcribe.py`). Segments with a borderline
@@ -592,18 +681,196 @@ recorder's manifest are used. Several track sessions of the same participant
 (after a rejoin) merge under one speaker. No waveform is produced on this
 path.
 
+### Glossary
+
+The glossary tells every stage how a term is written, how speech recognition
+may render it, how it is translated and how it is pronounced in dubbing
+(`app/src/lib/ai/glossary.ts`, applied by `infra/ai/worker/glossary.py`). It
+has two levels:
+
+- **Instance terms**, in **Video → Glossary** (`/admin/glossary`,
+  API `/api/admin/glossary`). They apply to every event. Administrators and
+  organizers add terms; an organizer edits and deletes only the terms they
+  added, administrators all of them. Everyone reaches the page from the
+  menu, and from the glossary panel of an event. A new installation starts with common
+  Italian public-administration acronyms, which administrators can edit or
+  delete.
+- **Event terms**, managed in the **After the event** tab of the event page
+  (API `/api/admin/events/{id}/glossary`) by administrators, the event's
+  organizer and its moderators. They add to the instance terms, and an event
+  term replaces an instance term with the same spelling (case-insensitive).
+  A duplicated event copies its glossary.
+
+Each term has:
+
+| Field | Used for |
+|---|---|
+| Term | The written form, kept in transcripts and subtitles |
+| Forms to correct (`aliases`) | Spoken or misspelled forms that speech recognition may produce; the worker replaces them with the term, case-insensitively and across spaces, dots and hyphens |
+| Reading (`reading`) | How dubbing reads the term when it has no pronunciation: `auto` (the speech synthesizer decides), `spell` (letter by letter, sent as `A-B-C`, a form the synthesizer spells in every language) or `word` (sent with only the first letter capitalized). For `spell` terms, letters written with dots or spaces (`A.B.C`, `A B C`) also become the term |
+| Pronunciation (`spoken`) | What dubbing says instead of the term, per language or for all languages (`*`) |
+| Fixed translations (`translations`) | The term's form in a target language; without one, the term is kept unchanged in every language |
+| Meaning (`note`) | Context for the model that corrects, summarizes and translates; it never appears in the outputs |
+
+How each stage uses it:
+
+- **Transcription.** After speech recognition, the forms to correct become
+  the term. The language model then corrects names, acronyms and technical
+  terms line by line, with the speakers' names and the glossary in its prompt
+  (names first, then event terms, then instance terms, up to 80 entries). A
+  corrected line is kept only if every changed part is a spelling variant of
+  the original words or a known term or name, no word is removed, and at most
+  three words, or 30% of a long line, change; otherwise the original stays.
+  After the correction the forms to correct are applied again. When a line
+  changes, its word timings are realigned to the new words, so the public
+  transcript can still highlight them.
+- **Correction limits.** The correction always runs when the job carries a
+  language model endpoint, on the GPU worker right after recognition. Only
+  its first request waits for vLLM's cold start (`LLM_CONNECT_WAIT_S`), and
+  not at all when the vLLM service name does not resolve; the others run in
+  parallel (`LLM_PARALLEL`) with two minutes each. It stops at
+  `AI_CORRECTION_MAX_S`, or earlier so that at least 15 minutes of the Job's
+  `activeDeadlineSeconds` (passed as `WORKER_DEADLINE_S`) remain, and keeps
+  the lines not yet corrected. Each finished batch refreshes the job's lease.
+- **Summary.** The terms that appear in the transcript are listed in the
+  prompt with their meaning, with the instruction to write them as given and
+  not to expand them.
+- **Translation.** In each subtitle line the terms become markers that the
+  model copies unchanged; the worker puts back the term or its fixed
+  translation. If the model loses or duplicates a marker, the batch is
+  translated again without markers, with the glossary rules in the prompt.
+  The summary is translated with the same rules in the prompt.
+- **Dubbing.** Before synthesis, each term, or its fixed translation in the
+  target language, is replaced by its pronunciation or by its reading. The
+  subtitles keep the written form.
+
 ### Summaries and translation
 
 - **Summary.** One JSON-mode request sends the whole transcript, with real
-  speaker names where known and the agenda when the event uses one, and asks
-  for an overall summary, key decisions, action items and topics with a start
-  time. `SUMMARY_MD` is rendered from that JSON without a second call.
+  speaker names where known, the agenda when the event uses one, and the room
+  timeline with its chapters when it has them, and asks for an overall
+  summary, key decisions, action items and topics with a start time. The
+  prompt asks the model to write in the source language; to give, in the
+  overall summary, the meeting's purpose, its main content and its outcome;
+  to list as decisions only what was explicitly decided or announced; to
+  write action items as "who — what — by when", naming who and when only
+  when they were said; to give each topic its concrete facts (initiatives,
+  numbers, dates, examples) and any audience questions with the answers
+  given; and to use a person's name only as it appears in the transcript.
+  `SUMMARY_MD` is rendered from that JSON without a second call.
+- **Topics from the agenda.** When the timeline carries chapters, the
+  structured summary's topics follow them (`_apply_chapters` in
+  `infra/ai/worker/llm.py`): one topic per chapter, in the same order, with
+  the chapter's title and start time, while the model writes what was said
+  from that chapter's start to the next one's. The worker matches each of the
+  model's topics to a chapter by title, then by start time, then by position,
+  and joins the texts of topics that fall on the same chapter; a chapter the
+  model wrote nothing for keeps its title alone. An opening topic, at
+  `00:00`, may precede the first chapter when the part before it has content
+  of its own. Chapter times are `MM:SS`, or `H:MM:SS` past one hour, and the
+  post-event player accepts both.
 - **Translation.** Segments are translated in numbered batches and matched
   back by index, keeping timings and speakers. If a batch comes back with the
   wrong number of lines, that batch is retried segment by segment. The
   structured summary is translated with the same JSON shape.
 - **Context length.** Because the summary request carries the whole
-  transcript, vLLM's `--max-model-len` must fit your longest events.
+  transcript, vLLM's `--max-model-len` must fit your longest events. The room
+  timeline adds at most 400 short lines, plus one line per chapter.
+
+### Room timeline
+
+The claim of a `SUMMARIZE` job carries `timeline`: what happened in the room
+and when, on the transcript's time base, so that the summary can place
+topics, polls, questions and audience activity. The portal builds it on every
+claim (`app/src/lib/postprod/live-timeline.ts`) and does not store it in the
+job row. It is left out when it has neither entries nor chapters, and when it
+cannot be read: the claim then goes ahead without it.
+
+```jsonc
+{
+  "t0": "<ISO time of the recording's time zero>",
+  "exact": true,
+  "entries": [
+    { "offsetSec": 754, "kind": "poll.closed", "text": "<one line>" }
+  ],
+  "chapters": [
+    { "offsetSec": 0, "title": "<agenda topic>" }
+  ]
+}
+```
+
+- **Sources.** The
+  [live action journal](architecture/live-interaction.md#live-action-journal):
+  agenda topics started, closed, skipped or reopened, polls with their
+  results, word-cloud prompts with their most frequent words (less any word a
+  moderator removed after the round closed), Q&A questions highlighted or
+  answered (with the written answer), feature toggles, recording start and
+  stop, the timer and the end of the event. Beside it, rows that already carry
+  a time: the text of every Q&A question not dismissed and of every question
+  marked in the chat, never their authors; the titles of shared materials;
+  and the number of chat messages (hidden ones excluded), app reactions and
+  raised hands in each five-minute window counted from `t0`.
+- **Window.** From 30 minutes before `t0` to 5 minutes after the end of the
+  recording (`t0` plus its duration). Without a known duration, to 5 minutes
+  after the end of the recording's call session, or after the claim while the
+  session is still open.
+- **Offsets.** `offsetSec` is whole seconds from `t0`, the same base as the
+  transcript's timings. A negative offset is an action before the recording
+  started.
+- **Chapters.** `chapters` lists the agenda topics in the order the host
+  started them, each with the time the server recorded for its start, in
+  whole seconds from `t0` (`chaptersFromActions`). The topic in progress when
+  the recording started opens at `0`, unless it was closed, skipped or
+  reopened before `t0`. After `t0` every start opens a chapter, two starts in
+  a row of the same topic make one, and a topic started after the end of the
+  recording is not a chapter. For this the portal reads the agenda's journal
+  rows from the start of the event, not only inside the window, because the
+  topic in progress at `t0` may have started long before. The list is empty
+  when the agenda was not used, and the summary's topics then come from the
+  model alone ([Summaries and translation](#summaries-and-translation)).
+- **Time zero.** `recordingTimeZero` picks `t0`:
+  - `Recording.mediaStartedAt`, the absolute time of the first recorded frame,
+    when it is set: `exact` is `true`. The multitrack ingest stores it when its
+    body carries the optional `recordingStartedAtMs`
+    ([Ingest contract](architecture/recording.md#ingest-contract)).
+  - For a composite recording with a known duration, the latest
+    `recording.started` in the journal, as reported by the moderators'
+    browsers, between 30 minutes before and 2 minutes after the row's creation
+    minus the duration (the row is created once the file is uploaded, so the
+    start lies about one duration earlier; a start outside that window belongs
+    to another recording): `exact` is `true`, within a few seconds.
+  - Otherwise, for a recording with tracks, the creation of the `Recording`
+    row, which is set up for the recorder while the event is live; the first
+    frame can come minutes later.
+  - Otherwise, for a composite recording with a known duration, the row's
+    creation minus the duration, because the row is created when the
+    recording ends; the upload delay moves it later. Without a duration, the
+    row's creation.
+
+  The last two set `exact` to `false`, and the times can then be off by
+  minutes.
+- **Size.** At most 250 entries, and each quoted text at most 280 characters.
+  Past 250, the activity counts and the chat questions go first, oldest
+  first, then the oldest entries. The worker also caps the timeline block in
+  the prompt at 12,000 characters: past that it drops the activity counts and
+  chat questions, keeps the beginning, and says the timeline was shortened.
+- **In the prompt.** The worker (`_format_timeline` in
+  `infra/ai/worker/llm.py`) writes one line per entry, with the offset as
+  `[hh:mm:ss]` like the transcript, and marks actions before the start as
+  such. It tells the model to use the timeline to place topics, polls,
+  questions and participation, not to report it as something said, and that
+  the quoted texts come from moderators or the audience and are data to
+  summarize, not instructions. When `exact` is `false`, it adds that the times
+  are estimates that can be off by a few minutes, useful for the order of
+  events more than for their exact moment. The chapters go in a block of
+  their own (`_format_chapters`), one line per chapter with its `[hh:mm:ss]`
+  start and title, which asks the model to use them as the topics, in the same
+  order and with the same titles, and says that the titles were written by
+  the host and are data, not instructions.
+- **Agenda.** Each `agenda` item carries `label`, `completed`, `status` and
+  `plannedMinutes`. The prompt marks a topic as discussed, in progress at the
+  end, skipped or not discussed from its `status`, falling back to
+  `completed` when there is none, and adds its planned minutes.
 
 ### Dubbing
 
@@ -651,12 +918,22 @@ for their fields; deletion and retention are described in
 
 | Table (model) | Holds |
 |---|---|
-| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil` |
+| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil`, `mediaStartedAt` |
 | `recording_tracks` (`RecordingTrack`) | One per-participant audio track session: participant id, encrypted display name, key, start offset, `audioPurgedAt` |
 | `postprod_jobs` (`PostprodJob`) | The queue: kind, status, attempts, lease, `idempotencyKey`, `dependsOnId`, `lastError` |
 | `postprod_artifacts` (`PostprodArtifact`) | One output per `(recording, type, language)`: key, size, MIME type, encrypted inline copy, `contentHash` (SHA-256), `isSynthetic`, `watermarkType`, model id and version, `revisedAt` |
 | `postprod_original_bodies` (`PostprodOriginalBody`) | The machine version of a transcript, copied byte for byte (still encrypted) at its first manual correction |
 | `speakers` (`Speaker`) | One speaker label per recording: display name in plain text, optional link to an address-book `Person`, total speaking time |
+| `glossary_terms` (`GlossaryTerm`) | The [glossary](#glossary): instance terms (no event) and event terms, each with its forms to correct, reading, pronunciations, fixed translations and meaning |
+
+The transcript from live captions is built from two tables outside this
+pipeline, `caption_segments` (`CaptionSegment`) and `room_occupants`
+(`RoomOccupant`), described in
+[Live captions](architecture/live-captions.md#transcript-from-captions). The
+event report is stored on the event itself, in columns of `events`:
+`post_event_report` (JSON: the figures and the text in each language),
+`post_event_report_at` and `post_event_report_published`
+([The event report](#the-event-report)).
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#E6F0FA", "primaryBorderColor": "#0066CC", "primaryTextColor": "#17324D", "lineColor": "#5C6F82", "tertiaryColor": "#F7F9FB", "edgeLabelBackground": "#FFFFFF"}}}%%
@@ -672,12 +949,13 @@ erDiagram
 
   RECORDING {
     uuid id PK
-    string blobKey "composite MP4 or multitrack placeholder"
+    string blobKey "composite MP4, multitrack placeholder, or empty for a transcript from captions"
     RecordingStatus status
     int runCount "storage run folder"
     jsonb consentSnapshot "event AI flags at enqueue"
     jsonb pipelineSnapshot "engines and models used"
     datetime retentionUntil
+    datetime mediaStartedAt "first recorded frame, optional"
   }
   RECORDING_TRACK {
     uuid recordingId FK
@@ -845,7 +1123,7 @@ points to this section.
     2. the site switch **Post-event pipeline active** (`aiPipelineEnabled`)
        in the site settings;
     3. per event, **Automatic transcription** and the other options in the
-       wizard's **Permissions** step.
+       wizard's advanced settings, section **Recording and AI**.
 11. **Check it.** Run a short test event with transcription on, or start one
     worker by hand with
     `kubectl create job -n pa-webinar --from=cronjob/pa-webinar-postprod-worker pa-webinar-postprod-worker-manual`
@@ -1007,6 +1285,11 @@ holds the defaults quoted here. Chart-wide keys are in
 | `worker.hfTokenSecret.name`, `.key` | empty, `HF_TOKEN` | Hugging Face token; set the name (see the [checklist](#operational-checklist)) |
 | `worker.extraEnv` | empty | Extra worker environment, for example `AUDIOSEAL_CACHE_DIR` or `LLM_CONNECT_WAIT_S` |
 | `worker.gpu.enabled`, `.count` | `true`, `1` | GPU request and limit |
+| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations, archives and event reports to it |
+| `worker.cpu.image` | empty: `worker.image` when that is set, otherwise `<app.image.repository>-postprod-worker-cpu` with the app image's tag | The CPU worker's light image. Set it whenever you set `worker.image`, or the CPU worker pulls the GPU worker's large image |
+| `worker.cpu.extraEnv` | empty | Environment of the CPU worker, for example `LLM_CONNECT_WAIT_S`; `worker.extraEnv` and the Hugging Face token reach only the GPU worker |
+| `worker.cpu.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Placement of the CPU worker |
+| `worker.cpu.resources` | requests `1` CPU / `3Gi`, limits `4` CPU / `8Gi` | CPU worker resources |
 | `worker.resources` | requests 8 CPU and 32Gi; limits 22 CPU and 200Gi | Sized for a GPU node with 24 vCPU and about 220 GiB; lower them for smaller nodes |
 
 ### Portal environment
@@ -1029,7 +1312,10 @@ Set these through `postprod.worker.extraEnv` unless noted:
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `LLM_CONNECT_WAIT_S` | `720` | How long a worker waits for vLLM to come up |
+| `LLM_CONNECT_WAIT_S` | `1200` | How long a worker waits for vLLM to come up |
+| `LLM_PARALLEL` | `6` | Parallel requests of the transcript correction ([Glossary](#glossary)) |
+| `AI_CORRECTION_MAX_S` | `1200` | Time budget of the transcript correction; lines not corrected by then stay as recognized |
+| `WORKER_DEADLINE_S` | set by the chart to `postprod.worker.activeDeadlineSeconds` | The Job's deadline, so the correction leaves time for the uploads |
 | `AI_WATERMARK` | `1` | `0` disables the AudioSeal watermark on dubbed audio |
 | `AUDIOSEAL_CACHE_DIR` | unset (AudioSeal then uses `XDG_CACHE_HOME`, `/work/.cache`) | Where the watermark generator is cached |
 | `WHISPERX_VERSION`, `PIPER_VERSION` | `whisperx-3.1`, `piper-1.2` | Version labels written to each artifact's `modelVersion`. They are labels, not detected versions: set them to the versions in `infra/ai/worker/requirements.txt` if you need exact provenance. |
@@ -1046,27 +1332,30 @@ this table gives only their effect on the pipeline.
 
 | Field | UI label | Effect on the pipeline |
 |---|---|---|
-| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off. It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
+| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
 | `aiAsrProvider`, `aiLlmProvider`, `aiTtsEngine` | **Transcription engine**, **Summary and translation engine**, **Dubbing engine** | One allowed value each ([Data sovereignty](#data-sovereignty)) |
-| `aiDefaultTargetLocales` | **Default translation languages** | Target languages for events without their own |
+| `aiDefaultTargetLocales` | **Default translation languages** | Target languages ticked in the wizard when translation is turned on, and used for events without their own (`en,fr,es,de` on a new installation) |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
-| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
+| `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime; with only the transcript published, the transcript stays while published and the other outputs follow the event's retention. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
 | `aiConsentDisclosure` | **AI notice in the waiting room** | Per-language notice text; empty uses the built-in text |
 
 ### Per-event settings
 
-In the event wizard, step **Permissions**, section **Automatic
-post-production**. An event template can pre-fill all of them.
+In the event wizard's advanced settings, section **Recording and AI**, under
+**Automatic post-production**. A format or an event template pre-fills them:
+recording an event turns on transcription, summary, translation (into the
+site's default languages, when there are some besides the transcription
+language) and per-participant recording.
 
 | Field | UI label | Effect |
 |---|---|---|
 | `aiTranscriptEnabled` | **Automatic transcription** | Required for everything else. Turning it off in the wizard also turns off summary, translation, dubbing and per-participant recording. |
-| `multitrackRecordingEnabled` | **Per-participant recording (high accuracy)** | Records one track per participant, with each participant's explicit consent ([Recording](architecture/recording.md)) |
+| `multitrackRecordingEnabled` | **Per-participant recording (high accuracy)** | Records one track per participant who consented to the transcription of what they say; the voices of the others are not recorded and do not appear in the transcript ([Recording](architecture/recording.md#consent-gates)) |
 | `retainParticipantTracks` | **Keep per-participant tracks** | Keeps the tracks after transcription, for per-speaker playback and the archive |
 | `aiSummaryEnabled` | **Summary and chapters** | Adds `SUMMARIZE` |
 | `aiTranslationEnabled` | **Translation into other languages** | Adds `TRANSLATE` for each target language |
-| `aiTargetLocales` | **Translation languages** | Comma-separated language codes; the wizard asks for at least one when translation is on |
+| `aiTargetLocales` | **Translation languages** | Chosen with checkboxes (English, French, Spanish and German first, the other EU languages in a group that opens) and stored as comma-separated language codes; the wizard asks for at least one when translation is on |
 | `aiDubbingEnabled` | **Audio dubbing** | Adds `DUB` for each target language; needs translation |
 | `expectedSpeakers` | **Expected number of speakers** | Forces the diarization to that number of speakers (1 to 30) |
 
@@ -1086,7 +1375,8 @@ What the GPUs must hold:
   plus room for the KV cache, so an 80 GB GPU
   ([Choosing another model](#choosing-another-model)).
 - **Quota** for `aiMaxConcurrentJobs` + 1 GPUs in the region: the workers at
-  the cap, plus vLLM.
+  the cap, plus vLLM. With the CPU worker some of those workers need no GPU,
+  but a queue of transcriptions can still fill the cap.
 
 On any cloud:
 
@@ -1119,7 +1409,7 @@ the spot taint too. Each platform guide covers its pool:
 
 ### The recording list
 
-**Transcripts / AI** in the administration menu opens `/admin/postprod`
+**Video → AI post-production** in the administration menu opens `/admin/postprod`
 (**AI post-production pipeline**). It lists recordings with their status,
 jobs and artifacts, filters by status, and refreshes every 10 seconds.
 Administrators see every recording; organizers see only the recordings of
@@ -1134,7 +1424,13 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 - **Transcript** is the editor: each segment with its speaker, a waveform
   when `WAVEFORM_JSON` exists, and playback of the source media through a
   short-lived signed URL. The speaker roster maps each label to a free-text
-  name or, for administrators only, to a person in the address book.
+  name or, for administrators only, to a person in the address book. A
+  recording without media, which carries only a transcript from live
+  captions, has no player: the editor says so, and the page offers **Update
+  from captions** instead of **Generate AI** and **Re-run**. It rebuilds the
+  transcript from the stored sentences, unless the transcript was corrected by
+  hand or the event's data retention has ended; when the rebuild moves the
+  transcript to the recording with video, the page goes to that recording.
 - **Summary** edits the Markdown and structured summary of each language.
 - **Translations** shows the translated languages and adds new ones.
 - **Archive** plays each retained participant track in sync with the video,
@@ -1147,8 +1443,8 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 
 | Action | What it does | Audit action |
 |---|---|---|
-| **Generate AI** | Turns on transcription and summary for the event and enqueues. The recording page shows it only for `READY` recordings; the event page's **Generate AI now** is always shown once the event has ended and has a recording. Repeating it on a finished run leaves the recording `POSTPROD_QUEUED` ([Idempotency and runs](#idempotency-and-runs)). | `POSTPROD_RERUN` |
-| **Re-run** | New run: bumps `runCount`, sets `POSTPROD_QUEUED`, enqueues a full graph. Refused while the event has transcription off. | `POSTPROD_RERUN` |
+| **Generate AI** | Turns on transcription and summary for the event and enqueues. The recording page shows it only for `READY` recordings; the event page's **Generate AI now** is always shown once the event has ended and has a recording. Repeating it on a finished run leaves the recording `POSTPROD_QUEUED` ([Idempotency and runs](#idempotency-and-runs)). Refused with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
+| **Re-run** | New run: bumps `runCount`, sets `POSTPROD_QUEUED`, enqueues a full graph. Refused while the event has transcription off, and with `409` when the recording's transcript from live captions was corrected by hand. | `POSTPROD_RERUN` |
 | **Cancel** | Marks every `PENDING`, `CLAIMED` and `RUNNING` job of the recording `FAILED` (`cancelled by admin`) and the recording `POSTPROD_FAILED` | `POSTPROD_CANCEL` |
 | **Add language** | One `TRANSLATE` job for a language other than the source, plus `DUB` if dubbing is on. The tab offers the languages enabled on the site that are not yet translated. Needs an existing `TRANSCRIPT_JSON`. | `POSTPROD_TRANSLATE_ADD` |
 | **Generate archive** | One `ARCHIVE` job. Needs unpurged tracks and the composite MP4. | `POSTPROD_ARCHIVE` |
@@ -1191,25 +1487,48 @@ certain**. The data-subject rights flow is described in
 
 ## Public experience
 
-AI outputs are public only for a recording that is published. Every public
-endpoint under `/api/events/<slug>/postprod/` answers `404` unless all of
-these hold (`app/src/lib/ai/access.ts`):
+AI outputs are public only for a recording that is published, and a
+transcript also when it is published on its own. Every public endpoint under
+`/api/events/<slug>/postprod/` answers `404` unless all of these hold
+(`app/src/lib/ai/access.ts`):
 
-- the site switch `aiPipelineEnabled` is on;
-- the event exists and `recordingPublished` is true;
+- the site switch `aiPipelineEnabled` is on, or the event keeps a transcript
+  from live captions (`captionsTranscriptEnabled`);
+- the event exists and its video (`recordingPublished`) or its transcript
+  (`transcriptPublished`, set from the **Transcript from captions** panel) is
+  published;
 - the post-event page is public (`postEventPublic`) and, when set,
   `postEventPublicUntil` has not passed.
 
 The same `404` covers every case, so the endpoints do not reveal why an
 output is unavailable.
 
+What passes the gate depends on its scope (`ambito` in `access.ts`):
+
+- **Everything** when the video is published and the site switch is on: the
+  transcript, subtitles, summaries, translations and dubbing.
+- **The transcript only** when only the transcript is published, or the site
+  switch is off: the transcript text in its source language. The transcript
+  response carries no summaries, subtitle tracks or dubbed audio; the subtitle
+  and dubbed-audio endpoints answer `404`; the downloads serve `transcript.txt`
+  and `transcript.srt` in the source language and nothing else. With the site
+  switch off, only a transcript built from live captions is served, never an
+  AI transcript.
+
 A fourth condition applies to the transcript and the downloads: they come
-from the most recent of the event's recordings whose status is
-`POSTPROD_DONE` or `POSTPROD_PARTIAL`. The event page builds its subtitle and
-audio menus, its summary card and its transcript tab from the transcript
-response. For an event with one recording, all of them are therefore hidden
-while that recording is `POSTPROD_QUEUED` (a run in progress),
-`POSTPROD_FAILED` (after **Cancel**) or `ARCHIVED`. The subtitle and dubbed-audio endpoints
+from one recording of the event, chosen in this order
+(`registrazionePubblica` in `app/src/lib/captions/transcript.ts`): the latest
+recording with an AI transcript and status `POSTPROD_DONE` or
+`POSTPROD_PARTIAL`; else the recording with a transcript from live captions,
+the one with video first; else the latest recording with one of those two
+statuses. With the site switch off, only the recording with a transcript from
+live captions. The transcript response
+says where the text comes from (`source`: `ai` or `live-captions`). The event
+page builds its subtitle and audio menus, its summary card and its transcript
+tab from the transcript response. For an event with one recording, all of
+them are therefore hidden while that recording is `POSTPROD_QUEUED` (a run in
+progress), `POSTPROD_FAILED` (after **Cancel**) or `ARCHIVED`, unless it
+carries a transcript from live captions. The subtitle and dubbed-audio endpoints
 themselves serve the newest matching artifact of the event whatever the
 recording's status, but the page does not link them then. How an event reaches that state is described in
 [From creation to recap](architecture/event-journey.md).
@@ -1219,7 +1538,7 @@ recording's status, but the page does not link them then. How an event reaches t
 | `GET …/postprod/transcript` | Segments with display names, low-confidence flags, the available subtitle languages, the summaries of each language and the public `pipelineSnapshot` |
 | `GET …/postprod/subtitle/<lang>` | The WebVTT file: inline from the database when it has an inline copy, otherwise a `302` to a signed storage URL |
 | `GET …/postprod/dubbed-audio/<lang>` | A `302` to a signed URL of the `.m4a` file |
-| `GET …/postprod/download/<file>` | `transcript.txt`, `transcript.srt` and `summary.md` as attachments, with `?lang=`. Any other file name answers `400`; the **Download** menu's `.vtt` link points to `…/postprod/subtitle/<lang>` |
+| `GET …/postprod/download/<file>` | `transcript.txt`, `transcript.srt` and `summary.md` as attachments, with `?lang=`. When the recording has no source language, which a recording without media may lack, the transcript is served in its own language whatever `?lang=` asks. File names carry the language the content is actually in. Any other file name answers `400`; the **Download** menu's `.vtt` link, shown only when a subtitle file exists for the language, points to `…/postprod/subtitle/<lang>` |
 
 On the event page:
 
@@ -1238,22 +1557,160 @@ On the event page:
   overlap, copies a link to a moment, and offers the downloads under
   **Download**. It shares the player's `<video>` element through a ref.
 
+## The event report
+
+Staff can ask for an AI report of the event: a text for those who were not
+there and for those who want to look back, set beside the platform's own
+figures and charts. It is a job of kind `REPORT` in the same queue, but staff
+request it by hand, it reads much more than the recording, and its result
+lives on the event, not on a recording (`app/src/lib/report/`,
+`infra/ai/worker/report.py`).
+
+**Requesting it.** The **AI event report** panel of the event's **After the
+event** tab (`app/src/components/admin/event-report-panel.tsx`) shows the
+requirements, the material available (transcript, chat messages, questions,
+published polls, words, ratings, reactions to the agenda) and the languages,
+and offers **Generate the report** or **Regenerate the report**. It is meant
+for after the ratings are in: those received up to the claim are included.
+Behind it is `/api/admin/events/<id>/report`, for the staff who manage the
+event (administrators, and organizers for their own events):
+
+| Method | Does |
+|---|---|
+| `GET` | The stored report, whether it is published, the last `REPORT` job, the requirements, the counts of available material and the languages |
+| `POST` | Queues a `REPORT` job (`202`, audit `EVENT_REPORT_REQUESTED`), with optional `targetLanguages`; by default the event's AI target languages (`aiTargetLocales`), without the source language. One at a time per event: while a job is pending or running, it answers `200` with that job |
+| `PUT` | `{ published }`: shows or hides the report on the event page (audit `EVENT_REPORT_PUBLISHED` or `EVENT_REPORT_WITHDRAWN`) |
+
+A request needs an `ENDED` event, the site switch on, and the event's data
+retention not yet over, because chat, reactions to the agenda and attendance
+are deleted at retention; otherwise `POST` answers `409`.
+
+**The job.** Unlike the other jobs it belongs to the event
+(`PostprodJob.eventId`), not to a recording (`recordingId` is empty): an
+event without a recording still has chat, polls and ratings, and nothing done
+to a recording (cancelling its post-production, replacing or deleting it)
+touches the report. It goes to the CPU worker (`AI_WORKER_KINDS` includes
+`REPORT` in the chart) and counts in the orchestrator's demand, so vLLM
+starts on demand as for a summary. It produces no artifact and changes no
+recording's status. The worker reports progress after each step, so a long
+transcript summarised in many chunks keeps its lease.
+
+**Inputs.** The portal gathers them when the job is claimed
+(`app/src/lib/report/input.ts`):
+
+- the event's title, description, and public organizations and people;
+- the agenda, with the agree and disagree count of each item;
+- the transcript the public page would show, from AI or from live captions,
+  with the speaker names given by staff or by those who consented, one line
+  per turn with its minute (long turns split), up to a length cap; the worker
+  first summarises a long transcript in chunks, so
+  that the final request fits the model's context;
+- the existing summary;
+- the chat without names, only role and time, as a sample of at most 400
+  messages spread over the event;
+- up to 40 Q&A questions with their written answers, without authors;
+- published polls, and word-cloud words;
+- the post-event questionnaire (Likert averages and up to 100 open comments,
+  without authors) and the older star ratings;
+- the platform's figures.
+
+The figures (`app/src/lib/report/metrics.ts`) are built on the same
+statistics as the **Statistics** tab (`app/src/lib/analytics/event-stats.ts`);
+questions count both those asked in chat and those of the separate Q&A.
+The portal computes them and stores them in the job's payload; the model only
+comments on them, and no number in the report comes from the model.
+
+**Writing.** The worker asks the language model, at the OpenAI-compatible
+endpoint of the claim (vLLM in the cluster), for a JSON report: title,
+abstract, summary, highlights, topics (explanation, key points, start minute,
+level of agreement, positions in favour, concerns and questions), a concept
+map (topics, concepts, actors and outcomes, with labelled links), agreement
+and disagreement, participation, benefits, feedback (strengths, things to
+improve, short voices from the comments in the model's own words), open
+questions and next steps. The prompt asks for facts from the inputs only,
+names only of the event's listed people and of named speakers, no attribution
+of chat or comment sentences to anyone, comments always reworded, and no
+personal data. The portal also removes any email address and phone number
+from the text it receives, keeping amounts, years, dates and public codes
+such as a CIG or a VAT number. The report is then translated into each
+requested language, with the glossary; a translation that fails leaves that
+language out. The worker posts the result to `POST /api/internal/event-report`
+(`x-api-key`), which normalises the text (`app/src/lib/report/normalize.ts`),
+joins it to the figures from the job, and freezes it on the event
+(`Event.postEventReport`, `postEventReportAt`) unpublished. The same
+transaction takes the figures from the job and closes it as done
+(`app/src/lib/report/job.ts`): a `REPORT` job is done only when its report is
+saved, a closed job never reopens, and every closure removes the figures in
+the same update. Every claim increments the job's `attempts`, and the
+worker sends that number back with its progress, failure and delivery: a
+message counts only while the number is still the job's, and the same update
+checks it. If a lease expires and another worker claims the job, the worker
+that lost it learns so from the next answer and stops without reporting a
+failure, so the text and the figures of a report always come from the same
+claim.
+
+**Publishing.** Staff read the report in the panel's preview, in each
+language, and publish it with **Show the report on the event page**
+(`Event.postEventReportPublished`); a regenerated report stays hidden until it
+is published again. The public event page shows it for an `ENDED` event whose
+post-event page is visible, after the video and before the description, in
+the page's language when there is a translation, otherwise in the event's
+language with a note (`app/src/lib/report/view.ts`,
+`app/src/components/events/report/`). A section appears only when it has
+content: header with the abstract and the AI notice, highlights,
+participation figures, a stacked chart of participation over time, the
+topics (with **Go to** a minute when there is a video), the concept map,
+agreement and disagreement with diverging bars for the agenda items, polls,
+the distribution of each Likert question, benefits, open questions, next
+steps and the full text. The charts are SVG and HTML drawn by the page, each
+with a table of its data for screen readers, and no chart library is loaded.
+The concept map's nodes take the keyboard focus and highlight their links,
+and a hidden list repeats the map for screen readers.
+
+**Retention.** The stored report is aggregate: counts and averages, the texts
+of published polls, of the most voted questions and of the words, which the
+recap also keeps, and the model's text, which is instructed to avoid personal
+data. Like the recap, it stays with the event after the cleanup deletes the
+data it came from, and goes only with the event; duplicating an event does
+not copy it ([Privacy and data protection](GDPR.md)).
+
 ## Transparency (AI Act Article 50)
 
 Article 50 of the EU AI Act requires that people know when content is
-generated by AI. The pipeline marks its outputs in five ways:
+generated by AI. The pipeline marks its outputs in these ways:
 
 - **In the data.** Every `PostprodArtifact` has `isSynthetic = true`, a
   transcript included, and records the producing component in `modelId` and
   `modelVersion`. Per-participant transcripts record `multitrack`, so the
   provenance panel shows that value as the speech-recognition model; the
-  archive records `archive-mux`, and the waveform records none.
+  archive records `archive-mux`, the transcript from live captions
+  `live-captions`, and the waveform records none.
 - **In the interface.** The transcript and summary carry the badge
   **AI-generated content**, with the text "Transcript and summary are
   produced automatically by the in-cluster AI pipeline. They may contain
   errors; the video remains the authoritative source." The disclaimer is part
-  of the interface, not of the summary file. Dubbed audio shows the synthetic
-  voice banner.
+  of the interface, not of the summary file. A transcript from live captions
+  carries the same badge with its own text: "The transcript comes from the
+  live event's automatic captions and includes only the contributions of
+  people who gave their consent. It may contain errors." Dubbed audio shows
+  the synthetic voice banner.
+- **In the files.** The portal marks every output it serves, when it serves
+  it (`app/src/lib/ai/marking.ts`), so outputs produced before this marking
+  carry it too, and the stored files the worker reads back stay unchanged:
+  - WebVTT subtitles get a `NOTE` block after the header with
+    `ai-generated: true` and the notice, which players ignore;
+  - the `.txt` transcript and the `.md` summary downloads start with the
+    notice, and the Markdown also with an `<!-- ai-generated: true -->`
+    comment;
+  - the `.srt` download, which has no comment syntax, and the dubbed audio
+    carry only the HTTP header;
+  - every one of these responses, and the transcript JSON of the public
+    panel (`aiGenerated: true`), carries the header `X-AI-Generated: true`.
+
+  A file that a person corrected after generation says so (`ai-revision`),
+  and so does the public panel, next to the badge. The first correction of a
+  transcript or of a summary keeps the machine version
+  (`PostprodOriginalBody`).
 - **In the audio.** Dubbed audio carries an AudioSeal watermark when
   watermarking succeeds (`watermarkType = audioseal`).
 - **In the provenance panel.** **AI processing transparency** opens the
@@ -1262,6 +1719,10 @@ generated by AI. The pipeline marks its outputs in five ways:
 - **Before the event.** When the site switch is on and the event uses any AI
   option, the waiting room shows the notice from **AI notice in the waiting
   room**.
+- **In the event report.** The published report says that its text is
+  written by an artificial intelligence model and that staff reviewed it
+  before publishing; the figures and charts beside it are computed by the
+  platform ([The event report](#the-event-report)).
 
 The legal analysis (bases, voice data, retention, the difference between
 transcription and biometric identification) is in
@@ -1310,7 +1771,7 @@ worker Jobs are deleted after `ttlSecondsAfterFinished`, and their logs go
 with them:
 
 ```bash
-kubectl get jobs -n pa-webinar -l app.kubernetes.io/component=postprod-worker
+kubectl get jobs -n pa-webinar -l 'app.kubernetes.io/component in (postprod-worker,postprod-worker-cpu)'
 kubectl logs -n pa-webinar job/<worker-job-name>
 kubectl logs -n pa-webinar job/<orchestrator-job-name>
 ```
@@ -1411,7 +1872,7 @@ of the cache layout. Seed again with the
 [seed Job](#seeding-the-models-volume), and add the alignment model for the
 recording's language.
 
-**Summary or translation jobs wait for 12 minutes, then fail with a connection
+**Summary or translation jobs wait for 20 minutes, then fail with a connection
 error.** vLLM is not reachable at the base URL in the claim. Check that the
 Service exists in the release namespace with the expected name, that
 `AI_VLLM_BASE_URL` in `app.env` matches it, and, with autoscaling on, that the
@@ -1525,17 +1986,23 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   of a run finishes by registering an artifact; a run whose last job fails,
   or that never completes, keeps the previous snapshot. Its LLM vendor and license are fixed values
   ([Choosing another model](#choosing-another-model)).
-- **Consent is per event.** `Registration` has columns for per-person consent
-  to transcription, summary and translation, but nothing writes or reads them.
-  `consentSnapshot` is a record of the event's flags, not a gate
-  ([Snapshots](#snapshots)).
+- **Consent to AI processing is per event.** `Registration` has columns for
+  per-person consent to transcription, summary and translation, but nothing
+  writes or reads them. `consentSnapshot` is a record of the event's flags,
+  not a gate ([Snapshots](#snapshots)). The only per-person consent is the
+  transcription of one's own contributions, which decides which tracks the
+  recorder records and what the transcript from live captions keeps; a
+  composite recording is transcribed whole.
 - **Corrections do not reach derived outputs.** Translations, summaries and
   dubbing cannot be regenerated from an edited transcript without discarding
   the edits.
-- **Some text is Italian in every language.** The summary prompt is written
-  in Italian; Markdown section headings exist for Italian, English and French,
-  and other languages get English headings. Unmapped speakers appear in the
-  public transcript as `Partecipante <n>` whatever the page language.
+- **Some text is Italian in every language.** The summary prompt, including
+  the room timeline the portal adds to it, is written in Italian; Markdown section headings exist for Italian, English and French,
+  and other languages get English headings. The opening topic that can
+  precede the agenda's chapters is requested as «Apertura», and the worker
+  names it so when it joins several of the model's topics into it. Unmapped
+  speakers appear in the public transcript as `Partecipante <n>` whatever the
+  page language.
 - **The Hugging Face Secret is mandatory.** The worker template renders the
   `HF_TOKEN` reference whenever the `hfTokenSecret` map exists, so an empty
   `postprod.worker.hfTokenSecret.name` breaks the worker template
@@ -1545,8 +2012,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
 - **No post-production on a single VM**, and without `postprod.enabled` no
   job deletes per-participant tracks
   ([Scheduled and background jobs](architecture/background-jobs.md)).
-- **No live captions** and **no full-text search** in transcripts
-  ([Roadmap](ROADMAP.md)).
+- **No full-text search** in transcripts ([Roadmap](ROADMAP.md)). Captions
+  during the event are not part of this pipeline: see
+  [Live captions](architecture/live-captions.md).
 
 ## Related pages
 

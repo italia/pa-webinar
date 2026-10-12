@@ -28,7 +28,8 @@ import {
   applyOverride,
   loadEmailTemplateOverride,
 } from '@/lib/email/resolve-template';
-import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
+import { localizedUrl } from '@/lib/utils/localized-url';
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { linguaEmail } from '@/lib/email/lingua';
@@ -91,7 +92,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       locale: testi,
       eventTitle: title,
       eventDate: formatDate(event.startsAt, testi, event.timezone),
-      eventTime: formatTime(event.startsAt, testi, event.timezone),
+      eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
       eventDuration: formatDuration(event.startsAt, event.endsAt),
       joinUrl: input.joinUrl,
       eventPageUrl: input.eventPageUrl,
@@ -107,6 +108,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       // pubblica ma non è mai arrivata in posta).
       eventImageUrl: absoluteEventImage(event, baseUrl),
       addressBookOptOutUrl: rubricaOptOutUrl(registration.person, baseUrl, input.locale),
+      myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', input.locale),
     };
 
     // UID stabile e SEQUENCE dall'ultima modifica: la conferma, i promemoria e

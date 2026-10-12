@@ -77,17 +77,21 @@ export function ConfirmProvider({ children }: { children: ReactNode }): React.Re
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
-      <Modal isOpen={state.open} toggle={() => settle(false)} centered>
-        <ModalHeader closeAriaLabel={tc('close')} toggle={() => settle(false)}>{state.title}</ModalHeader>
+      <Modal isOpen={state.open} toggle={() => settle(false)} centered labelledBy="confirm-dialog-title">
+        {/* Il nome della finestra e' il solo titolo, non l'intestazione intera
+            (che contiene anche il pulsante «Chiudi»). */}
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => settle(false)}>
+          <span id="confirm-dialog-title">{state.title}</span>
+        </ModalHeader>
         <ModalBody>
           <p className="mb-0">{state.message}</p>
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" outline onClick={() => settle(false)}>
-            {state.cancelLabel ?? 'Annulla'}
+            {state.cancelLabel ?? tc('cancel')}
           </Button>
           <Button color={state.danger ? 'danger' : 'primary'} onClick={() => settle(true)}>
-            {state.confirmLabel ?? 'Conferma'}
+            {state.confirmLabel ?? tc('confirm')}
           </Button>
         </ModalFooter>
       </Modal>

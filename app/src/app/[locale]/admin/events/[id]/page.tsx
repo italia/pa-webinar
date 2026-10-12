@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
@@ -9,7 +9,10 @@ import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { publicRegistrationFor } from '@/lib/events/registration-access';
 import EventManagementClient from '@/components/admin/event-management-client';
+import { localizedPath } from '@/lib/utils/localized-url';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface EventManagePageProps {
   params: Promise<{ id: string }>;
@@ -17,6 +20,17 @@ interface EventManagePageProps {
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]', id, { token, conToken: true });
+}
 
 export default async function EventManagePage({
   params,
@@ -29,8 +43,17 @@ export default async function EventManagePage({
 
   // Chi arriva dall'area di amministrazione (l'elenco, la libreria video)
   // non ha il token nell'indirizzo: vale la sessione dello staff, e per
-  // l'organizzatore solo sui propri eventi (ADR-014).
-  const staff = token ? null : await getStaffSession(await cookies());
+  // l'organizzatore solo sugli eventi che gestisce (eventScope, ADR-014).
+  const session = await getStaffSession(await cookies());
+
+  // Con una sessione che puo' gestire l'evento il token nell'indirizzo non
+  // serve: si torna all'indirizzo pulito, che non lo espone a cronologia,
+  // log e condivisioni dello schermo. Chi ha solo il link del moderatore
+  // (anche un organizzatore su un evento altrui) continua a entrare col token.
+  if (token && session && UUID_RE.test(id) && (await puoGestire(session, id))) {
+    redirect(localizedPath(`/admin/events/${id}`, locale));
+  }
+  const staff = token ? null : session;
 
   if (!token && !staff) {
     return (
@@ -82,7 +105,9 @@ export default async function EventManagePage({
       organizers: { orderBy: { sortOrder: 'asc' } },
       additionalMods: { orderBy: { createdAt: 'asc' } },
       questionnaires: true,
-      _count: { select: { registrations: true, recordings: true } },
+      // Le registrazioni con un file: quella «solo sottotitoli» non ha niente
+      // da dare alla pipeline AI.
+      _count: { select: { registrations: true, recordings: { where: { blobKey: { not: '' } } } } },
     },
   });
 
@@ -137,6 +162,7 @@ export default async function EventManagePage({
     // Gated separately from recordingUrl: an externally/manually-set recordingUrl
     // has no Recording row, so "Generate AI" would 404.
     hasRecordingRow: event._count.recordings > 0,
+    captionsTranscriptEnabled: event.captionsTranscriptEnabled,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
     postEventShowQA: event.postEventShowQA,
@@ -146,6 +172,8 @@ export default async function EventManagePage({
     postEventShowRecap: event.postEventShowRecap,
     postEventShowWordCloud: event.postEventShowWordCloud,
     postEventEmailEnabled: event.postEventEmailEnabled,
+    recordingNotifyEnabled: event.recordingNotifyEnabled,
+    recordingNotifiedAt: event.recordingNotifiedAt?.toISOString() ?? null,
     feedbackEnabled: event.feedbackEnabled,
     recordingConsentText: event.recordingConsentText,
     moderatorToken: event.moderatorToken,
@@ -157,6 +185,9 @@ export default async function EventManagePage({
     privacyPolicyText: event.privacyPolicyText,
     speakersInfo: event.speakersInfo as Record<string, string> | null,
     createdAt: event.createdAt.toISOString(),
+    accessMode: event.accessMode,
+    // Chi si iscrive davvero: la scelta dell'evento, o quella del sito.
+    registrationOpen: publicRegistrationFor(event, settings.publicRegistrationEnabled),
     requireOrganization: event.requireOrganization,
     requireOrganizationRole: event.requireOrganizationRole,
     requireOrganizationType: event.requireOrganizationType,
@@ -232,6 +263,7 @@ export default async function EventManagePage({
         // pubblica si valutano su questo finche' il browser non ha il suo
         // orologio, cosi' la prima passata del client coincide col server.
         renderedAt={Date.now()}
+        viaToken={staff ? null : (token ?? null)}
       />
     </div>
   );

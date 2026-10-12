@@ -42,12 +42,22 @@ const bodySchema = z.object({
   eventId: z.string().uuid(),
   recordingId: z.string().uuid(),
   tracks: z.array(trackSchema).min(1).max(500),
+  /** Ora assoluta (epoch ms, orologio del registratore) del primo fotogramma:
+   *  lo zero dei tempi delle tracce e della trascrizione. Facoltativa per i
+   *  registratori che non la mandano ancora; un valore senza senso si ignora
+   *  invece di rifiutare il manifest, che porterebbe via le tracce. */
+  recordingStartedAtMs: z.number().optional(),
 });
+
+/** Dal 2020 in poi: prima e' un valore rotto, non un'ora di registrazione. */
+const MIN_PLAUSIBLE_EPOCH_MS = Date.UTC(2020, 0, 1);
 
 export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
-  const { eventId, recordingId, tracks } = bodySchema.parse(await request.json());
+  const { eventId, recordingId, tracks, recordingStartedAtMs } = bodySchema.parse(
+    await request.json(),
+  );
 
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },
@@ -85,6 +95,18 @@ export const POST = withErrorHandling(async (request) => {
   const skipSilent = allTracksSilent(tracks) && recording.event.aiTranscriptEnabled;
 
   const result = await prisma.$transaction(async (tx) => {
+    // Lo zero dei tempi della trascrizione: la cronologia della sala ci
+    // misura sopra le sue azioni (lib/postprod/live-timeline.ts).
+    if (
+      recordingStartedAtMs !== undefined &&
+      Number.isFinite(recordingStartedAtMs) &&
+      recordingStartedAtMs >= MIN_PLAUSIBLE_EPOCH_MS
+    ) {
+      await tx.recording.update({
+        where: { id: recordingId },
+        data: { mediaStartedAt: new Date(recordingStartedAtMs) },
+      });
+    }
     for (const t of tracks) {
       const data = {
         participantId: t.participantId,

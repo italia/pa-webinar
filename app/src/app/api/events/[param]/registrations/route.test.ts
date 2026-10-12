@@ -99,13 +99,21 @@ describe('POST registrations — iscrizione pubblica', () => {
     expect(tx.eventInvitation.findFirst).not.toHaveBeenCalled();
   });
 
-  it('accesa: token, link e cookie nella risposta; nell\'email il link della sala', async () => {
+  it("accesa: token, link e cookie nella risposta; nell'email il link firmato", async () => {
     const res = await iscriviti('anna@example.com');
     const body = (await res.json()) as { accessToken: string; joinUrl: string };
     expect(body.accessToken).toBeTruthy();
     expect(body.joinUrl).toContain(`/live?token=${body.accessToken}`);
+    // La firma prova che l'indirizzo e' di chi apre l'email: non esce mai
+    // nella risposta al modulo.
+    expect(body.joinUrl).not.toContain('sig=');
     expect(res.headers.get('Set-Cookie')).toContain(`event_access_${EVENT_ID}=`);
-    expect(linkEmail().pathname).toBe(`/it/eventi/${SLUG}/live`);
+    const link = linkEmail();
+    expect(link.pathname).toBe(`/api/events/${SLUG}/registrations/enter`);
+    expect(link.searchParams.get('token')).toBe(body.accessToken);
+    // Iscrizione pubblica: la firma che prova l'indirizzo, non quella che lega.
+    expect(link.searchParams.get('proof')).toBeTruthy();
+    expect(link.searchParams.get('sig')).toBeNull();
   });
 
   it('accesa: un indirizzo già iscritto riceve «già iscritto»', async () => {
@@ -186,5 +194,120 @@ describe('POST registrations — iscrizione pubblica spenta', () => {
     // Nella lingua dell'iscrizione, non in quella di chi ha compilato ora.
     expect(input?.locale).toBe('en');
     expect(linkEmail().searchParams.get('token')).toBe('tok-vecchio');
+  });
+});
+
+describe('POST registrations — l ente quando l evento lo chiede', () => {
+  it('senza ente: 422, nessuna iscrizione', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: false,
+      multitrackRecordingEnabled: false,
+      requireOrganization: true,
+      accessMode: null,
+      _count: { registrations: 0 },
+    } as never);
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(422);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST registrations — la scelta dell evento vale sopra quella del sito', () => {
+  function evento(accessMode: 'OPEN' | 'INVITATION') {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: false,
+      multitrackRecordingEnabled: false,
+      accessMode,
+      _count: { registrations: 0 },
+    } as never);
+  }
+
+  it('solo su invito, con il sito aperto: chi non e invitato non si iscrive', async () => {
+    siteSettings.publicRegistrationEnabled = true;
+    evento('INVITATION');
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(202);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+    expect(sendConfirmationEmail).not.toHaveBeenCalled();
+  });
+
+  it('aperto, con il sito solo su invito: chiunque si iscrive', async () => {
+    siteSettings.publicRegistrationEnabled = false;
+    evento('OPEN');
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(201);
+    expect(tx.registration.create).toHaveBeenCalledTimes(1);
+    expect(tx.eventInvitation.findFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST registrations — consensi secondo il formato dell\'evento', () => {
+  function evento(over: Record<string, unknown>) {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: true,
+      multitrackRecordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      _count: { registrations: 0 },
+      ...over,
+    } as never);
+  }
+
+  function iscrivitiCon(consensi: Record<string, unknown>): Promise<Response> {
+    ipCounter += 1;
+    const request = new Request(`http://localhost:3000/api/events/${SLUG}/registrations`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': `10.2.0.${ipCounter}` },
+      body: JSON.stringify({ displayName: 'Anna Bianchi', email: 'anna@example.com', consentGiven: true, ...consensi }),
+    });
+    return POST(request as unknown as NextRequest, { params: Promise.resolve({ param: SLUG }) });
+  }
+
+  it('solo ascolto: niente consenso alla registrazione, la trascrizione si chiede ma e\' facoltativa', async () => {
+    evento({});
+    const senza = await iscrivitiCon({});
+    expect(senza.status).toBe(201);
+    expect((tx.registration.create.mock.calls[0]?.[0]?.data as Record<string, unknown>).consentMultitrack).toBe(false);
+    tx.registration.create.mockClear();
+    tx.gdprAuditLog.create.mockClear();
+    const res = await iscrivitiCon({ consentMultitrack: true });
+    expect(res.status).toBe(201);
+    const data = tx.registration.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(data.consentRecording).toBeNull();
+    expect(data.consentMultitrack).toBe(true);
+    const audit = JSON.parse(
+      (tx.gdprAuditLog.create.mock.calls[0]?.[0] as { data: { details: string } }).data.details,
+    );
+    expect(audit.recordingConsentRequired).toBe(false);
+  });
+
+  it('con il microfono concesso la registrazione e\' obbligatoria, la trascrizione no', async () => {
+    evento({ participantsCanUnmute: true });
+    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
+    const ok = await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
+    expect(ok.status).toBe(201);
+  });
+
+  it('con il solo schermo condiviso si chiede il consenso alla registrazione', async () => {
+    evento({ participantsCanShareScreen: true, multitrackRecordingEnabled: false });
+    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
   });
 });

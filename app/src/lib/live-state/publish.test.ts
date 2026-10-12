@@ -23,6 +23,7 @@ const FLAG_BASE = {
   chatEnabled: true,
   agendaEnabled: false,
   wordCloudEnabled: false,
+  liveCaptionsEnabled: true,
   recordingEnabled: false,
 };
 

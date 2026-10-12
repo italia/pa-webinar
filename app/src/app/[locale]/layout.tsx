@@ -94,7 +94,7 @@ export default async function LocaleLayout({
           <SettingsProvider settings={settings}>
             <Skiplink />
             <PAHeader isAdmin={isAdmin} />
-            <main id="main-content" className="flex-grow-1">
+            <main id="main-content" className="flex-grow-1" tabIndex={-1}>
               {children}
             </main>
             <PAFooter />

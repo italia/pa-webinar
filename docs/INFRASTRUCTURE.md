@@ -307,7 +307,7 @@ section not yet verified.
 |---|---|---|---|---|
 | Applications | Portal, every CronJob (email outbox, reminders, GDPR cleanup, retention, recording reconciliation, post-production orchestration), the bridge scaler, the recorder controller and the recorder bots, Jitsi signaling, in-cluster PostgreSQL and Redis if used | None needed; a label you choose if you set `app.nodeSelector` | Fixed or autoscaled, at least two nodes across zones for the two app replicas | The CronJobs, the scaler and the recorder controller inherit `app.nodeSelector`. If no node carries that label, the portal and every job stay `Pending`. The recorder bots take `recorder.nodeSelector` instead, empty by default |
 | Bridges | JVB | Label and taint `workload=jitsi-jvb` | 0 to N with the full profile; fixed otherwise | Regular capacity, never spot: an eviction drops everyone on the bridge. One bridge per node with the default host port. The complete contract is in [The JVB pool contract](../infra/aks/node-pools.md#the-jvb-pool-contract) |
-| Recording | Jibri, in the full profile, on the bridge pool (`workload=jitsi-jvb`) or on a pool of its own | Same as the bridges | Scaled up only while recording | The chart renders Jibri's upload script but does not mount it: see [Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script). The per-participant audio recorder is separate: see [Recording](architecture/recording.md) |
+| Recording | Jibri, in the full profile, on the bridge pool (`workload=jitsi-jvb`) or on a pool of its own | Same as the bridges | Scaled up only while recording | The chart mounts Jibri's upload script; the variables it reads are in [Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script). The per-participant audio recorder is separate: see [Recording](architecture/recording.md) |
 | GPU | AI post-production worker, and a vLLM server that you deploy | Label and taint `workload=ai-gpu` | 0 to N | The GPU device plugin must tolerate the pool's taint, and on spot capacity the spot taint too; otherwise no node advertises a GPU, the worker stays `Pending` and the GPU nodes keep running. A node's allocatable CPU and memory must exceed the worker's requests (`postprod.worker.resources` in `values.yaml`), or the autoscaler never scales the pool up. See [AI post-production](POSTPROD.md#provisioning-a-gpu-node-pool) |
 
 `examples/values-full.yaml` leaves `app.nodeSelector` empty, so the portal and
@@ -721,8 +721,16 @@ selected, so their own traffic is not restricted.
 
 | Direction | Allowed |
 |---|---|
-| Ingress, on TCP 3000 | The ingress controller: namespaces in `networkPolicy.ingress.fromNamespaceSelectors` (default: `ingress-nginx`) and pods in `fromPodSelectors`; with both lists empty, any source. Every pod carrying the release's selector labels, which admits the scheduled jobs, the scaler, the recorder controller and the post-production worker. The Jibri pods when Jibri is enabled. The `monitoring` namespace when `allowMonitoring` is on. Anything in `ingress.extraRules` |
+| Ingress, on TCP 3000 | The ingress controller: namespaces in `networkPolicy.ingress.fromNamespaceSelectors` (default: `ingress-nginx`) and pods in `fromPodSelectors`; with both lists empty, any source. Every pod carrying the release's selector labels, which admits the scheduled jobs, the scaler, the recorder controller and the post-production worker. The Jibri pods when Jibri is enabled. The Prosody pods when the chart installs Jitsi (`jitsi.enabled`), for the occupants module. The live captions pods when captions are enabled. The `monitoring` namespace when `allowMonitoring` is on. Anything in `ingress.extraRules` |
 | Egress | DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods); PostgreSQL and Redis pods; the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge statistics), 2222 (Jibri health), 80 (the web container) and 8888 (Jicofo's REST API), the last two for the status page's in-cluster probes; the recorder controller when it is enabled; the ingress controller's namespaces on 443 and 8443, for the portal's calls to its own public hostnames; TCP 587 anywhere (465 with `allowImplicitTlsSmtp`); TCP 443 anywhere except `169.254.0.0/16` (`httpsExcept`); anything in `egress.extraRules` |
+
+With in-cluster Jibri, a second policy (`<fullname>-jibri`) selects the Jibri
+pods and admits only the app pods, on TCP 2222. The chart opens Jibri's HTTP
+API on every interface so the portal can read its health, and that API also
+starts and stops recordings and streams without authentication: the policy
+keeps every other pod away from it. Jibri receives no other traffic; it opens
+its own connections to Prosody, the conference and storage. Without
+`networkPolicy.enabled`, any pod in the cluster can reach that API.
 
 [NetworkPolicy](DEPLOYMENT.md#networkpolicy) in Deploying with Helm describes
 each key. The PostgreSQL and Redis subcharts render their own permissive
@@ -816,6 +824,8 @@ builds ([Registry access](install/README.md#registry-access-to-the-published-ima
 | `ghcr.io/italia/pa-webinar` | Migration init container | `X.Y.Z-migrate` and `vX.Y.Z-migrate` per release. Releases published before both forms existed carry only `vX.Y.Z-migrate` ([Migration image tags](development/ci-and-release.md#migration-image-tags)). From the development branch, `dev-migrate` and `dev-migrate-<sha>` |
 | `ghcr.io/italia/pa-webinar-jitsi-web` | Jitsi web with the noise-suppression patch | One immutable tag per patch revision, named after the Jitsi release it patches (`stable-<jitsi-release>-rnnoise`, with a suffix for later revisions on the same release). The chart's default can lag behind the latest published tag: pin the one you pull ([Web image and pull secrets](DEPLOYMENT.md#web-image-and-pull-secrets)) |
 | `ghcr.io/italia/pa-webinar-recorder`, `-recorder-controller`, `-postprod-worker` | Per-participant recorder, its controller, AI post-production | The release version from 0.13.0, which the chart uses when the image value is empty (it takes the app image's tag); the floating `:dev` and an immutable `:dev-<sha>` from the development branch |
+| `ghcr.io/italia/pa-webinar-captions-gateway`, `-captions-engine` | Live captions: the gateway and the speech engine (the model is downloaded at pod start, not in the image) | The release version from the first release that includes them, which the chart uses when `captions.gateway.image` and `captions.engine.image` are empty; `:dev` and `:dev-<sha>` from the development branch |
+| `ghcr.io/italia/pa-webinar-postprod-worker-cpu` | AI post-production without a GPU (summaries, translations, archive), a light image | The release version from the first release that includes it, and `:dev`, `:dev-<sha>`; with `postprod.worker.image` set and this one not, the chart uses the GPU worker's image ([Upgrades](operations/upgrades.md#making-the-dev-components-roll-back)) |
 
 The development tags are for evaluation, as in the minikube guide; an
 installation that serves events pins a release. The published images are
@@ -834,8 +844,8 @@ docker build --target builder -t pa-webinar:local-migrate .        # migrations 
 
 The browser-facing settings (`NEXT_PUBLIC_*`) are read at runtime, so one image
 serves any host name. The other components build from their own folders:
-`infra/recorder`, `infra/recorder-controller`, and `infra/ai` with
-`Dockerfile.worker`. Local builds on other architectures were not tested.
+`infra/recorder`, `infra/recorder-controller`, `infra/captions/gateway`,
+`infra/captions/engine`, and `infra/ai` with `Dockerfile.worker`. Local builds on other architectures were not tested.
 
 To serve Jitsi web without credentials, use the standard image and drop the
 pull secrets:
@@ -921,7 +931,6 @@ tolerant liveness probe for the bridge, are chart defaults on every profile.
 | The bridge heap is not capped | A 4 GiB node thrashes and drops the conference | [Bridge memory on small nodes](#bridge-memory-on-small-nodes). `examples/values-minikube.yaml` caps it |
 | The bridge's default STUN server is a third-party service | An outbound dependency, and an extra advertised address. The post-install notes warn | [Advertised addresses and NAT](#advertised-addresses-and-nat) |
 | `db-migrate` starts before PostgreSQL is ready | A few restarts on the first install; early jobs end in `Error` | Wait: it resolves on its own |
-| Jibri is enabled by the standard and full profiles, but the chart renders its finalize script without mounting it | Composite recordings are neither uploaded nor registered | [Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script) |
 | The conference-root redirect is an ingress-nginx annotation | No redirect with other controllers; the notes warn when the redirect's class is in `ingress.nonNginxClassNames` | None |
 | Object storage accepts only static keys | IRSA, EKS Pod Identity and GKE or Azure workload identity cannot be used | Static keys |
 | `REDIS_URL` ends in `svc.cluster.local` | Chat fan-out fails on clusters with a custom cluster domain | Keep the default domain |

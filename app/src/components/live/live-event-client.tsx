@@ -18,6 +18,8 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
+import { messaggioErroreApi } from '@/lib/api-error-message';
+import { sezioniDopoEvento, type SezioneDopoEvento } from '@/lib/events/post-event-sections';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   faseRegistratoreStabile,
@@ -28,35 +30,53 @@ import {
 } from '@/lib/jitsi/bridge-readiness';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
-import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
-import ModeratorControls from '@/components/jitsi/moderator-controls';
-import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
+import { useQaAlerts } from '@/hooks/use-qa-alerts';
+import {
+  consensoRegistrazioneIngresso,
+  consensiDaInviare,
+  type ProveConsenso,
+} from '@/lib/live/entry-consents';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
+import { fetchMaterials, materialsListKey } from '@/components/materials/material-request';
 import ParticipantPanel from '@/components/participants/participant-panel';
-import PreJoinScreen from '@/components/live/pre-join-screen';
-import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal';
-import PresentationTimer from '@/components/live/presentation-timer';
+import PostEventFeedback from '@/components/live/post-event-feedback';
+import PresentationTimerBar from '@/components/live/presentation-timer';
+import LiveTimeStrip from '@/components/live/live-time-strip';
+import ClosingNotice from '@/components/live/closing-notice';
+import LiveCaptions from '@/components/live/live-captions';
+import StageName from '@/components/live/stage-name';
+import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
+import { useCaptionsControl } from '@/hooks/use-captions-control';
+import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
+import { primaryLanguageCode } from '@/lib/captions/vocabulary';
+import { TimerInterventiSync, useScartoOrologio } from '@/hooks/use-presentation-timer';
+import { usePresenze } from '@/hooks/use-presence';
 import ReactionBar from '@/components/live/reaction-bar';
-import ChatPanel from '@/components/live/chat-panel';
+import ChatPanel, { type ChatPreview } from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
 import {
   registrationAccessToken,
   voterIdentity,
   voterIdStorageKey,
 } from '@/components/live/voter-identity';
-import EventTimer from '@/components/live/event-timer';
+import AgendaTicker from '@/components/live/agenda-ticker';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
+  type RiepilogoSala,
   type WaitingRoomJoinPrefs,
   type WaitingRoomWarmup,
 } from '@/components/live/waiting-room';
 import { closingPhase, exitDestination, phaseAfterTokenConflict } from '@/components/live/live-phase';
 import { warmupFromLifecycle } from '@/components/live/lifecycle-warmup';
+import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
+import { isHumanParticipant } from '@/lib/jitsi/participants';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
+import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
+import { eventAdminPath } from '@/lib/events/admin-links';
 
 interface EventInfo {
   id: string;
@@ -90,13 +110,15 @@ interface EventInfo {
   speakers?: string | null;
   organizerName?: string | null;
   moderatorName?: string | null;
+  /** Descrizione, enti e persone per il riepilogo della sala d'attesa. */
+  riepilogo?: RiepilogoSala;
   imageUrl?: string | null;
   coverImageUrl?: string | null;
   maxParticipants?: number;
   registrationCount?: number;
   /** Soft-exit grace in minutes past endsAt. Null → site default. */
   gracePeriodMinutes?: number | null;
-  /** Resolved grace value (settings default applied). Used for the overtime banner. */
+  /** Tetto del fuori orario risolto (default di sito applicato): lo usa il contatore. */
   effectiveGraceMinutes?: number;
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
@@ -104,10 +126,15 @@ interface EventInfo {
    *  "Destino evento" default so ending the call never silently overrides a
    *  pre-configured private (postEventPublic=false) or library setting. */
   postEventPublic?: boolean;
+  /** Le sezioni che chi organizza mostra a evento concluso (Event.postEventShow*). */
+  postEventShow?: Record<SezioneDopoEvento, boolean>;
   libraryListed?: boolean;
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
+  /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
+   *  al consenso chiesto in sala d'attesa. */
+  privacy?: { url: string; testo?: string };
   timezone?: string;
   /** True quando il master switch AI è attivo e l'evento usa almeno una
    *  feature di post-produzione AI — abilita l'informativa in sala d'attesa. */
@@ -115,9 +142,19 @@ interface EventInfo {
   /** Testo custom per-locale dell'informativa AI (SiteSetting); null →
    *  la WaitingRoom usa il fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** Sottotitoli live disponibili nell'istanza: accesi dall'amministrazione e
+   *  servizio installato (lib/captions/availability). */
+  liveCaptionsAvailable?: boolean;
+  /** Il flag dell'evento all'apertura della pagina; dal vivo vale quello dei
+   *  flag della sala, che chi modera può cambiare. */
+  liveCaptionsEnabled?: boolean;
+  /** La lingua predefinita dell'istanza, la stessa con cui il servizio trascrive. */
+  liveCaptionsLanguage?: string;
   /** L'evento registra una traccia audio separata per partecipante →
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
+  /** La trascrizione dai sottotitoli e' attiva: si chiede il consenso. */
+  captionsTranscript?: boolean;
 }
 
 interface WatermarkSettings {
@@ -141,6 +178,12 @@ interface LiveEventClientProps {
   /** Il partecipante registrato ha già prestato il consenso multitrack alla
    *  registrazione → non lo si richiede di nuovo in sala d'attesa. */
   hasMultitrackConsent?: boolean;
+  /** Lo stesso per il consenso alla registrazione dell'evento: dato
+   *  all'iscrizione, o in sala d'attesa a un ingresso precedente. */
+  hasRecordingConsent?: boolean;
+  /** L'iscrizione risulta entrata in sala (Registration.joinedAt): la
+   *  valutazione si propone anche senza il token della sala di questa pagina. */
+  registrationJoined?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -172,8 +215,6 @@ interface LiveEventClientProps {
 
 type LivePhase =
   | 'waiting'
-  | 'consent_pending'
-  | 'pre_join'
   | 'fetching_jwt'
   | 'ready'
   | 'reconnecting'
@@ -181,6 +222,28 @@ type LivePhase =
   | 'left'
   | 'ended'
   | 'error';
+
+/** Quanto resta a schermo l'anteprima di un messaggio arrivato a chat chiusa. */
+const CHAT_PREVIEW_MS = 6_000;
+/** Una menzione resta di piu': e' un messaggio per chi guarda. */
+const CHAT_MENTION_PREVIEW_MS = 12_000;
+
+/** Larghezza della colonna dei pannelli su schermo largo: predefinita e limiti.
+ *  Il massimo lascia sempre almeno 420 px alla videochiamata. */
+const SIDEBAR_DEFAULT_W = 400;
+const SIDEBAR_MIN_W = 320;
+const SIDEBAR_MAX_W = 960;
+const SIDEBAR_MIN_VIDEO_W = 420;
+const SIDEBAR_WIDTH_KEY = 'pa-webinar.sidebar-width';
+/** La colonna compressa a una striscia di icone, ricordata nel browser. */
+const SIDEBAR_COLLAPSED_KEY = 'pa-webinar.sidebar-collapsed';
+
+function clampSidebarWidth(w: number): number {
+  const max = typeof window === 'undefined'
+    ? SIDEBAR_MAX_W
+    : Math.max(SIDEBAR_MIN_W, Math.min(SIDEBAR_MAX_W, window.innerWidth - SIDEBAR_MIN_VIDEO_W));
+  return Math.round(Math.min(max, Math.max(SIDEBAR_MIN_W, w)));
+}
 
 // Maximum number of automatic rejoin attempts after a network-induced
 // `videoConferenceLeft`. After this many failures we fall through to the
@@ -219,6 +282,8 @@ interface JitsiCredentials {
   roomName: string;
   displayName: string;
   role: string;
+  /** Le prove di consenso che il server ha salvato per questo posto. */
+  consentsRecorded?: { recording: boolean; multitrack: boolean };
 }
 
 export default function LiveEventClient({
@@ -229,6 +294,8 @@ export default function LiveEventClient({
   isSpeaker = false,
   isGuest = false,
   hasMultitrackConsent = false,
+  hasRecordingConsent = false,
+  registrationJoined = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -239,7 +306,9 @@ export default function LiveEventClient({
   whiteboardInfraReady = false,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
+  const tApi = useTranslations('apiErrors');
   const tc = useTranslations('common');
+  const tf = useTranslations('feedback');
   const router = useRouter();
 
   // Un solo canale per sala, montato qui: i pannelli si smontano al cambio
@@ -252,6 +321,12 @@ export default function LiveEventClient({
   const { pushLive } = useLiveState(event.slug);
   const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
+  // L'ultimo token della sala ricevuto: le credenziali si azzerano a ogni
+  // riconnessione, la prova di essere entrati resta (per la valutazione).
+  const [tokenSala, setTokenSala] = useState<string | null>(null);
+  useEffect(() => {
+    if (credentials?.jwt) setTokenSala(credentials.jwt);
+  }, [credentials?.jwt]);
   const [participantCount, setParticipantCount] = useState(0);
   // Mirror of participantCount for the peak reporter's interval: reading it
   // from a ref keeps the 30s timer from being torn down and restarted on every
@@ -274,6 +349,16 @@ export default function LiveEventClient({
   const [jitsiJoined, setJitsiJoined] = useState(false);
 
   const [eventStatus, setEventStatus] = useState(event.status);
+  // Chi è in diretta e chi aspetta: la pagina lo segnala per tutta la visita,
+  // spostandosi da «attesa» a «diretta» quando entra nella chiamata. Non a
+  // evento concluso, né fuori dalla sala (uscita, errore, fine).
+  const inChiamata = phase === 'ready' || phase === 'reconnecting';
+  const presenze = usePresenze(
+    event.slug,
+    inChiamata ? 'diretta' : 'attesa',
+    eventStatus !== 'ENDED' && phase !== 'ended' && phase !== 'error' && phase !== 'left',
+    token || undefined,
+  );
   // Letto dai gestori di uscita, che non devono ricrearsi a ogni cambio di
   // stato: decide fra «Evento concluso» e «Sei uscito dalla sala».
   const eventStatusRef = useRef(event.status);
@@ -320,6 +405,10 @@ export default function LiveEventClient({
   }, [jitsiDomain]);
 
   const [showFeedback, setShowFeedback] = useState(false);
+  const [leftFeedbackOpen, setLeftFeedbackOpen] = useState(false);
+  // La valutazione gia' data o saltata in questa visita: la schermata di
+  // chiusura non la chiede una seconda volta.
+  const [feedbackSettled, setFeedbackSettled] = useState(false);
   // Stable anonymous id for guests, persisted in localStorage so a refresh or
   // a network-induced Jitsi reconnect keeps the same identity (poll/agenda
   // dedup + "my reaction" recall depend on it). SSR-safe: falls back to a
@@ -364,13 +453,38 @@ export default function LiveEventClient({
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
   // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
   // so the user actually lands in the room with the state they picked.
-  // Fotocamera e microfono all'ingresso: accesi per chi conduce o interviene
-  // e nelle chiamate istantanee, che sono riunioni fra pari; spenti per chi
-  // assiste a un evento, che li accende quando vuole intervenire.
-  const devicesOnByDefault = isModerator || isSpeaker || event.eventType === 'INSTANT';
+  // Fotocamera e microfono partono spenti per tutti: li accende in sala
+  // d'attesa chi vuole provarli, e la scelta si ricorda a parte per chi
+  // conduce o interviene (anche nelle chiamate istantanee, riunioni fra pari)
+  // e per chi assiste.
+  const conduceOInterviene = isModerator || isSpeaker || event.eventType === 'INSTANT';
+  // I consensi dati in sala d'attesa di cui il server ha salvato la prova, in
+  // questa visita della pagina: a un ritorno in sala (evento tornato in
+  // attesa, uscita e rientro) non si chiedono di nuovo, e ogni ingresso
+  // successivo ne porta la prova per il suo posto (lib/live/entry-consents).
+  // Contano solo se il server dice di averli salvati: se l'ingresso fallisce,
+  // o la scrittura non riesce, la casella torna.
+  const [consensiRegistrati, setConsensiRegistrati] = useState<ProveConsenso>({
+    registrazione: false,
+    tracce: false,
+  });
+  // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
+  // chiederne il consenso, o se basta informare.
+  const consensoRegistrazione = consensoRegistrazioneIngresso({
+    formato: {
+      recordingEnabled: event.recordingEnabled,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
+      participantsCanUnmute: event.participantsCanUnmute,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanShareScreen: event.participantsCanShareScreen,
+    },
+    registrazioneDisponibile: recordingAvailable,
+    conduce: isModerator || isSpeaker,
+    giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
+  });
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: devicesOnByDefault,
-    micOn: devicesOnByDefault,
+    cameraOn: false,
+    micOn: false,
   });
 
   // ── Network-resilience: distinguish intentional hangup (user clicked
@@ -386,7 +500,12 @@ export default function LiveEventClient({
   // holds the grace timer so `readyToClose` can cancel it.
   const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Poll infrastructure status (JVB + Jibri) when event is LIVE
+  // Poll infrastructure status (JVB + Jibri) when event is LIVE.
+  // Dentro la chiamata lo stato del ponte non serve piu' (decide la sala
+  // d'attesa e la copertura prima dell'ingresso): da li' continua a chiederlo
+  // solo chi modera, per lo stato del registratore. Con centinaia di persone in
+  // sala erano centinaia di richieste ogni 3 secondi per tutta la diretta.
+  const statusPollNeeded = !jitsiJoined || isModerator;
   useEffect(() => {
     if (eventStatus !== 'LIVE') {
       setJvbReady(null);
@@ -394,6 +513,7 @@ export default function LiveEventClient({
       setRecorderPhase(null);
       return;
     }
+    if (!statusPollNeeded) return;
     let cancelled = false;
     const poll = async () => {
       try {
@@ -419,7 +539,7 @@ export default function LiveEventClient({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [eventStatus]);
+  }, [eventStatus, statusPollNeeded]);
 
   // Determine initial phase. Everyone (guest, participant, moderator,
   // speaker) lands on the unified waiting room first regardless of
@@ -502,7 +622,7 @@ export default function LiveEventClient({
   const fetchJwt = useCallback(async () => {
     setError('');
     try {
-      const body: Record<string, string> = {};
+      const body: Record<string, string | boolean> = {};
       if (isGuest || !token) {
         // Anonymous guest on a public (or password-cleared) LIVE event.
         // The typed name is required — we ensure it before transitioning
@@ -527,6 +647,13 @@ export default function LiveEventClient({
           body.displayNameOverride = chosenName;
         }
       }
+      // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
+      // traccia per partecipante): il server ne conserva la prova insieme al
+      // posto nella conferenza, uno nuovo a ogni ingresso.
+      const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
+      if (prove.registrazione) body.recordingConsent = true;
+      if (prove.tracce) body.multitrackConsent = true;
+      if (prove.registrazione || prove.tracce) body.locale = locale;
 
       const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
         method: 'POST',
@@ -573,13 +700,30 @@ export default function LiveEventClient({
         setError(
           data.code === 'GUEST_ACCESS_DISABLED'
             ? t('guestAccessDisabled')
-            : (data.error ?? t('connectionError')),
+            : // Per chi entra, un 401/403/404 vuol dire un link che non vale
+              // (revocato, sbagliato, di un evento cancellato), non permessi o
+              // sessioni come in amministrazione.
+              messaggioErroreApi(res.status, tApi, t('connectionError'), {
+                400: t('invalidToken'),
+                401: t('invalidToken'),
+                403: t('invalidToken'),
+                404: t('invalidToken'),
+                409: t('notOpenNow'),
+                422: t('nameRequired'),
+              }),
         );
         setPhase('error');
         return;
       }
 
       const data: JitsiCredentials = await res.json();
+      const salvati = data.consentsRecorded;
+      if (salvati && (salvati.recording || salvati.multitrack)) {
+        setConsensiRegistrati((c) => ({
+          registrazione: c.registrazione || salvati.recording,
+          tracce: c.tracce || salvati.multitrack,
+        }));
+      }
       setCredentials(data);
       setPhase('ready');
     } catch {
@@ -596,7 +740,11 @@ export default function LiveEventClient({
     initialDisplayName,
     router,
     t,
+    tApi,
     markEnded,
+    joinPrefs,
+    consensiRegistrati,
+    locale,
   ]);
 
   useEffect(() => {
@@ -605,43 +753,15 @@ export default function LiveEventClient({
     }
   }, [phase, fetchJwt]);
 
-  const handleConsentAccept = useCallback(() => {
-    // Name already collected in the waiting room; skip the (legacy)
-    // pre-join name form and fetch the JWT directly. Keeping `pre_join`
-    // as a reachable phase for the device-check experience Task 2 will
-    // add — for now consent → JWT is the shortest path.
-    setPhase('fetching_jwt');
-  }, []);
-
-  const handleConsentDecline = useCallback(() => {
-    router.push(percorso(`/events/${event.slug}`));
-  }, [router, event.slug]);
-
-  const handlePreJoin = useCallback((name: string) => {
-    setChosenName(name);
-    setPhase('fetching_jwt');
-  }, []);
-
-  // Unified entry from the waiting room. Dispatches through the
-  // consent → pre_join → fetching_jwt pipeline depending on role and
-  // whether recording consent is required for this event.
+  // Ingresso dalla sala d'attesa: nome, dispositivi e consensi li ha gia'
+  // raccolti lei, quindi si chiede subito il JWT.
   const handleEnterFromWaiting = useCallback(
     (name: string, prefs: WaitingRoomJoinPrefs) => {
       setChosenName(name);
       setJoinPrefs(prefs);
-      // Moderator + speaker magic-links skip the participant recording-
-      // consent modal (they're the ones driving recording). Guests and
-      // registered participants see it when recording is enabled AND the
-      // installation has something that can record.
-      if (event.recordingEnabled && recordingAvailable && !isModerator && !isSpeaker) {
-        setPhase('consent_pending');
-      } else {
-        // The waiting room has already collected the name + device
-        // preferences, so jump straight to the JWT fetch.
-        setPhase('fetching_jwt');
-      }
+      setPhase('fetching_jwt');
     },
-    [event.recordingEnabled, recordingAvailable, isModerator, isSpeaker]
+    [],
   );
 
   // Poll event status during ready phase to detect ENDED
@@ -664,10 +784,8 @@ export default function LiveEventClient({
           // as an intentional end so a late `videoConferenceLeft` from the
           // tearing-down iframe doesn't bounce the user into 'reconnecting'.
           userHangupRef.current = true;
+          // La valutazione e' dentro la schermata di chiusura (phase 'ended').
           setPhase('ended');
-          if (!isModerator) {
-            setShowFeedback(true);
-          }
         }
       } catch {
         /* retry */
@@ -727,6 +845,7 @@ export default function LiveEventClient({
     // to rejoin a call the user has already left for good.
     userHangupRef.current = true;
     setShowFeedback(false);
+    setFeedbackSettled(true);
     setPhase('ended');
   }, []);
 
@@ -742,6 +861,18 @@ export default function LiveEventClient({
   // pre-selected option preserves the admin's intent: confirming without
   // touching it must never flip a private event public, nor drop it from a
   // library it was set to appear in.
+  // Cosa resterà visibile scegliendo «Mantieni pubblico»: le sezioni che
+  // chi organizza mostra a evento concluso, come le applica la pagina («se ce
+  // ne sono»: una sezione senza contenuto non compare).
+  const sezioniDopo = event.postEventShow ? sezioniDopoEvento(event.postEventShow) : [];
+  const cosaResta =
+    sezioniDopo.length > 0
+      ? t('endDestino.publicHelpList', {
+          sections: new Intl.ListFormat(locale, { type: 'conjunction' }).format(
+            sezioniDopo.map((s) => t(`endDestino.sections.${s}`)),
+          ),
+        })
+      : t('endDestino.publicHelpNone');
   const [endDestino, setEndDestino] = useState<'public' | 'library' | 'archive'>(
     event.libraryListed
       ? 'library'
@@ -752,6 +883,11 @@ export default function LiveEventClient({
   const [endGenAi, setEndGenAi] = useState(false);
 
   const [showRecPrompt, setShowRecPrompt] = useState(false);
+  // La proposta di registrare non ha più senso quando la registrazione è
+  // partita, da qui o da chiunque altro.
+  useEffect(() => {
+    if (isRecording) setShowRecPrompt(false);
+  }, [isRecording]);
   const recPromptShownRef = useRef(false);
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -763,10 +899,28 @@ export default function LiveEventClient({
     };
   }, []);
 
+  // Per la cronologia della sala: quando questo browser e' entrato nella
+  // chiamata, l'ultimo stato della registrazione che ha visto, e se l'avvio
+  // l'ha chiesto lui. Il primo avviso dopo l'ingresso dice com'era gia' la
+  // registrazione, non che e' cambiata, a meno che a chiederla sia stato
+  // proprio questo browser (avvio automatico, o «Avvia» appena entrati).
+  const entratoAlleRef = useRef<number | null>(null);
+  const registrazioneVistaRef = useRef<boolean | null>(null);
+  const avvioChiestoQuiRef = useRef(false);
+  // Quando questo browser ha visto partire la registrazione (un cambio vero,
+  // non lo stato trovato entrando): fa da riferimento per la durata quando il
+  // server non sa, o sa male, quando è iniziata.
+  const [avvioOsservato, setAvvioOsservato] = useState<number | null>(null);
+  // Quante volte questo browser è entrato nella chiamata: dopo una
+  // riconnessione l'ora d'avvio si richiede, non si riusa quella in cache.
+  const [ingressi, setIngressi] = useState(0);
+  const scartoOrologio = useScartoOrologio(event.slug);
+
   // Shared "fire startRecording on Jitsi, with retry" — used both by the
   // moderator-confirmed prompt and by the autoStartRecording path which
   // bypasses the prompt entirely.
   const triggerRecording = useCallback((api: JitsiMeetExternalAPI) => {
+    avvioChiestoQuiRef.current = true;
     let attempts = 0;
     const tryStart = () => {
       try {
@@ -793,6 +947,12 @@ export default function LiveEventClient({
   );
 
   const handleJitsiReady = useCallback(() => {
+    entratoAlleRef.current = Date.now();
+    registrazioneVistaRef.current = null;
+    // Quello che si è visto prima di cadere non vale più: la registrazione
+    // può essere stata fermata e riavviata nel frattempo.
+    setAvvioOsservato(null);
+    setIngressi((n) => n + 1);
     // Open a CallSession server-side so every live event has a row in
     // `call_sessions` with start/end timestamps even when no recording
     // is ever triggered. The route is idempotent — repeated calls (mod
@@ -972,9 +1132,45 @@ export default function LiveEventClient({
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
   }, []);
-  const handleRecordingStatusChanged = useCallback((recording: boolean) => {
-    setIsRecording(recording);
-  }, []);
+  const handleRecordingStatusChanged = useCallback(
+    (recording: boolean) => {
+      setIsRecording(recording);
+      // Avvio e arresto della registrazione il server non li vede passare:
+      // li riferisce chi modera, per la cronologia della sala. Il server
+      // scarta lo stesso cambio riferito da piu' moderatori.
+      const prima = registrazioneVistaRef.current;
+      registrazioneVistaRef.current = recording;
+      if (prima === recording) return;
+      // «Ferma» senza aver mai visto «accesa» non è un cambio: Jitsi manda lo
+      // stato anche quando si accende o spegne la trascrizione dei
+      // sottotitoli, con la registrazione mai partita.
+      if (prima === null && !recording) return;
+      // Il primo stato visto appena entrati e' com'era gia': non un cambio,
+      // salvo che l'avvio l'abbia chiesto questo browser.
+      const entrato = entratoAlleRef.current;
+      const chiestoQui = recording && avvioChiestoQuiRef.current;
+      if (recording) avvioChiestoQuiRef.current = false;
+      // Trenta secondi: Jitsi può consegnare lo stato iniziale con ritardo, e
+      // un avvio vero di un altro moderatore in quella finestra lo riferisce
+      // il suo browser.
+      if (prima === null && !chiestoQui && entrato !== null && Date.now() - entrato < 30_000) return;
+      setAvvioOsservato(recording ? Date.now() : null);
+      if (!isModerator || !token) return;
+      void fetch(`/api/events/${event.slug}/live-actions`, {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          kind: recording ? 'recording.started' : 'recording.stopped',
+          atEpochMs: Date.now(),
+          sentAt: Date.now(),
+        }),
+      }).catch((err: unknown) => {
+        console.warn('[live] cronologia: registrazione non riferita', err);
+      });
+    },
+    [isModerator, token, event.slug],
+  );
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => {
     setJitsiApi(api);
   }, []);
@@ -1168,9 +1364,9 @@ export default function LiveEventClient({
   // Reactstrap portals every Modal into <body> by default. Once the app owns
   // fullscreen on the live wrapper, <body> is OUTSIDE the fullscreen
   // subtree, so those modals never reach the top layer and are simply invisible:
-  // in fullscreen "Condividi", the recording prompt and — worst of all — the
-  // moderator's "Esci dalla sala" dialog all looked like dead buttons, with no
-  // way out of the room. Rendering them inside the fullscreen element fixes it,
+  // in fullscreen the moderator's "Esci dalla sala" dialog and the other
+  // modals looked like dead buttons, with no way out of the room. («Condividi»
+  // is an inline popover inside the top bar and does not need this.) Rendering them inside the fullscreen element fixes it,
   // and outside fullscreen we keep the default (undefined = <body>) so nothing
   // else changes.
   const modalContainer = isFullscreen ? (liveRootRef.current ?? undefined) : undefined;
@@ -1191,6 +1387,71 @@ export default function LiveEventClient({
     setShowLeaveChoice(false);
     leaveSelf();
   }, [leaveSelf]);
+
+  // «Termina evento» dalla scheda Regia: stessa fine di «Termina per
+  // tutti», segnata prima che l'hangup faccia arrivare `readyToClose`. Chi ha
+  // il link principale resta sulla schermata di chiusura, che porta i link a
+  // quello che viene dopo (registrazione e resoconto, statistiche).
+  const handleEndedFromControls = useCallback(() => {
+    userHangupRef.current = true;
+    markEnded();
+  }, [markEnded]);
+
+  // I comandi della registrazione e il timer degli interventi, montati una
+  // volta: la striscia del tempo, la scheda Regia e la fascia del timer per il
+  // pubblico leggono lo stesso stato.
+  const conduce = credentials?.role === 'moderator';
+  const segnaAvvioChiesto = useCallback(() => {
+    avvioChiestoQuiRef.current = true;
+  }, []);
+  const registrazione = useRecordingControl({
+    api: jitsiApi,
+    attivo: conduce && event.recordingEnabled,
+    isRecording,
+    faseRegistratore: recorderPhase,
+    onAvvioRichiesto: segnaAvvioChiesto,
+  });
+  // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
+  // dal vivo, arriva con gli altri flag della sala (canale push o polling,
+  // stessa voce della barra laterale). Chi modera li accende nella stanza.
+  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean }>(
+    event.liveCaptionsAvailable ? `/api/events/${event.slug}/flags` : null,
+    (url: string) => fetch(url).then((r) => r.json()),
+    { refreshInterval: pushLive ? 0 : 15000 },
+  );
+  const sottotitoliAccesi =
+    !!event.liveCaptionsAvailable &&
+    (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
+  useCaptionsControl({
+    api: jitsiApi,
+    attivo: conduce && !!event.liveCaptionsAvailable,
+    accesi: sottotitoliAccesi,
+    // Solo un'etichetta per Jitsi: la lingua parlata la sceglie il servizio,
+    // dalla lingua predefinita dell'istanza, e qui si usa la stessa.
+    lingua: primaryLanguageCode(event.liveCaptionsLanguage),
+  });
+  // L'ora d'avvio della registrazione secondo il server (la cronologia della
+  // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
+  // Si chiede finché la registrazione è in corso e il server non la sa. Una
+  // chiave sua: la voce `/flags` la riscrive il canale live con i soli flag,
+  // e l'ora d'avvio sparirebbe a ogni aggiornamento.
+  const { data: flagsRegistrazione } = useSWR<{ recordingStartedAt?: string | null }>(
+    // L'avvio osservato e l'ingresso nella chiave: dopo uno stop e un riavvio,
+    // o dopo una riconnessione, non si riusa l'ora rimasta in cache.
+    conduce && isRecording
+      ? `/api/events/${event.slug}/flags?orologio=registrazione&dal=${avvioOsservato ?? 'entrata'}&ingresso=${ingressi}`
+      : null,
+    (url: string) => fetch(url).then((r) => r.json()),
+    // Senza un avvio noto si richiede ogni dieci secondi; con l'avvio, ogni
+    // minuto, per accorgersi di un riavvio fatto da altri.
+    { refreshInterval: (dati) => (dati?.recordingStartedAt ? 60_000 : 10_000) },
+  );
+  // Aprire una scheda della barra laterale da fuori (la striscia del tempo):
+  // il contatore fa ripetere la stessa richiesta.
+  const [richiestaScheda, setRichiestaScheda] = useState<{ tab: SidebarTab; n: number } | null>(null);
+  const apriRegia = useCallback(() => {
+    setRichiestaScheda((r) => ({ tab: 'regia', n: (r?.n ?? 0) + 1 }));
+  }, []);
 
   // "Termina per tutti": flip the event to ENDED (waiting participants and
   // those in the room detect it via their status poll and are taken to the
@@ -1259,11 +1520,24 @@ export default function LiveEventClient({
   // rileva la fine; ready → chiusura in corso). Prima era montato solo nel return
   // di phase='ready', quindi il questionario non appariva mai a fine call e il
   // bottone in sala d'attesa era morto.
-  const feedbackModal = showFeedback ? (
-    <PostEventFeedbackModal
+  // Chi risponde: l'iscrizione, se c'e'; altrimenti l'identificativo stabile
+  // del browser (ospiti e relatori, che un'iscrizione non ce l'hanno). Con
+  // la risposta va il token della sala ricevuto entrando: per chi non e'
+  // iscritto e' la prova di aver partecipato (lib/feedback/participation).
+  // Chi modera non valuta l'evento che conduce; chi non e' iscritto e non e'
+  // entrato da questa pagina non ha niente da provare, e la valutazione non
+  // gli si propone.
+  const feedbackIdentity = {
+    ...(registeredAccessToken ? { accessToken: registeredAccessToken } : { guestId }),
+    ...(tokenSala ? { roomToken: tokenSala } : {}),
+  };
+  const askFeedback =
+    !isModerator && event.feedbackEnabled !== false && (!!tokenSala || (!!registeredAccessToken && registrationJoined));
+  const feedbackModal = showFeedback && askFeedback ? (
+    <PostEventFeedback
       eventSlug={event.slug}
-      accessToken={registeredAccessToken}
-      guestId={isGuest ? guestId : undefined}
+      {...feedbackIdentity}
+      mode="dialog"
       onClose={handleFeedbackClose}
     />
   ) : null;
@@ -1303,11 +1577,21 @@ export default function LiveEventClient({
             timezone: event.timezone,
             aiPostprodEnabled: event.aiPostprodEnabled,
             aiConsentDisclosure: event.aiConsentDisclosure,
+            liveCaptions: !!event.liveCaptionsAvailable && (event.liveCaptionsEnabled ?? true),
             multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+            captionsTranscript: event.captionsTranscript,
+            riepilogo: event.riepilogo,
           }}
-          participantCount={participantCount}
+          presenze={presenze}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
-          devicesOnByDefault={devicesOnByDefault}
+          conduce={conduceOInterviene}
+          condivisione={{
+            locale,
+            // Il link da moderatore solo a chi modera (non ai relatori).
+            moderatorToken: isModerator && !isSpeaker ? token : undefined,
+            hasPublicPage: event.eventType !== 'INSTANT',
+            hasCallLink: event.guestEntryOpen !== false,
+          }}
           jvbReady={jvbReady}
           warmup={warmup}
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
@@ -1318,14 +1602,16 @@ export default function LiveEventClient({
           defaultName={chosenName || initialDisplayName}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
-          onLeaveFeedback={() => setShowFeedback(true)}
-          // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
-          // prestato alla registrazione, o il moderatore (è chi ha configurato
-          // e controlla la registrazione). Gli speaker NO: non controllano la
-          // registrazione e la loro traccia audio isolata è esattamente il dato
-          // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
-          // il consenso come ogni altro partecipante.
-          multitrackConsentExempt={isModerator || hasMultitrackConsent}
+          onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}
+          // La trascrizione dei propri interventi si chiede a tutti, anche a
+          // chi conduce e a chi interviene: e' facoltativa, e decide se la loro
+          // voce si registra e si trascrive. Non la si richiede a chi l'ha gia'
+          // data (all'iscrizione, o in sala in questa visita della pagina).
+          multitrackConsentExempt={hasMultitrackConsent || consensiRegistrati.tracce}
+          recordingConsentRequired={consensoRegistrazione.richiesto}
+          recordingListenOnly={consensoRegistrazione.soloAscolto}
+          recordingConsentText={event.recordingConsentText}
+          privacy={event.privacy}
         />
         {feedbackModal}
       </>
@@ -1351,19 +1637,56 @@ export default function LiveEventClient({
     </Link>
   );
 
+  // Il titolo dell'evento sopra il messaggio d'uscita: chi ha piu' schede
+  // aperte, o torna al computer dopo un po', deve capire di quale sala si parla.
+  const exitEventTitle = splitTitleKicker(event.title, event.parseTitleKicker ?? false).main;
+
   // ── Ended ──
   if (phase === 'ended') {
     return (
-      <div className="container py-5 text-center">
-        <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
-        <h1 className="h3 mb-3">{t('eventEnded')}</h1>
-        <p className="mb-4">{t('eventEndedMessage')}</p>
+      <div className="live-exit container">
+        <div className="live-exit__card">
+          <span className="live-exit__icon live-exit__icon--success" aria-hidden="true">
+            <Icon icon="it-check-circle" size="lg" color="success" />
+          </span>
+          <p className="live-exit__event">{exitEventTitle}</p>
+          <h1 className="h3 mb-2">{t('eventEnded')}</h1>
+          <p className="live-exit__message">
+            {isPrimaryModerator ? t('eventEndedModerator') : t('eventEndedMessage')}
+          </p>
 
-        {/* Questionario post-evento: emerge a fine call (poll ENDED →
-            setShowFeedback(true)) sopra questa schermata di chiusura. */}
-        {feedbackModal}
+          {/* La valutazione dentro la scheda: comunque sia finita la call
+              (fine dall'orario, da chi modera, rete caduta a evento chiuso). */}
+          {askFeedback && !feedbackSettled && (
+            <PostEventFeedback eventSlug={event.slug} {...feedbackIdentity} mode="inline" />
+          )}
 
-        {backLink}
+          {/* Chi conduce trova subito quello che serve dopo: i numeri, la
+              registrazione e il resoconto, la pagina pubblica. */}
+          {isPrimaryModerator ? (
+            <div className="live-exit__actions live-exit__actions--column">
+              <Link href={percorso(eventAdminPath(event.id, { viaToken: token, tab: 'dopo' }))}>
+                <Button color="primary" tag="span">
+                  {t('endLinks.after')}
+                </Button>
+              </Link>
+              <Link href={percorso(eventAdminPath(event.id, { viaToken: token, tab: 'statistiche' }))}>
+                <Button color="primary" outline tag="span">
+                  {t('endLinks.stats')}
+                </Button>
+              </Link>
+              {exitHref !== '/' && (
+                <Link href={percorso(exitHref)}>
+                  <Button color="primary" outline tag="span">
+                    {t('endLinks.publicPage')}
+                  </Button>
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="live-exit__actions">{backLink}</div>
+          )}
+        </div>
       </div>
     );
   }
@@ -1374,24 +1697,40 @@ export default function LiveEventClient({
   // chiuso — senza lo scaler nessuno lo chiuderebbe al posto suo.
   if (phase === 'left') {
     return (
-      <div className="container py-5 text-center">
-        <Icon icon="it-info-circle" size="xl" className="text-primary mb-3" />
-        <h1 className="h3 mb-3">{t('leftTitle')}</h1>
-        <p className="mb-3">{t('leftMessage')}</p>
-        {isModerator && (
-          <p className="mb-4 mx-auto text-muted" style={{ maxWidth: 560 }}>
-            {t('leftModeratorReminder', { action: t('leaveChoice.endForAll') })}
-          </p>
-        )}
+      <div className="live-exit container">
+        <div className="live-exit__card">
+          <span className="live-exit__icon" aria-hidden="true">
+            <Icon icon="it-logout" size="lg" color="primary" />
+          </span>
+          <p className="live-exit__event">{exitEventTitle}</p>
+          <h1 className="h3 mb-2">{t('leftTitle')}</h1>
+          <p className="live-exit__message">{t('leftMessage')}</p>
+          {isModerator && (
+            <p className="live-exit__note">
+              {t('leftModeratorReminder', { action: t('leaveChoice.endForAll') })}
+            </p>
+          )}
 
-        {feedbackModal}
+          {/* Uscito prima della fine: la valutazione si offre, non si impone. */}
+          {askFeedback &&
+            (leftFeedbackOpen ? (
+              <PostEventFeedback eventSlug={event.slug} {...feedbackIdentity} mode="inline" />
+            ) : (
+              <p className="live-exit__note">
+                {tf('leftPrompt')}{' '}
+                <button type="button" className="btn btn-link p-0 align-baseline" onClick={() => setLeftFeedbackOpen(true)}>
+                  {tf('leftCta')}
+                </button>
+              </p>
+            ))}
 
-        <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
-          <Button color="primary" onClick={handleRejoin}>
-            <Icon icon="it-video" size="sm" color="white" className="me-2" />
-            {t('rejoin')}
-          </Button>
-          {backLink}
+          <div className="live-exit__actions">
+            <Button color="primary" onClick={handleRejoin}>
+              <Icon icon="it-video" size="sm" color="white" className="me-2" />
+              {t('rejoin')}
+            </Button>
+            {backLink}
+          </div>
         </div>
       </div>
     );
@@ -1402,7 +1741,6 @@ export default function LiveEventClient({
     return (
       <div className="container py-5">
         <Alert color="danger">
-          <Icon icon="it-close-circle" className="me-2" />
           {error || t('connectionError')}
         </Alert>
         <div className="text-center mt-3">
@@ -1457,44 +1795,6 @@ export default function LiveEventClient({
     );
   }
 
-  // ── Recording consent ──
-  if (phase === 'consent_pending') {
-    return (
-      <>
-        <LiveTopBar
-          hasPublicPage={event.eventType !== 'INSTANT'}
-          hasCallLink={event.guestEntryOpen !== false}
-          title={event.title}
-          parseTitleKicker={event.parseTitleKicker}
-          imageUrl={event.imageUrl}
-          coverImageUrl={event.coverImageUrl}
-          participantCount={0}
-          isRecording={false}
-          role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
-          slug={event.slug}
-          locale={locale}
-          moderatorToken={isModerator ? token : undefined}
-        />
-        <RecordingConsent
-          onAccept={handleConsentAccept}
-          onDecline={handleConsentDecline}
-          customConsentText={event.recordingConsentText}
-        />
-      </>
-    );
-  }
-
-  // ── Pre-join screen ──
-  if (phase === 'pre_join') {
-    return (
-      <PreJoinScreen
-        eventTitle={event.title}
-        defaultName={chosenName || initialDisplayName}
-        onJoin={handlePreJoin}
-      />
-    );
-  }
-
   // ── Fetching JWT / Loading ──
   if (phase === 'fetching_jwt' || !credentials) {
     return (
@@ -1535,12 +1835,6 @@ export default function LiveEventClient({
   return (
     <LivePushContext.Provider value={pushLive}>
     <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
-      <RecordingBanner visible={isRecording} />
-      <OvertimeBanner
-        endsAt={event.endsAt}
-        graceMinutes={event.effectiveGraceMinutes ?? 15}
-      />
-
       <LiveTopBar
         hasPublicPage={!isInstantCall}
         hasCallLink={event.guestEntryOpen !== false}
@@ -1558,48 +1852,60 @@ export default function LiveEventClient({
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
         isFullscreen={isFullscreen}
-        modalContainer={modalContainer}
-        startsAt={event.startsAt}
-        endsAt={event.endsAt}
         onToggleFullscreen={toggleFullscreen}
       />
 
       {isActualModerator && !showJvbOverlay && (
-        <ModeratorControls
-          api={jitsiApi}
-          eventId={event.id}
-          moderatorToken={token}
+        <LiveTimeStrip
+          startsAt={event.startsAt}
+          endsAt={event.endsAt}
+          graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
           recordingEnabled={event.recordingEnabled}
-          recorderPhase={recorderPhase}
-          participantsCanUnmute={event.participantsCanUnmute}
-          participantsCanStartVideo={event.participantsCanStartVideo}
-          whiteboardEnabled={whiteboardOn}
-          whiteboardInfraReady={whiteboardInfraReady}
-          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
-          isPrimaryModerator={isPrimaryModerator}
-        />
-      )}
-
-      {!showJvbOverlay && (
-        <PresentationTimer
+          isRecording={isRecording}
+          recordingStartedAt={flagsRegistrazione?.recordingStartedAt ?? null}
+          scartoOrologio={scartoOrologio}
+          avvioOsservato={avvioOsservato}
+          istantanea={isInstantCall}
+          faseRegistratore={recorderPhase}
+          registrazione={registrazione}
           eventSlug={event.slug}
-          token={token}
-          isModerator={isActualModerator}
+          onApriRegia={apriRegia}
         />
       )}
 
-      {/* Read-only raised-hands queue visible to ALL attendees so
-          everyone sees who's in line to speak and in what order. The
-          moderator still gets the full panel with "approve mic/video"
-          buttons inside ModeratorControls above — this one stays
-          compact and silent when no hand is up. */}
-      {!showJvbOverlay && !isActualModerator && jitsiApi && (
-        <RaisedHandsPanel
-          api={jitsiApi}
-          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
-          readOnly
+      {/* Proposta di avviare la registrazione, quando il registratore è pronto.
+          Un avviso nella striscia di chi conduce, non una finestra: arriva da
+          solo, anche minuti dopo l'ingresso, e una finestra modale prendeva il
+          focus a chi stava parlando o scrivendo. */}
+      {isActualModerator && showRecPrompt && !showJvbOverlay && (
+        <div className="live-rec-prompt" role="status">
+          <span>{t('recordingPromptBody')}</span>
+          <span className="live-rec-prompt__actions">
+            <Button color="primary" size="xs" onClick={handleRecPromptStart}>
+              {t('recordingPromptStart')}
+            </Button>
+            <Button color="light" outline size="xs" onClick={handleRecPromptLater}>
+              {t('recordingPromptLater')}
+            </Button>
+          </span>
+        </div>
+      )}
+
+      {/* Chi non conduce non vede l'orologio: solo, negli ultimi minuti, che
+          la sala sta per chiudersi da sola. */}
+      {!isActualModerator && !showJvbOverlay && !isInstantCall && (
+        <ClosingNotice
+          startsAt={event.startsAt}
+          endsAt={event.endsAt}
+          graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
+          scartoOrologio={scartoOrologio}
         />
       )}
+      {/* Il timer degli interventi si legge solo in sala. */}
+      <TimerInterventiSync eventSlug={event.slug} />
+      {/* La fascia del timer per chi non conduce: chi conduce lo ha nella
+          striscia del tempo. */}
+      {!showJvbOverlay && !isActualModerator && <PresentationTimerBar eventSlug={event.slug} />}
 
       {/* Screenshare banner — attention cue whenever someone in the
           room starts sharing. Jitsi auto-pins the share but a visible
@@ -1645,6 +1951,8 @@ export default function LiveEventClient({
               whiteboardInfraReady={whiteboardInfraReady}
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
+              liveCaptions={Boolean(event.liveCaptionsAvailable)}
+              liveCaptionsOn={sottotitoliAccesi}
               rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
@@ -1656,6 +1964,15 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
+            {/* Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
+                la barra di Jitsi: impilati, non si coprono mai. Montata da
+                subito e solo nascosta sotto l'avviso di avvio del bridge:
+                deve ascoltare la sala già dall'ingresso, che è l'evento che
+                fa sparire quell'avviso. */}
+            <div className="live-stage-bottom" hidden={showJvbOverlay}>
+              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              <StageName api={jitsiApi} />
+            </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
             {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}
@@ -1677,41 +1994,32 @@ export default function LiveEventClient({
           qaEnabled={event.qaEnabled}
           chatEnabled={event.chatEnabled}
           agendaEnabled={event.agendaEnabled}
+          liveCaptionsAvailable={!!event.liveCaptionsAvailable}
+          liveCaptionsEnabled={event.liveCaptionsEnabled ?? true}
           whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
           jitsiApi={jitsiApi}
           localParticipantId={localEndpointId}
           displayName={credentials.displayName}
+          roomCount={participantCount}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
           {...voterIdentity(registeredAccessToken, guestId)}
+          richiestaScheda={richiestaScheda}
+          regia={
+            isActualModerator
+              ? {
+                  onEnded: handleEndedFromControls,
+                  modalContainer,
+                  recordingEnabled: event.recordingEnabled,
+                  isRecording,
+                  faseRegistratore: recorderPhase,
+                  registrazione,
+                }
+              : undefined
+          }
         />
       </div>
-
-      {feedbackModal}
-
-      {/* Recording pre-activation prompt for moderator */}
-      <Modal
-        isOpen={showRecPrompt}
-        toggle={handleRecPromptLater}
-        centered
-        container={modalContainer}
-      >
-        <ModalHeader closeAriaLabel={tc('close')} toggle={handleRecPromptLater}>
-          {t('recordingPromptTitle')}
-        </ModalHeader>
-        <ModalBody>
-          <p>{t('recordingPromptBody')}</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" outline onClick={handleRecPromptLater}>
-            {t('recordingPromptLater')}
-          </Button>
-          <Button color="primary" onClick={handleRecPromptStart}>
-            {t('recordingPromptStart')}
-          </Button>
-        </ModalFooter>
-      </Modal>
 
       {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
       <Modal
@@ -1789,7 +2097,9 @@ export default function LiveEventClient({
                 />
                 <span>
                   <span className="fw-semibold d-block">{t(`endDestino.${opt}`)}</span>
-                  <small className="text-muted">{t(`endDestino.${opt}Help`)}</small>
+                  <small className="text-muted">
+                    {opt === 'public' ? cosaResta : t(`endDestino.${opt}Help`)}
+                  </small>
                 </span>
               </label>
             ))}
@@ -1846,6 +2156,7 @@ export default function LiveEventClient({
 // ── Sidebar with tabs ──
 
 type SidebarTab =
+  | 'regia'
   | 'qa'
   | 'chat'
   | 'polls'
@@ -1856,6 +2167,9 @@ type SidebarTab =
 
 interface LiveSidebarProps {
   eventSlug: string;
+  /** Persone nella chiamata adesso, dallo stesso conteggio che la sala riceve
+   *  da Jitsi: il pannello dei partecipanti lo aggiorna solo quando e' aperto. */
+  roomCount?: number;
   /** Event UUID — used for the moderator feature-toggle PUT. The
    *  /api/events/[param] route accepts updates ONLY by UUID (a slug 400s
    *  before touching the DB). The slug is still used for the GET /flags poll,
@@ -1866,6 +2180,10 @@ interface LiveSidebarProps {
   qaEnabled: boolean;
   chatEnabled: boolean;
   agendaEnabled: boolean;
+  /** Sottotitoli live disponibili nell'istanza: la Regia mostra l'interruttore. */
+  liveCaptionsAvailable: boolean;
+  /** Il flag dei sottotitoli all'apertura, finché non arrivano i flag dal vivo. */
+  liveCaptionsEnabled: boolean;
   /** Whiteboard is enabled for this call → show the "not saved" reminder. */
   whiteboardEnabled: boolean;
   /** …and the installation actually serves it (see LiveEventClientProps). */
@@ -1886,16 +2204,31 @@ interface LiveSidebarProps {
   /** …oppure l'identificativo stabile del browser, per chi una registrazione
    *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
   voterGuestId?: string;
+  /** Una scheda da aprire chiesta da fuori (la striscia del tempo apre la
+   *  Regia); il contatore fa ripetere la stessa richiesta. */
+  richiestaScheda?: { tab: SidebarTab; n: number } | null;
+  /** La scheda Regia, per chi conduce (non per i relatori). */
+  regia?: {
+    onEnded: () => void;
+    modalContainer?: HTMLElement;
+    recordingEnabled: boolean;
+    isRecording: boolean;
+    faseRegistratore: FaseRegistratore | null;
+    registrazione: ControlloRegistrazione;
+  };
 }
 
 function LiveSidebar({
   eventSlug,
+  roomCount,
   eventId,
   token,
   isModerator,
   qaEnabled,
   chatEnabled,
   agendaEnabled,
+  liveCaptionsAvailable,
+  liveCaptionsEnabled,
   whiteboardEnabled,
   whiteboardInfraReady,
   jitsiApi,
@@ -1905,8 +2238,12 @@ function LiveSidebar({
   guestId,
   voterAccessToken,
   voterGuestId,
+  richiestaScheda,
+  regia,
 }: LiveSidebarProps) {
+  const tCommon = useTranslations('common');
   const t = useTranslations('live');
+  const tp = useTranslations('live.participants');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
   // reagiscono per tutti. I valori "eff*" sono quelli effettivi correnti.
@@ -1917,6 +2254,7 @@ function LiveSidebar({
     chatEnabled: boolean;
     agendaEnabled: boolean;
     wordCloudEnabled: boolean;
+    liveCaptionsEnabled: boolean;
     recordingEnabled: boolean;
   }>(
     `/api/events/${eventSlug}/flags`,
@@ -1932,6 +2270,7 @@ function LiveSidebar({
   // flags poll reports it enabled (no per-event prop → safe default false, so
   // it never flashes on before the real value loads).
   const effWordCloud = liveFlags?.wordCloudEnabled ?? false;
+  const effCaptions = liveFlags?.liveCaptionsEnabled ?? liveCaptionsEnabled;
   const showChat = effChat !== false;
 
   // Toggle di una funzione durante l'evento (moderatore): PUT del flag +
@@ -1939,7 +2278,7 @@ function LiveSidebar({
   // poll (15s).
   const toggleFeature = useCallback(
     async (
-      key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled' | 'wordCloudEnabled',
+      key: FunzioneSala['key'],
       current: boolean,
     ) => {
       await mutateFlags((cur) => (cur ? { ...cur, [key]: !current } : cur), {
@@ -1963,62 +2302,279 @@ function LiveSidebar({
       if (!res.ok) {
         console.error('toggleFeature failed', key, res.status);
       }
+      return res.ok;
     },
     [eventId, token, mutateFlags]
   );
+  const accendiParole = useCallback(() => toggleFeature('wordCloudEnabled', false), [toggleFeature]);
+  // Le funzioni che chi conduce accende e spegne per tutti dalla Regia.
+  const funzioniSala: FunzioneSala[] = [
+    { key: 'qaEnabled', label: t('sidebarTabQa'), on: effQa },
+    { key: 'chatEnabled', label: t('sidebarTabChat'), on: effChat },
+    { key: 'agendaEnabled', label: t('liveToggleAgenda'), on: effAgenda },
+    { key: 'wordCloudEnabled', label: t('sidebarTabWordcloud'), on: effWordCloud },
+    ...(liveCaptionsAvailable
+      ? [{ key: 'liveCaptionsEnabled' as const, label: t('captions.toggle'), on: effCaptions }]
+      : []),
+  ];
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     // Chat is the primary channel: prefer it as the initial
     // tab, falling back to Q&A then polls only when chat is disabled.
     showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
-  // Drawer-open state only matters on mobile (<992px); on desktop the
-  // .live-sidebar is always visible via CSS regardless of this flag.
+  // Mani alzate nella sala, dal pannello dei partecipanti (sempre montato).
+  const [handsCount, setHandsCount] = useState(0);
+  // Drawer-open state only matters on mobile (<992px); on desktop the column
+  // is in the flow, open unless collapsed (`collapsed` below).
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Chat unread count — set by ChatPanel via onUnreadCountChange.
   // A chat is "active" when the Chat tab is selected AND (on mobile)
   // the drawer is open.
   const [chatUnread, setChatUnread] = useState(0);
+  // Anteprima dell'ultimo messaggio arrivato a chat chiusa: un clic apre la
+  // chat, sparisce da sola, e il messaggio successivo la sostituisce.
+  const [chatPreview, setChatPreview] = useState<ChatPreview | null>(null);
+  useEffect(() => {
+    if (!chatPreview) return;
+    const durata =
+      chatPreview.mentionsMe || chatPreview.repliesToMe ? CHAT_MENTION_PREVIEW_MS : CHAT_PREVIEW_MS;
+    const timer = setTimeout(() => setChatPreview(null), durata);
+    return () => clearTimeout(timer);
+  }, [chatPreview]);
+  // Menzioni e risposte non lette: il contatore della chat diventa «@».
+  const [chatMentions, setChatMentions] = useState(0);
+  // Chi e' nella chiamata adesso, per le @menzioni (bot di registrazione escluso).
+  const getRoster = useCallback((): string[] => {
+    try {
+      return (jitsiApi?.getParticipantsInfo?.() ?? [])
+        .filter((p) => isHumanParticipant(p))
+        .map((p) => (p.displayName ?? '').trim())
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }, [jitsiApi]);
   // Sondaggi aperti in cui questa persona non ha ancora votato: il pannello
   // resta montato anche su un'altra scheda apposta per poterlo dire.
   const [pollsUnvoted, setPollsUnvoted] = useState(0);
-  const isChatActive = activeTab === 'chat';
+  // Un pannello e' sotto gli occhi quando e' la scheda scelta E si vede: su
+  // desktop a colonna non compressa, sotto i 992px solo a cassetto aperto.
+  // E' questo, non la sola scheda scelta, a dire se un messaggio o un
+  // materiale nuovo e' gia' stato visto.
+  const [isDesktop, setIsDesktop] = useState(true);
+  // Chi segue soprattutto la chat allarga la colonna trascinandone il bordo:
+  // la videochiamata si restringe di conseguenza, mai sotto i 420 px. La
+  // scelta resta nel browser; doppio clic sul bordo torna alla misura iniziale.
+  const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
+  useEffect(() => {
+    try {
+      const salvata = Number(window.localStorage.getItem(SIDEBAR_WIDTH_KEY));
+      if (Number.isFinite(salvata) && salvata > 0) setSidebarWidth(clampSidebarWidth(salvata));
+    } catch { /* storage non disponibile: misura predefinita */ }
+    const onResize = () => setSidebarWidth((w) => (w === null ? w : clampSidebarWidth(w)));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  // Desktop: la colonna si può comprimere a una striscia di icone, per chi
+  // vuole il video più grande o meno elementi intorno. Le schede e i loro
+  // contatori restano visibili; un clic su una scheda la riapre.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1');
+    } catch { /* storage non disponibile: si parte aperta */ }
+  }, []);
+  const impostaCompressa = useCallback((v: boolean) => {
+    setCollapsed(v);
+    try {
+      if (v) window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, '1');
+      else window.localStorage.removeItem(SIDEBAR_COLLAPSED_KEY);
+    } catch { /* vale finche' resta aperta la pagina */ }
+  }, []);
+  const compressa = isDesktop && collapsed;
+  const salvaLarghezza = useCallback((w: number | null) => {
+    try {
+      if (w === null) window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
+      else window.localStorage.setItem(SIDEBAR_WIDTH_KEY, String(w));
+    } catch { /* storage non disponibile: vale finche' resta aperta la pagina */ }
+  }, []);
+  const dragRef = useRef<{ x: number; w: number } | null>(null);
+  const onResizerPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const colonna = e.currentTarget.parentElement;
+    dragRef.current = { x: e.clientX, w: colonna?.getBoundingClientRect().width ?? SIDEBAR_DEFAULT_W };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    // Durante il trascinamento l'iframe della chiamata non deve catturare il
+    // puntatore, altrimenti il bordo si «stacca» appena ci si passa sopra.
+    document.documentElement.classList.add('live-resizing');
+  }, []);
+  const onResizerPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d) return;
+    // La colonna sta a destra: verso sinistra si allarga.
+    setSidebarWidth(clampSidebarWidth(d.w + (d.x - e.clientX)));
+  }, []);
+  const onResizerPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    document.documentElement.classList.remove('live-resizing');
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* gia' rilasciato */ }
+    setSidebarWidth((w) => {
+      salvaLarghezza(w);
+      return w;
+    });
+  }, [salvaLarghezza]);
+  const onResizerKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    const passo = e.shiftKey ? 96 : 32;
+    let next: number | null | undefined;
+    if (e.key === 'ArrowLeft') next = clampSidebarWidth((sidebarWidth ?? SIDEBAR_DEFAULT_W) + passo);
+    else if (e.key === 'ArrowRight') next = clampSidebarWidth((sidebarWidth ?? SIDEBAR_DEFAULT_W) - passo);
+    else if (e.key === 'Home') next = SIDEBAR_MIN_W;
+    else if (e.key === 'End') next = clampSidebarWidth(SIDEBAR_MAX_W);
+    else if (e.key === 'Enter') next = null;
+    if (next === undefined) return;
+    e.preventDefault();
+    setSidebarWidth(next);
+    salvaLarghezza(next);
+  }, [sidebarWidth, salvaLarghezza]);
+  useEffect(() => () => document.documentElement.classList.remove('live-resizing'), []);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(min-width: 992px)');
+    const aggiorna = () => setIsDesktop(mq.matches);
+    aggiorna();
+    mq.addEventListener('change', aggiorna);
+    return () => mq.removeEventListener('change', aggiorna);
+  }, []);
+  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop ? !compressa : drawerOpen);
+  // Aprire una scheda vuol dire mostrarla: su desktop riapre la colonna
+  // compressa, sul telefono apre il cassetto. Ogni via per aprire una scheda
+  // passa da qui.
+  const apriScheda = useCallback(
+    (key: SidebarTab) => {
+      setActiveTab(key);
+      if (isDesktop) impostaCompressa(false);
+      else setDrawerOpen(true);
+    },
+    [isDesktop, impostaCompressa],
+  );
+  // Una scheda chiesta da fuori (la striscia del tempo apre la Regia).
+  useEffect(() => {
+    if (richiestaScheda) apriScheda(richiestaScheda.tab);
+    // Solo alla nuova richiesta: apriScheda cambia con il layout.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [richiestaScheda?.n]);
+
+  // Entrati nella chiamata, si dice al server quale riquadro e' questo
+  // browser (lib/live/seats): chi modera vede accanto al nome l'iscrizione
+  // che c'e' dietro. Un nuovo ingresso (riconnessione) ha un endpoint nuovo.
+  useEffect(() => {
+    if (!localParticipantId || !token) return;
+    let annullato = false;
+    const dichiara = async (tentativo: number) => {
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/seats`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ endpointId: localParticipantId }),
+        });
+        // Rifiutata per il token o per l'id: riprovare non cambia niente.
+        if (res.ok || res.status === 403 || res.status === 422) return;
+      } catch {
+        /* rete: si riprova qui sotto */
+      }
+      if (!annullato && tentativo < 3) setTimeout(() => void dichiara(tentativo + 1), 5000 * tentativo);
+    };
+    void dichiara(1);
+    return () => {
+      annullato = true;
+    };
+  }, [localParticipantId, token, eventSlug]);
+  const isChatActive = onScreen('chat');
+  // Aperta la chat, l'anteprima non serve piu'.
+  useEffect(() => {
+    if (isChatActive) setChatPreview(null);
+  }, [isChatActive]);
+  // La scheda scelta decide che cosa si disegna; `pollsOnScreen` se si vede.
   const isPollsActive = activeTab === 'polls';
-  // Browser tab title flash: when unread increases while document is
-  // hidden, prefix the title with "● ". Restore on focus. We scope
-  // the effect to *this* sidebar instance so at most one listener is
-  // registered at a time.
+  const pollsOnScreen = onScreen('polls');
+  const materialsOnScreen = onScreen('materials');
+  // Domande nuove e risposte mentre si guarda altro: pallino sulla scheda e,
+  // a chi riguardano, suono o notifica (hooks/use-qa-alerts).
+  const { hasNews: qaNews } = useQaAlerts({
+    eventSlug,
+    token,
+    voterGuestId,
+    isModerator,
+    enabled: effQa,
+    onScreen: onScreen('qa'),
+  });
+  // Materiali nuovi mentre si guarda un'altra scheda: un pallino, come per i
+  // sondaggi. Stessa chiave del pannello, quindi stessa richiesta: aprirlo non
+  // ne aggiunge una. Con il canale vivo la rilettura la chiede l'avviso
+  // `materials`; senza, lo stesso giro del pannello.
+  // Una domanda «in una parola» appena aperta mentre si guarda altro: un
+  // pallino sulla scheda. Legge la versione leggera (c'e' una domanda aperta,
+  // e quale: in caldo sul server, uguale per tutti) e segue gli avvisi del
+  // canale, cosi' il pallino compare appena la domanda si apre. Il giro lento
+  // resta anche col canale: un'altra istanza dell'app puo' rispondere
+  // all'avviso con lo stato di un attimo prima.
+  const { data: giroParole } = useSWR<{ active: boolean; id?: string }>(
+    effWordCloud && !isModerator ? [`/api/events/${eventSlug}/wordcloud?lite=1`, 'alert', token] : null,
+    ([url, , tok]: [string, string, string]) =>
+      fetch(url, { headers: tok ? { Authorization: `Bearer ${tok}` } : undefined }).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+    { refreshInterval: 20_000, revalidateOnFocus: false },
+  );
+  const giriVistiRef = useRef<Set<string>>(new Set());
+  const wordcloudOnScreen = onScreen('wordcloud');
+  if (wordcloudOnScreen && giroParole?.id) giriVistiRef.current.add(giroParole.id);
+  const wordcloudNew =
+    !!giroParole?.active && !!giroParole.id && !wordcloudOnScreen && !giriVistiRef.current.has(giroParole.id);
+  const { data: materialsData } = useSWR<{ materials: Array<{ id: string }> }>(
+    materialsListKey(eventSlug, token),
+    fetchMaterials,
+    { refreshInterval: pushLive ? 0 : 30_000 },
+  );
+  const seenMaterialsRef = useRef<Set<string> | null>(null);
+  const [materialsNew, setMaterialsNew] = useState(false);
+  useEffect(() => {
+    if (!materialsData?.materials) return;
+    const ids = new Set(materialsData.materials.map((m) => m.id));
+    // Al primo elenco, e ogni volta che la scheda e' aperta, quel che c'e' e'
+    // visto.
+    if (seenMaterialsRef.current === null || materialsOnScreen) {
+      seenMaterialsRef.current = ids;
+      setMaterialsNew(false);
+      return;
+    }
+    const visti = seenMaterialsRef.current;
+    if ([...ids].some((id) => !visti.has(id))) setMaterialsNew(true);
+  }, [materialsData, materialsOnScreen]);
+  // Il titolo della scheda del browser dice quanti messaggi non letti ci
+  // sono mentre si guarda altro: «(3) Titolo». Torna com'era al ritorno.
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const BULLET = '● ';
-    const originalTitle = document.title;
-    let flashed = false;
-    const setFlashed = (on: boolean) => {
-      if (on === flashed) return;
-      flashed = on;
-      if (on) {
-        if (!document.title.startsWith(BULLET)) {
-          document.title = BULLET + document.title;
-        }
-      } else if (document.title.startsWith(BULLET)) {
-        document.title = document.title.slice(BULLET.length);
-      }
+    const PREFISSO = /^\(\d+\+?\) /;
+    const pulisci = () => {
+      if (PREFISSO.test(document.title)) document.title = document.title.replace(PREFISSO, '');
     };
-
-    if (chatUnread > 0 && document.hidden) setFlashed(true);
-    if (chatUnread === 0) setFlashed(false);
-
+    if (chatUnread > 0 && document.hidden) {
+      pulisci();
+      document.title = `(${chatUnread > 99 ? '99+' : chatUnread}) ${document.title}`;
+    } else if (chatUnread === 0) {
+      pulisci();
+    }
     const onVisibility = () => {
-      if (!document.hidden) setFlashed(false);
+      if (!document.hidden) pulisci();
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
-      setFlashed(false);
-      // Best-effort restore in case a teardown happens mid-flash.
-      if (document.title.startsWith(BULLET)) {
-        document.title = originalTitle;
-      }
+      pulisci();
     };
   }, [chatUnread]);
 
@@ -2032,6 +2588,9 @@ function LiveSidebar({
     label: string;
     svg: React.ReactNode;
     badge?: number;
+    /** `alert`: un numero da leggere (rosso, con il richiamo animato);
+     *  `neutral`: un conteggio informativo (i presenti). */
+    badgeTone?: 'alert' | 'mention' | 'neutral';
     dot?: boolean;
     /** Testo del pallino per chi usa uno screen reader: dire «messaggi non
      *  letti» sopra la scheda dei sondaggi è peggio che non dire niente. */
@@ -2059,7 +2618,10 @@ function LiveSidebar({
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       ),
-      dot: chatUnread > 0,
+      // Il numero dei non letti, non un pallino: a ogni messaggio nuovo il
+      // contatore «salta» e finche' non si legge pulsa.
+      badge: chatUnread,
+      badgeTone: chatMentions > 0 ? 'mention' : 'alert',
       dotLabel: t('sidebarTabChatUnread'),
       show: showChat,
     },
@@ -2084,6 +2646,8 @@ function LiveSidebar({
           <circle cx="12" cy="12" r="10" />
         </svg>
       ),
+      dot: qaNews,
+      dotLabel: t('sidebarTabQaNew'),
       show: effQa,
     },
     {
@@ -2109,7 +2673,7 @@ function LiveSidebar({
       // Un sondaggio aperto va notato anche da chi in quel momento sta
       // guardando la chat: senza questo segno, il canale avvisava il pannello
       // e il pannello non avvisava nessuno.
-      dot: pollsUnvoted > 0 && !isPollsActive,
+      dot: pollsUnvoted > 0 && !pollsOnScreen,
       dotLabel: t('sidebarTabPollsOpen'),
       show: true,
     },
@@ -2131,12 +2695,15 @@ function LiveSidebar({
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M4 7h10" />
-          <path d="M4 12h16" />
-          <path d="M4 17h7" />
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
         </svg>
       ),
-      show: effWordCloud,
+      // Chi conduce la vede anche spenta: dentro c'e' la spiegazione, e la
+      // prima domanda la accende per tutti. Era la funzione che nessuno usava
+      // perche' andava prima scoperta e accesa da un'altra parte.
+      show: effWordCloud || isModerator,
+      dot: wordcloudNew,
+      dotLabel: t('sidebarTabWordcloudNew'),
     },
     {
       key: 'agenda',
@@ -2154,8 +2721,11 @@ function LiveSidebar({
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M9 11l3 3L22 4" />
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          <rect x="3" y="4" width="6" height="6" rx="1" />
+          <path d="m3 17 2 2 4-4" />
+          <path d="M13 6h8" />
+          <path d="M13 12h8" />
+          <path d="M13 18h8" />
         </svg>
       ),
       show: effAgenda,
@@ -2163,6 +2733,8 @@ function LiveSidebar({
     {
       key: 'materials',
       label: t('sidebarTabMaterials'),
+      dot: materialsNew && !materialsOnScreen,
+      dotLabel: t('sidebarTabMaterialsNew'),
       svg: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -2203,12 +2775,101 @@ function LiveSidebar({
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       ),
-      badge: participantCount,
+      // Le mani alzate vincono sul conteggio, per chi modera: sono la coda da
+      // gestire, e la scheda è il posto unico dove gestirla. Altrimenti il
+      // conteggio della sala quando c'e': quello del pannello si ferma quando
+      // il pannello si chiude.
+      badge:
+        isModerator && handsCount > 0
+          ? handsCount
+          : roomCount && roomCount > 0
+            ? roomCount
+            : participantCount,
+      badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
+      dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
       show: true,
+    },
+    // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
+    // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
+    // Il pubblico non la vede.
+    {
+      key: 'regia',
+      label: t('controlRoom.tab'),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
+        </svg>
+      ),
+      dot: !!regia?.isRecording,
+      dotLabel: t('recordingActive'),
+      show: !!regia,
     },
   ];
 
   const visibleTabs = tabs.filter((tab) => tab.show);
+
+  // Una novità vera (un sondaggio in più da votare, una nuova domanda di «In
+  // una parola», materiali nuovi, domande nuove) si dice anche a voce, una
+  // volta: il pallino lo vede solo chi guarda. Si parte dai segnali, non dai
+  // pallini, che spariscono e tornano cambiando scheda. Nei primi secondi si
+  // registra solo quello che c'e' gia' (i dati arrivano dopo il primo disegno).
+  const [annuncioNovita, setAnnuncioNovita] = useState('');
+  const montataAlle = useRef<number | null>(null);
+  const segnaliPrima = useRef<{ sondaggi: number; giro: string | null; materiali: boolean; domande: boolean } | null>(null);
+  const codaNovita = useRef<string[]>([]);
+  const timerNovita = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(
+    () => () => {
+      for (const id of timerNovita.current) clearTimeout(id);
+    },
+    [],
+  );
+  const giroAperto = giroParole?.active && giroParole.id ? giroParole.id : null;
+  useEffect(() => {
+    const ora = { sondaggi: pollsUnvoted, giro: giroAperto, materiali: materialsNew, domande: qaNews };
+    const prima = segnaliPrima.current;
+    segnaliPrima.current = ora;
+    if (montataAlle.current === null) montataAlle.current = Date.now();
+    if (!prima || Date.now() - montataAlle.current < 3000) return;
+    const nuove: string[] = [];
+    if (ora.sondaggi > prima.sondaggi) nuove.push(t('sidebarTabPollsOpen'));
+    if (ora.giro && ora.giro !== prima.giro) nuove.push(t('sidebarTabWordcloudNew'));
+    if (ora.materiali && !prima.materiali) nuove.push(t('sidebarTabMaterialsNew'));
+    if (ora.domande && !prima.domande) nuove.push(t('sidebarTabQaNew'));
+    if (nuove.length === 0) return;
+    // In coda, non al posto di quelle gia' in attesa: due novita' ravvicinate
+    // si dicono insieme.
+    const vuota = codaNovita.current.length === 0;
+    codaNovita.current.push(...nuove);
+    if (!vuota) return;
+    timerNovita.current.push(
+      setTimeout(() => {
+        const testo = codaNovita.current.join('. ');
+        codaNovita.current = [];
+        setAnnuncioNovita('');
+        timerNovita.current.push(setTimeout(() => setAnnuncioNovita(testo), 50));
+      }, 300),
+    );
+  }, [pollsUnvoted, giroAperto, materialsNew, qaNews, t]);
 
   // If the moderator turns off the active tab's feature mid-event (e.g.
   // disables Q&A), that tab drops out of visibleTabs — without this the drawer
@@ -2227,10 +2888,9 @@ function LiveSidebar({
         setDrawerOpen(false);
         return;
       }
-      setActiveTab(key);
-      setDrawerOpen(true);
+      apriScheda(key);
     },
-    [activeTab, drawerOpen]
+    [activeTab, drawerOpen, apriScheda]
   );
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
@@ -2276,16 +2936,29 @@ function LiveSidebar({
             <span className="live-floating-btn__icon">{tab.svg}</span>
             <span className="live-floating-btn__label">{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="live-floating-btn__badge" aria-hidden="true">
-                {tab.badge}
+              <span
+                // La chiave cambia col numero: il contatore rinasce e la sua
+                // animazione d'ingresso riparte a ogni messaggio nuovo.
+                key={tab.badgeTone !== 'neutral' ? tab.badge : 'n'}
+                className={`live-floating-btn__badge${
+                  tab.badgeTone === 'mention' ? ' is-alert is-mention' : tab.badgeTone === 'alert' ? ' is-alert' : ''
+                }`}
+                aria-hidden="true"
+              >
+                {tab.badgeTone === 'mention' && '@'}
+                {tab.badge > 99 ? '99+' : tab.badge}
               </span>
             )}
-            {tab.dot && (
-              <span
-                className="live-floating-btn__dot"
-                aria-label={tab.dotLabel}
-                title={tab.dotLabel}
-              />
+            {/* Un contatore da leggere (non i presenti) arriva anche ai lettori
+                di schermo: il numero disegnato è nascosto. */}
+            {tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral' && tab.dotLabel && (
+              <span className="visually-hidden"> {tab.dotLabel}</span>
+            )}
+            {tab.dot && <span className="live-floating-btn__dot" aria-hidden="true" title={tab.dotLabel} />}
+            {/* Un aria-label su uno span non si legge: il testo entra nel nome
+                del pulsante. */}
+            {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+              <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
           </button>
         );
@@ -2299,6 +2972,59 @@ function LiveSidebar({
           overlays the Jitsi iframe and scales with the video. */}
       {slot && createPortal(floatingBar, slot)}
 
+      {/* Fuori dal pannello laterale, che sul telefono chiuso e' inerte: la
+          novita' si dice proprio a chi guarda il video. */}
+      <p className="visually-hidden" role="status">
+        {annuncioNovita}
+      </p>
+
+      {chatPreview && (
+        <div
+          className={`chat-preview${
+            chatPreview.mentionsMe || chatPreview.repliesToMe ? ' chat-preview--mention' : ''
+          }`}
+        >
+          <button
+            type="button"
+            className="chat-preview__open"
+            onClick={() => {
+              setChatPreview(null);
+              apriScheda('chat');
+            }}
+          >
+            <span
+              className="chat-preview__avatar"
+              style={{ backgroundColor: avatarColor(chatPreview.senderKey || chatPreview.senderName) }}
+              aria-hidden="true"
+            >
+              {avatarInitials(chatPreview.senderName)}
+            </span>
+            <span className="chat-preview__body">
+              <span className="chat-preview__title">
+                {chatPreview.mentionsMe
+                  ? t('chat.mentionNotificationTitle', { name: chatPreview.senderName })
+                  : chatPreview.repliesToMe
+                    ? t('chat.replyNotificationTitle', { name: chatPreview.senderName })
+                    : t('chat.messageNotificationTitle', { name: chatPreview.senderName })}
+              </span>
+              <span className="chat-preview__text">{chatPreview.text}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="chat-preview__close"
+            aria-label={tCommon('close')}
+            onClick={() => setChatPreview(null)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Scrim visible whenever the drawer is open (desktop + mobile).
           Click = close. */}
       <button
@@ -2310,8 +3036,58 @@ function LiveSidebar({
       />
 
       <div
-        className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}
+        className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}${
+          compressa ? ' live-sidebar--collapsed' : ''
+        }`}
+        style={
+          isDesktop && !compressa && sidebarWidth !== null
+            ? { width: sidebarWidth, flexBasis: sidebarWidth, maxWidth: 'none' }
+            : undefined
+        }
+        // Sul telefono il cassetto chiuso esce dallo schermo ma resterebbe
+        // raggiungibile con il tasto Tab: chiuso, è inerte.
+        inert={!isDesktop && !drawerOpen ? true : undefined}
       >
+        {isDesktop && (
+          <button
+            type="button"
+            className="live-sidebar-collapse"
+            onClick={() => impostaCompressa(!compressa)}
+            aria-expanded={!compressa}
+            aria-controls="live-sidebar-body"
+            aria-label={compressa ? t('expandSidebar') : t('collapseSidebar')}
+            title={compressa ? t('expandSidebar') : t('collapseSidebar')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {/* Una freccia sola, che ruota (globals.scss): verso destra
+                  comprime, verso sinistra riapre. */}
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        )}
+        {isDesktop && !compressa && (
+          <div
+            className="live-sidebar-resizer"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t('resizeSidebar')}
+            aria-valuenow={sidebarWidth ?? SIDEBAR_DEFAULT_W}
+            aria-valuemin={SIDEBAR_MIN_W}
+            aria-valuemax={SIDEBAR_MAX_W}
+            title={t('resizeSidebar')}
+            tabIndex={0}
+            onPointerDown={onResizerPointerDown}
+            onPointerMove={onResizerPointerMove}
+            onPointerUp={onResizerPointerUp}
+            onPointerCancel={onResizerPointerUp}
+            onKeyDown={onResizerKeyDown}
+            onDoubleClick={() => {
+              setSidebarWidth(null);
+              salvaLarghezza(null);
+            }}
+          />
+        )}
         {/* Desktop persistent-column tab strip (mobile keeps the floating bar
             + drawer header below). Proper tablist semantics for keyboard/SR. */}
         <div
@@ -2329,16 +3105,36 @@ function LiveSidebar({
                 aria-selected={isActive}
                 title={tab.label}
                 className={`live-sidebar-tab${isActive ? ' live-sidebar-tab--active' : ''}`}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => apriScheda(tab.key)}
               >
                 <span className="live-floating-btn__icon" aria-hidden="true">
                   {tab.svg}
                 </span>
                 <span className="live-sidebar-tab__label">{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="live-sidebar-tab__badge">{tab.badge}</span>
+                  <span
+                    key={tab.badgeTone !== 'neutral' ? tab.badge : 'n'}
+                    className={`live-sidebar-tab__badge${
+                      tab.badgeTone === 'mention'
+                        ? ' is-alert is-mention'
+                        : tab.badgeTone === 'alert'
+                          ? ' is-alert'
+                          : ' is-neutral'
+                    }`}
+                  >
+                    {tab.badgeTone === 'mention' && '@'}
+                    {tab.badge > 99 ? '99+' : tab.badge}
+                    {tab.badgeTone !== 'neutral' && tab.dotLabel && (
+                      <span className="visually-hidden"> {tab.dotLabel}</span>
+                    )}
+                  </span>
                 )}
                 {tab.dot && <span className="live-sidebar-tab__dot" aria-hidden="true" />}
+                {/* Il pallino da solo non arriva a chi usa un lettore di
+                    schermo: il suo testo entra nel nome della scheda. */}
+                {tab.dot && !(tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral') && tab.dotLabel && (
+                  <span className="visually-hidden"> {tab.dotLabel}</span>
+                )}
               </button>
             );
           })}
@@ -2375,52 +3171,26 @@ function LiveSidebar({
         </div>
 
         <div
-          className="flex-grow-1 d-flex flex-column live-sidebar-body"
+          id="live-sidebar-body"
+          className={`flex-grow-1 ${compressa ? 'd-none' : 'd-flex'} flex-column live-sidebar-body`}
           style={{ minHeight: 0, overflowY: 'auto' }}
         >
-          {/* Attivazione funzioni durante l'evento (solo moderatore). Le
-              modifiche si propagano agli altri client via polling dei flag. */}
-          {isModerator && (
-            <div
-              className="d-flex flex-wrap gap-2 px-3 py-2 align-items-center"
-              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.8rem' }}
-            >
-              <span className="text-secondary fw-semibold me-1">
-                {t('liveFeaturesLabel')}
-              </span>
-              {(
-                [
-                  ['qaEnabled', t('sidebarTabQa'), effQa],
-                  ['chatEnabled', t('sidebarTabChat'), effChat],
-                  ['agendaEnabled', t('liveToggleAgenda'), effAgenda],
-                  ['wordCloudEnabled', t('sidebarTabWordcloud'), effWordCloud],
-                ] as const
-              ).map(([key, label, on]) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`btn btn-sm ${on ? 'btn-primary' : 'btn-outline-secondary'} py-0 px-2`}
-                  style={{ fontSize: '0.78rem' }}
-                  onClick={() => void toggleFeature(key, on)}
-                  aria-pressed={on}
-                >
-                  {on ? '✓ ' : ''}
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-          {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
-              end-to-end encrypted — there's no capture hook). Remind moderators
-              to export + attach it as a material before the call ends. */}
-          {isModerator && whiteboardEnabled && whiteboardInfraReady && (
-            <div
-              className="px-3 py-2"
-              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
-              role="note"
-            >
-              <span className="text-secondary">💡 {t('whiteboardNotSavedHint')}</span>
-            </div>
+          {activeTab === 'regia' && regia && (
+            <ControlRoomPanel
+              api={jitsiApi}
+              eventId={eventId}
+              token={token}
+              onEnded={regia.onEnded}
+              modalContainer={regia.modalContainer}
+              recordingEnabled={regia.recordingEnabled}
+              isRecording={regia.isRecording}
+              faseRegistratore={regia.faseRegistratore}
+              registrazione={regia.registrazione}
+              funzioni={funzioniSala}
+              onToggleFunzione={(key, on) => void toggleFeature(key, on)}
+              lavagna={whiteboardEnabled && whiteboardInfraReady}
+              eventSlug={eventSlug}
+            />
           )}
           {activeTab === 'qa' && effQa && (
             <QAPanel
@@ -2455,6 +3225,9 @@ function LiveSidebar({
                 isModerator={isModerator}
                 active={isChatActive}
                 onUnreadCountChange={setChatUnread}
+                onPreview={setChatPreview}
+                onUnreadMentionsChange={setChatMentions}
+                getRoster={getRoster}
               />
             </div>
           )}
@@ -2473,17 +3246,20 @@ function LiveSidebar({
               isModerator={isModerator}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
-              active={isPollsActive}
+              active={pollsOnScreen}
               onUnvotedCountChange={setPollsUnvoted}
+              presentCount={roomCount && roomCount > 0 ? roomCount : participantCount}
             />
           </div>
-          {activeTab === 'wordcloud' && effWordCloud && (
+          {activeTab === 'wordcloud' && (effWordCloud || isModerator) && (
             <WordCloud
               eventSlug={eventSlug}
               token={token}
               isModerator={isModerator}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
+              enabled={effWordCloud}
+              onEnable={accendiParole}
             />
           )}
           {activeTab === 'agenda' && effAgenda && (
@@ -2502,14 +3278,20 @@ function LiveSidebar({
               isModerator={isModerator}
             />
           )}
-          {activeTab === 'participants' && (
+          {/* Sempre montato, come chat e sondaggi: segue mani alzate e chi sta
+              parlando anche mentre si guarda un'altra scheda. */}
+          <div className={activeTab === 'participants' ? 'd-block' : 'd-none'}>
             <ParticipantPanel
               api={jitsiApi}
               isModerator={isModerator}
               localParticipantId={localParticipantId}
               onCountChange={setParticipantCount}
+              onHandsChange={setHandsCount}
+              visible={onScreen('participants')}
+              eventSlug={eventSlug}
+              token={token}
             />
-          )}
+          </div>
         </div>
       </div>
     </>
@@ -2526,59 +3308,6 @@ const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = 
   participant: { badge: '#D4EDDA', badgeFg: '#155724' },
   guest: { badge: '#E9ECEF', badgeFg: 'var(--app-muted)' },
 };
-
-/**
- * Non-intrusive banner shown when the event has gone past its scheduled
- * endsAt but is within the grace window. Warns attendees the call will
- * close automatically; polls the wall clock every 30s so the countdown
- * is never more than half a minute stale.
- */
-function OvertimeBanner({
-  endsAt,
-  graceMinutes,
-}: {
-  endsAt: string;
-  graceMinutes: number;
-}) {
-  const t = useTranslations('live');
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(id);
-  }, []);
-
-  const endsAtMs = new Date(endsAt).getTime();
-  if (now < endsAtMs) return null;
-
-  // graceMinutes === -1 → never auto-close; graceMinutes === 0 → hard
-  // close (banner wouldn't be visible anyway since the scaler flips
-  // to ENDED instantly and the user gets redirected).
-  if (graceMinutes === 0) return null;
-
-  const closeAt = graceMinutes > 0 ? new Date(endsAtMs + graceMinutes * 60_000) : null;
-  const minutesLeft = closeAt
-    ? Math.max(0, Math.ceil((closeAt.getTime() - now) / 60_000))
-    : null;
-
-  const message =
-    closeAt && minutesLeft !== null
-      ? minutesLeft > 0
-        ? t('overtime.withCountdown', { minutes: minutesLeft })
-        : t('overtime.closingNow')
-      : t('overtime.indefinite');
-
-  return (
-    <div
-      className="px-3 py-2 d-flex align-items-center gap-2 text-white small"
-      style={{ background: '#A66300' }}
-      role="status"
-    >
-      <span aria-hidden="true">⏱</span>
-      {message}
-    </div>
-  );
-}
 
 interface LiveTopBarProps {
   title: string;
@@ -2621,11 +3350,6 @@ interface LiveTopBarProps {
    *  live-phase top bar (the consent-pending one renders no video/sidebar). */
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
-  /** Fullscreen element to portal the share modal into while fullscreen is on. */
-  modalContainer?: HTMLElement;
-  /** Orario dell'evento per il contatore in barra (B4). */
-  startsAt?: string;
-  endsAt?: string;
 }
 
 function LiveTopBar({
@@ -2646,9 +3370,6 @@ function LiveTopBar({
   onLeaveRoom,
   isFullscreen,
   onToggleFullscreen,
-  modalContainer,
-  startsAt,
-  endsAt,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -2657,7 +3378,6 @@ function LiveTopBar({
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
   const thumbUrl = imageUrl ?? coverImageUrl ?? null;
-  const monogram = (main.trim().charAt(0) || title.trim().charAt(0) || '?').toUpperCase();
 
   return (
     <div
@@ -2667,7 +3387,7 @@ function LiveTopBar({
         boxShadow: '0 2px 8px rgba(0, 40, 85, 0.3)',
       }}
     >
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center live-top-bar__lead">
         {/* PA Webinar brand — the immersive call overlay deliberately hides the
             site header/footer (wrong to show full chrome over a fullscreen
             call), so surface the brand here for orientation. Non-navigating on
@@ -2693,7 +3413,9 @@ function LiveTopBar({
             </span>
           )}
         </div>
-        {thumbUrl ? (
+        {/* La miniatura solo se l'evento ha un'immagine: l'iniziale del
+            titolo in un quadratino non diceva niente a nessuno. */}
+        {thumbUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={thumbUrl}
@@ -2708,22 +3430,6 @@ function LiveTopBar({
               border: '1px solid rgba(255,255,255,0.25)',
             }}
           />
-        ) : (
-          <span
-            aria-hidden="true"
-            className="me-2 flex-shrink-0 d-inline-flex align-items-center justify-content-center fw-bold"
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 6,
-              background: 'linear-gradient(135deg, #0066CC 0%, #004080 100%)',
-              color: '#fff',
-              fontSize: '0.8rem',
-              border: '1px solid rgba(255,255,255,0.25)',
-            }}
-          >
-            {monogram}
-          </span>
         )}
         <h1 className="h6 mb-0 me-3 text-white">
           {kicker && (
@@ -2739,7 +3445,7 @@ function LiveTopBar({
         <Badge
           color=""
           pill
-          className="px-2 py-1 me-2"
+          className="px-2 py-1 me-2 live-role-badge"
           style={{
             backgroundColor: badgeColors.badge,
             color: badgeColors.badgeFg,
@@ -2754,13 +3460,26 @@ function LiveTopBar({
          *  under-reported. The sidebar remains the single
          *  source of truth for the present-participant count. */}
       </div>
-      <div className="d-flex align-items-center gap-3">
-        {isRecording && (
-          <Badge color="danger" pill className="px-2 py-1">
-            <span className="me-1">●</span>
-            {t('recordingActive')}
-          </Badge>
+      {/* L'argomento in corso dell'agenda, per chi segue chiamata e chat
+          senza aprire il pannello: si apre sull'elenco completo. Sul telefono
+          va su una riga sua, sotto titolo e comandi. */}
+      <AgendaTicker eventSlug={slug} isModerator={role === 'moderator'} />
+      <div className="live-top-bar__actions d-flex align-items-center gap-2">
+        {/* Un'icona, non una fascia: chi è in sala sa che si registra senza
+            perdere una riga di video. Il ruolo status la annuncia quando
+            compare. Chi conduce la trova, con la durata, nella striscia del
+            tempo. */}
+        {isRecording && role !== 'moderator' && (
+          <span className="live-rec-indicator" title={t('recordingActive')} aria-hidden="true">
+            <span className="live-rec-indicator__dot" />
+            {t('recordingShort')}
+          </span>
         )}
+        {/* La regione resta montata e cambia testo: un contenitore che nasce
+            già pieno molti lettori di schermo non lo annunciano. */}
+        <span className="visually-hidden" role="status">
+          {isRecording ? t('recordingActive') : ''}
+        </span>
         {/* The "active vs registered" figure is moderator-only:
             participants shouldn't see attendance numbers. The live people-count
             now lives only in the participants sidebar, so non-moderators get
@@ -2792,24 +3511,12 @@ function LiveTopBar({
             <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
           </Button>
         )}
-        {startsAt && endsAt && (
-          <EventTimer
-            startsAt={startsAt}
-            endsAt={endsAt}
-            // Acceso di default per chi conduce la sala: la richiesta arriva da
-            // lì ("regolare al meglio i vari interventi"), e un orologio che
-            // scorre addosso al pubblico è pressione che nessuno ha chiesto.
-            // Chiunque può accenderlo dall'icona, e la scelta resta salvata.
-            defaultVisible={role === 'moderator'}
-          />
-        )}
         <LiveShareButton
           slug={slug}
           locale={locale}
           moderatorToken={moderatorToken}
           hasPublicPage={hasPublicPage}
           hasCallLink={hasCallLink}
-          modalContainer={modalContainer}
         />
         {onLeaveRoom && (
           <Button
@@ -2820,8 +3527,8 @@ function LiveTopBar({
             onClick={onLeaveRoom}
             aria-label={t('leaveRoom')}
           >
-            <Icon icon="it-external-link" size="xs" color="white" className="me-1" />
-            {t('leaveRoom')}
+            <Icon icon="it-logout" size="xs" color="white" />
+            <span className="leave-room-btn__text">{t('leaveRoom')}</span>
           </Button>
         )}
       </div>
@@ -2886,8 +3593,11 @@ function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
     <div
       className="d-flex align-items-center gap-2 px-3 py-2"
       style={{
-        background: 'linear-gradient(90deg, #F7A11A 0%, #D97706 100%)',
-        color: '#fff',
+        // Fascia informativa chiara, come gli avvisi della sala: il bianco
+        // sull'arancio di prima non arrivava al contrasto minimo (circa 2,5:1).
+        background: '#E6F0FA',
+        color: '#004D99',
+        borderBottom: '1px solid #CFE0F3',
         fontSize: '0.88rem',
         fontWeight: 600,
         flexShrink: 0,

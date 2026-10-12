@@ -4,25 +4,36 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { verifyRatingToken } from '@/lib/feedback/rating-link';
+import { tryDecryptPII } from '@/lib/crypto/pii';
+import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { vistaResoconto } from '@/lib/report/view';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { openGraphImages, twitterImageCard } from '@/lib/seo';
+import {
+  anteprimaEvento,
+  firmaPersone,
+  immagineAnteprima,
+  versioniLinguistiche,
+} from '@/lib/events/share-metadata';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { markdownToPlainText } from '@/lib/utils/markdown-text';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ invalidToken?: string }>;
+  searchParams?: Promise<{ invalidToken?: string; valuta?: string }>;
 }
 
 export async function generateMetadata({
@@ -32,63 +43,30 @@ export async function generateMetadata({
   const locale = await getLocale();
   const settings = await (await import('@/lib/settings')).getSettings();
 
-  const event = await prisma.event.findUnique({ where: { slug } });
+  const event = await prisma.event.findUnique({
+    where: { slug },
+    include: PERSONE_PUBBLICHE_INCLUDE,
+  });
   // Come la pagina: un evento non pubblico non espone titolo, descrizione
   // e immagine nemmeno nei metadati della risposta «non trovato».
   if (!event || !isEventPageVisible(event)) return { robots: { index: false } };
 
-  const title = getLocalized(event.title as LocalizedField, locale);
-  const description = getLocalized(event.description as LocalizedField, locale);
-
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
-  // Assoluta: i servizi che mostrano le anteprime leggono il tag senza avere
-  // un'origine su cui risolvere un percorso relativo. Porta con se' il momento
-  // dell'ultima modifica perche' quei servizi tengono in cache l'immagine per
-  // INDIRIZZO, anche per giorni: senza, correggere un titolo o sostituire la
-  // locandina la mattina dell'evento non cambierebbe nulla di cio' che vede
-  // chi riceve il link. Lo slug si codifica: da qui in poi e' un indirizzo con
-  // una parte di interrogazione, e un carattere speciale se la mangerebbe.
-  const scheda = settings.ogCardEnabled
-    ? `${baseUrl}/api/og/event/${encodeURIComponent(slug)}` +
-      `?locale=${locale}&v=${event.updatedAt.getTime()}`
-    : null;
+  // Titolo, descrizione in testo semplice e immagine (scheda composta dal
+  // server o copertina): gli stessi del link della sala e dell'iscrizione.
+  const anteprima = anteprimaEvento(
+    { ...event, firmaPersone: firmaPersone(event) },
+    settings,
+    locale,
+    `/events/${slug}`,
+  );
 
   return {
-    title,
-    description: description.slice(0, 160),
-    // Immagine dell'anteprima: la scheda composta dal server quando
-    // l'amministrazione la vuole (titolo, data e relatori DENTRO l'immagine,
-    // che e' l'unica cosa che molte applicazioni mostrano di un link), oppure
-    // il comportamento storico: la copertina dell'evento se c'è (è la più
-    // pertinente per un link condiviso), altrimenti il logo di default. Va
-    // messa QUI e non ereditata dal layout: Next sostituisce l'openGraph per
-    // segmento, non lo fonde (vedi lib/seo). La copertina 16:9 (`coverImageUrl`)
-    // vince sulla generica, come ovunque nell'app; `settings.seoImage` non entra
-    // qui di proposito: è l'immagine del SITO, quella dell'evento è più
-    // pertinente per un link condiviso.
-    openGraph: {
-      title,
-      description: description.slice(0, 160),
-      url: pageUrl,
-      type: 'website',
-      locale: locale === 'en' ? 'en_GB' : 'it_IT',
-      siteName: settings.siteName || 'PA Webinar',
-      images: scheda
-        ? [{ url: scheda, width: 1200, height: 630 }]
-        : openGraphImages(event.coverImageUrl ?? event.imageUrl),
-    },
-    twitter: twitterImageCard(
-      title,
-      description.slice(0, 160),
-      scheda ?? event.coverImageUrl ?? event.imageUrl,
-    ),
+    ...anteprima,
     alternates: {
       canonical: pageUrl,
-      languages: {
-        it: localizedUrl(baseUrl, `/events/${slug}`, 'it'),
-        en: localizedUrl(baseUrl, `/events/${slug}`, 'en'),
-      },
+      languages: versioniLinguistiche(`/events/${slug}`, settings.availableLocales),
     },
   };
 }
@@ -101,7 +79,8 @@ export default async function EventDetailPage({
   // Letti lato server (la route è già dynamic per il cookies() del layout):
   // un useSearchParams() nel client senza <Suspense> è un build breaker
   // latente il giorno in cui la route torna statica.
-  const invalidToken = (await searchParams)?.invalidToken === '1';
+  const parametri = await searchParams;
+  const invalidToken = parametri?.invalidToken === '1';
   const locale = await getLocale();
   const settings = await getSettings();
 
@@ -110,6 +89,9 @@ export default async function EventDetailPage({
     include: {
       _count: { select: { registrations: true } },
       tagLinks: { include: { tag: true } },
+      // Gli enti, e solo chi è stato scelto per la pagina pubblica con un
+      // accesso ancora valido.
+      ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });
 
@@ -132,10 +114,10 @@ export default async function EventDetailPage({
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
 
-  // Le due scelte dell'amministrazione che decidono i pulsanti della scheda:
-  // chi può iscriversi, e se in diretta si entra anche senza iscrizione.
+  // Le due scelte che decidono i pulsanti della scheda: chi può iscriversi,
+  // e se in diretta si entra anche senza iscrizione (dell'evento, o del sito).
   const registrationAccess = await registrationAccessFor(
-    event.id,
+    event,
     settings.publicRegistrationEnabled,
   );
   const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);
@@ -146,8 +128,18 @@ export default async function EventDetailPage({
   const registrationOpen = isEventOpenForRegistration(event);
 
   const title = getLocalized(event.title as LocalizedField, locale);
-  const description = getLocalized(event.description as LocalizedField, locale);
+  // I dati strutturati sono testo: la descrizione senza la sintassi Markdown.
+  const description = markdownToPlainText(getLocalized(event.description as LocalizedField, locale));
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+  // La stessa immagine dell'anteprima dei link, come indirizzo assoluto.
+  const immagine = immagineAnteprima(
+    { ...event, firmaPersone: firmaPersone(event) },
+    settings,
+    locale,
+  ).url;
+
+  // Chi organizza e chi interviene (lib/events/public-people).
+  const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -157,19 +149,33 @@ export default async function EventDetailPage({
     startDate: event.startsAt.toISOString(),
     endDate: event.endsAt.toISOString(),
     eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-    eventStatus:
-      event.status === 'ENDED'
-        ? 'https://schema.org/EventCancelled'
-        : 'https://schema.org/EventScheduled',
+    // Un evento concluso non e' annullato: lo dicono le date. La piattaforma
+    // non ha uno stato «annullato», quindi l'evento e' sempre in programma.
+    eventStatus: 'https://schema.org/EventScheduled',
+    ...(immagine ? { image: [immagine.startsWith('/') ? `${baseUrl}${immagine}` : immagine] } : {}),
     location: {
       '@type': 'VirtualLocation',
       url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
     },
-    organizer: {
-      '@type': 'Organization',
-      name: settings.organizationName || 'PA Webinar',
-      url: settings.organizationUrl || '',
-    },
+    organizer:
+      enti.length > 0
+        ? enti.map((e) => ({ '@type': 'Organization', name: e.name, ...(e.websiteUrl ? { url: e.websiteUrl } : {}) }))
+        : {
+            '@type': 'Organization',
+            name: settings.organizationName || 'PA Webinar',
+            url: settings.organizationUrl || '',
+          },
+    ...(persone.some((p) => p.role === 'speaker')
+      ? {
+          performer: persone
+            .filter((p) => p.role === 'speaker')
+            .map((p) => ({
+              '@type': 'Person',
+              name: p.name,
+              ...(p.organization ? { affiliation: { '@type': 'Organization', name: p.organization } } : {}),
+            })),
+        }
+      : {}),
     maximumAttendeeCapacity: event.maxParticipants,
     remainingAttendeeCapacity: event.maxParticipants - event._count.registrations,
   };
@@ -186,6 +192,7 @@ export default async function EventDetailPage({
   let answeredQuestions: {
     id: string;
     text: string;
+    answerText: string | null;
     authorName: string;
     upvotes: number;
     status: string;
@@ -206,19 +213,32 @@ export default async function EventDetailPage({
   // L'invito al questionario post-evento compare solo se l'evento ne ha uno:
   // senza, il modulo chiederebbe al server un questionario che non c'è.
   let hasPostEventQuestionnaire = false;
+  let feedbackProof: { accessToken?: string; ratingToken?: string } | null = null;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
     // regardless of the display toggle so it survives retention for the future
     // follow-up email; the page gates DISPLAY on postEventShowRecap below.
     recap = await ensureEventRecap(event.id);
+    // Il riepilogo si congela alla prima visita, ma le valutazioni arrivano
+    // anche dopo: si leggono al momento. Pubbliche solo se lo sono i feedback.
+    if (recap) {
+      const valutazioni = event.postEventShowFeedback ? await getFeedbackSummary(event.id) : null;
+      recap = {
+        ...recap,
+        feedback: !valutazioni
+          ? { average: null, count: 0 }
+          : valutazioni.count >= recap.feedback.count
+            ? { average: valutazioni.average, count: valutazioni.count }
+            : recap.feedback,
+      };
+    }
 
     const [
       materialsRaw,
       questionsRaw,
       pollsRaw,
-      feedbackAgg,
-      feedbackDist,
+      valutazioni,
       postEventQuestionnaire,
     ] = await Promise.all([
       // Vista del pubblico: la visibilità del singolo materiale
@@ -237,7 +257,12 @@ export default async function EventDetailPage({
         ? prisma.question.findMany({
             where: {
               eventId: event.id,
-              status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+              // Anche una domanda rimessa in attesa dopo una risposta scritta:
+              // la risposta si vedeva in sala, e resta.
+              OR: [
+                { status: { in: ['ANSWERED', 'HIGHLIGHTED'] } },
+                { status: 'PENDING', answerText: { not: null } },
+              ],
             },
             orderBy: { upvoteCount: 'desc' },
           })
@@ -248,21 +273,7 @@ export default async function EventDetailPage({
             include: { votes: { select: { optionIndex: true } } },
           })
         : Promise.resolve([]),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.aggregate({
-            where: { eventId: event.id },
-            _avg: { rating: true },
-            _count: true,
-          })
-        : Promise.resolve(null),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.groupBy({
-            by: ['rating'],
-            where: { eventId: event.id },
-            _count: true,
-            orderBy: { rating: 'desc' },
-          })
-        : Promise.resolve([]),
+      event.postEventShowFeedback ? getFeedbackSummary(event.id) : Promise.resolve(null),
       // Il toggle del feedback governa anche l'invito: spento, non serve
       // nemmeno sapere se il questionario c'è.
       event.postEventShowFeedback
@@ -277,6 +288,33 @@ export default async function EventDetailPage({
 
     hasPostEventQuestionnaire = !!postEventQuestionnaire;
 
+    // La valutazione dalla pagina pubblica: solo per un iscritto entrato in
+    // sala, riconosciuto dal link della valutazione dell'email di
+    // ringraziamento (?valuta=, lib/feedback/rating-link) o dal cookie
+    // d'accesso del browser con cui si e' iscritto. Chi e' entrato da ospite
+    // valuta in sala, alla fine (lib/feedback/participation).
+    if (hasPostEventQuestionnaire) {
+      const dalLink =
+        typeof parametri?.valuta === 'string' ? verifyRatingToken(parametri.valuta, event.id) : null;
+      if (dalLink) {
+        const iscrizione = await prisma.registration.findUnique({
+          where: { id: dalLink },
+          select: { eventId: true, joinedAt: true },
+        });
+        if (iscrizione?.eventId === event.id && iscrizione.joinedAt) feedbackProof = { ratingToken: parametri!.valuta! };
+      }
+      const candidato = feedbackProof
+        ? null
+        : await verifyEventAccess(event.id, cookieStore.get(eventAccessCookieName(event.id))?.value);
+      if (candidato) {
+        const iscrizione = await prisma.registration.findUnique({
+          where: { accessToken: candidato },
+          select: { eventId: true, joinedAt: true },
+        });
+        if (iscrizione?.eventId === event.id && iscrizione.joinedAt) feedbackProof = { accessToken: candidato };
+      }
+    }
+
     eventMaterials = materialsRaw.map((m) => ({
       id: m.id,
       title: m.title,
@@ -289,6 +327,7 @@ export default async function EventDetailPage({
     answeredQuestions = questionsRaw.map((q) => ({
       id: q.id,
       text: q.text,
+      answerText: q.answerText,
       authorName: q.authorName,
       upvotes: q.upvoteCount,
       status: q.status,
@@ -308,67 +347,8 @@ export default async function EventDetailPage({
       };
     });
 
-    if (feedbackAgg && feedbackAgg._count > 0) {
-      feedbackSummary = {
-        average: feedbackAgg._avg.rating,
-        count: feedbackAgg._count,
-        distribution: feedbackDist.map((d) => ({
-          rating: d.rating,
-          count: d._count,
-        })),
-      };
-    }
-
-    // Convergence fallback: events created after the feedback redesign
-    // collect ratings via the POST_EVENT questionnaire (QuestionnaireResponse),
-    // not the legacy EventFeedback table. When there is no legacy feedback,
-    // derive the public star summary from the questionnaire's 1-5 LIKERT
-    // answers (averaged across all rating questions) so the public Feedback
-    // tab keeps working for new events.
-    if (!feedbackSummary && event.postEventShowFeedback) {
-      const pq = await prisma.eventQuestionnaire.findUnique({
-        where: { eventId_placement: { eventId: event.id, placement: 'POST_EVENT' } },
-        select: {
-          _count: { select: { responses: true } },
-          responses: {
-            select: {
-              answers: {
-                select: { valueScale: true, item: { select: { type: true } } },
-              },
-            },
-          },
-        },
-      });
-      if (pq && pq._count.responses > 0) {
-        const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        let sum = 0;
-        let n = 0;
-        for (const r of pq.responses) {
-          for (const a of r.answers) {
-            if (
-              a.item.type === 'LIKERT' &&
-              a.valueScale != null &&
-              a.valueScale >= 1 &&
-              a.valueScale <= 5
-            ) {
-              counts[a.valueScale] = (counts[a.valueScale] ?? 0) + 1;
-              sum += a.valueScale;
-              n += 1;
-            }
-          }
-        }
-        if (n > 0) {
-          feedbackSummary = {
-            average: sum / n,
-            count: pq._count.responses,
-            distribution: [5, 4, 3, 2, 1].map((rating) => ({
-              rating,
-              count: counts[rating] ?? 0,
-            })),
-          };
-        }
-      }
-    }
+    // Una sola media per tutte le pagine (lib/feedback/feedback-summary).
+    if (valutazioni && valutazioni.count > 0) feedbackSummary = valutazioni;
   }
 
   // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova
@@ -405,6 +385,7 @@ export default async function EventDetailPage({
     registrationCount: event._count.registrations,
     status: event.status,
     recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+    transcriptPublished: event.transcriptPublished,
     youtubeUrl: event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
@@ -415,6 +396,8 @@ export default async function EventDetailPage({
     privacyPolicyUrl: event.privacyPolicyUrl,
     speakersInfo: event.speakersInfo as Record<string, string> | null,
     organizerName: event.organizerName,
+    organizers: enti,
+    people: persone,
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,
@@ -446,6 +429,8 @@ export default async function EventDetailPage({
         registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
         hasPostEventQuestionnaire={hasPostEventQuestionnaire}
+        feedbackProof={feedbackProof}
+        report={vistaResoconto(event, locale)}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

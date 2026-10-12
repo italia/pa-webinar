@@ -18,9 +18,11 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
-import { isInvited } from '@/lib/events/registration-access';
+import { isInvited, publicRegistrationFor } from '@/lib/events/registration-access';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { consensiRichiesti, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
+import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
   buildEventAccessSetCookie,
@@ -92,24 +94,34 @@ export const POST = withErrorHandling(async (request, context) => {
     linguaDaIntestazione(request.headers.get('Accept-Language')) ??
     defaultLocale;
 
-  // If recording is enabled, consentRecording must be true
-  if (event.recordingEnabled && consentRecording !== true) {
+  // I consensi obbligatori dipendono dal formato dell'evento: la stessa regola
+  // del modulo (lib/registration/consents).
+  const richiesti = consensiRichiesti({
+    ...event,
+    captionsTranscript: captionsTranscriptActive(event, await getSettings()),
+  });
+  if (richiesti.registrazione && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
   }
 
-  // ADR-013 Fase 5 — se l'evento registra le tracce per-partecipante,
-  // serve il consenso esplicito separato (PII sensibile).
-  if (event.multitrackRecordingEnabled && consentMultitrack !== true) {
-    throw new ValidationError('Validation failed', [{ path: ['consentMultitrack'], message: 'registration.errors.multitrackConsentRequired' }]);
+  // La trascrizione dei propri interventi (traccia audio per persona o
+  // sottotitoli salvati) e' facoltativa: senza, ci si iscrive lo stesso e la
+  // voce non si registra ne' si trascrive (lib/captions/room).
+
+  // L'ente, quando l'evento lo chiede: la regola del modulo vale anche per chi
+  // chiama la rotta direttamente. Ruolo e tipo di ente restano facoltativi.
+  if (event.requireOrganization && !organization?.trim()) {
+    throw new ValidationError('Validation failed', [{ path: ['organization'], message: 'registration.errors.organizationRequired' }]);
   }
 
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
-  // Iscrizione pubblica spenta dall'amministrazione: si iscrive solo chi e'
-  // fra gli invitati dell'evento (lib/events/registration-access), e il link
-  // personale lo consegna solo l'email (lib/events/registration-link).
-  const soloInvitati = !(await getSettings()).publicRegistrationEnabled;
+  // Iscrizione non aperta (l'evento e' solo su invito, o lo dice il sito): si
+  // iscrive solo chi e' fra gli invitati dell'evento
+  // (lib/events/registration-access), e il link personale lo consegna solo
+  // l'email (lib/events/registration-link).
+  const soloInvitati = !publicRegistrationFor(event, (await getSettings()).publicRegistrationEnabled);
 
   const esito: EsitoIscrizione = await prisma.$transaction(async (tx) => {
     // Check for duplicates inside transaction
@@ -149,8 +161,9 @@ export const POST = withErrorHandling(async (request, context) => {
         organizationType: organizationType || null,
         consentGiven,
         consentTimestamp: new Date(),
-        consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
-        consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
+        consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+        consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
+        consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         locale: pageLocale,
         accessToken,
@@ -166,8 +179,12 @@ export const POST = withErrorHandling(async (request, context) => {
         recordCount: 1,
         details: JSON.stringify({
           consentGiven: true,
-          consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
-          consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
+          consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+          // Il fatto lato server: la regola dell'evento chiedeva o no il
+          // consenso alla registrazione (altrimenti l'iscrizione informa).
+          recordingConsentRequired: richiesti.registrazione,
+          consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
+          consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
           consentAddressBook: consentAddressBook === true,
         }),
@@ -202,7 +219,7 @@ export const POST = withErrorHandling(async (request, context) => {
       await sendConfirmationEmail({
         registrationId: registrazione.id,
         locale,
-        joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true }),
+        joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true, bindsIdentity: true }),
         calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
         eventPageUrl: localizedUrl(baseUrl, `/events/${slug}`, locale),
       });
@@ -220,11 +237,16 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, pageLocale);
   const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, pageLocale);
+  const link = { baseUrl, slug, eventId: event.id, accessToken, locale: pageLocale };
 
+  // Nell'email il link firmato: aperto da questo browser, prova anche che
+  // l'indirizzo e' suo (lib/events/registration-link). La risposta qui sotto
+  // resta senza firma: il modulo non prova niente sull'indirizzo.
   await sendConfirmationEmail({
     registrationId: registration.id,
     locale: pageLocale,
-    joinUrl,
+    joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true }),
+    calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
     eventPageUrl,
   });
 

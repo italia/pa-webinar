@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { codificaLook, lookDaSeme } from '@pa-webinar/lobby/avatar';
 
 import { GardenPresenceClient } from './presence-adapter';
 import type { LobbyLocalState } from './shared';
@@ -268,6 +269,57 @@ describe('GardenPresenceClient — emote in arrivo dai peer', () => {
 
     expect(emoted).toEqual([]);
     expect(client.getPeers()).toEqual([]);
+    client.disconnect();
+  });
+});
+
+describe('GardenPresenceClient — aspetto e umore', () => {
+  it('manda l’aspetto scelto in avatarId e l’umore detto al laboratorio', async () => {
+    const client = await connectedClient();
+    const look = {
+      pelle: 3,
+      capelli: 2,
+      coloreCapelli: 1,
+      maglia: 4,
+      coloreMaglia: 6,
+      sotto: 2,
+      coloreSotto: 3,
+      scarpe: 1,
+      cappello: 0,
+      coloreCappello: 2,
+      occhiali: 1,
+    };
+    client.setProfile({ look, umore: 'carico' });
+    await vi.advanceTimersByTimeAsync(250);
+    const corpo = lastBody();
+    expect(corpo.avatarId).toBe(codificaLook(look));
+    expect(corpo.umore).toBe('carico');
+    client.setProfile({ umore: null });
+    await vi.advanceTimersByTimeAsync(250);
+    expect(lastBody()).not.toHaveProperty('umore');
+    client.disconnect();
+  });
+
+  it('chi manda la codifica di prima tiene maglia e accessori, il resto è a caso ma sempre lo stesso', async () => {
+    snapshot = [peerWire({ avatarId: '008758hg' })];
+    const client = await connectedClient();
+    await vi.advanceTimersByTimeAsync(250);
+    const [peer] = client.getPeers();
+    const base = lookDaSeme('peer-1');
+    expect(peer?.look).toEqual({ ...base, coloreMaglia: 2, cappello: 4, occhiali: 1 });
+    client.disconnect();
+  });
+
+  it('degli umori arrivano solo i conteggi del server', async () => {
+    const client = await connectedClient();
+    fetchMock.mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ peers: [], active: true, umori: { felice: 2, carico: 1 } }),
+      }),
+    );
+    await vi.advanceTimersByTimeAsync(250);
+    expect(client.getUmori()).toEqual({ felice: 2, carico: 1 });
     client.disconnect();
   });
 });

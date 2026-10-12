@@ -52,13 +52,17 @@ export class CountdownGate {
     this.glow = scene.add.graphics().setDepth(dividerY - 1);
     this.doors = scene.add.graphics().setDepth(dividerY + 2);
 
+    // Lo stato del cancello sta SOPRA il cartello, in una pillola sua: fra
+    // architrave e cartello si sovrapponeva al cartello «Ingresso
+    // videochiamata». Non davanti al cancello: coprirebbe chi ci arriva.
     this.gateLabel = scene.add
-      .text(layout.gate.centerX, dividerY - 44, '', {
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '16px',
+      .text(layout.gate.centerX, dividerY - 74 - 56, '', {
+        fontFamily: 'Titillium Web, system-ui, sans-serif',
+        fontSize: '18px',
+        fontStyle: '600',
         color: '#ffffff',
-        stroke: '#0c1422',
-        strokeThickness: 4,
+        backgroundColor: '#17324d',
+        padding: { x: 14, y: 6 },
         align: 'center',
       })
       .setOrigin(0.5, 1)
@@ -126,12 +130,13 @@ export class CountdownGate {
   private refreshLabels(remainingMs: number): void {
     const l = this.labels;
     if (this.status === 'live') {
-      this.gateLabel.setText(l.gateOpen).setColor('#008758');
+      // Colori chiari: l'etichetta sta su una pillola blu notte.
+      this.gateLabel.setText(l.gateOpen).setColor('#8ce0b8');
       this.stageLabel.setText(l.stageLive).setColor('#D9364F');
       return;
     }
     if (this.status === 'preparing') {
-      this.gateLabel.setText(l.gatePreparing).setColor('#A66300');
+      this.gateLabel.setText(l.gatePreparing).setColor('#ffd27a');
       this.stageLabel.setText(l.stagePreparing).setColor('#A66300');
       return;
     }

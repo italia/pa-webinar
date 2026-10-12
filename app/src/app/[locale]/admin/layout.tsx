@@ -29,12 +29,15 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           <>
             <AdminSessionKeepAlive />
             <AdminNav role={session.role} />
-            <AdminBreadcrumb />
+            <AdminBreadcrumb role={session.role} />
           </>
         )}
         {/* Senza storage per i file i campi "file o URL" offrono solo l'URL. */}
         <UploadsAvailabilityProvider available={getFilesStorage() !== null}>
-          <div className="admin-form-surface">{children}</div>
+          {/* Il bersaglio del «vai al contenuto della pagina» del menu. */}
+          <div id="admin-content" className="admin-form-surface" tabIndex={-1}>
+            {children}
+          </div>
         </UploadsAvailabilityProvider>
       </ConfirmProvider>
     </ToastProvider>

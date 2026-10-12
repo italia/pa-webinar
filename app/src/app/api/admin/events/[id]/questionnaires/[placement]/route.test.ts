@@ -33,15 +33,18 @@ vi.mock('@/lib/db', () => {
       findUnique: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      delete: vi.fn(),
     },
     questionnaireTemplateLink: { deleteMany: vi.fn(), createMany: vi.fn() },
     questionnaireItem: { deleteMany: vi.fn(), createMany: vi.fn() },
+    questionnaireResponse: { count: vi.fn() },
+    $queryRaw: vi.fn(),
   };
   return {
     prisma: {
       event: { findUnique: vi.fn() },
       questionTemplate: { count: vi.fn() },
-      eventQuestionnaire: { findUnique: vi.fn(), delete: vi.fn() },
+      eventQuestionnaire: { findUnique: vi.fn() },
       $transaction: vi.fn(async (cb: (t: typeof tx) => unknown) => cb(tx)),
       __tx: tx,
     },
@@ -50,7 +53,7 @@ vi.mock('@/lib/db', () => {
 
 import { prisma } from '@/lib/db';
 
-import { PUT } from './route';
+import { DELETE, PUT } from './route';
 
 const EVENT_ID = '4b3c2d1e-5f6a-4b7c-8d9e-0f1a2b3c4d5e';
 
@@ -158,5 +161,80 @@ describe('PUT questionnaires/[placement] — il rifiuto è leggibile', () => {
 
     expect(res.status).toBeLessThan(300);
     expect(mocked.__tx.eventQuestionnaire.create).toHaveBeenCalled();
+  });
+});
+
+describe('DELETE — le risposte si cancellano solo con conferma', () => {
+  const db = prisma as unknown as {
+    eventQuestionnaire: { findUnique: ReturnType<typeof vi.fn> };
+    __tx: {
+      eventQuestionnaire: { delete: ReturnType<typeof vi.fn> };
+      questionnaireResponse: { count: ReturnType<typeof vi.fn> };
+      $queryRaw: ReturnType<typeof vi.fn>;
+    };
+  };
+  const tx = () => db.__tx;
+  const elimina = (query = '') =>
+    DELETE(
+      new Request(
+        `http://localhost/api/admin/events/${EVENT_ID}/questionnaires/POST_EVENT${query}`,
+        { method: 'DELETE' },
+      ) as unknown as NextRequest,
+      { params: Promise.resolve({ id: EVENT_ID, placement: 'POST_EVENT' }) } as never,
+    );
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    db.eventQuestionnaire.findUnique.mockResolvedValue({ id: 'q1' });
+    tx().$queryRaw.mockResolvedValue([{ id: 'q1' }]);
+  });
+
+  it('conta le risposte a riga bloccata, prima di decidere', async () => {
+    tx().questionnaireResponse.count.mockResolvedValue(0);
+
+    await elimina();
+
+    expect(String(tx().$queryRaw.mock.calls[0]![0])).toContain('FOR UPDATE');
+    expect(tx().$queryRaw.mock.invocationCallOrder[0]!).toBeLessThan(
+      tx().questionnaireResponse.count.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('con risposte e senza conferma rifiuta e non cancella niente', async () => {
+    tx().questionnaireResponse.count.mockResolvedValue(3);
+
+    const res = await elimina();
+
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('HAS_RESPONSES');
+    expect(tx().eventQuestionnaire.delete).not.toHaveBeenCalled();
+  });
+
+  it('con risposte e conferma cancella tutto', async () => {
+    tx().questionnaireResponse.count.mockResolvedValue(3);
+
+    const res = await elimina('?withResponses=1');
+
+    expect(res.status).toBe(200);
+    expect(tx().eventQuestionnaire.delete).toHaveBeenCalledWith({ where: { id: 'q1' } });
+    expect((await res.json()).deletedResponses).toBe(3);
+  });
+
+  it('senza risposte non serve conferma', async () => {
+    tx().questionnaireResponse.count.mockResolvedValue(0);
+
+    const res = await elimina();
+
+    expect(res.status).toBe(200);
+    expect(tx().eventQuestionnaire.delete).toHaveBeenCalledTimes(1);
+  });
+
+  it('gia eliminato da un\'altra richiesta: 404', async () => {
+    tx().$queryRaw.mockResolvedValue([]);
+
+    const res = await elimina();
+
+    expect(res.status).toBe(404);
+    expect(tx().eventQuestionnaire.delete).not.toHaveBeenCalled();
   });
 });

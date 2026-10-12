@@ -22,9 +22,10 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
+import { invalidateModeratorCache } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,21 @@ export const POST = withErrorHandling(async (request) => {
   // iscritta, quindi vanno via come la voce di rubrica.
   const invitations = await prisma.eventInvitation.deleteMany({ where: { emailHash } });
 
+  // Le concessioni nominali con lo stesso indirizzo (nome, email, ente):
+  // cancellarle toglie anche il link personale per entrare nella sala, subito,
+  // senza aspettare la cache delle verifiche dei moderatori.
+  const daTogliere = await prisma.eventModerator.findMany({
+    where: { emailHash },
+    select: { eventId: true, token: true },
+  });
+  const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
+  for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);
+
+  // La foto profilo e' legata all'email, non a un evento: va via qui anche
+  // quando non resta nessuna iscrizione.
+  const photo = await prisma.profilePhoto.deleteMany({ where: { emailHash } });
+  const profilePhotoDeleted = photo.count > 0;
+
   const registrations = await prisma.registration.findMany({
     where: { emailHash },
     select: { id: true, eventId: true },
@@ -75,73 +91,15 @@ export const POST = withErrorHandling(async (request) => {
       deleted: 0,
       addressBookDeleted,
       invitationsDeleted: invitations.count,
+      grantsDeleted: grants.count,
+      profilePhotoDeleted,
     });
   }
 
   const registrationIds = registrations.map((r) => r.id);
   const eventIds = [...new Set(registrations.map((r) => r.eventId))];
-  // In chat un iscritto scrive come `reg-<id>` (lib/chat/sender): e' il solo
-  // legame tra i suoi messaggi e l'iscrizione, perche' la tabella della chat
-  // non ha una chiave verso le iscrizioni.
-  const chatSenderIds = registrationIds.map((id) => `reg-${id}`);
-
-  const chatAttachments = await prisma.chatMessage.findMany({
-    where: { senderId: { in: chatSenderIds }, attachmentBlobPath: { not: null } },
-    select: { attachmentBlobPath: true },
-  });
-
-  const counts = await prisma.$transaction(async (tx) => {
-    // Feedback e risposte ai questionari puntano l'iscrizione con onDelete
-    // SetNull: cancellare l'iscrizione li scollegherebbe soltanto, lasciando
-    // il nome di chi ha risposto. Le risposte si portano via le domande
-    // compilate per cascata.
-    const feedback = await tx.eventFeedback.deleteMany({
-      where: { registrationId: { in: registrationIds } },
-    });
-    const questionnaireResponses = await tx.questionnaireResponse.deleteMany({
-      where: { registrationId: { in: registrationIds } },
-    });
-    const chatMessages = await tx.chatMessage.deleteMany({
-      where: { senderId: { in: chatSenderIds } },
-    });
-    // Le reazioni della persona ai messaggi altrui: quelle ai suoi messaggi
-    // se ne vanno per cascata con i messaggi.
-    await tx.chatMessageReaction.deleteMany({ where: { senderId: { in: chatSenderIds } } });
-    // Le email accodate per queste iscrizioni (conferma, promemoria,
-    // cambio data, riepilogo) contengono indirizzo e link personali: il
-    // solo aggancio e' l'id dell'iscrizione nei metadati. Anche quelle non
-    // ancora partite: una persona cancellata non deve ricevere altro.
-    const outboxRows = await tx.$executeRaw`
-      DELETE FROM email_outbox
-      WHERE metadata->>'registrationId' = ANY(${registrationIds}::text[])
-    `;
-    const deletedRegistrations = await tx.registration.deleteMany({
-      where: { id: { in: registrationIds } },
-    });
-    return {
-      registrations: deletedRegistrations.count,
-      feedback: feedback.count,
-      questionnaireResponses: questionnaireResponses.count,
-      chatMessages: chatMessages.count,
-      outboxRows,
-    };
-  });
-
-  // I file allegati ai messaggi si cancellano dopo il commit. Se lo storage
-  // non risponde il file resta, senza piu' una riga che lo citi: lo si scrive
-  // nel log con il suo percorso (che non contiene dati personali) e lo si
-  // conta nella risposta e nel registro, perche' qualcuno lo tolga a mano.
-  let attachmentFilesNotDeleted = 0;
-  if (isAzureConfigured()) {
-    for (const a of chatAttachments) {
-      if (!a.attachmentBlobPath) continue;
-      const ok = await deleteBlob(a.attachmentBlobPath).catch((err: unknown) => {
-        console.error(`[gdpr/erasure] Attachment not deleted: ${a.attachmentBlobPath}`, err);
-        return false;
-      });
-      if (!ok) attachmentFilesNotDeleted++;
-    }
-  }
+  const counts = await eraseRegistrations(registrationIds, 'gdpr/erasure');
+  const { attachmentFilesNotDeleted } = counts;
 
   for (const eventId of eventIds) {
     await prisma.gdprAuditLog.create({
@@ -164,6 +122,8 @@ export const POST = withErrorHandling(async (request) => {
     deleted: counts.registrations,
     addressBookDeleted,
     invitationsDeleted: invitations.count,
+    grantsDeleted: grants.count,
+    profilePhotoDeleted,
     feedbackDeleted: counts.feedback,
     questionnaireResponsesDeleted: counts.questionnaireResponses,
     chatMessagesDeleted: counts.chatMessages,

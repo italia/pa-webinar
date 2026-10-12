@@ -49,9 +49,9 @@ const startUploadSchema = z.object({
 });
 
 export const POST = withErrorHandling(async (request) => {
-  // Anche l'organizzatore carica la registrazione dei propri eventi; il file
-  // si aggancia all'evento con il PATCH di /publications/:id, che controlla
-  // il proprietario (ADR-014).
+  // Anche l'organizzatore carica la registrazione degli eventi che gestisce;
+  // il file si aggancia all'evento con il PATCH di /publications/:id, che
+  // controlla chi gestisce l'evento (ADR-014).
   await requireStaff(await cookies());
 
   if (!isRecordingStorageConfigured()) {

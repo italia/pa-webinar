@@ -2,8 +2,13 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
-import { Link } from '@/i18n/navigation';
 import TagsManager from '@/components/admin/tags-manager';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/settings/tags');
+}
 
 export default async function TagsSettingsPage() {
   const locale = await getLocale();
@@ -29,22 +34,7 @@ export default async function TagsSettingsPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <Link
-          href="/admin/settings"
-          className="text-decoration-none"
-          style={{ color: 'var(--app-primary)', fontSize: '0.9rem' }}
-        >
-          {'←'} {t('backToSettings')}
-        </Link>
-      </div>
-
-      <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/settings/tags')} subtitle={t('subtitle')} />
 
       <TagsManager initialTags={initialTags} />
     </div>

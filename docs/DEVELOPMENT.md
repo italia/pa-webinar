@@ -61,7 +61,7 @@ The administration area has two ways in. The instance API key (`ADMIN_API_KEY`) 
    - The Compose stack sets `ADMIN_API_KEY=dev_admin_key_2026` in `docker-compose.yml`.
    - When Next.js runs on the host, the key comes from `app/.env`. The template `.env.example` sets `change_me_admin_key_in_production`.
    - Both values are public development placeholders. Never use them in a real installation (see [Development placeholders](../SECURITY.md#development-placeholders)).
-2. Open **Accounts** (`/en/admin/organizers`). Under **Add a person**, enter a name and an email, choose the **Role** (**Organiser** or **Administrator**) and press **Add**. **Send the sign-in link now** is selected by default.
+2. Open **Staff and access** > **Staff accounts** (`/en/admin/organizers`). Under **Add an account**, enter a name and an email, choose the **Role** (**Organiser** or **Administrator**) and press **Add**. **Send the sign-in link now** is selected by default.
 3. The sign-in email is queued in the email outbox, like every email the platform sends. The Compose `cron` service drains the outbox every minute, and the message then appears in Mailpit at <http://localhost:8025>. When Next.js runs on the host, the `cron` service cannot reach it: drain the outbox yourself (see [Next.js on the host](#nextjs-on-the-host)).
 4. Follow the link. It works once and expires after the number of minutes set by `DURATA_LINK_MINUTI` in `app/src/lib/auth/staff-link-config.ts`. Later, request a new link from the same sign-in page with **Send me the link**.
 
@@ -97,7 +97,7 @@ sequenceDiagram
   APP-->>You: session under your own name and role
 ```
 
-To act as a moderator of a demo event, open one of the moderator links that the seed printed. The `cron` service opens a published event at its start time and ends it after its end time and grace period; a moderator can open it earlier with **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
+To act as a moderator of a demo event, open one of the moderator links that the seed printed. The `cron` service opens a published event at its start time and ends it after its end time, once the room has emptied or at the overtime limit; a moderator can open it earlier with **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
 
 ## Local services
 
@@ -116,13 +116,15 @@ To act as a moderator of a demo event, open one of the moderator links that the 
 | `cron` | `curlimages/curl` | none | Calls four `/api/cron/*` routes of `app` with the `x-api-key` header |
 | `db-migrate` (profile `setup`) | The `builder` stage of the root `Dockerfile` | none | One-shot: `prisma migrate deploy`, then the seed |
 | `recorder-controller` (profile `recorder`) | Built from `infra/recorder-controller/` | none | Starts one recorder bot container per recording (the per-participant recording path) through the Docker socket |
+| `captions-model`, `captions-engine`, `captions-gateway` (profile `captions`) | Built from `infra/captions/engine/` and `infra/captions/gateway/` | none | Live captions: downloads the model into a volume (about 750 MB, once), runs the speech engine and the gateway the bridge streams audio to. Needs the `CAPTIONS_*` variables in `.env` (see `.env.example`) |
 
 A few details matter when something does not work:
 
 - **The `cron` loop.** It ticks every 30 seconds. It calls `email-outbox` and `lifecycle` every minute, `reminders` every 5 minutes and `cleanup` every hour, all four once at start-up. Each call logs `[cron] <route> ok` or a failure line (`docker compose logs cron`). Calls fail while the app is still starting, which is harmless. The cluster runs more jobs, at other cadences: see the parity matrix below and [Scheduled and background jobs](architecture/background-jobs.md).
 - **The status probes.** The `app` service reads the Jitsi components at their service names, as the chart does in a cluster: `JITSI_WEB_INTERNAL_URL` (`jitsi-web`), `PROSODY_INTERNAL_URL` (`prosody:5280`), `JICOFO_HEALTH_URL` (`jicofo:8888`) and `JVB_HEALTH_URL` (`jvb:8080`). The `jicofo` service sets `JICOFO_ENABLE_REST=1` and the `jvb` service `COLIBRI_REST_ENABLED=true` for this, the same switches the Jitsi subchart sets; neither port is published on the host. **System status** therefore shows every component probed, and the bridge as fixed bridges with `JVB_MAX_REPLICAS=1`, the one `jvb` service ([Monitoring and health](operations/monitoring.md#get-apistatus)).
 - **The bridge address.** The `jvb` service advertises `DOCKER_HOST_ADDRESS` (default `host.docker.internal`) as its address, and asks a public STUN server (`JVB_STUN_SERVERS` in `docker-compose.yml`) for its public address. Browsers on the same machine connect without changes. Other devices need more than this: see [Testing from another device](#testing-from-another-device).
-- **Shared placeholders.** `JITSI_JWT_SECRET` (default `s3cr3t_dev_only`) must be the same for `app`, `jitsi-web` and `prosody`, and `CRON_API_KEY` must be the same for `app`, `cron` and `recorder-controller`. Only `JITSI_JWT_SECRET`, `DOCKER_HOST_ADDRESS` and `COMPOSE_PROJECT_NAME` are read from your shell or from a `.env` file next to `docker-compose.yml` (ignored by Git). Every other value, `CRON_API_KEY` and `ADMIN_API_KEY` included, is written literally in each service, and changes only through an override file that updates every service that uses it.
+- **Shared placeholders.** `JITSI_JWT_SECRET` (default `s3cr3t_dev_only`) must be the same for `app`, `jitsi-web` and `prosody`, and `CRON_API_KEY` must be the same for `app`, `cron` and `recorder-controller`. Only `JITSI_JWT_SECRET`, `JITSI_BRANDING_URL`, `DOCKER_HOST_ADDRESS` and `COMPOSE_PROJECT_NAME` are read from your shell or from a `.env` file next to `docker-compose.yml` (ignored by Git). Every other value, `CRON_API_KEY` and `ADMIN_API_KEY` included, is written literally in each service, and changes only through an override file that updates every service that uses it.
+- **Conference colors.** `jitsi-web` sets `DYNAMIC_BRANDING_URL` to `JITSI_BRANDING_URL`, by default `http://localhost:3000/api/jitsi-branding.json`, the portal's dynamic-branding document. The browser fetches it from the conference page, so the default works from the same machine. Without it the stage is still the room's blue, but Jitsi's toolbar, menus and camera-off tiles keep its dark greys ([Branding limits](architecture/jitsi-integration.md#branding-limits)).
 - **The PII key escape hatch.** The Compose `app` runs the production image with a dummy `PII_ENCRYPTION_KEY`, so it sets `ALLOW_INSECURE_PII_KEY=true`. Only `docker-compose.yml` sets it; `.env.example` deliberately does not. The reason is in [Development placeholders](../SECURITY.md#development-placeholders).
 
 ```mermaid
@@ -222,7 +224,7 @@ Legend:
 
 Three capabilities are not part of the Compose stack and are impractical on a typical workstation:
 
-- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it. GPU node pools are covered in [Node pools](INFRASTRUCTURE.md#node-pools), the pipeline in [AI post-production](POSTPROD.md).
+- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it, and the AI event report, which needs only a language model, can run against the local stack ([AI post-production worker](#ai-post-production-worker)). GPU node pools are covered in [Node pools](INFRASTRUCTURE.md#node-pools), the pipeline in [AI post-production](POSTPROD.md).
 - **JVB scale-to-zero** is only useful where nodes are billed by use and a cluster autoscaler can remove them. On a single machine the bridge is already running.
 - **Jibri** needs the ALSA loopback kernel module on its host and elevated container privileges: the Jitsi subchart adds the `SYS_ADMIN` capability. A developer workstation is rarely prepared for either. Without a cluster, the recording path is the per-participant recorder, with the limits linked above ([Recording](architecture/recording.md)).
 
@@ -284,7 +286,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 Everything else is baked into the image at build time: `node_modules`, the Prisma client, and configuration outside the mounts such as `app/next.config.ts` and the `package.json` files. After you change dependencies, `schema.prisma` or those files, run the command again with `--build`.
 
-Because `app/public` comes from your checkout, the icon sprite must exist there. `app/public/svg/sprites.svg` is not in Git: `npm install` (or `npm ci`) on the host copies it from `bootstrap-italia` in the app's `postinstall` step. If icons are missing in this mode, run that once on the host.
+Because `app/public` comes from your checkout, the icon sprite must exist there. `app/public/svg/sprites.svg` is not in Git: `npm install` (or `npm ci`) on the host copies it from `bootstrap-italia` in the app's `postinstall` step. If icons are missing in this mode, run that once on the host. The same step copies the background-preview engine to `app/public/vendor/mediapipe/` (`npm run copy-vision --workspace=app` does only that copy); without it the waiting room says the background preview is not available.
 
 The development server applies no production guards, so the placeholders are accepted as they are. The `cron` service keeps calling `http://app:3000`, so email works as in the first mode.
 
@@ -418,11 +420,32 @@ To run the pair against the local stack, start the `recorder` profile (`docker c
 
 Component details are in [`infra/recorder/README.md`](../infra/recorder/README.md) and [`infra/recorder-controller/README.md`](../infra/recorder-controller/README.md). The mechanism is described in [Recording](architecture/recording.md).
 
+### Live captions
+
+`infra/captions/gateway/` is a separate npm project with its own lockfile, tested like the recorder packages. The speech engine is measured by `infra/captions/bench/` ([README](../infra/captions/bench/README.md)), not unit-tested.
+
+To run captions against the local stack, uncomment the three `CAPTIONS_*` lines in `.env` (they are in `.env.example`) and start the profile: `docker compose --profile captions up --build -d`. If `prosody`, `jicofo` and `app` were already running, recreate them so they read the new variables. Then, in a room entered from a moderator link with a working microphone, captions appear over the video after a second or two. `docker compose logs captions-gateway` shows conferences connecting and the load state; it never shows the text. How the pieces fit is in [Live captions](architecture/live-captions.md).
+
 ### AI post-production worker
 
 The worker in `infra/ai/worker/` is a Python package. Its unit tests need no GPU. No test loads a model: the heavy libraries (torch, WhisperX, pyannote) are imported only inside the functions that use them, and the tests do not call those functions. The commands and what the suite covers are in [Testing: AI worker](development/testing.md#ai-worker).
 
 `WORKER_STUB=1` (`postprod.worker.stub` in the chart) replaces speech recognition, the language model and speech synthesis with canned outputs. It exercises the claim, upload and register loop without a GPU, but the worker still needs a portal (`APP_INTERNAL_URL`, `CRON_API_KEY`), a queued job and a recordings store. In practice, stub mode is useful in a test cluster rather than in Compose.
+
+The AI event report (`REPORT`) needs no GPU of its own and no media, only a language model, so it can run against the local stack with any OpenAI-compatible server that answers `/chat/completions` with JSON output (`response_format`). Use test data only:
+
+1. In the app's environment set `AI_VLLM_BASE_URL` to the server's base URL, as the worker will reach it (it ends in `/v1`), and `AI_VLLM_MODEL_ID` to the model it serves. The portal hands both to the worker when the job is claimed.
+2. In the site settings, turn on **Post-event pipeline active**. On an ended event within its data retention, request the report from the **AI event report** panel of the **After the event** tab.
+3. From `infra/ai`, install `worker/requirements-cpu.txt` and run the worker without a GPU for that kind only. It claims one job, runs it and exits:
+
+   ```bash
+   cd infra/ai
+   pip install -r worker/requirements-cpu.txt
+   AI_WORKER_KINDS=REPORT APP_INTERNAL_URL=http://localhost:3000 CRON_API_KEY=<the app's CRON_API_KEY> \
+     python -m worker.cpu
+   ```
+
+The report arrives unpublished on the event, and the panel shows a preview. How the job works is in [AI post-production](POSTPROD.md#the-event-report).
 
 `infra/ai/local-out/` holds a development tool that runs the pipeline stages off-cluster on a workstation with an NVIDIA GPU and writes the results straight into a database. It bypasses the portal's encryption. Read its [README](../infra/ai/local-out/README.md) before you use it, and never point it at real data. See also [`infra/ai/worker/README.md`](../infra/ai/worker/README.md) and [AI post-production](POSTPROD.md).
 
@@ -521,7 +544,7 @@ The local stack is addressed as `localhost`, so a phone or a second computer can
 
 - `NEXT_PUBLIC_APP_URL` (`http://localhost:3000`): links in emails and redirects;
 - `NEXT_PUBLIC_JITSI_DOMAIN` (`localhost:8443`): the host of the embedded conference and the frame source allowed by the Content Security Policy. The Jitsi token's default subject is the same string, but as a fixed constant that does not follow this variable;
-- `PUBLIC_URL` of `jitsi-web` (`https://localhost:8443`);
+- `PUBLIC_URL` of `jitsi-web` (`https://localhost:8443`), and its `DYNAMIC_BRANDING_URL` (`JITSI_BRANDING_URL`, default `http://localhost:3000/api/jitsi-branding.json`);
 - `DOCKER_HOST_ADDRESS` of `jvb` (default `host.docker.internal`): the address the bridge advertises for media;
 - the self-signed certificate, which every device must accept;
 - camera and microphone: browsers grant them only in a secure context (HTTPS, or `localhost`), and the conference frame inherits the portal page's context, so over plain HTTP from another device no one can join with audio or video. The waiting room and the room say so, with a link to the `https://` address, instead of loading the call;

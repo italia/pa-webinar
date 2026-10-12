@@ -34,7 +34,7 @@ export const GET = withErrorHandling(async (_request, context: { params: Promise
         orderBy: { createdAt: 'desc' },
         take: 100,
         include: {
-          event: { select: { slug: true, title: true, startsAt: true } },
+          event: { select: { id: true, slug: true, title: true, startsAt: true } },
         },
       },
     },
@@ -62,6 +62,7 @@ export const GET = withErrorHandling(async (_request, context: { params: Promise
         organizationRole: r.organizationRole,
         organizationType: r.organizationType,
         event: {
+          id: r.event.id,
           slug: r.event.slug,
           title: r.event.title,
           startsAt: r.event.startsAt.toISOString(),

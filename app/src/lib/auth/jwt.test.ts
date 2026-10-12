@@ -9,6 +9,7 @@ import { readGravatarRef } from '@/lib/gravatar-ref';
 import {
   DEFAULT_JITSI_JWT_SUBJECT,
   generateJitsiJwt,
+  mediaLockOf,
   moderatorJitsiId,
   participantJitsiId,
   guestJitsiId,
@@ -44,7 +45,47 @@ async function decodeJwt(token: string) {
 
 // ── generateJitsiJwt ────────────────────────────────────────
 
+describe('mediaLockOf', () => {
+  it('blocca ciò che l\'evento non concede ai partecipanti', () => {
+    expect(
+      mediaLockOf({
+        participantsCanUnmute: true,
+        participantsCanStartVideo: false,
+        participantsCanShareScreen: false,
+      }),
+    ).toEqual({ audio: false, video: true, desktop: true });
+  });
+});
+
 describe('generateJitsiJwt', () => {
+  it('scrive i limiti e l\'esenzione nel contesto, e li omette se mancano', async () => {
+    const conLimiti = await decodeJwt(
+      await generateJitsiJwt({
+        roomName: 'evt-test-room',
+        displayName: 'Relatrice',
+        uniqueId: 'mod-1',
+        isModerator: false,
+        mediaLock: { audio: true, video: true, desktop: false },
+        mediaExempt: true,
+      }),
+    );
+    const u = (conLimiti.context as { user: Record<string, unknown> }).user;
+    expect(u.mediaLock).toEqual({ audio: true, video: true, desktop: false });
+    expect(u.mediaExempt).toBe(true);
+
+    const senza = await decodeJwt(
+      await generateJitsiJwt({
+        roomName: 'evt-test-room',
+        displayName: 'Registratore',
+        uniqueId: 'rec-1',
+        isModerator: false,
+      }),
+    );
+    const v = (senza.context as { user: Record<string, unknown> }).user;
+    expect(v).not.toHaveProperty('mediaLock');
+    expect(v).not.toHaveProperty('mediaExempt');
+  });
+
   it('generates a valid JWT for moderator', async () => {
     const jwt = await generateJitsiJwt({
       roomName: 'evt-test-room',

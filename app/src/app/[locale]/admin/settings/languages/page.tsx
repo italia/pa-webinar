@@ -3,6 +3,12 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { soloAdmin } from '@/lib/auth/staff-page';
 import { getSettings } from '@/lib/settings';
 import LanguageManagement from '@/components/admin/language-management';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/settings/languages');
+}
 
 export default async function LanguagesPage() {
   const locale = await getLocale();
@@ -27,12 +33,7 @@ export default async function LanguagesPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/settings/languages')} subtitle={t('subtitle')} />
       <LanguageManagement initialConfig={config} />
     </div>
   );

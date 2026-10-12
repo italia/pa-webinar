@@ -35,6 +35,7 @@ export default function ModeratorsDashboard({
   locale: string;
 }) {
   const t = useTranslations('admin.moderators');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
@@ -43,7 +44,8 @@ export default function ModeratorsDashboard({
   const [debounced, setDebounced] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
   const [rotating, setRotating] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Se il caricamento e' fallito: il messaggio mostrato e' quello generico tradotto.
+  const [error, setError] = useState(false);
 
   // Debounce the search input so every keystroke doesn't hit the DB.
   useEffect(() => {
@@ -52,15 +54,15 @@ export default function ModeratorsDashboard({
   }, [search]);
 
   const fetchRows = useCallback(async () => {
-    setError(null);
+    setError(false);
     try {
       const p = new URLSearchParams();
       if (debounced) p.set('q', debounced);
       const res = await fetch(`/api/admin/moderators?${p.toString()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData(await res.json() as ApiResponse);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'fetch error');
+    } catch {
+      setError(true);
     }
   }, [debounced]);
 
@@ -98,8 +100,8 @@ export default function ModeratorsDashboard({
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       await fetchRows();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'regenerate failed');
+    } catch {
+      toast.error(tc('errorGeneric'));
     } finally {
       setRotating(null);
     }
@@ -121,7 +123,7 @@ export default function ModeratorsDashboard({
         </CardBody>
       </Card>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>}
 
       {data && (
         <Card className="border-0 shadow-sm">

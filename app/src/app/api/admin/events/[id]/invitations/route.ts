@@ -42,7 +42,7 @@ async function loadEvent(id: string) {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
   // scrive l'invito, non il profilo della persona collegata.
@@ -59,11 +59,39 @@ export const GET = withErrorHandling(async (_request, context) => {
     orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
   });
 
+  // Chi fra gli invitati si e' gia' iscritto: per l'impronta dell'indirizzo,
+  // la stessa delle iscrizioni (con l'accesso «solo invitati» e' la domanda
+  // che chi organizza si fa). Gli inviti di prima della cifratura non hanno
+  // l'impronta: si calcola dall'indirizzo, che e' ancora in chiaro.
+  const impronte = rows.map((r) => {
+    if (r.emailHash) return r.emailHash;
+    const indirizzo = tryDecryptPII(r.email)?.trim();
+    return indirizzo ? hashEmail(indirizzo) : null;
+  });
+  const daCercare = impronte.filter((h): h is string => !!h);
+  const iscritte = new Set(
+    daCercare.length > 0
+      ? (
+          await prisma.registration.findMany({
+            where: { eventId: event.id, emailHash: { in: daCercare } },
+            select: { emailHash: true },
+          })
+        ).map((r) => r.emailHash)
+      : [],
+  );
+
+  // Solo i campi che servono: l'impronta e il link d'iscrizione dell'invito
+  // restano sul server.
   return Response.json({
-    rows: rows.map((r) => ({
-      ...r,
+    rows: rows.map((r, i) => ({
+      id: r.id,
+      eventId: r.eventId,
+      personId: r.personId,
+      role: r.role,
       name: tryDecryptPII(r.name),
       email: tryDecryptPII(r.email),
+      createdAt: r.createdAt,
+      registered: iscritte.has(impronte[i] ?? ''),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.
       person: conRubrica && r.person
@@ -75,7 +103,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
   // scrive l'invito, non il profilo della persona collegata.

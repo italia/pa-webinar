@@ -16,6 +16,8 @@
  * inherits".
  */
 
+import { coerceMatrix } from '@/lib/utils/permission-matrix';
+
 /** Columns copied verbatim from the source event. */
 export const DUPLICATED_EVENT_FIELDS = [
   // content & schedule (dates may be overridden by the caller)
@@ -35,6 +37,8 @@ export const DUPLICATED_EVENT_FIELDS = [
   'chatEnabled',
   'whiteboardEnabled',
   'wordCloudEnabled',
+  'liveCaptionsEnabled',
+  'captionsTranscriptEnabled',
   'agendaEnabled',
   'feedbackEnabled',
   'waitingRoomEngine',
@@ -47,6 +51,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'permissionMatrix',
 
   // registration rules
+  'accessMode',
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
@@ -54,6 +59,8 @@ export const DUPLICATED_EVENT_FIELDS = [
   // people & branding
   'moderatorName',
   'moderatorEmail',
+  'moderatorOrganization',
+  'moderatorOrganizationLogoUrl',
   'organizerName',
   'speakersInfo',
   'imageUrl',
@@ -88,6 +95,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'postEventShowRecap',
   'postEventShowWordCloud',
   'postEventEmailEnabled',
+  'recordingNotifyEnabled',
   'libraryListed',
 
   // series
@@ -105,7 +113,10 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   endsAt: 'set by the caller (explicit date or projected occurrence)',
   status: 'a copy always starts as DRAFT',
   moderatorToken: 'a fresh secret — reusing it would grant the old link control of the new room',
-  createdById: 'the copy belongs to whoever creates it: an organizer duplicating their own event must be able to manage the copy (ADR-014)',
+  createdById:
+    'set by the duplicate route: the copy belongs to whoever creates it, so they can manage it ' +
+    '(ADR-014), except that a co-organizer duplicating keeps the original creator as owner ' +
+    '(the co-organizer manages the copy through the copied organizer grant)',
   jitsiRoomName: 'a fresh room — reusing it would drop the copy into the old conference',
   joinPasswordHash: 'a secret the operator cannot read back, so it cannot be knowingly inherited',
   recurrenceSeriesId: 'series membership is assigned deliberately, not inherited (v0.9)',
@@ -121,14 +132,22 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
     'an absolute deadline set for the previous occurrence, normally already past ' +
     '— inheriting it would make the copy\'s post-event page 404 the moment it ends',
   recordingPublished: 'artefact of the occurrence that ran',
+  transcriptPublished: 'artefact of the occurrence that ran: the copy has its own transcript to review',
   recordingPublishedAt: 'artefact of the occurrence that ran',
+  recordingNotifiedAt: 'artefact of the occurrence that ran: the copy has its own recording to announce',
   recordingDuration: 'artefact of the occurrence that ran',
   recordingFileSize: 'artefact of the occurrence that ran',
   tempRecordingUrl: 'artefact of the occurrence that ran',
   tempRecordingStartedAt: 'artefact of the occurrence that ran',
   postEventRecap: 'generated from the occurrence that ran',
   postEventRecapAt: 'generated from the occurrence that ran',
+  postEventReport: 'generated from the occurrence that ran',
+  postEventReportAt: 'generated from the occurrence that ran',
+  postEventReportPublished: 'a decision about the occurrence that ran',
   postEventEmailSentAt: 'send state of the occurrence that ran',
+  moderatorPublicListed:
+    'publishing the lead organizer on the public page is a choice made for each event: ' +
+    'the copy starts unpublished, like every person on it',
 };
 
 /**
@@ -150,6 +169,17 @@ export function duplicatedConfig<T extends Record<string, unknown>>(
     if (value === undefined) continue;
     if (value === null && JSON_FIELDS.has(field)) continue;
     out[field] = value;
+  }
+  // La registrazione non parte mai da sola: la copia di un evento salvato con
+  // l'avvio automatico non lo eredita (la avvia chi conduce, con REC).
+  if (out.autoStartRecording !== undefined) out.autoStartRecording = false;
+  // La matrice si salva normalizzata, come in ogni altra scrittura: una
+  // sorgente salvata prima della regola avrebbe la colonna dei relatori
+  // diversa da quella che il wizard mostra.
+  if (out.permissionMatrix !== undefined) {
+    const matrice = coerceMatrix(out.permissionMatrix);
+    if (matrice) out.permissionMatrix = matrice;
+    else delete out.permissionMatrix;
   }
   return out;
 }

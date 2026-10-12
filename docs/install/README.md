@@ -598,7 +598,7 @@ two participants can join a room and hear and see each other.
   `app.env.NEXT_PUBLIC_WHITEBOARD_ENABLED: "true"`. That combination has not
   been tested.
 - **Composite recording with Jibri**: the standard and full profiles turn
-  Jibri on, but its upload script must be mounted by hand
+  Jibri on, and the chart mounts its upload script
   ([Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script)).
 - **Backups off the cluster, and of the object store**: `scripts/backup.sh`
   and the chart's nightly dump cover the database and the keys; copying them

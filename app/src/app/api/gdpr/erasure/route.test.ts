@@ -11,14 +11,22 @@ const tx = {
   eventFeedback: { deleteMany: vi.fn() },
   questionnaireResponse: { deleteMany: vi.fn() },
   chatMessage: { deleteMany: vi.fn() },
+  wordCloudSubmission: { deleteMany: vi.fn() },
   chatMessageReaction: { deleteMany: vi.fn() },
-  registration: { deleteMany: vi.fn() },
+  captionSegment: { deleteMany: vi.fn() },
+  roomOccupant: { deleteMany: vi.fn() },
+  registration: { deleteMany: vi.fn(), findMany: vi.fn() },
+  postprodArtifact: { findMany: vi.fn() },
   $executeRaw: vi.fn(),
 };
+const invalidate = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/auth/moderator', () => ({ invalidateModeratorCache: invalidate }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     person: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
+    eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
+    profilePhoto: { deleteMany: vi.fn() },
     registration: { findMany: vi.fn() },
     chatMessage: { findMany: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
@@ -42,6 +50,8 @@ type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   person: { deleteMany: Fn };
   eventInvitation: { deleteMany: Fn };
+  eventModerator: { deleteMany: Fn; findMany: Fn };
+  profilePhoto: { deleteMany: Fn };
   registration: { findMany: Fn };
   chatMessage: { findMany: Fn };
   gdprAuditLog: { create: Fn };
@@ -62,14 +72,22 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
+  db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
+  db.eventModerator.findMany.mockResolvedValue([{ eventId: 'evt-1', token: 'tok-1' }]);
+  db.profilePhoto.deleteMany.mockResolvedValue({ count: 1 });
   db.chatMessage.findMany.mockResolvedValue([]);
   db.gdprAuditLog.create.mockResolvedValue({});
   db.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
   tx.eventFeedback.deleteMany.mockResolvedValue({ count: 1 });
   tx.questionnaireResponse.deleteMany.mockResolvedValue({ count: 1 });
   tx.chatMessage.deleteMany.mockResolvedValue({ count: 3 });
+  tx.wordCloudSubmission.deleteMany.mockResolvedValue({ count: 2 });
   tx.chatMessageReaction.deleteMany.mockResolvedValue({ count: 0 });
+  tx.captionSegment.deleteMany.mockResolvedValue({ count: 0 });
+  tx.roomOccupant.deleteMany.mockResolvedValue({ count: 0 });
   tx.registration.deleteMany.mockResolvedValue({ count: 1 });
+  tx.registration.findMany.mockResolvedValue([{ eventId: 'ev-1' }]);
+  tx.postprodArtifact.findMany.mockResolvedValue([]);
   tx.$executeRaw.mockResolvedValue(2);
 });
 
@@ -84,6 +102,8 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 1,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      grantsDeleted: 1,
+      profilePhotoDeleted: true,
       feedbackDeleted: 1,
       questionnaireResponsesDeleted: 1,
       chatMessagesDeleted: 3,
@@ -108,7 +128,24 @@ describe('POST /api/gdpr/erasure', () => {
     expect(tx.chatMessageReaction.deleteMany).toHaveBeenCalledWith({
       where: { senderId: { in: ['reg-r1', 'reg-r2'] } },
     });
-    expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
+    // Le frasi dei sottotitoli e i posti in sala: il posto e' reg-<id>-<suffisso>.
+    const postiInSala = { OR: [{ seatId: { startsWith: 'reg-r1-' } }, { seatId: { startsWith: 'reg-r2-' } }] };
+    expect(tx.captionSegment.deleteMany).toHaveBeenCalledWith({ where: postiInSala });
+    // E dalla trascrizione gia' costruita dai sottotitoli degli eventi della persona.
+    expect(tx.postprodArtifact.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ modelId: 'live-captions', recording: { eventId: { in: ['ev-1'] } } }),
+      }),
+    );
+    expect(tx.roomOccupant.deleteMany).toHaveBeenCalledWith({ where: postiInSala });
+    // Le parole di «In una parola» non hanno una chiave verso l'iscrizione:
+    // la cascata non le porta via, e dopo la conservazione restano.
+    expect(tx.wordCloudSubmission.deleteMany).toHaveBeenCalledWith({ where: { registrationId: ids } });
+    // Il lock della trascrizione dell'evento, poi le email accodate.
+    expect(tx.$executeRaw).toHaveBeenCalledTimes(2);
+    const sql = (n: number) => (tx.$executeRaw.mock.calls[n]![0] as TemplateStringsArray).join('?');
+    expect(sql(0)).toContain('pg_advisory_xact_lock');
+    expect(sql(1)).toContain('DELETE FROM email_outbox');
     expect(tx.registration.deleteMany).toHaveBeenCalledWith({ where: { id: ids } });
     expect(db.gdprAuditLog.create).toHaveBeenCalledTimes(2);
   });
@@ -144,7 +181,15 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 0,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      grantsDeleted: 1,
+      profilePhotoDeleted: true,
     });
+    // Le concessioni nominali con lo stesso indirizzo vanno via anche loro, e
+    // il loro link smette subito di valere.
+    expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
+    expect(invalidate).toHaveBeenCalledWith('evt-1', 'tok-1');
+    // La foto e' legata all'email: va via anche senza iscrizioni.
+    expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
   });
 
   it('touches nothing with an invalid token', async () => {
@@ -152,6 +197,7 @@ describe('POST /api/gdpr/erasure', () => {
     expect(res.status).toBe(401);
     expect(db.person.deleteMany).not.toHaveBeenCalled();
     expect(db.eventInvitation.deleteMany).not.toHaveBeenCalled();
+    expect(db.eventModerator.deleteMany).not.toHaveBeenCalled();
     expect(db.$transaction).not.toHaveBeenCalled();
   });
 });

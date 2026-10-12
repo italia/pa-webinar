@@ -1,6 +1,7 @@
 import mitt from 'mitt';
 import type { Emitter } from 'mitt';
 
+import type { ChatBubble } from './context';
 import type {
   DeviceSelection,
   EmoteType,
@@ -50,6 +51,24 @@ export type LobbyEvents = {
   audioToggle: void;
   /** Current audio on/off state (AudioSystem → UI to sync the icon). */
   audioState: boolean;
+  /** Un messaggio della chat dell'evento: il fumetto sopra chi l'ha scritto. */
+  chatMessage: ChatBubble;
+  /** Un messaggio nascosto o cancellato: il suo fumetto sparisce. */
+  chatClear: string;
+  /** Un messaggio corretto: il fumetto mostra il testo nuovo. */
+  chatEdit: { id: string; text: string };
+  /** Chi sta scrivendo in chat adesso (nomi): i puntini sopra la testa. */
+  chatTyping: string[];
+  /** La scena è partita e ascolta il bus. */
+  sceneReady: void;
+  /** Il personaggio è arrivato vicino a un luogo (o se n'è andato: null). */
+  luogo: string | null;
+  /** Invio vicino a un luogo: la pagina decide cosa fare. */
+  interagisci: string;
+  /** Un'azione con effetto nella scena (la moneta, il caffè), dalla pagina. */
+  azione: string;
+  /** Coriandoli: un segreto trovato. */
+  festa: void;
 };
 
 export type LobbyBus = Emitter<LobbyEvents>;

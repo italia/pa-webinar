@@ -207,6 +207,38 @@ describe('GET /api/events/[slug]/materials — chi ha un token moderatore vede t
 
 });
 
+/**
+ * Quante volte un materiale è stato aperto è un dato per chi conduce: il
+ * pubblico non lo riceve, nemmeno come campo vuoto.
+ */
+describe('GET /api/events/[slug]/materials — il conteggio delle aperture', () => {
+  beforeEach(() => {
+    mockedEvent.mockResolvedValue(eventRow({ status: 'LIVE' }));
+    mockedMaterials.mockResolvedValue([{ ...materialRow('ALWAYS'), openCount: 7 }]);
+  });
+
+  it('il pubblico non lo riceve', async () => {
+    const body = (await (await GET(get(), ctx())).json()) as { materials: Record<string, unknown>[] };
+    expect(body.materials).toHaveLength(1);
+    expect(body.materials[0]).not.toHaveProperty('openCount');
+  });
+
+  it('nemmeno un iscritto o un relatore con il proprio token', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER' });
+    const body = (await (await GET(get({ Authorization: 'Bearer TOKEN_DEL_RELATORE' }), ctx())).json()) as {
+      materials: Record<string, unknown>[];
+    };
+    expect(body.materials[0]).not.toHaveProperty('openCount');
+  });
+
+  it('chi conduce lo riceve', async () => {
+    const body = (await (await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx())).json()) as {
+      materials: Record<string, unknown>[];
+    };
+    expect(body.materials[0]).toMatchObject({ openCount: 7 });
+  });
+});
+
 describe('GET /api/events/[slug]/materials — una sessione staff non allarga l’elenco', () => {
   // Chi amministra vede tutto nell'area admin. Nella sala, da iscritto o da
   // ospite, la stessa richiesta porta il cookie di sessione: se allargasse
@@ -372,6 +404,30 @@ describe('/api/events/[slug]/materials — chi ha aggiunto il materiale', () => 
     const res = await POST(post('TOKEN_DEL_COMODERATORE'), ctx());
     expect(res.status).toBe(201);
     expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '' });
+  });
+
+  it('la fase scelta in sala arriva alla riga; senza, il predefinito', async () => {
+    mockedEvent.mockResolvedValue(eventRow({ moderatorName: 'Conduzione' }));
+    const conFase = new Request(`https://webinar.example.gov.it/api/events/${SLUG}/materials`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${PRIMARY_TOKEN}` },
+      body: JSON.stringify({ title: 'Programma', url: 'https://example.org/p.pdf', visibility: 'BEFORE' }),
+    }) as unknown as NextRequest;
+    expect((await POST(conFase, ctx())).status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ visibility: 'BEFORE' });
+
+    expect((await POST(post(PRIMARY_TOKEN), ctx())).status).toBe(201);
+    expect(mockedCreate.mock.calls[1]![0].data).toMatchObject({ visibility: 'ALWAYS' });
+  });
+
+  it('una fase sconosciuta: 422, niente creato', async () => {
+    const req = new Request(`https://webinar.example.gov.it/api/events/${SLUG}/materials`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${PRIMARY_TOKEN}` },
+      body: JSON.stringify({ title: 'Programma', url: 'https://example.org/p.pdf', visibility: 'SEMPRE' }),
+    }) as unknown as NextRequest;
+    expect((await POST(req, ctx())).status).toBe(422);
+    expect(mockedCreate).not.toHaveBeenCalled();
   });
 
   it('l’elenco legge i segnaposto scritti in passato come «nessun nome»', async () => {

@@ -17,6 +17,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
+import { replaceEventTags, tagIdsFromSlugs } from '@/lib/events/event-tags';
 import { AppError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +38,7 @@ async function loadEvent(id: string) {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   await loadEvent(id);
 
@@ -51,7 +52,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   await loadEvent(id);
 
@@ -64,17 +65,8 @@ export const PUT = withErrorHandling(async (request, context) => {
     );
   }
 
-  const tags = parsed.data.slugs.length
-    ? await prisma.tag.findMany({ where: { slug: { in: parsed.data.slugs } }, select: { id: true } })
-    : [];
-
-  await prisma.$transaction([
-    prisma.eventTagLink.deleteMany({ where: { eventId: id } }),
-    prisma.eventTagLink.createMany({
-      data: tags.map((t) => ({ eventId: id, tagId: t.id })),
-      skipDuplicates: true,
-    }),
-  ]);
+  const tagIds = await tagIdsFromSlugs(prisma, parsed.data.slugs);
+  await prisma.$transaction((tx) => replaceEventTags(tx, id, tagIds));
 
   await logAdminAction({
     request,
@@ -83,5 +75,5 @@ export const PUT = withErrorHandling(async (request, context) => {
     details: { slugs: parsed.data.slugs },
   });
 
-  return Response.json({ updated: true, count: tags.length });
+  return Response.json({ updated: true, count: tagIds.length });
 });

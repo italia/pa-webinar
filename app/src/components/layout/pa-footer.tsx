@@ -6,6 +6,8 @@ import { Link, percorsoSeNoto } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
+import { LINK_PIEDE_EVENTI, linkVisibile } from './public-links';
+
 interface FooterLink {
   title: string;
   url: string;
@@ -22,7 +24,7 @@ const BUILD_CHANNEL = process.env.NEXT_PUBLIC_BUILD_CHANNEL ?? 'dev';
 const BUILD_DATE = process.env.NEXT_PUBLIC_BUILD_DATE ?? '';
 
 // Inline mono-stroke SVGs so the footer bar doesn't depend on the async
-// Bootstrap Italia sprite — same rationale as settings-sections-grid.
+// Bootstrap Italia sprite.
 const FOOTER_ICON_SIZE = 14;
 function FooterIconShield() {
   return (
@@ -143,7 +145,7 @@ export default function PAFooter() {
   const legalLinks = footerLinks.filter((l) => l.section === 'legal');
 
   return (
-    <footer className="it-footer" id="footer">
+    <footer className="it-footer" id="footer" tabIndex={-1}>
       <div className="it-footer-main">
         <div className="container">
           <section>
@@ -181,11 +183,13 @@ export default function PAFooter() {
                   </Link>
                 </h4>
                 <ul className="footer-list link-list clearfix">
-                  <li>
-                    <Link href="/video-library" className="list-item text-white">
-                      {t('nav.videoLibrary')}
-                    </Link>
-                  </li>
+                  {LINK_PIEDE_EVENTI.filter((l) => linkVisibile(l, settings)).map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="list-item text-white">
+                        {t(l.labelKey)}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className="col-lg-4 col-md-4 pb-2">

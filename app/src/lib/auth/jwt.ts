@@ -10,7 +10,7 @@
 
 import { randomUUID } from 'crypto';
 
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 
 import type { JitsiJwtFeatures } from '@/lib/jitsi/config';
 import { moderatorFeatures, participantFeatures } from '@/lib/jitsi/config';
@@ -79,11 +79,46 @@ interface JitsiTokenPayload {
    * sito, e renderebbe impuri gli unit test di questo modulo.
    */
   useGravatar?: boolean;
+  /**
+   * La foto che la persona ha caricato (indirizzo assoluto del portale, vedi
+   * lib/profile-photo): vince su Gravatar e sulle iniziali.
+   */
+  photoUrl?: string | null;
+  /**
+   * Cosa l'evento NON concede ai partecipanti. Lo legge il modulo Prosody
+   * `mod_pa_media_lock`, che al primo ingresso accende la moderazione audio e
+   * video di Jitsi: il limite vale sul bridge, non solo nella barra della sala.
+   * Va nello stesso modo in ogni token dell'evento (chiunque entri per primo
+   * accende il blocco).
+   */
+  mediaLock?: MediaLock;
+  /** Audio e video pieni senza moderare: il relatore, ammesso subito. */
+  mediaExempt?: boolean;
+}
+
+/** Microfono, videocamera, condivisione dello schermo: true = bloccato. */
+export interface MediaLock {
+  audio: boolean;
+  video: boolean;
+  desktop: boolean;
+}
+
+/** I limiti dei partecipanti di un evento, nella forma del token di Jitsi. */
+export function mediaLockOf(event: {
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
+}): MediaLock {
+  return {
+    audio: !event.participantsCanUnmute,
+    video: !event.participantsCanStartVideo,
+    desktop: !event.participantsCanShareScreen,
+  };
 }
 
 /** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
  *  qual caso l'avatar resta il data URI invece di diventare un link rotto). */
-function absoluteAppUrl(): string | null {
+export function absoluteAppUrl(): string | null {
   const url = appBaseUrl();
   return url ? `${url.origin}${url.pathname.replace(/\/$/, '')}` : null;
 }
@@ -147,6 +182,8 @@ export async function generateJitsiJwt(
       avatarUrl = `${base}/api/avatar?${q.toString()}`;
     }
   }
+  // La foto caricata vince: e' quella che la persona ha scelto di mostrare.
+  if (payload.photoUrl) avatarUrl = payload.photoUrl;
 
   const jwt = await new SignJWT({
     context: {
@@ -162,6 +199,8 @@ export async function generateJitsiJwt(
         avatar: avatarUrl,
         affiliation: payload.isModerator ? 'owner' : 'member',
         moderator: payload.isModerator ? 'true' : 'false',
+        ...(payload.mediaLock ? { mediaLock: payload.mediaLock } : {}),
+        ...(payload.mediaExempt ? { mediaExempt: true } : {}),
       },
       features,
     },
@@ -186,6 +225,40 @@ export async function generateJitsiJwt(
     .sign(getJitsiJwtSecret());
 
   return jwt;
+}
+
+/** Quanto dopo la scadenza un token della sala prova ancora di esserci stati. */
+const PROVA_PRESENZA_SECONDI = 24 * 60 * 60;
+
+/** Il posto di un iscritto: `reg-<id dell'iscrizione>-<suffisso>`. */
+const POSTO_ISCRITTO = /^reg-([0-9a-f-]{36})-[0-9a-f]+$/i;
+
+/**
+ * Il posto in sala provato da un token della sala: un token che il portale ha
+ * firmato per questa stanza (`room`) e consegnato a chi e' entrato. Vale anche
+ * scaduto da meno di un giorno: la valutazione arriva a fine evento, quando il
+ * token di chi e' entrato all'inizio e' gia' scaduto. Non vale il token di chi
+ * modera (chi conduce non valuta l'evento). Restituisce l'identificativo del
+ * posto (`context.user.id`) e, per un iscritto, l'iscrizione che contiene.
+ * Null se il token non e' nostro, non e' di questa stanza o e' troppo vecchio.
+ */
+export async function postoDaTokenSala(
+  token: string,
+  roomName: string,
+): Promise<{ posto: string; iscrizioneId: string | null } | null> {
+  try {
+    const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
+      issuer: getJitsiJwtIssuer(),
+      audience: getJitsiJwtAudience(),
+      clockTolerance: PROVA_PRESENZA_SECONDI,
+    });
+    if (payload.room !== roomName || payload.moderator === true) return null;
+    const id = (payload.context as { user?: { id?: unknown } } | undefined)?.user?.id;
+    if (typeof id !== 'string' || id.length === 0) return null;
+    return { posto: id, iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null };
+  } catch {
+    return null;
+  }
 }
 
 /**

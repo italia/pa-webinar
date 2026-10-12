@@ -32,8 +32,10 @@ describe('resolveLlmProvider', () => {
   it('falls back to the cluster-internal default URL', () => {
     const r = resolveLlmProvider({ siteProvider: 'vllm' });
     expect(r.provider).toBe('vllm');
-    expect(r.baseUrl).toMatch(/^http:\/\//);
-    expect(r.baseUrl).not.toMatch(/cloud\.ovh\.net|openai\.com|anthropic\.com/);
+    // Il servizio nel cluster, per nome: nessun fornitore esterno.
+    const indirizzo = new URL(r.baseUrl ?? '');
+    expect(indirizzo.protocol).toBe('http:');
+    expect(indirizzo.hostname).not.toContain('.');
   });
 
   it('prefers the explicit baseUrl/modelId override', () => {

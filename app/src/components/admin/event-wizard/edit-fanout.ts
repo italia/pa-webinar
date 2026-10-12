@@ -7,6 +7,8 @@
  * salvataggio che deve riprovarla — si verificano richiesta per richiesta.
  */
 
+import { differenzaProfilo, profiloSalvato } from '@/lib/events/grant-profile';
+
 import { questionnaireChanged } from './questionnaire-diff';
 import type { AdhocQuestionDraft, QuestionnaireBlock } from './step-4-content';
 import type { InitialEventShape, WizardForm } from './wizard-shell';
@@ -68,9 +70,9 @@ export async function submitQuestionnaire(
   placement: Placement,
   block: QuestionnaireBlock,
   defaultLocale: string,
-): Promise<void> {
+): Promise<FanoutResult | null> {
   if (block.templateIds.length === 0 && block.adhocQuestions.length === 0) {
-    return;
+    return null;
   }
   // Questi quattro campi il wizard non li mostra. Per un questionario che
   // esiste già si rimandano indietro quelli che ha: scrivere i predefiniti
@@ -88,7 +90,7 @@ export async function submitQuestionnaire(
       mapAdhocToApi(q, i, defaultLocale),
     ),
   };
-  await fanoutFetch(
+  return fanoutFetch(
     report,
     'questionnaires',
     `/api/admin/events/${eventId}/questionnaires/${placement}`,
@@ -107,6 +109,14 @@ export async function submitQuestionnaire(
  * don't write at all (it would reset what the wizard doesn't show); emptied →
  * DELETE, because the PUT ignores an empty body and the removal would be
  * swallowed silently; otherwise → the usual upsert.
+ *
+ * Un questionario che aveva gia' risposte all'apertura non si scrive mai da
+ * qui: il passo lo mostra in sola lettura, ma una bozza ripresa potrebbe
+ * portarne una versione modificata, e svuotarlo cancellerebbe le risposte.
+ * Se le risposte arrivano dopo l'apertura, il server rifiuta la DELETE senza
+ * conferma (e la PUT) con 409: il rifiuto finisce nel resoconto, e
+ * `onHasResponses` lo segna nello scatto, cosi' i salvataggi successivi non
+ * ripetono la richiesta che fallirebbe di nuovo.
  */
 async function saveQuestionnaire(
   report: FanoutReport,
@@ -115,14 +125,18 @@ async function saveQuestionnaire(
   block: QuestionnaireBlock,
   initial: QuestionnaireBlock | null,
   defaultLocale: string,
+  initialResponses: number,
+  onHasResponses: () => void,
 ): Promise<void> {
+  if (initialResponses > 0) return;
   if (!questionnaireChanged(block, initial)) return;
 
   const emptied =
     block.templateIds.length === 0 && block.adhocQuestions.length === 0;
+  let esito: FanoutResult | null;
   if (emptied) {
     if (!initial) return;
-    await fanoutFetch(
+    esito = await fanoutFetch(
       report,
       'questionnaires',
       `/api/admin/events/${eventId}/questionnaires/${placement}`,
@@ -131,10 +145,10 @@ async function saveQuestionnaire(
       // lo stato desiderato, non un errore da mostrare.
       [404],
     );
-    return;
+  } else {
+    esito = await submitQuestionnaire(report, eventId, placement, block, defaultLocale);
   }
-
-  await submitQuestionnaire(report, eventId, placement, block, defaultLocale);
+  if (esito?.outcome === 'failed' && esito.status === 409) onHasResponses();
 }
 
 // ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
@@ -146,7 +160,7 @@ async function saveQuestionnaire(
 //   – DELETE every initial row that is NOT in `form` by the same key.
 //
 // Identity keys:
-//   – organizers:        `${name}|${organization}`
+//   – organizers:        `${name}|${websiteUrl}|${logoUrl}`
 //   – moderators:        `${role}|${email}`
 //   – invitations:       `${email}` (invitations are event-scoped unique by email)
 //   – materials:         `${title}|${url}`
@@ -158,6 +172,32 @@ async function saveQuestionnaire(
 //
 // Questionnaires are handled differently: the upsert endpoint is PUT and
 // idempotently replaces templates + adhoc items, so we just call it.
+
+/**
+ * Il corpo con cui il wizard crea un materiale (POST
+ * /api/admin/events/{id}/materials). Il wizard tiene il tipo in minuscolo
+ * ('file' | 'link') e un id provvisorio; l'API vuole 'FILE' | 'LINK' e
+ * nessun id: mandando la bozza cosi' com'era, ogni materiale veniva
+ * rifiutato e l'evento nasceva senza.
+ */
+export function materialPayload(m: WizardForm['materials'][number]) {
+  const file = m.type === 'file';
+  return {
+    title: m.title,
+    url: m.url,
+    description: m.description ?? null,
+    type: file ? ('FILE' as const) : ('LINK' as const),
+    visibility: m.visibility,
+    // Di un file caricato la chiave nello storage: senza, la pulizia non
+    // saprebbe che cosa cancellare e il file resterebbe per sempre.
+    ...(file && {
+      fileName: m.fileName ?? null,
+      fileSize: m.fileSize ?? null,
+      mimeType: m.mimeType ?? null,
+      blobPath: m.blobPath ?? null,
+    }),
+  };
+}
 
 /**
  * Cosa il fan-out non e' riuscito a salvare.
@@ -199,6 +239,8 @@ export type FanoutOutcome = 'ok' | 'already' | 'failed';
 
 interface FanoutResult {
   outcome: FanoutOutcome;
+  /** Lo stato HTTP della risposta; null se la rete e' caduta. */
+  status: number | null;
   /** Il corpo di una risposta riuscita: porta l'id della riga appena creata. */
   body: { id?: string } | null;
   /** Il motivo del rifiuto, quando `failed`. */
@@ -217,16 +259,21 @@ async function fanoutRequest(
       // nata, che va registrato nello scatto perche' un secondo salvataggio
       // non la ricrei, e perche' resti cancellabile nella stessa sessione.
       const body = (await res.json().catch(() => null)) as { id?: string } | null;
-      return { outcome: 'ok', body, reason: null };
+      return { outcome: 'ok', status: res.status, body, reason: null };
     }
     if (alreadyStatuses.includes(res.status)) {
-      return { outcome: 'already', body: null, reason: null };
+      return { outcome: 'already', status: res.status, body: null, reason: null };
     }
     const body = (await res.json().catch(() => ({}))) as { error?: string };
-    return { outcome: 'failed', body: null, reason: body.error ?? `HTTP ${res.status}` };
+    return {
+      outcome: 'failed',
+      status: res.status,
+      body: null,
+      reason: body.error ?? `HTTP ${res.status}`,
+    };
   } catch {
     // Rete caduta: la risorsa non e' salvata, e va detto comunque.
-    return { outcome: 'failed', body: null, reason: null };
+    return { outcome: 'failed', status: null, body: null, reason: null };
   }
 }
 
@@ -284,8 +331,8 @@ export async function fanoutEditDiff(
   const auth = { Authorization: `Bearer ${moderatorToken}` };
 
   // Organizers
-  const orgKey = (o: { name: string; organization: string }) =>
-    `${o.name}|${o.organization}`;
+  const orgKey = (o: { name: string; logoUrl: string | null; websiteUrl: string | null }) =>
+    `${o.name}|${o.websiteUrl ?? ''}|${o.logoUrl ?? ''}`;
   const initialOrgByKey = new Map(
     initial.organizers.map((o) => [orgKey(o), o]),
   );
@@ -310,7 +357,6 @@ export async function fanoutEditDiff(
       initial.organizers.push({
         id: creato.body.id,
         name: o.name,
-        organization: o.organization,
         logoUrl: o.logoUrl ?? null,
         websiteUrl: o.websiteUrl ?? null,
       });
@@ -330,20 +376,60 @@ export async function fanoutEditDiff(
     initial.organizers = initial.organizers.filter((x) => x.id !== o.id);
   }
 
-  // EventModerators (MODERATOR + SPEAKER roles share one table)
-  const modKey = (
-    m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' },
-  ) => `${m.role}|${(m.email ?? '').toLowerCase()}`;
-  const initialModByKey = new Map(
-    initial.eventModerators.map((m) => [modKey(m), m]),
-  );
-  const currentMods: Array<{ email: string; role: 'MODERATOR' | 'SPEAKER'; name: string }> = [
-    ...form.moderators.map((m) => ({ email: m.email, role: 'MODERATOR' as const, name: m.name })),
-    ...form.speakers.map((s) => ({ email: s.email, role: 'SPEAKER' as const, name: s.name })),
+  // Le persone (concessioni MODERATOR e SPEAKER, una tabella sola). Una
+  // persona già salvata si riconosce dall'id della sua concessione, non
+  // dall'indirizzo: le concessioni senza email (dal pannello dell'evento)
+  // avrebbero tutte la stessa chiave. Una persona nuova si riconosce da ruolo
+  // ed email, che il wizard chiede e non ripete: serve al salvataggio che
+  // riprova, quando la concessione creata al primo giro è già nello scatto.
+  type Concessione = (typeof initial.eventModerators)[number];
+  const chiave = (m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' }) =>
+    `${m.role}|${(m.email ?? '').toLowerCase()}`;
+  const correnti = [
+    ...form.moderators.map((m) => ({ ...m, role: 'MODERATOR' as const })),
+    ...form.speakers.map((m) => ({ ...m, organizer: false, role: 'SPEAKER' as const })),
   ];
-  const currentModKeys = new Set(currentMods.map(modKey));
-  for (const m of currentMods) {
-    if (initialModByKey.has(modKey(m))) continue;
+  // Le concessioni da tenere: quelle che una persona del modulo usa ancora.
+  const tenute = new Set<string>();
+  const trova = (pred: (g: Concessione) => boolean) =>
+    initial.eventModerators.find((g) => !tenute.has(g.id) && pred(g));
+
+  for (const c of correnti) {
+    const salvata = c.grantId ? initial.eventModerators.find((g) => g.id === c.grantId) : undefined;
+    // La concessione con cui la persona entra ora: la sua, se il ruolo è lo
+    // stesso; quella che la sostituisce, se un salvataggio precedente ha
+    // già cambiato il ruolo; per una persona nuova, quella creata al giro
+    // prima.
+    const attuale =
+      salvata && salvata.role === c.role
+        ? salvata
+        : salvata
+          ? trova((g) => g.replaces === salvata.id && g.role === c.role)
+          : c.email
+            ? trova((g) => !g.replaces && chiave(g) === chiave(c))
+            : undefined;
+    if (attuale) {
+      tenute.add(attuale.id);
+      // Il link resta: cambia solo il profilo (ente, logo, organizzatore,
+      // pagina pubblica).
+      const profilo = differenzaProfilo(attuale, c);
+      if (!profilo) continue;
+      const aggiornato = await fanoutFetch(
+        report,
+        'moderators',
+        `/api/events/${eventId}/moderators/${attuale.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', ...auth },
+          body: JSON.stringify(profilo),
+        },
+      );
+      if (aggiornato.outcome === 'ok') Object.assign(attuale, profilo);
+      continue;
+    }
+    // Una persona nuova, o un cambio fra moderatore e relatore: serve una
+    // concessione nuova, con un link nuovo.
+    const profilo = profiloSalvato(c);
     const creato = await fanoutFetch(
       report,
       'moderators',
@@ -351,21 +437,34 @@ export async function fanoutEditDiff(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...auth },
-        body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
+        body: JSON.stringify({
+          name: c.name,
+          // Una concessione senza indirizzo resta senza: la stringa vuota
+          // non è un'email e farebbe rifiutare la richiesta.
+          email: c.email || undefined,
+          role: c.role,
+          ...profilo,
+        }),
       },
     );
     if (creato.body?.id) {
       initial.eventModerators.push({
         id: creato.body.id,
-        name: m.name,
-        email: m.email,
-        role: m.role,
+        name: c.name,
+        email: c.email || null,
+        role: c.role,
         personId: null,
+        ...profilo,
+        ...(salvata && { replaces: salvata.id }),
       });
+      tenute.add(creato.body.id);
+    } else if (salvata) {
+      // Il cambio di ruolo non è riuscito: la persona tiene il link che ha.
+      tenute.add(salvata.id);
     }
   }
-  for (const m of initial.eventModerators) {
-    if (currentModKeys.has(modKey(m))) continue;
+  for (const m of [...initial.eventModerators]) {
+    if (tenute.has(m.id)) continue;
     // Una revoca: finche' non riesce, il collegamento della persona resta
     // valido. Non entra fra le risorse generiche ma nell'elenco nominativo,
     // che il wizard mostra per nome.
@@ -443,7 +542,7 @@ export async function fanoutEditDiff(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(m),
+        body: JSON.stringify(materialPayload(m)),
       },
     );
     if (creato.body?.id) {
@@ -463,6 +562,15 @@ export async function fanoutEditDiff(
     initial.materials = initial.materials.filter((x) => x.id !== m.id);
   }
 
+  // Un rifiuto per risposte arrivate nel frattempo: lo scatto lo ricorda.
+  const segnaRisposte = (momento: 'pre' | 'post') => {
+    initial.questionnaireResponses = {
+      pre: initial.questionnaireResponses?.pre ?? 0,
+      post: initial.questionnaireResponses?.post ?? 0,
+      [momento]: Math.max(1, initial.questionnaireResponses?.[momento] ?? 0),
+    };
+  };
+
   // Questionnaires — PUT is idempotent (replaces templates + adhoc items);
   // a rejection (e.g. 409 once responses exist) lands in the report like the
   // other resources.
@@ -478,6 +586,8 @@ export async function fanoutEditDiff(
     form.preEventQuestionnaire,
     initial.preEventQuestionnaire,
     defaultLocale,
+    initial.questionnaireResponses?.pre ?? 0,
+    () => segnaRisposte('pre'),
   );
   await saveQuestionnaire(
     report,
@@ -486,6 +596,8 @@ export async function fanoutEditDiff(
     form.postEventQuestionnaire,
     initial.postEventQuestionnaire,
     defaultLocale,
+    initial.questionnaireResponses?.post ?? 0,
+    () => segnaRisposte('post'),
   );
 
   return report;

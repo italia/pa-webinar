@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
+import { eventAdminPath } from '@/lib/events/admin-links';
+import { moderatorRoomOpen } from '@/lib/events/participant-entry';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -26,9 +28,17 @@ export interface EventCardMenuEvent {
   status: string;
   eventType: string;
   moderatorToken: string;
+  endsAt: string;
 }
 
-export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) {
+export default function EventCardMenu({
+  event,
+  viaToken,
+}: {
+  event: EventCardMenuEvent;
+  /** Il token con cui si e' entrati nella pagina, se non c'e' una sessione dello staff. */
+  viaToken?: string | null;
+}) {
   const t = useTranslations('admin.eventsList.menu');
   const locale = useLocale();
   const router = useRouter();
@@ -141,11 +151,7 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
       const creato = await duplicaComeProssima(event.id);
       // La copia nasce in bozza: si apre subito la modifica, dove va
       // confermata.
-      router.push(
-        percorso(
-          `/admin/events/${creato.id}/edit?token=${encodeURIComponent(creato.moderatorToken)}`,
-        ),
-      );
+      router.push(percorso(eventAdminPath(creato.id, { edit: true })));
     });
 
   const elimina = () =>
@@ -173,7 +179,7 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
       <button
         ref={buttonRef}
         type="button"
-        className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
+        className="event-card-menu__toggle btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
         aria-expanded={open}
         aria-controls={listId}
         aria-label={t('actionsFor', { title: event.title })}
@@ -198,10 +204,25 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
             border: '1px solid #d9dadb',
           }}
         >
+          {/* Con la sala aperta, entrare e' la prima cosa che si cerca: la
+              stessa regola della pagina di gestione (moderatorRoomOpen). Un
+              pulsante, non un link: l'indirizzo porta il token del
+              moderatore, che passandoci sopra si vedrebbe. */}
+          {['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status) && moderatorRoomOpen(event) && (
+            <li>
+              <button
+                type="button"
+                className={voce}
+                onClick={() => router.push(percorso(`/events/${event.slug}/live?token=${event.moderatorToken}`))}
+              >
+                {t('enterRoom')}
+              </button>
+            </li>
+          )}
           <li>
             <Link
               className={voce}
-              href={percorso(`/admin/events/${event.id}?token=${event.moderatorToken}`)}
+              href={percorso(eventAdminPath(event.id, { viaToken }))}
             >
               {t('manage')}
             </Link>
@@ -210,7 +231,7 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
             <li>
               <Link
                 className={voce}
-                href={percorso(`/admin/events/${event.id}/edit?token=${event.moderatorToken}`)}
+                href={percorso(eventAdminPath(event.id, { edit: true, viaToken }))}
               >
                 {t('edit')}
               </Link>
@@ -238,7 +259,8 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
               </button>
             </li>
           )}
-          {!istantanea && (
+          {/* Duplicare e' dello staff (la rotta chiede la sessione). */}
+          {!istantanea && !viaToken && (
             <li>
               <button type="button" className={voce} onClick={duplica}>
                 {t('duplicate')}

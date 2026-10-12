@@ -175,7 +175,7 @@ conference, without an AWS bill.
 | NAT (`one_nat_gateway_per_az`) | One NAT gateway | One per zone survives the loss of a zone and costs more |
 | Node autoscaler | Cluster Autoscaler | Karpenter, which you set up yourself ([Karpenter](#karpenter-instead-of-cluster-autoscaler)) |
 | Ingress | ingress-nginx behind a Network Load Balancer | Its upstream project has announced its retirement ([Ingress controllers](../INFRASTRUCTURE.md#ingress-controllers)). The alternative is an Application Load Balancer (class `alb`) with an ACM certificate and an idle timeout of 3600 seconds; the bridge and TURN keep their Network Load Balancers. Not verified ([4. Install the cluster controllers](../../infra/tofu/eks/README.md#4-install-the-cluster-controllers)) |
-| Composite recording (`jibri_enabled`) | Off | Jibri needs the `snd-aloop` kernel module, not checked on the Amazon Linux 2023 image, and its upload script mounted by hand. The per-participant recorder bot needs neither ([Setting up recording](../operations/recording-setup.md)) |
+| Composite recording (`jibri_enabled`) | Off | Jibri needs the `snd-aloop` kernel module, not checked on the Amazon Linux 2023 image; the chart mounts its upload script. The per-participant recorder bot needs neither ([Setting up recording](../operations/recording-setup.md)) |
 | AI post-production (`gpu_enabled`) | Off | A GPU group from zero nodes, plus the NVIDIA device plugin ([AI post-production](../POSTPROD.md)) |
 
 ## Checklist
@@ -878,8 +878,8 @@ Controller created, and does not empty the bucket. In this order:
   Hub limits anonymous pulls per source address, and every private node
   pulls through the same NAT address: use Docker Hub credentials or an ECR
   pull-through cache if installs or scale-ups hit the limit.
-- **Jibri** needs `snd-aloop`, not checked on the Amazon Linux 2023 image,
-  and its upload script mounted by hand
+- **Jibri** needs `snd-aloop`, not checked on the Amazon Linux 2023 image;
+  the chart mounts its upload script
   ([Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script)).
 - **GPU.** The default `g5` GPU (24 GB) is too small for the default language
   model, and the NVIDIA device plugin has only been rendered, never run on

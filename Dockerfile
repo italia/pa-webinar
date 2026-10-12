@@ -115,6 +115,11 @@ WORKDIR /workspace/app
 RUN mkdir -p public/svg && \
     cp /workspace/node_modules/bootstrap-italia/dist/svg/sprites.svg public/svg/sprites.svg
 
+# Il motore dell'anteprima dello sfondo in sala d'attesa (WebAssembly di
+# MediaPipe), servito dal portale: nessun CDN. Lo script trova il pacchetto
+# ovunque npm l'abbia installato.
+RUN npm run copy-vision
+
 RUN npm run build
 
 # Clean standalone output: remove .env files and build-only traced packages

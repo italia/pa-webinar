@@ -8,11 +8,17 @@
  * Chat and reactions are handled by custom components in the app sidebar
  * and as a floating overlay, so they are excluded from the Jitsi toolbar.
  *
- * NOTE: Theme (customTheme), watermark, and branding settings are applied
- * server-side via Jitsi's _custom_config_js and _custom_interface_config_js
- * in the Helm values — NOT here. The IFrame API ignores customTheme and
- * dynamicBrandingUrl when passed via configOverwrite.
+ * NOTE: the IFrame API ignores customTheme and dynamicBrandingUrl when passed
+ * via configOverwrite. The stage colour is set here (DEFAULT_BACKGROUND, which
+ * the interfaceConfig whitelist accepts); the tile colours, avatar colours and
+ * stage pattern come from the dynamic-branding document
+ * (/api/jitsi-branding.json), which the Jitsi server reads only when its own
+ * config points at it (DYNAMIC_BRANDING_URL). See lib/jitsi/branding.
  */
+
+import { CAPTIONS_BUTTON_ID } from '@/lib/captions/toolbar-button';
+
+import { JITSI_STAGE_BACKGROUND } from './branding';
 
 /**
  * Toolbars carry NO native 'hangup' — for ANY role. Jitsi's own hangup
@@ -44,9 +50,10 @@ export const moderatorToolbarButtons = [
   ...baseToolbarButtons,
   // NO 'hangup' — see baseToolbarButtons: exit is our app button so the
   // moderator gets the "Esci solo tu / Termina per tutti" prompt.
-  'mute-everyone',
+  // Né 'mute-everyone' né 'participants-pane': elenco, «silenzia tutti», blocco
+  // di microfoni e video e mani alzate stanno nella scheda Partecipanti della
+  // sala, un posto solo invece di due.
   'security',
-  'participants-pane',
   // NB: 'whiteboard' NON è qui: JitsiRoom lo aggiunge solo per chi modera, da
   // desktop, quando l'evento l'ha scelta (Event.whiteboardEnabled) E
   // l'installazione ha il backend della lavagna (lib/jitsi/whiteboard.ts).
@@ -71,15 +78,12 @@ export const mobileBaseToolbarButtons = [
 ];
 
 /**
- * Moderator mobile toolbar: same trim as participants plus the
- * participants-pane button (needed to manage the room on small screens).
+ * Moderator mobile toolbar: same trim as participants. The room is managed
+ * from the Participants tab of the sidebar, also on small screens.
  * No native 'hangup' — exit goes through the app button (see
  * baseToolbarButtons) so the moderator gets the leave/end-for-all prompt.
  */
-export const mobileModeratorToolbarButtons = [
-  ...mobileBaseToolbarButtons,
-  'participants-pane',
-];
+export const mobileModeratorToolbarButtons = [...mobileBaseToolbarButtons];
 
 /**
  * Config overrides passed as `configOverwrite`.
@@ -120,7 +124,7 @@ export const jitsiConfigOverwrite = {
   // NOTE: `disableKick: true` is the safe default — prevents participants
   // from even attempting a kick (Jitsi would reject it server-side, but
   // showing the button confuses users). JitsiRoom flips this to `false`
-  // at instantiation when `role === 'moderator'` so the participants-pane
+  // at instantiation when `role === 'moderator'` so the tile menu's
   // "rimuovi utente" action actually dispatches. `disableGrantModerator`
   // stays `true` globally: only the primary moderator (via JWT) should
   // grant, never via UI.
@@ -143,7 +147,31 @@ export const jitsiConfigOverwrite = {
   // Overridden per role at instantiation
   toolbarButtons: baseToolbarButtons as string[],
 
+  // La barra principale: al massimo otto pulsanti, in quest'ordine; il resto
+  // va nel menu «…» («security», gli sfondi, la lavagna). Jitsi sceglie
+  // l'elenco con tanti pulsanti quanti ne entrano nella larghezza della sala
+  // e lo abbina per lunghezza alle sue soglie (da 8 a 2: le lunghezze devono
+  // restare queste); senza elenchi da 9 e da 10, le due soglie più larghe
+  // non valgono e la barra non supera gli otto. Due regole di Jitsi da
+  // ricordare: i posti che restano liberi li riempie con altri pulsanti, e
+  // un menu «…» con un solo pulsante non lo apre, lo rimette nella barra.
+  // Un pulsante personalizzato che non compare qui finisce sempre nel menu.
+  mainToolbarButtons: [
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID],
+    ['microphone', 'camera'],
+  ] as string[][],
+
   notifications: [] as string[],
+
+  // Il nome di chi è sul palco lo disegna la sala (components/live/stage-name),
+  // con il suo stile e nella stessa colonna dei sottotitoli: quello di Jitsi
+  // finiva sotto di loro.
+  hideDominantSpeakerBadge: true,
   disableReactions: true,
 
   // Keep a raised hand UP until the user lowers it or a moderator handles
@@ -209,6 +237,10 @@ export const jitsiConfigOverwrite = {
  * Interface config overrides passed as `interfaceConfigOverwrite`.
  */
 export const jitsiInterfaceConfigOverwrite = {
+  // La scena dietro ai video e ai riquadri senza telecamera: il blu della sala
+  // invece del nero di Jitsi (lib/jitsi/branding). Vale anche dove il server
+  // Jitsi non legge il documento di branding.
+  DEFAULT_BACKGROUND: JITSI_STAGE_BACKGROUND,
   SHOW_JITSI_WATERMARK: false,
   SHOW_WATERMARK_FOR_GUESTS: false,
   SHOW_BRAND_WATERMARK: false,
@@ -245,6 +277,12 @@ export interface JitsiJwtFeatures {
   livestreaming: boolean;
   'screen-sharing': boolean;
   'outbound-call': boolean;
+  /**
+   * Avviare e fermare la trascrizione dei sottotitoli live. Il client Jitsi
+   * scrive i metadati di stanza che la accendono solo se il token lo concede:
+   * lo fa la sala del portale per conto del moderatore (useCaptionsControl).
+   */
+  transcription: boolean;
 }
 
 export const participantFeatures: JitsiJwtFeatures = {
@@ -252,6 +290,7 @@ export const participantFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 export const moderatorFeatures: JitsiJwtFeatures = {
@@ -259,6 +298,7 @@ export const moderatorFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: true,
 };
 
 /**
@@ -272,6 +312,7 @@ export const speakerFeatures: JitsiJwtFeatures = {
   livestreaming: false,
   'screen-sharing': true,
   'outbound-call': false,
+  transcription: false,
 };
 
 /**

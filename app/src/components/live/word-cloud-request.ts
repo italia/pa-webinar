@@ -47,6 +47,9 @@ export function roomReadHeaders(token: string): HeadersInit | undefined {
 
 export type WordSubmitErrorKey =
   | 'errors.limit'
+  | 'errors.duplicate'
+  | 'errors.removed'
+  | 'errors.invalid'
   | 'errors.closed'
   | 'errors.rateLimited'
   | 'errors.send';
@@ -58,7 +61,17 @@ export type WordSubmitErrorKey =
  *  solo perdere altre parole. */
 export async function wordSubmitErrorKey(res: Response): Promise<WordSubmitErrorKey> {
   if (res.status === 429) return 'errors.rateLimited';
-  if (res.status !== 409) return 'errors.send';
+  if (res.status !== 409 && res.status !== 422) return 'errors.send';
   const body = (await res.json().catch(() => null)) as { code?: unknown } | null;
-  return body?.code === 'WORD_LIMIT_REACHED' ? 'errors.limit' : 'errors.closed';
+  if (res.status === 422) return body?.code === 'WORD_INVALID' ? 'errors.invalid' : 'errors.send';
+  switch (body?.code) {
+    case 'WORD_LIMIT_REACHED':
+      return 'errors.limit';
+    case 'WORD_DUPLICATE':
+      return 'errors.duplicate';
+    case 'WORD_REMOVED':
+      return 'errors.removed';
+    default:
+      return 'errors.closed';
+  }
 }

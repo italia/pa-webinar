@@ -787,8 +787,8 @@ really gets, as in
 
 - **Jibri** (composite video) runs on the bridge pool, or on the `jibri` pool
   with `jibri_pool.enabled`. The scaler runs at most one Jibri, only while an
-  event with recording on is `PROVISIONING` or `LIVE`. The chart renders
-  Jibri's upload script but does not mount it:
+  event with recording on is `PROVISIONING` or `LIVE`. The chart mounts
+  Jibri's upload script; the variables it reads are in
   [Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script).
   The Jibri pool is not yet verified.
 - **The recorder bot** (per-participant audio) runs on the applications pool;
@@ -863,7 +863,8 @@ On AKS, also:
   closed to Let's Encrypt; use DNS-01 or existing certificates.
 - **ingress-nginx is retired upstream.** The chart's defaults still target
   it.
-- **Composite recording** needs its upload script mounted by hand.
+- **Composite recording**: the chart mounts its upload script and passes it
+  the application's address and keys.
 - **Not included in the module**: the database, DNS records, Key Vault or
   External Secrets, monitoring, backups.
 - **Checked offline only.** Everything marked so in

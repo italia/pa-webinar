@@ -8,6 +8,7 @@ import { Icon } from '@/components/ui/icon';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { messaggioErroreApi } from '@/lib/api-error-message';
 
 interface TemplateRow {
   id: string;
@@ -43,6 +44,7 @@ const EMPTY_DRAFT: Draft = {
 export default function GdprTemplatesManagement() {
   const t = useTranslations('admin.gdprTemplates');
   const tc = useTranslations('common');
+  const tApi = useTranslations('apiErrors');
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -119,8 +121,7 @@ export default function GdprTemplatesManagement() {
       });
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.error ?? t('errors.saveFailed'));
+        setError(messaggioErroreApi(res.status, tApi, t('errors.saveFailed')));
         return;
       }
 
@@ -130,7 +131,7 @@ export default function GdprTemplatesManagement() {
     } finally {
       setSaving(false);
     }
-  }, [draft, editingId, fetchRows, t]);
+  }, [draft, editingId, fetchRows, t, tApi]);
 
   const handleDelete = useCallback(async (row: TemplateRow) => {
     const ok = await confirm({

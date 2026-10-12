@@ -27,7 +27,8 @@ export const dynamic = 'force-dynamic';
 
 interface ReclaimedRow {
   id: string;
-  recording_id: string;
+  /** Nulla per il resoconto dell'evento, che non ha registrazione. */
+  recording_id: string | null;
   attempts: number;
 }
 
@@ -63,6 +64,8 @@ export const GET = withErrorHandling(async (request) => {
     UPDATE postprod_jobs
     SET status = 'FAILED',
         completed_at = NOW(),
+        -- Un resoconto fallito non tiene la copia dei suoi numeri.
+        payload = CASE WHEN kind = 'REPORT' THEN payload - 'metrics' ELSE payload END,
         last_error = COALESCE(last_error, 'exceeded max attempts'),
         updated_at = NOW()
     WHERE status = 'PENDING'
@@ -74,7 +77,10 @@ export const GET = withErrorHandling(async (request) => {
   // just terminal-failed. Done as a separate update because
   // CASE WHEN inside the UPDATE above complicates the syntax.
   if (failed.length > 0) {
-    const recordingIds = Array.from(new Set(failed.map((r) => r.recording_id)));
+    // Il resoconto dell'evento non ha registrazione: non cambia lo stato di nessuna.
+    const recordingIds = Array.from(
+      new Set(failed.map((r) => r.recording_id).filter((id): id is string => id !== null)),
+    );
     await prisma.recording.updateMany({
       where: {
         id: { in: recordingIds },

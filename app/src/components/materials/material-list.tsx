@@ -1,6 +1,10 @@
+'use client';
+
 import { Card, CardBody } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+
+import { markMaterialOpened, materialOpenHandlers } from './material-request';
 
 export interface PublicMaterial {
   id: string;
@@ -13,8 +17,18 @@ export interface PublicMaterial {
  * L'elenco dei materiali come lo vede il pubblico nella scheda dell'evento:
  * prima dell'inizio e nella tab post-evento. Solo presentazione: quali
  * materiali entrano lo decide il server (lib/events/material-visibility).
+ *
+ * Un clic su un materiale lo conta fra le aperture (POST .../opened), senza
+ * token: qui non ce n'è uno. Il link apre comunque la destinazione da solo.
  */
-export default function MaterialList({ materials }: { materials: PublicMaterial[] }) {
+export default function MaterialList({
+  materials,
+  eventSlug,
+}: {
+  materials: PublicMaterial[];
+  /** L'evento dei materiali, per il conteggio delle aperture. */
+  eventSlug?: string;
+}) {
   return (
     <div className="d-flex flex-column gap-2">
       {materials.map((m) => (
@@ -25,6 +39,9 @@ export default function MaterialList({ materials }: { materials: PublicMaterial[
               target="_blank"
               rel="noopener noreferrer"
               className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+              {...(eventSlug
+                ? materialOpenHandlers(() => markMaterialOpened(eventSlug, m.id))
+                : {})}
             >
               <Icon icon="it-external-link" size="sm" />
               {m.title}

@@ -697,7 +697,7 @@ Add `--cacert "$S/ca.crt"` to both with `--tls private-ca`, and
 - **Sign in** at `https://webinar.example.org/en/admin/login`, with
   **Sign in with the instance key** and the `ADMIN_API_KEY` of `secrets.env`
   (`grep ADMIN_API_KEY "$S/secrets.env"`).
-- **Create your named administrator**: **People** > **Accounts**, add yourself
+- **Create your named administrator**: **Staff and access** > **Staff accounts**, add yourself
   with the **Administrator** role and **Send the sign-in link now** ticked.
   The link reaching your mailbox is the test of the SMTP relay. If it does
   not arrive, the email outbox holds the relay's answer

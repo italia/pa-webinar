@@ -148,8 +148,8 @@ the [job graph](../POSTPROD.md#job-graph), the [job states](../POSTPROD.md#job-s
   (`aiPipelineEnabled`, default `false` in `app/prisma/schema.prisma`).
 - Each event opts in with **Automatic transcription** (`aiTranscriptEnabled`) and the options that
   build on it. `consentSnapshot` records what each run was allowed to do.
-- The pipeline works on finished recordings only. Live captions are out of scope for this decision
-  ([Roadmap](../ROADMAP.md#further-out)).
+- The pipeline works on finished recordings only. Live captions are out of scope for this decision;
+  [ADR-018](018-live-captions.md) covers them.
 
 ## Consequences
 
@@ -196,7 +196,7 @@ cloud is covered in the platform guides of [Installing PA Webinar](../install/RE
 A run that starts from zero waits for several things. A node must be provisioned, a large CUDA image
 pulled onto it, and vLLM must load its weights. That takes minutes, and the decision accepts it:
 outputs arrive some time after the event, not during it. A worker that finds vLLM unreachable, or
-answering `503`, keeps retrying for `LLM_CONNECT_WAIT_S` seconds (720 by default in
+answering `503`, keeps retrying for `LLM_CONNECT_WAIT_S` seconds (1200 by default in
 `infra/ai/worker/llm.py`). Meanwhile the job stays `RUNNING` instead of going into backoff, and its
 worker Job stays active, so the orchestrator keeps vLLM at one replica (with `postprod.vllm.autoscale`
 on). The orchestrator's default one-minute schedule adds up to a minute of latency. That is

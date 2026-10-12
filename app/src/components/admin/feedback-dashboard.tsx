@@ -12,7 +12,9 @@
 
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Badge, Card, CardBody, Spinner } from 'design-react-kit';
+import { Badge, Card, CardBody } from 'design-react-kit';
+
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 type Localized = Record<string, string>;
 
@@ -55,6 +57,7 @@ function localize(obj: Localized | undefined, locale: string): string {
 export default function FeedbackDashboard() {
   const locale = useLocale();
   const t = useTranslations('feedbackAdmin');
+  const tc = useTranslations('common');
   const [rows, setRows] = useState<FeedbackRow[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -87,22 +90,18 @@ export default function FeedbackDashboard() {
   if (error) {
     return (
       <div className="alert alert-danger" role="alert">
-        {t('noFeedback')}
+        {tc('errorGeneric')}
       </div>
     );
   }
   if (rows === null) {
-    return (
-      <div className="text-center py-5">
-        <Spinner active small /> <span className="text-muted ms-2">…</span>
-      </div>
-    );
+    return <SkeletonLines lines={6} loadingLabel={tc('loading')} />;
   }
   if (rows.length === 0) {
     return (
-      <div className="alert alert-secondary" role="alert">
+      <p className="text-muted" role="status">
         {t('noFeedback')}
-      </div>
+      </p>
     );
   }
 

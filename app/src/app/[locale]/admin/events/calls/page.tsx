@@ -3,8 +3,14 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { staffOLogin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
 import InstantCallsList from '@/components/admin/instant-calls-list';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/events/calls');
+}
 
 export default async function InstantCallsPage() {
   const locale = await getLocale();
@@ -23,10 +29,7 @@ export default async function InstantCallsPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <h1 className="mb-1">{t('title')}</h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/events/calls')} subtitle={t('subtitle')} />
       <InstantCallsList
         locale={locale}
         idleGraceMinutes={settings?.jvbInactiveGraceMinutes ?? 45}

@@ -11,11 +11,12 @@
  */
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
-import { Link, percorso } from '@/i18n/navigation';
+import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 import RecordingOverview from './recording-overview';
 import TranscriptEditor from './transcript-editor';
@@ -23,16 +24,9 @@ import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
 import ArchivePanel from './archive-panel';
 import AiReliabilityPanel from './ai-reliability-panel';
+import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
 type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive' | 'reliability';
-
-function statusBadgeClass(status: string): string {
-  if (status.endsWith('DONE')) return 'bg-success';
-  if (status.endsWith('FAILED')) return 'bg-danger';
-  if (status.endsWith('PARTIAL')) return 'bg-warning text-dark';
-  if (status.endsWith('RUNNING') || status.endsWith('QUEUED')) return 'bg-info text-dark';
-  return 'bg-secondary';
-}
 
 function fmtDuration(sec: number | null): string {
   if (sec == null) return '–';
@@ -49,7 +43,12 @@ export default function RecordingManageClient({
   durationSec,
   sourceLanguage,
   createdAt,
+  soloSottotitoli = false,
+  eventId,
 }: {
+  /** La registrazione non ha un file: la trascrizione viene dai sottotitoli live. */
+  soloSottotitoli?: boolean;
+  eventId?: string;
   recordingId: string;
   eventTitle: string;
   eventSlug: string | null;
@@ -59,11 +58,48 @@ export default function RecordingManageClient({
   createdAt: string;
 }) {
   const t = useTranslations('admin.postprod');
+  const tApi = useTranslations('apiErrors');
+  const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
   const [tab, setTab] = useState<TabKey>('overview');
   const [rerunning, setRerunning] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [aggiornando, setAggiornando] = useState(false);
+  const router = useRouter();
+
+  // La trascrizione dai sottotitoli si ricostruisce dalle frasi salvate: non
+  // c'e' un file da trascrivere di nuovo.
+  async function aggiornaDaiSottotitoli(): Promise<void> {
+    if (!eventId) return;
+    setAggiornando(true);
+    try {
+      const r = await fetch(`/api/admin/events/${eventId}/captions-transcript`, { method: 'POST' });
+      const esito = (await r.json().catch(() => null)) as { stato?: string; recordingId?: string } | null;
+      if (!r.ok) {
+        toast.error(t('rerunFailed', { code: r.status }));
+      } else if (esito?.stato === 'gia-trascritta') {
+        toast.info(t('captionsRebuildKept'));
+      } else if (esito?.stato === 'ai-in-corso') {
+        toast.info(t('captionsRebuildAiRunning'));
+      } else if (esito?.stato === 'scritta') {
+        toast.success(t('captionsRebuildDone'));
+        // Arrivato il video, la trascrizione si sposta sulla sua registrazione
+        // e questa, senza file, non c'e' piu': si va dove sta adesso.
+        if (esito.recordingId && esito.recordingId !== recordingId) {
+          router.replace(percorso(`/admin/postprod/${esito.recordingId}`));
+        } else {
+          window.location.reload();
+        }
+      } else {
+        toast.info(t('captionsRebuildNone'));
+      }
+    } catch {
+      toast.error(t('rerunFailed', { code: 0 }));
+    } finally {
+      setAggiornando(false);
+    }
+  }
 
   async function rerun(): Promise<void> {
     const ok = await confirm({
@@ -94,7 +130,9 @@ export default function RecordingManageClient({
           toast.success(t('manageRerunOk'));
         }
       } else {
-        toast.error(t('rerunFailed', { code: r.status }));
+        toast.error(
+          messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+        );
       }
     } catch {
       toast.error(t('rerunFailed', { code: 0 }));
@@ -143,8 +181,9 @@ export default function RecordingManageClient({
           window.location.reload();
         }
       } else {
-        const data = (await r.json().catch(() => null)) as { error?: string } | null;
-        toast.error(data?.error ?? t('rerunFailed', { code: r.status }));
+        toast.error(
+          messaggioErroreApi(r.status, tApi, t('rerunFailed', { code: r.status }), {}, await codiceErrore(r)),
+        );
       }
     } catch {
       toast.error(t('rerunFailed', { code: 0 }));
@@ -164,22 +203,18 @@ export default function RecordingManageClient({
 
   return (
     <div className="container py-4">
-      {/* Header */}
-      <div className="mb-2">
-        <Link href="/admin/postprod" className="text-decoration-none small">
-          ← {t('manageBackToList')}
-        </Link>
-      </div>
+      {/* Header (il ritorno all'elenco lo danno le briciole) */}
       <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
         <div className="flex-grow-1">
           <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)', fontSize: '1.5rem' }}>
             {eventTitle}
           </h1>
           <div className="d-flex flex-wrap align-items-center gap-2 small text-secondary">
-            <span className={`badge ${statusBadgeClass(status)}`}>{status}</span>
+            <span className={`badge ${statusBadgeClass(status)}`}>{recordingStatusLabel(status, t)}</span>
             <span>· {t('manageDuration')}: {fmtDuration(durationSec)}</span>
             <span>· {t('manageSource')}: {sourceLanguage}</span>
-            <span>· {new Date(createdAt).toLocaleString()}</span>
+            {soloSottotitoli && <span>· {t('captionsSource')}</span>}
+            <span>· {format.dateTime(new Date(createdAt), { dateStyle: 'short', timeStyle: 'medium' })}</span>
           </div>
         </div>
         <div className="d-flex align-items-center gap-2">
@@ -192,7 +227,17 @@ export default function RecordingManageClient({
               {t('manageOpenPublic')}
             </Link>
           )}
-          {status === 'READY' && (
+          {soloSottotitoli ? (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary"
+              disabled={aggiornando}
+              onClick={() => void aggiornaDaiSottotitoli()}
+            >
+              {aggiornando ? '…' : t('captionsRebuild')}
+            </button>
+          ) : null}
+          {!soloSottotitoli && status === 'READY' && (
             <button
               type="button"
               className="btn btn-sm btn-primary"
@@ -202,14 +247,16 @@ export default function RecordingManageClient({
               {generating ? '…' : t('generateAi')}
             </button>
           )}
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            disabled={rerunning}
-            onClick={() => void rerun()}
-          >
-            {rerunning ? '…' : t('rerun')}
-          </button>
+          {!soloSottotitoli && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary"
+              disabled={rerunning}
+              onClick={() => void rerun()}
+            >
+              {rerunning ? '…' : t('rerun')}
+            </button>
+          )}
         </div>
       </div>
 

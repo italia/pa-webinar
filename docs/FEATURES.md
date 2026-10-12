@@ -43,7 +43,7 @@ flowchart LR
 
   subgraph AFTER["After: portal pages fed by background jobs"]
     direction TB
-    A1["Feedback<br/>post-event questionnaire<br/>or star rating"]
+    A1["Rating<br/>end-of-event questionnaire,<br/>asked in the room"]
     A2["Recap page<br/>anonymous aggregate,<br/>answered Q&A, poll results"]
     A3["Recording<br/>published by a moderator<br/>or the administration"]
     A4["Transcript, subtitles,<br/>summary, dubbing<br/>optional AI post-production"]
@@ -71,7 +71,7 @@ flowchart LR
 
 ### Who uses which surface
 
-Nobody has a user account with a password. Participants use a personal link. Guests need no link while an event is live, unless an administrator turns guest access off. Moderators and speakers use a magic link. Staff sign in with a one-time link sent by email, and the instance API key remains available to administrators.
+Nobody has a user account with a password. Participants use a personal link. Guests need no link while an event is live, unless an administrator turns guest access off or the event is invitation-only. Moderators and speakers use a magic link. Staff sign in with a one-time link sent by email, and the instance API key remains available to administrators.
 
 ```mermaid
 flowchart LR
@@ -95,7 +95,7 @@ flowchart LR
 
   R1 -- "no sign-in" --> S1
   R1 -- "personal link" --> S2
-  R2 -- "only while live,<br/>if guest access is on" --> S2
+  R2 -- "only while live, if guest access<br/>is on and the event is not invitation-only" --> S2
   R3 -- "magic link" --> S2
   R4 -- "one-time sign-in link,<br/>own events only" --> S3
   R5 -- "sign-in link<br/>or instance key" --> S3
@@ -130,11 +130,11 @@ An administrator picks one of five layouts under **Home page mode**: **Landing p
 ### Finding events
 
 - **Event list.** The **Events** (Eventi) page lists **Upcoming events** (Prossimi eventi) and **Past events** (Eventi passati). Tags can filter it (**Filter by tag**). Each tag has an Italian and an English name, a color and a sort order. Events that are warming up (`PROVISIONING`, `IDLE`) stay listed, so a visitor who arrives a few minutes early still finds the event.
-- **Calendar.** *Optional.* A public calendar with day, week, month, year and list views, turned on by **Public calendar**. It is off by default. When it is off, its page returns "not found".
-- **Event page.** The page shows the title and Markdown description in the visitor's language, the date and time zone, the cover image, the tags, the speakers and organizer when set, and the registration button. It also offers add-to-calendar links (Google, Outlook, Yahoo, and an `.ics` download). The page carries schema.org `Event` data and appears in the sitemap. When the event is live, it offers a link into the room. When the end time has passed without the room opening, the page shows the event as ended and says that registration is closed, instead of the registration button and the calendar links.
+- **Calendar.** *Optional.* A public calendar with day, week, month, year and list views, turned on by **Public calendar**, which also puts a **Calendar** link in the header and the footer. It is off by default. When it is off, the links disappear and its page returns "not found".
+- **Event page.** The page shows the title and Markdown description in the visitor's language, the date and time zone, the cover image, the tags, the organizing organizations and the people who take part, and the registration button. A person appears only when **Show on the public page** is ticked for them in the wizard's **People** step, which is off by default, also on a duplicated event; the page then shows their name, role, organization and logo. When no speaker is published, the page shows the free-text speakers field instead, and when no organization is set, the free-text organizer. It also offers add-to-calendar links (Google, Outlook, Yahoo, and an `.ics` download). The page carries schema.org `Event` data and appears in the sitemap. When the event is live, it offers a link into the room. When the end time has passed without the room opening, the page shows the event as ended and says that registration is closed, instead of the registration button and the calendar links.
   - **Before the start**, it also lists the event's materials marked **Before the event**. Materials left on the default, **In the room and after the event**, are not listed. The list disappears at the scheduled start time.
-  - **With public registration off**, it says that registration is reserved for invited people and that the link to enter arrives by email. When the event has no invitees, it removes the registration button, says that registration is not open to the public, and links to **Already registered? Get your personal link again**.
-- **Link previews.** When someone shares an event link, the preview image is a card that the server draws with the title, date, speakers, poster and organization. An administrator chooses which of these appear, or turns the card off.
+  - **When registration is by invitation only**, it says that registration is reserved for invited people and that the link to enter arrives by email. When the event has no invitees, it removes the registration button, says that registration is not open to the public, and links to **Already registered? Get your personal link again**.
+- **Link previews.** When someone shares an event link, whether the event page, the link to enter the room or the registration page, the preview shows the event's title and description, and an image that the server draws with the title, date, speakers, poster and organization. An administrator chooses which of these appear, or turns the card off.
 
 Instant calls have no public event page while they run: whoever has the link goes straight into the room.
 
@@ -178,28 +178,29 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
   - per-participant audio recording (required when that is on);
   - news about future events (optional);
   - inclusion in the address book (optional).
-- **Organization fields.** The form can also ask for an organization (with autocomplete), a role and an organization type. An event turns these on with `requireOrganization`, `requireOrganizationRole` and `requireOrganizationType`. When on, the organization name is mandatory.
+- **Organization fields.** The form can also ask for an organization (with autocomplete), a role and an organization type. An event turns these on in the wizard's **People** step, under **What we ask people who register** (`requireOrganization`, `requireOrganizationRole` and `requireOrganizationType`). When on, the organization name is mandatory, in the form and for the registration API; the role and the type stay optional.
 - **Pre-registration questionnaire.** *Optional.* When an event has one, it follows the registration form.
 - **Personal link.** Registration returns a personal join link and sets a signed cookie in that browser (with invitation-only registration, opening the emailed link sets the cookie instead). A registrant who comes back to the room without the link is still recognized. A forwarded link does not carry the registrant's name: whoever opens it enters as a guest under a name they type. With invitation-only registration the emailed link is signed, so forwarding the whole email forwards the identity too.
 - **Routing after registration.** If the event starts soon, the new registrant goes straight to the waiting room. How soon is set by the `waitingRoomLeadMinutes` site setting. Otherwise they see a confirmation screen with the calendar links. With invitation-only registration they are told to check their email instead.
 - **Emails.**
   - A confirmation with the personal link and an `.ics` file.
-  - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them: up to five per event, chosen from presets between **7 days before** and **15 minutes before**.
+  - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them before the event, with **Edit** in the **Notifications** panel of the event page: up to five per event, chosen from presets between **7 days before** and **15 minutes before**. A reminder already sent stays, and a moment already passed cannot be chosen.
   - A notice when the date of a published event changes.
-  - An *optional* thank-you email after the event, with a recap and a feedback link.
+  - An *optional* thank-you email after the event, with a recap and, for those who entered the room, a rating link.
+  - A notice when the event's recording, or its external video, becomes visible on the event page. It is on by default and can be turned off per event.
 
   Emails are written in the registrant's language when copy exists for it, and in English otherwise. See [Email and calendar](architecture/email.md).
 - **Capacity.** The expected number of participants sizes the video infrastructure. It is not a registration cap.
-- **Guests.** Unless an administrator turns off **Guest access enabled**, anyone can join a scheduled event without registering while it is live (`LIVE`), after typing a name. Instant calls always admit anyone with the link, whatever the setting, including while the room is warming up.
+- **Guests.** Unless an administrator turns off **Guest access enabled**, anyone can join a scheduled event without registering while it is live (`LIVE`), after typing a name. An event set to **Only people you invite** admits no guests, whatever the setting. Instant calls always admit anyone with the link, whatever the setting, including while the room is warming up.
 - **Join password.** *Optional.* It is set in the instant-call form, or through the API for any event. Guests must type it. Registrants who use their personal link and people with a magic link skip it.
 - **Invitations.** An organizer can keep a list of invitees (name, email, role **Guest** or **Speaker**) on each event, and administrators can fill it from the address book.
-- **Invitation-only registration.** When an administrator turns off **Public registration enabled**, only addresses on the event's invitation list can register. The form gives the same answer, **Check your email**, whatever address is typed: an invited address is registered, an address that is already registered gets its link again, and any other address gets nothing. The personal link arrives only by email, and opening it binds that browser to the registration. An event with no invitees then accepts no new registrations, and its registration page only offers to send the link again to people who registered earlier. People who already hold a personal link or a magic link are not affected. Guest access is a separate switch: for a closed meeting, turn off **Guest access enabled** as well, or anyone can still join as a guest while the event is live.
+- **Who can register.** Each event chooses **Anyone who registers** or **Only people you invite** (`Event.accessMode`): in the question **Who can take part?** when it is created, and in the wizard's **People** step under **Who registers**. An event that has made no choice follows the site setting **Public registration enabled**. **Anyone who registers** opens registration whatever that setting says, but does not turn guest entry on: guests still follow **Guest access enabled**.
+- **Invitation-only registration.** When an event is set to **Only people you invite**, or follows the site with **Public registration enabled** off, only addresses on the event's invitation list can register. The form gives the same answer, **Check your email**, whatever address is typed: an invited address is registered, an address that is already registered gets its link again, and any other address gets nothing. The personal link arrives only by email, and opening it binds that browser to the registration, also after registration is opened again. An event with no invitees then accepts no new registrations, and its registration page only offers to send the link again to people who registered earlier. People who already hold a personal link or a magic link are not affected. An event set to **Only people you invite** admits no guests either: nobody joins without a registration or a moderator or speaker link. A personal link is a seat, not a person, so an invitee who forwards theirs hands over their seat. An event that follows the site setting still admits guests while it is live, unless **Guest access enabled** is off too. Only event staff (administrators, and organizers on their own events) change who can take part; someone editing with a moderator link sees the choice but cannot change it. When the event asks for the organization, registration is refused without it, also when the registration route is called directly.
 
 Current limits:
 
 - The platform does not send invitation emails and does not create a personal link for each invitee: invitees register themselves with the address they were invited with.
 - With invitation-only registration, the pre-registration questionnaire is not shown, because the form's answer carries no personal link to submit it with.
-- The event wizard does not show the organization fields. They can be switched on only through the API.
 
 Configured in: [From creation to recap: the event journey](architecture/event-journey.md) · [Email and calendar](architecture/email.md) · [Privacy and data protection](GDPR.md).
 
@@ -213,18 +214,22 @@ The waiting room is the single front door. Personal links and magic links always
 - **Over plain `http://`.** The browser gives the page no microphone or camera, so the waiting room and the room show a notice with the `https://` address instead of trying to start the call.
 - **When the bridge lags.** If the event is live but the bridge still reports not ready after a minute, the room offers **Enter anyway**, so a stale readiness signal never locks people out.
 - **When live.** A short cue announces that the room is open, and the join button turns on.
-- **After the end.** It links to the recording and the feedback.
-- **Device check.** A camera preview, a microphone level meter and an audio test, with on and off switches. Participants start with camera and microphone off. Moderators, speakers and instant-call participants start with them on. On phones everyone joins muted, because mobile browsers need a tap to open the camera.
-- **Virtual background.** A few neutral images, such as **Light office** and **Institutional blue**, applied on entry. Background blur is available inside the room.
+- **After the end.** It links to the recording and, when feedback is on, offers everyone except moderators **Leave feedback**, which opens the end-of-event rating in a dialog.
+- **Profile photo.** *Optional.* Registrants who opened the personal link from their email in this browser can choose a photo. Someone who registered in this browser but has not opened that link here yet is asked to open it in this browser first, because it shows the address is theirs. Moderators and speakers do not add a photo: they keep their initials, or their Gravatar where it is enabled. Others in the room then see the photo instead of the initials, in the video tiles and in the participants panel; the chat keeps the initials. The photo is cropped to a square and saved as a small JPEG without its metadata (date, place, device). It also applies at later events the person registers for with the same email address, until they remove it. See [Avatars](architecture/identity-and-access.md#avatars).
+- **At a glance.** When, how long, who organizes, hosts and speaks, whether the event is recorded, and the description, with links to the event page and **Share**. Above it, how many people are live and how many are waiting.
+- **Audio and video.** Camera and microphone switches, off the first time for everyone; no permission is asked until one is turned on. Turning one on opens its test: the camera preview with the virtual backgrounds, the microphone level meter and picker, and an audio test. The last choice is remembered. On phones everyone joins muted, because mobile browsers need a tap to open the camera.
+- **Virtual background.** A few calm images, such as **Light office**, **Institutional blue** and **Studio**. The camera preview already shows the chosen one behind the person, cut out in the browser, and the room applies it on entry. Inside the room the same images are in Jitsi's backgrounds button, together with blur.
 - **Waiting-room music.** *Optional.* A track set on the event. It plays only before the start, and only after the participant chooses **Enable music**.
-- **Chat preview.** If the event has chat turned on, registrants and moderators can already read and write in it while the room warms up. Once the event is live, everyone can.
+- **Chat preview.** In the side column. If the event has chat turned on, registrants and moderators can already read and write in it while the room warms up. Once the event is live, everyone can.
+- **Your name.** Required to enter. While it is empty the field pulses gently, in blue rather than red.
 - **Notices and consent gates.**
   - When AI post-production is on for the event, an **AI processing after the event** notice appears. Its text can be customized.
-  - When per-participant recording is on, entry requires explicit consent.
+  - When live captions are on, a notice says so, and whether the text is kept: not at all, or, with a transcript from captions, with the name for the people who consented.
+  - When the event records per-participant audio or keeps a transcript from captions, everyone who has not given it yet, moderators and speakers included, is asked for the optional consent to the transcription of what they say. Entry does not depend on it: without it, the person's voice is not recorded and their words are not kept.
 
 ### Classic view and the square
 
-The waiting room has two layouts. The **classic view** is a static page with every control inline. **The square** is an optional 2D space built with Phaser: the people in it appear as avatars, and once the event is live you can walk into the gate to enter. A participant opens the square with **Step into the square**, leaves it with **Back to the waiting room**, and can switch to **Classic version** at any time, then return with **Back to the park**. The choice is remembered in that browser. Phones get the classic view by default.
+The waiting room has two layouts. The **classic view** is a static page with every control inline. **The square** is an optional 2D space built with Phaser: the people in it appear as avatars, messages written in the event chat show as bubbles above their authors (with dots while they type), five gestures (wave, heart, clap, laugh, idea) have a button and a key each, and sounds can be switched on (fountain, birds, footsteps, gestures, the gate opening). Everyone has a character, random at first and fully customizable (skin, hair, clothes, shoes, hat, glasses, colours). Four spaces have something to do: a coffee everyone sees at the café, the event's programme, speakers and materials at the notice board, the event's images and portraits of who is there at the gallery, the square's mood and the wardrobe at the lab; a fountain and a wishing well hold small surprises, and a legend lists the controls and the secret codes. Once the event is live you can walk into the gate to enter. A participant opens the square with **Step into the square**, leaves it with **Back to the waiting room**, and can switch to **Classic version** at any time, then return with **Show the square**. The square is offered in the side column as another place to wait, not as a step before entering. The choice is remembered in that browser. Phones get the classic view by default.
 
 An administrator sets the starting view per site or per event: **Videogame (Phaser lobby)** offers the square, and **Classic (static)** opens the classic view first. Visitors can still switch. How the view is resolved, the square's presence model and the accessibility contract are in [The waiting room and the square](architecture/waiting-room.md#engines-classic-view-and-the-square).
 
@@ -242,45 +247,61 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [From cr
 - **Participant permissions.** Each event decides whether participants may unmute, turn on their camera and share their screen. When a permission is off, its button disappears. Speakers always have full audio and video.
 - **Video quality.** A site-wide preset that each event can override: **Save data (360p)**, **Balanced (540p)**, **High (720p, recommended)** or **Maximum (1080p, high fidelity)**. On phones the platform limits resolution and the number of incoming videos to protect battery and data.
 - **Watermark.** The administration's logo can appear over the video, with configurable opacity and position.
+- **Stage colors.** The area behind the videos is the room's blue instead of black. Where the conference server reads the portal's branding document, Jitsi's toolbar, menus and dialogs, the tiles of people without a camera and the initials avatars use matching blues too. See [Branding limits](architecture/jitsi-integration.md#branding-limits).
 - **Advanced noise suppression.** *Optional.* It needs the patched Jitsi web image. See [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md).
 - **Reconnection.** After a network drop the app tries to rejoin automatically and shows each attempt.
-- **Top bar.** It shows the number of people present, the time left or the time elapsed (the audience can switch this on), **Share** (the **Link to join** and the **Event page**; moderators can also show the moderator link), and **Leave room**. When guest access is off, scheduled events offer only the event page, because the link to join would send the recipient to registration.
-- **Banners.** One banner announces who is sharing their screen. Another appears after the scheduled end, stating when the room will close.
+- **Top bar.** It shows the number of people present (to moderators), the current agenda topic while the agenda is on (it opens the whole agenda), **Share** (the **Link to join** and the **Event page**; moderators can also show the moderator link), and **Leave room**. When guest access is off, or the event is invitation-only, scheduled events offer only the event page, because the link to join would send the recipient to registration.
+- **Time strip** (moderators only). Under the top bar: how long the event has been on air, a progress bar against the scheduled time, and the scheduled end with the minutes left. The bar turns amber in the last ten minutes; past the end it shows the overtime and when the room closes on its own, with a moving texture, and turns red in the last ten minutes before the close. On the right, the recording state (a red **REC** pill with the recording's duration while it runs) and the talk timer while it is on; clicking either opens the **Control** panel. Participants and speakers see none of this: only the **REC** icon while recording and, in the last ten minutes before the room closes on its own, a notice saying when. Before the start, the strip says when the event begins; an instant call shows only the time on air.
+- **Banners.** One banner announces who is sharing their screen.
 
 ### Panels in the drawer
 
-The drawer is a column on the right on desktop and a sheet from the bottom on smaller screens. It holds these panels:
+The drawer is a column on the right on desktop, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, none when the system asks for reduced motion), and a sheet from the bottom on smaller screens. It holds these panels:
 
 | Panel | What it does | Default |
 |---|---|---|
-| **Chat** | Messages with replies, @mentions (with a browser notification), emoji reactions, image and PDF attachments up to 10 MB where the installation has files storage, and edits within 15 minutes. **Mark as a question** feeds a questions filter. Moderators can hide messages. Anyone who can read the chat can **Download the chat**. | On |
-| **Q&A** | Questions of up to 500 characters with upvotes. Registrants, guests and speakers can upvote. Moderators **Highlight**, **Mark as answered** or **Dismiss**. | Off |
+| **Control** | Moderators only, first in the strip: recording (start, stop with confirmation, recorder warnings), the room features switched on and off for everyone (Q&A, chat, agenda, **In one word**, whiteboard), the talk timer, and, set apart at the bottom, **End event**. Speakers and the audience do not see it | Always, for moderators |
+| **Chat** | Messages grouped by sender, each group headed by name, role and time, with replies, @mentions (typing `@`, or pressing the **@** button, suggests the people in the call and those who wrote in the chat; the button opens and closes the list without adding another `@`, and an empty list says so), an emoji picker with search and recently used emoji, emoji reactions, image and PDF attachments up to 10 MB where the installation has files storage, and edits within 15 minutes. A line under the messages says who is typing. Moderators can hide messages. Anyone who can read the chat can **Download the chat**. The bell sets the alerts, remembered by the browser: **All messages** (the default for moderators), **Mentions and replies** (the default for everyone else) or **Silent**, each with a sound and, once the browser allows it, a browser notification while the page is in the background or behind another window. While the chat is not in view, its tab counts the unread messages and each message that alerts also appears as a preview over the room; a message that mentions or replies to you is highlighted, its preview stays longer and the counter shows **@**. Nothing alerts for a message already on screen; a **new messages** button appears when the list is scrolled up. | On |
+| **Q&A** | Questions of up to 500 characters with upvotes. Registrants, guests and speakers can upvote. Moderators **Highlight**, **Mark as answered** or **Dismiss**, and can **Answer** in writing (up to 2000 characters): the answer appears under the question for everyone, and a pending or highlighted question becomes answered. The person who asked sees **Your question** on it. A dot on the tab tells who is on another panel that there are new questions or answers; a moderator also hears the chat sound for a new question, and whoever asked hears it when their question is answered, with a browser notification while the page is in the background or behind another window, as in the chat. The chat's bell settings apply, and **Silent** turns sound and notifications off here too. | Off |
 | **Polls** | Moderators create a poll, then **Close voting**, **Publish results** or **Reopen**. Each person votes once. | Always shown |
-| **Word cloud** | A moderator starts a round with a topic and a duration, and participants send words. | Off |
-| **Notes / Checklist** | Moderators list and tick off topics. The audience can mark **Agree** or **Disagree** on each item. | Off |
-| **Materials** | Links and files shared for the event. Files can be uploaded only where the installation has files storage; each item shows who added it, or "Added by the organisers". The audience sees the materials marked **In the room and after the event** or **During the event**. Moderators see every material, with its visibility marked on the restricted ones, and can add more during the call. | Always shown |
-| **Participants** | Who is present, with a volume control for each person that changes only what you hear. Moderators also see their own connection quality and can remove anyone but themselves. Role badges appear when the conference's roles tell moderators from participants. | Always shown |
+| **In one word** (word cloud) | A moderator asks a question with a duration (1, 2 or 3 minutes, or no time limit until the moderator closes it), and participants answer one word at a time, up to five each. The more people write the same word, the bigger it gets: each person counts once per word, and capitals and surrounding punctuation do not make a different word. Each word keeps its colour as the cloud changes. Moderators can remove a word: it leaves the cloud and the recap, and nobody can send it again in that round. The last closed cloud stays visible. Moderators see the tab even while the feature is off, and asking the first question turns it on for everyone. | Off |
+| **Agenda** | Moderators list the meeting's topics, each with an optional planned duration (a pasted list adds one topic per line), reorder them and mark each one in progress, discussed or skipped; **Next topic** closes the current topic and starts the next. Everyone sees where the meeting stands, also from the top bar, and moderators see when a topic runs over its planned time. The audience can mark **Agree** or **Disagree** on the topic in progress. | Off |
+| **Materials** | Links and files shared for the event, each with an icon and label for its format (PDF, DOCX, PPTX, XLSX, TXT, link), the size of a file or the site a link leads to, and who added it ("Added by the organisers" when no name is recorded) and when. With more than four items mixing files and links, **All**, **Files** and **Links** filter the list. Files can be uploaded only where the installation has files storage, by dragging them onto the panel or choosing them, with a progress bar and **Cancel upload**; the title is proposed from the file name. A dot on the tab tells who is on another panel that new materials were shared. The audience sees the materials marked **In the room and after the event** or **During the event**. Moderators see every material with its visibility and how many times it was opened or downloaded, choose the visibility when they add one during the call, **Edit** its title, description and visibility, use **Copy link** on links, and **Delete material** with a second click to confirm. Clicks in the room and on the event page are counted once per person every 10 minutes, never for moderators and staff, and without recording who clicked. | Always shown |
+| **Participants** | Who is present, each with the avatar the video tiles show (a photo, a Gravatar or initials) and **you** on your own row. Raised hands come first, in the order they were raised, each with its turn, and the person speaking is highlighted. The list is split into **Hosts** and **Audience** when the conference's roles tell moderators from participants, and a name search appears above 8 rows. The header counts people: someone who rejoins and leaves an old connection behind counts once, and the number of connections is shown beside it when it is higher. Each other person has a volume control that changes only what you hear. Moderators also see their own connection quality, and run the room from here: **Mute everyone**, **Turn off all video**, the **Microphones locked** and **Video locked** switches, **Give the floor**, **Audio only** and **Lower hand** on a raised hand, and, behind each row's actions button, **Mute**, **Turn off video**, **Take back the floor** and **Remove** (with a second click to confirm). For moderators the tab shows the number of raised hands. Under each name, moderators see the email address of the registration or personal link behind it, **Registered as: {name}** when the name typed in the room differs from the registration, **Registration link of {email}** for a registration link opened in another browser, or **Shared moderator link**, and **Identity cannot be verified** when two different links claimed the same connection; their search also matches those names and addresses. Screen readers announce raised hands to moderators while the panel is open. | Always shown |
 
-Moderators can switch Q&A, chat, **Notes / Checklist** and **Word cloud** on and off during the event. Everyone's panels update within seconds. See [Live interaction and realtime](architecture/live-interaction.md).
+Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off during the event. Everyone's panels update within seconds, and catch up on their own when the realtime connection comes back after an interruption. See [Live interaction and realtime](architecture/live-interaction.md).
 
 ### Reactions, timers and raised hands
 
 - **Reactions.** The site chooses the mode:
   - `NATIVE` (the default): Jitsi's own reactions button. It is ephemeral and nothing is counted.
   - `CUSTOM`: the app's reaction bar. Reactions are counted and appear in event analytics.
-- **Presentation timer.** A moderator starts a countdown (presets **5 min** to **30 min**, or custom). With **Show to all**, everyone sees it. It ends with **Time's up!**
-- **Event timer.** It shows the time to the scheduled end and keeps counting past it. It is on by default for moderators. Everyone else can switch it on, and the choice is remembered in the browser.
-- **Raised hands.** The queue is visible to everyone, in order. A hand stays up while its owner speaks, until they lower it or a moderator deals with it.
+- **Talk timer.** From the **Control** panel a moderator starts a countdown (presets **5 min** to **30 min**), pauses and resets it. With **Show to all**, participants see it in a bar above the call; moderators always see it in the time strip, where its colour and ring follow the time left. A paused timer resumes where it stopped. It ends with **Time's up!**, which stays on screen for 30 seconds.
+- **Raised hands.** They are listed in the **Participants** panel, in order, visible to everyone. A hand stays up while its owner speaks, until they lower it or a moderator deals with it.
 
 ### Recording in the room
 
 *Optional*, and only when the event enables recording.
 
-- Participants and guests see a **Recording consent** dialog before they enter, when the installation can record (Jibri, or the per-participant recorder). They can choose **Do not participate**. The waiting room's recording notice follows the same rule.
-- While recording is running, a banner stays visible to everyone.
-- Moderators start and stop the recording. With **Start recording automatically**, it starts on its own.
+- The waiting room says that the event is recorded, when the installation can record (Jibri, or the per-participant recorder). Whoever has not given the recording consent at registration (a guest from the room link, a registrant on another browser) ticks it there, next to the event's privacy notice, before entering; a registrant who gave it enters with one click. On a listen-only event the waiting room only informs.
+- While recording is running, a red **REC** icon stays in the top bar for participants and speakers; moderators see it, with the recording's duration, in the time strip. The duration comes from the start the room reported to the server, so every moderator sees the same figure, also after joining late.
+- Moderators start and stop the recording from the **Control** panel; stopping asks for confirmation. The wizard does not offer **Start recording automatically**; an event saved with it starts the recording on its own when a moderator joins, until the switch is turned off.
 
 The two capture paths (a composite video from Jibri, and per-participant audio from the recorder bot) are described in [Recording: composite video and per-speaker audio](architecture/recording.md).
+
+### Live captions
+
+*On by default* where the installation runs the captions service.
+
+- While the event runs, what each person says appears as captions over the video, with the speaker's name, a few tenths of a second after the words. Speech is transcribed by a recognizer inside the installation, on CPU: no audio or text leaves it, and the text is not kept unless the event keeps a transcript from captions.
+- Each viewer hides or shows the captions for themselves with the captions button in the call's toolbar; screen readers hear the finished sentences.
+- The waiting room tells participants that captions are on, and whether the text is kept.
+- **Transcript from captions.** *Optional*, per event, a sub-option of **Automatic captions** in the wizard; the new-event questions turn it on when the event can be recorded. The sentences of the people who consented to the transcription of what they say are kept with their name and, when the event ends, become its transcript, even without a recording or AI post-production. Everyone else appears only in the live captions. Staff review it in the **After the event** tab, correct it in the transcript editor and can publish it on the event page without a video. See [After the event](#transcript-from-captions).
+- Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**; administrators turn them off for the whole instance in the site settings.
+- The event's vocabulary (glossary, organizers, moderators and speakers) helps the recognizer write names and acronyms right.
+- If the service falls behind, it captions fewer speakers at once, then pauses and resumes on its own; the room and the status page say so.
+
+How it works, how to size it and its limits are in [Live captions](architecture/live-captions.md).
 
 ### Whiteboard
 
@@ -293,16 +314,16 @@ Its content is not saved: moderators are reminded to export it and attach it as 
 
 ### Mobile
 
-Below 992 px, the layout is a full-screen video with a floating control bar, and the drawer opens as a bottom sheet. Below 768 px, the Jitsi toolbar shrinks to microphone, camera, raised hand and settings, plus reactions in native mode. Moderators also get the participants pane. Screen sharing is hidden on phones because `getDisplayMedia` is not available inside iframes on iOS and most Android browsers.
+Below 992 px, the layout is a full-screen video with a floating control bar, and the drawer opens as a bottom sheet. Below 768 px, the Jitsi toolbar shrinks to microphone, camera, raised hand and settings, plus reactions in native mode. Moderators run the room from the **Participants** panel of the drawer. Screen sharing is hidden on phones because `getDisplayMedia` is not available inside iframes on iOS and most Android browsers.
 
 ### Leaving
 
 **Leave room** takes participants out, to a screen that says the event is still in progress and offers **Rejoin**. Moderators get a choice:
 
 - **Just leave.** The call goes on for everyone else. The leaving screen reminds the moderator that the event stays open until someone chooses **End for everyone**.
-- **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
+- **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**, and says which sections the ended page will show for this event. Polls still open are closed when the event ends, and no poll can be created or reopened afterwards. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
 
-When the event ends, participants get the feedback form, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead.
+When the event ends, however it ends, the closing screen asks everyone except moderators for the end-of-event rating, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead, which offers **Leave a rating** without waiting for the end. The rating is asked once per visit, whether it is answered or skipped. Only people who took part can rate. A registrant who entered the room rates once, with their registration. Someone who entered without registering presents the room token they received on entry, which the portal signed for that room, and rates once per entry: they are anonymous, and re-entering gives a new seat. Moderators do not rate. The public page of an ended event offers the rating only to a registrant who entered the room, recognized by the rating link in the thank-you email (a signed link that serves only to rate) or by the access cookie of the browser they registered from; everyone else rates in the room, at the end. The thank-you email invites to rate only those who entered the room; the others receive the recap.
 
 Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configuration reference](CONFIGURATION.md) · [From creation to recap: the event journey](architecture/event-journey.md).
 
@@ -310,21 +331,21 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configu
 
 Moderators and speakers have no accounts. They enter through magic links.
 
-- **Moderator link.** It is the event's primary link (`?token=`). It identifies a *seat*, not a person: everyone who opens it is a moderator. An administrator can regenerate it from **Moderators**, and the old link then stops working.
-- **Named grants.** Each is a personal link for one co-moderator (role `MODERATOR`) or speaker (role `SPEAKER`). They are created in the wizard's **People** step or on the event page, and each can be revoked on its own.
+- **Moderator link.** It is the event's primary link (`?token=`). It identifies a *seat*, not a person: everyone who opens it is a moderator. An administrator can regenerate it from **Moderator links**, and the old link then stops working.
+- **Named grants.** Each is a personal link for one organizer or moderator (role `MODERATOR`) or speaker (role `SPEAKER`), with the person's organization and whether the public page lists them. They are created in the wizard's **People** step or on the event page, and each can be revoked on its own. Next to **Copy link**, **Prepare email** opens the organizer's own mail program with a message holding only that person's link; the platform sends nothing for it, and there is no way to copy every link at once.
 - **Where to find the links.** The event page in the administration area shows them. **Share** in the room can also reveal the moderator link to a moderator, with a warning. The platform does not email magic links.
 
 What a moderator can do in the room:
 
 | Area | Controls |
 |---|---|
-| Start and end | **Start event** in the waiting room. **End event** in the moderator bar, or **End for everyone** from **Leave room**. |
-| Audio and video | **Participant mic** and **Participant video** moderation. Jitsi's own mute-everyone, security and participants-pane buttons. Remove a participant. |
-| Raised hands | **Give the floor** (audio and video), **Audio only**, **Lower hand**. |
-| Recording | **Start recording** and **Stop recording**, when the event enables recording. While the recorder starts, the button reads **Recording starting…**; if it has not started within the provisioning timeout, **Recording unavailable**; without a declared recordings storage (`RECORDING_STORAGE_TYPE`), **Recording not configured in infrastructure**. A running recording can always be stopped. |
-| Interaction | Toggle Q&A, chat, **Notes / Checklist** and **Word cloud**. Run polls, word-cloud rounds and the presentation timer. Moderate Q&A and hide chat messages. Add materials. |
+| Start and end | **Start event** in the waiting room. **End event** at the bottom of the **Control** panel, set apart and with a confirmation, or **End for everyone** from **Leave room**. |
+| Audio and video | In the **Participants** panel: **Mute everyone**, **Turn off all video**, the **Microphones locked** and **Video locked** switches, and per person **Mute**, **Turn off video**, **Take back the floor** and **Remove**. Jitsi's own security button. When an event does not grant participants the microphone, camera or screen, the room starts locked on the bridge. |
+| Raised hands | In the **Participants** panel: **Give the floor** (audio and video), **Audio only**, **Lower hand**. |
+| Recording | In the **Control** panel, **Start recording** and **Stop recording** (with a confirmation), when the event enables recording. While the recorder starts, the button reads **Recording starting…**; if it has not started within the provisioning timeout, **Recording unavailable**; without a declared recordings storage (`RECORDING_STORAGE_TYPE`), **Recording not configured in infrastructure**. A running recording can always be stopped. |
+| Interaction | In the **Control** panel, switch Q&A, chat, **Agenda** and **In one word** on and off for everyone, open the whiteboard, and run the talk timer. Run polls, word-cloud rounds and the agenda. Moderate Q&A, hide chat messages and remove words from the word cloud. Add, edit and delete materials, and see how often each was opened. |
 
-Speakers always have full audio, video and screen sharing. They have no moderation powers and no recording control, and they skip the participant recording-consent dialog.
+Speakers always have full audio, video and screen sharing. They have no moderation powers and no recording control, and the waiting room does not ask them for the recording consent.
 
 A token that is shared or forwarded cannot act as another person: editing a chat message, for example, needs a personal identity. See [Identity, access and tokens](architecture/identity-and-access.md).
 
@@ -332,37 +353,52 @@ Configured in: [Identity, access and tokens](architecture/identity-and-access.md
 
 ## Organizers
 
-Organizers are staff accounts with the role `ORGANIZER`. They sign in with a one-time link sent by email, and they see and manage only the events they created. See [ADR-014](adr/014-organizer-role.md).
+Organizers are staff accounts with the role `ORGANIZER`. They sign in with a one-time link sent by email, and they see and manage the events they created and those where they are named as an organizer with the same email address. See [ADR-014](adr/014-organizer-role.md).
 
 ### The event wizard
 
-Creating and editing an event use the same five steps. The wizard keeps an unsaved draft in the browser and offers to restore it.
+A new event starts from four questions instead of a list of named templates: **How many people do you expect?** (up to 20, up to 100, more than 100), **Who can speak and appear on video?** (everyone, or speakers and moderators while the audience writes in the chat), **Do you want to be able to record?** (yes, when you press **REC**, or no), **Who can take part?** (**Anyone who registers**, or **Only people you invite**, which also keeps guests out; the answer proposed is the one that matches **Public registration enabled**). A preview next to the questions shows the event that follows. Every room feature (chat, Q&A, agenda, “In one word” questions) starts on and can be turned on or off during the event. The answers live in the address (`?formato=medio.tutti.si.tutti`), so a reload keeps them; the organization's own templates stay under **Or use one of your organization's templates**.
+
+Creating and editing an event then use the same four simple steps, plus **Advanced settings** apart. When creating, a band above the steps names the format (or the template) in use, with **Change format**, which brings back the answers given; what was written about the event (title, description, dates, people, content) moves to the new format, which brings its own settings, and a notice offers **Start over**. The wizard keeps an unsaved draft in the browser, one per format or template, and offers to restore it when the same one is opened again. When editing, **Update event** is available on every step, and the edit links on the event page open the part they refer to (`?step=` on the edit address, `&section=` for a section of the advanced settings).
 
 | Step | Label | What it covers |
 |---|---|---|
-| 1 | **Basics** | Title and Markdown description in each enabled language, cover image, schedule and time zone, recurrence, tags, expected participants and the share expected to use a microphone or camera. Also the waiting-room audio. In **Advanced options**: the waiting-room layout, the video quality and the title kicker. |
-| 2 | **Permissions** | **Who can do what**: a grid of roles against chat, Q&A, microphone, camera, screen share and recording control. Recording and its options. Room features (**Live notes / checklist (agenda)**, **Live word cloud**, **Shared whiteboard**). *Optional* **Automatic post-production**. |
-| 3 | **People** | Co-organizing organizations, co-moderators, speakers and invitations. Administrators can also pick people from the address book. |
-| 4 | **Content** | Materials (a file or a link, each with a visibility setting) and questionnaires. |
-| 5 | **Review** | A summary, a capacity estimate, the privacy notice (a template, custom text or a document), the retention period and the primary moderator. **Save as draft** or **Publish event**. |
+| 1 | **Event** | Title and Markdown description in each enabled language, cover image, tags (when the installation has some). Under the title, how to add a kicker (`Kicker \| Title`); once the title has one, the choice to show it and a preview of the title as it will appear ([kicker](configuration/branding.md#editorial-title-kicker)). |
+| 2 | **When** | Start, end and time zone (the end follows the start, keeping the template's duration), expected participants, recurrence (folded). |
+| 3 | **People** | The lead organizer, who receives the event's main link (prefilled with the staff account creating the event; organization, logo and **Show on the public page** folded). Organizing entities, the event's people in one list, each with a role (**Organizer**, **Moderator** or **Speaker**), an organization with an optional logo and **Show on the public page**. **Who registers**: anyone, or only invitees (while an event has no choice of its own, the site setting applies), with a warning when an invitation-only event has no invitees yet; **What we ask people who register**: name and email always, plus **Organization (required to register)**, **Role (optional)** and **Organization type (optional)**. Then invitations, open when the event is invitation-only. Each section opens on demand and shows how many entries it holds. Administrators can also pick people from the address book. |
+| 4 | **Summary** | What is still missing to publish, each item a link to its field; then the event as others will see it, in one card with an icon per line: when, expected participants, who organizes and speaks, who can register and what registration asks for (with **Add invitees**, highlighted, when an invitation-only event has none), who can speak and appear on video, the room features, the recording (and, after it, transcript, summary and translation, with **Change languages** to tick the translation languages right there), the privacy notice. **Customize the settings** opens the advanced settings. **Save as draft** or **Publish event**. |
 
-A new blank event starts with chat on, Q&A off, and participants' microphone, camera and screen share off (`defaultMatrix()` in `app/src/lib/utils/permission-matrix.ts`).
+**Advanced settings** gathers what the template has already chosen, in sections that open on demand: **Participation and room features** (roles, the grid of what participants can do, agenda, “In one word” questions, shared whiteboard), **Recording and AI** (recording and **Automatic post-production**, offered when the installation has it on), **Content: materials and questionnaires**, **Waiting room and video** (waiting-room layout, video quality, waiting-room audio), **Privacy, data and the page after the event** (the privacy notice: a template, custom text or a document; retention, at most 365 days; whether the page stays visible), **Technical details** (a capacity estimate and the share expected to use a microphone or camera). The section reached from the summary (a capacity warning opens **Technical details**) is open, in view and focused; **Back to summary** returns.
+
+Required fields say so before anything is pressed. While empty, they pulse in blue with a line saying what they are needed for (**Needed to save the event.**, or **Needed to publish the event.** for the lead organizer's name and email); after a refused attempt they insist in amber. The step bar marks **To complete** under each step with a required field still empty, and the summary lists every missing field.
+
+The video recording never starts by itself: a host starts it with **REC**. The per-participant recorder, when the event has per-participant tracks, joins as soon as the event is live, whether or not **REC** is pressed ([Recording](architecture/recording.md)). Turning recording on while creating an event also turns on transcription, summary, translation into the installation's default languages (when it has some) and per-participant tracks, when the installation has AI post-production on; each can be turned off in **Advanced settings**. Answering yes to **Do you want to be able to record?** also turns on **Transcript from captions**, which takes effect where live captions are available. The automatic start is not offered: an event saved with it shows the switch while editing, so it can be turned off, and its summary says the recording starts on its own. The server never sets it on a new, duplicated or template-made event.
+
+A new event lasts one hour unless its template sets another duration. When the start changes, the end follows it on leaving the field, keeping the duration the event had.
+
+- **Links by email.** The personal links of the primary moderator, co-moderators and speakers are emailed when the event is published, not while it is a draft ([Moderator and speaker links](architecture/email.md#moderator-and-speaker-links)).
+- **With the moderator link only.** Someone who opens the wizard with the primary moderator link, without a staff session, sees invitations, materials and questionnaires but cannot change them: those belong to the staff.
+
+- **Errors.** When a step or the submission is refused, the focus moves to the first field to fix, which is marked as invalid and tied to its message; a list next to **Back** and **Next** links to each field. A message disappears as soon as its field is valid.
+- **After creation.** The wizard lands on the event's page with a summary on top: **Event published**, **Draft saved** or **Publishing failed** (a publish that was refused leaves a draft), **Copy the participant link**, **Moderator and speaker links** (the **People** tab), and the kinds of resources it could not save (organizations, invitations, co-moderators, speakers, materials, questionnaires), which can be added from that page. The summary stays until it is closed.
+- **Materials.** A file uploaded in the **Content** step is saved with its storage key, name, size and type, so deleting the material or the event removes the file too; an address typed there is a link.
 
 ### Reuse and series
 
-- **Event templates.** A template pre-fills the wizard: features, permissions, recording and AI options, default duration, retention and a description skeleton. Organizers pick templates, and administrators manage them.
-- **Duplicate.** **Duplicate as next occurrence** (in the event card's menu) and **Duplicate for next time** (on the event page) create a draft copy of the whole configuration, including tags, co-organizing organizations, named grants (with new links), agenda, questionnaires and reminders. If the event has a recurrence rule, the copy is dated to the next occurrence.
+- **Event templates.** A template pre-fills the wizard: features, permissions, recording and AI options, default duration, retention, whether the page stays public after the event, and a description skeleton. A new installation has five, named in Italian and renamable, each built around a typical scenario. The participant figure is an estimate used to size the media bridge, not a limit: registrations beyond it are accepted. **Webinar pubblico** (large audience, hundreds of people): moderators and speakers on video with screen sharing, the audience listens and takes part with chat, Q&A, polls and the agenda; recording is available and a moderator starts it, with per-participant tracks, transcript, summary and translations when recorded, on a public page; sized for about 300 people, ninety minutes. **Evento partecipativo** (open meeting of about a hundred people): everyone can speak, use the camera and share the screen, with chat and “In one word” questions; recording is available and a moderator starts it, with per-participant tracks, transcript, summary and translations when recorded; sized for about 100 people, one hour. **Riunione di lavoro** (small group): everyone can speak, use the camera and share the screen; no recording and no public page afterwards; sized for about 20 people. **Corso di formazione** (virtual classroom of a few dozen people): participants can speak and use the camera, ask questions (Q&A) and answer “In one word” questions, with the course agenda; recording is available and a host starts it, with per-participant tracks, transcript, summary and translations when recorded; no public page afterwards; sized for about 50 people, two hours. **Conferenza stampa** (press conference): speakers on video with screen sharing, journalists ask in writing (Q&A and chat) and the moderator gives the floor; recording is available and a moderator starts it, with per-participant tracks, transcript, summary and translations when recorded, on a public page; sized for about 150 people, one hour. Per-participant tracks are recorded only for the participants who consent to the transcription of what they say; the consent is optional and does not affect registration or entry. The wizard only applies the AI and track settings when AI post-production is on for the installation. Organizers pick templates, and administrators manage them.
+- **Duplicate.** **Duplicate as next occurrence** (in the event card's menu) and **Duplicate for next time** (on the event page) create a draft copy of the whole configuration, including tags, co-organizing organizations, named grants (with new links), agenda topics (without their progress), questionnaires and reminders. Invitations are not copied, so a copy open only to invitees accepts no registrations until invitees are added. If the event has a recurrence rule, the copy is dated to the next occurrence.
 - **Recurrence.** Daily, weekly, weekdays, monthly or a custom RRULE, with a preview of the next five occurrences. The rule does not create occurrences by itself: each one is made by duplicating the previous one.
 
 ### Running your events
 
+- **Event list.** **Events** in the administration lists the most recently created events first and hides archived events; the **Status** filter shows them again, with the number of events in each status. **Create new event** and **New quick call** sit side by side at the top; the second opens the quick-call form directly.
 - **Questionnaires.** A pre-registration questionnaire and a post-event questionnaire. Each combines reusable templates with questions for that event only (single choice, multiple choice, yes/no, Likert scale, open text).
 - **Materials.** Documents and links, uploaded to object storage or referenced by URL. Each material has a visibility of **In the room and after the event** (the default), **Before the event**, **During the event** or **After the event**, and the server applies it on every public surface: the event page before the start, the live-room materials panel and the concluded event page. The status decides the phase: `LIVE` counts as during, `ENDED` and `ARCHIVED` as after, and otherwise the schedule decides. Before the start, the public event page lists only the materials marked **Before the event**: a material left on the default appears in the live room during the event and on the concluded event page, never on the page before the start. Moderators see every material in the room, and staff see every material in the administration area. A staff session does not change what the public surfaces list. Visibility filters the lists only: a file stays downloadable from its URL by anyone who already has it, so it is not a way to keep a document confidential.
 - **Co-organizing organizations.** A name, logo and website for each partner organization. These are display information only and grant no access.
-- **Event page tabs.** **Overview**, **People** (registrations with CSV export, and the named grants), **Content**, **After the event** and **Statistics**. Invitations are edited in the wizard's **People** step.
+- **Event page tabs.** **Overview**, **People** (registrations with CSV export, and the named grants), **Content**, **After the event** and **Statistics**. Invitations are edited in the wizard's **People** step. Among the **Active features** of the **Overview**, **Registration open to all** shows who can register in practice, from the event's choice or the site setting; instant calls, which have no registration, do not show it.
 - **Statistics.** Conversion, peak participants, duration, distinct interactors, raised hands, reactions, retention and an activity timeline. The composite attention score appears only in the administration area, to staff who manage the event. It is never public.
 - **Instant calls.** Under **Instant calls**, **Create and join** opens a room immediately. The creator gets the moderator link. Everyone else gets full audio, video, screen sharing and file sharing. The whiteboard is on, where the installation supports it, and the creator (moderator) can open it for everyone. An optional join password is available. An instant call closes after inactivity, keeps its data for a short period, and has no public page unless someone turns one on.
-- **Recordings and AI.** Organizers work with the recordings and AI outputs of their own events under **Video & sessions** and **Transcripts / AI**. They can also upload an existing video onto an event.
+- **Recordings and AI.** Organizers work with the recordings and AI outputs of their own events under **Video** (**Recordings**, **AI post-production**, **Glossary**). They can also upload an existing video onto an event.
 
 Current limits:
 
@@ -375,15 +411,15 @@ Configured in: [From creation to recap: the event journey](architecture/event-jo
 
 Administrators are staff accounts with the role `ADMIN`, and they manage the whole installation. The instance API key (`ADMIN_API_KEY`) still works for emergencies and automation. See [ADR-015](adr/015-named-administrators.md).
 
-- **Accounts** (**Staff accounts**). Add a person as an organizer or an administrator, send them a sign-in link, deactivate or reactivate them, or delete them. A deleted organizer's events go back to the administration.
-- **Settings.** One runtime panel, with no redeploy needed: **Branding**, **Header**, **SEO**, **Home page**, **Pages**, **Footer**, **Features**, **Infra sizing** and **Post-event AI pipeline**. It covers the organization's names, logo, favicon and primary color, the email sender name and reply-to, link previews, the reactions mode, Gravatar (*optional*, fetched through the platform's own server), the scale-to-zero knobs and the AI switches. Under **Features**, **Guest access enabled** decides whether people can join a live scheduled event without registering, **Public registration enabled** decides whether anyone can register or only invitees (see [Registration and access](#registration-and-access)), and **Status page enabled** decides whether the status page is public. Each pod applies a change within a minute. See [Runtime settings](configuration/runtime-settings.md) and [Branding and white-labeling](configuration/branding.md).
+- **Staff and access**: **Staff accounts**, then **Moderator links** (copy or regenerate each event's moderator link). In **Staff accounts**, add a person as an organizer or an administrator, send them a sign-in link, deactivate or reactivate them, or delete them. A deleted organizer's events go back to the administration.
+- **Settings.** One runtime panel, with no redeploy needed: **Branding**, **Header**, **SEO**, **Home page**, **Pages**, **Footer**, **Features**, **Infra sizing** and **Post-event AI pipeline**. It covers the organization's names, logo, favicon and primary color, the email sender name and reply-to, link previews, the reactions mode, Gravatar (*optional*, fetched through the platform's own server), the scale-to-zero knobs and the AI switches. Under **Features**, **Guest access enabled** decides whether people can join a live scheduled event without registering (an event open only to invitees never admits them), **Public registration enabled** decides whether anyone can register or only invitees for the events that make no choice of their own (see [Registration and access](#registration-and-access)), and **Status page enabled** decides whether the status page is public. Each pod applies a change within a minute. Web addresses typed without a scheme (`www.example.org`), including the logo, image and footer-link addresses, are saved with `https://`; footer links that are site paths (`/privacy`) stay as they are. When a value is rejected, the panel opens the tab that holds the field, moves the focus to it, marks it as invalid and says what to write there. See [Runtime settings](configuration/runtime-settings.md) and [Branding and white-labeling](configuration/branding.md).
 - **Languages.** Choose the enabled EU languages and the default language, and override any interface string for the organization's own terminology (**Custom translations**).
-- **Templates and catalogs.** **Event templates**, **GDPR templates** (reusable privacy notices, one marked as the default), **Email templates** (the confirmation and reminder emails, per language) and **Tag management**.
+- **Templates and catalogs.** **Event templates** (under **Events**), **Privacy notices** (reusable privacy notices, one marked as the default), **Email templates** (the confirmation and reminder emails, per language) and **Tags** (under **Settings**).
 - **Address book.** People who opted in at registration. Their profile updates when they register again. Opting out removes them. The address book is for administrators only. See [ADR-011](adr/011-person-rubrica.md).
-- **People.** **Sign-ups** across all events, **Moderators** (copy or regenerate each event's moderator link) and **GDPR audit** (a log of deletions, recorded consents and exports).
-- **Questionnaires.** The **Template library**, **Responses and statistics**, and a **Feedback** dashboard.
+- **People.** **Sign-ups** across all events, the **Address book** and the **GDPR log** (deletions, recorded consents and exports).
+- **Questionnaires.** **Questionnaire templates**, **Responses**, and a **Feedback** dashboard.
 - **Publications.** One editorial hub for every published video: events, instant calls, uploaded archive items, and recordings waiting to be promoted. **New publication** uploads an existing video (MP4, WebM, MOV or M4V, up to 5 GB) straight to object storage and adds its metadata. It works with Azure Blob and with S3-compatible stores (AWS S3, MinIO, Google Cloud Storage through its S3 interoperability). The storage must accept the upload from the browser: its CORS policy must allow `PUT` from the portal origin, and an S3-compatible endpoint must be an HTTPS address that browsers can reach. See [Object storage](configuration/storage.md#5-browser-upload-of-videos).
-- **Video & sessions.** A library of all recordings, with **Orphans** (files in storage that belong to no event, deleted after a grace period unless kept), and **Transcripts / AI**.
+- **Video.** **Recordings** (a library of all recordings, with **Orphans**: files in storage that belong to no event, deleted after a grace period unless kept), **AI post-production**, the post-production **Glossary**, **Publications** and **New publication**.
 - **Analytics.** Figures across all events: registrations, participants, conversion, peaks, Q&A, polls and feedback.
 - **Monitoring** and **Infrastructure.** Availability, latency, capacity, hardware, chat and Redis charts (these need Prometheus), plus a component view: deployment mode, database, Jitsi, bridges and scaler, Jibri, storage and email. See [Monitoring and health](operations/monitoring.md).
 
@@ -394,13 +430,28 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [Brandin
 ### The concluded event page
 
 - **Visibility.** The page stays public after the end unless it is switched off, and it can close at a set date. Instant calls start with it off. When it is off or has expired, the page returns "not found" and leaves listings and the sitemap.
-- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results, the most-shared words and the average rating.
+- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results and the most-shared words. The average rating is read when the page is served, so later ratings count; when fewer answers are left than the summary counted, for example after an erasure, the stored figure is shown. It appears only while the event shows its feedback.
 - **Video.** A published recording plays in the platform's player, with speed control, picture-in-picture, keyboard shortcuts, subtitle tracks and a download link. If the event has a YouTube URL, the page shows a **Watch the video on YouTube** link. Nothing from YouTube loads until the visitor follows it.
-- **Tabs.** **AI transcript**, **Questions & Answers** (answered and highlighted questions), **Materials**, **Polls** (published results only) and **Feedback**. Each event can hide the Q&A, materials, polls, feedback, recap and word-cloud sections.
+- **Tabs.** **AI transcript** (also for a transcript from captions, with or without a video), **Questions & Answers** (answered and highlighted questions, with their written answers), **Materials**, **Polls** (published results only) and **Feedback**. Each event can hide the Q&A, materials, polls, feedback, recap and word-cloud sections.
+- **After the retention period.** The event's personal data is deleted, but the page and its content stay as configured: questions and answers, polls, words, ratings and materials remain, without the names of the people who wrote, voted or added them. See [Privacy and data protection](GDPR.md#what-stays-after-event-retention).
 
 ### Recording publication
 
 A recording stays private until a moderator or the administration publishes it (**Publish recording**) and picks how long it stays online, from **24 hours (temporary)** up to the event's retention deadline. **Publish to the video library** then lists the event in the **Video library**. Whatever is chosen, the event's GDPR retention still applies. See [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
+
+When the recording, or an external video, becomes visible on the event page, every registration the event still keeps receives one email with the event page link (**Notify registrants when the recording is published**, on by default). It goes out once per event, and only after the page itself is public. The switch can be turned off until the notice is sent; the panel then shows when it went out. Once data retention has deleted the registrations, nobody is notified. See [Email and calendar](architecture/email.md#recording-notice).
+
+### Transcript from captions
+
+*Optional*, per event, where the installation runs live captions. An event with **Transcript from captions** gets a transcript without a recording and without AI post-production:
+
+- During the event, the sentences of the people who consented to the transcription of what they say are kept, with their name. Of everyone else, only the fact that someone spoke is kept.
+- After the event it becomes the event's transcript on its own, at the next run of the reminders job once sentences have stopped arriving, and it is brought up to date if more sentences arrive or the video recording arrives later. The panel **Transcript from captions**, in the **After the event** tab, counts the saved sentences, the people who spoke and the sentences not saved for lack of consent, and offers **Build the transcript** or **Update from captions**, **Open in the editor** and **Publish the transcript on the event page**.
+- Staff correct it, name the speakers and erase passages in the same editor as AI transcripts. It never replaces an AI transcript or one corrected by hand, and an AI transcript made later replaces it.
+- Once published, the event page shows it in the **AI transcript** tab, also without a video, with a notice that it comes from the live event's automatic captions and includes only the people who consented. It has no subtitle track. Published on its own, only its text is public, with the `.txt` and `.srt` downloads.
+- A registrant who asks for erasure is removed from it: sentences, name and speaker entry.
+
+How it works: [Live captions](architecture/live-captions.md#transcript-from-captions).
 
 ### AI outputs
 
@@ -410,16 +461,16 @@ A recording stays private until a moderator or the administration publishes it (
 - the event's **Automatic post-production** options;
 - a recording.
 
-The public page shows AI outputs only when the recording is published and the concluded page is public.
+The public page shows AI outputs only when the recording is published and the concluded page is public. A transcript can also be published on its own, without the video: then only its text, in the original language, is public.
 
 | Output | Where it appears | Needs |
 |---|---|---|
 | Transcript | **AI transcript** tab: search, click a line to jump the video there, follow mode, **Now speaking**, shareable links to a moment, personal bookmarks kept in the browser, low-confidence and overlapping-speech marks, and downloads (`.txt`, `.srt`, `.vtt`). | **Automatic transcription** |
 | Subtitles | Subtitle tracks in the player, in the original language and in each translation. | Transcription (translations also need **Translation into other languages**) |
-| Summary and chapters | A summary card with **Decisions taken**, **Action items** and chapters that jump the video. It can be read in several languages. | **Summary and chapters** |
+| Summary and chapters | A summary card with **Decisions taken**, **Action items** and chapters that jump the video. When the event used the agenda, the chapters are its topics, in the order and at the time the host started them. It can be read in several languages. | **Summary and chapters** |
 | Translations | The transcript, summary and subtitles in the target languages. | **Translation into other languages** |
 | Dubbed audio | An **Audio** selector in the player, with a banner saying the voice is synthetic. It uses catalog voices only and never clones anyone's voice. | **Audio dubbing** (needs translation) |
-| Speaker labels | Speaker names on transcript lines. By default, diarization separates the voices and staff name them. Per-participant recording attributes each line with certainty. | Transcription. For certain attribution, **Per-participant recording**, with each participant's consent |
+| Speaker labels | Speaker names on transcript lines. By default, diarization separates the voices and staff name them. Per-participant recording attributes each line with certainty; its transcript holds only the voices of the participants who consented. | Transcription. For certain attribution, **Per-participant recording**, with each participant's consent |
 
 The transcript and the summary carry the **AI-generated content** label, and dubbed audio carries a synthetic-voice banner.
 
@@ -433,9 +484,24 @@ In the administration area, staff can:
 
 The pipeline is described in [AI post-production](POSTPROD.md), and the decision in [ADR-016](adr/016-in-cluster-ai-postproduction.md).
 
+### AI event report
+
+*Optional*, per event, where the AI pipeline is on. A report for those who were not there and for those who want to look back:
+
+- Staff request it from the **AI event report** panel of the **After the event** tab, usually once the ratings are in, and can regenerate it. It needs an ended event still within its data retention; the panel lists the material available and the languages to translate into.
+- The language model writes the text in the cluster: summary, highlights, the topics explained (with the minute they started, the level of agreement and the positions in favour, concerns and questions), a concept map, agreement and disagreement, what participants gained, their feedback, open questions and next steps. It reads the transcript, the chat without names, the questions, the published polls, the words, the agenda reactions and the ratings. Every figure and chart comes from the platform, not from the model.
+- Staff read it in a preview and publish it with **Show the report on the event page**; a regenerated report must be published again. The public page then shows it after the video, with participation figures and charts over time, the agenda's agree and disagree bars, the polls, the rating distributions and a concept map that can be explored with the keyboard. It is shown in the page's language when it was translated, otherwise in the event's language with a note.
+
+How it works: [AI post-production](POSTPROD.md#the-event-report).
+
 ### Feedback
 
-When the event ends, participants get the post-event questionnaire if the event has one, or a 1–5 star rating otherwise. Results feed the **Feedback** tab, the recap and the **Feedback** dashboard. The follow-up email is *optional* and sends registrants a thank-you with the recap and a feedback link, and the moderator a recap.
+The end-of-event rating is the event's post-event questionnaire. Every event, instant calls included, gets the platform's generic feedback questionnaire when it is created with feedback collection on; organizers can change it or remove it. The room asks for it as described in [Leaving](#leaving), and the concluded event page offers it too while it shows feedback. Organizers see the answers without the respondent's name, and the form says so.
+
+- **Ratings.** On the event page in the administration area, the **After the event** tab has a **Ratings** panel: the average and distribution of each question, every comment, the older star ratings, and **Download CSV**. Administrators, the event's organizer and its moderators see it; speakers do not.
+- **One average.** The **Feedback** tab of the concluded page, the recap and the event's **Statistics** tab show the same average rating, on a 1–5 scale.
+
+The follow-up email is *optional* and sends registrants a thank-you with the recap and a feedback link, and the moderator a recap.
 
 Configured in: [AI post-production](POSTPROD.md) · [Setting up recording](operations/recording-setup.md) · [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
 

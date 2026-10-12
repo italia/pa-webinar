@@ -34,6 +34,7 @@ const evento = (over: Partial<PanelReadEvent> = {}): PanelReadEvent => ({
   id: 'evt-1',
   status: 'LIVE',
   eventType: 'SCHEDULED',
+  accessMode: null,
   moderatorToken: 'tok-mod',
   joinPasswordHash: null,
   ...over,

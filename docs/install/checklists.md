@@ -196,7 +196,7 @@ stop, or warn, before they change anything. The commands let you check ahead.
       pa-webinar`; on k3s also `$S/helm-notes.txt`).
 - [ ] **The first sign-in**, with **Sign in with the instance key** at
       `/en/admin/login`.
-- [ ] **A named administrator**: **People** > **Accounts**, the
+- [ ] **A named administrator**: **Staff and access** > **Staff accounts**, the
       **Administrator** role, **Send the sign-in link now**. The link arrives:
       that is the test of the SMTP relay.
 - [ ] **A first event**: **New event**, a template or **Configure manually**,
@@ -226,8 +226,8 @@ Each step with the result to expect ([First steps](minikube.md#first-steps)):
       both hear and see each other.
 - [ ] **System status** shows two participants and one conference;
       **Monitoring** > **Infrastructure** shows **Fixed mode**.
-- [ ] **End for everyone** closes the room and shows the page with the
-      feedback form.
+- [ ] **End for everyone** closes the room and shows the registrant the
+      closing screen with the rating form.
 - [ ] `scripts/verify-install.sh --context pa-webinar ... --call` exits `0`.
 - [ ] When you are done, `scripts/minikube-down.sh --purge`, and the
       profile's name typed when it asks (`--yes` skips the question): the
@@ -342,7 +342,7 @@ Before the first public event. The owner is in each group's title.
       (IT).
 - [ ] The images you run scanned with your scanner, since published images
       are not scanned after publication (IT).
-- [ ] Staff accounts reviewed under **People** > **Accounts**: people who
+- [ ] Staff accounts reviewed under **Staff and access** > **Staff accounts**: people who
       left removed (IT, with Communications).
 - [ ] Certificates: your own renewed before they expire; with a private
       authority, the script run once a year re-signs them (IT).
@@ -488,7 +488,7 @@ mode, change the Secret and restart the portal
 | Key | Rotate | What else |
 |---|---|---|
 | `ADMIN_API_KEY` | Yes, whenever it may have leaked | New sign-ins with the instance key need the new value; sessions continue |
-| `CRON_API_KEY` | Yes | The scheduled jobs read it at their next run. Restart the recorder controller if it runs, and update the ServiceMonitor's bearer if you use one |
+| `CRON_API_KEY` | Yes | The scheduled jobs read it at their next run. Restart the recorder controller if it runs and the live captions service, and update the ServiceMonitor's bearer if you use one |
 | `SMTP_PASSWORD` and the other SMTP settings | Yes | On k3s, a new file with `--smtp-file` |
 | `JITSI_JWT_SECRET` | Yes, outside events | Both Secrets take it from the same line. Then restart Prosody, which drops the calls in progress: `kubectl -n pa-webinar rollout restart statefulset/pa-webinar-jitsi-meet-prosody` |
 | Object storage keys | Yes, at your provider; not scripted for Garage | Restart the portal |

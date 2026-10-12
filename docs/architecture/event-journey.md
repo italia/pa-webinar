@@ -23,8 +23,8 @@ flowchart TB
 
   subgraph ORG["Organizer: administration area"]
     direction TB
-    O1["Template<br/>or blank form"]:::portal
-    O2["Event wizard<br/>five steps"]:::portal
+    O1["Four questions<br/>or a template"]:::portal
+    O2["Event wizard<br/>four steps"]:::portal
     O3["DRAFT"]:::emph
     O4["PUBLISHED"]:::emph
     O5["Share links<br/>public page, guest link,<br/>moderator and speaker links"]:::portal
@@ -62,31 +62,35 @@ An event is one row of the `Event` model (table `events`) plus a handful of rela
 | Type | `eventType`: `SCHEDULED` (the default), `INSTANT` for [instant calls](#instant-calls), `LEGACY` for recordings imported from an external source, which have no live room. |
 | Status | `status`, one of `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` ([event-lifecycle.md](event-lifecycle.md)). |
 | Tags | `Tag` (slug, multilingual name, color, sort order) linked through `EventTagLink`. |
-| Co-organizing organizations | `EventOrganizer` rows: a name, an optional logo and an optional website, shown on the public page. Display metadata only: they grant no access and receive no email. The older single-string `organizerName` column is still read as a fallback. |
-| Owner | `createdById`, the staff account that created the event. Administrators manage every event; an organizer manages only the events they created ([ADR-014](../adr/014-organizer-role.md)). An event without an owner is managed by administrators only. |
+| Co-organizing organizations | `EventOrganizer` rows: a name, an optional logo and an optional website, shown on the public page under **Organized by**. Display metadata only: they grant no access and receive no email. The older single-string `organizerName` column is still read as a fallback when the event has none. |
+| People on the public page | The lead organizer when `moderatorPublicListed` is on, and named grants with `publicListed` (organizers, moderators and speakers), each with their organization, under **Organizers and speakers**. A logo is shown only when the app serves it (`/api/assets/…`), never from a third-party site. When the event lists no speaker, the free-text `speakersInfo` is shown instead (`app/src/lib/events/public-people.ts`). |
+| Owner | `createdById`, the staff account that created the event. Administrators manage every event; an organizer manages the events they created and those where they are named as an organizer with their account's email ([ADR-014](../adr/014-organizer-role.md)). An event without an owner is managed by administrators only. |
+| Who can take part | `accessMode`: `OPEN` (anyone can register), `INVITATION` (only invitees register, and no guests), or `NULL`, which follows the site settings ([Invitation-only registration](#invitation-only-registration)). |
 | Room and moderator seat | `jitsiRoomName` (a fresh UUID-based name per event) and `moderatorToken` (a UUID, the event's primary moderator link). Both are generated on creation and never copied ([identity-and-access.md](identity-and-access.md#moderator-and-speaker-links)). |
 
 ## Creating an event
 
-Administrators and organizers create events at `/admin/events/new` (**New event**). The page first offers the [template picker](#templates) and, above it, the card that creates an [instant call](#instant-calls). Choosing a template reloads the page with `?template=<id>`; skipping the picker opens a blank wizard. When no template exists, the blank wizard opens directly.
+Administrators and organizers create events at `/admin/events/new` (**New event**). The page first asks four questions, with the card that creates an [instant call](#instant-calls) above them: how many people are expected, who can speak and appear on video, whether the event can be recorded, and who can take part (`app/src/components/admin/guided-format.tsx`). The last one starts on the answer that matches the site setting `publicRegistrationEnabled`. A preview follows the answers. **Continue** reloads the page with `?formato=<people>.<voice>.<recording>.<access>` (access `tutti` or `invitati`), and the wizard opens with the values that `presetDaFormato()` derives from them (`app/src/lib/events/guided-format.ts`): every room feature on, participants' microphone, camera and screen on when the answer is **Everyone** and off when only speakers and moderators speak, the expected participants (20, 100 or 300), one hour, recording available with transcript, summary, translation and per-participant tracks, or no recording, `accessMode` `OPEN` for **Anyone who registers** or `INVITATION` for **Only people you invite** ([Invitation-only registration](#invitation-only-registration)), and a public page afterwards except for an invitation-only event or a small group where everyone speaks. **Change format** returns with `?scegli=` and the answers already given. The organization's [templates](#templates) stay in a folded list under the questions; choosing one reloads the page with `?template=<id>`. A template does not choose who can take part: an event started from one follows the site settings until a choice is made in **People**.
 
-### The five wizard steps
+### The four wizard steps and the advanced settings
 
-The wizard (`app/src/components/admin/event-wizard/`, shell in `wizard-shell.tsx`) keeps all five steps in one shared form state. Every step can be revisited from the step bar without losing later work.
+The wizard (`app/src/components/admin/event-wizard/`, shell in `wizard-shell.tsx`) has four steps in its step bar, **Event**, **When**, **People** and **Summary**, and, apart, **Advanced settings** (`advanced-settings.tsx`) with what the template has already chosen. All of them share one form state, so moving between them loses nothing. The step keys are in `app/src/lib/events/wizard-steps.ts`; an edit address can name a step (`?step=schedule`) and a section of the advanced settings (`&section=recording`), and the keys of the earlier five steps still work (`permissions` and `content` open their section). When creating, a band above the steps names the format or template in use and offers **Change format** (or **Change template**): the fields written about the event (title, description, dates, people, content) that differ from the starting values are kept in the browser for ten minutes (`pa-wizard-draft:trasloco`) and applied once over the new format's values, with a notice and **Start over** to drop them. The unsaved draft kept in the browser is one per format or template (`pa-wizard-draft:new:<id>`), offered when the same format is opened again; one saved by earlier versions under `pa-wizard-draft:new` is offered in any creation until it is restored or discarded, and a successful creation removes every creation draft.
 
-| Step | What it sets |
+| Part | What it sets |
 |---|---|
-| 1. **Basics** | Title and Markdown description for each enabled language; start, end and time zone (the site's default time zone; a new event starts tomorrow and lasts the template's default duration, or 120 minutes); expected participants; one cover image, stored both as the library cover and as the event image; waiting-room audio; tags; recurrence; per-event overrides for the title kicker, the waiting-room engine, the video quality preset and the expected share of participants who send audio or video. |
-| 2. **Permissions** | The role-by-feature permission matrix (the moderator column is always on), recording and automatic start, agenda, word cloud and whiteboard, and the AI post-production options. The whiteboard can be switched on only when the installation declares the whiteboard service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`, read by the page at request time); otherwise the switch says why, and a value already on can only be switched off. The options depend on each other: transcription needs recording; summary and translation need transcription; dubbing needs translation; per-participant recording needs recording and transcription; keeping participant tracks needs per-participant recording. Translation requires at least one target language. |
-| 3. **People** | Co-organizing organizations, co-moderators and speakers ([named grants](#invitations-and-named-grants)), and [invitations](#invitations-and-named-grants). The address-book picker appears only to administrators. |
-| 4. **Content** | [Materials](#materials-and-agenda) and the pre-registration and post-event [questionnaires](#questionnaires-and-post-event-feedback). **Save draft and go to questionnaire management** creates the event as a draft and opens its questionnaire page. |
-| 5. **Review** | A summary, a configuration diagram and an estimated-capacity preview computed from the site's bridge-sizing settings ([scaling.md](scaling.md)); the data retention in days, with a one-line reminder that personal data is deleted after that threshold; the privacy notice template (the one marked as default is preselected), a custom privacy text and a privacy document; the primary moderator's name and email, to which the moderator link is emailed ([email.md](email.md#moderator-and-speaker-links)). |
+| **Event** (step 1) | Title and Markdown description for each enabled language, one cover image (stored both as the library cover and as the event image) and tags. Under the title, a help line explains the `Kicker \| Title` convention; when the title contains `\|` with text on both sides, **Show “…” as a kicker above the title** sets `parseTitleKicker`, with a live preview ([branding](../configuration/branding.md#editorial-title-kicker)). |
+| **When** (step 2) | Start, end and time zone (the site's default time zone; a new event starts tomorrow at 10:00 in that time zone and lasts the template's default duration, or 60 minutes), expected participants, recurrence (folded). |
+| **People** (step 3) | The lead organizer, whose name and email receive the primary moderator link ([email.md](email.md#moderator-and-speaker-links)) and are prefilled with the name and email of the staff account creating the event (empty with the instance key); organization, logo and public listing folded. Organizing entities, the event's people with their role and organization ([named grants](#invitations-and-named-grants)). **Who registers** (`SezioneIscrizione` in `step-2-people.tsx`): **Anyone who registers** or **Only people you invite** (`accessMode`), with a note that the site setting applies while an event has no choice, and the warning "No invitees yet: while the list below is empty, nobody can register." when the event is invitation-only without invitees; then **What we ask people who register**, name and email always plus the organization fields ([The form](#the-form)). When editing, an event without a choice keeps following the site until one is picked. Then [invitations](#invitations-and-named-grants), open when the event is invitation-only. The address-book picker appears only to administrators. |
+| **Summary** (step 4) | What is still missing (`campiMancanti()` in `validation.ts`; in edit mode only what saving needs), each item a button that opens the step and focuses the field; then one preview card, headed by the title with its kicker, with an icon per line: dates, expected participants, organizer and people, who registers (**Anyone can register, from the event page.**, or **Invitation only. Invitees: N.** with **Add invitees** or **Change** opening **People**, highlighted when there are no invitees) and **At registration we ask for: …**, who speaks and appears on video, room features, recording and post-production (with the translation languages, opened with **Change languages**), privacy notice. **Customize the settings** opens the advanced settings; a capacity warning opens their technical details. |
+| **Advanced settings** | Folded sections, the one reached from a card open: **Participation and room features**: a short description of each role, then the role-by-feature permission matrix (only the participant column is chosen; the speaker column shows what speakers have in the room and the organizer and moderator column is always on; the stored matrix is normalized by `withRoleInvariants()` in `app/src/lib/utils/permission-matrix.ts`), agenda, word cloud and whiteboard (which can be switched on only when the installation declares the whiteboard service, `NEXT_PUBLIC_WHITEBOARD_ENABLED`), and automatic captions, on by default and shown only where [live captions](live-captions.md) are available, with **Transcript from captions** under them (`captionsTranscriptEnabled`, off by default; the new-event questions turn it on when the event can be recorded). **Recording and AI**: recording and the AI post-production options; the video recording never starts by itself (a host starts it with **REC**), the automatic start is shown only on an event saved with it, and the per-participant recorder joins when the event goes live ([recording.md](recording.md)); turning recording on while creating also turns on transcription, summary, translation (into the site's **Default translation languages**, when there are some besides the transcription language) and per-participant recording, when the installation has AI post-production on. The options depend on each other: transcription needs recording; summary and translation need transcription; dubbing needs translation; per-participant recording needs recording and transcription; keeping participant tracks needs per-participant recording. Translation requires at least one target language, chosen with checkboxes: English, French, Spanish and German first, the other EU languages in a group that opens; the transcription language is not offered. **Content: materials and questionnaires**: [materials](#materials-and-agenda) and the pre-registration and post-event [questionnaires](#questionnaires-and-post-event-feedback), where a questionnaire that already has responses is shown read-only, with the count and a link to the event's **Questionnaires** page; **Save draft and go to questionnaire management** creates the event as a draft and opens its questionnaire page. **Waiting room and video**: waiting-room engine, video quality preset, waiting-room audio. **Privacy, data and the page after the event**: the privacy notice template (the one marked as default is preselected), a custom privacy text and a privacy document; data retention in days; whether the page stays visible. The **Privacy and GDPR** edit link of the event page opens this section. **Technical details**: an estimated-capacity preview computed from the site's bridge-sizing settings ([scaling.md](scaling.md)), where the expected share of participants who send audio or video is set, and a configuration diagram. |
 
-Client-side checks run before moving on (`app/src/components/admin/event-wizard/validation.ts`): a title of at least three characters and a description of at least 10 characters, both in the site's default language and with leading and trailing spaces ignored; an end after the start; 2 to 500 expected participants; and target languages when translation is on. Title and description carry a `*` on the default language's tab, and when another language tab is open the error says which tab to switch to. The step 1 checks apply to **Save as draft** too, because the server stores drafts under the same rules. **Publish event** also requires the moderator name and a valid moderator email; **Save as draft** does not.
+Required fields say so while they are empty: they pulse in blue with a line saying they are needed to save the event (title, description, dates) or to publish it (the lead organizer's name and email), and after a refused attempt they insist in amber instead of turning red. The step bar shows **To complete** under each step with such a field.
+
+Client-side checks run before moving on (`app/src/components/admin/event-wizard/validation.ts`): a title of at least three characters and a description of at least 10 characters, both in the site's default language and with leading and trailing spaces ignored; an end after the start; 2 to 5,000 expected participants; and target languages when translation is on. Title and description carry a `*` on the default language's tab, and when another language tab is open the error says which tab to switch to. The checks of the first two steps apply to **Save as draft** too, because the server stores drafts under the same rules. **Publish event** also requires the lead organizer's name and a valid email, in the **People** step; **Save as draft** does not.
 
 The events API also requires an Italian title of at least 3 characters and an Italian description of at least 10 characters (`eventBaseSchema` in `app/src/lib/validation/schemas.ts`, with the threshold in `app/src/lib/validation/event-description.ts`), whatever the site's default language, on creation and on every edit that sends them. When the server still refuses the data (`422 VALIDATION_ERROR`), the wizard maps each issue to its step and field, jumps there and shows the localized message asking to check the highlighted fields. An issue that no field can show, such as a missing Italian text on a site whose default language is another, is quoted in the alert. The alert scrolls into view.
 
-`maxParticipants` is an estimate of attendance used for capacity planning, not a cap: registrations beyond it are accepted. The events API accepts up to 10,000 as a sanity bound (`app/src/lib/validation/schemas.ts`); the wizard stops at 500.
+`maxParticipants` is an estimate of attendance used for capacity planning, not a cap: registrations beyond it are accepted. The events API accepts up to 10,000 as a sanity bound (`app/src/lib/validation/schemas.ts`); the wizard stops at 5,000.
 
 The permission matrix is authoritative. The wizard and the server both derive the older boolean toggles (`qaEnabled`, `chatEnabled`, `participantsCanUnmute`, `participantsCanStartVideo`, `participantsCanShareScreen`) from it, so the two representations never disagree.
 
@@ -124,7 +128,7 @@ sequenceDiagram
   opt any side resource or the publishing failed
     W-->>O: toast naming what failed
   end
-  W->>O: navigate to /admin/events/{id}/edit?created=1
+  W->>O: navigate to /admin/events/{id}?created=1
 ```
 
 1. **`POST /api/events`** requires a staff session (administrator or organizer) and is rate-limited to 5 requests per minute per IP address. It validates the body with Zod, rejects an unknown privacy notice template with a field error, and creates the event:
@@ -148,9 +152,9 @@ sequenceDiagram
 
    A failure does not stop the sequence: the wizard collects the names of the resources that failed.
 3. **Publishing.** With **Publish event**, the wizard sends `PUT /api/events/{id}` with `{ "status": "PUBLISHED" }` and the moderator token.
-4. **Outcome.** If any side resource failed, a toast names it ("Event created, but some items weren't saved: …"). If the publishing request fails, the event stays a draft and a second toast says so, with the server's answer when there is one ("The event was created but not published: it is still a draft. …"). The toast lives in the administration layout, so it survives navigation. The wizard then clears its saved draft and navigates to `/admin/events/{id}/edit?created=1`, or to the event's questionnaire page when the organizer came from **Save draft and go to questionnaire management**.
+4. **Outcome.** If any side resource failed, a toast names it ("Event created, but some items weren't saved: …"). If the publishing request fails, the event stays a draft and a second toast says so, with the server's answer when there is one ("The event was created but not published: it is still a draft. …"). The toast lives in the administration layout, so it survives navigation. The wizard then clears its saved draft and navigates to the event's page, `/admin/events/{id}?created=1`, or to the event's questionnaire page when the organizer came from **Save draft and go to questionnaire management**.
 
-The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard-draft:new` (or `pa-wizard-draft:<eventId>` when editing), written 800 ms after the last change. When the wizard opens and finds one, it offers to restore or discard it.
+The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard-draft:new:<format or template>` (or `pa-wizard-draft:<eventId>` when editing), written 800 ms after the last change and no longer once the event is saved or the format changed. When the wizard opens and finds one, it offers to restore or discard it.
 
 ### Editing reuses the wizard
 
@@ -171,14 +175,14 @@ The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard
 
 An event template (`EventTemplate`, UI **Event templates** at `/admin/events/template`) is a preset that pre-fills the wizard. Everything stays editable in the wizard. A template can set:
 
-- the live features: Q&A, chat, agenda, word cloud and whiteboard, and the participants' microphone, camera and screen-sharing permissions, or a full permission matrix;
-- recording, automatic start, per-participant recording and the retention of participant tracks;
+- the live features: Q&A, chat, agenda, word cloud, whiteboard and automatic captions (on in a new template, as in a new event), and the participants' microphone, camera and screen-sharing permissions, or a full permission matrix;
+- recording, per-participant recording and the retention of participant tracks (a template's automatic start is ignored: recording starts only with **REC**);
 - the AI post-production options and their target languages (empty means the site default);
 - the waiting-room engine (empty means the site default);
 - the expected participants and the default duration, from which the wizard computes the end time;
 - a description in Italian and English, the suggested retention days and the expected number of speakers.
 
-The dependencies of step 2 apply when a template is loaded: a template that turns on transcription without recording pre-fills neither.
+The dependencies of **Recording and AI** apply when a template is loaded: a template that turns on transcription without recording pre-fills neither.
 
 System templates (`isSystem`) are inserted by database migrations that skip templates already present. Administrators can edit and delete them like any other: events copy the template's values at creation and keep no reference to it, so deleting a template never changes an existing event.
 
@@ -209,10 +213,10 @@ The rule is that a copy inherits the configuration, not the life of the occurren
 
 | Inherited | Not inherited |
 |---|---|
-| Description, time zone, event type, sizing and quality settings, every live-feature and permission setting, registration rules, the moderator contact, branding, the privacy and retention settings, recording and AI post-production flags, the post-event page settings and the library listing, the recurrence rule | Title (suffixed), slug, dates (resolved as above), status, room name, moderator token, owner, join password, series membership, `postEventPublicUntil`, `youtubeUrl`, and all runtime, analytics and recording state |
-| Tags, co-organizing organizations, active named grants (each with a fresh token), agenda items, questionnaires, reminder schedule | Registrations, invitations, questions, chat, reactions, polls, word-cloud rounds, feedback, call sessions, recordings, materials, GDPR audit entries |
+| Description, time zone, event type, sizing and quality settings, every live-feature and permission setting, registration rules (who can register, `accessMode`, and what the form asks), the moderator contact with its organization, branding, the privacy and retention settings, recording and AI post-production flags, the post-event page settings and the library listing, the recurrence rule | Title (suffixed), slug, dates (resolved as above), status, room name, moderator token, owner, join password, whether the lead organizer is shown on the public page, series membership, `postEventPublicUntil`, `youtubeUrl`, and all runtime, analytics and recording state |
+| Tags, co-organizing organizations, active named grants (each with a fresh token, its role and organization, and not shown on the public page until chosen again), agenda topics (title, order and planned duration), questionnaires, reminder schedule | The agenda's progress (status and times), registrations, invitations, questions, chat, reactions, polls, word-cloud rounds, feedback, call sessions, recordings, materials, GDPR audit entries |
 
-Revoked grants are not recreated. Materials and polls are left out on purpose: they are the content of a specific day.
+Revoked grants are not recreated. Invitations are not copied, so a copy open only to invitees (`accessMode` `INVITATION`) accepts no registrations until invitees are added. Materials and polls are left out on purpose: they are the content of a specific day. The permission matrix is copied normalized, like every write of it.
 
 ### Recurrence
 
@@ -248,7 +252,7 @@ Whether an event appears on public surfaces depends on its status, its type and,
 | `GET /api/events/{slug}/calendar.ics` | A calendar file for any event that is not a `DRAFT`, including `ARCHIVED` events, concluded events whose post-event page is off or expired, and instant calls ([known limitations](#known-limitations)). Times are UTC instants. The organizer's address is the platform's sender address (`SMTP_FROM`), never the moderator's personal email; its name is the moderator name, or the site name when none is set |
 | Event page | A schema.org `Event` block, with the expected participants as the attendee capacity |
 
-Tags are managed by administrators in **Tag management** (`/admin/settings/tags`, API `/api/admin/tags`) and attached in step 1 of the wizard.
+Tags are managed by administrators in **Settings → Tags** (`/admin/settings/tags`, API `/api/admin/tags`) and attached in step 1 of the wizard. Saving the wizard replaces the event's tags with the ones selected (`tagSlugs` on `PUT /api/events/{id}`), and only when they changed. Changing them takes the session of staff who manage the event, as choosing who can take part does: with a moderator link the step does not show tags, and a request that changes them is refused with `403`.
 
 ## Registration
 
@@ -273,18 +277,18 @@ sequenceDiagram
   B->>R: POST /api/events/{slug}/registrations with name, email, consents, page locale
   R->>R: rate limit, event open for registration, Zod, required consents
   R->>R: emailHash (HMAC-SHA256), encrypt name and email, accessToken (nanoid)
-  alt public registration on, emailHash already registered for this event
+  alt registration open to anyone, emailHash already registered for this event
     R->>DB: lookup in transaction
     DB-->>R: existing row
     R-->>B: 409 ALREADY_REGISTERED, the form offers a resend
-  else public registration on, new registrant
+  else registration open to anyone, new registrant
     R->>DB: INSERT Registration, create or refresh Person only with address-book consent
     R->>DB: INSERT GdprAuditLog CONSENT_RECORDED, then COMMIT
-    R->>DB: INSERT EmailOutbox row, confirmation with .ics attached
+    R->>DB: INSERT EmailOutbox row, confirmation with the entry link signed with proof, and .ics attached
     R-->>B: 201 accessToken and joinUrl, Set-Cookie event_access_{eventId}
-  else public registration off
+  else invitation only, chosen by the event or by the site setting
     R->>DB: lookup in transaction, INSERT only for an invited address
-    R->>DB: INSERT EmailOutbox row with the signed entry link, for a new or an existing registration
+    R->>DB: INSERT EmailOutbox row with the entry link signed with sig, for a new or an existing registration
     R-->>B: 202 with the same body for every address, no token and no cookie
   end
   J->>DB: claim pending outbox rows
@@ -297,10 +301,10 @@ The form asks for a name and an email address and shows the privacy notice ([GDP
 
 - consent to the processing, which is mandatory;
 - consent to the recording, mandatory when the event has recording on;
-- a separate consent to per-participant audio recording, mandatory when the event has it on;
+- a separate, optional consent to the transcription of one's own contributions, with one's name, when the event records per-participant audio or keeps a transcript from captions: without it the person registers and takes part, but is neither recorded on a track of their own nor kept in the transcript;
 - future communications and the address book, both optional.
 
-When the event's `requireOrganization`, `requireOrganizationRole` or `requireOrganizationType` flags are on, the form also asks for the organization, the role and the type of public body. Only the organization is mandatory, and only in the browser: the registration API accepts a request without any of the three, and the role and the type are optional even in the form ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)). The wizard does not expose these flags: they are set through the events API or inherited by duplication.
+When the event's `requireOrganization`, `requireOrganizationRole` or `requireOrganizationType` flags are on, the form also asks for the organization, the role and the type of public body. Only the organization is mandatory: the form asks for it, and the registration API answers `422` (`registration.errors.organizationRequired`) to a request without it. The role and the type stay optional. The wizard sets the flags in the **People** step, under **What we ask people who register** (**Organization (required to register)**, **Role (optional)**, **Organization type (optional)**); the events API accepts them too, and duplication copies them.
 
 The page's language is sent along and stored on the registration. Later emails use it for their links, and for their text when it is one of the email languages; otherwise the text is in English ([email.md](email.md#languages)).
 
@@ -310,42 +314,46 @@ The page's language is sent along and stored on the registration. Later emails u
 
 1. Allows 10 requests per minute per IP address and answers `409` if the event is not open for registration.
 2. Validates the body with Zod: `consentGiven` must be literally `true`, and the recording consents are checked against the event's flags.
-3. Computes `emailHash`, an HMAC-SHA256 of the lowercased, trimmed address keyed with `APP_SECRET` (plain SHA-256 when the variable is unset; `hashEmail()` in `app/src/lib/crypto/pii.ts`). The hash deduplicates registrations and is the form used for every lookup and match. The encrypted address is decrypted only where the address itself is needed: to send email, in the staff **Sign-ups** list and its export, in a data-subject export, and to derive the optional avatar reference in the room token ([identity-and-access.md](identity-and-access.md)).
+3. Computes `emailHash`, an HMAC-SHA256 of the lowercased, trimmed address keyed with `APP_SECRET` (plain SHA-256 when the variable is unset; `hashEmail()` in `app/src/lib/crypto/pii.ts`). The hash deduplicates registrations and is the form used for every lookup and match. The encrypted address is decrypted only where the address itself is needed: to send email, in the staff **Sign-ups** list and its export, in a data-subject export, to derive the optional avatar reference in the room token, and to show the room's moderators who is behind each video tile ([identity-and-access.md](identity-and-access.md#who-is-behind-each-video-tile)).
 4. Encrypts the name and the email address with AES-256-GCM (`encryptPII()`), and generates the personal `accessToken` with `nanoid` (24 characters).
 5. In one transaction:
-   - refuses a second registration with the same hash for the same event (`409` with code `ALREADY_REGISTERED`). With public registration off it keeps the existing row instead, to send its link again (see [Invitation-only registration](#invitation-only-registration));
-   - with public registration off, stops without writing anything when the address is not on the event's invitation list (`isInvited()` in `app/src/lib/events/registration-access.ts`);
+   - refuses a second registration with the same hash for the same event (`409` with code `ALREADY_REGISTERED`). When registration is by invitation only it keeps the existing row instead, to send its link again (see [Invitation-only registration](#invitation-only-registration));
+   - when registration is by invitation only, stops without writing anything when the address is not on the event's invitation list (`isInvited()` in `app/src/lib/events/registration-access.ts`);
    - links the address-book person record, which is created or refreshed only with the separate address-book consent ([ADR-011](../adr/011-person-rubrica.md));
    - inserts the registration with the consent timestamp;
    - writes a `CONSENT_RECORDED` entry to `GdprAuditLog` with the consent flags and no personal data.
-6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link, links to add the event to Google, Outlook and Yahoo calendars, and an `.ics` attachment. A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
-7. Answers `201` with the access token and the personal link, `/events/{slug}/live?token=<accessToken>` localized to the page's language, and sets the signed `event_access_<eventId>` cookie. The cookie lets the same browser return to the live page without the token in the URL ([identity-and-access.md](identity-and-access.md#registrants)). With public registration off, it answers `202` instead, as described next.
+6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link as the signed entry link `/api/events/{slug}/registrations/enter?token=…&proof=…&lang=…` (with `sig=…` in place of `proof=…` while registration is by invitation only, as described next), links to add the event to Google, Outlook and Yahoo calendars, which carry the unsigned link, and an `.ics` attachment. A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
+7. Answers `201` with the access token and the unsigned personal link, `/events/{slug}/live?token=<accessToken>` localized to the page's language, and sets the signed `event_access_<eventId>` cookie. The cookie lets the same browser return to the live page without the token in the URL. Opening the signed link from the email in the same browser also records that the address is proved, which the profile photo requires ([identity-and-access.md](identity-and-access.md#registrants)). When registration is by invitation only, it answers `202` instead, as described next.
 
 ### Invitation-only registration
 
-When the site setting `publicRegistrationEnabled` (**Public registration enabled**) is off, the event's invitation list (`EventInvitation`) is the list of addresses that may register. Whoever fills in the form has not proved that they own the address they typed, so the response never carries the personal link:
+Each event chooses who can register with `Event.accessMode`: `OPEN` (**Anyone who registers**), `INVITATION` (**Only people you invite**), or `NULL`, which follows the site setting `publicRegistrationEnabled` (**Public registration enabled**). `publicRegistrationFor()` in `app/src/lib/events/registration-access.ts` resolves the choice, and the registration route, the resend route, the reminders job and the event and registration pages all read it there. `OPEN` opens registration whatever the site setting says; it does not turn guest entry on.
+
+When registration is by invitation only, because the event says `INVITATION` or because it has no choice and the site setting is off, the event's invitation list (`EventInvitation`) is the list of addresses that may register. Whoever fills in the form has not proved that they own the address they typed, so the response never carries the personal link:
 
 - `POST /api/events/{slug}/registrations` answers `202` with `{ eventSlug, delivery: "email" }` and no cookie, whatever the address. An invited address is registered. An address that is already registered gets its confirmation again, in the language of the registration. Any other address gets nothing. The form shows **Check your email**. Neither the status code nor the body tells the caller which case applied.
-- The personal link in the confirmation, resend and reminder emails is the signed entry link `/api/events/{slug}/registrations/enter?token=…&sig=…&lang=…`. Opening it sets the `event_access_<eventId>` cookie and redirects to the room, so the mailbox is the proof of identity ([identity-and-access.md](identity-and-access.md#registrants)). The add-to-calendar links in the same emails carry the unsigned `/live?token=…` link, which gives a seat but not the registrant's identity.
+- In this mode the personal link in the confirmation, resend and reminder emails is the entry link signed with `sig`. Opening it sets the `event_access_<eventId>` cookie in whichever browser opens it, and redirects to the room, so the mailbox is the proof of identity. The signature is chosen when each email is built, from the event's choice or the site setting at that moment: a link sent in this mode keeps binding after registration is opened, and a link sent while registration was open (`proof`) never binds a browser other than the one that registered ([identity-and-access.md](identity-and-access.md#registrants)). The add-to-calendar links in the same emails carry the unsigned `/live?token=…` link, which gives a seat but not the registrant's identity.
 - An event with no invitations accepts no new registrations. Its registration page says that registration is not open to the public and offers only the resend form, and the event page links to it with **Already registered? Get your personal link again**.
-- Existing registrations, moderator and speaker links, and staff paths are unaffected. Guest entry is a separate switch (`guestAccessEnabled`): a closed meeting needs both off.
+- Existing registrations, moderator and speaker links, and staff paths are unaffected.
+- An `INVITATION` event admits no guests, whatever `guestAccessEnabled` says (`guestAccessAllowed()` in `app/src/lib/events/guest-window.ts`): otherwise anyone not invited could join without registering. An event that follows the site setting keeps guest entry as a separate switch, so a closed meeting needs both site settings off.
+- A duplicate does not copy the invitations, so an `INVITATION` copy accepts no registrations until invitees are added ([What a copy inherits](#what-a-copy-inherits)).
 - The pre-registration questionnaire is not shown, because the `202` carries no access token to submit it with.
 
-The registration page and the event page choose what to show with `registrationAccessFor()` in `app/src/lib/events/registration-access.ts`: `open`, `invitation` (public registration off, at least one invitation) or `closed` (public registration off, no invitations).
+The registration page and the event page choose what to show with `registrationAccessFor()` in `app/src/lib/events/registration-access.ts`: `open`, `invitation` (invitation only, at least one invitation) or `closed` (invitation only, no invitations).
 
 ### After the form
 
 When the event has a pre-registration questionnaire, the confirmation screen shows it and submits it with the new access token. When it has none and the event starts within `waitingRoomLeadMinutes` (a site setting, 15 by default in `app/prisma/schema.prisma`), the browser moves into the waiting room after about a second. Otherwise the participant sees a thank-you screen that checks the time again every 30 seconds and moves them in once the event is close.
 
-With public registration on, a second registration with the same address shows **Resend my access link**. With it off, the form answers every address in the same way and emails the link to an address that is already registered. `POST /api/events/{slug}/registrations/resend` queues the original confirmation again when the address is registered, with the signed entry link while public registration is off. It always answers `200` with the same neutral body, so it cannot be used to find out who is registered, and allows 5 requests per minute per IP address. The registration page also offers it on its own, under **Already registered? Get your personal link again**, when registration is closed.
+With registration open to anyone, a second registration with the same address shows **Resend my access link**. With invitation-only registration, the form answers every address in the same way and emails the link to an address that is already registered. `POST /api/events/{slug}/registrations/resend` queues the original confirmation again when the address is registered, with the entry link signed for the event's registration at that moment: `sig` while it is by invitation only, `proof` while it is open. It always answers `200` with the same neutral body, so it cannot be used to find out who is registered, and allows 5 requests per minute per IP address. The registration page also offers it on its own, under **Already registered? Get your personal link again**, when registration is closed.
 
 Registrations are listed in the administration area under **Sign-ups**, both across events and on each event's page.
 
 ## Invitations and named grants
 
-Step 3 of the wizard handles two different things.
+The wizard's **People** step handles four different things: the organizing entities shown on the public page (`EventOrganizer`: name, website, logo, with no access of any kind), the event's people, who registers and what the form asks ([Invitation-only registration](#invitation-only-registration), [The form](#the-form)), and invitations.
 
-**Named grants** are co-moderators (role `MODERATOR`) and speakers (role `SPEAKER`), stored as `EventModerator` rows, each with its own magic-link token. The wizard creates them through `POST /api/events/{id}/moderators` with the primary moderator token. Each person's link, `/events/{slug}/live?token=<grant token>`, is emailed once when the grant is created with an address ([email.md](email.md#moderator-and-speaker-links)), and can be copied from the **Co-moderators and speakers** panel on the event page, where each grant can also be revoked. The panel builds the links with the localized path of the page language. What each seat can do is described in [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links).
+**Named grants** are the event's people: organizers and moderators (role `MODERATOR`) and speakers (role `SPEAKER`), stored as `EventModerator` rows, each with its own magic-link token. The step lists them together, each with a role (**Organizer**, **Moderator** or **Speaker**), an organization with an optional logo, and **Show on the public page**. An organizer is a moderator with the `organizer` mark: in the room it has the same powers, and the public page lists it among the organizers. A person's organization is their own and can differ from the organizing entities. **Show on the public page** (`publicListed`) starts off for everyone: publishing a person's name and organization is a choice made person by person. The lead organizer has the same organization, logo and **Show on the public page** fields, stored on the event (`moderatorOrganization`, `moderatorOrganizationLogoUrl`, `moderatorPublicListed`). The public page shows only logos uploaded to the platform: a logo given as another website's address is not shown, and the form says so next to the field and next to each organizing entity. Duplicating an event copies each person's role and organization, but not the public listing. When editing, a saved person is recognized by the id of their grant, so grants without an email are told apart; a role change between moderator and speaker creates the new grant first and revokes the old one only once the new one exists. The wizard creates grants through `POST /api/events/{id}/moderators` with the primary moderator token; organization, logo, organizer mark and public listing change with `PATCH /api/events/{id}/moderators/{modId}`, which keeps the person's link. A role change between moderator and speaker revokes the grant and creates a new one, with a new link. Each person's link, `/events/{slug}/live?token=<grant token>`, is emailed once when the grant is created with an address ([email.md](email.md#moderator-and-speaker-links)), and can be copied from the **Organizers, moderators and speakers** panel on the event page, where each grant can also be revoked. The panel builds the links with the localized path of the page language. What each seat can do is described in [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links).
 
 **Invitations** (`EventInvitation`) are a per-event list of people to invite, with role `GUEST` or `SPEAKER`:
 
@@ -353,7 +361,7 @@ Step 3 of the wizard handles two different things.
 - An invitation can be linked to an address-book person (`personId`). Only administrators can link one: the address book belongs to the administration ([ADR-014](../adr/014-organizer-role.md)), and an organizer who sends a `personId` gets `403`.
 - The API is `/api/admin/events/{id}/invitations`, for administrators and the owning organizer. Each creation writes an `EVENT_INVITATION_CREATE` audit entry.
 - Invitations are not copied by duplication, and the GDPR cleanup deletes them with the event's other personal data.
-- With public registration off, the list is the set of addresses allowed to register for the event ([Invitation-only registration](#invitation-only-registration)). The wizard does not say so; only the help text of the setting does.
+- When registration is by invitation only, the list is the set of addresses allowed to register for the event ([Invitation-only registration](#invitation-only-registration)). The help text of the section says which of the two cases applies: with registration open, anyone can register after publication, invited or not.
 
 The schema has the columns for a pre-filled personal registration link (`token`, `sentAt`, `acceptedAt`, `declinedAt`), but nothing sends invitations yet: see [known limitations](#known-limitations).
 
@@ -361,8 +369,8 @@ The schema has the columns for a pre-filled personal registration link (`token`,
 
 | Mode | Who gets in | How |
 |---|---|---|
-| Registration | Anyone who registers while registration is open. With public registration off, only the addresses on the invitation list | The personal link from the confirmation email, or the `event_access_<eventId>` cookie in the browser that registered, or, with public registration off, in the browser that opened the signed entry link |
-| Guest link | Anyone holding `/events/{slug}/live`. The administration's event page shows it under **Event links** as **Direct invite (no registration)**, and hides it for scheduled events while `guestAccessEnabled` is off | The visitor types a name in the waiting room. Scheduled events admit guests only while `LIVE`, and only when the site setting `guestAccessEnabled` is on; instant calls, whatever that setting, admit them while `LIVE`, `IDLE` or `PROVISIONING`. At other times a scheduled event redirects to its registration page, or to the event page once `ENDED` or `ARCHIVED` |
+| Registration | Anyone who registers while registration is open. When registration is by invitation only, only the addresses on the invitation list | The personal link from the confirmation email, or the `event_access_<eventId>` cookie in the browser that registered, or in the browser that opened an entry link signed with `sig`, which the emails built while registration is by invitation only carry |
+| Guest link | Anyone holding `/events/{slug}/live`. The administration's event page shows it under **Event links** as **Direct invite (no registration)**, and hides it for scheduled events that admit no guests | The visitor types a name in the waiting room. Scheduled events admit guests only while `LIVE`, only when the site setting `guestAccessEnabled` is on, and never when the event is `INVITATION`; instant calls, whatever that setting, admit them while `LIVE`, `IDLE` or `PROVISIONING`. At other times a scheduled event redirects to its registration page, or to the event page once `ENDED` or `ARCHIVED` |
 | Join password | Visitors arriving without a personal token, when `joinPasswordHash` is set | Redirected to `/events/{slug}/password` first. A correct password sets a 12-hour grant cookie ([identity-and-access.md](identity-and-access.md#password-protected-events)) |
 | Moderator and speaker links | Holders of the primary moderator link or of a named grant | [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links) |
 
@@ -378,19 +386,21 @@ Capacity is not enforced at any of these doors. `maxParticipants` sizes the brid
 
 ### The template library
 
-Reusable question sets (`QuestionTemplate`) are managed under **Questionnaires**, in the **Template library** (`/admin/questionnaires`). Each question has a multilingual prompt and one of five types: `SINGLE_CHOICE`, `MULTI_CHOICE`, `YES_NO`, `LIKERT` (1 to 5 by default, with optional labels at the ends) and `OPEN_TEXT`. System templates are seeded by migrations and cannot be deleted.
+Reusable question sets (`QuestionTemplate`) are managed under **Questionnaires → Questionnaire templates** (`/admin/questionnaires`). Each question has a multilingual prompt and one of five types: `SINGLE_CHOICE`, `MULTI_CHOICE`, `YES_NO`, `LIKERT` (1 to 5 by default, with optional labels at the ends) and `OPEN_TEXT`. System templates are seeded by migrations and cannot be deleted.
+
+Each template says when it is offered (`QuestionTemplate.usage`, **When it is offered**): **Before the event (registration)**, **After the event (feedback)**, or both when unset. The wizard and the event's **Questionnaires** page offer, for each questionnaire, only the templates for that moment and those for both, plus any template already chosen, marked with its moment, so that it can be removed and picked again (`templatesFor()` in `app/src/lib/questionnaires/template-usage.ts`). The system feedback template is for after the event, and its moment cannot be changed (`PUT` answers `422`). The filter is a guide for the organizer: the questionnaire API accepts any template.
 
 ### Questionnaires on an event
 
 An event has at most one questionnaire per placement: `PRE_REGISTRATION` and `POST_EVENT` (`EventQuestionnaire`). A questionnaire combines linked library templates, in link order, with questions written for that event. It also has a title, a description, a `required` flag and an `allowEdit` flag.
 
-- **Where they are edited.** In step 4 of the wizard, or on the event's **Questionnaires** page (`/admin/events/{id}/questionnaires`), through `GET`, `PUT` and `DELETE` on `/api/admin/events/{id}/questionnaires/{placement}`. `PUT` replaces the questionnaire as a whole and is refused with `409` once responses exist. `DELETE` removes it together with all its responses, whether or not responses exist. The **Questionnaires** page shows the response count and asks for confirmation first; emptying the questionnaire in the edit wizard sends the same `DELETE` without either.
-- **Default feedback.** Every new event gets the platform's generic feedback template as its post-event questionnaire (the system template named by `FEEDBACK_GENERIC_TEMPLATE_NAME` in `app/src/lib/feedback/constants.ts`), unless `feedbackEnabled` is off. A questionnaire configured in the wizard replaces it.
-- **Where participants answer.** The pre-registration questionnaire appears on the registration confirmation screen. The post-event questionnaire appears in the feedback dialog when leaving the call and on the public post-event page. The standalone page `/events/{slug}/questionnaire/{placement}` shows either one.
-- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 10 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise.
-- **Results.** Responses and statistics are under **Questionnaires**, **Responses and statistics** (`/admin/questionnaires/responses`).
+- **Where they are edited.** In the wizard's **Content** step, or on the event's **Questionnaires** page (`/admin/events/{id}/questionnaires`), through `GET`, `PUT` and `DELETE` on `/api/admin/events/{id}/questionnaires/{placement}`. `PUT` replaces the questionnaire as a whole and is refused with `409` once responses exist. `DELETE` removes it together with all its responses; once responses exist it requires `?withResponses=1` and is refused with `409` (`HAS_RESPONSES`) without it. The **Questionnaires** page shows the response count, asks for confirmation and sends the parameter. The edit wizard never does: it shows a questionnaire with responses read-only and does not write it, and a questionnaire that receives its first responses while the wizard is open cannot be deleted by emptying it there.
+- **Default feedback.** Every new event, instant calls included, gets the platform's generic feedback template as its post-event questionnaire (the system template «Feedback generico», named by `FEEDBACK_GENERIC_TEMPLATE_NAME` in `app/src/lib/feedback/constants.ts`), unless it is created with `feedbackEnabled` off (`ensurePostEventQuestionnaire()` in `app/src/lib/feedback/default-questionnaire.ts`). A questionnaire configured in the wizard replaces it. Organizers can change or delete it on the **Questionnaires** page; nothing attaches it again afterwards, and reading an event never does.
+- **Where participants answer.** The pre-registration questionnaire appears on the registration confirmation screen. The post-event questionnaire is the end-of-event rating: the room asks for it on the closing screen, offers it on the leaving screen and from the waiting room of an ended event ([live-interaction.md](live-interaction.md#post-event-feedback)), and the public post-event page invites people to answer it. The standalone page `/events/{slug}/questionnaire/{placement}` shows either one. The post-event questionnaire can be read and answered only while feedback collection is on, the event is `LIVE`, `IDLE` or `ENDED`, and its retention has not expired (`endsAt` plus `dataRetentionDays`): from then on the event's personal data is being removed, and no new answer is collected.
+- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 60 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise. A post-event response stores neither the respondent's name nor an email hash: the registration is kept only to allow one response each.
+- **Results.** Responses and statistics are under **Questionnaires**, **Responses and statistics** (`/admin/questionnaires/responses`). The post-event answers of one event are also in the **Ratings** panel of its page ([Ratings](#ratings)).
 
-The older rating-and-comment feedback (`EventFeedback`, `POST /api/events/{slug}/feedback`, accepted while `LIVE` or `ENDED`) is still accepted. The post-event page's star summary uses it when it exists, and otherwise averages the 1-to-5 `LIKERT` answers of the post-event questionnaire.
+The room does not offer the older rating-and-comment feedback (`EventFeedback`); `POST /api/events/{slug}/feedback` accepts it while `LIVE` or `ENDED`, until the event's retention expires. Its rows count in the event's average rating next to the post-event answers ([Ratings](#ratings)).
 
 ## Materials and agenda
 
@@ -398,8 +408,9 @@ Materials (`EventMaterial`) are links or uploaded files, each with a title, an o
 
 | Where | Route | Credential |
 |---|---|---|
-| Wizard step 4, and the event's **Materials** page (`/admin/events/{id}/materials`) | `/api/admin/events/{id}/materials` | Staff session (administrator or owning organizer) |
-| Live room, by moderators | `POST /api/events/{slug}/materials`, 20 per minute per IP address and event | Moderator token |
+| The wizard's **Content** detail, and the event's **Materials** page (`/admin/events/{id}/materials`) | `/api/admin/events/{id}/materials` | Staff session (administrator or owning organizer) |
+| Live room, by moderators | `POST /api/events/{slug}/materials`, 20 per minute per IP address and event; `POST …/materials/upload`; `PATCH` and `DELETE …/materials/{id}` | Moderator token |
+| Open count, on a click in the room or on the public event page | `POST /api/events/{slug}/materials/{id}/opened` ([Materials](live-interaction.md#materials)) | Optional room token; moderators and staff are not counted |
 | Public read | `GET /api/events/{slug}/materials` and `GET /api/events/{slug}/files`, while the event is publicly visible (`isEventPubliclyVisible()`, which also covers a running instant call) | None for the public view; the primary moderator link or a co-moderator grant returns every material. On a password-protected event, a reader needs a room token of the event (registration or named grant), the join-password grant cookie or the registrant's access cookie, otherwise 401 |
 
 Visibility is enforced on the server (`app/src/lib/events/material-visibility.ts`). The event's phase comes from its status when the status is decisive: `LIVE` is `DURING`, and `ENDED` and `ARCHIVED` are `AFTER`. In any other status the clock decides: before `startsAt` is `BEFORE`, from `endsAt` on is `AFTER`, and in between is `DURING`.
@@ -410,11 +421,13 @@ Visibility is enforced on the server (`app/src/lib/events/material-visibility.ts
 
 The filter governs lists, not access: a link stays an external address, and an uploaded file stays downloadable from its `/api/assets/…` URL by anyone who already has it. Materials are not copied when an event is duplicated.
 
-The agenda is a checklist of points to cover. It is turned on with `agendaEnabled` in step 2, or during the event, and moderators add items from the live room, even while the event is running ([live-interaction.md](live-interaction.md#feature-catalog)). Agenda items are copied when an event is duplicated.
+The agenda is the list of topics for the meeting, each with an optional planned duration. It is turned on with `agendaEnabled` in step 2, or during the event, and moderators prepare and lead it from the live room, even while the event is running ([live-interaction.md](live-interaction.md#agenda)). When an event is duplicated, each topic's title, order and planned duration are copied; its status and times are not.
 
 ## After the event
 
-The event page in the administration area has five tabs: **Overview**, **People**, **Content**, **After the event** and **Statistics**.
+The event page in the administration area has five tabs: **Overview**, **People**, **Content**, **After the event** and **Statistics**. They work like system tabs: Tab reaches the open one, the arrow keys, Home and End move the focus between them, and Enter or Space opens the focused one (opening on every arrow would load each tab passed through). The open tab stays in the address (`?tab=`), so a reload or a copied link reopens it. On a wide screen the actions and the summary (registrations, reminders, tags) stay in view on the right, scrolling on their own when taller than the window; on a phone the actions come first, then the tabs, then the summary.
+
+The **People** tab lists, in order: the organizing entities, as the public page shows them; the organizers, moderators and speakers, each with **Copy link**, **Prepare email**, **Resend link** and **Revoke**; the invitees, each marked **Signed up** or **Not signed up yet**, with the count; and the registrations. **Resend link** queues the person's link email again (`POST /api/events/{id}/moderators/{modId}`); it is offered only while the platform emails links (the event is published and not concluded) and for grants with an address. Whether an invitee has signed up is decided by the address fingerprint (`hashEmail()`), the same one the registration stores; invitations made before the address was encrypted are compared through the plain address. The organizing entities are shown with the public page's filters: only logos served by the platform, only `http(s)` websites. The invitees need a staff session and are not shown with the primary moderator link alone; the registrations are listed in both cases, but only a staff session corrects or deletes them. **Edit** on the entities and on the invitees opens the wizard at **People**. On an invitation-only event the invitees are the list of who can register, and an empty list is shown as a warning.
 
 ### Ending and choosing the destination
 
@@ -422,7 +435,7 @@ When a moderator chooses **End for everyone**, the **Event destiny** dialog asks
 
 - **Keep it public**: the post-event page stays visible.
 - **Publish to the library**: the page stays visible and the event is also listed in the video library.
-- **Archive (private)**: the page returns `404`; data is kept until retention expires.
+- **Archive (private)**: the page returns `404`; the status stays `ENDED`, and retention removes the personal data as for any concluded event.
 
 The dialog preselects **Publish to the library** when the event is already listed. Only that option writes `libraryListed`: choosing **Keep it public** does not remove an existing library listing. **Archive (private)** takes the event out of the library in practice, because the library shows only events whose post-event page is public.
 
@@ -436,14 +449,18 @@ The **Post-event configuration** panel on the **After the event** tab controls t
 - **Publish to the video library** (`libraryListed`).
 - What the page shows: Q&A, materials, poll results, feedback, the recap and the word cloud (`postEventShow*`).
 - **Send recap email when the event ends** (`postEventEmailEnabled`), described in [email.md](email.md).
+- **Notify registrants when the recording is published** (`recordingNotifyEnabled`, on by default), with the time the notice went out once it has (`recordingNotifiedAt`), described in [email.md](email.md#recording-notice).
 - **Feedback survey active at event end** (`feedbackEnabled`).
+
+These settings keep applying after the event's retention: the GDPR cleanup removes the personal data but leaves the status and the content the page draws on (Q&A, materials, polls, ratings, word cloud), without names or identifiers ([GDPR.md](../GDPR.md#what-stays-after-event-retention)).
 
 The page shows, when available:
 
 - **The video**: the self-hosted recording once published. A `youtubeUrl` is shown as an external link, **Watch the video on YouTube**, never embedded, and only when it is an `http(s)` address on a YouTube host. Both appear when both exist.
-- **The event recap** (`app/src/lib/events/recap.ts`): an anonymous, aggregate snapshot with the peak headcount, the number of registrations, the most upvoted answered questions and questions asked in chat (text only, no author), published poll results, the most frequent word-cloud words and the average feedback. It is generated on the first view of the concluded page and stored on the event (`postEventRecap`), so it survives the GDPR cleanup that deletes the rows it came from.
-- **Tabs**: **AI transcript** (when AI outputs are available for the recording), **Questions & Answers** (answered and highlighted questions, when Q&A was on), **Materials**, **Polls** (published polls) and **Feedback** (the star summary).
-- **An invitation to answer the post-event questionnaire**, when feedback is shown and the event has one. It is meant for people who did not answer when leaving the call.
+- **The AI event report**, when staff requested and published it: after the video and before the description, with the platform's figures and charts and the text written by the language model ([AI post-production](../POSTPROD.md#the-event-report)).
+- **The event recap** (`app/src/lib/events/recap.ts`): an anonymous, aggregate snapshot with the peak headcount, the number of registrations, the most upvoted answered questions and questions asked in chat (text only, no author), published poll results, the most frequent word-cloud words and the average feedback. It is generated on the first view of the concluded page and stored on the event (`postEventRecap`), so it survives the GDPR cleanup, which deletes the registrations and chat messages it counts and quotes. The average rating is the exception: the page reads it when it is served ([Ratings](#ratings)), and shows it only while **Show feedback** is on.
+- **Tabs**: **AI transcript** (when AI outputs are available for the recording, or a transcript from captions is published, also without a video), **Questions & Answers** (answered and highlighted questions, when Q&A was on; after the event's retention they show no author), **Materials**, **Polls** (published polls) and **Feedback** (the average rating and its distribution).
+- **An invitation to answer the post-event questionnaire**, when feedback is shown, feedback collection is on and the event has one, until the event's retention expires. It is meant for people who did not answer in the room, and answers with the browser id, never with a registration.
 
 ### The recording and the video library
 
@@ -464,11 +481,26 @@ Administrators curate the library in **Publications** (`/admin/publications`). T
 
 When the installation's AI pipeline is on (the site setting `aiPipelineEnabled`) and AI post-production is enabled for the event, subtitles, the transcript, the summary, translations and dubbed audio are attached to the recording. The public page shows them next to the player, and staff review them in the administration area. The pipeline, the review workflow and the transparency notices are described in [POSTPROD.md](../POSTPROD.md); the privacy regime is in [privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md).
 
+An event with **Transcript from captions** gets a transcript without the AI pipeline: after the event, the caption sentences of the people who consented become its transcript, on its recording or on one created without media. The **Transcript from captions** panel of the **After the event** tab builds or updates it, opens it in the editor and publishes it on the event page (`transcriptPublished`), where it can be read also without a video while the post-event page is public; published this way, only the transcript text is public, not the AI outputs that accompany a published video. See [Live captions](live-captions.md#transcript-from-captions).
+
+### Ratings
+
+The **Ratings** panel of the **After the event** tab, below **Post-event configuration**, reads `GET /api/admin/events/{id}/feedback` (`app/src/lib/feedback/event-feedback-report.ts`) and refreshes every minute. Administrators and the event's organizer read it with their staff session, and the event's moderators (the primary link or a `MODERATOR` grant) with their token, when they open the event page from a moderator link. Speakers cannot. It shows:
+
+- how many ratings arrived;
+- for each question of the post-event questionnaire, how many people answered it, and the average and distribution of scale and yes/no answers, or the count per option of choice questions;
+- every comment (open-text answer), without names;
+- the older star ratings (`EventFeedback`), with their average and comments, when the event has any.
+
+**Download CSV** fetches `?format=csv&locale=<language>`: one row per response, with the submission time, whether it came through a registration or a browser id (`registration` or `guest`; after the event's retention every row reads `guest`), and one column per question, worded in the chosen language. Fields are separated by `;`, the file starts with a UTF-8 byte-order mark so spreadsheet programs read accented letters, yes/no answers are written as words, and a field that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'` so that it is never run as a formula.
+
+**One average.** `getFeedbackSummary()` in `app/src/lib/feedback/feedback-summary.ts` computes the event's average rating for the **Feedback** tab and the recap of the concluded page, and for the **Statistics** tab. Each response with at least one scale (`LIKERT`) answer counts once, as the mean of those answers, each rescaled to 1–5; each older star rating also counts once. The distribution rounds each value to the nearest star. It is computed on every request, so ratings given after the recap was first built are included.
+
 ### Event analytics
 
 The **Statistics** tab reads `GET /api/admin/events/{id}/analytics`, open to administrators and the owning organizer. It works for any event, recorded or not, and combines:
 
-- the recap;
+- the recap, with the average rating read at request time ([Ratings](#ratings));
 - attendance and conversion from the registrations' join and leave times;
 - the newest call session's peak headcount and times, and the raised-hand log across all sessions;
 - dwell and retention for registrants with both a join and a leave time;
@@ -495,8 +527,9 @@ Both call `POST /api/events/instant`, which requires a staff session and allows 
 - start time now and a nominal end four hours later. The end is cosmetic: it does not close the room;
 - `gracePeriodMinutes` set to `-1`, so the room closes on inactivity instead of at its nominal end ([event-lifecycle.md](event-lifecycle.md#instant-calls));
 - chat and whiteboard on, Q&A off, and microphone, camera and screen sharing open to everyone;
-- recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not shown the recording-consent step before joining ([known limitations](#known-limitations));
+- recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not asked for the recording consent before joining ([known limitations](#known-limitations));
 - a retention of 7 days and the post-event page off;
+- the platform's generic post-event feedback questionnaire, so the end of the call asks for a rating. If it cannot be attached, the call is created without it;
 - the name as the title, and the fixed Italian description `Videocall istantanea`. The API requires the `it` key, so the card stores the name there whatever language it was typed in; the list's quick form stores it under both `it` and `en`.
 
 The response carries the moderator's room link and the share link, `/events/{slug}/live`. Anyone with the share link enters as a guest while the call is `LIVE`, `IDLE` or `PROVISIONING`.
@@ -507,17 +540,13 @@ Instant calls do not get the bridge pre-scaling of scheduled events, so a large 
 
 These describe the current code. Planned work is tracked in [ROADMAP.md](../ROADMAP.md).
 
-- **Invitations are not sent.** No route generates `EventInvitation.token` or queues an invitation email, although step 3 describes invitees as receiving a personal link.
+- **Invitations are not sent.** No route generates `EventInvitation.token` or queues an invitation email: the organizer tells invitees by other means, as the help text of the wizard's **Invitations** section says.
 - **Content must exist in Italian.** The events API refuses a title or description without an Italian version, whatever the site's default language. The wizard checks the default language; on a site whose default is another language, the Italian requirement appears in the alert only after submit ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
-- **Post-create navigation.** After creating an event, the wizard opens `/admin/events/{id}/edit?created=1` without the moderator token, and the edit page answers `404` without it. The event itself exists and is reachable from the event list.
-- **Materials in the wizard.** Step 4 sends the material type in lowercase (`link`, `file`) while the materials API accepts only `LINK` and `FILE`, so materials added in the wizard are rejected and reported as not saved. The event's **Materials** page works.
-- **Emptying a questionnaire deletes its responses.** In the edit wizard, removing every template and question from a questionnaire deletes it with all collected responses, without a confirmation or a response count ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
-- **Tags in edit mode.** `PUT /api/events/{id}` does not write `tagSlugs`, and the wizard does not call `/api/admin/events/{id}/tags`, so tag changes made while editing are not saved.
 - **Unchecked publication.** On **Publish event**, the wizard does not check the result of the publishing request: if it fails, the event stays a `DRAFT` without any message.
 - **Organization names.** Step 3 asks for a contact name and an organization for each co-organizing organization, but only the contact name, the logo and the website are stored.
 - **Calendar file of hidden events.** `GET /api/events/{slug}/calendar.ics` answers for every event that is not a `DRAFT`, with no visibility check. Anyone who knows the slug of an `ARCHIVED` event, of a concluded event whose post-event page is off or expired, or of an instant call can still download its title, description, dates and moderator name.
-- **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording-consent step that participants of a recorded scheduled event see, so people who join through the share link are not asked before a moderator records.
-- **Feedback can be counted twice.** A registrant who answered the post-event questionnaire when leaving the call can answer again on the public post-event page, which submits as an anonymous respondent.
+- **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording consent that the waiting room asks of participants of a recorded scheduled event, so people who join through the share link are not asked before a moderator records.
+- **Feedback can be counted twice.** A registrant or a speaker who answered the post-event questionnaire in the room can answer again on the public post-event page, which submits with the browser's guest id.
 - **No series.** A recurrence rule only proposes the next date on duplication; occurrences are not created automatically and have no shared configuration ([ROADMAP.md](../ROADMAP.md#recurring-events-and-series)).
 
 ## Where the code lives

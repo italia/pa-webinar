@@ -33,11 +33,17 @@ describe('confirmation email', () => {
     expect(baseConfirmationCopy({ ...base(), locale: 'en' }).subject).toContain('Incontro di rete + domande');
   });
 
-  it('shows the event name prominently in the body, not just in the table', () => {
+  it('shows the event name once, as the headline, not again in the table', () => {
     const html = confirmationHtml(base());
-    // Once as the headline under the heading, once in the details table.
     const occurrences = html.split('Incontro di rete + domande').length - 1;
-    expect(occurrences).toBeGreaterThanOrEqual(2);
+    expect(occurrences).toBe(1);
+  });
+
+  it('links «I miei dati» when the page is known, in HTML and in text', () => {
+    const url = 'https://example.gov.it/it/privacy/i-miei-dati';
+    expect(confirmationHtml({ ...base(), myDataUrl: url })).toContain(`href="${url}"`);
+    expect(confirmationText({ ...base(), myDataUrl: url })).toContain(url);
+    expect(confirmationHtml(base())).not.toContain('i-miei-dati');
   });
 
   it('keeps the event name in the plain-text part', () => {
@@ -187,5 +193,16 @@ describe('uscita dalla rubrica nelle email', () => {
       eventPageUrl: 'https://example.gov.it/en/events/x',
     });
     expect(without.html).not.toContain('opt-out');
+  });
+});
+
+describe('email di ringraziamento: la valutazione solo a chi e\' entrato', () => {
+  it('chi e\' entrato e\' invitato a valutare, gli altri ricevono il riepilogo', async () => {
+    const { postEventParticipantEmail } = await import('./templates');
+    const base = { locale: 'it' as const, eventTitle: 'Evento', eventPageUrl: 'https://example.gov.it/it/eventi/x' };
+    expect(postEventParticipantEmail(base).text).toContain('feedback');
+    const soloRiepilogo = postEventParticipantEmail({ ...base, inviteRating: false });
+    expect(soloRiepilogo.text).not.toContain('feedback');
+    expect(soloRiepilogo.text).toContain('riepilogo');
   });
 });

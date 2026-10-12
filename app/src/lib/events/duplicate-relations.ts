@@ -33,6 +33,7 @@ export const DUPLICATED_EVENT_RELATIONS = [
   'agendaItems',
   'questionnaires',
   'reminders',
+  'glossaryTerms',
 ] as const;
 
 type DuplicatedRelation = (typeof DUPLICATED_EVENT_RELATIONS)[number];
@@ -49,16 +50,22 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   // qualcuno a un evento a cui non ha mai detto di sì.
   registrations: 'sono le persone iscritte a QUELL’occorrenza, e sono dati personali',
   invitations: 'un invito è un’azione verso una persona, non configurazione: la copia nasce in bozza e gli inviti si mandano quando la data è confermata',
+  multitrackConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
+  recordingConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
+  roomOccupants: 'chi era in sala in QUELL’occorrenza: dato della diretta, non configurazione',
+  captionSegments: 'frasi dette in QUELL’occorrenza, per la sua trascrizione: non si copiano',
 
   // Vita dell'evento.
   questions: 'domande poste durante quell’evento',
   chatMessages: 'conversazione di quell’evento (e dati personali cifrati)',
   liveReactions: 'reazioni di quell’evento',
   wordCloudRounds: 'giri di word cloud con le parole di chi c’era',
+  liveActions: 'cronologia della sala dell’occorrenza che si e’ svolta',
   feedback: 'giudizi su quell’evento',
   callSessions: 'sessioni della call che si è svolta',
   gdprAuditLogs: 'registro delle cancellazioni: appartiene alla riga che le ha subite',
   recordings: 'artefatti prodotti da quell’occorrenza',
+  reportJobs: 'lavori del resoconto di quell’occorrenza, che resta suo',
 
   // Casi discutibili, esclusi con motivo esplicito.
   polls: 'un sondaggio nasce quando lo si lancia e porta con sé i voti; copiare le sole domande sarebbe una funzione a parte (modelli di sondaggio), non una duplicazione',
@@ -80,14 +87,26 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     // in mano un accesso che le era stato tolto. È una regola di sicurezza, non
     // un dettaglio della query: un test la verifica.
     where: { revokedAt: null },
-    select: { name: true, email: true, role: true },
+    select: {
+      name: true,
+      email: true,
+      emailHash: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      organizationLogoUrl: true,
+    },
   },
   agendaItems: {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
-    // della riunione che si è svolta, non la scaletta.
-    select: { label: true, sortOrder: true },
+    // della riunione che si è svolta, non l'agenda.
+    select: { label: true, sortOrder: true, plannedMinutes: true },
   },
   reminders: { select: { offsetMinutes: true, label: true } },
+  // Il glossario della post-produzione: sigle e nomi di una serie si ripetono.
+  glossaryTerms: {
+    select: { term: true, aliases: true, reading: true, spoken: true, translations: true, note: true },
+  },
   questionnaires: {
     select: {
       placement: true,
@@ -183,7 +202,15 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
         // li cancella insieme al resto (vedi /api/cron/cleanup).
         name: m.name,
         email: m.email,
+        emailHash: m.emailHash,
         role: m.role,
+        // Ruolo ed ente seguono la persona; la pubblicazione no: presentare
+        // qualcuno nella pagina pubblica è una scelta per ogni evento, e la
+        // copia parte senza.
+        organizer: m.organizer,
+        organization: m.organization,
+        organizationLogoUrl: m.organizationLogoUrl,
+        publicListed: false,
         // Il token NON si eredita mai: è la credenziale con cui si entra in
         // sala da moderatore. Riusarlo darebbe al vecchio link il controllo
         // della stanza nuova — ed è la stessa regola già applicata al token
@@ -195,13 +222,30 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
 
   if (source.agendaItems.length > 0) {
     out.agendaItems = {
-      create: source.agendaItems.map((a) => ({ label: a.label, sortOrder: a.sortOrder })),
+      create: source.agendaItems.map((a) => ({
+        label: a.label,
+        sortOrder: a.sortOrder,
+        ...(a.plannedMinutes !== null && { plannedMinutes: a.plannedMinutes }),
+      })),
     };
   }
 
   if (source.reminders.length > 0) {
     out.reminders = {
       create: source.reminders.map((r) => ({ offsetMinutes: r.offsetMinutes, label: r.label })),
+    };
+  }
+
+  if (source.glossaryTerms.length > 0) {
+    out.glossaryTerms = {
+      create: source.glossaryTerms.map((g) => ({
+        term: g.term,
+        aliases: g.aliases,
+        reading: g.reading,
+        spoken: requiredJson(g.spoken),
+        translations: requiredJson(g.translations),
+        note: g.note,
+      })),
     };
   }
 

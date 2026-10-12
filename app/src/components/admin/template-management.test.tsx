@@ -22,11 +22,15 @@ const t = messages.admin.templates;
 let container: HTMLDivElement;
 let root: Root;
 
-function render(whiteboardInfraReady: boolean) {
+function render(whiteboardInfraReady: boolean, liveCaptionsAvailable = true) {
   act(() => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
-        <TemplateManagement templates={[]} whiteboardInfraReady={whiteboardInfraReady} />
+        <TemplateManagement
+          templates={[]}
+          whiteboardInfraReady={whiteboardInfraReady}
+          liveCaptionsAvailable={liveCaptionsAvailable}
+        />
       </NextIntlClientProvider>,
     );
   });
@@ -74,5 +78,26 @@ describe('TemplateManagement — lavagna', () => {
       interruttoreLavagna().click();
     });
     expect(interruttoreLavagna()).toBeChecked();
+  });
+});
+
+describe('TemplateManagement — sottotitoli', () => {
+  const interruttore = () =>
+    container.querySelector<HTMLInputElement>(
+      `input[aria-label="${messages.admin.form.liveCaptionsEnabled}"]`,
+    );
+
+  it('un modello nuovo li ha accesi, come un evento', () => {
+    render(true);
+    expect(interruttore()).toBeChecked();
+    act(() => {
+      interruttore()?.click();
+    });
+    expect(interruttore()).not.toBeChecked();
+  });
+
+  it('senza il servizio non li propone', () => {
+    render(true, false);
+    expect(interruttore()).toBeNull();
   });
 });

@@ -101,7 +101,7 @@ lists.
 | `default-src` | `'self'` | Fallback for every fetch directive not listed below |
 | `frame-ancestors` | `'none'` | No site can frame the portal: clickjacking protection. This also rules out embedding the portal in an intranet page |
 | `frame-src` | `'self' https://<jitsi-host>` | Only the Jitsi IFrame API. The event page shows an ended event's `youtubeUrl` as an external link (**Watch the video on YouTube**) and never embeds a third-party player, so visitors' browsers do not contact YouTube unless they choose to |
-| `script-src` | `'self' 'nonce-<nonce>' 'strict-dynamic' https: https://<jitsi-host>` | Per-request nonce plus `'strict-dynamic'`, with no `'unsafe-inline'`. See [What 'strict-dynamic' trusts](#what-strict-dynamic-trusts) |
+| `script-src` | `'self' 'nonce-<nonce>' 'strict-dynamic' https: https://<jitsi-host>`, plus `'wasm-unsafe-eval'` on the live page | Per-request nonce plus `'strict-dynamic'`, with no `'unsafe-inline'`. See [What 'strict-dynamic' trusts](#what-strict-dynamic-trusts). Only the live page (`/<locale>/events/<slug>/live`, which also hosts the waiting room) gets `'wasm-unsafe-eval'`: it allows compiling WebAssembly and nothing else, and JavaScript `eval` stays blocked. The waiting room's background preview needs it for MediaPipe's segmentation engine, served from `/vendor/mediapipe/`. The directive is built in `app/src/lib/security/script-src.ts` |
 | `style-src` | `'self' 'unsafe-inline'` | Deliberate trade-off. See [Why style-src keeps 'unsafe-inline'](#why-style-src-keeps-unsafe-inline) |
 | `font-src` | `'self' data:` | Fonts are self-hosted (`app/src/styles/_fonts.scss`); `data:` covers fonts embedded in stylesheets |
 | `img-src` | `'self' data: blob: https://i.ytimg.com` | Images come from the portal itself (uploads are served through `/api/assets`), from `data:` and `blob:` URLs built in the page, and from YouTube thumbnail URLs. No component builds an `i.ytimg.com` URL; the entry lets a pasted YouTube thumbnail render |
@@ -255,7 +255,8 @@ Rules for code that adds scripts:
 - A `<script>` written into server-rendered markup needs the nonce. Read it from
   `headers().get('content-security-policy')`, or from `x-nonce` through the mirroring described
   above. Without the nonce it is blocked, even from the portal's own origin.
-- Never add `'unsafe-inline'` or `'unsafe-eval'` to the production `script-src`.
+- Never add `'unsafe-inline'` or `'unsafe-eval'` to the production `script-src`. `'wasm-unsafe-eval'` is a
+  different keyword and covers WebAssembly only.
 
 ## Why style-src keeps 'unsafe-inline'
 

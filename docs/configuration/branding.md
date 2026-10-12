@@ -37,7 +37,7 @@ flowchart LR
     end
     MAIL["Emails"]
   end
-  JF["Inside the Jitsi frame<br/>not reached by site settings"]
+  JF["Inside the Jitsi frame<br/>Jitsi's own look,<br/>colors from the portal"]
 
   ID -->|"every surface"| SURF
   HOME --> LINK
@@ -64,8 +64,8 @@ flowchart LR
 
 The waiting room keeps the site's regular header and footer. The live room covers them with a
 full-screen call surface: there, the logo (or the site name) sits in the room's top bar and the
-watermark is drawn over the video. The Jitsi interface inside the frame is outside the portal's reach
-(see [Inside the Jitsi frame](#inside-the-jitsi-frame)).
+watermark is drawn over the video. The Jitsi interface inside the frame is outside the portal's reach,
+except for its colors (see [Inside the Jitsi frame](#inside-the-jitsi-frame)).
 
 ## How changes take effect
 
@@ -195,24 +195,33 @@ The **SEO** tab sets how the site appears in search results and in link previews
 - **SEO title** and **SEO description** (`seoTitle`, `seoDescription`) are the default title and
   description of pages that do not set their own. **Open Graph image** (`seoImage`) is the default
   preview image. Without it, the bundled `/images/logo/og-image.png` is used.
-- **Shared link preview** controls event links. With **Generate the preview** on (`ogCardEnabled`),
-  an event page advertises a card that the server draws, served by `/api/og/event/<slug>`. The card
-  is filled with **Primary color**, carries the PA Webinar mark, and prints the event title inside the
-  image. Switches choose what else goes in: **Poster as background**, **Date and time** (in the site's
-  default timezone), **Speakers** and **Organisation** (the event's organizer name,
-  `Event.organizerName`, when set, otherwise **Organization name**). With the card off, the preview
-  is the event's cover image, or the bundled `/images/logo/og-image.png` when the event has none.
+- **Shared link preview** controls event links: the event page, the link to enter the room
+  (`/events/<slug>/live`) and the registration page share the same preview, with the event's title
+  and its description as plain text (Markdown syntax removed, cut at about 160 characters). Links
+  to an event whose page is not public (a draft, an instant call, a concluded event whose page is
+  off) keep the site's default preview. With **Generate the preview** on (`ogCardEnabled`), the
+  preview image is a card that the server draws, served by `/api/og/event/<slug>`. The card is
+  filled with **Primary color**, carries the PA Webinar mark, and prints the event title inside the
+  image; when the title uses the kicker convention (**Kicker | Title**), the kicker goes above it.
+  Switches choose what else goes in: **Poster as background**, **Date and time** (in the event's
+  timezone), **Speakers** (the published speakers of the event, otherwise the free-text speakers,
+  one name per line) and **Organisation** (the event's organizing bodies, otherwise its organizer
+  name, `Event.organizerName`, otherwise **Organization name**). With the card off, the preview is
+  the event's cover image, or the bundled `/images/logo/og-image.png` when the event has none.
   **Open Graph image** is not used for event links.
 
-The card's URL changes whenever the event is edited, so preview services that cache images by address
-pick up a corrected title or poster.
+The card's URL changes whenever the event is edited or its published speakers and organizing bodies
+change, so preview services that cache images by address pick up a corrected title, poster or list of
+people, and a name removed from the event, also on an erasure request, does not stay in new previews.
+The same plain-text description, with paragraphs and lists kept, goes into the calendar file and the
+add-to-calendar links.
 
 ## Wording: translation overrides
 
 Any interface string can be reworded per language without touching the catalogs. Use this for
 organization-specific terminology, or to rewrite the landing copy.
 
-- **Where.** **Site settings** → **Language management** (`/en/admin/settings/languages`) →
+- **Where.** **Settings** → **Languages** (`/en/admin/settings/languages`) →
   **Custom translations**. Pick a language, then enter a **Translation key** in dot notation and its
   **Value**. Keys are the paths in `app/src/i18n/messages/<locale>.json`, for example
   `home.hero.title`. An override changes one language only.
@@ -233,7 +242,10 @@ language list, the default language and the catalog mechanics.
 convention. When it is on, an event title that contains `|` shows the part before the pipe as a small
 label above the main title, in listings, on the event page, in the waiting room and in the live room.
 It is off by default, so existing titles never change appearance. An event can override the site
-default in either direction (`Event.parseTitleKicker`; empty inherits the site setting).
+default in either direction (`Event.parseTitleKicker`; empty inherits the site setting). In the event
+wizard, under the title, a help line explains the convention; as soon as the title contains `|` with
+text on both sides, a box offers **Show “…” as a kicker above the title**, checked as the site setting
+says, with a preview of how the title will look.
 
 ## Header, footer and legal pages
 
@@ -341,9 +353,9 @@ The bundled track's source and license are recorded in
 
 ## Virtual backgrounds
 
-The backgrounds offered in the waiting room are a catalog in code (`SFONDI_VIRTUALI` in
-`app/src/lib/jitsi/virtual-background.ts`), not a runtime setting. They are abstract gradients
-bundled with the app. They follow the repository license, so no attribution is needed. To offer an
+The backgrounds offered in the waiting room, and in Jitsi's own backgrounds dialog inside the room,
+are a catalog in code (`SFONDI_VIRTUALI` in `app/src/lib/jitsi/virtual-background.ts`), not a runtime
+setting. They are abstract gradients and soft light effects bundled with the app. They follow the repository license, so no attribution is needed. To offer an
 organization's own backgrounds:
 
 1. add the images to the app;
@@ -358,11 +370,21 @@ How the chosen background reaches the conference is in
 
 ## Inside the Jitsi frame
 
-Site settings stop at the iframe. Inside it, Jitsi keeps its own colors, fonts and logos, and the
+Site settings stop at the iframe. Inside it, Jitsi keeps its own fonts, icons and layout, and the
 interface names the app "PA Webinar" (`APP_NAME` in `app/src/lib/jitsi/config.ts`) whatever
-**Application name** says. Why the portal cannot reach further, and the server-side options that
-remain, are described in
-[Branding limits](../architecture/jitsi-integration.md#branding-limits).
+**Application name** says. The colors come from the portal, and are not settings: the stage behind the
+videos is always the room's blue, and, when the Jitsi web server reads the portal's dynamic-branding
+document (`/api/jitsi-branding.json`), Jitsi's toolbar, menus and dialogs turn slate blue and the
+tiles of people without a camera a lighter blue, with matching colors for the initials avatars. That document also names the **Watermark URL**, or else the **Custom
+logo URL**, as Jitsi's logo, and **Organization URL** as its link.
+
+The chart points Jitsi at the document with `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL`, which
+is `null` by default because the chart does not know your portal's address. Set it to your portal's
+address followed by `/api/jitsi-branding.json`
+([Hostnames and ingress](../DEPLOYMENT.md#where-each-hostname-goes)). Participants' browsers fetch it,
+so it must be reachable without authentication. Unset, or behind HTTP authentication, only the stage
+color applies, and Jitsi's toolbar and menus keep their dark greys. Why the portal cannot reach further, and the server-side options that remain, are described
+in [Branding limits](../architecture/jitsi-integration.md#branding-limits).
 
 ## Design constraints
 
@@ -400,6 +422,7 @@ remain, are described in
 | Virtual backgrounds | `app/src/lib/jitsi/virtual-background.ts` and `app/public/images/virtual-backgrounds/` | Code change, 24-language names, rebuild |
 | Email layout | `app/src/lib/email/templates.ts` | Code change, rebuild |
 | Look of the Jitsi interface | Jitsi web configuration in the chart | Helm upgrade (see [deploying with Helm](../DEPLOYMENT.md)) |
+| Colors of the conference stage, toolbar, menus, tiles and initials avatars | `app/src/lib/jitsi/branding.ts` | Code change, rebuild the app image |
 
 ## Known limitations
 
@@ -409,14 +432,6 @@ remain, are described in
   URL** does not replace it there.
 - **Some footer links never display.** Links in the **Main** section are saved, but only **Legal**
   links are rendered.
-- **Saving after editing footer links fails.** The **Footer** tab keeps the list as a JSON string,
-  and the settings API expects an array. So **Save** returns a validation error, and none of the other
-  changes on the form are saved either. Until the editor is fixed, send `footerLinks` as an array to
-  `PUT /api/admin/settings`.
-- **Clearing the last custom legal text fails.** Emptying the only filled language of the privacy
-  policy or accessibility statement makes **Save** return a validation error, and no other change on
-  the form is saved. To go back to the built-in template, send `privacyPolicy` (or `accessibility`)
-  as `{}` to `PUT /api/admin/settings`.
 - **Several identity fields are single-language:** **Application name**, **Application description**,
   **SEO title**, **SEO description**, footer link titles and the custom home HTML. To get
   per-language SEO text, leave **SEO title** and **SEO description** empty (**SEO description** is

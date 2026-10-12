@@ -327,11 +327,17 @@ entry has the title in the language of `?locale=` or of `Accept-Language`
 and whether participants may start their camera.
 
 **Who calls it.** The **System status** page polls it every
-`statusPollIntervalSeconds`. Every open live-room client also polls it every
-few seconds while its event is `LIVE`, to learn whether the bridge and Jibri
-are ready. The interval is in `app/src/components/live/live-event-client.tsx`.
-During events this route carries a large share of the app's requests, and
-participants feel its latency. Each call runs several database queries and a
+`statusPollIntervalSeconds`. While its event is `LIVE`, a live-room client
+also polls it every few seconds to learn whether the bridge and Jibri are
+ready, until it has joined the call; after that only moderators keep
+polling it, for the recording control. The interval is in
+`app/src/components/live/live-event-client.tsx`. During events this route
+carries a large share of the app's requests, and participants feel its
+latency. Each pod computes the answer at most once every 3 seconds and
+serves it to every request in between: one answer per language of the
+titles while the status page is on, one reduced answer while it is off.
+Concurrent requests share the computation in flight, and `lastChecked` can
+be up to 3 seconds old. Each computation runs several database queries and a
 Redis ping. The probes of the conference components, of `/colibri/stats` and
 of Jibri are kept in memory for 5 seconds per pod, and concurrent requests
 share one probe in flight, so the load on those components does not grow
@@ -793,9 +799,9 @@ retention is the operator's decision**.
   `warn`. That includes the
   liveness calls to `/api/health` and every Prometheus scrape of
   `/api/metrics`. `/api/ready` writes a line only when it fails.
-- During events the request log is dominated by `/api/status`: every open
-  live room polls it every few seconds
-  ([`GET /api/status`](#get-apistatus)). Size the log store for that volume.
+- During events the request log is dominated by `/api/status`: every live
+  room that has not joined the call yet, and every moderator's room, polls it
+  every few seconds ([`GET /api/status`](#get-apistatus)). Size the log store for that volume.
 - Logged paths can contain event slugs, IDs and, for one public route, a
   registrant's access token. Set access control and retention on the log
   store accordingly.

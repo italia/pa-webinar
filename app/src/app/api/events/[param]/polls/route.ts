@@ -2,6 +2,7 @@ import { type PollStatus } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
+  AppError,
   NotFoundError,
   UnauthorizedError,
   ForbiddenError,
@@ -19,6 +20,7 @@ import {
 } from '@/lib/events/panel-read-access';
 import { getRedis } from '@/lib/redis';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { createPollSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -48,6 +50,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const reader = await authorizePanelRead(event, token);
   const { isModerator, registrationId } = reader;
 
+  const concluso = event.status === 'ENDED' || event.status === 'ARCHIVED';
   const where = isModerator
     ? { eventId: event.id }
     : { eventId: event.id, status: { in: ['OPEN', 'PUBLISHED'] as PollStatus[] } };
@@ -119,7 +122,10 @@ export const GET = withErrorHandling(async (request, context) => {
         id: poll.id,
         question: poll.question,
         options,
-        status: poll.status,
+        // A evento concluso un sondaggio rimasto aperto si presenta chiuso
+        // (il voto lo rifiuta gia' la rotta del voto). I risultati restano
+        // come li ha decisi chi modera: visibili al pubblico solo se pubblicati.
+        status: concluso && poll.status === 'OPEN' ? 'CLOSED' : poll.status,
         totalVotes,
         optionCounts: showResults ? optionCounts : null,
         createdAt: poll.createdAt.toISOString(),
@@ -167,6 +173,11 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!event || !(await isEventModerator(event, token))) {
     throw new ForbiddenError('Unauthorized');
   }
+  // A evento concluso non si apre un sondaggio: nessuno potrebbe votarlo, e
+  // a fine evento i sondaggi aperti si chiudono (lib/events/close-polls).
+  if (event.status === 'ENDED' || event.status === 'ARCHIVED') {
+    throw new AppError('Poll is closed', 409, 'POLL_CLOSED');
+  }
 
   const body = await parseJsonBody(request);
   const parsed = createPollSchema.safeParse(body);
@@ -187,6 +198,15 @@ export const POST = withErrorHandling(async (request, context) => {
 
   deleteCacheByPrefix(`polls:${event.id}`);
   pokeLivePanel(event.id, 'polls');
+
+  if (poll.status === 'OPEN') {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'poll.opened',
+      actor: 'moderator',
+      data: { pollId: poll.id, question: poll.question, options: poll.options },
+    });
+  }
 
   return Response.json(
     {

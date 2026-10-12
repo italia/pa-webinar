@@ -1,0 +1,25 @@
+# Termini dell'amministrazione digitale italiana, per glossary_check.py.
+# Nel corpus FLEURS non compaiono: misurano il danno di un glossario fuori tema.
+SPID
+CIE
+PagoPA
+app IO
+AgID
+ANPR
+PDND
+Piattaforma Digitale Nazionale Dati
+PNRR
+Polo Strategico Nazionale
+Developers Italia
+Designers Italia
+Agenzia per la Cybersicurezza Nazionale
+Codice dell'Amministrazione Digitale
+Dipartimento per la trasformazione digitale
+interoperabilità
+cybersicurezza
+open source
+riuso
+cloud
+accessibilità
+dichiarazione di accessibilità
+Linee guida

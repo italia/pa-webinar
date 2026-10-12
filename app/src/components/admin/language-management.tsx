@@ -56,9 +56,9 @@ export default function LanguageManagement({
     fetch('/api/admin/languages')
       .then((r) => r.json())
       .then(setConfig)
-      .catch(() => setError('Failed to load'))
+      .catch(() => setError(tc('errorGeneric')))
       .finally(() => setLoading(false));
-  }, [initialConfig]);
+  }, [initialConfig, tc]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -75,17 +75,18 @@ export default function LanguageManagement({
         }),
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Save failed');
+        // Un valore rifiutato si dice come tale; il resto e' un errore generico.
+        setError(res.status === 400 || res.status === 422 ? t('invalidValues') : tc('errorGeneric'));
+        return;
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+    } catch {
+      setError(tc('errorGeneric'));
     } finally {
       setSaving(false);
     }
-  }, [config]);
+  }, [config, t, tc]);
 
   const toggleLocale = useCallback((code: string) => {
     setConfig((prev) => {
@@ -143,20 +144,20 @@ export default function LanguageManagement({
           }),
         });
         if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error ?? 'Save failed');
+          setError(res.status === 400 || res.status === 422 ? t('invalidValues') : tc('errorGeneric'));
+          return;
         }
         const updated = await res.json();
         setConfig(updated);
         setOverrideKey('');
         setOverrideValue('');
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Error');
+      } catch {
+        setError(tc('errorGeneric'));
       } finally {
         setSaving(false);
       }
     },
-    [overrideKey, overrideValue],
+    [overrideKey, overrideValue, t, tc],
   );
 
   if (loading) {
@@ -195,6 +196,7 @@ export default function LanguageManagement({
             <select
               className="form-select"
               style={{ maxWidth: 320 }}
+              aria-label={t('defaultLocaleTitle')}
               value={config.defaultLocale}
               onChange={(e) => setDefaultLocale(e.target.value)}
             >
@@ -232,9 +234,11 @@ export default function LanguageManagement({
                   <div
                     className="p-3 rounded h-100 d-flex flex-column align-items-center text-center"
                     style={{
+                      // Una lingua spenta si distingue da fondo e bordo, non dalla
+                      // trasparenza, che porterebbe il testo sotto il 4,5:1.
                       backgroundColor: isEnabled ? '#f0f7ff' : '#f8f9fa',
-                      border: `1px solid ${isEnabled ? '#0066CC' : '#e8e8e8'}`,
-                      opacity: isEnabled ? 1 : 0.7,
+                      border: `1px ${isEnabled ? 'solid #0066CC' : 'dashed #c5cdd6'}`,
+                      color: isEnabled ? 'var(--app-text)' : 'var(--app-muted)',
                       cursor: isDefault ? 'default' : 'pointer',
                       transition: 'all 0.15s ease',
                     }}

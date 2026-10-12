@@ -38,6 +38,7 @@ export interface ParticipantEntryEvent {
   slug: string;
   status: string;
   eventType: string;
+  accessMode: string | null;
   endsAt: Date | string;
   postEventPublic: boolean;
   postEventPublicUntil: Date | string | null;
@@ -82,15 +83,15 @@ export function callInviteOpen(event: ParticipantEntryEvent, now: number = Date.
 export type ShareLink = { kind: 'page'; path: string } | { kind: 'invite'; path: string } | null;
 
 /**
- * Il link che si condivide dalla cima della pagina di gestione. Di un evento a
- * calendario e' la pagina pubblica, sempre: anche in bozza, da preparare per
- * quando esce. Una chiamata rapida una pagina pubblica non ce l'ha (salvo il
+ * Il link che si condivide dalla cima della pagina di gestione: la pagina
+ * pubblica, quando esiste per chi lo riceve. In bozza, archiviato o concluso
+ * con la pagina post-evento privata risponderebbe «non trovato», e non si
+ * offre. Una chiamata rapida una pagina pubblica non ce l'ha (salvo il
  * post-evento, se lo si rende pubblico), e si condivide l'invito alla sala
- * finche' funziona. Chiusa la chiamata senza pagina post-evento non resta
- * niente da condividere: un link che risponde «non trovato» non si offre.
+ * finche' funziona.
  */
 export function shareLink(event: ParticipantEntryEvent, now: number = Date.now()): ShareLink {
-  if (event.eventType !== 'INSTANT' || isEventPageVisible(event, now)) {
+  if (isEventPageVisible(event, now)) {
     return { kind: 'page', path: `/events/${event.slug}` };
   }
   if (callInviteOpen(event, now)) {

@@ -1,0 +1,33 @@
+# Worker di post-produzione senza GPU (postprod.worker.cpu nel chart): sintesi,
+# traduzioni e archivio. Stesso codice del worker con la GPU
+# (Dockerfile.worker), solo le dipendenze che servono a questi job
+# (worker/requirements-cpu.txt): l'immagine scende da ~15 GB compressi a meno
+# di 300 MB, e si scarica in pochi secondi sui nodi dell'app che la ospitano.
+# Alpine come l'immagine dell'app: la base Debian porta centinaia di
+# vulnerabilita' alte non ancora corrette a monte (ffmpeg e le sue librerie).
+FROM mirror.gcr.io/library/python:3.12-alpine3.24
+
+RUN apk add --no-cache ffmpeg tini ca-certificates
+
+WORKDIR /opt/worker
+
+COPY worker/requirements-cpu.txt ./requirements-cpu.txt
+RUN pip install --no-cache-dir -r requirements-cpu.txt
+
+COPY worker/ ./worker/
+
+# Il punto d'ingresso deve importarsi senza torch, WhisperX o Piper: se un
+# modulo li importasse all'avvio, il build si ferma qui e non al primo job.
+RUN python -c "import numpy, worker.cpu, worker.main; print('imports OK')"
+
+RUN adduser -D -u 10001 -h /work worker \
+    && mkdir -p /work && chown -R worker:worker /opt/worker /work
+USER 10001
+
+ENV HOME=/work \
+    XDG_CACHE_HOME=/work/.cache \
+    WORK_DIR=/work \
+    PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["python", "-m", "worker.cpu"]

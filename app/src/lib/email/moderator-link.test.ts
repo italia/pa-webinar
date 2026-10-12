@@ -8,11 +8,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
-    eventModerator: { findUnique: vi.fn() },
-    emailOutbox: { findUnique: vi.fn() },
+    eventModerator: { findUnique: vi.fn(), findMany: vi.fn() },
+    emailOutbox: { findUnique: vi.fn(), findMany: vi.fn() },
   },
 }));
-vi.mock('@/lib/email/outbox', () => ({ enqueueEmailOnce: vi.fn() }));
+vi.mock('@/lib/email/outbox', () => ({ enqueueEmailOnce: vi.fn(), enqueueEmail: vi.fn(async () => 'id') }));
 vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ siteName: 'Portale eventi', defaultLocale: 'it' })),
 }));
@@ -23,19 +23,21 @@ vi.mock('@/lib/crypto/pii', async (importOriginal) => ({
 
 import { prisma } from '@/lib/db';
 import { EMAIL_LOCALES } from '@/lib/email/lingua';
-import { enqueueEmailOnce } from '@/lib/email/outbox';
+import { enqueueEmail, enqueueEmailOnce } from '@/lib/email/outbox';
 
 import {
   adminRequestLocale,
   moderatorLinkEmail,
+  resendGrantModeratorLink,
   sendGrantModeratorLink,
+  sendGrantModeratorLinks,
   sendPrimaryModeratorLink,
 } from './moderator-link';
 
 const db = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn> };
-  eventModerator: { findUnique: ReturnType<typeof vi.fn> };
-  emailOutbox: { findUnique: ReturnType<typeof vi.fn> };
+  eventModerator: { findUnique: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
+  emailOutbox: { findUnique: ReturnType<typeof vi.fn>; findMany: ReturnType<typeof vi.fn> };
 };
 const mockedEnqueue = enqueueEmailOnce as unknown as ReturnType<typeof vi.fn>;
 
@@ -50,7 +52,7 @@ function eventRow(over: Record<string, unknown> = {}) {
     id: EVENT_ID,
     slug: 'incontro-mensile',
     title: { it: 'Incontro mensile', en: 'Monthly meeting' },
-    status: 'DRAFT',
+    status: 'PUBLISHED',
     startsAt: new Date('2027-03-01T09:00:00Z'),
     timezone: 'Europe/Rome',
     moderatorToken: PRIMARY_TOKEN,
@@ -82,6 +84,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.NEXT_PUBLIC_APP_URL = 'https://portale.example.test';
   db.emailOutbox.findUnique.mockResolvedValue(null);
+  db.emailOutbox.findMany.mockResolvedValue([]);
   db.event.findUnique.mockResolvedValue(eventRow());
   db.eventModerator.findUnique.mockResolvedValue(grantRow());
   mockedEnqueue.mockResolvedValue(true);
@@ -126,8 +129,10 @@ describe('sendPrimaryModeratorLink', () => {
     expect(input.dedupKey).toMatch(new RegExp(`^moderator-link:${EVENT_ID}:primary:`));
   });
 
-  it('sends nothing without an address or on a concluded event', async () => {
+  it('sends nothing without an address, on a draft or on a concluded event', async () => {
     db.event.findUnique.mockResolvedValue(eventRow({ moderatorEmail: null }));
+    expect(await sendPrimaryModeratorLink(EVENT_ID, { locale: 'it' })).toBe(false);
+    db.event.findUnique.mockResolvedValue(eventRow({ status: 'DRAFT' }));
     expect(await sendPrimaryModeratorLink(EVENT_ID, { locale: 'it' })).toBe(false);
     db.event.findUnique.mockResolvedValue(eventRow({ status: 'ENDED' }));
     expect(await sendPrimaryModeratorLink(EVENT_ID, { locale: 'it' })).toBe(false);
@@ -162,12 +167,94 @@ describe('sendGrantModeratorLink', () => {
     expect(queued().subject).toBe('Sei co-moderatore: Incontro mensile');
   });
 
-  it('sends nothing for a revoked grant or one without an address', async () => {
+  it('sends nothing for a revoked grant, one without an address, or on a draft', async () => {
     db.eventModerator.findUnique.mockResolvedValue(grantRow({ revokedAt: new Date() }));
     expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
     db.eventModerator.findUnique.mockResolvedValue(grantRow({ email: null }));
     expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
+    db.eventModerator.findUnique.mockResolvedValue(grantRow({ event: eventRow({ status: 'DRAFT' }) }));
+    expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
     expect(mockedEnqueue).not.toHaveBeenCalled();
+  });
+});
+
+describe('resendGrantModeratorLink', () => {
+  const mockedEnqueueAgain = enqueueEmail as unknown as ReturnType<typeof vi.fn>;
+
+  it('se il primo invio non c\'era, prende il suo posto con la sua chiave', async () => {
+    mockedEnqueue.mockResolvedValueOnce(true);
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    expect(mockedEnqueue.mock.calls[0]![0].dedupKey).toBeTruthy();
+    expect(mockedEnqueueAgain).not.toHaveBeenCalled();
+  });
+
+  it('se il primo invio c\'era, accoda di nuovo senza chiave', async () => {
+    mockedEnqueue.mockResolvedValueOnce(false);
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    expect(mockedEnqueueAgain).toHaveBeenCalledTimes(1);
+    const mail = mockedEnqueueAgain.mock.calls[0]![0];
+    expect(mail.dedupKey).toBeUndefined();
+    expect(mail.text).toContain(`token=${GRANT_TOKEN}`);
+  });
+
+  it('un errore del database non esce: risponde falso', async () => {
+    mockedEnqueue.mockRejectedValueOnce(new Error('db down'));
+    expect(await resendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(false);
+  });
+});
+
+describe('sendGrantModeratorLinks', () => {
+  function grant(id: string) {
+    const { event: _e, ...riga } = grantRow({ id });
+    return riga;
+  }
+
+  it('at publication, queues every active grant with an address, each under its own key', async () => {
+    db.eventModerator.findMany.mockResolvedValue([grant('grant-1'), grant('grant-2')]);
+    expect(await sendGrantModeratorLinks(EVENT_ID, { locale: 'it' })).toBe(2);
+    expect(db.eventModerator.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { eventId: EVENT_ID, revokedAt: null, email: { not: null } } }),
+    );
+    // L'evento si legge una volta, non per ogni concessione.
+    expect(db.event.findUnique).toHaveBeenCalledTimes(1);
+    expect(db.eventModerator.findUnique).not.toHaveBeenCalled();
+    const keys = mockedEnqueue.mock.calls.map((c) => (c[0] as { dedupKey: string }).dedupKey);
+    expect(keys).toEqual([
+      `moderator-link:${EVENT_ID}:grant:grant-1`,
+      `moderator-link:${EVENT_ID}:grant:grant-2`,
+    ]);
+  });
+
+  it('skips the grants whose link already went out, without rebuilding them', async () => {
+    db.eventModerator.findMany.mockResolvedValue([grant('grant-1'), grant('grant-2')]);
+    db.emailOutbox.findMany.mockResolvedValue([{ dedupKey: `moderator-link:${EVENT_ID}:grant:grant-1` }]);
+    expect(await sendGrantModeratorLinks(EVENT_ID, { locale: 'it' })).toBe(1);
+    expect((mockedEnqueue.mock.calls[0]![0] as { dedupKey: string }).dedupKey).toBe(
+      `moderator-link:${EVENT_ID}:grant:grant-2`,
+    );
+  });
+
+  it('sends nothing for a draft', async () => {
+    db.event.findUnique.mockResolvedValue(eventRow({ status: 'DRAFT' }));
+    db.eventModerator.findMany.mockResolvedValue([grant('grant-1')]);
+    expect(await sendGrantModeratorLinks(EVENT_ID, { locale: 'it' })).toBe(0);
+    expect(mockedEnqueue).not.toHaveBeenCalled();
+  });
+
+  it('one grant that fails to queue does not stop the others', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    db.eventModerator.findMany.mockResolvedValue([grant('grant-1'), grant('grant-2')]);
+    mockedEnqueue.mockRejectedValueOnce(new Error('pool timeout')).mockResolvedValueOnce(true);
+    expect(await sendGrantModeratorLinks(EVENT_ID, { locale: 'it' })).toBe(1);
+    expect(mockedEnqueue).toHaveBeenCalledTimes(2);
+    spy.mockRestore();
+  });
+
+  it('does not throw when the lookup fails', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    db.eventModerator.findMany.mockRejectedValue(new Error('db down'));
+    expect(await sendGrantModeratorLinks(EVENT_ID, { locale: 'it' })).toBe(0);
+    spy.mockRestore();
   });
 });
 

@@ -1,24 +1,27 @@
 'use client';
 
 /**
- * Step 5 — Review & publish.
- *
- * Read-mostly summary of everything chosen in steps 1–4, plus the GDPR /
- * retention fields (which, historically, lived lower in the form) and a
- * load-capacity preview. The shell owns the submit buttons — this component
- * only surfaces the data and lets the admin edit GDPR/moderator-contact
- * fields that are review-specific.
+ * Il riepilogo: in cima cio' che manca ancora per pubblicare (ogni voce porta
+ * al suo campo), poi l'evento in un'anteprima sola, come lo vedranno gli
+ * altri: quando, chi lo conduce, chi parla, le funzioni della sala, la
+ * registrazione (con le lingue di traduzione, che si cambiano qui) e
+ * l'informativa. Sotto, «Personalizza le impostazioni» apre le impostazioni
+ * avanzate. I pulsanti per salvare li ha il wizard.
  */
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import EventConfigDiagram from '@/components/admin/event-config-diagram';
-import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
-import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import LanguageChecklist from '@/components/admin/language-checklist';
+import { IconaMicrofono, IconaPersone, IconaRec } from '@/components/admin/guided-format';
+import { Icon } from '@/components/ui/icon';
+import { parseLocaleList } from '@/lib/ai/target-locales';
+import { localeNames } from '@/i18n/config';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
+import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
-import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
+import type { CampoMancante } from './validation';
 import type { WizardForm } from './wizard-shell';
 
 /** Format a timezone-naive "YYYY-MM-DDTHH:MM" wall-clock value (entered in the
@@ -41,32 +44,168 @@ function formatWallClock(dtLocal: string, locale: string): string {
 interface Props {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
-  jvbSizingConfig: JvbSizingConfig;
-  defaultSenderRatioPct: number;
   defaultLocale: string;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   fieldErrors?: Record<string, string>;
+  /** Apre le impostazioni avanzate (una sezione, se detta). */
+  onCustomize?: (sezione?: 'technical') => void;
+  /** Porta al campo che manca. */
+  onVaiAlCampo?: (campo: CampoMancante) => void;
+  /** Cio' che manca ancora, nell'ordine del wizard. */
+  mancanti?: CampoMancante[];
+  /** La post-produzione AI e' accesa sull'installazione. */
+  aiPipelineEnabled?: boolean;
+  /** I sottotitoli live ci sono nell'installazione. */
+  liveCaptionsAvailable?: boolean;
+  /** La lingua dell'evento: non si offre come lingua di traduzione. */
+  eventLocale?: string;
+  /** C'e' un avviso di capacita': lo si dice, e porta alle impostazioni. */
+  capacityWarning?: boolean;
+  /** La parte del titolo prima di «|» si mostra come sopratitolo. */
+  sopratitolo?: boolean;
+  /** Si iscrive chiunque (scelta dell'evento, o del sito). Assente per una
+   *  chiamata istantanea, che non ha iscrizione. */
+  iscrizioneAperta?: boolean;
+  /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
+  onVaiPersone?: () => void;
+}
+
+/** I nomi di un elenco di persone. */
+function nomi(persone: Array<{ name: string }>): string {
+  return persone.map((p) => p.name).join(', ');
 }
 
 export default function Step5Review({
   form,
   onChange,
-  jvbSizingConfig,
-  defaultSenderRatioPct,
   defaultLocale,
   gdprTemplates,
   fieldErrors = {},
+  onCustomize,
+  onVaiAlCampo,
+  mancanti = [],
+  aiPipelineEnabled = true,
+  liveCaptionsAvailable = false,
+  eventLocale,
+  capacityWarning = false,
+  sopratitolo = false,
+  iscrizioneAperta,
+  onVaiPersone,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
+  const tf = useTranslations('admin.wizard.flow');
+  const tp = useTranslations('admin.wizard.step2');
+  const tForm = useTranslations('admin.form');
   const toggles = togglesFromMatrix(form.permissionMatrix);
-  // Use the site default locale (not a client-side navigator.language guess)
-  // so the summary is stable and correct for locale-only events.
+  const senzaInvitati = iscrizioneAperta === false && form.invitations.length === 0;
+  // Cosa si chiede a chi si iscrive: nome ed email sempre, il resto se scelto.
+  const chiesti = [
+    tf('askName'),
+    tf('askEmail'),
+    ...(form.requireOrganization ? [tf('askOrganization')] : []),
+    ...(form.requireOrganizationRole ? [tf('askRole')] : []),
+    ...(form.requireOrganizationType ? [tf('askType')] : []),
+  ];
+  const titolo = splitTitleKicker(
+    form.title[defaultLocale] || form.title.it || form.title.en || '',
+    sopratitolo
+  );
   const locale: 'it' | 'en' = defaultLocale === 'it' ? 'it' : 'en';
+  // Le lingue si cambiano sul posto, a richiesta: l'anteprima resta
+  // un'anteprima. Si aprono da sole quando non ce n'e' nessuna (servono per
+  // tradurre) o quando un invio le segnala, e restano aperte finche' le si
+  // sceglie: chiuderle sotto il cursore alla prima spunta toglierebbe la
+  // seconda.
+  const [lingueAperte, setLingueAperte] = useState(false);
+  useEffect(() => {
+    if (fieldErrors.aiTargetLocales) setLingueAperte(true);
+  }, [fieldErrors.aiTargetLocales]);
 
-  const recurrenceText =
+  const ricorrenza =
     form.recurrenceRule && form.recurrencePreset !== 'none'
-      ? describeRRule(form.recurrenceRule, locale as 'it' | 'en')
-      : t('noRecurrence');
+      ? describeRRule(form.recurrenceRule, locale)
+      : null;
+
+  // Chi parla e si mostra: tutti, solo chi conduce e interviene, o un misto.
+  const perPartecipanti: Array<[boolean, string]> = [
+    [toggles.participantsCanUnmute, tp('feature.mic.label')],
+    [toggles.participantsCanStartVideo, tp('feature.video.label')],
+    [toggles.participantsCanShareScreen, tp('feature.share.label')],
+  ];
+  const voce = perPartecipanti.every(([on]) => on)
+    ? tf('voiceAll')
+    : perPartecipanti.every(([on]) => !on)
+      ? tf('voiceSpeakers')
+      : tf('participantsCan', {
+          list: perPartecipanti
+            .filter(([on]) => on)
+            .map(([, l]) => l)
+            .join(', '),
+        });
+  const funzioni = [
+    toggles.chatEnabled && tp('feature.chat.label'),
+    toggles.qaEnabled && tp('feature.qa.label'),
+    form.agendaEnabled && tForm('agendaEnabled'),
+    form.wordCloudEnabled && tForm('wordCloudEnabled'),
+    form.whiteboardEnabled && tForm('whiteboardEnabled'),
+    liveCaptionsAvailable && form.liveCaptionsEnabled && tForm('liveCaptionsEnabled'),
+    liveCaptionsAvailable &&
+      form.liveCaptionsEnabled &&
+      form.captionsTranscriptEnabled &&
+      tForm('captionsTranscriptEnabled'),
+  ].filter((x): x is string => !!x);
+  const traduce =
+    form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
+  const funzioniAi = [
+    tForm('aiTranscriptEnabled'),
+    form.aiSummaryEnabled && tForm('aiSummaryEnabled'),
+    traduce && tForm('aiTranslationEnabled'),
+    traduce && form.aiDubbingEnabled && tForm('aiDubbingEnabled'),
+  ].filter((x): x is string => !!x);
+  const lingue = parseLocaleList(form.aiTargetLocales).map(
+    (c) => (localeNames as Record<string, string>)[c] ?? c
+  );
+  const mostraLingue = traduce && (lingueAperte || lingue.length === 0);
+  const informativa = form.gdprTemplateId
+    ? tf('privacyTemplate', {
+        name: gdprTemplates.find((g) => g.id === form.gdprTemplateId)?.name ?? '—',
+      })
+    : form.privacyPolicyText?.trim()
+      ? tf('privacyCustom')
+      : form.privacyPolicyUrl
+        ? tf('privacyDocument')
+        : tf('privacySite');
+
+  // L'etichetta di un campo che manca, per l'elenco «manca ancora».
+  const etichettaCampo = (key: string): string => {
+    const campo = key.split('.')[0];
+    switch (campo) {
+      case 'title':
+        return tForm('titleLabel');
+      case 'description':
+        return tForm('descriptionLabel');
+      case 'startsAt':
+        return tForm('startsAt');
+      case 'endsAt':
+        return tForm('endsAt');
+      case 'maxParticipants':
+        return tForm('expectedParticipants');
+      case 'moderatorName':
+        return tf('fieldOrganizerName');
+      case 'moderatorEmail':
+        return tf('fieldOrganizerEmail');
+      case 'aiTargetLocales':
+        return tForm('aiTargetLocales');
+      case 'dataRetentionDays':
+        return t('retentionDays');
+      case 'gdprTemplateId':
+        return t('gdprTemplate');
+      default:
+        return campo ?? key;
+    }
+  };
+
+  const organizzatore = form.moderatorName?.trim();
 
   return (
     <div>
@@ -77,275 +216,227 @@ export default function Step5Review({
         {t('intro')}
       </p>
 
-      {/* Summary card */}
-      <div
-        className="p-3 mb-4 rounded border"
-        style={{ backgroundColor: '#F5F7FB', borderColor: '#dee5ec' }}
-      >
-        <div className="row g-2" style={{ fontSize: '0.9rem' }}>
-          <SummaryItem
-            label={t('summary.title')}
-            value={form.title[defaultLocale] || form.title.it || form.title.en || '—'}
-          />
-          <SummaryItem
-            label={t('summary.schedule')}
-            value={`${formatWallClock(form.startsAt, locale)} → ${formatWallClock(
-              form.endsAt,
-              locale,
-            )} (${form.timezone})`}
-          />
-          <SummaryItem
-            label={t('summary.recurrence')}
-            value={recurrenceText}
-          />
-          <SummaryItem
-            label={t('summary.maxParticipants')}
-            value={String(form.maxParticipants)}
-          />
-          <SummaryItem
-            label={t('summary.organizers')}
-            value={
-              form.organizers.length > 0
-                ? form.organizers.map((o) => o.name).join(', ')
-                : '—'
-            }
-          />
-          <SummaryItem
-            label={t('summary.speakers')}
-            value={
-              form.speakers.length > 0
-                ? form.speakers.map((s) => s.name).join(', ')
-                : '—'
-            }
-          />
-          <SummaryItem
-            label={t('summary.invitations')}
-            value={String(form.invitations.length)}
-          />
-          <SummaryItem
-            label={t('summary.materials')}
-            value={String(form.materials.length)}
-          />
-          <SummaryItem
-            label={t('summary.tags')}
-            value={form.tagSlugs.length > 0 ? form.tagSlugs.join(', ') : '—'}
-          />
-          <SummaryItem
-            label={t('summary.recording')}
-            value={
-              form.recordingEnabled
-                ? form.autoStartRecording
+      {/* Che cosa manca, prima di premere «Pubblica»: ogni voce porta al
+          campo. */}
+      {mancanti.length > 0 && (
+        <section className="wizard-mancanti mb-4" aria-labelledby="rev-mancanti-titolo">
+          <h3 id="rev-mancanti-titolo" className="wizard-mancanti__titolo">
+            <Icon icon="it-warning-circle" size="sm" className="me-1" />
+            {tf('missingHeading')}
+          </h3>
+          <ul className="wizard-mancanti__elenco">
+            {mancanti.map((m) => (
+              <li key={`${m.step}-${m.key}`}>
+                <button
+                  type="button"
+                  className="btn btn-link p-0 align-baseline"
+                  onClick={() => onVaiAlCampo?.(m)}
+                >
+                  {etichettaCampo(m.key)}
+                </button>{' '}
+                <span className="text-secondary">— {tf(`steps.${m.step}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* L'evento, come lo vedranno gli altri. */}
+      <section className="anteprima-evento mb-3" aria-labelledby="rev-anteprima-titolo">
+        <h3 id="rev-anteprima-titolo" className="anteprima-evento__titolo">
+          {titolo.kicker && <span className="event-title-kicker">{titolo.kicker}</span>}
+          {titolo.main || tf('untitled')}
+        </h3>
+        <ul className="anteprima-righe">
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-calendar" size="sm" />
+            </span>
+            <span>
+              {formatWallClock(form.startsAt, locale)} →{' '}
+              {formatWallClock(form.endsAt, locale)} ({form.timezone})
+              {ricorrenza && <span className="d-block text-secondary">{ricorrenza}</span>}
+            </span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <IconaPersone />
+            </span>
+            <span>
+              {t('summary.maxParticipants')}: {form.maxParticipants}
+            </span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-user" size="sm" />
+            </span>
+            <span>
+              {organizzatore ? (
+                <>
+                  {t('summary.primaryOrganizer')}: {organizzatore}
+                </>
+              ) : (
+                <span className="wizard-scheda__mancante fw-semibold">
+                  {t('summary.primaryOrganizer')}: {t('summary.primaryMissing')}
+                </span>
+              )}
+              {form.speakers.length > 0 && (
+                <span className="d-block">
+                  {t('summary.speakers')}: {nomi(form.speakers)}
+                </span>
+              )}
+              {form.moderators.length > 0 && (
+                <span className="d-block">
+                  {t('summary.moderators')}: {nomi(form.moderators)}
+                </span>
+              )}
+              {form.organizers.length > 0 && (
+                <span className="d-block">
+                  {t('summary.organizingEntities')}: {nomi(form.organizers)}
+                </span>
+              )}
+            </span>
+          </li>
+          {iscrizioneAperta !== undefined && (
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon={iscrizioneAperta ? 'it-unlocked' : 'it-mail'} size="sm" />
+              </span>
+              <span>
+                {iscrizioneAperta ? (
+                  tf('accessOpen')
+                ) : (
+                  <span
+                    className={
+                      senzaInvitati ? 'wizard-scheda__mancante fw-semibold' : undefined
+                    }
+                  >
+                    {tf('accessInvitation', { count: form.invitations.length })}
+                  </span>
+                )}{' '}
+                {onVaiPersone && (
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 align-baseline anteprima-link"
+                    onClick={onVaiPersone}
+                  >
+                    {senzaInvitati ? tf('addInvitees') : tf('change')}
+                  </button>
+                )}
+                <span className="d-block text-secondary">
+                  {tf('askLine', { list: chiesti.join(', ') })}
+                </span>
+              </span>
+            </li>
+          )}
+          <li>
+            <span className="anteprima-righe__icona">
+              <IconaMicrofono />
+            </span>
+            <span>{voce}</span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-comment" size="sm" />
+            </span>
+            <span>
+              <span className="anteprima-chip-elenco">
+                {funzioni.length > 0
+                  ? funzioni.map((f) => (
+                      <span key={f} className="anteprima-chip">
+                        {f}
+                      </span>
+                    ))
+                  : tf('none')}
+              </span>
+              <span className="d-block text-secondary small mt-1">
+                {tf('liveToggleNote')}
+              </span>
+            </span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <IconaRec />
+            </span>
+            <span>
+              {!form.recordingEnabled
+                ? t('summary.recordingOff')
+                : form.autoStartRecording
                   ? t('summary.recordingAuto')
-                  : t('summary.recordingManual')
-                : t('summary.recordingOff')
-            }
-          />
-          {form.multitrackRecordingEnabled && (
-            <SummaryItem
-              label={t('summary.multitrack')}
-              value={t('summary.multitrackOn')}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* GDPR / retention */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('gdprHeading')}
-        </h3>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-retention">
-              {t('retentionDays')}
-            </label>
-            <input
-              id="rev-retention"
-              type="number"
-              min={1}
-              max={365}
-              className="form-control"
-              value={form.dataRetentionDays}
-              onChange={(e) =>
-                onChange({
-                  dataRetentionDays:
-                    Number(e.target.value) || form.dataRetentionDays,
-                })
-              }
-            />
-            <small className="form-text text-muted">
-              {t('retentionHelp')}
-            </small>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-gdpr-template">
-              {t('gdprTemplate')}
-            </label>
-            <select
-              id="rev-gdpr-template"
-              className={`form-select${fieldErrors.gdprTemplateId ? ' is-invalid' : ''}`}
-              value={form.gdprTemplateId ?? ''}
-              onChange={(e) => {
-                const id = e.target.value || null;
-                // Scegliere un modello azzera il testo scritto a mano: la
-                // pagina di registrazione dà la precedenza al testo, e la
-                // casella che lo contiene sparisce appena un modello è
-                // scelto. Senza questo, il testo continuerebbe a vincere su
-                // una scelta che si vede fatta e non si può più disfare.
-                onChange({ gdprTemplateId: id, ...(id ? { privacyPolicyText: '' } : {}) });
-              }}
-            >
-              <option value="">{t('gdprTemplateNone')}</option>
-              {gdprTemplates.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                  {g.isDefault ? ' ★' : ''}
-                </option>
-              ))}
-            </select>
-            {fieldErrors.gdprTemplateId && (
-              <div className="invalid-feedback d-block">
-                {t('gdprTemplateUnknown')}
-              </div>
-            )}
-          </div>
-          {!form.gdprTemplateId && (
-            <div className="col-12">
-              <label className="form-label" htmlFor="rev-gdpr-text">
-                {t('privacyText')}
-              </label>
-              <textarea
-                id="rev-gdpr-text"
-                className="form-control"
-                rows={4}
-                value={form.privacyPolicyText ?? ''}
-                onChange={(e) => onChange({ privacyPolicyText: e.target.value })}
-              />
-              <small className="form-text text-muted">
-                {t('privacyTextHelp')}
-              </small>
-            </div>
-          )}
-          <div className="col-12">
-            <FileOrUrlInput
-              id="rev-privacy-doc"
-              label={t('privacyDoc')}
-              assetType="document"
-              value={form.privacyPolicyUrl}
-              onChange={(next) => onChange({ privacyPolicyUrl: next })}
-              helpText={t('privacyDocHelp')}
-            />
-          </div>
-        </div>
+                  : tf('recordingManual')}
+              {form.recordingEnabled && form.aiTranscriptEnabled && (
+                <span className="d-block">
+                  {tf('aiAfter', { list: funzioniAi.join(', ') })}
+                </span>
+              )}
+              {form.recordingEnabled &&
+                !form.aiTranscriptEnabled &&
+                !aiPipelineEnabled && (
+                  <span className="d-block text-secondary">{tp('aiPipelineOff')}</span>
+                )}
+              {traduce && (
+                <span className="d-block">
+                  {tf('translationLine', { list: lingue.join(', ') || tf('none') })}{' '}
+                  {/* Senza lingue l'elenco e' gia' aperto: niente da aprire. */}
+                  {lingue.length > 0 && (
+                    <button
+                      type="button"
+                      className="btn btn-link p-0 align-baseline anteprima-link"
+                      aria-expanded={mostraLingue}
+                      aria-controls={mostraLingue ? 'aiTargetLocales' : undefined}
+                      onClick={() => setLingueAperte((v) => !v)}
+                    >
+                      {tf('changeLanguages')}
+                    </button>
+                  )}
+                </span>
+              )}
+              {mostraLingue && (
+                <span id="aiTargetLocales" className="d-block mt-2">
+                  <LanguageChecklist
+                    legend={tForm('aiTargetLocales')}
+                    value={form.aiTargetLocales}
+                    onChange={(next) => {
+                      setLingueAperte(true);
+                      onChange({ aiTargetLocales: next });
+                    }}
+                    invalid={!!fieldErrors.aiTargetLocales}
+                    errorText={tForm('aiTargetLocalesRequired')}
+                    exclude={eventLocale ? [eventLocale] : []}
+                  />
+                </span>
+              )}
+            </span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-locked" size="sm" />
+            </span>
+            <span>{informativa}</span>
+          </li>
+        </ul>
+        {capacityWarning && (
+          <button
+            type="button"
+            className="btn btn-link p-0 anteprima-evento__avviso"
+            onClick={() => onCustomize?.('technical')}
+          >
+            <Icon icon="it-warning-circle" size="sm" className="me-1" />
+            {tf('capacityWarning')}
+          </button>
+        )}
       </section>
 
-      {/* Primary moderator: name+email are required to publish. This person
-          receives the moderator magic link (ADR-003) — distinct from the
-          additional co-moderators added in the People step. */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('moderatorHeading')}
-        </h3>
-        <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
-          {t('moderatorPublishHint')}
-        </p>
-        <div
-          className="p-2 mb-3 rounded"
-          style={{
-            background: 'rgba(0,102,204,0.08)',
-            border: '1px solid rgba(0,102,204,0.25)',
-            color: 'var(--app-text)',
-            fontSize: '0.82rem',
-          }}
+      {onCustomize && (
+        <button
+          type="button"
+          className="btn btn-outline-primary d-inline-flex align-items-center gap-2"
+          onClick={() => onCustomize()}
         >
-          {t('moderatorLinkNote')}
-        </div>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-name">
-              {t('moderatorName')}
-            </label>
-            <input
-              id="rev-mod-name"
-              type="text"
-              className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
-              value={form.moderatorName ?? ''}
-              onChange={(e) => onChange({ moderatorName: e.target.value })}
-            />
-            {fieldErrors.moderatorName && (
-              <div className="invalid-feedback d-block">{t('moderatorRequired')}</div>
-            )}
-          </div>
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-email">
-              {t('moderatorEmail')}
-            </label>
-            <input
-              id="rev-mod-email"
-              type="email"
-              className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
-              value={form.moderatorEmail ?? ''}
-              onChange={(e) => onChange({ moderatorEmail: e.target.value })}
-            />
-            {fieldErrors.moderatorEmail && (
-              <div className="invalid-feedback d-block">{t('moderatorEmailRequired')}</div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Load capacity */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('capacityHeading')}
-        </h3>
-        <JvbCapacityPreview
-          maxParticipants={form.maxParticipants}
-          senderRatioPct={form.expectedSenderRatioPct}
-          onSenderRatioChange={(next) =>
-            onChange({ expectedSenderRatioPct: next })
-          }
-          videoEnabled={toggles.participantsCanStartVideo}
-          defaultSenderRatioPct={defaultSenderRatioPct}
-          sizingConfig={jvbSizingConfig}
-        />
-      </section>
-
-      {/* Feature diagram */}
-      <section className="mb-3">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('featuresHeading')}
-        </h3>
-        <EventConfigDiagram
-          event={{
-            maxParticipants: form.maxParticipants,
-            qaEnabled: toggles.qaEnabled,
-            chatEnabled: toggles.chatEnabled,
-            recordingEnabled: form.recordingEnabled,
-            participantsCanUnmute: toggles.participantsCanUnmute,
-            participantsCanStartVideo: toggles.participantsCanStartVideo,
-            participantsCanShareScreen: toggles.participantsCanShareScreen,
-            speakers: form.speakers.map((s) => s.name).join(', ') || undefined,
-          }}
-          adminMode
-        />
-      </section>
-    </div>
-  );
-}
-
-function SummaryItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="col-md-6">
-      <div
-        className="text-secondary"
-        style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: 0.4 }}
-      >
-        {label}
-      </div>
-      <div className="fw-semibold" style={{ color: 'var(--app-text)', wordBreak: 'break-word' }}>
-        {value}
-      </div>
+          <Icon icon="it-settings" size="sm" color="primary" />
+          {tf('customize')}
+        </button>
+      )}
     </div>
   );
 }

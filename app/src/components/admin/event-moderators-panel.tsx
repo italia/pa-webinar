@@ -5,8 +5,11 @@ import { useTranslations } from 'next-intl';
 import { Badge, Button, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/components/ui/toast';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { mailtoHref } from '@/lib/email/mailto';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import type { PersonRole } from '@/lib/events/grant-profile';
 
 type GrantRole = 'MODERATOR' | 'SPEAKER';
 
@@ -15,6 +18,9 @@ interface ModeratorRow {
   name: string;
   email: string | null;
   role: GrantRole;
+  organizer: boolean;
+  organization: string | null;
+  publicListed: boolean;
   token: string;
   createdAt: string;
   revokedAt: string | null;
@@ -23,19 +29,30 @@ interface ModeratorRow {
 interface Props {
   eventId: string;
   eventSlug: string;
+  /** Il titolo dell'evento, per l'oggetto dell'email da preparare. */
+  eventTitle?: string;
   moderatorToken: string;
   baseUrl: string;
   locale: string;
+  /** Evento in bozza: i link per email partono alla pubblicazione. */
+  isDraft?: boolean;
+  /** «Reinvia link»: il portale manda i link per email (evento pubblicato e
+   *  non concluso). */
+  canResend?: boolean;
 }
 
 export default function EventModeratorsPanel({
   eventId,
   eventSlug,
+  eventTitle = '',
   moderatorToken,
   baseUrl,
   locale,
+  isDraft = false,
+  canResend = false,
 }: Props) {
   const t = useTranslations('admin.coModerators');
+  const toast = useToast();
   const tc = useTranslations('common');
   const confirm = useConfirm();
 
@@ -44,7 +61,10 @@ export default function EventModeratorsPanel({
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<GrantRole>('MODERATOR');
+  const [role, setRole] = useState<PersonRole>('moderator');
+  const [organization, setOrganization] = useState('');
+  // Spento di default: pubblicare nome ed ente è una scelta per ogni persona.
+  const [publicListed, setPublicListed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -85,7 +105,10 @@ export default function EventModeratorsPanel({
           body: JSON.stringify({
             name: name.trim(),
             email: email.trim() || undefined,
-            role,
+            role: role === 'speaker' ? 'SPEAKER' : 'MODERATOR',
+            organizer: role === 'organizer',
+            organization: organization.trim() || null,
+            publicListed,
           }),
         });
         if (!res.ok) {
@@ -94,14 +117,16 @@ export default function EventModeratorsPanel({
         }
         setName('');
         setEmail('');
-        setRole('MODERATOR');
+        setRole('moderator');
+        setOrganization('');
+        setPublicListed(false);
         setShowForm(false);
         await fetchRows();
       } finally {
         setSubmitting(false);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, email, role, eventId, moderatorToken, fetchRows, t],
+    }, [name, email, role, organization, publicListed, eventId, moderatorToken, fetchRows, t],
   );
 
   const handleRevoke = useCallback(
@@ -122,6 +147,32 @@ export default function EventModeratorsPanel({
     }, [eventId, moderatorToken, fetchRows, t, confirm],
   );
 
+  // «Reinvia link»: l'email con il link personale, di nuovo, a chi l'ha
+  // persa. Il server la rimette in coda (non in bozza, non a una concessione
+  // revocata o senza indirizzo, al massimo tre volte ogni dieci minuti).
+  const [reinviando, setReinviando] = useState<string | null>(null);
+  const handleResend = useCallback(
+    async (row: ModeratorRow) => {
+      setReinviando(row.id);
+      try {
+        const res = await fetch(`/api/events/${eventId}/moderators/${row.id}`, {
+          method: 'POST',
+          headers: authHeader,
+        });
+        if (res.ok) {
+          toast.success(t('resendDone', { name: row.name }));
+        } else {
+          toast.error(res.status === 429 ? t('resendTooMany') : t('resendFailed'));
+        }
+      } catch {
+        toast.error(t('resendFailed'));
+      } finally {
+        setReinviando(null);
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [eventId, moderatorToken, t, toast],
+  );
+
   // Indirizzo con i segmenti nella lingua della pagina (`/it/eventi/…`): un
   // link da copiare non passa dal router, quindi si traduce dalla mappa.
   const magicLink = useCallback(
@@ -135,6 +186,18 @@ export default function EventModeratorsPanel({
     setTimeout(() => setCopiedId(null), 2000);
   }, [magicLink]);
 
+  // L'email con il solo link di quella persona: niente «copia tutti i link»,
+  // che finirebbe in un messaggio di gruppo con le credenziali di tutti.
+  const emailPreparata = useCallback(
+    (row: ModeratorRow) =>
+      mailtoHref({
+        to: row.email ?? '',
+        subject: t('prepareEmailSubject', { title: eventTitle }),
+        body: t('prepareEmailBody', { name: row.name, title: eventTitle, link: magicLink(row.token) }),
+      }),
+    [t, eventTitle, magicLink],
+  );
+
   const activeCount = rows.filter((r) => r.revokedAt === null).length;
 
   return (
@@ -147,6 +210,11 @@ export default function EventModeratorsPanel({
           <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
             {t('introHint')}
           </div>
+          {isDraft && (
+            <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
+              {t('draftNote')}
+            </div>
+          )}
         </div>
         {!showForm && (
           <Button color="primary" size="sm" onClick={() => setShowForm(true)}>
@@ -184,14 +252,41 @@ export default function EventModeratorsPanel({
               id="co-mod-role"
               className="form-select"
               value={role}
-              onChange={(e) => setRole(e.target.value as GrantRole)}
+              onChange={(e) => setRole(e.target.value as PersonRole)}
             >
-              <option value="MODERATOR">{t('roleModerator')}</option>
-              <option value="SPEAKER">{t('roleSpeaker')}</option>
+              <option value="organizer">{t('roleOrganizer')}</option>
+              <option value="moderator">{t('roleModerator')}</option>
+              <option value="speaker">{t('roleSpeaker')}</option>
             </select>
             <div className="text-muted mt-1" style={{ fontSize: '0.78rem' }}>
-              {role === 'SPEAKER' ? t('roleSpeakerHint') : t('roleModeratorHint')}
+              {role === 'speaker'
+                ? t('roleSpeakerHint')
+                : role === 'organizer'
+                  ? t('roleOrganizerHint')
+                  : t('roleModeratorHint')}
             </div>
+          </div>
+          <div className="mb-2">
+            <Label htmlFor="co-mod-org">{t('organization')}</Label>
+            <Input
+              id="co-mod-org"
+              type="text"
+              maxLength={200}
+              value={organization}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOrganization(e.target.value)}
+            />
+          </div>
+          <div className="form-check mb-3">
+            <input
+              id="co-mod-public"
+              type="checkbox"
+              className="form-check-input"
+              checked={publicListed}
+              onChange={(e) => setPublicListed(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="co-mod-public">
+              {t('publicListed')}
+            </label>
           </div>
           <div className="d-flex gap-2">
             <Button color="primary" size="sm" type="submit" disabled={submitting || name.trim().length < 2}>
@@ -241,17 +336,26 @@ export default function EventModeratorsPanel({
                         color: row.role === 'SPEAKER' ? '#A66300' : '#0759A9',
                       }}
                     >
-                      {row.role === 'SPEAKER' ? t('roleSpeaker') : t('roleModerator')}
+                      {row.role === 'SPEAKER'
+                        ? t('roleSpeaker')
+                        : row.organizer
+                          ? t('roleOrganizer')
+                          : t('roleModerator')}
                     </Badge>
+                    {row.publicListed && !revoked && (
+                      <Badge color="" pill style={{ fontSize: '0.68rem', background: '#E6F4EA', color: '#1B6B2F' }}>
+                        {t('onPublicPage')}
+                      </Badge>
+                    )}
                     {revoked && (
-                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
+                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                         {t('revoked')}
                       </Badge>
                     )}
                   </div>
-                  {row.email && (
+                  {(row.email || row.organization) && (
                     <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                      {row.email}
+                      {[row.email, row.organization].filter(Boolean).join(' · ')}
                     </div>
                   )}
                   {!revoked && (
@@ -282,6 +386,29 @@ export default function EventModeratorsPanel({
                       >
                         {copiedId === row.id ? t('copied') : t('copyLink')}
                       </Button>
+                      <a
+                        className="btn btn-outline-secondary btn-xs"
+                        href={emailPreparata(row)}
+                        aria-label={t('prepareEmailFor', { name: row.name })}
+                      >
+                        {t('prepareEmail')}
+                      </a>
+                      {/* Il link parte dal portale solo a evento pubblicato e non
+                          concluso, e solo a chi ha un indirizzo. Il nome sta
+                          in un testo nascosto, dopo quello visibile: chi usa
+                          la voce dice «Reinvia link» e lo trova. */}
+                      {row.email && canResend && (
+                        <Button
+                          color="secondary"
+                          outline
+                          size="xs"
+                          onClick={() => handleResend(row)}
+                          disabled={reinviando === row.id}
+                        >
+                          {t('resend')}
+                          <span className="visually-hidden">{`: ${row.name}`}</span>
+                        </Button>
+                      )}
                       <Button
                         color="danger"
                         outline

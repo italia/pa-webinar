@@ -163,7 +163,7 @@ Dashed boxes are optional.
 | Two DNS names with TLS certificates, one for the portal (`webinar.example.com`) and one for the conference (`meet.webinar.example.com`). TURN over TLS needs a third name: on a managed cluster on coturn's own IP, with a certificate issued through DNS-01; on one k3s server on the same address and port as the portal. Object storage on one k3s server needs a fourth | The portal and the conference are served by separate ingresses | [DNS and TLS](INFRASTRUCTURE.md#dns-and-tls), [TURN](INFRASTRUCTURE.md#turn) |
 | A network path for media: a public IP on the bridge nodes with the bridge UDP port open, plus TURN over TLS on port 443 for participants behind restrictive firewalls | Audio and video. Media never passes through the portal | [Networking](INFRASTRUCTURE.md#networking), [Jitsi integration](architecture/jitsi-integration.md) |
 | PostgreSQL and Redis, in the cluster through the chart or as managed services | All state (PostgreSQL) and realtime fan-out in the live room (Redis) | [Deploying with Helm](DEPLOYMENT.md) |
-| An SMTP relay | Registration confirmations with the personal link (the only way it reaches registrants while public registration is off), reminders, staff sign-in links, confirmations of data-subject requests | [Email delivery](configuration/email.md), [Email and calendar](architecture/email.md) |
+| An SMTP relay | Registration confirmations with the personal link (the only way it reaches registrants while registration is by invitation only, and the proof of the address that a registrant needs to add a profile photo), reminders, staff sign-in links, confirmations of data-subject requests | [Email delivery](configuration/email.md), [Email and calendar](architecture/email.md) |
 | Object storage: Azure Blob Storage or an S3-compatible service (AWS S3, Google Cloud Storage through its S3-compatible API, or Garage, which the k3s installer adds to one server) | Recordings, uploaded materials and videos, AI outputs. Evaluation does not need it | [Object storage](configuration/storage.md) |
 | Optional: a GPU node pool, model weights, and an LLM server (vLLM) that you deploy separately from the chart | AI post-production only | [AI post-production](POSTPROD.md) |
 
@@ -268,10 +268,10 @@ Recording is switched on per event, and it is off by default. There are two
 capture paths, and you can enable either one or both:
 
 - **Composite video** (Jibri): a video of the room as participants see it. The
-  standard and full profiles enable Jibri, but the chart does not wire its
-  upload: you must give Jibri the finalize script yourself. Without it, the MP4
-  stays on the Jibri pod, the portal never registers the recording, and AI
-  post-production never receives it
+  standard and full profiles enable Jibri, and the chart mounts its finalize
+  script, which uploads the MP4 and registers the recording. With a
+  `fullnameOverride`, a different application Secret or values that replace
+  Jibri's volume lists, set the script's inputs yourself
   ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)).
 - **Per-participant audio** (the recorder bot and the recorder controller): one
   audio track per participant, used for speaker attribution in transcripts.
@@ -348,12 +348,15 @@ bodies on one installation is not supported. See
 
 - **Privacy notice.** You write it. The platform shows it from a site-wide page,
   from a default URL (`DEFAULT_PRIVACY_POLICY_URL`), from reusable
-  **GDPR templates**, or per event as a URL or as text.
+  privacy notice templates (**Settings → Privacy notices**), or per event as a URL
+  or as text.
   The [privacy notice checklist](privacy/privacy-notice-checklist.md) maps each
   fact your notice needs to the setting that controls it.
 - **Retention.** Each event has a retention period for participant data
   (`dataRetentionDays`, 30 days by default in `app/prisma/schema.prisma`). The
-  daily GDPR cleanup applies it. Address-book entries, recordings and AI
+  daily GDPR cleanup applies it: it deletes the personal data, and keeps the
+  event's live content without names or identifiers, for as long as the event
+  exists. Address-book entries, recordings and AI
   outputs follow their own regimes. [Privacy and data protection](GDPR.md) is
   the authoritative source for durations.
 - **Third parties.** Avatar lookup on Gravatar is off by default. If you turn it
@@ -374,7 +377,7 @@ bodies on one installation is not supported. See
   holder. It opens a new installation, and it serves emergencies and
   automation.
 - **Named administrators** (staff role `ADMIN`) and **organizers** (staff role
-  `ORGANIZER`, who manage only their own events): personal accounts that sign
+  `ORGANIZER`, who manage their own and co-organized events): personal accounts that sign
   in through one-time links sent by email, so SMTP is required. Deactivating
   an account takes effect on its next request, and the audit trail records who
   acted.
@@ -382,7 +385,7 @@ bodies on one installation is not supported. See
   links ([ADR-003](adr/003-moderator-magic-links.md)).
 
 The recommended path: sign in with the key once, create named administrators
-under **Accounts**, then keep the key in a vault
+under **Staff and access** > **Staff accounts**, then keep the key in a vault
 ([ADR-015](adr/015-named-administrators.md)). See
 [Identity, access and tokens](architecture/identity-and-access.md).
 
@@ -435,7 +438,7 @@ Plan the first installation as a project, not as a routine procedure.
 | Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `lifecycle`, `reminders` and `cleanup` jobs | For changing the code. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)). To evaluate the chart, use [minikube](install/minikube.md) |
 | Single VM | One k3s server, installed with `infra/onprem/k3s/pa-webinar-up.sh`: a supported small-production layout, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage and TURN are options of the installer | The documented path for a single server, with its limits stated once ([Installing on your own VMs with k3s](install/k3s.md)) |
 | Object storage | Azure Blob and S3-compatible providers are implemented, including video uploads from the administration area. Unit tests cover both providers with mocked SDKs. The S3 upload path has been exercised by hand against S3-compatible servers, but no automated test runs against a real storage service | The storage must accept uploads from browsers: CORS that allows `PUT` from the portal's origin and, on S3-compatible storage, an endpoint that is a public HTTPS address reachable by browsers and pods, and an access key with the permissions listed in [Object storage](configuration/storage.md#creating-buckets-and-containers). Test uploads and playback on your provider before the first event |
-| Composite recording (Jibri) | The standard and full profiles enable Jibri, but the chart does not wire the upload | The finalize script must be given to Jibri by hand, or composite recordings are neither uploaded nor registered ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)) |
+| Composite recording (Jibri) | The standard and full profiles enable Jibri, and the chart mounts its upload script and passes it the application's address and keys | With a `fullnameOverride`, a different application Secret or values that replace Jibri's volume lists, set the script's inputs yourself; the installation notes flag it ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)) |
 | TURN over TLS | coturn is an option of the Jitsi subchart, run by the AKS reference installation, and an add-on of the k3s installer tested in lab | On a managed cluster it needs its own IP, a third DNS name and a DNS-01 certificate; on one k3s server, `--turn` and a third DNS name. Test from a restrictive network before the first event ([TURN](INFRASTRUCTURE.md#turn)) |
 | Azure-specific tooling | `infra/tofu` holds only reference AKS node pools (bridges and GPU). The service-inventory generator in `infra/service-inventory/azure` reads Azure Resource Graph. The AI post-production setup procedure is written for AKS | Write the equivalents for your cloud |
 | Container images | The app and migration images are versioned per release and built only for `linux/amd64`. The recorder bot, recorder controller and AI worker images are versioned per release from 0.13.0; the chart gives them the app image's tag unless their value is set. The patched `jitsi/web` image sits on a registry that needs a pull secret. Published images accept no anonymous pulls, and after publication they are neither scanned nor signed | Build from source or mirror into your own registry. For releases before 0.13.0, pin the auxiliary images to a `:dev-<sha>` you have tested, because rolling back the chart does not roll them back. The stock `jitsi/web` image also works, with advanced noise suppression off ([ADR-017](adr/017-patched-jitsi-web-image.md)) |
@@ -521,8 +524,9 @@ software.
 - Data subjects can exercise access and erasure themselves. Erasure deletes
   the person's registrations and what cascades from them, and leaves the
   rest to other regimes:
-  - chat messages, questionnaire answers, invitations and named grants remain
-    until the event's retention;
+  - chat messages, invitations and named grants remain until the event's
+    retention; questionnaire answers given as a guest remain, and lose their
+    browser id at the event's retention;
   - the address-book entry remains until its own retention or until an
     administrator deletes it;
   - recordings, per-participant tracks and AI outputs follow their own
@@ -598,7 +602,7 @@ image tags explicitly, and pin the conference's internal credentials, or every
   - Helm values;
   - site settings (branding, languages, legal pages, translation overrides);
   - email templates;
-  - GDPR templates.
+  - privacy notice templates.
 
   See the [configuration reference](CONFIGURATION.md).
 - **Contribute fixes upstream.** [CONTRIBUTING](../CONTRIBUTING.md) explains

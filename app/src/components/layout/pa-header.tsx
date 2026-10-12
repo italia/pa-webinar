@@ -15,6 +15,7 @@ import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
 import LanguageSwitcher from './language-switcher';
+import { LINK_INTESTAZIONE, linkVisibile } from './public-links';
 
 interface PAHeaderProps {
   isAdmin?: boolean;
@@ -40,19 +41,22 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
   const parentUrl = parent ? settings.parentOrganizationUrl?.trim() || undefined : undefined;
   const appName = settings.siteName || t('common.appName');
 
+  // Il landmark «banner»: Headers del kit e' un div.
   return (
-    <Headers>
-      <SlimHeader
-        slimTitle={slimTitle}
-        slimSubtitle={slimSubtitle}
-        parentUrl={parentUrl}
-      />
-      <CenterHeader
-        appName={appName}
-        isAdmin={isAdmin}
-        logoUrl={settings.logoUrl}
-      />
-    </Headers>
+    <header>
+      <Headers>
+        <SlimHeader
+          slimTitle={slimTitle}
+          slimSubtitle={slimSubtitle}
+          parentUrl={parentUrl}
+        />
+        <CenterHeader
+          appName={appName}
+          isAdmin={isAdmin}
+          logoUrl={settings.logoUrl}
+        />
+      </Headers>
+    </header>
   );
 }
 
@@ -106,6 +110,8 @@ function CenterHeader({
   logoUrl?: string | null;
 }) {
   const t = useTranslations('nav');
+  const tr = useTranslations();
+  const settings = useSettings();
 
   return (
     <Header type="center" theme="dark" small>
@@ -121,40 +127,52 @@ function CenterHeader({
             {/* Default PA Webinar mark (white knockout) — appName text sits
                 next to it, so the image is decorative (aria-hidden). */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo/pa-webinar-mark-white.svg"
-              alt=""
-              aria-hidden="true"
-              style={{ height: 34, marginRight: 10 }}
-            />
+            {/* Il kit nasconde sui telefoni ogni figlio dopo il primo (qui il
+                titolo): il nome del link resta nel primo, per i lettori di
+                schermo, solo dove il titolo non si vede. */}
+            <span className="d-inline-flex align-items-center">
+              <img
+                src="/images/logo/pa-webinar-mark-white.svg"
+                alt=""
+                aria-hidden="true"
+                style={{ height: 34, marginRight: 10 }}
+              />
+              <span className="visually-hidden d-md-none">{appName}</span>
+            </span>
             <h2>{appName}</h2>
           </HeaderBrand>
         )}
         <HeaderRightZone>
-          {/* Archivio registrazioni pubblico: prima era raggiungibile solo
-              dal footer → poco scopribile. Esposto in header su ogni pagina. */}
-          <Link
-            href="/video-library"
-            // Sotto i 768px resta la sola icona: il nome serve comunque a chi
-            // usa un lettore di schermo.
-            aria-label={t('videoLibrary')}
-            className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-            style={{ fontSize: '0.9rem' }}
-          >
-            <Icon icon="it-video" size="sm" color="white" />
-            <span className="d-none d-md-inline">{t('videoLibrary')}</span>
-          </Link>
-          {isAdmin && (
-            <Link
-              href="/admin"
-              aria-label={t('admin')}
-              className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-              style={{ fontSize: '0.9rem' }}
-            >
-              <Icon icon="it-settings" size="sm" color="white" />
-              <span className="d-none d-md-inline">{t('admin')}</span>
-            </Link>
-          )}
+          {/* Videoteca e, se pubblico, calendario: su ogni pagina, non solo
+              nel piè di pagina dove nessuno li cercava. In un <nav>, perche'
+              chi usa un lettore di schermo li trovi tra i punti di riferimento. */}
+          <nav aria-label={t('mainLabel')} className="d-flex align-items-center">
+            {LINK_INTESTAZIONE.filter((l) => linkVisibile(l, settings)).map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                // Sotto i 768px resta la sola icona: il nome serve comunque a chi
+                // usa un lettore di schermo.
+                aria-label={tr(l.labelKey)}
+                className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+                style={{ fontSize: '0.9rem' }}
+              >
+                {l.icon && <Icon icon={l.icon} size="sm" color="white" />}
+                <span className="d-none d-md-inline">{tr(l.labelKey)}</span>
+              </Link>
+            ))}
+            {isAdmin && (
+              <Link
+                href="/admin/events"
+                aria-label={t('admin')}
+                className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+                style={{ fontSize: '0.9rem' }}
+              >
+                <Icon icon="it-tool" size="sm" color="white" />
+                <span className="d-none d-md-inline">{t('admin')}</span>
+              </Link>
+            )}
+          </nav>
         </HeaderRightZone>
       </HeaderContent>
     </Header>

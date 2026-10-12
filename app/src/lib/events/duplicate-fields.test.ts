@@ -116,6 +116,13 @@ describe('duplicatedConfig', () => {
     expect(out).not.toHaveProperty('peakParticipants');
   });
 
+  it('la copia non eredita l avvio automatico della registrazione', () => {
+    expect(duplicatedConfig({ recordingEnabled: true, autoStartRecording: true })).toMatchObject({
+      recordingEnabled: true,
+      autoStartRecording: false,
+    });
+  });
+
   it('preserves null (an explicit "no value") but skips undefined', () => {
     const out = duplicatedConfig({ gracePeriodMinutes: null, videoQuality: undefined });
     expect(out).toHaveProperty('gracePeriodMinutes', null);
@@ -141,10 +148,26 @@ describe('duplicatedConfig — Prisma Json handling', () => {
     expect(out.chatEnabled).toBe(true);
   });
 
-  it('still copies a Json column that has a value', () => {
-    const matrix = { chat: ['MODERATOR'] };
+  it('still copies a Json column that has a value, normalized like every write', () => {
+    const matrix = {
+      chat: ['MODERATOR', 'SPEAKER'],
+      qa: ['MODERATOR', 'SPEAKER'],
+      mic: ['GUEST', 'MODERATOR'],
+      video: ['MODERATOR'],
+      share: ['MODERATOR'],
+      recording_control: ['MODERATOR'],
+    };
     const out = duplicatedConfig({ permissionMatrix: matrix });
-    expect(out.permissionMatrix).toEqual(matrix);
+    // La colonna dei relatori segue la sala: chat e domande come i
+    // partecipanti, microfono, video e schermo sempre.
+    expect(out.permissionMatrix).toEqual({
+      chat: ['MODERATOR'],
+      qa: ['MODERATOR'],
+      mic: ['GUEST', 'MODERATOR', 'SPEAKER'],
+      video: ['MODERATOR', 'SPEAKER'],
+      share: ['MODERATOR', 'SPEAKER'],
+      recording_control: ['MODERATOR'],
+    });
   });
 
   it('does not inherit the previous occurrence’s published video or expiry', () => {
