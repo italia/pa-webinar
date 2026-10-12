@@ -147,7 +147,6 @@ export default async function EventManagePage({
     imageUrl: event.imageUrl,
     parseTitleKicker: event.parseTitleKicker,
     expectedSenderRatioPct: event.expectedSenderRatioPct,
-    capacityEstimateJson: event.capacityEstimateJson as Record<string, unknown> | null,
     recordingUrl: event.recordingUrl,
     tempRecordingUrl: event.tempRecordingUrl,
     tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,

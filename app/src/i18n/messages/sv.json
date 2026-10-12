@@ -759,7 +759,9 @@
       "helpImage": "Format som stöds: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Format som stöds: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället."
+      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället.",
+      "externalImage": "Bilder från andra webbplatser visas inte på portalens sidor.",
+      "externalImageUpload": "Ladda upp filen från din enhet."
     },
     "rubricaPicker": {
       "loading": "Söker…",
@@ -1613,7 +1615,8 @@
       "hide": "Dölj",
       "warning": "Alla som har den här länken administrerar evenemanget: visa den inte när du delar skärm och klistra inte in den i en chatt.",
       "hidden": "Länken är dold",
-      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt."
+      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt.",
+      "notYetPublished": "Fungerar först efter publiceringen: tills dess visas ”sidan hittades inte”."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultat",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Väntrum (webbplatsens standard)",
         "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassiskt (statiskt)",
-        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen."
+        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen.",
+        "primaryColorHex": "Primärfärg (hexkod)"
       },
       "watermark": {
         "title": "Videoanpassning",
@@ -1962,8 +1966,7 @@
         "min": "Kontrollera ”{field}”: minimivärdet är {min}.",
         "max": "Kontrollera ”{field}”: maxvärdet är {max}.",
         "field": "Kontrollera ”{field}”: värdet är ogiltigt."
-      },
-      "primaryColorHex": "Primärfärg (hexkod)"
+      }
     },
     "analytics": {
       "title": "Statistik",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Anmälningar",
         "ofMax": "{current} av {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Inga påminnelser konfigurerade",
         "tags": "Taggar",
         "postEventSummary": "{connected} anslutna av {registered} anmälda ({estimated} förväntade)",

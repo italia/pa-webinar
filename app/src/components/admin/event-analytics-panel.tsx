@@ -150,7 +150,14 @@ function EngagementTimeline({ data }: { data: Analytics['timeline'] }) {
           </span>
         ))}
       </div>
-      <div className="d-flex align-items-end gap-1" style={{ height: H + 22, overflowX: 'auto' }}>
+      {/* Scorre in orizzontale: deve poterlo fare anche chi usa la tastiera. */}
+      <div
+        className="d-flex align-items-end gap-1"
+        style={{ height: H + 22, overflowX: 'auto' }}
+        tabIndex={0}
+        role="group"
+        aria-label={t('timelineTitle')}
+      >
         {buckets.map((b, i) => {
           const isPeak = i === peakIndex && b.total > 0;
           const parts = b.total > 0 ? `${b.label} · ${b.total}` : b.label;

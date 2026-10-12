@@ -92,7 +92,7 @@ export default function EventConfigDiagram({
 
         {/* Mod → JVB */}
         <line x1="96" y1="60" x2="274" y2="60" stroke="#0066CC" strokeWidth="1.5" strokeDasharray="5,4" />
-        <text x="185" y="54" textAnchor="middle" fontSize="9" fill="#5A768A">
+        <text x="185" y="54" textAnchor="middle" fontSize="9" fill="#516B7E">
           {estimates.moderatorBandwidth}
         </text>
 
@@ -100,7 +100,7 @@ export default function EventConfigDiagram({
         <g transform="translate(300, 60)">
           <rect x="-32" y="-24" width="64" height="48" rx="8" fill="#E6F4EA" stroke="#008758" strokeWidth="1.5" />
           <text textAnchor="middle" y="2" fontSize="11" fontWeight="700" fill="#008758">JVB</text>
-          <text textAnchor="middle" y="14" fontSize="9" fill="#5A768A">×{estimates.jvbCount}</text>
+          <text textAnchor="middle" y="14" fontSize="9" fill="#516B7E">×{estimates.jvbCount}</text>
           <text textAnchor="middle" y="46" fontSize="10" fontWeight="600" fill="#17324D">
             {t('bridge')}
           </text>
@@ -108,7 +108,7 @@ export default function EventConfigDiagram({
 
         {/* JVB → participants */}
         <line x1="332" y1="60" x2="504" y2="60" stroke="#0066CC" strokeWidth="1.5" strokeDasharray="5,4" />
-        <text x="418" y="54" textAnchor="middle" fontSize="9" fill="#5A768A">
+        <text x="418" y="54" textAnchor="middle" fontSize="9" fill="#516B7E">
           {estimates.participantBandwidth}
         </text>
 
@@ -118,7 +118,7 @@ export default function EventConfigDiagram({
           <text textAnchor="middle" y="2" fontSize="13" fontWeight="700" fill="#17324D">
             {shownParticipants}
           </text>
-          <text textAnchor="middle" y="14" fontSize="8" fill="#5A768A">
+          <text textAnchor="middle" y="14" fontSize="8" fill="#516B7E">
             /{event.maxParticipants}
           </text>
           <text textAnchor="middle" y="46" fontSize="10" fontWeight="600" fill="#17324D">

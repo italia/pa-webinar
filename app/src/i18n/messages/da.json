@@ -759,7 +759,9 @@
       "helpImage": "Understøttede formater: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Understøttede formater: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
       "helpDocument": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
-      "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL."
+      "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL.",
+      "externalImage": "Billeder fra andre websteder vises ikke på portalens sider.",
+      "externalImageUpload": "Upload filen fra din enhed."
     },
     "rubricaPicker": {
       "loading": "Søger…",
@@ -1613,7 +1615,8 @@
       "hide": "Skjul",
       "warning": "Enhver med dette link administrerer begivenheden: vis det ikke, når du deler din skærm, og indsæt det ikke i en chat.",
       "hidden": "Linket er skjult",
-      "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt."
+      "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt.",
+      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultater",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Venteværelse (sitets standard)",
         "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassisk (statisk)",
-        "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen."
+        "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen.",
+        "primaryColorHex": "Primær farve (hex-kode)"
       },
       "watermark": {
         "title": "Videotilpasning",
@@ -1962,8 +1966,7 @@
         "min": "Kontroller »{field}«: minimumsværdien er {min}.",
         "max": "Kontroller »{field}«: maksimumværdien er {max}.",
         "field": "Kontroller »{field}«: værdien er ugyldig."
-      },
-      "primaryColorHex": "Primær farve (hex-kode)"
+      }
     },
     "analytics": {
       "title": "Statistik",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Tilmeldinger",
         "ofMax": "{current} af {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ingen påmindelser konfigureret",
         "tags": "Tags",
         "postEventSummary": "{connected} forbundet ud af {registered} tilmeldte ({estimated} forventet)",

@@ -759,7 +759,9 @@
       "helpImage": "Formats pris en charge : PNG, JPEG, WebP, SVG, GIF — max 10 Mo",
       "helpAudio": "Formats pris en charge : MP3, WAV, OGG, M4A, WebM — max 20 Mo",
       "helpDocument": "Formats pris en charge : PDF, DOCX, PPTX, XLSX, TXT — max 25 Mo",
-      "uploadsUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation : collez plutôt l'URL du fichier."
+      "uploadsUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation : collez plutôt l'URL du fichier.",
+      "externalImage": "Les images d'autres sites ne s'affichent pas sur les pages du portail.",
+      "externalImageUpload": "Téléversez le fichier depuis votre appareil."
     },
     "rubricaPicker": {
       "loading": "Recherche en cours…",
@@ -1613,7 +1615,8 @@
       "hide": "Masquer",
       "warning": "Toute personne disposant de ce lien administre l’événement : ne l’affichez pas lors d’un partage d’écran et ne le collez pas dans une conversation.",
       "hidden": "Lien masqué",
-      "copyFailed": "Échec de la copie : sélectionnez l’adresse ci-dessous et copiez-la manuellement."
+      "copyFailed": "Échec de la copie : sélectionnez l’adresse ci-dessous et copiez-la manuellement.",
+      "notYetPublished": "S'ouvre après la publication : d'ici là, la personne qui l'utilise voit « page introuvable »."
     },
     "feedbackAdmin": {
       "title": "Résultats des retours",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Salle d'attente (valeur par défaut du site)",
         "waitingRoomEngineGame": "Jeu vidéo (lobby Phaser)",
         "waitingRoomEngineClassic": "Classique (statique)",
-        "waitingRoomEngineHelp": "Mode par défaut de la salle d'attente. Il peut être modifié pour un événement donné et, pour une seule visite, avec le paramètre {param} dans l'adresse."
+        "waitingRoomEngineHelp": "Mode par défaut de la salle d'attente. Il peut être modifié pour un événement donné et, pour une seule visite, avec le paramètre {param} dans l'adresse.",
+        "primaryColorHex": "Couleur principale (code hexadécimal)"
       },
       "watermark": {
         "title": "Personnalisation vidéo",
@@ -1962,8 +1966,7 @@
         "min": "Vérifiez « {field} » : la valeur minimale est {min}.",
         "max": "Vérifiez « {field} » : la valeur maximale est {max}.",
         "field": "Vérifiez « {field} » : la valeur n'est pas valide."
-      },
-      "primaryColorHex": "Couleur principale (code hexadécimal)"
+      }
     },
     "analytics": {
       "title": "Statistiques",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Inscriptions",
         "ofMax": "{current} sur {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Aucun rappel configuré",
         "tags": "Tags",
         "postEventSummary": "{connected} connectés sur {registered} inscrits ({estimated} attendus)",

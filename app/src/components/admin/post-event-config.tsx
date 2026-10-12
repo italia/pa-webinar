@@ -308,29 +308,40 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
 
         <hr className="my-3" />
 
-        <div className="mb-3">
-          <div className="fw-semibold mb-2" style={{ fontSize: '0.9rem', color: 'var(--app-text)' }}>
+        {/* Le scelte del design system (form-check): il pallino nativo da
+            13 px era troppo piccolo da colpire. */}
+        <fieldset className="mb-3 border-0 p-0">
+          <legend
+            className="fw-semibold mb-2 float-none w-auto p-0"
+            style={{ fontSize: '0.9rem', color: 'var(--app-text)' }}
+          >
             {t('pageVisible')}
-          </div>
-          <div className="d-flex flex-column gap-1">
-            <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer' }}>
+          </legend>
+          <div className="d-flex flex-column">
+            <div className="form-check my-1">
               <input
                 type="radio"
+                id="post-event-visibility-always"
                 name="visibility"
                 checked={visibilityMode === 'always'}
                 onChange={() => handleVisibilityChange('always')}
               />
-              <span style={{ fontSize: '0.88rem' }}>{t('visibilityAlways')}</span>
-            </label>
-            <label className="d-flex align-items-center gap-2" style={{ cursor: 'pointer' }}>
+              <label htmlFor="post-event-visibility-always" style={{ fontSize: '0.88rem' }}>
+                {t('visibilityAlways')}
+              </label>
+            </div>
+            <div className="form-check my-1">
               <input
                 type="radio"
+                id="post-event-visibility-until"
                 name="visibility"
                 checked={visibilityMode === 'until'}
                 onChange={() => handleVisibilityChange('until')}
               />
-              <span style={{ fontSize: '0.88rem' }}>{t('visibilityUntil')}</span>
-            </label>
+              <label htmlFor="post-event-visibility-until" style={{ fontSize: '0.88rem' }}>
+                {t('visibilityUntil')}
+              </label>
+            </div>
             {visibilityMode === 'until' && (
               <FormGroup className="mb-0 ms-4 mt-1" style={{ maxWidth: 220 }}>
                 <Input
@@ -341,7 +352,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
               </FormGroup>
             )}
           </div>
-        </div>
+        </fieldset>
 
         <Alert color="info" className="mb-0" style={{ fontSize: '0.82rem' }}>
           {t('dataRetentionNote', { days: event.dataRetentionDays })}

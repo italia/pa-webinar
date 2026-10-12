@@ -759,7 +759,9 @@
       "helpImage": "Podržani formati: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Podržani formati: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
       "helpDocument": "Podržani formati: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
-      "uploadsUnavailable": "Učitavanje datoteka nije dostupno na ovoj instalaciji: umjesto toga zalijepite URL datoteke."
+      "uploadsUnavailable": "Učitavanje datoteka nije dostupno na ovoj instalaciji: umjesto toga zalijepite URL datoteke.",
+      "externalImage": "Slike s drugih web-mjesta ne prikazuju se na stranicama portala.",
+      "externalImageUpload": "Učitajte datoteku sa svojeg uređaja."
     },
     "rubricaPicker": {
       "loading": "Pretraživanje u tijeku…",
@@ -1613,7 +1615,8 @@
       "hide": "Sakrij",
       "warning": "Svatko tko ima ovu poveznicu upravlja događajem: nemojte je prikazivati pri dijeljenju zaslona i nemojte je lijepiti u chat.",
       "hidden": "Poveznica je skrivena",
-      "copyFailed": "Kopiranje nije uspjelo: odaberite adresu u nastavku i kopirajte je ručno."
+      "copyFailed": "Kopiranje nije uspjelo: odaberite adresu u nastavku i kopirajte je ručno.",
+      "notYetPublished": "Radi tek nakon objave: do tada se prikazuje „stranica nije pronađena”."
     },
     "feedbackAdmin": {
       "title": "Rezultati povratnih informacija",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Čekaonica (zadano za stranicu)",
         "waitingRoomEngineGame": "Videoigra (Phaser predvorje)",
         "waitingRoomEngineClassic": "Klasična (statična)",
-        "waitingRoomEngineHelp": "Zadani način rada čekaonice. Može se promijeniti za pojedini događaj i, za jedan posjet, parametrom {param} u adresi."
+        "waitingRoomEngineHelp": "Zadani način rada čekaonice. Može se promijeniti za pojedini događaj i, za jedan posjet, parametrom {param} u adresi.",
+        "primaryColorHex": "Primarna boja (heksadecimalni kôd)"
       },
       "watermark": {
         "title": "Prilagodba videa",
@@ -1962,8 +1966,7 @@
         "min": "Provjerite „{field}”: najmanja vrijednost je {min}.",
         "max": "Provjerite „{field}”: najveća vrijednost je {max}.",
         "field": "Provjerite „{field}”: vrijednost nije valjana."
-      },
-      "primaryColorHex": "Primarna boja (heksadecimalni kôd)"
+      }
     },
     "analytics": {
       "title": "Statistike",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Prijave",
         "ofMax": "{current} od {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nije konfiguriran nijedan podsjetnik",
         "tags": "Oznake",
         "postEventSummary": "{connected} povezanih od {registered} prijavljenih (očekivano {estimated})",

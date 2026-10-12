@@ -759,7 +759,9 @@
       "helpImage": "Formatos suportados: PNG, JPEG, WebP, SVG, GIF — máx. 10 MB",
       "helpAudio": "Formatos suportados: MP3, WAV, OGG, M4A, WebM — máx. 20 MB",
       "helpDocument": "Formatos suportados: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB",
-      "uploadsUnavailable": "O carregamento de ficheiros não está disponível nesta instalação: cole antes o URL do ficheiro."
+      "uploadsUnavailable": "O carregamento de ficheiros não está disponível nesta instalação: cole antes o URL do ficheiro.",
+      "externalImage": "As imagens de outros sites não aparecem nas páginas do portal.",
+      "externalImageUpload": "Carregue o ficheiro a partir do seu dispositivo."
     },
     "rubricaPicker": {
       "loading": "A pesquisar…",
@@ -1613,7 +1615,8 @@
       "hide": "Ocultar",
       "warning": "Quem tiver esta ligação administra o evento: não a mostre durante a partilha de ecrã e não a cole numa conversa.",
       "hidden": "Ligação oculta",
-      "copyFailed": "Não foi possível copiar: selecione o endereço abaixo e copie-o manualmente."
+      "copyFailed": "Não foi possível copiar: selecione o endereço abaixo e copie-o manualmente.",
+      "notYetPublished": "Abre depois da publicação: até lá, quem o usar vê «página não encontrada»."
     },
     "feedbackAdmin": {
       "title": "Resultados do Feedback",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Sala de espera (predefinição do site)",
         "waitingRoomEngineGame": "Videojogo (lobby Phaser)",
         "waitingRoomEngineClassic": "Clássica (estática)",
-        "waitingRoomEngineHelp": "Modo predefinido da sala de espera. Pode ser alterado para cada evento e, para uma única visita, com o parâmetro {param} no endereço."
+        "waitingRoomEngineHelp": "Modo predefinido da sala de espera. Pode ser alterado para cada evento e, para uma única visita, com o parâmetro {param} no endereço.",
+        "primaryColorHex": "Cor principal (código hexadecimal)"
       },
       "watermark": {
         "title": "Personalização do vídeo",
@@ -1962,8 +1966,7 @@
         "min": "Verifique «{field}»: o valor mínimo é {min}.",
         "max": "Verifique «{field}»: o valor máximo é {max}.",
         "field": "Verifique «{field}»: o valor não é válido."
-      },
-      "primaryColorHex": "Cor principal (código hexadecimal)"
+      }
     },
     "analytics": {
       "title": "Estatísticas",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Inscrições",
         "ofMax": "{current} de {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nenhum lembrete configurado",
         "tags": "Etiquetas",
         "postEventSummary": "{connected} ligados de {registered} inscritos ({estimated} previstos)",

@@ -759,7 +759,9 @@
       "helpImage": "Unterstützte Formate: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Unterstützte Formate: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
       "helpDocument": "Unterstützte Formate: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
-      "uploadsUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar: Bitte fügen Sie stattdessen die URL der Datei ein."
+      "uploadsUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar: Bitte fügen Sie stattdessen die URL der Datei ein.",
+      "externalImage": "Bilder von anderen Websites werden auf den Seiten des Portals nicht angezeigt.",
+      "externalImageUpload": "Lade die Datei von deinem Gerät hoch."
     },
     "rubricaPicker": {
       "loading": "Suche läuft…",
@@ -1613,7 +1615,8 @@
       "hide": "Ausblenden",
       "warning": "Wer diesen Link hat, verwaltet die Veranstaltung: Zeigen Sie ihn nicht bei der Bildschirmfreigabe und fügen Sie ihn nicht in einen Chat ein.",
       "hidden": "Link ausgeblendet",
-      "copyFailed": "Kopieren fehlgeschlagen: Markieren Sie die Adresse unten und kopieren Sie sie manuell."
+      "copyFailed": "Kopieren fehlgeschlagen: Markieren Sie die Adresse unten und kopieren Sie sie manuell.",
+      "notYetPublished": "Öffnet sich nach der Veröffentlichung: bis dahin erscheint „Seite nicht gefunden“."
     },
     "feedbackAdmin": {
       "title": "Feedback-Ergebnisse",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Warteraum (Standard der Website)",
         "waitingRoomEngineGame": "Videospiel (Phaser-Lobby)",
         "waitingRoomEngineClassic": "Klassisch (statisch)",
-        "waitingRoomEngineHelp": "Standardmodus des Warteraums. Er lässt sich für eine einzelne Veranstaltung ändern und, für einen einzelnen Besuch, mit dem Parameter {param} in der Adresse."
+        "waitingRoomEngineHelp": "Standardmodus des Warteraums. Er lässt sich für eine einzelne Veranstaltung ändern und, für einen einzelnen Besuch, mit dem Parameter {param} in der Adresse.",
+        "primaryColorHex": "Primärfarbe (Hex-Code)"
       },
       "watermark": {
         "title": "Video-Anpassung",
@@ -1962,8 +1966,7 @@
         "min": "Prüfen Sie „{field}“: Der Mindestwert ist {min}.",
         "max": "Prüfen Sie „{field}“: Der Höchstwert ist {max}.",
         "field": "Prüfen Sie „{field}“: Der Wert ist ungültig."
-      },
-      "primaryColorHex": "Primärfarbe (Hex-Code)"
+      }
     },
     "analytics": {
       "title": "Statistiken",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Anmeldungen",
         "ofMax": "{current} von {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Keine Erinnerungen konfiguriert",
         "tags": "Tags",
         "postEventSummary": "{connected} verbunden von {registered} Angemeldeten ({estimated} erwartet)",

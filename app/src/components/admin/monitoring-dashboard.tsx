@@ -732,7 +732,7 @@ export default function MonitoringDashboard({
           <Card className="border-0 shadow-sm h-100">
             <CardBody className="p-3">
               <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem' }}>{t('chartCpu')}</div>
-              <LineChart series={prom?.cpuSeries ?? []} color="#5A768A" height={120} format={(v) => `${(v * 100).toFixed(0)}%`} />
+              <LineChart series={prom?.cpuSeries ?? []} color="#516B7E" height={120} format={(v) => `${(v * 100).toFixed(0)}%`} />
               <div className="text-muted mt-1" style={{ fontSize: '0.72rem' }}>{t('cpuHelp')}</div>
             </CardBody>
           </Card>

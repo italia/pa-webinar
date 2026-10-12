@@ -81,18 +81,18 @@ function notificationHtml(locale: Locale, title: string, date: string, time: str
       <p style="font-size:16px;color:#17324D;line-height:1.6;">${c.body}</p>
       <table role="presentation" style="width:100%;margin:16px 0 24px;border-collapse:collapse;">
         <tr>
-          <td style="padding:8px 0;font-size:13px;color:#5A768A;text-transform:uppercase;width:130px;">${c.newDate}</td>
+          <td style="padding:8px 0;font-size:13px;color:#516B7E;text-transform:uppercase;width:130px;">${c.newDate}</td>
           <td style="padding:8px 0;font-size:15px;color:#17324D;font-weight:600;">${date}</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-size:13px;color:#5A768A;text-transform:uppercase;">${c.newTime}</td>
+          <td style="padding:8px 0;font-size:13px;color:#516B7E;text-transform:uppercase;">${c.newTime}</td>
           <td style="padding:8px 0;font-size:15px;color:#17324D;font-weight:600;">${time}</td>
         </tr>
       </table>
       <p style="font-size:14px;color:#455B71;line-height:1.5;">${c.linkNote}</p>
     </td></tr>
     <tr><td style="padding:16px 32px;background:#f5f7fb;text-align:center;">
-      <p style="margin:0;font-size:12px;color:#5A768A;">${c.footer}</p>
+      <p style="margin:0;font-size:12px;color:#516B7E;">${c.footer}</p>
     </td></tr>
   </table>
 </body>

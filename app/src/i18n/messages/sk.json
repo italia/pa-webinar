@@ -759,7 +759,9 @@
       "helpImage": "Podporované formáty: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Podporované formáty: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Nahrávanie súborov nie je v tejto inštalácii k dispozícii: namiesto toho vložte URL adresu súboru."
+      "uploadsUnavailable": "Nahrávanie súborov nie je v tejto inštalácii k dispozícii: namiesto toho vložte URL adresu súboru.",
+      "externalImage": "Obrázky z iných stránok sa na stránkach portálu nezobrazia.",
+      "externalImageUpload": "Nahrajte súbor zo svojho zariadenia."
     },
     "rubricaPicker": {
       "loading": "Vyhľadávanie…",
@@ -1613,7 +1615,8 @@
       "hide": "Skryť",
       "warning": "Ktokoľvek s týmto odkazom spravuje podujatie: nezobrazujte ho pri zdieľaní obrazovky a nevkladajte ho do chatu.",
       "hidden": "Odkaz je skrytý",
-      "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne."
+      "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne.",
+      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“."
     },
     "feedbackAdmin": {
       "title": "Výsledky spätnej väzby",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Čakáreň (predvolené nastavenie webu)",
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
-        "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese."
+        "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese.",
+        "primaryColorHex": "Primárna farba (hexadecimálny kód)"
       },
       "watermark": {
         "title": "Prispôsobenie videa",
@@ -1962,8 +1966,7 @@
         "min": "Skontrolujte „{field}“: minimálna hodnota je {min}.",
         "max": "Skontrolujte „{field}“: maximálna hodnota je {max}.",
         "field": "Skontrolujte „{field}“: hodnota nie je platná."
-      },
-      "primaryColorHex": "Primárna farba (hexadecimálny kód)"
+      }
     },
     "analytics": {
       "title": "Štatistiky",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Prihlášky",
         "ofMax": "{current} z {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Žiadne pripomienky nakonfigurované",
         "tags": "Tagy",
         "postEventSummary": "{connected} pripojených z {registered} registrovaných (očakávaných {estimated})",

@@ -640,6 +640,9 @@ function SeoTab({ settings, updateField }: TabProps) {
           id="seoImage"
           label={t('image')}
           assetType="image"
+          // Le anteprime per i social le scaricano i loro server: la CSP del
+          // portale non le riguarda, un'immagine di un altro sito va bene.
+          avvisoImmagineEsterna={false}
           value={settings.seoImage ?? null}
           onChange={(v) => updateField('seoImage', v)}
           helpText={t('imageHelp')}

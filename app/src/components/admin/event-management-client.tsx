@@ -44,6 +44,7 @@ import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
 import CallSessionsPanel from './call-sessions-panel';
@@ -164,7 +165,6 @@ interface EventData {
   coverImageUrl: string | null; imageUrl: string | null;
   parseTitleKicker: boolean | null;
   expectedSenderRatioPct: number | null;
-  capacityEstimateJson: Record<string, unknown> | null;
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
@@ -220,9 +220,13 @@ function useOrgTypeLabel(): (code: string) => string {
 }
 
 function tagChipStyle(color: string | null): CSSProperties {
-  const base = color ?? C_PRIMARY;
+  // Esadecimale anche il ripiego: la tinta si calcola dal colore, e una
+  // variabile CSS (C_PRIMARY) non si scompone.
+  const base = color ?? '#0066CC';
   return {
-    background: `${base}18`, color: base, border: `1px solid ${base}40`,
+    background: hexWithAlpha(base, 0x18 / 255),
+    color: inchiostroEtichetta(base, 0x18 / 255),
+    border: `1px solid ${hexWithAlpha(base, 0x40 / 255)}`,
     borderRadius: 999, fontSize: '0.75rem', fontWeight: 600,
     padding: '2px 10px', lineHeight: 1.6, whiteSpace: 'nowrap',
   };
@@ -355,11 +359,6 @@ export default function EventManagementClient({
   // chiamata chiusa senza pagina post-evento non ha niente da condividere.
   const condivisione = shareLink(eventoOra, istante);
   const invitoChiamata = callInviteOpen(eventoOra, istante);
-
-  // Capacity estimate sidebar surface. Everything else stays in the diagram.
-  const capacity = event.capacityEstimateJson ?? null;
-  const jvbCount = capacity && typeof capacity.jvbCount === 'number' ? capacity.jvbCount : null;
-  const jvbRam = capacity && typeof capacity.jvbRam === 'string' ? capacity.jvbRam : null;
 
   // Ritirare toglie l'evento dalle pagine pubbliche: si chiede conferma, come
   // dal menu della scheda nell'elenco, e un errore si vede.
@@ -891,15 +890,6 @@ export default function EventManagementClient({
                   {td('sidebar.estimatedAttendance', { estimated: event.maxParticipants })}
                 </div>
               )}
-              {(jvbCount !== null || jvbRam) && (
-                <div className="mt-3 pt-3 d-flex align-items-center gap-2"
-                     style={{ borderTop: '1px solid #f0f0f0', ...CAPTION, fontSize: '0.82rem' }}>
-                  <Svg name="info" size={14} />
-                  <span>
-                    {td('sidebar.capacityEstimate', { jvbs: jvbCount ?? 1, ram: jvbRam ?? '—' })}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Reminders */}
@@ -1157,7 +1147,13 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
         </div>
-        <div className="d-grid gap-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        {/* Due colonne finché ci stanno (mai tre); al telefono una sola. */}
+        <div
+          className="d-grid gap-2"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(14rem, calc(50% - 0.5rem))), 1fr))',
+          }}
+        >
           {toggles.map((toggle) => (
             <div key={toggle.label}
                  className="d-flex align-items-center gap-2 px-3 py-2"
@@ -1166,7 +1162,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
                 <Svg name={toggle.value ? 'check' : 'x'} size={14} />
               </span>
               {toggle.href ? (
-                <Link href={percorso(toggle.href)}>{toggle.label}</Link>
+                <Link href={percorso(toggle.href)} className="d-inline-block py-1">{toggle.label}</Link>
               ) : (
                 <span>{toggle.label}</span>
               )}
@@ -1182,6 +1178,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
         <H>{tl('title')}</H>
         <EventLinksSection
           slug={event.slug}
+          inBozza={event.status === 'DRAFT'}
           // Senza accesso degli ospiti l'invito diretto non fa entrare
           // nessuno: porta all'iscrizione, come la pagina pubblica. Per una
           // chiamata rapida lo stesso indirizzo e' IL link dei partecipanti,

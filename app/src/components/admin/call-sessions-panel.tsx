@@ -232,7 +232,8 @@ export default function CallSessionsPanel({
                         <h6 className="fw-semibold mb-2" style={{ fontSize: '0.85rem' }}>
                           {t('participantList')} ({participantList.length})
                         </h6>
-                        <div className="table-responsive">
+                        {/* Al telefono la tabella scorre: anche da tastiera. */}
+                        <div className="table-responsive" tabIndex={0} role="group" aria-label={t('participantList')}>
                           <table className="table table-sm mb-0" style={{ fontSize: '0.82rem' }}>
                             <thead>
                               <tr>

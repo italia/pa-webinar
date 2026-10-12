@@ -759,7 +759,9 @@
       "helpImage": "Ondersteunde formaten: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Ondersteunde formaten: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
       "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
-      "uploadsUnavailable": "Bestanden uploaden is op deze installatie niet beschikbaar: plak in plaats daarvan de URL van het bestand."
+      "uploadsUnavailable": "Bestanden uploaden is op deze installatie niet beschikbaar: plak in plaats daarvan de URL van het bestand.",
+      "externalImage": "Afbeeldingen van andere sites worden niet getoond op de pagina's van het portaal.",
+      "externalImageUpload": "Upload het bestand vanaf je apparaat."
     },
     "rubricaPicker": {
       "loading": "Bezig met zoeken…",
@@ -1613,7 +1615,8 @@
       "hide": "Verbergen",
       "warning": "Iedereen met deze link beheert het evenement: toon hem niet tijdens het delen van je scherm en plak hem niet in een chat.",
       "hidden": "Link verborgen",
-      "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig."
+      "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig.",
+      "notYetPublished": "Werkt pas na publicatie: tot dan krijgt wie hem gebruikt ‘pagina niet gevonden’."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultaten",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Wachtruimte (standaard van de site)",
         "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassiek (statisch)",
-        "waitingRoomEngineHelp": "Standaardmodus van de wachtruimte. Die kan per evenement worden gewijzigd en, voor één bezoek, met de parameter {param} in het adres."
+        "waitingRoomEngineHelp": "Standaardmodus van de wachtruimte. Die kan per evenement worden gewijzigd en, voor één bezoek, met de parameter {param} in het adres.",
+        "primaryColorHex": "Primaire kleur (hexcode)"
       },
       "watermark": {
         "title": "Video-aanpassing",
@@ -1962,8 +1966,7 @@
         "min": "Controleer ‘{field}’: de minimumwaarde is {min}.",
         "max": "Controleer ‘{field}’: de maximumwaarde is {max}.",
         "field": "Controleer ‘{field}’: de waarde is ongeldig."
-      },
-      "primaryColorHex": "Primaire kleur (hexcode)"
+      }
     },
     "analytics": {
       "title": "Statistieken",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Inschrijvingen",
         "ofMax": "{current} van {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Geen herinneringen geconfigureerd",
         "tags": "Tags",
         "postEventSummary": "{connected} verbonden van {registered} inschrijvingen ({estimated} verwacht)",

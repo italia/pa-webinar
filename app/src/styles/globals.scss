@@ -10,7 +10,28 @@
 :root {
   --app-text: #17324D;    /* heading/testo scuro brand */
   --app-primary: #0066CC; /* blu primario .italia */
-  --app-muted: #5A768A;   /* testo secondario */
+  --app-muted: #516B7E;   /* testo secondario: ≥4,5:1 anche sulle tinte chiare */
+  --app-warning-text: #8A5300; /* testo d'avviso sul bianco (≥6:1) */
+}
+
+// Nel kit la casella la disegna l'etichetta che segue l'input, nascosto con
+// opacità 0. Se l'input ha anche la classe di Bootstrap (form-check-input),
+// da disattivato Bootstrap gli ridà opacità 0,5: le due caselle si
+// sovrappongono e quella del kit sembra disegnata a metà.
+.form-check .form-check-input:disabled:has(+ label) {
+  opacity: 0;
+}
+
+// Un <summary> su una riga sola è alto 21 px: sotto la misura minima di un
+// bersaglio da toccare (24 px, WCAG 2.5.8).
+details > summary {
+  min-height: 1.5rem;
+}
+
+// Il grigio di `.text-muted` del pacchetto (#5d7083) scende sotto 4,5:1 sui
+// fondi tinti delle card e dei badge: lo stesso testo secondario del token.
+.text-muted {
+  color: var(--app-muted) !important;
 }
 
 // ── Bootstrap Italia overrides ───────────────────────────────────────────
@@ -65,7 +86,7 @@
     &:disabled,
     &[readonly] {
       background-color: #F5F7FB;
-      color: #5A768A;
+      color: var(--app-muted);
       border-color: #E8ECF0;
     }
   }
@@ -156,7 +177,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5A768A;
+  color: var(--app-muted);
   margin-bottom: 0.25em;
   line-height: 1.2;
 }
@@ -4154,7 +4175,7 @@ button.live-time-strip__rec {
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: #5A768A;
+      color: var(--app-muted);
       font-size: 1.15rem;
       line-height: 1;
       padding: 4px 8px;
@@ -4171,7 +4192,7 @@ button.live-time-strip__rec {
 
   &__search-status {
     font-size: 0.78rem;
-    color: #5A768A;
+    color: var(--app-muted);
     margin-bottom: 6px;
   }
 }
@@ -4259,7 +4280,7 @@ button.live-time-strip__rec {
   font-size: 0.78rem;
   font-weight: 500;
   background: #F6F8FA;
-  color: #5A768A;
+  color: var(--app-muted);
   border: 1px solid #E8ECF0;
 
   &__dot {
@@ -4308,7 +4329,7 @@ button.live-time-strip__rec {
 
   &__basis {
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
   }
 
   &__bar {
@@ -4340,7 +4361,7 @@ button.live-time-strip__rec {
 
   &__label {
     font-size: 0.68rem;
-    color: #5A768A;
+    color: var(--app-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
     line-height: 1.2;
@@ -4402,7 +4423,7 @@ button.live-time-strip__rec {
 
   &__stat-label {
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
     white-space: nowrap;
   }
 
@@ -4532,7 +4553,7 @@ button.live-time-strip__rec {
 
   &__detail-label {
     font-size: 0.78rem;
-    color: #78909C;
+    color: var(--app-muted);
   }
 
   &__detail-value {
@@ -4564,7 +4585,7 @@ button.live-time-strip__rec {
     align-items: center;
     gap: 5px;
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
   }
 
   &__legend-dot {
@@ -4576,7 +4597,7 @@ button.live-time-strip__rec {
 
   &__last-update {
     font-size: 0.72rem;
-    color: #90A4AE;
+    color: var(--app-muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -4641,7 +4662,7 @@ button.live-time-strip__rec {
 
   &__metric-label {
     font-size: 0.68rem;
-    color: #5A768A;
+    color: var(--app-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
   }
@@ -4668,7 +4689,7 @@ button.live-time-strip__rec {
 
   &__verdicts-subtitle {
     font-size: 0.78rem;
-    color: #78909C;
+    color: var(--app-muted);
     margin-bottom: 16px;
   }
 
@@ -4731,7 +4752,7 @@ button.live-time-strip__rec {
       th {
         font-size: 0.75rem;
         font-weight: 600;
-        color: #78909C;
+        color: var(--app-muted);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         padding: 10px 8px;
@@ -4790,7 +4811,7 @@ button.live-time-strip__rec {
     padding: 0.5rem 1rem;
     margin: 0.75rem 0;
     background: #F5F7FB;
-    color: #5A768A;
+    color: var(--app-muted);
     border-radius: 0 4px 4px 0;
   }
 
@@ -4883,7 +4904,7 @@ button.live-time-strip__rec {
   }
   &__stack-intro {
     margin: 0 0 1.25rem 0;
-    color: #5A768A;
+    color: var(--app-muted);
     font-size: 0.9rem;
   }
   &__stack-layers {
@@ -4910,7 +4931,7 @@ button.live-time-strip__rec {
   &__stack-layer-sub {
     display: block;
     font-weight: 400;
-    color: #5A768A;
+    color: var(--app-muted);
     font-size: 0.78rem;
     margin-top: 2px;
   }
@@ -6446,7 +6467,7 @@ button.live-time-strip__rec {
 }
 .wr-consensi__nota {
   font-size: 0.78rem;
-  color: #5a768a;
+  color: var(--app-muted);
   margin-top: 0.4rem;
 }
 .wr-consensi__privacy {
@@ -10375,7 +10396,7 @@ html.live-resizing .live-sidebar-resizer::after {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #5A768A;
+  color: var(--app-muted);
 }
 
 .wizard-sopratitolo__titolo {
@@ -10772,6 +10793,34 @@ html.live-resizing .live-sidebar-resizer::after {
     top: 20px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
+    // Che sotto c'e' altro deve vedersi: una barra sottile sempre presente e,
+    // dove il browser lo sa fare, il fondo che sfuma finche' non si arriva
+    // in fondo. Se la colonna non scorre non succede niente.
+    scrollbar-width: thin;
+    scrollbar-color: #b9c4cf transparent;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .event-manage__side {
+      animation: event-manage-side-fondo linear both;
+      animation-timeline: scroll(self);
+    }
+
+    // Con il fuoco dentro la colonna niente sfumatura: il controllo attivo
+    // (e il suo anello) si vedono pieni anche se stanno in fondo.
+    .event-manage__side:focus-within {
+      animation: none;
+    }
+  }
+}
+
+@keyframes event-manage-side-fondo {
+  0%,
+  97% {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 3rem), transparent);
+  }
+  100% {
+    mask-image: none;
   }
 }
 

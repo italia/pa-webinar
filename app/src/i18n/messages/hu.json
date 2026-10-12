@@ -759,7 +759,9 @@
       "helpImage": "Támogatott formátumok: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Támogatott formátumok: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
       "helpDocument": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
-      "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét."
+      "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét.",
+      "externalImage": "Más oldalakról származó képek nem jelennek meg a portál oldalain.",
+      "externalImageUpload": "Töltsd fel a fájlt az eszközödről."
     },
     "rubricaPicker": {
       "loading": "Keresés folyamatban…",
@@ -1613,7 +1615,8 @@
       "hide": "Elrejtés",
       "warning": "Aki rendelkezik ezzel a hivatkozással, az kezeli az eseményt: ne jelenítse meg képernyőmegosztás közben, és ne illessze be csevegésbe.",
       "hidden": "A hivatkozás rejtve van",
-      "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel."
+      "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel.",
+      "notYetPublished": "Csak a közzététel után működik: addig „az oldal nem található” üzenet jelenik meg."
     },
     "feedbackAdmin": {
       "title": "Visszajelzés eredményei",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Váróterem (a webhely alapértelmezése)",
         "waitingRoomEngineGame": "Videojáték (Phaser lobby)",
         "waitingRoomEngineClassic": "Klasszikus (statikus)",
-        "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel."
+        "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel.",
+        "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
       },
       "watermark": {
         "title": "Videó testreszabás",
@@ -1962,8 +1966,7 @@
         "min": "Ellenőrizze ezt: „{field}”: a legkisebb érték {min}.",
         "max": "Ellenőrizze ezt: „{field}”: a legnagyobb érték {max}.",
         "field": "Ellenőrizze ezt: „{field}”: az érték érvénytelen."
-      },
-      "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
+      }
     },
     "analytics": {
       "title": "Statisztikák",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Jelentkezések",
         "ofMax": "{current} / {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nincs beállított emlékeztető",
         "tags": "Címkék",
         "postEventSummary": "{connected} csatlakozott a(z) {registered} regisztráltból ({estimated} várt)",

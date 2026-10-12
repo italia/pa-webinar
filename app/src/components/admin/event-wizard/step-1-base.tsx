@@ -26,6 +26,7 @@ import { fromDatetimeLocalInTz, toDatetimeLocalInTz } from '@/lib/utils/date-for
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import { fondoEtichettaPiena } from '@/lib/utils/tag-color';
 
 export interface Step1Value {
   title: Record<string, string>;
@@ -617,7 +618,9 @@ export default function Step1Base({
                   className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline-secondary'}`}
                   style={{
                     borderRadius: 20,
-                    ...(active && tag.color ? { backgroundColor: tag.color, borderColor: tag.color } : {}),
+                    ...(active && tag.color
+                      ? { backgroundColor: fondoEtichettaPiena(tag.color), borderColor: fondoEtichettaPiena(tag.color) }
+                      : {}),
                   }}
                   onClick={() => toggleTag(tag.slug)}
                 >

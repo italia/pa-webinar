@@ -233,9 +233,13 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
           {t('metrics.totalParticipants')}
         </span>
       </div>
+      {/* Scorre in orizzontale: deve poterlo fare anche chi usa la tastiera. */}
       <div
         className="d-flex align-items-end gap-1"
         style={{ height: 200, overflowX: 'auto' }}
+        tabIndex={0}
+        role="group"
+        aria-label={t('timeline')}
       >
         {displayData.map((d, i) => (
           <div

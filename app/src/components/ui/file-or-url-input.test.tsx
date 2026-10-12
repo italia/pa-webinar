@@ -127,3 +127,59 @@ describe('FileOrUrlInput con il caricamento proposto', () => {
     expect(container.querySelector('[role="alert"]')?.textContent).toBe('Messaggio del server');
   });
 });
+
+describe('FileOrUrlInput — immagini di altri siti', () => {
+  it('avvisa che un\'immagine presa da un altro sito non comparirà', () => {
+    disegna(campo('https://altro-sito.example/copertina.png'));
+    expect(container.textContent).toContain(t.externalImage);
+  });
+
+  it('nessun avviso per un\'immagine servita dal portale', () => {
+    disegna(campo(`${window.location.origin}/api/files/copertina.png`));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('un file servito da un\'altra installazione e\' esterno anche se il percorso e\' /api/assets/', () => {
+    disegna(campo('https://altra-pa.example/api/assets/logo.png'));
+    expect(container.textContent).toContain(t.externalImage);
+  });
+
+  it('le anteprime di YouTube, ammesse dalla CSP, non avvisano', () => {
+    disegna(campo('https://i.ytimg.com/vi/abc/hqdefault.jpg'));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('con il caricamento disponibile consiglia di caricare il file', () => {
+    disegna(campo('https://altro-sito.example/copertina.png'));
+    expect(container.querySelector('[role="status"]')?.textContent).toContain(t.externalImageUpload);
+  });
+
+  it('un campo che non finisce nelle pagine puo\' fare a meno dell\'avviso', () => {
+    disegna(
+      <FileOrUrlInput
+        id="seo"
+        label="SEO"
+        value="https://altro-sito.example/anteprima.png"
+        onChange={vi.fn()}
+        assetType="image"
+        avvisoImmagineEsterna={false}
+      />,
+    );
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('l\'avviso e\' una regione di stato e consiglia il caricamento solo se c\'e\'', () => {
+    disegna(senzaStorage(campo('https://altro-sito.example/copertina.png')));
+    const stato = container.querySelector('[role="status"]');
+    expect(stato?.textContent).toContain(t.externalImage);
+    expect(stato?.textContent).not.toContain(t.externalImageUpload);
+    expect(container.querySelector('input[type="url"]')?.getAttribute('aria-describedby')).toBe(stato?.id);
+  });
+
+  it('nessun avviso per un indirizzo relativo o un\'immagine inline', () => {
+    disegna(campo('/api/files/copertina.png'));
+    expect(container.textContent).not.toContain(t.externalImage);
+    disegna(campo('data:image/png;base64,iVBORw0KGgo='));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+});

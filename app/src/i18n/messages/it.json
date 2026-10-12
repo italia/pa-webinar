@@ -155,7 +155,7 @@
       "registered": "Sei iscritto",
       "enterEvent": "Entra nell'evento",
       "eventEnded": "Evento concluso",
-      "eventHeldOn": "Questo evento si è svolto il {date}",
+      "eventHeldOn": "Questo evento si è svolto {date}",
       "totalRegistrations": "{count} persone iscritte",
       "recording": "Registrazione disponibile",
       "noRecording": "La registrazione video non è disponibile per questo evento.",
@@ -894,7 +894,9 @@
       "helpImage": "Formati supportati: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file."
+      "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file.",
+      "externalImage": "Le immagini di altri siti non compaiono sulle pagine del portale.",
+      "externalImageUpload": "Carica il file dal tuo dispositivo."
     },
     "rubricaPicker": {
       "loading": "Ricerca in corso…",
@@ -1748,7 +1750,8 @@
       "hide": "Nascondi",
       "warning": "Chi ha questo link amministra l’evento: non mostrarlo in condivisione schermo e non incollarlo in chat.",
       "hidden": "Link nascosto",
-      "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano."
+      "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano.",
+      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata»."
     },
     "feedbackAdmin": {
       "title": "Risultati Feedback",
@@ -1950,7 +1953,8 @@
         "waitingRoomEngine": "Sala d'attesa (predefinita del sito)",
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Classica (statica)",
-        "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo."
+        "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo.",
+        "primaryColorHex": "Colore primario (codice esadecimale)"
       },
       "watermark": {
         "title": "Personalizzazione video",
@@ -2097,8 +2101,7 @@
         "min": "Controlla «{field}»: il valore minimo è {min}.",
         "max": "Controlla «{field}»: il valore massimo è {max}.",
         "field": "Controlla «{field}»: il valore non è valido."
-      },
-      "primaryColorHex": "Colore primario (codice esadecimale)"
+      }
     },
     "analytics": {
       "title": "Statistiche",
@@ -2679,7 +2682,6 @@
       "sidebar": {
         "registrations": "Iscrizioni",
         "ofMax": "{current} su {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nessun promemoria configurato",
         "tags": "Tag",
         "postEventSummary": "{connected} connessi su {registered} iscritti (attesi {estimated})",

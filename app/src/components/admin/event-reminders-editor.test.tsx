@@ -156,7 +156,8 @@ describe('EventRemindersEditor', () => {
   it('una casella bloccata dice perche\', una volta sola', async () => {
     await disegna([riga(10080), riga(4320), riga(1440), riga(720), riga(360)]);
     const label = casella(p['1hour']).labels![0]!;
-    expect(label.textContent).toBe(`${p['1hour']}(${messages.reminders.limitReached})`);
+    // Con lo spazio: è il nome che legge il lettore di schermo.
+    expect(label.textContent).toBe(`${p['1hour']} (${messages.reminders.limitReached})`);
     expect(casella(p['1hour']).hasAttribute('aria-describedby')).toBe(false);
   });
 });
