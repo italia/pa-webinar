@@ -759,7 +759,9 @@
       "helpImage": "Formáidí tacaithe: PNG, JPEG, WebP, SVG, GIF — uasmhéid 10 MB",
       "helpAudio": "Formáidí tacaithe: MP3, WAV, OGG, M4A, WebM — uasmhéid 20 MB",
       "helpDocument": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid 25 MB",
-      "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin."
+      "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin.",
+      "externalImage": "Ní thaispeántar íomhánna ó shuíomhanna eile ar leathanaigh na tairsí.",
+      "externalImageUpload": "Uaslódáil an comhad ó do ghléas."
     },
     "rubricaPicker": {
       "loading": "Á chuardach…",
@@ -1613,7 +1615,8 @@
       "hide": "Folaigh",
       "warning": "Riarann duine ar bith a bhfuil an nasc seo aige an t-imeacht: ná taispeáin é agus tú ag comhroinnt scáileáin agus ná greamaigh i gcomhrá é.",
       "hidden": "Nasc folaithe",
-      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é."
+      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é.",
+      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”."
     },
     "feedbackAdmin": {
       "title": "Torthaí aiseolais",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Seomra feithimh (réamhshocrú an tsuímh)",
         "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
         "waitingRoomEngineClassic": "Clasaiceach (statach)",
-        "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh."
+        "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh.",
+        "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
       },
       "watermark": {
         "title": "Saincheapadh físe",
@@ -1962,8 +1966,7 @@
         "min": "Seiceáil “{field}”: is é {min} an luach íosta.",
         "max": "Seiceáil “{field}”: is é {max} an luach uasta.",
         "field": "Seiceáil “{field}”: níl an luach bailí."
-      },
-      "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
+      }
     },
     "analytics": {
       "title": "Staitisticí",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Cláruithe",
         "ofMax": "{current} as {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Aon mheabhrúchán cumraithe",
         "tags": "Clibeanna",
         "postEventSummary": "{connected} ceangailte as {registered} cláraithe (bhíothas ag súil le {estimated})",

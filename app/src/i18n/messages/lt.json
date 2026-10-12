@@ -759,7 +759,9 @@
       "helpImage": "Palaikomi formatai: PNG, JPEG, WebP, SVG, GIF — iki 10 MB",
       "helpAudio": "Palaikomi formatai: MP3, WAV, OGG, M4A, WebM — iki 20 MB",
       "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB",
-      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL."
+      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL.",
+      "externalImage": "Kitų svetainių vaizdai portalo puslapiuose nerodomi.",
+      "externalImageUpload": "Įkelkite failą iš savo įrenginio."
     },
     "rubricaPicker": {
       "loading": "Ieškoma…",
@@ -1613,7 +1615,8 @@
       "hide": "Slėpti",
       "warning": "Kiekvienas, turintis šią nuorodą, administruoja renginį: nerodykite jos bendrinant ekraną ir neįklijuokite jos į pokalbį.",
       "hidden": "Nuoroda paslėpta",
-      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka."
+      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka.",
+      "notYetPublished": "Veikia tik po paskelbimo: iki tol rodoma „puslapis nerastas“."
     },
     "feedbackAdmin": {
       "title": "Atsiliepimų rezultatai",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Laukiamasis (svetainės numatytasis)",
         "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
         "waitingRoomEngineClassic": "Klasikinis (statinis)",
-        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}."
+        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}.",
+        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
       },
       "watermark": {
         "title": "Vaizdo tinkinimas",
@@ -1962,8 +1966,7 @@
         "min": "Patikrinkite „{field}“: mažiausia reikšmė yra {min}.",
         "max": "Patikrinkite „{field}“: didžiausia reikšmė yra {max}.",
         "field": "Patikrinkite „{field}“: reikšmė netinkama."
-      },
-      "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Registracijos",
         "ofMax": "{current} iš {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Priminimų nesukonfigūruota",
         "tags": "Žymos",
         "postEventSummary": "{connected} prisijungė iš {registered} užsiregistravusių (numatyta {estimated})",

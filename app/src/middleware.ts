@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing';
 import { tryGetAppSecret } from '@/lib/auth/app-secret';
 import { getPublicEnv } from '@/lib/env';
 import { storageCspHosts } from '@/lib/storage/provider-type';
+import { IMMAGINI_ESTERNE_AMMESSE } from '@/lib/security/img-src';
 import { compilaWebAssembly, direttivaScript } from '@/lib/security/script-src';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -121,7 +122,7 @@ function applySecurityHeaders(
       // See docs/SECURITY-CSP.md for the migration plan.
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      "img-src 'self' data: blob: https://i.ytimg.com",
+      `img-src 'self' data: blob: ${IMMAGINI_ESTERNE_AMMESSE.join(' ')}`,
       `connect-src ${connectSrc}`,
       `media-src ${mediaSrc}`,
       "object-src 'none'",

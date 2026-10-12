@@ -759,7 +759,9 @@
       "helpImage": "Formatos admitidos: PNG, JPEG, WebP, SVG, GIF — máx. 10 MB",
       "helpAudio": "Formatos admitidos: MP3, WAV, OGG, M4A, WebM — máx. 20 MB",
       "helpDocument": "Formatos admitidos: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB",
-      "uploadsUnavailable": "La subida de archivos no está disponible en esta instalación: pegue la URL del archivo."
+      "uploadsUnavailable": "La subida de archivos no está disponible en esta instalación: pegue la URL del archivo.",
+      "externalImage": "Las imágenes de otros sitios no se muestran en las páginas del portal.",
+      "externalImageUpload": "Sube el archivo desde tu dispositivo."
     },
     "rubricaPicker": {
       "loading": "Buscando…",
@@ -1613,7 +1615,8 @@
       "hide": "Ocultar",
       "warning": "Cualquiera que tenga este enlace administra el evento: no lo muestres al compartir pantalla ni lo pegues en un chat.",
       "hidden": "Enlace oculto",
-      "copyFailed": "No se pudo copiar: selecciona la dirección de abajo y cópiala a mano."
+      "copyFailed": "No se pudo copiar: selecciona la dirección de abajo y cópiala a mano.",
+      "notYetPublished": "Se abre después de la publicación: hasta entonces, quien lo use verá «página no encontrada»."
     },
     "feedbackAdmin": {
       "title": "Resultados de valoraciones",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Sala de espera (predeterminada del sitio)",
         "waitingRoomEngineGame": "Videojuego (lobby Phaser)",
         "waitingRoomEngineClassic": "Clásica (estática)",
-        "waitingRoomEngineHelp": "Modo predeterminado de la sala de espera. Se puede cambiar para cada evento y, para una sola visita, con el parámetro {param} en la dirección."
+        "waitingRoomEngineHelp": "Modo predeterminado de la sala de espera. Se puede cambiar para cada evento y, para una sola visita, con el parámetro {param} en la dirección.",
+        "primaryColorHex": "Color principal (código hexadecimal)"
       },
       "watermark": {
         "title": "Personalización del vídeo",
@@ -1962,8 +1966,7 @@
         "min": "Revisa «{field}»: el valor mínimo es {min}.",
         "max": "Revisa «{field}»: el valor máximo es {max}.",
         "field": "Revisa «{field}»: el valor no es válido."
-      },
-      "primaryColorHex": "Color principal (código hexadecimal)"
+      }
     },
     "analytics": {
       "title": "Estadísticas",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Inscripciones",
         "ofMax": "{current} de {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No hay recordatorios configurados",
         "tags": "Etiquetas",
         "postEventSummary": "{connected} conectados de {registered} inscritos ({estimated} previstos)",

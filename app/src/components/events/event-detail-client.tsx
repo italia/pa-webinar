@@ -37,6 +37,7 @@ import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import type { ReportView } from '@/lib/report/types';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 interface AnsweredQuestion {
   id: string;
@@ -466,7 +467,7 @@ export default function EventDetailClient({
             <div className="d-flex flex-wrap gap-2 mb-4">
               {tags.map((tag) => {
                 const label = getLocalized(tag.name as LocalizedField, locale) || tag.slug;
-                const color = tag.color ?? '#5A768A';
+                const color = tag.color ?? '#516B7E';
                 return (
                   <Link
                     key={tag.slug}
@@ -477,9 +478,9 @@ export default function EventDetailClient({
                       borderRadius: 999,
                       fontSize: '0.78rem',
                       fontWeight: 600,
-                      backgroundColor: `${color}22`,
-                      color,
-                      border: `1px solid ${color}44`,
+                      backgroundColor: hexWithAlpha(color, 0x22 / 255),
+                      color: inchiostroEtichetta(color, 0x22 / 255),
+                      border: `1px solid ${hexWithAlpha(color, 0x44 / 255)}`,
                     }}
                   >
                     {label}
@@ -826,7 +827,10 @@ export default function EventDetailClient({
               infra/capacity info, not something public attendees need. */}
         </Col>
 
-        <Col lg={4}>
+        {/* Al telefono l'iscrizione (o l'ingresso) viene subito dopo il
+            titolo: in fondo alla descrizione non la trova nessuno. A evento
+            concluso (o finito senza essersi tenuto) conta prima il contenuto. */}
+        <Col lg={4} className={isEnded || pastEndNotHeld ? undefined : 'order-first order-lg-0 mb-4 mb-lg-0'}>
           <Card
             className="shadow-sm border-0 sticky-top"
             style={{ top: '1.5rem', borderRadius: '0.75rem' }}

@@ -154,6 +154,7 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
 
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const tNav = useTranslations('admin.nav');
   const tApi = useTranslations('apiErrors');
   const format = useFormatter();
   const toast = useToast();
@@ -281,7 +282,8 @@ export default function PostprodDashboard() {
         </div>
       </div>
 
-      <div className="table-responsive">
+      {/* Al telefono la tabella scorre: anche da tastiera. */}
+      <div className="table-responsive" tabIndex={0} role="group" aria-label={tNav('recordingsPostprod')}>
         <table className="table table-hover align-middle">
           <thead>
             <tr>

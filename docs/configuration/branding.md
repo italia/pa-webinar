@@ -99,9 +99,10 @@ either **Upload file** or **Paste URL**.
   configured, a small image can be pasted as a `data:` URI, which the Content Security Policy
   allows.
 - **A URL on another host usually does not display.** The Content Security Policy allows images only
-  from the portal itself, `data:` and `blob:` URIs, and YouTube thumbnails (`img-src` in
-  `app/src/middleware.ts`). A logo linked from an organization's website is saved without error but
-  blocked by the browser. Audio is limited the same way by `media-src`, which admits the portal, the
+  from the portal itself, `data:` and `blob:` URIs, and YouTube thumbnails (`img-src`, with the
+  external hosts in `app/src/lib/security/img-src.ts`). A logo linked from an organization's website
+  is saved without error but blocked by the browser; the image field warns about it under the URL.
+  The social preview image (SEO) is the exception: crawlers fetch it, so any host works. Audio is limited the same way by `media-src`, which admits the portal, the
   recording storage hosts and any host listed in `RECORDING_MEDIA_CSP_HOSTS`. See
   [Content Security Policy](../SECURITY-CSP.md).
 
@@ -125,7 +126,7 @@ differently. The organization name, description, favicon, primary color and wate
 | **Parent organization** and its URL | `parentOrganization`, `parentOrganizationUrl` | Top bar (a link that opens in a new tab when the URL is set) and the footer's second line |
 | **Site tagline** | `siteTagline` | Top bar and footer, only when **Parent organization** is empty. Written per language |
 | **Custom logo URL** | `logoUrl` | Center header next to the application name, live-room top bar (medium screens and up), watermark fallback |
-| **Support email** | `supportEmail` | Footer **Contacts** column (in the **Features** tab) |
+| **Support email** | `supportEmail` | Footer **Contacts** column (in the **Features** tab). With neither this nor **Organization URL** the column is not shown |
 | **GitHub repository URL** | `githubUrl` | Footer **Source code** and **SBOM latest release** links, the build-info commit link, the repository and Scorecard links of the **Security and transparency** page (the upstream repository when empty), and the release links and SBOM viewer of the changelog (only `https://github.com/<owner>/<repo>` URLs are used there). In the **Features** tab |
 
 The defaults for these columns are in `app/prisma/schema.prisma`. A few are worth changing on

@@ -15,6 +15,7 @@ import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
+import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 interface EventTag {
   slug: string;
@@ -51,23 +52,6 @@ export interface EventListClientProps {
   parseTitleKicker?: boolean;
 }
 
-function hexWithAlpha(hex: string, alpha: number): string {
-  const clean = hex.replace('#', '');
-  const normalized =
-    clean.length === 3
-      ? clean
-          .split('')
-          .map((c) => c + c)
-          .join('')
-      : clean;
-  if (normalized.length !== 6) return hex;
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-  if ([r, g, b].some((v) => Number.isNaN(v))) return hex;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
 export default function EventListClient({
   events,
   muted = false,
@@ -95,7 +79,7 @@ export default function EventListClient({
         const borderColor = isLive
           ? '#008758'
           : isEnded
-            ? '#5A768A'
+            ? '#516B7E'
             : 'var(--app-primary)';
 
         const eventTags = event.tags ?? [];
@@ -184,7 +168,7 @@ export default function EventListClient({
                           className="badge text-decoration-none"
                           style={{
                             backgroundColor: hexWithAlpha(color, 0.15),
-                            color,
+                            color: inchiostroEtichetta(color, 0.15),
                             fontWeight: 500,
                             fontSize: '0.72rem',
                             padding: '3px 8px',

@@ -759,7 +759,9 @@
       "helpImage": "Formati appoġġjati: PNG, JPEG, WebP, SVG, GIF — massimu 10 MB",
       "helpAudio": "Formati appoġġjati: MP3, WAV, OGG, M4A, WebM — massimu 20 MB",
       "helpDocument": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu 25 MB",
-      "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl."
+      "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl.",
+      "externalImage": "L-immaġini minn siti oħra ma jidhrux fil-paġni tal-portal.",
+      "externalImageUpload": "Tella' l-fajl mill-apparat tiegħek."
     },
     "rubricaPicker": {
       "loading": "Tfittxija għaddejja…",
@@ -1613,7 +1615,8 @@
       "hide": "Aħbi",
       "warning": "Kull min għandu dan il-link jamministra l-avveniment: turiehx waqt li taqsam l-iskrin u tehmżux f’chat.",
       "hidden": "Il-link huwa moħbi",
-      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment."
+      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment.",
+      "notYetPublished": "Jaħdem biss wara l-pubblikazzjoni: sa dakinhar jidher “il-paġna ma nstabitx”."
     },
     "feedbackAdmin": {
       "title": "Riżultati tal-Feedback",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Kamra tal-istennija (prestabbilit tas-sit)",
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Klassika (statika)",
-        "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz."
+        "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz.",
+        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
       },
       "watermark": {
         "title": "Personalizzazzjoni tal-vidjo",
@@ -1962,8 +1966,7 @@
         "min": "Iċċekkja “{field}”: il-valur minimu huwa {min}.",
         "max": "Iċċekkja “{field}”: il-valur massimu huwa {max}.",
         "field": "Iċċekkja “{field}”: il-valur mhuwiex validu."
-      },
-      "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Reġistrazzjonijiet",
         "ofMax": "{current} fuq {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ebda promemoria configurato",
         "tags": "Tag",
         "postEventSummary": "{connected} imqabbdin minn {registered} reġistrati ({estimated} mistennija)",

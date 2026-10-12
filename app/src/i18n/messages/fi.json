@@ -759,7 +759,9 @@
       "helpImage": "Tuetut muodot: PNG, JPEG, WebP, SVG, GIF — enint. 10 MB",
       "helpAudio": "Tuetut muodot: MP3, WAV, OGG, M4A, WebM — enint. 20 MB",
       "helpDocument": "Tuetut muodot: PDF, DOCX, PPTX, XLSX, TXT — enint. 25 MB",
-      "uploadsUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa: liitä sen sijaan tiedoston URL."
+      "uploadsUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa: liitä sen sijaan tiedoston URL.",
+      "externalImage": "Muiden sivustojen kuvia ei näytetä portaalin sivuilla.",
+      "externalImageUpload": "Lataa tiedosto laitteeltasi."
     },
     "rubricaPicker": {
       "loading": "Haetaan…",
@@ -1613,7 +1615,8 @@
       "hide": "Piilota",
       "warning": "Kuka tahansa, jolla on tämä linkki, hallinnoi tapahtumaa: älä näytä sitä näyttöä jaettaessa äläkä liitä sitä keskusteluun.",
       "hidden": "Linkki on piilotettu",
-      "copyFailed": "Kopiointi epäonnistui: valitse alla oleva osoite ja kopioi se käsin."
+      "copyFailed": "Kopiointi epäonnistui: valitse alla oleva osoite ja kopioi se käsin.",
+      "notYetPublished": "Toimii vasta julkaisun jälkeen: siihen asti näkyy ”sivua ei löytynyt”."
     },
     "feedbackAdmin": {
       "title": "Palautteen tulokset",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Odotushuone (sivuston oletus)",
         "waitingRoomEngineGame": "Videopeli (Phaser-aula)",
         "waitingRoomEngineClassic": "Klassinen (staattinen)",
-        "waitingRoomEngineHelp": "Odotushuoneen oletustila. Sitä voi muuttaa yksittäiselle tapahtumalle ja yhden käynnin ajaksi osoitteen parametrilla {param}."
+        "waitingRoomEngineHelp": "Odotushuoneen oletustila. Sitä voi muuttaa yksittäiselle tapahtumalle ja yhden käynnin ajaksi osoitteen parametrilla {param}.",
+        "primaryColorHex": "Pääväri (heksadesimaalikoodi)"
       },
       "watermark": {
         "title": "Videon mukauttaminen",
@@ -1962,8 +1966,7 @@
         "min": "Tarkista ”{field}”: pienin arvo on {min}.",
         "max": "Tarkista ”{field}”: suurin arvo on {max}.",
         "field": "Tarkista ”{field}”: arvo ei kelpaa."
-      },
-      "primaryColorHex": "Pääväri (heksadesimaalikoodi)"
+      }
     },
     "analytics": {
       "title": "Tilastot",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Ilmoittautumiset",
         "ofMax": "{current} / {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Muistutuksia ei ole määritetty",
         "tags": "Tagit",
         "postEventSummary": "{connected} yhdistänyt {registered} ilmoittautuneesta (odotettiin {estimated})",

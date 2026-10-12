@@ -333,6 +333,15 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
           text-transform: capitalize;
         }
 
+        /* Numeri e nomi dei giorni e numeri delle settimane sono <a> che non
+           portano da nessuna parte: il sottolineato dei link del kit li
+           faceva sembrare cliccabili. Gli eventi e il «+N» restano link. */
+        .fc-bootstrap-italia .fc-daygrid-day-number,
+        .fc-bootstrap-italia .fc-col-header-cell-cushion,
+        .fc-bootstrap-italia .fc-daygrid-week-number {
+          text-decoration: none;
+        }
+
         .fc-bootstrap-italia .fc-daygrid-day-number {
           color: #17324D;
           font-size: 0.85rem;
@@ -348,7 +357,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
            il 4,5:1. Il colore attenuato basta a distinguerli. */
         .fc-bootstrap-italia .fc-weekend-cell .fc-daygrid-day-number,
         .fc-bootstrap-italia .fc-day-other .fc-daygrid-day-number {
-          color: #5A768A;
+          color: #516B7E;
           opacity: 1;
         }
 
@@ -381,7 +390,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
 
         .fc-bootstrap-italia .fc-timegrid-slot-label {
           font-size: 0.75rem;
-          color: #5A768A;
+          color: #516B7E;
         }
 
         .fc-bootstrap-italia .fc-list-event:hover td {

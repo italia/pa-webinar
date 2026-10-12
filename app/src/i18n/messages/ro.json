@@ -759,7 +759,9 @@
       "helpImage": "Formate acceptate: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formate acceptate: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului."
+      "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului.",
+      "externalImage": "Imaginile de pe alte site-uri nu apar pe paginile portalului.",
+      "externalImageUpload": "Încarcă fișierul de pe dispozitivul tău."
     },
     "rubricaPicker": {
       "loading": "Se caută…",
@@ -1613,7 +1615,8 @@
       "hide": "Ascunde",
       "warning": "Oricine are acest link administrează evenimentul: nu îl afișa în timpul partajării ecranului și nu îl lipi într-un chat.",
       "hidden": "Link ascuns",
-      "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual."
+      "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual.",
+      "notYetPublished": "Funcționează după publicare: până atunci apare „pagina nu a fost găsită”."
     },
     "feedbackAdmin": {
       "title": "Rezultate feedback",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Sala de așteptare (implicită a site-ului)",
         "waitingRoomEngineGame": "Joc video (lobby Phaser)",
         "waitingRoomEngineClassic": "Clasică (statică)",
-        "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă."
+        "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă.",
+        "primaryColorHex": "Culoare principală (cod hexazecimal)"
       },
       "watermark": {
         "title": "Personalizare video",
@@ -1962,8 +1966,7 @@
         "min": "Verificați „{field}”: valoarea minimă este {min}.",
         "max": "Verificați „{field}”: valoarea maximă este {max}.",
         "field": "Verificați „{field}”: valoarea nu este validă."
-      },
-      "primaryColorHex": "Culoare principală (cod hexazecimal)"
+      }
     },
     "analytics": {
       "title": "Statistici",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Înscrieri",
         "ofMax": "{current} din {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Niciun memento configurat",
         "tags": "Etichete",
         "postEventSummary": "{connected} conectați din {registered} înscriși ({estimated} așteptați)",

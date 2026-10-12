@@ -759,7 +759,9 @@
       "helpImage": "Obsługiwane formaty: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Obsługiwane formaty: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
       "helpDocument": "Obsługiwane formaty: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
-      "uploadsUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji: zamiast tego wklej adres URL pliku."
+      "uploadsUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji: zamiast tego wklej adres URL pliku.",
+      "externalImage": "Obrazy z innych witryn nie są wyświetlane na stronach portalu.",
+      "externalImageUpload": "Prześlij plik ze swojego urządzenia."
     },
     "rubricaPicker": {
       "loading": "Wyszukiwanie…",
@@ -1613,7 +1615,8 @@
       "hide": "Ukryj",
       "warning": "Każdy, kto ma ten link, zarządza wydarzeniem: nie pokazuj go podczas udostępniania ekranu i nie wklejaj go na czacie.",
       "hidden": "Link ukryty",
-      "copyFailed": "Kopiowanie nie powiodło się: zaznacz adres poniżej i skopiuj go ręcznie."
+      "copyFailed": "Kopiowanie nie powiodło się: zaznacz adres poniżej i skopiuj go ręcznie.",
+      "notYetPublished": "Działa dopiero po publikacji: do tego czasu pojawi się „nie znaleziono strony”."
     },
     "feedbackAdmin": {
       "title": "Wyniki ankiety",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Poczekalnia (domyślna dla witryny)",
         "waitingRoomEngineGame": "Gra wideo (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasyczna (statyczna)",
-        "waitingRoomEngineHelp": "Domyślny tryb poczekalni. Można go zmienić dla pojedynczego wydarzenia, a na jedną wizytę – parametrem {param} w adresie."
+        "waitingRoomEngineHelp": "Domyślny tryb poczekalni. Można go zmienić dla pojedynczego wydarzenia, a na jedną wizytę – parametrem {param} w adresie.",
+        "primaryColorHex": "Kolor podstawowy (kod szesnastkowy)"
       },
       "watermark": {
         "title": "Personalizacja wideo",
@@ -1962,8 +1966,7 @@
         "min": "Sprawdź „{field}”: wartość minimalna to {min}.",
         "max": "Sprawdź „{field}”: wartość maksymalna to {max}.",
         "field": "Sprawdź „{field}”: wartość jest nieprawidłowa."
-      },
-      "primaryColorHex": "Kolor podstawowy (kod szesnastkowy)"
+      }
     },
     "analytics": {
       "title": "Statystyki",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Zapisy",
         "ofMax": "{current} z {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nie skonfigurowano przypomnień",
         "tags": "Tagi",
         "postEventSummary": "{connected} połączonych z {registered} zarejestrowanych (oczekiwano {estimated})",

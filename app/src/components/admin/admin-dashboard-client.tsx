@@ -19,6 +19,7 @@ import { eventAdminPath } from '@/lib/events/admin-links';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
+import { fondoEtichettaPiena, hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 import StatusBadge from './status-badge';
 import EventCardMenu from './event-card-menu';
@@ -103,23 +104,6 @@ function gruppoPerData(e: { status: string; endsAt: string }, adesso: number): n
 /** Tutti gli eventi tranne gli archiviati: la lista di lavoro di tutti i giorni. */
 const DEFAULT_STATUS_FILTER = 'NOT_ARCHIVED';
 type BulkAction = 'delete' | 'archive' | null;
-
-function hexWithAlpha(hex: string, alpha: number): string {
-  const clean = hex.replace('#', '');
-  const normalized =
-    clean.length === 3
-      ? clean
-          .split('')
-          .map((c) => c + c)
-          .join('')
-      : clean;
-  if (normalized.length !== 6) return hex;
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-  if ([r, g, b].some((v) => Number.isNaN(v))) return hex;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 function monogram(title: string): string {
   const trimmed = title.trim();
@@ -371,7 +355,7 @@ export default function AdminDashboardClient({
                 className="position-absolute d-flex align-items-center"
                 style={{ top: 0, bottom: 0, left: 10, pointerEvents: 'none' }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A768A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#516B7E" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
               </span>
               <input
                 id="events-search"
@@ -457,9 +441,9 @@ export default function AdminDashboardClient({
                     className="btn btn-sm"
                     style={{
                       borderRadius: 20,
-                      border: `1px solid ${color}`,
-                      backgroundColor: active ? color : hexWithAlpha(color, 0.1),
-                      color: active ? '#fff' : color,
+                      border: `1px solid ${active ? fondoEtichettaPiena(color) : color}`,
+                      backgroundColor: active ? fondoEtichettaPiena(color) : hexWithAlpha(color, 0.1),
+                      color: active ? '#fff' : inchiostroEtichetta(color, 0.1),
                       fontWeight: 500,
                       padding: '4px 12px',
                     }}
@@ -639,10 +623,12 @@ export default function AdminDashboardClient({
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
-                    aria-hidden={cover ? 'true' : undefined}
                   >
+                    {/* La copertina è uno sfondo, già muto: qui dentro ci sono
+                        lo stato e la casella di selezione, che vanno letti. */}
                     {!cover && (
                       <span
+                        aria-hidden="true"
                         style={{
                           color: '#fff',
                           fontSize: '3rem',
@@ -756,7 +742,7 @@ export default function AdminDashboardClient({
                               className="badge"
                               style={{
                                 backgroundColor: hexWithAlpha(color, 0.15),
-                                color,
+                                color: inchiostroEtichetta(color, 0.15),
                                 fontWeight: 500,
                                 fontSize: '0.72rem',
                                 padding: '3px 8px',

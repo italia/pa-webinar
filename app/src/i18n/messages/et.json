@@ -759,7 +759,9 @@
       "helpImage": "Toetatud vormingud: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Toetatud vormingud: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL."
+      "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL.",
+      "externalImage": "Teiste saitide pilte portaali lehtedel ei kuvata.",
+      "externalImageUpload": "Laadi fail oma seadmest üles."
     },
     "rubricaPicker": {
       "loading": "Otsin…",
@@ -1613,7 +1615,8 @@
       "hide": "Peida",
       "warning": "Igaüks, kellel on see link, haldab sündmust: ära näita seda ekraani jagamisel ega kleebi seda vestlusesse.",
       "hidden": "Link on peidetud",
-      "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi."
+      "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi.",
+      "notYetPublished": "Töötab alles pärast avaldamist: seni kuvatakse „lehte ei leitud“."
     },
     "feedbackAdmin": {
       "title": "Tagasiside tulemused",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Ooteruum (saidi vaikeväärtus)",
         "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
         "waitingRoomEngineClassic": "Klassikaline (staatiline)",
-        "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}."
+        "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}.",
+        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
       },
       "watermark": {
         "title": "Video kohandamine",
@@ -1962,8 +1966,7 @@
         "min": "Kontrollige välja „{field}“: väikseim väärtus on {min}.",
         "max": "Kontrollige välja „{field}“: suurim väärtus on {max}.",
         "field": "Kontrollige välja „{field}“: väärtus on vigane."
-      },
-      "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Registreerimised",
         "ofMax": "{current} / {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Meeldetuletusi pole konfigureeritud",
         "tags": "Sildid",
         "postEventSummary": "{connected} ühendatud {registered} registreerunust (oodati {estimated})",

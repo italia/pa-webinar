@@ -759,7 +759,9 @@
       "helpImage": "Atbalstītie formāti: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Atbalstītie formāti: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
       "helpDocument": "Atbalstītie formāti: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
-      "uploadsUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama: tā vietā ielīmējiet faila URL."
+      "uploadsUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama: tā vietā ielīmējiet faila URL.",
+      "externalImage": "Attēli no citām vietnēm portāla lapās netiek rādīti.",
+      "externalImageUpload": "Augšupielādējiet failu no savas ierīces."
     },
     "rubricaPicker": {
       "loading": "Notiek meklēšana…",
@@ -1613,7 +1615,8 @@
       "hide": "Paslēpt",
       "warning": "Ikviens, kam ir šī saite, pārvalda pasākumu: nerādiet to, koplietojot ekrānu, un neielīmējiet to tērzēšanā.",
       "hidden": "Saite ir paslēpta",
-      "copyFailed": "Kopēšana neizdevās: atlasiet tālāk norādīto adresi un kopējiet to manuāli."
+      "copyFailed": "Kopēšana neizdevās: atlasiet tālāk norādīto adresi un kopējiet to manuāli.",
+      "notYetPublished": "Darbojas tikai pēc publicēšanas: līdz tam tiek rādīts “lapa nav atrasta”."
     },
     "feedbackAdmin": {
       "title": "Atsauksmju rezultāti",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Uzgaidāmā telpa (vietnes noklusējums)",
         "waitingRoomEngineGame": "Videospēle (Phaser vestibils)",
         "waitingRoomEngineClassic": "Klasiskā (statiskā)",
-        "waitingRoomEngineHelp": "Uzgaidāmās telpas noklusējuma režīms. To var mainīt atsevišķam pasākumam un vienam apmeklējumam — ar parametru {param} adresē."
+        "waitingRoomEngineHelp": "Uzgaidāmās telpas noklusējuma režīms. To var mainīt atsevišķam pasākumam un vienam apmeklējumam — ar parametru {param} adresē.",
+        "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)"
       },
       "watermark": {
         "title": "Video pielāgošana",
@@ -1962,8 +1966,7 @@
         "min": "Pārbaudiet “{field}”: mazākā vērtība ir {min}.",
         "max": "Pārbaudiet “{field}”: lielākā vērtība ir {max}.",
         "field": "Pārbaudiet “{field}”: vērtība nav derīga."
-      },
-      "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Pieteikumi",
         "ofMax": "{current} no {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nav konfigurētu atgādinājumu",
         "tags": "Tagi",
         "postEventSummary": "{connected} pievienojušies no {registered} reģistrētajiem (gaidīti {estimated})",

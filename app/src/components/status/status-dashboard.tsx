@@ -123,7 +123,7 @@ export default function StatusDashboard() {
 
   const stressLevel = data.metrics.jvbStressLevel;
   const stressColor = stressLevel === null
-    ? '#5A768A'
+    ? '#516B7E'
     : stressLevel > 0.7
       ? '#CC334D'
       : stressLevel > 0.5
@@ -144,7 +144,7 @@ export default function StatusDashboard() {
               {Math.round(stressLevel * 100)}%
             </span>
           </div>
-          <div className="progress" style={{ height: 6, borderRadius: 3 }}>
+          <div className="progress" aria-hidden="true" style={{ height: 6, borderRadius: 3 }}>
             <div
               className="progress-bar"
               style={{

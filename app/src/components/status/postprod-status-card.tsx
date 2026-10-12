@@ -18,7 +18,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations, useFormatter, useNow } from 'next-intl';
 import { Badge, Card, CardBody } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
@@ -73,6 +73,9 @@ const STATUS_THEME: Record<
 export default function PostprodStatusCard() {
   const t = useTranslations('status.postprod');
   const format = useFormatter();
+  // «2 ore fa» si misura da un adesso esplicito: senza, next-intl lo segnala
+  // come errore in console e il testo resta fermo.
+  const adesso = useNow({ updateInterval: 60_000 });
   const [data, setData] = useState<PostprodStatus | null>(null);
   const [error, setError] = useState(false);
 
@@ -235,7 +238,7 @@ export default function PostprodStatusCard() {
             {/* Legenda chips — solo gli stati con valore > 0, niente rumore. */}
             <div className="d-flex flex-wrap gap-2 mb-3" style={{ fontSize: '0.78rem' }}>
               {pending > 0 && (
-                <QueueChip color="#5A768A" label={t('queuePending')} value={pending} />
+                <QueueChip color="#516B7E" label={t('queuePending')} value={pending} />
               )}
               {(claimed + running) > 0 && (
                 <QueueChip color="#0066CC" label={t('queueRunning')} value={claimed + running} />
@@ -305,7 +308,7 @@ export default function PostprodStatusCard() {
             <div className="mb-1">
               <Icon icon="it-check" size="xs" className="me-1" color="success" />
               {t('lastSuccess', {
-                when: format.relativeTime(new Date(data.lastSuccessAt)),
+                when: format.relativeTime(new Date(data.lastSuccessAt), adesso),
               })}
             </div>
           )}
@@ -313,7 +316,7 @@ export default function PostprodStatusCard() {
             <div className="mb-1">
               <Icon icon="it-warning-circle" size="xs" className="me-1" color="warning" />
               {t('lastFailure', {
-                when: format.relativeTime(new Date(data.lastFailureAt)),
+                when: format.relativeTime(new Date(data.lastFailureAt), adesso),
               })}
             </div>
           )}

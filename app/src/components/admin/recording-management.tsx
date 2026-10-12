@@ -262,27 +262,37 @@ export default function RecordingManagement({
             </div>
 
             {/* Retention options */}
+            {/* Le scelte del design system (form-check): il pallino nativo
+                da 13 px era troppo piccolo da colpire. */}
+            {/* Il bordo sul contenitore: su quello del fieldset la legenda si
+                siederebbe sopra la linea, tagliandola. */}
             <div className="border rounded p-3 mb-3">
-              <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-                {t('retentionLabel')}
-              </div>
-              <div className="d-flex flex-column gap-1">
+              <fieldset className="border-0 p-0 m-0">
+                <legend
+                  className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
+                  style={{ color: 'var(--app-text)' }}
+                >
+                  {t('retentionLabel')}
+                </legend>
                 {RETENTION_OPTIONS.map(({ value, labelKey }) => (
-                  <label key={value} className="d-flex align-items-center gap-2" style={{ cursor: 'pointer' }}>
+                  <div key={value} className="form-check my-1">
                     <input
                       type="radio"
+                      id={`retention-${value}`}
                       name="retention"
                       checked={value === -1 ? retentionDays === null : retentionDays === value}
                       onChange={() => handleRetentionChange(value)}
                       disabled={saving}
                     />
-                    <span style={{ fontSize: '0.88rem' }}>{t(labelKey)}</span>
-                  </label>
+                    <label htmlFor={`retention-${value}`} style={{ fontSize: '0.88rem' }}>
+                      {t(labelKey)}
+                    </label>
+                  </div>
                 ))}
-              </div>
-              <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
-                {t('retentionNote')}
-              </div>
+                <div className="text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+                  {t('retentionNote')}
+                </div>
+              </fieldset>
             </div>
 
             {/* Action buttons */}

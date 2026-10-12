@@ -759,7 +759,9 @@
       "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead."
+      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead.",
+      "externalImage": "Images from other sites are not shown on the portal's pages.",
+      "externalImageUpload": "Upload the file from your device."
     },
     "rubricaPicker": {
       "loading": "Searching…",
@@ -1613,7 +1615,8 @@
       "hide": "Hide",
       "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
       "hidden": "Link hidden",
-      "copyFailed": "Copy failed: select the address below and copy it manually."
+      "copyFailed": "Copy failed: select the address below and copy it manually.",
+      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”."
     },
     "feedbackAdmin": {
       "title": "Feedback Results",
@@ -1815,7 +1818,8 @@
         "waitingRoomEngine": "Waiting room (site default)",
         "waitingRoomEngineGame": "Videogame (Phaser lobby)",
         "waitingRoomEngineClassic": "Classic (static)",
-        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address."
+        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address.",
+        "primaryColorHex": "Primary color (hex code)"
       },
       "watermark": {
         "title": "Video customization",
@@ -1962,8 +1966,7 @@
         "min": "Check “{field}”: the minimum value is {min}.",
         "max": "Check “{field}”: the maximum value is {max}.",
         "field": "Check “{field}”: the value is not valid."
-      },
-      "primaryColorHex": "Primary color (hex code)"
+      }
     },
     "analytics": {
       "title": "Analytics",
@@ -2544,7 +2547,6 @@
       "sidebar": {
         "registrations": "Sign-ups",
         "ofMax": "{current} of {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No reminders configured",
         "tags": "Tags",
         "postEventSummary": "{connected} connected out of {registered} sign-ups ({estimated} expected)",
