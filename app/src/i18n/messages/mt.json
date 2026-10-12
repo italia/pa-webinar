@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "X’ġara fil-kamra",
-        "rivista": "Messaġġi: {messaggi} · mistoqsijiet: {domande} · stħarriġ: {sondaggi} · F'kelma waħda: {nuvole}. Agħżel x’jibqa’ fil-paġna pubblika.",
-        "vuota": "Iċ-chat, il-mistoqsijiet, l-istħarriġ u l-kliem ma ntużawx."
+        "rivista": "Messaġġi: {messaggi} · mistoqsijiet: {domande} · stħarriġ: {sondaggi} · F'kelma waħda: {nuvole}.",
+        "vuota": "Iċ-chat, il-mistoqsijiet, l-istħarriġ u l-kliem ma ntużawx.",
+        "inSospeso": "Mistoqsijiet mingħajr tweġiba: {domandeInSospeso}. Immarkahom bħala mwieġba jew warrabhom."
       },
       "materiali": {
         "title": "Materjali għal min ma kienx hemm",
@@ -3362,6 +3363,74 @@
         "scaduta": "Mhux viżibbli aktar: id-data ta’ skadenza għaddiet.",
         "archiviato": "Avveniment arkivjat: il-paġna mhix pubblika.",
         "libreriaSenzaVideo": "Viżibbli għal kulħadd; se tidher fil-librerija tal-vidjos meta l-vidjo jiġi ppubblikat."
+      }
+    },
+    "roomReview": {
+      "title": "X’ġara fil-kamra",
+      "intro": "Irrevedi dak li nkiteb u ntalab: aħbi dak li m’għandux jibqa’, agħlaq il-mistoqsijiet, ippubblika r-riżultati tal-istħarriġ. Il-ġabra fil-qosor fuq il-paġna pubblika tiġi aġġornata ma' kull bidla.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Mistoqsijiet",
+        "polls": "Stħarriġ",
+        "words": "F'kelma waħda"
+      },
+      "loading": "Qed jitgħabba…",
+      "error": "Din il-parti ma setgħetx tinqara: erġa’ pprova aktar tard.",
+      "actionError": "L-azzjoni ma rnexxietx: erġa’ pprova.",
+      "chat": {
+        "empty": "L-ebda messaġġ.",
+        "limit": "Qed jintwerew l-aħħar {count} messaġġ.",
+        "question": "Mistoqsija",
+        "moderator": "Moderazzjoni",
+        "hide": "Aħbi",
+        "hideFor": "Aħbi l-messaġġ ta’ {name}",
+        "hidden": "Il-messaġġ ġie moħbi.",
+        "confirmTitle": "Taħbi l-messaġġ?",
+        "confirmBody": "Jisparixxi mill-istorja, mill-esportazzjoni u mill-ġabra fil-qosor, flimkien ma’ kwalunkwe fajl mehmuż. Din l-azzjoni ma tistax titreġġa’ lura."
+      },
+      "qa": {
+        "empty": "L-ebda mistoqsija.",
+        "status": {
+          "PENDING": "Pendenti",
+          "HIGHLIGHTED": "Evidenzjata",
+          "ANSWERED": "Imweġba",
+          "DISMISSED": "Miċħuda"
+        },
+        "markAnswered": "Marka bħala mweġba",
+        "dismiss": "Iċħad",
+        "fromChat": "mis-chat",
+        "votes": "Voti: {count}",
+        "answeredOk": "Il-mistoqsija ġiet immarkata bħala mweġba.",
+        "dismissedOk": "Il-mistoqsija ġiet miċħuda.",
+        "limit": "Qed jintwerew {count} mistoqsija mmarkati fiċ-chat: l-ewwel dawk miftuħa, imbagħad l-aktar reċenti magħluqa."
+      },
+      "polls": {
+        "empty": "L-ebda stħarriġ.",
+        "status": {
+          "OPEN": "Miftuħ",
+          "CLOSED": "Magħluq: ir-riżultati mhumiex pubbliċi",
+          "PUBLISHED": "Riżultati ppubblikati"
+        },
+        "votes": "Voti: {count}",
+        "publish": "Ippubblika r-riżultati",
+        "published": "Ir-riżultati ġew ippubblikati."
+      },
+      "words": {
+        "empty": "L-ebda kelma.",
+        "prompt": "Mistoqsija: {prompt}",
+        "people": "Persuni: {count}",
+        "hide": "Aħbi",
+        "hideFor": "Aħbi “{word}”",
+        "hidden": "Il-kelma ġiet moħbija.",
+        "confirmTitle": "Taħbi l-kelma?",
+        "confirmBody": "Tisparixxi mis-sħaba u mill-ġabra fil-qosor. Din l-azzjoni ma tistax titreġġa’ lura.",
+        "round": "Rawnd: {date}"
+      },
+      "recap": {
+        "button": "Aġġorna l-ġabra fil-qosor pubblika",
+        "done": "Il-ġabra fil-qosor pubblika ġiet aġġornata.",
+        "notPossible": "Il-ġabra fil-qosor ma tistax tiġi aġġornata aktar: l-avveniment għadu ma ntemmx jew id-dejta tiegħu skadiet.",
+        "error": "L-aġġornament ma rnexxiex: erġa’ pprova."
       }
     }
   },

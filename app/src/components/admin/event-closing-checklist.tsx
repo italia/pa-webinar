@@ -24,6 +24,7 @@ export const ANCORE_CHIUSURA = {
   resoconto: 'dopo-resoconto',
   ai: 'dopo-ai',
   trascrizione: 'dopo-trascrizione',
+  sala: 'dopo-sala',
 } as const;
 
 const CHIAVE_STATO: Record<StatoVoce, 'fatto' | 'daFare' | 'inCorso' | 'nonServe'> = {
@@ -153,7 +154,7 @@ export default function EventClosingChecklist({
       case 'sala':
         return v.stato === 'non-serve'
           ? null
-          : pulsante(t('azioni.apri'), () => vaiA(ANCORE_CHIUSURA.pagina));
+          : pulsante(t('azioni.apri'), () => vaiA(ANCORE_CHIUSURA.sala));
       case 'materiali':
         // Ci sono ma la pagina non li mostra: si accende la sezione nella
         // configurazione dopo l'evento, non si aggiungono materiali.

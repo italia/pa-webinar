@@ -11341,3 +11341,136 @@ html.live-resizing .live-sidebar-resizer::after {
 [id^='dopo-'][tabindex='-1']:focus {
   outline: none;
 }
+
+// ── «Cosa è successo in sala»: la revisione dopo l'evento ─────────────────
+.sala-rivista__intro {
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  max-width: 70ch;
+  margin-bottom: 0.75rem;
+}
+.sala-rivista__schede {
+  margin-bottom: 0.75rem;
+}
+// Dopo un'azione il fuoco torna al pannello: la cornice serve a chi usa la
+// tastiera, non dopo un clic.
+.sala-rivista__pannello:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+.sala-rivista__nota {
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  margin: 0.25rem 0 0.75rem;
+}
+.sala-rivista__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 28rem;
+  overflow-y: auto;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+}
+.sala-rivista__lista--larga {
+  max-height: none;
+}
+.sala-rivista__voce {
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid #edf1f5;
+}
+.sala-rivista__voce:first-child {
+  border-top: 0;
+}
+.sala-rivista__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+  color: var(--app-text);
+
+  time {
+    color: var(--app-muted);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+}
+.sala-rivista__etichetta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: #f1f4f7;
+  color: var(--app-muted);
+}
+.sala-rivista__etichetta--aperta {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+.sala-rivista__nota-breve {
+  font-size: 0.78rem;
+  color: var(--app-muted);
+}
+.sala-rivista__testo {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--app-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.sala-rivista__opzioni {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.35rem;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(4rem, 1fr) 2.5rem;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+  }
+}
+.sala-rivista__barra {
+  height: 0.5rem;
+  background: #edf1f5;
+  border-radius: 999px;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--app-primary);
+  }
+}
+.sala-rivista__numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sala-rivista__parole {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+    border: 1px solid #dde4ec;
+    border-radius: 999px;
+  }
+}
+.sala-rivista__parola {
+  font-weight: 600;
+  color: var(--app-text);
+}
+.sala-rivista__piede {
+  margin-top: 1rem;
+}

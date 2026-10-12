@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Wat er in de zaal gebeurde",
-        "rivista": "Berichten: {messaggi} · vragen: {domande} · peilingen: {sondaggi} · In één woord: {nuvole}. Kies wat op de openbare pagina blijft.",
-        "vuota": "Chat, vragen, peilingen en woorden zijn niet gebruikt."
+        "rivista": "Berichten: {messaggi} · vragen: {domande} · peilingen: {sondaggi} · In één woord: {nuvole}.",
+        "vuota": "Chat, vragen, peilingen en woorden zijn niet gebruikt.",
+        "inSospeso": "Onbeantwoorde vragen: {domandeInSospeso}. Markeer ze als beantwoord of wijs ze af."
       },
       "materiali": {
         "title": "Materialen voor wie er niet bij was",
@@ -3362,6 +3363,74 @@
         "scaduta": "Niet meer zichtbaar: de vervaldatum is verstreken.",
         "archiviato": "Evenement gearchiveerd: de pagina is niet openbaar.",
         "libreriaSenzaVideo": "Voor iedereen zichtbaar; in de videobibliotheek verschijnt hij zodra de video is gepubliceerd."
+      }
+    },
+    "roomReview": {
+      "title": "Wat er in de zaal gebeurde",
+      "intro": "Bekijk wat er is geschreven en gevraagd: verberg wat niet mag blijven staan, sluit de vragen af en publiceer de resultaten van de peilingen. De samenvatting op de openbare pagina wordt bij elke wijziging bijgewerkt.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Vragen",
+        "polls": "Peilingen",
+        "words": "In één woord"
+      },
+      "loading": "Laden…",
+      "error": "Kan dit deel niet lezen: probeer het later opnieuw.",
+      "actionError": "De actie is mislukt: probeer het opnieuw.",
+      "chat": {
+        "empty": "Geen berichten.",
+        "limit": "De laatste {count} berichten worden getoond.",
+        "question": "Vraag",
+        "moderator": "Presentatie",
+        "hide": "Verbergen",
+        "hideFor": "Bericht van {name} verbergen",
+        "hidden": "Bericht verborgen.",
+        "confirmTitle": "Bericht verbergen?",
+        "confirmBody": "Het verdwijnt uit de geschiedenis, de export en de samenvatting, samen met een eventuele bijlage. Dit kan niet ongedaan worden gemaakt."
+      },
+      "qa": {
+        "empty": "Geen vragen.",
+        "status": {
+          "PENDING": "In afwachting",
+          "HIGHLIGHTED": "Uitgelicht",
+          "ANSWERED": "Beantwoord",
+          "DISMISSED": "Afgewezen"
+        },
+        "markAnswered": "Markeren als beantwoord",
+        "dismiss": "Afwijzen",
+        "fromChat": "uit de chat",
+        "votes": "Stemmen: {count}",
+        "answeredOk": "Vraag gemarkeerd als beantwoord.",
+        "dismissedOk": "Vraag afgewezen.",
+        "limit": "Er worden {count} in de chat gemarkeerde vragen getoond: eerst de open, dan de meest recent gesloten."
+      },
+      "polls": {
+        "empty": "Geen peilingen.",
+        "status": {
+          "OPEN": "Open",
+          "CLOSED": "Gesloten: resultaten niet openbaar",
+          "PUBLISHED": "Resultaten gepubliceerd"
+        },
+        "votes": "Stemmen: {count}",
+        "publish": "Resultaten publiceren",
+        "published": "Resultaten gepubliceerd."
+      },
+      "words": {
+        "empty": "Geen woorden.",
+        "prompt": "Vraag: {prompt}",
+        "people": "Personen: {count}",
+        "hide": "Verbergen",
+        "hideFor": "‘{word}’ verbergen",
+        "hidden": "Woord verborgen.",
+        "confirmTitle": "Woord verbergen?",
+        "confirmBody": "Het verdwijnt uit de woordwolk en de samenvatting. Dit kan niet ongedaan worden gemaakt.",
+        "round": "Ronde van {date}"
+      },
+      "recap": {
+        "button": "Openbare samenvatting bijwerken",
+        "done": "Openbare samenvatting bijgewerkt.",
+        "notPossible": "De samenvatting kan niet meer worden bijgewerkt: het evenement is niet afgelopen of de bewaartermijn van de gegevens is verstreken.",
+        "error": "Bijwerken mislukt: probeer het opnieuw."
       }
     }
   },

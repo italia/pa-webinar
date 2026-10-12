@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Kaj se je dogajalo v sobi",
-        "rivista": "Sporočila: {messaggi} · vprašanja: {domande} · ankete: {sondaggi} · Z eno besedo: {nuvole}. Izberite, kaj ostane na javni strani.",
-        "vuota": "Klepet, vprašanja, ankete in besede niso bili uporabljeni."
+        "rivista": "Sporočila: {messaggi} · vprašanja: {domande} · ankete: {sondaggi} · Z eno besedo: {nuvole}.",
+        "vuota": "Klepet, vprašanja, ankete in besede niso bili uporabljeni.",
+        "inSospeso": "Neodgovorjena vprašanja: {domandeInSospeso}. Označite jih kot odgovorjena ali jih zavrzite."
       },
       "materiali": {
         "title": "Gradiva za tiste, ki jih ni bilo",
@@ -3362,6 +3363,74 @@
         "scaduta": "Ni več vidna: datum poteka je minil.",
         "archiviato": "Dogodek arhiviran: stran ni javna.",
         "libreriaSenzaVideo": "Vidna vsem; v video knjižnici se bo prikazala, ko bo videoposnetek objavljen."
+      }
+    },
+    "roomReview": {
+      "title": "Kaj se je dogajalo v sobi",
+      "intro": "Preglejte, kaj je bilo napisano in vprašano: skrijte, kar ne sme ostati, zaključite vprašanja, objavite rezultate anket. Povzetek na javni strani se posodobi ob vsaki spremembi.",
+      "tabs": {
+        "chat": "Klepet",
+        "qa": "Vprašanja",
+        "polls": "Ankete",
+        "words": "Z eno besedo"
+      },
+      "loading": "Nalaganje…",
+      "error": "Tega dela ni mogoče prebrati: poskusite znova pozneje.",
+      "actionError": "Dejanje ni uspelo: poskusite znova.",
+      "chat": {
+        "empty": "Ni sporočil.",
+        "limit": "Prikazanih je zadnjih {count} sporočil.",
+        "question": "Vprašanje",
+        "moderator": "Vodenje",
+        "hide": "Skrij",
+        "hideFor": "Skrij sporočilo od {name}",
+        "hidden": "Sporočilo je skrito.",
+        "confirmTitle": "Želite skriti sporočilo?",
+        "confirmBody": "Izgine iz zgodovine, izvoza in povzetka, skupaj z morebitno prilogo. Dejanja ni mogoče razveljaviti."
+      },
+      "qa": {
+        "empty": "Ni vprašanj.",
+        "status": {
+          "PENDING": "V čakanju",
+          "HIGHLIGHTED": "Izpostavljeno",
+          "ANSWERED": "Odgovorjeno",
+          "DISMISSED": "Zavrnjeno"
+        },
+        "markAnswered": "Označi kot odgovorjeno",
+        "dismiss": "Zavrni",
+        "fromChat": "iz klepeta",
+        "votes": "Glasovi: {count}",
+        "answeredOk": "Vprašanje je označeno kot odgovorjeno.",
+        "dismissedOk": "Vprašanje je zavrnjeno.",
+        "limit": "Prikazanih je {count} vprašanj, označenih v klepetu: najprej odprta, nato najnovejša zaprta."
+      },
+      "polls": {
+        "empty": "Ni anket.",
+        "status": {
+          "OPEN": "Odprto",
+          "CLOSED": "Zaprto: rezultati niso javni",
+          "PUBLISHED": "Rezultati objavljeni"
+        },
+        "votes": "Glasovi: {count}",
+        "publish": "Objavi rezultate",
+        "published": "Rezultati so objavljeni."
+      },
+      "words": {
+        "empty": "Ni besed.",
+        "prompt": "Vprašanje: {prompt}",
+        "people": "Število oseb: {count}",
+        "hide": "Skrij",
+        "hideFor": "Skrij »{word}«",
+        "hidden": "Beseda je skrita.",
+        "confirmTitle": "Želite skriti besedo?",
+        "confirmBody": "Izgine iz oblaka in povzetka. Dejanja ni mogoče razveljaviti.",
+        "round": "Krog z dne {date}"
+      },
+      "recap": {
+        "button": "Posodobi javni povzetek",
+        "done": "Javni povzetek je posodobljen.",
+        "notPossible": "Povzetka ni več mogoče posodobiti: dogodek se ni končal ali pa je potekel rok hrambe njegovih podatkov.",
+        "error": "Posodobitev ni uspela: poskusite znova."
       }
     }
   },

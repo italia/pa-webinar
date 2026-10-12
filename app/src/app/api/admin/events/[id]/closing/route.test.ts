@@ -64,6 +64,7 @@ const DATI: DatiChiusura = {
   resocontoInLavorazione: false,
   messaggi: 0,
   domande: 0,
+  domandeInSospeso: 0,
   sondaggi: 0,
   nuvole: 0,
   materialiDopo: 1,

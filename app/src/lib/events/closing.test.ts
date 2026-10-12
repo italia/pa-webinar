@@ -27,6 +27,7 @@ const base: DatiChiusura = {
   resocontoInLavorazione: false,
   messaggi: 0,
   domande: 0,
+  domandeInSospeso: 0,
   sondaggi: 0,
   nuvole: 0,
   materialiDopo: 0,
@@ -146,6 +147,20 @@ describe("chiudi l'evento — resoconto", () => {
 });
 
 describe("chiudi l'evento — sala, materiali, valutazioni, pagina", () => {
+  it('domande rimaste aperte: da fare, si chiudono dalla revisione', () => {
+    expect(voce({ messaggi: 10, domande: 3, domandeInSospeso: 2 }, 'sala')).toMatchObject(
+      {
+        stato: 'da-fare',
+        caso: 'inSospeso',
+        numeri: { domandeInSospeso: 2 },
+      }
+    );
+    // su un evento archiviato non si rivede piu' niente
+    expect(
+      voce({ status: 'ARCHIVED', domande: 3, domandeInSospeso: 2 }, 'sala').stato
+    ).toBe('fatto');
+  });
+
   it('la sala si racconta, non chiede niente', () => {
     expect(voce({ messaggi: 10, domande: 3 }, 'sala')).toMatchObject({
       stato: 'fatto',
@@ -220,18 +235,24 @@ describe("chiudi l'evento — cio' che non si puo' piu' fare", () => {
   const ai = { recordingId: 'r1', origine: 'ai' as const };
 
   it("evento archiviato: trascrizione e resoconto non si pubblicano piu' (la pagina non e' pubblica)", () => {
-    expect(voce({ status: 'ARCHIVED', trascrizione: ai }, 'trascrizione').caso).toBe('nonPiu');
-    expect(voce({ status: 'ARCHIVED', resocontoGenerato: true }, 'resoconto').caso).toBe('nonPiu');
+    expect(voce({ status: 'ARCHIVED', trascrizione: ai }, 'trascrizione').caso).toBe(
+      'nonPiu'
+    );
+    expect(voce({ status: 'ARCHIVED', resocontoGenerato: true }, 'resoconto').caso).toBe(
+      'nonPiu'
+    );
   });
 
   it("dati scaduti: il resoconto non si genera piu', ma se c'e' si pubblica ancora", () => {
     const dopo = { adesso: FINE.getTime() + 31 * GIORNO };
     expect(voce({}, 'resoconto', dopo).caso).toBe('nonPiu');
-    expect(voce({ resocontoGenerato: true }, 'resoconto', dopo).caso).toBe('daPubblicare');
+    expect(voce({ resocontoGenerato: true }, 'resoconto', dopo).caso).toBe(
+      'daPubblicare'
+    );
     expect(voce({ trascrizione: ai }, 'trascrizione', dopo).stato).toBe('da-fare');
   });
 
-  it("pipeline spenta: un lavoro rimasto in coda non tiene la trascrizione «in corso»", () => {
+  it('pipeline spenta: un lavoro rimasto in coda non tiene la trascrizione «in corso»', () => {
     expect(
       voce(
         {
@@ -240,20 +261,32 @@ describe("chiudi l'evento — cio' che non si puo' piu' fare", () => {
           trascrizione: { recordingId: 'r2', origine: 'sottotitoli' },
           trascrizioneInLavorazione: true,
         },
-        'trascrizione',
-      ).caso,
+        'trascrizione'
+      ).caso
     ).toBe('prontaSottotitoli');
   });
 
   it("il file si aspetta dalla chiusura vera della sala, non dall'orario", () => {
     const chiusa = new Date(FINE.getTime() - 3 * ORA);
-    expect(voce({ fineEffettiva: chiusa }, 'registrazione', { adesso: FINE.getTime() + ORA }).caso).toBe('nessunFile');
+    expect(
+      voce({ fineEffettiva: chiusa }, 'registrazione', { adesso: FINE.getTime() + ORA })
+        .caso
+    ).toBe('nessunFile');
     const tardi = new Date(FINE.getTime() + 5 * ORA);
-    expect(voce({ fineEffettiva: tardi }, 'registrazione', { adesso: FINE.getTime() + 6 * ORA }).caso).toBe('inArrivo');
+    expect(
+      voce({ fineEffettiva: tardi }, 'registrazione', {
+        adesso: FINE.getTime() + 6 * ORA,
+      }).caso
+    ).toBe('inArrivo');
   });
 
-  it("materiali nascosti su una pagina che non si vede: non chiedono niente, ma si dice che ci sono", () => {
-    expect(voce({ materialiDopo: 2, postEventShowMaterials: false, postEventPublic: false }, 'materiali')).toMatchObject({
+  it('materiali nascosti su una pagina che non si vede: non chiedono niente, ma si dice che ci sono', () => {
+    expect(
+      voce(
+        { materialiDopo: 2, postEventShowMaterials: false, postEventPublic: false },
+        'materiali'
+      )
+    ).toMatchObject({
       stato: 'non-serve',
       caso: 'nascosti',
     });

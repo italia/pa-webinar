@@ -21,11 +21,13 @@ vi.mock('@/lib/auth/moderator', () => ({
   verifyModeratorToken: vi.fn(),
 }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/events/recap', () => ({ rifaiRiepilogo: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { authenticateChatSender } from '@/lib/chat/authenticate';
 import { verifyModeratorToken } from '@/lib/auth/moderator';
 import { recordLiveAction } from '@/lib/live/actions';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 
 import { DELETE, PATCH } from './route';
 
@@ -65,6 +67,8 @@ describe('DELETE /chat/[messageId] — cronologia della sala', () => {
       actor: 'moderator',
       data: { messageId: MESSAGE_ID },
     });
+    // il riepilogo pubblico, se l'evento e' concluso, si rifa'
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
   });
 
   it('un messaggio gia’ nascosto non si registra di nuovo', async () => {
@@ -76,6 +80,7 @@ describe('DELETE /chat/[messageId] — cronologia della sala', () => {
     const res = await DELETE(del(), ctx);
     expect(res.status).toBe(200);
     expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(rifaiRiepilogo).not.toHaveBeenCalled();
   });
 
   it('senza moderazione, o su un messaggio inesistente: niente', async () => {

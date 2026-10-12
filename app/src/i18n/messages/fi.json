@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Mitä huoneessa tapahtui",
-        "rivista": "Viestit: {messaggi} · kysymykset: {domande} · kyselyt: {sondaggi} · Yhdellä sanalla: {nuvole}. Valitse, mitä jää julkiselle sivulle.",
-        "vuota": "Keskustelua, kysymyksiä, kyselyitä ja sanoja ei käytetty."
+        "rivista": "Viestit: {messaggi} · kysymykset: {domande} · kyselyt: {sondaggi} · Yhdellä sanalla: {nuvole}.",
+        "vuota": "Keskustelua, kysymyksiä, kyselyitä ja sanoja ei käytetty.",
+        "inSospeso": "Vastaamattomat kysymykset: {domandeInSospeso}. Merkitse ne vastatuiksi tai hylkää ne."
       },
       "materiali": {
         "title": "Materiaalit poissa olleille",
@@ -3362,6 +3363,74 @@
         "scaduta": "Ei enää näkyvissä: vanhentumispäivä on ohitettu.",
         "archiviato": "Tapahtuma arkistoitu: sivu ei ole julkinen.",
         "libreriaSenzaVideo": "Näkyy kaikille; se ilmestyy videokirjastoon, kun video julkaistaan."
+      }
+    },
+    "roomReview": {
+      "title": "Mitä huoneessa tapahtui",
+      "intro": "Käy läpi, mitä kirjoitettiin ja kysyttiin: piilota se, minkä ei pidä jäädä näkyviin, sulje kysymykset ja julkaise kyselyjen tulokset. Julkisen sivun yhteenveto päivittyy jokaisen muutoksen myötä.",
+      "tabs": {
+        "chat": "Keskustelu",
+        "qa": "Kysymykset",
+        "polls": "Kyselyt",
+        "words": "Yhdellä sanalla"
+      },
+      "loading": "Ladataan…",
+      "error": "Tätä osaa ei voitu lukea: yritä myöhemmin uudelleen.",
+      "actionError": "Toiminto epäonnistui: yritä uudelleen.",
+      "chat": {
+        "empty": "Ei viestejä.",
+        "limit": "Näytetään viimeiset {count} viestiä.",
+        "question": "Kysymys",
+        "moderator": "Juontaja",
+        "hide": "Piilota",
+        "hideFor": "Piilota viesti, lähettäjä {name}",
+        "hidden": "Viesti piilotettu.",
+        "confirmTitle": "Piilotetaanko viesti?",
+        "confirmBody": "Se poistuu historiasta, viennistä ja yhteenvedosta mahdollisen liitteen kanssa. Toimintoa ei voi kumota."
+      },
+      "qa": {
+        "empty": "Ei kysymyksiä.",
+        "status": {
+          "PENDING": "Odottaa",
+          "HIGHLIGHTED": "Korostettu",
+          "ANSWERED": "Vastattu",
+          "DISMISSED": "Hylätty"
+        },
+        "markAnswered": "Merkitse vastatuksi",
+        "dismiss": "Hylkää",
+        "fromChat": "keskustelusta",
+        "votes": "Ääniä: {count}",
+        "answeredOk": "Kysymys merkitty vastatuksi.",
+        "dismissedOk": "Kysymys hylätty.",
+        "limit": "Näytetään {count} chatissa merkittyä kysymystä: ensin avoimet, sitten viimeksi suljetut."
+      },
+      "polls": {
+        "empty": "Ei kyselyitä.",
+        "status": {
+          "OPEN": "Avoin",
+          "CLOSED": "Suljettu: tulokset eivät ole julkisia",
+          "PUBLISHED": "Tulokset julkaistu"
+        },
+        "votes": "Ääniä: {count}",
+        "publish": "Julkaise tulokset",
+        "published": "Tulokset julkaistu."
+      },
+      "words": {
+        "empty": "Ei sanoja.",
+        "prompt": "Kysymys: {prompt}",
+        "people": "Henkilöitä: {count}",
+        "hide": "Piilota",
+        "hideFor": "Piilota ”{word}”",
+        "hidden": "Sana piilotettu.",
+        "confirmTitle": "Piilotetaanko sana?",
+        "confirmBody": "Se poistuu sanapilvestä ja yhteenvedosta. Toimintoa ei voi kumota.",
+        "round": "Kierros {date}"
+      },
+      "recap": {
+        "button": "Päivitä julkinen yhteenveto",
+        "done": "Julkinen yhteenveto päivitetty.",
+        "notPossible": "Yhteenvetoa ei voi enää päivittää: tapahtuma ei ole päättynyt tai sen tietojen säilytysaika on päättynyt.",
+        "error": "Päivitys epäonnistui: yritä uudelleen."
       }
     }
   },

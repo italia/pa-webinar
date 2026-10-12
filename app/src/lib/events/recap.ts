@@ -266,6 +266,9 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
   // Only concluded, real events get a recap. LEGACY imports have no live data.
   if (event.status !== 'ENDED' || event.eventType === 'LEGACY') return null;
 
+  // Lo snapshot porta l'ora d'inizio della lettura, come la ricostruzione
+  // chiesta a mano: fra le due vince quella cominciata dopo.
+  const inizio = new Date();
   const recap = await buildRecap(eventId);
   // Oltre la conservazione dei dati iscrizioni e chat non ci sono piu': un
   // riepilogo fatto adesso direbbe zero iscritti. Si mostra, ma non si
@@ -275,8 +278,59 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
     where: { id: eventId, postEventRecapAt: null },
     data: {
       postEventRecap: recap as unknown as Prisma.InputJsonValue,
-      postEventRecapAt: new Date(),
+      postEventRecapAt: inizio,
     },
   });
   return recap;
+}
+
+/**
+ * Dopo una modifica ai contenuti della sala (un messaggio nascosto o
+ * corretto, una domanda chiusa, un sondaggio pubblicato o tolto, una parola
+ * nascosta) il riepilogo congelato di un evento concluso si rifa' subito: la
+ * pagina pubblica non deve continuare a mostrare cio' che si e' tolto.
+ * Durante la diretta, o con i dati gia' scaduti, non fa niente
+ * (ricostruisciRiepilogo). Si chiama solo se qualcosa e' cambiato davvero:
+ * rifarlo rilegge tutta la sala. Non fa mai fallire la modifica.
+ */
+export async function rifaiRiepilogo(eventId: string, status?: string): Promise<void> {
+  // Chi ha gia' l'evento in mano passa lo stato: in diretta niente letture.
+  if (status !== undefined && status !== 'ENDED') return;
+  try {
+    await ricostruisciRiepilogo(eventId);
+  } catch (err) {
+    console.warn('[recap] ricostruzione dopo la modifica non riuscita:', err);
+  }
+}
+
+export type EsitoRicostruzione = 'fatto' | 'non-concluso' | 'scaduto';
+
+/**
+ * Rifà il riepilogo congelato con i dati di adesso. Serve dopo la revisione
+ * della sala: un messaggio nascosto, una domanda scartata o un sondaggio
+ * pubblicato dopo la prima visita della pagina non cambierebbero niente,
+ * perche' la pagina mostra lo snapshot. Solo per un evento concluso (non
+ * importato) con i dati ancora conservati: oltre, chat e iscrizioni non ci
+ * sono piu' e il riepilogo nuovo direbbe zero.
+ */
+export async function ricostruisciRiepilogo(eventId: string): Promise<EsitoRicostruzione> {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { status: true, eventType: true, endsAt: true, dataRetentionDays: true },
+  });
+  if (!event || event.status !== 'ENDED' || event.eventType === 'LEGACY') return 'non-concluso';
+  if (isEventDataRetentionExpired(event, new Date())) return 'scaduto';
+  // Due ricostruzioni insieme: vince quella cominciata dopo. Lo snapshot
+  // porta l'ora d'inizio della lettura, e una ricostruzione piu' vecchia non
+  // scrive sopra una piu' recente.
+  const inizio = new Date();
+  const recap = await buildRecap(eventId);
+  await prisma.event.updateMany({
+    where: { id: eventId, OR: [{ postEventRecapAt: null }, { postEventRecapAt: { lt: inizio } }] },
+    data: {
+      postEventRecap: recap as unknown as Prisma.InputJsonValue,
+      postEventRecapAt: inizio,
+    },
+  });
+  return 'fatto';
 }

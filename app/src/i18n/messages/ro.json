@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Ce s-a întâmplat în sală",
-        "rivista": "Mesaje: {messaggi} · întrebări: {domande} · sondaje: {sondaggi} · Într-un cuvânt: {nuvole}. Alegeți ce rămâne pe pagina publică.",
-        "vuota": "Chatul, întrebările, sondajele și cuvintele nu au fost folosite."
+        "rivista": "Mesaje: {messaggi} · întrebări: {domande} · sondaje: {sondaggi} · Într-un cuvânt: {nuvole}.",
+        "vuota": "Chatul, întrebările, sondajele și cuvintele nu au fost folosite.",
+        "inSospeso": "Întrebări fără răspuns: {domandeInSospeso}. Marcați-le ca răspunse sau respingeți-le."
       },
       "materiali": {
         "title": "Materiale pentru cei care au lipsit",
@@ -3362,6 +3363,74 @@
         "scaduta": "Nu mai este vizibilă: data de expirare a trecut.",
         "archiviato": "Eveniment arhivat: pagina nu este publică.",
         "libreriaSenzaVideo": "Vizibilă pentru toți; va apărea în biblioteca video după ce videoclipul va fi publicat."
+      }
+    },
+    "roomReview": {
+      "title": "Ce s-a întâmplat în sală",
+      "intro": "Revedeți ce s-a scris și ce s-a întrebat: ascundeți ce nu trebuie să rămână, închideți întrebările, publicați rezultatele sondajelor. Recapitularea de pe pagina publică se actualizează la fiecare modificare.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Întrebări",
+        "polls": "Sondaje",
+        "words": "Într-un cuvânt"
+      },
+      "loading": "Se încarcă…",
+      "error": "Această parte nu poate fi citită: încercați din nou mai târziu.",
+      "actionError": "Operațiunea nu a reușit: încercați din nou.",
+      "chat": {
+        "empty": "Niciun mesaj.",
+        "limit": "Se afișează doar cele mai recente mesaje: {count}.",
+        "question": "Întrebare",
+        "moderator": "Moderare",
+        "hide": "Ascunde",
+        "hideFor": "Ascunde mesajul de la {name}",
+        "hidden": "Mesaj ascuns.",
+        "confirmTitle": "Ascundeți mesajul?",
+        "confirmBody": "Dispare din istoric, din export și din recapitulare, împreună cu eventualul atașament. Acțiunea nu poate fi anulată."
+      },
+      "qa": {
+        "empty": "Nicio întrebare.",
+        "status": {
+          "PENDING": "În așteptare",
+          "HIGHLIGHTED": "Evidențiat",
+          "ANSWERED": "Răspuns dat",
+          "DISMISSED": "Respins"
+        },
+        "markAnswered": "Marcați ca având răspuns",
+        "dismiss": "Respingeți",
+        "fromChat": "din chat",
+        "votes": "Voturi: {count}",
+        "answeredOk": "Întrebarea a fost marcată ca având răspuns.",
+        "dismissedOk": "Întrebarea a fost respinsă.",
+        "limit": "Se afișează {count} întrebări marcate în chat: mai întâi cele deschise, apoi cele închise cel mai recent."
+      },
+      "polls": {
+        "empty": "Niciun sondaj.",
+        "status": {
+          "OPEN": "Deschis",
+          "CLOSED": "Închis: rezultatele nu sunt publice",
+          "PUBLISHED": "Rezultate publicate"
+        },
+        "votes": "Voturi: {count}",
+        "publish": "Publicați rezultatele",
+        "published": "Rezultatele au fost publicate."
+      },
+      "words": {
+        "empty": "Niciun cuvânt.",
+        "prompt": "Întrebare: {prompt}",
+        "people": "Persoane: {count}",
+        "hide": "Ascunde",
+        "hideFor": "Ascunde „{word}”",
+        "hidden": "Cuvânt ascuns.",
+        "confirmTitle": "Ascundeți cuvântul?",
+        "confirmBody": "Dispare din nor și din recapitulare. Acțiunea nu poate fi anulată.",
+        "round": "Runda din {date}"
+      },
+      "recap": {
+        "button": "Actualizați recapitularea publică",
+        "done": "Recapitularea publică a fost actualizată.",
+        "notPossible": "Recapitularea nu mai poate fi actualizată: evenimentul nu s-a încheiat sau datele sale au expirat.",
+        "error": "Actualizarea nu a reușit: încercați din nou."
       }
     }
   },

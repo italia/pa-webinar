@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Što se događalo u sobi",
-        "rivista": "Poruke: {messaggi} · pitanja: {domande} · ankete: {sondaggi} · Jednom riječju: {nuvole}. Odaberite što ostaje na javnoj stranici.",
-        "vuota": "Chat, pitanja, ankete i riječi nisu korišteni."
+        "rivista": "Poruke: {messaggi} · pitanja: {domande} · ankete: {sondaggi} · Jednom riječju: {nuvole}.",
+        "vuota": "Chat, pitanja, ankete i riječi nisu korišteni.",
+        "inSospeso": "Pitanja bez odgovora: {domandeInSospeso}. Označite ih kao odgovorena ili ih odbacite."
       },
       "materiali": {
         "title": "Materijali za one koji nisu bili prisutni",
@@ -3362,6 +3363,74 @@
         "scaduta": "Više nije vidljiva: datum isteka je prošao.",
         "archiviato": "Događaj arhiviran: stranica nije javna.",
         "libreriaSenzaVideo": "Vidljiva svima; u videoteci će se pojaviti kada videozapis bude objavljen."
+      }
+    },
+    "roomReview": {
+      "title": "Što se događalo u sobi",
+      "intro": "Pregledajte što je napisano i pitano: sakrijte ono što ne treba ostati, zatvorite pitanja, objavite rezultate anketa. Sažetak na javnoj stranici ažurira se sa svakom promjenom.",
+      "tabs": {
+        "chat": "Razgovor",
+        "qa": "Pitanja",
+        "polls": "Ankete",
+        "words": "Jednom riječju"
+      },
+      "loading": "Učitavanje…",
+      "error": "Ovaj dio nije moguće pročitati: pokušajte ponovno kasnije.",
+      "actionError": "Radnja nije uspjela: pokušajte ponovno.",
+      "chat": {
+        "empty": "Nema poruka.",
+        "limit": "Prikazuje se zadnjih {count} poruka.",
+        "question": "Pitanje",
+        "moderator": "Moderiranje",
+        "hide": "Sakrij",
+        "hideFor": "Sakrij poruku od {name}",
+        "hidden": "Poruka je sakrivena.",
+        "confirmTitle": "Sakriti poruku?",
+        "confirmBody": "Nestaje iz povijesti, izvoza i sažetka, zajedno s eventualnim privitkom. Radnja se ne može poništiti."
+      },
+      "qa": {
+        "empty": "Nema pitanja.",
+        "status": {
+          "PENDING": "Na čekanju",
+          "HIGHLIGHTED": "Istaknuto",
+          "ANSWERED": "Odgovoreno",
+          "DISMISSED": "Odbačeno"
+        },
+        "markAnswered": "Označi kao odgovoreno",
+        "dismiss": "Odbaci",
+        "fromChat": "iz razgovora",
+        "votes": "Glasovi: {count}",
+        "answeredOk": "Pitanje je označeno kao odgovoreno.",
+        "dismissedOk": "Pitanje je odbačeno.",
+        "limit": "Prikazuje se {count} pitanja označenih u chatu: najprije otvorena, zatim najnovija zatvorena."
+      },
+      "polls": {
+        "empty": "Nema anketa.",
+        "status": {
+          "OPEN": "Otvoreno",
+          "CLOSED": "Zatvoreno: rezultati nisu javni",
+          "PUBLISHED": "Rezultati objavljeni"
+        },
+        "votes": "Glasovi: {count}",
+        "publish": "Objavi rezultate",
+        "published": "Rezultati su objavljeni."
+      },
+      "words": {
+        "empty": "Nema riječi.",
+        "prompt": "Pitanje: {prompt}",
+        "people": "Broj osoba: {count}",
+        "hide": "Sakrij",
+        "hideFor": "Sakrij „{word}”",
+        "hidden": "Riječ je sakrivena.",
+        "confirmTitle": "Sakriti riječ?",
+        "confirmBody": "Nestaje iz oblaka i sažetka. Radnja se ne može poništiti.",
+        "round": "Krug od {date}"
+      },
+      "recap": {
+        "button": "Ažuriraj javni sažetak",
+        "done": "Javni sažetak je ažuriran.",
+        "notPossible": "Sažetak se više ne može ažurirati: događaj nije završio ili je istekao rok čuvanja njegovih podataka.",
+        "error": "Ažuriranje nije uspjelo: pokušajte ponovno."
       }
     }
   },

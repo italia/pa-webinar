@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Hvad der skete i rummet",
-        "rivista": "Beskeder: {messaggi} · spørgsmål: {domande} · afstemninger: {sondaggi} · Med ét ord: {nuvole}. Vælg, hvad der bliver på den offentlige side.",
-        "vuota": "Chat, spørgsmål, afstemninger og ord blev ikke brugt."
+        "rivista": "Beskeder: {messaggi} · spørgsmål: {domande} · afstemninger: {sondaggi} · Med ét ord: {nuvole}.",
+        "vuota": "Chat, spørgsmål, afstemninger og ord blev ikke brugt.",
+        "inSospeso": "Ubesvarede spørgsmål: {domandeInSospeso}. Markér dem som besvaret, eller afvis dem."
       },
       "materiali": {
         "title": "Materialer til dem, der ikke var med",
@@ -3362,6 +3363,74 @@
         "scaduta": "Ikke længere synlig: udløbsdatoen er passeret.",
         "archiviato": "Arrangementet er arkiveret: siden er ikke offentlig.",
         "libreriaSenzaVideo": "Synlig for alle; den vises i videobiblioteket, når videoen er offentliggjort."
+      }
+    },
+    "roomReview": {
+      "title": "Hvad der skete i rummet",
+      "intro": "Gennemgå, hvad der blev skrevet og spurgt om: skjul det, der ikke skal blive stående, luk spørgsmålene, og publicér resultaterne af afstemningerne. Opsummeringen på den offentlige side opdateres ved hver ændring.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Spørgsmål",
+        "polls": "Afstemninger",
+        "words": "Med ét ord"
+      },
+      "loading": "Indlæser…",
+      "error": "Kan ikke læse denne del: prøv igen senere.",
+      "actionError": "Handlingen mislykkedes: prøv igen.",
+      "chat": {
+        "empty": "Ingen beskeder.",
+        "limit": "Viser de seneste {count} beskeder.",
+        "question": "Spørgsmål",
+        "moderator": "Vært",
+        "hide": "Skjul",
+        "hideFor": "Skjul beskeden fra {name}",
+        "hidden": "Beskeden er skjult.",
+        "confirmTitle": "Skjul beskeden?",
+        "confirmBody": "Den forsvinder fra historikken, eksporten og opsummeringen sammen med en eventuel vedhæftet fil. Det kan ikke fortrydes."
+      },
+      "qa": {
+        "empty": "Ingen spørgsmål.",
+        "status": {
+          "PENDING": "Afventer",
+          "HIGHLIGHTED": "Fremhævet",
+          "ANSWERED": "Besvaret",
+          "DISMISSED": "Afvist"
+        },
+        "markAnswered": "Markér som besvaret",
+        "dismiss": "Afvis",
+        "fromChat": "fra chatten",
+        "votes": "Stemmer: {count}",
+        "answeredOk": "Spørgsmålet er markeret som besvaret.",
+        "dismissedOk": "Spørgsmålet er afvist.",
+        "limit": "Viser {count} spørgsmål markeret i chatten: først de åbne, derefter de senest lukkede."
+      },
+      "polls": {
+        "empty": "Ingen afstemninger.",
+        "status": {
+          "OPEN": "Åben",
+          "CLOSED": "Lukket: resultaterne er ikke offentlige",
+          "PUBLISHED": "Resultaterne er publiceret"
+        },
+        "votes": "Stemmer: {count}",
+        "publish": "Publicér resultaterne",
+        "published": "Resultaterne er publiceret."
+      },
+      "words": {
+        "empty": "Ingen ord.",
+        "prompt": "Spørgsmål: {prompt}",
+        "people": "Personer: {count}",
+        "hide": "Skjul",
+        "hideFor": "Skjul »{word}«",
+        "hidden": "Ordet er skjult.",
+        "confirmTitle": "Skjul ordet?",
+        "confirmBody": "Det forsvinder fra skyen og fra opsummeringen. Det kan ikke fortrydes.",
+        "round": "Runden den {date}"
+      },
+      "recap": {
+        "button": "Opdater den offentlige opsummering",
+        "done": "Den offentlige opsummering er opdateret.",
+        "notPossible": "Opsummeringen kan ikke længere opdateres: arrangementet er ikke afsluttet, eller opbevaringstiden for dets data er udløbet.",
+        "error": "Opdateringen mislykkedes: prøv igen."
       }
     }
   },

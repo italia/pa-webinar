@@ -62,6 +62,7 @@ import RecordingManagement from './recording-management';
 import CaptionsTranscriptPanel from './captions-transcript-panel';
 import EventReportPanel from './event-report-panel';
 import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklist';
+import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -1528,6 +1529,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tg = useTranslations('admin.glossary');
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
+  const trr = useTranslations('admin.roomReview');
   const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
@@ -1650,6 +1652,20 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           }}
         />
       </div>
+
+      {/* Cosa e' successo in sala, da rivedere a evento finito: subito dopo
+          le regole su cosa la pagina pubblica mostra. */}
+      {isEnded && (
+        <div className="mb-4" id={ANCORE_CHIUSURA.sala} tabIndex={-1}>
+          <H>{trr('title')}</H>
+          <EventRoomReview
+            eventId={event.id}
+            slug={event.slug}
+            token={event.moderatorToken}
+            concluso={status === 'ENDED'}
+          />
+        </div>
+      )}
 
       {/* Le valutazioni di chi ha partecipato, subito sotto le regole che le
           raccolgono e le pubblicano. */}

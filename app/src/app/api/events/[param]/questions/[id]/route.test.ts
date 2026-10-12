@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/cache', () => ({ deleteCacheByPrefix: vi.fn() }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/events/recap', () => ({ rifaiRiepilogo: vi.fn() }));
 vi.mock('@/lib/auth/moderator', () => ({
   isEventModerator: vi.fn(async (_e: unknown, token: string) => token === 'token-moderatore'),
 }));
@@ -25,6 +26,7 @@ vi.mock('@/lib/auth/moderator', () => ({
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction } from '@/lib/live/actions';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 
 import { PATCH } from './route';
 
@@ -165,6 +167,7 @@ describe('PATCH questions/[id]: cronologia della sala', () => {
       actor: 'moderator',
       data: { questionId: QID, status: 'ANSWERED', answered: true },
     });
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
     const tutto = JSON.stringify(vi.mocked(recordLiveAction).mock.calls);
     expect(tutto).not.toContain('A novembre');
     expect(tutto).not.toContain('bando');
@@ -185,6 +188,7 @@ describe('PATCH questions/[id]: cronologia della sala', () => {
     domanda('ANSWERED', 'Vecchia risposta');
     await PATCH(richiesta({ answer: '' }), contesto as never);
     expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(rifaiRiepilogo).not.toHaveBeenCalled();
   });
 
   it('chi non conduce, o una richiesta vuota: niente in cronologia', async () => {

@@ -23,6 +23,7 @@ import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
@@ -72,6 +73,8 @@ export const DELETE = withErrorHandling(async (request, context) => {
       actor: 'moderator',
       data: { messageId: message.id },
     });
+    // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+    await rifaiRiepilogo(event.id, event.status);
   }
 
   // Tell every connected client to remove it live. Non-essential envelope
@@ -145,7 +148,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   const message = await prisma.chatMessage.findFirst({
     where: { id: messageId, eventId: auth.eventId, hiddenAt: null },
-    select: { id: true, senderId: true, createdAt: true },
+    select: { id: true, senderId: true, createdAt: true, isQuestion: true },
   });
   if (!message) throw new NotFoundError('Message');
 
@@ -188,5 +191,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
     op: 'edit',
   });
 
+  // Il riepilogo pubblico di un evento concluso riporta le domande: se si e'
+  // corretta una domanda, si rifa'.
+  if (message.isQuestion) await rifaiRiepilogo(auth.eventId);
   return NextResponse.json({ ok: true, editedAt: editedAt.toISOString() });
 });

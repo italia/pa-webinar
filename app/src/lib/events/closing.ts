@@ -65,6 +65,8 @@ export interface DatiChiusura {
   resocontoInLavorazione: boolean;
   messaggi: number;
   domande: number;
+  /** Domande (pannello Q&A o segnate in chat) ne' risposte ne' scartate. */
+  domandeInSospeso: number;
   sondaggi: number;
   nuvole: number;
   materialiDopo: number;
@@ -116,7 +118,10 @@ export function statoChiusura(
   const archiviato = d.status === 'ARCHIVED';
   const resocontoGenerabile =
     d.status === 'ENDED' &&
-    !conservazioneFinita({ endsAt: d.endsAt, dataRetentionDays: d.dataRetentionDays }, new Date(adesso));
+    !conservazioneFinita(
+      { endsAt: d.endsAt, dataRetentionDays: d.dataRetentionDays },
+      new Date(adesso)
+    );
   const paginaVisibile =
     d.status !== 'ARCHIVED' &&
     isEventPageVisible(
@@ -198,9 +203,9 @@ export function statoChiusura(
     });
   }
 
-  // Cosa e' successo in sala: per ora si dice com'e' andata e si sceglie cosa
-  // resta nella pagina pubblica; non chiede altro, perche' domande e
-  // sondaggi rimasti aperti non si chiudono da qui.
+  // Cosa e' successo in sala: da fare se restano domande ne' risposte ne'
+  // scartate, che si chiudono dalla revisione qui sotto. I sondaggi chiusi e
+  // non pubblicati no: tenere i risultati per se' e' una scelta legittima.
   const numeriSala = {
     messaggi: d.messaggi,
     domande: d.domande,
@@ -209,6 +214,13 @@ export function statoChiusura(
   };
   if (d.messaggi + d.domande + d.sondaggi + d.nuvole === 0) {
     voci.push({ voce: 'sala', stato: 'non-serve', caso: 'vuota' });
+  } else if (d.domandeInSospeso > 0 && d.status === 'ENDED') {
+    voci.push({
+      voce: 'sala',
+      stato: 'da-fare',
+      caso: 'inSospeso',
+      numeri: { domandeInSospeso: d.domandeInSospeso },
+    });
   } else {
     voci.push({ voce: 'sala', stato: 'fatto', caso: 'rivista', numeri: numeriSala });
   }
@@ -334,7 +346,9 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
     trascrizioniAttive,
     resocontiAttivi,
     perTipoMessaggio,
+    domandeChatInSospeso,
     domande,
+    domandeInSospeso,
     sondaggi,
     nuvole,
     materialiDopo,
@@ -358,7 +372,19 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
       where: { eventId, hiddenAt: null },
       _count: { _all: true },
     }),
+    prisma.chatMessage.count({
+      where: {
+        eventId,
+        hiddenAt: null,
+        isQuestion: true,
+        answeredAt: null,
+        dismissedAt: null,
+      },
+    }),
     prisma.question.count({ where: { eventId } }),
+    prisma.question.count({
+      where: { eventId, status: { in: ['PENDING', 'HIGHLIGHTED'] } },
+    }),
     prisma.poll.count({ where: { eventId } }),
     prisma.wordCloudRound.count({ where: { eventId } }),
     prisma.eventMaterial.count({
@@ -413,6 +439,7 @@ export async function caricaDatiChiusura(eventId: string): Promise<DatiChiusura 
     resocontoInLavorazione: resocontiAttivi > 0,
     messaggi: conteggio(false),
     domande: domande + conteggio(true),
+    domandeInSospeso: domandeInSospeso + domandeChatInSospeso,
     sondaggi,
     nuvole,
     materialiDopo,

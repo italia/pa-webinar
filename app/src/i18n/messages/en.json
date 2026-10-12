@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "What happened in the room",
-        "rivista": "Messages: {messaggi} · questions: {domande} · polls: {sondaggi} · In one word: {nuvole}. Choose what stays on the public page.",
-        "vuota": "Chat, questions, polls and words were not used."
+        "rivista": "Messages: {messaggi} · questions: {domande} · polls: {sondaggi} · In one word: {nuvole}.",
+        "vuota": "Chat, questions, polls and words were not used.",
+        "inSospeso": "Unanswered questions: {domandeInSospeso}. Mark them as answered or dismiss them."
       },
       "materiali": {
         "title": "Materials for people who missed it",
@@ -3362,6 +3363,74 @@
         "scaduta": "No longer visible: its expiry date has passed.",
         "archiviato": "Event archived: the page is not public.",
         "libreriaSenzaVideo": "Visible to everyone; it will appear in the video library once the video is published."
+      }
+    },
+    "roomReview": {
+      "title": "What happened in the room",
+      "intro": "Review what was written and asked: hide what should not stay, close the questions, publish poll results. The summary on the public page updates with every change.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Questions",
+        "polls": "Polls",
+        "words": "In one word"
+      },
+      "loading": "Loading…",
+      "error": "Could not read this part: try again later.",
+      "actionError": "That did not work: try again.",
+      "chat": {
+        "empty": "No messages.",
+        "limit": "Showing the last {count} messages.",
+        "question": "Question",
+        "moderator": "Host",
+        "hide": "Hide",
+        "hideFor": "Hide the message from {name}",
+        "hidden": "Message hidden.",
+        "confirmTitle": "Hide the message?",
+        "confirmBody": "It disappears from the history, the export and the summary, together with any attachment. This cannot be undone."
+      },
+      "qa": {
+        "empty": "No questions.",
+        "status": {
+          "PENDING": "Waiting",
+          "HIGHLIGHTED": "Highlighted",
+          "ANSWERED": "Answered",
+          "DISMISSED": "Dismissed"
+        },
+        "markAnswered": "Mark as answered",
+        "dismiss": "Dismiss",
+        "fromChat": "from the chat",
+        "votes": "Votes: {count}",
+        "answeredOk": "Question marked as answered.",
+        "dismissedOk": "Question dismissed.",
+        "limit": "Showing {count} questions marked in the chat: open ones first, then the most recent closed ones."
+      },
+      "polls": {
+        "empty": "No polls.",
+        "status": {
+          "OPEN": "Open",
+          "CLOSED": "Closed: results not public",
+          "PUBLISHED": "Results published"
+        },
+        "votes": "Votes: {count}",
+        "publish": "Publish the results",
+        "published": "Results published."
+      },
+      "words": {
+        "empty": "No words.",
+        "prompt": "Question: {prompt}",
+        "people": "People: {count}",
+        "hide": "Hide",
+        "hideFor": "Hide “{word}”",
+        "hidden": "Word hidden.",
+        "confirmTitle": "Hide the word?",
+        "confirmBody": "It disappears from the cloud and from the summary. This cannot be undone.",
+        "round": "Round of {date}"
+      },
+      "recap": {
+        "button": "Update the public summary",
+        "done": "Public summary updated.",
+        "notPossible": "The summary can no longer be updated: the event has not ended or its data has expired.",
+        "error": "The update did not work: try again."
       }
     }
   },

@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Co się działo w sali",
-        "rivista": "Wiadomości: {messaggi} · pytania: {domande} · ankiety: {sondaggi} · Jednym słowem: {nuvole}. Wybierz, co zostaje na stronie publicznej.",
-        "vuota": "Czat, pytania, ankiety i słowa nie były używane."
+        "rivista": "Wiadomości: {messaggi} · pytania: {domande} · ankiety: {sondaggi} · Jednym słowem: {nuvole}.",
+        "vuota": "Czat, pytania, ankiety i słowa nie były używane.",
+        "inSospeso": "Pytania bez odpowiedzi: {domandeInSospeso}. Oznacz je jako odpowiedziane albo odrzuć."
       },
       "materiali": {
         "title": "Materiały dla nieobecnych",
@@ -3362,6 +3363,74 @@
         "scaduta": "Już niewidoczna: minęła data wygaśnięcia.",
         "archiviato": "Wydarzenie zarchiwizowane: strona nie jest publiczna.",
         "libreriaSenzaVideo": "Widoczna dla wszystkich; w bibliotece wideo pojawi się, gdy wideo zostanie opublikowane."
+      }
+    },
+    "roomReview": {
+      "title": "Co się działo w sali",
+      "intro": "Przejrzyj, co zostało napisane i o co pytano: ukryj to, co nie powinno zostać, zamknij pytania, opublikuj wyniki ankiet. Podsumowanie na stronie publicznej aktualizuje się przy każdej zmianie.",
+      "tabs": {
+        "chat": "Czat",
+        "qa": "Pytania",
+        "polls": "Ankiety",
+        "words": "Jednym słowem"
+      },
+      "loading": "Ładowanie…",
+      "error": "Nie można odczytać tej części: spróbuj ponownie później.",
+      "actionError": "Operacja się nie powiodła: spróbuj ponownie.",
+      "chat": {
+        "empty": "Brak wiadomości.",
+        "limit": "Pokazano ostatnich {count} wiadomości.",
+        "question": "Pytanie",
+        "moderator": "Prowadzenie",
+        "hide": "Ukryj",
+        "hideFor": "Ukryj wiadomość od {name}",
+        "hidden": "Wiadomość ukryta.",
+        "confirmTitle": "Ukryć wiadomość?",
+        "confirmBody": "Zniknie z historii, eksportu i podsumowania wraz z ewentualnym załącznikiem. Tej operacji nie można cofnąć."
+      },
+      "qa": {
+        "empty": "Brak pytań.",
+        "status": {
+          "PENDING": "Oczekujące",
+          "HIGHLIGHTED": "Wyróżnione",
+          "ANSWERED": "Odpowiedziane",
+          "DISMISSED": "Odrzucone"
+        },
+        "markAnswered": "Oznacz jako odpowiedziane",
+        "dismiss": "Odrzuć",
+        "fromChat": "z czatu",
+        "votes": "Głosy: {count}",
+        "answeredOk": "Pytanie oznaczone jako odpowiedziane.",
+        "dismissedOk": "Pytanie odrzucone.",
+        "limit": "Wyświetlane jest {count} pytań oznaczonych na czacie: najpierw otwarte, potem ostatnio zamknięte."
+      },
+      "polls": {
+        "empty": "Brak ankiet.",
+        "status": {
+          "OPEN": "Otwarta",
+          "CLOSED": "Zamknięta: wyniki niepubliczne",
+          "PUBLISHED": "Wyniki opublikowane"
+        },
+        "votes": "Głosy: {count}",
+        "publish": "Opublikuj wyniki",
+        "published": "Wyniki opublikowane."
+      },
+      "words": {
+        "empty": "Brak słów.",
+        "prompt": "Pytanie: {prompt}",
+        "people": "Liczba osób: {count}",
+        "hide": "Ukryj",
+        "hideFor": "Ukryj „{word}”",
+        "hidden": "Słowo ukryte.",
+        "confirmTitle": "Ukryć słowo?",
+        "confirmBody": "Zniknie z chmury i podsumowania. Tej operacji nie można cofnąć.",
+        "round": "Runda z {date}"
+      },
+      "recap": {
+        "button": "Zaktualizuj publiczne podsumowanie",
+        "done": "Publiczne podsumowanie zaktualizowane.",
+        "notPossible": "Podsumowania nie można już zaktualizować: wydarzenie się nie zakończyło lub upłynął okres przechowywania jego danych.",
+        "error": "Aktualizacja się nie powiodła: spróbuj ponownie."
       }
     }
   },

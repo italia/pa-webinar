@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Qué pasó en la sala",
-        "rivista": "Mensajes: {messaggi} · preguntas: {domande} · encuestas: {sondaggi} · En una palabra: {nuvole}. Elige qué se queda en la página pública.",
-        "vuota": "No se usaron el chat, las preguntas, las encuestas ni las palabras."
+        "rivista": "Mensajes: {messaggi} · preguntas: {domande} · encuestas: {sondaggi} · En una palabra: {nuvole}.",
+        "vuota": "No se usaron el chat, las preguntas, las encuestas ni las palabras.",
+        "inSospeso": "Preguntas sin respuesta: {domandeInSospeso}. Márcalas como respondidas o descártalas."
       },
       "materiali": {
         "title": "Materiales para quien no asistió",
@@ -3362,6 +3363,74 @@
         "scaduta": "Ya no es visible: la fecha de caducidad ha pasado.",
         "archiviato": "Evento archivado: la página no es pública.",
         "libreriaSenzaVideo": "Visible para todos; aparecerá en la biblioteca de vídeos cuando se publique el vídeo."
+      }
+    },
+    "roomReview": {
+      "title": "Qué pasó en la sala",
+      "intro": "Revisa lo que se escribió y se preguntó: oculta lo que no deba quedarse, cierra las preguntas y publica los resultados de las encuestas. El resumen de la página pública se actualiza con cada cambio.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Preguntas",
+        "polls": "Encuestas",
+        "words": "En una palabra"
+      },
+      "loading": "Cargando…",
+      "error": "No se puede leer esta parte: inténtalo de nuevo más tarde.",
+      "actionError": "No se ha podido completar la acción: inténtalo de nuevo.",
+      "chat": {
+        "empty": "No hay mensajes.",
+        "limit": "Se muestran los últimos {count} mensajes.",
+        "question": "Pregunta",
+        "moderator": "Moderación",
+        "hide": "Ocultar",
+        "hideFor": "Ocultar el mensaje de {name}",
+        "hidden": "Mensaje oculto.",
+        "confirmTitle": "¿Ocultar el mensaje?",
+        "confirmBody": "Desaparece del historial, de la exportación y del resumen, junto con el archivo adjunto, si lo hay. No se puede deshacer."
+      },
+      "qa": {
+        "empty": "No hay preguntas.",
+        "status": {
+          "PENDING": "Pendiente",
+          "HIGHLIGHTED": "Destacada",
+          "ANSWERED": "Respondida",
+          "DISMISSED": "Descartada"
+        },
+        "markAnswered": "Marcar como respondida",
+        "dismiss": "Descartar",
+        "fromChat": "desde el chat",
+        "votes": "Votos: {count}",
+        "answeredOk": "Pregunta marcada como respondida.",
+        "dismissedOk": "Pregunta descartada.",
+        "limit": "Se muestran {count} preguntas marcadas en el chat: primero las abiertas, luego las cerradas más recientes."
+      },
+      "polls": {
+        "empty": "No hay encuestas.",
+        "status": {
+          "OPEN": "Abierta",
+          "CLOSED": "Cerrada: resultados no públicos",
+          "PUBLISHED": "Resultados publicados"
+        },
+        "votes": "Votos: {count}",
+        "publish": "Publicar los resultados",
+        "published": "Resultados publicados."
+      },
+      "words": {
+        "empty": "No hay palabras.",
+        "prompt": "Pregunta: {prompt}",
+        "people": "Personas: {count}",
+        "hide": "Ocultar",
+        "hideFor": "Ocultar «{word}»",
+        "hidden": "Palabra oculta.",
+        "confirmTitle": "¿Ocultar la palabra?",
+        "confirmBody": "Desaparece de la nube y del resumen. No se puede deshacer.",
+        "round": "Ronda del {date}"
+      },
+      "recap": {
+        "button": "Actualizar el resumen público",
+        "done": "Resumen público actualizado.",
+        "notPossible": "El resumen ya no se puede actualizar: el evento no ha terminado o sus datos han caducado.",
+        "error": "No se ha podido actualizar: inténtalo de nuevo."
       }
     }
   },

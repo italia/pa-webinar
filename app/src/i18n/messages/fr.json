@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Ce qui s’est passé dans la salle",
-        "rivista": "Messages : {messaggi} · questions : {domande} · sondages : {sondaggi} · En un mot: {nuvole}. Choisissez ce qui reste sur la page publique.",
-        "vuota": "Le chat, les questions, les sondages et les mots n’ont pas été utilisés."
+        "rivista": "Messages : {messaggi} · questions : {domande} · sondages : {sondaggi} · En un mot: {nuvole}.",
+        "vuota": "Le chat, les questions, les sondages et les mots n’ont pas été utilisés.",
+        "inSospeso": "Questions sans réponse : {domandeInSospeso}. Marquez-les comme traitées ou écartez-les."
       },
       "materiali": {
         "title": "Documents pour les absents",
@@ -3362,6 +3363,74 @@
         "scaduta": "N’est plus visible : la date d’expiration est passée.",
         "archiviato": "Événement archivé : la page n’est pas publique.",
         "libreriaSenzaVideo": "Visible par tous ; elle apparaîtra dans la vidéothèque une fois la vidéo publiée."
+      }
+    },
+    "roomReview": {
+      "title": "Ce qui s’est passé dans la salle",
+      "intro": "Passez en revue ce qui a été écrit et demandé : masquez ce qui ne doit pas rester, clôturez les questions, publiez les résultats des sondages. Le récapitulatif de la page publique se met à jour à chaque modification.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Questions",
+        "polls": "Sondages",
+        "words": "En un mot"
+      },
+      "loading": "Chargement…",
+      "error": "Impossible de lire cette partie : réessayez plus tard.",
+      "actionError": "L’opération a échoué : réessayez.",
+      "chat": {
+        "empty": "Aucun message.",
+        "limit": "Seuls les {count} derniers messages sont affichés.",
+        "question": "Question",
+        "moderator": "Animation",
+        "hide": "Masquer",
+        "hideFor": "Masquer le message de {name}",
+        "hidden": "Message masqué.",
+        "confirmTitle": "Masquer le message ?",
+        "confirmBody": "Il disparaît de l'historique, de l'export et du récapitulatif, avec l'éventuelle pièce jointe. Cette action est irréversible."
+      },
+      "qa": {
+        "empty": "Aucune question.",
+        "status": {
+          "PENDING": "En attente",
+          "HIGHLIGHTED": "Mise en avant",
+          "ANSWERED": "Répondue",
+          "DISMISSED": "Écartée"
+        },
+        "markAnswered": "Marquer comme répondue",
+        "dismiss": "Écarter",
+        "fromChat": "posée dans le chat",
+        "votes": "Votes : {count}",
+        "answeredOk": "Question marquée comme répondue.",
+        "dismissedOk": "Question écartée.",
+        "limit": "Affichage de {count} questions signalées dans le chat : d'abord les ouvertes, puis les plus récentes parmi les fermées."
+      },
+      "polls": {
+        "empty": "Aucun sondage.",
+        "status": {
+          "OPEN": "Ouvert",
+          "CLOSED": "Clôturé : résultats non publics",
+          "PUBLISHED": "Résultats publiés"
+        },
+        "votes": "Votes : {count}",
+        "publish": "Publier les résultats",
+        "published": "Résultats publiés."
+      },
+      "words": {
+        "empty": "Aucun mot.",
+        "prompt": "Question : {prompt}",
+        "people": "Personnes : {count}",
+        "hide": "Masquer",
+        "hideFor": "Masquer « {word} »",
+        "hidden": "Mot masqué.",
+        "confirmTitle": "Masquer le mot ?",
+        "confirmBody": "Il disparaît du nuage et du récapitulatif. Cette action est irréversible.",
+        "round": "Tour du {date}"
+      },
+      "recap": {
+        "button": "Mettre à jour le récapitulatif public",
+        "done": "Récapitulatif public mis à jour.",
+        "notPossible": "Le récapitulatif ne peut plus être mis à jour : l’événement n’est pas terminé ou ses données ont expiré.",
+        "error": "La mise à jour a échoué : réessayez."
       }
     }
   },

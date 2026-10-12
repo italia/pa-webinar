@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Čo sa dialo v miestnosti",
-        "rivista": "Správy: {messaggi} · otázky: {domande} · ankety: {sondaggi} · Jedným slovom: {nuvole}. Vyberte, čo zostane na verejnej stránke.",
-        "vuota": "Chat, otázky, ankety ani slová sa nepoužili."
+        "rivista": "Správy: {messaggi} · otázky: {domande} · ankety: {sondaggi} · Jedným slovom: {nuvole}.",
+        "vuota": "Chat, otázky, ankety ani slová sa nepoužili.",
+        "inSospeso": "Nezodpovedané otázky: {domandeInSospeso}. Označte ich ako zodpovedané alebo ich zamietnite."
       },
       "materiali": {
         "title": "Materiály pre tých, ktorí sa nezúčastnili",
@@ -3362,6 +3363,74 @@
         "scaduta": "Už nie je viditeľná: dátum platnosti uplynul.",
         "archiviato": "Podujatie archivované: stránka nie je verejná.",
         "libreriaSenzaVideo": "Viditeľná pre všetkých; vo videoknižnici sa zobrazí, keď bude video zverejnené."
+      }
+    },
+    "roomReview": {
+      "title": "Čo sa dialo v miestnosti",
+      "intro": "Prezrite si, čo sa písalo a na čo sa kto pýtal: skryte, čo nemá zostať, uzavrite otázky, zverejnite výsledky ankiet. Zhrnutie na verejnej stránke sa aktualizuje pri každej zmene.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Otázky",
+        "polls": "Ankety",
+        "words": "Jedným slovom"
+      },
+      "loading": "Načítanie…",
+      "error": "Túto časť sa nedá načítať: skúste to neskôr.",
+      "actionError": "Akcia sa nepodarila: skúste to znova.",
+      "chat": {
+        "empty": "Žiadne správy.",
+        "limit": "Zobrazuje sa posledných {count} správ.",
+        "question": "Otázka",
+        "moderator": "Moderovanie",
+        "hide": "Skryť",
+        "hideFor": "Skryť správu od {name}",
+        "hidden": "Správa je skrytá.",
+        "confirmTitle": "Skryť správu?",
+        "confirmBody": "Zmizne z histórie, z exportu aj zo zhrnutia vrátane prípadnej prílohy. Túto akciu nemožno vrátiť späť."
+      },
+      "qa": {
+        "empty": "Žiadne otázky.",
+        "status": {
+          "PENDING": "Čaká na vybavenie",
+          "HIGHLIGHTED": "Zvýraznené",
+          "ANSWERED": "Zodpovedané",
+          "DISMISSED": "Zamietnuté"
+        },
+        "markAnswered": "Označiť ako zodpovedanú",
+        "dismiss": "Zamietnuť",
+        "fromChat": "z chatu",
+        "votes": "Hlasy: {count}",
+        "answeredOk": "Otázka označená ako zodpovedaná.",
+        "dismissedOk": "Otázka zamietnutá.",
+        "limit": "Zobrazuje sa {count} otázok označených v chate: najprv otvorené, potom najnovšie uzavreté."
+      },
+      "polls": {
+        "empty": "Žiadne ankety.",
+        "status": {
+          "OPEN": "Otvorené",
+          "CLOSED": "Uzavreté: výsledky nie sú verejné",
+          "PUBLISHED": "Výsledky zverejnené"
+        },
+        "votes": "Hlasy: {count}",
+        "publish": "Zverejniť výsledky",
+        "published": "Výsledky sú zverejnené."
+      },
+      "words": {
+        "empty": "Žiadne slová.",
+        "prompt": "Otázka: {prompt}",
+        "people": "Počet ľudí: {count}",
+        "hide": "Skryť",
+        "hideFor": "Skryť „{word}“",
+        "hidden": "Slovo je skryté.",
+        "confirmTitle": "Skryť slovo?",
+        "confirmBody": "Zmizne z oblaku aj zo zhrnutia. Túto akciu nemožno vrátiť späť.",
+        "round": "Kolo z {date}"
+      },
+      "recap": {
+        "button": "Aktualizovať verejné zhrnutie",
+        "done": "Verejné zhrnutie je aktualizované.",
+        "notPossible": "Zhrnutie sa už nedá aktualizovať: podujatie neskončilo alebo uplynula doba uchovávania jeho údajov.",
+        "error": "Aktualizácia sa nepodarila: skúste to znova."
       }
     }
   },

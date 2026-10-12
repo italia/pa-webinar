@@ -16,9 +16,11 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/cache', () => ({ deleteCacheByPrefix: vi.fn() }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/events/recap', () => ({ rifaiRiepilogo: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { recordLiveAction } from '@/lib/live/actions';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 
 import { DELETE, PATCH } from './route';
 
@@ -102,6 +104,7 @@ describe('PATCH /api/events/[slug]/polls/[id] — cronologia', () => {
         data: expect.objectContaining({ counts: [5, 0, 2], totalVotes: 7 }),
       }),
     );
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
   });
 
   it('riaprire registra solo id e domanda', async () => {
@@ -121,6 +124,7 @@ describe('PATCH /api/events/[slug]/polls/[id] — cronologia', () => {
     const res = await PATCH(req('PATCH', { status: 'CLOSED' }), ctx());
     expect(res.status).toBe(200);
     expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(rifaiRiepilogo).not.toHaveBeenCalled();
   });
 
   it('senza moderazione: niente scrittura, niente cronologia', async () => {
@@ -143,6 +147,7 @@ describe('DELETE /api/events/[slug]/polls/[id] — cronologia', () => {
     const res = await DELETE(req('DELETE'), ctx());
     expect(res.status).toBe(200);
     expect(mockedDelete).toHaveBeenCalledWith({ where: { id: POLL_ID } });
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
     expect(recordLiveAction).toHaveBeenCalledWith({
       eventId: EVENT_ID,
       kind: 'poll.deleted',

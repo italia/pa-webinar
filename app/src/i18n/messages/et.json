@@ -3337,8 +3337,9 @@
       },
       "sala": {
         "title": "Mis ruumis toimus",
-        "rivista": "Sõnumid: {messaggi} · küsimused: {domande} · küsitlused: {sondaggi} · Ühe sõnaga: {nuvole}. Valige, mis jääb avalikule lehele.",
-        "vuota": "Vestlust, küsimusi, küsitlusi ja sõnu ei kasutatud."
+        "rivista": "Sõnumid: {messaggi} · küsimused: {domande} · küsitlused: {sondaggi} · Ühe sõnaga: {nuvole}.",
+        "vuota": "Vestlust, küsimusi, küsitlusi ja sõnu ei kasutatud.",
+        "inSospeso": "Vastamata küsimused: {domandeInSospeso}. Märkige need vastatuks või jätke kõrvale."
       },
       "materiali": {
         "title": "Materjalid neile, kes ei osalenud",
@@ -3362,6 +3363,74 @@
         "scaduta": "Pole enam nähtav: aegumiskuupäev on möödas.",
         "archiviato": "Üritus arhiveeritud: leht pole avalik.",
         "libreriaSenzaVideo": "Nähtav kõigile; videoteegis ilmub see siis, kui video on avaldatud."
+      }
+    },
+    "roomReview": {
+      "title": "Mis ruumis toimus",
+      "intro": "Vaadake üle, mida kirjutati ja küsiti: peitke see, mis ei tohi jääda, sulgege küsimused, avaldage küsitluste tulemused. Avaliku lehe kokkuvõte uueneb iga muudatusega.",
+      "tabs": {
+        "chat": "Vestlus",
+        "qa": "Küsimused",
+        "polls": "Küsitlused",
+        "words": "Ühe sõnaga"
+      },
+      "loading": "Laadimine…",
+      "error": "Seda osa ei õnnestunud lugeda: proovige hiljem uuesti.",
+      "actionError": "Toiming ebaõnnestus: proovige uuesti.",
+      "chat": {
+        "empty": "Sõnumeid pole.",
+        "limit": "Kuvatakse viimased {count} sõnumit.",
+        "question": "Küsimus",
+        "moderator": "Juhtimine",
+        "hide": "Peida",
+        "hideFor": "Peida sõnum, saatja {name}",
+        "hidden": "Sõnum on peidetud.",
+        "confirmTitle": "Kas peita sõnum?",
+        "confirmBody": "See kaob ajaloost, ekspordist ja kokkuvõttest koos võimaliku manusega. Seda ei saa tagasi võtta."
+      },
+      "qa": {
+        "empty": "Küsimusi pole.",
+        "status": {
+          "PENDING": "Ootel",
+          "HIGHLIGHTED": "Esiletõstetud",
+          "ANSWERED": "Vastatud",
+          "DISMISSED": "Tagasi lükatud"
+        },
+        "markAnswered": "Märgi vastatuks",
+        "dismiss": "Lükka tagasi",
+        "fromChat": "vestlusest",
+        "votes": "Hääli: {count}",
+        "answeredOk": "Küsimus on märgitud vastatuks.",
+        "dismissedOk": "Küsimus on tagasi lükatud.",
+        "limit": "Kuvatakse {count} vestluses märgitud küsimust: kõigepealt avatud, siis viimati suletud."
+      },
+      "polls": {
+        "empty": "Küsitlusi pole.",
+        "status": {
+          "OPEN": "Avatud",
+          "CLOSED": "Suletud: tulemused pole avalikud",
+          "PUBLISHED": "Tulemused avaldatud"
+        },
+        "votes": "Hääli: {count}",
+        "publish": "Avalda tulemused",
+        "published": "Tulemused on avaldatud."
+      },
+      "words": {
+        "empty": "Sõnu pole.",
+        "prompt": "Küsimus: {prompt}",
+        "people": "Inimesi: {count}",
+        "hide": "Peida",
+        "hideFor": "Peida „{word}“",
+        "hidden": "Sõna on peidetud.",
+        "confirmTitle": "Kas peita sõna?",
+        "confirmBody": "See kaob pilvest ja kokkuvõttest. Seda ei saa tagasi võtta.",
+        "round": "Voor: {date}"
+      },
+      "recap": {
+        "button": "Värskenda avalikku kokkuvõtet",
+        "done": "Avalik kokkuvõte on värskendatud.",
+        "notPossible": "Kokkuvõtet ei saa enam värskendada: üritus ei ole lõppenud või selle andmete säilitusaeg on läbi.",
+        "error": "Värskendamine ebaõnnestus: proovige uuesti."
       }
     }
   },

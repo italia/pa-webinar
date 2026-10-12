@@ -3472,8 +3472,9 @@
       },
       "sala": {
         "title": "Cosa è successo in sala",
-        "rivista": "Messaggi: {messaggi} · domande: {domande} · sondaggi: {sondaggi} · In una parola: {nuvole}. Scegli cosa resta nella pagina pubblica.",
-        "vuota": "Chat, domande, sondaggi e parole non sono stati usati."
+        "rivista": "Messaggi: {messaggi} · domande: {domande} · sondaggi: {sondaggi} · In una parola: {nuvole}.",
+        "vuota": "Chat, domande, sondaggi e parole non sono stati usati.",
+        "inSospeso": "Domande senza risposta: {domandeInSospeso}. Segnale come risposte o scartale."
       },
       "materiali": {
         "title": "Materiali per chi non c'era",
@@ -3497,6 +3498,74 @@
         "scaduta": "Non più visibile: la data di scadenza è passata.",
         "archiviato": "Evento archiviato: la pagina non è pubblica.",
         "libreriaSenzaVideo": "Visibile a tutti; nella libreria video comparirà quando il video sarà pubblicato."
+      }
+    },
+    "roomReview": {
+      "title": "Cosa è successo in sala",
+      "intro": "Rivedi cosa è stato scritto e chiesto: nascondi ciò che non deve restare, chiudi le domande, pubblica i risultati dei sondaggi. Il riepilogo della pagina pubblica si aggiorna a ogni modifica.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Domande",
+        "polls": "Sondaggi",
+        "words": "In una parola"
+      },
+      "loading": "Caricamento…",
+      "error": "Non riesco a leggere questa parte: riprova più tardi.",
+      "actionError": "Operazione non riuscita: riprova.",
+      "chat": {
+        "empty": "Nessun messaggio.",
+        "limit": "Si vedono gli ultimi {count} messaggi.",
+        "question": "Domanda",
+        "moderator": "Conduzione",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi il messaggio di {name}",
+        "hidden": "Messaggio nascosto.",
+        "confirmTitle": "Nascondere il messaggio?",
+        "confirmBody": "Sparisce dalla cronologia, dall'esportazione e dal riepilogo, con l'eventuale allegato. Non si può annullare."
+      },
+      "qa": {
+        "empty": "Nessuna domanda.",
+        "status": {
+          "PENDING": "In attesa",
+          "HIGHLIGHTED": "In evidenza",
+          "ANSWERED": "Risposta",
+          "DISMISSED": "Scartata"
+        },
+        "markAnswered": "Segna come risposta",
+        "dismiss": "Scarta",
+        "fromChat": "dalla chat",
+        "votes": "Voti: {count}",
+        "answeredOk": "Domanda segnata come risposta.",
+        "dismissedOk": "Domanda scartata.",
+        "limit": "Si vedono {count} domande segnate in chat: prima quelle aperte, poi le chiuse più recenti."
+      },
+      "polls": {
+        "empty": "Nessun sondaggio.",
+        "status": {
+          "OPEN": "Aperto",
+          "CLOSED": "Chiuso: risultati non pubblici",
+          "PUBLISHED": "Risultati pubblicati"
+        },
+        "votes": "Voti: {count}",
+        "publish": "Pubblica i risultati",
+        "published": "Risultati pubblicati."
+      },
+      "words": {
+        "empty": "Nessuna parola.",
+        "prompt": "Domanda: {prompt}",
+        "people": "Persone: {count}",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi «{word}»",
+        "hidden": "Parola nascosta.",
+        "confirmTitle": "Nascondere la parola?",
+        "confirmBody": "Sparisce dalla nuvola e dal riepilogo. Non si può annullare.",
+        "round": "Giro del {date}"
+      },
+      "recap": {
+        "button": "Aggiorna il riepilogo pubblico",
+        "done": "Riepilogo pubblico aggiornato.",
+        "notPossible": "Il riepilogo non si aggiorna più: l'evento non è concluso o i suoi dati sono scaduti.",
+        "error": "Aggiornamento non riuscito: riprova."
       }
     }
   },
