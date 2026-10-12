@@ -52,6 +52,7 @@ local timer = require 'util.timer';
 
 local util = module:require 'util';
 local get_room_by_name_and_subdomain = util.get_room_by_name_and_subdomain;
+local get_room_from_jid = util.get_room_from_jid;
 local process_host_module = util.process_host_module;
 local is_admin = util.is_admin;
 local is_healthcheck_room = util.is_healthcheck_room;
@@ -185,6 +186,16 @@ local function is_exempt(user)
     return user ~= nil and user.mediaExempt == true;
 end
 
+-- «Ammesso» alla sola persona: l'elenco ai moderatori parte a parte.
+local function notify_approved(room, media_type, approved_jid)
+    send_json(approved_jid, {
+        type = 'av_moderation';
+        room = internal_room_jid_match_rewrite(room.jid);
+        mediaType = media_type;
+        approved = true;
+    });
+end
+
 -- Mette l'occupante tra gli ammessi di ogni tipo moderato, una volta sola.
 local function admit(room, occupant, why)
     if not room.av_moderation then
@@ -201,6 +212,44 @@ local function admit(room, occupant, why)
     end
 end
 
+-- Accende il blocco prima che chi entra sia nella sala, all'ingresso del
+-- primo che lo porta nel token. Chi entra trova la moderazione già accesa,
+-- come chi entra dopo un moderatore: parte col microfono chiuso e, se è
+-- ammesso, riaprendolo si sente. La moderazione non si accende mai mentre
+-- l'ingresso di qualcuno nella conferenza è in corso: un relatore col
+-- microfono aperto resterebbe muto sul bridge con il client che lo mostra
+-- aperto.
+--
+-- Chi entra, se esente o moderatore, è tra gli ammessi già all'accensione:
+-- Jicofo, quando la moderazione si accende, silenzia sul bridge chi non
+-- trova nell'elenco.
+local function on_occupant_pre_join(event)
+    local room, occupant, session = event.room, event.occupant, event.origin;
+    if room._data.pa_media_lock_applied or is_healthcheck_room(room.jid)
+        or (occupant and is_admin(occupant.bare_jid)) then
+        return;
+    end
+    local user = session and session.jitsi_meet_context_user;
+    local lock = type(user) == 'table' and user.mediaLock or nil;
+    if type(lock) ~= 'table' then
+        return;
+    end
+    room._data.pa_media_lock_applied = true;
+    local actor = room.jid .. '/focus';
+    local nick = occupant and internal_room_jid_match_rewrite(occupant.nick);
+    for _, m in ipairs(MEDIA_TYPES) do
+        if lock[m] == true and start_lock(room, m, actor) then
+            if (is_exempt(user) or user.affiliation == 'owner') and nick
+                and not contains(room.av_moderation[m], nick) then
+                room.av_moderation[m]:push(nick);
+            end
+            notify_whitelist(room, m);
+            notify_enabled(room, actor, m);
+            module:log('info', 'Moderazione %s accesa in %s', m, room.jid);
+        end
+    end
+end
+
 local function on_occupant_joined(event)
     local room, occupant, session = event.room, event.occupant, event.origin;
     if is_healthcheck_room(room.jid) or is_admin(occupant.bare_jid) then
@@ -211,22 +260,22 @@ local function on_occupant_joined(event)
         return;
     end
 
-    local lock = user.mediaLock;
-    if type(lock) == 'table' and not room._data.pa_media_lock_applied then
-        room._data.pa_media_lock_applied = true;
-        local actor = room.jid .. '/focus';
-        for _, m in ipairs(MEDIA_TYPES) do
-            if lock[m] == true and start_lock(room, m, actor) then
-                notify_enabled(room, actor, m);
-                notify_whitelist(room, m);
-                module:log('info', 'Moderazione %s accesa in %s', m, room.jid);
-            end
-        end
-    end
-
     if room:get_role(occupant.nick) == 'moderator' then
         admit(room, occupant, 'moderatore');
     elseif is_exempt(user) then
+        -- Già tra gli ammessi se è stato lui ad accendere il blocco: il
+        -- componente, al suo ingresso, gli ha detto che la moderazione è
+        -- accesa, e manca solo il suo «ammesso». Per gli altri tipi lo manda
+        -- admit.
+        local nick = internal_room_jid_match_rewrite(occupant.nick);
+        if room.av_moderation then
+            for _, m in ipairs(MEDIA_TYPES) do
+                local whitelist = room.av_moderation[m];
+                if whitelist and contains(whitelist, nick) then
+                    notify_approved(room, m, occupant.jid);
+                end
+            end
+        end
         admit(room, occupant, 'esente');
     end
 end
@@ -284,8 +333,12 @@ local function on_av_command(event)
     end);
 end
 
+-- Dopo i moduli dei token, che hanno già letto il token di chi entra, e dopo
+-- i controlli della stanza (password -20, stanza chiusa -30), che possono
+-- ancora rifiutare l'ingresso: qui si accende la prima volta, prima che entri.
+module:hook('muc-occupant-pre-join', on_occupant_pre_join, -40);
 -- Dopo il componente av_moderation (-2), che informa chi entra dello stato già
--- acceso: qui si accende la prima volta e si ammettono gli esenti.
+-- acceso: qui si ammettono moderatori ed esenti.
 module:hook('muc-occupant-joined', on_occupant_joined, -3);
 -- Dopo il componente (-1), che sull'owner aggiunge agli ammessi.
 module:hook('muc-set-affiliation', on_affiliation_changed, -2);

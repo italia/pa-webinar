@@ -65,11 +65,20 @@ toolbar. The portal writes two claims into every token of an event (`app/src/lib
 | `context.user.mediaLock` | `{ audio, video, desktop }`: what the event does **not** grant participants (`participantsCanUnmute`, `participantsCanStartVideo`, `participantsCanShareScreen` off) |
 | `context.user.mediaExempt` | `true` for speakers, who have full audio and video without moderating |
 
-On the first join to a room that carries a lock, the module switches on Jitsi's audio/video moderation
-(the stock `av_moderation_component`) for each locked media type, before any moderator joins, and
-announces it on the component's behalf to every occupant and to Jicofo. Jicofo then keeps everyone who
+When the first person whose token carries a lock is about to join a room, the module switches on Jitsi's
+audio/video moderation (the stock `av_moderation_component`) for each locked media type, before any
+moderator joins, and announces it on the component's behalf to the room and to Jicofo. Jicofo then keeps everyone who
 is not allowed muted on the bridge, whatever their client does. Moderators are always allowed. A
 speaker is added to the allowed list as soon as they join.
+
+The module switches the lock on as the first person who carries it is about to enter the room
+(`muc-occupant-pre-join`, after the room's password and lock checks), before that person is in the
+room. Everyone, the first included, therefore
+enters a room that is already moderated: they join with the microphone and camera off, and a speaker or
+a moderator turns them on and is heard. If that first person is a speaker, they are on the allowed list
+from the switch-on, which reaches Jicofo first, and get their "allowed" message as soon as they are in. Switched
+on while a speaker's own join into the conference was still in progress, the lock would leave that
+speaker muted on the bridge while their client showed the microphone open.
 
 Three details matter when you read its logs or change it:
 
@@ -311,7 +320,10 @@ of the [Jitsi upgrade checklist](../../docs/architecture/jitsi-integration.md#ji
 
   Wherever the module is loaded, check that Prosody logs `Set affiliation to ...` on each join. Then
   repeat the checks listed under **Checked in the lab** above, with the moderator link and with a
-  guest.
+  guest. For the media lock, in a room of an event that grants participants nothing: a guest who
+  forces the microphone on is not heard; a speaker is heard after turning the microphone on, both when
+  a moderator joined first and when the speaker is the first to join. The module also relies on the
+  `muc-occupant-pre-join` event carrying the joining occupant and on Jicofo already being in the room.
 - **Occupants module.** `mod_pa_occupants` relies on the `muc-occupant-joined` and `muc-occupant-left`
   hooks, the session field `jitsi_meet_context_user`, the meeting id that the stock meeting-id module
   keeps in the room's data (`room._data.meetingId`), the occupant's nickname resource being the bridge
