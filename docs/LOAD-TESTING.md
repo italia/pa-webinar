@@ -367,12 +367,12 @@ event are:
 |---|---|---|
 | `GET /api/events/{slug}` | Public event data | The app does not cache it, so every request that reaches a pod queries the database. The public response carries `Cache-Control: public, s-maxage=30, stale-while-revalidate=60`: a caching proxy or CDN in front of the portal would absorb repeats, and the chart's ingress does not cache. The moderator response (a request with a valid token) carries no such header |
 | `POST /api/events/{slug}/registrations` | Creates a registration: encrypted personal data, a consent audit entry, a person record, and a confirmation email queued in the email outbox | A per-address limit on each app pod. A repeated email address returns `409`, so give every virtual user its own address |
-| `POST /api/events/{slug}/jitsi/token` | Issues the conference JWT at join time | Guest tokens have a per-address limit on each app pod, set by `GUEST_JWT_RATE_LIMIT_PER_MINUTE` |
+| `POST /api/events/{slug}/jitsi/token` | Issues the conference JWT at join time | Guest tokens have a per-address limit on each app pod, set by `GUEST_JWT_RATE_LIMIT_PER_MINUTE` and multiplied by `ROOM_RATE_LIMIT_MULTIPLIER` |
 | `GET /api/events/{slug}/questions` | Reads the Q&A panel. The room re-reads it after every `qa` poke, and polls it every 3 seconds while push is unavailable | While push is unavailable, each pod caches the question list for 2 seconds. Finding the caller's own upvotes is not cached: every read from a caller with a voting identity (a registration, or the browser id the room sends for everyone else) costs one more indexed query, once at least one listed question has an upvote |
 | `POST /api/events/{slug}/questions` | Submits a Q&A question | A cooldown per registration, or per address for guests |
-| `POST /api/events/{slug}/questions/{id}/upvote` | Upvotes a question | 10 per minute per registration or browser id, plus 300 per minute per address and event for browser ids (`app/src/app/api/events/[param]/questions/[id]/upvote/route.ts`); a browser id is accepted only inside the guest window or with a room token |
+| `POST /api/events/{slug}/questions/{id}/upvote` | Upvotes a question | 10 per minute per registration or browser id, plus 300 per minute per address and event for browser ids, times `ROOM_RATE_LIMIT_MULTIPLIER` (`app/src/app/api/events/[param]/questions/[id]/upvote/route.ts`); a browser id is accepted only inside the guest window or with a room token |
 
-The values of the other limits are in [Reference limits](architecture/security.md#reference-limits).
+The values of the other limits are in [Reference limits](architecture/security.md#reference-limits). Virtual users behind one address share every per-address limit; `ROOM_RATE_LIMIT_MULTIPLIER` raises those of the room together (see [Security architecture](architecture/security.md#reference-limits)).
 
 A registration test sends a JSON body with `displayName`, `email` and `consentGiven: true`. Add
 `consentRecording: true` when the event records; without it the call answers `422`. `consentMultitrack`

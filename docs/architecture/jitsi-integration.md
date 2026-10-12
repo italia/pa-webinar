@@ -322,11 +322,12 @@ Each event has three flags: `participantsCanUnmute`, `participantsCanStartVideo`
 - when `participantsCanShareScreen` is off, it removes the screen-share button.
 
 The server enforces them too. Every token of the event carries the flags that are off, and the Prosody
-module `mod_pa_media_lock` switches on Jitsi's audio, video and screen-share moderation on the first
-join to the room, before any moderator arrives. Jicofo then keeps every participant who is not allowed
+module `mod_pa_media_lock` switches on Jitsi's audio, video and screen-share moderation as the first
+person enters the room, before any moderator arrives. Jicofo then keeps every participant who is not allowed
 muted on the bridge, so a client that ignores the hidden buttons still cannot be heard or seen.
-Moderators are always allowed, and speakers are allowed as soon as they join
-([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
+Moderators are always allowed, and speakers are allowed as soon as they join. The lock is switched on
+before the first person enters, so everyone, including a speaker who is the first to join, enters a
+room that is already moderated ([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
 
 A moderator can lift or restore the moderation during the call from the control bar
 (**Participant mic**, **Participant video**). Both toggles are always shown to moderators.
@@ -644,6 +645,11 @@ people who joined before captions or the transcript were turned on are still att
 keeps nothing. It uses the rows to decide, voice by voice, whether
 the transcript from captions keeps a sentence and whether the recorder records a track
 ([Live captions](live-captions.md#transcript-from-captions), [Recording](recording.md#consent-gates)).
+To a join, and to a question the module sends every thirty seconds while someone is in the room, the
+portal answers with whether the event wants captions now, where the captions service is installed, and
+in a room without a moderator `mod_pa_captions` turns the room's transcription on or off to match, so captions do not wait for a moderator
+([How it works](live-captions.md#how-it-works)). A proxy or a stub that drops
+that answer leaves captions to the moderators' rooms.
 
 The module acts only when Prosody has `PA_PORTAL_URL`, which the chart sets to the portal Service's full
 name (Prosody's resolver does not use the pod's search domains),
@@ -905,7 +911,8 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    domain is still allow-listed. `mod_pa_media_lock` copies parts of the stock `av_moderation_component`
    (the room's `av_moderation` state and the shape of its messages): in a room of an event that grants
    participants nothing, check that a guest who forces the microphone on is not heard, that a speaker is
-   heard, and that Jicofo's log reads `Moderation for AUDIO ... was enabled by focus`.
+   heard after turning the microphone on, also when the speaker is the first to join, and that Jicofo's
+   log reads `Moderation for AUDIO ... was enabled by focus`.
    `mod_pa_occupants` reads the session field `jitsi_meet_context_user`, the occupant's nickname and
    the room's `meetingId`: in a room of an event, check that a row appears in `room_occupants` for each
    person who joins, with the seat of their token, and that Prosody logs no `Occupanti:` warning.

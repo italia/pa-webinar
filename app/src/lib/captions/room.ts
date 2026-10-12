@@ -8,6 +8,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 
 const CAMPI_EVENTO = {
   id: true,
+  status: true,
   liveCaptionsEnabled: true,
   captionsTranscriptEnabled: true,
   multitrackRecordingEnabled: true,

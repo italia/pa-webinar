@@ -59,6 +59,15 @@
     "cancel": "Odustani",
     "confirm": "Potvrdi",
     "close": "Zatvori",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kod: {name}",
+      "alt": "QR kod poveznice „{name}”",
+      "hint": "Skenirajte ga kamerom telefona da biste otvorili poveznicu.",
+      "download": "Preuzmi (SVG)",
+      "error": "QR kod nije moguće izraditi. Ponovno učitajte stranicu i pokušajte ponovno; u međuvremenu možete kopirati poveznicu."
+    },
     "back": "Natrag",
     "next": "Dalje",
     "send": "Pošalji",

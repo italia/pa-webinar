@@ -1426,6 +1426,8 @@ export default function LiveEventClient({
     api: jitsiApi,
     attivo: conduce && !!event.liveCaptionsAvailable,
     accesi: sottotitoliAccesi,
+    // Solo un valore arrivato dal server: un corpo d'errore non lo e'.
+    certo: typeof flagsSala?.liveCaptionsEnabled === 'boolean',
     // Solo un'etichetta per Jitsi: la lingua parlata la sceglie il servizio,
     // dalla lingua predefinita dell'istanza, e qui si usa la stessa.
     lingua: primaryLanguageCode(event.liveCaptionsLanguage),

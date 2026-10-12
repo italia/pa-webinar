@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 // Headroom added to the registration capacity for the client-reported peak
 // clamp: moderators/co-moderators/speakers/a few guests legitimately join
@@ -88,7 +89,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // legitimately produces ~600 reports a minute, and the pre-auth bucket must
   // never throttle a real audience (the moderator included) before the
   // per-reporter limit below has had a chance to do the accurate job.
-  const ipLimit = rateLimit(`peak:ip:${ip}`, { limit: 600, windowMs: 60_000 });
+  const ipLimit = rateLimit(`peak:ip:${ip}`, {
+    limit: limiteDellaSala(600),
+    windowMs: 60_000,
+  });
   if (!ipLimit.allowed) {
     throw new RateLimitError((ipLimit.resetAt - Date.now()) / 1000);
   }
@@ -153,8 +157,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // 2) Post-auth, keyed on the resolved reporter (house style: `auth.senderId`,
   //    `registration.id`, …). One client reports twice a minute; the headroom
   //    covers remounts and reconnects.
+  // Chi non porta un token conta per indirizzo, e dietro un indirizzo solo
+  // puo' esserci una sala intera: quel conto si scala con la sala.
   const rl = rateLimit(`peak:${event.id}:${reporter}`, {
-    limit: 10,
+    limit: reporter.startsWith('ip:') ? limiteDellaSala(10) : 10,
     windowMs: 60_000,
   });
   if (!rl.allowed) {

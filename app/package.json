@@ -54,6 +54,7 @@
     "next-intl": "^4.13.4",
     "nodemailer": "^10.0.13",
     "prom-client": "^15.0.0",
+    "qrcode-generator": "^2.0.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "rrule": "^2.8.1",

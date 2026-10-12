@@ -13,6 +13,7 @@ import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const ip = getClientIp(request);
   const ipRl = rateLimit(`poll-vote-ip:${ip}:${event.id}`, {
-    limit: 60,
+    limit: limiteDellaSala(60),
     windowMs: 60_000,
   });
   if (!ipRl.allowed) {

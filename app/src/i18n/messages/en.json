@@ -59,6 +59,15 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR code: {name}",
+      "alt": "QR code for the link “{name}”",
+      "hint": "Point your phone's camera at it to open the link.",
+      "download": "Download (SVG)",
+      "error": "The QR code could not be created. Reload the page and try again; meanwhile you can copy the link."
+    },
     "back": "Back",
     "next": "Next",
     "send": "Send",

@@ -3,6 +3,7 @@ import { AppError, ForbiddenError, NotFoundError, RateLimitError } from '@/lib/e
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
 
 export const dynamic = 'force-dynamic';
@@ -81,7 +82,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`session-open:${ip}`, { limit: 30, windowMs: 60_000 });
+  const rl = rateLimit(`session-open:${ip}`, {
+    limit: limiteDellaSala(30),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

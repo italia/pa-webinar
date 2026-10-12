@@ -23,6 +23,7 @@ import {
   RateLimitError,
 } from '@/lib/errors';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,7 +62,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // per-voter guard is the per-identity 30/min limit below.
   const ip = getClientIp(request);
   const ipRl = rateLimit(`agenda-react-ip:${ip}:${event.id}`, {
-    limit: 600,
+    limit: limiteDellaSala(600),
     windowMs: 60_000,
   });
   if (!ipRl.allowed) {

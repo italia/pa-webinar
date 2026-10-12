@@ -14,6 +14,7 @@ import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
 
@@ -269,7 +270,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // mezzo minuto consumato.
   if (!registrationId && !grantId && guestId) {
     const ipRl = rateLimit(`qa-guest-ip:${event.id}:${ip}`, {
-      limit: 60,
+      limit: limiteDellaSala(60),
       windowMs: 60_000,
     });
     if (!ipRl.allowed) {

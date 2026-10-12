@@ -11,6 +11,7 @@ import { identitaPerValutazione } from '@/lib/feedback/participation';
 import { createFeedbackSchema } from '@/lib/validation/schemas';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // ufficio esce su internet da un solo indirizzo: con 10 al minuto chi
   // rispondeva dopo i primi dieci colleghi perdeva la risposta. Il doppio
   // invio lo ferma gia' la deduplica per persona.
-  const rl = rateLimit(`feedback:${ip}`, { limit: 60, windowMs: 60_000 });
+  const rl = rateLimit(`feedback:${ip}`, {
+    limit: limiteDellaSala(60),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

@@ -59,6 +59,15 @@
     "cancel": "Annulla",
     "confirm": "Conferma",
     "close": "Chiudi",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Codice QR: {name}",
+      "alt": "Codice QR del link «{name}»",
+      "hint": "Inquadralo con la fotocamera del telefono per aprire il link.",
+      "download": "Scarica (SVG)",
+      "error": "Il codice QR non si è potuto creare. Ricarica la pagina e riprova; intanto puoi copiare il link."
+    },
     "back": "Indietro",
     "next": "Avanti",
     "send": "Invia",

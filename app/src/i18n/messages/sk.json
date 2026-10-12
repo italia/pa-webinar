@@ -59,6 +59,15 @@
     "cancel": "Zrušiť",
     "confirm": "Potvrdiť",
     "close": "Zavrieť",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kód: {name}",
+      "alt": "QR kód odkazu „{name}“",
+      "hint": "Naskenujte ho fotoaparátom telefónu a odkaz sa otvorí.",
+      "download": "Stiahnuť (SVG)",
+      "error": "QR kód sa nepodarilo vytvoriť. Načítajte stránku znova a skúste to znova; zatiaľ môžete odkaz skopírovať."
+    },
     "back": "Späť",
     "next": "Ďalej",
     "send": "Odoslať",

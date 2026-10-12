@@ -59,6 +59,15 @@
     "cancel": "Atšaukti",
     "confirm": "Patvirtinti",
     "close": "Uždaryti",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kodas: {name}",
+      "alt": "Nuorodos „{name}“ QR kodas",
+      "hint": "Nuskenuokite jį telefono kamera, kad atidarytumėte nuorodą.",
+      "download": "Atsisiųsti (SVG)",
+      "error": "QR kodo sukurti nepavyko. Įkelkite puslapį iš naujo ir bandykite dar kartą; tuo metu galite nukopijuoti nuorodą."
+    },
     "back": "Atgal",
     "next": "Toliau",
     "send": "Siųsti",

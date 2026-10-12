@@ -59,6 +59,15 @@
     "cancel": "Peruuta",
     "confirm": "Vahvista",
     "close": "Sulje",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-koodi: {name}",
+      "alt": "QR-koodi linkille ”{name}”",
+      "hint": "Skannaa se puhelimen kameralla, niin linkki avautuu.",
+      "download": "Lataa (SVG)",
+      "error": "QR-koodia ei voitu luoda. Lataa sivu uudelleen ja yritä uudelleen; sillä välin voit kopioida linkin."
+    },
     "back": "Takaisin",
     "next": "Seuraava",
     "send": "Lähetä",

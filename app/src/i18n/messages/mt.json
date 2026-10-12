@@ -59,6 +59,15 @@
     "cancel": "Ikkanċella",
     "confirm": "Ikkonferma",
     "close": "Agħlaq",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Kodiċi QR: {name}",
+      "alt": "Kodiċi QR tal-link “{name}”",
+      "hint": "Skennjah bil-kamera tat-telefon biex tiftaħ il-link.",
+      "download": "Niżżel (SVG)",
+      "error": "Il-kodiċi QR ma setax jinħoloq. Erġa' tella' l-paġna u erġa' pprova; sadanittant tista' tikkopja l-link."
+    },
     "back": "Lura",
     "next": "Li jmiss",
     "send": "Ibgħat",

@@ -3054,6 +3054,11 @@
     "publisher": "Nicolas DUBIEN",
     "email": "github@dubien.org"
   },
+  "qrcode-generator@2.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kazuhikoarase/qrcode-generator",
+    "publisher": "Kazuhiko Arase"
+  },
   "queue-microtask@1.2.3": {
     "licenses": "MIT",
     "repository": "https://github.com/feross/queue-microtask",

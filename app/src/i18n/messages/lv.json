@@ -59,6 +59,15 @@
     "cancel": "Atcelt",
     "confirm": "Apstiprināt",
     "close": "Aizvērt",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kods: {name}",
+      "alt": "QR kods saitei “{name}”",
+      "hint": "Noskenējiet to ar tālruņa kameru, lai atvērtu saiti.",
+      "download": "Lejupielādēt (SVG)",
+      "error": "QR kodu neizdevās izveidot. Pārlādējiet lapu un mēģiniet vēlreiz; pa to laiku varat nokopēt saiti."
+    },
     "back": "Atpakaļ",
     "next": "Tālāk",
     "send": "Nosūtīt",

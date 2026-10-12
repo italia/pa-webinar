@@ -65,11 +65,20 @@ toolbar. The portal writes two claims into every token of an event (`app/src/lib
 | `context.user.mediaLock` | `{ audio, video, desktop }`: what the event does **not** grant participants (`participantsCanUnmute`, `participantsCanStartVideo`, `participantsCanShareScreen` off) |
 | `context.user.mediaExempt` | `true` for speakers, who have full audio and video without moderating |
 
-On the first join to a room that carries a lock, the module switches on Jitsi's audio/video moderation
-(the stock `av_moderation_component`) for each locked media type, before any moderator joins, and
-announces it on the component's behalf to every occupant and to Jicofo. Jicofo then keeps everyone who
+When the first person whose token carries a lock is about to join a room, the module switches on Jitsi's
+audio/video moderation (the stock `av_moderation_component`) for each locked media type, before any
+moderator joins, and announces it on the component's behalf to the room and to Jicofo. Jicofo then keeps everyone who
 is not allowed muted on the bridge, whatever their client does. Moderators are always allowed. A
 speaker is added to the allowed list as soon as they join.
+
+The module switches the lock on as the first person who carries it is about to enter the room
+(`muc-occupant-pre-join`, after the room's password and lock checks), before that person is in the
+room. Everyone, the first included, therefore
+enters a room that is already moderated: they join with the microphone and camera off, and a speaker or
+a moderator turns them on and is heard. If that first person is a speaker, they are on the allowed list
+from the switch-on, which reaches Jicofo first, and get their "allowed" message as soon as they are in. Switched
+on while a speaker's own join into the conference was still in progress, the lock would leave that
+speaker muted on the bridge while their client showed the microphone open.
 
 Three details matter when you read its logs or change it:
 
@@ -157,8 +166,20 @@ metadata), it writes two keys into the metadata of every room except the health-
 | `asyncTranscription: true` | Jicofo asks the bridge to stream audio to the transcription service only for rooms that carry it. Recent Jitsi versions refuse this key when a client sets it, moderators included, so only a server module can |
 | `transcription.urlParams.room` | The room name. From `stable-10978` Jicofo appends these parameters to the transcription WebSocket address, so the captions service knows which event the audio belongs to and asks the portal for its language and vocabulary. Earlier versions ignore it: the portal then finds the event from the meeting id that the [occupants module](#the-occupants-module) reported, and without that module the service falls back to its default language |
 
-The metadata alone transcribes nothing: transcription starts when a moderator turns captions on in the
-room (`recording.isTranscribingEnabled`), and stops when they turn them off.
+The metadata alone transcribes nothing: transcription starts when the room's `recording.isTranscribingEnabled`
+is on. Two paths write it. The room page of a moderator does, with the IFrame API command `setSubtitles`,
+at join and when the event's switch changes; the stock room metadata component accepts that write only
+from an occupant with the moderator role. In a room without a moderator the module does it: at each
+join, and every thirty seconds while someone is in the room, the
+[occupants module](#the-occupants-module) passes on the portal's answer (event `pa-captions-wanted`),
+and the module turns transcription on or off to match the event, then announces
+the new metadata to the room and to Jicofo (`room-metadata-changed`). While a moderator is in the room,
+the module leaves the decision to the moderator's room, so the two never contradict each other. An
+answer does not overwrite a later decision: a change a moderator's room made after the portal was asked
+(`jitsi-metadata-updated` for the key `recording`), or the answer to a later question. The module logs each change it makes
+as `Sottotitoli accesi` or `Sottotitoli spenti`. A room already on whose transcription has stopped, for
+example after a restart of the captions service, is not started again by a join: a moderator turns the
+switch off and on.
 
 The module is wired like the others. With the Helm chart, `global.captions.enabled` sets
 `PA_CAPTIONS_ENABLED` for Prosody and, for Jicofo, the transcription address
@@ -183,7 +204,7 @@ a JSON body to `POST <PA_PORTAL_URL>/api/internal/jitsi/occupants`:
 | `meetingId` | The room's meeting id, which the captions service receives from the bridge on every Jitsi version |
 | `endpointId` | The resource of the occupant's nickname in the room: the id the bridge uses for that person's audio |
 | `seatId` | `context.user.id` of the token |
-| `action` | `joined` or `left` |
+| `action` | `joined`, `left`, or `check` (below) |
 | `ts` | The send time, in seconds |
 
 The header `x-pa-signature` carries the hex HMAC-SHA256 of the raw body. Its key is derived from
@@ -195,8 +216,22 @@ signature does not match or `ts` is more than 300 seconds away from its clock
 key in `x-api-key`, like the other internal routes.
 
 It sends no name and no address. An occupant without a token context, such as a component that signs in
-with a password, is not reported, and neither is Jicofo (`focus`). The request does not wait for an
-answer; a status other than `200` or `204` is logged at `warn` level with the prefix `Occupanti:`. The
+with a password, is not reported, and neither is Jicofo (`focus`). The request does not hold up the
+join; a status other than `200` or `204` is logged at `warn` level with the prefix `Occupanti:`. To a
+join, where the captions service is installed, the portal answers `200` with `{ "captions": false }`
+when captions are off for the instance or for the event, and with `{ "captions": true }` when they are
+on and the event is live. Before the event is live, and for the multitrack recorder's join, it decides
+nothing (`204`). The module hands the answer to the
+[live captions module](#the-live-captions-module), which turns the room's transcription on or off
+when no moderator is in the room (judged by the tokens in the room, not by the role of the moment).
+Everything else is answered `204`. Where captions are installed (`PA_CAPTIONS_ENABLED=true`), every
+thirty seconds the module also sends `action: "check"` for each open room with someone in it other
+than the multitrack recorder, with the room and the meeting id but no endpoint or seat: the portal
+stores nothing and answers the same question, so the event going live, or a switch changed in the
+administration area, reaches a room nobody joins. Rooms with a moderator are not asked about, since
+their moderator's room decides. To a room that is not an event's, or when the portal has no captions
+service, it answers `404`, and the module stops asking for that room, logging it once at `info` level;
+any other error leaves the questions going. The
 portal finds the event by room name, exact first, then ignoring case, and stores the notification for
 every event when live captions are available and on for the instance (the captions service installed
 and the site setting on), whatever the event's own captions switch, and for every event with
@@ -311,12 +346,19 @@ of the [Jitsi upgrade checklist](../../docs/architecture/jitsi-integration.md#ji
 
   Wherever the module is loaded, check that Prosody logs `Set affiliation to ...` on each join. Then
   repeat the checks listed under **Checked in the lab** above, with the moderator link and with a
-  guest.
+  guest. For the media lock, in a room of an event that grants participants nothing: a guest who
+  forces the microphone on is not heard; a speaker is heard after turning the microphone on, both when
+  a moderator joined first and when the speaker is the first to join. The module also relies on the
+  `muc-occupant-pre-join` event carrying the joining occupant and on Jicofo already being in the room.
 - **Occupants module.** `mod_pa_occupants` relies on the `muc-occupant-joined` and `muc-occupant-left`
   hooks, the session field `jitsi_meet_context_user`, the meeting id that the stock meeting-id module
   keeps in the room's data (`room._data.meetingId`), the occupant's nickname resource being the bridge
   endpoint id, `net.http` and `util.hashes`. In a room of an event, check that `room_occupants` gets a row for each
   person who joins, with their token's seat, and that Prosody logs no `Occupanti:` warning.
+- **Live captions module.** With only a speaker and a guest in a room whose event has captions on,
+  check that Prosody logs `Sottotitoli accesi` and that captions appear; it relies on the stock room
+  metadata component's `jitsi-metadata-updated` and `room-metadata-changed` events and on
+  `util.time`.
 - **Finalize script.** The chart's script relies on:
   - the subchart's finalize path (`/config/finalize.sh` through `JIBRI_FINALIZE_RECORDING_SCRIPT_PATH`)
     and its `jitsi-meet.jibri.custom.other._finalize_sh` slot;
