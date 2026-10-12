@@ -20,6 +20,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { generateJitsiJwt } from '@/lib/auth/jwt';
+import { recorderSeat } from '@/lib/recorder/seat';
 import { RECORDER_DISPLAY_NAME } from '@/lib/jitsi/participants';
 
 export const dynamic = 'force-dynamic';
@@ -57,7 +58,7 @@ export const POST = withErrorHandling(async (request) => {
     roomName,
     displayName: RECORDER_DISPLAY_NAME,
     // uniqueId stabile per recording → Jitsi lo tratta come un endpoint solo.
-    uniqueId: `rec-bot-${recording.id}`,
+    uniqueId: recorderSeat(recording.id),
     isModerator: false,
     expiresInSeconds,
   });

@@ -168,7 +168,12 @@ describe('LiveCaptions', () => {
   });
 });
 
-function Moderatore(props: { api: JitsiMeetExternalAPI | null; attivo: boolean; accesi: boolean }) {
+function Moderatore(props: {
+  api: JitsiMeetExternalAPI | null;
+  attivo: boolean;
+  accesi: boolean;
+  certo?: boolean;
+}) {
   useCaptionsControl({ ...props, lingua: 'it' });
   return null;
 }
@@ -192,14 +197,23 @@ describe('useCaptionsControl', () => {
     expect(raw.executeCommand).not.toHaveBeenCalled();
   });
 
-  it("entrato con i sottotitoli spenti non manda uno spegnimento inutile, e li riaccende a un nuovo ingresso", () => {
+  it('con il valore della pagina, forse vecchio, non manda uno «spenti»: aspetta il server', () => {
+    const { api, raw, emit } = fakeApi();
+    render(<Moderatore api={api} attivo accesi={false} certo={false} />);
+    act(() => emit('videoConferenceJoined', {}));
+    expect(raw.executeCommand).not.toHaveBeenCalled();
+    render(<Moderatore api={api} attivo accesi={false} certo />);
+    expect(raw.executeCommand).toHaveBeenLastCalledWith('setSubtitles', false, false, 'it');
+  });
+
+  it("entrato con i sottotitoli spenti li spegne nella stanza, e li riaccende a un nuovo ingresso", () => {
     const { api, raw, emit } = fakeApi();
     render(<Moderatore api={api} attivo accesi={false} />);
     act(() => emit('videoConferenceJoined', {}));
-    expect(raw.executeCommand).not.toHaveBeenCalled();
+    expect(raw.executeCommand).toHaveBeenLastCalledWith('setSubtitles', false, false, 'it');
     render(<Moderatore api={api} attivo accesi />);
-    expect(raw.executeCommand).toHaveBeenCalledTimes(1);
+    expect(raw.executeCommand).toHaveBeenLastCalledWith('setSubtitles', true, false, 'it');
     act(() => emit('videoConferenceJoined', {}));
-    expect(raw.executeCommand).toHaveBeenCalledTimes(2);
+    expect(raw.executeCommand).toHaveBeenCalledTimes(3);
   });
 });

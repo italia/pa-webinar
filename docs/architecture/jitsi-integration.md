@@ -645,6 +645,11 @@ people who joined before captions or the transcript were turned on are still att
 keeps nothing. It uses the rows to decide, voice by voice, whether
 the transcript from captions keeps a sentence and whether the recorder records a track
 ([Live captions](live-captions.md#transcript-from-captions), [Recording](recording.md#consent-gates)).
+To a join, and to a question the module sends every thirty seconds while someone is in the room, the
+portal answers with whether the event wants captions now, where the captions service is installed, and
+in a room without a moderator `mod_pa_captions` turns the room's transcription on or off to match, so captions do not wait for a moderator
+([How it works](live-captions.md#how-it-works)). A proxy or a stub that drops
+that answer leaves captions to the moderators' rooms.
 
 The module acts only when Prosody has `PA_PORTAL_URL`, which the chart sets to the portal Service's full
 name (Prosody's resolver does not use the pod's search domains),

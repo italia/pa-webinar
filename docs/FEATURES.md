@@ -297,7 +297,7 @@ The two capture paths (a composite video from Jibri, and per-participant audio f
 - Each viewer hides or shows the captions for themselves with the captions button in the call's toolbar; screen readers hear the finished sentences.
 - The waiting room tells participants that captions are on, and whether the text is kept.
 - **Transcript from captions.** *Optional*, per event, a sub-option of **Automatic captions** in the wizard; the new-event questions turn it on when the event can be recorded. The sentences of the people who consented to the transcription of what they say are kept with their name and, when the event ends, become its transcript, even without a recording or AI post-production. Everyone else appears only in the live captions. Staff review it in the **After the event** tab, correct it in the transcript editor and can publish it on the event page without a video. See [After the event](#transcript-from-captions).
-- Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**; administrators turn them off for the whole instance in the site settings.
+- They start once the event is live, within half a minute, with or without a moderator in the room. Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**; administrators turn them off for the whole instance in the site settings.
 - The event's vocabulary (glossary, organizers, moderators and speakers) helps the recognizer write names and acronyms right.
 - If the service falls behind, it captions fewer speakers at once, then pauses and resumes on its own; the room and the status page say so.
 
