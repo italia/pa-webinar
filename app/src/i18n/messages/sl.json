@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Dogodek se je končal. Spodaj najdete statistiko in, če je bil posnet, posnetek in poročilo.",
     "endLinks": {
-      "after": "Posnetek in poročilo",
+      "after": "Zaključi dogodek",
       "stats": "Statistika dogodka",
       "publicPage": "Javna stran dogodka"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "V obdelavi",
       "statusPartial": "Delno obdelano",
       "statusDone": "Obdelano",
-      "statusFailed": "Obdelava ni uspela"
+      "statusFailed": "Obdelava ni uspela",
+      "manageBackToEvent": "Nazaj na dogodek"
     },
     "questionnairesPage": {
       "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Organizatorske ustanove",
       "organizersEdit": "Uredi ustanove",
       "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira."
+    },
+    "closing": {
+      "title": "Zaključi dogodek",
+      "intro": "Kaj je še treba narediti, da bodo tisti, ki jih ni bilo, našli vse, udeleženci pa lahko povedali, kako je bilo.",
+      "summaryTodo": "{count, plural, one {# naloga za dokončanje} two {# nalogi za dokončanje} few {# naloge za dokončanje} other {# nalog za dokončanje}}",
+      "summaryDone": "Vse je opravljeno",
+      "loading": "Preverjanje, kaj je še treba narediti…",
+      "error": "Ni mogoče prebrati, kaj je še treba narediti: znova naložite stran.",
+      "stato": {
+        "fatto": "Opravljeno",
+        "daFare": "Treba opraviti",
+        "inCorso": "V teku",
+        "nonServe": "Ni potrebno"
+      },
+      "azioni": {
+        "apri": "Odpri",
+        "rivedi": "Preglej prepis",
+        "materiali": "Pojdi na gradiva"
+      },
+      "registrazione": {
+        "title": "Snemanje",
+        "pubblicata": "Objavljeno.",
+        "daPubblicare": "Videoposnetek je pripravljen: objavite ga za tiste, ki jih ni bilo.",
+        "inArrivo": "Če je bil dogodek posnet, datoteka prispe nekaj minut po koncu.",
+        "spenta": "Snemanje ni bilo predvideno.",
+        "nessunFile": "Ni videoposnetka: dogodek ni bil posnet ali pa datoteka ni prispela."
+      },
+      "trascrizione": {
+        "title": "Prepis",
+        "pubblicata": "Objavljen.",
+        "prontaAi": "Pripravljen iz poprodukcije: preglejte ga; objavi se skupaj z videoposnetkom.",
+        "prontaSottotitoli": "Pripravljen iz podnapisov: preverite imena in ga objavite.",
+        "inLavorazione": "V obdelavi.",
+        "nessuna": "Ga ni: ni ne podnapisov ne poprodukcije.",
+        "soloStaff": "Pregleda ga in objavi organizator dogodka v administraciji.",
+        "nonPiu": "Ni ga več mogoče spremeniti: dogodek je arhiviran ali pa je potekel rok hrambe njegovih podatkov."
+      },
+      "resoconto": {
+        "title": "Poročilo",
+        "pubblicato": "Objavljeno.",
+        "daPubblicare": "Ustvarjeno: preberite ga in objavite.",
+        "daGenerare": "Treba ga je ustvariti iz prepisa, klepeta in ocen.",
+        "inLavorazione": "V obdelavi.",
+        "senzaPipeline": "Poprodukcija z UI v tej namestitvi ni aktivna.",
+        "soloStaff": "Ustvari ga in objavi organizator dogodka v administraciji.",
+        "nonPiu": "Ni ga več mogoče spremeniti: dogodek je arhiviran ali pa je potekel rok hrambe njegovih podatkov."
+      },
+      "sala": {
+        "title": "Kaj se je dogajalo v sobi",
+        "rivista": "Sporočila: {messaggi} · vprašanja: {domande} · ankete: {sondaggi} · Z eno besedo: {nuvole}. Izberite, kaj ostane na javni strani.",
+        "vuota": "Klepet, vprašanja, ankete in besede niso bili uporabljeni."
+      },
+      "materiali": {
+        "title": "Gradiva za tiste, ki jih ni bilo",
+        "presenti": "Vidno po dogodku: {materiali}.",
+        "nessuno": "Po dogodku ni vidno nič: dodajte prosojnice ali dokumente govorcev, če obstajajo.",
+        "nascosti": "Gradiva: {materiali}, vendar javna stran gradiv ne prikazuje: vklopite jih v nastavitvah za obdobje po dogodku."
+      },
+      "valutazioni": {
+        "title": "Ocene",
+        "emailInviata": "E-poštno sporočilo s prošnjo za oceno je bilo poslano. Odgovori: {valutazioni}.",
+        "emailInPartenza": "E-poštno sporočilo s prošnjo za oceno bo kmalu poslano udeležencem. Odgovori: {valutazioni}.",
+        "emailSpenta": "E-poštno sporočilo s prošnjo za oceno je izklopljeno: vklopiti ga je mogoče do enega tedna po koncu. Odgovori: {valutazioni}.",
+        "raccolte": "Odgovori: {valutazioni}.",
+        "spente": "Za ta dogodek niso aktivne."
+      },
+      "pagina": {
+        "title": "Javna stran",
+        "visibile": "Vidna vsem.",
+        "nellaLibreria": "Vidna vsem in v video knjižnici.",
+        "privata": "Umaknjena: javnost je ne vidi.",
+        "scaduta": "Ni več vidna: datum poteka je minil.",
+        "archiviato": "Dogodek arhiviran: stran ni javna.",
+        "libreriaSenzaVideo": "Vidna vsem; v video knjižnici se bo prikazala, ko bo videoposnetek objavljen."
+      }
     }
   },
   "email": {

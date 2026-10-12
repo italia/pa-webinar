@@ -441,6 +441,24 @@ The dialog preselects **Publish to the library** when the event is already liste
 
 A checkbox can also turn on the AI transcript and summary, which then run when the recording is processed. The choice is sent with the status change in a single `PUT /api/events/{id}`. How the status itself changes is in [event-lifecycle.md](event-lifecycle.md#leaving-and-ending).
 
+### Close the event
+
+On an ended or archived event the **After the event** tab opens with **Close the event**, the list of what is left to do (`app/src/components/admin/event-closing-checklist.tsx`). It reads `GET /api/admin/events/{id}/closing`, which a staff session that manages the event or a moderator token can call, and rereads it every 15 seconds and when the page regains focus. The states are decided in `app/src/lib/events/closing.ts`:
+
+| Line | Done | To do | In progress | Not needed |
+|---|---|---|---|---|
+| **Recording** | published, or a YouTube link | a file not yet published | no file yet, up to 3 hours after the room closed (the end of its last session, or the scheduled end) | not planned, or still no file after those 3 hours |
+| **Transcript** | shown on the public page: published, or the video published (the rule of `assertPostprodAccessible()`) | ready, from the recording the public page would use (`registrazionePubblica()`) | a transcription job running | neither source, or the feature off; an archived event, whose page is never public; with only a moderator link, what staff does |
+| **Report** | published | not generated, or generated and not published | the report job running | AI post-production off; an archived event; not generated and past the data retention, when it can no longer be generated; with only a moderator link |
+| **What happened in the room** | used: the counts of messages, questions and polls, with the choice of what stays public | | | no chat, questions, polls or words |
+| **Materials** | at least one visible after the event, with the page's materials section on | some hidden because that section is off, on a visible page | | none visible after the event, as they are optional, or hidden on a page that is not visible |
+| **Ratings** | the request email sent; or, after the week from the end or on an archived event, the responses collected | the email off, within a week of the end | the email on and not yet sent, within a week of the end | ratings off |
+| **Public page** | always: visible, in the video library (only with a video to watch), withdrawn or expired | | | archived event |
+
+A line is **To do** only when whoever looks at the tab can do it from there: with only a moderator link, the transcript and the report, which staff handle in the administration area, are not.
+
+Each line has a button to the part of the tab where it is done. A transcript from post-production opens in the editor of its recording, whose page has **Back to the event**; rows of **Post-production** link to their event's **After the event** tab. At the end of the live room, the primary moderator's first button opens this tab.
+
 ### The post-event page
 
 The **Post-event configuration** panel on the **After the event** tab controls the concluded event's public page:

@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Akce skončila. Níže najdete statistiky, a pokud se nahrávala, také záznam a zprávu.",
     "endLinks": {
-      "after": "Záznam a zpráva",
+      "after": "Uzavřít akci",
       "stats": "Statistiky akce",
       "publicPage": "Veřejná stránka akce"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Zpracovává se",
       "statusPartial": "Částečně zpracováno",
       "statusDone": "Zpracováno",
-      "statusFailed": "Zpracování selhalo"
+      "statusFailed": "Zpracování selhalo",
+      "manageBackToEvent": "Zpět na akci"
     },
     "questionnairesPage": {
       "subtitle": "Znovupoužitelné šablony otázek pro dotazníky předregistrace a po události."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Pořádající instituce",
       "organizersEdit": "Upravit instituce",
       "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá."
+    },
+    "closing": {
+      "title": "Uzavřít akci",
+      "intro": "Co zbývá udělat, aby ti, kdo nebyli přítomni, našli vše potřebné a účastníci mohli říct, jak to proběhlo.",
+      "summaryTodo": "{count, plural, one {# úkol k dokončení} few {# úkoly k dokončení} many {# úkolu k dokončení} other {# úkolů k dokončení}}",
+      "summaryDone": "Vše hotovo",
+      "loading": "Kontroluje se, co zbývá udělat…",
+      "error": "Nelze načíst, co zbývá udělat: načtěte stránku znovu.",
+      "stato": {
+        "fatto": "Hotovo",
+        "daFare": "K vyřízení",
+        "inCorso": "Probíhá",
+        "nonServe": "Není potřeba"
+      },
+      "azioni": {
+        "apri": "Otevřít",
+        "rivedi": "Zkontrolovat přepis",
+        "materiali": "Přejít na materiály"
+      },
+      "registrazione": {
+        "title": "Záznam",
+        "pubblicata": "Zveřejněn.",
+        "daPubblicare": "Video je připravené: zveřejněte ho pro ty, kdo nebyli přítomni.",
+        "inArrivo": "Pokud byla akce nahrána, soubor dorazí několik minut po skončení.",
+        "spenta": "Nebyl plánován.",
+        "nessunFile": "Žádné video: akce nebyla nahrána, nebo soubor nedorazil."
+      },
+      "trascrizione": {
+        "title": "Přepis",
+        "pubblicata": "Zveřejněn.",
+        "prontaAi": "Připraven z postprodukce: zkontrolujte ho; zveřejní se spolu s videem.",
+        "prontaSottotitoli": "Připraven z titulků: zkontrolujte jména a zveřejněte ho.",
+        "inLavorazione": "Zpracovává se.",
+        "nessuna": "Není k dispozici: chybí titulky i postprodukce.",
+        "soloStaff": "Kontrolu a zveřejnění provádí organizátor akce v administraci.",
+        "nonPiu": "Už jej nelze upravit: akce je archivována nebo uplynula doba uchovávání jejích dat."
+      },
+      "resoconto": {
+        "title": "Zpráva",
+        "pubblicato": "Zveřejněna.",
+        "daPubblicare": "Vygenerována: přečtěte si ji a zveřejněte.",
+        "daGenerare": "Zbývá vygenerovat z přepisu, chatu a hodnocení.",
+        "inLavorazione": "Zpracovává se.",
+        "senzaPipeline": "AI postprodukce není v této instalaci aktivní.",
+        "soloStaff": "Vygenerování a zveřejnění provádí organizátor akce v administraci.",
+        "nonPiu": "Už ji nelze upravit: akce je archivována nebo uplynula doba uchovávání jejích dat."
+      },
+      "sala": {
+        "title": "Co se dělo v místnosti",
+        "rivista": "Zprávy: {messaggi} · otázky: {domande} · ankety: {sondaggi} · Jedním slovem: {nuvole}. Vyberte, co zůstane na veřejné stránce.",
+        "vuota": "Chat, otázky, ankety ani slova nebyly použity."
+      },
+      "materiali": {
+        "title": "Materiály pro ty, kdo nebyli přítomni",
+        "presenti": "Viditelné po akci: {materiali}.",
+        "nessuno": "Po akci není nic viditelné: přidejte snímky nebo dokumenty řečníků, pokud existují.",
+        "nascosti": "Materiály: {materiali}, ale veřejná stránka materiály nezobrazuje: zapněte je v nastavení pro období po akci."
+      },
+      "valutazioni": {
+        "title": "Hodnocení",
+        "emailInviata": "E-mail se žádostí o hodnocení byl odeslán. Odpovědi: {valutazioni}.",
+        "emailInPartenza": "E-mail se žádostí o hodnocení brzy odejde účastníkům. Odpovědi: {valutazioni}.",
+        "emailSpenta": "E-mail se žádostí o hodnocení je vypnutý: lze ho zapnout až do jednoho týdne po skončení. Odpovědi: {valutazioni}.",
+        "raccolte": "Odpovědi: {valutazioni}.",
+        "spente": "Pro tuto akci není aktivní."
+      },
+      "pagina": {
+        "title": "Veřejná stránka",
+        "visibile": "Viditelná pro všechny.",
+        "nellaLibreria": "Viditelná pro všechny a ve videotéce.",
+        "privata": "Stažena: veřejnost ji nevidí.",
+        "scaduta": "Již není viditelná: datum vypršení uplynulo.",
+        "archiviato": "Akce archivována: stránka není veřejná.",
+        "libreriaSenzaVideo": "Viditelná pro všechny; ve videotéce se objeví, až bude video zveřejněno."
+      }
     }
   },
   "email": {

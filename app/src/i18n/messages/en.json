@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "The event has ended. Below you'll find the statistics and, if the event was recorded, the recording and the report.",
     "endLinks": {
-      "after": "Recording and report",
+      "after": "Close the event",
       "stats": "Event statistics",
       "publicPage": "Public event page"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Processing",
       "statusPartial": "Partly processed",
       "statusDone": "Processed",
-      "statusFailed": "Processing failed"
+      "statusFailed": "Processing failed",
+      "manageBackToEvent": "Back to the event"
     },
     "questionnairesPage": {
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Organizing bodies",
       "organizersEdit": "Edit organizers",
       "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
+    },
+    "closing": {
+      "title": "Close the event",
+      "intro": "What is left to do so that people who missed it find everything, and people who attended can say how it went.",
+      "summaryTodo": "{count, plural, one {# thing to complete} other {# things to complete}}",
+      "summaryDone": "All done",
+      "loading": "Checking what is left to do…",
+      "error": "Could not read what is left to do: reload the page.",
+      "stato": {
+        "fatto": "Done",
+        "daFare": "To do",
+        "inCorso": "In progress",
+        "nonServe": "Not needed"
+      },
+      "azioni": {
+        "apri": "Open",
+        "rivedi": "Review the transcript",
+        "materiali": "Go to materials"
+      },
+      "registrazione": {
+        "title": "Recording",
+        "pubblicata": "Published.",
+        "daPubblicare": "The video is ready: publish it for people who missed the event.",
+        "inArrivo": "If it was recorded, the file arrives a few minutes after the end.",
+        "spenta": "It was not planned.",
+        "nessunFile": "No video: it was not recorded, or the file did not arrive."
+      },
+      "trascrizione": {
+        "title": "Transcript",
+        "pubblicata": "Published.",
+        "prontaAi": "Ready from post-production: review it; it is published together with the video.",
+        "prontaSottotitoli": "Ready from the captions: check the names and publish it.",
+        "inLavorazione": "In progress.",
+        "nessuna": "None: neither captions nor post-production.",
+        "soloStaff": "The event organizer reviews and publishes it from the administration area.",
+        "nonPiu": "Can no longer be changed: the event is archived or its data has expired."
+      },
+      "resoconto": {
+        "title": "Report",
+        "pubblicato": "Published.",
+        "daPubblicare": "Generated: read it and publish it.",
+        "daGenerare": "To generate, from the transcript, the chat and the ratings.",
+        "inLavorazione": "In progress.",
+        "senzaPipeline": "AI post-production is not enabled on this installation.",
+        "soloStaff": "The event organizer generates and publishes it from the administration area.",
+        "nonPiu": "Can no longer be changed: the event is archived or its data has expired."
+      },
+      "sala": {
+        "title": "What happened in the room",
+        "rivista": "Messages: {messaggi} · questions: {domande} · polls: {sondaggi} · In one word: {nuvole}. Choose what stays on the public page.",
+        "vuota": "Chat, questions, polls and words were not used."
+      },
+      "materiali": {
+        "title": "Materials for people who missed it",
+        "presenti": "Visible after the event: {materiali}.",
+        "nessuno": "None visible after the event: add the speakers' slides or documents, if any.",
+        "nascosti": "There are {materiali}, but the public page does not show materials: turn them on in the post-event configuration."
+      },
+      "valutazioni": {
+        "title": "Ratings",
+        "emailInviata": "The email asking for them has been sent. Responses: {valutazioni}.",
+        "emailInPartenza": "The email asking for them goes out shortly to attendees. Responses: {valutazioni}.",
+        "emailSpenta": "The email asking for them is off: it can be turned on up to a week after the end. Responses: {valutazioni}.",
+        "raccolte": "Responses: {valutazioni}.",
+        "spente": "Not enabled for this event."
+      },
+      "pagina": {
+        "title": "Public page",
+        "visibile": "Visible to everyone.",
+        "nellaLibreria": "Visible to everyone and in the video library.",
+        "privata": "Withdrawn: the public cannot see it.",
+        "scaduta": "No longer visible: its expiry date has passed.",
+        "archiviato": "Event archived: the page is not public.",
+        "libreriaSenzaVideo": "Visible to everyone; it will appear in the video library once the video is published."
+      }
     }
   },
   "email": {

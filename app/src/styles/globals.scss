@@ -11227,3 +11227,117 @@ html.live-resizing .live-sidebar-resizer::after {
   justify-content: center;
   gap: 0.5rem;
 }
+
+// ── «Chiudi l'evento»: cosa resta da fare dopo la fine ─────────────────────
+.chiusura {
+  border: 1px solid #dde4ec;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 0.5rem;
+  background: #fff;
+}
+.chiusura__testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+.chiusura__titolo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.chiusura__riepilogo {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #00703c;
+}
+.chiusura__riepilogo--da-fare {
+  color: var(--app-warning-text);
+}
+.chiusura__intro,
+.chiusura__attesa,
+.chiusura__errore {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  max-width: 70ch;
+}
+.chiusura__errore {
+  color: #a3162a;
+}
+.chiusura__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.chiusura__voce {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #edf1f5;
+}
+.chiusura__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-self: start;
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chiusura__voce--fatto .chiusura__stato {
+  background: #e3f3ea;
+  color: #00703c;
+}
+.chiusura__voce--da-fare .chiusura__stato {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+.chiusura__voce--in-corso .chiusura__stato {
+  background: #e6effa;
+  color: #0b4f99;
+}
+.chiusura__voce--non-serve .chiusura__stato {
+  background: #f1f4f7;
+  color: var(--app-muted);
+}
+.chiusura__testo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  min-width: 0;
+
+  strong {
+    font-size: 0.95rem;
+    color: var(--app-text);
+  }
+}
+// Le voci che non servono restano, ma non chiedono attenzione.
+.chiusura__voce--non-serve .chiusura__testo strong {
+  color: var(--app-muted);
+  font-weight: 600;
+}
+.chiusura__azione:empty {
+  display: none;
+}
+@media (max-width: 575.98px) {
+  .chiusura__voce {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+}
+
+// Le parti della scheda a cui porta la lista ricevono il fuoco da lì: niente
+// cornice su un intero blocco, il titolo resta il riferimento.
+[id^='dopo-'][tabindex='-1']:focus {
+  outline: none;
+}

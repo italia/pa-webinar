@@ -23,6 +23,8 @@ import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { isUuid } from '@/lib/events/event-param';
+import { AppError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +42,13 @@ export const GET = withErrorHandling(async (request) => {
   );
   const offset = Math.max(0, Number(url.searchParams.get('offset')) || 0);
   const statusParam = url.searchParams.get('status');
-  const eventId = url.searchParams.get('eventId') ?? undefined;
+  // Un identificativo malformato e' un errore, non «nessun filtro»: chi
+  // chiede le registrazioni di un evento non deve ricevere quelle di tutti.
+  const eventIdGrezzo = url.searchParams.get('eventId');
+  if (eventIdGrezzo && !isUuid(eventIdGrezzo)) {
+    throw new AppError('eventId must be a UUID', 400, 'BAD_REQUEST');
+  }
+  const eventId = eventIdGrezzo ?? undefined;
   const statuses = statusParam
     ? statusParam
         .split(',')

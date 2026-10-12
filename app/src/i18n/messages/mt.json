@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "L-avveniment intemm. Hawn taħt issib l-istatistika u, jekk l-avveniment ġie rreġistrat, ir-reġistrazzjoni u r-rapport.",
     "endLinks": {
-      "after": "Reġistrazzjoni u rapport",
+      "after": "Agħlaq l-avveniment",
       "stats": "Statistika tal-avveniment",
       "publicPage": "Paġna pubblika tal-avveniment"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Qed jiġi pproċessat",
       "statusPartial": "Ipproċessata parzjalment",
       "statusDone": "Ipproċessata",
-      "statusFailed": "L-ipproċessar ma rnexxiex"
+      "statusFailed": "L-ipproċessar ma rnexxiex",
+      "manageBackToEvent": "Lura għall-avveniment"
     },
     "questionnairesPage": {
       "subtitle": "Template użati mill-ġdid ta' mistoqsijiet għal i dawnonari ta' preġistrazzjoni u post-avveniment."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Entitajiet organizzaturi",
       "organizersEdit": "Editja l-entitajiet",
       "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza."
+    },
+    "closing": {
+      "title": "Agħlaq l-avveniment",
+      "intro": "X’fadal x’isir biex min ma kienx hemm isib kollox u min kien hemm ikun jista’ jgħid kif mar.",
+      "summaryTodo": "{count, plural, one {# kompitu pendenti} two {# kompiti pendenti} few {# kompiti pendenti} many {#-il kompitu pendenti} other {# kompitu pendenti}}",
+      "summaryDone": "Kollox lest",
+      "loading": "Qed jiġi ċċekkjat x’fadal x’isir…",
+      "error": "Ma setax jinqara x’fadal x’isir: erġa’ tella’ l-paġna.",
+      "stato": {
+        "fatto": "Lest",
+        "daFare": "Biex isir",
+        "inCorso": "Għaddej",
+        "nonServe": "Mhux meħtieġ"
+      },
+      "azioni": {
+        "apri": "Iftaħ",
+        "rivedi": "Irrevedi t-traskrizzjoni",
+        "materiali": "Mur għall-materjali"
+      },
+      "registrazione": {
+        "title": "Rekording",
+        "pubblicata": "Ippubblikat.",
+        "daPubblicare": "Il-vidjo lest: ippubblikah għal min ma kienx hemm.",
+        "inArrivo": "Jekk l-avveniment ġie rrekordjat, il-fajl jasal ftit minuti wara t-tmiem.",
+        "spenta": "Ir-rekording ma kienx ippjanat.",
+        "nessunFile": "L-ebda vidjo: l-avveniment ma ġiex irrekordjat, jew il-fajl ma waslx."
+      },
+      "trascrizione": {
+        "title": "Traskrizzjoni",
+        "pubblicata": "Ippubblikata.",
+        "prontaAi": "Lesta mill-post-produzzjoni: irrevediha; tiġi ppubblikata flimkien mal-vidjo.",
+        "prontaSottotitoli": "Lesta mis-sottotitoli: iċċekkja l-ismijiet u ppubblikaha.",
+        "inLavorazione": "Qed tiġi pproċessata.",
+        "nessuna": "M’hemmx: la sottotitoli u lanqas post-produzzjoni.",
+        "soloStaff": "L-organizzatur tal-avveniment jirrevediha u jippubblikaha miż-żona tal-amministrazzjoni.",
+        "nonPiu": "Ma tistax tinbidel aktar: l-avveniment huwa arkivjat jew id-dejta tiegħu skadiet."
+      },
+      "resoconto": {
+        "title": "Rapport",
+        "pubblicato": "Ippubblikat.",
+        "daPubblicare": "Iġġenerat: aqrah u ppubblikah.",
+        "daGenerare": "Irid jiġi ġġenerat mit-traskrizzjoni, miċ-chat u mill-valutazzjonijiet.",
+        "inLavorazione": "Qed jiġi pproċessat.",
+        "senzaPipeline": "Il-post-produzzjoni AI mhix attiva f’din l-installazzjoni.",
+        "soloStaff": "L-organizzatur tal-avveniment jiġġenerah u jippubblikah miż-żona tal-amministrazzjoni.",
+        "nonPiu": "Ma jistax jinbidel aktar: l-avveniment huwa arkivjat jew id-dejta tiegħu skadiet."
+      },
+      "sala": {
+        "title": "X’ġara fil-kamra",
+        "rivista": "Messaġġi: {messaggi} · mistoqsijiet: {domande} · stħarriġ: {sondaggi} · F'kelma waħda: {nuvole}. Agħżel x’jibqa’ fil-paġna pubblika.",
+        "vuota": "Iċ-chat, il-mistoqsijiet, l-istħarriġ u l-kliem ma ntużawx."
+      },
+      "materiali": {
+        "title": "Materjali għal min ma kienx hemm",
+        "presenti": "Viżibbli wara l-avveniment: {materiali}.",
+        "nessuno": "Xejn viżibbli wara l-avveniment: żid is-slajds jew id-dokumenti tal-kelliema, jekk hemm.",
+        "nascosti": "Materjali: {materiali}, iżda l-paġna pubblika ma turix il-materjali: ixgħelhom fil-konfigurazzjoni ta’ wara l-avveniment."
+      },
+      "valutazioni": {
+        "title": "Valutazzjonijiet",
+        "emailInviata": "L-email li titlobhom intbagħtet. Tweġibiet: {valutazioni}.",
+        "emailInPartenza": "L-email li titlobhom se tintbagħat dalwaqt lil min ipparteċipa. Tweġibiet: {valutazioni}.",
+        "emailSpenta": "L-email li titlobhom hija mitfija: tista’ tinxtegħel sa ġimgħa wara t-tmiem. Tweġibiet: {valutazioni}.",
+        "raccolte": "Tweġibiet: {valutazioni}.",
+        "spente": "Mhumiex attivi għal dan l-avveniment."
+      },
+      "pagina": {
+        "title": "Paġna pubblika",
+        "visibile": "Viżibbli għal kulħadd.",
+        "nellaLibreria": "Viżibbli għal kulħadd u fil-librerija tal-vidjos.",
+        "privata": "Irtirata: il-pubbliku ma jarahiex.",
+        "scaduta": "Mhux viżibbli aktar: id-data ta’ skadenza għaddiet.",
+        "archiviato": "Avveniment arkivjat: il-paġna mhix pubblika.",
+        "libreriaSenzaVideo": "Viżibbli għal kulħadd; se tidher fil-librerija tal-vidjos meta l-vidjo jiġi ppubblikat."
+      }
     }
   },
   "email": {

@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Het evenement is afgelopen. Hieronder vind je de statistieken en, als het is opgenomen, de opname en het verslag.",
     "endLinks": {
-      "after": "Opname en verslag",
+      "after": "Evenement afsluiten",
       "stats": "Statistieken van het evenement",
       "publicPage": "Openbare pagina van het evenement"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Wordt verwerkt",
       "statusPartial": "Gedeeltelijk verwerkt",
       "statusDone": "Verwerkt",
-      "statusFailed": "Verwerking mislukt"
+      "statusFailed": "Verwerking mislukt",
+      "manageBackToEvent": "Terug naar het evenement"
     },
     "questionnairesPage": {
       "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Organiserende instanties",
       "organizersEdit": "Instanties bewerken",
       "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert."
+    },
+    "closing": {
+      "title": "Evenement afsluiten",
+      "intro": "Wat er nog moet gebeuren zodat wie er niet bij was alles vindt en wie er wel bij was kan zeggen hoe het ging.",
+      "summaryTodo": "{count, plural, one {# openstaande taak} other {# openstaande taken}}",
+      "summaryDone": "Alles gedaan",
+      "loading": "Controleren wat er nog moet gebeuren…",
+      "error": "Kan niet lezen wat er nog moet gebeuren: laad de pagina opnieuw.",
+      "stato": {
+        "fatto": "Klaar",
+        "daFare": "Te doen",
+        "inCorso": "Bezig",
+        "nonServe": "Niet nodig"
+      },
+      "azioni": {
+        "apri": "Openen",
+        "rivedi": "Transcriptie nakijken",
+        "materiali": "Naar de materialen"
+      },
+      "registrazione": {
+        "title": "Opname",
+        "pubblicata": "Gepubliceerd.",
+        "daPubblicare": "De video is klaar: publiceer hem voor wie er niet bij was.",
+        "inArrivo": "Als er is opgenomen, komt het bestand een paar minuten na afloop binnen.",
+        "spenta": "Er was geen opname gepland.",
+        "nessunFile": "Geen video: er is niet opgenomen, of het bestand is niet binnengekomen."
+      },
+      "trascrizione": {
+        "title": "Transcriptie",
+        "pubblicata": "Gepubliceerd.",
+        "prontaAi": "Klaar vanuit de nabewerking: kijk hem na; hij wordt samen met de video gepubliceerd.",
+        "prontaSottotitoli": "Klaar vanuit de ondertiteling: controleer de namen en publiceer hem.",
+        "inLavorazione": "Wordt verwerkt.",
+        "nessuna": "Geen: geen ondertiteling en geen nabewerking.",
+        "soloStaff": "De organisator van het evenement kijkt hem na en publiceert hem in het beheergedeelte.",
+        "nonPiu": "Kan niet meer worden gewijzigd: het evenement is gearchiveerd of de bewaartermijn van de gegevens is verstreken."
+      },
+      "resoconto": {
+        "title": "Verslag",
+        "pubblicato": "Gepubliceerd.",
+        "daPubblicare": "Gegenereerd: lees het na en publiceer het.",
+        "daGenerare": "Nog te genereren, op basis van de transcriptie, de chat en de beoordelingen.",
+        "inLavorazione": "Wordt verwerkt.",
+        "senzaPipeline": "AI-nabewerking is niet actief op deze installatie.",
+        "soloStaff": "De organisator van het evenement genereert het en publiceert het in het beheergedeelte.",
+        "nonPiu": "Kan niet meer worden gewijzigd: het evenement is gearchiveerd of de bewaartermijn van de gegevens is verstreken."
+      },
+      "sala": {
+        "title": "Wat er in de zaal gebeurde",
+        "rivista": "Berichten: {messaggi} · vragen: {domande} · peilingen: {sondaggi} · In één woord: {nuvole}. Kies wat op de openbare pagina blijft.",
+        "vuota": "Chat, vragen, peilingen en woorden zijn niet gebruikt."
+      },
+      "materiali": {
+        "title": "Materialen voor wie er niet bij was",
+        "presenti": "Zichtbaar na het evenement: {materiali}.",
+        "nessuno": "Niets zichtbaar na het evenement: voeg dia’s of documenten van de sprekers toe, als die er zijn.",
+        "nascosti": "Materialen: {materiali}, maar de openbare pagina toont geen materialen: zet ze aan in de instellingen voor na het evenement."
+      },
+      "valutazioni": {
+        "title": "Beoordelingen",
+        "emailInviata": "De e-mail waarin erom wordt gevraagd is verstuurd. Reacties: {valutazioni}.",
+        "emailInPartenza": "De e-mail waarin erom wordt gevraagd gaat binnenkort naar de deelnemers. Reacties: {valutazioni}.",
+        "emailSpenta": "De e-mail waarin erom wordt gevraagd staat uit: die kan tot een week na afloop worden aangezet. Reacties: {valutazioni}.",
+        "raccolte": "Reacties: {valutazioni}.",
+        "spente": "Niet actief voor dit evenement."
+      },
+      "pagina": {
+        "title": "Openbare pagina",
+        "visibile": "Voor iedereen zichtbaar.",
+        "nellaLibreria": "Voor iedereen zichtbaar en in de videobibliotheek.",
+        "privata": "Ingetrokken: het publiek ziet hem niet.",
+        "scaduta": "Niet meer zichtbaar: de vervaldatum is verstreken.",
+        "archiviato": "Evenement gearchiveerd: de pagina is niet openbaar.",
+        "libreriaSenzaVideo": "Voor iedereen zichtbaar; in de videobibliotheek verschijnt hij zodra de video is gepubliceerd."
+      }
     }
   },
   "email": {

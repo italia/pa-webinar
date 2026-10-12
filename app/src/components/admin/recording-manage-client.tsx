@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, percorso, useRouter } from '@/i18n/navigation';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
@@ -218,6 +219,16 @@ export default function RecordingManageClient({
           </div>
         </div>
         <div className="d-flex align-items-center gap-2">
+          {/* Il lavoro sul video fa parte della chiusura dell'evento: da qui
+              si torna alla sua scheda «Dopo l'evento». */}
+          {eventId && (
+            <Link
+              href={percorso(eventAdminPath(eventId, { tab: 'dopo' }))}
+              className="btn btn-sm btn-outline-primary"
+            >
+              {t('manageBackToEvent')}
+            </Link>
+          )}
           {eventSlug && (
             <Link
               href={percorso(`/events/${eventSlug}`)}

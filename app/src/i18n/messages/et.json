@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Üritus on lõppenud. Allpool leiad statistika ja, kui üritus salvestati, salvestuse ja ülevaate.",
     "endLinks": {
-      "after": "Salvestus ja aruanne",
+      "after": "Ürituse lõpetamine",
       "stats": "Ürituse statistika",
       "publicPage": "Ürituse avalik leht"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Töötlemisel",
       "statusPartial": "Osaliselt töödeldud",
       "statusDone": "Töödeldud",
-      "statusFailed": "Töötlemine ebaõnnestus"
+      "statusFailed": "Töötlemine ebaõnnestus",
+      "manageBackToEvent": "Tagasi ürituse juurde"
     },
     "questionnairesPage": {
       "subtitle": "Korduvkasutatavad küsimuste mallid eelregistreerimise ja sündmusejärgsete küsimustike jaoks."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Korraldavad asutused",
       "organizersEdit": "Muuda asutusi",
       "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab."
+    },
+    "closing": {
+      "title": "Ürituse lõpetamine",
+      "intro": "Mis on veel teha, et need, kes ei osalenud, leiaksid kõik üles ja osalejad saaksid öelda, kuidas läks.",
+      "summaryTodo": "{count, plural, one {# tegemata ülesanne} other {# tegemata ülesannet}}",
+      "summaryDone": "Kõik on tehtud",
+      "loading": "Kontrollitakse, mis on veel teha…",
+      "error": "Ei õnnestunud lugeda, mis on veel teha: laadige leht uuesti.",
+      "stato": {
+        "fatto": "Tehtud",
+        "daFare": "Teha",
+        "inCorso": "Töös",
+        "nonServe": "Pole vaja"
+      },
+      "azioni": {
+        "apri": "Ava",
+        "rivedi": "Vaata transkriptsioon üle",
+        "materiali": "Mine materjalide juurde"
+      },
+      "registrazione": {
+        "title": "Salvestus",
+        "pubblicata": "Avaldatud.",
+        "daPubblicare": "Video on valmis: avaldage see neile, kes ei osalenud.",
+        "inArrivo": "Kui üritus salvestati, jõuab fail kohale mõni minut pärast lõppu.",
+        "spenta": "Salvestust ei olnud ette nähtud.",
+        "nessunFile": "Videot pole: üritust ei salvestatud või fail ei jõudnud kohale."
+      },
+      "trascrizione": {
+        "title": "Transkriptsioon",
+        "pubblicata": "Avaldatud.",
+        "prontaAi": "Järeltöötlusest valmis: vaadake see üle; see avaldatakse koos videoga.",
+        "prontaSottotitoli": "Subtiitritest valmis: kontrollige nimesid ja avaldage see.",
+        "inLavorazione": "Töötlemisel.",
+        "nessuna": "Puudub: pole ei subtiitreid ega järeltöötlust.",
+        "soloStaff": "Ürituse korraldaja vaatab selle üle ja avaldab haldusalas.",
+        "nonPiu": "Enam ei saa muuta: üritus on arhiveeritud või selle andmete säilitusaeg on läbi."
+      },
+      "resoconto": {
+        "title": "Ülevaade",
+        "pubblicato": "Avaldatud.",
+        "daPubblicare": "Loodud: lugege see läbi ja avaldage.",
+        "daGenerare": "Tuleb luua transkriptsiooni, vestluse ja hinnangute põhjal.",
+        "inLavorazione": "Töötlemisel.",
+        "senzaPipeline": "AI järeltöötlus pole selles paigalduses aktiivne.",
+        "soloStaff": "Ürituse korraldaja loob selle ja avaldab haldusalas.",
+        "nonPiu": "Enam ei saa muuta: üritus on arhiveeritud või selle andmete säilitusaeg on läbi."
+      },
+      "sala": {
+        "title": "Mis ruumis toimus",
+        "rivista": "Sõnumid: {messaggi} · küsimused: {domande} · küsitlused: {sondaggi} · Ühe sõnaga: {nuvole}. Valige, mis jääb avalikule lehele.",
+        "vuota": "Vestlust, küsimusi, küsitlusi ja sõnu ei kasutatud."
+      },
+      "materiali": {
+        "title": "Materjalid neile, kes ei osalenud",
+        "presenti": "Nähtavad pärast üritust: {materiali}.",
+        "nessuno": "Pärast üritust pole midagi nähtaval: lisage esinejate slaidid või dokumendid, kui need on olemas.",
+        "nascosti": "Materjalid: {materiali}, kuid avalik leht materjale ei näita: lülitage nende kuvamine sisse ürituse järgse aja seadetes."
+      },
+      "valutazioni": {
+        "title": "Hinnangud",
+        "emailInviata": "Hinnangut paluv e-kiri on saadetud. Vastused: {valutazioni}.",
+        "emailInPartenza": "Hinnangut paluv e-kiri saadetakse peagi osalejatele. Vastused: {valutazioni}.",
+        "emailSpenta": "Hinnangut paluv e-kiri on välja lülitatud: selle saab sisse lülitada kuni nädal pärast lõppu. Vastused: {valutazioni}.",
+        "raccolte": "Vastused: {valutazioni}.",
+        "spente": "Selle ürituse jaoks pole aktiivsed."
+      },
+      "pagina": {
+        "title": "Avalik leht",
+        "visibile": "Nähtav kõigile.",
+        "nellaLibreria": "Nähtav kõigile ja videoteegis.",
+        "privata": "Tagasi võetud: avalikkus seda ei näe.",
+        "scaduta": "Pole enam nähtav: aegumiskuupäev on möödas.",
+        "archiviato": "Üritus arhiveeritud: leht pole avalik.",
+        "libreriaSenzaVideo": "Nähtav kõigile; videoteegis ilmub see siis, kui video on avaldatud."
+      }
     }
   },
   "email": {

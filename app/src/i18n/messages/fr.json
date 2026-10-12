@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "L'événement est terminé. Ci-dessous, vous trouverez les statistiques et, si l'événement a été enregistré, l'enregistrement et le compte rendu.",
     "endLinks": {
-      "after": "Enregistrement et compte rendu",
+      "after": "Clôturer l’événement",
       "stats": "Statistiques de l'événement",
       "publicPage": "Page publique de l'événement"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "En cours de traitement",
       "statusPartial": "Partiellement traitée",
       "statusDone": "Traitée",
-      "statusFailed": "Traitement échoué"
+      "statusFailed": "Traitement échoué",
+      "manageBackToEvent": "Retour à l’événement"
     },
     "questionnairesPage": {
       "subtitle": "Modèles de questions réutilisables pour les questionnaires de pré-inscription et après l'événement."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Organismes organisateurs",
       "organizersEdit": "Modifier les organismes",
       "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise."
+    },
+    "closing": {
+      "title": "Clôturer l’événement",
+      "intro": "Ce qu’il reste à faire pour que les absents trouvent tout et que les participants puissent dire comment cela s’est passé.",
+      "summaryTodo": "{count, plural, one {# tâche à terminer} many {# tâches à terminer} other {# tâches à terminer}}",
+      "summaryDone": "Tout est fait",
+      "loading": "Vérification de ce qu’il reste à faire…",
+      "error": "Impossible de lire ce qu’il reste à faire : rechargez la page.",
+      "stato": {
+        "fatto": "Fait",
+        "daFare": "À faire",
+        "inCorso": "En cours",
+        "nonServe": "Non requis"
+      },
+      "azioni": {
+        "apri": "Ouvrir",
+        "rivedi": "Relire la transcription",
+        "materiali": "Aller aux documents"
+      },
+      "registrazione": {
+        "title": "Enregistrement",
+        "pubblicata": "Publié.",
+        "daPubblicare": "La vidéo est prête : publiez-la pour les absents.",
+        "inArrivo": "Si l’événement a été enregistré, le fichier arrive quelques minutes après la fin.",
+        "spenta": "Il n’était pas prévu.",
+        "nessunFile": "Aucune vidéo : l’événement n’a pas été enregistré, ou le fichier n’est pas arrivé."
+      },
+      "trascrizione": {
+        "title": "Transcription",
+        "pubblicata": "Publiée.",
+        "prontaAi": "Prête depuis la post-production : relisez-la ; elle est publiée avec la vidéo.",
+        "prontaSottotitoli": "Prête à partir des sous-titres : vérifiez les noms et publiez-la.",
+        "inLavorazione": "En cours de traitement.",
+        "nessuna": "Aucune : ni sous-titres ni post-production.",
+        "soloStaff": "La personne qui organise l’événement la relit et la publie depuis l’espace d’administration.",
+        "nonPiu": "Ne peut plus être modifiée : l’événement est archivé ou ses données ont expiré."
+      },
+      "resoconto": {
+        "title": "Compte rendu",
+        "pubblicato": "Publié.",
+        "daPubblicare": "Généré : relisez-le et publiez-le.",
+        "daGenerare": "À générer, à partir de la transcription, du chat et des évaluations.",
+        "inLavorazione": "En cours de traitement.",
+        "senzaPipeline": "La post-production IA n’est pas activée sur cette installation.",
+        "soloStaff": "La personne qui organise l’événement le génère et le publie depuis l’espace d’administration.",
+        "nonPiu": "Ne peut plus être modifié : l’événement est archivé ou ses données ont expiré."
+      },
+      "sala": {
+        "title": "Ce qui s’est passé dans la salle",
+        "rivista": "Messages : {messaggi} · questions : {domande} · sondages : {sondaggi} · En un mot: {nuvole}. Choisissez ce qui reste sur la page publique.",
+        "vuota": "Le chat, les questions, les sondages et les mots n’ont pas été utilisés."
+      },
+      "materiali": {
+        "title": "Documents pour les absents",
+        "presenti": "Visibles après l’événement : {materiali}.",
+        "nessuno": "Aucun document visible après l’événement : ajoutez les diapositives ou documents des intervenants, s’il y en a.",
+        "nascosti": "Il y en a {materiali}, mais la page publique n’affiche pas les documents : activez-les dans la configuration après l’événement."
+      },
+      "valutazioni": {
+        "title": "Évaluations",
+        "emailInviata": "L’e-mail qui les sollicite a été envoyé. Réponses : {valutazioni}.",
+        "emailInPartenza": "L’e-mail qui les sollicite part bientôt aux participants. Réponses : {valutazioni}.",
+        "emailSpenta": "L’e-mail qui les sollicite est désactivé : il peut être activé jusqu’à une semaine après la fin. Réponses : {valutazioni}.",
+        "raccolte": "Réponses : {valutazioni}.",
+        "spente": "Non activées pour cet événement."
+      },
+      "pagina": {
+        "title": "Page publique",
+        "visibile": "Visible par tous.",
+        "nellaLibreria": "Visible par tous et dans la vidéothèque.",
+        "privata": "Retirée : le public ne la voit pas.",
+        "scaduta": "N’est plus visible : la date d’expiration est passée.",
+        "archiviato": "Événement archivé : la page n’est pas publique.",
+        "libreriaSenzaVideo": "Visible par tous ; elle apparaîtra dans la vidéothèque une fois la vidéo publiée."
+      }
     }
   },
   "email": {

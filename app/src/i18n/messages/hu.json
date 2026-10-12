@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Az esemény véget ért. Lent megtalálja a statisztikákat, és ha rögzítették, a felvételt és a beszámolót.",
     "endLinks": {
-      "after": "Felvétel és beszámoló",
+      "after": "Az esemény lezárása",
       "stats": "Az esemény statisztikái",
       "publicPage": "Az esemény nyilvános oldala"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Feldolgozás alatt",
       "statusPartial": "Részben feldolgozva",
       "statusDone": "Feldolgozva",
-      "statusFailed": "A feldolgozás sikertelen"
+      "statusFailed": "A feldolgozás sikertelen",
+      "manageBackToEvent": "Vissza az eseményhez"
     },
     "questionnairesPage": {
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Szervező intézmények",
       "organizersEdit": "Intézmények szerkesztése",
       "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi."
+    },
+    "closing": {
+      "title": "Az esemény lezárása",
+      "intro": "Mi van még hátra ahhoz, hogy akik nem voltak ott, mindent megtaláljanak, a résztvevők pedig elmondhassák, milyen volt.",
+      "summaryTodo": "{count, plural, one {# hátralévő teendő} other {# hátralévő teendő}}",
+      "summaryDone": "Minden kész",
+      "loading": "A hátralévő teendők ellenőrzése…",
+      "error": "Nem sikerült beolvasni a hátralévő teendőket: töltse újra az oldalt.",
+      "stato": {
+        "fatto": "Kész",
+        "daFare": "Teendő",
+        "inCorso": "Folyamatban",
+        "nonServe": "Nem szükséges"
+      },
+      "azioni": {
+        "apri": "Megnyitás",
+        "rivedi": "Átirat áttekintése",
+        "materiali": "Ugrás az anyagokhoz"
+      },
+      "registrazione": {
+        "title": "Felvétel",
+        "pubblicata": "Közzétéve.",
+        "daPubblicare": "A videó elkészült: tegye közzé azoknak, akik nem voltak ott.",
+        "inArrivo": "Ha készült felvétel, a fájl néhány perccel a befejezés után érkezik.",
+        "spenta": "Felvétel nem volt tervezve.",
+        "nessunFile": "Nincs videó: nem készült felvétel, vagy a fájl nem érkezett meg."
+      },
+      "trascrizione": {
+        "title": "Átirat",
+        "pubblicata": "Közzétéve.",
+        "prontaAi": "Elkészült az utómunkából: tekintse át; a videóval együtt kerül közzétételre.",
+        "prontaSottotitoli": "Elkészült a feliratokból: ellenőrizze a neveket, és tegye közzé.",
+        "inLavorazione": "Feldolgozás alatt.",
+        "nessuna": "Nincs: sem felirat, sem utómunka nem készült.",
+        "soloStaff": "Az esemény szervezője tekinti át és teszi közzé az adminisztrációs felületen.",
+        "nonPiu": "Már nem módosítható: az esemény archiválva van, vagy lejárt az adatainak megőrzési ideje."
+      },
+      "resoconto": {
+        "title": "Beszámoló",
+        "pubblicato": "Közzétéve.",
+        "daPubblicare": "Elkészült: olvassa át, és tegye közzé.",
+        "daGenerare": "Még el kell készíteni az átiratból, a csevegésből és az értékelésekből.",
+        "inLavorazione": "Feldolgozás alatt.",
+        "senzaPipeline": "Az AI-utómunka ebben a telepítésben nincs bekapcsolva.",
+        "soloStaff": "Az esemény szervezője készíti el és teszi közzé az adminisztrációs felületen.",
+        "nonPiu": "Már nem módosítható: az esemény archiválva van, vagy lejárt az adatainak megőrzési ideje."
+      },
+      "sala": {
+        "title": "Mi történt a teremben",
+        "rivista": "Üzenetek: {messaggi} · kérdések: {domande} · szavazások: {sondaggi} · Egy szóval: {nuvole}. Válassza ki, mi maradjon a nyilvános oldalon.",
+        "vuota": "A csevegést, a kérdéseket, a szavazásokat és a szavakat nem használták."
+      },
+      "materiali": {
+        "title": "Anyagok azoknak, akik nem voltak ott",
+        "presenti": "Az esemény után látható: {materiali}.",
+        "nessuno": "Az esemény után semmi sem látható: adja hozzá az előadók diáit vagy dokumentumait, ha vannak.",
+        "nascosti": "Anyagok: {materiali}, de a nyilvános oldal nem jeleníti meg az anyagokat: kapcsolja be őket az esemény utáni időszak beállításaiban."
+      },
+      "valutazioni": {
+        "title": "Értékelések",
+        "emailInviata": "Az értékelést kérő e-mail elment. Válaszok: {valutazioni}.",
+        "emailInPartenza": "Az értékelést kérő e-mail hamarosan elmegy a résztvevőknek. Válaszok: {valutazioni}.",
+        "emailSpenta": "Az értékelést kérő e-mail ki van kapcsolva: a befejezés után legfeljebb egy hétig bekapcsolható. Válaszok: {valutazioni}.",
+        "raccolte": "Válaszok: {valutazioni}.",
+        "spente": "Ennél az eseménynél nincs bekapcsolva."
+      },
+      "pagina": {
+        "title": "Nyilvános oldal",
+        "visibile": "Mindenki számára látható.",
+        "nellaLibreria": "Mindenki számára látható, és a videótárban is szerepel.",
+        "privata": "Visszavonva: a nyilvánosság nem látja.",
+        "scaduta": "Már nem látható: a lejárati dátum elmúlt.",
+        "archiviato": "Az esemény archiválva: az oldal nem nyilvános.",
+        "libreriaSenzaVideo": "Mindenki számára látható; a videótárban akkor jelenik meg, amikor a videót közzéteszik."
+      }
     }
   },
   "email": {

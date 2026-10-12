@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Evenemanget är slut. Nedan hittar du statistiken och, om det spelades in, inspelningen och rapporten.",
     "endLinks": {
-      "after": "Inspelning och rapport",
+      "after": "Avsluta evenemanget",
       "stats": "Statistik för evenemanget",
       "publicPage": "Evenemangets offentliga sida"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Bearbetas",
       "statusPartial": "Delvis bearbetad",
       "statusDone": "Bearbetad",
-      "statusFailed": "Bearbetningen misslyckades"
+      "statusFailed": "Bearbetningen misslyckades",
+      "manageBackToEvent": "Tillbaka till evenemanget"
     },
     "questionnairesPage": {
       "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
@@ -3287,6 +3288,81 @@
       "organizersTitle": "Arrangerande organisationer",
       "organizersEdit": "Redigera organisationer",
       "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar."
+    },
+    "closing": {
+      "title": "Avsluta evenemanget",
+      "intro": "Det som återstår för att de som missade evenemanget ska hitta allt och de som deltog ska kunna säga hur det gick.",
+      "summaryTodo": "{count, plural, one {# uppgift kvar} other {# uppgifter kvar}}",
+      "summaryDone": "Allt klart",
+      "loading": "Kontrollerar vad som återstår…",
+      "error": "Det gick inte att läsa vad som återstår: ladda om sidan.",
+      "stato": {
+        "fatto": "Klart",
+        "daFare": "Att göra",
+        "inCorso": "Pågår",
+        "nonServe": "Behövs inte"
+      },
+      "azioni": {
+        "apri": "Öppna",
+        "rivedi": "Granska transkriptionen",
+        "materiali": "Gå till materialet"
+      },
+      "registrazione": {
+        "title": "Inspelning",
+        "pubblicata": "Publicerad.",
+        "daPubblicare": "Videon är klar: publicera den för dem som missade evenemanget.",
+        "inArrivo": "Om evenemanget spelades in kommer filen några minuter efter slutet.",
+        "spenta": "Ingen inspelning var planerad.",
+        "nessunFile": "Ingen video: evenemanget spelades inte in, eller så kom filen inte fram."
+      },
+      "trascrizione": {
+        "title": "Transkription",
+        "pubblicata": "Publicerad.",
+        "prontaAi": "Klar från efterbearbetningen: granska den; den publiceras tillsammans med videon.",
+        "prontaSottotitoli": "Klar från textningen: kontrollera namnen och publicera den.",
+        "inLavorazione": "Bearbetas.",
+        "nessuna": "Saknas: varken textning eller efterbearbetning.",
+        "soloStaff": "Evenemangets arrangör granskar och publicerar den i administrationen.",
+        "nonPiu": "Kan inte längre ändras: evenemanget är arkiverat eller lagringstiden för dess data har löpt ut."
+      },
+      "resoconto": {
+        "title": "Rapport",
+        "pubblicato": "Publicerad.",
+        "daPubblicare": "Genererad: läs igenom och publicera den.",
+        "daGenerare": "Ska genereras utifrån transkriptionen, chatten och omdömena.",
+        "inLavorazione": "Bearbetas.",
+        "senzaPipeline": "AI-efterbearbetning är inte aktiverad i den här installationen.",
+        "soloStaff": "Evenemangets arrangör genererar och publicerar den i administrationen.",
+        "nonPiu": "Kan inte längre ändras: evenemanget är arkiverat eller lagringstiden för dess data har löpt ut."
+      },
+      "sala": {
+        "title": "Vad som hände i rummet",
+        "rivista": "Meddelanden: {messaggi} · frågor: {domande} · omröstningar: {sondaggi} · Med ett ord: {nuvole}. Välj vad som ska finnas kvar på den publika sidan.",
+        "vuota": "Chatt, frågor, omröstningar och ord användes inte."
+      },
+      "materiali": {
+        "title": "Material för dem som missade evenemanget",
+        "presenti": "Synligt efter evenemanget: {materiali}.",
+        "nessuno": "Inget synligt efter evenemanget: lägg till talarnas bilder eller dokument, om det finns några.",
+        "nascosti": "Material: {materiali}, men den publika sidan visar inte material: slå på dem i inställningarna för tiden efter evenemanget."
+      },
+      "valutazioni": {
+        "title": "Omdömen",
+        "emailInviata": "E-postmeddelandet som ber om omdömen har skickats. Svar: {valutazioni}.",
+        "emailInPartenza": "E-postmeddelandet som ber om omdömen skickas snart till deltagarna. Svar: {valutazioni}.",
+        "emailSpenta": "E-postmeddelandet som ber om omdömen är avstängt: det kan slås på upp till en vecka efter slutet. Svar: {valutazioni}.",
+        "raccolte": "Svar: {valutazioni}.",
+        "spente": "Inte aktiverade för det här evenemanget."
+      },
+      "pagina": {
+        "title": "Publik sida",
+        "visibile": "Synlig för alla.",
+        "nellaLibreria": "Synlig för alla och i videobiblioteket.",
+        "privata": "Tillbakadragen: allmänheten ser den inte.",
+        "scaduta": "Inte längre synlig: utgångsdatumet har passerat.",
+        "archiviato": "Evenemanget är arkiverat: sidan är inte publik.",
+        "libreriaSenzaVideo": "Synlig för alla; den visas i videobiblioteket när videon har publicerats."
+      }
     }
   },
   "email": {
