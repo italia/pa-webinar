@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "L'evento è concluso. Qui sotto trovi le statistiche e, se l'evento è stato registrato, la registrazione e il resoconto.",
     "endLinks": {
-      "after": "Registrazione e resoconto",
+      "after": "Chiudi l'evento",
       "stats": "Statistiche dell'evento",
       "publicPage": "Pagina pubblica dell'evento"
     },
@@ -3104,7 +3104,8 @@
       "statusRunning": "In elaborazione",
       "statusPartial": "Elaborata in parte",
       "statusDone": "Elaborata",
-      "statusFailed": "Elaborazione non riuscita"
+      "statusFailed": "Elaborazione non riuscita",
+      "manageBackToEvent": "Torna all'evento"
     },
     "questionnairesPage": {
       "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
@@ -3422,6 +3423,150 @@
       "organizersTitle": "Enti organizzatori",
       "organizersEdit": "Modifica gli enti",
       "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
+    },
+    "closing": {
+      "title": "Chiudi l'evento",
+      "intro": "Cosa resta da fare perché chi non c'era trovi tutto e chi c'era possa dire com'è andata.",
+      "summaryTodo": "{count, plural, one {# cosa da completare} other {# cose da completare}}",
+      "summaryDone": "Tutto fatto",
+      "loading": "Controllo cosa resta da fare…",
+      "error": "Non riesco a leggere cosa resta da fare: ricarica la pagina.",
+      "stato": {
+        "fatto": "Fatto",
+        "daFare": "Da fare",
+        "inCorso": "In corso",
+        "nonServe": "Non serve"
+      },
+      "azioni": {
+        "apri": "Apri",
+        "rivedi": "Rivedi la trascrizione",
+        "materiali": "Vai ai materiali"
+      },
+      "registrazione": {
+        "title": "Registrazione",
+        "pubblicata": "Pubblicata.",
+        "daPubblicare": "Il video è pronto: pubblicalo perché lo veda chi non c'era.",
+        "inArrivo": "Se è stata registrata, il file arriva qualche minuto dopo la fine.",
+        "spenta": "Non era prevista.",
+        "nessunFile": "Nessun video: non è stato registrato, o il file non è arrivato."
+      },
+      "trascrizione": {
+        "title": "Trascrizione",
+        "pubblicata": "Pubblicata.",
+        "prontaAi": "Pronta dalla post-produzione: rivedila, si pubblica insieme al video.",
+        "prontaSottotitoli": "Pronta dai sottotitoli: controlla i nomi e pubblicala.",
+        "inLavorazione": "In lavorazione.",
+        "nessuna": "Non c'è: né sottotitoli né post-produzione.",
+        "soloStaff": "La rivede e la pubblica chi organizza l'evento, dall'area riservata.",
+        "nonPiu": "Non si cambia più: l'evento è archiviato o i suoi dati sono scaduti."
+      },
+      "resoconto": {
+        "title": "Resoconto",
+        "pubblicato": "Pubblicato.",
+        "daPubblicare": "Generato: rileggilo e pubblicalo.",
+        "daGenerare": "Da generare, a partire da trascrizione, chat e valutazioni.",
+        "inLavorazione": "In lavorazione.",
+        "senzaPipeline": "La post-produzione AI non è attiva su questa installazione.",
+        "soloStaff": "Lo genera e lo pubblica chi organizza l'evento, dall'area riservata.",
+        "nonPiu": "Non si cambia più: l'evento è archiviato o i suoi dati sono scaduti."
+      },
+      "sala": {
+        "title": "Cosa è successo in sala",
+        "rivista": "Messaggi: {messaggi} · domande: {domande} · sondaggi: {sondaggi} · In una parola: {nuvole}.",
+        "vuota": "Chat, domande, sondaggi e parole non sono stati usati.",
+        "inSospeso": "Domande senza risposta: {domandeInSospeso}. Segnale come risposte o scartale."
+      },
+      "materiali": {
+        "title": "Materiali per chi non c'era",
+        "presenti": "Visibili dopo l'evento: {materiali}.",
+        "nessuno": "Nessuno visibile dopo l'evento: aggiungi slide o documenti dei relatori, se ci sono.",
+        "nascosti": "Ce ne sono {materiali}, ma la pagina pubblica non mostra i materiali: accendili nella configurazione dopo l'evento."
+      },
+      "valutazioni": {
+        "title": "Valutazioni",
+        "emailInviata": "L'email per chiederle è partita. Risposte: {valutazioni}.",
+        "emailInPartenza": "L'email per chiederle parte a breve a chi ha partecipato. Risposte: {valutazioni}.",
+        "emailSpenta": "L'email per chiederle è spenta: si può accendere fino a una settimana dalla fine. Risposte: {valutazioni}.",
+        "raccolte": "Risposte: {valutazioni}.",
+        "spente": "Non attive per questo evento."
+      },
+      "pagina": {
+        "title": "Pagina pubblica",
+        "visibile": "Visibile a tutti.",
+        "nellaLibreria": "Visibile a tutti e nella libreria video.",
+        "privata": "Ritirata: il pubblico non la vede.",
+        "scaduta": "Non più visibile: la data di scadenza è passata.",
+        "archiviato": "Evento archiviato: la pagina non è pubblica.",
+        "libreriaSenzaVideo": "Visibile a tutti; nella libreria video comparirà quando il video sarà pubblicato."
+      }
+    },
+    "roomReview": {
+      "title": "Cosa è successo in sala",
+      "intro": "Rivedi cosa è stato scritto e chiesto: nascondi ciò che non deve restare, chiudi le domande, pubblica i risultati dei sondaggi. Il riepilogo della pagina pubblica si aggiorna a ogni modifica.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Domande",
+        "polls": "Sondaggi",
+        "words": "In una parola"
+      },
+      "loading": "Caricamento…",
+      "error": "Non riesco a leggere questa parte: riprova più tardi.",
+      "actionError": "Operazione non riuscita: riprova.",
+      "chat": {
+        "empty": "Nessun messaggio.",
+        "limit": "Si vedono gli ultimi {count} messaggi.",
+        "question": "Domanda",
+        "moderator": "Conduzione",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi il messaggio di {name}",
+        "hidden": "Messaggio nascosto.",
+        "confirmTitle": "Nascondere il messaggio?",
+        "confirmBody": "Sparisce dalla cronologia, dall'esportazione e dal riepilogo, con l'eventuale allegato. Non si può annullare."
+      },
+      "qa": {
+        "empty": "Nessuna domanda.",
+        "status": {
+          "PENDING": "In attesa",
+          "HIGHLIGHTED": "In evidenza",
+          "ANSWERED": "Risposta",
+          "DISMISSED": "Scartata"
+        },
+        "markAnswered": "Segna come risposta",
+        "dismiss": "Scarta",
+        "fromChat": "dalla chat",
+        "votes": "Voti: {count}",
+        "answeredOk": "Domanda segnata come risposta.",
+        "dismissedOk": "Domanda scartata.",
+        "limit": "Si vedono {count} domande segnate in chat: prima quelle aperte, poi le chiuse più recenti."
+      },
+      "polls": {
+        "empty": "Nessun sondaggio.",
+        "status": {
+          "OPEN": "Aperto",
+          "CLOSED": "Chiuso: risultati non pubblici",
+          "PUBLISHED": "Risultati pubblicati"
+        },
+        "votes": "Voti: {count}",
+        "publish": "Pubblica i risultati",
+        "published": "Risultati pubblicati."
+      },
+      "words": {
+        "empty": "Nessuna parola.",
+        "prompt": "Domanda: {prompt}",
+        "people": "Persone: {count}",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi «{word}»",
+        "hidden": "Parola nascosta.",
+        "confirmTitle": "Nascondere la parola?",
+        "confirmBody": "Sparisce dalla nuvola e dal riepilogo. Non si può annullare.",
+        "round": "Giro del {date}"
+      },
+      "recap": {
+        "button": "Aggiorna il riepilogo pubblico",
+        "done": "Riepilogo pubblico aggiornato.",
+        "notPossible": "Il riepilogo non si aggiorna più: l'evento non è concluso o i suoi dati sono scaduti.",
+        "error": "Aggiornamento non riuscito: riprova."
+      }
     }
   },
   "email": {

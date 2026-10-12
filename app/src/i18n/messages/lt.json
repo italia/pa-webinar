@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Renginys baigėsi. Žemiau rasite statistiką ir, jei renginys buvo įrašytas, įrašą ir ataskaitą.",
     "endLinks": {
-      "after": "Įrašas ir ataskaita",
+      "after": "Užbaigti renginį",
       "stats": "Renginio statistika",
       "publicPage": "Viešasis renginio puslapis"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Apdorojama",
       "statusPartial": "Iš dalies apdorota",
       "statusDone": "Apdorota",
-      "statusFailed": "Apdorojimas nepavyko"
+      "statusFailed": "Apdorojimas nepavyko",
+      "manageBackToEvent": "Grįžti į renginį"
     },
     "questionnairesPage": {
       "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Organizuojančios institucijos",
       "organizersEdit": "Redaguoti institucijas",
       "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja."
+    },
+    "closing": {
+      "title": "Užbaigti renginį",
+      "intro": "Kas dar liko padaryti, kad nedalyvavusieji rastų viską, o dalyviai galėtų pasakyti, kaip sekėsi.",
+      "summaryTodo": "{count, plural, one {# likusi užduotis} few {# likusios užduotys} many {# likusios užduoties} other {# likusių užduočių}}",
+      "summaryDone": "Viskas atlikta",
+      "loading": "Tikrinama, kas dar liko padaryti…",
+      "error": "Nepavyko nuskaityti, kas dar liko padaryti: įkelkite puslapį iš naujo.",
+      "stato": {
+        "fatto": "Atlikta",
+        "daFare": "Reikia atlikti",
+        "inCorso": "Vykdoma",
+        "nonServe": "Nereikia"
+      },
+      "azioni": {
+        "apri": "Atidaryti",
+        "rivedi": "Peržiūrėti transkripciją",
+        "materiali": "Eiti į medžiagą"
+      },
+      "registrazione": {
+        "title": "Įrašas",
+        "pubblicata": "Paskelbtas.",
+        "daPubblicare": "Vaizdo įrašas paruoštas: paskelbkite jį nedalyvavusiesiems.",
+        "inArrivo": "Jei renginys buvo įrašytas, failas atkeliauja praėjus kelioms minutėms po pabaigos.",
+        "spenta": "Įrašymas nebuvo numatytas.",
+        "nessunFile": "Vaizdo įrašo nėra: renginys nebuvo įrašytas arba failas neatkeliavo."
+      },
+      "trascrizione": {
+        "title": "Transkripcija",
+        "pubblicata": "Paskelbta.",
+        "prontaAi": "Parengta pogamybos metu: peržiūrėkite ją; ji skelbiama kartu su vaizdo įrašu.",
+        "prontaSottotitoli": "Parengta iš subtitrų: patikrinkite vardus ir paskelbkite.",
+        "inLavorazione": "Apdorojama.",
+        "nessuna": "Nėra: nei subtitrų, nei pogamybos.",
+        "soloStaff": "Ją peržiūri ir paskelbia renginio organizatorius administravimo srityje.",
+        "nonPiu": "Nebegalima keisti: renginys suarchyvuotas arba baigėsi jo duomenų saugojimo laikas."
+      },
+      "resoconto": {
+        "title": "Ataskaita",
+        "pubblicato": "Paskelbta.",
+        "daPubblicare": "Sugeneruota: perskaitykite ir paskelbkite.",
+        "daGenerare": "Reikia sugeneruoti iš transkripcijos, pokalbio ir įvertinimų.",
+        "inLavorazione": "Apdorojama.",
+        "senzaPipeline": "DI pogamyba šiame diegime neįjungta.",
+        "soloStaff": "Ją sugeneruoja ir paskelbia renginio organizatorius administravimo srityje.",
+        "nonPiu": "Nebegalima keisti: renginys suarchyvuotas arba baigėsi jo duomenų saugojimo laikas."
+      },
+      "sala": {
+        "title": "Kas vyko kambaryje",
+        "rivista": "Žinutės: {messaggi} · klausimai: {domande} · apklausos: {sondaggi} · Vienu žodžiu: {nuvole}.",
+        "vuota": "Pokalbis, klausimai, apklausos ir žodžiai nebuvo naudojami.",
+        "inSospeso": "Neatsakyti klausimai: {domandeInSospeso}. Pažymėkite juos kaip atsakytus arba atmeskite."
+      },
+      "materiali": {
+        "title": "Medžiaga nedalyvavusiesiems",
+        "presenti": "Matoma po renginio: {materiali}.",
+        "nessuno": "Po renginio nieko nematyti: pridėkite pranešėjų skaidres ar dokumentus, jei jų yra.",
+        "nascosti": "Yra medžiagos ({materiali}), tačiau viešajame puslapyje medžiaga nerodoma: įjunkite jos rodymą nustatymuose, skirtuose laikui po renginio."
+      },
+      "valutazioni": {
+        "title": "Įvertinimai",
+        "emailInviata": "El. laiškas su prašymu įvertinti išsiųstas. Atsakymai: {valutazioni}.",
+        "emailInPartenza": "El. laiškas su prašymu įvertinti netrukus bus išsiųstas dalyviams. Atsakymai: {valutazioni}.",
+        "emailSpenta": "El. laiškas su prašymu įvertinti išjungtas: jį galima įjungti iki savaitės po pabaigos. Atsakymai: {valutazioni}.",
+        "raccolte": "Atsakymai: {valutazioni}.",
+        "spente": "Šiam renginiui neįjungti."
+      },
+      "pagina": {
+        "title": "Viešasis puslapis",
+        "visibile": "Matomas visiems.",
+        "nellaLibreria": "Matomas visiems ir vaizdo įrašų bibliotekoje.",
+        "privata": "Atšauktas: visuomenė jo nemato.",
+        "scaduta": "Nebematomas: galiojimo data praėjo.",
+        "archiviato": "Renginys suarchyvuotas: puslapis nėra viešas.",
+        "libreriaSenzaVideo": "Matomas visiems; vaizdo įrašų bibliotekoje jis atsiras, kai vaizdo įrašas bus paskelbtas."
+      }
+    },
+    "roomReview": {
+      "title": "Kas vyko kambaryje",
+      "intro": "Peržiūrėkite, kas buvo parašyta ir paklausta: paslėpkite tai, kas neturi likti, užbaikite klausimus, paskelbkite apklausų rezultatus. Viešojo puslapio suvestinė atnaujinama po kiekvieno pakeitimo.",
+      "tabs": {
+        "chat": "Pokalbis",
+        "qa": "Klausimai",
+        "polls": "Apklausos",
+        "words": "Vienu žodžiu"
+      },
+      "loading": "Įkeliama…",
+      "error": "Nepavyko nuskaityti šios dalies: bandykite vėliau.",
+      "actionError": "Veiksmas nepavyko: bandykite dar kartą.",
+      "chat": {
+        "empty": "Nėra žinučių.",
+        "limit": "Rodoma paskutinių žinučių: {count}.",
+        "question": "Klausimas",
+        "moderator": "Vedėjas",
+        "hide": "Slėpti",
+        "hideFor": "Slėpti žinutę: {name}",
+        "hidden": "Žinutė paslėpta.",
+        "confirmTitle": "Paslėpti žinutę?",
+        "confirmBody": "Ji dings iš istorijos, eksporto ir suvestinės kartu su galimu priedu. Šio veiksmo atšaukti negalima."
+      },
+      "qa": {
+        "empty": "Nėra klausimų.",
+        "status": {
+          "PENDING": "Laukiama",
+          "HIGHLIGHTED": "Išskirtas",
+          "ANSWERED": "Atsakyta",
+          "DISMISSED": "Atmestas"
+        },
+        "markAnswered": "Pažymėti kaip atsakytą",
+        "dismiss": "Atmesti",
+        "fromChat": "iš pokalbio",
+        "votes": "Balsai: {count}",
+        "answeredOk": "Klausimas pažymėtas kaip atsakytas.",
+        "dismissedOk": "Klausimas atmestas.",
+        "limit": "Rodoma {count} pokalbyje pažymėtų klausimų: pirmiausia atviri, paskui naujausi uždaryti."
+      },
+      "polls": {
+        "empty": "Nėra apklausų.",
+        "status": {
+          "OPEN": "Atvira",
+          "CLOSED": "Uždaryta: rezultatai nevieši",
+          "PUBLISHED": "Rezultatai paskelbti"
+        },
+        "votes": "Balsai: {count}",
+        "publish": "Paskelbti rezultatus",
+        "published": "Rezultatai paskelbti."
+      },
+      "words": {
+        "empty": "Nėra žodžių.",
+        "prompt": "Klausimas: {prompt}",
+        "people": "Žmonių: {count}",
+        "hide": "Slėpti",
+        "hideFor": "Slėpti „{word}“",
+        "hidden": "Žodis paslėptas.",
+        "confirmTitle": "Paslėpti žodį?",
+        "confirmBody": "Jis dings iš debesies ir suvestinės. Šio veiksmo atšaukti negalima.",
+        "round": "Raundas: {date}"
+      },
+      "recap": {
+        "button": "Atnaujinti viešąją suvestinę",
+        "done": "Viešoji suvestinė atnaujinta.",
+        "notPossible": "Suvestinės nebegalima atnaujinti: renginys nesibaigė arba baigėsi jo duomenų saugojimo laikas.",
+        "error": "Atnaujinti nepavyko: bandykite dar kartą."
+      }
     }
   },
   "email": {

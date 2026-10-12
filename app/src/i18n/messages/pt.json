@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "O evento terminou. Abaixo encontra as estatísticas e, se o evento foi gravado, a gravação e o relatório.",
     "endLinks": {
-      "after": "Gravação e relatório",
+      "after": "Encerrar o evento",
       "stats": "Estatísticas do evento",
       "publicPage": "Página pública do evento"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Em processamento",
       "statusPartial": "Processada em parte",
       "statusDone": "Processada",
-      "statusFailed": "Processamento falhou"
+      "statusFailed": "Processamento falhou",
+      "manageBackToEvent": "Voltar ao evento"
     },
     "questionnairesPage": {
       "subtitle": "Modelos reutilizáveis de perguntas para os questionários de pré-inscrição e pós-evento."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Entidades organizadoras",
       "organizersEdit": "Editar entidades",
       "organizersEmpty": "Nenhuma entidade indicada: a página pública não mostra quem organiza."
+    },
+    "closing": {
+      "title": "Encerrar o evento",
+      "intro": "O que falta fazer para que quem não esteve presente encontre tudo e quem esteve possa dizer como correu.",
+      "summaryTodo": "{count, plural, one {# tarefa por concluir} many {# tarefas por concluir} other {# tarefas por concluir}}",
+      "summaryDone": "Tudo concluído",
+      "loading": "A verificar o que falta fazer…",
+      "error": "Não foi possível ler o que falta fazer: recarregue a página.",
+      "stato": {
+        "fatto": "Concluído",
+        "daFare": "Por fazer",
+        "inCorso": "Em curso",
+        "nonServe": "Não é necessário"
+      },
+      "azioni": {
+        "apri": "Abrir",
+        "rivedi": "Rever a transcrição",
+        "materiali": "Ir para os materiais"
+      },
+      "registrazione": {
+        "title": "Gravação",
+        "pubblicata": "Publicada.",
+        "daPubblicare": "O vídeo está pronto: publique-o para quem não esteve presente.",
+        "inArrivo": "Se o evento foi gravado, o ficheiro chega alguns minutos após o fim.",
+        "spenta": "Não estava prevista.",
+        "nessunFile": "Sem vídeo: o evento não foi gravado ou o ficheiro não chegou."
+      },
+      "trascrizione": {
+        "title": "Transcrição",
+        "pubblicata": "Publicada.",
+        "prontaAi": "Pronta a partir da pós-produção: reveja-a; é publicada juntamente com o vídeo.",
+        "prontaSottotitoli": "Pronta a partir das legendas: verifique os nomes e publique-a.",
+        "inLavorazione": "Em processamento.",
+        "nessuna": "Não existe: nem legendas nem pós-produção.",
+        "soloStaff": "Quem organiza o evento revê-a e publica-a a partir da área de administração.",
+        "nonPiu": "Já não pode ser alterada: o evento está arquivado ou os seus dados expiraram."
+      },
+      "resoconto": {
+        "title": "Relatório",
+        "pubblicato": "Publicado.",
+        "daPubblicare": "Gerado: releia-o e publique-o.",
+        "daGenerare": "Por gerar, a partir da transcrição, do chat e das avaliações.",
+        "inLavorazione": "Em processamento.",
+        "senzaPipeline": "A pós-produção com IA não está ativa nesta instalação.",
+        "soloStaff": "Quem organiza o evento gera-o e publica-o a partir da área de administração.",
+        "nonPiu": "Já não pode ser alterado: o evento está arquivado ou os seus dados expiraram."
+      },
+      "sala": {
+        "title": "O que aconteceu na sala",
+        "rivista": "Mensagens: {messaggi} · perguntas: {domande} · sondagens: {sondaggi} · Numa palavra: {nuvole}.",
+        "vuota": "O chat, as perguntas, as sondagens e as palavras não foram usados.",
+        "inSospeso": "Perguntas sem resposta: {domandeInSospeso}. Marque-as como respondidas ou descarte-as."
+      },
+      "materiali": {
+        "title": "Materiais para quem não esteve presente",
+        "presenti": "Visíveis após o evento: {materiali}.",
+        "nessuno": "Nenhum visível após o evento: adicione os diapositivos ou documentos dos oradores, se existirem.",
+        "nascosti": "Há {materiali}, mas a página pública não mostra os materiais: ative-os na configuração para depois do evento."
+      },
+      "valutazioni": {
+        "title": "Avaliações",
+        "emailInviata": "O e-mail a pedi-las foi enviado. Respostas: {valutazioni}.",
+        "emailInPartenza": "O e-mail a pedi-las será enviado em breve aos participantes. Respostas: {valutazioni}.",
+        "emailSpenta": "O e-mail a pedi-las está desativado: pode ser ativado até uma semana após o fim. Respostas: {valutazioni}.",
+        "raccolte": "Respostas: {valutazioni}.",
+        "spente": "Não ativas para este evento."
+      },
+      "pagina": {
+        "title": "Página pública",
+        "visibile": "Visível para todos.",
+        "nellaLibreria": "Visível para todos e na biblioteca de vídeo.",
+        "privata": "Retirada: o público não a vê.",
+        "scaduta": "Deixou de estar visível: a data de expiração já passou.",
+        "archiviato": "Evento arquivado: a página não é pública.",
+        "libreriaSenzaVideo": "Visível para todos; aparecerá na biblioteca de vídeo quando o vídeo for publicado."
+      }
+    },
+    "roomReview": {
+      "title": "O que aconteceu na sala",
+      "intro": "Reveja o que foi escrito e perguntado: oculte o que não deve ficar, feche as perguntas, publique os resultados das sondagens. O resumo da página pública é atualizado a cada alteração.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Perguntas",
+        "polls": "Sondagens",
+        "words": "Numa palavra"
+      },
+      "loading": "A carregar…",
+      "error": "Não foi possível ler esta parte: tente novamente mais tarde.",
+      "actionError": "A operação falhou: tente novamente.",
+      "chat": {
+        "empty": "Sem mensagens.",
+        "limit": "São mostradas as últimas {count} mensagens.",
+        "question": "Pergunta",
+        "moderator": "Moderação",
+        "hide": "Ocultar",
+        "hideFor": "Ocultar a mensagem de {name}",
+        "hidden": "Mensagem ocultada.",
+        "confirmTitle": "Ocultar a mensagem?",
+        "confirmBody": "Desaparece do histórico, da exportação e do resumo, juntamente com o eventual anexo. Não é possível anular."
+      },
+      "qa": {
+        "empty": "Sem perguntas.",
+        "status": {
+          "PENDING": "Pendente",
+          "HIGHLIGHTED": "Em destaque",
+          "ANSWERED": "Respondida",
+          "DISMISSED": "Descartada"
+        },
+        "markAnswered": "Marcar como respondida",
+        "dismiss": "Descartar",
+        "fromChat": "do chat",
+        "votes": "Votos: {count}",
+        "answeredOk": "Pergunta marcada como respondida.",
+        "dismissedOk": "Pergunta descartada.",
+        "limit": "São mostradas {count} perguntas marcadas no chat: primeiro as abertas, depois as fechadas mais recentes."
+      },
+      "polls": {
+        "empty": "Sem sondagens.",
+        "status": {
+          "OPEN": "Aberta",
+          "CLOSED": "Fechada: resultados não públicos",
+          "PUBLISHED": "Resultados publicados"
+        },
+        "votes": "Votos: {count}",
+        "publish": "Publicar os resultados",
+        "published": "Resultados publicados."
+      },
+      "words": {
+        "empty": "Sem palavras.",
+        "prompt": "Pergunta: {prompt}",
+        "people": "Pessoas: {count}",
+        "hide": "Ocultar",
+        "hideFor": "Ocultar «{word}»",
+        "hidden": "Palavra ocultada.",
+        "confirmTitle": "Ocultar a palavra?",
+        "confirmBody": "Desaparece da nuvem e do resumo. Não é possível anular.",
+        "round": "Ronda de {date}"
+      },
+      "recap": {
+        "button": "Atualizar o resumo público",
+        "done": "Resumo público atualizado.",
+        "notPossible": "O resumo já não pode ser atualizado: o evento não terminou ou os seus dados expiraram.",
+        "error": "A atualização falhou: tente novamente."
+      }
     }
   },
   "email": {

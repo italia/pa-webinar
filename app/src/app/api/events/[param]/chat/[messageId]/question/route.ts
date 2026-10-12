@@ -30,6 +30,7 @@ import { senderColourKey } from '@/lib/chat/sender-key';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -112,6 +113,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
       actor: 'moderator',
       data: { messageId: message.id, status },
     });
+    // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+    await rifaiRiepilogo(event.id, event.status);
   }
 
   // L'envelope porta i campi VERI del messaggio, non segnaposto vuoti.

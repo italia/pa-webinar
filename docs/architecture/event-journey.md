@@ -441,6 +441,26 @@ The dialog preselects **Publish to the library** when the event is already liste
 
 A checkbox can also turn on the AI transcript and summary, which then run when the recording is processed. The choice is sent with the status change in a single `PUT /api/events/{id}`. How the status itself changes is in [event-lifecycle.md](event-lifecycle.md#leaving-and-ending).
 
+### Close the event
+
+On an ended or archived event the **After the event** tab opens with **Close the event**, the list of what is left to do (`app/src/components/admin/event-closing-checklist.tsx`). It reads `GET /api/admin/events/{id}/closing`, which a staff session that manages the event or a moderator token can call, and rereads it every 15 seconds and when the page regains focus. The states are decided in `app/src/lib/events/closing.ts`:
+
+| Line | Done | To do | In progress | Not needed |
+|---|---|---|---|---|
+| **Recording** | published, or a YouTube link | a file not yet published | no file yet, up to 3 hours after the room closed (the end of its last session, or the scheduled end) | not planned, or still no file after those 3 hours |
+| **Transcript** | shown on the public page: published, or the video published (the rule of `assertPostprodAccessible()`) | ready, from the recording the public page would use (`registrazionePubblica()`) | a transcription job running | neither source, or the feature off; an archived event, whose page is never public; with only a moderator link, what staff does |
+| **Report** | published | not generated, or generated and not published | the report job running | AI post-production off; an archived event; not generated and past the data retention, when it can no longer be generated; with only a moderator link |
+| **What happened in the room** | used, with no question left open: the counts of messages, questions, polls and words | questions neither answered nor dismissed, on an ended event | | no chat, questions, polls or words |
+| **Materials** | at least one visible after the event, with the page's materials section on | some hidden because that section is off, on a visible page | | none visible after the event, as they are optional, or hidden on a page that is not visible |
+| **Ratings** | the request email sent; or, after the week from the end or on an archived event, the responses collected | the email off, within a week of the end | the email on and not yet sent, within a week of the end | ratings off |
+| **Public page** | always: visible, in the video library (only with a video to watch), withdrawn or expired | | | archived event |
+
+A line is **To do** only when whoever looks at the tab can do it from there: with only a moderator link, the transcript and the report, which staff handle in the administration area, are not.
+
+Each line has a button to the part of the tab where it is done. A transcript from post-production opens in the editor of its recording, whose page has **Back to the event**; rows of **Post-production** link to their event's **After the event** tab. At the end of the live room, the primary moderator's first button opens this tab.
+
+**What happened in the room**, below **Post-event configuration**, reviews the live content of the concluded event (`app/src/components/admin/event-room-review.tsx`). Changes go through the room's own routes with the moderator token, which the event page always holds: **Chat** lists the last 500 messages, with **Hide** on each (`DELETE /api/events/{slug}/chat/{id}`, after a confirmation, as it cannot be undone and removes any attachment); **Questions** lists the Q&A questions and the chat messages marked as a question (all the open ones, then the most recent closed ones up to 1000, with a note when some are left out), open ones first, with **Mark as answered** and **Dismiss**; **Polls** shows each poll's results and **Publish the results** on a closed one; **In one word** lists the words of every round, with **Hide** after a confirmation. The chat questions and the words of all rounds come from `GET /api/admin/events/{id}/room-review` (staff who manage the event or the moderator token), because the room's routes return only the latest messages and the latest round. The post-event page shows a recap frozen at its first view, so on an ended event the panel ends with **Update the public summary**, `POST /api/admin/events/{id}/recap`: it rebuilds the recap from the current data within the data retention, answers `409` otherwise, and of two rebuilds at once keeps the one that started later. On an ended event, any change that alters the room's content (hiding a message, editing a question, changing the state of a question, changing the state of a poll or deleting it, hiding a word) also rebuilds the frozen recap, so the public page stops showing what was removed; during the live session nothing is rebuilt.
+
 ### The post-event page
 
 The **Post-event configuration** panel on the **After the event** tab controls the concluded event's public page:

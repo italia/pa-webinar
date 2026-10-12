@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
 vi.mock('@/lib/chat/pubsub', () => ({ publishChat: vi.fn() }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/events/recap', () => ({ rifaiRiepilogo: vi.fn() }));
 vi.mock('@/lib/auth/moderator', () => ({
   extractModeratorToken: (req: Request) =>
     req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? null,
@@ -29,6 +30,7 @@ import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { verifyModeratorToken } from '@/lib/auth/moderator';
 import { recordLiveAction } from '@/lib/live/actions';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 
 import { PATCH } from './route';
 
@@ -113,6 +115,7 @@ describe('PATCH /chat/[messageId]/question — cronologia della sala', () => {
       actor: 'moderator',
       data: { messageId: MESSAGE_ID, status: 'ANSWERED' },
     });
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
     const tutto = JSON.stringify(vi.mocked(recordLiveAction).mock.calls);
     expect(tutto).not.toContain('Anna');
     expect(tutto).not.toContain('registrazione');
@@ -152,6 +155,7 @@ describe('PATCH /chat/[messageId]/question — cronologia della sala', () => {
     });
     await PATCH(patchRequest('ANSWERED'), ctx);
     expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(rifaiRiepilogo).not.toHaveBeenCalled();
   });
 
   it('senza moderazione, o su un messaggio che non è una domanda: niente', async () => {

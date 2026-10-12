@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Tapahtuma on päättynyt. Alta löydät tilastot ja, jos tapahtuma tallennettiin, tallenteen ja raportin.",
     "endLinks": {
-      "after": "Tallenne ja raportti",
+      "after": "Päätä tapahtuma",
       "stats": "Tapahtuman tilastot",
       "publicPage": "Tapahtuman julkinen sivu"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Käsitellään",
       "statusPartial": "Osittain käsitelty",
       "statusDone": "Käsitelty",
-      "statusFailed": "Käsittely epäonnistui"
+      "statusFailed": "Käsittely epäonnistui",
+      "manageBackToEvent": "Takaisin tapahtumaan"
     },
     "questionnairesPage": {
       "subtitle": "Uudelleenkäytettävät kysymysmallit ennakkoilmoittautumis- ja tapahtuman jälkeisiä kyselyitä varten."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Järjestävät organisaatiot",
       "organizersEdit": "Muokkaa organisaatioita",
       "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää."
+    },
+    "closing": {
+      "title": "Päätä tapahtuma",
+      "intro": "Mitä on vielä tehtävä, jotta poissa olleet löytävät kaiken ja osallistujat voivat kertoa, miten meni.",
+      "summaryTodo": "{count, plural, one {# keskeneräinen tehtävä} other {# keskeneräistä tehtävää}}",
+      "summaryDone": "Kaikki valmista",
+      "loading": "Tarkistetaan, mitä on vielä tehtävä…",
+      "error": "Jäljellä olevia tehtäviä ei voitu lukea: lataa sivu uudelleen.",
+      "stato": {
+        "fatto": "Valmis",
+        "daFare": "Tekemättä",
+        "inCorso": "Käynnissä",
+        "nonServe": "Ei tarvita"
+      },
+      "azioni": {
+        "apri": "Avaa",
+        "rivedi": "Tarkista litterointi",
+        "materiali": "Siirry materiaaleihin"
+      },
+      "registrazione": {
+        "title": "Tallennus",
+        "pubblicata": "Julkaistu.",
+        "daPubblicare": "Video on valmis: julkaise se poissa olleita varten.",
+        "inArrivo": "Jos tapahtuma tallennettiin, tiedosto saapuu muutama minuutti päättymisen jälkeen.",
+        "spenta": "Tallennusta ei ollut suunniteltu.",
+        "nessunFile": "Ei videota: tapahtumaa ei tallennettu tai tiedosto ei saapunut."
+      },
+      "trascrizione": {
+        "title": "Litterointi",
+        "pubblicata": "Julkaistu.",
+        "prontaAi": "Valmis jälkikäsittelystä: tarkista se; se julkaistaan yhdessä videon kanssa.",
+        "prontaSottotitoli": "Valmis tekstityksestä: tarkista nimet ja julkaise se.",
+        "inLavorazione": "Käsittelyssä.",
+        "nessuna": "Ei ole: ei tekstitystä eikä jälkikäsittelyä.",
+        "soloStaff": "Tapahtuman järjestäjä tarkistaa ja julkaisee sen ylläpidossa.",
+        "nonPiu": "Ei voi enää muuttaa: tapahtuma on arkistoitu tai sen tietojen säilytysaika on päättynyt."
+      },
+      "resoconto": {
+        "title": "Raportti",
+        "pubblicato": "Julkaistu.",
+        "daPubblicare": "Luotu: lue se läpi ja julkaise.",
+        "daGenerare": "Luotava litteroinnin, keskustelun ja arvioiden pohjalta.",
+        "inLavorazione": "Käsittelyssä.",
+        "senzaPipeline": "Tekoälyjälkikäsittely ei ole käytössä tässä asennuksessa.",
+        "soloStaff": "Tapahtuman järjestäjä luo ja julkaisee sen ylläpidossa.",
+        "nonPiu": "Ei voi enää muuttaa: tapahtuma on arkistoitu tai sen tietojen säilytysaika on päättynyt."
+      },
+      "sala": {
+        "title": "Mitä huoneessa tapahtui",
+        "rivista": "Viestit: {messaggi} · kysymykset: {domande} · kyselyt: {sondaggi} · Yhdellä sanalla: {nuvole}.",
+        "vuota": "Keskustelua, kysymyksiä, kyselyitä ja sanoja ei käytetty.",
+        "inSospeso": "Vastaamattomat kysymykset: {domandeInSospeso}. Merkitse ne vastatuiksi tai hylkää ne."
+      },
+      "materiali": {
+        "title": "Materiaalit poissa olleille",
+        "presenti": "Näkyvissä tapahtuman jälkeen: {materiali}.",
+        "nessuno": "Mitään ei näy tapahtuman jälkeen: lisää puhujien diat tai asiakirjat, jos niitä on.",
+        "nascosti": "Materiaaleja: {materiali}, mutta julkinen sivu ei näytä materiaaleja: ota ne käyttöön tapahtuman jälkeisen ajan asetuksissa."
+      },
+      "valutazioni": {
+        "title": "Arviot",
+        "emailInviata": "Arvioita pyytävä sähköposti on lähetetty. Vastaukset: {valutazioni}.",
+        "emailInPartenza": "Arvioita pyytävä sähköposti lähtee pian osallistujille. Vastaukset: {valutazioni}.",
+        "emailSpenta": "Arvioita pyytävä sähköposti on pois päältä: sen voi ottaa käyttöön viikon ajan päättymisestä. Vastaukset: {valutazioni}.",
+        "raccolte": "Vastaukset: {valutazioni}.",
+        "spente": "Ei käytössä tässä tapahtumassa."
+      },
+      "pagina": {
+        "title": "Julkinen sivu",
+        "visibile": "Näkyy kaikille.",
+        "nellaLibreria": "Näkyy kaikille ja videokirjastossa.",
+        "privata": "Poistettu näkyvistä: yleisö ei näe sitä.",
+        "scaduta": "Ei enää näkyvissä: vanhentumispäivä on ohitettu.",
+        "archiviato": "Tapahtuma arkistoitu: sivu ei ole julkinen.",
+        "libreriaSenzaVideo": "Näkyy kaikille; se ilmestyy videokirjastoon, kun video julkaistaan."
+      }
+    },
+    "roomReview": {
+      "title": "Mitä huoneessa tapahtui",
+      "intro": "Käy läpi, mitä kirjoitettiin ja kysyttiin: piilota se, minkä ei pidä jäädä näkyviin, sulje kysymykset ja julkaise kyselyjen tulokset. Julkisen sivun yhteenveto päivittyy jokaisen muutoksen myötä.",
+      "tabs": {
+        "chat": "Keskustelu",
+        "qa": "Kysymykset",
+        "polls": "Kyselyt",
+        "words": "Yhdellä sanalla"
+      },
+      "loading": "Ladataan…",
+      "error": "Tätä osaa ei voitu lukea: yritä myöhemmin uudelleen.",
+      "actionError": "Toiminto epäonnistui: yritä uudelleen.",
+      "chat": {
+        "empty": "Ei viestejä.",
+        "limit": "Näytetään viimeiset {count} viestiä.",
+        "question": "Kysymys",
+        "moderator": "Juontaja",
+        "hide": "Piilota",
+        "hideFor": "Piilota viesti, lähettäjä {name}",
+        "hidden": "Viesti piilotettu.",
+        "confirmTitle": "Piilotetaanko viesti?",
+        "confirmBody": "Se poistuu historiasta, viennistä ja yhteenvedosta mahdollisen liitteen kanssa. Toimintoa ei voi kumota."
+      },
+      "qa": {
+        "empty": "Ei kysymyksiä.",
+        "status": {
+          "PENDING": "Odottaa",
+          "HIGHLIGHTED": "Korostettu",
+          "ANSWERED": "Vastattu",
+          "DISMISSED": "Hylätty"
+        },
+        "markAnswered": "Merkitse vastatuksi",
+        "dismiss": "Hylkää",
+        "fromChat": "keskustelusta",
+        "votes": "Ääniä: {count}",
+        "answeredOk": "Kysymys merkitty vastatuksi.",
+        "dismissedOk": "Kysymys hylätty.",
+        "limit": "Näytetään {count} chatissa merkittyä kysymystä: ensin avoimet, sitten viimeksi suljetut."
+      },
+      "polls": {
+        "empty": "Ei kyselyitä.",
+        "status": {
+          "OPEN": "Avoin",
+          "CLOSED": "Suljettu: tulokset eivät ole julkisia",
+          "PUBLISHED": "Tulokset julkaistu"
+        },
+        "votes": "Ääniä: {count}",
+        "publish": "Julkaise tulokset",
+        "published": "Tulokset julkaistu."
+      },
+      "words": {
+        "empty": "Ei sanoja.",
+        "prompt": "Kysymys: {prompt}",
+        "people": "Henkilöitä: {count}",
+        "hide": "Piilota",
+        "hideFor": "Piilota ”{word}”",
+        "hidden": "Sana piilotettu.",
+        "confirmTitle": "Piilotetaanko sana?",
+        "confirmBody": "Se poistuu sanapilvestä ja yhteenvedosta. Toimintoa ei voi kumota.",
+        "round": "Kierros {date}"
+      },
+      "recap": {
+        "button": "Päivitä julkinen yhteenveto",
+        "done": "Julkinen yhteenveto päivitetty.",
+        "notPossible": "Yhteenvetoa ei voi enää päivittää: tapahtuma ei ole päättynyt tai sen tietojen säilytysaika on päättynyt.",
+        "error": "Päivitys epäonnistui: yritä uudelleen."
+      }
     }
   },
   "email": {

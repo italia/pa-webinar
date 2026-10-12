@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Tá an ócáid thart. Thíos gheobhaidh tú na staitisticí agus, má taifeadadh an ócáid, an taifeadadh agus an tuarascáil.",
     "endLinks": {
-      "after": "Taifeadadh agus tuarascáil",
+      "after": "Dún an imeacht",
       "stats": "Staitisticí na hócáide",
       "publicPage": "Leathanach poiblí na hócáide"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Á próiseáil",
       "statusPartial": "Próiseáilte go páirteach",
       "statusDone": "Próiseáilte",
-      "statusFailed": "Theip ar an bpróiseáil"
+      "statusFailed": "Theip ar an bpróiseáil",
+      "manageBackToEvent": "Ar ais chuig an imeacht"
     },
     "questionnairesPage": {
       "subtitle": "Teimpléid in-athúsáidte ceisteanna do cheistneoirí réamhchlárúcháin agus iar-imeachta."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Comhlachtaí eagraithe",
       "organizersEdit": "Cuir na comhlachtaí in eagar",
       "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
+    },
+    "closing": {
+      "title": "Dún an imeacht",
+      "intro": "A bhfuil fágtha le déanamh ionas go bhfaighidh na daoine nach raibh i láthair gach rud, agus go mbeidh na rannpháirtithe in ann a rá conas mar a d’éirigh leis.",
+      "summaryTodo": "{count, plural, one {# tasc le déanamh} two {# thasc le déanamh} few {# thasc le déanamh} many {# dtasc le déanamh} other {# tasc le déanamh}}",
+      "summaryDone": "Gach rud déanta",
+      "loading": "Ag seiceáil a bhfuil fágtha le déanamh…",
+      "error": "Ní féidir a bhfuil fágtha le déanamh a léamh: athlódáil an leathanach.",
+      "stato": {
+        "fatto": "Déanta",
+        "daFare": "Le déanamh",
+        "inCorso": "Ar siúl",
+        "nonServe": "Níl gá leis"
+      },
+      "azioni": {
+        "apri": "Oscail",
+        "rivedi": "Athbhreithnigh an tras-scríbhinn",
+        "materiali": "Téigh chuig na hábhair"
+      },
+      "registrazione": {
+        "title": "Taifeadadh",
+        "pubblicata": "Foilsithe.",
+        "daPubblicare": "Tá an físeán réidh: foilsigh é do na daoine nach raibh i láthair.",
+        "inArrivo": "Má taifeadadh an t-imeacht, beidh an comhad ann cúpla nóiméad tar éis an deiridh.",
+        "spenta": "Ní raibh taifeadadh beartaithe.",
+        "nessunFile": "Níl aon fhíseán ann: níor taifeadadh an t-imeacht, nó níor tháinig an comhad."
+      },
+      "trascrizione": {
+        "title": "Tras-scríbhinn",
+        "pubblicata": "Foilsithe.",
+        "prontaAi": "Réidh ón iarléiriú: athbhreithnigh í; foilseofar í in éineacht leis an bhfíseán.",
+        "prontaSottotitoli": "Réidh ó na fotheidil: seiceáil na hainmneacha agus foilsigh í.",
+        "inLavorazione": "Á próiseáil.",
+        "nessuna": "Níl ceann ann: níl fotheidil ná iarléiriú ann.",
+        "soloStaff": "Is é eagraí an imeachta a athbhreithníonn agus a fhoilsíonn í, ón limistéar riaracháin.",
+        "nonPiu": "Ní féidir í a athrú a thuilleadh: tá an t-imeacht cartlannaithe nó tá a shonraí imithe in éag."
+      },
+      "resoconto": {
+        "title": "Tuarascáil",
+        "pubblicato": "Foilsithe.",
+        "daPubblicare": "Ginte: léigh í agus foilsigh í.",
+        "daGenerare": "Le giniúint, bunaithe ar an tras-scríbhinn, ar an gcomhrá agus ar na meastóireachtaí.",
+        "inLavorazione": "Á próiseáil.",
+        "senzaPipeline": "Níl an t-iarléiriú AI gníomhach ar an suiteáil seo.",
+        "soloStaff": "Is é eagraí an imeachta a ghineann agus a fhoilsíonn í, ón limistéar riaracháin.",
+        "nonPiu": "Ní féidir í a athrú a thuilleadh: tá an t-imeacht cartlannaithe nó tá a shonraí imithe in éag."
+      },
+      "sala": {
+        "title": "Cad a tharla sa seomra",
+        "rivista": "Teachtaireachtaí: {messaggi} · ceisteanna: {domande} · pobalbhreitheanna: {sondaggi} · In aon fhocal amháin: {nuvole}.",
+        "vuota": "Níor úsáideadh an comhrá, na ceisteanna, na pobalbhreitheanna ná na focail.",
+        "inSospeso": "Ceisteanna gan freagra: {domandeInSospeso}. Marcáil iad mar fhreagraithe nó díbh iad."
+      },
+      "materiali": {
+        "title": "Ábhair do na daoine nach raibh i láthair",
+        "presenti": "Le feiceáil tar éis an imeachta: {materiali}.",
+        "nessuno": "Níl aon cheann le feiceáil tar éis an imeachta: cuir sleamhnáin nó doiciméid na gcainteoirí leis, má tá siad ann.",
+        "nascosti": "Ábhair: {materiali}, ach ní thaispeánann an leathanach poiblí na hábhair: cuir ar siúl iad sna socruithe don tréimhse tar éis an imeachta."
+      },
+      "valutazioni": {
+        "title": "Meastóireachtaí",
+        "emailInviata": "Seoladh an ríomhphost ag iarraidh meastóireachtaí. Freagraí: {valutazioni}.",
+        "emailInPartenza": "Seolfar an ríomhphost ag iarraidh meastóireachtaí chuig na rannpháirtithe go luath. Freagraí: {valutazioni}.",
+        "emailSpenta": "Tá an ríomhphost ag iarraidh meastóireachtaí múchta: is féidir é a chasadh air suas le seachtain tar éis an deiridh. Freagraí: {valutazioni}.",
+        "raccolte": "Freagraí: {valutazioni}.",
+        "spente": "Níl siad gníomhach don imeacht seo."
+      },
+      "pagina": {
+        "title": "Leathanach poiblí",
+        "visibile": "Le feiceáil ag cách.",
+        "nellaLibreria": "Le feiceáil ag cách agus sa leabharlann físeán.",
+        "privata": "Tarraingthe siar: ní fheiceann an pobal é.",
+        "scaduta": "Níl sé le feiceáil a thuilleadh: tá an dáta éagtha caite.",
+        "archiviato": "Imeacht cartlannaithe: níl an leathanach poiblí.",
+        "libreriaSenzaVideo": "Le feiceáil ag cách; taispeánfar é sa leabharlann físeán nuair a fhoilseofar an físeán."
+      }
+    },
+    "roomReview": {
+      "title": "Cad a tharla sa seomra",
+      "intro": "Athbhreithnigh an méid a scríobhadh agus a fiafraíodh: folaigh an méid nár cheart a fhágáil, dún na ceisteanna, foilsigh torthaí na bpobalbhreitheanna. Nuashonraítear an achoimre ar an leathanach poiblí le gach athrú.",
+      "tabs": {
+        "chat": "Comhrá",
+        "qa": "Ceisteanna",
+        "polls": "Pobalbhreitheanna",
+        "words": "In aon fhocal amháin"
+      },
+      "loading": "Ag lódáil…",
+      "error": "Ní féidir an chuid seo a léamh: bain triail eile as ar ball.",
+      "actionError": "Theip ar an ngníomh: bain triail eile as.",
+      "chat": {
+        "empty": "Gan teachtaireachtaí.",
+        "limit": "Taispeántar na {count} teachtaireacht is déanaí.",
+        "question": "Ceist",
+        "moderator": "Óstach",
+        "hide": "Folaigh",
+        "hideFor": "Folaigh an teachtaireacht ó {name}",
+        "hidden": "Teachtaireacht folaithe.",
+        "confirmTitle": "An bhfolófar an teachtaireacht?",
+        "confirmBody": "Imeoidh sí as an stair, as an easpórtáil agus as an achoimre, mar aon le haon cheangaltán. Ní féidir é seo a chealú."
+      },
+      "qa": {
+        "empty": "Gan ceisteanna.",
+        "status": {
+          "PENDING": "Ar feitheamh",
+          "HIGHLIGHTED": "Aibhsithe",
+          "ANSWERED": "Freagartha",
+          "DISMISSED": "Diúltaithe"
+        },
+        "markAnswered": "Marcáil mar fhreagartha",
+        "dismiss": "Diúltaigh",
+        "fromChat": "ón gcomhrá",
+        "votes": "Vótaí: {count}",
+        "answeredOk": "Marcáladh an cheist mar fhreagartha.",
+        "dismissedOk": "Diúltaíodh an cheist.",
+        "limit": "Ag taispeáint {count} ceist a marcáladh sa chomhrá: na cinn oscailte ar dtús, ansin na cinn dúnta is déanaí."
+      },
+      "polls": {
+        "empty": "Gan pobalbhreitheanna.",
+        "status": {
+          "OPEN": "Oscailte",
+          "CLOSED": "Dúnta: níl na torthaí poiblí",
+          "PUBLISHED": "Torthaí foilsithe"
+        },
+        "votes": "Vótaí: {count}",
+        "publish": "Foilsigh na torthaí",
+        "published": "Torthaí foilsithe."
+      },
+      "words": {
+        "empty": "Gan focail.",
+        "prompt": "Ceist: {prompt}",
+        "people": "Daoine: {count}",
+        "hide": "Folaigh",
+        "hideFor": "Folaigh “{word}”",
+        "hidden": "Focal folaithe.",
+        "confirmTitle": "An bhfolófar an focal?",
+        "confirmBody": "Imeoidh sé as an scamall agus as an achoimre. Ní féidir é seo a chealú.",
+        "round": "Babhta: {date}"
+      },
+      "recap": {
+        "button": "Nuashonraigh an achoimre phoiblí",
+        "done": "Nuashonraíodh an achoimre phoiblí.",
+        "notPossible": "Ní féidir an achoimre a nuashonrú a thuilleadh: níl an t-imeacht thart nó tá a shonraí imithe in éag.",
+        "error": "Theip ar an nuashonrú: bain triail eile as."
+      }
     }
   },
   "email": {

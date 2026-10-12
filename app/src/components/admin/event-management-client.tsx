@@ -61,6 +61,8 @@ import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CaptionsTranscriptPanel from './captions-transcript-panel';
 import EventReportPanel from './event-report-panel';
+import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklist';
+import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -768,6 +770,7 @@ export default function EventManagementClient({
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
               <PostEventTab event={event} status={status} viaToken={viaToken}
+                            onMateriali={() => scegliScheda('contenuti')}
                             paginaPostEvento={paginaPostEvento}
                             onPaginaPostEvento={(patch) =>
                               setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
@@ -1514,8 +1517,9 @@ function ContentTab({ event, staffTools }: { event: EventData; staffTools: boole
   );
 }
 
-function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken }: {
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken, onMateriali }: {
   event: EventData; status: string; viaToken: string | null;
+  onMateriali: () => void;
   paginaPostEvento: PostEventVisibility;
   onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
 }) {
@@ -1525,6 +1529,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tg = useTranslations('admin.glossary');
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
+  const trr = useTranslations('admin.roomReview');
   const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
@@ -1584,7 +1589,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   // evento concluso e' la prima cosa da fare, e sta in cima.
   const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
   const bloccoRegistrazione = (
-      <div className="mb-4">
+      <div className="mb-4" id={ANCORE_CHIUSURA.registrazione} tabIndex={-1}>
         <H>{td('recordingSection')}</H>
         <RecordingManagement
           event={{
@@ -1606,11 +1611,21 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
 
   return (
     <>
+      {/* In cima, a evento finito: cosa resta da fare, voce per voce, con il
+          pulsante che porta alla parte qui sotto dove la si fa. */}
+      {isEnded && (
+        <EventClosingChecklist
+          eventId={event.id}
+          token={viaToken}
+          conTrascrizioneDaiSottotitoli={event.captionsTranscriptEnabled}
+          onMateriali={onMateriali}
+        />
+      )}
       {registrazioneInCima && bloccoRegistrazione}
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
-      <div>
+      <div id={ANCORE_CHIUSURA.pagina} tabIndex={-1}>
         <H>{td('postEventTitle')}</H>
         {/* I valori correnti, non quelli del caricamento: la scheda si
             rimonta ogni volta che la si riapre. */}
@@ -1638,9 +1653,23 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         />
       </div>
 
+      {/* Cosa e' successo in sala, da rivedere a evento finito: subito dopo
+          le regole su cosa la pagina pubblica mostra. */}
+      {isEnded && (
+        <div className="mb-4" id={ANCORE_CHIUSURA.sala} tabIndex={-1}>
+          <H>{trr('title')}</H>
+          <EventRoomReview
+            eventId={event.id}
+            slug={event.slug}
+            token={event.moderatorToken}
+            concluso={status === 'ENDED'}
+          />
+        </div>
+      )}
+
       {/* Le valutazioni di chi ha partecipato, subito sotto le regole che le
           raccolgono e le pubblicano. */}
-      <div className="mb-4">
+      <div className="mb-4" id={ANCORE_CHIUSURA.valutazioni} tabIndex={-1}>
         <H>{tfb('title')}</H>
         <EventFeedbackPanel eventId={event.id} token={viaToken} />
       </div>
@@ -1649,7 +1678,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           Lo chiede lo staff (accende il modello linguistico), non chi arriva
           con il link del moderatore. */}
       {!viaToken && (
-        <div className="mb-4">
+        <div className="mb-4" id={ANCORE_CHIUSURA.resoconto} tabIndex={-1}>
           <H>{trp('title')}</H>
           <EventReportPanel eventId={event.id} locale={locale} />
         </div>
@@ -1659,6 +1688,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           trascrizione (testo + diarization), sintesi, traduzioni.
           È il collegamento che mancava fra evento e post-produzione. */}
       <div
+        id={ANCORE_CHIUSURA.ai}
+        tabIndex={-1}
         className="mb-4 p-4"
         style={{
           border: `1px solid ${C_PRIMARY}33`,
@@ -1716,7 +1747,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
       {/* La trascrizione dai sottotitoli live, se l'evento la tiene: si legge
           e si pubblica anche senza video e senza pipeline AI. */}
       {event.captionsTranscriptEnabled && (
-        <div className="mb-4">
+        <div className="mb-4" id={ANCORE_CHIUSURA.trascrizione} tabIndex={-1}>
           <H>{tct('title')}</H>
           <CaptionsTranscriptPanel
             eventId={event.id}

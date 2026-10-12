@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Pasākums ir beidzies. Zemāk atradīsiet statistiku un, ja pasākums tika ierakstīts, ierakstu un pārskatu.",
     "endLinks": {
-      "after": "Ieraksts un pārskats",
+      "after": "Noslēgt pasākumu",
       "stats": "Pasākuma statistika",
       "publicPage": "Pasākuma publiskā lapa"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "Tiek apstrādāts",
       "statusPartial": "Daļēji apstrādāts",
       "statusDone": "Apstrādāts",
-      "statusFailed": "Apstrāde neizdevās"
+      "statusFailed": "Apstrāde neizdevās",
+      "manageBackToEvent": "Atpakaļ uz pasākumu"
     },
     "questionnairesPage": {
       "subtitle": "Atkārtoti izmantojamas jautājumu veidnes pirmsreģistrācijas un pēcpasākuma anketām."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Rīkotājiestādes",
       "organizersEdit": "Rediģēt iestādes",
       "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko."
+    },
+    "closing": {
+      "title": "Noslēgt pasākumu",
+      "intro": "Kas vēl jāizdara, lai tie, kas nepiedalījās, atrastu visu, un dalībnieki varētu pastāstīt, kā gāja.",
+      "summaryTodo": "{count, plural, zero {# nepabeigtu uzdevumu} one {# nepabeigts uzdevums} other {# nepabeigti uzdevumi}}",
+      "summaryDone": "Viss izdarīts",
+      "loading": "Notiek pārbaude, kas vēl jāizdara…",
+      "error": "Neizdevās nolasīt, kas vēl jāizdara: pārlādējiet lapu.",
+      "stato": {
+        "fatto": "Izdarīts",
+        "daFare": "Jāizdara",
+        "inCorso": "Notiek",
+        "nonServe": "Nav vajadzīgs"
+      },
+      "azioni": {
+        "apri": "Atvērt",
+        "rivedi": "Pārskatīt atšifrējumu",
+        "materiali": "Doties uz materiāliem"
+      },
+      "registrazione": {
+        "title": "Ieraksts",
+        "pubblicata": "Publicēts.",
+        "daPubblicare": "Video ir gatavs: publicējiet to tiem, kas nepiedalījās.",
+        "inArrivo": "Ja pasākums tika ierakstīts, fails pienāks dažas minūtes pēc beigām.",
+        "spenta": "Ierakstīšana nebija paredzēta.",
+        "nessunFile": "Nav video: pasākums netika ierakstīts vai fails nepienāca."
+      },
+      "trascrizione": {
+        "title": "Atšifrējums",
+        "pubblicata": "Publicēts.",
+        "prontaAi": "Gatavs no pēcapstrādes: pārskatiet to; tas tiek publicēts kopā ar video.",
+        "prontaSottotitoli": "Gatavs no subtitriem: pārbaudiet vārdus un publicējiet to.",
+        "inLavorazione": "Tiek apstrādāts.",
+        "nessuna": "Nav: nav ne subtitru, ne pēcapstrādes.",
+        "soloStaff": "To pārskata un publicē pasākuma organizators administrēšanas sadaļā.",
+        "nonPiu": "Vairs nevar mainīt: pasākums ir arhivēts vai ir beidzies tā datu glabāšanas termiņš."
+      },
+      "resoconto": {
+        "title": "Pārskats",
+        "pubblicato": "Publicēts.",
+        "daPubblicare": "Izveidots: izlasiet un publicējiet to.",
+        "daGenerare": "Jāizveido no atšifrējuma, tērzēšanas un vērtējumiem.",
+        "inLavorazione": "Tiek apstrādāts.",
+        "senzaPipeline": "MI pēcapstrāde šajā instalācijā nav aktīva.",
+        "soloStaff": "To izveido un publicē pasākuma organizators administrēšanas sadaļā.",
+        "nonPiu": "Vairs nevar mainīt: pasākums ir arhivēts vai ir beidzies tā datu glabāšanas termiņš."
+      },
+      "sala": {
+        "title": "Kas notika telpā",
+        "rivista": "Ziņas: {messaggi} · jautājumi: {domande} · aptaujas: {sondaggi} · Vienā vārdā: {nuvole}.",
+        "vuota": "Tērzēšana, jautājumi, aptaujas un vārdi netika izmantoti.",
+        "inSospeso": "Neatbildēti jautājumi: {domandeInSospeso}. Atzīmējiet tos kā atbildētus vai noraidiet."
+      },
+      "materiali": {
+        "title": "Materiāli tiem, kas nepiedalījās",
+        "presenti": "Redzami pēc pasākuma: {materiali}.",
+        "nessuno": "Pēc pasākuma nekas nav redzams: pievienojiet runātāju slaidus vai dokumentus, ja tādi ir.",
+        "nascosti": "Materiāli: {materiali}, taču publiskajā lapā materiāli netiek rādīti: ieslēdziet tos iestatījumos periodam pēc pasākuma."
+      },
+      "valutazioni": {
+        "title": "Vērtējumi",
+        "emailInviata": "E-pasts ar lūgumu novērtēt ir nosūtīts. Atbildes: {valutazioni}.",
+        "emailInPartenza": "E-pasts ar lūgumu novērtēt drīz tiks nosūtīts dalībniekiem. Atbildes: {valutazioni}.",
+        "emailSpenta": "E-pasts ar lūgumu novērtēt ir izslēgts: to var ieslēgt līdz nedēļai pēc beigām. Atbildes: {valutazioni}.",
+        "raccolte": "Atbildes: {valutazioni}.",
+        "spente": "Šim pasākumam nav aktīvi."
+      },
+      "pagina": {
+        "title": "Publiskā lapa",
+        "visibile": "Redzama visiem.",
+        "nellaLibreria": "Redzama visiem un video bibliotēkā.",
+        "privata": "Atsaukta: sabiedrība to neredz.",
+        "scaduta": "Vairs nav redzama: derīguma termiņš ir beidzies.",
+        "archiviato": "Pasākums arhivēts: lapa nav publiska.",
+        "libreriaSenzaVideo": "Redzama visiem; video bibliotēkā tā parādīsies, kad video tiks publicēts."
+      }
+    },
+    "roomReview": {
+      "title": "Kas notika telpā",
+      "intro": "Pārskatiet, kas tika rakstīts un jautāts: paslēpiet to, kam nav jāpaliek, slēdziet jautājumus, publicējiet aptauju rezultātus. Publiskās lapas pārskats tiek atjaunināts ar katru izmaiņu.",
+      "tabs": {
+        "chat": "Tērzēšana",
+        "qa": "Jautājumi",
+        "polls": "Aptaujas",
+        "words": "Vienā vārdā"
+      },
+      "loading": "Ielādē…",
+      "error": "Neizdevās nolasīt šo daļu: mēģiniet vēlāk vēlreiz.",
+      "actionError": "Darbība neizdevās: mēģiniet vēlreiz.",
+      "chat": {
+        "empty": "Nav ziņu.",
+        "limit": "Redzamas pēdējās {count} ziņas.",
+        "question": "Jautājums",
+        "moderator": "Vadītājs",
+        "hide": "Paslēpt",
+        "hideFor": "Paslēpt dalībnieka {name} ziņu",
+        "hidden": "Ziņa paslēpta.",
+        "confirmTitle": "Paslēpt ziņu?",
+        "confirmBody": "Tā pazūd no vēstures, eksporta un pārskata kopā ar iespējamo pielikumu. Šo darbību nevar atsaukt."
+      },
+      "qa": {
+        "empty": "Nav jautājumu.",
+        "status": {
+          "PENDING": "Gaida",
+          "HIGHLIGHTED": "Izcelts",
+          "ANSWERED": "Atbildēts",
+          "DISMISSED": "Noraidīts"
+        },
+        "markAnswered": "Atzīmēt kā atbildētu",
+        "dismiss": "Noraidīt",
+        "fromChat": "no tērzēšanas",
+        "votes": "Balsis: {count}",
+        "answeredOk": "Jautājums atzīmēts kā atbildēts.",
+        "dismissedOk": "Jautājums noraidīts.",
+        "limit": "Tiek rādīti {count} tērzēšanā atzīmēti jautājumi: vispirms atvērtie, tad nesen slēgtie."
+      },
+      "polls": {
+        "empty": "Nav aptauju.",
+        "status": {
+          "OPEN": "Atvērta",
+          "CLOSED": "Slēgta: rezultāti nav publiski",
+          "PUBLISHED": "Rezultāti publicēti"
+        },
+        "votes": "Balsis: {count}",
+        "publish": "Publicēt rezultātus",
+        "published": "Rezultāti publicēti."
+      },
+      "words": {
+        "empty": "Nav vārdu.",
+        "prompt": "Jautājums: {prompt}",
+        "people": "Personu skaits: {count}",
+        "hide": "Paslēpt",
+        "hideFor": "Paslēpt “{word}”",
+        "hidden": "Vārds paslēpts.",
+        "confirmTitle": "Paslēpt vārdu?",
+        "confirmBody": "Tas pazūd no mākoņa un pārskata. Šo darbību nevar atsaukt.",
+        "round": "Kārta: {date}"
+      },
+      "recap": {
+        "button": "Atjaunināt publisko pārskatu",
+        "done": "Publiskais pārskats atjaunināts.",
+        "notPossible": "Pārskatu vairs nevar atjaunināt: pasākums nav beidzies vai ir beidzies tā datu glabāšanas termiņš.",
+        "error": "Atjaunināšana neizdevās: mēģiniet vēlreiz."
+      }
     }
   },
   "email": {

@@ -163,7 +163,7 @@ export type EsitoTrascrizione =
   | { stato: 'gia-trascritta'; recordingId: string };
 
 /** I lavori della pipeline che scrivono una trascrizione AI su una registrazione. */
-const TRASCRIZIONE_AI_IN_CORSO = {
+export const TRASCRIZIONE_AI_IN_CORSO = {
   kind: { in: ['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK'] },
   status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
   NOT: { idempotencyKey: { startsWith: 'captions-transcript:' } },

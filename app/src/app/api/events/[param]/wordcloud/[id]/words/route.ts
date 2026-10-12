@@ -12,6 +12,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { extractModeratorToken, isEventModerator } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction } from '@/lib/live/actions';
 import { normalizeWord } from '@/lib/wordcloud/normalize';
@@ -73,6 +74,8 @@ export const DELETE = withErrorHandling(async (request, context) => {
       actor: 'moderator',
       data: { roundId: round.id, hidden: tolte.count },
     });
+    // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+    await rifaiRiepilogo(event.id, event.status);
   }
 
   return Response.json({ word: parola, hidden: tolte.count });

@@ -18,6 +18,8 @@ import useSWR from 'swr';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { eventAdminPath } from '@/lib/events/admin-links';
+import { isUuid } from '@/lib/events/event-param';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
@@ -174,11 +176,23 @@ export default function PostprodDashboard() {
 
   const qs = new URLSearchParams();
   if (statusFilter) qs.set('status', statusFilter);
+  // Arrivando da un evento si cercano le sue registrazioni sul server: fra
+  // le prime righe dell'elenco generale potrebbero non esserci. Se l'evento
+  // non ne ha, si torna all'elenco di tutte.
+  const [senzaFiltro, setSenzaFiltro] = useState(false);
+  const filtroEvento = deepEventId && isUuid(deepEventId) && !senzaFiltro ? deepEventId : null;
+  if (filtroEvento) qs.set('eventId', filtroEvento);
   const { data, error, isLoading, mutate } = useSWR<ListResponse>(
     `/api/admin/postprod?${qs.toString()}`,
     fetcher as (url: string) => Promise<ListResponse>,
     { refreshInterval: 10_000 },
   );
+
+  // Se la lettura filtrata non e' mai riuscita si torna all'elenco di tutte;
+  // un errore di una rilettura successiva non cambia cosa si sta guardando.
+  useEffect(() => {
+    if (error && !data && filtroEvento) setSenzaFiltro(true);
+  }, [error, data, filtroEvento]);
 
   useEffect(() => {
     if (deepLinkApplied.current || !data) return;
@@ -186,14 +200,26 @@ export default function PostprodDashboard() {
     const match = data.rows.find(
       (r) => r.id === deepRecordingId || r.eventId === deepEventId,
     );
+    if (!match && filtroEvento && data.rows.length === 0) {
+      deepLinkApplied.current = true;
+      setSenzaFiltro(true);
+      return;
+    }
+    // Da un evento con piu' registrazioni si resta sull'elenco filtrato: si
+    // sceglie quale aprire, invece di finire sempre sulla piu' recente.
+    if (match && !deepRecordingId && filtroEvento && data.rows.length > 1) {
+      deepLinkApplied.current = true;
+      return;
+    }
     if (match) {
       deepLinkApplied.current = true;
       // Deep-link da registrazioni/evento → pagina di gestione completa
       // del video (trascrizione + sintesi + traduzioni), non l'editor
-      // inline cramped della lista.
-      router.push(percorso(`/admin/postprod/${match.id}`));
+      // inline cramped della lista. Sostituisce la voce della cronologia:
+      // «Indietro» non deve riportare qui e rimandare avanti.
+      router.replace(percorso(`/admin/postprod/${match.id}`));
     }
-  }, [data, deepRecordingId, deepEventId, router]);
+  }, [data, deepRecordingId, deepEventId, filtroEvento, router]);
 
   async function rerun(recordingId: string): Promise<void> {
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
@@ -281,6 +307,18 @@ export default function PostprodDashboard() {
           {data ? t('totalRows', { count: data.total }) : isLoading ? '…' : ''}
         </div>
       </div>
+      {/* Arrivando da un evento con piu' registrazioni l'elenco e' filtrato:
+          lo si dice, e si torna a tutte con un clic. */}
+      {filtroEvento && data && data.rows.length > 0 && (
+        <div className="d-flex flex-wrap align-items-center gap-2 mb-3 small">
+          <span>
+            {t('colEvent')}: <strong>{data.rows[0]!.eventTitle}</strong>
+          </span>
+          <button type="button" className="btn btn-link btn-sm p-0" onClick={() => setSenzaFiltro(true)}>
+            {t('all')}
+          </button>
+        </div>
+      )}
 
       {/* Al telefono la tabella scorre: anche da tastiera. */}
       <div className="table-responsive" tabIndex={0} role="group" aria-label={tNav('recordingsPostprod')}>
@@ -308,8 +346,18 @@ export default function PostprodDashboard() {
                     style={{ cursor: 'pointer' }}
                   >
                     <td>
-                      <div className="fw-semibold">{row.eventTitle}</div>
-                      <code className="small text-muted">{row.eventSlug}</code>
+                      {/* Il titolo porta all'evento, sulla scheda «Dopo l'evento»;
+                          il resto della riga apre il dettaglio qui. */}
+                      <Link
+                        href={percorso(eventAdminPath(row.eventId, { tab: 'dopo' }))}
+                        className="fw-semibold d-inline-block"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {row.eventTitle}
+                      </Link>
+                      <div>
+                        <code className="small text-muted">{row.eventSlug}</code>
+                      </div>
                     </td>
                     <td>{format.dateTime(new Date(row.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
                     <td>{formatDuration(row.durationSec)}</td>

@@ -9,6 +9,7 @@ import {
 } from '@/lib/errors';
 import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction } from '@/lib/live/actions';
 import { updateQuestionSchema } from '@/lib/validation/schemas';
@@ -91,6 +92,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
       actor: 'moderator',
       data: { questionId: updated.id, status: updated.status, answered: !!answerText },
     });
+    // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+    await rifaiRiepilogo(event.id, event.status);
   }
 
   return Response.json({

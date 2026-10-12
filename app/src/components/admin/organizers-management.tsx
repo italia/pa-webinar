@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { Button, FormGroup, Input, Label } from 'design-react-kit';
+import { Button } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
@@ -163,72 +163,72 @@ export default function OrganizersManagement() {
         <h2 id="org-nuovo" className="h5 mb-3">
           {t('newTitle')}
         </h2>
-        <form
-          onSubmit={crea}
-          className="row g-3 align-items-end"
-          style={{ maxWidth: 860 }}
-        >
-          <FormGroup className="col-md-3 mb-0">
-            <Label htmlFor="org-nome">{t('name')}</Label>
-            <Input
-              id="org-nome"
-              value={nome}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNome(e.target.value)
-              }
-              required
-              minLength={2}
-            />
-          </FormGroup>
-          <FormGroup className="col-md-3 mb-0">
-            <Label htmlFor="org-email">{t('email')}</Label>
-            <Input
-              id="org-email"
-              type="email"
-              value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              required
-            />
-          </FormGroup>
-          <div className="col-md-3">
-            <label htmlFor="org-ruolo" className="form-label">
-              {t('role')}
-            </label>
-            <select
-              id="org-ruolo"
-              className="form-select"
-              value={ruolo}
-              onChange={(e) => setRuolo(e.target.value as Ruolo)}
-              aria-describedby="org-ruolo-aiuto"
-            >
-              <option value="ORGANIZER">{t('roleOrganizer')}</option>
-              <option value="ADMIN">{t('roleAdmin')}</option>
-            </select>
-          </div>
-          <div className="col-md-3">
-            <Button type="submit" color="primary" className="w-100" disabled={salvando}>
-              {t('add')}
-            </Button>
-          </div>
-          <div className="col-12">
-            <p id="org-ruolo-aiuto" className="form-text mt-0 mb-2">
-              {t('roleHelp')}
-            </p>
-            <div className="form-check">
-              <input
-                id="org-invita"
-                type="checkbox"
-                className="form-check-input"
-                checked={invita}
-                onChange={(e) => setInvita(e.target.checked)}
-              />
-              <label htmlFor="org-invita" className="form-check-label">
-                {t('sendNow')}
+        {/* Tre campi dello stesso tipo sulla stessa riga, e sotto l'aiuto sul
+            ruolo, l'invio del link e il pulsante: con i campi del kit e un
+            menu semplice affiancati, etichette e altezze non combaciavano. */}
+        <form onSubmit={crea} style={{ maxWidth: 860 }}>
+          <div className="row g-3">
+            <div className="col-md-4">
+              <label htmlFor="org-nome" className="form-label">
+                {t('name')}
               </label>
+              <input
+                id="org-nome"
+                className="form-control"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+                minLength={2}
+                autoComplete="name"
+              />
+            </div>
+            <div className="col-md-4">
+              <label htmlFor="org-email" className="form-label">
+                {t('email')}
+              </label>
+              <input
+                id="org-email"
+                type="email"
+                className="form-control"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </div>
+            <div className="col-md-4">
+              <label htmlFor="org-ruolo" className="form-label">
+                {t('role')}
+              </label>
+              <select
+                id="org-ruolo"
+                className="form-select"
+                value={ruolo}
+                onChange={(e) => setRuolo(e.target.value as Ruolo)}
+                aria-describedby="org-ruolo-aiuto"
+              >
+                <option value="ORGANIZER">{t('roleOrganizer')}</option>
+                <option value="ADMIN">{t('roleAdmin')}</option>
+              </select>
             </div>
           </div>
+          <p id="org-ruolo-aiuto" className="form-text mt-2 mb-3">
+            {t('roleHelp')}
+          </p>
+          {/* L'opzione prima del pulsante: cambia cosa fa l'invio, e chi
+              usa la tastiera deve incontrarla prima di inviare. */}
+          <div className="form-check mt-0 mb-3">
+            <input
+              id="org-invita"
+              type="checkbox"
+              checked={invita}
+              onChange={(e) => setInvita(e.target.checked)}
+            />
+            <label htmlFor="org-invita">{t('sendNow')}</label>
+          </div>
+          <Button type="submit" color="primary" disabled={salvando}>
+            {t('add')}
+          </Button>
         </form>
       </section>
 

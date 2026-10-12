@@ -606,7 +606,7 @@
     },
     "eventEndedModerator": "Događaj je završio. Ispod ćete pronaći statistiku i, ako je snimljen, snimku i izvješće.",
     "endLinks": {
-      "after": "Snimka i izvješće",
+      "after": "Zatvori događaj",
       "stats": "Statistika događaja",
       "publicPage": "Javna stranica događaja"
     },
@@ -2969,7 +2969,8 @@
       "statusRunning": "U obradi",
       "statusPartial": "Djelomično obrađeno",
       "statusDone": "Obrađeno",
-      "statusFailed": "Obrada nije uspjela"
+      "statusFailed": "Obrada nije uspjela",
+      "manageBackToEvent": "Natrag na događaj"
     },
     "questionnairesPage": {
       "subtitle": "Ponovno upotrebljivi predlošci pitanja za upitnike prije prijave i nakon događaja."
@@ -3287,6 +3288,150 @@
       "organizersTitle": "Ustanove organizatori",
       "organizersEdit": "Uredi ustanove",
       "organizersEmpty": "Nije navedena nijedna ustanova: javna stranica ne prikazuje tko organizira."
+    },
+    "closing": {
+      "title": "Zatvori događaj",
+      "intro": "Što je još preostalo učiniti kako bi oni koji nisu bili prisutni sve pronašli, a sudionici mogli reći kako je prošlo.",
+      "summaryTodo": "{count, plural, one {# preostali zadatak} few {# preostala zadatka} other {# preostalih zadataka}}",
+      "summaryDone": "Sve je gotovo",
+      "loading": "Provjera što je još preostalo…",
+      "error": "Nije moguće pročitati što je preostalo: ponovno učitajte stranicu.",
+      "stato": {
+        "fatto": "Gotovo",
+        "daFare": "Treba obaviti",
+        "inCorso": "U tijeku",
+        "nonServe": "Nije potrebno"
+      },
+      "azioni": {
+        "apri": "Otvori",
+        "rivedi": "Pregledaj transkript",
+        "materiali": "Idi na materijale"
+      },
+      "registrazione": {
+        "title": "Snimka",
+        "pubblicata": "Objavljena.",
+        "daPubblicare": "Videozapis je spreman: objavite ga za one koji nisu bili prisutni.",
+        "inArrivo": "Ako je događaj snimljen, datoteka stiže nekoliko minuta nakon završetka.",
+        "spenta": "Snimanje nije bilo predviđeno.",
+        "nessunFile": "Nema videozapisa: događaj nije snimljen ili datoteka nije stigla."
+      },
+      "trascrizione": {
+        "title": "Transkript",
+        "pubblicata": "Objavljen.",
+        "prontaAi": "Spreman iz postprodukcije: pregledajte ga; objavljuje se zajedno s videozapisom.",
+        "prontaSottotitoli": "Spreman iz titlova: provjerite imena i objavite ga.",
+        "inLavorazione": "U obradi.",
+        "nessuna": "Nema ga: nema ni titlova ni postprodukcije.",
+        "soloStaff": "Pregledava ga i objavljuje organizator događaja u administraciji.",
+        "nonPiu": "Više se ne može mijenjati: događaj je arhiviran ili je istekao rok čuvanja njegovih podataka."
+      },
+      "resoconto": {
+        "title": "Izvješće",
+        "pubblicato": "Objavljeno.",
+        "daPubblicare": "Generirano: pročitajte ga i objavite.",
+        "daGenerare": "Treba ga generirati iz transkripta, chata i ocjena.",
+        "inLavorazione": "U obradi.",
+        "senzaPipeline": "AI postprodukcija nije aktivna na ovoj instalaciji.",
+        "soloStaff": "Generira ga i objavljuje organizator događaja u administraciji.",
+        "nonPiu": "Više se ne može mijenjati: događaj je arhiviran ili je istekao rok čuvanja njegovih podataka."
+      },
+      "sala": {
+        "title": "Što se događalo u sobi",
+        "rivista": "Poruke: {messaggi} · pitanja: {domande} · ankete: {sondaggi} · Jednom riječju: {nuvole}.",
+        "vuota": "Chat, pitanja, ankete i riječi nisu korišteni.",
+        "inSospeso": "Pitanja bez odgovora: {domandeInSospeso}. Označite ih kao odgovorena ili ih odbacite."
+      },
+      "materiali": {
+        "title": "Materijali za one koji nisu bili prisutni",
+        "presenti": "Vidljivo nakon događaja: {materiali}.",
+        "nessuno": "Ništa nije vidljivo nakon događaja: dodajte slajdove ili dokumente govornika, ako postoje.",
+        "nascosti": "Materijali: {materiali}, ali javna stranica ne prikazuje materijale: uključite ih u postavkama za razdoblje nakon događaja."
+      },
+      "valutazioni": {
+        "title": "Ocjene",
+        "emailInviata": "E-poruka s molbom za ocjenu je poslana. Odgovori: {valutazioni}.",
+        "emailInPartenza": "E-poruka s molbom za ocjenu uskoro odlazi sudionicima. Odgovori: {valutazioni}.",
+        "emailSpenta": "E-poruka s molbom za ocjenu je isključena: može se uključiti do tjedan dana nakon završetka. Odgovori: {valutazioni}.",
+        "raccolte": "Odgovori: {valutazioni}.",
+        "spente": "Nisu aktivne za ovaj događaj."
+      },
+      "pagina": {
+        "title": "Javna stranica",
+        "visibile": "Vidljiva svima.",
+        "nellaLibreria": "Vidljiva svima i u videoteci.",
+        "privata": "Povučena: javnost je ne vidi.",
+        "scaduta": "Više nije vidljiva: datum isteka je prošao.",
+        "archiviato": "Događaj arhiviran: stranica nije javna.",
+        "libreriaSenzaVideo": "Vidljiva svima; u videoteci će se pojaviti kada videozapis bude objavljen."
+      }
+    },
+    "roomReview": {
+      "title": "Što se događalo u sobi",
+      "intro": "Pregledajte što je napisano i pitano: sakrijte ono što ne treba ostati, zatvorite pitanja, objavite rezultate anketa. Sažetak na javnoj stranici ažurira se sa svakom promjenom.",
+      "tabs": {
+        "chat": "Razgovor",
+        "qa": "Pitanja",
+        "polls": "Ankete",
+        "words": "Jednom riječju"
+      },
+      "loading": "Učitavanje…",
+      "error": "Ovaj dio nije moguće pročitati: pokušajte ponovno kasnije.",
+      "actionError": "Radnja nije uspjela: pokušajte ponovno.",
+      "chat": {
+        "empty": "Nema poruka.",
+        "limit": "Prikazuje se zadnjih {count} poruka.",
+        "question": "Pitanje",
+        "moderator": "Moderiranje",
+        "hide": "Sakrij",
+        "hideFor": "Sakrij poruku od {name}",
+        "hidden": "Poruka je sakrivena.",
+        "confirmTitle": "Sakriti poruku?",
+        "confirmBody": "Nestaje iz povijesti, izvoza i sažetka, zajedno s eventualnim privitkom. Radnja se ne može poništiti."
+      },
+      "qa": {
+        "empty": "Nema pitanja.",
+        "status": {
+          "PENDING": "Na čekanju",
+          "HIGHLIGHTED": "Istaknuto",
+          "ANSWERED": "Odgovoreno",
+          "DISMISSED": "Odbačeno"
+        },
+        "markAnswered": "Označi kao odgovoreno",
+        "dismiss": "Odbaci",
+        "fromChat": "iz razgovora",
+        "votes": "Glasovi: {count}",
+        "answeredOk": "Pitanje je označeno kao odgovoreno.",
+        "dismissedOk": "Pitanje je odbačeno.",
+        "limit": "Prikazuje se {count} pitanja označenih u chatu: najprije otvorena, zatim najnovija zatvorena."
+      },
+      "polls": {
+        "empty": "Nema anketa.",
+        "status": {
+          "OPEN": "Otvoreno",
+          "CLOSED": "Zatvoreno: rezultati nisu javni",
+          "PUBLISHED": "Rezultati objavljeni"
+        },
+        "votes": "Glasovi: {count}",
+        "publish": "Objavi rezultate",
+        "published": "Rezultati su objavljeni."
+      },
+      "words": {
+        "empty": "Nema riječi.",
+        "prompt": "Pitanje: {prompt}",
+        "people": "Broj osoba: {count}",
+        "hide": "Sakrij",
+        "hideFor": "Sakrij „{word}”",
+        "hidden": "Riječ je sakrivena.",
+        "confirmTitle": "Sakriti riječ?",
+        "confirmBody": "Nestaje iz oblaka i sažetka. Radnja se ne može poništiti.",
+        "round": "Krug od {date}"
+      },
+      "recap": {
+        "button": "Ažuriraj javni sažetak",
+        "done": "Javni sažetak je ažuriran.",
+        "notPossible": "Sažetak se više ne može ažurirati: događaj nije završio ili je istekao rok čuvanja njegovih podataka.",
+        "error": "Ažuriranje nije uspjelo: pokušajte ponovno."
+      }
     }
   },
   "email": {
