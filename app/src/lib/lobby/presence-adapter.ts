@@ -174,12 +174,12 @@ export class GardenPresenceClient implements PresenceClient {
    * client vecchi continuano a funzionare senza sapere che esiste.
    *
    * NIENTE POST fuori banda: l'emote viaggia sul PROSSIMO ping (5Hz), cioè
-   * entro ≤200ms. Un POST immediato per ogni pressione spendeva il budget della
-   * rotta ping (600/min per IP) sullo STESSO conto dei ping di posizione: due
-   * utenti dietro lo stesso NAT erano già al limite, e un tasto tenuto premuto
-   * li faceva sparire dal giardino di tutti. Duecento millisecondi su un saluto
-   * non si notano; l'avatar sparito sì. Il gioco anima comunque il gesto locale
-   * all'istante.
+   * entro ≤200ms. Un POST per ogni pressione spenderebbe il budget della rotta
+   * ping, che è per indirizzo e conta ~300 ping al minuto per browser, sullo
+   * STESSO conto dei ping di posizione di tutti quelli dietro la stessa rete:
+   * un tasto tenuto premuto li farebbe sparire dalla piazza di tutti. Duecento
+   * millisecondi su un saluto non si notano; l'avatar sparito sì. Il gioco
+   * anima comunque il gesto locale all'istante.
    */
   emote(type: EmoteType): void {
     if (!this.connected) return;

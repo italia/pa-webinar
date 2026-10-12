@@ -23,6 +23,7 @@ import {
 import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { findPhotoByEmailHash, profilePhotoUrl } from '@/lib/profile-photo';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
@@ -231,7 +232,7 @@ export const POST = withErrorHandling(async (request, context) => {
       // exactly like the pure-guest path below — a forwarded link shouldn't be a
       // faster route to bulk JWT minting than an anonymous one.
       const ip = getClientIp(request);
-      const limit = parseInt(process.env.GUEST_JWT_RATE_LIMIT_PER_MINUTE || '120', 10);
+      const limit = limiteTokenOspiti();
       const rl = rateLimit(`guest-jwt:${ip}`, { limit, windowMs: 60_000 });
       if (!rl.allowed) {
         throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
@@ -338,13 +339,13 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new AppError('Join password required', 403, 'JOIN_PASSWORD_REQUIRED');
     }
 
-    // Default 120/min per IP to accommodate bursts of participants joining
-    // from a shared corporate NAT (common scenario: announcing the link
-    // during an MS Teams call where 100+ colleagues click simultaneously).
-    // Tunable per-deploy via GUEST_JWT_RATE_LIMIT_PER_MINUTE; the in-memory
-    // limiter is per-pod, so the effective ceiling is N_replicas × limit.
+    // 120 al minuto per indirizzo: chi entra dalla stessa rete di un ente arriva
+    // tutto insieme (un link annunciato in una riunione e cento colleghi che
+    // lo aprono). Si regola con GUEST_JWT_RATE_LIMIT_PER_MINUTE e scala con
+    // gli altri limiti della sala (lib/room-rate-limit); il conto e' per pod,
+    // quindi il tetto vero e' il numero di pod per il limite.
     const ip = getClientIp(request);
-    const limit = parseInt(process.env.GUEST_JWT_RATE_LIMIT_PER_MINUTE || '120', 10);
+    const limit = limiteTokenOspiti();
     const rl = rateLimit(`guest-jwt:${ip}`, { limit, windowMs: 60_000 });
     if (!rl.allowed) {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);

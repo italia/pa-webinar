@@ -8,6 +8,7 @@ import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { verifyEventAccess, eventAccessCookieName } from '@/lib/event-session';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const ip = getClientIp(request);
   // Generous limit: a co-located audience behind one NAT egress often all leave
   // within the same minute at event end — don't drop their leave beacons.
-  const rl = rateLimit(`attendance-leave:${ip}`, { limit: 240, windowMs: 60_000 });
+  const rl = rateLimit(`attendance-leave:${ip}`, {
+    limit: limiteDellaSala(240),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

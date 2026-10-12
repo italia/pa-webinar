@@ -368,7 +368,7 @@ sequenceDiagram
 ### Cost, limits and exposure
 
 - **Load.** Each person in the square generates about five requests per second to the app tier. Each request does one PostgreSQL read (the event status) and two Redis round trips; checking a room token adds up to three more reads once every 5 seconds per token and pod. A hundred people in the square means about 500 requests per second. App-tier scaling is covered in [scaling the media plane](scaling.md).
-- **Rate limit.** 600 pings per minute per client IP, counted in memory on each pod (`app/src/lib/rate-limit.ts`). One browser uses about 300. Two browsers behind the same NAT address reach the limit on a pod, and a third starts getting `429` responses: its avatar stops updating and disappears for others after 10 seconds.
+- **Rate limit.** 600 pings per minute per client IP, counted in memory on each pod (`app/src/lib/rate-limit.ts`). One browser uses about 300, so two browsers behind one NAT address fit. With more, the address spends its budget before the minute ends, and from then until the window resets every ping from that address gets `429`: all of its avatars stop updating and disappear for others after 10 seconds. For an event whose audience shares one address, `ROOM_RATE_LIMIT_MULTIPLIER` raises the budget with the room's other per-IP limits: about one unit for every two browsers ([Security architecture](security.md#rate-limits-and-abuse-controls)).
 - **Exposure.** Knowing an event's slug is not enough to read names: without access to the room, the route returns positions only. Anyone with access sees the names of the people in the square while they are there, which is the same audience as the room itself. The name shown is whatever is in the page's name field. An empty name appears as `Ospite`, a literal Italian placeholder.
 
 ## Accessibility contract
@@ -402,7 +402,7 @@ The canvas itself does not read `prefers-reduced-motion`, and a screen reader ge
 
 - Chat bubbles find their author by display name. If the name in the chat differs from the one in the square (a registrant who changed the name field, or a shared moderator link that writes as "Moderator"), the bubble does not show, or shows over someone in the square with that same name. Your own messages always go on your avatar.
 - `CLASSIC` does not remove the square. See [`CLASSIC` is a starting point, not a switch-off](#classic-is-a-starting-point-not-a-switch-off).
-- Presence is rate-limited per IP per pod, which penalizes offices behind one NAT address.
+- Presence is rate-limited per IP per pod, which penalizes offices behind one NAT address unless `ROOM_RATE_LIMIT_MULTIPLIER` is raised.
 - The square shows no one as "in the call": the app adapter reports no call members.
 - The error boundary saves the classic preference, so one failed load keeps that browser in the classic view on later visits.
 - Errors raised later inside the running game loop are not caught by the React error boundary, so they do not trigger the fallback.

@@ -373,17 +373,17 @@ The values below come from the route files. To list every call site with its val
 | Registration. With invitation-only registration, this call can also resend the link of an address that is already registered | `POST /api/events/{slug}/registrations` | IP | 10 per minute |
 | Personal link resend | `POST …/registrations/resend` | IP | 5 per minute |
 | Join password | `POST …/verify-password` | IP and event | 10 per minute |
-| Guest Jitsi token, including a personal link opened in another browser | `POST …/jitsi/token` | IP | `GUEST_JWT_RATE_LIMIT_PER_MINUTE`, default 120 per minute |
-| Call session opening | `POST …/sessions` | IP | 30 per minute |
+| Guest Jitsi token, including a personal link opened in another browser | `POST …/jitsi/token` | IP | `GUEST_JWT_RATE_LIMIT_PER_MINUTE` (default 120 per minute) × `ROOM_RATE_LIMIT_MULTIPLIER` |
+| Call session opening | `POST …/sessions` | IP | 30 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
 | Chat message / attachment | `POST …/chat`, `POST …/chat/attachment` | Event and sender | 30 / 10 per minute |
 | Chat typing signal | `POST …/chat/typing` | Event and sender / event | 40 per minute / 10 per second; past the second limit the signal is accepted and not published |
-| Q&A question | `POST …/questions` | Registration, named grant, or the guest's browser id and event (IP when a guest sends no browser id) / IP and event, for guests with a browser id | 1 per 30 seconds / 60 per minute |
-| Q&A upvote | `POST …/questions/{id}/upvote` | IP and event, for browser ids / voter (registration or browser id) | 300 / 10 per minute |
-| Poll vote | `POST …/polls/{id}/vote` | IP and event / voter | 60 / 10 per minute |
+| Q&A question | `POST …/questions` | Registration, named grant, or the guest's browser id and event (IP when a guest sends no browser id) / IP and event, for guests with a browser id | 1 per 30 seconds / 60 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
+| Q&A upvote | `POST …/questions/{id}/upvote` | IP and event, for browser ids / voter (registration or browser id) | 300 × `ROOM_RATE_LIMIT_MULTIPLIER` / 10 per minute |
+| Poll vote | `POST …/polls/{id}/vote` | IP and event / voter | 60 × `ROOM_RATE_LIMIT_MULTIPLIER` / 10 per minute |
 | Profile photo upload | `POST …/profile-photo` | Email hash | 10 per hour |
 | Call seat claim | `POST …/seats` | Hash of the room token | 12 per 10 minutes |
 | Material opening count | `POST …/materials/{id}/opened` | Material and the hash of a room token valid for the event, otherwise material and IP | 1 per 10 minutes; past it the request still answers 204 and is not counted |
-| Square presence ping | `POST …/garden/ping` | IP | 600 per minute |
+| Square presence ping | `POST …/garden/ping` | IP | 600 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
 | Export download, erasure confirmation | `GET /api/gdpr/export`, `POST /api/gdpr/erasure` | IP | 10 per hour |
 | Address-book opt-out | `POST /api/rubrica/opt-out` | IP | 10 per minute |
@@ -392,6 +392,8 @@ The values below come from the route files. To list every call site with its val
 The entry route of the registration emails, `GET …/registrations/enter`, has no rate limit. It answers a valid, an invalid and an unknown token in the same way, with a redirect, and sets its cookie only for a valid signature; for a link signed with `proof`, only in the browser that already holds the registration's cookie ([Identity, access and tokens](identity-and-access.md#registrants)).
 
 The guest limit is generous because many participants may join from behind one corporate NAT at the same moment. To change it on the chart, add the variable to `app.env`, which is rendered into the portal's ConfigMap.
+
+The per-IP limits of what happens in the room fit an office: a few people behind one address. When the audience is in one place and reaches the internet through its Wi-Fi, a whole room shares one address. `ROOM_RATE_LIMIT_MULTIPLIER` (default `1`, at most `100`, `app/src/lib/room-rate-limit.ts`) multiplies these limits together, as marked in the table: guest Jitsi tokens, call session opening, Q&A questions and upvotes, poll votes and the square, and also reactions, agenda reactions, the word cloud, presence, raised hands and their lowering, attendance, peak reports (the per-IP limit, and the per-reporter one of a reporter without a token), ratings and questionnaire answers. Some per-IP limits on the way into the room stay as they are on purpose: registration, because each one sends an email (an on-site audience registers beforehand or enters as guests); the join password, a guard against guessing; the registration lookup, a guard against guessing tokens; and the cap on raised hands written to the room's journal, a guard against invented ones, so at such an event the journal, and the AI summary that reads it, count fewer raised hands than there were. On a password-protected event every guest also goes through the join password's limit, so an on-site audience enters slowly there. Speaker reports come only from moderators. The multiplier applies to the whole installation, not to one event, and lives in the portal's configuration: on the chart, a change restarts the app pods, so set it before such an event and back to `1` after it. It also multiplies what one abusive address can do, and where the identity is an id the browser chooses (guest votes, questions and ratings), the per-IP limit is the main brake on stuffing. Limits keyed by registration, sender or voter do not change.
 
 ### Other abuse controls
 

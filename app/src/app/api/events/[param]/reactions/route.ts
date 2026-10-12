@@ -7,6 +7,7 @@ import {
 import { prisma } from '@/lib/db';
 import { sendReactionSchema, VALID_EMOJIS } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +34,10 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!event) throw new NotFoundError('Event');
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`reaction:${ip}`, { limit: 30, windowMs: 60_000 });
+  const rl = rateLimit(`reaction:${ip}`, {
+    limit: limiteDellaSala(30),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

@@ -28,6 +28,7 @@ import {
 import { prisma } from '@/lib/db';
 import { getCached, setCache } from '@/lib/cache';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import {
   authorizePanelRead,
@@ -76,7 +77,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // Molte persone dietro la stessa rete di un ente: il limite per indirizzo è
   // largo (una scheda segnala al più quattro volte al minuto), e serve solo
   // contro chi martella.
-  const rl = rateLimit(`presence:${getClientIp(request)}`, { limit: 2400, windowMs: 60_000 });
+  const rl = rateLimit(`presence:${getClientIp(request)}`, {
+    limit: limiteDellaSala(2400),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
 
   const parsed = corpo.safeParse(await parseJsonBody(request));

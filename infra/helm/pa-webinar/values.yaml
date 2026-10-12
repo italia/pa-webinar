@@ -118,6 +118,13 @@ app:
     # Behind one load balancer/WAF that appends, or with the GKE Ingress
     # (classes gce, gce-internal: it appends "<client>,<lb-ip>"):
     #   TRUSTED_PROXY_HOPS: "1"
+    # The per-IP limits of the room (square presence, reactions, votes,
+    # questions, ratings, guest tokens) fit an office behind one address.
+    # For an event whose audience shares one address, such as one on a
+    # venue's Wi-Fi, multiply them (integer 1-100, whole installation; set it
+    # before the event, since a change restarts the pods, and back after it;
+    # it also raises what one abusive address can do):
+    #   ROOM_RATE_LIMIT_MULTIPLIER: "20"
 
     # ── Service inventory (CycloneDX 1.6) ──
     #

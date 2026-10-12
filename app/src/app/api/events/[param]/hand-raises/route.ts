@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { recordLiveActions, serverTimeOf } from '@/lib/live/actions';
 
 export const dynamic = 'force-dynamic';
@@ -66,7 +67,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // Limite generoso: è un self-report (ogni client ~6 POST/min per il debounce
   // di 10s), ma molti partecipanti dietro un solo NAT istituzionale condividono
   // l'IP, quindi teniamo il budget alto per non perdere alzate durante un picco.
-  const rl = rateLimit(`hand-raises:${ip}`, { limit: 240, windowMs: 60_000 });
+  const rl = rateLimit(`hand-raises:${ip}`, {
+    limit: limiteDellaSala(240),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

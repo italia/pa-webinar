@@ -29,6 +29,7 @@ import {
   validateAnswers,
 } from '@/lib/questionnaires';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import {
   QUESTIONNAIRE_PLACEMENTS,
   submitQuestionnaireResponseSchema,
@@ -56,7 +57,10 @@ export const POST = withErrorHandling(async (request, context) => {
   // ufficio esce su internet da un solo indirizzo: con 10 al minuto chi
   // rispondeva dopo i primi dieci colleghi perdeva la risposta. Il doppio
   // invio lo ferma gia' la deduplica per persona.
-  const rl = rateLimit(`questionnaire:${ip}`, { limit: 60, windowMs: 60_000 });
+  const rl = rateLimit(`questionnaire:${ip}`, {
+    limit: limiteDellaSala(60),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
