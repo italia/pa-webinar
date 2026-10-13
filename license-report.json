@@ -2051,7 +2051,7 @@
     "email": "nathan@tootallnate.net",
     "url": "http://n8.io/"
   },
-  "ical-generator@8.1.1": {
+  "ical-generator@11.1.2": {
     "licenses": "MIT",
     "repository": "https://github.com/sebbo2002/ical-generator",
     "publisher": "Sebastian Pekarek",
@@ -3477,11 +3477,6 @@
   "use-sync-external-store@1.7.0": {
     "licenses": "MIT",
     "repository": "https://github.com/react/react"
-  },
-  "uuid-random@1.3.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jchook/uuid-random",
-    "publisher": "Wes Roberts"
   },
   "uuid@14.0.2": {
     "licenses": "MIT",
