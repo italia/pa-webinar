@@ -327,7 +327,7 @@ jobs:
       # The ghcr.io/actions/actions-runner image used by ARC ships docker CLI
       # but not the compose v2 plugin — install it on the fly so `docker compose`
       # works on the self-hosted runner the same way it does on ubuntu-latest.
-      - uses: docker/setup-compose-action@4eb059ff7f16592f9c84d5ca339c53cb7c5064e2 # v2
+      - uses: docker/setup-compose-action@54042514f505b273907334ae2b9cdbb9a0213c1a # v2.4.0
       # Authenticate to Docker Hub when credentials are provided as
       # repo secrets. Anonymous pulls share a low rate limit (100 / 6h
       # per IP) that the shared ARC runner exhausts quickly during a
