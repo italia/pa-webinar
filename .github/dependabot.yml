@@ -47,6 +47,15 @@ updates:
   - dependency-name: zod
     update-types:
     - version-update:semver-major
+  # Dalla 8 chiede zod 4, il cui major e' escluso qui sopra.
+  - dependency-name: '@asteasolutions/zod-to-openapi'
+    update-types:
+    - version-update:semver-major
+  # Dalla 1.0 MediaPipe include la telemetria verso Google: resta fissato
+  # alla 0.10.35 (app/package.json).
+  - dependency-name: '@mediapipe/tasks-vision'
+    versions:
+    - '>=1.0.0'
   - dependency-name: eslint
     update-types:
     - version-update:semver-major
