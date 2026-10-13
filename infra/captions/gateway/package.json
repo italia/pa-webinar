@@ -6,7 +6,7 @@
   "description": "Gateway dei sottotitoli live: riceve dal bridge Jitsi l'audio di chi parla, lo trascrive con il motore in streaming e rimanda il testo",
   "license": "EUPL-1.2",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "scripts": {
     "build": "tsc",

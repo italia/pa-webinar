@@ -176,7 +176,7 @@ Publishing or redistributing an image distributes everything inside it. Base ima
 
 | Component | Image and where it is set | License | Notes |
 |---|---|---|---|
-| Portal | `ghcr.io/italia/pa-webinar:X.Y.Z`, built from `Dockerfile` on `node:20-alpine` (pulled through `mirror.gcr.io` by default) | Node.js: MIT. npm packages: see the report. | The only image with a release SBOM. |
+| Portal | `ghcr.io/italia/pa-webinar:X.Y.Z`, built from `Dockerfile` on `node:22-alpine` (pulled through `mirror.gcr.io` by default) | Node.js: MIT. npm packages: see the report. | The only image with a release SBOM. |
 | Migrations | `ghcr.io/italia/pa-webinar:X.Y.Z-migrate` and `:vX.Y.Z-migrate`, the `builder` stage of the same `Dockerfile` | As the portal, plus the development dependencies | Carries the whole workspace dependency tree, development dependencies included. No SBOM. |
 | Jitsi Meet web | `ghcr.io/italia/pa-webinar-jitsi-web` (`jitsi-meet.web.image` in `values.yaml`), built from `jitsi/web`. `docker-compose.yml` runs stock `jitsi/web:stable`. | Apache-2.0 | Modified third-party code. See [Modified third-party code](#modified-third-party-code). |
 | Prosody | `jitsi/prosody`, through the `jitsi-meet` subchart, or `jitsi/prosody:stable` in `docker-compose.yml` | Prosody: MIT. Image recipe: Apache-2.0. | The module in `infra/jitsi/prosody-plugins/` is PA Webinar's own code. |
