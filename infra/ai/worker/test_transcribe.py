@@ -171,12 +171,21 @@ def test_diarize_segments_skips_without_valid_token():
     assert [s["speaker"] for s in out] == ["SPEAKER_00"]
 
 
+class _FakeDiarize:
+    """Il sottomodulo ``whisperx.diarize``: e' li' che sta la pipeline."""
+
+    def __init__(self, pipeline_cls):
+        self.DiarizationPipeline = pipeline_cls
+
+
 def test_diarize_segments_falls_back_on_pyannote_error():
     aligned = {"segments": [{"start": 0.0, "end": 1.0, "text": "x"}]}
 
+    def boom(**_kw):
+        raise RuntimeError("pyannote unreachable")
+
     class BoomWhisperx:
-        def DiarizationPipeline(self, **_kw):
-            raise RuntimeError("pyannote unreachable")
+        diarize = _FakeDiarize(boom)
 
     out = tr._diarize_segments(
         BoomWhisperx(), aligned, object(),
@@ -185,12 +194,17 @@ def test_diarize_segments_falls_back_on_pyannote_error():
     assert [s["speaker"] for s in out] == ["SPEAKER_00"]
 
 
-def test_diarize_segments_uses_pyannote_result_when_ok():
+def test_diarize_segments_uses_pyannote_result_when_ok(monkeypatch):
     aligned = {"segments": [{"start": 0.0, "end": 1.0, "text": "x"}]}
+    monkeypatch.setenv("PYANNOTE_CACHE", "/models/pyannote")
+    calls = []
+
+    def pipeline(**kw):
+        calls.append(kw)
+        return lambda *a, **k: {"diar": True}
 
     class OkWhisperx:
-        def DiarizationPipeline(self, **_kw):
-            return lambda *a, **k: {"diar": True}
+        diarize = _FakeDiarize(pipeline)
 
         def assign_word_speakers(self, _diar, _aligned):
             return {
@@ -199,8 +213,31 @@ def test_diarize_segments_uses_pyannote_result_when_ok():
                 ]
             }
 
+    token = "hf_" + "a" * 34
     out = tr._diarize_segments(
         OkWhisperx(), aligned, object(),
-        hf_token="hf_" + "a" * 34, expected_speakers=None, device="cpu",
+        hf_token=token, expected_speakers=None, device="cpu",
     )
     assert out[0]["speaker"] == "SPEAKER_01"
+    # Il modello e la cache vanno passati: pyannote.audio 4 non legge
+    # PYANNOTE_CACHE e WhisperX, senza nome, carica un altro modello.
+    assert calls == [{
+        "model_name": "pyannote/speaker-diarization-3.1",
+        "token": token,
+        "device": "cpu",
+        "cache_dir": "/models/pyannote",
+    }]
+
+
+def test_diarization_pipeline_cls_imports_the_submodule(monkeypatch):
+    # Il pacchetto vero carica i sottomoduli solo su richiesta: senza
+    # attributo `diarize` la classe si prende importando `<pacchetto>.diarize`.
+    import sys
+    import types
+
+    pkg = types.ModuleType("fakewx")
+    sub = types.ModuleType("fakewx.diarize")
+    sub.DiarizationPipeline = object
+    monkeypatch.setitem(sys.modules, "fakewx", pkg)
+    monkeypatch.setitem(sys.modules, "fakewx.diarize", sub)
+    assert tr._diarization_pipeline_cls(pkg) is object

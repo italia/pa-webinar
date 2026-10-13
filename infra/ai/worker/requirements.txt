@@ -1,74 +1,67 @@
-# Postprod AI worker dependencies.
-# Do NOT install packages that talk to external APIs other than the
-# in-cluster app and vLLM Service.
+# Dipendenze del worker di post-produzione AI.
+# NON installare pacchetti che parlano con API esterne: il worker parla solo
+# con l'app e con il servizio vLLM nel cluster.
 #
-# CUDA pinning: the GPU nodes run driver 550.x (A100), which supports
-# CUDA 12.x up to 12.4 but NOT CUDA 13. The NGC base (24.10) ships an
-# *alpha* torch 2.5 and NO torchaudio, so pip pulled torchaudio from
-# PyPI — and the latest (2.11.0) is a CUDA-13 build, crashing the worker
-# with `OSError: libcudart.so.13: cannot open shared object file`.
-# Fix: install a single, self-consistent torch/torchvision/torchaudio
-# trio from the CUDA-12.4 wheel index, overriding the NGC alpha torch.
-# These wheels bundle the CUDA-12 runtime (libcudart.so.12) which the
-# 550 driver runs natively. ctranslate2 (faster-whisper backend) stays
-# on its CUDA-12 build. Bump cu124→cu126/cu128 only after the GPU node
-# driver is bumped to 565+/580+.
---extra-index-url https://download.pytorch.org/whl/cu124
-torch==2.6.0
-torchvision==0.21.0
-torchaudio==2.6.0
-# pyannote / transformers behave best on numpy 1.x; avoid the 2.x ABI flip.
-numpy<2
+# CUDA: i nodi GPU hanno il driver 550.x (A100), che esegue le wheel CUDA 12
+# (12.4 in modo nativo, dalla 12.5 per compatibilita' di versione minore,
+# driver >= 525) ma NON CUDA 13. Le wheel di torch e torchcodec pubblicate su
+# PyPI sono CUDA 13 (`libcudart.so.13`): tutto il blocco CUDA viene
+# dall'indice cu126, con l'etichetta `+cu126` scritta per intero, perche' una
+# versione senza etichetta farebbe scegliere a pip la wheel CUDA 13. cu126 e'
+# l'unico indice CUDA 12 che ha torch 2.14. Il build si ferma se entra una
+# wheel CUDA 13 (vedi Dockerfile.worker).
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch==2.14.1+cu126
+torchvision==0.29.1+cu126
+# torchaudio 2.11 e' l'ultima release (il progetto e' in manutenzione) e non
+# dichiara una versione di torch. Il worker non usa API di torchaudio;
+# WhisperX usa solo `torchaudio.pipelines` (modelli di allineamento), che la
+# 2.11 mantiene.
+torchaudio==2.11.0+cu126
+# Lettura dell'audio per pyannote.audio 4 (ha sostituito l'I/O di torchaudio).
+torchcodec==0.17.0+cu126
+numpy==2.2.6
 
-# HTTP client — used to talk to the app's /api/internal/* endpoints
-# and to the in-cluster vLLM service. Sync API is plenty here: a
-# worker is sequential by design (one job per Pod).
+# Client HTTP verso /api/internal/* dell'app e verso vLLM nel cluster. Basta
+# l'API sincrona: un worker esegue un job alla volta (un job per pod).
 httpx==0.28.1
 
-# Pydantic — validates the claim response shape so we don't deref
-# `None`s on a malformed payload. Matches what `lib/ai/schemas.ts`
-# enforces server-side.
+# Pydantic valida la forma della risposta del claim, cosi' un payload
+# malformato non porta a dereferenziare `None`. Corrisponde a quello che
+# impone `lib/ai/schemas.ts` lato server.
 pydantic==2.9.2
 
-# ASR + diarization. WhisperX bundles faster-whisper + pyannote
-# integration + word-level alignment via wav2vec2.
-# Pin a 3.3.x (compatible with pyannote 3.3) — whisperx 3.1.x bloccava
-# pyannote a 3.1.1 (vecchia, alcune voci IT mal allineate).
-# Pyannote stesso lo lasciamo libero: whisperx tira la versione
-# compatibile per sua dipendenza.
-whisperx>=3.3.0,<3.5.0
+# ASR e diarization. WhisperX (requirements-whisperx.txt) si installa SENZA
+# le sue dipendenze: ogni release 3.8.x fissa torch alla 2.8, che non ha le
+# correzioni di sicurezza. Le sue dipendenze stanno quindi qui, a versioni
+# che funzionano con il torch fissato sopra.
+pyannote.audio==4.0.7
+faster-whisper==1.2.1
+# CTranslate2 dalla 4.6.3 non chiede piu' cuDNN (le wheel sono costruite
+# senza): il backend di faster-whisper usa solo cuBLAS 12.
+ctranslate2==4.8.3
+nltk==3.10.3
+omegaconf==2.4.0
+pandas==2.3.3
 
-# CTranslate2 backend for faster-whisper. Left to whisperx to resolve
-# transitively (it hard-pins faster-whisper to a CT2 4.4.x build, which
-# links cuDNN 8). Bumping CT2 to a cuDNN-9 build (>=4.5) is impossible
-# without dropping the whisperx<3.5 cap (needed for pyannote 3.3 align).
-# So instead the cuDNN-8 runtime libs (libcudnn_*.so.8) are provided in
-# the image on a side LD_LIBRARY_PATH dir — see Dockerfile.worker — since
-# the base ships cuDNN 9 only. cuDNN 8 and 9 coexist (distinct sonames).
-
-# Subtitle / VTT writing. Custom helpers in worker/vtt.py use this.
+# Sottotitoli VTT, scritti dagli helper in worker/vtt.py.
 webvtt-py==0.5.1
 
-# Storage upload uses presigned PUT URLs — no SDK needed.
+# Il caricamento degli artefatti usa URL PUT prefirmati: nessun SDK.
 
-# Tokenizer for prompt construction (used by LLM client).
-# Bump >=4.48.0 per CVE-2024-11392 (deserialization untrusted data,
-# HIGH severity rilevato da Trivy nel CI dell'app — anche se l'uso qui
-# è solo per costruire prompt, e non scarichiamo modelli arbitrari,
-# evita il blocco del security scan).
-#
-# Bump 4.48.3 → 4.57.6, l'ULTIMA della major 4. Chiude 7 advisory
-# (ReDoS fixate in 4.51/4.52.1/4.53, improper input validation) restando
-# compatibile con lo stack pinnato: whisperx chiede `transformers>=4.48.0`
-# (nessun cap) e 4.57.6 vuole `numpy>=1.17`, quindi il pin `numpy<2` regge.
-# NON si sale alla major 5 (romperebbe lo stack ASR): l'unico advisory che
-# resta aperto lì (GHSA-fgcw-684q-jj6r) è nel path del modello LightGlue
-# (visione), mai caricato da questo worker audio → alert dismesso not-used.
-transformers==4.57.6
+# Modelli Hugging Face per l'allineamento di WhisperX (wav2vec2) e pipeline.
+# transformers >= 5.10.1 (la 5.10.0 e' stata ritirata da PyPI) chiude gli
+# advisory sul codice di generazione personalizzato e su `save_pretrained`;
+# la linea 5.x chiede huggingface-hub >= 1.5, che accetta solo `token=` (mai
+# `use_auth_token=`).
+transformers==5.19.0
+huggingface-hub==2.2.0
 
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
 # (ONNX runtime), niente GPU richiesta. Per DUB job.
+# Dalla 1.3 il pacchetto e' GPL-3.0-or-later (e la 1.8 cambia l'API di sintesi):
+# salire e' una decisione di licenza, oltre che un cambio di codice.
 piper-tts==1.2.0
 
 # Sentry / structured logging optional — we use stdlib logging
@@ -76,9 +69,9 @@ piper-tts==1.2.0
 gender-guesser>=0.4,<1
 
 # AudioSeal (Meta, MIT) — watermark inudibile sull'audio doppiato per
-# conformità AI Act Art. 50. Gira sul torch già pinnato (2.6 cu124); il
-# trio torch/torchvision/torchaudio resta fissato sopra (pin esatti
+# conformità AI Act Art. 50. Gira sul torch fissato sopra (pin esatti
 # vincono sulle dipendenze >= di audioseal). Modello scaricato da HF a
-# runtime (audioseal_wm_16bits, ~pochi MB). Best-effort: il DUB non
-# fallisce se il watermark non riesce (vedi worker/tts.py).
+# runtime (audioseal_wm_16bits, ~pochi MB) se non e' nella cartella di
+# AUDIOSEAL_CACHE_DIR. Best-effort: il DUB non fallisce se il watermark non
+# riesce (vedi worker/tts.py).
 audioseal==0.1.4

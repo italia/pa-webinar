@@ -187,10 +187,30 @@ updates:
   - dependency-name: audioseal
     update-types:
     - version-update:semver-major
+  # Dalla 1.3 piper-tts e' GPL-3.0-or-later: salire e' una decisione di
+  # licenza, non un aggiornamento.
   - dependency-name: piper-tts
+    versions:
+    - '>=1.3'
+  - dependency-name: pydantic
     update-types:
     - version-update:semver-major
-  - dependency-name: pydantic
+  - dependency-name: pyannote.audio
+    update-types:
+    - version-update:semver-major
+  - dependency-name: faster-whisper
+    update-types:
+    - version-update:semver-major
+  - dependency-name: ctranslate2
+    update-types:
+    - version-update:semver-major
+  - dependency-name: torchcodec
+    update-types:
+    - version-update:semver-major
+  - dependency-name: huggingface-hub
+    update-types:
+    - version-update:semver-major
+  - dependency-name: nltk
     update-types:
     - version-update:semver-major
 - package-ecosystem: docker

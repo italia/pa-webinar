@@ -241,7 +241,7 @@ module that imported torch, WhisperX or Piper at startup would stop the build.
 | `HF_HUB_OFFLINE=1` | image | Hugging Face libraries never download at run time, so the models must be seeded first ([Seeding the models volume](../../../docs/POSTPROD.md#seeding-the-models-volume)) |
 | `HOME=/work`, `XDG_CACHE_HOME=/work/.cache`, `MPLCONFIGDIR=/work/.config/matplotlib` | image | Libraries that write under `~` land on the writable volume |
 | `TMPDIR=/work` | chart | `tempfile` works on a read-only root. Every handler's working folder lives here |
-| `LD_LIBRARY_PATH` starting with `/opt/cudnn8/nvidia/cudnn/lib` | image | CTranslate2 finds cuDNN 8 (see [Dependency constraints](#dependency-constraints)) |
+| `PYANNOTE_METRICS_ENABLED=false` | image | pyannote.audio 4 would otherwise send usage telemetry to its vendor |
 | `APP_INTERNAL_URL`, `CRON_API_KEY` | chart | Portal URL and shared key. Both are required |
 | `WORKER_ID` | not set | Defaults to the pod's host name. The portal records it as `leasedBy` |
 | `HF_TOKEN` | chart, from `postprod.worker.hfTokenSecret` | Turns on diarization |
@@ -400,19 +400,25 @@ rollback is in
 `requirements.txt` holds a balanced stack. Check these constraints before you
 bump anything:
 
-- The `torch`, `torchvision` and `torchaudio` trio is pinned from the CUDA
-  12.4 wheel index and replaces the base image's PyTorch. Move to a newer
-  CUDA index only after the GPU nodes' NVIDIA driver supports it.
+- The CUDA set (`torch`, `torchvision`, `torchaudio`, `torchcodec`) is
+  pinned from the cu126 wheel index with the `+cu126` label written out,
+  and replaces the base image's PyTorch. A bare version would pull the
+  CUDA 13 build from PyPI, which the GPU nodes' driver cannot run, and the
+  build fails if a CUDA 13 wheel is present.
 - The Dockerfile uninstalls the base image's `flash-attn`, `apex` and
   `transformer-engine`, because they were built against the replaced
   PyTorch.
-- `whisperx` is pinned to `>=3.3.0,<3.5.0`, and its faster-whisper pins a
-  CTranslate2 build that links cuDNN 8. The image stages cuDNN 8 in
-  `/opt/cudnn8` and puts it first on `LD_LIBRARY_PATH`, while PyTorch keeps
-  its own cuDNN 9.
-- `numpy<2` keeps pyannote and `transformers` on the 1.x ABI.
-- `transformers` stays on the 4.x line, because the 5.x line breaks the
-  stack.
+- `whisperx` is in `requirements-whisperx.txt` and is installed with
+  `--no-deps`, because its releases pin an older PyTorch. Its dependencies
+  (pyannote.audio, faster-whisper, CTranslate2, NLTK, pandas) are pinned in
+  `requirements.txt`; compare them with WhisperX's own list when you bump it.
+- pyannote.audio 4 takes `token=` and does not read `PYANNOTE_CACHE` by
+  itself, so `transcribe.py` passes the model and the cache folder.
+- WhisperX alignment splits sentences with NLTK's Punkt tokenizer. The image
+  does not ship NLTK's pretrained Punkt data: `punkt_params.py` writes
+  untrained parameters at build time, so nothing is downloaded at run time.
+- `piper-tts` stays on 1.2: from 1.3 the package is GPL-3.0-or-later, and
+  1.8 also changes the synthesis API.
 - No package may call an external service at run time.
 
 The CI filesystem scan (`trivy fs`) reads `requirements.txt`. The worker
