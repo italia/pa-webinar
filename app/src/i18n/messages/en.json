@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {One more event} other {# more events}}",
     "noEvents": "No events in this period",
-    "weekShort": "Wk"
+    "legend": {
+      "title": "Tags",
+      "noTag": "No tag"
+    },
+    "popover": {
+      "open": "Open the event page",
+      "manage": "Manage the event",
+      "publicPage": "Public page",
+      "registrations": "{count, plural, =0 {no registrations} one {# registration} other {# registrations}}"
+    }
   },
   "footer": {
     "privacy": "Privacy policy",

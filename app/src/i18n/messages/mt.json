@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Avveniment ieħor} other {# avvenimenti oħra}}",
     "noEvents": "L-ebda avveniment f'dan il-perjodu",
-    "weekShort": "Ġim."
+    "legend": {
+      "title": "Tags",
+      "noTag": "Mingħajr tag"
+    },
+    "popover": {
+      "open": "Iftaħ il-paġna tal-avveniment",
+      "manage": "Immaniġġja l-avveniment",
+      "publicPage": "Paġna pubblika",
+      "registrations": "{count, plural, =0 {ebda reġistrazzjoni} one {# reġistrazzjoni} two {# reġistrazzjonijiet} few {# reġistrazzjonijiet} many {# reġistrazzjoni} other {# reġistrazzjoni}}"
+    }
   },
   "footer": {
     "privacy": "Avviż dwar il-privatezza",

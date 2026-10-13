@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, zero {Vēl # pasākumi} one {Vēl # pasākums} other {Vēl # pasākumi}}",
     "noEvents": "Šajā periodā pasākumu nav",
-    "weekShort": "Ned."
+    "legend": {
+      "title": "Birkas",
+      "noTag": "Bez birkas"
+    },
+    "popover": {
+      "open": "Atvērt pasākuma lapu",
+      "manage": "Pārvaldīt pasākumu",
+      "publicPage": "Publiskā lapa",
+      "registrations": "{count, plural, =0 {nav reģistrāciju} zero {# reģistrāciju} one {# reģistrācija} other {# reģistrācijas}}"
+    }
   },
   "footer": {
     "privacy": "Privātuma politika",

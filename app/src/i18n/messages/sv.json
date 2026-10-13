@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ett evenemang till} other {# evenemang till}}",
     "noEvents": "Inga evenemang under den här perioden",
-    "weekShort": "V."
+    "legend": {
+      "title": "Taggar",
+      "noTag": "Utan tagg"
+    },
+    "popover": {
+      "open": "Öppna evenemangets sida",
+      "manage": "Hantera evenemanget",
+      "publicPage": "Publik sida",
+      "registrations": "{count, plural, =0 {inga anmälningar} one {# anmälan} other {# anmälningar}}"
+    }
   },
   "footer": {
     "privacy": "Integritetspolicy",

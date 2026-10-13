@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Nog één evenement} other {Nog # evenementen}}",
     "noEvents": "Geen evenementen in deze periode",
-    "weekShort": "Wk"
+    "legend": {
+      "title": "Tags",
+      "noTag": "Zonder tag"
+    },
+    "popover": {
+      "open": "Pagina van het evenement openen",
+      "manage": "Evenement beheren",
+      "publicPage": "Openbare pagina",
+      "registrations": "{count, plural, =0 {geen aanmeldingen} one {# aanmelding} other {# aanmeldingen}}"
+    }
   },
   "footer": {
     "privacy": "Privacybeleid",

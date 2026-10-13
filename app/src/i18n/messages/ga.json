@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ócáid amháin eile} other {# ócáid eile}}",
     "noEvents": "Níl aon ócáid sa tréimhse seo",
-    "weekShort": "Scht."
+    "legend": {
+      "title": "Clibeanna",
+      "noTag": "Gan chlib"
+    },
+    "popover": {
+      "open": "Oscail leathanach an imeachta",
+      "manage": "Bainistigh an t-imeacht",
+      "publicPage": "Leathanach poiblí",
+      "registrations": "{count, plural, =0 {gan chlárúchán} one {# chlárúchán} two {# chlárúchán} few {# chlárúchán} many {# gclárúchán} other {# clárúchán}}"
+    }
   },
   "footer": {
     "privacy": "Beartas príobháideachta",

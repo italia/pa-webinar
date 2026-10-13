@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ešte jedno podujatie} few {Ešte # podujatia} many {Ešte # podujatia} other {Ešte # podujatí}}",
     "noEvents": "V tomto období nie sú žiadne podujatia",
-    "weekShort": "Týž."
+    "legend": {
+      "title": "Štítky",
+      "noTag": "Bez štítka"
+    },
+    "popover": {
+      "open": "Otvoriť stránku podujatia",
+      "manage": "Spravovať podujatie",
+      "publicPage": "Verejná stránka",
+      "registrations": "{count, plural, =0 {žiadne registrácie} one {# registrácia} few {# registrácie} many {# registrácie} other {# registrácií}}"
+    }
   },
   "footer": {
     "privacy": "Zásady ochrany osobných údajov",

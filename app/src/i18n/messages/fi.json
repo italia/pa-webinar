@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Yksi tapahtuma lisää} other {# tapahtumaa lisää}}",
     "noEvents": "Ei tapahtumia tällä jaksolla",
-    "weekShort": "Vk"
+    "legend": {
+      "title": "Tunnisteet",
+      "noTag": "Ei tunnistetta"
+    },
+    "popover": {
+      "open": "Avaa tapahtumasivu",
+      "manage": "Hallinnoi tapahtumaa",
+      "publicPage": "Julkinen sivu",
+      "registrations": "{count, plural, =0 {ei ilmoittautumisia} one {# ilmoittautuminen} other {# ilmoittautumista}}"
+    }
   },
   "footer": {
     "privacy": "Tietosuojaseloste",

@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Încă un eveniment} few {Încă # evenimente} other {Încă # de evenimente}}",
     "noEvents": "Niciun eveniment în această perioadă",
-    "weekShort": "Săpt."
+    "legend": {
+      "title": "Etichete",
+      "noTag": "Fără etichetă"
+    },
+    "popover": {
+      "open": "Deschide pagina evenimentului",
+      "manage": "Gestionează evenimentul",
+      "publicPage": "Pagină publică",
+      "registrations": "{count, plural, =0 {nicio înscriere} one {# înscriere} few {# înscrieri} other {# de înscrieri}}"
+    }
   },
   "footer": {
     "privacy": "Politica de confidențialitate",

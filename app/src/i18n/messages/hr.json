@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Još # događaj} few {Još # događaja} other {Još # događaja}}",
     "noEvents": "Nema događaja u ovom razdoblju",
-    "weekShort": "Tj."
+    "legend": {
+      "title": "Oznake",
+      "noTag": "Bez oznake"
+    },
+    "popover": {
+      "open": "Otvori stranicu događaja",
+      "manage": "Upravljaj događajem",
+      "publicPage": "Javna stranica",
+      "registrations": "{count, plural, =0 {nema prijava} one {# prijava} few {# prijave} other {# prijava}}"
+    }
   },
   "footer": {
     "privacy": "Politika privatnosti",

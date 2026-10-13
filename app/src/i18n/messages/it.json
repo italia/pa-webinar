@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Un altro evento} other {Altri # eventi}}",
     "noEvents": "Nessun evento in questo periodo",
-    "weekShort": "Sett."
+    "legend": {
+      "title": "Etichette",
+      "noTag": "Senza etichetta"
+    },
+    "popover": {
+      "open": "Apri la pagina dell'evento",
+      "manage": "Gestisci l'evento",
+      "publicPage": "Pagina pubblica",
+      "registrations": "{count, plural, =0 {nessun iscritto} one {# iscritto} other {# iscritti}}"
+    }
   },
   "footer": {
     "privacy": "Informativa privacy",
