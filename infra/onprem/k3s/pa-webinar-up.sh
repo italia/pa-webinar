@@ -157,7 +157,7 @@ Esecuzione
                             cluster, se è andato perso
   --verify-call             alla fine, e a ogni lancio successivo, due
                             partecipanti headless provano una chiamata
-                            (scripts/verify-install.sh --call). Servono node 20
+                            (scripts/verify-install.sh --call). Servono node 22
                             o più recente, Playwright (npm ci nella radice del
                             repository) e un Chromium (npx playwright install
                             chromium, o --verify-browser): si controllano
@@ -513,9 +513,9 @@ controlla_kubectl "$(minore_di "${K3S_VERSIONE_PROVATA%%+*}")" "k3s ${K3S_VERSIO
 # la sola versione senza interfaccia o nessuna.
 if [ "$PROVA_CHIAMATA" = "si" ]; then
   command -v node >/dev/null 2>&1 \
-    || errore "--verify-call: manca node su questa macchina (20 o più recente). Per installare senza la prova: --no-verify-call."
+    || errore "--verify-call: manca node su questa macchina (22 o più recente). Per installare senza la prova: --no-verify-call."
   v_node="$(node -p 'process.versions.node' 2>/dev/null || true)"
-  almeno "${v_node:-0}" "20.0.0" || errore "--verify-call: node ${v_node:-?}, serve 20 o più recente. Per installare senza la prova: --no-verify-call."
+  almeno "${v_node:-0}" "22.0.0" || errore "--verify-call: node ${v_node:-?}, serve 22 o più recente. Per installare senza la prova: --no-verify-call."
   # shellcheck disable=SC2016  # codice JavaScript, non variabili della shell
   prova_browser='
     const { createRequire } = require("node:module");

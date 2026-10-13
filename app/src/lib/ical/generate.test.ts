@@ -79,6 +79,18 @@ describe('generateEventICal', () => {
     expect(ics).toContain('eventi@dominio.gov.it');
   });
 
+  it('writes quotes in the organizer name as typographic quotes, never RFC 6868 escapes', () => {
+    // Molti client di posta mostrano alla lettera `^'` (RFC 6868) o `\"`.
+    const ics = generateEventICal({
+      ...baseInput(),
+      organizerName: 'Ufficio "Innovazione"\nDigitale',
+    });
+    const organizer = ics.replace(/\r\n /g, '').split('\r\n').find((l) => l.startsWith('ORGANIZER'));
+    expect(organizer).toContain('CN="Ufficio \u201CInnovazione\u201D Digitale"');
+    expect(organizer).not.toContain("^'");
+    expect(organizer).not.toContain('\\"');
+  });
+
   it('falls back to a placeholder organizer when SMTP_FROM is empty', () => {
     process.env.SMTP_FROM = '';
     expect(generateEventICal(baseInput())).toContain('noreply@dominio.gov.it');

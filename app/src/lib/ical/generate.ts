@@ -93,6 +93,20 @@ export function calendarOrganizerEmail(): string {
  * replies to the organizer. Same UID and a growing SEQUENCE in every file,
  * so a later file updates the entry instead of adding a second one.
  */
+/**
+ * Il nome dell'organizzatore come valore di un parametro iCalendar (`CN=`).
+ * Le virgolette doppie li' non possono stare: ical-generator le codifica come
+ * chiede la RFC 6868 (`^'`), che molti client di posta mostrano alla lettera.
+ * Diventano virgolette tipografiche, che si leggono uguali; un a capo diventa
+ * uno spazio.
+ */
+export function icsParamText(text: string): string {
+  return text
+    .replace(/\r?\n/g, ' ')
+    .replace(/"([^"]*)"/g, '\u201C$1\u201D')
+    .replace(/"/g, '\u201D');
+}
+
 export function generateEventICal(input: EventICalInput): string {
   const calendar = ical({
     name: input.title,
@@ -110,7 +124,7 @@ export function generateEventICal(input: EventICalInput): string {
     description: markdownToPlainText(input.description, { paragrafi: true }),
     url: input.url,
     organizer: {
-      name: input.organizerName,
+      name: icsParamText(input.organizerName),
       email: calendarOrganizerEmail(),
     },
   });

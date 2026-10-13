@@ -15,7 +15,7 @@ Other topics have their own pages:
 |---|---|---|
 | Docker Engine with the Compose plugin | Docker 24 or later, Compose 2.20 or later | The local stack. Podman also runs it, with `podman compose` |
 | Git | Any recent version | Cloning the repository |
-| Node.js | 20 or later (`engines` in the root `package.json`) | Running Next.js on the host, tests, lint, type checks and scripts |
+| Node.js | 22.22.2 or later in the 22 line, or 24.15 or later (`engines` in the root `package.json`) | Running Next.js on the host, tests, lint, type checks and scripts |
 | npm | 10 or later (`engines` in the root `package.json`) | Installing the workspaces |
 
 Only Docker and Git are needed to start the stack. Some component checks need more tools: Helm 3, `openssl` and Python 3 with PyYAML for the chart validator, and Python 3 for the AI worker tests. [Testing](development/testing.md) lists what each check needs.

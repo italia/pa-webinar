@@ -8,8 +8,8 @@
 # runner exhausts the 100-per-6h Docker Hub quota during a single
 # busy day). The mirror is content-addressable and serves the exact
 # same digests as docker.io/library — overridable at build time:
-#   docker build --build-arg NODE_BASE=node:20-alpine .
-ARG NODE_BASE=mirror.gcr.io/library/node:20-alpine
+#   docker build --build-arg NODE_BASE=node:22-alpine .
+ARG NODE_BASE=mirror.gcr.io/library/node:22-alpine
 
 # ── Stage 1: Dependencies ────────────────────────────────────
 FROM ${NODE_BASE} AS deps
