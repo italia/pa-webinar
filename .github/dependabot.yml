@@ -186,7 +186,15 @@ updates:
   - dependency-name: torchaudio
     update-types:
     - version-update:semver-major
+  # Il worker GPU gira sul Python 3.10 dell'immagine NGC: numpy dalla 2.3
+  # chiede Python 3.11 o successivo, pandas 3 lo stesso. Le minor di numpy si
+  # aggiornano a mano anche per il worker senza GPU, che sta nella stessa
+  # cartella.
   - dependency-name: numpy
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  - dependency-name: pandas
     update-types:
     - version-update:semver-major
   - dependency-name: transformers
