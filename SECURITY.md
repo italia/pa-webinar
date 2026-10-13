@@ -220,7 +220,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 
 `.github/dependabot.yml` checks for updates every week. It is the authoritative list of what is covered:
 
-- **npm:** the root workspaces, the app, the recorder, the recorder controller and the live captions gateway.
+- **npm:** the root project with its workspaces (the app and the lobby share one lockfile), the recorder, the recorder controller and the live captions gateway.
 - **pip:** the AI post-production worker.
 - **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway and captions engine bases, and the build-only `node` stage of the patched jitsi/web image. The app, worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
 - **GitHub Actions:** every action used by the workflows.
@@ -228,7 +228,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 
 For npm, minor and patch updates are grouped into one pull request per directory.
 
-**Major versions.** Major updates of the dependencies listed under `ignore` are excluded from routine updates. The list covers the framework, the ORM, the validation library, the TypeScript toolchain, the worker's machine-learning stack and some base images. Each of these majors is done as a dedicated upgrade, with the code adapted, the full gates run and a code review.
+**Major versions.** Major updates of the dependencies listed under `ignore` in `.github/dependabot.yml` are excluded from routine updates; the file is the list. They are runtime dependencies whose majors need code changes, such as the framework, the ORM and the worker's machine-learning stack, plus some base images. Each of these majors is done as a dedicated upgrade, with the code adapted, the full gates run and a code review. The Node type definitions (`@types/node`) are matched by hand to the Node major used at runtime, in the same change that moves the runtime.
 
 **Security updates still arrive.** The exclusions use `version-update:semver-major`, which applies to routine version updates only. When Dependabot security updates are enabled for the repository, a vulnerable dependency still gets its pull request.
 
