@@ -2,7 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const { uploadData, BlockBlobClient } = vi.hoisted(() => {
   const uploadData = vi.fn();
-  return { uploadData, BlockBlobClient: vi.fn(() => ({ uploadData })) };
+  // Il client si costruisce con `new`: l'implementazione del mock deve essere
+  // una function, non una arrow function.
+  return {
+    uploadData,
+    BlockBlobClient: vi.fn(function () {
+      return { uploadData };
+    }),
+  };
 });
 vi.mock('@azure/storage-blob', () => ({ BlockBlobClient }));
 
