@@ -20,7 +20,7 @@ torchvision==0.29.1+cu126
 torchaudio==2.11.0+cu126
 # Lettura dell'audio per pyannote.audio 4 (ha sostituito l'I/O di torchaudio).
 torchcodec==0.17.0+cu126
-numpy==2.2.6
+numpy==2.5.3
 
 # Client HTTP verso /api/internal/* dell'app e verso vLLM nel cluster. Basta
 # l'API sincrona: un worker esegue un job alla volta (un job per pod).

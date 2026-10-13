@@ -5,4 +5,4 @@
 # (requirements.txt), e da soli fanno un'immagine di ~15 GB.
 httpx==0.28.1
 pydantic==2.9.2
-numpy==2.5.4
+numpy==2.5.3
