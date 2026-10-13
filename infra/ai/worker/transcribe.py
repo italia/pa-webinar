@@ -16,12 +16,17 @@ CPU-only dev box. The stub is the default when ``WORKER_STUB=1``.
 
 from __future__ import annotations
 
+import importlib
 import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 log = logging.getLogger(__name__)
+
+# Modello di diarization (GATED su Hugging Face). Va passato esplicitamente:
+# senza, WhisperX carica un altro modello, che non e' nella cache dei modelli.
+DIARIZATION_MODEL = "pyannote/speaker-diarization-3.1"
 
 
 @dataclass
@@ -120,6 +125,18 @@ def _single_speaker_segments(aligned: Dict[str, Any]) -> List[Dict[str, Any]]:
     return out
 
 
+def _diarization_pipeline_cls(whisperx: Any) -> Any:
+    """La classe ``DiarizationPipeline`` di WhisperX.
+
+    WhisperX la espone solo nel sottomodulo ``whisperx.diarize``, non al primo
+    livello del pacchetto: ``whisperx.DiarizationPipeline`` non esiste.
+    """
+    diarize = getattr(whisperx, "diarize", None)
+    if diarize is None:
+        diarize = importlib.import_module(f"{whisperx.__name__}.diarize")
+    return diarize.DiarizationPipeline
+
+
 def _diarize_segments(
     whisperx: Any,
     aligned: Dict[str, Any],
@@ -148,8 +165,13 @@ def _diarize_segments(
 
     try:
         log.info("running diarization (expected_speakers=%s)", expected_speakers)
-        diarize_pipeline = whisperx.DiarizationPipeline(
-            use_auth_token=hf_token, device=device
+        # pyannote.audio 4 non legge PYANNOTE_CACHE da solo: la cache dei
+        # modelli gliela passa il worker.
+        diarize_pipeline = _diarization_pipeline_cls(whisperx)(
+            model_name=DIARIZATION_MODEL,
+            token=hf_token,
+            device=device,
+            cache_dir=os.environ.get("PYANNOTE_CACHE"),
         )
         # Quando il moderatore conosce il numero di speaker, lo forziamo:
         # min_speakers == max_speakers == expected_speakers fissa k.
@@ -272,7 +294,7 @@ def transcribe_with_whisperx(
         return_char_alignments=False,
     )
 
-    # Diarization (chi-parla) con pyannote 3.1 — modello GATED. È
+    # Diarization (chi-parla) con pyannote (DIARIZATION_MODEL, GATED). È
     # best-effort: senza token HF valido o se pyannote fallisce,
     # `_diarize_segments` degrada a single-speaker invece di crashare.
     diarized_segments = _diarize_segments(
@@ -314,7 +336,7 @@ def transcribe_with_whisperx(
         segments=segments,
         speakers=speakers,
         model_id=asr_model_id,
-        model_version=os.environ.get("WHISPERX_VERSION", "whisperx-3.1"),
+        model_version=os.environ.get("WHISPERX_VERSION", "whisperx-3.8"),
         raw_json={"segments": segments, "language": language, "speakers": speakers},
     )
 

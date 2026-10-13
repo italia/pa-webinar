@@ -407,7 +407,7 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             }
             for s in merged["speakers"]
         ]
-        model_version = os.environ.get("WHISPERX_VERSION", "whisperx-3.1") + "+multitrack"
+        model_version = os.environ.get("WHISPERX_VERSION", "whisperx-3.8") + "+multitrack"
 
         raw_bytes = json.dumps(merged, ensure_ascii=False).encode("utf-8")
         _write_and_upload(

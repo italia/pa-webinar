@@ -1,0 +1,8 @@
+# WhisperX, installato con `pip install --no-deps` (vedi Dockerfile.worker).
+#
+# Ogni release 3.8.x fissa torch a 2.8, che non ha le correzioni di sicurezza
+# di torch: con le sue dipendenze, pip scenderebbe di versione. Le dipendenze
+# che servono davvero stanno in requirements.txt, a versioni compatibili con
+# il torch fissato li'. A ogni aggiornamento di WhisperX vanno riconfrontate
+# con il suo pyproject.toml.
+whisperx==3.8.6
