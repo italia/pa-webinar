@@ -367,10 +367,10 @@ The portal answers on <http://localhost:3000/en>, Mailpit on <http://localhost:8
 
 - **Decisions are recorded.** Every architecture-level choice has an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md).
 - **Branches and commits.** Conventional Commits with a scope. Every change enters `dev`; `main` moves only through a `dev` → `main` pull request merged with a merge commit, never squashed, and releases are `vX.Y.Z` tags on `main`.
-- **Gates before every commit and push.** Lint, typecheck and unit tests before every commit; before every push, the same commands as each CI job the change touches, because no blocking check runs on `dev`.
+- **Gates before every commit and push.** Lint, typecheck and unit tests before every commit; before every push, the same commands as each CI job the change touches, because no blocking check runs on `dev`. Git hooks, installed by `npm install`, run them on what changed, check the commit message format and look for secrets in the added lines ([Git hooks](docs/development/methodology.md#git-hooks)).
 - **Code review** of every non-trivial change before it is committed or merged, with every finding resolved or explicitly accepted.
 - **Rules encoded as tests.** A coverage ratchet (thresholds in `app/vitest.config.ts` are never lowered to let a change pass), the 24-language parity test, the localized-URL test and a CI check that the database schema and its migrations agree.
-- **Supply chain.** Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, and an OpenSSF Scorecard workflow exists whose results are not yet published. A license report is checked in CI, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
+- **Supply chain.** Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, and an OpenSSF Scorecard workflow exists whose results are not yet published. Production dependency licenses are checked against the policy from the lockfiles, a license report is kept up to date, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
 - **Releases.** Each release publishes the images, an SPDX SBOM, the packaged chart and a GitHub Release. Release notes are written by hand in all 24 languages. CI builds and never deploys.
 
 ```mermaid

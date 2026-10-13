@@ -1,6 +1,7 @@
 {
   "name": "pa-webinar-recorder-controller",
   "version": "0.1.0",
+  "license": "EUPL-1.2",
   "private": true,
   "type": "module",
   "description": "Operator riconciliante che orchestra i Job recorder multi-traccia (ADR-013 Fase 3)",

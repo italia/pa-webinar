@@ -14,6 +14,7 @@ Run every command from the repository root unless a row or block says otherwise.
 | App unit and guard tests | The Vitest suite under `app/src/` | `npm run test --workspace=app` (also `test:watch`, `test:coverage`) | Nothing: no database, Redis or Jitsi | **Unit Tests**, with the coverage thresholds |
 | Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
+| Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) and the license policy (SPDX expressions, lockfile reading) | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
 | AI worker | Pure logic of the post-production worker | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Python. No GPU, no models | **Unit Tests (worker AI)** |
 | Helm chart | The chart renders on every profile and meets the installation invariants | `./scripts/validate-chart.sh` | Helm, `python3` with PyYAML, `openssl`, the subcharts | **Helm Chart**, plus a server-side dry run on kind |
 | Migration integrity | Migrations apply to an empty database and match `schema.prisma` | `prisma migrate deploy`, then `prisma migrate diff --exit-code`, against a throwaway database | A disposable PostgreSQL | **Migration Integrity** |
@@ -179,6 +180,10 @@ The tests cover pure logic:
 ### Lobby
 
 `npm run lobby:typecheck` runs `tsc --noEmit` with the strict options of `lobby/tsconfig.json`. It checks the library source, the development harness and the Vite configuration. The lobby has no unit tests. On the app side, the presence and schedule adapters in `app/src/lib/lobby/` are unit-tested with the rest of the app. The canvas itself is checked by hand; see [The square](#the-square).
+
+### Repository tooling
+
+`scripts/git-hooks/rules.test.mjs` and `scripts/licenses/policy.test.mjs` cover the logic behind the [Git hooks](methodology.md#git-hooks) and the license check: which commit messages pass, which added lines look like secrets or conflict markers, which checks a set of changed files calls for, how an SPDX expression is judged and which lockfile entries count as production packages. They use `node:test`, with no dependency to install. Test secrets are assembled from fragments, so that no scanner mistakes them for real ones.
 
 ### AI worker
 

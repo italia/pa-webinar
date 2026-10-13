@@ -25,7 +25,11 @@
     "lobby:build": "npm run build --workspace=lobby",
     "lobby:typecheck": "npm run typecheck --workspace=lobby",
     "license:report": "node scripts/generate-license-report.mjs",
-    "changelog:md": "node scripts/generate-changelog-md.mjs"
+    "license:check": "node scripts/licenses/check.mjs",
+    "changelog:md": "node scripts/generate-changelog-md.mjs",
+    "test:scripts": "node --test scripts/licenses/policy.test.mjs scripts/git-hooks/rules.test.mjs",
+    "hooks:install": "node scripts/git-hooks/install.mjs --force",
+    "prepare": "node scripts/git-hooks/install.mjs"
   },
   "overrides": {
     "react": "^19.2.8",

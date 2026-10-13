@@ -475,7 +475,7 @@ The chart lives in `infra/helm/pa-webinar/`. Its reference is [Deploying with He
 
 ## Adding a dependency
 
-- [ ] Check the license. The **License Compliance** job fails on the licenses listed in its `--failOn` argument in `.github/workflows/ci.yml` (GPL, AGPL and SSPL variants). It checks the production dependencies of the root workspaces (`app` and `lobby`) only. The recorder bot, the recorder controller, the Python worker and container images are outside it, so check those by hand. The policy is in [THIRD-PARTY-LICENSES.md](../../THIRD-PARTY-LICENSES.md).
+- [ ] Check the license with `npm run license:check`. The **License Compliance** job runs it too and fails on a forbidden license (GPL, AGPL, SSPL in every SPDX variant, source-available licenses) or on one that is missing or not on the allowed list. It reads the lockfiles of the root workspaces (`app` and `lobby`), the recorder bot, the recorder controller and the captions gateway. The Python worker and container images are outside it, so check those by hand. The policy is in [THIRD-PARTY-LICENSES.md](../../THIRD-PARTY-LICENSES.md).
 - [ ] For a root-workspace dependency, run `npm run license:report` and commit `license-report.json` together with `package-lock.json`. CI fails when the report is out of date.
 - [ ] Prefer a dependency that makes no network calls of its own and loads nothing from a third-party origin at runtime. A browser dependency that fetches from a CDN is blocked by the Content Security Policy and conflicts with the privacy model.
 - [ ] A dependency of the recorder bot, the recorder controller or the worker goes in that component's own manifest, not in the app.
@@ -484,7 +484,7 @@ Scanning, Dependabot and the SBOMs are described in [SECURITY.md](../../SECURITY
 
 ## Tests expected per kind of change
 
-The pre-commit gates run for every change: `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test --workspace=app`. CI runs the suite with coverage thresholds from `app/vitest.config.ts`. Those thresholds are a ratchet on the measured value: raise them, never lower them to let a change through. The layers, commands and CI jobs are in [Testing](testing.md), and the process is in [How we develop PA Webinar](methodology.md).
+The pre-commit gates run for every change: `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test --workspace=app`, and the [Git hooks](methodology.md#git-hooks) run them on what you changed. CI runs the suite with coverage thresholds from `app/vitest.config.ts`. Those thresholds are a ratchet on the measured value: raise them, never lower them to let a change through. The layers, commands and CI jobs are in [Testing](testing.md), and the process is in [How we develop PA Webinar](methodology.md).
 
 Several rules are encoded as guard tests: they fail when a step of a recipe is skipped. The table lists what to add and what already watches you.
 

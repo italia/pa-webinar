@@ -21,7 +21,7 @@ A third-party component may be used only if PA Webinar stays distributable under
 
 | Group | Examples | Position |
 |---|---|---|
-| Permissive | MIT, MIT-0, ISC, BSD-2-Clause, BSD-3-Clause, 0BSD, Apache-2.0, CC0-1.0, BlueOak-1.0.0, Python-2.0 | Accepted. These licenses let a combined work be distributed under another license, EUPL included, provided their notices are kept. |
+| Permissive | MIT, MIT-0, ISC, BSD-2-Clause, BSD-3-Clause, 0BSD, Apache-2.0, CC0-1.0, CC-BY-4.0, BlueOak-1.0.0, Python-2.0, Unlicense, Zlib, BSL-1.0 | Accepted. These licenses let a combined work be distributed under another license, EUPL included, provided their notices are kept. |
 | Weak copyleft | LGPL-2.1, LGPL-3.0, MPL-2.0 | Accepted case by case, when the component stays a separate library that PA Webinar does not modify. Its own files keep its license, and the rest of PA Webinar stays under EUPL. Each accepted case is listed under [npm licenses assessed individually](#npm-licenses-assessed-individually). |
 | Strong copyleft and source-available | GPL-2.0, GPL-3.0, AGPL-3.0, SSPL-1.0 | Not accepted in the portal's production dependencies. |
 
@@ -37,58 +37,66 @@ This has three consequences for the policy:
 
 ## Enforcement
 
-A dependency change in the npm workspaces goes through two CI steps before it reaches `main`, and a reviewer reads the change to the license report. The first step inspects no packages, so the report diff and the review do the work.
+A dependency change goes through two CI steps before it reaches `main`, and a reviewer reads the change to the license report. The pre-commit Git hook runs the same two steps when a lockfile is staged ([Git hooks](docs/development/methodology.md#git-hooks)).
 
 ```mermaid
 flowchart LR
-  change["Dependency change<br/>in app/ or lobby/"]:::portal
+  change["Dependency change<br/>in a lockfile"]:::portal
   report["npm run license:report<br/>regenerates license-report.json"]:::step
   commit["Commit license-report.json<br/>with package-lock.json"]:::step
-  failon["CI step 1: failOn<br/>(inspects no packages)"]:::inert
+  policy{"CI step 1: license:check<br/>only allowed licenses?"}:::check
   diff{"CI step 2: report diff<br/>report up to date?"}:::check
   review["Reviewer reads the<br/>license-report.json diff"]:::step
   merge["Merge to main"]:::data
+  fail1["Job fails: replace the<br/>dependency or record a<br/>verified exception"]:::risk
   fail2["Job fails:<br/>regenerate and commit"]:::risk
 
-  change --> report --> commit --> failon
-  failon -. "always passes" .-> diff
+  change --> report --> commit --> policy
+  policy -- "no" --> fail1
+  policy -- "yes" --> diff
   diff -- "no" --> fail2
   diff -- "yes" --> review --> merge
 
   classDef portal fill:#E6F0FA,stroke:#0066CC,stroke-width:2px,color:#17324D
   classDef step fill:#E6F7F7,stroke:#00A3A3,stroke-width:2px,color:#17324D
   classDef check fill:#FFF4E5,stroke:#CC7A00,stroke-width:2px,color:#17324D
-  classDef inert fill:#EEF1F4,stroke:#5C6F82,stroke-width:2px,stroke-dasharray:5 3,color:#17324D
   classDef risk fill:#FCE8EC,stroke:#D1344C,stroke-width:2px,color:#17324D
   classDef data fill:#E6F4EE,stroke:#008055,stroke-width:2px,color:#17324D
 ```
-
-In practice the report diff and the review are the controls. See [Limits of the automated check](#limits-of-the-automated-check).
 
 ### What CI runs
 
 The **License Compliance** job (`license-check` in `.github/workflows/ci.yml`) runs on pushes and pull requests to `main` and on manual dispatch. It does not run on `dev`. It has two steps:
 
 ```bash
-# 1. Meant to block listed licenses in production dependencies
-#    (it inspects no packages: see "Limits of the automated check")
-npx license-checker --production --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-3.0-only;SSPL-1.0" --excludePrivatePackages
+# 1. Production licenses, read from the lockfiles
+npm run license:check
 
 # 2. Fail if the committed report is stale
 npm run license:report
 git diff --exit-code license-report.json
 ```
 
-When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Before you push, run the second step locally to confirm that the report is current. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
+**Step 1** runs `scripts/licenses/check.mjs`. It reads `package-lock.json`, which holds the `app` and `lobby` workspaces, and the lockfiles of `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`, whose packages ship in images. It takes every package that is not a development-only dependency and evaluates the SPDX expression the package declares, with the rules in `scripts/licenses/policy.mjs`:
 
-**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`, and to the AI worker's Python requirements, are not covered by any license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
+- an identifier on the allowed list passes: the permissive licenses and the weak-copyleft ones of [The rule](#the-rule), and EUPL-1.2. The list is `AMMESSE` in the script;
+- an identifier in a forbidden family fails: GPL, AGPL and SSPL in every SPDX variant (`-only`, `-or-later`, `+`), and the source-available families BUSL, Elastic, PolyForm, Commons Clause and CC BY-NC;
+- `A OR B` passes when one side is allowed, and `A AND B` only when both are. `WITH` exceptions do not change the family;
+- anything else fails too: a missing license, a name that is not SPDX (`BSD`, `Proprietary`), a `LicenseRef`. It passes once someone verifies the real license and records it, with the reason, in `scripts/licenses/exceptions.json`. Entries are keyed by name and version, so an update is checked again. An exception applies only to such a license: it never clears a forbidden one, and the license it records is judged by the same rules.
+
+A new weak-copyleft dependency passes the check, but it is accepted case by case: the report diff shows it, and the reviewer records it under [npm licenses assessed individually](#npm-licenses-assessed-individually).
+
+The rules have tests (`npm run test:scripts`), which the Lint & Typecheck job runs.
+
+**Step 2** keeps the report honest. When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
+
+**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Step 1 also covers Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`. Updates to the AI worker's Python requirements are covered by no license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
 
 ### Limits of the automated check
 
-- **The production scan is empty.** Run from the repository root, `license-checker --production` finds no packages. The root `package.json` declares workspaces but no dependencies of its own, so the first step passes without inspecting any dependency of `app/` or `lobby/`. You can reproduce this: the same command with `--failOn "MIT"` also exits with code 0. In practice, the effective control is the second step together with review. Every dependency change shows up in the `license-report.json` diff, and the reviewer sees any new license there.
-- **Matching is exact.** `--failOn` compares the whole license string of a package against each list entry. SPDX variants such as `GPL-2.0-only`, `GPL-3.0-only`, `GPL-3.0-or-later` and `AGPL-3.0-or-later` do not match, and neither do compound expressions such as `(MIT OR GPL-3.0)`.
-- **The tool is not pinned.** `npx` fetches the current `license-checker` from the registry at run time, because no manifest in the repository pins it.
-- **Only the workspace tree is covered.** Everything outside the npm workspaces is assessed by hand on this page.
+- **Declared licenses only.** The check trusts the license each package declares, as the lockfile records it. A package that declares the wrong license passes. The report diff and the review are the controls for that.
+- **npm only.** The AI worker's Python packages, the container images, model weights, voices, fonts and other assets are assessed by hand on this page.
+- **The report reads `node_modules`.** `license:report` runs a pinned `license-checker` on the installed tree, so run `npm ci` first. The policy check reads the lockfiles and needs no install.
 
 The diagram shows which control covers each part of PA Webinar:
 
@@ -97,20 +105,22 @@ flowchart LR
   ws["npm workspace tree<br/>app/ and lobby/"]:::portal
   appimg["App image<br/>ghcr.io/italia/pa-webinar"]:::portal
   migimg["Migration image<br/>X.Y.Z-migrate"]:::other
-  rec["infra/recorder and<br/>infra/recorder-controller<br/>npm trees"]:::other
+  rec["infra/recorder,<br/>infra/recorder-controller and<br/>infra/captions/gateway npm trees"]:::portal
   py["AI worker<br/>Python packages"]:::other
   img["Other images and<br/>chart dependencies"]:::other
   mdl["Model weights<br/>and voices"]:::other
   ast["Fonts, audio<br/>and images"]:::other
 
   rep["license-report.json<br/>and CI License Compliance"]:::data
+  chk["CI license:check<br/>on the lockfiles"]:::data
   sbom["Release SBOM<br/>sbom.spdx.json"]:::data
   manual["Manual assessment<br/>on this page"]:::check
 
   ws --> rep
+  ws --> chk
   appimg --> sbom
   migimg --> manual
-  rec --> manual
+  rec --> chk
   py --> manual
   img --> manual
   mdl --> manual
@@ -128,7 +138,7 @@ flowchart LR
 
 `npm run license:report` runs `scripts/generate-license-report.mjs`, which works in three steps:
 
-1. It calls `license-checker` with `--json --relativeLicensePath --excludePrivatePackages`. That last flag leaves out the workspace packages themselves, which are private.
+1. It calls `license-checker`, at the version pinned in the script, with `--json --relativeLicensePath --excludePrivatePackages`. That last flag leaves out the workspace packages themselves, which are private.
 2. For each package it keeps `licenses`, `repository`, `publisher`, `email` and `url`. It drops local paths and license-file paths, so every machine produces the same file.
 3. It omits platform-specific native packages (`linux`, `linuxmusl`, `darwin`, `win32` and similar builds), so the report does not depend on the platform it was generated on. As a result, the LGPL libvips binaries (`@img/sharp-libvips-*`) are missing from the report. libvips appears in it only through `@img/sharp-wasm32`. The image SBOM does list the binaries (see [Release SBOMs](#release-sboms)).
 
@@ -292,7 +302,6 @@ Record every new component here, or in `license-report.json` for the npm workspa
 These points need a decision by the maintainers. Each one is described in the section it links to.
 
 - **Full EUPL text.** `LICENSE` carries a notice and a link, not the text. Redistributors must include a copy of the license (EUPL Article 5), so adding the official EUPL-1.2 text to the repository and the image would make that obligation easy to meet. [Reusing PA Webinar](docs/REUSE.md#eupl-12-in-plain-words) already tells adopters to include a copy. See [PA Webinar's license](#pa-webinars-license).
-- **CI license scan.** The production scan inspects no packages, and its matching is exact. See [Limits of the automated check](#limits-of-the-automated-check).
 - **Report generator.** It omits platform-specific packages because it assumes they share their parent's license. That assumption does not hold for libvips. The omitted binaries can be seen in the image SBOM. See [The npm report](#the-npm-report-license-reportjson) and [Release SBOMs](#release-sboms).
 - **GPL code in the AI worker image.** `gender-guesser` and espeak-ng (through `piper-phonemize`). See [AI stack and model weights](#ai-stack-and-model-weights).
 - **Non-commercial alignment weights.** The default alignment models for Italian, French, German and Spanish are CC BY-NC 4.0. See [AI stack and model weights](#ai-stack-and-model-weights).

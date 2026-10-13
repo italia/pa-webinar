@@ -1,6 +1,7 @@
 {
   "name": "@pa-webinar/app",
   "version": "0.13.0",
+  "license": "EUPL-1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -12,16 +12,16 @@ Three other pages cover what this one does not:
 
 | Practice | Where it is checked |
 |---|---|
-| Conventional Commits with a scope | Review. The release workflow also groups the GitHub Release notes by commit type. |
-| Pre-commit gates: lint, typecheck and unit tests before every commit | The author, by hand. There is no Git hook, and no test runs on `dev`. |
-| The same commands as CI before every push | The author, with the table in [CI parity](#ci-parity-before-every-push). |
+| Conventional Commits with a scope | The `commit-msg` Git hook, then review. The release workflow also groups the GitHub Release notes by commit type. |
+| Pre-commit gates: lint, typecheck and unit tests before every commit | The author, helped by the [Git hooks](#git-hooks) that `npm install` installs. No test runs on `dev`. |
+| The same commands as CI before every push | The `pre-push` Git hook, for the areas the pushed commits touch, and the author, with the table in [CI parity](#ci-parity-before-every-push). |
 | Full CI before anything reaches `main` | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) runs on the `dev` → `main` pull request, and the maintainers merge only when every blocking job is green |
 | Code review of every non-trivial change | Before the commit, or before the merge of a pull request |
 | Coverage that cannot silently drop | Thresholds in [`app/vitest.config.ts`](../../app/vitest.config.ts), enforced by `npm run test:coverage` |
 | Project rules encoded as tests | [Guard tests](#guard-tests), such as the 24-language parity test |
 | Schema and migrations in sync | The Migration Integrity job |
 | A chart that renders on every profile, and that a Kubernetes API server accepts for the example profiles | [`scripts/validate-chart.sh`](../../scripts/validate-chart.sh), and `kubectl apply --dry-run=server` on a throwaway kind cluster |
-| Dependency license policy | The License Compliance job |
+| Dependency license policy | `npm run license:check` in the License Compliance job and in the Git hooks |
 | Vulnerability and secret scanning | Trivy on the repository and on the image (blocking by rule); CodeQL (non-blocking) |
 | Architecture decisions | Architecture Decision Records in [`docs/adr/`](../adr/README.md) |
 | Release notes in all 24 languages | A test on the release-note catalogs |
@@ -171,7 +171,7 @@ npx tsc --noEmit --project app/tsconfig.json
 npm run test --workspace=app
 ```
 
-No Git hook runs them for you, and no test runs on `dev`. They are the only check between a commit and the integration branch.
+The pre-commit [Git hook](#git-hooks) runs them on what you staged. No test runs on `dev`: these gates are the only check between a commit and the integration branch.
 
 These three commands cover the `app` workspace only. If you touched one of the areas below, also run its check:
 
@@ -181,13 +181,31 @@ These three commands cover the `app` workspace only. If you touched one of the a
 | `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/` | In that folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`. These packages sit outside the npm workspaces. |
 | `infra/ai/worker/` | In that folder: `pip install -r requirements-test.txt`, then `python -m pytest -q`. The tests cover pure logic and need no GPU. |
 | `infra/helm/` | `./scripts/validate-chart.sh`. No other local check looks at the chart. |
-| Dependencies | `npm run license:report`, then commit `license-report.json` together with `package-lock.json` |
+| Dependencies | `npm run license:check`, then `npm run license:report` and commit `license-report.json` together with `package-lock.json` |
 | `app/prisma/schema.prisma` | `npm run db:migrate:dev --workspace=app`, then commit the generated SQL with the schema. See [Database changes](#database-changes). |
 | Interface strings | The key must exist in all 24 catalogs in `app/src/i18n/messages/`. Add it to `it.json` and `en.json`, then run `node scripts/sync-i18n.mjs` to create it in the other catalogs. |
 
 The i18n sync script fills a missing key with the English text. The parity test then passes, because it checks that keys are present, non-empty and have the same placeholders, and it cannot tell a copy from a translation. Replace the English copies with real translations. Review is the only check that catches an untranslated string.
 
 `validate-chart.sh` needs Helm, `python3` with PyYAML, and the subcharts (`helm dependency build infra/helm/pa-webinar`). When something is missing, it stops and prints the command that fixes it. It renders the chart with the default values and with each profile and example values file, runs `helm lint`, and checks invariants whose violation breaks an installation. For example, it checks that every Secret a component mounts carries the keys that component needs, and that every Ingress path is absolute. The script itself is the authoritative list.
+
+## Git hooks
+
+The repository ships three Git hooks in [`scripts/git-hooks/`](../../scripts/git-hooks/). `npm install` (or `npm ci`) at the repository root installs them, by pointing `core.hooksPath` at that folder. If `core.hooksPath` already points somewhere else, it leaves it alone and says so; `npm run hooks:install` sets it anyway. They run the gates for you, on what changed, and add a few checks no gate covers. They need nothing beyond Node and the tools of the area you touched.
+
+| Hook | When | What it runs |
+|---|---|---|
+| `pre-commit` | `git commit` | On the staged files: secrets in the added lines (common key and token formats), merge-conflict markers, files over 5 MB. Then, for what is staged: ESLint on the staged code of `app/`, the app type check, the unit tests related to the staged files (`vitest related`), the 24-language parity test when a catalog changed, a staged migration when `schema.prisma` changed, the lobby and service type checks, the license check and report when a lockfile changed, the chart validation when `infra/helm/` changed, and Prettier on new code files only. |
+| `commit-msg` | after you write the message | The [commit format](#commits): `type(scope): subject`, 72 characters at most, no emoji, no trailing period, a blank line before the body, no attribution trailers. Merge, revert and fixup messages pass as Git writes them. |
+| `pre-push` | `git push` | The [CI-parity](#ci-parity-before-every-push) commands. Always: lint, type check, the script tests and the coverage run. For the areas the pushed commits touch: tests of the services, the lobby type check, the chart validation, the worker tests, the license check and the migration check. Then the Trivy filesystem scan on a clean checkout of each pushed commit. |
+
+A check whose tool is missing (Helm, Trivy, pytest, a throwaway database for the migration check in `SHADOW_DATABASE_URL`) is skipped with a notice, and CI still runs it. The Docker build and the E2E suite are not run by the hooks; `pre-push` reminds you when your change calls for them. Every hook ends with a summary of what ran, what was skipped and what failed.
+
+- **The hooks help, they do not replace the rules.** The full unit-test suite runs before the push, not at every commit, and some checks need tools you may not have. Declaring what you skipped still applies.
+- **They read the working tree.** Apart from the secret, conflict and size checks, which read the staged content, the checks run on your working copy. With a partially staged file, or when you push a branch other than the one checked out, the result describes the working copy; the hooks print a notice when that happens.
+- **Skipping them** is for exceptional cases: `git commit --no-verify` or `git push --no-verify`, and say why in the commit body or the pull request.
+- **The rules are tested.** The message format, the secret patterns, the choice of checks and the license policy are pure functions with tests: `npm run test:scripts`, which CI runs in Lint & Typecheck.
+- **Removing them:** `git config --unset core.hooksPath`.
 
 ## CI parity before every push
 
@@ -199,21 +217,21 @@ Run every command from the repository root unless the table says otherwise.
 
 | Job in `ci.yml` | Local equivalent | You may skip it when |
 |---|---|---|
-| Lint & Typecheck | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | Never |
+| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` | Never |
 | Unit Tests | `npm run test:coverage --workspace=app`. **Not** `npm run test`: only the coverage run enforces the thresholds. | Never |
 | Unit Tests (recorder, controller) | In `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Nothing changed in those folders |
 | Typecheck (lobby) | `npm run lobby:typecheck`, which runs the same `tsc --noEmit` as `npx tsc --noEmit -p lobby/tsconfig.json` | Nothing changed in `lobby/` |
 | Helm Chart | `./scripts/validate-chart.sh`. The second step, `kubectl apply --dry-run=server`, needs a cluster (see below). | Nothing changed in `infra/helm/` |
 | Unit Tests (worker AI) | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Nothing changed in `infra/ai/worker/` |
 | Security Scan | `trivy fs --severity CRITICAL,HIGH --exit-code 1 .` | Never: it also looks for secrets in every file |
-| License Compliance | `npx license-checker --production --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-3.0-only;SSPL-1.0" --excludePrivatePackages`, then `npm run license:report && git diff --exit-code license-report.json` | No dependency changed |
+| License Compliance | `npm run license:check`, then `npm run license:report && git diff --exit-code license-report.json` | No dependency changed |
 | Migration Integrity | `prisma migrate deploy` and `prisma migrate diff` against a throwaway database (see below) | Nothing changed in `app/prisma/` |
 | Docker Build & Scan | `docker build -t pa-webinar:local .`, then `trivy image --severity CRITICAL,HIGH --exit-code 1 pa-webinar:local` | Documentation-only changes |
 | E2E Smoke Tests (non-blocking) | Start the local stack, then run `npx playwright test --project=chromium` from `app/` (see below) | You did not touch the flows of the live room |
 
 A few jobs need more than one command, or have a catch.
 
-**Match the install.** CI starts every Node job from `npm ci`. If `package-lock.json` changed, run `npm ci` locally first, so that you test the tree CI installs. `license-checker` in particular reads the installed `node_modules`.
+**Match the install.** CI starts every Node job from `npm ci`. If `package-lock.json` changed, run `npm ci` locally first, so that you test the tree CI installs. `npm run license:report` in particular reads the installed `node_modules`.
 
 **Migration Integrity.** CI applies every migration to an empty PostgreSQL, then checks that the migrations produce exactly the schema in `schema.prisma`. Do the same against a throwaway database. The `migrate diff` step **resets the shadow database**: never point it at a database whose contents you want to keep, including your local development database.
 
@@ -353,7 +371,7 @@ SECURITY.md owns the [supply-chain and CI controls](../../SECURITY.md#supply-cha
 
 - **Pull-request code never runs on the self-hosted runner.** Every action is pinned to a full commit SHA, and token permissions are kept to the minimum. A new or changed workflow keeps all three properties.
 - **Scans run on the way to `main`.** Trivy scans the repository and the application image. A CRITICAL or HIGH finding means the pull request is not merged until the finding is fixed or recorded in `.trivyignore`. CodeQL and OpenSSF Scorecard are non-blocking.
-- **The repository holds no secrets.** No pre-commit hook scans for secrets. Before a change reaches `dev`, review is the only control. On the way to `main`, the Trivy filesystem scan also looks for embedded secrets. Leave the development placeholders in `docker-compose.yml` and `.env.example` as they are.
+- **The repository holds no secrets.** The pre-commit [Git hook](#git-hooks) rejects added lines that match common key and token formats; it is a pattern match, and review remains the control before `dev`. On the way to `main`, the Trivy filesystem scan also looks for embedded secrets. Leave the development placeholders in `docker-compose.yml` and `.env.example` as they are.
 
 ## Releases
 

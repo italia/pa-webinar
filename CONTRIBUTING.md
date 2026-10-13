@@ -142,7 +142,7 @@ Tick only what is true, and explain any unticked item.
 
 The [pull request template](.github/pull_request_template.md) turns this list into checkboxes and adds the base branch, the title, the type of change and a confirmation for reviewers.
 
-Nothing checks the secrets and personal-data item before a change enters `dev`: there is no pre-commit secret-scanning hook, and Trivy's secret scan runs only on the way to `main`. Review is the control. Leave the development placeholders in `docker-compose.yml` and `.env.example` unchanged; why they exist is in [SECURITY.md](SECURITY.md#development-placeholders).
+Before a change enters `dev`, the pre-commit [Git hook](docs/development/methodology.md#git-hooks) rejects added lines that match common key and token formats, but nothing checks for personal data or internal names, and Trivy's secret scan runs only on the way to `main`. Review is the control. Leave the development placeholders in `docker-compose.yml` and `.env.example` unchanged; why they exist is in [SECURITY.md](SECURITY.md#development-placeholders).
 
 ## Review and merge
 

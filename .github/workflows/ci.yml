@@ -34,6 +34,8 @@ jobs:
       - run: npm ci
       - run: npm run lint --workspace=app
       - run: npx tsc --noEmit --project app/tsconfig.json
+      # Le regole dei git hook e la politica delle licenze.
+      - run: npm run test:scripts
 
   test:
     name: Unit Tests
@@ -248,9 +250,10 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm ci
+      # Licenze di produzione lette dai lockfile (workspace e servizi npm che
+      # finiscono nelle immagini), espressioni SPDX valutate per intero.
       - name: Check forbidden licenses
-        run: |
-          npx license-checker --production --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-3.0-only;SSPL-1.0" --excludePrivatePackages
+        run: npm run license:check
       - name: Verify license-report.json is up to date
         run: |
           npm run license:report

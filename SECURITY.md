@@ -251,7 +251,7 @@ What the scanners do not cover:
 - **Published images are never scanned.** No workflow scans the images pushed to GHCR. The release image is rebuilt from the tag. The migration, recorder, recorder controller, post-production worker and patched jitsi/web images are never scanned as built images, with their OS packages and everything added at build time. Only their dependency manifests in the repository are covered by the filesystem scan. An operator that needs image scanning should scan the digests it deploys.
 - **Trivy runs with its default scanners:** known vulnerabilities and embedded secrets. `.trivyignore`, at the repository root, records each accepted finding with its justification.
 - **CodeQL does not analyze the Python worker.** Its language matrix is JavaScript and TypeScript only. CodeQL also needs code scanning to be enabled on the repository.
-- **Secret scanning has no pre-commit hook.** Code review and the Trivy scan are the controls.
+- **The secret check before a commit is a pattern match.** The pre-commit Git hook ([Git hooks](docs/development/methodology.md#git-hooks)) looks for common key and token formats in the added lines. It runs only where the hooks are installed, and it can be skipped with `--no-verify`. Code review and the Trivy scan remain the controls.
 
 ### Release artifacts and SBOMs
 
@@ -276,13 +276,13 @@ The service inventory is a separate document. It is a CycloneDX 1.6 view of the 
 
 The `License Compliance` job in `ci.yml` fails in two cases:
 
-- `license-checker` finds a production npm dependency of the root workspaces (`app`, `lobby`) whose license is one of `GPL-2.0`, `GPL-3.0`, `AGPL-3.0`, `AGPL-3.0-only` or `SSPL-1.0`;
+- `npm run license:check` finds a production npm dependency under a forbidden license (GPL, AGPL, SSPL in every SPDX variant, or a source-available license), or one whose license is missing, not SPDX or not on the allowed list, unless it has been verified and recorded as an exception. It reads the lockfiles of the root workspaces (`app`, `lobby`) and of the recorder, the recorder controller and the captions gateway, and evaluates whole SPDX expressions;
 - `license-report.json` is out of date.
 
 The check has limits:
 
-- **Exact matching.** `license-checker` matches the license string exactly, so other SPDX variants (such as `GPL-3.0-only` or `GPL-2.0-or-later`) and license expressions (such as `(MIT OR GPL-3.0)`) are not caught. `license-report.json` and [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) are the review point for those.
-- **Root workspaces only.** The dependencies of the recorder, the recorder controller and the post-production worker are not checked.
+- **Declared licenses only.** It trusts the license each package declares. `license-report.json` and [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) are the review point for anything else.
+- **npm only.** The post-production worker's Python dependencies are not checked.
 
 The license policy is in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
