@@ -987,37 +987,27 @@
     "repository": "https://github.com/vitejs/vite-plugin-react",
     "publisher": "Evan You"
   },
-  "@vitest/coverage-v8@4.1.11": {
+  "@vitest/coverage-v8@5.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/vitest-dev/vitest",
     "publisher": "Anthony Fu",
     "email": "anthonyfu117@hotmail.com"
   },
-  "@vitest/expect@4.1.11": {
+  "@vitest/istanbul-lib-coverage@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vitest-dev/istanbuljs",
+    "publisher": "Vitest Team"
+  },
+  "@vitest/istanbul-lib-report@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vitest-dev/istanbuljs",
+    "publisher": "Vitest Team"
+  },
+  "@vitest/mocker@5.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/vitest-dev/vitest"
   },
-  "@vitest/mocker@4.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitest-dev/vitest"
-  },
-  "@vitest/pretty-format@4.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitest-dev/vitest"
-  },
-  "@vitest/runner@4.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitest-dev/vitest"
-  },
-  "@vitest/snapshot@4.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitest-dev/vitest"
-  },
-  "@vitest/spy@4.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitest-dev/vitest"
-  },
-  "@vitest/utils@4.1.11": {
+  "@vitest/spy@5.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/vitest-dev/vitest"
   },
@@ -2083,11 +2073,6 @@
     "email": "d@domenic.me",
     "url": "https://domenic.me/"
   },
-  "html-escaper@2.0.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/WebReflection/html-escaper",
-    "publisher": "Andrea Giammarchi"
-  },
   "http-proxy-agent@7.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/TooTallNate/proxy-agents",
@@ -2376,24 +2361,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/kkomelin/isomorphic-dompurify"
   },
-  "istanbul-lib-coverage@3.2.2": {
-    "licenses": "BSD-3-Clause",
-    "repository": "https://github.com/istanbuljs/istanbuljs",
-    "publisher": "Krishnan Anantheswaran",
-    "email": "kananthmail-github@yahoo.com"
-  },
-  "istanbul-lib-report@3.0.1": {
-    "licenses": "BSD-3-Clause",
-    "repository": "https://github.com/istanbuljs/istanbuljs",
-    "publisher": "Krishnan Anantheswaran",
-    "email": "kananthmail-github@yahoo.com"
-  },
-  "istanbul-reports@3.2.0": {
-    "licenses": "BSD-3-Clause",
-    "repository": "https://github.com/istanbuljs/istanbuljs",
-    "publisher": "Krishnan Anantheswaran",
-    "email": "kananthmail-github@yahoo.com"
-  },
   "iterator.prototype@1.1.5": {
     "licenses": "MIT",
     "repository": "https://github.com/ljharb/Iterator.prototype",
@@ -2553,7 +2520,7 @@
     "repository": "https://github.com/videojs/m3u8-parser",
     "publisher": "Brightcove, Inc"
   },
-  "magic-string@0.30.21": {
+  "magic-string@1.4.3": {
     "licenses": "MIT",
     "repository": "https://github.com/Rich-Harris/magic-string",
     "publisher": "Rich Harris"
@@ -2561,13 +2528,6 @@
   "magicast@0.5.5": {
     "licenses": "MIT",
     "repository": "https://github.com/unjs/magicast"
-  },
-  "make-dir@4.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/sindresorhus/make-dir",
-    "publisher": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "https://sindresorhus.com"
   },
   "marked@18.1.1": {
     "licenses": "MIT",
@@ -2775,7 +2735,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "obug@2.2.1": {
+  "obug@3.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/sxzz/obug",
     "publisher": "Kevin Deng",
@@ -3279,12 +3239,6 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "siginfo@2.0.0": {
-    "licenses": "ISC",
-    "repository": "https://github.com/emilbayes/siginfo",
-    "publisher": "Emil Bay",
-    "email": "github@tixz.dk"
-  },
   "source-map-js@1.2.2": {
     "licenses": "BSD-3-Clause",
     "repository": "https://github.com/7rulnik/source-map-js",
@@ -3295,12 +3249,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/shuding/stable-hash",
     "publisher": "Shu Ding"
-  },
-  "stackback@0.0.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/shtylman/node-stackback",
-    "publisher": "Roman Shtylman",
-    "email": "shtylman@gmail.com"
   },
   "standard-as-callback@2.1.0": {
     "licenses": "MIT",
@@ -3416,7 +3364,7 @@
     "email": "welch@quietplease.com",
     "url": "http://quietplease.com/"
   },
-  "tinybench@2.9.0": {
+  "tinybench@6.2.2": {
     "licenses": "MIT",
     "repository": "https://github.com/tinylibs/tinybench"
   },
@@ -3622,7 +3570,7 @@
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You"
   },
-  "vitest@4.1.11": {
+  "vitest@5.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/vitest-dev/vitest",
     "publisher": "Anthony Fu",
@@ -3705,7 +3653,7 @@
     "email": "i@izs.me",
     "url": "http://blog.izs.me"
   },
-  "why-is-node-running@2.3.0": {
+  "why-is-node-running@3.2.1": {
     "licenses": "MIT",
     "repository": "https://github.com/mafintosh/why-is-node-running",
     "publisher": "Mathias Buus",
