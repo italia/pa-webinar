@@ -5,6 +5,11 @@ on:
     tags:
       - "v*"
 
+# Default in sola lettura per ogni job; chi pubblica immagini o file della
+# release eleva i propri permessi nel suo blocco.
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar
