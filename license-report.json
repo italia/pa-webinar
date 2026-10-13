@@ -10,7 +10,17 @@
     "repository": "https://github.com/asamuzaK/cssColor",
     "publisher": "asamuzaK"
   },
+  "@asamuzakjp/css-color@7.1.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/asamuzaK/cssColor",
+    "publisher": "asamuzaK"
+  },
   "@asamuzakjp/dom-selector@7.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/asamuzaK/domSelector",
+    "publisher": "asamuzaK"
+  },
+  "@asamuzakjp/dom-selector@9.2.4": {
     "licenses": "MIT",
     "repository": "https://github.com/asamuzaK/domSelector",
     "publisher": "asamuzaK"
@@ -346,27 +356,27 @@
     "email": "bramus@bram.us",
     "url": "https://www.bram.us/"
   },
-  "@csstools/color-helpers@6.1.1": {
+  "@csstools/color-helpers@6.1.2": {
     "licenses": "MIT-0",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-calc@3.4.0": {
+  "@csstools/css-calc@3.4.3": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-color-parser@4.2.3": {
+  "@csstools/css-color-parser@4.2.6": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-parser-algorithms@4.0.0": {
+  "@csstools/css-parser-algorithms@4.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-syntax-patches-for-csstree@1.1.14": {
+  "@csstools/css-syntax-patches-for-csstree@1.1.15": {
     "licenses": "MIT-0",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@csstools/css-tokenizer@4.0.1": {
+  "@csstools/css-tokenizer@4.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
@@ -427,7 +437,7 @@
     "repository": "https://github.com/eslint/rewrite",
     "publisher": "Nicholas C. Zakas"
   },
-  "@exodus/bytes@1.15.2": {
+  "@exodus/bytes@1.16.0": {
     "licenses": "MIT",
     "repository": "https://github.com/ExodusOSS/bytes",
     "publisher": "Exodus Movement, Inc."
@@ -807,7 +817,14 @@
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "@testing-library/jest-dom@6.9.1": {
+  "@testing-library/dom@10.4.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/testing-library/dom-testing-library",
+    "publisher": "Kent C. Dodds",
+    "email": "me@kentcdodds.com",
+    "url": "https://kentcdodds.com"
+  },
+  "@testing-library/jest-dom@7.0.1": {
     "licenses": "MIT",
     "repository": "https://github.com/testing-library/jest-dom",
     "publisher": "Ernesto Garcia",
@@ -820,6 +837,10 @@
     "publisher": "Kent C. Dodds",
     "email": "me@kentcdodds.com",
     "url": "https://kentcdodds.com"
+  },
+  "@types/aria-query@5.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
   "@types/babel__core@7.20.5": {
     "licenses": "MIT",
@@ -1041,12 +1062,26 @@
     "publisher": "Julian Garnier",
     "email": "hello@julian.gr"
   },
+  "ansi-regex@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
   "ansi-styles@4.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/chalk/ansi-styles",
     "publisher": "Sindre Sorhus",
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
+  },
+  "ansi-styles@5.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com"
   },
   "anynum@1.0.1": {
     "licenses": "MIT",
@@ -1068,6 +1103,12 @@
     "repository": "https://github.com/theKashey/aria-hidden",
     "publisher": "Anton Korzunov",
     "email": "thekashey@gmail.com"
+  },
+  "aria-query@5.3.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/A11yance/aria-query",
+    "publisher": "Jesse Beach",
+    "email": "splendidnoise@gmail.com"
   },
   "aria-query@5.3.2": {
     "licenses": "Apache-2.0",
@@ -1405,6 +1446,13 @@
     "email": "d@domenic.me",
     "url": "https://domenic.me/"
   },
+  "data-urls@8.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/data-urls",
+    "publisher": "Domenic Denicola",
+    "email": "d@domenic.me",
+    "url": "https://domenic.me/"
+  },
   "data-view-buffer@1.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/inspect-js/data-view-buffer",
@@ -1510,6 +1558,10 @@
   "doctrine@2.1.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/eslint/doctrine"
+  },
+  "dom-accessibility-api@0.5.16": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eps1lon/dom-accessibility-api"
   },
   "dom-accessibility-api@0.6.3": {
     "licenses": "MIT",
@@ -2024,6 +2076,13 @@
     "email": "d@domenic.me",
     "url": "https://domenic.me/"
   },
+  "html-encoding-sniffer@7.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/html-encoding-sniffer",
+    "publisher": "Domenic Denicola",
+    "email": "d@domenic.me",
+    "url": "https://domenic.me/"
+  },
   "html-escaper@2.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/WebReflection/html-escaper",
@@ -2371,6 +2430,10 @@
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/jsdom"
   },
+  "jsdom@30.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/jsdom"
+  },
   "jsesc@3.1.0": {
     "licenses": "MIT",
     "repository": "https://github.com/mathiasbynens/jsesc",
@@ -2478,6 +2541,12 @@
     "repository": "https://github.com/isaacs/node-lru-cache",
     "publisher": "Isaac Z. Schlueter",
     "email": "i@izs.me"
+  },
+  "lz-string@1.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pieroxy/lz-string",
+    "publisher": "pieroxy",
+    "email": "pieroxy@pieroxy.net"
   },
   "m3u8-parser@7.2.0": {
     "licenses": "Apache-2.0",
@@ -2871,6 +2940,12 @@
     "repository": "https://github.com/prettier/prettier",
     "publisher": "James Long"
   },
+  "pretty-format@27.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/jest",
+    "publisher": "James Kyle",
+    "email": "me@thejameskyle.com"
+  },
   "prisma@6.19.3": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/prisma/prisma",
@@ -2953,6 +3028,10 @@
     "publisher": "Chris Bolin"
   },
   "react-is@16.13.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react"
+  },
+  "react-is@17.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react"
   },
@@ -3384,6 +3463,12 @@
     "publisher": "Sebastian Mayr",
     "email": "npm@smayr.name"
   },
+  "tr46@7.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/tr46",
+    "publisher": "Sebastian Mayr",
+    "email": "npm@smayr.name"
+  },
   "ts-api-utils@2.5.0": {
     "licenses": "MIT",
     "repository": "https://github.com/JoshuaKGoldberg/ts-api-utils",
@@ -3471,6 +3556,10 @@
     "licenses": "MIT",
     "repository": "https://github.com/nodejs/undici"
   },
+  "undici@8.11.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/undici"
+  },
   "unrs-resolver@1.12.2": {
     "licenses": "MIT",
     "repository": "https://github.com/unrs/unrs-resolver"
@@ -3543,6 +3632,10 @@
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/w3c-xmlserializer"
   },
+  "w3c-xmlserializer@6.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/w3c-xmlserializer"
+  },
   "warning@4.0.3": {
     "licenses": "MIT",
     "repository": "https://github.com/BerkeleyTrue/warning",
@@ -3569,6 +3662,12 @@
     "url": "https://domenic.me/"
   },
   "whatwg-url@16.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/whatwg-url",
+    "publisher": "Sebastian Mayr",
+    "email": "github@smayr.name"
+  },
+  "whatwg-url@17.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/whatwg-url",
     "publisher": "Sebastian Mayr",
