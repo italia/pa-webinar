@@ -118,7 +118,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push app image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           push: true
@@ -141,7 +141,7 @@ jobs:
             org.opencontainers.image.ref.name=dev
 
       - name: Build and push migration image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           push: true
@@ -261,7 +261,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push worker image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/ai
           file: ./infra/ai/Dockerfile.worker
@@ -329,7 +329,7 @@ jobs:
           echo "tags=${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev-$SHA_SHORT" >> "$GITHUB_OUTPUT"
 
       - name: Build and push CPU worker image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/ai
           file: ./infra/ai/Dockerfile.worker-cpu
@@ -426,7 +426,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push recorder image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/recorder
           file: ./infra/recorder/Dockerfile
@@ -528,7 +528,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push recorder-controller image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/recorder-controller
           file: ./infra/recorder-controller/Dockerfile
@@ -624,7 +624,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push captions-gateway image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/captions/gateway
           file: ./infra/captions/gateway/Dockerfile
@@ -721,7 +721,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Build and push captions-engine image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./infra/captions/engine
           file: ./infra/captions/engine/Dockerfile
