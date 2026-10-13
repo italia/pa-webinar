@@ -17,7 +17,7 @@
       "name": "pa-webinar",
       "version": "<VERSIONE APP DEPLOYATA, es. 0.5.1>",
       "description": "Istanza pa-webinar per il tenant <TENANT-ID> (ambiente <test|production>).",
-      "licenses": [{ "license": { "id": "AGPL-3.0-only" } }],
+      "licenses": [{ "license": { "id": "EUPL-1.2" } }],
       "externalReferences": [
         { "type": "vcs", "url": "https://github.com/italia/pa-webinar" },
         { "type": "website", "url": "https://<host-pubblico-istanza>" }
@@ -39,7 +39,7 @@
       "version": "<VERSIONE/TAG>",
       "purl": "pkg:oci/italia/pa-webinar@sha256:<DIGEST>?repository_url=ghcr.io",
       "description": "Immagine OCI dell'applicazione Next.js.",
-      "licenses": [{ "license": { "id": "AGPL-3.0-only" } }],
+      "licenses": [{ "license": { "id": "EUPL-1.2" } }],
       "properties": [
         { "name": "pa-webinar:layer", "value": "app" },
         { "name": "pa-webinar:stack-label", "value": "pa-webinar (Next.js)" }

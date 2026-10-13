@@ -341,10 +341,9 @@ Run these checks before you publish, and again after every regeneration.
 
 The application image and every service are tagged with `pa-webinar:layer` and `pa-webinar:stack-label`. The framework package and the TLS certificate are not, so they appear only in the tables.
 
-Fill it in by following step 2 of the [new-installation checklist](SERVICE-INVENTORY-GENERATION.md#new-installation-checklist). Three things in the template must change before you publish:
+Fill it in by following step 2 of the [new-installation checklist](SERVICE-INVENTORY-GENERATION.md#new-installation-checklist). Two things in the template must change before you publish:
 
 - Its placeholder text and descriptions are in Italian. The page shows descriptions exactly as written, so write them in the language your readers expect.
-- Its PA Webinar entries, `metadata.component` and the application image, declare `AGPL-3.0-only`. PA Webinar is released under `EUPL-1.2`: change both.
 - Its `annotations[]` entry is a note for the operator. Annotations are published in the download, so rewrite or remove it.
 
 ## Related documents

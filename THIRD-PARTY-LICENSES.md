@@ -10,9 +10,8 @@ The page is maintained by hand and describes the repository as it is. It is not 
 - **Copyright owner.** `publiccode.yml` names the Dipartimento per la Trasformazione Digitale (Italian Department for Digital Transformation) as `mainCopyrightOwner`.
 - **Contributions.** Contributions come in under the same license: inbound equals outbound. See [CONTRIBUTING.md](CONTRIBUTING.md#license-of-contributions).
 - **Component manifests.** Some component manifests carry their own `license` field:
-  - `lobby/package.json` declares `EUPL-1.2`.
+  - `lobby/package.json`, `infra/recorder/package.json` and `infra/captions/gateway/package.json` declare `EUPL-1.2`.
   - `app/package.json` and `infra/recorder-controller/package.json` declare no license.
-  - `infra/recorder/package.json` declares `AGPL-3.0-or-later`. This does not match the repository license. See [Open points](#open-points).
 
 ## License policy
 
@@ -293,7 +292,6 @@ Record every new component here, or in `license-report.json` for the npm workspa
 These points need a decision by the maintainers. Each one is described in the section it links to.
 
 - **Full EUPL text.** `LICENSE` carries a notice and a link, not the text. Redistributors must include a copy of the license (EUPL Article 5), so adding the official EUPL-1.2 text to the repository and the image would make that obligation easy to meet. [Reusing PA Webinar](docs/REUSE.md#eupl-12-in-plain-words) already tells adopters to include a copy. See [PA Webinar's license](#pa-webinars-license).
-- **Recorder license field.** `infra/recorder/package.json` declares `AGPL-3.0-or-later` while the repository is EUPL-1.2. See [PA Webinar's license](#pa-webinars-license).
 - **CI license scan.** The production scan inspects no packages, and its matching is exact. See [Limits of the automated check](#limits-of-the-automated-check).
 - **Report generator.** It omits platform-specific packages because it assumes they share their parent's license. That assumption does not hold for libvips. The omitted binaries can be seen in the image SBOM. See [The npm report](#the-npm-report-license-reportjson) and [Release SBOMs](#release-sboms).
 - **GPL code in the AI worker image.** `gender-guesser` and espeak-ng (through `piper-phonemize`). See [AI stack and model weights](#ai-stack-and-model-weights).

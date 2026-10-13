@@ -588,7 +588,6 @@ Publish the document at an `https://` URL that you control, and set it in the He
    - Set a new `serialNumber`, `metadata.manufacturer` and `metadata.component` (name, deployed version, website).
    - Set the header properties `pa-webinar:tenant`, `pa-webinar:cloud-provider`, `pa-webinar:region` and `pa-webinar:deployment-mode`. For the deployment mode you can use the chart's `jitsi.mode`: `simple`, `standard` or `full`.
    - Replace the template's placeholder text, which is in Italian.
-   - Change the license entries from `AGPL-3.0-only` to `EUPL-1.2`, the license PA Webinar is published under.
 3. Build the DEV half for the release you deploy, including every other image, by digest. Choose a curated or a complete component list first ([The DEV half](#the-dev-half-software-components)).
 4. Build the OPS half from your provider's inventory, and add the services no API finds ([The OPS half](#the-ops-half-operational-services)).
 5. Write the declarations your evidence supports, with an assessor and an affirmation ([PA declarations](#pa-declarations)).

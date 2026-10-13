@@ -512,11 +512,9 @@ What to look for:
 
 ## License
 
-The repository is released under the European Union Public Licence
-(EUPL-1.2). This package's `package.json` declares
-`"license": "AGPL-3.0-or-later"` instead. The mismatch is recorded as an open
-point in
-[Third-party licenses](../../THIRD-PARTY-LICENSES.md#pa-webinars-license).
+Like the rest of the repository, this package is released under the
+European Union Public Licence (EUPL-1.2), which its `package.json` declares.
+See [Third-party licenses](../../THIRD-PARTY-LICENSES.md#pa-webinars-license).
 
 ## Related pages
 
