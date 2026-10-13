@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Még egy esemény} other {Még # esemény}}",
     "noEvents": "Ebben az időszakban nincs esemény",
-    "weekShort": "Hét"
+    "legend": {
+      "title": "Címkék",
+      "noTag": "Címke nélkül"
+    },
+    "popover": {
+      "open": "Az esemény oldalának megnyitása",
+      "manage": "Az esemény kezelése",
+      "publicPage": "Nyilvános oldal",
+      "registrations": "{count, plural, =0 {nincs regisztráció} one {# regisztráció} other {# regisztráció}}"
+    }
   },
   "footer": {
     "privacy": "Adatvédelmi tájékoztató",

@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Dar # renginys} few {Dar # renginiai} many {Dar # renginio} other {Dar # renginių}}",
     "noEvents": "Šiuo laikotarpiu renginių nėra",
-    "weekShort": "Sav."
+    "legend": {
+      "title": "Žymos",
+      "noTag": "Be žymos"
+    },
+    "popover": {
+      "open": "Atverti renginio puslapį",
+      "manage": "Tvarkyti renginį",
+      "publicPage": "Viešasis puslapis",
+      "registrations": "{count, plural, =0 {registracijų nėra} one {# registracija} few {# registracijos} many {# registracijos} other {# registracijų}}"
+    }
   },
   "footer": {
     "privacy": "Privatumo politika",

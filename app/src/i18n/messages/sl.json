@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Še # dogodek} two {Še # dogodka} few {Še # dogodki} other {Še # dogodkov}}",
     "noEvents": "V tem obdobju ni dogodkov",
-    "weekShort": "Ted."
+    "legend": {
+      "title": "Oznake",
+      "noTag": "Brez oznake"
+    },
+    "popover": {
+      "open": "Odpri stran dogodka",
+      "manage": "Upravljaj dogodek",
+      "publicPage": "Javna stran",
+      "registrations": "{count, plural, =0 {brez prijav} one {# prijava} two {# prijavi} few {# prijave} other {# prijav}}"
+    }
   },
   "footer": {
     "privacy": "Politika zasebnosti",

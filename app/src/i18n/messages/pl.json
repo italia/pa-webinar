@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Jeszcze jedno wydarzenie} few {Jeszcze # wydarzenia} many {Jeszcze # wydarzeń} other {Jeszcze # wydarzenia}}",
     "noEvents": "Brak wydarzeń w tym okresie",
-    "weekShort": "Tydz."
+    "legend": {
+      "title": "Tagi",
+      "noTag": "Bez tagu"
+    },
+    "popover": {
+      "open": "Otwórz stronę wydarzenia",
+      "manage": "Zarządzaj wydarzeniem",
+      "publicPage": "Strona publiczna",
+      "registrations": "{count, plural, =0 {brak rejestracji} one {# rejestracja} few {# rejestracje} many {# rejestracji} other {# rejestracji}}"
+    }
   },
   "footer": {
     "privacy": "Polityka prywatności",

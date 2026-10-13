@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Eine weitere Veranstaltung} other {# weitere Veranstaltungen}}",
     "noEvents": "Keine Veranstaltungen in diesem Zeitraum",
-    "weekShort": "KW"
+    "legend": {
+      "title": "Tags",
+      "noTag": "Ohne Tag"
+    },
+    "popover": {
+      "open": "Veranstaltungsseite öffnen",
+      "manage": "Veranstaltung verwalten",
+      "publicPage": "Öffentliche Seite",
+      "registrations": "{count, plural, =0 {keine Anmeldungen} one {# Anmeldung} other {# Anmeldungen}}"
+    }
   },
   "footer": {
     "privacy": "Datenschutzerklärung",

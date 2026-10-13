@@ -248,7 +248,7 @@ Whether an event appears on public surfaces depends on its status, its type and,
 |---|---|
 | Home page | Upcoming public events |
 | `/events` | Upcoming and past public events, with tag chips and a tag filter: `/en/events?tag=<slug>` |
-| `/calendar` | Upcoming public events, read from `GET /api/events/calendar`. When the site setting `calendarPublic` is off, the page answers `404` and the feed returns an empty list |
+| `/calendar` | Upcoming public events, read from `GET /api/events/calendar` (title split from its kicker as on the event page, and the event's tags for the colors and the legend). When the site setting `calendarPublic` is off, the page answers `404` and the feed returns an empty list. The staff view of the same feed (`mode=admin`) is sent with `Cache-Control: private, no-store`, so no shared cache keeps drafts |
 | Sitemap | Every public event |
 | `GET /api/events` | The same public events as JSON, cached for 60 seconds |
 | `GET /api/events/{slug}/calendar.ics` | A calendar file for any event that is not a `DRAFT`, including `ARCHIVED` events, concluded events whose post-event page is off or expired, and instant calls ([known limitations](#known-limitations)). Times are UTC instants. The organizer's address is the platform's sender address (`SMTP_FROM`), never the moderator's personal email; its name is the moderator name, or the site name when none is set |

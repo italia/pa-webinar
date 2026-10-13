@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Én begivenhed mere} other {# begivenheder mere}}",
     "noEvents": "Ingen begivenheder i denne periode",
-    "weekShort": "Uge"
+    "legend": {
+      "title": "Tags",
+      "noTag": "Uden tag"
+    },
+    "popover": {
+      "open": "Åbn arrangementets side",
+      "manage": "Administrer arrangementet",
+      "publicPage": "Offentlig side",
+      "registrations": "{count, plural, =0 {ingen tilmeldinger} one {# tilmelding} other {# tilmeldinger}}"
+    }
   },
   "footer": {
     "privacy": "Privatlivspolitik",

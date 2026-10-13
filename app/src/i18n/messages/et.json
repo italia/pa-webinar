@@ -4402,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Veel üks üritus} other {Veel # üritust}}",
     "noEvents": "Sellel perioodil üritusi pole",
-    "weekShort": "Näd."
+    "legend": {
+      "title": "Sildid",
+      "noTag": "Sildita"
+    },
+    "popover": {
+      "open": "Ava sündmuse leht",
+      "manage": "Halda sündmust",
+      "publicPage": "Avalik leht",
+      "registrations": "{count, plural, =0 {registreeringuid pole} one {# registreering} other {# registreeringut}}"
+    }
   },
   "footer": {
     "privacy": "Privaatsuspoliitika",
