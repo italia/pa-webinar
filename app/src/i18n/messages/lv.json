@@ -761,7 +761,21 @@
       "helpDocument": "Atbalstītie formāti: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
       "uploadsUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama: tā vietā ielīmējiet faila URL.",
       "externalImage": "Attēli no citām vietnēm portāla lapās netiek rādīti.",
-      "externalImageUpload": "Augšupielādējiet failu no savas ierīces."
+      "externalImageUpload": "Augšupielādējiet failu no savas ierīces.",
+      "cropHelp": "Cita formāta attēlu šeit apgriež pirms augšupielādes.",
+      "crop": {
+        "title": "Attēla apgriešana",
+        "intro": "Velciet attēlu, lai izvēlētos rādāmo daļu; ar slīdni to var palielināt.",
+        "frame": "Apgriešanas rāmis",
+        "keys": "Ar tastatūru: bultiņas pārvieto attēlu (ar Shift lielākiem soļiem), + un − to palielina un samazina.",
+        "zoom": "Tālummaiņa",
+        "size": "Tiks saglabāts {width} × {height} pikseļu izmērā.",
+        "small": "Attēls ir mazs: lapā tas var izskatīties izplūdis.",
+        "error": "Šo attēlu nevar nolasīt: mēģiniet citu failu.",
+        "cancel": "Atcelt",
+        "confirm": "Izmantot šo apgriezumu",
+        "encodeError": "Apgriezumu neizdevās sagatavot: mēģiniet vēlreiz."
+      }
     },
     "rubricaPicker": {
       "loading": "Notiek meklēšana…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Ar * atzīmētie lauki vajadzīgi pasākuma saglabāšanai: kamēr tie ir tukši, tas norādīts pie katra lauka.",
         "kickerHint": "Lai pievienotu virsvirsrakstu, rakstiet to pirms virsraksta un atdaliet ar |, piemēram, “Tikšanās cikls | Pirmā tikšanās”.",
         "kickerUse": "Rādīt “{kicker}” kā virsvirsrakstu",
-        "kickerPreview": "Tā tas izskatās pasākuma lapā"
+        "kickerPreview": "Tā tas izskatās pasākuma lapā",
+        "coverImageSize": "Ieteicamais izmērs: 1600 × 900 pikseļi (16:9)."
       },
       "step2": {
         "heading": "Kurš ko var darīt",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizācija",
         "askRole": "amats",
         "askType": "organizācijas veids"
+      },
+      "preview": {
+        "title": "Lapas priekšskatījums",
+        "open": "Atvērt priekšskatījumu",
+        "note": "Šādi izskatās pasākuma lapa; tā atjaunojas, kamēr rakstāt.",
+        "noteNoDate": "Šādi izskatās pasākuma lapa; kamēr nav norādīts datums, laiks ir tikai piemērs.",
+        "titlePlaceholder": "Pasākuma nosaukums",
+        "descriptionPlaceholder": "Šeit parādīsies apraksts."
       }
     },
     "nav": {

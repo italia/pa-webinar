@@ -761,7 +761,21 @@
       "helpDocument": "Unterstützte Formate: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
       "uploadsUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar: Bitte fügen Sie stattdessen die URL der Datei ein.",
       "externalImage": "Bilder von anderen Websites werden auf den Seiten des Portals nicht angezeigt.",
-      "externalImageUpload": "Lade die Datei von deinem Gerät hoch."
+      "externalImageUpload": "Lade die Datei von deinem Gerät hoch.",
+      "cropHelp": "Ein Bild mit anderem Seitenverhältnis wird hier vor dem Hochladen zugeschnitten.",
+      "crop": {
+        "title": "Bild zuschneiden",
+        "intro": "Ziehen Sie das Bild, um den sichtbaren Ausschnitt zu wählen; mit dem Schieberegler vergrößern Sie es.",
+        "frame": "Zuschnittrahmen",
+        "keys": "Per Tastatur: Die Pfeiltasten verschieben das Bild (mit Umschalt in großen Schritten), + und − vergrößern und verkleinern es.",
+        "zoom": "Zoom",
+        "size": "Es wird mit {width} × {height} Pixel gespeichert.",
+        "small": "Das Bild ist klein: Auf der Seite könnte es unscharf wirken.",
+        "error": "Dieses Bild kann nicht gelesen werden: Versuchen Sie es mit einer anderen Datei.",
+        "cancel": "Abbrechen",
+        "confirm": "Diesen Zuschnitt verwenden",
+        "encodeError": "Der Zuschnitt konnte nicht vorbereitet werden: Versuchen Sie es erneut."
+      }
     },
     "rubricaPicker": {
       "loading": "Suche läuft…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Mit * markierte Felder sind zum Speichern nötig: Solange sie leer sind, steht es bei jedem Feld.",
         "kickerHint": "Für eine Dachzeile schreiben Sie sie vor den Titel und trennen beide mit |, zum Beispiel „Veranstaltungsreihe | Das erste Treffen“.",
         "kickerUse": "„{kicker}“ als Dachzeile anzeigen",
-        "kickerPreview": "So erscheint er auf der Veranstaltungsseite"
+        "kickerPreview": "So erscheint er auf der Veranstaltungsseite",
+        "coverImageSize": "Empfohlenes Format: 1600 × 900 Pixel (16:9)."
       },
       "step2": {
         "heading": "Wer darf was",
@@ -1118,6 +1133,14 @@
         "askOrganization": "Organisation",
         "askRole": "Funktion",
         "askType": "Art der Organisation"
+      },
+      "preview": {
+        "title": "Seitenvorschau",
+        "open": "Vorschau öffnen",
+        "note": "So sieht die Veranstaltungsseite aus; sie wird während der Eingabe aktualisiert.",
+        "noteNoDate": "So sieht die Veranstaltungsseite aus; solange das Datum fehlt, ist die Uhrzeit nur ein Beispiel.",
+        "titlePlaceholder": "Titel der Veranstaltung",
+        "descriptionPlaceholder": "Hier erscheint die Beschreibung."
       }
     },
     "nav": {

@@ -761,7 +761,21 @@
       "helpDocument": "Formats pris en charge : PDF, DOCX, PPTX, XLSX, TXT — max 25 Mo",
       "uploadsUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation : collez plutôt l'URL du fichier.",
       "externalImage": "Les images d'autres sites ne s'affichent pas sur les pages du portail.",
-      "externalImageUpload": "Téléversez le fichier depuis votre appareil."
+      "externalImageUpload": "Téléversez le fichier depuis votre appareil.",
+      "cropHelp": "Une image d'un autre format est recadrée ici, avant le téléversement.",
+      "crop": {
+        "title": "Recadrer l'image",
+        "intro": "Faites glisser l'image pour choisir la partie à afficher ; le curseur permet de l'agrandir.",
+        "frame": "Cadre de recadrage",
+        "keys": "Au clavier : les flèches déplacent l'image (par grands pas avec Maj), + et − l'agrandissent et la réduisent.",
+        "zoom": "Zoom",
+        "size": "Elle sera enregistrée en {width} × {height} pixels.",
+        "small": "L'image est petite : sur la page, elle pourrait paraître floue.",
+        "error": "Impossible de lire cette image : essayez un autre fichier.",
+        "cancel": "Annuler",
+        "confirm": "Utiliser ce recadrage",
+        "encodeError": "Le recadrage n'a pas pu être préparé : réessayez."
+      }
     },
     "rubricaPicker": {
       "loading": "Recherche en cours…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Les champs marqués * sont nécessaires pour enregistrer l'événement : tant qu'ils sont vides, chacun l'indique.",
         "kickerHint": "Pour un surtitre, écrivez-le avant le titre et séparez-les par |, par exemple « Cycle de rencontres | La première rencontre ».",
         "kickerUse": "Afficher « {kicker} » comme surtitre",
-        "kickerPreview": "Aperçu sur la page de l'événement"
+        "kickerPreview": "Aperçu sur la page de l'événement",
+        "coverImageSize": "Format recommandé : 1600 × 900 pixels (16:9)."
       },
       "step2": {
         "heading": "Qui peut faire quoi",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisme",
         "askRole": "fonction",
         "askType": "type d'organisme"
+      },
+      "preview": {
+        "title": "Aperçu de la page",
+        "open": "Ouvrir l'aperçu",
+        "note": "Voici à quoi ressemble la page de l'événement ; elle se met à jour pendant la saisie.",
+        "noteNoDate": "Voici à quoi ressemble la page de l'événement ; tant que la date manque, l'horaire est un exemple.",
+        "titlePlaceholder": "Le titre de l'événement",
+        "descriptionPlaceholder": "La description apparaîtra ici."
       }
     },
     "nav": {

@@ -761,7 +761,21 @@
       "helpDocument": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului.",
       "externalImage": "Imaginile de pe alte site-uri nu apar pe paginile portalului.",
-      "externalImageUpload": "Încarcă fișierul de pe dispozitivul tău."
+      "externalImageUpload": "Încarcă fișierul de pe dispozitivul tău.",
+      "cropHelp": "O imagine cu alt format se decupează aici, înainte de încărcare.",
+      "crop": {
+        "title": "Decupați imaginea",
+        "intro": "Trageți imaginea pentru a alege partea afișată; cu glisorul o măriți.",
+        "frame": "Cadrul de decupare",
+        "keys": "De la tastatură: săgețile mută imaginea (cu Shift, în pași mari), + și − o măresc și o micșorează.",
+        "zoom": "Mărire",
+        "size": "Se va salva la {width} × {height} pixeli.",
+        "small": "Imaginea este mică: pe pagină ar putea apărea neclară.",
+        "error": "Această imagine nu poate fi citită: încercați alt fișier.",
+        "cancel": "Anulați",
+        "confirm": "Folosiți această decupare",
+        "encodeError": "Decuparea nu a putut fi pregătită: încercați din nou."
+      }
     },
     "rubricaPicker": {
       "loading": "Se caută…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Câmpurile marcate cu * sunt necesare pentru a salva evenimentul: cât timp sunt goale, fiecare o spune.",
         "kickerHint": "Pentru un supratitlu, scrie-l înaintea titlului și separă-le cu |, de exemplu „Ciclu de întâlniri | Prima întâlnire”.",
         "kickerUse": "Afișează „{kicker}” ca supratitlu",
-        "kickerPreview": "Așa apare pe pagina evenimentului"
+        "kickerPreview": "Așa apare pe pagina evenimentului",
+        "coverImageSize": "Format recomandat: 1600 × 900 pixeli (16:9)."
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizație",
         "askRole": "funcție",
         "askType": "tip de organizație"
+      },
+      "preview": {
+        "title": "Previzualizarea paginii",
+        "open": "Deschideți previzualizarea",
+        "note": "Așa arată pagina evenimentului; se actualizează pe măsură ce scrieți.",
+        "noteNoDate": "Așa arată pagina evenimentului; cât timp lipsește data, ora este doar un exemplu.",
+        "titlePlaceholder": "Titlul evenimentului",
+        "descriptionPlaceholder": "Aici va apărea descrierea."
       }
     },
     "nav": {

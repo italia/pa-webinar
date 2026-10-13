@@ -761,7 +761,21 @@
       "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
       "uploadsUnavailable": "Bestanden uploaden is op deze installatie niet beschikbaar: plak in plaats daarvan de URL van het bestand.",
       "externalImage": "Afbeeldingen van andere sites worden niet getoond op de pagina's van het portaal.",
-      "externalImageUpload": "Upload het bestand vanaf je apparaat."
+      "externalImageUpload": "Upload het bestand vanaf je apparaat.",
+      "cropHelp": "Een afbeelding met een andere verhouding wordt hier bijgesneden, vóór het uploaden.",
+      "crop": {
+        "title": "Afbeelding bijsnijden",
+        "intro": "Sleep de afbeelding om het deel te kiezen dat u wilt tonen; met de schuifregelaar zoomt u in.",
+        "frame": "Bijsnijkader",
+        "keys": "Met het toetsenbord: de pijltjestoetsen verplaatsen de afbeelding (met Shift in grote stappen), + en − zoomen in en uit.",
+        "zoom": "Zoom",
+        "size": "Wordt opgeslagen op {width} × {height} pixels.",
+        "small": "De afbeelding is klein: op de pagina kan die onscherp lijken.",
+        "error": "Deze afbeelding kan niet worden gelezen: probeer een ander bestand.",
+        "cancel": "Annuleren",
+        "confirm": "Deze uitsnede gebruiken",
+        "encodeError": "De uitsnede kon niet worden voorbereid: probeer het opnieuw."
+      }
     },
     "rubricaPicker": {
       "loading": "Bezig met zoeken…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Velden met * zijn nodig om het evenement op te slaan: zolang ze leeg zijn, staat het bij elk veld.",
         "kickerHint": "Voor een bovenregel schrijft u die vóór de titel en scheidt u ze met |, bijvoorbeeld ‘Reeks bijeenkomsten | De eerste bijeenkomst’.",
         "kickerUse": "‘{kicker}’ als bovenregel tonen",
-        "kickerPreview": "Zo ziet het eruit op de evenementpagina"
+        "kickerPreview": "Zo ziet het eruit op de evenementpagina",
+        "coverImageSize": "Aanbevolen formaat: 1600 × 900 pixels (16:9)."
       },
       "step2": {
         "heading": "Wie mag wat",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisatie",
         "askRole": "functie",
         "askType": "soort organisatie"
+      },
+      "preview": {
+        "title": "Voorbeeld van de pagina",
+        "open": "Voorbeeld openen",
+        "note": "Zo ziet de pagina van het evenement eruit; ze wordt bijgewerkt terwijl u typt.",
+        "noteNoDate": "Zo ziet de pagina van het evenement eruit; zolang de datum ontbreekt, is het tijdstip een voorbeeld.",
+        "titlePlaceholder": "De titel van het evenement",
+        "descriptionPlaceholder": "Hier verschijnt de beschrijving."
       }
     },
     "nav": {

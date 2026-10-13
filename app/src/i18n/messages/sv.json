@@ -761,7 +761,21 @@
       "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället.",
       "externalImage": "Bilder från andra webbplatser visas inte på portalens sidor.",
-      "externalImageUpload": "Ladda upp filen från din enhet."
+      "externalImageUpload": "Ladda upp filen från din enhet.",
+      "cropHelp": "En bild i ett annat format beskärs här, innan den laddas upp.",
+      "crop": {
+        "title": "Beskär bilden",
+        "intro": "Dra i bilden för att välja vilken del som ska visas; med reglaget zoomar du in.",
+        "frame": "Beskärningsram",
+        "keys": "Med tangentbordet: piltangenterna flyttar bilden (med Skift i långa steg), + och − zoomar in och ut.",
+        "zoom": "Zoom",
+        "size": "Den sparas i {width} × {height} pixlar.",
+        "small": "Bilden är liten: på sidan kan den se suddig ut.",
+        "error": "Bilden kan inte läsas: prova med en annan fil.",
+        "cancel": "Avbryt",
+        "confirm": "Använd den här beskärningen",
+        "encodeError": "Beskärningen kunde inte förberedas: försök igen."
+      }
     },
     "rubricaPicker": {
       "loading": "Söker…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Fält markerade med * behövs för att spara evenemanget: så länge de är tomma står det vid varje fält.",
         "kickerHint": "För en överrubrik skriver du den före titeln och skiljer dem åt med |, till exempel ”Mötesserie | Det första mötet”.",
         "kickerUse": "Visa ”{kicker}” som överrubrik",
-        "kickerPreview": "Så här ser den ut på evenemangssidan"
+        "kickerPreview": "Så här ser den ut på evenemangssidan",
+        "coverImageSize": "Rekommenderat format: 1600 × 900 pixlar (16:9)."
       },
       "step2": {
         "heading": "Vem får göra vad",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisation",
         "askRole": "roll",
         "askType": "typ av organisation"
+      },
+      "preview": {
+        "title": "Förhandsvisning av sidan",
+        "open": "Öppna förhandsvisningen",
+        "note": "Så här ser evenemangets sida ut; den uppdateras medan du skriver.",
+        "noteNoDate": "Så här ser evenemangets sida ut; så länge datumet saknas är tiden bara ett exempel.",
+        "titlePlaceholder": "Evenemangets titel",
+        "descriptionPlaceholder": "Här visas beskrivningen."
       }
     },
     "nav": {

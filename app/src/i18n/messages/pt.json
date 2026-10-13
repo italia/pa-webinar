@@ -761,7 +761,21 @@
       "helpDocument": "Formatos suportados: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB",
       "uploadsUnavailable": "O carregamento de ficheiros não está disponível nesta instalação: cole antes o URL do ficheiro.",
       "externalImage": "As imagens de outros sites não aparecem nas páginas do portal.",
-      "externalImageUpload": "Carregue o ficheiro a partir do seu dispositivo."
+      "externalImageUpload": "Carregue o ficheiro a partir do seu dispositivo.",
+      "cropHelp": "Uma imagem com outro formato é recortada aqui, antes do carregamento.",
+      "crop": {
+        "title": "Recortar a imagem",
+        "intro": "Arraste a imagem para escolher a parte a mostrar; com o controlo deslizante pode ampliá-la.",
+        "frame": "Moldura do recorte",
+        "keys": "Com o teclado: as setas movem a imagem (com Shift, em passos longos), + e − ampliam-na e reduzem-na.",
+        "zoom": "Zoom",
+        "size": "Será guardada com {width} × {height} píxeis.",
+        "small": "A imagem é pequena: na página pode parecer desfocada.",
+        "error": "Não é possível ler esta imagem: experimente outro ficheiro.",
+        "cancel": "Cancelar",
+        "confirm": "Usar este recorte",
+        "encodeError": "Não foi possível preparar o recorte: tente novamente."
+      }
     },
     "rubricaPicker": {
       "loading": "A pesquisar…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Os campos com * são necessários para guardar o evento: enquanto estiverem vazios, cada um o indica.",
         "kickerHint": "Para um antetítulo, escreva-o antes do título e separe-os com |, por exemplo «Ciclo de encontros | O primeiro encontro».",
         "kickerUse": "Mostrar «{kicker}» como antetítulo",
-        "kickerPreview": "Assim aparece na página do evento"
+        "kickerPreview": "Assim aparece na página do evento",
+        "coverImageSize": "Formato recomendado: 1600 × 900 píxeis (16:9)."
       },
       "step2": {
         "heading": "Quem pode fazer o quê",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organização",
         "askRole": "cargo",
         "askType": "tipo de organização"
+      },
+      "preview": {
+        "title": "Pré-visualização da página",
+        "open": "Abrir a pré-visualização",
+        "note": "Assim fica a página do evento; atualiza-se enquanto escreve.",
+        "noteNoDate": "Assim fica a página do evento; enquanto faltar a data, o horário é apenas um exemplo.",
+        "titlePlaceholder": "O título do evento",
+        "descriptionPlaceholder": "A descrição aparecerá aqui."
       }
     },
     "nav": {

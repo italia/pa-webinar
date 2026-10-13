@@ -896,7 +896,21 @@
       "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file.",
       "externalImage": "Le immagini di altri siti non compaiono sulle pagine del portale.",
-      "externalImageUpload": "Carica il file dal tuo dispositivo."
+      "externalImageUpload": "Carica il file dal tuo dispositivo.",
+      "cropHelp": "Un'immagine di altro formato si ritaglia qui, prima del caricamento.",
+      "crop": {
+        "title": "Ritaglia l'immagine",
+        "intro": "Trascina l'immagine per scegliere la parte da mostrare; con il cursore la ingrandisci.",
+        "frame": "Riquadro del ritaglio",
+        "keys": "Da tastiera: le frecce spostano l'immagine (con Maiusc a passi lunghi), + e − la ingrandiscono e la rimpiccioliscono.",
+        "zoom": "Ingrandimento",
+        "size": "Si salva a {width} × {height} pixel.",
+        "small": "È piccola: sulla pagina potrebbe vedersi sgranata.",
+        "error": "Questa immagine non si riesce a leggere: prova con un altro file.",
+        "cancel": "Annulla",
+        "confirm": "Usa questo ritaglio",
+        "encodeError": "Il ritaglio non si è potuto preparare: riprova."
+      }
     },
     "rubricaPicker": {
       "loading": "Ricerca in corso…",
@@ -959,7 +973,8 @@
         "requiredLegend": "I campi con * servono per salvare l'evento: finché sono vuoti lo vedi accanto a ciascuno.",
         "kickerHint": "Per un sopratitolo, scrivilo prima del titolo e separali con |, per esempio «Ciclo di incontri | Il primo appuntamento».",
         "kickerUse": "Mostra «{kicker}» come sopratitolo",
-        "kickerPreview": "Così appare sulla pagina dell'evento"
+        "kickerPreview": "Così appare sulla pagina dell'evento",
+        "coverImageSize": "Formato consigliato: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -1253,6 +1268,14 @@
         "askOrganization": "ente",
         "askRole": "ruolo",
         "askType": "tipo di ente"
+      },
+      "preview": {
+        "title": "Anteprima della pagina",
+        "open": "Apri l'anteprima",
+        "note": "Così appare la pagina dell'evento; si aggiorna mentre scrivi.",
+        "noteNoDate": "Così appare la pagina dell'evento; finché manca la data, l'orario è d'esempio.",
+        "titlePlaceholder": "Il titolo dell'evento",
+        "descriptionPlaceholder": "Qui comparirà la descrizione."
       }
     },
     "nav": {

@@ -761,7 +761,21 @@
       "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead.",
       "externalImage": "Images from other sites are not shown on the portal's pages.",
-      "externalImageUpload": "Upload the file from your device."
+      "externalImageUpload": "Upload the file from your device.",
+      "cropHelp": "An image with a different shape is cropped here, before it is uploaded.",
+      "crop": {
+        "title": "Crop the image",
+        "intro": "Drag the image to choose the part to show; use the slider to zoom in.",
+        "frame": "Crop frame",
+        "keys": "With the keyboard: the arrows move the image (with Shift in long steps), + and − zoom in and out.",
+        "zoom": "Zoom",
+        "size": "It will be saved at {width} × {height} pixels.",
+        "small": "It is small: on the page it may look blurry.",
+        "error": "This image cannot be read: try another file.",
+        "cancel": "Cancel",
+        "confirm": "Use this crop",
+        "encodeError": "The crop could not be prepared: try again."
+      }
     },
     "rubricaPicker": {
       "loading": "Searching…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Fields marked * are needed to save the event: while they are empty, each one says so.",
         "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
         "kickerUse": "Show “{kicker}” as a kicker above the title",
-        "kickerPreview": "How it looks on the event page"
+        "kickerPreview": "How it looks on the event page",
+        "coverImageSize": "Recommended size: 1600 × 900 pixels (16:9)."
       },
       "step2": {
         "heading": "Who can do what",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organization",
         "askRole": "role",
         "askType": "organization type"
+      },
+      "preview": {
+        "title": "Page preview",
+        "open": "Open the preview",
+        "note": "This is how the event page looks; it updates as you type.",
+        "noteNoDate": "This is how the event page looks; until the date is set, the time is an example.",
+        "titlePlaceholder": "The event title",
+        "descriptionPlaceholder": "The description will appear here."
       }
     },
     "nav": {

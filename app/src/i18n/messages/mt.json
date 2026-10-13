@@ -761,7 +761,21 @@
       "helpDocument": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu 25 MB",
       "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl.",
       "externalImage": "L-immaġini minn siti oħra ma jidhrux fil-paġni tal-portal.",
-      "externalImageUpload": "Tella' l-fajl mill-apparat tiegħek."
+      "externalImageUpload": "Tella' l-fajl mill-apparat tiegħek.",
+      "cropHelp": "Immaġni ta' forma differenti tinqata' hawn, qabel ma tittella'.",
+      "crop": {
+        "title": "Aqta' l-immaġni",
+        "intro": "Kaxkar l-immaġni biex tagħżel il-parti li trid turi; bis-slider tkabbarha.",
+        "frame": "Qafas tal-qtugħ",
+        "keys": "Bit-tastiera: il-vleġeġ iċaqilqu l-immaġni (b'Shift f'passi twal), + u − ikabbruha u jċekknuha.",
+        "zoom": "Zoom",
+        "size": "Se tiġi ssejvjata f'{width} × {height} pixel.",
+        "small": "L-immaġni hija żgħira: fuq il-paġna tista' tidher imċajpra.",
+        "error": "Din l-immaġni ma tistax tinqara: ipprova fajl ieħor.",
+        "cancel": "Ikkanċella",
+        "confirm": "Uża dan il-qtugħ",
+        "encodeError": "Il-qtugħ ma setax jitħejja: erġa' pprova."
+      }
     },
     "rubricaPicker": {
       "loading": "Tfittxija għaddejja…",
@@ -824,7 +838,8 @@
         "requiredLegend": "L-oqsma mmarkati b'* huma meħtieġa biex jiġi ssejvjat l-avveniment: sakemm huma vojta, kull wieħed jgħidha.",
         "kickerHint": "Għal sopratitolu, iktbu qabel it-titolu u isseparahom b'|, pereżempju “Serje ta' laqgħat | L-ewwel laqgħa”.",
         "kickerUse": "Uri “{kicker}” bħala sopratitolu",
-        "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment"
+        "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment",
+        "coverImageSize": "Daqs rakkomandat: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Min jista' jagħmel xiex",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizzazzjoni",
         "askRole": "rwol",
         "askType": "tip ta' organizzazzjoni"
+      },
+      "preview": {
+        "title": "Anteprima tal-paġna",
+        "open": "Iftaħ l-anteprima",
+        "note": "Hekk tidher il-paġna tal-avveniment; tiġi aġġornata waqt li tikteb.",
+        "noteNoDate": "Hekk tidher il-paġna tal-avveniment; sakemm tonqos id-data, il-ħin huwa biss eżempju.",
+        "titlePlaceholder": "It-titlu tal-avveniment",
+        "descriptionPlaceholder": "Id-deskrizzjoni se tidher hawn."
       }
     },
     "nav": {

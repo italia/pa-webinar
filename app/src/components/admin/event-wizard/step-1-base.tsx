@@ -208,6 +208,8 @@ export default function Step1Base({
   const titoloScritto = value.title[contentLocale] ?? '';
   const sopratitolo = splitTitleKicker(titoloScritto, true);
   const sopratitoloAcceso = value.parseTitleKicker ?? siteDefaultParseTitleKicker;
+  // Il sopratitolo l'ha acceso il titolo, non una scelta: lo si puo' ritirare.
+  const accesoDaSolo = useRef(false);
 
   const promemoria = (id: string) => (
     <div id={id} className="wizard-campo__hint">
@@ -502,7 +504,33 @@ export default function Step1Base({
                 : ''
             }`}
             value={value.title[contentLocale] ?? ''}
-            onChange={(e) => setLocalized('title', contentLocale, e.target.value)}
+            onChange={(e) => {
+              const nuovo = e.target.value;
+              // Appena il titolo ha un «|» il sopratitolo si accende da solo,
+              // se per questo evento nessuno l'ha ancora scelto: chi scrive
+              // «|» di solito lo vuole. Spento a mano, resta spento.
+              // Solo se cosi' non cambia nient'altro: il sopratitolo risulta
+              // spento (nessuna scelta per l'evento, sito che non lo usa) e
+              // nessun titolo, in nessuna lingua, aveva gia' un «|».
+              const accendi =
+                value.parseTitleKicker === null &&
+                !siteDefaultParseTitleKicker &&
+                !Object.values(value.title).some((tt) => splitTitleKicker(tt ?? '', true).kicker) &&
+                !!splitTitleKicker(nuovo, true).kicker;
+              // Acceso da solo e poi tolto l'ultimo «|»: si torna a seguire
+              // il sito, come se non fosse mai successo.
+              const titoli = { ...value.title, [contentLocale]: nuovo };
+              const spegni =
+                accesoDaSolo.current &&
+                value.parseTitleKicker === true &&
+                !Object.values(titoli).some((tt) => splitTitleKicker(tt ?? '', true).kicker);
+              if (accendi) accesoDaSolo.current = true;
+              if (spegni) accesoDaSolo.current = false;
+              onChange({
+                title: titoli,
+                ...(accendi ? { parseTitleKicker: true } : spegni ? { parseTitleKicker: null } : {}),
+              });
+            }}
             required={contentLocale === defaultLocale}
             aria-describedby={
               titoloVuoto && !fieldErrors[`title.${defaultLocale}`]
@@ -533,7 +561,11 @@ export default function Step1Base({
                   type="checkbox"
                   className="form-check-input"
                   checked={sopratitoloAcceso}
-                  onChange={(e) => onChange({ parseTitleKicker: e.target.checked })}
+                  onChange={(e) => {
+                    // Una scelta fatta a mano resta.
+                    accesoDaSolo.current = false;
+                    onChange({ parseTitleKicker: e.target.checked });
+                  }}
                 />
                 <label className="form-check-label" htmlFor="ev-parse-title-kicker">
                   {t('kickerUse', { kicker: sopratitolo.kicker })}
@@ -595,7 +627,8 @@ export default function Step1Base({
           onChange={(next) =>
             onChange({ coverImageUrl: next, imageUrl: next ?? null })
           }
-          helpText={t('coverImageHelp')}
+          helpText={`${t('coverImageSize')} ${t('coverImageHelp')}`}
+          ritaglio={{ rapporto: 16 / 9, larghezza: 1600 }}
         />
       </section>
 

@@ -761,7 +761,21 @@
       "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Nahrávanie súborov nie je v tejto inštalácii k dispozícii: namiesto toho vložte URL adresu súboru.",
       "externalImage": "Obrázky z iných stránok sa na stránkach portálu nezobrazia.",
-      "externalImageUpload": "Nahrajte súbor zo svojho zariadenia."
+      "externalImageUpload": "Nahrajte súbor zo svojho zariadenia.",
+      "cropHelp": "Obrázok iného formátu sa tu pred nahraním oreže.",
+      "crop": {
+        "title": "Orezanie obrázka",
+        "intro": "Potiahnutím obrázka vyberte časť, ktorá sa má zobraziť; posúvačom ho zväčšíte.",
+        "frame": "Rámik orezu",
+        "keys": "Z klávesnice: šípky posúvajú obrázok (so Shiftom po dlhších krokoch), + a − ho zväčšujú a zmenšujú.",
+        "zoom": "Zväčšenie",
+        "size": "Uloží sa vo veľkosti {width} × {height} pixelov.",
+        "small": "Obrázok je malý: na stránke môže vyzerať rozmazane.",
+        "error": "Tento obrázok sa nedá načítať: skúste iný súbor.",
+        "cancel": "Zrušiť",
+        "confirm": "Použiť tento orez",
+        "encodeError": "Výrez sa nepodarilo pripraviť: skúste to znova."
+      }
     },
     "rubricaPicker": {
       "loading": "Vyhľadávanie…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Polia označené * sú potrebné na uloženie podujatia: kým sú prázdne, je to pri každom uvedené.",
         "kickerHint": "Nadtitulok napíšte pred názov a oddeľte ich znakom |, napríklad „Cyklus stretnutí | Prvé stretnutie“.",
         "kickerUse": "Zobraziť „{kicker}“ ako nadtitulok",
-        "kickerPreview": "Takto vyzerá na stránke podujatia"
+        "kickerPreview": "Takto vyzerá na stránke podujatia",
+        "coverImageSize": "Odporúčaný formát: 1600 × 900 pixelov (16:9)."
       },
       "step2": {
         "heading": "Kto môže robiť čo",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizácia",
         "askRole": "funkcia",
         "askType": "typ organizácie"
+      },
+      "preview": {
+        "title": "Náhľad stránky",
+        "open": "Otvoriť náhľad",
+        "note": "Takto vyzerá stránka podujatia; aktualizuje sa počas písania.",
+        "noteNoDate": "Takto vyzerá stránka podujatia; kým chýba dátum, čas je len ukážkový.",
+        "titlePlaceholder": "Názov podujatia",
+        "descriptionPlaceholder": "Tu sa zobrazí popis."
       }
     },
     "nav": {

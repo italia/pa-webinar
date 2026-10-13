@@ -761,7 +761,21 @@
       "helpDocument": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
       "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét.",
       "externalImage": "Más oldalakról származó képek nem jelennek meg a portál oldalain.",
-      "externalImageUpload": "Töltsd fel a fájlt az eszközödről."
+      "externalImageUpload": "Töltsd fel a fájlt az eszközödről.",
+      "cropHelp": "Az eltérő arányú képet itt vághatja körül a feltöltés előtt.",
+      "crop": {
+        "title": "Kép körülvágása",
+        "intro": "Húzza a képet a megjelenítendő rész kiválasztásához; a csúszkával nagyíthatja.",
+        "frame": "Körülvágási keret",
+        "keys": "Billentyűzettel: a nyilak mozgatják a képet (Shifttel nagyobb lépésekben), a + és a − nagyítja és kicsinyíti.",
+        "zoom": "Nagyítás",
+        "size": "{width} × {height} képpontos méretben lesz mentve.",
+        "small": "A kép kicsi: az oldalon szemcsésnek tűnhet.",
+        "error": "Ez a kép nem olvasható be: próbálkozzon másik fájllal.",
+        "cancel": "Mégse",
+        "confirm": "Kivágás alkalmazása",
+        "encodeError": "A kivágást nem sikerült előkészíteni: próbálja újra."
+      }
     },
     "rubricaPicker": {
       "loading": "Keresés folyamatban…",
@@ -824,7 +838,8 @@
         "requiredLegend": "A *-gal jelölt mezők az esemény mentéséhez kellenek: amíg üresek, mindegyiknél jelezzük.",
         "kickerHint": "Felülcímhez írja a cím elé, és válassza el őket | jellel, például „Találkozósorozat | Az első találkozó”.",
         "kickerUse": "„{kicker}” megjelenítése felülcímként",
-        "kickerPreview": "Így jelenik meg az esemény oldalán"
+        "kickerPreview": "Így jelenik meg az esemény oldalán",
+        "coverImageSize": "Ajánlott méret: 1600 × 900 képpont (16:9)."
       },
       "step2": {
         "heading": "Ki mit tehet",
@@ -1118,6 +1133,14 @@
         "askOrganization": "szervezet",
         "askRole": "beosztás",
         "askType": "szervezet típusa"
+      },
+      "preview": {
+        "title": "Az oldal előnézete",
+        "open": "Előnézet megnyitása",
+        "note": "Így jelenik meg az esemény oldala; gépelés közben frissül.",
+        "noteNoDate": "Így jelenik meg az esemény oldala; amíg nincs megadva dátum, az időpont csak példa.",
+        "titlePlaceholder": "Az esemény címe",
+        "descriptionPlaceholder": "Itt jelenik meg a leírás."
       }
     },
     "nav": {
