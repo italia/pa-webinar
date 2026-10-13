@@ -40,7 +40,7 @@ export default defineConfig({
       // parecchi punti — lo sfonda e fa rosso. Quando la copertura sale in
       // modo stabile, questi numeri si alzano dietro; mai il contrario.
       //
-      // Misura di riferimento (Vitest 4, copertura V8 rimappata sull'AST):
+      // Misura di riferimento (Vitest 5, copertura V8 rimappata sull'AST):
       // lines 46,0 · functions 40,3 · branches 41,8 · statements 45,0.
       thresholds: {
         lines: 44,
