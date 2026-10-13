@@ -588,7 +588,7 @@
     "publisher": "Next.js Team",
     "email": "support@vercel.com"
   },
-  "@next/eslint-plugin-next@15.5.25": {
+  "@next/eslint-plugin-next@15.5.27": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js"
   },
@@ -862,7 +862,7 @@
     "publisher": "Jason Swearingen",
     "email": "https://jasonswearingen.github.io"
   },
-  "@types/node@22.20.4": {
+  "@types/node@22.20.5": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
@@ -1667,7 +1667,7 @@
     "email": "sindresorhus@gmail.com",
     "url": "https://sindresorhus.com"
   },
-  "eslint-config-next@15.5.25": {
+  "eslint-config-next@15.5.27": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js"
   },

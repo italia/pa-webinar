@@ -74,6 +74,17 @@ updates:
   - dependency-name: phaser
     update-types:
     - version-update:semver-major
+  # Con vite 8, caricare il pacchetto CommonJS di design-react-kit porta
+  # NODE_ENV a "production" dentro i test dell'app, che falliscono con
+  # "jsxDEV is not a function". vite (dichiarato da app e lobby) e
+  # @vitejs/plugin-react 6, che lo chiede, restano fermi finche' non e'
+  # risolto.
+  - dependency-name: vite
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@vitejs/plugin-react'
+    update-types:
+    - version-update:semver-major
 - package-ecosystem: docker
   directory: /
   schedule:
