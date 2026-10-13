@@ -6,7 +6,10 @@
 # del LLM) e pydantic (la forma del claim, in client.py, che i test del worker
 # e del resoconto importano). Cosi' il job CI non deve tirare ~2 GB di CUDA
 # per verificare che l'allineamento dei sottotitoli non regredisca.
-numpy<2
+numpy>=2.1,<3
+# I parametri Punkt che l'immagine genera (punkt_params.py), caricati come li
+# carica l'allineamento di WhisperX.
+nltk>=3.9.1
 httpx==0.28.1
 pydantic==2.9.2
 pytest

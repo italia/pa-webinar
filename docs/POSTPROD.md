@@ -622,7 +622,7 @@ it with backoff.
 | Stage | Default | Set in | Notes |
 |---|---|---|---|
 | Speech recognition | WhisperX with `large-v3`, the faster-whisper conversion `Systran/faster-whisper-large-v3` | `AI_ASR_MODEL_ID` on the app, default in `providers.ts` | Word-level alignment with a wav2vec2 model per source language |
-| Diarization | `pyannote/speaker-diarization-3.1` through WhisperX | `infra/ai/worker/transcribe.py` | Gated model; mixed-audio recordings only |
+| Diarization | `pyannote/speaker-diarization-3.1` through WhisperX | `DIARIZATION_MODEL` in `infra/ai/worker/transcribe.py` | Gated model; mixed-audio recordings only |
 | Summary and translation | `mistralai/Mistral-Small-3.2-24B-Instruct-2506` served by vLLM | `AI_VLLM_MODEL_ID` on the app, default in `providers.ts` | OpenAI-compatible `/v1/chat/completions` |
 | Dubbing | Piper voices | `AI_TTS_VOICES_PATH` on the app (default `/models/piper`) | Voices for `en`, `fr` and `it` are baked into the image under `/opt/piper-voices` |
 | Watermark | AudioSeal `audioseal_wm_16bits` | `infra/ai/worker/tts.py` | Dubbed audio only; `AI_WATERMARK=0` on the worker turns it off |
@@ -1066,7 +1066,10 @@ points to this section.
    ```
 
    Set `postprod.worker.hfTokenSecret.name: hf-token`. The token must belong to
-   an account that accepted the conditions of the gated pyannote models.
+   an account that accepted the conditions of the gated pyannote models:
+   `pyannote/speaker-diarization-3.1`, `pyannote/segmentation-3.0` and
+   `pyannote/speaker-diarization-community-1`, from which pyannote.audio 4
+   takes the PLDA files of the pipeline.
    The name is required even if you do not want diarization, because of a
    chart defect: the worker template checks whether the `hfTokenSecret` map
    exists, not whether the name is set, and the default map always exists.
@@ -1176,6 +1179,7 @@ spec:
               import whisperx
               from huggingface_hub import snapshot_download
               from audioseal import AudioSeal
+              from whisperx.diarize import DiarizationPipeline
 
               # Speech recognition: WhisperX loads "large-v3" from this repository.
               snapshot_download("Systran/faster-whisper-large-v3")
@@ -1183,7 +1187,14 @@ spec:
               for lang in ("it", "en"):
                   whisperx.load_align_model(language_code=lang, device="cpu")
               # Diarization (gated): accept its conditions on Hugging Face first.
-              whisperx.DiarizationPipeline(use_auth_token=os.environ["HF_TOKEN"], device="cpu")
+              # The worker reads it from PYANNOTE_CACHE, so it is seeded there. Loading it
+              # also fetches the PLDA files from pyannote/speaker-diarization-community-1.
+              DiarizationPipeline(
+                  model_name="pyannote/speaker-diarization-3.1",
+                  token=os.environ["HF_TOKEN"],
+                  device="cpu",
+                  cache_dir="/models/pyannote",
+              )
               # Language model, if vLLM mounts this volume as its Hugging Face cache.
               snapshot_download("mistralai/Mistral-Small-3.2-24B-Instruct-2506")
               # Watermark generator for dubbed audio.
@@ -1318,7 +1329,7 @@ Set these through `postprod.worker.extraEnv` unless noted:
 | `WORKER_DEADLINE_S` | set by the chart to `postprod.worker.activeDeadlineSeconds` | The Job's deadline, so the correction leaves time for the uploads |
 | `AI_WATERMARK` | `1` | `0` disables the AudioSeal watermark on dubbed audio |
 | `AUDIOSEAL_CACHE_DIR` | unset (AudioSeal then uses `XDG_CACHE_HOME`, `/work/.cache`) | Where the watermark generator is cached |
-| `WHISPERX_VERSION`, `PIPER_VERSION` | `whisperx-3.1`, `piper-1.2` | Version labels written to each artifact's `modelVersion`. They are labels, not detected versions: set them to the versions in `infra/ai/worker/requirements.txt` if you need exact provenance. |
+| `WHISPERX_VERSION`, `PIPER_VERSION` | `whisperx-3.8`, `piper-1.2` | Version labels written to each artifact's `modelVersion`. They are labels, not detected versions: set them to the versions in `infra/ai/worker/requirements-whisperx.txt` and `infra/ai/worker/requirements.txt` if you need exact provenance. |
 | `LOG_LEVEL` | `INFO` | Worker log level |
 | `HF_TOKEN` | from `hfTokenSecret` | Hugging Face token |
 | `WORKER_STUB` | from `stub` | Canned outputs without models |
