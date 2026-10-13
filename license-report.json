@@ -5,37 +5,15 @@
     "publisher": "TJ Holowaychuk",
     "email": "tj@vision-media.ca"
   },
-  "@asamuzakjp/css-color@5.1.11": {
-    "licenses": "MIT",
-    "repository": "https://github.com/asamuzaK/cssColor",
-    "publisher": "asamuzaK"
-  },
   "@asamuzakjp/css-color@7.1.5": {
     "licenses": "MIT",
     "repository": "https://github.com/asamuzaK/cssColor",
-    "publisher": "asamuzaK"
-  },
-  "@asamuzakjp/dom-selector@7.1.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/asamuzaK/domSelector",
     "publisher": "asamuzaK"
   },
   "@asamuzakjp/dom-selector@9.2.4": {
     "licenses": "MIT",
     "repository": "https://github.com/asamuzaK/domSelector",
     "publisher": "asamuzaK"
-  },
-  "@asamuzakjp/generational-cache@1.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/asamuzaK/generationalCache",
-    "publisher": "asamuzaK"
-  },
-  "@asamuzakjp/nwsapi@2.3.9": {
-    "licenses": "MIT",
-    "repository": "https://github.com/dperini/nwsapi",
-    "publisher": "Diego Perini",
-    "email": "diego.perini@gmail.com",
-    "url": "http://www.iport.it/"
   },
   "@asteasolutions/zod-to-openapi@7.3.4": {
     "licenses": "MIT",
@@ -1429,13 +1407,6 @@
     "repository": "https://github.com/tad-lispy/node-damerau-levenshtein",
     "publisher": "The Spanish Inquisition"
   },
-  "data-urls@7.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/data-urls",
-    "publisher": "Domenic Denicola",
-    "email": "d@domenic.me",
-    "url": "https://domenic.me/"
-  },
   "data-urls@8.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/data-urls",
@@ -2059,13 +2030,6 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "html-encoding-sniffer@6.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/html-encoding-sniffer",
-    "publisher": "Domenic Denicola",
-    "email": "d@domenic.me",
-    "url": "https://domenic.me/"
-  },
   "html-encoding-sniffer@7.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/html-encoding-sniffer",
@@ -2357,7 +2321,7 @@
     "email": "i@izs.me",
     "url": "http://blog.izs.me/"
   },
-  "isomorphic-dompurify@3.19.0": {
+  "isomorphic-dompurify@4.5.0": {
     "licenses": "MIT",
     "repository": "https://github.com/kkomelin/isomorphic-dompurify"
   },
@@ -2392,10 +2356,6 @@
     "repository": "https://github.com/nodeca/js-yaml",
     "publisher": "Vladimir Zapparov",
     "email": "dervus.grim@gmail.com"
-  },
-  "jsdom@29.1.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/jsdom"
   },
   "jsdom@30.1.2": {
     "licenses": "MIT",
@@ -3351,12 +3311,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/vercel/swr"
   },
-  "symbol-tree@3.2.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/js-symbol-tree",
-    "publisher": "Joris van der Wel",
-    "email": "joris@jorisvanderwel.com"
-  },
   "tdigest@0.1.3": {
     "licenses": "MIT",
     "repository": "https://github.com/welch/tdigest",
@@ -3404,12 +3358,6 @@
     "repository": "https://github.com/salesforce/tough-cookie",
     "publisher": "Jeremy Stashewsky",
     "email": "jstash@gmail.com"
-  },
-  "tr46@6.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/tr46",
-    "publisher": "Sebastian Mayr",
-    "email": "npm@smayr.name"
   },
   "tr46@7.0.0": {
     "licenses": "MIT",
@@ -3500,10 +3448,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/nodejs/undici"
   },
-  "undici@7.29.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/nodejs/undici"
-  },
   "undici@8.11.2": {
     "licenses": "MIT",
     "repository": "https://github.com/nodejs/undici"
@@ -3576,10 +3520,6 @@
     "publisher": "Anthony Fu",
     "email": "anthonyfu117@hotmail.com"
   },
-  "w3c-xmlserializer@5.0.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/w3c-xmlserializer"
-  },
   "w3c-xmlserializer@6.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/jsdom/w3c-xmlserializer"
@@ -3608,12 +3548,6 @@
     "publisher": "Domenic Denicola",
     "email": "d@domenic.me",
     "url": "https://domenic.me/"
-  },
-  "whatwg-url@16.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/jsdom/whatwg-url",
-    "publisher": "Sebastian Mayr",
-    "email": "github@smayr.name"
   },
   "whatwg-url@17.2.0": {
     "licenses": "MIT",
