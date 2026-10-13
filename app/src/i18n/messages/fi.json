@@ -761,7 +761,21 @@
       "helpDocument": "Tuetut muodot: PDF, DOCX, PPTX, XLSX, TXT — enint. 25 MB",
       "uploadsUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa: liitä sen sijaan tiedoston URL.",
       "externalImage": "Muiden sivustojen kuvia ei näytetä portaalin sivuilla.",
-      "externalImageUpload": "Lataa tiedosto laitteeltasi."
+      "externalImageUpload": "Lataa tiedosto laitteeltasi.",
+      "cropHelp": "Eri muotoinen kuva rajataan tässä ennen lataamista.",
+      "crop": {
+        "title": "Rajaa kuva",
+        "intro": "Valitse näytettävä osa vetämällä kuvaa; liukusäätimellä voit suurentaa sitä.",
+        "frame": "Rajauskehys",
+        "keys": "Näppäimistöllä: nuolinäppäimet siirtävät kuvaa (Vaihto-näppäimen kanssa pidemmin askelin), + ja − suurentavat ja pienentävät sitä.",
+        "zoom": "Suurennus",
+        "size": "Kuva tallennetaan kokoon {width} × {height} pikseliä.",
+        "small": "Kuva on pieni: sivulla se voi näyttää rakeiselta.",
+        "error": "Tätä kuvaa ei voi lukea: kokeile toista tiedostoa.",
+        "cancel": "Peruuta",
+        "confirm": "Käytä tätä rajausta",
+        "encodeError": "Rajausta ei voitu valmistella: yritä uudelleen."
+      }
     },
     "rubricaPicker": {
       "loading": "Haetaan…",
@@ -824,7 +838,8 @@
         "requiredLegend": "*-merkityt kentät tarvitaan tapahtuman tallentamiseen: niin kauan kuin ne ovat tyhjiä, se lukee jokaisen kohdalla.",
         "kickerHint": "Kirjoita yläotsikko ennen otsikkoa ja erota ne merkillä |, esimerkiksi ”Tapaamissarja | Ensimmäinen tapaaminen”.",
         "kickerUse": "Näytä ”{kicker}” yläotsikkona",
-        "kickerPreview": "Näin se näkyy tapahtuman sivulla"
+        "kickerPreview": "Näin se näkyy tapahtuman sivulla",
+        "coverImageSize": "Suositeltu koko: 1600 × 900 pikseliä (16:9)."
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisaatio",
         "askRole": "rooli",
         "askType": "organisaation tyyppi"
+      },
+      "preview": {
+        "title": "Sivun esikatselu",
+        "open": "Avaa esikatselu",
+        "note": "Tältä tapahtuman sivu näyttää; se päivittyy kirjoittaessasi.",
+        "noteNoDate": "Tältä tapahtuman sivu näyttää; niin kauan kuin päivämäärä puuttuu, kellonaika on esimerkki.",
+        "titlePlaceholder": "Tapahtuman otsikko",
+        "descriptionPlaceholder": "Kuvaus näkyy tässä."
       }
     },
     "nav": {

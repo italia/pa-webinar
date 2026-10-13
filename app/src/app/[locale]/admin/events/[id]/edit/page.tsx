@@ -356,6 +356,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
+        campiLiberi={{
+          speakersInfo: (event.speakersInfo ?? null) as Record<string, string> | null,
+          organizerName: event.organizerName ?? null,
+        }}
       />
     </div>
   );

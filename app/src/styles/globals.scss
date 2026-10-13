@@ -11474,3 +11474,173 @@ html.live-resizing .live-sidebar-resizer::after {
 .sala-rivista__piede {
   margin-top: 1rem;
 }
+
+// ── Creazione dell'evento: l'anteprima della pagina accanto al modulo ──────
+// Sugli schermi larghi il modulo a sinistra e, ferma accanto mentre si
+// scorre, l'anteprima ridotta; sotto i 1200 px resta il pulsante che la apre
+// a tutta larghezza.
+@media (min-width: 1200px) {
+  .wizard-con-anteprima {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: 2rem;
+    align-items: start;
+  }
+  .wizard-con-anteprima > .anteprima-pagina {
+    position: sticky;
+    top: 1rem;
+  }
+}
+.anteprima-pagina {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #dde4ec;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+@media (min-width: 1200px) {
+  .wizard-con-anteprima > .anteprima-pagina {
+    margin-top: 0;
+  }
+}
+.anteprima-pagina__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.anteprima-pagina__titolo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--app-text);
+}
+.anteprima-pagina__nota {
+  font-size: 0.82rem;
+  color: var(--app-muted);
+  margin: 0.35rem 0 0.75rem;
+}
+// La versione ridotta: la pagina vera a tre quarti, e non piu' alta di
+// mezza finestra (il resto si vede aprendo l'anteprima).
+.anteprima-pagina__ridotta {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .anteprima-pagina__ridotta {
+    display: block;
+    zoom: 0.62;
+    max-height: calc((100vh - 9rem) / 0.62);
+    overflow: hidden;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(23, 50, 77, 0.12);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent);
+    mask-image: linear-gradient(to bottom, #000 85%, transparent);
+  }
+}
+.anteprima-pagina__vuoto {
+  color: var(--app-muted);
+  font-style: italic;
+}
+
+// ── Ritaglio di un'immagine prima del caricamento ──────────────────────────
+.ritaglio-immagine__testo {
+  margin-bottom: 0.75rem;
+  color: var(--app-text);
+}
+.ritaglio-immagine__cornice {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e8f0fe;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+  &:focus-visible {
+    outline: 3px solid var(--app-primary);
+    outline-offset: 2px;
+  }
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+}
+.ritaglio-immagine__nota {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+  margin: 0.5rem 0 0;
+}
+.ritaglio-immagine__nota--avviso {
+  color: var(--app-warning-text);
+  font-weight: 600;
+}
+.ritaglio-immagine__zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--app-text);
+
+  .form-range {
+    flex: 1;
+  }
+}
+
+// L'anteprima di un'immagine con formato richiesto: il riquadro delle schede.
+.file-or-url-input__riquadro {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #e8f0fe;
+}
+
+// ── Copertina della pagina dell'evento ─────────────────────────────────────
+// 16:9 fino a 340 px d'altezza: oltre, l'immagine intera sta al centro e i
+// lati (per un JPEG) li riempie la stessa immagine, sfocata e schiarita.
+.event-cover {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(38vh, 340px);
+  overflow: hidden;
+  background-color: #e8f0fe;
+}
+.event-cover__sfondo {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(28px) saturate(0.9);
+  opacity: 0.55;
+  transform: scale(1.15);
+}
+// L'immagine intera, alta quanto il riquadro e larga quanto le serve (mai
+// oltre): il suo fondo pieno copre lo sfondo sfocato sotto le parti
+// trasparenti.
+.event-cover__immagine {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  background-color: #e8f0fe;
+}

@@ -761,7 +761,21 @@
       "helpDocument": "Podržani formati: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
       "uploadsUnavailable": "Učitavanje datoteka nije dostupno na ovoj instalaciji: umjesto toga zalijepite URL datoteke.",
       "externalImage": "Slike s drugih web-mjesta ne prikazuju se na stranicama portala.",
-      "externalImageUpload": "Učitajte datoteku sa svojeg uređaja."
+      "externalImageUpload": "Učitajte datoteku sa svojeg uređaja.",
+      "cropHelp": "Slika drugačijeg formata ovdje se obrezuje prije prijenosa.",
+      "crop": {
+        "title": "Obrezivanje slike",
+        "intro": "Povucite sliku kako biste odabrali dio koji se prikazuje; klizačem je povećavate.",
+        "frame": "Okvir obrezivanja",
+        "keys": "Tipkovnicom: strelice pomiču sliku (sa Shiftom u većim koracima), + i − je povećavaju i smanjuju.",
+        "zoom": "Povećanje",
+        "size": "Spremit će se u veličini {width} × {height} piksela.",
+        "small": "Slika je mala: na stranici bi mogla izgledati mutno.",
+        "error": "Ova se slika ne može pročitati: pokušajte s drugom datotekom.",
+        "cancel": "Odustani",
+        "confirm": "Upotrijebi ovaj izrez",
+        "encodeError": "Obrezivanje nije bilo moguće pripremiti: pokušajte ponovno."
+      }
     },
     "rubricaPicker": {
       "loading": "Pretraživanje u tijeku…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Polja označena s * potrebna su za spremanje događaja: dok su prazna, to piše uz svako.",
         "kickerHint": "Za nadnaslov napišite ga prije naslova i odvojite ih znakom |, na primjer „Ciklus susreta | Prvi susret”.",
         "kickerUse": "Prikaži „{kicker}” kao nadnaslov",
-        "kickerPreview": "Ovako izgleda na stranici događaja"
+        "kickerPreview": "Ovako izgleda na stranici događaja",
+        "coverImageSize": "Preporučeni format: 1600 × 900 piksela (16:9)."
       },
       "step2": {
         "heading": "Tko što može",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizacija",
         "askRole": "uloga",
         "askType": "vrsta organizacije"
+      },
+      "preview": {
+        "title": "Pregled stranice",
+        "open": "Otvori pregled",
+        "note": "Ovako izgleda stranica događaja; ažurira se dok pišete.",
+        "noteNoDate": "Ovako izgleda stranica događaja; dok nedostaje datum, vrijeme je samo primjer.",
+        "titlePlaceholder": "Naslov događaja",
+        "descriptionPlaceholder": "Ovdje će se prikazati opis."
       }
     },
     "nav": {

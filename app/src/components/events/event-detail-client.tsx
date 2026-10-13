@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit';
+import { Alert, Button, Card, CardBody, Row, Col } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
-import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
-import { initials } from '@/lib/utils/speaker-palette';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
@@ -35,9 +33,8 @@ import BookmarksPanel from '@/components/events/bookmarks-panel';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import type { ReportView } from '@/lib/report/types';
-import EventTitle from '@/components/events/event-title';
+import EventHeader, { EventPeople, type TagChip } from '@/components/events/event-header';
 import { MarkdownRenderer } from '@/components/ui/markdown';
-import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 interface AnsweredQuestion {
   id: string;
@@ -111,12 +108,6 @@ interface FeedbackSummary {
   distribution: { rating: number; count: number }[];
 }
 
-interface TagChip {
-  slug: string;
-  name: Record<string, string>;
-  color: string | null;
-}
-
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
@@ -158,12 +149,6 @@ interface EventDetailClientProps {
   report?: ReportView | null;
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  PUBLISHED: 'var(--app-primary)',
-  LIVE: '#008758',
-  ENDED: 'var(--app-muted)',
-};
-
 /** Display name for ISO language codes, used in the subtitle / audio
  *  switcher menus. Uses Intl.DisplayNames con fallback al codice se
  *  Intl non riconosce il tag. */
@@ -197,7 +182,6 @@ export default function EventDetailClient({
   report = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
-  const durata = useDurataTesto();
   const tr = useTranslations('registration');
   const tl = useTranslations('live');
   const svegliaPonte = () => {
@@ -251,7 +235,6 @@ export default function EventDetailClient({
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
-  const durataTesto = durata(startsAt, endsAt);
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
@@ -270,7 +253,6 @@ export default function EventDetailClient({
       : event.status;
   const youtubeLink = youtubeWatchLink(event.youtubeUrl);
   const isLive = event.status === 'LIVE';
-  const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
   // o non ha ne' il video ne' la sola trascrizione pubblicati.
@@ -394,196 +376,18 @@ export default function EventDetailClient({
         </div>
       )}
 
-      {/* ─── Event header: cover + hero in one cohesive card ─── */}
-      <div
-        className="mb-5 rounded-3 shadow-sm overflow-hidden"
-        style={{ border: '1px solid #e3e9f0' }}
-      >
-        {/* 16:9 cover, cover-filled — same treatment as the event cards and
-            video-library thumbnails, so it looks consistent in every view
-            regardless of the asset's native ratio. The admin sets coverImageUrl
-            and imageUrl to the same asset; imageUrl carries it here (it also
-            doubles as the post-event video poster). */}
-        {event.imageUrl && (
-          <div
-            style={{
-              width: '100%',
-              aspectRatio: '16 / 9',
-              // Cap the height so a wide screen can't blow the banner up to
-              // ~full-viewport. `contain` keeps a designed cover graphic fully
-              // visible (no crop) centred on a soft brand background.
-              maxHeight: 'min(38vh, 340px)',
-              backgroundImage: `url(${event.imageUrl})`,
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundColor: '#E8F0FE',
-            }}
-            role="img"
-            aria-label={title}
-          />
-        )}
-
-        {/* ─── Hero content ─── */}
-        <div
-          className="p-4 p-lg-5"
-          style={{
-            background: 'linear-gradient(135deg, #F5F7FB 0%, #E8F0FE 100%)',
-            borderLeft: `5px solid ${accentColor}`,
-          }}
-        >
-          <div className="d-flex align-items-center gap-2 mb-3">
-            {/* In diretta basta il segnale «In corso» con il punto: due
-                etichette uguali una accanto all'altra non dicono di piu'. */}
-            {!isLive && <StatusPill status={publicStatus} />}
-            {isLive && (
-              <Badge
-                color="success"
-                className="px-2 py-1 d-inline-flex align-items-center gap-1"
-                style={{ fontSize: '0.75rem' }}
-              >
-                <span
-                  className="rounded-circle d-inline-block pulse-dot"
-                  style={{
-                    width: 7,
-                    height: 7,
-                    backgroundColor: '#fff',
-                  }}
-                />
-                {t('card.liveNow')}
-              </Badge>
-            )}
-          </div>
-
-          <EventTitle
-            title={title}
-            kickerEnabled={parseTitleKicker}
-            as="h1"
-            className="mb-3"
-            style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
-          />
-
-          {tags.length > 0 && (
-            <div className="d-flex flex-wrap gap-2 mb-4">
-              {tags.map((tag) => {
-                const label = getLocalized(tag.name as LocalizedField, locale) || tag.slug;
-                const color = tag.color ?? '#516B7E';
-                return (
-                  <Link
-                    key={tag.slug}
-                    href={percorso(`/events?tag=${tag.slug}`)}
-                    className="text-decoration-none"
-                    style={{
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: 999,
-                      fontSize: '0.78rem',
-                      fontWeight: 600,
-                      backgroundColor: hexWithAlpha(color, 0x22 / 255),
-                      color: inchiostroEtichetta(color, 0x22 / 255),
-                      border: `1px solid ${hexWithAlpha(color, 0x44 / 255)}`,
-                    }}
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
-          <Row className="g-3 g-lg-4">
-            <Col xs={12} md="auto">
-              <div className="d-flex align-items-center">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    backgroundColor: 'rgba(0,102,204,0.1)',
-                  }}
-                >
-                  <Icon icon="it-calendar" className="text-primary" />
-                </div>
-                <div>
-                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                    {format.dateTime(startsAt, {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </div>
-                  <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                    {format.dateTime(startsAt, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {' – '}
-                    {format.dateTime(endsAt, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {' · '}
-                    {durataTesto}
-                  </div>
-                </div>
-              </div>
-            </Col>
-            {/* I campi di testo libero restano per gli eventi che non hanno
-                persone o enti strutturati. */}
-            {speakers && !event.people?.some((p) => p.role === 'speaker') && (
-              <Col xs={12} md="auto">
-                <div className="d-flex align-items-center">
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                    style={{
-                      width: 44,
-                      height: 44,
-                      backgroundColor: 'rgba(0,102,204,0.1)',
-                    }}
-                  >
-                    <Icon icon="it-user" className="text-primary" />
-                  </div>
-                  <div>
-                    <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                      {t('detail.speakers')}
-                    </div>
-                    {/* Un relatore per riga, come li scrive chi crea l'evento:
-                        senza `pre-line` gli a capo sparivano e i nomi si
-                        fondevano in una riga sola. */}
-                    <div className="text-muted" style={{ fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
-                      {speakers}
-                    </div>
-                  </div>
-                </div>
-              </Col>
-            )}
-            {event.organizerName && !(event.organizers && event.organizers.length > 0) && (
-              <Col xs={12} md="auto">
-                <div className="d-flex align-items-center">
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                    style={{
-                      width: 44,
-                      height: 44,
-                      backgroundColor: 'rgba(0,102,204,0.1)',
-                    }}
-                  >
-                    <Icon icon="it-pa" className="text-primary" />
-                  </div>
-                  <div>
-                    <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                      {t('detail.organizer')}
-                    </div>
-                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                      {event.organizerName}
-                    </div>
-                  </div>
-                </div>
-              </Col>
-            )}
-          </Row>
-        </div>
-      </div>
+      <EventHeader
+        title={title}
+        parseTitleKicker={parseTitleKicker}
+        imageUrl={event.imageUrl}
+        tags={tags}
+        startsAt={startsAt}
+        endsAt={endsAt}
+        publicStatus={publicStatus}
+        isLive={isLive}
+        speakers={speakers && !event.people?.some((p) => p.role === 'speaker') ? speakers : null}
+        organizerName={event.organizerName && !(event.organizers && event.organizers.length > 0) ? event.organizerName : null}
+      />
 
       <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
 
@@ -999,32 +803,6 @@ export default function EventDetailClient({
   );
 }
 
-function StatusPill({ status }: { status: string }) {
-  const t = useTranslations('events.status');
-  const colorMap: Record<string, { bg: string; fg: string }> = {
-    PUBLISHED: { bg: '#E8F0FE', fg: 'var(--app-primary)' },
-    LIVE: { bg: '#D4EDDA', fg: '#155724' },
-    ENDED: { bg: '#E9ECEF', fg: 'var(--app-muted)' },
-    DRAFT: { bg: '#FFF3CD', fg: '#856404' },
-    ARCHIVED: { bg: '#E9ECEF', fg: 'var(--app-muted)' },
-  };
-  const fallback = { bg: '#FFF3CD', fg: '#856404' };
-  const c = colorMap[status] ?? fallback;
-  return (
-    <Badge
-      color=""
-      className="px-2 py-1 fw-semibold"
-      style={{ fontSize: '0.72rem', backgroundColor: c.bg, color: c.fg }}
-    >
-      {/* Per il pubblico un evento pubblicato e' un evento «in programma»:
-          «Pubblicato» e' una parola di chi lo gestisce. */}
-      {status === 'PUBLISHED'
-        ? t('UPCOMING')
-        : t(status as 'DRAFT' | 'LIVE' | 'ENDED' | 'ARCHIVED')}
-    </Badge>
-  );
-}
-
 function PostEventSidebar({
   event,
   feedbackSummary,
@@ -1116,76 +894,5 @@ function PostEventSidebar({
         </div>
       )}
     </>
-  );
-}
-
-/**
- * Chi organizza e chi interviene: gli enti, con logo e sito, e le persone
- * pubblicate, ciascuna con il proprio ente. L'ente di una persona può essere
- * diverso da quello che organizza l'evento.
- */
-function EventPeople({ organizers, people }: { organizers: EntePubblico[]; people: PersonaPubblica[] }) {
-  const t = useTranslations('events');
-  if (organizers.length === 0 && people.length === 0) return null;
-  const gruppi: Array<{ role: PersonaPubblica['role']; label: string }> = [
-    { role: 'organizer', label: t('detail.peopleOrganizers') },
-    { role: 'moderator', label: t('detail.peopleModerators') },
-    { role: 'speaker', label: t('detail.speakers') },
-  ];
-  return (
-    <section className="event-people mb-4" aria-labelledby="event-people-title">
-      <h2 id="event-people-title" className="h5 fw-bold mb-3">
-        {t('detail.peopleTitle')}
-      </h2>
-      {organizers.length > 0 && (
-        <div className="event-people__group">
-          <h3 className="event-people__label">{t('detail.organizedBy')}</h3>
-          <ul className="event-people__orgs">
-            {organizers.map((o, i) => (
-              <li key={`${i}-${o.name}`} className="event-org">
-                {o.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={o.logoUrl} alt="" className="event-org__logo" />
-                ) : (
-                  <span className="event-org__initials" aria-hidden="true">{initials(o.name)}</span>
-                )}
-                {o.websiteUrl ? (
-                  <a href={o.websiteUrl} target="_blank" rel="noopener noreferrer" className="event-org__name">
-                    {o.name}
-                  </a>
-                ) : (
-                  <span className="event-org__name">{o.name}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {gruppi.map(({ role, label }) => {
-        const chi = people.filter((p) => p.role === role);
-        if (chi.length === 0) return null;
-        return (
-          <div key={role} className="event-people__group">
-            <h3 className="event-people__label">{label}</h3>
-            <ul className="event-people__list">
-              {chi.map((p, i) => (
-                <li key={`${p.name}-${i}`} className="event-person">
-                  {p.logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.logoUrl} alt="" className="event-person__logo" />
-                  ) : (
-                    <span className="event-person__initials" aria-hidden="true">{initials(p.name)}</span>
-                  )}
-                  <span className="event-person__who">
-                    <span className="event-person__name">{p.name}</span>
-                    {p.organization && <span className="event-person__org">{p.organization}</span>}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })}
-    </section>
   );
 }

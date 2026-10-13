@@ -761,7 +761,21 @@
       "helpDocument": "Obsługiwane formaty: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
       "uploadsUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji: zamiast tego wklej adres URL pliku.",
       "externalImage": "Obrazy z innych witryn nie są wyświetlane na stronach portalu.",
-      "externalImageUpload": "Prześlij plik ze swojego urządzenia."
+      "externalImageUpload": "Prześlij plik ze swojego urządzenia.",
+      "cropHelp": "Obraz o innych proporcjach zostanie tu przycięty przed przesłaniem.",
+      "crop": {
+        "title": "Przytnij obraz",
+        "intro": "Przeciągnij obraz, aby wybrać widoczny fragment; suwakiem możesz go powiększyć.",
+        "frame": "Ramka przycinania",
+        "keys": "Z klawiatury: strzałki przesuwają obraz (z klawiszem Shift o większe odcinki), + i − powiększają go i pomniejszają.",
+        "zoom": "Powiększenie",
+        "size": "Zostanie zapisany w rozmiarze {width} × {height} pikseli.",
+        "small": "Obraz jest mały: na stronie może wyglądać na nieostry.",
+        "error": "Nie można odczytać tego obrazu: spróbuj z innym plikiem.",
+        "cancel": "Anuluj",
+        "confirm": "Użyj tego kadru",
+        "encodeError": "Nie udało się przygotować kadrowania: spróbuj ponownie."
+      }
     },
     "rubricaPicker": {
       "loading": "Wyszukiwanie…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Pola oznaczone * są potrzebne do zapisania wydarzenia: dopóki są puste, każde to mówi.",
         "kickerHint": "Aby dodać nadtytuł, wpisz go przed tytułem i oddziel znakiem |, na przykład „Cykl spotkań | Pierwsze spotkanie”.",
         "kickerUse": "Pokaż „{kicker}” jako nadtytuł",
-        "kickerPreview": "Tak wygląda na stronie wydarzenia"
+        "kickerPreview": "Tak wygląda na stronie wydarzenia",
+        "coverImageSize": "Zalecany format: 1600 × 900 pikseli (16:9)."
       },
       "step2": {
         "heading": "Kto może co robić",
@@ -1118,6 +1133,14 @@
         "askOrganization": "instytucja",
         "askRole": "stanowisko",
         "askType": "rodzaj instytucji"
+      },
+      "preview": {
+        "title": "Podgląd strony",
+        "open": "Otwórz podgląd",
+        "note": "Tak wygląda strona wydarzenia; aktualizuje się w trakcie pisania.",
+        "noteNoDate": "Tak wygląda strona wydarzenia; dopóki brakuje daty, godzina jest przykładowa.",
+        "titlePlaceholder": "Tytuł wydarzenia",
+        "descriptionPlaceholder": "Tutaj pojawi się opis."
       }
     },
     "nav": {

@@ -761,7 +761,21 @@
       "helpDocument": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
       "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL.",
       "externalImage": "Billeder fra andre websteder vises ikke på portalens sider.",
-      "externalImageUpload": "Upload filen fra din enhed."
+      "externalImageUpload": "Upload filen fra din enhed.",
+      "cropHelp": "Et billede i et andet format beskæres her, før det uploades.",
+      "crop": {
+        "title": "Beskær billedet",
+        "intro": "Træk i billedet for at vælge den del, der skal vises; med skyderen zoomer du ind.",
+        "frame": "Beskæringsramme",
+        "keys": "Med tastaturet: piletasterne flytter billedet (med Skift i lange trin), + og − zoomer ind og ud.",
+        "zoom": "Zoom",
+        "size": "Det gemmes i {width} × {height} pixel.",
+        "small": "Billedet er lille: på siden kan det se sløret ud.",
+        "error": "Billedet kan ikke læses: prøv med en anden fil.",
+        "cancel": "Annuller",
+        "confirm": "Brug denne beskæring",
+        "encodeError": "Beskæringen kunne ikke forberedes: prøv igen."
+      }
     },
     "rubricaPicker": {
       "loading": "Søger…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Felter markeret med * kræves for at gemme arrangementet: så længe de er tomme, står det ved hvert felt.",
         "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
         "kickerUse": "Vis »{kicker}« som overlinje",
-        "kickerPreview": "Sådan ser den ud på arrangementets side"
+        "kickerPreview": "Sådan ser den ud på arrangementets side",
+        "coverImageSize": "Anbefalet format: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisation",
         "askRole": "rolle",
         "askType": "organisationstype"
+      },
+      "preview": {
+        "title": "Forhåndsvisning af siden",
+        "open": "Åbn forhåndsvisningen",
+        "note": "Sådan ser arrangementets side ud; den opdateres, mens du skriver.",
+        "noteNoDate": "Sådan ser arrangementets side ud; så længe datoen mangler, er tidspunktet et eksempel.",
+        "titlePlaceholder": "Arrangementets titel",
+        "descriptionPlaceholder": "Her vises beskrivelsen."
       }
     },
     "nav": {

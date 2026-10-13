@@ -761,7 +761,21 @@
       "helpDocument": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid 25 MB",
       "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin.",
       "externalImage": "Ní thaispeántar íomhánna ó shuíomhanna eile ar leathanaigh na tairsí.",
-      "externalImageUpload": "Uaslódáil an comhad ó do ghléas."
+      "externalImageUpload": "Uaslódáil an comhad ó do ghléas.",
+      "cropHelp": "Déantar íomhá de chruth eile a bhearradh anseo, sula n-uaslódáiltear í.",
+      "crop": {
+        "title": "Bearr an íomhá",
+        "intro": "Tarraing an íomhá chun an chuid atá le taispeáint a roghnú; úsáid an sleamhnán chun súmáil isteach.",
+        "frame": "Fráma bearrtha",
+        "keys": "Leis an méarchlár: bogann na saigheada an íomhá (le Shift i gcéimeanna fada), súmálann + agus − isteach agus amach.",
+        "zoom": "Súmáil",
+        "size": "Sábhálfar í ag {width} × {height} picteilín.",
+        "small": "Tá an íomhá beag: d'fhéadfadh sí a bheith doiléir ar an leathanach.",
+        "error": "Ní féidir an íomhá seo a léamh: bain triail as comhad eile.",
+        "cancel": "Cealaigh",
+        "confirm": "Úsáid an bearradh seo",
+        "encodeError": "Níorbh fhéidir an barradh a ullmhú: bain triail eile as."
+      }
     },
     "rubricaPicker": {
       "loading": "Á chuardach…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Teastaíonn na réimsí le * chun an t-imeacht a shábháil: fad atá siad folamh, deirtear é le gach ceann.",
         "kickerHint": "Le haghaidh forcheannteidil, scríobh roimh an teideal é agus scar iad le |, mar shampla “Sraith cruinnithe | An chéad chruinniú”.",
         "kickerUse": "Taispeáin “{kicker}” mar fhorcheannteideal",
-        "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta"
+        "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta",
+        "coverImageSize": "Formáid mholta: 1600 × 900 picteilín (16:9)."
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
@@ -1118,6 +1133,14 @@
         "askOrganization": "eagraíocht",
         "askRole": "ról",
         "askType": "cineál eagraíochta"
+      },
+      "preview": {
+        "title": "Réamhamharc ar an leathanach",
+        "open": "Oscail an réamhamharc",
+        "note": "Seo mar a fheictear leathanach na hócáide; nuashonraítear é agus tú ag clóscríobh.",
+        "noteNoDate": "Seo mar a fheictear leathanach na hócáide; go dtí go socraítear an dáta, níl san am ach sampla.",
+        "titlePlaceholder": "Teideal na hócáide",
+        "descriptionPlaceholder": "Beidh an cur síos le feiceáil anseo."
       }
     },
     "nav": {

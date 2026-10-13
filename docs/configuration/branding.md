@@ -245,8 +245,11 @@ label above the main title, in listings, on the event page, in the waiting room 
 It is off by default, so existing titles never change appearance. An event can override the site
 default in either direction (`Event.parseTitleKicker`; empty inherits the site setting). In the event
 wizard, under the title, a help line explains the convention; as soon as the title contains `|` with
-text on both sides, a box offers **Show “…” as a kicker above the title**, checked as the site setting
-says, with a preview of how the title will look.
+text on both sides, a box offers **Show “…” as a kicker above the title**, with a preview of how the
+title will look. The box follows the site setting, with one exception: when the site setting is off,
+the event has no choice of its own and no title in any language has a kicker yet, typing the first `|`
+checks it for the event; deleting that `|` again returns the event to the site setting. A choice made
+by hand in the box stays as it is.
 
 ## Header, footer and legal pages
 

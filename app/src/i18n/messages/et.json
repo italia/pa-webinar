@@ -761,7 +761,21 @@
       "helpDocument": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL.",
       "externalImage": "Teiste saitide pilte portaali lehtedel ei kuvata.",
-      "externalImageUpload": "Laadi fail oma seadmest üles."
+      "externalImageUpload": "Laadi fail oma seadmest üles.",
+      "cropHelp": "Teistsuguse kujuga pilt kärbitakse siin enne üleslaadimist.",
+      "crop": {
+        "title": "Pildi kärpimine",
+        "intro": "Lohistage pilti, et valida kuvatav osa; liuguriga saate seda suurendada.",
+        "frame": "Kärpimisraam",
+        "keys": "Klaviatuuriga: nooleklahvid liigutavad pilti (koos Shiftiga pikemate sammudega), + ja − suurendavad ja vähendavad seda.",
+        "zoom": "Suurendus",
+        "size": "Salvestatakse suuruses {width} × {height} pikslit.",
+        "small": "Pilt on väike: lehel võib see paista udune.",
+        "error": "Seda pilti ei õnnestu lugeda: proovige mõnda teist faili.",
+        "cancel": "Tühista",
+        "confirm": "Kasuta seda kärbet",
+        "encodeError": "Kärbet ei õnnestunud ette valmistada: proovige uuesti."
+      }
     },
     "rubricaPicker": {
       "loading": "Otsin…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Tärniga * väljad on vajalikud ürituse salvestamiseks: kuni need on tühjad, on see iga välja juures kirjas.",
         "kickerHint": "Pealkirja kohal oleva rea jaoks kirjuta see enne pealkirja ja eralda märgiga |, näiteks „Kohtumiste sari | Esimene kohtumine“.",
         "kickerUse": "Näita „{kicker}“ pealkirja kohal",
-        "kickerPreview": "Nii näeb see välja ürituse lehel"
+        "kickerPreview": "Nii näeb see välja ürituse lehel",
+        "coverImageSize": "Soovitatav suurus: 1600 × 900 pikslit (16:9)."
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organisatsioon",
         "askRole": "roll",
         "askType": "organisatsiooni liik"
+      },
+      "preview": {
+        "title": "Lehe eelvaade",
+        "open": "Ava eelvaade",
+        "note": "Selline näeb välja ürituse leht; see uueneb kirjutamise ajal.",
+        "noteNoDate": "Selline näeb välja ürituse leht; kuni kuupäev on määramata, on kellaaeg vaid näide.",
+        "titlePlaceholder": "Ürituse pealkiri",
+        "descriptionPlaceholder": "Siia ilmub kirjeldus."
       }
     },
     "nav": {

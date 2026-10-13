@@ -761,7 +761,21 @@
       "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB",
       "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL.",
       "externalImage": "Kitų svetainių vaizdai portalo puslapiuose nerodomi.",
-      "externalImageUpload": "Įkelkite failą iš savo įrenginio."
+      "externalImageUpload": "Įkelkite failą iš savo įrenginio.",
+      "cropHelp": "Kitokio formato paveikslėlis čia apkarpomas prieš įkeliant.",
+      "crop": {
+        "title": "Paveikslėlio apkarpymas",
+        "intro": "Vilkite paveikslėlį, kad pasirinktumėte rodomą dalį; slankikliu galite jį padidinti.",
+        "frame": "Apkarpymo rėmelis",
+        "keys": "Klaviatūra: rodyklės perkelia paveikslėlį (su Shift didesniais žingsniais), + ir − jį padidina ir sumažina.",
+        "zoom": "Mastelis",
+        "size": "Bus išsaugotas {width} × {height} pikselių dydžiu.",
+        "small": "Paveikslėlis mažas: puslapyje jis gali atrodyti neryškus.",
+        "error": "Šio paveikslėlio nepavyksta nuskaityti: pabandykite kitą failą.",
+        "cancel": "Atšaukti",
+        "confirm": "Naudoti šį apkarpymą",
+        "encodeError": "Nepavyko paruošti apkarpymo: bandykite dar kartą."
+      }
     },
     "rubricaPicker": {
       "loading": "Ieškoma…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Laukai, pažymėti *, reikalingi renginiui išsaugoti: kol jie tušti, tai nurodyta prie kiekvieno.",
         "kickerHint": "Norėdami pridėti antraštę virš pavadinimo, parašykite ją prieš pavadinimą ir atskirkite ženklu |, pavyzdžiui, „Susitikimų ciklas | Pirmasis susitikimas“.",
         "kickerUse": "Rodyti „{kicker}“ virš pavadinimo",
-        "kickerPreview": "Taip atrodo renginio puslapyje"
+        "kickerPreview": "Taip atrodo renginio puslapyje",
+        "coverImageSize": "Rekomenduojamas dydis: 1600 × 900 pikselių (16:9)."
       },
       "step2": {
         "heading": "Kas ką gali daryti",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizacija",
         "askRole": "pareigos",
         "askType": "organizacijos tipas"
+      },
+      "preview": {
+        "title": "Puslapio peržiūra",
+        "open": "Atidaryti peržiūrą",
+        "note": "Taip atrodo renginio puslapis; jis atsinaujina jums rašant.",
+        "noteNoDate": "Taip atrodo renginio puslapis; kol nenurodyta data, laikas yra tik pavyzdys.",
+        "titlePlaceholder": "Renginio pavadinimas",
+        "descriptionPlaceholder": "Čia bus rodomas aprašymas."
       }
     },
     "nav": {

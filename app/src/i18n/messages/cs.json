@@ -761,7 +761,21 @@
       "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
       "uploadsUnavailable": "Nahrávání souborů není v této instalaci k dispozici: vložte URL adresu souboru.",
       "externalImage": "Obrázky z jiných webů se na stránkách portálu nezobrazí.",
-      "externalImageUpload": "Nahrajte soubor ze svého zařízení."
+      "externalImageUpload": "Nahrajte soubor ze svého zařízení.",
+      "cropHelp": "Obrázek jiného formátu se zde před nahráním ořízne.",
+      "crop": {
+        "title": "Oříznutí obrázku",
+        "intro": "Přetažením obrázku zvolte část, která se má zobrazit; posuvníkem jej zvětšíte.",
+        "frame": "Rámeček ořezu",
+        "keys": "Z klávesnice: šipky posouvají obrázek (se Shiftem po delších krocích), + a − jej zvětšují a zmenšují.",
+        "zoom": "Zvětšení",
+        "size": "Uloží se ve velikosti {width} × {height} pixelů.",
+        "small": "Obrázek je malý: na stránce může vypadat rozmazaně.",
+        "error": "Tento obrázek nelze načíst: zkuste jiný soubor.",
+        "cancel": "Zrušit",
+        "confirm": "Použít tento ořez",
+        "encodeError": "Výřez se nepodařilo připravit: zkuste to znovu."
+      }
     },
     "rubricaPicker": {
       "loading": "Probíhá vyhledávání…",
@@ -824,7 +838,8 @@
         "requiredLegend": "Pole označená * jsou potřeba k uložení akce: dokud jsou prázdná, je to u každého uvedeno.",
         "kickerHint": "Nadtitulek napište před název a oddělte je znakem |, například „Cyklus setkání | První setkání“.",
         "kickerUse": "Zobrazit „{kicker}“ jako nadtitulek",
-        "kickerPreview": "Takto vypadá na stránce akce"
+        "kickerPreview": "Takto vypadá na stránce akce",
+        "coverImageSize": "Doporučený formát: 1600 × 900 pixelů (16:9)."
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -1118,6 +1133,14 @@
         "askOrganization": "organizace",
         "askRole": "funkce",
         "askType": "typ organizace"
+      },
+      "preview": {
+        "title": "Náhled stránky",
+        "open": "Otevřít náhled",
+        "note": "Takto vypadá stránka akce; aktualizuje se během psaní.",
+        "noteNoDate": "Takto vypadá stránka akce; dokud chybí datum, je čas jen ukázkový.",
+        "titlePlaceholder": "Název akce",
+        "descriptionPlaceholder": "Zde se zobrazí popis."
       }
     },
     "nav": {
