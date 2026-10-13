@@ -3504,7 +3504,7 @@
     "publisher": "Andreas Gal",
     "email": "gal@mozilla.com"
   },
-  "vite@6.4.3": {
+  "vite@6.4.4": {
     "licenses": "MIT",
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You"
