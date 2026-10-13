@@ -204,7 +204,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 ### Pinned actions and least-privilege tokens
 
 - **Pinned actions.** Every `uses:` in `.github/workflows/` references a full commit SHA, with the tag in a trailing comment (`actions/checkout@<sha> # v4`). No workflow uses a floating reference such as `@v4` or `@main`. Dependabot updates the SHA and the comment together.
-- **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml` and `release.yml` set a read-only workflow default. `jitsi-web.yml` declares permissions per job only. The jobs that need more than read access are elevated:
+- **Least-privilege tokens.** Every workflow sets a read-only workflow default. The jobs that need more than read access are elevated:
 
   | Workflow | Workflow-level permissions | Elevated jobs |
   |---|---|---|
@@ -212,7 +212,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `codeql.yml` | `read-all` | The analysis job gets `security-events: write` to upload results |
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
-  | `jitsi-web.yml` | None declared | The job that pushes the image gets `packages: write` |
+  | `jitsi-web.yml` | `contents: read` | The job that pushes the image gets `packages: write` |
   | `release.yml` | `contents: read` | The image job gets `packages: write` and `contents: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
 
 - **Jobs without a `permissions` block.** Such a job receives the workflow default, or, when the workflow declares none, the repository's default token permissions, a repository setting that the workflow files do not show. The change-detection jobs in `dev.yml` take the workflow's read-only default.

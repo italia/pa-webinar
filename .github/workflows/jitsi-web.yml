@@ -23,6 +23,11 @@ on:
       - ".github/workflows/jitsi-web.yml"
   workflow_dispatch: {}
 
+# Default in sola lettura; il job che pubblica l'immagine eleva i propri
+# permessi nel suo blocco.
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar-jitsi-web
