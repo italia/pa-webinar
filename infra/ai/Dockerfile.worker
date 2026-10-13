@@ -36,27 +36,26 @@ WORKDIR /opt/worker
 
 # Versioni fissate, per non dipendere dal resolver di pip. Il blocco CUDA e'
 # per CUDA 12 (cu126).
-COPY worker/requirements.txt worker/requirements-whisperx.txt ./
-# requirements.txt fissa torch, torchvision, torchaudio e torchcodec cu126,
-# che sostituiscono il torch alpha di NGC, piu' le dipendenze di WhisperX.
+COPY worker/requirements.txt worker/requirements-whisperx.txt worker/build_check.py ./
+# Prima si tolgono i pacchetti di NGC che il worker non usa e che, con torch
+# e numpy sostituiti, non si importano piu': flash-attn, apex,
+# transformer-engine, torch-tensorrt e nvfuser sono compilati sul torch di
+# NGC; pyarrow, numba e spaCy (con thinc e blis) su numpy 1.x, e scikit-learn
+# importa pyarrow se lo trova. Il triton di NGC va tolto PRIMA di installare
+# torch: scrive nella stessa cartella del triton che torch si porta dietro.
 # Poi:
+#  - requirements.txt fissa torch, torchvision, torchaudio e torchcodec cu126,
+#    piu' le dipendenze di WhisperX;
 #  - WhisperX entra con --no-deps: le sue release fissano un torch piu'
 #    vecchio (vedi requirements-whisperx.txt);
-#  - si tolgono flash-attn, apex e transformer-engine di NGC: compilati sul
-#    torch di prima, dopo la sostituzione non si caricano ("undefined symbol:
-#    _ZN3c105Error...") e transformers importa flash-attn per wav2vec2
-#    (allineamento di WhisperX). Non servono.
-# Il controllo al build importa tutta la catena (un'ABI rotta si vede in CI)
-# e fallisce se e' entrata una wheel CUDA 13: per etichetta o nome del
-# pacchetto (cu13), per versione CUDA di torch, o per una libcudart.so.13
-# spedita da una wheel senza etichetta (driver 550 = CUDA 12 al massimo).
-RUN pip install --no-cache-dir -r requirements.txt \
+#  - build_check.py importa tutta la catena, verifica che non ci sia niente
+#    di CUDA 13 (driver 550 = CUDA 12 al massimo) e che ogni pacchetto
+#    compilato che dipende da numpy si importi ancora.
+RUN pip uninstall -y apex flash-attn flash_attn transformer-engine transformer_engine \
+        torch-tensorrt torch_tensorrt nvfuser pytorch-triton pyarrow numba spacy thinc blis \
+    && pip install --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir --no-deps -r requirements-whisperx.txt \
-    && (pip uninstall -y flash-attn flash_attn transformer-engine transformer_engine apex || true) \
-    && python -c "import torch, torchvision, torchaudio, torchcodec, numpy, pandas, scipy, sklearn; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx, ctranslate2; from whisperx.diarize import DiarizationPipeline; import whisperx.alignment, whisperx.asr; import pyannote.audio.pipelines; from piper import PiperVoice; import audioseal; assert torch.version.cuda.startswith('12.'), torch.version.cuda; print('imports OK: torch', torch.__version__, 'CUDA', torch.version.cuda, 'CT2', ctranslate2.__version__)" \
-    && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; fi \
-    && if python -c "import site, glob, sys; sys.exit(0 if any(glob.glob(p + '/**/libcudart.so.13*', recursive=True) for p in site.getsitepackages()) else 1)"; then echo 'BUILD FAIL: libcudart.so.13 found in site-packages'; exit 1; fi \
-    && echo 'build-check OK: no CUDA-13 wheels'
+    && python build_check.py
 
 # Pre-bake Piper TTS voices into the image (rhasspy/piper-voices, MIT,
 # ~20-60MB each, NOT gated → no HF token at build). The DUB job reads

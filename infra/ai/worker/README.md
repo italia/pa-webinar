@@ -405,9 +405,15 @@ bump anything:
   and replaces the base image's PyTorch. A bare version would pull the
   CUDA 13 build from PyPI, which the GPU nodes' driver cannot run, and the
   build fails if a CUDA 13 wheel is present.
-- The Dockerfile uninstalls the base image's `flash-attn`, `apex` and
-  `transformer-engine`, because they were built against the replaced
-  PyTorch.
+- Before installing, the Dockerfile uninstalls the base image's packages
+  that the worker does not use and that break once PyTorch and numpy are
+  replaced: `flash-attn`, `apex`, `transformer-engine`, `torch-tensorrt` and
+  `nvfuser` (built against the old PyTorch), `pyarrow`, `numba` and spaCy
+  (built against numpy 1.x; scikit-learn imports `pyarrow` when it is
+  present), and the base image's `pytorch-triton`, which shares its folder
+  with the Triton that PyTorch installs. `build_check.py` then fails the
+  build if any installed package with compiled extensions that depends on
+  numpy no longer imports.
 - `whisperx` is in `requirements-whisperx.txt` and is installed with
   `--no-deps`, because its releases pin an older PyTorch. Its dependencies
   (pyannote.audio, faster-whisper, CTranslate2, NLTK, pandas) are pinned in
