@@ -42,7 +42,7 @@ faster-whisper==1.2.1
 ctranslate2==4.8.3
 nltk==3.10.3
 omegaconf==2.4.0
-pandas==2.3.3
+pandas==3.0.6
 
 # Sottotitoli VTT, scritti dagli helper in worker/vtt.py.
 webvtt-py==0.5.1
