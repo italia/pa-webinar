@@ -260,6 +260,11 @@ updates:
   labels:
   - dependencies
   - docker
+# Il worker senza GPU gira su python:<versione>-alpine: le wheel musl delle
+# sue dipendenze (oggi pydantic-core di pydantic 2.9.2, fino alla 3.13)
+# arrivano dopo una versione nuova di Python, e senza compilatore il build
+# si ferma. Il salto di versione si fa a mano,
+# insieme alle dipendenze; Dependabot aggiorna solo Alpine e le patch.
 - package-ecosystem: docker
   directory: /infra/ai
   schedule:
@@ -268,6 +273,11 @@ updates:
   labels:
   - dependencies
   - docker
+  ignore:
+  - dependency-name: library/python
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
 # ATTENZIONE: questa immagine e' la build PATCHATA di jitsi/web (rnnoise 48kHz).
 # Un bump dell'immagine base perde la patch -> vedi `ignore` sotto.
 - package-ecosystem: docker
