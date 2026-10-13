@@ -211,7 +211,7 @@ The self-hosted runner lives inside a Kubernetes cluster, where code could reach
 - `ci.yml` sends `pull_request` events to GitHub-hosted runners through its conditional `runs-on`, and keeps the self-hosted runner for pushes and dispatches.
 - The publishing workflows start only on trusted events: pushes to `dev` or `main`, tags, manual dispatch or a schedule. No workflow uses `pull_request_target`.
 - Every `uses:` is pinned to a full commit SHA, with the tag in a trailing comment.
-- Workflow-level permissions are read-only where they are declared (`ci.yml`, `codeql.yml`, `scorecard.yml`). `dev.yml`, `jitsi-web.yml` and `release.yml` set permissions per job: only the jobs that publish images or attach files to a release get `packages: write` or `contents: write`, and jobs with no block (the change-detection jobs of `dev.yml`) get the repository's default token permissions, which must stay read-only.
+- Workflow-level permissions are read-only where they are declared (`ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`); `jitsi-web.yml` sets them on its only job. Only the jobs that publish images or attach files to a release get `packages: write` or `contents: write`; jobs with no block, such as the change-detection jobs of `dev.yml`, take the workflow's read-only default.
 
 Any new workflow that a pull request can trigger must keep the same conditional runner. The complete policy, including the permission table and fork approval, is in [SECURITY.md](../../SECURITY.md#where-ci-code-runs).
 

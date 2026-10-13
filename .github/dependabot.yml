@@ -47,6 +47,15 @@ updates:
   - dependency-name: zod
     update-types:
     - version-update:semver-major
+  # Dalla 8 chiede zod 4, il cui major e' escluso qui sopra.
+  - dependency-name: '@asteasolutions/zod-to-openapi'
+    update-types:
+    - version-update:semver-major
+  # Dalla 1.0 MediaPipe include la telemetria verso Google: resta fissato
+  # alla 0.10.35 (app/package.json).
+  - dependency-name: '@mediapipe/tasks-vision'
+    versions:
+    - '>=1.0.0'
   - dependency-name: eslint
     update-types:
     - version-update:semver-major
@@ -72,6 +81,17 @@ updates:
     update-types:
     - version-update:semver-major
   - dependency-name: phaser
+    update-types:
+    - version-update:semver-major
+  # Con vite 8, caricare il pacchetto CommonJS di design-react-kit porta
+  # NODE_ENV a "production" dentro i test dell'app, che falliscono con
+  # "jsxDEV is not a function". vite (dichiarato da app e lobby) e
+  # @vitejs/plugin-react 6, che lo chiede, restano fermi finche' non e'
+  # risolto.
+  - dependency-name: vite
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@vitejs/plugin-react'
     update-types:
     - version-update:semver-major
 - package-ecosystem: docker
@@ -175,7 +195,15 @@ updates:
   - dependency-name: torchaudio
     update-types:
     - version-update:semver-major
+  # Il worker GPU gira sul Python 3.10 dell'immagine NGC: numpy dalla 2.3
+  # chiede Python 3.11 o successivo, pandas 3 lo stesso. Le minor di numpy si
+  # aggiornano a mano anche per il worker senza GPU, che sta nella stessa
+  # cartella.
   - dependency-name: numpy
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  - dependency-name: pandas
     update-types:
     - version-update:semver-major
   - dependency-name: transformers
