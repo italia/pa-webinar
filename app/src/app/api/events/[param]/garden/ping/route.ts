@@ -45,6 +45,7 @@ import {
   type GardenPeer,
 } from '@/lib/garden/pubsub';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import {
   authorizePanelRead,
@@ -139,9 +140,13 @@ export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
 
   const ip = getClientIp(request);
-  // Generous cap: ~5 Hz × 60 s = 300 pings/min. Well above what a
-  // well-behaved client sends; catches runaway loops.
-  const rl = rateLimit(`garden-ping:${ip}`, { limit: 600, windowMs: 60_000 });
+  // ~5 Hz × 60 s = 300 ping al minuto per browser: due browser per
+  // indirizzo, o di piu' dove i limiti della sala sono scalati per un luogo
+  // (lib/room-rate-limit).
+  const rl = rateLimit(`garden-ping:${ip}`, {
+    limit: limiteDellaSala(600),
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }

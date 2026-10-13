@@ -8,6 +8,7 @@ import { localizedPath } from '@/lib/utils/localized-url';
 import { getSettings } from '@/lib/settings';
 import { isUpcomingPublicEvent, publicEventStatusWhere } from '@/lib/events/visibility';
 import EventList from '@/components/events/event-list';
+import { fondoEtichettaPiena, hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 export const revalidate = 60;
 
@@ -104,7 +105,7 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
         <section>
           <h2
             className="h4 fw-semibold pb-2 mb-4"
-            style={{ borderBottom: '2px solid #5A768A' }}
+            style={{ borderBottom: '2px solid #516B7E' }}
           >
             {t('past')}
           </h2>
@@ -123,23 +124,6 @@ interface TagFilterRowProps {
 
 async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
   const t = await getTranslations('events.list');
-
-  function hexWithAlpha(hex: string, alpha: number): string {
-    const clean = hex.replace('#', '');
-    const normalized =
-      clean.length === 3
-        ? clean
-            .split('')
-            .map((c) => c + c)
-            .join('')
-        : clean;
-    if (normalized.length !== 6) return hex;
-    const r = parseInt(normalized.slice(0, 2), 16);
-    const g = parseInt(normalized.slice(2, 4), 16);
-    const b = parseInt(normalized.slice(4, 6), 16);
-    if ([r, g, b].some((v) => Number.isNaN(v))) return hex;
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }
 
   return (
     <div className="mb-4">
@@ -175,9 +159,9 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
               aria-current={active ? 'true' : undefined}
               style={{
                 borderRadius: 20,
-                border: `1px solid ${color}`,
-                backgroundColor: active ? color : hexWithAlpha(color, 0.1),
-                color: active ? '#fff' : color,
+                border: `1px solid ${active ? fondoEtichettaPiena(color) : color}`,
+                backgroundColor: active ? fondoEtichettaPiena(color) : hexWithAlpha(color, 0.1),
+                color: active ? '#fff' : inchiostroEtichetta(color, 0.1),
                 fontWeight: 500,
                 padding: '4px 12px',
                 textDecoration: 'none',

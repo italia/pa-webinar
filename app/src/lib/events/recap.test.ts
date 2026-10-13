@@ -15,7 +15,15 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 
-import { buildRecap, ensureEventRecap, isRecapEmpty, formatRecapSummary, type EventRecap } from './recap';
+import {
+  buildRecap,
+  ensureEventRecap,
+  isRecapEmpty,
+  formatRecapSummary,
+  ricostruisciRiepilogo,
+  rifaiRiepilogo,
+  type EventRecap,
+} from './recap';
 
 const mocked = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
@@ -297,6 +305,95 @@ describe('ensureEventRecap', () => {
       endsAt: new Date(Date.now() - 40 * 86_400_000), dataRetentionDays: 30, peakParticipants: 3,
     });
     expect(await ensureEventRecap('e1')).not.toBeNull();
+    expect(mocked.event.updateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('ricostruisciRiepilogo', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function base() {
+    mocked.registration.count.mockResolvedValue(0);
+    mocked.question.findMany.mockResolvedValue([]);
+    mocked.poll.findMany.mockResolvedValue([]);
+    mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
+    mocked.chatMessage.findMany.mockResolvedValue([]);
+    mocked.eventFeedback.findMany.mockResolvedValue([]);
+  }
+
+  it("rifa il riepilogo anche se era gia' congelato", async () => {
+    base();
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'ENDED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() - 86_400_000),
+      dataRetentionDays: 30,
+      peakParticipants: 3,
+      postEventRecap: { version: 2 },
+      postEventRecapAt: new Date(),
+    });
+    expect(await ricostruisciRiepilogo('e1')).toBe('fatto');
+    // Scrive solo sopra uno snapshot piu' vecchio dell'inizio della lettura.
+    const arg = mocked.event.updateMany.mock.calls[0]![0] as {
+      where: { id: string; OR: unknown[] };
+      data: { postEventRecapAt: Date };
+    };
+    expect(arg.where.id).toBe('e1');
+    expect(arg.where.OR).toEqual([
+      { postEventRecapAt: null },
+      { postEventRecapAt: { lt: arg.data.postEventRecapAt } },
+    ]);
+  });
+
+  it('evento non concluso, o importato: niente', async () => {
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'LIVE',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(),
+      dataRetentionDays: 30,
+    });
+    expect(await ricostruisciRiepilogo('e1')).toBe('non-concluso');
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'ENDED',
+      eventType: 'LEGACY',
+      endsAt: new Date(),
+      dataRetentionDays: 30,
+    });
+    expect(await ricostruisciRiepilogo('e1')).toBe('non-concluso');
+    expect(mocked.event.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('oltre la conservazione: non si rifa (direbbe zero iscritti)', async () => {
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'ENDED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() - 40 * 86_400_000),
+      dataRetentionDays: 30,
+    });
+    expect(await ricostruisciRiepilogo('e1')).toBe('scaduto');
+    expect(mocked.event.updateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('rifaiRiepilogo', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('un errore non fa fallire la modifica che lo chiede', async () => {
+    mocked.event.findUnique.mockRejectedValue(new Error('db giu'));
+    const avviso = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await expect(rifaiRiepilogo('e1')).resolves.toBeUndefined();
+    expect(avviso).toHaveBeenCalled();
+    avviso.mockRestore();
+  });
+
+  it('in diretta non tocca niente', async () => {
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'LIVE',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(),
+      dataRetentionDays: 30,
+    });
+    await rifaiRiepilogo('e1');
     expect(mocked.event.updateMany).not.toHaveBeenCalled();
   });
 });

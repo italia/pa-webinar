@@ -212,7 +212,8 @@ worthless after ten seconds and is never needed afterwards.
   long as those people are in the square.
 - **A per-IP, per-pod rate limit.** One browser uses about half of the 600 pings a minute, so two browsers behind one
   NAT address reach the limit on a pod. From then until the one-minute window resets, every ping from that address
-  gets 429, and all of those avatars disappear for others after 10 seconds.
+  gets 429, and all of those avatars disappear for others after 10 seconds. `ROOM_RATE_LIMIT_MULTIPLIER` raises the
+  limit for an event whose audience shares one address.
 - **The square shows no one as in the call.** The app's conference adapter reports no call members, so everyone
   appears as waiting.
 - **The canvas cannot be tested headless.** Automated coverage stops at unit tests (engine precedence, the presence

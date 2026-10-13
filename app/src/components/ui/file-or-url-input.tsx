@@ -23,10 +23,12 @@
  * between server and client in some layouts.
  */
 
-import { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import ImageCropDialog, { type Ritaglio } from '@/components/ui/image-crop-dialog';
 import { useUploadsAvailable } from '@/components/ui/uploads-availability';
+import { IMMAGINI_ESTERNE_AMMESSE } from '@/lib/security/img-src';
 import { withScheme } from '@/lib/utils/with-scheme';
 import { MATERIAL_FILE_MIME_TYPES } from '@/lib/validation/materials';
 import type { AssetUploadResponse } from '@/lib/validation/schemas';
@@ -59,6 +61,40 @@ export interface FileOrUrlInputProps {
    * lo fornisce l'area admin dal server (`UploadsAvailabilityProvider`).
    */
   uploadsEnabled?: boolean;
+  /**
+   * Avvisa se l'immagine viene da un altro sito, e quindi non comparirebbe
+   * nelle pagine del portale. Falso per le immagini che non finiscono nelle
+   * pagine (l'anteprima per i social la scaricano i loro server).
+   */
+  avvisoImmagineEsterna?: boolean;
+  /**
+   * Formato richiesto per le immagini caricate (es. la copertina 16:9): un
+   * file di altro formato si ritaglia nel browser prima di caricarlo, e
+   * l'anteprima mostra il riquadro come lo vedono le schede degli eventi.
+   */
+  ritaglio?: Ritaglio;
+}
+
+/** Le immagini che si ritagliano: le altre (SVG, GIF animate) passano come sono. */
+const RITAGLIABILI = ['image/jpeg', 'image/png', 'image/webp'];
+/** Scarto di formato sotto cui un'immagine e' gia' giusta e non si ritaglia. */
+const TOLLERANZA_FORMATO = 0.01;
+
+/** Larghezza e altezza di un'immagine scelta, lette nel browser. */
+function misuraImmagine(file: File): Promise<{ w: number; h: number } | null> {
+  return new Promise((risolvi) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      risolvi({ w: img.naturalWidth, h: img.naturalHeight });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      risolvi(null);
+    };
+    img.src = url;
+  });
 }
 
 const DEFAULT_ACCEPT: Record<FileOrUrlAssetType, string> = {
@@ -75,6 +111,26 @@ function isValidUrl(v: string): boolean {
     return (
       u.protocol === 'http:' || u.protocol === 'https:' || u.protocol === 'data:'
     );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Le pagine del portale mostrano solo immagini servite da lui stesso o dai
+ * pochi siti ammessi dalla CSP: un'immagine indicata con l'indirizzo di un
+ * altro sito si salva ma non compare. «Lui stesso» e' l'origine da cui si
+ * sta amministrando: i file caricati portano l'indirizzo pubblico del
+ * portale, lo stesso da cui di solito si amministra. Il solo percorso
+ * /api/assets/ non basta: lo ha anche un'altra installazione.
+ */
+function immagineDaAltroSito(url: string | null | undefined, origine: string | null): boolean {
+  if (!url || !origine) return false;
+  try {
+    const u = new URL(url, origine);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    if (u.origin === origine) return false;
+    return !IMMAGINI_ESTERNE_AMMESSE.includes(u.origin);
   } catch {
     return false;
   }
@@ -167,11 +223,14 @@ export default function FileOrUrlInput({
   disabled,
   required,
   uploadsEnabled,
+  avvisoImmagineEsterna = true,
+  ritaglio,
 }: FileOrUrlInputProps) {
   const t = useTranslations('admin.fileOrUrl');
   const reactId = useId();
   const fileInputId = `${id}-file-${reactId}`;
   const urlInputId = `${id}-url-${reactId}`;
+  const avvisoId = `${id}-avviso-${reactId}`;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadsFromServer = useUploadsAvailable();
@@ -180,9 +239,20 @@ export default function FileOrUrlInput({
   // Senza storage resta solo l'URL, qualunque cosa sia stata scelta prima.
   const mode: Mode = uploadsAvailable ? modeScelto : 'url';
   const [uploading, setUploading] = useState(false);
+  const [daRitagliare, setDaRitagliare] = useState<File | null>(null);
+  // Mentre si misura un'immagine scelta, o la si ritaglia, un altro file non
+  // si accetta: partirebbero due caricamenti.
+  const [preparando, setPreparando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState<string>(value ?? '');
   const [urlError, setUrlError] = useState<string | null>(null);
+  // L'origine si legge dopo il montaggio: sul server non c'e', e l'avviso
+  // disegnato solo nel browser non deve far divergere il primo disegno.
+  const [origine, setOrigine] = useState<string | null>(null);
+  useEffect(() => {
+    setOrigine(window.location.origin);
+  }, []);
+  const esterna = assetType === 'image' && avvisoImmagineEsterna && immagineDaAltroSito(value, origine);
 
   // Il valore puo' cambiare da fuori (dati del modulo arrivati dopo il primo
   // disegno, un caricamento riuscito): la casella dell'URL lo segue, a meno
@@ -241,16 +311,38 @@ export default function FileOrUrlInput({
     [assetType, onChange, onUpload, t],
   );
 
+  // Con un formato richiesto, un'immagine di altro formato passa prima dal
+  // ritaglio; una gia' giusta (o che non si ritaglia) si carica com'e'.
+  const scegliFile = async (file: File) => {
+    if (preparando || daRitagliare) return;
+    if (ritaglio && assetType === 'image' && RITAGLIABILI.includes(file.type)) {
+      setPreparando(true);
+      const misura = await misuraImmagine(file);
+      setPreparando(false);
+      if (misura && Math.abs(misura.w / misura.h / ritaglio.rapporto - 1) > TOLLERANZA_FORMATO) {
+        setError(null);
+        setDaRitagliare(file);
+        return;
+      }
+    }
+    void handleFileChosen(file);
+  };
+
+  const chiudiRitaglio = () => {
+    setDaRitagliare(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) void handleFileChosen(file);
+    if (file) void scegliFile(file);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (disabled || uploading) return;
+    if (disabled || uploading || preparando || daRitagliare) return;
     const file = e.dataTransfer.files?.[0];
-    if (file) void handleFileChosen(file);
+    if (file) void scegliFile(file);
   };
 
   const commitUrl = (raw: string) => {
@@ -361,7 +453,7 @@ export default function FileOrUrlInput({
             type="file"
             accept={effectiveAccept}
             onChange={onFileInputChange}
-            disabled={disabled || uploading}
+            disabled={disabled || uploading || preparando || !!daRitagliare}
             className="form-control"
           />
           {uploading && (
@@ -376,6 +468,11 @@ export default function FileOrUrlInput({
           )}
           {defaultHelp && (
             <div className="form-text text-muted mt-2">{defaultHelp}</div>
+          )}
+          {ritaglio && assetType === 'image' && (
+            <div className="form-text text-muted mt-1">
+              {t('cropHelp')}
+            </div>
           )}
           {error && (
             <div
@@ -401,6 +498,7 @@ export default function FileOrUrlInput({
             id={urlInputId}
             type="url"
             className={`form-control${urlError ? ' is-invalid' : ''}`}
+            aria-describedby={esterna ? avvisoId : undefined}
             placeholder={t('urlPlaceholder')}
             value={urlDraft}
             onChange={onUrlChange}
@@ -421,11 +519,37 @@ export default function FileOrUrlInput({
         </div>
       )}
 
+      {/* La regione c'e' sempre, vuota: cosi' il lettore di schermo annuncia
+          l'avviso quando compare, e il campo dell'URL lo cita. */}
+      <div
+        id={avvisoId}
+        role="status"
+        className={esterna ? 'form-text mt-2 fw-semibold' : undefined}
+        style={esterna ? { color: 'var(--app-warning-text)' } : undefined}
+      >
+        {esterna && (
+          <>
+            {t('externalImage')}
+            {uploadsAvailable && <> {t('externalImageUpload')}</>}
+          </>
+        )}
+      </div>
+
       {showPreview && (
         <div className="mt-3 p-2 border rounded bg-white d-flex align-items-center gap-3 flex-wrap">
           <div className="flex-grow-1" style={{ minWidth: 0 }}>
             <div className="small text-muted mb-1">{t('preview')}</div>
-            {assetType === 'image' && (
+            {assetType === 'image' && ritaglio && (
+              // Il riquadro delle schede degli eventi: l'immagine lo riempie.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={value!}
+                alt=""
+                className="file-or-url-input__riquadro"
+                style={{ aspectRatio: String(ritaglio.rapporto) }}
+              />
+            )}
+            {assetType === 'image' && !ritaglio && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={value!}
@@ -474,6 +598,18 @@ export default function FileOrUrlInput({
             {t('remove')}
           </button>
         </div>
+      )}
+
+      {daRitagliare && ritaglio && (
+        <ImageCropDialog
+          file={daRitagliare}
+          ritaglio={ritaglio}
+          onAnnulla={chiudiRitaglio}
+          onConferma={(ritagliato) => {
+            setDaRitagliare(null);
+            void handleFileChosen(ritagliato);
+          }}
+        />
       )}
     </div>
   );

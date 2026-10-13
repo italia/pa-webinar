@@ -59,6 +59,15 @@
     "cancel": "Anulați",
     "confirm": "Confirmați",
     "close": "Închideți",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Cod QR: {name}",
+      "alt": "Cod QR pentru linkul „{name}”",
+      "hint": "Scanează-l cu camera telefonului pentru a deschide linkul.",
+      "download": "Descarcă (SVG)",
+      "error": "Codul QR nu a putut fi creat. Reîncarcă pagina și încearcă din nou; între timp poți copia linkul."
+    },
     "back": "Înapoi",
     "next": "Înainte",
     "send": "Trimiteți",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Evenimentul s-a încheiat. Mai jos găsești statisticile și, dacă evenimentul a fost înregistrat, înregistrarea și raportul.",
     "endLinks": {
-      "after": "Înregistrare și raport",
+      "after": "Închideți evenimentul",
       "stats": "Statisticile evenimentului",
       "publicPage": "Pagina publică a evenimentului"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Formate acceptate: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formate acceptate: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului."
+      "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului.",
+      "externalImage": "Imaginile de pe alte site-uri nu apar pe paginile portalului.",
+      "externalImageUpload": "Încarcă fișierul de pe dispozitivul tău.",
+      "cropHelp": "O imagine cu alt format se decupează aici, înainte de încărcare.",
+      "crop": {
+        "title": "Decupați imaginea",
+        "intro": "Trageți imaginea pentru a alege partea afișată; cu glisorul o măriți.",
+        "frame": "Cadrul de decupare",
+        "keys": "De la tastatură: săgețile mută imaginea (cu Shift, în pași mari), + și − o măresc și o micșorează.",
+        "zoom": "Mărire",
+        "size": "Se va salva la {width} × {height} pixeli.",
+        "small": "Imaginea este mică: pe pagină ar putea apărea neclară.",
+        "error": "Această imagine nu poate fi citită: încercați alt fișier.",
+        "cancel": "Anulați",
+        "confirm": "Folosiți această decupare",
+        "encodeError": "Decuparea nu a putut fi pregătită: încercați din nou."
+      }
     },
     "rubricaPicker": {
       "loading": "Se caută…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Câmpurile marcate cu * sunt necesare pentru a salva evenimentul: cât timp sunt goale, fiecare o spune.",
         "kickerHint": "Pentru un supratitlu, scrie-l înaintea titlului și separă-le cu |, de exemplu „Ciclu de întâlniri | Prima întâlnire”.",
         "kickerUse": "Afișează „{kicker}” ca supratitlu",
-        "kickerPreview": "Așa apare pe pagina evenimentului"
+        "kickerPreview": "Așa apare pe pagina evenimentului",
+        "coverImageSize": "Format recomandat: 1600 × 900 pixeli (16:9)."
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizație",
         "askRole": "funcție",
         "askType": "tip de organizație"
+      },
+      "preview": {
+        "title": "Previzualizarea paginii",
+        "open": "Deschideți previzualizarea",
+        "note": "Așa arată pagina evenimentului; se actualizează pe măsură ce scrieți.",
+        "noteNoDate": "Așa arată pagina evenimentului; cât timp lipsește data, ora este doar un exemplu.",
+        "titlePlaceholder": "Titlul evenimentului",
+        "descriptionPlaceholder": "Aici va apărea descrierea."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Ascunde",
       "warning": "Oricine are acest link administrează evenimentul: nu îl afișa în timpul partajării ecranului și nu îl lipi într-un chat.",
       "hidden": "Link ascuns",
-      "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual."
+      "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual.",
+      "notYetPublished": "Funcționează după publicare: până atunci apare „pagina nu a fost găsită”."
     },
     "feedbackAdmin": {
       "title": "Rezultate feedback",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Sala de așteptare (implicită a site-ului)",
         "waitingRoomEngineGame": "Joc video (lobby Phaser)",
         "waitingRoomEngineClassic": "Clasică (statică)",
-        "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă."
+        "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă.",
+        "primaryColorHex": "Culoare principală (cod hexazecimal)"
       },
       "watermark": {
         "title": "Personalizare video",
@@ -1953,8 +1989,7 @@
         "min": "Verificați „{field}”: valoarea minimă este {min}.",
         "max": "Verificați „{field}”: valoarea maximă este {max}.",
         "field": "Verificați „{field}”: valoarea nu este validă."
-      },
-      "primaryColorHex": "Culoare principală (cod hexazecimal)"
+      }
     },
     "analytics": {
       "title": "Statistici",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Înscrieri",
         "ofMax": "{current} din {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Niciun memento configurat",
         "tags": "Etichete",
         "postEventSummary": "{connected} conectați din {registered} înscriși ({estimated} așteptați)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "În procesare",
       "statusPartial": "Procesată parțial",
       "statusDone": "Procesată",
-      "statusFailed": "Procesarea a eșuat"
+      "statusFailed": "Procesarea a eșuat",
+      "manageBackToEvent": "Înapoi la eveniment"
     },
     "questionnairesPage": {
       "subtitle": "Șabloane reutilizabile de întrebări pentru chestionarele de preînregistrare și post-eveniment."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Instituții organizatoare",
       "organizersEdit": "Editează instituțiile",
       "organizersEmpty": "Nicio instituție indicată: pagina publică nu arată cine organizează."
+    },
+    "closing": {
+      "title": "Închideți evenimentul",
+      "intro": "Ce mai rămâne de făcut pentru ca cei care au lipsit să găsească totul, iar participanții să poată spune cum a fost.",
+      "summaryTodo": "{count, plural, one {# sarcină rămasă} few {# sarcini rămase} other {# de sarcini rămase}}",
+      "summaryDone": "Totul este gata",
+      "loading": "Se verifică ce mai rămâne de făcut…",
+      "error": "Nu se poate citi ce mai rămâne de făcut: reîncărcați pagina.",
+      "stato": {
+        "fatto": "Gata",
+        "daFare": "De făcut",
+        "inCorso": "În curs",
+        "nonServe": "Nu este necesar"
+      },
+      "azioni": {
+        "apri": "Deschideți",
+        "rivedi": "Revizuiți transcrierea",
+        "materiali": "Mergeți la materiale"
+      },
+      "registrazione": {
+        "title": "Înregistrare",
+        "pubblicata": "Publicată.",
+        "daPubblicare": "Videoclipul este gata: publicați-l pentru cei care au lipsit.",
+        "inArrivo": "Dacă evenimentul a fost înregistrat, fișierul sosește la câteva minute după încheiere.",
+        "spenta": "Nu era prevăzută.",
+        "nessunFile": "Niciun videoclip: evenimentul nu a fost înregistrat sau fișierul nu a sosit."
+      },
+      "trascrizione": {
+        "title": "Transcriere",
+        "pubblicata": "Publicată.",
+        "prontaAi": "Gata din postproducție: revizuiți-o; se publică împreună cu videoclipul.",
+        "prontaSottotitoli": "Gata din subtitrări: verificați numele și publicați-o.",
+        "inLavorazione": "În curs de procesare.",
+        "nessuna": "Nu există: nici subtitrări, nici postproducție.",
+        "soloStaff": "Organizatorul evenimentului o revizuiește și o publică din zona de administrare.",
+        "nonPiu": "Nu mai poate fi modificată: evenimentul este arhivat sau datele sale au expirat."
+      },
+      "resoconto": {
+        "title": "Raport",
+        "pubblicato": "Publicat.",
+        "daPubblicare": "Generat: recitiți-l și publicați-l.",
+        "daGenerare": "De generat, pe baza transcrierii, a chatului și a evaluărilor.",
+        "inLavorazione": "În curs de procesare.",
+        "senzaPipeline": "Postproducția AI nu este activă în această instalare.",
+        "soloStaff": "Organizatorul evenimentului îl generează și îl publică din zona de administrare.",
+        "nonPiu": "Nu mai poate fi modificat: evenimentul este arhivat sau datele sale au expirat."
+      },
+      "sala": {
+        "title": "Ce s-a întâmplat în sală",
+        "rivista": "Mesaje: {messaggi} · întrebări: {domande} · sondaje: {sondaggi} · Într-un cuvânt: {nuvole}.",
+        "vuota": "Chatul, întrebările, sondajele și cuvintele nu au fost folosite.",
+        "inSospeso": "Întrebări fără răspuns: {domandeInSospeso}. Marcați-le ca răspunse sau respingeți-le."
+      },
+      "materiali": {
+        "title": "Materiale pentru cei care au lipsit",
+        "presenti": "Vizibile după eveniment: {materiali}.",
+        "nessuno": "Niciunul vizibil după eveniment: adăugați diapozitivele sau documentele vorbitorilor, dacă există.",
+        "nascosti": "Materiale: {materiali}, dar pagina publică nu afișează materialele: activați-le în configurarea pentru perioada de după eveniment."
+      },
+      "valutazioni": {
+        "title": "Evaluări",
+        "emailInviata": "E-mailul prin care sunt solicitate a fost trimis. Răspunsuri: {valutazioni}.",
+        "emailInPartenza": "E-mailul prin care sunt solicitate pleacă în curând către participanți. Răspunsuri: {valutazioni}.",
+        "emailSpenta": "E-mailul prin care sunt solicitate este dezactivat: poate fi activat până la o săptămână după încheiere. Răspunsuri: {valutazioni}.",
+        "raccolte": "Răspunsuri: {valutazioni}.",
+        "spente": "Nu sunt active pentru acest eveniment."
+      },
+      "pagina": {
+        "title": "Pagină publică",
+        "visibile": "Vizibilă pentru toți.",
+        "nellaLibreria": "Vizibilă pentru toți și în biblioteca video.",
+        "privata": "Retrasă: publicul nu o vede.",
+        "scaduta": "Nu mai este vizibilă: data de expirare a trecut.",
+        "archiviato": "Eveniment arhivat: pagina nu este publică.",
+        "libreriaSenzaVideo": "Vizibilă pentru toți; va apărea în biblioteca video după ce videoclipul va fi publicat."
+      }
+    },
+    "roomReview": {
+      "title": "Ce s-a întâmplat în sală",
+      "intro": "Revedeți ce s-a scris și ce s-a întrebat: ascundeți ce nu trebuie să rămână, închideți întrebările, publicați rezultatele sondajelor. Recapitularea de pe pagina publică se actualizează la fiecare modificare.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Întrebări",
+        "polls": "Sondaje",
+        "words": "Într-un cuvânt"
+      },
+      "loading": "Se încarcă…",
+      "error": "Această parte nu poate fi citită: încercați din nou mai târziu.",
+      "actionError": "Operațiunea nu a reușit: încercați din nou.",
+      "chat": {
+        "empty": "Niciun mesaj.",
+        "limit": "Se afișează doar cele mai recente mesaje: {count}.",
+        "question": "Întrebare",
+        "moderator": "Moderare",
+        "hide": "Ascunde",
+        "hideFor": "Ascunde mesajul de la {name}",
+        "hidden": "Mesaj ascuns.",
+        "confirmTitle": "Ascundeți mesajul?",
+        "confirmBody": "Dispare din istoric, din export și din recapitulare, împreună cu eventualul atașament. Acțiunea nu poate fi anulată."
+      },
+      "qa": {
+        "empty": "Nicio întrebare.",
+        "status": {
+          "PENDING": "În așteptare",
+          "HIGHLIGHTED": "Evidențiat",
+          "ANSWERED": "Răspuns dat",
+          "DISMISSED": "Respins"
+        },
+        "markAnswered": "Marcați ca având răspuns",
+        "dismiss": "Respingeți",
+        "fromChat": "din chat",
+        "votes": "Voturi: {count}",
+        "answeredOk": "Întrebarea a fost marcată ca având răspuns.",
+        "dismissedOk": "Întrebarea a fost respinsă.",
+        "limit": "Se afișează {count} întrebări marcate în chat: mai întâi cele deschise, apoi cele închise cel mai recent."
+      },
+      "polls": {
+        "empty": "Niciun sondaj.",
+        "status": {
+          "OPEN": "Deschis",
+          "CLOSED": "Închis: rezultatele nu sunt publice",
+          "PUBLISHED": "Rezultate publicate"
+        },
+        "votes": "Voturi: {count}",
+        "publish": "Publicați rezultatele",
+        "published": "Rezultatele au fost publicate."
+      },
+      "words": {
+        "empty": "Niciun cuvânt.",
+        "prompt": "Întrebare: {prompt}",
+        "people": "Persoane: {count}",
+        "hide": "Ascunde",
+        "hideFor": "Ascunde „{word}”",
+        "hidden": "Cuvânt ascuns.",
+        "confirmTitle": "Ascundeți cuvântul?",
+        "confirmBody": "Dispare din nor și din recapitulare. Acțiunea nu poate fi anulată.",
+        "round": "Runda din {date}"
+      },
+      "recap": {
+        "button": "Actualizați recapitularea publică",
+        "done": "Recapitularea publică a fost actualizată.",
+        "notPossible": "Recapitularea nu mai poate fi actualizată: evenimentul nu s-a încheiat sau datele sale au expirat.",
+        "error": "Actualizarea nu a reușit: încercați din nou."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Încă un eveniment} few {Încă # evenimente} other {Încă # de evenimente}}",
     "noEvents": "Niciun eveniment în această perioadă",
-    "weekShort": "Săpt."
+    "legend": {
+      "title": "Etichete",
+      "noTag": "Fără etichetă"
+    },
+    "popover": {
+      "open": "Deschide pagina evenimentului",
+      "manage": "Gestionează evenimentul",
+      "publicPage": "Pagină publică",
+      "registrations": "{count, plural, =0 {nicio înscriere} one {# înscriere} few {# înscrieri} other {# de înscrieri}}"
+    }
   },
   "footer": {
     "privacy": "Politica de confidențialitate",

@@ -143,6 +143,9 @@ export default function PAFooter() {
   }
 
   const legalLinks = footerLinks.filter((l) => l.section === 'legal');
+  // Senza sito dell'ente né email di supporto la colonna «Contatti»
+  // resterebbe un titolo sopra il vuoto: non si disegna.
+  const conContatti = orgUrl !== '#' || Boolean(settings.supportEmail);
 
   return (
     <footer className="it-footer" id="footer" tabIndex={-1}>
@@ -192,33 +195,35 @@ export default function PAFooter() {
                   ))}
                 </ul>
               </div>
-              <div className="col-lg-4 col-md-4 pb-2">
-                <h4>{t('footer.contacts')}</h4>
-                <ul className="footer-list link-list clearfix">
-                  {orgUrl !== '#' && (
-                    <li>
-                      <a
-                        href={orgUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="list-item"
-                      >
-                        {new URL(orgUrl).hostname.replace(/^www\./, '')}
-                      </a>
-                    </li>
-                  )}
-                  {settings.supportEmail && (
-                    <li>
-                      <a
-                        href={`mailto:${settings.supportEmail}`}
-                        className="list-item"
-                      >
-                        {settings.supportEmail}
-                      </a>
-                    </li>
-                  )}
-                </ul>
-              </div>
+              {conContatti && (
+                <div className="col-lg-4 col-md-4 pb-2">
+                  <h4>{t('footer.contacts')}</h4>
+                  <ul className="footer-list link-list clearfix">
+                    {orgUrl !== '#' && (
+                      <li>
+                        <a
+                          href={orgUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="list-item"
+                        >
+                          {new URL(orgUrl).hostname.replace(/^www\./, '')}
+                        </a>
+                      </li>
+                    )}
+                    {settings.supportEmail && (
+                      <li>
+                        <a
+                          href={`mailto:${settings.supportEmail}`}
+                          className="list-item"
+                        >
+                          {settings.supportEmail}
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
               <div className="col-lg-4 col-md-4 pb-2">
                 <h4>{t('footer.openSource')}</h4>
                 <ul className="footer-list link-list clearfix">

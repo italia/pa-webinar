@@ -2016,7 +2016,9 @@ export default function WaitingRoom({
 
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
                 {captionsNoticeBlock && <div className="mb-3">{captionsNoticeBlock}</div>}
-                <div className="mb-3">{netiquetteBlock}</div>
+                {/* Le buone pratiche servono a chi sta per entrare, non a chi
+                    trova la sala già chiusa. */}
+                {!isEnded && <div className="mb-3">{netiquetteBlock}</div>}
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
                 {isPublished && !notHeld && !isModerator && (

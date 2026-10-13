@@ -39,7 +39,7 @@ export default function PostEventQA({ questions }: PostEventQAProps) {
         <Card
           key={q.id}
           className="border-0 shadow-sm"
-          style={{ borderRadius: 8, borderLeft: `3px solid ${STATUS_COLOR[q.status] ?? '#5A768A'}` }}
+          style={{ borderRadius: 8, borderLeft: `3px solid ${STATUS_COLOR[q.status] ?? '#516B7E'}` }}
         >
           <CardBody className="p-3">
             <div className="d-flex justify-content-between align-items-start mb-2">
@@ -55,7 +55,7 @@ export default function PostEventQA({ questions }: PostEventQAProps) {
                   style={{
                     fontSize: '0.7rem',
                     backgroundColor: q.status === 'ANSWERED' ? '#D4EDDA' : '#E8F0FE',
-                    color: STATUS_COLOR[q.status] ?? '#5A768A',
+                    color: STATUS_COLOR[q.status] ?? '#516B7E',
                   }}
                 >
                   {t(`status.${q.status}` as 'status.ANSWERED' | 'status.HIGHLIGHTED')}

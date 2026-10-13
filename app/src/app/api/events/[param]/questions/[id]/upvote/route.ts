@@ -14,6 +14,7 @@ import {
 } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { upvoteQuestionSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -83,7 +84,10 @@ export const POST = withErrorHandling(async (request, context) => {
     // ragione: dietro l'uscita di un ente sta una sala intera, e ognuno può
     // sostenere più domande. Trecento sono sessanta persone da cinque voti.
     const ip = getClientIp(request);
-    const ipRl = rateLimit(`upvote-ip:${event.id}:${ip}`, { limit: 300, windowMs: 60_000 });
+    const ipRl = rateLimit(`upvote-ip:${event.id}:${ip}`, {
+      limit: limiteDellaSala(300),
+      windowMs: 60_000,
+    });
     if (!ipRl.allowed) {
       throw new RateLimitError((ipRl.resetAt - Date.now()) / 1000, 'NETWORK_RATE_LIMIT');
     }

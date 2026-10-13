@@ -59,6 +59,15 @@
     "cancel": "Cealaigh",
     "confirm": "Deimhnigh",
     "close": "Dún",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Cód QR: {name}",
+      "alt": "Cód QR don nasc “{name}”",
+      "hint": "Scan é le ceamara an fhóin chun an nasc a oscailt.",
+      "download": "Íoslódáil (SVG)",
+      "error": "Níorbh fhéidir an cód QR a chruthú. Athlódáil an leathanach agus bain triail eile as; idir an dá linn is féidir leat an nasc a chóipeáil."
+    },
     "back": "Ar ais",
     "next": "Ar aghaidh",
     "send": "Seol",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Tá an ócáid thart. Thíos gheobhaidh tú na staitisticí agus, má taifeadadh an ócáid, an taifeadadh agus an tuarascáil.",
     "endLinks": {
-      "after": "Taifeadadh agus tuarascáil",
+      "after": "Dún an imeacht",
       "stats": "Staitisticí na hócáide",
       "publicPage": "Leathanach poiblí na hócáide"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Formáidí tacaithe: PNG, JPEG, WebP, SVG, GIF — uasmhéid 10 MB",
       "helpAudio": "Formáidí tacaithe: MP3, WAV, OGG, M4A, WebM — uasmhéid 20 MB",
       "helpDocument": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid 25 MB",
-      "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin."
+      "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin.",
+      "externalImage": "Ní thaispeántar íomhánna ó shuíomhanna eile ar leathanaigh na tairsí.",
+      "externalImageUpload": "Uaslódáil an comhad ó do ghléas.",
+      "cropHelp": "Déantar íomhá de chruth eile a bhearradh anseo, sula n-uaslódáiltear í.",
+      "crop": {
+        "title": "Bearr an íomhá",
+        "intro": "Tarraing an íomhá chun an chuid atá le taispeáint a roghnú; úsáid an sleamhnán chun súmáil isteach.",
+        "frame": "Fráma bearrtha",
+        "keys": "Leis an méarchlár: bogann na saigheada an íomhá (le Shift i gcéimeanna fada), súmálann + agus − isteach agus amach.",
+        "zoom": "Súmáil",
+        "size": "Sábhálfar í ag {width} × {height} picteilín.",
+        "small": "Tá an íomhá beag: d'fhéadfadh sí a bheith doiléir ar an leathanach.",
+        "error": "Ní féidir an íomhá seo a léamh: bain triail as comhad eile.",
+        "cancel": "Cealaigh",
+        "confirm": "Úsáid an bearradh seo",
+        "encodeError": "Níorbh fhéidir an barradh a ullmhú: bain triail eile as."
+      }
     },
     "rubricaPicker": {
       "loading": "Á chuardach…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Teastaíonn na réimsí le * chun an t-imeacht a shábháil: fad atá siad folamh, deirtear é le gach ceann.",
         "kickerHint": "Le haghaidh forcheannteidil, scríobh roimh an teideal é agus scar iad le |, mar shampla “Sraith cruinnithe | An chéad chruinniú”.",
         "kickerUse": "Taispeáin “{kicker}” mar fhorcheannteideal",
-        "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta"
+        "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta",
+        "coverImageSize": "Formáid mholta: 1600 × 900 picteilín (16:9)."
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
@@ -1107,6 +1133,14 @@
         "askOrganization": "eagraíocht",
         "askRole": "ról",
         "askType": "cineál eagraíochta"
+      },
+      "preview": {
+        "title": "Réamhamharc ar an leathanach",
+        "open": "Oscail an réamhamharc",
+        "note": "Seo mar a fheictear leathanach na hócáide; nuashonraítear é agus tú ag clóscríobh.",
+        "noteNoDate": "Seo mar a fheictear leathanach na hócáide; go dtí go socraítear an dáta, níl san am ach sampla.",
+        "titlePlaceholder": "Teideal na hócáide",
+        "descriptionPlaceholder": "Beidh an cur síos le feiceáil anseo."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Folaigh",
       "warning": "Riarann duine ar bith a bhfuil an nasc seo aige an t-imeacht: ná taispeáin é agus tú ag comhroinnt scáileáin agus ná greamaigh i gcomhrá é.",
       "hidden": "Nasc folaithe",
-      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é."
+      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é.",
+      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”."
     },
     "feedbackAdmin": {
       "title": "Torthaí aiseolais",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Seomra feithimh (réamhshocrú an tsuímh)",
         "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
         "waitingRoomEngineClassic": "Clasaiceach (statach)",
-        "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh."
+        "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh.",
+        "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
       },
       "watermark": {
         "title": "Saincheapadh físe",
@@ -1953,8 +1989,7 @@
         "min": "Seiceáil “{field}”: is é {min} an luach íosta.",
         "max": "Seiceáil “{field}”: is é {max} an luach uasta.",
         "field": "Seiceáil “{field}”: níl an luach bailí."
-      },
-      "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
+      }
     },
     "analytics": {
       "title": "Staitisticí",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Cláruithe",
         "ofMax": "{current} as {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Aon mheabhrúchán cumraithe",
         "tags": "Clibeanna",
         "postEventSummary": "{connected} ceangailte as {registered} cláraithe (bhíothas ag súil le {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Á próiseáil",
       "statusPartial": "Próiseáilte go páirteach",
       "statusDone": "Próiseáilte",
-      "statusFailed": "Theip ar an bpróiseáil"
+      "statusFailed": "Theip ar an bpróiseáil",
+      "manageBackToEvent": "Ar ais chuig an imeacht"
     },
     "questionnairesPage": {
       "subtitle": "Teimpléid in-athúsáidte ceisteanna do cheistneoirí réamhchlárúcháin agus iar-imeachta."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Comhlachtaí eagraithe",
       "organizersEdit": "Cuir na comhlachtaí in eagar",
       "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
+    },
+    "closing": {
+      "title": "Dún an imeacht",
+      "intro": "A bhfuil fágtha le déanamh ionas go bhfaighidh na daoine nach raibh i láthair gach rud, agus go mbeidh na rannpháirtithe in ann a rá conas mar a d’éirigh leis.",
+      "summaryTodo": "{count, plural, one {# tasc le déanamh} two {# thasc le déanamh} few {# thasc le déanamh} many {# dtasc le déanamh} other {# tasc le déanamh}}",
+      "summaryDone": "Gach rud déanta",
+      "loading": "Ag seiceáil a bhfuil fágtha le déanamh…",
+      "error": "Ní féidir a bhfuil fágtha le déanamh a léamh: athlódáil an leathanach.",
+      "stato": {
+        "fatto": "Déanta",
+        "daFare": "Le déanamh",
+        "inCorso": "Ar siúl",
+        "nonServe": "Níl gá leis"
+      },
+      "azioni": {
+        "apri": "Oscail",
+        "rivedi": "Athbhreithnigh an tras-scríbhinn",
+        "materiali": "Téigh chuig na hábhair"
+      },
+      "registrazione": {
+        "title": "Taifeadadh",
+        "pubblicata": "Foilsithe.",
+        "daPubblicare": "Tá an físeán réidh: foilsigh é do na daoine nach raibh i láthair.",
+        "inArrivo": "Má taifeadadh an t-imeacht, beidh an comhad ann cúpla nóiméad tar éis an deiridh.",
+        "spenta": "Ní raibh taifeadadh beartaithe.",
+        "nessunFile": "Níl aon fhíseán ann: níor taifeadadh an t-imeacht, nó níor tháinig an comhad."
+      },
+      "trascrizione": {
+        "title": "Tras-scríbhinn",
+        "pubblicata": "Foilsithe.",
+        "prontaAi": "Réidh ón iarléiriú: athbhreithnigh í; foilseofar í in éineacht leis an bhfíseán.",
+        "prontaSottotitoli": "Réidh ó na fotheidil: seiceáil na hainmneacha agus foilsigh í.",
+        "inLavorazione": "Á próiseáil.",
+        "nessuna": "Níl ceann ann: níl fotheidil ná iarléiriú ann.",
+        "soloStaff": "Is é eagraí an imeachta a athbhreithníonn agus a fhoilsíonn í, ón limistéar riaracháin.",
+        "nonPiu": "Ní féidir í a athrú a thuilleadh: tá an t-imeacht cartlannaithe nó tá a shonraí imithe in éag."
+      },
+      "resoconto": {
+        "title": "Tuarascáil",
+        "pubblicato": "Foilsithe.",
+        "daPubblicare": "Ginte: léigh í agus foilsigh í.",
+        "daGenerare": "Le giniúint, bunaithe ar an tras-scríbhinn, ar an gcomhrá agus ar na meastóireachtaí.",
+        "inLavorazione": "Á próiseáil.",
+        "senzaPipeline": "Níl an t-iarléiriú AI gníomhach ar an suiteáil seo.",
+        "soloStaff": "Is é eagraí an imeachta a ghineann agus a fhoilsíonn í, ón limistéar riaracháin.",
+        "nonPiu": "Ní féidir í a athrú a thuilleadh: tá an t-imeacht cartlannaithe nó tá a shonraí imithe in éag."
+      },
+      "sala": {
+        "title": "Cad a tharla sa seomra",
+        "rivista": "Teachtaireachtaí: {messaggi} · ceisteanna: {domande} · pobalbhreitheanna: {sondaggi} · In aon fhocal amháin: {nuvole}.",
+        "vuota": "Níor úsáideadh an comhrá, na ceisteanna, na pobalbhreitheanna ná na focail.",
+        "inSospeso": "Ceisteanna gan freagra: {domandeInSospeso}. Marcáil iad mar fhreagraithe nó díbh iad."
+      },
+      "materiali": {
+        "title": "Ábhair do na daoine nach raibh i láthair",
+        "presenti": "Le feiceáil tar éis an imeachta: {materiali}.",
+        "nessuno": "Níl aon cheann le feiceáil tar éis an imeachta: cuir sleamhnáin nó doiciméid na gcainteoirí leis, má tá siad ann.",
+        "nascosti": "Ábhair: {materiali}, ach ní thaispeánann an leathanach poiblí na hábhair: cuir ar siúl iad sna socruithe don tréimhse tar éis an imeachta."
+      },
+      "valutazioni": {
+        "title": "Meastóireachtaí",
+        "emailInviata": "Seoladh an ríomhphost ag iarraidh meastóireachtaí. Freagraí: {valutazioni}.",
+        "emailInPartenza": "Seolfar an ríomhphost ag iarraidh meastóireachtaí chuig na rannpháirtithe go luath. Freagraí: {valutazioni}.",
+        "emailSpenta": "Tá an ríomhphost ag iarraidh meastóireachtaí múchta: is féidir é a chasadh air suas le seachtain tar éis an deiridh. Freagraí: {valutazioni}.",
+        "raccolte": "Freagraí: {valutazioni}.",
+        "spente": "Níl siad gníomhach don imeacht seo."
+      },
+      "pagina": {
+        "title": "Leathanach poiblí",
+        "visibile": "Le feiceáil ag cách.",
+        "nellaLibreria": "Le feiceáil ag cách agus sa leabharlann físeán.",
+        "privata": "Tarraingthe siar: ní fheiceann an pobal é.",
+        "scaduta": "Níl sé le feiceáil a thuilleadh: tá an dáta éagtha caite.",
+        "archiviato": "Imeacht cartlannaithe: níl an leathanach poiblí.",
+        "libreriaSenzaVideo": "Le feiceáil ag cách; taispeánfar é sa leabharlann físeán nuair a fhoilseofar an físeán."
+      }
+    },
+    "roomReview": {
+      "title": "Cad a tharla sa seomra",
+      "intro": "Athbhreithnigh an méid a scríobhadh agus a fiafraíodh: folaigh an méid nár cheart a fhágáil, dún na ceisteanna, foilsigh torthaí na bpobalbhreitheanna. Nuashonraítear an achoimre ar an leathanach poiblí le gach athrú.",
+      "tabs": {
+        "chat": "Comhrá",
+        "qa": "Ceisteanna",
+        "polls": "Pobalbhreitheanna",
+        "words": "In aon fhocal amháin"
+      },
+      "loading": "Ag lódáil…",
+      "error": "Ní féidir an chuid seo a léamh: bain triail eile as ar ball.",
+      "actionError": "Theip ar an ngníomh: bain triail eile as.",
+      "chat": {
+        "empty": "Gan teachtaireachtaí.",
+        "limit": "Taispeántar na {count} teachtaireacht is déanaí.",
+        "question": "Ceist",
+        "moderator": "Óstach",
+        "hide": "Folaigh",
+        "hideFor": "Folaigh an teachtaireacht ó {name}",
+        "hidden": "Teachtaireacht folaithe.",
+        "confirmTitle": "An bhfolófar an teachtaireacht?",
+        "confirmBody": "Imeoidh sí as an stair, as an easpórtáil agus as an achoimre, mar aon le haon cheangaltán. Ní féidir é seo a chealú."
+      },
+      "qa": {
+        "empty": "Gan ceisteanna.",
+        "status": {
+          "PENDING": "Ar feitheamh",
+          "HIGHLIGHTED": "Aibhsithe",
+          "ANSWERED": "Freagartha",
+          "DISMISSED": "Diúltaithe"
+        },
+        "markAnswered": "Marcáil mar fhreagartha",
+        "dismiss": "Diúltaigh",
+        "fromChat": "ón gcomhrá",
+        "votes": "Vótaí: {count}",
+        "answeredOk": "Marcáladh an cheist mar fhreagartha.",
+        "dismissedOk": "Diúltaíodh an cheist.",
+        "limit": "Ag taispeáint {count} ceist a marcáladh sa chomhrá: na cinn oscailte ar dtús, ansin na cinn dúnta is déanaí."
+      },
+      "polls": {
+        "empty": "Gan pobalbhreitheanna.",
+        "status": {
+          "OPEN": "Oscailte",
+          "CLOSED": "Dúnta: níl na torthaí poiblí",
+          "PUBLISHED": "Torthaí foilsithe"
+        },
+        "votes": "Vótaí: {count}",
+        "publish": "Foilsigh na torthaí",
+        "published": "Torthaí foilsithe."
+      },
+      "words": {
+        "empty": "Gan focail.",
+        "prompt": "Ceist: {prompt}",
+        "people": "Daoine: {count}",
+        "hide": "Folaigh",
+        "hideFor": "Folaigh “{word}”",
+        "hidden": "Focal folaithe.",
+        "confirmTitle": "An bhfolófar an focal?",
+        "confirmBody": "Imeoidh sé as an scamall agus as an achoimre. Ní féidir é seo a chealú.",
+        "round": "Babhta: {date}"
+      },
+      "recap": {
+        "button": "Nuashonraigh an achoimre phoiblí",
+        "done": "Nuashonraíodh an achoimre phoiblí.",
+        "notPossible": "Ní féidir an achoimre a nuashonrú a thuilleadh: níl an t-imeacht thart nó tá a shonraí imithe in éag.",
+        "error": "Theip ar an nuashonrú: bain triail eile as."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ócáid amháin eile} other {# ócáid eile}}",
     "noEvents": "Níl aon ócáid sa tréimhse seo",
-    "weekShort": "Scht."
+    "legend": {
+      "title": "Clibeanna",
+      "noTag": "Gan chlib"
+    },
+    "popover": {
+      "open": "Oscail leathanach an imeachta",
+      "manage": "Bainistigh an t-imeacht",
+      "publicPage": "Leathanach poiblí",
+      "registrations": "{count, plural, =0 {gan chlárúchán} one {# chlárúchán} two {# chlárúchán} few {# chlárúchán} many {# gclárúchán} other {# clárúchán}}"
+    }
   },
   "footer": {
     "privacy": "Beartas príobháideachta",

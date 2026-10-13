@@ -989,7 +989,7 @@ export function staffLoginEmail(input: StaffLoginEmailInput): {
   const body = `
 <p style="margin:0 0 16px;">${escapeHtml(c.intro(input.name, site))}</p>
 ${ctaButton(c.cta, input.url)}
-<p style="margin:16px 0 0;color:#5A768A;font-size:14px;">${escapeHtml(c.expiry(input.minutes))}<br>${escapeHtml(c.ignore)}</p>`;
+<p style="margin:16px 0 0;color:#516B7E;font-size:14px;">${escapeHtml(c.expiry(input.minutes))}<br>${escapeHtml(c.ignore)}</p>`;
   const html = layout(escapeHtml(c.heading), body, '', input.locale, site);
   const text = [
     c.heading,

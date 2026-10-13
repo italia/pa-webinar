@@ -307,6 +307,7 @@ The coverage thresholds in [`app/vitest.config.ts`](../../app/vitest.config.ts) 
 
 - **A floor just below the measured value.** The margin is a couple of points. It absorbs the noise of an ordinary change, such as a few new uncovered functions. It does not absorb the loss of a tested module, which costs several points and turns the run red.
 - **It rises and never falls.** When coverage rises and stays up, the thresholds are raised behind it. They are never lowered to let a change pass.
+- **A new measuring tool resets the floor, and nothing else does.** When an upgrade changes how coverage is counted, as a Vitest major can, the floor is set again just below the new measurement. The reset goes in the commit that changes the tool, and that commit changes no application code: the same code measured with the old and the new tool is the proof that coverage did not drop. Any other reason to move a threshold down is a lowering.
 - **Read the numbers from the file.** Do not quote them in documentation, pull requests or commit messages.
 - **Enforced only with coverage.** `npm run test:coverage --workspace=app` enforces the thresholds, and it is what the Unit Tests job runs. `npm run test` runs the same suite without them.
 - **Scope.** The thresholds cover `app/src`. The recorder, the recorder controller and the AI worker have their own test suites without a coverage floor, and the lobby is only type-checked.

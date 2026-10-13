@@ -22,10 +22,12 @@ vi.mock('@/lib/auth/moderator', () => ({
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/events/recap', () => ({ rifaiRiepilogo: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction } from '@/lib/live/actions';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 
 import { DELETE } from './route';
 
@@ -78,6 +80,8 @@ describe('DELETE /api/events/[slug]/wordcloud/[id]/words', () => {
       data: { hiddenAt: expect.any(Date) },
     });
     expect(pokeLivePanel).toHaveBeenCalledWith(EVENT_ID, 'wordcloud');
+    // a evento concluso il riepilogo pubblico non deve tenere la parola
+    expect(vi.mocked(rifaiRiepilogo).mock.calls[0]?.[0]).toBe(EVENT_ID);
   });
 
   it('niente da nascondere: nessun avviso', async () => {
@@ -85,6 +89,7 @@ describe('DELETE /api/events/[slug]/wordcloud/[id]/words', () => {
     expect(await res.json()).toEqual({ word: 'assente', hidden: 0 });
     expect(mockedHide).not.toHaveBeenCalled();
     expect(pokeLivePanel).not.toHaveBeenCalled();
+    expect(rifaiRiepilogo).not.toHaveBeenCalled();
   });
 
   it('una parola di soli simboli non e’ una parola', async () => {

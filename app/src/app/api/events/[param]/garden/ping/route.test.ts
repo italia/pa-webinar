@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 /**
  * Il ping del giardino come CONTRATTO di rete, non come funzione.
@@ -268,5 +268,43 @@ describe('POST /api/events/[param]/garden/ping — umore della piazza', () => {
     const body = (await res.json()) as { peers: Record<string, unknown>[]; umori: Record<string, number> };
     expect(body.umori).toEqual({ felice: 2, curioso: 0, assonnato: 0, carico: 1 });
     for (const p of body.peers) expect(p).not.toHaveProperty('umore');
+  });
+});
+
+describe('POST /api/events/[param]/garden/ping — il tetto per indirizzo', () => {
+  function pingDa(ip: string, userId: string): NextRequest {
+    return new Request(`https://webinar.gov.it/api/events/${SLUG}/garden/ping`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+      body: JSON.stringify({ ...legacyPing(), userId }),
+    }) as unknown as NextRequest;
+  }
+
+  /** Quanti ping passano da un indirizzo, cambiando identificativo a ogni ping. */
+  async function quantiPassano(ip: string, tentativi: number): Promise<number> {
+    let passati = 0;
+    for (let i = 0; i < tentativi; i++) {
+      if ((await POST(pingDa(ip, `browser-${i}`), ctx())).status === 200) passati++;
+    }
+    return passati;
+  }
+
+  // Una riga di log per richiesta: centinaia qui, e coprirebbero gli errori veri.
+  beforeEach(() => {
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    delete process.env.ROOM_RATE_LIMIT_MULTIPLIER;
+    vi.mocked(console.log).mockRestore();
+  });
+
+  it('è per indirizzo: un identificativo nuovo a ogni ping non lo aggira', async () => {
+    expect(await quantiPassano('198.51.100.20', 610)).toBe(600);
+  });
+
+  it('si moltiplica con gli altri limiti della sala', async () => {
+    process.env.ROOM_RATE_LIMIT_MULTIPLIER = '2';
+    expect(await quantiPassano('198.51.100.21', 1210)).toBe(1200);
   });
 });

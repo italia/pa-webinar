@@ -1007,13 +1007,19 @@ describe('creazione — i default del modello', () => {
     expect(container.textContent).toContain(s1.kickerHint);
     expect(container.querySelector('#ev-parse-title-kicker')).toBeNull();
     type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il primo incontro');
-    const casella = byId<HTMLInputElement>('ev-parse-title-kicker');
-    expect(casella.checked).toBe(false);
+    // Chi scrive «|» di solito vuole il sopratitolo: si accende da solo.
+    const casella = () => byId<HTMLInputElement>('ev-parse-title-kicker');
+    expect(casella().checked).toBe(true);
     const anteprima = () => container.querySelector('.wizard-sopratitolo__titolo')!;
-    expect(anteprima().querySelector('.event-title-kicker')).toBeNull();
-    click(casella);
     expect(anteprima().querySelector('.event-title-kicker')?.textContent).toBe('Ciclo');
     expect(anteprima().querySelector('.event-title-main')?.textContent).toBe('Il primo incontro');
+    // Spento a mano, resta spento anche se il titolo cambia.
+    click(casella());
+    expect(anteprima().querySelector('.event-title-kicker')).toBeNull();
+    type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il secondo incontro');
+    expect(casella().checked).toBe(false);
+    type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il primo incontro');
+    click(casella());
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
     goToStep(w.steps.review);
@@ -1021,6 +1027,30 @@ describe('creazione — i default del modello', () => {
     expect(container.querySelector('.anteprima-evento__titolo .event-title-kicker')?.textContent).toBe('Ciclo');
     await press(button(w.saveDraft));
     expect(payloadInviato()).toMatchObject({ parseTitleKicker: true });
+  });
+
+  it('acceso dal «|» e poi tolto il «|»: l\'evento torna a seguire il sito', async () => {
+    renderWizard({ template: modello });
+    type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il primo incontro');
+    expect(byId<HTMLInputElement>('ev-parse-title-kicker').checked).toBe(true);
+    type(byId<HTMLInputElement>('ev-title'), 'Il primo incontro');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep(w.steps.review);
+    await press(button(w.saveDraft));
+    expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
+  });
+
+  it('con il sopratitolo gia\' acceso dal sito, scrivere «|» non fissa niente per l\'evento', async () => {
+    renderWizard({ template: modello, siteDefaultParseTitleKicker: true });
+    type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il primo incontro');
+    expect(byId<HTMLInputElement>('ev-parse-title-kicker').checked).toBe(true);
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep(w.steps.review);
+    await press(button(w.saveDraft));
+    // Resta «come il sito»: se il sito cambia idea, l'evento la segue.
+    expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
   });
 
   it('chi si iscrive: segue il sito finche non si sceglie, e solo su invito lo dice ovunque', async () => {

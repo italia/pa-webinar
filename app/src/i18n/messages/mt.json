@@ -59,6 +59,15 @@
     "cancel": "Ikkanċella",
     "confirm": "Ikkonferma",
     "close": "Agħlaq",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Kodiċi QR: {name}",
+      "alt": "Kodiċi QR tal-link “{name}”",
+      "hint": "Skennjah bil-kamera tat-telefon biex tiftaħ il-link.",
+      "download": "Niżżel (SVG)",
+      "error": "Il-kodiċi QR ma setax jinħoloq. Erġa' tella' l-paġna u erġa' pprova; sadanittant tista' tikkopja l-link."
+    },
     "back": "Lura",
     "next": "Li jmiss",
     "send": "Ibgħat",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "L-avveniment intemm. Hawn taħt issib l-istatistika u, jekk l-avveniment ġie rreġistrat, ir-reġistrazzjoni u r-rapport.",
     "endLinks": {
-      "after": "Reġistrazzjoni u rapport",
+      "after": "Agħlaq l-avveniment",
       "stats": "Statistika tal-avveniment",
       "publicPage": "Paġna pubblika tal-avveniment"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Formati appoġġjati: PNG, JPEG, WebP, SVG, GIF — massimu 10 MB",
       "helpAudio": "Formati appoġġjati: MP3, WAV, OGG, M4A, WebM — massimu 20 MB",
       "helpDocument": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu 25 MB",
-      "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl."
+      "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl.",
+      "externalImage": "L-immaġini minn siti oħra ma jidhrux fil-paġni tal-portal.",
+      "externalImageUpload": "Tella' l-fajl mill-apparat tiegħek.",
+      "cropHelp": "Immaġni ta' forma differenti tinqata' hawn, qabel ma tittella'.",
+      "crop": {
+        "title": "Aqta' l-immaġni",
+        "intro": "Kaxkar l-immaġni biex tagħżel il-parti li trid turi; bis-slider tkabbarha.",
+        "frame": "Qafas tal-qtugħ",
+        "keys": "Bit-tastiera: il-vleġeġ iċaqilqu l-immaġni (b'Shift f'passi twal), + u − ikabbruha u jċekknuha.",
+        "zoom": "Zoom",
+        "size": "Se tiġi ssejvjata f'{width} × {height} pixel.",
+        "small": "L-immaġni hija żgħira: fuq il-paġna tista' tidher imċajpra.",
+        "error": "Din l-immaġni ma tistax tinqara: ipprova fajl ieħor.",
+        "cancel": "Ikkanċella",
+        "confirm": "Uża dan il-qtugħ",
+        "encodeError": "Il-qtugħ ma setax jitħejja: erġa' pprova."
+      }
     },
     "rubricaPicker": {
       "loading": "Tfittxija għaddejja…",
@@ -813,7 +838,8 @@
         "requiredLegend": "L-oqsma mmarkati b'* huma meħtieġa biex jiġi ssejvjat l-avveniment: sakemm huma vojta, kull wieħed jgħidha.",
         "kickerHint": "Għal sopratitolu, iktbu qabel it-titolu u isseparahom b'|, pereżempju “Serje ta' laqgħat | L-ewwel laqgħa”.",
         "kickerUse": "Uri “{kicker}” bħala sopratitolu",
-        "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment"
+        "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment",
+        "coverImageSize": "Daqs rakkomandat: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Min jista' jagħmel xiex",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizzazzjoni",
         "askRole": "rwol",
         "askType": "tip ta' organizzazzjoni"
+      },
+      "preview": {
+        "title": "Anteprima tal-paġna",
+        "open": "Iftaħ l-anteprima",
+        "note": "Hekk tidher il-paġna tal-avveniment; tiġi aġġornata waqt li tikteb.",
+        "noteNoDate": "Hekk tidher il-paġna tal-avveniment; sakemm tonqos id-data, il-ħin huwa biss eżempju.",
+        "titlePlaceholder": "It-titlu tal-avveniment",
+        "descriptionPlaceholder": "Id-deskrizzjoni se tidher hawn."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Aħbi",
       "warning": "Kull min għandu dan il-link jamministra l-avveniment: turiehx waqt li taqsam l-iskrin u tehmżux f’chat.",
       "hidden": "Il-link huwa moħbi",
-      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment."
+      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment.",
+      "notYetPublished": "Jaħdem biss wara l-pubblikazzjoni: sa dakinhar jidher “il-paġna ma nstabitx”."
     },
     "feedbackAdmin": {
       "title": "Riżultati tal-Feedback",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Kamra tal-istennija (prestabbilit tas-sit)",
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Klassika (statika)",
-        "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz."
+        "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz.",
+        "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
       },
       "watermark": {
         "title": "Personalizzazzjoni tal-vidjo",
@@ -1953,8 +1989,7 @@
         "min": "Iċċekkja “{field}”: il-valur minimu huwa {min}.",
         "max": "Iċċekkja “{field}”: il-valur massimu huwa {max}.",
         "field": "Iċċekkja “{field}”: il-valur mhuwiex validu."
-      },
-      "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Reġistrazzjonijiet",
         "ofMax": "{current} fuq {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ebda promemoria configurato",
         "tags": "Tag",
         "postEventSummary": "{connected} imqabbdin minn {registered} reġistrati ({estimated} mistennija)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Qed jiġi pproċessat",
       "statusPartial": "Ipproċessata parzjalment",
       "statusDone": "Ipproċessata",
-      "statusFailed": "L-ipproċessar ma rnexxiex"
+      "statusFailed": "L-ipproċessar ma rnexxiex",
+      "manageBackToEvent": "Lura għall-avveniment"
     },
     "questionnairesPage": {
       "subtitle": "Template użati mill-ġdid ta' mistoqsijiet għal i dawnonari ta' preġistrazzjoni u post-avveniment."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Entitajiet organizzaturi",
       "organizersEdit": "Editja l-entitajiet",
       "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza."
+    },
+    "closing": {
+      "title": "Agħlaq l-avveniment",
+      "intro": "X’fadal x’isir biex min ma kienx hemm isib kollox u min kien hemm ikun jista’ jgħid kif mar.",
+      "summaryTodo": "{count, plural, one {# kompitu pendenti} two {# kompiti pendenti} few {# kompiti pendenti} many {#-il kompitu pendenti} other {# kompitu pendenti}}",
+      "summaryDone": "Kollox lest",
+      "loading": "Qed jiġi ċċekkjat x’fadal x’isir…",
+      "error": "Ma setax jinqara x’fadal x’isir: erġa’ tella’ l-paġna.",
+      "stato": {
+        "fatto": "Lest",
+        "daFare": "Biex isir",
+        "inCorso": "Għaddej",
+        "nonServe": "Mhux meħtieġ"
+      },
+      "azioni": {
+        "apri": "Iftaħ",
+        "rivedi": "Irrevedi t-traskrizzjoni",
+        "materiali": "Mur għall-materjali"
+      },
+      "registrazione": {
+        "title": "Rekording",
+        "pubblicata": "Ippubblikat.",
+        "daPubblicare": "Il-vidjo lest: ippubblikah għal min ma kienx hemm.",
+        "inArrivo": "Jekk l-avveniment ġie rrekordjat, il-fajl jasal ftit minuti wara t-tmiem.",
+        "spenta": "Ir-rekording ma kienx ippjanat.",
+        "nessunFile": "L-ebda vidjo: l-avveniment ma ġiex irrekordjat, jew il-fajl ma waslx."
+      },
+      "trascrizione": {
+        "title": "Traskrizzjoni",
+        "pubblicata": "Ippubblikata.",
+        "prontaAi": "Lesta mill-post-produzzjoni: irrevediha; tiġi ppubblikata flimkien mal-vidjo.",
+        "prontaSottotitoli": "Lesta mis-sottotitoli: iċċekkja l-ismijiet u ppubblikaha.",
+        "inLavorazione": "Qed tiġi pproċessata.",
+        "nessuna": "M’hemmx: la sottotitoli u lanqas post-produzzjoni.",
+        "soloStaff": "L-organizzatur tal-avveniment jirrevediha u jippubblikaha miż-żona tal-amministrazzjoni.",
+        "nonPiu": "Ma tistax tinbidel aktar: l-avveniment huwa arkivjat jew id-dejta tiegħu skadiet."
+      },
+      "resoconto": {
+        "title": "Rapport",
+        "pubblicato": "Ippubblikat.",
+        "daPubblicare": "Iġġenerat: aqrah u ppubblikah.",
+        "daGenerare": "Irid jiġi ġġenerat mit-traskrizzjoni, miċ-chat u mill-valutazzjonijiet.",
+        "inLavorazione": "Qed jiġi pproċessat.",
+        "senzaPipeline": "Il-post-produzzjoni AI mhix attiva f’din l-installazzjoni.",
+        "soloStaff": "L-organizzatur tal-avveniment jiġġenerah u jippubblikah miż-żona tal-amministrazzjoni.",
+        "nonPiu": "Ma jistax jinbidel aktar: l-avveniment huwa arkivjat jew id-dejta tiegħu skadiet."
+      },
+      "sala": {
+        "title": "X’ġara fil-kamra",
+        "rivista": "Messaġġi: {messaggi} · mistoqsijiet: {domande} · stħarriġ: {sondaggi} · F'kelma waħda: {nuvole}.",
+        "vuota": "Iċ-chat, il-mistoqsijiet, l-istħarriġ u l-kliem ma ntużawx.",
+        "inSospeso": "Mistoqsijiet mingħajr tweġiba: {domandeInSospeso}. Immarkahom bħala mwieġba jew warrabhom."
+      },
+      "materiali": {
+        "title": "Materjali għal min ma kienx hemm",
+        "presenti": "Viżibbli wara l-avveniment: {materiali}.",
+        "nessuno": "Xejn viżibbli wara l-avveniment: żid is-slajds jew id-dokumenti tal-kelliema, jekk hemm.",
+        "nascosti": "Materjali: {materiali}, iżda l-paġna pubblika ma turix il-materjali: ixgħelhom fil-konfigurazzjoni ta’ wara l-avveniment."
+      },
+      "valutazioni": {
+        "title": "Valutazzjonijiet",
+        "emailInviata": "L-email li titlobhom intbagħtet. Tweġibiet: {valutazioni}.",
+        "emailInPartenza": "L-email li titlobhom se tintbagħat dalwaqt lil min ipparteċipa. Tweġibiet: {valutazioni}.",
+        "emailSpenta": "L-email li titlobhom hija mitfija: tista’ tinxtegħel sa ġimgħa wara t-tmiem. Tweġibiet: {valutazioni}.",
+        "raccolte": "Tweġibiet: {valutazioni}.",
+        "spente": "Mhumiex attivi għal dan l-avveniment."
+      },
+      "pagina": {
+        "title": "Paġna pubblika",
+        "visibile": "Viżibbli għal kulħadd.",
+        "nellaLibreria": "Viżibbli għal kulħadd u fil-librerija tal-vidjos.",
+        "privata": "Irtirata: il-pubbliku ma jarahiex.",
+        "scaduta": "Mhux viżibbli aktar: id-data ta’ skadenza għaddiet.",
+        "archiviato": "Avveniment arkivjat: il-paġna mhix pubblika.",
+        "libreriaSenzaVideo": "Viżibbli għal kulħadd; se tidher fil-librerija tal-vidjos meta l-vidjo jiġi ppubblikat."
+      }
+    },
+    "roomReview": {
+      "title": "X’ġara fil-kamra",
+      "intro": "Irrevedi dak li nkiteb u ntalab: aħbi dak li m’għandux jibqa’, agħlaq il-mistoqsijiet, ippubblika r-riżultati tal-istħarriġ. Il-ġabra fil-qosor fuq il-paġna pubblika tiġi aġġornata ma' kull bidla.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Mistoqsijiet",
+        "polls": "Stħarriġ",
+        "words": "F'kelma waħda"
+      },
+      "loading": "Qed jitgħabba…",
+      "error": "Din il-parti ma setgħetx tinqara: erġa’ pprova aktar tard.",
+      "actionError": "L-azzjoni ma rnexxietx: erġa’ pprova.",
+      "chat": {
+        "empty": "L-ebda messaġġ.",
+        "limit": "Qed jintwerew l-aħħar {count} messaġġ.",
+        "question": "Mistoqsija",
+        "moderator": "Moderazzjoni",
+        "hide": "Aħbi",
+        "hideFor": "Aħbi l-messaġġ ta’ {name}",
+        "hidden": "Il-messaġġ ġie moħbi.",
+        "confirmTitle": "Taħbi l-messaġġ?",
+        "confirmBody": "Jisparixxi mill-istorja, mill-esportazzjoni u mill-ġabra fil-qosor, flimkien ma’ kwalunkwe fajl mehmuż. Din l-azzjoni ma tistax titreġġa’ lura."
+      },
+      "qa": {
+        "empty": "L-ebda mistoqsija.",
+        "status": {
+          "PENDING": "Pendenti",
+          "HIGHLIGHTED": "Evidenzjata",
+          "ANSWERED": "Imweġba",
+          "DISMISSED": "Miċħuda"
+        },
+        "markAnswered": "Marka bħala mweġba",
+        "dismiss": "Iċħad",
+        "fromChat": "mis-chat",
+        "votes": "Voti: {count}",
+        "answeredOk": "Il-mistoqsija ġiet immarkata bħala mweġba.",
+        "dismissedOk": "Il-mistoqsija ġiet miċħuda.",
+        "limit": "Qed jintwerew {count} mistoqsija mmarkati fiċ-chat: l-ewwel dawk miftuħa, imbagħad l-aktar reċenti magħluqa."
+      },
+      "polls": {
+        "empty": "L-ebda stħarriġ.",
+        "status": {
+          "OPEN": "Miftuħ",
+          "CLOSED": "Magħluq: ir-riżultati mhumiex pubbliċi",
+          "PUBLISHED": "Riżultati ppubblikati"
+        },
+        "votes": "Voti: {count}",
+        "publish": "Ippubblika r-riżultati",
+        "published": "Ir-riżultati ġew ippubblikati."
+      },
+      "words": {
+        "empty": "L-ebda kelma.",
+        "prompt": "Mistoqsija: {prompt}",
+        "people": "Persuni: {count}",
+        "hide": "Aħbi",
+        "hideFor": "Aħbi “{word}”",
+        "hidden": "Il-kelma ġiet moħbija.",
+        "confirmTitle": "Taħbi l-kelma?",
+        "confirmBody": "Tisparixxi mis-sħaba u mill-ġabra fil-qosor. Din l-azzjoni ma tistax titreġġa’ lura.",
+        "round": "Rawnd: {date}"
+      },
+      "recap": {
+        "button": "Aġġorna l-ġabra fil-qosor pubblika",
+        "done": "Il-ġabra fil-qosor pubblika ġiet aġġornata.",
+        "notPossible": "Il-ġabra fil-qosor ma tistax tiġi aġġornata aktar: l-avveniment għadu ma ntemmx jew id-dejta tiegħu skadiet.",
+        "error": "L-aġġornament ma rnexxiex: erġa’ pprova."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Avveniment ieħor} other {# avvenimenti oħra}}",
     "noEvents": "L-ebda avveniment f'dan il-perjodu",
-    "weekShort": "Ġim."
+    "legend": {
+      "title": "Tags",
+      "noTag": "Mingħajr tag"
+    },
+    "popover": {
+      "open": "Iftaħ il-paġna tal-avveniment",
+      "manage": "Immaniġġja l-avveniment",
+      "publicPage": "Paġna pubblika",
+      "registrations": "{count, plural, =0 {ebda reġistrazzjoni} one {# reġistrazzjoni} two {# reġistrazzjonijiet} few {# reġistrazzjonijiet} many {# reġistrazzjoni} other {# reġistrazzjoni}}"
+    }
   },
   "footer": {
     "privacy": "Avviż dwar il-privatezza",

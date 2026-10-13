@@ -324,7 +324,7 @@ export default function PostEventHero({
                       type="button"
                       onClick={() => stamp && seekTo(stamp)}
                       disabled={!seekable}
-                      className="btn p-0 d-inline-flex align-items-center gap-2"
+                      className="btn d-inline-flex align-items-center gap-2"
                       style={{
                         background: 'transparent',
                         color: palette.color,
@@ -344,8 +344,11 @@ export default function PostEventHero({
                           background: palette.color,
                           color: 'white',
                           borderRadius: 999,
-                          width: 28,
+                          // «00:00» e «1:02:03» non stanno in 28 px: il
+                          // badge cresce con il testo.
+                          minWidth: 28,
                           height: 22,
+                          padding: '0 7px',
                           fontSize: '0.7rem',
                           fontVariantNumeric: 'tabular-nums',
                           fontWeight: 600,

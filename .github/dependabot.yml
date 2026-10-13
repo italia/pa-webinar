@@ -1,18 +1,22 @@
 # Dependabot — configurazione aggiornamenti.
 #
-# Politica MAJOR (24 lug 2026, dopo la remediation delle vulnerabilita'):
-# i major di runtime sono ignorati come update di ROUTINE. Vanno fatti come
-# upgrade DEDICATI (adattamento del codice + gate completo + review), mai come
-# merge di massa: e' cosi' che si introducono regressioni.
+# Politica MAJOR: i major delle dipendenze in `ignore` non arrivano come
+# aggiornamenti di routine. Si fanno come upgrade DEDICATI (codice adattato,
+# gate completo, code review), mai come merge di massa: e' cosi' che si
+# introducono regressioni.
 #
-# IMPORTANTE: `version-update:semver-major` NON silenzia gli avvisi di SICUREZZA.
-# Se esce una CVE su una di queste dipendenze, Dependabot apre comunque la PR.
-# (Verificato sul campo: le vulnerabilita' di luglio erano tutte risolvibili con
-# patch/minor — es. la fix di next era 15.5.21, non il major 16.)
+# `version-update:semver-major` NON silenzia gli avvisi di SICUREZZA: se esce
+# una CVE su una di queste dipendenze, Dependabot apre comunque la PR.
+#
+# `@types/node` va allineato al major di Node a runtime (immagini e CI): si
+# sposta a mano, nello stesso cambio che sposta il runtime, mai da solo.
 version: 2
 updates:
+# Il package.json alla RADICE dichiara i workspace (app, lobby): questo blocco
+# copre le dipendenze di tutti e tre, con un solo package-lock. Un secondo
+# blocco su /app aprirebbe le stesse PR due volte.
 - package-ecosystem: npm
-  directory: /app
+  directory: /
   schedule:
     interval: weekly
     day: monday
@@ -52,10 +56,22 @@ updates:
   - dependency-name: typescript
     update-types:
     - version-update:semver-major
+  - dependency-name: '@types/node'
+    update-types:
+    - version-update:semver-major
   - dependency-name: ical-generator
     update-types:
     - version-update:semver-major
   - dependency-name: nanoid
+    update-types:
+    - version-update:semver-major
+  - dependency-name: ioredis
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@fullcalendar/*'
+    update-types:
+    - version-update:semver-major
+  - dependency-name: phaser
     update-types:
     - version-update:semver-major
 - package-ecosystem: docker
@@ -66,37 +82,8 @@ updates:
   labels:
   - dependencies
   - docker
-# Il package.json alla RADICE: dichiara i workspace (app, lobby) e le dipendenze
-# di build. Senza questo blocco un aggiornamento di sicurezza qui non sarebbe
-# mai proposto.
-- package-ecosystem: npm
-  directory: /
-  schedule:
-    interval: weekly
-    day: monday
-  open-pull-requests-limit: 5
-  labels:
-  - dependencies
-  groups:
-    minor-and-patch:
-      update-types:
-      - minor
-      - patch
-  ignore:
-  - dependency-name: phaser
-    update-types:
-    - version-update:semver-major
-  - dependency-name: typescript
-    update-types:
-    - version-update:semver-major
-  - dependency-name: prisma
-    update-types:
-    - version-update:semver-major
-  - dependency-name: '@prisma/client'
-    update-types:
-    - version-update:semver-major
 # Recorder e controller stanno FUORI dai workspace npm: hanno un package-lock
-# proprio che nessuno teneva aggiornato. Sono anche le immagini piu' delicate
+# proprio. Sono anche le immagini piu' delicate
 # del progetto: il recorder gira Chrome headless e maneggia audio
 # per-partecipante (dato dell'art. 9).
 - package-ecosystem: npm
@@ -119,6 +106,9 @@ updates:
   - dependency-name: typescript
     update-types:
     - version-update:semver-major
+  - dependency-name: '@types/node'
+    update-types:
+    - version-update:semver-major
 - package-ecosystem: npm
   directory: /infra/recorder-controller
   schedule:
@@ -134,6 +124,12 @@ updates:
       - patch
   ignore:
   - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@types/node'
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@kubernetes/client-node'
     update-types:
     - version-update:semver-major
 # Il gateway dei sottotitoli live: fuori dai workspace npm come il recorder,
@@ -153,6 +149,9 @@ updates:
       - patch
   ignore:
   - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@types/node'
     update-types:
     - version-update:semver-major
 # Il worker della pipeline AI. Lo stack CUDA (torch/whisperx/numpy) e' pinnato

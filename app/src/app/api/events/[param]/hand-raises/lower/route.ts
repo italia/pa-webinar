@@ -27,6 +27,7 @@ import { prisma } from '@/lib/db';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { publishControl } from '@/lib/live-control/pubsub';
 
 export const dynamic = 'force-dynamic';
@@ -55,7 +56,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const ip = getClientIp(request);
   const rl = rateLimit(`lower-hand:${ip}:${event.id}`, {
-    limit: 60,
+    limit: limiteDellaSala(60),
     windowMs: 60_000,
   });
   if (!rl.allowed) {

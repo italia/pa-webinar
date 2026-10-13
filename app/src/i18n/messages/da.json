@@ -59,6 +59,15 @@
     "cancel": "Annuller",
     "confirm": "Bekræft",
     "close": "Luk",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kode: {name}",
+      "alt": "QR-kode til linket »{name}«",
+      "hint": "Scan den med telefonens kamera for at åbne linket.",
+      "download": "Download (SVG)",
+      "error": "QR-koden kunne ikke oprettes. Genindlæs siden, og prøv igen; i mellemtiden kan du kopiere linket."
+    },
     "back": "Tilbage",
     "next": "Næste",
     "send": "Send",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Arrangementet er slut. Nedenfor finder du statistikken og, hvis det blev optaget, optagelsen og rapporten.",
     "endLinks": {
-      "after": "Optagelse og rapport",
+      "after": "Afslut arrangementet",
       "stats": "Statistik for arrangementet",
       "publicPage": "Arrangementets offentlige side"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Understøttede formater: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Understøttede formater: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
       "helpDocument": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
-      "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL."
+      "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL.",
+      "externalImage": "Billeder fra andre websteder vises ikke på portalens sider.",
+      "externalImageUpload": "Upload filen fra din enhed.",
+      "cropHelp": "Et billede i et andet format beskæres her, før det uploades.",
+      "crop": {
+        "title": "Beskær billedet",
+        "intro": "Træk i billedet for at vælge den del, der skal vises; med skyderen zoomer du ind.",
+        "frame": "Beskæringsramme",
+        "keys": "Med tastaturet: piletasterne flytter billedet (med Skift i lange trin), + og − zoomer ind og ud.",
+        "zoom": "Zoom",
+        "size": "Det gemmes i {width} × {height} pixel.",
+        "small": "Billedet er lille: på siden kan det se sløret ud.",
+        "error": "Billedet kan ikke læses: prøv med en anden fil.",
+        "cancel": "Annuller",
+        "confirm": "Brug denne beskæring",
+        "encodeError": "Beskæringen kunne ikke forberedes: prøv igen."
+      }
     },
     "rubricaPicker": {
       "loading": "Søger…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Felter markeret med * kræves for at gemme arrangementet: så længe de er tomme, står det ved hvert felt.",
         "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
         "kickerUse": "Vis »{kicker}« som overlinje",
-        "kickerPreview": "Sådan ser den ud på arrangementets side"
+        "kickerPreview": "Sådan ser den ud på arrangementets side",
+        "coverImageSize": "Anbefalet format: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organisation",
         "askRole": "rolle",
         "askType": "organisationstype"
+      },
+      "preview": {
+        "title": "Forhåndsvisning af siden",
+        "open": "Åbn forhåndsvisningen",
+        "note": "Sådan ser arrangementets side ud; den opdateres, mens du skriver.",
+        "noteNoDate": "Sådan ser arrangementets side ud; så længe datoen mangler, er tidspunktet et eksempel.",
+        "titlePlaceholder": "Arrangementets titel",
+        "descriptionPlaceholder": "Her vises beskrivelsen."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Skjul",
       "warning": "Enhver med dette link administrerer begivenheden: vis det ikke, når du deler din skærm, og indsæt det ikke i en chat.",
       "hidden": "Linket er skjult",
-      "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt."
+      "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt.",
+      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultater",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Venteværelse (sitets standard)",
         "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassisk (statisk)",
-        "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen."
+        "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen.",
+        "primaryColorHex": "Primær farve (hex-kode)"
       },
       "watermark": {
         "title": "Videotilpasning",
@@ -1953,8 +1989,7 @@
         "min": "Kontroller »{field}«: minimumsværdien er {min}.",
         "max": "Kontroller »{field}«: maksimumværdien er {max}.",
         "field": "Kontroller »{field}«: værdien er ugyldig."
-      },
-      "primaryColorHex": "Primær farve (hex-kode)"
+      }
     },
     "analytics": {
       "title": "Statistik",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Tilmeldinger",
         "ofMax": "{current} af {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ingen påmindelser konfigureret",
         "tags": "Tags",
         "postEventSummary": "{connected} forbundet ud af {registered} tilmeldte ({estimated} forventet)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Behandles",
       "statusPartial": "Delvist behandlet",
       "statusDone": "Behandlet",
-      "statusFailed": "Behandlingen mislykkedes"
+      "statusFailed": "Behandlingen mislykkedes",
+      "manageBackToEvent": "Tilbage til begivenheden"
     },
     "questionnairesPage": {
       "subtitle": "Genbrugelige skabeloner til spørgsmål til før-tilmelding og efter-arrangement-spørgeskemaer."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Arrangerende organisationer",
       "organizersEdit": "Rediger organisationer",
       "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer."
+    },
+    "closing": {
+      "title": "Afslut arrangementet",
+      "intro": "Det, der mangler, for at dem, der ikke var med, kan finde det hele, og deltagerne kan sige, hvordan det gik.",
+      "summaryTodo": "{count, plural, one {# opgave tilbage} other {# opgaver tilbage}}",
+      "summaryDone": "Alt er klaret",
+      "loading": "Tjekker, hvad der mangler…",
+      "error": "Kan ikke læse, hvad der mangler: genindlæs siden.",
+      "stato": {
+        "fatto": "Færdig",
+        "daFare": "Mangler",
+        "inCorso": "I gang",
+        "nonServe": "Ikke nødvendig"
+      },
+      "azioni": {
+        "apri": "Åbn",
+        "rivedi": "Gennemgå udskriften",
+        "materiali": "Gå til materialerne"
+      },
+      "registrazione": {
+        "title": "Optagelse",
+        "pubblicata": "Offentliggjort.",
+        "daPubblicare": "Videoen er klar: offentliggør den for dem, der ikke var med.",
+        "inArrivo": "Hvis arrangementet blev optaget, kommer filen et par minutter efter afslutningen.",
+        "spenta": "Der var ikke planlagt optagelse.",
+        "nessunFile": "Ingen video: arrangementet blev ikke optaget, eller filen kom ikke frem."
+      },
+      "trascrizione": {
+        "title": "Udskrift",
+        "pubblicata": "Offentliggjort.",
+        "prontaAi": "Klar fra efterbehandlingen: gennemgå den; den offentliggøres sammen med videoen.",
+        "prontaSottotitoli": "Klar fra underteksterne: tjek navnene og offentliggør den.",
+        "inLavorazione": "Under behandling.",
+        "nessuna": "Ingen: hverken undertekster eller efterbehandling.",
+        "soloStaff": "Arrangøren gennemgår og offentliggør den i administrationen.",
+        "nonPiu": "Kan ikke længere ændres: arrangementet er arkiveret, eller opbevaringstiden for dets data er udløbet."
+      },
+      "resoconto": {
+        "title": "Referat",
+        "pubblicato": "Offentliggjort.",
+        "daPubblicare": "Genereret: læs det igennem og offentliggør det.",
+        "daGenerare": "Skal genereres ud fra udskriften, chatten og vurderingerne.",
+        "inLavorazione": "Under behandling.",
+        "senzaPipeline": "AI-efterbehandling er ikke aktiveret på denne installation.",
+        "soloStaff": "Arrangøren genererer og offentliggør det i administrationen.",
+        "nonPiu": "Kan ikke længere ændres: arrangementet er arkiveret, eller opbevaringstiden for dets data er udløbet."
+      },
+      "sala": {
+        "title": "Hvad der skete i rummet",
+        "rivista": "Beskeder: {messaggi} · spørgsmål: {domande} · afstemninger: {sondaggi} · Med ét ord: {nuvole}.",
+        "vuota": "Chat, spørgsmål, afstemninger og ord blev ikke brugt.",
+        "inSospeso": "Ubesvarede spørgsmål: {domandeInSospeso}. Markér dem som besvaret, eller afvis dem."
+      },
+      "materiali": {
+        "title": "Materialer til dem, der ikke var med",
+        "presenti": "Synlige efter arrangementet: {materiali}.",
+        "nessuno": "Intet er synligt efter arrangementet: tilføj talernes slides eller dokumenter, hvis der er nogen.",
+        "nascosti": "Materialer: {materiali}, men den offentlige side viser ikke materialer: slå dem til i indstillingerne for tiden efter arrangementet."
+      },
+      "valutazioni": {
+        "title": "Vurderinger",
+        "emailInviata": "E-mailen, der beder om dem, er sendt. Svar: {valutazioni}.",
+        "emailInPartenza": "E-mailen, der beder om dem, sendes snart til deltagerne. Svar: {valutazioni}.",
+        "emailSpenta": "E-mailen, der beder om dem, er slået fra: den kan slås til op til en uge efter afslutningen. Svar: {valutazioni}.",
+        "raccolte": "Svar: {valutazioni}.",
+        "spente": "Ikke aktiveret for dette arrangement."
+      },
+      "pagina": {
+        "title": "Offentlig side",
+        "visibile": "Synlig for alle.",
+        "nellaLibreria": "Synlig for alle og i videobiblioteket.",
+        "privata": "Trukket tilbage: offentligheden kan ikke se den.",
+        "scaduta": "Ikke længere synlig: udløbsdatoen er passeret.",
+        "archiviato": "Arrangementet er arkiveret: siden er ikke offentlig.",
+        "libreriaSenzaVideo": "Synlig for alle; den vises i videobiblioteket, når videoen er offentliggjort."
+      }
+    },
+    "roomReview": {
+      "title": "Hvad der skete i rummet",
+      "intro": "Gennemgå, hvad der blev skrevet og spurgt om: skjul det, der ikke skal blive stående, luk spørgsmålene, og publicér resultaterne af afstemningerne. Opsummeringen på den offentlige side opdateres ved hver ændring.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Spørgsmål",
+        "polls": "Afstemninger",
+        "words": "Med ét ord"
+      },
+      "loading": "Indlæser…",
+      "error": "Kan ikke læse denne del: prøv igen senere.",
+      "actionError": "Handlingen mislykkedes: prøv igen.",
+      "chat": {
+        "empty": "Ingen beskeder.",
+        "limit": "Viser de seneste {count} beskeder.",
+        "question": "Spørgsmål",
+        "moderator": "Vært",
+        "hide": "Skjul",
+        "hideFor": "Skjul beskeden fra {name}",
+        "hidden": "Beskeden er skjult.",
+        "confirmTitle": "Skjul beskeden?",
+        "confirmBody": "Den forsvinder fra historikken, eksporten og opsummeringen sammen med en eventuel vedhæftet fil. Det kan ikke fortrydes."
+      },
+      "qa": {
+        "empty": "Ingen spørgsmål.",
+        "status": {
+          "PENDING": "Afventer",
+          "HIGHLIGHTED": "Fremhævet",
+          "ANSWERED": "Besvaret",
+          "DISMISSED": "Afvist"
+        },
+        "markAnswered": "Markér som besvaret",
+        "dismiss": "Afvis",
+        "fromChat": "fra chatten",
+        "votes": "Stemmer: {count}",
+        "answeredOk": "Spørgsmålet er markeret som besvaret.",
+        "dismissedOk": "Spørgsmålet er afvist.",
+        "limit": "Viser {count} spørgsmål markeret i chatten: først de åbne, derefter de senest lukkede."
+      },
+      "polls": {
+        "empty": "Ingen afstemninger.",
+        "status": {
+          "OPEN": "Åben",
+          "CLOSED": "Lukket: resultaterne er ikke offentlige",
+          "PUBLISHED": "Resultaterne er publiceret"
+        },
+        "votes": "Stemmer: {count}",
+        "publish": "Publicér resultaterne",
+        "published": "Resultaterne er publiceret."
+      },
+      "words": {
+        "empty": "Ingen ord.",
+        "prompt": "Spørgsmål: {prompt}",
+        "people": "Personer: {count}",
+        "hide": "Skjul",
+        "hideFor": "Skjul »{word}«",
+        "hidden": "Ordet er skjult.",
+        "confirmTitle": "Skjul ordet?",
+        "confirmBody": "Det forsvinder fra skyen og fra opsummeringen. Det kan ikke fortrydes.",
+        "round": "Runden den {date}"
+      },
+      "recap": {
+        "button": "Opdater den offentlige opsummering",
+        "done": "Den offentlige opsummering er opdateret.",
+        "notPossible": "Opsummeringen kan ikke længere opdateres: arrangementet er ikke afsluttet, eller opbevaringstiden for dets data er udløbet.",
+        "error": "Opdateringen mislykkedes: prøv igen."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Én begivenhed mere} other {# begivenheder mere}}",
     "noEvents": "Ingen begivenheder i denne periode",
-    "weekShort": "Uge"
+    "legend": {
+      "title": "Tags",
+      "noTag": "Uden tag"
+    },
+    "popover": {
+      "open": "Åbn arrangementets side",
+      "manage": "Administrer arrangementet",
+      "publicPage": "Offentlig side",
+      "registrations": "{count, plural, =0 {ingen tilmeldinger} one {# tilmelding} other {# tilmeldinger}}"
+    }
   },
   "footer": {
     "privacy": "Privatlivspolitik",

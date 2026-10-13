@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
+
+import LinkQr, { nomeFileQr } from '@/components/ui/link-qr';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 type RowKey = 'call' | 'event' | 'mod';
@@ -138,6 +140,8 @@ export default function LiveShareButton({
   const popRef = useRef<HTMLDivElement>(null);
   const timerChiusura = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerCopia = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Un codice QR aperto sopra il fumetto (components/ui/link-qr).
+  const qrAperto = useRef(false);
   const popId = useId();
   const titoloId = useId();
 
@@ -180,6 +184,9 @@ export default function LiveShareButton({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
+        // Con il codice QR aperto, Esc chiude il QR (lo fa il <dialog> da
+        // solo) e il fumetto resta.
+        if (qrAperto.current) return;
         chiudi(true);
       }
     };
@@ -188,7 +195,10 @@ export default function LiveShareButton({
     };
     // Un clic nella videochiamata non arriva a questa pagina (è un iframe):
     // la pagina però perde il fuoco, e il fumetto si chiude.
-    const onBlur = () => chiudi(false);
+    // Il QR resta proiettato anche se si passa a un'altra finestra.
+    const onBlur = () => {
+      if (!qrAperto.current) chiudi(false);
+    };
     document.addEventListener('keydown', onKey, true);
     document.addEventListener('pointerdown', onPointer);
     window.addEventListener('blur', onBlur);
@@ -245,16 +255,29 @@ export default function LiveShareButton({
     });
   }
 
-  const riga = (key: RowKey, url: string, pericolo = false) => (
+  const riga = (key: RowKey, url: string, etichetta: string, pericolo = false) => (
     <div className={`live-share__field${copied === key ? ' is-copied' : ''}`}>
       <input
         type="text"
         readOnly
         value={url}
         className="live-share__url"
-        aria-label={key === 'mod' ? t('moderatorLink') : rows.find((r) => r.key === key)?.label}
+        aria-label={etichetta}
         onFocus={(e) => e.currentTarget.select()}
       />
+      {/* Il QR, da proiettare per chi e' in sala: mai per il link da
+          moderatore, che porta il token. */}
+      {key !== 'mod' && url && (
+        <LinkQr
+          url={url}
+          nome={etichetta}
+          nomeFile={nomeFileQr(slug, key === 'call' ? 'sala' : 'pagina')}
+          className="live-share__qr"
+          onApertura={(aperto) => {
+            qrAperto.current = aperto;
+          }}
+        />
+      )}
       <button
         type="button"
         className={`live-share__copy${pericolo ? ' live-share__copy--danger' : ''}`}
@@ -323,7 +346,7 @@ export default function LiveShareButton({
                   <span className="live-share__card-icon">{r.icon}</span>
                   <span className="live-share__card-label">{r.label}</span>
                 </div>
-                {riga(r.key, r.url)}
+                {riga(r.key, r.url, r.label)}
                 <p className="live-share__hint">{r.hint}</p>
               </section>
             ))}
@@ -350,7 +373,7 @@ export default function LiveShareButton({
                     {/* Un div, NON <Alert> di design-react-kit (l'icona finisce
                         sotto il testo). */}
                     <p className="live-share__warning">{t('moderatorWarning')}</p>
-                    {riga('mod', modUrl, true)}
+                    {riga('mod', modUrl, t('moderatorLink'), true)}
                     <p className="live-share__hint">{t('moderatorLinkHint')}</p>
                   </div>
                 )}

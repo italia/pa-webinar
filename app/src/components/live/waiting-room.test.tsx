@@ -610,3 +610,16 @@ describe('sala d\'attesa — ciclo di vita', () => {
     expect(container.textContent).not.toContain(t.notHeldTitle);
   });
 });
+
+describe('sala d\'attesa — evento concluso', () => {
+  it('niente buone pratiche per entrare in una sala già chiusa', () => {
+    render({ event: { ...eventoLive, status: 'ENDED', startsAt: oraPiu(-90), endsAt: oraPiu(-30) } });
+    expect(container.textContent).toContain(t.endedTitle);
+    expect(container.textContent).not.toContain(t.netiquetteTitle);
+  });
+
+  it('prima della fine le buone pratiche restano', () => {
+    render();
+    expect(container.textContent).toContain(t.netiquetteTitle);
+  });
+});

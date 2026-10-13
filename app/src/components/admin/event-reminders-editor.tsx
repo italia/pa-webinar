@@ -115,52 +115,61 @@ export default function EventRemindersEditor({
   };
 
   return (
-    <fieldset className="mt-3 pt-3" style={{ borderTop: '1px solid #f0f0f0' }} aria-busy={inCorso}
-              aria-describedby={idLimite}>
-      <legend className="fw-semibold mb-1" style={{ fontSize: '0.85rem', float: 'none' }}>
-        {tr('editLegend')}
-      </legend>
-      <p id={idLimite} className="mb-2" style={{ color: 'var(--app-muted)', fontSize: '0.78rem' }}>
-        {tr('maxReminders', { max: MAX_REMINDERS })}
-      </p>
-      <ul className="list-unstyled mb-0 d-flex flex-column gap-1">
-        {REMINDER_PRESETS.map(({ offsetMinutes, key }) => {
-          const riga = perScarto.get(offsetMinutes);
-          const acceso = !!riga;
-          const inviato = (riga?.sentCount ?? 0) > 0;
-          const passato = !acceso && reminderTriggerAt(inizio, offsetMinutes).getTime() <= Date.now();
-          const limite = !acceso && pieno;
-          // Il perche' di una casella bloccata, nel suo nome: letto una volta.
-          const nota = inviato
-            ? tr('alreadySent')
-            : passato
-              ? tr('alreadyPassed')
-              : limite
-                ? tr('limitReached')
-                : null;
-          const id = `promemoria-${offsetMinutes}`;
-          return (
-            <li key={offsetMinutes} className="form-check mb-0">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={id}
-                checked={acceso}
-                disabled={nota !== null}
-                onChange={(e) => void cambia(offsetMinutes, e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor={id} style={{ fontSize: '0.85rem' }}>
-                {tr(`presets.${key}`)}
-                {nota && (
-                  <span className="ms-1" style={{ color: 'var(--app-muted)', fontSize: '0.75rem' }}>
-                    ({nota})
-                  </span>
-                )}
-              </label>
-            </li>
-          );
-        })}
-      </ul>
-    </fieldset>
+    // Il filetto sta sul contenitore: sul bordo del fieldset la legenda ci si
+    // siede sopra e lascia una riga che corre alla sua destra.
+    <div className="mt-3 pt-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+      <fieldset className="border-0 p-0 m-0" aria-busy={inCorso} aria-describedby={idLimite}>
+        <legend className="fw-semibold mb-1 p-0" style={{ fontSize: '0.85rem', float: 'none' }}>
+          {tr('editLegend')}
+        </legend>
+        <p id={idLimite} className="mb-2" style={{ color: 'var(--app-muted)', fontSize: '0.78rem' }}>
+          {tr('maxReminders', { max: MAX_REMINDERS })}
+        </p>
+        <ul className="list-unstyled mb-0 d-flex flex-column gap-1">
+          {REMINDER_PRESETS.map(({ offsetMinutes, key }) => {
+            const riga = perScarto.get(offsetMinutes);
+            const acceso = !!riga;
+            const inviato = (riga?.sentCount ?? 0) > 0;
+            const passato = !acceso && reminderTriggerAt(inizio, offsetMinutes).getTime() <= Date.now();
+            const limite = !acceso && pieno;
+            // Il perche' di una casella bloccata, nel suo nome: letto una volta.
+            const nota = inviato
+              ? tr('alreadySent')
+              : passato
+                ? tr('alreadyPassed')
+                : limite
+                  ? tr('limitReached')
+                  : null;
+            const id = `promemoria-${offsetMinutes}`;
+            return (
+              <li key={offsetMinutes} className="form-check mb-0">
+                {/* La casella del design system: è l'etichetta a disegnarla. Con
+                    anche la classe di Bootstrap (form-check-input) le due
+                    versioni si sovrapponevano e quella disattivata usciva
+                    disegnata a metà. */}
+                <input
+                  type="checkbox"
+                  id={id}
+                  checked={acceso}
+                  disabled={nota !== null}
+                  onChange={(e) => void cambia(offsetMinutes, e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor={id} style={{ fontSize: '0.85rem' }}>
+                  {tr(`presets.${key}`)}
+                  {/* Lo spazio è testo, non margine: senza, il nome letto dai
+                      lettori di schermo diventa «7 giorni prima(orario passato)». */}
+                  {nota && (
+                    <>
+                      {' '}
+                      <span style={{ color: 'var(--app-muted)', fontSize: '0.75rem' }}>({nota})</span>
+                    </>
+                  )}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+    </div>
   );
 }

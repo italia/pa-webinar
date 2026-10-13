@@ -59,6 +59,15 @@
     "cancel": "Tühista",
     "confirm": "Kinnita",
     "close": "Sulge",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kood: {name}",
+      "alt": "QR-kood lingile „{name}“",
+      "hint": "Skaneeri see telefoni kaameraga, et link avada.",
+      "download": "Laadi alla (SVG)",
+      "error": "QR-koodi ei õnnestunud luua. Laadi leht uuesti ja proovi uuesti; seni saad lingi kopeerida."
+    },
     "back": "Tagasi",
     "next": "Edasi",
     "send": "Saada",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Üritus on lõppenud. Allpool leiad statistika ja, kui üritus salvestati, salvestuse ja ülevaate.",
     "endLinks": {
-      "after": "Salvestus ja aruanne",
+      "after": "Ürituse lõpetamine",
       "stats": "Ürituse statistika",
       "publicPage": "Ürituse avalik leht"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Toetatud vormingud: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Toetatud vormingud: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL."
+      "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL.",
+      "externalImage": "Teiste saitide pilte portaali lehtedel ei kuvata.",
+      "externalImageUpload": "Laadi fail oma seadmest üles.",
+      "cropHelp": "Teistsuguse kujuga pilt kärbitakse siin enne üleslaadimist.",
+      "crop": {
+        "title": "Pildi kärpimine",
+        "intro": "Lohistage pilti, et valida kuvatav osa; liuguriga saate seda suurendada.",
+        "frame": "Kärpimisraam",
+        "keys": "Klaviatuuriga: nooleklahvid liigutavad pilti (koos Shiftiga pikemate sammudega), + ja − suurendavad ja vähendavad seda.",
+        "zoom": "Suurendus",
+        "size": "Salvestatakse suuruses {width} × {height} pikslit.",
+        "small": "Pilt on väike: lehel võib see paista udune.",
+        "error": "Seda pilti ei õnnestu lugeda: proovige mõnda teist faili.",
+        "cancel": "Tühista",
+        "confirm": "Kasuta seda kärbet",
+        "encodeError": "Kärbet ei õnnestunud ette valmistada: proovige uuesti."
+      }
     },
     "rubricaPicker": {
       "loading": "Otsin…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Tärniga * väljad on vajalikud ürituse salvestamiseks: kuni need on tühjad, on see iga välja juures kirjas.",
         "kickerHint": "Pealkirja kohal oleva rea jaoks kirjuta see enne pealkirja ja eralda märgiga |, näiteks „Kohtumiste sari | Esimene kohtumine“.",
         "kickerUse": "Näita „{kicker}“ pealkirja kohal",
-        "kickerPreview": "Nii näeb see välja ürituse lehel"
+        "kickerPreview": "Nii näeb see välja ürituse lehel",
+        "coverImageSize": "Soovitatav suurus: 1600 × 900 pikslit (16:9)."
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organisatsioon",
         "askRole": "roll",
         "askType": "organisatsiooni liik"
+      },
+      "preview": {
+        "title": "Lehe eelvaade",
+        "open": "Ava eelvaade",
+        "note": "Selline näeb välja ürituse leht; see uueneb kirjutamise ajal.",
+        "noteNoDate": "Selline näeb välja ürituse leht; kuni kuupäev on määramata, on kellaaeg vaid näide.",
+        "titlePlaceholder": "Ürituse pealkiri",
+        "descriptionPlaceholder": "Siia ilmub kirjeldus."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Peida",
       "warning": "Igaüks, kellel on see link, haldab sündmust: ära näita seda ekraani jagamisel ega kleebi seda vestlusesse.",
       "hidden": "Link on peidetud",
-      "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi."
+      "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi.",
+      "notYetPublished": "Töötab alles pärast avaldamist: seni kuvatakse „lehte ei leitud“."
     },
     "feedbackAdmin": {
       "title": "Tagasiside tulemused",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Ooteruum (saidi vaikeväärtus)",
         "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
         "waitingRoomEngineClassic": "Klassikaline (staatiline)",
-        "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}."
+        "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}.",
+        "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
       },
       "watermark": {
         "title": "Video kohandamine",
@@ -1953,8 +1989,7 @@
         "min": "Kontrollige välja „{field}“: väikseim väärtus on {min}.",
         "max": "Kontrollige välja „{field}“: suurim väärtus on {max}.",
         "field": "Kontrollige välja „{field}“: väärtus on vigane."
-      },
-      "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Registreerimised",
         "ofMax": "{current} / {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Meeldetuletusi pole konfigureeritud",
         "tags": "Sildid",
         "postEventSummary": "{connected} ühendatud {registered} registreerunust (oodati {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Töötlemisel",
       "statusPartial": "Osaliselt töödeldud",
       "statusDone": "Töödeldud",
-      "statusFailed": "Töötlemine ebaõnnestus"
+      "statusFailed": "Töötlemine ebaõnnestus",
+      "manageBackToEvent": "Tagasi ürituse juurde"
     },
     "questionnairesPage": {
       "subtitle": "Korduvkasutatavad küsimuste mallid eelregistreerimise ja sündmusejärgsete küsimustike jaoks."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Korraldavad asutused",
       "organizersEdit": "Muuda asutusi",
       "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab."
+    },
+    "closing": {
+      "title": "Ürituse lõpetamine",
+      "intro": "Mis on veel teha, et need, kes ei osalenud, leiaksid kõik üles ja osalejad saaksid öelda, kuidas läks.",
+      "summaryTodo": "{count, plural, one {# tegemata ülesanne} other {# tegemata ülesannet}}",
+      "summaryDone": "Kõik on tehtud",
+      "loading": "Kontrollitakse, mis on veel teha…",
+      "error": "Ei õnnestunud lugeda, mis on veel teha: laadige leht uuesti.",
+      "stato": {
+        "fatto": "Tehtud",
+        "daFare": "Teha",
+        "inCorso": "Töös",
+        "nonServe": "Pole vaja"
+      },
+      "azioni": {
+        "apri": "Ava",
+        "rivedi": "Vaata transkriptsioon üle",
+        "materiali": "Mine materjalide juurde"
+      },
+      "registrazione": {
+        "title": "Salvestus",
+        "pubblicata": "Avaldatud.",
+        "daPubblicare": "Video on valmis: avaldage see neile, kes ei osalenud.",
+        "inArrivo": "Kui üritus salvestati, jõuab fail kohale mõni minut pärast lõppu.",
+        "spenta": "Salvestust ei olnud ette nähtud.",
+        "nessunFile": "Videot pole: üritust ei salvestatud või fail ei jõudnud kohale."
+      },
+      "trascrizione": {
+        "title": "Transkriptsioon",
+        "pubblicata": "Avaldatud.",
+        "prontaAi": "Järeltöötlusest valmis: vaadake see üle; see avaldatakse koos videoga.",
+        "prontaSottotitoli": "Subtiitritest valmis: kontrollige nimesid ja avaldage see.",
+        "inLavorazione": "Töötlemisel.",
+        "nessuna": "Puudub: pole ei subtiitreid ega järeltöötlust.",
+        "soloStaff": "Ürituse korraldaja vaatab selle üle ja avaldab haldusalas.",
+        "nonPiu": "Enam ei saa muuta: üritus on arhiveeritud või selle andmete säilitusaeg on läbi."
+      },
+      "resoconto": {
+        "title": "Ülevaade",
+        "pubblicato": "Avaldatud.",
+        "daPubblicare": "Loodud: lugege see läbi ja avaldage.",
+        "daGenerare": "Tuleb luua transkriptsiooni, vestluse ja hinnangute põhjal.",
+        "inLavorazione": "Töötlemisel.",
+        "senzaPipeline": "AI järeltöötlus pole selles paigalduses aktiivne.",
+        "soloStaff": "Ürituse korraldaja loob selle ja avaldab haldusalas.",
+        "nonPiu": "Enam ei saa muuta: üritus on arhiveeritud või selle andmete säilitusaeg on läbi."
+      },
+      "sala": {
+        "title": "Mis ruumis toimus",
+        "rivista": "Sõnumid: {messaggi} · küsimused: {domande} · küsitlused: {sondaggi} · Ühe sõnaga: {nuvole}.",
+        "vuota": "Vestlust, küsimusi, küsitlusi ja sõnu ei kasutatud.",
+        "inSospeso": "Vastamata küsimused: {domandeInSospeso}. Märkige need vastatuks või jätke kõrvale."
+      },
+      "materiali": {
+        "title": "Materjalid neile, kes ei osalenud",
+        "presenti": "Nähtavad pärast üritust: {materiali}.",
+        "nessuno": "Pärast üritust pole midagi nähtaval: lisage esinejate slaidid või dokumendid, kui need on olemas.",
+        "nascosti": "Materjalid: {materiali}, kuid avalik leht materjale ei näita: lülitage nende kuvamine sisse ürituse järgse aja seadetes."
+      },
+      "valutazioni": {
+        "title": "Hinnangud",
+        "emailInviata": "Hinnangut paluv e-kiri on saadetud. Vastused: {valutazioni}.",
+        "emailInPartenza": "Hinnangut paluv e-kiri saadetakse peagi osalejatele. Vastused: {valutazioni}.",
+        "emailSpenta": "Hinnangut paluv e-kiri on välja lülitatud: selle saab sisse lülitada kuni nädal pärast lõppu. Vastused: {valutazioni}.",
+        "raccolte": "Vastused: {valutazioni}.",
+        "spente": "Selle ürituse jaoks pole aktiivsed."
+      },
+      "pagina": {
+        "title": "Avalik leht",
+        "visibile": "Nähtav kõigile.",
+        "nellaLibreria": "Nähtav kõigile ja videoteegis.",
+        "privata": "Tagasi võetud: avalikkus seda ei näe.",
+        "scaduta": "Pole enam nähtav: aegumiskuupäev on möödas.",
+        "archiviato": "Üritus arhiveeritud: leht pole avalik.",
+        "libreriaSenzaVideo": "Nähtav kõigile; videoteegis ilmub see siis, kui video on avaldatud."
+      }
+    },
+    "roomReview": {
+      "title": "Mis ruumis toimus",
+      "intro": "Vaadake üle, mida kirjutati ja küsiti: peitke see, mis ei tohi jääda, sulgege küsimused, avaldage küsitluste tulemused. Avaliku lehe kokkuvõte uueneb iga muudatusega.",
+      "tabs": {
+        "chat": "Vestlus",
+        "qa": "Küsimused",
+        "polls": "Küsitlused",
+        "words": "Ühe sõnaga"
+      },
+      "loading": "Laadimine…",
+      "error": "Seda osa ei õnnestunud lugeda: proovige hiljem uuesti.",
+      "actionError": "Toiming ebaõnnestus: proovige uuesti.",
+      "chat": {
+        "empty": "Sõnumeid pole.",
+        "limit": "Kuvatakse viimased {count} sõnumit.",
+        "question": "Küsimus",
+        "moderator": "Juhtimine",
+        "hide": "Peida",
+        "hideFor": "Peida sõnum, saatja {name}",
+        "hidden": "Sõnum on peidetud.",
+        "confirmTitle": "Kas peita sõnum?",
+        "confirmBody": "See kaob ajaloost, ekspordist ja kokkuvõttest koos võimaliku manusega. Seda ei saa tagasi võtta."
+      },
+      "qa": {
+        "empty": "Küsimusi pole.",
+        "status": {
+          "PENDING": "Ootel",
+          "HIGHLIGHTED": "Esiletõstetud",
+          "ANSWERED": "Vastatud",
+          "DISMISSED": "Tagasi lükatud"
+        },
+        "markAnswered": "Märgi vastatuks",
+        "dismiss": "Lükka tagasi",
+        "fromChat": "vestlusest",
+        "votes": "Hääli: {count}",
+        "answeredOk": "Küsimus on märgitud vastatuks.",
+        "dismissedOk": "Küsimus on tagasi lükatud.",
+        "limit": "Kuvatakse {count} vestluses märgitud küsimust: kõigepealt avatud, siis viimati suletud."
+      },
+      "polls": {
+        "empty": "Küsitlusi pole.",
+        "status": {
+          "OPEN": "Avatud",
+          "CLOSED": "Suletud: tulemused pole avalikud",
+          "PUBLISHED": "Tulemused avaldatud"
+        },
+        "votes": "Hääli: {count}",
+        "publish": "Avalda tulemused",
+        "published": "Tulemused on avaldatud."
+      },
+      "words": {
+        "empty": "Sõnu pole.",
+        "prompt": "Küsimus: {prompt}",
+        "people": "Inimesi: {count}",
+        "hide": "Peida",
+        "hideFor": "Peida „{word}“",
+        "hidden": "Sõna on peidetud.",
+        "confirmTitle": "Kas peita sõna?",
+        "confirmBody": "See kaob pilvest ja kokkuvõttest. Seda ei saa tagasi võtta.",
+        "round": "Voor: {date}"
+      },
+      "recap": {
+        "button": "Värskenda avalikku kokkuvõtet",
+        "done": "Avalik kokkuvõte on värskendatud.",
+        "notPossible": "Kokkuvõtet ei saa enam värskendada: üritus ei ole lõppenud või selle andmete säilitusaeg on läbi.",
+        "error": "Värskendamine ebaõnnestus: proovige uuesti."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Veel üks üritus} other {Veel # üritust}}",
     "noEvents": "Sellel perioodil üritusi pole",
-    "weekShort": "Näd."
+    "legend": {
+      "title": "Sildid",
+      "noTag": "Sildita"
+    },
+    "popover": {
+      "open": "Ava sündmuse leht",
+      "manage": "Halda sündmust",
+      "publicPage": "Avalik leht",
+      "registrations": "{count, plural, =0 {registreeringuid pole} one {# registreering} other {# registreeringut}}"
+    }
   },
   "footer": {
     "privacy": "Privaatsuspoliitika",

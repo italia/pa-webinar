@@ -10,7 +10,28 @@
 :root {
   --app-text: #17324D;    /* heading/testo scuro brand */
   --app-primary: #0066CC; /* blu primario .italia */
-  --app-muted: #5A768A;   /* testo secondario */
+  --app-muted: #516B7E;   /* testo secondario: ≥4,5:1 anche sulle tinte chiare */
+  --app-warning-text: #8A5300; /* testo d'avviso sul bianco (≥6:1) */
+}
+
+// Nel kit la casella la disegna l'etichetta che segue l'input, nascosto con
+// opacità 0. Se l'input ha anche la classe di Bootstrap (form-check-input),
+// da disattivato Bootstrap gli ridà opacità 0,5: le due caselle si
+// sovrappongono e quella del kit sembra disegnata a metà.
+.form-check .form-check-input:disabled:has(+ label) {
+  opacity: 0;
+}
+
+// Un <summary> su una riga sola è alto 21 px: sotto la misura minima di un
+// bersaglio da toccare (24 px, WCAG 2.5.8).
+details > summary {
+  min-height: 1.5rem;
+}
+
+// Il grigio di `.text-muted` del pacchetto (#5d7083) scende sotto 4,5:1 sui
+// fondi tinti delle card e dei badge: lo stesso testo secondario del token.
+.text-muted {
+  color: var(--app-muted) !important;
 }
 
 // ── Bootstrap Italia overrides ───────────────────────────────────────────
@@ -65,7 +86,7 @@
     &:disabled,
     &[readonly] {
       background-color: #F5F7FB;
-      color: #5A768A;
+      color: var(--app-muted);
       border-color: #E8ECF0;
     }
   }
@@ -156,7 +177,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5A768A;
+  color: var(--app-muted);
   margin-bottom: 0.25em;
   line-height: 1.2;
 }
@@ -1725,6 +1746,41 @@ button.live-time-strip__rec {
 
   .is-copied & {
     background: #008758;
+  }
+}
+
+// Il QR accanto a «Copia»: secondario, bianco con il testo blu. Sul telefono
+// resta l'icona, perche' l'indirizzo da controllare abbia spazio.
+.live-share__qr {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0066cc;
+  white-space: nowrap;
+  background: #fff;
+  border: 0;
+  border-left: 1px solid #d9e2ec;
+
+  &:hover {
+    background: #eef4fb;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb400;
+    outline-offset: -2px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .live-share__qr {
+    padding: 0 0.55rem;
+
+    span {
+      display: none;
+    }
   }
 }
 
@@ -4119,7 +4175,7 @@ button.live-time-strip__rec {
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: #5A768A;
+      color: var(--app-muted);
       font-size: 1.15rem;
       line-height: 1;
       padding: 4px 8px;
@@ -4136,7 +4192,7 @@ button.live-time-strip__rec {
 
   &__search-status {
     font-size: 0.78rem;
-    color: #5A768A;
+    color: var(--app-muted);
     margin-bottom: 6px;
   }
 }
@@ -4224,7 +4280,7 @@ button.live-time-strip__rec {
   font-size: 0.78rem;
   font-weight: 500;
   background: #F6F8FA;
-  color: #5A768A;
+  color: var(--app-muted);
   border: 1px solid #E8ECF0;
 
   &__dot {
@@ -4273,7 +4329,7 @@ button.live-time-strip__rec {
 
   &__basis {
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
   }
 
   &__bar {
@@ -4305,7 +4361,7 @@ button.live-time-strip__rec {
 
   &__label {
     font-size: 0.68rem;
-    color: #5A768A;
+    color: var(--app-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
     line-height: 1.2;
@@ -4367,7 +4423,7 @@ button.live-time-strip__rec {
 
   &__stat-label {
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
     white-space: nowrap;
   }
 
@@ -4497,7 +4553,7 @@ button.live-time-strip__rec {
 
   &__detail-label {
     font-size: 0.78rem;
-    color: #78909C;
+    color: var(--app-muted);
   }
 
   &__detail-value {
@@ -4529,7 +4585,7 @@ button.live-time-strip__rec {
     align-items: center;
     gap: 5px;
     font-size: 0.72rem;
-    color: #5A768A;
+    color: var(--app-muted);
   }
 
   &__legend-dot {
@@ -4541,7 +4597,7 @@ button.live-time-strip__rec {
 
   &__last-update {
     font-size: 0.72rem;
-    color: #90A4AE;
+    color: var(--app-muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -4606,7 +4662,7 @@ button.live-time-strip__rec {
 
   &__metric-label {
     font-size: 0.68rem;
-    color: #5A768A;
+    color: var(--app-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
   }
@@ -4633,7 +4689,7 @@ button.live-time-strip__rec {
 
   &__verdicts-subtitle {
     font-size: 0.78rem;
-    color: #78909C;
+    color: var(--app-muted);
     margin-bottom: 16px;
   }
 
@@ -4696,7 +4752,7 @@ button.live-time-strip__rec {
       th {
         font-size: 0.75rem;
         font-weight: 600;
-        color: #78909C;
+        color: var(--app-muted);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         padding: 10px 8px;
@@ -4755,7 +4811,7 @@ button.live-time-strip__rec {
     padding: 0.5rem 1rem;
     margin: 0.75rem 0;
     background: #F5F7FB;
-    color: #5A768A;
+    color: var(--app-muted);
     border-radius: 0 4px 4px 0;
   }
 
@@ -4848,7 +4904,7 @@ button.live-time-strip__rec {
   }
   &__stack-intro {
     margin: 0 0 1.25rem 0;
-    color: #5A768A;
+    color: var(--app-muted);
     font-size: 0.9rem;
   }
   &__stack-layers {
@@ -4875,7 +4931,7 @@ button.live-time-strip__rec {
   &__stack-layer-sub {
     display: block;
     font-weight: 400;
-    color: #5A768A;
+    color: var(--app-muted);
     font-size: 0.78rem;
     margin-top: 2px;
   }
@@ -6411,7 +6467,7 @@ button.live-time-strip__rec {
 }
 .wr-consensi__nota {
   font-size: 0.78rem;
-  color: #5a768a;
+  color: var(--app-muted);
   margin-top: 0.4rem;
 }
 .wr-consensi__privacy {
@@ -10340,7 +10396,7 @@ html.live-resizing .live-sidebar-resizer::after {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #5A768A;
+  color: var(--app-muted);
 }
 
 .wizard-sopratitolo__titolo {
@@ -10737,6 +10793,34 @@ html.live-resizing .live-sidebar-resizer::after {
     top: 20px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
+    // Che sotto c'e' altro deve vedersi: una barra sottile sempre presente e,
+    // dove il browser lo sa fare, il fondo che sfuma finche' non si arriva
+    // in fondo. Se la colonna non scorre non succede niente.
+    scrollbar-width: thin;
+    scrollbar-color: #b9c4cf transparent;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .event-manage__side {
+      animation: event-manage-side-fondo linear both;
+      animation-timeline: scroll(self);
+    }
+
+    // Con il fuoco dentro la colonna niente sfumatura: il controllo attivo
+    // (e il suo anello) si vedono pieni anche se stanno in fondo.
+    .event-manage__side:focus-within {
+      animation: none;
+    }
+  }
+}
+
+@keyframes event-manage-side-fondo {
+  0%,
+  97% {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 3rem), transparent);
+  }
+  100% {
+    mask-image: none;
   }
 }
 
@@ -11076,4 +11160,610 @@ html.live-resizing .live-sidebar-resizer::after {
   border-radius: 8px;
   background: #f5f7fb;
   color: var(--app-muted);
+}
+
+// Il codice QR di un link (components/ui/link-qr): grande, nero su bianco,
+// da proiettare o stampare.
+.link-qr {
+  width: min(560px, 94vw);
+  max-height: 94vh;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+
+  &::backdrop {
+    background: rgba(23, 50, 77, 0.6);
+  }
+}
+
+.link-qr__corpo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.link-qr__titolo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.link-qr__codice {
+  width: min(400px, 70vmin);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.link-qr__link {
+  margin: 0;
+  font-family: var(--bs-font-monospace, monospace);
+  font-size: 0.78rem;
+  color: #33485f;
+  word-break: break-all;
+}
+
+.link-qr__errore {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: #a32a3e;
+  background: #fdecee;
+  border-radius: 6px;
+}
+
+.link-qr__aiuto {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5c6f82;
+}
+
+.link-qr__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+// ── «Chiudi l'evento»: cosa resta da fare dopo la fine ─────────────────────
+.chiusura {
+  border: 1px solid #dde4ec;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 0.5rem;
+  background: #fff;
+}
+.chiusura__testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+.chiusura__titolo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.chiusura__riepilogo {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #00703c;
+}
+.chiusura__riepilogo--da-fare {
+  color: var(--app-warning-text);
+}
+.chiusura__intro,
+.chiusura__attesa,
+.chiusura__errore {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  max-width: 70ch;
+}
+.chiusura__errore {
+  color: #a3162a;
+}
+.chiusura__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.chiusura__voce {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #edf1f5;
+}
+.chiusura__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-self: start;
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chiusura__voce--fatto .chiusura__stato {
+  background: #e3f3ea;
+  color: #00703c;
+}
+.chiusura__voce--da-fare .chiusura__stato {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+.chiusura__voce--in-corso .chiusura__stato {
+  background: #e6effa;
+  color: #0b4f99;
+}
+.chiusura__voce--non-serve .chiusura__stato {
+  background: #f1f4f7;
+  color: var(--app-muted);
+}
+.chiusura__testo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  min-width: 0;
+
+  strong {
+    font-size: 0.95rem;
+    color: var(--app-text);
+  }
+}
+// Le voci che non servono restano, ma non chiedono attenzione.
+.chiusura__voce--non-serve .chiusura__testo strong {
+  color: var(--app-muted);
+  font-weight: 600;
+}
+.chiusura__azione:empty {
+  display: none;
+}
+@media (max-width: 575.98px) {
+  .chiusura__voce {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+}
+
+// Le parti della scheda a cui porta la lista ricevono il fuoco da lì: niente
+// cornice su un intero blocco, il titolo resta il riferimento.
+[id^='dopo-'][tabindex='-1']:focus {
+  outline: none;
+}
+
+// ── «Cosa è successo in sala»: la revisione dopo l'evento ─────────────────
+.sala-rivista__intro {
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  max-width: 70ch;
+  margin-bottom: 0.75rem;
+}
+.sala-rivista__schede {
+  margin-bottom: 0.75rem;
+}
+// Dopo un'azione il fuoco torna al pannello: la cornice serve a chi usa la
+// tastiera, non dopo un clic.
+.sala-rivista__pannello:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+.sala-rivista__nota {
+  font-size: 0.88rem;
+  color: var(--app-muted);
+  margin: 0.25rem 0 0.75rem;
+}
+.sala-rivista__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 28rem;
+  overflow-y: auto;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+}
+.sala-rivista__lista--larga {
+  max-height: none;
+}
+.sala-rivista__voce {
+  padding: 0.65rem 0.85rem;
+  border-top: 1px solid #edf1f5;
+}
+.sala-rivista__voce:first-child {
+  border-top: 0;
+}
+.sala-rivista__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+  color: var(--app-text);
+
+  time {
+    color: var(--app-muted);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+}
+.sala-rivista__etichetta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: #f1f4f7;
+  color: var(--app-muted);
+}
+.sala-rivista__etichetta--aperta {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+.sala-rivista__nota-breve {
+  font-size: 0.78rem;
+  color: var(--app-muted);
+}
+.sala-rivista__testo {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--app-text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.sala-rivista__opzioni {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.35rem;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(4rem, 1fr) 2.5rem;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+  }
+}
+.sala-rivista__barra {
+  height: 0.5rem;
+  background: #edf1f5;
+  border-radius: 999px;
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--app-primary);
+  }
+}
+.sala-rivista__numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sala-rivista__parole {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+    border: 1px solid #dde4ec;
+    border-radius: 999px;
+  }
+}
+.sala-rivista__parola {
+  font-weight: 600;
+  color: var(--app-text);
+}
+.sala-rivista__piede {
+  margin-top: 1rem;
+}
+
+// ── Creazione dell'evento: l'anteprima della pagina accanto al modulo ──────
+// Sugli schermi larghi il modulo a sinistra e, ferma accanto mentre si
+// scorre, l'anteprima ridotta; sotto i 1200 px resta il pulsante che la apre
+// a tutta larghezza.
+@media (min-width: 1200px) {
+  .wizard-con-anteprima {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    gap: 2rem;
+    align-items: start;
+  }
+  .wizard-con-anteprima > .anteprima-pagina {
+    position: sticky;
+    top: 1rem;
+  }
+}
+.anteprima-pagina {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #dde4ec;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+@media (min-width: 1200px) {
+  .wizard-con-anteprima > .anteprima-pagina {
+    margin-top: 0;
+  }
+}
+.anteprima-pagina__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.anteprima-pagina__titolo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--app-text);
+}
+.anteprima-pagina__nota {
+  font-size: 0.82rem;
+  color: var(--app-muted);
+  margin: 0.35rem 0 0.75rem;
+}
+// La versione ridotta: la pagina vera a tre quarti, e non piu' alta di
+// mezza finestra (il resto si vede aprendo l'anteprima).
+.anteprima-pagina__ridotta {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .anteprima-pagina__ridotta {
+    display: block;
+    zoom: 0.62;
+    max-height: calc((100vh - 9rem) / 0.62);
+    overflow: hidden;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(23, 50, 77, 0.12);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent);
+    mask-image: linear-gradient(to bottom, #000 85%, transparent);
+  }
+}
+.anteprima-pagina__vuoto {
+  color: var(--app-muted);
+  font-style: italic;
+}
+
+// ── Ritaglio di un'immagine prima del caricamento ──────────────────────────
+.ritaglio-immagine__testo {
+  margin-bottom: 0.75rem;
+  color: var(--app-text);
+}
+.ritaglio-immagine__cornice {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e8f0fe;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+  &:focus-visible {
+    outline: 3px solid var(--app-primary);
+    outline-offset: 2px;
+  }
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+}
+.ritaglio-immagine__nota {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+  margin: 0.5rem 0 0;
+}
+.ritaglio-immagine__nota--avviso {
+  color: var(--app-warning-text);
+  font-weight: 600;
+}
+.ritaglio-immagine__zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--app-text);
+
+  .form-range {
+    flex: 1;
+  }
+}
+
+// L'anteprima di un'immagine con formato richiesto: il riquadro delle schede.
+.file-or-url-input__riquadro {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #e8f0fe;
+}
+
+// ── Copertina della pagina dell'evento ─────────────────────────────────────
+// 16:9 fino a 340 px d'altezza: oltre, l'immagine intera sta al centro e i
+// lati (per un JPEG) li riempie la stessa immagine, sfocata e schiarita.
+.event-cover {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(38vh, 340px);
+  overflow: hidden;
+  background-color: #e8f0fe;
+}
+.event-cover__sfondo {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(28px) saturate(0.9);
+  opacity: 0.55;
+  transform: scale(1.15);
+}
+// L'immagine intera, alta quanto il riquadro e larga quanto le serve (mai
+// oltre): il suo fondo pieno copre lo sfondo sfocato sotto le parti
+// trasparenti.
+.event-cover__immagine {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  background-color: #e8f0fe;
+}
+
+// ── Calendario: legenda delle etichette e riquadro dell'evento ─────────────
+.event-calendar {
+  position: relative;
+
+  // Riceve il fuoco solo se l'evento da cui si era partiti non c'e' piu'.
+  &:focus {
+    outline: none;
+  }
+}
+.calendario-legenda {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+  }
+}
+.calendario-legenda__punto {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.calendario-riquadro {
+  position: absolute;
+  // Sopra anche il riquadro «+N» del calendario (z-index 9999).
+  z-index: 10000;
+  width: min(22rem, 100%);
+  padding: 1rem 1.1rem 1.1rem;
+  background: #fff;
+  border: 1px solid #dde4ec;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(23, 50, 77, 0.18);
+
+  &:focus-visible {
+    outline: 3px solid var(--app-primary);
+    outline-offset: 2px;
+  }
+}
+.calendario-riquadro__chiudi {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--app-muted);
+
+  &:hover {
+    background: #f1f4f7;
+  }
+}
+.calendario-riquadro__sopra {
+  margin: 0 2rem 0.15rem 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+.calendario-riquadro__titolo {
+  margin: 0 2rem 0.35rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--app-text);
+}
+.calendario-riquadro__quando,
+.calendario-riquadro__stato {
+  margin: 0 0 0.35rem;
+  font-size: 0.86rem;
+  color: var(--app-text);
+}
+.calendario-riquadro__stato {
+  color: var(--app-muted);
+}
+.calendario-riquadro__etichette {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+
+  li {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 600;
+  }
+}
+.calendario-riquadro__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+.calendario-evento-link {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
 }

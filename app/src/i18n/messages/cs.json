@@ -59,6 +59,15 @@
     "cancel": "Zrušit",
     "confirm": "Potvrdit",
     "close": "Zavřít",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kód: {name}",
+      "alt": "QR kód odkazu „{name}“",
+      "hint": "Naskenujte ho fotoaparátem telefonu a odkaz se otevře.",
+      "download": "Stáhnout (SVG)",
+      "error": "QR kód se nepodařilo vytvořit. Načtěte stránku znovu a zkuste to znovu; mezitím můžete odkaz zkopírovat."
+    },
     "back": "Zpět",
     "next": "Další",
     "send": "Odeslat",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Akce skončila. Níže najdete statistiky, a pokud se nahrávala, také záznam a zprávu.",
     "endLinks": {
-      "after": "Záznam a zpráva",
+      "after": "Uzavřít akci",
       "stats": "Statistiky akce",
       "publicPage": "Veřejná stránka akce"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Podporované formáty: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Podporované formáty: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Nahrávání souborů není v této instalaci k dispozici: vložte URL adresu souboru."
+      "uploadsUnavailable": "Nahrávání souborů není v této instalaci k dispozici: vložte URL adresu souboru.",
+      "externalImage": "Obrázky z jiných webů se na stránkách portálu nezobrazí.",
+      "externalImageUpload": "Nahrajte soubor ze svého zařízení.",
+      "cropHelp": "Obrázek jiného formátu se zde před nahráním ořízne.",
+      "crop": {
+        "title": "Oříznutí obrázku",
+        "intro": "Přetažením obrázku zvolte část, která se má zobrazit; posuvníkem jej zvětšíte.",
+        "frame": "Rámeček ořezu",
+        "keys": "Z klávesnice: šipky posouvají obrázek (se Shiftem po delších krocích), + a − jej zvětšují a zmenšují.",
+        "zoom": "Zvětšení",
+        "size": "Uloží se ve velikosti {width} × {height} pixelů.",
+        "small": "Obrázek je malý: na stránce může vypadat rozmazaně.",
+        "error": "Tento obrázek nelze načíst: zkuste jiný soubor.",
+        "cancel": "Zrušit",
+        "confirm": "Použít tento ořez",
+        "encodeError": "Výřez se nepodařilo připravit: zkuste to znovu."
+      }
     },
     "rubricaPicker": {
       "loading": "Probíhá vyhledávání…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Pole označená * jsou potřeba k uložení akce: dokud jsou prázdná, je to u každého uvedeno.",
         "kickerHint": "Nadtitulek napište před název a oddělte je znakem |, například „Cyklus setkání | První setkání“.",
         "kickerUse": "Zobrazit „{kicker}“ jako nadtitulek",
-        "kickerPreview": "Takto vypadá na stránce akce"
+        "kickerPreview": "Takto vypadá na stránce akce",
+        "coverImageSize": "Doporučený formát: 1600 × 900 pixelů (16:9)."
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizace",
         "askRole": "funkce",
         "askType": "typ organizace"
+      },
+      "preview": {
+        "title": "Náhled stránky",
+        "open": "Otevřít náhled",
+        "note": "Takto vypadá stránka akce; aktualizuje se během psaní.",
+        "noteNoDate": "Takto vypadá stránka akce; dokud chybí datum, je čas jen ukázkový.",
+        "titlePlaceholder": "Název akce",
+        "descriptionPlaceholder": "Zde se zobrazí popis."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Skrýt",
       "warning": "Kdokoli s tímto odkazem spravuje událost: nezobrazujte jej při sdílení obrazovky a nevkládejte jej do chatu.",
       "hidden": "Odkaz je skrytý",
-      "copyFailed": "Kopírování se nezdařilo: vyberte adresu níže a zkopírujte ji ručně."
+      "copyFailed": "Kopírování se nezdařilo: vyberte adresu níže a zkopírujte ji ručně.",
+      "notYetPublished": "Funguje až po zveřejnění: do té doby se zobrazí „stránka nenalezena“."
     },
     "feedbackAdmin": {
       "title": "Výsledky zpětné vazby",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Čekárna (výchozí nastavení webu)",
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
-        "waitingRoomEngineHelp": "Výchozí režim čekárny. Lze jej změnit pro jednotlivou událost a pro jednu návštěvu parametrem {param} v adrese."
+        "waitingRoomEngineHelp": "Výchozí režim čekárny. Lze jej změnit pro jednotlivou událost a pro jednu návštěvu parametrem {param} v adrese.",
+        "primaryColorHex": "Primární barva (hexadecimální kód)"
       },
       "watermark": {
         "title": "Přizpůsobení videa",
@@ -1953,8 +1989,7 @@
         "min": "Zkontrolujte „{field}“: minimální hodnota je {min}.",
         "max": "Zkontrolujte „{field}“: maximální hodnota je {max}.",
         "field": "Zkontrolujte „{field}“: hodnota není platná."
-      },
-      "primaryColorHex": "Primární barva (hexadecimální kód)"
+      }
     },
     "analytics": {
       "title": "Statistiky",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Přihlášky",
         "ofMax": "{current} z {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Není nakonfigurováno žádné upozornění",
         "tags": "Štítky",
         "postEventSummary": "{connected} připojených z {registered} registrovaných (očekáváno {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Zpracovává se",
       "statusPartial": "Částečně zpracováno",
       "statusDone": "Zpracováno",
-      "statusFailed": "Zpracování selhalo"
+      "statusFailed": "Zpracování selhalo",
+      "manageBackToEvent": "Zpět na akci"
     },
     "questionnairesPage": {
       "subtitle": "Znovupoužitelné šablony otázek pro dotazníky předregistrace a po události."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Pořádající instituce",
       "organizersEdit": "Upravit instituce",
       "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá."
+    },
+    "closing": {
+      "title": "Uzavřít akci",
+      "intro": "Co zbývá udělat, aby ti, kdo nebyli přítomni, našli vše potřebné a účastníci mohli říct, jak to proběhlo.",
+      "summaryTodo": "{count, plural, one {# úkol k dokončení} few {# úkoly k dokončení} many {# úkolu k dokončení} other {# úkolů k dokončení}}",
+      "summaryDone": "Vše hotovo",
+      "loading": "Kontroluje se, co zbývá udělat…",
+      "error": "Nelze načíst, co zbývá udělat: načtěte stránku znovu.",
+      "stato": {
+        "fatto": "Hotovo",
+        "daFare": "K vyřízení",
+        "inCorso": "Probíhá",
+        "nonServe": "Není potřeba"
+      },
+      "azioni": {
+        "apri": "Otevřít",
+        "rivedi": "Zkontrolovat přepis",
+        "materiali": "Přejít na materiály"
+      },
+      "registrazione": {
+        "title": "Záznam",
+        "pubblicata": "Zveřejněn.",
+        "daPubblicare": "Video je připravené: zveřejněte ho pro ty, kdo nebyli přítomni.",
+        "inArrivo": "Pokud byla akce nahrána, soubor dorazí několik minut po skončení.",
+        "spenta": "Nebyl plánován.",
+        "nessunFile": "Žádné video: akce nebyla nahrána, nebo soubor nedorazil."
+      },
+      "trascrizione": {
+        "title": "Přepis",
+        "pubblicata": "Zveřejněn.",
+        "prontaAi": "Připraven z postprodukce: zkontrolujte ho; zveřejní se spolu s videem.",
+        "prontaSottotitoli": "Připraven z titulků: zkontrolujte jména a zveřejněte ho.",
+        "inLavorazione": "Zpracovává se.",
+        "nessuna": "Není k dispozici: chybí titulky i postprodukce.",
+        "soloStaff": "Kontrolu a zveřejnění provádí organizátor akce v administraci.",
+        "nonPiu": "Už jej nelze upravit: akce je archivována nebo uplynula doba uchovávání jejích dat."
+      },
+      "resoconto": {
+        "title": "Zpráva",
+        "pubblicato": "Zveřejněna.",
+        "daPubblicare": "Vygenerována: přečtěte si ji a zveřejněte.",
+        "daGenerare": "Zbývá vygenerovat z přepisu, chatu a hodnocení.",
+        "inLavorazione": "Zpracovává se.",
+        "senzaPipeline": "AI postprodukce není v této instalaci aktivní.",
+        "soloStaff": "Vygenerování a zveřejnění provádí organizátor akce v administraci.",
+        "nonPiu": "Už ji nelze upravit: akce je archivována nebo uplynula doba uchovávání jejích dat."
+      },
+      "sala": {
+        "title": "Co se dělo v místnosti",
+        "rivista": "Zprávy: {messaggi} · otázky: {domande} · ankety: {sondaggi} · Jedním slovem: {nuvole}.",
+        "vuota": "Chat, otázky, ankety ani slova nebyly použity.",
+        "inSospeso": "Nezodpovězené otázky: {domandeInSospeso}. Označte je jako zodpovězené, nebo je zamítněte."
+      },
+      "materiali": {
+        "title": "Materiály pro ty, kdo nebyli přítomni",
+        "presenti": "Viditelné po akci: {materiali}.",
+        "nessuno": "Po akci není nic viditelné: přidejte snímky nebo dokumenty řečníků, pokud existují.",
+        "nascosti": "Materiály: {materiali}, ale veřejná stránka materiály nezobrazuje: zapněte je v nastavení pro období po akci."
+      },
+      "valutazioni": {
+        "title": "Hodnocení",
+        "emailInviata": "E-mail se žádostí o hodnocení byl odeslán. Odpovědi: {valutazioni}.",
+        "emailInPartenza": "E-mail se žádostí o hodnocení brzy odejde účastníkům. Odpovědi: {valutazioni}.",
+        "emailSpenta": "E-mail se žádostí o hodnocení je vypnutý: lze ho zapnout až do jednoho týdne po skončení. Odpovědi: {valutazioni}.",
+        "raccolte": "Odpovědi: {valutazioni}.",
+        "spente": "Pro tuto akci není aktivní."
+      },
+      "pagina": {
+        "title": "Veřejná stránka",
+        "visibile": "Viditelná pro všechny.",
+        "nellaLibreria": "Viditelná pro všechny a ve videotéce.",
+        "privata": "Stažena: veřejnost ji nevidí.",
+        "scaduta": "Již není viditelná: datum vypršení uplynulo.",
+        "archiviato": "Akce archivována: stránka není veřejná.",
+        "libreriaSenzaVideo": "Viditelná pro všechny; ve videotéce se objeví, až bude video zveřejněno."
+      }
+    },
+    "roomReview": {
+      "title": "Co se dělo v místnosti",
+      "intro": "Projděte si, co se psalo a na co se kdo ptal: skryjte, co nemá zůstat, uzavřete otázky, zveřejněte výsledky anket. Shrnutí na veřejné stránce se aktualizuje s každou změnou.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Otázky",
+        "polls": "Ankety",
+        "words": "Jedním slovem"
+      },
+      "loading": "Načítání…",
+      "error": "Tuto část nelze načíst: zkuste to později.",
+      "actionError": "Akce se nezdařila: zkuste to znovu.",
+      "chat": {
+        "empty": "Žádné zprávy.",
+        "limit": "Zobrazuje se posledních {count} zpráv.",
+        "question": "Otázka",
+        "moderator": "Moderování",
+        "hide": "Skrýt",
+        "hideFor": "Skrýt zprávu od {name}",
+        "hidden": "Zpráva skryta.",
+        "confirmTitle": "Skrýt zprávu?",
+        "confirmBody": "Zmizí z historie, z exportu i ze shrnutí, včetně případné přílohy. Tuto akci nelze vrátit zpět."
+      },
+      "qa": {
+        "empty": "Žádné otázky.",
+        "status": {
+          "PENDING": "Čeká na vyřízení",
+          "HIGHLIGHTED": "Zvýrazněno",
+          "ANSWERED": "Zodpovězeno",
+          "DISMISSED": "Zamítnuto"
+        },
+        "markAnswered": "Označit jako zodpovězenou",
+        "dismiss": "Zamítnout",
+        "fromChat": "z chatu",
+        "votes": "Hlasy: {count}",
+        "answeredOk": "Otázka označena jako zodpovězená.",
+        "dismissedOk": "Otázka zamítnuta.",
+        "limit": "Zobrazuje se {count} otázek označených v chatu: nejprve otevřené, pak nejnovější uzavřené."
+      },
+      "polls": {
+        "empty": "Žádné ankety.",
+        "status": {
+          "OPEN": "Otevřeno",
+          "CLOSED": "Uzavřeno: výsledky nejsou veřejné",
+          "PUBLISHED": "Výsledky zveřejněny"
+        },
+        "votes": "Hlasy: {count}",
+        "publish": "Zveřejnit výsledky",
+        "published": "Výsledky zveřejněny."
+      },
+      "words": {
+        "empty": "Žádná slova.",
+        "prompt": "Otázka: {prompt}",
+        "people": "Počet lidí: {count}",
+        "hide": "Skrýt",
+        "hideFor": "Skrýt „{word}“",
+        "hidden": "Slovo skryto.",
+        "confirmTitle": "Skrýt slovo?",
+        "confirmBody": "Zmizí z oblaku i ze shrnutí. Tuto akci nelze vrátit zpět.",
+        "round": "Kolo z {date}"
+      },
+      "recap": {
+        "button": "Aktualizovat veřejné shrnutí",
+        "done": "Veřejné shrnutí aktualizováno.",
+        "notPossible": "Shrnutí už nelze aktualizovat: akce neskončila nebo uplynula doba uchovávání jejích dat.",
+        "error": "Aktualizace se nezdařila: zkuste to znovu."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ještě jedna akce} few {Ještě # akce} many {Ještě # akce} other {Ještě # akcí}}",
     "noEvents": "V tomto období nejsou žádné akce",
-    "weekShort": "Týd."
+    "legend": {
+      "title": "Štítky",
+      "noTag": "Bez štítku"
+    },
+    "popover": {
+      "open": "Otevřít stránku události",
+      "manage": "Spravovat událost",
+      "publicPage": "Veřejná stránka",
+      "registrations": "{count, plural, =0 {žádné registrace} one {# registrace} few {# registrace} many {# registrace} other {# registrací}}"
+    }
   },
   "footer": {
     "privacy": "Zásady ochrany osobních údajů",

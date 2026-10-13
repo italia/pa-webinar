@@ -189,7 +189,7 @@ Every build rewrites its cache tag, so the previous cache manifest stays in `pa-
 
 ### Dependency updates
 
-`.github/dependabot.yml` checks every week for updates to the npm packages (root workspaces, app, recorder, recorder controller), the Python worker, the base images and the GitHub Actions. Major versions of the dependencies listed under `ignore` are left out of routine updates and done as dedicated upgrades. What is covered and why is in [SECURITY.md](../../SECURITY.md#dependency-updates).
+`.github/dependabot.yml` checks every week for updates to the npm packages (the root project with its workspaces, the recorder, the recorder controller and the live captions gateway), the Python worker, the base images and the GitHub Actions. Major versions of the dependencies listed under `ignore` are left out of routine updates and done as dedicated upgrades. What is covered and why is in [SECURITY.md](../../SECURITY.md#dependency-updates).
 
 ### Running the workflows in a fork
 

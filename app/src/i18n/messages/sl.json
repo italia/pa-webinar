@@ -59,6 +59,15 @@
     "cancel": "Prekliči",
     "confirm": "Potrdi",
     "close": "Zapri",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Koda QR: {name}",
+      "alt": "Koda QR za povezavo »{name}«",
+      "hint": "Skenirajte jo s kamero telefona, da odprete povezavo.",
+      "download": "Prenesi (SVG)",
+      "error": "Kode QR ni bilo mogoče ustvariti. Znova naložite stran in poskusite znova; medtem lahko kopirate povezavo."
+    },
     "back": "Nazaj",
     "next": "Naprej",
     "send": "Pošlji",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Dogodek se je končal. Spodaj najdete statistiko in, če je bil posnet, posnetek in poročilo.",
     "endLinks": {
-      "after": "Posnetek in poročilo",
+      "after": "Zaključi dogodek",
       "stats": "Statistika dogodka",
       "publicPage": "Javna stran dogodka"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Podprti formati: PNG, JPEG, WebP, SVG, GIF — največ 10 MB",
       "helpAudio": "Podprti formati: MP3, WAV, OGG, M4A, WebM — največ 20 MB",
       "helpDocument": "Podprti formati: PDF, DOCX, PPTX, XLSX, TXT — največ 25 MB",
-      "uploadsUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo: namesto tega prilepite URL datoteke."
+      "uploadsUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo: namesto tega prilepite URL datoteke.",
+      "externalImage": "Slike z drugih spletnih mest se na straneh portala ne prikažejo.",
+      "externalImageUpload": "Naložite datoteko s svoje naprave.",
+      "cropHelp": "Slika drugačnega formata se tukaj obreže pred nalaganjem.",
+      "crop": {
+        "title": "Obrezovanje slike",
+        "intro": "Povlecite sliko, da izberete del, ki bo prikazan; z drsnikom jo povečate.",
+        "frame": "Okvir obrezovanja",
+        "keys": "S tipkovnico: puščice premikajo sliko (s tipko Shift v daljših korakih), + in − jo povečata in pomanjšata.",
+        "zoom": "Povečava",
+        "size": "Shranjena bo v velikosti {width} × {height} slikovnih pik.",
+        "small": "Slika je majhna: na strani je lahko videti zrnata.",
+        "error": "Te slike ni mogoče prebrati: poskusite z drugo datoteko.",
+        "cancel": "Prekliči",
+        "confirm": "Uporabi ta izrez",
+        "encodeError": "Obreza ni bilo mogoče pripraviti: poskusite znova."
+      }
     },
     "rubricaPicker": {
       "loading": "Iskanje poteka …",
@@ -813,7 +838,8 @@
         "requiredLegend": "Polja, označena z *, so potrebna za shranjevanje dogodka: dokler so prazna, je to navedeno pri vsakem.",
         "kickerHint": "Za nadnaslov ga napišite pred naslov in ju ločite z |, na primer »Cikel srečanj | Prvo srečanje«.",
         "kickerUse": "Prikaži »{kicker}« kot nadnaslov",
-        "kickerPreview": "Tako je videti na strani dogodka"
+        "kickerPreview": "Tako je videti na strani dogodka",
+        "coverImageSize": "Priporočena velikost: 1600 × 900 slikovnih pik (16:9)."
       },
       "step2": {
         "heading": "Kdo lahko kaj počne",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizacija",
         "askRole": "vloga",
         "askType": "vrsta organizacije"
+      },
+      "preview": {
+        "title": "Predogled strani",
+        "open": "Odpri predogled",
+        "note": "Tako je videti stran dogodka; posodablja se med pisanjem.",
+        "noteNoDate": "Tako je videti stran dogodka; dokler datum ni določen, je ura le primer.",
+        "titlePlaceholder": "Naslov dogodka",
+        "descriptionPlaceholder": "Tukaj se bo prikazal opis."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Skrij",
       "warning": "Kdor koli ima to povezavo, upravlja dogodek: ne prikazujte je med deljenjem zaslona in je ne lepite v klepet.",
       "hidden": "Povezava je skrita",
-      "copyFailed": "Kopiranje ni uspelo: izberite spodnji naslov in ga kopirajte ročno."
+      "copyFailed": "Kopiranje ni uspelo: izberite spodnji naslov in ga kopirajte ročno.",
+      "notYetPublished": "Deluje šele po objavi: do takrat se prikaže »strani ni mogoče najti«."
     },
     "feedbackAdmin": {
       "title": "Rezultati povratnih informacij",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Čakalnica (privzeto za spletišče)",
         "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
         "waitingRoomEngineClassic": "Klasična (statična)",
-        "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu."
+        "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu.",
+        "primaryColorHex": "Primarna barva (šestnajstiška koda)"
       },
       "watermark": {
         "title": "Prilagoditev videa",
@@ -1953,8 +1989,7 @@
         "min": "Preverite »{field}«: najmanjša vrednost je {min}.",
         "max": "Preverite »{field}«: največja vrednost je {max}.",
         "field": "Preverite »{field}«: vrednost ni veljavna."
-      },
-      "primaryColorHex": "Primarna barva (šestnajstiška koda)"
+      }
     },
     "analytics": {
       "title": "Statistike",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Prijave",
         "ofMax": "{current} od {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ni nastavljenih opomnikov",
         "tags": "Oznake",
         "postEventSummary": "{connected} povezanih od {registered} prijavljenih (pričakovanih {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "V obdelavi",
       "statusPartial": "Delno obdelano",
       "statusDone": "Obdelano",
-      "statusFailed": "Obdelava ni uspela"
+      "statusFailed": "Obdelava ni uspela",
+      "manageBackToEvent": "Nazaj na dogodek"
     },
     "questionnairesPage": {
       "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Organizatorske ustanove",
       "organizersEdit": "Uredi ustanove",
       "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira."
+    },
+    "closing": {
+      "title": "Zaključi dogodek",
+      "intro": "Kaj je še treba narediti, da bodo tisti, ki jih ni bilo, našli vse, udeleženci pa lahko povedali, kako je bilo.",
+      "summaryTodo": "{count, plural, one {# naloga za dokončanje} two {# nalogi za dokončanje} few {# naloge za dokončanje} other {# nalog za dokončanje}}",
+      "summaryDone": "Vse je opravljeno",
+      "loading": "Preverjanje, kaj je še treba narediti…",
+      "error": "Ni mogoče prebrati, kaj je še treba narediti: znova naložite stran.",
+      "stato": {
+        "fatto": "Opravljeno",
+        "daFare": "Treba opraviti",
+        "inCorso": "V teku",
+        "nonServe": "Ni potrebno"
+      },
+      "azioni": {
+        "apri": "Odpri",
+        "rivedi": "Preglej prepis",
+        "materiali": "Pojdi na gradiva"
+      },
+      "registrazione": {
+        "title": "Snemanje",
+        "pubblicata": "Objavljeno.",
+        "daPubblicare": "Videoposnetek je pripravljen: objavite ga za tiste, ki jih ni bilo.",
+        "inArrivo": "Če je bil dogodek posnet, datoteka prispe nekaj minut po koncu.",
+        "spenta": "Snemanje ni bilo predvideno.",
+        "nessunFile": "Ni videoposnetka: dogodek ni bil posnet ali pa datoteka ni prispela."
+      },
+      "trascrizione": {
+        "title": "Prepis",
+        "pubblicata": "Objavljen.",
+        "prontaAi": "Pripravljen iz poprodukcije: preglejte ga; objavi se skupaj z videoposnetkom.",
+        "prontaSottotitoli": "Pripravljen iz podnapisov: preverite imena in ga objavite.",
+        "inLavorazione": "V obdelavi.",
+        "nessuna": "Ga ni: ni ne podnapisov ne poprodukcije.",
+        "soloStaff": "Pregleda ga in objavi organizator dogodka v administraciji.",
+        "nonPiu": "Ni ga več mogoče spremeniti: dogodek je arhiviran ali pa je potekel rok hrambe njegovih podatkov."
+      },
+      "resoconto": {
+        "title": "Poročilo",
+        "pubblicato": "Objavljeno.",
+        "daPubblicare": "Ustvarjeno: preberite ga in objavite.",
+        "daGenerare": "Treba ga je ustvariti iz prepisa, klepeta in ocen.",
+        "inLavorazione": "V obdelavi.",
+        "senzaPipeline": "Poprodukcija z UI v tej namestitvi ni aktivna.",
+        "soloStaff": "Ustvari ga in objavi organizator dogodka v administraciji.",
+        "nonPiu": "Ni ga več mogoče spremeniti: dogodek je arhiviran ali pa je potekel rok hrambe njegovih podatkov."
+      },
+      "sala": {
+        "title": "Kaj se je dogajalo v sobi",
+        "rivista": "Sporočila: {messaggi} · vprašanja: {domande} · ankete: {sondaggi} · Z eno besedo: {nuvole}.",
+        "vuota": "Klepet, vprašanja, ankete in besede niso bili uporabljeni.",
+        "inSospeso": "Neodgovorjena vprašanja: {domandeInSospeso}. Označite jih kot odgovorjena ali jih zavrzite."
+      },
+      "materiali": {
+        "title": "Gradiva za tiste, ki jih ni bilo",
+        "presenti": "Vidno po dogodku: {materiali}.",
+        "nessuno": "Po dogodku ni vidno nič: dodajte prosojnice ali dokumente govorcev, če obstajajo.",
+        "nascosti": "Gradiva: {materiali}, vendar javna stran gradiv ne prikazuje: vklopite jih v nastavitvah za obdobje po dogodku."
+      },
+      "valutazioni": {
+        "title": "Ocene",
+        "emailInviata": "E-poštno sporočilo s prošnjo za oceno je bilo poslano. Odgovori: {valutazioni}.",
+        "emailInPartenza": "E-poštno sporočilo s prošnjo za oceno bo kmalu poslano udeležencem. Odgovori: {valutazioni}.",
+        "emailSpenta": "E-poštno sporočilo s prošnjo za oceno je izklopljeno: vklopiti ga je mogoče do enega tedna po koncu. Odgovori: {valutazioni}.",
+        "raccolte": "Odgovori: {valutazioni}.",
+        "spente": "Za ta dogodek niso aktivne."
+      },
+      "pagina": {
+        "title": "Javna stran",
+        "visibile": "Vidna vsem.",
+        "nellaLibreria": "Vidna vsem in v video knjižnici.",
+        "privata": "Umaknjena: javnost je ne vidi.",
+        "scaduta": "Ni več vidna: datum poteka je minil.",
+        "archiviato": "Dogodek arhiviran: stran ni javna.",
+        "libreriaSenzaVideo": "Vidna vsem; v video knjižnici se bo prikazala, ko bo videoposnetek objavljen."
+      }
+    },
+    "roomReview": {
+      "title": "Kaj se je dogajalo v sobi",
+      "intro": "Preglejte, kaj je bilo napisano in vprašano: skrijte, kar ne sme ostati, zaključite vprašanja, objavite rezultate anket. Povzetek na javni strani se posodobi ob vsaki spremembi.",
+      "tabs": {
+        "chat": "Klepet",
+        "qa": "Vprašanja",
+        "polls": "Ankete",
+        "words": "Z eno besedo"
+      },
+      "loading": "Nalaganje…",
+      "error": "Tega dela ni mogoče prebrati: poskusite znova pozneje.",
+      "actionError": "Dejanje ni uspelo: poskusite znova.",
+      "chat": {
+        "empty": "Ni sporočil.",
+        "limit": "Prikazanih je zadnjih {count} sporočil.",
+        "question": "Vprašanje",
+        "moderator": "Vodenje",
+        "hide": "Skrij",
+        "hideFor": "Skrij sporočilo od {name}",
+        "hidden": "Sporočilo je skrito.",
+        "confirmTitle": "Želite skriti sporočilo?",
+        "confirmBody": "Izgine iz zgodovine, izvoza in povzetka, skupaj z morebitno prilogo. Dejanja ni mogoče razveljaviti."
+      },
+      "qa": {
+        "empty": "Ni vprašanj.",
+        "status": {
+          "PENDING": "V čakanju",
+          "HIGHLIGHTED": "Izpostavljeno",
+          "ANSWERED": "Odgovorjeno",
+          "DISMISSED": "Zavrnjeno"
+        },
+        "markAnswered": "Označi kot odgovorjeno",
+        "dismiss": "Zavrni",
+        "fromChat": "iz klepeta",
+        "votes": "Glasovi: {count}",
+        "answeredOk": "Vprašanje je označeno kot odgovorjeno.",
+        "dismissedOk": "Vprašanje je zavrnjeno.",
+        "limit": "Prikazanih je {count} vprašanj, označenih v klepetu: najprej odprta, nato najnovejša zaprta."
+      },
+      "polls": {
+        "empty": "Ni anket.",
+        "status": {
+          "OPEN": "Odprto",
+          "CLOSED": "Zaprto: rezultati niso javni",
+          "PUBLISHED": "Rezultati objavljeni"
+        },
+        "votes": "Glasovi: {count}",
+        "publish": "Objavi rezultate",
+        "published": "Rezultati so objavljeni."
+      },
+      "words": {
+        "empty": "Ni besed.",
+        "prompt": "Vprašanje: {prompt}",
+        "people": "Število oseb: {count}",
+        "hide": "Skrij",
+        "hideFor": "Skrij »{word}«",
+        "hidden": "Beseda je skrita.",
+        "confirmTitle": "Želite skriti besedo?",
+        "confirmBody": "Izgine iz oblaka in povzetka. Dejanja ni mogoče razveljaviti.",
+        "round": "Krog z dne {date}"
+      },
+      "recap": {
+        "button": "Posodobi javni povzetek",
+        "done": "Javni povzetek je posodobljen.",
+        "notPossible": "Povzetka ni več mogoče posodobiti: dogodek se ni končal ali pa je potekel rok hrambe njegovih podatkov.",
+        "error": "Posodobitev ni uspela: poskusite znova."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Še # dogodek} two {Še # dogodka} few {Še # dogodki} other {Še # dogodkov}}",
     "noEvents": "V tem obdobju ni dogodkov",
-    "weekShort": "Ted."
+    "legend": {
+      "title": "Oznake",
+      "noTag": "Brez oznake"
+    },
+    "popover": {
+      "open": "Odpri stran dogodka",
+      "manage": "Upravljaj dogodek",
+      "publicPage": "Javna stran",
+      "registrations": "{count, plural, =0 {brez prijav} one {# prijava} two {# prijavi} few {# prijave} other {# prijav}}"
+    }
   },
   "footer": {
     "privacy": "Politika zasebnosti",

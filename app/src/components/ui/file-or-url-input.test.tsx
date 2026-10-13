@@ -127,3 +127,134 @@ describe('FileOrUrlInput con il caricamento proposto', () => {
     expect(container.querySelector('[role="alert"]')?.textContent).toBe('Messaggio del server');
   });
 });
+
+describe('FileOrUrlInput — immagini di altri siti', () => {
+  it('avvisa che un\'immagine presa da un altro sito non comparirà', () => {
+    disegna(campo('https://altro-sito.example/copertina.png'));
+    expect(container.textContent).toContain(t.externalImage);
+  });
+
+  it('nessun avviso per un\'immagine servita dal portale', () => {
+    disegna(campo(`${window.location.origin}/api/files/copertina.png`));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('un file servito da un\'altra installazione e\' esterno anche se il percorso e\' /api/assets/', () => {
+    disegna(campo('https://altra-pa.example/api/assets/logo.png'));
+    expect(container.textContent).toContain(t.externalImage);
+  });
+
+  it('le anteprime di YouTube, ammesse dalla CSP, non avvisano', () => {
+    disegna(campo('https://i.ytimg.com/vi/abc/hqdefault.jpg'));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('con il caricamento disponibile consiglia di caricare il file', () => {
+    disegna(campo('https://altro-sito.example/copertina.png'));
+    expect(container.querySelector('[role="status"]')?.textContent).toContain(t.externalImageUpload);
+  });
+
+  it('un campo che non finisce nelle pagine puo\' fare a meno dell\'avviso', () => {
+    disegna(
+      <FileOrUrlInput
+        id="seo"
+        label="SEO"
+        value="https://altro-sito.example/anteprima.png"
+        onChange={vi.fn()}
+        assetType="image"
+        avvisoImmagineEsterna={false}
+      />,
+    );
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+
+  it('l\'avviso e\' una regione di stato e consiglia il caricamento solo se c\'e\'', () => {
+    disegna(senzaStorage(campo('https://altro-sito.example/copertina.png')));
+    const stato = container.querySelector('[role="status"]');
+    expect(stato?.textContent).toContain(t.externalImage);
+    expect(stato?.textContent).not.toContain(t.externalImageUpload);
+    expect(container.querySelector('input[type="url"]')?.getAttribute('aria-describedby')).toBe(stato?.id);
+  });
+
+  it('nessun avviso per un indirizzo relativo o un\'immagine inline', () => {
+    disegna(campo('/api/files/copertina.png'));
+    expect(container.textContent).not.toContain(t.externalImage);
+    disegna(campo('data:image/png;base64,iVBORw0KGgo='));
+    expect(container.textContent).not.toContain(t.externalImage);
+  });
+});
+
+describe('formato richiesto: il ritaglio prima del caricamento', () => {
+  let misura = { w: 1600, h: 900 };
+  class ImmagineFinta {
+    naturalWidth = 0;
+    naturalHeight = 0;
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    set src(_v: string) {
+      this.naturalWidth = misura.w;
+      this.naturalHeight = misura.h;
+      setTimeout(() => this.onload?.(), 0);
+    }
+  }
+
+  beforeEach(() => {
+    vi.stubGlobal('Image', ImmagineFinta);
+    URL.createObjectURL = () => 'blob:prova';
+    URL.revokeObjectURL = () => {};
+    fetchMock.mockResolvedValue(
+      risposta(200, {
+        url: 'https://webinar.example.gov.it/api/assets/image/a.jpg',
+        key: 'k',
+        mime: 'image/jpeg',
+        size: 1,
+        filename: 'a.jpg',
+      }),
+    );
+  });
+
+  const copertina = (ritaglio?: { rapporto: number; larghezza: number }) => (
+    <FileOrUrlInput
+      id="cover"
+      label="Copertina"
+      value={null}
+      onChange={vi.fn()}
+      assetType="image"
+      uploadsEnabled
+      ritaglio={ritaglio}
+    />
+  );
+
+  it('un\'immagine gia\' 16:9 si carica com\'e\'', async () => {
+    misura = { w: 1600, h: 900 };
+    disegna(copertina({ rapporto: 16 / 9, larghezza: 1600 }));
+    await scegliFile();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(document.body.textContent).not.toContain(t.crop.title);
+  });
+
+  it('un\'immagine di altro formato apre il ritaglio; annullando non si carica niente', async () => {
+    misura = { w: 1000, h: 1000 };
+    disegna(copertina({ rapporto: 16 / 9, larghezza: 1600 }));
+    await scegliFile();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain(t.crop.title);
+    const annulla = Array.from(document.body.querySelectorAll('button')).find(
+      (b) => b.textContent === t.crop.cancel,
+    )!;
+    await act(async () => annulla.click());
+    for (let i = 0; i < 3; i++) {
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('senza formato richiesto nessun ritaglio, qualunque sia la forma', async () => {
+    misura = { w: 1000, h: 1000 };
+    disegna(copertina());
+    await scegliFile();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});

@@ -44,6 +44,7 @@ import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
 import CallSessionsPanel from './call-sessions-panel';
@@ -60,6 +61,8 @@ import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CaptionsTranscriptPanel from './captions-transcript-panel';
 import EventReportPanel from './event-report-panel';
+import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklist';
+import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
@@ -164,7 +167,6 @@ interface EventData {
   coverImageUrl: string | null; imageUrl: string | null;
   parseTitleKicker: boolean | null;
   expectedSenderRatioPct: number | null;
-  capacityEstimateJson: Record<string, unknown> | null;
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
@@ -220,9 +222,13 @@ function useOrgTypeLabel(): (code: string) => string {
 }
 
 function tagChipStyle(color: string | null): CSSProperties {
-  const base = color ?? C_PRIMARY;
+  // Esadecimale anche il ripiego: la tinta si calcola dal colore, e una
+  // variabile CSS (C_PRIMARY) non si scompone.
+  const base = color ?? '#0066CC';
   return {
-    background: `${base}18`, color: base, border: `1px solid ${base}40`,
+    background: hexWithAlpha(base, 0x18 / 255),
+    color: inchiostroEtichetta(base, 0x18 / 255),
+    border: `1px solid ${hexWithAlpha(base, 0x40 / 255)}`,
     borderRadius: 999, fontSize: '0.75rem', fontWeight: 600,
     padding: '2px 10px', lineHeight: 1.6, whiteSpace: 'nowrap',
   };
@@ -355,11 +361,6 @@ export default function EventManagementClient({
   // chiamata chiusa senza pagina post-evento non ha niente da condividere.
   const condivisione = shareLink(eventoOra, istante);
   const invitoChiamata = callInviteOpen(eventoOra, istante);
-
-  // Capacity estimate sidebar surface. Everything else stays in the diagram.
-  const capacity = event.capacityEstimateJson ?? null;
-  const jvbCount = capacity && typeof capacity.jvbCount === 'number' ? capacity.jvbCount : null;
-  const jvbRam = capacity && typeof capacity.jvbRam === 'string' ? capacity.jvbRam : null;
 
   // Ritirare toglie l'evento dalle pagine pubbliche: si chiede conferma, come
   // dal menu della scheda nell'elenco, e un errore si vede.
@@ -769,6 +770,7 @@ export default function EventManagementClient({
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
               <PostEventTab event={event} status={status} viaToken={viaToken}
+                            onMateriali={() => scegliScheda('contenuti')}
                             paginaPostEvento={paginaPostEvento}
                             onPaginaPostEvento={(patch) =>
                               setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
@@ -889,15 +891,6 @@ export default function EventManagementClient({
               ) : (
                 <div style={CAPTION}>
                   {td('sidebar.estimatedAttendance', { estimated: event.maxParticipants })}
-                </div>
-              )}
-              {(jvbCount !== null || jvbRam) && (
-                <div className="mt-3 pt-3 d-flex align-items-center gap-2"
-                     style={{ borderTop: '1px solid #f0f0f0', ...CAPTION, fontSize: '0.82rem' }}>
-                  <Svg name="info" size={14} />
-                  <span>
-                    {td('sidebar.capacityEstimate', { jvbs: jvbCount ?? 1, ram: jvbRam ?? '—' })}
-                  </span>
                 </div>
               )}
             </div>
@@ -1157,7 +1150,13 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
         </div>
-        <div className="d-grid gap-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        {/* Due colonne finché ci stanno (mai tre); al telefono una sola. */}
+        <div
+          className="d-grid gap-2"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(14rem, calc(50% - 0.5rem))), 1fr))',
+          }}
+        >
           {toggles.map((toggle) => (
             <div key={toggle.label}
                  className="d-flex align-items-center gap-2 px-3 py-2"
@@ -1166,7 +1165,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
                 <Svg name={toggle.value ? 'check' : 'x'} size={14} />
               </span>
               {toggle.href ? (
-                <Link href={percorso(toggle.href)}>{toggle.label}</Link>
+                <Link href={percorso(toggle.href)} className="d-inline-block py-1">{toggle.label}</Link>
               ) : (
                 <span>{toggle.label}</span>
               )}
@@ -1181,6 +1180,8 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
       <div className="mt-4">
         <H>{tl('title')}</H>
         <EventLinksSection
+          slug={event.slug}
+          inBozza={event.status === 'DRAFT'}
           // Senza accesso degli ospiti l'invito diretto non fa entrare
           // nessuno: porta all'iscrizione, come la pagina pubblica. Per una
           // chiamata rapida lo stesso indirizzo e' IL link dei partecipanti,
@@ -1516,8 +1517,9 @@ function ContentTab({ event, staffTools }: { event: EventData; staffTools: boole
   );
 }
 
-function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken }: {
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken, onMateriali }: {
   event: EventData; status: string; viaToken: string | null;
+  onMateriali: () => void;
   paginaPostEvento: PostEventVisibility;
   onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
 }) {
@@ -1527,6 +1529,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tg = useTranslations('admin.glossary');
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
+  const trr = useTranslations('admin.roomReview');
   const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
@@ -1586,7 +1589,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   // evento concluso e' la prima cosa da fare, e sta in cima.
   const registrazioneInCima = status === 'ENDED' || status === 'ARCHIVED';
   const bloccoRegistrazione = (
-      <div className="mb-4">
+      <div className="mb-4" id={ANCORE_CHIUSURA.registrazione} tabIndex={-1}>
         <H>{td('recordingSection')}</H>
         <RecordingManagement
           event={{
@@ -1608,11 +1611,21 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
 
   return (
     <>
+      {/* In cima, a evento finito: cosa resta da fare, voce per voce, con il
+          pulsante che porta alla parte qui sotto dove la si fa. */}
+      {isEnded && (
+        <EventClosingChecklist
+          eventId={event.id}
+          token={viaToken}
+          conTrascrizioneDaiSottotitoli={event.captionsTranscriptEnabled}
+          onMateriali={onMateriali}
+        />
+      )}
       {registrazioneInCima && bloccoRegistrazione}
       {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
           libreria, feedback — e poi cio' che ne e' uscito. Decisione e
           risultato si leggono nello stesso posto. */}
-      <div>
+      <div id={ANCORE_CHIUSURA.pagina} tabIndex={-1}>
         <H>{td('postEventTitle')}</H>
         {/* I valori correnti, non quelli del caricamento: la scheda si
             rimonta ogni volta che la si riapre. */}
@@ -1640,9 +1653,23 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
         />
       </div>
 
+      {/* Cosa e' successo in sala, da rivedere a evento finito: subito dopo
+          le regole su cosa la pagina pubblica mostra. */}
+      {isEnded && (
+        <div className="mb-4" id={ANCORE_CHIUSURA.sala} tabIndex={-1}>
+          <H>{trr('title')}</H>
+          <EventRoomReview
+            eventId={event.id}
+            slug={event.slug}
+            token={event.moderatorToken}
+            concluso={status === 'ENDED'}
+          />
+        </div>
+      )}
+
       {/* Le valutazioni di chi ha partecipato, subito sotto le regole che le
           raccolgono e le pubblicano. */}
-      <div className="mb-4">
+      <div className="mb-4" id={ANCORE_CHIUSURA.valutazioni} tabIndex={-1}>
         <H>{tfb('title')}</H>
         <EventFeedbackPanel eventId={event.id} token={viaToken} />
       </div>
@@ -1651,7 +1678,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           Lo chiede lo staff (accende il modello linguistico), non chi arriva
           con il link del moderatore. */}
       {!viaToken && (
-        <div className="mb-4">
+        <div className="mb-4" id={ANCORE_CHIUSURA.resoconto} tabIndex={-1}>
           <H>{trp('title')}</H>
           <EventReportPanel eventId={event.id} locale={locale} />
         </div>
@@ -1661,6 +1688,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           trascrizione (testo + diarization), sintesi, traduzioni.
           È il collegamento che mancava fra evento e post-produzione. */}
       <div
+        id={ANCORE_CHIUSURA.ai}
+        tabIndex={-1}
         className="mb-4 p-4"
         style={{
           border: `1px solid ${C_PRIMARY}33`,
@@ -1718,7 +1747,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
       {/* La trascrizione dai sottotitoli live, se l'evento la tiene: si legge
           e si pubblica anche senza video e senza pipeline AI. */}
       {event.captionsTranscriptEnabled && (
-        <div className="mb-4">
+        <div className="mb-4" id={ANCORE_CHIUSURA.trascrizione} tabIndex={-1}>
           <H>{tct('title')}</H>
           <CaptionsTranscriptPanel
             eventId={event.id}

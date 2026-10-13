@@ -59,6 +59,15 @@
     "cancel": "Zrušiť",
     "confirm": "Potvrdiť",
     "close": "Zavrieť",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kód: {name}",
+      "alt": "QR kód odkazu „{name}“",
+      "hint": "Naskenujte ho fotoaparátom telefónu a odkaz sa otvorí.",
+      "download": "Stiahnuť (SVG)",
+      "error": "QR kód sa nepodarilo vytvoriť. Načítajte stránku znova a skúste to znova; zatiaľ môžete odkaz skopírovať."
+    },
     "back": "Späť",
     "next": "Ďalej",
     "send": "Odoslať",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Podujatie sa skončilo. Nižšie nájdete štatistiky, a ak sa nahrávalo, aj záznam a správu.",
     "endLinks": {
-      "after": "Záznam a správa",
+      "after": "Uzavrieť podujatie",
       "stats": "Štatistiky podujatia",
       "publicPage": "Verejná stránka podujatia"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Podporované formáty: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Podporované formáty: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Nahrávanie súborov nie je v tejto inštalácii k dispozícii: namiesto toho vložte URL adresu súboru."
+      "uploadsUnavailable": "Nahrávanie súborov nie je v tejto inštalácii k dispozícii: namiesto toho vložte URL adresu súboru.",
+      "externalImage": "Obrázky z iných stránok sa na stránkach portálu nezobrazia.",
+      "externalImageUpload": "Nahrajte súbor zo svojho zariadenia.",
+      "cropHelp": "Obrázok iného formátu sa tu pred nahraním oreže.",
+      "crop": {
+        "title": "Orezanie obrázka",
+        "intro": "Potiahnutím obrázka vyberte časť, ktorá sa má zobraziť; posúvačom ho zväčšíte.",
+        "frame": "Rámik orezu",
+        "keys": "Z klávesnice: šípky posúvajú obrázok (so Shiftom po dlhších krokoch), + a − ho zväčšujú a zmenšujú.",
+        "zoom": "Zväčšenie",
+        "size": "Uloží sa vo veľkosti {width} × {height} pixelov.",
+        "small": "Obrázok je malý: na stránke môže vyzerať rozmazane.",
+        "error": "Tento obrázok sa nedá načítať: skúste iný súbor.",
+        "cancel": "Zrušiť",
+        "confirm": "Použiť tento orez",
+        "encodeError": "Výrez sa nepodarilo pripraviť: skúste to znova."
+      }
     },
     "rubricaPicker": {
       "loading": "Vyhľadávanie…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Polia označené * sú potrebné na uloženie podujatia: kým sú prázdne, je to pri každom uvedené.",
         "kickerHint": "Nadtitulok napíšte pred názov a oddeľte ich znakom |, napríklad „Cyklus stretnutí | Prvé stretnutie“.",
         "kickerUse": "Zobraziť „{kicker}“ ako nadtitulok",
-        "kickerPreview": "Takto vyzerá na stránke podujatia"
+        "kickerPreview": "Takto vyzerá na stránke podujatia",
+        "coverImageSize": "Odporúčaný formát: 1600 × 900 pixelov (16:9)."
       },
       "step2": {
         "heading": "Kto môže robiť čo",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizácia",
         "askRole": "funkcia",
         "askType": "typ organizácie"
+      },
+      "preview": {
+        "title": "Náhľad stránky",
+        "open": "Otvoriť náhľad",
+        "note": "Takto vyzerá stránka podujatia; aktualizuje sa počas písania.",
+        "noteNoDate": "Takto vyzerá stránka podujatia; kým chýba dátum, čas je len ukážkový.",
+        "titlePlaceholder": "Názov podujatia",
+        "descriptionPlaceholder": "Tu sa zobrazí popis."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Skryť",
       "warning": "Ktokoľvek s týmto odkazom spravuje podujatie: nezobrazujte ho pri zdieľaní obrazovky a nevkladajte ho do chatu.",
       "hidden": "Odkaz je skrytý",
-      "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne."
+      "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne.",
+      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“."
     },
     "feedbackAdmin": {
       "title": "Výsledky spätnej väzby",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Čakáreň (predvolené nastavenie webu)",
         "waitingRoomEngineGame": "Videohra (lobby Phaser)",
         "waitingRoomEngineClassic": "Klasická (statická)",
-        "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese."
+        "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese.",
+        "primaryColorHex": "Primárna farba (hexadecimálny kód)"
       },
       "watermark": {
         "title": "Prispôsobenie videa",
@@ -1953,8 +1989,7 @@
         "min": "Skontrolujte „{field}“: minimálna hodnota je {min}.",
         "max": "Skontrolujte „{field}“: maximálna hodnota je {max}.",
         "field": "Skontrolujte „{field}“: hodnota nie je platná."
-      },
-      "primaryColorHex": "Primárna farba (hexadecimálny kód)"
+      }
     },
     "analytics": {
       "title": "Štatistiky",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Prihlášky",
         "ofMax": "{current} z {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Žiadne pripomienky nakonfigurované",
         "tags": "Tagy",
         "postEventSummary": "{connected} pripojených z {registered} registrovaných (očakávaných {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Spracúva sa",
       "statusPartial": "Čiastočne spracované",
       "statusDone": "Spracované",
-      "statusFailed": "Spracovanie zlyhalo"
+      "statusFailed": "Spracovanie zlyhalo",
+      "manageBackToEvent": "Späť na podujatie"
     },
     "questionnairesPage": {
       "subtitle": "Opakovane použiteľné šablóny otázok pre predregistračné a po-podujatie dotazníky."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Organizujúce inštitúcie",
       "organizersEdit": "Upraviť inštitúcie",
       "organizersEmpty": "Nie je uvedená žiadna inštitúcia: verejná stránka neukazuje, kto organizuje."
+    },
+    "closing": {
+      "title": "Uzavrieť podujatie",
+      "intro": "Čo ešte zostáva urobiť, aby tí, ktorí sa nezúčastnili, našli všetko potrebné a účastníci mohli povedať, ako to prebehlo.",
+      "summaryTodo": "{count, plural, one {# úloha na dokončenie} few {# úlohy na dokončenie} many {# úlohy na dokončenie} other {# úloh na dokončenie}}",
+      "summaryDone": "Všetko hotové",
+      "loading": "Kontroluje sa, čo zostáva urobiť…",
+      "error": "Nedá sa načítať, čo zostáva urobiť: načítajte stránku znova.",
+      "stato": {
+        "fatto": "Hotovo",
+        "daFare": "Na vybavenie",
+        "inCorso": "Prebieha",
+        "nonServe": "Nie je potrebné"
+      },
+      "azioni": {
+        "apri": "Otvoriť",
+        "rivedi": "Skontrolovať prepis",
+        "materiali": "Prejsť na materiály"
+      },
+      "registrazione": {
+        "title": "Záznam",
+        "pubblicata": "Zverejnený.",
+        "daPubblicare": "Video je pripravené: zverejnite ho pre tých, ktorí sa nezúčastnili.",
+        "inArrivo": "Ak bolo podujatie nahraté, súbor príde niekoľko minút po skončení.",
+        "spenta": "Nebol plánovaný.",
+        "nessunFile": "Žiadne video: podujatie nebolo nahraté alebo súbor neprišiel."
+      },
+      "trascrizione": {
+        "title": "Prepis",
+        "pubblicata": "Zverejnený.",
+        "prontaAi": "Pripravený z postprodukcie: skontrolujte ho; zverejní sa spolu s videom.",
+        "prontaSottotitoli": "Pripravený z titulkov: skontrolujte mená a zverejnite ho.",
+        "inLavorazione": "Spracováva sa.",
+        "nessuna": "Nie je k dispozícii: chýbajú titulky aj postprodukcia.",
+        "soloStaff": "Kontroluje a zverejňuje ho organizátor podujatia v administrácii.",
+        "nonPiu": "Už sa nedá upraviť: podujatie je archivované alebo uplynula doba uchovávania jeho údajov."
+      },
+      "resoconto": {
+        "title": "Správa",
+        "pubblicato": "Zverejnená.",
+        "daPubblicare": "Vygenerovaná: prečítajte si ju a zverejnite.",
+        "daGenerare": "Treba ju vygenerovať z prepisu, chatu a hodnotení.",
+        "inLavorazione": "Spracováva sa.",
+        "senzaPipeline": "AI postprodukcia nie je v tejto inštalácii aktívna.",
+        "soloStaff": "Generuje a zverejňuje ju organizátor podujatia v administrácii.",
+        "nonPiu": "Už sa nedá upraviť: podujatie je archivované alebo uplynula doba uchovávania jeho údajov."
+      },
+      "sala": {
+        "title": "Čo sa dialo v miestnosti",
+        "rivista": "Správy: {messaggi} · otázky: {domande} · ankety: {sondaggi} · Jedným slovom: {nuvole}.",
+        "vuota": "Chat, otázky, ankety ani slová sa nepoužili.",
+        "inSospeso": "Nezodpovedané otázky: {domandeInSospeso}. Označte ich ako zodpovedané alebo ich zamietnite."
+      },
+      "materiali": {
+        "title": "Materiály pre tých, ktorí sa nezúčastnili",
+        "presenti": "Viditeľné po podujatí: {materiali}.",
+        "nessuno": "Po podujatí nie je nič viditeľné: pridajte snímky alebo dokumenty rečníkov, ak existujú.",
+        "nascosti": "Materiály: {materiali}, ale verejná stránka materiály nezobrazuje: zapnite ich v nastaveniach pre obdobie po podujatí."
+      },
+      "valutazioni": {
+        "title": "Hodnotenia",
+        "emailInviata": "E-mail so žiadosťou o hodnotenie bol odoslaný. Odpovede: {valutazioni}.",
+        "emailInPartenza": "E-mail so žiadosťou o hodnotenie čoskoro odíde účastníkom. Odpovede: {valutazioni}.",
+        "emailSpenta": "E-mail so žiadosťou o hodnotenie je vypnutý: dá sa zapnúť až do jedného týždňa po skončení. Odpovede: {valutazioni}.",
+        "raccolte": "Odpovede: {valutazioni}.",
+        "spente": "Pre toto podujatie nie sú aktívne."
+      },
+      "pagina": {
+        "title": "Verejná stránka",
+        "visibile": "Viditeľná pre všetkých.",
+        "nellaLibreria": "Viditeľná pre všetkých a vo videoknižnici.",
+        "privata": "Stiahnutá: verejnosť ju nevidí.",
+        "scaduta": "Už nie je viditeľná: dátum platnosti uplynul.",
+        "archiviato": "Podujatie archivované: stránka nie je verejná.",
+        "libreriaSenzaVideo": "Viditeľná pre všetkých; vo videoknižnici sa zobrazí, keď bude video zverejnené."
+      }
+    },
+    "roomReview": {
+      "title": "Čo sa dialo v miestnosti",
+      "intro": "Prezrite si, čo sa písalo a na čo sa kto pýtal: skryte, čo nemá zostať, uzavrite otázky, zverejnite výsledky ankiet. Zhrnutie na verejnej stránke sa aktualizuje pri každej zmene.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Otázky",
+        "polls": "Ankety",
+        "words": "Jedným slovom"
+      },
+      "loading": "Načítanie…",
+      "error": "Túto časť sa nedá načítať: skúste to neskôr.",
+      "actionError": "Akcia sa nepodarila: skúste to znova.",
+      "chat": {
+        "empty": "Žiadne správy.",
+        "limit": "Zobrazuje sa posledných {count} správ.",
+        "question": "Otázka",
+        "moderator": "Moderovanie",
+        "hide": "Skryť",
+        "hideFor": "Skryť správu od {name}",
+        "hidden": "Správa je skrytá.",
+        "confirmTitle": "Skryť správu?",
+        "confirmBody": "Zmizne z histórie, z exportu aj zo zhrnutia vrátane prípadnej prílohy. Túto akciu nemožno vrátiť späť."
+      },
+      "qa": {
+        "empty": "Žiadne otázky.",
+        "status": {
+          "PENDING": "Čaká na vybavenie",
+          "HIGHLIGHTED": "Zvýraznené",
+          "ANSWERED": "Zodpovedané",
+          "DISMISSED": "Zamietnuté"
+        },
+        "markAnswered": "Označiť ako zodpovedanú",
+        "dismiss": "Zamietnuť",
+        "fromChat": "z chatu",
+        "votes": "Hlasy: {count}",
+        "answeredOk": "Otázka označená ako zodpovedaná.",
+        "dismissedOk": "Otázka zamietnutá.",
+        "limit": "Zobrazuje sa {count} otázok označených v chate: najprv otvorené, potom najnovšie uzavreté."
+      },
+      "polls": {
+        "empty": "Žiadne ankety.",
+        "status": {
+          "OPEN": "Otvorené",
+          "CLOSED": "Uzavreté: výsledky nie sú verejné",
+          "PUBLISHED": "Výsledky zverejnené"
+        },
+        "votes": "Hlasy: {count}",
+        "publish": "Zverejniť výsledky",
+        "published": "Výsledky sú zverejnené."
+      },
+      "words": {
+        "empty": "Žiadne slová.",
+        "prompt": "Otázka: {prompt}",
+        "people": "Počet ľudí: {count}",
+        "hide": "Skryť",
+        "hideFor": "Skryť „{word}“",
+        "hidden": "Slovo je skryté.",
+        "confirmTitle": "Skryť slovo?",
+        "confirmBody": "Zmizne z oblaku aj zo zhrnutia. Túto akciu nemožno vrátiť späť.",
+        "round": "Kolo z {date}"
+      },
+      "recap": {
+        "button": "Aktualizovať verejné zhrnutie",
+        "done": "Verejné zhrnutie je aktualizované.",
+        "notPossible": "Zhrnutie sa už nedá aktualizovať: podujatie neskončilo alebo uplynula doba uchovávania jeho údajov.",
+        "error": "Aktualizácia sa nepodarila: skúste to znova."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ešte jedno podujatie} few {Ešte # podujatia} many {Ešte # podujatia} other {Ešte # podujatí}}",
     "noEvents": "V tomto období nie sú žiadne podujatia",
-    "weekShort": "Týž."
+    "legend": {
+      "title": "Štítky",
+      "noTag": "Bez štítka"
+    },
+    "popover": {
+      "open": "Otvoriť stránku podujatia",
+      "manage": "Spravovať podujatie",
+      "publicPage": "Verejná stránka",
+      "registrations": "{count, plural, =0 {žiadne registrácie} one {# registrácia} few {# registrácie} many {# registrácie} other {# registrácií}}"
+    }
   },
   "footer": {
     "privacy": "Zásady ochrany osobných údajov",

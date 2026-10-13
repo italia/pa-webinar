@@ -10,6 +10,7 @@ import {
 } from '@/lib/errors';
 import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { rifaiRiepilogo } from '@/lib/events/recap';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction, type LiveActionKind } from '@/lib/live/actions';
 import { updatePollStatusSchema } from '@/lib/validation/schemas';
@@ -99,6 +100,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
             ...(await conteggiVoti(updated.id, options)),
           };
     await recordLiveAction({ eventId: event.id, kind, actor: 'moderator', data });
+    // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+    await rifaiRiepilogo(event.id, event.status);
   }
 
   return Response.json({
@@ -142,5 +145,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
     data: { pollId: poll.id, question: poll.question },
   });
 
+  // Il riepilogo pubblico di un evento concluso si rifa' con la modifica.
+  await rifaiRiepilogo(event.id, event.status);
   return Response.json({ ok: true });
 });

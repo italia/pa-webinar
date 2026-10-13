@@ -19,6 +19,8 @@
 import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import LinkQr, { nomeFileQr } from '@/components/ui/link-qr';
+
 interface Riga {
   chiave: 'publicPage' | 'guestJoin' | 'callInvite' | 'moderatorLink';
   url: string;
@@ -35,7 +37,22 @@ function Chiave() {
   );
 }
 
-export default function EventLinksSection({ righe }: { righe: Riga[] }) {
+export default function EventLinksSection({
+  righe,
+  slug,
+  inBozza = false,
+}: {
+  righe: Riga[];
+  /** Per il nome dei file dei codici QR. */
+  slug: string;
+  /**
+   * L'evento non è ancora pubblicato: la pagina pubblica e l'invito non si
+   * aprono. Gli indirizzi restano (non cambiano alla pubblicazione, e si
+   * possono preparare inviti e QR prima), ma si dice che oggi non portano a
+   * niente.
+   */
+  inBozza?: boolean;
+}) {
   const t = useTranslations('admin.links');
   // Scoperte una per una: oggi la riga riservata e' una sola, ma il giorno in
   // cui se ne aggiunge un'altra un interruttore unico scoprirebbe anche quella
@@ -109,8 +126,25 @@ export default function EventLinksSection({ righe }: { righe: Riga[] }) {
                 <div className="text-muted mt-1" style={{ fontSize: '0.85rem' }}>
                   {t(`${r.chiave}Hint`)}
                 </div>
+                {inBozza && !r.riservato && (
+                  <div className="mt-1 fw-semibold" style={{ fontSize: '0.85rem', color: 'var(--app-warning-text)' }}>
+                    {t('notYetPublished')}
+                  </div>
+                )}
               </div>
               <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                {/* Il QR solo per i link senza token: chi fotografa lo schermo
+                    non deve portarsi via una credenziale. */}
+                {!r.riservato && (
+                  <LinkQr
+                    url={r.url}
+                    nome={t(`${r.chiave}`)}
+                    nomeFile={nomeFileQr(
+                      slug,
+                      r.chiave === 'publicPage' ? 'pagina' : 'sala',
+                    )}
+                  />
+                )}
                 {r.riservato && (
                   <button
                     type="button"

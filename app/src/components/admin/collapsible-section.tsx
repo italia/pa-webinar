@@ -103,14 +103,14 @@ const ICONS: Record<string, React.ReactNode> = {
 
 function ChevronDown() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A768A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#516B7E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="6 9 12 15 18 9" />
     </svg>
   );
 }
 function ChevronUp() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A768A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#516B7E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="18 15 12 9 6 15" />
     </svg>
   );

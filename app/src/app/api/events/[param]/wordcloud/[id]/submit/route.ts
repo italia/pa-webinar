@@ -14,6 +14,7 @@ import { recordLiveAction } from '@/lib/live/actions';
 import { forgetWordcloudLite } from '@/lib/wordcloud/lite';
 import { submitWordCloudSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { limiteDellaSala } from '@/lib/room-rate-limit';
 import { countWordsByPerson, isRoundExpired, normalizeWord } from '@/lib/wordcloud/normalize';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // una volta sola. Il limite vero a testa è quello per identità più sotto.
   const ip = getClientIp(request);
   const ipRl = rateLimit(`wc-submit-ip:${ip}:${event.id}`, {
-    limit: 300,
+    limit: limiteDellaSala(300),
     windowMs: 60_000,
   });
   if (!ipRl.allowed) {

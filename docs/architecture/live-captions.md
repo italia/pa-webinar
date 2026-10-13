@@ -21,7 +21,7 @@ flowchart LR
     end
     APP["Portal"]
 
-    PROS -->|"room metadata:<br/>asyncTranscription, room name"| JIC
+    PROS -->|"room metadata:<br/>asyncTranscription, room name,<br/>transcription on or off"| JIC
     M -->|"IFrame API setSubtitles<br/>(moderators only)"| JIC
     JIC -->|"open transcription<br/>to the gateway"| JVB
     M -->|"Opus audio"| JVB
@@ -35,19 +35,20 @@ flowchart LR
     GW -->|"room context:<br/>language, vocabulary"| APP
     APP -->|"/status"| GW
     PROS -.->|"who is in the room:<br/>endpoint, seat"| APP
+    APP -.->|"answer to a join:<br/>captions wanted now?"| PROS
     GW -.->|"final sentences,<br/>only with the transcript on"| APP
 ```
 
 The dashed arrows tell the portal who is behind each voice and, when the event keeps a transcript, carry its sentences: see [Transcript from captions](#transcript-from-captions).
 
 1. **Prosody marks the room.** When the service is installed, the project's module `mod_pa_captions` sets two room metadata keys at creation: `asyncTranscription`, which clients cannot set, and `transcription.urlParams.room`, the room name. Nothing is transcribed yet.
-2. **The moderator's room turns it on.** If captions are on for the event, the room page of each moderator sends the IFrame API command `setSubtitles` after joining. Jitsi writes `recording.isTranscribingEnabled` into the room metadata; only a moderator's token, which carries the `transcription` feature, may do it.
+2. **The room is turned on as people join.** Each time someone with a token joins, and every thirty seconds while someone is in the room, Prosody's `mod_pa_occupants` asks the portal (`POST /api/internal/jitsi/occupants`) whether the event wants captions now: off when captions are off for the instance or for the event, on when they are on and the event is live (the scaler starts the service while the event is starting, so by then it has loaded its model); before the event is live, and for the multitrack recorder, it decides nothing. A room whose people all joined before the start is therefore turned on within half a minute of the event going live. In a room without a moderator, `mod_pa_captions` then writes `recording.isTranscribingEnabled` into the room metadata itself, on or off, so captions start without a moderator once the event is live. While a moderator is in the room, the moderator's room page decides: it sends the IFrame API command `setSubtitles` after joining and whenever the switch changes. The token's `transcription` feature lets the moderator's client send it, and the stock room metadata component accepts the write only from an occupant with the moderator role, so no other client can change it. An answer that arrives late does not overwrite a later decision.
 3. **Jicofo connects the bridge.** Jicofo builds the service URL from its template (`jicofo.transcription.url-template`, with the meeting id and, from Jitsi stable-10978, the room name as a query parameter) and tells the bridge to open it.
 4. **The bridge streams speakers.** The bridge sends the Opus audio of every participant whose microphone is on, pauses included; a muted microphone sends nothing.
 5. **The gateway transcribes.** For each speaker it decodes Opus to 16 kHz mono PCM, finds the stretches with voice, sends only those to an engine session opened with the room's language and vocabulary, and turns the engine's fragments into captions. Silence on an open microphone costs no engine time.
 6. **Every room shows the captions.** The bridge relays each `transcription-result` to all participants. The room receives it through the IFrame API event `transcriptionChunkReceived`, resolves the speaker's display name from the endpoint id, and draws it over the video (`app/src/components/live/live-captions.tsx`).
 
-Turning captions off during the event (the **Automatic captions** switch in the control room) sends `setSubtitles` with `false`, which stops the transcription for the room.
+Turning captions off during the event (the **Automatic captions** switch in the control room) sends `setSubtitles` with `false`, which stops the transcription for the room. In a room without a moderator, Prosody follows the switch within half a minute.
 
 Jitsi treats transcription as a kind of recording: when it starts or stops, every client plays the spoken "recording on/off" announcement and the IFrame API reports a recording status change. Nothing is recorded, so once captions are on in a room, from the start or turned on later, the room turns those two sounds off for the rest of the session (`disabledSounds`); it never takes a "stopped" status it has not seen start as the end of a recording. During a real recording Jitsi skips the sounds by itself while transcription is on, and the room shows its own recording notice.
 
@@ -57,10 +58,10 @@ Jitsi treats transcription as a kind of recording: when it starts or stops, ever
 |---|---|---|---|
 | Installation | Helm: `global.captions.enabled` | `true` | Renders the captions pod, the Prosody module setting and Jicofo's URL template, and gives the portal `CAPTIONS_STATUS_URL`. Without it the portal never tries to start captions. |
 | Instance | **Settings → Features → Live captions** (`SiteSetting.liveCaptionsEnabled`) | on | Off, no event starts captions and the scaler keeps the service at zero. On, the scaler keeps it up while any event is live or starting, also when a moderator turns captions off in the room, so that turning them back on is immediate. |
-| Event | `Event.liveCaptionsEnabled`: **Automatic captions** in the event wizard (advanced settings, room features) and in event templates, and switched live from the control room | on | Off, the room's moderators stop the transcription. The wizard and the templates show the switch only where captions are available on the instance. |
+| Event | `Event.liveCaptionsEnabled`: **Automatic captions** in the event wizard (advanced settings, room features) and in event templates, and switched live from the control room | on | Off, the room's moderators stop the transcription, and in a room without a moderator Prosody turns it off within half a minute. The wizard and the templates show the switch only where captions are available on the instance. |
 | Viewer | **Captions** button in the Jitsi toolbar | shown | Hides the captions for that viewer only; the icon is crossed out while they are hidden, and the choice is kept in the browser. |
 
-Captions start only when a moderator is in the room: speakers and participants cannot start them.
+Captions start once the event is live, at the first join or within half a minute, whether or not a moderator is in the room; no client other than a moderator's can start or stop them.
 
 ## The gateway
 
@@ -108,6 +109,7 @@ sequenceDiagram
 
   P->>APP: POST /api/internal/jitsi/occupants<br/>room, meeting id, endpoint, seat
   APP->>DB: room_occupants
+  APP-->>P: to a join: captions wanted now
   GW->>APP: GET /api/internal/captions/context
   APP-->>GW: transcript true
   GW->>APP: POST /api/internal/captions/segments<br/>final sentences, by endpoint
@@ -172,7 +174,9 @@ The vocabulary the service receives contains the names of the event's organizers
 
 ## Known limitations
 
-- **A moderator must be in the room.** Captions are turned on by a moderator's room page; a room with only speakers and participants has none. Before Jitsi stable-10978, Jicofo puts a conference on the bridge only from two participants: a moderator alone is captioned once someone else joins.
+- **Up to half a minute.** In a room without a moderator, a change that does not come with a join (the event going live, a switch changed from the administration area) reaches the room at the next question, within thirty seconds. Before Jitsi stable-10978, Jicofo puts a conference on the bridge only from two participants: a person alone is captioned once someone else joins.
+- **The instance switch with a moderator in the room.** The moderator's room reads whether captions are available on the instance when it loads, and while a moderator is in the room Prosody leaves the decision to it: turning live captions off, or on, for the instance during an event reaches a room with a moderator when the moderator reloads it. A moderator who joins with a client other than the portal's room page keeps the decision without ever taking it.
+- **Captions stopped in a room already on.** A join does not restart a transcription that stopped in a room whose metadata already says on, for example after a restart of the service: a moderator turns the switch off and on.
 - **A restart of the service during a conference.** On Jitsi stable-10741 the bridge tries to reconnect once; if the service is not back yet, transcription resumes only when a moderator turns captions off and on again, or joins again.
 - **The "recording" announcements of Jitsi.** A participant whose room learns that captions were turned on only after transcription has started (the room falls back to polling when the push channel is unavailable) can hear Jitsi's "recording is on" once. Once captions have been on in a room, Jitsi's spoken recording announcements stay off for that session, also for a real recording started after captions are turned off; the room's own recording notice is unaffected.
 - **Numbers come out in words.** The engine has no inverse text normalization for Italian.

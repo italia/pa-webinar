@@ -403,15 +403,18 @@ The variable is listed with the other recording settings in the
 ### Images and audio from other hosts
 
 `img-src` has no configuration point. An image URL pasted into an admin form instead of an upload,
-such as a logo on an organization's website, is saved but blocked when the page renders. Audio pasted
+such as a logo on an organization's website, is saved but blocked when the page renders; the image
+field says so as soon as the URL is entered. Audio pasted
 as a URL plays only if its host is in `media-src`, which `RECORDING_MEDIA_CSP_HOSTS` can extend.
 Uploading the file is the reliable choice. See [Branding and white-labeling](configuration/branding.md).
 
 ## Changing the policy
 
 - Edit `applySecurityHeaders()` in `app/src/middleware.ts`, or `storageCspHosts()` in
-  `app/src/lib/storage/provider-type.ts` for storage hosts. Keep their comments and this page in
-  step, in the same change.
+  `app/src/lib/storage/provider-type.ts` for storage hosts. The external hosts in `img-src` live in
+  `IMMAGINI_ESTERNE_AMMESSE` (`app/src/lib/security/img-src.ts`), which the admin image field also
+  reads to warn about images that would not display. Keep their comments and this page in step, in
+  the same change.
 - **A new third-party embed** needs `frame-src`. If it uses the camera, microphone or screen, it
   also needs its origin in `Permissions-Policy`.
 - **A new browser-side call to another origin** needs `connect-src`. Prefer routing it through a

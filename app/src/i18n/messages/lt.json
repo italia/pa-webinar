@@ -59,6 +59,15 @@
     "cancel": "Atšaukti",
     "confirm": "Patvirtinti",
     "close": "Uždaryti",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR kodas: {name}",
+      "alt": "Nuorodos „{name}“ QR kodas",
+      "hint": "Nuskenuokite jį telefono kamera, kad atidarytumėte nuorodą.",
+      "download": "Atsisiųsti (SVG)",
+      "error": "QR kodo sukurti nepavyko. Įkelkite puslapį iš naujo ir bandykite dar kartą; tuo metu galite nukopijuoti nuorodą."
+    },
     "back": "Atgal",
     "next": "Toliau",
     "send": "Siųsti",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Renginys baigėsi. Žemiau rasite statistiką ir, jei renginys buvo įrašytas, įrašą ir ataskaitą.",
     "endLinks": {
-      "after": "Įrašas ir ataskaita",
+      "after": "Užbaigti renginį",
       "stats": "Renginio statistika",
       "publicPage": "Viešasis renginio puslapis"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Palaikomi formatai: PNG, JPEG, WebP, SVG, GIF — iki 10 MB",
       "helpAudio": "Palaikomi formatai: MP3, WAV, OGG, M4A, WebM — iki 20 MB",
       "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB",
-      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL."
+      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL.",
+      "externalImage": "Kitų svetainių vaizdai portalo puslapiuose nerodomi.",
+      "externalImageUpload": "Įkelkite failą iš savo įrenginio.",
+      "cropHelp": "Kitokio formato paveikslėlis čia apkarpomas prieš įkeliant.",
+      "crop": {
+        "title": "Paveikslėlio apkarpymas",
+        "intro": "Vilkite paveikslėlį, kad pasirinktumėte rodomą dalį; slankikliu galite jį padidinti.",
+        "frame": "Apkarpymo rėmelis",
+        "keys": "Klaviatūra: rodyklės perkelia paveikslėlį (su Shift didesniais žingsniais), + ir − jį padidina ir sumažina.",
+        "zoom": "Mastelis",
+        "size": "Bus išsaugotas {width} × {height} pikselių dydžiu.",
+        "small": "Paveikslėlis mažas: puslapyje jis gali atrodyti neryškus.",
+        "error": "Šio paveikslėlio nepavyksta nuskaityti: pabandykite kitą failą.",
+        "cancel": "Atšaukti",
+        "confirm": "Naudoti šį apkarpymą",
+        "encodeError": "Nepavyko paruošti apkarpymo: bandykite dar kartą."
+      }
     },
     "rubricaPicker": {
       "loading": "Ieškoma…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Laukai, pažymėti *, reikalingi renginiui išsaugoti: kol jie tušti, tai nurodyta prie kiekvieno.",
         "kickerHint": "Norėdami pridėti antraštę virš pavadinimo, parašykite ją prieš pavadinimą ir atskirkite ženklu |, pavyzdžiui, „Susitikimų ciklas | Pirmasis susitikimas“.",
         "kickerUse": "Rodyti „{kicker}“ virš pavadinimo",
-        "kickerPreview": "Taip atrodo renginio puslapyje"
+        "kickerPreview": "Taip atrodo renginio puslapyje",
+        "coverImageSize": "Rekomenduojamas dydis: 1600 × 900 pikselių (16:9)."
       },
       "step2": {
         "heading": "Kas ką gali daryti",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organizacija",
         "askRole": "pareigos",
         "askType": "organizacijos tipas"
+      },
+      "preview": {
+        "title": "Puslapio peržiūra",
+        "open": "Atidaryti peržiūrą",
+        "note": "Taip atrodo renginio puslapis; jis atsinaujina jums rašant.",
+        "noteNoDate": "Taip atrodo renginio puslapis; kol nenurodyta data, laikas yra tik pavyzdys.",
+        "titlePlaceholder": "Renginio pavadinimas",
+        "descriptionPlaceholder": "Čia bus rodomas aprašymas."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Slėpti",
       "warning": "Kiekvienas, turintis šią nuorodą, administruoja renginį: nerodykite jos bendrinant ekraną ir neįklijuokite jos į pokalbį.",
       "hidden": "Nuoroda paslėpta",
-      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka."
+      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka.",
+      "notYetPublished": "Veikia tik po paskelbimo: iki tol rodoma „puslapis nerastas“."
     },
     "feedbackAdmin": {
       "title": "Atsiliepimų rezultatai",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Laukiamasis (svetainės numatytasis)",
         "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
         "waitingRoomEngineClassic": "Klasikinis (statinis)",
-        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}."
+        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}.",
+        "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
       },
       "watermark": {
         "title": "Vaizdo tinkinimas",
@@ -1953,8 +1989,7 @@
         "min": "Patikrinkite „{field}“: mažiausia reikšmė yra {min}.",
         "max": "Patikrinkite „{field}“: didžiausia reikšmė yra {max}.",
         "field": "Patikrinkite „{field}“: reikšmė netinkama."
-      },
-      "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
+      }
     },
     "analytics": {
       "title": "Statistika",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Registracijos",
         "ofMax": "{current} iš {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Priminimų nesukonfigūruota",
         "tags": "Žymos",
         "postEventSummary": "{connected} prisijungė iš {registered} užsiregistravusių (numatyta {estimated})",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Apdorojama",
       "statusPartial": "Iš dalies apdorota",
       "statusDone": "Apdorota",
-      "statusFailed": "Apdorojimas nepavyko"
+      "statusFailed": "Apdorojimas nepavyko",
+      "manageBackToEvent": "Grįžti į renginį"
     },
     "questionnairesPage": {
       "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Organizuojančios institucijos",
       "organizersEdit": "Redaguoti institucijas",
       "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja."
+    },
+    "closing": {
+      "title": "Užbaigti renginį",
+      "intro": "Kas dar liko padaryti, kad nedalyvavusieji rastų viską, o dalyviai galėtų pasakyti, kaip sekėsi.",
+      "summaryTodo": "{count, plural, one {# likusi užduotis} few {# likusios užduotys} many {# likusios užduoties} other {# likusių užduočių}}",
+      "summaryDone": "Viskas atlikta",
+      "loading": "Tikrinama, kas dar liko padaryti…",
+      "error": "Nepavyko nuskaityti, kas dar liko padaryti: įkelkite puslapį iš naujo.",
+      "stato": {
+        "fatto": "Atlikta",
+        "daFare": "Reikia atlikti",
+        "inCorso": "Vykdoma",
+        "nonServe": "Nereikia"
+      },
+      "azioni": {
+        "apri": "Atidaryti",
+        "rivedi": "Peržiūrėti transkripciją",
+        "materiali": "Eiti į medžiagą"
+      },
+      "registrazione": {
+        "title": "Įrašas",
+        "pubblicata": "Paskelbtas.",
+        "daPubblicare": "Vaizdo įrašas paruoštas: paskelbkite jį nedalyvavusiesiems.",
+        "inArrivo": "Jei renginys buvo įrašytas, failas atkeliauja praėjus kelioms minutėms po pabaigos.",
+        "spenta": "Įrašymas nebuvo numatytas.",
+        "nessunFile": "Vaizdo įrašo nėra: renginys nebuvo įrašytas arba failas neatkeliavo."
+      },
+      "trascrizione": {
+        "title": "Transkripcija",
+        "pubblicata": "Paskelbta.",
+        "prontaAi": "Parengta pogamybos metu: peržiūrėkite ją; ji skelbiama kartu su vaizdo įrašu.",
+        "prontaSottotitoli": "Parengta iš subtitrų: patikrinkite vardus ir paskelbkite.",
+        "inLavorazione": "Apdorojama.",
+        "nessuna": "Nėra: nei subtitrų, nei pogamybos.",
+        "soloStaff": "Ją peržiūri ir paskelbia renginio organizatorius administravimo srityje.",
+        "nonPiu": "Nebegalima keisti: renginys suarchyvuotas arba baigėsi jo duomenų saugojimo laikas."
+      },
+      "resoconto": {
+        "title": "Ataskaita",
+        "pubblicato": "Paskelbta.",
+        "daPubblicare": "Sugeneruota: perskaitykite ir paskelbkite.",
+        "daGenerare": "Reikia sugeneruoti iš transkripcijos, pokalbio ir įvertinimų.",
+        "inLavorazione": "Apdorojama.",
+        "senzaPipeline": "DI pogamyba šiame diegime neįjungta.",
+        "soloStaff": "Ją sugeneruoja ir paskelbia renginio organizatorius administravimo srityje.",
+        "nonPiu": "Nebegalima keisti: renginys suarchyvuotas arba baigėsi jo duomenų saugojimo laikas."
+      },
+      "sala": {
+        "title": "Kas vyko kambaryje",
+        "rivista": "Žinutės: {messaggi} · klausimai: {domande} · apklausos: {sondaggi} · Vienu žodžiu: {nuvole}.",
+        "vuota": "Pokalbis, klausimai, apklausos ir žodžiai nebuvo naudojami.",
+        "inSospeso": "Neatsakyti klausimai: {domandeInSospeso}. Pažymėkite juos kaip atsakytus arba atmeskite."
+      },
+      "materiali": {
+        "title": "Medžiaga nedalyvavusiesiems",
+        "presenti": "Matoma po renginio: {materiali}.",
+        "nessuno": "Po renginio nieko nematyti: pridėkite pranešėjų skaidres ar dokumentus, jei jų yra.",
+        "nascosti": "Yra medžiagos ({materiali}), tačiau viešajame puslapyje medžiaga nerodoma: įjunkite jos rodymą nustatymuose, skirtuose laikui po renginio."
+      },
+      "valutazioni": {
+        "title": "Įvertinimai",
+        "emailInviata": "El. laiškas su prašymu įvertinti išsiųstas. Atsakymai: {valutazioni}.",
+        "emailInPartenza": "El. laiškas su prašymu įvertinti netrukus bus išsiųstas dalyviams. Atsakymai: {valutazioni}.",
+        "emailSpenta": "El. laiškas su prašymu įvertinti išjungtas: jį galima įjungti iki savaitės po pabaigos. Atsakymai: {valutazioni}.",
+        "raccolte": "Atsakymai: {valutazioni}.",
+        "spente": "Šiam renginiui neįjungti."
+      },
+      "pagina": {
+        "title": "Viešasis puslapis",
+        "visibile": "Matomas visiems.",
+        "nellaLibreria": "Matomas visiems ir vaizdo įrašų bibliotekoje.",
+        "privata": "Atšauktas: visuomenė jo nemato.",
+        "scaduta": "Nebematomas: galiojimo data praėjo.",
+        "archiviato": "Renginys suarchyvuotas: puslapis nėra viešas.",
+        "libreriaSenzaVideo": "Matomas visiems; vaizdo įrašų bibliotekoje jis atsiras, kai vaizdo įrašas bus paskelbtas."
+      }
+    },
+    "roomReview": {
+      "title": "Kas vyko kambaryje",
+      "intro": "Peržiūrėkite, kas buvo parašyta ir paklausta: paslėpkite tai, kas neturi likti, užbaikite klausimus, paskelbkite apklausų rezultatus. Viešojo puslapio suvestinė atnaujinama po kiekvieno pakeitimo.",
+      "tabs": {
+        "chat": "Pokalbis",
+        "qa": "Klausimai",
+        "polls": "Apklausos",
+        "words": "Vienu žodžiu"
+      },
+      "loading": "Įkeliama…",
+      "error": "Nepavyko nuskaityti šios dalies: bandykite vėliau.",
+      "actionError": "Veiksmas nepavyko: bandykite dar kartą.",
+      "chat": {
+        "empty": "Nėra žinučių.",
+        "limit": "Rodoma paskutinių žinučių: {count}.",
+        "question": "Klausimas",
+        "moderator": "Vedėjas",
+        "hide": "Slėpti",
+        "hideFor": "Slėpti žinutę: {name}",
+        "hidden": "Žinutė paslėpta.",
+        "confirmTitle": "Paslėpti žinutę?",
+        "confirmBody": "Ji dings iš istorijos, eksporto ir suvestinės kartu su galimu priedu. Šio veiksmo atšaukti negalima."
+      },
+      "qa": {
+        "empty": "Nėra klausimų.",
+        "status": {
+          "PENDING": "Laukiama",
+          "HIGHLIGHTED": "Išskirtas",
+          "ANSWERED": "Atsakyta",
+          "DISMISSED": "Atmestas"
+        },
+        "markAnswered": "Pažymėti kaip atsakytą",
+        "dismiss": "Atmesti",
+        "fromChat": "iš pokalbio",
+        "votes": "Balsai: {count}",
+        "answeredOk": "Klausimas pažymėtas kaip atsakytas.",
+        "dismissedOk": "Klausimas atmestas.",
+        "limit": "Rodoma {count} pokalbyje pažymėtų klausimų: pirmiausia atviri, paskui naujausi uždaryti."
+      },
+      "polls": {
+        "empty": "Nėra apklausų.",
+        "status": {
+          "OPEN": "Atvira",
+          "CLOSED": "Uždaryta: rezultatai nevieši",
+          "PUBLISHED": "Rezultatai paskelbti"
+        },
+        "votes": "Balsai: {count}",
+        "publish": "Paskelbti rezultatus",
+        "published": "Rezultatai paskelbti."
+      },
+      "words": {
+        "empty": "Nėra žodžių.",
+        "prompt": "Klausimas: {prompt}",
+        "people": "Žmonių: {count}",
+        "hide": "Slėpti",
+        "hideFor": "Slėpti „{word}“",
+        "hidden": "Žodis paslėptas.",
+        "confirmTitle": "Paslėpti žodį?",
+        "confirmBody": "Jis dings iš debesies ir suvestinės. Šio veiksmo atšaukti negalima.",
+        "round": "Raundas: {date}"
+      },
+      "recap": {
+        "button": "Atnaujinti viešąją suvestinę",
+        "done": "Viešoji suvestinė atnaujinta.",
+        "notPossible": "Suvestinės nebegalima atnaujinti: renginys nesibaigė arba baigėsi jo duomenų saugojimo laikas.",
+        "error": "Atnaujinti nepavyko: bandykite dar kartą."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Dar # renginys} few {Dar # renginiai} many {Dar # renginio} other {Dar # renginių}}",
     "noEvents": "Šiuo laikotarpiu renginių nėra",
-    "weekShort": "Sav."
+    "legend": {
+      "title": "Žymos",
+      "noTag": "Be žymos"
+    },
+    "popover": {
+      "open": "Atverti renginio puslapį",
+      "manage": "Tvarkyti renginį",
+      "publicPage": "Viešasis puslapis",
+      "registrations": "{count, plural, =0 {registracijų nėra} one {# registracija} few {# registracijos} many {# registracijos} other {# registracijų}}"
+    }
   },
   "footer": {
     "privacy": "Privatumo politika",

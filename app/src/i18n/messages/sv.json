@@ -59,6 +59,15 @@
     "cancel": "Avbryt",
     "confirm": "Bekräfta",
     "close": "Stäng",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kod: {name}",
+      "alt": "QR-kod för länken ”{name}”",
+      "hint": "Skanna den med telefonens kamera för att öppna länken.",
+      "download": "Ladda ned (SVG)",
+      "error": "QR-koden kunde inte skapas. Ladda om sidan och försök igen; under tiden kan du kopiera länken."
+    },
     "back": "Tillbaka",
     "next": "Nästa",
     "send": "Skicka",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Evenemanget är slut. Nedan hittar du statistiken och, om det spelades in, inspelningen och rapporten.",
     "endLinks": {
-      "after": "Inspelning och rapport",
+      "after": "Avsluta evenemanget",
       "stats": "Statistik för evenemanget",
       "publicPage": "Evenemangets offentliga sida"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Format som stöds: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Format som stöds: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället."
+      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället.",
+      "externalImage": "Bilder från andra webbplatser visas inte på portalens sidor.",
+      "externalImageUpload": "Ladda upp filen från din enhet.",
+      "cropHelp": "En bild i ett annat format beskärs här, innan den laddas upp.",
+      "crop": {
+        "title": "Beskär bilden",
+        "intro": "Dra i bilden för att välja vilken del som ska visas; med reglaget zoomar du in.",
+        "frame": "Beskärningsram",
+        "keys": "Med tangentbordet: piltangenterna flyttar bilden (med Skift i långa steg), + och − zoomar in och ut.",
+        "zoom": "Zoom",
+        "size": "Den sparas i {width} × {height} pixlar.",
+        "small": "Bilden är liten: på sidan kan den se suddig ut.",
+        "error": "Bilden kan inte läsas: prova med en annan fil.",
+        "cancel": "Avbryt",
+        "confirm": "Använd den här beskärningen",
+        "encodeError": "Beskärningen kunde inte förberedas: försök igen."
+      }
     },
     "rubricaPicker": {
       "loading": "Söker…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Fält markerade med * behövs för att spara evenemanget: så länge de är tomma står det vid varje fält.",
         "kickerHint": "För en överrubrik skriver du den före titeln och skiljer dem åt med |, till exempel ”Mötesserie | Det första mötet”.",
         "kickerUse": "Visa ”{kicker}” som överrubrik",
-        "kickerPreview": "Så här ser den ut på evenemangssidan"
+        "kickerPreview": "Så här ser den ut på evenemangssidan",
+        "coverImageSize": "Rekommenderat format: 1600 × 900 pixlar (16:9)."
       },
       "step2": {
         "heading": "Vem får göra vad",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organisation",
         "askRole": "roll",
         "askType": "typ av organisation"
+      },
+      "preview": {
+        "title": "Förhandsvisning av sidan",
+        "open": "Öppna förhandsvisningen",
+        "note": "Så här ser evenemangets sida ut; den uppdateras medan du skriver.",
+        "noteNoDate": "Så här ser evenemangets sida ut; så länge datumet saknas är tiden bara ett exempel.",
+        "titlePlaceholder": "Evenemangets titel",
+        "descriptionPlaceholder": "Här visas beskrivningen."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Dölj",
       "warning": "Alla som har den här länken administrerar evenemanget: visa den inte när du delar skärm och klistra inte in den i en chatt.",
       "hidden": "Länken är dold",
-      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt."
+      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt.",
+      "notYetPublished": "Fungerar först efter publiceringen: tills dess visas ”sidan hittades inte”."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultat",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Väntrum (webbplatsens standard)",
         "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
         "waitingRoomEngineClassic": "Klassiskt (statiskt)",
-        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen."
+        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen.",
+        "primaryColorHex": "Primärfärg (hexkod)"
       },
       "watermark": {
         "title": "Videoanpassning",
@@ -1953,8 +1989,7 @@
         "min": "Kontrollera ”{field}”: minimivärdet är {min}.",
         "max": "Kontrollera ”{field}”: maxvärdet är {max}.",
         "field": "Kontrollera ”{field}”: värdet är ogiltigt."
-      },
-      "primaryColorHex": "Primärfärg (hexkod)"
+      }
     },
     "analytics": {
       "title": "Statistik",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Anmälningar",
         "ofMax": "{current} av {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Inga påminnelser konfigurerade",
         "tags": "Taggar",
         "postEventSummary": "{connected} anslutna av {registered} anmälda ({estimated} förväntade)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Bearbetas",
       "statusPartial": "Delvis bearbetad",
       "statusDone": "Bearbetad",
-      "statusFailed": "Bearbetningen misslyckades"
+      "statusFailed": "Bearbetningen misslyckades",
+      "manageBackToEvent": "Tillbaka till evenemanget"
     },
     "questionnairesPage": {
       "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Arrangerande organisationer",
       "organizersEdit": "Redigera organisationer",
       "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar."
+    },
+    "closing": {
+      "title": "Avsluta evenemanget",
+      "intro": "Det som återstår för att de som missade evenemanget ska hitta allt och de som deltog ska kunna säga hur det gick.",
+      "summaryTodo": "{count, plural, one {# uppgift kvar} other {# uppgifter kvar}}",
+      "summaryDone": "Allt klart",
+      "loading": "Kontrollerar vad som återstår…",
+      "error": "Det gick inte att läsa vad som återstår: ladda om sidan.",
+      "stato": {
+        "fatto": "Klart",
+        "daFare": "Att göra",
+        "inCorso": "Pågår",
+        "nonServe": "Behövs inte"
+      },
+      "azioni": {
+        "apri": "Öppna",
+        "rivedi": "Granska transkriptionen",
+        "materiali": "Gå till materialet"
+      },
+      "registrazione": {
+        "title": "Inspelning",
+        "pubblicata": "Publicerad.",
+        "daPubblicare": "Videon är klar: publicera den för dem som missade evenemanget.",
+        "inArrivo": "Om evenemanget spelades in kommer filen några minuter efter slutet.",
+        "spenta": "Ingen inspelning var planerad.",
+        "nessunFile": "Ingen video: evenemanget spelades inte in, eller så kom filen inte fram."
+      },
+      "trascrizione": {
+        "title": "Transkription",
+        "pubblicata": "Publicerad.",
+        "prontaAi": "Klar från efterbearbetningen: granska den; den publiceras tillsammans med videon.",
+        "prontaSottotitoli": "Klar från textningen: kontrollera namnen och publicera den.",
+        "inLavorazione": "Bearbetas.",
+        "nessuna": "Saknas: varken textning eller efterbearbetning.",
+        "soloStaff": "Evenemangets arrangör granskar och publicerar den i administrationen.",
+        "nonPiu": "Kan inte längre ändras: evenemanget är arkiverat eller lagringstiden för dess data har löpt ut."
+      },
+      "resoconto": {
+        "title": "Rapport",
+        "pubblicato": "Publicerad.",
+        "daPubblicare": "Genererad: läs igenom och publicera den.",
+        "daGenerare": "Ska genereras utifrån transkriptionen, chatten och omdömena.",
+        "inLavorazione": "Bearbetas.",
+        "senzaPipeline": "AI-efterbearbetning är inte aktiverad i den här installationen.",
+        "soloStaff": "Evenemangets arrangör genererar och publicerar den i administrationen.",
+        "nonPiu": "Kan inte längre ändras: evenemanget är arkiverat eller lagringstiden för dess data har löpt ut."
+      },
+      "sala": {
+        "title": "Vad som hände i rummet",
+        "rivista": "Meddelanden: {messaggi} · frågor: {domande} · omröstningar: {sondaggi} · Med ett ord: {nuvole}.",
+        "vuota": "Chatt, frågor, omröstningar och ord användes inte.",
+        "inSospeso": "Obesvarade frågor: {domandeInSospeso}. Markera dem som besvarade eller avfärda dem."
+      },
+      "materiali": {
+        "title": "Material för dem som missade evenemanget",
+        "presenti": "Synligt efter evenemanget: {materiali}.",
+        "nessuno": "Inget synligt efter evenemanget: lägg till talarnas bilder eller dokument, om det finns några.",
+        "nascosti": "Material: {materiali}, men den publika sidan visar inte material: slå på dem i inställningarna för tiden efter evenemanget."
+      },
+      "valutazioni": {
+        "title": "Omdömen",
+        "emailInviata": "E-postmeddelandet som ber om omdömen har skickats. Svar: {valutazioni}.",
+        "emailInPartenza": "E-postmeddelandet som ber om omdömen skickas snart till deltagarna. Svar: {valutazioni}.",
+        "emailSpenta": "E-postmeddelandet som ber om omdömen är avstängt: det kan slås på upp till en vecka efter slutet. Svar: {valutazioni}.",
+        "raccolte": "Svar: {valutazioni}.",
+        "spente": "Inte aktiverade för det här evenemanget."
+      },
+      "pagina": {
+        "title": "Publik sida",
+        "visibile": "Synlig för alla.",
+        "nellaLibreria": "Synlig för alla och i videobiblioteket.",
+        "privata": "Tillbakadragen: allmänheten ser den inte.",
+        "scaduta": "Inte längre synlig: utgångsdatumet har passerat.",
+        "archiviato": "Evenemanget är arkiverat: sidan är inte publik.",
+        "libreriaSenzaVideo": "Synlig för alla; den visas i videobiblioteket när videon har publicerats."
+      }
+    },
+    "roomReview": {
+      "title": "Vad som hände i rummet",
+      "intro": "Gå igenom vad som skrevs och frågades: dölj det som inte ska finnas kvar, stäng frågorna och publicera resultaten av omröstningarna. Sammanfattningen på den publika sidan uppdateras vid varje ändring.",
+      "tabs": {
+        "chat": "Chatt",
+        "qa": "Frågor",
+        "polls": "Omröstningar",
+        "words": "Med ett ord"
+      },
+      "loading": "Laddar…",
+      "error": "Det gick inte att läsa den här delen: försök igen senare.",
+      "actionError": "Åtgärden misslyckades: försök igen.",
+      "chat": {
+        "empty": "Inga meddelanden.",
+        "limit": "De senaste {count} meddelandena visas.",
+        "question": "Fråga",
+        "moderator": "Värd",
+        "hide": "Dölj",
+        "hideFor": "Dölj meddelandet från {name}",
+        "hidden": "Meddelandet är dolt.",
+        "confirmTitle": "Dölja meddelandet?",
+        "confirmBody": "Det försvinner från historiken, exporten och sammanfattningen, tillsammans med eventuell bifogad fil. Det går inte att ångra."
+      },
+      "qa": {
+        "empty": "Inga frågor.",
+        "status": {
+          "PENDING": "Väntande",
+          "HIGHLIGHTED": "Markerad",
+          "ANSWERED": "Besvarad",
+          "DISMISSED": "Avvisad"
+        },
+        "markAnswered": "Markera som besvarad",
+        "dismiss": "Avvisa",
+        "fromChat": "från chatten",
+        "votes": "Röster: {count}",
+        "answeredOk": "Frågan har markerats som besvarad.",
+        "dismissedOk": "Frågan har avvisats.",
+        "limit": "Visar {count} frågor som markerats i chatten: först de öppna, sedan de senast stängda."
+      },
+      "polls": {
+        "empty": "Inga omröstningar.",
+        "status": {
+          "OPEN": "Öppen",
+          "CLOSED": "Stängd: resultaten är inte offentliga",
+          "PUBLISHED": "Resultaten publicerade"
+        },
+        "votes": "Röster: {count}",
+        "publish": "Publicera resultaten",
+        "published": "Resultaten har publicerats."
+      },
+      "words": {
+        "empty": "Inga ord.",
+        "prompt": "Fråga: {prompt}",
+        "people": "Personer: {count}",
+        "hide": "Dölj",
+        "hideFor": "Dölj ”{word}”",
+        "hidden": "Ordet är dolt.",
+        "confirmTitle": "Dölja ordet?",
+        "confirmBody": "Det försvinner från ordmolnet och sammanfattningen. Det går inte att ångra.",
+        "round": "Omgången den {date}"
+      },
+      "recap": {
+        "button": "Uppdatera den publika sammanfattningen",
+        "done": "Den publika sammanfattningen är uppdaterad.",
+        "notPossible": "Sammanfattningen kan inte längre uppdateras: evenemanget har inte avslutats eller lagringstiden för dess data har löpt ut.",
+        "error": "Uppdateringen misslyckades: försök igen."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Ett evenemang till} other {# evenemang till}}",
     "noEvents": "Inga evenemang under den här perioden",
-    "weekShort": "V."
+    "legend": {
+      "title": "Taggar",
+      "noTag": "Utan tagg"
+    },
+    "popover": {
+      "open": "Öppna evenemangets sida",
+      "manage": "Hantera evenemanget",
+      "publicPage": "Publik sida",
+      "registrations": "{count, plural, =0 {inga anmälningar} one {# anmälan} other {# anmälningar}}"
+    }
   },
   "footer": {
     "privacy": "Integritetspolicy",

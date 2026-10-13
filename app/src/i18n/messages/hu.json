@@ -59,6 +59,15 @@
     "cancel": "Mégse",
     "confirm": "Megerősítés",
     "close": "Bezárás",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR-kód: {name}",
+      "alt": "QR-kód a(z) „{name}” hivatkozáshoz",
+      "hint": "Olvassa be a telefon kamerájával a hivatkozás megnyitásához.",
+      "download": "Letöltés (SVG)",
+      "error": "A QR-kódot nem sikerült létrehozni. Töltse be újra az oldalt, és próbálja újra; addig is kimásolhatja a hivatkozást."
+    },
     "back": "Vissza",
     "next": "Tovább",
     "send": "Küldés",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "Az esemény véget ért. Lent megtalálja a statisztikákat, és ha rögzítették, a felvételt és a beszámolót.",
     "endLinks": {
-      "after": "Felvétel és beszámoló",
+      "after": "Az esemény lezárása",
       "stats": "Az esemény statisztikái",
       "publicPage": "Az esemény nyilvános oldala"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Támogatott formátumok: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Támogatott formátumok: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
       "helpDocument": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
-      "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét."
+      "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét.",
+      "externalImage": "Más oldalakról származó képek nem jelennek meg a portál oldalain.",
+      "externalImageUpload": "Töltsd fel a fájlt az eszközödről.",
+      "cropHelp": "Az eltérő arányú képet itt vághatja körül a feltöltés előtt.",
+      "crop": {
+        "title": "Kép körülvágása",
+        "intro": "Húzza a képet a megjelenítendő rész kiválasztásához; a csúszkával nagyíthatja.",
+        "frame": "Körülvágási keret",
+        "keys": "Billentyűzettel: a nyilak mozgatják a képet (Shifttel nagyobb lépésekben), a + és a − nagyítja és kicsinyíti.",
+        "zoom": "Nagyítás",
+        "size": "{width} × {height} képpontos méretben lesz mentve.",
+        "small": "A kép kicsi: az oldalon szemcsésnek tűnhet.",
+        "error": "Ez a kép nem olvasható be: próbálkozzon másik fájllal.",
+        "cancel": "Mégse",
+        "confirm": "Kivágás alkalmazása",
+        "encodeError": "A kivágást nem sikerült előkészíteni: próbálja újra."
+      }
     },
     "rubricaPicker": {
       "loading": "Keresés folyamatban…",
@@ -813,7 +838,8 @@
         "requiredLegend": "A *-gal jelölt mezők az esemény mentéséhez kellenek: amíg üresek, mindegyiknél jelezzük.",
         "kickerHint": "Felülcímhez írja a cím elé, és válassza el őket | jellel, például „Találkozósorozat | Az első találkozó”.",
         "kickerUse": "„{kicker}” megjelenítése felülcímként",
-        "kickerPreview": "Így jelenik meg az esemény oldalán"
+        "kickerPreview": "Így jelenik meg az esemény oldalán",
+        "coverImageSize": "Ajánlott méret: 1600 × 900 képpont (16:9)."
       },
       "step2": {
         "heading": "Ki mit tehet",
@@ -1107,6 +1133,14 @@
         "askOrganization": "szervezet",
         "askRole": "beosztás",
         "askType": "szervezet típusa"
+      },
+      "preview": {
+        "title": "Az oldal előnézete",
+        "open": "Előnézet megnyitása",
+        "note": "Így jelenik meg az esemény oldala; gépelés közben frissül.",
+        "noteNoDate": "Így jelenik meg az esemény oldala; amíg nincs megadva dátum, az időpont csak példa.",
+        "titlePlaceholder": "Az esemény címe",
+        "descriptionPlaceholder": "Itt jelenik meg a leírás."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Elrejtés",
       "warning": "Aki rendelkezik ezzel a hivatkozással, az kezeli az eseményt: ne jelenítse meg képernyőmegosztás közben, és ne illessze be csevegésbe.",
       "hidden": "A hivatkozás rejtve van",
-      "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel."
+      "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel.",
+      "notYetPublished": "Csak a közzététel után működik: addig „az oldal nem található” üzenet jelenik meg."
     },
     "feedbackAdmin": {
       "title": "Visszajelzés eredményei",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Váróterem (a webhely alapértelmezése)",
         "waitingRoomEngineGame": "Videojáték (Phaser lobby)",
         "waitingRoomEngineClassic": "Klasszikus (statikus)",
-        "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel."
+        "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel.",
+        "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
       },
       "watermark": {
         "title": "Videó testreszabás",
@@ -1953,8 +1989,7 @@
         "min": "Ellenőrizze ezt: „{field}”: a legkisebb érték {min}.",
         "max": "Ellenőrizze ezt: „{field}”: a legnagyobb érték {max}.",
         "field": "Ellenőrizze ezt: „{field}”: az érték érvénytelen."
-      },
-      "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
+      }
     },
     "analytics": {
       "title": "Statisztikák",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Jelentkezések",
         "ofMax": "{current} / {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nincs beállított emlékeztető",
         "tags": "Címkék",
         "postEventSummary": "{connected} csatlakozott a(z) {registered} regisztráltból ({estimated} várt)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Feldolgozás alatt",
       "statusPartial": "Részben feldolgozva",
       "statusDone": "Feldolgozva",
-      "statusFailed": "A feldolgozás sikertelen"
+      "statusFailed": "A feldolgozás sikertelen",
+      "manageBackToEvent": "Vissza az eseményhez"
     },
     "questionnairesPage": {
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Szervező intézmények",
       "organizersEdit": "Intézmények szerkesztése",
       "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi."
+    },
+    "closing": {
+      "title": "Az esemény lezárása",
+      "intro": "Mi van még hátra ahhoz, hogy akik nem voltak ott, mindent megtaláljanak, a résztvevők pedig elmondhassák, milyen volt.",
+      "summaryTodo": "{count, plural, one {# hátralévő teendő} other {# hátralévő teendő}}",
+      "summaryDone": "Minden kész",
+      "loading": "A hátralévő teendők ellenőrzése…",
+      "error": "Nem sikerült beolvasni a hátralévő teendőket: töltse újra az oldalt.",
+      "stato": {
+        "fatto": "Kész",
+        "daFare": "Teendő",
+        "inCorso": "Folyamatban",
+        "nonServe": "Nem szükséges"
+      },
+      "azioni": {
+        "apri": "Megnyitás",
+        "rivedi": "Átirat áttekintése",
+        "materiali": "Ugrás az anyagokhoz"
+      },
+      "registrazione": {
+        "title": "Felvétel",
+        "pubblicata": "Közzétéve.",
+        "daPubblicare": "A videó elkészült: tegye közzé azoknak, akik nem voltak ott.",
+        "inArrivo": "Ha készült felvétel, a fájl néhány perccel a befejezés után érkezik.",
+        "spenta": "Felvétel nem volt tervezve.",
+        "nessunFile": "Nincs videó: nem készült felvétel, vagy a fájl nem érkezett meg."
+      },
+      "trascrizione": {
+        "title": "Átirat",
+        "pubblicata": "Közzétéve.",
+        "prontaAi": "Elkészült az utómunkából: tekintse át; a videóval együtt kerül közzétételre.",
+        "prontaSottotitoli": "Elkészült a feliratokból: ellenőrizze a neveket, és tegye közzé.",
+        "inLavorazione": "Feldolgozás alatt.",
+        "nessuna": "Nincs: sem felirat, sem utómunka nem készült.",
+        "soloStaff": "Az esemény szervezője tekinti át és teszi közzé az adminisztrációs felületen.",
+        "nonPiu": "Már nem módosítható: az esemény archiválva van, vagy lejárt az adatainak megőrzési ideje."
+      },
+      "resoconto": {
+        "title": "Beszámoló",
+        "pubblicato": "Közzétéve.",
+        "daPubblicare": "Elkészült: olvassa át, és tegye közzé.",
+        "daGenerare": "Még el kell készíteni az átiratból, a csevegésből és az értékelésekből.",
+        "inLavorazione": "Feldolgozás alatt.",
+        "senzaPipeline": "Az AI-utómunka ebben a telepítésben nincs bekapcsolva.",
+        "soloStaff": "Az esemény szervezője készíti el és teszi közzé az adminisztrációs felületen.",
+        "nonPiu": "Már nem módosítható: az esemény archiválva van, vagy lejárt az adatainak megőrzési ideje."
+      },
+      "sala": {
+        "title": "Mi történt a teremben",
+        "rivista": "Üzenetek: {messaggi} · kérdések: {domande} · szavazások: {sondaggi} · Egy szóval: {nuvole}.",
+        "vuota": "A csevegést, a kérdéseket, a szavazásokat és a szavakat nem használták.",
+        "inSospeso": "Megválaszolatlan kérdések: {domandeInSospeso}. Jelölje meg őket megválaszoltként, vagy vesse el őket."
+      },
+      "materiali": {
+        "title": "Anyagok azoknak, akik nem voltak ott",
+        "presenti": "Az esemény után látható: {materiali}.",
+        "nessuno": "Az esemény után semmi sem látható: adja hozzá az előadók diáit vagy dokumentumait, ha vannak.",
+        "nascosti": "Anyagok: {materiali}, de a nyilvános oldal nem jeleníti meg az anyagokat: kapcsolja be őket az esemény utáni időszak beállításaiban."
+      },
+      "valutazioni": {
+        "title": "Értékelések",
+        "emailInviata": "Az értékelést kérő e-mail elment. Válaszok: {valutazioni}.",
+        "emailInPartenza": "Az értékelést kérő e-mail hamarosan elmegy a résztvevőknek. Válaszok: {valutazioni}.",
+        "emailSpenta": "Az értékelést kérő e-mail ki van kapcsolva: a befejezés után legfeljebb egy hétig bekapcsolható. Válaszok: {valutazioni}.",
+        "raccolte": "Válaszok: {valutazioni}.",
+        "spente": "Ennél az eseménynél nincs bekapcsolva."
+      },
+      "pagina": {
+        "title": "Nyilvános oldal",
+        "visibile": "Mindenki számára látható.",
+        "nellaLibreria": "Mindenki számára látható, és a videótárban is szerepel.",
+        "privata": "Visszavonva: a nyilvánosság nem látja.",
+        "scaduta": "Már nem látható: a lejárati dátum elmúlt.",
+        "archiviato": "Az esemény archiválva: az oldal nem nyilvános.",
+        "libreriaSenzaVideo": "Mindenki számára látható; a videótárban akkor jelenik meg, amikor a videót közzéteszik."
+      }
+    },
+    "roomReview": {
+      "title": "Mi történt a teremben",
+      "intro": "Tekintse át, mit írtak és kérdeztek: rejtse el, aminek nem kell megmaradnia, zárja le a kérdéseket, tegye közzé a szavazások eredményeit. A nyilvános oldal összegzése minden módosítással frissül.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Kérdések",
+        "polls": "Szavazások",
+        "words": "Egy szóval"
+      },
+      "loading": "Betöltés…",
+      "error": "Ezt a részt nem sikerült beolvasni: próbálja újra később.",
+      "actionError": "A művelet nem sikerült: próbálja újra.",
+      "chat": {
+        "empty": "Nincsenek üzenetek.",
+        "limit": "Az utolsó {count} üzenet látható.",
+        "question": "Kérdés",
+        "moderator": "Moderálás",
+        "hide": "Elrejtés",
+        "hideFor": "{name} üzenetének elrejtése",
+        "hidden": "Üzenet elrejtve.",
+        "confirmTitle": "Elrejti az üzenetet?",
+        "confirmBody": "Eltűnik az előzményekből, az exportból és az összegzésből, az esetleges melléklettel együtt. A művelet nem vonható vissza."
+      },
+      "qa": {
+        "empty": "Nincsenek kérdések.",
+        "status": {
+          "PENDING": "Várakozó",
+          "HIGHLIGHTED": "Kiemelt",
+          "ANSWERED": "Megválaszolva",
+          "DISMISSED": "Elutasítva"
+        },
+        "markAnswered": "Megjelölés megválaszoltként",
+        "dismiss": "Elutasítás",
+        "fromChat": "a chatből",
+        "votes": "Szavazatok: {count}",
+        "answeredOk": "A kérdés megválaszoltként megjelölve.",
+        "dismissedOk": "A kérdés elutasítva.",
+        "limit": "A csevegésben megjelölt {count} kérdés látható: először a nyitottak, majd a legutóbb lezártak."
+      },
+      "polls": {
+        "empty": "Nincsenek szavazások.",
+        "status": {
+          "OPEN": "Nyitott",
+          "CLOSED": "Lezárt: az eredmények nem nyilvánosak",
+          "PUBLISHED": "Eredmények közzétéve"
+        },
+        "votes": "Szavazatok: {count}",
+        "publish": "Eredmények közzététele",
+        "published": "Eredmények közzétéve."
+      },
+      "words": {
+        "empty": "Nincsenek szavak.",
+        "prompt": "Kérdés: {prompt}",
+        "people": "Személyek: {count}",
+        "hide": "Elrejtés",
+        "hideFor": "„{word}” elrejtése",
+        "hidden": "Szó elrejtve.",
+        "confirmTitle": "Elrejti a szót?",
+        "confirmBody": "Eltűnik a felhőből és az összegzésből. A művelet nem vonható vissza.",
+        "round": "Kör: {date}"
+      },
+      "recap": {
+        "button": "A nyilvános összegzés frissítése",
+        "done": "A nyilvános összegzés frissítve.",
+        "notPossible": "Az összegzés már nem frissíthető: az esemény nem ért véget, vagy lejárt az adatainak megőrzési ideje.",
+        "error": "A frissítés nem sikerült: próbálja újra."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Még egy esemény} other {Még # esemény}}",
     "noEvents": "Ebben az időszakban nincs esemény",
-    "weekShort": "Hét"
+    "legend": {
+      "title": "Címkék",
+      "noTag": "Címke nélkül"
+    },
+    "popover": {
+      "open": "Az esemény oldalának megnyitása",
+      "manage": "Az esemény kezelése",
+      "publicPage": "Nyilvános oldal",
+      "registrations": "{count, plural, =0 {nincs regisztráció} one {# regisztráció} other {# regisztráció}}"
+    }
   },
   "footer": {
     "privacy": "Adatvédelmi tájékoztató",

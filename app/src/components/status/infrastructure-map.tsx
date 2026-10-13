@@ -17,7 +17,7 @@ const STATUS_COLORS: Record<string, string> = {
   standby: 'var(--app-muted)',
   scaling: 'var(--app-primary)',
   // Non monitorato: né bene né male, nessun colore d'allarme.
-  unknown: '#5A768A',
+  unknown: '#516B7E',
 };
 
 const STATUS_BG: Record<string, string> = {
@@ -270,7 +270,9 @@ export default function InfrastructureMap() {
           visible above the diagram even if verdict cards expand the
           outer container. */}
       <div className="infra-map__canvas" onClick={() => setSelected(null)}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="infra-map__svg" role="img" aria-label={t('ariaLabel')}>
+        {/* Un gruppo, non un'immagine: i servizi dentro si aprono da tastiera,
+            e dentro un role="img" sparirebbero per chi usa un lettore. */}
+        <svg viewBox={`0 0 ${W} ${H}`} className="infra-map__svg" role="group" aria-label={t('ariaLabel')}>
           <defs>
             <filter id="infraShadow">
               <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.07" />
@@ -429,7 +431,7 @@ export default function InfrastructureMap() {
             const p = LAYOUT[svc.id];
             if (!p) return null;
             const hi = isHighlighted(svc.id);
-            const sc = STATUS_COLORS[svc.status] ?? '#5A768A';
+            const sc = STATUS_COLORS[svc.status] ?? '#516B7E';
             const bg = hi ? (STATUS_BG[svc.status] ?? '#eceff1') : '#fff';
             const iconPath = SERVICE_ICONS[svc.id] ?? SERVICE_ICONS.app ?? '';
             const halfW = NODE_W / 2;
@@ -591,7 +593,7 @@ export default function InfrastructureMap() {
                 </thead>
                 <tbody>
                   {data.services.map((svc) => {
-                    const sc = STATUS_COLORS[svc.status] ?? '#5A768A';
+                    const sc = STATUS_COLORS[svc.status] ?? '#516B7E';
                     const svcName = resolveI18nKey(t, svc.name);
                     const verdictText = resolveI18nKey(t, svc.verdict);
                     const running = svc.replicas.running;
@@ -760,7 +762,7 @@ function VerdictCard({ service, t }: {
   service: InfraMapData['services'][0];
   t: ReturnType<typeof useTranslations<'infraMap'>>;
 }) {
-  const sc = STATUS_COLORS[service.status] ?? '#5A768A';
+  const sc = STATUS_COLORS[service.status] ?? '#516B7E';
   const svcName = resolveI18nKey(t, service.name);
   const verdictText = resolveI18nKey(t, service.verdict);
   const impactText = service.impact ? resolveI18nKey(t, service.impact) : null;
@@ -810,7 +812,7 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
   onClose: () => void;
 }) {
   const tc = useTranslations('common');
-  const sc = STATUS_COLORS[service.status] ?? '#5A768A';
+  const sc = STATUS_COLORS[service.status] ?? '#516B7E';
   const svcName = resolveI18nKey(t, service.name);
   const verdictText = resolveI18nKey(t, service.verdict);
 
@@ -826,7 +828,7 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
             <Badge style={{ backgroundColor: sc, fontSize: '0.68rem' }}>
               {t(`statuses.${service.status}` as Parameters<typeof t>[0])}
             </Badge>
-            <span style={{ fontSize: '0.7rem', color: '#5A768A' }}>{service.technicalName}</span>
+            <span style={{ fontSize: '0.7rem', color: '#516B7E' }}>{service.technicalName}</span>
           </div>
         </div>
         <button className="btn btn-sm btn-link text-muted p-0" onClick={onClose} aria-label={tc('close')}>&#10005;</button>
@@ -877,7 +879,7 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
                     {Math.round(Number(service.metadata.stressLevel) * 100)}%
                   </span>
                 </div>
-                <div className="progress" style={{ height: 6, borderRadius: 3 }}>
+                <div className="progress" aria-hidden="true" style={{ height: 6, borderRadius: 3 }}>
                   <div className="progress-bar" style={{ width: `${Number(service.metadata.stressLevel) * 100}%`, backgroundColor: sc, borderRadius: 3 }} />
                 </div>
               </div>

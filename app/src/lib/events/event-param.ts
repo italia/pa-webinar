@@ -8,6 +8,11 @@
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Il valore ha la forma di un UUID (identificativo di evento, registrazione…). */
+export function isUuid(value: string): boolean {
+  return UUID_RE.test(value);
+}
+
 /** Prisma `where` matching an event by id (if the param looks like a UUID) or slug. */
 export function eventParamWhere(param: string) {
   return UUID_RE.test(param)

@@ -59,6 +59,15 @@
     "cancel": "Annulla",
     "confirm": "Conferma",
     "close": "Chiudi",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "Codice QR: {name}",
+      "alt": "Codice QR del link «{name}»",
+      "hint": "Inquadralo con la fotocamera del telefono per aprire il link.",
+      "download": "Scarica (SVG)",
+      "error": "Il codice QR non si è potuto creare. Ricarica la pagina e riprova; intanto puoi copiare il link."
+    },
     "back": "Indietro",
     "next": "Avanti",
     "send": "Invia",
@@ -146,7 +155,7 @@
       "registered": "Sei iscritto",
       "enterEvent": "Entra nell'evento",
       "eventEnded": "Evento concluso",
-      "eventHeldOn": "Questo evento si è svolto il {date}",
+      "eventHeldOn": "Questo evento si è svolto {date}",
       "totalRegistrations": "{count} persone iscritte",
       "recording": "Registrazione disponibile",
       "noRecording": "La registrazione video non è disponibile per questo evento.",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "L'evento è concluso. Qui sotto trovi le statistiche e, se l'evento è stato registrato, la registrazione e il resoconto.",
     "endLinks": {
-      "after": "Registrazione e resoconto",
+      "after": "Chiudi l'evento",
       "stats": "Statistiche dell'evento",
       "publicPage": "Pagina pubblica dell'evento"
     },
@@ -885,7 +894,23 @@
       "helpImage": "Formati supportati: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file."
+      "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file.",
+      "externalImage": "Le immagini di altri siti non compaiono sulle pagine del portale.",
+      "externalImageUpload": "Carica il file dal tuo dispositivo.",
+      "cropHelp": "Un'immagine di altro formato si ritaglia qui, prima del caricamento.",
+      "crop": {
+        "title": "Ritaglia l'immagine",
+        "intro": "Trascina l'immagine per scegliere la parte da mostrare; con il cursore la ingrandisci.",
+        "frame": "Riquadro del ritaglio",
+        "keys": "Da tastiera: le frecce spostano l'immagine (con Maiusc a passi lunghi), + e − la ingrandiscono e la rimpiccioliscono.",
+        "zoom": "Ingrandimento",
+        "size": "Si salva a {width} × {height} pixel.",
+        "small": "È piccola: sulla pagina potrebbe vedersi sgranata.",
+        "error": "Questa immagine non si riesce a leggere: prova con un altro file.",
+        "cancel": "Annulla",
+        "confirm": "Usa questo ritaglio",
+        "encodeError": "Il ritaglio non si è potuto preparare: riprova."
+      }
     },
     "rubricaPicker": {
       "loading": "Ricerca in corso…",
@@ -948,7 +973,8 @@
         "requiredLegend": "I campi con * servono per salvare l'evento: finché sono vuoti lo vedi accanto a ciascuno.",
         "kickerHint": "Per un sopratitolo, scrivilo prima del titolo e separali con |, per esempio «Ciclo di incontri | Il primo appuntamento».",
         "kickerUse": "Mostra «{kicker}» come sopratitolo",
-        "kickerPreview": "Così appare sulla pagina dell'evento"
+        "kickerPreview": "Così appare sulla pagina dell'evento",
+        "coverImageSize": "Formato consigliato: 1600 × 900 pixel (16:9)."
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -1242,6 +1268,14 @@
         "askOrganization": "ente",
         "askRole": "ruolo",
         "askType": "tipo di ente"
+      },
+      "preview": {
+        "title": "Anteprima della pagina",
+        "open": "Apri l'anteprima",
+        "note": "Così appare la pagina dell'evento; si aggiorna mentre scrivi.",
+        "noteNoDate": "Così appare la pagina dell'evento; finché manca la data, l'orario è d'esempio.",
+        "titlePlaceholder": "Il titolo dell'evento",
+        "descriptionPlaceholder": "Qui comparirà la descrizione."
       }
     },
     "nav": {
@@ -1739,7 +1773,8 @@
       "hide": "Nascondi",
       "warning": "Chi ha questo link amministra l’evento: non mostrarlo in condivisione schermo e non incollarlo in chat.",
       "hidden": "Link nascosto",
-      "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano."
+      "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano.",
+      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata»."
     },
     "feedbackAdmin": {
       "title": "Risultati Feedback",
@@ -1941,7 +1976,8 @@
         "waitingRoomEngine": "Sala d'attesa (predefinita del sito)",
         "waitingRoomEngineGame": "Videogame (lobby Phaser)",
         "waitingRoomEngineClassic": "Classica (statica)",
-        "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo."
+        "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo.",
+        "primaryColorHex": "Colore primario (codice esadecimale)"
       },
       "watermark": {
         "title": "Personalizzazione video",
@@ -2088,8 +2124,7 @@
         "min": "Controlla «{field}»: il valore minimo è {min}.",
         "max": "Controlla «{field}»: il valore massimo è {max}.",
         "field": "Controlla «{field}»: il valore non è valido."
-      },
-      "primaryColorHex": "Colore primario (codice esadecimale)"
+      }
     },
     "analytics": {
       "title": "Statistiche",
@@ -2670,7 +2705,6 @@
       "sidebar": {
         "registrations": "Iscrizioni",
         "ofMax": "{current} su {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nessun promemoria configurato",
         "tags": "Tag",
         "postEventSummary": "{connected} connessi su {registered} iscritti (attesi {estimated})",
@@ -3093,7 +3127,8 @@
       "statusRunning": "In elaborazione",
       "statusPartial": "Elaborata in parte",
       "statusDone": "Elaborata",
-      "statusFailed": "Elaborazione non riuscita"
+      "statusFailed": "Elaborazione non riuscita",
+      "manageBackToEvent": "Torna all'evento"
     },
     "questionnairesPage": {
       "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
@@ -3411,6 +3446,150 @@
       "organizersTitle": "Enti organizzatori",
       "organizersEdit": "Modifica gli enti",
       "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
+    },
+    "closing": {
+      "title": "Chiudi l'evento",
+      "intro": "Cosa resta da fare perché chi non c'era trovi tutto e chi c'era possa dire com'è andata.",
+      "summaryTodo": "{count, plural, one {# cosa da completare} other {# cose da completare}}",
+      "summaryDone": "Tutto fatto",
+      "loading": "Controllo cosa resta da fare…",
+      "error": "Non riesco a leggere cosa resta da fare: ricarica la pagina.",
+      "stato": {
+        "fatto": "Fatto",
+        "daFare": "Da fare",
+        "inCorso": "In corso",
+        "nonServe": "Non serve"
+      },
+      "azioni": {
+        "apri": "Apri",
+        "rivedi": "Rivedi la trascrizione",
+        "materiali": "Vai ai materiali"
+      },
+      "registrazione": {
+        "title": "Registrazione",
+        "pubblicata": "Pubblicata.",
+        "daPubblicare": "Il video è pronto: pubblicalo perché lo veda chi non c'era.",
+        "inArrivo": "Se è stata registrata, il file arriva qualche minuto dopo la fine.",
+        "spenta": "Non era prevista.",
+        "nessunFile": "Nessun video: non è stato registrato, o il file non è arrivato."
+      },
+      "trascrizione": {
+        "title": "Trascrizione",
+        "pubblicata": "Pubblicata.",
+        "prontaAi": "Pronta dalla post-produzione: rivedila, si pubblica insieme al video.",
+        "prontaSottotitoli": "Pronta dai sottotitoli: controlla i nomi e pubblicala.",
+        "inLavorazione": "In lavorazione.",
+        "nessuna": "Non c'è: né sottotitoli né post-produzione.",
+        "soloStaff": "La rivede e la pubblica chi organizza l'evento, dall'area riservata.",
+        "nonPiu": "Non si cambia più: l'evento è archiviato o i suoi dati sono scaduti."
+      },
+      "resoconto": {
+        "title": "Resoconto",
+        "pubblicato": "Pubblicato.",
+        "daPubblicare": "Generato: rileggilo e pubblicalo.",
+        "daGenerare": "Da generare, a partire da trascrizione, chat e valutazioni.",
+        "inLavorazione": "In lavorazione.",
+        "senzaPipeline": "La post-produzione AI non è attiva su questa installazione.",
+        "soloStaff": "Lo genera e lo pubblica chi organizza l'evento, dall'area riservata.",
+        "nonPiu": "Non si cambia più: l'evento è archiviato o i suoi dati sono scaduti."
+      },
+      "sala": {
+        "title": "Cosa è successo in sala",
+        "rivista": "Messaggi: {messaggi} · domande: {domande} · sondaggi: {sondaggi} · In una parola: {nuvole}.",
+        "vuota": "Chat, domande, sondaggi e parole non sono stati usati.",
+        "inSospeso": "Domande senza risposta: {domandeInSospeso}. Segnale come risposte o scartale."
+      },
+      "materiali": {
+        "title": "Materiali per chi non c'era",
+        "presenti": "Visibili dopo l'evento: {materiali}.",
+        "nessuno": "Nessuno visibile dopo l'evento: aggiungi slide o documenti dei relatori, se ci sono.",
+        "nascosti": "Ce ne sono {materiali}, ma la pagina pubblica non mostra i materiali: accendili nella configurazione dopo l'evento."
+      },
+      "valutazioni": {
+        "title": "Valutazioni",
+        "emailInviata": "L'email per chiederle è partita. Risposte: {valutazioni}.",
+        "emailInPartenza": "L'email per chiederle parte a breve a chi ha partecipato. Risposte: {valutazioni}.",
+        "emailSpenta": "L'email per chiederle è spenta: si può accendere fino a una settimana dalla fine. Risposte: {valutazioni}.",
+        "raccolte": "Risposte: {valutazioni}.",
+        "spente": "Non attive per questo evento."
+      },
+      "pagina": {
+        "title": "Pagina pubblica",
+        "visibile": "Visibile a tutti.",
+        "nellaLibreria": "Visibile a tutti e nella libreria video.",
+        "privata": "Ritirata: il pubblico non la vede.",
+        "scaduta": "Non più visibile: la data di scadenza è passata.",
+        "archiviato": "Evento archiviato: la pagina non è pubblica.",
+        "libreriaSenzaVideo": "Visibile a tutti; nella libreria video comparirà quando il video sarà pubblicato."
+      }
+    },
+    "roomReview": {
+      "title": "Cosa è successo in sala",
+      "intro": "Rivedi cosa è stato scritto e chiesto: nascondi ciò che non deve restare, chiudi le domande, pubblica i risultati dei sondaggi. Il riepilogo della pagina pubblica si aggiorna a ogni modifica.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Domande",
+        "polls": "Sondaggi",
+        "words": "In una parola"
+      },
+      "loading": "Caricamento…",
+      "error": "Non riesco a leggere questa parte: riprova più tardi.",
+      "actionError": "Operazione non riuscita: riprova.",
+      "chat": {
+        "empty": "Nessun messaggio.",
+        "limit": "Si vedono gli ultimi {count} messaggi.",
+        "question": "Domanda",
+        "moderator": "Conduzione",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi il messaggio di {name}",
+        "hidden": "Messaggio nascosto.",
+        "confirmTitle": "Nascondere il messaggio?",
+        "confirmBody": "Sparisce dalla cronologia, dall'esportazione e dal riepilogo, con l'eventuale allegato. Non si può annullare."
+      },
+      "qa": {
+        "empty": "Nessuna domanda.",
+        "status": {
+          "PENDING": "In attesa",
+          "HIGHLIGHTED": "In evidenza",
+          "ANSWERED": "Risposta",
+          "DISMISSED": "Scartata"
+        },
+        "markAnswered": "Segna come risposta",
+        "dismiss": "Scarta",
+        "fromChat": "dalla chat",
+        "votes": "Voti: {count}",
+        "answeredOk": "Domanda segnata come risposta.",
+        "dismissedOk": "Domanda scartata.",
+        "limit": "Si vedono {count} domande segnate in chat: prima quelle aperte, poi le chiuse più recenti."
+      },
+      "polls": {
+        "empty": "Nessun sondaggio.",
+        "status": {
+          "OPEN": "Aperto",
+          "CLOSED": "Chiuso: risultati non pubblici",
+          "PUBLISHED": "Risultati pubblicati"
+        },
+        "votes": "Voti: {count}",
+        "publish": "Pubblica i risultati",
+        "published": "Risultati pubblicati."
+      },
+      "words": {
+        "empty": "Nessuna parola.",
+        "prompt": "Domanda: {prompt}",
+        "people": "Persone: {count}",
+        "hide": "Nascondi",
+        "hideFor": "Nascondi «{word}»",
+        "hidden": "Parola nascosta.",
+        "confirmTitle": "Nascondere la parola?",
+        "confirmBody": "Sparisce dalla nuvola e dal riepilogo. Non si può annullare.",
+        "round": "Giro del {date}"
+      },
+      "recap": {
+        "button": "Aggiorna il riepilogo pubblico",
+        "done": "Riepilogo pubblico aggiornato.",
+        "notPossible": "Il riepilogo non si aggiorna più: l'evento non è concluso o i suoi dati sono scaduti.",
+        "error": "Aggiornamento non riuscito: riprova."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {Un altro evento} other {Altri # eventi}}",
     "noEvents": "Nessun evento in questo periodo",
-    "weekShort": "Sett."
+    "legend": {
+      "title": "Etichette",
+      "noTag": "Senza etichetta"
+    },
+    "popover": {
+      "open": "Apri la pagina dell'evento",
+      "manage": "Gestisci l'evento",
+      "publicPage": "Pagina pubblica",
+      "registrations": "{count, plural, =0 {nessun iscritto} one {# iscritto} other {# iscritti}}"
+    }
   },
   "footer": {
     "privacy": "Informativa privacy",

@@ -6,7 +6,10 @@ import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
 /**
  * La trascrizione dei sottotitoli live, accesa e spenta dal browser di chi
- * modera (ADR-018).
+ * modera (ADR-018). Non e' l'unica strada: a ogni ingresso nella sala Prosody
+ * chiede al portale se l'evento li vuole e la accende o la spegne da solo
+ * (mod_pa_captions), anche senza un moderatore. Qui la decisione arriva
+ * subito quando chi modera cambia l'interruttore.
  *
  * Jitsi la avvia quando un moderatore scrive nei metadati della stanza che la
  * vuole: il comando `setSubtitles` dell'IFrame API fa proprio questo, se il
@@ -23,6 +26,7 @@ export function useCaptionsControl({
   api,
   attivo,
   accesi,
+  certo = true,
   lingua,
 }: {
   api: JitsiMeetExternalAPI | null;
@@ -30,6 +34,11 @@ export function useCaptionsControl({
   attivo: boolean;
   /** I sottotitoli dell'evento sono accesi in questo momento. */
   accesi: boolean;
+  /**
+   * `accesi` viene dal server, non dal valore con cui la pagina e' stata
+   * disegnata: solo allora si manda anche uno «spenti».
+   */
+  certo?: boolean;
   /** Codice primario della lingua dell'evento ("it"). */
   lingua: string;
 }): void {
@@ -49,14 +58,16 @@ export function useCaptionsControl({
     if (!api || !attivo || ingressi === 0) return;
     const ultimo = inviato.current;
     if (ultimo && ultimo.accesi === accesi && ultimo.ingresso === ingressi) return;
-    // Spegnere senza averli mai accesi da qui non serve: lo stato iniziale
-    // della stanza è già "spenti".
-    if (!accesi && !ultimo) return;
+    // Anche il primo «spenti» parte, ma solo con il valore del server: a
+    // stanza gia' spenta non cambia niente, e se Prosody non ha potuto
+    // chiedere al portale la stanza segue comunque l'interruttore. Con il
+    // valore con cui la pagina e' stata disegnata, forse vecchio, si aspetta.
+    if (!accesi && !ultimo && !certo) return;
     try {
       api.executeCommand('setSubtitles', accesi, false, lingua);
       inviato.current = { accesi, ingresso: ingressi };
     } catch (err) {
       console.error('setSubtitles failed', err);
     }
-  }, [api, attivo, accesi, lingua, ingressi]);
+  }, [api, attivo, accesi, certo, lingua, ingressi]);
 }

@@ -20,8 +20,8 @@
  * persone e invitati vanno alle loro API (l'evento a quel punto ha un id).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -36,6 +36,7 @@ import {
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import {
   lingueDiPartenzaTraduzione,
   SOURCE_LANGUAGE_FALLBACK,
@@ -59,6 +60,7 @@ import {
 } from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
+import PagePreview, { datiAnteprima } from './page-preview';
 import Step1Base, { type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 import StepPeople, {
@@ -164,6 +166,10 @@ export interface WizardProps {
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
    *  non ne propone le funzioni. */
   aiPipelineEnabled?: boolean;
+  /** In modifica: relatori e organizzatore scritti a mano (eventi di prima
+   *  delle persone strutturate), che la pagina mostra ancora e l'anteprima
+   *  quindi pure. */
+  campiLiberi?: { speakersInfo: Record<string, string> | null; organizerName: string | null };
   /** In modifica: il passo da cui partire (i link «Modifica» della pagina
    *  dell'evento portano dritti a quello che serve). */
   initialStep?: StepKey | 'permissions' | 'content';
@@ -325,6 +331,17 @@ export interface Step5ReviewFields {
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
   requireOrganizationType: boolean;
+}
+
+/** Data e ora del modulo come istante, o null finche' non e' valida. */
+function istanteDalModulo(locale: string, tz: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(locale)) return null;
+  try {
+    const d = fromDatetimeLocalInTz(locale, tz);
+    return Number.isNaN(d.getTime()) ? null : d;
+  } catch {
+    return null;
+  }
 }
 
 export type WizardForm = Step1Value &
@@ -1039,6 +1056,34 @@ export default function EventWizard(props: WizardProps) {
   // Chi si iscrive davvero: la scelta dell'evento, o quella del sito. Una
   // chiamata istantanea non ha iscrizione: il link e' l'invito.
   const istantanea = initialEvent?.event.eventType === 'INSTANT';
+  // L'anteprima della pagina segue il modulo un passo indietro: si scrive
+  // senza aspettarla. Nella lingua dell'interfaccia, come la vedrebbe chi
+  // visita il sito in quella lingua (con il ripiego della pagina),
+  // e con tutte le etichette, anche quando il modulo non le fa cambiare.
+  const linguaInterfaccia = useLocale();
+  const moduloDifferito = useDeferredValue(form);
+  const conAnteprima = !istantanea && (activeStep === 'base' || activeStep === 'schedule');
+  const anteprima = useMemo(
+    () =>
+      conAnteprima
+        ? datiAnteprima(moduloDifferito, {
+            locale: linguaInterfaccia,
+            tags: props.availableTags,
+            startsAt: istanteDalModulo(moduloDifferito.startsAt, moduloDifferito.timezone),
+            endsAt: istanteDalModulo(moduloDifferito.endsAt, moduloDifferito.timezone),
+            parseTitleKicker: resolveKickerEnabled(moduloDifferito, props.siteDefaultParseTitleKicker),
+            campiLiberi: props.campiLiberi,
+          })
+        : null,
+    [
+      conAnteprima,
+      moduloDifferito,
+      linguaInterfaccia,
+      props.availableTags,
+      props.siteDefaultParseTitleKicker,
+      props.campiLiberi,
+    ],
+  );
   const iscrizioneAperta = publicRegistrationFor(
     form,
     props.publicRegistrationEnabled ?? true
@@ -1758,17 +1803,24 @@ export default function EventWizard(props: WizardProps) {
           </button>
         )}
         {(activeStep === 'base' || activeStep === 'schedule') && (
-          <Step1Base
-            parte={activeStep === 'base' ? 'evento' : 'quando'}
-            value={form}
-            onChange={updateForm}
-            enabledLocales={props.enabledLocales}
-            defaultLocale={props.defaultLocale}
-            availableTags={etichette}
-            fieldErrors={fieldErrors}
-            siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
-            siteDefaultVideoQuality={props.siteDefaultVideoQuality}
-          />
+          // Accanto al modulo, come apparira' la pagina dell'evento (non per
+          // le chiamate rapide, che una pagina pubblica non l'hanno).
+          <div className={istantanea ? undefined : 'wizard-con-anteprima'}>
+            <div className="wizard-con-anteprima__modulo">
+              <Step1Base
+                parte={activeStep === 'base' ? 'evento' : 'quando'}
+                value={form}
+                onChange={updateForm}
+                enabledLocales={props.enabledLocales}
+                defaultLocale={props.defaultLocale}
+                availableTags={etichette}
+                fieldErrors={fieldErrors}
+                siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
+                siteDefaultVideoQuality={props.siteDefaultVideoQuality}
+              />
+            </div>
+            {anteprima && <PagePreview dati={anteprima} />}
+          </div>
         )}
         {activeStep === 'invites' && (
           <RubricaAccessContext.Provider value={props.canUseRubrica ?? false}>

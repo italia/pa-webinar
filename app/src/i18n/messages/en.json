@@ -59,6 +59,15 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
+    "qr": {
+      "button": "QR",
+      "buttonLabel": "QR — {name}",
+      "title": "QR code: {name}",
+      "alt": "QR code for the link “{name}”",
+      "hint": "Point your phone's camera at it to open the link.",
+      "download": "Download (SVG)",
+      "error": "The QR code could not be created. Reload the page and try again; meanwhile you can copy the link."
+    },
     "back": "Back",
     "next": "Next",
     "send": "Send",
@@ -597,7 +606,7 @@
     },
     "eventEndedModerator": "The event has ended. Below you'll find the statistics and, if the event was recorded, the recording and the report.",
     "endLinks": {
-      "after": "Recording and report",
+      "after": "Close the event",
       "stats": "Event statistics",
       "publicPage": "Public event page"
     },
@@ -750,7 +759,23 @@
       "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
-      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead."
+      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead.",
+      "externalImage": "Images from other sites are not shown on the portal's pages.",
+      "externalImageUpload": "Upload the file from your device.",
+      "cropHelp": "An image with a different shape is cropped here, before it is uploaded.",
+      "crop": {
+        "title": "Crop the image",
+        "intro": "Drag the image to choose the part to show; use the slider to zoom in.",
+        "frame": "Crop frame",
+        "keys": "With the keyboard: the arrows move the image (with Shift in long steps), + and − zoom in and out.",
+        "zoom": "Zoom",
+        "size": "It will be saved at {width} × {height} pixels.",
+        "small": "It is small: on the page it may look blurry.",
+        "error": "This image cannot be read: try another file.",
+        "cancel": "Cancel",
+        "confirm": "Use this crop",
+        "encodeError": "The crop could not be prepared: try again."
+      }
     },
     "rubricaPicker": {
       "loading": "Searching…",
@@ -813,7 +838,8 @@
         "requiredLegend": "Fields marked * are needed to save the event: while they are empty, each one says so.",
         "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
         "kickerUse": "Show “{kicker}” as a kicker above the title",
-        "kickerPreview": "How it looks on the event page"
+        "kickerPreview": "How it looks on the event page",
+        "coverImageSize": "Recommended size: 1600 × 900 pixels (16:9)."
       },
       "step2": {
         "heading": "Who can do what",
@@ -1107,6 +1133,14 @@
         "askOrganization": "organization",
         "askRole": "role",
         "askType": "organization type"
+      },
+      "preview": {
+        "title": "Page preview",
+        "open": "Open the preview",
+        "note": "This is how the event page looks; it updates as you type.",
+        "noteNoDate": "This is how the event page looks; until the date is set, the time is an example.",
+        "titlePlaceholder": "The event title",
+        "descriptionPlaceholder": "The description will appear here."
       }
     },
     "nav": {
@@ -1604,7 +1638,8 @@
       "hide": "Hide",
       "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
       "hidden": "Link hidden",
-      "copyFailed": "Copy failed: select the address below and copy it manually."
+      "copyFailed": "Copy failed: select the address below and copy it manually.",
+      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”."
     },
     "feedbackAdmin": {
       "title": "Feedback Results",
@@ -1806,7 +1841,8 @@
         "waitingRoomEngine": "Waiting room (site default)",
         "waitingRoomEngineGame": "Videogame (Phaser lobby)",
         "waitingRoomEngineClassic": "Classic (static)",
-        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address."
+        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address.",
+        "primaryColorHex": "Primary color (hex code)"
       },
       "watermark": {
         "title": "Video customization",
@@ -1953,8 +1989,7 @@
         "min": "Check “{field}”: the minimum value is {min}.",
         "max": "Check “{field}”: the maximum value is {max}.",
         "field": "Check “{field}”: the value is not valid."
-      },
-      "primaryColorHex": "Primary color (hex code)"
+      }
     },
     "analytics": {
       "title": "Analytics",
@@ -2535,7 +2570,6 @@
       "sidebar": {
         "registrations": "Sign-ups",
         "ofMax": "{current} of {max}",
-        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No reminders configured",
         "tags": "Tags",
         "postEventSummary": "{connected} connected out of {registered} sign-ups ({estimated} expected)",
@@ -2958,7 +2992,8 @@
       "statusRunning": "Processing",
       "statusPartial": "Partly processed",
       "statusDone": "Processed",
-      "statusFailed": "Processing failed"
+      "statusFailed": "Processing failed",
+      "manageBackToEvent": "Back to the event"
     },
     "questionnairesPage": {
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
@@ -3276,6 +3311,150 @@
       "organizersTitle": "Organizing bodies",
       "organizersEdit": "Edit organizers",
       "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
+    },
+    "closing": {
+      "title": "Close the event",
+      "intro": "What is left to do so that people who missed it find everything, and people who attended can say how it went.",
+      "summaryTodo": "{count, plural, one {# thing to complete} other {# things to complete}}",
+      "summaryDone": "All done",
+      "loading": "Checking what is left to do…",
+      "error": "Could not read what is left to do: reload the page.",
+      "stato": {
+        "fatto": "Done",
+        "daFare": "To do",
+        "inCorso": "In progress",
+        "nonServe": "Not needed"
+      },
+      "azioni": {
+        "apri": "Open",
+        "rivedi": "Review the transcript",
+        "materiali": "Go to materials"
+      },
+      "registrazione": {
+        "title": "Recording",
+        "pubblicata": "Published.",
+        "daPubblicare": "The video is ready: publish it for people who missed the event.",
+        "inArrivo": "If it was recorded, the file arrives a few minutes after the end.",
+        "spenta": "It was not planned.",
+        "nessunFile": "No video: it was not recorded, or the file did not arrive."
+      },
+      "trascrizione": {
+        "title": "Transcript",
+        "pubblicata": "Published.",
+        "prontaAi": "Ready from post-production: review it; it is published together with the video.",
+        "prontaSottotitoli": "Ready from the captions: check the names and publish it.",
+        "inLavorazione": "In progress.",
+        "nessuna": "None: neither captions nor post-production.",
+        "soloStaff": "The event organizer reviews and publishes it from the administration area.",
+        "nonPiu": "Can no longer be changed: the event is archived or its data has expired."
+      },
+      "resoconto": {
+        "title": "Report",
+        "pubblicato": "Published.",
+        "daPubblicare": "Generated: read it and publish it.",
+        "daGenerare": "To generate, from the transcript, the chat and the ratings.",
+        "inLavorazione": "In progress.",
+        "senzaPipeline": "AI post-production is not enabled on this installation.",
+        "soloStaff": "The event organizer generates and publishes it from the administration area.",
+        "nonPiu": "Can no longer be changed: the event is archived or its data has expired."
+      },
+      "sala": {
+        "title": "What happened in the room",
+        "rivista": "Messages: {messaggi} · questions: {domande} · polls: {sondaggi} · In one word: {nuvole}.",
+        "vuota": "Chat, questions, polls and words were not used.",
+        "inSospeso": "Unanswered questions: {domandeInSospeso}. Mark them as answered or dismiss them."
+      },
+      "materiali": {
+        "title": "Materials for people who missed it",
+        "presenti": "Visible after the event: {materiali}.",
+        "nessuno": "None visible after the event: add the speakers' slides or documents, if any.",
+        "nascosti": "There are {materiali}, but the public page does not show materials: turn them on in the post-event configuration."
+      },
+      "valutazioni": {
+        "title": "Ratings",
+        "emailInviata": "The email asking for them has been sent. Responses: {valutazioni}.",
+        "emailInPartenza": "The email asking for them goes out shortly to attendees. Responses: {valutazioni}.",
+        "emailSpenta": "The email asking for them is off: it can be turned on up to a week after the end. Responses: {valutazioni}.",
+        "raccolte": "Responses: {valutazioni}.",
+        "spente": "Not enabled for this event."
+      },
+      "pagina": {
+        "title": "Public page",
+        "visibile": "Visible to everyone.",
+        "nellaLibreria": "Visible to everyone and in the video library.",
+        "privata": "Withdrawn: the public cannot see it.",
+        "scaduta": "No longer visible: its expiry date has passed.",
+        "archiviato": "Event archived: the page is not public.",
+        "libreriaSenzaVideo": "Visible to everyone; it will appear in the video library once the video is published."
+      }
+    },
+    "roomReview": {
+      "title": "What happened in the room",
+      "intro": "Review what was written and asked: hide what should not stay, close the questions, publish poll results. The summary on the public page updates with every change.",
+      "tabs": {
+        "chat": "Chat",
+        "qa": "Questions",
+        "polls": "Polls",
+        "words": "In one word"
+      },
+      "loading": "Loading…",
+      "error": "Could not read this part: try again later.",
+      "actionError": "That did not work: try again.",
+      "chat": {
+        "empty": "No messages.",
+        "limit": "Showing the last {count} messages.",
+        "question": "Question",
+        "moderator": "Host",
+        "hide": "Hide",
+        "hideFor": "Hide the message from {name}",
+        "hidden": "Message hidden.",
+        "confirmTitle": "Hide the message?",
+        "confirmBody": "It disappears from the history, the export and the summary, together with any attachment. This cannot be undone."
+      },
+      "qa": {
+        "empty": "No questions.",
+        "status": {
+          "PENDING": "Waiting",
+          "HIGHLIGHTED": "Highlighted",
+          "ANSWERED": "Answered",
+          "DISMISSED": "Dismissed"
+        },
+        "markAnswered": "Mark as answered",
+        "dismiss": "Dismiss",
+        "fromChat": "from the chat",
+        "votes": "Votes: {count}",
+        "answeredOk": "Question marked as answered.",
+        "dismissedOk": "Question dismissed.",
+        "limit": "Showing {count} questions marked in the chat: open ones first, then the most recent closed ones."
+      },
+      "polls": {
+        "empty": "No polls.",
+        "status": {
+          "OPEN": "Open",
+          "CLOSED": "Closed: results not public",
+          "PUBLISHED": "Results published"
+        },
+        "votes": "Votes: {count}",
+        "publish": "Publish the results",
+        "published": "Results published."
+      },
+      "words": {
+        "empty": "No words.",
+        "prompt": "Question: {prompt}",
+        "people": "People: {count}",
+        "hide": "Hide",
+        "hideFor": "Hide “{word}”",
+        "hidden": "Word hidden.",
+        "confirmTitle": "Hide the word?",
+        "confirmBody": "It disappears from the cloud and from the summary. This cannot be undone.",
+        "round": "Round of {date}"
+      },
+      "recap": {
+        "button": "Update the public summary",
+        "done": "Public summary updated.",
+        "notPossible": "The summary can no longer be updated: the event has not ended or its data has expired.",
+        "error": "The update did not work: try again."
+      }
     }
   },
   "email": {
@@ -4223,7 +4402,16 @@
     },
     "moreLinkHint": "{count, plural, one {One more event} other {# more events}}",
     "noEvents": "No events in this period",
-    "weekShort": "Wk"
+    "legend": {
+      "title": "Tags",
+      "noTag": "No tag"
+    },
+    "popover": {
+      "open": "Open the event page",
+      "manage": "Manage the event",
+      "publicPage": "Public page",
+      "registrations": "{count, plural, =0 {no registrations} one {# registration} other {# registrations}}"
+    }
   },
   "footer": {
     "privacy": "Privacy policy",
