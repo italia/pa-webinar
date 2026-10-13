@@ -8,3 +8,19 @@
 # segreti di produzione vivono nei Secret Kubernetes, mai nel codice/immagine,
 # e sono coperti dal check GitGuardian.
 azure-storage-account-key
+
+# CVE-2026-81726 (GHSA-8mgp-746c-j5xp) - NLTK: alcune API dei modelli
+# (TransitionParser.train/parse, AveragedPerceptron.save/load,
+# PerceptronTagger.save_to_json, save_maxent_params) aprono con `open()`
+# percorsi scelti da chi chiama, anche quando la sandbox `pathsec` di NLTK e'
+# attiva. Il vettore richiede di far scegliere a input non fidati il percorso
+# di un modello da leggere o scrivere con quelle API. Il worker di
+# post-produzione usa NLTK solo per la divisione in frasi dell'allineamento di
+# WhisperX: `nltk.data.load('tokenizers/punkt_tab/<lingua>.pickle')`, con la
+# lingua presa da una tabella fissa, e i parametri Punkt li scrive
+# `punkt_params.py` al build dell'immagine. Un grep di
+# `TransitionParser|AveragedPerceptron|PerceptronTagger|maxent|pathsec` sul
+# worker, su WhisperX, pyannote.audio e transformers e' vuoto. Nessuna
+# versione corretta e' ancora uscita. Rischio accettato (VEX: not_affected):
+# da togliere quando NLTK pubblica la correzione.
+CVE-2026-81726
