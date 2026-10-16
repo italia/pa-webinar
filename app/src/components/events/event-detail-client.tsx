@@ -149,18 +149,6 @@ interface EventDetailClientProps {
   report?: ReportView | null;
 }
 
-/** Display name for ISO language codes, used in the subtitle / audio
- *  switcher menus. Uses Intl.DisplayNames con fallback al codice se
- *  Intl non riconosce il tag. */
-function localeDisplayName(lang: string): string {
-  try {
-    const n = new Intl.DisplayNames(['it'], { type: 'language' });
-    return n.of(lang) ?? lang.toUpperCase();
-  } catch {
-    return lang.toUpperCase();
-  }
-}
-
 export default function EventDetailClient({
   event,
   locale,
@@ -283,13 +271,14 @@ export default function EventDetailClient({
         const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map((lang) => ({
           language: lang,
           src: `/api/events/${event.slug}/postprod/subtitle/${lang}`,
-          label: localeDisplayName(lang),
+          // Nella lingua della pagina, come i menu del lettore.
+          label: locName(lang, locale),
           isDefault: lang === data.sourceLanguage,
         }));
         const audio: AudioTrack[] = (data.dubbedAudio ?? []).map((d) => ({
           language: d.language,
           src: d.src,
-          label: `${localeDisplayName(d.language)} (AI)`,
+          label: `${locName(d.language, locale)} (AI)`,
           isSynthetic: true,
         }));
         const segmentsLite = (data.segments ?? []).map((s) => ({
@@ -333,7 +322,7 @@ export default function EventDetailClient({
     return () => {
       cancelled = true;
     };
-  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug]);
+  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug, locale]);
 
   return (
     <div className="container py-5">
