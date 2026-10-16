@@ -24,6 +24,7 @@ model and the dataset at pinned versions and check their SHA-256, all in
 | `paced_load.py` | The sizing test. Starts the engine's realtime WebSocket server and opens N sessions that send audio at real-time pace in 20 ms frames, like the bridge forwards Opus. Measures processing delay, delay of the first word of each sentence, drift over time, server CPU and memory, and WER. |
 | `glossary_check.py` | Effect of a glossary on the transcript, through the engine's word boosting, at several strengths: recall of the glossary terms, WER on the sentences that contain none of them, and glossary terms written where they were not said. One glossary is the names in the sentences themselves; the other, `glossary-pa.txt`, is off topic on purpose. |
 | `report.py` | Turns a results folder into Markdown tables with a verdict per point. |
+| `event_wer.py` | Accuracy on a real event: the machine text of a transcript from captions against the same transcript corrected by a person. Not part of `run.sh`. |
 | `run.sh` | Runs the whole suite for one or more CPU budgets. |
 
 The chunk size is the model's algorithmic latency: 80, 160, 320, 560 or
@@ -84,6 +85,20 @@ node, with the CPU budget set by the container's limit. It uses the stock
 Python image and takes the scripts from a ConfigMap; see the comments in the
 file for the commands and the precautions (the pool scales from zero, and
 the run must not share the node with a live event).
+
+## Accuracy on a real event
+
+FLEURS is read speech. To measure the captions on a real meeting, use an event that kept a [transcript from captions](../../../docs/architecture/live-captions.md#transcript-from-captions):
+
+1. Correct the transcript from captions in the transcript editor, listening to the event. When the event was recorded, the transcript sits on the recording with video and the editor plays it; AI post-production must not run on that recording, because its transcript replaces the one from captions. At the first correction the portal keeps the machine text, and the editor returns both versions line by line.
+2. Save the editor's data as a member of staff who manages the event: `GET /api/admin/postprod/recordings/<id>/transcript`, into a JSON file.
+3. Measure:
+
+```bash
+python3 event_wer.py transcript.json
+```
+
+For each line, the machine text is compared with the corrected one; correcting adds and removes no lines, so nothing has to be aligned. The script refuses a transcript with no corrected line (including one where only speakers were reassigned), or whose machine text cannot be compared line by line, and says so when the transcript does not come from captions. The figure is only as good as the correction: a line left wrong counts as right. Numbers written as digits on one side and in words on the other count as errors. The output shows no names unless `--names` is given. The file holds names and speech: delete it after the measurement.
 
 ## Unit tests
 
