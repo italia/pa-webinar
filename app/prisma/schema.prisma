@@ -818,17 +818,15 @@ model Registration {
   // registrations without consent leave this null. See ADR-011.
   personId String? @map("person_id") @db.Uuid
 
-  // ── AI postprod consent (Art. 6.1.a granular) ─────────────────
-  // Three independent opt-ins surfaced in the waiting room when the
-  // event has the corresponding `Event.ai*Enabled` flag on. Default
-  // null = "not asked yet" (a registration created before the flag
-  // existed); the live page treats null as "not consented" and
-  // surfaces the prompt at join time. The pipeline filters
-  // participant-level artifacts (chunked transcript lines etc.) by
-  // checking these flags via the speaker → registration mapping.
-  aiConsentTranscript  Boolean? @map("ai_consent_transcript")
-  aiConsentSummary     Boolean? @map("ai_consent_summary")
-  aiConsentTranslation Boolean? @map("ai_consent_translation")
+  // Colonne di un progetto precedente (consenso separato a trascrizione,
+  // sintesi e traduzione), mai scritte né lette: il consenso per persona è
+  // `consentMultitrack`, applicato voce per voce dal registratore e dai
+  // sottotitoli. Fuori dal client con @ignore. Toglierle dal database rompe
+  // i pod della versione precedente durante l'aggiornamento (le selezionano):
+  // la migrazione va in una release successiva a quella che le ignora.
+  aiConsentTranscript  Boolean? @map("ai_consent_transcript") @ignore
+  aiConsentSummary     Boolean? @map("ai_consent_summary") @ignore
+  aiConsentTranslation Boolean? @map("ai_consent_translation") @ignore
 
   // Relations
   event                  Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)

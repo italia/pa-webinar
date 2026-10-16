@@ -188,7 +188,7 @@ Recording is off unless both the operator and the event turn it on. Jibri is dis
 
 When the registration is deleted, at retention or by erasure, the per-person proof goes with it. The `CONSENT_RECORDED` rows remain, and they prove that consents were collected without saying by whom.
 
-`Registration` also has the columns `aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation`. No code writes or reads them. AI processing is governed at the event level.
+`Registration` also has the columns `aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation`, left over from an earlier design. The application ignores them (`@ignore` in the schema) and they are always empty; they stay in the database because a release that dropped them would break the pods of the previous release during a rolling update. A person's consent to the transcription of what they say is the per-participant consent above; the rest of AI processing is governed at the event level.
 
 ### Withdrawing consent
 

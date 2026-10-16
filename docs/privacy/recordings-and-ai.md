@@ -883,7 +883,7 @@ privacy notice states the actual basis.
 | Transcript from captions: keeping a person's sentences with their name | Art. 6(1)(a): the same consent, given to the current version of its text | The same records, with the version of the text each consent was given to. Each stored sentence carries the conference seat whose consent allowed it (`CaptionSegment.seatId`) |
 | Keeping tracks beyond transcription | The same consent, plus the privacy notice | Only the event flag. `consentSnapshot` does not include **Keep per-participant tracks** or dubbing |
 | The AI event report | The basis of AI post-production; staff decide whether to publish it | `AdminAuditLog` entries `EVENT_REPORT_REQUESTED`, `EVENT_REPORT_PUBLISHED` and `EVENT_REPORT_WITHDRAWN`. The report records the model that wrote it |
-| Per-participant AI choices (transcript, summary, translation) | Art. 6(1)(a), granular | `Registration.aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation` exist in the schema, but no code reads or writes them, and no screen asks for them |
+| Per-participant AI choices (summary, translation) | Not offered | A person's consent covers the transcription of what they say; summaries and translations are built from that transcript. `Registration.aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation` are columns left over from an earlier design: the application ignores them and they are always empty |
 
 Points for the controller's assessment:
 
