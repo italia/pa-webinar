@@ -55,6 +55,15 @@ describe('multipartPartSize', () => {
   });
 });
 
+describe('put', () => {
+  it('passa il segnale di interruzione al client', async () => {
+    send.mockResolvedValue({});
+    const signal = new AbortController().signal;
+    await provider().put('postprod/a.json', Buffer.from('x'), 'application/json', { signal });
+    expect(send).toHaveBeenCalledWith(expect.anything(), { abortSignal: signal });
+  });
+});
+
 describe('getUploadUrl', () => {
   it.each([undefined, 'http://minio.local:9000'])(
     'un URL firmato non porta il CRC32 del corpo vuoto (endpoint %s)',

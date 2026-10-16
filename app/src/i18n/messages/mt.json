@@ -5179,6 +5179,7 @@
     "storageUnavailable": "It-tlugħ tal-fajls mhux disponibbli f'din l-installazzjoni.",
     "aiDisabledForEvent": "L-IA hija mitfija għal dan l-avveniment: uża «Iġġenera l-AI» biex tixgħelha u tibda l-ipproċessar.",
     "sourceTranscriptMissing": "Din ir-reġistrazzjoni għadha mhix traskritta: ittraskriviha qabel ma żżid traduzzjoni.",
+    "captionsTranscriptNotTranslatable": "Din it-traskrizzjoni ġejja mis-sottotitoli diretti: it-traduzzjoni awtomatika teħtieġ traskrizzjoni AI tar-reġistrazzjoni.",
     "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra."
   }
 }

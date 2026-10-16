@@ -92,6 +92,7 @@ export class AzureStorageProvider implements StorageProvider {
     key: string,
     body: Buffer | Uint8Array,
     contentType: string,
+    opts: { signal?: AbortSignal } = {},
   ): Promise<{ publicUrl: string }> {
     const blockBlob = this.client
       .getContainerClient(this.bucket)
@@ -99,6 +100,7 @@ export class AzureStorageProvider implements StorageProvider {
     const buf = Buffer.isBuffer(body) ? body : Buffer.from(body);
     await blockBlob.uploadData(buf, {
       blobHTTPHeaders: { blobContentType: contentType },
+      ...(opts.signal && { abortSignal: opts.signal }),
     });
     return { publicUrl: this.publicUrl(key) };
   }

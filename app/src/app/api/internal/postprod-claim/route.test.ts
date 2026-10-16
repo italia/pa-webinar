@@ -6,7 +6,22 @@ vi.mock('@/lib/db', () => ({
     $queryRaw: vi.fn(),
     postprodJob: { update: vi.fn() },
     siteSetting: { findUnique: vi.fn(async () => ({ aiLlmProvider: 'vllm' })) },
+    recording: { findUnique: vi.fn() },
+    speaker: { findMany: vi.fn(async () => []) },
+    postprodArtifact: { findFirst: vi.fn(async () => null) },
   },
+}));
+const ingressi = vi.hoisted(() => ({
+  trascrizione: vi.fn(async () => ({ downloadUrl: 'https://archivio/trascrizione', blobKey: 'postprod/e/r/001/transcript.raw.json' })),
+  sottotitoli: vi.fn(async () => null),
+}));
+vi.mock('@/lib/ai/transcript-input', () => ({
+  trascrizionePerIlWorker: ingressi.trascrizione,
+  sottotitoliPerIlWorker: ingressi.sottotitoli,
+}));
+vi.mock('@/lib/storage/postprod', () => ({
+  presignArtifactUpload: vi.fn(async ({ blobKey }: { blobKey: string }) => ({ uploadUrl: `https://su/${blobKey}` })),
+  presignArtifactDownload: vi.fn(async ({ blobKey }: { blobKey: string }) => `https://giu/${blobKey}`),
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 const r = vi.hoisted(() => ({
@@ -120,4 +135,34 @@ describe('POST /api/internal/postprod-claim', () => {
     expect((await claim({ workerId: 'w-cpu', kinds: ['REPORT'] })).status).toBe(204);
   });
 
+  it('la sintesi riceve la trascrizione dal modulo che la allinea all archivio', async () => {
+    const recordingId = '22222222-3333-4444-8555-666666666666';
+    fn(prisma.$queryRaw).mockResolvedValueOnce([
+      {
+        id: '66666666-7777-4888-8999-000000000001',
+        recording_id: recordingId,
+        kind: 'SUMMARIZE',
+        payload: { runId: '77777777-8888-4999-8aaa-bbbbbbbbbbbb', sourceLanguage: 'it' },
+        attempts: 1,
+        next_attempt_at: new Date(),
+        depends_on_id: null,
+      },
+    ]);
+    const registrazione = {
+      id: recordingId,
+      eventId: '11111111-2222-4333-8444-555555555555',
+      runCount: 1,
+      sourceLanguage: 'it',
+      blobKey: 'recordings/x.mp4',
+      event: { id: '11111111-2222-4333-8444-555555555555', slug: 'e', aiTargetLocales: [], title: { it: 'E' }, organizerName: null, speakersInfo: null, expectedSpeakers: null, agendaItems: [] },
+      callSession: null,
+      _count: { tracks: 0 },
+    };
+    fn(prisma.recording.findUnique).mockResolvedValueOnce(registrazione);
+    const res = await claim({ workerId: 'w-cpu', kinds: ['SUMMARIZE'] });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { inputs: Array<{ role: string; downloadUrl: string }> };
+    expect(ingressi.trascrizione).toHaveBeenCalledWith(expect.objectContaining({ id: recordingId, runCount: 1 }), expect.any(Number));
+    expect(body.inputs).toContainEqual(expect.objectContaining({ role: 'transcript', downloadUrl: 'https://archivio/trascrizione' }));
+  });
 });

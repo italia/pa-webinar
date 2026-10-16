@@ -47,6 +47,7 @@ import {
   presignArtifactDownload,
   presignArtifactUpload,
 } from '@/lib/storage/postprod';
+import { sottotitoliPerIlWorker, trascrizionePerIlWorker } from '@/lib/ai/transcript-input';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { postprodJobAttemptsTotal } from '@/lib/metrics';
 import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
@@ -386,19 +387,13 @@ export const POST = withErrorHandling(async (request) => {
     }
     // Sottotitoli sorgente (best-effort): se il TRANSCRIBE non è ancora
     // completato non c'è VTT — l'archivio si genera comunque senza.
-    const vtt = await prisma.postprodArtifact.findFirst({
-      where: { recordingId: recording.id, type: 'TRANSCRIPT_VTT' },
-      orderBy: { createdAt: 'desc' },
-      select: { blobKey: true, language: true },
-    });
+    // Corretti anch'essi, se la trascrizione e' stata rivista
+    // (lib/ai/transcript-input).
+    const vtt = await sottotitoliPerIlWorker(recording, lease);
     if (vtt) {
-      const vttUrl = await presignArtifactDownload({
-        blobKey: vtt.blobKey,
-        expiresInMinutes: lease,
-      });
       inputs.push({
         role: 'subtitle',
-        downloadUrl: vttUrl,
+        downloadUrl: vtt.downloadUrl,
         blobKey: vtt.blobKey,
         displayName: vtt.language ?? recording.sourceLanguage ?? 'it',
       });
@@ -410,29 +405,23 @@ export const POST = withErrorHandling(async (request) => {
     // can't match NULL via the generated input type (NULL is treated
     // as "distinct" in SQL but not as a value in TypeScript), so we
     // use findFirst with the equality semantics we need.
-    const transcript = await prisma.postprodArtifact.findFirst({
-      where: {
-        recordingId: recording.id,
-        type: 'TRANSCRIPT_JSON',
-        language: null,
-      },
-      select: { blobKey: true },
-    });
+    // La trascrizione corretta a mano si riscrive nell'archivio prima di
+    // firmarne l'indirizzo: il worker legge il file, non la banca dati
+    // (lib/ai/transcript-input).
+    const transcript = await trascrizionePerIlWorker(recording, lease);
     if (!transcript) {
-      // Defensive: dependency check above should have prevented this.
+      // Defensive: dependency check above should have prevented this, and the
+      // translations route refuses a transcript from the live captions (no
+      // stored file to hand over).
       throw new AppError(
-        `claim ${row.id}: transcript missing despite DONE dependency`,
+        `claim ${row.id}: transcript missing (or from the live captions) despite DONE dependency`,
         500,
         'POSTPROD_INCONSISTENT_DEPS',
       );
     }
-    const url = await presignArtifactDownload({
-      blobKey: transcript.blobKey,
-      expiresInMinutes: lease,
-    });
     inputs.push({
       role: 'transcript',
-      downloadUrl: url,
+      downloadUrl: transcript.downloadUrl,
       blobKey: transcript.blobKey,
     });
 

@@ -5179,6 +5179,7 @@
     "storageUnavailable": "La subida de archivos no está disponible en esta instalación.",
     "aiDisabledForEvent": "La IA está desactivada para este evento: usa «Generar IA» para activarla e iniciar el proceso.",
     "sourceTranscriptMissing": "Esta grabación aún no está transcrita: transcríbela antes de añadir una traducción.",
+    "captionsTranscriptNotTranslatable": "Esta transcripción procede de los subtítulos en directo: la traducción automática necesita una transcripción con IA de la grabación.",
     "sameLanguage": "El idioma elegido es el original de la grabación: elige otro."
   }
 }

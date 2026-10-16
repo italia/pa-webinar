@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Failų įkėlimas šioje diegimo versijoje nepasiekiamas.",
     "aiDisabledForEvent": "DI šiam renginiui išjungtas: naudokite „Generuoti DI“, kad jį įjungtumėte ir pradėtumėte apdorojimą.",
     "sourceTranscriptMissing": "Šis įrašas dar netranskribuotas: pirmiausia jį transkribuokite, tada pridėkite vertimą.",
+    "captionsTranscriptNotTranslatable": "Ši transkripcija gauta iš tiesioginių subtitrų: automatiniam vertimui reikia įrašo DI transkripcijos.",
     "sameLanguage": "Pasirinkta kalba yra originali įrašo kalba: pasirinkite kitą."
   }
 }

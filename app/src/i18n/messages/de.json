@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar.",
     "aiDisabledForEvent": "Die KI ist für diese Veranstaltung ausgeschaltet: Mit „KI erzeugen“ schalten Sie sie ein und starten die Pipeline.",
     "sourceTranscriptMissing": "Diese Aufzeichnung ist noch nicht transkribiert: Transkribieren Sie sie, bevor Sie eine Übersetzung hinzufügen.",
+    "captionsTranscriptNotTranslatable": "Dieses Transkript stammt aus den Live-Untertiteln: Die automatische Übersetzung benötigt ein KI-Transkript der Aufzeichnung.",
     "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere."
   }
 }

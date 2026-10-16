@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval.",
     "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",
     "sourceTranscriptMissing": "Seda salvestust pole veel transkribeeritud: transkribeeri see enne tõlke lisamist.",
+    "captionsTranscriptNotTranslatable": "See transkriptsioon pärineb otsesubtiitritest: automaattõlge vajab salvestise tehisintellekti transkriptsiooni.",
     "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu."
   }
 }

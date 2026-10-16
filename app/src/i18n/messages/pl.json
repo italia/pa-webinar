@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji.",
     "aiDisabledForEvent": "AI jest wyłączona dla tego wydarzenia: użyj „Wygeneruj AI”, aby ją włączyć i uruchomić przetwarzanie.",
     "sourceTranscriptMissing": "To nagranie nie ma jeszcze transkrypcji: najpierw je przetranskrybuj, potem dodaj tłumaczenie.",
+    "captionsTranscriptNotTranslatable": "Ta transkrypcja pochodzi z napisów na żywo: automatyczne tłumaczenie wymaga transkrypcji AI nagrania.",
     "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny."
   }
 }

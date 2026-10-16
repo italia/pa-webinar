@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Bestanden uploaden is niet beschikbaar op deze installatie.",
     "aiDisabledForEvent": "AI staat uit voor dit evenement: gebruik ‘AI genereren’ om het aan te zetten en de verwerking te starten.",
     "sourceTranscriptMissing": "Deze opname is nog niet getranscribeerd: transcribeer haar voordat je een vertaling toevoegt.",
+    "captionsTranscriptNotTranslatable": "Deze transcriptie komt uit de live-ondertiteling: automatische vertaling vereist een AI-transcriptie van de opname.",
     "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere."
   }
 }

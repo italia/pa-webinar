@@ -759,10 +759,12 @@ discarded. The summary editor keeps no machine version: it overwrites the
 summary.
 
 An ordinary correction changes the database copies of the transcript and its
-source-language subtitles only. The files in object storage keep the machine
-text until an erasure rewrites them, and every output generated later from
-them (a translation language added afterwards, a new archive) starts from that
-stored text.
+source-language subtitles. Outputs generated afterwards start from the
+corrected text: before handing a corrected transcript to a summary or
+translation job, the platform writes it to object storage, and before an
+archive job it does the same with the source-language subtitles
+(`app/src/lib/ai/transcript-input.ts`). Dubbing follows its translation.
+Outputs already produced are not regenerated.
 
 ### Erasing a passage
 
@@ -771,11 +773,13 @@ versions would no longer be comparable. To remove a person's words for good,
 the editor has a separate mode: **Erase from the original too**, saved with
 **Save and erase from the original**. It applies the same line changes to the
 machine version of the transcript and of its source-language subtitles. It
-rewrites the stored transcript and subtitle files of the current run with the
-revised version, and writes a `POSTPROD_TRANSCRIPT_REDACT` entry to the admin
-audit log instead of `POSTPROD_TRANSCRIPT_EDIT`. Only lines whose text changed
-are rewritten. If rewriting the stored files fails, the editor says so and the
-removal can be repeated.
+rewrites the plain-text transcript, and the stored transcript, subtitle and
+plain-text files of the current run, with the revised version (every time, so
+repeating an erasure after a failed write rewrites the files again), and
+writes a `POSTPROD_TRANSCRIPT_REDACT` entry to the admin audit log instead of
+`POSTPROD_TRANSCRIPT_EDIT`. Only lines whose text changed are rewritten in the
+machine version. If rewriting the stored files fails, the editor says so and
+the removal can be repeated.
 
 Erasure works on text. The spoken words stay in the recording itself: in the
 composite video, which is public once published, and in the per-participant
@@ -790,14 +794,14 @@ flowchart LR
         direction TB
         cur["Revised transcript and<br/>source-language subtitles<br/>(database copies)"]
         orig["Machine version<br/>PostprodOriginalBody"]
-        files["Transcript and subtitle files<br/>of the current run in storage"]
+        files["Transcript, subtitle and plain-text<br/>files of the current run in storage"]
         log["AdminAuditLog entry<br/>POSTPROD_TRANSCRIPT_REDACT"]
     end
 
     subgraph missed["Not touched: handle separately"]
         direction TB
         media["Composite video and<br/>per-participant tracks<br/>(the audio of the words)"]
-        derived["Summaries, translations,<br/>translated subtitles,<br/>plain-text transcript file"]
+        derived["Summaries, translations,<br/>translated subtitles"]
         audio["Dubbed audio and video,<br/>downloadable archive"]
         old["Files of earlier pipeline runs"]
     end
@@ -833,8 +837,8 @@ not regenerated:
   stored file keeps the old text.
 - **Translated subtitles:** have no editor. Running the pipeline again starts
   over from the audio and would put the passage back.
-- **Dubbed audio and video, the archive, and the stored plain-text transcript:**
-  keep the passage until they are purged.
+- **Dubbed audio and video, and an archive already built:** keep the passage
+  until they are purged.
 
 ### Data-subject requests
 

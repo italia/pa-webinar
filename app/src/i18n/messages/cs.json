@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Nahrávání souborů není v této instalaci k dispozici.",
     "aiDisabledForEvent": "AI je pro tuto akci vypnutá: pomocí „Vygenerovat AI“ ji zapnete a spustíte zpracování.",
     "sourceTranscriptMissing": "Tento záznam ještě není přepsaný: nejdřív ho přepište, pak přidejte překlad.",
+    "captionsTranscriptNotTranslatable": "Tento přepis pochází z živých titulků: automatický překlad vyžaduje AI přepis záznamu.",
     "sameLanguage": "Zvolený jazyk je původní jazyk záznamu: vyberte jiný."
   }
 }

@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Níl uaslódáil comhad ar fáil ar an tsuiteáil seo.",
     "aiDisabledForEvent": "Tá IS múchta don ócáid seo: úsáid «Cruthaigh AI» chun é a chur ar siúl agus an phróiseáil a thosú.",
     "sourceTranscriptMissing": "Níl an taifeadadh seo tras-scríofa fós: tras-scríobh é sula gcuirfidh tú aistriúchán leis.",
+    "captionsTranscriptNotTranslatable": "Tagann an tras-scríbhinn seo ó na fotheidil bheo: teastaíonn tras-scríbhinn AI den taifeadadh don aistriúchán uathoibríoch.",
     "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile."
   }
 }

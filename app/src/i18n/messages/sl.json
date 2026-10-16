@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo.",
     "aiDisabledForEvent": "UI je za ta dogodek izklopljena: z »Ustvari z AI« jo vklopite in zaženete obdelavo.",
     "sourceTranscriptMissing": "Ta posnetek še ni prepisan: najprej ga prepišite, nato dodajte prevod.",
+    "captionsTranscriptNotTranslatable": "Ta prepis izvira iz podnapisov v živo: samodejni prevod potrebuje prepis posnetka z UI.",
     "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega."
   }
 }

@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama.",
     "aiDisabledForEvent": "MI šim pasākumam ir izslēgts: izmantojiet “Ģenerēt MI”, lai to ieslēgtu un sāktu apstrādi.",
     "sourceTranscriptMissing": "Šis ieraksts vēl nav transkribēts: vispirms to transkribējiet, tad pievienojiet tulkojumu.",
+    "captionsTranscriptNotTranslatable": "Šis atšifrējums iegūts no tiešraides subtitriem: automātiskajai tulkošanai nepieciešams ieraksta MI atšifrējums.",
     "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu."
   }
 }

@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation.",
     "aiDisabledForEvent": "L'IA est désactivée pour cet événement : utilisez « Générer l'IA » pour l'activer et lancer le pipeline.",
     "sourceTranscriptMissing": "Cet enregistrement n'est pas encore transcrit : transcrivez-le avant d'ajouter une traduction.",
+    "captionsTranscriptNotTranslatable": "Cette transcription provient des sous-titres en direct : la traduction automatique nécessite une transcription IA de l'enregistrement.",
     "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre."
   }
 }

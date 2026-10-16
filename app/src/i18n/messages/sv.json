@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Filuppladdning är inte tillgänglig i den här installationen.",
     "aiDisabledForEvent": "AI är avstängd för det här evenemanget: använd ”Generera AI” för att slå på den och starta bearbetningen.",
     "sourceTranscriptMissing": "Den här inspelningen är inte transkriberad än: transkribera den innan du lägger till en översättning.",
+    "captionsTranscriptNotTranslatable": "Den här transkriptionen kommer från livetextningen: automatisk översättning kräver en AI-transkription av inspelningen.",
     "sameLanguage": "Det valda språket är inspelningens originalspråk: välj ett annat."
   }
 }

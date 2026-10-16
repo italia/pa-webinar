@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildVtt, sha256Hex } from './transcript-format';
+import { buildPlainText, buildVtt, sha256Hex } from './transcript-format';
 
 describe('buildVtt', () => {
   it('matches the worker segments_to_vtt format (voice tag + visible prefix)', () => {
@@ -50,5 +50,17 @@ describe('sha256Hex', () => {
     expect(sha256Hex('abc')).toBe(
       'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     );
+  });
+});
+
+describe('buildPlainText', () => {
+  it('come il file del worker: [HH:MM:SS] etichetta: testo, senza i segmenti vuoti', () => {
+    expect(
+      buildPlainText([
+        { start: 83.4, end: 85, text: ' Lorem ipsum ', speaker: 'SPEAKER_00' },
+        { start: 86, end: 87, text: '', speaker: 'SPEAKER_01' },
+        { start: 3725, end: 3726, text: 'Dolor', speaker: null },
+      ]),
+    ).toBe('[00:01:23] SPEAKER_00: Lorem ipsum\n[01:02:05] SPEAKER_??: Dolor');
   });
 });

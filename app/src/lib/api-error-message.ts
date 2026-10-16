@@ -28,6 +28,7 @@ export type ApiErrorKey =
   | 'storageUnavailable'
   | 'aiDisabledForEvent'
   | 'sourceTranscriptMissing'
+  | 'captionsTranscriptNotTranslatable'
   | 'sameLanguage';
 
 /** I codici d'errore che le rotte usano per le condizioni sopra. */
@@ -40,6 +41,7 @@ export const API_ERROR_CODES = {
   STORAGE_UNAVAILABLE: 'storageUnavailable',
   AI_DISABLED_FOR_EVENT: 'aiDisabledForEvent',
   SOURCE_TRANSCRIPT_MISSING: 'sourceTranscriptMissing',
+  CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE: 'captionsTranscriptNotTranslatable',
   SAME_LANGUAGE: 'sameLanguage',
 } as const satisfies Record<string, ApiErrorKey>;
 

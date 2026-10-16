@@ -172,6 +172,7 @@ export class S3StorageProvider implements StorageProvider {
     key: string,
     body: Buffer | Uint8Array,
     contentType: string,
+    opts: { signal?: AbortSignal } = {},
   ): Promise<{ publicUrl: string }> {
     await this.client.send(
       new PutObjectCommand({
@@ -180,6 +181,7 @@ export class S3StorageProvider implements StorageProvider {
         Body: body,
         ContentType: contentType,
       }),
+      opts.signal ? { abortSignal: opts.signal } : {},
     );
     return { publicUrl: this.publicUrl(key) };
   }

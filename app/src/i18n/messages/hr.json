@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Učitavanje datoteka nije dostupno u ovoj instalaciji.",
     "aiDisabledForEvent": "Umjetna inteligencija isključena je za ovaj događaj: upotrijebite „Generiraj AI” da je uključite i pokrenete obradu.",
     "sourceTranscriptMissing": "Ova snimka još nije transkribirana: transkribirajte je prije dodavanja prijevoda.",
+    "captionsTranscriptNotTranslatable": "Ovaj transkript potječe iz titlova uživo: automatski prijevod zahtijeva AI transkript snimke.",
     "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi."
   }
 }

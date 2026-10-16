@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare.",
     "aiDisabledForEvent": "AI este oprită pentru acest eveniment: folosește „Generează AI” pentru a o porni și a lansa procesarea.",
     "sourceTranscriptMissing": "Această înregistrare nu este încă transcrisă: transcrie-o înainte de a adăuga o traducere.",
+    "captionsTranscriptNotTranslatable": "Această transcriere provine din subtitrările live: traducerea automată necesită o transcriere AI a înregistrării.",
     "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta."
   }
 }

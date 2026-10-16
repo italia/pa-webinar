@@ -5179,6 +5179,7 @@
     "storageUnavailable": "File uploads are not available on this installation.",
     "aiDisabledForEvent": "AI is off for this event: use «Generate AI» to turn it on and start the pipeline.",
     "sourceTranscriptMissing": "This recording has not been transcribed yet: transcribe it before adding a translation.",
+    "captionsTranscriptNotTranslatable": "This transcript comes from the live captions: automatic translation needs an AI transcript of the recording.",
     "sameLanguage": "The chosen language is the recording's original one: pick another."
   }
 }

@@ -1460,7 +1460,7 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 | **Add language** | One `TRANSLATE` job for a language other than the source, plus `DUB` if dubbing is on. The tab offers the languages enabled on the site that are not yet translated. Needs an existing `TRANSCRIPT_JSON`. | `POSTPROD_TRANSLATE_ADD` |
 | **Generate archive** | One `ARCHIVE` job. Needs unpurged tracks and the composite MP4. | `POSTPROD_ARCHIVE` |
 | Speaker mapping | Names a speaker label or links it to an address-book person | `POSTPROD_SPEAKER_MAP` |
-| Transcript edit | Rewrites the segments, then the source VTT and the speaking times | `POSTPROD_TRANSCRIPT_EDIT`, or `POSTPROD_TRANSCRIPT_REDACT` with erasure |
+| Transcript edit | Rewrites the segments, then the source VTT and the speaking times. A summary or translation that runs afterwards reads the corrected text, because the claim first writes the revised transcript to storage; an archive does the same with the source VTT. Dubbing follows its translation. Outputs already produced stay as they are | `POSTPROD_TRANSCRIPT_EDIT`, or `POSTPROD_TRANSCRIPT_REDACT` with erasure |
 | Summary edit | Rewrites the summary of one language | `POSTPROD_SUMMARY_EDIT` |
 
 All actions write to the administration audit log. All of them except the
@@ -1489,9 +1489,14 @@ version, still encrypted and byte for byte, into `PostprodOriginalBody`, and
 sets `revisedAt` on the artifact. Later corrections do not touch the copy.
 **Show original text** displays the machine text under each corrected line.
 **Erase from the original too** applies the correction to the preserved copy
-as well, for erasure requests. An ordinary correction changes only the
-database copies of the transcript and its source subtitles; the files in
-object storage keep the machine text until an erasure rewrites them too. A copy captured from a transcript that had already
+as well, for erasure requests. An ordinary correction changes the
+database copies of the transcript and its source subtitles. When a worker
+later takes a summary or translation job, the claim first writes the corrected
+transcript to object storage (the source subtitles, for an archive job), so
+those outputs start from the corrected text. A transcript from the live
+captions has no stored file and is never handed to a worker: adding a
+translation to it is refused (`CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE`). An
+erasure rewrites the stored transcript, subtitle and plain-text files at once. A copy captured from a transcript that had already
 been corrected is marked `certainMachineOrigin = false`, shown as **Origin not
 certain**. The data-subject rights flow is described in
 [Privacy and data protection](GDPR.md).

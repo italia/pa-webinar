@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Ebben a telepítésben a fájlfeltöltés nem érhető el.",
     "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",
     "sourceTranscriptMissing": "Ez a felvétel még nincs átírva: előbb írja át, aztán adjon hozzá fordítást.",
+    "captionsTranscriptNotTranslatable": "Ez az átirat az élő feliratokból származik: az automatikus fordításhoz a felvétel MI-átirata szükséges.",
     "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat."
   }
 }

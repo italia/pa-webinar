@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Upload af filer er ikke tilgængelig på denne installation.",
     "aiDisabledForEvent": "AI er slået fra for dette arrangement: brug »Generér AI« for at slå den til og starte behandlingen.",
     "sourceTranscriptMissing": "Denne optagelse er endnu ikke transskriberet: transskriber den, før du tilføjer en oversættelse.",
+    "captionsTranscriptNotTranslatable": "Denne transskription kommer fra liveundertekster: automatisk oversættelse kræver en AI-transskription af optagelsen.",
     "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet."
   }
 }

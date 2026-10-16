@@ -144,6 +144,8 @@ export interface StorageProvider {
     key: string,
     body: Buffer | Uint8Array,
     contentType: string,
+    /** Interrompe il caricamento (per esempio dopo un tempo massimo). */
+    opts?: { signal?: AbortSignal },
   ): Promise<{ publicUrl: string }>;
 
   /**

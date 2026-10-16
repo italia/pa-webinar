@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Il caricamento di file non è disponibile su questa installazione.",
     "aiDisabledForEvent": "L'AI è spenta per questo evento: usa «Genera AI» per accenderla e avviare la pipeline.",
     "sourceTranscriptMissing": "Questa registrazione non è ancora trascritta: trascrivila prima di aggiungere una traduzione.",
+    "captionsTranscriptNotTranslatable": "Questa trascrizione viene dai sottotitoli live: la traduzione automatica parte solo da una trascrizione AI della registrazione.",
     "sameLanguage": "La lingua scelta è quella originale della registrazione: scegline un'altra."
   }
 }

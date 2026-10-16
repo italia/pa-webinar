@@ -5179,6 +5179,7 @@
     "storageUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa.",
     "aiDisabledForEvent": "Tekoäly on pois päältä tässä tapahtumassa: ota se käyttöön ja käynnistä käsittely painikkeella ”Luo tekoälyllä”.",
     "sourceTranscriptMissing": "Tätä tallennetta ei ole vielä litteroitu: litteroi se ennen käännöksen lisäämistä.",
+    "captionsTranscriptNotTranslatable": "Tämä litterointi on peräisin livetekstityksestä: automaattinen käännös edellyttää tallenteen tekoälylitterointia.",
     "sameLanguage": "Valittu kieli on tallenteen alkuperäinen kieli: valitse toinen."
   }
 }

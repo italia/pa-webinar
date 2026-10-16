@@ -20,8 +20,12 @@
  *               speaker assignment.
  *
  * Editing the source transcript does NOT re-run translation/dubbing —
- * those are downstream AI artifacts. The admin must "re-run" the
- * pipeline if they want derived languages refreshed; the UI says so.
+ * those are downstream AI artifacts. What the workers produce AFTER the
+ * correction (a summary or translation still queued, a language added
+ * later) does read the corrected text: the claim writes the revised
+ * transcript to storage before handing it to the worker
+ * (lib/ai/transcript-input). An erasure, instead, rewrites the stored files
+ * here and now, so that the removed sentence does not stay in them.
  *
  * Auth: admin session cookie (same as the rest of /api/admin/postprod).
  */
@@ -37,7 +41,8 @@ import { applicaRedazione, conservaOriginali } from '@/lib/ai/original-body';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rewritePostprodBlob } from '@/lib/storage/postprod';
-import { buildVtt, parseInlineTranscriptJson, sha256Hex } from '@/lib/ai/transcript-format';
+import { buildPlainText, buildVtt, parseInlineTranscriptJson, sha256Hex } from '@/lib/ai/transcript-format';
+import { sceltaSorgente } from '@/lib/ai/transcript-input';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,7 +90,7 @@ async function loadRecording(id: string) {
         },
       },
       artifacts: {
-        where: { type: { in: ['TRANSCRIPT_JSON', 'TRANSCRIPT_VTT', 'WAVEFORM_JSON'] } },
+        where: { type: { in: ['TRANSCRIPT_JSON', 'TRANSCRIPT_VTT', 'TRANSCRIPT_TXT', 'WAVEFORM_JSON'] } },
         select: {
           id: true,
           type: true,
@@ -326,12 +331,21 @@ export const PUT = withErrorHandling(async (request, context) => {
     if (sp.displayName) speakerNames.set(sp.diarLabel, sp.displayName);
   }
   const newVttBody = buildVtt(segments, speakerNames);
-
-  const vttArtifact = recording.artifacts.find(
-    (a) =>
-      a.type === 'TRANSCRIPT_VTT' &&
-      (a.language === recording.sourceLanguage || a.language === transcript.language),
+  // Sottotitoli e testo nella lingua della registrazione: la stessa scelta
+  // della presa in carico, che allinea lo stesso file.
+  const lingueSorgente = [recording.sourceLanguage, transcript.language];
+  const vttArtifact = sceltaSorgente(
+    recording.artifacts.filter((a) => a.type === 'TRANSCRIPT_VTT'),
+    lingueSorgente,
   );
+  const txtArtifact = sceltaSorgente(
+    recording.artifacts.filter((a) => a.type === 'TRANSCRIPT_TXT'),
+    lingueSorgente,
+  );
+  // Il testo semplice si rifa' solo per una cancellazione: e' un file in piu'
+  // che conterrebbe ancora la frase tolta. Una correzione ordinaria non lo
+  // tocca (nessuno lo legge, a parte chi scarica i file).
+  const newTxtBody = buildPlainText(segments, speakerNames);
 
   // Il testo come l'ha prodotto la macchina, conservato alla PRIMA correzione.
   // Si copia il corpo memorizzato, non quello ricostruito dai segmenti: il
@@ -443,6 +457,17 @@ export const PUT = withErrorHandling(async (request, context) => {
       }
     }
 
+    if (redactOriginal && txtArtifact) {
+      await tx.postprodArtifact.update({
+        where: { id: txtArtifact.id },
+        data: {
+          inlineBody: encryptPII(newTxtBody),
+          contentHash: sha256Hex(newTxtBody),
+          sizeBytes: BigInt(Buffer.byteLength(newTxtBody, 'utf8')),
+        },
+      });
+    }
+
     if (vttArtifact) {
       await tx.postprodArtifact.update({
         where: { id: vttArtifact.id },
@@ -467,20 +492,25 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   });
 
-  // Il file nell'archivio va riscritto fuori dalla transazione: è rete, e una
-  // sua lentezza non deve tenere aperta una transazione sul database. Se
-  // fallisce lo diciamo nella risposta invece di far finta di niente — la
-  // cancellazione nella banca dati è già avvenuta e non si annulla.
+  // Una cancellazione riscrive anche i file nell'archivio, sempre: anche
+  // quando la si ripete dopo una scrittura non riuscita (a quel punto nella
+  // banca dati non c'e' piu' niente da togliere, ma nei file si'). Fuori dalla
+  // transazione: e' rete, e una sua lentezza non deve tenere aperta una
+  // transazione sul database. Se fallisce lo diciamo nella risposta invece di
+  // far finta di niente — la cancellazione nella banca dati e' gia' avvenuta e
+  // non si annulla. Una correzione ordinaria non scrive qui: la versione
+  // corretta arriva nell'archivio quando un lavoro la prende
+  // (lib/ai/transcript-input).
   let archivioAggiornato = true;
-  if (redactOriginal && redazioniApplicate > 0) {
+  if (redactOriginal) {
     // La trascrizione dai sottotitoli live non ha un file nell'archivio.
-    archivioAggiornato = jsonArtifact.blobKey
-      ? await rewritePostprodBlob(jsonArtifact.blobKey, newJsonBody, jsonArtifact.mimeType)
-      : true;
-    if (vttArtifact) {
-      const ok = await rewritePostprodBlob(vttArtifact.blobKey, newVttBody, vttArtifact.mimeType);
-      archivioAggiornato = archivioAggiornato && ok;
-    }
+    const daRiscrivere = [
+      ...(jsonArtifact.blobKey ? [{ key: jsonArtifact.blobKey, body: newJsonBody, type: jsonArtifact.mimeType }] : []),
+      ...(vttArtifact?.blobKey ? [{ key: vttArtifact.blobKey, body: newVttBody, type: vttArtifact.mimeType }] : []),
+      ...(txtArtifact?.blobKey ? [{ key: txtArtifact.blobKey, body: newTxtBody, type: txtArtifact.mimeType }] : []),
+    ];
+    const esiti = await Promise.all(daRiscrivere.map((f) => rewritePostprodBlob(f.key, f.body, f.type)));
+    archivioAggiornato = esiti.every(Boolean);
   }
 
   await logAdminAction({

@@ -5179,6 +5179,7 @@
     "storageUnavailable": "O carregamento de ficheiros não está disponível nesta instalação.",
     "aiDisabledForEvent": "A IA está desligada para este evento: use «Gerar IA» para a ligar e iniciar o processo.",
     "sourceTranscriptMissing": "Esta gravação ainda não foi transcrita: transcreva-a antes de adicionar uma tradução.",
+    "captionsTranscriptNotTranslatable": "Esta transcrição provém das legendas em direto: a tradução automática requer uma transcrição por IA da gravação.",
     "sameLanguage": "O idioma escolhido é o original da gravação: escolha outro."
   }
 }
