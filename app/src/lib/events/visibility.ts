@@ -128,7 +128,8 @@ export function isEventPubliclyVisible(
 }
 
 /**
- * True se l'evento accetta nuove registrazioni (pagina + POST API).
+ * True se l'evento accetta nuove registrazioni (pagina + POST API). Mai
+ * una chiamata istantanea.
  *
  * Un evento non ancora aperto (PUBLISHED, o in warm-up) la accetta solo fino a
  * `endsAt`: oltre, è un evento che non si è tenuto, qualunque stato abbia
@@ -142,6 +143,8 @@ export function isEventOpenForRegistration(
   event: EventLike,
   now: number = Date.now(),
 ): boolean {
+  // Una chiamata istantanea non ha iscrizioni: si entra dai due link.
+  if (event.eventType === 'INSTANT') return false;
   if (event.status === 'LIVE') return true;
   if (event.status === 'PUBLISHED') return new Date(event.endsAt).getTime() > now;
   return isWarmupPubliclyVisible(event, now);
