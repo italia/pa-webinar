@@ -222,6 +222,26 @@ export default function ChatPanel({
   const messagesRef = useRef<ChatMessage[]>([]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
   const [input, setInput] = useState('');
+  // La bozza sopravvive a un rimontaggio del pannello (una riconnessione, un
+  // cambio di fase, la chat spenta e riaccesa): resta nella scheda del
+  // browser, mai sul server, e si cancella all'invio.
+  const chiaveBozza = `pa-webinar.chat-bozza:${eventSlug}`;
+  useEffect(() => {
+    try {
+      const bozza = window.sessionStorage.getItem(chiaveBozza);
+      if (bozza) setInput(bozza);
+    } catch {
+      /* archivio del browser non disponibile: niente bozza */
+    }
+  }, [chiaveBozza]);
+  useEffect(() => {
+    try {
+      if (input) window.sessionStorage.setItem(chiaveBozza, input);
+      else window.sessionStorage.removeItem(chiaveBozza);
+    } catch {
+      /* archivio del browser non disponibile: niente bozza */
+    }
+  }, [chiaveBozza, input]);
   const [sending, setSending] = useState(false);
   // Live-chat transport health, surfaced as an unobtrusive pill.
   //   'live'         → SSE stream is delivering frames.
@@ -1370,6 +1390,14 @@ export default function ChatPanel({
         setComposeError(attachment ? t('attachFailed') : t('sendFailed'));
         return;
       }
+      // Accettato: la bozza salvata non serve più, anche se nel frattempo il
+      // pannello si è smontato e lo svuotamento del campo qui sotto non
+      // arriverebbe.
+      try {
+        window.sessionStorage.removeItem(chiaveBozza);
+      } catch {
+        /* archivio del browser non disponibile */
+      }
       // Optimistic echo: render our OWN message immediately
       // using the REAL server id, instead of relying solely on the Redis→SSE
       // fan-out. A user behind a proxy that silently buffers the SSE stream
@@ -1430,7 +1458,7 @@ export default function ChatPanel({
     } finally {
       setSending(false);
     }
-  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
+  }, [chiaveBozza, input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
 
   // Nascondere un messaggio vale per tutti e non si annulla: il primo clic
   // chiede conferma (il pulsante diventa «Conferma»), il secondo agisce.

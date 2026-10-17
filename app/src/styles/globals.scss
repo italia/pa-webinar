@@ -1134,6 +1134,12 @@ button.live-time-strip__rec {
 // Drawer. Always `position: fixed`; slides in from the right on desktop
 // and from the bottom on mobile. Closed state = translated off-screen
 // (no tab strip peek anymore — the floating bar is the launcher).
+// Il cassetto riceve il fuoco quando si apre (sul telefono): è un contenitore,
+// non un comando, e il bordo del fuoco lo vedono i suoi controlli.
+.live-sidebar:focus {
+  outline: none;
+}
+
 .live-sidebar {
   background: #ffffff;
   width: 100%;

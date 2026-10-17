@@ -2905,16 +2905,63 @@ function LiveSidebar({
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
+  // Le frecce spostano fra le schede della colonna e aprono quella raggiunta;
+  // Inizio e Fine vanno alla prima e all'ultima.
+  const spostaScheda = (e: React.KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const n = visibleTabs.length;
+    const dove =
+      e.key === 'ArrowRight' || e.key === 'ArrowDown' ? (i + 1) % n
+        : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? (i - 1 + n) % n
+          : e.key === 'Home' ? 0
+            : e.key === 'End' ? n - 1
+              : null;
+    const prossima = dove === null ? undefined : visibleTabs[dove];
+    if (!prossima) return;
+    e.preventDefault();
+    apriScheda(prossima.key);
+    document.getElementById(`live-tab-${prossima.key}`)?.focus();
+  };
+
   // ESC closes the drawer (desktop users expect it, mobile scrim
-  // already handles the tap-outside pattern).
+  // already handles the tap-outside pattern). In un campo di testo Esc esce
+  // dal campo e basta: chi scrive in chat non perde il pannello per un tasto;
+  // il secondo Esc lo chiude.
   useEffect(() => {
     if (!drawerOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeDrawer();
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      const campo = e.target instanceof HTMLElement ? e.target : null;
+      if (
+        campo &&
+        sidebarRef.current?.contains(campo) &&
+        (campo.isContentEditable || campo.matches('input, textarea, select'))
+      ) {
+        campo.blur();
+        sidebarRef.current?.focus();
+        return;
+      }
+      closeDrawer();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [drawerOpen, closeDrawer]);
+
+  // Sul telefono il cassetto copre la sala: aperto, il fuoco ci entra; chiuso,
+  // torna al pulsante da cui era partito.
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const fuocoPrimaRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (isDesktop) return;
+    if (drawerOpen) {
+      fuocoPrimaRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const raf = requestAnimationFrame(() => sidebarRef.current?.focus());
+      return () => cancelAnimationFrame(raf);
+    }
+    const prima = fuocoPrimaRef.current;
+    fuocoPrimaRef.current = null;
+    if (prima?.isConnected) prima.focus();
+    return undefined;
+  }, [drawerOpen, isDesktop]);
 
   // The floating controls portal target is mounted in LiveBody just
   // after <JitsiRoom>. We wait a tick after mount to read it, since
@@ -2941,7 +2988,7 @@ function LiveSidebar({
             type="button"
             className={`live-floating-btn${isActive && drawerOpen ? ' live-floating-btn--active' : ''}`}
             onClick={() => handleTabClick(tab.key)}
-            aria-pressed={isActive}
+            aria-pressed={isActive && drawerOpen}
           >
             <span className="live-floating-btn__icon">{tab.svg}</span>
             <span className="live-floating-btn__label">{tab.label}</span>
@@ -3057,6 +3104,8 @@ function LiveSidebar({
         // Sul telefono il cassetto chiuso esce dallo schermo ma resterebbe
         // raggiungibile con il tasto Tab: chiuso, è inerte.
         inert={!isDesktop && !drawerOpen ? true : undefined}
+        ref={sidebarRef}
+        tabIndex={-1}
       >
         {isDesktop && (
           <button
@@ -3105,14 +3154,21 @@ function LiveSidebar({
           role="tablist"
           aria-label={t('floatingControlsLabel')}
         >
-          {visibleTabs.map((tab) => {
+          {visibleTabs.map((tab, i) => {
             const isActive = activeTab === tab.key;
+            // Una sola scheda nel giro del tasto Tab (quella aperta, o la
+            // prima); fra le schede ci si sposta con le frecce.
+            const nelGiro = isActive || (i === 0 && !visibleTabs.some((v) => v.key === activeTab));
             return (
               <button
                 key={tab.key}
                 type="button"
                 role="tab"
+                id={`live-tab-${tab.key}`}
                 aria-selected={isActive}
+                aria-controls="live-sidebar-body"
+                tabIndex={nelGiro ? 0 : -1}
+                onKeyDown={(e) => spostaScheda(e, i)}
                 title={tab.label}
                 className={`live-sidebar-tab${isActive ? ' live-sidebar-tab--active' : ''}`}
                 onClick={() => apriScheda(tab.key)}
@@ -3182,6 +3238,12 @@ function LiveSidebar({
 
         <div
           id="live-sidebar-body"
+          // Pannello delle schede solo dove le schede ci sono (la colonna da
+          // computer) e quella aperta è fra quelle mostrate; sul telefono il
+          // cassetto si apre dai pulsanti della barra in basso.
+          {...(isDesktop && visibleTabs.some((v) => v.key === activeTab)
+            ? { role: 'tabpanel', 'aria-labelledby': `live-tab-${activeTab}` }
+            : {})}
           className={`flex-grow-1 ${compressa ? 'd-none' : 'd-flex'} flex-column live-sidebar-body`}
           style={{ minHeight: 0, overflowY: 'auto' }}
         >
