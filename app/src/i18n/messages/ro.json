@@ -517,16 +517,6 @@
       "whiteboard": "Tablă"
     },
     "closeDrawer": "Închideți",
-    "hintBanner": {
-      "ariaLabel": "Sfaturi",
-      "controls": "Comenzile sunt în partea de jos",
-      "raiseHand": "Ridicați mâna pentru a vorbi",
-      "sidebar": "Q&A și chat în bara laterală",
-      "dismiss": "Am înțeles"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persoană} other {# persoane}}"
-    },
     "sidebarTabChatUnread": "Mesaje noi necitite",
     "sidebarTabPollsOpen": "Sondaj deschis la care încă nu ați votat",
     "floatingControlsLabel": "Comenzi eveniment",

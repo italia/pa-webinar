@@ -517,16 +517,6 @@
       "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Stäng",
-    "hintBanner": {
-      "ariaLabel": "Tips",
-      "controls": "Kontroller längst ned",
-      "raiseHand": "Räck upp handen för att tala",
-      "sidebar": "Q&A och chatt i sidopanelen",
-      "dismiss": "Uppfattat"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# person} other {# personer}}"
-    },
     "sidebarTabChatUnread": "Nya olästa meddelanden",
     "sidebarTabPollsOpen": "Öppen omröstning där du ännu inte har röstat",
     "floatingControlsLabel": "Evenemangskontroller",

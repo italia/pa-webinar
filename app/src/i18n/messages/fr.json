@@ -517,16 +517,6 @@
       "whiteboard": "Tableau blanc"
     },
     "closeDrawer": "Fermer",
-    "hintBanner": {
-      "ariaLabel": "Conseils",
-      "controls": "Commandes en bas",
-      "raiseHand": "Levez la main pour parler",
-      "sidebar": "Q&R et chat dans le panneau latéral",
-      "dismiss": "Compris"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# personne} other {# personnes}}"
-    },
     "sidebarTabChatUnread": "Nouveaux messages non lus",
     "sidebarTabPollsOpen": "Sondage ouvert auquel vous n'avez pas encore répondu",
     "floatingControlsLabel": "Commandes de l'événement",

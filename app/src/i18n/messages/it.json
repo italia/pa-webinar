@@ -531,16 +531,6 @@
       "eventEndedSuccess": "Evento terminato con successo. Reindirizzamento..."
     },
     "closeDrawer": "Chiudi",
-    "hintBanner": {
-      "ariaLabel": "Suggerimenti",
-      "controls": "Controlli in basso",
-      "raiseHand": "Alza la mano per parlare",
-      "sidebar": "Q&A e chat nella barra laterale",
-      "dismiss": "Ho capito"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persona} other {# persone}}"
-    },
     "sidebarTabChatUnread": "Nuovi messaggi non letti",
     "sidebarTabPollsOpen": "Sondaggio aperto in cui non hai ancora votato",
     "floatingControlsLabel": "Controlli evento",

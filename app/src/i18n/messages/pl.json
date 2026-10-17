@@ -517,16 +517,6 @@
       "whiteboard": "Tablica"
     },
     "closeDrawer": "Zamknij",
-    "hintBanner": {
-      "ariaLabel": "Wskazówki",
-      "controls": "Sterowanie znajduje się na dole",
-      "raiseHand": "Podnieś rękę, aby zabrać głos",
-      "sidebar": "Q&A i czat w panelu bocznym",
-      "dismiss": "Rozumiem"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# osoba} few {# osoby} many {# osób} other {# osób}}"
-    },
     "sidebarTabChatUnread": "Nowe nieprzeczytane wiadomości",
     "sidebarTabPollsOpen": "Otwarta ankieta, w której nie oddano jeszcze Twojego głosu",
     "floatingControlsLabel": "Sterowanie wydarzeniem",

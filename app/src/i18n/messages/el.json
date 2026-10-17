@@ -517,16 +517,6 @@
       "whiteboard": "Πίνακας"
     },
     "closeDrawer": "Κλείσιμο",
-    "hintBanner": {
-      "ariaLabel": "Συμβουλές",
-      "controls": "Τα χειριστήρια βρίσκονται κάτω",
-      "raiseHand": "Σηκώστε το χέρι για να μιλήσετε",
-      "sidebar": "Q&A και συνομιλία στην πλευρική στήλη",
-      "dismiss": "Κατανοητό"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# άτομο} other {# άτομα}}"
-    },
     "sidebarTabChatUnread": "Νέα μη αναγνωσμένα μηνύματα",
     "sidebarTabPollsOpen": "Ανοιχτή δημοσκόπηση στην οποία δεν έχετε ψηφίσει ακόμη",
     "floatingControlsLabel": "Χειριστήρια εκδήλωσης",

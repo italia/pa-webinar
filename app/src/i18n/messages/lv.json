@@ -517,16 +517,6 @@
       "whiteboard": "Tāfele"
     },
     "closeDrawer": "Aizvērt",
-    "hintBanner": {
-      "ariaLabel": "Padomi",
-      "controls": "Vadīklas atrodas apakšā",
-      "raiseHand": "Paceliet roku, lai runātu",
-      "sidebar": "Q&A un tērzēšana sānu panelī",
-      "dismiss": "Sapratu"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persona} other {# personas}}"
-    },
     "sidebarTabChatUnread": "Jauni nelasīti ziņojumi",
     "sidebarTabPollsOpen": "Atvērta aptauja, kurā vēl neesat balsojis",
     "floatingControlsLabel": "Pasākuma vadīklas",

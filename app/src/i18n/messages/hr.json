@@ -517,16 +517,6 @@
       "whiteboard": "Ploča"
     },
     "closeDrawer": "Zatvori",
-    "hintBanner": {
-      "ariaLabel": "Savjeti",
-      "controls": "Kontrole su pri dnu",
-      "raiseHand": "Podignite ruku za govor",
-      "sidebar": "Q&A i razgovor u bočnoj traci",
-      "dismiss": "Razumijem"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# osoba} few {# osobe} other {# osoba}}"
-    },
     "sidebarTabChatUnread": "Nove nepročitane poruke",
     "sidebarTabPollsOpen": "Otvorena anketa u kojoj još niste glasali",
     "floatingControlsLabel": "Kontrole događaja",

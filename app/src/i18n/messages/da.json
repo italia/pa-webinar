@@ -517,16 +517,6 @@
       "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Luk",
-    "hintBanner": {
-      "ariaLabel": "Tips",
-      "controls": "Knapper i bunden",
-      "raiseHand": "Ræk hånden op for at tale",
-      "sidebar": "Q&A og chat i sidepanelet",
-      "dismiss": "Forstået"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# person} other {# personer}}"
-    },
     "sidebarTabChatUnread": "Nye ulæste beskeder",
     "sidebarTabPollsOpen": "Åben afstemning, som du endnu ikke har stemt i",
     "floatingControlsLabel": "Arrangementsknapper",

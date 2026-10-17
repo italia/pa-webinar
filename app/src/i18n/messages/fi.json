@@ -517,16 +517,6 @@
       "whiteboard": "Piirtotaulu"
     },
     "closeDrawer": "Sulje",
-    "hintBanner": {
-      "ariaLabel": "Vinkit",
-      "controls": "Säätimet alareunassa",
-      "raiseHand": "Nosta käsi puhuaksesi",
-      "sidebar": "Q&A ja keskustelu sivupaneelissa",
-      "dismiss": "Selvä"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# henkilö} other {# henkilöä}}"
-    },
     "sidebarTabChatUnread": "Uusia lukemattomia viestejä",
     "sidebarTabPollsOpen": "Avoin kysely, johon et ole vielä vastannut",
     "floatingControlsLabel": "Tapahtuman säätimet",

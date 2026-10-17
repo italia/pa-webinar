@@ -871,13 +871,6 @@ button.live-time-strip__rec {
   }
 }
 
-// Ancillary flex-children stacked above the main video area. Without
-// `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
-// these banners and eat into their legibility.
-.live-hint-banner {
-  flex-shrink: 0;
-}
-
 // Registrazione in corso: un'icona nella barra in alto, non una fascia.
 .live-rec-indicator {
   display: inline-flex;
@@ -1960,7 +1953,7 @@ button.live-time-strip__rec {
   // and stays persistently visible in tile view — otherwise the overlay sat
   // right on top of those controls and blocked their clicks.
   bottom: 88px;
-  // #7: the custom bar sits BOTTOM-LEFT (not centre) so it can NEVER overlap
+  // The custom bar sits BOTTOM-LEFT (not centre) so it can NEVER overlap
   // Jitsi's native bottom-centre control bar. It only renders in CUSTOM
   // reactions mode (NATIVE mode uses Jitsi's own toolbar reactions button).
   // Still lifted above the toolbar band and pointer-events:none on the

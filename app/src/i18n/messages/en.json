@@ -517,16 +517,6 @@
       "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Close",
-    "hintBanner": {
-      "ariaLabel": "Tips",
-      "controls": "Controls are at the bottom",
-      "raiseHand": "Raise your hand to speak",
-      "sidebar": "Q&A and chat in the side panel",
-      "dismiss": "Got it"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# person} other {# people}}"
-    },
     "sidebarTabChatUnread": "New unread messages",
     "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Event controls",

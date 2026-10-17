@@ -977,7 +977,7 @@ model EventAgendaItem {
   // Tenuto allineato a `status` (vero solo per DONE): lo leggono la sintesi
   // della post-produzione e i client della versione precedente.
   completed Boolean @default(false)
-  // Lo stato dell'argomento nella scaletta. Uno solo alla volta e' CURRENT.
+  // Lo stato dell'argomento nell'agenda. Uno solo alla volta e' CURRENT.
   status    AgendaItemStatus @default(PENDING)
 
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -1392,7 +1392,7 @@ model SiteSetting {
   // per inattività SICURA è già data dalla grace 45-min LIVE->IDLE (risvegliabile);
   // questo close terminale anticipato resta un opt-in configurabile da admin.
   jvbEmptyCloseMinutes     Int @default(-1) @map("jvb_empty_close_minutes")
-  // Modalità reazioni (#7): 'NATIVE' = pulsante reazioni nativo di Jitsi nella
+  // Modalità reazioni: 'NATIVE' = pulsante reazioni nativo di Jitsi nella
   // barra (effimere, nessuna analitica); 'CUSTOM' = barra reazioni custom
   // dell'app (persistite/aggregate). Default 'NATIVE'.
   reactionsMode            String @default("NATIVE") @map("reactions_mode")
@@ -1405,7 +1405,7 @@ model SiteSetting {
 
   // Timeout oltre il quale un evento LIVE/PROVISIONING senza JVB pronto
   // viene segnalato come "degraded" sulla status page (invece che come
-  // "standby normale"). Default 15 min, copre cold-start del nodo F16
+  // "standby normale"). Default 15 min, copre l'avvio a freddo del nodo del bridge
   // (~3-5 min) + boot JVB (~1 min) + margine di sicurezza.
   jvbProvisioningTimeoutMinutes Int @default(15) @map("jvb_provisioning_timeout_minutes")
 
@@ -2612,7 +2612,7 @@ model RecordingConsent {
 }
 
 // La cronologia della sala: un'azione dal vivo per riga (un argomento della
-// scaletta avviato, un sondaggio chiuso, una funzione accesa, una mano
+// dell'agenda avviato, un sondaggio chiuso, una funzione accesa, una mano
 // alzata...), con l'ora del server come unica base dei tempi. La
 // post-produzione la legge accanto alla trascrizione (lib/postprod/
 // live-timeline.ts). Scrive lib/live/actions.ts.

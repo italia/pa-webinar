@@ -517,16 +517,6 @@
       "whiteboard": "Clár bán"
     },
     "closeDrawer": "Dún",
-    "hintBanner": {
-      "ariaLabel": "Leideanna",
-      "controls": "Tá na rialuithe thíos",
-      "raiseHand": "Ardaigh do lámh chun labhairt",
-      "sidebar": "Q&A agus comhrá sa bharra taoibh",
-      "dismiss": "Tuigim"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# duine} other {# dhuine}}"
-    },
     "sidebarTabChatUnread": "Teachtaireachtaí nua gan léamh",
     "sidebarTabPollsOpen": "Pobalbhreith oscailte nár vótáil sibh inti fós",
     "floatingControlsLabel": "Rialuithe imeachta",

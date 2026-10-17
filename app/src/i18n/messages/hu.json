@@ -517,16 +517,6 @@
       "whiteboard": "Tábla"
     },
     "closeDrawer": "Bezárás",
-    "hintBanner": {
-      "ariaLabel": "Tippek",
-      "controls": "A vezérlők lent találhatók",
-      "raiseHand": "Emelje fel a kezét, ha beszélni szeretne",
-      "sidebar": "Q&A és chat az oldalsávban",
-      "dismiss": "Értettem"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# fő} other {# fő}}"
-    },
     "sidebarTabChatUnread": "Új, olvasatlan üzenetek",
     "sidebarTabPollsOpen": "Nyitott szavazás, amelyen még nem szavazott",
     "floatingControlsLabel": "Eseményvezérlők",

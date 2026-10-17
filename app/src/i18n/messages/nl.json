@@ -517,16 +517,6 @@
       "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Sluiten",
-    "hintBanner": {
-      "ariaLabel": "Tips",
-      "controls": "Bediening onderaan",
-      "raiseHand": "Steek uw hand op om te spreken",
-      "sidebar": "Q&A en chat in het zijpaneel",
-      "dismiss": "Begrepen"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persoon} other {# personen}}"
-    },
     "sidebarTabChatUnread": "Nieuwe ongelezen berichten",
     "sidebarTabPollsOpen": "Open peiling waarin u nog niet hebt gestemd",
     "floatingControlsLabel": "Bediening evenement",

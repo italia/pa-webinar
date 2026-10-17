@@ -517,16 +517,6 @@
       "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Agħlaq",
-    "hintBanner": {
-      "ariaLabel": "Suġġerimenti",
-      "controls": "Il-kontrolli jinsabu f'isfel",
-      "raiseHand": "Għolli idek biex titkellem",
-      "sidebar": "Q&A u chat fil-pannell tal-ġenb",
-      "dismiss": "Fhimt"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persuna} other {# persuni}}"
-    },
     "sidebarTabChatUnread": "Messaġġi ġodda mhux moqrija",
     "sidebarTabPollsOpen": "Stħarriġ miftuħ li għadek ma vvutajtx fih",
     "floatingControlsLabel": "Kontrolli tal-avveniment",

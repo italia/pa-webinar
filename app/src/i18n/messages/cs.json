@@ -517,16 +517,6 @@
       "whiteboard": "Tabule"
     },
     "closeDrawer": "Zavřít",
-    "hintBanner": {
-      "ariaLabel": "Tipy",
-      "controls": "Ovládací prvky dole",
-      "raiseHand": "Zvedněte ruku, chcete-li mluvit",
-      "sidebar": "Q&A a chat v bočním panelu",
-      "dismiss": "Rozumím"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# osoba} few {# osoby} other {# osob}}"
-    },
     "sidebarTabChatUnread": "Nové nepřečtené zprávy",
     "sidebarTabPollsOpen": "Otevřená anketa, ve které jste ještě nehlasovali",
     "floatingControlsLabel": "Ovládání události",

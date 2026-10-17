@@ -517,16 +517,6 @@
       "whiteboard": "Lenta"
     },
     "closeDrawer": "Uždaryti",
-    "hintBanner": {
-      "ariaLabel": "Patarimai",
-      "controls": "Valdikliai apačioje",
-      "raiseHand": "Pakelkite ranką, jei norite kalbėti",
-      "sidebar": "Q&A ir pokalbis šoninėje juostoje",
-      "dismiss": "Supratau"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# asmuo} other {# asmenys}}"
-    },
     "sidebarTabChatUnread": "Naujos neperskaitytos žinutės",
     "sidebarTabPollsOpen": "Atvira apklausa, kurioje dar nebalsavote",
     "floatingControlsLabel": "Renginio valdikliai",

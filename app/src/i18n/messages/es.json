@@ -517,16 +517,6 @@
       "whiteboard": "Pizarra"
     },
     "closeDrawer": "Cerrar",
-    "hintBanner": {
-      "ariaLabel": "Sugerencias",
-      "controls": "Controles abajo",
-      "raiseHand": "Levante la mano para hablar",
-      "sidebar": "Q&A y chat en la barra lateral",
-      "dismiss": "Entendido"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# persona} other {# personas}}"
-    },
     "sidebarTabChatUnread": "Mensajes nuevos sin leer",
     "sidebarTabPollsOpen": "Encuesta abierta en la que aún no has votado",
     "floatingControlsLabel": "Controles del evento",

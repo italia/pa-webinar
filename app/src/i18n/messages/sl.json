@@ -517,16 +517,6 @@
       "whiteboard": "Tabla"
     },
     "closeDrawer": "Zapri",
-    "hintBanner": {
-      "ariaLabel": "Namigi",
-      "controls": "Krmilniki spodaj",
-      "raiseHand": "Dvignite roko za besedo",
-      "sidebar": "Q&A in klepet v stranski vrstici",
-      "dismiss": "Razumem"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# oseba} two {# osebi} few {# osebe} other {# oseb}}"
-    },
     "sidebarTabChatUnread": "Nova neprebrana sporočila",
     "sidebarTabPollsOpen": "Odprta anketa, v kateri še niste glasovali",
     "floatingControlsLabel": "Krmilniki dogodka",

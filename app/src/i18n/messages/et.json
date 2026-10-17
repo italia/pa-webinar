@@ -517,16 +517,6 @@
       "whiteboard": "Tahvel"
     },
     "closeDrawer": "Sulge",
-    "hintBanner": {
-      "ariaLabel": "Nõuanded",
-      "controls": "Juhtnupud on all",
-      "raiseHand": "Tõstke käsi rääkimiseks",
-      "sidebar": "Q&A ja vestlus külgribal",
-      "dismiss": "Selge"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# inimene} other {# inimest}}"
-    },
     "sidebarTabChatUnread": "Uued lugemata sõnumid",
     "sidebarTabPollsOpen": "Avatud küsitlus, milles te pole veel hääletanud",
     "floatingControlsLabel": "Sündmuse juhtnupud",

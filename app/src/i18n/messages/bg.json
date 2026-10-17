@@ -517,16 +517,6 @@
       "whiteboard": "Бяла дъска"
     },
     "closeDrawer": "Затвори",
-    "hintBanner": {
-      "ariaLabel": "Съвети",
-      "controls": "Контролите са отдолу",
-      "raiseHand": "Вдигнете ръка, за да говорите",
-      "sidebar": "Q&A и чат в страничната лента",
-      "dismiss": "Разбрах"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# човек} other {# души}}"
-    },
     "sidebarTabChatUnread": "Нови непрочетени съобщения",
     "sidebarTabPollsOpen": "Отворена анкета, в която още не сте гласували",
     "floatingControlsLabel": "Контроли на събитието",

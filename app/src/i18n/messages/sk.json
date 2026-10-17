@@ -517,16 +517,6 @@
       "whiteboard": "Tabuľa"
     },
     "closeDrawer": "Zavrieť",
-    "hintBanner": {
-      "ariaLabel": "Tipy",
-      "controls": "Ovládacie prvky sú dole",
-      "raiseHand": "Zdvihnite ruku, ak chcete hovoriť",
-      "sidebar": "Q&A a chat v bočnom paneli",
-      "dismiss": "Rozumiem"
-    },
-    "topBarCount": {
-      "live": "👥 {count, plural, one {# osoba} other {# osôb}}"
-    },
     "sidebarTabChatUnread": "Nové neprečítané správy",
     "sidebarTabPollsOpen": "Otvorená anketa, v ktorej ste ešte nehlasovali",
     "floatingControlsLabel": "Ovládanie podujatia",

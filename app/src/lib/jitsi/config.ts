@@ -5,8 +5,9 @@
  * screen share, etc.) while keeping our custom wrapper for moderator
  * features (recording, end event) and the Q&A panel.
  *
- * Chat and reactions are handled by custom components in the app sidebar
- * and as a floating overlay, so they are excluded from the Jitsi toolbar.
+ * La chat è un componente della colonna laterale della sala, quindi non sta
+ * nella barra di Jitsi. Le reazioni usano il pulsante di Jitsi, salvo che il
+ * sito scelga la barra della sala (JitsiRoom, `reactionsMode`).
  *
  * NOTE: the IFrame API ignores customTheme and dynamicBrandingUrl when passed
  * via configOverwrite. The stage colour is set here (DEFAULT_BACKGROUND, which
@@ -30,7 +31,7 @@ import { JITSI_STAGE_BACKGROUND } from './branding';
  * handleLeaveRoom / handleReadyToClose.
  *
  * 'chat' excluded: we use a custom ChatPanel in the sidebar.
- * 'reactions' excluded: we use a custom ReactionBar overlay.
+ * 'reactions' la aggiunge JitsiRoom nella modalità NATIVE (quella predefinita).
  */
 export const baseToolbarButtons = [
   'microphone',
