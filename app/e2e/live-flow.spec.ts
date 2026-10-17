@@ -103,9 +103,17 @@ test.describe('Live event flow (smoke)', () => {
 
   test.afterAll(async ({ request }) => {
     if (eventId) {
-      await request.delete(`${BASE}/api/events/${eventId}`, {
-        headers: { Authorization: `Bearer ${moderatorToken}` },
-      });
+      // Un evento in diretta non si elimina (409): prima si termina. Contro un
+      // ambiente condiviso resterebbe in diretta e terrebbe acceso il bridge.
+      // La cancellazione si tenta comunque, anche se la chiusura fallisce.
+      try {
+        await setEventStatus(request, eventId, moderatorToken, 'ENDED');
+      } finally {
+        const res = await request.delete(`${BASE}/api/events/${eventId}`, {
+          headers: { Authorization: `Bearer ${moderatorToken}` },
+        });
+        expect(res.ok(), `Delete event failed: ${res.status()}`).toBeTruthy();
+      }
     }
   });
 
