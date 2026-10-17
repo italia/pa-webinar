@@ -37,6 +37,10 @@ interface LiveTimeStripProps {
   registrazione: ControlloRegistrazione;
   eventSlug: string;
   onApriRegia: () => void;
+  /** Solo l'orologio dell'evento, per chi interviene senza condurre: timer e
+   *  registrazione li governa chi conduce, e il timer chi interviene lo vede
+   *  già nella fascia del pubblico. */
+  soloOrologio?: boolean;
 }
 
 // Icone della striscia: segnali, non decorazione. Disegnate qui (niente
@@ -109,6 +113,7 @@ export default function LiveTimeStrip({
   registrazione,
   eventSlug,
   onApriRegia,
+  soloOrologio = false,
 }: LiveTimeStripProps) {
   const timer = useTimerInterventi(eventSlug);
   const t = useTranslations('live.strip');
@@ -226,76 +231,78 @@ export default function LiveTimeStrip({
         )}
       </div>
 
-      <div className="live-time-strip__side">
-        {/* Il timer degli interventi: lo stesso della fascia per il pubblico,
-            con il colore che cambia e un anello che si svuota. */}
-        {timer.active && (
-          <button
-            type="button"
-            className={`live-time-strip__chip live-time-strip__chip--${toniTimer(timer.remaining, timer.duration)}${
-              timer.paused ? ' live-time-strip__chip--paused' : ''
-            }${timer.remaining > 0 && timer.remaining < 60 && !timer.paused ? ' live-time-strip__chip--last' : ''}`}
-            onClick={onApriRegia}
-            aria-label={t('timerChipLabel', { time: formatTimer(timer.remaining) })}
-          >
-            <span
-              className="live-time-strip__ring"
-              style={{
-                ['--quota' as string]: `${timer.duration > 0 ? (timer.remaining / timer.duration) * 360 : 0}deg`,
-              }}
-              aria-hidden="true"
-            />
-            <span>{t('timerChip')}</span>
-            <strong className="font-monospace">
-              {timer.remaining === 0 ? tt('timeUp') : formatTimer(timer.remaining)}
-            </strong>
-            {timer.paused && <span className="live-time-strip__chip-note">{t('timerPaused')}</span>}
-          </button>
-        )}
+      {!soloOrologio && (
+        <div className="live-time-strip__side">
+          {/* Il timer degli interventi: lo stesso della fascia per il pubblico,
+              con il colore che cambia e un anello che si svuota. */}
+          {timer.active && (
+            <button
+              type="button"
+              className={`live-time-strip__chip live-time-strip__chip--${toniTimer(timer.remaining, timer.duration)}${
+                timer.paused ? ' live-time-strip__chip--paused' : ''
+              }${timer.remaining > 0 && timer.remaining < 60 && !timer.paused ? ' live-time-strip__chip--last' : ''}`}
+              onClick={onApriRegia}
+              aria-label={t('timerChipLabel', { time: formatTimer(timer.remaining) })}
+            >
+              <span
+                className="live-time-strip__ring"
+                style={{
+                  ['--quota' as string]: `${timer.duration > 0 ? (timer.remaining / timer.duration) * 360 : 0}deg`,
+                }}
+                aria-hidden="true"
+              />
+              <span>{t('timerChip')}</span>
+              <strong className="font-monospace">
+                {timer.remaining === 0 ? tt('timeUp') : formatTimer(timer.remaining)}
+              </strong>
+              {timer.paused && <span className="live-time-strip__chip-note">{t('timerPaused')}</span>}
+            </button>
+          )}
 
-        {recordingEnabled &&
-          (isRecording ? (
-            <button
-              type="button"
-              className="live-time-strip__rec live-time-strip__rec--on"
-              onClick={onApriRegia}
-              aria-label={durataRec ? t('recOnLabel', { time: durataRec }) : tl('recordingActive')}
-            >
-              <span className="live-time-strip__rec-dot" aria-hidden="true" />
-              <span>{tl('recordingShort')}</span>
-              {durataRec && <strong className="font-monospace">{durataRec}</strong>}
-            </button>
-          ) : registrazione.inPausa ? (
-            <span className="live-time-strip__rec live-time-strip__rec--wait">{tl('moderator.recPreparing')}</span>
-          ) : faseRegistratore === 'in-avvio' ? (
-            <span className="live-time-strip__rec live-time-strip__rec--wait" title={tl('jibriScalingTooltip')}>
-              {tl('jibriScaling')}
-            </span>
-          ) : faseRegistratore === 'non-partito' || faseRegistratore === 'non-configurato' ? (
-            <button
-              type="button"
-              className="live-time-strip__rec live-time-strip__rec--warn"
-              onClick={onApriRegia}
-              title={faseRegistratore === 'non-partito' ? tl('recorderNotStartedDetail') : tl('jibriNotConfigured')}
-            >
-              {faseRegistratore === 'non-partito' ? tl('recorderNotStarted') : tl('jibriNotConfigured')}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="live-time-strip__rec live-time-strip__rec--off"
-              onClick={onApriRegia}
-              aria-label={t('recOffLabel')}
-            >
-              <span className="live-time-strip__rec-dot" aria-hidden="true" />
-              <span>{t('recOff')}</span>
-            </button>
-          ))}
-      </div>
+          {recordingEnabled &&
+            (isRecording ? (
+              <button
+                type="button"
+                className="live-time-strip__rec live-time-strip__rec--on"
+                onClick={onApriRegia}
+                aria-label={durataRec ? t('recOnLabel', { time: durataRec }) : tl('recordingActive')}
+              >
+                <span className="live-time-strip__rec-dot" aria-hidden="true" />
+                <span>{tl('recordingShort')}</span>
+                {durataRec && <strong className="font-monospace">{durataRec}</strong>}
+              </button>
+            ) : registrazione.inPausa ? (
+              <span className="live-time-strip__rec live-time-strip__rec--wait">{tl('moderator.recPreparing')}</span>
+            ) : faseRegistratore === 'in-avvio' ? (
+              <span className="live-time-strip__rec live-time-strip__rec--wait" title={tl('jibriScalingTooltip')}>
+                {tl('jibriScaling')}
+              </span>
+            ) : faseRegistratore === 'non-partito' || faseRegistratore === 'non-configurato' ? (
+              <button
+                type="button"
+                className="live-time-strip__rec live-time-strip__rec--warn"
+                onClick={onApriRegia}
+                title={faseRegistratore === 'non-partito' ? tl('recorderNotStartedDetail') : tl('jibriNotConfigured')}
+              >
+                {faseRegistratore === 'non-partito' ? tl('recorderNotStarted') : tl('jibriNotConfigured')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="live-time-strip__rec live-time-strip__rec--off"
+                onClick={onApriRegia}
+                aria-label={t('recOffLabel')}
+              >
+                <span className="live-time-strip__rec-dot" aria-hidden="true" />
+                <span>{t('recOff')}</span>
+              </button>
+            ))}
+        </div>
+      )}
 
       {/* Gli avvisi del registratore (non partito, avvio fallito): qui, e non
           solo nella Regia, perché si vedano da qualunque scheda. */}
-      {registrazione.avviso && (
+      {!soloOrologio && registrazione.avviso && (
         <div className="live-time-strip__alert" role="alert">
           {registrazione.avviso}
         </div>

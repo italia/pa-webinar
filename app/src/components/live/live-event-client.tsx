@@ -1862,7 +1862,9 @@ export default function LiveEventClient({
         onToggleFullscreen={toggleFullscreen}
       />
 
-      {isActualModerator && !showJvbOverlay && (
+      {/* L'orologio dell'evento per chi conduce e per chi interviene; per
+          chi interviene senza i comandi di timer e registrazione. */}
+      {(isActualModerator || isSpeaker) && !showJvbOverlay && (
         <LiveTimeStrip
           startsAt={event.startsAt}
           endsAt={event.endsAt}
@@ -1877,6 +1879,7 @@ export default function LiveEventClient({
           registrazione={registrazione}
           eventSlug={event.slug}
           onApriRegia={apriRegia}
+          soloOrologio={!isActualModerator}
         />
       )}
 
@@ -1898,9 +1901,9 @@ export default function LiveEventClient({
         </div>
       )}
 
-      {/* Chi non conduce non vede l'orologio: solo, negli ultimi minuti, che
-          la sala sta per chiudersi da sola. */}
-      {!isActualModerator && !showJvbOverlay && !isInstantCall && (
+      {/* Il pubblico non vede l'orologio: solo, negli ultimi minuti, che la
+          sala sta per chiudersi da sola. */}
+      {!isActualModerator && !isSpeaker && !showJvbOverlay && !isInstantCall && (
         <ClosingNotice
           startsAt={event.startsAt}
           endsAt={event.endsAt}
