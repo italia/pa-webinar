@@ -378,7 +378,8 @@ export const GET = withErrorHandling(async (request) => {
       recordingEnabled: event.recordingEnabled,
       status: event.status,
       eventType: event.eventType,
-      recordingUrl: event.recordingUrl,
+      // Come la rotta del singolo evento: il video solo se pubblicato.
+      recordingUrl: event.recordingPublished ? event.recordingUrl : null,
     };
   });
 
