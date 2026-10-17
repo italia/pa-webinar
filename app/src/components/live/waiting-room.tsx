@@ -183,6 +183,9 @@ interface WaitingRoomProps {
     hasCallLink: boolean;
   };
   role: 'moderator' | 'participant' | 'guest';
+  /** Microfono e fotocamera che l'evento concede a questa persona in sala
+   *  (chi conduce o interviene li ha sempre). Default: entrambi. */
+  mediaConcessi?: { microfono: boolean; fotocamera: boolean };
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di chi assiste. Per tutti partono spenti. */
   conduce?: boolean;
@@ -267,6 +270,7 @@ export default function WaitingRoom({
   condivisione,
   role,
   conduce = false,
+  mediaConcessi = { microfono: true, fotocamera: true },
   jvbReady,
   defaultName,
   onEnterLive,
@@ -1053,7 +1057,12 @@ export default function WaitingRoom({
   );
 
   const deviceCheckField = (
-    <DeviceCheck conduce={conduce} onStateChange={handleDeviceStateChange} />
+    <DeviceCheck
+      conduce={conduce}
+      microfonoConcesso={mediaConcessi.microfono}
+      fotocameraConcessa={mediaConcessi.fotocamera}
+      onStateChange={handleDeviceStateChange}
+    />
   );
 
   // Le buone pratiche si aprono a richiesta: chi le conosce non le rilegge.

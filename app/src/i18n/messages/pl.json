@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Podgląd tła nie jest dostępny w tej przeglądarce: tło i tak zostanie zastosowane po wejściu do sali.",
     "backgroundHintPreview": "Widzisz je już w podglądzie i zostanie po wejściu do sali. Aby rozmyć tło, użyj w środku przycisku teł.",
     "avTitle": "Dźwięk i obraz",
-    "avOffHint": "Wchodzisz z wyłączoną kamerą i mikrofonem i możesz je włączyć w sali. Jeśli chcesz je najpierw wypróbować, włącz je tutaj."
+    "avOffHint": "Wchodzisz z wyłączoną kamerą i mikrofonem i możesz je włączyć w sali. Jeśli chcesz je najpierw wypróbować, włącz je tutaj.",
+    "avOffHintCamera": "Wchodzisz z wyłączoną kamerą i możesz ją włączyć w sali. Jeśli chcesz ją najpierw sprawdzić, włącz ją tutaj.",
+    "avOffHintMic": "Wchodzisz z wyłączonym mikrofonem i możesz go włączyć w sali. Jeśli chcesz go najpierw sprawdzić, włącz go tutaj.",
+    "avListenOnly": "W tym wydarzeniu publiczność słucha: wchodzisz z wyłączonym mikrofonem i kamerą. Jeśli prowadzący udzieli ci głosu, w sali pojawi się przycisk do ich włączenia.",
+    "avMicLocked": "Mikrofon pozostaje wyłączony, dopóki prowadzący nie udzieli ci głosu: wtedy w sali pojawi się przycisk do jego włączenia.",
+    "avCameraLocked": "Kamera pozostaje wyłączona, dopóki prowadzący nie udzieli ci głosu: wtedy w sali pojawi się przycisk do jej włączenia."
   },
   "garden": {
     "enable": "Pokaż ogród",

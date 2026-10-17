@@ -318,8 +318,21 @@ Each event has three flags: `participantsCanUnmute`, `participantsCanStartVideo`
 `participantsCanShareScreen`. They apply to the participant role:
 
 - when `participantsCanUnmute` or `participantsCanStartVideo` is off, `JitsiRoom` removes the
-  microphone or camera button and forces that participant to join muted;
+  microphone or camera button and forces that participant to join muted, and the waiting room offers
+  no microphone or camera switch to that participant and says why;
 - when `participantsCanShareScreen` is off, it removes the screen-share button.
+
+The buttons follow the moderation during the call. `JitsiRoom` listens to `moderationStatusChanged`,
+`moderationParticipantApproved` and `moderationParticipantRejected` and rewrites the toolbar with
+`overwriteConfig`. When a moderator gives a participant the floor, that participant gets the
+microphone (and camera) button back, together with Jitsi's notice asking them to speak. When the
+floor is taken back, or the moderation is switched on again, the button goes away and the room closes
+a microphone or camera that was still open, which the bridge has already muted. When the moderation is
+lifted, every participant in the room gets the buttons; someone who joins after that gets them only
+when a moderator gives them the floor, because the room shows a button only after Jitsi's own event
+says the person may use it. The site keeps Jitsi's notifications off except
+`notify.hostAskedUnmute`, `notify.mutedRemotelyTitle` and `notify.videoMutedRemotelyTitle`
+(`notifications` in `app/src/lib/jitsi/config.ts`).
 
 The server enforces them too. Every token of the event carries the flags that are off, and the Prosody
 module `mod_pa_media_lock` switches on Jitsi's audio, video and screen-share moderation as the first
@@ -329,8 +342,14 @@ Moderators are always allowed, and speakers are allowed as soon as they join. Th
 before the first person enters, so everyone, including a speaker who is the first to join, enters a
 room that is already moderated ([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
 
-A moderator can lift or restore the moderation during the call from the control bar
-(**Participant mic**, **Participant video**). Both toggles are always shown to moderators.
+With the lock on, Jitsi closes the microphone and camera of everyone who has just joined, moderators
+and speakers included, when it receives the room's start-muted rule. For a moderator or speaker who
+chose them on in the waiting room, `JitsiRoom` opens them again, once, in the first seconds after
+joining. After that, or as soon as the person presses the button themselves, a mute stays as it is,
+whoever caused it. On a phone, where everyone joins with both off, it does nothing.
+
+A moderator can lift or restore the moderation during the call from the **Participants** tab
+(**Microphones locked**, **Video locked**). Both toggles are always shown to moderators.
 
 ### Video quality presets
 

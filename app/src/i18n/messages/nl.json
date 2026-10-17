@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "De voorvertoning van de achtergrond is niet beschikbaar in deze browser: de achtergrond wordt toch toegepast als je de zaal binnengaat.",
     "backgroundHintPreview": "Je ziet hem al in de voorvertoning, en hij blijft als je de zaal binnengaat. Gebruik binnen de knop voor achtergronden om je achtergrond te vervagen.",
     "avTitle": "Audio en video",
-    "avOffHint": "Je komt binnen met camera en microfoon uit en kunt ze in de zaal aanzetten. Wil je ze eerst proberen, zet ze dan hier aan."
+    "avOffHint": "Je komt binnen met camera en microfoon uit en kunt ze in de zaal aanzetten. Wil je ze eerst proberen, zet ze dan hier aan.",
+    "avOffHintCamera": "Je komt binnen met de camera uit en kunt hem in de zaal aanzetten. Wil je hem eerst proberen, zet hem dan hier aan.",
+    "avOffHintMic": "Je komt binnen met de microfoon uit en kunt hem in de zaal aanzetten. Wil je hem eerst proberen, zet hem dan hier aan.",
+    "avListenOnly": "Bij dit evenement luistert het publiek: je komt binnen met microfoon en camera uit. Als de moderator je het woord geeft, verschijnt in de zaal de knop om ze aan te zetten.",
+    "avMicLocked": "De microfoon blijft uit tot de moderator je het woord geeft: dan verschijnt in de zaal de knop om hem aan te zetten.",
+    "avCameraLocked": "De camera blijft uit tot de moderator je het woord geeft: dan verschijnt in de zaal de knop om hem aan te zetten."
   },
   "garden": {
     "enable": "Toon de tuin",

@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Fono peržiūra šioje naršyklėje nepasiekiama: fonas vis tiek pritaikomas įėjus į kambarį.",
     "backgroundHintPreview": "Jau matote jį peržiūroje, ir jis išliks įėjus į kambarį. Norėdami sulieti foną, viduje naudokite fonų mygtuką.",
     "avTitle": "Garsas ir vaizdas",
-    "avOffHint": "Įeinate išjungę kamerą ir mikrofoną ir galite juos įjungti kambaryje. Jei norite juos išbandyti iš anksto, įjunkite juos čia."
+    "avOffHint": "Įeinate išjungę kamerą ir mikrofoną ir galite juos įjungti kambaryje. Jei norite juos išbandyti iš anksto, įjunkite juos čia.",
+    "avOffHintCamera": "Įeinate išjungę kamerą ir galėsite ją įjungti kambaryje. Jei norite ją pirmiau išbandyti, įjunkite ją čia.",
+    "avOffHintMic": "Įeinate išjungę mikrofoną ir galėsite jį įjungti kambaryje. Jei norite jį pirmiau išbandyti, įjunkite jį čia.",
+    "avListenOnly": "Šiame renginyje auditorija klausosi: įeinate išjungę mikrofoną ir kamerą. Jei vedėjas suteiks jums žodį, kambaryje atsiras mygtukas jiems įjungti.",
+    "avMicLocked": "Mikrofonas lieka išjungtas, kol vedėjas suteiks jums žodį: tada kambaryje atsiras mygtukas jam įjungti.",
+    "avCameraLocked": "Kamera lieka išjungta, kol vedėjas suteiks jums žodį: tada kambaryje atsiras mygtukas jai įjungti."
   },
   "garden": {
     "enable": "Rodyti sodą",

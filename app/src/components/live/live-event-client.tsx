@@ -1587,6 +1587,11 @@ export default function LiveEventClient({
           presenze={presenze}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
           conduce={conduceOInterviene}
+          // Gli stessi permessi che la sala dà a JitsiRoom.
+          mediaConcessi={{
+            microfono: isModerator || isSpeaker || event.participantsCanUnmute,
+            fotocamera: isModerator || isSpeaker || event.participantsCanStartVideo,
+          }}
           condivisione={{
             locale,
             // Il link da moderatore solo a chi modera (non ai relatori).

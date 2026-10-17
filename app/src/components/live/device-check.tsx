@@ -105,6 +105,11 @@ interface DeviceCheckProps {
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di quando si partecipa. */
   conduce?: boolean;
+  /** L'evento concede il microfono a questa persona: senza, si entra chiusi
+   *  finché chi conduce non dà la parola, e qui non c'è niente da scegliere. */
+  microfonoConcesso?: boolean;
+  /** Come sopra, per la fotocamera. */
+  fotocameraConcessa?: boolean;
 }
 
 /**
@@ -114,7 +119,12 @@ interface DeviceCheckProps {
  * periferiche, livello del microfono, prova delle casse — e la scelta passa
  * alla sala come stato d'ingresso.
  */
-export default function DeviceCheck({ onStateChange, conduce = false }: DeviceCheckProps) {
+export default function DeviceCheck({
+  onStateChange,
+  conduce = false,
+  microfonoConcesso = true,
+  fotocameraConcessa = true,
+}: DeviceCheckProps) {
   const t = useTranslations('deviceCheck');
 
   // Spenti finché non si legge la scelta memorizzata, dopo il montaggio: il
@@ -123,11 +133,13 @@ export default function DeviceCheck({ onStateChange, conduce = false }: DeviceCh
   const [cameraOn, setCameraOn] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const [montato, setMontato] = useState(false);
+  // Un mezzo non concesso resta spento, anche se l'ultima volta era acceso:
+  // in sala si entrerebbe comunque chiusi.
   useEffect(() => {
-    setCameraOn(readBoolPref(chiavi.camera, false));
-    setMicOn(readBoolPref(chiavi.mic, false));
+    setCameraOn(fotocameraConcessa && readBoolPref(chiavi.camera, false));
+    setMicOn(microfonoConcesso && readBoolPref(chiavi.mic, false));
     setMontato(true);
-  }, [chiavi.camera, chiavi.mic]);
+  }, [chiavi.camera, chiavi.mic, fotocameraConcessa, microfonoConcesso]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -290,6 +302,15 @@ export default function DeviceCheck({ onStateChange, conduce = false }: DeviceCh
 
   const aperto = cameraOn || micOn;
 
+  // La prova delle casse: nel pannello della prova, e da sola per chi ascolta
+  // soltanto.
+  const provaCasse = (
+    <Button color="primary" outline size="xs" onClick={suonoDiProva} className="d-inline-flex align-items-center gap-1">
+      <Icon icon="it-hearing" size="xs" color="primary" />
+      {t('speakerTest')}
+    </Button>
+  );
+
   const interruttore = (
     tipo: 'camera' | 'mic',
     acceso: boolean,
@@ -336,12 +357,33 @@ export default function DeviceCheck({ onStateChange, conduce = false }: DeviceCh
         {t('avTitle')}
       </h2>
 
-      <div className="av-check__toggles">
-        {interruttore('camera', cameraOn, setCameraOn, chiavi.camera)}
-        {interruttore('mic', micOn, setMicOn, chiavi.mic)}
-      </div>
-
-      {!aperto && <p className="av-check__hint">{t('avOffHint')}</p>}
+      {fotocameraConcessa || microfonoConcesso ? (
+        <>
+          <div className="av-check__toggles">
+            {fotocameraConcessa && interruttore('camera', cameraOn, setCameraOn, chiavi.camera)}
+            {microfonoConcesso && interruttore('mic', micOn, setMicOn, chiavi.mic)}
+          </div>
+          {!aperto && (
+            <p className="av-check__hint">
+              {fotocameraConcessa && microfonoConcesso
+                ? t('avOffHint')
+                : fotocameraConcessa
+                  ? t('avOffHintCamera')
+                  : t('avOffHintMic')}
+            </p>
+          )}
+          {!microfonoConcesso && <p className="av-check__hint">{t('avMicLocked')}</p>}
+          {!fotocameraConcessa && <p className="av-check__hint">{t('avCameraLocked')}</p>}
+        </>
+      ) : (
+        <>
+          {/* Chi ascolta soltanto: niente da accendere, ma le casse si provano. */}
+          <p className="av-check__hint">{t('avListenOnly')}</p>
+          <div className="av-check__speaker">
+            {provaCasse}
+          </div>
+        </>
+      )}
 
       {/* La prova si apre con un interruttore acceso; chiusa resta fuori dal
           giro della tastiera. */}
@@ -442,10 +484,7 @@ export default function DeviceCheck({ onStateChange, conduce = false }: DeviceCh
           </div>
 
           <div className="av-check__speaker">
-            <Button color="primary" outline size="xs" onClick={suonoDiProva} className="d-inline-flex align-items-center gap-1">
-              <Icon icon="it-hearing" size="xs" color="primary" />
-              {t('speakerTest')}
-            </Button>
+            {provaCasse}
           </div>
 
           {/* Sfondo virtuale, accanto all'anteprima: è il momento in cui ci si

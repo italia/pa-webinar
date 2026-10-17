@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "The background preview isn't available in this browser: the background is still applied when you enter the room.",
     "backgroundHintPreview": "You can already see it in the preview, and it stays on when you enter the room. To blur your background, use the backgrounds button once inside.",
     "avTitle": "Audio and video",
-    "avOffHint": "You enter with camera and microphone off and can turn them on in the room. To try them first, turn them on here."
+    "avOffHint": "You enter with camera and microphone off and can turn them on in the room. To try them first, turn them on here.",
+    "avOffHintCamera": "You enter with the camera off and can turn it on in the room. To try it first, turn it on here.",
+    "avOffHintMic": "You enter with the microphone off and can turn it on in the room. To try it first, turn it on here.",
+    "avListenOnly": "In this event the audience listens: you enter with microphone and camera off. If the host gives you the floor, the button to turn them on appears in the room.",
+    "avMicLocked": "The microphone stays off until the host gives you the floor: then the button to turn it on appears in the room.",
+    "avCameraLocked": "The camera stays off until the host gives you the floor: then the button to turn it on appears in the room."
   },
   "garden": {
     "enable": "Show the garden",

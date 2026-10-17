@@ -166,7 +166,11 @@ export const jitsiConfigOverwrite = {
     ['microphone', 'camera'],
   ] as string[][],
 
-  notifications: [] as string[],
+  // Le notifiche di Jitsi sono spente, tranne quelle sulla parola: la
+  // richiesta di chi conduce di intervenire, con il pulsante per accendere il
+  // microfono, e l'avviso a chi è stato silenziato. Senza la prima, chi riceve
+  // la parola in un evento a microfoni bloccati non saprebbe di averla.
+  notifications: ['notify.hostAskedUnmute', 'notify.mutedRemotelyTitle', 'notify.videoMutedRemotelyTitle'] as string[],
 
   // Il nome di chi è sul palco lo disegna la sala (components/live/stage-name),
   // con il suo stile e nella stessa colonna dei sottotitoli: quello di Jitsi

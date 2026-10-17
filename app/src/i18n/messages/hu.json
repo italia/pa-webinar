@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "A háttér előnézete ebben a böngészőben nem érhető el: a háttér ettől még érvényesül, amikor belép a terembe.",
     "backgroundHintPreview": "Már látja az előnézetben, és megmarad, amikor belép a terembe. A háttér elmosásához bent használja a hátterek gombot.",
     "avTitle": "Hang és videó",
-    "avOffHint": "Kikapcsolt kamerával és mikrofonnal lép be, és a teremben bekapcsolhatja őket. Ha előbb ki szeretné próbálni őket, kapcsolja be itt."
+    "avOffHint": "Kikapcsolt kamerával és mikrofonnal lép be, és a teremben bekapcsolhatja őket. Ha előbb ki szeretné próbálni őket, kapcsolja be itt.",
+    "avOffHintCamera": "Kikapcsolt kamerával lép be, és a teremben bekapcsolhatja. Ha előbb ki szeretné próbálni, kapcsolja be itt.",
+    "avOffHintMic": "Kikapcsolt mikrofonnal lép be, és a teremben bekapcsolhatja. Ha előbb ki szeretné próbálni, kapcsolja be itt.",
+    "avListenOnly": "Ezen az eseményen a közönség hallgat: kikapcsolt mikrofonnal és kamerával lép be. Ha a moderátor szót ad Önnek, a teremben megjelenik a bekapcsolásukra szolgáló gomb.",
+    "avMicLocked": "A mikrofon kikapcsolva marad, amíg a moderátor szót nem ad Önnek: ekkor a teremben megjelenik a bekapcsolására szolgáló gomb.",
+    "avCameraLocked": "A kamera kikapcsolva marad, amíg a moderátor szót nem ad Önnek: ekkor a teremben megjelenik a bekapcsolására szolgáló gomb."
   },
   "garden": {
     "enable": "Kert megjelenítése",

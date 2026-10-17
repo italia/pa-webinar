@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "A pré-visualização do fundo não está disponível neste navegador: o fundo é aplicado na mesma quando entra na sala.",
     "backgroundHintPreview": "Já o vê na pré-visualização e mantém-se quando entra na sala. Para desfocar o fundo, use o botão de fundos lá dentro.",
     "avTitle": "Áudio e vídeo",
-    "avOffHint": "Entra com a câmara e o microfone desligados e pode ligá-los na sala. Para os experimentar antes, ligue-os aqui."
+    "avOffHint": "Entra com a câmara e o microfone desligados e pode ligá-los na sala. Para os experimentar antes, ligue-os aqui.",
+    "avOffHintCamera": "Entra com a câmara desligada e poderá ligá-la na sala. Se quiser experimentá-la antes, ligue-a aqui.",
+    "avOffHintMic": "Entra com o microfone desligado e poderá ligá-lo na sala. Se quiser experimentá-lo antes, ligue-o aqui.",
+    "avListenOnly": "Neste evento o público ouve: entra com o microfone e a câmara desligados. Se quem modera lhe der a palavra, aparece na sala o botão para os ligar.",
+    "avMicLocked": "O microfone fica desligado até quem modera lhe dar a palavra: aparece então na sala o botão para o ligar.",
+    "avCameraLocked": "A câmara fica desligada até quem modera lhe dar a palavra: aparece então na sala o botão para a ligar."
   },
   "garden": {
     "enable": "Mostrar o jardim",

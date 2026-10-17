@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "L'aperçu de l'arrière-plan n'est pas disponible dans ce navigateur : l'arrière-plan est tout de même appliqué quand vous entrez dans la salle.",
     "backgroundHintPreview": "Vous le voyez déjà dans l'aperçu, et il reste actif quand vous entrez dans la salle. Pour flouter l'arrière-plan, utilisez le bouton des arrière-plans une fois à l'intérieur.",
     "avTitle": "Audio et vidéo",
-    "avOffHint": "Vous entrez avec la caméra et le micro éteints, et pourrez les allumer dans la salle. Pour les essayer avant, allumez-les ici."
+    "avOffHint": "Vous entrez avec la caméra et le micro éteints, et pourrez les allumer dans la salle. Pour les essayer avant, allumez-les ici.",
+    "avOffHintCamera": "Vous entrez avec la caméra éteinte et pourrez l'allumer dans la salle. Pour l'essayer avant, allumez-la ici.",
+    "avOffHintMic": "Vous entrez avec le micro éteint et pourrez l'allumer dans la salle. Pour l'essayer avant, allumez-le ici.",
+    "avListenOnly": "Dans cet événement, le public écoute : vous entrez avec le micro et la caméra éteints. Si l'animateur vous donne la parole, le bouton pour les allumer apparaît dans la salle.",
+    "avMicLocked": "Le micro reste éteint jusqu'à ce que l'animateur vous donne la parole : le bouton pour l'allumer apparaît alors dans la salle.",
+    "avCameraLocked": "La caméra reste éteinte jusqu'à ce que l'animateur vous donne la parole : le bouton pour l'allumer apparaît alors dans la salle."
   },
   "garden": {
     "enable": "Afficher le jardin",

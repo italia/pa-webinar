@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Previzualizarea fundalului nu este disponibilă în acest browser: fundalul se aplică oricum când intrați în sală.",
     "backgroundHintPreview": "Îl vedeți deja în previzualizare și rămâne când intrați în sală. Pentru a estompa fundalul, folosiți butonul de fundaluri din sală.",
     "avTitle": "Audio și video",
-    "avOffHint": "Intrați cu camera și microfonul oprite și le puteți porni în sală. Pentru a le încerca înainte, porniți-le aici."
+    "avOffHint": "Intrați cu camera și microfonul oprite și le puteți porni în sală. Pentru a le încerca înainte, porniți-le aici.",
+    "avOffHintCamera": "Intrați cu camera oprită și o puteți porni în sală. Dacă vreți să o încercați înainte, porniți-o aici.",
+    "avOffHintMic": "Intrați cu microfonul oprit și îl puteți porni în sală. Dacă vreți să îl încercați înainte, porniți-l aici.",
+    "avListenOnly": "La acest eveniment publicul ascultă: intrați cu microfonul și camera oprite. Dacă moderatorul vă dă cuvântul, în sală apare butonul pentru a le porni.",
+    "avMicLocked": "Microfonul rămâne oprit până când moderatorul vă dă cuvântul: atunci în sală apare butonul pentru a-l porni.",
+    "avCameraLocked": "Camera rămâne oprită până când moderatorul vă dă cuvântul: atunci în sală apare butonul pentru a o porni."
   },
   "garden": {
     "enable": "Afișați grădina",

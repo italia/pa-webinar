@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Die Hintergrundvorschau ist in diesem Browser nicht verfügbar: Der Hintergrund wird beim Betreten des Raums trotzdem angewendet.",
     "backgroundHintPreview": "Sie sehen ihn bereits in der Vorschau, und er bleibt erhalten, wenn Sie den Raum betreten. Zum Weichzeichnen nutzen Sie im Raum die Schaltfläche für Hintergründe.",
     "avTitle": "Audio und Video",
-    "avOffHint": "Sie treten mit ausgeschalteter Kamera und ausgeschaltetem Mikrofon ein und können sie im Raum einschalten. Um sie vorher zu testen, schalten Sie sie hier ein."
+    "avOffHint": "Sie treten mit ausgeschalteter Kamera und ausgeschaltetem Mikrofon ein und können sie im Raum einschalten. Um sie vorher zu testen, schalten Sie sie hier ein.",
+    "avOffHintCamera": "Sie treten mit ausgeschalteter Kamera ein und können sie im Raum einschalten. Um sie vorher zu testen, schalten Sie sie hier ein.",
+    "avOffHintMic": "Sie treten mit ausgeschaltetem Mikrofon ein und können es im Raum einschalten. Um es vorher zu testen, schalten Sie es hier ein.",
+    "avListenOnly": "Bei dieser Veranstaltung hört das Publikum zu: Sie treten mit ausgeschaltetem Mikrofon und ausgeschalteter Kamera ein. Erteilt Ihnen die Moderation das Wort, erscheint im Raum die Schaltfläche zum Einschalten.",
+    "avMicLocked": "Das Mikrofon bleibt aus, bis die Moderation Ihnen das Wort erteilt: Dann erscheint im Raum die Schaltfläche zum Einschalten.",
+    "avCameraLocked": "Die Kamera bleibt aus, bis die Moderation Ihnen das Wort erteilt: Dann erscheint im Raum die Schaltfläche zum Einschalten."
   },
   "garden": {
     "enable": "Garten anzeigen",

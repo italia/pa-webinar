@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Förhandsvisning av bakgrunden är inte tillgänglig i den här webbläsaren: bakgrunden används ändå när du går in i rummet.",
     "backgroundHintPreview": "Du ser den redan i förhandsvisningen, och den finns kvar när du går in i rummet. Använd knappen för bakgrunder inne i rummet för att göra bakgrunden suddig.",
     "avTitle": "Ljud och video",
-    "avOffHint": "Du går in med kamera och mikrofon avstängda och kan slå på dem i rummet. Slå på dem här om du vill prova dem först."
+    "avOffHint": "Du går in med kamera och mikrofon avstängda och kan slå på dem i rummet. Slå på dem här om du vill prova dem först.",
+    "avOffHintCamera": "Du går in med kameran avstängd och kan slå på den i rummet. Vill du prova den först, slå på den här.",
+    "avOffHintMic": "Du går in med mikrofonen avstängd och kan slå på den i rummet. Vill du prova den först, slå på den här.",
+    "avListenOnly": "Vid det här evenemanget lyssnar publiken: du går in med mikrofon och kamera avstängda. Om moderatorn ger dig ordet visas knappen för att slå på dem i rummet.",
+    "avMicLocked": "Mikrofonen förblir avstängd tills moderatorn ger dig ordet: då visas knappen för att slå på den i rummet.",
+    "avCameraLocked": "Kameran förblir avstängd tills moderatorn ger dig ordet: då visas knappen för att slå på den i rummet."
   },
   "garden": {
     "enable": "Visa trädgården",

@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Forhåndsvisning af baggrunden er ikke tilgængelig i denne browser: baggrunden anvendes stadig, når du går ind i rummet.",
     "backgroundHintPreview": "Du kan allerede se den i forhåndsvisningen, og den bliver ved, når du går ind i rummet. Brug baggrundsknappen inde i rummet for at sløre baggrunden.",
     "avTitle": "Lyd og video",
-    "avOffHint": "Du går ind med kamera og mikrofon slukket og kan tænde dem i rummet. Tænd dem her, hvis du vil prøve dem først."
+    "avOffHint": "Du går ind med kamera og mikrofon slukket og kan tænde dem i rummet. Tænd dem her, hvis du vil prøve dem først.",
+    "avOffHintCamera": "Du går ind med kameraet slukket og kan tænde det i rummet. Vil du prøve det først, så tænd det her.",
+    "avOffHintMic": "Du går ind med mikrofonen slukket og kan tænde den i rummet. Vil du prøve den først, så tænd den her.",
+    "avListenOnly": "Ved dette arrangement lytter publikum: du går ind med mikrofon og kamera slukket. Hvis ordstyreren giver dig ordet, vises knappen til at tænde dem i rummet.",
+    "avMicLocked": "Mikrofonen forbliver slukket, indtil ordstyreren giver dig ordet: så vises knappen til at tænde den i rummet.",
+    "avCameraLocked": "Kameraet forbliver slukket, indtil ordstyreren giver dig ordet: så vises knappen til at tænde det i rummet."
   },
   "garden": {
     "enable": "Vis haven",

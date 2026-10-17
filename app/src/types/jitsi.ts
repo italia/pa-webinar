@@ -76,6 +76,10 @@ export interface JitsiEventMap {
   audioModerationChanged: [{ enabled: boolean }];
   videoModerationChanged: [{ enabled: boolean }];
   moderationStatusChanged: [{ enabled: boolean; mediaType: string }];
+  /** Chi conduce ha dato la parola: a chi la riceve arriva con il proprio id. */
+  moderationParticipantApproved: [{ id?: string; mediaType: string }];
+  /** Chi conduce ha tolto la parola. */
+  moderationParticipantRejected: [{ id?: string; mediaType: string }];
   displayNameChange: [{ id: string; displayname: string }];
   dominantSpeakerChanged: [{ id: string }];
   tileViewChanged: [{ enabled: boolean }];

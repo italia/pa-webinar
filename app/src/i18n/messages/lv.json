@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Fona priekšskatījums šajā pārlūkā nav pieejams: fons tik un tā tiek lietots, ieejot telpā.",
     "backgroundHintPreview": "Jūs to jau redzat priekšskatījumā, un tas paliek, ieejot telpā. Lai izpludinātu fonu, telpā izmantojiet fonu pogu.",
     "avTitle": "Audio un video",
-    "avOffHint": "Jūs ienākat ar izslēgtu kameru un mikrofonu un varat tos ieslēgt telpā. Ja vēlaties tos vispirms izmēģināt, ieslēdziet tos šeit."
+    "avOffHint": "Jūs ienākat ar izslēgtu kameru un mikrofonu un varat tos ieslēgt telpā. Ja vēlaties tos vispirms izmēģināt, ieslēdziet tos šeit.",
+    "avOffHintCamera": "Tu ienāc ar izslēgtu kameru un varēsi to ieslēgt telpā. Ja vēlies to vispirms izmēģināt, ieslēdz to šeit.",
+    "avOffHintMic": "Tu ienāc ar izslēgtu mikrofonu un varēsi to ieslēgt telpā. Ja vēlies to vispirms izmēģināt, ieslēdz to šeit.",
+    "avListenOnly": "Šajā pasākumā publika klausās: tu ienāc ar izslēgtu mikrofonu un kameru. Ja vadītājs tev dod vārdu, telpā parādās poga to ieslēgšanai.",
+    "avMicLocked": "Mikrofons paliek izslēgts, līdz vadītājs tev dod vārdu: tad telpā parādās poga tā ieslēgšanai.",
+    "avCameraLocked": "Kamera paliek izslēgta, līdz vadītājs tev dod vārdu: tad telpā parādās poga tās ieslēgšanai."
   },
   "garden": {
     "enable": "Rādīt dārzu",

@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Anteprima dello sfondo non disponibile in questo browser: lo sfondo si applica comunque quando entri in sala.",
     "backgroundHintPreview": "Lo vedi già nell'anteprima e resta quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro.",
     "avTitle": "Audio e video",
-    "avOffHint": "Entri con fotocamera e microfono spenti e potrai accenderli in sala. Se vuoi provarli prima, accendili qui."
+    "avOffHint": "Entri con fotocamera e microfono spenti e potrai accenderli in sala. Se vuoi provarli prima, accendili qui.",
+    "avOffHintCamera": "Entri con la fotocamera spenta e potrai accenderla in sala. Se vuoi provarla prima, accendila qui.",
+    "avOffHintMic": "Entri con il microfono spento e potrai accenderlo in sala. Se vuoi provarlo prima, accendilo qui.",
+    "avListenOnly": "In questo evento il pubblico ascolta: entri con microfono e fotocamera spenti. Se chi conduce ti dà la parola, in sala compare il pulsante per accenderli.",
+    "avMicLocked": "Il microfono resta spento finché chi conduce non ti dà la parola: allora in sala compare il pulsante per accenderlo.",
+    "avCameraLocked": "La fotocamera resta spenta finché chi conduce non ti dà la parola: allora in sala compare il pulsante per accenderla."
   },
   "garden": {
     "enable": "Mostra il giardino",

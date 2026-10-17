@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Pregled pozadine nije dostupan u ovom pregledniku: pozadina se svejedno primjenjuje kad uđete u sobu.",
     "backgroundHintPreview": "Već ga vidite u pregledu i ostaje kad uđete u sobu. Za zamućivanje pozadine upotrijebite gumb za pozadine unutra.",
     "avTitle": "Zvuk i video",
-    "avOffHint": "Ulazite s isključenom kamerom i mikrofonom i možete ih uključiti u sobi. Ako ih želite prvo isprobati, uključite ih ovdje."
+    "avOffHint": "Ulazite s isključenom kamerom i mikrofonom i možete ih uključiti u sobi. Ako ih želite prvo isprobati, uključite ih ovdje.",
+    "avOffHintCamera": "Ulazite s isključenom kamerom i možete je uključiti u sobi. Ako je želite prvo isprobati, uključite je ovdje.",
+    "avOffHintMic": "Ulazite s isključenim mikrofonom i možete ga uključiti u sobi. Ako ga želite prvo isprobati, uključite ga ovdje.",
+    "avListenOnly": "Na ovom događaju publika sluša: ulazite s isključenim mikrofonom i kamerom. Ako vam moderator da riječ, u sobi se pojavljuje gumb za njihovo uključivanje.",
+    "avMicLocked": "Mikrofon ostaje isključen dok vam moderator ne da riječ: tada se u sobi pojavljuje gumb za njegovo uključivanje.",
+    "avCameraLocked": "Kamera ostaje isključena dok vam moderator ne da riječ: tada se u sobi pojavljuje gumb za njezino uključivanje."
   },
   "garden": {
     "enable": "Prikaži vrt",

@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Il-previżjoni tal-isfond mhix disponibbli f'dan il-browser: l-isfond jiġi applikat xorta meta tidħol fil-kamra.",
     "backgroundHintPreview": "Diġà tarah fil-previżjoni, u jibqa' meta tidħol fil-kamra. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ġewwa.",
     "avTitle": "Awdjo u vidjo",
-    "avOffHint": "Tidħol bil-kamera u l-mikrofonu mitfija u tista' tixgħelhom fil-kamra. Biex tippruvahom l-ewwel, ixgħelhom hawn."
+    "avOffHint": "Tidħol bil-kamera u l-mikrofonu mitfija u tista' tixgħelhom fil-kamra. Biex tippruvahom l-ewwel, ixgħelhom hawn.",
+    "avOffHintCamera": "Tidħol bil-kamera mitfija u tista' tixgħelha fil-kamra. Jekk trid tipprovaha l-ewwel, ixgħelha hawn.",
+    "avOffHintMic": "Tidħol bil-mikrofonu mitfi u tista' tixgħlu fil-kamra. Jekk trid tipprovah l-ewwel, ixgħlu hawn.",
+    "avListenOnly": "F'dan l-avveniment il-pubbliku jisma': tidħol bil-mikrofonu u l-kamera mitfija. Jekk min jimmodera jagħtik il-kelma, fil-kamra tidher il-buttuna biex tixgħelhom.",
+    "avMicLocked": "Il-mikrofonu jibqa' mitfi sakemm min jimmodera jagħtik il-kelma: imbagħad fil-kamra tidher il-buttuna biex tixgħlu.",
+    "avCameraLocked": "Il-kamera tibqa' mitfija sakemm min jimmodera jagħtik il-kelma: imbagħad fil-kamra tidher il-buttuna biex tixgħelha."
   },
   "garden": {
     "enable": "Mostra il-giardino",

@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Náhled pozadí není v tomto prohlížeči k dispozici: pozadí se přesto použije při vstupu do místnosti.",
     "backgroundHintPreview": "Vidíte ho už v náhledu a zůstane i po vstupu do místnosti. Pro rozmazání pozadí použijte uvnitř tlačítko pozadí.",
     "avTitle": "Zvuk a video",
-    "avOffHint": "Vstoupíte s vypnutou kamerou a mikrofonem a v místnosti je můžete zapnout. Chcete-li je nejprve vyzkoušet, zapněte je zde."
+    "avOffHint": "Vstoupíte s vypnutou kamerou a mikrofonem a v místnosti je můžete zapnout. Chcete-li je nejprve vyzkoušet, zapněte je zde.",
+    "avOffHintCamera": "Vstupujete s vypnutou kamerou a v místnosti ji můžete zapnout. Pokud ji chcete nejdřív vyzkoušet, zapněte ji zde.",
+    "avOffHintMic": "Vstupujete s vypnutým mikrofonem a v místnosti ho můžete zapnout. Pokud ho chcete nejdřív vyzkoušet, zapněte ho zde.",
+    "avListenOnly": "Na této akci publikum poslouchá: vstupujete s vypnutým mikrofonem a kamerou. Pokud vám moderátor udělí slovo, objeví se v místnosti tlačítko k jejich zapnutí.",
+    "avMicLocked": "Mikrofon zůstane vypnutý, dokud vám moderátor neudělí slovo: pak se v místnosti objeví tlačítko k jeho zapnutí.",
+    "avCameraLocked": "Kamera zůstane vypnutá, dokud vám moderátor neudělí slovo: pak se v místnosti objeví tlačítko k jejímu zapnutí."
   },
   "garden": {
     "enable": "Zobrazit zahradu",

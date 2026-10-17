@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Níl réamhamharc an chúlra ar fáil sa bhrabhsálaí seo: cuirtear an cúlra i bhfeidhm fós nuair a théann tú isteach sa seomra.",
     "backgroundHintPreview": "Feiceann tú cheana féin é sa réamhamharc, agus fanann sé ann nuair a théann tú isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáid an cnaipe cúlraí istigh.",
     "avTitle": "Fuaim agus físeán",
-    "avOffHint": "Téann tú isteach leis an gceamara agus an micreafón múchta agus is féidir leat iad a chasadh air sa seomra. Chun iad a thriail ar dtús, cas air anseo iad."
+    "avOffHint": "Téann tú isteach leis an gceamara agus an micreafón múchta agus is féidir leat iad a chasadh air sa seomra. Chun iad a thriail ar dtús, cas air anseo iad.",
+    "avOffHintCamera": "Téann tú isteach agus an ceamara múchta agus is féidir leat é a chasadh air sa seomra. Más mian leat é a thriail ar dtús, cas air anseo é.",
+    "avOffHintMic": "Téann tú isteach agus an micreafón múchta agus is féidir leat é a chasadh air sa seomra. Más mian leat é a thriail ar dtús, cas air anseo é.",
+    "avListenOnly": "San imeacht seo éisteann an lucht féachana: téann tú isteach agus an micreafón agus an ceamara múchta. Má thugann an t-óstach an t-urlár duit, tagann an cnaipe chun iad a chasadh air sa seomra.",
+    "avMicLocked": "Fanann an micreafón múchta go dtí go dtugann an t-óstach an t-urlár duit: ansin tagann an cnaipe chun é a chasadh air sa seomra.",
+    "avCameraLocked": "Fanann an ceamara múchta go dtí go dtugann an t-óstach an t-urlár duit: ansin tagann an cnaipe chun é a chasadh air sa seomra."
   },
   "garden": {
     "enable": "Taispeáin an gairdín",

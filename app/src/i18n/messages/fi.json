@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Taustan esikatselu ei ole käytettävissä tässä selaimessa: tausta otetaan silti käyttöön, kun tulet huoneeseen.",
     "backgroundHintPreview": "Näet sen jo esikatselussa, ja se pysyy, kun tulet huoneeseen. Sumenna tausta huoneessa taustapainikkeella.",
     "avTitle": "Ääni ja video",
-    "avOffHint": "Tulet sisään kamera ja mikrofoni pois päältä ja voit kytkeä ne huoneessa. Jos haluat kokeilla niitä ensin, kytke ne tässä päälle."
+    "avOffHint": "Tulet sisään kamera ja mikrofoni pois päältä ja voit kytkeä ne huoneessa. Jos haluat kokeilla niitä ensin, kytke ne tässä päälle.",
+    "avOffHintCamera": "Tulet sisään kamera pois päältä ja voit käynnistää sen huoneessa. Jos haluat kokeilla sitä ensin, käynnistä se tässä.",
+    "avOffHintMic": "Tulet sisään mikrofoni pois päältä ja voit käynnistää sen huoneessa. Jos haluat kokeilla sitä ensin, käynnistä se tässä.",
+    "avListenOnly": "Tässä tapahtumassa yleisö kuuntelee: tulet sisään mikrofoni ja kamera pois päältä. Jos juontaja antaa sinulle puheenvuoron, huoneeseen tulee painike niiden käynnistämiseen.",
+    "avMicLocked": "Mikrofoni pysyy pois päältä, kunnes juontaja antaa sinulle puheenvuoron: silloin huoneeseen tulee painike sen käynnistämiseen.",
+    "avCameraLocked": "Kamera pysyy pois päältä, kunnes juontaja antaa sinulle puheenvuoron: silloin huoneeseen tulee painike sen käynnistämiseen."
   },
   "garden": {
     "enable": "Näytä puutarha",

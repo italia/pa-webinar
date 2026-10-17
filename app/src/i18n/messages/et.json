@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "Tausta eelvaade pole selles brauseris saadaval: taust rakendatakse siiski ruumi sisenemisel.",
     "backgroundHintPreview": "Näed seda juba eelvaates ja see jääb alles, kui sisened ruumi. Tausta hägustamiseks kasuta ruumis taustade nuppu.",
     "avTitle": "Heli ja video",
-    "avOffHint": "Sisened väljalülitatud kaamera ja mikrofoniga ning saad need ruumis sisse lülitada. Kui soovid neid enne proovida, lülita need siin sisse."
+    "avOffHint": "Sisened väljalülitatud kaamera ja mikrofoniga ning saad need ruumis sisse lülitada. Kui soovid neid enne proovida, lülita need siin sisse.",
+    "avOffHintCamera": "Sisened väljalülitatud kaameraga ja saad selle ruumis sisse lülitada. Kui tahad seda enne proovida, lülita see siin sisse.",
+    "avOffHintMic": "Sisened väljalülitatud mikrofoniga ja saad selle ruumis sisse lülitada. Kui tahad seda enne proovida, lülita see siin sisse.",
+    "avListenOnly": "Sellel üritusel publik kuulab: sisened mikrofoni ja kaameraga välja lülitatult. Kui juht annab sulle sõna, ilmub ruumis nupp nende sisselülitamiseks.",
+    "avMicLocked": "Mikrofon jääb välja, kuni juht annab sulle sõna: siis ilmub ruumis nupp selle sisselülitamiseks.",
+    "avCameraLocked": "Kaamera jääb välja, kuni juht annab sulle sõna: siis ilmub ruumis nupp selle sisselülitamiseks."
   },
   "garden": {
     "enable": "Näita aeda",

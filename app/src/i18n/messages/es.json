@@ -5123,7 +5123,12 @@
     "backgroundPreviewUnavailable": "La vista previa del fondo no está disponible en este navegador: el fondo se aplica igualmente al entrar en la sala.",
     "backgroundHintPreview": "Ya lo ves en la vista previa y se mantiene al entrar en la sala. Para desenfocar el fondo, usa el botón de fondos una vez dentro.",
     "avTitle": "Audio y vídeo",
-    "avOffHint": "Entras con la cámara y el micrófono apagados y podrás encenderlos en la sala. Si quieres probarlos antes, enciéndelos aquí."
+    "avOffHint": "Entras con la cámara y el micrófono apagados y podrás encenderlos en la sala. Si quieres probarlos antes, enciéndelos aquí.",
+    "avOffHintCamera": "Entras con la cámara apagada y podrás encenderla en la sala. Si quieres probarla antes, enciéndela aquí.",
+    "avOffHintMic": "Entras con el micrófono apagado y podrás encenderlo en la sala. Si quieres probarlo antes, enciéndelo aquí.",
+    "avListenOnly": "En este evento el público escucha: entras con el micrófono y la cámara apagados. Si quien modera te da la palabra, en la sala aparece el botón para encenderlos.",
+    "avMicLocked": "El micrófono sigue apagado hasta que quien modera te dé la palabra: entonces en la sala aparece el botón para encenderlo.",
+    "avCameraLocked": "La cámara sigue apagada hasta que quien modera te dé la palabra: entonces en la sala aparece el botón para encenderla."
   },
   "garden": {
     "enable": "Mostrar el jardín",

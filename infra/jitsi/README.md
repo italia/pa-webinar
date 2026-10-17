@@ -75,15 +75,16 @@ The module switches the lock on as the first person who carries it is about to e
 (`muc-occupant-pre-join`, after the room's password and lock checks), before that person is in the
 room. Everyone, the first included, therefore
 enters a room that is already moderated: they join with the microphone and camera off, and a speaker or
-a moderator turns them on and is heard. If that first person is a speaker, they are on the allowed list
+a moderator turns them on and is heard. The room turns them back on by itself for a speaker or a
+moderator who chose them on in the waiting room. If that first person is a speaker, they are on the allowed list
 from the switch-on, which reaches Jicofo first, and get their "allowed" message as soon as they are in. Switched
 on while a speaker's own join into the conference was still in progress, the lock would leave that
 speaker muted on the bridge while their client showed the microphone open.
 
 Three details matter when you read its logs or change it:
 
-- the lock is switched on once per room. A moderator can lift it during the call from the control bar
-  (**Participant mic**, **Participant video**), and it stays lifted until the room empties and is
+- the lock is switched on once per room. A moderator can lift it during the call from the
+  **Participants** tab (**Microphones locked**, **Video locked**), and it stays lifted until the room empties and is
   created again. In the same way, a change to the event's participant flags while the room is open
   reaches the room only when it is created again; until then the moderator's toggles decide;
 - when a moderator switches moderation back on, the stock component starts again from an allowed list
