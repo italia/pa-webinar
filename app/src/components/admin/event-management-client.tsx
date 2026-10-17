@@ -1242,6 +1242,8 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
           icon="it-settings"
         >
         <EventConfigDiagram
+          // Le funzioni dell'evento sono già elencate più su, nella pagina.
+          showFeatureChips={false}
           event={{
             maxParticipants: event.maxParticipants,
             qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,

@@ -18,6 +18,9 @@ interface EventConfigDiagramProps {
   };
   registrationCount?: number;
   adminMode?: boolean;
+  /** Le funzioni accese, come etichette sotto il diagramma. Dove la pagina
+   *  le elenca già (la gestione dell'evento) si tolgono. */
+  showFeatureChips?: boolean;
 }
 
 function FeatureChip({
@@ -48,6 +51,7 @@ export default function EventConfigDiagram({
   event,
   registrationCount,
   adminMode = true,
+  showFeatureChips = true,
 }: EventConfigDiagramProps) {
   const t = useTranslations('diagram');
 
@@ -139,14 +143,16 @@ export default function EventConfigDiagram({
       </svg>
 
       {/* ── Feature chips ─────────────────────────────────────────── */}
-      <div className="diagram-chips mt-3">
-        <FeatureChip active={event.qaEnabled} label="Q&A" />
-        <FeatureChip active={event.chatEnabled} label="Chat" />
-        <FeatureChip active={event.recordingEnabled} label={t('jibri')} />
-        <FeatureChip active={event.participantsCanUnmute} label={t('chips.mic')} />
-        <FeatureChip active={event.participantsCanStartVideo} label={t('chips.video')} />
-        <FeatureChip active={event.participantsCanShareScreen} label={t('chips.screen')} />
-      </div>
+      {showFeatureChips && (
+        <div className="diagram-chips mt-3">
+          <FeatureChip active={event.qaEnabled} label="Q&A" />
+          <FeatureChip active={event.chatEnabled} label="Chat" />
+          <FeatureChip active={event.recordingEnabled} label={t('jibri')} />
+          <FeatureChip active={event.participantsCanUnmute} label={t('chips.mic')} />
+          <FeatureChip active={event.participantsCanStartVideo} label={t('chips.video')} />
+          <FeatureChip active={event.participantsCanShareScreen} label={t('chips.screen')} />
+        </div>
+      )}
 
       {/* ── Occupancy + estimates (admin only) ───────────────────── */}
       {adminMode && (
