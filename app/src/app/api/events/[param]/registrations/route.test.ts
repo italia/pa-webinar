@@ -310,4 +310,17 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     expect((await iscrivitiCon({})).status).toBe(422);
     expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
   });
+
+  it('dove l\'installazione non puo\' registrare il consenso alla registrazione non si chiede', async () => {
+    // Jitsi del chart, senza Jibri, senza registratore per partecipante e senza storage.
+    vi.stubEnv('JITSI_WEB_INTERNAL_URL', 'http://jitsi-web');
+    vi.stubEnv('JIBRI_HEALTH_URL', '');
+    vi.stubEnv('RECORDER_CONTROLLER_URL', '');
+    try {
+      evento({ participantsCanUnmute: true, multitrackRecordingEnabled: false });
+      expect((await iscrivitiCon({})).status).toBe(201);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });

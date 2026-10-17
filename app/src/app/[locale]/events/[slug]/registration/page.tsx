@@ -15,6 +15,7 @@ import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
+import { recordingAvailable } from '@/lib/recording/availability';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -127,7 +128,9 @@ export default async function RegistrationPage({
             eventSlug={slug}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
-            recordingEnabled={event.recordingEnabled}
+            // Un'installazione che non può registrare non chiede il consenso
+            // alla registrazione e non la annuncia (come la sala d'attesa).
+            recordingEnabled={event.recordingEnabled && recordingAvailable()}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             captionsTranscript={captionsTranscriptActive(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}

@@ -24,6 +24,7 @@ import { consensiRichiesti, VERSIONE_TESTO_TRASCRIZIONE } from '@/lib/registrati
 import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { recordingAvailable } from '@/lib/recording/availability';
 import {
   buildEventAccessSetCookie,
   eventAccessTtlSeconds,
@@ -98,6 +99,9 @@ export const POST = withErrorHandling(async (request, context) => {
   // del modulo (lib/registration/consents).
   const richiesti = consensiRichiesti({
     ...event,
+    // Come la sala d'attesa: dove l'installazione non può registrare, il
+    // consenso alla registrazione non si chiede.
+    recordingEnabled: event.recordingEnabled && recordingAvailable(),
     captionsTranscript: captionsTranscriptActive(event, await getSettings()),
   });
   if (richiesti.registrazione && consentRecording !== true) {
