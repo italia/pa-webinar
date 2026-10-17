@@ -135,8 +135,9 @@ What the specs cover:
   - a duplicate registration shows the already-registered message with its resend button;
   - returning to the live URL without the token still works, through the signed per-event cookie.
 - **`design-system.spec.ts`.** The institutional header strip must have a solid background in the served stylesheet. This proves that the CSS color repair (`app/src/lib/css/repair-percent-colors.ts`) is still wired into the production build. The spec skips itself when the stylesheet is not minified, as in a development build.
+- **`accessibility.spec.ts`.** An automatic accessibility check with axe-core (`@axe-core/playwright`), limited to the WCAG 2.1 level A and AA rules, the level EN 301 549 requires. It covers the public pages, the waiting room, the main administration pages and the live room: the moderator and a participant enter, and every tab of the side column (the bottom bar on a phone) is checked. Any violation fails the spec, and the message lists the rule and the elements. The Jitsi conference is excluded, as a third-party frame. An automatic check covers what a tool can see (contrast, accessible names, structure, ARIA attributes), not keyboard use, reading order or the sense of the texts, which stay manual.
 
-Each group deletes its event when it finishes. No spec joins a Jitsi conference: the suite stops at the waiting room.
+Each group deletes its event when it finishes. Apart from the accessibility spec, which enters the live room to check the side column, no spec joins a Jitsi conference: the suite stops at the waiting room.
 
 The browser runs with the `it-IT` locale. The specs open Italian URLs (`/it/eventi/…`) and match Italian labels, such as "Entra ora" for **Enter now**. If you change one of those strings in `app/src/i18n/messages/it.json` or one of those paths in `app/src/i18n/routing.ts`, update the spec in the same change.
 
@@ -374,7 +375,7 @@ Check keyboard use and the text alternatives against the [accessibility contract
 
 ### Other areas without automated tests
 
-- **Visual rendering with the .italia design system**, including contrast on the light theme and keyboard navigation. Check these in the browser.
+- **Visual rendering with the .italia design system**, and keyboard navigation. Check these in the browser; contrast is part of the automatic accessibility check above.
 - **The Content Security Policy.** Follow the manual plan in [Testing CSP changes](../SECURITY-CSP.md#testing-csp-changes).
 - **Email content and delivery.** In the local stack, Mailpit captures every message. The Compose `cron` service must be running, or nothing is sent. See [Local development](../DEVELOPMENT.md).
 - **Capacity.** See [Load testing](../LOAD-TESTING.md).

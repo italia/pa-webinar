@@ -147,6 +147,10 @@
     "publisher": "Amazon Web Services",
     "url": "http://aws.amazon.com"
   },
+  "@axe-core/playwright@4.13.0": {
+    "licenses": "MPL-2.0",
+    "repository": "https://github.com/dequelabs/axe-core-npm"
+  },
   "@azure/abort-controller@2.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
