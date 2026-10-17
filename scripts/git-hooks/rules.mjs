@@ -201,3 +201,16 @@ export function daFormattare(nuovi) {
     (f) => /\.(ts|tsx|js|jsx|mjs|cjs|scss|css)$/.test(f) && !f.startsWith('app/public/')
   );
 }
+
+/**
+ * La modifica allo schema tocca solo commenti o righe vuote: il modello del
+ * database non cambia, e non serve una migrazione. `diff` è l'output di
+ * `git diff --cached -U0` sul file dello schema.
+ */
+export function soloCommentiSchema(diff) {
+  const righe = diff
+    .split('\n')
+    .filter((r) => (r.startsWith('+') || r.startsWith('-')) && !r.startsWith('+++') && !r.startsWith('---'))
+    .map((r) => r.slice(1).trim());
+  return righe.length > 0 && righe.every((r) => r === '' || r.startsWith('//'));
+}

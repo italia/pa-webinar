@@ -32,6 +32,7 @@ import {
   erroriMessaggio,
   righeAggiunte,
   segretiAggiunti,
+  soloCommentiSchema,
 } from './rules.mjs';
 
 const RADICE = git(['rev-parse', '--show-toplevel']).trim();
@@ -260,7 +261,10 @@ function preCommit() {
       join(RADICE, 'app')
     );
   }
-  if (c.schema && !c.migrazioni) {
+  // Solo commenti nello schema: il modello non cambia, la migrazione non serve.
+  const soloCommenti =
+    c.schema && soloCommentiSchema(git(['diff', '--cached', '-U0', '--', 'app/prisma/schema.prisma']));
+  if (c.schema && !c.migrazioni && !soloCommenti) {
     errore('Database migration', [
       'app/prisma/schema.prisma changed but no migration is staged.',
       'Run npm run db:migrate:dev --workspace=app and add the generated SQL.',

@@ -12,6 +12,7 @@ import {
   MARCATORE_CONSENTITO,
   righeAggiunte,
   segretiAggiunti,
+  soloCommentiSchema,
 } from './rules.mjs';
 
 describe('erroriMessaggio', () => {
@@ -173,5 +174,24 @@ describe('daFormattare', () => {
       daFormattare(['a.ts', 'b.md', 'c.json', 'app/public/x.js', 'd.scss']),
       ['a.ts', 'd.scss']
     );
+  });
+});
+
+describe('soloCommentiSchema', () => {
+  const diff = (...righe) =>
+    ['diff --git a/app/prisma/schema.prisma b/app/prisma/schema.prisma', '--- a/app/prisma/schema.prisma', '+++ b/app/prisma/schema.prisma', '@@ -10 +10 @@', ...righe].join('\n');
+
+  it('commenti e righe vuote non chiedono una migrazione', () => {
+    assert.equal(soloCommentiSchema(diff('-  // vecchio commento', '+  // commento nuovo', '+')), true);
+  });
+
+  it('un campo, un attributo o un modello la chiedono', () => {
+    assert.equal(soloCommentiSchema(diff('+  nota String? @map("nota")')), false);
+    assert.equal(soloCommentiSchema(diff('-  // commento', '+  aiConsent Boolean @ignore')), false);
+    assert.equal(soloCommentiSchema(diff('+  campo Int // con commento in coda')), false);
+  });
+
+  it('un diff vuoto non è «solo commenti»', () => {
+    assert.equal(soloCommentiSchema(''), false);
   });
 });
