@@ -163,7 +163,7 @@ export default function MiniTranscript({ playerRef, segments }: Props) {
             height: 6,
             borderRadius: 3,
             background: '#CC334D',
-            animation: 'mini-transcript-pulse 1.4s ease-in-out infinite',
+            animation: 'mini-transcript-pulse 1.4s ease-in-out 3',
           }}
         />
         {t('miniTranscriptLabel')}

@@ -115,8 +115,14 @@ details > summary {
 
 // Il punto che pulsa accanto a «In diretta». Con il movimento ridotto resta
 // fermo: lo stato lo dice gia' il testo accanto.
+//
+// Le animazioni che richiamano l'attenzione (punti, aloni, pulsanti che
+// pulsano, campi da compilare) si fermano entro cinque secondi: un movimento
+// che parte da solo e dura di più va potuto fermare (WCAG 2.2.2). Restano
+// continue solo quelle che mostrano qualcosa che sta accadendo: caricamento,
+// chi sta scrivendo, il livello della voce.
 .pulse-dot {
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -272,13 +278,13 @@ html.live-call-immersive body {
 }
 
 .live-time-strip__live-core {
-  animation: live-core 2s ease-in-out infinite;
+  animation: live-core 2s ease-in-out 2;
   transform-origin: 12px 12px;
 }
 
 .live-time-strip__live-wave {
   opacity: 0.25;
-  animation: live-wave 2s ease-in-out infinite;
+  animation: live-wave 2s ease-in-out 2;
 }
 
 .live-time-strip__live-wave--2 {
@@ -321,7 +327,7 @@ html.live-call-immersive body {
     inset: 0;
     background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
     transform: translateX(-100%);
-    animation: strip-sheen 3.2s ease-in-out infinite;
+    animation: strip-sheen 3.2s ease-in-out 1;
   }
 }
 
@@ -351,7 +357,7 @@ html.live-call-immersive body {
 
 // Oltre la fine la clessidra si gira, ogni tanto.
 .live-time-strip__hourglass {
-  animation: hourglass-turn 4s ease-in-out infinite;
+  animation: hourglass-turn 4s ease-in-out 1;
 }
 
 @keyframes hourglass-turn {
@@ -376,7 +382,7 @@ html.live-call-immersive body {
       transparent 6px 12px
     );
     background-size: 34px 34px;
-    animation: strip-overtime 1.6s linear infinite;
+    animation: strip-overtime 1.6s linear 3;
   }
 }
 
@@ -447,7 +453,7 @@ html.live-call-immersive body {
 }
 
 .live-time-strip__chip--last {
-  animation: chip-last 1s ease-in-out infinite;
+  animation: chip-last 1s ease-in-out 5;
 }
 
 @keyframes chip-last {
@@ -497,11 +503,11 @@ button.live-time-strip__rec {
   border-color: transparent;
   background: #d9364f;
   box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.55);
-  animation: rec-glow 2.4s ease-out infinite;
+  animation: rec-glow 2.4s ease-out 2;
 
   .live-time-strip__rec-dot {
     background: #fff;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 
   &:hover,
@@ -612,7 +618,7 @@ button.live-time-strip__rec {
 }
 
 .presentation-timer-bar--last {
-  animation: timer-last-minute 1s ease-in-out infinite;
+  animation: timer-last-minute 1s ease-in-out 5;
 }
 
 @keyframes timer-last-minute {
@@ -711,7 +717,7 @@ button.live-time-strip__rec {
   height: 9px;
   border-radius: 50%;
   background: #d9364f;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 .control-room__rec-dot--light {
@@ -892,7 +898,7 @@ button.live-time-strip__rec {
   height: 8px;
   border-radius: 50%;
   background: #fff;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2131,7 +2137,7 @@ button.live-time-strip__rec {
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, #fff 0%, #E3EEF9 100%);
     box-shadow: 0 10px 24px -12px rgba(0, 102, 204, 0.45), 0 0 0 6px rgba(0, 102, 204, 0.05);
-    animation: chat-empty-float 4s ease-in-out infinite;
+    animation: chat-empty-float 4s ease-in-out 1;
 
     .icon { fill: #0066CC; }
 
@@ -4978,7 +4984,7 @@ button.live-time-strip__rec {
 // class was referenced but never defined — the box sat static. Reuses the
 // arcade pulse so the "starts in" panel draws the eye as the event nears.
 .waiting-countdown--pulse {
-  animation: arcadeChipPulse 1.6s ease-in-out infinite;
+  animation: arcadeChipPulse 1.6s ease-in-out 3;
 }
 
 // ── Waiting-room DSI shell ──
@@ -6054,7 +6060,7 @@ button.live-time-strip__rec {
   inset: 0;
   border-radius: 8px;
   pointer-events: none;
-  animation: wr-cta-ring 1.8s ease-out infinite;
+  animation: wr-cta-ring 1.8s ease-out 2;
 }
 
 .wr-cta--go .wr-cta__btn {
@@ -6063,7 +6069,7 @@ button.live-time-strip__rec {
   background: linear-gradient(120deg, #007a4f 0%, #00a36c 100%) !important;
   border-color: #007a4f !important;
   color: #fff !important;
-  animation: wr-cta-breathe 1.8s ease-in-out infinite;
+  animation: wr-cta-breathe 1.8s ease-in-out 2;
 
   &::before {
     content: '';
@@ -6074,14 +6080,14 @@ button.live-time-strip__rec {
     width: 40%;
     background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
     pointer-events: none;
-    animation: wr-cta-shine 2.8s ease-in-out infinite;
+    animation: wr-cta-shine 2.8s ease-in-out 1;
   }
 }
 
 .wr-cta__arrow {
   display: inline-flex;
   margin-left: 0.6rem;
-  animation: wr-cta-arrow 1.2s ease-in-out infinite;
+  animation: wr-cta-arrow 1.2s ease-in-out 4;
 }
 
 @keyframes wr-cta-ring {
@@ -6416,7 +6422,8 @@ button.live-time-strip__rec {
     inset: -4px;
     border-radius: 50%;
     border: 2px solid rgba(217, 54, 79, 0.45);
-    animation: wr-ripple 1.8s ease-out infinite;
+    // Finita l'onda, l'anello resta com'è all'ultimo fotogramma: invisibile.
+    animation: wr-ripple 1.8s ease-out 2 forwards;
   }
 }
 
@@ -6687,18 +6694,18 @@ button.live-time-strip__rec {
 // Il richiamo sta sulla linea del campo (Bootstrap Italia disegna solo il
 // bordo inferiore): si ispessisce e si colora, senza riquadri attorno.
 .wr-name-field--empty .form-control {
-  animation: wr-name-line 1.8s ease-in-out infinite;
+  animation: wr-name-line 1.8s ease-in-out 2;
 }
 
 .wr-name-field--empty label {
-  animation: wr-name-label 1.8s ease-in-out infinite;
+  animation: wr-name-label 1.8s ease-in-out 2;
 }
 
 .wr-name-field--insist {
   animation: wr-name-nudge 0.4s ease-in-out;
 
   .form-control {
-    animation: wr-name-line-amber 1.2s ease-in-out infinite;
+    animation: wr-name-line-amber 1.2s ease-in-out 4;
   }
 }
 
@@ -7178,7 +7185,7 @@ button.live-time-strip__rec {
 
 .wr-piazza-card__art {
   flex-shrink: 0;
-  animation: wr-art-float 4s ease-in-out infinite;
+  animation: wr-art-float 4s ease-in-out 1;
 }
 
 .wr-piazza-card__text {
@@ -7272,7 +7279,7 @@ button.live-time-strip__rec {
     height: 7px;
     border-radius: 50%;
     background: currentColor;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 }
 
@@ -7470,7 +7477,7 @@ button.live-time-strip__rec {
   box-sizing: content-box;
   animation:
     tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
-    tab-badge-halo 1.6s ease-out 0.45s infinite;
+    tab-badge-halo 1.6s ease-out 0.45s 2;
 }
 
 .live-sidebar-tab__badge.is-alert {
@@ -7491,7 +7498,7 @@ button.live-time-strip__rec {
 
 .live-sidebar-tab__dot,
 .live-floating-btn__dot {
-  animation: tab-badge-halo 1.6s ease-out infinite;
+  animation: tab-badge-halo 1.6s ease-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7893,7 +7900,7 @@ html.live-resizing .live-sidebar-resizer::after {
   color: #3D2600;
   animation:
     tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
-    tab-badge-halo-mention 1.4s ease-out 0.45s infinite;
+    tab-badge-halo-mention 1.4s ease-out 0.45s 3;
 }
 
 @keyframes tab-badge-halo-mention {
@@ -8059,7 +8066,7 @@ html.live-resizing .live-sidebar-resizer::after {
     height: 7px;
     border-radius: 50%;
     background: currentColor;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 }
 
@@ -8555,7 +8562,7 @@ html.live-resizing .live-sidebar-resizer::after {
   height: 10px;
   border-radius: 50%;
   background: #0066CC;
-  animation: agenda-pulse 1.8s ease-in-out infinite;
+  animation: agenda-pulse 1.8s ease-in-out 2;
 }
 
 @keyframes agenda-pulse {
@@ -8836,7 +8843,7 @@ html.live-resizing .live-sidebar-resizer::after {
   border-radius: 50%;
   background: #7FD6A8;
   box-shadow: 0 0 0 0 rgba(127, 214, 168, 0.6);
-  animation: agenda-ticker-dot 1.8s ease-in-out infinite;
+  animation: agenda-ticker-dot 1.8s ease-in-out 2;
 }
 
 @keyframes agenda-ticker-dot {
@@ -10290,12 +10297,12 @@ html.live-resizing .live-sidebar-resizer::after {
 .wizard-campo--vuoto {
   .form-control,
   textarea {
-    animation: wizard-campo-anello 1.8s ease-in-out infinite;
+    animation: wizard-campo-anello 1.8s ease-in-out 2;
   }
 
   label,
   .form-label {
-    animation: wr-name-label 1.8s ease-in-out infinite;
+    animation: wr-name-label 1.8s ease-in-out 2;
   }
 }
 
@@ -10305,7 +10312,7 @@ html.live-resizing .live-sidebar-resizer::after {
   .form-control,
   textarea {
     border-color: #c27700 !important;
-    animation: wizard-campo-anello-ambra 1.2s ease-in-out infinite;
+    animation: wizard-campo-anello-ambra 1.2s ease-in-out 4;
   }
 
   .invalid-feedback,

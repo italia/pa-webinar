@@ -91,7 +91,7 @@ function StatusBadge({
             height: 6,
             borderRadius: '50%',
             background: '#fff',
-            animation: 'pulse 1.5s ease-in-out infinite',
+            animation: 'pulse 1.5s ease-in-out 3',
           }}
         />
         LIVE
