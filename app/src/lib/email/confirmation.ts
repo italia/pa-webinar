@@ -11,6 +11,7 @@
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import {
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
@@ -122,7 +123,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       endsAt: event.endsAt,
       timezone: event.timezone,
       url: input.eventPageUrl,
-      organizerName: event.moderatorName ?? 'PA Webinar',
+      organizerName: await nomeOrganizzatoreCalendario(event.id),
     });
 
     const override = await loadEmailTemplateOverride('confirmation', testi);

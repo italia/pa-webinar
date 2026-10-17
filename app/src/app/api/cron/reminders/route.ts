@@ -22,6 +22,7 @@ import {
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
 import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
@@ -113,6 +114,8 @@ export const GET = withErrorHandling(async (request) => {
 
     if (registrations.length === 0) continue;
     remindersProcessed++;
+    // Solo per gli eventi con qualcuno da avvisare: una lettura per evento.
+    const organizzatoreIcs = await nomeOrganizzatoreCalendario(event.id);
 
     for (const reg of registrations) {
       try {
@@ -184,7 +187,7 @@ export const GET = withErrorHandling(async (request) => {
           endsAt: event.endsAt,
           timezone: event.timezone,
           url: eventPageUrl,
-          organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
+          organizerName: organizzatoreIcs,
         });
 
         // Una lettura per lingua, non una per iscritto.

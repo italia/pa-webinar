@@ -6,6 +6,7 @@
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { lingueIscrizione } from '@/lib/email/lingua';
 import { getSettings } from '@/lib/settings';
@@ -120,6 +121,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const { defaultLocale: predefinita } = await getSettings();
+      const organizzatoreIcs = await nomeOrganizzatoreCalendario(event.id);
 
       // Ognuno nella lingua in cui si e' iscritto: testi, titolo, data e
       // link. Il contenuto si prepara una volta per lingua.
@@ -145,7 +147,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
           endsAt: event.endsAt,
           timezone: event.timezone,
           url: eventPageUrl,
-          organizerName: event.moderatorName ?? 'PA Webinar',
+          organizerName: organizzatoreIcs,
         });
         const nuovo = {
           subject: COPY[testi].subject(title),

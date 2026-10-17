@@ -9,6 +9,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * promemoria gia' scattati («inizia domani» a 18 minuti dall'inizio).
  * DB ed effetti collaterali sono stub; la scelta (reminder-plan) gira davvero.
  */
+// Il nome dell'organizzatore nel calendario ha la sua prova (lib/ical/organizer).
+vi.mock('@/lib/ical/organizer', () => ({ nomeOrganizzatoreCalendario: vi.fn(async () => 'Ente di prova') }));
 vi.mock('@/lib/captions/transcript', () => ({
   costruisciTrascrizioniMancanti: vi.fn(async () => 0),
 }));
