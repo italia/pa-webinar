@@ -28,6 +28,7 @@ import {
   presignArtifactDownload,
 } from '@/lib/storage/postprod';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { registrazioneConVideo } from '@/lib/captions/transcript';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     where: { id },
     select: {
       id: true,
+      blobKey: true,
       sourceLanguage: true,
       tracks: {
         where: { audioPurgedAt: null },
@@ -109,7 +111,9 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
 
   return Response.json({
-    mixUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
+    // Senza il video della sala (solo tracce, o solo sottotitoli) non c'è un
+    // mix da riprodurre: il player resterebbe vuoto.
+    mixUrl: registrazioneConVideo(recording) ? `/api/admin/postprod/recordings/${recording.id}/media` : null,
     tracks,
     subtitleVtt,
     subtitleLang: vttArtifact?.language ?? recording.sourceLanguage ?? 'it',

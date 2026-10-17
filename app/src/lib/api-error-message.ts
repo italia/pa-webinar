@@ -22,6 +22,7 @@ export type ApiErrorKey =
   | 'rateLimited'
   | 'aiPipelineDisabled'
   | 'recordingWithoutMedia'
+  | 'recordingWithoutVideo'
   | 'transcriptCorrected'
   | 'noParticipantTracks'
   | 'summaryMissing'
@@ -35,6 +36,7 @@ export type ApiErrorKey =
 export const API_ERROR_CODES = {
   AI_PIPELINE_DISABLED: 'aiPipelineDisabled',
   RECORDING_WITHOUT_MEDIA: 'recordingWithoutMedia',
+  RECORDING_WITHOUT_VIDEO: 'recordingWithoutVideo',
   TRANSCRIPT_CORRECTED: 'transcriptCorrected',
   NO_PARTICIPANT_TRACKS: 'noParticipantTracks',
   SUMMARY_MISSING: 'summaryMissing',

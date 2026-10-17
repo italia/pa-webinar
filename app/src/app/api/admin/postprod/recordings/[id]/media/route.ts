@@ -16,6 +16,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
+import { registrazioneConVideo } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import {
@@ -36,7 +37,9 @@ export const GET = withErrorHandling(async (_request, context) => {
     where: { id },
     select: { blobKey: true },
   });
-  if (!recording?.blobKey) throw new NotFoundError('Recording media');
+  // Il segnaposto multitraccia è un prefisso, non un file: firmato darebbe un
+  // errore dello storage invece del 404.
+  if (!recording || !registrazioneConVideo(recording)) throw new NotFoundError('Recording media');
   if (!isPostprodStorageConfigured()) throw new NotFoundError('Recording storage');
 
   const url = await presignArtifactDownload({
