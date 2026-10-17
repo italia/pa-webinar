@@ -4663,6 +4663,8 @@
       "elapsed": "sagatavošanā jau {time}",
       "scheduled": "Telpa atveras sākuma laikā",
       "scheduledDetail": "Vai agrāk, kad rīkotājs sāk pasākumu. Pa to laiku vari pārbaudīt kameru un mikrofonu vai izmantot tērzēšanu.",
+      "readyBeforeStart": "Telpa ir gatava: tā atveras plkst. {time}",
+      "readyBeforeStartDetail": "Ieejas poga aktivizējas pati sākuma laikā. Tikmēr vari pārbaudīt kameru un mikrofonu vai izmantot tērzēšanu.",
       "slow": "Tas aizņem vairāk laika nekā parasti. Telpa atvērsies pati, tiklīdz būs gatava: ja tas nenotiek dažu minūšu laikā, informējiet organizatorus."
     },
     "exitWaiting": "Iziet no uzgaidāmās telpas",

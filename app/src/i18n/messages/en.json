@@ -4663,6 +4663,8 @@
       "elapsed": "preparing for {time}",
       "scheduled": "The room opens at the start time",
       "scheduledDetail": "Or earlier, when the organizer starts the event. Meanwhile you can check your camera and microphone or use the chat.",
+      "readyBeforeStart": "The room is ready: it opens at {time}",
+      "readyBeforeStartDetail": "The button to enter turns on by itself at the start time. Meanwhile you can check your camera and microphone or use the chat.",
       "slow": "It's taking longer than usual. The room opens by itself as soon as it's ready: if it doesn't within a few minutes, let the organizers know."
     },
     "exitWaiting": "Leave the waiting room",

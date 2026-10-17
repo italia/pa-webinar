@@ -4663,6 +4663,8 @@
       "elapsed": "připravuje se {time}",
       "scheduled": "Místnost se otevře v čase zahájení",
       "scheduledDetail": "Nebo dříve, když organizátor událost spustí. Zatím si můžete zkontrolovat kameru a mikrofon nebo použít chat.",
+      "readyBeforeStart": "Místnost je připravena: otevírá se v {time}",
+      "readyBeforeStartDetail": "Tlačítko pro vstup se v čase zahájení aktivuje samo. Mezitím můžete zkontrolovat kameru a mikrofon nebo použít chat.",
       "slow": "Trvá to déle než obvykle. Místnost se otevře sama, jakmile bude připravená: pokud se to nestane během několika minut, dejte vědět pořadatelům."
     },
     "exitWaiting": "Opustit čekárnu",

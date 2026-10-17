@@ -4663,6 +4663,8 @@
       "elapsed": "v pripravi že {time}",
       "scheduled": "Dvorana se odpre ob začetku",
       "scheduledDetail": "Ali prej, ko organizator zažene dogodek. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
+      "readyBeforeStart": "Soba je pripravljena: odpre se ob {time}",
+      "readyBeforeStartDetail": "Gumb za vstop se ob začetku aktivira sam. Medtem lahko preverite kamero in mikrofon ali uporabite klepet.",
       "slow": "Traja dlje kot običajno. Soba se odpre sama, ko je pripravljena: če se to ne zgodi v nekaj minutah, obvestite organizatorje."
     },
     "exitWaiting": "Zapusti čakalnico",

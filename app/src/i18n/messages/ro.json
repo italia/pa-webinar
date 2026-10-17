@@ -4663,6 +4663,8 @@
       "elapsed": "în pregătire de {time}",
       "scheduled": "Sala se deschide la ora de început",
       "scheduledDetail": "Sau mai devreme, când organizatorul pornește evenimentul. Între timp poți verifica camera și microfonul sau folosi conversația.",
+      "readyBeforeStart": "Sala este pregătită: se deschide la {time}",
+      "readyBeforeStartDetail": "Butonul de intrare se activează singur la ora de început. Între timp puteți verifica camera și microfonul sau folosi chatul.",
       "slow": "Durează mai mult decât de obicei. Sala se deschide singură imediat ce este gata: dacă nu se întâmplă în câteva minute, anunță organizatorii."
     },
     "exitWaiting": "Ieși din sala de așteptare",

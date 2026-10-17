@@ -22,6 +22,7 @@ describe('warmupFromLifecycle', () => {
         phase,
         startedAt: null,
         serverTime: SERVER_TIME,
+        bridgePronto: false,
       });
     }
   });
@@ -32,7 +33,14 @@ describe('warmupFromLifecycle', () => {
       phase: 'starting',
       startedAt,
       serverTime: SERVER_TIME,
+      bridgePronto: false,
     });
+  });
+
+  it('dice se un bridge è già pronto (prima dell’inizio la fase resta «starting»)', () => {
+    expect(warmupFromLifecycle(risposta({ phase: 'starting', startedAt: null, ready: 1 }))?.bridgePronto).toBe(true);
+    expect(warmupFromLifecycle(risposta({ phase: 'starting', startedAt: null, ready: 0 }))?.bridgePronto).toBe(false);
+    expect(warmupFromLifecycle(risposta({ phase: 'starting', startedAt: null, ready: '1' }))?.bridgePronto).toBe(false);
   });
 
   it('fuori dal warm-up la risposta non ha telemetria: null', () => {

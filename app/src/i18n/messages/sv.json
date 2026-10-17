@@ -4663,6 +4663,8 @@
       "elapsed": "förbereds sedan {time}",
       "scheduled": "Rummet öppnas vid starttiden",
       "scheduledDetail": "Eller tidigare, när arrangören startar evenemanget. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
+      "readyBeforeStart": "Rummet är redo: det öppnar kl. {time}",
+      "readyBeforeStartDetail": "Knappen för att gå in aktiveras av sig själv vid starttiden. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
       "slow": "Det tar längre tid än vanligt. Rummet öppnas av sig självt när det är klart: om det inte sker inom några minuter, meddela arrangörerna."
     },
     "exitWaiting": "Lämna väntrummet",

@@ -4663,6 +4663,8 @@
       "elapsed": "valmistelussa {time}",
       "scheduled": "Sali avautuu alkamisaikaan",
       "scheduledDetail": "Tai aiemmin, kun järjestäjä käynnistää tapahtuman. Sillä välin voit tarkistaa kameran ja mikrofonin tai käyttää keskustelua.",
+      "readyBeforeStart": "Huone on valmis: se avautuu klo {time}",
+      "readyBeforeStartDetail": "Sisäänpääsypainike aktivoituu itsestään alkamisaikana. Sillä välin voit tarkistaa kameran ja mikrofonin tai käyttää chattia.",
       "slow": "Tämä kestää tavallista kauemmin. Huone avautuu itsestään heti kun se on valmis: jos niin ei käy muutamassa minuutissa, ilmoita järjestäjille."
     },
     "exitWaiting": "Poistu odotustilasta",

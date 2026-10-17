@@ -4663,6 +4663,8 @@
       "elapsed": "{time} óta készül",
       "scheduled": "A terem a kezdési időpontban nyílik meg",
       "scheduledDetail": "Vagy korábban, amikor a szervező elindítja az eseményt. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést.",
+      "readyBeforeStart": "A terem készen áll: {time}-kor nyílik",
+      "readyBeforeStartDetail": "A belépés gombja a kezdés időpontjában magától aktívvá válik. Addig ellenőrizheti a kamerát és a mikrofont, vagy használhatja a csevegést.",
       "slow": "A szokásosnál tovább tart. A terem magától megnyílik, amint elkészül: ha néhány percen belül nem történik meg, szóljon a szervezőknek."
     },
     "exitWaiting": "Kilépés a váróteremből",

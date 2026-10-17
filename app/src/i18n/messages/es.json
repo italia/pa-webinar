@@ -4663,6 +4663,8 @@
       "elapsed": "en preparación desde hace {time}",
       "scheduled": "La sala se abre a la hora de inicio",
       "scheduledDetail": "O antes, cuando la organización inicie el evento. Mientras tanto puedes revisar cámara y micrófono o usar el chat.",
+      "readyBeforeStart": "La sala está lista: se abre a las {time}",
+      "readyBeforeStartDetail": "El botón para entrar se activa solo a la hora de inicio. Mientras tanto puedes revisar cámara y micrófono o usar el chat.",
       "slow": "Está tardando más de lo habitual. La sala se abre sola en cuanto esté lista: si no ocurre en unos minutos, avisa a la organización."
     },
     "exitWaiting": "Salir de la sala de espera",

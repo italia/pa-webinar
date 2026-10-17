@@ -4663,6 +4663,8 @@
       "elapsed": "priprema traje {time}",
       "scheduled": "Soba se otvara u vrijeme početka",
       "scheduledDetail": "Ili ranije, kada organizator pokrene događaj. U međuvremenu možeš provjeriti kameru i mikrofon ili koristiti razgovor.",
+      "readyBeforeStart": "Soba je spremna: otvara se u {time}",
+      "readyBeforeStartDetail": "Gumb za ulazak sam se aktivira u vrijeme početka. U međuvremenu možete provjeriti kameru i mikrofon ili koristiti chat.",
       "slow": "Traje dulje nego inače. Soba se otvara sama čim bude spremna: ako se to ne dogodi za nekoliko minuta, obavijestite organizatore."
     },
     "exitWaiting": "Izađi iz čekaonice",

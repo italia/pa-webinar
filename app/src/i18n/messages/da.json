@@ -4663,6 +4663,8 @@
       "elapsed": "under forberedelse i {time}",
       "scheduled": "Rummet åbner på starttidspunktet",
       "scheduledDetail": "Eller tidligere, når arrangøren starter begivenheden. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
+      "readyBeforeStart": "Rummet er klar: det åbner kl. {time}",
+      "readyBeforeStartDetail": "Knappen til at gå ind bliver aktiv af sig selv ved starttidspunktet. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
       "slow": "Det tager længere tid end normalt. Rummet åbner af sig selv, så snart det er klar: Sker det ikke inden for få minutter, så giv arrangørerne besked."
     },
     "exitWaiting": "Forlad venteværelset",

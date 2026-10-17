@@ -4663,6 +4663,8 @@
       "elapsed": "á ullmhú le {time}",
       "scheduled": "Osclaíonn an seomra ag an am tosaigh",
       "scheduledDetail": "Nó níos luaithe, nuair a thosaíonn an t-eagraí an t-imeacht. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
+      "readyBeforeStart": "Tá an seomra réidh: osclaíonn sé ag {time}",
+      "readyBeforeStartDetail": "Éiríonn an cnaipe chun dul isteach gníomhach as féin ag an am tosaithe. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
       "slow": "Tá sé ag tógáil níos faide ná mar is gnách. Osclaíonn an seomra leis féin a luaithe a bhíonn sé réidh: mura dtarlaíonn sé laistigh de chúpla nóiméad, cuir in iúl do na heagraithe é."
     },
     "exitWaiting": "Fág an seomra feithimh",

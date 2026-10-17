@@ -4663,6 +4663,8 @@
       "elapsed": "ruošiama jau {time}",
       "scheduled": "Salė atsidaro pradžios metu",
       "scheduledDetail": "Arba anksčiau, kai organizatorius pradeda renginį. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
+      "readyBeforeStart": "Kambarys paruoštas: jis atsidaro {time}",
+      "readyBeforeStartDetail": "Įėjimo mygtukas suaktyvėja pats pradžios metu. Tuo tarpu galite patikrinti kamerą ir mikrofoną arba naudotis pokalbiu.",
       "slow": "Tai užtrunka ilgiau nei įprastai. Kambarys atsidarys pats, kai tik bus paruoštas: jei to neįvyks per kelias minutes, praneškite organizatoriams."
     },
     "exitWaiting": "Išeiti iš laukiamojo",

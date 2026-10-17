@@ -4663,6 +4663,8 @@
       "elapsed": "w przygotowaniu od {time}",
       "scheduled": "Sala otworzy się o godzinie rozpoczęcia",
       "scheduledDetail": "Albo wcześniej, gdy organizator uruchomi wydarzenie. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu.",
+      "readyBeforeStart": "Sala jest gotowa: otwiera się o {time}",
+      "readyBeforeStartDetail": "Przycisk wejścia uaktywni się sam o godzinie rozpoczęcia. W międzyczasie możesz sprawdzić kamerę i mikrofon lub skorzystać z czatu.",
       "slow": "Trwa to dłużej niż zwykle. Sala otworzy się sama, gdy będzie gotowa: jeśli nie stanie się to w ciągu kilku minut, powiadom organizatorów."
     },
     "exitWaiting": "Opuść poczekalnię",

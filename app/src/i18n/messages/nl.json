@@ -4663,6 +4663,8 @@
       "elapsed": "in voorbereiding sinds {time}",
       "scheduled": "De zaal gaat open op het starttijdstip",
       "scheduledDetail": "Of eerder, wanneer de organisatie het evenement start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
+      "readyBeforeStart": "De zaal is klaar: hij gaat open om {time}",
+      "readyBeforeStartDetail": "De knop om binnen te gaan wordt vanzelf actief op het begintijdstip. Intussen kun je camera en microfoon controleren of de chat gebruiken.",
       "slow": "Het duurt langer dan normaal. De zaal gaat vanzelf open zodra ze klaar is: gebeurt dat niet binnen een paar minuten, laat het de organisatie weten."
     },
     "exitWaiting": "Wachtruimte verlaten",

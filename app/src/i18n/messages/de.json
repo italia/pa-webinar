@@ -4663,6 +4663,8 @@
       "elapsed": "seit {time} in Vorbereitung",
       "scheduled": "Der Raum öffnet zur Startzeit",
       "scheduledDetail": "Oder früher, wenn die Organisation die Veranstaltung startet. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen.",
+      "readyBeforeStart": "Der Raum ist bereit: Er öffnet um {time}",
+      "readyBeforeStartDetail": "Die Schaltfläche zum Eintreten wird zur Startzeit von selbst aktiv. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen.",
       "slow": "Es dauert länger als üblich. Der Raum öffnet sich von selbst, sobald er bereit ist: Falls nicht innerhalb weniger Minuten, informieren Sie die Organisation."
     },
     "exitWaiting": "Warteraum verlassen",

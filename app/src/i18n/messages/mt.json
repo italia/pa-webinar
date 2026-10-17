@@ -4663,6 +4663,8 @@
       "elapsed": "qed jitħejja minn {time}",
       "scheduled": "Is-sala tinfetaħ fil-ħin tal-bidu",
       "scheduledDetail": "Jew qabel, meta l-organizzatur jibda l-avveniment. Sadanittant tista' tiċċekkja l-kamera u l-mikrofonu jew tuża ċ-chat.",
+      "readyBeforeStart": "Il-kamra hija lesta: tiftaħ fil-{time}",
+      "readyBeforeStartDetail": "Il-buttuna biex tidħol tattiva ruħha waħedha fil-ħin tal-bidu. Sadanittant tista' tiċċekkja l-kamera u l-mikrofonu jew tuża ċ-chat.",
       "slow": "Qed tieħu aktar ħin mis-soltu. Il-kamra tinfetaħ waħedha hekk kif tkun lesta: jekk dan ma jiġrix fi ftit minuti, għarraf lill-organizzaturi."
     },
     "exitWaiting": "Oħroġ mill-kamra tal-istennija",

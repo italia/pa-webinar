@@ -4663,6 +4663,8 @@
       "elapsed": "ettevalmistuses {time}",
       "scheduled": "Ruum avaneb algusajal",
       "scheduledDetail": "Või varem, kui korraldaja sündmuse käivitab. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
+      "readyBeforeStart": "Ruum on valmis: see avatakse kell {time}",
+      "readyBeforeStartDetail": "Sisenemisnupp aktiveerub alguse ajal ise. Seni saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
       "slow": "See võtab tavalisest kauem aega. Ruum avaneb ise kohe, kui on valmis: kui seda ei juhtu mõne minuti jooksul, anna korraldajatele teada."
     },
     "exitWaiting": "Lahku ooteruumist",
