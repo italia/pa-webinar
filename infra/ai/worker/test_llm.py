@@ -263,7 +263,7 @@ CHAPTERS = [
 ]
 
 
-def test_structured_summary_topics_follow_the_scaletta_chapters(monkeypatch):
+def test_structured_summary_topics_follow_the_agenda_chapters(monkeypatch):
     seen = {}
 
     def fake_chat(**kw):
@@ -289,7 +289,7 @@ def test_structured_summary_topics_follow_the_scaletta_chapters(monkeypatch):
         timeline={"exact": True, "entries": [], "chapters": CHAPTERS},
     )
     user = seen["messages"][1]["content"]
-    assert "Capitoli della scaletta" in user
+    assert "Capitoli dell'agenda" in user
     assert "[00:12:34] Il nuovo servizio" in user
     assert out["topics"] == [
         {"title": "Saluti", "start_mmss": "00:00", "summary": "Benvenuto."},

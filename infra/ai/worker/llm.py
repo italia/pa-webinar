@@ -772,9 +772,9 @@ def _format_mmss(sec: float) -> str:
 
 
 def _timeline_chapters(timeline: Optional[dict]) -> list:
-    """I capitoli della scaletta dalla cronologia: ``[{"offsetSec", "title"}]``
+    """I capitoli dell'agenda dalla cronologia: ``[{"offsetSec", "title"}]``
     in ordine di tempo, gia' calcolati dal portale (gli argomenti avviati in
-    sala). Righe illeggibili scartate; vuota se la scaletta non e' stata usata."""
+    sala). Righe illeggibili scartate; vuota se l'agenda non e' stata usata."""
     if not isinstance(timeline, dict):
         return []
     out = []
@@ -798,7 +798,7 @@ def _format_chapters(chapters: list) -> str:
         return ""
     lines = [f"- {_format_offset(c['offsetSec'])} {c['title']}" for c in chapters]
     return (
-        "\n\nCapitoli della scaletta, nell'ordine e con l'ora d'inizio in cui chi "
+        "\n\nCapitoli dell'agenda, nell'ordine e con l'ora d'inizio in cui chi "
         "conduce li ha avviati in sala. Usali come `topics`: uno per capitolo, "
         "stesso ordine, stesso titolo; per ciascuno riassumi ciò che si è detto "
         "dal suo inizio all'inizio del successivo. Se prima del primo capitolo "
@@ -833,7 +833,7 @@ def _parse_mmss(value: Any) -> Optional[float]:
 
 
 def _apply_chapters(summary: Dict[str, Any], chapters: list) -> Dict[str, Any]:
-    """I topic della sintesi seguono i capitoli della scaletta: titolo e ora
+    """I topic della sintesi seguono i capitoli dell'agenda: titolo e ora
     vengono dai capitoli (dichiarati in sala), il testo dal modello.
 
     Ogni topic del modello va a un capitolo:
@@ -879,7 +879,7 @@ def _apply_chapters(summary: Dict[str, Any], chapters: list) -> Dict[str, Any]:
         key = _norm_title(str(t.get("title") or ""))
         candidati = by_title.get(key) if key else None
         if candidati:
-            # Un titolo ripetuto in scaletta: decide l'ora, o il primo libero.
+            # Un titolo ripetuto nell'agenda: decide l'ora, o il primo libero.
             if len(candidati) > 1 and start is not None and capitolo_alle(start) in candidati:
                 scelto = capitolo_alle(start)
             else:
@@ -958,7 +958,7 @@ def summarize_transcript_structured(
     glossary: Optional[List["gl.Term"]] = None,
 ) -> Dict[str, Any]:
     """SUMMARY_JSON: sintesi strutturata via LLM JSON-mode. Con i capitoli
-    della scaletta nella cronologia, i topic sono quelli (vedi _apply_chapters).
+    dell'agenda nella cronologia, i topic sono quelli (vedi _apply_chapters).
     I termini del glossario presenti nella trascrizione arrivano al modello con
     il loro significato, perche' li scriva nella forma giusta."""
     chapters = _timeline_chapters(timeline)
