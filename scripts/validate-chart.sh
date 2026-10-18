@@ -288,11 +288,12 @@ done
 # e il bridge con lo stesso tag, la parte web con l'immagine originale dello
 # stesso rilascio (il chart usa quella patchata, con un suffisso). Nel chart la
 # versione si legge come la guardia pa-webinar.validateJitsiVersions: digest
-# tolto, tag mobili per quello che sono, una forma diversa non confrontata, un
-# tag vuoto come la versione del sottochart. Compose usa solo le immagini
-# pubbliche di Jitsi: un suo tag che non dice il rilascio è un errore.
+# tolto, tag mobili per quello che sono, una forma diversa non confrontata (lo
+# si dice), un tag vuoto come la versione del sottochart. Compose usa solo le
+# immagini pubbliche di Jitsi: un suo tag che la guardia non saprebbe leggere
+# (refuso, variabile, solo digest) è un errore.
 if ! python3 - docker-compose.yml "$CHART" >"$OUT/compose-jitsi.err" 2>&1 <<'PY'
-import glob
+import os
 import re
 import sys
 import tarfile
@@ -312,11 +313,21 @@ def versione(tag):
     return trovata.group(0) if trovata else None
 
 
-def versione_sottochart():
-    for archivio in glob.glob(f"{chart}/charts/jitsi-meet-*.tgz"):
+def leggi_versione_sottochart():
+    # Il sottochart che Helm usa: quello del Chart.lock, in archivio o già
+    # spacchettato.
+    bloccate = (yaml.safe_load(open(f"{chart}/Chart.lock")) or {}).get("dependencies") or []
+    versione_chart = next((d.get("version") for d in bloccate if d.get("name") == "jitsi-meet"), None)
+    if os.path.exists(f"{chart}/charts/jitsi-meet/Chart.yaml"):
+        return (yaml.safe_load(open(f"{chart}/charts/jitsi-meet/Chart.yaml")) or {}).get("appVersion")
+    archivio = f"{chart}/charts/jitsi-meet-{versione_chart}.tgz"
+    if versione_chart and os.path.exists(archivio):
         with tarfile.open(archivio) as tgz:
             return (yaml.safe_load(tgz.extractfile("jitsi-meet/Chart.yaml")) or {}).get("appVersion")
     return None
+
+
+versione_sottochart = leggi_versione_sottochart()
 
 
 def tag_compose(immagine):
@@ -327,6 +338,7 @@ def tag_compose(immagine):
 
 
 problemi = []
+saltati = []
 for servizio, componente in (("jitsi-web", "web"), ("prosody", "prosody"), ("jicofo", "jicofo"), ("jvb", "jvb")):
     immagine = (servizi.get(servizio) or {}).get("image")
     if not immagine:
@@ -337,16 +349,22 @@ for servizio, componente in (("jitsi-web", "web"), ("prosody", "prosody"), ("jic
     if not trovata:
         problemi.append(f"{servizio}: il tag di {immagine} non dice il rilascio di Jitsi")
         continue
-    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag") or versione_sottochart()
+    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag") or versione_sottochart
     attesa = versione(tag_chart) if tag_chart else None
-    if attesa and attesa != trovata:
+    if not attesa:
+        saltati.append(f"{servizio} (chart: {tag_chart or 'versione del sottochart sconosciuta'})")
+    elif attesa != trovata:
         problemi.append(f"{servizio}={tag} (chart: {tag_chart})")
+if saltati:
+    print("confronto con Compose saltato per " + ", ".join(saltati))
 if problemi:
     print(", ".join(problemi))
     sys.exit(1)
 PY
 then
   errore "docker-compose.yml non usa il rilascio di Jitsi del chart: $(cat "$OUT/compose-jitsi.err")"
+elif [ -s "$OUT/compose-jitsi.err" ]; then
+  cat "$OUT/compose-jitsi.err"
 fi
 
 echo "helm lint"
