@@ -32,7 +32,7 @@ export function multitrackRecordingPrefix(eventId: string, recordingId: string):
  * Chiave del manifesto che il recorder carica accanto alle tracce. Né il
  * portale né il worker lo leggono: i dati arrivano con l'ingest. Contiene però
  * i nomi in chiaro, quindi segue le tracce: resta finché ne resta una e si
- * cancella con l'ultima (`lib/recorder/manifest`).
+ * cancella con l'ultima, sempre da `lib/recorder/manifest`.
  */
 export function multitrackManifestKey(eventId: string, recordingId: string): string {
   return `${multitrackRecordingPrefix(eventId, recordingId)}tracks.json`;

@@ -147,7 +147,8 @@ export const GET = withErrorHandling(async (request) => {
   }
 
   // Il manifesto se ne va con l'ultima traccia della registrazione.
-  const manifestsDeleted = await cancellaManifestiSenzaTracce(storage, toccate);
+  const manifesti = await cancellaManifestiSenzaTracce(storage, toccate);
+  failed += manifesti.falliti;
 
   return Response.json({
     ok: true,
@@ -155,6 +156,6 @@ export const GET = withErrorHandling(async (request) => {
     untranscribedExpired: expired.length,
     purged,
     failed,
-    manifestsDeleted,
+    manifestsDeleted: manifesti.cancellati,
   });
 });

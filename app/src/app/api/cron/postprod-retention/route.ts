@@ -26,7 +26,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { isMultitrackPlaceholder, multitrackManifestKey } from '@/lib/recorder/lifecycle';
+import { cancellaManifesto } from '@/lib/recorder/manifest';
 import {
   deletePostprodBlob,
   getPostprodStorage,
@@ -50,8 +50,7 @@ export const dynamic = 'force-dynamic';
  */
 async function purgeRecordingTracks(
   recordingId: string,
-  eventId: string,
-  blobKey: string
+  eventId: string
 ): Promise<{ blobsDeleted: number; blobsFailed: number }> {
   let blobsDeleted = 0;
   let blobsFailed = 0;
@@ -74,20 +73,12 @@ async function purgeRecordingTracks(
     }
   }
   await prisma.recordingTrack.deleteMany({ where: { recordingId } });
-  // Senza piu' tracce, via anche il manifesto con i nomi: di ogni
-  // registrazione multitraccia, anche di quella che non ha mai avuto righe di
-  // traccia (resta il segnaposto).
-  if (tracks.length > 0 || isMultitrackPlaceholder(blobKey)) {
-    try {
-      await storage.delete(multitrackManifestKey(eventId, recordingId));
-    } catch (err) {
-      blobsFailed += 1;
-      console.warn('[postprod-retention] manifest delete failed', {
-        recordingId,
-        err: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
+  // Senza piu' tracce, via anche il manifesto con i nomi. Sempre: una
+  // registrazione multitraccia puo' non avere righe di traccia (avviso del
+  // recorder mai arrivato) e aver gia' preso la chiave del mix al posto del
+  // segnaposto; per le altre la chiave non esiste.
+  if ((await cancellaManifesto(storage, eventId, recordingId)) === 'fallito')
+    blobsFailed += 1;
   return { blobsDeleted, blobsFailed };
 }
 
@@ -99,8 +90,7 @@ async function purgeRecordingTracks(
  */
 async function purgeRecordingArtifacts(
   recordingId: string,
-  eventId: string,
-  blobKey: string
+  eventId: string
 ): Promise<{ blobsDeleted: number; blobsFailed: number; artifactsDeleted: number }> {
   let blobsDeleted = 0;
   let blobsFailed = 0;
@@ -130,7 +120,7 @@ async function purgeRecordingArtifacts(
   const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
   await prisma.speaker.deleteMany({ where: { recordingId } });
 
-  const tp = await purgeRecordingTracks(recordingId, eventId, blobKey);
+  const tp = await purgeRecordingTracks(recordingId, eventId);
   blobsDeleted += tp.blobsDeleted;
   blobsFailed += tp.blobsFailed;
 
@@ -191,7 +181,7 @@ export const GET = withErrorHandling(async (request) => {
       retentionUntil: { not: null, lt: now },
       status: { not: 'ARCHIVED' },
     },
-    select: { id: true, eventId: true, blobKey: true },
+    select: { id: true, eventId: true },
     take: 50, // bound the per-tick work
   });
 
@@ -205,7 +195,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const r = await purgeRecordingArtifacts(rec.id, rec.eventId, rec.blobKey);
+    const r = await purgeRecordingArtifacts(rec.id, rec.eventId);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
     artifactsDeleted += r.artifactsDeleted;
@@ -243,7 +233,6 @@ export const GET = withErrorHandling(async (request) => {
     select: {
       id: true,
       eventId: true,
-      blobKey: true,
       event: { select: { endsAt: true, dataRetentionDays: true } },
     },
     take: 50,
@@ -256,7 +245,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const r = await purgeRecordingArtifacts(rec.id, rec.eventId, rec.blobKey);
+    const r = await purgeRecordingArtifacts(rec.id, rec.eventId);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
     artifactsDeleted += r.artifactsDeleted;
@@ -341,7 +330,6 @@ export const GET = withErrorHandling(async (request) => {
     select: {
       id: true,
       eventId: true,
-      blobKey: true,
       event: { select: { endsAt: true, dataRetentionDays: true } },
     },
     take: 50,
@@ -356,7 +344,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const tp = await purgeRecordingTracks(rec.id, rec.eventId, rec.blobKey);
+    const tp = await purgeRecordingTracks(rec.id, rec.eventId);
     blobsDeleted += tp.blobsDeleted;
     blobsFailed += tp.blobsFailed;
     publishedTracksPurged += 1;

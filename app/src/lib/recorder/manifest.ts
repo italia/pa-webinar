@@ -1,14 +1,15 @@
 /**
  * Il manifesto `tracks.json` di una registrazione multitraccia segue le sue
- * tracce: lo cancellano i due lavori che cancellano tracce quando della
- * registrazione non resta nessuna traccia con l'audio presente. Questo helper
- * serve multitrack-purge, che segna le tracce e ne lascia le righe;
- * postprod-retention cancella le righe e il manifesto insieme. Contiene i
- * nomi in chiaro e nessuno lo legge dopo il caricamento.
+ * tracce: va via con l'ultima. Lo cancellano i due lavori che cancellano
+ * tracce, sempre da qui: multitrack-purge, che segna le tracce e ne lascia le
+ * righe, quando della registrazione non resta nessuna traccia con l'audio
+ * presente; postprod-retention, che cancella righe e manifesto insieme.
+ * Contiene i nomi in chiaro e nessuno lo legge dopo il caricamento.
  *
- * Best-effort: un errore resta un avviso nei log, e un manifesto che resta lo
- * trova la riconciliazione delle registrazioni, che lo vede orfano e lo
- * cancella allo scadere della tolleranza.
+ * Best-effort: un errore è un avviso nei log e un fallimento contato da chi
+ * chiama. Un manifesto che resta lo trova la riconciliazione delle
+ * registrazioni, che lo vede orfano e lo cancella allo scadere della
+ * tolleranza.
  */
 
 import { prisma } from '@/lib/db';
@@ -16,39 +17,63 @@ import type { StorageProvider } from '@/lib/storage';
 
 import { multitrackManifestKey } from './lifecycle';
 
+type Storage = Pick<StorageProvider, 'delete'>;
+
+export type EsitoManifesto = 'cancellato' | 'assente' | 'fallito';
+
 /**
- * `registrazioni`: id della registrazione → id dell'evento. Restituisce
- * quanti manifesti sono stati davvero cancellati.
+ * Cancella il manifesto di una registrazione. Non lancia: per una
+ * registrazione che non è multitraccia la chiave non esiste ('assente'; con
+ * S3 la cancellazione di una chiave assente risulta riuscita).
+ */
+export async function cancellaManifesto(
+  storage: Storage,
+  eventId: string,
+  recordingId: string
+): Promise<EsitoManifesto> {
+  try {
+    return (await storage.delete(multitrackManifestKey(eventId, recordingId)))
+      ? 'cancellato'
+      : 'assente';
+  } catch (err) {
+    console.warn('[recorder/manifest] manifest delete failed', {
+      recordingId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    return 'fallito';
+  }
+}
+
+/**
+ * `registrazioni`: id della registrazione → id dell'evento. Cancella il
+ * manifesto di quelle che non hanno più tracce con l'audio presente.
  */
 export async function cancellaManifestiSenzaTracce(
-  storage: Pick<StorageProvider, 'delete'>,
+  storage: Storage,
   registrazioni: Map<string, string>
-): Promise<number> {
-  if (registrazioni.size === 0) return 0;
-  let cancellati = 0;
+): Promise<{ cancellati: number; falliti: number }> {
+  if (registrazioni.size === 0) return { cancellati: 0, falliti: 0 };
+  let restano: Set<string>;
   try {
     const conTracce = await prisma.recordingTrack.groupBy({
       by: ['recordingId'],
       where: { recordingId: { in: [...registrazioni.keys()] }, audioPurgedAt: null },
     });
-    const restano = new Set(conTracce.map((r) => r.recordingId));
-    for (const [recordingId, eventId] of registrazioni) {
-      if (restano.has(recordingId)) continue;
-      try {
-        if (await storage.delete(multitrackManifestKey(eventId, recordingId)))
-          cancellati += 1;
-      } catch (err) {
-        console.warn('[recorder/manifest] manifest delete failed', {
-          recordingId,
-          err: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
+    restano = new Set(conTracce.map((r) => r.recordingId));
   } catch (err) {
-    console.warn('[recorder/manifest] manifest cleanup failed', {
+    console.warn('[recorder/manifest] track lookup failed', {
       recordingIds: [...registrazioni.keys()],
       err: err instanceof Error ? err.message : String(err),
     });
+    return { cancellati: 0, falliti: registrazioni.size };
   }
-  return cancellati;
+  let cancellati = 0;
+  let falliti = 0;
+  for (const [recordingId, eventId] of registrazioni) {
+    if (restano.has(recordingId)) continue;
+    const esito = await cancellaManifesto(storage, eventId, recordingId);
+    if (esito === 'cancellato') cancellati += 1;
+    if (esito === 'fallito') falliti += 1;
+  }
+  return { cancellati, falliti };
 }

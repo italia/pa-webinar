@@ -109,25 +109,28 @@ describe('GET /api/cron/postprod-retention — manifesto delle tracce', () => {
     expect(m.storageDelete).toHaveBeenCalledWith(manifesto);
   });
 
-  it('lo cancella anche se la registrazione multitraccia non ha mai avuto righe di traccia', async () => {
+  it('lo cancella anche senza righe di traccia, ancora al segnaposto', async () => {
     scadutaIl('recordings/multitrack/ev-1/rec-m/');
     await giro();
     expect(m.storageDelete).toHaveBeenCalledWith(manifesto);
   });
 
-  it('non lo cerca per una registrazione che non è multitraccia', async () => {
+  it('lo cancella anche senza righe di traccia quando il mix ha preso il posto del segnaposto', async () => {
     scadutaIl('recordings/ev-1/rec-m.mp4');
     await giro();
-    expect(m.storageDelete).not.toHaveBeenCalled();
+    expect(m.storageDelete).toHaveBeenCalledWith(manifesto);
   });
 
   it('una cancellazione fallita conta tra i file non cancellati', async () => {
     scadutaIl('recordings/multitrack/ev-1/rec-m/');
     m.storageDelete.mockRejectedValue(new Error('rete'));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const res = await giro();
-    expect(res.blobsFailed).toBe(1);
-    expect(warn).toHaveBeenCalledWith('[postprod-retention] manifest delete failed', expect.objectContaining({ recordingId: 'rec-m' }));
-    warn.mockRestore();
+    try {
+      const res = await giro();
+      expect(res.blobsFailed).toBe(1);
+      expect(warn).toHaveBeenCalledWith('[recorder/manifest] manifest delete failed', expect.objectContaining({ recordingId: 'rec-m' }));
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

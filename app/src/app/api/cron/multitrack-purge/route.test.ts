@@ -98,4 +98,18 @@ describe('GET /api/cron/multitrack-purge', () => {
     expect(db.recordingTrack.groupBy).not.toHaveBeenCalled();
     expect(del).toHaveBeenCalledTimes(1);
   });
+
+  it('counts a manifest that could not be deleted as a failure', async () => {
+    db.event.findMany.mockResolvedValue([]);
+    db.recordingTrack.findMany.mockResolvedValueOnce([traccia('t1', 'e', 'r1')]);
+    // La traccia va, il manifesto no.
+    del.mockResolvedValueOnce(true).mockRejectedValueOnce(new Error('storage giù'));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const body = await (await GET(req() as never, ctx as never)).json();
+      expect(body).toMatchObject({ purged: 1, failed: 1, manifestsDeleted: 0 });
+    } finally {
+      warn.mockRestore();
+    }
+  });
 });
