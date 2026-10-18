@@ -34,8 +34,9 @@ async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
     where: { eventId: { in: events.map((e) => e.id) }, revokedAt: null },
     _count: { _all: true },
   });
+  const conteggi = new Map(perRuolo.map((r) => [`${r.eventId}:${r.role}`, r._count._all]));
   const quanti = (eventId: string, role: 'MODERATOR' | 'SPEAKER') =>
-    perRuolo.find((r) => r.eventId === eventId && r.role === role)?._count._all ?? 0;
+    conteggi.get(`${eventId}:${role}`) ?? 0;
 
   return events.map((e) => ({
     id: e.id,
