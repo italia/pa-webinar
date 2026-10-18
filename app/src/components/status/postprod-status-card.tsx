@@ -196,7 +196,7 @@ export default function PostprodStatusCard() {
             <div
               className="progress mb-2"
               style={{ height: 14, borderRadius: 7, overflow: 'hidden' }}
-              role="meter"
+              role="img"
               aria-label={t('queueAriaLabel')}
             >
               {pending > 0 && (
@@ -350,7 +350,7 @@ function QueueChip({
   return (
     <span
       className="d-inline-flex align-items-center gap-1 px-2 py-1 rounded"
-      style={{ background: `${color}15`, color }}
+      style={{ background: `${color}15`, color: 'var(--app-text)' }}
     >
       <span
         style={{

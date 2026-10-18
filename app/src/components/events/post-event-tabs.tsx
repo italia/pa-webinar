@@ -240,6 +240,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
                         className="progress-bar bg-primary"
                         role="progressbar"
                         style={{ width: `${pct}%`, borderRadius: 3 }}
+                        aria-label={option}
                         aria-valuenow={pct}
                         aria-valuemin={0}
                         aria-valuemax={100}

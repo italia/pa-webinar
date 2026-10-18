@@ -473,7 +473,9 @@ export default function DeviceCheck({
                   ))}
                 </select>
                 <div className="small mt-2 mb-1 text-muted">{t('micLevel')}</div>
-                <div className="av-check__meter" role="meter" aria-label={t('micLevel')}>
+                {/* Solo visivo: un valore che cambia a ogni fotogramma non si legge
+                    con un lettore di schermo, e il titolo sopra dice cos'è. */}
+                <div className="av-check__meter" aria-hidden="true">
                   <div ref={meterRef} className="av-check__meter-fill" />
                 </div>
                 {permissionState === 'granted' && !stream?.getAudioTracks()[0] && (

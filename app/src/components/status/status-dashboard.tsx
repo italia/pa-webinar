@@ -244,6 +244,7 @@ export default function StatusDashboard() {
                         backgroundColor: jvbCapacityColor,
                         borderRadius: 6,
                       }}
+                      aria-label={t('jvbNodes')}
                       aria-valuenow={jvbRunning}
                       aria-valuemin={0}
                       aria-valuemax={jvbMaxReplicas}
@@ -256,6 +257,7 @@ export default function StatusDashboard() {
                           width: `${Math.min(100, ((jvbDesired - jvbRunning) / jvbMaxReplicas) * 100)}%`,
                           backgroundColor: '#A66300',
                         }}
+                        aria-label={t('jvbScaling')}
                         aria-valuenow={jvbDesired - jvbRunning}
                         aria-valuemin={0}
                         aria-valuemax={jvbMaxReplicas}
