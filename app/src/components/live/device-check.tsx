@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useId, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
@@ -144,6 +144,7 @@ export default function DeviceCheck({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const meterRef = useRef<HTMLDivElement | null>(null);
+  const idLivello = useId();
   const streamRef = useRef<MediaStream | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [permissionState, setPermissionState] = useState<PermissionState>('idle');
@@ -297,6 +298,7 @@ export default function DeviceCheck({
       if (frame !== null) cancelAnimationFrame(frame);
       void ctx?.close().catch(() => {});
       if (barra) barra.style.width = '0%';
+      barra?.parentElement?.setAttribute('aria-valuenow', '0');
     };
   }, [stream]);
 
@@ -480,11 +482,11 @@ export default function DeviceCheck({
                     </option>
                   ))}
                 </select>
-                <div className="small mt-2 mb-1 text-muted">{t('micLevel')}</div>
+                <div id={idLivello} className="small mt-2 mb-1 text-muted">{t('micLevel')}</div>
                 <div
                   className="av-check__meter"
                   role="meter"
-                  aria-label={t('micLevel')}
+                  aria-labelledby={idLivello}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={0}

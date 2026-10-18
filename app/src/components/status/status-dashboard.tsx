@@ -250,7 +250,7 @@ export default function StatusDashboard() {
                       aria-valuemax={jvbMaxReplicas}
                       aria-valuetext={
                         data.metrics.jvbStatus === 'scaling'
-                          ? `${jvbRunning}/${jvbDesired} ${t('nodesReady')}`
+                          ? `${t('jvbScaling')} ${jvbRunning}/${jvbDesired} ${t('nodesReady')}`
                           : `${jvbRunning}/${jvbMaxReplicas} ${t('nodesActive')}`
                       }
                     />

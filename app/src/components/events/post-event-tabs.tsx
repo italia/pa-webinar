@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type RefObject } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import {
   Badge,
   Card,
@@ -218,6 +218,7 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
 
 function PollsTabContent({ polls }: { polls: PollData[] }) {
   const t = useTranslations('events.recap');
+  const format = useFormatter();
   return (
     <div className="d-flex flex-column gap-3">
       {polls.map((poll) => (
@@ -242,7 +243,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
                         role="progressbar"
                         style={{ width: `${pct}%`, borderRadius: 3 }}
                         aria-labelledby={`${poll.id}-opzione-${i}`}
-                        aria-valuetext={`${t('votes', { count })} (${pct}%)`}
+                        aria-valuetext={`${t('votes', { count })}, ${format.number(pct / 100, { style: 'percent' })}`}
                         aria-valuenow={pct}
                         aria-valuemin={0}
                         aria-valuemax={100}

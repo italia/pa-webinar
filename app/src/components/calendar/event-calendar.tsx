@@ -187,10 +187,13 @@ function montaEvento(info: EventMountArg) {
 /**
  * Il «+N» di un giorno pieno apre l'elenco degli eventi di quel giorno:
  * FullCalendar lo disegna come un link senza indirizzo con aria-expanded, che
- * senza il ruolo di pulsante non vale.
+ * senza il ruolo di pulsante non vale. Il nome è il suggerimento («altri N
+ * eventi»), che FullCalendar mette solo nel title.
  */
 function montaAltri(info: MoreLinkMountArg) {
   info.el.setAttribute('role', 'button');
+  const suggerimento = info.el.getAttribute('title');
+  if (suggerimento) info.el.setAttribute('aria-label', suggerimento);
 }
 
 export default function EventCalendar({ mode, initialEvents = [] }: EventCalendarProps) {
