@@ -605,13 +605,14 @@ one does, its schedule and its Helm keys are in
 reference under **Video recordings**, tab **Orphans**, and deletes them after
 `orphanRecordingGraceDays` unless an administrator marks them **Keep**
 ([recordings-reconcile](../architecture/background-jobs.md#recordings-reconcile)).
-While the event's data retention lasts, per-participant tracks whose audio is
-still present, and the `tracks.json` of their recordings, are not orphans: the
-purge jobs delete them by the event's rules. Under `recordings/multitrack/` the
-tab shows files with no track row, such as an upload whose ingest failed or the
-files of a deleted session, a manifest whose deletion failed, and tracks still
-present after the event's retention. **Delete now** on a track that is not an
-orphan deletes it at the next run as well.
+While the event's data retention lasts (or a later retention date of the
+recording, or a pipeline task that reads them), per-participant tracks whose
+audio is still present, and the `tracks.json` of their recordings, are not
+orphans: the purge jobs delete them by the event's rules. Under
+`recordings/multitrack/` the tab shows files with no track row, such as an
+upload whose ingest failed or the files of a deleted session, a manifest whose
+deletion failed, and tracks still present after the event's retention. **Delete
+now** on a track that is not an orphan deletes it at the next run as well.
 
 One case needs an operator:
 

@@ -49,13 +49,14 @@ export const dynamic = 'force-dynamic';
  * minimized at retention.
  */
 async function purgeRecordingTracks(
-  recordingId: string
+  recordingId: string,
+  eventId: string
 ): Promise<{ blobsDeleted: number; blobsFailed: number }> {
   let blobsDeleted = 0;
   let blobsFailed = 0;
   const tracks = await prisma.recordingTrack.findMany({
     where: { recordingId },
-    select: { blobKey: true, audioPurgedAt: true, recording: { select: { eventId: true } } },
+    select: { blobKey: true, audioPurgedAt: true },
   });
   const storage = getPostprodStorage();
   for (const tr of tracks) {
@@ -73,8 +74,7 @@ async function purgeRecordingTracks(
   }
   await prisma.recordingTrack.deleteMany({ where: { recordingId } });
   // Senza piu' tracce, via anche il manifesto con i nomi.
-  const eventId = tracks[0]?.recording.eventId;
-  if (eventId) await cancellaManifestiSenzaTracce(storage, new Map([[recordingId, eventId]]));
+  await cancellaManifestiSenzaTracce(storage, new Map([[recordingId, eventId]]));
   return { blobsDeleted, blobsFailed };
 }
 
@@ -85,7 +85,8 @@ async function purgeRecordingTracks(
  * the (non-published) event-bound regimes so the two never drift.
  */
 async function purgeRecordingArtifacts(
-  recordingId: string
+  recordingId: string,
+  eventId: string
 ): Promise<{ blobsDeleted: number; blobsFailed: number; artifactsDeleted: number }> {
   let blobsDeleted = 0;
   let blobsFailed = 0;
@@ -115,7 +116,7 @@ async function purgeRecordingArtifacts(
   const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
   await prisma.speaker.deleteMany({ where: { recordingId } });
 
-  const tp = await purgeRecordingTracks(recordingId);
+  const tp = await purgeRecordingTracks(recordingId, eventId);
   blobsDeleted += tp.blobsDeleted;
   blobsFailed += tp.blobsFailed;
 
@@ -190,7 +191,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const r = await purgeRecordingArtifacts(rec.id);
+    const r = await purgeRecordingArtifacts(rec.id, rec.eventId);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
     artifactsDeleted += r.artifactsDeleted;
@@ -227,6 +228,7 @@ export const GET = withErrorHandling(async (request) => {
     },
     select: {
       id: true,
+      eventId: true,
       event: { select: { endsAt: true, dataRetentionDays: true } },
     },
     take: 50,
@@ -239,7 +241,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const r = await purgeRecordingArtifacts(rec.id);
+    const r = await purgeRecordingArtifacts(rec.id, rec.eventId);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
     artifactsDeleted += r.artifactsDeleted;
@@ -263,6 +265,7 @@ export const GET = withErrorHandling(async (request) => {
     },
     select: {
       id: true,
+      eventId: true,
       event: { select: { endsAt: true, dataRetentionDays: true } },
     },
     take: 50,
@@ -322,6 +325,7 @@ export const GET = withErrorHandling(async (request) => {
     },
     select: {
       id: true,
+      eventId: true,
       event: { select: { endsAt: true, dataRetentionDays: true } },
     },
     take: 50,
@@ -336,7 +340,7 @@ export const GET = withErrorHandling(async (request) => {
       deferredActiveJob += 1;
       continue;
     }
-    const tp = await purgeRecordingTracks(rec.id);
+    const tp = await purgeRecordingTracks(rec.id, rec.eventId);
     blobsDeleted += tp.blobsDeleted;
     blobsFailed += tp.blobsFailed;
     publishedTracksPurged += 1;

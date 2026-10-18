@@ -125,6 +125,16 @@ async function runReconcile() {
         recording: {
           select: {
             eventId: true,
+            retentionUntil: true,
+            // Un lavoro che legge ancora le tracce le tiene conosciute.
+            jobs: {
+              where: {
+                kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+                status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
+              },
+              select: { id: true },
+              take: 1,
+            },
             event: {
               select: { status: true, endsAt: true, lastActiveAt: true, dataRetentionDays: true },
             },
@@ -156,13 +166,19 @@ async function runReconcile() {
   }
 
   // Una traccia, e il manifesto della sua registrazione, sono conosciuti
-  // finche' i dati dell'evento sono in conservazione. Oltre, una traccia
-  // ancora presente e' sfuggita ai lavori che la cancellano (un lavoro della
-  // pipeline bloccato, la conservazione AI spenta): diventa orfana, e la
-  // tolleranza la cancella.
+  // finche' qualcosa li tiene: i dati dell'evento in conservazione, la
+  // conservazione propria della registrazione, un lavoro che li legge. Oltre,
+  // una traccia ancora presente e' sfuggita ai lavori che la cancellano (la
+  // conservazione AI spenta, per esempio): diventa orfana, e la tolleranza la
+  // cancella.
   const deleteNow = new Set(deleteNowTracks.map((r) => r.blobName));
   for (const track of tracks) {
-    if (isEventEligibleForCleanup(track.recording.event, runStartedAt)) continue;
+    const { retentionUntil, jobs, event } = track.recording;
+    const sfuggita =
+      isEventEligibleForCleanup(event, runStartedAt) &&
+      (retentionUntil === null || retentionUntil <= runStartedAt) &&
+      jobs.length === 0;
+    if (sfuggita) continue;
     const name = recordingBlobNameFromKey(track.blobKey);
     if (name && !deleteNow.has(name)) knownBlobNames.add(name);
     const manifest = recordingBlobNameFromKey(
@@ -258,6 +274,17 @@ async function runReconcile() {
         // Blob was already gone; drop the row anyway.
         await prisma.orphanRecording.delete({ where: { id: row.id } });
         result.sweepDeleted += 1;
+      }
+      // Una traccia tolta qui risulta cancellata come quelle dei lavori di
+      // cancellazione: la riga resta senza audio, e la pulizia la toglie.
+      if (row.blobName.startsWith(MULTITRACK_FOLDER)) {
+        await prisma.recordingTrack.updateMany({
+          where: {
+            blobKey: MULTITRACK_PREFIX + row.blobName.slice(MULTITRACK_FOLDER.length),
+            audioPurgedAt: null,
+          },
+          data: { audioPurgedAt: new Date() },
+        });
       }
     } catch (e) {
       console.error('[recordings-reconcile] failed to delete', row.blobName, e);

@@ -308,10 +308,11 @@ services:
         # email-outbox e lifecycle ogni minuto, reminders ogni 5, cleanup
         # ogni ora. lifecycle apre gli eventi all'ora di inizio e chiude quelli
         # finiti: qui non c'è lo scaler dei bridge che lo farebbe.
-        # multitrack-purge ogni 15 minuti, recordings-reconcile ogni 6 ore e
-        # rubrica-retention una volta al giorno: le prime due cancellano le
-        # tracce per partecipante e gli oggetti orfani quando c'è un archivio
-        # a oggetti, e senza archivio rispondono che non c'è niente da fare.
+        # multitrack-purge ogni 15 minuti, recordings-reconcile ogni 6 ore,
+        # postprod-retention e rubrica-retention una volta al giorno: le prime
+        # tre cancellano tracce, risultati AI e oggetti orfani quando c'è un
+        # archivio a oggetti, e senza archivio rispondono che non c'è niente
+        # da fare.
         i=0
         while true; do
           call() {
@@ -325,6 +326,7 @@ services:
           [ $$((i % 120)) -eq 0 ] && call cleanup
           [ $$((i % 30)) -eq 0 ] && call multitrack-purge
           [ $$((i % 720)) -eq 0 ] && call recordings-reconcile
+          [ $$((i % 2880)) -eq 0 ] && call postprod-retention
           [ $$((i % 2880)) -eq 0 ] && call rubrica-retention
           i=$$((i + 1))
           sleep 30

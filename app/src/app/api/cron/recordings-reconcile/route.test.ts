@@ -10,7 +10,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findMany: vi.fn() },
     callSession: { findMany: vi.fn() },
-    recordingTrack: { findMany: vi.fn() },
+    recordingTrack: { findMany: vi.fn(), updateMany: vi.fn() },
     orphanRecording: {
       upsert: vi.fn(),
       deleteMany: vi.fn(),
@@ -41,7 +41,7 @@ type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   event: { findMany: Fn };
   callSession: { findMany: Fn };
-  recordingTrack: { findMany: Fn };
+  recordingTrack: { findMany: Fn; updateMany: Fn };
   orphanRecording: { upsert: Fn; deleteMany: Fn; findMany: Fn; delete: Fn };
   siteSetting: { findFirst: Fn };
 };
@@ -59,11 +59,12 @@ const traccia = (
   eventId: string,
   recordingId: string,
   file: string,
-  event = inConservazione
+  event = inConservazione,
+  recording: { retentionUntil?: Date | null; jobs?: Array<{ id: string }> } = {}
 ) => ({
   blobKey: `recordings/multitrack/${eventId}/${recordingId}/audio/${file}`,
   recordingId,
-  recording: { eventId, event },
+  recording: { eventId, retentionUntil: null, jobs: [], ...recording, event },
 });
 const blob = (name: string) => ({
   name,
@@ -121,6 +122,21 @@ describe('GET /api/cron/recordings-reconcile', () => {
     expect(body).toMatchObject({ linked: 0, orphansDiscovered: 2 });
   });
 
+  it('keeps a track past event retention while its recording or a job still holds it', async () => {
+    db.recordingTrack.findMany.mockResolvedValue([
+      traccia('ev-1', 'rec-1', 'a.opus', scaduto, {
+        retentionUntil: new Date(Date.now() + 86_400_000),
+      }),
+      traccia('ev-1', 'rec-2', 'b.opus', scaduto, { jobs: [{ id: 'job-1' }] }),
+    ]);
+    listRecordingBlobs.mockResolvedValue([
+      blob('multitrack/ev-1/rec-1/audio/a.opus'),
+      blob('multitrack/ev-1/rec-2/audio/b.opus'),
+    ]);
+    const body = await (await GET(req() as never, ctx as never)).json();
+    expect(body).toMatchObject({ linked: 2, orphansDiscovered: 0 });
+  });
+
   it('honors a "delete now" decision on a known track', async () => {
     db.recordingTrack.findMany.mockResolvedValue([traccia('ev-1', 'rec-1', 'p1-0.opus')]);
     // La prima lettura cerca le decisioni «elimina subito» sulle tracce, la
@@ -133,6 +149,14 @@ describe('GET /api/cron/recordings-reconcile', () => {
     listRecordingBlobs.mockResolvedValue([blob('multitrack/ev-1/rec-1/audio/p1-0.opus')]);
     const body = await (await GET(req() as never, ctx as never)).json();
     expect(body).toMatchObject({ linked: 0, sweepDeleted: 1 });
+    // La traccia tolta risulta cancellata, come dopo i lavori di cancellazione.
+    expect(db.recordingTrack.updateMany).toHaveBeenCalledWith({
+      where: {
+        blobKey: 'recordings/multitrack/ev-1/rec-1/audio/p1-0.opus',
+        audioPurgedAt: null,
+      },
+      data: { audioPurgedAt: expect.any(Date) },
+    });
     expect(db.orphanRecording.findMany.mock.calls[0]?.[0]).toMatchObject({
       where: { decision: 'delete-now', blobName: { startsWith: 'multitrack/' } },
     });

@@ -387,7 +387,8 @@ handles it with the least it needs:
   once the transcription has finished, unless the event keeps the tracks
   (**Keep per-participant tracks**). Durations, legal bases and consent are in
   [Recordings, voice data and AI outputs](../../docs/privacy/recordings-and-ai.md).
-- **Orphan sweep.** While the event's data retention lasts,
+- **Orphan sweep.** While the event's data retention lasts (or a later
+  retention date of the recording, or a pipeline task that reads them),
   `recordings-reconcile` knows every track whose audio is still present and
   the `tracks.json` of its recording, and leaves them to the purge jobs, which
   delete the manifest with the recording's last track. Under

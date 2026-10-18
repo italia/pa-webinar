@@ -32,7 +32,7 @@ flowchart LR
     SCALER["jvb-scaler<br/>kubectl + curl"]:::job
     ORCH["postprod-orchestrator<br/>kubectl + curl"]:::job
   end
-  COMPOSE["Compose cron service<br/>email-outbox · lifecycle<br/>reminders · cleanup<br/>multitrack-purge · recordings-reconcile<br/>rubrica-retention"]:::job
+  COMPOSE["Compose cron service<br/>email-outbox · lifecycle<br/>reminders · cleanup<br/>multitrack-purge · recordings-reconcile<br/>postprod-retention · rubrica-retention"]:::job
 
   subgraph PORTAL["Portal: the only decision maker and writer"]
     direction TB
@@ -153,7 +153,7 @@ It also deletes staff sign-in link rows one day after they were used or expired,
 
 ### recordings-reconcile
 
-**Does.** The job lists every object under `recordings/` in the recordings storage domain. It records each object that no `Event.recordingUrl`, `CallSession.recordingUrl` or `CallSession.recordingFilename` references as an orphan in `orphan_recordings`, except, while the event's data retention lasts, a per-participant track whose audio is still present and the `tracks.json` of its recording. **Delete now** on such a track still applies. It forgets orphan rows whose object has disappeared. It then sweeps: it deletes orphans marked **Delete now**, and pending orphans discovered more than `orphanRecordingGraceDays` ago (a `SiteSetting` field, default in `app/prisma/schema.prisma`; `0` disables the time-based sweep). Orphans marked **Keep** are never deleted. Administrators see and decide on orphans in the **Orphans** tab of **Video recordings** (`/admin/recordings`). It is the only curl job that uses `POST`. When recording storage is not configured, it answers `skipped: true`.
+**Does.** The job lists every object under `recordings/` in the recordings storage domain. It records each object that no `Event.recordingUrl`, `CallSession.recordingUrl` or `CallSession.recordingFilename` references as an orphan in `orphan_recordings`, except, while the event's data retention lasts (or a later retention date of the recording, or a pipeline task that reads them), a per-participant track whose audio is still present and the `tracks.json` of its recording. **Delete now** on such a track still applies. It forgets orphan rows whose object has disappeared. It then sweeps: it deletes orphans marked **Delete now**, and pending orphans discovered more than `orphanRecordingGraceDays` ago (a `SiteSetting` field, default in `app/prisma/schema.prisma`; `0` disables the time-based sweep). Orphans marked **Keep** are never deleted. Administrators see and decide on orphans in the **Orphans** tab of **Video recordings** (`/admin/recordings`). It is the only curl job that uses `POST`. When recording storage is not configured, it answers `skipped: true`.
 
 **If it does not run.** Recording files that lost their link to an event, for example after a failed upload webhook, stay in storage indefinitely. The **Orphans** tab stays empty. This job is also the backstop for per-participant files: those with no track row, such as the files of a recording whose rows were deleted, a manifest whose deletion failed, and tracks still present after the event's data retention ([recording.md](recording.md#background-jobs-that-touch-recordings)).
 
@@ -214,7 +214,7 @@ The CronJob templates (`infra/helm/pa-webinar/templates/cronjob-*.yaml`) share t
 
 ## Docker Compose
 
-The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls seven routes with the same `x-api-key` header (`docker-compose.yml`):
+The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls eight routes with the same `x-api-key` header (`docker-compose.yml`):
 
 | Job | Chart default | Compose |
 |---|---|---|
@@ -224,9 +224,10 @@ The Compose stack is the development loop, not an installation, and it has no Cr
 | `cleanup` | daily at 03:00 | every hour |
 | `multitrack-purge` | every 15 minutes | every 15 minutes |
 | `recordings-reconcile` | every 6 hours | every 6 hours |
+| `postprod-retention` | daily at 03:30 | every 24 hours |
 | `rubrica-retention` | daily at 04:00 | every 24 hours |
 
-Some cadences differ from the chart's. All seven routes also run once when the service starts. `multitrack-purge` and `recordings-reconcile` answer `skipped: true` until object storage is configured. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
+Some cadences differ from the chart's. All eight routes also run once when the service starts. `multitrack-purge`, `recordings-reconcile` and `postprod-retention` answer `skipped: true` until object storage is configured. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
 
 Running the cleanup every hour does not delete anything earlier: retention is computed per event, so data is removed within an hour of expiry instead of within a day.
 
@@ -235,7 +236,6 @@ Nothing else runs on a schedule on a single VM:
 | Not run in Compose | Consequence |
 |---|---|
 | `jvb-scaler` | Nothing to lose: the `lifecycle` route opens and closes events, without pre-scale or `IDLE` ([event-lifecycle.md](event-lifecycle.md#running-without-the-scaler)), and the Compose stack runs one bridge. |
-| `postprod-retention` | AI outputs are never deleted by a job, and with the `recorder` profile neither are tracks that the event keeps after their transcription. Nothing to do without AI post-production. |
 | `postprod-orchestrator`, `postprod-reclaim` | Nothing to do: AI post-production does not run on a single VM. |
 | `web-config-reload` hook | Restart `jitsi-web` yourself after changing its configuration. |
 

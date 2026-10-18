@@ -332,25 +332,26 @@ API, because it writes names into the transcript. Signed-URL mechanics are in
   transcription consumes when the event's data retention expires, so an
   installation that records without AI post-production also deletes its
   tracks on time.
-- **Docker Compose runs `multitrack-purge` and the orphan sweep, not
-  `postprod-retention`.** The `cron` service calls `multitrack-purge` and
-  `recordings-reconcile` when object storage is configured. On a single VM with
-  the `recorder` profile and AI post-production, schedule `postprod-retention`
-  yourself ([how](../architecture/background-jobs.md#docker-compose)).
+- **Docker Compose runs the same jobs.** The `cron` service calls
+  `multitrack-purge`, `recordings-reconcile` and `postprod-retention`, which
+  act once object storage is configured
+  ([how](../architecture/background-jobs.md#docker-compose)).
 - **The orphan sweep is the backstop for tracks.** `recordings-reconcile`
   lists every object under `recordings/` and knows the composite video
   (`Event.recordingUrl`, `CallSession.recordingUrl`,
-  `CallSession.recordingFilename`) and, while the event's data retention
-  lasts, every track whose audio is still present and the `tracks.json` of
-  its recording. During that window a track awaiting transcription, never
-  transcribed or retained is not an orphan: the purge jobs delete it by the
-  rules above. Past the event's retention, a track still present has escaped
-  them (a pipeline task stuck in the queue, `postprod-retention` not running)
-  and becomes an orphan. So do files with no track row (an upload whose
+  `CallSession.recordingFilename`) and every track whose audio is still
+  present, with the `tracks.json` of its recording, while something holds it:
+  the event's data retention, a later retention date of the recording itself,
+  or a pipeline task that still reads it. Until then a track awaiting
+  transcription, never transcribed or retained is not an orphan: the purge
+  jobs delete it by the rules above. After that, a track still present has
+  escaped them (`postprod-retention` not running, for example) and becomes an
+  orphan. So do files with no track row (an upload whose
   ingest failed, the files of a recording whose rows were deleted) and a
   manifest whose deletion failed. The sweep deletes orphans after
   `orphanRecordingGraceDays` (default in `app/prisma/schema.prisma`; `0` turns
-  the automatic deletion off) unless an administrator marks them **Keep**.
+  the automatic deletion off) unless an administrator marks them **Keep**,
+  and stamps `audioPurgedAt` on the track rows of the files it deletes.
   **Delete now** on a track deletes it at the next run, even inside the
   retention window.
 - **Deleting an event or a call session deletes rows, not files.** Deleting an
@@ -975,8 +976,9 @@ Retention and deletion:
 - **Files of earlier pipeline runs are never deleted.** After a re-run, the
   previous run's files under `postprod/` are no longer referenced by any row,
   and no job removes them.
-- **`postprod-retention` exists only with `postprod.enabled`.** On Docker
-  Compose it does not run; `multitrack-purge` and the orphan sweep do.
+- **`postprod-retention` exists in the chart only with `postprod.enabled`.**
+  Without it, tracks that an event keeps after their transcription are
+  deleted only by the orphan sweep, after the event's retention.
 - **Deleting an event or a call session leaves files in storage.** Deleting a
   session removes only its composite video file; its track and output files
   stay, and `postprod/` files are never swept.
