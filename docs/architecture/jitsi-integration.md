@@ -340,7 +340,10 @@ person enters the room, before any moderator arrives. Jicofo then keeps every pa
 muted on the bridge, so a client that ignores the hidden buttons still cannot be heard or seen.
 Moderators are always allowed, and speakers are allowed as soon as they join. The lock is switched on
 before the first person enters, so everyone, including a speaker who is the first to join, enters a
-room that is already moderated ([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
+room that is already moderated. Jicofo creates each new media session of a person who does not moderate
+muted on the bridge, also when they are allowed; the module asks Jicofo to unmute every allowed person
+it gives a new session to, such as a speaker who was alone in the room when someone else joins
+([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
 
 With the lock on, Jitsi closes the microphone and camera of everyone who has just joined, moderators
 and speakers included, when it receives the room's start-muted rule. For a moderator or speaker who
@@ -939,10 +942,12 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    still in the image and `mod_token_affiliation_custom` still loads. Jicofo still reads
    `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER` from its environment. The recorder account on the hidden
    domain is still allow-listed. `mod_pa_media_lock` copies parts of the stock `av_moderation_component`
-   (the room's `av_moderation` state and the shape of its messages): in a room of an event that grants
-   participants nothing, check that a guest who forces the microphone on is not heard, that a speaker is
-   heard after turning the microphone on, also when the speaker is the first to join, and that Jicofo's
-   log reads `Moderation for AUDIO ... was enabled by focus`.
+   (the room's `av_moderation` state and the shape of its messages) and the unmute request a client
+   sends Jicofo (`<mute xmlns="http://jitsi.org/jitmeet/audio">false</mute>`): in a room of an event that
+   grants participants nothing, check that a guest who forces the microphone on is not heard, that a
+   speaker is heard after turning the microphone on, also when the speaker joined first and turned it on
+   while alone, and again after everyone else has left and someone joins, and that Jicofo's log reads
+   `Moderation for AUDIO ... was enabled by focus` and `Will unmute ...` for the speaker.
    `mod_pa_occupants` reads the session field `jitsi_meet_context_user`, the occupant's nickname and
    the room's `meetingId`: in a room of an event, check that a row appears in `room_occupants` for each
    person who joins, with the seat of their token, and that Prosody logs no `Occupanti:` warning.

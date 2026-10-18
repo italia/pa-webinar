@@ -40,6 +40,17 @@
 -- riparte da un elenco con i soli moderatori: il modulo vi riaggiunge gli
 -- esenti presenti.
 --
+-- Jicofo apre la sessione di ciascuno solo quando nella sala ci sono almeno
+-- due persone, e la riapre a chi resta solo e la perde. Con la moderazione
+-- accesa, chi non modera nasce chiuso sul bridge anche se è tra gli ammessi, e
+-- il client non lo sa: chiede di essere aperto una volta sola, alla prima
+-- accensione del microfono, e se in quel momento era solo nella sala Jicofo
+-- non aveva ancora una sessione a cui applicarla. Un relatore che ha aperto il
+-- microfono da solo resterebbe muto per tutti con il microfono aperto davanti.
+-- A ogni sessione che Jicofo offre a un ammesso che non modera, il modulo
+-- ripete a suo nome quella richiesta: Jicofo la accoglie perché è tra gli
+-- ammessi, e i client non vedono niente.
+--
 -- Il modulo replica parti interne del componente (stato della sala e forma
 -- dei messaggi): a ogni aggiornamento di Jitsi va riprovato
 -- (docs/architecture/jitsi-integration.md, checklist di aggiornamento).
@@ -49,6 +60,9 @@ local json = require 'cjson.safe';
 local st = require 'util.stanza';
 
 local timer = require 'util.timer';
+
+local jid_bare = require 'util.jid'.bare;
+local uuid = require 'util.uuid'.generate;
 
 local util = module:require 'util';
 local get_room_by_name_and_subdomain = util.get_room_by_name_and_subdomain;
@@ -333,6 +347,55 @@ local function on_av_command(event)
     end);
 end
 
+-- Jicofo deve aver registrato sul bridge la sessione appena offerta prima che
+-- le si chieda di aprirla.
+local APERTURA_S = 1;
+
+-- La richiesta che il client manda a Jicofo quando accende un mezzo dopo che
+-- Jicofo lo ha chiuso: «apri me» per ogni tipo moderato in cui la persona è
+-- tra gli ammessi. Passa dalla sala, che la consegna a Jicofo come se venisse
+-- dall'occupante; la risposta torna al client, che la ignora.
+local function request_open(room, nick)
+    local occupant = room.av_moderation and room:get_occupant_by_nick(nick);
+    if not occupant or room:get_role(nick) == 'moderator' then
+        return;
+    end
+    local listed = internal_room_jid_match_rewrite(nick);
+    for _, m in ipairs(MEDIA_TYPES) do
+        local whitelist = room.av_moderation[m];
+        if whitelist and contains(whitelist, listed) then
+            module:send(st.iq({ type = 'set'; from = occupant.jid; to = room.jid .. '/focus'; id = uuid(); })
+                :tag('mute', { xmlns = 'http://jitsi.org/jitmeet/' .. m; jid = nick; }):text('false'):up());
+            module:log('info', 'Aperto sul bridge %s (ammesso, nuova sessione) per %s in %s', listed, m, room.jid);
+        end
+    end
+end
+
+-- Jicofo offre una sessione (nuova, o su un altro bridge) a chi è nella sala.
+local function on_iq_to_occupant(event)
+    local stanza = event.stanza;
+    if stanza.attr.type ~= 'set' then
+        return;
+    end
+    local jingle = stanza:get_child('jingle', 'urn:xmpp:jingle:1');
+    local action = jingle and jingle.attr.action;
+    if action ~= 'session-initiate' and action ~= 'transport-replace' then
+        return;
+    end
+    local room = get_room_from_jid(jid_bare(stanza.attr.to));
+    if not room or not room.av_moderation then
+        return;
+    end
+    local sender = room:get_occupant_jid(stanza.attr.from);
+    if not sender or not ends_with(sender, '/focus') then
+        return;
+    end
+    local nick = stanza.attr.to;
+    timer.add_task(APERTURA_S, function()
+        request_open(room, nick);
+    end);
+end
+
 -- Dopo i moduli dei token, che hanno già letto il token di chi entra, e dopo
 -- i controlli della stanza (password -20, stanza chiusa -30), che possono
 -- ancora rifiutare l'ingresso: qui si accende la prima volta, prima che entri.
@@ -342,6 +405,8 @@ module:hook('muc-occupant-pre-join', on_occupant_pre_join, -40);
 module:hook('muc-occupant-joined', on_occupant_joined, -3);
 -- Dopo il componente (-1), che sull'owner aggiunge agli ammessi.
 module:hook('muc-set-affiliation', on_affiliation_changed, -2);
+-- Prima della MUC, che inoltra la stanza a chi è nella sala.
+module:hook('iq/full', on_iq_to_occupant, 10);
 -- Prima del componente, che ferma l'evento quando lo gestisce.
 process_host_module(av_host, function(host_module)
     host_module:hook('message/host', on_av_command, 10);

@@ -81,6 +81,16 @@ from the switch-on, which reaches Jicofo first, and get their "allowed" message 
 on while a speaker's own join into the conference was still in progress, the lock would leave that
 speaker muted on the bridge while their client showed the microphone open.
 
+Jicofo opens a person's media session only when at least two people are in the room. It opens a new
+one for someone who stays alone and loses theirs, and for someone moved to another bridge. With
+moderation on, Jicofo creates every new session of a person who does not moderate muted on the bridge,
+allowed list or not, and does not tell the client. The client asks Jicofo to unmute it only once, the
+first time the person turns the microphone on: a speaker who did that while alone in the room, before
+Jicofo had a session for them, would stay muted on the bridge with the microphone open on screen. Each
+time Jicofo offers a session to someone on the allowed list who does not moderate, the module repeats
+that request on their behalf a second later. Jicofo grants it because they are allowed; clients see
+nothing.
+
 Three details matter when you read its logs or change it:
 
 - the lock is switched on once per room. A moderator can lift it during the call from the
@@ -98,7 +108,7 @@ Three details matter when you read its logs or change it:
   `token_affiliation` then restores the token's role, the module removes that participant from the
   allowed list again, unless the token marks them exempt.
 
-The module logs every switch-on, admission and removal at `info` level.
+The module logs every switch-on, admission, removal and reopening on the bridge at `info` level.
 
 ### Where it is loaded
 
