@@ -55,7 +55,7 @@ describe('cancellaManifestiSenzaTracce', () => {
     expect(del).toHaveBeenCalledTimes(2);
   });
 
-  it('does nothing for an empty set, and counts every manifest as failed when the lookup fails', async () => {
+  it('does nothing for an empty set, and counts one failure when the lookup fails', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     const del = vi.fn(async () => true);
     expect(await cancellaManifestiSenzaTracce({ delete: del }, new Map())).toEqual({
@@ -65,7 +65,13 @@ describe('cancellaManifestiSenzaTracce', () => {
     expect(groupBy).not.toHaveBeenCalled();
     groupBy.mockRejectedValue(new Error('db giù'));
     expect(
-      await cancellaManifestiSenzaTracce({ delete: del }, new Map([['r', 'e']]))
+      await cancellaManifestiSenzaTracce(
+        { delete: del },
+        new Map([
+          ['r', 'e'],
+          ['r2', 'e'],
+        ])
+      )
     ).toEqual({ cancellati: 0, falliti: 1 });
     expect(del).not.toHaveBeenCalled();
   });

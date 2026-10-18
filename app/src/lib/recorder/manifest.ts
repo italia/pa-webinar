@@ -23,8 +23,9 @@ export type EsitoManifesto = 'cancellato' | 'assente' | 'fallito';
 
 /**
  * Cancella il manifesto di una registrazione. Non lancia: per una
- * registrazione che non è multitraccia la chiave non esiste ('assente'; con
- * S3 la cancellazione di una chiave assente risulta riuscita).
+ * registrazione che non è multitraccia la chiave non esiste ('assente').
+ * L'esito è quello del provider: con S3 una chiave assente risulta
+ * cancellata, e un errore risulta assente (il provider lo scrive nei log).
  */
 export async function cancellaManifesto(
   storage: Storage,
@@ -65,7 +66,8 @@ export async function cancellaManifestiSenzaTracce(
       recordingIds: [...registrazioni.keys()],
       err: err instanceof Error ? err.message : String(err),
     });
-    return { cancellati: 0, falliti: registrazioni.size };
+    // Quali manifesti andavano cancellati non si sa: un fallimento solo.
+    return { cancellati: 0, falliti: 1 };
   }
   let cancellati = 0;
   let falliti = 0;
