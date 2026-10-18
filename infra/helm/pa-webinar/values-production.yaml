@@ -247,7 +247,7 @@ jitsi-meet:
     # accorgersene.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
-      tag: stable-10741-rnnoise-r3
+      tag: stable-11031-rnnoise
       pullPolicy: Always
     ingress:
       enabled: true

@@ -221,6 +221,64 @@ l'aggiornamento di un'installazione esistente sarebbe peggio del difetto.
 {{- end -}}
 
 {{/*
+Una sola versione di Jitsi per tutta la conferenza.
+
+Parte web, Prosody, Jicofo, bridge e Jibri si parlano con protocolli che
+cambiano fra una versione e l'altra: una parte web piu' nuova o piu' vecchia
+del resto entra in sala, ma funzioni come la moderazione dei microfoni, i
+sottotitoli o la mano alzata si comportano in modo diverso, e lo si scopre a
+evento iniziato. Succede fissando l'immagine di un solo componente, per
+esempio la sola parte web patchata, e lasciando gli altri al valore
+predefinito. Un tag vuoto vale la versione del sottochart; se Helm non la
+espone, il componente conta come versione sconosciuta e la resa si ferma
+finche' il tag non e' scritto.
+
+Si confronta solo la versione nella forma `stable-<numero>`, con quello che
+segue (`-rnnoise`, una revisione) ignorato: un tag di forma diversa, per
+esempio quello di un registro interno con una numerazione propria, non viene
+riconosciuto e non blocca la resa.
+*/}}
+{{- define "pa-webinar.validateJitsiVersions" -}}
+{{- if .Values.jitsi.enabled -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $predefinita := "" -}}
+{{- with .Subcharts -}}
+{{- with index . "jitsi-meet" -}}
+{{- $predefinita = .Chart.AppVersion -}}
+{{- end -}}
+{{- end -}}
+{{- $componenti := list "web" "prosody" "jicofo" "jvb" -}}
+{{- range $c := list "jibri" "jigasi" "transcriber" -}}
+{{- if dig $c "enabled" false $jm -}}
+{{- $componenti = append $componenti $c -}}
+{{- end -}}
+{{- end -}}
+{{- $versioni := list -}}
+{{- $dettaglio := list -}}
+{{- range $c := $componenti -}}
+{{- $tag := dig $c "image" "tag" "" $jm | default "" | toString -}}
+{{- $versione := "" -}}
+{{- if $tag -}}
+{{- $versione = regexFind "^stable-[0-9]+" $tag -}}
+{{- else if $predefinita -}}
+{{- $tag = $predefinita -}}
+{{- $versione = regexFind "^stable-[0-9]+" $tag -}}
+{{- else -}}
+{{- $tag = "(versione del sottochart sconosciuta)" -}}
+{{- $versione = $tag -}}
+{{- end -}}
+{{- if $versione -}}
+{{- $versioni = append $versioni $versione -}}
+{{- $dettaglio = append $dettaglio (printf "%s=%s" $c $tag) -}}
+{{- end -}}
+{{- end -}}
+{{- if gt (len (uniq $versioni)) 1 -}}
+{{- fail (printf "I componenti della conferenza sono a versioni di Jitsi diverse (%s). Una parte web di una versione con Prosody e Jicofo di un'altra entra in sala ma si comporta in modo diverso in moderazione, sottotitoli e mano alzata. Fissa la stessa versione in jitsi-meet.<componente>.image.tag per tutti i componenti, quella che l'installazione gia' usa oppure quella di values.yaml." (join ", " $dettaglio)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Classe dell'Ingress e annotazione di classe devono coincidere.
 
 Il controller che serve un Ingress lo sceglie `spec.ingressClassName`;

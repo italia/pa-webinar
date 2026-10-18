@@ -1515,6 +1515,12 @@ deve_fallire "opzioni della JVM di Jicofo senza l'indirizzo dei sottotitoli" "JA
   --set-string 'jitsi-meet.jicofo.extraEnvs.JAVA_TOOL_OPTIONS=-Xss1m'
 deve_fallire "script di fine registrazione montato due volte" "_finalize_sh" \
   --set jitsi-meet.jibri.enabled=true --set-string 'jitsi-meet.jibri.custom.other._finalize_sh=#!/bin/sh'
+# Una sola versione di Jitsi: la sola parte web fissata a un'altra versione, e un
+# componente lasciato al predefinito del sottochart.
+deve_fallire "parte web a una versione di Jitsi diversa dal resto" "web=stable-10741" \
+  --set jitsi-meet.web.image.tag=stable-10741-rnnoise-r3
+deve_fallire "componente lasciato alla versione del sottochart" "jicofo=" \
+  --set 'jitsi-meet.jicofo.image.tag=null'
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del
 # sottochart che il chart non può ricavare.
 deve_fallire "site.portalHost con lo schema" "site.portalHost" \

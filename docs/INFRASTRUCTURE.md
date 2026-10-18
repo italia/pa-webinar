@@ -82,7 +82,8 @@ recommendations were derived from the measurements.
   add-on; Kubernetes v1.32, and v1.35 for the runs in
   [Try PA Webinar on minikube](install/minikube.md#measured-usage)); Helm 4;
   the simple profile; Jitsi `stable-10741` with the standard `jitsi/web`
-  image.
+  image (the chart now pins a newer release, which these runs did not
+  cover).
 
 The limits of these numbers:
 

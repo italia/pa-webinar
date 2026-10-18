@@ -1040,12 +1040,13 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
   [infra/jitsi-web-patched](../infra/jitsi-web-patched/README.md).
 - `jitsi-meet.imagePullSecrets` is one list for every Jitsi pod; the subchart has no per-component
   list.
-- **The chart default tag and the published tag are maintained separately.** Compare
-  `jitsi-meet.web.image.tag` in `values.yaml` with `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`
-  before you rely on the default.
-- **To use the stock image**, set `jitsi-meet.web.image.repository: jitsi/web` and
-  `jitsi-meet.web.image.tag: null`, so that the subchart uses its own Jitsi release (its
-  `appVersion`), and set `jitsi-meet.imagePullSecrets: []`:
+- **One Jitsi release for every component.** The chart default for the web image is the tag that
+  `.github/workflows/jitsi-web.yml` publishes (`IMAGE_TAG`), and Prosody, Jicofo, the bridge and Jibri
+  are pinned to the same release. The chart refuses to render components on different releases
+  ([One Jitsi version for the whole conference](architecture/jitsi-integration.md#the-patched-web-image)).
+- **To use the stock image**, set `jitsi-meet.web.image.repository: jitsi/web` and the upstream tag of
+  the same release as the other components (the chart's web tag without `-rnnoise`), and set
+  `jitsi-meet.imagePullSecrets: []`:
 
   ```yaml
   jitsi-meet:
@@ -1053,7 +1054,7 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
     web:
       image:
         repository: jitsi/web
-        tag: null
+        tag: stable-11031
   ```
 
   Advanced noise suppression must then stay off. It is off unless

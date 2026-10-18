@@ -525,8 +525,8 @@ On top of the simple profile, `examples/values-minikube.yaml`:
   ([Bridge memory on small nodes](../INFRASTRUCTURE.md#bridge-memory-on-small-nodes));
 - sets `stunServers: ""`: the bridge advertises the node IP, which browsers on
   the workstation reach directly, and asks no third-party STUN server;
-- uses the standard `jitsi/web` image at the subchart's Jitsi release, with no
-  pull secrets;
+- uses the standard `jitsi/web` image at the same Jitsi release as the other
+  conference components, with no pull secrets;
 - renders the conference Ingress from the chart (`jitsi.conferenceIngress`,
   with the subchart's Ingress off), and removes the cert-manager annotation
   from both Ingresses;

@@ -46,7 +46,7 @@ An upgrade moves several parts, each with its own value in the chart:
 | Portal | `app.image.tag` | The Next.js application. |
 | Migration image | `app.migration.image.tag` | The `builder` stage of the same build. It runs the database migrations before each app pod starts. |
 | Chart | the chart you pass to `helm upgrade` | Templates, defaults, the pinned subcharts (PostgreSQL, Redis, Jitsi Meet) and the third-party images `values.yaml` pins, the PostgreSQL server image among them. A new PostgreSQL major version needs care: see [Reading the dry run](#reading-the-dry-run). |
-| Patched Jitsi web image | `jitsi-meet.web.image.tag` | Built by its own workflow. Changing it is a conference-image rollout. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
+| Jitsi conference images | `jitsi-meet.web.image.tag`, and `jitsi-meet.{prosody,jicofo,jvb,jibri}.image.tag` | One Jitsi release for every component, pinned in `values.yaml`; the patched web image is built by its own workflow. Changing them is a conference rollout, and the chart refuses mixed releases. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
 | Recorder bot, recorder controller, AI post-production worker | `recorder.image`, `recorder.controller.image`, `postprod.worker.image` | Empty by default: the chart uses the app image's tag, and each release from 0.13.0 publishes them with its version. See [Rollback](#making-the-dev-components-roll-back). |
 | AI post-production worker without a GPU | `postprod.worker.cpu.image` | Empty by default: `postprod.worker.image` when that is set, otherwise the app image's tag. Published with each release from the first one that includes it. |
 
@@ -330,9 +330,10 @@ app:
   migrations if only the app tag moves. When the new release adds migrations, its pods then fail
   their readiness check against the old schema, and the rollout stalls.
 
-This is also the moment to pin anything you have not pinned yet. That includes
-`jitsi-meet.web.image.tag`, so the conference image changes only when you decide, and the Jitsi
-credentials ([Pin the generated credentials](#pin-the-generated-credentials)).
+This is also the moment to pin anything you have not pinned yet. That includes the Jitsi image tags,
+`jitsi-meet.web.image.tag` and the same release for `prosody`, `jicofo`, `jvb` and `jibri`, so the
+conference changes only when you decide, and the Jitsi credentials
+([Pin the generated credentials](#pin-the-generated-credentials)).
 
 **3. Dry-run and diff.**
 
@@ -426,6 +427,9 @@ option and `--recover-secrets`, which rebuilds the secrets file from the cluster
   `templates/deployment.yaml` includes, stop incoherent values before anything reaches the cluster.
   They catch, among others:
   - advanced noise suppression switched on over a web image that is not patched;
+  - conference components on different Jitsi releases, typically the web image pinned and the others
+    left to a chart default that has moved: pin them all to the same release
+    ([One Jitsi version for the whole conference](../architecture/jitsi-integration.md#the-patched-web-image));
   - a datastore Secret that the subcharts do not point to, or that no template renders;
   - conference token authentication that Prosody could not verify: no secret, two conflicting
     secret settings (`jitsi-meet.prosody.jwt.secret` and `jwt.existingSecretName` together, or an

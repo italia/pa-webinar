@@ -947,6 +947,19 @@ jitsi-meet:
     - name: ghcr-secret
     - name: dockerhub-secret
 
+  # Versione di Jitsi. Tutti i componenti della conferenza (web, Prosody,
+  # Jicofo, bridge, Jibri) girano alla stessa versione, fissata qui sotto in
+  # ogni `image.tag`: il predefinito del sottochart è più vecchio, e i moduli
+  # Prosody del progetto, la configurazione di Jicofo per i sottotitoli e
+  # l'API di salute di Jibri sono provati su questa. Per cambiare versione si
+  # cambiano tutti insieme, compresa l'immagine web patchata
+  # (`IMAGE_TAG` in .github/workflows/jitsi-web.yml): il chart si rifiuta di
+  # rendere versioni diverse fra i componenti, perché una parte web più nuova
+  # o più vecchia del resto si accorda male con Prosody e Jicofo e il guasto
+  # si vede solo in sala.
+  # Un'installazione esistente che fissava solo l'immagine web va allineata
+  # anche negli altri componenti, alla versione che già usa o a questa.
+
   # Autenticazione della conferenza con i token dell'applicazione. Issuer e
   # audience accettati devono contenere JITSI_JWT_ISSUER e JITSI_JWT_AUDIENCE
   # dell'applicazione, e il segreto deve essere JITSI_JWT_SECRET: se divergono
@@ -955,6 +968,8 @@ jitsi-meet:
   # Prosody questa mappa vince su `extraCommonEnvs`, e il chart si rifiuta di
   # rendere se i due dicono cose diverse.
   prosody:
+    image:
+      tag: stable-11031
     extraEnvs:
       AUTH_TYPE: jwt
       JWT_APP_ID: pa_webinar
@@ -1037,6 +1052,8 @@ jitsi-meet:
   # è entrato per primo o perché il moderatore è uscito. La resa si ferma se
   # l'autenticazione è spenta qui ma Prosody non assegna i ruoli dal token.
   jicofo:
+    image:
+      tag: stable-11031
     extraEnvs:
       JICOFO_ENABLE_AUTH: "false"
       ENABLE_AUTO_OWNER: "false"
@@ -1067,6 +1084,8 @@ jitsi-meet:
   # che questo chart non accende e con cui la lavagna non è stata provata.
 
   jvb:
+    image:
+      tag: stable-11031
     replicaCount: 1
     resources:
       requests:
@@ -1108,6 +1127,8 @@ jitsi-meet:
     # jitsi.requirePinnedCredentials.
 
   jibri:
+    image:
+      tag: stable-11031
     enabled: false
     replicaCount: 0
     singleUseMode: true
@@ -1172,6 +1193,15 @@ jitsi-meet:
         subPath: finalize.sh
         readOnly: true
 
+  # Jigasi e il trascrittore del sottochart: spenti e non usati dal portale,
+  # fissati alla stessa versione degli altri componenti per chi li accende.
+  jigasi:
+    image:
+      tag: stable-11031
+  transcriber:
+    image:
+      tag: stable-11031
+
   web:
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
     # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
@@ -1189,14 +1219,12 @@ jitsi-meet:
     # silenzio. Un prelievo fallito è invece un guasto rumoroso e reversibile.
     # Un aggiornamento con `--reuse-values` non riprende i valori predefiniti
     # del file: passa l'override esplicitamente.
-    # ATTENZIONE: questo tag non coincide con `IMAGE_TAG` in
-    # .github/workflows/jitsi-web.yml, che pubblica una revisione più recente.
-    # Allinearli è un rollout dell'immagine della conferenza e va deciso, non
-    # fatto di passaggio: finché restano diversi, chi si appoggia a questo
-    # valore predefinito serve una revisione più vecchia di quella pubblicata.
+    # Il tag è `IMAGE_TAG` di .github/workflows/jitsi-web.yml, che la pubblica:
+    # stessa versione di Jitsi degli altri componenti (vedi in testa a questa
+    # sezione), più la patch.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
-      tag: stable-10741-rnnoise
+      tag: stable-11031-rnnoise
       pullPolicy: Always
     # Il documento di branding del portale: la filigrana della scena e i colori
     # di barra dei controlli, menu, riquadri e avatar con le iniziali, intonati

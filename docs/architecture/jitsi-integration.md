@@ -735,14 +735,21 @@ bundle still parses, and then pushes the exact image it validated. A patch chang
 `IMAGE_TAG`, so a rollback stays possible. The chart pulls with `pullPolicy: Always` as a safety net in
 case a tag is ever rewritten.
 
-**Chart default versus published tag.** `jitsi-meet.web.image.tag` in `values.yaml` and `IMAGE_TAG` in
-the workflow are maintained separately, and a comment in `values.yaml` records when they diverge.
-Compare them before relying on the chart default. Aligning them is a conference-image rollout, done
-through [upgrades and rollback](../operations/upgrades.md), never in passing.
+**One Jitsi version for the whole conference.** `values.yaml` pins every conference component to the
+same Jitsi release: `jitsi-meet.web.image.tag` is the workflow's `IMAGE_TAG`, and
+`jitsi-meet.{prosody,jicofo,jvb,jibri,jigasi,transcriber}.image.tag` are the same release without the
+patch suffix. The subchart's own `appVersion` is older and is not used. The
+`pa-webinar.validateJitsiVersions` guard refuses to render when the enabled components disagree,
+comparing the `stable-<number>` part of each tag. An empty tag counts as the subchart's `appVersion`,
+and as an unknown version, which also stops the render, when Helm does not expose it; a tag in another
+form is not recognized and does not block. The case it catches is an installation that pinned only the web image and left the other
+components to the chart default: when the default moves, the web part and Prosody, Jicofo and the bridge
+end up on different releases. To upgrade such an installation, pin the other components to the release
+the web image already uses, or move all of them to the chart's release.
 
 **Without the patched image.** An installation that cannot pull it sets
-`jitsi-meet.web.image.repository: jitsi/web` and a matching upstream `jitsi-meet.web.image.tag` (the
-subchart's `appVersion`, unless the backend images are pinned to another release), and empties
+`jitsi-meet.web.image.repository: jitsi/web` and the upstream `jitsi-meet.web.image.tag` of the same
+release as the other components (the chart's release without the `-rnnoise` suffix), and empties
 `jitsi-meet.imagePullSecrets`. Changing only the repository keeps the chart's default tag, which exists
 only for the patched image, and the pull fails. It must also leave noise suppression
 enforced off, which the rnnoise guard enforces. It loses the self-view recovery and the click-through
@@ -913,10 +920,12 @@ Bumping Jitsi is a change to the conference that every event depends on. Work th
 order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 
 1. **Bump the subchart and the backend images.** Update the `jitsi-meet` dependency in
-   `infra/helm/pa-webinar/Chart.yaml`. The Prosody, Jicofo and JVB images follow the subchart's
-   `appVersion` unless pinned. Run `helm dependency update infra/helm/pa-webinar`, commit the vendored
-   chart and `Chart.lock`,
-   and run `./scripts/validate-chart.sh`.
+   `infra/helm/pa-webinar/Chart.yaml` when the new release needs it. The Prosody, Jicofo, JVB and Jibri
+   images are pinned in `values.yaml` (`jitsi-meet.<component>.image.tag`): move them together, and
+   move the web image with them in step 3, since the chart refuses to render mixed releases. Update
+   the profiles that use the stock web image (`examples/values-k3s.yaml`, `values-minikube.yaml`,
+   `values-eks.yaml`). Run `helm dependency update infra/helm/pa-webinar` if the dependency changed,
+   commit the vendored chart and `Chart.lock`, and run `./scripts/validate-chart.sh`.
 2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` in
    `infra/jitsi-web-patched/Dockerfile`, and `BASE_TAG`, `BASE_IMAGE` and a new `IMAGE_TAG` in
    `.github/workflows/jitsi-web.yml`. Every exactly-one-match assertion and every workflow check must
