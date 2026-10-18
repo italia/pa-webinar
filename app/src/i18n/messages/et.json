@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Inimesi pole valitud} one {1 inimene valitud} other {# inimest valitud}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Põhiandmed",
-        "permissions": "Õigused",
-        "invites": "Inimesed",
-        "content": "Sisu",
-        "review": "Ülevaade"
-      },
       "saveDraft": "Salvesta mustandina",
       "publish": "Avalda sündmus",
       "updateEvent": "Uuenda sündmust",

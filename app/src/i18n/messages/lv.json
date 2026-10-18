@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Nav atlasītu personu} one {1 atlasīta persona} other {# atlasītas personas}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Pamati",
-        "permissions": "Atļaujas",
-        "invites": "Personas",
-        "content": "Saturs",
-        "review": "Kopsavilkums"
-      },
       "saveDraft": "Saglabāt kā melnrakstu",
       "publish": "Publicēt pasākumu",
       "updateEvent": "Atjaunināt pasākumu",

@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Inga personer markerade} one {1 person markerad} other {# personer markerade}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Grunder",
-        "permissions": "Behörigheter",
-        "invites": "Personer",
-        "content": "Innehåll",
-        "review": "Sammanfattning"
-      },
       "saveDraft": "Spara som utkast",
       "publish": "Publicera evenemang",
       "updateEvent": "Uppdatera evenemang",

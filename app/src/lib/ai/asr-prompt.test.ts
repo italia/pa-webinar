@@ -25,6 +25,20 @@ describe('buildAsrInitialPrompt', () => {
     expect(out).toBe('Termini: XYZ, ABC. Incontro di prova Organizzato da Ente. Partecipanti e relatori: Relatore 1.');
   });
 
+  it('gli enti organizzatori vincono sul nome libero', () => {
+    expect(
+      buildAsrInitialPrompt({
+        title: 'T',
+        organizerName: 'Nome libero',
+        organizers: [{ name: 'Ente Uno' }, { name: ' Ente Due ' }],
+        speakersInfo: {},
+      }),
+    ).toBe('T Organizzato da Ente Uno, Ente Due.');
+    expect(
+      buildAsrInitialPrompt({ title: 'T', organizerName: 'Nome libero', organizers: [], speakersInfo: {} }),
+    ).toBe('T Organizzato da Nome libero.');
+  });
+
   it('senza glossario resta com’era; oltre il limite si taglia la testa, non i relatori', () => {
     expect(buildAsrInitialPrompt({ title: 'T', organizerName: null, speakersInfo: {} })).toBe('T');
     const lungo = buildAsrInitialPrompt(

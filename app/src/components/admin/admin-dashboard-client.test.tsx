@@ -42,7 +42,8 @@ const evento = (id: string, status: string, startsInMin: number, createdMinAgo: 
   organizerName: null,
   parseTitleKicker: null,
   moderatorCount: 0,
-  organizerCount: 0,
+  speakerCount: 0,
+  organizers: [],
   tags: [],
 });
 
@@ -89,5 +90,29 @@ describe('elenco degli eventi — il giorno dell\'evento', () => {
     // Un pulsante, non un link: il token del moderatore non si vede passando.
     expect(oggi?.querySelector('a[href*="token="]')).toBeNull();
     expect(Array.from(oggi?.querySelectorAll('button') ?? []).some((b) => b.textContent === messages.admin.eventsList.menu.enterRoom)).toBe(true);
+  });
+});
+
+describe('elenco degli eventi — persone ed enti della scheda', () => {
+  it('conta moderatori e relatori per ruolo e mostra gli enti organizzatori', () => {
+    const conPersone = {
+      ...evento('persone', 'PUBLISHED', 60 * 24, 1),
+      moderatorCount: 1,
+      speakerCount: 3,
+      organizers: [{ name: 'Ente Uno' }, { name: 'Ente Due' }],
+      organizerName: 'Nome libero',
+    };
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <AdminDashboardClient events={[conPersone] as never} renderedAt={ora} availableTags={[]} siteDefaultParseTitleKicker={false} />
+        </NextIntlClientProvider>,
+      );
+    });
+    const scheda = container.querySelector('.row.g-4')?.textContent ?? '';
+    // Il link principale conta come un moderatore in più.
+    expect(scheda).toContain('2 moderatori · 3 relatori');
+    expect(scheda).toContain('Ente Uno, Ente Due');
+    expect(scheda).not.toContain('Nome libero');
   });
 });

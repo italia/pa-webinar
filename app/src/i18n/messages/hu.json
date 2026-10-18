@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Nincs kijelölt személy} one {1 kijelölt személy} other {# kijelölt személy}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Alapok",
-        "permissions": "Jogosultságok",
-        "invites": "Személyek",
-        "content": "Tartalmak",
-        "review": "Összefoglaló"
-      },
       "saveDraft": "Mentés piszkozatként",
       "publish": "Esemény közzététele",
       "updateEvent": "Esemény frissítése",

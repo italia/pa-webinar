@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Nepasirinkta nė vienas asmuo} one {Pasirinktas 1 asmuo} other {Pasirinkti # asmenys}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Pagrindas",
-        "permissions": "Leidimai",
-        "invites": "Asmenys",
-        "content": "Turinys",
-        "review": "Santrauka"
-      },
       "saveDraft": "Įrašyti kaip juodraštį",
       "publish": "Skelbti renginį",
       "updateEvent": "Atnaujinti renginį",

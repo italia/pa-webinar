@@ -85,11 +85,11 @@ function click(el: HTMLElement) {
 }
 
 /**
- * Al passo con questa etichetta. I quattro passi e le impostazioni avanzate
- * sono nella barra; «Permessi» e «Contenuti» di una volta sono sezioni delle
- * impostazioni avanzate, che qui si aprono.
+ * Al passo indicato per nome, o con questa etichetta. I quattro passi e le
+ * impostazioni avanzate sono nella barra; «Permessi» e «Contenuti» di una
+ * volta sono sezioni delle impostazioni avanzate, che qui si aprono.
  */
-function goToStep(label: string) {
+function goToStep(label: 'base' | 'invites' | 'review' | 'permissions' | 'content' | (string & {})) {
   const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
   const vai = (testo: string) => {
     const b = Array.from(nav.querySelectorAll<HTMLButtonElement>('button')).find((el) =>
@@ -99,13 +99,13 @@ function goToStep(label: string) {
     click(b);
   };
   const sezione: Record<string, string> = {
-    [w.steps.permissions]: 'participation',
-    [w.steps.content]: 'content',
+    permissions: 'participation',
+    content: 'content',
   };
   const passo: Record<string, string> = {
-    [w.steps.base]: w.flow.steps.base,
-    [w.steps.invites]: w.flow.steps.invites,
-    [w.steps.review]: w.flow.steps.review,
+    base: w.flow.steps.base,
+    invites: w.flow.steps.invites,
+    review: w.flow.steps.review,
   };
   const s = sezione[label];
   if (!s) {
@@ -127,7 +127,7 @@ function apriSezione(id: string) {
 
 /** L'organizzatore principale, nel passo «Persone». */
 function organizzatore(nome = 'Mario Rossi', email = 'mario@example.org') {
-  goToStep(w.steps.invites);
+  goToStep('invites');
   type(byId<HTMLInputElement>('wiz-primary-name'), nome);
   type(byId<HTMLInputElement>('wiz-primary-email'), email);
 }
@@ -189,7 +189,7 @@ describe('creazione — descrizione mancante', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
 
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.publish));
 
     expect(alertText()).toBe(w.validationFailed);
@@ -203,7 +203,7 @@ describe('creazione — descrizione mancante', () => {
   it('la bozza chiede la stessa descrizione: la creazione salva comunque l evento', async () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.saveDraft));
 
     expect(alertText()).toBe(w.validationFailed);
@@ -229,7 +229,7 @@ describe('creazione — descrizione mancante', () => {
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
 
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.publish));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -308,13 +308,13 @@ describe('modifica — revoca di un co-moderatore', () => {
 
     renderWizard({ mode: 'edit', initialEvent: structuredClone(initialEvent) });
 
-    goToStep(w.steps.invites);
+    goToStep('invites');
     const riga = Array.from(container.querySelectorAll('li')).find((li) =>
       li.textContent?.includes('Anna Bianchi'),
     )!;
     click(button(w.step3.remove, riga));
 
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.updateEvent));
 
     const atteso = w.revocationFailed
@@ -582,7 +582,7 @@ describe('passo Permessi — lavagna', () => {
 
   it('senza il servizio lavagna l interruttore non si accende e dice perche', () => {
     renderWizard({ whiteboardInfraReady: false });
-    goToStep(w.steps.permissions);
+    goToStep('permissions');
 
     expect(interruttoreLavagna()).toBeDisabled();
     expect(container.textContent).toContain(messages.admin.form.whiteboardUnavailable);
@@ -590,7 +590,7 @@ describe('passo Permessi — lavagna', () => {
 
   it('con il servizio lavagna l interruttore funziona come prima', () => {
     renderWizard({ whiteboardInfraReady: true });
-    goToStep(w.steps.permissions);
+    goToStep('permissions');
 
     expect(interruttoreLavagna()).toBeEnabled();
     expect(container.textContent).not.toContain(messages.admin.form.whiteboardUnavailable);
@@ -615,7 +615,7 @@ describe('passo Permessi — lavagna', () => {
         maxParticipants: 100,
       },
     });
-    goToStep(w.steps.permissions);
+    goToStep('permissions');
 
     expect(interruttoreLavagna()).toBeChecked();
     expect(interruttoreLavagna()).toBeEnabled();
@@ -638,7 +638,7 @@ describe('creazione — pubblicazione non riuscita', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     return press(button(w.publish));
   }
 
@@ -702,7 +702,7 @@ describe('creazione — dove si arriva', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
   }
 
   beforeEach(() => {
@@ -781,7 +781,7 @@ describe('validazione — il fuoco va al campo da correggere', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.publish));
 
     expect(fetchMock).not.toHaveBeenCalled();
@@ -810,7 +810,7 @@ describe('creazione — risorse non salvate', () => {
     // «Aggiungi» del modulo delle persone: quello che segue il suo campo email.
     const bloccoPersone = byId('person-email').closest('.row') ?? container;
     await press(button(w.step3.add, bloccoPersone));
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.saveDraft));
 
     expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
@@ -833,7 +833,7 @@ describe('creazione — risorse non salvate', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.publish));
 
     const salvato = JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}');
@@ -855,11 +855,11 @@ describe('creazione — risorse non salvate', () => {
       renderWizard();
       type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
       type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-      goToStep(w.steps.invites);
+      goToStep('invites');
       type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
       type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
       await press(button(w.step3.add, byId('person-email').closest('.row') ?? container));
-      goToStep(w.steps.review);
+      goToStep('review');
       await press(button(w.saveDraft));
     } finally {
       setItem.mockRestore();
@@ -983,7 +983,7 @@ describe('creazione — i default del modello', () => {
   it('nel riepilogo: registrazione col pulsante REC, mai automatica, e le funzioni AI accese', async () => {
     renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'en,fr,es,de' });
     compila();
-    goToStep(w.steps.review);
+    goToStep('review');
     const anteprima = container.querySelector<HTMLElement>('.anteprima-evento')!;
     expect(anteprima.textContent).toContain(w.flow.recordingManual);
     expect(anteprima.textContent).toContain(messages.admin.form.aiSummaryEnabled);
@@ -1022,7 +1022,7 @@ describe('creazione — i default del modello', () => {
     click(casella());
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     // Anche il riepilogo mostra il titolo come apparira'.
     expect(container.querySelector('.anteprima-evento__titolo .event-title-kicker')?.textContent).toBe('Ciclo');
     await press(button(w.saveDraft));
@@ -1036,7 +1036,7 @@ describe('creazione — i default del modello', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Il primo incontro');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.saveDraft));
     expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
   });
@@ -1047,7 +1047,7 @@ describe('creazione — i default del modello', () => {
     expect(byId<HTMLInputElement>('ev-parse-title-kicker').checked).toBe(true);
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
     organizzatore();
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.saveDraft));
     // Resta «come il sito»: se il sito cambia idea, l'evento la segue.
     expect(payloadInviato().parseTitleKicker ?? null).toBeNull();
@@ -1058,7 +1058,7 @@ describe('creazione — i default del modello', () => {
     const s3 = messages.admin.wizard.step3;
     renderWizard({ template: { ...modello, accessMode: null }, publicRegistrationEnabled: true });
     compila();
-    goToStep(w.steps.invites);
+    goToStep('invites');
     const sezione = container.querySelector('.wizard-iscrizione')!;
     expect(sezione.textContent).toContain(s3.accessSiteDefault);
     const scelta = (testo: string) =>
@@ -1077,7 +1077,7 @@ describe('creazione — i default del modello', () => {
     expect(inviti.open).toBe(true);
 
     click(byId<HTMLInputElement>(sezione.querySelector('input[type=checkbox]')!.id));
-    goToStep(w.steps.review);
+    goToStep('review');
     const anteprima = container.querySelector('.anteprima-evento')!;
     expect(anteprima.textContent).toContain(w.flow.accessInvitation.replace('{count}', '0'));
     expect(anteprima.textContent).toContain(w.flow.addInvitees);
@@ -1096,7 +1096,7 @@ describe('creazione — i default del modello', () => {
       onChangeTemplate: cambia,
     });
     compila();
-    goToStep(w.steps.invites);
+    goToStep('invites');
     const sezione = container.querySelector('.wizard-iscrizione')!;
     const invito = Array.from(sezione.querySelectorAll('label')).find(
       (l) => l.querySelector('.formato-scelta__titolo')?.textContent === g.access.invitation,
@@ -1119,7 +1119,7 @@ describe('creazione — i default del modello', () => {
   it('senza lingue in cui tradurre, la traduzione non si accende da sola', async () => {
     renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'it' });
     compila();
-    goToStep(w.steps.review);
+    goToStep('review');
     expect(container.textContent).not.toContain(messages.admin.form.aiTargetLocales);
     await press(button(w.saveDraft));
     expect(payloadInviato()).toMatchObject({ aiTranscriptEnabled: true, aiTranslationEnabled: false });
@@ -1128,7 +1128,7 @@ describe('creazione — i default del modello', () => {
   it('le lingue di traduzione si cambiano nel riepilogo', async () => {
     renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'en,fr' });
     compila();
-    goToStep(w.steps.review);
+    goToStep('review');
     // Le lingue si aprono a richiesta, nell'anteprima.
     click(button(w.flow.changeLanguages));
     const francese = Array.from(container.querySelectorAll<HTMLInputElement>('#aiTargetLocales input[type="checkbox"]')).find(
@@ -1142,12 +1142,12 @@ describe('creazione — i default del modello', () => {
   it('senza modello, accendere la registrazione accende anche trascrizione, sintesi, traduzione e tracce', async () => {
     renderWizard({ aiPipelineEnabled: true, defaultTargetLocales: 'en,de' });
     compila();
-    goToStep(w.steps.permissions);
+    goToStep('permissions');
     click(container.querySelector<HTMLElement>(`[aria-label="${messages.admin.form.recordingEnabled}"]`)!);
     // L'avvio automatico non si offre piu'.
     expect(container.querySelector(`[aria-label="${messages.admin.form.autoStartRecording}"]`)).toBeNull();
     expect(container.textContent).toContain(w.step2.recordingManualNote);
-    goToStep(w.steps.review);
+    goToStep('review');
     await press(button(w.saveDraft));
     expect(payloadInviato()).toMatchObject({
       recordingEnabled: true,
@@ -1253,7 +1253,7 @@ describe('obbligatori — si fanno notare', () => {
   it('il riepilogo elenca cio che manca, e ogni voce porta al suo campo', () => {
     renderWizard();
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.review);
+    goToStep('review');
     const elenco = container.querySelector('.wizard-mancanti')!;
     expect(elenco.textContent).toContain(messages.admin.form.titleLabel);
     expect(elenco.textContent).toContain(w.flow.fieldOrganizerEmail);
@@ -1263,7 +1263,7 @@ describe('obbligatori — si fanno notare', () => {
 
   it('il nome dell organizzatore vuoto dice che serve per pubblicare', () => {
     renderWizard();
-    goToStep(w.steps.invites);
+    goToStep('invites');
     const campo = byId<HTMLInputElement>('wiz-primary-name').closest('.wizard-campo')!;
     expect(campo).toHaveClass('wizard-campo--vuoto');
     expect(campo.textContent).toContain(w.flow.requiredToPublish);

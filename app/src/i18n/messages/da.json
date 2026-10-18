@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Ingen personer valgt} one {1 person valgt} other {# personer valgt}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Grundlæggende",
-        "permissions": "Tilladelser",
-        "invites": "Personer",
-        "content": "Indhold",
-        "review": "Oversigt"
-      },
       "saveDraft": "Gem som kladde",
       "publish": "Udgiv arrangement",
       "updateEvent": "Opdater arrangement",

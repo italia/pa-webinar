@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Nobena oseba ni izbrana} one {1 izbrana oseba} two {# izbrani osebi} few {# izbrane osebe} other {# izbranih oseb}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Osnove",
-        "permissions": "Dovoljenja",
-        "invites": "Osebe",
-        "content": "Vsebine",
-        "review": "Povzetek"
-      },
       "saveDraft": "Shrani kot osnutek",
       "publish": "Objavi dogodek",
       "updateEvent": "Posodobi dogodek",

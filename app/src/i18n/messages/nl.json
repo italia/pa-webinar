@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Geen personen geselecteerd} one {1 persoon geselecteerd} other {# personen geselecteerd}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Basis",
-        "permissions": "Rechten",
-        "invites": "Personen",
-        "content": "Inhoud",
-        "review": "Overzicht"
-      },
       "saveDraft": "Opslaan als concept",
       "publish": "Evenement publiceren",
       "updateEvent": "Evenement bijwerken",

@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Žiadna osoba nevybraná} one {1 osoba vybraná} other {# osôb vybraných}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Základné",
-        "permissions": "Oprávnenia",
-        "invites": "Osoby",
-        "content": "Obsah",
-        "review": "Súhrn"
-      },
       "saveDraft": "Uložiť ako koncept",
       "publish": "Zverejniť podujatie",
       "updateEvent": "Aktualizovať podujatie",

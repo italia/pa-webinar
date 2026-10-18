@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Няма избрани лица} one {1 избрано лице} other {# избрани лица}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Основни",
-        "permissions": "Разрешения",
-        "invites": "Лица",
-        "content": "Съдържание",
-        "review": "Обобщение"
-      },
       "saveDraft": "Запази като чернова",
       "publish": "Публикувай събитието",
       "updateEvent": "Актуализирай събитието",

@@ -175,6 +175,7 @@ export const POST = withErrorHandling(async (request) => {
           aiTargetLocales: true,
           title: true,
           organizerName: true,
+          organizers: { select: { name: true }, orderBy: { sortOrder: 'asc' } },
           speakersInfo: true,
           expectedSpeakers: true,
           // Agenda/note (se la funzione è attiva): confluisce nel prompt

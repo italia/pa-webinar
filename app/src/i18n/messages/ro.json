@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Nicio persoană selectată} one {1 persoană selectată} other {# persoane selectate}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Bază",
-        "permissions": "Permisiuni",
-        "invites": "Persoane",
-        "content": "Conținut",
-        "review": "Rezumat"
-      },
       "saveDraft": "Salvați ca ciornă",
       "publish": "Publicați evenimentul",
       "updateEvent": "Actualizați evenimentul",

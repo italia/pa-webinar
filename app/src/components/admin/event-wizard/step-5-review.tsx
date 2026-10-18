@@ -206,6 +206,10 @@ export default function Step5Review({
   };
 
   const organizzatore = form.moderatorName?.trim();
+  // Chi conduce col segno di organizzatore sta fra chi organizza, non fra i
+  // moderatori: lo stesso ruolo che il passo «Persone» gli ha dato.
+  const altriOrganizzatori = form.moderators.filter((m) => m.organizer);
+  const moderatori = form.moderators.filter((m) => !m.organizer);
 
   return (
     <div>
@@ -280,14 +284,19 @@ export default function Step5Review({
                   {t('summary.primaryOrganizer')}: {t('summary.primaryMissing')}
                 </span>
               )}
+              {altriOrganizzatori.length > 0 && (
+                <span className="d-block">
+                  {t('summary.organizersPeople')}: {nomi(altriOrganizzatori)}
+                </span>
+              )}
+              {moderatori.length > 0 && (
+                <span className="d-block">
+                  {t('summary.moderators')}: {nomi(moderatori)}
+                </span>
+              )}
               {form.speakers.length > 0 && (
                 <span className="d-block">
                   {t('summary.speakers')}: {nomi(form.speakers)}
-                </span>
-              )}
-              {form.moderators.length > 0 && (
-                <span className="d-block">
-                  {t('summary.moderators')}: {nomi(form.moderators)}
                 </span>
               )}
               {form.organizers.length > 0 && (

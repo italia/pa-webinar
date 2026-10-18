@@ -16,6 +16,7 @@ import { Link, percorso, useRouter as useRouterLocale } from '@/i18n/navigation'
 import { moderatorRoomOpen } from '@/lib/events/participant-entry';
 import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
+import { nomiOrganizzatori } from '@/lib/events/organizer-names';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -47,8 +48,11 @@ interface EventSummary {
   imageUrl: string | null;
   organizerName: string | null;
   parseTitleKicker: boolean | null;
+  /** Moderatori nominali oltre al link principale. */
   moderatorCount: number;
-  organizerCount: number;
+  speakerCount: number;
+  /** Gli enti organizzatori; `organizerName` resta per gli eventi che non li hanno. */
+  organizers: Array<{ name: string }>;
   tags: TagSummary[];
 }
 
@@ -203,7 +207,9 @@ export default function AdminDashboardClient({
       if (needle) {
         const title = getLocalized(event.title, locale).toLowerCase();
         const slug = event.slug.toLowerCase();
-        const organizer = (event.organizerName ?? '').toLowerCase();
+        // Anche il nome libero, quando ci sono gli enti: e' ancora un dato
+        // dell'evento, e chi lo cerca deve trovarlo.
+        const organizer = `${nomiOrganizzatori(event)} ${event.organizerName ?? ''}`.toLowerCase();
         if (
           !title.includes(needle) &&
           !slug.includes(needle) &&
@@ -796,11 +802,11 @@ export default function AdminDashboardClient({
                           {durata(startsAt, endsAt)}
                         </span>
                       </li>
-                      {event.organizerName && (
+                      {nomiOrganizzatori(event) && (
                         <li className="d-flex align-items-center gap-2 mb-1">
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                           <span className="text-truncate">
-                            {event.organizerName}
+                            {nomiOrganizzatori(event)}
                           </span>
                         </li>
                       )}
@@ -809,7 +815,7 @@ export default function AdminDashboardClient({
                         <span>
                           {tList('moderatorsSpeakers', {
                             mods: event.moderatorCount + 1,
-                            speakers: event.organizerCount,
+                            speakers: event.speakerCount,
                           })}
                         </span>
                       </li>

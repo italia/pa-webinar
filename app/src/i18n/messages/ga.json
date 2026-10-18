@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Níor roghnaíodh duine ar bith} one {1 duine roghnaithe} other {# dhuine roghnaithe}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Bunús",
-        "permissions": "Ceadanna",
-        "invites": "Daoine",
-        "content": "Ábhar",
-        "review": "Achoimre"
-      },
       "saveDraft": "Sábháil mar dhréacht",
       "publish": "Foilsigh an t-imeacht",
       "updateEvent": "Nuashonraigh an t-imeacht",

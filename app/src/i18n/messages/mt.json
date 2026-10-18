@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Ebda persuna magħżula} one {1 persuna magħżula} other {# persuni magħżula}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Bażi",
-        "permissions": "Permessi",
-        "invites": "Persuni",
-        "content": "Kontenut",
-        "review": "Sommarju"
-      },
       "saveDraft": "Salva bħala abbozz",
       "publish": "Ippubblika l-avveniment",
       "updateEvent": "Aġġorna l-avveniment",

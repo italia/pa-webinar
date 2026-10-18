@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Aucune personne sélectionnée} one {1 personne sélectionnée} other {# personnes sélectionnées}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Bases",
-        "permissions": "Permissions",
-        "invites": "Personnes",
-        "content": "Contenus",
-        "review": "Récapitulatif"
-      },
       "saveDraft": "Enregistrer comme brouillon",
       "publish": "Publier l'événement",
       "updateEvent": "Mettre à jour l'événement",

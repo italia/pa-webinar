@@ -774,13 +774,6 @@
       "selectedCount": "{count, plural, =0 {Ei valittuja henkilöitä} one {1 henkilö valittu} other {# henkilöä valittu}}"
     },
     "wizard": {
-      "steps": {
-        "base": "Perustiedot",
-        "permissions": "Oikeudet",
-        "invites": "Henkilöt",
-        "content": "Sisältö",
-        "review": "Yhteenveto"
-      },
       "saveDraft": "Tallenna luonnoksena",
       "publish": "Julkaise tapahtuma",
       "updateEvent": "Päivitä tapahtuma",
