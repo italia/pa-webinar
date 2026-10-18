@@ -445,8 +445,8 @@ Plan the first installation as a project, not as a routine procedure.
 | Backup and restore | `scripts/backup.sh` and `scripts/restore.sh` cover the database, the keys and an object store on a volume of the cluster, such as the Garage add-on of one k3s server, and the chart can take a nightly dump. An object store outside the cluster is backed up with its provider's tools | Schedule them, copy the backups away from the cluster, and run the restore drill. See [Backups](#backups) |
 | Alerting | Alert rules cover the application, database, bridges, scaler and TURN. They do not cover scheduled jobs, the email outbox, retention or disk. `scripts/verify-install.sh --quiet` checks those from cron. The cleanup job reports success even when it fails on individual events | Run the installation check on a schedule, and add checks on job outcomes ([Monitoring](operations/monitoring.md)) |
 | Post-install verification | `scripts/verify-install.sh` checks an installation from outside and inside the cluster, and with `--call` joins two headless browsers to a room and checks audio and video both ways | Run it after every install and upgrade, and hold a call from two real networks before you announce anything ([Post-install verification](install/checklists.md#post-install-verification)) |
-| Automated tests | Unit tests focus on library logic under a coverage ratchet. Browser tests do not enter a conference | See [Testing](development/testing.md) |
-| Accessibility | An accessibility-statement page is provided. Conformance has not been measured, and nothing checks accessibility automatically | Evaluate the platform before you publish your statement |
+| Automated tests | Unit tests focus on library logic under a coverage ratchet. Browser tests cover registration, the waiting room, questions, polls, erasure and the live room's side column, but not the conference's audio and video | See [Testing](development/testing.md) |
+| Accessibility | An accessibility-statement page is provided. The end-to-end suite checks WCAG 2.1 AA automatically with axe-core and checks keyboard use on the public pages; screen readers and the other manual checks have not been carried out, and the known non-conformities are listed | Complete the evaluation and publish your statement ([Accessibility](ACCESSIBILITY.md)) |
 | Participant identity | Registration by name and email. There is no SPID, CIE or eIDAS sign-in | SPID/CIE sign-in is a conditional roadmap item. eIDAS sign-in is not on the roadmap |
 
 The roadmap's known limitations section lists the boundaries of features that
@@ -540,7 +540,8 @@ software.
 - Public bodies in the EU must publish an accessibility statement for their
   websites (Directive (EU) 2016/2102). In Italy, the Legge Stanca (Italian
   accessibility law) and the AgID guidelines apply. The platform provides the
-  page, and you supply the evaluation and the text.
+  page and the project's own evaluation ([Accessibility](ACCESSIBILITY.md)),
+  and you supply your evaluation and the text.
 
 ### Backups
 

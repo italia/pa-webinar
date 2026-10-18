@@ -216,6 +216,7 @@ For controllers, DPOs, security reviewers and anyone who handles a vulnerability
 |---|---|
 | [Privacy and data protection](GDPR.md) | Personal data in PA Webinar: controller and processor roles, the data inventory and retention table, the consent model, the daily GDPR cleanup, data-subject rights, the address book, cookies, logs, audit trails and the consent texts. |
 | [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md) | The privacy side of recording, per-participant audio and AI post-production: what is captured, voice-data minimization, retention regimes, editing and erasure, and legal bases. |
+| [Accessibility](ACCESSIBILITY.md) | What the project checks for WCAG 2.1 AA and how, the known non-conformities, and how an administration writes its own accessibility statement. |
 | [Privacy notice checklist for controllers](privacy/privacy-notice-checklist.md) | The platform facts a controller's privacy notice has to cover, each mapped to the setting that controls it, and the settings to review before the first public event. It is not legal advice. |
 | [Security policy](../SECURITY.md) | How to report a vulnerability privately, which versions are supported, what the maintainers commit to, and the supply-chain and CI controls: runner isolation, pinned actions, token permissions, dependency updates, scanners, SBOMs and the secrets policy. |
 | [Security architecture](architecture/security.md) | The application's own security controls and their limits. |
@@ -271,6 +272,7 @@ Each of these files sits next to the code it describes.
 | How do I put our logo and colors on the portal? | [Branding and white-labeling](configuration/branding.md) |
 | How long is personal data kept, and what deletes it? | [Privacy: data inventory and retention](GDPR.md#data-inventory-and-retention) |
 | What must our privacy notice say? | [Privacy notice checklist](privacy/privacy-notice-checklist.md) |
+| What do we need for our accessibility statement? | [Accessibility](ACCESSIBILITY.md#writing-the-administrations-statement) |
 | How do I report a vulnerability? | [Security policy: reporting a vulnerability](../SECURITY.md#reporting-a-vulnerability) |
 | How do I add interface text or a new page? | [Extending: UI text and languages](development/extending.md#adding-ui-text-or-a-language) and [adding a page](development/extending.md#adding-a-page) |
 | What must pass before I commit or push? | [Methodology: local gates](development/methodology.md#local-gates-before-every-commit) and [CI parity](development/methodology.md#ci-parity-before-every-push) |
