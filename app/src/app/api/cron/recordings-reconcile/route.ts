@@ -101,7 +101,7 @@ async function runReconcile() {
   // Build the "known" set: every blob name the DB knows about.
   // Event.recordingUrl + CallSession.recordingUrl carry absolute URLs,
   // CallSession.recordingFilename carries the bare blob name.
-  const [eventLinks, sessionLinks, tracks, deleteNowTracks] = await Promise.all([
+  const [eventLinks, sessionLinks, registrazioni, deleteNowTracks] = await Promise.all([
     prisma.event.findMany({
       where: { recordingUrl: { not: null } },
       select: { recordingUrl: true },
@@ -115,31 +115,28 @@ async function runReconcile() {
       },
       select: { recordingUrl: true, recordingFilename: true },
     }),
-    // Tracce per partecipante con l'audio ancora presente: le cancellano
-    // multitrack-purge e postprod-retention, con le regole dell'evento.
-    prisma.recordingTrack.findMany({
-      where: { audioPurgedAt: null },
+    // Le registrazioni con tracce per partecipante ancora presenti: le
+    // cancellano multitrack-purge e postprod-retention, con le regole
+    // dell'evento. Una riga per registrazione, con le sue tracce.
+    prisma.recording.findMany({
+      where: { tracks: { some: { audioPurgedAt: null } } },
       select: {
-        blobKey: true,
-        recordingId: true,
-        recording: {
-          select: {
-            eventId: true,
-            retentionUntil: true,
-            // Un lavoro che legge ancora le tracce le tiene conosciute.
-            jobs: {
-              where: {
-                kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
-                status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
-              },
-              select: { id: true },
-              take: 1,
-            },
-            event: {
-              select: { status: true, endsAt: true, lastActiveAt: true, dataRetentionDays: true },
-            },
+        id: true,
+        eventId: true,
+        retentionUntil: true,
+        // Un lavoro che legge ancora le tracce le tiene conosciute.
+        jobs: {
+          where: {
+            kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+            status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
           },
+          select: { id: true },
+          take: 1,
         },
+        event: {
+          select: { status: true, endsAt: true, lastActiveAt: true, dataRetentionDays: true },
+        },
+        tracks: { where: { audioPurgedAt: null }, select: { blobKey: true } },
       },
     }),
     // "Elimina subito" chiesto dall'amministrazione su una traccia vale anche
@@ -172,19 +169,17 @@ async function runReconcile() {
   // conservazione AI spenta, per esempio): diventa orfana, e la tolleranza la
   // cancella.
   const deleteNow = new Set(deleteNowTracks.map((r) => r.blobName));
-  for (const track of tracks) {
-    const { retentionUntil, jobs, event } = track.recording;
-    const sfuggita =
-      isEventEligibleForCleanup(event, runStartedAt) &&
-      (retentionUntil === null || retentionUntil <= runStartedAt) &&
-      jobs.length === 0;
-    if (sfuggita) continue;
-    const name = recordingBlobNameFromKey(track.blobKey);
+  const conosciuto = (name: string | null) => {
     if (name && !deleteNow.has(name)) knownBlobNames.add(name);
-    const manifest = recordingBlobNameFromKey(
-      multitrackManifestKey(track.recording.eventId, track.recordingId),
-    );
-    if (manifest) knownBlobNames.add(manifest);
+  };
+  for (const rec of registrazioni) {
+    const sfuggita =
+      isEventEligibleForCleanup(rec.event, runStartedAt) &&
+      (rec.retentionUntil === null || rec.retentionUntil <= runStartedAt) &&
+      rec.jobs.length === 0;
+    if (sfuggita) continue;
+    for (const track of rec.tracks) conosciuto(recordingBlobNameFromKey(track.blobKey));
+    conosciuto(recordingBlobNameFromKey(multitrackManifestKey(rec.eventId, rec.id)));
   }
 
   const blobs = await listRecordingBlobs();

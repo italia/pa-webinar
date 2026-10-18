@@ -26,7 +26,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { cancellaManifestiSenzaTracce } from '@/lib/recorder/manifest';
+import { multitrackManifestKey } from '@/lib/recorder/lifecycle';
 import {
   deletePostprodBlob,
   getPostprodStorage,
@@ -73,8 +73,18 @@ async function purgeRecordingTracks(
     }
   }
   await prisma.recordingTrack.deleteMany({ where: { recordingId } });
-  // Senza piu' tracce, via anche il manifesto con i nomi.
-  await cancellaManifestiSenzaTracce(storage, new Map([[recordingId, eventId]]));
+  // Senza piu' tracce, via anche il manifesto con i nomi. Se non resta, la
+  // riconciliazione lo vede orfano.
+  if (tracks.length > 0) {
+    try {
+      await storage.delete(multitrackManifestKey(eventId, recordingId));
+    } catch (err) {
+      console.warn('[postprod-retention] manifest delete failed', {
+        recordingId,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
   return { blobsDeleted, blobsFailed };
 }
 
