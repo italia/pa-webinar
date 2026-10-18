@@ -61,6 +61,14 @@ type FieldErrors = Partial<Record<string, string>>;
 /** Lo stesso controllo della rotta di rinvio del link. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Gli errori del questionario che il modulo sa mostrare; un 422 con un altro
+// messaggio viene da risposte che il server non riconosce.
+const ERRORI_QUESTIONARIO = new Set([
+  'registration.errors.questionnaireRequired',
+  'registration.errors.questionnaireIncomplete',
+  'registration.errors.questionnaireChanged',
+]);
+
 export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
@@ -286,15 +294,9 @@ export default function RegistrationFormClient({
           };
           const sulQuestionario = data.details?.find((d) => d.path?.[0] === 'questionnaireAnswers');
           if (res.status === 422 && sulQuestionario) {
-            // Un messaggio che il modulo non conosce viene da risposte che il
-            // server non riconosce: il questionario va ricaricato.
-            const noti = [
-              'registration.errors.questionnaireRequired',
-              'registration.errors.questionnaireIncomplete',
-              'registration.errors.questionnaireChanged',
-            ];
+            // Un messaggio sconosciuto: il questionario va ricaricato.
             setErrors({
-              questionnaireAnswers: noti.includes(sulQuestionario.message ?? '')
+              questionnaireAnswers: ERRORI_QUESTIONARIO.has(sulQuestionario.message ?? '')
                 ? sulQuestionario.message
                 : 'registration.errors.questionnaireChanged',
             });
