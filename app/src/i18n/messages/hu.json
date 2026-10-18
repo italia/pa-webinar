@@ -265,7 +265,10 @@
       "consentRequired": "Az adatkezeléshez való hozzájárulás kötelező",
       "recordingConsentRequired": "A felvételhez való hozzájárulás ehhez az eseményhez kötelező",
       "eventFull": "Az esemény elérte a maximális résztvevőszámot",
-      "generic": "Hiba a regisztráció során. Próbálja újra."
+      "generic": "Hiba a regisztráció során. Próbálja újra.",
+      "questionnaireRequired": "A regisztrációhoz válaszoljon a kérdőív kérdéseire.",
+      "questionnaireIncomplete": "Válaszoljon a kérdőív összes kötelező kérdésére.",
+      "questionnaireChanged": "A kérdőív megváltozott, amíg az űrlapot kitöltötte: töltse újra az oldalt, és válaszoljon újra."
     }
   },
   "videoLibrary": {

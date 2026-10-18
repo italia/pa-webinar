@@ -265,7 +265,10 @@
       "consentRequired": "Zgoda na przetwarzanie danych jest wymagana",
       "recordingConsentRequired": "Zgoda na nagrywanie jest wymagana dla tego wydarzenia",
       "eventFull": "Wydarzenie osiągnęło maksymalną liczbę uczestników",
-      "generic": "Błąd podczas rejestracji. Proszę spróbować ponownie."
+      "generic": "Błąd podczas rejestracji. Proszę spróbować ponownie.",
+      "questionnaireRequired": "Aby się zarejestrować, odpowiedz na pytania z kwestionariusza.",
+      "questionnaireIncomplete": "Odpowiedz na wszystkie obowiązkowe pytania z kwestionariusza.",
+      "questionnaireChanged": "Kwestionariusz zmienił się podczas wypełniania formularza: odśwież stronę i odpowiedz ponownie."
     }
   },
   "videoLibrary": {

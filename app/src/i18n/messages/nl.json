@@ -265,7 +265,10 @@
       "consentRequired": "Toestemming voor gegevensverwerking is vereist",
       "recordingConsentRequired": "Toestemming voor opname is vereist voor dit evenement",
       "eventFull": "Het evenement heeft het maximale aantal deelnemers bereikt",
-      "generic": "Fout bij inschrijving. Probeer het opnieuw."
+      "generic": "Fout bij inschrijving. Probeer het opnieuw.",
+      "questionnaireRequired": "Beantwoord de vragen van de vragenlijst om u in te schrijven.",
+      "questionnaireIncomplete": "Beantwoord alle verplichte vragen van de vragenlijst.",
+      "questionnaireChanged": "De vragenlijst is gewijzigd terwijl u het formulier invulde: laad de pagina opnieuw en antwoord opnieuw."
     }
   },
   "videoLibrary": {

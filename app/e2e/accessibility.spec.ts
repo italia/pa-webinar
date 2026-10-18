@@ -80,6 +80,43 @@ async function preparaEvento(page: Page) {
     data: { status: 'PUBLISHED' },
   });
   expect(pubblicato.ok(), `pubblicazione: ${pubblicato.status()}`).toBeTruthy();
+  // Un questionario con ogni tipo di domanda: compare nel modulo d'iscrizione,
+  // e il controllo lo guarda li'.
+  const questionario = await page.request.put(
+    `/api/admin/events/${id}/questionnaires/PRE_REGISTRATION`,
+    {
+      data: {
+        placement: 'PRE_REGISTRATION',
+        title: { it: 'Prima di iscriverti' },
+        required: false,
+        adhocItems: [
+          {
+            type: 'OPEN_TEXT',
+            prompt: { it: 'Da quale ufficio partecipi?' },
+            required: true,
+          },
+          {
+            type: 'SINGLE_CHOICE',
+            prompt: { it: 'Come hai saputo dell’evento?' },
+            options: [{ it: 'Email' }, { it: 'Sito' }],
+          },
+          {
+            type: 'MULTI_CHOICE',
+            prompt: { it: 'Quali temi ti interessano?' },
+            options: [{ it: 'Dati' }, { it: 'Servizi' }],
+          },
+          { type: 'YES_NO', prompt: { it: 'Hai già partecipato?' } },
+          {
+            type: 'LIKERT',
+            prompt: { it: 'Quanto conosci il tema?' },
+            scaleMin: 1,
+            scaleMax: 5,
+          },
+        ],
+      },
+    }
+  );
+  expect(questionario.ok(), `questionario: ${await questionario.text()}`).toBeTruthy();
   const iscritto = await page.request.post(`/api/events/${slug}/registrations`, {
     data: {
       displayName: 'Persona di prova',

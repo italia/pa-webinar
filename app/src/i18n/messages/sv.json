@@ -265,7 +265,10 @@
       "consentRequired": "Samtycke till databehandling krävs",
       "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
       "eventFull": "Evenemanget har nått maximalt antal deltagare",
-      "generic": "Fel vid anmälan. Försök igen."
+      "generic": "Fel vid anmälan. Försök igen.",
+      "questionnaireRequired": "Svara på frågorna i enkäten för att anmäla dig.",
+      "questionnaireIncomplete": "Svara på alla obligatoriska frågor i enkäten.",
+      "questionnaireChanged": "Enkäten ändrades medan du fyllde i formuläret: ladda om sidan och svara igen."
     }
   },
   "videoLibrary": {

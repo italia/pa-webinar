@@ -265,7 +265,10 @@
       "consentRequired": "El consentimiento para el tratamiento de datos es obligatorio",
       "recordingConsentRequired": "El consentimiento para la grabación es obligatorio para este evento",
       "eventFull": "El evento ha alcanzado el número máximo de participantes",
-      "generic": "Error durante la inscripción. Inténtelo de nuevo."
+      "generic": "Error durante la inscripción. Inténtelo de nuevo.",
+      "questionnaireRequired": "Para inscribirse, responda a las preguntas del cuestionario.",
+      "questionnaireIncomplete": "Responda a todas las preguntas obligatorias del cuestionario.",
+      "questionnaireChanged": "El cuestionario ha cambiado mientras rellenaba el formulario: vuelva a cargar la página y responda de nuevo."
     }
   },
   "videoLibrary": {

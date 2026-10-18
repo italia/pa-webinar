@@ -265,7 +265,10 @@
       "consentRequired": "Sutikimas dėl duomenų tvarkymo yra privalomas",
       "recordingConsentRequired": "Šiam renginiui būtinas sutikimas dėl įrašymo",
       "eventFull": "Renginys pasiekė maksimalų dalyvių skaičių",
-      "generic": "Registracijos klaida. Bandykite dar kartą."
+      "generic": "Registracijos klaida. Bandykite dar kartą.",
+      "questionnaireRequired": "Norėdami užsiregistruoti, atsakykite į klausimyno klausimus.",
+      "questionnaireIncomplete": "Atsakykite į visus privalomus klausimyno klausimus.",
+      "questionnaireChanged": "Klausimynas pasikeitė, kol pildėte formą: iš naujo įkelkite puslapį ir atsakykite dar kartą."
     }
   },
   "videoLibrary": {

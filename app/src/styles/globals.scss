@@ -6151,6 +6151,19 @@ button.live-time-strip__rec {
   font-weight: 700;
 }
 
+// Il questionario dell'iscrizione: un gruppo come quello dei consensi. Con
+// un errore il bordo diventa rosso, e il gruppo riceve il fuoco.
+.registration-questionnaire {
+  padding: 1rem 1rem 0.75rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+}
+
+.registration-questionnaire--error {
+  border-color: #cc334d;
+  box-shadow: inset 4px 0 0 #cc334d;
+}
+
 .registration-consents__notice {
   padding: 0.6rem 0.75rem;
   border-left: 4px solid #0066cc;

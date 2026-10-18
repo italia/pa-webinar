@@ -265,7 +265,10 @@
       "consentRequired": "Il-kunsens għall-ipproċessar tad-dejta huwa obbligatorju",
       "recordingConsentRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju għal dan l-avveniment",
       "eventFull": "L-avveniment laħaq in-numru massimu ta' parteċipanti",
-      "generic": "Żball waqt ir-reġistrazzjoni. Jekk jogħġbok erġa' pprova."
+      "generic": "Żball waqt ir-reġistrazzjoni. Jekk jogħġbok erġa' pprova.",
+      "questionnaireRequired": "Biex tirreġistra, wieġeb il-mistoqsijiet tal-kwestjonarju.",
+      "questionnaireIncomplete": "Wieġeb il-mistoqsijiet obbligatorji kollha tal-kwestjonarju.",
+      "questionnaireChanged": "Il-kwestjonarju nbidel waqt li kont qed timla l-formola: erġa' tella' l-paġna u wieġeb mill-ġdid."
     }
   },
   "videoLibrary": {

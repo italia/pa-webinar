@@ -13,7 +13,10 @@ import {
 
 import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
-import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
+import QuestionnaireForm, {
+  type QuestionnaireState,
+  type RenderedQuestionnaire,
+} from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
 import { consensiRichiesti } from '@/lib/registration/consents';
@@ -37,10 +40,9 @@ interface RegistrationFormClientProps {
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
-  /** When the event has a PRE_REGISTRATION questionnaire, the success
-   *  screen must show it (and stay put) instead of auto-redirecting the
-   *  user into the waiting room. */
-  hasPreRegistrationQuestionnaire?: boolean;
+  /** Il questionario dell'iscrizione, letto dal server: le sue domande sono
+   *  parte del modulo. Assente se l'evento non ne ha uno. */
+  preRegistrationQuestionnaire?: RenderedQuestionnaire | null;
   /** Event start (ISO). Routing: registering within waitingRoomLeadMinutes
    *  of start → straight to the waiting room; registering earlier → thank-you. */
   startsAt: string;
@@ -69,7 +71,7 @@ export default function RegistrationFormClient({
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   participantsCanShareScreen = false,
-  hasPreRegistrationQuestionnaire,
+  preRegistrationQuestionnaire,
   startsAt,
   waitingRoomLeadMinutes,
   profiling,
@@ -115,6 +117,15 @@ export default function RegistrationFormClient({
   }, []);
 
   const [errors, setErrors] = useState<FieldErrors>({});
+  // Le risposte al questionario dell'iscrizione, quando l'evento ne ha uno:
+  // partono con il modulo.
+  const [questionario, setQuestionario] = useState<QuestionnaireState | null>(null);
+  const aggiornaQuestionario = useCallback((stato: QuestionnaireState) => {
+    setQuestionario(stato);
+    setErrors((prev) =>
+      prev.questionnaireAnswers ? { ...prev, questionnaireAnswers: undefined } : prev,
+    );
+  }, []);
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -189,6 +200,16 @@ export default function RegistrationFormClient({
     if (richiesti.registrazione && !consentRecording) {
       fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
     }
+    // Il questionario: obbligatorio vuol dire almeno una risposta; chi
+    // risponde, risponde anche alle domande obbligatorie. Le stesse regole
+    // della rotta.
+    if (questionario) {
+      if (questionario.required && questionario.answers.length === 0) {
+        fieldErrors.questionnaireAnswers = 'registration.errors.questionnaireRequired';
+      } else if (questionario.answers.length > 0 && questionario.missing > 0) {
+        fieldErrors.questionnaireAnswers = 'registration.errors.questionnaireIncomplete';
+      }
+    }
 
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
@@ -196,7 +217,7 @@ export default function RegistrationFormClient({
     }
     setErrors({});
     return true;
-  }, [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce]);
+  }, [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, questionario]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -211,7 +232,9 @@ export default function RegistrationFormClient({
         // saprebbe cosa non va.
         requestAnimationFrame(() => {
           formRef.current
-            ?.querySelector<HTMLElement>('[aria-invalid="true"], .is-invalid')
+            ?.querySelector<HTMLElement>(
+              '[aria-invalid="true"], .is-invalid, .registration-questionnaire--error',
+            )
             ?.focus();
         });
         return;
@@ -230,6 +253,9 @@ export default function RegistrationFormClient({
         if (showOrg && organization) body.organization = organization;
         if (showRole && organizationRole) body.organizationRole = organizationRole;
         if (showType && organizationType) body.organizationType = organizationType;
+        if (questionario && questionario.answers.length > 0) {
+          body.questionnaireAnswers = questionario.answers;
+        }
 
         const res = await fetch(`/api/events/${eventSlug}/registrations`, {
           method: 'POST',
@@ -253,6 +279,21 @@ export default function RegistrationFormClient({
         }
 
         if (!res.ok) {
+          // Il questionario rifiutato dal server: l'errore va sul questionario,
+          // dove si corregge, non in cima al modulo.
+          const data = (await res.json().catch(() => ({}))) as {
+            details?: Array<{ path?: unknown[]; message?: string }>;
+          };
+          const sulQuestionario = data.details?.find((d) => d.path?.[0] === 'questionnaireAnswers');
+          if (res.status === 422 && sulQuestionario?.message) {
+            setErrors({ questionnaireAnswers: sulQuestionario.message });
+            requestAnimationFrame(() => {
+              formRef.current
+                ?.querySelector<HTMLElement>('.registration-questionnaire--error')
+                ?.focus();
+            });
+            return;
+          }
           setServerError(t('errors.generic'));
           return;
         }
@@ -276,7 +317,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, locale],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, locale, questionario],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email
@@ -326,19 +367,19 @@ export default function RegistrationFormClient({
   }, [success]);
 
   // One-step access: the registration API already handed us the personal
-  // accessToken, so when there's no PRE_REGISTRATION questionnaire to fill AND
-  // the event is near start we send the user straight into the waiting room
+  // accessToken (the questionnaire, if any, went with the registration), so
+  // when the event is near start we send the user straight into the waiting room
   // instead of making them click "Enter room". Registering hours early instead
   // lands on the thank-you screen (with an iCal link) — see below. A short delay
   // lets the "Registration complete" confirmation register; the manual button
   // below stays as a no-JS / slow-redirect fallback.
   useEffect(() => {
-    if (!success || !registrationAccessToken || hasPreRegistrationQuestionnaire) return;
+    if (!success || !registrationAccessToken) return;
     if (!isNearStart()) return;
     const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
     const id = setTimeout(() => router.push(percorso(target)), 1200);
     return () => clearTimeout(id);
-  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart, nowTick]);
+  }, [success, registrationAccessToken, eventSlug, router, isNearStart, nowTick]);
 
   if (success && linkByEmail) {
     return (
@@ -355,11 +396,10 @@ export default function RegistrationFormClient({
   }
 
   if (success) {
-    // Auto-redirect straight into the waiting room when there's nothing
-    // left to do on this screen (no PRE_REGISTRATION questionnaire). When
-    // a questionnaire is present we stay so the user can fill it first.
+    // Auto-redirect straight into the waiting room: nothing is left to do on
+    // this screen.
     const nearStart = isNearStart();
-    const autoRedirecting = !!registrationAccessToken && !hasPreRegistrationQuestionnaire && nearStart;
+    const autoRedirecting = !!registrationAccessToken && nearStart;
     return (
       <div className="py-4">
         <div className="text-center">
@@ -390,17 +430,6 @@ export default function RegistrationFormClient({
                 : t('successScheduledMessage')}
           </p>
         </div>
-        {/* Il server sa gia' se l'evento ha un questionario pre-iscrizione:
-            senza, non lo si chiede nemmeno (la richiesta finirebbe in 404). */}
-        {registrationAccessToken && hasPreRegistrationQuestionnaire && (
-          <div className="mb-4">
-            <QuestionnaireForm
-              eventSlug={eventSlug}
-              placement="PRE_REGISTRATION"
-              accessToken={registrationAccessToken}
-            />
-          </div>
-        )}
         {/* Immediate entry: the registration API already returned the
             personal accessToken, so we send the user straight into the
             waiting room instead of forcing them to wait for the
@@ -735,6 +764,35 @@ export default function RegistrationFormClient({
             {t('gdprLink')}
           </a>
         </div>
+      )}
+
+      {/* Il questionario dell'iscrizione, prima dei consensi: le risposte
+          partono con il modulo. */}
+      {preRegistrationQuestionnaire && (
+        <>
+          <QuestionnaireForm
+            eventSlug={eventSlug}
+            placement="PRE_REGISTRATION"
+            questionnaire={preRegistrationQuestionnaire}
+            embedded={{
+              onChange: aggiornaQuestionario,
+              errorId: errors.questionnaireAnswers ? 'questionnaireAnswersError' : undefined,
+              invalid: !!errors.questionnaireAnswers,
+              requiredMark: (
+                <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+              ),
+            }}
+          />
+          {errors.questionnaireAnswers && (
+            <div id="questionnaireAnswersError" className="text-danger small mt-n2 mb-4">
+              {errors.questionnaireAnswers === 'registration.errors.questionnaireRequired'
+                ? t('errors.questionnaireRequired')
+                : errors.questionnaireAnswers === 'registration.errors.questionnaireChanged'
+                  ? t('errors.questionnaireChanged')
+                  : t('errors.questionnaireIncomplete')}
+            </div>
+          )}
+        </>
       )}
 
       {/* I consensi in un gruppo, ognuno con il suo stato scritto accanto:

@@ -265,7 +265,10 @@
       "consentRequired": "Tá toiliú le próiseáil sonraí riachtanach",
       "recordingConsentRequired": "Tá toiliú leis an taifeadadh riachtanach don imeacht seo",
       "eventFull": "Tá uaslíon na rannpháirtithe sroichte ag an imeacht",
-      "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil."
+      "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil.",
+      "questionnaireRequired": "Chun clárú, freagair ceisteanna an cheistiúcháin.",
+      "questionnaireIncomplete": "Freagair na ceisteanna éigeantacha go léir sa cheistiúchán.",
+      "questionnaireChanged": "Athraíodh an ceistiúchán agus tú ag líonadh na foirme: athlódáil an leathanach agus freagair arís."
     }
   },
   "videoLibrary": {

@@ -265,7 +265,10 @@
       "consentRequired": "Consent to data processing is required",
       "recordingConsentRequired": "Recording consent is required for this event",
       "eventFull": "The event has reached the maximum number of participants",
-      "generic": "Registration error. Please try again."
+      "generic": "Registration error. Please try again.",
+      "questionnaireRequired": "To register, answer the questions in the questionnaire.",
+      "questionnaireIncomplete": "Answer all the required questions in the questionnaire.",
+      "questionnaireChanged": "The questionnaire changed while you were filling in the form: reload the page and answer again."
     }
   },
   "videoLibrary": {

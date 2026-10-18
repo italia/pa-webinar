@@ -265,7 +265,10 @@
       "consentRequired": "Samtykke til databehandling er påkrævet",
       "recordingConsentRequired": "Samtykke til optagelse er påkrævet for denne begivenhed",
       "eventFull": "Begivenheden har nået det maksimale antal deltagere",
-      "generic": "Fejl ved tilmelding. Prøv venligst igen."
+      "generic": "Fejl ved tilmelding. Prøv venligst igen.",
+      "questionnaireRequired": "Besvar spørgsmålene i spørgeskemaet for at tilmelde dig.",
+      "questionnaireIncomplete": "Besvar alle de obligatoriske spørgsmål i spørgeskemaet.",
+      "questionnaireChanged": "Spørgeskemaet blev ændret, mens du udfyldte formularen: genindlæs siden, og svar igen."
     }
   },
   "videoLibrary": {

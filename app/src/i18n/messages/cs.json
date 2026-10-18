@@ -265,7 +265,10 @@
       "consentRequired": "Souhlas se zpracováním údajů je povinný",
       "recordingConsentRequired": "Souhlas s nahráváním je pro tuto událost povinný",
       "eventFull": "Událost dosáhla maximálního počtu účastníků",
-      "generic": "Chyba při registraci. Zkuste to znovu."
+      "generic": "Chyba při registraci. Zkuste to znovu.",
+      "questionnaireRequired": "Pro registraci odpovězte na otázky dotazníku.",
+      "questionnaireIncomplete": "Odpovězte na všechny povinné otázky dotazníku.",
+      "questionnaireChanged": "Dotazník se změnil, zatímco jste vyplňovali formulář: načtěte stránku znovu a odpovězte znovu."
     }
   },
   "videoLibrary": {

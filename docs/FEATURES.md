@@ -179,7 +179,7 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
   - news about future events (optional);
   - inclusion in the address book (optional).
 - **Organization fields.** The form can also ask for an organization (with autocomplete), a role and an organization type. An event turns these on in the wizard's **People** step, under **What we ask people who register** (`requireOrganization`, `requireOrganizationRole` and `requireOrganizationType`). When on, the organization name is mandatory, in the form and for the registration API; the role and the type stay optional.
-- **Pre-registration questionnaire.** *Optional.* When an event has one, it follows the registration form.
+- **Pre-registration questionnaire.** *Optional.* When an event has one, its questions are part of the registration form, before the consents, and the answers are saved with the registration. When the questionnaire is required, nobody registers without answering it; when it is optional, a registrant who answers must still answer its required questions.
 - **Personal link.** Registration returns a personal join link and sets a signed cookie in that browser (with invitation-only registration, opening the emailed link sets the cookie instead). A registrant who comes back to the room without the link is still recognized. A forwarded link does not carry the registrant's name: whoever opens it enters as a guest under a name they type. With invitation-only registration the emailed link is signed, so forwarding the whole email forwards the identity too.
 - **Routing after registration.** If the event starts soon, the new registrant goes straight to the waiting room. How soon is set by the `waitingRoomLeadMinutes` site setting. Otherwise they see a confirmation screen with the calendar links. With invitation-only registration they are told to check their email instead.
 - **Emails.**
@@ -200,7 +200,6 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
 Current limits:
 
 - The platform does not send invitation emails and does not create a personal link for each invitee: invitees register themselves with the address they were invited with.
-- With invitation-only registration, the pre-registration questionnaire is not shown, because the form's answer carries no personal link to submit it with.
 
 Configured in: [From creation to recap: the event journey](architecture/event-journey.md) · [Email and calendar](architecture/email.md) · [Privacy and data protection](GDPR.md).
 

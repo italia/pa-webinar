@@ -265,7 +265,10 @@
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
       "recordingConsentRequired": "Il consenso alla videoregistrazione è obbligatorio per questo evento",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
-      "generic": "Errore durante l'iscrizione. Riprova."
+      "generic": "Errore durante l'iscrizione. Riprova.",
+      "questionnaireRequired": "Per iscriverti rispondi alle domande del questionario.",
+      "questionnaireIncomplete": "Rispondi a tutte le domande obbligatorie del questionario.",
+      "questionnaireChanged": "Il questionario è cambiato mentre compilavi il modulo: ricarica la pagina e rispondi di nuovo."
     }
   },
   "videoLibrary": {

@@ -276,71 +276,84 @@ export function validateAnswers(
  * their previous answers within the same transaction. If `allowEdit`
  * is false and a response exists, we throw a 409.
  */
-export async function submitResponse(opts: {
+export interface SubmitResponseInput {
   questionnaire: RenderedQuestionnaire;
   registrationId: string | null;
   guestId: string | null;
   respondentName: string | null;
   respondentEmailHash: string | null;
   answers: ReturnType<typeof validateAnswers>;
-}): Promise<{ id: string; created: boolean }> {
+}
+
+export async function submitResponse(
+  opts: SubmitResponseInput,
+): Promise<{ id: string; created: boolean }> {
+  return prisma.$transaction((tx) => writeResponse(tx, opts));
+}
+
+/**
+ * La stessa scrittura dentro una transazione gia' aperta: l'iscrizione la usa
+ * per salvare le risposte del questionario insieme alla registrazione.
+ */
+export async function writeResponse(
+  tx: Prisma.TransactionClient,
+  opts: SubmitResponseInput,
+): Promise<{ id: string; created: boolean }> {
   const { questionnaire, registrationId, guestId } = opts;
   if (!registrationId && !guestId) {
     throw new AppError('Respondent identity missing', 400, 'BAD_REQUEST');
   }
 
-  return prisma.$transaction(async (tx) => {
-    const existing = await tx.questionnaireResponse.findFirst({
-      where: {
-        questionnaireId: questionnaire.id,
-        ...(registrationId ? { registrationId } : { guestId }),
-      },
-    });
-
-    if (existing && !questionnaire.allowEdit) {
-      throw new AppError(
-        'Response already submitted for this questionnaire',
-        409,
-        'ALREADY_SUBMITTED',
-      );
-    }
-
-    const response = existing
-      ? await tx.questionnaireResponse.update({
-          where: { id: existing.id },
-          data: {
-            respondentName: opts.respondentName,
-            respondentEmailHash: opts.respondentEmailHash,
-          },
-        })
-      : await tx.questionnaireResponse.create({
-          data: {
-            questionnaireId: questionnaire.id,
-            registrationId,
-            guestId,
-            respondentName: opts.respondentName,
-            respondentEmailHash: opts.respondentEmailHash,
-          },
-        });
-
-    if (existing) {
-      await tx.questionnaireAnswer.deleteMany({ where: { responseId: response.id } });
-    }
-
-    if (opts.answers.length > 0) {
-      await tx.questionnaireAnswer.createMany({
-        data: opts.answers.map((a) => ({
-          responseId: response.id,
-          itemId: a.itemId,
-          valueText: a.valueText,
-          valueChoices: a.valueChoices ?? Prisma.JsonNull,
-          valueScale: a.valueScale,
-        })),
-      });
-    }
-
-    return { id: response.id, created: !existing };
+  const existing = await tx.questionnaireResponse.findFirst({
+    where: {
+      questionnaireId: questionnaire.id,
+      ...(registrationId ? { registrationId } : { guestId }),
+    },
   });
+
+  if (existing && !questionnaire.allowEdit) {
+    throw new AppError(
+      'Response already submitted for this questionnaire',
+      409,
+      'ALREADY_SUBMITTED',
+    );
+  }
+
+  const response = existing
+    ? await tx.questionnaireResponse.update({
+        where: { id: existing.id },
+        data: {
+          respondentName: opts.respondentName,
+          respondentEmailHash: opts.respondentEmailHash,
+        },
+      })
+    : await tx.questionnaireResponse.create({
+        data: {
+          questionnaireId: questionnaire.id,
+          registrationId,
+          guestId,
+          respondentName: opts.respondentName,
+          respondentEmailHash: opts.respondentEmailHash,
+        },
+      });
+
+  if (existing) {
+    await tx.questionnaireAnswer.deleteMany({ where: { responseId: response.id } });
+  }
+
+  if (opts.answers.length > 0) {
+    await tx.questionnaireAnswer.createMany({
+      data: opts.answers.map((a) => ({
+        responseId: response.id,
+        itemId: a.itemId,
+        valueText: a.valueText,
+        valueChoices: a.valueChoices ?? Prisma.JsonNull,
+        valueScale: a.valueScale,
+      })),
+    });
+  }
+
+  return { id: response.id, created: !existing };
 }
 
 /**

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 import { defaultLocale } from '@/i18n/config';
@@ -11,7 +12,17 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { createRegistrationSchema } from '@/lib/validation/schemas';
+import {
+  createRegistrationSchema,
+  type QuestionnaireAnswerInput,
+} from '@/lib/validation/schemas';
+import {
+  findEventQuestionnaireByPlacement,
+  validateAnswers,
+  writeResponse,
+  type RenderedQuestionnaire,
+} from '@/lib/questionnaires';
+import { rispostaVuota } from '@/lib/questionnaires/answers';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
@@ -118,6 +129,11 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', [{ path: ['organization'], message: 'registration.errors.organizationRequired' }]);
   }
 
+  // Il questionario dell'iscrizione: le risposte arrivano con il modulo e si
+  // salvano con l'iscrizione. Se e' obbligatorio, senza risposte l'iscrizione
+  // non si completa; altrimenti chi non risponde si iscrive lo stesso.
+  const questionario = await valutaQuestionario(event.id, parsed.data.questionnaireAnswers);
+
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
@@ -126,8 +142,13 @@ export const POST = withErrorHandling(async (request, context) => {
   // (lib/events/registration-access), e il link personale lo consegna solo
   // l'email (lib/events/registration-link).
   const soloInvitati = !publicRegistrationFor(event, (await getSettings()).publicRegistrationEnabled);
+  // Solo su invito l'errore sul questionario arriva a tutti allo stesso punto:
+  // dopo il controllo degli inviti direbbe chi e' invitato. Con l'iscrizione
+  // aperta arriva dopo il controllo del doppione, che ha la precedenza: chi e'
+  // gia' iscritto riceve «gia' iscritto» e il link di nuovo.
+  if (soloInvitati && questionario.errore) throw questionario.errore;
 
-  const esito: EsitoIscrizione = await prisma.$transaction(async (tx) => {
+  const esito: EsitoIscrizione = await iscriviNellaTransazione(questionario.risposte !== null, () => prisma.$transaction(async (tx) => {
     // Check for duplicates inside transaction
     const existing = await tx.registration.findUnique({
       where: { eventId_emailHash: { eventId: event.id, emailHash } },
@@ -144,6 +165,7 @@ export const POST = withErrorHandling(async (request, context) => {
     if (soloInvitati && !(await isInvited(tx, event.id, email))) {
       return { tipo: 'nonInvitato' };
     }
+    if (questionario.errore) throw questionario.errore;
 
     const personId = await upsertPersonOnRegistration(tx, {
       emailHash,
@@ -175,6 +197,19 @@ export const POST = withErrorHandling(async (request, context) => {
       },
     });
 
+    if (questionario.risposte) {
+      await writeResponse(tx, {
+        questionnaire: questionario.risposte.questionario,
+        registrationId: reg.id,
+        guestId: null,
+        // La risposta e' legata all'iscrizione, che ha nome e indirizzo
+        // cifrati: qui non si ripetono in chiaro.
+        respondentName: null,
+        respondentEmailHash: emailHash,
+        answers: questionario.risposte.valide,
+      });
+    }
+
     // GDPR audit: record consent
     await tx.gdprAuditLog.create({
       data: {
@@ -196,7 +231,7 @@ export const POST = withErrorHandling(async (request, context) => {
     });
 
     return { tipo: 'nuova', registrazione: reg };
-  });
+  }));
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
@@ -277,3 +312,76 @@ export const POST = withErrorHandling(async (request, context) => {
     { status: 201, headers: { 'Cache-Control': 'no-store', 'Set-Cookie': eventCookie } },
   );
 });
+
+/** Il questionario cambiato a modulo aperto: le risposte non valgono piu'. */
+function questionarioCambiato(): ValidationError {
+  return new ValidationError('Validation failed', [
+    { path: ['questionnaireAnswers'], message: 'registration.errors.questionnaireChanged' },
+  ]);
+}
+
+/**
+ * Le risposte da salvare con l'iscrizione, gia' controllate, oppure l'errore
+ * che ferma l'iscrizione: un questionario obbligatorio senza risposte, una
+ * domanda obbligatoria senza risposta, o risposte a domande che non ci sono
+ * piu' (il questionario e' cambiato mentre il modulo era aperto). Un
+ * questionario senza domande non chiede niente.
+ */
+async function valutaQuestionario(
+  eventId: string,
+  inviate: QuestionnaireAnswerInput[] | undefined,
+): Promise<{
+  risposte: { questionario: RenderedQuestionnaire; valide: ReturnType<typeof validateAnswers> } | null;
+  errore: ValidationError | null;
+}> {
+  const nessuno = { risposte: null, errore: null };
+  const q = await findEventQuestionnaireByPlacement(eventId, 'PRE_REGISTRATION');
+  if (!q || q.items.length === 0) return nessuno;
+  const date = (inviate ?? []).filter((r) => !rispostaVuota(r));
+  if (date.length === 0) {
+    if (!q.required) return nessuno;
+    return {
+      risposte: null,
+      errore: new ValidationError('Validation failed', [
+        { path: ['questionnaireAnswers'], message: 'registration.errors.questionnaireRequired' },
+      ]),
+    };
+  }
+  try {
+    return { risposte: { questionario: q, valide: validateAnswers(q, date) }, errore: null };
+  } catch (e) {
+    if (!(e instanceof ValidationError)) throw e;
+    const problemi = Array.isArray(e.details) ? (e.details as Array<{ message?: string }>) : [];
+    const soloMancanti =
+      problemi.length > 0 &&
+      problemi.every((p) => p.message === 'required answer missing' || p.message === 'required');
+    return {
+      risposte: null,
+      errore: soloMancanti
+        ? new ValidationError('Validation failed', [
+            {
+              path: ['questionnaireAnswers'],
+              message: 'registration.errors.questionnaireIncomplete',
+            },
+          ])
+        : questionarioCambiato(),
+    };
+  }
+}
+
+/**
+ * L'iscrizione con le risposte: se il questionario cambia fra il controllo e
+ * la scrittura (domande sostituite o tolte), il vincolo sulle domande ferma la
+ * transazione, e chi si iscrive deve ricaricare la pagina, non vedere un
+ * errore generico.
+ */
+async function iscriviNellaTransazione<T>(conRisposte: boolean, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (conRisposte && e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') {
+      throw questionarioCambiato();
+    }
+    throw e;
+  }
+}

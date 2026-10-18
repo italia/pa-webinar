@@ -265,7 +265,10 @@
       "consentRequired": "Consimțământul pentru prelucrarea datelor este obligatoriu",
       "recordingConsentRequired": "Consimțământul pentru înregistrarea video este obligatoriu pentru acest eveniment",
       "eventFull": "Evenimentul a atins numărul maxim de participanți",
-      "generic": "Eroare la înscriere. Vă rugăm să reîncercați."
+      "generic": "Eroare la înscriere. Vă rugăm să reîncercați.",
+      "questionnaireRequired": "Pentru a vă înscrie, răspundeți la întrebările din chestionar.",
+      "questionnaireIncomplete": "Răspundeți la toate întrebările obligatorii din chestionar.",
+      "questionnaireChanged": "Chestionarul s-a schimbat în timp ce completați formularul: reîncărcați pagina și răspundeți din nou."
     }
   },
   "videoLibrary": {

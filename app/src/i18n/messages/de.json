@@ -265,7 +265,10 @@
       "consentRequired": "Die Einwilligung zur Datenverarbeitung ist erforderlich",
       "recordingConsentRequired": "Die Einwilligung zur Aufzeichnung ist für diese Veranstaltung erforderlich",
       "eventFull": "Die maximale Teilnehmerzahl für diese Veranstaltung wurde erreicht",
-      "generic": "Fehler bei der Anmeldung. Bitte versuchen Sie es erneut."
+      "generic": "Fehler bei der Anmeldung. Bitte versuchen Sie es erneut.",
+      "questionnaireRequired": "Um sich anzumelden, beantworten Sie die Fragen des Fragebogens.",
+      "questionnaireIncomplete": "Beantworten Sie alle Pflichtfragen des Fragebogens.",
+      "questionnaireChanged": "Der Fragebogen wurde geändert, während Sie das Formular ausgefüllt haben: Laden Sie die Seite neu und antworten Sie erneut."
     }
   },
   "videoLibrary": {

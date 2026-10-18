@@ -265,7 +265,10 @@
       "consentRequired": "Soglasje z obdelavo podatkov je obvezno",
       "recordingConsentRequired": "Soglasje s snemanjem je obvezno za ta dogodek",
       "eventFull": "Dogodek je dosegel največje število udeležencev",
-      "generic": "Napaka pri prijavi. Prosimo, poskusite znova."
+      "generic": "Napaka pri prijavi. Prosimo, poskusite znova.",
+      "questionnaireRequired": "Za prijavo odgovorite na vprašanja vprašalnika.",
+      "questionnaireIncomplete": "Odgovorite na vsa obvezna vprašanja vprašalnika.",
+      "questionnaireChanged": "Vprašalnik se je spremenil, medtem ko ste izpolnjevali obrazec: znova naložite stran in odgovorite znova."
     }
   },
   "videoLibrary": {

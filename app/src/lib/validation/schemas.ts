@@ -275,6 +275,17 @@ export const ORGANIZATION_TYPES = [
   'ASL', 'UNIVERSITY', 'PUBLIC_ENTITY', 'IN_HOUSE', 'OTHER',
 ] as const;
 
+// Submission: one answer per item. Value shape discriminates on the
+// item's type at runtime (not enforced in the schema because we don't
+// know item types at parse time; the service layer validates each
+// answer against its item).
+export const questionnaireAnswerInputSchema = z.object({
+  itemId: z.string().uuid(),
+  valueText: z.string().max(2000).nullable().optional(),
+  valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
+  valueScale: z.number().int().min(0).max(11).nullable().optional(),
+});
+
 export const createRegistrationSchema = z.object({
   displayName: z
     .string()
@@ -306,6 +317,10 @@ export const createRegistrationSchema = z.object({
   // Lingua della pagina da cui ci si iscrive: la lingua delle email
   // successive. Un valore che non e' una lingua della piattaforma si ignora.
   locale: z.string().max(10).optional(),
+  // Le risposte al questionario dell'iscrizione, quando l'evento ne ha uno:
+  // si salvano con l'iscrizione, e un questionario obbligatorio senza
+  // risposte la ferma.
+  questionnaireAnswers: z.array(questionnaireAnswerInputSchema).max(100).optional(),
 });
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
@@ -579,17 +594,6 @@ export const upsertEventQuestionnaireSchema = z.object({
 });
 
 export type UpsertEventQuestionnaireInput = z.infer<typeof upsertEventQuestionnaireSchema>;
-
-// Submission: one answer per item. Value shape discriminates on the
-// item's type at runtime (not enforced in the schema because we don't
-// know item types at parse time; the service layer validates each
-// answer against its item).
-export const questionnaireAnswerInputSchema = z.object({
-  itemId: z.string().uuid(),
-  valueText: z.string().max(2000).nullable().optional(),
-  valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
-  valueScale: z.number().int().min(0).max(11).nullable().optional(),
-});
 
 export const submitQuestionnaireResponseSchema = z.object({
   answers: z.array(questionnaireAnswerInputSchema).max(100),

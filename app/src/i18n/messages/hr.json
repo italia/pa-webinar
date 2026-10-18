@@ -265,7 +265,10 @@
       "consentRequired": "Pristanak na obradu podataka je obvezan",
       "recordingConsentRequired": "Pristanak na snimanje je obvezan za ovaj događaj",
       "eventFull": "Događaj je dosegnuo maksimalan broj sudionika",
-      "generic": "Pogreška pri prijavi. Molimo pokušajte ponovno."
+      "generic": "Pogreška pri prijavi. Molimo pokušajte ponovno.",
+      "questionnaireRequired": "Za prijavu odgovorite na pitanja iz upitnika.",
+      "questionnaireIncomplete": "Odgovorite na sva obavezna pitanja iz upitnika.",
+      "questionnaireChanged": "Upitnik se promijenio dok ste ispunjavali obrazac: ponovno učitajte stranicu i ponovno odgovorite."
     }
   },
   "videoLibrary": {

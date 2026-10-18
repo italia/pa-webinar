@@ -265,7 +265,10 @@
       "consentRequired": "Nõusolek andmetöötluseks on kohustuslik",
       "recordingConsentRequired": "Selle ürituse jaoks on salvestamise nõusolek kohustuslik",
       "eventFull": "Üritus on saavutanud osalejate maksimaalse arvu",
-      "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti."
+      "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti.",
+      "questionnaireRequired": "Registreerumiseks vastake küsimustiku küsimustele.",
+      "questionnaireIncomplete": "Vastake kõigile küsimustiku kohustuslikele küsimustele.",
+      "questionnaireChanged": "Küsimustikku muudeti vormi täitmise ajal: laadige leht uuesti ja vastake uuesti."
     }
   },
   "videoLibrary": {

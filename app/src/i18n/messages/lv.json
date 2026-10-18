@@ -265,7 +265,10 @@
       "consentRequired": "Piekrišana datu apstrādei ir obligāta",
       "recordingConsentRequired": "Šim pasākumam nepieciešama piekrišana ierakstīšanai",
       "eventFull": "Pasākums ir sasniedzis maksimālo dalībnieku skaitu",
-      "generic": "Reģistrācijas kļūda. Lūdzu, mēģiniet vēlreiz."
+      "generic": "Reģistrācijas kļūda. Lūdzu, mēģiniet vēlreiz.",
+      "questionnaireRequired": "Lai reģistrētos, atbildiet uz anketas jautājumiem.",
+      "questionnaireIncomplete": "Atbildiet uz visiem anketas obligātajiem jautājumiem.",
+      "questionnaireChanged": "Anketa tika mainīta, kamēr aizpildījāt veidlapu: pārlādējiet lapu un atbildiet vēlreiz."
     }
   },
   "videoLibrary": {

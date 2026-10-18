@@ -8,6 +8,7 @@
  * chiunque, così da qui non si scopre chi è invitato; chi era già iscritto
  * riceve di nuovo il link nella propria casella.
  */
+import { Prisma } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,11 +30,18 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 vi.mock('@/lib/persons', () => ({ upsertPersonOnRegistration: vi.fn(async () => null) }));
 vi.mock('@/lib/email/confirmation', () => ({ sendConfirmationEmail: vi.fn() }));
+vi.mock('@/lib/questionnaires', async (importOriginal) => ({
+  ...(await importOriginal<typeof Questionari>()),
+  findEventQuestionnaireByPlacement: vi.fn(async () => null),
+  writeResponse: vi.fn(async () => ({ id: 'resp-1', created: true })),
+}));
 
 import { prisma } from '@/lib/db';
 import { hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { verifyRegistrationEntry } from '@/lib/events/registration-link';
+import { findEventQuestionnaireByPlacement, writeResponse } from '@/lib/questionnaires';
+import type * as Questionari from '@/lib/questionnaires';
 
 import { POST } from './route';
 
@@ -48,7 +56,7 @@ beforeAll(() => {
 
 let ipCounter = 0;
 
-function iscriviti(email: string): Promise<Response> {
+function iscriviti(email: string, extra: Record<string, unknown> = {}): Promise<Response> {
   ipCounter += 1;
   const request = new Request(`http://localhost:3000/api/events/${SLUG}/registrations`, {
     method: 'POST',
@@ -56,7 +64,7 @@ function iscriviti(email: string): Promise<Response> {
       'content-type': 'application/json',
       'x-forwarded-for': `10.1.0.${ipCounter}`,
     },
-    body: JSON.stringify({ displayName: 'Anna Bianchi', email, consentGiven: true }),
+    body: JSON.stringify({ displayName: 'Anna Bianchi', email, consentGiven: true, ...extra }),
   });
   return POST(request as unknown as NextRequest, {
     params: Promise.resolve({ param: SLUG }),
@@ -83,6 +91,8 @@ beforeEach(() => {
   }));
   tx.gdprAuditLog.create.mockResolvedValue({});
   tx.eventInvitation.findFirst.mockResolvedValue(null);
+  vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(null);
+  vi.mocked(writeResponse).mockResolvedValue({ id: 'resp-1', created: true });
 });
 
 /** Il link personale passato all'email, come oggetto URL. */
@@ -322,5 +332,159 @@ describe('POST registrations — consensi secondo il formato dell\'evento', () =
     } finally {
       vi.unstubAllEnvs();
     }
+  });
+});
+
+describe('POST registrations — questionario dell\'iscrizione', () => {
+  const DOMANDA = '22222222-2222-4222-8222-222222222222';
+  const FACOLTATIVA = '33333333-3333-4333-8333-333333333333';
+  const questionario = (required: boolean) => ({
+    id: 'q-1',
+    eventId: EVENT_ID,
+    placement: 'PRE_REGISTRATION' as const,
+    title: { it: 'Prima di iscriverti' },
+    description: {},
+    required,
+    allowEdit: false,
+    items: [
+      {
+        id: DOMANDA,
+        prompt: { it: 'Da quale ufficio?' },
+        type: 'OPEN_TEXT' as const,
+        options: null,
+        scaleMin: null,
+        scaleMax: null,
+        scaleMinLabel: null,
+        scaleMaxLabel: null,
+        required: true,
+        source: 'adhoc' as const,
+        templateId: null,
+      },
+      {
+        id: FACOLTATIVA,
+        prompt: { it: 'Altro?' },
+        type: 'OPEN_TEXT' as const,
+        options: null,
+        scaleMin: null,
+        scaleMax: null,
+        scaleMinLabel: null,
+        scaleMaxLabel: null,
+        required: false,
+        source: 'adhoc' as const,
+        templateId: null,
+      },
+    ],
+  });
+  const errore = async (res: Response) =>
+    ((await res.json()) as { details?: Array<{ path: string[]; message: string }> }).details?.[0];
+
+  it('obbligatorio e senza risposte: 422 sul questionario, nessuna iscrizione', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(true) as never);
+    const res = await iscriviti('anna@example.com', {
+      questionnaireAnswers: [{ itemId: DOMANDA, valueText: '   ' }],
+    });
+    expect(res.status).toBe(422);
+    expect(await errore(res)).toEqual({
+      path: ['questionnaireAnswers'],
+      message: 'registration.errors.questionnaireRequired',
+    });
+    expect(tx.registration.create).not.toHaveBeenCalled();
+  });
+
+  it('una domanda obbligatoria senza risposta: 422, anche se il questionario è facoltativo', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(false) as never);
+    const res = await iscriviti('anna@example.com', {
+      questionnaireAnswers: [{ itemId: FACOLTATIVA, valueText: 'Solo questa' }],
+    });
+    expect(res.status).toBe(422);
+    expect((await errore(res))?.message).toBe('registration.errors.questionnaireIncomplete');
+    expect(tx.registration.create).not.toHaveBeenCalled();
+  });
+
+  it('con le risposte: si iscrive e le risposte si salvano con l\'iscrizione', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(true) as never);
+    const res = await iscriviti('anna@example.com', {
+      questionnaireAnswers: [{ itemId: DOMANDA, valueText: 'Ufficio stampa' }],
+    });
+    expect(res.status).toBe(201);
+    expect(writeResponse).toHaveBeenCalledTimes(1);
+    const [t, scritta] = vi.mocked(writeResponse).mock.calls[0]!;
+    // Nella stessa transazione dell'iscrizione.
+    expect(t).toBe(tx);
+    expect(scritta).toMatchObject({
+      registrationId: 'reg-1',
+      guestId: null,
+      // Il nome sta cifrato nell'iscrizione: qui non si ripete in chiaro.
+      respondentName: null,
+      respondentEmailHash: hashEmail('anna@example.com'),
+      answers: [{ itemId: DOMANDA, valueText: 'Ufficio stampa' }],
+    });
+  });
+
+  it('facoltativo e senza risposte: si iscrive, nessuna risposta', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(false) as never);
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(201);
+    expect(writeResponse).not.toHaveBeenCalled();
+  });
+
+  it('solo su invito: le risposte dell\'invitato si salvano, quelle degli altri no', async () => {
+    siteSettings.publicRegistrationEnabled = false;
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(true) as never);
+    const risposte = { questionnaireAnswers: [{ itemId: DOMANDA, valueText: 'Ufficio stampa' }] };
+
+    const estraneo = await iscriviti('anna@example.com', risposte);
+    expect(estraneo.status).toBe(202);
+    expect(writeResponse).not.toHaveBeenCalled();
+
+    tx.eventInvitation.findFirst.mockResolvedValue({ id: 'inv-1' });
+    const invitato = await iscriviti('anna@example.com', risposte);
+    expect(invitato.status).toBe(202);
+    expect(writeResponse).toHaveBeenCalledTimes(1);
+  });
+
+  it('un questionario senza domande non chiede niente, anche se obbligatorio', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue({
+      ...questionario(true),
+      items: [],
+    } as never);
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(201);
+    expect(writeResponse).not.toHaveBeenCalled();
+  });
+
+  it("chi è già iscritto riceve «già iscritto», non l'errore del questionario", async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(true) as never);
+    tx.registration.findUnique.mockResolvedValue({ id: 'reg-0', accessToken: 'T', locale: 'it' });
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(409);
+    expect(((await res.json()) as { code: string }).code).toBe('ALREADY_REGISTERED');
+  });
+
+  it('una risposta a una domanda che non c\'è più: il questionario è cambiato', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(false) as never);
+    const res = await iscriviti('anna@example.com', {
+      questionnaireAnswers: [
+        { itemId: DOMANDA, valueText: 'Ufficio stampa' },
+        { itemId: '44444444-4444-4444-8444-444444444444', valueText: 'Sparita' },
+      ],
+    });
+    expect(res.status).toBe(422);
+    expect((await errore(res))?.message).toBe('registration.errors.questionnaireChanged');
+  });
+
+  it('il questionario cambiato durante la scrittura: 422, non un errore generico', async () => {
+    vi.mocked(findEventQuestionnaireByPlacement).mockResolvedValue(questionario(false) as never);
+    vi.mocked(writeResponse).mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Foreign key constraint failed', {
+        code: 'P2003',
+        clientVersion: 'test',
+      }),
+    );
+    const res = await iscriviti('anna@example.com', {
+      questionnaireAnswers: [{ itemId: DOMANDA, valueText: 'Ufficio stampa' }],
+    });
+    expect(res.status).toBe(422);
+    expect((await errore(res))?.message).toBe('registration.errors.questionnaireChanged');
   });
 });

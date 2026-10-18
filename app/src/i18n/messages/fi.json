@@ -265,7 +265,10 @@
       "consentRequired": "Suostumus tietojenkäsittelyyn on pakollinen",
       "recordingConsentRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan",
       "eventFull": "Tapahtuman osallistujamäärä on täynnä",
-      "generic": "Virhe ilmoittautumisessa. Yritä uudelleen."
+      "generic": "Virhe ilmoittautumisessa. Yritä uudelleen.",
+      "questionnaireRequired": "Vastaa kyselyn kysymyksiin ilmoittautuaksesi.",
+      "questionnaireIncomplete": "Vastaa kaikkiin kyselyn pakollisiin kysymyksiin.",
+      "questionnaireChanged": "Kysely muuttui, kun täytit lomaketta: lataa sivu uudelleen ja vastaa uudelleen."
     }
   },
   "videoLibrary": {
