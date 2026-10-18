@@ -197,7 +197,7 @@ export default function PostprodStatusCard() {
               className="progress mb-2"
               style={{ height: 14, borderRadius: 7, overflow: 'hidden' }}
               role="img"
-              aria-label={t('queueAriaLabel')}
+              aria-label={`${t('queueAriaLabel')}: ${pending} ${t('queuePending')}, ${claimed + running} ${t('queueRunning')}, ${done} ${t('queueDone')}, ${failed} ${t('queueFailed')}`}
             >
               {pending > 0 && (
                 <div

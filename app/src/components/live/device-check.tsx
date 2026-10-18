@@ -262,6 +262,7 @@ export default function DeviceCheck({
     const barra = meterRef.current;
     let ctx: AudioContext | null = null;
     let frame: number | null = null;
+    let aggiornato = 0;
     try {
       const Ctx =
         window.AudioContext ||
@@ -279,6 +280,13 @@ export default function DeviceCheck({
         for (let i = 0; i < buffer.length; i += 1) somma += buffer[i] ?? 0;
         const pct = Math.min(100, Math.round((somma / buffer.length / 128) * 100));
         if (barra) barra.style.width = `${pct}%`;
+        // Il valore per i lettori di schermo, due volte al secondo: a ogni
+        // fotogramma sarebbe solo rumore.
+        const ora = performance.now();
+        if (barra?.parentElement && ora - aggiornato > 500) {
+          barra.parentElement.setAttribute('aria-valuenow', String(pct));
+          aggiornato = ora;
+        }
         frame = requestAnimationFrame(loop);
       };
       loop();
@@ -473,9 +481,14 @@ export default function DeviceCheck({
                   ))}
                 </select>
                 <div className="small mt-2 mb-1 text-muted">{t('micLevel')}</div>
-                {/* Solo visivo: un valore che cambia a ogni fotogramma non si legge
-                    con un lettore di schermo, e il titolo sopra dice cos'è. */}
-                <div className="av-check__meter" aria-hidden="true">
+                <div
+                  className="av-check__meter"
+                  role="meter"
+                  aria-label={t('micLevel')}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={0}
+                >
                   <div ref={meterRef} className="av-check__meter-fill" />
                 </div>
                 {permissionState === 'granted' && !stream?.getAudioTracks()[0] && (

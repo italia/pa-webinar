@@ -217,6 +217,7 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
 }
 
 function PollsTabContent({ polls }: { polls: PollData[] }) {
+  const t = useTranslations('events.recap');
   return (
     <div className="d-flex flex-column gap-3">
       {polls.map((poll) => (
@@ -232,7 +233,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
                 return (
                   <div key={i}>
                     <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.85rem' }}>
-                      <span>{option}</span>
+                      <span id={`${poll.id}-opzione-${i}`}>{option}</span>
                       <span className="fw-semibold">{pct}%</span>
                     </div>
                     <div className="progress" style={{ height: 6, borderRadius: 3 }}>
@@ -240,7 +241,8 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
                         className="progress-bar bg-primary"
                         role="progressbar"
                         style={{ width: `${pct}%`, borderRadius: 3 }}
-                        aria-label={option}
+                        aria-labelledby={`${poll.id}-opzione-${i}`}
+                        aria-valuetext={`${t('votes', { count })} (${pct}%)`}
                         aria-valuenow={pct}
                         aria-valuemin={0}
                         aria-valuemax={100}
@@ -251,7 +253,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
               })}
             </div>
             <div className="text-muted mt-2" style={{ fontSize: '0.78rem' }}>
-              {poll.totalVotes} voti
+              {t('votes', { count: poll.totalVotes })}
             </div>
           </CardBody>
         </Card>
