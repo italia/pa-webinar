@@ -126,8 +126,12 @@ services:
   # jitsi-meet subchart's own Ingress; what must stay reachable on the
   # conference host is in docs/DEPLOYMENT.md, "The conference Ingress".
 
+  # La stessa versione di Jitsi del chart (jitsi-meet in
+  # infra/helm/pa-webinar/values.yaml) per tutti e quattro i servizi: il tag
+  # mobile `stable` lasciava a ogni macchina la versione che aveva scaricato
+  # l'ultima volta, e componenti di versioni diverse si accordano male.
   jitsi-web:
-    image: jitsi/web:stable
+    image: jitsi/web:stable-11031
     restart: unless-stopped
     ports:
       - "8443:443"
@@ -158,7 +162,7 @@ services:
       - prosody
 
   prosody:
-    image: jitsi/prosody:stable
+    image: jitsi/prosody:stable-11031
     restart: unless-stopped
     environment:
       - ENABLE_AUTH=1
@@ -196,7 +200,7 @@ services:
       - ./infra/jitsi/prosody-plugins:/prosody-plugins-custom:ro
 
   jicofo:
-    image: jitsi/jicofo:stable
+    image: jitsi/jicofo:stable-11031
     restart: unless-stopped
     environment:
       - TZ=Europe/Rome
@@ -237,7 +241,7 @@ services:
       - prosody
 
   jvb:
-    image: jitsi/jvb:stable
+    image: jitsi/jvb:stable-11031
     restart: unless-stopped
     ports:
       - "10000:10000/udp"

@@ -740,9 +740,11 @@ same Jitsi release: `jitsi-meet.web.image.tag` is the workflow's `IMAGE_TAG`, an
 `jitsi-meet.{prosody,jicofo,jvb,jibri,jigasi,transcriber}.image.tag` are the same release without the
 patch suffix. The subchart's own `appVersion` is older and is not used. The
 `pa-webinar.validateJitsiVersions` guard refuses to render when the enabled components disagree,
-comparing the `stable-<number>` part of each tag. An empty tag counts as the subchart's `appVersion`,
-and as an unknown version, which also stops the render, when Helm does not expose it; a tag in another
-form is not recognized and does not block. The case it catches is an installation that pinned only the web image and left the other
+comparing the `stable-<number>` or `unstable-<number>` part of each tag. The floating tags `stable`,
+`unstable` and `latest` count as themselves, so one of them next to a pinned release stops the render.
+An empty tag counts as the subchart's `appVersion`, and as an unknown version, which also stops the
+render, when Helm does not expose it; a tag in another form is not recognized and does not block. The
+Docker Compose stack pins the same release for its four Jitsi services. The case it catches is an installation that pinned only the web image and left the other
 components to the chart default: when the default moves, the web part and Prosody, Jicofo and the bridge
 end up on different releases. To upgrade such an installation, pin the other components to the release
 the web image already uses, or move all of them to the chart's release.

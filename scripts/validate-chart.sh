@@ -1521,6 +1521,10 @@ deve_fallire "parte web a una versione di Jitsi diversa dal resto" "web=stable-1
   --set jitsi-meet.web.image.tag=stable-10741-rnnoise-r3
 deve_fallire "componente lasciato alla versione del sottochart" "jicofo=" \
   --set 'jitsi-meet.jicofo.image.tag=null'
+deve_fallire "componente su un tag mobile accanto a versioni fissate" "jvb=stable)" \
+  --set jitsi-meet.jvb.image.tag=stable
+deve_fallire "parte web su una versione unstable" "web=unstable-" \
+  --set jitsi-meet.web.image.tag=unstable-11200
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del
 # sottochart che il chart non può ricavare.
 deve_fallire "site.portalHost con lo schema" "site.portalHost" \
