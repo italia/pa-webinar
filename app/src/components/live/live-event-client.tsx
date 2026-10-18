@@ -2333,6 +2333,9 @@ function LiveSidebar({
     showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
+  // Un numero solo per i presenti in tutta la colonna: quello della sala
+  // quando c'e', che il pannello aggiorna solo a scheda aperta.
+  const presenti = roomCount && roomCount > 0 ? roomCount : participantCount;
   // Mani alzate nella sala, dal pannello dei partecipanti (sempre montato).
   const [handsCount, setHandsCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the column
@@ -2789,12 +2792,7 @@ function LiveSidebar({
       // gestire, e la scheda è il posto unico dove gestirla. Altrimenti il
       // conteggio della sala quando c'e': quello del pannello si ferma quando
       // il pannello si chiude.
-      badge:
-        isModerator && handsCount > 0
-          ? handsCount
-          : roomCount && roomCount > 0
-            ? roomCount
-            : participantCount,
+      badge: isModerator && handsCount > 0 ? handsCount : presenti,
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
       show: true,
@@ -3320,7 +3318,7 @@ function LiveSidebar({
               voterGuestId={voterGuestId}
               active={pollsOnScreen}
               onUnvotedCountChange={setPollsUnvoted}
-              presentCount={roomCount && roomCount > 0 ? roomCount : participantCount}
+              presentCount={presenti}
             />
           </div>
           {activeTab === 'wordcloud' && (effWordCloud || isModerator) && (
@@ -3358,6 +3356,7 @@ function LiveSidebar({
               isModerator={isModerator}
               localParticipantId={localParticipantId}
               onCountChange={setParticipantCount}
+              presenti={presenti}
               onHandsChange={setHandsCount}
               visible={onScreen('participants')}
               eventSlug={eventSlug}

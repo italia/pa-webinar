@@ -48,6 +48,10 @@ interface ParticipantPanelProps {
    *  `videoConferenceJoined`): la propria riga non si espelle. */
   localParticipantId?: string | null;
   onCountChange?: (count: number) => void;
+  /** Le persone in sala come le conta la colonna (`LiveSidebar`): lo stesso
+   *  numero della scheda e dei sondaggi. Senza, vale il conteggio del
+   *  pannello. */
+  presenti?: number;
   /** La scheda e' aperta. Il pannello resta montato per seguire le mani alzate
    *  e il conteggio; a scheda chiusa non disegna l'elenco e non chiede altro. */
   visible?: boolean;
@@ -72,6 +76,7 @@ export default function ParticipantPanel({
   isModerator,
   localParticipantId = null,
   onCountChange,
+  presenti: presentiDellaSala,
   visible = true,
   eventSlug,
   token,
@@ -609,6 +614,8 @@ export default function ParticipantPanel({
     );
   };
 
+  const presenti = presentiDellaSala ?? persone;
+
   return (
     <div className="people">
       <div className="live-panel-header live-panel-header--bar people__header">
@@ -621,8 +628,9 @@ export default function ParticipantPanel({
             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
           {t('title')}
-          <span className="live-panel-header__count">{persone}</span>
+          <span className="live-panel-header__count">{presenti}</span>
         </h6>
+        {/* Collegamenti e persone dallo stesso elenco del pannello. */}
         {participants.length > persone && (
           <span className="people__links" title={t('connectionsHint')}>
             {t('connections', { count: participants.length })}

@@ -33,11 +33,16 @@ function fakeApi(roomsInfo: unknown): JitsiMeetExternalAPI {
   } as unknown as JitsiMeetExternalAPI;
 }
 
-async function render(api: JitsiMeetExternalAPI, isModerator = true) {
+async function render(api: JitsiMeetExternalAPI, isModerator = true, presenti?: number) {
   await act(async () => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
-        <ParticipantPanel api={api} isModerator={isModerator} localParticipantId="io" />
+        <ParticipantPanel
+          api={api}
+          isModerator={isModerator}
+          localParticipantId="io"
+          presenti={presenti}
+        />
       </NextIntlClientProvider>,
     );
   });
@@ -390,5 +395,19 @@ describe('ParticipantPanel — chi c’e’ dietro i riquadri', () => {
     });
     expect(container.querySelector('input[type="search"]')).toBeNull();
     expect(container.querySelectorAll('.people-row')).toHaveLength(5);
+  });
+});
+
+describe('ParticipantPanel — conteggio', () => {
+  const conteggio = () => container.querySelector('.live-panel-header__count')?.textContent;
+
+  it('mostra il numero della colonna, lo stesso della scheda e dei sondaggi', async () => {
+    await render(fakeApi(undefined), true, 5);
+    expect(conteggio()).toBe('5');
+  });
+
+  it('senza il numero della sala usa il proprio', async () => {
+    await render(fakeApi(undefined));
+    expect(conteggio()).toBe('2');
   });
 });
