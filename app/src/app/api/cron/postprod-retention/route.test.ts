@@ -12,13 +12,15 @@ const m = vi.hoisted(() => ({
   artifactDeleteMany: vi.fn(),
   jobFindFirst: vi.fn(),
   deleteBlob: vi.fn(),
+  storageDelete: vi.fn(),
+  trackFindMany: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 vi.mock('@/lib/storage/postprod', () => ({
   isPostprodStorageConfigured: () => true,
   deletePostprodBlob: m.deleteBlob,
-  getPostprodStorage: vi.fn(),
+  getPostprodStorage: () => ({ delete: m.storageDelete }),
 }));
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -27,7 +29,7 @@ vi.mock('@/lib/db', () => ({
     postprodJob: { findFirst: m.jobFindFirst, updateMany: vi.fn() },
     postprodOriginalBody: { deleteMany: vi.fn() },
     speaker: { deleteMany: vi.fn() },
-    recordingTrack: { findMany: vi.fn(async () => []), deleteMany: vi.fn(), updateMany: vi.fn() },
+    recordingTrack: { findMany: m.trackFindMany, deleteMany: vi.fn(), updateMany: vi.fn() },
     siteSetting: { findUnique: vi.fn(async () => ({ aiArtifactRetentionDays: 0 })) },
   },
 }));
@@ -40,6 +42,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   m.jobFindFirst.mockResolvedValue(null);
   m.deleteBlob.mockResolvedValue(true);
+  m.storageDelete.mockResolvedValue(true);
+  m.trackFindMany.mockResolvedValue([]);
   m.artifactDeleteMany.mockResolvedValue({ count: 2 });
   m.recordingFindMany.mockImplementation(async (args: { where: { event?: { transcriptPublished?: boolean } } }) =>
     args.where.event?.transcriptPublished === true ? [{ id: 'rec-1', event: scaduto }] : [],
@@ -84,5 +88,46 @@ describe('GET /api/cron/postprod-retention — trascrizione pubblicata da sola',
     await GET(new Request('http://x/api/cron/postprod-retention') as never, { params: Promise.resolve({}) } as never);
     expect(m.artifactFindMany).not.toHaveBeenCalled();
     expect(m.artifactDeleteMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET /api/cron/postprod-retention — manifesto delle tracce', () => {
+  const scadutaIl = (blobKey: string) => {
+    m.recordingFindMany.mockImplementation(async (args: { where: { retentionUntil?: unknown } }) =>
+      args.where.retentionUntil ? [{ id: 'rec-m', eventId: 'ev-1', blobKey }] : [],
+    );
+  };
+  const manifesto = 'recordings/multitrack/ev-1/rec-m/tracks.json';
+  const giro = async () =>
+    (await GET(new Request('http://x/api/cron/postprod-retention') as never, { params: Promise.resolve({}) } as never)).json();
+
+  it('lo cancella con le tracce', async () => {
+    scadutaIl('recordings/ev-1/rec-m.mp4');
+    m.trackFindMany.mockResolvedValue([{ blobKey: 'recordings/multitrack/ev-1/rec-m/a.ogg', audioPurgedAt: null }]);
+    await giro();
+    expect(m.storageDelete).toHaveBeenCalledWith('recordings/multitrack/ev-1/rec-m/a.ogg');
+    expect(m.storageDelete).toHaveBeenCalledWith(manifesto);
+  });
+
+  it('lo cancella anche se la registrazione multitraccia non ha mai avuto righe di traccia', async () => {
+    scadutaIl('recordings/multitrack/ev-1/rec-m/');
+    await giro();
+    expect(m.storageDelete).toHaveBeenCalledWith(manifesto);
+  });
+
+  it('non lo cerca per una registrazione che non è multitraccia', async () => {
+    scadutaIl('recordings/ev-1/rec-m.mp4');
+    await giro();
+    expect(m.storageDelete).not.toHaveBeenCalled();
+  });
+
+  it('una cancellazione fallita conta tra i file non cancellati', async () => {
+    scadutaIl('recordings/multitrack/ev-1/rec-m/');
+    m.storageDelete.mockRejectedValue(new Error('rete'));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const res = await giro();
+    expect(res.blobsFailed).toBe(1);
+    expect(warn).toHaveBeenCalledWith('[postprod-retention] manifest delete failed', expect.objectContaining({ recordingId: 'rec-m' }));
+    warn.mockRestore();
   });
 });

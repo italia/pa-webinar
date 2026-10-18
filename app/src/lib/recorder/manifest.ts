@@ -1,9 +1,10 @@
 /**
  * Il manifesto `tracks.json` di una registrazione multitraccia segue le sue
- * tracce: lo cancellano i due lavori che cancellano tracce (multitrack-purge e
- * postprod-retention) quando della registrazione non resta nessuna traccia con
- * l'audio presente. Contiene i nomi in chiaro e nessuno lo legge dopo il
- * caricamento.
+ * tracce: lo cancellano i due lavori che cancellano tracce quando della
+ * registrazione non resta nessuna traccia con l'audio presente. Questo helper
+ * serve multitrack-purge, che segna le tracce e ne lascia le righe;
+ * postprod-retention cancella le righe e il manifesto insieme. Contiene i
+ * nomi in chiaro e nessuno lo legge dopo il caricamento.
  *
  * Best-effort: un errore resta un avviso nei log, e un manifesto che resta lo
  * trova la riconciliazione delle registrazioni, che lo vede orfano e lo
@@ -44,7 +45,8 @@ export async function cancellaManifestiSenzaTracce(
       }
     }
   } catch (err) {
-    console.warn('[recorder/manifest] track lookup failed', {
+    console.warn('[recorder/manifest] manifest cleanup failed', {
+      recordingIds: [...registrazioni.keys()],
       err: err instanceof Error ? err.message : String(err),
     });
   }
