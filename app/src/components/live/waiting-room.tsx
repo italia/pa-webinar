@@ -18,6 +18,7 @@ import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import { canStartManually } from '@/lib/events/lifecycle';
+import { nomiOrganizzatori } from '@/lib/events/organizer-names';
 import {
   annuncioApertura,
   statoIngresso,
@@ -1565,13 +1566,15 @@ export default function WaitingRoom({
   const nomiPersone = (lista: PersonaPubblica[]) =>
     lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
   const descrizione = event.riepilogo?.descrizione?.trim() || null;
+  // Chi organizza, come nel resto della piattaforma (lib/events/organizer-names).
+  const organizzatori = nomiOrganizzatori({ organizers: enti, organizerName: event.organizerName });
   // La bacheca della piazza: le stesse informazioni del riepilogo.
   const bacheca: DatiBacheca = {
     titolo: event.title,
     voci: [
       { etichetta: t('summaryWhen'), valore: `${dateLabel} · ${startTimeLabel} – ${endTimeLabel} (${durataTesto})` },
-      ...(enti.length > 0 || event.organizerName
-        ? [{ etichetta: te('detail.organizedBy'), valore: enti.length > 0 ? enti.map((e) => e.name).join(', ') : (event.organizerName ?? '') }]
+      ...(organizzatori
+        ? [{ etichetta: te('detail.organizedBy'), valore: organizzatori }]
         : []),
       ...(conduzione.length > 0 ? [{ etichetta: te('detail.peopleModerators'), valore: nomiPersone(conduzione) }] : []),
       ...(relatori.length > 0 || event.speakers
@@ -1769,13 +1772,13 @@ export default function WaitingRoom({
       durataTesto,
     ),
   ];
-  if (enti.length > 0 || event.organizerName) {
+  if (organizzatori) {
     fatti.push(
       fatto(
         'enti',
         svg(<><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M9 21v-6h6v6" /></>),
         te('detail.organizedBy'),
-        enti.length > 0 ? enti.map((e) => e.name).join(', ') : event.organizerName,
+        organizzatori,
       ),
     );
   }
