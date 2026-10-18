@@ -9,18 +9,31 @@
  *
  * Questo cron, frequente (es. ogni 15 min), trova le tracce non ancora
  * purgate il cui recording ha un job TRANSCRIBE_MULTITRACK DONE, elimina
- * il blob audio e marca `audioPurgedAt`. Idempotente.
+ * il blob audio e marca `audioPurgedAt`. Con l'ultima traccia di una
+ * registrazione cancella anche il suo manifesto `tracks.json`. Idempotente.
  *
  * Protetto da CRON_API_KEY.
  */
+
+import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { isEventEligibleForCleanup } from '@/lib/gdpr/cleanup-selection';
+import { cancellaManifestiSenzaTracce } from '@/lib/recorder/manifest';
 import { getPostprodStorage, isPostprodStorageConfigured } from '@/lib/storage/postprod';
 
 export const dynamic = 'force-dynamic';
+
+const SELEZIONE = {
+  id: true,
+  blobKey: true,
+  recordingId: true,
+  recording: { select: { eventId: true } },
+} satisfies Prisma.RecordingTrackSelect;
+
+type Traccia = Prisma.RecordingTrackGetPayload<{ select: typeof SELEZIONE }>;
 
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
@@ -31,7 +44,7 @@ export const GET = withErrorHandling(async (request) => {
 
   // Tracce ancora presenti il cui recording ha già completato la
   // trascrizione multi-traccia → audio grezzo non più necessario.
-  const tracks: Array<{ id: string; blobKey: string }> = await prisma.recordingTrack.findMany({
+  const tracks: Traccia[] = await prisma.recordingTrack.findMany({
     where: {
       audioPurgedAt: null,
       recording: {
@@ -62,7 +75,7 @@ export const GET = withErrorHandling(async (request) => {
         ],
       },
     },
-    select: { id: true, blobKey: true },
+    select: SELEZIONE,
     take: 500,
   });
 
@@ -107,7 +120,7 @@ export const GET = withErrorHandling(async (request) => {
               OR: [{ retentionUntil: null }, { retentionUntil: { lte: now } }],
             },
           },
-          select: { id: true, blobKey: true },
+          select: SELEZIONE,
           orderBy: { createdAt: 'asc' },
           take: 500,
         });
@@ -116,6 +129,8 @@ export const GET = withErrorHandling(async (request) => {
   const storage = getPostprodStorage();
   let purged = 0;
   let failed = 0;
+  // Registrazioni di cui questo giro ha cancellato almeno una traccia.
+  const toccate = new Map<string, string>();
   for (const t of tracks) {
     try {
       await storage.delete(t.blobKey);
@@ -124,11 +139,15 @@ export const GET = withErrorHandling(async (request) => {
         data: { audioPurgedAt: new Date() },
       });
       purged += 1;
+      toccate.set(t.recordingId, t.recording.eventId);
     } catch {
       // best-effort: riproveremo al prossimo tick (audioPurgedAt resta null)
       failed += 1;
     }
   }
+
+  // Il manifesto se ne va con l'ultima traccia della registrazione.
+  const manifestsDeleted = await cancellaManifestiSenzaTracce(storage, toccate);
 
   return Response.json({
     ok: true,
@@ -136,5 +155,6 @@ export const GET = withErrorHandling(async (request) => {
     untranscribedExpired: expired.length,
     purged,
     failed,
+    manifestsDeleted,
   });
 });

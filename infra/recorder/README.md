@@ -387,13 +387,14 @@ handles it with the least it needs:
   once the transcription has finished, unless the event keeps the tracks
   (**Keep per-participant tracks**). Durations, legal bases and consent are in
   [Recordings, voice data and AI outputs](../../docs/privacy/recordings-and-ai.md).
-- **Orphan sweep.** `recordings-reconcile` knows only the composite-video
-  links (`Event.recordingUrl`, `CallSession.recordingUrl`,
-  `CallSession.recordingFilename`). Every object under `recordings/multitrack/`
-  is therefore an orphan to it: `tracks.json` and any track audio still
-  present, including tracks kept with **Keep per-participant tracks**. They
-  are deleted after the orphan grace period unless an administrator marks them
-  **Keep** ([Orphans](../../docs/operations/recording-setup.md#orphans)).
+- **Orphan sweep.** While the event's data retention lasts,
+  `recordings-reconcile` knows every track whose audio is still present and
+  the `tracks.json` of its recording, and leaves them to the purge jobs, which
+  delete the manifest with the recording's last track. Under
+  `recordings/multitrack/` it sweeps files with no track row and tracks still
+  present after the event's retention, after the orphan grace period unless an
+  administrator marks them **Keep**
+  ([Orphans](../../docs/operations/recording-setup.md#orphans)).
 - **Local files.** In Kubernetes the tracks are written to an `emptyDir`
   capped by `recorder.workSizeLimit`, which is deleted with the pod.
 - **Logs.** The bot logs one line per captured track with its `trackFileId`,

@@ -26,6 +26,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { cancellaManifestiSenzaTracce } from '@/lib/recorder/manifest';
 import {
   deletePostprodBlob,
   getPostprodStorage,
@@ -54,7 +55,7 @@ async function purgeRecordingTracks(
   let blobsFailed = 0;
   const tracks = await prisma.recordingTrack.findMany({
     where: { recordingId },
-    select: { blobKey: true, audioPurgedAt: true },
+    select: { blobKey: true, audioPurgedAt: true, recording: { select: { eventId: true } } },
   });
   const storage = getPostprodStorage();
   for (const tr of tracks) {
@@ -71,6 +72,9 @@ async function purgeRecordingTracks(
     }
   }
   await prisma.recordingTrack.deleteMany({ where: { recordingId } });
+  // Senza piu' tracce, via anche il manifesto con i nomi.
+  const eventId = tracks[0]?.recording.eventId;
+  if (eventId) await cancellaManifestiSenzaTracce(storage, new Map([[recordingId, eventId]]));
   return { blobsDeleted, blobsFailed };
 }
 

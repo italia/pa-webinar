@@ -45,8 +45,7 @@ assessment belongs to the controller of each installation.
 - By default, a participant's isolated audio is deleted soon after it has been
   transcribed. It stays longer when the event is set to keep it (**Keep
   per-participant tracks**), or when transcription never completes. It then
-  goes at the event's retention, or earlier through the orphan sweep, provided
-  those jobs run.
+  goes at the event's retention, provided the purge job runs.
 - The event page labels transcripts, summaries and dubbed audio as
   machine-generated. Subtitles in the player and downloaded files carry no
   marker. The models used for a recording appear on the event page only when
@@ -223,9 +222,9 @@ flowchart LR
     store[("Object storage<br/>recordings/multitrack/…<br/>track audio + tracks.json")]
     tx["TRANSCRIBE_MULTITRACK<br/>worker job, no diarization"]
     keep{"Keep per-participant<br/>tracks?"}
-    purge["multitrack-purge<br/>audio deleted at the next run<br/>(default every 15 min)"]
+    purge["multitrack-purge<br/>audio deleted at the next run<br/>(default every 15 min),<br/>tracks.json with the last track"]
     retain["Tracks kept for the archive<br/>and per-speaker playback<br/>until the event's retention"]
-    orphan["recordings-reconcile orphan sweep<br/>any track file or tracks.json still present,<br/>deleted after orphanRecordingGraceDays<br/>unless marked Keep"]
+    orphan["recordings-reconcile orphan sweep<br/>only files with no track row:<br/>a failed upload or ingest, a manifest<br/>left behind, deleted after<br/>orphanRecordingGraceDays unless marked Keep"]
     out[("Transcript with speaker names<br/>PostprodArtifact<br/>its own retention regime")]
 
     gate -->|"checked for each track"| bot
@@ -235,7 +234,7 @@ flowchart LR
     tx --> keep
     keep -->|"no (default)"| purge
     keep -->|"yes (opt-in)"| retain
-    store -.->|"listed as orphans<br/>(on by default in the chart)"| orphan
+    store -.->|"files the database<br/>does not know"| orphan
 
     classDef risk fill:#FBE9EC,stroke:#D1344C,stroke-width:2px,color:#17324D
     classDef proc fill:#E6F0FA,stroke:#0066CC,color:#17324D
@@ -263,7 +262,9 @@ all three conditions:
 - the event does not keep its tracks.
 
 For each selected track, it deletes the audio file and stamps `audioPurgedAt`.
-The database row stays, with its encrypted name and timing, because the
+When no track of a recording has its audio left, it also deletes the
+recording's `tracks.json`, and `postprod-retention` does the same when it
+purges a recording's tracks. The database row stays, with its encrypted name and timing, because the
 transcript's attribution refers to it. The `cleanup` job deletes those rows
 when the event's data retention expires.
 
@@ -271,8 +272,7 @@ The purge job never selects a track whose transcription never finishes. That
 happens when the AI switch is off, when every track is silent (the recording is
 then marked `POSTPROD_FAILED`) or when the job fails for good. Those tracks
 wait for the event-bound retention pass described in
-[Retention regimes](#retention-regimes), unless the orphan sweep deletes them
-first (see [Operator responsibilities](#operator-responsibilities)).
+[Retention regimes](#retention-regimes).
 
 ### Keeping tracks
 
@@ -296,8 +296,7 @@ The purge job keeps retained tracks until the recording's own
 `Recording.retentionUntil`, but no screen or API sets that date. In practice,
 retained tracks are deleted by `postprod-retention` when the event's data
 retention expires (`endsAt` plus `dataRetentionDays`), whether or not the
-video is published. The orphan sweep can delete them earlier (see
-[Operator responsibilities](#operator-responsibilities)). The wizard warns
+video is published. The wizard warns
 whoever sets the option that it "extends retention of sensitive personal data
 (isolated voice) until the event's retention deadline".
 
@@ -314,7 +313,7 @@ privacy notice and in its own communication to participants.
 | Item | Where | Who can read it | Protection |
 |---|---|---|---|
 | Track audio | Object storage, `recordings/multitrack/<eventId>/<recordingId>/audio/` | The recorder bot writes each file through its own signed upload URL. The worker reads the files through signed URLs valid for its job lease. Staff play retained tracks | Never public. At-rest encryption is the storage provider's |
-| `tracks.json` | Same prefix | Anyone allowed to list the bucket | Display names in plain text |
+| `tracks.json` | Same prefix | Anyone allowed to list the bucket | Display names in plain text. Nothing reads it after the upload; the purge jobs delete it with the recording's last track |
 | Track rows (`RecordingTrack`) | PostgreSQL | The portal | Display name encrypted |
 | Downloadable archive | Object storage, `postprod/…/archive.mkv` | Staff who manage the event, through a signed URL | Never public |
 | Mixed audio | Inside the composite MP4 | Anyone who reaches the waiting room, guests included, through the temporary catch-up copy (24 hours); the public, once the video is published | See [Privacy and data protection](../GDPR.md) |
@@ -333,24 +332,27 @@ API, because it writes names into the transcript. Signed-URL mechanics are in
   transcription consumes when the event's data retention expires, so an
   installation that records without AI post-production also deletes its
   tracks on time.
-- **Docker Compose runs neither purge job, nor the orphan sweep.** On a single
-  VM with the `recorder` profile, schedule `postprod-retention` yourself: it is
-  the job that deletes tracks at the event's retention, together with
-  `multitrack-purge` ([how](../architecture/background-jobs.md#docker-compose)).
-- **The orphan sweep reaches every track file.** `recordings-reconcile` lists
-  every object under `recordings/` and knows only the composite video
+- **Docker Compose runs `multitrack-purge` and the orphan sweep, not
+  `postprod-retention`.** The `cron` service calls `multitrack-purge` and
+  `recordings-reconcile` when object storage is configured. On a single VM with
+  the `recorder` profile and AI post-production, schedule `postprod-retention`
+  yourself ([how](../architecture/background-jobs.md#docker-compose)).
+- **The orphan sweep is the backstop for tracks.** `recordings-reconcile`
+  lists every object under `recordings/` and knows the composite video
   (`Event.recordingUrl`, `CallSession.recordingUrl`,
-  `CallSession.recordingFilename`); no track key is in its known set. Every
-  track file still in storage (awaiting transcription, never transcribed, or
-  retained) and every `tracks.json` appears in the **Orphans** tab and is
-  deleted after `orphanRecordingGraceDays` (default in
-  `app/prisma/schema.prisma`; `0` turns the automatic deletion off) unless an
-  administrator marks it **Keep**. This happens even without post-production,
-  because `recordings-reconcile` is on by default
-  (`cronjobs.recordingsReconcile.enabled` in
-  `infra/helm/pa-webinar/values.yaml`) and does not depend on
-  `postprod.enabled`. The sweep deletes the files but does not update
-  `audioPurgedAt`.
+  `CallSession.recordingFilename`) and, while the event's data retention
+  lasts, every track whose audio is still present and the `tracks.json` of
+  its recording. During that window a track awaiting transcription, never
+  transcribed or retained is not an orphan: the purge jobs delete it by the
+  rules above. Past the event's retention, a track still present has escaped
+  them (a pipeline task stuck in the queue, `postprod-retention` not running)
+  and becomes an orphan. So do files with no track row (an upload whose
+  ingest failed, the files of a recording whose rows were deleted) and a
+  manifest whose deletion failed. The sweep deletes orphans after
+  `orphanRecordingGraceDays` (default in `app/prisma/schema.prisma`; `0` turns
+  the automatic deletion off) unless an administrator marks them **Keep**.
+  **Delete now** on a track deletes it at the next run, even inside the
+  retention window.
 - **Deleting an event or a call session deletes rows, not files.** Deleting an
   event removes its recordings, tracks, speaker records and AI outputs from
   the database by cascade, and every file stays in the bucket. Deleting a call
@@ -587,7 +589,7 @@ switch on ([AI post-production](../POSTPROD.md#the-event-report)).
 Three kinds of data follow different clocks:
 
 - **Raw track audio:** deleted after transcription, or at the event's
-  retention when kept, or earlier by the orphan sweep.
+  retention when kept or never transcribed.
 - **AI outputs:** artifacts, their machine versions, speaker records and job
   payloads.
 - **The composite video:** owned by [Privacy and data protection](../GDPR.md).
@@ -647,8 +649,7 @@ flowchart TD
 Tracks that are not retained are deleted after transcription on every branch;
 the diagram shows when the remaining ones go. The site-wide limit
 (`aiArtifactRetentionDays`), when set, deletes old outputs on every branch,
-a published transcript included. The orphan sweep can delete any
-track file earlier (see [Operator responsibilities](#operator-responsibilities)).
+a published transcript included.
 
 ### Event-bound purge
 
@@ -974,13 +975,8 @@ Retention and deletion:
 - **Files of earlier pipeline runs are never deleted.** After a re-run, the
   previous run's files under `postprod/` are no longer referenced by any row,
   and no job removes them.
-- **Track files show up as orphans.** The orphan sweep lists every track file
-  and `tracks.json`, retained or still awaiting transcription, and deletes it
-  after the grace period unless an administrator marks it **Keep**.
-- **`tracks.json` is removed only by the orphan sweep.** Neither purge job
-  deletes it.
-- **The purge jobs exist only with `postprod.enabled`.** On Docker Compose,
-  neither purge job nor the orphan sweep runs.
+- **`postprod-retention` exists only with `postprod.enabled`.** On Docker
+  Compose it does not run; `multitrack-purge` and the orphan sweep do.
 - **Deleting an event or a call session leaves files in storage.** Deleting a
   session removes only its composite video file; its track and output files
   stay, and `postprod/` files are never swept.

@@ -187,11 +187,20 @@ export async function listRecordingBlobs(): Promise<RecordingBlobEntry[]> {
   return entries.map((e) => ({
     // strip the `recordings/` prefix to keep backwards compat with
     // callers that only know filenames, not full keys
-    name: e.key.startsWith(KEY_PREFIX) ? e.key.slice(KEY_PREFIX.length) : e.key,
+    name: recordingBlobNameFromKey(e.key) ?? e.key,
     url: e.url,
     sizeBytes: e.sizeBytes,
     lastModified: e.lastModified,
   }));
+}
+
+/**
+ * Nome "nudo" (quello di `listRecordingBlobs`) di una chiave completa
+ * `recordings/…`, o null se la chiave sta fuori dal dominio delle
+ * registrazioni.
+ */
+export function recordingBlobNameFromKey(key: string): string | null {
+  return key.startsWith(KEY_PREFIX) ? key.slice(KEY_PREFIX.length) : null;
 }
 
 /** Delete by bare blob name (without the `recordings/` prefix). */

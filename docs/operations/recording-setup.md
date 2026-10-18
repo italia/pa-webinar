@@ -352,12 +352,10 @@ records no track at all
 
 Turn AI post-production on together with the recorder (`postprod.enabled: true`
 and, in the site settings, **Post-event pipeline active**). The tracks exist
-only to be transcribed, and the `multitrack-purge` job that deletes them after
-transcription renders only with `postprod.enabled` and deletes nothing until a
-transcription has finished. With the pipeline off, bots keep recording and the
-tracks stay in storage until the recording's retention job or the orphan sweep
-removes them ([Orphans](#orphans)). Setting up the pipeline is covered in
-[AI post-production](../POSTPROD.md).
+only to be transcribed. With the pipeline off, bots keep recording and the
+`multitrack-purge` job, which the chart renders with the recorder too, deletes
+the tracks only when the event's data retention expires. Setting up the
+pipeline is covered in [AI post-production](../POSTPROD.md).
 
 The controller checks for wanted bots every `recorder.controller.reconcileIntervalMs`
 (30 seconds in `values.yaml`). When the JVB scaler runs, the app also notifies
@@ -607,16 +605,18 @@ one does, its schedule and its Helm keys are in
 reference under **Video recordings**, tab **Orphans**, and deletes them after
 `orphanRecordingGraceDays` unless an administrator marks them **Keep**
 ([recordings-reconcile](../architecture/background-jobs.md#recordings-reconcile)).
-Two cases need an operator:
+While the event's data retention lasts, per-participant tracks whose audio is
+still present, and the `tracks.json` of their recordings, are not orphans: the
+purge jobs delete them by the event's rules. Under `recordings/multitrack/` the
+tab shows files with no track row, such as an upload whose ingest failed or the
+files of a deleted session, a manifest whose deletion failed, and tracks still
+present after the event's retention. **Delete now** on a track that is not an
+orphan deletes it at the next run as well.
+
+One case needs an operator:
 
 - **A video whose webhook failed.** It becomes an orphan. Review the tab after
   a failed recording and mark the file **Keep** before the grace period ends.
-- **Retained per-participant tracks.** Tracks and their manifests live under
-  `recordings/multitrack/`, which the database fields the job checks never
-  reference. With **Keep per-participant tracks** on, they are deleted after
-  the grace period whatever the event's retention says. Mark them **Keep**, or
-  set `orphanRecordingGraceDays` to `0` and review the tab by hand
-  ([Known limitations](../architecture/recording.md#known-limitations)).
 
 Before the first reconcile run after a database restore, read
 [After restoring a database backup](../architecture/background-jobs.md#after-restoring-a-database-backup).

@@ -25,6 +25,7 @@ import { NotFoundError, ValidationError } from '@/lib/errors';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { allTracksSilent, SILENCE_FLOOR_BYTES_PER_SEC } from '@/lib/ai/track-silence';
+import { multitrackRecordingPrefix } from '@/lib/recorder/lifecycle';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,7 +74,7 @@ export const POST = withErrorHandling(async (request) => {
   }
 
   // Path-confinement: ogni traccia deve vivere sotto il prefisso atteso.
-  const prefix = `recordings/multitrack/${eventId}/${recordingId}/`;
+  const prefix = multitrackRecordingPrefix(eventId, recordingId);
   for (const t of tracks) {
     if (!t.blobKey.startsWith(prefix)) {
       throw new ValidationError(

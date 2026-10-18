@@ -32,7 +32,7 @@ flowchart LR
     SCALER["jvb-scaler<br/>kubectl + curl"]:::job
     ORCH["postprod-orchestrator<br/>kubectl + curl"]:::job
   end
-  COMPOSE["Compose cron service<br/>email-outbox · lifecycle<br/>reminders · cleanup"]:::job
+  COMPOSE["Compose cron service<br/>email-outbox · lifecycle<br/>reminders · cleanup<br/>multitrack-purge · recordings-reconcile<br/>rubrica-retention"]:::job
 
   subgraph PORTAL["Portal: the only decision maker and writer"]
     direction TB
@@ -112,7 +112,7 @@ Every CronJob is named `<release>-<job>`, where `<release>` is the chart's full 
 | `postprod-orchestrator` | `GET /api/internal/postprod-pending`, then the Kubernetes API | `postprod.orchestrator.schedule` (`* * * * *`) | `postprod.enabled` (default `false`) and `postprod.orchestrator.enabled` |
 | `postprod-reclaim` | `GET /api/cron/postprod-reclaim` | `postprod.reclaim.schedule` (`* * * * *`) | `postprod.enabled` and `postprod.reclaim.enabled` |
 | `postprod-retention` | `GET /api/cron/postprod-retention` | `postprod.retention.schedule` (`30 3 * * *`) | `postprod.enabled` and `postprod.retention.enabled` |
-| `multitrack-purge` | `GET /api/cron/multitrack-purge` | `postprod.multitrackPurgeSchedule`, not declared in `values.yaml`; the template falls back to `*/15 * * * *` | `postprod.enabled` (no key of its own) |
+| `multitrack-purge` | `GET /api/cron/multitrack-purge` | `postprod.multitrackPurgeSchedule`, not declared in `values.yaml`; the template falls back to `*/15 * * * *` | `postprod.enabled` or `recorder.enabled` (no key of its own) |
 | `web-config-reload` hook | Kubernetes API (`kubectl rollout restart`) | none: a Helm `post-install` and `post-upgrade` hook | `configReloadHook.enabled` (default `true`) |
 
 More objects render as CronJobs but never run on a schedule: `postprod-worker`, `postprod-worker-cpu` and `recorder`. They are suspended templates (see [Suspended CronJobs as Job templates](#suspended-cronjobs-as-job-templates)). The recorder controller is a Deployment, not a CronJob (see [Long-running controllers](#long-running-controllers)).
@@ -153,9 +153,9 @@ It also deletes staff sign-in link rows one day after they were used or expired,
 
 ### recordings-reconcile
 
-**Does.** The job lists every object under `recordings/` in the recordings storage domain. It records each object that no `Event.recordingUrl`, `CallSession.recordingUrl` or `CallSession.recordingFilename` references as an orphan in `orphan_recordings`. It forgets orphan rows whose object has disappeared. It then sweeps: it deletes orphans marked **Delete now**, and pending orphans discovered more than `orphanRecordingGraceDays` ago (a `SiteSetting` field, default in `app/prisma/schema.prisma`; `0` disables the time-based sweep). Orphans marked **Keep** are never deleted. Administrators see and decide on orphans in the **Orphans** tab of **Video recordings** (`/admin/recordings`). It is the only curl job that uses `POST`. When recording storage is not configured, it answers `skipped: true`.
+**Does.** The job lists every object under `recordings/` in the recordings storage domain. It records each object that no `Event.recordingUrl`, `CallSession.recordingUrl` or `CallSession.recordingFilename` references as an orphan in `orphan_recordings`, except, while the event's data retention lasts, a per-participant track whose audio is still present and the `tracks.json` of its recording. **Delete now** on such a track still applies. It forgets orphan rows whose object has disappeared. It then sweeps: it deletes orphans marked **Delete now**, and pending orphans discovered more than `orphanRecordingGraceDays` ago (a `SiteSetting` field, default in `app/prisma/schema.prisma`; `0` disables the time-based sweep). Orphans marked **Keep** are never deleted. Administrators see and decide on orphans in the **Orphans** tab of **Video recordings** (`/admin/recordings`). It is the only curl job that uses `POST`. When recording storage is not configured, it answers `skipped: true`.
 
-**If it does not run.** Recording files that lost their link to an event, for example after a failed upload webhook, stay in storage indefinitely. The **Orphans** tab stays empty. This job also removes the per-participant objects that the purge jobs leave behind; see [Known limitations](#known-limitations) and [recording.md](recording.md#background-jobs-that-touch-recordings).
+**If it does not run.** Recording files that lost their link to an event, for example after a failed upload webhook, stay in storage indefinitely. The **Orphans** tab stays empty. This job is also the backstop for per-participant files: those with no track row, such as the files of a recording whose rows were deleted, a manifest whose deletion failed, and tracks still present after the event's data retention ([recording.md](recording.md#background-jobs-that-touch-recordings)).
 
 ### rubrica-retention
 
@@ -189,9 +189,9 @@ It also deletes staff sign-in link rows one day after they were used or expired,
 
 ### multitrack-purge
 
-**Does.** The job deletes the audio object of each per-participant track once the multitrack transcription of its recording has completed, and stamps `audioPurgedAt` on the track. It skips recordings that still have a multitrack transcription or archive task pending or running. When an event keeps its tracks (**Keep per-participant tracks**), it waits for `Recording.retentionUntil`, which the application never sets, so retained tracks are in practice removed by `postprod-retention` at the end of the event's retention ([privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md#keeping-tracks)). The transcript stays. The track audio, isolated voice data, does not. Details are in [recording.md](recording.md) and [privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md).
+**Does.** The job deletes the audio object of each per-participant track once the multitrack transcription of its recording has completed, and stamps `audioPurgedAt` on the track. A track that no transcription consumes goes when the event's data retention expires. When no track of a recording has its audio left, it also deletes the recording's `tracks.json`, as `postprod-retention` does when it purges a recording's tracks. It skips recordings that still have a multitrack transcription or archive task pending or running. When an event keeps its tracks (**Keep per-participant tracks**), it waits for `Recording.retentionUntil`, which the application never sets, so retained tracks are in practice removed by `postprod-retention` at the end of the event's retention ([privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md#keeping-tracks)). The transcript stays. The track audio, isolated voice data, does not. Details are in [recording.md](recording.md) and [privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md).
 
-**If it does not run.** Isolated voice audio stays in storage until `postprod-retention` removes it at the end of the event's retention window, instead of minutes after transcription. The job renders only with `postprod.enabled`. An installation that enables `recorder.enabled` without `postprod.enabled` records tracks that neither purge job deletes. Only the orphan sweep of `recordings-reconcile` eventually removes them (see [Known limitations](#known-limitations)).
+**If it does not run.** Isolated voice audio stays in storage until `postprod-retention` removes it at the end of the event's retention window, instead of minutes after transcription. Without post-production, where `postprod-retention` is not rendered, nothing deletes the tracks. The job renders with `postprod.enabled` or `recorder.enabled`.
 
 ### web-config-reload hook
 
@@ -214,7 +214,7 @@ The CronJob templates (`infra/helm/pa-webinar/templates/cronjob-*.yaml`) share t
 
 ## Docker Compose
 
-The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls four routes with the same `x-api-key` header (`docker-compose.yml`):
+The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls seven routes with the same `x-api-key` header (`docker-compose.yml`):
 
 | Job | Chart default | Compose |
 |---|---|---|
@@ -222,8 +222,11 @@ The Compose stack is the development loop, not an installation, and it has no Cr
 | `lifecycle` | every minute, without the scaler | every minute |
 | `reminders` | every 15 minutes | every 5 minutes |
 | `cleanup` | daily at 03:00 | every hour |
+| `multitrack-purge` | every 15 minutes | every 15 minutes |
+| `recordings-reconcile` | every 6 hours | every 6 hours |
+| `rubrica-retention` | daily at 04:00 | every 24 hours |
 
-Some cadences differ from the chart's. All four routes also run once when the service starts. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
+Some cadences differ from the chart's. All seven routes also run once when the service starts. `multitrack-purge` and `recordings-reconcile` answer `skipped: true` until object storage is configured. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
 
 Running the cleanup every hour does not delete anything earlier: retention is computed per event, so data is removed within an hour of expiry instead of within a day.
 
@@ -231,10 +234,8 @@ Nothing else runs on a schedule on a single VM:
 
 | Not run in Compose | Consequence |
 |---|---|
-| `rubrica-retention` | Opted-out and inactive address-book records are never deleted. |
-| `recordings-reconcile` | Orphan recording files are never listed or swept. |
 | `jvb-scaler` | Nothing to lose: the `lifecycle` route opens and closes events, without pre-scale or `IDLE` ([event-lifecycle.md](event-lifecycle.md#running-without-the-scaler)), and the Compose stack runs one bridge. |
-| `multitrack-purge`, `postprod-retention` | With the `recorder` profile, per-participant tracks are never deleted by a job. |
+| `postprod-retention` | AI outputs are never deleted by a job, and with the `recorder` profile neither are tracks that the event keeps after their transcription. Nothing to do without AI post-production. |
 | `postprod-orchestrator`, `postprod-reclaim` | Nothing to do: AI post-production does not run on a single VM. |
 | `web-config-reload` hook | Restart `jitsi-web` yourself after changing its configuration. |
 
@@ -381,7 +382,5 @@ A job that acts on the cluster also needs its own ServiceAccount and a namespace
 ## Known limitations
 
 - **Green does not mean healthy.** Routes absorb per-item failures and still return 2xx, and the `kubectl` jobs exit successfully when the portal does not answer. The chart ships no alert rule for scheduled jobs, the email outbox or retention. Only a cluster-wide rule such as `KubeJobFailed`, where installed, sees Failed Jobs. See [operations/monitoring.md](../operations/monitoring.md) and the open item in [ROADMAP.md](../ROADMAP.md).
-- **Per-participant objects look like orphans.** `recordings-reconcile` lists everything under `recordings/`, including `recordings/multitrack/`, and none of the fields it checks references those objects. Retained tracks and track manifests therefore appear in the **Orphans** tab and are deleted after the grace period unless marked **Keep**, whatever the event's track retention says ([recording.md](recording.md#known-limitations)).
 - **Sent email is kept.** No job deletes rows from `email_outbox`. Sent and failed messages stay in the table. The recipient address and the bodies are encrypted at rest; the subject is not.
-- **Tracks without post-production.** `multitrack-purge` and `postprod-retention` render only with `postprod.enabled`. With the recorder on and post-production off, no job deletes per-participant track audio on purpose. Only the orphan sweep above removes it, after the grace period and regardless of the event's retention settings.
 - **NetworkPolicy and recorder bots.** With `networkPolicy.enabled`, per-participant recorder bots cannot reach the portal until a `networkPolicy.ingress.extraRules` entry admits pods labeled `app.kubernetes.io/component: recorder` ([Before enabling the NetworkPolicy](#before-enabling-the-networkpolicy)). The other jobs are admitted by the policy itself.

@@ -18,7 +18,7 @@ import { prisma } from '@/lib/db';
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import { presignArtifactUpload } from '@/lib/storage/postprod';
 import { isConfinedBlobKey } from '@/lib/recorder/blob-key';
-import { MULTITRACK_PREFIX } from '@/lib/recorder/lifecycle';
+import { multitrackRecordingPrefix } from '@/lib/recorder/lifecycle';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +55,7 @@ export const POST = withErrorHandling(async (request) => {
   // vedi isConfinedBlobKey per i casi che lascerebbe passare (`..`, `%2e%2e`,
   // doppie barre). Questa rotta consegna un permesso di SCRITTURA su storage
   // condiviso: la key deve stare dentro la cartella di QUESTA registrazione.
-  const prefix = `${MULTITRACK_PREFIX}${recording.eventId}/${recordingId}/`;
+  const prefix = multitrackRecordingPrefix(recording.eventId, recordingId);
   if (!isConfinedBlobKey(blobKey, prefix)) {
     throw new ValidationError(
       `blobKey "${blobKey}" non confinata sotto il prefisso atteso "${prefix}"`,

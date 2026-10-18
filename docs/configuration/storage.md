@@ -702,10 +702,6 @@ Known gaps:
   deleted after the grace period unless it is marked **Keep**. On AWS S3
   without an endpoint the names match. Jibri recordings are not affected,
   because `CallSession.recordingFilename` matches.
-- **Per-participant objects are flagged as orphans.** Objects under
-  `recordings/multitrack/` are referenced by none of the fields above, so
-  retained tracks and every `tracks.json` go through the orphan sweep (see
-  [Recording](../architecture/recording.md#known-limitations)).
 - **Backup only for a store in the cluster.** The `--include-storage`
   option of `scripts/backup.sh` and `scripts/restore.sh` covers an object
   store on a volume of the cluster, such as the Garage add-on of one k3s

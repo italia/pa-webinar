@@ -5,7 +5,8 @@
  *
  *  1. **Reconcile** — enumerate every blob in the recordings container,
  *     compare against Event.recordingUrl + CallSession.recordingUrl +
- *     CallSession.recordingFilename, and upsert rows in
+ *     CallSession.recordingFilename + the per-participant tracks still
+ *     present (and their manifest), and upsert rows in
  *     `orphan_recordings` for blobs that aren't linked anywhere. Each
  *     upsert refreshes `last_seen_at`. Rows whose blob has vanished
  *     from the bucket are removed.
@@ -28,13 +29,19 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { isEventEligibleForCleanup } from '@/lib/gdpr/cleanup-selection';
+import { MULTITRACK_PREFIX, multitrackManifestKey } from '@/lib/recorder/lifecycle';
 import {
   isRecordingStorageConfigured,
   listRecordingBlobs,
   deleteRecordingBlobByName,
+  recordingBlobNameFromKey,
 } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
+
+/** La cartella delle registrazioni multitraccia, nei nomi di `listRecordingBlobs`. */
+const MULTITRACK_FOLDER = recordingBlobNameFromKey(MULTITRACK_PREFIX) ?? MULTITRACK_PREFIX;
 
 interface ReconcileResult {
   scanned: number;
@@ -94,7 +101,7 @@ async function runReconcile() {
   // Build the "known" set: every blob name the DB knows about.
   // Event.recordingUrl + CallSession.recordingUrl carry absolute URLs,
   // CallSession.recordingFilename carries the bare blob name.
-  const [eventLinks, sessionLinks] = await Promise.all([
+  const [eventLinks, sessionLinks, tracks, deleteNowTracks] = await Promise.all([
     prisma.event.findMany({
       where: { recordingUrl: { not: null } },
       select: { recordingUrl: true },
@@ -107,6 +114,29 @@ async function runReconcile() {
         ],
       },
       select: { recordingUrl: true, recordingFilename: true },
+    }),
+    // Tracce per partecipante con l'audio ancora presente: le cancellano
+    // multitrack-purge e postprod-retention, con le regole dell'evento.
+    prisma.recordingTrack.findMany({
+      where: { audioPurgedAt: null },
+      select: {
+        blobKey: true,
+        recordingId: true,
+        recording: {
+          select: {
+            eventId: true,
+            event: {
+              select: { status: true, endsAt: true, lastActiveAt: true, dataRetentionDays: true },
+            },
+          },
+        },
+      },
+    }),
+    // "Elimina subito" chiesto dall'amministrazione su una traccia vale anche
+    // se la traccia e' conosciuta.
+    prisma.orphanRecording.findMany({
+      where: { decision: 'delete-now', blobName: { startsWith: MULTITRACK_FOLDER } },
+      select: { blobName: true },
     }),
   ]);
 
@@ -123,6 +153,22 @@ async function runReconcile() {
       if (name) knownBlobNames.add(name);
     }
     if (row.recordingFilename) knownBlobNames.add(row.recordingFilename);
+  }
+
+  // Una traccia, e il manifesto della sua registrazione, sono conosciuti
+  // finche' i dati dell'evento sono in conservazione. Oltre, una traccia
+  // ancora presente e' sfuggita ai lavori che la cancellano (un lavoro della
+  // pipeline bloccato, la conservazione AI spenta): diventa orfana, e la
+  // tolleranza la cancella.
+  const deleteNow = new Set(deleteNowTracks.map((r) => r.blobName));
+  for (const track of tracks) {
+    if (isEventEligibleForCleanup(track.recording.event, runStartedAt)) continue;
+    const name = recordingBlobNameFromKey(track.blobKey);
+    if (name && !deleteNow.has(name)) knownBlobNames.add(name);
+    const manifest = recordingBlobNameFromKey(
+      multitrackManifestKey(track.recording.eventId, track.recordingId),
+    );
+    if (manifest) knownBlobNames.add(manifest);
   }
 
   const blobs = await listRecordingBlobs();

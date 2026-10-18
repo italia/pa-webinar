@@ -601,11 +601,11 @@ on a single VM, where Jibri is impractical.
 As shipped, the Compose file does not complete a recording; the missing
 settings are listed in
 [Setting up recording](../operations/recording-setup.md#docker-compose-the-recorder-profile).
-Its `cron` loop calls only `email-outbox`, `reminders` and `cleanup`: without
-`multitrack-purge`, `postprod-retention` and `recordings-reconcile`, nothing
-removes track audio or `tracks.json` files, and without
-`jvb-desired-replicas` the edge trigger never fires (the reconcile tick still
-runs).
+Its `cron` loop calls `multitrack-purge` and `recordings-reconcile` among
+the others, so track audio and `tracks.json` files go as in the chart, except
+for tracks that an event keeps after an AI transcription, which need
+`postprod-retention`. Without `jvb-desired-replicas` the edge trigger never
+fires (the reconcile tick still runs).
 
 ### Images
 
@@ -743,7 +743,9 @@ never sets, so kept tracks are deleted by `postprod-retention` once the event
 is `ENDED` or `ARCHIVED` and its data retention (`endsAt` +
 `dataRetentionDays`) has passed, whether or not the video is published. That
 job exists in the chart only when `postprod.enabled` and
-`postprod.retention.enabled` are both true. The retention regimes are
+`postprod.retention.enabled` are both true. Without post-production no
+transcription consumes the tracks, kept or not, and `multitrack-purge` deletes
+them at the same point. The retention regimes are
 described in [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md).
 
 ### Background jobs that touch recordings
@@ -751,9 +753,9 @@ described in [Recordings, voice data and AI outputs](../privacy/recordings-and-a
 | Job | What it does to recordings |
 |---|---|
 | `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, clears the participant lists of its call sessions, and, unless the video or the transcript is published, deletes the transcript from captions (with the whole recording when it holds nothing else). |
-| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. In the chart it exists only when `postprod.enabled` is true. |
+| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
 | `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for an event whose video is published it purges only the tracks, and for one whose transcript alone is published it keeps only the transcript. See [AI post-production](../POSTPROD.md). |
-| `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
+| `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`, and, while the event's data retention lasts, with the keys of the per-participant tracks whose audio is still present and the `tracks.json` of their recordings. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
 
 Schedules, Helm keys and what breaks when a job does not run are in
 [Scheduled and background jobs](background-jobs.md).
@@ -845,12 +847,6 @@ link or publicly. From here on, the pipeline is described in
   (30 days by default in `schema.prisma`), even when it is published, unless an
   administrator marks it **Keep**. The chart runs the job by default
   (`cronjobs.recordingsReconcile.enabled: true` in `values.yaml`).
-- **Orphan sweep and multitrack objects.** `recordings-reconcile` also lists
-  the objects under `recordings/multitrack/`, which none of the fields it
-  checks reference. Retained tracks and every `tracks.json` therefore appear as
-  orphans and are deleted after the grace period unless marked **Keep**. The
-  purge jobs delete track audio but not `tracks.json`, which holds display
-  names in plain text; in practice the orphan sweep is what removes it.
 - **No automatic transcript when the recorder captures nothing.** On an event
   with per-participant recording, the Jibri webhook does not enqueue
   post-production. If the recorder produced no tracks, no pipeline starts

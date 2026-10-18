@@ -20,6 +20,24 @@ import type { Prisma, PrismaClient } from '@prisma/client';
 /** Prefisso (marker) delle registrazioni multi-traccia in object storage. */
 export const MULTITRACK_PREFIX = 'recordings/multitrack/';
 
+/**
+ * Cartella di una registrazione multitraccia, con la barra finale: tracce e
+ * manifesto stanno qui sotto (`infra/recorder/src/paths.ts`).
+ */
+export function multitrackRecordingPrefix(eventId: string, recordingId: string): string {
+  return `${MULTITRACK_PREFIX}${eventId}/${recordingId}/`;
+}
+
+/**
+ * Chiave del manifesto che il recorder carica accanto alle tracce. Né il
+ * portale né il worker lo leggono: i dati arrivano con l'ingest. Contiene però
+ * i nomi in chiaro, quindi segue le tracce: resta finché ne resta una e si
+ * cancella con l'ultima (`lib/recorder/manifest`).
+ */
+export function multitrackManifestKey(eventId: string, recordingId: string): string {
+  return `${multitrackRecordingPrefix(eventId, recordingId)}tracks.json`;
+}
+
 /** True se la Recording è un segnaposto multitraccia (non ancora il mix). */
 export function isMultitrackPlaceholder(blobKey: string): boolean {
   return blobKey.startsWith(MULTITRACK_PREFIX);
