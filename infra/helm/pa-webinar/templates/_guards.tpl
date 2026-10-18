@@ -235,17 +235,19 @@ finche' il tag non e' scritto.
 
 Si confronta la versione nella forma `stable-<numero>` o `unstable-<numero>`,
 con quello che segue (`-rnnoise`, una revisione, un digest) ignorato. I tag
-mobili `stable`, `unstable` e `latest` contano per quello che sono: non dicono
-una versione, e accanto a una versione fissata la resa si ferma. Un tag di
+mobili `stable`, `unstable` e `latest` contano per quello che sono, anche con
+un digest: non dicono una versione, e accanto a una versione fissata la resa
+si ferma. Un tag di
 forma diversa, per esempio quello di un registro interno con una numerazione
 propria, non viene riconosciuto e non blocca la resa.
 */}}
 {{/* La versione di Jitsi in un tag, o vuoto se il tag non ne dice una. */}}
 {{- define "pa-webinar.jitsiVersion" -}}
-{{- if has . (list "stable" "unstable" "latest") -}}
-{{- . -}}
+{{- $tag := regexReplaceAll "@.*$" . "" -}}
+{{- if has $tag (list "stable" "unstable" "latest") -}}
+{{- $tag -}}
 {{- else -}}
-{{- regexFind "^(stable|unstable)-[0-9]+" . -}}
+{{- regexFind "^(stable|unstable)-[0-9]+" $tag -}}
 {{- end -}}
 {{- end -}}
 

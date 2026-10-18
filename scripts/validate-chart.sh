@@ -284,6 +284,39 @@ for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua mod_pa_capt
   fi
 done
 
+# Lo stack Docker Compose usa il rilascio di Jitsi del chart: Prosody, Jicofo
+# e il bridge con lo stesso tag, la parte web con l'immagine originale dello
+# stesso rilascio (il chart usa quella patchata, con un suffisso).
+if ! python3 - docker-compose.yml "$CHART/values.yaml" >"$OUT/compose-jitsi.err" 2>&1 <<'PY'
+import re
+import sys
+
+import yaml
+
+servizi = yaml.safe_load(open(sys.argv[1]))["services"]
+jitsi = yaml.safe_load(open(sys.argv[2])).get("jitsi-meet") or {}
+
+
+def versione(tag):
+    trovata = re.match(r"^(stable|unstable)-[0-9]+", str(tag or ""))
+    return trovata.group(0) if trovata else str(tag)
+
+
+diversi = []
+for servizio, componente in (("jitsi-web", "web"), ("prosody", "prosody"), ("jicofo", "jicofo"), ("jvb", "jvb")):
+    immagine = servizi[servizio]["image"]
+    tag = immagine.rsplit(":", 1)[1] if ":" in immagine.split("/")[-1] else "latest"
+    atteso = versione(((jitsi.get(componente) or {}).get("image") or {}).get("tag"))
+    if versione(tag) != atteso:
+        diversi.append(f"{servizio}={tag} (chart: {atteso})")
+if diversi:
+    print(", ".join(diversi))
+    sys.exit(1)
+PY
+then
+  errore "docker-compose.yml non usa il rilascio di Jitsi del chart: $(cat "$OUT/compose-jitsi.err")"
+fi
+
 echo "helm lint"
 # Con i soli valori predefiniti la resa si ferma alla guardia sul segreto JWT
 # della conferenza, e il lint non guarderebbe gli altri template.
@@ -1525,6 +1558,8 @@ deve_fallire "componente su un tag mobile accanto a versioni fissate" "jvb=stabl
   --set jitsi-meet.jvb.image.tag=stable
 deve_fallire "parte web su una versione unstable" "web=unstable-" \
   --set jitsi-meet.web.image.tag=unstable-11200
+deve_fallire "componente su un tag mobile con digest" "jvb=stable@" \
+  --set 'jitsi-meet.jvb.image.tag=stable@sha256:0000000000000000000000000000000000000000000000000000000000000000'
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del
 # sottochart che il chart non può ricavare.
 deve_fallire "site.portalHost con lo schema" "site.portalHost" \
