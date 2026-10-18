@@ -134,10 +134,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  // JWT is minted only when the bridge is ready (LIVE) or the event is still
-  // in the pre-start window (PUBLISHED). For PROVISIONING/IDLE the frontend
-  // must first transition through the ProvisioningScreen; handing out a JWT
-  // now would drop the user on a cold JVB.
+  // JWT is minted only when the bridge is ready (LIVE) or, for moderators and
+  // speakers, in the pre-start window (PUBLISHED). For PROVISIONING/IDLE the
+  // frontend must first transition through the ProvisioningScreen; handing
+  // out a JWT now would drop the user on a cold JVB.
   if (!['PUBLISHED', 'LIVE'].includes(event.status)) {
     throw new ConflictError('Event is not active', { currentStatus: event.status });
   }
@@ -212,6 +212,14 @@ export const POST = withErrorHandling(async (request, context) => {
 
     if (!registration || registration.eventId !== event.id) {
       throw new ForbiddenError('Invalid access token');
+    }
+
+    // Chi partecipa entra a evento iniziato: prima la sala d'attesa lo fa
+    // aspettare, e il token non deve aprirgli la conferenza direttamente.
+    // Chi modera o interviene entra anche prima (ramo sopra), gli ospiti solo
+    // in diretta (ramo sotto).
+    if (event.status !== 'LIVE') {
+      throw new ConflictError('Event is not live yet', { currentStatus: event.status });
     }
 
     // The accessToken lives in the personal join link, so a FORWARDED link would

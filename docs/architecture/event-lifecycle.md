@@ -270,12 +270,12 @@ Transitions lag their nominal time by up to one lifecycle interval (one minute).
 Two layers decide whether someone gets into the conference: the waiting room, and the Jitsi token endpoint `POST /api/events/<slug>/jitsi/token`.
 
 - **The waiting room** enables its join button only when the event is `LIVE`, for every role. Moderators reach `LIVE` from `PUBLISHED`, `PROVISIONING` or `IDLE` with **Start event**.
-- **The token endpoint** mints a JWT only when the event is `PUBLISHED` or `LIVE`, and only when the event is `LIVE` for guests without a token. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on and the event is not `INVITATION` (otherwise `403`).
+- **The token endpoint** mints a JWT for a moderator or speaker link when the event is `PUBLISHED` or `LIVE`, and for a registrant, someone opening a forwarded registration link, or a guest without a token only when the event is `LIVE`. Any other status gets `409`. Guests also need guest access to be allowed: always for instant calls, and for scheduled events only while the `guestAccessEnabled` site setting is on and the event is not `INVITATION` (otherwise `403`).
 
 | Status | Moderator or speaker link | Registrant | Guest (no token) |
 |---|---|---|---|
 | `DRAFT` | `409` | `409` | `409` |
-| `PUBLISHED` | Token issued; the waiting room still waits for `LIVE` | Token issued; the waiting room still waits for `LIVE` | `409`; the live URL redirects to registration |
+| `PUBLISHED` | Token issued; the waiting room still waits for `LIVE` | `409`; the waiting room waits for `LIVE` | `409`; the live URL redirects to registration |
 | `PROVISIONING`, `IDLE` | `409` | `409` | `409`; scheduled events redirect to registration (so tokenless guests cannot wake an `IDLE` room); instant calls show the waiting room |
 | `LIVE` | Token issued | Token issued | Token issued when guest access is allowed, rate-limited per IP |
 | `ENDED`, `ARCHIVED` | `409` | `409` | `409`; the live URL redirects to the event page (instant calls answer 404) |
