@@ -286,18 +286,22 @@ done
 
 # Lo stack Docker Compose usa il rilascio di Jitsi del chart: Prosody, Jicofo
 # e il bridge con lo stesso tag, la parte web con l'immagine originale dello
-# stesso rilascio (il chart usa quella patchata, con un suffisso). La versione
-# si legge come la guardia pa-webinar.validateJitsiVersions: digest tolto, tag
-# mobili per quello che sono, una forma diversa non confrontata. Un tag vuoto
-# nel chart vale la versione del sottochart, che la guardia controlla.
-if ! python3 - docker-compose.yml "$CHART/values.yaml" >"$OUT/compose-jitsi.err" 2>&1 <<'PY'
+# stesso rilascio (il chart usa quella patchata, con un suffisso). Nel chart la
+# versione si legge come la guardia pa-webinar.validateJitsiVersions: digest
+# tolto, tag mobili per quello che sono, una forma diversa non confrontata, un
+# tag vuoto come la versione del sottochart. Compose usa solo le immagini
+# pubbliche di Jitsi: un suo tag che non dice il rilascio è un errore.
+if ! python3 - docker-compose.yml "$CHART" >"$OUT/compose-jitsi.err" 2>&1 <<'PY'
+import glob
 import re
 import sys
+import tarfile
 
 import yaml
 
 servizi = yaml.safe_load(open(sys.argv[1])).get("services") or {}
-jitsi = yaml.safe_load(open(sys.argv[2])).get("jitsi-meet") or {}
+chart = sys.argv[2]
+jitsi = yaml.safe_load(open(f"{chart}/values.yaml")).get("jitsi-meet") or {}
 
 
 def versione(tag):
@@ -308,13 +312,18 @@ def versione(tag):
     return trovata.group(0) if trovata else None
 
 
+def versione_sottochart():
+    for archivio in glob.glob(f"{chart}/charts/jitsi-meet-*.tgz"):
+        with tarfile.open(archivio) as tgz:
+            return (yaml.safe_load(tgz.extractfile("jitsi-meet/Chart.yaml")) or {}).get("appVersion")
+    return None
+
+
 def tag_compose(immagine):
-    nome, _, digest = immagine.partition("@")
-    ultimo = nome.split("/")[-1]
-    if ":" in ultimo:
-        return ultimo.rsplit(":", 1)[1]
-    # Solo il digest non dice il rilascio; senza niente vale latest.
-    return None if digest else "latest"
+    nome = immagine.split("@", 1)[0].split("/")[-1]
+    if ":" in nome:
+        return nome.rsplit(":", 1)[1]
+    return None if "@" in immagine else "latest"
 
 
 problemi = []
@@ -323,14 +332,14 @@ for servizio, componente in (("jitsi-web", "web"), ("prosody", "prosody"), ("jic
     if not immagine:
         problemi.append(f"{servizio}: nessuna immagine nel servizio")
         continue
-    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag")
-    if not tag_chart:
-        continue
     tag = tag_compose(immagine)
-    if tag is None:
+    trovata = versione(tag) if tag else None
+    if not trovata:
+        problemi.append(f"{servizio}: il tag di {immagine} non dice il rilascio di Jitsi")
         continue
-    attesa, trovata = versione(tag_chart), versione(tag)
-    if attesa and trovata and attesa != trovata:
+    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag") or versione_sottochart()
+    attesa = versione(tag_chart) if tag_chart else None
+    if attesa and attesa != trovata:
         problemi.append(f"{servizio}={tag} (chart: {tag_chart})")
 if problemi:
     print(", ".join(problemi))
