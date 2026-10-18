@@ -292,7 +292,8 @@ done
 # si dice), un tag vuoto come la versione del sottochart. Compose usa solo le
 # immagini pubbliche di Jitsi: un suo tag che la guardia non saprebbe leggere
 # (refuso, variabile, solo digest) è un errore.
-if ! python3 - docker-compose.yml "$CHART" >"$OUT/compose-jitsi.err" 2>&1 <<'PY'
+if ! python3 - docker-compose.yml "$CHART" >"$OUT/compose-jitsi.err" 2>"$OUT/compose-jitsi.note" <<'PY'
+import functools
 import os
 import re
 import sys
@@ -313,21 +314,23 @@ def versione(tag):
     return trovata.group(0) if trovata else None
 
 
-def leggi_versione_sottochart():
-    # Il sottochart che Helm usa: quello del Chart.lock, in archivio o già
-    # spacchettato.
-    bloccate = (yaml.safe_load(open(f"{chart}/Chart.lock")) or {}).get("dependencies") or []
-    versione_chart = next((d.get("version") for d in bloccate if d.get("name") == "jitsi-meet"), None)
-    if os.path.exists(f"{chart}/charts/jitsi-meet/Chart.yaml"):
+@functools.cache
+def versione_sottochart():
+    # Il sottochart che Helm usa: l'archivio della versione nel Chart.lock;
+    # senza, una copia spacchettata. Se non si trova, None.
+    try:
+        bloccate = (yaml.safe_load(open(f"{chart}/Chart.lock")) or {}).get("dependencies") or []
+        versione_chart = next((d.get("version") for d in bloccate if d.get("name") == "jitsi-meet"), None)
+        archivio = f"{chart}/charts/jitsi-meet-{versione_chart}.tgz"
+        if versione_chart and os.path.exists(archivio):
+            with tarfile.open(archivio) as tgz:
+                return (yaml.safe_load(tgz.extractfile("jitsi-meet/Chart.yaml")) or {}).get("appVersion")
+    except (OSError, KeyError, tarfile.TarError, yaml.YAMLError):
+        pass
+    try:
         return (yaml.safe_load(open(f"{chart}/charts/jitsi-meet/Chart.yaml")) or {}).get("appVersion")
-    archivio = f"{chart}/charts/jitsi-meet-{versione_chart}.tgz"
-    if versione_chart and os.path.exists(archivio):
-        with tarfile.open(archivio) as tgz:
-            return (yaml.safe_load(tgz.extractfile("jitsi-meet/Chart.yaml")) or {}).get("appVersion")
-    return None
-
-
-versione_sottochart = leggi_versione_sottochart()
+    except (OSError, yaml.YAMLError):
+        return None
 
 
 def tag_compose(immagine):
@@ -349,23 +352,22 @@ for servizio, componente in (("jitsi-web", "web"), ("prosody", "prosody"), ("jic
     if not trovata:
         problemi.append(f"{servizio}: il tag di {immagine} non dice il rilascio di Jitsi")
         continue
-    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag") or versione_sottochart
+    tag_chart = ((jitsi.get(componente) or {}).get("image") or {}).get("tag") or versione_sottochart()
     attesa = versione(tag_chart) if tag_chart else None
     if not attesa:
         saltati.append(f"{servizio} (chart: {tag_chart or 'versione del sottochart sconosciuta'})")
     elif attesa != trovata:
         problemi.append(f"{servizio}={tag} (chart: {tag_chart})")
 if saltati:
-    print("confronto con Compose saltato per " + ", ".join(saltati))
+    print("confronto con Compose saltato per " + ", ".join(saltati), file=sys.stderr)
 if problemi:
     print(", ".join(problemi))
     sys.exit(1)
 PY
 then
-  errore "docker-compose.yml non usa il rilascio di Jitsi del chart: $(cat "$OUT/compose-jitsi.err")"
-elif [ -s "$OUT/compose-jitsi.err" ]; then
-  cat "$OUT/compose-jitsi.err"
+  errore "docker-compose.yml non usa il rilascio di Jitsi del chart: $(cat "$OUT/compose-jitsi.err" "$OUT/compose-jitsi.note")"
 fi
+[ -s "$OUT/compose-jitsi.note" ] && sed 's/^/  /' "$OUT/compose-jitsi.note"
 
 echo "helm lint"
 # Con i soli valori predefiniti la resa si ferma alla guardia sul segreto JWT
