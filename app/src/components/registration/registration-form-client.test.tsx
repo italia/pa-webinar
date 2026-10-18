@@ -221,4 +221,20 @@ describe('RegistrationFormClient — questionario dell\'iscrizione', () => {
     expect(container.textContent).toContain(messages.registration.errors.questionnaireIncomplete);
     expect(container.textContent).not.toContain(messages.registration.errors.generic);
   });
+
+  it('un rifiuto sul questionario che il modulo non conosce chiede di ricaricare', async () => {
+    rispostaIscrizione = () =>
+      new Response(
+        JSON.stringify({
+          code: 'VALIDATION_ERROR',
+          details: [{ path: ['questionnaireAnswers', 0, 'itemId'], message: 'Invalid uuid' }],
+        }),
+        { status: 422 },
+      );
+    disegna(questionario(false));
+    await attendi();
+    rispondi('Ufficio stampa');
+    await iscriviti();
+    expect(container.textContent).toContain(messages.registration.errors.questionnaireChanged);
+  });
 });

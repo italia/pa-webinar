@@ -285,8 +285,19 @@ export default function RegistrationFormClient({
             details?: Array<{ path?: unknown[]; message?: string }>;
           };
           const sulQuestionario = data.details?.find((d) => d.path?.[0] === 'questionnaireAnswers');
-          if (res.status === 422 && sulQuestionario?.message) {
-            setErrors({ questionnaireAnswers: sulQuestionario.message });
+          if (res.status === 422 && sulQuestionario) {
+            // Un messaggio che il modulo non conosce viene da risposte che il
+            // server non riconosce: il questionario va ricaricato.
+            const noti = [
+              'registration.errors.questionnaireRequired',
+              'registration.errors.questionnaireIncomplete',
+              'registration.errors.questionnaireChanged',
+            ];
+            setErrors({
+              questionnaireAnswers: noti.includes(sulQuestionario.message ?? '')
+                ? sulQuestionario.message
+                : 'registration.errors.questionnaireChanged',
+            });
             requestAnimationFrame(() => {
               formRef.current
                 ?.querySelector<HTMLElement>('.registration-questionnaire--error')
