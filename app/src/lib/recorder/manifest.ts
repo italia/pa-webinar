@@ -5,9 +5,9 @@
  * l'audio presente. Contiene i nomi in chiaro e nessuno lo legge dopo il
  * caricamento.
  *
- * Best-effort: un manifesto che resta lo trova la riconciliazione delle
- * registrazioni, che lo vede orfano e lo cancella allo scadere della
- * tolleranza.
+ * Best-effort: un errore resta un avviso nei log, e un manifesto che resta lo
+ * trova la riconciliazione delle registrazioni, che lo vede orfano e lo
+ * cancella allo scadere della tolleranza.
  */
 
 import { prisma } from '@/lib/db';
@@ -36,12 +36,17 @@ export async function cancellaManifestiSenzaTracce(
       try {
         if (await storage.delete(multitrackManifestKey(eventId, recordingId)))
           cancellati += 1;
-      } catch {
-        // resta alla riconciliazione
+      } catch (err) {
+        console.warn('[recorder/manifest] manifest delete failed', {
+          recordingId,
+          err: err instanceof Error ? err.message : String(err),
+        });
       }
     }
-  } catch {
-    // resta alla riconciliazione
+  } catch (err) {
+    console.warn('[recorder/manifest] track lookup failed', {
+      err: err instanceof Error ? err.message : String(err),
+    });
   }
   return cancellati;
 }
