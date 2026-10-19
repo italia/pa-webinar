@@ -1128,7 +1128,8 @@
         "speakers": "cainteoirí",
         "materials": "ábhair",
         "questionnaires": "ceistneoirí",
-        "agenda": "clár"
+        "agenda": "clár",
+        "textTranslation": "meaistriúchán"
       },
       "revocationFailed": "Theip ar an gcúlghairm rochtana do {name}: tá an nasc rochtana bailí i gcónaí. Sábháil arís chun iarracht eile a dhéanamh, nó cúlghair é ón gcluaisín “{tab}” ar leathanach an imeachta.",
       "validationFailedDetail": "Dhiúltaigh an freastalaí do roinnt sonraí: {reason}. Ceartaigh iad agus bain triail eile as.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Ní féidir an achoimre a nuashonrú a thuilleadh: níl an t-imeacht thart nó tá a shonraí imithe in éag.",
         "error": "Theip ar an nuashonrú: bain triail eile as."
       }
+    },
+    "textTranslation": {
+      "heading": "Meaistriúchán",
+      "intro": "Aistríonn sé an teideal agus an cur síos le samhail a ritheann ar fhreastalaithe na suiteála seo. Ní líonann sé ach na réimsí atá folamh fós: léigh an téacs aistrithe sula sábhálann tú.",
+      "languages": "Teangacha le haistriú",
+      "start": "Aistrigh le hIS",
+      "afterCreate": "Tar éis sábhála, aistrigh le hIS",
+      "afterCreateHelp": "Aistrítear an teideal agus an cur síos go dtí na teangacha a roghnaíodh. Léigh agus sábháil na haistriúcháin tríd an imeacht a chur in eagar.",
+      "offer": "Tá meaistriúcháin den téacs seo ar fáil do: {languages}.",
+      "useOffer": "Úsáid na haistriúcháin",
+      "machineMark": "meaistrithe, le hathbhreithniú",
+      "reviewAlert": "Meaistrithe: léigh é sula sábhálann tú.",
+      "error": "Níorbh fhéidir an t-aistriúchán a iarraidh. Bain triail eile as.",
+      "queued": "Sa scuaine: tosóidh an t-aistriúchán go luath.",
+      "running": "Aistriúchán ar siúl: d'fhéadfadh sé cúpla nóiméad a thógáil.",
+      "busy": "Tá aistriúchán eile ar siúl cheana don imeacht seo: bain triail eile as nuair a bheidh sé críochnaithe.",
+      "noTargets": "Roghnaigh teanga amháin ar a laghad.",
+      "sourceMissing": "Scríobh an teideal nó an cur síos sa phríomhtheanga ar dtús.",
+      "done": "Aistriúchán réidh do: {languages}. Léigh é sula sábhálann tú.",
+      "doneNothing": "Aistriúchán réidh, ach bhí na réimsí sna teangacha sin líonta cheana: níor cuireadh aon téacs in ionad.",
+      "failed": "Theip ar an aistriúchán: {reason}",
+      "failedGeneric": "Theip ar an aistriúchán.",
+      "status": {
+        "queued": "Tá meaistriúchán an teidil agus an chur síos sa scuaine.",
+        "running": "Tá meaistriúchán an teidil agus an chur síos ar siúl.",
+        "ready": "Tá meaistriúchán an teidil agus an chur síos réidh do: {languages}. Léigh agus sábháil é tríd an imeacht a chur in eagar.",
+        "review": "Athbhreithnigh na téacsanna",
+        "failed": "Theip ar mheaistriúchán an teidil agus an chur síos: {reason}",
+        "failedGeneric": "Theip ar mheaistriúchán an teidil agus an chur síos."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "Tá IS múchta don ócáid seo: úsáid «Cruthaigh AI» chun é a chur ar siúl agus an phróiseáil a thosú.",
     "sourceTranscriptMissing": "Níl an taifeadadh seo tras-scríofa fós: tras-scríobh é sula gcuirfidh tú aistriúchán leis.",
     "captionsTranscriptNotTranslatable": "Tagann an tras-scríbhinn seo ó na fotheidil bheo: teastaíonn tras-scríbhinn AI den taifeadadh don aistriúchán uathoibríoch.",
-    "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile."
+    "sameLanguage": "Is í an teanga a roghnaigh tú bunteanga an taifeadta: roghnaigh ceann eile.",
+    "mtUnavailable": "Níl meaistriúchán suiteáilte ar an ásc seo."
   }
 }

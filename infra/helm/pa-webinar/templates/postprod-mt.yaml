@@ -1,0 +1,208 @@
+{{- if include "pa-webinar.mtEnabled" . }}
+{{- $p := .Values.postprod }}
+{{- $mt := $p.mt }}
+{{- $file := printf "/models/%s" $mt.model.file }}
+{{- $scala := include "pa-webinar.mtScaled" . }}
+# ─────────────────────────────────────────────────────────────
+# Motore di traduzione su CPU (postprod.mt).
+#
+# Server llama.cpp con l'API OpenAI-compatibile e un modello di traduzione
+# (EuroLLM-9B-Instruct): traduce titolo e descrizione degli eventi (lavoro
+# TRANSLATE_TEXT) per il worker senza GPU, che lo chiama su HTTP. Niente vLLM,
+# niente GPU. Il portale ne riceve l'indirizzo (AI_MT_BASE_URL, ConfigMap) e
+# solo allora offre la traduzione automatica.
+#
+# Con scaleToZero le repliche le porta l'orchestratore della post-produzione:
+# una mentre c'e' una traduzione in coda o in corso, zero dopo idleMinutes
+# senza lavoro. Scritte qui, ogni aggiornamento le riporterebbe al valore del
+# chart.
+# ─────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pa-webinar.mtName" . }}
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postprod-mt
+spec:
+  selector:
+    {{- include "pa-webinar.mtSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: mt
+      port: 8080
+      targetPort: mt
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pa-webinar.mtName" . }}
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postprod-mt
+spec:
+  {{- if not $scala }}
+  replicas: 1
+  {{- end }}
+  # Un pod alla volta: ognuno tiene il modello in memoria (circa 5 GiB), e un
+  # volume persistente per il modello di solito si monta da un pod solo.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "pa-webinar.mtSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pa-webinar.mtSelectorLabels" . | nindent 8 }}
+    spec:
+      # Nessuna API di Kubernetes da chiamare, e nessuna variabile dei
+      # Service del namespace nell'ambiente.
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      {{- with .Values.app.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with ($mt.nodeSelector | default .Values.app.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with ($mt.tolerations | default .Values.app.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $mt.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # Scarica il modello e ne verifica l'impronta: un file diverso ferma
+        # il pod prima che il server parta. Con un volume persistente un file
+        # gia' presente con l'impronta giusta non si riscarica.
+        - name: fetch-model
+          image: {{ $mt.image }}
+          imagePullPolicy: {{ $mt.imagePullPolicy | default "IfNotPresent" }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              percorso="$MT_MODEL_PATH"
+              if [ -f "$percorso" ] && echo "$MT_MODEL_SHA256  $percorso" | sha256sum -c - >/dev/null 2>&1; then
+                echo "modello gia' presente in $percorso"
+                exit 0
+              fi
+              rm -f "$percorso"
+              echo "scarico il modello in $percorso"
+              curl -fsSL --retry 5 --retry-delay 5 --connect-timeout 20 -o "$percorso.part" "$MT_MODEL_URL"
+              if ! echo "$MT_MODEL_SHA256  $percorso.part" | sha256sum -c - >/dev/null 2>&1; then
+                rm -f "$percorso.part"
+                echo "impronta del modello errata: atteso $MT_MODEL_SHA256" >&2
+                exit 1
+              fi
+              mv "$percorso.part" "$percorso"
+              echo "modello pronto"
+          env:
+            - name: MT_MODEL_URL
+              value: {{ $mt.model.url | quote }}
+            - name: MT_MODEL_SHA256
+              value: {{ $mt.model.sha256 | quote }}
+            - name: MT_MODEL_PATH
+              value: {{ $file | quote }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: mt
+          image: {{ $mt.image }}
+          imagePullPolicy: {{ $mt.imagePullPolicy | default "IfNotPresent" }}
+          args:
+            - -m
+            - {{ $file | quote }}
+            - -t
+            - {{ $mt.threads | toString | quote }}
+            - -c
+            - {{ $mt.contextSize | toString | quote }}
+            # Una richiesta alla volta: piu' slot non aumentano le parole al
+            # secondo, dividono la stessa memoria.
+            - -np
+            - "1"
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --alias
+            - {{ $mt.model.id | quote }}
+            - --no-webui
+            - --no-slots
+          ports:
+            - name: mt
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          # /health risponde 200 a modello caricato, anche mentre traduce.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: mt
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: mt
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: mt
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml $mt.resources | nindent 12 }}
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: models
+          {{- if $mt.modelsPvc }}
+          persistentVolumeClaim:
+            claimName: {{ $mt.modelsPvc }}
+          {{- else }}
+          emptyDir:
+            sizeLimit: {{ $mt.modelsSizeLimit | default "8Gi" }}
+          {{- end }}
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+{{- end }}

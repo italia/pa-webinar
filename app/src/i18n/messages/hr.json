@@ -1128,7 +1128,8 @@
         "speakers": "govornici",
         "materials": "materijali",
         "questionnaires": "upitnici",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "strojno prevođenje"
       },
       "revocationFailed": "Opoziv pristupa za {name} nije uspio: poveznica za pristup i dalje vrijedi. Spremi ponovno za novi pokušaj ili je opozovi na kartici „{tab}” na stranici događaja.",
       "validationFailedDetail": "Poslužitelj je odbio neke podatke: {reason}. Ispravi ih i pokušaj ponovno.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Sažetak se više ne može ažurirati: događaj nije završio ili je istekao rok čuvanja njegovih podataka.",
         "error": "Ažuriranje nije uspjelo: pokušajte ponovno."
       }
+    },
+    "textTranslation": {
+      "heading": "Strojno prevođenje",
+      "intro": "Prevodi naslov i opis modelom koji radi na poslužiteljima ove instalacije. Ispunjava samo polja koja su još prazna: prije spremanja pročitajte prevedeni tekst.",
+      "languages": "Ciljni jezici",
+      "start": "Prevedi s pomoću UI-ja",
+      "afterCreate": "Nakon spremanja prevedi s pomoću UI-ja",
+      "afterCreateHelp": "Naslov i opis prevode se na odabrane jezike. Pročitajte i spremite prijevode uređivanjem događaja.",
+      "offer": "Za ovaj tekst postoje strojni prijevodi za: {languages}.",
+      "useOffer": "Upotrijebi prijevode",
+      "machineMark": "strojno prevedeno, treba pregledati",
+      "reviewAlert": "Strojno prevedeno: pročitajte prije spremanja.",
+      "error": "Prijevod nije bilo moguće zatražiti. Pokušajte ponovno.",
+      "queued": "U redu čekanja: prevođenje uskoro počinje.",
+      "running": "Prevođenje je u tijeku: može potrajati nekoliko minuta.",
+      "busy": "Za ovaj je događaj već u tijeku drugi prijevod: pokušajte ponovno kad završi.",
+      "noTargets": "Odaberite barem jedan jezik.",
+      "sourceMissing": "Najprije napišite naslov ili opis na glavnom jeziku.",
+      "done": "Prijevod je spreman za: {languages}. Pročitajte ga prije spremanja.",
+      "doneNothing": "Prijevod je spreman, ali polja na tim jezicima već su bila ispunjena: nijedan tekst nije zamijenjen.",
+      "failed": "Prevođenje nije uspjelo: {reason}",
+      "failedGeneric": "Prevođenje nije uspjelo.",
+      "status": {
+        "queued": "Strojni prijevod naslova i opisa u redu je čekanja.",
+        "running": "Strojni prijevod naslova i opisa je u tijeku.",
+        "ready": "Strojni prijevod naslova i opisa spreman je za: {languages}. Pročitajte ga i spremite uređivanjem događaja.",
+        "review": "Pregledaj tekstove",
+        "failed": "Strojni prijevod naslova i opisa nije uspio: {reason}",
+        "failedGeneric": "Strojni prijevod naslova i opisa nije uspio."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "Umjetna inteligencija isključena je za ovaj događaj: upotrijebite „Generiraj AI” da je uključite i pokrenete obradu.",
     "sourceTranscriptMissing": "Ova snimka još nije transkribirana: transkribirajte je prije dodavanja prijevoda.",
     "captionsTranscriptNotTranslatable": "Ovaj transkript potječe iz titlova uživo: automatski prijevod zahtijeva AI transkript snimke.",
-    "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi."
+    "sameLanguage": "Odabrani jezik izvorni je jezik snimke: odaberite drugi.",
+    "mtUnavailable": "Strojno prevođenje nije instalirano na ovoj instanci."
   }
 }

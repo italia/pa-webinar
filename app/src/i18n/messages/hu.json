@@ -1128,7 +1128,8 @@
         "speakers": "előadók",
         "materials": "anyagok",
         "questionnaires": "kérdőívek",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "gépi fordítás"
       },
       "revocationFailed": "Nem sikerült visszavonni {name} hozzáférését: a hozzáférési link továbbra is érvényes. Mentsen újra az újrapróbálkozáshoz, vagy vonja vissza az esemény oldalának „{tab}” lapján.",
       "validationFailedDetail": "A szerver elutasított néhány adatot: {reason}. Javítsa ki, és próbálja újra.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Az összegzés már nem frissíthető: az esemény nem ért véget, vagy lejárt az adatainak megőrzési ideje.",
         "error": "A frissítés nem sikerült: próbálja újra."
       }
+    },
+    "textTranslation": {
+      "heading": "Gépi fordítás",
+      "intro": "A címet és a leírást egy olyan modellel fordítja le, amely ennek a telepítésnek a saját szerverein fut. Csak a még üres mezőket tölti ki: mentés előtt olvassa át a lefordított szöveget.",
+      "languages": "Célnyelvek",
+      "start": "Fordítás MI-vel",
+      "afterCreate": "Mentés után fordítás MI-vel",
+      "afterCreateHelp": "A cím és a leírás a választott nyelvekre fordítódik le. A fordításokat az esemény szerkesztésével olvassa át és mentse.",
+      "offer": "Ennek a szövegnek gépi fordításai érhetők el ezeken a nyelveken: {languages}.",
+      "useOffer": "Fordítások használata",
+      "machineMark": "gépi fordítás, átnézendő",
+      "reviewAlert": "Gépi fordítás: mentés előtt nézze át.",
+      "error": "A fordítást nem sikerült kérni. Próbálja újra.",
+      "queued": "Sorban áll: a fordítás hamarosan elindul.",
+      "running": "Fordítás folyamatban: ez néhány percig tarthat.",
+      "busy": "Ehhez az eseményhez már fut egy másik fordítás: próbálja újra, ha befejeződött.",
+      "noTargets": "Válasszon legalább egy nyelvet.",
+      "sourceMissing": "Először írja meg a címet vagy a leírást a fő nyelven.",
+      "done": "A fordítás elkészült ezeken a nyelveken: {languages}. Mentés előtt nézze át.",
+      "doneNothing": "A fordítás elkészült, de ezeknek a nyelveknek a mezői már ki voltak töltve: egyetlen szöveg sem lett lecserélve.",
+      "failed": "A fordítás nem sikerült: {reason}",
+      "failedGeneric": "A fordítás nem sikerült.",
+      "status": {
+        "queued": "A cím és a leírás gépi fordítása sorban áll.",
+        "running": "A cím és a leírás gépi fordítása folyamatban van.",
+        "ready": "A cím és a leírás gépi fordítása elkészült ezeken a nyelveken: {languages}. Nézze át és mentse az esemény szerkesztésével.",
+        "review": "Szövegek átnézése",
+        "failed": "A cím és a leírás gépi fordítása nem sikerült: {reason}",
+        "failedGeneric": "A cím és a leírás gépi fordítása nem sikerült."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "Az MI ki van kapcsolva ennél az eseménynél: az „AI-tartalom létrehozása” gombbal bekapcsolhatja és elindíthatja a feldolgozást.",
     "sourceTranscriptMissing": "Ez a felvétel még nincs átírva: előbb írja át, aztán adjon hozzá fordítást.",
     "captionsTranscriptNotTranslatable": "Ez az átirat az élő feliratokból származik: az automatikus fordításhoz a felvétel MI-átirata szükséges.",
-    "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat."
+    "sameLanguage": "A választott nyelv a felvétel eredeti nyelve: válasszon másikat.",
+    "mtUnavailable": "A gépi fordítás nincs telepítve ezen a példányon."
   }
 }

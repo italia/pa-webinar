@@ -147,6 +147,9 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   postEventReport: 'generated from the occurrence that ran',
   postEventReportAt: 'generated from the occurrence that ran',
   postEventReportPublished: 'a decision about the occurrence that ran',
+  textTranslations:
+    'machine translation proposals of the source event\'s texts: the copy has its own title ' +
+    'and translations it accepted are already in its title and description',
   postEventEmailSentAt: 'send state of the occurrence that ran',
   moderatorPublicListed:
     'publishing the lead organizer on the public page is a choice made for each event: ' +

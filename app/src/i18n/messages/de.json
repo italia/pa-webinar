@@ -1128,7 +1128,8 @@
         "speakers": "Referenten",
         "materials": "Materialien",
         "questionnaires": "Fragebögen",
-        "agenda": "Programm"
+        "agenda": "Programm",
+        "textTranslation": "automatische Übersetzung"
       },
       "revocationFailed": "Der Widerruf des Zugangs für {name} ist fehlgeschlagen: Der Zugangslink ist weiterhin gültig. Speichern Sie erneut, um es noch einmal zu versuchen, oder widerrufen Sie ihn im Reiter „{tab}“ der Veranstaltungsseite.",
       "validationFailedDetail": "Der Server hat einige Daten abgelehnt: {reason}. Korrigieren Sie sie und versuchen Sie es erneut.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Die Zusammenfassung kann nicht mehr aktualisiert werden: Die Veranstaltung ist nicht beendet oder die Aufbewahrungsfrist ihrer Daten ist abgelaufen.",
         "error": "Die Aktualisierung ist fehlgeschlagen: Versuchen Sie es erneut."
       }
+    },
+    "textTranslation": {
+      "heading": "Automatische Übersetzung",
+      "intro": "Übersetzt Titel und Beschreibung mit einem Modell, das auf den Servern dieser Installation läuft. Es füllt nur Felder, die noch leer sind: Prüfen Sie den übersetzten Text vor dem Speichern.",
+      "languages": "Zielsprachen",
+      "start": "Mit KI übersetzen",
+      "afterCreate": "Nach dem Speichern mit KI übersetzen",
+      "afterCreateHelp": "Titel und Beschreibung werden in die gewählten Sprachen übersetzt. Prüfen und speichern Sie die Übersetzungen, indem Sie die Veranstaltung bearbeiten.",
+      "offer": "Für diesen Text gibt es automatische Übersetzungen in: {languages}.",
+      "useOffer": "Übersetzungen übernehmen",
+      "machineMark": "automatisch übersetzt, zu prüfen",
+      "reviewAlert": "Automatisch übersetzt: vor dem Speichern prüfen.",
+      "error": "Die Übersetzung konnte nicht angefordert werden. Versuchen Sie es erneut.",
+      "queued": "In der Warteschlange: Die Übersetzung beginnt in Kürze.",
+      "running": "Übersetzung läuft: Das kann einige Minuten dauern.",
+      "busy": "Für diese Veranstaltung läuft bereits eine andere Übersetzung: Versuchen Sie es erneut, wenn sie abgeschlossen ist.",
+      "noTargets": "Wählen Sie mindestens eine Sprache.",
+      "sourceMissing": "Schreiben Sie zuerst den Titel oder die Beschreibung in der Hauptsprache.",
+      "done": "Übersetzung fertig für: {languages}. Vor dem Speichern prüfen.",
+      "doneNothing": "Übersetzung fertig, aber die Felder dieser Sprachen waren bereits ausgefüllt: Es wurde kein Text ersetzt.",
+      "failed": "Die Übersetzung ist fehlgeschlagen: {reason}",
+      "failedGeneric": "Die Übersetzung ist fehlgeschlagen.",
+      "status": {
+        "queued": "Die automatische Übersetzung von Titel und Beschreibung ist in der Warteschlange.",
+        "running": "Die automatische Übersetzung von Titel und Beschreibung läuft.",
+        "ready": "Die automatische Übersetzung von Titel und Beschreibung ist fertig für: {languages}. Prüfen und speichern Sie sie, indem Sie die Veranstaltung bearbeiten.",
+        "review": "Texte prüfen",
+        "failed": "Die automatische Übersetzung von Titel und Beschreibung ist fehlgeschlagen: {reason}",
+        "failedGeneric": "Die automatische Übersetzung von Titel und Beschreibung ist fehlgeschlagen."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "Die KI ist für diese Veranstaltung ausgeschaltet: Mit „KI erzeugen“ schalten Sie sie ein und starten die Pipeline.",
     "sourceTranscriptMissing": "Diese Aufzeichnung ist noch nicht transkribiert: Transkribieren Sie sie, bevor Sie eine Übersetzung hinzufügen.",
     "captionsTranscriptNotTranslatable": "Dieses Transkript stammt aus den Live-Untertiteln: Die automatische Übersetzung benötigt ein KI-Transkript der Aufzeichnung.",
-    "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere."
+    "sameLanguage": "Die gewählte Sprache ist die Originalsprache der Aufzeichnung: Wählen Sie eine andere.",
+    "mtUnavailable": "Die automatische Übersetzung ist auf dieser Instanz nicht installiert."
   }
 }

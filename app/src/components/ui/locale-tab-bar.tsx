@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from 'design-react-kit';
+
 import { localeNames, type Locale } from '@/i18n/config';
 
 interface LocaleTabBarProps {
@@ -9,6 +10,12 @@ interface LocaleTabBarProps {
   activeLocale: string;
   onSelectLocale: (locale: string) => void;
   filledLocales?: string[];
+  /** Le lingue riempite dalla traduzione automatica, da rileggere: un terzo
+   *  segno, diverso da quello delle lingue compilate. */
+  machineLocales?: string[];
+  /** Il nome accessibile di quel segno ("tradotto automaticamente, da
+   *  rileggere"), nella lingua dell'interfaccia. */
+  machineLabel?: string;
 }
 
 export default function LocaleTabBar({
@@ -17,6 +24,8 @@ export default function LocaleTabBar({
   activeLocale,
   onSelectLocale,
   filledLocales,
+  machineLocales,
+  machineLabel,
 }: LocaleTabBarProps) {
   return (
     <div
@@ -28,6 +37,7 @@ export default function LocaleTabBar({
         const isActive = code === activeLocale;
         const isDefault = code === defaultLocale;
         const isFilled = filledLocales?.includes(code);
+        const isMachine = !isDefault && !!machineLabel && machineLocales?.includes(code);
         return (
           <button
             key={code}
@@ -56,8 +66,17 @@ export default function LocaleTabBar({
                 *
               </Badge>
             )}
-            {!isDefault && isFilled && (
-              <span style={{ color: '#008758', fontSize: '0.65rem' }}>●</span>
+            {isMachine ? (
+              <>
+                {/* Un rombo ambra: tradotto in automatico, da rileggere. */}
+                <span aria-hidden="true" title={machineLabel} style={{ color: '#A66300', fontSize: '0.7rem' }}>
+                  ◆
+                </span>
+                <span className="visually-hidden">{`, ${machineLabel}`}</span>
+              </>
+            ) : (
+              !isDefault &&
+              isFilled && <span style={{ color: '#008758', fontSize: '0.65rem' }}>●</span>
             )}
           </button>
         );

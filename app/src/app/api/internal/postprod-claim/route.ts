@@ -25,7 +25,7 @@ import { z } from 'zod';
 
 import { buildAsrInitialPrompt } from '@/lib/ai/asr-prompt';
 import { glossaryForEvent, glossaryHints } from '@/lib/ai/glossary';
-import { POSTPROD_JOB_KINDS } from '@/lib/ai/job-classes';
+import { POSTPROD_JOB_KINDS, type PostprodJobKind } from '@/lib/ai/job-classes';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
@@ -37,10 +37,11 @@ import {
   expectedArtifactsForJob,
   postprodJobPayloadSchema,
 } from '@/lib/ai';
-import type { reportPayloadSchema } from '@/lib/ai/schemas';
+import type { reportPayloadSchema, translateTextPayloadSchema } from '@/lib/ai/schemas';
 import {
   resolveAsrProvider,
   resolveLlmProvider,
+  resolveMtProvider,
   resolveTtsProvider,
 } from '@/lib/ai/providers';
 import {
@@ -49,7 +50,7 @@ import {
 } from '@/lib/storage/postprod';
 import { sottotitoliPerIlWorker, trascrizionePerIlWorker } from '@/lib/ai/transcript-input';
 import { tryDecryptPII } from '@/lib/crypto/pii';
-import { postprodJobAttemptsTotal } from '@/lib/metrics';
+import { postprodJobAttemptsTotal, postprodJobsCompletedTotal } from '@/lib/metrics';
 import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
 import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
@@ -69,9 +70,9 @@ const claimRequestSchema = z.object({
 
 interface ClaimedRow {
   id: string;
-  /** Nullo per il resoconto dell'evento (REPORT). */
+  /** Nullo per i lavori dell'evento (REPORT, TRANSLATE_TEXT). */
   recording_id: string | null;
-  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE' | 'REPORT';
+  kind: PostprodJobKind;
   payload: unknown;
   attempts: number;
   next_attempt_at: Date;
@@ -159,6 +160,12 @@ export const POST = withErrorHandling(async (request) => {
   // risultato torna alla rotta del resoconto.
   if (parsed.data.kind === 'REPORT') {
     return rispostaResoconto(row, parsed.data.payload, leaseUntil);
+  }
+  // La traduzione di titolo e descrizione: il testo e' nel lavoro, il motore
+  // e' quello su CPU (nessuna richiesta a vLLM), il risultato torna a
+  // api/internal/event-text-translation.
+  if (parsed.data.kind === 'TRANSLATE_TEXT') {
+    return rispostaTraduzioneTesti(row, parsed.data.payload, leaseUntil);
   }
   if (!row.recording_id) {
     throw new ValidationError(`postprod_job ${row.id} (${row.kind}) has no recording`);
@@ -653,6 +660,60 @@ async function rispostaResoconto(
       llmProvider: llm.provider,
       llmBaseUrl: llm.baseUrl,
       llmModelId: llm.modelId,
+      glossary: glossaryHints(glossary),
+    },
+  });
+}
+
+/**
+ * Il claim di un lavoro TRANSLATE_TEXT: il testo da tradurre, il motore di
+ * traduzione su CPU e il glossario. Senza motore (tolto dall'installazione
+ * dopo la richiesta) il lavoro non potrebbe mai andare: si chiude come
+ * fallito invece di tornare in coda a ogni giro.
+ */
+async function rispostaTraduzioneTesti(
+  row: ClaimedRow,
+  payload: z.infer<typeof translateTextPayloadSchema>,
+  leaseUntil: Date
+): Promise<Response> {
+  const motore = resolveMtProvider();
+  if (!motore) {
+    const chiusi = await prisma.$executeRaw`
+      UPDATE postprod_jobs
+      SET status = 'FAILED', completed_at = NOW(), leased_at = NULL, leased_by = NULL,
+          last_error = 'The CPU translation engine is not configured (AI_MT_BASE_URL)', updated_at = NOW()
+      WHERE id = ${row.id}::uuid AND status = 'CLAIMED' AND attempts = ${row.attempts}
+    `;
+    if (chiusi > 0) postprodJobsCompletedTotal.labels('TRANSLATE_TEXT', 'FAILED').inc();
+    return new Response(null, { status: 204 });
+  }
+  const glossary = await glossaryForEvent(payload.eventId);
+  return Response.json({
+    claimed: true,
+    jobId: row.id,
+    recordingId: null,
+    kind: row.kind,
+    payload: {
+      eventId: payload.eventId,
+      sourceLanguage: payload.sourceLanguage,
+      targetLanguages: payload.targetLanguages,
+      sourceHash: payload.sourceHash,
+    },
+    attempts: row.attempts,
+    leaseExpiresAt: leaseUntil.toISOString(),
+    sourceDownloadUrl: '',
+    uploadTargets: {},
+    inputs: [],
+    textInput: {
+      sourceLanguage: payload.sourceLanguage,
+      targetLanguages: payload.targetLanguages,
+      title: payload.title,
+      description: payload.description,
+      sourceHash: payload.sourceHash,
+    },
+    providerHints: {
+      mtBaseUrl: motore.baseUrl,
+      mtModelId: motore.modelId,
       glossary: glossaryHints(glossary),
     },
   });

@@ -98,6 +98,9 @@ profili=(
   "k3s-componenti:$CHART/examples/values-simple.yaml"
   "k3s-addon:$CHART/examples/values-simple.yaml"
   "sottotitoli-spenti:$CHART/examples/values-full.yaml"
+  "postprod:$CHART/examples/values-full.yaml"
+  "postprod-mt:$CHART/examples/values-full.yaml"
+  "postprod-senza-cpu:$CHART/examples/values-full.yaml"
 )
 
 # Il file di una singola installazione k3s come lo scrive chi la automatizza:
@@ -272,6 +275,16 @@ argomenti_profilo() {
     # La copia del database su un volume già presente, senza NetworkPolicy.
     semplice-backup)
       printf '%s\n' --set backup.enabled=true --set backup.persistence.existingClaim=copie-db --set backup.retention=3 ;;
+    # La post-produzione AI, che nessun altro profilo rende: con vLLM acceso
+    # a richiesta, con il motore di traduzione su CPU e la NetworkPolicy, e
+    # senza il worker senza GPU.
+    postprod)
+      printf '%s\n' --set postprod.enabled=true --set postprod.vllm.autoscale=true ;;
+    postprod-mt)
+      printf '%s\n' --set postprod.enabled=true --set postprod.vllm.autoscale=true \
+        --set postprod.mt.enabled=true --set networkPolicy.enabled=true ;;
+    postprod-senza-cpu)
+      printf '%s\n' --set postprod.enabled=true --set postprod.worker.cpu.enabled=false ;;
   esac
 }
 
@@ -719,6 +732,34 @@ for pol in docs:
                 for r in uscite):
             print(f"la NetworkPolicy {nome} non lascia ai sottotitoli il contesto della stanza chiesto all'applicazione (3000)")
         continue
+    # La policy del motore di traduzione su CPU: entra solo il worker senza
+    # GPU, sulla 8080 (il motore non ha autenticazione); escono DNS e HTTPS
+    # (il modello).
+    if (pol["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "postprod-mt":
+        for t, n, m in carichi:
+            sel = seleziona(selettore, etichette(m))
+            del_motore = etichette(m).get("app.kubernetes.io/component") == "postprod-mt"
+            if del_motore and not sel:
+                print(f"la NetworkPolicy {nome} non seleziona {t}/{n}")
+            if sel and not del_motore:
+                print(f"la NetworkPolicy {nome} seleziona anche {t}/{n}")
+        regole = spec.get("ingress") or []
+        if any(not r.get("from") for r in regole):
+            print(f"la NetworkPolicy {nome} ha una regola di ingresso senza sorgente: il motore resterebbe aperto a tutti")
+        porte = {p.get("port") for r in regole for p in r.get("ports") or []}
+        if porte != {8080}:
+            print(f"la NetworkPolicy {nome} dovrebbe ammettere solo la porta 8080, non {sorted(porte)}")
+        for t, n, m in carichi:
+            componente_m = etichette(m).get("app.kubernetes.io/component")
+            ammesso = any(ammette(r, etichette(m), 8080) for r in regole)
+            if componente_m == "postprod-worker-cpu" and not ammesso:
+                print(f"{t}/{n}: il worker senza GPU non raggiungerebbe il motore di traduzione, la NetworkPolicy {nome} non lo ammette sulla 8080")
+            if componente_m not in ("postprod-worker-cpu", "postprod-mt") and ammesso:
+                print(f"la NetworkPolicy {nome} lascia entrare nel motore di traduzione anche {t}/{n}")
+        porte_u = {p.get("port") for r in spec.get("egress") or [] for p in r.get("ports") or []}
+        if not {53, 443} <= porte_u:
+            print(f"la NetworkPolicy {nome} dovrebbe lasciar uscire DNS e HTTPS (53, 443), non {sorted(porte_u)}")
+        continue
     if not any(t == "Deployment" and n == nome and seleziona(selettore, etichette(m)) for t, n, m in carichi):
         print(f"la NetworkPolicy {nome} non seleziona il Deployment dell'applicazione, che resterebbe senza restrizioni")
     for tipo, n, modello in carichi:
@@ -751,6 +792,10 @@ if del_chart_np:
     if sottotitoli and not any((d["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "captions"
                                for d in del_chart_np):
         print(f"NetworkPolicy accesa ma nessuna policy per i pod dei sottotitoli ({', '.join(sorted(sottotitoli))})")
+    motore = {n for t, n, m in carichi if etichette(m).get("app.kubernetes.io/component") == "postprod-mt"}
+    if motore and not any((d["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "postprod-mt"
+                          for d in del_chart_np):
+        print(f"NetworkPolicy accesa ma nessuna policy per i pod del motore di traduzione ({', '.join(sorted(motore))})")
 
 # Lo scaler dei bridge con un nome esplicito deve trovare quel Deployment:
 # altrimenti legge zero repliche, `kubectl scale` fallisce e con
@@ -1558,6 +1603,150 @@ PY
     [ -n "$problema" ] && errore "$problema"
   done <"$OUT/$nome.addon"
 
+  # Post-produzione AI: quale worker prende quali lavori, quale motore si
+  # accende. Difetti che non fermano l'installazione e si pagano dopo: una
+  # trascrizione presa dal worker senza GPU e uccisa a metà, la GPU accesa per
+  # tradurre due righe di testo, un motore di traduzione che scarica un
+  # modello diverso o finisce sul pool con la GPU.
+  if ! python3 - "$reso" "$nome" >"$OUT/$nome.pp" 2>"$OUT/$nome.pp.err" <<'PY'
+import json
+import re
+import sys
+
+import yaml
+
+docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+profilo = sys.argv[2]
+GPU = {"TRANSCRIBE", "TRANSCRIBE_MULTITRACK", "DUB"}
+
+
+def del_chart(d):
+    return str((d["metadata"].get("labels") or {}).get("helm.sh/chart", "")).startswith("pa-webinar-")
+
+
+def pod(d):
+    spec = d.get("spec") or {}
+    if d.get("kind") == "CronJob":
+        spec = ((spec.get("jobTemplate") or {}).get("spec") or {})
+    return ((spec.get("template") or {}).get("spec")) or {}
+
+
+def componente(d):
+    spec = d.get("spec") or {}
+    if d.get("kind") == "CronJob":
+        spec = ((spec.get("jobTemplate") or {}).get("spec") or {})
+    return (((spec.get("template") or {}).get("metadata") or {}).get("labels") or {}).get("app.kubernetes.io/component")
+
+
+def tipi(cj):
+    for c in pod(cj).get("containers") or []:
+        for e in c.get("env") or []:
+            if e.get("name") == "AI_WORKER_KINDS":
+                return {k.strip() for k in str(e.get("value", "")).split(",") if k.strip()}
+    return None
+
+
+cron = [d for d in docs if d.get("kind") == "CronJob" and del_chart(d)]
+w_gpu = next((d for d in cron if componente(d) == "postprod-worker"), None)
+w_cpu = next((d for d in cron if componente(d) == "postprod-worker-cpu"), None)
+orch = next((d for d in cron if componente(d) == "cronjob-postprod-orchestrator"), None)
+motore = next((d for d in docs if d.get("kind") == "Deployment" and componente(d) == "postprod-mt"), None)
+
+if profilo.startswith("postprod") and not (w_gpu and orch):
+    print("profilo della post-produzione senza il worker o l'orchestratore resi")
+
+if w_cpu is not None:
+    k = tipi(w_cpu)
+    if not k:
+        print("il worker senza GPU non ha AI_WORKER_KINDS: si rifiuta di partire")
+    elif k & GPU:
+        print(f"il worker senza GPU prende anche {sorted(k & GPU)}: una trascrizione o un doppiaggio finirebbero uccisi a metà")
+if w_gpu is not None:
+    k = tipi(w_gpu)
+    if k is None:
+        print("il worker con la GPU non ha AI_WORKER_KINDS: prenderebbe anche la traduzione dei testi, che non deve accendere la GPU")
+    elif "TRANSLATE_TEXT" in k:
+        print("il worker con la GPU prende la traduzione dei testi (TRANSLATE_TEXT): accenderebbe la GPU per qualche riga di testo")
+    elif w_cpu is None and not (k >= {"TRANSCRIBE", "SUMMARIZE", "TRANSLATE", "ARCHIVE", "REPORT"}):
+        print(f"senza worker CPU il worker con la GPU deve prendere gli altri lavori, prende solo {sorted(k)}")
+
+# vLLM si accende solo per i lavori che lo usano (desiredLlm del portale).
+if orch is not None:
+    testo = "\n".join(str(x) for c in pod(orch).get("containers") or [] for x in (c.get("command") or []) + (c.get("args") or []))
+    if "VLLM_DEPLOY=" in testo and "desiredLlm" not in testo:
+        print("l'orchestratore accende vLLM per ogni lavoro, anche quelli che non lo usano: manca desiredLlm")
+
+app = next((d for d in docs if d.get("kind") == "Deployment" and del_chart(d) and componente(d) is None), None)
+mappa = next((d.get("data") or {} for d in docs if d.get("kind") == "ConfigMap" and app is not None
+              and d["metadata"]["name"] == app["metadata"]["name"]), {})
+
+if motore is None:
+    if "AI_MT_BASE_URL" in mappa:
+        print("AI_MT_BASE_URL impostato senza il motore di traduzione reso: il portale offrirebbe una traduzione che non parte")
+    sys.exit(0)
+
+nome = motore["metadata"]["name"]
+spec = pod(motore)
+if w_cpu is None or "TRANSLATE_TEXT" not in (tipi(w_cpu) or set()):
+    print("motore di traduzione reso, ma nessun worker senza GPU prende TRANSLATE_TEXT")
+contenitori = (spec.get("containers") or []) + (spec.get("initContainers") or [])
+for c in contenitori:
+    if not re.search(r"@sha256:[0-9a-f]{64}$", str(c.get("image", ""))):
+        print(f"{nome}/{c.get('name')}: l'immagine {c.get('image')} non è fissata per digest")
+    risorse = json.dumps(c.get("resources") or {})
+    if "nvidia.com/gpu" in risorse:
+        print(f"{nome}/{c.get('name')} chiede una GPU: il motore di traduzione gira su CPU")
+# Mai sul pool con la GPU: niente selettori o tolleranze del worker con la GPU.
+gpu_spec = pod(w_gpu) if w_gpu is not None else {}
+for k, v in (gpu_spec.get("nodeSelector") or {}).items():
+    if (spec.get("nodeSelector") or {}).get(k) == v:
+        print(f"il motore di traduzione va sui nodi {k}={v}, quelli del worker con la GPU")
+for t in gpu_spec.get("tolerations") or []:
+    if t in (spec.get("tolerations") or []):
+        print(f"il motore di traduzione tollera {t}, la marcatura del pool con la GPU")
+if any(str(v) in json.dumps(spec.get("affinity") or {}) for v in (gpu_spec.get("nodeSelector") or {}).values()):
+    print("l'affinità del motore di traduzione nomina il pool con la GPU")
+# Il modello: indirizzo a revisione fissa e impronta.
+init = next((c for c in spec.get("initContainers") or [] if c.get("name") == "fetch-model"), None)
+variabili = {e["name"]: str(e.get("value", "")) for e in (init or {}).get("env") or []}
+if init is None:
+    print("il motore di traduzione non scarica né verifica il modello (initContainer fetch-model)")
+elif not re.fullmatch(r"[0-9a-f]{64}", variabili.get("MT_MODEL_SHA256", "")) or "sha256sum -c" not in json.dumps(init.get("command")):
+    print("il modello del motore di traduzione si scarica senza verificarne l'impronta")
+elif profilo == "postprod-mt" and not re.search(r"/[0-9a-f]{40}/", variabili.get("MT_MODEL_URL", "")):
+    print(f"l'indirizzo del modello non è a revisione fissa: {variabili.get('MT_MODEL_URL')}")
+argomenti = " ".join(str(a) for c in spec.get("containers") or [] for a in c.get("args") or [])
+if variabili.get("MT_MODEL_PATH") and variabili["MT_MODEL_PATH"] not in argomenti:
+    print(f"il motore carica un file diverso da quello scaricato ({variabili.get('MT_MODEL_PATH')})")
+# Il Service e l'indirizzo che il portale passa al worker.
+servizio = next((d for d in docs if d.get("kind") == "Service" and d["metadata"]["name"] == nome), None)
+etichette_m = ((motore["spec"].get("template") or {}).get("metadata") or {}).get("labels") or {}
+if servizio is None or any(etichette_m.get(k) != v for k, v in (servizio["spec"].get("selector") or {}).items()):
+    print(f"nessun Service {nome} che selezioni i pod del motore")
+indirizzo = mappa.get("AI_MT_BASE_URL", "")
+trovato = re.match(r"^http://([a-z0-9-]+)(\.[a-z0-9.-]+)?:(\d+)/v1$", indirizzo)
+if not trovato or trovato.group(1) != nome or trovato.group(3) != "8080":
+    print(f"AI_MT_BASE_URL è {indirizzo!r}: deve puntare al Service {nome} sulla 8080, /v1")
+if not mappa.get("AI_MT_MODEL_ID"):
+    print("AI_MT_MODEL_ID manca: il portale non saprebbe quale modello scrivere sulle traduzioni")
+# Le repliche: senza, le porta l'orchestratore, che deve conoscere il
+# Deployment e poterlo scalare.
+if "replicas" not in motore["spec"]:
+    testo = "\n".join(str(x) for c in pod(orch).get("containers") or [] for x in (c.get("command") or [])) if orch else ""
+    if f'MT_DEPLOY="{nome}"' not in testo:
+        print(f"il motore di traduzione non ha repliche fisse, ma l'orchestratore non lo scala ({nome})")
+    ruoli = [d for d in docs if d.get("kind") == "Role" and "postprod-orchestrator" in d["metadata"]["name"]]
+    if not any("deployments/scale" in (r.get("resources") or []) and nome in (r.get("resourceNames") or [nome])
+               for d in ruoli for r in d.get("rules") or []):
+        print(f"l'orchestratore non ha il permesso di scalare {nome}")
+PY
+  then
+    errore "controllo della post-produzione non eseguito su $nome: $(head -3 "$OUT/$nome.pp.err" | tr '\n' ' ')"
+  fi
+  while read -r problema; do
+    [ -n "$problema" ] && errore "$problema"
+  done <"$OUT/$nome.pp"
+
   # Un nome di risorsa oltre i 63 caratteri viene rifiutato all'apply.
   while read -r n; do
     [ "${#n}" -le 63 ] || errore "nome oltre 63 caratteri: $n"
@@ -1642,6 +1831,14 @@ deve_fallire "copia del database senza il PostgreSQL del chart" "backup.enabled"
   --set secrets.generate.DATABASE_URL=postgresql://u:p@db.ente.example:5432/pa_webinar
 deve_fallire "copia del database con zero copie" "backup.retention" \
   --set backup.enabled=true --set backup.retention=0
+# Motore di traduzione su CPU: solo con il worker senza GPU, con un modello
+# verificabile.
+deve_fallire "motore di traduzione senza il worker senza GPU" "postprod.worker.cpu.enabled" \
+  --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.worker.cpu.enabled=false
+deve_fallire "impronta del modello di traduzione malformata" "postprod.mt.model.sha256" \
+  --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.sha256=abc
+deve_fallire "file del modello di traduzione con un percorso" "postprod.mt.model.file" \
+  --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.file=../modello.gguf
 
 echo
 if [ "$fallimenti" -gt 0 ]; then

@@ -89,4 +89,17 @@ data:
   {{- if and (include "pa-webinar.captionsEnabled" .) (not (hasKey $env "CAPTIONS_STATUS_URL")) }}
   CAPTIONS_STATUS_URL: {{ include "pa-webinar.captionsStatusUrl" . | quote }}
   {{- end }}
+  {{- /*
+    Il motore di traduzione su CPU (templates/postprod-mt.yaml): il portale
+    lo passa al worker nel claim dei lavori TRANSLATE_TEXT e, dalla presenza
+    dell'indirizzo, sa che la traduzione automatica dei testi c'e'.
+  */}}
+  {{- if include "pa-webinar.mtEnabled" . }}
+  {{- if not (hasKey $env "AI_MT_BASE_URL") }}
+  AI_MT_BASE_URL: {{ include "pa-webinar.mtBaseUrl" . | quote }}
+  {{- end }}
+  {{- if not (hasKey $env "AI_MT_MODEL_ID") }}
+  AI_MT_MODEL_ID: {{ .Values.postprod.mt.model.id | quote }}
+  {{- end }}
+  {{- end }}
 {{- include "pa-webinar.validateJitsiRoles" . }}

@@ -68,9 +68,10 @@ The exchange as the portal sees it is drawn in
 
 ## Portal protocol
 
-The worker calls three internal endpoints, all `POST` and all authenticated
-with the header `x-api-key: <CRON_API_KEY>`, the shared key the cron jobs
-use; an `Authorization: Bearer` header is refused. The base URL comes from
+The worker calls three internal endpoints, plus a delivery endpoint for each
+job of an event. All are `POST` and authenticated with the header
+`x-api-key: <CRON_API_KEY>`, the shared key the cron jobs use; an
+`Authorization: Bearer` header is refused. The base URL comes from
 `APP_INTERNAL_URL`. What the portal does with each call is described in
 [Claim, progress, register](../../../docs/POSTPROD.md#claim-progress-register).
 
@@ -79,6 +80,14 @@ use; an `Authorization: Bearer` header is refused. The base URL comes from
 | `/api/internal/postprod-claim` | `AppClient.claim(lease_minutes=30)` | Once, at start. `204` means nothing to claim |
 | `/api/internal/postprod-progress` | `AppClient.progress(job_id, status, ...)` | `RUNNING` right after the claim and between stages, then `DONE` or `FAILED` once |
 | `/api/internal/postprod-artifact` | `AppClient.register_artifact(...)` | After each output is uploaded |
+| `/api/internal/event-report` | `AppClient.deliver_report(...)` | `REPORT`: once, with the report text in each language |
+| `/api/internal/event-text-translation` | `AppClient.deliver_text_translation(...)` | `TRANSLATE_TEXT`: once, with the title and description in each language |
+
+The jobs of an event (`REPORT`, `TRANSLATE_TEXT`) send their claim number
+(`attempt`) with every progress report and with the delivery. An answer with
+`superseded`, `alreadyDelivered` or `closed`, or a progress answer with status
+`DONE` or `FAILED`, means another attempt owns the job or it is closed: the
+handler raises `LavoroChiuso` and the worker exits without reporting a failure.
 
 The pydantic models in `client.py` describe what
 `app/src/app/api/internal/postprod-claim/route.ts` returns, and ignore fields
@@ -100,6 +109,11 @@ the schema together.
   and the platform's figures). A `REPORT` job has no media, inputs or upload
   targets: the worker sends the report to `POST /api/internal/event-report`
   ([The event report](../../../docs/POSTPROD.md#the-event-report)).
+- **`textInput`.** `TRANSLATE_TEXT` only: `sourceLanguage`,
+  `targetLanguages`, `title`, `description` (Markdown) and `sourceHash`. The
+  job has no media, inputs or upload targets: the worker sends the
+  translations to `POST /api/internal/event-text-translation`
+  ([Event text translation](../../../docs/POSTPROD.md#event-text-translation)).
 - **`sourceDownloadUrl`.** A presigned GET for the recording's composite
   media.
 - **`inputs[]`.** Presigned GETs for dependencies, each with a `role`:
@@ -124,6 +138,8 @@ the schema together.
 | Hint | Where the portal gets it | When the hint is absent |
 |---|---|---|
 | `llmBaseUrl`, `llmModelId` | `AI_VLLM_BASE_URL` and `AI_VLLM_MODEL_ID`, with defaults in `app/src/lib/ai/providers.ts` | The LLM helpers return stub output |
+| `mtBaseUrl`, `mtModelId` | `AI_MT_BASE_URL` and `AI_MT_MODEL_ID`, which the chart sets with `postprod.mt.enabled`. `TRANSLATE_TEXT` only | `text_translate.py` returns stub output (`[xx] text`) |
+| `glossary` | The event's and the instance's glossary terms (`app/src/lib/ai/glossary.ts`) | No protected terms |
 | `asrModelId` | `AI_ASR_MODEL_ID` (default `large-v3` in `providers.ts`) | `large-v3` |
 | `ttsVoicesPath` | `AI_TTS_VOICES_PATH` (default `/models/piper` in `providers.ts`) | `/models/piper` |
 | `asrInitialPrompt` | Built from the event title, organizer name and speaker information, at most 800 characters. `TRANSCRIBE` only | No prompt |
@@ -172,6 +188,8 @@ the schema together.
 | `DUB` | `run_dub` | `translatedTranscript`, and the composite media for the video | `DUBBED_AUDIO`, optional `DUBBED_VIDEO` | Piper on CPU, AudioSeal |
 | `ARCHIVE` | `run_archive` | composite media, `track`, `subtitle` | `ARCHIVE_MKV` | ffmpeg, with track offsets refined by `align.py` |
 | `SUBTITLE` | none | - | - | Reported `DONE` with no artifacts: `TRANSCRIBE` already writes the source-language VTT, and the portal does not enqueue this kind |
+| `REPORT` | `run_report` | `reportInput` | none: delivered to `/api/internal/event-report` | vLLM |
+| `TRANSLATE_TEXT` | `run_translate_text` | `textInput` | none: delivered to `/api/internal/event-text-translation` | the CPU translation engine (llama.cpp with EuroLLM-9B-Instruct), one request per line, never vLLM |
 
 **How dubbing picks voices.** A voice is an `.onnx` file plus its
 `.onnx.json`. `voice_pool.build_voice_pool` lists every such voice for the
@@ -210,6 +228,12 @@ always a catalog synthetic voice, never a cloned one.
 - `name_gender.py`: infers M, F or N from a first name, for voice matching.
 - `archive.py`: builds and runs the ffmpeg command that muxes the composite
   video, the per-participant tracks and the subtitles into one MKV.
+- `text_translate.py`: the translation of an event's title and description
+  with the CPU translation engine. It keeps the Markdown structure line by
+  line, turns links into `<aN>` tags and addresses, emails and glossary terms
+  into `⟦n⟧` placeholders, splits the title on its kicker, and waits for the
+  engine's cold start (`MT_CONNECT_WAIT_S`). It needs only `httpx`, and
+  `main.py` imports it inside `run_translate_text`.
 - `waveform.py`: a normalized peak envelope, drawn by the transcript editor.
 - `conftest.py`: adds this folder to `sys.path` for pytest.
 - `test_*.py`: the unit tests.
@@ -229,11 +253,14 @@ mounts are writable: `/models`, which is the PVC named in
 `postprod.worker.modelsPvc` or else an empty scratch volume, and `/work`, a
 scratch volume of `postprod.worker.workSizeLimit`.
 
-The worker without a GPU (`python -m worker.cpu`, for summaries, translations
-and the archive) has its own image, `../Dockerfile.worker-cpu`: Python on
-Alpine with ffmpeg and the packages in `requirements-cpu.txt`, under 300 MB.
-It mounts only `/work`. Its build imports `worker.cpu` and `worker.main`, so a
+The worker without a GPU (`python -m worker.cpu`, for summaries, translations,
+the archive, the event report and the translation of event texts) has its own
+image, `../Dockerfile.worker-cpu`: Python on Alpine with ffmpeg and the
+packages in `requirements-cpu.txt`, under 300 MB. It mounts only `/work`. Its
+build imports `worker.cpu`, `worker.main` and `worker.text_translate`, so a
 module that imported torch, WhisperX or Piper at startup would stop the build.
+The translation of event texts adds no package: the model runs in its own
+pod (`postprod.mt`), and the worker calls it over HTTP.
 
 | Variable | Set by | Why |
 |---|---|---|
@@ -247,6 +274,8 @@ module that imported torch, WhisperX or Piper at startup would stop the build.
 | `HF_TOKEN` | chart, from `postprod.worker.hfTokenSecret` | Turns on diarization |
 | `WORKER_STUB` | chart, from `postprod.worker.stub` | [Stub mode](#stub-mode) |
 | `LLM_CONNECT_WAIT_S` | `postprod.worker.extraEnv`, `postprod.worker.cpu.extraEnv` | How long an LLM call waits for vLLM. Default 1200 seconds in `llm.py` |
+| `MT_CONNECT_WAIT_S` | `postprod.worker.cpu.extraEnv` | How long the first request of a `TRANSLATE_TEXT` job waits for the CPU translation engine to start and load its model. Default 900 seconds in `text_translate.py`; after the engine has answered once, a later wait is at most 180 seconds |
+| `WORKER_DEADLINE_S` | chart, from `postprod.worker.activeDeadlineSeconds` | The Job's deadline: the transcript correction and the translation of event texts stop in time to deliver what they have |
 
 `LLM_CONNECT_WAIT_S` covers connection errors and `503` answers. The wait
 between retries grows by 2 seconds per attempt, up to 15 seconds. Any other
@@ -348,18 +377,19 @@ python -m pytest -q
   `sys.path`, so the bare `pytest -q` that CI runs collects the same tests.
   A `ModuleNotFoundError` from a bare `pytest` means another interpreter is
   running it.
-- **CPU only, with light dependencies.** `requirements-test.txt` holds only
-  `numpy`, `httpx` and `pytest`. The modules import `torch`, `whisperx`,
-  `piper` and `audioseal` inside functions, so the tests never load them.
-  Keep it that way: a heavy import at module level breaks the suite.
-  `client.py`, and `main.py` through it, import `pydantic` at module level,
-  and `pydantic` is not in `requirements-test.txt`. A test that imports them
-  must add it there.
+- **CPU only, with light dependencies.** `requirements-test.txt` holds
+  `numpy`, `nltk`, `httpx`, `pydantic` and `pytest`. The modules import
+  `torch`, `whisperx`, `piper` and `audioseal` inside functions, so the tests
+  never load them. Keep it that way: a heavy import at module level breaks
+  the suite. CI runs Python 3.11; with a newer system Python, create a 3.11
+  environment for the suite (for example `uv venv -p 3.11`).
 - **What is covered.** The tests cover pure logic: offset cross-correlation,
   the archive command, LLM parsing, rendering and batching (with
   `_chat_completions` replaced), the multitrack merge, the transcription
   fallbacks (with a fake `whisperx` module in `sys.modules`), voice-folder
-  resolution and the VTT round trip.
+  resolution, the VTT round trip, and the translation of event texts
+  (request format, Markdown, links, placeholders, kicker, deadline and
+  delivery, with `_chat_completions` replaced).
 - **In CI.** The job **Unit Tests (worker AI)** in `.github/workflows/ci.yml`
   runs `pytest -q` on Python 3.11 for pull requests to `main`, pushes to
   `main` and manual runs; it does not run on `dev`. The job list is in

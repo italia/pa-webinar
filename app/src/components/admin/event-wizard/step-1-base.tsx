@@ -9,7 +9,7 @@
  * collects the full form and POSTs on review.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import EventTitle from '@/components/events/event-title';
@@ -84,6 +84,11 @@ interface Props {
   /** L'amministrazione crea una categoria nuova da qui, gia' scelta per
    *  l'evento: la riceve chi tiene l'elenco delle categorie. */
   onEtichettaCreata?: (etichetta: EtichettaCreata) => void;
+  /** La traduzione automatica di titolo e descrizione (text-translation.tsx),
+   *  sotto le lingue: solo se l'installazione la offre. */
+  traduzione?: ReactNode;
+  /** Le lingue riempite dalla traduzione automatica, da rileggere. */
+  machineLocales?: string[];
 }
 
 export default function Step1Base({
@@ -97,6 +102,8 @@ export default function Step1Base({
   siteDefaultVideoQuality,
   parte = 'evento',
   onEtichettaCreata,
+  traduzione,
+  machineLocales = [],
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
@@ -107,6 +114,7 @@ export default function Step1Base({
   // Il testo del campo partecipanti mentre lo si scrive (null fuori dal campo).
   const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
+  const tTrad = useTranslations('admin.textTranslation');
   const [contentLocale, setContentLocale] = useState(defaultLocale);
   // Titolo e descrizione sono obbligatori solo nella lingua predefinita:
   // l'asterisco compare sulla sua scheda, come quello della barra delle lingue.
@@ -491,8 +499,23 @@ export default function Step1Base({
           defaultLocale={defaultLocale}
           activeLocale={contentLocale}
           onSelectLocale={setContentLocale}
-          filledLocales={Object.keys(value.title).filter((l) => value.title[l])}
+          // Compilata se ha il titolo o la descrizione.
+          filledLocales={enabledLocales.filter(
+            (l) => !!value.title[l]?.trim() || !!value.description[l]?.trim()
+          )}
+          machineLocales={machineLocales}
+          machineLabel={tTrad('machineMark')}
         />
+
+        {traduzione}
+
+        {/* Una lingua riempita dalla traduzione automatica: da rileggere prima
+            di salvare (il salvataggio e' la revisione). */}
+        {contentLocale !== defaultLocale && machineLocales.includes(contentLocale) && (
+          <div className="alert alert-info mb-3" role="note">
+            {tTrad('reviewAlert')}
+          </div>
+        )}
 
         <div
           className={`mb-3 wizard-campo${

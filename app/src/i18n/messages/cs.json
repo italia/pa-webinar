@@ -1128,7 +1128,8 @@
         "speakers": "řečníci",
         "materials": "materiály",
         "questionnaires": "dotazníky",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "strojový překlad"
       },
       "revocationFailed": "Zrušení přístupu pro {name} se nezdařilo: přístupový odkaz stále platí. Uložte znovu pro další pokus, nebo jej zrušte na kartě „{tab}“ na stránce události.",
       "validationFailedDetail": "Server odmítl některé údaje: {reason}. Opravte je a zkuste to znovu.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Shrnutí už nelze aktualizovat: akce neskončila nebo uplynula doba uchovávání jejích dat.",
         "error": "Aktualizace se nezdařila: zkuste to znovu."
       }
+    },
+    "textTranslation": {
+      "heading": "Strojový překlad",
+      "intro": "Přeloží název a popis modelem, který běží na serverech této instalace. Vyplní jen pole, která jsou ještě prázdná: před uložením si přeložený text přečtěte.",
+      "languages": "Cílové jazyky",
+      "start": "Přeložit pomocí AI",
+      "afterCreate": "Po uložení přeložit pomocí AI",
+      "afterCreateHelp": "Název a popis se přeloží do zvolených jazyků. Překlady zkontrolujte a uložte úpravou události.",
+      "offer": "Strojové překlady tohoto textu jsou k dispozici pro: {languages}.",
+      "useOffer": "Použít překlady",
+      "machineMark": "strojově přeloženo, ke kontrole",
+      "reviewAlert": "Strojově přeloženo: před uložením zkontrolujte.",
+      "error": "Překlad se nepodařilo vyžádat. Zkuste to znovu.",
+      "queued": "Ve frontě: překlad brzy začne.",
+      "running": "Probíhá překlad: může to trvat několik minut.",
+      "busy": "Pro tuto událost už probíhá jiný překlad: zkuste to znovu, až skončí.",
+      "noTargets": "Vyberte alespoň jeden jazyk.",
+      "sourceMissing": "Nejprve napište název nebo popis v hlavním jazyce.",
+      "done": "Překlad je připraven pro: {languages}. Před uložením zkontrolujte.",
+      "doneNothing": "Překlad je připraven, ale pole v těchto jazycích už byla vyplněna: žádný text nebyl nahrazen.",
+      "failed": "Překlad se nezdařil: {reason}",
+      "failedGeneric": "Překlad se nezdařil.",
+      "status": {
+        "queued": "Strojový překlad názvu a popisu čeká ve frontě.",
+        "running": "Probíhá strojový překlad názvu a popisu.",
+        "ready": "Strojový překlad názvu a popisu je připraven pro: {languages}. Zkontrolujte ho a uložte úpravou události.",
+        "review": "Zkontrolovat texty",
+        "failed": "Strojový překlad názvu a popisu se nezdařil: {reason}",
+        "failedGeneric": "Strojový překlad názvu a popisu se nezdařil."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI je pro tuto akci vypnutá: pomocí „Vygenerovat AI“ ji zapnete a spustíte zpracování.",
     "sourceTranscriptMissing": "Tento záznam ještě není přepsaný: nejdřív ho přepište, pak přidejte překlad.",
     "captionsTranscriptNotTranslatable": "Tento přepis pochází z živých titulků: automatický překlad vyžaduje AI přepis záznamu.",
-    "sameLanguage": "Zvolený jazyk je původní jazyk záznamu: vyberte jiný."
+    "sameLanguage": "Zvolený jazyk je původní jazyk záznamu: vyberte jiný.",
+    "mtUnavailable": "Strojový překlad není na této instanci nainstalován."
   }
 }

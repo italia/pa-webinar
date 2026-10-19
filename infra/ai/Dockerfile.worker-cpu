@@ -1,5 +1,7 @@
 # Worker di post-produzione senza GPU (postprod.worker.cpu nel chart): sintesi,
-# traduzioni e archivio. Stesso codice del worker con la GPU
+# traduzioni, archivio e traduzione dei testi degli eventi (quest'ultima
+# chiama su HTTP il motore di traduzione su CPU, postprod.mt: nessuna
+# dipendenza in piu' qui). Stesso codice del worker con la GPU
 # (Dockerfile.worker), solo le dipendenze che servono a questi job
 # (worker/requirements-cpu.txt): l'immagine scende da ~15 GB compressi a meno
 # di 300 MB, e si scarica in pochi secondi sui nodi dell'app che la ospitano.
@@ -18,7 +20,7 @@ COPY worker/ ./worker/
 
 # Il punto d'ingresso deve importarsi senza torch, WhisperX o Piper: se un
 # modulo li importasse all'avvio, il build si ferma qui e non al primo job.
-RUN python -c "import numpy, worker.cpu, worker.main; print('imports OK')"
+RUN python -c "import numpy, worker.cpu, worker.main, worker.text_translate; print('imports OK')"
 
 RUN adduser -D -u 10001 -h /work worker \
     && mkdir -p /work && chown -R worker:worker /opt/worker /work

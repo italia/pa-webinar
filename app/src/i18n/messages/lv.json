@@ -1128,7 +1128,8 @@
         "speakers": "runātāji",
         "materials": "materiāli",
         "questionnaires": "anketas",
-        "agenda": "programma"
+        "agenda": "programma",
+        "textTranslation": "mašīntulkošana"
       },
       "revocationFailed": "Neizdevās atsaukt piekļuvi ({name}): piekļuves saite joprojām ir derīga. Saglabājiet vēlreiz, lai mēģinātu atkārtoti, vai atsauciet to pasākuma lapas cilnē “{tab}”.",
       "validationFailedDetail": "Serveris noraidīja dažus datus: {reason}. Izlabojiet un mēģiniet vēlreiz.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Pārskatu vairs nevar atjaunināt: pasākums nav beidzies vai ir beidzies tā datu glabāšanas termiņš.",
         "error": "Atjaunināšana neizdevās: mēģiniet vēlreiz."
       }
+    },
+    "textTranslation": {
+      "heading": "Mašīntulkošana",
+      "intro": "Tulko nosaukumu un aprakstu ar modeli, kas darbojas šīs instalācijas serveros. Tā aizpilda tikai laukus, kas vēl ir tukši: pirms saglabāšanas pārlasiet tulkoto tekstu.",
+      "languages": "Mērķa valodas",
+      "start": "Tulkot ar MI",
+      "afterCreate": "Pēc saglabāšanas tulkot ar MI",
+      "afterCreateHelp": "Nosaukums un apraksts tiek tulkoti izvēlētajās valodās. Pārlasiet un saglabājiet tulkojumus, rediģējot pasākumu.",
+      "offer": "Šim tekstam ir mašīntulkojumi valodās: {languages}.",
+      "useOffer": "Izmantot tulkojumus",
+      "machineMark": "mašīntulkots, jāpārlasa",
+      "reviewAlert": "Mašīntulkots: pārlasiet pirms saglabāšanas.",
+      "error": "Tulkojumu neizdevās pieprasīt. Mēģiniet vēlreiz.",
+      "queued": "Rindā: tulkošana drīz sāksies.",
+      "running": "Notiek tulkošana: tas var aizņemt dažas minūtes.",
+      "busy": "Šim pasākumam jau notiek cits tulkojums: mēģiniet vēlreiz, kad tas beigsies.",
+      "noTargets": "Izvēlieties vismaz vienu valodu.",
+      "sourceMissing": "Vispirms uzrakstiet nosaukumu vai aprakstu galvenajā valodā.",
+      "done": "Tulkojums gatavs valodās: {languages}. Pārlasiet pirms saglabāšanas.",
+      "doneNothing": "Tulkojums gatavs, bet šo valodu lauki jau bija aizpildīti: neviens teksts netika aizstāts.",
+      "failed": "Tulkošana neizdevās: {reason}",
+      "failedGeneric": "Tulkošana neizdevās.",
+      "status": {
+        "queued": "Nosaukuma un apraksta mašīntulkojums ir rindā.",
+        "running": "Notiek nosaukuma un apraksta mašīntulkošana.",
+        "ready": "Nosaukuma un apraksta mašīntulkojums ir gatavs valodās: {languages}. Pārlasiet un saglabājiet to, rediģējot pasākumu.",
+        "review": "Pārskatīt tekstus",
+        "failed": "Nosaukuma un apraksta mašīntulkošana neizdevās: {reason}",
+        "failedGeneric": "Nosaukuma un apraksta mašīntulkošana neizdevās."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "MI šim pasākumam ir izslēgts: izmantojiet “Ģenerēt MI”, lai to ieslēgtu un sāktu apstrādi.",
     "sourceTranscriptMissing": "Šis ieraksts vēl nav transkribēts: vispirms to transkribējiet, tad pievienojiet tulkojumu.",
     "captionsTranscriptNotTranslatable": "Šis atšifrējums iegūts no tiešraides subtitriem: automātiskajai tulkošanai nepieciešams ieraksta MI atšifrējums.",
-    "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu."
+    "sameLanguage": "Izvēlētā valoda ir ieraksta oriģinālvaloda: izvēlieties citu.",
+    "mtUnavailable": "Šajā instancē mašīntulkošana nav instalēta."
   }
 }

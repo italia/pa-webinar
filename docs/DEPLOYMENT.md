@@ -152,6 +152,7 @@ example profiles in `infra/helm/pa-webinar/examples/`.
 | JVB scaler CronJob with its ServiceAccount and Role | `jitsi.mode: full` and `jvbScaler.enabled` | off | off | off | on |
 | Recorder controller Deployment, suspended recorder CronJob, RBAC | `recorder.enabled` and `recorder.controller.enabled` | off | off | off | off |
 | Post-production: orchestrator, suspended worker template, reclaim, retention and multitrack-purge jobs | `postprod.enabled`; each job except the multitrack purge also has its own `enabled` | off | off | off | off |
+| CPU translation engine for event titles and descriptions: Deployment and Service `<fullname>-mt` and, with the NetworkPolicy on, a policy of its own | `postprod.enabled` and `postprod.mt.enabled`, with `postprod.worker.cpu.enabled` | off | off | off | off |
 | ServiceMonitor for the app | `metrics.serviceMonitor.enabled` | off | off | off | on |
 | PrometheusRule | `metrics.prometheusRule.enabled` | off | off | off | off |
 | Grafana dashboard ConfigMap | `metrics.grafanaDashboard.enabled` | off | off | off | off |
@@ -1247,6 +1248,12 @@ Set what the defaults cannot know before you rely on the policy:
   `fromNamespaceSelectors` and `fromPodSelectors` are both empty. Admit the bots with a `networkPolicy.ingress.extraRules` entry for pods labeled
   `app.kubernetes.io/component: recorder` on port 3000
   ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)).
+
+Two other components get a policy of their own when they are rendered: the live captions service
+([Live captions](architecture/live-captions.md)) and the CPU translation engine of the post-production
+(`<fullname>-mt`), which admits only the post-production CPU worker on port 8080 and lets out only DNS
+and HTTPS, for the model download ([Event text translation](POSTPROD.md#event-text-translation)). An
+in-cluster mirror of the model goes in `networkPolicy.mt.extraEgressRules`.
 
 Without a CNI that enforces NetworkPolicy, the object is accepted and ignored. Which platforms enforce
 it is in [Network policies](INFRASTRUCTURE.md#network-policies).

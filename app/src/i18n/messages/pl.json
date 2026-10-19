@@ -1128,7 +1128,8 @@
         "speakers": "prelegenci",
         "materials": "materiały",
         "questionnaires": "kwestionariusze",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "tłumaczenie maszynowe"
       },
       "revocationFailed": "Nie udało się cofnąć dostępu ({name}): link dostępu nadal jest ważny. Zapisz ponownie, aby spróbować jeszcze raz, lub cofnij go na karcie „{tab}” na stronie wydarzenia.",
       "validationFailedDetail": "Serwer odrzucił niektóre dane: {reason}. Popraw je i spróbuj ponownie.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Podsumowania nie można już zaktualizować: wydarzenie się nie zakończyło lub upłynął okres przechowywania jego danych.",
         "error": "Aktualizacja się nie powiodła: spróbuj ponownie."
       }
+    },
+    "textTranslation": {
+      "heading": "Tłumaczenie maszynowe",
+      "intro": "Tłumaczy tytuł i opis za pomocą modelu działającego na serwerach tej instalacji. Wypełnia tylko pola, które są jeszcze puste: przed zapisaniem przeczytaj przetłumaczony tekst.",
+      "languages": "Języki docelowe",
+      "start": "Przetłumacz za pomocą AI",
+      "afterCreate": "Po zapisaniu przetłumacz za pomocą AI",
+      "afterCreateHelp": "Tytuł i opis zostaną przetłumaczone na wybrane języki. Przeczytaj i zapisz tłumaczenia, edytując wydarzenie.",
+      "offer": "Dostępne są tłumaczenia maszynowe tego tekstu na: {languages}.",
+      "useOffer": "Użyj tłumaczeń",
+      "machineMark": "przetłumaczone maszynowo, do sprawdzenia",
+      "reviewAlert": "Przetłumaczone maszynowo: sprawdź przed zapisaniem.",
+      "error": "Nie udało się zlecić tłumaczenia. Spróbuj ponownie.",
+      "queued": "W kolejce: tłumaczenie wkrótce się rozpocznie.",
+      "running": "Trwa tłumaczenie: może to potrwać kilka minut.",
+      "busy": "Dla tego wydarzenia trwa już inne tłumaczenie: spróbuj ponownie, gdy się zakończy.",
+      "noTargets": "Wybierz co najmniej jeden język.",
+      "sourceMissing": "Najpierw wpisz tytuł lub opis w języku głównym.",
+      "done": "Tłumaczenie gotowe dla: {languages}. Sprawdź przed zapisaniem.",
+      "doneNothing": "Tłumaczenie gotowe, ale pola w tych językach były już wypełnione: żaden tekst nie został zastąpiony.",
+      "failed": "Tłumaczenie nie powiodło się: {reason}",
+      "failedGeneric": "Tłumaczenie nie powiodło się.",
+      "status": {
+        "queued": "Tłumaczenie maszynowe tytułu i opisu czeka w kolejce.",
+        "running": "Trwa tłumaczenie maszynowe tytułu i opisu.",
+        "ready": "Tłumaczenie maszynowe tytułu i opisu jest gotowe dla: {languages}. Sprawdź je i zapisz, edytując wydarzenie.",
+        "review": "Sprawdź teksty",
+        "failed": "Tłumaczenie maszynowe tytułu i opisu nie powiodło się: {reason}",
+        "failedGeneric": "Tłumaczenie maszynowe tytułu i opisu nie powiodło się."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI jest wyłączona dla tego wydarzenia: użyj „Wygeneruj AI”, aby ją włączyć i uruchomić przetwarzanie.",
     "sourceTranscriptMissing": "To nagranie nie ma jeszcze transkrypcji: najpierw je przetranskrybuj, potem dodaj tłumaczenie.",
     "captionsTranscriptNotTranslatable": "Ta transkrypcja pochodzi z napisów na żywo: automatyczne tłumaczenie wymaga transkrypcji AI nagrania.",
-    "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny."
+    "sameLanguage": "Wybrany język jest oryginalnym językiem nagrania: wybierz inny.",
+    "mtUnavailable": "Tłumaczenie maszynowe nie jest zainstalowane w tej instancji."
   }
 }

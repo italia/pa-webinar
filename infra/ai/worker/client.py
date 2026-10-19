@@ -65,6 +65,10 @@ class ProviderHints(BaseModel):
     # voci {term, aliases, reading, spoken, translations, note}, lette da
     # glossary.parse.
     glossary: List[Dict[str, Any]] = Field(default_factory=list)
+    # Il motore di traduzione su CPU (lavoro TRANSLATE_TEXT): indirizzo
+    # OpenAI-compatibile (.../v1) e modello. Mai vLLM per questo lavoro.
+    mtBaseUrl: Optional[str] = None
+    mtModelId: Optional[str] = None
 
 
 class ClaimResponse(BaseModel):
@@ -72,7 +76,7 @@ class ClaimResponse(BaseModel):
 
     claimed: bool = True
     jobId: str
-    # Nullo per il resoconto dell'evento (REPORT), che non ha registrazione.
+    # Nullo per i lavori dell'evento (REPORT, TRANSLATE_TEXT), senza registrazione.
     recordingId: Optional[str] = None
     kind: str
     payload: Dict[str, Any]
@@ -88,6 +92,9 @@ class ClaimResponse(BaseModel):
     providerHints: ProviderHints
     # Lavoro REPORT: gli ingressi del resoconto raccolti dal portale al claim.
     reportInput: Optional[Dict[str, Any]] = None
+    # Lavoro TRANSLATE_TEXT: il testo da tradurre {sourceLanguage,
+    # targetLanguages, title, description, sourceHash}.
+    textInput: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -260,6 +267,35 @@ class AppClient:
         if model_version is not None:
             payload["modelVersion"] = model_version
         r = self._client.post("/api/internal/event-report", json=payload)
+        r.raise_for_status()
+        try:
+            risposta = r.json()
+        except ValueError:
+            return {}
+        return risposta if isinstance(risposta, dict) else {}
+
+    def deliver_text_translation(
+        self,
+        *,
+        job_id: str,
+        title: Dict[str, str],
+        description: Dict[str, str],
+        model_id: Optional[str],
+        model_version: Optional[str] = None,
+        attempt: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Consegna le traduzioni di titolo e descrizione (lavoro
+        TRANSLATE_TEXT): un testo per lingua. Il portale le salva come
+        proposta; la risposta dice, come per il resoconto, se lo aveva gia'
+        fatto un altro tentativo o se il lavoro non e' piu' di questo."""
+        payload: Dict[str, Any] = {"jobId": job_id, "title": title, "description": description}
+        if attempt is not None:
+            payload["attempt"] = attempt
+        if model_id is not None:
+            payload["modelId"] = model_id
+        if model_version is not None:
+            payload["modelVersion"] = model_version
+        r = self._client.post("/api/internal/event-text-translation", json=payload)
         r.raise_for_status()
         try:
             risposta = r.json()

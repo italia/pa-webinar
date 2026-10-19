@@ -1,9 +1,10 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/db', () => ({
   prisma: {
     $queryRaw: vi.fn(),
+    $executeRaw: vi.fn(async () => 1),
     postprodJob: { update: vi.fn() },
     siteSetting: { findUnique: vi.fn(async () => ({ aiLlmProvider: 'vllm' })) },
     recording: { findUnique: vi.fn() },
@@ -165,4 +166,59 @@ describe('POST /api/internal/postprod-claim', () => {
     expect(ingressi.trascrizione).toHaveBeenCalledWith(expect.objectContaining({ id: recordingId, runCount: 1 }), expect.any(Number));
     expect(body.inputs).toContainEqual(expect.objectContaining({ role: 'transcript', downloadUrl: 'https://archivio/trascrizione' }));
   });
+
+  describe('traduzione di titolo e descrizione (TRANSLATE_TEXT)', () => {
+    const eventId = '11111111-2222-4333-8444-555555555555';
+    const riga = {
+      id: '66666666-7777-4888-8999-000000000000',
+      recording_id: null,
+      kind: 'TRANSLATE_TEXT',
+      payload: {
+        eventId,
+        sourceLanguage: 'it',
+        targetLanguages: ['de', 'en'],
+        title: 'Ciclo | Titolo',
+        description: '# Testo',
+        sourceHash: 'a'.repeat(64),
+      },
+      attempts: 1,
+      next_attempt_at: new Date(),
+      depends_on_id: null,
+    };
+    const ambiente = { ...process.env };
+    afterEach(() => {
+      process.env = { ...ambiente };
+    });
+
+    it('il testo, il motore su CPU e nessun indirizzo di vLLM', async () => {
+      process.env.AI_MT_BASE_URL = 'http://videocall-pa-webinar-mt:8080/v1';
+      process.env.AI_MT_MODEL_ID = 'modello-mt';
+      fn(prisma.$queryRaw).mockResolvedValueOnce([riga]);
+      const res = await claim({ workerId: 'w-cpu', kinds: ['TRANSLATE_TEXT'] });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { providerHints: Record<string, unknown> } & Record<string, unknown>;
+      expect(body).toMatchObject({
+        recordingId: null,
+        kind: 'TRANSLATE_TEXT',
+        textInput: { sourceLanguage: 'it', targetLanguages: ['de', 'en'], title: 'Ciclo | Titolo', description: '# Testo' },
+        uploadTargets: {},
+        inputs: [],
+      });
+      // Il testo viaggia una volta sola, in textInput.
+      expect(body.payload).not.toHaveProperty('title');
+      expect(body.providerHints).toMatchObject({ mtBaseUrl: 'http://videocall-pa-webinar-mt:8080/v1', mtModelId: 'modello-mt' });
+      expect(body.providerHints).not.toHaveProperty('llmBaseUrl');
+    });
+
+    it('senza motore il lavoro si chiude come fallito invece di tornare in coda', async () => {
+      delete process.env.AI_MT_BASE_URL;
+      fn(prisma.$queryRaw).mockResolvedValueOnce([riga]);
+      const res = await claim({ workerId: 'w-cpu', kinds: ['TRANSLATE_TEXT'] });
+      expect(res.status).toBe(204);
+      const sql = sqlOf(fn(prisma.$executeRaw).mock.calls[0]!);
+      expect(sql).toContain("status = 'FAILED'");
+      expect(sql).toContain("status = 'CLAIMED' AND attempts = ?");
+    });
+  });
+
 });

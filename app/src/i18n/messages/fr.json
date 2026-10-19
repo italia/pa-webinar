@@ -1128,7 +1128,8 @@
         "speakers": "intervenants",
         "materials": "documents",
         "questionnaires": "questionnaires",
-        "agenda": "programme"
+        "agenda": "programme",
+        "textTranslation": "traduction automatique"
       },
       "revocationFailed": "La révocation de l’accès de {name} a échoué : son lien d’accès est toujours valide. Enregistrez à nouveau pour réessayer, ou révoquez-le depuis l’onglet « {tab} » de la page de l’événement.",
       "validationFailedDetail": "Le serveur a refusé certaines données : {reason}. Corrigez-les et réessayez.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Le récapitulatif ne peut plus être mis à jour : l’événement n’est pas terminé ou ses données ont expiré.",
         "error": "La mise à jour a échoué : réessayez."
       }
+    },
+    "textTranslation": {
+      "heading": "Traduction automatique",
+      "intro": "Traduit le titre et la description avec un modèle qui tourne sur les serveurs de cette installation. Seuls les champs encore vides sont remplis : relisez le texte traduit avant d'enregistrer.",
+      "languages": "Langues de traduction",
+      "start": "Traduire avec l'IA",
+      "afterCreate": "Après l'enregistrement, traduire avec l'IA",
+      "afterCreateHelp": "Le titre et la description sont traduits dans les langues choisies. Relisez et enregistrez les traductions en modifiant l'événement.",
+      "offer": "Des traductions automatiques de ce texte sont disponibles pour : {languages}.",
+      "useOffer": "Utiliser les traductions",
+      "machineMark": "traduit automatiquement, à relire",
+      "reviewAlert": "Traduit automatiquement : relisez avant d'enregistrer.",
+      "error": "Impossible de demander la traduction. Réessayez.",
+      "queued": "En file d'attente : la traduction va bientôt commencer.",
+      "running": "Traduction en cours : cela peut prendre quelques minutes.",
+      "busy": "Une autre traduction est déjà en cours pour cet événement : réessayez quand elle sera terminée.",
+      "noTargets": "Choisissez au moins une langue.",
+      "sourceMissing": "Écrivez d'abord le titre ou la description dans la langue principale.",
+      "done": "Traduction prête pour : {languages}. Relisez avant d'enregistrer.",
+      "doneNothing": "Traduction prête, mais les champs de ces langues étaient déjà remplis : aucun texte n'a été remplacé.",
+      "failed": "La traduction a échoué : {reason}",
+      "failedGeneric": "La traduction a échoué.",
+      "status": {
+        "queued": "La traduction automatique du titre et de la description est en file d'attente.",
+        "running": "La traduction automatique du titre et de la description est en cours.",
+        "ready": "La traduction automatique du titre et de la description est prête pour : {languages}. Relisez-la et enregistrez-la en modifiant l'événement.",
+        "review": "Revoir les textes",
+        "failed": "La traduction automatique du titre et de la description a échoué : {reason}",
+        "failedGeneric": "La traduction automatique du titre et de la description a échoué."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "L'IA est désactivée pour cet événement : utilisez « Générer l'IA » pour l'activer et lancer le pipeline.",
     "sourceTranscriptMissing": "Cet enregistrement n'est pas encore transcrit : transcrivez-le avant d'ajouter une traduction.",
     "captionsTranscriptNotTranslatable": "Cette transcription provient des sous-titres en direct : la traduction automatique nécessite une transcription IA de l'enregistrement.",
-    "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre."
+    "sameLanguage": "La langue choisie est celle d'origine de l'enregistrement : choisissez-en une autre.",
+    "mtUnavailable": "La traduction automatique n'est pas installée sur cette instance."
   }
 }

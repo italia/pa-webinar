@@ -879,6 +879,82 @@ describe('creazione — risorse non salvate', () => {
   });
 });
 
+describe('creazione — traduzione automatica dopo il salvataggio', () => {
+  const CREATO = { id: 'evt-tradotto', slug: 'evt-tradotto', moderatorToken: 'tok-t' };
+  const tt = messages.admin.textTranslation;
+
+  function compila() {
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+  }
+
+  it('senza la traduzione nell\'installazione il passo non cambia', () => {
+    renderWizard();
+    expect(container.textContent).not.toContain(tt.heading);
+  });
+
+  it('scelta: dopo la creazione la chiede con il testo salvato, nelle lingue vuote', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/text-translation')) return json(202, { stato: 'accodato', jobId: 'j' });
+      return json(200, {});
+    });
+    renderWizard({ textTranslationAvailable: true, enabledLocales: ['it', 'en', 'de'] });
+    compila();
+    click(byId<HTMLInputElement>('traduci-dopo'));
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+
+    const richiesta = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/text-translation'));
+    expect(String(richiesta![0])).toBe(`/api/admin/events/${CREATO.id}/text-translation`);
+    expect(JSON.parse(String(richiesta![1].body))).toEqual({
+      sourceLanguage: 'it',
+      title: 'Evento di prova',
+      description: 'Una descrizione valida per il wizard.',
+      targetLanguages: ['en', 'de'],
+    });
+    // Tutto salvato: nessuna risorsa mancante da dire.
+    expect(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`)).toBeNull();
+  });
+
+  it('una richiesta rifiutata non blocca la creazione: arriva al riepilogo come risorsa non salvata', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/text-translation')) return json(422, { code: 'MT_UNAVAILABLE' });
+      return json(200, {});
+    });
+    renderWizard({ textTranslationAvailable: true });
+    compila();
+    click(byId<HTMLInputElement>('traduci-dopo'));
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+
+    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
+    expect(JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}')).toEqual({
+      unsaved: ['textTranslation'],
+      publishFailed: false,
+    });
+  });
+
+  it('non scelta: nessuna richiesta', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      return json(200, {});
+    });
+    renderWizard({ textTranslationAvailable: true });
+    compila();
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/text-translation'))).toBe(false);
+  });
+});
+
 describe('passo «Quando» — la fine segue l inizio', () => {
   function fuoco(el: HTMLElement, dentro: boolean) {
     act(() => {

@@ -1128,7 +1128,8 @@
         "speakers": "sprekers",
         "materials": "materiaal",
         "questionnaires": "vragenlijsten",
-        "agenda": "programma"
+        "agenda": "programma",
+        "textTranslation": "automatische vertaling"
       },
       "revocationFailed": "Het intrekken van de toegang van {name} is mislukt: de toegangslink is nog steeds geldig. Sla opnieuw op om het nogmaals te proberen, of trek hem in via het tabblad “{tab}” op de pagina van het evenement.",
       "validationFailedDetail": "De server heeft enkele gegevens geweigerd: {reason}. Corrigeer ze en probeer het opnieuw.",
@@ -3535,6 +3536,36 @@
         "notPossible": "De samenvatting kan niet meer worden bijgewerkt: het evenement is niet afgelopen of de bewaartermijn van de gegevens is verstreken.",
         "error": "Bijwerken mislukt: probeer het opnieuw."
       }
+    },
+    "textTranslation": {
+      "heading": "Automatische vertaling",
+      "intro": "Vertaalt de titel en de beschrijving met een model dat op de servers van deze installatie draait. Alleen velden die nog leeg zijn worden ingevuld: controleer de vertaalde tekst voordat je opslaat.",
+      "languages": "Talen om naar te vertalen",
+      "start": "Vertalen met AI",
+      "afterCreate": "Na het opslaan vertalen met AI",
+      "afterCreateHelp": "De titel en de beschrijving worden vertaald in de gekozen talen. Controleer en sla de vertalingen op door het evenement te bewerken.",
+      "offer": "Er zijn automatische vertalingen van deze tekst voor: {languages}.",
+      "useOffer": "Vertalingen gebruiken",
+      "machineMark": "automatisch vertaald, nog te controleren",
+      "reviewAlert": "Automatisch vertaald: controleer voordat je opslaat.",
+      "error": "De vertaling kon niet worden aangevraagd. Probeer het opnieuw.",
+      "queued": "In de wachtrij: de vertaling begint zo.",
+      "running": "Bezig met vertalen: dit kan enkele minuten duren.",
+      "busy": "Er loopt al een andere vertaling voor dit evenement: probeer het opnieuw als die klaar is.",
+      "noTargets": "Kies minstens één taal.",
+      "sourceMissing": "Schrijf eerst de titel of de beschrijving in de hoofdtaal.",
+      "done": "Vertaling klaar voor: {languages}. Controleer voordat je opslaat.",
+      "doneNothing": "Vertaling klaar, maar de velden in die talen waren al ingevuld: er is geen tekst vervangen.",
+      "failed": "De vertaling is mislukt: {reason}",
+      "failedGeneric": "De vertaling is mislukt.",
+      "status": {
+        "queued": "De automatische vertaling van titel en beschrijving staat in de wachtrij.",
+        "running": "De automatische vertaling van titel en beschrijving is bezig.",
+        "ready": "De automatische vertaling van titel en beschrijving is klaar voor: {languages}. Controleer en sla haar op door het evenement te bewerken.",
+        "review": "Teksten controleren",
+        "failed": "De automatische vertaling van titel en beschrijving is mislukt: {reason}",
+        "failedGeneric": "De automatische vertaling van titel en beschrijving is mislukt."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI staat uit voor dit evenement: gebruik ‘AI genereren’ om het aan te zetten en de verwerking te starten.",
     "sourceTranscriptMissing": "Deze opname is nog niet getranscribeerd: transcribeer haar voordat je een vertaling toevoegt.",
     "captionsTranscriptNotTranslatable": "Deze transcriptie komt uit de live-ondertiteling: automatische vertaling vereist een AI-transcriptie van de opname.",
-    "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere."
+    "sameLanguage": "De gekozen taal is de oorspronkelijke taal van de opname: kies een andere.",
+    "mtUnavailable": "Automatische vertaling is niet geïnstalleerd op deze instantie."
   }
 }

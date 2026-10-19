@@ -37,6 +37,7 @@ need the transparency facts. Related pages:
 [Administration](#administration) ·
 [Public experience](#public-experience) ·
 [The event report](#the-event-report) ·
+[Event text translation](#event-text-translation) ·
 [Transparency (AI Act Article 50)](#transparency-ai-act-article-50) ·
 [Observability](#observability) ·
 [Local development and tests](#local-development-and-tests) ·
@@ -50,7 +51,10 @@ storage. `PostprodArtifactType` in `app/prisma/schema.prisma` is the
 authoritative list. The one exception is the transcript built from live
 captions (see below), which is not produced by this pipeline and has no file.
 The event report (`REPORT`) produces no artifact at all: its result is stored
-on the event ([The event report](#the-event-report)).
+on the event ([The event report](#the-event-report)). Neither does the machine
+translation of an event's title and description (`TRANSLATE_TEXT`): it is
+stored on the event as a proposal that staff review in the wizard
+([Event text translation](#event-text-translation)).
 
 | Artifact type | Produced by | Language | Contents | Where it is used |
 |---|---|---|---|---|
@@ -115,8 +119,10 @@ built and who decides what it keeps:
 ## Data sovereignty
 
 All inference runs inside the cluster: speech recognition and alignment
-(WhisperX), diarization (pyannote.audio), the language model (vLLM) and speech
-synthesis (Piper). Three rules in the code keep it that way:
+(WhisperX), diarization (pyannote.audio), the language model (vLLM), speech
+synthesis (Piper) and, for event titles and descriptions, the CPU translation
+engine (llama.cpp with EuroLLM-9B-Instruct). Three rules in the code keep it
+that way:
 
 - **Closed provider lists.** `app/src/lib/ai/providers.ts` declares one
   allowed value per engine: `vllm` for the language model, `whisperx` for
@@ -124,28 +130,39 @@ synthesis (Piper). Three rules in the code keep it that way:
   engine as text, but the claim endpoint parses it through these enums, so any
   other value makes the claim fail. Adding a backend means adding an enum
   value, a resolver branch and a worker implementation, and the backend must
-  run in-cluster.
+  run in-cluster. The CPU translation engine follows the same rule:
+  `resolveMtProvider` returns the address the chart gives the portal
+  (`AI_MT_BASE_URL`), and without one the feature is not offered at all;
+  there is no fallback to vLLM.
 - **The portal decides, the worker executes.** The worker holds no endpoint
   or model configuration of its own. Every claim response carries
   `providerHints` (engine, vLLM base URL, model ids, voice path), resolved by
   the portal from its own environment.
 - **Narrow data paths.** The worker talks to three places: the portal's
   internal API, object storage through presigned URLs, and the vLLM service
-  named in `providerHints`. Model weights are read from a volume mounted at
+  named in `providerHints` (or, for `TRANSLATE_TEXT`, the CPU translation
+  engine named there). Model weights are read from a volume mounted at
   `/models`, and the image sets `HF_HUB_OFFLINE=1`.
 
 Two components download public model weights (never data) outside the
 Hugging Face offline switch when their files are missing from the cache: the
 torchaudio alignment models that WhisperX uses for some languages, and the
 AudioSeal watermark generator. The [operational checklist](#operational-checklist)
-seeds both.
+seeds both. The CPU translation engine downloads its weights when its pod
+starts, from a URL pinned to a repository revision (`postprod.mt.model.url`),
+and checks the file's SHA-256 before the server starts: a different file stops
+the pod. An installation without Internet access points the URL to an internal
+mirror of the same file.
 
 The rule is enforced by what the code calls, not by the network. The chart's
 NetworkPolicy (`networkPolicy.enabled`, off by default) selects only the
 application pods, so it neither blocks nor restricts the worker
 ([checklist](#operational-checklist), step 9). If you need network-level
 enforcement, write your own policy that limits the worker's egress to the
-portal, the storage endpoint and vLLM.
+portal, the storage endpoint and vLLM. The CPU translation engine is the
+exception: with `networkPolicy.enabled` it gets its own policy, which admits
+only the CPU worker on port 8080 and lets out only DNS and HTTPS (the model
+download).
 
 ## Architecture and inputs
 
@@ -200,6 +217,7 @@ there is work: the GPU node pool scales to zero between runs.
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
 | **Generate the report** (event page, **After the event** tab) | `POST /api/admin/events/<id>/report` enqueues one `REPORT` job for an ended event within its data retention ([The event report](#the-event-report)). | none |
+| **Translate with AI** (event wizard, **Event** step) | `POST /api/admin/events/<id>/text-translation` enqueues one `TRANSLATE_TEXT` job with the title and description written in the form, saved or not ([Event text translation](#event-text-translation)). | none |
 
 Every path goes through `app/src/lib/ai/enqueue.ts`, and every path is gated
 by the site-wide switch `aiPipelineEnabled`: the automatic paths do nothing
@@ -269,6 +287,8 @@ flowchart TD
 - **`REPORT`** is never part of a full enqueue either, and depends on no job:
   staff request it, and it reads whatever transcript and summary exist when it
   is claimed.
+- **`TRANSLATE_TEXT`** belongs to an event, not to a recording, and depends on
+  no job: staff request it from the wizard, at any time, also for a draft.
 - **Optional extras.** `WAVEFORM_JSON` (from `TRANSCRIBE`) and `DUBBED_VIDEO`
   (from `DUB`) get upload targets but are not part of the job's expected
   artifacts. They are best-effort: failing to produce them never fails the
@@ -285,6 +305,7 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
 | `ARCHIVE` | The composite MP4; each unpurged track; the source `TRANSCRIPT_VTT` when it exists | none |
 | `REPORT` | No file: the portal gathers the event's material and figures at claim time (`reportInput`) | The language model's endpoint and the glossary ([The event report](#the-event-report)) |
+| `TRANSLATE_TEXT` | No file: the title, the description and the target languages travel in the job (`textInput`) | The CPU translation engine's endpoint and model (`mtBaseUrl`, `mtModelId`) and the glossary ([Event text translation](#event-text-translation)) |
 
 ## Queue semantics
 
@@ -351,6 +372,13 @@ provider hints. The worker never signs URLs and never writes to the database.
 - The presigned URLs in the work order are valid for the lease length. They
   are not renewed when the lease is refreshed (see
   [Known limitations](#known-limitations)).
+- **Jobs of an event** (`REPORT`, `TRANSLATE_TEXT`) have a stricter rule,
+  shared in `app/src/lib/report/job.ts`. After an expired lease two workers can
+  hold the same job, so every message carries the claim number (`attempt`),
+  and a write counts only if that number is still the job's: the worker that
+  was overtaken reads `superseded` in the answer and stops. Only the delivery
+  route marks such a job `DONE`, in the same transaction that stores its
+  result, and a closed job never reopens.
 
 ### Retries and backoff
 
@@ -425,8 +453,8 @@ A job whose dependency failed is never runnable and stays `PENDING`.
 `POSTPROD_QUEUED` while its jobs run. A recording without media, created to
 hold a transcript from live captions, is created `POSTPROD_DONE` and never
 enters the queue; a transcript from captions added to an existing recording
-leaves its status as it is. A `REPORT` job belongs to the event, not to a
-recording, so it changes no recording's status.
+leaves its status as it is. A `REPORT` or `TRANSLATE_TEXT` job belongs to the
+event, not to a recording, so it changes no recording's status.
 
 Both checks cover the jobs of every run, not only the latest:
 
@@ -451,8 +479,14 @@ piling up. Each run:
    `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`,
    split into `desiredGpu` and `desiredCpu` for the two kinds of worker
    ([The worker Job](#the-worker-job)). The split keeps the same overall cap
-   and gives transcription and dubbing their share first. While the site
-   switch is off, every count is zero and the orchestrator stops here;
+   and gives transcription and dubbing their share first. Two more counts say
+   which engine must be up: `desiredLlm`, the runnable, claimed and running
+   jobs that ask vLLM for text (`LLM_JOB_KINDS` in
+   `app/src/lib/ai/job-classes.ts`: `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`,
+   `SUMMARIZE`, `TRANSLATE`, `REPORT`), and `desiredMt`, the same for the CPU
+   translation engine (`TRANSLATE_TEXT`). While the site switch is off, every
+   count is zero and the orchestrator stops here, after scaling the CPU
+   translation engine ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand));
 2. counts the active worker Jobs of each kind in the release namespace, by
    the labels `app.kubernetes.io/component=postprod-worker` and
    `app.kubernetes.io/component=postprod-worker-cpu`;
@@ -474,7 +508,9 @@ for example, waits for the other language's `TRANSLATE` to finish.
 The orchestrator never reads the database: the portal is the only owner of
 the queue. Its namespaced Role allows only `get` and `list` on CronJobs and
 `get`, `list`, `create` and `delete` on Jobs, plus Deployment scaling when
-`postprod.vllm.autoscale` is on. The pattern of a suspended CronJob used as a
+`postprod.vllm.autoscale` is on, and reading, annotating and scaling the one
+Deployment of the CPU translation engine when it is rendered with
+`postprod.mt.scaleToZero.enabled`. The pattern of a suspended CronJob used as a
 Job template, shared with the recorder, is described in
 [Scheduled and background jobs](architecture/background-jobs.md).
 
@@ -483,10 +519,13 @@ Job template, shared with the recorder, is described in
 A vLLM Deployment that always has one replica keeps a GPU node running and
 defeats scale-to-zero. With `postprod.vllm.autoscale: true`, the orchestrator
 scales the Deployment named in `postprod.vllm.deploymentName` (empty means
-`<fullname>-vllm`) in the release namespace: to one replica while `desired`
-is above zero or any worker is active, and to zero when the pipeline is idle.
-It does nothing when the Deployment does not exist. Leave the Deployment at
-zero replicas as its resting state.
+`<fullname>-vllm`) in the release namespace: to one replica while
+`desiredLlm` is above zero, and to zero when no job needs it. Dubbing, the
+archive and the translation of event texts therefore never start the vLLM GPU.
+With a portal that does not send `desiredLlm` (an older release), the rule is
+the previous one: one replica while `desired` is above zero or any worker is
+active. It does nothing when the Deployment does not exist. Leave the
+Deployment at zero replicas as its resting state.
 
 The vLLM step runs only when the portal answers and the site switch is on. If
 you turn **Post-event pipeline active** off while vLLM is up, the orchestrator
@@ -495,6 +534,26 @@ never scales it down, and its GPU node stays up. Scale it to zero yourself:
 ```bash
 kubectl scale deploy -n <namespace> <fullname>-vllm --replicas=0
 ```
+
+### The CPU translation engine on demand
+
+With `postprod.mt.enabled`, the chart renders `<fullname>-mt`, a Deployment
+and a Service for the CPU translation engine (`templates/postprod-mt.yaml`,
+[Event text translation](#event-text-translation)). With
+`postprod.mt.scaleToZero.enabled` (the default) the Deployment has no fixed
+replica count, and the orchestrator scales it at every run:
+
+- to one replica while `desiredMt` is above zero, writing the time on the
+  Deployment's annotation `pa-webinar/mt-last-busy`;
+- to zero after `postprod.mt.scaleToZero.idleMinutes` (15) without work,
+  counted from that annotation, so a second request a few minutes later finds
+  the engine still loaded. A Deployment without the annotation (just
+  installed) goes to zero at the first run without work.
+
+This step runs before the site switch check: with the pipeline off, the engine
+also goes to zero after the idle time, because it occupies CPU and memory on
+the app nodes. With `scaleToZero.enabled: false` the Deployment keeps one
+replica.
 
 ### The worker Job
 
@@ -505,10 +564,11 @@ image:
 | Template | Takes | Runs on |
 |---|---|---|
 | `<fullname>-postprod-worker` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`, `DUB` | the GPU pool, with a whole GPU and tens of GB of memory |
-| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE`, `REPORT` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
+| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE`, `REPORT`, `TRANSLATE_TEXT` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
 
 Summaries and translations get their text from vLLM, which has its own GPU,
-and the archive remuxes without re-encoding. The CPU worker runs the same code
+the archive remuxes without re-encoding, and the translation of event texts
+calls the CPU translation engine over HTTP. The CPU worker runs the same code
 from a light image, `pa-webinar-postprod-worker-cpu` (`infra/ai/Dockerfile.worker-cpu`:
 Python on Alpine with ffmpeg, `httpx`, `pydantic` and `numpy`, under 300 MB),
 because the GPU worker's image is about 15 GB compressed and would be pulled
@@ -519,7 +579,10 @@ processes the whole track at once and needs tens of GB for a long event.
 
 Each worker sends the kinds it takes (`AI_WORKER_KINDS`) when it claims a job.
 The CPU worker starts from its own entry point, `python -m worker.cpu`, which
-refuses to run without a list or with a GPU kind in it. An older worker image
+refuses to run without a list or with a GPU kind in it. Without the CPU worker
+(`postprod.worker.cpu.enabled: false`) the GPU worker takes every kind except
+`TRANSLATE_TEXT`, which must never start a GPU node; the chart therefore
+refuses to render `postprod.mt.enabled` without the CPU worker. An older worker image
 lacks that module, so a CPU pod pinned to it exits before claiming anything.
 Both variants share the rest of the pod template:
 
@@ -603,6 +666,12 @@ that does not match the artifact type. It encrypts `inlineBody` with the PII
 key, and for `TRANSCRIPT_JSON` it upserts one `Speaker` row per speaker label.
 The worker sends an inline copy for text and JSON files of at most 8 MiB (`INLINE_MAX_BYTES` in `infra/ai/worker/main.py`), enough for the transcript of an event of several hours.
 
+The jobs of an event register no artifact. They deliver their result to a
+route of their own, which closes the job in the same transaction:
+`POST /api/internal/event-report` for `REPORT` ([The event report](#the-event-report))
+and `POST /api/internal/event-text-translation` for `TRANSLATE_TEXT`
+([Event text translation](#event-text-translation)).
+
 ### Waiting for a cold language model
 
 When vLLM scales from zero it needs several minutes to load weights. A
@@ -624,6 +693,7 @@ it with backoff.
 | Speech recognition | WhisperX with `large-v3`, the faster-whisper conversion `Systran/faster-whisper-large-v3` | `AI_ASR_MODEL_ID` on the app, default in `providers.ts` | Word-level alignment with a wav2vec2 model per source language |
 | Diarization | `pyannote/speaker-diarization-3.1` through WhisperX | `DIARIZATION_MODEL` in `infra/ai/worker/transcribe.py` | Gated model; mixed-audio recordings only |
 | Summary and translation | `mistralai/Mistral-Small-3.2-24B-Instruct-2506` served by vLLM | `AI_VLLM_MODEL_ID` on the app, default in `providers.ts` | OpenAI-compatible `/v1/chat/completions` |
+| Event title and description | `utter-project/EuroLLM-9B-Instruct-2512`, GGUF `Q4_K_M`, served by llama.cpp on CPU | `postprod.mt.model` in the chart, which sets `AI_MT_BASE_URL` and `AI_MT_MODEL_ID` on the app | OpenAI-compatible `/v1/chat/completions`; no GPU ([Event text translation](#event-text-translation)) |
 | Dubbing | Piper voices | `AI_TTS_VOICES_PATH` on the app (default `/models/piper`) | Voices for `en`, `fr` and `it` are baked into the image under `/opt/piper-voices` |
 | Watermark | AudioSeal `audioseal_wm_16bits` | `infra/ai/worker/tts.py` | Dubbed audio only; `AI_WATERMARK=0` on the worker turns it off |
 
@@ -776,6 +846,10 @@ How each stage uses it:
 - **Context length.** Because the summary request carries the whole
   transcript, vLLM's `--max-model-len` must fit your longest events. The room
   timeline adds at most 400 short lines, plus one line per chapter.
+- **Event title and description.** A different model on a different engine:
+  EuroLLM-9B-Instruct on CPU ([Event text translation](#event-text-translation)).
+  It covers the 24 official EU languages, Irish and Maltese included, and a
+  short text does not justify starting a GPU node.
 
 ### Room timeline
 
@@ -1287,8 +1361,16 @@ holds the defaults quoted here. Chart-wide keys are in
 | `multitrackPurgeSchedule` | not in `values.yaml`; the template uses `*/15 * * * *` | Deletes per-participant audio after transcription |
 | `vllm.autoscale` | `false` | Lets the orchestrator scale vLLM between zero and one replica |
 | `vllm.deploymentName` | empty, meaning `<fullname>-vllm` | The Deployment to scale |
+| `mt.enabled` | `false` | Renders the CPU translation engine (`<fullname>-mt`) and gives the portal `AI_MT_BASE_URL` and `AI_MT_MODEL_ID`. Requires `worker.cpu.enabled` |
+| `mt.image`, `.imagePullPolicy` | the llama.cpp server image pinned by digest, `IfNotPresent` | Engine image; the init container that downloads the model uses the same image |
+| `mt.model.url`, `.sha256`, `.file`, `.id` | a Hugging Face URL pinned to a revision, its SHA-256, the file name in the volume, `utter-project/EuroLLM-9B-Instruct-2512` | The model, checked at every pod start |
+| `mt.threads`, `.contextSize` | `4`, `4096` | Compute threads (more than four do not speed generation up) and context in tokens |
+| `mt.modelsPvc`, `.modelsSizeLimit` | empty, `8Gi` | A PersistentVolumeClaim that keeps the model between starts; empty means a scratch volume of `modelsSizeLimit` and a download at every start |
+| `mt.scaleToZero.enabled`, `.idleMinutes` | `true`, `15` | The orchestrator keeps the engine at one replica only while there is work, and for `idleMinutes` after it ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand)) |
+| `mt.resources` | requests `4` CPU / `6Gi`, limits `4` CPU / `7Gi` | The model takes 4.4 to 5.1 GiB in memory |
+| `mt.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Never the GPU pool |
 | `worker.enabled` | `true` | Renders the suspended worker template |
-| `worker.image`, `.imagePullPolicy`, `.imagePullSecrets` | `ghcr.io/italia/pa-webinar-postprod-worker:dev`, `IfNotPresent`, empty (inherits `app.imagePullSecrets`) | Worker image |
+| `worker.image`, `.imagePullPolicy`, `.imagePullSecrets` | empty (`<app.image.repository>-postprod-worker` with the app image's tag), `IfNotPresent`, empty (inherits `app.imagePullSecrets`) | Worker image |
 | `worker.activeDeadlineSeconds`, `.ttlSecondsAfterFinished` | `3600`, `600` | Per-Job deadline and cleanup |
 | `worker.stub` | `false` | Sets `WORKER_STUB=1`: canned outputs, no models |
 | `worker.nodeSelector`, `.tolerations`, `.affinity` | `workload: ai-gpu`, the matching toleration, empty | Placement on the GPU pool |
@@ -1296,7 +1378,7 @@ holds the defaults quoted here. Chart-wide keys are in
 | `worker.hfTokenSecret.name`, `.key` | empty, `HF_TOKEN` | Hugging Face token; set the name (see the [checklist](#operational-checklist)) |
 | `worker.extraEnv` | empty | Extra worker environment, for example `AUDIOSEAL_CACHE_DIR` or `LLM_CONNECT_WAIT_S` |
 | `worker.gpu.enabled`, `.count` | `true`, `1` | GPU request and limit |
-| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations, archives and event reports to it |
+| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations, archives, event reports and event text translations to it |
 | `worker.cpu.image` | empty: `worker.image` when that is set, otherwise `<app.image.repository>-postprod-worker-cpu` with the app image's tag | The CPU worker's light image. Set it whenever you set `worker.image`, or the CPU worker pulls the GPU worker's large image |
 | `worker.cpu.extraEnv` | empty | Environment of the CPU worker, for example `LLM_CONNECT_WAIT_S`; `worker.extraEnv` and the Hugging Face token reach only the GPU worker |
 | `worker.cpu.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Placement of the CPU worker |
@@ -1314,6 +1396,8 @@ them when it answers a claim; defaults are in `app/src/lib/ai/providers.ts`.
 | `AI_VLLM_MODEL_ID` | `mistralai/Mistral-Small-3.2-24B-Instruct-2506` | Model id sent to vLLM |
 | `AI_ASR_MODEL_ID` | `large-v3` | WhisperX model |
 | `AI_TTS_VOICES_PATH` | `/models/piper` | Piper voice folder on the worker |
+| `AI_MT_BASE_URL` | unset; the chart sets it to `http://<fullname>-mt.<namespace>.svc.cluster.local:8080/v1` with `postprod.mt.enabled` | The CPU translation engine. Unset, the wizard offers no machine translation and the API answers `422 MT_UNAVAILABLE` |
+| `AI_MT_MODEL_ID` | `utter-project/EuroLLM-9B-Instruct-2512`; the chart sets `postprod.mt.model.id` | Model id sent to the engine and stored with the translations |
 
 The full environment reference is in [Configuration](CONFIGURATION.md).
 
@@ -1324,6 +1408,7 @@ Set these through `postprod.worker.extraEnv` unless noted:
 | Variable | Default | Purpose |
 |---|---|---|
 | `LLM_CONNECT_WAIT_S` | `1200` | How long a worker waits for vLLM to come up |
+| `MT_CONNECT_WAIT_S` | `900` | How long a `TRANSLATE_TEXT` job waits for the CPU translation engine to come up (pod start, model download and load); set it through `postprod.worker.cpu.extraEnv` |
 | `LLM_PARALLEL` | `6` | Parallel requests of the transcript correction ([Glossary](#glossary)) |
 | `AI_CORRECTION_MAX_S` | `1200` | Time budget of the transcript correction; lines not corrected by then stay as recognized |
 | `WORKER_DEADLINE_S` | set by the chart to `postprod.worker.activeDeadlineSeconds` | The Job's deadline, so the correction leaves time for the uploads |
@@ -1343,7 +1428,7 @@ this table gives only their effect on the pipeline.
 
 | Field | UI label | Effect on the pipeline |
 |---|---|---|
-| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
+| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)). It also gates the machine translation of event texts in the wizard |
 | `aiAsrProvider`, `aiLlmProvider`, `aiTtsEngine` | **Transcription engine**, **Summary and translation engine**, **Dubbing engine** | One allowed value each ([Data sovereignty](#data-sovereignty)) |
 | `aiDefaultTargetLocales` | **Default translation languages** | Target languages ticked in the wizard when translation is turned on, and used for events without their own (`en,fr,es,de` on a new installation) |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
@@ -1690,6 +1775,143 @@ data. Like the recap, it stays with the event after the cleanup deletes the
 data it came from, and goes only with the event; duplicating an event does
 not copy it ([Privacy and data protection](GDPR.md)).
 
+## Event text translation
+
+Staff can have an event's title and description translated into the
+installation's other languages. A translation model on CPU inside the cluster
+does the work, so no vLLM and no GPU node are involved. The result is only a
+proposal. It never changes the event's title or description. People review it
+in the wizard, and saving the wizard publishes it (`app/src/lib/text-translation/`,
+`infra/ai/worker/text_translate.py`).
+
+**The engine.** `postprod.mt.enabled` renders `<fullname>-mt`, a Deployment
+and a Service (`templates/postprod-mt.yaml`). They run the OpenAI-compatible
+server of llama.cpp with EuroLLM-9B-Instruct-2512 (Apache-2.0) in GGUF
+`Q4_K_M`. The model covers the 24 official EU languages, Irish and Maltese
+included.
+
+- **Model download.** An init container downloads the model from
+  `postprod.mt.model.url`, which is pinned to a repository revision. It writes
+  to a scratch volume (`modelsSizeLimit`) or to a PersistentVolumeClaim
+  (`modelsPvc`) and checks the file's SHA-256 (`postprod.mt.model.sha256`).
+  A different file stops the pod before the server starts.
+- **Server.** It answers `/health` for the probes and serves one request at a
+  time.
+- **Resources and placement.** The pod requests 4 CPU and 6 GiB (limit 7 GiB)
+  and runs on the app's nodes, never on the GPU pool.
+- **Starting and stopping.** The orchestrator starts and stops the engine
+  ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand)).
+- **Portal configuration.** The chart gives the portal `AI_MT_BASE_URL` and
+  `AI_MT_MODEL_ID`. Without them the wizard does not show the feature, and
+  `POST` answers `422 MT_UNAVAILABLE`.
+- **Network policy.** With `networkPolicy.enabled` the engine has its own
+  policy. It admits only the CPU worker, on port 8080.
+
+On a workstation CPU with four threads, a title with a kicker and a Markdown
+description of a dozen lines took 21 to 30 seconds per language, and the model
+used 4.4 to 5.1 GiB of memory. Expect a cloud vCPU to be slower, because
+generation is bound by memory bandwidth, and measure on your nodes. More
+threads do not speed generation up. Translations go one language at a time.
+
+**Requesting it.** In the event wizard, the **Event** step shows a **Machine
+translation** card under the language tabs to staff: administrators, and
+organizers for their own events. It appears only when the site switch is on
+and the engine is installed. Otherwise the wizard is unchanged, and a
+moderator who opens the wizard with the moderator link never sees it.
+
+- **Editing an event.** The card lists the enabled languages other than the
+  default one. By default it ticks those that still have an empty field where
+  the default language has text. **Translate with AI** sends the title and
+  description as they are in the form, saved or not. The card shows the state
+  and, while the job is queued or running, reads it again every 10 seconds.
+  When the translation is ready it fills **only the fields that are still
+  empty**, so text a person wrote is never replaced. The languages it filled
+  get a third mark in the language tabs, an amber diamond with the accessible
+  name "machine translated, to be reviewed". The tab of such a language shows
+  the notice **Machine translated: review before saving.** When the wizard
+  opens, a stored proposal of the same source text that would fill empty
+  fields is offered with **Use the translations**.
+- **Creating an event.** The event has no id yet, so the card offers **After
+  saving, translate with AI** with the same choice of languages. After
+  creating the event the wizard requests the translation. A refused request
+  does not stop the creation: the summary of the new event lists it among the
+  resources that were not saved.
+- **The event page.** The **Overview** tab shows one line of state: queued,
+  running, ready (with the languages and a link to edit the texts), or failed
+  (with the reason). It reads the state again only while the job is in
+  progress.
+
+Behind it is `/api/admin/events/<id>/text-translation`, for the staff who
+manage the event:
+
+| Method | Does |
+|---|---|
+| `GET` | `available` (site switch on and engine installed), the last `TRANSLATE_TEXT` job, the stored proposal, and `pending`: the languages the proposal would fill in the saved text, when it comes from that text |
+| `POST` | `{ sourceLanguage, title, description, targetLanguages }`. The title is at most 300 characters and the description at most 10,000. The languages must be enabled on the site and differ from the source. It queues a `TRANSLATE_TEXT` job (`202`, audit `EVENT_TEXT_TRANSLATION_REQUESTED`). One at a time per event: while a job is pending or running it answers `200 { stato: "in-corso" }` with the hash of that job's text. It answers `200 { stato: "pronto" }`, without a new job, when the stored proposal already covers this text and these languages. With the site switch off it answers `422 AI_PIPELINE_DISABLED`; without the engine, `422 MT_UNAVAILABLE` |
+
+**The job.** `TRANSLATE_TEXT` belongs to the event (`eventId`), like the
+report, and depends on no job.
+
+- **Payload.** It carries the source language, the target languages, the text
+  and its SHA-256 (`sourceHash`, computed in the same way in the browser and
+  in the portal, `app/src/lib/text-translation/source.ts`).
+- **Which worker.** Only the CPU worker takes it, so it never wakes the GPU
+  worker. `desiredLlm` does not count it, so it never starts vLLM.
+  `desiredMt` counts it and starts the engine.
+- **Claim.** The claim returns `textInput` and, in `providerHints`, the
+  engine's address and model (`mtBaseUrl`, `mtModelId`) and the glossary. A
+  claim without an engine configured closes the job as failed instead of
+  sending it back to the queue.
+- **Attempt rule.** Progress and delivery follow the attempt rule of the
+  event's jobs ([Leases and reclaim](#leases-and-reclaim)).
+
+**How the worker translates.** The model translates well one sentence at a
+time, with its own request format: one user message,
+`Translate the following <Source> source text to <Target>:`, no system
+prompt, temperature 0. So the worker:
+
+- translates the description line by line, keeping each line's Markdown
+  prefix (headings, lists, quotes, numbers), the blank lines, the code blocks
+  and the rules untouched, and translating table cells one by one. Lines
+  longer than 1,000 characters are split between sentences;
+- turns each link into `<aN>text</aN>`, which the model keeps, and puts the
+  address back afterwards. When a tag is lost, the line is translated without
+  links and each link text on its own, so no link is dropped;
+- replaces web addresses, email addresses and glossary terms with `⟦n⟧`
+  placeholders that the model copies, because a model will happily change a
+  word inside an email address. A line that loses a placeholder is translated
+  again without them;
+- splits the title on its first `|` (the kicker) and translates the two parts
+  separately;
+- waits up to `MT_CONNECT_WAIT_S` seconds (900 by default) for the engine
+  while it starts and loads the model. The job stays `RUNNING` meanwhile, so
+  the orchestrator keeps the engine up. An unreachable engine after the wait
+  fails the attempt;
+- reports progress before each language, and stops when the job was closed or
+  taken over. Close to the Job's deadline it delivers the languages it has;
+  a language that fails is left out, and a job with no language translated
+  fails.
+
+**Delivery and storage.** The worker posts the texts to
+`POST /api/internal/event-text-translation` (`x-api-key`).
+
+- **Validation.** A language that was not requested makes the delivery fail.
+  The title keeps at most one `|`, and only if the source title has one. Both
+  texts are cleaned of control characters.
+- **Transaction.** The same transaction closes the job as done and stores the
+  proposal on the event, in `Event.textTranslations`:
+  `{ version, sourceLanguage, sourceHash, generatedAt, model, title, description }`,
+  with one entry per language.
+- **Merging.** A new proposal for the same source text adds its languages to
+  the stored ones. A proposal for a different text replaces them.
+- **What is not stored.** The proposal is never written into the event's
+  title or description, and duplicating an event does not copy it. Event
+  texts are not participants' personal data.
+
+The wizard and the event page render the translated text as Markdown, like
+any description, never as HTML. What the public page shows is the text a
+person saved after reviewing it.
+
 ## Transparency (AI Act Article 50)
 
 Article 50 of the EU AI Act requires that people know when content is
@@ -1847,6 +2069,21 @@ kubectl logs -n pa-webinar job/<orchestrator-job-name>
 - **Keep tests off shared GPUs.** Every worker Job can wake a GPU node, so
   prefer the stub, the unit tests or your own workstation to a shared GPU
   pool when testing.
+- **The CPU translation engine on a workstation.** It needs no GPU. Start the
+  pinned server image with a downloaded copy of the model (check its SHA-256
+  against `postprod.mt.model.sha256`), point the portal at it with
+  `AI_MT_BASE_URL=http://localhost:18081/v1`, and run the worker for that job
+  kind alone:
+
+  ```bash
+  docker run --rm -p 18081:8080 -v <models folder>:/models:ro \
+    <postprod.mt.image> -m /models/<postprod.mt.model.file> -t 4 -c 4096 -np 1 \
+    --host 0.0.0.0 --port 8080 --no-webui
+  AI_WORKER_KINDS=TRANSLATE_TEXT python -m worker.cpu
+  ```
+
+  The site switch must be on, and something must run the worker: the Docker
+  Compose stack has no orchestrator.
 
 The worker's code layout is described in [its README](../infra/ai/worker/README.md).
 Running the pipeline stages off-cluster on a workstation GPU is a development
@@ -1959,6 +2196,16 @@ Deployment to zero by hand ([vLLM on demand](#vllm-on-demand)).
 ## Known limitations
 
 Several of these are tracked in the [Roadmap](ROADMAP.md).
+
+- **Machine translation of event texts is slow and uneven.** It takes tens of
+  seconds per language on CPU, one language at a time on one replica, and the
+  first request after the engine was stopped also waits for the model
+  download (about 5.6 GB, unless `postprod.mt.modelsPvc` keeps it). Irish in
+  particular comes out with meaning errors more often than the other
+  languages, and a short line out of context (a one-word list item) can be
+  mistranslated: the proposal is always meant to be reviewed. Only the title
+  and the description are translated; tags, questionnaires, materials and the
+  other multilingual texts are not.
 
 - **Every recording is transcribed as Italian.** The source language is
   `Recording.sourceLanguage`, which no screen or API sets, so it falls back to

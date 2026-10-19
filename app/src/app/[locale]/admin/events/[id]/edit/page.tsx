@@ -13,6 +13,7 @@ import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
+import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
@@ -383,6 +384,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
+        // Solo allo staff: la rotta della traduzione e' dell'amministrazione.
+        textTranslationAvailable={staffCanManage && traduzioneDisponibile(siteSettings)}
         campiLiberi={{
           speakersInfo: (event.speakersInfo ?? null) as Record<string, string> | null,
           organizerName: event.organizerName ?? null,

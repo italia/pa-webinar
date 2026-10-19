@@ -1128,7 +1128,8 @@
         "speakers": "ponentes",
         "materials": "materiales",
         "questionnaires": "cuestionarios",
-        "agenda": "programa"
+        "agenda": "programa",
+        "textTranslation": "traducción automática"
       },
       "revocationFailed": "No se ha podido revocar el acceso de {name}: su enlace sigue siendo válido. Guarda de nuevo para reintentarlo o revócalo desde la pestaña «{tab}» de la página del evento.",
       "validationFailedDetail": "El servidor ha rechazado algunos datos: {reason}. Corrígelos y vuelve a intentarlo.",
@@ -3535,6 +3536,36 @@
         "notPossible": "El resumen ya no se puede actualizar: el evento no ha terminado o sus datos han caducado.",
         "error": "No se ha podido actualizar: inténtalo de nuevo."
       }
+    },
+    "textTranslation": {
+      "heading": "Traducción automática",
+      "intro": "Traduce el título y la descripción con un modelo que funciona en los servidores de esta instalación. Solo rellena los campos que siguen vacíos: revisa el texto traducido antes de guardar.",
+      "languages": "Idiomas de destino",
+      "start": "Traducir con IA",
+      "afterCreate": "Después de guardar, traducir con IA",
+      "afterCreateHelp": "El título y la descripción se traducen a los idiomas elegidos. Revisa y guarda las traducciones editando el evento.",
+      "offer": "Hay traducciones automáticas de este texto para: {languages}.",
+      "useOffer": "Usar las traducciones",
+      "machineMark": "traducido automáticamente, por revisar",
+      "reviewAlert": "Traducido automáticamente: revísalo antes de guardar.",
+      "error": "No se ha podido solicitar la traducción. Inténtalo de nuevo.",
+      "queued": "En cola: la traducción empezará en breve.",
+      "running": "Traducción en curso: puede tardar unos minutos.",
+      "busy": "Ya hay otra traducción en curso para este evento: inténtalo de nuevo cuando termine.",
+      "noTargets": "Elige al menos un idioma.",
+      "sourceMissing": "Escribe primero el título o la descripción en el idioma principal.",
+      "done": "Traducción lista para: {languages}. Revísala antes de guardar.",
+      "doneNothing": "Traducción lista, pero los campos de esos idiomas ya estaban rellenados: no se ha sustituido ningún texto.",
+      "failed": "La traducción ha fallado: {reason}",
+      "failedGeneric": "La traducción ha fallado.",
+      "status": {
+        "queued": "La traducción automática del título y la descripción está en cola.",
+        "running": "La traducción automática del título y la descripción está en curso.",
+        "ready": "La traducción automática del título y la descripción está lista para: {languages}. Revísala y guárdala editando el evento.",
+        "review": "Revisar los textos",
+        "failed": "La traducción automática del título y la descripción ha fallado: {reason}",
+        "failedGeneric": "La traducción automática del título y la descripción ha fallado."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "La IA está desactivada para este evento: usa «Generar IA» para activarla e iniciar el proceso.",
     "sourceTranscriptMissing": "Esta grabación aún no está transcrita: transcríbela antes de añadir una traducción.",
     "captionsTranscriptNotTranslatable": "Esta transcripción procede de los subtítulos en directo: la traducción automática necesita una transcripción con IA de la grabación.",
-    "sameLanguage": "El idioma elegido es el original de la grabación: elige otro."
+    "sameLanguage": "El idioma elegido es el original de la grabación: elige otro.",
+    "mtUnavailable": "La traducción automática no está instalada en esta instancia."
   }
 }

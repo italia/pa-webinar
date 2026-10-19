@@ -92,6 +92,46 @@ spec:
                   DESIRED_CPU=$(echo "$RESPONSE" | grep -o '"desiredCpu":[0-9]*' | grep -o '[0-9]*' || true)
                   [ -z "$DESIRED_GPU" ] && DESIRED_GPU=$DESIRED
                   [ -z "$DESIRED_CPU" ] && DESIRED_CPU=0
+                  # Quale motore serve: i lavori che usano vLLM e quelli del
+                  # motore di traduzione su CPU, compresi quelli in esecuzione.
+                  # Un'app che non li manda: vLLM come prima, motore spento.
+                  DESIRED_LLM=$(echo "$RESPONSE" | grep -o '"desiredLlm":[0-9]*' | grep -o '[0-9]*' || true)
+                  DESIRED_MT=$(echo "$RESPONSE" | grep -o '"desiredMt":[0-9]*' | grep -o '[0-9]*' || true)
+                  [ -z "$DESIRED_MT" ] && DESIRED_MT=0
+{{- if include "pa-webinar.mtScaled" . }}
+
+                  # ── 1a. Motore di traduzione su CPU on-demand ────
+                  # Una replica mentre c'e' una traduzione dei testi in coda o
+                  # in corso; a zero dopo postprod.mt.scaleToZero.idleMinutes
+                  # senza lavoro, contati dall'annotazione che l'orchestratore
+                  # aggiorna a ogni giro con lavoro. Anche a pipeline spenta:
+                  # il motore occupa CPU e memoria sui nodi dell'app.
+                  MT_DEPLOY="{{ include "pa-webinar.mtName" . }}"
+                  MT_IDLE_S={{ mul (int .Values.postprod.mt.scaleToZero.idleMinutes) 60 }}
+                  MT_HAVE=$(kubectl get deploy -n "$NS" "$MT_DEPLOY" \
+                    -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "")
+                  if [ -n "$MT_HAVE" ]; then
+                    ORA=$(date +%s)
+                    if [ "$ENABLED" = "true" ] && [ "$DESIRED_MT" -gt 0 ]; then
+                      MT_WANT=1
+                      kubectl annotate deploy -n "$NS" "$MT_DEPLOY" --overwrite \
+                        "pa-webinar/mt-last-busy=$ORA" >/dev/null 2>&1 || true
+                    else
+                      ULTIMO=$(kubectl get deploy -n "$NS" "$MT_DEPLOY" \
+                        -o jsonpath='{.metadata.annotations.pa-webinar/mt-last-busy}' 2>/dev/null || echo "")
+                      case "$ULTIMO" in ''|*[!0-9]*) ULTIMO=0 ;; esac
+                      if [ $((ORA - ULTIMO)) -lt "$MT_IDLE_S" ]; then
+                        MT_WANT=$MT_HAVE
+                      else
+                        MT_WANT=0
+                      fi
+                    fi
+                    if [ "$MT_HAVE" != "$MT_WANT" ]; then
+                      log "mt $MT_DEPLOY: scaling $MT_HAVE -> $MT_WANT"
+                      kubectl scale deploy -n "$NS" "$MT_DEPLOY" --replicas="$MT_WANT" || true
+                    fi
+                  fi
+{{- end }}
 
                   if [ "$ENABLED" != "true" ]; then
                     log "pipeline disabled — nothing to do"
@@ -125,19 +165,25 @@ spec:
                   DESIRED_CPU=0
 {{- end }}
                   ACTIVE=$((ACTIVE_GPU + ACTIVE_CPU))
-                  log "active workers gpu=$ACTIVE_GPU cpu=$ACTIVE_CPU desired gpu=$DESIRED_GPU cpu=$DESIRED_CPU runnable=$RUNNABLE"
+                  log "active workers gpu=$ACTIVE_GPU cpu=$ACTIVE_CPU desired gpu=$DESIRED_GPU cpu=$DESIRED_CPU runnable=$RUNNABLE llm=${DESIRED_LLM:-?} mt=$DESIRED_MT"
 {{- if .Values.postprod.vllm.autoscale }}
 
                   # ── 1b. vLLM on-demand ───────────────────────────
                   # vLLM e' un Deployment GPU persistente: lasciarlo a
                   # replicas=1 tiene acceso l'A100 (~3.40 EUR/h) anche a
                   # vuoto e vanifica lo scale-to-zero del pool. Lo
-                  # accendiamo solo quando c'e' lavoro (desired>0 o worker
-                  # ancora attivi) e lo spegniamo quando la pipeline e' idle.
+                  # accendiamo solo quando c'e' lavoro che lo usa
+                  # (desiredLlm: trascrizione, sintesi, traduzioni,
+                  # resoconto; non doppiaggio, archivio ne' traduzione dei
+                  # testi) e lo spegniamo quando non ce n'e'. Con un'app che
+                  # non manda desiredLlm, come prima: lavoro in coda o worker
+                  # ancora attivi.
                   # Idempotente: scala solo se serve. Se il Deployment non
                   # esiste (vLLM non deployato) non fa nulla.
                   VLLM_DEPLOY="{{ .Values.postprod.vllm.deploymentName | default (printf "%s-vllm" (include "pa-webinar.fullname" .)) }}"
-                  if [ "$DESIRED" -gt 0 ] || [ "$ACTIVE" -gt 0 ]; then
+                  if [ -n "$DESIRED_LLM" ]; then
+                    if [ "$DESIRED_LLM" -gt 0 ]; then VLLM_WANT=1; else VLLM_WANT=0; fi
+                  elif [ "$DESIRED" -gt 0 ] || [ "$ACTIVE" -gt 0 ]; then
                     VLLM_WANT=1
                   else
                     VLLM_WANT=0
@@ -228,6 +274,18 @@ rules:
     verbs: ["get", "list"]
   - apiGroups: ["apps"]
     resources: ["deployments/scale"]
+    verbs: ["get", "update", "patch"]
+{{- end }}
+{{- if include "pa-webinar.mtScaled" . }}
+  # Motore di traduzione su CPU on-demand (sezione 1a dello script): solo il
+  # suo Deployment, letto, annotato con l'ultimo lavoro e scalato.
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: [{{ include "pa-webinar.mtName" . | quote }}]
+    verbs: ["get", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    resourceNames: [{{ include "pa-webinar.mtName" . | quote }}]
     verbs: ["get", "update", "patch"]
 {{- end }}
   # No access to pods / exec / secrets — workers receive secrets via

@@ -1128,7 +1128,8 @@
         "speakers": "speakers",
         "materials": "materials",
         "questionnaires": "questionnaires",
-        "agenda": "programme"
+        "agenda": "programme",
+        "textTranslation": "machine translation"
       },
       "revocationFailed": "Revoking access for {name} failed: their access link is still valid. Save again to retry, or revoke it from the “{tab}” tab of the event page.",
       "validationFailedDetail": "The server rejected some data: {reason}. Fix it and try again.",
@@ -3535,6 +3536,36 @@
         "notPossible": "The summary can no longer be updated: the event has not ended or its data has expired.",
         "error": "The update did not work: try again."
       }
+    },
+    "textTranslation": {
+      "heading": "Machine translation",
+      "intro": "Translates the title and description with a model running on this installation's own servers. It only fills fields that are still empty: review the translated text before saving.",
+      "languages": "Languages to translate into",
+      "start": "Translate with AI",
+      "afterCreate": "After saving, translate with AI",
+      "afterCreateHelp": "The title and description are translated into the chosen languages. Review and save the translations by editing the event.",
+      "offer": "Machine translations of this text are available for {languages}.",
+      "useOffer": "Use the translations",
+      "machineMark": "machine translated, to be reviewed",
+      "reviewAlert": "Machine translated: review before saving.",
+      "error": "The translation could not be requested. Try again.",
+      "queued": "Queued: the translation will start shortly.",
+      "running": "Translating: this may take a few minutes.",
+      "busy": "Another translation is already running for this event: try again when it finishes.",
+      "noTargets": "Choose at least one language.",
+      "sourceMissing": "First write the title or the description in the main language.",
+      "done": "Translation ready for {languages}: review it before saving.",
+      "doneNothing": "Translation ready, but the fields in those languages were already filled in: no text was replaced.",
+      "failed": "The translation failed: {reason}",
+      "failedGeneric": "The translation failed.",
+      "status": {
+        "queued": "Machine translation of the title and description is queued.",
+        "running": "Machine translation of the title and description is running.",
+        "ready": "Machine translation of the title and description is ready for {languages}: review and save it by editing the event.",
+        "review": "Review the texts",
+        "failed": "Machine translation of the title and description failed: {reason}",
+        "failedGeneric": "Machine translation of the title and description failed."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI is off for this event: use «Generate AI» to turn it on and start the pipeline.",
     "sourceTranscriptMissing": "This recording has not been transcribed yet: transcribe it before adding a translation.",
     "captionsTranscriptNotTranslatable": "This transcript comes from the live captions: automatic translation needs an AI transcript of the recording.",
-    "sameLanguage": "The chosen language is the recording's original one: pick another."
+    "sameLanguage": "The chosen language is the recording's original one: pick another.",
+    "mtUnavailable": "Machine translation is not installed on this instance."
   }
 }

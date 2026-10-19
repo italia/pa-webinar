@@ -1128,7 +1128,8 @@
         "speakers": "vorbitori",
         "materials": "materiale",
         "questionnaires": "chestionare",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "traducere automată"
       },
       "revocationFailed": "Revocarea accesului pentru {name} nu a reușit: linkul de acces este încă valabil. Salvați din nou pentru a reîncerca sau revocați-l din fila „{tab}” a paginii evenimentului.",
       "validationFailedDetail": "Serverul a respins unele date: {reason}. Corectați-le și încercați din nou.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Recapitularea nu mai poate fi actualizată: evenimentul nu s-a încheiat sau datele sale au expirat.",
         "error": "Actualizarea nu a reușit: încercați din nou."
       }
+    },
+    "textTranslation": {
+      "heading": "Traducere automată",
+      "intro": "Traduce titlul și descrierea cu un model care rulează pe serverele acestei instalări. Completează doar câmpurile încă goale: recitește textul tradus înainte de a salva.",
+      "languages": "Limbi țintă",
+      "start": "Tradu cu IA",
+      "afterCreate": "După salvare, tradu cu IA",
+      "afterCreateHelp": "Titlul și descrierea sunt traduse în limbile alese. Recitește și salvează traducerile editând evenimentul.",
+      "offer": "Există traduceri automate ale acestui text pentru: {languages}.",
+      "useOffer": "Folosește traducerile",
+      "machineMark": "tradus automat, de revizuit",
+      "reviewAlert": "Tradus automat: recitește înainte de a salva.",
+      "error": "Traducerea nu a putut fi solicitată. Încearcă din nou.",
+      "queued": "În coadă: traducerea începe în curând.",
+      "running": "Traducere în curs: poate dura câteva minute.",
+      "busy": "Pentru acest eveniment este deja în curs o altă traducere: încearcă din nou după ce se termină.",
+      "noTargets": "Alege cel puțin o limbă.",
+      "sourceMissing": "Scrie mai întâi titlul sau descrierea în limba principală.",
+      "done": "Traducere gata pentru: {languages}. Recitește înainte de a salva.",
+      "doneNothing": "Traducere gata, dar câmpurile acelor limbi erau deja completate: niciun text nu a fost înlocuit.",
+      "failed": "Traducerea a eșuat: {reason}",
+      "failedGeneric": "Traducerea a eșuat.",
+      "status": {
+        "queued": "Traducerea automată a titlului și a descrierii este în coadă.",
+        "running": "Traducerea automată a titlului și a descrierii este în curs.",
+        "ready": "Traducerea automată a titlului și a descrierii este gata pentru: {languages}. Recitește-o și salveaz-o editând evenimentul.",
+        "review": "Revizuiește textele",
+        "failed": "Traducerea automată a titlului și a descrierii a eșuat: {reason}",
+        "failedGeneric": "Traducerea automată a titlului și a descrierii a eșuat."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI este oprită pentru acest eveniment: folosește „Generează AI” pentru a o porni și a lansa procesarea.",
     "sourceTranscriptMissing": "Această înregistrare nu este încă transcrisă: transcrie-o înainte de a adăuga o traducere.",
     "captionsTranscriptNotTranslatable": "Această transcriere provine din subtitrările live: traducerea automată necesită o transcriere AI a înregistrării.",
-    "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta."
+    "sameLanguage": "Limba aleasă este cea originală a înregistrării: alege alta.",
+    "mtUnavailable": "Traducerea automată nu este instalată pe această instanță."
   }
 }

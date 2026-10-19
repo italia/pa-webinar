@@ -1128,7 +1128,8 @@
         "speakers": "talere",
         "materials": "materialer",
         "questionnaires": "spørgeskemaer",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "maskinoversættelse"
       },
       "revocationFailed": "Tilbagekaldelsen af adgangen for {name} mislykkedes: adgangslinket er stadig gyldigt. Gem igen for at prøve igen, eller tilbagekald det under fanen »{tab}« på arrangementets side.",
       "validationFailedDetail": "Serveren afviste nogle data: {reason}. Ret dem, og prøv igen.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Opsummeringen kan ikke længere opdateres: arrangementet er ikke afsluttet, eller opbevaringstiden for dets data er udløbet.",
         "error": "Opdateringen mislykkedes: prøv igen."
       }
+    },
+    "textTranslation": {
+      "heading": "Maskinoversættelse",
+      "intro": "Oversætter titel og beskrivelse med en model, der kører på denne installations egne servere. Den udfylder kun felter, der stadig er tomme: gennemlæs den oversatte tekst, før du gemmer.",
+      "languages": "Sprog, der skal oversættes til",
+      "start": "Oversæt med AI",
+      "afterCreate": "Oversæt med AI efter at have gemt",
+      "afterCreateHelp": "Titel og beskrivelse oversættes til de valgte sprog. Gennemlæs og gem oversættelserne ved at redigere begivenheden.",
+      "offer": "Der findes maskinoversættelser af denne tekst for: {languages}.",
+      "useOffer": "Brug oversættelserne",
+      "machineMark": "maskinoversat, skal gennemlæses",
+      "reviewAlert": "Maskinoversat: gennemlæs, før du gemmer.",
+      "error": "Oversættelsen kunne ikke bestilles. Prøv igen.",
+      "queued": "I kø: oversættelsen starter om lidt.",
+      "running": "Oversætter: det kan tage et par minutter.",
+      "busy": "Der kører allerede en anden oversættelse for denne begivenhed: prøv igen, når den er færdig.",
+      "noTargets": "Vælg mindst ét sprog.",
+      "sourceMissing": "Skriv først titlen eller beskrivelsen på hovedsproget.",
+      "done": "Oversættelsen er klar for: {languages}. Gennemlæs den, før du gemmer.",
+      "doneNothing": "Oversættelsen er klar, men felterne på de sprog var allerede udfyldt: ingen tekst blev erstattet.",
+      "failed": "Oversættelsen mislykkedes: {reason}",
+      "failedGeneric": "Oversættelsen mislykkedes.",
+      "status": {
+        "queued": "Maskinoversættelsen af titel og beskrivelse står i kø.",
+        "running": "Maskinoversættelsen af titel og beskrivelse er i gang.",
+        "ready": "Maskinoversættelsen af titel og beskrivelse er klar for: {languages}. Gennemlæs og gem den ved at redigere begivenheden.",
+        "review": "Gennemse teksterne",
+        "failed": "Maskinoversættelsen af titel og beskrivelse mislykkedes: {reason}",
+        "failedGeneric": "Maskinoversættelsen af titel og beskrivelse mislykkedes."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI er slået fra for dette arrangement: brug »Generér AI« for at slå den til og starte behandlingen.",
     "sourceTranscriptMissing": "Denne optagelse er endnu ikke transskriberet: transskriber den, før du tilføjer en oversættelse.",
     "captionsTranscriptNotTranslatable": "Denne transskription kommer fra liveundertekster: automatisk oversættelse kræver en AI-transskription af optagelsen.",
-    "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet."
+    "sameLanguage": "Det valgte sprog er optagelsens originalsprog: vælg et andet.",
+    "mtUnavailable": "Maskinoversættelse er ikke installeret på denne instans."
   }
 }

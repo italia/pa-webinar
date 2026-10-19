@@ -30,7 +30,8 @@ export type ApiErrorKey =
   | 'aiDisabledForEvent'
   | 'sourceTranscriptMissing'
   | 'captionsTranscriptNotTranslatable'
-  | 'sameLanguage';
+  | 'sameLanguage'
+  | 'mtUnavailable';
 
 /** I codici d'errore che le rotte usano per le condizioni sopra. */
 export const API_ERROR_CODES = {
@@ -45,6 +46,7 @@ export const API_ERROR_CODES = {
   SOURCE_TRANSCRIPT_MISSING: 'sourceTranscriptMissing',
   CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE: 'captionsTranscriptNotTranslatable',
   SAME_LANGUAGE: 'sameLanguage',
+  MT_UNAVAILABLE: 'mtUnavailable',
 } as const satisfies Record<string, ApiErrorKey>;
 
 const PER_STATO: Partial<Record<number, ApiErrorKey>> = {

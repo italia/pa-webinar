@@ -48,9 +48,31 @@ describe('GET /api/internal/postprod-pending', () => {
     expect(await (await call()).json()).toMatchObject({ desiredGpu: 0, desiredCpu: 1 });
   });
 
+  it('quale motore tenere acceso: vLLM solo per i lavori che lo usano, il motore su CPU per la traduzione dei testi', async () => {
+    // Una traduzione dei testi in esecuzione e nient'altro: vLLM resta spento.
+    fn(prisma.$queryRaw).mockResolvedValue([
+      { runnable: 0n, claimed: 0n, running: 1n, gpu_runnable: 0n, gpu_claimed: 0n, llm_work: 0n, mt_work: 1n },
+    ]);
+    expect(await (await call()).json()).toMatchObject({ desired: 0, desiredLlm: 0, desiredMt: 1 });
+    const params = fn(prisma.$queryRaw).mock.calls[0]!.slice(1);
+    expect(params).toContainEqual(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'REPORT']);
+    expect(params).toContainEqual(['TRANSLATE_TEXT']);
+    // La traduzione dei testi non e' mai fra i lavori di vLLM.
+    const llm = params.find((p) => Array.isArray(p) && p.includes('SUMMARIZE')) as string[];
+    expect(llm).not.toContain('TRANSLATE_TEXT');
+    expect(llm).not.toContain('DUB');
+    expect(llm).not.toContain('ARCHIVE');
+  });
+
   it('pipeline spenta: tutto a zero', async () => {
     fn(prisma.siteSetting.findUnique).mockResolvedValue({ aiPipelineEnabled: false, aiMaxConcurrentJobs: 2 });
-    expect(await (await call()).json()).toMatchObject({ desired: 0, desiredGpu: 0, desiredCpu: 0 });
+    expect(await (await call()).json()).toMatchObject({
+      desired: 0,
+      desiredGpu: 0,
+      desiredCpu: 0,
+      desiredLlm: 0,
+      desiredMt: 0,
+    });
     expect(prisma.$queryRaw).not.toHaveBeenCalled();
   });
 });

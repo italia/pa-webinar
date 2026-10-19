@@ -53,6 +53,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/[id]/questionnaires/[placement]/route.ts': 'proprio evento',
   'api/admin/events/[id]/registrations/[regId]/route.ts': 'rettifica e cancellazione di un’iscrizione a un proprio evento',
   'api/admin/events/[id]/tags/route.ts': 'proprio evento',
+  'api/admin/events/[id]/text-translation/route.ts': 'traduzione automatica di titolo e descrizione del proprio evento',
   'api/admin/postprod/route.ts': 'registrazioni dei propri eventi',
   'api/admin/postprod/recordings/[id]/archive/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/recordings/[id]/cancel/route.ts': 'registrazione di un proprio evento',

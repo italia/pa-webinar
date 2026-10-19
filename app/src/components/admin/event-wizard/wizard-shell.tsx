@@ -49,6 +49,8 @@ import {
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
+import { applicaProposta, type TextTranslations } from '@/lib/text-translation/proposals';
+import { testoSorgente } from '@/lib/text-translation/source';
 
 import { RubricaAccessContext } from '../rubrica-picker';
 
@@ -69,6 +71,7 @@ import {
   type StepProgrammeValue,
   type VoceSalvata,
 } from './programme-plan';
+import { lingueDaTradurre, TraduzioneTestiCard, useTraduzioneTesti } from './text-translation';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
 import {
   LibreriaDomandeProvider,
@@ -185,6 +188,10 @@ export interface WizardProps {
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
    *  non ne propone le funzioni. */
   aiPipelineEnabled?: boolean;
+  /** La traduzione automatica di titolo e descrizione c'e' (pipeline AI
+   *  accesa, motore di traduzione su CPU installato) e chi apre il wizard e'
+   *  lo staff: solo allora il passo «Evento» la offre. */
+  textTranslationAvailable?: boolean;
   /** In modifica: relatori e organizzatore scritti a mano (eventi di prima
    *  delle persone strutturate), che la pagina mostra ancora e l'anteprima
    *  quindi pure. */
@@ -913,6 +920,57 @@ export default function EventWizard(props: WizardProps) {
   // una volta sola per tutto il wizard.
   const libreriaDomande = useStatoLibreriaDomande();
 
+  // ── Traduzione automatica di titolo e descrizione ────────────────────────
+  // Le lingue riempite dalla traduzione, da rileggere prima di salvare, e in
+  // creazione la scelta di tradurre dopo il salvataggio.
+  const traduzioneOfferta = !!props.textTranslationAvailable && viaToken === null;
+  const [lingueTradotte, setLingueTradotte] = useState<string[]>([]);
+  const [traduzioneDopo, setTraduzioneDopo] = useState<{ attiva: boolean; lingue: string[] | null }>({
+    attiva: false,
+    lingue: null,
+  });
+  const formRef = useRef(form);
+  formRef.current = form;
+  const applicaTraduzione = useCallback((proposta: TextTranslations, lingue: string[]) => {
+    // Solo i campi ancora vuoti: un testo scritto da una persona resta.
+    const { riempite } = applicaProposta(proposta, lingue, formRef.current.title, formRef.current.description);
+    if (riempite.length === 0) return [];
+    setForm((prev) => {
+      const r = applicaProposta(proposta, riempite, prev.title, prev.description);
+      return { ...prev, title: r.title, description: r.description };
+    });
+    setLingueTradotte((prima) => [...new Set([...prima, ...riempite])]);
+    return riempite;
+  }, []);
+  const traduzione = useTraduzioneTesti({
+    attiva: traduzioneOfferta && mode === 'edit' && !!initialEvent,
+    eventId: initialEvent?.id ?? null,
+    sorgente: props.defaultLocale,
+    titoli: form.title,
+    descrizioni: form.description,
+    applica: applicaTraduzione,
+  });
+  const schedaTraduzione = !traduzioneOfferta ? null : mode === 'edit' ? (
+    <TraduzioneTestiCard
+      mode="edit"
+      stato={traduzione}
+      lingueAttive={props.enabledLocales}
+      sorgente={props.defaultLocale}
+      titoli={form.title}
+      descrizioni={form.description}
+    />
+  ) : (
+    <TraduzioneTestiCard
+      mode="create"
+      dopo={traduzioneDopo}
+      onDopo={setTraduzioneDopo}
+      lingueAttive={props.enabledLocales}
+      sorgente={props.defaultLocale}
+      titoli={form.title}
+      descrizioni={form.description}
+    />
+  );
+
   // ── Bozza nel browser ─────────────────────────────────────────────────────
   // Il modulo si salva nel browser (con un attimo di ritardo), cosi' un
   // ricaricamento o un clic sbagliato non lo perde: in modifica una bozza per
@@ -1608,6 +1666,34 @@ export default function EventWizard(props: WizardProps) {
         );
         if (reportQ.failed.length > 0) failed.add('questionnaires');
 
+        // 5b) La traduzione automatica di titolo e descrizione, se scelta:
+        //     l'evento ora ha un id. Una richiesta rifiutata non blocca niente:
+        //     si dice nel riepilogo, e si puo' chiedere di nuovo dal wizard.
+        if (traduzioneOfferta && traduzioneDopo.attiva) {
+          const sorgente = testoSorgente(props.defaultLocale, form.title, form.description);
+          const candidate = lingueDaTradurre(props.enabledLocales, props.defaultLocale, form.title, form.description);
+          const lingue = traduzioneDopo.lingue
+            ? traduzioneDopo.lingue.filter(
+                (l) => l !== props.defaultLocale && props.enabledLocales.includes(l)
+              )
+            : candidate;
+          if (lingue.length > 0 && (sorgente.title || sorgente.description)) {
+            const ok = await fetch(`/api/admin/events/${created.id}/text-translation`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sourceLanguage: sorgente.sourceLanguage,
+                title: sorgente.title,
+                description: sorgente.description,
+                targetLanguages: lingue,
+              }),
+            })
+              .then((r) => r.ok)
+              .catch(() => false);
+            if (!ok) failed.add('textTranslation');
+          }
+        }
+
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PUT on the
         //    detail route (the route only exports PUT, not PATCH).
@@ -1701,6 +1787,9 @@ export default function EventWizard(props: WizardProps) {
       retentionMax,
       showError,
       serverErrorMessage,
+      traduzioneOfferta,
+      traduzioneDopo,
+      props.enabledLocales,
     ]
   );
 
@@ -1877,6 +1966,8 @@ export default function EventWizard(props: WizardProps) {
                 fieldErrors={fieldErrors}
                 siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
                 siteDefaultVideoQuality={props.siteDefaultVideoQuality}
+                traduzione={schedaTraduzione}
+                machineLocales={lingueTradotte}
               />
             </div>
             {anteprima && <PagePreview dati={anteprima} />}

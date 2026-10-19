@@ -20,6 +20,8 @@
 
 import { z } from 'zod';
 
+import { POSTPROD_JOB_KINDS } from './job-classes';
+
 // ── Common primitives ────────────────────────────────────────────
 
 /**
@@ -135,6 +137,24 @@ export const reportPayloadSchema = z.object({
   metrics: z.unknown().optional(),
 });
 
+/** Quanto testo si traduce al massimo: titolo e descrizione (Markdown). */
+export const TEXT_TRANSLATION_TITLE_MAX = 300;
+export const TEXT_TRANSLATION_DESCRIPTION_MAX = 10_000;
+
+/**
+ * La traduzione di titolo e descrizione dell'evento (lib/text-translation): il
+ * testo di partenza e' quello del modulo al momento della richiesta, anche se
+ * non ancora salvato, e `sourceHash` ne e' l'impronta (lib/text-translation/source).
+ */
+export const translateTextPayloadSchema = z.object({
+  eventId: uuidSchema,
+  sourceLanguage: languageCodeSchema,
+  targetLanguages: z.array(languageCodeSchema).min(1).max(24),
+  title: z.string().max(TEXT_TRANSLATION_TITLE_MAX),
+  description: z.string().max(TEXT_TRANSLATION_DESCRIPTION_MAX),
+  sourceHash: z.string().regex(/^[a-f0-9]{64}$/),
+});
+
 /**
  * Discriminated union over all known kinds. Use it to validate a row
  * before handing it to a worker:
@@ -153,6 +173,7 @@ export const postprodJobPayloadSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('DUB'), payload: dubPayloadSchema }),
   z.object({ kind: z.literal('ARCHIVE'), payload: archivePayloadSchema }),
   z.object({ kind: z.literal('REPORT'), payload: reportPayloadSchema }),
+  z.object({ kind: z.literal('TRANSLATE_TEXT'), payload: translateTextPayloadSchema }),
 ]);
 
 export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
@@ -166,9 +187,9 @@ export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
  */
 export const claimResponseSchema = z.object({
   jobId: uuidSchema,
-  // Nullo per il resoconto dell'evento (REPORT), che non ha registrazione.
+  // Nullo per i lavori dell'evento (REPORT, TRANSLATE_TEXT), senza registrazione.
   recordingId: uuidSchema.nullable(),
-  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB', 'ARCHIVE', 'REPORT']),
+  kind: z.enum(POSTPROD_JOB_KINDS),
   payload: z.unknown(), // narrowed via postprodJobPayloadSchema downstream
   attempts: z.number().int().min(0),
   leaseExpiresAt: z.string().datetime(),

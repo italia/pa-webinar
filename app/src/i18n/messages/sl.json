@@ -1128,7 +1128,8 @@
         "speakers": "govorci",
         "materials": "gradiva",
         "questionnaires": "vprašalniki",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "strojno prevajanje"
       },
       "revocationFailed": "Preklic dostopa za {name} ni uspel: povezava za dostop še vedno velja. Znova shranite za nov poskus ali jo prekličite na zavihku »{tab}« na strani dogodka.",
       "validationFailedDetail": "Strežnik je zavrnil nekatere podatke: {reason}. Popravite jih in poskusite znova.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Povzetka ni več mogoče posodobiti: dogodek se ni končal ali pa je potekel rok hrambe njegovih podatkov.",
         "error": "Posodobitev ni uspela: poskusite znova."
       }
+    },
+    "textTranslation": {
+      "heading": "Strojno prevajanje",
+      "intro": "Prevede naslov in opis z modelom, ki teče na strežnikih te namestitve. Izpolni le polja, ki so še prazna: pred shranjevanjem preberite prevedeno besedilo.",
+      "languages": "Ciljni jeziki",
+      "start": "Prevedi z UI",
+      "afterCreate": "Po shranjevanju prevedi z UI",
+      "afterCreateHelp": "Naslov in opis se prevedeta v izbrane jezike. Prevode preberite in shranite z urejanjem dogodka.",
+      "offer": "Za to besedilo so na voljo strojni prevodi za: {languages}.",
+      "useOffer": "Uporabi prevode",
+      "machineMark": "strojno prevedeno, za pregled",
+      "reviewAlert": "Strojno prevedeno: pred shranjevanjem preberite.",
+      "error": "Prevoda ni bilo mogoče zahtevati. Poskusite znova.",
+      "queued": "V čakalni vrsti: prevajanje se bo kmalu začelo.",
+      "running": "Prevajanje poteka: to lahko traja nekaj minut.",
+      "busy": "Za ta dogodek že poteka drug prevod: poskusite znova, ko se konča.",
+      "noTargets": "Izberite vsaj en jezik.",
+      "sourceMissing": "Najprej napišite naslov ali opis v glavnem jeziku.",
+      "done": "Prevod je pripravljen za: {languages}. Pred shranjevanjem ga preberite.",
+      "doneNothing": "Prevod je pripravljen, vendar so bila polja v teh jezikih že izpolnjena: nobeno besedilo ni bilo zamenjano.",
+      "failed": "Prevajanje ni uspelo: {reason}",
+      "failedGeneric": "Prevajanje ni uspelo.",
+      "status": {
+        "queued": "Strojni prevod naslova in opisa čaka v vrsti.",
+        "running": "Strojno prevajanje naslova in opisa poteka.",
+        "ready": "Strojni prevod naslova in opisa je pripravljen za: {languages}. Preberite ga in shranite z urejanjem dogodka.",
+        "review": "Preglej besedila",
+        "failed": "Strojno prevajanje naslova in opisa ni uspelo: {reason}",
+        "failedGeneric": "Strojno prevajanje naslova in opisa ni uspelo."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "UI je za ta dogodek izklopljena: z »Ustvari z AI« jo vklopite in zaženete obdelavo.",
     "sourceTranscriptMissing": "Ta posnetek še ni prepisan: najprej ga prepišite, nato dodajte prevod.",
     "captionsTranscriptNotTranslatable": "Ta prepis izvira iz podnapisov v živo: samodejni prevod potrebuje prepis posnetka z UI.",
-    "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega."
+    "sameLanguage": "Izbrani jezik je izvirni jezik posnetka: izberite drugega.",
+    "mtUnavailable": "Strojno prevajanje na tej instanci ni nameščeno."
   }
 }

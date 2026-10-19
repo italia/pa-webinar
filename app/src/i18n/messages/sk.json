@@ -1128,7 +1128,8 @@
         "speakers": "rečníci",
         "materials": "materiály",
         "questionnaires": "dotazníky",
-        "agenda": "program"
+        "agenda": "program",
+        "textTranslation": "strojový preklad"
       },
       "revocationFailed": "Odobratie prístupu pre {name} sa nepodarilo: prístupový odkaz stále platí. Uložte znova pre ďalší pokus, alebo ho odoberte na karte „{tab}“ na stránke podujatia.",
       "validationFailedDetail": "Server odmietol niektoré údaje: {reason}. Opravte ich a skúste to znova.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Zhrnutie sa už nedá aktualizovať: podujatie neskončilo alebo uplynula doba uchovávania jeho údajov.",
         "error": "Aktualizácia sa nepodarila: skúste to znova."
       }
+    },
+    "textTranslation": {
+      "heading": "Strojový preklad",
+      "intro": "Preloží názov a opis modelom, ktorý beží na serveroch tejto inštalácie. Vyplní len polia, ktoré sú ešte prázdne: pred uložením si preložený text prečítajte.",
+      "languages": "Cieľové jazyky",
+      "start": "Preložiť pomocou AI",
+      "afterCreate": "Po uložení preložiť pomocou AI",
+      "afterCreateHelp": "Názov a opis sa preložia do zvolených jazykov. Preklady skontrolujte a uložte úpravou podujatia.",
+      "offer": "Strojové preklady tohto textu sú k dispozícii pre: {languages}.",
+      "useOffer": "Použiť preklady",
+      "machineMark": "strojovo preložené, na kontrolu",
+      "reviewAlert": "Strojovo preložené: pred uložením skontrolujte.",
+      "error": "Preklad sa nepodarilo vyžiadať. Skúste to znova.",
+      "queued": "V poradí: preklad sa čoskoro začne.",
+      "running": "Prebieha preklad: môže to trvať niekoľko minút.",
+      "busy": "Pre toto podujatie už prebieha iný preklad: skúste to znova, keď sa skončí.",
+      "noTargets": "Vyberte aspoň jeden jazyk.",
+      "sourceMissing": "Najprv napíšte názov alebo opis v hlavnom jazyku.",
+      "done": "Preklad je pripravený pre: {languages}. Pred uložením skontrolujte.",
+      "doneNothing": "Preklad je pripravený, ale polia v týchto jazykoch už boli vyplnené: žiadny text nebol nahradený.",
+      "failed": "Preklad sa nepodaril: {reason}",
+      "failedGeneric": "Preklad sa nepodaril.",
+      "status": {
+        "queued": "Strojový preklad názvu a opisu čaká v poradí.",
+        "running": "Prebieha strojový preklad názvu a opisu.",
+        "ready": "Strojový preklad názvu a opisu je pripravený pre: {languages}. Skontrolujte ho a uložte úpravou podujatia.",
+        "review": "Skontrolovať texty",
+        "failed": "Strojový preklad názvu a opisu sa nepodaril: {reason}",
+        "failedGeneric": "Strojový preklad názvu a opisu sa nepodaril."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "AI je pre toto podujatie vypnutá: pomocou „Vygenerovať AI“ ju zapnete a spustíte spracovanie.",
     "sourceTranscriptMissing": "Tento záznam ešte nie je prepísaný: najprv ho prepíšte, potom pridajte preklad.",
     "captionsTranscriptNotTranslatable": "Tento prepis pochádza zo živých titulkov: automatický preklad vyžaduje AI prepis záznamu.",
-    "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný."
+    "sameLanguage": "Zvolený jazyk je pôvodný jazyk záznamu: vyberte iný.",
+    "mtUnavailable": "Strojový preklad nie je na tejto inštancii nainštalovaný."
   }
 }

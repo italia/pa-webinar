@@ -8,6 +8,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
 import EventManagementClient from '@/components/admin/event-management-client';
@@ -263,6 +264,7 @@ export default async function EventManagePage({
         // orologio, cosi' la prima passata del client coincide col server.
         renderedAt={Date.now()}
         viaToken={staff ? null : (token ?? null)}
+        textTranslationAvailable={!!staff && traduzioneDisponibile(settings)}
       />
     </div>
   );

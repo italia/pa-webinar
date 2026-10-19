@@ -13,7 +13,7 @@ const m = vi.hoisted(() => ({
   resoconto: vi.fn(),
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
-vi.mock('@/lib/report/job', () => ({ avanzamentoResoconto: m.resoconto }));
+vi.mock('@/lib/report/job', () => ({ avanzamentoLavoroEvento: m.resoconto }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     postprodJob: { findUnique: m.job, update: m.aggiorna },
@@ -59,6 +59,15 @@ describe('POST /api/internal/postprod-progress', () => {
     expect(m.aggiorna).not.toHaveBeenCalled();
   });
 
+  it('la traduzione dei testi dell\'evento segue le stesse regole del resoconto', async () => {
+    m.job.mockResolvedValue(lavoro({ kind: 'TRANSLATE_TEXT' }));
+    m.resoconto.mockResolvedValueOnce({ status: 'RUNNING' });
+    const res = await avanza({ status: 'DONE', attempt: 1 });
+    expect(await res.json()).toEqual({ ok: true, status: 'RUNNING' });
+    expect(m.resoconto).toHaveBeenCalledTimes(1);
+    // Un DONE del worker non chiude il lavoro: lo chiude solo la consegna.
+    expect(m.aggiorna).not.toHaveBeenCalled();
+  });
 
   it('gli altri lavori restano come prima', async () => {
     m.job.mockResolvedValue(lavoro({ kind: 'SUMMARIZE', recordingId: 'rec-1', attempts: 2 }));

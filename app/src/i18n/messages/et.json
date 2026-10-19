@@ -1128,7 +1128,8 @@
         "speakers": "esinejad",
         "materials": "materjalid",
         "questionnaires": "küsimustikud",
-        "agenda": "kava"
+        "agenda": "kava",
+        "textTranslation": "masintõlge"
       },
       "revocationFailed": "Ligipääsu tühistamine ebaõnnestus ({name}): ligipääsulink kehtib endiselt. Salvesta uuesti, et uuesti proovida, või tühista see sündmuse lehe vahekaardil „{tab}“.",
       "validationFailedDetail": "Server lükkas osa andmetest tagasi: {reason}. Paranda ja proovi uuesti.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Kokkuvõtet ei saa enam värskendada: üritus ei ole lõppenud või selle andmete säilitusaeg on läbi.",
         "error": "Värskendamine ebaõnnestus: proovige uuesti."
       }
+    },
+    "textTranslation": {
+      "heading": "Masintõlge",
+      "intro": "Tõlgib pealkirja ja kirjelduse mudeliga, mis töötab selle paigalduse enda serverites. See täidab ainult veel tühjad väljad: loe tõlgitud tekst enne salvestamist üle.",
+      "languages": "Sihtkeeled",
+      "start": "Tõlgi tehisintellektiga",
+      "afterCreate": "Pärast salvestamist tõlgi tehisintellektiga",
+      "afterCreateHelp": "Pealkiri ja kirjeldus tõlgitakse valitud keeltesse. Loe tõlked üle ja salvesta need sündmust muutes.",
+      "offer": "Selle teksti masintõlked on olemas keeltes: {languages}.",
+      "useOffer": "Kasuta tõlkeid",
+      "machineMark": "masintõlgitud, vaja üle lugeda",
+      "reviewAlert": "Masintõlgitud: loe enne salvestamist üle.",
+      "error": "Tõlget ei õnnestunud tellida. Proovi uuesti.",
+      "queued": "Järjekorras: tõlkimine algab varsti.",
+      "running": "Tõlkimine käib: see võib võtta mõne minuti.",
+      "busy": "Selle sündmuse jaoks käib juba teine tõlge: proovi uuesti, kui see on lõppenud.",
+      "noTargets": "Vali vähemalt üks keel.",
+      "sourceMissing": "Kirjuta kõigepealt pealkiri või kirjeldus põhikeeles.",
+      "done": "Tõlge on valmis keeltes: {languages}. Loe enne salvestamist üle.",
+      "doneNothing": "Tõlge on valmis, kuid nende keelte väljad olid juba täidetud: ühtegi teksti ei asendatud.",
+      "failed": "Tõlkimine ebaõnnestus: {reason}",
+      "failedGeneric": "Tõlkimine ebaõnnestus.",
+      "status": {
+        "queued": "Pealkirja ja kirjelduse masintõlge on järjekorras.",
+        "running": "Pealkirja ja kirjelduse masintõlge käib.",
+        "ready": "Pealkirja ja kirjelduse masintõlge on valmis keeltes: {languages}. Loe see üle ja salvesta sündmust muutes.",
+        "review": "Vaata tekstid üle",
+        "failed": "Pealkirja ja kirjelduse masintõlge ebaõnnestus: {reason}",
+        "failedGeneric": "Pealkirja ja kirjelduse masintõlge ebaõnnestus."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "Tehisintellekt on selle ürituse jaoks välja lülitatud: kasuta nuppu „Loo AI“, et see sisse lülitada ja töötlus käivitada.",
     "sourceTranscriptMissing": "Seda salvestust pole veel transkribeeritud: transkribeeri see enne tõlke lisamist.",
     "captionsTranscriptNotTranslatable": "See transkriptsioon pärineb otsesubtiitritest: automaattõlge vajab salvestise tehisintellekti transkriptsiooni.",
-    "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu."
+    "sameLanguage": "Valitud keel on salvestuse algkeel: vali mõni muu.",
+    "mtUnavailable": "Masintõlge ei ole selles eksemplaris paigaldatud."
   }
 }

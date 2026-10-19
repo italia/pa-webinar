@@ -659,3 +659,46 @@ rifiuterebbe il Deployment. Meglio dirlo qui, con la strada per uscirne.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- /*
+Motore di traduzione su CPU (postprod.mt): valori che, sbagliati, non fermano
+l'installazione ma lasciano la traduzione automatica ferma, e lo si scopre
+quando qualcuno la chiede dal wizard.
+  - la traduzione dei testi gira solo sul worker senza GPU: senza di lui il
+    lavoro resterebbe in coda (e l'orchestratore accenderebbe a ogni giro il
+    worker con la GPU, che non lo prende);
+  - il modello: senza indirizzo o con un'impronta malformata lo scaricamento
+    all'avvio del pod fallisce sempre; il nome del file finisce in un percorso;
+  - thread, contesto e attesa prima dello spegnimento sono numeri.
+*/}}
+{{- define "pa-webinar.validateMt" -}}
+{{- if include "pa-webinar.mtEnabled" . -}}
+{{- $p := .Values.postprod | default dict -}}
+{{- $mt := dig "mt" dict $p | default dict -}}
+{{- if not (and (dig "worker" "enabled" false $p) (dig "worker" "cpu" "enabled" false $p)) -}}
+{{- fail "postprod.mt.enabled richiede postprod.worker.enabled e postprod.worker.cpu.enabled: la traduzione di titolo e descrizione gira solo sul worker senza GPU, e senza di lui il lavoro resterebbe in coda per sempre. Accendi il worker senza GPU, oppure spegni il motore (postprod.mt.enabled: false)." -}}
+{{- end -}}
+{{- $url := toString (dig "model" "url" "" $mt | default "") -}}
+{{- if not (regexMatch "^https?://[^[:space:]]+$" $url) -}}
+{{- fail (printf "postprod.mt.model.url è %q: serve l'indirizzo http(s) da cui il pod scarica il modello di traduzione (quello di values.yaml, o un mirror interno con lo stesso file)." $url) -}}
+{{- end -}}
+{{- $impronta := toString (dig "model" "sha256" "" $mt | default "") -}}
+{{- if not (regexMatch "^[0-9a-f]{64}$" $impronta) -}}
+{{- fail (printf "postprod.mt.model.sha256 è %q: serve l'impronta SHA-256 del file del modello, 64 caratteri esadecimali minuscoli (sha256sum <file>). Senza, lo scaricamento all'avvio del pod non si può verificare e il motore non parte." $impronta) -}}
+{{- end -}}
+{{- if not (regexMatch "^[A-Za-z0-9][A-Za-z0-9._-]*$" (toString (dig "model" "file" "" $mt | default ""))) -}}
+{{- fail "postprod.mt.model.file deve essere un nome di file (lettere, cifre, . _ -), senza percorso: è il file del modello nel volume del pod." -}}
+{{- end -}}
+{{- if not (dig "model" "id" "" $mt) -}}
+{{- fail "postprod.mt.model.id è vuoto: serve il nome del modello, che il portale scrive nelle traduzioni che salva." -}}
+{{- end -}}
+{{- range $voce := list (list "postprod.mt.threads" (dig "threads" 4 $mt)) (list "postprod.mt.contextSize" (dig "contextSize" 4096 $mt)) -}}
+{{- if not (regexMatch "^[1-9][0-9]*$" (toString (index $voce 1))) -}}
+{{- fail (printf "%s è %v: serve un intero da 1 in su." (index $voce 0) (index $voce 1)) -}}
+{{- end -}}
+{{- end -}}
+{{- if not (regexMatch "^[0-9]+$" (toString (dig "scaleToZero" "idleMinutes" 15 $mt))) -}}
+{{- fail (printf "postprod.mt.scaleToZero.idleMinutes è %v: serve un intero da 0 in su." (dig "scaleToZero" "idleMinutes" 15 $mt)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

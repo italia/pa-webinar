@@ -811,17 +811,20 @@ written since then is lost, so do it only when the older release cannot run on t
 Under the additive rule, that should not happen.
 
 **Post-production jobs of a kind the older release does not know.** A release can add a job kind,
-as the AI event report (`REPORT`) does. The older release does not run it, and its orchestrator keeps
-asking for a worker, and keeps vLLM running, for each such job still pending. Before rolling back
-past the release that added a kind, close its open jobs with `psql` on the database:
+as the AI event report (`REPORT`) and the machine translation of event texts (`TRANSLATE_TEXT`) do.
+The older release does not run it, and its orchestrator keeps asking for a worker, and keeps vLLM
+running, for each such job still pending. Before rolling back past the release that added a kind,
+close its open jobs with `psql` on the database:
 
 ```sql
 UPDATE postprod_jobs
 SET status = 'FAILED', last_error = 'rolled back', completed_at = NOW(), updated_at = NOW()
-WHERE kind = 'REPORT' AND status IN ('PENDING', 'CLAIMED', 'RUNNING');
+WHERE kind IN ('REPORT', 'TRANSLATE_TEXT') AND status IN ('PENDING', 'CLAIMED', 'RUNNING');
 ```
 
-Staff request the report again once the newer release is back.
+Staff request the report or the translation again once the newer release is back. Machine
+translation proposals stay in `events.text_translations`, which the older release does not read; the
+older chart removes the CPU translation engine (`<fullname>-mt`).
 
 ### Restore a backup
 

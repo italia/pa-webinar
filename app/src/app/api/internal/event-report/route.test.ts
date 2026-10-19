@@ -25,7 +25,7 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 vi.mock('@/lib/report/enqueue', () => ({ salvaResoconto: m.salva }));
-vi.mock('@/lib/report/job', () => ({ consegnaResoconto: m.prendi, statoResoconto: m.stato }));
+vi.mock('@/lib/report/job', () => ({ consegnaResoconto: m.prendi, statoLavoroEvento: m.stato }));
 
 import { POST } from './route';
 

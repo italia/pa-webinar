@@ -13,7 +13,17 @@
  *     "desired": 2,         // min(runnable + claimed, maxConcurrent)
  *     "desiredGpu": 1,      // `desired` diviso fra il worker con la GPU
  *     "desiredCpu": 1,      // e quello senza (lib/ai/job-classes)
+ *     "desiredLlm": 1,      // lavori pronti, presi o in esecuzione che
+ *                           // usano vLLM (LLM_JOB_KINDS)
+ *     "desiredMt": 0,       // lo stesso per il motore di traduzione su CPU
+ *                           // (MT_JOB_KINDS)
  *   }
+ *
+ * `desiredLlm` e `desiredMt` dicono all'orchestratore quale motore tenere
+ * acceso: vLLM (la GPU) solo per i lavori che gli chiedono testo, il motore su
+ * CPU solo per la traduzione di titolo e descrizione. Contano anche i lavori
+ * RUNNING, che `desired` non conta: il motore deve restare acceso finche' il
+ * worker lo usa. Un orchestratore che non li legge accende vLLM come prima.
  *
  * The orchestrator's policy is: if `desired > currently-running k8s
  * Jobs`, create more; if less, wait (jobs are one-shot, no scale-down
@@ -22,10 +32,12 @@
  * Auth: CRON_API_KEY.
  */
 
+import { Prisma } from '@prisma/client';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { GPU_WORKER_KINDS } from '@/lib/ai/job-classes';
+import { GPU_WORKER_KINDS, LLM_JOB_KINDS, MT_JOB_KINDS } from '@/lib/ai/job-classes';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +47,8 @@ interface CountRow {
   running: bigint;
   gpu_runnable: bigint;
   gpu_claimed: bigint;
+  llm_work: bigint;
+  mt_work: bigint;
 }
 
 export const GET = withErrorHandling(async (request) => {
@@ -60,8 +74,21 @@ export const GET = withErrorHandling(async (request) => {
       desired: 0,
       desiredGpu: 0,
       desiredCpu: 0,
+      desiredLlm: 0,
+      desiredMt: 0,
     });
   }
+
+  // Un lavoro che tiene acceso il suo motore: pronto (come per il claim),
+  // preso o in esecuzione.
+  const inLavoro = Prisma.sql`(
+    j.status IN ('CLAIMED', 'RUNNING')
+    OR (j.status = 'PENDING'
+        AND j.next_attempt_at <= NOW()
+        AND (j.depends_on_id IS NULL
+             OR EXISTS (SELECT 1 FROM postprod_jobs dep
+                        WHERE dep.id = j.depends_on_id AND dep.status = 'DONE')))
+  )`;
 
   // One query for all three counts — cheap (indexed by status). The
   // "runnable" set checks dependency-DONE in the same way the claim
@@ -87,11 +114,25 @@ export const GET = withErrorHandling(async (request) => {
       ) AS gpu_runnable,
       COUNT(*) FILTER (
         WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[]) AND j.status = 'CLAIMED'
-      ) AS gpu_claimed
+      ) AS gpu_claimed,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...LLM_JOB_KINDS]}::text[]) AND ${inLavoro}
+      ) AS llm_work,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...MT_JOB_KINDS]}::text[]) AND ${inLavoro}
+      ) AS mt_work
     FROM postprod_jobs j
   `;
 
-  const row = rows[0] ?? { runnable: 0n, claimed: 0n, running: 0n, gpu_runnable: 0n, gpu_claimed: 0n };
+  const row = rows[0] ?? {
+    runnable: 0n,
+    claimed: 0n,
+    running: 0n,
+    gpu_runnable: 0n,
+    gpu_claimed: 0n,
+    llm_work: 0n,
+    mt_work: 0n,
+  };
   const runnable = Number(row.runnable);
   const claimed = Number(row.claimed);
   const running = Number(row.running);
@@ -117,5 +158,7 @@ export const GET = withErrorHandling(async (request) => {
     desired,
     desiredGpu,
     desiredCpu,
+    desiredLlm: Number(row.llm_work),
+    desiredMt: Number(row.mt_work),
   });
 });

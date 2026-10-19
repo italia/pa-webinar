@@ -86,6 +86,8 @@ interface Props {
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
+  /** La traduzione automatica di titolo e descrizione c'e' (vedi il wizard). */
+  textTranslationAvailable?: boolean;
   defaultModerator?: { name: string; email: string } | null;
   /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
   publicRegistrationEnabled?: boolean;
@@ -117,6 +119,7 @@ export default function CreateEventWithTemplate({
   liveCaptionsAvailable = false,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
+  textTranslationAvailable = false,
   defaultModerator = null,
   publicRegistrationEnabled = true,
   initialInstant = false,
@@ -174,6 +177,7 @@ export default function CreateEventWithTemplate({
       liveCaptionsAvailable={liveCaptionsAvailable}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
+      textTranslationAvailable={textTranslationAvailable}
       defaultModerator={defaultModerator}
       publicRegistrationEnabled={publicRegistrationEnabled}
     />

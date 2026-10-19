@@ -222,9 +222,17 @@ model Event {
   postEventReport          Json?         @map("post_event_report")
   postEventReportAt        DateTime?     @map("post_event_report_at")
   postEventReportPublished Boolean       @default(false) @map("post_event_report_published")
-  // I lavori del resoconto (PostprodJob di tipo REPORT): sono dell'evento,
-  // non di una registrazione.
+  // I lavori dell'evento (PostprodJob di tipo REPORT e TRANSLATE_TEXT):
+  // sono dell'evento, non di una registrazione.
   reportJobs               PostprodJob[]
+
+  // Le traduzioni automatiche di titolo e descrizione (lib/text-translation),
+  // come proposta: { sourceLanguage, sourceHash, generatedAt, model,
+  // title: {lingua: testo}, description: {lingua: testo} }. Non cambiano mai
+  // `title` e `description`: chi modifica l'evento le rilegge nel wizard e le
+  // salva lui. `sourceHash` dice da quale testo vengono, per non proporle
+  // dopo che il testo di partenza e' cambiato.
+  textTranslations Json? @map("text_translations")
 
   // Post-event follow-up email (opt-in per event). When enabled, the reminders
   // cron sends a thank-you + recap/feedback email to registrants and a recap
@@ -2070,6 +2078,10 @@ enum PostprodJobKind {
   // concettuale, consenso e dissenso, partecipazione, valutazioni. Lo avvia
   // lo staff dopo l'evento; il risultato si congela su Event.postEventReport.
   REPORT
+  // La traduzione di titolo e descrizione dell'evento (lib/text-translation)
+  // con il motore di traduzione su CPU, senza vLLM ne' GPU. Lo avvia lo staff
+  // dal wizard; il risultato e' una proposta su Event.textTranslations.
+  TRANSLATE_TEXT
 }
 
 enum PostprodJobStatus {
@@ -2278,8 +2290,8 @@ model GlossaryTerm {
 
 model PostprodJob {
   id          String  @id @default(uuid()) @db.Uuid
-  // La registrazione di cui e' un passo; nulla solo per il resoconto
-  // dell'evento (REPORT), che e' dell'evento (`eventId`).
+  // La registrazione di cui e' un passo; nulla solo per i lavori
+  // dell'evento (REPORT, TRANSLATE_TEXT), che sono dell'evento (`eventId`).
   recordingId String? @map("recording_id") @db.Uuid
   eventId     String? @map("event_id") @db.Uuid
 

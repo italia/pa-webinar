@@ -1128,7 +1128,8 @@
         "speakers": "kelliema",
         "materials": "materjali",
         "questionnaires": "kwestjonarji",
-        "agenda": "programm"
+        "agenda": "programm",
+        "textTranslation": "traduzzjoni awtomatika"
       },
       "revocationFailed": "Ir-revoka tal-aċċess għal {name} ma rnexxietx: il-link tal-aċċess għadu validu. Erġa’ ssejvja biex terġa’ tipprova, jew irrevokah mill-iskeda “{tab}” tal-paġna tal-avveniment.",
       "validationFailedDetail": "Is-server irrifjuta xi data: {reason}. Ikkoreġiha u erġa’ pprova.",
@@ -3535,6 +3536,36 @@
         "notPossible": "Il-ġabra fil-qosor ma tistax tiġi aġġornata aktar: l-avveniment għadu ma ntemmx jew id-dejta tiegħu skadiet.",
         "error": "L-aġġornament ma rnexxiex: erġa’ pprova."
       }
+    },
+    "textTranslation": {
+      "heading": "Traduzzjoni awtomatika",
+      "intro": "Tittraduċi t-titlu u d-deskrizzjoni b'mudell li jaħdem fuq is-servers ta' din l-installazzjoni. Timla biss l-oqsma li għadhom vojta: aqra t-test tradott qabel ma ssalva.",
+      "languages": "Lingwi li fihom tittraduċi",
+      "start": "Ittraduċi bl-IA",
+      "afterCreate": "Wara li ssalva, ittraduċi bl-IA",
+      "afterCreateHelp": "It-titlu u d-deskrizzjoni jiġu tradotti fil-lingwi magħżula. Aqra u ssalva t-traduzzjonijiet billi teditja l-avveniment.",
+      "offer": "Hemm traduzzjonijiet awtomatiċi ta' dan it-test għal: {languages}.",
+      "useOffer": "Uża t-traduzzjonijiet",
+      "machineMark": "tradott awtomatikament, irid jiġi rivedut",
+      "reviewAlert": "Tradott awtomatikament: aqrah qabel ma ssalva.",
+      "error": "Ma setgħetx tintalab it-traduzzjoni. Erġa' pprova.",
+      "queued": "Fil-kju: it-traduzzjoni tibda dalwaqt.",
+      "running": "Traduzzjoni għaddejja: tista' tieħu ftit minuti.",
+      "busy": "Għal dan l-avveniment diġà għaddejja traduzzjoni oħra: erġa' pprova meta tispiċċa.",
+      "noTargets": "Agħżel mill-inqas lingwa waħda.",
+      "sourceMissing": "L-ewwel ikteb it-titlu jew id-deskrizzjoni fil-lingwa ewlenija.",
+      "done": "It-traduzzjoni lesta għal: {languages}. Aqraha qabel ma ssalva.",
+      "doneNothing": "It-traduzzjoni lesta, iżda l-oqsma f'dawk il-lingwi kienu diġà mimlija: ebda test ma ġie sostitwit.",
+      "failed": "It-traduzzjoni ma rnexxietx: {reason}",
+      "failedGeneric": "It-traduzzjoni ma rnexxietx.",
+      "status": {
+        "queued": "It-traduzzjoni awtomatika tat-titlu u d-deskrizzjoni qiegħda fil-kju.",
+        "running": "It-traduzzjoni awtomatika tat-titlu u d-deskrizzjoni għaddejja.",
+        "ready": "It-traduzzjoni awtomatika tat-titlu u d-deskrizzjoni lesta għal: {languages}. Aqraha u ssalvaha billi teditja l-avveniment.",
+        "review": "Irrevedi t-testi",
+        "failed": "It-traduzzjoni awtomatika tat-titlu u d-deskrizzjoni ma rnexxietx: {reason}",
+        "failedGeneric": "It-traduzzjoni awtomatika tat-titlu u d-deskrizzjoni ma rnexxietx."
+      }
     }
   },
   "email": {
@@ -5269,6 +5300,7 @@
     "aiDisabledForEvent": "L-IA hija mitfija għal dan l-avveniment: uża «Iġġenera l-AI» biex tixgħelha u tibda l-ipproċessar.",
     "sourceTranscriptMissing": "Din ir-reġistrazzjoni għadha mhix traskritta: ittraskriviha qabel ma żżid traduzzjoni.",
     "captionsTranscriptNotTranslatable": "Din it-traskrizzjoni ġejja mis-sottotitoli diretti: it-traduzzjoni awtomatika teħtieġ traskrizzjoni AI tar-reġistrazzjoni.",
-    "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra."
+    "sameLanguage": "Il-lingwa magħżula hija l-lingwa oriġinali tar-reġistrazzjoni: agħżel oħra.",
+    "mtUnavailable": "It-traduzzjoni awtomatika mhijiex installata f'din l-istanza."
   }
 }

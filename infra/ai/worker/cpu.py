@@ -2,7 +2,7 @@
 
 Esegue lo stesso ciclo di ``worker.main`` ma solo per i tipi di job in
 AI_WORKER_KINDS, che il chart imposta ai job che non usano la GPU nel worker
-(sintesi, traduzioni, archivio). Si rifiuta di partire se l'elenco manca o
+(sintesi, traduzioni, archivio, traduzione dei testi degli eventi). Si rifiuta di partire se l'elenco manca o
 comprende un job del worker con la GPU: su un pod con pochi GB e senza GPU
 una trascrizione finirebbe uccisa a meta', e il job perderebbe un tentativo.
 

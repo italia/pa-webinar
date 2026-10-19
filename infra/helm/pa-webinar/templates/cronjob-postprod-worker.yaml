@@ -9,12 +9,14 @@
   - `postprod-worker`: con la GPU, per la trascrizione (WhisperX, pyannote)
     e il doppiaggio (la filigrana AudioSeal chiede molta memoria);
   - `postprod-worker-cpu` (postprod.worker.cpu.enabled): senza GPU, per
-    sintesi e traduzioni (il testo lo produce vLLM, sulla sua GPU) e archivio.
+    sintesi e traduzioni (il testo lo produce vLLM, sulla sua GPU), archivio
+    e traduzione dei testi degli eventi (il motore su CPU, postprod.mt).
     Per una sintesi si accende cosi' una sola A100. Ha un'immagine sua,
     leggera (infra/ai/Dockerfile.worker-cpu): quella del worker con la GPU
     pesa ~15 GB e si scaricherebbe su ogni nodo dell'app che lo ospita.
-  Senza la variante CPU, il worker con la GPU prende ogni tipo di job. Gli
-  elenchi dei tipi sono quelli di app/src/lib/ai/job-classes.ts. La variante
+  Senza la variante CPU, il worker con la GPU prende ogni tipo di job tranne
+  la traduzione dei testi. Gli elenchi dei tipi sono quelli di
+  app/src/lib/ai/job-classes.ts. La variante
   CPU parte da `worker.cpu`, che un'immagine del worker precedente a questa
   separazione non ha: il pod termina senza prendere job. Variabili
   (`extraEnv`) e token di Hugging Face sono per variante: quelle del worker
@@ -179,7 +181,10 @@ spec:
 {{- $w := .Values.postprod.worker }}
 {{- $cpu := $w.cpu | default dict }}
 {{- $gpuRes := dict "requests" (dict "cpu" ($w.resources.requests.cpu | default "2") "memory" ($w.resources.requests.memory | default "16Gi")) "limits" (dict "cpu" ($w.resources.limits.cpu | default "8") "memory" ($w.resources.limits.memory | default "48Gi")) }}
-{{- $gpuKinds := list }}
+{{- /* Senza la variante CPU il worker con la GPU prende tutti i tipi tranne
+       la traduzione dei testi (TRANSLATE_TEXT), che non deve mai accendere
+       la GPU: gira solo sul worker senza GPU (pa-webinar.validateMt). */}}
+{{- $gpuKinds := list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "SUMMARIZE" "TRANSLATE" "SUBTITLE" "DUB" "ARCHIVE" "REPORT" }}
 {{- if $cpu.enabled }}
 {{- $gpuKinds = list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "DUB" }}
 {{- end }}
@@ -196,6 +201,6 @@ spec:
        col tag dell'app. */}}
 {{- $cpuImage := $cpu.image | default $w.image | default (include "pa-webinar.auxImage" (list . "" "postprod-worker-cpu")) }}
 ---
-{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE" "REPORT") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE" "REPORT" "TRANSLATE_TEXT") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
 {{- end }}
 {{- end }}

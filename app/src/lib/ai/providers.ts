@@ -7,12 +7,13 @@
  * and ship that selection in the claim response.
  *
  * **Sovereignty policy**: every provider supported here must run
- * **in-cluster on the AI GPU node pool**. No external API endpoints
+ * **in-cluster** (the AI GPU node pool, or the app nodes for the CPU
+ * translation engine). No external API endpoints
  * (no OVH AI, no Anthropic, no OpenAI, no Hugging Face Inference
  * Endpoints). PA data never leaves the cluster except to the
- * configured object storage. If a future internal alternative to vLLM
- * is added (e.g. text-generation-inference, llama.cpp), it lives
- * here too, but the constraint "in-cluster only" stands.
+ * configured object storage. The CPU translation engine for the event
+ * title and description (llama.cpp, `resolveMtProvider`) lives here too,
+ * under the same constraint: "in-cluster only".
  *
  * Provider envelope is intentionally minimal (provider id + base URL
  * inside the cluster + model id) so adding a new in-cluster backend
@@ -99,6 +100,40 @@ export function resolveLlmProvider(opts: {
       throw new Error(`unknown llm provider: ${String(_exhaustive)}`);
     }
   }
+}
+
+export interface ResolvedMt {
+  /** OpenAI-compatible base URL of the CPU translation engine (…/v1). */
+  baseUrl: string;
+  /** Model id the engine serves, recorded on the translations it writes. */
+  modelId: string;
+}
+
+/**
+ * Il motore di traduzione su CPU (llama.cpp con un modello di traduzione,
+ * postprod.mt nel chart), per titolo e descrizione dell'evento (job
+ * TRANSLATE_TEXT). Stessa regola di sovranita' di vLLM: un Service del
+ * cluster, mai un'API esterna. Il chart imposta AI_MT_BASE_URL e
+ * AI_MT_MODEL_ID sull'app solo quando rende il motore: senza indirizzo il
+ * motore non c'e' e la traduzione automatica non si offre (null). Nessun
+ * ripiego su vLLM: accenderebbe la GPU per qualche riga di testo.
+ */
+export function resolveMtProvider(
+  env: Record<string, string | undefined> = process.env
+): ResolvedMt | null {
+  const baseUrl = env.AI_MT_BASE_URL?.trim();
+  if (!baseUrl) return null;
+  let url: URL;
+  try {
+    url = new URL(baseUrl);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+  return {
+    baseUrl: baseUrl.replace(/\/+$/, ''),
+    modelId: env.AI_MT_MODEL_ID?.trim() || 'utter-project/EuroLLM-9B-Instruct-2512',
+  };
 }
 
 export interface ResolvedTts {

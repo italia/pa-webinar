@@ -62,6 +62,7 @@ import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CaptionsTranscriptPanel from './captions-transcript-panel';
 import EventReportPanel from './event-report-panel';
+import EventTextTranslationStatus from './event-text-translation-status';
 import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklist';
 import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
@@ -208,6 +209,9 @@ interface EventManagementClientProps {
   viaToken?: string | null;
   /** L'istante del rendering sul server (ms): vedi `istante` qui sotto. */
   renderedAt: number;
+  /** La traduzione automatica di titolo e descrizione c'e' nell'installazione:
+   *  la panoramica ne mostra lo stato (solo allo staff). */
+  textTranslationAvailable?: boolean;
 }
 
 // Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
@@ -238,6 +242,7 @@ function tagChipStyle(color: string | null): CSSProperties {
 // ── Main component ──
 export default function EventManagementClient({
   event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt, viaToken = null,
+  textTranslationAvailable = false,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
@@ -760,6 +765,7 @@ export default function EventManagementClient({
                 guestLiveUrl={(isInstant ? invitoChiamata : guestEntryOpen) ? guestLiveUrl : null}
                 moderatorUrl={moderatorUrl}
                 instant={isInstant}
+                textTranslation={textTranslationAvailable && !viaToken}
               />
             )}
             {activeTab === 'persone' && (
@@ -1101,11 +1107,15 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
+function OverviewTab({
+  event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant, textTranslation,
+}: {
   event: EventData; description: string; locale: string;
   editUrlAt: (step: WizardStep, section?: WizardAdvancedSection) => string;
   publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
   instant: boolean;
+  /** Lo stato della traduzione automatica di titolo e descrizione. */
+  textTranslation: boolean;
 }) {
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
@@ -1136,6 +1146,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
 
   return (
     <>
+      {textTranslation && <EventTextTranslationStatus eventId={event.id} editHref={editUrlAt('base')} />}
       {description && (
         <div className="mb-4">
           <H>{te('detail.description')}</H>

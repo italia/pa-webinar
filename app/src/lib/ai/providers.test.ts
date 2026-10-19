@@ -5,6 +5,7 @@ import {
   parseTargetLocales,
   resolveAsrProvider,
   resolveLlmProvider,
+  resolveMtProvider,
   resolveTtsProvider,
   ttsProviderSchema,
 } from './providers';
@@ -113,5 +114,26 @@ describe('parseTargetLocales', () => {
   });
   it('dedupes while preserving first-seen order', () => {
     expect(parseTargetLocales('en,fr,en,FR,de')).toEqual(['en', 'fr', 'de']);
+  });
+});
+
+describe('resolveMtProvider', () => {
+  it("senza indirizzo il motore non c'e': nessuna traduzione automatica, nessun ripiego su vLLM", () => {
+    expect(resolveMtProvider({})).toBeNull();
+    expect(resolveMtProvider({ AI_MT_BASE_URL: '   ' })).toBeNull();
+  });
+
+  it("l'indirizzo del Service nel cluster, senza la barra finale, e il modello", () => {
+    expect(
+      resolveMtProvider({ AI_MT_BASE_URL: 'http://pa-webinar-mt:8080/v1/', AI_MT_MODEL_ID: 'modello' }),
+    ).toEqual({ baseUrl: 'http://pa-webinar-mt:8080/v1', modelId: 'modello' });
+    expect(resolveMtProvider({ AI_MT_BASE_URL: 'http://pa-webinar-mt:8080/v1' })?.modelId).toBe(
+      'utter-project/EuroLLM-9B-Instruct-2512',
+    );
+  });
+
+  it("un indirizzo che non e' http(s) non vale", () => {
+    expect(resolveMtProvider({ AI_MT_BASE_URL: 'non un indirizzo' })).toBeNull();
+    expect(resolveMtProvider({ AI_MT_BASE_URL: 'ftp://pa-webinar-mt/v1' })).toBeNull();
   });
 });
