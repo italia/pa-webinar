@@ -916,6 +916,11 @@ export default function LiveEventClient({
   const [ingressi, setIngressi] = useState(0);
   const scartoOrologio = useScartoOrologio(event.slug);
 
+  // I sottotitoli rimettono la loro scelta subito dopo ogni comando di
+  // registrazione di questa sala (useCaptionsControl, più sotto).
+  const riaffermaSottotitoliRef = useRef<() => void>(() => {});
+  const riaffermaSottotitoli = useCallback(() => riaffermaSottotitoliRef.current(), []);
+
   // Shared "fire startRecording on Jitsi, with retry" — used both by the
   // moderator-confirmed prompt and by the autoStartRecording path which
   // bypasses the prompt entirely.
@@ -925,6 +930,7 @@ export default function LiveEventClient({
     const tryStart = () => {
       try {
         api.executeCommand('startRecording', { mode: 'file' });
+        riaffermaSottotitoliRef.current();
       } catch {
         if (attempts < 3) {
           attempts += 1;
@@ -1410,6 +1416,7 @@ export default function LiveEventClient({
     isRecording,
     faseRegistratore: recorderPhase,
     onAvvioRichiesto: segnaAvvioChiesto,
+    dopoComando: riaffermaSottotitoli,
   });
   // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
   // dal vivo, arriva con gli altri flag della sala (canale push o polling,
@@ -1422,7 +1429,7 @@ export default function LiveEventClient({
   const sottotitoliAccesi =
     !!event.liveCaptionsAvailable &&
     (flagsSala?.liveCaptionsEnabled ?? event.liveCaptionsEnabled ?? true);
-  useCaptionsControl({
+  const riaffermaSottotitoliOra = useCaptionsControl({
     api: jitsiApi,
     attivo: conduce && !!event.liveCaptionsAvailable,
     accesi: sottotitoliAccesi,
@@ -1431,8 +1438,10 @@ export default function LiveEventClient({
     // Solo un'etichetta per Jitsi: la lingua parlata la sceglie il servizio,
     // dalla lingua predefinita dell'istanza, e qui si usa la stessa.
     lingua: primaryLanguageCode(event.liveCaptionsLanguage),
-    registrazione: isRecording,
   });
+  useEffect(() => {
+    riaffermaSottotitoliRef.current = riaffermaSottotitoliOra;
+  }, [riaffermaSottotitoliOra]);
   // L'ora d'avvio della registrazione secondo il server (la cronologia della
   // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
   // Si chiede finché la registrazione è in corso e il server non la sa. Una
