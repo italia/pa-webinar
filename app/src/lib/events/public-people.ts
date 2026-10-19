@@ -56,18 +56,29 @@ export function ruoloPubblico(g: { role: 'MODERATOR' | 'SPEAKER'; organizer: boo
   return g.organizer ? 'organizer' : 'moderator';
 }
 
-/** Prima chi organizza, poi chi conduce, poi chi parla; a parità, per nome. */
-export function ordinaPersone(persone: PersonaPubblica[]): PersonaPubblica[] {
+/**
+ * Prima chi organizza, poi chi conduce, poi chi parla. A parità di ruolo,
+ * nell'ordine del programma (`turno`: il primo argomento su cui la persona
+ * interviene), poi per nome: chi non interviene su nessun argomento viene
+ * dopo chi interviene, in ordine alfabetico come prima.
+ */
+export function ordinaPersone<T extends PersonaPubblica & { turno?: number | null }>(persone: T[]): T[] {
   const peso: Record<PersonRole, number> = { organizer: 0, moderator: 1, speaker: 2 };
+  const turno = (p: T) => p.turno ?? Number.POSITIVE_INFINITY;
   return [...persone].sort(
-    (a, b) => peso[a.role] - peso[b.role] || a.name.localeCompare(b.name, 'it'),
+    (a, b) =>
+      peso[a.role] - peso[b.role] ||
+      (turno(a) === turno(b) ? 0 : turno(a) < turno(b) ? -1 : 1) ||
+      a.name.localeCompare(b.name, 'it'),
   );
 }
 
 /** Le relazioni da leggere per `entiEPersonePubblici` (da unire
- *  all'`include` di Prisma): gli enti in ordine, e solo le concessioni
- *  pubblicate e ancora valide. I campi del moderatore principale sono colonne
- *  dell'evento, già nella riga. */
+ *  all'`include` o al `select` di Prisma): gli enti in ordine, solo le
+ *  concessioni pubblicate e ancora valide, e gli argomenti dell'agenda che
+ *  hanno chi interviene (l'ordine del programma). I campi del moderatore
+ *  principale sono colonne dell'evento, già nella riga; `agendaEnabled` lo
+ *  aggiunge chi usa un `select`. */
 export const PERSONE_PUBBLICHE_INCLUDE = {
   organizers: {
     orderBy: { sortOrder: 'asc' },
@@ -76,6 +87,7 @@ export const PERSONE_PUBBLICHE_INCLUDE = {
   additionalMods: {
     where: { publicListed: true, revokedAt: null },
     select: {
+      id: true,
       name: true,
       role: true,
       organizer: true,
@@ -84,11 +96,18 @@ export const PERSONE_PUBBLICHE_INCLUDE = {
       photoId: true,
     },
   },
+  agendaItems: {
+    // Solo quelli con chi interviene: una persona o l'organizzatore principale.
+    where: { NOT: { speakerGrantId: null, speakerPrimary: false } },
+    orderBy: { sortOrder: 'asc' },
+    select: { speakerGrantId: true, speakerPrimary: true },
+  },
 } as const;
 
 interface EventoConPersone {
   organizers: Array<{ name: string; logoUrl: string | null; websiteUrl: string | null }>;
   additionalMods: Array<{
+    id: string;
     name: string;
     role: 'MODERATOR' | 'SPEAKER';
     organizer: boolean;
@@ -96,6 +115,10 @@ interface EventoConPersone {
     organizationLogoUrl: string | null;
     photoId: string | null;
   }>;
+  /** L'agenda e' accesa: solo allora il programma ordina le persone. */
+  agendaEnabled: boolean;
+  /** Gli argomenti dell'agenda in ordine, con chi interviene. */
+  agendaItems: Array<{ speakerGrantId: string | null; speakerPrimary: boolean }>;
   moderatorName: string | null;
   moderatorPublicListed: boolean;
   moderatorOrganization: string | null;
@@ -104,10 +127,11 @@ interface EventoConPersone {
 }
 
 /**
- * Gli enti e le persone che si mostrano di un evento: la pagina pubblica e
- * il riepilogo della sala d'attesa li prendono da qui, così una regola nuova
- * vale per entrambi. Il nome di una concessione è cifrato: lo decifra chi
- * chiama (questo modulo si usa anche nel browser, per i tipi).
+ * Gli enti e le persone che si mostrano di un evento: la pagina pubblica, il
+ * riepilogo della sala d'attesa, l'anteprima dei link e i dati strutturati li
+ * prendono da qui, così una regola nuova vale per tutti. Il nome di una
+ * concessione è cifrato: lo decifra chi chiama (questo modulo si usa anche nel
+ * browser, per i tipi).
  */
 export function entiEPersonePubblici(
   event: EventoConPersone,
@@ -118,6 +142,15 @@ export function entiEPersonePubblici(
     logoUrl: logoPubblico(o.logoUrl),
     websiteUrl: sitoPubblico(o.websiteUrl),
   }));
+  // Il primo argomento del programma su cui ognuno interviene.
+  const turni = new Map<string, number>();
+  let turnoPrincipale: number | null = null;
+  if (event.agendaEnabled) {
+    event.agendaItems.forEach((a, i) => {
+      if (a.speakerPrimary) turnoPrincipale ??= i;
+      else if (a.speakerGrantId && !turni.has(a.speakerGrantId)) turni.set(a.speakerGrantId, i);
+    });
+  }
   const persone = ordinaPersone([
     // L'organizzatore principale, se chi compila ha scelto di presentarlo.
     ...(event.moderatorPublicListed && event.moderatorName
@@ -128,6 +161,7 @@ export function entiEPersonePubblici(
             organization: event.moderatorOrganization,
             logoUrl: logoPubblico(event.moderatorOrganizationLogoUrl),
             photoUrl: event.moderatorPhotoId ? personPhotoPath(event.moderatorPhotoId) : null,
+            turno: turnoPrincipale,
           },
         ]
       : []),
@@ -137,7 +171,8 @@ export function entiEPersonePubblici(
       organization: m.organization,
       logoUrl: logoPubblico(m.organizationLogoUrl),
       photoUrl: m.photoId ? personPhotoPath(m.photoId) : null,
+      turno: turni.get(m.id) ?? null,
     })),
-  ]);
+  ]).map(({ turno: _turno, ...persona }) => persona);
   return { enti, persone };
 }

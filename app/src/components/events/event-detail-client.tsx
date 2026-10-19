@@ -34,6 +34,8 @@ import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import type { ReportView } from '@/lib/report/types';
 import EventHeader, { EventPeople, type TagChip } from '@/components/events/event-header';
+import EventProgramme from '@/components/events/event-programme';
+import type { VoceProgramma } from '@/lib/agenda/programme';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
 interface AnsweredQuestion {
@@ -72,6 +74,8 @@ interface EventData {
   /** Gli enti che organizzano e le persone pubblicate (lib/events/public-people). */
   organizers?: EntePubblico[];
   people?: PersonaPubblica[];
+  /** Il programma, ad agenda accesa (lib/agenda/programme). */
+  programme?: VoceProgramma[];
   imageUrl: string | null;
   peakParticipants?: number;
   postEventPublic?: boolean;
@@ -509,6 +513,12 @@ export default function EventDetailClient({
             {t('detail.description')}
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
+
+          {/* Il programma, prima dell'evento e durante: dopo lo raccontano il
+              resoconto e i capitoli del video. */}
+          {publicStatus !== 'ENDED' && (event.programme?.length ?? 0) > 0 && (
+            <EventProgramme items={event.programme!} startsAt={startsAt} live={isLive} />
+          )}
 
           {/* Materiali prima dell'inizio: il server manda qui solo quelli che
               il pubblico può vedere in questa fase (sempre visibili e

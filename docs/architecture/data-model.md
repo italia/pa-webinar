@@ -356,6 +356,8 @@ erDiagram
     AgendaItemStatus status "one CURRENT per event"
     boolean completed "true only for DONE"
     int plannedMinutes "optional"
+    uuid speakerGrantId FK "who speaks, a named grant (SetNull)"
+    boolean speakerPrimary "the lead organizer speaks"
   }
   AGENDA_ITEM_REACTION {
     uuid id PK
@@ -495,7 +497,7 @@ The GDPR cleanup never deletes an expired event, so the `onDelete: Cascade` of i
 | `QuestionnaireResponse` | `POST_EVENT` responses are kept with their answers, without `registrationId`, `respondentName` or `respondentEmailHash`, and with `guestId` set to the event pseudonym. `PRE_REGISTRATION` responses are deleted. |
 | `EventFeedback` | Kept, without `registrationId`, and with `guestId` set to the event pseudonym. |
 | `EventMaterial` | Kept, with its file. `addedBy` is emptied. The file goes when the material or the event is deleted. |
-| `EventAgendaItem`, `LiveAction` | Kept: they hold no names. The `AgendaItemReaction` rows are deleted. |
+| `EventAgendaItem`, `LiveAction` | Kept: they hold no names. An agenda item's speaker is a reference to a named grant: the grants are deleted, and `speakerGrantId` becomes empty (`ON DELETE SET NULL`) while the topic stays. The `AgendaItemReaction` rows are deleted. |
 
 The event pseudonym is `'anon:' || md5(<event id> || ':' || <identity>)`, where the identity is the row's original `registrationId`, else its `guestId`, else its own `id`. It is the same for one person across the event's `PollVote`, `WordCloudSubmission`, `EventFeedback` and `POST_EVENT` `QuestionnaireResponse` rows, and differs between events, so the one-per-identity unique indexes hold and per-person counts, such as the event analytics and the words per person, stay as they were.
 

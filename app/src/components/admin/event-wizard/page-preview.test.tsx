@@ -13,6 +13,7 @@ vi.mock('@/i18n/navigation', () => ({
 }));
 
 import PagePreview, { datiAnteprima } from './page-preview';
+import type { AgendaDraft } from './programme-plan';
 
 /**
  * L'anteprima della pagina nella creazione dell'evento: gli stessi dati che
@@ -68,6 +69,8 @@ const MODULO = {
   moderatorOrganization: null,
   moderatorOrganizationLogoUrl: null,
   moderatorPhotoId: null as string | null,
+  agendaEnabled: false,
+  agenda: [] as AgendaDraft[],
 };
 
 const INIZIO = new Date('2026-10-29T09:00:00Z');
@@ -136,6 +139,44 @@ describe('datiAnteprima', () => {
     });
     expect(conPersone.relatoriLiberi).toBeNull();
     expect(conPersone.organizzatoreLibero).toBeNull();
+  });
+
+  it('il programma come nella pagina: in ordine, chi interviene solo se presentato, e le persone nel suo ordine', () => {
+    const d = datiAnteprima(
+      {
+        ...MODULO,
+        speakers: [
+          ...MODULO.speakers,
+          { name: 'Bruno', email: 'bruno@example.org', personId: null, organization: null, organizationLogoUrl: null, publicListed: true, photoId: null },
+        ],
+        agendaEnabled: true,
+        agenda: [
+          { key: 'r1', label: 'Apertura', minutes: '10', speakerKey: 'primary' },
+          { key: 'r2', label: 'Un caso', minutes: '20', speakerKey: 'e:n@example.org' },
+          { key: 'r3', label: '  ', minutes: '5', speakerKey: null },
+          { key: 'r4', label: 'Intervento', minutes: '', speakerKey: 'e:luca@example.org' },
+          { key: 'r5', label: 'Saluti', minutes: '5', speakerKey: 'e:bruno@example.org' },
+        ],
+      },
+      { locale: 'it', tags: ETICHETTE, startsAt: INIZIO, endsAt: FINE, parseTitleKicker: false },
+    );
+    expect(d.programma.map((v) => [v.label, v.plannedMinutes, v.speaker?.name ?? null])).toEqual([
+      ['Apertura', 10, 'Chi organizza'],
+      // Nascosta non e' presentata: solo l'argomento.
+      ['Un caso', 20, null],
+      ['Intervento', null, 'Luca'],
+      ['Saluti', 5, 'Bruno'],
+    ]);
+    expect(d.programma[2]?.speaker?.photoUrl).toBe('/api/avatar/person/22222222-2222-4222-8222-222222222222');
+    // Bruno interviene dopo Luca: fra i relatori viene dopo, anche se il nome
+    // verrebbe prima.
+    expect(d.persone.persone.filter((p) => p.role === 'speaker').map((p) => p.name)).toEqual(['Luca', 'Bruno']);
+    // Ad agenda spenta niente programma, e l'ordine torna alfabetico.
+    const spenta = datiAnteprima(
+      { ...MODULO, agendaEnabled: false, agenda: [{ key: 'r1', label: 'Apertura', minutes: '', speakerKey: null }] },
+      { locale: 'it', tags: ETICHETTE, startsAt: INIZIO, endsAt: FINE, parseTitleKicker: false },
+    );
+    expect(spenta.programma).toEqual([]);
   });
 
   it('un modulo con campi mancanti non la ferma', () => {
@@ -207,6 +248,36 @@ describe('PagePreview', () => {
       Array.from(ridotta.querySelectorAll('a')).some((a) => a.textContent === 'Riuso')
     ).toBe(false);
     expect(container.textContent).toContain(messages.admin.wizard.preview.note);
+  });
+
+  it('il programma compare sotto la descrizione, con gli orari dall inizio', () => {
+    const dati = datiAnteprima(
+      {
+        ...MODULO,
+        agendaEnabled: true,
+        agenda: [
+          { key: 'r1', label: 'Apertura', minutes: '15', speakerKey: 'e:luca@example.org' },
+          { key: 'r2', label: 'Domande', minutes: '30', speakerKey: null },
+        ],
+      },
+      { locale: 'it', tags: ETICHETTE, startsAt: INIZIO, endsAt: FINE, parseTitleKicker: false },
+    );
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <PagePreview dati={dati} />
+        </NextIntlClientProvider>
+      );
+    });
+    const ridotta = container.querySelector('.anteprima-pagina__ridotta')!;
+    const voci = Array.from(ridotta.querySelectorAll('.event-programma__voce'));
+    expect(voci).toHaveLength(2);
+    expect(Array.from(ridotta.querySelectorAll('.event-programma__quando time')).map((t) => t.textContent)).toEqual([
+      '10:00',
+      '10:15',
+    ]);
+    expect(voci[0]?.textContent).toContain('Luca');
+    expect(ridotta.querySelector('.event-programma__nota')?.textContent).toContain('45 minuti');
   });
 
   it("senza titolo ne' data dice che cosa manca", () => {

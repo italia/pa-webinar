@@ -25,11 +25,15 @@ import {
 } from 'design-react-kit';
 
 import EventHeader, { EventPeople, type TagChip } from '@/components/events/event-header';
+import EventProgramme from '@/components/events/event-programme';
 import { Icon } from '@/components/ui/icon';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import type { RelatoreProgramma, VoceProgramma } from '@/lib/agenda/programme';
+import { personPhotoPath } from '@/lib/events/person-photo';
 import { entiEPersonePubblici } from '@/lib/events/public-people';
 import { getLocalized } from '@/lib/utils/locale';
 
+import { CHIAVE_PRINCIPALE, chiavePersona, vociCompilate } from './programme-plan';
 import { useFasciaCopertina } from './use-fascia-copertina';
 import type { WizardForm } from './wizard-shell';
 
@@ -45,6 +49,8 @@ export interface DatiAnteprima {
   /** Relatori e organizzatore scritti a mano, se non ce ne sono di strutturati. */
   relatoriLiberi: string | null;
   organizzatoreLibero: string | null;
+  /** Il programma, ad agenda accesa: come lo mostrera' la pagina. */
+  programma: VoceProgramma[];
 }
 
 /**
@@ -68,6 +74,8 @@ export function datiAnteprima(
     | 'moderatorOrganization'
     | 'moderatorOrganizationLogoUrl'
     | 'moderatorPhotoId'
+    | 'agendaEnabled'
+    | 'agenda'
   >,
   {
     locale,
@@ -89,31 +97,33 @@ export function datiAnteprima(
     };
   }
 ): DatiAnteprima {
+  // Le persone presentate, con la loro chiave del programma al posto
+  // dell'id della concessione (le persone nuove non ne hanno ancora uno).
+  const presentate = [
+    ...(form.moderators ?? []).map((m) => ({ ...m, role: 'MODERATOR' as const })),
+    ...(form.speakers ?? []).map((s) => ({ ...s, organizer: false, role: 'SPEAKER' as const })),
+  ]
+    .filter((p) => p.publicListed && p.name.trim())
+    .map((p) => ({
+      id: chiavePersona(p) ?? `senza-chiave:${p.name}`,
+      name: p.name,
+      role: p.role,
+      organizer: p.organizer,
+      organization: p.organization,
+      organizationLogoUrl: p.organizationLogoUrl,
+      photoId: p.photoId ?? null,
+    }));
+  const agendaAccesa = !!form.agendaEnabled;
+  const voci = agendaAccesa ? vociCompilate(form.agenda ?? []) : [];
   const persone = entiEPersonePubblici(
     {
       organizers: form.organizers ?? [],
-      additionalMods: [
-        ...(form.moderators ?? [])
-          .filter((m) => m.publicListed && m.name.trim())
-          .map((m) => ({
-            name: m.name,
-            role: 'MODERATOR' as const,
-            organizer: m.organizer,
-            organization: m.organization,
-            organizationLogoUrl: m.organizationLogoUrl,
-            photoId: m.photoId ?? null,
-          })),
-        ...(form.speakers ?? [])
-          .filter((s) => s.publicListed && s.name.trim())
-          .map((s) => ({
-            name: s.name,
-            role: 'SPEAKER' as const,
-            organizer: false,
-            organization: s.organization,
-            organizationLogoUrl: s.organizationLogoUrl,
-            photoId: s.photoId ?? null,
-          })),
-      ],
+      additionalMods: presentate,
+      agendaEnabled: agendaAccesa,
+      agendaItems: voci.map((v) => ({
+        speakerGrantId: v.speakerKey && v.speakerKey !== CHIAVE_PRINCIPALE ? v.speakerKey : null,
+        speakerPrimary: v.speakerKey === CHIAVE_PRINCIPALE,
+      })),
       moderatorName: form.moderatorName || null,
       moderatorPublicListed: !!form.moderatorPublicListed,
       moderatorOrganization: form.moderatorOrganization ?? null,
@@ -122,6 +132,30 @@ export function datiAnteprima(
     },
     (nome) => nome
   );
+  // Chi interviene, con le stesse regole della pagina: solo se presentato.
+  const relatore = (chiave: string | null): RelatoreProgramma | null => {
+    if (!chiave) return null;
+    if (chiave === CHIAVE_PRINCIPALE) {
+      return form.moderatorPublicListed && form.moderatorName?.trim()
+        ? {
+            name: form.moderatorName,
+            organization: form.moderatorOrganization ?? null,
+            photoUrl: form.moderatorPhotoId ? personPhotoPath(form.moderatorPhotoId) : null,
+          }
+        : null;
+    }
+    const p = presentate.find((x) => x.id === chiave);
+    return p
+      ? { name: p.name, organization: p.organization, photoUrl: p.photoId ? personPhotoPath(p.photoId) : null }
+      : null;
+  };
+  const programma: VoceProgramma[] = voci.map((v, i) => ({
+    id: v.id ?? `anteprima-${i}`,
+    label: v.label,
+    plannedMinutes: v.plannedMinutes,
+    status: 'PENDING',
+    speaker: relatore(v.speakerKey),
+  }));
   // Come la pagina: getLocalized, con lo stesso ripiego.
   const relatori = getLocalized(campiLiberi?.speakersInfo ?? null, locale).trim();
   return {
@@ -143,6 +177,7 @@ export function datiAnteprima(
       campiLiberi?.organizerName && persone.enti.length === 0
         ? campiLiberi.organizerName
         : null,
+    programma,
   };
 }
 
@@ -169,6 +204,7 @@ function Pagina({ dati, completa }: { dati: DatiAnteprima; completa: boolean }) 
       ) : (
         <p className="anteprima-pagina__vuoto">{tw('descriptionPlaceholder')}</p>
       )}
+      <EventProgramme items={dati.programma} startsAt={inizio} />
     </>
   );
   return (

@@ -15,6 +15,7 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
+import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
 
@@ -108,6 +109,9 @@ interface Props {
   /** Prima degli inviti: chi si iscrive e cosa gli si chiede
    *  (SezioneIscrizione). */
   iscrizione?: React.ReactNode;
+  /** Subito dopo le persone, perche' sceglie fra loro: il programma
+   *  dell'incontro (ProgrammeSection). */
+  programma?: React.ReactNode;
   /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
    *  non si cambiano. */
   photosLocked?: boolean;
@@ -123,6 +127,7 @@ export default function StepPeople({
   publicRegistrationEnabled = true,
   children,
   iscrizione,
+  programma,
   photosLocked = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
@@ -151,6 +156,8 @@ export default function StepPeople({
         taken={principale}
         photosLocked={photosLocked}
       />
+
+      {programma}
 
       {iscrizione}
 
@@ -389,42 +396,6 @@ export function PrimarySection({
         </div>
       </div>
     </section>
-  );
-}
-
-/**
- * Una sezione del passo, richiudibile: chiusa finche' e' vuota, aperta se ha
- * gia' qualcuno. Il riassunto dice cosa contiene e quante persone ci sono,
- * cosi' il passo si legge con un colpo d'occhio e si apre solo cio' che serve.
- */
-function Gruppo({
-  title,
-  help,
-  count,
-  aperto = false,
-  children,
-}: {
-  title: string;
-  help: string;
-  count: number;
-  /** Aperto anche se vuoto: serve compilarlo. */
-  aperto?: boolean;
-  children: React.ReactNode;
-}) {
-  const [apertoAllInizio] = useState(count > 0);
-  return (
-    <details className="wizard-group mb-3" open={apertoAllInizio || aperto || undefined}>
-      <summary>
-        <span className="wizard-group__title">
-          {title}
-          {count > 0 && (
-            <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>
-          )}
-        </span>
-        <span className="wizard-group__help">{help}</span>
-      </summary>
-      <div className="wizard-group__body">{children}</div>
-    </details>
   );
 }
 

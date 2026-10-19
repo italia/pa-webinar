@@ -428,6 +428,8 @@ model EventModerator {
   revokedAt DateTime? @map("revoked_at")
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  // Gli argomenti del programma su cui la persona interviene.
+  agendaItems EventAgendaItem[]
 
   @@index([eventId])
   @@index([emailHash])
@@ -998,11 +1000,22 @@ model EventAgendaItem {
   // Quanto dovrebbe durare, se chi conduce lo ha detto: il moderatore vede
   // quando si va oltre.
   plannedMinutes Int?   @map("planned_minutes")
+  // Chi interviene sull'argomento, preparato prima dell'evento: una persona
+  // dell'evento (concessione). SetNull: la pulizia e la cancellazione dei
+  // dati tolgono la persona, l'argomento resta senza nome. La pagina
+  // pubblica lo mostra solo se la persona e' presentata (publicListed) e non
+  // revocata.
+  speakerGrantId String?         @map("speaker_grant_id") @db.Uuid
+  speaker        EventModerator? @relation(fields: [speakerGrantId], references: [id], onDelete: SetNull)
+  // Interviene l'organizzatore principale (colonne dell'evento, non una
+  // concessione). Mai insieme a speakerGrantId: lo controllano le rotte.
+  speakerPrimary Boolean @default(false) @map("speaker_primary")
 
   event     Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reactions AgendaItemReaction[]
 
   @@index([eventId])
+  @@index([speakerGrantId])
   @@map("event_agenda_items")
 }
 

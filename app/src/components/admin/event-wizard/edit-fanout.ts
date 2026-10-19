@@ -1,6 +1,6 @@
 /**
  * Il salvataggio delle risorse collegate a un evento: organizzatori,
- * co-moderatori e relatori, inviti, materiali, questionari.
+ * co-moderatori e relatori, il programma, inviti, materiali, questionari.
  *
  * Vive fuori dal componente perche' e' logica pura di rete: si prova senza
  * rendere il wizard, e i casi che contano — una revoca rifiutata, un secondo
@@ -9,6 +9,7 @@
 
 import { differenzaProfilo, profiloSalvato } from '@/lib/events/grant-profile';
 
+import { concessioneDaChiave, pianoCambiato, pianoDaInviare, type VoceSalvata } from './programme-plan';
 import { questionnaireChanged } from './questionnaire-diff';
 import type { AdhocQuestionDraft, QuestionnaireBlock } from './step-4-content';
 import type { InitialEventShape, WizardForm } from './wizard-shell';
@@ -478,6 +479,33 @@ export async function fanoutEditDiff(
       continue;
     }
     initial.eventModerators = initial.eventModerators.filter((x) => x.id !== m.id);
+  }
+
+  // Il programma, dopo le persone: chi interviene si traduce nella
+  // concessione che la persona ha adesso (una persona nuova, o con un ruolo
+  // cambiato, ne ha appena ricevuta una). Si manda solo se e' cambiato, e mai
+  // un'agenda gia' usata in sala, che il passo mostra in sola lettura; con
+  // l'agenda spenta il programma salvato resta com'e'.
+  if (form.agendaEnabled && !initial.agendaLocked) {
+    const salvato = initial.agenda ?? [];
+    const piano = pianoDaInviare(form.agenda ?? [], (k) => concessioneDaChiave(k, initial.eventModerators));
+    if (pianoCambiato(piano, salvato)) {
+      const esito = await fanoutFetch(report, 'agenda', `/api/events/${eventId}/agenda`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...auth },
+        body: JSON.stringify({ base: salvato.map((v) => v.id), plan: piano }),
+      });
+      const items = (esito.body as { items?: VoceSalvata[] } | null)?.items;
+      if (esito.outcome === 'ok' && Array.isArray(items)) {
+        initial.agenda = items.map((v) => ({
+          id: v.id,
+          label: v.label,
+          plannedMinutes: v.plannedMinutes ?? null,
+          speakerGrantId: v.speakerGrantId ?? null,
+          speakerPrimary: !!v.speakerPrimary,
+        }));
+      }
+    }
   }
 
   // Invitations (admin-session auth, no moderator token)

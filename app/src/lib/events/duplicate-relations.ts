@@ -89,6 +89,8 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     // un dettaglio della query: un test la verifica.
     where: { revokedAt: null },
     select: {
+      // L'id serve solo a ritrovare la persona nel programma copiato.
+      id: true,
       name: true,
       email: true,
       emailHash: true,
@@ -102,7 +104,13 @@ export const DUPLICATE_SOURCE_INCLUDE = {
   agendaItems: {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
     // della riunione che si è svolta, non l'agenda.
-    select: { label: true, sortOrder: true, plannedMinutes: true },
+    select: {
+      label: true,
+      sortOrder: true,
+      plannedMinutes: true,
+      speakerGrantId: true,
+      speakerPrimary: true,
+    },
   },
   reminders: { select: { offsetMinutes: true, label: true } },
   // Il glossario della post-produzione: sigle e nomi di una serie si ripetono.
@@ -144,10 +152,23 @@ export type DuplicateSource = Pick<
   DuplicatedRelation
 >;
 
-/** Il payload di creazione annidato, verificato contro i tipi di Prisma. */
+/** Il payload di creazione annidato, verificato contro i tipi di Prisma. Il
+ *  programma non c'è: si crea dopo l'evento (vedi `DuplicatedRelations`). */
 export type DuplicatedRelationsPayload = Partial<
-  Pick<Prisma.EventCreateInput, DuplicatedRelation>
+  Pick<Prisma.EventCreateInput, Exclude<DuplicatedRelation, 'agendaItems'>>
 >;
+
+/**
+ * Cosa scrive la copia: le relazioni annidate nella creazione dell'evento e,
+ * a parte, gli argomenti del programma. Questi puntano alle persone appena
+ * create (chi interviene), e dentro un'unica creazione annidata l'ordine in
+ * cui Prisma inserisce relazioni sorelle non è garantito: si scrivono dopo,
+ * nella stessa transazione, con l'id della copia di ogni persona.
+ */
+export interface DuplicatedRelations {
+  nested: DuplicatedRelationsPayload;
+  agendaItems: Array<Omit<Prisma.EventAgendaItemCreateManyInput, 'eventId'>>;
+}
 
 /**
  * Prisma rifiuta `null` esplicito su una colonna Json nullable: va OMESSA.
@@ -178,8 +199,10 @@ function requiredJson(value: Prisma.JsonValue | null): Prisma.InputJsonValue {
  * non compaiono affatto: passare `{ create: [] }` funziona, ma sporca il
  * payload e rende più difficile leggere cosa è stato davvero copiato.
  */
-export function duplicatedRelations(source: DuplicateSource): DuplicatedRelationsPayload {
+export function duplicatedRelations(source: DuplicateSource): DuplicatedRelations {
   const out: DuplicatedRelationsPayload = {};
+  // L'id di ogni persona nell'originale → quello della sua copia.
+  const copie = new Map<string, string>();
 
   if (source.tagLinks.length > 0) {
     out.tagLinks = { create: source.tagLinks.map((l) => ({ tagId: l.tagId })) };
@@ -198,41 +221,49 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
 
   if (source.additionalMods.length > 0) {
     out.additionalMods = {
-      create: source.additionalMods.map((m) => ({
-        // Nome ed email restano cifrati: si copiano i valori così come sono,
-        // senza decifrare nulla. Seguono la retention dell'evento copiato, che
-        // li cancella insieme al resto (vedi /api/cron/cleanup).
-        name: m.name,
-        email: m.email,
-        emailHash: m.emailHash,
-        role: m.role,
-        // Ruolo, ente e foto seguono la persona; la pubblicazione no:
-        // presentare qualcuno nella pagina pubblica è una scelta per ogni
-        // evento, e la copia parte senza. La foto è la stessa riga
-        // dell'originale: si cancella solo quando nessuno la usa più.
-        organizer: m.organizer,
-        organization: m.organization,
-        organizationLogoUrl: m.organizationLogoUrl,
-        photoId: m.photoId,
-        publicListed: false,
-        // Il token NON si eredita mai: è la credenziale con cui si entra in
-        // sala da moderatore. Riusarlo darebbe al vecchio link il controllo
-        // della stanza nuova — ed è la stessa regola già applicata al token
-        // principale dell'evento.
-        token: randomUUID(),
-      })),
+      create: source.additionalMods.map((m) => {
+        const id = randomUUID();
+        copie.set(m.id, id);
+        return {
+          // L'id della copia lo sceglie chi copia: il programma lo usa.
+          id,
+          // Nome ed email restano cifrati: si copiano i valori così come sono,
+          // senza decifrare nulla. Seguono la retention dell'evento copiato, che
+          // li cancella insieme al resto (vedi /api/cron/cleanup).
+          name: m.name,
+          email: m.email,
+          emailHash: m.emailHash,
+          role: m.role,
+          // Ruolo, ente e foto seguono la persona; la pubblicazione no:
+          // presentare qualcuno nella pagina pubblica è una scelta per ogni
+          // evento, e la copia parte senza. La foto è la stessa riga
+          // dell'originale: si cancella solo quando nessuno la usa più.
+          organizer: m.organizer,
+          organization: m.organization,
+          organizationLogoUrl: m.organizationLogoUrl,
+          photoId: m.photoId,
+          publicListed: false,
+          // Il token NON si eredita mai: è la credenziale con cui si entra in
+          // sala da moderatore. Riusarlo darebbe al vecchio link il controllo
+          // della stanza nuova — ed è la stessa regola già applicata al token
+          // principale dell'evento.
+          token: randomUUID(),
+        };
+      }),
     };
   }
 
-  if (source.agendaItems.length > 0) {
-    out.agendaItems = {
-      create: source.agendaItems.map((a) => ({
-        label: a.label,
-        sortOrder: a.sortOrder,
-        ...(a.plannedMinutes !== null && { plannedMinutes: a.plannedMinutes }),
-      })),
-    };
-  }
+  // Il programma: titolo, ordine, durata e chi interviene, con la copia della
+  // persona. Una persona non copiata (revocata) lascia l'argomento senza nome.
+  const agendaItems = source.agendaItems.map((a) => ({
+    label: a.label,
+    sortOrder: a.sortOrder,
+    ...(a.plannedMinutes !== null && { plannedMinutes: a.plannedMinutes }),
+    ...(a.speakerGrantId && copie.has(a.speakerGrantId)
+      ? { speakerGrantId: copie.get(a.speakerGrantId)! }
+      : {}),
+    ...(a.speakerPrimary && { speakerPrimary: true }),
+  }));
 
   if (source.reminders.length > 0) {
     out.reminders = {
@@ -292,5 +323,5 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
     };
   }
 
-  return out;
+  return { nested: out, agendaItems };
 }

@@ -10,7 +10,8 @@ export type UnsavedResource =
   | 'moderators'
   | 'speakers'
   | 'materials'
-  | 'questionnaires';
+  | 'questionnaires'
+  | 'agenda';
 
 export interface CreationOutcome {
   unsaved: UnsavedResource[];
@@ -25,6 +26,7 @@ const TIPI: readonly UnsavedResource[] = [
   'speakers',
   'materials',
   'questionnaires',
+  'agenda',
 ];
 
 const chiave = (eventId: string) => `pa-wizard-unsaved:${eventId}`;

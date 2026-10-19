@@ -20,6 +20,7 @@ const { tx } = vi.hoisted(() => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     eventAgendaItem: { findUnique: vi.fn(), delete: vi.fn() },
+    eventModerator: { findMany: vi.fn() },
     $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
   },
 }));
@@ -192,5 +193,42 @@ describe('PATCH agenda: cronologia della sala', () => {
         data: { itemId: ITEM_ID, label: 'Apertura', status: 'SKIPPED' },
       }),
     );
+  });
+});
+
+describe('PATCH: chi interviene', () => {
+  const RELATORE = '99999999-9999-4999-8999-999999999999';
+  const mockedGrants = prisma.eventModerator.findMany as unknown as ReturnType<typeof vi.fn>;
+
+  it('una persona valida di questo evento si salva', async () => {
+    mockedGrants.mockResolvedValue([{ id: RELATORE }]);
+    mockedFind.mockResolvedValue({ id: ITEM_ID, eventId: EVENT_ID, speakerGrantId: null, speakerPrimary: false });
+    const res = await PATCH(patch({ speakerGrantId: RELATORE }), ctx());
+    expect(res.status).toBe(200);
+    expect(mockedGrants).toHaveBeenCalledWith({
+      where: { id: { in: [RELATORE] }, eventId: EVENT_ID, revokedAt: null },
+      select: { id: true },
+    });
+    const scritto = tx.eventAgendaItem.update.mock.calls[0]?.[0] as { data: Record<string, unknown> };
+    expect(scritto.data).toEqual({ speakerGrantId: RELATORE });
+  });
+
+  it('una persona revocata o di un altro evento: 422', async () => {
+    mockedGrants.mockResolvedValue([]);
+    mockedFind.mockResolvedValue({ id: ITEM_ID, eventId: EVENT_ID, speakerGrantId: null, speakerPrimary: false });
+    const res = await PATCH(patch({ speakerGrantId: RELATORE }), ctx());
+    expect(res.status).toBe(422);
+    expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
+  });
+
+  it('l’organizzatore principale su un argomento che ha già una persona: 422', async () => {
+    mockedFind.mockResolvedValue({ id: ITEM_ID, eventId: EVENT_ID, speakerGrantId: RELATORE, speakerPrimary: false });
+    const res = await PATCH(patch({ speakerPrimary: true }), ctx());
+    expect(res.status).toBe(422);
+    // Insieme alla persona tolta, invece, si accetta; la persona che c'era
+    // non si ricontrolla.
+    const ok = await PATCH(patch({ speakerPrimary: true, speakerGrantId: null }), ctx());
+    expect(ok.status).toBe(200);
+    expect(mockedGrants).not.toHaveBeenCalled();
   });
 });

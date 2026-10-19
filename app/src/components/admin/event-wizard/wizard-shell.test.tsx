@@ -1361,3 +1361,242 @@ describe('foto delle persone', () => {
     expect(container.textContent).toContain(step3.personPhotoStaffOnly);
   });
 });
+
+/**
+ * Il programma nel passo «Persone»: con l'agenda spenta una riga sola con il
+ * pulsante che la accende; accesa, gli argomenti con chi interviene, che alla
+ * creazione partono dopo le persone, con le concessioni appena create.
+ */
+describe('programma', () => {
+  const sp = w.step3;
+
+  function scegli(el: HTMLSelectElement, value: string) {
+    act(() => {
+      el.value = value;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+
+  function compilaEvento() {
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
+    type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
+    click(button(sp.add, byId('person-email').closest('.row') ?? container));
+  }
+
+  it('agenda spenta: una riga con il pulsante; accesa, il primo argomento prende il fuoco', () => {
+    compilaEvento();
+    expect(container.querySelector('.wizard-programma')).toBeNull();
+    click(button(sp.programEnable));
+    const titolo = byId<HTMLInputElement>('wiz-programma-0-titolo');
+    expect(document.activeElement).toBe(titolo);
+    // Chi interviene: nessuno, l'organizzatore principale e le persone del passo.
+    const opzioni = Array.from(byId<HTMLSelectElement>('wiz-programma-0-chi').options).map((o) => o.text);
+    expect(opzioni).toEqual([
+      sp.programNone,
+      'Mario Rossi (Organizzatore)',
+      'Relatore 1 (Relatore)',
+    ]);
+  });
+
+  it('creazione: il programma parte dopo le persone, con la concessione appena creata', async () => {
+    const CREATO = { id: 'evt-prog', slug: 'evt-prog', moderatorToken: 'tok-prog' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/moderators') && init.method === 'POST') return json(201, { id: 'g-relatore' });
+      if (url.endsWith('/agenda') && init.method === 'PUT') return json(200, { items: [] });
+      return json(200, {});
+    });
+    compilaEvento();
+    click(button(sp.programEnable));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    scegli(byId<HTMLSelectElement>('wiz-programma-0-chi'), 'e:relatore@example.org');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), '20');
+    click(button(sp.programAdd));
+    type(byId<HTMLInputElement>('wiz-programma-1-titolo'), 'Domande');
+    scegli(byId<HTMLSelectElement>('wiz-programma-1-chi'), 'primary');
+    // Una riga lasciata vuota non si salva.
+    click(button(sp.programAdd));
+
+    goToStep('review');
+    expect(container.querySelector('.anteprima-evento')?.textContent).toContain('Programma: 2 argomenti');
+    await press(button(w.saveDraft));
+
+    const chiamate = fetchMock.mock.calls as Array<[string, RequestInit]>;
+    const iPut = chiamate.findIndex(([u, i]) => u === `/api/events/${CREATO.id}/agenda` && i.method === 'PUT');
+    const iPersona = chiamate.findIndex(([u, i]) => u === `/api/events/${CREATO.id}/moderators` && i.method === 'POST');
+    expect(iPut).toBeGreaterThan(iPersona);
+    const [, init] = chiamate[iPut]!;
+    expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${CREATO.moderatorToken}`);
+    expect(JSON.parse(String(init.body))).toEqual({
+      base: [],
+      plan: [
+        { label: 'Intervento', plannedMinutes: 20, speakerGrantId: 'g-relatore', speakerPrimary: false },
+        { label: 'Domande', plannedMinutes: null, speakerGrantId: null, speakerPrimary: true },
+      ],
+    });
+    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
+  });
+
+  it('un programma rifiutato arriva alla pagina dell evento fra le risorse non salvate', async () => {
+    const CREATO = { id: 'evt-prog-ko', slug: 'evt-prog-ko', moderatorToken: 'tok' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/agenda') && init.method === 'PUT') return json(422, { error: 'Invalid agenda plan' });
+      return json(200, {});
+    });
+    compilaEvento();
+    click(button(sp.programEnable));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    goToStep('review');
+    await press(button(w.saveDraft));
+    const salvato = JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}');
+    expect(salvato).toEqual({ unsaved: ['agenda'], publishFailed: false });
+  });
+
+  it('una durata che non e una durata ferma il salvataggio sul suo campo', async () => {
+    compilaEvento();
+    click(button(sp.programEnable));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), 'dieci');
+    goToStep('review');
+    await press(button(w.saveDraft));
+
+    expect(chiamateAlServer()).toHaveLength(0);
+    const minuti = byId<HTMLInputElement>('wiz-programma-0-min');
+    expect(minuti).toHaveClass('is-invalid');
+    expect(document.activeElement).toBe(minuti);
+    expect(container.textContent).toContain(messages.agenda.minutesInvalid);
+  });
+
+  it('gli orari seguono l inizio dell evento e la somma delle durate; oltre la fine lo dice', () => {
+    compilaEvento();
+    click(button(sp.programEnable));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Uno');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), '45');
+    click(button(sp.programAdd));
+    type(byId<HTMLInputElement>('wiz-programma-1-titolo'), 'Due');
+    type(byId<HTMLInputElement>('wiz-programma-1-min'), '30');
+    const ore = Array.from(container.querySelectorAll('.wizard-programma__ora')).map((o) => o.textContent);
+    // Un evento nuovo comincia alle 10 e dura un'ora.
+    expect(ore).toEqual(['10:00', '10:45']);
+    const totale = container.querySelector('.wizard-programma__totale')?.textContent ?? '';
+    expect(totale).toContain('fino alle 11:15');
+    expect(totale).toContain('15 minuti');
+  });
+
+  it('togliere una persona toglie la sua scelta, e lo dice', () => {
+    compilaEvento();
+    click(button(sp.programEnable));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    scegli(byId<HTMLSelectElement>('wiz-programma-0-chi'), 'e:relatore@example.org');
+    const riga = Array.from(container.querySelectorAll('li.wizard-person')).find((li) =>
+      li.textContent?.includes('Relatore 1'),
+    )!;
+    click(button(sp.remove, riga));
+    expect(byId<HTMLSelectElement>('wiz-programma-0-chi').value).toBe('');
+    expect(container.textContent).toContain('Un argomento non ha più chi interviene');
+  });
+
+  it('modifica: un agenda gia usata in sala si legge soltanto, e non si manda', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: {
+        ...structuredClone(ATTIVA),
+        agendaLocked: true,
+      },
+    });
+    goToStep('invites');
+    expect(byId<HTMLInputElement>('wiz-programma-0-titolo').readOnly).toBe(true);
+    expect(byId<HTMLSelectElement>('wiz-programma-0-chi').disabled).toBe(true);
+    expect(() => button(sp.programAdd)).toThrow();
+    expect(container.textContent).toContain(sp.programFrozen);
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect((fetchMock.mock.calls as Array<[string]>).some(([u]) => u.endsWith('/agenda'))).toBe(false);
+  });
+
+  it('modifica: il programma salvato torna con chi interviene, e cambiato si manda con la base letta', async () => {
+    fetchMock.mockImplementation(async () => json(200, { items: [] }));
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
+    goToStep('invites');
+    expect(byId<HTMLInputElement>('wiz-programma-0-titolo').value).toBe('Apertura');
+    expect(byId<HTMLSelectElement>('wiz-programma-0-chi').value).toBe('e:anna@example.org');
+    expect(byId<HTMLInputElement>('wiz-programma-0-min').value).toBe('10');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), '15');
+    goToStep('review');
+    await press(button(w.updateEvent));
+    const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([u, i]) => u === '/api/events/evt-prog/agenda' && i.method === 'PUT',
+    );
+    expect(JSON.parse(String(put?.[1].body))).toEqual({
+      base: ['a1'],
+      plan: [{ id: 'a1', label: 'Apertura', plannedMinutes: 15, speakerGrantId: 'mod-1', speakerPrimary: false }],
+    });
+  });
+});
+
+/** Un evento salvato con l'agenda accesa e un argomento, per la modifica. */
+const ATTIVA: InitialEventShape = {
+  id: 'evt-prog',
+  slug: 'evento-programma',
+  moderatorToken: 'token-primario',
+  event: {
+    title: { it: 'Evento con programma' },
+    description: { it: 'Una descrizione valida per il wizard.' },
+    startsAt: '2030-01-10T09:00:00.000Z',
+    endsAt: '2030-01-10T11:00:00.000Z',
+    timezone: 'Europe/Rome',
+    maxParticipants: 100,
+    coverImageUrl: null,
+    imageUrl: null,
+    waitingRoomAudioUrl: null,
+    tagSlugs: [],
+    recurrenceRule: null,
+    parseTitleKicker: null,
+    waitingRoomEngine: null,
+    videoQuality: null,
+    expectedSenderRatioPct: null,
+    permissionMatrix: null,
+    qaEnabled: false,
+    chatEnabled: true,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+    recordingEnabled: false,
+    agendaEnabled: true,
+    autoStartRecording: false,
+    dataRetentionDays: 30,
+    postEventPublic: true,
+    status: 'PUBLISHED',
+    gdprTemplateId: null,
+    privacyPolicyText: null,
+    privacyPolicyUrl: null,
+    moderatorName: 'Mario Rossi',
+    moderatorEmail: 'mario@example.org',
+    moderatorOrganization: null,
+    moderatorOrganizationLogoUrl: null,
+    moderatorPublicListed: false,
+    moderatorPhotoId: null,
+    accessMode: null,
+    requireOrganization: false,
+    requireOrganizationRole: false,
+    requireOrganizationType: false,
+  },
+  organizers: [],
+  eventModerators: [
+    { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: true, photoId: null },
+  ],
+  invitations: [],
+  materials: [],
+  preEventQuestionnaire: null,
+  postEventQuestionnaire: null,
+  agenda: [{ id: 'a1', label: 'Apertura', plannedMinutes: 10, speakerGrantId: 'mod-1', speakerPrimary: false }],
+  agendaLocked: false,
+};

@@ -30,6 +30,8 @@ const campiPerIlTitolo = cache((slug: string) =>
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
       moderatorPhotoId: true,
+      // A agenda accesa le persone seguono l'ordine del programma.
+      agendaEnabled: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   }),

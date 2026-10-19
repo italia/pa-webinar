@@ -59,6 +59,16 @@ import {
   submitQuestionnaire,
 } from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
+import ProgrammeSection from './programme-section';
+import {
+  agendaDalServer,
+  concessioneDaChiave,
+  conIdSalvati,
+  istanteDalModulo,
+  pianoDaInviare,
+  type StepProgrammeValue,
+  type VoceSalvata,
+} from './programme-plan';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
 import {
   LibreriaDomandeProvider,
@@ -320,6 +330,11 @@ export interface InitialEventShape {
   /** Le risposte gia' raccolte dai due questionari: con risposte, il wizard
    *  non li cambia ne' li svuota (vedi edit-fanout). */
   questionnaireResponses?: QuestionnaireResponseCounts;
+  /** Il programma salvato (gli argomenti dell'agenda, in ordine). */
+  agenda?: VoceSalvata[];
+  /** L'agenda e' gia' stata usata in sala (un argomento non piu' da
+   *  discutere, o con le reazioni del pubblico): il wizard non la cambia. */
+  agendaLocked?: boolean;
 }
 
 export interface Step5ReviewFields {
@@ -346,20 +361,10 @@ export interface Step5ReviewFields {
   requireOrganizationType: boolean;
 }
 
-/** Data e ora del modulo come istante, o null finche' non e' valida. */
-function istanteDalModulo(locale: string, tz: string): Date | null {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(locale)) return null;
-  try {
-    const d = fromDatetimeLocalInTz(locale, tz);
-    return Number.isNaN(d.getTime()) ? null : d;
-  } catch {
-    return null;
-  }
-}
-
 export type WizardForm = Step1Value &
   StepPermissionsValue &
   StepPeopleValue &
+  StepProgrammeValue &
   Step4Value &
   Step5ReviewFields;
 
@@ -522,6 +527,8 @@ export default function EventWizard(props: WizardProps) {
           role: i.role,
           personId: i.personId,
         })),
+        // Il programma, con chi interviene tradotto nelle chiavi del modulo.
+        agenda: agendaDalServer(initialEvent.agenda ?? [], initialEvent.eventModerators),
 
         // Step 4
         materials: initialEvent.materials.map((m) => ({
@@ -660,6 +667,7 @@ export default function EventWizard(props: WizardProps) {
       moderators: [],
       speakers: [],
       invitations: [],
+      agenda: [],
 
       // Step 4
       materials: [],
@@ -1023,6 +1031,11 @@ export default function EventWizard(props: WizardProps) {
         ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
         ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
         ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
+        // Un'agenda gia' usata in sala non si cambia da qui, come sopra; una
+        // bozza di prima del programma non lo porta, e resta quello del modulo.
+        ...(initialEvent?.agendaLocked || !Array.isArray(salvata.form.agenda)
+          ? { agenda: prima.agenda }
+          : {}),
       }));
     // La bozza della versione precedente, ripresa, vive ora sotto la chiave
     // di questo formato.
@@ -1413,6 +1426,12 @@ export default function EventWizard(props: WizardProps) {
             props.defaultLocale
           );
           setRisposteQuestionari((snapshotRef.current ?? initialEvent).questionnaireResponses);
+          // Gli argomenti nuovi del programma hanno ora un id: un altro
+          // salvataggio li aggiorna invece di ricrearli.
+          const agendaSalvata = (snapshotRef.current ?? initialEvent).agenda;
+          if (agendaSalvata) {
+            setForm((prima) => ({ ...prima, agenda: conIdSalvati(prima.agenda ?? [], agendaSalvata) }));
+          }
 
           // Non si cancella la bozza e non si naviga via: il testo digitato
           // deve restare recuperabile, altrimenti l'avviso direbbe di
@@ -1507,44 +1526,53 @@ export default function EventWizard(props: WizardProps) {
           if (!ok) failed.add('invitations');
         }
 
-        // 3) Organizzatori e moderatori (EventModerator, ruolo MODERATOR)
-        for (const mod of form.moderators) {
-          const ok = await fetch(`/api/events/${created.id}/moderators`, {
+        // 3) Organizzatori, moderatori e relatori (EventModerator). La
+        //    concessione creata serve al programma: chi interviene si indica
+        //    con la persona, che solo ora ha un id.
+        const concessioni: Array<{ id: string; email: string | null }> = [];
+        const persone = [
+          ...form.moderators.map((m) => ({ ...m, role: 'MODERATOR' as const })),
+          ...form.speakers.map((sp) => ({ ...sp, organizer: false, role: 'SPEAKER' as const })),
+        ];
+        for (const p of persone) {
+          const creata = await fetch(`/api/events/${created.id}/moderators`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({
-              name: mod.name,
-              email: mod.email,
-              role: 'MODERATOR',
-              ...profiloSalvato(mod),
+              name: p.name,
+              email: p.email,
+              role: p.role,
+              ...profiloSalvato(p),
             }),
           })
-            .then((r) => r.ok)
-            .catch(() => false);
-          if (!ok) failed.add('moderators');
+            .then(async (r) =>
+              r.ok ? { id: ((await r.json().catch(() => null)) as { id?: string } | null)?.id } : null,
+            )
+            .catch(() => null);
+          if (!creata) failed.add(p.role === 'MODERATOR' ? 'moderators' : 'speakers');
+          else if (creata.id) concessioni.push({ id: creata.id, email: p.email });
         }
 
-        // 4) Speakers (additional EventModerator rows, SPEAKER role)
-        for (const sp of form.speakers) {
-          const ok = await fetch(`/api/events/${created.id}/moderators`, {
-            method: 'POST',
+        // 4) Il programma, se l'agenda e' accesa: gli argomenti con chi
+        //    interviene, in una richiesta.
+        const piano = form.agendaEnabled
+          ? pianoDaInviare(form.agenda ?? [], (chiave) => concessioneDaChiave(chiave, concessioni))
+          : [];
+        if (piano.length > 0) {
+          const ok = await fetch(`/api/events/${created.id}/agenda`, {
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
-            body: JSON.stringify({
-              name: sp.name,
-              email: sp.email,
-              role: 'SPEAKER',
-              ...profiloSalvato({ ...sp, organizer: false }),
-            }),
+            body: JSON.stringify({ base: [], plan: piano }),
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add('speakers');
+          if (!ok) failed.add('agenda');
         }
 
         // 5) Materials
@@ -1864,6 +1892,18 @@ export default function EventWizard(props: WizardProps) {
               photosLocked={viaToken !== null}
               primary={primario}
               publicRegistrationEnabled={iscrizioneAperta}
+              // Il programma si pubblica nella pagina dell'evento: una
+              // chiamata istantanea non ne ha una.
+              programma={
+                istantanea ? undefined : (
+                  <ProgrammeSection
+                    value={form}
+                    onChange={updateForm}
+                    locked={!!initialEvent?.agendaLocked}
+                    fieldErrors={fieldErrors}
+                  />
+                )
+              }
               iscrizione={
                 istantanea ? undefined : (
                   <SezioneIscrizione
@@ -2162,6 +2202,7 @@ const CAMPI_DELL_EVENTO = [
   'moderators',
   'speakers',
   'invitations',
+  'agenda',
   'materials',
   'preEventQuestionnaire',
   'postEventQuestionnaire',
@@ -2204,6 +2245,11 @@ function conDatiDellEvento(modulo: WizardForm, dati: Partial<WizardForm>): Wizar
 /** L'elemento di un campo che manca, per portarci il fuoco. */
 function idDelCampo(key: string, defaultLocale: string): string | null {
   const campo = key.split('.')[0];
+  // La durata di un argomento del programma: il campo della sua riga.
+  if (campo === 'agenda') {
+    const riga = Number(key.split('.')[1]);
+    return Number.isInteger(riga) ? `wiz-programma-${riga}-min` : null;
+  }
   switch (campo) {
     case 'title':
       return 'ev-title';

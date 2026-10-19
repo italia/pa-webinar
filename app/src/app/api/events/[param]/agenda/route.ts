@@ -3,8 +3,12 @@
  * allineato a Q&A/poll:
  *   GET  → gli argomenti in ordine, con stato e reazioni (chiunque sia in
  *          stanza). `?lite=1`: solo titoli e stati, per la barra della sala.
+ *          Nessuna delle due dice chi interviene: la lettura non chiede
+ *          token, e la pagina pubblica mostra solo le persone presentate.
  *   POST → il moderatore aggiunge un argomento, o un elenco incollato.
- *   PUT  → il moderatore riordina l'agenda.
+ *   PUT  → il moderatore riordina l'agenda (`{order}`), oppure salva il
+ *          programma preparato prima dell'evento (`{base, plan}`): argomenti,
+ *          durate e chi interviene, in una richiesta sola.
  * Mutazioni protette da token moderatore (Bearer o ?token).
  */
 
@@ -22,6 +26,7 @@ import {
 } from '@/lib/errors';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 import { deleteCacheByPrefix, getCached, setCache } from '@/lib/cache';
+import { agendaSpeakerSchema, verificaRelatori } from '@/lib/agenda/speaker';
 import { MAX_AGENDA_ITEMS, plannedMinutesSchema } from '@/lib/agenda/status';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +44,30 @@ const reorderSchema = z.object({
   order: z.array(z.string().uuid()).min(1).max(MAX_AGENDA_ITEMS),
 });
 
+/**
+ * Il programma preparato prima dell'evento (il wizard): l'elenco intero, al
+ * posto di quello che c'era. `base` sono gli argomenti che chi scrive aveva
+ * letto: se nel frattempo l'agenda e' cambiata (la sala, un'altra scheda),
+ * la richiesta si rifiuta invece di cancellare cio' che non conosceva. Un
+ * argomento con `id` si aggiorna, uno senza si crea, uno di `base` che non
+ * c'e' piu' si toglie.
+ */
+const planSchema = z.object({
+  base: z.array(z.string().uuid()).max(MAX_AGENDA_ITEMS),
+  plan: z
+    .array(
+      z
+        .object({
+          id: z.string().uuid().optional(),
+          label: labelSchema,
+          plannedMinutes: plannedMinutesSchema.nullable().optional(),
+        })
+        .merge(agendaSpeakerSchema),
+    )
+    .max(MAX_AGENDA_ITEMS),
+});
+
+/** Cio' che legge chiunque (GET): senza chi interviene. */
 const ITEM_SELECT = {
   id: true,
   label: true,
@@ -48,6 +77,13 @@ const ITEM_SELECT = {
   completedAt: true,
   plannedMinutes: true,
   sortOrder: true,
+} as const;
+
+/** Cio' che torna a chi ha salvato il programma: anche chi interviene. */
+const PLAN_SELECT = {
+  ...ITEM_SELECT,
+  speakerGrantId: true,
+  speakerPrimary: true,
 } as const;
 
 async function requireModerator(request: Request, slug: string) {
@@ -216,7 +252,11 @@ export const POST = withErrorHandling(async (request, context) => {
 export const PUT = withErrorHandling(async (request, context) => {
   const { param: slug } = (await context.params) as { param: string };
   const event = await requireModerator(request, slug);
-  const { order } = reorderSchema.parse(await parseJsonBody(request));
+  const body = await parseJsonBody(request);
+  if (body && typeof body === 'object' && 'plan' in body) {
+    return salvaProgramma(event.id, planSchema.parse(body));
+  }
+  const { order } = reorderSchema.parse(body);
 
   await prisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT id FROM events WHERE id = ${event.id}::uuid FOR NO KEY UPDATE`;
@@ -228,11 +268,9 @@ export const PUT = withErrorHandling(async (request, context) => {
     // L'ordine deve dire dove va OGNI argomento, una volta sola: un elenco
     // vecchio (qualcuno ha appena aggiunto o tolto un argomento) si rifiuta,
     // invece di lasciare quelli mancanti in una posizione a caso.
-    const completo =
-      new Set(order).size === order.length &&
-      order.length === ids.size &&
-      order.every((id) => ids.has(id));
-    if (!completo) throw new ConflictError('The agenda changed: reload it and try again');
+    if (!stessoInsieme(order, ids)) {
+      throw new ConflictError('The agenda changed: reload it and try again');
+    }
     for (const [i, id] of order.entries()) {
       await tx.eventAgendaItem.update({ where: { id }, data: { sortOrder: i + 1 } });
     }
@@ -241,3 +279,77 @@ export const PUT = withErrorHandling(async (request, context) => {
   notify(event.id);
   return new Response(null, { status: 204 });
 });
+
+/** Vero se `elenco` nomina ogni id di `ids` una volta sola, e nient'altro. */
+function stessoInsieme(elenco: string[], ids: Set<string>): boolean {
+  return (
+    new Set(elenco).size === elenco.length &&
+    elenco.length === ids.size &&
+    elenco.every((id) => ids.has(id))
+  );
+}
+
+/**
+ * Il programma preparato prima dell'evento, al posto dell'agenda che c'era.
+ *
+ * Solo finche' l'agenda non e' stata usata: un argomento gia' avviato,
+ * discusso o saltato, o con le reazioni del pubblico, e' la storia della
+ * riunione, e da li' in poi l'agenda si guida dalla sala (409). Chi
+ * interviene dev'essere una persona di questo evento, non revocata (422).
+ */
+async function salvaProgramma(eventId: string, { base, plan }: z.infer<typeof planSchema>) {
+  const items = await prisma.$transaction(async (tx) => {
+    // In fila con le altre scritture dell'agenda (aggiunte, riordini, cambi
+    // di stato dalla sala).
+    await tx.$executeRaw`SELECT id FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
+    const esistenti = await tx.eventAgendaItem.findMany({
+      where: { eventId },
+      select: { id: true, status: true, _count: { select: { reactions: true } } },
+    });
+    const ids = new Set(esistenti.map((e) => e.id));
+    if (!stessoInsieme(base, ids)) {
+      throw new ConflictError('The agenda changed: reload it and try again');
+    }
+    if (esistenti.some((e) => e.status !== 'PENDING' || e._count.reactions > 0)) {
+      throw new ConflictError('The agenda is already in use: change it from the room');
+    }
+
+    // Un argomento da aggiornare dev'essere di questa agenda, e una volta sola.
+    const visti = new Set<string>();
+    const problemi: Array<{ path: (string | number)[]; message: string }> = [];
+    plan.forEach((v, i) => {
+      if (!v.id) return;
+      if (!ids.has(v.id) || visti.has(v.id)) {
+        problemi.push({ path: ['plan', i, 'id'], message: 'Unknown or repeated agenda item' });
+      }
+      visti.add(v.id);
+    });
+    problemi.push(...(await verificaRelatori(tx, eventId, plan, (i, campo) => ['plan', i, campo])));
+    if (problemi.length > 0) throw new ValidationError('Invalid agenda plan', problemi);
+
+    const daTogliere = base.filter((id) => !visti.has(id));
+    if (daTogliere.length > 0) {
+      await tx.eventAgendaItem.deleteMany({ where: { eventId, id: { in: daTogliere } } });
+    }
+    const out = [];
+    // In fila, non in parallelo: una transazione e' una connessione sola.
+    for (const [i, v] of plan.entries()) {
+      const data = {
+        label: v.label,
+        plannedMinutes: v.plannedMinutes ?? null,
+        speakerGrantId: v.speakerGrantId ?? null,
+        speakerPrimary: v.speakerPrimary ?? false,
+        sortOrder: i + 1,
+      };
+      out.push(
+        v.id
+          ? await tx.eventAgendaItem.update({ where: { id: v.id }, data, select: PLAN_SELECT })
+          : await tx.eventAgendaItem.create({ data: { eventId, ...data }, select: PLAN_SELECT }),
+      );
+    }
+    return out;
+  });
+
+  notify(eventId);
+  return Response.json({ items });
+}

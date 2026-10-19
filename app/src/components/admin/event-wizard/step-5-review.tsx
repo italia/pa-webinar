@@ -15,12 +15,15 @@ import { useTranslations } from 'next-intl';
 import LanguageChecklist from '@/components/admin/language-checklist';
 import { IconaMicrofono, IconaPersone, IconaRec } from '@/components/admin/guided-format';
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
+import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
 import { localeNames } from '@/i18n/config';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
+import { vociCompilate } from './programme-plan';
 import type { CampoMancante } from './validation';
 import type { WizardForm } from './wizard-shell';
 
@@ -100,7 +103,11 @@ export default function Step5Review({
   const tf = useTranslations('admin.wizard.flow');
   const tp = useTranslations('admin.wizard.step2');
   const tForm = useTranslations('admin.form');
+  const durata = useDurataTesto();
   const toggles = togglesFromMatrix(form.permissionMatrix);
+  // Il programma, ad agenda accesa: quanti argomenti e quanto dura.
+  const programma = form.agendaEnabled ? vociCompilate(form.agenda ?? []) : [];
+  const durataDelProgramma = durataProgramma(programma);
   const senzaInvitati = iscrizioneAperta === false && form.invitations.length === 0;
   // Cosa si chiede a chi si iscrive: nome ed email sempre, il resto se scelto.
   const chiesti = [
@@ -204,6 +211,8 @@ export default function Step5Review({
         return t('retentionDays');
       case 'gdprTemplateId':
         return t('gdprTemplate');
+      case 'agenda':
+        return tf('fieldProgrammeMinutes', { n: Number(key.split('.')[1] ?? 0) + 1 });
       default:
         return campo ?? key;
     }
@@ -310,6 +319,30 @@ export default function Step5Review({
               )}
             </span>
           </li>
+          {programma.length > 0 && (
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon="it-list" size="sm" />
+              </span>
+              <span>
+                {durataDelProgramma !== null
+                  ? t('summary.programmeWithDuration', {
+                      count: programma.length,
+                      duration: durata(0, durataDelProgramma * 60_000),
+                    })
+                  : t('summary.programme', { count: programma.length })}{' '}
+                {onVaiPersone && (
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 align-baseline anteprima-link"
+                    onClick={onVaiPersone}
+                  >
+                    {tf('change')}
+                  </button>
+                )}
+              </span>
+            </li>
+          )}
           {iscrizioneAperta !== undefined && (
             <li>
               <span className="anteprima-righe__icona">

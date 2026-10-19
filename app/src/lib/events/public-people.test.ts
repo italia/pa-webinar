@@ -44,9 +44,11 @@ describe('ruoloPubblico e ordinaPersone', () => {
 const base = {
   organizers: [{ name: 'Ente A', logoUrl: '/api/assets/a.png', websiteUrl: 'javascript:alert(1)' }],
   additionalMods: [
-    { name: 'cifrato:Relatore 1', role: 'SPEAKER' as const, organizer: false, organization: 'Ente B', organizationLogoUrl: 'https://altro.example/logo.png', photoId: 'foto-relatore' },
-    { name: 'cifrato:Conduttore 1', role: 'MODERATOR' as const, organizer: false, organization: null, organizationLogoUrl: null, photoId: null },
+    { id: 'g-relatore-1', name: 'cifrato:Relatore 1', role: 'SPEAKER' as const, organizer: false, organization: 'Ente B', organizationLogoUrl: 'https://altro.example/logo.png', photoId: 'foto-relatore' },
+    { id: 'g-conduttore-1', name: 'cifrato:Conduttore 1', role: 'MODERATOR' as const, organizer: false, organization: null, organizationLogoUrl: null, photoId: null },
   ],
+  agendaEnabled: false,
+  agendaItems: [] as Array<{ speakerGrantId: string | null; speakerPrimary: boolean }>,
   moderatorName: 'Organizzatrice',
   moderatorPublicListed: false,
   moderatorOrganization: null,
@@ -86,5 +88,85 @@ describe('entiEPersonePubblici', () => {
     // moderatore principale è filtrato qui, e con lui la sua foto.
     const { persone } = entiEPersonePubblici(base, decifra);
     expect(persone.some((p) => p.photoUrl === '/api/avatar/person/foto-organizzatrice')).toBe(false);
+  });
+});
+
+describe('l’ordine del programma', () => {
+  const relatore = (id: string, nome: string) => ({
+    id,
+    name: `cifrato:${nome}`,
+    role: 'SPEAKER' as const,
+    organizer: false,
+    organization: null,
+    organizationLogoUrl: null,
+    photoId: null,
+  });
+  const evento = {
+    ...base,
+    additionalMods: [
+      relatore('g-anna', 'Anna'),
+      relatore('g-bruno', 'Bruno'),
+      relatore('g-carla', 'Carla'),
+      relatore('g-dario', 'Dario'),
+      { ...relatore('g-mod', 'Moderatore'), role: 'MODERATOR' as const },
+    ],
+    agendaEnabled: true,
+    // Carla apre, poi Bruno (due volte: conta il primo intervento), poi
+    // l'organizzatrice principale.
+    agendaItems: [
+      { speakerGrantId: 'g-carla', speakerPrimary: false },
+      { speakerGrantId: 'g-bruno', speakerPrimary: false },
+      { speakerGrantId: null, speakerPrimary: true },
+      { speakerGrantId: 'g-bruno', speakerPrimary: false },
+    ],
+  };
+
+  it('a parità di ruolo, nell’ordine del primo intervento; chi non interviene dopo, per nome', () => {
+    const { persone } = entiEPersonePubblici(evento, decifra);
+    expect(persone.map((p) => [p.name, p.role])).toEqual([
+      ['Moderatore', 'moderator'],
+      ['Carla', 'speaker'],
+      ['Bruno', 'speaker'],
+      ['Anna', 'speaker'],
+      ['Dario', 'speaker'],
+    ]);
+  });
+
+  it('il ruolo viene prima del programma', () => {
+    const { persone } = entiEPersonePubblici(
+      {
+        ...evento,
+        moderatorPublicListed: true,
+        agendaItems: [
+          { speakerGrantId: 'g-dario', speakerPrimary: false },
+          { speakerGrantId: 'g-mod', speakerPrimary: false },
+          { speakerGrantId: null, speakerPrimary: true },
+        ],
+      },
+      decifra,
+    );
+    expect(persone.map((p) => p.name)).toEqual([
+      'Organizzatrice',
+      'Moderatore',
+      'Dario',
+      'Anna',
+      'Bruno',
+      'Carla',
+    ]);
+  });
+
+  it('ad agenda spenta resta l’ordine alfabetico', () => {
+    const { persone } = entiEPersonePubblici({ ...evento, agendaEnabled: false }, decifra);
+    expect(persone.filter((p) => p.role === 'speaker').map((p) => p.name)).toEqual([
+      'Anna',
+      'Bruno',
+      'Carla',
+      'Dario',
+    ]);
+  });
+
+  it('la chiave d’ordine non esce: le persone hanno la forma di sempre', () => {
+    const { persone } = entiEPersonePubblici(evento, decifra);
+    for (const p of persone) expect(Object.keys(p).sort()).toEqual(['logoUrl', 'name', 'organization', 'photoUrl', 'role']);
   });
 });

@@ -286,6 +286,8 @@ export async function ingressoResoconto(
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
       moderatorPhotoId: true,
+      // A agenda accesa le persone seguono l'ordine del programma.
+      agendaEnabled: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });

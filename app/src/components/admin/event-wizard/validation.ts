@@ -14,6 +14,7 @@ import { parseLocaleList } from '@/lib/ai/target-locales';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { WIZARD_STEPS, type WizardStep } from '@/lib/events/wizard-steps';
 
+import { erroriProgramma } from './programme-plan';
 import type { WizardForm } from './wizard-shell';
 
 export const STEP_KEYS = WIZARD_STEPS;
@@ -68,6 +69,11 @@ export function validateStep(
     ) {
       errs['maxParticipants'] = 'outOfRange';
     }
+  }
+  if (step === 'invites') {
+    // Il programma: una durata scritta che non e' una durata. Senza, il
+    // salvataggio la lascerebbe cadere in silenzio.
+    Object.assign(errs, erroriProgramma(form));
   }
   if (step === 'review') {
     // La traduzione automatica senza lingue target non produce nulla:

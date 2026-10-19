@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db';
 import { verifyRatingToken } from '@/lib/feedback/rating-link';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { orariProgramma, relatoreDelProgramma, type VoceProgramma } from '@/lib/agenda/programme';
 import { vistaResoconto } from '@/lib/report/view';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
@@ -92,6 +93,29 @@ export default async function EventDetailPage({
       // Gli enti, e solo chi è stato scelto per la pagina pubblica con un
       // accesso ancora valido.
       ...PERSONE_PUBBLICHE_INCLUDE,
+      // Il programma: tutti gli argomenti in ordine, con chi interviene.
+      // Della persona si legge se è presentata e non revocata: il nome esce
+      // solo allora (relatoreDelProgramma).
+      agendaItems: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: {
+          id: true,
+          label: true,
+          plannedMinutes: true,
+          status: true,
+          speakerGrantId: true,
+          speakerPrimary: true,
+          speaker: {
+            select: {
+              name: true,
+              organization: true,
+              photoId: true,
+              publicListed: true,
+              revokedAt: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -141,6 +165,23 @@ export default async function EventDetailPage({
   // Chi organizza e chi interviene (lib/events/public-people).
   const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
 
+  // Il programma preparato prima dell'evento, se l'agenda è accesa. Di chi
+  // interviene solo cio' che la pagina mostra gia' (persona presentata).
+  const programma: VoceProgramma[] = event.agendaEnabled
+    ? event.agendaItems.map((a) => ({
+        id: a.id,
+        label: a.label,
+        plannedMinutes: a.plannedMinutes,
+        status: a.status,
+        speaker: relatoreDelProgramma(a, event, tryDecryptPII),
+      }))
+    : [];
+  const orariDelProgramma = orariProgramma(event.startsAt, programma);
+  const luogo = {
+    '@type': 'VirtualLocation',
+    url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -153,10 +194,7 @@ export default async function EventDetailPage({
     // non ha uno stato «annullato», quindi l'evento e' sempre in programma.
     eventStatus: 'https://schema.org/EventScheduled',
     ...(immagine ? { image: [immagine.startsWith('/') ? `${baseUrl}${immagine}` : immagine] } : {}),
-    location: {
-      '@type': 'VirtualLocation',
-      url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
-    },
+    location: luogo,
     organizer:
       enti.length > 0
         ? enti.map((e) => ({ '@type': 'Organization', name: e.name, ...(e.websiteUrl ? { url: e.websiteUrl } : {}) }))
@@ -179,6 +217,34 @@ export default async function EventDetailPage({
       : {}),
     maximumAttendeeCapacity: event.maxParticipants,
     remainingAttendeeCapacity: event.maxParticipants - event._count.registrations,
+    // Gli argomenti del programma, con gli orari solo quando si conoscono e
+    // chi interviene solo se la pagina lo presenta.
+    ...(programma.length > 0
+      ? {
+          subEvent: programma.map((v, i) => {
+            const { start, end } = orariDelProgramma[i]!;
+            return {
+              '@type': 'Event',
+              name: v.label,
+              eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+              location: luogo,
+              ...(start ? { startDate: start.toISOString() } : {}),
+              ...(end ? { endDate: end.toISOString() } : {}),
+              ...(v.speaker
+                ? {
+                    performer: {
+                      '@type': 'Person',
+                      name: v.speaker.name,
+                      ...(v.speaker.organization
+                        ? { affiliation: { '@type': 'Organization', name: v.speaker.organization } }
+                        : {}),
+                    },
+                  }
+                : {}),
+            };
+          }),
+        }
+      : {}),
   };
 
   // Fetch post-event data for ENDED events
@@ -399,6 +465,7 @@ export default async function EventDetailPage({
     organizerName: event.organizerName,
     organizers: enti,
     people: persone,
+    programme: programma,
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,

@@ -411,13 +411,15 @@ export const GET = withErrorHandling(async (request) => {
           select: { photoId: true },
         });
 
-        // Named moderator/speaker grants: `name` and `email` are encrypted PII
-        // and `token` is a durable magic-link credential. Same cascade trap as
-        // the chat above — the event row survives the cleanup, so nothing else
-        // ever removes these. The public programme is unaffected: the speaker
-        // list shown on the event page comes from `Event.speakersInfo`, not from
-        // these rows. Copies of a recurring event multiply the grants, so a
-        // series would otherwise keep one contact's address alive indefinitely.
+        // Le concessioni nominali (moderatori, relatori): nome ed email sono
+        // dati personali cifrati e `token` e' una credenziale che non scade.
+        // Stessa trappola della chat qui sopra: la riga dell'evento resta, e
+        // nient'altro le toglierebbe mai. Le persone della pagina pubblica e
+        // chi interviene nel programma vengono da queste righe: dopo la
+        // pulizia la pagina non presenta piu' nessuno e gli argomenti restano
+        // senza nome (speakerGrantId torna vuoto, ON DELETE SET NULL). Le
+        // copie di un evento ricorrente moltiplicano le concessioni: senza,
+        // una serie terrebbe in vita l'indirizzo di una persona per sempre.
         const moderatorGrantsDeleted = await tx.eventModerator.deleteMany({
           where: { eventId: evt.id },
         });

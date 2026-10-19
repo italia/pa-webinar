@@ -18,6 +18,7 @@ import { useNow, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
+import { parsePlannedMinutes as parseMinutes } from '@/lib/agenda/programme';
 import { splitAgendaLines, type AgendaStatus } from '@/lib/agenda/status';
 
 import AgendaStatusLine from './agenda-status-line';
@@ -56,20 +57,6 @@ interface Props {
 
 /** Il campo «nuovo argomento» cresce con il testo fino a questa altezza. */
 const ADD_MAX_HEIGHT = 140;
-
-/**
- * Minuti scritti in un campo: vuoto vuol dire nessuna durata (null), un intero
- * tra 1 e 600 e' la durata, il resto non e' valido (undefined): si dice, non
- * si cancella in silenzio la durata che c'era. Il campo e' di testo: uno di
- * tipo numero con dentro «1e» o lettere varrebbe '' e sembrerebbe vuoto.
- */
-function parseMinutes(raw: string): number | null | undefined {
-  const testo = raw.trim();
-  if (testo === '') return null;
-  if (!/^\d{1,3}$/.test(testo)) return undefined;
-  const n = Number(testo);
-  return n >= 1 && n <= 600 ? n : undefined;
-}
 
 export default function AgendaPanel({
   eventSlug,

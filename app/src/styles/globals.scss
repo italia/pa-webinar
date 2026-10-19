@@ -6302,6 +6302,211 @@ button.live-time-strip__rec {
   vertical-align: -4px;
 }
 
+// ── Il programma dell'incontro nella pagina pubblica: l'ora, una linea con
+// un punto per argomento, l'argomento con chi interviene e, a destra, la
+// durata. Niente timeline di Bootstrap Italia (orizzontale, a schede): qui
+// conta leggere l'ordine dall'alto in basso, anche al telefono.
+.event-programma__nota {
+  margin: 0 0 1.25rem;
+  color: #5a6772;
+  font-size: 0.875rem;
+}
+
+.event-programma__elenco {
+  // La colonna dell'ora e quella della linea con i punti.
+  --programma-ora: 3.25rem;
+  --programma-binario: 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event-programma__voce {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr) auto;
+  grid-template-areas: 'quando . corpo durata';
+  align-items: baseline;
+  padding-bottom: 1.5rem;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  // La linea, dal punto di questo argomento a quello del successivo.
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(0.4rem + 12px);
+    bottom: -0.4rem;
+    left: calc(var(--programma-ora) + var(--programma-binario) / 2 - 1px);
+    width: 2px;
+    background: #d6e3f1;
+  }
+
+  &:last-child::before {
+    display: none;
+  }
+
+  // Il punto: vuoto, pieno per l'argomento in corso.
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0.4rem;
+    left: calc(var(--programma-ora) + var(--programma-binario) / 2 - 6px);
+    width: 12px;
+    height: 12px;
+    border: 2px solid #0066cc;
+    border-radius: 50%;
+    background: #fff;
+  }
+}
+
+.event-programma__quando {
+  grid-area: quando;
+  color: #0066cc;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.event-programma__corpo {
+  grid-area: corpo;
+  min-width: 0;
+}
+
+.event-programma__titolo {
+  margin: 0;
+  color: #17324d;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+// «In corso», accanto all'argomento: lo stesso verde della diretta.
+.event-programma__adesso {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: #008758;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: 0.1em;
+}
+
+.event-programma__chi {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0;
+  min-width: 0;
+}
+
+// La foto (o le iniziali) in un cerchio, come in «Chi organizza e
+// interviene», piu' piccola.
+.event-programma__foto {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.event-programma__iniziali {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 102, 204, 0.1);
+  color: #004d99;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.event-programma__persona {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.event-programma__nome {
+  color: #17324d;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-programma__ente {
+  color: #5a6772;
+  font-size: 0.825rem;
+  overflow-wrap: anywhere;
+}
+
+.event-programma__durata {
+  grid-area: durata;
+  padding-left: 1rem;
+  color: #5a6772;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// In diretta: l'argomento in corso ha il punto pieno, con un alone; quelli
+// gia' discussi o saltati restano leggibili, piu' sommessi.
+.event-programma__voce--ora {
+  &::after {
+    border-color: #008758;
+    background: #008758;
+    box-shadow: 0 0 0 4px rgba(0, 135, 88, 0.18);
+  }
+
+  .event-programma__quando {
+    color: #00663f;
+  }
+}
+
+.event-programma__voce--passata {
+  &::after {
+    border-color: #8fa3b7;
+    background: #8fa3b7;
+  }
+
+  .event-programma__quando,
+  .event-programma__titolo {
+    color: #5a6772;
+  }
+}
+
+// Al telefono la durata va sotto l'ora, e l'argomento ha tutta la riga.
+@media (max-width: 575.98px) {
+  .event-programma__elenco {
+    --programma-ora: 3rem;
+    --programma-binario: 1.75rem;
+  }
+
+  .event-programma__voce {
+    grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'quando . corpo'
+      'durata . corpo';
+    align-items: start;
+  }
+
+  .event-programma__durata {
+    padding-left: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    text-align: right;
+  }
+}
+
 .registration-when {
   display: flex;
   align-items: center;
@@ -11421,6 +11626,215 @@ html:has(.wizard-azioni) {
 .wizard-group--static {
   > .wizard-group__body {
     padding: 1rem;
+  }
+}
+
+// ── Il programma nel passo «Persone» del wizard: una riga per argomento con
+// l'ora calcolata, l'argomento, chi interviene, i minuti e i comandi.
+.wizard-programma-spento > .wizard-group__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.wizard-programma-spento__testo {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+
+.wizard-programma__nota {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: #0066cc;
+  }
+}
+
+.wizard-programma__intestazione,
+.wizard-programma__voce {
+  display: grid;
+  // L'ultima colonna e' larga quanto i tre comandi: l'intestazione, che non
+  // li ha, resta allineata alle righe.
+  grid-template-columns: 3rem minmax(0, 1fr) minmax(10rem, 15rem) 4.5rem 6.5rem;
+  gap: 0.25rem 0.75rem;
+}
+
+.wizard-programma__intestazione {
+  // Il bordo delle righe: un pixel in piu' per lato.
+  padding: 0 calc(0.75rem + 1px) 0.35rem;
+  color: #455b71;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.wizard-programma {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-programma__voce {
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.wizard-programma__ora {
+  color: #0066cc;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wizard-programma__argomento,
+.wizard-programma__chi,
+.wizard-programma__min {
+  min-width: 0;
+}
+
+// Le etichette dei campi: sugli schermi larghi le dice l'intestazione, e qui
+// restano per le tecnologie assistive.
+.wizard-programma__etichetta {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #455b71;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.wizard-programma__comandi {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.wizard-programma__comando {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #c5d0db;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: none;
+
+  .icon {
+    fill: #0066cc;
+  }
+
+  &:hover:not(:disabled) {
+    background: #f2f7fc;
+  }
+
+  &:disabled {
+    border-color: #c5d0db;
+    box-shadow: none;
+    opacity: 0.35;
+  }
+}
+
+.wizard-programma__comando--togli .icon {
+  fill: #a1112e;
+}
+
+.wizard-programma__nascosto {
+  grid-column: 2 / -1;
+  margin: 0;
+  color: #5a6772;
+  font-size: 0.8rem;
+}
+
+.wizard-programma__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.wizard-programma__incolla {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+  background: #f5f7fb;
+}
+
+.wizard-programma__totale {
+  margin-top: 1rem;
+  color: #3d4955;
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .wizard-programma__etichetta {
+    @include visually-hidden;
+  }
+}
+
+// Sugli schermi stretti ogni riga va a capo: l'ora a sinistra, poi
+// l'argomento, chi interviene, e i minuti con i comandi sulla stessa riga.
+@media (max-width: 767.98px) {
+  .wizard-programma__intestazione {
+    display: none;
+  }
+
+  .wizard-programma__voce {
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'ora argomento argomento'
+      '. chi chi'
+      '. min comandi'
+      '. nascosto nascosto';
+    align-items: end;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .wizard-programma__ora {
+    grid-area: ora;
+    align-self: end;
+    padding-bottom: 0.4rem;
+  }
+
+  .wizard-programma__argomento {
+    grid-area: argomento;
+  }
+
+  .wizard-programma__chi {
+    grid-area: chi;
+  }
+
+  .wizard-programma__min {
+    grid-area: min;
+
+    .form-control {
+      max-width: 6rem;
+    }
+  }
+
+  .wizard-programma__comandi {
+    grid-area: comandi;
+    padding-bottom: 0.15rem;
+  }
+
+  .wizard-programma__nascosto {
+    grid-area: nascosto;
   }
 }
 

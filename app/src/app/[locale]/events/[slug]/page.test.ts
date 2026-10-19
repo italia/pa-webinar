@@ -408,3 +408,116 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
     ]);
   });
 });
+
+describe('scheda dell’evento — programma', () => {
+  const agenda = [
+    {
+      id: 'a1',
+      label: 'Apertura',
+      plannedMinutes: 10,
+      status: 'PENDING',
+      speakerGrantId: null,
+      speakerPrimary: true,
+      speaker: null,
+    },
+    {
+      id: 'a2',
+      label: 'Intervento',
+      plannedMinutes: 30,
+      status: 'PENDING',
+      speakerGrantId: 'g-pubblica',
+      speakerPrimary: false,
+      speaker: { name: 'Relatrice 1', organization: 'Ente', photoId: FOTO, publicListed: true, revokedAt: null },
+    },
+    {
+      id: 'a3',
+      label: 'Un caso',
+      plannedMinutes: null,
+      status: 'PENDING',
+      speakerGrantId: 'g-nascosta',
+      speakerPrimary: false,
+      speaker: { name: 'Persona nascosta', organization: null, photoId: null, publicListed: false, revokedAt: null },
+    },
+  ];
+  const INIZIO = new Date('2030-03-05T09:00:00.000Z');
+  const conProgramma = (over: Record<string, unknown> = {}) =>
+    eventRow({
+      startsAt: INIZIO,
+      endsAt: new Date(INIZIO.getTime() + 2 * HOUR),
+      agendaEnabled: true,
+      agendaItems: agenda,
+      moderatorName: 'Organizzatrice',
+      moderatorPublicListed: true,
+      moderatorOrganization: 'Ente A',
+      moderatorOrganizationLogoUrl: null,
+      moderatorPhotoId: null,
+      ...over,
+    });
+
+  async function jsonLd(): Promise<Record<string, unknown>> {
+    const tree = (await EventDetailPage({ params: Promise.resolve({ slug: SLUG }) })) as ReactElement<{
+      children: ReactNode;
+    }>;
+    const script = ([] as ReactNode[])
+      .concat(tree.props.children)
+      .find((c): c is ReactElement<{ dangerouslySetInnerHTML: { __html: string } }> => isValidElement(c) && c.type === 'script');
+    return JSON.parse(script!.props.dangerouslySetInnerHTML.__html) as Record<string, unknown>;
+  }
+
+  it('passa al client gli argomenti, con chi interviene solo se presentato', async () => {
+    mockedEvent.mockResolvedValue(conProgramma());
+    const props = await clientProps();
+    const programma = (props.event as { programme: unknown[] }).programme;
+    expect(programma).toEqual([
+      { id: 'a1', label: 'Apertura', plannedMinutes: 10, status: 'PENDING', speaker: { name: 'Organizzatrice', organization: 'Ente A', photoUrl: null } },
+      {
+        id: 'a2',
+        label: 'Intervento',
+        plannedMinutes: 30,
+        status: 'PENDING',
+        speaker: { name: 'Relatrice 1', organization: 'Ente', photoUrl: `/api/avatar/person/${FOTO}` },
+      },
+      { id: 'a3', label: 'Un caso', plannedMinutes: null, status: 'PENDING', speaker: null },
+    ]);
+    expect(JSON.stringify(props)).not.toContain('Persona nascosta');
+    expect(JSON.stringify(props)).not.toContain('g-nascosta');
+  });
+
+  it('nei dati strutturati un sotto-evento per argomento, con gli orari che si conoscono', async () => {
+    mockedEvent.mockResolvedValue(conProgramma());
+    const ld = await jsonLd();
+    const sotto = ld.subEvent as Array<Record<string, unknown>>;
+    expect(sotto.map((s) => [s.name, s.startDate ?? null, s.endDate ?? null])).toEqual([
+      ['Apertura', '2030-03-05T09:00:00.000Z', '2030-03-05T09:10:00.000Z'],
+      ['Intervento', '2030-03-05T09:10:00.000Z', '2030-03-05T09:40:00.000Z'],
+      // Senza durata: si sa quando comincia, non quando finisce.
+      ['Un caso', '2030-03-05T09:40:00.000Z', null],
+    ]);
+    expect(sotto[1]?.performer).toEqual({
+      '@type': 'Person',
+      name: 'Relatrice 1',
+      affiliation: { '@type': 'Organization', name: 'Ente' },
+    });
+    expect(sotto[2]).not.toHaveProperty('performer');
+    expect(JSON.stringify(ld)).not.toContain('Persona nascosta');
+  });
+
+  it('una persona revocata, o l’organizzatore principale non presentato, non escono', async () => {
+    mockedEvent.mockResolvedValue(
+      conProgramma({
+        moderatorPublicListed: false,
+        agendaItems: [{ ...agenda[1], speaker: { ...agenda[1]!.speaker!, revokedAt: new Date() } }, agenda[0]],
+      }),
+    );
+    const props = await clientProps();
+    const programma = (props.event as { programme: Array<{ speaker: unknown }> }).programme;
+    expect(programma.map((v) => v.speaker)).toEqual([null, null]);
+  });
+
+  it('ad agenda spenta nessun programma, ne’ nei dati strutturati', async () => {
+    mockedEvent.mockResolvedValue(conProgramma({ agendaEnabled: false }));
+    const props = await clientProps();
+    expect((props.event as { programme: unknown[] }).programme).toEqual([]);
+    expect(await jsonLd()).not.toHaveProperty('subEvent');
+  });
+});

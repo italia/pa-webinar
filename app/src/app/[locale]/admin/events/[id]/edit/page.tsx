@@ -143,6 +143,20 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           orderBy: { createdAt: 'asc' },
         },
         materials: { orderBy: { createdAt: 'asc' } },
+        // Il programma: gli argomenti in ordine, con chi interviene, e cio'
+        // che dice se l'agenda e' gia' stata usata in sala.
+        agendaItems: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          select: {
+            id: true,
+            label: true,
+            plannedMinutes: true,
+            status: true,
+            speakerGrantId: true,
+            speakerPrimary: true,
+            _count: { select: { reactions: true } },
+          },
+        },
         questionnaires: {
           include: {
             templates: { orderBy: { sortOrder: 'asc' } },
@@ -299,6 +313,16 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       pre: pre?._count.responses ?? 0,
       post: post?._count.responses ?? 0,
     },
+    agenda: event.agendaItems.map((a) => ({
+      id: a.id,
+      label: a.label,
+      plannedMinutes: a.plannedMinutes,
+      speakerGrantId: a.speakerGrantId,
+      speakerPrimary: a.speakerPrimary,
+    })),
+    // Come la rotta che salva il programma: un argomento non piu' da
+    // discutere, o con le reazioni del pubblico, e l'agenda e' della sala.
+    agendaLocked: event.agendaItems.some((a) => a.status !== 'PENDING' || a._count.reactions > 0),
   };
 
   return (
