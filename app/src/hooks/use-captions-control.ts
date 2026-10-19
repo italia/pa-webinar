@@ -26,6 +26,10 @@ import type { JitsiMeetExternalAPI } from '@/types/jitsi';
  * avviando o fermando la registrazione la sala di Jitsi riscrive negli stessi
  * metadati che la trascrizione è spenta (`startRecording` senza l'opzione
  * `transcription`, `stopRecording` sempre), e Jicofo chiude i sottotitoli.
+ * Il cambio è quello dello stato della registrazione che la sala già segue,
+ * non ogni `recordingStatusChanged`: Jitsi lo manda anche quando si accende
+ * o si spegne la sola trascrizione, e rimandare la scelta allora potrebbe
+ * smentire quella appena fatta da un altro moderatore.
  */
 export function useCaptionsControl({
   api,
@@ -33,6 +37,7 @@ export function useCaptionsControl({
   accesi,
   certo = true,
   lingua,
+  registrazione = false,
 }: {
   api: JitsiMeetExternalAPI | null;
   /** Chi usa la sala modera e il servizio dei sottotitoli è disponibile. */
@@ -46,38 +51,38 @@ export function useCaptionsControl({
   certo?: boolean;
   /** Codice primario della lingua dell'evento ("it"). */
   lingua: string;
+  /** La sala sta registrando (lo stato che la sala segue da Jitsi). */
+  registrazione?: boolean;
 }): void {
   const [ingressi, setIngressi] = useState(0);
-  const [registrazioni, setRegistrazioni] = useState(0);
   const inviato = useRef<{
     accesi: boolean;
     ingresso: number;
-    registrazione: number;
+    lingua: string;
+    registrazione: boolean;
   } | null>(null);
 
   useEffect(() => {
     if (!api) return;
     const entrato = () => setIngressi((n) => n + 1);
-    const registrazione = () => setRegistrazioni((n) => n + 1);
     api.addListener('videoConferenceJoined', entrato);
-    api.addListener('recordingStatusChanged', registrazione);
     return () => {
       api.removeListener('videoConferenceJoined', entrato);
-      api.removeListener('recordingStatusChanged', registrazione);
     };
   }, [api]);
 
   useEffect(() => {
     if (!api || !attivo || ingressi === 0) return;
     const ultimo = inviato.current;
-    if (ultimo && ultimo.accesi === accesi && ultimo.ingresso === ingressi) {
-      // Cambiata solo la registrazione: a sottotitoli spenti non c'è niente da
-      // rimettere.
-      if (ultimo.registrazione === registrazioni || !accesi) {
-        inviato.current = { ...ultimo, registrazione: registrazioni };
-        return;
-      }
-    }
+    // All'ingresso, a ogni cambio della scelta o della lingua e, con i
+    // sottotitoli accesi, a ogni cambio della registrazione.
+    const serve =
+      !ultimo ||
+      ultimo.accesi !== accesi ||
+      ultimo.ingresso !== ingressi ||
+      ultimo.lingua !== lingua ||
+      (accesi && ultimo.registrazione !== registrazione);
+    if (!serve) return;
     // Anche il primo «spenti» parte, ma solo con il valore del server: a
     // stanza gia' spenta non cambia niente, e se Prosody non ha potuto
     // chiedere al portale la stanza segue comunque l'interruttore. Con il
@@ -85,9 +90,9 @@ export function useCaptionsControl({
     if (!accesi && !ultimo && !certo) return;
     try {
       api.executeCommand('setSubtitles', accesi, false, lingua);
-      inviato.current = { accesi, ingresso: ingressi, registrazione: registrazioni };
+      inviato.current = { accesi, ingresso: ingressi, lingua, registrazione };
     } catch (err) {
       console.error('setSubtitles failed', err);
     }
-  }, [api, attivo, accesi, certo, lingua, ingressi, registrazioni]);
+  }, [api, attivo, accesi, certo, lingua, ingressi, registrazione]);
 }

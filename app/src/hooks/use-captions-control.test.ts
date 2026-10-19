@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 /**
- * La sala di chi modera manda a Jitsi la scelta dei sottotitoli all'ingresso e
- * a ogni cambio dell'interruttore, e la rimanda a ogni cambio della
- * registrazione: avviarla o fermarla riscrive nei metadati della stanza che la
- * trascrizione è spenta.
+ * La sala di chi modera manda a Jitsi la scelta dei sottotitoli all'ingresso, a
+ * ogni cambio dell'interruttore o della lingua, e la rimanda a ogni cambio
+ * della registrazione: avviarla o fermarla riscrive nei metadati della stanza
+ * che la trascrizione è spenta.
  */
 
 import { act, createElement } from 'react';
@@ -38,18 +38,31 @@ function finteApi() {
 let container: HTMLDivElement;
 let root: Root;
 
-function Sala(props: { api: JitsiMeetExternalAPI; accesi: boolean }) {
+function Sala(props: {
+  api: JitsiMeetExternalAPI;
+  accesi: boolean;
+  registrazione: boolean;
+  lingua: string;
+}) {
   useCaptionsControl({
     api: props.api,
     attivo: true,
     accesi: props.accesi,
-    lingua: 'it',
+    lingua: props.lingua,
+    registrazione: props.registrazione,
   });
   return null;
 }
 
-function disegna(api: JitsiMeetExternalAPI, accesi: boolean) {
-  act(() => root.render(createElement(Sala, { api, accesi })));
+function disegna(
+  api: JitsiMeetExternalAPI,
+  accesi: boolean,
+  {
+    registrazione = false,
+    lingua = 'it',
+  }: { registrazione?: boolean; lingua?: string } = {}
+) {
+  act(() => root.render(createElement(Sala, { api, accesi, registrazione, lingua })));
 }
 
 beforeEach(() => {
@@ -72,12 +85,12 @@ describe('useCaptionsControl', () => {
     expect(sottotitoli()).toEqual([['setSubtitles', true, false, 'it']]);
   });
 
-  it('a sottotitoli accesi la rimanda a ogni cambio della registrazione', () => {
+  it('a sottotitoli accesi la rimanda quando la registrazione parte e quando si ferma', () => {
     const { api, emetti, sottotitoli } = finteApi();
     disegna(api, true);
     emetti('videoConferenceJoined');
-    emetti('recordingStatusChanged', { on: true, mode: 'file' });
-    emetti('recordingStatusChanged', { on: false, mode: 'file' });
+    disegna(api, true, { registrazione: true });
+    disegna(api, true, { registrazione: false });
     expect(sottotitoli()).toHaveLength(3);
     expect(sottotitoli().every((c) => c[1] === true)).toBe(true);
   });
@@ -87,8 +100,25 @@ describe('useCaptionsControl', () => {
     disegna(api, false);
     emetti('videoConferenceJoined');
     const prima = sottotitoli().length;
-    emetti('recordingStatusChanged', { on: true, mode: 'file' });
+    disegna(api, false, { registrazione: true });
     expect(sottotitoli()).toHaveLength(prima);
+  });
+
+  it('un evento di stato di Jitsi da solo non rimanda niente', () => {
+    const { api, emetti, sottotitoli } = finteApi();
+    disegna(api, true);
+    emetti('videoConferenceJoined');
+    // Lo manda anche la sola trascrizione: decide lo stato della registrazione.
+    emetti('recordingStatusChanged', { on: false, mode: 'file', transcription: false });
+    expect(sottotitoli()).toHaveLength(1);
+  });
+
+  it('un cambio della lingua manda di nuovo la scelta', () => {
+    const { api, emetti, sottotitoli } = finteApi();
+    disegna(api, true);
+    emetti('videoConferenceJoined');
+    disegna(api, true, { lingua: 'en' });
+    expect(sottotitoli().map((c) => c[3])).toEqual(['it', 'en']);
   });
 
   it("un cambio dell'interruttore manda la nuova scelta una volta", () => {

@@ -1431,6 +1431,7 @@ export default function LiveEventClient({
     // Solo un'etichetta per Jitsi: la lingua parlata la sceglie il servizio,
     // dalla lingua predefinita dell'istanza, e qui si usa la stessa.
     lingua: primaryLanguageCode(event.liveCaptionsLanguage),
+    registrazione: isRecording,
   });
   // L'ora d'avvio della registrazione secondo il server (la cronologia della
   // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
