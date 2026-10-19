@@ -4,5 +4,5 @@
 # torch, WhisperX o Piper: quelli servono solo al worker con la GPU
 # (requirements.txt), e da soli fanno un'immagine di ~15 GB.
 httpx==0.28.1
-pydantic==2.9.2
+pydantic==2.14.1
 numpy==2.5.4
