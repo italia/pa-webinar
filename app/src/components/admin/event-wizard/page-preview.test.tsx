@@ -60,12 +60,14 @@ const MODULO = {
       organization: 'Ente',
       organizationLogoUrl: null,
       publicListed: true,
+      photoId: '22222222-2222-4222-8222-222222222222',
     },
   ],
   moderatorName: 'Chi organizza',
   moderatorPublicListed: true,
   moderatorOrganization: null,
   moderatorOrganizationLogoUrl: null,
+  moderatorPhotoId: null as string | null,
 };
 
 const INIZIO = new Date('2026-10-29T09:00:00Z');
@@ -88,6 +90,12 @@ describe('datiAnteprima', () => {
       ['Chi organizza', 'organizer'],
       ['Anna', 'moderator'],
       ['Luca', 'speaker'],
+    ]);
+    // La foto caricata compare come nella pagina; senza, le iniziali.
+    expect(d.persone.persone.map((p) => p.photoUrl)).toEqual([
+      null,
+      null,
+      '/api/avatar/person/22222222-2222-4222-8222-222222222222',
     ]);
   });
 
@@ -191,6 +199,9 @@ describe('PagePreview', () => {
     expect(ridotta.querySelector('.event-title-kicker')?.textContent).toBe('Ciclo');
     expect(ridotta.textContent).toContain('Riuso');
     expect(ridotta.textContent).toContain('Comune di Esempio');
+    // La foto della persona, nel cerchio come nella pagina.
+    const foto = ridotta.querySelector<HTMLImageElement>('img.event-person__photo');
+    expect(foto?.getAttribute('src')).toBe('/api/avatar/person/22222222-2222-4222-8222-222222222222');
     // L'etichetta e' testo, non un link all'elenco degli eventi.
     expect(
       Array.from(ridotta.querySelectorAll('a')).some((a) => a.textContent === 'Riuso')

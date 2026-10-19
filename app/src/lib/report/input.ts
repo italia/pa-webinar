@@ -285,6 +285,7 @@ export async function ingressoResoconto(
       moderatorPublicListed: true,
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
+      moderatorPhotoId: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });

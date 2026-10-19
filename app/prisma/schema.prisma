@@ -112,6 +112,10 @@ model Event {
   moderatorOrganization        String? @map("moderator_organization")
   moderatorOrganizationLogoUrl String? @map("moderator_organization_logo_url")
   moderatorPublicListed        Boolean @default(false) @map("moderator_public_listed")
+  // La sua foto (EventPersonPhoto), caricata dallo staff: nella pagina
+  // pubblica compare solo se la persona e' presentata, come il nome.
+  moderatorPhotoId String?           @map("moderator_photo_id") @db.Uuid
+  moderatorPhoto   EventPersonPhoto? @relation("FotoOrganizzatorePrincipale", fields: [moderatorPhotoId], references: [id], onDelete: SetNull)
 
   // Optional join password. When set, guests visiting /live without a
   // valid accessToken or matching password are redirected to a password
@@ -363,6 +367,8 @@ model Event {
   // «Gli eventi di questo organizzatore»: l'elenco dell'area di
   // amministrazione per chi non e' amministratore.
   @@index([createdById], map: "events_created_by_id_idx")
+  // «Chi usa ancora questa foto»: la pulizia delle foto delle persone.
+  @@index([moderatorPhotoId])
   @@map("events")
 }
 
@@ -409,6 +415,10 @@ model EventModerator {
   // La persona compare nella pagina pubblica dell'evento. Spento di default:
   // nome ed ente si pubblicano solo per scelta di chi compila, per ognuno.
   publicListed Boolean @default(false) @map("public_listed")
+  // La foto della persona (EventPersonPhoto), caricata dallo staff: nella
+  // pagina pubblica compare solo con publicListed, come il nome.
+  photoId String?           @map("photo_id") @db.Uuid
+  photo   EventPersonPhoto? @relation(fields: [photoId], references: [id], onDelete: SetNull)
 
   // Per-grant magic link token. Still UUID so `randomUUID()` from
   // crypto can generate it safely.
@@ -421,6 +431,7 @@ model EventModerator {
 
   @@index([eventId])
   @@index([emailHash])
+  @@index([photoId])
   @@map("event_moderators")
 }
 
@@ -2652,4 +2663,25 @@ model ProfilePhoto {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("profile_photos")
+}
+
+// La foto di una persona dell'evento (organizzatore principale, moderatore,
+// relatore): la persona la manda a chi organizza, che la carica nel wizard.
+// La piattaforma non chiede un consenso suo: la foto compare nella pagina
+// pubblica solo se la persona e' presentata (publicListed), come il nome.
+// Il server la ricodifica in JPEG 400x400 senza metadati: piccola per
+// costruzione, sta qui come ProfilePhoto. Una riga puo' servire piu' eventi
+// (la copia di un evento porta con se' la foto della persona): si cancella
+// solo quando nessuno la usa piu' (lib/events/person-photo-store), mai con
+// una deleteMany senza quel controllo.
+model EventPersonPhoto {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contentType String   @map("content_type") @db.VarChar(32)
+  bytes       Bytes
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  leadOf Event[]          @relation("FotoOrganizzatorePrincipale")
+  grants EventModerator[]
+
+  @@map("event_person_photos")
 }

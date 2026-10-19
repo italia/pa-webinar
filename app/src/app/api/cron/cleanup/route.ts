@@ -24,10 +24,15 @@ import {
   staffInactiveDeactivateDays,
 } from '@/lib/gdpr/log-retention';
 import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
+import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
 import { CAPTIONS_TRANSCRIPT_MODEL } from '@/lib/captions/transcript';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
+
+/** Giorni dopo cui la foto di una persona dell'evento che nessuno usa (mai
+ *  salvata, sostituita, o di un evento cancellato) si cancella. */
+const PERSON_PHOTO_GRACE_DAYS = 7;
 
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +41,10 @@ export const dynamic = 'force-dynamic';
  *
  * GDPR data cleanup: for events whose retention period has expired, deletes
  * participant personal data — registrations, chat messages (encrypted),
- * invitations, named grants, consents, reactions — and strips every identity
- * from the content that stays with the event (questions, poll votes, words,
- * ratings, end-of-event answers, materials). Ripassa ogni giorno sugli eventi
+ * invitations, named grants and their photos, the lead organizer's photo,
+ * consents, reactions — and strips every identity from the content that
+ * stays with the event (questions, poll votes, words, ratings, end-of-event
+ * answers, materials). Ripassa ogni giorno sugli eventi
  * oltre la conservazione: tutto e' idempotente, e cosi' toglie anche cio' che
  * si fosse scritto dopo il primo giro o che un giro fallito avesse lasciato.
  * L'evento concluso resta com'e'.
@@ -47,9 +53,10 @@ export const dynamic = 'force-dynamic';
  * oltre la fine più la retention): vengono archiviati, con le sessioni di
  * chiamata chiuse, e ripuliti nello stesso giro.
  *
- * Fuori dagli eventi: svuota la coda delle email inviate o fallite e toglie
+ * Fuori dagli eventi: svuota la coda delle email inviate o fallite, toglie
  * IP, user agent e nomi dal registro audit oltre la loro conservazione
- * (lib/gdpr/log-retention).
+ * (lib/gdpr/log-retention) e cancella le foto delle persone che nessun evento
+ * usa piu'.
  *
  * Se una parte fallisce risponde 500 con `ok: false` e l'elenco delle parti
  * fallite: il CronJob fallisce e si vede, invece di dare un esito verde a una
@@ -188,6 +195,7 @@ export const GET = withErrorHandling(async (request) => {
       tempRecordingUrl: true,
       recordingPublished: true,
       transcriptPublished: true,
+      moderatorPhotoId: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
@@ -396,6 +404,13 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Le foto delle persone (EventPersonPhoto) delle concessioni: si
+        // leggono prima di cancellare le righe che le indicano.
+        const fotoConcessioni = await tx.eventModerator.findMany({
+          where: { eventId: evt.id, photoId: { not: null } },
+          select: { photoId: true },
+        });
+
         // Named moderator/speaker grants: `name` and `email` are encrypted PII
         // and `token` is a durable magic-link credential. Same cascade trap as
         // the chat above — the event row survives the cleanup, so nothing else
@@ -405,6 +420,21 @@ export const GET = withErrorHandling(async (request) => {
         // series would otherwise keep one contact's address alive indefinitely.
         const moderatorGrantsDeleted = await tx.eventModerator.deleteMany({
           where: { eventId: evt.id },
+        });
+
+        // La foto dell'organizzatore principale se ne va anche se il suo nome
+        // resta sull'evento. Poi questa e quelle delle concessioni, solo se
+        // nessun altro evento le usa: la copia di un evento condivide la foto
+        // della persona, e la tiene finche' dura la sua conservazione.
+        const leadOrganizerPhotoCleared = await tx.event.updateMany({
+          where: { id: evt.id, moderatorPhotoId: { not: null } },
+          data: { moderatorPhotoId: null },
+        });
+        const personPhotosDeleted = await deleteUnreferencedPersonPhotos(tx, {
+          ids: [
+            ...fotoConcessioni.map((f) => f.photoId).filter((id): id is string => !!id),
+            ...(evt.moderatorPhotoId ? [evt.moderatorPhotoId] : []),
+          ],
         });
 
         // Per-participant audio track rows (ADR-013). `displayName` is encrypted
@@ -468,6 +498,8 @@ export const GET = withErrorHandling(async (request) => {
           agendaReactions: agendaReactionsDeleted.count,
           invitations: invitationsDeleted.count,
           moderatorGrants: moderatorGrantsDeleted.count,
+          leadOrganizerPhotos: leadOrganizerPhotoCleared.count,
+          personPhotos: personPhotosDeleted,
           recordingTracks: recordingTracksDeleted.count,
           callSessionsScrubbed: callSessionsScrubbed.count,
         };
@@ -586,6 +618,20 @@ export const GET = withErrorHandling(async (request) => {
     failures.push('profile-photos');
   }
 
+  // ── Foto delle persone degli eventi ──
+  // Quelle che nessun evento e nessuna concessione usano piu': caricate e mai
+  // salvate, sostituite da un'altra, o di un evento cancellato. Il margine
+  // lascia il tempo di salvare il wizard in cui sono state caricate.
+  let personPhotosSwept = 0;
+  try {
+    personPhotosSwept = await deleteUnreferencedPersonPhotos(prisma, {
+      olderThan: new Date(now.getTime() - PERSON_PHOTO_GRACE_DAYS * 86_400_000),
+    });
+  } catch (err) {
+    console.error('[cron/cleanup] Failed to purge unused person photos:', err);
+    failures.push('person-photos');
+  }
+
   // ── Coda delle email ──
   // Una riga inviata o fallita conserva destinatario, testo (con i link
   // personali) e allegato .ics: non serve piu' a nulla dopo la conservazione.
@@ -673,6 +719,7 @@ export const GET = withErrorHandling(async (request) => {
       staffAccountsDeactivated: staffDeactivated,
       emailOutboxDeleted: outboxDeleted,
       profilePhotosDeleted,
+      personPhotosDeleted: personPhotosSwept,
       emailOutboxScrubbed: outboxScrubbed,
       auditLogRowsScrubbed: auditScrubbed,
       tempRecordingsCleaned: tempRecordingEvents.length,

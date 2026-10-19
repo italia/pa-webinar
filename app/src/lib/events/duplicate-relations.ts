@@ -45,6 +45,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   gdprTemplate: 'il legame viaggia con la colonna gdprTemplateId',
   recurrenceSeries: 'idem con recurrenceSeriesId: l’appartenenza a una serie si assegna, non si eredita',
   seriesChildren: 'lato inverso: le occorrenze figlie restano dell’originale',
+  moderatorPhoto: 'il legame viaggia con la colonna moderatorPhotoId: la copia usa la stessa foto',
 
   // Persone e loro azioni: copiarle significherebbe iscrivere o invitare
   // qualcuno a un evento a cui non ha mai detto di sì.
@@ -95,6 +96,7 @@ export const DUPLICATE_SOURCE_INCLUDE = {
       organizer: true,
       organization: true,
       organizationLogoUrl: true,
+      photoId: true,
     },
   },
   agendaItems: {
@@ -204,12 +206,14 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
         email: m.email,
         emailHash: m.emailHash,
         role: m.role,
-        // Ruolo ed ente seguono la persona; la pubblicazione no: presentare
-        // qualcuno nella pagina pubblica è una scelta per ogni evento, e la
-        // copia parte senza.
+        // Ruolo, ente e foto seguono la persona; la pubblicazione no:
+        // presentare qualcuno nella pagina pubblica è una scelta per ogni
+        // evento, e la copia parte senza. La foto è la stessa riga
+        // dell'originale: si cancella solo quando nessuno la usa più.
         organizer: m.organizer,
         organization: m.organization,
         organizationLogoUrl: m.organizationLogoUrl,
+        photoId: m.photoId,
         publicListed: false,
         // Il token NON si eredita mai: è la credenziale con cui si entra in
         // sala da moderatore. Riusarlo darebbe al vecchio link il controllo

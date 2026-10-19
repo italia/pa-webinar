@@ -4,6 +4,7 @@ import { useContext, useEffect, useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Scelta } from '@/components/admin/guided-format';
+import PersonPhotoField, { PersonAvatar } from '@/components/admin/person-photo-field';
 import RubricaPicker, {
   RubricaAccessContext,
   type RubricaPickedPerson,
@@ -24,12 +25,15 @@ export interface OrganizerEntry {
   websiteUrl: string | null;
 }
 
-/** L'ente di una persona e se la pagina pubblica la presenta. L'ente della
- *  persona può essere diverso da quello che organizza l'evento. */
+/** L'ente di una persona, la sua foto e se la pagina pubblica la presenta.
+ *  L'ente della persona può essere diverso da quello che organizza l'evento. */
 export interface PersonProfile {
   organization: string | null;
   organizationLogoUrl: string | null;
   publicListed: boolean;
+  /** La foto caricata dallo staff (EventPersonPhoto). Assente in una bozza
+   *  salvata prima che la foto esistesse: il salvataggio non la tocca. */
+  photoId?: string | null;
 }
 
 /** Organizzatori e moderatori: conducono la sala, ognuno con il proprio link. */
@@ -83,6 +87,7 @@ interface LeadOrganizerPatch {
   moderatorOrganization?: string | null;
   moderatorOrganizationLogoUrl?: string | null;
   moderatorPublicListed?: boolean;
+  moderatorPhotoId?: string | null;
 }
 
 interface Props {
@@ -103,6 +108,9 @@ interface Props {
   /** Prima degli inviti: chi si iscrive e cosa gli si chiede
    *  (SezioneIscrizione). */
   iscrizione?: React.ReactNode;
+  /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
+   *  non si cambiano. */
+  photosLocked?: boolean;
 }
 
 const isEmail = emailValida;
@@ -115,6 +123,7 @@ export default function StepPeople({
   publicRegistrationEnabled = true,
   children,
   iscrizione,
+  photosLocked = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
@@ -140,6 +149,7 @@ export default function StepPeople({
         speakers={value.speakers}
         onChange={onChange}
         taken={principale}
+        photosLocked={photosLocked}
       />
 
       {iscrizione}
@@ -158,7 +168,8 @@ export default function StepPeople({
  * L'organizzatore principale: riceve per email il link condiviso per condurre
  * l'evento. Nome ed email servono per pubblicare, non per la bozza: finche'
  * mancano lo dicono (lampeggiano, con la riga «serve per pubblicare»), e
- * dopo un tentativo insistono. Ente, logo e pagina pubblica restano ripiegati.
+ * dopo un tentativo insistono. Foto, ente, logo e pagina pubblica restano
+ * ripiegati.
  */
 export function PrimarySection({
   primary,
@@ -167,6 +178,7 @@ export function PrimarySection({
   prefilledModeratorEmail,
   showLinksOnPublish,
   perPubblicare = true,
+  photosLocked = false,
 }: {
   primary: LeadOrganizer;
   onPrimaryChange: (patch: LeadOrganizerPatch) => void;
@@ -175,16 +187,21 @@ export function PrimarySection({
   showLinksOnPublish: boolean;
   /** Si pubblica da qui (creazione): nome ed email lo dicono finche' mancano. */
   perPubblicare?: boolean;
+  /** Senza sessione dello staff la foto si vede e non si cambia. */
+  photosLocked?: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tf = useTranslations('admin.wizard.flow');
   const profiloErrato = !!(
-    fieldErrors.moderatorOrganization || fieldErrors.moderatorOrganizationLogoUrl
+    fieldErrors.moderatorOrganization ||
+    fieldErrors.moderatorOrganizationLogoUrl ||
+    fieldErrors.moderatorPhotoId
   );
   // Aperto se all'apertura c'era gia' qualcosa: svuotare un campo non lo
   // richiude sotto il cursore.
   const [altroAperto, setAltroAperto] = useState(
     profiloErrato ||
+      !!primary.photoId ||
       !!primary.organization ||
       !!primary.organizationLogoUrl ||
       primary.publicListed
@@ -293,11 +310,21 @@ export function PrimarySection({
               promemoria('wiz-primary-email-promemoria')}
           </div>
           <div className="col-12">
-            {/* Ente, logo e pagina pubblica: non servono per pubblicare,
-                restano ripiegati (aperti se hanno gia' un valore o un errore). */}
+            {/* Foto, ente, logo e pagina pubblica: non servono per
+                pubblicare, restano ripiegati (aperti se hanno gia' un valore
+                o un errore). */}
             <details className="wizard-primary__more" open={altroAperto || undefined}>
               <summary className="small">{t('primaryMore')}</summary>
               <div className="row g-3 pt-2">
+                <div className="col-12">
+                  <PersonPhotoField
+                    id="wiz-primary-photo"
+                    name={primary.name}
+                    photoId={primary.photoId}
+                    onChange={(v) => onPrimaryChange({ moderatorPhotoId: v })}
+                    readOnly={photosLocked}
+                  />
+                </div>
                 <div className="col-md-6">
                   <label className="form-label" htmlFor="wiz-primary-org">
                     {t('personOrganization')}
@@ -622,6 +649,7 @@ const BOZZA_VUOTA: Bozza = {
   organization: null,
   organizationLogoUrl: null,
   publicListed: false,
+  photoId: null,
 };
 
 /** Mette una persona nell'elenco del suo ruolo. */
@@ -648,12 +676,14 @@ function PeopleSection({
   speakers,
   onChange,
   taken,
+  photosLocked,
 }: {
   moderators: ModeratorEntry[];
   speakers: SpeakerEntry[];
   onChange: (patch: Partial<StepPeopleValue>) => void;
   /** Gli indirizzi già usati altrove (l'organizzatore principale). */
   taken: readonly string[];
+  photosLocked: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'person';
@@ -721,6 +751,7 @@ function PeopleSection({
           organization: draft.organization?.trim() || null,
           organizationLogoUrl: draft.organizationLogoUrl?.trim() || null,
           publicListed: draft.publicListed,
+          photoId: draft.photoId ?? null,
         },
         draft.role
       )
@@ -748,6 +779,8 @@ function PeopleSection({
           organization: p.organization?.trim() || null,
           organizationLogoUrl: null,
           publicListed: false,
+          // La rubrica non ha foto: la persona la manda a chi organizza.
+          photoId: null,
         },
         draft.role
       );
@@ -778,9 +811,12 @@ function PeopleSection({
                 className="list-group-item wizard-person"
               >
                 <div className="d-flex justify-content-between align-items-start gap-2">
-                  <div className="text-break">
-                    <div className="fw-semibold">{r.entry.name}</div>
-                    <small className="text-muted">{r.entry.email}</small>
+                  <div className="wizard-person__chi">
+                    <PersonAvatar name={r.entry.name} photoId={r.entry.photoId} />
+                    <div className="text-break">
+                      <div className="fw-semibold">{r.entry.name}</div>
+                      <small className="text-muted">{r.entry.email}</small>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -850,6 +886,14 @@ function PeopleSection({
                       </div>
                     </details>
                     <LogoEsterno url={r.entry.organizationLogoUrl} />
+                    <PersonPhotoField
+                      id={`${rid}-photo`}
+                      name={r.entry.name}
+                      photoId={r.entry.photoId}
+                      onChange={(v) => aggiorna(r, { photoId: v })}
+                      readOnly={photosLocked}
+                      compact
+                    />
                   </div>
                 </div>
               </li>
@@ -933,6 +977,16 @@ function PeopleSection({
           />
           <LogoEsterno url={draft.organizationLogoUrl} />
         </div>
+        {!photosLocked && (
+          <div className="col-12">
+            <PersonPhotoField
+              id={`${id}-photo`}
+              name={draft.name}
+              photoId={draft.photoId}
+              onChange={(v) => setDraft((d) => ({ ...d, photoId: v }))}
+            />
+          </div>
+        )}
         <div className="col-md-8">
           <div className="form-check">
             <input

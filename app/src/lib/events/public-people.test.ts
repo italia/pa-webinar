@@ -30,6 +30,7 @@ describe('ruoloPubblico e ordinaPersone', () => {
       role: ruoloPubblico({ role, organizer }),
       organization: null,
       logoUrl: null,
+      photoUrl: null,
     });
     const ordinate = ordinaPersone([p('Zeno', 'SPEAKER'), p('Bea', 'MODERATOR'), p('Ada', 'MODERATOR', true)]);
     expect(ordinate.map((x) => [x.name, x.role])).toEqual([
@@ -43,13 +44,14 @@ describe('ruoloPubblico e ordinaPersone', () => {
 const base = {
   organizers: [{ name: 'Ente A', logoUrl: '/api/assets/a.png', websiteUrl: 'javascript:alert(1)' }],
   additionalMods: [
-    { name: 'cifrato:Relatore 1', role: 'SPEAKER' as const, organizer: false, organization: 'Ente B', organizationLogoUrl: 'https://altro.example/logo.png' },
-    { name: 'cifrato:Conduttore 1', role: 'MODERATOR' as const, organizer: false, organization: null, organizationLogoUrl: null },
+    { name: 'cifrato:Relatore 1', role: 'SPEAKER' as const, organizer: false, organization: 'Ente B', organizationLogoUrl: 'https://altro.example/logo.png', photoId: 'foto-relatore' },
+    { name: 'cifrato:Conduttore 1', role: 'MODERATOR' as const, organizer: false, organization: null, organizationLogoUrl: null, photoId: null },
   ],
   moderatorName: 'Organizzatrice',
   moderatorPublicListed: false,
   moderatorOrganization: null,
   moderatorOrganizationLogoUrl: null,
+  moderatorPhotoId: 'foto-organizzatrice' as string | null,
 };
 const decifra = vi.fn((v: string) => v.replace('cifrato:', ''));
 
@@ -68,5 +70,21 @@ describe('entiEPersonePubblici', () => {
     expect(entiEPersonePubblici(base, decifra).persone.some((p) => p.name === 'Organizzatrice')).toBe(false);
     const pubblicato = entiEPersonePubblici({ ...base, moderatorPublicListed: true }, decifra);
     expect(pubblicato.persone[0]).toMatchObject({ name: 'Organizzatrice', role: 'organizer' });
+  });
+
+  it('la foto segue la persona: il percorso dell’app, o niente', () => {
+    const { persone } = entiEPersonePubblici({ ...base, moderatorPublicListed: true }, decifra);
+    expect(persone.map((p) => [p.name, p.photoUrl])).toEqual([
+      ['Organizzatrice', '/api/avatar/person/foto-organizzatrice'],
+      ['Conduttore 1', null],
+      ['Relatore 1', '/api/avatar/person/foto-relatore'],
+    ]);
+  });
+
+  it('la foto dell’organizzatore principale non presentato non esce da nessuna parte', () => {
+    // Le concessioni arrivano già filtrate dalla query (publicListed); il
+    // moderatore principale è filtrato qui, e con lui la sua foto.
+    const { persone } = entiEPersonePubblici(base, decifra);
+    expect(persone.some((p) => p.photoUrl === '/api/avatar/person/foto-organizzatrice')).toBe(false);
   });
 });

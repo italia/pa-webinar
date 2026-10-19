@@ -67,6 +67,7 @@ export function datiAnteprima(
     | 'moderatorPublicListed'
     | 'moderatorOrganization'
     | 'moderatorOrganizationLogoUrl'
+    | 'moderatorPhotoId'
   >,
   {
     locale,
@@ -100,6 +101,7 @@ export function datiAnteprima(
             organizer: m.organizer,
             organization: m.organization,
             organizationLogoUrl: m.organizationLogoUrl,
+            photoId: m.photoId ?? null,
           })),
         ...(form.speakers ?? [])
           .filter((s) => s.publicListed && s.name.trim())
@@ -109,12 +111,14 @@ export function datiAnteprima(
             organizer: false,
             organization: s.organization,
             organizationLogoUrl: s.organizationLogoUrl,
+            photoId: s.photoId ?? null,
           })),
       ],
       moderatorName: form.moderatorName || null,
       moderatorPublicListed: !!form.moderatorPublicListed,
       moderatorOrganization: form.moderatorOrganization ?? null,
       moderatorOrganizationLogoUrl: form.moderatorOrganizationLogoUrl ?? null,
+      moderatorPhotoId: form.moderatorPhotoId ?? null,
     },
     (nome) => nome
   );

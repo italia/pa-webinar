@@ -106,6 +106,7 @@ export const CREATED_EVENT_FIELDS = [
   'moderatorOrganization',
   'moderatorOrganizationLogoUrl',
   'moderatorPublicListed',
+  'moderatorPhotoId',
 
   // serie
   'recurrenceRule',

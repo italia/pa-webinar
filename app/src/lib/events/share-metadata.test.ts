@@ -85,11 +85,13 @@ describe('immagine e persone', () => {
       organizer: false,
       organization: null,
       organizationLogoUrl: null,
+      photoId: null,
     })),
     moderatorName: null,
     moderatorPublicListed: false,
     moderatorOrganization: null,
     moderatorOrganizationLogoUrl: null,
+    moderatorPhotoId: null,
   });
 
   it('togliere un relatore cambia l’indirizzo della scheda', () => {

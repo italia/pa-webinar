@@ -6232,11 +6232,19 @@ button.live-time-strip__rec {
   object-fit: contain;
 }
 
-.event-person__logo {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 6px;
+// La foto di una persona (o le iniziali) in un cerchio: il file e' quadrato,
+// il cerchio lo disegna la pagina. Un filo chiaro la stacca dal fondo.
+.event-person__photo,
+.event-person__initials {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.event-person__photo {
+  object-fit: cover;
   background: #fff;
 }
 
@@ -6246,13 +6254,20 @@ button.live-time-strip__rec {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
   border-radius: 50%;
   background: rgba(0, 102, 204, 0.1);
   color: #004d99;
-  font-size: 0.85rem;
   font-weight: 700;
+}
+
+.event-org__initials {
+  width: 40px;
+  height: 40px;
+  font-size: 0.85rem;
+}
+
+.event-person__initials {
+  font-size: 0.95rem;
 }
 
 .event-org__name {
@@ -6273,6 +6288,18 @@ button.live-time-strip__rec {
 .event-person__org {
   color: #5a6772;
   font-size: 0.85rem;
+}
+
+// Il logo dell'ente della persona, piccolo, in riga con il nome dell'ente: un
+// nome lungo va a capo sotto il logo, non in una colonna accanto.
+.event-person__org-logo {
+  display: inline-block;
+  width: auto;
+  height: 18px;
+  max-width: 72px;
+  margin-right: 0.35rem;
+  object-fit: contain;
+  vertical-align: -4px;
 }
 
 .registration-when {
@@ -11223,7 +11250,7 @@ html:has(.wizard-azioni) {
   color: #a1253b;
 }
 
-// Ente, logo e pagina pubblica dell'organizzatore principale, ripiegati.
+// Foto, ente, logo e pagina pubblica dell'organizzatore principale, ripiegati.
 .wizard-primary__more > summary {
   cursor: pointer;
   color: var(--app-primary);
@@ -11307,6 +11334,88 @@ html:has(.wizard-azioni) {
 .wizard-person__logo > summary {
   cursor: pointer;
   color: var(--app-primary);
+}
+
+// La foto di una persona (o le sue iniziali) in un cerchio: wizard e
+// anteprima della pagina. Il file e' quadrato, il cerchio e' solo qui.
+.person-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.person-avatar--iniziali {
+  background: rgba(0, 102, 204, 0.1);
+  color: #004d99;
+  font-weight: 700;
+}
+
+// La foto nel wizard: il cerchio, il titolo, l'aiuto e i pulsanti.
+.person-photo-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.person-photo-field__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.person-photo-field__title {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.person-photo-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+// Nella riga di una persona gia' in elenco: pulsanti leggeri, come «Cambia il
+// logo dell'ente» accanto.
+.person-photo-field__actions--riga {
+  gap: 0.25rem 0.75rem;
+  margin-top: 0;
+
+  .btn {
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    text-decoration: underline;
+  }
+}
+
+.person-photo-field__msg--ok {
+  color: #00663f;
+}
+
+.person-photo-field__msg--errore {
+  color: #a1112e;
+  font-weight: 600;
+}
+
+// Nella riga di una persona gia' in elenco: la foto accanto al nome.
+.wizard-person__chi {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .wizard-group--static {
@@ -12299,6 +12408,23 @@ html:has(.wizard-azioni) {
     transform-origin: 0 0;
     pointer-events: none;
   }
+}
+// Il riquadro quadrato (la foto di una persona): stretto e al centro, per
+// restare dentro lo schermo anche in orizzontale.
+.ritaglio-immagine__cornice--stretta {
+  max-width: min(100%, 22rem);
+  margin-inline: auto;
+}
+// Il cerchio in cui la pagina mostra la foto: gli angoli fuori dal cerchio si
+// scuriscono, il bordo bianco segna dove finisce. Solo un'indicazione: il
+// file resta quadrato.
+.ritaglio-immagine__maschera {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(23, 50, 77, 0.55);
+  outline: 2px solid #fff;
 }
 // Sotto il riquadro, la fascia della pagina dell'evento sugli schermi larghi:
 // stesso disegno di .event-cover (immagine intera al centro, lati sfumati).

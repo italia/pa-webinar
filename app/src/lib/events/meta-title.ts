@@ -29,6 +29,7 @@ const campiPerIlTitolo = cache((slug: string) =>
       moderatorPublicListed: true,
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
+      moderatorPhotoId: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   }),

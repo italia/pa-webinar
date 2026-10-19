@@ -43,6 +43,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/[id]/glossary/route.ts': 'glossario della post-produzione del proprio evento',
   'api/admin/glossary/route.ts': 'glossario comune della post-produzione: chi organizza lo legge e lo arricchisce',
   'api/admin/glossary/[id]/route.ts': 'solo le voci del glossario comune aggiunte da chi organizza',
+  'api/admin/person-photos/route.ts': 'foto delle persone dei propri eventi, caricate dal wizard',
   'api/admin/events/[id]/glossary/[termId]/route.ts': 'glossario della post-produzione del proprio evento',
   'api/admin/events/[id]/invitations/route.ts': 'proprio evento',
   'api/admin/events/[id]/invitations/[invId]/route.ts': 'proprio evento',

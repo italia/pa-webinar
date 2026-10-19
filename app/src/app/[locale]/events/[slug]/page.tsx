@@ -172,6 +172,7 @@ export default async function EventDetailPage({
             .map((p) => ({
               '@type': 'Person',
               name: p.name,
+              ...(p.photoUrl ? { image: `${baseUrl}${p.photoUrl}` } : {}),
               ...(p.organization ? { affiliation: { '@type': 'Organization', name: p.organization } } : {}),
             })),
         }

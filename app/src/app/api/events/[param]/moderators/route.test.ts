@@ -9,6 +9,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
     eventModerator: { create: vi.fn() },
+    eventPersonPhoto: { findFirst: vi.fn() },
   },
 }));
 vi.mock('@/lib/crypto/pii', () => ({
@@ -43,7 +44,9 @@ import { POST } from './route';
 const db = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn> };
   eventModerator: { create: ReturnType<typeof vi.fn> };
+  eventPersonPhoto: { findFirst: ReturnType<typeof vi.fn> };
 };
+const FOTO = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
 
 const EVENT_ID = '0e5c3a9e-4b1d-4c7e-9f2a-6d8b1c3e5f70';
 const PRIMARY = '7b2f9c1e-3a4d-4e5f-8a6b-9c0d1e2f3a4b';
@@ -154,5 +157,29 @@ describe('POST /api/events/[param]/moderators — profilo della persona', () => 
     const data = db.eventModerator.create.mock.calls[0]![0].data;
     expect(data.publicListed).toBeUndefined();
     expect(data.organizer).toBeUndefined();
+    expect(data.photoId).toBeUndefined();
+    expect(db.eventPersonPhoto.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('salva la foto caricata dal wizard, se nessun altro evento la usa', async () => {
+    db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
+    const res = await POST(
+      post({ name: 'Relatore 1', role: 'SPEAKER', photoId: FOTO }) as never,
+      ctx as never,
+    );
+    expect(res.status).toBe(201);
+    expect(db.eventModerator.create.mock.calls[0]![0].data.photoId).toBe(FOTO);
+    const where = db.eventPersonPhoto.findFirst.mock.calls[0]![0].where as { OR: unknown[] };
+    expect(where.OR).toContainEqual({ grants: { some: { eventId: EVENT_ID } } });
+  });
+
+  it('una foto che non c’è più si lascia cadere: la persona si aggiunge comunque', async () => {
+    db.eventPersonPhoto.findFirst.mockResolvedValue(null);
+    const res = await POST(
+      post({ name: 'Relatore 1', role: 'SPEAKER', photoId: FOTO }) as never,
+      ctx as never,
+    );
+    expect(res.status).toBe(201);
+    expect(db.eventModerator.create.mock.calls[0]![0].data.photoId).toBeNull();
   });
 });

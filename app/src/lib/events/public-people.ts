@@ -6,12 +6,16 @@
  */
 
 import type { PersonRole } from './grant-profile';
+import { personPhotoPath } from './person-photo';
 
 export interface PersonaPubblica {
   name: string;
   role: PersonRole;
   organization: string | null;
   logoUrl: string | null;
+  /** La foto della persona (percorso dell'app), solo se è presentata: come
+   *  il nome, compare per la scelta di chi compila. */
+  photoUrl: string | null;
 }
 
 export interface EntePubblico {
@@ -71,7 +75,14 @@ export const PERSONE_PUBBLICHE_INCLUDE = {
   },
   additionalMods: {
     where: { publicListed: true, revokedAt: null },
-    select: { name: true, role: true, organizer: true, organization: true, organizationLogoUrl: true },
+    select: {
+      name: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      organizationLogoUrl: true,
+      photoId: true,
+    },
   },
 } as const;
 
@@ -83,11 +94,13 @@ interface EventoConPersone {
     organizer: boolean;
     organization: string | null;
     organizationLogoUrl: string | null;
+    photoId: string | null;
   }>;
   moderatorName: string | null;
   moderatorPublicListed: boolean;
   moderatorOrganization: string | null;
   moderatorOrganizationLogoUrl: string | null;
+  moderatorPhotoId: string | null;
 }
 
 /**
@@ -114,6 +127,7 @@ export function entiEPersonePubblici(
             role: 'organizer' as const,
             organization: event.moderatorOrganization,
             logoUrl: logoPubblico(event.moderatorOrganizationLogoUrl),
+            photoUrl: event.moderatorPhotoId ? personPhotoPath(event.moderatorPhotoId) : null,
           },
         ]
       : []),
@@ -122,6 +136,7 @@ export function entiEPersonePubblici(
       role: ruoloPubblico(m),
       organization: m.organization,
       logoUrl: logoPubblico(m.organizationLogoUrl),
+      photoUrl: m.photoId ? personPhotoPath(m.photoId) : null,
     })),
   ]);
   return { enti, persone };

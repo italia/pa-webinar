@@ -61,6 +61,9 @@ export const DUPLICATED_EVENT_FIELDS = [
   'moderatorEmail',
   'moderatorOrganization',
   'moderatorOrganizationLogoUrl',
+  // La foto segue la persona, come il logo: la copia usa la stessa riga, che
+  // si cancella solo quando nessun evento la usa più (person-photo-store).
+  'moderatorPhotoId',
   'organizerName',
   'speakersInfo',
   'imageUrl',

@@ -265,6 +265,7 @@ export interface InitialEventShape {
     moderatorOrganization: string | null;
     moderatorOrganizationLogoUrl: string | null;
     moderatorPublicListed: boolean;
+    moderatorPhotoId: string | null;
     /** Una chiamata istantanea non ha iscrizione. */
     eventType?: string;
     accessMode: EventAccessModeValue | null;
@@ -291,6 +292,7 @@ export interface InitialEventShape {
     organization: string | null;
     organizationLogoUrl: string | null;
     publicListed: boolean;
+    photoId: string | null;
     /** La concessione creata per un cambio di ruolo, al posto di questa. */
     replaces?: string;
   }>;
@@ -334,6 +336,8 @@ export interface Step5ReviewFields {
   moderatorOrganization: string | null;
   moderatorOrganizationLogoUrl: string | null;
   moderatorPublicListed: boolean;
+  /** La sua foto (EventPersonPhoto), caricata dallo staff. */
+  moderatorPhotoId: string | null;
   /** Chi partecipa (passo «Persone»): null = come dice il sito. */
   accessMode: EventAccessModeValue | null;
   /** Cosa si chiede a chi si iscrive, oltre a nome ed email. */
@@ -498,6 +502,7 @@ export default function EventWizard(props: WizardProps) {
             organization: m.organization,
             organizationLogoUrl: m.organizationLogoUrl,
             publicListed: m.publicListed,
+            photoId: m.photoId,
           })),
         speakers: initialEvent.eventModerators
           .filter((m) => m.role === 'SPEAKER')
@@ -509,6 +514,7 @@ export default function EventWizard(props: WizardProps) {
             organization: m.organization,
             organizationLogoUrl: m.organizationLogoUrl,
             publicListed: m.publicListed,
+            photoId: m.photoId,
           })),
         invitations: initialEvent.invitations.map((i) => ({
           name: i.name,
@@ -545,6 +551,7 @@ export default function EventWizard(props: WizardProps) {
         moderatorOrganization: ev.moderatorOrganization ?? null,
         moderatorOrganizationLogoUrl: ev.moderatorOrganizationLogoUrl ?? null,
         moderatorPublicListed: ev.moderatorPublicListed ?? false,
+        moderatorPhotoId: ev.moderatorPhotoId ?? null,
         accessMode: ev.accessMode,
         requireOrganization: ev.requireOrganization,
         requireOrganizationRole: ev.requireOrganizationRole,
@@ -678,6 +685,7 @@ export default function EventWizard(props: WizardProps) {
       moderatorOrganization: null,
       moderatorOrganizationLogoUrl: null,
       moderatorPublicListed: false,
+      moderatorPhotoId: null,
       accessMode: tpl?.accessMode ?? null,
       requireOrganization: false,
       requireOrganizationRole: false,
@@ -1362,6 +1370,7 @@ export default function EventWizard(props: WizardProps) {
           moderatorOrganization: form.moderatorOrganization?.trim() || null,
           moderatorOrganizationLogoUrl: form.moderatorOrganizationLogoUrl?.trim() || null,
           moderatorPublicListed: !!form.moderatorPublicListed,
+          moderatorPhotoId: form.moderatorPhotoId ?? null,
           // In modifica solo se cambiato: un evento che segue il sito (null)
           // continua a seguirlo finche' qui non si sceglie.
           // Con un link di conduzione non si manda mai: lo decide lo staff.
@@ -1683,6 +1692,7 @@ export default function EventWizard(props: WizardProps) {
       organization: form.moderatorOrganization ?? null,
       organizationLogoUrl: form.moderatorOrganizationLogoUrl ?? null,
       publicListed: !!form.moderatorPublicListed,
+      photoId: form.moderatorPhotoId ?? null,
     }),
     [
       form.moderatorName,
@@ -1690,6 +1700,7 @@ export default function EventWizard(props: WizardProps) {
       form.moderatorOrganization,
       form.moderatorOrganizationLogoUrl,
       form.moderatorPublicListed,
+      form.moderatorPhotoId,
     ]
   );
 
@@ -1849,6 +1860,8 @@ export default function EventWizard(props: WizardProps) {
               value={form}
               onChange={updateForm}
               invitationsLocked={viaToken !== null}
+              // Le foto si caricano con la sessione dello staff.
+              photosLocked={viaToken !== null}
               primary={primario}
               publicRegistrationEnabled={iscrizioneAperta}
               iscrizione={
@@ -1890,6 +1903,7 @@ export default function EventWizard(props: WizardProps) {
                   mode === 'create' || initialEvent?.event.status === 'DRAFT'
                 }
                 perPubblicare={mode === 'create'}
+                photosLocked={viaToken !== null}
               />
             </StepPeople>
           </RubricaAccessContext.Provider>
@@ -2139,6 +2153,7 @@ const CAMPI_DELL_EVENTO = [
   'moderatorOrganization',
   'moderatorOrganizationLogoUrl',
   'moderatorPublicListed',
+  'moderatorPhotoId',
   'parseTitleKicker',
   'requireOrganization',
   'requireOrganizationRole',

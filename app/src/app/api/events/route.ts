@@ -7,6 +7,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -120,6 +121,10 @@ export const POST = withErrorHandling(async (request) => {
     ]);
   }
 
+  // La foto dell'organizzatore principale, appena caricata dal wizard: se non
+  // c'e' piu' (o e' di un altro evento) l'evento nasce senza, non si rifiuta.
+  const fotoPrincipale = (await usablePersonPhotoId(data.moderatorPhotoId, null)) ?? null;
+
   const event = await prisma.event.create({
     data: {
       createdById: session.accountId,
@@ -191,6 +196,7 @@ export const POST = withErrorHandling(async (request) => {
       moderatorOrganization: data.moderatorOrganization || null,
       moderatorOrganizationLogoUrl: data.moderatorOrganizationLogoUrl || null,
       moderatorPublicListed: data.moderatorPublicListed ?? false,
+      moderatorPhotoId: fotoPrincipale,
       speakersInfo: data.speakersInfo,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,

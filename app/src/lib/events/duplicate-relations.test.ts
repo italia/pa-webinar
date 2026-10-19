@@ -38,6 +38,7 @@ function fullSource(): DuplicateSource {
         organizer: true,
         organization: 'Ente B',
         organizationLogoUrl: '/api/assets/images/b.png',
+        photoId: 'foto-1',
       },
       {
         name: 'cifrato:nome2',
@@ -47,6 +48,7 @@ function fullSource(): DuplicateSource {
         organizer: false,
         organization: null,
         organizationLogoUrl: null,
+        photoId: null,
       },
     ],
     agendaItems: [
@@ -138,16 +140,19 @@ describe('classificazione delle relazioni di Event', () => {
 });
 
 describe('duplicatedRelations', () => {
-  it('copia ruolo ed ente delle persone, non la pubblicazione', () => {
+  it('copia ruolo, ente e foto delle persone, non la pubblicazione', () => {
     const out = duplicatedRelations(fullSource());
     const created = out.additionalMods?.create as Record<string, unknown>[];
     expect(created[0]).toMatchObject({
       organizer: true,
       organization: 'Ente B',
       organizationLogoUrl: '/api/assets/images/b.png',
+      // La stessa riga della foto: la pulizia la toglie solo quando nessun
+      // evento la usa più.
+      photoId: 'foto-1',
       publicListed: false,
     });
-    expect(created[1]).toMatchObject({ organizer: false, publicListed: false });
+    expect(created[1]).toMatchObject({ organizer: false, photoId: null, publicListed: false });
   });
 
   it('non eredita MAI il token dei co-moderatori: è una credenziale', () => {

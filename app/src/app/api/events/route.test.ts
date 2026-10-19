@@ -45,6 +45,7 @@ vi.mock('@/lib/db', () => ({
     eventTagLink: { createMany: vi.fn(async () => undefined) },
     questionTemplate: { findUnique: vi.fn(async () => null) },
     eventQuestionnaire: { create: vi.fn(async () => undefined) },
+    eventPersonPhoto: { findFirst: vi.fn(async () => null) },
   },
 }));
 
@@ -67,7 +68,9 @@ const GDPR_ID = '3f2a1b0c-4d5e-4f6a-8b9c-0d1e2f3a4b5c';
 const mocked = prisma as unknown as {
   event: { create: ReturnType<typeof vi.fn> };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
+  eventPersonPhoto: { findFirst: ReturnType<typeof vi.fn> };
 };
+const FOTO = '5d1c2b3a-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
 
 /** Corpo minimo che supera `createEventSchema`, più i campi sotto esame. */
 function corpo(extra: Record<string, unknown> = {}) {
@@ -152,6 +155,30 @@ describe('POST /api/events — persistenza dei campi accettati', () => {
     expect(dati.postEventEmailEnabled).toBe(true);
     expect(dati.recordingConsentText).toBe('Testo del consenso');
     expect(dati.wordCloudEnabled).toBe(true);
+  });
+
+  it('la foto dell’organizzatore principale: salvata se nessuno la usa, lasciata cadere altrimenti', async () => {
+    // Da un indirizzo suo: il limite di creazioni per minuto conta per IP.
+    const daAltroIp = (body: unknown) =>
+      new Request('http://localhost/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-forwarded-for': '198.51.100.77' },
+        body: JSON.stringify(body),
+      }) as unknown as NextRequest;
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce({ id: FOTO });
+    await POST(daAltroIp(corpo({ moderatorPhotoId: FOTO })), { params: Promise.resolve({}) } as never);
+    expect(datiScritti().moderatorPhotoId).toBe(FOTO);
+    // Alla creazione la foto non può essere già di un evento.
+    expect(mocked.eventPersonPhoto.findFirst.mock.calls[0]![0].where).toEqual({
+      id: FOTO,
+      OR: [{ leadOf: { none: {} }, grants: { none: {} } }],
+    });
+
+    vi.clearAllMocks();
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce(null);
+    const res = await POST(daAltroIp(corpo({ moderatorPhotoId: FOTO })), { params: Promise.resolve({}) } as never);
+    expect(res.status).toBe(201);
+    expect(datiScritti().moderatorPhotoId).toBeNull();
   });
 
   it('la registrazione non parte mai da sola, anche se la richiesta lo chiede', async () => {

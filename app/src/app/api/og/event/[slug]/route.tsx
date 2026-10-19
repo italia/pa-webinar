@@ -221,6 +221,7 @@ export const GET = withErrorHandling(async (request, context) => {
       moderatorPublicListed: true,
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
+      moderatorPhotoId: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });

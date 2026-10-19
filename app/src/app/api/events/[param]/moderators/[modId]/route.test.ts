@@ -9,6 +9,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn(), update: vi.fn() },
+    eventPersonPhoto: { findFirst: vi.fn() },
     emailOutbox: { count: vi.fn(async () => 0) },
   },
 }));
@@ -46,8 +47,10 @@ import { PATCH, POST } from './route';
 const db = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn> };
   eventModerator: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+  eventPersonPhoto: { findFirst: ReturnType<typeof vi.fn> };
   emailOutbox: { count: ReturnType<typeof vi.fn> };
 };
+const FOTO = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
 
 const EVENT_ID = '0e5c3a9e-4b1d-4c7e-9f2a-6d8b1c3e5f70';
 const MOD_ID = '5d1c2b3a-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
@@ -104,6 +107,32 @@ describe('PATCH /api/events/[param]/moderators/[modId]', () => {
   it("un ente vuoto si toglie", async () => {
     await PATCH(patch({ organization: '' }) as never, ctx as never);
     expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ organization: null });
+  });
+
+  it('la foto si mette, e torna nella risposta', async () => {
+    db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
+    const res = await PATCH(patch({ photoId: FOTO }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ photoId: FOTO });
+    expect(db.eventModerator.update.mock.calls[0]![0].select).toMatchObject({ photoId: true });
+    expect(await res.json()).toMatchObject({ photoId: FOTO });
+  });
+
+  it('la foto si toglie senza cercarla', async () => {
+    await PATCH(patch({ photoId: null }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ photoId: null });
+    expect(db.eventPersonPhoto.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('una foto che non c’è più (o di un altro evento) si lascia cadere, senza rifiutare', async () => {
+    db.eventPersonPhoto.findFirst.mockResolvedValue(null);
+    const res = await PATCH(patch({ photoId: FOTO, publicListed: true }) as never, ctx as never);
+    expect(res.status).toBe(200);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ photoId: null, publicListed: true });
+  });
+
+  it('un profilo senza foto non la tocca', async () => {
+    await PATCH(patch({ publicListed: true }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).not.toHaveProperty('photoId');
   });
 
   it("una concessione senza impronta la riceve, per riconoscere l'account dello staff", async () => {

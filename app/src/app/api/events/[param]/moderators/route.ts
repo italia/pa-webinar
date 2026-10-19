@@ -24,6 +24,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { adminRequestLocale, sendGrantModeratorLink } from '@/lib/email/moderator-link';
 import { getSettings } from '@/lib/settings';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
 import { z } from 'zod';
 
@@ -77,6 +78,7 @@ export const GET = withErrorHandling(async (request, context) => {
       organization: true,
       organizationLogoUrl: true,
       publicListed: true,
+      photoId: true,
       token: true,
       createdAt: true,
       revokedAt: true,
@@ -118,6 +120,8 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   if (parsed.data.organizer) await requireOrganizerMarkRight(event.id);
+  // La foto caricata dal wizard: una che non c'e' piu' si lascia cadere.
+  const photoId = await usablePersonPhotoId(parsed.data.photoId, event.id);
 
   const created = await prisma.eventModerator.create({
     data: {
@@ -128,7 +132,7 @@ export const POST = withErrorHandling(async (request, context) => {
       // (lib/auth/staff-session, eventScope).
       emailHash: parsed.data.email ? hashEmail(parsed.data.email) : null,
       role: parsed.data.role ?? EventModeratorRole.MODERATOR,
-      ...grantProfileData(parsed.data),
+      ...grantProfileData({ ...parsed.data, photoId }),
       token: randomUUID(),
     },
   });

@@ -252,6 +252,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       moderatorOrganization: event.moderatorOrganization,
       moderatorOrganizationLogoUrl: event.moderatorOrganizationLogoUrl,
       moderatorPublicListed: event.moderatorPublicListed,
+      moderatorPhotoId: event.moderatorPhotoId,
       eventType: event.eventType,
       accessMode: event.accessMode,
       requireOrganization: event.requireOrganization,
@@ -274,6 +275,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       organization: m.organization,
       organizationLogoUrl: m.organizationLogoUrl,
       publicListed: m.publicListed,
+      photoId: m.photoId,
     })),
     invitations: event.invitations.map((i) => ({
       id: i.id,

@@ -18,6 +18,7 @@ import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import {
@@ -300,6 +301,10 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
+  // La foto dell'organizzatore principale: una che non c'e' piu' (o di un
+  // altro evento) si lascia cadere, senza rifiutare il resto della modifica.
+  const fotoPrincipale = await usablePersonPhotoId(data.moderatorPhotoId, eventId);
+
   const dateChanged =
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
     (data.endsAt !== undefined && new Date(data.endsAt).getTime() !== event.endsAt.getTime());
@@ -462,6 +467,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.moderatorPublicListed !== undefined && {
         moderatorPublicListed: data.moderatorPublicListed,
       }),
+      ...(fotoPrincipale !== undefined && { moderatorPhotoId: fotoPrincipale }),
       ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),

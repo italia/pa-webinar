@@ -83,8 +83,9 @@ durable credential.
 **Named grant** (`EventModerator`, role `MODERATOR` or `SPEAKER`): a
 per-person access grant to one event, with its own magic-link token, that can
 be revoked on its own (`revokedAt`). Organizers, moderators and speakers added
-in the wizard's **People** step each receive one, with their organization and
-whether the public page lists them (`publicListed`). An *event organizer* is a
+in the wizard's **People** step each receive one, with their organization, an
+optional photo uploaded by staff (`photoId`), and whether the public page lists
+them (`publicListed`). An *event organizer* is a
 `MODERATOR` grant with `organizer` set: same powers in the room, listed among
 the organizers. The table is `event_moderators` even though it also holds
 speakers.

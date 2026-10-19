@@ -289,6 +289,7 @@ describe('modifica — revoca di un co-moderatore', () => {
       moderatorOrganization: null,
       moderatorOrganizationLogoUrl: null,
       moderatorPublicListed: false,
+      moderatorPhotoId: null,
       accessMode: null,
       requireOrganization: false,
       requireOrganizationRole: false,
@@ -296,7 +297,7 @@ describe('modifica — revoca di un co-moderatore', () => {
     },
     organizers: [],
     eventModerators: [
-      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
+      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
     ],
     invitations: [],
     materials: [],
@@ -1275,5 +1276,88 @@ describe('obbligatori — si fanno notare', () => {
     const campo = byId<HTMLInputElement>('wiz-primary-name').closest('.wizard-campo')!;
     expect(campo).toHaveClass('wizard-campo--vuoto');
     expect(campo.textContent).toContain(w.flow.requiredToPublish);
+  });
+});
+
+describe('foto delle persone', () => {
+  const FOTO_PRINCIPALE = '11111111-1111-4111-8111-111111111111';
+  const FOTO_ANNA = '22222222-2222-4222-8222-222222222222';
+  const conFoto = (): InitialEventShape =>
+    ({
+      id: 'evt-foto',
+      slug: 'evento-foto',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: null,
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+        moderatorName: 'Mario Rossi',
+        moderatorEmail: 'mario@example.org',
+        moderatorPhotoId: FOTO_PRINCIPALE,
+      },
+      organizers: [],
+      eventModerators: [
+        { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: true, photoId: FOTO_ANNA },
+      ],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    }) as unknown as InitialEventShape;
+
+  const chiamate = () => fetchMock.mock.calls as Array<[string, RequestInit]>;
+
+  it('si vedono, si tolgono dalla riga della persona, e il salvataggio le porta', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({ mode: 'edit', initialEvent: conFoto() });
+    goToStep('invites');
+
+    // L'organizzatore principale: il pannello si apre da solo, con la foto.
+    const primario = byId('wiz-primary-name').closest('section')!;
+    expect(primario.querySelector('details.wizard-primary__more')?.hasAttribute('open')).toBe(true);
+    expect(primario.querySelector('img')?.getAttribute('src')).toBe(`/api/avatar/person/${FOTO_PRINCIPALE}`);
+
+    // La riga di Anna: la foto accanto al nome, e i pulsanti con il suo nome.
+    const riga = Array.from(container.querySelectorAll('li.wizard-person')).find((li) =>
+      li.textContent?.includes('Anna Bianchi'),
+    )!;
+    expect(riga.querySelector('img.person-avatar')?.getAttribute('src')).toBe(`/api/avatar/person/${FOTO_ANNA}`);
+    const togli = Array.from(riga.querySelectorAll<HTMLButtonElement>('button')).find(
+      (b) => b.getAttribute('aria-label') === w.step3.personPhotoRemoveFor.replace('{name}', 'Anna Bianchi'),
+    )!;
+    click(togli);
+    expect(riga.querySelector('img.person-avatar')).toBeNull();
+
+    goToStep('review');
+    await press(button(w.updateEvent));
+
+    const put = chiamate().find(([url, init]) => url === '/api/events/evt-foto' && init.method === 'PUT');
+    expect(JSON.parse(String(put![1].body)).moderatorPhotoId).toBe(FOTO_PRINCIPALE);
+    const patch = chiamate().find(
+      ([url, init]) => url === '/api/events/evt-foto/moderators/mod-1' && init.method === 'PATCH',
+    );
+    expect(JSON.parse(String(patch![1].body))).toEqual({ photoId: null });
+  });
+
+  it('con un link di conduzione si vedono ma non si cambiano', () => {
+    renderWizard({ mode: 'edit', initialEvent: conFoto(), initialStep: 'invites', viaToken: 'token-primario' });
+    const step3 = w.step3;
+    const etichette = [step3.personPhotoAdd, step3.personPhotoChange, step3.personPhotoRemove];
+    const pulsanti = Array.from(container.querySelectorAll('button')).filter((b) =>
+      etichette.includes(b.textContent?.trim() ?? ''),
+    );
+    expect(pulsanti).toEqual([]);
+    expect(container.querySelector('input[type="file"][accept="image/jpeg,image/png,image/webp"]')).toBeNull();
+    expect(container.textContent).toContain(step3.personPhotoStaffOnly);
   });
 });

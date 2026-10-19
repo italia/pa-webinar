@@ -67,6 +67,7 @@ vi.mock('@/lib/db', () => ({
     tag: { findMany: vi.fn() },
     eventTagLink: { findMany: vi.fn(), deleteMany: vi.fn(), createMany: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
+    eventPersonPhoto: { findFirst: vi.fn() },
     $transaction: vi.fn(),
   },
 }));
@@ -93,6 +94,7 @@ const mocked = prisma as unknown as {
     deleteMany: ReturnType<typeof vi.fn>;
     createMany: ReturnType<typeof vi.fn>;
   };
+  eventPersonPhoto: { findFirst: ReturnType<typeof vi.fn> };
   $transaction: ReturnType<typeof vi.fn>;
 };
 
@@ -223,6 +225,31 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(dati.requireOrganizationRole).toBe(false);
     expect(dati.requireOrganizationType).toBe(false);
     expect(dati.gdprTemplateId).toBe(GDPR_ID);
+  });
+
+  it('la foto dell’organizzatore principale: messa, tolta, lasciata cadere; assente non si tocca', async () => {
+    const FOTO = '5d1c2b3a-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce({ id: FOTO });
+    await PUT(richiesta({ moderatorPhotoId: FOTO }), contesto as never);
+    expect(datiScritti().moderatorPhotoId).toBe(FOTO);
+    // Già di questo evento (anche se una sua copia la condivide): si tiene.
+    expect(mocked.eventPersonPhoto.findFirst.mock.calls[0]![0].where.OR).toContainEqual({
+      leadOf: { some: { id: EVENT_ID } },
+    });
+
+    mocked.event.update.mockClear();
+    await PUT(richiesta({ moderatorPhotoId: null }), contesto as never);
+    expect(datiScritti().moderatorPhotoId).toBeNull();
+
+    mocked.event.update.mockClear();
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce(null);
+    const res = await PUT(richiesta({ moderatorPhotoId: FOTO }), contesto as never);
+    expect(res.status).toBe(200);
+    expect(datiScritti().moderatorPhotoId).toBeNull();
+
+    mocked.event.update.mockClear();
+    await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+    expect(datiScritti()).not.toHaveProperty('moderatorPhotoId');
   });
 
   // 100 partecipanti con il video: alla quota predefinita (30%) basta un

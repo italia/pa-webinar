@@ -9,11 +9,12 @@
  * ADR-011) with the same email-hash. Rows that only point at a
  * registration with onDelete SetNull, or not at all, are deleted
  * explicitly: feedback, questionnaire responses, chat messages (with
- * their attachment files), the invitations addressed to that email and
- * the outbox rows written for those registrations. Recordings tied to
- * the underlying Event are NOT deleted here — they are governed by the
- * event-level retention cron and are subject to separate legal-hold
- * rules.
+ * their attachment files), the invitations addressed to that email, the
+ * named grants with that email (with their photos, when no other event
+ * uses them) and the outbox rows written for those registrations.
+ * Recordings tied to the underlying Event are NOT deleted here — they are
+ * governed by the event-level retention cron and are subject to separate
+ * legal-hold rules.
  *
  * Writes a GdprAuditLog row per affected event (no PII; only counts
  * and an emailHash prefix), mirroring the cron/cleanup audit format.
@@ -26,6 +27,7 @@ import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 import { invalidateModeratorCache } from '@/lib/auth/moderator';
+import { deleteUnreferencedPersonPhotos } from '@/lib/events/person-photo-store';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,10 +72,15 @@ export const POST = withErrorHandling(async (request) => {
   // senza aspettare la cache delle verifiche dei moderatori.
   const daTogliere = await prisma.eventModerator.findMany({
     where: { emailHash },
-    select: { eventId: true, token: true },
+    select: { eventId: true, token: true, photoId: true },
   });
   const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
   for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);
+  // Le foto di quelle concessioni, caricate dallo staff: via, salvo quelle
+  // che un'altra persona o un altro evento usa ancora.
+  const grantPhotosDeleted = await deleteUnreferencedPersonPhotos(prisma, {
+    ids: daTogliere.map((g) => g.photoId).filter((id): id is string => !!id),
+  });
 
   // La foto profilo e' legata all'email, non a un evento: va via qui anche
   // quando non resta nessuna iscrizione.
@@ -92,6 +99,7 @@ export const POST = withErrorHandling(async (request) => {
       addressBookDeleted,
       invitationsDeleted: invitations.count,
       grantsDeleted: grants.count,
+      grantPhotosDeleted,
       profilePhotoDeleted,
     });
   }
@@ -123,6 +131,7 @@ export const POST = withErrorHandling(async (request) => {
     addressBookDeleted,
     invitationsDeleted: invitations.count,
     grantsDeleted: grants.count,
+    grantPhotosDeleted,
     profilePhotoDeleted,
     feedbackDeleted: counts.feedback,
     questionnaireResponsesDeleted: counts.questionnaireResponses,

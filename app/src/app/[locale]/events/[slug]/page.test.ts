@@ -70,6 +70,7 @@ const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.f
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
+const FOTO = '33333333-3333-4333-8333-333333333333';
 const SLUG = 'evento-di-prova';
 const HOUR = 60 * 60 * 1000;
 
@@ -341,8 +342,8 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
           { name: 'Ente organizzatore', logoUrl: 'https://cdn.example.com/logo.png', websiteUrl: 'https://ente.example.gov.it' },
         ],
         additionalMods: [
-          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: 'Ente 2', organizationLogoUrl: '/api/assets/images/l.png' },
-          { name: 'Organizzatore 1', role: 'MODERATOR', organizer: true, organization: null, organizationLogoUrl: null },
+          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: 'Ente 2', organizationLogoUrl: '/api/assets/images/l.png', photoId: FOTO },
+          { name: 'Organizzatore 1', role: 'MODERATOR', organizer: true, organization: null, organizationLogoUrl: null, photoId: null },
         ],
       }),
     );
@@ -352,9 +353,40 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
       { name: 'Ente organizzatore', logoUrl: null, websiteUrl: 'https://ente.example.gov.it/' },
     ]);
     expect(event.people).toEqual([
-      { name: 'Organizzatore 1', role: 'organizer', organization: null, logoUrl: null },
-      { name: 'Relatore 1', role: 'speaker', organization: 'Ente 2', logoUrl: '/api/assets/images/l.png' },
+      { name: 'Organizzatore 1', role: 'organizer', organization: null, logoUrl: null, photoUrl: null },
+      {
+        name: 'Relatore 1',
+        role: 'speaker',
+        organization: 'Ente 2',
+        logoUrl: '/api/assets/images/l.png',
+        photoUrl: `/api/avatar/person/${FOTO}`,
+      },
     ]);
+  });
+
+  it('la foto di chi interviene va anche nei dati strutturati della pagina', async () => {
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        additionalMods: [
+          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: null, organizationLogoUrl: null, photoId: FOTO },
+          { name: 'Relatore 2', role: 'SPEAKER', organizer: false, organization: null, organizationLogoUrl: null, photoId: null },
+        ],
+      }),
+    );
+    const tree = (await EventDetailPage({
+      params: Promise.resolve({ slug: SLUG }),
+    })) as ReactElement<{ children: ReactNode }>;
+    const script = ([] as ReactNode[])
+      .concat(tree.props.children)
+      .find(
+        (c): c is ReactElement<{ dangerouslySetInnerHTML: { __html: string } }> =>
+          isValidElement(c) && c.type === 'script',
+      );
+    const dati = JSON.parse(script!.props.dangerouslySetInnerHTML.__html) as {
+      performer: Array<{ name: string; image?: string }>;
+    };
+    expect(dati.performer[0]!.image).toMatch(new RegExp(`/api/avatar/person/${FOTO}$`));
+    expect(dati.performer[1]).not.toHaveProperty('image');
   });
 
   it("l'organizzatore principale compare solo se scelto, fra chi organizza", async () => {
@@ -372,7 +404,7 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
       }),
     );
     expect(((await clientProps()).event as { people: unknown[] }).people).toEqual([
-      { name: 'Contatto 1', role: 'organizer', organization: 'Ente 1', logoUrl: null },
+      { name: 'Contatto 1', role: 'organizer', organization: 'Ente 1', logoUrl: null, photoUrl: null },
     ]);
   });
 });

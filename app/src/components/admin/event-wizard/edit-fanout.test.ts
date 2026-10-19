@@ -28,8 +28,8 @@ function snapshot(): InitialEventShape {
       { id: 'org-1', name: 'Ente', logoUrl: null, websiteUrl: null },
     ],
     eventModerators: [
-      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
-      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
+      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
     ],
     invitations: [
       { id: 'inv-1', name: 'Ospite', email: 'ospite@example.org', role: 'GUEST', personId: null },
@@ -367,7 +367,7 @@ describe('materialPayload — file caricato', () => {
 
 describe('differenzaProfilo', () => {
   it('una bozza senza profilo non conta come modifica', () => {
-    const salvato = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false };
+    const salvato = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
     expect(differenzaProfilo(salvato, {})).toBeNull();
     expect(differenzaProfilo(salvato, { organization: '' })).toBeNull();
   });
@@ -375,10 +375,21 @@ describe('differenzaProfilo', () => {
   it('manda solo i campi cambiati', () => {
     expect(
       differenzaProfilo(
-        { organizer: false, organization: 'A', organizationLogoUrl: null, publicListed: false },
-        { organizer: false, organization: 'B', organizationLogoUrl: null, publicListed: true },
+        { organizer: false, organization: 'A', organizationLogoUrl: null, publicListed: false, photoId: null },
+        { organizer: false, organization: 'B', organizationLogoUrl: null, publicListed: true, photoId: null },
       ),
     ).toEqual({ organization: 'B', publicListed: true });
+  });
+
+  it('la foto: messa, cambiata, tolta; assente non si tocca', () => {
+    const senza = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
+    const con = { ...senza, photoId: 'foto-1' };
+    expect(differenzaProfilo(senza, { photoId: 'foto-1' })).toEqual({ photoId: 'foto-1' });
+    expect(differenzaProfilo(con, { photoId: 'foto-2' })).toEqual({ photoId: 'foto-2' });
+    expect(differenzaProfilo(con, { photoId: null })).toEqual({ photoId: null });
+    expect(differenzaProfilo(con, { photoId: 'foto-1' })).toBeNull();
+    // Una bozza salvata prima che la foto esistesse non la cancella.
+    expect(differenzaProfilo(con, { publicListed: false })).toBeNull();
   });
 });
 
@@ -393,6 +404,7 @@ describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
     organization: null,
     organizationLogoUrl: null,
     publicListed: false,
+    photoId: null as string | null,
   });
   const voce = (grantId: string, name: string, patch: Record<string, unknown> = {}) => ({
     grantId,
@@ -479,6 +491,43 @@ describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
 
     expect(calls('PATCH', '/moderators/')).toEqual([]);
     expect(calls('DELETE', '/moderators/')).toEqual([]);
+  });
+
+  it('la foto cambiata va nella PATCH, da sola', async () => {
+    respond(() => json(200, {}));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = { ...formWithout(), moderators: [voce('a', 'A', { photoId: 'foto-2' })] } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    const [patch] = calls('PATCH', '/moderators/');
+    expect(JSON.parse(String(patch![1].body))).toEqual({ photoId: 'foto-2' });
+    expect(initial.eventModerators[0]!.photoId).toBe('foto-2');
+  });
+
+  it('una bozza vecchia, senza la foto, non la toglie', async () => {
+    respond(() => json(200, {}));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = {
+      ...formWithout(),
+      moderators: [{ grantId: 'a', name: 'A', email: '', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false }],
+    } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('PATCH', '/moderators/')).toEqual([]);
+  });
+
+  it('al cambio di ruolo la foto passa alla concessione nuova', async () => {
+    respond((url, init) => (init.method === 'POST' ? json(201, { id: 'nuova' }) : json(200, {})));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = { ...formWithout(), speakers: [voce('a', 'A', { photoId: 'foto-1' })] } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    const [post] = calls('POST', '/moderators');
+    expect(JSON.parse(String(post![1].body))).toMatchObject({ role: 'SPEAKER', photoId: 'foto-1' });
+    expect(initial.eventModerators.map((m) => [m.id, m.photoId])).toEqual([['nuova', 'foto-1']]);
   });
 });
 

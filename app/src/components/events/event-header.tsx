@@ -387,9 +387,18 @@ export function EventPeople({
             <ul className="event-people__list">
               {chi.map((p, i) => (
                 <li key={`${p.name}-${i}`} className="event-person">
-                  {p.logoUrl ? (
+                  {/* La foto in un cerchio, o le iniziali: accanto al nome, che
+                      la dice gia', e' decorativa. */}
+                  {p.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.logoUrl} alt="" className="event-person__logo" />
+                    <img
+                      src={p.photoUrl}
+                      alt=""
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                      className="event-person__photo"
+                    />
                   ) : (
                     <span className="event-person__initials" aria-hidden="true">
                       {initials(p.name)}
@@ -397,8 +406,21 @@ export function EventPeople({
                   )}
                   <span className="event-person__who">
                     <span className="event-person__name">{p.name}</span>
-                    {p.organization && (
-                      <span className="event-person__org">{p.organization}</span>
+                    {(p.organization || p.logoUrl) && (
+                      <span className="event-person__org">
+                        {/* Il logo dell'ente, piccolo, accanto al suo nome; da
+                            solo dice di essere il logo dell'ente. */}
+                        {p.logoUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.logoUrl}
+                            alt={p.organization ? '' : t('detail.personOrganizationLogo')}
+                            loading="lazy"
+                            className="event-person__org-logo"
+                          />
+                        )}
+                        {p.organization}
+                      </span>
                     )}
                   </span>
                 </li>

@@ -2,11 +2,14 @@
 
 /**
  * Ritaglio di un'immagine nel browser, prima del caricamento: un riquadro
- * nel formato richiesto (per la copertina 16:9), l'immagine che ci si
- * trascina dentro e un cursore per ingrandirla. Il ritaglio si disegna su un
- * canvas alla larghezza richiesta (mai piu' grande dell'originale: niente
- * immagini gonfiate) e torna come JPEG, su fondo bianco per le immagini con
- * trasparenza. Il file originale non lascia il browser.
+ * nel formato richiesto (per la copertina 16:9, quadrato per la foto di una
+ * persona), l'immagine che ci si trascina dentro e un cursore per
+ * ingrandirla. Per una foto mostrata in un cerchio il riquadro scurisce gli
+ * angoli fuori dal cerchio: il file prodotto resta quadrato. Il ritaglio si
+ * disegna su un canvas alla larghezza richiesta (mai piu' grande
+ * dell'originale: niente immagini gonfiate) e torna come JPEG, su fondo
+ * bianco per le immagini con trasparenza. Il file originale non lascia il
+ * browser.
  *
  * Tastiera: con il fuoco sul riquadro le frecce spostano l'immagine
  * (Maiusc per passi lunghi), + e - la ingrandiscono e la rimpiccioliscono.
@@ -32,6 +35,12 @@ export interface Ritaglio {
    *  copertina sugli schermi larghi), il rapporto della fascia: il ritaglio
    *  la mostra sotto il riquadro, come apparira'. */
   fascia?: number;
+  /** La pagina mostra l'immagine in un cerchio (la foto di una persona): il
+   *  riquadro lo indica scurendo gli angoli. Solo un'indicazione: il file
+   *  prodotto resta un rettangolo del formato richiesto. */
+  forma?: 'cerchio';
+  /** Il nome del file prodotto quando l'originale non ne ha uno. */
+  nome?: string;
 }
 
 /**
@@ -317,15 +326,20 @@ export default function ImageCropDialog({
       fallito();
       return;
     }
-    const nome = file.name.replace(/\.[^.]+$/, '') || 'copertina';
+    const nome = file.name.replace(/\.[^.]+$/, '') || ritaglio.nome || 'copertina';
     onConferma(new File([blob], `${nome}.jpg`, { type: 'image/jpeg' }));
   };
+
+  const cerchio = ritaglio.forma === 'cerchio';
+  // Un riquadro quadrato largo quanto la finestra grande sarebbe piu' alto
+  // dello schermo: finestra normale e riquadro stretto, al centro.
+  const stretto = ritaglio.rapporto <= 1;
 
   return (
     <Modal
       isOpen
       toggle={annulla}
-      size="lg"
+      size={stretto ? undefined : 'lg'}
       labelledBy="ritaglio-titolo"
       className="ritaglio-immagine"
     >
@@ -333,7 +347,7 @@ export default function ImageCropDialog({
         <span id="ritaglio-titolo">{t('title')}</span>
       </ModalHeader>
       <ModalBody>
-        <p className="ritaglio-immagine__testo">{t('intro')}</p>
+        <p className="ritaglio-immagine__testo">{cerchio ? t('introCircle') : t('intro')}</p>
         {errore ? (
           <p className="text-danger" role="alert">
             {t('error')}
@@ -342,7 +356,7 @@ export default function ImageCropDialog({
           <>
             <div
               ref={cornice}
-              className="ritaglio-immagine__cornice"
+              className={`ritaglio-immagine__cornice${stretto ? ' ritaglio-immagine__cornice--stretta' : ''}`}
               style={{ aspectRatio: String(ritaglio.rapporto) }}
               tabIndex={0}
               role="group"
@@ -367,6 +381,7 @@ export default function ImageCropDialog({
                   }}
                 />
               )}
+              {cerchio && <div className="ritaglio-immagine__maschera" aria-hidden="true" />}
             </div>
             <p id="ritaglio-tasti" className="ritaglio-immagine__nota">
               {t('keys')}

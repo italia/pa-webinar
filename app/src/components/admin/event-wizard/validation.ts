@@ -133,6 +133,7 @@ const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['moderatorEmail', 'invites'],
   ['moderatorOrganization', 'invites'],
   ['moderatorOrganizationLogoUrl', 'invites'],
+  ['moderatorPhotoId', 'invites'],
 ]);
 
 /** Campi multilingua: il passo 1 li evidenzia nella lingua predefinita. */

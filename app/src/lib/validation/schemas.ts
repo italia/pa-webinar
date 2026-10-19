@@ -83,6 +83,9 @@ export const eventBaseSchema = z.object({
   moderatorOrganization: z.string().trim().max(200).nullable().optional(),
   moderatorOrganizationLogoUrl: z.string().url().max(2048).nullable().optional(),
   moderatorPublicListed: z.boolean().optional(),
+  // La sua foto (EventPersonPhoto): un id che non si può usare si lascia
+  // cadere (lib/events/person-photo-store, usablePersonPhotoId).
+  moderatorPhotoId: z.string().uuid().nullable().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
