@@ -68,6 +68,9 @@ interface Props {
   iscrizioneAperta?: boolean;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
+  /** Quante domande si fanno prima e dopo l'evento, sotto cio' che si chiede
+   *  all'iscrizione. */
+  questionari?: React.ReactNode;
 }
 
 /** I nomi di un elenco di persone. */
@@ -91,6 +94,7 @@ export default function Step5Review({
   sopratitolo = false,
   iscrizioneAperta,
   onVaiPersone,
+  questionari,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const tf = useTranslations('admin.wizard.flow');
@@ -335,6 +339,7 @@ export default function Step5Review({
                 <span className="d-block text-secondary">
                   {tf('askLine', { list: chiesti.join(', ') })}
                 </span>
+                {questionari}
               </span>
             </li>
           )}

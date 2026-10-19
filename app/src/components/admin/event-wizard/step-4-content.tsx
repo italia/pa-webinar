@@ -4,12 +4,13 @@
  * Step 4 — Content.
  *
  * Let the admin attach pre/post questionnaires (reusable templates + ad-hoc
- * questions) and materials. Templates are fetched from
- * /api/admin/question-templates. Ad-hoc questions are default-locale only;
- * the wizard shell wraps them into the multi-locale API shape on submit.
+ * questions) and materials. Templates, with their questions, come from
+ * /api/admin/question-templates (libreria-domande). Ad-hoc questions are
+ * default-locale only; the wizard shell wraps them into the multi-locale API
+ * shape on submit.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Link, percorso } from '@/i18n/navigation';
@@ -22,6 +23,8 @@ import {
   templatesFor,
   type QuestionnaireMoment,
 } from '@/lib/questionnaires/template-usage';
+
+import { AnteprimaDomande, useLibreriaDomande, type ModelloDiDomande } from './libreria-domande';
 
 export interface MaterialDraft {
   title: string;
@@ -95,13 +98,7 @@ export interface Step4Value {
   materials: MaterialDraft[];
 }
 
-interface TemplateRow {
-  id: string;
-  name: string;
-  description: string | null;
-  itemCount?: number;
-  usage?: QuestionnaireMoment | null;
-}
+type TemplateRow = ModelloDiDomande;
 
 interface Props {
   value: Step4Value;
@@ -153,26 +150,9 @@ export default function Step4Content({
   eventId,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
-  const [templates, setTemplates] = useState<TemplateRow[]>([]);
+  // La libreria dei modelli la legge solo lo staff.
+  const templates = useLibreriaDomande(!staffLocked);
   const [savingDraft, setSavingDraft] = useState(false);
-
-  useEffect(() => {
-    // La libreria dei modelli la legge solo lo staff.
-    if (staffLocked) return;
-    let cancelled = false;
-    fetch('/api/admin/question-templates', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { rows: [] }))
-      .then((data) => {
-        if (cancelled) return;
-        setTemplates(Array.isArray(data.rows) ? data.rows : []);
-      })
-      .catch(() => {
-        /* silent */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [staffLocked]);
 
   const handleSaveAndNavigate = onSaveDraftAndNavigate
     ? async () => {
@@ -506,6 +486,8 @@ function PlacementEditor({
           {t('addQuestion')}
         </button>
       </div>
+
+      <AnteprimaDomande blocco={value} libreria={libreria} />
     </div>
   );
 }

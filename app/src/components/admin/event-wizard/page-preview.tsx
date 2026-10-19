@@ -30,6 +30,7 @@ import { MarkdownRenderer } from '@/components/ui/markdown';
 import { entiEPersonePubblici } from '@/lib/events/public-people';
 import { getLocalized } from '@/lib/utils/locale';
 
+import { useFasciaCopertina } from './use-fascia-copertina';
 import type { WizardForm } from './wizard-shell';
 
 export interface DatiAnteprima {
@@ -233,6 +234,7 @@ function PagePreview({ dati }: { dati: DatiAnteprima }) {
   // chiudersi (niente lampo vuoto), e intanto la copia ridotta aspetta.
   const [montata, setMontata] = useState(false);
   const largo = useSchermoLargo();
+  const fascia = useFasciaCopertina();
   return (
     <aside className="anteprima-pagina" aria-labelledby="anteprima-pagina-titolo">
       <div className="anteprima-pagina__testa">
@@ -256,7 +258,11 @@ function PagePreview({ dati }: { dati: DatiAnteprima }) {
       {/* La copia ridotta solo dove si vede, e mai insieme a quella aperta:
           si disegnerebbe la pagina due volte, con gli stessi id. */}
       {largo && !montata && (
-        <div className="anteprima-pagina__ridotta" inert>
+        <div
+          className="anteprima-pagina__ridotta"
+          inert
+          style={{ '--fascia-copertina': String(fascia) } as React.CSSProperties}
+        >
           <Pagina dati={dati} completa={false} />
         </div>
       )}

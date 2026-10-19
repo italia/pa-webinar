@@ -26,7 +26,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import ImageCropDialog, { type Ritaglio } from '@/components/ui/image-crop-dialog';
+import ImageCropDialog, { riduciImmagine, type Ritaglio } from '@/components/ui/image-crop-dialog';
 import { useUploadsAvailable } from '@/components/ui/uploads-availability';
 import { IMMAGINI_ESTERNE_AMMESSE } from '@/lib/security/img-src';
 import { withScheme } from '@/lib/utils/with-scheme';
@@ -79,6 +79,9 @@ export interface FileOrUrlInputProps {
 const RITAGLIABILI = ['image/jpeg', 'image/png', 'image/webp'];
 /** Scarto di formato sotto cui un'immagine e' gia' giusta e non si ritaglia. */
 const TOLLERANZA_FORMATO = 0.01;
+/** Oltre questa misura (sulla larghezza richiesta) un'immagine gia' nel formato
+ *  giusto si riduce prima del caricamento. */
+const RIDUZIONE_OLTRE = 1.25;
 
 /** Larghezza e altezza di un'immagine scelta, lette nel browser. */
 function misuraImmagine(file: File): Promise<{ w: number; h: number } | null> {
@@ -312,18 +315,29 @@ export default function FileOrUrlInput({
   );
 
   // Con un formato richiesto, un'immagine di altro formato passa prima dal
-  // ritaglio; una gia' giusta (o che non si ritaglia) si carica com'e'.
+  // ritaglio; una gia' giusta si carica com'e' (un JPEG molto piu' grande del
+  // necessario, ridotto alla larghezza richiesta). Quelle che non si
+  // ritagliano (SVG, GIF) passano come sono.
   const scegliFile = async (file: File) => {
     if (preparando || daRitagliare) return;
     if (ritaglio && assetType === 'image' && RITAGLIABILI.includes(file.type)) {
       setPreparando(true);
       const misura = await misuraImmagine(file);
-      setPreparando(false);
       if (misura && Math.abs(misura.w / misura.h / ritaglio.rapporto - 1) > TOLLERANZA_FORMATO) {
+        setPreparando(false);
         setError(null);
         setDaRitagliare(file);
         return;
       }
+      // Solo i JPEG: un PNG o un WebP possono avere parti trasparenti, che il
+      // JPEG ridotto riempirebbe di bianco senza dirlo.
+      const ridotta =
+        file.type === 'image/jpeg' && misura && misura.w > ritaglio.larghezza * RIDUZIONE_OLTRE
+          ? await riduciImmagine(file, ritaglio.larghezza)
+          : null;
+      setPreparando(false);
+      void handleFileChosen(ridotta ?? file);
+      return;
     }
     void handleFileChosen(file);
   };

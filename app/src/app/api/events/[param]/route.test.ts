@@ -55,7 +55,10 @@ vi.mock('@/lib/events/call-sessions', () => sessioni);
 const sondaggi = vi.hoisted(() => ({ chiudiSondaggiAperti: vi.fn(async () => 0) }));
 vi.mock('@/lib/events/close-polls', () => sondaggi);
 
-vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({
+  recordLiveAction: vi.fn(),
+  recordLiveActions: vi.fn(),
+}));
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -70,6 +73,7 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError } from '@/lib/errors';
+import { DEFAULT_JVB_CONFIG, jvbsForEvent } from '@/lib/jvb-sizing';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { DELETE, PUT } from './route';
@@ -160,7 +164,7 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
       async ({ data }: { data: Record<string, unknown> }) => ({
         ...eventoEsistente(),
         ...data,
-      }),
+      })
     );
   });
 
@@ -193,7 +197,7 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
         ...eventoEsistente(),
         recordingFileSize: BigInt(4502766),
         ...data,
-      }),
+      })
     );
 
     // Una modifica di fine evento, la piu' comune dopo una registrazione.
@@ -211,7 +215,7 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
         requireOrganizationType: false,
         gdprTemplateId: GDPR_ID,
       }),
-      contesto as never,
+      contesto as never
     );
 
     const dati = datiScritti();
@@ -219,6 +223,32 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(dati.requireOrganizationRole).toBe(false);
     expect(dati.requireOrganizationType).toBe(false);
     expect(dati.gdprTemplateId).toBe(GDPR_ID);
+  });
+
+  // 100 partecipanti con il video: alla quota predefinita (30%) basta un
+  // ponte, con tutti che parlano ne servono due.
+  const conVideo = (quota: number | null) => ({
+    ...eventoEsistente(),
+    maxParticipants: 100,
+    participantsCanStartVideo: true,
+    expectedSenderRatioPct: quota,
+  });
+
+  it('la quota di chi parla rifa la stima della capacita, anche da sola', async () => {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(conVideo(null) as never);
+    await PUT(richiesta({ expectedSenderRatioPct: 100 }), contesto as never);
+    const stima = datiScritti().capacityEstimateJson as { jvbCount: number } | undefined;
+    expect(stima?.jvbCount).toBe(jvbsForEvent(100, 100, true, DEFAULT_JVB_CONFIG));
+    expect(stima?.jvbCount).not.toBe(jvbsForEvent(100, 30, true, DEFAULT_JVB_CONFIG));
+  });
+
+  it('una stima rifatta per altro tiene la quota gia salvata', async () => {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(conVideo(100) as never);
+    await PUT(richiesta({ maxParticipants: 100 }), contesto as never);
+    const stima = datiScritti().capacityEstimateJson as { jvbCount: number } | undefined;
+    expect(stima?.jvbCount).toBe(jvbsForEvent(100, 100, true, DEFAULT_JVB_CONFIG));
   });
 
   it('chi partecipa lo cambia solo lo staff dell evento, non un link di conduzione', async () => {
@@ -238,12 +268,15 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
   });
 
   it('rimandare la scelta che c e gia non chiede lo staff', async () => {
-    await PUT(richiesta({ accessMode: null, requireOrganization: false }), contesto as never);
+    await PUT(
+      richiesta({ accessMode: null, requireOrganization: false }),
+      contesto as never
+    );
     expect(staff.requireEventManager).not.toHaveBeenCalled();
     expect(datiScritti().requireOrganization).toBe(false);
   });
 
-  it('svuota il testo dell\'informativa quando arriva una stringa vuota', async () => {
+  it("svuota il testo dell'informativa quando arriva una stringa vuota", async () => {
     // È il percorso che usa il wizard quando si sceglie un modello: il testo
     // scritto a mano va svuotato, altrimenti continuerebbe a vincere su una
     // scelta già fatta. Si salva come assente (null), così all'iscrizione si
@@ -255,7 +288,7 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(dati.privacyPolicyText).toBeNull();
   });
 
-  it('rifiuta un testo dell\'informativa nullo', async () => {
+  it("rifiuta un testo dell'informativa nullo", async () => {
     // Limite noto dello schema: il campo non è dichiarato annullabile, quindi
     // si svuota con la stringa vuota e non con `null`. Fissato qui perché il
     // giorno in cui lo schema cambia, questo test lo dica.
@@ -285,15 +318,22 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
   beforeEach(async () => {
     vi.clearAllMocks();
     mocked.event.update.mockImplementation(
-      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        ...eventoEsistente(),
+        ...data,
+      })
     );
-    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) =>
+      fn(prisma)
+    );
   });
 
   async function conStato(attuale: string, corpo: Record<string, unknown>) {
     const { verifyModeratorToken } = await import('@/lib/auth/moderator');
     vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
-      eventoEsistente(attuale) as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+      eventoEsistente(attuale) as unknown as Awaited<
+        ReturnType<typeof verifyModeratorToken>
+      >
     );
     return PUT(richiesta(corpo), contesto as never);
   }
@@ -309,10 +349,18 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
 
     expect(r.status).toBe(200);
     expect(mocked.$transaction).toHaveBeenCalledTimes(1);
-    expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+    expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(
+      prisma,
+      [EVENT_ID],
+      expect.any(Date)
+    );
     // Solo verso una fine i sondaggi aperti si chiudono (DRAFT non e' una fine).
     if (nuovo === 'ENDED') {
-      expect(sondaggi.chiudiSondaggiAperti).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+      expect(sondaggi.chiudiSondaggiAperti).toHaveBeenCalledWith(
+        prisma,
+        [EVENT_ID],
+        expect.any(Date)
+      );
     } else {
       expect(sondaggi.chiudiSondaggiAperti).not.toHaveBeenCalled();
     }
@@ -349,9 +397,14 @@ describe('PUT /api/events/[param] — tag', () => {
     vi.clearAllMocks();
     staff.requireEventManager.mockResolvedValue(undefined);
     mocked.event.update.mockImplementation(
-      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        ...eventoEsistente(),
+        ...data,
+      })
     );
-    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) =>
+      fn(prisma)
+    );
     mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-a' }]);
   });
 
@@ -361,7 +414,10 @@ describe('PUT /api/events/[param] — tag', () => {
       { id: 'tag-b', slug: 'b' },
     ]);
 
-    const r = await PUT(richiesta({ tagSlugs: ['a', 'b', 'sparito'] }), contesto as never);
+    const r = await PUT(
+      richiesta({ tagSlugs: ['a', 'b', 'sparito'] }),
+      contesto as never
+    );
 
     expect(r.status).toBe(200);
     expect(staff.requireEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
@@ -373,9 +429,11 @@ describe('PUT /api/events/[param] — tag', () => {
     // Nel registro le etichette scritte davvero, non quelle chieste.
     const { logAdminAction } = await import('@/lib/audit/admin-audit');
     expect(vi.mocked(logAdminAction)).toHaveBeenCalledWith(
-      expect.objectContaining({ details: expect.objectContaining({ tags: ['a', 'b'] }) }),
+      expect.objectContaining({ details: expect.objectContaining({ tags: ['a', 'b'] }) })
     );
-    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID },
+    });
     expect(mocked.eventTagLink.createMany).toHaveBeenCalledWith({
       data: [
         { eventId: EVENT_ID, tagId: 'tag-a' },
@@ -389,12 +447,17 @@ describe('PUT /api/events/[param] — tag', () => {
     await PUT(richiesta({ tagSlugs: [] }), contesto as never);
 
     expect(mocked.tag.findMany).not.toHaveBeenCalled();
-    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID } });
+    expect(mocked.eventTagLink.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID },
+    });
     expect(mocked.eventTagLink.createMany).not.toHaveBeenCalled();
   });
 
   it('le stesse etichette, in un altro ordine, non si riscrivono', async () => {
-    mocked.eventTagLink.findMany.mockResolvedValue([{ tagId: 'tag-b' }, { tagId: 'tag-a' }]);
+    mocked.eventTagLink.findMany.mockResolvedValue([
+      { tagId: 'tag-b' },
+      { tagId: 'tag-a' },
+    ]);
     mocked.tag.findMany.mockResolvedValue([{ id: 'tag-a' }, { id: 'tag-b' }]);
 
     const r = await PUT(richiesta({ tagSlugs: ['a', 'b'] }), contesto as never);
@@ -429,18 +492,26 @@ describe('PUT /api/events/[param] — cronologia della sala', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocked.event.update.mockImplementation(
-      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        ...eventoEsistente(),
+        ...data,
+      })
     );
-    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) =>
+      fn(prisma)
+    );
   });
 
-  async function conEvento(attuale: Record<string, unknown>, corpo: Record<string, unknown>) {
+  async function conEvento(
+    attuale: Record<string, unknown>,
+    corpo: Record<string, unknown>
+  ) {
     const { verifyModeratorToken } = await import('@/lib/auth/moderator');
     vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
-      attuale as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+      attuale as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>
     );
     mocked.event.update.mockImplementation(
-      async ({ data }: { data: Record<string, unknown> }) => ({ ...attuale, ...data }),
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...attuale, ...data })
     );
     return PUT(richiesta(corpo), contesto as never);
   }
@@ -448,7 +519,7 @@ describe('PUT /api/events/[param] — cronologia della sala', () => {
   it('una funzione accesa dalla sala registra quale e come', async () => {
     const r = await conEvento(
       { ...eventoEsistente('LIVE'), qaEnabled: false, wordCloudEnabled: true },
-      { qaEnabled: true, wordCloudEnabled: true },
+      { qaEnabled: true, wordCloudEnabled: true }
     );
     expect(r.status).toBe(200);
     // Solo quella cambiata davvero: la seconda era gia' accesa.
@@ -482,7 +553,10 @@ describe('PUT /api/events/[param] — cronologia della sala', () => {
   it('una modifica rifiutata non registra niente', async () => {
     const { verifyModeratorToken } = await import('@/lib/auth/moderator');
     vi.mocked(verifyModeratorToken).mockResolvedValueOnce(null);
-    const r = await PUT(richiesta({ status: 'ENDED', qaEnabled: true }), contesto as never);
+    const r = await PUT(
+      richiesta({ status: 'ENDED', qaEnabled: true }),
+      contesto as never
+    );
     expect(r.status).toBe(403);
     expect(recordLiveAction).not.toHaveBeenCalled();
     expect(recordLiveActions).not.toHaveBeenCalled();
@@ -500,7 +574,9 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     vi.clearAllMocks();
     tx.$queryRaw.mockResolvedValue([{ status: 'PUBLISHED' }]);
     tx.event.delete.mockResolvedValue({});
-    mocked.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
+    mocked.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) =>
+      fn(tx)
+    );
     files.removeFilesOfEventsBeingDeleted.mockResolvedValue(1);
   });
 
@@ -518,9 +594,9 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     expect(String(tx.$queryRaw.mock.calls[0]![0])).toContain('FOR NO KEY UPDATE');
     expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith({ id: EVENT_ID });
     expect(tx.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
-    expect(files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]).toBeLessThan(
-      tx.event.delete.mock.invocationCallOrder[0]!,
-    );
+    expect(
+      files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]
+    ).toBeLessThan(tx.event.delete.mock.invocationCallOrder[0]!);
   });
 
   it('un evento in diretta non si elimina: 409, nessun file toccato', async () => {
@@ -543,7 +619,7 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
 
   it('se i file non si cancellano, l’evento resta: 503', async () => {
     files.removeFilesOfEventsBeingDeleted.mockRejectedValue(
-      new AppError('storage', 503, 'STORAGE_DELETE_FAILED'),
+      new AppError('storage', 503, 'STORAGE_DELETE_FAILED')
     );
     const r = await DELETE(cancella(), contesto as never);
 

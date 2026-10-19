@@ -12,8 +12,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import EventConfigDiagram from '@/components/admin/event-config-diagram';
-import JvbCapacityPreview, { capacityWarnings } from '@/components/admin/jvb-capacity-preview';
+import CapacityPanel, { capacityWarnings } from '@/components/admin/capacity-panel';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
@@ -219,42 +218,21 @@ export function SezioneTecnica({
   jvbSizingConfig: JvbSizingConfig;
   defaultSenderRatioPct: number;
 }) {
-  const t = useTranslations('admin.wizard.step5');
   const toggles = togglesFromMatrix(form.permissionMatrix);
   return (
-    <>
-      <section className="mb-4">
-        <h4 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('capacityHeading')}
-        </h4>
-        <JvbCapacityPreview
-          maxParticipants={form.maxParticipants}
-          senderRatioPct={form.expectedSenderRatioPct}
-          onSenderRatioChange={(next) => onChange({ expectedSenderRatioPct: next })}
-          videoEnabled={toggles.participantsCanStartVideo}
-          defaultSenderRatioPct={defaultSenderRatioPct}
-          sizingConfig={jvbSizingConfig}
-        />
-      </section>
-      <section className="mb-1">
-        <h4 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('featuresHeading')}
-        </h4>
-        <EventConfigDiagram
-          event={{
-            maxParticipants: form.maxParticipants,
-            qaEnabled: toggles.qaEnabled,
-            chatEnabled: toggles.chatEnabled,
-            recordingEnabled: form.recordingEnabled,
-            participantsCanUnmute: toggles.participantsCanUnmute,
-            participantsCanStartVideo: toggles.participantsCanStartVideo,
-            participantsCanShareScreen: toggles.participantsCanShareScreen,
-            speakers: form.speakers.map((s) => s.name).join(', ') || undefined,
-          }}
-          adminMode
-        />
-      </section>
-    </>
+    <CapacityPanel
+      maxParticipants={form.maxParticipants}
+      senderRatioPct={form.expectedSenderRatioPct}
+      onSenderRatioChange={(next) => onChange({ expectedSenderRatioPct: next })}
+      videoEnabled={toggles.participantsCanStartVideo}
+      defaultSenderRatioPct={defaultSenderRatioPct}
+      sizingConfig={jvbSizingConfig}
+      recordingEnabled={form.recordingEnabled}
+      participantsCanUnmute={toggles.participantsCanUnmute}
+      participantsCanShareScreen={toggles.participantsCanShareScreen}
+      startsAt={form.startsAt}
+      endsAt={form.endsAt}
+    />
   );
 }
 

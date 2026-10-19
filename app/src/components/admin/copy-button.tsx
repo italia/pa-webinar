@@ -8,9 +8,14 @@ import { Icon } from '@/components/ui/icon';
 
 interface CopyButtonProps {
   text: string;
+  /** Il testo del pulsante al posto di «Copia link» (es. quale link). */
+  label?: string;
+  /** Il nome per chi usa un lettore di schermo, quando in pagina ci sono
+   *  piu' pulsanti di copia: deve contenere il testo visibile. */
+  accessibleName?: string;
 }
 
-export default function CopyButton({ text }: CopyButtonProps) {
+export default function CopyButton({ text, label, accessibleName }: CopyButtonProps) {
   const t = useTranslations('admin.links');
   const [copied, setCopied] = useState(false);
 
@@ -37,10 +42,10 @@ export default function CopyButton({ text }: CopyButtonProps) {
       outline
       size="sm"
       onClick={handleCopy}
-      aria-label={t('copyLink')}
+      aria-label={accessibleName ?? label ?? t('copyLink')}
     >
       <Icon icon={copied ? 'it-check' : 'it-copy'} size="sm" className="me-1" />
-      {copied ? t('copied') : t('copyLink')}
+      {copied ? t('copied') : (label ?? t('copyLink'))}
     </Button>
   );
 }

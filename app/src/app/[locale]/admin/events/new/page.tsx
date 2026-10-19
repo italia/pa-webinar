@@ -131,6 +131,7 @@ export default async function CreateEventPage({
         defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={30}
         canUseRubrica={session.role === 'admin'}
+        canManageTags={session.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         jvbSizingConfig={{
           cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,

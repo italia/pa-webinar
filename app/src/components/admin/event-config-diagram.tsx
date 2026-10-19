@@ -15,6 +15,8 @@ interface EventConfigDiagramProps {
     speakers?: string | null;
     startsAt?: string;
     endsAt?: string;
+    /** La quota di chi parla dell'evento (null: quella predefinita). */
+    expectedSenderRatioPct?: number | null;
   };
   registrationCount?: number;
   adminMode?: boolean;
@@ -67,6 +69,7 @@ export default function EventConfigDiagram({
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
+    expectedSenderRatioPct: event.expectedSenderRatioPct,
   });
 
   const speakerCount = event.speakers

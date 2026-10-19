@@ -45,7 +45,21 @@ export interface EventEstimates {
   storageEstimate: string;
 }
 
-export function calculateEstimates(event: EventConfig): EventEstimates {
+/** Le stesse stime in numeri, per chi le formatta da se' (il pannello della
+ *  capacita' nel wizard). `calculateEstimates` le mette in parole. */
+export interface EventEstimateNumbers {
+  sizedFor: number;
+  basedOnRegistrations: boolean;
+  moderatorUpMbps: number;
+  participantDownMbps: number;
+  totalMbps: number;
+  jvbCount: number;
+  jvbRamMB: number;
+  durationHours: number;
+  storageGB: number;
+}
+
+export function estimateNumbers(event: EventConfig): EventEstimateNumbers {
   const basedOnRegistrations =
     event.registeredParticipants !== undefined &&
     event.registeredParticipants > 0;
@@ -102,9 +116,33 @@ export function calculateEstimates(event: EventConfig): EventEstimates {
     durationHours = Math.max(0, durationMs / (1000 * 60 * 60));
   }
 
-  const storageGB = event.recordingEnabled
-    ? ((1.5 * durationHours * 3600) / 8 / 1024).toFixed(1)
-    : '0';
+  const storageGB = event.recordingEnabled ? (1.5 * durationHours * 3600) / 8 / 1024 : 0;
+
+  return {
+    sizedFor: participants,
+    basedOnRegistrations,
+    moderatorUpMbps: moderatorUp,
+    participantDownMbps: participantDown,
+    totalMbps: totalBandwidth,
+    jvbCount,
+    jvbRamMB,
+    durationHours,
+    storageGB,
+  };
+}
+
+export function calculateEstimates(event: EventConfig): EventEstimates {
+  const {
+    sizedFor: participants,
+    basedOnRegistrations,
+    moderatorUpMbps: moderatorUp,
+    participantDownMbps: participantDown,
+    totalMbps: totalBandwidth,
+    jvbCount,
+    jvbRamMB,
+    durationHours,
+    storageGB,
+  } = estimateNumbers(event);
 
   return {
     sizedFor: participants,
@@ -124,6 +162,6 @@ export function calculateEstimates(event: EventConfig): EventEstimates {
       durationHours >= 1
         ? `${Math.floor(durationHours)}h ${Math.round((durationHours % 1) * 60)}m`
         : `${Math.round(durationHours * 60)}m`,
-    storageEstimate: `~${storageGB} GB`,
+    storageEstimate: `~${event.recordingEnabled ? storageGB.toFixed(1) : '0'} GB`,
   };
 }

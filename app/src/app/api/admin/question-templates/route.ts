@@ -3,6 +3,8 @@
  *
  * GET  — list all templates with item counts and how many live event
  *        questionnaires reference them (so the UI can warn before delete).
+ *        With `?domande=1` each row also carries its questions, read-only:
+ *        whoever composes a questionnaire sees what a template asks.
  * POST — create a template with its initial items in a single write.
  */
 
@@ -19,10 +21,11 @@ import { createQuestionTemplateSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = withErrorHandling(async () => {
+export const GET = withErrorHandling(async (request) => {
   // La libreria delle domande si usa per comporre i questionari dei propri
   // eventi; modificarla resta dell'amministrazione.
   await requireStaff(await cookies());
+  const conDomande = new URL(request.url).searchParams.get('domande') === '1';
 
   const rows = await prisma.questionTemplate.findMany({
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
@@ -36,6 +39,21 @@ export const GET = withErrorHandling(async () => {
       createdAt: true,
       updatedAt: true,
       _count: { select: { items: true, questionnaires: true } },
+      ...(conDomande
+        ? {
+            items: {
+              orderBy: { sortOrder: 'asc' as const },
+              select: {
+                prompt: true,
+                type: true,
+                options: true,
+                scaleMin: true,
+                scaleMax: true,
+                required: true,
+              },
+            },
+          }
+        : {}),
     },
   });
 
@@ -50,6 +68,7 @@ export const GET = withErrorHandling(async () => {
         usage: r.usage,
         itemCount: r._count.items,
         usedByQuestionnaires: r._count.questionnaires,
+        ...('items' in r ? { items: r.items } : {}),
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
       })),

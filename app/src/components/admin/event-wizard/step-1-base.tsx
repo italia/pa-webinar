@@ -28,6 +28,9 @@ import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import { fondoEtichettaPiena } from '@/lib/utils/tag-color';
 
+import NuovaEtichetta, { type EtichettaCreata } from './nuova-etichetta';
+import { useFasciaCopertina } from './use-fascia-copertina';
+
 export interface Step1Value {
   title: Record<string, string>;
   description: Record<string, string>;
@@ -78,6 +81,9 @@ interface Props {
    * scelte sulla sala d'attesa e sul video, fra le impostazioni avanzate.
    */
   parte?: 'evento' | 'quando' | 'avanzate';
+  /** L'amministrazione crea una categoria nuova da qui, gia' scelta per
+   *  l'evento: la riceve chi tiene l'elenco delle categorie. */
+  onEtichettaCreata?: (etichetta: EtichettaCreata) => void;
 }
 
 export default function Step1Base({
@@ -90,9 +96,11 @@ export default function Step1Base({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   parte = 'evento',
+  onEtichettaCreata,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
+  const fasciaCopertina = useFasciaCopertina();
   // La ricorrenza resta aperta se c'era all'apertura: scegliere «nessuna»
   // non la richiude sotto il cursore.
   const [ricorrenzaAperta] = useState(value.recurrencePreset !== 'none');
@@ -628,12 +636,17 @@ export default function Step1Base({
             onChange({ coverImageUrl: next, imageUrl: next ?? null })
           }
           helpText={`${t('coverImageSize')} ${t('coverImageHelp')}`}
-          ritaglio={{ rapporto: 16 / 9, larghezza: 1600 }}
+          ritaglio={{
+            rapporto: 16 / 9,
+            larghezza: 1600,
+            // La fascia della pagina dell'evento su uno schermo largo.
+            fascia: fasciaCopertina,
+          }}
         />
       </section>
 
       {/* Tags */}
-      {availableTags.length > 0 && (
+      {(availableTags.length > 0 || onEtichettaCreata) && (
         <section className="mb-4">
           <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             {t('tagsHeading')}
@@ -662,6 +675,23 @@ export default function Step1Base({
               );
             })}
           </div>
+          {onEtichettaCreata && (
+            <NuovaEtichetta
+              defaultLocale={defaultLocale}
+              esistenti={availableTags}
+              onCreata={(nuova) => {
+                onEtichettaCreata(nuova);
+                if (!value.tagSlugs.includes(nuova.slug)) {
+                  onChange({ tagSlugs: [...value.tagSlugs, nuova.slug] });
+                }
+              }}
+              onScegliEsistente={(slug) => {
+                if (!value.tagSlugs.includes(slug)) {
+                  onChange({ tagSlugs: [...value.tagSlugs, slug] });
+                }
+              }}
+            />
+          )}
         </section>
       )}
     </div>

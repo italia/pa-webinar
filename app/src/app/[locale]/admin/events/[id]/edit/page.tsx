@@ -322,6 +322,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         initialStep={initialStep}
         initialSection={initialSection}
         canUseRubrica={session?.role === 'admin'}
+        canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}

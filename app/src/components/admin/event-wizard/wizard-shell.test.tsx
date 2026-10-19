@@ -159,6 +159,14 @@ function alertText(): string {
   return container.querySelector('[role="alert"]')?.textContent ?? '';
 }
 
+/** Le chiamate al server tranne la lettura della libreria dei modelli di
+ *  domande, che il riepilogo fa per contare le domande. */
+function chiamateAlServer() {
+  return (fetchMock.mock.calls as Array<[string, RequestInit?]>).filter(
+    ([url]) => !String(url).startsWith('/api/admin/question-templates'),
+  );
+}
+
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   container = document.createElement('div');
@@ -193,7 +201,7 @@ describe('creazione — descrizione mancante', () => {
     await press(button(w.publish));
 
     expect(alertText()).toBe(w.validationFailed);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(chiamateAlServer()).toHaveLength(0);
     expect(byId('ev-description-it')).toHaveClass('is-invalid');
     expect(container.querySelector('.invalid-feedback')?.textContent).toBe(
       w.step1.validation.descriptionRequired.replace('{min}', '10'),
@@ -207,7 +215,7 @@ describe('creazione — descrizione mancante', () => {
     await press(button(w.saveDraft));
 
     expect(alertText()).toBe(w.validationFailed);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(chiamateAlServer()).toHaveLength(0);
     expect(byId('ev-description-it')).toHaveClass('is-invalid');
   });
 
@@ -232,7 +240,7 @@ describe('creazione — descrizione mancante', () => {
     goToStep('review');
     await press(button(w.publish));
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(chiamateAlServer()).toHaveLength(1);
     expect(alertText()).toBe(w.validationFailed);
     expect(alertText()).not.toContain('Validation failed');
     // Tornato al passo Base, con il campo evidenziato.
@@ -784,7 +792,7 @@ describe('validazione — il fuoco va al campo da correggere', () => {
     goToStep('review');
     await press(button(w.publish));
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(chiamateAlServer()).toHaveLength(0);
     const attivo = document.activeElement as HTMLElement;
     expect(attivo.id).toBe('wiz-primary-name');
     expect(attivo.getAttribute('aria-invalid')).toBe('true');

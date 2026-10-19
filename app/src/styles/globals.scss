@@ -10144,6 +10144,41 @@ html.live-resizing .live-sidebar-resizer::after {
   }
 }
 
+// Sotto le quattro domande, le alternative: i modelli e la videochiamata al
+// volo, in righe sobrie dello stesso peso.
+.formato__modelli {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.formato-alternativa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.formato-alternativa__testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.formato-alternativa__titolo {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.formato-alternativa__desc {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
 // ── L'evento in righe con un'icona ciascuna: l'anteprima del formato e quella
 // del riepilogo.
 .anteprima-righe {
@@ -10239,6 +10274,530 @@ html.live-resizing .live-sidebar-resizer::after {
   background: #eef4fb;
   color: var(--app-text);
   font-size: 0.9rem;
+}
+
+// ── Le chiamate rapide: filtri come nell'elenco degli eventi, una riga per
+// chiamata con i dati e i due link da copiare.
+.chiamate-filtri {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #f5f7fb;
+
+  .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+}
+
+.chiamate-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.chiamate-barra__conta {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.chiamate-vuoto {
+  padding: 2.5rem 1rem;
+  border-radius: 8px;
+  background: #f5f7fb;
+  text-align: center;
+  color: var(--app-muted);
+
+  .icon { fill: var(--app-muted); }
+}
+
+.chiamate-elenco {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chiamata {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 8px;
+  background: #fff;
+
+  @media (min-width: 992px) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.chiamata--scelta {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 1px var(--app-primary);
+}
+
+.chiamata__scelta {
+  margin-top: 0.3rem;
+}
+
+.chiamata__corpo {
+  min-width: 0;
+}
+
+.chiamata__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+
+.chiamata__titolo {
+  font-weight: 700;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.chiamata__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: #eef1f4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--app-muted);
+}
+
+.chiamata__stato--live {
+  background: #fde8e8;
+  color: #a61919;
+}
+
+.chiamata__punto {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #d1344c;
+}
+
+.chiamata__stato--pausa {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+
+.chiamata__stato--rec {
+  background: #e3f4ec;
+  color: #00704a;
+}
+
+.chiamata__dati {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  svg { width: 14px; height: 14px; }
+  .icon { fill: var(--app-muted); }
+}
+
+.chiamata__link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  grid-column: 2;
+
+  @media (min-width: 992px) {
+    grid-column: auto;
+    justify-content: flex-end;
+  }
+}
+
+// La videochiamata al volo, dal pulsante «Nuova chiamata».
+.chiamata-nuova {
+  max-width: 48rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chiamata-nuova__testa {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.chiamata-nuova__icona {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e6eff8;
+
+  .icon { fill: var(--app-primary); }
+}
+
+.chiamata-nuova__titolo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.chiamata-nuova__sottotitolo {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+}
+
+.chiamata-nuova__nota {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+// ── La capacita' di un evento: quanti parlano, il flusso da chi parla ai
+// ponti video a chi ascolta, il carico dei ponti e le risorse.
+.capacita {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.capacita__quota {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.capacita__domanda {
+  float: none;
+  margin-bottom: 0.5rem;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__profili {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capacita__profilo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #b9d0e8;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-primary);
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:has(input:checked) {
+    border-color: var(--app-primary);
+    background: var(--app-primary);
+    color: #fff;
+
+    .capacita__pct { color: #fff; }
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--app-primary);
+    outline-offset: 2px;
+  }
+
+  &:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.capacita__pct {
+  margin-left: 0.25rem;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
+.capacita__nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+// Tre blocchi con una freccia fra l'uno e l'altro; sul telefono in colonna.
+.capacita__flusso {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.25rem;
+  }
+}
+
+.capacita__nodo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  background: #fff;
+
+  // La freccia verso il blocco dopo.
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -1.35rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-right: 2px solid #8fb3d9;
+    border-bottom: 2px solid #8fb3d9;
+    transform: translateX(-50%) rotate(45deg);
+
+    @media (min-width: 768px) {
+      left: auto;
+      right: -1.6rem;
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%) rotate(-45deg);
+    }
+  }
+}
+
+.capacita__nodo--ponte {
+  border-color: var(--app-primary);
+  background: #f0f6fc;
+}
+
+.capacita__nodo--limite {
+  border-color: #c77700;
+  background: #fff7eb;
+}
+
+.capacita__icona {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.25rem;
+  border-radius: 50%;
+  background: #e6eff8;
+  color: var(--app-primary);
+
+  svg { width: 18px; height: 18px; }
+  .icon { fill: var(--app-primary); }
+}
+
+.capacita__numero {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text);
+}
+
+.capacita__etichetta {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__dettaglio {
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+.capacita__carico-testa {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-text);
+
+  strong { font-variant-numeric: tabular-nums; }
+}
+
+.capacita__oltre {
+  color: #a61919;
+}
+
+.capacita__barra {
+  display: flex;
+  height: 0.85rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6edf4;
+}
+
+.capacita__parte--parlano { background: var(--app-primary); }
+.capacita__parte--ascolto { background: #7fb2e5; }
+
+.capacita__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.capacita__campione {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  background: #e6edf4;
+  border: 1px solid #c5d3e0;
+}
+.capacita__campione--parlano { background: var(--app-primary); border-color: var(--app-primary); }
+.capacita__campione--ascolto { background: #7fb2e5; border-color: #7fb2e5; }
+
+.capacita__risorse {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+
+  > div {
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    background: #f5f8fb;
+  }
+
+  dt {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--app-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--app-text);
+  }
+}
+
+// ── Le azioni del wizard: la barra si ferma in fondo allo schermo mentre si
+// scorre il passo, con i pulsanti uno accanto all'altro a destra (non ai due
+// capi della pagina). A sinistra lo stato del salvataggio.
+.wizard-azioni {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #e8e8e8;
+  background: #fff;
+  box-shadow: 0 -8px 12px -10px rgba(23, 50, 77, 0.25);
+}
+
+.wizard-azioni__stato {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.wizard-azioni__pulsanti {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+// Il campo che riceve il fuoco non finisce sotto la barra (WCAG 2.4.11).
+html:has(.wizard-azioni) {
+  scroll-padding-bottom: 6rem;
+}
+
+// ── Una categoria nuova dal wizard, sotto quelle che ci sono.
+.nuova-etichetta {
+  margin-top: 0.75rem;
+}
+
+.nuova-etichetta__campo {
+  max-width: 34rem;
+
+  .form-control {
+    flex: 1 1 14rem;
+    width: auto;
+  }
+}
+
+.nuova-etichetta__apri {
+  border-radius: 20px;
+}
+
+.nuova-etichetta__gestisci {
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 // Il ritorno al riepilogo da un dettaglio (Persone, Permessi, Contenuti).
@@ -10383,6 +10942,144 @@ html.live-resizing .live-sidebar-resizer::after {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--app-text);
+}
+
+// ── I questionari accanto a cio' che si chiede all'iscrizione: una riga per
+// momento (prima, dopo), con le domande da aprire e «Modifica».
+.wizard-questionari {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e6edf4;
+}
+
+.wizard-questionari__righe {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-questionari__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.4rem 0;
+  font-size: 0.92rem;
+  color: var(--app-text);
+
+  > details,
+  > .wizard-questionari__testo {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+}
+
+.wizard-questionari__modifica {
+  font-weight: 600;
+}
+
+// ── «Vedi le domande»: un questionario in sola lettura, come lo leggera'
+// chi risponde.
+.anteprima-domande {
+  margin-top: 0.75rem;
+
+  > summary {
+    cursor: pointer;
+    width: fit-content;
+    font-weight: 600;
+    color: var(--app-primary);
+  }
+
+  &[open] > summary {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.anteprima-domande--riga {
+  margin-top: 0;
+
+  > summary {
+    width: auto;
+    font-weight: 400;
+    color: var(--app-text);
+  }
+}
+
+.anteprima-domande__momento + .anteprima-domande__momento {
+  margin-top: 1rem;
+}
+
+.anteprima-domande__titolo {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.elenco-domande {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e6edf4;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.elenco-domande__gruppo + .elenco-domande__gruppo {
+  margin-top: 0.75rem;
+}
+
+.elenco-domande__fonte {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--app-muted);
+}
+
+.elenco-domande__lista {
+  margin: 0;
+  padding-left: 1.4rem;
+
+  > li + li {
+    margin-top: 0.5rem;
+  }
+}
+
+.elenco-domande__testo {
+  display: block;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.elenco-domande__tipo {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+.elenco-domande__opzioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid #d9e2ea;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.82rem;
+    color: var(--app-text);
+  }
+}
+
+.elenco-domande__vuoto {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
 }
 
 .wizard-iscrizione__avviso {
@@ -11564,6 +12261,13 @@ html.live-resizing .live-sidebar-resizer::after {
   color: var(--app-muted);
   font-style: italic;
 }
+// Nell'anteprima ridotta (solo sugli schermi larghi) la copertina ha la forma
+// che ha nella pagina vera sullo stesso schermo (la fascia di .event-cover,
+// calcolata in lib/events/cover-band), non un riquadro 16:9.
+.anteprima-pagina__ridotta .event-cover {
+  aspect-ratio: var(--fascia-copertina, 1140 / 340);
+  max-height: none;
+}
 
 // ── Ritaglio di un'immagine prima del caricamento ──────────────────────────
 .ritaglio-immagine__testo {
@@ -11594,6 +12298,50 @@ html.live-resizing .live-sidebar-resizer::after {
     max-width: none;
     transform-origin: 0 0;
     pointer-events: none;
+  }
+}
+// Sotto il riquadro, la fascia della pagina dell'evento sugli schermi larghi:
+// stesso disegno di .event-cover (immagine intera al centro, lati sfumati).
+.ritaglio-immagine__fascia-blocco {
+  margin: 0.75rem 0 0;
+}
+.ritaglio-immagine__fascia {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e8f0fe;
+}
+.ritaglio-immagine__fascia-sfondo {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  filter: blur(28px) saturate(0.9);
+  opacity: 0.55;
+  transform: scale(1.15);
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+  }
+}
+.ritaglio-immagine__fascia-finestra {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
   }
 }
 .ritaglio-immagine__nota {

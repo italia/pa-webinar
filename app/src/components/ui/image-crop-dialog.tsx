@@ -28,6 +28,51 @@ export interface Ritaglio {
   rapporto: number;
   /** Larghezza del file prodotto, in pixel, se l'originale basta. */
   larghezza: number;
+  /** Se la pagina mostra l'immagine intera dentro una fascia piu' larga (la
+   *  copertina sugli schermi larghi), il rapporto della fascia: il ritaglio
+   *  la mostra sotto il riquadro, come apparira'. */
+  fascia?: number;
+}
+
+/**
+ * Un'immagine gia' nel formato giusto ma piu' grande del necessario si riduce
+ * nel browser alla larghezza richiesta, senza chiedere: chi apre la pagina non
+ * scarica megabyte che non vedrebbe. Torna JPEG su fondo bianco, come il
+ * ritaglio; null se il browser non ci riesce (si carica l'originale).
+ */
+export async function riduciImmagine(
+  file: File,
+  larghezza: number
+): Promise<File | null> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, ko) => {
+      const i = new Image();
+      i.onload = () => ok(i);
+      i.onerror = () => ko(new Error('immagine illeggibile'));
+      i.src = url;
+    });
+    if (img.naturalWidth <= larghezza) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = larghezza;
+    canvas.height = Math.round((img.naturalHeight * larghezza) / img.naturalWidth);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((r) =>
+      canvas.toBlob(r, 'image/jpeg', 0.9)
+    );
+    if (!blob) return null;
+    const nome = file.name.replace(/\.[^.]+$/, '') || 'immagine';
+    return new File([blob], `${nome}.jpg`, { type: 'image/jpeg' });
+  } catch {
+    return null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 /** Sotto questa larghezza (sul totale richiesto) l'immagine si vede sgranata. */
@@ -326,6 +371,60 @@ export default function ImageCropDialog({
             <p id="ritaglio-tasti" className="ritaglio-immagine__nota">
               {t('keys')}
             </p>
+            {/* La pagina dell'evento, sugli schermi larghi: l'immagine intera
+                al centro di una fascia, con i lati sfumati. Si aggiorna
+                mentre si sposta il ritaglio. */}
+            {ritaglio.fascia && url && img && lato && (
+              <figure className="ritaglio-immagine__fascia-blocco">
+                <figcaption className="ritaglio-immagine__nota mb-1">
+                  {t('pagePreview')}
+                </figcaption>
+                <div
+                  className="ritaglio-immagine__fascia"
+                  style={{ aspectRatio: String(ritaglio.fascia) }}
+                  aria-hidden="true"
+                >
+                  {/* Lo sfondo sfocato e' la sola parte ritagliata, larga
+                      quanto la fascia e centrata in altezza, sfocata e
+                      ingrandita come .event-cover__sfondo nella pagina. */}
+                  <div
+                    className="ritaglio-immagine__fascia-sfondo"
+                    style={{
+                      height: lato.fw / ritaglio.rapporto,
+                      top: -(lato.fw / ritaglio.rapporto - lato.fw / ritaglio.fascia) / 2,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      style={{
+                        width: lato.iw * scala,
+                        height: lato.ih * scala,
+                        transform: `translate(${stato.x}px, ${stato.y}px)`,
+                      }}
+                    />
+                  </div>
+                  <div
+                    className="ritaglio-immagine__fascia-finestra"
+                    style={{ aspectRatio: String(ritaglio.rapporto) }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      style={{
+                        width: lato.iw * scala * (ritaglio.rapporto / ritaglio.fascia),
+                        height: lato.ih * scala * (ritaglio.rapporto / ritaglio.fascia),
+                        transform: `translate(${stato.x * (ritaglio.rapporto / ritaglio.fascia)}px, ${
+                          stato.y * (ritaglio.rapporto / ritaglio.fascia)
+                        }px)`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </figure>
+            )}
             <label className="ritaglio-immagine__zoom">
               <span>{t('zoom')}</span>
               <input

@@ -1096,6 +1096,7 @@ export function SezioneIscrizione({
   invitati,
   bloccato = false,
   iniziale = null,
+  questionari,
 }: {
   accessMode: EventAccessModeValue | null;
   requireOrganization: boolean;
@@ -1119,6 +1120,9 @@ export function SezioneIscrizione({
   /** La scelta con cui il modulo e' partito: tornarci la rimette com'era (una
    *  scelta fissata resta fissata anche se coincide col sito). */
   iniziale?: EventAccessModeValue | null;
+  /** Le domande dei questionari, prima e dopo l'evento: si vedono qui accanto
+   *  a cio' che si chiede all'iscrizione. */
+  questionari?: React.ReactNode;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tg = useTranslations('admin.guided');
@@ -1209,6 +1213,7 @@ export function SezioneIscrizione({
         {chiede('requireOrganizationRole', requireOrganizationRole, t('askRole'))}
         {chiede('requireOrganizationType', requireOrganizationType, t('askType'))}
       </fieldset>
+      {questionari}
     </section>
   );
 }

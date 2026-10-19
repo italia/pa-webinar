@@ -315,7 +315,8 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.recordingEnabled !== undefined ||
     data.participantsCanUnmute !== undefined ||
     data.participantsCanStartVideo !== undefined ||
-    data.participantsCanShareScreen !== undefined;
+    data.participantsCanShareScreen !== undefined ||
+    data.expectedSenderRatioPct !== undefined;
 
   const nextCapacityEstimate = capacityInputsTouched
     ? {
@@ -332,6 +333,12 @@ export const PUT = withErrorHandling(async (request, context) => {
             data.participantsCanStartVideo ?? event.participantsCanStartVideo,
           participantsCanShareScreen:
             data.participantsCanShareScreen ?? event.participantsCanShareScreen,
+          // La quota di chi parla dell'evento, come alla creazione: senza, i
+          // ponti si stimerebbero sulla quota predefinita.
+          expectedSenderRatioPct:
+            data.expectedSenderRatioPct !== undefined
+              ? data.expectedSenderRatioPct
+              : event.expectedSenderRatioPct,
         }),
         computedAt: new Date().toISOString(),
       }

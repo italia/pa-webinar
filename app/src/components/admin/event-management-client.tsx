@@ -53,6 +53,7 @@ import EventAnalyticsPanel from './event-analytics-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
+import EventQuestionsPreview from './event-questions-preview';
 import EventInvitationsPanel from './event-invitations-panel';
 import EventRemindersEditor from './event-reminders-editor';
 import EventModeratorsPanel from './event-moderators-panel';
@@ -1253,6 +1254,7 @@ function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLi
             participantsCanShareScreen: event.participantsCanShareScreen,
             speakers: speakers || undefined,
             startsAt: event.startsAt, endsAt: event.endsAt,
+            expectedSenderRatioPct: event.expectedSenderRatioPct,
           }}
           registrationCount={event.registrationCount} adminMode
         />
@@ -1514,6 +1516,10 @@ function ContentTab({ event, staffTools }: { event: EventData; staffTools: boole
         <div style={{ fontSize: '0.88rem', color: C_MUTED }}>
           {td('questionnaireCount', { count: event.questionnaireCount })}
         </div>
+        {/* Le domande si vedono anche senza aprire la gestione. */}
+        {staffTools && event.questionnaireCount > 0 && (
+          <EventQuestionsPreview eventId={event.id} />
+        )}
       </div>
     </>
   );

@@ -73,6 +73,8 @@ interface Props {
   defaultSenderRatioPct: number;
   defaultRetentionDays: number;
   canUseRubrica: boolean;
+  /** Si creano categorie nuove dal wizard: solo l'amministrazione. */
+  canManageTags?: boolean;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
@@ -105,6 +107,7 @@ export default function CreateEventWithTemplate({
   defaultSenderRatioPct,
   defaultRetentionDays,
   canUseRubrica,
+  canManageTags = false,
   jvbSizingConfig,
   availableTags,
   gdprTemplates,
@@ -161,6 +164,7 @@ export default function CreateEventWithTemplate({
       defaultSenderRatioPct={defaultSenderRatioPct}
       defaultRetentionDays={defaultRetentionDays}
       canUseRubrica={canUseRubrica}
+      canManageTags={canManageTags}
       jvbSizingConfig={jvbSizingConfig}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
@@ -217,50 +221,6 @@ export default function CreateEventWithTemplate({
 
   return (
     <div>
-        <div className="mb-4">
-          <button
-            type="button"
-            className="border-0 bg-transparent p-0 w-100 text-start"
-            onClick={() => setShowInstant(true)}
-          >
-            <div
-              className="d-flex align-items-center gap-3 p-3 rounded-3"
-              style={{
-                border: '2px dashed #008758',
-                backgroundColor: 'rgba(0,135,88,0.04)',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,135,88,0.08)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,135,88,0.04)';
-              }}
-            >
-              <div
-                className="d-flex align-items-center justify-content-center rounded-2"
-                style={{
-                  width: 48,
-                  height: 48,
-                  backgroundColor: 'rgba(0,135,88,0.12)',
-                  flexShrink: 0,
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#008758" strokeWidth="2" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              </div>
-              <div>
-                <h6 className="fw-semibold mb-0" style={{ color: '#00704A' }}>
-                  {ti('title')}
-                </h6>
-                <p className="text-muted mb-0" style={{ fontSize: '0.82rem' }}>
-                  {ti('subtitle')}
-                </p>
-              </div>
-            </div>
-          </button>
-        </div>
-
         <GuidedFormat
           initial={decodificaFormato(scegliParam)}
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
@@ -282,6 +242,21 @@ export default function CreateEventWithTemplate({
               </div>
             </details>
           )}
+          {/* La videochiamata al volo e' un'alternativa, non lo scopo della
+              pagina: sta in fondo, accanto ai modelli, senza colori suoi. */}
+          <div className="formato-alternativa">
+            <span className="formato-alternativa__testo">
+              <span className="formato-alternativa__titolo">{tg('instantAlt')}</span>
+              <span className="formato-alternativa__desc">{ti('subtitle')}</span>
+            </span>
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setShowInstant(true)}
+            >
+              {tg('instantAltAction')}
+            </button>
+          </div>
         </GuidedFormat>
     </div>
   );

@@ -19,6 +19,7 @@ import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import ElencoDomande, { type DomandaInLettura } from '@/components/questionnaires/elenco-domande';
 import { USAGE_SHORT_KEY, type TemplateUsage } from '@/lib/questionnaires/template-usage';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
@@ -53,9 +54,11 @@ interface TemplateRow {
   usage: TemplateUsage;
   itemCount: number;
   usedByQuestionnaires: number;
+  /** Le domande, in sola lettura: «Vedi le domande». */
+  items?: DomandaInLettura[];
 }
 
-interface TemplateDetail extends TemplateRow {
+interface TemplateDetail extends Omit<TemplateRow, 'items'> {
   items: {
     id: string;
     prompt: Record<string, string>;
@@ -102,7 +105,7 @@ export default function QuestionTemplatesManagement() {
   const fetchRows = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/question-templates', { cache: 'no-store' });
+      const res = await fetch('/api/admin/question-templates?domande=1', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setRows(data.rows);
@@ -578,6 +581,15 @@ export default function QuestionTemplatesManagement() {
                     <div className="text-muted mt-1" style={{ fontSize: '0.75rem' }}>
                       {t('stats', { items: row.itemCount, used: row.usedByQuestionnaires })}
                     </div>
+                    {row.items && row.items.length > 0 && (
+                      <details className="anteprima-domande mt-2">
+                        <summary>
+                          {tTypes('previewShow', { count: row.items.length })}
+                          <span className="visually-hidden"> – {row.name}</span>
+                        </summary>
+                        <ElencoDomande gruppi={[{ domande: row.items }]} />
+                      </details>
+                    )}
                   </div>
                   <div className="d-flex gap-2 flex-shrink-0">
                     <Button

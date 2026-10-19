@@ -60,6 +60,12 @@ import {
 } from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
+import {
+  LibreriaDomandeProvider,
+  RiepilogoQuestionari,
+  RigheQuestionari,
+  useStatoLibreriaDomande,
+} from './libreria-domande';
 import PagePreview, { datiAnteprima } from './page-preview';
 import Step1Base, { type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
@@ -137,6 +143,9 @@ export interface WizardProps {
   defaultRetentionDays: number;
   /** Mostrare la ricerca in rubrica negli inviti: solo all'amministrazione. */
   canUseRubrica?: boolean;
+  /** Si possono creare categorie nuove (le categorie sono del sito: solo
+   *  l'amministrazione). */
+  canManageTags?: boolean;
   /** In modifica, il token con cui si e' entrati se non c'e' una sessione dello
    *  staff: solo allora il ritorno alla pagina dell'evento lo porta con se'. */
   viaToken?: string | null;
@@ -361,7 +370,9 @@ export default function EventWizard(props: WizardProps) {
   const viaToken = props.viaToken ?? null;
   // Le etichette le cambia lo staff dell'evento: con un link di conduzione il
   // passo non le propone (e il salvataggio non le manda).
-  const etichette = viaToken !== null ? [] : props.availableTags;
+  // Le categorie create dal wizard si aggiungono all'elenco, gia' scelte.
+  const [etichetteCreate, setEtichetteCreate] = useState<WizardProps['availableTags']>([]);
+  const etichette = viaToken !== null ? [] : [...props.availableTags, ...etichetteCreate];
   const initialEvent = props.initialEvent;
   // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
   // pubblicazioni in libreria) si puo' modificare senza toccarla: in quel caso
@@ -881,6 +892,10 @@ export default function EventWizard(props: WizardProps) {
   const updateForm = useCallback((patch: Partial<WizardForm>) => {
     setForm((prev) => ({ ...prev, ...patch }));
   }, []);
+
+  // La libreria dei modelli di domande: la leggono i passi che la mostrano,
+  // una volta sola per tutto il wizard.
+  const libreriaDomande = useStatoLibreriaDomande();
 
   // ── Bozza nel browser ─────────────────────────────────────────────────────
   // Il modulo si salva nel browser (con un attimo di ritardo), cosi' un
@@ -1679,6 +1694,7 @@ export default function EventWizard(props: WizardProps) {
   );
 
   return (
+    <LibreriaDomandeProvider value={libreriaDomande}>
     <div>
       {draftAvailable && (
         <div
@@ -1809,6 +1825,11 @@ export default function EventWizard(props: WizardProps) {
             <div className="wizard-con-anteprima__modulo">
               <Step1Base
                 parte={activeStep === 'base' ? 'evento' : 'quando'}
+                onEtichettaCreata={
+                  viaToken === null && props.canManageTags
+                    ? (nuova) => setEtichetteCreate((prima) => [...prima, nuova])
+                    : undefined
+                }
                 value={form}
                 onChange={updateForm}
                 enabledLocales={props.enabledLocales}
@@ -1842,6 +1863,18 @@ export default function EventWizard(props: WizardProps) {
                     invitati={form.invitations.length}
                     bloccato={viaToken !== null}
                   iniziale={initial.accessMode}
+                    questionari={
+                      // I questionari li gestisce lo staff: chi entra con il
+                      // link di conduzione non li vede qui.
+                      viaToken === null ? (
+                        <RiepilogoQuestionari
+                          pre={form.preEventQuestionnaire}
+                          post={form.postEventQuestionnaire}
+                          feedbackPredefinito={mode === 'create'}
+                          onModifica={() => vai('advanced', 'content')}
+                        />
+                      ) : undefined
+                    }
                   />
                 )
               }
@@ -1876,6 +1909,15 @@ export default function EventWizard(props: WizardProps) {
             eventLocale={SOURCE_LANGUAGE_FALLBACK}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
+            questionari={
+              viaToken === null ? (
+                <RigheQuestionari
+                  pre={form.preEventQuestionnaire}
+                  post={form.postEventQuestionnaire}
+                  feedbackPredefinito={mode === 'create'}
+                />
+              ) : undefined
+            }
             sopratitolo={form.parseTitleKicker ?? props.siteDefaultParseTitleKicker}
             capacityWarning={avvisoCapacita(
               form,
@@ -1994,27 +2036,26 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
-      <div
-        className="d-flex justify-content-between mt-4 pt-3"
-        style={{ borderTop: '1px solid #e8e8e8' }}
-      >
+      {/* Le azioni del passo restano a portata: la barra si ferma in fondo
+          allo schermo mentre si scorre, con Indietro accanto ad Avanti. */}
+      <div className="wizard-azioni">
+        <div className="wizard-azioni__pulsanti">
         {/* Dalle impostazioni avanzate si torna al riepilogo con il pulsante
-            a destra (e con il collegamento in cima): uno solo, non due. */}
-        {activeStep === 'advanced' ? (
-          <span />
-        ) : (
+            a destra (e con il collegamento in cima): uno solo, non due. Al
+            primo passo non c'e' niente prima. */}
+        {activeStep !== 'advanced' && activeStep !== 'base' && (
           <button
             type="button"
             className="btn btn-outline-primary"
             onClick={goPrev}
-            disabled={activeStep === 'base' || submitting}
+            disabled={submitting}
           >
             ← {tc('back')}
           </button>
         )}
 
         {activeStep !== 'review' ? (
-          <div className="d-flex gap-2 flex-wrap justify-content-end">
+          <>
             {/* In modifica si salva da qualunque passo: cambiare
                 un'impostazione non obbliga a percorrere tutto il wizard. */}
             {mode === 'edit' && (
@@ -2035,7 +2076,7 @@ export default function EventWizard(props: WizardProps) {
             >
               {activeStep === 'advanced' ? t('flow.backToReview') : `${tc('next')} →`}
             </button>
-          </div>
+          </>
         ) : mode === 'edit' ? (
           <button
             type="button"
@@ -2046,7 +2087,7 @@ export default function EventWizard(props: WizardProps) {
             {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
           </button>
         ) : (
-          <div className="d-flex gap-2">
+          <>
             <button
               type="button"
               className="btn btn-outline-secondary"
@@ -2063,10 +2104,12 @@ export default function EventWizard(props: WizardProps) {
             >
               {submitting && azione === 'publish' ? tc('saving') : t('publish')}
             </button>
-          </div>
+          </>
         )}
+        </div>
       </div>
     </div>
+    </LibreriaDomandeProvider>
   );
 }
 
