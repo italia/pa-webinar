@@ -959,7 +959,9 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 6. **Make a real call.** Use several devices and at least one microphone that does not run at 48 kHz.
    Check that audio works with noise suppression in its configured state, that participants cannot act
    as moderators, and that moderators can. Check self view, reactions over the toolbar, screen sharing,
-   raised hands, the leave prompt and recording if it is enabled.
+   raised hands, the leave prompt and recording if it is enabled. With live captions on, start and stop
+   a recording and check that captions keep coming: Jitsi's recording commands write into the room
+   metadata that transcription is off ([Live captions](live-captions.md)).
 7. **Run a load-test smoke test** with the toolkit in
    [scripts/load-test/README.md](../../scripts/load-test/README.md), and compare with the reference
    measurements in [LOAD-TESTING](../LOAD-TESTING.md).
