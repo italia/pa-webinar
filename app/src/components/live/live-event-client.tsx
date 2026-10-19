@@ -930,13 +930,14 @@ export default function LiveEventClient({
     const tryStart = () => {
       try {
         api.executeCommand('startRecording', { mode: 'file' });
-        riaffermaSottotitoliRef.current();
       } catch {
         if (attempts < 3) {
           attempts += 1;
           recPromptRetryRef.current = setTimeout(tryStart, 3000 * attempts);
         }
+        return;
       }
+      riaffermaSottotitoliRef.current();
     };
     tryStart();
   }, []);

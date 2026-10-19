@@ -78,20 +78,22 @@ export function useCaptionsControl({
     // chiedere al portale la stanza segue comunque l'interruttore. Con il
     // valore con cui la pagina e' stata disegnata, forse vecchio, si aspetta.
     if (!accesi && !ultimo && !certo) return;
-    try {
-      api.executeCommand('setSubtitles', accesi, false, lingua);
+    if (manda(api, accesi, lingua))
       inviato.current = { accesi, ingresso: ingressi, lingua };
-    } catch (err) {
-      console.error('setSubtitles failed', err);
-    }
   }, [api, attivo, accesi, certo, lingua, ingressi]);
 
   return useCallback(() => {
-    if (!api || !attivo || !accesi || ingressi === 0) return;
-    try {
-      api.executeCommand('setSubtitles', true, false, lingua);
-    } catch (err) {
-      console.error('setSubtitles failed', err);
-    }
+    if (api && attivo && accesi && ingressi > 0) manda(api, true, lingua);
   }, [api, attivo, accesi, lingua, ingressi]);
+}
+
+/** La scelta a Jitsi; i sottotitoli nativi restano nascosti. Vero se è partita. */
+function manda(api: JitsiMeetExternalAPI, accesi: boolean, lingua: string): boolean {
+  try {
+    api.executeCommand('setSubtitles', accesi, false, lingua);
+    return true;
+  } catch (err) {
+    console.error('setSubtitles failed', err);
+    return false;
+  }
 }

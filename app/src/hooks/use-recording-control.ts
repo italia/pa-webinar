@@ -104,7 +104,6 @@ export function useRecordingControl({
     if (!api) return;
     try {
       api.executeCommand('startRecording', { mode: 'file' });
-      dopoComando?.();
     } catch {
       // Il registratore non è ancora nella stanza: si riprova con attesa crescente.
       if (tentativi.current < MAX_TENTATIVI) {
@@ -114,7 +113,10 @@ export function useRecordingControl({
         tentativi.current = 0;
         mostraAvviso(tl('recorderStartFailed'), 8000);
       }
+      return;
     }
+    // Fuori dal try: un suo errore non è un avvio fallito da ritentare.
+    dopoComando?.();
   }, [api, tl, mostraAvviso, dopoComando]);
 
   // Un errore del servizio di registrazione: si riprova, poi si avvisa.
