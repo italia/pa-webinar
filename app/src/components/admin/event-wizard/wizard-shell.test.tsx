@@ -1455,12 +1455,14 @@ describe('foto delle persone', () => {
 });
 
 /**
- * Il programma nel passo «Persone»: con l'agenda spenta una riga sola con il
- * pulsante che la accende; accesa, gli argomenti con chi interviene, che alla
- * creazione partono dopo le persone, con le concessioni appena create.
+ * Il programma nel suo passo, fra «Persone» e il riepilogo: con l'agenda
+ * spenta lo dice e la accende; accesa, gli argomenti con chi interviene, che
+ * alla creazione partono dopo le persone, con le concessioni appena create.
+ * Ci si arriva anche dalla scheda sotto la descrizione e dal riepilogo.
  */
 describe('programma', () => {
   const sp = w.step3;
+  const tp = w.programme;
 
   function scegli(el: HTMLSelectElement, value: string) {
     act(() => {
@@ -1479,19 +1481,75 @@ describe('programma', () => {
     click(button(sp.add, byId('person-email').closest('.row') ?? container));
   }
 
-  it('agenda spenta: una riga con il pulsante; accesa, il primo argomento prende il fuoco', () => {
+  /** I nomi dei passi nella barra, in ordine. */
+  function passi(): string[] {
+    const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
+    return Array.from(nav.querySelectorAll('ol > li:not(.wizard-passi__avanzate) button')).map(
+      (b) => b.querySelector('.d-flex.flex-column > span')?.textContent ?? '',
+    );
+  }
+  const passoAttivo = () =>
+    container.querySelector('nav [aria-current="step"]')?.textContent ?? '';
+  const avanti = () => button(`${messages.common.next} →`);
+  /** Il pulsante «+ Intervento» di una persona (ha il nome nell'etichetta). */
+  const intervento = (nome: string) => {
+    const b = container.querySelector<HTMLButtonElement>(
+      `button[aria-label="${tp.addTalkFor.replace('{name}', nome)}"]`,
+    );
+    if (!b) throw new Error(`nessun «+ Intervento» per ${nome}`);
+    return b;
+  };
+
+  it('un evento ha cinque passi, con il programma fra «Persone» e il riepilogo', () => {
+    renderWizard();
+    expect(passi()).toEqual([
+      w.flow.steps.base,
+      w.flow.steps.schedule,
+      w.flow.steps.invites,
+      w.flow.steps.programme,
+      w.flow.steps.review,
+    ]);
+  });
+
+  it('una chiamata istantanea ne ha quattro, e il programma chiesto per indirizzo apre «Persone»', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: { ...structuredClone(ATTIVA), event: { ...structuredClone(ATTIVA.event), eventType: 'INSTANT' } },
+      initialStep: 'programme',
+    });
+    expect(passi()).toEqual([w.flow.steps.base, w.flow.steps.schedule, w.flow.steps.invites, w.flow.steps.review]);
+    expect(passoAttivo()).toContain(w.flow.steps.invites);
+    expect(container.textContent).not.toContain(tp.peoplePointer);
+    goToStep('base');
+    expect(container.querySelector('.wizard-programma-scheda')).toBeNull();
+  });
+
+  it('«Avanti» va da «Persone» al programma, e dal programma al riepilogo; in «Persone» lo si dice', () => {
     compilaEvento();
+    expect(container.textContent).toContain(tp.peoplePointer);
+    // Il programma non e' piu' nel passo «Persone».
     expect(container.querySelector('.wizard-programma')).toBeNull();
-    click(button(sp.programEnable));
+    click(avanti());
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+    expect(container.querySelector('h2')?.textContent).toBe(tp.heading);
+    // Accanto, l'anteprima della pagina.
+    expect(container.querySelector('.anteprima-pagina')).not.toBeNull();
+    click(avanti());
+    expect(passoAttivo()).toContain(w.flow.steps.review);
+    click(button(`← ${messages.common.back}`));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+  });
+
+  it('agenda spenta: lo dice; «Accendi» prepara il primo argomento, che prende il fuoco', () => {
+    compilaEvento();
+    goToStep(w.flow.steps.programme);
+    expect(container.textContent).toContain(tp.statusOff);
+    click(button(tp.turnOn));
     const titolo = byId<HTMLInputElement>('wiz-programma-0-titolo');
     expect(document.activeElement).toBe(titolo);
     // Chi interviene: nessuno, l'organizzatore principale e le persone del passo.
     const opzioni = Array.from(byId<HTMLSelectElement>('wiz-programma-0-chi').options).map((o) => o.text);
-    expect(opzioni).toEqual([
-      sp.programNone,
-      'Mario Rossi (Organizzatore)',
-      'Relatore 1 (Relatore)',
-    ]);
+    expect(opzioni).toEqual([sp.programNone, 'Mario Rossi (Organizzatore)', 'Relatore 1 (Relatore)']);
   });
 
   it('creazione: il programma parte dopo le persone, con la concessione appena creata', async () => {
@@ -1504,9 +1562,10 @@ describe('programma', () => {
       return json(200, {});
     });
     compilaEvento();
-    click(button(sp.programEnable));
+    goToStep(w.flow.steps.programme);
+    // Dalla persona: la riga nasce con lei, e accende l'agenda.
+    click(intervento('Relatore 1'));
     type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
-    scegli(byId<HTMLSelectElement>('wiz-programma-0-chi'), 'e:relatore@example.org');
     type(byId<HTMLInputElement>('wiz-programma-0-min'), '20');
     click(button(sp.programAdd));
     type(byId<HTMLInputElement>('wiz-programma-1-titolo'), 'Domande');
@@ -1534,6 +1593,92 @@ describe('programma', () => {
     expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
   });
 
+  it('creazione: una persona aggiunta dal programma va fra le persone, e l’argomento alla sua concessione', async () => {
+    const CREATO = { id: 'evt-nuova', slug: 'evt-nuova', moderatorToken: 'tok-nuova' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/moderators') && init.method === 'POST') {
+        const corpo = JSON.parse(String(init.body)) as { email: string };
+        return json(201, { id: corpo.email === 'carla@example.org' ? 'g-carla' : 'g-altro' });
+      }
+      if (url.endsWith('/agenda') && init.method === 'PUT') return json(200, { items: [] });
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep(w.flow.steps.programme);
+    expect(container.textContent).toContain(tp.noPeople);
+    click(button(tp.newPerson));
+    const modulo = container.querySelector<HTMLElement>('.wizard-programma__nuova')!;
+    const campi = modulo.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"]');
+    type(campi[0]!, 'Carla Verdi');
+    type(campi[1]!, 'carla@example.org');
+    click(button(tp.newPersonAssign, modulo));
+    expect(document.activeElement?.id).toBe('wiz-programma-0-titolo');
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Il nuovo servizio');
+
+    // Nel passo «Persone» c'e' anche lei.
+    goToStep('invites');
+    expect(
+      Array.from(container.querySelectorAll('li.wizard-person')).some((li) => li.textContent?.includes('Carla Verdi')),
+    ).toBe(true);
+
+    goToStep('review');
+    await press(button(w.saveDraft));
+    const chiamate = fetchMock.mock.calls as Array<[string, RequestInit]>;
+    const persona = chiamate.find(([u, i]) => u === `/api/events/${CREATO.id}/moderators` && i.method === 'POST');
+    expect(JSON.parse(String(persona![1].body))).toMatchObject({
+      name: 'Carla Verdi',
+      email: 'carla@example.org',
+      role: 'SPEAKER',
+      publicListed: false,
+    });
+    const put = chiamate.find(([u, i]) => u === `/api/events/${CREATO.id}/agenda` && i.method === 'PUT');
+    expect(JSON.parse(String(put![1].body))).toEqual({
+      base: [],
+      plan: [{ label: 'Il nuovo servizio', plannedMinutes: null, speakerGrantId: 'g-carla', speakerPrimary: false }],
+    });
+  });
+
+  it('creazione: spento dalle impostazioni avanzate, il programma non si salva, e lo dicono interruttore e riepilogo', async () => {
+    const CREATO = { id: 'evt-spento', slug: 'evt-spento', moderatorToken: 'tok-spento' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/moderators') && init.method === 'POST') return json(201, { id: 'g-relatore' });
+      if (url.endsWith('/agenda') && init.method === 'PUT') return json(200, { items: [] });
+      return json(200, {});
+    });
+    compilaEvento();
+    goToStep(w.flow.steps.programme);
+    click(intervento('Relatore 1'));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    goToStep('permissions');
+    act(() => {
+      container
+        .querySelector<HTMLInputElement>(`input[aria-label="${messages.admin.form.agendaEnabled}"]`)!
+        .click();
+    });
+    const plurale = '{count, plural, one {# argomento} other {# argomenti}}';
+    expect(container.textContent).toContain(tp.toggleOffWarningCreate.replace(plurale, '1 argomento'));
+    // Nel passo, gli argomenti si leggono soltanto e lo si dice.
+    goToStep(w.flow.steps.programme);
+    expect(byId<HTMLInputElement>('wiz-programma-0-titolo').readOnly).toBe(true);
+    expect(container.textContent).toContain(tp.offKeptCreate);
+    goToStep('review');
+    expect(container.querySelector('.anteprima-evento')?.textContent).toContain(
+      tp.reviewOffCreate.replace(plurale, '1 argomento'),
+    );
+    await press(button(w.saveDraft));
+    const chiamate = fetchMock.mock.calls as Array<[string, RequestInit]>;
+    const post = chiamate.find(([u, i]) => u === '/api/events' && i.method === 'POST');
+    expect(JSON.parse(String(post![1].body)).agendaEnabled).toBe(false);
+    expect(chiamate.some(([u]) => u === `/api/events/${CREATO.id}/agenda`)).toBe(false);
+  });
+
   it('un programma rifiutato arriva alla pagina dell evento fra le risorse non salvate', async () => {
     const CREATO = { id: 'evt-prog-ko', slug: 'evt-prog-ko', moderatorToken: 'tok' };
     fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
@@ -1543,7 +1688,8 @@ describe('programma', () => {
       return json(200, {});
     });
     compilaEvento();
-    click(button(sp.programEnable));
+    goToStep(w.flow.steps.programme);
+    click(button(tp.turnOn));
     type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
     goToStep('review');
     await press(button(w.saveDraft));
@@ -1551,24 +1697,47 @@ describe('programma', () => {
     expect(salvato).toEqual({ unsaved: ['agenda'], publishFailed: false });
   });
 
-  it('una durata che non e una durata ferma il salvataggio sul suo campo', async () => {
+  it('una durata che non e una durata ferma «Avanti» sul programma, e il riepilogo degli errori porta al campo', () => {
     compilaEvento();
-    click(button(sp.programEnable));
+    goToStep(w.flow.steps.programme);
+    click(button(tp.turnOn));
     type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
     type(byId<HTMLInputElement>('wiz-programma-0-min'), 'dieci');
-    goToStep('review');
-    await press(button(w.saveDraft));
-
-    expect(chiamateAlServer()).toHaveLength(0);
+    click(avanti());
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
     const minuti = byId<HTMLInputElement>('wiz-programma-0-min');
     expect(minuti).toHaveClass('is-invalid');
     expect(document.activeElement).toBe(minuti);
     expect(container.textContent).toContain(messages.agenda.minutesInvalid);
+    // Il fuoco altrove, il collegamento «da correggere» lo riporta al campo.
+    byId<HTMLInputElement>('wiz-programma-0-titolo').focus();
+    const daCorreggere = container.querySelector<HTMLElement>('.mt-4.small[role="status"]')!;
+    click(button(sp.programMinutesFor.replace('{n}', '1'), daCorreggere));
+    expect(document.activeElement).toBe(minuti);
+  });
+
+  it('una durata che non e una durata ferma il salvataggio, e porta al passo del programma', async () => {
+    compilaEvento();
+    goToStep(w.flow.steps.programme);
+    click(button(tp.turnOn));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), 'dieci');
+    goToStep('review');
+    // Nel riepilogo cio' che manca dice il passo del programma.
+    expect(container.querySelector('.wizard-mancanti')?.textContent).toContain(w.flow.steps.programme);
+    await press(button(w.saveDraft));
+
+    expect(chiamateAlServer()).toHaveLength(0);
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+    const minuti = byId<HTMLInputElement>('wiz-programma-0-min');
+    expect(minuti).toHaveClass('is-invalid');
+    expect(document.activeElement).toBe(minuti);
   });
 
   it('gli orari seguono l inizio dell evento e la somma delle durate; oltre la fine lo dice', () => {
     compilaEvento();
-    click(button(sp.programEnable));
+    goToStep(w.flow.steps.programme);
+    click(button(tp.turnOn));
     type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Uno');
     type(byId<HTMLInputElement>('wiz-programma-0-min'), '45');
     click(button(sp.programAdd));
@@ -1582,17 +1751,142 @@ describe('programma', () => {
     expect(totale).toContain('15 minuti');
   });
 
-  it('togliere una persona toglie la sua scelta, e lo dice', () => {
+  it('togliere una persona in «Persone» toglie la sua scelta senza aprire il programma; il programma poi lo dice', () => {
     compilaEvento();
-    click(button(sp.programEnable));
+    goToStep(w.flow.steps.programme);
+    click(intervento('Relatore 1'));
     type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
-    scegli(byId<HTMLSelectElement>('wiz-programma-0-chi'), 'e:relatore@example.org');
+    goToStep('invites');
     const riga = Array.from(container.querySelectorAll('li.wizard-person')).find((li) =>
       li.textContent?.includes('Relatore 1'),
     )!;
     click(button(sp.remove, riga));
+    // Rimessa subito con lo stesso indirizzo, la persona non si ritrova
+    // l'intervento di prima: la scelta e' stata tolta subito, senza passare
+    // dal programma.
+    type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
+    type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
+    click(button(sp.add, byId('person-email').closest('.row') ?? container));
+    goToStep('review');
+    expect(container.querySelector('.anteprima-evento')?.textContent).toContain('Programma: 1 argomento');
+    goToStep(w.flow.steps.programme);
     expect(byId<HTMLSelectElement>('wiz-programma-0-chi').value).toBe('');
     expect(container.textContent).toContain('Un argomento non ha più chi interviene');
+    // Detto una volta: tornando al passo non lo ripete.
+    goToStep('review');
+    goToStep(w.flow.steps.programme);
+    expect(container.textContent).not.toContain('Un argomento non ha più chi interviene');
+  });
+
+  it('una scelta tolta a mano nel programma non si dice come persona tolta', () => {
+    compilaEvento();
+    goToStep(w.flow.steps.programme);
+    click(intervento('Relatore 1'));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    scegli(byId<HTMLSelectElement>('wiz-programma-0-chi'), '');
+    goToStep('review');
+    goToStep(w.flow.steps.programme);
+    expect(container.textContent).not.toContain('Un argomento non ha più chi interviene');
+  });
+
+  it('«Cambia formato» porta il programma acceso, anche verso un formato con l’agenda spenta', () => {
+    const cambia = vi.fn();
+    renderWizard({
+      template: {
+        id: 'tpl-senza-agenda',
+        name: 'Riunione',
+        qaEnabled: false,
+        chatEnabled: true,
+        recordingEnabled: false,
+        autoStartRecording: false,
+        agendaEnabled: false,
+        participantsCanUnmute: true,
+        participantsCanStartVideo: true,
+        participantsCanShareScreen: true,
+        maxParticipants: 20,
+      },
+      onChangeTemplate: cambia,
+    });
+    goToStep(w.flow.steps.programme);
+    click(button(sp.programAdd));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Apertura');
+    click(button(w.flow.changeTemplate));
+    const portati = JSON.parse(localStorage.getItem('pa-wizard-draft:trasloco')!) as {
+      dati: Record<string, unknown>;
+    };
+    expect(portati.dati.agendaEnabled).toBe(true);
+    expect((portati.dati.agenda as Array<{ label: string }>)[0]!.label).toBe('Apertura');
+  });
+
+  it('una bozza ripresa senza la persona di un argomento toglie la scelta, e il programma lo dice', () => {
+    // Una bozza di prima del programma: le persone, ma non gli argomenti
+    // (restano quelli salvati, che nominano chi nella bozza non c'e').
+    localStorage.setItem(
+      `pa-wizard-draft:${ATTIVA.id}`,
+      JSON.stringify({ moderators: [], speakers: [] }),
+    );
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
+    click(button(w.draftRestore));
+    goToStep(w.flow.steps.programme);
+    expect(byId<HTMLInputElement>('wiz-programma-0-titolo').value).toBe('Apertura');
+    expect(byId<HTMLSelectElement>('wiz-programma-0-chi').value).toBe('');
+    expect(container.textContent).toContain('Un argomento non ha più chi interviene');
+  });
+
+  it('la scheda sotto la descrizione porta al programma, e poi lo riassume', () => {
+    compilaEvento();
+    goToStep('base');
+    const scheda = container.querySelector<HTMLElement>('.wizard-programma-scheda')!;
+    expect(scheda.textContent).toContain(tp.cardEmpty);
+    click(button(tp.cardPrepare, scheda));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+    click(intervento('Relatore 1'));
+    type(byId<HTMLInputElement>('wiz-programma-0-titolo'), 'Intervento');
+    type(byId<HTMLInputElement>('wiz-programma-0-min'), '30');
+    goToStep('base');
+    const dopo = container.querySelector<HTMLElement>('.wizard-programma-scheda')!;
+    expect(dopo.textContent).toContain('1 argomento · 10:00–10:30');
+    click(button(tp.cardChange, dopo));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+  });
+
+  it('una descrizione che contiene gia un programma lo fa notare, e porta al passo', () => {
+    renderWizard();
+    type(
+      byId<HTMLTextAreaElement>('ev-description-it'),
+      'Una mattina di lavoro.\n\n## Programma\n\n- 10:00 Apertura\n- 10:30 Interventi',
+    );
+    const scheda = container.querySelector<HTMLElement>('.wizard-programma-scheda')!;
+    expect(scheda.textContent).toContain(tp.descriptionHasProgramme);
+    click(button(tp.goToProgramme, scheda));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+  });
+
+  it('il riepilogo ha sempre la riga del programma: vuota porta a prepararlo', () => {
+    renderWizard();
+    goToStep('review');
+    const anteprima = container.querySelector<HTMLElement>('.anteprima-evento')!;
+    expect(anteprima.textContent).toContain(tp.reviewEmpty);
+    click(button(tp.reviewPrepare, anteprima));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+  });
+
+  it('impostazioni avanzate: l’interruttore porta al programma e, spento con argomenti, dice che restano', () => {
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
+    goToStep('permissions');
+    const interruttore = container.querySelector<HTMLInputElement>(
+      `input[aria-label="${messages.admin.form.agendaEnabled}"]`,
+    )!;
+    expect(container.textContent).not.toContain('resta salvato');
+    act(() => {
+      interruttore.click();
+    });
+    expect(container.textContent).toContain(
+      tp.toggleOffWarning.replace('{count, plural, one {# argomento} other {# argomenti}}', '1 argomento'),
+    );
+    click(button(`${tp.toggleLink} →`));
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
+    expect(container.textContent).toContain(tp.statusOff);
   });
 
   it('modifica: un agenda gia usata in sala si legge soltanto, e non si manda', async () => {
@@ -1604,11 +1898,20 @@ describe('programma', () => {
         agendaLocked: true,
       },
     });
-    goToStep('invites');
+    goToStep(w.flow.steps.programme);
     expect(byId<HTMLInputElement>('wiz-programma-0-titolo').readOnly).toBe(true);
     expect(byId<HTMLSelectElement>('wiz-programma-0-chi').disabled).toBe(true);
     expect(() => button(sp.programAdd)).toThrow();
+    expect(container.querySelector('.wizard-programma__persone')).toBeNull();
     expect(container.textContent).toContain(sp.programFrozen);
+    // Togliere la persona in «Persone» non tocca un'agenda gia' usata.
+    goToStep('invites');
+    const riga = Array.from(container.querySelectorAll('li.wizard-person')).find((li) =>
+      li.textContent?.includes('Anna Bianchi'),
+    )!;
+    click(button(sp.remove, riga));
+    goToStep(w.flow.steps.programme);
+    expect(container.textContent).not.toContain('Un argomento non ha più chi interviene');
     goToStep('review');
     await press(button(w.updateEvent));
     expect((fetchMock.mock.calls as Array<[string]>).some(([u]) => u.endsWith('/agenda'))).toBe(false);
@@ -1616,13 +1919,13 @@ describe('programma', () => {
 
   it('modifica: il programma salvato torna con chi interviene, e cambiato si manda con la base letta', async () => {
     fetchMock.mockImplementation(async () => json(200, { items: [] }));
-    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA) });
-    goToStep('invites');
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(ATTIVA), initialStep: 'programme' });
+    expect(passoAttivo()).toContain(w.flow.steps.programme);
     expect(byId<HTMLInputElement>('wiz-programma-0-titolo').value).toBe('Apertura');
     expect(byId<HTMLSelectElement>('wiz-programma-0-chi').value).toBe('e:anna@example.org');
     expect(byId<HTMLInputElement>('wiz-programma-0-min').value).toBe('10');
     type(byId<HTMLInputElement>('wiz-programma-0-min'), '15');
-    goToStep('review');
+    // In modifica si salva dal passo stesso.
     await press(button(w.updateEvent));
     const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
       ([u, i]) => u === '/api/events/evt-prog/agenda' && i.method === 'PUT',
@@ -1630,6 +1933,40 @@ describe('programma', () => {
     expect(JSON.parse(String(put?.[1].body))).toEqual({
       base: ['a1'],
       plan: [{ id: 'a1', label: 'Apertura', plannedMinutes: 15, speakerGrantId: 'mod-1', speakerPrimary: false }],
+    });
+  });
+
+  it('con il solo link di conduzione il programma si cambia, e una persona nuova parte col token', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url.endsWith('/moderators') && init.method === 'POST') return json(201, { id: 'g-carla' });
+      return json(200, { items: [] });
+    });
+    renderWizard({
+      mode: 'edit',
+      initialEvent: structuredClone(ATTIVA),
+      initialStep: 'programme',
+      viaToken: 'token-primario',
+    });
+    click(button(tp.newPerson));
+    const modulo = container.querySelector<HTMLElement>('.wizard-programma__nuova')!;
+    const campi = modulo.querySelectorAll<HTMLInputElement>('input[type="text"], input[type="email"]');
+    type(campi[0]!, 'Carla Verdi');
+    type(campi[1]!, 'carla@example.org');
+    click(button(tp.newPersonAssign, modulo));
+    type(byId<HTMLInputElement>('wiz-programma-1-titolo'), 'Domande');
+    await press(button(w.updateEvent));
+    const chiamate = fetchMock.mock.calls as Array<[string, RequestInit]>;
+    const iPersona = chiamate.findIndex(([u, i]) => u === '/api/events/evt-prog/moderators' && i.method === 'POST');
+    const iPut = chiamate.findIndex(([u, i]) => u === '/api/events/evt-prog/agenda' && i.method === 'PUT');
+    expect(iPersona).toBeGreaterThanOrEqual(0);
+    expect(iPut).toBeGreaterThan(iPersona);
+    expect((chiamate[iPut]![1].headers as Record<string, string>).Authorization).toBe('Bearer token-primario');
+    expect(JSON.parse(String(chiamate[iPut]![1].body)).plan[1]).toEqual({
+      label: 'Domande',
+      plannedMinutes: null,
+      speakerGrantId: 'g-carla',
+      speakerPrimary: false,
     });
   });
 });

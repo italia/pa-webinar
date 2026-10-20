@@ -1,15 +1,30 @@
 /**
- * I passi del wizard dell'evento, in ordine: quattro domande semplici
- * («Evento», «Quando», «Persone», il riepilogo) e, a parte, le impostazioni
- * avanzate, gia' scelte dal modello. Stanno qui (e non nel wizard) perche' li
- * usano anche gli indirizzi della modifica (`?step=`) e le pagine del server
- * che li leggono.
+ * I passi del wizard dell'evento, in ordine: le domande semplici («Evento»,
+ * «Quando», «Persone», il «Programma», facoltativo, e il riepilogo) e, a
+ * parte, le impostazioni avanzate, gia' scelte dal modello. Stanno qui (e non
+ * nel wizard) perche' li usano anche gli indirizzi della modifica (`?step=`)
+ * e le pagine del server che li leggono.
  */
-export const WIZARD_STEPS = ['base', 'schedule', 'invites', 'review', 'advanced'] as const;
+export const WIZARD_STEPS = ['base', 'schedule', 'invites', 'programme', 'review', 'advanced'] as const;
 export type WizardStep = (typeof WIZARD_STEPS)[number];
 
 /** I passi numerati nella barra; le impostazioni avanzate stanno a parte. */
-export const WIZARD_MAIN_STEPS = ['base', 'schedule', 'invites', 'review'] as const;
+export const WIZARD_MAIN_STEPS = ['base', 'schedule', 'invites', 'programme', 'review'] as const;
+export type WizardMainStep = (typeof WIZARD_MAIN_STEPS)[number];
+
+/**
+ * I passi numerati di un evento. Una chiamata istantanea non ha una pagina
+ * pubblica, e quindi nemmeno un programma da pubblicare: il passo non c'e'.
+ */
+export function passiPrincipali(istantanea: boolean): readonly WizardMainStep[] {
+  return istantanea ? WIZARD_MAIN_STEPS.filter((s) => s !== 'programme') : WIZARD_MAIN_STEPS;
+}
+
+/** Il passo da aprire per un evento: il programma di una chiamata istantanea
+ *  (un indirizzo scritto a mano) apre il passo prima, «Persone». */
+export function passoDisponibile(step: WizardStep, istantanea: boolean): WizardStep {
+  return istantanea && step === 'programme' ? 'invites' : step;
+}
 
 /** Le sezioni delle impostazioni avanzate. */
 export const WIZARD_ADVANCED_SECTIONS = [

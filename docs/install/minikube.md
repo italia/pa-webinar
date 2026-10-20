@@ -649,8 +649,8 @@ Compose stack.
 
 - **A scheduled event.** **New event** first asks four questions on the
   event's format (the saved templates stay in a folded list below them).
-  The wizard then has four steps, **Event**, **When**, **People** and
-  **Summary**, with **Advanced settings** apart. Publishing needs the lead
+  The wizard then has five steps, **Event**, **When**, **People**,
+  **Programme** (optional) and **Summary**, with **Advanced settings** apart. Publishing needs the lead
   organizer's name and email, entered in **People**, used for the moderator
   link and the confirmation email; like every email of this setup, it lands
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands

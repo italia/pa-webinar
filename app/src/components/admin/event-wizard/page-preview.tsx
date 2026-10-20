@@ -10,6 +10,10 @@
  * L'anteprima non porta altrove: i link non si seguono (si perderebbe il
  * modulo), e quella ridotta non riceve il fuoco ne' si legge due volte con
  * il lettore di schermo (`inert`): il contenuto e' gia' nel modulo.
+ *
+ * Nel passo «Programma» l'anteprima guarda il programma (`fuoco`): la
+ * testata senza copertina, la descrizione accorciata e il programma intero,
+ * o il posto dove comparira'.
  */
 import { memo, useEffect, useState, type MouseEvent } from 'react';
 import { useTranslations } from 'next-intl';
@@ -186,9 +190,25 @@ function fermaLink(e: MouseEvent<HTMLDivElement>) {
   if ((e.target as HTMLElement).closest('a')) e.preventDefault();
 }
 
-function Pagina({ dati, completa }: { dati: DatiAnteprima; completa: boolean }) {
+/** Su che cosa si concentra l'anteprima: la pagina intera, o il programma. */
+export type FuocoAnteprima = 'pagina' | 'programma';
+
+function Pagina({
+  dati,
+  completa,
+  fuoco = 'pagina',
+}: {
+  dati: DatiAnteprima;
+  completa: boolean;
+  fuoco?: FuocoAnteprima;
+}) {
   const t = useTranslations('events');
   const tw = useTranslations('admin.wizard.preview');
+  const tp = useTranslations('admin.wizard.programme');
+  // Il programma in primo piano: la descrizione si accorcia (nella versione
+  // ridotta), e senza argomenti si vede dove comparira'.
+  const sulProgramma = fuoco === 'programma';
+  const breve = sulProgramma && !completa;
   // Finche' la data manca, la pagina mostra un orario d'esempio: un'ora da
   // adesso. Lo dice la nota sotto l'anteprima.
   const inizio = dati.startsAt ?? new Date();
@@ -200,11 +220,21 @@ function Pagina({ dati, completa }: { dati: DatiAnteprima; completa: boolean }) 
         {t('detail.description')}
       </h2>
       {dati.description.trim() ? (
-        <MarkdownRenderer content={dati.description} className="mb-4" />
+        breve ? (
+          <div className="anteprima-pagina__descrizione-breve mb-4">
+            <MarkdownRenderer content={dati.description} />
+          </div>
+        ) : (
+          <MarkdownRenderer content={dati.description} className="mb-4" />
+        )
       ) : (
         <p className="anteprima-pagina__vuoto">{tw('descriptionPlaceholder')}</p>
       )}
-      <EventProgramme items={dati.programma} startsAt={inizio} />
+      {sulProgramma && dati.programma.length === 0 ? (
+        <p className="anteprima-pagina__posto-programma">{tp('previewPlaceholder')}</p>
+      ) : (
+        <EventProgramme items={dati.programma} startsAt={inizio} />
+      )}
     </>
   );
   return (
@@ -212,7 +242,7 @@ function Pagina({ dati, completa }: { dati: DatiAnteprima; completa: boolean }) 
       <EventHeader
         title={titolo}
         parseTitleKicker={dati.parseTitleKicker}
-        imageUrl={dati.imageUrl}
+        imageUrl={breve ? null : dati.imageUrl}
         tags={dati.tags}
         startsAt={inizio}
         endsAt={fine}
@@ -266,7 +296,13 @@ function useSchermoLargo(): boolean {
   return largo;
 }
 
-function PagePreview({ dati }: { dati: DatiAnteprima }) {
+function PagePreview({
+  dati,
+  fuoco = 'pagina',
+}: {
+  dati: DatiAnteprima;
+  fuoco?: FuocoAnteprima;
+}) {
   const tw = useTranslations('admin.wizard.preview');
   const tc = useTranslations('common');
   const [aperta, setAperta] = useState(false);
@@ -303,7 +339,7 @@ function PagePreview({ dati }: { dati: DatiAnteprima }) {
           inert
           style={{ '--fascia-copertina': String(fascia) } as React.CSSProperties}
         >
-          <Pagina dati={dati} completa={false} />
+          <Pagina dati={dati} completa={false} fuoco={fuoco} />
         </div>
       )}
       <Modal
@@ -317,7 +353,9 @@ function PagePreview({ dati }: { dati: DatiAnteprima }) {
         <ModalHeader closeAriaLabel={tc('close')} toggle={() => setAperta(false)}>
           <span id="anteprima-pagina-finestra">{tw('title')}</span>
         </ModalHeader>
-        <ModalBody>{(aperta || montata) && <Pagina dati={dati} completa />}</ModalBody>
+        <ModalBody>
+          {(aperta || montata) && <Pagina dati={dati} completa fuoco={fuoco} />}
+        </ModalBody>
       </Modal>
     </aside>
   );

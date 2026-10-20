@@ -16,7 +16,7 @@ import {
   parsePlannedMinutes,
 } from '@/lib/agenda/programme';
 import type { PersonRole } from '@/lib/events/grant-profile';
-import { fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { fromDatetimeLocalInTz, toDatetimeLocalInTz } from '@/lib/utils/date-format';
 
 /** Un argomento del programma, come lo tiene il modulo. */
 export interface AgendaDraft {
@@ -87,25 +87,28 @@ export interface OpzioneRelatore {
   publicListed: boolean;
 }
 
-/** Le persone fra cui scegliere: l'organizzatore principale, poi le persone
- *  del passo nell'ordine dell'elenco. */
-export function opzioniRelatore(form: {
+/** Le persone dell'evento come le legge il programma. */
+export interface PersoneDelModulo {
   moderatorName?: string | null;
   moderatorPublicListed?: boolean;
-  moderators: Array<{
+  moderators: ReadonlyArray<{
     name: string;
     email: string;
     grantId?: string | null;
     organizer: boolean;
     publicListed: boolean;
   }>;
-  speakers: Array<{
+  speakers: ReadonlyArray<{
     name: string;
     email: string;
     grantId?: string | null;
     publicListed: boolean;
   }>;
-}): OpzioneRelatore[] {
+}
+
+/** Le persone fra cui scegliere: l'organizzatore principale, poi le persone
+ *  del passo nell'ordine dell'elenco. */
+export function opzioniRelatore(form: PersoneDelModulo): OpzioneRelatore[] {
   const out: OpzioneRelatore[] = [];
   const principale = (form.moderatorName ?? '').trim();
   if (principale) {
@@ -133,6 +136,26 @@ export function opzioniRelatore(form: {
       out.push({ key, name: s.name, role: 'speaker', publicListed: !!s.publicListed });
   }
   return out;
+}
+
+/**
+ * Le persone fra cui scegliere nel programma: come opzioniRelatore, ma
+ * l'organizzatore principale c'e' sempre, anche senza nome (cancellarlo e
+ * riscriverlo non deve togliere i suoi interventi). Il nome vuoto lo
+ * sostituisce chi mostra l'elenco.
+ */
+export function opzioniConPrincipale(form: PersoneDelModulo): OpzioneRelatore[] {
+  const tutte = opzioniRelatore(form);
+  if (tutte.some((o) => o.key === CHIAVE_PRINCIPALE)) return tutte;
+  return [
+    {
+      key: CHIAVE_PRINCIPALE,
+      name: '',
+      role: 'organizer',
+      publicListed: !!form.moderatorPublicListed,
+    },
+    ...tutte,
+  ];
 }
 
 /** Una riga che si salva: ha un titolo. Le righe vuote si lasciano. */
@@ -306,8 +329,81 @@ export function chiaviOrfane(
   );
 }
 
-/** Errori del programma per il passo «Persone»: una durata scritta che non e'
- *  una durata. Le righe senza titolo non contano (non si salvano). */
+/**
+ * Il modulo senza le scelte di chi interviene rimaste senza persona (tolta
+ * nel passo «Persone»), e le righe che l'hanno persa. L'organizzatore
+ * principale resta sempre una scelta, anche senza nome: cancellarlo e
+ * riscriverlo non toglie i suoi interventi.
+ */
+export function senzaRelatoriAssenti<T extends PersoneDelModulo & { agenda?: readonly AgendaDraft[] }>(
+  form: T
+): { form: T; righe: string[] } {
+  const orfane = chiaviOrfane(form.agenda ?? [], opzioniConPrincipale(form));
+  const righe: string[] = [];
+  const agenda = (form.agenda ?? []).map((v) => {
+    if (!v.speakerKey || !orfane.has(v.speakerKey)) return v;
+    righe.push(v.key);
+    return { ...v, speakerKey: null };
+  });
+  return righe.length === 0 ? { form, righe } : { form: { ...form, agenda }, righe };
+}
+
+/** I relatori che non hanno ancora un intervento nel programma: un argomento
+ *  con un titolo (una riga senza non si salva). */
+export function relatoriSenzaIntervento(
+  form: PersoneDelModulo & { agenda?: readonly AgendaDraft[] }
+): OpzioneRelatore[] {
+  const assegnate = new Set(
+    (form.agenda ?? []).filter(haTitolo).map((v) => v.speakerKey).filter(Boolean)
+  );
+  return opzioniRelatore(form).filter((o) => o.role === 'speaker' && !assegnate.has(o.key));
+}
+
+/** Una riga appena aggiunta e ancora intatta: senza argomento, senza chi
+ *  interviene, senza durata e mai salvata. */
+export function rigaIntatta(v: AgendaDraft | undefined): boolean {
+  return !!v && !v.id && !haTitolo(v) && !v.speakerKey && !v.minutes.trim();
+}
+
+/**
+ * Il programma con un intervento di una persona in fondo: nella riga vuota
+ * appena aggiunta, se c'e' (non resta una riga in piu' da togliere), altrimenti
+ * in una riga nuova. Con l'indice della riga, per portarci il fuoco.
+ */
+export function conIntervento(
+  agenda: readonly AgendaDraft[],
+  speakerKey: string
+): { agenda: AgendaDraft[]; indice: number } {
+  const ultima = agenda.length - 1;
+  if (rigaIntatta(agenda[ultima])) {
+    return {
+      agenda: agenda.map((v, i) => (i === ultima ? { ...v, speakerKey } : v)),
+      indice: ultima,
+    };
+  }
+  return { agenda: [...agenda, { ...nuovaVoce(), speakerKey }], indice: agenda.length };
+}
+
+/**
+ * La descrizione sembra contenere gia' un programma: un titolo «Programma» o
+ * «Agenda» (anche in inglese), o almeno due righe che cominciano con un
+ * orario («10:00», «- 10.30», «| 11:00 |»). Nella pagina comparirebbe due
+ * volte, e senza orari calcolati ne' persone.
+ */
+export function descrizioneConProgramma(testo: string | null | undefined): boolean {
+  const righe = (testo ?? '').split(/\r?\n/);
+  const titolo = /^\s*(?:#{1,6}\s*|\*\*|__)?\s*(?:programma|programme|program|agenda)\b[\s:*_]*$/i;
+  if (righe.some((r) => titolo.test(r))) return true;
+  // Un orario, non una data («12.05.2026») ne' il numero di un paragrafo
+  // («1.10»): con il punto l'ora ha due cifre, o e' del mattino («9.30»).
+  const orario =
+    /^\s*(?:[-*+]\s+|\d+[.)]\s+|\|\s*)?(?:\*\*)?(?:ore\s+)?(?:(?:[01]?\d|2[0-3]):|(?:[01]\d|2[0-3]|0?[7-9])\.)[0-5]\d\b(?![.:/]\d)/i;
+  return righe.filter((r) => orario.test(r)).length >= 2;
+}
+
+/** Errori del programma per il suo passo: una durata scritta che non e' una
+ *  durata. Le righe senza titolo non contano (non si salvano), e ad agenda
+ *  spenta nemmeno il programma (non si salva: il passo non lo fa cambiare). */
 export function erroriProgramma(form: {
   agendaEnabled: boolean;
   agenda?: readonly AgendaDraft[];
@@ -320,6 +416,11 @@ export function erroriProgramma(form: {
     }
   });
   return errs;
+}
+
+/** L'ora («hh:mm») di un istante nel fuso dell'evento. */
+export function oraNelFuso(d: Date, tz: string): string {
+  return toDatetimeLocalInTz(d, tz).slice(11, 16);
 }
 
 /** Data e ora del modulo (`AAAA-MM-GGThh:mm` nel fuso dell'evento) come

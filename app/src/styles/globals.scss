@@ -11649,21 +11649,8 @@ html:has(.wizard-azioni) {
   }
 }
 
-// ── Il programma nel passo «Persone» del wizard: una riga per argomento con
-// l'ora calcolata, l'argomento, chi interviene, i minuti e i comandi.
-.wizard-programma-spento > .wizard-group__body {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1.5rem;
-}
-
-.wizard-programma-spento__testo {
-  flex: 1 1 22rem;
-  min-width: 0;
-}
-
+// ── Il programma nel passo «Programma» del wizard: una riga per argomento
+// con l'ora calcolata, l'argomento, chi interviene, i minuti e i comandi.
 .wizard-programma__nota {
   display: flex;
   gap: 0.5rem;
@@ -11802,15 +11789,20 @@ html:has(.wizard-azioni) {
   }
 }
 
-@media (min-width: 768px) {
+// Fino ai 1200 px il modulo ha tutta la larghezza: le etichette le dice
+// l'intestazione delle colonne. Oltre, il passo ha l'anteprima accanto e le
+// righe vanno a capo come sugli schermi stretti (sotto), con le etichette.
+@media (min-width: 768px) and (max-width: 1199.98px) {
   .wizard-programma__etichetta {
     @include visually-hidden;
   }
 }
 
-// Sugli schermi stretti ogni riga va a capo: l'ora a sinistra, poi
-// l'argomento, chi interviene, e i minuti con i comandi sulla stessa riga.
-@media (max-width: 767.98px) {
+// Ogni riga va a capo: l'ora a sinistra, poi l'argomento, chi interviene, e
+// i minuti con i comandi sulla stessa riga. Sugli schermi stretti, e nella
+// colonna del modulo accanto all'anteprima (niente container query: il
+// minificatore le ha gia' rovinate una volta).
+@mixin wizard-programma-a-capo {
   .wizard-programma__intestazione {
     display: none;
   }
@@ -11855,6 +11847,16 @@ html:has(.wizard-azioni) {
 
   .wizard-programma__nascosto {
     grid-area: nascosto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  @include wizard-programma-a-capo;
+}
+
+@media (min-width: 1200px) {
+  .wizard-con-anteprima {
+    @include wizard-programma-a-capo;
   }
 }
 
@@ -13407,4 +13409,232 @@ a.campo-file__nome {
   .campo-file .progress-bar {
     transition: none;
   }
+
+// ── Il passo «Programma» del wizard: lo stato, le persone da cui partire,
+// la persona nuova; la scheda nel passo «Evento» e il posto del programma
+// nell'anteprima della pagina.
+.wizard-programma__stato {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  background: #eef7f1;
+  color: #00532f;
+  font-size: 0.9rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: currentColor;
+  }
+}
+
+.wizard-programma__stato--spento {
+  background: #f2f4f7;
+  color: #3d4955;
+
+  > span {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+}
+
+.wizard-programma__stato-nota {
+  flex-basis: 100%;
+  font-size: 0.85rem;
+}
+
+.wizard-programma__blocco {
+  margin-bottom: 1.5rem;
+}
+
+.wizard-programma__sottotitolo {
+  margin: 0 0 0.5rem;
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.wizard-programma__vuoto {
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.9rem;
+}
+
+.wizard-programma__persone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+// Una persona: un pulsante grande abbastanza per il dito (44 px), con la
+// foto, il nome, il ruolo e l'azione scritta.
+.wizard-programma__persona {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  max-width: 100%;
+  padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+  border: 1px solid #c5d0db;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-text);
+  font-size: 0.875rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #0066cc;
+    background: #f2f7fc;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &[aria-expanded='true'] {
+    border-color: #0066cc;
+    background: #f2f7fc;
+  }
+}
+
+.wizard-programma__persona--nuova {
+  padding-left: 0.75rem;
+  border-style: dashed;
+}
+
+.wizard-programma__persona-testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.wizard-programma__persona-nome {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wizard-programma__persona-ruolo {
+  color: #455b71;
+  font-size: 0.78rem;
+}
+
+.wizard-programma__persona-azione {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.2rem;
+  color: #0066cc;
+  font-weight: 600;
+
+  .icon {
+    fill: currentColor;
+  }
+}
+
+.wizard-programma__senza {
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+}
+
+.wizard-programma__nuova {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid #c5d0db;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.wizard-programma__nuova-titolo {
+  margin: 0 0 0.5rem;
+  color: var(--app-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.wizard-programma__mostra {
+  font-size: 0.8rem;
+}
+
+// Il rimando dal passo «Persone».
+.wizard-programma__rimando {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0 0 1rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: #0066cc;
+  }
+}
+
+// La scheda del programma nel passo «Evento», sotto la descrizione.
+.wizard-programma-scheda {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.wizard-programma-scheda__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.wizard-programma-scheda__icona {
+  flex-shrink: 0;
+  fill: #0066cc;
+}
+
+.wizard-programma-scheda__testo {
+  flex: 1 1 16rem;
+  min-width: 0;
+  color: #3d4955;
+  font-size: 0.9rem;
+}
+
+.wizard-programma-scheda__titolo {
+  margin: 0 0 0.15rem;
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+// Nell'anteprima con il programma in primo piano: la descrizione accorciata
+// a qualche riga, e il posto del programma finche' non ha argomenti.
+.anteprima-pagina__descrizione-breve {
+  max-height: 6.5em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+}
+
+.anteprima-pagina__posto-programma {
+  margin: 0 0 1rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed #c5d0db;
+  border-radius: 8px;
+  color: var(--app-muted);
+  text-align: center;
 }

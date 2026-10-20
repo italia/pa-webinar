@@ -280,6 +280,64 @@ describe('PagePreview', () => {
     expect(ridotta.querySelector('.event-programma__nota')?.textContent).toContain('45 minuti');
   });
 
+  it('sul programma: senza argomenti il posto dove comparira\', la descrizione accorciata e niente copertina', () => {
+    const dati = datiAnteprima(
+      { ...MODULO, agendaEnabled: true },
+      { locale: 'it', tags: ETICHETTE, startsAt: INIZIO, endsAt: FINE, parseTitleKicker: false },
+    );
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <PagePreview dati={dati} fuoco="programma" />
+        </NextIntlClientProvider>
+      );
+    });
+    const ridotta = container.querySelector('.anteprima-pagina__ridotta')!;
+    expect(ridotta.textContent).toContain(messages.admin.wizard.programme.previewPlaceholder);
+    expect(ridotta.querySelector('.anteprima-pagina__descrizione-breve')?.textContent).toContain('descrizione');
+    expect(ridotta.querySelector('.event-cover, img[src="/api/assets/image/copertina.jpg"]')).toBeNull();
+  });
+
+  it('sul programma, con argomenti: il programma al posto del segnaposto', () => {
+    const dati = datiAnteprima(
+      {
+        ...MODULO,
+        agendaEnabled: true,
+        agenda: [{ key: 'r1', label: 'Apertura', minutes: '15', speakerKey: null }],
+      },
+      { locale: 'it', tags: ETICHETTE, startsAt: INIZIO, endsAt: FINE, parseTitleKicker: false },
+    );
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <PagePreview dati={dati} fuoco="programma" />
+        </NextIntlClientProvider>
+      );
+    });
+    const ridotta = container.querySelector('.anteprima-pagina__ridotta')!;
+    expect(ridotta.querySelectorAll('.event-programma__voce')).toHaveLength(1);
+    expect(ridotta.textContent).not.toContain(messages.admin.wizard.programme.previewPlaceholder);
+  });
+
+  it('sulla pagina intera, senza argomenti, nessun segnaposto del programma', () => {
+    const dati = datiAnteprima(MODULO, {
+      locale: 'it',
+      tags: ETICHETTE,
+      startsAt: INIZIO,
+      endsAt: FINE,
+      parseTitleKicker: false,
+    });
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <PagePreview dati={dati} />
+        </NextIntlClientProvider>
+      );
+    });
+    expect(container.textContent).not.toContain(messages.admin.wizard.programme.previewPlaceholder);
+    expect(container.querySelector('.anteprima-pagina__descrizione-breve')).toBeNull();
+  });
+
   it("senza titolo ne' data dice che cosa manca", () => {
     const dati = datiAnteprima(
       { ...MODULO, title: { it: '' }, description: { it: '' } },

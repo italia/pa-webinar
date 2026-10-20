@@ -1,13 +1,15 @@
 'use client';
 
 /**
- * Il wizard dell'evento, in quattro passi semplici:
+ * Il wizard dell'evento, in cinque passi semplici:
  *
  *   1. Evento      — titolo, descrizione, copertina, categorie
  *   2. Quando      — date e fuso, partecipanti attesi, ricorrenza
  *   3. Persone     — organizzatore principale, enti, persone con un ruolo,
  *                    invitati
- *   4. Riepilogo   — cio' che manca, l'evento e le scelte del modello in
+ *   4. Programma   — facoltativo: gli argomenti, chi interviene, le durate
+ *                    (non per le chiamate istantanee, che non hanno pagina)
+ *   5. Riepilogo   — cio' che manca, l'evento e le scelte del modello in
  *                    schede, le lingue di traduzione, l'informativa; bozza o
  *                    pubblicazione
  *
@@ -44,7 +46,8 @@ import {
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
-  WIZARD_MAIN_STEPS,
+  passiPrincipali,
+  passoDisponibile,
   wizardStepFromParam,
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
@@ -61,13 +64,16 @@ import {
   submitQuestionnaire,
 } from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
-import ProgrammeSection from './programme-section';
+import StepProgramma from './programme-section';
+import ProgrammeCard from './programme-card';
 import {
   agendaDalServer,
   concessioneDaChiave,
   conIdSalvati,
+  haTitolo,
   istanteDalModulo,
   pianoDaInviare,
+  senzaRelatoriAssenti,
   type StepProgrammeValue,
   type VoceSalvata,
 } from './programme-plan';
@@ -715,9 +721,13 @@ export default function EventWizard(props: WizardProps) {
   // Quale pulsante ha avviato il salvataggio: solo lui dice «Salvataggio…».
   const [azione, setAzione] = useState<'draft' | 'publish' | null>(null);
   // Il passo di partenza, anche nominato come una volta (`permissions`,
-  // `content`: ora sezioni delle impostazioni avanzate).
+  // `content`: ora sezioni delle impostazioni avanzate). Una chiamata
+  // istantanea non ha il programma: chi lo chiede arriva a «Persone».
+  const istantanea = initialEvent?.event.eventType === 'INSTANT';
   const partenza = mode === 'edit' ? wizardStepFromParam(props.initialStep) : null;
-  const [activeStep, setActiveStep] = useState<StepKey>(partenza?.step ?? 'base');
+  const [activeStep, setActiveStep] = useState<StepKey>(
+    partenza ? passoDisponibile(partenza.step, istantanea) : 'base',
+  );
   const [submitting, setSubmitting] = useState(false);
   // Le foto delle persone in viaggio verso il server: finche' ce n'e' una,
   // salvare o cambiare passo la perderebbe (il campo smonta e il modulo non
@@ -920,9 +930,52 @@ export default function EventWizard(props: WizardProps) {
     return () => osservatore.disconnect();
   }, [fieldErrors, activeStep]);
 
-  const updateForm = useCallback((patch: Partial<WizardForm>) => {
-    setForm((prev) => ({ ...prev, ...patch }));
-  }, []);
+  // Una persona tolta (nel passo «Persone») non interviene piu': le sue
+  // scelte nel programma si tolgono subito, anche senza aprire il passo
+  // «Programma» (senzaRelatoriAssenti). Vale anche per un modulo che arriva
+  // intero (una bozza ripresa): le persone della bozza possono non essere
+  // quelle del programma che resta. Un'agenda gia' usata in sala non si
+  // tocca: si legge soltanto.
+  const agendaBloccata = !!initialEvent?.agendaLocked;
+  const conSceltePulite = useCallback(
+    (modulo: WizardForm): WizardForm =>
+      agendaBloccata ? modulo : senzaRelatoriAssenti(modulo).form,
+    [agendaBloccata],
+  );
+  const updateForm = useCallback(
+    (patch: Partial<WizardForm>) => {
+      setForm((prev) => {
+        const next = { ...prev, ...patch };
+        return 'moderators' in patch || 'speakers' in patch ? conSceltePulite(next) : next;
+      });
+    },
+    [conSceltePulite],
+  );
+  // Il passo «Programma», quando si apre, dice quanti argomenti hanno perso
+  // chi interviene da quando lo si e' visto l'ultima volta: il confronto e'
+  // con le scelte di allora (all'inizio, quelle di partenza). Una scelta
+  // tolta a mano nel passo era gia' vista, e non conta.
+  const agendaCorrenteRef = useRef(form.agenda);
+  useEffect(() => {
+    agendaCorrenteRef.current = form.agenda;
+  }, [form.agenda]);
+  const scelteVisteRef = useRef<Map<string, string | null>>(
+    new Map((initial.agenda ?? []).map((v) => [v.key, v.speakerKey])),
+  );
+  const [righeSenzaRelatore, setRigheSenzaRelatore] = useState(0);
+  useEffect(() => {
+    if (activeStep !== 'programme') return;
+    const viste = scelteVisteRef.current;
+    setRigheSenzaRelatore(
+      (agendaCorrenteRef.current ?? []).filter((v) => !v.speakerKey && !!viste.get(v.key)).length,
+    );
+    return () => {
+      scelteVisteRef.current = new Map(
+        (agendaCorrenteRef.current ?? []).map((v) => [v.key, v.speakerKey]),
+      );
+      setRigheSenzaRelatore(0);
+    };
+  }, [activeStep]);
 
   // La libreria dei modelli di domande: la leggono i passi che la mostrano,
   // una volta sola per tutto il wizard.
@@ -1090,8 +1143,13 @@ export default function EventWizard(props: WizardProps) {
     // Un questionario che ha gia' risposte non si cambia da qui: la bozza non
     // ne riporta una versione modificata, che il salvataggio non scriverebbe.
     const risposte = initialEvent?.questionnaireResponses;
+    // Le scelte della bozza sono di chi l'ha scritta: il programma dira'
+    // solo quelle tolte ora, per una persona che nella bozza non c'e'.
+    if (salvata && Array.isArray(salvata.form.agenda) && !initialEvent?.agendaLocked) {
+      scelteVisteRef.current = new Map(salvata.form.agenda.map((v) => [v.key, v.speakerKey]));
+    }
     if (salvata)
-      setForm((prima) => ({
+      setForm((prima) => conSceltePulite({
         ...prima,
         ...salvata.form,
         ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
@@ -1111,7 +1169,7 @@ export default function EventWizard(props: WizardProps) {
       /* ignore */
     }
     setDraftAvailable(false);
-  }, [draftKey, viaToken, initialEvent]);
+  }, [draftKey, viaToken, initialEvent, conSceltePulite]);
   const dismissDraft = useCallback(() => {
     try {
       const salvata = savedDraftRef.current;
@@ -1122,10 +1180,12 @@ export default function EventWizard(props: WizardProps) {
     setDraftAvailable(false);
   }, []);
 
-  // Quattro passi nella barra e, a parte, le impostazioni avanzate (con la
-  // sezione aperta). Avanti e Indietro percorrono i quattro passi; dalle
-  // impostazioni avanzate si torna al riepilogo.
-  const indicePasso = (WIZARD_MAIN_STEPS as readonly StepKey[]).indexOf(activeStep);
+  // I passi nella barra (cinque, quattro per una chiamata istantanea, senza
+  // il programma) e, a parte, le impostazioni avanzate (con la sezione
+  // aperta). Avanti e Indietro percorrono i passi; dalle impostazioni
+  // avanzate si torna al riepilogo.
+  const passi = passiPrincipali(istantanea);
+  const indicePasso = (passi as readonly StepKey[]).indexOf(activeStep);
   const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
     if (fotoInViaggio > 0) return;
     if (step === 'advanced') apriSezione(sez ?? null);
@@ -1133,7 +1193,10 @@ export default function EventWizard(props: WizardProps) {
   };
   const goPrev = () => {
     if (activeStep === 'advanced') vai('review');
-    else if (indicePasso > 0) vai(WIZARD_MAIN_STEPS[indicePasso - 1]!);
+    else if (indicePasso > 0) vai(passi[indicePasso - 1]!);
+    // Il programma di una chiamata istantanea (raggiunto da un errore) non e'
+    // nella barra: si torna a «Persone».
+    else if (indicePasso < 0) vai(passoDisponibile(activeStep, istantanea));
   };
   /** Al passo dopo (dalle impostazioni avanzate: al riepilogo), solo con il
    *  passo a posto. */
@@ -1153,20 +1216,19 @@ export default function EventWizard(props: WizardProps) {
     setFieldErrors({});
     setSubmitError(null);
     if (activeStep === 'advanced' || indicePasso < 0) setActiveStep('review');
-    else if (indicePasso < WIZARD_MAIN_STEPS.length - 1)
-      setActiveStep(WIZARD_MAIN_STEPS[indicePasso + 1]!);
+    else if (indicePasso < passi.length - 1)
+      setActiveStep(passi[indicePasso + 1]!);
   };
 
-  // Chi si iscrive davvero: la scelta dell'evento, o quella del sito. Una
-  // chiamata istantanea non ha iscrizione: il link e' l'invito.
-  const istantanea = initialEvent?.event.eventType === 'INSTANT';
   // L'anteprima della pagina segue il modulo un passo indietro: si scrive
   // senza aspettarla. Nella lingua dell'interfaccia, come la vedrebbe chi
   // visita il sito in quella lingua (con il ripiego della pagina),
   // e con tutte le etichette, anche quando il modulo non le fa cambiare.
   const linguaInterfaccia = useLocale();
   const moduloDifferito = useDeferredValue(form);
-  const conAnteprima = !istantanea && (activeStep === 'base' || activeStep === 'schedule');
+  const conAnteprima =
+    !istantanea &&
+    (activeStep === 'base' || activeStep === 'schedule' || activeStep === 'programme');
   const anteprima = useMemo(
     () =>
       conAnteprima
@@ -1188,6 +1250,8 @@ export default function EventWizard(props: WizardProps) {
       props.campiLiberi,
     ],
   );
+  // Chi si iscrive davvero: la scelta dell'evento, o quella del sito. Una
+  // chiamata istantanea non ha iscrizione: il link e' l'invito.
   const iscrizioneAperta = publicRegistrationFor(
     form,
     props.publicRegistrationEnabled ?? true
@@ -1915,7 +1979,7 @@ export default function EventWizard(props: WizardProps) {
       )}
 
       <StepNav
-        steps={WIZARD_MAIN_STEPS.map((k) => ({
+        steps={passi.map((k) => ({
           key: k,
           label: t(`flow.steps.${k}`),
           daCompletare: mancanti.some((m) => m.step === k),
@@ -1966,6 +2030,15 @@ export default function EventWizard(props: WizardProps) {
             <div className="wizard-con-anteprima__modulo">
               <Step1Base
                 parte={activeStep === 'base' ? 'evento' : 'quando'}
+                dopoDescrizione={
+                  istantanea ? undefined : (
+                    <ProgrammeCard
+                      value={form}
+                      descrizione={form.description[props.defaultLocale] ?? ''}
+                      onVai={() => vai('programme')}
+                    />
+                  )
+                }
                 onEtichettaCreata={
                   viaToken === null && props.canManageTags
                     ? (nuova) => setEtichetteCreate((prima) => [...prima, nuova])
@@ -1998,17 +2071,8 @@ export default function EventWizard(props: WizardProps) {
               primary={primario}
               publicRegistrationEnabled={iscrizioneAperta}
               // Il programma si pubblica nella pagina dell'evento: una
-              // chiamata istantanea non ne ha una.
-              programma={
-                istantanea ? undefined : (
-                  <ProgrammeSection
-                    value={form}
-                    onChange={updateForm}
-                    locked={!!initialEvent?.agendaLocked}
-                    fieldErrors={fieldErrors}
-                  />
-                )
-              }
+              // chiamata istantanea non ne ha una, ne' il passo che lo prepara.
+              rimandoProgramma={!istantanea}
               iscrizione={
                 istantanea ? undefined : (
                   <SezioneIscrizione
@@ -2054,6 +2118,25 @@ export default function EventWizard(props: WizardProps) {
             </StepPeople>
           </RubricaAccessContext.Provider>
         )}
+        {activeStep === 'programme' && (
+          // Accanto, la pagina dell'evento con il programma in primo piano.
+          // Una chiamata istantanea non ha il passo nella barra: ci arriva
+          // solo un errore da correggere, che deve potersi vedere.
+          <div className={istantanea ? undefined : 'wizard-con-anteprima'}>
+            <div className="wizard-con-anteprima__modulo">
+              <StepProgramma
+                value={form}
+                onChange={updateForm}
+                locked={agendaBloccata}
+                fieldErrors={fieldErrors}
+                tolte={righeSenzaRelatore}
+                onVaiPersone={() => vai('invites')}
+                creazione={mode === 'create'}
+              />
+            </div>
+            {anteprima && <PagePreview dati={anteprima} fuoco="programma" />}
+          </div>
+        )}
         {activeStep === 'review' && (
           <Step5Review
             form={form}
@@ -2069,6 +2152,8 @@ export default function EventWizard(props: WizardProps) {
             eventLocale={SOURCE_LANGUAGE_FALLBACK}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
+            onVaiProgramma={istantanea ? undefined : () => vai('programme')}
+            programmaInCreazione={mode === 'create'}
             questionari={
               viaToken === null ? (
                 <RigheQuestionari
@@ -2099,6 +2184,14 @@ export default function EventWizard(props: WizardProps) {
               participation: (
                 <StepPermissions
                   parte="partecipazione"
+                  programma={
+                    istantanea
+                      ? undefined
+                      : {
+                          argomenti: (form.agenda ?? []).filter(haTitolo).length,
+                          onVai: () => vai('programme'),
+                        }
+                  }
                   value={form}
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
@@ -2275,7 +2368,7 @@ export default function EventWizard(props: WizardProps) {
 
 // ── Step navigation bar ─────────────────────────────────────────────────────
 //
-// I quattro passi numerati e, a parte, le impostazioni avanzate. Ogni passo
+// I passi numerati e, a parte, le impostazioni avanzate. Ogni passo
 // si apre con un clic (lo stato e' uno solo, non si perde niente); un passo
 // con un campo obbligatorio vuoto lo dice sotto il nome.
 
@@ -2324,6 +2417,9 @@ function datiCambiati(f: WizardForm, partenza: WizardForm): Partial<WizardForm> 
       (out as Record<string, unknown>)[k] = f[k];
     }
   }
+  // Un programma preparato e acceso e' dell'evento: con un formato che ha
+  // l'agenda spenta non diventerebbe di sola lettura, ne' si perderebbe.
+  if (out.agenda && f.agendaEnabled) out.agendaEnabled = true;
   return out;
 }
 
