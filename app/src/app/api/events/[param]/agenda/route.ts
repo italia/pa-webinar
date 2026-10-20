@@ -26,6 +26,7 @@ import {
 } from '@/lib/errors';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 import { deleteCacheByPrefix, getCached, setCache } from '@/lib/cache';
+import { getRedis } from '@/lib/redis';
 import { agendaSpeakerSchema, verificaRelatori } from '@/lib/agenda/speaker';
 import { MAX_AGENDA_ITEMS, agendaGiaUsata, plannedMinutesSchema } from '@/lib/agenda/status';
 
@@ -115,11 +116,16 @@ export const GET = withErrorHandling(async (request, context) => {
   const url = new URL(request.url);
 
   // Lettura leggera per l'anteprima nella barra della sala: titoli e stati,
-  // niente reazioni e niente identita', uguale per tutti e tenuta in caldo
-  // qualche secondo. La legge ogni presente, non solo chi apre il pannello.
+  // niente reazioni e niente identita', uguale per tutti. La legge ogni
+  // presente, non solo chi apre il pannello: senza canale si tiene in caldo
+  // qualche secondo. Col canale attivo no, come per domande e sondaggi: i
+  // client rileggono appena arriva l'avviso, e un'altra istanza dell'app
+  // risponderebbe con la voce corrente di prima, che resterebbe sullo schermo
+  // fino al giro successivo.
   if (url.searchParams.get('lite') === '1') {
-    const chiave = `agenda-lite:${event.id}`;
-    const inCaldo = getCached<unknown>(chiave);
+    const pushAttivo = getRedis()?.status === 'ready';
+    const chiave = pushAttivo ? null : `agenda-lite:${event.id}`;
+    const inCaldo = chiave ? getCached<unknown>(chiave) : null;
     if (inCaldo) return Response.json(inCaldo);
     const voci = await prisma.eventAgendaItem.findMany({
       where: { eventId: event.id },
@@ -141,9 +147,7 @@ export const GET = withErrorHandling(async (request, context) => {
         completedAt: v.completedAt?.toISOString() ?? null,
       })),
     };
-    // Breve: con piu' istanze dell'app, quella che risponde dopo un avviso
-    // puo' avere in caldo lo stato di prima.
-    setCache(chiave, corpo, 2000);
+    if (chiave) setCache(chiave, corpo, 2000);
     return Response.json(corpo);
   }
 

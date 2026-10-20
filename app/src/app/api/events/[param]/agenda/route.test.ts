@@ -38,6 +38,9 @@ vi.mock('@/lib/auth/moderator', () => ({
   ),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+/** Redis pronto = il canale della sala consegna gli avvisi. */
+const { canale } = vi.hoisted(() => ({ canale: { attivo: false } }));
+vi.mock('@/lib/redis', () => ({ getRedis: () => (canale.attivo ? { status: 'ready' } : null) }));
 
 const EVENT_ID = '55555555-5555-4555-8555-555555555555';
 const A = '11111111-1111-4111-8111-111111111111';
@@ -191,6 +194,18 @@ describe('GET ?lite=1 (barra della sala)', () => {
     await POST(req('POST', { label: 'Nuovo' }), ctx());
     await GET(req('GET', undefined, '', '?lite=1'), ctx());
     expect(mockedItems).toHaveBeenCalledTimes(2);
+  });
+
+  it('col canale attivo non si tiene in caldo: dopo un avviso ogni istanza legge la voce corrente vera', async () => {
+    canale.attivo = true;
+    try {
+      mockedItems.mockResolvedValue([]);
+      await GET(req('GET', undefined, '', '?lite=1'), ctx());
+      await GET(req('GET', undefined, '', '?lite=1'), ctx());
+      expect(mockedItems).toHaveBeenCalledTimes(2);
+    } finally {
+      canale.attivo = false;
+    }
   });
 });
 
