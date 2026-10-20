@@ -4107,6 +4107,7 @@
     "exportToPresent": "Upload de pdf-versie om het aan de zaal te presenteren.",
     "errors": {
       "changed": "De presentatie is intussen gewijzigd: probeer het opnieuw.",
+      "notPresenter": "Nu presenteert iemand anders: de pagina is voor de zaal niet gewijzigd.",
       "closed": "Het evenement is afgelopen: presenteren is niet meer mogelijk.",
       "notPresentable": "Alleen een pdf die bij de materialen is geüpload, kan worden gepresenteerd.",
       "forbidden": "Alleen moderators en sprekers kunnen presenteren.",

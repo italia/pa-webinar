@@ -9,8 +9,11 @@
  *   POST    presenta un PDF caricato fra i materiali dell'evento (sostituisce
  *           quello in corso). Sullo stesso PDF è il passaggio di mano («Presenta
  *           tu»): chi chiama diventa chi presenta, dalla pagina indicata, e il
- *           numero di pagine già noto resta;
- *   PATCH   vai a una pagina del materiale presentato;
+ *           numero di pagine già noto resta. Con `expectedVersion` il passaggio
+ *           vale solo se la presentazione è ancora quella vista, stesso PDF e
+ *           stessa versione (409 altrimenti);
+ *   PATCH   vai a una pagina del materiale presentato: solo chi presenta
+ *           adesso, chiunque altro riceve 409 NOT_PRESENTER;
  *   DELETE  chiudi la presentazione.
  *
  * Le tre mutazioni: link moderatore principale o concessione nominale non
@@ -117,6 +120,11 @@ function presentazioneCambiata(): AppError {
   return new ConflictError('The presentation changed');
 }
 
+/** Chi chiede non è chi presenta adesso: la presentazione è passata di mano. */
+function nonPresentaPiu(): AppError {
+  return new AppError('Only the current presenter can change page', 409, 'NOT_PRESENTER');
+}
+
 function eNonTrovato(err: unknown): boolean {
   return (
     !!err &&
@@ -167,6 +175,32 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', erroriDi(parsed.error));
   const { materialId } = parsed.data;
   const page = parsed.data.page ?? 1;
+  // «Presenta tu» dice quale presentazione vedeva: il materiale e la versione.
+  const versioneAttesa = parsed.data.expectedVersion;
+
+  // Lo stesso PDF già presentato: tiene il numero di pagine e, se a chiamare è
+  // un altro, è un passaggio di mano.
+  const prima = await prisma.eventPresentation.findUnique({
+    where: { eventId: event.id },
+    select: {
+      materialId: true,
+      pageCount: true,
+      presenterRole: true,
+      presenterGrantId: true,
+      version: true,
+    },
+  });
+  // Il passaggio di mano vale solo sulla presentazione che chi chiama vedeva:
+  // se nel frattempo è cambiata (un altro documento, la chiusura, un altro
+  // passaggio di mano, una pagina girata), una vista rimasta indietro non
+  // riporta in sala il PDF di prima né lo toglie a chi lo ha appena preso.
+  // Chi chiama rilegge e vede la presentazione com'è adesso.
+  if (
+    versioneAttesa !== undefined &&
+    (prima?.materialId !== materialId || prima.version !== versioneAttesa)
+  ) {
+    throw presentazioneCambiata();
+  }
 
   // Un PDF dell'evento, anche fuori dalla fase che il pubblico vede adesso:
   // presentarlo è mostrarlo alla sala, come farebbe la condivisione dello
@@ -183,17 +217,6 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Only an uploaded PDF can be presented', 422, 'NOT_PRESENTABLE');
   }
 
-  // Lo stesso PDF già presentato: tiene il numero di pagine e, se a chiamare è
-  // un altro, è un passaggio di mano.
-  const prima = await prisma.eventPresentation.findUnique({
-    where: { eventId: event.id },
-    select: {
-      materialId: true,
-      pageCount: true,
-      presenterRole: true,
-      presenterGrantId: true,
-    },
-  });
   const stessoDocumento = prima?.materialId === material.id;
   const passaggio = stessoDocumento && !isCurrentPresenter(prima, grant);
   const presenter = {
@@ -204,12 +227,29 @@ export const POST = withErrorHandling(async (request, context) => {
     presenterGrantId: grant.grantId,
     startedAt: new Date(),
   };
-  const row = await prisma.eventPresentation.upsert({
-    where: { eventId: event.id },
-    create: { eventId: event.id, ...presenter, version: 1 },
-    update: { ...presenter, version: { increment: 1 } },
-    select: PRESENTATION_ROW_SELECT,
-  });
+  let row;
+  if (versioneAttesa !== undefined) {
+    try {
+      // Documento e versione fanno parte della condizione: cambiata fra la
+      // lettura e la scrittura, la presentazione non passa di mano e una
+      // chiusa non si riapre.
+      row = await prisma.eventPresentation.update({
+        where: { eventId: event.id, materialId: material.id, version: versioneAttesa },
+        data: { ...presenter, version: { increment: 1 } },
+        select: PRESENTATION_ROW_SELECT,
+      });
+    } catch (err) {
+      if (eNonTrovato(err)) throw presentazioneCambiata();
+      throw err;
+    }
+  } else {
+    row = await prisma.eventPresentation.upsert({
+      where: { eventId: event.id },
+      create: { eventId: event.id, ...presenter, version: 1 },
+      update: { ...presenter, version: { increment: 1 } },
+      select: PRESENTATION_ROW_SELECT,
+    });
+  }
 
   publishPresentation(event.id, pointerOf(row));
   void recordLiveAction({
@@ -243,6 +283,11 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   const attuale = await readPresentationRow(event.id);
   if (!attuale || attuale.materialId !== materialId) throw presentazioneCambiata();
+  // Gira pagina solo chi presenta adesso: la stessa concessione, o il link
+  // principale per una presentazione avviata con quello. Le pagine ancora in
+  // viaggio da chi presentava prima di un passaggio di mano non spostano il
+  // documento di chi lo ha preso.
+  if (!isCurrentPresenter(attuale, grant)) throw nonPresentaPiu();
 
   const pageCount = parsed.data.pageCount ?? attuale.pageCount;
   // Oltre l'ultima pagina, quando si sa quale sia, si resta sull'ultima.
@@ -256,16 +301,27 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   let row;
   try {
-    // Il materiale fa parte della condizione: se nel frattempo un altro ne ha
-    // presentato uno diverso, questa pagina non sposta il suo documento.
+    // Materiale e chi presenta fanno parte della condizione: se nel frattempo
+    // un altro ne ha presentato uno diverso, o ha preso la presentazione,
+    // questa pagina non sposta il suo documento.
     row = await prisma.eventPresentation.update({
-      where: { eventId: event.id, materialId },
+      where: {
+        eventId: event.id,
+        materialId,
+        presenterRole: grant.role,
+        presenterGrantId: grant.grantId,
+      },
       data: { page, pageCount, version: { increment: 1 } },
       select: PRESENTATION_ROW_SELECT,
     });
   } catch (err) {
-    if (eNonTrovato(err)) throw presentazioneCambiata();
-    throw err;
+    if (!eNonTrovato(err)) throw err;
+    // Cambiata fra la lettura e la scrittura: se è lo stesso documento, l'ha
+    // presa un altro, e lo si dice con il codice di chi non presenta più.
+    const ora = await readPresentationRow(event.id);
+    throw ora?.materialId === materialId && !isCurrentPresenter(ora, grant)
+      ? nonPresentaPiu()
+      : presentazioneCambiata();
   }
 
   publishPresentation(event.id, pointerOf(row));

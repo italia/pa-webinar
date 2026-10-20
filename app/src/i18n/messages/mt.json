@@ -4107,6 +4107,7 @@
     "exportToPresent": "Biex tippreżentah lill-kamra, tella’ l-verżjoni PDF tiegħu.",
     "errors": {
       "changed": "Sadanittant il-preżentazzjoni nbidlet: erġa' pprova.",
+      "notPresenter": "Issa qed tippreżenta persuna oħra: il-paġna ma nbidlitx għas-sala.",
       "closed": "L-avveniment intemm: m’għadux possibbli tippreżenta.",
       "notPresentable": "Jista’ jiġi ppreżentat biss PDF imtella’ fost il-materjali.",
       "forbidden": "Il-moderaturi u l-kelliema biss jistgħu jippreżentaw.",

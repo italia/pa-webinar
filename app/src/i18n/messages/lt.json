@@ -4107,6 +4107,7 @@
     "exportToPresent": "Norėdami pristatyti kambariui, įkelkite jo PDF versiją.",
     "errors": {
       "changed": "Tuo metu pristatymas pasikeitė: bandykite dar kartą.",
+      "notPresenter": "Dabar pristato kitas asmuo: puslapis salei nepasikeitė.",
       "closed": "Renginys baigėsi: pristatyti nebegalima.",
       "notPresentable": "Pristatyti galima tik į medžiagą įkeltą PDF.",
       "forbidden": "Pristatyti gali tik moderatoriai ir pranešėjai.",

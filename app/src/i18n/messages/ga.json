@@ -4107,6 +4107,7 @@
     "exportToPresent": "Chun é a chur i láthair an tseomra, uaslódáil a leagan PDF.",
     "errors": {
       "changed": "Athraíodh an cur i láthair idir an dá linn: bainigí triail eile as.",
+      "notPresenter": "Tá duine eile ag cur i láthair anois: níor athraíodh an leathanach don seomra.",
       "closed": "Tá an t-imeacht thart: ní féidir cur i láthair a thuilleadh.",
       "notPresentable": "Ní féidir ach PDF a uaslódáladh i measc na n-ábhar a chur i láthair.",
       "forbidden": "Ní féidir ach le modhnóirí agus le cainteoirí cur i láthair.",

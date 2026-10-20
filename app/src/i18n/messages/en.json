@@ -4107,6 +4107,7 @@
     "exportToPresent": "To present it to the room, upload its PDF version.",
     "errors": {
       "changed": "The presentation changed in the meantime: try again.",
+      "notPresenter": "Someone else is presenting now: the page did not change for the room.",
       "closed": "The event has ended: presenting is no longer possible.",
       "notPresentable": "Only a PDF uploaded among the materials can be presented.",
       "forbidden": "Only moderators and speakers can present.",

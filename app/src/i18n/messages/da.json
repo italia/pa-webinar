@@ -4107,6 +4107,7 @@
     "exportToPresent": "Upload PDF-versionen for at præsentere den for rummet.",
     "errors": {
       "changed": "Præsentationen er ændret i mellemtiden: prøv igen.",
+      "notPresenter": "Nu præsenterer en anden: siden blev ikke skiftet for salen.",
       "closed": "Begivenheden er afsluttet: det er ikke længere muligt at præsentere.",
       "notPresentable": "Kun en pdf, der er uploadet blandt materialerne, kan præsenteres.",
       "forbidden": "Kun moderatorer og talere kan præsentere.",

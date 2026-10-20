@@ -4107,6 +4107,7 @@
     "exportToPresent": "Ladda upp PDF-versionen för att presentera den för rummet.",
     "errors": {
       "changed": "Presentationen har ändrats under tiden: försök igen.",
+      "notPresenter": "Nu presenterar någon annan: sidan byttes inte för salen.",
       "closed": "Evenemanget har avslutats: det går inte längre att presentera.",
       "notPresentable": "Endast en pdf som laddats upp bland materialen kan presenteras.",
       "forbidden": "Endast moderatorer och talare kan presentera.",

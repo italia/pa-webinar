@@ -15,9 +15,10 @@
  * rilettura frenata. Titolo, nome di chi presenta e file stanno dietro le
  * rotte che controllano chi sta nella stanza.
  *
- * CHI. Presentare, girare pagina e chiudere: il link moderatore principale e
- * le concessioni nominali non revocate dell'evento, sia MODERATOR sia SPEAKER
- * (`resolveGrantForEvent`). Leggere: chi sta nella stanza, con la regola dei
+ * CHI. Presentare e chiudere: il link moderatore principale e le concessioni
+ * nominali non revocate dell'evento, sia MODERATOR sia SPEAKER
+ * (`resolveGrantForEvent`). Girare pagina: solo chi presenta adesso
+ * (`isCurrentPresenter`). Leggere: chi sta nella stanza, con la regola dei
  * pannelli (lib/events/panel-read-access).
  *
  * COSA SI PRESENTA. Un PDF caricato fra i materiali dell'evento, con il file

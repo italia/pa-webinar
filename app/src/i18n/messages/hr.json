@@ -4107,6 +4107,7 @@
     "exportToPresent": "Da biste ga prezentirali sobi, prenesite njegovu PDF verziju.",
     "errors": {
       "changed": "U međuvremenu se prezentacija promijenila: pokušajte ponovno.",
+      "notPresenter": "Sada prezentira druga osoba: stranica se za dvoranu nije promijenila.",
       "closed": "Događaj je završio: više nije moguće prezentirati.",
       "notPresentable": "Može se prezentirati samo PDF učitan među materijale.",
       "forbidden": "Prezentirati mogu samo moderatori i govornici.",

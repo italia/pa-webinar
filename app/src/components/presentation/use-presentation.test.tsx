@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PresentationPointer, PresentationState } from '@/lib/presentation/types';
 
 import {
+  PRESENTATION_CHANGE_MESSAGE_MS,
   actionErrorFromResponse,
   usePresentation,
   type PresentationControls,
@@ -101,6 +102,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   act(() => root.unmount());
   container.remove();
   vi.unstubAllGlobals();
@@ -275,12 +277,15 @@ describe('usePresentation — chi presenta', () => {
     await act(async () => {
       esito = await risultato.current!.stop();
     });
+    // La rilettura non trattiene i pulsanti.
+    expect(risultato.current!.busy).toBe(false);
+    await attendi();
     expect(esito).toBe('forbidden');
     expect(risultato.current!.actionError).toBe('forbidden');
     expect(risultato.current!.view.materialId).toBe(M1);
   });
 
-  it('«Presenta tu»: POST sullo stesso documento dalla pagina di chi presenta, e la risposta vale subito', async () => {
+  it('«Presenta tu»: POST sullo stesso documento dalla pagina di chi presenta, con la versione vista, e la risposta vale subito', async () => {
     await monta();
     servito = {
       version: 4,
@@ -299,8 +304,222 @@ describe('usePresentation — chi presenta', () => {
     expect(JSON.parse((init as RequestInit).body as string)).toEqual({
       materialId: M1,
       page: 2,
+      expectedVersion: 3,
     });
     expect(risultato.current!.view.info?.yours).toBe(true);
+    expect(risultato.current!.actionError).toBeNull();
+  });
+
+  it('«Presenta tu» rifiutato perché il documento è cambiato: lo dice, rilegge e mostra quello vero', async () => {
+    await monta();
+    // Nel frattempo è stato presentato un altro documento: la vista non lo sa ancora.
+    servito = stato(6, M2, 1);
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST')
+        return new Response(JSON.stringify({ code: 'CONFLICT' }), { status: 409 });
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    const letture = chiamate('GET').length;
+    let esito: unknown;
+    await act(async () => {
+      esito = await risultato.current!.takeOver(2);
+    });
+    await attendi();
+    expect(esito).toBe('changed');
+    expect(chiamate('POST')).toHaveLength(1);
+    expect(risultato.current!.actionError).toBe('changed');
+    expect(chiamate('GET').length).toBeGreaterThan(letture);
+    expect(risultato.current!.view).toMatchObject({ materialId: M2, page: 1 });
+  });
+
+  it('«Presenta tu» rifiutato perché la presentazione è chiusa: rilegge, e l’errore non resta per la prossima', async () => {
+    await monta();
+    servito = stato(6, null);
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST')
+        return new Response(JSON.stringify({ code: 'CONFLICT' }), { status: 409 });
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    await act(async () => {
+      await risultato.current!.takeOver();
+    });
+    await attendi();
+    expect(risultato.current!.view.materialId).toBeNull();
+    expect(risultato.current!.actionError).toBeNull();
+  });
+
+  it('dopo un passaggio di mano le pagine di chi presentava non valgono: un solo messaggio, coda svuotata, rilettura', async () => {
+    await monta();
+    let rilasciaPagina: () => void = () => {};
+    let rilasciaLettura: () => void = () => {};
+    let trattieni = false;
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        await new Promise<void>((r) => {
+          rilasciaPagina = r;
+        });
+        return new Response(JSON.stringify({ code: 'NOT_PRESENTER' }), { status: 409 });
+      }
+      if (trattieni) {
+        await new Promise<void>((r) => {
+          rilasciaLettura = r;
+        });
+      }
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    const letture = chiamate('GET').length;
+    act(() => {
+      risultato.current!.goTo(3, 10);
+      risultato.current!.goTo(4, 10);
+      risultato.current!.goTo(5, 10);
+    });
+    expect(chiamate('PATCH')).toHaveLength(1);
+    // Nel frattempo la relatrice ha preso la presentazione.
+    servito = {
+      version: 4,
+      presentation: {
+        ...stato(4, M1, 2).presentation!,
+        presenterRole: 'SPEAKER',
+        startedAt: '2026-10-08T09:30:00.000Z',
+      },
+    };
+    trattieni = true;
+    await act(async () => {
+      rilasciaPagina();
+    });
+    await attendi();
+    // Mentre si rilegge chi presentava preme ancora: nemmeno questa parte.
+    act(() => risultato.current!.goTo(6, 10));
+    trattieni = false;
+    await act(async () => {
+      rilasciaLettura();
+    });
+    await attendi();
+    // Le pagine in coda non partono: erano per il turno finito.
+    expect(chiamate('PATCH')).toHaveLength(1);
+    expect(chiamate('GET').length).toBe(letture + 1);
+    expect(risultato.current!.actionError).toBe('notPresenter');
+    expect(risultato.current!.view.info?.presenterRole).toBe('SPEAKER');
+    // Torna la pagina di chi presenta adesso.
+    expect(risultato.current!.displayPage).toBe(2);
+  });
+
+  it('il messaggio di una presentazione passata a un altro si toglie da solo', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await monta();
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH')
+        return new Response(JSON.stringify({ code: 'NOT_PRESENTER' }), { status: 409 });
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    act(() => risultato.current!.goTo(4, 10));
+    await attendi();
+    expect(risultato.current!.actionError).toBe('notPresenter');
+    await act(async () => {
+      vi.advanceTimersByTime(PRESENTATION_CHANGE_MESSAGE_MS - 1_000);
+    });
+    expect(risultato.current!.actionError).toBe('notPresenter');
+    await act(async () => {
+      vi.advanceTimersByTime(1_000);
+    });
+    expect(risultato.current!.actionError).toBeNull();
+  });
+
+  it('una pagina chiesta su un documento appena avviato parte anche dopo il rifiuto di una vecchia', async () => {
+    await monta();
+    let rilascia: () => void = () => {};
+    let patch = 0;
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH') {
+        patch++;
+        if (patch === 1) {
+          await new Promise<void>((r) => {
+            rilascia = r;
+          });
+          return new Response(JSON.stringify({ code: 'CONFLICT' }), { status: 409 });
+        }
+        const corpo = JSON.parse(init.body as string) as { page: number };
+        servito = stato(servito.version + 1, M2, corpo.page);
+        return new Response(JSON.stringify(servito), { status: 200 });
+      }
+      if (init?.method === 'POST') servito = stato(4, M2, 1);
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    // Una pagina del primo documento in viaggio, poi il secondo avviato e sfogliato.
+    act(() => risultato.current!.goTo(3, 10));
+    await act(async () => {
+      await risultato.current!.start(M2);
+    });
+    expect(risultato.current!.view.materialId).toBe(M2);
+    act(() => risultato.current!.goTo(3, 10));
+    await act(async () => {
+      rilascia();
+    });
+    await attendi();
+    expect(chiamate('PATCH')).toHaveLength(2);
+    expect(JSON.parse((chiamate('PATCH')[1]![1] as RequestInit).body as string)).toMatchObject({
+      materialId: M2,
+      page: 3,
+    });
+    expect(risultato.current!.view).toMatchObject({ materialId: M2, page: 3 });
+  });
+
+  it('«Presenta tu» porta la versione più recente che si vede, anche arrivata dal canale', async () => {
+    await monta({ materialId: M1, page: 3, version: 5 });
+    await act(async () => {
+      await risultato.current!.takeOver();
+    });
+    const [, init] = chiamate('POST')[0]!;
+    expect(JSON.parse((init as RequestInit).body as string)).toEqual({
+      materialId: M1,
+      page: 3,
+      expectedVersion: 5,
+    });
+  });
+
+  it('«Presenta tu» rifiutato e rilettura non riuscita: la scena resta com’era, con il messaggio', async () => {
+    await monta();
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST')
+        return new Response(JSON.stringify({ code: 'CONFLICT' }), { status: 409 });
+      return new Response('bad gateway', { status: 502 });
+    });
+    await act(async () => {
+      await risultato.current!.takeOver();
+    });
+    await attendi();
+    expect(risultato.current!.view).toMatchObject({ materialId: M1, page: 2 });
+    expect(risultato.current!.actionError).toBe('changed');
+  });
+
+  it('il messaggio vale per il suo turno: un nuovo turno dello stesso documento lo toglie', async () => {
+    await monta();
+    fetchMock.mockImplementation(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'PATCH')
+        return new Response(JSON.stringify({ code: 'NOT_PRESENTER' }), { status: 409 });
+      return new Response(JSON.stringify(servito), { status: 200 });
+    });
+    act(() => risultato.current!.goTo(4, 10));
+    await attendi();
+    expect(risultato.current!.actionError).toBe('notPresenter');
+    // Lo stesso PDF ripreso da qualcun altro: un turno nuovo.
+    const turnoNuovo = '2026-10-08T10:00:00.000Z';
+    servito = {
+      version: 6,
+      presentation: { ...stato(6, M1, 1).presentation!, startedAt: turnoNuovo },
+    };
+    await act(async () => {
+      root.render(
+        <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+          <Sonda
+            pointer={{ materialId: M1, page: 1, version: 6, startedAt: turnoNuovo }}
+            canPresent
+          />
+        </SWRConfig>
+      );
+    });
+    await attendi();
+    expect(risultato.current!.view.info?.startedAt).toBe(turnoNuovo);
     expect(risultato.current!.actionError).toBeNull();
   });
 
@@ -353,6 +572,7 @@ describe('actionErrorFromResponse', () => {
   it('ogni risposta ha il suo messaggio', () => {
     expect(actionErrorFromResponse(409, 'CONFLICT')).toBe('changed');
     expect(actionErrorFromResponse(409, 'EVENT_CLOSED')).toBe('closed');
+    expect(actionErrorFromResponse(409, 'NOT_PRESENTER')).toBe('notPresenter');
     expect(actionErrorFromResponse(422, 'NOT_PRESENTABLE')).toBe('notPresentable');
     // Un materiale o un evento che non c'è più non è «non presentabile».
     expect(actionErrorFromResponse(404)).toBe('generic');

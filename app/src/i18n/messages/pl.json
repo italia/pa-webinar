@@ -4107,6 +4107,7 @@
     "exportToPresent": "Aby zaprezentować go sali, prześlij jego wersję PDF.",
     "errors": {
       "changed": "W międzyczasie prezentacja się zmieniła: spróbuj ponownie.",
+      "notPresenter": "Teraz prezentuje inna osoba: strona nie zmieniła się dla sali.",
       "closed": "Wydarzenie się zakończyło: nie można już prezentować.",
       "notPresentable": "Można prezentować tylko plik PDF przesłany do materiałów.",
       "forbidden": "Prezentować mogą tylko moderatorzy i prelegenci.",

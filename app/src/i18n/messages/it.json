@@ -818,6 +818,7 @@
     "exportToPresent": "Per presentarlo alla sala, caricane la versione PDF.",
     "errors": {
       "changed": "Nel frattempo la presentazione è cambiata: riprova.",
+      "notPresenter": "Ora presenta un'altra persona: la pagina non è cambiata per la sala.",
       "closed": "L'evento è concluso: non si può più presentare.",
       "notPresentable": "Si può presentare solo un PDF caricato fra i materiali.",
       "forbidden": "Solo chi conduce e i relatori possono presentare.",

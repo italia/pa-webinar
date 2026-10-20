@@ -4107,6 +4107,7 @@
     "exportToPresent": "Ruumile esitlemiseks laadige üles selle PDF-versioon.",
     "errors": {
       "changed": "Esitlus on vahepeal muutunud: proovige uuesti.",
+      "notPresenter": "Nüüd esitleb keegi teine: lehekülg saali jaoks ei muutunud.",
       "closed": "Üritus on lõppenud: esitleda enam ei saa.",
       "notPresentable": "Esitleda saab ainult materjalide hulka üles laaditud PDF-i.",
       "forbidden": "Esitleda saavad ainult moderaatorid ja esinejad.",

@@ -5,14 +5,23 @@ import { PRESENTATION_PAGE_MAX } from '@/lib/presentation/types';
 
 const pagina = z.number().int().min(1).max(PRESENTATION_PAGE_MAX);
 
-/** POST /api/events/[param]/presentation: presenta questo materiale, da questa pagina. */
+/**
+ * POST /api/events/[param]/presentation: presenta questo materiale, da questa
+ * pagina. Con `expectedVersion` è «Presenta tu»: il chiamante prende la
+ * presentazione che vedeva, `materialId` alla versione `expectedVersion`. Vale
+ * solo se la presentazione è ancora quella: se nel frattempo è cambiata (un
+ * altro documento, la chiusura, un altro passaggio di mano, una pagina
+ * girata), 409 e nulla cambia; chi chiama rilegge e decide di nuovo.
+ */
 export const startPresentationSchema = z.object({
   materialId: z.string().uuid(),
   page: pagina.optional(),
+  expectedVersion: z.number().int().min(0).optional(),
 });
 
 /**
- * PATCH /api/events/[param]/presentation: vai a questa pagina. Il materiale è
+ * PATCH /api/events/[param]/presentation: vai a questa pagina. Solo chi
+ * presenta adesso; chiunque altro riceve 409 NOT_PRESENTER. Il materiale è
  * quello che il chiamante crede presentato: se nel frattempo un altro ne ha
  * presentato uno diverso, o ha chiuso, il cambio di pagina non vale (409) e
  * non sposta il documento di qualcun altro. `pageCount` lo manda il browser

@@ -4107,6 +4107,7 @@
     "exportToPresent": "Jos haluat esittää sen huoneelle, lataa sen PDF-versio.",
     "errors": {
       "changed": "Esitys on sillä välin muuttunut: yritä uudelleen.",
+      "notPresenter": "Nyt esittää joku muu: sivu ei vaihtunut salille.",
       "closed": "Tapahtuma on päättynyt: esittäminen ei ole enää mahdollista.",
       "notPresentable": "Vain materiaaleihin ladatun PDF:n voi esittää.",
       "forbidden": "Vain moderaattorit ja puhujat voivat esittää.",

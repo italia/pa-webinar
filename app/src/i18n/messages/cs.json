@@ -4107,6 +4107,7 @@
     "exportToPresent": "Chcete-li jej prezentovat místnosti, nahrajte jeho verzi PDF.",
     "errors": {
       "changed": "Prezentace se mezitím změnila: zkuste to znovu.",
+      "notPresenter": "Nyní prezentuje někdo jiný: strana se pro sál nezměnila.",
       "closed": "Událost skončila: prezentovat už nelze.",
       "notPresentable": "Prezentovat lze pouze PDF nahrané mezi materiály.",
       "forbidden": "Prezentovat mohou pouze moderátoři a řečníci.",

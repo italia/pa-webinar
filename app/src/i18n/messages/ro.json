@@ -4107,6 +4107,7 @@
     "exportToPresent": "Pentru a-l prezenta sălii, încărcați versiunea sa PDF.",
     "errors": {
       "changed": "Între timp, prezentarea s-a schimbat: încercați din nou.",
+      "notPresenter": "Acum prezintă altă persoană: pagina nu s-a schimbat pentru sală.",
       "closed": "Evenimentul s-a încheiat: nu se mai poate prezenta.",
       "notPresentable": "Se poate prezenta doar un PDF încărcat printre materiale.",
       "forbidden": "Doar moderatorii și vorbitorii pot prezenta.",

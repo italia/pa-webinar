@@ -4107,6 +4107,7 @@
     "exportToPresent": "Pour le présenter à la salle, téléversez sa version PDF.",
     "errors": {
       "changed": "La présentation a changé entre-temps : réessayez.",
+      "notPresenter": "Une autre personne présente désormais : la page n’a pas changé pour la salle.",
       "closed": "L'événement est terminé : il n'est plus possible de présenter.",
       "notPresentable": "Seul un PDF téléversé parmi les documents peut être présenté.",
       "forbidden": "Seuls les modérateurs et les intervenants peuvent présenter.",

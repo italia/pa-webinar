@@ -4107,6 +4107,7 @@
     "exportToPresent": "Um es dem Raum zu präsentieren, laden Sie die PDF-Version hoch.",
     "errors": {
       "changed": "Die Präsentation hat sich inzwischen geändert: Versuchen Sie es erneut.",
+      "notPresenter": "Jetzt präsentiert eine andere Person: Die Seite hat sich für den Raum nicht geändert.",
       "closed": "Die Veranstaltung ist beendet: Präsentieren ist nicht mehr möglich.",
       "notPresentable": "Präsentiert werden kann nur ein unter den Materialien hochgeladenes PDF.",
       "forbidden": "Nur Moderation und Vortragende können präsentieren.",

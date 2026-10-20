@@ -31,7 +31,7 @@ import type { PresentationPointer, PresentationState } from '@/lib/presentation/
 
 /** Perché un'azione di chi presenta non è andata, per il messaggio da mostrare. */
 export type PresentationActionError =
-  'changed' | 'closed' | 'notPresentable' | 'forbidden' | 'generic';
+  'changed' | 'closed' | 'notPresenter' | 'notPresentable' | 'forbidden' | 'generic';
 
 export interface PresentationControls {
   view: PresentationView;
@@ -47,7 +47,10 @@ export interface PresentationControls {
   /**
    * «Presenta tu»: chi può presentare prende la presentazione in corso, sullo
    * stesso documento, dalla pagina indicata (quella che sta guardando) o da
-   * quella di chi presenta. Il suo nome compare come chi presenta.
+   * quella di chi presenta. Il suo nome compare come chi presenta. Porta la
+   * versione che si vede: se nel frattempo la presentazione è cambiata (un
+   * altro documento, la chiusura, un altro passaggio di mano, una pagina
+   * girata) non vale ('changed'), e lo stato si rilegge.
    */
   takeOver: (page?: number) => Promise<PresentationActionError | null>;
   /** Va a una pagina del documento presentato. Le richieste ravvicinate si accorpano. */
@@ -57,8 +60,11 @@ export interface PresentationControls {
   /** Avvio o chiusura in corso. */
   busy: boolean;
   /**
-   * L'ultima azione di chi presenta non riuscita (un cambio di pagina o la
-   * chiusura); null dopo una riuscita. L'avvio risponde a chi lo chiama.
+   * L'ultima azione di chi presenta non riuscita (un cambio di pagina, «Presenta
+   * tu» o la chiusura), finché la sala mostra il turno a cui si riferisce;
+   * null dopo una riuscita. Un rifiuto perché la presentazione è cambiata o è
+   * passata a un altro si toglie da solo dopo qualche secondo. L'avvio
+   * risponde a chi lo chiama.
    */
   actionError: PresentationActionError | null;
   /** Rilegge lo stato completo. */
@@ -67,6 +73,14 @@ export interface PresentationControls {
 
 /** Chi assiste rilegge lo stato completo entro questo intervallo, non tutti insieme. */
 const RILETTURA_MAX_MS = 800;
+
+/**
+ * Quanto resta il messaggio di un'azione rifiutata perché la presentazione è
+ * cambiata o è passata a un altro: la scena mostra già lo stato vero, e il
+ * messaggio dice solo cosa è successo, non resta per tutto il turno di chi
+ * presenta adesso.
+ */
+export const PRESENTATION_CHANGE_MESSAGE_MS = 12_000;
 
 export const PresentationContext = createContext<PresentationControls | null>(null);
 
@@ -104,7 +118,11 @@ export function actionErrorFromResponse(
   status: number,
   code?: string
 ): PresentationActionError {
-  if (status === 409) return code === 'EVENT_CLOSED' ? 'closed' : 'changed';
+  if (status === 409) {
+    if (code === 'EVENT_CLOSED') return 'closed';
+    if (code === 'NOT_PRESENTER') return 'notPresenter';
+    return 'changed';
+  }
   if (status === 422 && code === 'NOT_PRESENTABLE') return 'notPresentable';
   if (status === 401 || status === 403) return 'forbidden';
   return 'generic';
@@ -119,6 +137,18 @@ export function presentationErrorMessage(
   errore: PresentationActionError
 ): string {
   return t(`errors.${errore}`);
+}
+
+/**
+ * Il turno di una presentazione: il documento e il momento in cui è stato
+ * avviato o preso (`startedAt`, che ogni avvio e passaggio di mano rinnova).
+ * Null quando nessuno presenta.
+ */
+function turnoDi(
+  materialId: string | null,
+  startedAt: string | null | undefined
+): string | null {
+  return materialId ? `${materialId}@${startedAt ?? ''}` : null;
 }
 
 async function erroreDi(res: Response): Promise<PresentationActionError> {
@@ -210,7 +240,64 @@ export function usePresentation({
     pageCount?: number;
   } | null>(null);
   const inVoloRef = useRef(false);
-  const [actionError, setActionError] = useState<PresentationActionError | null>(null);
+
+  // ── Esito dell'ultima azione non riuscita ────────────────────────────────
+  // Un messaggio vale per il turno a cui si riferisce: lo stesso documento,
+  // avviato o preso nello stesso momento. Si mostra finché la sala mostra
+  // quel turno e non ricompare su una presentazione successiva, anche dello
+  // stesso documento, né quando la presentazione si chiude.
+  const turno = turnoDi(view.materialId, view.info?.startedAt);
+  const turnoRef = useRef(turno);
+  useEffect(() => {
+    turnoRef.current = turno;
+  }, [turno]);
+  const [errore, setErrore] = useState<{
+    tipo: PresentationActionError;
+    turno: string;
+  } | null>(null);
+  useEffect(() => {
+    if (errore?.tipo !== 'changed' && errore?.tipo !== 'notPresenter') return;
+    const timer = setTimeout(
+      () => setErrore((e) => (e === errore ? null : e)),
+      PRESENTATION_CHANGE_MESSAGE_MS
+    );
+    return () => clearTimeout(timer);
+  }, [errore]);
+  const setActionError = useCallback((tipo: PresentationActionError | null) => {
+    const attuale = turnoRef.current;
+    setErrore(tipo && attuale ? { tipo, turno: attuale } : null);
+  }, []);
+  /**
+   * Un'azione rifiutata: si rilegge lo stato, e il messaggio vale per il
+   * turno che la rilettura mostra, quello vero. Se nessuno presenta più non
+   * c'è nulla da dire: la scena sparisce.
+   */
+  const segnalaERileggi = useCallback(
+    async (tipo: PresentationActionError) => {
+      // Fuori dalla chiamata non si legge nulla, e non c'è una scena su cui dirlo.
+      if (!active) return;
+      let turnoVero = turnoRef.current;
+      try {
+        // La lettura passa da `mutate` come dato, non come rilettura: così se
+        // non riesce lo si sa (`mutate()` senza dati si risolve comunque con
+        // la cache), e se riesce si ha lo stato che la sala mostrerà.
+        const fresco = await mutate(
+          fetchPresentation(presentationKey(eventSlug, token)),
+          { revalidate: false }
+        );
+        turnoVero = turnoDi(
+          fresco?.presentation?.materialId ?? null,
+          fresco?.presentation?.startedAt
+        );
+      } catch {
+        // Rilettura non riuscita (un 502 di passaggio): resta lo stato di
+        // prima, e il messaggio vale per quello.
+      }
+      setErrore(turnoVero ? { tipo, turno: turnoVero } : null);
+    },
+    [active, mutate, eventSlug, token]
+  );
+  const actionError = errore && errore.turno === turno ? errore.tipo : null;
 
   const goTo = useCallback(
     (page: number, pageCount?: number) => {
@@ -248,13 +335,24 @@ export function usePresentation({
               setActionError(null);
               accogli((await res.json()) as PresentationState);
             } else {
-              const errore = await erroreDi(res);
-              setActionError(errore);
-              // Il documento è cambiato (o la presentazione è chiusa): le
-              // pagine ancora in coda erano per l'altro.
-              if (errore === 'changed' || errore === 'closed') {
-                desiderataRef.current = null;
-                void mutate();
+              const esito = await erroreDi(res);
+              // Il documento è cambiato, la presentazione è chiusa o è
+              // passata a un altro: le pagine ancora in coda per quel
+              // documento erano per il turno finito, e così quelle chieste
+              // mentre si rilegge. Un solo messaggio e una sola rilettura, non
+              // una per pagina; una pagina chiesta intanto su un altro
+              // documento, appena avviato, parte comunque.
+              if (esito === 'changed' || esito === 'closed' || esito === 'notPresenter') {
+                const scartaVecchie = () => {
+                  if (desiderataRef.current?.materialId === prossima.materialId) {
+                    desiderataRef.current = null;
+                  }
+                };
+                scartaVecchie();
+                await segnalaERileggi(esito);
+                scartaVecchie();
+              } else {
+                setActionError(esito);
               }
             }
           }
@@ -264,7 +362,7 @@ export function usePresentation({
         }
       })();
     },
-    [view.materialId, canPresent, url, token, accogli, mutate]
+    [view.materialId, canPresent, url, token, accogli, setActionError, segnalaERileggi]
   );
 
   const displayPage =
@@ -273,10 +371,13 @@ export function usePresentation({
   // ── Avvio e chiusura ─────────────────────────────────────────────────────
   const [busy, setBusy] = useState(false);
 
-  const start = useCallback(
+  // Avvio e «Presenta tu» sono lo stesso POST: il secondo porta anche la
+  // versione dello stato che si vedeva (`expectedVersion`).
+  const avvia = useCallback(
     async (
       materialId: string,
-      page?: number
+      page?: number,
+      expectedVersion?: number
     ): Promise<PresentationActionError | null> => {
       if (!canPresent) return 'forbidden';
       setBusy(true);
@@ -287,7 +388,11 @@ export function usePresentation({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(page && page > 1 ? { materialId, page } : { materialId }),
+          body: JSON.stringify({
+            materialId,
+            ...(page && page > 1 ? { page } : {}),
+            ...(expectedVersion !== undefined ? { expectedVersion } : {}),
+          }),
         });
         if (!res.ok) return await erroreDi(res);
         accogli((await res.json()) as PresentationState);
@@ -299,7 +404,12 @@ export function usePresentation({
         setBusy(false);
       }
     },
-    [canPresent, url, token, accogli]
+    [canPresent, url, token, accogli, setActionError]
+  );
+
+  const start = useCallback(
+    (materialId: string, page?: number) => avvia(materialId, page),
+    [avvia]
   );
 
   const stop = useCallback(async (): Promise<PresentationActionError | null> => {
@@ -314,11 +424,11 @@ export function usePresentation({
       });
       if (!res.ok) {
         // Anche la scena deve dirlo: chi presenta crederebbe chiusa una
-        // presentazione che la sala vede ancora.
-        const errore = await erroreDi(res);
-        setActionError(errore);
-        void mutate();
-        return errore;
+        // presentazione che la sala vede ancora. La rilettura non trattiene i
+        // pulsanti: durante un rilascio può durare.
+        const esito = await erroreDi(res);
+        void segnalaERileggi(esito);
+        return esito;
       }
       desiderataRef.current = null;
       accogli((await res.json()) as PresentationState);
@@ -330,18 +440,21 @@ export function usePresentation({
     } finally {
       setBusy(false);
     }
-  }, [view.materialId, canPresent, url, token, accogli, mutate]);
+  }, [view.materialId, canPresent, url, token, accogli, setActionError, segnalaERileggi]);
 
   const takeOver = useCallback(
     async (page?: number): Promise<PresentationActionError | null> => {
       const materialId = view.materialId;
       if (!materialId) return null;
-      const errore = await start(materialId, page ?? view.page);
-      setActionError(errore);
-      if (errore) void mutate();
-      return errore;
+      // Il documento e la versione che si vedono: se nel frattempo la
+      // presentazione è cambiata, il server rifiuta (409) invece di riportare
+      // in sala il PDF di prima o di toglierlo a chi lo ha appena preso, e si
+      // rilegge lo stato per mostrare quello vero.
+      const esito = await avvia(materialId, page ?? view.page, view.version);
+      if (esito) await segnalaERileggi(esito);
+      return esito;
     },
-    [view.materialId, view.page, start, mutate]
+    [view.materialId, view.page, view.version, avvia, segnalaERileggi]
   );
 
   const refresh = useCallback(() => {

@@ -4107,6 +4107,7 @@
     "exportToPresent": "Če ga želite predstaviti sobi, naložite njegovo različico PDF.",
     "errors": {
       "changed": "Medtem se je predstavitev spremenila: poskusite znova.",
+      "notPresenter": "Zdaj predstavlja nekdo drug: stran se za dvorano ni spremenila.",
       "closed": "Dogodek se je končal: predstavljanje ni več mogoče.",
       "notPresentable": "Predstaviti je mogoče samo PDF, naložen med gradiva.",
       "forbidden": "Predstavljajo lahko samo moderatorji in govorniki.",

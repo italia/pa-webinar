@@ -4107,6 +4107,7 @@
     "exportToPresent": "Para o apresentar à sala, carregue a sua versão em PDF.",
     "errors": {
       "changed": "Entretanto a apresentação mudou: tente novamente.",
+      "notPresenter": "Agora apresenta outra pessoa: a página não mudou para a sala.",
       "closed": "O evento terminou: já não é possível apresentar.",
       "notPresentable": "Só é possível apresentar um PDF carregado nos materiais.",
       "forbidden": "Só a moderação e os oradores podem apresentar.",

@@ -331,6 +331,12 @@ describe('PresentationStage — chi presenta', () => {
     await render(presentatore({ actionError: 'changed' }));
     expect(container.textContent).toContain(tp.errors.changed);
   });
+
+  it('una pagina rifiutata perché ora presenta un altro lo dice come avviso', async () => {
+    await render(controlli({ canPresent: true, actionError: 'notPresenter' }));
+    const avviso = container.querySelector('[role="alert"]');
+    expect(avviso?.textContent).toBe(tp.errors.notPresenter);
+  });
 });
 
 describe('PresentationStage — ridotta', () => {

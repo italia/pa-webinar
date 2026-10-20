@@ -4107,6 +4107,7 @@
     "exportToPresent": "Lai to prezentētu telpai, augšupielādējiet tā PDF versiju.",
     "errors": {
       "changed": "Pa to laiku prezentācija ir mainījusies: mēģiniet vēlreiz.",
+      "notPresenter": "Tagad prezentē cita persona: lapa zālei netika mainīta.",
       "closed": "Pasākums ir beidzies: prezentēt vairs nav iespējams.",
       "notPresentable": "Prezentēt var tikai materiālos augšupielādētu PDF.",
       "forbidden": "Prezentēt var tikai moderatori un runātāji.",

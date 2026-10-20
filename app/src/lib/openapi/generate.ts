@@ -481,7 +481,10 @@ registry.registerPath({
   description:
     `${presentationWrite} Replaces any presentation in progress. On the material already being ` +
     'presented it hands the presentation over to the caller ("Take over"), from the given page, ' +
-    'keeping the known page count. Only an uploaded PDF among the ' +
+    'keeping the known page count. With `expectedVersion` (the version of the state the caller ' +
+    'was looking at) the take-over is conditional: if the presentation is no longer `materialId` at ' +
+    'that version (another material was started, the presentation was stopped, someone else took ' +
+    'over or turned a page) it answers 409 CONFLICT and changes nothing. Only an uploaded PDF among the ' +
     "event's materials can be presented, by a moderator or a speaker alike. Once the event is ENDED or " +
     'ARCHIVED the reads show no presentation.',
   security: [{ [moderatorToken.name]: [] }],
@@ -493,7 +496,10 @@ registry.registerPath({
     200: { description: 'Presentation state' },
     403: { description: 'Not a moderator or speaker token for this event' },
     404: { description: 'Material not found or not visible to the caller' },
-    409: { description: 'The event is closed (EVENT_CLOSED)' },
+    409: {
+      description:
+        'The event is closed (EVENT_CLOSED), or a take-over found the presentation changed since `expectedVersion` (CONFLICT)',
+    },
     422: { description: 'The material is not an uploaded PDF (NOT_PRESENTABLE)' },
   },
 });
@@ -502,9 +508,12 @@ registry.registerPath({
   method: 'patch',
   path: '/api/events/{param}/presentation',
   tags: ['Presentation'],
-  summary: 'Go to a page of the presented PDF (moderator or speaker)',
+  summary: 'Go to a page of the presented PDF (current presenter)',
   description:
-    `${presentationWrite} \`materialId\` must be the material being presented, otherwise 409: ` +
+    `${presentationWrite} Only the current presenter (the same named grant, or the primary link ` +
+    'for a presentation started with it) may change page; anyone else gets 409 NOT_PRESENTER, so ' +
+    'a page change still in flight from the previous presenter never moves the document after a ' +
+    'take-over. `materialId` must be the material being presented, otherwise 409: ' +
     "a page change never moves a document someone else has just started. `pageCount` is the " +
     'number of pages counted by the presenter; past the last page the page is the last one.',
   security: [{ [moderatorToken.name]: [] }],
@@ -515,7 +524,10 @@ registry.registerPath({
   responses: {
     200: { description: 'Presentation state' },
     403: { description: 'Not a moderator or speaker token for this event' },
-    409: { description: 'The presentation changed or ended (CONFLICT), or the event is closed (EVENT_CLOSED)' },
+    409: {
+      description:
+        'The presentation changed or ended (CONFLICT), the caller is not the current presenter (NOT_PRESENTER), or the event is closed (EVENT_CLOSED)',
+    },
   },
 });
 

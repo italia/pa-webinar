@@ -10,7 +10,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * principale e le concessioni nominali, moderatori e relatori, con un PDF
  * dell'evento. Ogni cambio fa crescere la versione, va
  * sul canale della sala come puntatore e finisce nella cronologia; un cambio
- * di pagina su un documento che nel frattempo è cambiato non vale.
+ * di pagina su un documento che nel frattempo è cambiato, o da chi non
+ * presenta più, non vale, e «Presenta tu» non vale su una presentazione
+ * cambiata dopo la versione vista.
  *
  * Le autorizzazioni girano davvero; database, canale e cronologia sono finti.
  */
@@ -371,6 +373,118 @@ describe('POST /api/events/[slug]/presentation — presenta', () => {
     });
   });
 
+  it('«Presenta tu» con la versione vista: passaggio di mano condizionato al documento', async () => {
+    mockedRow.mockResolvedValue(riga());
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    const res = await POST(
+      req('POST', {
+        token: 'TOKEN_RELATORE',
+        body: { materialId: MATERIAL_ID, page: 3, expectedVersion: 7 },
+      }),
+      ctx()
+    );
+    expect(res.status).toBe(200);
+    // Una scrittura condizionata a documento e versione, mai un upsert che lo riapra.
+    expect(mockedUpsert).not.toHaveBeenCalled();
+    const update = mockedUpdate.mock.calls[0]![0];
+    expect(update.where).toEqual({ eventId: EVENT_ID, materialId: MATERIAL_ID, version: 7 });
+    expect(update.data).toMatchObject({
+      materialId: MATERIAL_ID,
+      page: 3,
+      pageCount: 12,
+      presenterRole: 'SPEAKER',
+      presenterGrantId: 'grant-speaker',
+      startedAt: expect.any(Date),
+      version: { increment: 1 },
+    });
+    expect(publish).toHaveBeenCalledTimes(1);
+    expect(journal.mock.calls[0]![0]).toMatchObject({
+      kind: 'presentation.started',
+      actor: 'speaker',
+      data: { materialId: MATERIAL_ID, page: 3, handover: true },
+    });
+    expect((await res.json()).presentation).toMatchObject({ yours: true });
+  });
+
+  it('«Presenta tu» sullo stesso documento cambiato nel frattempo (pagina girata, altro passaggio di mano): 409', async () => {
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    for (const dopo of [
+      riga({ page: 4, version: 8 }),
+      riga({ presenterRole: 'MODERATOR', presenterGrantId: 'grant-moderator', version: 8 }),
+    ]) {
+      mockedRow.mockResolvedValue(dopo);
+      const res = await POST(
+        req('POST', {
+          token: 'TOKEN_RELATORE',
+          body: { materialId: MATERIAL_ID, page: 3, expectedVersion: 7 },
+        }),
+        ctx()
+      );
+      expect(res.status).toBe(409);
+      expect((await res.json()).code).toBe('CONFLICT');
+    }
+    expect(mockedUpsert).not.toHaveBeenCalled();
+    expect(mockedUpdate).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    expect(journal).not.toHaveBeenCalled();
+  });
+
+  it('«Presenta tu» su un documento sostituito nel frattempo: 409, il PDF di prima non torna', async () => {
+    // beforeEach: in corso OTHER_ID, la vista del relatore mostrava ancora MATERIAL_ID.
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    const res = await POST(
+      req('POST', {
+        token: 'TOKEN_RELATORE',
+        body: { materialId: MATERIAL_ID, page: 3, expectedVersion: 7 },
+      }),
+      ctx()
+    );
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('CONFLICT');
+    expect(mockedUpsert).not.toHaveBeenCalled();
+    expect(mockedUpdate).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    expect(journal).not.toHaveBeenCalled();
+  });
+
+  it('«Presenta tu» su una presentazione chiusa nel frattempo: 409, non la riapre', async () => {
+    for (const chiusa of [riga({ materialId: null, material: null }), null]) {
+      vi.clearAllMocks();
+      mockedRow.mockResolvedValue(chiusa);
+      const res = await POST(
+        req('POST', { body: { materialId: MATERIAL_ID, expectedVersion: 7 } }),
+        ctx()
+      );
+      expect(res.status).toBe(409);
+      expect(mockedUpsert).not.toHaveBeenCalled();
+      expect(mockedUpdate).not.toHaveBeenCalled();
+      expect(publish).not.toHaveBeenCalled();
+    }
+  });
+
+  it('«Presenta tu» quando il documento cambia fra la lettura e la scrittura: 409', async () => {
+    mockedRow.mockResolvedValue(riga());
+    mockedUpdate.mockRejectedValue(
+      Object.assign(new Error('not found'), { code: 'P2025' })
+    );
+    const res = await POST(
+      req('POST', { body: { materialId: MATERIAL_ID, expectedVersion: 7 } }),
+      ctx()
+    );
+    expect(res.status).toBe(409);
+    expect(mockedUpsert).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    expect(journal).not.toHaveBeenCalled();
+  });
+
+  it('una versione attesa non valida: 422', async () => {
+    const res = await POST(
+      req('POST', { body: { materialId: MATERIAL_ID, expectedVersion: -1 } }),
+      ctx()
+    );
+    expect(res.status).toBe(422);
+  });
+
   it('chi presenta già lo stesso PDF e lo riavvia: niente passaggio di mano in cronologia', async () => {
     mockedRow.mockResolvedValue(riga());
     const res = await POST(
@@ -526,8 +640,13 @@ describe('PATCH /api/events/[slug]/presentation — gira pagina', () => {
     );
     expect(res.status).toBe(200);
     const update = mockedUpdate.mock.calls[0]![0];
-    // Il materiale fa parte della condizione.
-    expect(update.where).toEqual({ eventId: EVENT_ID, materialId: MATERIAL_ID });
+    // Il materiale e chi presenta fanno parte della condizione.
+    expect(update.where).toEqual({
+      eventId: EVENT_ID,
+      materialId: MATERIAL_ID,
+      presenterRole: 'MODERATOR',
+      presenterGrantId: null,
+    });
     expect(update.data).toEqual({ page: 4, pageCount: 12, version: { increment: 1 } });
     // Lo stesso turno: chi presenta non cambia.
     expect(publish).toHaveBeenCalledWith(EVENT_ID, {
@@ -549,7 +668,10 @@ describe('PATCH /api/events/[slug]/presentation — gira pagina', () => {
     });
   });
 
-  it('un relatore gira pagina', async () => {
+  it('il relatore che presenta gira pagina', async () => {
+    mockedRow.mockResolvedValue(
+      riga({ presenterRole: 'SPEAKER', presenterGrantId: 'grant-speaker' })
+    );
     mockedGrant.mockResolvedValue(concessione('SPEAKER'));
     const res = await PATCH(
       req('PATCH', {
@@ -559,7 +681,58 @@ describe('PATCH /api/events/[slug]/presentation — gira pagina', () => {
       ctx()
     );
     expect(res.status).toBe(200);
+    expect(mockedUpdate.mock.calls[0]![0].where).toEqual({
+      eventId: EVENT_ID,
+      materialId: MATERIAL_ID,
+      presenterRole: 'SPEAKER',
+      presenterGrantId: 'grant-speaker',
+    });
     expect(journal.mock.calls[0]![0]).toMatchObject({ actor: 'speaker' });
+  });
+
+  it('dopo un passaggio di mano, le pagine di chi presentava prima non valgono: 409 NOT_PRESENTER', async () => {
+    // Presenta la relatrice: il link principale non gira più pagina.
+    mockedRow.mockResolvedValue(
+      riga({ presenterRole: 'SPEAKER', presenterGrantId: 'grant-speaker' })
+    );
+    let res = await PATCH(
+      req('PATCH', { body: { materialId: MATERIAL_ID, page: 4 } }),
+      ctx()
+    );
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('NOT_PRESENTER');
+    // Nemmeno un co-moderatore o un altro relatore.
+    for (const altro of [
+      concessione('MODERATOR'),
+      concessione('SPEAKER', { id: 'grant-altro-relatore' }),
+    ]) {
+      mockedGrant.mockResolvedValue(altro);
+      res = await PATCH(
+        req('PATCH', { token: 'TOKEN_ALTRO', body: { materialId: MATERIAL_ID, page: 4 } }),
+        ctx()
+      );
+      expect(res.status).toBe(409);
+      expect((await res.json()).code).toBe('NOT_PRESENTER');
+    }
+    expect(mockedUpdate).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    expect(journal).not.toHaveBeenCalled();
+  });
+
+  it('presenta il link principale: un relatore non gira pagina, nemmeno sulla stessa', async () => {
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    for (const page of [4, 3]) {
+      const res = await PATCH(
+        req('PATCH', {
+          token: 'TOKEN_RELATORE',
+          body: { materialId: MATERIAL_ID, page, pageCount: 12 },
+        }),
+        ctx()
+      );
+      expect(res.status).toBe(409);
+      expect((await res.json()).code).toBe('NOT_PRESENTER');
+    }
+    expect(mockedUpdate).not.toHaveBeenCalled();
   });
 
   it('un altro documento è stato presentato nel frattempo: 409, niente scritto', async () => {
@@ -620,12 +793,35 @@ describe('PATCH /api/events/[slug]/presentation — gira pagina', () => {
     mockedUpdate.mockRejectedValue(
       Object.assign(new Error('not found'), { code: 'P2025' })
     );
+    mockedRow
+      .mockResolvedValueOnce(riga())
+      .mockResolvedValueOnce(riga({ materialId: OTHER_ID, material: { title: 'Altro' } }));
     const res = await PATCH(
       req('PATCH', { body: { materialId: MATERIAL_ID, page: 4 } }),
       ctx()
     );
     expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('CONFLICT');
     expect(publish).not.toHaveBeenCalled();
+  });
+
+  it('un passaggio di mano fra la lettura e la scrittura: 409 NOT_PRESENTER', async () => {
+    mockedUpdate.mockRejectedValue(
+      Object.assign(new Error('not found'), { code: 'P2025' })
+    );
+    mockedRow
+      .mockResolvedValueOnce(riga())
+      .mockResolvedValueOnce(
+        riga({ presenterRole: 'SPEAKER', presenterGrantId: 'grant-speaker', version: 8 })
+      );
+    const res = await PATCH(
+      req('PATCH', { body: { materialId: MATERIAL_ID, page: 4 } }),
+      ctx()
+    );
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('NOT_PRESENTER');
+    expect(publish).not.toHaveBeenCalled();
+    expect(journal).not.toHaveBeenCalled();
   });
 
   it('un iscritto non gira pagina: 403', async () => {
@@ -691,6 +887,16 @@ describe('DELETE /api/events/[slug]/presentation — chiude', () => {
     const res = await DELETE(req('DELETE', { query: `?materialId=${OTHER_ID}` }), ctx());
     expect(res.status).toBe(409);
     expect(mockedUpdate).not.toHaveBeenCalled();
+  });
+
+  it('chiude anche chi non presenta: un relatore chiude la presentazione del link principale', async () => {
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    const res = await DELETE(
+      req('DELETE', { token: 'TOKEN_RELATORE', query: `?materialId=${MATERIAL_ID}` }),
+      ctx()
+    );
+    expect(res.status).toBe(200);
+    expect(mockedUpdate).toHaveBeenCalled();
   });
 
   it('anche a evento concluso si può chiudere', async () => {

@@ -4107,6 +4107,7 @@
     "exportToPresent": "Ha a teremnek szeretné prezentálni, töltse fel a PDF-változatát.",
     "errors": {
       "changed": "Időközben a prezentáció megváltozott: próbálja újra.",
+      "notPresenter": "Most más prezentál: az oldal nem változott meg a terem számára.",
       "closed": "Az esemény véget ért: már nem lehet prezentálni.",
       "notPresentable": "Csak az anyagok közé feltöltött PDF prezentálható.",
       "forbidden": "Csak a moderátorok és az előadók prezentálhatnak.",
