@@ -44,7 +44,9 @@ const OGNI_MS = 10_000;
 
 interface Lavoro {
   status: string;
-  lastError: string | null;
+  /** Il motivo riconosciuto di un lavoro non riuscito; il testo grezzo
+   *  (lastError, in inglese) resta al registro della post-produzione. */
+  errorCode?: 'MT_UNAVAILABLE' | null;
   sourceHash: string | null;
 }
 
@@ -189,8 +191,8 @@ export function useTraduzioneTesti(opts: {
         );
       } else if (job?.status === 'FAILED' && job.sourceHash === chiesta) {
         setMessaggio(
-          job.lastError
-            ? { tipo: 'failed', motivo: job.lastError }
+          job.errorCode === 'MT_UNAVAILABLE'
+            ? { tipo: 'failed', motivo: tErr('mtUnavailable') }
             : { tipo: 'failedGeneric' }
         );
       } else {
@@ -199,7 +201,7 @@ export function useTraduzioneTesti(opts: {
     } catch {
       /* rete assente: si riprova al prossimo giro */
     }
-  }, [eventId]);
+  }, [eventId, tErr]);
 
   useEffect(() => {
     if (attiva) void carica();

@@ -1906,10 +1906,10 @@ prompt, temperature 0. So the worker:
 - turns each link into `<aN>text</aN>`, which the model keeps, and puts the
   address back afterwards. When a tag is lost, the line is translated without
   links and each link text on its own, so no link is dropped;
-- replaces web addresses, email addresses and glossary terms with `⟦n⟧`
-  placeholders that the model copies, because a model will happily change a
-  word inside an email address. A line that loses a placeholder is translated
-  again without them;
+- replaces inline code (`` `...` ``), web addresses, email addresses and
+  glossary terms with `⟦n⟧` placeholders that the model copies, because a
+  model will happily change a word inside an email address. A line that loses
+  a placeholder is translated again without them;
 - splits the title on its first `|` (the kicker) and translates the two parts
   separately;
 - waits up to `MT_CONNECT_WAIT_S` seconds (900 by default) for the engine
@@ -1920,6 +1920,23 @@ prompt, temperature 0. So the worker:
   taken over. Close to the Job's deadline it delivers the languages it has;
   a language that fails is left out, and a job with no language translated
   fails.
+
+**Known limits of the result.** The proposal is meant to be read before it is
+saved, and these are the things to look for:
+
+- each line is translated on its own, so a sentence broken over two lines
+  (a list item that continues on the next line) is translated as two pieces
+  and can lose its sense;
+- the output language is not checked: now and then a line comes back in
+  another language (English instead of German, for example);
+- emphasis can move or change (a bold word lost, italics turned into bold),
+  and the title of a link (`[text](url "title")`) stays in the source
+  language;
+- register and small punctuation follow the model (formal and informal
+  address mixed in one text, a missing closing mark).
+
+Translating about 2 KB of description into one language takes about a minute
+on four CPU cores; a title takes a few seconds.
 
 **Delivery and storage.** The worker posts the texts to
 `POST /api/internal/event-text-translation` (`x-api-key`).

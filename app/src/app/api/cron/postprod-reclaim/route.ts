@@ -31,6 +31,7 @@ import { MT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
 import { resolveMtProvider } from '@/lib/ai/providers';
 import { postprodJobsCompletedTotal } from '@/lib/metrics';
+import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,8 +42,6 @@ interface ReclaimedRow {
   attempts: number;
 }
 
-/** Lo stesso motivo della chiusura al claim (api/internal/postprod-claim). */
-const MOTORE_ASSENTE = 'The CPU translation engine is not configured (AI_MT_BASE_URL)';
 
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
@@ -111,7 +110,7 @@ export const GET = withErrorHandling(async (request) => {
       UPDATE postprod_jobs
       SET status = 'FAILED',
           completed_at = NOW(),
-          last_error = ${MOTORE_ASSENTE},
+          last_error = ${MOTIVO_MOTORE_ASSENTE},
           updated_at = NOW()
       WHERE status = 'PENDING'
         AND kind::text = ANY(${[...MT_JOB_KINDS]}::text[])

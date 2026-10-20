@@ -55,6 +55,7 @@ import { buildEventFeedbackReport } from '@/lib/feedback/event-feedback-report';
 import { ingressoResoconto } from '@/lib/report/input';
 import { scriviNumeriResoconto } from '@/lib/report/job';
 import { metricheResoconto } from '@/lib/report/metrics';
+import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
 
 export const dynamic = 'force-dynamic';
 
@@ -681,7 +682,7 @@ async function rispostaTraduzioneTesti(
     const chiusi = await prisma.$executeRaw`
       UPDATE postprod_jobs
       SET status = 'FAILED', completed_at = NOW(), leased_at = NULL, leased_by = NULL,
-          last_error = 'The CPU translation engine is not configured (AI_MT_BASE_URL)', updated_at = NOW()
+          last_error = ${MOTIVO_MOTORE_ASSENTE}, updated_at = NOW()
       WHERE id = ${row.id}::uuid AND status = 'CLAIMED' AND attempts = ${row.attempts}
     `;
     if (chiusi > 0) postprodJobsCompletedTotal.labels('TRANSLATE_TEXT', 'FAILED').inc();

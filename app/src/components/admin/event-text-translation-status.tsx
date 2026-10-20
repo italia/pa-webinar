@@ -15,8 +15,12 @@ import { Link, percorso } from '@/i18n/navigation';
 import { nomeLingua } from './event-wizard/text-translation';
 
 interface Stato {
-  job: { status: string; lastError: string | null } | null;
+  /** Il testo grezzo del motivo (lastError, in inglese) non si mostra: resta
+   *  al registro della post-produzione; qui solo il motivo riconosciuto. */
+  job: { status: string; errorCode?: 'MT_UNAVAILABLE' | null } | null;
   pending: string[];
+  /** La traduzione si puo' chiedere adesso (pipeline accesa, motore c'e'). */
+  available?: boolean;
 }
 
 const IN_CORSO = new Set(['PENDING', 'CLAIMED', 'RUNNING']);
@@ -29,6 +33,7 @@ export default function EventTextTranslationStatus({
   editHref: string;
 }) {
   const t = useTranslations('admin.textTranslation.status');
+  const tErr = useTranslations('apiErrors');
   const [stato, setStato] = useState<Stato | null>(null);
 
   const carica = useCallback(async () => {
@@ -58,11 +63,13 @@ export default function EventTextTranslationStatus({
   let pronta = false;
   if (job && IN_CORSO.has(job.status)) {
     testo = job.status === 'RUNNING' ? t('running') : t('queued');
-  } else if (job?.status === 'FAILED') {
-    testo = job.lastError ? t('failed', { reason: job.lastError }) : t('failedGeneric');
   } else if (stato && stato.pending.length > 0) {
     testo = t('ready', { languages: stato.pending.map(nomeLingua).join(', ') });
     pronta = true;
+  } else if (job?.status === 'FAILED') {
+    if (job.errorCode !== 'MT_UNAVAILABLE') testo = t('failedGeneric');
+    // Il motore mancava e adesso c'e': non c'e' piu' niente da dire.
+    else if (!stato?.available) testo = t('failed', { reason: tErr('mtUnavailable') });
   }
 
   // La regione resta nella pagina anche vuota: chi usa un lettore di schermo

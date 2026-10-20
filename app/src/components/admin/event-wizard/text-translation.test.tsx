@@ -476,7 +476,7 @@ describe("stato nella pagina dell'evento", () => {
         async () =>
           new Response(
             JSON.stringify({
-              job: { status: 'FAILED', lastError: 'motore giu' },
+              job: { status: 'FAILED', lastError: 'engine timeout', errorCode: null },
               pending: [],
             })
           )
@@ -486,9 +486,39 @@ describe("stato nella pagina dell'evento", () => {
     root = createRoot(container);
     mount(<EventTextTranslationStatus eventId={ID} editHref="/x" />);
     await attendi();
+    // Il motivo grezzo (in inglese) non arriva nella pagina.
+    expect(container.textContent).toBe(tt.status.failedGeneric);
+  });
+
+  it('motore assente: il motivo nella lingua della pagina, e niente quando il motore torna', async () => {
+    const risposta = (available: boolean) =>
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              available,
+              job: {
+                status: 'FAILED',
+                lastError: 'The CPU translation engine is not configured (AI_MT_BASE_URL)',
+                errorCode: 'MT_UNAVAILABLE',
+              },
+              pending: [],
+            })
+          )
+      );
+    vi.stubGlobal('fetch', risposta(false));
+    mount(<EventTextTranslationStatus eventId={ID} editHref="/x" />);
+    await attendi();
     expect(container.textContent).toBe(
-      tt.status.failed.replace('{reason}', 'motore giu')
+      tt.status.failed.replace('{reason}', messages.apiErrors.mtUnavailable)
     );
+
+    vi.stubGlobal('fetch', risposta(true));
+    act(() => root.unmount());
+    root = createRoot(container);
+    mount(<EventTextTranslationStatus eventId={ID} editHref="/x" />);
+    await attendi();
+    expect(container.textContent).toBe('');
   });
 
   it('niente da dire: niente nella pagina', async () => {

@@ -27,6 +27,11 @@ import { improntaSorgente, type TestoSorgente } from './source';
 
 type Db = Prisma.TransactionClient | typeof prisma;
 
+/** Il motivo con cui si chiude un lavoro quando il motore su CPU non e'
+ *  configurato (al claim e nel reclaim): chi lo mostra lo riconosce e dice
+ *  la cosa nella lingua della pagina (errorCode MT_UNAVAILABLE). */
+export const MOTIVO_MOTORE_ASSENTE = 'The CPU translation engine is not configured (AI_MT_BASE_URL)';
+
 export type EsitoRichiesta =
   | { stato: 'accodato'; jobId: string }
   /** Una traduzione dell'evento e' gia' in coda o in corso (anche di un altro testo). */
@@ -70,6 +75,8 @@ export async function ultimoLavoroTraduzione(eventId: string) {
   const letto = translateTextPayloadSchema.safeParse(payload);
   return {
     ...resto,
+    // Il motivo per chi legge: il testo grezzo e' in inglese, per il registro.
+    errorCode: resto.lastError === MOTIVO_MOTORE_ASSENTE ? ('MT_UNAVAILABLE' as const) : null,
     sourceLanguage: letto.success ? letto.data.sourceLanguage : null,
     sourceHash: letto.success ? letto.data.sourceHash : null,
     targetLanguages: letto.success ? letto.data.targetLanguages : [],

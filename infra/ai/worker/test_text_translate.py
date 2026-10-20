@@ -262,6 +262,20 @@ def test_solo_indirizzi_e_glossario_non_arrivano_al_modello(monkeypatch):
     assert finto.richieste == []
 
 
+def test_codice_in_linea_resta_com_e(monkeypatch):
+    finto = FintoMotore(monkeypatch)
+    m = _motore()
+    assert tt.traduci_riga(m, "Usa il comando `npm run build` e poi `codice`.", "it", "de") == (
+        "[German] Usa il comando `npm run build` e poi `codice`."
+    )
+    # Ne' il codice ne' i suoi segnaposto arrivano al modello come testo.
+    assert all("npm run build" not in r[0] and "codice" not in r[0] for r in finto.richieste)
+    # Una riga di solo codice non arriva al modello.
+    finto.richieste.clear()
+    assert tt.traduci_riga(m, "`codice`", "it", "de") == "`codice`"
+    assert finto.richieste == []
+
+
 def test_link_perso_si_traduce_a_parte_senza_perderlo(monkeypatch):
     # Il modello butta via i segnaposto dei link.
     FintoMotore(monkeypatch, traduci=lambda testo, dst: re.sub(r"</?a\d+>", "", testo).replace("regolamento", "Regeln"))

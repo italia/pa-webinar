@@ -174,6 +174,8 @@ _INDIRIZZO = re.compile(
     r"<(?:https?://|mailto:)[^>\s]+>|https?://[^\s<>()\[\]]+[^\s<>()\[\].,;:!?'\"]|"
     r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
 )
+# Il codice in linea (`...`): come gli indirizzi, resta com'e'.
+_CODICE = re.compile(r"`[^`\n]+`")
 _PRIVATO = re.compile("(\\d+)")
 
 
@@ -207,15 +209,18 @@ def rimetti_link(tradotta: str, link: List[Link]) -> Optional[str]:
 
 
 def proteggi(testo: str, termini: List["gl.Term"], destinazione: str) -> Tuple[str, List[str]]:
-    """Indirizzi, email e termini del glossario come ⟦n⟧; il secondo valore
-    dice con che cosa rimetterli (il termine, o la sua traduzione fissa)."""
+    """Codice in linea, indirizzi, email e termini del glossario come ⟦n⟧; il
+    secondo valore dice con che cosa rimetterli (il termine, o la sua
+    traduzione fissa)."""
     indirizzi: List[str] = []
 
     def via(m: re.Match[str]) -> str:
         indirizzi.append(m.group(0))
         return f"{len(indirizzi)}"
 
-    # Prima gli indirizzi, con caratteri privati che il glossario non tocca.
+    # Prima il codice in linea e gli indirizzi, con caratteri privati che il
+    # glossario non tocca.
+    testo = _CODICE.sub(via, testo)
     testo = _INDIRIZZO.sub(via, testo)
     testo, sostituzioni = gl.protect(testo, termini, destinazione) if termini else (testo, [])
     base = len(sostituzioni)
