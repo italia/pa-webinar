@@ -1073,6 +1073,21 @@ export default function EventWizard(props: WizardProps) {
   const aspettoSchede = useAspettoSchede(statoLingue.stati);
   const ricaricaLingue = statoLingue.ricarica;
   const scartaLetture = statoLingue.scarta;
+  // Dopo «Segna come riletta», «È ancora corretta» o «Ritraduci» i pulsanti
+  // del pannello spariscono: il fuoco va sulla scheda della lingua (il cui
+  // nome dice il nuovo stato) invece di cadere sulla pagina, e la regione di
+  // stato delle lingue lo annuncia.
+  const annunciaStatoLingua = statoLingue.annunciaStato;
+  const [schedaDaRaggiungere, setSchedaDaRaggiungere] = useState<string | null>(null);
+  useEffect(() => {
+    if (!schedaDaRaggiungere) return;
+    setSchedaDaRaggiungere(null);
+    annunciaStatoLingua(schedaDaRaggiungere);
+    (
+      document.getElementById(`ev-scheda-${schedaDaRaggiungere}`) ??
+      document.getElementById('ev-title')
+    )?.focus();
+  }, [schedaDaRaggiungere, annunciaStatoLingua]);
   // Un campo di titolo o descrizione cambiato in una lingua la tocca.
   const aggiornaTesti = useCallback(
     (patch: Partial<WizardForm>) => {
@@ -1149,7 +1164,10 @@ export default function EventWizard(props: WizardProps) {
         fallimento={statoLingue.fallimenti[lingua]}
         inviando={statoLingue.inviando === lingua}
         errore={statoLingue.errore}
-        onRiletta={() => tocca([lingua])}
+        onRiletta={() => {
+          tocca([lingua]);
+          setSchedaDaRaggiungere(lingua);
+        }}
         onRitraduci={() => {
           // Il testo di una persona se ne va: al salvataggio la lingua e'
           // vuota, e il server la traduce.
@@ -1158,6 +1176,7 @@ export default function EventWizard(props: WizardProps) {
             title: { ...formRef.current.title, [lingua]: '' },
             description: { ...formRef.current.description, [lingua]: '' },
           });
+          setSchedaDaRaggiungere(lingua);
         }}
         onRiprova={() => void statoLingue.riprova(lingua)}
       />

@@ -119,6 +119,9 @@ export interface StatoLingueEvento {
   errore: string | null;
   /** Il testo della regione che annuncia le traduzioni arrivate. */
   annuncio: string;
+  /** Annuncia nella stessa regione lo stato di una lingua adesso (dopo
+   *  un'azione del pannello, che toglie i suoi pulsanti). */
+  annunciaStato: (lingua: string) => void;
   /** Rilegge lo stato (lo staff, dopo un salvataggio). */
   ricarica: () => Promise<void>;
   /** Le letture partite prima di adesso non valgono (dopo un salvataggio). */
@@ -233,6 +236,15 @@ export function useLingueEvento(opts: {
     return { stati, fallimenti };
   }, [schede, server, toccate, principaleCambiato, principale, titoli, descrizioni, motore, lingueEvento, attive, ora]);
 
+  const annunciaStato = useCallback(
+    (lingua: string) => {
+      const s = stati[lingua];
+      if (!s) return;
+      setAnnuncio(t('status.item', { language: nomeLingua(lingua), state: t(`stateLower.${s}`) }));
+    },
+    [stati, t]
+  );
+
   // Si rilegge solo mentre una lingua si sta traducendo, e solo lo staff (la
   // lettura e' dell'amministrazione); di rado se il motore non e' partito.
   const valori = Object.values(stati);
@@ -280,7 +292,18 @@ export function useLingueEvento(opts: {
     [eventId, staff, ricarica, t, tErr]
   );
 
-  return { schede, stati, fallimenti, riprova, inviando, errore, annuncio, ricarica, scarta };
+  return {
+    schede,
+    stati,
+    fallimenti,
+    riprova,
+    inviando,
+    errore,
+    annuncio,
+    annunciaStato,
+    ricarica,
+    scarta,
+  };
 }
 
 /** Il testo e l'aspetto di ogni scheda, per LocaleTabBar. */

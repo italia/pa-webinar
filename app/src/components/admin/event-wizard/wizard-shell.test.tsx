@@ -1055,8 +1055,15 @@ describe('lingue dell evento e traduzione automatica', () => {
     fetchMock.mockClear();
     goToStep('base');
     click(scheda('English'));
+    // Da tastiera: il pulsante premuto sparisce con l'avviso, e il fuoco va
+    // sulla scheda della lingua, non sulla pagina; il nuovo stato si annuncia.
+    button(tt.markReviewed).focus();
     click(button(tt.markReviewed));
     expect(scheda('English').textContent).toContain(tt.state.human);
+    expect(document.activeElement).toBe(scheda('English'));
+    expect(container.querySelector('#aiTargetLocales [role="status"]')!.textContent).toBe(
+      tt.status.item.replace('{language}', 'English').replace('{state}', tt.stateLower.human),
+    );
     click(scheda('Deutsch'));
     type(byId<HTMLInputElement>('ev-title'), 'Neuer Titel');
     goToStep('review');
@@ -1081,9 +1088,14 @@ describe('lingue dell evento e traduzione automatica', () => {
     expect(scheda('English').textContent).toContain(tt.state.onSave);
     click(scheda('Deutsch'));
     click(button(tt.retranslate));
+    button(tt.retranslateConfirm).focus();
     click(button(tt.retranslateConfirm));
     expect(byId<HTMLInputElement>('ev-title').value).toBe('');
     expect(scheda('Deutsch').textContent).toContain(tt.state.onSave);
+    expect(document.activeElement).toBe(scheda('Deutsch'));
+    expect(container.querySelector('#aiTargetLocales [role="status"]')!.textContent).toBe(
+      tt.status.item.replace('{language}', 'Deutsch').replace('{state}', tt.stateLower.onSave),
+    );
     goToStep('review');
     await press(button(w.updateEvent));
     const corpo = payload('PUT');
