@@ -283,6 +283,56 @@ def test_link_perso_si_traduce_a_parte_senza_perderlo(monkeypatch):
     assert tradotto == "Leggi il [Regeln](https://x.example/r.pdf)."
 
 
+def _link_una_volta(tradotto, destinazione):
+    """Il link c'e', intero (testo fra parentesi quadre e destinazione) e una volta sola."""
+    assert tradotto.count(destinazione) == 1, tradotto
+    assert len(re.findall(r"\[[^\]]+\]\(" + re.escape(destinazione) + r"\)", tradotto)) == 1, tradotto
+
+
+@pytest.mark.parametrize(
+    "rovina",
+    [
+        lambda testo: re.sub(r"</?a\d+>", "", testo),
+        lambda testo: re.sub(r"</a\d+>", "", testo),
+        lambda testo: f"{testo} <a1>ancora</a1>" if "<a1>" in testo else testo,
+    ],
+    ids=["segnaposto-tolti", "solo-apertura", "segnaposto-doppio"],
+)
+def test_segnaposto_rovinato_il_link_resta_una_volta(monkeypatch, rovina):
+    # Il modello toglie, spezza o ripete i segnaposto dei link: la riga si
+    # traduce senza, e ogni link torna una volta sola, al suo posto.
+    FintoMotore(monkeypatch, traduci=lambda testo, dst: rovina(testo).replace("regolamento", "Regeln").replace("modulo", "Formular"))
+    tradotto = tt.traduci_riga(
+        _motore(), "Leggi il [regolamento](https://x.example/r.pdf) e compila il [modulo](https://x.example/m).", "it", "de"
+    )
+    assert tradotto == "Leggi il [Regeln](https://x.example/r.pdf) e compila il [Formular](https://x.example/m)."
+    _link_una_volta(tradotto, "https://x.example/r.pdf")
+    _link_una_volta(tradotto, "https://x.example/m")
+
+
+def test_link_perso_e_tradotto_diversamente_finisce_in_fondo_una_volta(monkeypatch):
+    # Da solo il testo del link si traduce in un altro modo che nella frase, e
+    # nella riga non si ritrova: il link va in fondo, fra parentesi, una volta.
+    def traduci(testo, dst):
+        if testo == "domande frequenti":
+            return "Häufig gestellte Fragen"
+        return re.sub(r"</?a\d+>", "", testo).replace("Leggi le domande frequenti", "Lesen Sie die häufig gestellten Fragen")
+
+    FintoMotore(monkeypatch, traduci=traduci)
+    tradotto = tt.traduci_riga(_motore(), "Leggi le [domande frequenti](https://x.example/faq).", "it", "de")
+    assert tradotto == "Lesen Sie die häufig gestellten Fragen. ([Häufig gestellte Fragen](https://x.example/faq))"
+    _link_una_volta(tradotto, "https://x.example/faq")
+
+
+def test_link_perso_con_il_testo_ripetuto_nella_riga_resta_una_volta(monkeypatch):
+    # Il testo del link compare due volte nella traduzione: il link va sulla
+    # prima, e la seconda resta testo.
+    FintoMotore(monkeypatch, traduci=lambda testo, dst: re.sub(r"</?a\d+>", "", testo).replace("bando", "Ausschreibung"))
+    tradotto = tt.traduci_riga(_motore(), "Il [bando](https://x.example/b) e le FAQ sul bando.", "it", "de")
+    assert tradotto == "Il [Ausschreibung](https://x.example/b) e le FAQ sul Ausschreibung."
+    _link_una_volta(tradotto, "https://x.example/b")
+
+
 def test_segnaposto_perso_si_ritraduce_senza(monkeypatch):
     chiamate = []
 
