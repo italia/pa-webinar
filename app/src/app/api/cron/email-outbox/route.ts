@@ -23,6 +23,7 @@ import { sendEmail } from '@/lib/email/send';
 import {
   MAX_EMAIL_OUTBOX_ATTEMPTS,
   nextAttemptDelayMs,
+  unpackOutboxParts,
 } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
@@ -98,18 +99,16 @@ export const GET = withErrorHandling(async (request) => {
           const html = tryDecryptPII(row.html);
           if (!html) throw new Error('missing html body');
           const text = tryDecryptPII(row.text) ?? undefined;
+          // Allegati e invito di calendario: in chiaro le righe di prima,
+          // cifrati quelli con l'invito (lib/email/outbox).
+          const { attachments, calendarInvite } = unpackOutboxParts(row.attachments);
           await sendEmail({
             to: recipient,
             subject: row.subject,
             html,
             text,
-            attachments: Array.isArray(row.attachments)
-              ? (row.attachments as Array<{
-                  filename: string;
-                  content: string;
-                  contentType: string;
-                }>)
-              : undefined,
+            attachments,
+            calendarInvite,
           });
 
           await prisma.emailOutbox.update({

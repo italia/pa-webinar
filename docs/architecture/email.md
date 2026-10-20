@@ -79,7 +79,7 @@ To add a new kind of email, follow the checklist in [Extending PA Webinar](../de
 |---|---|---|
 | `to_address`, `html`, `text` | Encrypted with `PII_ENCRYPTION_KEY` (AES-256-GCM, `encryptPII()`) | A database dump or an ad hoc query does not reveal recipients, personalized greetings or the access links inside the body |
 | `subject` | Plain text | It contains at most the event title or the site name, and keeping it readable makes triage possible |
-| `attachments` | Plain JSON | The calendar file, when there is one (see [Calendar files](#calendar-files)) |
+| `attachments` | Plain JSON, or encrypted (`encryptJSON()`) when the row carries a calendar invitation | The personal calendar invitation, which holds the recipient's address and join link, and any other attachment (see [Calendar files](#calendar-files)). Rows without an invitation keep the plain list; a reader of the previous version that meets an encrypted row sends the email without its attachments |
 | `metadata` | Plain JSON | A `kind` (listed in the [catalog](#emails-the-platform-sends)) plus record ids such as `registrationId`, `eventId` or `accountId`. The job never reads it; it exists for tracing |
 | `status`, `attempts`, `next_attempt_at`, `sent_at`, `last_error` | Scheduling state | `last_error` is truncated to 1,000 characters (`app/src/app/api/cron/email-outbox/route.ts`) |
 
@@ -103,8 +103,8 @@ stateDiagram-v2
     C --> P: run dies mid-send,<br/>lease expires
 
     note right of S
-        SENT and FAILED rows
-        are never deleted
+        SENT and FAILED rows are deleted
+        by the GDPR cleanup after retention
     end note
 
     classDef pending fill:#FDF1E3,stroke:#CC7A00,color:#17324D
@@ -116,6 +116,8 @@ stateDiagram-v2
     class S ok
     class F bad
 ```
+
+The GDPR cleanup deletes `SENT` and `FAILED` rows `EMAIL_OUTBOX_RETENTION_DAYS` days (30 by default) after their last update; rows with a deduplication key (moderator links, calendar invitations) are emptied instead of deleted, so that each one is still sent only once. Erasure on request deletes the rows written for the erased registrations ([Privacy and data protection](../GDPR.md)).
 
 "Claimed" is not a separate status in the table: the run pushes the row's `next_attempt_at` five minutes into the future, so no other run sees it as due. The retry schedule and the attempt limit are `nextAttemptDelayMs()` and `MAX_EMAIL_OUTBOX_ATTEMPTS` in `app/src/lib/email/outbox.ts`: six attempts in all, spaced 1 minute, 5 minutes, 30 minutes, 2 hours and 12 hours apart, so a message is given up about fourteen and a half hours after its first failure. A `FAILED` row is never retried automatically.
 
@@ -137,14 +139,16 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 
 | Email | Sent when | To | Carries | Editable | `metadata.kind` |
 |---|---|---|---|---|---|
-| Registration confirmation | A registration is created (`POST /api/events/<slug>/registrations`), or someone presses **Resend my access link** after the form reports that the address is already registered (`POST /api/events/<slug>/registrations/resend`). When registration is by invitation only, also whenever the form is submitted again for an address that is already registered ([Invitation-only registration](#invitation-only-registration)) | The registrant | Personal join link, event page link, add-to-calendar links, `event.ics` attachment | Yes, **Registration confirmation** | `confirmation` |
+| Registration confirmation | A registration is created (`POST /api/events/<slug>/registrations`), or someone presses **Resend my access link** after the form reports that the address is already registered (`POST /api/events/<slug>/registrations/resend`). When registration is by invitation only, also whenever the form is submitted again for an address that is already registered ([Invitation-only registration](#invitation-only-registration)) | The registrant | Personal join link, event page link, add-to-calendar links, the registrant's [calendar invitation](#calendar-files) | Yes, **Registration confirmation** | `confirmation` |
 | Reminder | The reminders job finds the event's current reminder due ([Reminders](#reminders)) | Every registrant who had registered by the reminder's moment and has not received it | The same as the confirmation, plus a "starts tomorrow / in N hours / in N minutes" note | Yes, **Event reminder** | `reminder` |
-| Date-change notice | An edit of the event (`PUT /api/events/<id>`) changes its start or end time while the event is `PUBLISHED` | Every registrant | The new date and time and an `event-updated.ics` attachment. No link: it says that the personal join link is unchanged | No | `date-change-notification` |
+| Date-change notice | An edit of the event (`PUT /api/events/<id>`) changes its start or end time while the event is `PUBLISHED` | Every registrant | The new date and time and the registrant's updated calendar invitation, which moves the entry already in the calendar. The body has no link: it says that the personal join link is unchanged | No | `date-change-notification` |
 | Post-event thank-you | The reminders job finalizes an event that opted in (see [After the event](#after-the-event)) | Every registrant, whether or not they attended | Event page link, where the recap and the feedback form are | No | `post_event_participant` |
 | Post-event recap | The same run | The event's moderator contact (`moderatorEmail`), if set | Headcount, registrations, questions, polls and average feedback; event page link; recording link if the recording is published | No | `post_event_moderator` |
 | Recording notice | The reminders job finds an `ENDED` event whose recording is visible on its public page ([Recording notice](#recording-notice)) | Every registration the event still keeps, whether or not they attended | Event page link, where the recording is | No | `recording_published` |
-| Moderator link | An event with a primary contact address (`moderatorEmail`) is published or leaves the draft state (`PUT /api/events/<id>`), or that address changes on an event that is not a draft; once per address | The event's primary contact | The event's management link and the room link, both with the primary moderator token, and the warning that the link is personal and must not be shared | No | `moderator-link` |
-| Co-moderator or speaker link | A named grant with an email address is created on an event that is not a draft (`POST /api/events/<id>/moderators`), the event it belongs to is published, or the event is saved again from the wizard while not a draft (which retries links that did not reach the outbox); once per grant | The grant's address | The room link with the grant's token, a text for the role (co-moderator or speaker) and the same warning | No | `moderator-link` |
+| Moderator link | An event with a primary contact address (`moderatorEmail`) is published or leaves the draft state (`PUT /api/events/<id>`), or that address changes on an event that is not a draft; once per address | The event's primary contact | The event's management link and the room link, both with the primary moderator token, the warning that the link is personal and must not be shared, and a calendar invitation with the room link | No | `moderator-link` |
+| Calendar update for the people running the event | An edit of the event changes its start or end time while the event is `PUBLISHED`, as for the date-change notice | The primary contact and every active named grant with an address. A primary contact changed in the same save is skipped: their new moderator link already carries the invitation | The new date and time, the room link with the person's token, the personal-link warning and the updated calendar invitation | No | `calendar-invite` |
+| Co-moderator or speaker link | A named grant with an email address is created on an event that is not a draft (`POST /api/events/<id>/moderators`), the event it belongs to is published, or the event is saved again from the wizard while not a draft (which retries links that did not reach the outbox); once per grant | The grant's address | The room link with the grant's token, a text for the role (co-moderator or speaker), the same warning and a calendar invitation with the room link | No | `moderator-link` |
+| Calendar invitation | An administrator resends the invitations of an event (`POST /api/admin/events/<id>/calendar-invites`, [Updates and resending](#updates-and-resending)) | Every registrant, the primary contact and every active named grant with an address; once per person, start and end time, address and, for moderators and speakers, token | A short text, the personal link (the signed entry link for registrants, the room link with the token for moderators and speakers, with the personal-link warning) and the calendar invitation | No | `calendar-invite` |
 | Staff sign-in link | A request from the sign-in page (`POST /api/staff/login-link`), an administrator creating a staff account with the invitation option, or re-sending the link from **Staff accounts** | An active staff account | One-time sign-in link ([lifetime](#what-each-link-is)) | No | `staff-login` |
 | Data export link | A data subject asks for a copy of their data (`POST /api/gdpr/export/request`, right of access, Art. 15) | The address typed in the form | Signed link to `/privacy/my-data` ([lifetime](#what-each-link-is)) | No | `gdpr-export-request` |
 | Erasure link | A data subject asks for erasure (`POST /api/gdpr/erasure/request`, right to erasure, Art. 17) | The address typed in the form | Signed link to `/privacy/my-data/erasure` ([lifetime](#what-each-link-is)) | No | `gdpr-erasure-request` |
@@ -177,7 +181,7 @@ The confirmation contains, in order:
 - add-to-calendar links for Google, Outlook and Yahoo, and a **Download .ics** link;
 - the note "Keep this email — it contains your personal link to access the event";
 - a **View event page** link;
-- a footer note, then the `event.ics` attachment. For registrants in the address book, the default footer note says how to leave the address book, and the signed opt-out link (**Remove me from the address book**, valid 90 days) follows the note even when an administrator has customized it ([Privacy and data protection](../GDPR.md#the-address-book)).
+- a footer note, then the calendar invitation ([Calendar files](#calendar-files)). For registrants in the address book, the default footer note says how to leave the address book, and the signed opt-out link (**Remove me from the address book**, valid 90 days) follows the note even when an administrator has customized it ([Privacy and data protection](../GDPR.md#the-address-book)).
 
 A reminder has the same layout, with the "starts in…" sentence as its introduction and no note under the button.
 
@@ -284,7 +288,7 @@ The language is stored once, at registration, and every later email to that regi
 | Staff sign-in link | The page the link was requested from: the sign-in page, or the administration page of the administrator who sent it |
 | Data-subject links | The page the request was made from, otherwise Italian |
 
-**Staff sign-in emails exist in all five languages**, like every other email. Dates and times in the body are written in the text language's regional format (English uses day-month order and a 24-hour clock) and in the event's time zone (`Event.timezone`, falling back to `Europe/Rome` in `app/src/lib/utils/date-format.ts`), with no zone label. The calendar attachment carries the exact instant ([Time zones](#time-zones)).
+**Staff sign-in emails exist in all five languages**, like every other email. Dates and times in the body are written in the text language's regional format (English uses day-month order and a 24-hour clock) and in the event's time zone (`Event.timezone`, falling back to `Europe/Rome` in `app/src/lib/utils/date-format.ts`), with no zone label. The calendar invitation carries the event's time zone ([Time zones](#time-zones)).
 
 That emails cover five languages while the interface covers 24 is a known limitation tracked in the [roadmap](../ROADMAP.md#known-limitations-of-shipped-features). The interface side is described in [Languages and localization](i18n.md).
 
@@ -325,34 +329,52 @@ Reminders go to registrants only. Moderators and speakers receive none.
 
 ### Where they appear
 
-| Where | File | Organizer (`ORGANIZER`) |
+| Where | File | Method |
 |---|---|---|
-| Attached to the confirmation and to every reminder | `event.ics`, `text/calendar; charset=utf-8; method=PUBLISH` | `SMTP_FROM` |
-| Attached to the date-change notice | `event-updated.ics` | `SMTP_FROM` |
-| Public download, `GET /api/events/<slug>/calendar.ics`, linked from emails, the registration confirmation screen and the add-to-calendar menu on the event page (**Download .ics file**) | `evento-<slug>.ics`, cached publicly for an hour (`app/src/app/api/events/[param]/calendar.ics/route.ts`) | `SMTP_FROM` |
+| The confirmation, every reminder, the date-change notice, the moderator and speaker links, and the resent invitation | The recipient's **calendar invitation**: a `text/calendar; method=REQUEST` part of the message, plus the same file attached as `invite.ics` | `REQUEST` |
+| Public download, `GET /api/events/<slug>/calendar.ics`, linked from emails, the registration confirmation screen and the add-to-calendar menu on the event page (**Download .ics file**) | `evento-<slug>.ics`, cached publicly for an hour (`app/src/app/api/events/[param]/calendar.ics/route.ts`) | `PUBLISH` |
 
-The organizer address is always the platform's (`calendarOrganizerEmail()`), never the moderator's personal address; an empty `SMTP_FROM` counts as unset and gives the built-in placeholder. Every file uses `METHOD:PUBLISH`, as does the `method` of the attachment's content type: calendar clients add the event without asking for a reply, and send no RSVP to the organizer.
+### The calendar invitation
 
-The organizer column gives the address. The organizer name is `moderatorName`; when it is not set, the name is "PA Webinar" in confirmation and date-change files, and the site name in reminder files and in the public download.
+Every email that confirms a person's part in an event carries a personal invitation (`generateEventInvitation()` in `app/src/lib/ical/invitation.ts`), so that Gmail, Outlook and other clients show it as an invitation to accept or add, not as a link or an attachment to open:
 
-The generator is `generateEventICal()` in `app/src/lib/ical/generate.ts`, built on `ical-generator`.
+- **Message shape.** The invitation travels as nodemailer's `icalEvent`: a `text/calendar; charset=utf-8; method=REQUEST` part inside the `multipart/alternative` next to the text and HTML bodies, and an `invite.ics` attachment for clients that do not read that part (`mailOptions()` in `app/src/lib/email/send.ts`).
+- **`METHOD:REQUEST`**, with `ORGANIZER` set to the platform address (`calendarOrganizerEmail()`, `SMTP_FROM`, the same address as the sender) and the organizing body's name, and a single `ATTENDEE`: the recipient, with `RSVP=FALSE`. The platform reads no replies, and Outlook then does not offer to send one to a mailbox that does not answer.
+- **The personal join link** is in `URL` and at the top of `DESCRIPTION`, followed by the event description as plain text and the event page. Registrants get the unsigned room link, `/live?token=…`, as in the add-to-calendar links ([The signed personal link](#the-signed-personal-link)), and it is also their `LOCATION`. Moderators and speakers get the room link with their token and the personal-link warning; their `LOCATION` is the public event page, because the token is a durable credential and calendar reminders show the location on screen, also during a screen share.
+- **No personal data beyond the recipient's**: their address and their link. `CLASS:PRIVATE` asks calendars that are shared with others to show the slot as busy without the details.
+- **`UID`**: `<event id>.<seat>.<HMAC>@<portal host>`, where the seat is `registration`, `primary` or `grant`, and the HMAC (keyed with `APP_SECRET`) covers the event, the seat and the lowercased address (`invitationUid()`). It is the same in every email to that person for that event, so a reminder, a date-change notice or a resent invitation updates the entry already in the calendar. It reveals neither the address nor a value shared across events, and a person who is both a registrant and a speaker keeps two separate entries, each with its own link.
+- **`SEQUENCE`**: the seconds from 2024-01-01 UTC to the event's last update (`Event.updatedAt`, `icsSequence()`), which grows with every change of the event, dates included.
+- **The outbox stores the invitation encrypted** ([What a row holds](#what-a-row-holds)). A failure to build it is logged with the error's name only, and the email goes out without it.
+
+Replies are not processed: accepting or declining in a calendar client changes nothing on the platform ([Roadmap](../ROADMAP.md)).
+
+### Updates and resending
+
+When the start or end time of a `PUBLISHED` event changes, registrants receive the date-change notice and the people who run the event receive their updated invitation through the same module (`sendStaffCalendarUpdates()`), in the language of the administration page that made the change. Like the notice, it is queued after the response and a failure does not fail the save. A date change while the event is `PROVISIONING`, `IDLE` or `LIVE` sends neither.
+
+When an administrator corrects a registrant's address (`PATCH /api/admin/events/<id>/registrations/<regId>`), the emails still queued for that registration go to the new address without their calendar invitation, which names the old one; the next email carries the invitation for the new address.
+
+Invitations reach only the people who receive one of the emails above after the feature is deployed. Their `UID` differs from the one of the public download and of the calendar files that earlier versions attached (`<event id>@<portal host>`): an entry imported from one of those stays beside the invitation and is not updated by it. For an event whose people registered earlier, or after a change that calendars must receive, an administrator can send every person their invitation again (`app/src/lib/email/calendar-invite.ts`):
+
+- `GET /api/admin/events/<id>/calendar-invites` is a dry run: it counts registrants, active named grants with an address and the primary contact, and sends nothing.
+- `POST /api/admin/events/<id>/calendar-invites` with `{ "confirm": "<event slug>" }` queues the emails; any other body answers `422`. Draft, `ENDED` and `ARCHIVED` events, and events whose end time has passed, answer `409`. The answer counts the queued, already queued and failed messages, and the action is written to the audit log (`EVENT_CALENDAR_INVITES_SEND`).
+- Each person receives the invitation once: the outbox key holds the event, its start and end, the seat and an HMAC of the address and, for moderators and speakers, of the token, so repeating the request queues nothing more, while a change of the time, a corrected address or a renewed primary token allows a new send. The key does not use the `SEQUENCE`, which also grows with the status changes of the event's lifecycle. The update after a date change has no key: it is sent once per change, also when the event moves back to a time it had before. Registrants receive it in their registration language; moderators and speakers in the language of the administration page that made the request.
+- Both routes are for administrators only. With the default schedule the outbox sends about 50 messages a minute ([Throughput and timing](#throughput-and-timing)).
+
+### The public download
+
+The download is the same for everyone and carries neither a recipient nor a personal link (`generateEventICal()` in `app/src/lib/ical/generate.ts`, built on `ical-generator`):
+
+- `METHOD:PUBLISH`: calendar clients add the event without asking for a reply.
+- `SUMMARY`: the event title in the page language; `DESCRIPTION`: the event description as plain text; `URL`: the public event page.
+- `ORGANIZER`: the platform address (`SMTP_FROM`; an empty value counts as unset and gives the built-in placeholder), named after the event's first organizing body, or else the installation's organization name, or else the site name (`app/src/lib/ical/organizer.ts`); never the moderator.
+- `UID`: `<event id>@<portal host>`, the same in every download (`icsUid()`), with the same `SEQUENCE` as the invitations.
 
 ### Time zones
 
-Start and end are written as **UTC instants** (`DTSTART:20300115T091500Z`), with no `TZID` parameter and no `VTIMEZONE` component. Every calendar client converts them to the reader's own time zone, which is also what an online audience spread across time zones needs. `Event.timezone` is used only to write the human-readable time in the email body.
+The invitation writes start and end as local times of the event's time zone (`DTSTART;TZID=Europe/Rome:20301015T111500`), with a `VTIMEZONE` component that defines that zone (`fusoCalendario()` in `app/src/lib/ical/timezone.ts`). The definition is derived from the runtime's time-zone data: the changes between standard and daylight time in the event's year become two yearly rules, used only if they reproduce exactly every change of the year before and the year after. The invitation falls back to **UTC instants** (`DTSTART:20301015T091500Z`) when the zone is `UTC` or unknown, when its rules are not two yearly changes, or when the start or end is within three hours of a change, where a local time can be ambiguous. Both forms give every client the same instant; the local form also shows the event's own zone.
 
-A `TZID` label must not be added without a matching `VTIMEZONE` and a real conversion: the library does not convert the instant, so labeling a UTC wall-clock time as local time shifts the event by the zone's offset.
-
-### What the file contains
-
-- `SUMMARY`: the event title in the recipient's page language.
-- `DESCRIPTION`: the event description as stored, which is Markdown source, not rendered text.
-- `URL`: the public event page. The personal join link is **not** in the file.
-- `ORGANIZER`: the platform address, with the organizer name above.
-- `UID`: `<event id>@<portal host>`, the same in every file for the event (`icsUid()`).
-- `SEQUENCE`: the seconds from 2024-01-01 UTC to the event's last update (`Event.updatedAt`), which grows with every change of the event, dates included (`icsSequence()`).
-
-Because the `UID` is stable and the `SEQUENCE` grows, a calendar client recognizes `event-updated.ics`, a later reminder or the public download as the event it already holds, and updates that entry instead of adding a second one.
+The public download always writes UTC instants, with no `TZID` and no `VTIMEZONE`. A `TZID` label must never be written without a matching `VTIMEZONE` and a real conversion: labeling a UTC wall-clock time as local time shifts the event by the zone's offset.
 
 ### Add-to-calendar links
 
@@ -499,7 +521,6 @@ On a local stack, every message is captured by Mailpit instead of being delivere
 
 | Gap | Effect | Tracked in |
 |---|---|---|
-| **The outbox is never emptied.** No job deletes `SENT` or `FAILED` rows, and erasure on request does not touch them. | Encrypted addresses and bodies, including personal join links and moderator links, stay in the database indefinitely. The plain-text calendar attachments keep the moderator contact's name. The `moderator-link` rows are also what prevents a primary link from being sent twice: a purge that deletes them lets a later publication send it again. | [Roadmap: the email outbox is never emptied](../ROADMAP.md#next) |
 | **Texts promise emails that are not sent.** The event wizard says that invited guests each get "a personal join link". | Invited guests receive nothing until they register; staff must send them the event page. | Not yet tracked |
 | **Confirmations and reminders ignore the site name in their header.** No caller passes the site name to these two templates. | The header band always reads "PA Webinar", and `{{siteName}}` renders empty in confirmation overrides (it works in reminder overrides). | Not yet tracked |
 | **The date-change notice always names PA Webinar.** Its footer text is fixed in `app/src/lib/email/notification.ts`. | A white-labeled installation still tells registrants that the email was sent automatically by PA Webinar. | Not yet tracked |
@@ -527,6 +548,7 @@ On a local stack, every message is captured by Mailpit instead of being delivere
 | Built-in texts and layouts | `app/src/lib/email/templates.ts` |
 | Template overrides | `app/src/lib/email/resolve-template.ts`, `app/src/app/api/admin/email-templates/` |
 | Email languages | `app/src/lib/email/lingua.ts` |
-| Calendar files and links | `app/src/lib/ical/` |
+| Calendar files, invitations and links | `app/src/lib/ical/` |
+| Resending the calendar invitations | `app/src/lib/email/calendar-invite.ts`, `app/src/app/api/admin/events/[id]/calendar-invites/route.ts` |
 | Staff sign-in email | `app/src/lib/auth/staff-login.ts` |
 | Data model (`EmailOutbox`, `EmailTemplate`, `EventReminder`, `ReminderSent`) | `app/prisma/schema.prisma`; see [Data model](data-model.md) |

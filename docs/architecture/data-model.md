@@ -116,7 +116,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 | `Question.text`, `EventFeedback.comment`, `QuestionnaireAnswer.valueText`, `WordCloudSubmission.word` | Free text typed by participants. |
 | `Question.answerText` | The written answer a moderator gives to a Q&A question. |
 | `LiveAction.data` | The details of a live action: ids, counts and texts written by moderators (agenda topics, poll questions with their options and results, word-cloud prompts), and the most frequent words of a closed word-cloud round, which participants typed. No names. |
-| `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), the calendar attachment (which names the event contact and gives their email address), and the last SMTP error (which can quote the recipient). The recipient and both bodies are encrypted. |
+| `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), attachments other than the calendar invitation, and the last SMTP error (which can quote the recipient). The recipient, both bodies and the calendar invitation (recipient's address and personal link) are encrypted. |
 | `AdminAuditLog.ip`, `AdminAuditLog.userAgent` | The client IP address and user agent of every administrative write. No job deletes these rows. |
 | `ProfilePhoto.bytes` | The image a person uploaded to show in the room. It is served without a credential to anyone who has its address, which every participant receives in the conference. |
 

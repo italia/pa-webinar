@@ -27,6 +27,7 @@ import {
   isEventModerator,
   constantTimeEqual,
 } from '@/lib/auth/moderator';
+import { sendStaffCalendarUpdates } from '@/lib/email/calendar-invite';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
 import {
   adminRequestLocale,
@@ -595,11 +596,6 @@ export const PUT = withErrorHandling(async (request, context) => {
         })
       : await prisma.event.update(updateArgs);
 
-  if (dateChanged && event.status === 'PUBLISHED') {
-    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
-    sendDateChangeNotifications({ eventId });
-  }
-
   // I link personali: alla pubblicazione (o all'uscita dalla bozza) partono
   // quello del moderatore principale e quelli delle concessioni create in
   // bozza; un indirizzo del principale cambiato riceve il suo. Una volta sola
@@ -608,6 +604,30 @@ export const PUT = withErrorHandling(async (request, context) => {
   const moderatorEmailChanged =
     data.moderatorEmail !== undefined &&
     (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
+
+  if (dateChanged && event.status === 'PUBLISHED') {
+    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
+    sendDateChangeNotifications({ eventId });
+    // Chi conduce ha l'invito di calendario dai link: riceve quello con la
+    // nuova ora, nella lingua di chi ha fatto la modifica. Come l'avviso, non
+    // trattiene la risposta e non la fa fallire: l'evento e' gia' salvato. Un
+    // principale appena cambiato riceve il suo link (qui sotto), che porta
+    // gia' l'invito con la nuova ora.
+    void (async () => {
+      try {
+        const { defaultLocale: predefinita } = await getSettings();
+        await sendStaffCalendarUpdates(eventId, {
+          staffLocale: adminRequestLocale(request, predefinita),
+          skipPrimary: moderatorEmailChanged,
+        });
+      } catch (err) {
+        console.error('[events] staff calendar updates not queued', {
+          eventId,
+          error: err instanceof Error ? err.name : 'unknown',
+        });
+      }
+    })();
+  }
   const pubblicato =
     (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
     (event.status === 'DRAFT' && updated.status !== 'DRAFT');
