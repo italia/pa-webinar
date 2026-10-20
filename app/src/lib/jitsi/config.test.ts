@@ -367,4 +367,10 @@ describe('barra principale di Jitsi', () => {
     expect(elenchi.flat()).not.toContain('security');
     expect(elenchi[0]).toContain('pa-captions');
   });
+
+  it('la condivisione dello schermo resta in barra anche negli elenchi da sei e da cinque', () => {
+    const elenchi = jitsiConfigOverwrite.mainToolbarButtons;
+    expect(elenchi[2]).toContain('desktop');
+    expect(elenchi[3]).toContain('desktop');
+  });
 });

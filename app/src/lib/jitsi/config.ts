@@ -160,8 +160,12 @@ export const jitsiConfigOverwrite = {
   mainToolbarButtons: [
     ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
     ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
-    ['microphone', 'camera', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
-    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID, 'settings'],
+    // Da sei pulsanti in giu' la condivisione dello schermo resta in barra
+    // (chi presenta la cerca li', anche con la colonna laterale larga) e i
+    // sottotitoli passano nel menu «…». Chi non puo' condividere non la vede:
+    // il posto lo prende un altro pulsante.
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', 'settings'],
+    ['microphone', 'camera', 'desktop', 'raisehand', 'settings'],
     ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
     ['microphone', 'camera', CAPTIONS_BUTTON_ID],
     ['microphone', 'camera'],
