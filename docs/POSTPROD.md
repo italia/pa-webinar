@@ -1533,8 +1533,8 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 ### The recording page
 
 **Manage** opens `/admin/postprod/<recordingId>`, with the tabs
-**Transcript**, **Summary**, **Translations**, **Archive** and
-**Reliability**:
+**Transcript**, **Summary**, **Translations**, **Slides**, **Archive** and
+**Reliability** (`?tab=slides` opens the **Slides** tab directly):
 
 - **Transcript** is the editor: each segment with its speaker, a waveform
   when `WAVEFORM_JSON` exists, and playback of the source media through a
@@ -1548,6 +1548,11 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
   transcript to the recording with video, the page goes to that recording.
 - **Summary** edits the Markdown and structured summary of each language.
 - **Translations** shows the translated languages and adds new ones.
+- **Slides** governs the PDF pages presented in the room that the event page
+  shows beside the published video: **Show synced slides**, the presented
+  PDFs with the reason one is not shown, the alignment correction in seconds
+  and a preview with the video. It uses no AI and works with the pipeline off
+  ([Synced slides](architecture/recording.md#synced-slides)).
 - **Archive** plays each retained participant track in sync with the video,
   generates the MKV archive and downloads it. Isolated voice is sensitive
   personal data, so this tab exists only in the administration area.
@@ -1566,6 +1571,7 @@ their own events ([ADR-014](adr/014-organizer-role.md)).
 | Speaker mapping | Names a speaker label or links it to an address-book person | `POSTPROD_SPEAKER_MAP` |
 | Transcript edit | Rewrites the segments, then the source VTT and the speaking times. A summary or translation that runs afterwards reads the corrected text, because the claim first writes the revised transcript to storage; an archive does the same with the source VTT. Dubbing follows its translation. Outputs already produced stay as they are | `POSTPROD_TRANSCRIPT_EDIT`, or `POSTPROD_TRANSCRIPT_REDACT` with erasure |
 | Summary edit | Rewrites the summary of one language | `POSTPROD_SUMMARY_EDIT` |
+| Synced slides | Shows or hides the slides beside the video and sets the alignment correction (`Recording.slidesEnabled`, `slidesOffsetSec`) | `POSTPROD_SLIDES_UPDATE` |
 
 All actions write to the administration audit log. All of them except the
 recording list require the administrator or the organizer who created the

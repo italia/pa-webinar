@@ -228,7 +228,7 @@ A moderator or a speaker shows a PDF from the event's materials to the whole roo
 
 **Accessibility.** The area is a labelled region that takes focus; with focus inside it the arrow keys, Page Up, Page Down, Home and End move the shared page for a presenter and browse locally for everyone else, except inside the page-number field. The page indicator is a polite live region. The canvas has a text alternative with the title and the page, and **Text of the page** shows the page's text extracted by pdf.js.
 
-**Recording.** Jibri records the Jitsi page, not the portal, so the presentation area is not in the composite video, and the per-participant recorder captures audio only. The presenter always sees a note saying that the pages are in the room panel and not in the call video; while a recording runs, the note asks them to also share their screen from the call toolbar if the pages must be in the video. The journal records `presentation.started`, `presentation.page` and `presentation.stopped` ([Live action journal](#live-action-journal)), which post-production places beside the transcript.
+**Recording.** Jibri records the Jitsi page, not the portal, so the presentation area is not in the composite video, and the per-participant recorder captures audio only. The presenter always sees a note saying that the pages are in the room panel and not in the call video; while a recording runs, the note asks them to also share their screen from the call toolbar if the pages must be in the video. The journal records `presentation.started`, `presentation.page` and `presentation.stopped` ([Live action journal](#live-action-journal)), which post-production places beside the transcript and the event page turns into slides beside the published video ([Synced slides](recording.md#synced-slides)).
 
 ### Reactions
 
@@ -268,7 +268,7 @@ The room does not offer the older star rating (`EventFeedback`). `POST /feedback
 
 ## Live action journal
 
-The room also keeps a journal of what happened and when: one `LiveAction` row per action, written by `recordLiveAction` and `recordLiveActions` in `app/src/lib/live/actions.ts`. AI post-production places it beside the transcript, so the summary knows when a topic started or a poll closed ([POSTPROD.md](../POSTPROD.md#room-timeline)). The journal has no reader in the room.
+The room also keeps a journal of what happened and when: one `LiveAction` row per action, written by `recordLiveAction` and `recordLiveActions` in `app/src/lib/live/actions.ts`. AI post-production places it beside the transcript, so the summary knows when a topic started or a poll closed ([POSTPROD.md](../POSTPROD.md#room-timeline)), and the page of a concluded event reads the presentation entries to show the slides beside the published video ([Synced slides](recording.md#synced-slides)). The journal has no reader in the room.
 
 - **One time base.** `at` is the server's clock. An action that happened in a browser is converted to server time, described below.
 - **No people.** `actor` holds the role (`moderator`, `speaker`, `participant`, or `system` for a round closed at its expiry or a change made from the administration area), never a person. `data` holds ids, counts and texts written by moderators. It never holds names or endpoint ids, nor the text of a Q&A question or a chat message: post-production reads those from their own tables.
