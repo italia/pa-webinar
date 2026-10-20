@@ -738,14 +738,16 @@ export default function EventWizard(props: WizardProps) {
     partenza ? passoDisponibile(partenza.step, istantanea) : 'base',
   );
   const [submitting, setSubmitting] = useState(false);
-  // Le foto delle persone in viaggio verso il server: finche' ce n'e' una,
-  // salvare o cambiare passo la perderebbe (il campo smonta e il modulo non
-  // ha ancora il suo id).
-  const [fotoInViaggio, setFotoInViaggio] = useState(0);
-  const segnalaFoto = useCallback((inCaricamento: boolean) => {
-    setFotoInViaggio((n) => Math.max(0, n + (inCaricamento ? 1 : -1)));
+  // I file in viaggio verso il server, da ogni campo dei passi e delle
+  // impostazioni avanzate (foto delle persone, copertina, loghi, audio della
+  // sala d'attesa, documento della privacy, materiali): finche' ce n'e' uno,
+  // salvare o cambiare passo lo perderebbe (il campo smonta e interrompe il
+  // caricamento, e il modulo non ha ancora il suo indirizzo).
+  const [caricamentiInViaggio, setCaricamentiInViaggio] = useState(0);
+  const segnalaCaricamento = useCallback((inCaricamento: boolean) => {
+    setCaricamentiInViaggio((n) => Math.max(0, n + (inCaricamento ? 1 : -1)));
   }, []);
-  const fermo = submitting || fotoInViaggio > 0;
+  const fermo = submitting || caricamentiInViaggio > 0;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   // Gli errori trovati nel browser: spariscono appena il campo torna valido.
@@ -1360,7 +1362,7 @@ export default function EventWizard(props: WizardProps) {
   const passi = passiPrincipali(istantanea);
   const indicePasso = (passi as readonly StepKey[]).indexOf(activeStep);
   const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
-    if (fotoInViaggio > 0) return;
+    if (caricamentiInViaggio > 0) return;
     if (step === 'advanced') apriSezione(sez ?? null);
     setActiveStep(step);
   };
@@ -1374,7 +1376,7 @@ export default function EventWizard(props: WizardProps) {
   /** Al passo dopo (dalle impostazioni avanzate: al riepilogo), solo con il
    *  passo a posto. */
   const goNext = () => {
-    if (fotoInViaggio > 0) return;
+    if (caricamentiInViaggio > 0) return;
     const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
@@ -1453,10 +1455,12 @@ export default function EventWizard(props: WizardProps) {
         bersaglio?.scrollIntoView?.({ block: 'center' });
         return;
       }
+      // Un altro passo smonterebbe il campo di un file in viaggio: si aspetta.
+      if (caricamentiInViaggio > 0) return;
       campoDaRaggiungere.current = id;
       setActiveStep(m.step);
     },
-    [props.defaultLocale, activeStep]
+    [props.defaultLocale, activeStep, caricamentiInViaggio]
   );
   useEffect(() => {
     const id = campoDaRaggiungere.current;
@@ -1547,8 +1551,8 @@ export default function EventWizard(props: WizardProps) {
    */
   const handleSubmit = useCallback(
     async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
-      // Una foto ancora in viaggio non e' nel modulo: si salverebbe senza.
-      if (fotoInViaggio > 0) return;
+      // Un file ancora in viaggio non e' nel modulo: si salverebbe senza.
+      if (caricamentiInViaggio > 0) return;
       setAzione(submitMode);
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
@@ -2044,7 +2048,7 @@ export default function EventWizard(props: WizardProps) {
       toccate,
       ricaricaLingue,
       scartaLetture,
-      fotoInViaggio,
+      caricamentiInViaggio,
     ]
   );
 
@@ -2145,7 +2149,8 @@ export default function EventWizard(props: WizardProps) {
             type="button"
             className="btn btn-sm btn-outline-primary"
             onClick={cambiaModello}
-            disabled={cambiandoModello}
+            // Un file in viaggio non arriverebbe nel formato nuovo.
+            disabled={cambiandoModello || caricamentiInViaggio > 0}
           >
             {props.formatoLabel
               ? t('flow.changeFormat')
@@ -2231,6 +2236,7 @@ export default function EventWizard(props: WizardProps) {
                 siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
                 siteDefaultVideoQuality={props.siteDefaultVideoQuality}
                 lingue={activeStep === 'base' ? lingueDelPasso : undefined}
+                onUploadBusy={segnalaCaricamento}
               />
             </div>
             {anteprima && <PagePreview dati={anteprima} />}
@@ -2244,7 +2250,7 @@ export default function EventWizard(props: WizardProps) {
               invitationsLocked={viaToken !== null}
               // Le foto si caricano con la sessione dello staff.
               photosLocked={viaToken !== null}
-              onPhotoBusy={segnalaFoto}
+              onUploadBusy={segnalaCaricamento}
               primary={primario}
               publicRegistrationEnabled={iscrizioneAperta}
               // Il programma si pubblica nella pagina dell'evento: una
@@ -2290,7 +2296,7 @@ export default function EventWizard(props: WizardProps) {
                 }
                 perPubblicare={mode === 'create'}
                 photosLocked={viaToken !== null}
-                onPhotoBusy={segnalaFoto}
+                onUploadBusy={segnalaCaricamento}
               />
             </StepPeople>
           </RubricaAccessContext.Provider>
@@ -2403,6 +2409,7 @@ export default function EventWizard(props: WizardProps) {
                   defaultFeedbackHint={mode === 'create'}
                   responseCounts={risposteQuestionari}
                   eventId={initialEvent?.id}
+                  onUploadBusy={segnalaCaricamento}
                 />
               ),
               room: (
@@ -2416,6 +2423,7 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
                   siteDefaultVideoQuality={props.siteDefaultVideoQuality}
+                  onUploadBusy={segnalaCaricamento}
                 />
               ),
               data: (
@@ -2425,6 +2433,7 @@ export default function EventWizard(props: WizardProps) {
                   gdprTemplates={props.gdprTemplates}
                   fieldErrors={fieldErrors}
                   retentionMax={retentionMax}
+                  onUploadBusy={segnalaCaricamento}
                 />
               ),
               technical: (

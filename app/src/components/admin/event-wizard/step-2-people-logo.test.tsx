@@ -36,6 +36,10 @@ class XhrFinto {
 let container: HTMLDivElement;
 let root: Root;
 
+/** Il valore del passo all'ultimo disegno, e chi riceve i file in viaggio. */
+let valoreFinale: StepPeopleValue | null = null;
+const occupato = vi.fn();
+
 function Passo() {
   const [value, setValue] = useState<StepPeopleValue>({
     organizers: [],
@@ -43,10 +47,12 @@ function Passo() {
     speakers: [],
     invitations: [],
   });
+  valoreFinale = value;
   return (
     <StepPeople
       value={value}
       onChange={(patch) => setValue((v) => ({ ...v, ...patch }))}
+      onUploadBusy={occupato}
       primary={{
         name: 'Organizzatrice 1',
         email: 'org@example.test',
@@ -81,6 +87,8 @@ function scrivi(input: HTMLInputElement, valore: string) {
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   XhrFinto.ultimo = null;
+  valoreFinale = null;
+  occupato.mockReset();
   vi.stubGlobal('XMLHttpRequest', XhrFinto);
   URL.createObjectURL = () => 'blob:prova';
   URL.revokeObjectURL = () => {};
@@ -149,5 +157,86 @@ describe('StepPeople — il logo di un ente', () => {
         .querySelector('[data-testid="org-logo"] .campo-file__miniatura img')
         ?.getAttribute('src')
     ).toBe(URL_LOGO);
+  });
+});
+
+/** Sceglie un file nel selettore nascosto del campo con quell'id. */
+async function scegliLogo(prefisso: string) {
+  const selettore = document.querySelector<HTMLInputElement>(
+    `input[type="file"][id^="${prefisso}-file-"]`
+  );
+  if (!selettore) throw new Error(`nessun selettore ${prefisso}`);
+  const file = new File([new Uint8Array([1])], 'logo.png', { type: 'image/png' });
+  Object.defineProperty(selettore, 'files', { value: [file], configurable: true });
+  await act(async () => {
+    selettore.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await svuota();
+}
+
+async function arrivaLogo() {
+  const xhr = XhrFinto.ultimo!;
+  act(() => {
+    xhr.status = 200;
+    xhr.responseText = JSON.stringify({
+      url: URL_LOGO,
+      key: 'assets/image/2026/10/logo.png',
+      mime: 'image/png',
+      size: 1,
+      filename: 'logo.png',
+    });
+    xhr.onload?.();
+  });
+  await svuota();
+}
+
+/** Il pulsante «Aggiungi» del modulo che contiene quel campo. */
+function aggiungiAccanto(idCampo: string): HTMLButtonElement {
+  const riga = document.getElementById(idCampo)!.closest('.row')!;
+  return Array.from(riga.querySelectorAll<HTMLButtonElement>('button')).find(
+    (b) => b.textContent?.trim() === messages.admin.wizard.step3.add
+  )!;
+}
+
+describe('StepPeople — «Aggiungi» aspetta il logo in viaggio', () => {
+  it('una persona nuova non parte senza il suo logo, e il logo non passa alla persona dopo', async () => {
+    scrivi(document.getElementById('person-name') as HTMLInputElement, 'Relatore 1');
+    scrivi(document.getElementById('person-email') as HTMLInputElement, 'relatore1@example.test');
+    await scegliLogo('person-logo');
+    const aggiungi = aggiungiAccanto('person-name');
+    expect(aggiungi.disabled).toBe(true);
+    // Il wizard lo sa: non salva e non cambia passo.
+    expect(occupato).toHaveBeenLastCalledWith(true);
+
+    await arrivaLogo();
+    expect(occupato).toHaveBeenLastCalledWith(false);
+    expect(aggiungi.disabled).toBe(false);
+    act(() => aggiungi.click());
+    const persone = [...valoreFinale!.moderators, ...valoreFinale!.speakers];
+    expect(persone).toHaveLength(1);
+    expect(persone[0]!.organizationLogoUrl).toBe(URL_LOGO);
+    // Il modulo della persona dopo riparte vuoto, anche nel logo.
+    expect(
+      document.querySelector('[data-testid="person-logo"] .campo-file__miniatura img')
+    ).toBeNull();
+  });
+
+  it('un ente non parte senza il suo logo', async () => {
+    scrivi(document.getElementById('org-name') as HTMLInputElement, 'Ente di prova');
+    await scegliLogo('org-logo');
+    const aggiungi = aggiungiAccanto('org-name');
+    expect(aggiungi.disabled).toBe(true);
+    act(() => aggiungi.click());
+    expect(valoreFinale!.organizers).toHaveLength(0);
+
+    await arrivaLogo();
+    act(() => aggiungi.click());
+    expect(valoreFinale!.organizers).toEqual([
+      { name: 'Ente di prova', logoUrl: URL_LOGO, websiteUrl: null },
+    ]);
+    // Il campo segue il modulo azzerato: il logo di prima non resta in vista.
+    expect(
+      document.querySelector('[data-testid="org-logo"] .campo-file__miniatura img')
+    ).toBeNull();
   });
 });

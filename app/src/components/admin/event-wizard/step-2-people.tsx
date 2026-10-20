@@ -116,9 +116,10 @@ interface Props {
   /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
    *  non si cambiano. */
   photosLocked?: boolean;
-  /** Ogni foto che parte per il server (true) e che ha finito (false): il
-   *  wizard non salva e non cambia passo finche' ce n'e' una in viaggio. */
-  onPhotoBusy?: (inCaricamento: boolean) => void;
+  /** Ogni file che parte per il server (true) e che ha finito (false), foto
+   *  o logo: il wizard non salva e non cambia passo finche' ce n'e' uno in
+   *  viaggio. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 const isEmail = emailValida;
@@ -133,7 +134,7 @@ export default function StepPeople({
   iscrizione,
   rimandoProgramma = false,
   photosLocked = false,
-  onPhotoBusy,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
   const tp = useTranslations('admin.wizard.programme');
@@ -153,6 +154,7 @@ export default function StepPeople({
       <OrganizersSection
         value={value.organizers}
         onChange={(next) => onChange({ organizers: next })}
+        onUploadBusy={onUploadBusy}
       />
 
       <PeopleSection
@@ -161,7 +163,7 @@ export default function StepPeople({
         onChange={onChange}
         taken={principale}
         photosLocked={photosLocked}
-        onPhotoBusy={onPhotoBusy}
+        onUploadBusy={onUploadBusy}
       />
 
       {rimandoProgramma && (
@@ -198,7 +200,7 @@ export function PrimarySection({
   showLinksOnPublish,
   perPubblicare = true,
   photosLocked = false,
-  onPhotoBusy,
+  onUploadBusy,
 }: {
   primary: LeadOrganizer;
   onPrimaryChange: (patch: LeadOrganizerPatch) => void;
@@ -209,8 +211,8 @@ export function PrimarySection({
   perPubblicare?: boolean;
   /** Senza sessione dello staff la foto si vede e non si cambia. */
   photosLocked?: boolean;
-  /** La foto in viaggio verso il server: vedi StepPeople. */
-  onPhotoBusy?: (inCaricamento: boolean) => void;
+  /** La foto o il logo in viaggio verso il server: vedi StepPeople. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tf = useTranslations('admin.wizard.flow');
@@ -345,7 +347,7 @@ export function PrimarySection({
                     photoId={primary.photoId}
                     onChange={(v) => onPrimaryChange({ moderatorPhotoId: v })}
                     readOnly={photosLocked}
-                    onBusy={onPhotoBusy}
+                    onBusy={onUploadBusy}
                   />
                 </div>
                 <div className="col-md-6">
@@ -401,6 +403,7 @@ export function PrimarySection({
                         onChange={(v) =>
                           onPrimaryChange({ moderatorOrganizationLogoUrl: v })
                         }
+                        onBusy={onUploadBusy}
                       />
                     </div>
                   </details>
@@ -506,17 +509,23 @@ function FieldError({ message }: { message: string | null }) {
 function OrganizersSection({
   value,
   onChange,
+  onUploadBusy,
 }: {
   value: OrganizerEntry[];
   onChange: (next: OrganizerEntry[]) => void;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'org';
   const vuoto: OrganizerEntry = { name: '', logoUrl: null, websiteUrl: null };
   const [draft, setDraft] = useState<OrganizerEntry>(vuoto);
   const [err, setErr] = useState<string | null>(null);
+  // Mentre il logo va al server l'ente non si aggiunge: partirebbe senza, e
+  // il logo arrivato dopo finirebbe nell'ente successivo.
+  const [logoInCaricamento, setLogoInCaricamento] = useState(false);
 
   const add = () => {
+    if (logoInCaricamento) return;
     if (!draft.name.trim()) {
       setErr(t('organizerRequired'));
       return;
@@ -580,11 +589,20 @@ function OrganizersSection({
             assetType="image"
             value={draft.logoUrl}
             onChange={(v) => setDraft({ ...draft, logoUrl: v })}
+            onBusy={(b) => {
+              setLogoInCaricamento(b);
+              onUploadBusy?.(b);
+            }}
           />
           <LogoEsterno url={draft.logoUrl} />
         </div>
         <div className="col-md-3">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
+          <button
+            type="button"
+            className="btn btn-primary w-100"
+            onClick={add}
+            disabled={logoInCaricamento}
+          >
             {t('add')}
           </button>
         </div>
@@ -630,7 +648,7 @@ function PeopleSection({
   onChange,
   taken,
   photosLocked,
-  onPhotoBusy,
+  onUploadBusy,
 }: {
   moderators: ModeratorEntry[];
   speakers: SpeakerEntry[];
@@ -638,17 +656,19 @@ function PeopleSection({
   /** Gli indirizzi già usati altrove (l'organizzatore principale). */
   taken: readonly string[];
   photosLocked: boolean;
-  onPhotoBusy?: (inCaricamento: boolean) => void;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'person';
   const [draft, setDraft] = useState<Bozza>(BOZZA_VUOTA);
   const [err, setErr] = useState<string | null>(null);
-  // La foto della persona nuova e' della bozza: mentre va al server la
-  // persona non si aggiunge (arriverebbe senza), e ogni aggiunta da' alla
-  // bozza successiva un campo nuovo, senza il messaggio della foto di prima
-  // e senza poter ricevere un caricamento rimasto indietro.
+  // La foto e il logo della persona nuova sono della bozza: mentre vanno al
+  // server la persona non si aggiunge (arriverebbe senza), e ogni aggiunta
+  // da' alla bozza successiva campi nuovi, senza il messaggio del file di
+  // prima e senza poter ricevere un caricamento rimasto indietro.
   const [fotoInCaricamento, setFotoInCaricamento] = useState(false);
+  const [logoInCaricamento, setLogoInCaricamento] = useState(false);
+  const fileInCaricamento = fotoInCaricamento || logoInCaricamento;
   const [bozzaN, setBozzaN] = useState(0);
   const tutte = righe(moderators, speakers);
   // Una persona ha un ruolo solo: gli indirizzi gia' usati (people-draft).
@@ -684,7 +704,7 @@ function PeopleSection({
   };
 
   const add = () => {
-    if (fotoInCaricamento) return;
+    if (fileInCaricamento) return;
     const esito = controllaBozza(draft, giaPresenti);
     if ('errore' in esito) {
       setErr(t(esito.errore));
@@ -819,6 +839,7 @@ function PeopleSection({
                           assetType="image"
                           value={r.entry.organizationLogoUrl}
                           onChange={(v) => aggiorna(r, { organizationLogoUrl: v })}
+                          onBusy={onUploadBusy}
                         />
                       </div>
                     </details>
@@ -830,7 +851,7 @@ function PeopleSection({
                       onChange={(v) => aggiorna(r, { photoId: v })}
                       readOnly={photosLocked}
                       compact
-                      onBusy={onPhotoBusy}
+                      onBusy={onUploadBusy}
                     />
                   </div>
                 </div>
@@ -907,11 +928,16 @@ function PeopleSection({
         </div>
         <div className="col-12">
           <FileOrUrlInput
+            key={bozzaN}
             id={`${id}-logo`}
             label={t('personLogo')}
             assetType="image"
             value={draft.organizationLogoUrl}
             onChange={(v) => setDraft({ ...draft, organizationLogoUrl: v })}
+            onBusy={(b) => {
+              setLogoInCaricamento(b);
+              onUploadBusy?.(b);
+            }}
           />
           <LogoEsterno url={draft.organizationLogoUrl} />
         </div>
@@ -925,7 +951,7 @@ function PeopleSection({
               onChange={(v) => setDraft((d) => ({ ...d, photoId: v }))}
               onBusy={(b) => {
                 setFotoInCaricamento(b);
-                onPhotoBusy?.(b);
+                onUploadBusy?.(b);
               }}
             />
           </div>
@@ -949,7 +975,7 @@ function PeopleSection({
             type="button"
             className="btn btn-primary w-100"
             onClick={add}
-            disabled={fotoInCaricamento}
+            disabled={fileInCaricamento}
           >
             {t('add')}
           </button>

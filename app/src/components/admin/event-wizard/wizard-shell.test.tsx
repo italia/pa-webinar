@@ -2406,3 +2406,167 @@ describe('foto di una persona in viaggio verso il server', () => {
     expect(container.querySelector('#wiz-primary-name')).toBeNull();
   });
 });
+
+describe('file in viaggio verso il server', () => {
+  // Il caricamento dei campi «file o link» passa da XMLHttpRequest.
+  class XhrFinto {
+    static ultimo: XhrFinto | null = null;
+    upload = { onprogress: null };
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    onabort: (() => void) | null = null;
+    status = 0;
+    responseText = '';
+    annullato = false;
+    constructor() {
+      XhrFinto.ultimo = this;
+    }
+    open() {}
+    send() {}
+    abort() {
+      this.annullato = true;
+      this.onabort?.();
+    }
+    rispondi(corpo: unknown) {
+      this.status = 200;
+      this.responseText = JSON.stringify(corpo);
+      this.onload?.();
+    }
+  }
+  const ORIGINE = window.location.origin;
+
+  beforeEach(() => {
+    XhrFinto.ultimo = null;
+    vi.stubGlobal('XMLHttpRequest', XhrFinto);
+    URL.createObjectURL = () => 'blob:prova';
+    URL.revokeObjectURL = () => {};
+  });
+
+  async function scegli(prefisso: string, file: File) {
+    const input = container.querySelector<HTMLInputElement>(`input[type="file"][id^="${prefisso}-file-"]`);
+    if (!input) throw new Error(`nessun selettore ${prefisso}`);
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    await act(async () => {
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    for (let i = 0; i < 4; i++) {
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+    }
+  }
+  function payloadPost(): Record<string, unknown> {
+    const chiamata = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => init?.method === 'POST' && url === '/api/events',
+    );
+    return JSON.parse(String(chiamata?.[1].body)) as Record<string, unknown>;
+  }
+
+  it('la copertina: il wizard non cambia passo finche\' non e\' arrivata, e il file arriva al modulo', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (String(input) === '/api/events' && init.method === 'POST')
+        return json(201, { id: 'evt-c', slug: 'evt-c', moderatorToken: 'tok-c' });
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    // Un SVG non si ritaglia: parte subito.
+    await scegli('ev-cover', new File(['<svg/>'], 'copertina.svg', { type: 'image/svg+xml' }));
+    const xhr = XhrFinto.ultimo!;
+
+    const avanti = () => button(`${messages.common.next} →`);
+    expect(avanti().disabled).toBe(true);
+    // Neanche dalla barra dei passi o dalla scheda del programma: il campo
+    // smonterebbe e interromperebbe il caricamento.
+    goToStep('invites');
+    click(button(w.programme.cardPrepare));
+    expect(container.querySelector('#ev-title')).not.toBeNull();
+    expect(xhr.annullato).toBe(false);
+
+    const url = `${ORIGINE}/api/assets/image/2026/10/copertina.svg`;
+    await act(async () => {
+      xhr.rispondi({ url, key: 'assets/image/copertina.svg', mime: 'image/svg+xml', size: 6, filename: 'copertina.svg' });
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(avanti().disabled).toBe(false);
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payloadPost()).toMatchObject({ coverImageUrl: url });
+  });
+
+  it('i materiali: «Aggiungi materiale» aspetta il file, e dopo il modulo riparte vuoto', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (String(input) === '/api/events' && init.method === 'POST')
+        return json(201, { id: 'evt-m', slug: 'evt-m', moderatorToken: 'tok-m' });
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep('content');
+    const aggiungi = () => button(w.step4.addMaterial);
+    const carica = async (nome: string) => {
+      type(byId<HTMLInputElement>('mat-title'), nome);
+      await scegli('mat-url', new File([new Uint8Array([1])], `${nome}.pdf`, { type: 'application/pdf' }));
+      expect(aggiungi().disabled).toBe(true);
+      await act(async () => {
+        XhrFinto.ultimo!.rispondi({
+          url: `${ORIGINE}/api/assets/document/${nome}.pdf`,
+          key: `assets/document/${nome}.pdf`,
+          mime: 'application/pdf',
+          size: 1,
+          filename: `${nome}.pdf`,
+        });
+      });
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+      click(aggiungi());
+      // Il campo segue il modulo azzerato: il file appena aggiunto non resta.
+      expect(container.querySelector('[data-testid="mat-url"] a.campo-file__nome')).toBeNull();
+    };
+    await carica('slide');
+    await carica('programma');
+    goToStep('review');
+    await press(button(w.saveDraft));
+    const materiali = (fetchMock.mock.calls as Array<[string, RequestInit]>)
+      .filter(([url]) => url === '/api/admin/events/evt-m/materials')
+      .map(([, init]) => JSON.parse(String(init.body)) as Record<string, unknown>);
+    expect(materiali).toMatchObject([
+      { title: 'slide', type: 'FILE', url: `${ORIGINE}/api/assets/document/slide.pdf` },
+      { title: 'programma', type: 'FILE', url: `${ORIGINE}/api/assets/document/programma.pdf` },
+    ]);
+  });
+
+  it('il documento della privacy: dalle impostazioni avanzate non si torna al riepilogo finche\' non e\' arrivato', async () => {
+    renderWizard();
+    goToStep('review');
+    goToStep(w.flow.steps.advanced);
+    apriSezione('data');
+    await scegli('rev-privacy-doc', new File([new Uint8Array([1])], 'privacy.pdf', { type: 'application/pdf' }));
+    const xhr = XhrFinto.ultimo!;
+    click(button(`← ${w.flow.backToReview}`));
+    expect(container.querySelector('[data-testid="rev-privacy-doc"]')).not.toBeNull();
+    expect(xhr.annullato).toBe(false);
+
+    await act(async () => {
+      xhr.rispondi({
+        url: `${ORIGINE}/api/assets/document/privacy.pdf`,
+        key: 'assets/document/privacy.pdf',
+        mime: 'application/pdf',
+        size: 1,
+        filename: 'privacy.pdf',
+      });
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    click(button(`← ${w.flow.backToReview}`));
+    expect(container.querySelector('[data-testid="rev-privacy-doc"]')).toBeNull();
+  });
+});

@@ -104,12 +104,16 @@ export function SezioneDati({
   gdprTemplates,
   fieldErrors = {},
   retentionMax = MAX_RETENTION_DAYS,
+  onUploadBusy,
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   fieldErrors?: Record<string, string>;
   retentionMax?: number;
+  /** Il documento della privacy in viaggio verso il server: il wizard
+   *  aspetta che arrivi prima di salvare o cambiare passo. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step5');
   const tPost = useTranslations('postEvent');
@@ -168,6 +172,7 @@ export function SezioneDati({
           value={form.privacyPolicyUrl}
           onChange={(next) => onChange({ privacyPolicyUrl: next })}
           helpText={t('privacyDocHelp')}
+          onBusy={onUploadBusy}
         />
       </div>
       <div className="col-md-6">

@@ -99,6 +99,9 @@ interface Props {
     aspetto: Record<string, AspettoScheda>;
     pannello: (lingua: string) => ReactNode;
   };
+  /** Ogni file che parte per il server (true) e che ha finito (false): il
+   *  wizard non salva e non cambia passo finche' ce n'e' uno in viaggio. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 export default function Step1Base({
@@ -114,6 +117,7 @@ export default function Step1Base({
   dopoDescrizione,
   onEtichettaCreata,
   lingue,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
@@ -333,6 +337,7 @@ export default function Step1Base({
             value={value.waitingRoomAudioUrl}
             onChange={(next) => onChange({ waitingRoomAudioUrl: next })}
             helpText={t('waitingRoomAudioHelp')}
+            onBusy={onUploadBusy}
           />
         </div>
       </div>
@@ -681,6 +686,7 @@ export default function Step1Base({
             // La fascia della pagina dell'evento su uno schermo largo.
             fascia: fasciaCopertina,
           }}
+          onBusy={onUploadBusy}
         />
       </section>
 

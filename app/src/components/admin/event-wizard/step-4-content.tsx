@@ -121,6 +121,9 @@ interface Props {
   responseCounts?: QuestionnaireResponseCounts;
   /** In modifica: l'evento, per portare alla pagina dei suoi questionari. */
   eventId?: string;
+  /** Il file di un materiale in viaggio verso il server: il wizard aspetta
+   *  che arrivi prima di salvare o cambiare passo. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -148,6 +151,7 @@ export default function Step4Content({
   incorporato = false,
   responseCounts,
   eventId,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
   // La libreria dei modelli la legge solo lo staff.
@@ -198,6 +202,7 @@ export default function Step4Content({
           <MaterialsSection
             value={value.materials}
             onChange={(next) => onChange({ materials: next })}
+            onUploadBusy={onUploadBusy}
           />
         </>
       )}
@@ -678,9 +683,11 @@ function AdhocQuestionEditor({
 function MaterialsSection({
   value,
   onChange,
+  onUploadBusy,
 }: {
   value: MaterialDraft[];
   onChange: (next: MaterialDraft[]) => void;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step4');
   const tMaterials = useTranslations('admin.materials');
@@ -691,8 +698,12 @@ function MaterialsSection({
     type: 'file',
     visibility: 'ALWAYS',
   });
+  // Mentre il file va al server il materiale non si aggiunge: partirebbe con
+  // l'indirizzo di prima, e il file arrivato dopo finirebbe nel successivo.
+  const [fileInViaggio, setFileInViaggio] = useState(false);
 
   const add = () => {
+    if (fileInViaggio) return;
     if (!draft.title.trim() || !draft.url.trim()) return;
     onChange([
       ...value,
@@ -796,6 +807,10 @@ function MaterialsSection({
                 blobPath: meta.key,
               }))
             }
+            onBusy={(b) => {
+              setFileInViaggio(b);
+              onUploadBusy?.(b);
+            }}
           />
         </div>
         <div className="row g-2">
@@ -832,7 +847,7 @@ function MaterialsSection({
               type="button"
               className="btn btn-primary w-100"
               onClick={add}
-              disabled={!draft.title.trim() || !draft.url.trim()}
+              disabled={fileInViaggio || !draft.title.trim() || !draft.url.trim()}
             >
               {t('addMaterial')}
             </button>
