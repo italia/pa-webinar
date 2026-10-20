@@ -63,8 +63,9 @@ A few features leave the path on purpose:
   shown live.
 - **Lower hand has no state to store.** Its route skips the write and publishes on `control:<eventId>`. It is
   the only publish a request waits for, capped at one second (`app/src/lib/live-control/pubsub.ts`).
-- **The timer and the live counters of the reaction bar** keep their state in process memory. They are the
-  exceptions listed under [what it costs](#what-it-costs).
+- **The timer and the live counters of the reaction bar** have no table: their state lives in Redis with an
+  expiry, shared by every app pod, and in process memory when Redis is not configured. They are the exceptions
+  listed under [what it costs](#what-it-costs).
 
 ### Redis carries fan-out only
 
@@ -114,7 +115,7 @@ Administrators set it under **Reactions (emoji)** in the site settings
 | Value | What the room shows | What the portal stores |
 |---|---|---|
 | `NATIVE` | **Jitsi native (in the toolbar, ephemeral)**: Jitsi's own reactions button, phones included | Nothing. Reactions are ephemeral and absent from event analytics |
-| `CUSTOM` | **App custom (left-hand bar, with stats)**: the app's reaction bar at the bottom left of the room. Jitsi's reactions stay disabled | One `Reaction` row per click (emoji and timestamp only, capped per event) for event analytics, plus an in-process counter for the live display |
+| `CUSTOM` | **App custom (left-hand bar, with stats)**: the app's reaction bar at the bottom left of the room. Jitsi's reactions stay disabled | One `Reaction` row per click (emoji and timestamp only, capped per event) for event analytics, plus a counter in Redis for the live display |
 
 The default keeps reactions inside the conference and stores nothing. An installation that wants reactions
 counted in event analytics switches to `CUSTOM`. The mode is read when a live page renders, so the change
@@ -157,9 +158,9 @@ reaches a room the next time it is opened ([ADR-001](001-jitsi-iframe-api.md#wha
   per process for `live:` are portal code. Open SSE connections are held by the processes that render pages, so
   app-tier sizing has to count them ([ADR-002](002-nextjs-fullstack.md)).
 - **Two features are exceptions to the principle.** The presentation timer and the live counters of the app's
-  reaction bar live in the memory of one app process, so with several replicas two browsers can see different
-  values, and a pod restart resets them
-  ([known limitations](../architecture/live-interaction.md#known-limitations)).
+  reaction bar are not stored in PostgreSQL: they live in Redis with an expiry, so a Redis restart resets them.
+  Without Redis they live in the memory of each app process, which is right only for a single replica
+  ([Redis availability](../architecture/live-interaction.md#redis-availability)).
 - **Every interaction model enters the GDPR cleanup explicitly.** The GDPR cleanup keeps an event instead of
   deleting it, so foreign-key cascades never fire for the events it processes. The cleanup therefore handles
   each interaction table by name, deleting its rows or removing the identities from those that stay with the

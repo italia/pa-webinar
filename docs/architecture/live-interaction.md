@@ -45,7 +45,7 @@ flowchart LR
   classDef fallback fill:#FFF3E0,stroke:#CC7A00,color:#17324D,stroke-dasharray:4 3
 ```
 
-Two features do not follow this principle: the presentation timer and the counters of the app's reaction bar keep their state in the memory of one app process. See [Known limitations](#known-limitations). The chat's typing indicator stores nothing at all: it travels only through Redis (see [Chat](#chat)).
+Two features do not follow this principle: the presentation timer and the counters of the app's reaction bar have no table. Their state lives in Redis with an expiry, so every app pod reads the same value; without Redis it lives in the memory of each app process (see [Redis availability](#redis-availability)). The chat's typing indicator stores nothing at all: it travels only through Redis (see [Chat](#chat)).
 
 ## Feature catalog
 
@@ -59,8 +59,8 @@ In this page, **moderator** means a caller holding the event's primary moderator
 | Word cloud | `WordCloudRound`, `WordCloudSubmission` | Rounds and word removal: moderators. Words: registrants, everyone else by browser id | Panel read rule | Poke `wordcloud`, plus a 30 s poll |
 | Agenda | `EventAgendaItem`, `AgendaItemReaction` | Items: moderators. **Agree** / **Disagree**: registrants and browser ids | Anyone who knows the event slug | Poke `agenda` |
 | Materials | `EventMaterial` | Moderators. The open count: the audience's clicks | Anyone while the event is publicly visible: before the start only `BEFORE`; during the event `ALWAYS` and `DURING`; after it `ALWAYS` and `AFTER`. Every material, with its open count, with a moderator token | Poke `materials`, plus a 120 s poll |
-| Reactions (app bar) | Process memory, plus `Reaction` rows for analytics | Anyone who knows the event slug | Anyone who knows the event slug | 5 s poll |
-| Timer | Process memory | Moderators | Anyone who knows the event slug | 5 s poll |
+| Reactions (app bar) | Redis (`live:reactions:<eventId>`), plus `Reaction` rows for analytics | Anyone who knows the event slug | Anyone who knows the event slug | 5 s poll |
+| Timer | Redis (`live:timer:<eventId>`) | Moderators | Anyone who knows the event slug | 5 s poll |
 | Raised hands | Jitsi. Analytics in `CallSession.handRaiseLog` and the [live action journal](#live-action-journal) | Participants in Jitsi. **Lower hand**: moderators | Jitsi roster | Jitsi events, plus `control:<eventId>` |
 | Post-event feedback | The `POST_EVENT` questionnaire (`QuestionnaireResponse`); older star ratings in `EventFeedback` | Registrants and browser ids, except moderators, while feedback collection is on, the event is `LIVE`, `IDLE` or `ENDED` and its retention (`endsAt` plus `dataRetentionDays`) has not expired | Average and distribution: the concluded event page, when it shows feedback. Every answer: staff who manage the event and its moderators (**Ratings** panel) | Not live |
 | Live flags | `Event` columns | Moderators | Anyone who knows the event slug | Snapshot `flags` on `live:<eventId>` |
@@ -214,11 +214,11 @@ The count is one number per material (`EventMaterial.openCount`), with no record
 `SiteSetting.reactionsMode` selects one of two modes. Administrators set it under **Reactions (emoji)** in the site settings ([configuration/runtime-settings.md](../configuration/runtime-settings.md)):
 
 - `NATIVE` (the default in `schema.prisma`), **Jitsi native (in the toolbar, ephemeral)**: Jitsi's own reactions button. The portal stores nothing.
-- `CUSTOM`, **App custom (left-hand bar, with stats)**: the app's reaction bar. `POST /reactions` increments an in-process counter for the live display. It also inserts one `Reaction` row (emoji and timestamp only, capped per event) for [event analytics](event-journey.md). Clients poll `GET /reactions` every 5 seconds.
+- `CUSTOM`, **App custom (left-hand bar, with stats)**: the app's reaction bar. `POST /reactions` increments the event's counter for the live display: a Redis hash shared by every pod, which expires 4 hours after the last click. It also inserts one `Reaction` row (emoji and timestamp only, capped per event) for [event analytics](event-journey.md). Clients poll `GET /reactions` every 5 seconds.
 
 ### Timer
 
-Moderators **Start**, **Pause** and **Reset** a countdown. The room offers presets of 5, 10, 15 and 30 minutes; `POST /timer` accepts any duration from 10 seconds to 2 hours. **Show to all** toggles its visibility without restarting it. The state lives in the memory of the pod that received the command, for up to two hours. Clients poll `GET /timer` every 5 seconds and count down locally between polls.
+Moderators **Start**, **Pause** and **Reset** a countdown. The room offers presets of 5, 10, 15 and 30 minutes; `POST /timer` accepts any duration from 10 seconds to 2 hours. **Show to all** toggles its visibility without restarting it. The state lives in Redis, shared by every pod, for twelve hours after the last command; two commands sent at the same moment on different pods keep the later one. A countdown that reached zero shows **Time's up** for 30 seconds and then turns off: every read works that out from the stored state, and no read writes it. Clients poll `GET /timer` every 5 seconds and count down locally between polls.
 
 ### Raised-hand queue
 
@@ -470,13 +470,14 @@ The Jitsi toolbar, per-device buttons and the screen-share banner are covered in
 
 **How it is deployed.** The chart deploys the Bitnami Redis subchart as a single standalone node with no persistence (`save ""`, `appendonly no`) and authentication on. It requests 50m CPU and 128Mi memory, and raises the pub/sub output-buffer limit for bursts during a live event. See the `redis:` block of `infra/helm/pa-webinar/values.yaml`. To use a managed Redis instead, disable the subchart and set `REDIS_URL` ([CONFIGURATION.md](../CONFIGURATION.md), [DEPLOYMENT.md](../DEPLOYMENT.md)). The Docker Compose stack also runs Redis without persistence, so a single VM exercises the same code path as a cluster.
 
-**When Redis restarts or is evicted.** Fan-out stops until the pod is back. Nothing is lost: every write is already in PostgreSQL. Chat clients catch up through the watchdog backfill. Open live streams stay on push: when the subscriber reconnects, each one sends the snapshots again and a poke for every panel, so the panels catch up then (see [Known limitations](#known-limitations) for the outage itself). A browser whose stream errors for another reason goes back to polling. The Redis client reconnects on its own, with a back-off capped at 3 seconds.
+**When Redis restarts or is evicted.** Fan-out stops until the pod is back. Nothing stored in PostgreSQL is lost; the timer and the reaction-bar counters, which live only in Redis, start again from nothing (the moderator restarts the timer). While Redis does not answer, each pod keeps serving the last timer and counts it read or wrote; a timer command or a click handled meanwhile stays on that pod, and Redis's value applies again once it answers. Chat clients catch up through the watchdog backfill. Open live streams stay on push: when the subscriber reconnects, each one sends the snapshots again and a poke for every panel, so the panels catch up then (see [Known limitations](#known-limitations) for the outage itself). A browser whose stream errors for another reason goes back to polling. The Redis client reconnects on its own, with a back-off capped at 3 seconds.
 
 **When `REDIS_URL` is not set.** Publish and subscribe become no-ops:
 
 - The chat keeps working. Messages are stored, and other clients receive them through the backfill watchdog (about 15 seconds of delay) instead of the stream.
 - The live stream sends `pushAvailable: false`, and every panel keeps polling.
 - **Lower hand** signals are not delivered.
+- The timer and the reaction-bar counters live in the memory of each app process. That is right for a single replica; with several replicas and no session affinity, a browser whose requests land on another pod sees a different timer or different counts, and a pod restart resets them. The same per-process memory serves as a fallback while a configured Redis does not answer: each pod keeps answering with the last value it read or wrote.
 - `/api/status`, which backs the **System status** page, reports Redis as `outage` and the overall status as `outage`, because realtime fan-out is treated as a required dependency. The administration's infrastructure page shows the Redis node as standby. See [operations/monitoring.md](../operations/monitoring.md).
 
 **Metrics.** The app exports `eventi_chat_messages_total` and `eventi_chat_sse_connections` (chat streams only). Redis's own metrics need the subchart's exporter, which is off by default. Enable it with the subchart's `redis.metrics` values if you want the Redis figures in the **In-app chat & Redis** section of the administration's **Monitoring** page (`/admin/monitoring`). Details are in [operations/monitoring.md](../operations/monitoring.md).
@@ -485,7 +486,6 @@ The Jitsi toolbar, per-device buttons and the screen-share banner are covered in
 
 ## Known limitations
 
-- **Timer and reaction-bar counters are per pod.** They live in process memory. The chart runs at least two app replicas by default (`autoscaling.minReplicas`, or `app.replicaCount` when autoscaling is off in `values.yaml`), with no session affinity. A browser whose requests land on another pod can see a different timer or different reaction counts, and a pod restart resets them. The `Reaction` rows used for analytics are not affected.
 - **A Redis outage that starts after a live stream opened is not signaled to the client.** The `ping` keepalive comes from the app pod, not from Redis, so the client keeps polling off. Pokes published during the outage are dropped, and the panels stay as they were until Redis returns; then every open stream resends the snapshots and pokes every panel. The chat is not affected, because its watchdog relies on real message frames.
 - **Browser-id identities are chosen by the client.** Poll, word-cloud and agenda deduplication for browsers without a registration is only as strong as the browser's honesty.
 - **The whiteboard is not stored.** Jitsi's whiteboard is ephemeral. When it is enabled for the event (`whiteboardEnabled`, always on for instant calls) and for the installation (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), the drawer reminds moderators to export it and attach it as a material before ending.

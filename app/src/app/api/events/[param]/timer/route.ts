@@ -9,24 +9,11 @@ import {
 import { prisma } from '@/lib/db';
 import { timerActionSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
-import { getCached, setCache } from '@/lib/cache';
 import { recordLiveAction } from '@/lib/live/actions';
+import { leggiTimer, scriviTimer, type TimerState } from '@/lib/live/timer-state';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
-
-interface TimerState {
-  active: boolean;
-  duration: number;
-  remaining: number;
-  visible: boolean;
-  startedAt: number | null;
-  pausedAt: number | null;
-}
-
-function getTimerKey(eventId: string): string {
-  return `timer:${eventId}`;
-}
 
 /** Quanto resta visibile «Tempo scaduto» prima che il timer si spenga. */
 const SCADUTO_VISIBILE_MS = 30_000;
@@ -36,6 +23,29 @@ function resolveRemaining(state: TimerState): number {
   if (state.pausedAt) return state.remaining;
   const elapsed = (Date.now() - state.startedAt) / 1000;
   return Math.max(0, state.remaining - elapsed);
+}
+
+/**
+ * Allo zero il timer resta acceso ancora un po', così «Tempo scaduto» si vede
+ * anche da chi in quel momento guardava altrove; poi si spegne. Si calcola a
+ * ogni lettura invece di riscrivere lo stato: lo stato e' condiviso fra le
+ * istanze, e una lettura che riscrive potrebbe cancellare un comando del
+ * moderatore arrivato nel frattempo a un'altra istanza.
+ */
+function spentoSeScaduto(state: TimerState): TimerState {
+  const remaining = resolveRemaining(state);
+  const scadutoAlle =
+    state.active && state.startedAt && !state.pausedAt ? state.startedAt + state.remaining * 1000 : null;
+  if (state.active && remaining <= 0 && (scadutoAlle === null || Date.now() - scadutoAlle >= SCADUTO_VISIBILE_MS)) {
+    return { ...state, active: false, remaining: 0, startedAt: null };
+  }
+  return state;
+}
+
+/** Il timer dell'evento, già spento se è scaduto da un pezzo. */
+async function timerDi(eventId: string): Promise<TimerState | null> {
+  const state = await leggiTimer(eventId);
+  return state ? spentoSeScaduto(state) : null;
 }
 
 // POST /api/events/[slug]/timer — moderator sets/updates timer
@@ -66,14 +76,12 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   const { action, duration, visible } = parsed.data;
-  const key = getTimerKey(event.id);
-  let state = getCached<TimerState>(key);
+  let state = await timerDi(event.id);
   // Il conto alla rovescia stava correndo? Pausa e azzeramento finiscono
   // nella cronologia solo se fermano davvero qualcosa.
   const correvaPrima =
     !!state && state.active && !!state.startedAt && !state.pausedAt && resolveRemaining(state) > 0;
 
-  const TTL = 7200_000;
   let ripreso = false;
 
   switch (action) {
@@ -127,11 +135,11 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   if (visible !== undefined && state) {
-    state.visible = visible;
+    state = { ...state, visible };
   }
 
   if (state) {
-    setCache(key, state, TTL);
+    await scriviTimer(event.id, state);
   }
 
   if (action === 'start' && state) {
@@ -174,8 +182,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const key = getTimerKey(event.id);
-  const state = getCached<TimerState>(key);
+  const state = await timerDi(event.id);
 
   if (!state) {
     return Response.json({
@@ -189,17 +196,6 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
 
   const remaining = resolveRemaining(state);
-
-  // Allo zero il timer resta acceso ancora un po', così «Tempo scaduto» si
-  // vede anche da chi in quel momento guardava altrove; poi si spegne.
-  const scadutoAlle =
-    state.active && state.startedAt && !state.pausedAt ? state.startedAt + state.remaining * 1000 : null;
-  if (state.active && remaining <= 0 && (scadutoAlle === null || Date.now() - scadutoAlle >= SCADUTO_VISIBILE_MS)) {
-    state.active = false;
-    state.remaining = 0;
-    state.startedAt = null;
-    setCache(key, state, 7200_000);
-  }
 
   return Response.json({
     active: state.active,
