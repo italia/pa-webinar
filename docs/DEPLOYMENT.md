@@ -178,8 +178,10 @@ Things the table does not show:
   the in-cluster addresses of the conference's components (`JITSI_WEB_INTERNAL_URL`,
   `PROSODY_INTERNAL_URL`, `JICOFO_HEALTH_URL`). Without the scaler it also writes `JVB_MAX_REPLICAS`
   from `jitsi-meet.jvb.replicaCount`, when that is above zero and `app.env` does not declare that
-  another tool scales the bridges (`JVB_SCALER_ENABLED: "true"`). A key set in `app.env` always wins
-  ([Configuration reference](CONFIGURATION.md#videobridge-and-scaler)).
+  another tool scales the bridges (`JVB_SCALER_ENABLED: "true"`). For the capacity estimate of an
+  event it also writes `JVB_NUM_LOUDEST`, the voices the bridge forwards (with `jitsi.enabled`),
+  `JVB_CASCADING` (with `jitsi-meet.octo.enabled`) and `CAPTIONS_MAX_STREAMS` (with live captions).
+  A key set in `app.env` always wins ([Configuration reference](CONFIGURATION.md#videobridge-and-scaler)).
 - **In-cluster addresses use full Service names**, `<service>.<namespace>.svc.<global.clusterDomain>`,
   with `cluster.local` when `global.clusterDomain` is unset and the short name when it is empty. A full
   name resolves at once even when the Service does not exist, where a short name first walks every
@@ -1075,6 +1077,9 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
 | `jitsi-meet.jvb.stunServers` | `meet-jit-si-turnrelay.jitsi.net:443`, a third-party server run by the Jitsi project, which learns the bridge's address. The example profiles keep it, and the post-install notes warn about it | STUN lets the bridge discover its public address. Use `""` when the announced address is already right (`publicIPs`, or `useNodeIP` on a node whose network interface carries a reachable address). Otherwise use your own STUN server, or the chart's coturn with `jitsi-meet.turnHost` and `jitsi-meet.jvb.useInternalStun: true`. With neither STUN nor `publicIPs`, a bridge behind NAT announces a private address and remote participants hear and see nobody |
 | `jitsi-meet.jvb.replicaCount` | `1` | Fixed bridges in simple and standard; `0` in full, where the scaler owns the count |
 | `jitsi-meet.jvb.nodeSelector`, `tolerations`, `resources` | any node | The full profile pins bridges to the dedicated pool |
+| `global.jvb.numLoudest` | `5` | Loudest-only routing: the bridge forwards to each participant only the audio of the `numLoudest` loudest voices and of the dominant speaker, and `0` turns it off. It reaches the bridge as JVM options in `jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS`, and the app as `JVB_NUM_LOUDEST`. A values file that sets `VIDEOBRIDGE_DEBUG_OPTIONS` replaces the chart's options: start from them and append yours. The chart stops rendering when the bridge options and `numLoudest` disagree. Changing the value restarts the bridge ([Loudest-only audio routing](architecture/scaling.md#loudest-only-audio-routing)) |
+| `jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_MAX_MEMORY` | unset: the image default, `3072m` | The bridge's Java heap. The image passes `-Xmx` from this variable and the other JVM options from `VIDEOBRIDGE_DEBUG_OPTIONS`. It does not read `VIDEOBRIDGE_OPTS`, so a heap set there has no effect |
+| `jitsi-meet.jvb.livenessProbe`, `readinessProbe` | `/about/health` every 10 s, 5 s timeout, 6 failures | The subchart waits 1 s. On a busy node a failed liveness probe restarts the bridge and drops every conference on it, and a failed readiness probe takes the bridge out of the Service the app reads, so the status page reports it down |
 
 Several bridges behind a single address break calls; the reason and the safe configurations are in
 [The single-IP pitfall](architecture/scaling.md#the-single-ip-pitfall).

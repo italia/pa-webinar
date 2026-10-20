@@ -471,8 +471,11 @@ CPU limit is the same as in the chart's default JVB resources (`jitsi-meet.jvb.r
 ### Large bridge: 15 CPUs
 
 The JVB container ran alone on a 16-vCPU, 32 GiB compute-optimized VM, with a request of 14 CPUs and
-24 GiB and a limit of 15 CPUs and 28 GiB. The JVM options, set through `VIDEOBRIDGE_OPTS`, were
-`-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`.
+24 GiB and a limit of 15 CPUs and 28 GiB. The JVM options
+`-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40` were set in
+`VIDEOBRIDGE_OPTS`, which the bridge image does not read, so the bridge ran with the image's default
+heap of 3 GiB (`-Xmx3072m`). To change the heap, set `VIDEOBRIDGE_MAX_MEMORY`; other JVM options go
+in `VIDEOBRIDGE_DEBUG_OPTIONS` ([Bridge (JVB)](DEPLOYMENT.md#bridge-jvb)).
 
 | Pattern | Participants | Video senders | Peak stress | Peak egress | JVB CPU used |
 |---|---|---|---|---|---|
@@ -480,7 +483,7 @@ The JVB container ran alone on a 16-vCPU, 32 GiB compute-optimized VM, with a re
 | All senders | 47 | 25 | 0.095 | about 23.4 Mbps | about 1.05 of 15 cores |
 
 In both runs the generator, not the bridge, set the ceiling: 78 browsers in the first, 25 working senders
-out of 50 requested in the second. The JVM heap stayed at about 1.1 GiB of 16. There were no errors.
+out of 50 requested in the second. The JVM heap stayed at about 1.1 GiB of 3. There were no errors.
 
 ### How well the two bridges agree
 

@@ -1380,6 +1380,7 @@ holds the defaults quoted here. Chart-wide keys are in
 | `mt.image`, `.imagePullPolicy` | the llama.cpp server image pinned by digest, `IfNotPresent` | Engine image; the init container that downloads the model uses the same image |
 | `mt.model.url`, `.sha256`, `.file`, `.id` | a Hugging Face URL pinned to a revision, its SHA-256, the file name in the volume, `utter-project/EuroLLM-9B-Instruct-2512` | The model, checked at every pod start |
 | `mt.threads`, `.contextSize` | `4`, `4096` | Compute threads (more than four do not speed generation up) and context in tokens |
+| `mt.cacheRamMiB` | `0` | The llama.cpp prompt cache in MiB (`--cache-ram`), `-1` for no cap. Requests are single lines that never reuse it. With llama.cpp's default cap of 8 GiB the cache keeps growing until the pod exceeds its memory limit in the middle of a large job |
 | `mt.modelsPvc`, `.modelsSizeLimit` | empty, `8Gi` | A PersistentVolumeClaim that keeps the model between starts; empty means a scratch volume of `modelsSizeLimit` and a download at every start |
 | `mt.scaleToZero.enabled`, `.idleMinutes` | `true`, `15` | The orchestrator keeps the engine at one replica only while there is work, and for `idleMinutes` after it ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand)) |
 | `mt.resources` | requests `4` CPU / `6Gi`, limits `4` CPU / `7Gi` | The model takes 4.4 to 5.1 GiB in memory |
@@ -1812,6 +1813,11 @@ included.
   A different file stops the pod before the server starts.
 - **Server.** It answers `/health` for the probes and serves one request at a
   time.
+- **Prompt cache.** The server runs without a prompt cache (`--cache-ram 0`,
+  from `postprod.mt.cacheRamMiB`). Every request is a single line and never
+  reuses it. With llama.cpp's default of 8 GiB, EuroLLM-9B grew by about 7 MiB
+  per request, and a job in 23 languages, about 520 requests, would pass the
+  7 GiB limit. Without the cache, memory stayed flat and speed did not change.
 - **Resources and placement.** The pod requests 4 CPU and 6 GiB (limit 7 GiB)
   and runs on the app's nodes, never on the GPU pool.
 - **Starting and stopping.** The orchestrator starts and stops the engine

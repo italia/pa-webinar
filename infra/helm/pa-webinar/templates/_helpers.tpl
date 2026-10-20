@@ -374,6 +374,33 @@ true
 {{- end }}
 
 {{/*
+Quante voci il bridge inoltra a ogni partecipante, ricavato dalle opzioni
+della JVM che il bridge riceve davvero
+(jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS, valutate con `tpl` come
+fa il sottochart): 0 quando l'instradamento delle sole voci più forti è
+spento, altrimenti -Dvideobridge.loudest.num-loudest, o 3, il predefinito del
+bridge, se manca. Ricavato e non letto da global.jvb.numLoudest: con un
+aggiornamento --reuse-values da una versione precedente le opzioni non ci
+sono, e il portale non deve contare su un instradamento che il bridge non fa.
+Restituisce un intero.
+*/}}
+{{- define "pa-webinar.jvbNumLoudest" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $opzioni := tpl (toString (dig "jvb" "extraEnvs" "VIDEOBRIDGE_DEBUG_OPTIONS" "" $jm | default "")) . -}}
+{{- $acceso := false -}}
+{{- $voci := 3 -}}
+{{- range (regexSplit "\\s+" (trim $opzioni) -1) -}}
+{{- /* Il bridge legge i booleani come la sua libreria di configurazione: vero è true, yes oppure on, in minuscolo. */ -}}
+{{- if hasPrefix "-Dvideobridge.loudest.route-loudest-only=" . -}}
+{{- $acceso = has (trimPrefix "-Dvideobridge.loudest.route-loudest-only=" .) (list "true" "yes" "on") -}}
+{{- else if regexMatch "^-Dvideobridge\\.loudest\\.num-loudest=[0-9]+$" . -}}
+{{- $voci = int (trimPrefix "-Dvideobridge.loudest.num-loudest=" .) -}}
+{{- end -}}
+{{- end -}}
+{{- if $acceso -}}{{ $voci }}{{- else -}}0{{- end -}}
+{{- end }}
+
+{{/*
 Nome base delle risorse del sottochart jitsi-meet, calcolato come lo calcola
 lui (`jitsi-meet.fullname`), override compresi. I Service si chiamano
 `<nome base>-web`, `<nome base>-prosody`, `<nome base>-jvb` e così via.

@@ -147,6 +147,11 @@ spec:
             # secondo, dividono la stessa memoria.
             - -np
             - "1"
+            # Cache dei prompt: le richieste non la riusano mai, e con il
+            # valore predefinito di llama.cpp (8 GiB) cresce fino a portare il
+            # pod oltre la sua memoria.
+            - --cache-ram
+            - {{ int (dig "cacheRamMiB" 0 $mt) | toString | quote }}
             - --host
             - 0.0.0.0
             - --port

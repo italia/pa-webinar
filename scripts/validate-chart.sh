@@ -101,6 +101,8 @@ profili=(
   "postprod:$CHART/examples/values-full.yaml"
   "postprod-mt:$CHART/examples/values-full.yaml"
   "postprod-senza-cpu:$CHART/examples/values-full.yaml"
+  "ponte-tutte-le-voci:$CHART/examples/values-simple.yaml"
+  "ponte-cascata:$CHART/examples/values-full.yaml"
 )
 
 # Il file di una singola installazione k3s come lo scrive chi la automatizza:
@@ -285,6 +287,12 @@ argomenti_profilo() {
         --set postprod.mt.enabled=true --set networkPolicy.enabled=true ;;
     postprod-senza-cpu)
       printf '%s\n' --set postprod.enabled=true --set postprod.worker.cpu.enabled=false ;;
+    # Il bridge che inoltra ogni voce, e quello con tre voci e la cascata fra
+    # bridge (Octo): il portale deve saperlo come lo sa il bridge.
+    ponte-tutte-le-voci)
+      printf '%s\n' --set global.jvb.numLoudest=0 ;;
+    ponte-cascata)
+      printf '%s\n' --set global.jvb.numLoudest=3 --set jitsi-meet.octo.enabled=true ;;
   esac
 }
 
@@ -1069,6 +1077,43 @@ if bridge > 0 and variabili.get("JVB_SCALER_ENABLED") == "false":
     elif int(tetto) > bridge:
         print(f"JVB_MAX_REPLICAS è {tetto} ma i bridge fissi sono {bridge}")
 
+# Come lavora il bridge, per la stima delle risorse di un evento: quante voci
+# inoltra a ogni partecipante (instradamento delle sole voci più forti) e se
+# una conferenza passa da un bridge all'altro (Octo). Il portale lo legge da
+# JVB_NUM_LOUDEST e JVB_CASCADING: diversi da quello che il bridge fa, la
+# stima sbaglia senza che niente lo dica. L'heap della JVM si imposta con
+# VIDEOBRIDGE_MAX_MEMORY: VIDEOBRIDGE_OPTS l'immagine non la legge.
+ponte = next((v for n, v in mappe.items() if n.endswith("-jvb") and "COLIBRI_REST_ENABLED" in v), None)
+if ponte is not None:
+    # Come li legge il bridge: vero è true, yes oppure on, in minuscolo; senza
+    # numero, 3.
+    acceso, voci = False, 3
+    for o in str(ponte.get("VIDEOBRIDGE_DEBUG_OPTIONS") or "").split():
+        if o.startswith("-Dvideobridge.loudest.route-loudest-only="):
+            acceso = o.split("=", 1)[1] in ("true", "yes", "on")
+        elif re.fullmatch(r"-Dvideobridge\.loudest\.num-loudest=\d+", o):
+            voci = int(o.split("=", 1)[1])
+    voci = voci if acceso else 0
+    if variabili.get("JVB_NUM_LOUDEST") != str(voci):
+        print(f"il bridge inoltra {voci} voci a ogni partecipante (0 = tutte) ma il portale ha JVB_NUM_LOUDEST={variabili.get('JVB_NUM_LOUDEST')!r}")
+    predefinito = int(((yaml.safe_load(open(os.path.join(sys.argv[3], "values.yaml"))).get("global") or {}).get("jvb") or {}).get("numLoudest", 0))
+    if predefinito < 1:
+        print(f"global.jvb.numLoudest in values.yaml è {predefinito}: l'instradamento delle sole voci più forti deve essere acceso per impostazione predefinita")
+    atteso = {"ponte-tutte-le-voci": 0, "ponte-cascata": 3}.get(profilo, predefinito)
+    if voci != atteso:
+        print(f"il bridge inoltra {voci} voci (0 = tutte) invece delle {atteso} di global.jvb.numLoudest")
+    if "VIDEOBRIDGE_OPTS" in ponte:
+        print("il bridge ha VIDEOBRIDGE_OPTS, che l'immagine non passa alla JVM: l'heap va in VIDEOBRIDGE_MAX_MEMORY, le altre opzioni in VIDEOBRIDGE_DEBUG_OPTIONS")
+    cascata = str(ponte.get("ENABLE_OCTO", "")).lower() == "true"
+    if cascata != (variabili.get("JVB_CASCADING") == "true"):
+        print(f"il bridge ha ENABLE_OCTO={ponte.get('ENABLE_OCTO')!r} ma il portale ha JVB_CASCADING={variabili.get('JVB_CASCADING')!r}")
+    if cascata != (profilo == "ponte-cascata"):
+        print(f"cascata fra bridge {'accesa' if cascata else 'spenta'} sul profilo {profilo}")
+else:
+    for chiave in ("JVB_NUM_LOUDEST", "JVB_CASCADING"):
+        if chiave in variabili:
+            print(f"{chiave} è impostato ({variabili[chiave]!r}) ma il chart non rende il bridge: il portale stimerebbe un bridge che non conosce")
+
 # Ruoli nella sala: con i token del portale e Jicofo autenticato, ogni
 # partecipante diventerebbe moderatore. Il chart spegne l'autenticazione di
 # Jicofo e fa assegnare i ruoli a Prosody dal token.
@@ -1162,6 +1207,10 @@ if sottotitoli:
     amb = {e["name"]: e for e in gw.get("env") or []}
     if (amb.get("CAPTIONS_AUTH_TOKEN") or {}).get("value") != intestazione:
         print("il segreto dei sottotitoli non è lo stesso nel gateway (CAPTIONS_AUTH_TOKEN) e in Jicofo (X-Captions-Token): il gateway rifiuterebbe il bridge")
+    # Le voci trascritte insieme: il portale ne stima le risorse con lo
+    # stesso numero che il gateway applica.
+    if variabili.get("CAPTIONS_MAX_STREAMS") != str((amb.get("CAPTIONS_MAX_STREAMS") or {}).get("value")):
+        print(f"il gateway trascrive al massimo {(amb.get('CAPTIONS_MAX_STREAMS') or {}).get('value')!r} voci ma il portale ha CAPTIONS_MAX_STREAMS={variabili.get('CAPTIONS_MAX_STREAMS')!r}")
     contesto = str((amb.get("CAPTIONS_CONTEXT_URL") or {}).get("value", ""))
     porta_app = (servizi.get(nome_app) or {}).get("spec", {}).get("ports", [{}])[0].get("port")
     if contesto != f"http://{nome_app}:{porta_app}/api/internal/captions/context":
@@ -1195,6 +1244,8 @@ else:
         print("i sottotitoli non sono resi ma Prosody ha PA_CAPTIONS_ENABLED=true")
     if variabili.get("CAPTIONS_STATUS_URL"):
         print(f"i sottotitoli non sono resi ma l'applicazione ha CAPTIONS_STATUS_URL ({variabili['CAPTIONS_STATUS_URL']})")
+    if variabili.get("CAPTIONS_MAX_STREAMS"):
+        print(f"i sottotitoli non sono resi ma l'applicazione ha CAPTIONS_MAX_STREAMS ({variabili['CAPTIONS_MAX_STREAMS']})")
 
 # Autorità di certificazione in più: il file indicato a Node deve esistere nel
 # volume montato.
@@ -1337,6 +1388,10 @@ for tipo, d, m in modelli():
             if int(sonda.get("timeoutSeconds") or 1) < 5 or \
                     int(sonda.get("periodSeconds") or 10) * int(sonda.get("failureThreshold") or 3) < 60:
                 print(f"{tipo}/{d['metadata']['name']}: sonda di vita del bridge troppo stretta ({sonda}): un nodo carico lo riavvia e fa cadere le conferenze")
+            pronto = c.get("readinessProbe") or {}
+            if pronto and (int(pronto.get("timeoutSeconds") or 1) < 5 or
+                           int(pronto.get("periodSeconds") or 10) * int(pronto.get("failureThreshold") or 3) < 30):
+                print(f"{tipo}/{d['metadata']['name']}: sonda di prontezza del bridge troppo stretta ({pronto}): su un nodo carico il bridge esce dal Service della sua API e il portale lo legge come spento")
 
 # ── Lavori pianificati che chiamano il portale ──
 # All'avvio a freddo il portale non risponde per un minuto o più: ogni
@@ -1764,6 +1819,18 @@ elif profilo == "postprod-mt" and not re.search(r"/[0-9a-f]{40}/", variabili.get
 argomenti = " ".join(str(a) for c in spec.get("containers") or [] for a in c.get("args") or [])
 if variabili.get("MT_MODEL_PATH") and variabili["MT_MODEL_PATH"] not in argomenti:
     print(f"il motore carica un file diverso da quello scaricato ({variabili.get('MT_MODEL_PATH')})")
+# La cache dei prompt di llama.cpp: le richieste sono di una riga e non la
+# riusano mai. Con il valore predefinito di llama.cpp (8 GiB) cresce fino a
+# portare il pod oltre la sua memoria a metà di un lavoro grande.
+lista = [str(a) for c in (spec.get("containers") or [])[:1] for a in c.get("args") or []]
+if "--cache-ram" not in lista:
+    print("il motore di traduzione non limita la cache dei prompt (--cache-ram): la memoria cresce a ogni richiesta fino a uccidere il pod")
+else:
+    cache = (lista[lista.index("--cache-ram") + 1:] or [""])[0]
+    if not re.fullmatch(r"-1|\d+", cache):
+        print(f"--cache-ram è seguito da {cache!r}, non da un numero di MiB")
+    elif profilo == "postprod-mt" and cache != "0":
+        print(f"--cache-ram è {cache}: il valore predefinito del chart deve essere 0")
 # Il Service e l'indirizzo che il portale passa al worker.
 servizio = next((d for d in docs if d.get("kind") == "Service" and d["metadata"]["name"] == nome), None)
 etichette_m = ((motore["spec"].get("template") or {}).get("metadata") or {}).get("labels") or {}
@@ -1885,6 +1952,17 @@ deve_fallire "impronta del modello di traduzione malformata" "postprod.mt.model.
   --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.sha256=abc
 deve_fallire "file del modello di traduzione con un percorso" "postprod.mt.model.file" \
   --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.file=../modello.gguf
+deve_fallire "cache dei prompt del motore di traduzione negativa" "postprod.mt.cacheRamMiB" \
+  --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.cacheRamMiB=-5
+# Instradamento delle sole voci più forti: un numero, e le opzioni della JVM
+# del bridge che lo portano davvero.
+deve_fallire "numero di voci più forti non intero" "global.jvb.numLoudest" \
+  --set-string global.jvb.numLoudest=cinque
+deve_fallire "opzioni della JVM del bridge senza le voci più forti" "VIDEOBRIDGE_DEBUG_OPTIONS" \
+  --set-string 'jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS=-Xss1m'
+deve_fallire "opzioni della JVM del bridge con un altro numero di voci" "VIDEOBRIDGE_DEBUG_OPTIONS" \
+  --set global.jvb.numLoudest=0 \
+  --set-string 'jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS=-Dvideobridge.loudest.route-loudest-only=true'
 
 echo
 if [ "$fallimenti" -gt 0 ]; then

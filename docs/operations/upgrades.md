@@ -587,6 +587,11 @@ not restart Prosody; restart its StatefulSet when no call is running. A values f
 `XMPP_MUC_MODULES` keeps its list: add `pa_media_lock` to it, or participant limits stay enforced only
 by the room's toolbar.
 
+Loudest-only routing on the bridge is such a change too. The upgrade that first brings
+`global.jvb.numLoudest` changes the bridge's configuration and restarts the bridge, and so does a
+later change of the number: run it outside events
+([Loudest-only audio routing](../architecture/scaling.md#loudest-only-audio-routing)).
+
 Upgrading Jitsi itself follows the
 [Jitsi upgrade checklist](../architecture/jitsi-integration.md#jitsi-upgrade-checklist).
 
