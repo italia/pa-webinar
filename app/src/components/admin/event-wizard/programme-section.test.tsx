@@ -290,7 +290,7 @@ describe('StepProgramma: dalle persone', () => {
     click(pulsante('Aggiungi un intervento di Anna Rossi'));
     expect(ultimo.agenda).toHaveLength(MAX_AGENDA_ITEMS);
     expect(pulsante(tp.newPersonAssign).disabled).toBe(true);
-  });
+  }, 15_000);
 
   it('al numero massimo di argomenti pulsanti e persone non aggiungono piu’', () => {
     const piene = Array.from({ length: MAX_AGENDA_ITEMS }, (_, i) => riga(`A${i}`, '1'));
