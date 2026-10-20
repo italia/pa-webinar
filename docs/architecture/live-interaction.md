@@ -218,7 +218,7 @@ The count is one number per material (`EventMaterial.openCount`), with no record
 
 ### Timer
 
-Moderators **Start**, **Pause** and **Reset** a countdown. The room offers presets of 5, 10, 15 and 30 minutes; `POST /timer` accepts any duration from 10 seconds to 2 hours. **Show to all** toggles its visibility without restarting it. The state lives in Redis, shared by every pod, for twelve hours after the last command; two commands sent at the same moment on different pods keep the later one. A countdown that reached zero shows **Time's up** for 30 seconds and then turns off: every read works that out from the stored state, and no read writes it. Clients poll `GET /timer` every 5 seconds and count down locally between polls.
+Moderators **Start**, **Pause** and **Reset** a countdown. The room offers presets of 1, 2, 3, 5, 10, 15 and 30 minutes; `POST /timer` accepts any duration from 10 seconds to 2 hours. **Show to all** toggles its visibility without restarting it. The state lives in Redis, shared by every pod, for twelve hours after the last command; two commands sent at the same moment on different pods keep the later one. A countdown that reached zero shows **Time's up** for 30 seconds and then turns off: every read works that out from the stored state, and no read writes it. Clients poll `GET /timer` every 5 seconds and count down locally between polls.
 
 ### Raised-hand queue
 
