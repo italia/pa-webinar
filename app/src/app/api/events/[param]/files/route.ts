@@ -28,6 +28,7 @@ import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
 import { materialAddedBy, materialAuthorName } from '@/lib/events/material-author';
 import { fileDeletionFailed, removeMaterialBlob } from '@/lib/events/material-files';
+import { endPresentationOfMaterial } from '@/lib/presentation/state';
 
 const uploadRequestSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -206,6 +207,10 @@ export const DELETE = withErrorHandling(
 
     if (!material) throw new NotFoundError('Material not found');
 
+    // Se la sala lo sta guardando, la presentazione si chiude per prima: prima
+    // che il file sparisca e prima che la riga se ne vada
+    // (lib/presentation/state).
+    await endPresentationOfMaterial(event.id, material, 'moderator');
     // Stesse regole di ogni altra cancellazione di un materiale
     // (lib/events/material-files): il file solo se è di questo evento e nessun
     // altro lo usa ancora, e prima della riga, che resta se lo storage non

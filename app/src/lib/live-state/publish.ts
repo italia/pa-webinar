@@ -16,6 +16,7 @@ import {
   type LiveFlagField,
   type LiveFlags,
   type PokeablePanel,
+  type PresentationPointer,
 } from './pubsub';
 
 // L'elenco dei flag vive in un posto solo, nel modulo del canale.
@@ -72,6 +73,22 @@ export function pokeLivePanel(eventId: string, panel: PokeablePanel): void {
 export function __resetPokeCoalescing(): void {
   for (const finestra of finestre.values()) clearTimeout(finestra.timer);
   finestre.clear();
+}
+
+/**
+ * Annuncia dove e' arrivata la presentazione (materiale, pagina, versione).
+ * Niente accorpamento: ogni pagina girata parte subito, e il client tiene
+ * comunque la versione piu' alta che riceve. Solo i tre campi del puntatore,
+ * anche se il chiamante ne passa altri.
+ */
+export function publishPresentation(eventId: string, pointer: PresentationPointer): void {
+  void publishLiveState(eventId, {
+    op: 'presentation',
+    materialId: pointer.materialId,
+    page: pointer.page,
+    version: pointer.version,
+    ts: new Date().toISOString(),
+  });
 }
 
 /** Annuncia il nuovo stato dell'evento (LIVE, ENDED, …). */

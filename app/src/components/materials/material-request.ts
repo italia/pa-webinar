@@ -178,6 +178,15 @@ export interface UploadOptions {
   onProgress?: (fraction: number) => void;
   /** Annulla il caricamento in corso: l'esito e' 'aborted', non un errore. */
   signal?: AbortSignal;
+  /** Il materiale e' nato: il suo id, per chi deve farci qualcosa subito (presentarlo). */
+  onCreated?: (materialId: string) => void;
+}
+
+/** L'id del materiale creato, dalla risposta del caricamento; null se non si legge. */
+export function createdMaterialId(body: unknown): string | null {
+  if (!body || typeof body !== 'object') return null;
+  const id = (body as { id?: unknown }).id;
+  return typeof id === 'string' && id.length > 0 ? id : null;
 }
 
 /**
@@ -219,6 +228,15 @@ export async function uploadMaterialFile(
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           opts.onProgress?.(1);
+          if (opts.onCreated) {
+            let id: string | null = null;
+            try {
+              id = createdMaterialId(JSON.parse(xhr.responseText));
+            } catch {
+              // Risposta non JSON: il materiale c'e', solo non se ne sa l'id.
+            }
+            if (id) opts.onCreated(id);
+          }
           fine(null);
           return;
         }
@@ -249,7 +267,18 @@ export async function uploadMaterialFile(
     if (opts.signal?.aborted || (e instanceof DOMException && e.name === 'AbortError')) return 'aborted';
     throw e;
   }
-  if (res.ok) return null;
+  if (res.ok) {
+    if (opts.onCreated) {
+      let id: string | null = null;
+      try {
+        id = createdMaterialId(await res.json());
+      } catch {
+        // Risposta non JSON: il materiale c'e', solo non se ne sa l'id.
+      }
+      if (id) opts.onCreated(id);
+    }
+    return null;
+  }
   let code: string | undefined;
   try {
     code = ((await res.json()) as { code?: string }).code;

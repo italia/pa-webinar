@@ -19,6 +19,7 @@ import {
   removeMaterialBlob,
 } from '@/lib/events/material-files';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { endPresentationOfMaterial } from '@/lib/presentation/state';
 import { updateMaterialAdminSchema } from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
@@ -166,12 +167,16 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   const existing = await prisma.eventMaterial.findUnique({
     where: { id: materialId },
-    select: { id: true, eventId: true, blobPath: true },
+    select: { id: true, eventId: true, blobPath: true, title: true },
   });
   if (!existing || existing.eventId !== id) {
     throw new NotFoundError('Material');
   }
 
+  // Se la sala lo sta guardando, la presentazione si chiude per prima: prima
+  // che il file sparisca e prima che la riga se ne vada
+  // (lib/presentation/state).
+  await endPresentationOfMaterial(id, existing, 'system');
   // Il file caricato se ne va con il suo materiale, e prima della riga: se lo
   // storage non risponde il materiale resta e si riprova
   // (lib/events/material-files).

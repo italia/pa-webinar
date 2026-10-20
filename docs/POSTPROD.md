@@ -895,7 +895,10 @@ cannot be read: the claim then goes ahead without it.
   results, word-cloud prompts with their most frequent words (less any word a
   moderator removed after the round closed), Q&A questions highlighted or
   answered (with the written answer), feature toggles, recording start and
-  stop, the timer and the end of the event. Beside it, rows that already carry
+  stop, the timer, the PDF presented in the room (start, each page shown and
+  stop; a page left within 5 seconds for another one was only passed through
+  and is dropped, and the pages shown are the first entries to go when the
+  timeline is too long) and the end of the event. Beside it, rows that already carry
   a time: the text of every Q&A question not dismissed and of every question
   marked in the chat, never their authors; the titles of shared materials;
   and the number of chat messages (hidden ones excluded), app reactions and

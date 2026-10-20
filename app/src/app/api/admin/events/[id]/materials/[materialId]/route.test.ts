@@ -32,6 +32,8 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findFirst: vi.fn() },
     eventMaterial: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    // Nessuna presentazione in corso: togliere un materiale non annuncia nulla.
+    eventPresentation: { updateMany: vi.fn(async () => ({ count: 0 })) },
   },
 }));
 vi.mock('@/lib/storage', () => ({

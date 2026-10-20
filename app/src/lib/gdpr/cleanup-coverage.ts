@@ -45,6 +45,7 @@ export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
   WordCloudRound: 'contenuto dell’evento: le parole restano, senza iscrizione né identificativo del browser (UPDATE di word_cloud_submissions nella transazione)',
   EventAgendaItem: 'l’agenda è contenuto dell’evento, senza dati personali (chi interviene è un riferimento alla concessione, che torna vuoto quando la concessione si cancella); le reazioni delle persone agli argomenti si cancellano',
   LiveAction: 'cronologia della sala senza nomi (titoli, risultati, ore delle azioni): contenuto dell’evento, serve anche alla post-produzione',
+  EventPresentation: 'quale materiale la sala sta guardando e a che pagina, con il ruolo di chi presenta: nessun nome copiato; il legame con la concessione nominale si azzera da sé quando la transazione cancella le concessioni (SET NULL)',
   EventOrganizer: 'enti organizzatori: dati istituzionali pubblici, non personali, e restano leggibili sull’evento anche dopo la conservazione dei dati',
   EventTagLink: 'legame con una parola chiave: nessun dato personale',
   GlossaryTerm: 'glossario della post-produzione (sigle, termini, pronunce): configurazione dell’evento scritta da chi lo organizza, non dati delle persone che partecipano',

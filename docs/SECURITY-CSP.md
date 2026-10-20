@@ -102,6 +102,7 @@ lists.
 | `frame-ancestors` | `'none'` | No site can frame the portal: clickjacking protection. This also rules out embedding the portal in an intranet page |
 | `frame-src` | `'self' https://<jitsi-host>` | Only the Jitsi IFrame API. The event page shows an ended event's `youtubeUrl` as an external link (**Watch the video on YouTube**) and never embeds a third-party player, so visitors' browsers do not contact YouTube unless they choose to |
 | `script-src` | `'self' 'nonce-<nonce>' 'strict-dynamic' https: https://<jitsi-host>`, plus `'wasm-unsafe-eval'` on the live page | Per-request nonce plus `'strict-dynamic'`, with no `'unsafe-inline'`. See [What 'strict-dynamic' trusts](#what-strict-dynamic-trusts). Only the live page (`/<locale>/events/<slug>/live`, which also hosts the waiting room) gets `'wasm-unsafe-eval'`: it allows compiling WebAssembly and nothing else, and JavaScript `eval` stays blocked. The waiting room's background preview needs it for MediaPipe's segmentation engine, served from `/vendor/mediapipe/`. The directive is built in `app/src/lib/security/script-src.ts` |
+| `worker-src` | `'self'` | The PDF viewer of the live room (pdf.js) parses documents in a module worker that the portal serves from `/_next/static/media/`. Without the directive, workers fall back to `script-src`, where `'strict-dynamic'` makes browsers ignore `'self'` and each browser treats workers its own way. `blob:` is not allowed: no worker is built from a blob. See [The PDF viewer's worker](#the-pdf-viewers-worker) |
 | `style-src` | `'self' 'unsafe-inline'` | Deliberate trade-off. See [Why style-src keeps 'unsafe-inline'](#why-style-src-keeps-unsafe-inline) |
 | `font-src` | `'self' data:` | Fonts are self-hosted (`app/src/styles/_fonts.scss`); `data:` covers fonts embedded in stylesheets |
 | `img-src` | `'self' data: blob: https://i.ytimg.com` | Images come from the portal itself (uploads are served through `/api/assets`), from `data:` and `blob:` URLs built in the page, and from YouTube thumbnail URLs. No component builds an `i.ytimg.com` URL; the entry lets a pasted YouTube thumbnail render |
@@ -257,6 +258,19 @@ Rules for code that adds scripts:
   above. Without the nonce it is blocked, even from the portal's own origin.
 - Never add `'unsafe-inline'` or `'unsafe-eval'` to the production `script-src`. `'wasm-unsafe-eval'` is a
   different keyword and covers WebAssembly only.
+
+### The PDF viewer's worker
+
+The live room renders a presented PDF with pdf.js (`app/src/components/presentation/pdf-loader.ts`).
+The library is a chunk of the bundle, loaded with a dynamic import, so `'strict-dynamic'` covers it.
+Its worker is a separate file: the bundler emits it into `/_next/static/media/` from
+`new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url)`, and pdf.js starts it with
+`new Worker(url, { type: 'module' })`. `worker-src 'self'` allows exactly that and nothing else:
+same origin, no `blob:` and no other host. The worker's response does not pass through the
+middleware (`/_next/*` is excluded), so it runs without a policy of its own, like any other static
+chunk. pdf.js runs with `useWasm: false` and loads no font or CMap file from the network, so the
+viewer needs no `'wasm-unsafe-eval'` and no extra `connect-src` entry. The document itself comes
+from `GET /api/events/{slug}/presentation/file` on the portal origin.
 
 ## Why style-src keeps 'unsafe-inline'
 

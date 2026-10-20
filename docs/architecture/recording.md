@@ -816,6 +816,13 @@ link or publicly. From here on, the pipeline is described in
   session.
 - **Recording indicator.** Only Jibri raises the in-room **Recording in
   progress** banner.
+- **A PDF presented in the room is not in the video.** Jibri records the
+  Jitsi page, and the presentation area belongs to the portal around it; the
+  multitrack recorder captures audio only. The pages reach the recording only
+  if the presenter also shares their screen in the call, which the room
+  suggests while a recording runs. The live action journal still records
+  each start, page shown and stop, so the AI timeline and summary know which
+  page was on screen and when ([Presentation](live-interaction.md#presentation)).
 - **One composite recording at a time.** The JVB scaler asks for at most one
   Jibri replica.
 - **A second multitrack recording in one event.** The portal recognizes the

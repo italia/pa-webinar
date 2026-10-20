@@ -130,3 +130,34 @@ describe('useLiveState — stato dell’evento e materiali', () => {
     expect(chiaviRilette(MATERIALI)).toBe(true);
   });
 });
+
+describe('useLiveState — presentazione', () => {
+  const M1 = '55555555-5555-4555-8555-555555555555';
+
+  it('il puntatore arriva così com’è, senza riletture', () => {
+    const { hook, sorgente } = apri();
+    act(() => {
+      sorgente.invia({ op: 'presentation', materialId: M1, page: 3, version: 4, ts });
+    });
+    expect(hook.result.current.presentation).toEqual({ materialId: M1, page: 3, version: 4 });
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it('due puntatori incrociati: resta il più recente', () => {
+    const { hook, sorgente } = apri();
+    act(() => {
+      sorgente.invia({ op: 'presentation', materialId: M1, page: 5, version: 6, ts });
+      sorgente.invia({ op: 'presentation', materialId: M1, page: 4, version: 5, ts });
+    });
+    expect(hook.result.current.presentation).toEqual({ materialId: M1, page: 5, version: 6 });
+  });
+
+  it('la chiusura passa come puntatore vuoto', () => {
+    const { hook, sorgente } = apri();
+    act(() => {
+      sorgente.invia({ op: 'presentation', materialId: M1, page: 5, version: 6, ts });
+      sorgente.invia({ op: 'presentation', materialId: null, page: 1, version: 7, ts });
+    });
+    expect(hook.result.current.presentation).toEqual({ materialId: null, page: 1, version: 7 });
+  });
+});

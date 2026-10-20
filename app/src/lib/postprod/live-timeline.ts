@@ -7,7 +7,8 @@
  * Mette insieme due fonti, entrambe con l'ora del server:
  *  - il registro delle azioni dal vivo (live_actions, lib/live/actions.ts):
  *    agenda, sondaggi, «In una parola», stati delle domande, funzioni,
- *    registrazione, timer, mani alzate, fine evento;
+ *    registrazione, timer, mani alzate, PDF presentati e pagine mostrate,
+ *    fine evento;
  *  - le righe che un'ora ce l'hanno gia': domande del Q&A e domande in chat
  *    (il testo, mai chi le ha scritte), materiali condivisi, e l'attivita'
  *    della chat e delle reazioni contata per finestre di cinque minuti.
@@ -125,6 +126,12 @@ const MAX_AGENDA_ACTIONS = 1_000;
 const MAX_ENTRIES = 250;
 /** Lunghezza massima di un testo citato. */
 const MAX_TEXT = 280;
+/**
+ * Una pagina della presentazione lasciata prima di questo tempo e' stata solo
+ * attraversata (chi presenta ne ha girate diverse di fila per arrivare a
+ * un'altra): non entra in cronologia.
+ */
+const PAGE_DWELL_MS = 5_000;
 
 /** Le funzioni che chi modera accende e spegne durante l'evento: una per
  *  ogni flag attivabile dal vivo, e il compilatore pretende che ci siano
@@ -226,6 +233,22 @@ export function describeAction(
       return 'Timer fermato';
     case 'event.ended':
       return 'Evento terminato dal moderatore';
+    case 'presentation.started': {
+      const titolo = cita(data.title);
+      return titolo ? `Presentazione avviata: «${titolo}»` : 'Presentazione avviata';
+    }
+    case 'presentation.page': {
+      const pagina = Number(data.page);
+      if (!Number.isInteger(pagina) || pagina < 1) return null;
+      const totale = Number(data.pageCount);
+      const di = Number.isInteger(totale) && totale > 0 ? ` di ${totale}` : '';
+      const titolo = cita(data.title);
+      return `Pagina ${pagina}${di} della presentazione${titolo ? ` «${titolo}»` : ''}`;
+    }
+    case 'presentation.stopped': {
+      const titolo = cita(data.title);
+      return titolo ? `Presentazione conclusa: «${titolo}»` : 'Presentazione conclusa';
+    }
     default:
       // chat.hidden, chat.question.status, hand.*: non entrano una per una
       // (le mani alzate si contano per finestra).
@@ -239,6 +262,26 @@ interface Fatto {
   text: string;
   /** Si sacrifica per prima quando le voci sono troppe. */
   minore?: boolean;
+}
+
+/**
+ * Le azioni senza le pagine della presentazione solo attraversate: una pagina
+ * seguita da un'altra azione della presentazione entro `PAGE_DWELL_MS` non e'
+ * stata mostrata davvero. Le azioni arrivano in ordine di tempo.
+ */
+export function withoutFleetingPages<T extends { at: Date; kind: string }>(
+  azioni: readonly T[],
+): T[] {
+  const presentazione = azioni.filter((a) => a.kind.startsWith('presentation.'));
+  const attraversate = new Set<T>();
+  for (let i = 0; i < presentazione.length - 1; i++) {
+    const a = presentazione[i]!;
+    const dopo = presentazione[i + 1]!;
+    if (a.kind === 'presentation.page' && dopo.at.getTime() - a.at.getTime() < PAGE_DWELL_MS) {
+      attraversate.add(a);
+    }
+  }
+  return azioni.filter((a) => !attraversate.has(a));
 }
 
 interface Conteggio {
@@ -354,7 +397,7 @@ export async function buildLiveTimeline(opts: {
   const perId = new Map(domande.map((q) => [q.id, { text: q.text, answerText: q.answerText }]));
   const fatti: Fatto[] = [];
 
-  for (const az of azioni) {
+  for (const az of withoutFleetingPages(azioni)) {
     let data = (az.data && typeof az.data === 'object' ? az.data : {}) as Record<string, unknown>;
     const via = tolte.get(str(data.roundId));
     if (az.kind === 'wordcloud.closed' && via && Array.isArray(data.words)) {
@@ -366,7 +409,16 @@ export async function buildLiveTimeline(opts: {
       };
     }
     const testo = describeAction(az.kind, data, perId);
-    if (testo) fatti.push({ at: az.at, kind: az.kind, text: testo });
+    // Le pagine della presentazione sono tante: in un prompt troppo lungo se
+    // ne vanno prima delle altre voci.
+    if (testo) {
+      fatti.push({
+        at: az.at,
+        kind: az.kind,
+        text: testo,
+        ...(az.kind === 'presentation.page' && { minore: true }),
+      });
+    }
   }
 
   for (const q of domande) {
