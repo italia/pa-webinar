@@ -86,12 +86,12 @@ describe('unisciTesti — con textEdits (il wizard)', () => {
     expect(out.title.de).toBe('Titel');
   });
 
-  it('una lingua tolta dalle lingue dell evento perde testo e stato', () => {
+  it('una lingua tolta dalle lingue dell evento, e toccata, perde testo e stato', () => {
     const out = unisciTesti({
       principale: 'it',
       salvati,
       inviati: { title: salvati.title, description: salvati.description },
-      toccate: [],
+      toccate: ['fr'],
       lingueTolte: ['fr'],
       impronta: NUOVA,
       improntaPrecedente: VECCHIA,
@@ -100,6 +100,24 @@ describe('unisciTesti — con textEdits (il wizard)', () => {
     expect(out.title).not.toHaveProperty('fr');
     expect(out.description).not.toHaveProperty('fr');
     expect(out.stato).not.toHaveProperty('fr');
+  });
+
+  it('una lingua uscita dall elenco senza essere toccata tiene testo e stato', () => {
+    // Una bozza di prima che non conosceva le lingue: l'elenco cambia, ma
+    // nessuno ha scelto di togliere un testo.
+    const out = unisciTesti({
+      principale: 'it',
+      salvati,
+      inviati: { title: { it: 'Titolo' }, description: { it: 'Descrizione' } },
+      toccate: [],
+      lingueTolte: ['en', 'fr', 'de'],
+      impronta: NUOVA,
+      improntaPrecedente: VECCHIA,
+      ora: ORA,
+    });
+    expect(out.title).toEqual(salvati.title);
+    expect(out.description).toEqual(salvati.description);
+    expect(out.stato).toEqual(salvati.stato);
   });
 
   it('la lingua principale viene sempre da chi salva e non ha uno stato', () => {

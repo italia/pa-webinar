@@ -299,10 +299,11 @@ describe('traduzione automatica: dal salvataggio alla consegna', () => {
     await riconciliaTraduzioni(ID);
     await lavoraEConsegna();
     const risposta = await salva({
-      title: { it: 'Titolo nuovo', en: '[en] Ciclo | Titolo', de: 'Zyklus | Titel' },
-      description: { it: 'Descrizione', en: '[en] Descrizione', de: 'Beschreibung' },
+      title: { it: 'Titolo nuovo', en: '[en] Ciclo | Titolo', de: '' },
+      description: { it: 'Descrizione', en: '[en] Descrizione', de: '' },
       aiTargetLocales: 'en',
-      textEdits: { touched: [] },
+      // Il wizard tocca la lingua tolta (chi la toglie ha confermato).
+      textEdits: { touched: ['de'] },
     });
     expect(evento().title).toEqual({ it: 'Titolo nuovo', en: '[en] Ciclo | Titolo' });
     expect(evento().textLocaleState).not.toHaveProperty('de');

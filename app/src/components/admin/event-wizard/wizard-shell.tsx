@@ -1094,23 +1094,28 @@ export default function EventWizard(props: WizardProps) {
     [tocca, updateForm]
   );
   // Togliere una lingua dall'evento: le lingue tolte con un testo lo perdono
-  // al salvataggio (chi toglie ha confermato).
+  // al salvataggio (chi toglie ha confermato). Ogni lingua tolta e' toccata:
+  // il server toglie testo e stato solo alle lingue tolte che il modulo dice
+  // toccate, mai a quelle uscite dall'elenco senza una scelta di chi scrive.
   const cambiaLingueEvento = useCallback(
     (valore: string | null, tolte: string[]) => {
+      const prima = formRef.current;
+      const dopo = parseLocaleList(valore);
+      const uscite = parseLocaleList(prima.aiTargetLocales).filter((l) => !dopo.includes(l));
       // Nessuna lingua e' una scelta: si salva '' (null vorrebbe dire «quelle
       // del sito»).
       if (tolte.length === 0) {
+        tocca(uscite);
         updateForm({ aiTargetLocales: valore ?? '' });
         return;
       }
-      const prima = formRef.current;
       const title = { ...prima.title };
       const description = { ...prima.description };
       for (const l of tolte) {
         title[l] = '';
         description[l] = '';
       }
-      tocca(tolte);
+      tocca([...new Set([...tolte, ...uscite])]);
       updateForm({ aiTargetLocales: valore ?? '', title, description });
     },
     [tocca, updateForm]
@@ -1313,6 +1318,10 @@ export default function EventWizard(props: WizardProps) {
       setForm((prima) => conSceltePulite({
         ...prima,
         ...datiBozza,
+        // Una bozza di prima senza lingue (null) non toglie quelle del
+        // modulo: per lei null era «nessuna traduzione», non una scelta, e
+        // salvarla come '' toglierebbe all'evento ogni lingua e il loro testo.
+        ...(datiBozza.aiTargetLocales == null ? { aiTargetLocales: prima.aiTargetLocales } : {}),
         ...(datiBozza.title || datiBozza.description
           ? { title: testiBozza(prima).title, description: testiBozza(prima).description }
           : {}),
@@ -1653,7 +1662,8 @@ export default function EventWizard(props: WizardProps) {
             form.retainParticipantTracks,
           // Le lingue dell'evento: le schede, la traduzione automatica al
           // salvataggio e (se accesa) quella di sottotitoli e sintesi. Sempre
-          // esplicite: null (una bozza di prima) vorrebbe dire «quelle del sito».
+          // esplicite ('' e' «nessuna»): null vorrebbe dire «quelle del sito».
+          // Il modulo le ha sempre, anche dopo una bozza di prima (restoreDraft).
           aiTargetLocales: form.aiTargetLocales ?? '',
           // Le lingue toccate qui: delle altre il server tiene il testo che
           // ha, anche una traduzione arrivata a pagina aperta.

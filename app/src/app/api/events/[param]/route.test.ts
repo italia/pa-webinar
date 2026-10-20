@@ -702,13 +702,13 @@ describe('PUT /api/events/[param] — lingue di titolo e descrizione', () => {
     expect((await r.json()).traduzione).toEqual({ avviata: true, lingue: ['en'] });
   });
 
-  it('una lingua tolta dalle lingue dell evento perde testo e stato', async () => {
+  it('una lingua tolta dalle lingue dell evento, e toccata, perde testo e stato', async () => {
     await PUT(
       richiesta({
-        title: salvato.title,
-        description: salvato.description,
+        title: { ...salvato.title, fr: '' },
+        description: { ...salvato.description, fr: '' },
         aiTargetLocales: 'en',
-        textEdits: { touched: [] },
+        textEdits: { touched: ['fr'] },
       }),
       contesto as never
     );
@@ -724,11 +724,30 @@ describe('PUT /api/events/[param] — lingue di titolo e descrizione', () => {
         title: salvato.title,
         description: salvato.description,
         aiTargetLocales: 'en',
-        textEdits: { touched: [] },
+        textEdits: { touched: ['fr'] },
       }),
       contesto as never
     );
     expect(datiScritti().title).toEqual({ it: 'Titolo', en: 'Arrived title' });
+  });
+
+  it('cambiare solo l elenco delle lingue non cancella testi: le lingue uscite e non toccate li tengono', async () => {
+    // Una bozza di prima ripresa: l'evento seguiva le lingue del sito, il
+    // modulo manda nessuna lingua e non tocca niente.
+    mocked.event.findUnique.mockResolvedValue({ ...salvato, aiTargetLocales: null });
+    await PUT(
+      richiesta({
+        title: salvato.title,
+        description: salvato.description,
+        aiTargetLocales: '',
+        textEdits: { touched: [] },
+      }),
+      contesto as never
+    );
+    const dati = datiScritti();
+    expect(dati.title).toEqual(salvato.title);
+    expect(dati.description).toEqual(salvato.description);
+    expect(dati.textLocaleState).toEqual(salvato.textLocaleState);
   });
 
   it('senza textEdits il testo inviato vale per tutte le lingue, come sempre', async () => {

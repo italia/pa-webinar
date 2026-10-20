@@ -1147,14 +1147,46 @@ describe('lingue dell evento e traduzione automatica', () => {
     expect(corpo.title).toMatchObject({ en: 'Test event', de: 'Mein Titel' });
   });
 
-  it('una bozza di prima senza lingue non diventa «quelle del sito»', async () => {
+  it('una bozza di prima senza lingue tiene quelle del modulo, e il testo delle altre lingue', async () => {
     fetchMock.mockImplementation(async () => json(200, {}));
-    localStorage.setItem('pa-wizard-draft:evt-l', JSON.stringify({ aiTargetLocales: null }));
-    renderWizard({ mode: 'edit', initialEvent: structuredClone(evento), enabledLocales: ['it', 'en', 'de'] });
+    // La versione precedente salvava null per un evento senza traduzione,
+    // senza dire le lingue toccate.
+    localStorage.setItem(
+      'pa-wizard-draft:evt-l',
+      JSON.stringify({ title: evento.event.title, description: evento.event.description, aiTargetLocales: null }),
+    );
+    renderWizard({
+      mode: 'edit',
+      initialEvent: { ...structuredClone(evento), event: { ...evento.event, aiTargetLocales: null } },
+      enabledLocales: ['it', 'en', 'de'],
+      defaultTargetLocales: 'en,de',
+    });
     click(button(w.draftRestore));
+    expect(container.querySelector('.lingue-evento__riga')!.textContent).toContain('English · Deutsch');
     goToStep('review');
     await press(button(w.updateEvent));
-    expect(payload('PUT').aiTargetLocales).toBe('');
+    const corpo = payload('PUT');
+    expect(corpo.aiTargetLocales).toBe('en,de');
+    expect(corpo.textEdits).toEqual({ touched: [] });
+    expect(corpo.title).toMatchObject({ en: 'Test event', de: 'Testveranstaltung' });
+  });
+
+  it('creazione: una bozza di prima senza lingue parte da quelle del sito', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (String(input) === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      return json(200, {});
+    });
+    localStorage.setItem(
+      'pa-wizard-draft:new',
+      JSON.stringify({ title: { it: 'Evento di prova' }, aiTargetLocales: null }),
+    );
+    renderWizard({ enabledLocales: ['it', 'en', 'de'], defaultTargetLocales: 'en,de' });
+    click(button(w.draftRestore));
+    compila();
+    organizzatore();
+    goToStep('review');
+    await press(button(w.saveDraft));
+    expect(payload('POST').aiTargetLocales).toBe('en,de');
   });
 
   it('con il link di conduzione le lingue toccate restano tali dopo il salvataggio', async () => {
@@ -1207,6 +1239,9 @@ describe('lingue dell evento e traduzione automatica', () => {
     goToStep('review');
     await press(button(w.updateEvent));
     expect(payload('PUT').aiTargetLocales).toBe('');
+    // Le lingue tolte, anche senza un testo, sono una scelta: il server le
+    // toglie solo se toccate.
+    expect(payload('PUT').textEdits).toEqual({ touched: ['de', 'en'] });
   });
 
   it('un evento che non aveva scelto lingue parte da quelle del sito, senza aggiungere quelle con un testo', () => {

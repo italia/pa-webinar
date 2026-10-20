@@ -8,7 +8,10 @@
  * che diventa di una persona; di tutte le altre resta il testo salvato, con il
  * suo stato. Cosi' una traduzione arrivata mentre il wizard era aperto non si
  * cancella con il testo che il modulo aveva caricato prima. Una lingua tolta
- * dalle lingue dell'evento perde testo e stato.
+ * dalle lingue dell'evento perde testo e stato solo se e' fra le toccate (chi
+ * l'ha tolta l'ha scelto): una lingua uscita dall'elenco senza che il modulo
+ * la dica toccata (una bozza di prima che non conosceva le lingue) tiene il
+ * testo salvato. Cambiare soltanto l'elenco non cancella mai un testo.
  *
  * Senza `textEdits` (un client dell'API, una scheda di prima) il testo
  * inviato sostituisce tutto, come sempre; le lingue il cui testo cambia
@@ -69,7 +72,8 @@ export function testiDiUnEventoNuovo(opts: {
  * `inviati` sono titolo e descrizione della richiesta (undefined quelli non
  * inviati: restano quelli salvati); `toccate` e' `textEdits.touched`, o null
  * senza `textEdits`. `lingueTolte` sono le lingue uscite dalle lingue
- * dell'evento con questo salvataggio (valgono solo con `textEdits`).
+ * dell'evento con questo salvataggio: valgono solo con `textEdits`, e solo
+ * quelle toccate.
  */
 export function unisciTesti(opts: {
   principale: string;
@@ -133,7 +137,7 @@ export function unisciTesti(opts: {
       stato[l] = cambiata ? diUnaPersona(impronta, ora) : statoSalvato(l);
       continue;
     }
-    if (opts.lingueTolte.includes(l)) continue;
+    if (opts.lingueTolte.includes(l) && opts.toccate.includes(l)) continue;
     if (opts.toccate.includes(l)) {
       scrivi(l, inviatoTitolo[l], inviataDescrizione[l]);
       if (haTesto(l, title, description)) stato[l] = diUnaPersona(impronta, ora);

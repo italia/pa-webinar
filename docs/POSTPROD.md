@@ -1924,13 +1924,16 @@ the languages other than the main one that the person touched on the page
   translation delivered while the wizard was open is not wiped by the text the
   form had loaded;
 - a language removed from the event languages loses its text and its state
+  when it is also touched, and the wizard touches every language it removes
   (for an event that never chose its languages, the earlier list is the site's
-  defaults).
+  defaults); a language that leaves the list without being touched keeps its
+  text and state, so a save that only changes the list never deletes a text.
 
 The wizard's draft in the browser also remembers the touched languages:
 restoring it brings back the text of those languages only, so a translation
 delivered after the draft was written is not replaced by the draft's older
-text.
+text. A draft written by an earlier version without event languages keeps
+the languages of the form.
 
 A request without `textEdits` (an API client, an older page) keeps the former
 behavior: the text sent replaces all languages, and the languages whose text

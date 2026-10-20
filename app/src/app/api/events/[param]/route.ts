@@ -410,7 +410,8 @@ export const PUT = withErrorHandling(async (request, context) => {
   }) => {
     const toccate = data.textEdits?.touched ?? null;
     // Le lingue tolte dalle lingue dell'evento con questo salvataggio (un
-    // evento che non ne aveva scelte aveva quelle predefinite del sito).
+    // evento che non ne aveva scelte aveva quelle predefinite del sito):
+    // perdono il testo solo quelle che il modulo dice toccate (unisciTesti).
     const predefinite = impostazioniTesti?.aiDefaultTargetLocales;
     const prima = lingueDellEvento(salvato.aiTargetLocales, predefinite);
     const dopo =
