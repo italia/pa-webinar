@@ -12926,16 +12926,6 @@ html:has(.wizard-azioni) {
   }
 }
 
-// L'anteprima di un'immagine con formato richiesto: il riquadro delle schede.
-.file-or-url-input__riquadro {
-  display: block;
-  width: 100%;
-  max-width: 20rem;
-  object-fit: cover;
-  border-radius: 4px;
-  background: #e8f0fe;
-}
-
 // ── Copertina della pagina dell'evento ─────────────────────────────────────
 // 16:9 fino a 340 px d'altezza: oltre, l'immagine intera sta al centro e i
 // lati (per un JPEG) li riempie la stessa immagine, sfocata e schiarita.
@@ -13092,5 +13082,329 @@ html:has(.wizard-azioni) {
   &:hover,
   &:focus-visible {
     text-decoration: underline;
+  }
+}
+
+// ── Campo «file o link» (components/ui/file-or-url-input) ──────────────────
+// Un riquadro che e' anche la zona di rilascio (la copertina, nella forma del
+// formato richiesto) o una riga compatta con la miniatura (loghi, favicon,
+// audio, documenti), e sotto il link. Solo tema chiaro.
+.campo-file {
+  --campo-file-bordo: #99c2eb;
+  --campo-file-fondo: #f2f7fc;
+  --campo-file-errore: #a1112e;
+  --campo-file-linea: #d1d9e0;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+}
+.campo-file__etichetta {
+  display: block;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__aiuto {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.875rem;
+  color: var(--app-muted);
+}
+.campo-file__zona {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+  padding: 1rem;
+  border: 2px dashed var(--campo-file-bordo);
+  border-radius: 4px;
+  background: var(--campo-file-fondo);
+  text-align: center;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  &.is-cliccabile {
+    cursor: pointer;
+  }
+  &.is-cliccabile:hover,
+  &.is-sopra {
+    border-color: var(--app-primary);
+  }
+  &.is-sopra {
+    border-style: solid;
+    background: #e3eefa;
+  }
+  &.is-errore {
+    border-color: #cc334d;
+  }
+  &.is-occupato {
+    cursor: progress;
+  }
+}
+// La forma del formato richiesto; se il testo non ci sta (una finestra
+// stretta), il riquadro si allunga invece di tagliarlo.
+.campo-file__zona--riquadro {
+  width: 100%;
+  max-width: 30rem;
+}
+// Pieno: l'immagine riempie il riquadro, il bordo diventa una linea sottile.
+.campo-file__zona--piena {
+  border: 1px solid var(--campo-file-linea);
+  background: #fff;
+}
+.campo-file__zona--riquadro.campo-file__zona--piena {
+  overflow: hidden;
+  padding: 0;
+  background: #e8f0fe;
+}
+.campo-file__zona--avviso {
+  border: 2px solid #e0b46b;
+  background: #fff8ec;
+}
+.campo-file__zona--segnaposto {
+  border: 1px solid var(--campo-file-linea);
+  background: #f5f7f9;
+}
+// Il velo che riceve il trascinamento: vuoto, sopra tutto il riquadro.
+.campo-file__cattura {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.campo-file__vuoto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.campo-file__immagine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.campo-file__immagine--attesa {
+  opacity: 0.45;
+}
+// Sopra l'immagine mentre si carica (o mentre ci si trascina un file nuovo).
+.campo-file__velo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+.campo-file__progresso {
+  width: 60%;
+  height: 6px;
+  background: #fff;
+}
+.campo-file__velo-testo {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__annulla {
+  background: #fff;
+}
+.campo-file__titolo {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__titolo--avviso {
+  color: var(--app-warning-text);
+}
+.campo-file__icona-avviso {
+  fill: var(--app-warning-text);
+}
+.campo-file__oppure {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.campo-file__formati {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+.campo-file__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  max-width: 30rem;
+  margin-top: 0.5rem;
+}
+.campo-file__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.35rem;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.campo-file__nome {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 600;
+  color: var(--app-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.campo-file__nome {
+  color: var(--app-primary);
+}
+.campo-file__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.campo-file__rimuovi {
+  text-decoration: none;
+}
+.campo-file__errore {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--campo-file-errore);
+
+  > .icon {
+    flex: none;
+    margin-top: 0.15rem;
+  }
+  > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+.campo-file__riprova {
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}
+.campo-file__nota {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+// La riga compatta: miniatura, testo, azioni; sotto i 30rem le azioni vanno a
+// capo, a tutta larghezza.
+.campo-file__zona--compatta {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+
+  .campo-file__formati {
+    margin: 0;
+  }
+  .campo-file__progresso {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+  .campo-file__annulla {
+    background: transparent;
+  }
+}
+.campo-file__miniatura {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 56px;
+  overflow: hidden;
+  border: 1px solid var(--campo-file-linea);
+  border-radius: 4px;
+  background: #fff;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+// Un logo trasparente resta visibile su una scacchiera chiara.
+.campo-file__miniatura--scacchi {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eef1f4 25%, transparent 25%, transparent 75%, #eef1f4 75%),
+    linear-gradient(45deg, #eef1f4 25%, transparent 25%, transparent 75%, #eef1f4 75%);
+  background-position: 0 0, 6px 6px;
+  background-size: 12px 12px;
+}
+.campo-file__testo {
+  display: flex;
+  flex: 1 1 10rem;
+  flex-direction: column;
+  min-width: 0;
+}
+.campo-file__audio {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin-top: 0.5rem;
+}
+.campo-file__link {
+  max-width: 30rem;
+  margin-top: 0.75rem;
+}
+.campo-file--compatta .campo-file__link {
+  max-width: none;
+}
+.campo-file__link-etichetta {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+.campo-file__link-campo {
+  position: relative;
+}
+.campo-file__link-icona {
+  position: absolute;
+  top: 50%;
+  left: 0.6rem;
+  transform: translateY(-50%);
+  fill: var(--app-muted);
+  pointer-events: none;
+}
+.campo-file .campo-file__input {
+  min-height: 2.75rem;
+  padding-left: 2rem;
+}
+.campo-file .campo-file__input--avviso:not(:focus) {
+  border-color: #e0b46b;
+}
+// Su un telefono non si trascina: restano il pulsante e i formati. Lo
+// nasconde il CSS, cosi' server e browser disegnano lo stesso campo.
+@media (hover: none) and (pointer: coarse) {
+  .campo-file__trascina {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campo-file__zona,
+  .campo-file .progress-bar {
+    transition: none;
   }
 }

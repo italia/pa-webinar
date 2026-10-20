@@ -21,6 +21,10 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   // Menu e briciole per tutto lo staff; il menu sa quale ruolo ha davanti
   // (ADR-014).
   const session = await getStaffSession(cookieStore);
+  // Il caricamento di file chiede lo storage e una sessione dello staff (la
+  // rotta lo pretende): con il solo link di conduzione si incolla un link.
+  const senzaCaricamento =
+    getFilesStorage() === null ? 'storage' : session ? null : 'sessione';
 
   return (
     <ToastProvider>
@@ -32,8 +36,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
             <AdminBreadcrumb role={session.role} />
           </>
         )}
-        {/* Senza storage per i file i campi "file o URL" offrono solo l'URL. */}
-        <UploadsAvailabilityProvider available={getFilesStorage() !== null}>
+        {/* Dove non si puo' caricare, i campi «file o link» offrono il link. */}
+        <UploadsAvailabilityProvider
+          available={senzaCaricamento === null}
+          reason={senzaCaricamento}
+        >
           {/* Il bersaglio del «vai al contenuto della pagina» del menu. */}
           <div id="admin-content" className="admin-form-surface" tabIndex={-1}>
             {children}

@@ -85,7 +85,7 @@ export async function riduciImmagine(
 }
 
 /** Sotto questa larghezza (sul totale richiesto) l'immagine si vede sgranata. */
-const SOGLIA_PICCOLA = 0.75;
+export const SOGLIA_PICCOLA = 0.75;
 const ZOOM_MAX = 3;
 const PASSO = 10;
 const PASSO_LUNGO = 50;
@@ -336,12 +336,15 @@ export default function ImageCropDialog({
   const stretto = ritaglio.rapporto <= 1;
 
   return (
+    // Scorre solo il corpo: intestazione e pulsanti restano in vista anche su
+    // uno schermo basso, dove «Usa questo ritaglio» finiva sotto la piega.
     <Modal
       isOpen
       toggle={annulla}
       size={stretto ? undefined : 'lg'}
       labelledBy="ritaglio-titolo"
       className="ritaglio-immagine"
+      scrollable
     >
       <ModalHeader closeAriaLabel={tc('close')} toggle={annulla}>
         <span id="ritaglio-titolo">{t('title')}</span>

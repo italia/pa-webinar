@@ -31,9 +31,9 @@ const ORIGIN = 'https://webinar.example.gov.it';
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
 const ctx = { params: Promise.resolve({}) };
 
-async function upload(): Promise<NextRequest> {
+async function upload(tipo = 'image/png'): Promise<NextRequest> {
   const form = new FormData();
-  form.append('file', new File([new Uint8Array(PNG)], 'logo.png', { type: 'image/png' }));
+  form.append('file', new File([new Uint8Array(PNG)], 'logo.png', { type: tipo }));
   const encoded = new Response(form);
   const body = Buffer.from(await encoded.arrayBuffer());
   return new Request(`${ORIGIN}/api/admin/assets/upload-url?type=image`, {
@@ -99,5 +99,13 @@ describe('POST /api/admin/assets/upload-url', () => {
     expect(body.key).toMatch(/^assets\/image\//);
     expect(body.url).toContain('/api/assets/image/');
     expect(livelloDelLog(log)).toBe('info');
+  });
+
+  it('un tipo fuori dalle regole condivise con il campo del browser: 415', async () => {
+    storage.current = { put: vi.fn(async () => undefined) };
+    const res = await POST(await upload('image/heic'), ctx);
+    expect(res.status).toBe(415);
+    expect(((await res.json()) as { code?: string }).code).toBe('UNSUPPORTED_MEDIA_TYPE');
+    expect(storage.current.put).not.toHaveBeenCalled();
   });
 });
