@@ -1,6 +1,5 @@
-publiccodeYmlVersion: "0.4"
-name: pa-webinar
-applicationSuite: pa-webinar
+publiccodeYmlVersion: "0"
+name: PA Webinar
 url: "https://github.com/italia/pa-webinar"
 landingURL: "https://github.com/italia/pa-webinar"
 softwareVersion: "0.13.0"
@@ -11,9 +10,15 @@ platforms:
   - web
 
 categories:
-  - collaboration
+  - event-management
   - video-conferencing
+  - web-conferencing
+  - collaboration
   - communications
+
+organisation:
+  uri: "urn:x-italian-pa:pcm"
+  name: Dipartimento per la Trasformazione Digitale
 
 usedBy:
   - Dipartimento per la Trasformazione Digitale
@@ -26,11 +31,17 @@ dependsOn:
       versionMin: "2.0"
       optional: false
     - name: PostgreSQL
-      versionMin: "15"
+      versionMin: "16"
+      optional: false
+    - name: Redis
+      versionMin: "7"
       optional: false
     - name: Node.js
       versionMin: "20"
       optional: false
+
+supports:
+  - id: "alias:gdpr"
 
 maintenance:
   type: internal
@@ -42,7 +53,6 @@ maintenance:
 legal:
   license: EUPL-1.2
   mainCopyrightOwner: Dipartimento per la Trasformazione Digitale
-  repoOwner: Dipartimento per la Trasformazione Digitale
 
 localisation:
   localisationReady: true
@@ -72,52 +82,57 @@ localisation:
     - sl
     - sv
 
-it:
-  countryExtensionVersion: "0.2"
-  conforme:
-    lineeGuidaDesign: true
-    modelloInteroperabilita: true
-    misureMinimeSicurezza: true
-    gdpr: true
+IT:
+  countryExtensionVersion: "1.0"
   piattaforme:
     spid: false
     cie: false
     anpr: false
     pagopa: false
+    io: false
 
 description:
   it:
-    genericName: Piattaforma eventi digitali
     shortDescription: >
-      Piattaforma open-source per eventi pubblici digitali della PA, basata su Jitsi Meet e design system .italia.
+      Piattaforma open source per eventi pubblici digitali della PA, basata su Jitsi Meet e sul design system .italia.
     longDescription: >
-      pa-webinar è una piattaforma web per organizzare e gestire eventi pubblici digitali — webinar,
-      presentazioni, meeting pubblici. Utilizza Jitsi Meet come motore video/audio self-hosted e il
-      design system .italia per l'interfaccia utente.
+      PA Webinar è una piattaforma web con cui le pubbliche amministrazioni organizzano eventi
+      pubblici online (webinar, presentazioni, incontri aperti) sulla propria infrastruttura. Usa
+      Jitsi Meet, installato in proprio, come motore audio e video e il design system .italia
+      (Bootstrap Italia e design-react-kit) per l'interfaccia, disponibile nelle 24 lingue
+      ufficiali dell'Unione europea.
 
-      Architettura scalabile orizzontalmente su Kubernetes: capacità per singolo evento di ~300 partecipanti
-      con un bridge JVB standard (estendibile tramite bridge cascading); capacità totale della piattaforma
-      limitata solo dalle risorse del cluster, con auto-scaling dei bridge JVB e scale-to-zero quando
-      inattivo.
+      Ogni evento ha una pagina pubblica, un'iscrizione con consensi mai preselezionati e una sala
+      che si apre e si chiude secondo il calendario. In sala il pubblico partecipa con chat,
+      domande con voto, sondaggi, word cloud, reazioni e mani alzate; moderatori e relatori entrano
+      con un link, senza account. Dopo l'evento la registrazione si pubblica nella
+      libreria video e la post-produzione AI facoltativa, eseguita dentro il cluster, aggiunge
+      sottotitoli, trascrizione, sintesi, traduzioni e doppiaggio.
 
-      Funzionalità principali: video conferenza integrata, Q&A con upvote, sondaggi, word cloud e
-      reazioni live, registrazione partecipanti GDPR-compliant, registrazione video, moderazione
-      avanzata, inviti email con allegato iCal, interfaccia multilingue (24 lingue UE), design system
-      .italia, API REST documentate in OpenAPI 3, cloud-native (Kubernetes, Helm).
+      Si installa su Kubernetes con un unico chart Helm, da un server k3s a un cluster gestito.
+      Una conferenza resta su un solo bridge (Jitsi Videobridge): più bridge portano più
+      conferenze e, nel profilo completo, si accendono prima degli eventi in calendario e scendono
+      a zero tra un evento e l'altro. Marchio, lingue offerte e modalità di iscrizione si
+      configurano a runtime, senza ricompilare.
     documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
     apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/docs/architecture/api.md#openapi"
     features:
-      - Video conferenza con Jitsi Meet, scalabile orizzontalmente su Kubernetes
-      - Q&A con sistema di upvote
-      - Sondaggi, word cloud e reazioni live
-      - Registrazione partecipanti GDPR-compliant
-      - Registrazione video con consenso esplicito
-      - Moderazione avanzata (mute, mani alzate, chat on/off)
-      - Email inviti con allegato iCal
-      - Interfaccia multilingue (24 lingue UE)
-      - Design system .italia (Bootstrap Italia)
-      - API REST documentate in OpenAPI 3
-      - Cloud-native (Kubernetes, Helm, scale-to-zero)
+      - Pagina pubblica dell'evento, iscrizione con consensi mai preselezionati, lista degli invitati
+      - Email di conferma con file di calendario e promemoria
+      - Sala Jitsi Meet integrata nel portale, con sala d'attesa e verifica dei dispositivi
+      - Chat, Q&A con voto, sondaggi, word cloud, reazioni e coda delle mani alzate
+      - Moderatori e relatori con magic link, senza account
+      - Controllo di microfoni e videocamere dei partecipanti, con passaggio di parola
+      - Registrazione video, anche con una traccia audio per partecipante e il suo consenso
+      - Libreria video, statistiche dell'evento, questionari prima e dopo l'evento
+      - Post-produzione AI nel cluster, facoltativa, senza API esterne
+      - Sottotitoli, trascrizione, sintesi, traduzioni e doppiaggio delle registrazioni
+      - I partecipanti possono chiedere copia o cancellazione dei propri dati
+      - Account nominali per amministratori e organizzatori, con accesso tramite link monouso
+      - Interfaccia in 24 lingue UE, marchio e impostazioni configurabili a runtime
+      - Pagine di trasparenza, stato del sistema, changelog con SBOM, inventario dei servizi
+      - Chart Helm per Kubernetes, bridge con scale-to-zero facoltativo
+      - API REST con documento OpenAPI 3.1, a copertura parziale
     screenshots:
       - docs/screenshots/home.png
       - docs/screenshots/events.png
@@ -126,28 +141,50 @@ description:
       - docs/screenshots/status.png
       - docs/screenshots/changelog.png
   en:
-    genericName: Digital events platform
     shortDescription: >
-      Open-source platform for public digital events, built on Jitsi Meet and the Italian .italia design system.
+      Open-source platform for public digital events of public administrations, built on Jitsi Meet and the .italia design system.
     longDescription: >
-      pa-webinar is a web platform for organizing and managing public digital events — webinars,
-      presentations, public meetings. It uses Jitsi Meet as a self-hosted video/audio engine and the
-      .italia design system for the user interface.
+      PA Webinar is a web platform that public administrations use to run public online events
+      (webinars, presentations, open meetings) on their own infrastructure. It uses self-hosted
+      Jitsi Meet as its audio and video engine and the .italia design system (Bootstrap Italia
+      and design-react-kit) for the interface, which is available in the 24 official languages of
+      the European Union.
 
-      Horizontally scalable architecture on Kubernetes: per-event capacity ~300 participants on a
-      standard JVB bridge (extendable via bridge cascading); total platform capacity bounded only by
-      cluster resources, with auto-scaling JVB bridges and scale-to-zero when idle.
+      Each event has a public page, registration with consents that are never pre-ticked, and a
+      room that opens and closes on schedule. In the room the audience takes part through chat,
+      Q&A with upvotes, polls, word cloud, reactions and raised hands; moderators and speakers
+      join with a link and need no account. After the event the recording is published
+      to the video library, and the optional AI post-production, which runs inside the cluster,
+      adds subtitles, a transcript, a summary, translations and dubbing.
+
+      It installs on Kubernetes with a single Helm chart, from one k3s server to a managed
+      cluster. A conference stays on one bridge (Jitsi Videobridge): more bridges carry more
+      conferences and, in the full profile, they start before scheduled events and scale to zero
+      between them. Branding, offered languages and registration mode are configured at runtime,
+      without a rebuild.
     documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
     apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/docs/architecture/api.md#openapi"
     features:
-      - Video conferencing with Jitsi Meet, horizontally scalable on Kubernetes
-      - Q&A with upvote system
-      - Live polls, word cloud and reactions
-      - GDPR-compliant participant registration
-      - Video recording with explicit consent
-      - Advanced moderation (mute, hand raise, chat toggle)
-      - Email invitations with iCal attachment
-      - Multilingual interface (24 EU languages)
-      - .italia design system (Bootstrap Italia)
-      - REST APIs documented in OpenAPI 3
-      - Cloud-native (Kubernetes, Helm, scale-to-zero)
+      - Public event page, registration with consents never pre-ticked, invitation list
+      - Confirmation emails with calendar files, and reminders
+      - Jitsi Meet room embedded in the portal, with a waiting room and a device check
+      - Chat, Q&A with upvotes, polls, word cloud, reactions and a raised-hand queue
+      - Moderators and speakers join through a magic link, with no account
+      - Control of participants' microphones and cameras, giving the floor
+      - Video recording, optionally with one audio track per participant, with their consent
+      - Video library, event analytics, pre-event and post-event questionnaires
+      - Optional AI post-production inside the cluster, with no external APIs
+      - Subtitles, transcripts, summaries, translations and dubbing of recordings
+      - Participants can get a copy of their data or have it erased
+      - Named accounts for administrators and organizers, signing in with a one-time link
+      - Interface in 24 EU languages, branding and settings configurable at runtime
+      - Transparency pages, system status, changelog with SBOMs, service inventory
+      - Helm chart for Kubernetes, with optional bridge scale-to-zero
+      - REST APIs with an OpenAPI 3.1 document, partial coverage
+    screenshots:
+      - docs/screenshots/home.png
+      - docs/screenshots/events.png
+      - docs/screenshots/video-library.png
+      - docs/screenshots/service-inventory.png
+      - docs/screenshots/status.png
+      - docs/screenshots/changelog.png
