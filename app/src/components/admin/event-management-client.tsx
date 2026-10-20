@@ -174,6 +174,9 @@ interface EventData {
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
+  /** La registrazione del video dell'evento, quando in sala si è presentato un
+   *  PDF: le sue slide sincronizzate si regolano dalla post-produzione. */
+  slidesRecordingId?: string | null;
   /** L'evento salva le frasi dei sottotitoli per la trascrizione. */
   captionsTranscriptEnabled: boolean;
   postEventPublic: boolean; postEventPublicUntil: string | null;
@@ -1621,6 +1624,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             recordingDeleteAfterDays: event.recordingDeleteAfterDays,
             moderatorToken: event.moderatorToken,
           }}
+          slidesRecordingId={event.slidesRecordingId ?? null}
         />
       </div>
   );

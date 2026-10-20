@@ -2238,6 +2238,16 @@ model Recording {
   // della trascrizione. La manda il registratore multitraccia col manifest;
   // senza, la cronologia della sala usa createdAt come zero approssimato.
   mediaStartedAt DateTime? @map("media_started_at")
+
+  // Le slide presentate in sala accanto a questo video, sulla pagina pubblica
+  // dell'evento (lib/presentation/recording-slides): accese di predefinito,
+  // si vedono solo se in sala e' stato presentato un PDF che c'e' ancora ed e'
+  // visibile dopo l'evento. `slidesOffsetSec` sposta i cambi di slide sul
+  // video, positivo piu' tardi e negativo prima, quando lo zero dei tempi e'
+  // fuori di qualche secondo.
+  slidesEnabled   Boolean @default(true) @map("slides_enabled")
+  slidesOffsetSec Int     @default(0) @map("slides_offset_sec")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

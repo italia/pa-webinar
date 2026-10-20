@@ -25,9 +25,11 @@ import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
 import ArchivePanel from './archive-panel';
 import AiReliabilityPanel from './ai-reliability-panel';
+import RecordingSlidesPanel from './recording-slides-panel';
+import { RECORDING_TABS, type RecordingTab } from './recording-tabs';
 import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
-type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive' | 'reliability';
+type TabKey = RecordingTab;
 
 function fmtDuration(sec: number | null): string {
   if (sec == null) return '–';
@@ -46,7 +48,10 @@ export default function RecordingManageClient({
   createdAt,
   soloSottotitoli = false,
   eventId,
+  initialTab = 'overview',
 }: {
+  /** La scheda aperta all'arrivo. */
+  initialTab?: TabKey;
   /** La registrazione non ha un file: la trascrizione viene dai sottotitoli live. */
   soloSottotitoli?: boolean;
   eventId?: string;
@@ -63,7 +68,7 @@ export default function RecordingManageClient({
   const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
-  const [tab, setTab] = useState<TabKey>('overview');
+  const [tab, setTab] = useState<TabKey>(initialTab);
   const [rerunning, setRerunning] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [aggiornando, setAggiornando] = useState(false);
@@ -193,14 +198,17 @@ export default function RecordingManageClient({
     }
   }
 
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: 'overview', label: t('ov.tab') },
-    { key: 'transcript', label: t('manageTabTranscript') },
-    { key: 'summary', label: t('manageTabSummary') },
-    { key: 'translations', label: t('manageTabTranslations') },
-    { key: 'archive', label: t('manageTabArchive') },
-    { key: 'reliability', label: t('manageTabReliability') },
-  ];
+  // Una per scheda: il compilatore pretende l'etichetta di ognuna (recording-tabs).
+  const etichette: Record<TabKey, string> = {
+    overview: t('ov.tab'),
+    transcript: t('manageTabTranscript'),
+    summary: t('manageTabSummary'),
+    translations: t('manageTabTranslations'),
+    slides: t('manageTabSlides'),
+    archive: t('manageTabArchive'),
+    reliability: t('manageTabReliability'),
+  };
+  const tabs = RECORDING_TABS.map((key) => ({ key, label: etichette[key] }));
 
   return (
     <div className="container py-4">
@@ -299,6 +307,7 @@ export default function RecordingManageClient({
         {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} status={status} />}
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} status={status} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
+        {tab === 'slides' && <RecordingSlidesPanel recordingId={recordingId} />}
         {tab === 'archive' && <ArchivePanel recordingId={recordingId} />}
         {tab === 'reliability' && <AiReliabilityPanel recordingId={recordingId} />}
       </div>

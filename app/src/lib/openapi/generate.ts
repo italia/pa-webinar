@@ -682,6 +682,29 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/recording/slides',
+  tags: ['Recording'],
+  summary: 'The PDF of a slide shown beside the published recording',
+  description:
+    'No credential. Answers only while the concluded event page is public, shows the event ' +
+    'materials and has its video published, and only for a material (`m`) whose pages the page ' +
+    'shows beside the video: ' +
+    'presented in the room during the recording, still an uploaded PDF of the event, visible after ' +
+    'the event, with the synced slides switched on for that recording. Any other id answers 404. ' +
+    'The file is streamed from the files storage with `Cache-Control: private, no-store`.',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ m: z.string().uuid() }),
+  },
+  responses: {
+    200: { description: 'application/pdf' },
+    404: { description: 'Not a slide shown beside the published video' },
+    503: { description: 'Files storage not configured' },
+  },
+});
+
+registry.registerPath({
   method: 'post',
   path: '/api/admin/login',
   tags: ['Admin'],

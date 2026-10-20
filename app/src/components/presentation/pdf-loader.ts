@@ -4,8 +4,10 @@
  * pdf.js (Mozilla, Apache-2.0) per il visore delle presentazioni, servito
  * dall'app stessa: nessun CDN.
  *
- * Si carica solo quando qualcuno presenta, con un import dinamico: chi non
- * vede mai una presentazione non scarica la libreria. È la versione «legacy»
+ * Si carica con un import dinamico solo quando serve: in sala quando
+ * qualcuno presenta, sulla pagina di un evento concluso quando accanto al
+ * video ci sono le slide presentate. Chi non vede mai un PDF non scarica la
+ * libreria. È la versione «legacy»
  * del pacchetto, quella per i browser meno recenti: il pubblico di un evento
  * della PA arriva anche da dispositivi aggiornati di rado.
  *

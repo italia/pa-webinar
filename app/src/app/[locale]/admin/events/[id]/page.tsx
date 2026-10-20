@@ -13,6 +13,7 @@ import { durataInOre } from '@/lib/capacity/model';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
+import { recordingOfEventVideo } from '@/lib/presentation/recording-slides-data';
 import EventManagementClient from '@/components/admin/event-management-client';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventPageMetadata } from '@/components/admin/admin-page-title';
@@ -124,6 +125,21 @@ export default async function EventManagePage({
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const settings = await getSettings();
 
+  // Le slide sincronizzate si regolano sulla registrazione del video
+  // dell'evento, dalla pagina della post-produzione (solo staff): il link
+  // compare quando quel video e' della sala e in sala si e' presentato un PDF.
+  const [videoDellaSala, presentazione] =
+    staff && event.recordingUrl
+      ? await Promise.all([
+          recordingOfEventVideo(event.id, event.recordingUrl),
+          prisma.liveAction.findFirst({
+            where: { eventId: event.id, kind: 'presentation.started' },
+            select: { id: true },
+          }),
+        ])
+      : [null, null];
+  const slidesRecordingId = videoDellaSala && presentazione ? videoDellaSala.id : null;
+
   const serialized = {
     id: event.id,
     slug: event.slug,
@@ -164,6 +180,7 @@ export default async function EventManagePage({
     // Gated separately from recordingUrl: an externally/manually-set recordingUrl
     // has no Recording row, so "Generate AI" would 404.
     hasRecordingRow: event._count.recordings > 0,
+    slidesRecordingId,
     captionsTranscriptEnabled: event.captionsTranscriptEnabled,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,

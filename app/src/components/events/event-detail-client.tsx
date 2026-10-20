@@ -30,6 +30,8 @@ import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
 import MiniTranscript from '@/components/events/mini-transcript';
 import BookmarksPanel from '@/components/events/bookmarks-panel';
+import RecordingSlides from '@/components/presentation/recording-slides';
+import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import type { ReportView } from '@/lib/report/types';
@@ -156,6 +158,9 @@ interface EventDetailClientProps {
   feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
   /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
   report?: ReportView | null;
+  /** Le slide presentate in sala da mostrare accanto al video pubblicato
+   *  (lib/presentation/recording-slides-data); null se non ce ne sono. */
+  recordingSlides?: RecordingSlidesView | null;
 }
 
 export default function EventDetailClient({
@@ -177,6 +182,7 @@ export default function EventDetailClient({
   hasPostEventQuestionnaire = false,
   feedbackProof = null,
   report = null,
+  recordingSlides = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tr = useTranslations('registration');
@@ -352,6 +358,88 @@ export default function EventDetailClient({
     };
   }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug, locale]);
 
+  // Il video pubblicato di un evento concluso, con cio' che lo accompagna
+  // (chi parla, la trascrizione breve, il doppiaggio, lo scaricamento). La
+  // registrazione passa dal player del portale (/api/events/[slug]/recording).
+  const videoPubblicato = isEnded && !!event.recordingUrl;
+  const bloccoVideo = videoPubblicato ? (
+    <div className="mb-4">
+      <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
+        <VideoPlayer
+          ref={playerRef}
+          src={`/api/events/${event.slug}/recording`}
+          title={title}
+          poster={event.imageUrl ?? undefined}
+          subtitleTracks={postprodMeta?.subtitleTracks}
+          audioTracks={postprodMeta?.audioTracks}
+          onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
+        />
+        {postprodMeta?.segmentsLite && (
+          <NowSpeakingChip
+            playerRef={playerRef}
+            segments={postprodMeta.segmentsLite}
+          />
+        )}
+      </div>
+      <VideoMiniPlayer
+        playerRef={playerRef}
+        anchorRef={playerAnchorRef}
+        title={title}
+        poster={event.imageUrl}
+      />
+
+      {/* Mini-transcript inline sotto al video: 3 righe
+          (precedente / attiva / successiva) seguono il
+          playhead in tempo reale. L'utente vede chi parla e
+          cosa dice senza dover scrollare al transcript
+          completo (che resta disponibile nelle tab più sotto). */}
+      {postprodMeta?.segmentsLite && (
+        <MiniTranscript
+          playerRef={playerRef}
+          segments={postprodMeta.segmentsLite}
+        />
+      )}
+
+      {/* Scoperibilità del doppiaggio: nota sobria sotto al video
+          che indica al visitatore dove cliccare per cambiare
+          audio. Renderizzata solo se ci sono tracce doppiate. */}
+      {postprodMeta?.audioTracks && postprodMeta.audioTracks.length > 0 && (
+        <div
+          className="d-flex align-items-start gap-2 mb-3"
+          style={{
+            fontSize: '0.82rem',
+            color: 'var(--app-muted)',
+            background: '#f7faff',
+            border: '1px solid #d6e3f1',
+            borderRadius: 8,
+            padding: '8px 12px',
+          }}
+        >
+          <Icon icon="it-hearing" size="sm" color={undefined} />
+          <span>
+            {tPostprod('dubAvailableHint', {
+              langs: postprodMeta.audioTracks
+                .map((a) => locName(a.language, locale))
+                .join(', '),
+            })}
+          </span>
+        </div>
+      )}
+
+      <div className="mt-2">
+        <a
+          href={`/api/events/${event.slug}/recording`}
+          download
+          className="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+          style={{ fontSize: '0.9rem' }}
+        >
+          <Icon icon="it-download" size="sm" />
+          {tv('download')}
+        </a>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className="container py-5">
       <div className="mb-4">
@@ -410,6 +498,21 @@ export default function EventDetailClient({
 
       <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
 
+      {/* Con le slide presentate in sala il video sale sopra le colonne, a
+          tutta larghezza: accanto le slide sul desktop, sotto al telefono. */}
+      {videoPubblicato && recordingSlides && (
+        <div className="row g-4 mb-2">
+          <div className="col-lg-7">{bloccoVideo}</div>
+          <div className="col-lg-5 mb-4">
+            <RecordingSlides
+              playerRef={playerRef}
+              cues={recordingSlides.cues}
+              materials={recordingSlides.materials}
+            />
+          </div>
+        </div>
+      )}
+
       {/* ─── Content + Sidebar ─── */}
       <Row>
         <Col lg={8} className="mb-4 mb-lg-0">
@@ -450,83 +553,8 @@ export default function EventDetailClient({
               </div>
             </div>
           )}
-          {isEnded && event.recordingUrl && (
-            <div className="mb-4">
-              <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
-                <VideoPlayer
-                  ref={playerRef}
-                  src={`/api/events/${event.slug}/recording`}
-                  title={title}
-                  poster={event.imageUrl ?? undefined}
-                  subtitleTracks={postprodMeta?.subtitleTracks}
-                  audioTracks={postprodMeta?.audioTracks}
-                  onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
-                />
-                {postprodMeta?.segmentsLite && (
-                  <NowSpeakingChip
-                    playerRef={playerRef}
-                    segments={postprodMeta.segmentsLite}
-                  />
-                )}
-              </div>
-              <VideoMiniPlayer
-                playerRef={playerRef}
-                anchorRef={playerAnchorRef}
-                title={title}
-                poster={event.imageUrl}
-              />
-
-              {/* Mini-transcript inline sotto al video: 3 righe
-                  (precedente / attiva / successiva) seguono il
-                  playhead in tempo reale. L'utente vede chi parla e
-                  cosa dice senza dover scrollare al transcript
-                  completo (che resta disponibile nelle tab più sotto). */}
-              {postprodMeta?.segmentsLite && (
-                <MiniTranscript
-                  playerRef={playerRef}
-                  segments={postprodMeta.segmentsLite}
-                />
-              )}
-
-              {/* Scoperibilità del doppiaggio: nota sobria sotto al video
-                  che indica al visitatore dove cliccare per cambiare
-                  audio. Renderizzata solo se ci sono tracce doppiate. */}
-              {postprodMeta?.audioTracks && postprodMeta.audioTracks.length > 0 && (
-                <div
-                  className="d-flex align-items-start gap-2 mb-3"
-                  style={{
-                    fontSize: '0.82rem',
-                    color: 'var(--app-muted)',
-                    background: '#f7faff',
-                    border: '1px solid #d6e3f1',
-                    borderRadius: 8,
-                    padding: '8px 12px',
-                  }}
-                >
-                  <Icon icon="it-hearing" size="sm" color={undefined} />
-                  <span>
-                    {tPostprod('dubAvailableHint', {
-                      langs: postprodMeta.audioTracks
-                        .map((a) => locName(a.language, locale))
-                        .join(', '),
-                    })}
-                  </span>
-                </div>
-              )}
-
-              <div className="mt-2">
-                <a
-                  href={`/api/events/${event.slug}/recording`}
-                  download
-                  className="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-                  style={{ fontSize: '0.9rem' }}
-                >
-                  <Icon icon="it-download" size="sm" />
-                  {tv('download')}
-                </a>
-              </div>
-            </div>
-          )}
+          {/* Senza slide il video sta qui; con le slide sta sopra, accanto a loro. */}
+          {videoPubblicato && !recordingSlides && bloccoVideo}
           {/* // TODO v0.5.0: Live catch-up player with HLS */}
 
           {/* Il resoconto dell'evento, pubblicato dallo staff: dopo il video,

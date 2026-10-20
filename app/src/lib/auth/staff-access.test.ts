@@ -62,6 +62,8 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/postprod/recordings/[id]/media/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/recordings/[id]/reliability/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/recordings/[id]/rerun/route.ts': 'registrazione di un proprio evento',
+  'api/admin/postprod/recordings/[id]/slides/route.ts': 'slide sincronizzate della registrazione di un proprio evento',
+  'api/admin/postprod/recordings/[id]/slides/file/route.ts': 'PDF delle slide per l’anteprima, di un proprio evento',
   'api/admin/postprod/recordings/[id]/summary/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/recordings/[id]/tracks/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/recordings/[id]/transcript/route.ts': 'registrazione di un proprio evento',
