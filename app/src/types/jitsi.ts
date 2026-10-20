@@ -92,6 +92,10 @@ export interface JitsiEventMap {
    *  i client, anche con i sottotitoli nativi di Jitsi nascosti. L'IFrame API
    *  lo consegna dentro `data`. */
   transcriptionChunkReceived: [{ data?: JitsiTranscriptionChunk }];
+  /** Un errore della videochiamata. `type` e `isFatal` li calcola Jitsi: un
+   *  errore fatale della connessione o della conferenza è quello per cui
+   *  ricaricherebbe la propria pagina (lib/jitsi/riconnessione). */
+  errorOccurred: [{ error?: { name?: string; message?: string; type?: string; isFatal?: boolean } }];
 }
 
 /**

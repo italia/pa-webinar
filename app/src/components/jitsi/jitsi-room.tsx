@@ -32,6 +32,7 @@ import {
   leggiSfondo,
   SFONDO_PREDEFINITO,
 } from '@/lib/jitsi/virtual-background';
+import { erroreDaRientro } from '@/lib/jitsi/riconnessione';
 import { InsecureContextNotice, useInsecureContext } from '@/components/live/insecure-context';
 
 import { loadExternalApi } from './external-api-loader';
@@ -106,6 +107,17 @@ interface JitsiRoomProps {
    *  drop. The parent uses it as the authoritative "the user left" signal so
    *  the native hangup doesn't get mistaken for a network blip and reconnected. */
   onReadyToClose?: () => void;
+  /** La conferenza è persa: un errore che Jitsi considera fatale, della
+   *  connessione o della conferenza. Jitsi mostrerebbe «Sei stato
+   *  disconnesso» e ricaricherebbe la propria pagina dopo 10-30 secondi: la
+   *  sala rientra prima, da sé (lib/jitsi/riconnessione). */
+  onConnectionLost?: () => void;
+  /** Microfono o videocamera accesi o spenti, da chiunque: la sala lo ricorda
+   *  per rientrare, dopo una caduta, come si era. */
+  onMediaChanged?: (mezzo: Medium, muto: boolean) => void;
+  /** Rientro dopo una caduta: lo stato lo mostra la sala, quindi niente
+   *  spinner di caricamento qui. */
+  inRientro?: boolean;
   onParticipantCountChanged?: (count: number) => void;
   onRecordingStatusChanged?: (isRecording: boolean) => void;
   onApiReady?: (api: JitsiAPI) => void;
@@ -155,6 +167,9 @@ export default function JitsiRoom({
   onReady,
   onLeft,
   onReadyToClose,
+  onConnectionLost,
+  onMediaChanged,
+  inRientro = false,
   onParticipantCountChanged,
   onRecordingStatusChanged,
   onApiReady,
@@ -194,6 +209,8 @@ export default function JitsiRoom({
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
   const onReadyToCloseRef = useRef(onReadyToClose);
+  const onConnectionLostRef = useRef(onConnectionLost);
+  const onMediaChangedRef = useRef(onMediaChanged);
   const onParticipantCountChangedRef = useRef(onParticipantCountChanged);
   const onRecordingStatusChangedRef = useRef(onRecordingStatusChanged);
   const onApiReadyRef = useRef(onApiReady);
@@ -201,6 +218,8 @@ export default function JitsiRoom({
   useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   useEffect(() => { onLeftRef.current = onLeft; }, [onLeft]);
   useEffect(() => { onReadyToCloseRef.current = onReadyToClose; }, [onReadyToClose]);
+  useEffect(() => { onConnectionLostRef.current = onConnectionLost; }, [onConnectionLost]);
+  useEffect(() => { onMediaChangedRef.current = onMediaChanged; }, [onMediaChanged]);
   useEffect(() => { onParticipantCountChangedRef.current = onParticipantCountChanged; }, [onParticipantCountChanged]);
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
@@ -563,8 +582,15 @@ export default function JitsiRoom({
           sfondoConsegnato = true;
         };
 
+        // Questa chiamata è entrata in conferenza, e da allora non l'ha persa:
+        // decide cosa riferire alla sala per il rientro dopo una caduta.
+        let entrata = false;
+        let persa = false;
+
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
+          entrata = true;
+          persa = false;
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
           if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
@@ -715,8 +741,21 @@ export default function JitsiRoom({
           if (muto === false && nostro) basta[m] = true;
           if (muto) setTimeout(() => void riapri(m), 300);
         };
-        api.addListener('audioMuteStatusChanged', (e: { muted?: boolean }) => cambioStato('audio', e?.muted));
-        api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => cambioStato('video', e?.muted));
+        // Lo stato dei mezzi, per la sala: dopo una caduta si rientra come si
+        // era. Non quello di una conferenza già persa: smontandosi, Jitsi può
+        // riferire mezzi spenti che la persona non ha spento.
+        const riferisciMezzo = (m: Medium, muto: boolean | undefined): void => {
+          if (disposedRef.current || persa || typeof muto !== 'boolean') return;
+          onMediaChangedRef.current?.(m, muto);
+        };
+        api.addListener('audioMuteStatusChanged', (e: { muted?: boolean }) => {
+          cambioStato('audio', e?.muted);
+          riferisciMezzo('audio', e?.muted);
+        });
+        api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
+          cambioStato('video', e?.muted);
+          riferisciMezzo('video', e?.muted);
+        });
         api.addListener('toolbarButtonClicked', (e: { key: string }) => {
           if (e?.key === 'microphone') basta.audio = true;
           if (e?.key === 'camera') basta.video = true;
@@ -761,6 +800,7 @@ export default function JitsiRoom({
 
         api.addListener('videoConferenceLeft', () => {
           if (disposedRef.current) return;
+          persa = true;
           if (nsEnforceTimerRef.current) {
             clearInterval(nsEnforceTimerRef.current);
             nsEnforceTimerRef.current = null;
@@ -779,6 +819,18 @@ export default function JitsiRoom({
         api.addListener('readyToClose', () => {
           if (disposedRef.current) return;
           onReadyToCloseRef.current?.();
+        });
+
+        // Conferenza persa (sessione scaduta sul server, Prosody o Jicofo
+        // riavviati, bridge perso): Jitsi aprirebbe la finestra «Sei stato
+        // disconnesso» e ricaricherebbe la propria pagina con le scelte di
+        // partenza. Le cadute brevi non arrivano qui: le riprende Jitsi. Solo
+        // dopo essere entrati: un errore all'ingresso (il bridge che si sta
+        // accendendo) resta a Jitsi e agli avvisi della sala d'ingresso.
+        api.addListener('errorOccurred', (e) => {
+          if (disposedRef.current || !erroreDaRientro(e)) return;
+          persa = true;
+          if (entrata) onConnectionLostRef.current?.();
         });
 
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
@@ -899,7 +951,7 @@ export default function JitsiRoom({
         </div>
       ) : (
         <>
-          {loadState === 'loading' && !revealedWhileLoading && (
+          {loadState === 'loading' && !revealedWhileLoading && !inRientro && (
             <div className="position-absolute top-50 start-50 translate-middle text-center">
               <Spinner active double />
               <p className="mt-3 text-white-50">{t('connecting')}</p>
