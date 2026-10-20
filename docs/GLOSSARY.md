@@ -230,9 +230,9 @@ editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
 **Event wizard**: the form that creates or edits an event, after four
-questions on its format: four steps (**Event**, **When**, **People**,
-**Summary**) and the **Advanced settings** with what the format or template
-has already chosen.
+questions on its format: five steps (**Event**, **When**, **People**,
+**Programme**, optional and not for instant calls, and **Summary**) and the
+**Advanced settings** with what the format or template has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -985,7 +985,8 @@ these docs and the code use *organizer*.
 | Evento | **Event** | event wizard, step 1 |
 | Quando | **When** | event wizard, step 2 |
 | Persone | **People** | event wizard, step 3 |
-| Riepilogo | **Summary** | event wizard, step 4 |
+| Programma | **Programme** | event wizard, step 4 (optional, not for instant calls) |
+| Riepilogo | **Summary** | event wizard, step 5 |
 | Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
 | Duplica per la prossima | **Duplicate for next time** | duplicate as the next occurrence |
