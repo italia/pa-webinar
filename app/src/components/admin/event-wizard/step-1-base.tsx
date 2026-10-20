@@ -13,7 +13,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import EventTitle from '@/components/events/event-title';
-import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import LocaleTabBar, { type StatoScheda as AspettoScheda } from '@/components/ui/locale-tab-bar';
 import { MarkdownEditor } from '@/components/ui/markdown';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import RecurrencePicker from '@/components/admin/recurrence-picker';
@@ -29,6 +29,7 @@ import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import { fondoEtichettaPiena } from '@/lib/utils/tag-color';
 
 import NuovaEtichetta, { type EtichettaCreata } from './nuova-etichetta';
+import { nomeLingua } from './text-translation';
 import { useFasciaCopertina } from './use-fascia-copertina';
 
 export interface Step1Value {
@@ -84,11 +85,17 @@ interface Props {
   /** L'amministrazione crea una categoria nuova da qui, gia' scelta per
    *  l'evento: la riceve chi tiene l'elenco delle categorie. */
   onEtichettaCreata?: (etichetta: EtichettaCreata) => void;
-  /** La traduzione automatica di titolo e descrizione (text-translation.tsx),
-   *  sotto le lingue: solo se l'installazione la offre. */
-  traduzione?: ReactNode;
-  /** Le lingue riempite dalla traduzione automatica, da rileggere. */
-  machineLocales?: string[];
+  /**
+   * Le lingue dell'evento (text-translation.tsx): la riga «Lingue
+   * dell'evento» sopra le schede, le schede con il loro stato scritto e
+   * l'avviso dentro la scheda. Senza, le schede sono le lingue del sito.
+   */
+  lingue?: {
+    riga: ReactNode;
+    schede: string[];
+    aspetto: Record<string, AspettoScheda>;
+    pannello: (lingua: string) => ReactNode;
+  };
 }
 
 export default function Step1Base({
@@ -102,8 +109,7 @@ export default function Step1Base({
   siteDefaultVideoQuality,
   parte = 'evento',
   onEtichettaCreata,
-  traduzione,
-  machineLocales = [],
+  lingue,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
@@ -115,7 +121,10 @@ export default function Step1Base({
   const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
   const tTrad = useTranslations('admin.textTranslation');
-  const [contentLocale, setContentLocale] = useState(defaultLocale);
+  const schede = lingue?.schede ?? enabledLocales;
+  const [linguaScelta, setContentLocale] = useState(defaultLocale);
+  // Una lingua tolta dalle schede (tolta dall'evento) lascia il posto alla principale.
+  const contentLocale = schede.includes(linguaScelta) ? linguaScelta : defaultLocale;
   // Titolo e descrizione sono obbligatori solo nella lingua predefinita:
   // l'asterisco compare sulla sua scheda, come quello della barra delle lingue.
   const onDefaultTab = contentLocale === defaultLocale;
@@ -494,28 +503,26 @@ export default function Step1Base({
 
       {/* Title / description */}
       <section className="mb-4">
+        {lingue?.riga}
         <LocaleTabBar
-          enabledLocales={enabledLocales}
+          enabledLocales={schede}
           defaultLocale={defaultLocale}
           activeLocale={contentLocale}
           onSelectLocale={setContentLocale}
           // Compilata se ha il titolo o la descrizione.
-          filledLocales={enabledLocales.filter(
+          filledLocales={schede.filter(
             (l) => !!value.title[l]?.trim() || !!value.description[l]?.trim()
           )}
-          machineLocales={machineLocales}
-          machineLabel={tTrad('machineMark')}
+          ariaLabel={tTrad('tabsLabel')}
+          panelId="ev-testi-pannello"
+          idPrefix="ev-scheda"
+          stati={lingue?.aspetto}
         />
 
-        {traduzione}
-
-        {/* Una lingua riempita dalla traduzione automatica: da rileggere prima
-            di salvare (il salvataggio e' la revisione). */}
-        {contentLocale !== defaultLocale && machineLocales.includes(contentLocale) && (
-          <div className="alert alert-info mb-3" role="note">
-            {tTrad('reviewAlert')}
-          </div>
-        )}
+        {/* La scheda: titolo e descrizione nella lingua scelta, che i campi
+            dicono (anche alle tecnologie assistive, con `lang`). */}
+        <div role="tabpanel" id="ev-testi-pannello" aria-labelledby={`ev-scheda-${contentLocale}`}>
+        {lingue?.pannello(contentLocale)}
 
         <div
           className={`mb-3 wizard-campo${
@@ -523,11 +530,12 @@ export default function Step1Base({
           }`}
         >
           <label className="form-label fw-semibold" htmlFor="ev-title">
-            {tAdmin('form.titleLabel')}
+            {tTrad('titleLabel', { language: nomeLingua(contentLocale) })}
             {requiredMark}
           </label>
           <input
             id="ev-title"
+            lang={contentLocale}
             type="text"
             className={`form-control ${
               contentLocale === defaultLocale && fieldErrors[`title.${defaultLocale}`]
@@ -626,7 +634,8 @@ export default function Step1Base({
         >
           <MarkdownEditor
             id={`ev-description-${contentLocale}`}
-            label={`${tAdmin('form.descriptionLabel')}${requiredMark}`}
+            label={`${tTrad('descriptionLabel', { language: nomeLingua(contentLocale) })}${requiredMark}`}
+            lang={contentLocale}
             value={value.description[contentLocale] ?? ''}
             onChange={(v) => setLocalized('description', contentLocale, v)}
             rows={6}
@@ -645,6 +654,7 @@ export default function Step1Base({
             </div>
           )}
           {descrizioneVuota && !descriptionError && promemoria('ev-description-promemoria')}
+        </div>
         </div>
       </section>
 

@@ -20,9 +20,8 @@ import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
 import { localeNames, type Locale } from '@/i18n/config';
+import { Link, percorso } from '@/i18n/navigation';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
-import LanguageChecklist from '@/components/admin/language-checklist';
-import { DEFAULT_TARGET_LOCALES } from '@/lib/ai/target-locales';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
@@ -1865,6 +1864,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
  */
 function PostprodTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.postprod');
+  const tLingue = useTranslations('admin.languages');
 
   return (
     <div>
@@ -1965,16 +1965,13 @@ function PostprodTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
         <Col md={12}>
-          {/* Il gruppo prende il fuoco se il server rifiuta il campo. */}
-          <div id="aiDefaultTargetLocales" className="mb-3" tabIndex={-1} aria-label={t('defaultTargetLocales')}>
-            <LanguageChecklist
-              legend={t('defaultTargetLocales')}
-              description={t('defaultTargetLocalesHelp')}
-              value={settings.aiDefaultTargetLocales ?? DEFAULT_TARGET_LOCALES}
-              onChange={(next) => updateField('aiDefaultTargetLocales', next ?? '')}
-              emptyHint={t('defaultTargetLocalesEmpty')}
-            />
-          </div>
+          {/* Le lingue di sottotitoli e sintesi sono le lingue dell'evento, e
+              quelle predefinite si scelgono con le lingue del sito. Il blocco
+              prende il fuoco se il server rifiuta il campo. */}
+          <p id="aiDefaultTargetLocales" className="small mb-3" tabIndex={-1}>
+            {tLingue('eventLanguagesMoved')}{' '}
+            <Link href={percorso('/admin/settings/languages')}>{tLingue('eventLanguagesLink')}</Link>
+          </p>
         </Col>
       </Row>
 

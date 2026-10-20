@@ -53,6 +53,11 @@ interface EventHeaderProps {
   /** Il titolo e' l'h1 della pagina; in anteprima, dentro un'altra pagina,
    *  e' un paragrafo con lo stesso aspetto. */
   titleAs?: 'h1' | 'p';
+  /** La lingua del titolo, se non e' quella della pagina (un titolo non
+   *  tradotto, mostrato nella lingua principale). */
+  titleLang?: string;
+  /** Sotto il titolo: l'avviso di un testo tradotto in automatico. */
+  titleNote?: ReactNode;
 }
 
 /**
@@ -94,6 +99,8 @@ export default function EventHeader({
   organizerName = null,
   tagLinks = true,
   titleAs = 'h1',
+  titleLang,
+  titleNote = null,
 }: EventHeaderProps) {
   const t = useTranslations('events');
   const format = useFormatter();
@@ -168,7 +175,9 @@ export default function EventHeader({
             as={titleAs}
             className={titleAs === 'h1' ? 'mb-3' : 'h1 mb-3'}
             style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
+            lang={titleLang}
           />
+          {titleNote}
 
           {tags.length > 0 && (
             <div className="d-flex flex-wrap gap-2 mb-4">

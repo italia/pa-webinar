@@ -2,6 +2,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import { getSettings } from '@/lib/settings';
+import { DEFAULT_TARGET_LOCALES } from '@/lib/ai/target-locales';
 import LanguageManagement from '@/components/admin/language-management';
 import AdminPageHeader from '@/components/admin/admin-page-header';
 import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
@@ -29,6 +30,8 @@ export default async function LanguagesPage() {
       string,
       Record<string, string>
     >,
+    aiDefaultTargetLocales: settings.aiDefaultTargetLocales ?? DEFAULT_TARGET_LOCALES,
+    aiPipelineEnabled: settings.aiPipelineEnabled,
   };
 
   return (

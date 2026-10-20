@@ -140,12 +140,19 @@ describe('duplicatedConfig — Prisma Json handling', () => {
       permissionMatrix: null,
       description: null,
       speakersInfo: null,
+      textLocaleState: null,
       chatEnabled: true,
     });
     expect(out).not.toHaveProperty('permissionMatrix');
     expect(out).not.toHaveProperty('description');
     expect(out).not.toHaveProperty('speakersInfo');
+    expect(out).not.toHaveProperty('textLocaleState');
     expect(out.chatEnabled).toBe(true);
+  });
+
+  it('the copy keeps who wrote each language: a machine translation still carries its notice', () => {
+    const stato = { en: { origin: 'MACHINE', sourceHash: 'a'.repeat(64), at: '2026-10-20T10:00:00.000Z' } };
+    expect(duplicatedConfig({ textLocaleState: stato }).textLocaleState).toEqual(stato);
   });
 
   it('still copies a Json column that has a value, normalized like every write', () => {

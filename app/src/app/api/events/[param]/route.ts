@@ -20,7 +20,7 @@ import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/ev
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { updateEventSchema } from '@/lib/validation/schemas';
-import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
+import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
@@ -40,6 +40,14 @@ import { hashJoinPassword } from '@/lib/auth/password';
 import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
+import { improntaSorgente, testoSorgente } from '@/lib/text-translation/source';
+import {
+  letturaStatoTesti,
+  linguaPrincipale,
+  lingueDellEvento,
+} from '@/lib/text-translation/stato-lingue';
+import { unisciTesti } from '@/lib/text-translation/unione-testi';
 
 export const dynamic = 'force-dynamic';
 
@@ -386,17 +394,75 @@ export const PUT = withErrorHandling(async (request, context) => {
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
 
+  // Titolo e descrizione, con lo stato di ogni lingua (lib/text-translation/
+  // unione-testi). Con `textEdits` (il wizard) delle lingue non toccate resta
+  // il testo salvato: lo si rilegge a riga bloccata, nella transazione della
+  // scrittura, perche' una traduzione consegnata intanto non si perda. Senza,
+  // il testo inviato vale per tutte le lingue, come sempre.
+  const conTesti = data.title !== undefined || data.description !== undefined;
+  const impostazioniTesti = conTesti ? await getSettings() : null;
+  const principale = linguaPrincipale(impostazioniTesti);
+  const testiDaScrivere = (salvato: {
+    title: unknown;
+    description: unknown;
+    textLocaleState: unknown;
+    aiTargetLocales: string | null;
+  }) => {
+    const toccate = data.textEdits?.touched ?? null;
+    // Le lingue tolte dalle lingue dell'evento con questo salvataggio (un
+    // evento che non ne aveva scelte aveva quelle predefinite del sito).
+    const predefinite = impostazioniTesti?.aiDefaultTargetLocales;
+    const prima = lingueDellEvento(salvato.aiTargetLocales, predefinite);
+    const dopo =
+      data.aiTargetLocales === undefined
+        ? prima
+        : lingueDellEvento(data.aiTargetLocales, predefinite);
+    const titoloPrincipale =
+      data.title !== undefined ? (data.title as Record<string, string>) : salvato.title;
+    const descrizionePrincipale =
+      data.description !== undefined
+        ? (data.description as Record<string, string>)
+        : salvato.description;
+    const testi = unisciTesti({
+      principale,
+      salvati: {
+        title: salvato.title,
+        description: salvato.description,
+        stato: letturaStatoTesti(salvato.textLocaleState),
+      },
+      inviati: { title: data.title, description: data.description },
+      toccate,
+      lingueTolte: prima.filter((l) => !dopo.includes(l)),
+      impronta: improntaSorgente(
+        testoSorgente(
+          principale,
+          titoloPrincipale as Record<string, string> | null,
+          descrizionePrincipale as Record<string, string> | null,
+        ),
+      ),
+      improntaPrecedente: improntaSorgente(
+        testoSorgente(
+          principale,
+          salvato.title as Record<string, string> | null,
+          salvato.description as Record<string, string> | null,
+        ),
+      ),
+      ora: new Date(),
+    });
+    return {
+      title: testi.title,
+      description: testi.description,
+      textLocaleState: testi.stato as unknown as Prisma.InputJsonValue,
+    };
+  };
+  const conUnione = conTesti && data.textEdits !== undefined;
+
   const updateArgs = {
     where: { id: eventId },
     data: {
+      ...(conTesti && !conUnione && testiDaScrivere(event)),
       ...(revivedStatus && { status: revivedStatus }),
       ...(matrixUpdate && { permissionMatrix: matrixUpdate }),
-      ...(data.title !== undefined && {
-        title: pruneEmptyTranslations(data.title as LocalizedField),
-      }),
-      ...(data.description !== undefined && {
-        description: pruneEmptyTranslations(data.description as LocalizedField),
-      }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
@@ -585,15 +651,34 @@ export const PUT = withErrorHandling(async (request, context) => {
   const closesPolls =
     nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
   const updated =
-    closesSessions || closesPolls || tagIds !== null
+    closesSessions || closesPolls || tagIds !== null || conUnione
       ? await prisma.$transaction(async (tx) => {
-          const aggiornato = await tx.event.update(updateArgs);
+          let argomenti: Prisma.EventUpdateArgs = updateArgs;
+          if (conUnione) {
+            await tx.$queryRaw`SELECT id FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
+            const salvato = await tx.event.findUnique({
+              where: { id: eventId },
+              select: { title: true, description: true, textLocaleState: true, aiTargetLocales: true },
+            });
+            if (!salvato) throw new NotFoundError('Event');
+            argomenti = { ...updateArgs, data: { ...updateArgs.data, ...testiDaScrivere(salvato) } };
+          }
+          const aggiornato = await tx.event.update(argomenti);
           if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
           if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
           if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
           return aggiornato;
         })
       : await prisma.event.update(updateArgs);
+
+  // Dopo un salvataggio del testo o delle lingue, il server chiede la
+  // traduzione delle lingue della pagina che ne hanno bisogno
+  // (lib/text-translation/auto). Un salvataggio automatico di una bozza non
+  // deve arrivare qui.
+  const traduzione =
+    conTesti || data.aiTargetLocales !== undefined
+      ? await riconciliaTraduzioni(eventId, { request })
+      : undefined;
 
   if (dateChanged && event.status === 'PUBLISHED') {
     // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
@@ -664,6 +749,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       updated.recordingFileSize === null ? null : Number(updated.recordingFileSize),
     dateChanged,
     ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
+    ...(traduzione && { traduzione }),
   });
 });
 

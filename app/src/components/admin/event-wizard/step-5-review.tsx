@@ -4,26 +4,24 @@
  * Il riepilogo: in cima cio' che manca ancora per pubblicare (ogni voce porta
  * al suo campo), poi l'evento in un'anteprima sola, come lo vedranno gli
  * altri: quando, chi lo conduce, chi parla, le funzioni della sala, la
- * registrazione (con le lingue di traduzione, che si cambiano qui) e
- * l'informativa. Sotto, «Personalizza le impostazioni» apre le impostazioni
+ * registrazione (con le lingue di traduzione, che si cambiano nel passo
+ * «Evento») e l'informativa. Sotto, «Personalizza le impostazioni» apre le impostazioni
  * avanzate. I pulsanti per salvare li ha il wizard.
  */
 
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import LanguageChecklist from '@/components/admin/language-checklist';
 import { IconaMicrofono, IconaPersone, IconaRec } from '@/components/admin/guided-format';
 import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import { localeNames } from '@/i18n/config';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
 import { vociCompilate } from './programme-plan';
+import { nomeLingua } from './text-translation';
 import type { CampoMancante } from './validation';
 import type { WizardForm } from './wizard-shell';
 
@@ -60,8 +58,6 @@ interface Props {
   aiPipelineEnabled?: boolean;
   /** I sottotitoli live ci sono nell'installazione. */
   liveCaptionsAvailable?: boolean;
-  /** La lingua dell'evento: non si offre come lingua di traduzione. */
-  eventLocale?: string;
   /** C'e' un avviso di capacita': lo si dice, e porta alle impostazioni. */
   capacityWarning?: boolean;
   /** La parte del titolo prima di «|» si mostra come sopratitolo. */
@@ -83,16 +79,13 @@ function nomi(persone: Array<{ name: string }>): string {
 
 export default function Step5Review({
   form,
-  onChange,
   defaultLocale,
   gdprTemplates,
-  fieldErrors = {},
   onCustomize,
   onVaiAlCampo,
   mancanti = [],
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
-  eventLocale,
   capacityWarning = false,
   sopratitolo = false,
   iscrizioneAperta,
@@ -103,6 +96,7 @@ export default function Step5Review({
   const tf = useTranslations('admin.wizard.flow');
   const tp = useTranslations('admin.wizard.step2');
   const tForm = useTranslations('admin.form');
+  const tTrad = useTranslations('admin.textTranslation');
   const durata = useDurataTesto();
   const toggles = togglesFromMatrix(form.permissionMatrix);
   // Il programma, ad agenda accesa: quanti argomenti e quanto dura.
@@ -122,15 +116,6 @@ export default function Step5Review({
     sopratitolo
   );
   const locale: 'it' | 'en' = defaultLocale === 'it' ? 'it' : 'en';
-  // Le lingue si cambiano sul posto, a richiesta: l'anteprima resta
-  // un'anteprima. Si aprono da sole quando non ce n'e' nessuna (servono per
-  // tradurre) o quando un invio le segnala, e restano aperte finche' le si
-  // sceglie: chiuderle sotto il cursore alla prima spunta toglierebbe la
-  // seconda.
-  const [lingueAperte, setLingueAperte] = useState(false);
-  useEffect(() => {
-    if (fieldErrors.aiTargetLocales) setLingueAperte(true);
-  }, [fieldErrors.aiTargetLocales]);
 
   const ricorrenza =
     form.recurrenceRule && form.recurrencePreset !== 'none'
@@ -173,10 +158,7 @@ export default function Step5Review({
     traduce && tForm('aiTranslationEnabled'),
     traduce && form.aiDubbingEnabled && tForm('aiDubbingEnabled'),
   ].filter((x): x is string => !!x);
-  const lingue = parseLocaleList(form.aiTargetLocales).map(
-    (c) => (localeNames as Record<string, string>)[c] ?? c
-  );
-  const mostraLingue = traduce && (lingueAperte || lingue.length === 0);
+  const lingue = parseLocaleList(form.aiTargetLocales).map(nomeLingua);
   const informativa = form.gdprTemplateId
     ? tf('privacyTemplate', {
         name: gdprTemplates.find((g) => g.id === form.gdprTemplateId)?.name ?? '—',
@@ -206,7 +188,7 @@ export default function Step5Review({
       case 'moderatorEmail':
         return tf('fieldOrganizerEmail');
       case 'aiTargetLocales':
-        return tForm('aiTargetLocales');
+        return tTrad('eventLanguages');
       case 'dataRetentionDays':
         return t('retentionDays');
       case 'gdprTemplateId':
@@ -421,36 +403,25 @@ export default function Step5Review({
                 !aiPipelineEnabled && (
                   <span className="d-block text-secondary">{tp('aiPipelineOff')}</span>
                 )}
+              {/* Le lingue sono quelle dell'evento: si cambiano nel passo
+                  «Evento», dove fanno anche le schede di titolo e descrizione. */}
               {traduce && (
                 <span className="d-block">
-                  {tf('translationLine', { list: lingue.join(', ') || tf('none') })}{' '}
-                  {/* Senza lingue l'elenco e' gia' aperto: niente da aprire. */}
-                  {lingue.length > 0 && (
-                    <button
-                      type="button"
-                      className="btn btn-link p-0 align-baseline anteprima-link"
-                      aria-expanded={mostraLingue}
-                      aria-controls={mostraLingue ? 'aiTargetLocales' : undefined}
-                      onClick={() => setLingueAperte((v) => !v)}
-                    >
-                      {tf('changeLanguages')}
-                    </button>
+                  {tf('translationLine', { list: lingue.join(', ') || tf('none') })}
+                  {onVaiAlCampo && (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 align-baseline anteprima-link"
+                        onClick={() =>
+                          onVaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })
+                        }
+                      >
+                        {tTrad('changeInEventStep', { step: tf('steps.base') })}
+                      </button>
+                    </>
                   )}
-                </span>
-              )}
-              {mostraLingue && (
-                <span id="aiTargetLocales" className="d-block mt-2">
-                  <LanguageChecklist
-                    legend={tForm('aiTargetLocales')}
-                    value={form.aiTargetLocales}
-                    onChange={(next) => {
-                      setLingueAperte(true);
-                      onChange({ aiTargetLocales: next });
-                    }}
-                    invalid={!!fieldErrors.aiTargetLocales}
-                    errorText={tForm('aiTargetLocalesRequired')}
-                    exclude={eventLocale ? [eventLocale] : []}
-                  />
                 </span>
               )}
             </span>

@@ -88,6 +88,8 @@ interface Props {
   aiPipelineEnabled?: boolean;
   /** La traduzione automatica di titolo e descrizione c'e' (vedi il wizard). */
   textTranslationAvailable?: boolean;
+  /** Chi crea l'evento amministra l'istanza (vedi il wizard). */
+  isSiteAdmin?: boolean;
   defaultModerator?: { name: string; email: string } | null;
   /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
   publicRegistrationEnabled?: boolean;
@@ -120,6 +122,7 @@ export default function CreateEventWithTemplate({
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
+  isSiteAdmin = false,
   defaultModerator = null,
   publicRegistrationEnabled = true,
   initialInstant = false,
@@ -178,6 +181,7 @@ export default function CreateEventWithTemplate({
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}
+      isSiteAdmin={isSiteAdmin}
       defaultModerator={defaultModerator}
       publicRegistrationEnabled={publicRegistrationEnabled}
     />

@@ -100,6 +100,22 @@ export async function ultimoLavoroResoconto(eventId: string) {
 }
 
 /**
+ * Le lingue in cui si traduce il resoconto, se chi lo chiede non ne indica:
+ * quelle della trascrizione e della sintesi (lib/ai/enqueue), cioe' le lingue
+ * dell'evento o, se non ne ha, quelle predefinite del sito, ma solo se la
+ * traduzione di sottotitoli e sintesi e' accesa. Le lingue dell'evento si
+ * salvano sempre, perche' fanno anche le schede di titolo e descrizione: da
+ * sole non chiedono altre traduzioni.
+ */
+export function lingueDelResoconto(
+  evento: { aiTargetLocales: string | null; aiTranslationEnabled: boolean },
+  predefinite: string | null | undefined
+): string[] {
+  if (!evento.aiTranslationEnabled) return [];
+  return parseTargetLocales(evento.aiTargetLocales || predefinite);
+}
+
+/**
  * Accoda il resoconto. Solo a evento concluso, entro la conservazione dei dati
  * (chat, d'accordo e presenze si cancellano alla scadenza), con la pipeline AI
  * accesa, e uno alla volta per evento.
@@ -117,11 +133,12 @@ export async function accodaResoconto(
         endsAt: true,
         dataRetentionDays: true,
         aiTargetLocales: true,
+        aiTranslationEnabled: true,
       },
     }),
     prisma.siteSetting.findUnique({
       where: { id: 'singleton' },
-      select: { aiPipelineEnabled: true },
+      select: { aiPipelineEnabled: true, aiDefaultTargetLocales: true },
     }),
   ]);
   if (!evento) return { stato: 'evento-assente' };
@@ -146,7 +163,7 @@ export async function accodaResoconto(
 
     const sorgente = await linguaResoconto(eventId, tx);
     const destinazioni = (
-      opzioni.targetLanguages ?? parseTargetLocales(evento.aiTargetLocales)
+      opzioni.targetLanguages ?? lingueDelResoconto(evento, impostazioni.aiDefaultTargetLocales)
     ).filter((l, i, tutte) => l !== sorgente && tutte.indexOf(l) === i);
     const lavoro = await tx.postprodJob.create({
       data: {

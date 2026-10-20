@@ -25,6 +25,7 @@ import { prisma } from '@/lib/db';
 import { progressPayloadSchema } from '@/lib/ai/schemas';
 import { EVENT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { avanzamentoLavoroEvento } from '@/lib/report/job';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
 import {
   postprodJobDurationSeconds,
   postprodJobsCompletedTotal,
@@ -71,6 +72,7 @@ export const POST = withErrorHandling(async (request) => {
       attempts: true,
       startedAt: true,
       recordingId: true,
+      eventId: true,
     },
   });
   if (!job) throw new NotFoundError('PostprodJob');
@@ -97,6 +99,12 @@ export const POST = withErrorHandling(async (request) => {
       postprodJobsCompletedTotal.labels(job.kind, risposta.status).inc();
       const secs = job.startedAt ? (Date.now() - job.startedAt.getTime()) / 1000 : 0;
       if (secs > 0) postprodJobDurationSeconds.labels(job.kind).observe(secs);
+      // Una traduzione dei testi fallita: se intanto il testo principale e'
+      // cambiato, quello nuovo si traduce adesso (lo stesso testo no: si
+      // riprova a mano, lib/text-translation/auto).
+      if (job.kind === 'TRANSLATE_TEXT' && risposta.status === 'FAILED' && job.eventId) {
+        await riconciliaTraduzioni(job.eventId, { request, actor: 'system', dopoConsegna: true });
+      }
     }
     return Response.json({ ok: true, ...risposta });
   }

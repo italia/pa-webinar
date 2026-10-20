@@ -41,6 +41,7 @@ const evento = {
   endsAt: new Date(),
   dataRetentionDays: 30,
   aiTargetLocales: 'en,fr,it',
+  aiTranslationEnabled: true,
 };
 
 beforeEach(() => {
@@ -76,6 +77,21 @@ describe('accodaResoconto', () => {
         }),
       })
     );
+  });
+
+  it("senza la traduzione di sottotitoli e sintesi le lingue dell'evento non si usano", async () => {
+    // Le lingue dell'evento si salvano sempre (fanno anche le schede di
+    // titolo e descrizione): da sole non chiedono un resoconto tradotto.
+    m.event.findUnique.mockResolvedValue({ ...evento, aiTranslationEnabled: false });
+    await accodaResoconto('ev-1');
+    expect(m.postprodJob.create.mock.calls[0]![0].data.payload.targetLanguages).toEqual([]);
+  });
+
+  it("un evento che non ha scelto lingue usa quelle del sito, come trascrizione e sintesi", async () => {
+    m.event.findUnique.mockResolvedValue({ ...evento, aiTargetLocales: null });
+    m.siteSetting.findUnique.mockResolvedValue({ aiPipelineEnabled: true, aiDefaultTargetLocales: 'de,it' });
+    await accodaResoconto('ev-1');
+    expect(m.postprodJob.create.mock.calls[0]![0].data.payload.targetLanguages).toEqual(['de']);
   });
 
   it("le lingue chieste dallo staff prendono il posto di quelle dell'evento", async () => {

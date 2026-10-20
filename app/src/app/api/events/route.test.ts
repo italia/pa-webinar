@@ -53,6 +53,11 @@ vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ defaultLocale: 'it' })),
 }));
 
+const traduzioni = vi.hoisted(() => ({
+  riconciliaTraduzioni: vi.fn(async () => ({ avviata: true, lingue: ['en'] })),
+}));
+vi.mock('@/lib/text-translation/auto', () => traduzioni);
+
 vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   sendPrimaryModeratorLink: vi.fn(async () => true),
@@ -245,5 +250,64 @@ describe('POST /api/events — link del moderatore principale', () => {
     expect(body.links.moderatorLink).toMatch(
       /\/it\/admin\/eventi\/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\?token=/,
     );
+  });
+});
+
+describe('POST /api/events — lingue e traduzione automatica', () => {
+  const daIp = (ip: string, body: unknown) =>
+    new Request('http://localhost/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
+      body: JSON.stringify(body),
+    }) as unknown as NextRequest;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
+      id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
+      slug: data.slug,
+      moderatorToken: data.moderatorToken,
+      status: 'DRAFT',
+    }));
+  });
+
+  it('le lingue dell evento si salvano anche senza registrazione, e la traduzione parte da sola', async () => {
+    const r = await POST(
+      daIp('198.51.100.81', corpo({ aiTargetLocales: 'en,fr', recordingEnabled: false })),
+      { params: Promise.resolve({}) } as never,
+    );
+    expect(r.status).toBe(201);
+    expect(datiScritti().aiTargetLocales).toBe('en,fr');
+    expect(traduzioni.riconciliaTraduzioni).toHaveBeenCalledWith(
+      '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
+      expect.anything(),
+    );
+    expect((await r.json()).traduzione).toEqual({ avviata: true, lingue: ['en'] });
+  });
+
+  it('ogni lingua scritta, oltre alla principale, e di una persona; le vuote non si salvano', async () => {
+    await POST(
+      daIp(
+        '198.51.100.82',
+        corpo({
+          title: { it: 'Evento di prova', en: 'Test event', fr: '' },
+          description: { it: 'Descrizione', en: '' },
+          textEdits: { touched: ['en'] },
+        }),
+      ),
+      { params: Promise.resolve({}) } as never,
+    );
+    const dati = datiScritti();
+    expect(dati.title).toEqual({ it: 'Evento di prova', en: 'Test event' });
+    expect(dati.description).toEqual({ it: 'Descrizione' });
+    const stato = dati.textLocaleState as Record<string, { origin: string; sourceHash: string }>;
+    expect(Object.keys(stato)).toEqual(['en']);
+    expect(stato.en!.origin).toBe('HUMAN');
+    expect(stato.en!.sourceHash).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('un evento solo nella lingua principale non ha stato', async () => {
+    await POST(daIp('198.51.100.83', corpo()), { params: Promise.resolve({}) } as never);
+    expect(datiScritti()).not.toHaveProperty('textLocaleState');
   });
 });

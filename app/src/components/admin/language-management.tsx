@@ -15,6 +15,7 @@ import {
   Spinner,
   Badge,
 } from 'design-react-kit';
+import LanguageChecklist, { parseLocaleList } from '@/components/admin/language-checklist';
 import { Icon } from '@/components/ui/icon';
 import { locales, localeNames, type Locale } from '@/i18n/config';
 
@@ -23,6 +24,11 @@ interface LanguageConfig {
   availableLocales: string[];
   localeNames: Record<string, string>;
   translationOverrides: Record<string, Record<string, string>>;
+  /** Le lingue predefinite degli eventi (SiteSetting.aiDefaultTargetLocales). */
+  aiDefaultTargetLocales?: string;
+  /** La post-produzione AI e' accesa: le lingue fuori dal sito servono a
+   *  sottotitoli e sintesi. */
+  aiPipelineEnabled?: boolean;
 }
 
 interface LanguageManagementProps {
@@ -72,6 +78,9 @@ export default function LanguageManagement({
           defaultLocale: config.defaultLocale,
           availableLocales: config.availableLocales,
           localeNames: config.localeNames,
+          ...(config.aiDefaultTargetLocales !== undefined && {
+            aiDefaultTargetLocales: config.aiDefaultTargetLocales,
+          }),
         }),
       });
       if (!res.ok) {
@@ -169,6 +178,11 @@ export default function LanguageManagement({
   }
 
   const enabledCount = config.availableLocales.length;
+  // Le lingue predefinite degli eventi che il sito non ha: valgono solo per
+  // sottotitoli e sintesi.
+  const fuoriDalSito = parseLocaleList(config.aiDefaultTargetLocales ?? '').filter(
+    (c) => !config.availableLocales.includes(c)
+  );
 
   return (
     <div>
@@ -282,6 +296,36 @@ export default function LanguageManagement({
               );
             })}
           </Row>
+
+          {/* Le lingue con cui nasce ogni evento: le sue schede, la
+              traduzione automatica di titolo e descrizione nelle lingue del
+              sito, e sottotitoli e sintesi quando l'evento li traduce. */}
+          {config.aiDefaultTargetLocales !== undefined && (
+            <div id="aiDefaultTargetLocales" className="mt-4 pt-3 border-top" tabIndex={-1}>
+              <LanguageChecklist
+                legend={t('eventLanguagesTitle')}
+                description={t('eventLanguagesHelp')}
+                value={config.aiDefaultTargetLocales}
+                onChange={(next) =>
+                  setConfig((prev) => ({ ...prev, aiDefaultTargetLocales: next ?? '' }))
+                }
+                exclude={[config.defaultLocale]}
+                available={config.availableLocales.filter((l) => l !== config.defaultLocale)}
+                othersLabel={t('eventLanguagesOthers')}
+                showOthers={!!config.aiPipelineEnabled}
+                emptyHint={t('eventLanguagesEmpty')}
+              />
+              {fuoriDalSito.length > 0 && (
+                <p className="small text-muted mb-0">
+                  {t('eventLanguagesNotOnSite', {
+                    languages: fuoriDalSito
+                      .map((c) => (localeNames as Record<string, string>)[c] ?? c)
+                      .join(', '),
+                  })}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="d-flex gap-2 align-items-center mt-3">
             <Button

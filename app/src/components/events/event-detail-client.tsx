@@ -6,7 +6,7 @@ import { Alert, Button, Card, CardBody, Row, Col } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
-import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getLocalized, getLocalizedWithLocale, type LocalizedField } from '@/lib/utils/locale';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
@@ -76,6 +76,11 @@ interface EventData {
   people?: PersonaPubblica[];
   /** Il programma, ad agenda accesa (lib/agenda/programme). */
   programme?: VoceProgramma[];
+  /** Le lingue in cui titolo e descrizione sono tradotti in automatico e
+   *  nessuno li ha ancora riletti: la pagina lo dice. */
+  lingueAutomatiche?: string[];
+  /** La lingua principale dei testi: quella mostrata dove manca la lingua della pagina. */
+  linguaPrincipale?: string;
   imageUrl: string | null;
   peakParticipants?: number;
   postEventPublic?: boolean;
@@ -222,8 +227,27 @@ export default function EventDetailClient({
     pipelineSnapshot?: PipelineSnapshot;
   } | null>(null);
 
-  const title = getLocalized(event.title, locale);
-  const description = getLocalized(event.description, locale);
+  // Il testo nella lingua della pagina o, se manca, nella lingua principale:
+  // in quel caso il testo dice la sua lingua (lang). Un testo mostrato che e'
+  // tradotto in automatico e non riletto lo dice anche a chi legge.
+  const titolo = getLocalizedWithLocale(event.title, locale, event.linguaPrincipale);
+  const descrizione = getLocalizedWithLocale(event.description, locale, event.linguaPrincipale);
+  const title = titolo.testo;
+  const description = descrizione.testo;
+  const altraLingua = (lingua: string | null) =>
+    lingua && lingua !== locale ? lingua : undefined;
+  const automatica = [titolo.lingua, descrizione.lingua].some(
+    (l) => !!l && !!event.lingueAutomatiche?.includes(l)
+  );
+  const notaAutomatica = automatica ? (
+    <p className="traduzione-automatica d-flex align-items-start gap-1 mb-3">
+      <Icon icon="it-exchange-circle" size="sm" className="flex-shrink-0" />
+      <span>
+        <strong>{t('detail.machineTranslation')}</strong>{' '}
+        {t('detail.machineTranslationNote')}
+      </span>
+    </p>
+  ) : null;
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
@@ -371,6 +395,8 @@ export default function EventDetailClient({
 
       <EventHeader
         title={title}
+        titleLang={altraLingua(titolo.lingua)}
+        titleNote={notaAutomatica}
         parseTitleKicker={parseTitleKicker}
         imageUrl={event.imageUrl}
         tags={tags}
@@ -512,7 +538,11 @@ export default function EventDetailClient({
           <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('detail.description')}
           </h2>
-          <MarkdownRenderer content={description} className="mb-4" />
+          <MarkdownRenderer
+            content={description}
+            className="mb-4"
+            lang={altraLingua(descrizione.lingua)}
+          />
 
           {/* Il programma, prima dell'evento e durante: dopo lo raccontano il
               resoconto e i capitoli del video. */}

@@ -81,8 +81,9 @@ describe('mapServerIssues', () => {
       ],
       'it',
     );
-    // Le date stanno nel passo «Quando», prima di «Persone» e del riepilogo.
-    expect(mapped.step).toBe('schedule');
+    // Le lingue dell'evento stanno nel passo «Evento», prima di «Quando» e
+    // di «Persone».
+    expect(mapped.step).toBe('base');
     expect(mapped.fieldErrors).toEqual({
       moderatorEmail: 'server',
       aiTargetLocales: 'server',
@@ -114,5 +115,27 @@ describe('mapServerIssues', () => {
       step: null,
       unmapped: [],
     });
+  });
+});
+
+describe('validateStep base — lingue dell evento', () => {
+  const traduce = { recordingEnabled: true, aiTranscriptEnabled: true, aiTranslationEnabled: true };
+  it('la traduzione di sottotitoli e sintesi senza lingue si ferma al passo «Evento»', () => {
+    expect(validateStep('base', base({ ...traduce, aiTargetLocales: null }), 'it')).toEqual({
+      aiTargetLocales: 'required',
+    });
+    // Un valore vecchio scritto a mano non conta come lingua.
+    expect(validateStep('base', base({ ...traduce, aiTargetLocales: 'english' }), 'it')).toEqual({
+      aiTargetLocales: 'required',
+    });
+    expect(validateStep('base', base({ ...traduce, aiTargetLocales: 'en' }), 'it')).toEqual({});
+    expect(validateStep('review', base({ ...traduce, aiTargetLocales: null }), 'it')).toEqual({});
+  });
+
+  it('senza traduzione (o senza registrazione) le lingue possono mancare: l evento e in una lingua sola', () => {
+    expect(validateStep('base', base({ aiTargetLocales: null }), 'it')).toEqual({});
+    expect(
+      validateStep('base', base({ ...traduce, recordingEnabled: false, aiTargetLocales: null }), 'it')
+    ).toEqual({});
   });
 });

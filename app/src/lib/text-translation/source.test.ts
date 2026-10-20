@@ -21,20 +21,16 @@ describe('testo di partenza e impronta', () => {
     });
   });
 
-  it("l'impronta e' lo SHA-256 di lingua, titolo e descrizione, uguale nel browser e nel server", async () => {
+  it("l'impronta e' lo SHA-256 di lingua, titolo e descrizione", () => {
     const atteso = createHash('sha256')
       .update(JSON.stringify(['it', 'Titolo', 'Testo']))
       .digest('hex');
     expect(
-      await improntaSorgente({
-        sourceLanguage: 'it',
-        title: 'Titolo',
-        description: 'Testo',
-      })
+      improntaSorgente({ sourceLanguage: 'it', title: 'Titolo', description: 'Testo' })
     ).toBe(atteso);
     // Gli spazi ai bordi non cambiano il testo.
     expect(
-      await improntaSorgente({
+      improntaSorgente({
         sourceLanguage: 'it',
         title: ' Titolo ',
         description: 'Testo \n',
@@ -46,7 +42,7 @@ describe('testo di partenza e impronta', () => {
       { sourceLanguage: 'it', title: 'Titolo.', description: 'Testo' },
       { sourceLanguage: 'it', title: 'Titolo', description: 'Testo.' },
     ]) {
-      expect(await improntaSorgente(altro)).not.toBe(atteso);
+      expect(improntaSorgente(altro)).not.toBe(atteso);
     }
   });
 });
