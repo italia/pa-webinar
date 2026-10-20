@@ -285,8 +285,9 @@ are `NOT NULL`, so these variables have no effect, including the `JVB_PRE_SCALE_
 These settings turn each event's declared audience into a number of Jitsi Videobridge (JVB) replicas.
 Only the JVB scaler acts on the result, so they provision nothing unless the scaler runs
 (`jvbScaler.enabled: true` in the chart's `full` profile, off by default; Docker Compose has no
-scaler). Without it they only feed the estimates on the status pages. The capacity estimate in the event wizard and on the event page
-uses only **vCPU per JVB pod**, the two stress thresholds and the default sender ratio
+scaler). Without it they only feed the estimates on the status pages. The capacity estimate in the
+event wizard and on the event page uses only **vCPU per JVB pod**, the two stress thresholds, the
+default sender ratio and, when the bridges are linked, **Max JVB replicas**
 ([how](../architecture/scaling.md#the-capacity-estimate-in-the-wizard-and-on-the-event-page)).
 The formula, a worked example and how the result becomes nodes are in
 [scaling the media plane](../architecture/scaling.md#sizing-from-an-event-to-a-number-of-bridges).

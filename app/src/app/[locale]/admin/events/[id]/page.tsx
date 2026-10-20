@@ -185,7 +185,6 @@ export default async function EventManagePage({
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
     privacyPolicyText: event.privacyPolicyText,
-    speakersInfo: event.speakersInfo as Record<string, string> | null,
     createdAt: event.createdAt.toISOString(),
     accessMode: event.accessMode,
     // Chi si iscrive davvero: la scelta dell'evento, o quella del sito.

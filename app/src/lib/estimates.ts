@@ -14,6 +14,7 @@ import {
   type LivelloCapacita,
 } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import { DEFAULT_JVB_CONFIG, jvbsForEvent } from '@/lib/jvb-sizing';
 
 interface EventConfig {
   maxParticipants: number;
@@ -57,7 +58,12 @@ export interface EventEstimateNumbers {
   cores: number;
   bridgeLoadPct: number;
   level: LivelloCapacita;
+  /** I ponti che chiederebbe lo scaler (lib/jvb-sizing), che il modello non
+   *  usa ancora: la stima resta confrontabile con il suo conteggio. */
   jvbCount: number;
+  /** I ponti dell'evento secondo il modello (piu' di uno solo con i ponti
+   *  collegati). */
+  bridges: number;
   durationHours: number;
   storageGB: number;
   storageGBMax: number;
@@ -93,7 +99,7 @@ export function estimateNumbers(event: EventConfig): EventEstimateNumbers {
       liveCaptionsEnabled: event.liveCaptionsEnabled ?? false,
       durationHours,
     },
-    event.istanza ?? ISTANZA_PREDEFINITA,
+    event.istanza ?? ISTANZA_PREDEFINITA
   );
   return {
     model: 2,
@@ -108,7 +114,13 @@ export function estimateNumbers(event: EventConfig): EventEstimateNumbers {
     cores: s.ponte.core,
     bridgeLoadPct: s.ponte.carico * 100,
     level: s.ponte.livello,
-    jvbCount: s.ponte.ponti,
+    jvbCount: jvbsForEvent(
+      s.partecipanti,
+      event.expectedSenderRatioPct ?? (event.participantsCanStartVideo ? 30 : 0),
+      event.participantsCanStartVideo,
+      DEFAULT_JVB_CONFIG
+    ),
+    bridges: s.ponte.ponti,
     durationHours,
     storageGB: s.registrazione?.gbMin ?? 0,
     storageGBMax: s.registrazione?.gbMax ?? 0,

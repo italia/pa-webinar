@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { ISTANZA_PREDEFINITA, stimaCapacita } from '@/lib/capacity/model';
+import { DEFAULT_JVB_CONFIG, jvbsForEvent } from '@/lib/jvb-sizing';
 
 import { calculateEstimates, estimateNumbers } from './estimates';
 
@@ -25,7 +26,11 @@ describe('estimateNumbers', () => {
     expect(n.durationHours).toBeCloseTo(1.5);
     expect(n.storageGB).toBeCloseTo((4 * 1.5 * 3600) / 8 / 1024);
     expect(n.storageGBMax).toBeCloseTo((10 * 1.5 * 3600) / 8 / 1024);
-    const senzaDate = estimateNumbers({ ...base, startsAt: undefined, endsAt: undefined });
+    const senzaDate = estimateNumbers({
+      ...base,
+      startsAt: undefined,
+      endsAt: undefined,
+    });
     expect(senzaDate.durationHours).toBe(2);
     expect(estimateNumbers({ ...base, recordingEnabled: false }).storageGB).toBe(0);
   });
@@ -50,7 +55,9 @@ describe('estimateNumbers', () => {
     expect(n.participantDownMbps).toBe(s.perPartecipante.downMbps);
     expect(n.cores).toBe(s.ponte.core);
     expect(n.bridgeLoadPct).toBeCloseTo(s.ponte.carico * 100);
-    expect(n.jvbCount).toBe(1);
+    expect(n.bridges).toBe(1);
+    // I ponti dello scaler, con la sua formula, per confronto.
+    expect(n.jvbCount).toBe(jvbsForEvent(100, 30, true, DEFAULT_JVB_CONFIG));
   });
 
   it('con piu iscritti che partecipanti attesi stima sugli iscritti', () => {

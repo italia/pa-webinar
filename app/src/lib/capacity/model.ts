@@ -85,6 +85,9 @@ export interface CapacitaIstanza {
   stressCritical: number;
   /** I ponti dell'istanza (JVB_MAX_REPLICAS). */
   instanceBridges: number;
+  /** I ponti che lo scaler concede a un evento (SiteSetting.jvbMaxReplicas);
+   *  senza, quelli dell'istanza. Conta solo con i ponti collegati. */
+  perEventBridges?: number;
   /** Le voci piu' forti che il ponte inoltra a ciascuno (JVB_NUM_LOUDEST);
    *  0: le inoltra tutte. */
   numLoudest: number;
@@ -207,7 +210,12 @@ export interface StimaCapacita {
     pontiNecessari: number;
     entra: boolean;
   };
-  istanza: { ponti: number; coreDelPonte: number; cascading: boolean };
+  istanza: {
+    ponti: number;
+    pontiPerEvento: number;
+    coreDelPonte: number;
+    cascading: boolean;
+  };
   registrazione: {
     core: number;
     gbMin: number;
@@ -436,11 +444,15 @@ function calcola(
   const s = soglie(istanza);
   const livello = livelloCapacita(carico, s);
   const pontiIstanza = Math.max(1, Math.floor(finito(istanza.instanceBridges, 1)));
+  const pontiPerEvento = Math.min(
+    pontiIstanza,
+    Math.max(1, Math.floor(finito(istanza.perEventBridges, pontiIstanza)))
+  );
   // Con i ponti collegati l'evento si allarga finche' ogni ponte resta sotto
-  // la soglia critica; senza, resta su uno.
+  // la soglia critica, fino ai ponti concessi a un evento; senza, resta su uno.
   const pontiNecessari = Math.max(1, Math.ceil(carico / s.critica));
-  const ponti = istanza.cascading ? Math.min(pontiNecessari, pontiIstanza) : 1;
-  const entra = istanza.cascading ? pontiNecessari <= pontiIstanza : carico <= 1;
+  const ponti = istanza.cascading ? Math.min(pontiNecessari, pontiPerEvento) : 1;
+  const entra = istanza.cascading ? pontiNecessari <= pontiPerEvento : carico <= 1;
 
   const ore =
     input.durationHours !== null && Number.isFinite(input.durationHours)
@@ -482,7 +494,12 @@ function calcola(
       pontiNecessari,
       entra,
     },
-    istanza: { ponti: pontiIstanza, coreDelPonte, cascading: istanza.cascading },
+    istanza: {
+      ponti: pontiIstanza,
+      pontiPerEvento,
+      coreDelPonte,
+      cascading: istanza.cascading,
+    },
     registrazione: input.recordingEnabled
       ? {
           core: REGISTRAZIONE.core,

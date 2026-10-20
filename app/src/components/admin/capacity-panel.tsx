@@ -18,6 +18,7 @@ import {
   COEFFICIENTI_CORE,
   MAX_RIQUADRI,
   MICROFONI_APERTI_TIPICI,
+  PROFILI_WEBCAM,
   SCHERMO_MBPS,
   SOGLIA_CPU_PONTE,
   profiloFlussi,
@@ -30,12 +31,14 @@ import {
 import { videoQualityBudget } from '@/lib/jitsi/config';
 
 /** Le quote di webcam fra cui si sceglie (0: solo chi presenta). */
-const PROFILI = [
-  { key: 'presenters', value: 0 },
-  { key: 'few', value: 10 },
-  { key: 'half', value: 50 },
-  { key: 'all', value: 100 },
-] as const;
+/** Il nome di ogni quota di webcam che il modello propone. */
+const NOME_PROFILO: Record<(typeof PROFILI_WEBCAM)[number], string> = {
+  0: 'presenters',
+  10: 'few',
+  50: 'half',
+  100: 'all',
+};
+const PROFILI = PROFILI_WEBCAM.map((value) => ({ key: NOME_PROFILO[value], value }));
 
 const ICONA_LIVELLO: Record<LivelloCapacita, string> = {
   ampio: 'it-check-circle',
@@ -130,7 +133,7 @@ export default function CapacityPanel({
       ? t('levelText.cascade', { count: s.ponte.ponti })
       : t('levelText.cascadeOver', {
           needed: s.ponte.pontiNecessari,
-          available: s.istanza.ponti,
+          available: s.istanza.pontiPerEvento,
         });
   })();
 
@@ -243,7 +246,7 @@ export default function CapacityPanel({
         </div>
       </div>
 
-      <section className="capacita__blocco" aria-labelledby={`${id}-per`}>
+      <section aria-labelledby={`${id}-per`}>
         <Titolo id={`${id}-per`} className="capacita__titolo">
           {t('perParticipant')}
         </Titolo>

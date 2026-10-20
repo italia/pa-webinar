@@ -349,6 +349,19 @@ describe('livello e ponti', () => {
     expect(pochi.ponte.entra).toBe(false);
   });
 
+  it('con i ponti collegati conta anche il tetto per evento del sito', () => {
+    const grande = { ...webinar, maxParticipants: 1000 };
+    const r = stimaCapacita(grande, {
+      ...ponte15,
+      cascading: true,
+      instanceBridges: 6,
+      perEventBridges: 2,
+    });
+    expect(r.ponte.ponti).toBe(2);
+    expect(r.ponte.entra).toBe(false);
+    expect(r.istanza).toMatchObject({ ponti: 6, pontiPerEvento: 2 });
+  });
+
   it('il carico e sui core del ponte dell istanza', () => {
     const piccolo = stimaCapacita(
       { ...riunione, maxParticipants: 100 },

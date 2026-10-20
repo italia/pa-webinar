@@ -347,8 +347,8 @@ with the site's stress thresholds:
 
 Without cascading, an event stays on one bridge, and above 100% it does not
 fit. With cascading (`JVB_CASCADING=true`), the panel says how many linked
-bridges the event would use, `ceil(load / critical threshold)`, up to
-`JVB_MAX_REPLICAS`. When the level is not **Ample margin**, the panel
+bridges the event would use, `ceil(load / critical threshold)`, up to the
+per-event cap `SiteSetting.jvbMaxReplicas` and to `JVB_MAX_REPLICAS`. When the level is not **Ample margin**, the panel
 names the first change that brings the load under the warning threshold: a
 lower quality preset, then fewer webcams, then fewer participants. Above 25
 webcams, fewer webcams barely help, because every viewer already sees a
@@ -363,6 +363,7 @@ transcribed voice, up to `CAPTIONS_MAX_STREAMS` voices at once.
 | Cores per bridge | `SiteSetting.jvbCpuCoresPerPod` |
 | Stress thresholds | `SiteSetting.jvbStressWarnPercent` and `jvbStressCriticalPercent` |
 | Bridges in the instance | `JVB_MAX_REPLICAS` |
+| Bridges for one event, with cascading | `SiteSetting.jvbMaxReplicas`, never above `JVB_MAX_REPLICAS` |
 | Loudest voices forwarded | `JVB_NUM_LOUDEST`; unset or `0` means every voice |
 | Linked bridges | `JVB_CASCADING`, `true` or unset |
 | Voices transcribed at once | `CAPTIONS_MAX_STREAMS`, `4` when unset |
@@ -800,8 +801,9 @@ The portal scales in the usual way for a stateless web application:
   on an event (`capacityEstimateJson`, at creation and whenever its
   capacity inputs are edited) comes from the capacity model with the
   built-in instance defaults (a 16-core bridge, every voice forwarded), not
-  from the site's settings or the app environment; it carries `model: 2`
-  and nothing reads it back. The scaler recomputes on every tick from the
+  from the site's settings or the app environment; it carries `model: 2`,
+  the model's bridges in `bridges` and the scaler formula's count in
+  `jvbCount`, and nothing reads it back. The scaler recomputes on every tick from the
   current settings, so compare against the route's `breakdown` instead.
 - **A Redis outage stops scaling.** The snapshot write waits for Redis, so
   no tick applies a replica count until Redis is back (see

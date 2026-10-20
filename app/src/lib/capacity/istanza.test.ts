@@ -44,6 +44,7 @@ describe('capacitaIstanza', () => {
     vi.stubEnv('JVB_NUM_LOUDEST', '5');
     const istanza = capacitaIstanza({
       jvbCpuCoresPerPod: 15,
+      jvbMaxReplicas: 3,
       jvbStressWarnPercent: 40,
       jvbStressCriticalPercent: 80,
       defaultSenderRatioPct: 20,
@@ -54,6 +55,7 @@ describe('capacitaIstanza', () => {
       stressWarn: 40,
       stressCritical: 80,
       instanceBridges: 1,
+      perEventBridges: 3,
       numLoudest: 5,
       siteCameraPct: 20,
       siteVideoQuality: 'BALANCED',

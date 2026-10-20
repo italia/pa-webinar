@@ -36,6 +36,7 @@ export function ambienteCapacita(
 
 export interface ImpostazioniCapacita {
   jvbCpuCoresPerPod?: number | null;
+  jvbMaxReplicas?: number | null;
   jvbStressWarnPercent?: number | null;
   jvbStressCriticalPercent?: number | null;
   defaultSenderRatioPct?: number | null;
@@ -52,6 +53,7 @@ export function capacitaIstanza(impostazioni: ImpostazioniCapacita): CapacitaIst
     stressCritical:
       impostazioni.jvbStressCriticalPercent ?? ISTANZA_PREDEFINITA.stressCritical,
     instanceBridges: Number.isFinite(ponti) && ponti > 0 ? ponti : 1,
+    perEventBridges: impostazioni.jvbMaxReplicas ?? undefined,
     ...ambienteCapacita(),
     captionsAvailable: liveCaptionsAvailable(impostazioni),
     siteCameraPct:

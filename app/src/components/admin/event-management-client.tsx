@@ -192,7 +192,6 @@ interface EventData {
   moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
   jitsiRoomName: string; dataRetentionDays: number;
   privacyPolicyUrl: string | null; privacyPolicyText: string | null;
-  speakersInfo: Record<string, string> | null;
   createdAt: string;
   tags: TagData[]; organizers: OrganizerData[]; eventModerators: EventModeratorData[];
   questionnaireCount: number;
