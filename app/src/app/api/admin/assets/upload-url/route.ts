@@ -50,40 +50,16 @@ import {
   type AssetType,
 } from '@/lib/utils/asset-key';
 import { contentMatchesDeclaredMime } from '@/lib/utils/mime-sniff';
-import {
-  MATERIAL_FILE_MAX_BYTES,
-  MATERIAL_FILE_MIME_TYPES,
-} from '@/lib/validation/materials';
+import { ASSET_MAX_BYTES, ASSET_MIME_TYPES } from '@/lib/uploads/limits';
 
 export const dynamic = 'force-dynamic';
 
 type AssetKind = AssetType;
 
-const ALLOWED_MIME: Record<AssetKind, ReadonlySet<string>> = {
-  image: new Set([
-    'image/png',
-    'image/jpeg',
-    'image/webp',
-    'image/svg+xml',
-    'image/gif',
-  ]),
-  audio: new Set([
-    'audio/mpeg',
-    'audio/wav',
-    'audio/ogg',
-    'audio/mp4',
-    'audio/webm',
-  ]),
-  // I documenti sono i materiali dell'evento: stessa regola della sala.
-  document: new Set<string>(MATERIAL_FILE_MIME_TYPES),
-};
-
-// Caps in bytes (MiB-based to match object-store dashboards).
-const MAX_SIZE: Record<AssetKind, number> = {
-  image: 10 * 1024 * 1024,
-  audio: 20 * 1024 * 1024,
-  document: MATERIAL_FILE_MAX_BYTES,
-};
+// Tipi e pesi ammessi: la stessa regola che il campo del browser controlla
+// prima di spedire (lib/uploads/limits).
+const ALLOWED_MIME = ASSET_MIME_TYPES;
+const MAX_SIZE = ASSET_MAX_BYTES;
 
 function assertAssetKind(raw: string | null): AssetKind {
   if (raw === 'image' || raw === 'audio' || raw === 'document') return raw;
@@ -151,11 +127,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const mime = fileField.type || 'application/octet-stream';
   const allowedForType = ALLOWED_MIME[type];
-  if (!allowedForType.has(mime)) {
+  if (!allowedForType.includes(mime)) {
     throw new AppError(
-      `MIME type "${mime}" is not allowed for assetType=${type}. Allowed: ${Array.from(
-        allowedForType,
-      ).join(', ')}`,
+      `MIME type "${mime}" is not allowed for assetType=${type}. Allowed: ${allowedForType.join(', ')}`,
       415,
       'UNSUPPORTED_MEDIA_TYPE',
     );

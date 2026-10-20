@@ -37,9 +37,9 @@ pipeline cannot run unless the recordings domain is configured.
 A domain that is not configured is disabled, and the features that depend on
 it degrade:
 
-- **Files domain disabled.** The administration area offers only the URL
+- **Files domain disabled.** The administration area offers only the link
   field for its file inputs, with the note "File uploads are not available on
-  this installation: paste the file's URL instead.", the live room offers no file upload for materials, and
+  this installation: paste the file's link.", the live room offers no file upload for materials, and
   the chat shows no attachment button. Called directly, the upload endpoints
   answer `503` with `STORAGE_UNAVAILABLE`, logged at `warn`, not `error`. `/api/assets/…` answers `404`.
   Materials given as links keep working.

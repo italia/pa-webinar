@@ -420,8 +420,8 @@ page is in [Conference-root redirect](#conference-root-redirect).
   applies before requests are spread over the app replicas; the app's own limits count per process
   ([Security architecture](architecture/security.md)).
 - **Body size against upload caps.** Three kinds of upload pass through the Ingress as multipart
-  bodies: staff uploads of images up to 10 MiB and audio up to 20 MiB (`MAX_SIZE` in
-  `app/src/app/api/admin/assets/upload-url/route.ts`), event materials up to 25 MiB, from the
+  bodies: staff uploads of images up to 10 MiB and audio up to 20 MiB (`ASSET_MAX_BYTES` in
+  `app/src/lib/uploads/limits.ts`), event materials up to 25 MiB, from the
   administration area or from the live room (`MATERIAL_FILE_MAX_BYTES` in
   `app/src/lib/validation/materials.ts`), and chat attachments up to 10 MiB
   (`CHAT_ATTACHMENT_MAX_BYTES` in `app/src/lib/chat/attachments.ts`). The default `proxy-body-size: 30m`
