@@ -21,7 +21,7 @@ PA Webinar is open-source software that lets a public administration (PA) run pu
 The Dipartimento per la Trasformazione Digitale owns and maintains PA Webinar. The Dipartimento is part of the Presidenza del Consiglio dei Ministri (Presidency of the Council of Ministers of Italy). It has three roles:
 
 - **Copyright holder.** It is the `legal.mainCopyrightOwner` in [`publiccode.yml`](publiccode.yml).
-- **Repository owner.** It is the `legal.repoOwner` of [github.com/italia/pa-webinar](https://github.com/italia/pa-webinar).
+- **Repository owner.** It owns [github.com/italia/pa-webinar](https://github.com/italia/pa-webinar) and is the `organisation` in [`publiccode.yml`](publiccode.yml), identified there by the iPA code of the Presidenza del Consiglio dei Ministri (`urn:x-italian-pa:pcm`).
 - **Maintainer.** `maintenance.type` is `internal`. In the publiccode.yml standard, this means the repository owner maintains the software itself. No maintenance contract with a third party is declared.
 
 The maintenance contact is **segreteria.trasformazionedigitale@governo.it**, with the affiliation Presidenza del Consiglio dei Ministri.
