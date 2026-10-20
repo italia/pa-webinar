@@ -653,6 +653,8 @@ erDiagram
     string blobKey "mix key or multitrack placeholder"
     RecordingStatus status
     datetime retentionUntil
+    boolean slidesEnabled "synced slides shown"
+    int slidesOffsetSec "slide alignment"
   }
   RECORDING_TRACK {
     uuid id PK
@@ -799,6 +801,87 @@ link or publicly. From here on, the pipeline is described in
   offset. See [AI post-production](../POSTPROD.md).
 - **Content Security Policy.** The storage host must be allowed in
   `media-src`; see [Content Security Policy](../SECURITY-CSP.md).
+
+### Synced slides
+
+Jibri records the Jitsi page, not the portal, so a PDF presented in the room
+([Presentation](live-interaction.md#presentation)) is not in the video. The
+room's journal has it: `presentation.started`, `presentation.page` and
+`presentation.stopped`, with the server time, the material, the page and the
+title. The event page puts the pages back beside the published video
+(`app/src/lib/presentation/recording-slides.ts`, pure, and
+`recording-slides-data.ts`, which reads the database).
+
+- **Which recording.** The page plays `Event.recordingUrl`. Slides go beside
+  it only when it is the file of a room recording: the `Recording` whose call
+  session has the same `recordingUrl`, as the recording webhook writes both.
+  That recording gives the time base, the duration and the staff's choices. An
+  event recorded in several segments has one `Recording` per segment, and the
+  page shows the slides of the segment it plays; a video uploaded by hand has
+  no `Recording`, no time base and no slides.
+- **Time base.** The file of a room recording is the Jibri composite, which
+  arrives with the webhook at the end of its call session, after the video
+  ended. Zero is the start of the recording reported by the room
+  (`recording.started`, `videoSegmentFromJournal`). With a duration, it is
+  the start of the closed segment (a start and the `recording.stopped` that
+  follows it, before the arrival) whose length best matches the duration,
+  among those starting around the arrival minus the duration; without
+  journaled stops, the start closest to that estimate, preferring those not
+  after it, so that a recording stopped and restarted at once does not take
+  the next start. Without any start, the estimate itself. Without a
+  duration, the last closed segment before the arrival, which also gives
+  the end; with none, the last start up to the arrival. Either way the
+  entries of another segment of the same event never fall into this
+  video. For a multitrack recording this differs from the zero of its
+  transcript, which is the start of the tracks: the recorder begins when the
+  room goes live, the composite video when a moderator presses **Start
+  recording**. A journal entry at server time `at` lands at
+  `(at − zero) + Recording.slidesOffsetSec` seconds in the video.
+- **From entries to cues.** The entries are read in time order as a state
+  machine: a start puts a document on screen from a page, a page change moves
+  it (and also names the document on screen), a stop of the document on screen
+  clears it, and `event.ended` closes the room. What happens before the first
+  frame decides the opening page; what happens after the end of the video is
+  not in it. Consecutive identical states merge, so a handover on the same page
+  opens no new cue. The result is a list of non-overlapping cues
+  `{start, end, materialId, page}` in video seconds.
+- **Which materials.** A cue stays only when its material is still an
+  uploaded PDF of the event (`isPresentableMaterial`) and visible after the
+  event (`ALWAYS` or `AFTER`, `lib/events/material-visibility.ts`). Other
+  cues are dropped and leave a gap. With no cue left, with
+  `Recording.slidesEnabled` off, or with the page's materials switched off
+  (`postEventShowMaterials`), the page gets no slides: it never shows a
+  document it does not already list.
+- **Serving the PDF.** The page receives the cues and, per material, a
+  `fileUrl` on `GET /api/events/<slug>/recording/slides?m=<materialId>`. That
+  route answers only while the concluded page is public
+  (`isEventPageVisible`) and the video published, checks first that the
+  material can be shown and was presented in the room, then recomputes the
+  slides and serves only a material among them, streaming it from files storage through
+  a short-lived signed URL that never leaves the server
+  (`lib/presentation/serve-pdf.ts`, shared with the room's presentation file
+  route), with `Cache-Control: private, no-store`. It never hands out the
+  material's `/api/assets` address. The page and the route keep what they
+  read from the journal and the materials for 30 seconds per recording, in
+  each app process; the staff's switch and correction apply at once.
+- **In the browser.** `app/src/components/presentation/recording-slides.tsx`
+  follows the `<video>` element on `timeupdate`, `seeked` and
+  `loadedmetadata`, and on every animation frame while it plays, and re-renders
+  only when the video crosses a cue boundary. It downloads each PDF once, the
+  one on screen or the next one coming, and renders the page with the same
+  pdf.js as the room, under `worker-src 'self'`.
+- **Staff.** `GET` and `PATCH /api/admin/postprod/recordings/<id>/slides`
+  (managers of the event) read the journal entries on the recording's time
+  base and the presented materials with the reason one is not shown, and
+  change `slidesEnabled` and `slidesOffsetSec` (whole seconds, within ±3600).
+  The preview in the recording's **Slides** tab recomputes the cues in the
+  browser with the same functions at every correction, plays the recording
+  from `/api/admin/postprod/recordings/<id>/media`, and reads the PDFs from
+  `/api/admin/postprod/recordings/<id>/slides/file`.
+- **Limit.** Only a moderator's **End for everyone** writes `event.ended` to
+  the journal. When the platform closes the room on its own (the lifecycle
+  job) and nobody stopped the presentation, the last page stays beside the
+  video until its end.
 
 ## Known limitations
 

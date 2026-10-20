@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { SLIDE_OFFSET_MAX_SEC } from '@/lib/presentation/recording-slides';
 import { PRESENTATION_PAGE_MAX } from '@/lib/presentation/types';
 
 const pagina = z.number().int().min(1).max(PRESENTATION_PAGE_MAX);
@@ -32,3 +33,32 @@ export const stopPresentationQuerySchema = z.object({
 export const presentationFileQuerySchema = z.object({
   m: z.string().uuid(),
 });
+
+/**
+ * GET /api/events/[param]/recording/slides?m=… e
+ * GET /api/admin/postprod/recordings/[id]/slides/file?m=…: il materiale di una
+ * slide accanto alla registrazione.
+ */
+export const recordingSlidesFileQuerySchema = z.object({
+  m: z.string().uuid(),
+});
+
+/**
+ * PATCH /api/admin/postprod/recordings/[id]/slides: se mostrare le slide
+ * accanto al video e lo scarto, in secondi interi, dei cambi di slide sul
+ * video (positivo più tardi, negativo prima).
+ */
+export const recordingSlidesSettingsSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    offsetSec: z
+      .number()
+      .int()
+      .min(-SLIDE_OFFSET_MAX_SEC)
+      .max(SLIDE_OFFSET_MAX_SEC)
+      .optional(),
+  })
+  .strict()
+  .refine((v) => v.enabled !== undefined || v.offsetSec !== undefined, {
+    message: 'Nothing to change',
+  });

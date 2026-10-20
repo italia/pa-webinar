@@ -15,6 +15,8 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
+import { publicRecordingSlides } from '@/lib/presentation/recording-slides-data';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
@@ -282,6 +284,9 @@ export default async function EventDetailPage({
   // senza, il modulo chiederebbe al server un questionario che non c'è.
   let hasPostEventQuestionnaire = false;
   let feedbackProof: { accessToken?: string; ratingToken?: string } | null = null;
+  // Le slide presentate in sala accanto al video pubblicato
+  // (lib/presentation/recording-slides-data).
+  let recordingSlides: RecordingSlidesView | null = null;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -355,6 +360,19 @@ export default async function EventDetailPage({
     ]);
 
     hasPostEventQuestionnaire = !!postEventQuestionnaire;
+
+    // Un contorno del video: se non si leggono, la pagina resta quella di
+    // sempre, con il video senza slide.
+    if (event.recordingPublished && event.recordingUrl) {
+      try {
+        recordingSlides = await publicRecordingSlides(event);
+      } catch (err) {
+        console.error(
+          '[events/page] slide della registrazione non lette',
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
 
     // La valutazione dalla pagina pubblica: solo per un iscritto entrato in
     // sala, riconosciuto dal link della valutazione dell'email di
@@ -514,6 +532,7 @@ export default async function EventDetailPage({
         polls={pollsData}
         feedbackSummary={feedbackSummary}
         recap={recap}
+        recordingSlides={recordingSlides}
         tags={event.tagLinks.map((l) => ({
           slug: l.tag.slug,
           name: (l.tag.name ?? {}) as Record<string, string>,

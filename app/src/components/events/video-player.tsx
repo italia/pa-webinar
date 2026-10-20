@@ -12,6 +12,8 @@ import {
 } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { formatVideoTime } from '@/lib/utils/video-time';
+
 export interface SubtitleTrack {
   /** ISO-639-1 language code, e.g. "it", "en", "fr". */
   language: string;
@@ -93,15 +95,6 @@ export interface VideoPlayerHandle {
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
-
-function formatTime(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-}
 
 function VideoPlayerImpl(
   {
@@ -842,7 +835,7 @@ function VideoPlayerImpl(
 
           {/* Time */}
           <span className="video-player__time">
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
           </span>
 
           <div className="video-player__spacer" />

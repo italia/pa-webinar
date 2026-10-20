@@ -34,6 +34,9 @@ interface RecordingManagementProps {
     moderatorToken: string;
   };
   jibriAvailable?: boolean;
+  /** La registrazione del video, quando ha slide presentate in sala da
+   *  regolare (pagina della post-produzione, scheda «Slide»). */
+  slidesRecordingId?: string | null;
 }
 
 const RETENTION_OPTIONS = [
@@ -61,6 +64,7 @@ function formatFileSize(bytes: number): string {
 export default function RecordingManagement({
   event,
   jibriAvailable = true,
+  slidesRecordingId = null,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
   const toast = useToast();
@@ -325,6 +329,18 @@ export default function RecordingManagement({
                     <Icon icon="it-comment" size="sm" />
                     {t('transcriptManage')}
                   </Link>
+                  {/* Le slide presentate in sala, accanto al video sulla
+                      pagina pubblica: si mostrano, si allineano e si provano
+                      dalla scheda «Slide» della registrazione. */}
+                  {slidesRecordingId && (
+                    <Link
+                      href={percorso(`/admin/postprod/${slidesRecordingId}?tab=slides`)}
+                      className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                    >
+                      <Icon icon="it-presentation" size="sm" />
+                      {t('slidesManage')}
+                    </Link>
+                  )}
                 </>
               )}
               <Button

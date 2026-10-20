@@ -1316,6 +1316,300 @@ button.live-time-strip__rec {
   }
 }
 
+// ── Slide accanto alla registrazione ──
+//
+// Le pagine presentate in sala, sincronizzate con il video della pagina
+// dell'evento concluso (components/presentation/recording-slides). Superficie
+// chiara come il resto della pagina; il riquadro della slide ha le proporzioni
+// di una slide 16:9, così la pagina non salta quando la slide cambia, e una
+// slide 4:3 resta al centro con i margini.
+.recording-slides {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #fff;
+  color: var(--app-text);
+  border: 1px solid #D9E1E8;
+  border-radius: 8px;
+  overflow: hidden;
+
+  &__icon {
+    flex-shrink: 0;
+    fill: var(--app-primary);
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #E3E8EE;
+  }
+
+  &__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--app-text);
+  }
+
+  &__doc {
+    font-size: 0.82rem;
+    margin: 0;
+    color: var(--app-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__canvas-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #EEF1F4;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(23, 50, 77, 0.25);
+
+    &.is-hidden {
+      visibility: hidden;
+    }
+  }
+
+  &__status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--app-text);
+    background: #EEF1F4;
+  }
+
+  &__spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 102, 204, 0.25);
+    border-top-color: #0066CC;
+    animation: presentation-spin 0.9s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-top: 1px solid #E3E8EE;
+  }
+
+  &__indicator {
+    margin: 0;
+    min-width: 7rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #C5D0DA;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover:not(:disabled) {
+      background: #EEF4FB;
+      border-color: var(--app-primary);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      color: #8A9BAB;
+      cursor: not-allowed;
+    }
+
+    &--text {
+      min-width: 0;
+    }
+  }
+
+  &__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: auto;
+    min-height: 44px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-primary);
+    text-decoration: none;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+  }
+
+  &__text,
+  &__list {
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.85rem;
+    border-top: 1px solid #E3E8EE;
+
+    summary {
+      cursor: pointer;
+      color: var(--app-primary);
+      font-weight: 600;
+      padding: 0.35rem 0;
+
+      &:focus-visible {
+        outline: 3px solid #0066CC;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__text p {
+    max-height: 12rem;
+    overflow-y: auto;
+    margin: 0.25rem 0 0;
+    white-space: pre-line;
+    color: var(--app-text);
+  }
+
+  &__chapters {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    max-height: 16rem;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  &__chapter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.6rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: transparent;
+    color: var(--app-text);
+    text-align: left;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      background: #EEF4FB;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: -3px;
+    }
+
+    &.is-current {
+      border-left-color: var(--app-primary);
+      background: #EEF4FB;
+      font-weight: 600;
+    }
+  }
+
+  &__chapter-time {
+    color: var(--app-primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 3.5rem;
+  }
+
+  &__chapter-doc {
+    flex-basis: 100%;
+    padding-left: 4.1rem;
+    color: var(--app-muted);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__note {
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    border-top: 1px solid #E3E8EE;
+  }
+}
+
+// Il pannello dello staff: l'elenco dei motivi per cui le slide si vedono o no.
+.recording-slides-admin__status {
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  color: var(--app-text);
+
+  li + li {
+    margin-top: 0.25rem;
+  }
+
+  &:empty {
+    display: none;
+  }
+}
+
 // ── Sidebar / floating controls (Meet-style) ──
 //
 // Video takes the full width of .live-body. A "floating control bar"
