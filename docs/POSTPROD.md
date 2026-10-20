@@ -329,7 +329,7 @@ stateDiagram-v2
     RUNNING --> PENDING: lease expired,<br/>postprod-reclaim
     CLAIMED --> PENDING: lease expired,<br/>postprod-reclaim
     RUNNING --> FAILED: FAILED at the attempt cap
-    PENDING --> FAILED: attempts at the cap,<br/>or Cancel
+    PENDING --> FAILED: attempts at the cap, Cancel,<br/>or no translation engine
     RUNNING --> FAILED: Cancel
     CLAIMED --> FAILED: Cancel
     DONE --> [*]
@@ -369,6 +369,11 @@ provider hints. The worker never signs URLs and never writes to the database.
   every `CLAIMED` or `RUNNING` job whose lease expired more than a minute ago,
   for example after an out-of-memory kill or a lost node. It does not reset
   `attempts`, because the claim already counted that attempt.
+- Without the CPU translation engine configured (`AI_MT_BASE_URL` unset), the
+  same job marks `FAILED` every `PENDING` `TRANSLATE_TEXT` job, with
+  `lastError` "The CPU translation engine is not configured (AI_MT_BASE_URL)".
+  No worker could claim it, so its attempts would never grow. A claimed one is left to its worker: when the worker
+  gives it back, or its lease expires, the next run closes it.
 - The presigned URLs in the work order are valid for the lease length. They
   are not renewed when the lease is refreshed (see
   [Known limitations](#known-limitations)).
@@ -484,7 +489,11 @@ piling up. Each run:
    jobs that ask vLLM for text (`LLM_JOB_KINDS` in
    `app/src/lib/ai/job-classes.ts`: `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`,
    `SUMMARIZE`, `TRANSLATE`, `REPORT`), and `desiredMt`, the same for the CPU
-   translation engine (`TRANSLATE_TEXT`). While the site switch is off, every
+   translation engine (`TRANSLATE_TEXT`). `desiredWithoutMt` is `desired`
+   without the `TRANSLATE_TEXT` jobs, capped after removing them, for a chart
+   without the CPU worker. Without the CPU translation engine configured
+   (`AI_MT_BASE_URL` unset), no worker can run a `TRANSLATE_TEXT` job, so those
+   jobs are left out of every count. While the site switch is off, every
    count is zero and the orchestrator stops here, after scaling the CPU
    translation engine ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand));
 2. counts the active worker Jobs of each kind in the release namespace, by
@@ -495,8 +504,12 @@ piling up. Each run:
    `--from=cronjob/<fullname>-postprod-worker-cpu`, where `<fullname>` is the
    chart's full name (`pa-webinar` for a release named `pa-webinar`).
 
-Without the CPU worker (`postprod.worker.cpu.enabled: false`), or with a
-portal that does not send the split, every job goes to the GPU worker.
+Without the CPU worker (`postprod.worker.cpu.enabled: false`), the GPU worker
+takes every job except `TRANSLATE_TEXT`, and the orchestrator sizes it with
+`desiredWithoutMt`, so a translation of event texts left in the queue never
+starts a GPU node. With a portal that does not send the split, every job goes
+to the GPU worker; one that does not send `desiredWithoutMt` predates
+`TRANSLATE_TEXT`, and the orchestrator uses `desired`.
 
 `RUNNING` jobs are not in `desired`, but their pods are in the active count.
 A new worker therefore starts only when runnable plus claimed jobs outnumber
@@ -582,7 +595,9 @@ The CPU worker starts from its own entry point, `python -m worker.cpu`, which
 refuses to run without a list or with a GPU kind in it. Without the CPU worker
 (`postprod.worker.cpu.enabled: false`) the GPU worker takes every kind except
 `TRANSLATE_TEXT`, which must never start a GPU node; the chart therefore
-refuses to render `postprod.mt.enabled` without the CPU worker. An older worker image
+refuses to render `postprod.mt.enabled` without the CPU worker, and the
+orchestrator does not count `TRANSLATE_TEXT` jobs for the GPU worker
+([The orchestrator](#the-orchestrator)). An older worker image
 lacks that module, so a CPU pod pinned to it exits before claiming anything.
 Both variants share the rest of the pod template:
 
@@ -1856,8 +1871,15 @@ report, and depends on no job.
   and its SHA-256 (`sourceHash`, computed in the same way in the browser and
   in the portal, `app/src/lib/text-translation/source.ts`).
 - **Which worker.** Only the CPU worker takes it, so it never wakes the GPU
-  worker. `desiredLlm` does not count it, so it never starts vLLM.
+  worker: without the CPU worker, `desiredWithoutMt` leaves it out of the GPU
+  worker's count. `desiredLlm` does not count it, so it never starts vLLM.
   `desiredMt` counts it and starts the engine.
+- **Without the engine.** When the portal has no engine configured
+  (`AI_MT_BASE_URL` unset, for example after `postprod.mt.enabled` was turned
+  off with jobs still queued), the orchestrator does not count these jobs and
+  `postprod-reclaim` closes the queued ones as failed
+  ([Leases and reclaim](#leases-and-reclaim)). The wizard and the event page
+  do not show the feature while the engine is missing.
 - **Claim.** The claim returns `textInput` and, in `providerHints`, the
   engine's address and model (`mtBaseUrl`, `mtModelId`) and the glossary. A
   claim without an engine configured closes the job as failed instead of
@@ -1870,10 +1892,17 @@ time, with its own request format: one user message,
 `Translate the following <Source> source text to <Target>:`, no system
 prompt, temperature 0. So the worker:
 
-- translates the description line by line, keeping each line's Markdown
-  prefix (headings, lists, quotes, numbers), the blank lines, the code blocks
-  and the rules untouched, and translating table cells one by one. Lines
-  longer than 1,000 characters are split between sentences;
+- translates the description line by line, keeping each line's indentation
+  and Markdown prefix (headings, lists, quotes, numbers), the blank lines, the
+  code blocks and the rules untouched, and translating table cells one by one.
+  Code blocks are the fenced ones and the indented ones: a line indented by
+  four columns beyond the margin, or beyond the content of the list item it
+  belongs to, that does not continue a paragraph. Lines longer than 1,000
+  characters are split between sentences;
+- never sends the model a line or a piece with nothing to translate: empty,
+  only numbers and symbols, or only links and images without text (an image
+  alone on its line, for example) stay as they are, and a piece made only of
+  addresses and glossary terms gets them back without a request;
 - turns each link into `<aN>text</aN>`, which the model keeps, and puts the
   address back afterwards. When a tag is lost, the line is translated without
   links and each link text on its own, so no link is dropped;

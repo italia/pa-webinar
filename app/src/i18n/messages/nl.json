@@ -3552,6 +3552,7 @@
       "queued": "In de wachtrij: de vertaling begint zo.",
       "running": "Bezig met vertalen: dit kan enkele minuten duren.",
       "busy": "Er loopt al een andere vertaling voor dit evenement: probeer het opnieuw als die klaar is.",
+      "sourceChanged": "De titel of beschrijving is na het verzoek gewijzigd: de vertaling is niet ingevuld. Gebruik opnieuw ‘{button}’ om de huidige tekst te vertalen.",
       "noTargets": "Kies minstens één taal.",
       "sourceMissing": "Schrijf eerst de titel of de beschrijving in de hoofdtaal.",
       "done": "Vertaling klaar voor: {languages}. Controleer voordat je opslaat.",

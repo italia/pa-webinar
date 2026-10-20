@@ -3552,6 +3552,7 @@
       "queued": "Queued: the translation will start shortly.",
       "running": "Translating: this may take a few minutes.",
       "busy": "Another translation is already running for this event: try again when it finishes.",
+      "sourceChanged": "The title or description changed after the request: the translation was not filled in. To translate the current text, use “{button}” again.",
       "noTargets": "Choose at least one language.",
       "sourceMissing": "First write the title or the description in the main language.",
       "done": "Translation ready for {languages}: review it before saving.",

@@ -44,7 +44,10 @@ function mount(node: ReactNode) {
   });
 }
 
-/** Come il wizard: il modulo, la funzione che riempie i campi vuoti, la scheda. */
+/**
+ * Come il wizard: il modulo, la funzione che riempie i campi vuoti, la scheda,
+ * e un pulsante che cambia il testo di partenza come farebbe chi scrive.
+ */
 function Banco({
   titoli,
   descrizioni,
@@ -89,6 +92,16 @@ function Banco({
         descrizioni={form.description}
       />
       <pre data-testid="modulo">{JSON.stringify({ ...form, segnate })}</pre>
+      <button
+        type="button"
+        data-testid="riscrivi"
+        onClick={() =>
+          setForm((prima) => ({
+            ...prima,
+            description: { ...prima.description, it: `${prima.description.it} riscritto` },
+          }))
+        }
+      />
     </>
   );
 }
@@ -101,12 +114,20 @@ const modulo = () =>
   };
 const pulsante = (testo: string) =>
   [...container.querySelectorAll('button')].find((b) => b.textContent?.trim() === testo)!;
+const stato = () => container.querySelector('[role="status"]')!.textContent;
 const attendi = async () => {
   for (let i = 0; i < 5; i += 1) {
     await act(async () => {
       await Promise.resolve();
     });
   }
+};
+/** Il giro successivo della rilettura ogni 10 secondi. */
+const avanza = async () => {
+  await act(async () => {
+    vi.advanceTimersByTime(10_000);
+  });
+  await attendi();
 };
 
 async function proposta(
@@ -249,6 +270,102 @@ describe('scheda della traduzione automatica (modifica)', () => {
     });
     await attendi();
     expect(letture).toBe(2);
+  });
+
+  it("se il testo di partenza cambia mentre il lavoro gira, a lavoro finito non riempie niente", async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    const p = await proposta('Titolo', 'Testo');
+    let fase: 'nessuno' | 'in-coda' | 'consegnata' = 'nessuno';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        if (init?.method === 'POST') {
+          fase = 'in-coda';
+          return new Response(JSON.stringify({ stato: 'accodato', jobId: 'j' }), {
+            status: 202,
+          });
+        }
+        const job =
+          fase === 'nessuno'
+            ? null
+            : {
+                status: fase === 'consegnata' ? 'DONE' : 'PENDING',
+                lastError: null,
+                sourceHash: p.sourceHash,
+              };
+        return new Response(
+          JSON.stringify({ job, proposals: fase === 'consegnata' ? p : null })
+        );
+      })
+    );
+    mount(<Banco titoli={{ it: 'Titolo' }} descrizioni={{ it: 'Testo' }} />);
+    await attendi();
+    await act(async () => {
+      pulsante(tt.start).click();
+    });
+    await attendi();
+    expect(stato()).toBe(tt.queued);
+    // Chi aspetta continua a scrivere la descrizione italiana.
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>('[data-testid="riscrivi"]')!.click();
+    });
+    fase = 'consegnata';
+    await avanza();
+    // La traduzione del testo di prima non entra nel modulo...
+    expect(modulo()).toEqual({
+      title: { it: 'Titolo' },
+      description: { it: 'Testo riscritto' },
+      segnate: [],
+    });
+    // ...lo si dice, con il pulsante per tradurre il testo attuale...
+    expect(stato()).toBe(tt.sourceChanged.replace('{button}', tt.start));
+    expect(pulsante(tt.start).disabled).toBe(false);
+    // ...e non si offre: viene da un altro testo.
+    expect(container.textContent).not.toContain(tt.useOffer);
+  });
+
+  it("con un'altra traduzione gia' in corso lo dice finche' non finisce, e non accoda niente", async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    // La traduzione chiesta alla creazione, di un altro testo.
+    const altra = await proposta('Titolo di prima', 'Testo di prima');
+    let status = 'PENDING';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        if (init?.method === 'POST') {
+          return new Response(
+            JSON.stringify({ stato: 'in-corso', jobId: 'j', sourceHash: altra.sourceHash })
+          );
+        }
+        return new Response(
+          JSON.stringify({
+            job: { status, lastError: null, sourceHash: altra.sourceHash },
+            proposals: status === 'DONE' ? altra : null,
+          })
+        );
+      })
+    );
+    mount(<Banco titoli={{ it: 'Titolo' }} descrizioni={{ it: 'Testo' }} />);
+    await attendi();
+    expect(stato()).toBe(tt.queued);
+    await act(async () => {
+      pulsante(tt.start).click();
+    });
+    await attendi();
+    // Non «in coda»: la richiesta di questa pagina non e' stata accodata.
+    expect(stato()).toBe(tt.busy);
+    status = 'RUNNING';
+    await avanza();
+    expect(stato()).toBe(tt.busy);
+    // Finita l'altra: l'avviso sparisce e il modulo resta com'era.
+    status = 'DONE';
+    await avanza();
+    expect(stato()).toBe('');
+    expect(modulo()).toEqual({
+      title: { it: 'Titolo' },
+      description: { it: 'Testo' },
+      segnate: [],
+    });
   });
 
   it("una proposta gia' pronta per lo stesso testo si offre; per un altro testo no", async () => {

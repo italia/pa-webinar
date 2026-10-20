@@ -1,7 +1,7 @@
 /**
  * GET /api/cron/postprod-reclaim
  *
- * Janitor cron — runs every ~1 min. Two responsibilities:
+ * Janitor cron — runs every ~1 min. Three responsibilities:
  *
  *   1. **Reclaim expired leases**: any PostprodJob with status='CLAIMED'
  *      whose `next_attempt_at` is in the past lost its worker (pod
@@ -15,13 +15,22 @@
  *      jobs may still succeed; the orchestrator's overall view is
  *      built by the artifact register endpoint).
  *
+ *   3. **Traduzione dei testi senza motore**: senza il motore di traduzione
+ *      su CPU configurato (AI_MT_BASE_URL, tolto dall'installazione dopo la
+ *      richiesta) un lavoro di MT_JOB_KINDS in coda non lo esegue nessun
+ *      worker, e senza claim i suoi tentativi non crescono mai: si chiude
+ *      come fallito, con il motivo in `last_error`.
+ *
  * Protected by CRON_API_KEY.
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { MT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
+import { resolveMtProvider } from '@/lib/ai/providers';
+import { postprodJobsCompletedTotal } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +40,9 @@ interface ReclaimedRow {
   recording_id: string | null;
   attempts: number;
 }
+
+/** Lo stesso motivo della chiusura al claim (api/internal/postprod-claim). */
+const MOTORE_ASSENTE = 'The CPU translation engine is not configured (AI_MT_BASE_URL)';
 
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
@@ -90,6 +102,25 @@ export const GET = withErrorHandling(async (request) => {
     });
   }
 
+  // Step 3 — la traduzione dei testi senza motore. Solo i lavori in coda,
+  // anche quelli appena ripresi dal passo 1: uno preso ha un worker vivo, che
+  // lo chiude da se' o lo rimanda in coda, e al giro dopo si chiude qui.
+  let senzaMotore = 0;
+  if (!resolveMtProvider()) {
+    const chiusi = await prisma.$queryRaw<Array<{ kind: string }>>`
+      UPDATE postprod_jobs
+      SET status = 'FAILED',
+          completed_at = NOW(),
+          last_error = ${MOTORE_ASSENTE},
+          updated_at = NOW()
+      WHERE status = 'PENDING'
+        AND kind::text = ANY(${[...MT_JOB_KINDS]}::text[])
+      RETURNING kind::text AS kind
+    `;
+    for (const { kind } of chiusi) postprodJobsCompletedTotal.labels(kind, 'FAILED').inc();
+    senzaMotore = chiusi.length;
+  }
+
   // Refresha i gauge della coda — il cron è il "battito" canonico,
   // garantisce che Prometheus veda valori freschi anche se la app non
   // riceve richieste utenti (es. orari di basso traffico). Il refresh
@@ -102,5 +133,6 @@ export const GET = withErrorHandling(async (request) => {
     ok: true,
     reclaimed: reclaimed.length,
     failed: failed.length,
+    failedNoMtEngine: senzaMotore,
   });
 });

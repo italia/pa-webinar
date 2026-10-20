@@ -3552,6 +3552,7 @@
       "queued": "I kø: oversættelsen starter om lidt.",
       "running": "Oversætter: det kan tage et par minutter.",
       "busy": "Der kører allerede en anden oversættelse for denne begivenhed: prøv igen, når den er færdig.",
+      "sourceChanged": "Titlen eller beskrivelsen er ændret efter anmodningen: oversættelsen blev ikke indsat. Brug »{button}« igen for at oversætte den aktuelle tekst.",
       "noTargets": "Vælg mindst ét sprog.",
       "sourceMissing": "Skriv først titlen eller beskrivelsen på hovedsproget.",
       "done": "Oversættelsen er klar for: {languages}. Gennemlæs den, før du gemmer.",

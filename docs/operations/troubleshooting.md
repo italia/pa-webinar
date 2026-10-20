@@ -461,7 +461,7 @@ Quick checks before the pipeline's own troubleshooting in [POSTPROD.md](../POSTP
 - `postprod.enabled` is `false` by default in `values.yaml`. Without it the chart renders neither the orchestrator nor the worker template.
 - **Post-event pipeline active** (`aiPipelineEnabled`, off by default in `app/prisma/schema.prisma`), under **Site settings** → **Post-event AI pipeline**. While it is off, the orchestrator is told to start nothing.
 - At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), with and without a GPU together, and a failed job waits for its retry delay.
-- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`.
+- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`, which also needs `postprod.mt.enabled: false` ([Turning off the CPU translation engine](upgrades.md#turning-off-the-cpu-translation-engine)).
 - A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools are covered in [Node pools](../INFRASTRUCTURE.md#node-pools), and quotas in the guide of each managed cloud.
 
 ```bash

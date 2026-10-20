@@ -3552,6 +3552,7 @@
       "queued": "Fil-kju: it-traduzzjoni tibda dalwaqt.",
       "running": "Traduzzjoni għaddejja: tista' tieħu ftit minuti.",
       "busy": "Għal dan l-avveniment diġà għaddejja traduzzjoni oħra: erġa' pprova meta tispiċċa.",
+      "sourceChanged": "It-titlu jew id-deskrizzjoni nbidlu wara t-talba: it-traduzzjoni ma ddaħħlitx. Biex tittraduċi t-test attwali, erġa' uża “{button}”.",
       "noTargets": "Agħżel mill-inqas lingwa waħda.",
       "sourceMissing": "L-ewwel ikteb it-titlu jew id-deskrizzjoni fil-lingwa ewlenija.",
       "done": "It-traduzzjoni lesta għal: {languages}. Aqraha qabel ma ssalva.",

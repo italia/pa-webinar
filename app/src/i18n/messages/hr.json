@@ -3552,6 +3552,7 @@
       "queued": "U redu čekanja: prevođenje uskoro počinje.",
       "running": "Prevođenje je u tijeku: može potrajati nekoliko minuta.",
       "busy": "Za ovaj je događaj već u tijeku drugi prijevod: pokušajte ponovno kad završi.",
+      "sourceChanged": "Naslov ili opis promijenio se nakon zahtjeva: prijevod nije umetnut. Za prijevod trenutačnog teksta ponovno upotrijebite „{button}”.",
       "noTargets": "Odaberite barem jedan jezik.",
       "sourceMissing": "Najprije napišite naslov ili opis na glavnom jeziku.",
       "done": "Prijevod je spreman za: {languages}. Pročitajte ga prije spremanja.",

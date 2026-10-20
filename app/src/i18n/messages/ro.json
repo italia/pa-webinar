@@ -3552,6 +3552,7 @@
       "queued": "În coadă: traducerea începe în curând.",
       "running": "Traducere în curs: poate dura câteva minute.",
       "busy": "Pentru acest eveniment este deja în curs o altă traducere: încearcă din nou după ce se termină.",
+      "sourceChanged": "Titlul sau descrierea s-au schimbat după cerere: traducerea nu a fost inserată. Pentru a traduce textul actual, folosește din nou „{button}”.",
       "noTargets": "Alege cel puțin o limbă.",
       "sourceMissing": "Scrie mai întâi titlul sau descrierea în limba principală.",
       "done": "Traducere gata pentru: {languages}. Recitește înainte de a salva.",

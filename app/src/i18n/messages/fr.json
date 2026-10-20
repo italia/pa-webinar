@@ -3552,6 +3552,7 @@
       "queued": "En file d'attente : la traduction va bientôt commencer.",
       "running": "Traduction en cours : cela peut prendre quelques minutes.",
       "busy": "Une autre traduction est déjà en cours pour cet événement : réessayez quand elle sera terminée.",
+      "sourceChanged": "Le titre ou la description a changé après la demande : la traduction n'a pas été insérée. Pour traduire le texte actuel, utilisez à nouveau « {button} ».",
       "noTargets": "Choisissez au moins une langue.",
       "sourceMissing": "Écrivez d'abord le titre ou la description dans la langue principale.",
       "done": "Traduction prête pour : {languages}. Relisez avant d'enregistrer.",

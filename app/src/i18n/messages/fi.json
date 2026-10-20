@@ -3552,6 +3552,7 @@
       "queued": "Jonossa: käännös alkaa pian.",
       "running": "Käännös käynnissä: se voi kestää muutaman minuutin.",
       "busy": "Tälle tapahtumalle on jo käynnissä toinen käännös: yritä uudelleen, kun se on valmis.",
+      "sourceChanged": "Otsikko tai kuvaus muuttui pyynnön jälkeen: käännöstä ei lisätty. Käännä nykyinen teksti valitsemalla uudelleen ”{button}”.",
       "noTargets": "Valitse vähintään yksi kieli.",
       "sourceMissing": "Kirjoita ensin otsikko tai kuvaus pääkielellä.",
       "done": "Käännös valmis kielille: {languages}. Tarkista ennen tallentamista.",

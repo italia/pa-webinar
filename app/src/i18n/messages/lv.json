@@ -3552,6 +3552,7 @@
       "queued": "Rindā: tulkošana drīz sāksies.",
       "running": "Notiek tulkošana: tas var aizņemt dažas minūtes.",
       "busy": "Šim pasākumam jau notiek cits tulkojums: mēģiniet vēlreiz, kad tas beigsies.",
+      "sourceChanged": "Nosaukums vai apraksts mainījās pēc pieprasījuma: tulkojums netika ievietots. Lai tulkotu pašreizējo tekstu, vēlreiz izmantojiet “{button}”.",
       "noTargets": "Izvēlieties vismaz vienu valodu.",
       "sourceMissing": "Vispirms uzrakstiet nosaukumu vai aprakstu galvenajā valodā.",
       "done": "Tulkojums gatavs valodās: {languages}. Pārlasiet pirms saglabāšanas.",

@@ -3552,6 +3552,7 @@
       "queued": "W kolejce: tłumaczenie wkrótce się rozpocznie.",
       "running": "Trwa tłumaczenie: może to potrwać kilka minut.",
       "busy": "Dla tego wydarzenia trwa już inne tłumaczenie: spróbuj ponownie, gdy się zakończy.",
+      "sourceChanged": "Tytuł lub opis zmienił się po wysłaniu prośby: tłumaczenie nie zostało wstawione. Aby przetłumaczyć bieżący tekst, użyj ponownie „{button}”.",
       "noTargets": "Wybierz co najmniej jeden język.",
       "sourceMissing": "Najpierw wpisz tytuł lub opis w języku głównym.",
       "done": "Tłumaczenie gotowe dla: {languages}. Sprawdź przed zapisaniem.",

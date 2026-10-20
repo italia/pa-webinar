@@ -3552,6 +3552,7 @@
       "queued": "Sa scuaine: tosóidh an t-aistriúchán go luath.",
       "running": "Aistriúchán ar siúl: d'fhéadfadh sé cúpla nóiméad a thógáil.",
       "busy": "Tá aistriúchán eile ar siúl cheana don imeacht seo: bain triail eile as nuair a bheidh sé críochnaithe.",
+      "sourceChanged": "Athraíodh an teideal nó an cur síos tar éis an iarratais: níor cuireadh an t-aistriúchán isteach. Chun an téacs reatha a aistriú, úsáid “{button}” arís.",
       "noTargets": "Roghnaigh teanga amháin ar a laghad.",
       "sourceMissing": "Scríobh an teideal nó an cur síos sa phríomhtheanga ar dtús.",
       "done": "Aistriúchán réidh do: {languages}. Léigh é sula sábhálann tú.",

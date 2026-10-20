@@ -159,9 +159,14 @@ spec:
                   ACTIVE_CPU=$(active_of postprod-worker-cpu)
                   ACTIVE_CPU=${ACTIVE_CPU:-0}
 {{- else }}
-                  # Senza worker CPU il worker con la GPU fa tutto.
+                  # Senza worker CPU il worker con la GPU fa tutto tranne la
+                  # traduzione dei testi (TRANSLATE_TEXT), che non prende mai:
+                  # quei lavori non gli chiedono un worker (desiredWithoutMt),
+                  # altrimenti la GPU si accenderebbe a ogni giro per niente.
+                  # Un'app che non lo manda non ha quel tipo: tutto `desired`.
                   ACTIVE_CPU=0
-                  DESIRED_GPU=$DESIRED
+                  DESIRED_GPU=$(echo "$RESPONSE" | grep -o '"desiredWithoutMt":[0-9]*' | grep -o '[0-9]*' || true)
+                  [ -z "$DESIRED_GPU" ] && DESIRED_GPU=$DESIRED
                   DESIRED_CPU=0
 {{- end }}
                   ACTIVE=$((ACTIVE_GPU + ACTIVE_CPU))

@@ -3552,6 +3552,7 @@
       "queued": "V poradí: preklad sa čoskoro začne.",
       "running": "Prebieha preklad: môže to trvať niekoľko minút.",
       "busy": "Pre toto podujatie už prebieha iný preklad: skúste to znova, keď sa skončí.",
+      "sourceChanged": "Názov alebo popis sa po žiadosti zmenil: preklad nebol vložený. Ak chcete preložiť aktuálny text, použite znova „{button}“.",
       "noTargets": "Vyberte aspoň jeden jazyk.",
       "sourceMissing": "Najprv napíšte názov alebo opis v hlavnom jazyku.",
       "done": "Preklad je pripravený pre: {languages}. Pred uložením skontrolujte.",

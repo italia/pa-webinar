@@ -763,6 +763,35 @@ keys from the application Secret in the same upgrade. A Secret created with `kub
 claimed by the chart makes the upgrade fail, because Helm refuses to adopt a resource it does not
 own.
 
+## Turning off the CPU translation engine
+
+Setting `postprod.mt.enabled: false` removes the CPU translation engine (`<fullname>-mt`) and
+takes `AI_MT_BASE_URL` away from the portal. The chart refuses `postprod.mt.enabled` without the
+CPU worker, so moving to a profile without it (`postprod.worker.cpu.enabled: false`) turns the
+engine off too.
+
+Translations of event texts (`TRANSLATE_TEXT`) still in the queue then have nothing to run them.
+Once the new app pods are up, the portal handles them without a manual step:
+
+- the post-production orchestrator leaves them out of its counts, so they start no worker, and
+  never a GPU worker;
+- `postprod-reclaim`, which runs every minute, marks the queued ones `FAILED` with `lastError`
+  "The CPU translation engine is not configured (AI_MT_BASE_URL)";
+- a job a CPU worker had already claimed fails when the engine goes away. When it returns to the
+  queue, or its lease expires, the next `postprod-reclaim` run closes it the same way.
+
+The wizard and the event page stop offering machine translation. Proposals already stored stay on
+their events (`events.text_translations`), and text already filled from them and saved stays
+unchanged. To check that no translation is left open:
+
+```sql
+SELECT status, count(*) FROM postprod_jobs WHERE kind = 'TRANSLATE_TEXT' GROUP BY status;
+```
+
+Turning the engine on works the other way round: until every app pod has `AI_MT_BASE_URL`, an old
+pod that answers a claim or a `postprod-reclaim` run can close a translation requested on a new
+pod, with the same reason. Staff request it again once the rollout is done.
+
 ## Rollback
 
 ### Rolling back the release

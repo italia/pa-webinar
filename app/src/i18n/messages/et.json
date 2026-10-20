@@ -3552,6 +3552,7 @@
       "queued": "Järjekorras: tõlkimine algab varsti.",
       "running": "Tõlkimine käib: see võib võtta mõne minuti.",
       "busy": "Selle sündmuse jaoks käib juba teine tõlge: proovi uuesti, kui see on lõppenud.",
+      "sourceChanged": "Pealkiri või kirjeldus muutus pärast taotlust: tõlget ei lisatud. Praeguse teksti tõlkimiseks kasuta uuesti nuppu „{button}“.",
       "noTargets": "Vali vähemalt üks keel.",
       "sourceMissing": "Kirjuta kõigepealt pealkiri või kirjeldus põhikeeles.",
       "done": "Tõlge on valmis keeltes: {languages}. Loe enne salvestamist üle.",

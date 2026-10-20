@@ -3552,6 +3552,7 @@
       "queued": "Eilėje: vertimas netrukus prasidės.",
       "running": "Verčiama: tai gali užtrukti kelias minutes.",
       "busy": "Šiam renginiui jau vyksta kitas vertimas: bandykite dar kartą, kai jis baigsis.",
+      "sourceChanged": "Pavadinimas arba aprašymas pasikeitė po užklausos: vertimas neįrašytas. Norėdami išversti dabartinį tekstą, dar kartą naudokite „{button}“.",
       "noTargets": "Pasirinkite bent vieną kalbą.",
       "sourceMissing": "Pirmiausia parašykite pavadinimą arba aprašymą pagrindine kalba.",
       "done": "Vertimas paruoštas šiomis kalbomis: {languages}. Prieš išsaugodami peržiūrėkite.",

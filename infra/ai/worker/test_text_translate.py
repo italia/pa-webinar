@@ -84,6 +84,10 @@ def test_indirizzi_email_e_glossario_protetti_con_numerazione_unica():
         ("- [x] fatto", "- [x] ", "fatto"),
         ("**Grassetto** iniziale", "", "**Grassetto** iniziale"),
         ("Testo semplice", "", "Testo semplice"),
+        # Il rientro senza segni (il seguito di una voce) e' prefisso anche lui.
+        ("  seguito della voce", "  ", "seguito della voce"),
+        ("\tcon il tab", "\t", "con il tab"),
+        (">   rientrata", ">   ", "rientrata"),
     ],
 )
 def test_prefisso_markdown(riga, prefisso, testo):
@@ -127,6 +131,135 @@ def test_markdown_riga_per_riga_con_struttura_intatta(monkeypatch):
     inviati = [r[0] for r in finto.richieste]
     assert "Di cosa parliamo" in inviati
     assert not any("https://" in r for r in inviati)
+
+
+def test_markdown_rientri_conservati_e_codice_rientrato_non_tradotto(monkeypatch):
+    finto = FintoMotore(monkeypatch)
+    sorgente = [
+        "- Voce",
+        "  seguito della voce",
+        "",
+        "  Secondo paragrafo della voce",
+        "  - Sottovoce",
+        "",
+        "    Paragrafo della sottovoce",
+        "",
+        "        codice nella sottovoce",
+        "- Voce due",
+        "",
+        "1. Primo passo",
+        "",
+        "       codice nel passo",
+        "",
+        "Paragrafo",
+        "    che continua",
+        "",
+        "    codice rientrato",
+        "\tcodice con il tab",
+        "",
+        "## Titolo",
+        "    codice dopo il titolo",
+    ]
+    tradotto = tt.traduci_markdown(_motore(), "\n".join(sorgente), "it", "de")
+    assert tradotto.split("\n") == [
+        "- [German] Voce",
+        "  [German] seguito della voce",
+        "",
+        "  [German] Secondo paragrafo della voce",
+        "  - [German] Sottovoce",
+        "",
+        "    [German] Paragrafo della sottovoce",
+        "",
+        "        codice nella sottovoce",
+        "- [German] Voce due",
+        "",
+        "1. [German] Primo passo",
+        "",
+        "       codice nel passo",
+        "",
+        "[German] Paragrafo",
+        "    [German] che continua",
+        "",
+        "    codice rientrato",
+        "\tcodice con il tab",
+        "",
+        "## [German] Titolo",
+        "    codice dopo il titolo",
+    ]
+    # Il codice rientrato non arriva al modello, il rientro nemmeno.
+    inviati = [r[0] for r in finto.richieste]
+    assert not any("codice" in r for r in inviati)
+    assert all(r == r.strip() for r in inviati)
+
+
+def test_riga_di_spazi_unificatori_non_apre_il_codice(monkeypatch):
+    # Per il Markdown una riga di soli spazi unificatori non e' vuota: e' testo
+    # del paragrafo, e la riga rientrata che segue lo continua.
+    FintoMotore(monkeypatch)
+    sorgente = "Il convegno presenta i risultati.\n\u00a0\n\tLe iscrizioni chiudono il 30 novembre."
+    tradotto = tt.traduci_markdown(_motore(), sorgente, "it", "de")
+    assert tradotto.split("\n") == [
+        "[German] Il convegno presenta i risultati.",
+        "\u00a0",
+        "\t[German] Le iscrizioni chiudono il 30 novembre.",
+    ]
+
+
+def test_riga_senza_niente_da_tradurre_non_arriva_al_modello(monkeypatch):
+    # Il modello butta via i segnaposto dei link: una riga con la sola
+    # immagine non deve diventare una richiesta vuota con la risposta in fondo.
+    finto = FintoMotore(monkeypatch, traduci=lambda testo, dst: re.sub(r"</?a\d+>", "", testo).upper())
+    sorgente = "\n".join([
+        "Titolo",
+        "",
+        "![](https://ente.example/banner.png)",
+        "",
+        "[→](https://ente.example) ![](https://ente.example/a.png)",
+        "",
+        "10:00 – 11:30",
+        "",
+        "Vai al [→](https://ente.example/p) programma",
+    ])
+    tradotto = tt.traduci_markdown(_motore(), sorgente, "it", "de")
+    assert tradotto.split("\n") == [
+        "TITOLO",
+        "",
+        "![](https://ente.example/banner.png)",
+        "",
+        "[→](https://ente.example) ![](https://ente.example/a.png)",
+        "",
+        "10:00 – 11:30",
+        "",
+        "VAI AL [→](https://ente.example/p) PROGRAMMA",
+    ]
+    # Il testo del link fatto di soli simboli non si traduce a parte.
+    assert [r[0] for r in finto.richieste] == ["Titolo", "Vai al <a1>→</a1> programma", "Vai al → programma"]
+
+
+def test_testo_vuoto_non_chiama_il_motore(monkeypatch):
+    finto = FintoMotore(monkeypatch)
+    m = _motore()
+    assert m.traduci_frase("", "it", "de") == ""
+    assert m.traduci_frase("  \n", "it", "de") == ""
+    assert tt._traduci_semplice(m, "", "it", "de", []) == ""
+    assert tt._traduci_semplice(m, "   ", "it", "de", []) == ""
+    assert tt._traduci_semplice(m, "→", "it", "de", []) == "→"
+    assert tt.traduci_riga(m, "", "it", "de") == ""
+    assert finto.richieste == []
+    monkeypatch.setenv("WORKER_STUB", "1")
+    assert tt.Motore(None, None).traduci_frase(" ", "it", "en") == ""
+
+
+def test_solo_indirizzi_e_glossario_non_arrivano_al_modello(monkeypatch):
+    finto = FintoMotore(monkeypatch)
+    termini = gl.parse([{"term": "Agenzia Esempio", "translations": {"de": "Beispielagentur"}}])
+    m = _motore()
+    assert tt.traduci_riga(m, "Agenzia Esempio", "it", "de", termini) == "Beispielagentur"
+    assert tt.traduci_riga(m, "info@ente.example", "it", "de", termini) == "info@ente.example"
+    assert tt.traduci_riga(m, "info@ente.example, Agenzia Esempio", "it", "de", termini) == (
+        "info@ente.example, Beispielagentur"
+    )
+    assert finto.richieste == []
 
 
 def test_link_perso_si_traduce_a_parte_senza_perderlo(monkeypatch):

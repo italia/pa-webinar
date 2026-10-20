@@ -3552,6 +3552,7 @@
       "queued": "Sorban áll: a fordítás hamarosan elindul.",
       "running": "Fordítás folyamatban: ez néhány percig tarthat.",
       "busy": "Ehhez az eseményhez már fut egy másik fordítás: próbálja újra, ha befejeződött.",
+      "sourceChanged": "A cím vagy a leírás megváltozott a kérés után: a fordítás nem került be. A jelenlegi szöveg lefordításához használja újra a(z) „{button}” gombot.",
       "noTargets": "Válasszon legalább egy nyelvet.",
       "sourceMissing": "Először írja meg a címet vagy a leírást a fő nyelven.",
       "done": "A fordítás elkészült ezeken a nyelveken: {languages}. Mentés előtt nézze át.",

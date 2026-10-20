@@ -3552,6 +3552,7 @@
       "queued": "In der Warteschlange: Die Übersetzung beginnt in Kürze.",
       "running": "Übersetzung läuft: Das kann einige Minuten dauern.",
       "busy": "Für diese Veranstaltung läuft bereits eine andere Übersetzung: Versuchen Sie es erneut, wenn sie abgeschlossen ist.",
+      "sourceChanged": "Titel oder Beschreibung haben sich nach der Anfrage geändert: Die Übersetzung wurde nicht eingefügt. Um den aktuellen Text zu übersetzen, verwenden Sie erneut „{button}“.",
       "noTargets": "Wählen Sie mindestens eine Sprache.",
       "sourceMissing": "Schreiben Sie zuerst den Titel oder die Beschreibung in der Hauptsprache.",
       "done": "Übersetzung fertig für: {languages}. Vor dem Speichern prüfen.",

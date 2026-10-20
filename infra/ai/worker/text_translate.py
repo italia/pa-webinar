@@ -10,8 +10,10 @@ Il modello traduce bene una frase alla volta con il suo formato di richiesta
 (un solo messaggio, nessun prompt di sistema, temperatura 0), quindi:
 
   * la descrizione (Markdown) si traduce riga per riga: il prefisso della riga
-    (titoli, elenchi, citazioni) e le righe vuote restano come sono, i blocchi
-    di codice e i separatori non si traducono;
+    (rientro, titoli, elenchi, citazioni) e le righe vuote restano come sono,
+    i blocchi di codice (fra ``` o rientrati) e i separatori non si traducono;
+  * una riga o un pezzo senza niente da tradurre (vuoto, numeri e simboli,
+    un'immagine senza testo alternativo) resta com'e' e al modello non va;
   * i link diventano ``<aN>testo</aN>``, che il modello conserva, e l'indirizzo
     si rimette dopo; se un segnaposto si perde, il testo del link si traduce a
     parte e il link non va perso;
@@ -116,6 +118,9 @@ class Motore:
 
     def traduci_frase(self, testo: str, sorgente: str, destinazione: str) -> str:
         """Una frase (o una riga) con il formato di richiesta del modello."""
+        if not testo.strip():
+            # A una richiesta vuota il modello risponde con una frase sua.
+            return ""
         if _stub() or not self.base_url or not self.model_id:
             return f"[{destinazione}] {testo}"
         src, dst = LINGUE[sorgente], LINGUE[destinazione]
@@ -255,10 +260,18 @@ def _frasi(testo: str) -> List[str]:
 def _traduci_semplice(motore: Motore, testo: str, sorgente: str, destinazione: str,
                       termini: List["gl.Term"]) -> str:
     """Un testo senza link: indirizzi e glossario protetti, se il modello li
-    conserva; altrimenti tradotto com'e'."""
+    conserva; altrimenti tradotto com'e'. Vuoto, torna vuoto."""
     pezzi = []
     for pezzo in _frasi(testo):
+        if _SOLO_SIMBOLI.match(pezzo):
+            # Niente da tradurre (vuoto, numeri, simboli): al modello non va.
+            pezzi.append(pezzo if pezzo.strip() else "")
+            continue
         protetto, sostituzioni = proteggi(pezzo, termini, destinazione)
+        if _SOLO_SIMBOLI.match(protetto):
+            # Solo indirizzi e termini del glossario: si rimettono e basta.
+            pezzi.append(gl.restore(protetto, sostituzioni) or pezzo)
+            continue
         tradotto = motore.traduci_frase(protetto, sorgente, destinazione)
         rimesso = gl.restore(tradotto, sostituzioni) if sostituzioni else tradotto
         if rimesso is None:
@@ -272,7 +285,11 @@ def traduci_riga(motore: Motore, testo: str, sorgente: str, destinazione: str,
                  termini: Optional[List["gl.Term"]] = None) -> str:
     """Il testo di una riga (senza il prefisso Markdown), con i suoi link."""
     termini = termini or []
-    if not testo.strip() or _SOLO_SIMBOLI.match(testo):
+    # Il testo senza i link: vuoto o di soli numeri e simboli (anche una riga
+    # con la sola immagine senza testo alternativo) non c'e' niente da
+    # tradurre, e la riga resta com'e'.
+    piano = _LINK.sub(lambda m: m.group(2), testo)
+    if _SOLO_SIMBOLI.match(piano):
         return testo
     con_tag, link = estrai_link(testo)
     if not link:
@@ -289,7 +306,6 @@ def traduci_riga(motore: Motore, testo: str, sorgente: str, destinazione: str,
     # colpo): il testo senza link, poi ogni link a parte, rimesso dove si
     # ritrova il suo testo tradotto, o in fondo alla riga.
     log.info("link placeholder lost translating to %s: translating links apart", destinazione)
-    piano = _LINK.sub(lambda m: m.group(2), testo)
     tradotto = _traduci_semplice(motore, piano, sorgente, destinazione, termini)
     for l in link:
         testo_link = _traduci_semplice(motore, l.testo, sorgente, destinazione, termini) if l.testo.strip() else l.testo
@@ -307,16 +323,37 @@ _PREFISSO = re.compile(r"^\s*(?:#{1,6}\s+|>\s?|[-*+]\s+(?:\[[ xX]\]\s+)?|\d{1,3}
 _RECINTO = re.compile(r"^\s*(```|~~~)")
 _SEPARATORE = re.compile(r"^\s*([-*_])(?:\s*\1){2,}\s*$")
 _TABELLA_SEP = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*(?::?-{3,}:?\s*)?\|?\s*$")
+# Il segno di una voce d'elenco con il suo rientro e lo spazio dopo: dove
+# finisce comincia il contenuto della voce.
+_VOCE = re.compile(r"[ \t]*(?:[-*+]|\d{1,3}[.)])[ \t]+")
+# Il codice rientrato: almeno quattro colonne oltre il margine, o oltre il
+# contenuto della voce d'elenco in cui sta.
+RIENTRO_CODICE = 4
+
+
+def _colonne(testo: str) -> int:
+    """La larghezza in colonne, con il tab fino al multiplo di 4 successivo
+    (come lo conta il Markdown)."""
+    return len(testo.expandtabs(4))
+
+
+def _rientro(riga: str) -> int:
+    return _colonne(riga[: len(riga) - len(riga.lstrip(" \t"))])
 
 
 def dividi_prefisso(riga: str) -> Tuple[str, str]:
-    """(prefisso, testo) di una riga Markdown."""
+    """(prefisso, testo) di una riga Markdown: il prefisso e' il rientro con i
+    segni di titolo, citazione ed elenco, il testo comincia dopo gli spazi."""
     fine = 0
     while True:
         m = _PREFISSO.match(riga[fine:])
         if not m or not m.group(0):
             break
         fine += m.end()
+    # Anche il rientro senza segni (il seguito di una voce d'elenco, una riga
+    # che continua il paragrafo) e' prefisso: senza, la struttura cambia.
+    resto = riga[fine:]
+    fine += len(resto) - len(resto.lstrip())
     return riga[:fine], riga[fine:]
 
 
@@ -325,6 +362,12 @@ def traduci_markdown(motore: Motore, testo: str, sorgente: str, destinazione: st
     """La descrizione, riga per riga, con la struttura Markdown intatta."""
     out: List[str] = []
     nel_codice: Optional[str] = None
+    # La colonna del contenuto di ogni voce d'elenco aperta, le annidate in
+    # coda: una riga rientrata fin li' e' il seguito della voce, non codice.
+    voci: List[int] = []
+    # La riga prima e' testo di un paragrafo: una riga rientrata lo continua,
+    # perche' il codice rientrato non interrompe un paragrafo.
+    dopo_testo = False
     for riga in testo.replace("\r\n", "\n").split("\n"):
         recinto = _RECINTO.match(riga)
         if nel_codice:
@@ -332,13 +375,34 @@ def traduci_markdown(motore: Motore, testo: str, sorgente: str, destinazione: st
             if recinto and recinto.group(1) == nel_codice:
                 nel_codice = None
             continue
+        # Vuota come la intende il Markdown: solo spazi e tabulazioni. Una riga
+        # di soli spazi unificatori (incollata da una pagina web) e' testo del
+        # paragrafo, e la riga rientrata che segue lo continua.
+        if not riga.strip(" \t"):
+            out.append(riga)
+            dopo_testo = False
+            continue
+        rientro = _rientro(riga)
+        separatore = _SEPARATORE.match(riga)
+        # Una riga che continua il paragrafo resta nella voce anche se rientra
+        # meno; ogni altra chiude le voci di cui non raggiunge il contenuto.
+        continua = dopo_testo and not (_PREFISSO.match(riga) or recinto or separatore)
+        if not continua:
+            while voci and rientro < voci[-1]:
+                voci.pop()
+        if not dopo_testo and rientro >= (voci[-1] if voci else 0) + RIENTRO_CODICE:
+            # Codice rientrato: come quello fra ```, non si traduce.
+            out.append(riga)
+            continue
+        dopo_testo = False
         if recinto:
             nel_codice = recinto.group(1)
             out.append(riga)
             continue
-        if not riga.strip() or _SEPARATORE.match(riga) or _TABELLA_SEP.match(riga):
+        if separatore or _TABELLA_SEP.match(riga):
             out.append(riga)
             continue
+        dopo_testo = True
         if riga.lstrip().startswith("|") and riga.rstrip().endswith("|"):
             # Una riga di tabella: si traduce cella per cella.
             celle = riga.split("|")
@@ -348,10 +412,16 @@ def traduci_markdown(motore: Motore, testo: str, sorgente: str, destinazione: st
                 for i, c in enumerate(celle)
             ))
             continue
+        voce = _VOCE.match(riga)
+        if voce:
+            voci.append(_colonne(voce.group(0)))
         prefisso, corpo = dividi_prefisso(riga)
+        # Dopo un titolo non c'e' un paragrafo da continuare; una riga di soli
+        # spazi unificatori invece e' testo (il prefisso se li e' presi tutti).
+        dopo_testo = (bool(corpo) or not riga.strip()) and not prefisso.lstrip().startswith("#")
         # Lo spazio in coda che in Markdown va a capo resta.
-        coda = corpo[len(corpo.rstrip()):]
-        out.append(prefisso + traduci_riga(motore, corpo.strip(), sorgente, destinazione, termini) + coda)
+        frase = corpo.rstrip()
+        out.append(prefisso + traduci_riga(motore, frase, sorgente, destinazione, termini) + corpo[len(frase):])
     return "\n".join(out)
 
 

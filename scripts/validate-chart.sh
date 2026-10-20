@@ -1610,8 +1610,11 @@ PY
   # modello diverso o finisce sul pool con la GPU.
   if ! python3 - "$reso" "$nome" >"$OUT/$nome.pp" 2>"$OUT/$nome.pp.err" <<'PY'
 import json
+import os
 import re
+import subprocess
 import sys
+import tempfile
 
 import yaml
 
@@ -1675,6 +1678,49 @@ if orch is not None:
     testo = "\n".join(str(x) for c in pod(orch).get("containers") or [] for x in (c.get("command") or []) + (c.get("args") or []))
     if "VLLM_DEPLOY=" in testo and "desiredLlm" not in testo:
         print("l'orchestratore accende vLLM per ogni lavoro, anche quelli che non lo usano: manca desiredLlm")
+
+
+def orchestra(risposta):
+    """Un giro dello script dell'orchestratore reso, con curl che risponde
+    `risposta` (compatta, come Response.json del portale) e kubectl finto
+    senza worker attivi: i modelli da cui crea un worker."""
+    comando = next((c.get("command") or [] for c in pod(orch).get("containers") or []), [])
+    with tempfile.TemporaryDirectory() as finti:
+        registro = os.path.join(finti, "creati")
+        for nome_f, corpo in (("curl", 'printf %s "$RISPOSTA"\n'),
+                              ("kubectl", '[ "$1" = create ] && echo "$@" >>"$REGISTRO"\nexit 0\n')):
+            percorso = os.path.join(finti, nome_f)
+            with open(percorso, "w") as f:
+                f.write("#!/bin/sh\n" + corpo)
+            os.chmod(percorso, 0o755)
+        env = {"PATH": finti + os.pathsep + os.environ.get("PATH", ""), "CRON_API_KEY": "x",
+               "RISPOSTA": json.dumps(risposta, separators=(",", ":")), "REGISTRO": registro}
+        subprocess.run(comando, env=env, capture_output=True, timeout=60, check=False)
+        righe = open(registro).read().split("\n") if os.path.exists(registro) else []
+    return [r.split("--from=cronjob/", 1)[1].split()[0] for r in righe if "--from=cronjob/" in r]
+
+
+# Lo script dell'orchestratore su una coda di prova: la traduzione dei testi
+# (TRANSLATE_TEXT) non accende mai il worker con la GPU, che non la prende;
+# un'app che non manda le misure nuove vale come prima.
+if orch is not None and w_gpu is not None:
+    gpu = w_gpu["metadata"]["name"]
+    cpu = w_cpu["metadata"]["name"] if w_cpu is not None else None
+    base = {"pipelineEnabled": True, "claimed": 0, "running": 0, "maxConcurrent": 2}
+    sola_traduzione = {**base, "runnable": 1, "desired": 1, "desiredGpu": 0, "desiredCpu": 1,
+                       "desiredLlm": 0, "desiredMt": 1, "desiredWithoutMt": 0}
+    trascrizione = {**base, "runnable": 1, "desired": 1, "desiredGpu": 1, "desiredCpu": 0,
+                    "desiredLlm": 1, "desiredMt": 0, "desiredWithoutMt": 1}
+    app_vecchia = {**base, "runnable": 1, "desired": 1}
+    creati = orchestra(sola_traduzione)
+    if gpu in creati:
+        print(f"una traduzione dei testi in coda accende il worker con la GPU, che non la prende: {creati}")
+    if cpu is not None and creati != [cpu]:
+        print(f"una traduzione dei testi in coda non accende il worker senza GPU: {creati}")
+    if orchestra(trascrizione) != [gpu]:
+        print(f"una trascrizione in coda non accende il worker con la GPU: {orchestra(trascrizione)}")
+    if cpu is None and orchestra(app_vecchia) != [gpu]:
+        print(f"senza worker CPU, con un'app che non manda desiredWithoutMt, il lavoro in coda non accende il worker con la GPU: {orchestra(app_vecchia)}")
 
 app = next((d for d in docs if d.get("kind") == "Deployment" and del_chart(d) and componente(d) is None), None)
 mappa = next((d.get("data") or {} for d in docs if d.get("kind") == "ConfigMap" and app is not None

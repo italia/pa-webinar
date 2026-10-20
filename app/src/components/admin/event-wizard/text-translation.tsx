@@ -7,8 +7,9 @@
  * In modifica: si chiede con il testo del modulo, anche non salvato, e
  * finche' il lavoro e' in coda o in corso lo stato si rilegge ogni 10
  * secondi. Quando e' pronto, le traduzioni riempiono SOLO i campi ancora
- * vuoti e le lingue riempite si segnano come da rileggere: un testo scritto
- * da una persona non si sostituisce mai, e il salvataggio del wizard e' la
+ * vuoti, e solo se il testo di partenza del modulo e' ancora quello chiesto;
+ * le lingue riempite si segnano come da rileggere: un testo scritto da una
+ * persona non si sostituisce mai, e il salvataggio del wizard e' la
  * revisione. Aprendo il wizard, le proposte gia' pronte per lo stesso testo
  * di partenza si offrono con un pulsante.
  *
@@ -32,7 +33,11 @@ import {
   proposteApplicabili,
   type TextTranslations,
 } from '@/lib/text-translation/proposals';
-import { improntaSorgente, testoSorgente } from '@/lib/text-translation/source';
+import {
+  improntaSorgente,
+  testoSorgente,
+  type TestoSorgente,
+} from '@/lib/text-translation/source';
 
 const IN_CORSO = new Set(['PENDING', 'CLAIMED', 'RUNNING']);
 const OGNI_MS = 10_000;
@@ -49,6 +54,7 @@ type Messaggio =
         | 'queued'
         | 'running'
         | 'busy'
+        | 'sourceChanged'
         | 'noTargets'
         | 'sourceMissing'
         | 'doneNothing'
@@ -116,8 +122,16 @@ export function useTraduzioneTesti(opts: {
   // L'impronta del testo di cui questa pagina ha chiesto la traduzione:
   // solo quel lavoro, finito, riempie i campi da solo.
   const nostro = useRef<string | null>(null);
+  // La richiesta di questa pagina e' stata respinta perche' l'evento ha gia'
+  // un'altra traduzione in coda o in corso: lo si dice finche' non finisce.
+  const occupato = useRef(false);
   const applicaRef = useRef(applica);
   applicaRef.current = applica;
+  // Il testo di partenza com'e' ora nel modulo: a lavoro finito si confronta
+  // con quello chiesto.
+  const testo = testoSorgente(sorgente, titoli, descrizioni);
+  const testoRef = useRef<TestoSorgente>(testo);
+  testoRef.current = testo;
 
   const carica = useCallback(async (): Promise<void> => {
     if (!eventId) return;
@@ -134,20 +148,37 @@ export function useTraduzioneTesti(opts: {
       if (job && IN_CORSO.has(job.status)) {
         // Anche un lavoro chiesto altrove (alla creazione, da un'altra
         // finestra): si dice che c'e', e a lavoro finito la proposta si offre.
-        setMessaggio({ tipo: job.status === 'RUNNING' ? 'running' : 'queued' });
+        // Se ha appena fatto respingere la richiesta di questa pagina, resta
+        // l'avviso: «in coda» farebbe credere accodata la richiesta respinta.
+        setMessaggio(
+          occupato.current
+            ? { tipo: 'busy' }
+            : { tipo: job.status === 'RUNNING' ? 'running' : 'queued' }
+        );
         return;
       }
+      occupato.current = false;
       const chiesta = nostro.current;
       if (!chiesta) {
         setMessaggio((prima) =>
-          prima?.tipo === 'queued' || prima?.tipo === 'running' ? null : prima
+          prima?.tipo === 'queued' || prima?.tipo === 'running' || prima?.tipo === 'busy'
+            ? null
+            : prima
         );
         return;
       }
       nostro.current = null;
       if (p && p.sourceHash === chiesta) {
         // La traduzione chiesta da qui e' pronta (appena consegnata, o gia'
-        // salvata per lo stesso testo): riempie i campi ancora vuoti.
+        // salvata per lo stesso testo). Se nel frattempo il testo di partenza
+        // del modulo e' cambiato, tradurrebbe un testo che non c'e' piu': non
+        // riempie niente, e la proposta torna utile solo se il testo torna
+        // quello di prima (l'offerta la confronta con il modulo).
+        if ((await improntaSorgente(testoRef.current)) !== chiesta) {
+          setMessaggio({ tipo: 'sourceChanged' });
+          return;
+        }
+        // Riempie i campi ancora vuoti.
         const riempite = applicaRef.current(p, [
           ...new Set([...Object.keys(p.title), ...Object.keys(p.description)]),
         ]);
@@ -183,7 +214,6 @@ export function useTraduzioneTesti(opts: {
 
   // L'impronta del testo di partenza del modulo, per riconoscere le proposte
   // che vengono da questo testo.
-  const testo = testoSorgente(sorgente, titoli, descrizioni);
   useEffect(() => {
     let vivo = true;
     void improntaSorgente(testo).then((h) => {
@@ -242,9 +272,12 @@ export function useTraduzioneTesti(opts: {
         }
         const esito = (await r.json()) as { stato: string; sourceHash?: string | null };
         if (esito.stato === 'in-corso' && esito.sourceHash !== h) {
-          // Una traduzione di un altro testo: la si lascia finire.
+          // Una traduzione di un altro testo: la si lascia finire, e non si
+          // accoda niente.
+          occupato.current = true;
           setMessaggio({ tipo: 'busy' });
         } else {
+          occupato.current = false;
           nostro.current = h;
           setMessaggio({ tipo: 'queued' });
         }
@@ -283,6 +316,8 @@ function TestoMessaggio({ messaggio }: { messaggio: Messaggio }) {
       return <>{t('done', { languages: messaggio.lingue.map(nomeLingua).join(', ') })}</>;
     case 'failed':
       return <>{t('failed', { reason: messaggio.motivo })}</>;
+    case 'sourceChanged':
+      return <>{t('sourceChanged', { button: t('start') })}</>;
     case 'error':
       return <>{messaggio.testo}</>;
     default:
