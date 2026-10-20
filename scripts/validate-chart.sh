@@ -1764,6 +1764,18 @@ elif profilo == "postprod-mt" and not re.search(r"/[0-9a-f]{40}/", variabili.get
 argomenti = " ".join(str(a) for c in spec.get("containers") or [] for a in c.get("args") or [])
 if variabili.get("MT_MODEL_PATH") and variabili["MT_MODEL_PATH"] not in argomenti:
     print(f"il motore carica un file diverso da quello scaricato ({variabili.get('MT_MODEL_PATH')})")
+# La cache dei prompt di llama.cpp: le richieste sono di una riga e non la
+# riusano mai. Con il valore predefinito di llama.cpp (8 GiB) cresce fino a
+# portare il pod oltre la sua memoria a metà di un lavoro grande.
+lista = [str(a) for c in (spec.get("containers") or [])[:1] for a in c.get("args") or []]
+if "--cache-ram" not in lista:
+    print("il motore di traduzione non limita la cache dei prompt (--cache-ram): la memoria cresce a ogni richiesta fino a uccidere il pod")
+else:
+    cache = (lista[lista.index("--cache-ram") + 1:] or [""])[0]
+    if not re.fullmatch(r"-1|\d+", cache):
+        print(f"--cache-ram è seguito da {cache!r}, non da un numero di MiB")
+    elif profilo == "postprod-mt" and cache != "0":
+        print(f"--cache-ram è {cache}: il valore predefinito del chart deve essere 0")
 # Il Service e l'indirizzo che il portale passa al worker.
 servizio = next((d for d in docs if d.get("kind") == "Service" and d["metadata"]["name"] == nome), None)
 etichette_m = ((motore["spec"].get("template") or {}).get("metadata") or {}).get("labels") or {}
@@ -1885,6 +1897,8 @@ deve_fallire "impronta del modello di traduzione malformata" "postprod.mt.model.
   --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.sha256=abc
 deve_fallire "file del modello di traduzione con un percorso" "postprod.mt.model.file" \
   --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.model.file=../modello.gguf
+deve_fallire "cache dei prompt del motore di traduzione negativa" "postprod.mt.cacheRamMiB" \
+  --set postprod.enabled=true --set postprod.mt.enabled=true --set postprod.mt.cacheRamMiB=-5
 
 echo
 if [ "$fallimenti" -gt 0 ]; then

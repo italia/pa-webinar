@@ -700,5 +700,8 @@ quando qualcuno la chiede dal wizard.
 {{- if not (regexMatch "^[0-9]+$" (toString (dig "scaleToZero" "idleMinutes" 15 $mt))) -}}
 {{- fail (printf "postprod.mt.scaleToZero.idleMinutes è %v: serve un intero da 0 in su." (dig "scaleToZero" "idleMinutes" 15 $mt)) -}}
 {{- end -}}
+{{- if not (regexMatch "^(-1|[0-9]+)$" (toString (dig "cacheRamMiB" 0 $mt))) -}}
+{{- fail (printf "postprod.mt.cacheRamMiB è %v: serve un intero di MiB da 0 in su (0 = nessuna cache dei prompt, il valore consigliato), o -1 per nessun tetto." (dig "cacheRamMiB" 0 $mt)) -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}

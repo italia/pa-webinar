@@ -1662,6 +1662,13 @@ postprod:
     threads: 4
     # Contesto del modello in token: richiesta e risposta di una riga.
     contextSize: 4096
+    # Cache dei prompt di llama.cpp nella memoria del pod, in MiB (--cache-ram;
+    # -1 = nessun tetto). Ogni richiesta è una riga sola e non ne riusa
+    # nessuna: con il valore predefinito di llama.cpp, 8 GiB, la cache cresce
+    # di circa 7 MiB a richiesta, e a metà di una traduzione grande il pod
+    # supera il limite di memoria e viene ucciso. Con 0 la memoria resta
+    # piatta, alla stessa velocità.
+    cacheRamMiB: 0
     # Un volume gia' presente per il modello (PersistentVolumeClaim): il file
     # resta fra un avvio e l'altro e non si riscarica. Vuoto: un volume
     # temporaneo, e il modello si scarica a ogni accensione.
