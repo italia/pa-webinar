@@ -30,7 +30,8 @@
  * dalla sala: ciò che si condivide in diretta (le slide, un documento) di
  * solito serve anche dopo, e un `DURING` lo farebbe sparire dalla pagina
  * dell'evento alla chiusura. Chi conduce la può cambiare anche dopo (PATCH
- * ../materials/[id]).
+ * ../materials/[id]). Un relatore non sceglie la visibilità: il campo, se lo
+ * manda, non si legge, e vale `ALWAYS`.
  *
  * QUANTO. Il link moderatore è condiviso e non scade: oltre al limite per
  * minuto, un tetto per evento sul numero di file e sui byte
@@ -142,7 +143,7 @@ export const POST = withErrorHandling(async (request, context) => {
   // controllato sul file qui sotto.
   const grant = await resolveGrantForEvent(event, token);
   if (!grant) throw new ForbiddenError('Unauthorized');
-  const soloPdf = grant.role === EventModeratorRole.SPEAKER;
+  const relatore = grant.role === EventModeratorRole.SPEAKER;
 
   const ip = getClientIp(request);
   const rl = rateLimit(`materials-upload:${ip}:${event.id}`, {
@@ -190,7 +191,7 @@ export const POST = withErrorHandling(async (request, context) => {
   try {
     // Come per i link: un nome solo se gia' pubblico (lib/events/material-author).
     const addedBy = materialAddedBy(grant);
-    return await riceviECrea(request, event, addedBy, storage, giaCaricati.bytes, soloPdf);
+    return await riceviECrea(request, event, addedBy, storage, giaCaricati.bytes, relatore);
   } finally {
     caricamentiInCorso--;
   }
@@ -207,8 +208,8 @@ async function riceviECrea(
   addedBy: string,
   storage: NonNullable<ReturnType<typeof getFilesStorage>>,
   bytesGiaCaricati: number,
-  /** Un relatore: solo un PDF. */
-  soloPdf: boolean,
+  /** Un relatore: solo un PDF, con la visibilità predefinita. */
+  relatore: boolean,
 ): Promise<Response> {
   let form: FormData;
   try {
@@ -225,7 +226,8 @@ async function riceviECrea(
   const fields = uploadFieldsSchema.safeParse({
     title: textField(form, 'title'),
     description: textField(form, 'description'),
-    visibility: textField(form, 'visibility'),
+    // La visibilità la sceglie solo chi conduce: per un relatore vale la predefinita.
+    visibility: relatore ? undefined : textField(form, 'visibility'),
   });
   if (!fields.success) {
     throw new ValidationError(
@@ -235,7 +237,7 @@ async function riceviECrea(
   }
 
   const mime = normalizeMimeType(fileField.type || 'application/octet-stream');
-  if (!ALLOWED_MIME.has(mime) || (soloPdf && mime !== 'application/pdf')) {
+  if (!ALLOWED_MIME.has(mime) || (relatore && mime !== 'application/pdf')) {
     throw new AppError(
       `MIME type "${mime}" is not allowed for event materials`,
       415,

@@ -169,6 +169,16 @@ describe('POST /materials/upload — chi può caricare', () => {
     expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '', mimeType: 'application/pdf' });
   });
 
+  it('un relatore non sceglie la visibilità: il campo si ignora e vale la predefinita', async () => {
+    mockedGrant.mockResolvedValue({ id: 'grant-relatore', eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER', name: 'R', email: null });
+    for (const visibility of ['AFTER', 'SEMPRE']) {
+      mockedCreate.mockClear();
+      const res = await POST(await upload({ token: 'TOKEN_DEL_RELATORE', fields: { visibility } }), ctx());
+      expect(res.status).toBe(201);
+      expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ visibility: 'ALWAYS' });
+    }
+  });
+
   it('il token di un relatore con un file che non è un PDF: 415, niente nello storage', async () => {
     mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER', name: 'R', email: null });
     const res = await POST(
