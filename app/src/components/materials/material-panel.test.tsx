@@ -760,6 +760,7 @@ describe('MaterialPanel — presentare un PDF alla sala', () => {
       displayPage: 1,
       canPresent: true,
       start: vi.fn(async () => null),
+      takeOver: vi.fn(async () => null),
       goTo: vi.fn(),
       stop: vi.fn(async () => null),
       busy: false,
@@ -851,6 +852,10 @@ describe('MaterialPanel — presentare un PDF alla sala', () => {
     expect(container.querySelector('select')).toBeNull();
     // Nessuna scelta fra link e file.
     expect(container.querySelector('.material-panel__modes')).toBeNull();
+    // Le tipologie dette sono quelle vere: solo PDF, con l'indicazione per le slide.
+    const formatiRelatore = tp.pdfOnlyHelp.replace('{maxMb}', '25');
+    expect(container.textContent).toContain(formatiRelatore);
+    expect(container.textContent).not.toContain('DOCX');
 
     Object.defineProperty(input, 'files', {
       value: [new File(['PK'], 'testo.docx', {
@@ -897,6 +902,29 @@ describe('MaterialPanel — presentare un PDF alla sala', () => {
       (l) => l.textContent === tp.presentAfterUpload,
     );
     expect(container.querySelector<HTMLInputElement>(`#${CSS.escape(presentaDopo!.htmlFor)}`)!.checked).toBe(false);
+  });
+
+  it('a chi conduce ricorda che alla sala si presenta solo un PDF', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ materials: elenco, uploadsEnabled: true }), { status: 200 }),
+    );
+    await renderInSala(controlli());
+    act(() => pulsante(t.addMaterial).click());
+    act(() => pulsante(t.modeFile).click());
+    expect(container.querySelector('.material-panel__present-hint')?.textContent).toBe(tp.exportHint);
+  });
+
+  it('slide in un altro formato: chi può presentare sa che serve il PDF, chi assiste no', async () => {
+    const pptx = file('ppt1', {
+      mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      url: '/api/assets/document/ppt1.pptx',
+    });
+    elenco = [pptx];
+    await renderInSala(controlli());
+    expect(container.querySelector('.material-item__present-hint')?.textContent).toBe(tp.exportToPresent);
+    expect(presenta('Materiale ppt1')).toBeNull();
+    await renderInSala(controlli({ canPresent: false }), { isModerator: false });
+    expect(container.querySelector('.material-item__present-hint')).toBeNull();
   });
 
   it('fuori dalla sala (nessun contesto) la riga non parla di presentazioni', async () => {

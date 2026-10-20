@@ -25,6 +25,7 @@ import { publishPresentation } from '@/lib/live-state/publish';
 import {
   NO_PRESENTATION,
   endPresentationOfMaterial,
+  isCurrentPresenter,
   isPresentableMaterial,
   isPresentationOpen,
   pointerForStatus,
@@ -102,11 +103,32 @@ describe('readPresentationPointer', () => {
   });
 
   it('chiusa: la pagina non conta, la versione sì', async () => {
-    mockedFind.mockResolvedValue({ materialId: null, page: 7, version: 9 });
+    mockedFind.mockResolvedValue({
+      materialId: null,
+      page: 7,
+      version: 9,
+      startedAt: null,
+    });
     expect(await readPresentationPointer(EVENT_ID)).toEqual({
       materialId: null,
       page: 1,
       version: 9,
+      startedAt: null,
+    });
+  });
+
+  it('in corso: materiale, pagina, versione e inizio del turno di chi presenta', async () => {
+    mockedFind.mockResolvedValue({
+      materialId: MATERIAL_ID,
+      page: 3,
+      version: 4,
+      startedAt: new Date('2026-10-21T09:00:00.000Z'),
+    });
+    expect(await readPresentationPointer(EVENT_ID)).toEqual({
+      materialId: MATERIAL_ID,
+      page: 3,
+      version: 4,
+      startedAt: '2026-10-21T09:00:00.000Z',
     });
   });
 });
@@ -119,6 +141,7 @@ describe('presentationStateOf: chi presenta', () => {
       page: 2,
       pageCount: null,
       presenterRole: 'SPEAKER',
+      presenterGrantId: 'grant-relatrice',
       startedAt: null,
       version: 3,
       material: { title: 'Slide' },
@@ -162,6 +185,44 @@ describe('presentationStateOf: chi presenta', () => {
         ?.presenterRole
     ).toBeNull();
   });
+
+  it('dice a chi chiede se la presentazione è sua', () => {
+    const r = riga();
+    expect(presentationStateOf(r, evento).presentation?.yours).toBe(false);
+    expect(
+      presentationStateOf(r, evento, { role: 'SPEAKER', grantId: 'grant-relatrice' })
+        .presentation?.yours
+    ).toBe(true);
+    // Un altro relatore, o il link principale, no.
+    expect(
+      presentationStateOf(r, evento, { role: 'SPEAKER', grantId: 'grant-altro' })
+        .presentation?.yours
+    ).toBe(false);
+    expect(
+      presentationStateOf(r, evento, { role: 'MODERATOR', grantId: null }).presentation
+        ?.yours
+    ).toBe(false);
+  });
+});
+
+describe('isCurrentPresenter', () => {
+  it('il link principale presenta: vale per chiunque lo usi, non per una concessione', () => {
+    const r = { presenterRole: 'MODERATOR', presenterGrantId: null };
+    expect(isCurrentPresenter(r, { role: 'MODERATOR', grantId: null })).toBe(true);
+    expect(
+      isCurrentPresenter(r, { role: 'MODERATOR', grantId: 'grant-comoderatore' })
+    ).toBe(false);
+    expect(isCurrentPresenter(r, null)).toBe(false);
+  });
+
+  it('nessuno presenta: di nessuno', () => {
+    expect(
+      isCurrentPresenter(
+        { presenterRole: null, presenterGrantId: null },
+        { role: 'MODERATOR', grantId: null }
+      )
+    ).toBe(false);
+  });
 });
 
 describe('evento concluso', () => {
@@ -170,12 +231,18 @@ describe('evento concluso', () => {
     expect(isPresentationOpen('IDLE')).toBe(true);
     expect(isPresentationOpen('ENDED')).toBe(false);
     expect(isPresentationOpen('ARCHIVED')).toBe(false);
-    const p = { materialId: MATERIAL_ID, page: 4, version: 6 };
+    const p = {
+      materialId: MATERIAL_ID,
+      page: 4,
+      version: 6,
+      startedAt: '2026-10-21T09:00:00.000Z',
+    };
     expect(pointerForStatus(p, 'LIVE')).toBe(p);
     expect(pointerForStatus(p, 'ENDED')).toEqual({
       materialId: null,
       page: 1,
       version: 6,
+      startedAt: null,
     });
   });
 });
@@ -183,7 +250,12 @@ describe('evento concluso', () => {
 describe('endPresentationOfMaterial', () => {
   it('chiude la presentazione di quel materiale e lo annuncia', async () => {
     mockedUpdateMany.mockResolvedValue({ count: 1 });
-    mockedFind.mockResolvedValue({ materialId: null, page: 1, version: 10 });
+    mockedFind.mockResolvedValue({
+      materialId: null,
+      page: 1,
+      version: 10,
+      startedAt: null,
+    });
     await endPresentationOfMaterial(
       EVENT_ID,
       { id: MATERIAL_ID, title: 'Slide' },
@@ -197,6 +269,7 @@ describe('endPresentationOfMaterial', () => {
       materialId: null,
       page: 1,
       version: 10,
+      startedAt: null,
     });
     expect(journal).toHaveBeenCalledWith(
       expect.objectContaining({

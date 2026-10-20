@@ -152,6 +152,15 @@ describe('useLiveState — presentazione', () => {
     expect(hook.result.current.presentation).toEqual({ materialId: M1, page: 5, version: 6 });
   });
 
+  it('porta anche l’inizio del turno di chi presenta, quando c’è', () => {
+    const { hook, sorgente } = apri();
+    const turno = '2026-10-21T09:30:00.000Z';
+    act(() => {
+      sorgente.invia({ op: 'presentation', materialId: M1, page: 3, version: 8, startedAt: turno, ts });
+    });
+    expect(hook.result.current.presentation).toEqual({ materialId: M1, page: 3, version: 8, startedAt: turno });
+  });
+
   it('la chiusura passa come puntatore vuoto', () => {
     const { hook, sorgente } = apri();
     act(() => {

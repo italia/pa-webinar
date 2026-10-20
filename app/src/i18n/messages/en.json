@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Upload a PDF to present",
     "started": "Presentation started.",
     "stopped": "Presentation stopped.",
+    "takeOver": "Take over",
+    "takeOverHint": "Take over the presentation from this page: your name will show as the presenter.",
+    "roomOnlyNote": "The pages appear in this room panel, not in the call video: the recording does not include them.",
+    "pdfOnlyHelp": "PDF only, max {maxMb} MB. PowerPoint, Keynote or Impress slides: export them to PDF first.",
+    "exportHint": "Only a PDF can be presented to the room: export PowerPoint, Keynote or Impress slides to PDF first.",
+    "exportToPresent": "To present it to the room, upload its PDF version.",
     "errors": {
       "changed": "The presentation changed in the meantime: try again.",
       "closed": "The event has ended: presenting is no longer possible.",
       "notPresentable": "Only a PDF uploaded among the materials can be presented.",
       "forbidden": "Only moderators and speakers can present.",
       "generic": "The operation failed. Try again.",
-      "pdfOnly": "You can upload only a PDF to present."
+      "pdfOnly": "You can upload only a PDF to present: export PowerPoint, Keynote or Impress slides to PDF first."
     }
   },
   "reminders": {

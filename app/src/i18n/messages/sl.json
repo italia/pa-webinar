@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Naloži PDF za predstavitev",
     "started": "Predstavitev se je začela.",
     "stopped": "Predstavitev je ustavljena.",
+    "takeOver": "Prevzemi predstavitev",
+    "takeOverHint": "Prevzemite predstavitev od te strani: kot predstavitelj bo prikazano vaše ime.",
+    "roomOnlyNote": "Strani so vidne v tem podoknu sobe, ne v videu klica: posnetek jih ne vsebuje.",
+    "pdfOnlyHelp": "Samo PDF, največ {maxMb} MB. Diapozitive iz PowerPointa, Keynota ali Impressa najprej izvozite v PDF.",
+    "exportHint": "Sobi je mogoče predstaviti samo PDF: diapozitive iz PowerPointa, Keynota ali Impressa najprej izvozite v PDF.",
+    "exportToPresent": "Če ga želite predstaviti sobi, naložite njegovo različico PDF.",
     "errors": {
       "changed": "Medtem se je predstavitev spremenila: poskusite znova.",
       "closed": "Dogodek se je končal: predstavljanje ni več mogoče.",
       "notPresentable": "Predstaviti je mogoče samo PDF, naložen med gradiva.",
       "forbidden": "Predstavljajo lahko samo moderatorji in govorniki.",
       "generic": "Dejanje ni uspelo. Poskusite znova.",
-      "pdfOnly": "Naložite lahko samo PDF za predstavitev."
+      "pdfOnly": "Za predstavitev lahko naložite samo PDF: diapozitive iz PowerPointa, Keynota ali Impressa najprej izvozite v PDF."
     }
   },
   "reminders": {

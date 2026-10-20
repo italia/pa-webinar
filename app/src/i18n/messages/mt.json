@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Tella’ PDF biex tippreżenta",
     "started": "Il-preżentazzjoni bdiet.",
     "stopped": "Il-preżentazzjoni twaqqfet.",
+    "takeOver": "Ħu l-preżentazzjoni",
+    "takeOverHint": "Ħu l-preżentazzjoni minn din il-paġna: ismek jidher bħala dak ta’ min qed jippreżenta.",
+    "roomOnlyNote": "Il-paġni jidhru f’dan il-pannell tal-kamra, mhux fil-video tas-sejħa: ir-reġistrazzjoni ma fihiex.",
+    "pdfOnlyHelp": "PDF biss, massimu {maxMb} MB. Slajds ta’ PowerPoint, Keynote jew Impress: esportahom l-ewwel f’PDF.",
+    "exportHint": "Lill-kamra tista’ tippreżenta PDF biss: esporta l-ewwel f’PDF is-slajds ta’ PowerPoint, Keynote jew Impress.",
+    "exportToPresent": "Biex tippreżentah lill-kamra, tella’ l-verżjoni PDF tiegħu.",
     "errors": {
       "changed": "Sadanittant il-preżentazzjoni nbidlet: erġa' pprova.",
       "closed": "L-avveniment intemm: m’għadux possibbli tippreżenta.",
       "notPresentable": "Jista’ jiġi ppreżentat biss PDF imtella’ fost il-materjali.",
       "forbidden": "Il-moderaturi u l-kelliema biss jistgħu jippreżentaw.",
       "generic": "L-operazzjoni ma rnexxietx. Erġa' pprova.",
-      "pdfOnly": "Tista’ ttella’ biss PDF biex tippreżenta."
+      "pdfOnly": "Tista’ ttella’ biss PDF biex tippreżenta: esporta l-ewwel f’PDF is-slajds ta’ PowerPoint, Keynote jew Impress."
     }
   },
   "reminders": {

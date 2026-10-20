@@ -25,6 +25,7 @@ function stato(version: number, materialId: string | null, page = 1): Presentati
           title: `Documento ${materialId.slice(0, 2)}`,
           presenterName: null,
           presenterRole: 'MODERATOR',
+          yours: false,
           startedAt: '2026-10-08T09:00:00.000Z',
           fileUrl: `/api/events/${SLUG}/presentation/file?m=${materialId}`,
         }
@@ -97,6 +98,33 @@ describe('presentationView', () => {
     });
     expect(v).toMatchObject({ materialId: M2, page: 1, stale: true, info: null });
     expect(v.fileUrl).toBe(`/api/events/${SLUG}/presentation/file?m=${M2}`);
+  });
+
+  it('stesso documento, altra persona che presenta («Presenta tu»): da rileggere, il documento resta', () => {
+    const v = presentationView(SLUG, stato(4, M1, 3), {
+      materialId: M1,
+      page: 3,
+      version: 5,
+      startedAt: '2026-10-08T09:30:00.000Z',
+    });
+    expect(v).toMatchObject({ materialId: M1, page: 3, stale: true, info: null });
+    expect(v.fileUrl).toBe(`/api/events/${SLUG}/presentation/file?m=${M1}`);
+  });
+
+  it('stesso turno, o un puntatore senza turno (replica precedente): niente da rileggere', () => {
+    const turno = '2026-10-08T09:00:00.000Z';
+    expect(
+      presentationView(SLUG, stato(4, M1, 3), {
+        materialId: M1,
+        page: 4,
+        version: 5,
+        startedAt: turno,
+      }).stale
+    ).toBe(false);
+    expect(
+      presentationView(SLUG, stato(4, M1, 3), { materialId: M1, page: 4, version: 5 })
+        .stale
+    ).toBe(false);
   });
 
   it('chiusa dal canale: niente da mostrare, anche se lo stato completo è indietro', () => {

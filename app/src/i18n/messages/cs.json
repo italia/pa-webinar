@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Nahrát PDF k prezentaci",
     "started": "Prezentace byla zahájena.",
     "stopped": "Prezentace byla ukončena.",
+    "takeOver": "Převzít prezentaci",
+    "takeOverHint": "Převezměte prezentaci od této stránky: jako prezentující se zobrazí vaše jméno.",
+    "roomOnlyNote": "Stránky se zobrazují v tomto panelu místnosti, ne ve videu hovoru: záznam je neobsahuje.",
+    "pdfOnlyHelp": "Pouze PDF, max {maxMb} MB. Snímky z PowerPointu, Keynote nebo Impressu nejprve exportujte do PDF.",
+    "exportHint": "Místnosti lze prezentovat pouze PDF: snímky z PowerPointu, Keynote nebo Impressu nejprve exportujte do PDF.",
+    "exportToPresent": "Chcete-li jej prezentovat místnosti, nahrajte jeho verzi PDF.",
     "errors": {
       "changed": "Prezentace se mezitím změnila: zkuste to znovu.",
       "closed": "Událost skončila: prezentovat už nelze.",
       "notPresentable": "Prezentovat lze pouze PDF nahrané mezi materiály.",
       "forbidden": "Prezentovat mohou pouze moderátoři a řečníci.",
       "generic": "Operace se nezdařila. Zkuste to znovu.",
-      "pdfOnly": "Můžete nahrát pouze PDF k prezentaci."
+      "pdfOnly": "K prezentaci můžete nahrát pouze PDF: snímky z PowerPointu, Keynote nebo Impressu nejprve exportujte do PDF."
     }
   },
   "reminders": {

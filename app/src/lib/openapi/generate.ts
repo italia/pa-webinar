@@ -452,7 +452,8 @@ const presentationRead =
 const presentationWrite =
   'Primary moderator link or a non-revoked named grant, moderator or speaker (Bearer). Every ' +
   'change bumps `version`, is announced on the live stream as a `presentation` snapshot ' +
-  '(material id, page, version) and is written to the live action journal.';
+  '(material id, page, version and `startedAt`, which changes when the presentation changes hands) ' +
+  'and is written to the live action journal.';
 
 registry.registerPath({
   method: 'get',
@@ -462,8 +463,8 @@ registry.registerPath({
   description:
     `${presentationRead} Returns \`{version, presentation}\`; \`presentation\` is null when nobody ` +
     'is presenting, otherwise it carries the material id and title, the current page, the page ' +
-    'count once the presenter reported it, who presents and `fileUrl`, the route that serves the ' +
-    'document.',
+    'count once the presenter reported it, who presents, `yours` (the caller is the current ' +
+    'presenter), `startedAt` and `fileUrl`, the route that serves the document.',
   request: { params: z.object({ param: z.string() }) },
   responses: {
     200: { description: 'Presentation state' },
@@ -478,7 +479,9 @@ registry.registerPath({
   tags: ['Presentation'],
   summary: 'Present a PDF to the room (moderator or speaker)',
   description:
-    `${presentationWrite} Replaces any presentation in progress. Only an uploaded PDF among the ` +
+    `${presentationWrite} Replaces any presentation in progress. On the material already being ` +
+    'presented it hands the presentation over to the caller ("Take over"), from the given page, ' +
+    'keeping the known page count. Only an uploaded PDF among the ' +
     "event's materials can be presented, by a moderator or a speaker alike. Once the event is ENDED or " +
     'ARCHIVED the reads show no presentation.',
   security: [{ [moderatorToken.name]: [] }],

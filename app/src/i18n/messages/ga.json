@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Uaslódáil PDF le cur i láthair",
     "started": "Tosaíodh an cur i láthair.",
     "stopped": "Stopadh an cur i láthair.",
+    "takeOver": "Glac an cur i láthair",
+    "takeOverHint": "Glac an cur i láthair ón leathanach seo: taispeánfar d’ainm mar an té atá á chur i láthair.",
+    "roomOnlyNote": "Feictear na leathanaigh sa phainéal seo den seomra, ní i bhfíseán an ghlao: níl siad sa taifeadadh.",
+    "pdfOnlyHelp": "PDF amháin, uasmhéid {maxMb} MB. Sleamhnáin PowerPoint, Keynote nó Impress: easpórtáil go PDF iad ar dtús.",
+    "exportHint": "Ní féidir ach PDF a chur i láthair an tseomra: easpórtáil sleamhnáin PowerPoint, Keynote nó Impress go PDF ar dtús.",
+    "exportToPresent": "Chun é a chur i láthair an tseomra, uaslódáil a leagan PDF.",
     "errors": {
       "changed": "Athraíodh an cur i láthair idir an dá linn: bainigí triail eile as.",
       "closed": "Tá an t-imeacht thart: ní féidir cur i láthair a thuilleadh.",
       "notPresentable": "Ní féidir ach PDF a uaslódáladh i measc na n-ábhar a chur i láthair.",
       "forbidden": "Ní féidir ach le modhnóirí agus le cainteoirí cur i láthair.",
       "generic": "Theip ar an oibríocht. Bainigí triail eile as.",
-      "pdfOnly": "Ní féidir libh ach PDF le cur i láthair a uaslódáil."
+      "pdfOnly": "Ní féidir leat ach PDF a uaslódáil le cur i láthair: easpórtáil sleamhnáin PowerPoint, Keynote nó Impress go PDF ar dtús."
     }
   },
   "reminders": {

@@ -198,6 +198,10 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   const fileMode = uploadsEnabled && (mode === 'file' || speakerUpload);
   const allowedTypes = speakerUpload ? PDF_ONLY : MATERIAL_FILE_MIME_TYPES;
   const chosenIsPdf = file?.type === 'application/pdf';
+  // Le tipologie accettate: un relatore carica solo il PDF che presenta.
+  const fileHelp = speakerUpload ? tp('pdfOnlyHelp', { maxMb: MAX_MB }) : t('fileHelp', { maxMb: MAX_MB });
+  // A chi può presentare si ricorda che alla sala si presenta solo un PDF.
+  const presentHint = canPresent && !speakerUpload ? tp('exportHint') : null;
 
   const uploadErrorMessage = useCallback(
     (e: MaterialUploadError): string => {
@@ -624,11 +628,12 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                   <Icon icon="it-upload" size="sm" color="primary" aria-hidden="true" />
                   <span className="material-panel__drop-title">{t('dropzoneTitle')}</span>
                   <span className="material-panel__drop-choose">{t('dropzoneChoose')}</span>
-                  <span className="material-panel__meta">{t('fileHelp', { maxMb: MAX_MB })}</span>
+                  <span className="material-panel__meta">{fileHelp}</span>
                 </label>
               )}
+              {presentHint && <p className="material-panel__meta material-panel__present-hint">{presentHint}</p>}
               <span id={fileHelpId} className="visually-hidden">
-                {t('fileHelp', { maxMb: MAX_MB })}
+                {presentHint ? `${fileHelp} ${presentHint}` : fileHelp}
               </span>
             </div>
           ) : (

@@ -7,7 +7,9 @@
  *           iscritti, gli ospiti finché la stanza è aperta a loro; con la
  *           password dell'evento, solo chi l'ha inserita.
  *   POST    presenta un PDF caricato fra i materiali dell'evento (sostituisce
- *           quello in corso);
+ *           quello in corso). Sullo stesso PDF è il passaggio di mano («Presenta
+ *           tu»): chi chiama diventa chi presenta, dalla pagina indicata, e il
+ *           numero di pagine già noto resta;
  *   PATCH   vai a una pagina del materiale presentato;
  *   DELETE  chiudi la presentazione.
  *
@@ -17,6 +19,9 @@
  * crescere la versione, annuncia il nuovo puntatore sul canale della sala
  * (snapshot `presentation`) e scrive l'azione nella cronologia, che la
  * post-produzione legge accanto alla trascrizione. Vedi lib/presentation/state.
+ *
+ * Ogni risposta dice a chi chiede se la presentazione è sua (`yours`): chi può
+ * presentare e non è chi presenta adesso vede «Presenta tu».
  */
 
 import type { z } from 'zod';
@@ -44,6 +49,7 @@ import {
   PRESENTABLE_MATERIAL_SELECT,
   PRESENTATION_CLEARED,
   PRESENTATION_ROW_SELECT,
+  isCurrentPresenter,
   isPresentableMaterial,
   isPresentationOpen,
   liveActorOf,
@@ -129,9 +135,18 @@ function erroriDi(error: z.ZodError) {
 export const GET = withErrorHandling(async (request, context) => {
   const { param } = await parametri(context);
   const event = await eventoDa(param);
-  await authorizePanelRead(event, extractModeratorToken(request));
+  const token = extractModeratorToken(request);
+  const lettore = await authorizePanelRead(event, token);
+  // Chi può presentare deve sapere se la presentazione è sua: solo per lui si
+  // risolve la concessione.
+  const viewer =
+    token && (lettore.kind === 'moderator' || lettore.kind === 'speaker')
+      ? await resolveGrantForEvent(event, token)
+      : null;
   const row = await readPresentationRow(event.id);
-  return Response.json(presentationStateOf(row, event), { headers: nessunaCache });
+  return Response.json(presentationStateOf(row, event, viewer), {
+    headers: nessunaCache,
+  });
 });
 
 // ── POST: presenta un materiale ──────────────────────────
@@ -168,10 +183,23 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Only an uploaded PDF can be presented', 422, 'NOT_PRESENTABLE');
   }
 
+  // Lo stesso PDF già presentato: tiene il numero di pagine e, se a chiamare è
+  // un altro, è un passaggio di mano.
+  const prima = await prisma.eventPresentation.findUnique({
+    where: { eventId: event.id },
+    select: {
+      materialId: true,
+      pageCount: true,
+      presenterRole: true,
+      presenterGrantId: true,
+    },
+  });
+  const stessoDocumento = prima?.materialId === material.id;
+  const passaggio = stessoDocumento && !isCurrentPresenter(prima, grant);
   const presenter = {
     materialId: material.id,
-    page,
-    pageCount: null,
+    page: stessoDocumento && prima.pageCount ? Math.min(page, prima.pageCount) : page,
+    pageCount: stessoDocumento ? prima.pageCount : null,
     presenterRole: grant.role,
     presenterGrantId: grant.grantId,
     startedAt: new Date(),
@@ -188,10 +216,15 @@ export const POST = withErrorHandling(async (request, context) => {
     eventId: event.id,
     kind: 'presentation.started',
     actor: liveActorOf(grant.role),
-    data: { materialId: material.id, title: material.title, page },
+    data: {
+      materialId: material.id,
+      title: material.title,
+      page: row.page,
+      ...(passaggio ? { handover: true } : {}),
+    },
   });
 
-  return Response.json(presentationStateOf(row, event), { headers: nessunaCache });
+  return Response.json(presentationStateOf(row, event, grant), { headers: nessunaCache });
 });
 
 // ── PATCH: vai a una pagina ──────────────────────────────
@@ -216,7 +249,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const page = pageCount ? Math.min(parsed.data.page, pageCount) : parsed.data.page;
   if (page === attuale.page && pageCount === attuale.pageCount) {
     // Niente da cambiare: nessuna versione nuova, nessun annuncio.
-    return Response.json(presentationStateOf(attuale, event), { headers: nessunaCache });
+    return Response.json(presentationStateOf(attuale, event, grant), {
+      headers: nessunaCache,
+    });
   }
 
   let row;
@@ -243,7 +278,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     });
   }
 
-  return Response.json(presentationStateOf(row, event), { headers: nessunaCache });
+  return Response.json(presentationStateOf(row, event, grant), { headers: nessunaCache });
 });
 
 // ── DELETE: chiudi la presentazione ──────────────────────
@@ -266,7 +301,9 @@ export const DELETE = withErrorHandling(async (request, context) => {
   const attuale = await readPresentationRow(event.id);
   // Già chiusa: il risultato chiesto c'è.
   if (!attuale?.materialId) {
-    return Response.json(presentationStateOf(attuale, event), { headers: nessunaCache });
+    return Response.json(presentationStateOf(attuale, event, grant), {
+      headers: nessunaCache,
+    });
   }
   // Chi chiude la presentazione che vedeva non chiude quella appena aperta da un altro.
   const { materialId } = query.data;
@@ -292,5 +329,5 @@ export const DELETE = withErrorHandling(async (request, context) => {
     data: { materialId: attuale.materialId, title: attuale.material?.title ?? '' },
   });
 
-  return Response.json(presentationStateOf(row, event), { headers: nessunaCache });
+  return Response.json(presentationStateOf(row, event, grant), { headers: nessunaCache });
 });

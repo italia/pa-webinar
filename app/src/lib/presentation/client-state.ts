@@ -11,10 +11,10 @@
  * lenta del polling non riporta così la sala alla pagina di prima.
  *
  * Il puntatore non ha titolo né nome di chi presenta (restano dietro la rotta
- * che controlla chi sta nella stanza): quando annuncia un documento che lo
- * stato completo non conosce ancora, la vista lo dice (`stale`) e chi la usa
- * rilegge. Il file intanto si può già chiedere: il suo indirizzo dipende solo
- * dal materiale.
+ * che controlla chi sta nella stanza): quando annuncia un documento, o un
+ * turno di chi presenta (`startedAt`), che lo stato completo non conosce
+ * ancora, la vista lo dice (`stale`) e chi la usa rilegge. Il file intanto si
+ * può già chiedere: il suo indirizzo dipende solo dal materiale.
  */
 
 import {
@@ -77,8 +77,18 @@ export function presentationView(
       stale: false,
     };
   }
+  // Lo stato completo vale se parla dello stesso documento e dello stesso
+  // turno: quando la presentazione passa di mano sullo stesso PDF cambiano chi
+  // presenta e `yours`, e va riletto. Un puntatore senza turno (da una replica
+  // non aggiornata) non obbliga a rileggere.
+  const stessoTurno = (p: PresentationInfo) =>
+    ptr.startedAt === undefined ||
+    ptr.startedAt === null ||
+    p.startedAt === ptr.startedAt;
   const conosciuto =
-    full?.presentation?.materialId === ptr.materialId ? full.presentation : null;
+    full?.presentation?.materialId === ptr.materialId && stessoTurno(full.presentation)
+      ? full.presentation
+      : null;
   return {
     version: ptr.version,
     materialId: ptr.materialId,

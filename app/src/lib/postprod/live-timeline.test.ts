@@ -115,6 +115,15 @@ describe('describeAction', () => {
     );
   });
 
+  it('presentazione: passaggio di mano sullo stesso documento', () => {
+    expect(
+      describeAction('presentation.started', { title: 'Slide', page: 7, handover: true }, nessuna),
+    ).toBe('La presentazione «Slide» passa a un altro presentatore dalla pagina 7');
+    expect(describeAction('presentation.started', { title: 'Slide', page: 1, handover: true }, nessuna)).toBe(
+      'La presentazione «Slide» passa a un altro presentatore',
+    );
+  });
+
   it('i testi lunghi si accorciano', () => {
     const t = describeAction('agenda.topic', { label: 'x'.repeat(400), status: 'DONE' }, nessuna) ?? '';
     expect(t.length).toBeLessThan(320);

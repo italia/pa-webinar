@@ -213,6 +213,8 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
             materialId: busta.materialId,
             page: busta.page,
             version: busta.version,
+            // Assente da una replica non ancora aggiornata: resta sconosciuto.
+            ...(busta.startedAt !== undefined ? { startedAt: busta.startedAt } : {}),
           };
           if (vivo) setPresentation((prima) => newerPointer(prima, arrivato));
           break;

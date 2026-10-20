@@ -79,6 +79,13 @@ export interface PresentationPointer {
   page: number;
   /** Cresce a ogni cambio: fra due stati si tiene quello con il numero piu' alto. */
   version: number;
+  /**
+   * Quando chi presenta adesso ha preso la parola (avvio o «Presenta tu»):
+   * cambia quando la presentazione passa di mano anche sullo stesso
+   * documento, e dice alla sala di rileggere chi presenta. Null quando nessuno
+   * presenta; assente nei messaggi di una versione precedente dell'app.
+   */
+  startedAt?: string | null;
 }
 
 export type LiveEnvelope =

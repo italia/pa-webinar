@@ -233,6 +233,10 @@ export default function MaterialItem({
               <div className="material-item__byline">
                 {author} · <time dateTime={m.createdAt}>{whenLabel(m.createdAt)}</time>
               </div>
+              {/* Slide in un altro formato: chi può presentare sa cosa fare. */}
+              {present?.canPresent && kind === 'slides' && (
+                <p className="material-item__present-hint">{tp('exportToPresent')}</p>
+              )}
               {present && presentable && (presentando || present.canPresent) && (
                 <div className="material-item__present">
                   {presentando && (

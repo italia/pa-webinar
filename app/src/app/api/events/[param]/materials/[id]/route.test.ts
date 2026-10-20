@@ -75,7 +75,7 @@ beforeEach(() => {
   mockedOtherRow.mockResolvedValue(null);
   mockedPrivacyNotice.mockResolvedValue(null);
   mockedEndPresentation.mockResolvedValue({ count: 0 });
-  mockedPresentation.mockResolvedValue({ materialId: null, page: 1, version: 4 });
+  mockedPresentation.mockResolvedValue({ materialId: null, page: 1, version: 4, startedAt: null });
 });
 
 describe('DELETE /api/events/[slug]/materials/[id]', () => {
@@ -118,7 +118,12 @@ describe('DELETE /api/events/[slug]/materials/[id]', () => {
     expect(mockedEndPresentation.mock.invocationCallOrder[0]).toBeLessThan(
       mockedDelete.mock.invocationCallOrder[0]!,
     );
-    expect(publishPresentation).toHaveBeenCalledWith(EVENT_ID, { materialId: null, page: 1, version: 4 });
+    expect(publishPresentation).toHaveBeenCalledWith(EVENT_ID, {
+      materialId: null,
+      page: 1,
+      version: 4,
+      startedAt: null,
+    });
   });
 
   it('un materiale che nessuno presenta: nessun annuncio della presentazione', async () => {

@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Ladda upp en pdf att presentera",
     "started": "Presentationen har startat.",
     "stopped": "Presentationen har avslutats.",
+    "takeOver": "Ta över presentationen",
+    "takeOverHint": "Ta över presentationen från den här sidan: ditt namn visas som den som presenterar.",
+    "roomOnlyNote": "Sidorna visas i den här panelen i rummet, inte i samtalets video: inspelningen innehåller dem inte.",
+    "pdfOnlyHelp": "Endast PDF, max {maxMb} MB. Bilder från PowerPoint, Keynote eller Impress: exportera dem först till PDF.",
+    "exportHint": "Endast en PDF kan presenteras för rummet: exportera först bilder från PowerPoint, Keynote eller Impress till PDF.",
+    "exportToPresent": "Ladda upp PDF-versionen för att presentera den för rummet.",
     "errors": {
       "changed": "Presentationen har ändrats under tiden: försök igen.",
       "closed": "Evenemanget har avslutats: det går inte längre att presentera.",
       "notPresentable": "Endast en pdf som laddats upp bland materialen kan presenteras.",
       "forbidden": "Endast moderatorer och talare kan presentera.",
       "generic": "Åtgärden misslyckades. Försök igen.",
-      "pdfOnly": "Du kan bara ladda upp en pdf att presentera."
+      "pdfOnly": "Du kan bara ladda upp en PDF för att presentera: exportera först bilder från PowerPoint, Keynote eller Impress till PDF."
     }
   },
   "reminders": {

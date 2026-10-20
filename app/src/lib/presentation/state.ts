@@ -55,6 +55,7 @@ export const NO_PRESENTATION: PresentationPointer = {
   materialId: null,
   page: 1,
   version: 0,
+  startedAt: null,
 };
 
 /**
@@ -78,7 +79,7 @@ export function pointerForStatus(
 ): PresentationPointer {
   return isPresentationOpen(eventStatus)
     ? pointer
-    : { materialId: null, page: 1, version: pointer.version };
+    : { materialId: null, page: 1, version: pointer.version, startedAt: null };
 }
 
 /** Ciò che una lettura della riga porta con sé per costruire la risposta. */
@@ -87,6 +88,7 @@ export const PRESENTATION_ROW_SELECT = {
   page: true,
   pageCount: true,
   presenterRole: true,
+  presenterGrantId: true,
   startedAt: true,
   version: true,
   material: { select: { title: true } },
@@ -135,10 +137,16 @@ export function pointerOf(row: {
   materialId: string | null;
   page: number;
   version: number;
+  startedAt: Date | null;
 }): PresentationPointer {
   return row.materialId
-    ? { materialId: row.materialId, page: row.page, version: row.version }
-    : { materialId: null, page: 1, version: row.version };
+    ? {
+        materialId: row.materialId,
+        page: row.page,
+        version: row.version,
+        startedAt: row.startedAt?.toISOString() ?? null,
+      }
+    : { materialId: null, page: 1, version: row.version, startedAt: null };
 }
 
 /** Il puntatore corrente dell'evento, o quello vuoto se non ha mai presentato. */
@@ -147,7 +155,7 @@ export async function readPresentationPointer(
 ): Promise<PresentationPointer> {
   const row = await prisma.eventPresentation.findUnique({
     where: { eventId },
-    select: { materialId: true, page: true, version: true },
+    select: { materialId: true, page: true, version: true, startedAt: true },
   });
   return row ? pointerOf(row) : NO_PRESENTATION;
 }
@@ -190,12 +198,38 @@ function nomeDiChiPresenta(
 }
 
 /**
+ * Chi chiede, quando può presentare: il ruolo e la concessione nominale (null
+ * per il link principale), come li risolve `resolveGrantForEvent`.
+ */
+export interface PresentationViewer {
+  role: string;
+  grantId: string | null;
+}
+
+/**
+ * Chi chiede è chi presenta: stesso ruolo e stessa concessione. Il link
+ * principale è condiviso, quindi vale per chiunque lo usi.
+ */
+export function isCurrentPresenter(
+  row: { presenterRole: string | null; presenterGrantId: string | null },
+  viewer: PresentationViewer | null | undefined
+): boolean {
+  if (!viewer || !row.presenterRole) return false;
+  return (
+    row.presenterRole === viewer.role &&
+    (row.presenterGrantId ?? null) === (viewer.grantId ?? null)
+  );
+}
+
+/**
  * La risposta di GET .../presentation (e delle mutazioni) per una riga. Con
  * `status` concluso (vedi `isPresentationOpen`) nessuna presentazione.
+ * `viewer` è chi chiede, se può presentare: dice se la presentazione è sua.
  */
 export function presentationStateOf(
   row: PresentationRow | null,
-  event: { slug: string; moderatorName: string | null; status?: string }
+  event: { slug: string; moderatorName: string | null; status?: string },
+  viewer?: PresentationViewer | null
 ): PresentationState {
   const aperta = event.status === undefined || isPresentationOpen(event.status);
   if (!aperta || !row?.materialId || !row.material) {
@@ -210,6 +244,7 @@ export function presentationStateOf(
       title: row.material.title,
       presenterName: nomeDiChiPresenta(row, event),
       presenterRole: ruolo(row.presenterRole),
+      yours: isCurrentPresenter(row, viewer),
       startedAt: row.startedAt?.toISOString() ?? null,
       fileUrl: presentationFileUrl(event.slug, row.materialId),
     },

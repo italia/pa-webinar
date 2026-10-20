@@ -235,6 +235,14 @@ export function describeAction(
       return 'Evento terminato dal moderatore';
     case 'presentation.started': {
       const titolo = cita(data.title);
+      if (data.handover === true) {
+        // «Presenta tu»: stesso documento, un'altra persona presenta.
+        const pagina = Number(data.page);
+        const da = Number.isInteger(pagina) && pagina > 1 ? ` dalla pagina ${pagina}` : '';
+        return titolo
+          ? `La presentazione «${titolo}» passa a un altro presentatore${da}`
+          : `La presentazione passa a un altro presentatore${da}`;
+      }
       return titolo ? `Presentazione avviata: «${titolo}»` : 'Presentazione avviata';
     }
     case 'presentation.page': {

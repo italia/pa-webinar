@@ -48,13 +48,15 @@ function controlli(over: Partial<PresentationControls> = {}): PresentationContro
         title: 'Slide della sessione',
         presenterName: 'Relatrice di prova',
         presenterRole: 'SPEAKER',
-        startedAt: null,
+        yours: false,
+        startedAt: '2026-10-21T09:00:00.000Z',
         fileUrl: FILE_URL,
       },
     },
     displayPage: 2,
     canPresent: false,
     start: vi.fn(async () => null),
+    takeOver: vi.fn(async () => null),
     goTo: vi.fn(),
     stop: vi.fn(async () => null),
     busy: false,
@@ -62,6 +64,12 @@ function controlli(over: Partial<PresentationControls> = {}): PresentationContro
     refresh: vi.fn(),
     ...over,
   };
+}
+
+/** Chi presenta adesso: può presentare e la presentazione è sua. */
+function presentatore(over: Partial<PresentationControls> = {}): PresentationControls {
+  const base = controlli({ canPresent: true, ...over });
+  return { ...base, view: { ...base.view, info: { ...base.view.info!, yours: true } } };
 }
 
 async function render(
@@ -178,7 +186,9 @@ describe('PresentationStage — chi assiste', () => {
     fetchMock.mockImplementation(() => new Promise(() => {}));
     const ctrl = controlli({ canPresent: true });
     await render(ctrl);
-    expect(container.querySelector('[role="status"]')?.textContent).toContain(tp.loading);
+    expect(
+      container.querySelector('.presentation-stage__status[role="status"]')?.textContent
+    ).toContain(tp.loading);
     expect(pulsante(tp.next)?.disabled).toBe(true);
     tasto('ArrowRight');
     expect(ctrl.goTo).not.toHaveBeenCalled();
@@ -208,7 +218,20 @@ describe('PresentationStage — chi assiste', () => {
   it('nessun comando di chi presenta', async () => {
     await render(controlli());
     expect(pulsante(tp.stop)).toBeUndefined();
+    expect(pulsante(tp.takeOver)).toBeUndefined();
     expect(container.querySelector('input[type=number]')).toBeNull();
+    expect(container.querySelector('[role="note"]')).toBeNull();
+  });
+
+  it('annuncia ai lettori di schermo cosa si presenta e chi lo presenta', async () => {
+    await render(controlli());
+    const annuncio = Array.from(container.querySelectorAll('[role="status"]')).find(
+      (el) => !el.classList.contains('presentation-stage__status')
+    );
+    expect(annuncio?.getAttribute('aria-live')).toBe('polite');
+    expect(annuncio?.textContent).toBe(
+      `Slide della sessione. ${tp.presentedBy.replace('{name}', 'Relatrice di prova')}`
+    );
   });
 
   it('un documento che non si scarica lo dice, e si può riprovare', async () => {
@@ -227,7 +250,7 @@ describe('PresentationStage — chi assiste', () => {
 
 describe('PresentationStage — chi presenta', () => {
   it('le frecce girano la pagina per tutta la sala, con il numero di pagine', async () => {
-    const ctrl = controlli({ canPresent: true });
+    const ctrl = presentatore();
     await render(ctrl, { token: 'TOKEN_MOD' });
     tasto('ArrowRight');
     expect(ctrl.goTo).toHaveBeenLastCalledWith(3, 5);
@@ -241,7 +264,7 @@ describe('PresentationStage — chi presenta', () => {
   });
 
   it('le frecce dentro il campo della pagina non girano le slide', async () => {
-    const ctrl = controlli({ canPresent: true });
+    const ctrl = presentatore();
     await render(ctrl, { token: 'TOKEN_MOD' });
     const campo = container.querySelector<HTMLInputElement>('input[type=number]')!;
     act(() => {
@@ -253,7 +276,7 @@ describe('PresentationStage — chi presenta', () => {
   });
 
   it('chiude la presentazione', async () => {
-    const ctrl = controlli({ canPresent: true });
+    const ctrl = presentatore();
     await render(ctrl, { token: 'TOKEN_MOD' });
     act(() => pulsante(tp.stop)!.click());
     expect(ctrl.stop).toHaveBeenCalled();
@@ -264,8 +287,48 @@ describe('PresentationStage — chi presenta', () => {
     expect(container.querySelector('[role="note"]')?.textContent).toBe(tp.recordingNote);
   });
 
+  it('anche senza registrazione dice che le pagine stanno nel riquadro della sala, non nella chiamata', async () => {
+    await render(controlli({ canPresent: true }));
+    expect(container.querySelector('[role="note"]')?.textContent).toBe(tp.roomOnlyNote);
+  });
+
+  it('chi può presentare e non presenta adesso prende la presentazione con «Presenta tu»', async () => {
+    const ctrl = controlli({ canPresent: true });
+    await render(ctrl, { token: 'TOKEN_RELATORE' });
+    const prendi = pulsante(tp.takeOver)!;
+    expect(prendi).toBeDefined();
+    expect(prendi.getAttribute('aria-describedby')).toBeTruthy();
+    act(() => prendi.click());
+    await attendi();
+    // Dalla pagina che sta guardando: quella di chi presenta.
+    expect(ctrl.takeOver).toHaveBeenCalledWith(2);
+    // Il focus passa alla scena: le frecce girano subito le pagine.
+    expect(document.activeElement).toBe(scena());
+  });
+
+  it('chi presenta adesso non vede «Presenta tu»', async () => {
+    await render(presentatore());
+    expect(pulsante(tp.takeOver)).toBeUndefined();
+    expect(pulsante(tp.stop)).toBeDefined();
+  });
+
+  it('chi può presentare ma non presenta sfoglia solo per sé, e prende dalla pagina a cui è arrivato', async () => {
+    const ctrl = controlli({ canPresent: true });
+    await render(ctrl, { token: 'TOKEN_RELATORE' });
+    // Nessun campo per la pagina, ma può chiudere.
+    expect(container.querySelector('input[type=number]')).toBeNull();
+    expect(pulsante(tp.stop)).toBeDefined();
+    tasto('ArrowRight');
+    tasto('ArrowRight');
+    expect(ctrl.goTo).not.toHaveBeenCalled();
+    expect(indicatore()).toBe('Pagina 4 di 5');
+    act(() => pulsante(tp.takeOver)!.click());
+    await attendi();
+    expect(ctrl.takeOver).toHaveBeenCalledWith(4);
+  });
+
   it('un cambio di pagina non riuscito lo dice', async () => {
-    await render(controlli({ canPresent: true, actionError: 'changed' }));
+    await render(presentatore({ actionError: 'changed' }));
     expect(container.textContent).toContain(tp.errors.changed);
   });
 });

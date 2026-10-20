@@ -46,10 +46,13 @@ const TESTO_MAX = 4_000;
  * La scena della presentazione: la pagina del PDF che chi presenta mostra a
  * tutta la sala, accanto alla videochiamata.
  *
- * Chi presenta (moderatori e relatori) gira le pagine per tutti, con i
- * pulsanti o con le frecce della tastiera a riquadro selezionato, e chiude la
- * presentazione. Chi assiste segue la pagina di chi presenta; può sfogliare da
- * solo, e un pulsante lo riporta alla pagina condivisa. Il numero di pagina si
+ * Chi presenta gira le pagine per tutti, con i pulsanti o con le frecce della
+ * tastiera a riquadro selezionato. Gli altri moderatori e relatori possono
+ * chiudere la presentazione e prenderla con «Presenta tu», dalla pagina che
+ * stanno guardando; finché non la prendono sfogliano solo per sé, come chi
+ * assiste, così un tasto premuto per leggere avanti non sposta la sala. Chi
+ * assiste segue la pagina di chi presenta; può sfogliare da solo, e un
+ * pulsante lo riporta alla pagina condivisa. Il numero di pagina si
  * annuncia ai lettori di schermo senza interrompere, e il testo della pagina
  * si legge sotto la slide.
  *
@@ -68,6 +71,8 @@ export default function PresentationStage({
   const view = controls?.view;
   const fileUrl = view?.fileUrl ?? null;
   const canPresent = controls?.canPresent ?? false;
+  // Gira le pagine per tutti solo chi presenta adesso.
+  const comanda = canPresent && !!view?.info?.yours;
   const sharedPage = controls?.displayPage ?? 1;
 
   const [documento, setDocumento] = useState<PdfDocument | null>(null);
@@ -81,9 +86,14 @@ export default function PresentationStage({
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sezioneRef = useRef<HTMLElement>(null);
   const titleId = useId();
   const hintId = useId();
   const gotoId = useId();
+  const takeOverHintId = useId();
+  // Chi presenta e cosa, per i lettori di schermo: si annuncia all'avvio e a
+  // ogni passaggio di mano, non a ogni pagina (quella la dice l'indicatore).
+  const [annuncio, setAnnuncio] = useState('');
 
   // ── Il documento: uno per materiale presentato ───────────────────────────
   useEffect(() => {
@@ -131,11 +141,10 @@ export default function PresentationStage({
 
   const total = documento?.numPages ?? view?.info?.pageCount ?? null;
   const paginaCondivisa = clampPage(sharedPage, total);
-  const pagina = canPresent
+  const pagina = comanda
     ? paginaCondivisa
     : clampPage(paginaLibera ?? paginaCondivisa, total);
-  const sfoglia =
-    !canPresent && paginaLibera !== null && paginaLibera !== paginaCondivisa;
+  const sfoglia = !comanda && paginaLibera !== null && paginaLibera !== paginaCondivisa;
   // Chi presenta è arrivato alla pagina su cui sfogliava chi assiste: da qui
   // lo si segue di nuovo, invece di restare fermi quando passa oltre.
   useEffect(() => {
@@ -230,14 +239,14 @@ export default function PresentationStage({
     (destinazione: number) => {
       if (!controls || !pronto) return;
       const p = clampPage(destinazione, total);
-      if (canPresent) {
+      if (comanda) {
         controls.goTo(p, total ?? undefined);
         return;
       }
       // Chi assiste sfoglia per conto suo; tornato alla pagina condivisa, la segue di nuovo.
       setPaginaLibera(p === paginaCondivisa ? null : p);
     },
-    [controls, pronto, canPresent, total, paginaCondivisa]
+    [controls, pronto, comanda, total, paginaCondivisa]
   );
 
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
@@ -274,22 +283,62 @@ export default function PresentationStage({
     setVaiA('');
   };
 
+  const titolo = view?.info?.title ?? '';
+  const chi = view?.info?.presenterName
+    ? t('presentedBy', { name: view.info.presenterName })
+    : view?.info?.presenterRole === 'SPEAKER'
+      ? t('presentedBySpeaker')
+      : view?.info?.presenterRole === 'MODERATOR'
+        ? t('presentedByModerator')
+        : null;
+  // Una volta per turno: il nome e il titolo arrivano insieme a lui.
+  const turno = view?.info?.startedAt ?? null;
+  const turnoAnnunciatoRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!turno || !titolo || turnoAnnunciatoRef.current === turno) return;
+    turnoAnnunciatoRef.current = turno;
+    setAnnuncio(chi ? `${titolo}. ${chi}` : titolo);
+  }, [turno, titolo, chi]);
+
+  const [prendendo, setPrendendo] = useState(false);
+  const presentaTu = useCallback(async () => {
+    if (!controls) return;
+    setPrendendo(true);
+    try {
+      // Dalla pagina che sta guardando: quella di chi presenta, o quella a
+      // cui è arrivato sfogliando da solo.
+      const errore = await controls.takeOver(pagina);
+      // Il pulsante sparisce: il focus va alla scena, dove le frecce girano
+      // subito le pagine per tutti.
+      if (!errore) sezioneRef.current?.focus();
+    } finally {
+      setPrendendo(false);
+    }
+  }, [controls, pagina]);
+
+  // Presa la presentazione, la pagina è quella condivisa: lo sfoglio di prima
+  // non deve tornare quando la si passa a qualcun altro.
+  useEffect(() => {
+    if (comanda) setPaginaLibera(null);
+  }, [comanda]);
+
   if (!controls || !view?.materialId) return null;
 
-  const titolo = view.info?.title ?? '';
   const indicatore = total
     ? t('pageOf', { page: pagina, total })
     : t('pageOnly', { page: pagina });
-  const chi = view.info?.presenterName
-    ? t('presentedBy', { name: view.info.presenterName })
-    : view.info?.presenterRole === 'SPEAKER'
-      ? t('presentedBySpeaker')
-      : view.info?.presenterRole === 'MODERATOR'
-        ? t('presentedByModerator')
-        : null;
   const errore = controls.actionError
     ? presentationErrorMessage(t, controls.actionError)
     : null;
+  // «Presenta tu»: per chi può presentare ma non è chi presenta adesso.
+  const puoPrendere = canPresent && !!view.info && !view.info.yours;
+
+  // Chi presenta e cosa: annunciato anche a presentazione ridotta.
+  const regioneAnnuncio = (
+    <p className="visually-hidden" role="status" aria-live="polite">
+      {annuncio}
+    </p>
+  );
 
   if (minimized) {
     return (
@@ -317,12 +366,14 @@ export default function PresentationStage({
           <Icon icon="it-expand" size="sm" aria-hidden="true" />
           <span>{t('expand')}</span>
         </button>
+        {regioneAnnuncio}
       </section>
     );
   }
 
   return (
     <section
+      ref={sezioneRef}
       className="presentation-stage"
       aria-labelledby={titleId}
       aria-describedby={hintId}
@@ -342,6 +393,23 @@ export default function PresentationStage({
           </h2>
           {chi && <p className="presentation-stage__by">{chi}</p>}
         </div>
+        {puoPrendere && (
+          <>
+            <button
+              type="button"
+              className="presentation-stage__btn presentation-stage__btn--take"
+              disabled={controls.busy || prendendo}
+              onClick={() => void presentaTu()}
+              aria-describedby={takeOverHintId}
+            >
+              <Icon icon="it-presentation" size="sm" aria-hidden="true" />
+              <span>{t('takeOver')}</span>
+            </button>
+            <span id={takeOverHintId} className="visually-hidden">
+              {t('takeOverHint')}
+            </span>
+          </>
+        )}
         <button
           type="button"
           className="presentation-stage__btn presentation-stage__btn--quiet"
@@ -353,8 +421,9 @@ export default function PresentationStage({
         </button>
       </header>
       <p id={hintId} className="visually-hidden">
-        {canPresent ? t('keyboardHintPresenter') : t('keyboardHintViewer')}
+        {comanda ? t('keyboardHintPresenter') : t('keyboardHintViewer')}
       </p>
+      {regioneAnnuncio}
 
       <div className="presentation-stage__canvas-wrap" ref={wrapRef}>
         <canvas
@@ -415,43 +484,43 @@ export default function PresentationStage({
           <Icon icon="it-chevron-right" size="sm" aria-hidden="true" />
         </button>
 
-        {canPresent && (
-          <>
-            <form className="presentation-stage__goto" onSubmit={onVaiA}>
-              <label htmlFor={gotoId} className="visually-hidden">
-                {t('goToPage')}
-              </label>
-              <input
-                id={gotoId}
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={total ?? undefined}
-                className="form-control form-control-sm"
-                // L'intervallo delle pagine, uguale in ogni lingua: il nome del
-                // campo lo dà l'etichetta.
-                placeholder={total ? `1–${total}` : undefined}
-                value={vaiA}
-                onChange={(e) => setVaiA(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="presentation-stage__btn presentation-stage__btn--text"
-                disabled={!pronto}
-              >
-                {t('go')}
-              </button>
-            </form>
+        {comanda && (
+          <form className="presentation-stage__goto" onSubmit={onVaiA}>
+            <label htmlFor={gotoId} className="visually-hidden">
+              {t('goToPage')}
+            </label>
+            <input
+              id={gotoId}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={total ?? undefined}
+              className="form-control form-control-sm"
+              // L'intervallo delle pagine, uguale in ogni lingua: il nome del
+              // campo lo dà l'etichetta.
+              placeholder={total ? `1–${total}` : undefined}
+              value={vaiA}
+              onChange={(e) => setVaiA(e.target.value)}
+            />
             <button
-              type="button"
-              className="presentation-stage__btn presentation-stage__btn--stop"
-              disabled={controls.busy}
-              onClick={() => void controls.stop()}
+              type="submit"
+              className="presentation-stage__btn presentation-stage__btn--text"
+              disabled={!pronto}
             >
-              <Icon icon="it-close" size="sm" aria-hidden="true" />
-              <span>{t('stop')}</span>
+              {t('go')}
             </button>
-          </>
+          </form>
+        )}
+        {canPresent && (
+          <button
+            type="button"
+            className="presentation-stage__btn presentation-stage__btn--stop"
+            disabled={controls.busy}
+            onClick={() => void controls.stop()}
+          >
+            <Icon icon="it-close" size="sm" aria-hidden="true" />
+            <span>{t('stop')}</span>
+          </button>
         )}
 
         {sfoglia && (
@@ -478,9 +547,12 @@ export default function PresentationStage({
           {errore}
         </p>
       )}
-      {canPresent && isRecording && (
+      {/* Chi presenta deve sapere dove si vedono le pagine: nel riquadro
+          della sala, non nel video della chiamata, quindi nemmeno nella
+          registrazione. */}
+      {canPresent && (
         <p className="presentation-stage__note" role="note">
-          {t('recordingNote')}
+          {isRecording ? t('recordingNote') : t('roomOnlyNote')}
         </p>
       )}
 

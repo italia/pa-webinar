@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Augšupielādēt PDF prezentēšanai",
     "started": "Prezentācija sākta.",
     "stopped": "Prezentācija beigta.",
+    "takeOver": "Pārņemt prezentāciju",
+    "takeOverHint": "Pārņemiet prezentāciju no šīs lapas: kā prezentētāja tiks rādīts jūsu vārds.",
+    "roomOnlyNote": "Lapas ir redzamas šajā telpas panelī, nevis zvana video: ierakstā to nav.",
+    "pdfOnlyHelp": "Tikai PDF, maks. {maxMb} MB. PowerPoint, Keynote vai Impress slaidus vispirms eksportējiet uz PDF.",
+    "exportHint": "Telpai var prezentēt tikai PDF: PowerPoint, Keynote vai Impress slaidus vispirms eksportējiet uz PDF.",
+    "exportToPresent": "Lai to prezentētu telpai, augšupielādējiet tā PDF versiju.",
     "errors": {
       "changed": "Pa to laiku prezentācija ir mainījusies: mēģiniet vēlreiz.",
       "closed": "Pasākums ir beidzies: prezentēt vairs nav iespējams.",
       "notPresentable": "Prezentēt var tikai materiālos augšupielādētu PDF.",
       "forbidden": "Prezentēt var tikai moderatori un runātāji.",
       "generic": "Darbība neizdevās. Mēģiniet vēlreiz.",
-      "pdfOnly": "Jūs varat augšupielādēt tikai PDF prezentēšanai."
+      "pdfOnly": "Prezentēšanai varat augšupielādēt tikai PDF: PowerPoint, Keynote vai Impress slaidus vispirms eksportējiet uz PDF."
     }
   },
   "reminders": {

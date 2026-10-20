@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Įkelti PDF pristatymui",
     "started": "Pristatymas pradėtas.",
     "stopped": "Pristatymas baigtas.",
+    "takeOver": "Perimti pristatymą",
+    "takeOverHint": "Perimkite pristatymą nuo šio puslapio: kaip pristatančiojo bus rodomas jūsų vardas.",
+    "roomOnlyNote": "Puslapiai rodomi šiame kambario skydelyje, o ne skambučio vaizdo įraše: įrašas jų neapima.",
+    "pdfOnlyHelp": "Tik PDF, iki {maxMb} MB. PowerPoint, Keynote ar Impress skaidres pirmiausia eksportuokite į PDF.",
+    "exportHint": "Kambariui galima pristatyti tik PDF: PowerPoint, Keynote ar Impress skaidres pirmiausia eksportuokite į PDF.",
+    "exportToPresent": "Norėdami pristatyti kambariui, įkelkite jo PDF versiją.",
     "errors": {
       "changed": "Tuo metu pristatymas pasikeitė: bandykite dar kartą.",
       "closed": "Renginys baigėsi: pristatyti nebegalima.",
       "notPresentable": "Pristatyti galima tik į medžiagą įkeltą PDF.",
       "forbidden": "Pristatyti gali tik moderatoriai ir pranešėjai.",
       "generic": "Veiksmas nepavyko. Bandykite dar kartą.",
-      "pdfOnly": "Galite įkelti tik PDF pristatymui."
+      "pdfOnly": "Pristatymui galite įkelti tik PDF: PowerPoint, Keynote ar Impress skaidres pirmiausia eksportuokite į PDF."
     }
   },
   "reminders": {

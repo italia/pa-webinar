@@ -185,12 +185,31 @@ describe('GET /api/events/[slug]/presentation', () => {
         // Link principale: il nome del conduttore scritto sull'evento.
         presenterName: 'Conduzione',
         presenterRole: 'MODERATOR',
+        // Un ospite non presenta: la presentazione non è sua.
+        yours: false,
         startedAt: '2026-10-08T09:10:00.000Z',
         fileUrl: `/api/events/${SLUG}/presentation/file?m=${MATERIAL_ID}`,
       },
     });
     // Mai l'indirizzo pubblico del file.
     expect(JSON.stringify(body)).not.toContain('/api/assets');
+    // Mai la concessione di chi presenta.
+    expect(JSON.stringify(body)).not.toContain('presenterGrantId');
+  });
+
+  it('chi presenta adesso la legge come sua; un relatore che non presenta no', async () => {
+    // Presenta il link principale (riga senza concessione).
+    let res = await GET(req('GET'), ctx());
+    expect((await res.json()).presentation.yours).toBe(true);
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    res = await GET(req('GET', { token: 'TOKEN_RELATORE' }), ctx());
+    expect((await res.json()).presentation.yours).toBe(false);
+    // Presenta la relatrice: per lei sì.
+    mockedRow.mockResolvedValue(
+      riga({ presenterRole: 'SPEAKER', presenterGrantId: 'grant-speaker' })
+    );
+    res = await GET(req('GET', { token: 'TOKEN_RELATORE' }), ctx());
+    expect((await res.json()).presentation.yours).toBe(true);
   });
 
   it('nessuno presenta: presentation null, con la versione', async () => {
@@ -258,6 +277,13 @@ describe('GET /api/events/[slug]/presentation', () => {
 });
 
 describe('POST /api/events/[slug]/presentation — presenta', () => {
+  beforeEach(() => {
+    // In corso un altro documento: avviare questo non è un passaggio di mano.
+    mockedRow.mockResolvedValue(
+      riga({ materialId: OTHER_ID, material: { title: 'Altro' } })
+    );
+  });
+
   it('chi modera presenta un PDF: versione nuova, puntatore sul canale, cronologia', async () => {
     const res = await POST(req('POST', { body: { materialId: MATERIAL_ID } }), ctx());
     expect(res.status).toBe(200);
@@ -280,12 +306,14 @@ describe('POST /api/events/[slug]/presentation — presenta', () => {
     expect(upsert.update).toMatchObject({
       materialId: MATERIAL_ID,
       page: 1,
+      pageCount: null,
       version: { increment: 1 },
     });
     expect(publish).toHaveBeenCalledWith(EVENT_ID, {
       materialId: MATERIAL_ID,
       page: 1,
       version: 8,
+      startedAt: expect.any(String),
     });
     expect(journal).toHaveBeenCalledWith({
       eventId: EVENT_ID,
@@ -296,6 +324,77 @@ describe('POST /api/events/[slug]/presentation — presenta', () => {
     expect((await res.json()).presentation).toMatchObject({
       materialId: MATERIAL_ID,
       page: 1,
+      yours: true,
+    });
+  });
+
+  it('«Presenta tu» sullo stesso PDF: passa di mano, stessa pagina, numero di pagine tenuto', async () => {
+    mockedRow.mockResolvedValue(riga());
+    mockedGrant.mockResolvedValue(concessione('SPEAKER'));
+    const res = await POST(
+      req('POST', {
+        token: 'TOKEN_RELATORE',
+        body: { materialId: MATERIAL_ID, page: 3 },
+      }),
+      ctx()
+    );
+    expect(res.status).toBe(200);
+    expect(mockedUpsert.mock.calls[0]![0].update).toMatchObject({
+      materialId: MATERIAL_ID,
+      page: 3,
+      pageCount: 12,
+      presenterRole: 'SPEAKER',
+      presenterGrantId: 'grant-speaker',
+      startedAt: expect.any(Date),
+      version: { increment: 1 },
+    });
+    // Un turno nuovo: la sala rilegge chi presenta.
+    expect(publish.mock.calls[0]![1]).toMatchObject({
+      materialId: MATERIAL_ID,
+      page: 3,
+      startedAt: expect.any(String),
+    });
+    expect(journal).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'presentation.started',
+      actor: 'speaker',
+      data: {
+        materialId: MATERIAL_ID,
+        title: 'Slide della sessione',
+        page: 3,
+        handover: true,
+      },
+    });
+    expect((await res.json()).presentation).toMatchObject({
+      presenterRole: 'SPEAKER',
+      yours: true,
+    });
+  });
+
+  it('chi presenta già lo stesso PDF e lo riavvia: niente passaggio di mano in cronologia', async () => {
+    mockedRow.mockResolvedValue(riga());
+    const res = await POST(
+      req('POST', { body: { materialId: MATERIAL_ID, page: 3 } }),
+      ctx()
+    );
+    expect(res.status).toBe(200);
+    expect(mockedUpsert.mock.calls[0]![0].update).toMatchObject({
+      page: 3,
+      pageCount: 12,
+    });
+    expect(journal.mock.calls[0]![0].data).toEqual({
+      materialId: MATERIAL_ID,
+      title: 'Slide della sessione',
+      page: 3,
+    });
+  });
+
+  it('«Presenta tu» oltre l’ultima pagina nota: resta sull’ultima', async () => {
+    mockedRow.mockResolvedValue(riga());
+    await POST(req('POST', { body: { materialId: MATERIAL_ID, page: 40 } }), ctx());
+    expect(mockedUpsert.mock.calls[0]![0].update).toMatchObject({
+      page: 12,
+      pageCount: 12,
     });
   });
 
@@ -430,10 +529,12 @@ describe('PATCH /api/events/[slug]/presentation — gira pagina', () => {
     // Il materiale fa parte della condizione.
     expect(update.where).toEqual({ eventId: EVENT_ID, materialId: MATERIAL_ID });
     expect(update.data).toEqual({ page: 4, pageCount: 12, version: { increment: 1 } });
+    // Lo stesso turno: chi presenta non cambia.
     expect(publish).toHaveBeenCalledWith(EVENT_ID, {
       materialId: MATERIAL_ID,
       page: 4,
       version: 8,
+      startedAt: '2026-10-08T09:10:00.000Z',
     });
     expect(journal).toHaveBeenCalledWith({
       eventId: EVENT_ID,
@@ -566,6 +667,7 @@ describe('DELETE /api/events/[slug]/presentation — chiude', () => {
       materialId: null,
       page: 1,
       version: 8,
+      startedAt: null,
     });
     expect(journal).toHaveBeenCalledWith({
       eventId: EVENT_ID,

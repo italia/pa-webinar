@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Subir un PDF para presentar",
     "started": "Presentación iniciada.",
     "stopped": "Presentación detenida.",
+    "takeOver": "Tomar la presentación",
+    "takeOverHint": "Tome la presentación desde esta página: su nombre aparecerá como el de quien presenta.",
+    "roomOnlyNote": "Las páginas se ven en este recuadro de la sala, no en el vídeo de la llamada: la grabación no las contiene.",
+    "pdfOnlyHelp": "Solo PDF, máx. {maxMb} MB. Diapositivas de PowerPoint, Keynote o Impress: expórtelas antes a PDF.",
+    "exportHint": "A la sala solo se puede presentar un PDF: exporte antes a PDF las diapositivas de PowerPoint, Keynote o Impress.",
+    "exportToPresent": "Para presentarlo a la sala, suba su versión en PDF.",
     "errors": {
       "changed": "Mientras tanto la presentación ha cambiado: inténtelo de nuevo.",
       "closed": "El evento ha terminado: ya no se puede presentar.",
       "notPresentable": "Solo se puede presentar un PDF subido entre los materiales.",
       "forbidden": "Solo la moderación y los ponentes pueden presentar.",
       "generic": "La operación no se ha completado. Inténtelo de nuevo.",
-      "pdfOnly": "Solo puede subir un PDF para presentar."
+      "pdfOnly": "Solo puede subir un PDF para presentar: exporte antes a PDF las diapositivas de PowerPoint, Keynote o Impress."
     }
   },
   "reminders": {

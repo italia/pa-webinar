@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Een pdf uploaden om te presenteren",
     "started": "Presentatie gestart.",
     "stopped": "Presentatie gestopt.",
+    "takeOver": "Presentatie overnemen",
+    "takeOverHint": "Neem de presentatie over vanaf deze pagina: uw naam wordt getoond als die van de presentator.",
+    "roomOnlyNote": "De pagina’s verschijnen in dit paneel van de zaal, niet in de video van het gesprek: de opname bevat ze niet.",
+    "pdfOnlyHelp": "Alleen pdf, max. {maxMb} MB. Dia’s uit PowerPoint, Keynote of Impress: exporteer ze eerst naar pdf.",
+    "exportHint": "Aan de zaal kan alleen een pdf worden gepresenteerd: exporteer dia’s uit PowerPoint, Keynote of Impress eerst naar pdf.",
+    "exportToPresent": "Upload de pdf-versie om het aan de zaal te presenteren.",
     "errors": {
       "changed": "De presentatie is intussen gewijzigd: probeer het opnieuw.",
       "closed": "Het evenement is afgelopen: presenteren is niet meer mogelijk.",
       "notPresentable": "Alleen een pdf die bij de materialen is geüpload, kan worden gepresenteerd.",
       "forbidden": "Alleen moderators en sprekers kunnen presenteren.",
       "generic": "De bewerking is mislukt. Probeer het opnieuw.",
-      "pdfOnly": "U kunt alleen een pdf uploaden om te presenteren."
+      "pdfOnly": "U kunt alleen een pdf uploaden om te presenteren: exporteer dia’s uit PowerPoint, Keynote of Impress eerst naar pdf."
     }
   },
   "reminders": {

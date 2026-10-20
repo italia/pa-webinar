@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Učitaj PDF za prezentiranje",
     "started": "Prezentacija je pokrenuta.",
     "stopped": "Prezentacija je zaustavljena.",
+    "takeOver": "Preuzmi prezentaciju",
+    "takeOverHint": "Preuzmite prezentaciju od ove stranice: kao osoba koja prezentira prikazat će se vaše ime.",
+    "roomOnlyNote": "Stranice se vide u ovom panelu sobe, a ne u videu poziva: snimka ih ne sadrži.",
+    "pdfOnlyHelp": "Samo PDF, maks. {maxMb} MB. Slajdove iz PowerPointa, Keynotea ili Impressa najprije izvezite u PDF.",
+    "exportHint": "Sobi se može prezentirati samo PDF: slajdove iz PowerPointa, Keynotea ili Impressa najprije izvezite u PDF.",
+    "exportToPresent": "Da biste ga prezentirali sobi, prenesite njegovu PDF verziju.",
     "errors": {
       "changed": "U međuvremenu se prezentacija promijenila: pokušajte ponovno.",
       "closed": "Događaj je završio: više nije moguće prezentirati.",
       "notPresentable": "Može se prezentirati samo PDF učitan među materijale.",
       "forbidden": "Prezentirati mogu samo moderatori i govornici.",
       "generic": "Radnja nije uspjela. Pokušajte ponovno.",
-      "pdfOnly": "Možete učitati samo PDF za prezentiranje."
+      "pdfOnly": "Za prezentiranje možete prenijeti samo PDF: slajdove iz PowerPointa, Keynotea ili Impressa najprije izvezite u PDF."
     }
   },
   "reminders": {

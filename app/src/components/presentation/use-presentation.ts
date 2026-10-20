@@ -39,8 +39,17 @@ export interface PresentationControls {
   displayPage: number;
   /** Chi conduce o un relatore: può avviare, girare pagina e chiudere. */
   canPresent: boolean;
-  /** Avvia la presentazione di un materiale (sostituisce quella in corso). */
-  start: (materialId: string) => Promise<PresentationActionError | null>;
+  /**
+   * Avvia la presentazione di un materiale (sostituisce quella in corso), dalla
+   * pagina indicata o dalla prima.
+   */
+  start: (materialId: string, page?: number) => Promise<PresentationActionError | null>;
+  /**
+   * «Presenta tu»: chi può presentare prende la presentazione in corso, sullo
+   * stesso documento, dalla pagina indicata (quella che sta guardando) o da
+   * quella di chi presenta. Il suo nome compare come chi presenta.
+   */
+  takeOver: (page?: number) => Promise<PresentationActionError | null>;
   /** Va a una pagina del documento presentato. Le richieste ravvicinate si accorpano. */
   goTo: (page: number, pageCount?: number) => void;
   /** Chiude la presentazione in corso. */
@@ -55,6 +64,9 @@ export interface PresentationControls {
   /** Rilegge lo stato completo. */
   refresh: () => void;
 }
+
+/** Chi assiste rilegge lo stato completo entro questo intervallo, non tutti insieme. */
+const RILETTURA_MAX_MS = 800;
 
 export const PresentationContext = createContext<PresentationControls | null>(null);
 
@@ -162,14 +174,25 @@ export function usePresentation({
     [eventSlug, completo, pointer]
   );
 
-  // Il canale ha annunciato un documento nuovo: si rilegge lo stato completo
-  // (titolo, chi presenta). Una volta per versione.
+  // Il canale ha annunciato un documento nuovo, o un passaggio di mano: si
+  // rilegge lo stato completo (titolo, chi presenta). Una volta per versione.
+  // Chi assiste aspetta un istante a caso, come per il file: una sala piena
+  // che rilegge nello stesso millisecondo è un picco evitabile.
   const rilettoRef = useRef(-1);
   useEffect(() => {
     if (!view.stale || view.version <= rilettoRef.current) return;
-    rilettoRef.current = view.version;
-    void mutate();
-  }, [view.stale, view.version, mutate]);
+    const versione = view.version;
+    const rileggi = () => {
+      rilettoRef.current = versione;
+      void mutate();
+    };
+    if (canPresent) {
+      rileggi();
+      return;
+    }
+    const timer = setTimeout(rileggi, Math.floor(Math.random() * RILETTURA_MAX_MS));
+    return () => clearTimeout(timer);
+  }, [view.stale, view.version, mutate, canPresent]);
 
   const accogli = useCallback((stato: PresentationState) => {
     setMio((prima) => newerState(prima, stato));
@@ -251,7 +274,10 @@ export function usePresentation({
   const [busy, setBusy] = useState(false);
 
   const start = useCallback(
-    async (materialId: string): Promise<PresentationActionError | null> => {
+    async (
+      materialId: string,
+      page?: number
+    ): Promise<PresentationActionError | null> => {
       if (!canPresent) return 'forbidden';
       setBusy(true);
       try {
@@ -261,7 +287,7 @@ export function usePresentation({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ materialId }),
+          body: JSON.stringify(page && page > 1 ? { materialId, page } : { materialId }),
         });
         if (!res.ok) return await erroreDi(res);
         accogli((await res.json()) as PresentationState);
@@ -306,6 +332,18 @@ export function usePresentation({
     }
   }, [view.materialId, canPresent, url, token, accogli, mutate]);
 
+  const takeOver = useCallback(
+    async (page?: number): Promise<PresentationActionError | null> => {
+      const materialId = view.materialId;
+      if (!materialId) return null;
+      const errore = await start(materialId, page ?? view.page);
+      setActionError(errore);
+      if (errore) void mutate();
+      return errore;
+    },
+    [view.materialId, view.page, start, mutate]
+  );
+
   const refresh = useCallback(() => {
     void mutate();
   }, [mutate]);
@@ -319,12 +357,24 @@ export function usePresentation({
       displayPage,
       canPresent,
       start,
+      takeOver,
       goTo,
       stop,
       busy,
       actionError,
       refresh,
     }),
-    [view, displayPage, canPresent, start, goTo, stop, busy, actionError, refresh]
+    [
+      view,
+      displayPage,
+      canPresent,
+      start,
+      takeOver,
+      goTo,
+      stop,
+      busy,
+      actionError,
+      refresh,
+    ]
   );
 }

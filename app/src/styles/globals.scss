@@ -1175,6 +1175,10 @@ button.live-time-strip__rec {
     gap: 0.25rem;
     margin-left: auto;
 
+    + .presentation-stage__btn--stop {
+      margin-left: 0;
+    }
+
     // Su un telefono contano le frecce e la chiusura: lo spazio va alla slide.
     @media (max-width: 575.98px) {
       display: none;
@@ -1232,7 +1236,29 @@ button.live-time-strip__rec {
       min-width: 0;
     }
 
+    // «Presenta tu»: il passaggio di mano, ben visibile a chi può prenderla.
+    &--take {
+      flex-shrink: 0;
+      background: var(--app-primary);
+      border-color: var(--app-primary);
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: #004D99;
+        border-color: #004D99;
+        color: #fff;
+      }
+
+      &:disabled {
+        color: #fff;
+        opacity: 0.65;
+      }
+    }
+
+    // In fondo alla riga: dopo «Vai» per chi presenta, dopo le frecce per gli
+    // altri che possono chiudere.
     &--stop {
+      margin-left: auto;
       color: #A61C2E;
       border-color: #E3A3AC;
 
@@ -3911,6 +3937,11 @@ button.live-time-strip__rec {
     font-size: 0.82rem;
   }
 
+  // Alla sala si presenta solo un PDF: il promemoria sotto la scelta del file.
+  &__present-hint {
+    margin: 4px 0 0;
+  }
+
   &__label {
     display: block;
     margin-bottom: 2px;
@@ -4105,6 +4136,14 @@ button.live-time-strip__rec {
     align-items: center;
     gap: 6px;
     margin-top: 6px;
+  }
+
+  // Slide in un altro formato: per presentarle serve il PDF.
+  &__present-hint {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #5C6F82;
   }
 
   &__badge--live {

@@ -28,6 +28,12 @@ export interface PresentationInfo {
    */
   presenterName: string | null;
   presenterRole: PresenterRole | null;
+  /**
+   * Chi chiede è chi presenta adesso: la stessa concessione nominale, o il
+   * link principale. Gli altri che possono presentare vedono «Presenta tu».
+   */
+  yours: boolean;
+  /** Quando chi presenta adesso ha preso la parola: cambia a ogni passaggio di mano. */
   startedAt: string | null;
   /** Dove si legge il PDF: la rotta che controlla chi sta nella stanza, mai l'indirizzo pubblico del file. */
   fileUrl: string;
@@ -51,5 +57,6 @@ export function pointerOfState(state: PresentationState): PresentationPointer {
     materialId: state.presentation?.materialId ?? null,
     page: state.presentation?.page ?? 1,
     version: state.version,
+    startedAt: state.presentation?.startedAt ?? null,
   };
 }

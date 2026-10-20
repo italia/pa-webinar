@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Prześlij PDF do zaprezentowania",
     "started": "Prezentacja rozpoczęta.",
     "stopped": "Prezentacja zakończona.",
+    "takeOver": "Przejmij prezentację",
+    "takeOverHint": "Przejmij prezentację od tej strony: jako osoba prezentująca wyświetli się Twoje imię i nazwisko.",
+    "roomOnlyNote": "Strony są widoczne w tym panelu sali, a nie w wideo rozmowy: nagranie ich nie zawiera.",
+    "pdfOnlyHelp": "Tylko PDF, maks. {maxMb} MB. Slajdy z PowerPointa, Keynote lub Impressa najpierw wyeksportuj do PDF.",
+    "exportHint": "Sali można zaprezentować tylko PDF: slajdy z PowerPointa, Keynote lub Impressa najpierw wyeksportuj do PDF.",
+    "exportToPresent": "Aby zaprezentować go sali, prześlij jego wersję PDF.",
     "errors": {
       "changed": "W międzyczasie prezentacja się zmieniła: spróbuj ponownie.",
       "closed": "Wydarzenie się zakończyło: nie można już prezentować.",
       "notPresentable": "Można prezentować tylko plik PDF przesłany do materiałów.",
       "forbidden": "Prezentować mogą tylko moderatorzy i prelegenci.",
       "generic": "Operacja się nie powiodła. Spróbuj ponownie.",
-      "pdfOnly": "Możesz przesłać tylko PDF do zaprezentowania."
+      "pdfOnly": "Do prezentacji możesz przesłać tylko PDF: slajdy z PowerPointa, Keynote lub Impressa najpierw wyeksportuj do PDF."
     }
   },
   "reminders": {

@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Încărcați un PDF de prezentat",
     "started": "Prezentarea a început.",
     "stopped": "Prezentarea a fost oprită.",
+    "takeOver": "Preluați prezentarea",
+    "takeOverHint": "Preluați prezentarea de la această pagină: numele dumneavoastră va apărea ca al persoanei care prezintă.",
+    "roomOnlyNote": "Paginile se văd în acest panou al sălii, nu în videoclipul apelului: înregistrarea nu le conține.",
+    "pdfOnlyHelp": "Doar PDF, max {maxMb} MB. Diapozitivele din PowerPoint, Keynote sau Impress: exportați-le mai întâi în PDF.",
+    "exportHint": "Sălii i se poate prezenta doar un PDF: exportați mai întâi în PDF diapozitivele din PowerPoint, Keynote sau Impress.",
+    "exportToPresent": "Pentru a-l prezenta sălii, încărcați versiunea sa PDF.",
     "errors": {
       "changed": "Între timp, prezentarea s-a schimbat: încercați din nou.",
       "closed": "Evenimentul s-a încheiat: nu se mai poate prezenta.",
       "notPresentable": "Se poate prezenta doar un PDF încărcat printre materiale.",
       "forbidden": "Doar moderatorii și vorbitorii pot prezenta.",
       "generic": "Operațiunea nu a reușit. Încercați din nou.",
-      "pdfOnly": "Puteți încărca doar un PDF de prezentat."
+      "pdfOnly": "Puteți încărca doar un PDF pentru prezentare: exportați mai întâi în PDF diapozitivele din PowerPoint, Keynote sau Impress."
     }
   },
   "reminders": {

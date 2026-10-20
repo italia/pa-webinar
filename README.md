@@ -55,7 +55,7 @@ What is still missing is in the [roadmap](docs/ROADMAP.md). What shipped, releas
 
 - Register with a name, an email address and consents that are never pre-ticked, or, where the administration allows guests, join by name while the event is live.
 - Wait in the waiting room: device check, virtual backgrounds, optional music, and the optional 2D square (**Step into the square**).
-- Take part in the live room: chat, Q&A with upvotes, polls, word cloud, reactions, a visible raised-hand queue and shared materials.
+- Take part in the live room: chat, Q&A with upvotes, polls, word cloud, reactions, a visible raised-hand queue, shared materials and a PDF presented to the room page by page, without screen sharing.
 - Watch the recording later, with subtitles, a transcript, a summary and dubbed audio when AI post-production runs.
 - Request a copy or the erasure of their data under **My data**.
 

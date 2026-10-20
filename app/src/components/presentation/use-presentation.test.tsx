@@ -35,7 +35,8 @@ function stato(version: number, materialId: string | null, page = 1): Presentati
           title: `Documento ${materialId.slice(0, 2)}`,
           presenterName: null,
           presenterRole: 'MODERATOR',
-          startedAt: null,
+          yours: false,
+          startedAt: '2026-10-08T09:00:00.000Z',
           fileUrl: `/api/events/${SLUG}/presentation/file?m=${materialId}`,
         }
       : null,
@@ -153,6 +154,26 @@ describe('usePresentation — lettura', () => {
   });
 });
 
+describe('usePresentation — chi assiste', () => {
+  it('un documento nuovo dal canale: rilegge anche chi assiste, dopo un istante a caso', async () => {
+    const caso = vi.spyOn(Math, 'random').mockReturnValue(0);
+    await monta(null, false);
+    const prima = chiamate('GET').length;
+    servito = stato(5, M2, 1);
+    await act(async () => {
+      root.render(
+        <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+          <Sonda pointer={{ materialId: M2, page: 1, version: 5 }} canPresent={false} />
+        </SWRConfig>
+      );
+    });
+    await attendi();
+    expect(chiamate('GET').length).toBeGreaterThan(prima);
+    expect(risultato.current!.view).toMatchObject({ materialId: M2, stale: false });
+    caso.mockRestore();
+  });
+});
+
 describe('usePresentation — chi presenta', () => {
   it('avvia: POST con il materiale, e la risposta vale subito', async () => {
     await monta();
@@ -257,6 +278,62 @@ describe('usePresentation — chi presenta', () => {
     expect(esito).toBe('forbidden');
     expect(risultato.current!.actionError).toBe('forbidden');
     expect(risultato.current!.view.materialId).toBe(M1);
+  });
+
+  it('«Presenta tu»: POST sullo stesso documento dalla pagina di chi presenta, e la risposta vale subito', async () => {
+    await monta();
+    servito = {
+      version: 4,
+      presentation: {
+        ...stato(4, M1, 2).presentation!,
+        yours: true,
+        startedAt: '2026-10-08T09:30:00.000Z',
+      },
+    };
+    let esito: unknown;
+    await act(async () => {
+      esito = await risultato.current!.takeOver();
+    });
+    expect(esito).toBeNull();
+    const [, init] = chiamate('POST')[0]!;
+    expect(JSON.parse((init as RequestInit).body as string)).toEqual({
+      materialId: M1,
+      page: 2,
+    });
+    expect(risultato.current!.view.info?.yours).toBe(true);
+    expect(risultato.current!.actionError).toBeNull();
+  });
+
+  it('il canale annuncia un passaggio di mano sullo stesso documento: si rilegge chi presenta', async () => {
+    await monta();
+    const prima = chiamate('GET').length;
+    servito = {
+      version: 5,
+      presentation: {
+        ...stato(5, M1, 2).presentation!,
+        presenterRole: 'SPEAKER',
+        startedAt: '2026-10-08T09:30:00.000Z',
+      },
+    };
+    await act(async () => {
+      root.render(
+        <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+          <Sonda
+            pointer={{
+              materialId: M1,
+              page: 2,
+              version: 5,
+              startedAt: '2026-10-08T09:30:00.000Z',
+            }}
+            canPresent
+          />
+        </SWRConfig>
+      );
+    });
+    await attendi();
+    expect(chiamate('GET').length).toBeGreaterThan(prima);
+    expect(risultato.current!.view).toMatchObject({ materialId: M1, stale: false });
+    expect(risultato.current!.view.info?.presenterRole).toBe('SPEAKER');
   });
 
   it('chi non può presentare non manda nulla', async () => {

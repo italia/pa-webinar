@@ -4060,13 +4060,19 @@
     "uploadPdfToPresent": "Laadige üles esitletav PDF",
     "started": "Esitlus algas.",
     "stopped": "Esitlus lõpetati.",
+    "takeOver": "Võta esitlus üle",
+    "takeOverHint": "Võtke esitlus sellelt lehelt üle: esitlejana kuvatakse teie nimi.",
+    "roomOnlyNote": "Lehed on näha selles ruumi paneelis, mitte kõne videos: salvestis neid ei sisalda.",
+    "pdfOnlyHelp": "Ainult PDF, max {maxMb} MB. PowerPointi, Keynote’i või Impressi slaidid eksportige esmalt PDF-iks.",
+    "exportHint": "Ruumile saab esitleda ainult PDF-i: eksportige PowerPointi, Keynote’i või Impressi slaidid esmalt PDF-iks.",
+    "exportToPresent": "Ruumile esitlemiseks laadige üles selle PDF-versioon.",
     "errors": {
       "changed": "Esitlus on vahepeal muutunud: proovige uuesti.",
       "closed": "Üritus on lõppenud: esitleda enam ei saa.",
       "notPresentable": "Esitleda saab ainult materjalide hulka üles laaditud PDF-i.",
       "forbidden": "Esitleda saavad ainult moderaatorid ja esinejad.",
       "generic": "Toiming ebaõnnestus. Proovige uuesti.",
-      "pdfOnly": "Saate üles laadida ainult esitletava PDF-i."
+      "pdfOnly": "Esitlemiseks saate üles laadida ainult PDF-i: eksportige PowerPointi, Keynote’i või Impressi slaidid esmalt PDF-iks."
     }
   },
   "reminders": {
