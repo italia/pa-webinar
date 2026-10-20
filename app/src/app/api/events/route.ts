@@ -121,9 +121,11 @@ export const POST = withErrorHandling(async (request) => {
     ]);
   }
 
-  // La foto dell'organizzatore principale, appena caricata dal wizard: se non
-  // c'e' piu' (o e' di un altro evento) l'evento nasce senza, non si rifiuta.
-  const fotoPrincipale = (await usablePersonPhotoId(data.moderatorPhotoId, null)) ?? null;
+  // La foto dell'organizzatore principale, appena caricata dal wizard (chi crea
+  // e' lo staff): se non c'e' piu' (o e' di un altro evento) l'evento nasce
+  // senza, non si rifiuta.
+  const fotoPrincipale =
+    (await usablePersonPhotoId(data.moderatorPhotoId, null, 'staff')) ?? null;
 
   const event = await prisma.event.create({
     data: {

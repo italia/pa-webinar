@@ -719,6 +719,14 @@ export default function EventWizard(props: WizardProps) {
   const partenza = mode === 'edit' ? wizardStepFromParam(props.initialStep) : null;
   const [activeStep, setActiveStep] = useState<StepKey>(partenza?.step ?? 'base');
   const [submitting, setSubmitting] = useState(false);
+  // Le foto delle persone in viaggio verso il server: finche' ce n'e' una,
+  // salvare o cambiare passo la perderebbe (il campo smonta e il modulo non
+  // ha ancora il suo id).
+  const [fotoInViaggio, setFotoInViaggio] = useState(0);
+  const segnalaFoto = useCallback((inCaricamento: boolean) => {
+    setFotoInViaggio((n) => Math.max(0, n + (inCaricamento ? 1 : -1)));
+  }, []);
+  const fermo = submitting || fotoInViaggio > 0;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   // Gli errori trovati nel browser: spariscono appena il campo torna valido.
@@ -1119,6 +1127,7 @@ export default function EventWizard(props: WizardProps) {
   // impostazioni avanzate si torna al riepilogo.
   const indicePasso = (WIZARD_MAIN_STEPS as readonly StepKey[]).indexOf(activeStep);
   const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
+    if (fotoInViaggio > 0) return;
     if (step === 'advanced') apriSezione(sez ?? null);
     setActiveStep(step);
   };
@@ -1129,6 +1138,7 @@ export default function EventWizard(props: WizardProps) {
   /** Al passo dopo (dalle impostazioni avanzate: al riepilogo), solo con il
    *  passo a posto. */
   const goNext = () => {
+    if (fotoInViaggio > 0) return;
     const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
@@ -1300,6 +1310,8 @@ export default function EventWizard(props: WizardProps) {
    */
   const handleSubmit = useCallback(
     async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
+      // Una foto ancora in viaggio non e' nel modulo: si salverebbe senza.
+      if (fotoInViaggio > 0) return;
       setAzione(submitMode);
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
@@ -1790,6 +1802,7 @@ export default function EventWizard(props: WizardProps) {
       traduzioneOfferta,
       traduzioneDopo,
       props.enabledLocales,
+      fotoInViaggio,
     ]
   );
 
@@ -1981,6 +1994,7 @@ export default function EventWizard(props: WizardProps) {
               invitationsLocked={viaToken !== null}
               // Le foto si caricano con la sessione dello staff.
               photosLocked={viaToken !== null}
+              onPhotoBusy={segnalaFoto}
               primary={primario}
               publicRegistrationEnabled={iscrizioneAperta}
               // Il programma si pubblica nella pagina dell'evento: una
@@ -2035,6 +2049,7 @@ export default function EventWizard(props: WizardProps) {
                 }
                 perPubblicare={mode === 'create'}
                 photosLocked={viaToken !== null}
+                onPhotoBusy={segnalaFoto}
               />
             </StepPeople>
           </RubricaAccessContext.Provider>
@@ -2193,7 +2208,7 @@ export default function EventWizard(props: WizardProps) {
             type="button"
             className="btn btn-outline-primary"
             onClick={goPrev}
-            disabled={submitting}
+            disabled={fermo}
           >
             ← {tc('back')}
           </button>
@@ -2208,7 +2223,7 @@ export default function EventWizard(props: WizardProps) {
                 type="button"
                 className="btn btn-outline-primary"
                 onClick={() => handleSubmit('draft')}
-                disabled={submitting}
+                disabled={fermo}
               >
                 {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
               </button>
@@ -2217,7 +2232,7 @@ export default function EventWizard(props: WizardProps) {
               type="button"
               className="btn btn-primary"
               onClick={goNext}
-              disabled={submitting}
+              disabled={fermo}
             >
               {activeStep === 'advanced' ? t('flow.backToReview') : `${tc('next')} →`}
             </button>
@@ -2227,7 +2242,7 @@ export default function EventWizard(props: WizardProps) {
             type="button"
             className="btn btn-primary"
             onClick={() => handleSubmit('draft')}
-            disabled={submitting}
+            disabled={fermo}
           >
             {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
           </button>
@@ -2237,7 +2252,7 @@ export default function EventWizard(props: WizardProps) {
               type="button"
               className="btn btn-outline-secondary"
               onClick={() => handleSubmit('draft')}
-              disabled={submitting}
+              disabled={fermo}
             >
               {submitting && azione === 'draft' ? tc('saving') : t('saveDraft')}
             </button>
@@ -2245,7 +2260,7 @@ export default function EventWizard(props: WizardProps) {
               type="button"
               className="btn btn-primary"
               onClick={() => handleSubmit('publish')}
-              disabled={submitting}
+              disabled={fermo}
             >
               {submitting && azione === 'publish' ? tc('saving') : t('publish')}
             </button>

@@ -22,7 +22,10 @@ vi.mock('@/lib/auth/moderator', () => ({
   constantTimeEqual: vi.fn(() => true),
 }));
 
-const staff = vi.hoisted(() => ({ requireEventManager: vi.fn() }));
+const staff = vi.hoisted(() => ({
+  requireEventManager: vi.fn(),
+  isEventManager: vi.fn(async () => false),
+}));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({})) }));
 vi.mock('@/lib/auth/staff-session', () => staff);
 vi.mock('@/lib/audit/admin-audit', () => ({
@@ -250,6 +253,34 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     mocked.event.update.mockClear();
     await PUT(richiesta({ postEventShowQA: false }), contesto as never);
     expect(datiScritti()).not.toHaveProperty('moderatorPhotoId');
+  });
+
+  it('una foto che nessuno usa la aggancia solo lo staff dell’evento, non il solo link', async () => {
+    const FOTO = '5d1c2b3a-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
+    const libera = { leadOf: { none: {} }, grants: { none: {} } };
+    // Con il solo link di conduzione: solo le foto che l'evento usa già. Una
+    // foto tolta da un altro evento non la usa nessuno, e non si prende.
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce(null);
+    await PUT(richiesta({ moderatorPhotoId: FOTO }), contesto as never);
+    expect(staff.isEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
+    expect(mocked.eventPersonPhoto.findFirst.mock.calls[0]![0].where.OR).not.toContainEqual(
+      libera
+    );
+    expect(datiScritti().moderatorPhotoId).toBeNull();
+
+    // Lo staff che gestisce l'evento: anche la foto appena caricata.
+    mocked.event.update.mockClear();
+    staff.isEventManager.mockResolvedValueOnce(true);
+    mocked.eventPersonPhoto.findFirst.mockResolvedValueOnce({ id: FOTO });
+    await PUT(richiesta({ moderatorPhotoId: FOTO }), contesto as never);
+    expect(mocked.eventPersonPhoto.findFirst.mock.calls[1]![0].where.OR).toContainEqual(libera);
+    expect(datiScritti().moderatorPhotoId).toBe(FOTO);
+
+    // Senza una foto da mettere la sessione non si legge.
+    staff.isEventManager.mockClear();
+    await PUT(richiesta({ moderatorPhotoId: null }), contesto as never);
+    await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+    expect(staff.isEventManager).not.toHaveBeenCalled();
   });
 
   // 100 partecipanti con il video: alla quota predefinita (30%) basta un

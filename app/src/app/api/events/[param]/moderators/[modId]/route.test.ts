@@ -30,6 +30,12 @@ vi.mock('@/lib/email/moderator-link', () => ({
 }));
 vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => ({ defaultLocale: 'it' })) }));
 
+// La sessione dello staff dell'evento: con il solo link (il caso di
+// partenza) una foto che nessuno usa non si aggancia.
+const staff = vi.hoisted(() => ({ isEventManager: vi.fn(async () => false) }));
+vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({})) }));
+vi.mock('@/lib/auth/staff-session', () => staff);
+
 const organizerMark = vi.hoisted(() => ({ allowed: true }));
 vi.mock('@/lib/auth/organizer-mark', async () => {
   const { ForbiddenError } = await import('@/lib/errors');
@@ -133,6 +139,27 @@ describe('PATCH /api/events/[param]/moderators/[modId]', () => {
   it('un profilo senza foto non la tocca', async () => {
     await PATCH(patch({ publicListed: true }) as never, ctx as never);
     expect(db.eventModerator.update.mock.calls[0]![0].data).not.toHaveProperty('photoId');
+    expect(staff.isEventManager).not.toHaveBeenCalled();
+  });
+
+  it('una foto che nessuno usa la aggancia solo lo staff dell’evento, non il solo link', async () => {
+    const libera = { leadOf: { none: {} }, grants: { none: {} } };
+    // Il link principale da solo: le foto che l'evento usa già, nient'altro
+    // (una foto tolta da un altro evento non la usa nessuno).
+    db.eventPersonPhoto.findFirst.mockResolvedValue(null);
+    await PATCH(patch({ photoId: FOTO }) as never, ctx as never);
+    expect(staff.isEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
+    const soloLink = db.eventPersonPhoto.findFirst.mock.calls[0]![0].where as { OR: unknown[] };
+    expect(soloLink.OR).not.toContainEqual(libera);
+    expect(soloLink.OR).toContainEqual({ grants: { some: { eventId: EVENT_ID } } });
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ photoId: null });
+
+    staff.isEventManager.mockResolvedValueOnce(true);
+    db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
+    await PATCH(patch({ photoId: FOTO }) as never, ctx as never);
+    const conStaff = db.eventPersonPhoto.findFirst.mock.calls[1]![0].where as { OR: unknown[] };
+    expect(conStaff.OR).toContainEqual(libera);
+    expect(db.eventModerator.update.mock.calls[1]![0].data).toEqual({ photoId: FOTO });
   });
 
   it("una concessione senza impronta la riceve, per riconoscere l'account dello staff", async () => {

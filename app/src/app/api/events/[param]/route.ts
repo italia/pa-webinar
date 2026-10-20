@@ -37,7 +37,7 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
-import { requireEventManager } from '@/lib/auth/staff-session';
+import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 
@@ -303,7 +303,14 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   // La foto dell'organizzatore principale: una che non c'e' piu' (o di un
   // altro evento) si lascia cadere, senza rifiutare il resto della modifica.
-  const fotoPrincipale = await usablePersonPhotoId(data.moderatorPhotoId, eventId);
+  // Una foto nuova, che nessuno usa ancora, la aggancia solo lo staff
+  // dell'evento (lo carica solo lo staff): con il solo link di conduzione si
+  // tiene la foto che l'evento ha gia'.
+  const fotoPrincipale = await usablePersonPhotoId(
+    data.moderatorPhotoId,
+    eventId,
+    data.moderatorPhotoId && (await isEventManager(await cookies(), eventId)) ? 'staff' : 'link'
+  );
 
   const dateChanged =
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||

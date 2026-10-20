@@ -22,6 +22,22 @@ vi.mock('@/components/ui/toast', () => ({
   useToast: () => ({ error: toastError, success: vi.fn(), info: vi.fn() }),
 }));
 
+// Il ritaglio vero disegna su un canvas: lo sostituisce uno che conferma subito.
+vi.mock('@/components/ui/image-crop-dialog', () => ({
+  default: function RitaglioFinto(props: { onConferma: (f: File) => void }) {
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          props.onConferma(new File([new Uint8Array([0xff, 0xd8, 0xff])], 'foto.jpg', { type: 'image/jpeg' }))
+        }
+      >
+        conferma-ritaglio
+      </button>
+    );
+  },
+}));
+
 const w = messages.admin.wizard;
 const fetchMock = vi.fn();
 
@@ -1676,3 +1692,45 @@ const ATTIVA: InitialEventShape = {
   agenda: [{ id: 'a1', label: 'Apertura', plannedMinutes: 10, speakerGrantId: 'mod-1', speakerPrimary: false }],
   agendaLocked: false,
 };
+
+describe('foto di una persona in viaggio verso il server', () => {
+  it('il wizard non salva e non cambia passo finche\' la foto non e\' arrivata', async () => {
+    let rispondi: (r: Response) => void = () => {};
+    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
+      if (String(input) === '/api/admin/person-photos') {
+        return new Promise<Response>((r) => (rispondi = r));
+      }
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+
+    const input = byId<HTMLInputElement>('wiz-primary-photo-file');
+    Object.defineProperty(input, 'files', {
+      value: [new File([new Uint8Array([1])], 'ritratto.png', { type: 'image/png' })],
+      configurable: true,
+    });
+    await act(async () => {
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await press(button('conferma-ritaglio'));
+
+    const avanti = () => button(`${messages.common.next} →`);
+    expect(avanti().disabled).toBe(true);
+    // Neanche dalla barra dei passi: il campo smonterebbe e la foto andrebbe persa.
+    goToStep('review');
+    expect(container.querySelector('#wiz-primary-name')).not.toBeNull();
+
+    await act(async () => {
+      rispondi(json(201, { id: '11111111-1111-4111-8111-111111111111', url: '/api/avatar/person/x' }));
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(avanti().disabled).toBe(false);
+    goToStep('review');
+    expect(container.querySelector('#wiz-primary-name')).toBeNull();
+  });
+});

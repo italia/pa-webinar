@@ -15,13 +15,13 @@
 
 import { useFormatter, useTranslations } from 'next-intl';
 
+import PersonPhoto from '@/components/events/person-photo';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import {
   durataProgramma,
   orariProgramma,
   type VoceProgramma,
 } from '@/lib/agenda/programme';
-import { initials } from '@/lib/utils/speaker-palette';
 
 interface Props {
   items: VoceProgramma[];
@@ -89,24 +89,14 @@ export default function EventProgramme({ items, startsAt, live = false }: Props)
                   <p className="event-programma__chi">
                     {/* La foto (o le iniziali) accanto al nome, che la dice
                         gia': decorativa. */}
-                    {v.speaker.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={v.speaker.photoUrl}
-                        alt=""
-                        width={32}
-                        height={32}
-                        loading="lazy"
-                        className="event-programma__foto"
-                      />
-                    ) : (
-                      <span
-                        className="event-programma__foto event-programma__iniziali"
-                        aria-hidden="true"
-                      >
-                        {initials(v.speaker.name)}
-                      </span>
-                    )}
+                    <PersonPhoto
+                      src={v.speaker.photoUrl}
+                      name={v.speaker.name}
+                      size={32}
+                      loading="lazy"
+                      className="event-programma__foto"
+                      initialsClassName="event-programma__foto event-programma__iniziali"
+                    />
                     <span className="event-programma__persona">
                       <span className="event-programma__nome">{v.speaker.name}</span>
                       {v.speaker.organization && (

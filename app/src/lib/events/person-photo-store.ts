@@ -46,18 +46,27 @@ const SENZA_RIFERIMENTI = {
 } satisfies Prisma.EventPersonPhotoWhereInput;
 
 /**
+ * Chi scrive la foto su un evento: lo staff che lo gestisce (o che lo crea),
+ * o chi ha soltanto un link di conduzione.
+ */
+export type PersonPhotoWriter = 'staff' | 'link';
+
+/**
  * L'id di una foto da scrivere su un evento (`eventId`, null alla creazione) o
- * su una sua concessione: lo stesso se la foto esiste e non la usa nessuno, o
- * la usa già questo evento; altrimenti null. Undefined resta undefined: il
- * campo non si tocca.
+ * su una sua concessione: lo stesso se la foto la usa già questo evento, o se
+ * non la usa nessuno e a scriverla è lo staff; altrimenti null. Undefined
+ * resta undefined: il campo non si tocca.
  *
- * Una foto appena caricata non la usa nessuno; una già salvata la usa questo
- * evento, anche quando passa da una concessione a un'altra al cambio di ruolo,
- * o quando la copia di un evento la condivide con l'originale (la copia la
- * riceve senza passare da qui: lib/events/duplicate-*). La foto usata solo da
- * altri eventi non si aggancia: chi ha solo il link di conduzione non può
- * prendere la foto mostrata da un'altra pagina, né tenerla in vita oltre la
- * conservazione di quell'evento.
+ * Una foto già salvata la usa questo evento, anche quando passa da una
+ * concessione a un'altra al cambio di ruolo, o quando la copia di un evento
+ * la condivide con l'originale (la copia la riceve senza passare da qui:
+ * lib/events/duplicate-*): la tiene anche chi ha solo il link di conduzione.
+ * Una foto che nessuno usa è quella appena caricata dallo staff nel wizard,
+ * ma anche quella tolta da un altro evento, o rimasta da un evento
+ * cancellato, in attesa della pulizia: la aggancia solo lo staff, come solo
+ * lo staff carica le foto. Con il solo link non si prende la foto mostrata
+ * da un'altra pagina, né si tiene in vita una foto che il suo evento ha tolto.
+ * La foto usata solo da altri eventi non si aggancia per nessuno.
  *
  * Un id sconosciuto si lascia cadere invece di rifiutare la richiesta: una
  * bozza del wizard può ricordare una foto caricata e mai salvata, che la
@@ -67,20 +76,20 @@ const SENZA_RIFERIMENTI = {
 export async function usablePersonPhotoId(
   id: string | null | undefined,
   eventId: string | null,
+  writer: PersonPhotoWriter,
   db: Db = prisma
 ): Promise<string | null | undefined> {
   if (id === undefined) return undefined;
   if (!id || !UUID_RE.test(id)) return null;
+  const ammesse: Prisma.EventPersonPhotoWhereInput[] = [
+    ...(writer === 'staff' ? [SENZA_RIFERIMENTI] : []),
+    ...(eventId
+      ? [{ leadOf: { some: { id: eventId } } }, { grants: { some: { eventId } } }]
+      : []),
+  ];
+  if (ammesse.length === 0) return null;
   const foto = await db.eventPersonPhoto.findFirst({
-    where: {
-      id,
-      OR: [
-        SENZA_RIFERIMENTI,
-        ...(eventId
-          ? [{ leadOf: { some: { id: eventId } } }, { grants: { some: { eventId } } }]
-          : []),
-      ],
-    },
+    where: { id, OR: ammesse },
     select: { id: true },
   });
   return foto?.id ?? null;

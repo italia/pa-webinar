@@ -14,9 +14,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import PersonPhoto from '@/components/events/person-photo';
 import ImageCropDialog, { type Ritaglio } from '@/components/ui/image-crop-dialog';
 import { PERSON_PHOTO_SIDE, personPhotoPath } from '@/lib/events/person-photo';
-import { initials } from '@/lib/utils/speaker-palette';
 
 const TIPI = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -29,7 +29,9 @@ const RITAGLIO: Ritaglio = {
 
 /**
  * La foto di una persona in un cerchio, o le sue iniziali. Accanto al nome è
- * decorativa: chi legge lo schermo trova già il nome lì vicino.
+ * decorativa: chi legge lo schermo trova già il nome lì vicino. Una foto che
+ * l'indirizzo non serve (con il solo link di conduzione, quella di chi non è
+ * nella pagina pubblica) lascia le iniziali.
  */
 export function PersonAvatar({
   name,
@@ -44,24 +46,16 @@ export function PersonAvatar({
   alt?: string;
 }) {
   const stile = { width: size, height: size, fontSize: Math.round(size * 0.36) };
-  return photoId ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={personPhotoPath(photoId)}
+  return (
+    <PersonPhoto
+      src={photoId ? personPhotoPath(photoId) : null}
+      name={name}
+      size={size}
       alt={alt}
-      width={size}
-      height={size}
       className="person-avatar"
+      initialsClassName="person-avatar person-avatar--iniziali"
       style={stile}
     />
-  ) : (
-    <span
-      className="person-avatar person-avatar--iniziali"
-      style={stile}
-      aria-hidden="true"
-    >
-      {initials(name)}
-    </span>
   );
 }
 
@@ -72,6 +66,7 @@ export default function PersonPhotoField({
   onChange,
   readOnly = false,
   compact = false,
+  onBusy,
 }: {
   id: string;
   /** Il nome della persona: iniziali, testo alternativo, etichette. */
@@ -83,6 +78,9 @@ export default function PersonPhotoField({
   /** Nella riga di una persona già in elenco: solo i pulsanti (la foto è
    *  accanto al nome). */
   compact?: boolean;
+  /** Mentre la foto va al server (true) e quando ha finito (false): chi usa
+   *  il campo può aspettarla prima di salvare la persona. */
+  onBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -108,6 +106,18 @@ export default function PersonPhotoField({
       montato.current = false;
     };
   }, []);
+  // Il caricamento in corso, a chi usa il campo: finisce anche se il campo
+  // esce dal modulo prima della risposta.
+  const occupato = useRef(onBusy);
+  useEffect(() => {
+    occupato.current = onBusy;
+  }, [onBusy]);
+  useEffect(() => {
+    if (!inviando) return;
+    const avvisaOccupato = occupato.current;
+    avvisaOccupato?.(true);
+    return () => avvisaOccupato?.(false);
+  }, [inviando]);
 
   if (readOnly) {
     if (compact) return null;

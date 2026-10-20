@@ -77,25 +77,25 @@ describe('normalizePersonPhoto', () => {
 
 describe('usablePersonPhotoId', () => {
   it('assente resta assente, vuoto o malformato è nessuna foto, senza leggere il database', async () => {
-    expect(await usablePersonPhotoId(undefined, EVENTO)).toBeUndefined();
-    expect(await usablePersonPhotoId(null, EVENTO)).toBeNull();
-    expect(await usablePersonPhotoId('', EVENTO)).toBeNull();
-    expect(await usablePersonPhotoId('../altro', EVENTO)).toBeNull();
+    expect(await usablePersonPhotoId(undefined, EVENTO, 'staff')).toBeUndefined();
+    expect(await usablePersonPhotoId(null, EVENTO, 'staff')).toBeNull();
+    expect(await usablePersonPhotoId('', EVENTO, 'staff')).toBeNull();
+    expect(await usablePersonPhotoId('../altro', EVENTO, 'link')).toBeNull();
     expect(db.eventPersonPhoto.findFirst).not.toHaveBeenCalled();
   });
 
   it('una foto che non c’è più (o di un altro evento) si lascia cadere', async () => {
     db.eventPersonPhoto.findFirst.mockResolvedValue(null);
-    expect(await usablePersonPhotoId(FOTO, EVENTO)).toBeNull();
+    expect(await usablePersonPhotoId(FOTO, EVENTO, 'staff')).toBeNull();
   });
 
   it('una foto usabile torna con il suo id', async () => {
     db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
-    expect(await usablePersonPhotoId(FOTO, EVENTO)).toBe(FOTO);
+    expect(await usablePersonPhotoId(FOTO, EVENTO, 'staff')).toBe(FOTO);
   });
 
-  it('su un evento: libera, o già usata da questo evento', async () => {
-    await usablePersonPhotoId(FOTO, EVENTO);
+  it('lo staff, su un evento: una foto che nessuno usa, o già usata da questo evento', async () => {
+    await usablePersonPhotoId(FOTO, EVENTO, 'staff');
     expect(db.eventPersonPhoto.findFirst).toHaveBeenCalledWith({
       where: {
         id: FOTO,
@@ -109,12 +109,31 @@ describe('usablePersonPhotoId', () => {
     });
   });
 
-  it('alla creazione dell’evento: solo una foto che nessuno usa', async () => {
-    await usablePersonPhotoId(FOTO, null);
+  it('con il solo link: solo una foto già usata da questo evento, mai una che nessuno usa', async () => {
+    // Una foto tolta da un altro evento (o rimasta da un evento cancellato)
+    // non la usa nessuno, e il suo indirizzo era pubblico: il link non la
+    // aggancia al proprio evento.
+    await usablePersonPhotoId(FOTO, EVENTO, 'link');
+    expect(db.eventPersonPhoto.findFirst).toHaveBeenCalledWith({
+      where: {
+        id: FOTO,
+        OR: [{ leadOf: { some: { id: EVENTO } } }, { grants: { some: { eventId: EVENTO } } }],
+      },
+      select: { id: true },
+    });
+  });
+
+  it('alla creazione dell’evento (lo staff): solo una foto che nessuno usa', async () => {
+    await usablePersonPhotoId(FOTO, null, 'staff');
     expect(db.eventPersonPhoto.findFirst).toHaveBeenCalledWith({
       where: { id: FOTO, OR: [SENZA_RIFERIMENTI] },
       select: { id: true },
     });
+  });
+
+  it('senza evento e senza staff non c’è foto da accettare: nessuna, senza leggere', async () => {
+    expect(await usablePersonPhotoId(FOTO, null, 'link')).toBeNull();
+    expect(db.eventPersonPhoto.findFirst).not.toHaveBeenCalled();
   });
 });
 

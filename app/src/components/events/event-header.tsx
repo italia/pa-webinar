@@ -13,6 +13,7 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Badge, Row, Col } from 'design-react-kit';
 
 import EventTitle from '@/components/events/event-title';
+import PersonPhoto from '@/components/events/person-photo';
 import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
@@ -389,21 +390,14 @@ export function EventPeople({
                 <li key={`${p.name}-${i}`} className="event-person">
                   {/* La foto in un cerchio, o le iniziali: accanto al nome, che
                       la dice gia', e' decorativa. */}
-                  {p.photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.photoUrl}
-                      alt=""
-                      width={48}
-                      height={48}
-                      loading="lazy"
-                      className="event-person__photo"
-                    />
-                  ) : (
-                    <span className="event-person__initials" aria-hidden="true">
-                      {initials(p.name)}
-                    </span>
-                  )}
+                  <PersonPhoto
+                    src={p.photoUrl}
+                    name={p.name}
+                    size={48}
+                    loading="lazy"
+                    className="event-person__photo"
+                    initialsClassName="event-person__initials"
+                  />
                   <span className="event-person__who">
                     <span className="event-person__name">{p.name}</span>
                     {(p.organization || p.logoUrl) && (

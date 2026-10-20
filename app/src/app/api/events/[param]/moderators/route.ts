@@ -14,6 +14,8 @@
 import { randomUUID } from 'crypto';
 
 import { EventModeratorRole } from '@prisma/client';
+import { cookies } from 'next/headers';
+import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
@@ -26,7 +28,7 @@ import { getSettings } from '@/lib/settings';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
 import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
-import { z } from 'zod';
+import { isEventManager } from '@/lib/auth/staff-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -120,8 +122,14 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   if (parsed.data.organizer) await requireOrganizerMarkRight(event.id);
-  // La foto caricata dal wizard: una che non c'e' piu' si lascia cadere.
-  const photoId = await usablePersonPhotoId(parsed.data.photoId, event.id);
+  // La foto caricata dal wizard: una che non c'e' piu' si lascia cadere. Una
+  // che nessuno usa ancora la aggancia solo lo staff dell'evento, che e' chi
+  // la carica: con il solo link si tengono le foto che l'evento ha gia'.
+  const photoId = await usablePersonPhotoId(
+    parsed.data.photoId,
+    event.id,
+    parsed.data.photoId && (await isEventManager(await cookies(), event.id)) ? 'staff' : 'link',
+  );
 
   const created = await prisma.eventModerator.create({
     data: {

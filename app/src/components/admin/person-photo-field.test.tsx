@@ -158,6 +158,49 @@ describe('PersonPhotoField', () => {
     );
   });
 
+  it('mentre la foto va al server lo dice a chi usa il campo, e quando ha finito anche', async () => {
+    let rispondi: (r: Response) => void = () => {};
+    fetchMock.mockReturnValue(new Promise<Response>((r) => (rispondi = r)));
+    const onBusy = vi.fn();
+    disegna(
+      <PersonPhotoField
+        id="p"
+        name="Relatrice Uno"
+        photoId={null}
+        onChange={vi.fn()}
+        onBusy={onBusy}
+      />
+    );
+    expect(onBusy).not.toHaveBeenCalled();
+    await scegli();
+    await clic(pulsante('conferma-ritaglio'));
+    expect(onBusy).toHaveBeenLastCalledWith(true);
+    await act(async () => {
+      rispondi(risposta(201, { id: FOTO, url: `/api/avatar/person/${FOTO}` }));
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(onBusy).toHaveBeenLastCalledWith(false);
+  });
+
+  it('se il campo esce dal modulo durante il caricamento, il caricamento finisce comunque', async () => {
+    fetchMock.mockReturnValue(new Promise<Response>(() => {}));
+    const onBusy = vi.fn();
+    disegna(
+      <PersonPhotoField
+        id="p"
+        name="Relatrice Uno"
+        photoId={null}
+        onChange={vi.fn()}
+        onBusy={onBusy}
+      />
+    );
+    await scegli();
+    await clic(pulsante('conferma-ritaglio'));
+    expect(onBusy).toHaveBeenLastCalledWith(true);
+    disegna(<span />);
+    expect(onBusy).toHaveBeenLastCalledWith(false);
+  });
+
   it('un ritaglio annullato non manda niente', async () => {
     disegna(
       <PersonPhotoField id="p" name="Relatrice Uno" photoId={null} onChange={vi.fn()} />
@@ -272,5 +315,14 @@ describe('PersonAvatar', () => {
     expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
     disegna(<PersonAvatar name="Relatrice Uno" photoId={null} />);
     expect(container.querySelector('span')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('una foto che l’indirizzo non serve (con il solo link di conduzione) lascia le iniziali', () => {
+    disegna(<PersonAvatar name="Relatrice Uno" photoId={FOTO} />);
+    act(() => {
+      container.querySelector('img')!.dispatchEvent(new Event('error'));
+    });
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.querySelector('.person-avatar--iniziali')?.textContent).toBe('RU');
   });
 });

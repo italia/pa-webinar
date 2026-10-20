@@ -19,6 +19,7 @@ vi.mock('react', async (orig) => ({
 import {
   eventScope,
   getStaffSession,
+  isEventManager,
   puoGestire,
   signStaffSession,
   type StaffSession,
@@ -105,5 +106,36 @@ describe('la sessione rilegge l’account (ADR-014)', () => {
     findUnique.mockResolvedValue({ id: ID, active: false, role: 'ADMIN' });
     const token = await signStaffSession({ id: ID, role: 'ADMIN' });
     expect(await getStaffSession(cookiesCon(token))).toBeNull();
+  });
+});
+
+describe('lo staff dell’evento, su una rotta aperta anche al link', () => {
+  const SECRET = 'x'.repeat(40);
+  const ID = '11111111-2222-4333-8444-555555555555';
+  const EVENTO = '66666666-7777-4888-8999-000000000000';
+  const cookiesCon = (token: string | null) =>
+    ({
+      get: (n: string) => (n === 'admin_session' && token ? { value: token } : undefined),
+    }) as never;
+
+  beforeEach(() => {
+    process.env.APP_SECRET = SECRET;
+    findUnique.mockReset();
+    eventCount.mockReset();
+  });
+
+  it('senza sessione, o con una che non gestisce l’evento: no, senza rifiutare', async () => {
+    expect(await isEventManager(cookiesCon(null), EVENTO)).toBe(false);
+    findUnique.mockResolvedValue({ id: ID, active: true, role: 'ORGANIZER', emailHash: 'h' });
+    eventCount.mockResolvedValueOnce(0);
+    const token = await signStaffSession({ id: ID, role: 'ORGANIZER' });
+    expect(await isEventManager(cookiesCon(token), EVENTO)).toBe(false);
+  });
+
+  it('chi lo gestisce: sì', async () => {
+    findUnique.mockResolvedValue({ id: ID, active: true, role: 'ORGANIZER', emailHash: 'h' });
+    eventCount.mockResolvedValueOnce(1);
+    const token = await signStaffSession({ id: ID, role: 'ORGANIZER' });
+    expect(await isEventManager(cookiesCon(token), EVENTO)).toBe(true);
   });
 });

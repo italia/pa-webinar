@@ -115,6 +115,9 @@ interface Props {
   /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
    *  non si cambiano. */
   photosLocked?: boolean;
+  /** Ogni foto che parte per il server (true) e che ha finito (false): il
+   *  wizard non salva e non cambia passo finche' ce n'e' una in viaggio. */
+  onPhotoBusy?: (inCaricamento: boolean) => void;
 }
 
 const isEmail = emailValida;
@@ -129,6 +132,7 @@ export default function StepPeople({
   iscrizione,
   programma,
   photosLocked = false,
+  onPhotoBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
@@ -155,6 +159,7 @@ export default function StepPeople({
         onChange={onChange}
         taken={principale}
         photosLocked={photosLocked}
+        onPhotoBusy={onPhotoBusy}
       />
 
       {programma}
@@ -186,6 +191,7 @@ export function PrimarySection({
   showLinksOnPublish,
   perPubblicare = true,
   photosLocked = false,
+  onPhotoBusy,
 }: {
   primary: LeadOrganizer;
   onPrimaryChange: (patch: LeadOrganizerPatch) => void;
@@ -196,6 +202,8 @@ export function PrimarySection({
   perPubblicare?: boolean;
   /** Senza sessione dello staff la foto si vede e non si cambia. */
   photosLocked?: boolean;
+  /** La foto in viaggio verso il server: vedi StepPeople. */
+  onPhotoBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tf = useTranslations('admin.wizard.flow');
@@ -330,6 +338,7 @@ export function PrimarySection({
                     photoId={primary.photoId}
                     onChange={(v) => onPrimaryChange({ moderatorPhotoId: v })}
                     readOnly={photosLocked}
+                    onBusy={onPhotoBusy}
                   />
                 </div>
                 <div className="col-md-6">
@@ -648,6 +657,7 @@ function PeopleSection({
   onChange,
   taken,
   photosLocked,
+  onPhotoBusy,
 }: {
   moderators: ModeratorEntry[];
   speakers: SpeakerEntry[];
@@ -655,11 +665,18 @@ function PeopleSection({
   /** Gli indirizzi già usati altrove (l'organizzatore principale). */
   taken: readonly string[];
   photosLocked: boolean;
+  onPhotoBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'person';
   const [draft, setDraft] = useState<Bozza>(BOZZA_VUOTA);
   const [err, setErr] = useState<string | null>(null);
+  // La foto della persona nuova e' della bozza: mentre va al server la
+  // persona non si aggiunge (arriverebbe senza), e ogni aggiunta da' alla
+  // bozza successiva un campo nuovo, senza il messaggio della foto di prima
+  // e senza poter ricevere un caricamento rimasto indietro.
+  const [fotoInCaricamento, setFotoInCaricamento] = useState(false);
+  const [bozzaN, setBozzaN] = useState(0);
   const tutte = righe(moderators, speakers);
   // Una persona ha un ruolo solo: gli indirizzi, senza distinguere maiuscole
   // (quelli di un evento esistente possono averne).
@@ -697,6 +714,7 @@ function PeopleSection({
   };
 
   const add = () => {
+    if (fotoInCaricamento) return;
     if (!draft.name.trim() || !draft.email.trim()) {
       setErr(t('personRequired'));
       return;
@@ -729,6 +747,7 @@ function PeopleSection({
     );
     // Il ruolo resta: di solito si aggiungono più persone con lo stesso.
     setDraft({ ...BOZZA_VUOTA, role: draft.role });
+    setBozzaN((n) => n + 1);
   };
 
   const onAddMany = (picks: RubricaPickedPerson[]) => {
@@ -864,6 +883,7 @@ function PeopleSection({
                       onChange={(v) => aggiorna(r, { photoId: v })}
                       readOnly={photosLocked}
                       compact
+                      onBusy={onPhotoBusy}
                     />
                   </div>
                 </div>
@@ -951,10 +971,15 @@ function PeopleSection({
         {!photosLocked && (
           <div className="col-12">
             <PersonPhotoField
+              key={bozzaN}
               id={`${id}-photo`}
               name={draft.name}
               photoId={draft.photoId}
               onChange={(v) => setDraft((d) => ({ ...d, photoId: v }))}
+              onBusy={(b) => {
+                setFotoInCaricamento(b);
+                onPhotoBusy?.(b);
+              }}
             />
           </div>
         )}
@@ -973,7 +998,12 @@ function PeopleSection({
           </div>
         </div>
         <div className="col-md-4">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
+          <button
+            type="button"
+            className="btn btn-primary w-100"
+            onClick={add}
+            disabled={fotoInCaricamento}
+          >
             {t('add')}
           </button>
         </div>

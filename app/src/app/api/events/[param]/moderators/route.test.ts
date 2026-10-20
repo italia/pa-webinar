@@ -26,6 +26,12 @@ vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
   sendGrantModeratorLink: vi.fn(async () => true),
 }));
 
+// La sessione dello staff dell'evento: con il solo link (il caso di
+// partenza) una foto che nessuno usa non si aggancia.
+const staff = vi.hoisted(() => ({ isEventManager: vi.fn(async () => false) }));
+vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({})) }));
+vi.mock('@/lib/auth/staff-session', () => staff);
+
 const organizerMark = vi.hoisted(() => ({ allowed: true }));
 vi.mock('@/lib/auth/organizer-mark', async () => {
   const { ForbiddenError } = await import('@/lib/errors');
@@ -162,6 +168,7 @@ describe('POST /api/events/[param]/moderators — profilo della persona', () => 
   });
 
   it('salva la foto caricata dal wizard, se nessun altro evento la usa', async () => {
+    staff.isEventManager.mockResolvedValueOnce(true);
     db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
     const res = await POST(
       post({ name: 'Relatore 1', role: 'SPEAKER', photoId: FOTO }) as never,
@@ -171,6 +178,24 @@ describe('POST /api/events/[param]/moderators — profilo della persona', () => 
     expect(db.eventModerator.create.mock.calls[0]![0].data.photoId).toBe(FOTO);
     const where = db.eventPersonPhoto.findFirst.mock.calls[0]![0].where as { OR: unknown[] };
     expect(where.OR).toContainEqual({ grants: { some: { eventId: EVENT_ID } } });
+  });
+
+  it('una foto che nessuno usa la aggancia solo lo staff dell’evento, non il solo link', async () => {
+    const libera = { leadOf: { none: {} }, grants: { none: {} } };
+    db.eventPersonPhoto.findFirst.mockResolvedValue(null);
+    await POST(post({ name: 'Relatore 1', role: 'SPEAKER', photoId: FOTO }) as never, ctx as never);
+    expect(staff.isEventManager).toHaveBeenCalledWith(expect.anything(), EVENT_ID);
+    const soloLink = db.eventPersonPhoto.findFirst.mock.calls[0]![0].where as { OR: unknown[] };
+    expect(soloLink.OR).not.toContainEqual(libera);
+    expect(db.eventModerator.create.mock.calls[0]![0].data.photoId).toBeNull();
+
+    // Lo staff che crea l'evento dal wizard: la foto appena caricata.
+    staff.isEventManager.mockResolvedValueOnce(true);
+    db.eventPersonPhoto.findFirst.mockResolvedValue({ id: FOTO });
+    await POST(post({ name: 'Relatore 2', role: 'SPEAKER', photoId: FOTO }) as never, ctx as never);
+    const conStaff = db.eventPersonPhoto.findFirst.mock.calls[1]![0].where as { OR: unknown[] };
+    expect(conStaff.OR).toContainEqual(libera);
+    expect(db.eventModerator.create.mock.calls[1]![0].data.photoId).toBe(FOTO);
   });
 
   it('una foto che non c’è più si lascia cadere: la persona si aggiunge comunque', async () => {
