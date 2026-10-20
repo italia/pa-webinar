@@ -52,8 +52,9 @@ authoritative list. The one exception is the transcript built from live
 captions (see below), which is not produced by this pipeline and has no file.
 The event report (`REPORT`) produces no artifact at all: its result is stored
 on the event ([The event report](#the-event-report)). Neither does the machine
-translation of an event's title and description (`TRANSLATE_TEXT`): it is
-stored on the event as a proposal that staff review in the wizard
+translation of an event's title and description (`TRANSLATE_TEXT`): it goes
+into the event's title and description, in the languages that are empty or
+already machine-translated, and is marked as machine text
 ([Event text translation](#event-text-translation)).
 
 | Artifact type | Produced by | Language | Contents | Where it is used |
@@ -217,7 +218,7 @@ there is work: the GPU node pool scales to zero between runs.
 | **Add language** | `POST /api/admin/postprod/recordings/<id>/translations` enqueues one `TRANSLATE` job, and a `DUB` job when the event has dubbing on. | none |
 | **Generate archive** | `POST /api/admin/postprod/recordings/<id>/archive` enqueues one `ARCHIVE` job. | none |
 | **Generate the report** (event page, **After the event** tab) | `POST /api/admin/events/<id>/report` enqueues one `REPORT` job for an ended event within its data retention ([The event report](#the-event-report)). | none |
-| **Translate with AI** (event wizard, **Event** step) | `POST /api/admin/events/<id>/text-translation` enqueues one `TRANSLATE_TEXT` job with the title and description written in the form, saved or not ([Event text translation](#event-text-translation)). | none |
+| Saving an event (wizard or API) | After `POST /api/events` or a `PUT /api/events/<id>` that sends the title, the description or the event languages, the server enqueues one `TRANSLATE_TEXT` job for the page languages that are empty or machine-translated from an older text. **Retry** in the wizard calls `POST /api/admin/events/<id>/text-translation` ([Event text translation](#event-text-translation)). | none |
 
 Every path goes through `app/src/lib/ai/enqueue.ts`, and every path is gated
 by the site-wide switch `aiPipelineEnabled`: the automatic paths do nothing
@@ -1443,9 +1444,9 @@ this table gives only their effect on the pipeline.
 
 | Field | UI label | Effect on the pipeline |
 |---|---|---|
-| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)). It also gates the machine translation of event texts in the wizard |
+| `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off, except that an event keeping a transcript from live captions still serves that transcript ([Public experience](#public-experience)). It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)). It also gates the automatic translation of event texts |
 | `aiAsrProvider`, `aiLlmProvider`, `aiTtsEngine` | **Transcription engine**, **Summary and translation engine**, **Dubbing engine** | One allowed value each ([Data sovereignty](#data-sovereignty)) |
-| `aiDefaultTargetLocales` | **Default translation languages** | Target languages ticked in the wizard when translation is turned on, and used for events without their own (`en,fr,es,de` on a new installation) |
+| `aiDefaultTargetLocales` | **Default event languages** (in **Settings › Languages**) | The languages every new event starts with, and those of events without their own (`en,fr,es,de` on a new installation). Those not active on the site only serve subtitles and summary |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
 | `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime; with only the transcript published, the transcript stays while published and the other outputs follow the event's retention. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
@@ -1455,9 +1456,8 @@ this table gives only their effect on the pipeline.
 
 In the event wizard's advanced settings, section **Recording and AI**, under
 **Automatic post-production**. A format or an event template pre-fills them:
-recording an event turns on transcription, summary, translation (into the
-site's default languages, when there are some besides the transcription
-language) and per-participant recording.
+recording an event turns on transcription, summary, translation (when the
+event has languages besides the main one) and per-participant recording.
 
 | Field | UI label | Effect |
 |---|---|---|
@@ -1466,7 +1466,7 @@ language) and per-participant recording.
 | `retainParticipantTracks` | **Keep per-participant tracks** | Keeps the tracks after transcription, for per-speaker playback and the archive |
 | `aiSummaryEnabled` | **Summary and chapters** | Adds `SUMMARIZE` |
 | `aiTranslationEnabled` | **Translation into other languages** | Adds `TRANSLATE` for each target language |
-| `aiTargetLocales` | **Translation languages** | Chosen with checkboxes (English, French, Spanish and German first, the other EU languages in a group that opens) and stored as comma-separated language codes; the wizard asks for at least one when translation is on |
+| `aiTargetLocales` | **Event languages** | Chosen in the **Event** step (the site languages first, the other EU languages in a group that opens) and stored as comma-separated language codes. Translation uses them only when it is on; the wizard asks for at least one then ([Event text translation](#event-text-translation)) |
 | `aiDubbingEnabled` | **Audio dubbing** | Adds `DUB` for each target language; needs translation |
 | `expectedSpeakers` | **Expected number of speakers** | Forces the diarization to that number of speakers (1 to 30) |
 
@@ -1694,7 +1694,7 @@ event (administrators, and organizers for their own events):
 | Method | Does |
 |---|---|
 | `GET` | The stored report, whether it is published, the last `REPORT` job, the requirements, the counts of available material and the languages |
-| `POST` | Queues a `REPORT` job (`202`, audit `EVENT_REPORT_REQUESTED`), with optional `targetLanguages`; by default the event's AI target languages (`aiTargetLocales`), without the source language. One at a time per event: while a job is pending or running, it answers `200` with that job |
+| `POST` | Queues a `REPORT` job (`202`, audit `EVENT_REPORT_REQUESTED`), with optional `targetLanguages`; by default the languages of the transcript and summary: when **Translation into other languages** is on, the event languages (`aiTargetLocales`, or the site's defaults when it is empty), without the source language, and none otherwise. One at a time per event: while a job is pending or running, it answers `200` with that job |
 | `PUT` | `{ published }`: shows or hides the report on the event page (audit `EVENT_REPORT_PUBLISHED` or `EVENT_REPORT_WITHDRAWN`) |
 
 A request needs an `ENDED` event, the site switch on, and the event's data
@@ -1792,12 +1792,14 @@ not copy it ([Privacy and data protection](GDPR.md)).
 
 ## Event text translation
 
-Staff can have an event's title and description translated into the
-installation's other languages. A translation model on CPU inside the cluster
-does the work, so no vLLM and no GPU node are involved. The result is only a
-proposal. It never changes the event's title or description. People review it
-in the wizard, and saving the wizard publishes it (`app/src/lib/text-translation/`,
-`infra/ai/worker/text_translate.py`).
+The title and description of an event are translated automatically into the
+event's languages when the event is saved. A translation model on CPU inside
+the cluster does the work, so no vLLM and no GPU node are involved. The
+machine text is published at once, with an **Automatic translation** notice on
+the public page, until a person reviews it. A text written by a person is
+never replaced (`app/src/lib/text-translation/`,
+`infra/ai/worker/text_translate.py`; the decision is recorded in
+[ADR-019](adr/019-event-languages-text-translation.md)).
 
 **The engine.** `postprod.mt.enabled` renders `<fullname>-mt`, a Deployment
 and a Service (`templates/postprod-mt.yaml`). They run the OpenAI-compatible
@@ -1817,8 +1819,9 @@ included.
 - **Starting and stopping.** The orchestrator starts and stops the engine
   ([The CPU translation engine on demand](#the-cpu-translation-engine-on-demand)).
 - **Portal configuration.** The chart gives the portal `AI_MT_BASE_URL` and
-  `AI_MT_MODEL_ID`. Without them the wizard does not show the feature, and
-  `POST` answers `422 MT_UNAVAILABLE`.
+  `AI_MT_MODEL_ID`. Without them nothing is translated: the wizard says that
+  the other languages are written by hand and that an empty language shows
+  the main text, and `POST` answers `422 MT_UNAVAILABLE`.
 - **Network policy.** With `networkPolicy.enabled` the engine has its own
   policy. It admits only the CPU worker, on port 8080.
 
@@ -1828,48 +1831,126 @@ used 4.4 to 5.1 GiB of memory. Expect a cloud vCPU to be slower, because
 generation is bound by memory bandwidth, and measure on your nodes. More
 threads do not speed generation up. Translations go one language at a time.
 
-**Requesting it.** In the event wizard, the **Event** step shows a **Machine
-translation** card under the language tabs to staff: administrators, and
-organizers for their own events. It appears only when the site switch is on
-and the engine is installed. Otherwise the wizard is unchanged, and a
-moderator who opens the wizard with the moderator link never sees it.
+**The event languages.** An event has one list of languages,
+`Event.aiTargetLocales` (comma-separated codes; an empty string means no
+language besides the main one; null, for events that never chose, means the
+site's `aiDefaultTargetLocales`). The wizard always saves it, and the list
+drives three things:
 
-- **Editing an event.** The card lists the enabled languages other than the
-  default one. By default it ticks those that still have an empty field where
-  the default language has text. **Translate with AI** sends the title and
-  description as they are in the form, saved or not. The card shows the state
-  and, while the job is queued or running, reads it again every 10 seconds.
-  When the translation is ready it fills **only the fields that are still
-  empty**, so text a person wrote is never replaced. The languages it filled
-  get a third mark in the language tabs, an amber diamond with the accessible
-  name "machine translated, to be reviewed". The tab of such a language shows
-  the notice **Machine translated: review before saving.** When the wizard
-  opens, a stored proposal of the same source text that would fill empty
-  fields is offered with **Use the translations**.
-- **Creating an event.** The event has no id yet, so the card offers **After
-  saving, translate with AI** with the same choice of languages. After
-  creating the event the wizard requests the translation. A refused request
-  does not stop the creation: the summary of the new event lists it among the
-  resources that were not saved.
-- **The event page.** The **Overview** tab shows one line of state: queued,
-  running, ready (with the languages and a link to edit the texts), or failed
-  (with the reason). It reads the state again only while the job is in
-  progress.
+- the language tabs of the title and description, in the **Event** step: the
+  main language (the site's default language), the event languages that are
+  active on the site, and any active site language that already has text;
+- the automatic translation of the title and description, into the **page
+  languages**: the event languages active on the site, other than the main one;
+- the translation of subtitles and summary, only when the event turns on
+  **Translation into other languages** (`aiTranslationEnabled`). An event
+  language that is not active on the site (`uk`, for example) only serves this.
+
+A new event starts from its template's languages, otherwise from the site's
+**Default event languages** (**Settings › Languages**). Where automatic
+translation is available, a new event does not take the template's English
+description skeleton: that language starts empty and is translated from the
+main text. The **Event** step
+shows them in a row, **Event languages: Italiano (main) · English ·
+Français**, with **Change languages**. Removing a language that has text asks
+for confirmation, because its title and description are deleted when the event
+is saved. The review step and the advanced settings show the list read-only,
+with a link to the **Event** step.
+
+**The state of each language.** `Event.textLocaleState` records, for each
+language other than the main one, who wrote the text and from which main
+text: `{ [language]: { origin, sourceHash, at, model? } }`. `origin` is
+`MACHINE` or `HUMAN` (a reviewed language counts as `HUMAN`); `sourceHash` is
+the SHA-256 of the main title and description, computed on the server only.
+Texts saved before this column existed have no state and count as written by
+a person; the first save gives them the hash of the main text they were
+written against, so that a later change of the main text marks them as to
+update. Each tab says its state in words, with an icon, and the tab panel
+explains it (`app/src/lib/text-translation/stato-lingue.ts`):
+
+| State | Tab | In the panel |
+|---|---|---|
+| main | **Main** | — |
+| translated on save (empty, or machine text from an older main text; engine available) | **On save** | The title and description are translated when you save; you can also write them |
+| being translated (a job includes the language, up to 15 minutes) | **Translating** | The translation is in progress |
+| waiting (a job open for more than 15 minutes) | **Waiting** | The engine has not started; the page shows the main text meanwhile |
+| machine (from the current main text) | **Automatic** | The page shows it with the notice until someone reviews it. **Mark as reviewed** |
+| human (from the current main text) | **Reviewed** | — |
+| stale (a person's text on an older main text, or machine text with the engine off) | **Needs update** | **Translate again automatically** (staff, engine available; asks for confirmation, then empties the language in the form, so that the save translates it) and **Still correct** |
+| failed (the last job, on the same main text, failed, or completed without a text for the language) | **Failed** | The reason, and **Retry** (staff) |
+| empty (engine off) | **Empty** | The page shows the main text |
+
+Without the engine, or for an instant call or an archived event, nothing
+promises a translation: an empty language is **Empty**, and an administrator
+also reads that automatic translation is not active on the installation.
+
+**When the server translates.** After saving an event (`POST /api/events`, or a
+`PUT /api/events/<id>` that sends the title, the description or the event
+languages), `riconciliaTraduzioni` (`app/src/lib/text-translation/auto.ts`):
+
+- does nothing without the engine or with the site switch off, for an instant
+  call or an archived event, or while a `TRANSLATE_TEXT` job of the event is
+  pending or running;
+- picks the page languages that are empty, or machine-translated from a
+  different main text (`sourceHash`); never a language written by a person;
+- does not repeat the last job when it had the same main text and the same
+  languages and failed, or completed without a text for those languages: the
+  language says **Failed** and is retried with **Retry**. Called after a
+  delivery or a final failure, it never repeats it, so there is no endless
+  round of jobs. It does repeat it when the person saving emptied again a
+  language the engine had translated;
+- queues one job and logs `EVENT_TEXT_TRANSLATION_REQUESTED` with the person
+  who saved. A failure is written to the log and does not fail the save.
+
+A draft saved automatically must never call it: it would translate a text
+half written. Drafts saved on purpose are translated, so that they are ready
+when the event is published.
+
+**What the save writes.** The wizard sends `textEdits: { touched: [...] }`,
+the languages other than the main one that the person touched on the page
+(an edit, **Mark as reviewed**, **Still correct**, a removed language)
+(`app/src/lib/text-translation/unione-testi.ts`):
+
+- a touched language takes the text of the form and becomes `HUMAN` on the
+  current main text; an empty touched language loses its state;
+- a language that was not touched keeps the text and the state stored on the
+  server, read again with the row locked in the transaction of the update: a
+  translation delivered while the wizard was open is not wiped by the text the
+  form had loaded;
+- a language removed from the event languages loses its text and its state
+  (for an event that never chose its languages, the earlier list is the site's
+  defaults).
+
+The wizard's draft in the browser also remembers the touched languages:
+restoring it brings back the text of those languages only, so a translation
+delivered after the draft was written is not replaced by the draft's older
+text.
+
+A request without `textEdits` (an API client, an older page) keeps the former
+behavior: the text sent replaces all languages, and the languages whose text
+changes become `HUMAN`. The response of `PUT` and `POST` carries
+`traduzione: { avviata, lingue }` when the server looked at the languages.
+
+While a language is being translated, the wizard of the staff reads the state
+again every 10 seconds (every minute while the engine has not started) and
+brings the delivered texts into the languages the person did not touch. With the moderator link the wizard shows the states of
+its first render and does not poll. The event page shows one line with the
+state of each page language, and a link to the texts when one is to review.
 
 Behind it is `/api/admin/events/<id>/text-translation`, for the staff who
 manage the event:
 
 | Method | Does |
 |---|---|
-| `GET` | `available` (site switch on and engine installed), the last `TRANSLATE_TEXT` job, the stored proposal, and `pending`: the languages the proposal would fill in the saved text, when it comes from that text |
-| `POST` | `{ sourceLanguage, title, description, targetLanguages }`. The title is at most 300 characters and the description at most 10,000. The languages must be enabled on the site and differ from the source. It queues a `TRANSLATE_TEXT` job (`202`, audit `EVENT_TEXT_TRANSLATION_REQUESTED`). One at a time per event: while a job is pending or running it answers `200 { stato: "in-corso" }` with the hash of that job's text. It answers `200 { stato: "pronto" }`, without a new job, when the stored proposal already covers this text and these languages. With the site switch off it answers `422 AI_PIPELINE_DISABLED`; without the engine, `422 MT_UNAVAILABLE` |
+| `GET` | `{ engine, principale, lingue, job, testi }`: whether automatic translation is available for this event, the main language, for each event language and each language with text its `state`, `origin`, `current` (from the stored main text), `page` (active on the site), `event` (in the event languages) and `failure`, the last `TRANSLATE_TEXT` job, and the stored texts in the languages other than the main one |
+| `POST` | `{ lingue }`: **Retry**. It translates the stored main text into those languages, which must be active on the site and differ from the main one; only the page languages that are empty or machine-translated count, never a person's text, and the earlier jobs are not looked at. One job at a time per event: while a job is pending or running it answers `200 { stato: "in-corso" }`; with nothing to translate, or for an instant call or an archived event, `200 { stato: "nessuna" }`, and the wizard says so instead of announcing a translation. It queues a `TRANSLATE_TEXT` job (`202`, audit `EVENT_TEXT_TRANSLATION_REQUESTED`). With the site switch off it answers `422 AI_PIPELINE_DISABLED`; without the engine, `422 MT_UNAVAILABLE` |
 
 **The job.** `TRANSLATE_TEXT` belongs to the event (`eventId`), like the
 report, and depends on no job.
 
-- **Payload.** It carries the source language, the target languages, the text
-  and its SHA-256 (`sourceHash`, computed in the same way in the browser and
-  in the portal, `app/src/lib/text-translation/source.ts`).
+- **Payload.** It carries the source language, the target languages, the
+  stored main text and its SHA-256 (`sourceHash`, computed by the portal,
+  `app/src/lib/text-translation/source.ts`).
 - **Which worker.** Only the CPU worker takes it, so it never wakes the GPU
   worker: without the CPU worker, `desiredWithoutMt` leaves it out of the GPU
   worker's count. `desiredLlm` does not count it, so it never starts vLLM.
@@ -1878,8 +1959,8 @@ report, and depends on no job.
   (`AI_MT_BASE_URL` unset, for example after `postprod.mt.enabled` was turned
   off with jobs still queued), the orchestrator does not count these jobs and
   `postprod-reclaim` closes the queued ones as failed
-  ([Leases and reclaim](#leases-and-reclaim)). The wizard and the event page
-  do not show the feature while the engine is missing.
+  ([Leases and reclaim](#leases-and-reclaim)). While the engine is missing the
+  wizard promises no translation.
 - **Claim.** The claim returns `textInput` and, in `providerHints`, the
   engine's address and model (`mtBaseUrl`, `mtModelId`) and the glossary. A
   claim without an engine configured closes the job as failed instead of
@@ -1921,8 +2002,8 @@ prompt, temperature 0. So the worker:
   a language that fails is left out, and a job with no language translated
   fails.
 
-**Known limits of the result.** The proposal is meant to be read before it is
-saved, and these are the things to look for:
+**Known limits of the result.** The machine text is published with its notice
+until someone reviews it, and these are the things to look for when reviewing:
 
 - each line is translated on its own, so a sentence broken over two lines
   (a list item that continues on the next line) is translated as two pieces
@@ -1944,19 +2025,38 @@ on four CPU cores; a title takes a few seconds.
 - **Validation.** A language that was not requested makes the delivery fail.
   The title keeps at most one `|`, and only if the source title has one. Both
   texts are cleaned of control characters.
-- **Transaction.** The same transaction closes the job as done and stores the
-  proposal on the event, in `Event.textTranslations`:
-  `{ version, sourceLanguage, sourceHash, generatedAt, model, title, description }`,
-  with one entry per language.
-- **Merging.** A new proposal for the same source text adds its languages to
-  the stored ones. A proposal for a different text replaces them.
-- **What is not stored.** The proposal is never written into the event's
-  title or description, and duplicating an event does not copy it. Event
-  texts are not participants' personal data.
+- **Transaction.** The same transaction closes the job as done, stores the
+  delivered texts on the event as its last machine translation
+  (`Event.textTranslations`:
+  `{ version, sourceLanguage, sourceHash, generatedAt, model, title, description }`;
+  a delivery for the same source text adds its languages, one for a different
+  text replaces them) and applies them.
+- **Applying.** With the event row locked, the delivery is applied only when
+  the stored main text still has the job's `sourceHash`. Then each requested
+  language that is still a page language and is empty or machine-translated
+  gets the delivered title and description and the state `MACHINE` with the
+  model; a language written by a person, or removed from the event meanwhile,
+  is never touched. A language is written whole: when the main text has
+  a title (or a description) and the delivery has none for that language, the
+  language stays as it is.
+- **After.** The server looks at the languages again (`riconciliaTraduzioni`):
+  a main text changed during the translation (a stale delivery, kept only as
+  the last machine translation) or a language added meanwhile gets a new job.
+  It does the same when a job fails for good (`postprod-progress`).
+- **Duplication.** A copy keeps the texts and their state, so a machine
+  language keeps its notice; the copy's title gets "(copia)", so its languages
+  are translated again at the copy's first save. The last machine translation
+  (`textTranslations`) is not copied. Event texts are not participants'
+  personal data.
 
-The wizard and the event page render the translated text as Markdown, like
-any description, never as HTML. What the public page shows is the text a
-person saved after reviewing it.
+**On the public page.** A language whose text is `MACHINE` shows, under the
+title, the notice **Automatic translation**: the title and description were
+translated by an automatic model and nobody has reviewed them yet. The page
+receives only the list of those languages, never the states or the hashes.
+When the page language has no text, the main text (the site's default
+language) is shown instead, and the title and description carry `lang` with
+the language they are in; the notice follows the text that is shown. Emails,
+calendar files and link previews use the translated text without the notice.
 
 ## Transparency (AI Act Article 50)
 
@@ -2249,9 +2349,11 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   download (about 5.6 GB, unless `postprod.mt.modelsPvc` keeps it). Irish in
   particular comes out with meaning errors more often than the other
   languages, and a short line out of context (a one-word list item) can be
-  mistranslated: the proposal is always meant to be reviewed. Only the title
-  and the description are translated; tags, questionnaires, materials and the
-  other multilingual texts are not.
+  mistranslated. The machine text is published with its notice before anyone
+  reviews it, and its output language is not checked: a line can come back in
+  another language until a person reviews it. Only the title and the
+  description are translated; tags, the programme topics, questionnaires,
+  materials and the other multilingual texts are not.
 
 - **Every recording is transcribed as Italian.** The source language is
   `Recording.sourceLanguage`, which no screen or API sets, so it falls back to

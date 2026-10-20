@@ -42,6 +42,7 @@ ADR-001 to ADR-010 record the platform's founding decisions. Later records take 
 | [016](016-in-cluster-ai-postproduction.md) | In-cluster AI post-production | Accepted | Builds on [006](006-recording-and-storage.md) and [013](013-multitrack-speaker-attribution.md); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split | [AI post-production](../POSTPROD.md) |
 | [017](017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point | Accepted | The one sanctioned exception to [001](001-jitsi-iframe-api.md)'s rule against modifying Jitsi | [Jitsi integration](../architecture/jitsi-integration.md), [component README](../../infra/jitsi-web-patched/README.md) |
 | [018](018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge | Accepted | Respects [001](001-jitsi-iframe-api.md) (IFrame API command and event, server-side configuration); reuses [007](007-jvb-scale-to-zero.md)'s scale-to-zero split, [013](013-multitrack-speaker-attribution.md)'s per-participant consent and [016](016-in-cluster-ai-postproduction.md)'s sovereignty rule, glossary and transcript artifact | [Live captions](../architecture/live-captions.md) |
+| [019](019-event-languages-text-translation.md) | One language list per event, and automatic translation of its texts at save | Accepted | Builds on [008](008-eu-languages.md) (the site languages) and on [016](016-in-cluster-ai-postproduction.md)'s CPU translation engine and queue | [AI post-production: Event text translation](../POSTPROD.md#event-text-translation) |
 
 "Accepted" means that the decision is in force. It does not mean that the component runs by default. Several accepted decisions govern optional parts that an installation turns on. In `infra/helm/pa-webinar/values.yaml`, these keys default to `false`: `jvbScaler.enabled` (ADR-007), `jitsi-meet.jibri.enabled` (the composite path of ADR-006), `recorder.enabled` (ADR-013) and `postprod.enabled` (ADR-016). Live captions (ADR-018) are the exception: `global.captions.enabled` defaults to `true`.
 
@@ -64,6 +65,7 @@ flowchart LR
     A013["013 · Media<br/>Multitrack recording"]:::media
     A016["016 · AI<br/>In-cluster<br/>post-production"]:::job
     A018["018 · AI<br/>Live captions"]:::job
+    A019["019 · AI<br/>Event languages and<br/>text translation"]:::job
     A005["005 · Realtime<br/>Live interaction<br/>in the portal"]:::portal
     A012["012 · Realtime<br/>Optional 2D square"]:::portal
     A010["010 · Platform<br/>SiteSetting singleton"]:::portal
@@ -86,6 +88,8 @@ flowchart LR
     A001 -->|"command and event<br/>of the IFrame API"| A018
     A005 -->|"presence kept in Redis,<br/>polled over HTTP"| A012
     A010 -->|"active languages<br/>set at runtime"| A008
+    A008 -->|"page languages are<br/>the active ones"| A019
+    A016 -->|"CPU engine<br/>and queue"| A019
 
     classDef portal fill:#E6F0FA,stroke:#0066CC,stroke-width:2px,color:#17324D
     classDef risk fill:#FCE8EC,stroke:#D1344C,stroke-width:2px,color:#17324D
