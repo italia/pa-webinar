@@ -73,6 +73,14 @@ import { closingPhase, exitDestination, phaseAfterTokenConflict } from '@/compon
 import { warmupFromLifecycle } from '@/components/live/lifecycle-warmup';
 import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import { isHumanParticipant } from '@/lib/jitsi/participants';
+import {
+  conCambioMedia,
+  connessioneInstabile,
+  richiestaJson,
+  statoEvento,
+  type StatoMedia,
+} from '@/lib/jitsi/riconnessione';
+import { useRientro } from '@/hooks/use-rientro';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
@@ -217,7 +225,6 @@ type LivePhase =
   | 'waiting'
   | 'fetching_jwt'
   | 'ready'
-  | 'reconnecting'
   // Uscito dalla conferenza con l'evento ancora aperto: si puo' rientrare.
   | 'left'
   | 'ended'
@@ -245,12 +252,6 @@ function clampSidebarWidth(w: number): number {
   return Math.round(Math.min(max, Math.max(SIDEBAR_MIN_W, w)));
 }
 
-// Maximum number of automatic rejoin attempts after a network-induced
-// `videoConferenceLeft`. After this many failures we fall through to the
-// closing screen ("Sei uscito dalla sala", with a way back in, unless the
-// event ended) so the user can decide what to do manually.
-const MAX_RECONNECT_ATTEMPTS = 3;
-
 // Grace window after an UNFLAGGED `videoConferenceLeft` before we commit to
 // reconnecting. Jitsi's native hangup fires videoConferenceLeft first and
 // `readyToClose` a moment later; this window lets the intentional-close
@@ -258,12 +259,18 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 // into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
 const LEAVE_RECONNECT_GRACE_MS = 1200;
 
+/** Quanto resta l'annuncio «Connessione ripristinata» per i lettori di schermo. */
+const ANNUNCIO_RIPRISTINO_MS = 5_000;
+
+/** Tempo massimo della richiesta del token durante un rientro. */
+const ATTESA_TOKEN_RIENTRO_MS = 10_000;
+
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
 // globals.scss): the call overlays the PA header/footer and the outer
 // document scroll is locked, so the video sits in a single viewport-locked
 // frame with no double scroll. The waiting room keeps the normal chrome.
-const IMMERSIVE_PHASES = new Set<LivePhase>(['fetching_jwt', 'ready', 'reconnecting']);
+const IMMERSIVE_PHASES = new Set<LivePhase>(['fetching_jwt', 'ready']);
 
 // Statuses the waiting room knows how to render. The /lifecycle poll accepts
 // a status transition only if it's one of these — DRAFT/ARCHIVED leak through
@@ -352,7 +359,7 @@ export default function LiveEventClient({
   // Chi è in diretta e chi aspetta: la pagina lo segnala per tutta la visita,
   // spostandosi da «attesa» a «diretta» quando entra nella chiamata. Non a
   // evento concluso, né fuori dalla sala (uscita, errore, fine).
-  const inChiamata = phase === 'ready' || phase === 'reconnecting';
+  const inChiamata = phase === 'ready';
   const presenze = usePresenze(
     event.slug,
     inChiamata ? 'diretta' : 'attesa',
@@ -487,18 +494,30 @@ export default function LiveEventClient({
     micOn: false,
   });
 
-  // ── Network-resilience: distinguish intentional hangup (user clicked
-  // "Esci dalla sala" or finished post-event flow) from an unintentional
-  // `videoConferenceLeft` triggered by Jitsi when the participant's
-  // network drops momentarily. Without this, the app immediately shows
-  // "Evento concluso" on every blip and the user loses access to the
-  // call. We retry up to MAX_RECONNECT_ATTEMPTS before giving up.
+  // ── Tenuta della connessione: un'uscita voluta («Esci dalla sala», la fine
+  // del percorso dopo l'evento) va distinta da un `videoConferenceLeft` che
+  // Jitsi manda quando la conferenza è persa. Senza questa distinzione ogni
+  // caduta porterebbe alla schermata di chiusura, fuori dalla chiamata.
   const userHangupRef = useRef(false);
-  const reconnectAttemptsRef = useRef(0);
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Deferred reconnect decision after an unflagged leave (see handleJitsiLeft):
-  // holds the grace timer so `readyToClose` can cancel it.
+  // La decisione rimandata dopo un'uscita non segnata (handleJitsiLeft): il
+  // timer della finestra di tolleranza, che `readyToClose` può annullare.
   const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Microfono e videocamera come sono adesso in sala (riferiti da Jitsi) e
+  // come farli partire al prossimo montaggio: null = le scelte della sala
+  // d'attesa. Cambia solo a chiamata smontata, perché JitsiRoom ricrea la
+  // chiamata quando cambiano le sue impostazioni di partenza.
+  const mediaRef = useRef<StatoMedia>({ audio: false, video: false });
+  const [mediaAllAvvio, setMediaAllAvvio] = useState<StatoMedia | null>(null);
+  // Il portale non risponde da qualche prova, o il browser è offline: Jitsi
+  // intanto prova a riprendere da sé, la sala lo dice con discrezione.
+  const [reteInstabile, setReteInstabile] = useState(false);
+  const proveFalliteRef = useRef(0);
+  // «Connessione ripristinata», per chi usa un lettore di schermo.
+  const [ripristinata, setRipristinata] = useState(false);
+  const phaseRef = useRef<LivePhase>('waiting');
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   // Poll infrastructure status (JVB + Jibri) when event is LIVE.
   // Dentro la chiamata lo stato del ponte non serve piu' (decide la sala
@@ -548,15 +567,14 @@ export default function LiveEventClient({
   // `phase='ended'` is now only reached mid-session when the event really
   // ends, for the "evento concluso" thank-you screen; `phase='left'` when
   // this client leaves a call that is still open.
-  // We also preserve `reconnecting` and `fetching_jwt` so a network blip
-  // mid-event doesn't get clobbered back to the waiting room when the
-  // LIVE→LIVE eventStatus poll re-fires this effect.
+  // Anche `fetching_jwt` resta com'è: un ingresso in corso non torna alla
+  // sala d'attesa quando il controllo dello stato (LIVE→LIVE) rilancia
+  // questo effetto.
   useEffect(() => {
     setPhase((prev) =>
       prev === 'ready' ||
       prev === 'ended' ||
       prev === 'left' ||
-      prev === 'reconnecting' ||
       prev === 'fetching_jwt'
         ? prev
         : 'waiting'
@@ -619,117 +637,120 @@ export default function LiveEventClient({
   //   - moderator / speaker magic-link:  moderatorToken=<token>
   //   - registered participant:          accessToken=<token>
   //   - anonymous guest (no token):      guestName=<name>
-  const fetchJwt = useCallback(async () => {
-    setError('');
-    try {
-      const body: Record<string, string | boolean> = {};
-      if (isGuest || !token) {
-        // Anonymous guest on a public (or password-cleared) LIVE event.
-        // The typed name is required — we ensure it before transitioning
-        // into fetching_jwt from the waiting room.
-        body.guestName = chosenName.trim();
-      } else if (isModerator || isSpeaker) {
-        // Both moderators and speakers arrive via magic link → they use
-        // the `moderatorToken` field (the JWT route's grant flow handles
-        // the role distinction and issues the right Jitsi features).
-        // The magic link is SHARED, so the generic grant name
-        // ("Moderatore" / "Relatore") is never useful — always forward the
-        // name the moderator typed in the waiting room (required there) so
-        // each one shows up under their own identity in chat / the
-        // participant list instead of all collapsing to "Moderatore".
-        body.moderatorToken = token;
-        if (chosenName.trim()) {
-          body.displayNameOverride = chosenName.trim();
-        }
-      } else {
-        body.accessToken = token;
-        if (chosenName && chosenName !== initialDisplayName) {
-          body.displayNameOverride = chosenName;
-        }
+  //
+  // Serve all'ingresso e ai rientri dopo una caduta, e dice com'è andata:
+  // 'fatto' (credenziali nuove impostate), 'rete' (il portale non ha
+  // risposto: riprovare ha senso) o 'gestito' (risposta definitiva del
+  // portale, la schermata giusta è già impostata). In un rientro anche un
+  // portale momentaneamente in difficoltà (5xx, troppe richieste) vale
+  // 'rete': si riprova da soli invece di mostrare un errore.
+  const richiediCredenziali = useCallback(async (rientro = false): Promise<'fatto' | 'rete' | 'gestito'> => {
+    const body: Record<string, string | boolean> = {};
+    if (isGuest || !token) {
+      // Ospite senza link personale, a evento pubblico (o con la password
+      // già data) in diretta. Il nome scritto è obbligatorio: lo chiede la
+      // sala d'attesa prima di passare a fetching_jwt.
+      body.guestName = chosenName.trim();
+    } else if (isModerator || isSpeaker) {
+      // Chi modera e chi interviene arrivano dal link personale e usano il
+      // campo `moderatorToken`: la rotta del token distingue i ruoli e dà a
+      // ciascuno le funzioni di Jitsi giuste. Il link principale è
+      // CONDIVISO, quindi il nome generico («Moderatore», «Relatore») non
+      // serve: si manda sempre il nome scritto in sala d'attesa (lì è
+      // obbligatorio), così ognuno compare con il proprio nome in chat e
+      // nell'elenco dei partecipanti invece di diventare «Moderatore».
+      body.moderatorToken = token;
+      if (chosenName.trim()) {
+        body.displayNameOverride = chosenName.trim();
       }
-      // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
-      // traccia per partecipante): il server ne conserva la prova insieme al
-      // posto nella conferenza, uno nuovo a ogni ingresso.
-      const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
-      if (prove.registrazione) body.recordingConsent = true;
-      if (prove.tracce) body.multitrackConsent = true;
-      if (prove.registrazione || prove.tracce) body.locale = locale;
-
-      const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        // Il cookie della password e' scaduto mentre si era in sala: la
-        // pagina della password lo rilascia, riprovare qui non servirebbe.
-        if (data.code === 'JOIN_PASSWORD_REQUIRED') {
-          router.replace(percorso(`/events/${event.slug}/password`));
-          return;
-        }
-        // L'evento non ammette piu' ingressi (concluso, o tornato in attesa
-        // dopo l'inattivita') mentre si rientrava o si aspettava: lo stato
-        // vero lo dice /lifecycle, e la schermata giusta non e' un errore.
-        if (res.status === 409) {
-          try {
-            const lc = await fetch(`/api/events/${event.slug}/lifecycle`);
-            const lcData = lc.ok ? ((await lc.json()) as { status?: string }) : null;
-            const next = phaseAfterTokenConflict(lcData?.status);
-            if (next === 'ended') {
-              markEnded();
-              setPhase('ended');
-              return;
-            }
-            if (next === 'waiting' && lcData?.status) {
-              // Tornando in sala d'attesa la si lascia risvegliare il bridge.
-              wokeOnceRef.current = false;
-              eventStatusRef.current = lcData.status;
-              setEventStatus(lcData.status);
-              setPhase('waiting');
-              return;
-            }
-          } catch {
-            /* resta l'errore qui sotto */
-          }
-        }
-        // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
-        // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
-        // non cambierebbe l'esito.
-        setError(
-          data.code === 'GUEST_ACCESS_DISABLED'
-            ? t('guestAccessDisabled')
-            : // Per chi entra, un 401/403/404 vuol dire un link che non vale
-              // (revocato, sbagliato, di un evento cancellato), non permessi o
-              // sessioni come in amministrazione.
-              messaggioErroreApi(res.status, tApi, t('connectionError'), {
-                400: t('invalidToken'),
-                401: t('invalidToken'),
-                403: t('invalidToken'),
-                404: t('invalidToken'),
-                409: t('notOpenNow'),
-                422: t('nameRequired'),
-              }),
-        );
-        setPhase('error');
-        return;
+    } else {
+      body.accessToken = token;
+      if (chosenName && chosenName !== initialDisplayName) {
+        body.displayNameOverride = chosenName;
       }
-
-      const data: JitsiCredentials = await res.json();
-      const salvati = data.consentsRecorded;
-      if (salvati && (salvati.recording || salvati.multitrack)) {
-        setConsensiRegistrati((c) => ({
-          registrazione: c.registrazione || salvati.recording,
-          tracce: c.tracce || salvati.multitrack,
-        }));
-      }
-      setCredentials(data);
-      setPhase('ready');
-    } catch {
-      setError(t('connectionError'));
-      setPhase('error');
     }
+    // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
+    // traccia per partecipante): il server ne conserva la prova insieme al
+    // posto nella conferenza, uno nuovo a ogni ingresso.
+    const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
+    if (prove.registrazione) body.recordingConsent = true;
+    if (prove.tracce) body.multitrackConsent = true;
+    if (prove.registrazione || prove.tracce) body.locale = locale;
+
+    // In un rientro con un tempo massimo, corpo compreso: a rete instabile la
+    // richiesta può restare appesa, e il rientro deve poter riprovare.
+    const res = await richiestaJson(`/api/events/${event.slug}/jitsi/token`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      attesaMs: rientro ? ATTESA_TOKEN_RIENTRO_MS : 0,
+    });
+    if (!res) return 'rete';
+
+    if (rientro && (res.status >= 500 || res.status === 429)) return 'rete';
+    if (!res.ok) {
+      const errore = (res.data ?? {}) as { code?: string };
+      // Il cookie della password e' scaduto mentre si era in sala: la
+      // pagina della password lo rilascia, riprovare qui non servirebbe.
+      if (errore.code === 'JOIN_PASSWORD_REQUIRED') {
+        router.replace(percorso(`/events/${event.slug}/password`));
+        return 'gestito';
+      }
+      // L'evento non ammette piu' ingressi (concluso, o tornato in attesa
+      // dopo l'inattivita') mentre si rientrava o si aspettava: lo stato
+      // vero lo dice /lifecycle, e la schermata giusta non e' un errore.
+      if (res.status === 409) {
+        const lc = await richiestaJson(`/api/events/${event.slug}/lifecycle`);
+        // In un rientro, senza risposta si riprova: la rete è ancora incerta.
+        if (!lc && rientro) return 'rete';
+        const stato = statoEvento(lc);
+        const next = phaseAfterTokenConflict(stato);
+        if (next === 'ended') {
+          markEnded();
+          setPhase('ended');
+          return 'gestito';
+        }
+        if (next === 'waiting' && stato) {
+          // Tornando in sala d'attesa la si lascia risvegliare il bridge.
+          wokeOnceRef.current = false;
+          eventStatusRef.current = stato;
+          setEventStatus(stato);
+          setPhase('waiting');
+          return 'gestito';
+        }
+      }
+      // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
+      // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
+      // non cambierebbe l'esito.
+      setError(
+        errore.code === 'GUEST_ACCESS_DISABLED'
+          ? t('guestAccessDisabled')
+          : // Per chi entra, un 401/403/404 vuol dire un link che non vale
+            // (revocato, sbagliato, di un evento cancellato), non permessi o
+            // sessioni come in amministrazione.
+            messaggioErroreApi(res.status, tApi, t('connectionError'), {
+              400: t('invalidToken'),
+              401: t('invalidToken'),
+              403: t('invalidToken'),
+              404: t('invalidToken'),
+              409: t('notOpenNow'),
+              422: t('nameRequired'),
+            }),
+      );
+      setPhase('error');
+      return 'gestito';
+    }
+
+    const data = res.data as JitsiCredentials | null;
+    if (!data || typeof data.jwt !== 'string') return 'rete';
+    const salvati = data.consentsRecorded;
+    if (salvati && (salvati.recording || salvati.multitrack)) {
+      setConsensiRegistrati((c) => ({
+        registrazione: c.registrazione || salvati.recording,
+        tracce: c.tracce || salvati.multitrack,
+      }));
+    }
+    setCredentials(data);
+    return 'fatto';
   }, [
     event.slug,
     isModerator,
@@ -747,6 +768,17 @@ export default function LiveEventClient({
     locale,
   ]);
 
+  const fetchJwt = useCallback(async () => {
+    setError('');
+    const esito = await richiediCredenziali();
+    if (esito === 'fatto') {
+      setPhase('ready');
+    } else if (esito === 'rete') {
+      setError(t('connectionError'));
+      setPhase('error');
+    }
+  }, [richiediCredenziali, t]);
+
   useEffect(() => {
     if (phase === 'fetching_jwt') {
       fetchJwt();
@@ -759,85 +791,142 @@ export default function LiveEventClient({
     (name: string, prefs: WaitingRoomJoinPrefs) => {
       setChosenName(name);
       setJoinPrefs(prefs);
+      mediaRef.current = { audio: prefs.micOn, video: prefs.cameraOn };
+      setMediaAllAvvio(null);
       setPhase('fetching_jwt');
     },
     [],
   );
 
-  // Poll event status during ready phase to detect ENDED
-  useEffect(() => {
-    if (phase !== 'ready') return;
-    const pollInterval = setInterval(async () => {
-      try {
-        // Qui serve solo lo `status`, e questa chiamata la ripete ogni
-        // partecipante ogni cinque secondi per tutta la durata dell'evento: la
-        // rotta dell'evento intero carica anche relazioni che nessuno guarda.
-        // `/lifecycle` è la stessa fonte, molto più leggera.
-        const res = await fetch(`/api/events/${event.slug}/lifecycle`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.status === 'ENDED' && eventStatus !== 'ENDED') {
-          markEnded();
-          // Drive the in-app "Evento concluso" closing screen instead of
-          // leaving phase='ready' (which keeps repainting the JVB warming
-          // overlay over a dead iframe — "Sala in preparazione"). Mark this
-          // as an intentional end so a late `videoConferenceLeft` from the
-          // tearing-down iframe doesn't bounce the user into 'reconnecting'.
-          userHangupRef.current = true;
-          // La valutazione e' dentro la schermata di chiusura (phase 'ended').
-          setPhase('ended');
-        }
-      } catch {
-        /* retry */
-      }
-    }, 5000);
-    return () => clearInterval(pollInterval);
-  }, [phase, event.slug, eventStatus, isModerator, markEnded]);
-
-  // While in the reconnecting phase, schedule an automatic re-init of
-  // the JitsiRoom by flipping back to `fetching_jwt` (which already
-  // re-runs the JWT exchange and re-mounts the iframe). Backoff is
-  // 2s × current attempt number so we wait progressively longer between
-  // tries (2s → 4s → 6s) without overloading a flaky link.
-  useEffect(() => {
-    if (phase !== 'reconnecting') return;
-    const delay = 2000 * Math.max(1, reconnectAttemptsRef.current);
-    reconnectTimerRef.current = setTimeout(() => {
-      // Drop the stale credentials so the JWT route is re-hit (the JWT
-      // may have aged out by the time the network is back). The
-      // existing fetching_jwt → ready transition handles the rest.
-      setCredentials(null);
-      setJitsiJoined(false);
-      setPhase('fetching_jwt');
-    }, delay);
-    return () => {
-      if (reconnectTimerRef.current) {
-        clearTimeout(reconnectTimerRef.current);
-        reconnectTimerRef.current = null;
-      }
-    };
-  }, [phase]);
-
-  const handleReconnectCancel = useCallback(() => {
-    // The user explicitly gave up. Mark this as intentional so any
-    // late-firing `videoConferenceLeft` doesn't loop us back here.
+  // ── Rientro automatico dopo una caduta ──
+  // La chiamata persa si smonta subito (con la rete presente Jitsi saluta la
+  // conferenza, e nessun doppione resta agli altri) e la sala resta com'è:
+  // pannelli, chat, barra in alto. Quando il portale risponde e l'evento è
+  // ancora in corso, la chiamata si rimonta con lo stesso token se vale
+  // ancora, e con microfono e videocamera come li aveva la persona
+  // (hooks/use-rientro, lib/jitsi/riconnessione).
+  const richiediTokenRientro = useCallback(() => richiediCredenziali(true), [richiediCredenziali]);
+  const rientroConcluso = useCallback(() => {
+    markEnded();
     userHangupRef.current = true;
-    if (reconnectTimerRef.current) {
-      clearTimeout(reconnectTimerRef.current);
-      reconnectTimerRef.current = null;
-    }
+    setPhase('ended');
+  }, [markEnded]);
+  // Troppo a lungo: la schermata di uscita, con «Rientra». L'uscita si
+  // registra come quella di chi esce da sé (sendLeaveBeacon, più sotto).
+  const segnaUscitaRef = useRef<() => void>(() => {});
+  const rinunciaRientro = useCallback(() => {
+    segnaUscitaRef.current();
     setPhase(closingPhase(eventStatusRef.current));
   }, []);
+  const {
+    rientro,
+    rientroRef,
+    montaggio,
+    lungo: rientroLungo,
+    avvia: avviaRientroChiamata,
+    concludi: concludiRientro,
+  } = useRientro({
+    inSala: phase === 'ready',
+    slug: event.slug,
+    richiediToken: richiediTokenRientro,
+    onConcluso: rientroConcluso,
+    onRinuncia: rinunciaRientro,
+  });
 
-  // «Rientra» dalla schermata di uscita: di nuovo il token e la sala, come dopo
-  // una riconnessione. Il consenso alla registrazione e' gia' stato dato.
+  const avviaRientro = useCallback(() => {
+    if (userHangupRef.current || phaseRef.current !== 'ready') return;
+    if (pendingLeaveTimerRef.current) {
+      clearTimeout(pendingLeaveTimerRef.current);
+      pendingLeaveTimerRef.current = null;
+    }
+    if (!avviaRientroChiamata()) return;
+    setMediaAllAvvio({ ...mediaRef.current });
+    setJitsiJoined(false);
+    // Lo stato della rete lo dice ora il rientro; alla ripresa si ricomincia
+    // a contare da capo, senza l'avviso di prima della caduta.
+    proveFalliteRef.current = 0;
+    setReteInstabile(false);
+  }, [avviaRientroChiamata]);
+
+  // A chiamata smontata (inizio del rientro, o un montaggio che non è entrato
+  // in tempo) l'API vecchia non serve più a nessuno.
+  const chiamataSmontata = rientro !== null && !rientro.montata;
+  useEffect(() => {
+    if (chiamataSmontata) setJitsiApi(null);
+  }, [chiamataSmontata]);
+
+  // In chiamata si controlla lo stato dell'evento, per accorgersi della fine
+  // (ENDED). La stessa domanda dice anche se il portale risponde: qualche
+  // prova di fila senza risposta,
+  // o il browser offline, e la sala avvisa che la connessione è instabile
+  // mentre Jitsi prova a riprendere da sé (lib/jitsi/riconnessione).
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    proveFalliteRef.current = 0;
+    const aggiornaRete = () => {
+      setReteInstabile(connessioneInstabile(proveFalliteRef.current, navigator.onLine));
+    };
+    const pollInterval = setInterval(async () => {
+      // Durante un rientro le stesse domande le fa il rientro.
+      if (rientroRef.current) return;
+      // Qui serve solo lo `status`, e questa chiamata la ripete ogni
+      // partecipante ogni cinque secondi per tutta la durata dell'evento: la
+      // rotta dell'evento intero carica anche relazioni che nessuno guarda.
+      // `/lifecycle` è la stessa fonte, molto più leggera. Con un tempo
+      // massimo: a rete caduta una richiesta resterebbe appesa per minuti.
+      const res = await richiestaJson(`/api/events/${event.slug}/lifecycle`, { attesaMs: 4_000 });
+      if (rientroRef.current) return;
+      // Senza risposta conta come rete assente; una risposta d'errore del
+      // portale (un aggiornamento in corso) no: la rete c'è.
+      proveFalliteRef.current = res ? 0 : proveFalliteRef.current + 1;
+      aggiornaRete();
+      if (statoEvento(res) === 'ENDED' && eventStatus !== 'ENDED') {
+        markEnded();
+        // La schermata «Evento concluso» invece di restare in 'ready', che
+        // ridisegnerebbe l'avviso di avvio del bridge sopra una chiamata
+        // ormai chiusa. È una fine voluta: un `videoConferenceLeft` tardivo
+        // della chiamata che si smonta non deve far partire un rientro.
+        userHangupRef.current = true;
+        // La valutazione e' dentro la schermata di chiusura (phase 'ended').
+        setPhase('ended');
+      }
+    }, 5000);
+    window.addEventListener('online', aggiornaRete);
+    window.addEventListener('offline', aggiornaRete);
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('online', aggiornaRete);
+      window.removeEventListener('offline', aggiornaRete);
+      setReteInstabile(false);
+    };
+  }, [phase, event.slug, eventStatus, isModerator, markEnded, rientroRef]);
+
+  // «Connessione ripristinata» per qualche secondo, nella regione annunciata.
+  useEffect(() => {
+    if (!ripristinata) return;
+    const timer = setTimeout(() => setRipristinata(false), ANNUNCIO_RIPRISTINO_MS);
+    return () => clearTimeout(timer);
+  }, [ripristinata]);
+
+  const handleMediaChanged = useCallback((mezzo: 'audio' | 'video', muto: boolean) => {
+    // Durante un rientro vale lo stato di prima della caduta, finché la
+    // chiamata rimontata non è dentro: prima, con il blocco dei microfoni,
+    // Jitsi la riferisce chiusa anche a chi la riaprirà appena entrato.
+    if (rientroRef.current) return;
+    mediaRef.current = conCambioMedia(mediaRef.current, mezzo, muto);
+  }, [rientroRef]);
+
+  // «Rientra» dalla schermata di uscita: di nuovo il token e la sala, con le
+  // scelte della sala d'attesa. Il consenso alla registrazione e' gia' stato
+  // dato.
   const handleRejoin = useCallback(() => {
     userHangupRef.current = false;
-    reconnectAttemptsRef.current = 0;
     setCredentials(null);
     setJitsiJoined(false);
+    mediaRef.current = { audio: joinPrefs.micOn, video: joinPrefs.cameraOn };
+    setMediaAllAvvio(null);
     setPhase('fetching_jwt');
-  }, []);
+  }, [joinPrefs]);
 
   const handleFeedbackClose = useCallback(() => {
     // Closing the post-event feedback panel is also a legitimate end of
@@ -894,7 +983,6 @@ export default function LiveEventClient({
   useEffect(() => {
     return () => {
       if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current);
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
     };
   }, []);
@@ -970,9 +1058,12 @@ export default function LiveEventClient({
       // to the user.
     });
 
-    // Successful (re)entry: clear any pending reconnect bookkeeping so
-    // the next genuine drop starts from a fresh attempt counter.
-    reconnectAttemptsRef.current = 0;
+    // Ingresso riuscito: un rientro in corso è finito, e la prossima caduta
+    // riparte dal primo tentativo.
+    if (rientroRef.current) {
+      concludiRientro();
+      setRipristinata(true);
+    }
     userHangupRef.current = false;
     setJitsiJoined(true);
 
@@ -992,6 +1083,8 @@ export default function LiveEventClient({
     jibriReady,
     jitsiApi,
     autoOrPromptRecording,
+    rientroRef,
+    concludiRientro,
   ]);
 
   // Show recording prompt (or auto-trigger) when Jibri becomes ready after
@@ -1038,6 +1131,9 @@ export default function LiveEventClient({
       /* best-effort */
     }
   }, [isGuest, isModerator, isSpeaker, token, event.slug]);
+  useEffect(() => {
+    segnaUscitaRef.current = sendLeaveBeacon;
+  }, [sendLeaveBeacon]);
 
   const handleReadyToClose = useCallback(() => {
     sendLeaveBeacon();
@@ -1045,10 +1141,6 @@ export default function LiveEventClient({
     if (pendingLeaveTimerRef.current) {
       clearTimeout(pendingLeaveTimerRef.current);
       pendingLeaveTimerRef.current = null;
-    }
-    if (reconnectTimerRef.current) {
-      clearTimeout(reconnectTimerRef.current);
-      reconnectTimerRef.current = null;
     }
     if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
   }, [showFeedback, sendLeaveBeacon]);
@@ -1078,12 +1170,14 @@ export default function LiveEventClient({
       if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
       return;
     }
+    // Un rientro è già partito (Jitsi ha riferito la conferenza persa prima
+    // di uscirne): non c'è altro da decidere.
+    if (rientroRef.current) return;
 
-    // Unflagged `videoConferenceLeft`: EITHER the user clicked Jitsi's own
-    // hangup ("termina chiamata" — a `readyToClose` follows within a moment)
-    // OR the network genuinely dropped. Defer the reconnect decision by a
-    // short grace window so `handleReadyToClose` can veto it; otherwise the
-    // native hangup gets misread as a blip and rejoins immediately.
+    // `videoConferenceLeft` senza un'uscita segnata: o l'hangup di Jitsi (un
+    // `readyToClose` arriva subito dopo) o la conferenza persa. La decisione
+    // aspetta una breve finestra in cui `handleReadyToClose` può fermarla:
+    // altrimenti un hangup voluto sembrerebbe una caduta, e si rientrerebbe.
     if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
     pendingLeaveTimerRef.current = setTimeout(() => {
       pendingLeaveTimerRef.current = null;
@@ -1092,50 +1186,27 @@ export default function LiveEventClient({
         if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
         return;
       }
-      // No intentional-close signal — ask the server whether the event
-      // ended (→ closing screen) or it's a real drop (→ reconnect).
+      if (rientroRef.current) return;
+      // Nessun segnale di uscita voluta: il portale dice se l'evento è
+      // concluso (la chiusura, senza un rientro nel mezzo) o se la conferenza
+      // è persa (il rientro). Senza risposta (rete ancora assente) è una
+      // caduta: il rientro continua a chiedere.
       void (async () => {
-        try {
-          const res = await fetch(`/api/events/${event.slug}/lifecycle`);
-          // readyToClose may still land while the fetch is in flight.
-          if (userHangupRef.current) {
-            setPhase(closingPhase(eventStatusRef.current));
-            return;
-          }
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status === 'ENDED') {
-              markEnded();
-              setPhase('ended');
-              return;
-            }
-          }
-          // Anything else (LIVE, non-OK response we couldn't classify)
-          // → assume the user dropped. Try to rejoin.
-          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-            reconnectAttemptsRef.current += 1;
-            setPhase('reconnecting');
-          } else {
-            setPhase(closingPhase(eventStatusRef.current));
-          }
-        } catch {
-          // Network error reaching our own API — most likely the user is
-          // still offline. Treat as a transient drop and keep retrying
-          // until we exhaust the attempt budget.
-          if (userHangupRef.current) {
-            setPhase(closingPhase(eventStatusRef.current));
-            return;
-          }
-          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-            reconnectAttemptsRef.current += 1;
-            setPhase('reconnecting');
-          } else {
-            setPhase(closingPhase(eventStatusRef.current));
-          }
+        const res = await richiestaJson(`/api/events/${event.slug}/lifecycle`);
+        // Il `readyToClose` può arrivare anche mentre si aspetta la risposta.
+        if (userHangupRef.current) {
+          setPhase(closingPhase(eventStatusRef.current));
+          return;
         }
+        if (statoEvento(res) === 'ENDED') {
+          markEnded();
+          setPhase('ended');
+          return;
+        }
+        avviaRientro();
       })();
     }, LEAVE_RECONNECT_GRACE_MS);
-  }, [showFeedback, event.slug, markEnded]);
+  }, [showFeedback, event.slug, markEnded, avviaRientro, rientroRef]);
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
   }, []);
@@ -1341,12 +1412,16 @@ export default function LiveEventClient({
   // deliberate hangup so the network-resilience path doesn't rejoin behind us.
   const leaveSelf = useCallback(() => {
     userHangupRef.current = true;
-    if (jitsiApi) {
+    // Durante un rientro la chiamata non è (ancora) in conferenza e non
+    // risponderebbe all'hangup: si esce subito, e smontarla basta. L'uscita
+    // si registra qui, perché `readyToClose` non arriverà.
+    if (jitsiApi && !rientroRef.current) {
       jitsiApi.executeCommand('hangup');
     } else {
+      sendLeaveBeacon();
       setPhase(closingPhase(eventStatusRef.current));
     }
-  }, [jitsiApi]);
+  }, [jitsiApi, rientroRef, sendLeaveBeacon]);
 
   // App-owned fullscreen toggle: targets the live root wrapper so both the
   // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
@@ -1779,40 +1854,6 @@ export default function LiveEventClient({
     );
   }
 
-  // ── Reconnecting (network drop recovery) ──
-  if (phase === 'reconnecting') {
-    return (
-      <div
-        className="d-flex flex-column align-items-center justify-content-center"
-        style={{ minHeight: '60vh' }}
-      >
-        <div
-          className="card p-4 text-center"
-          style={{ maxWidth: 480, width: '100%' }}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="d-flex justify-content-center mb-3">
-            <Spinner active double />
-          </div>
-          <h2 className="h4 mb-3">{t('reconnecting')}</h2>
-          <p className="mb-3 text-muted">{t('reconnectingMessage')}</p>
-          <p className="small text-muted mb-4">
-            {t('reconnectingAttempt', {
-              n: reconnectAttemptsRef.current,
-              total: MAX_RECONNECT_ATTEMPTS,
-            })}
-          </p>
-          <div>
-            <Button color="secondary" outline onClick={handleReconnectCancel}>
-              {t('reconnectingCancel')}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // ── Fetching JWT / Loading ──
   if (phase === 'fetching_jwt' || !credentials) {
     return (
@@ -1847,8 +1888,22 @@ export default function LiveEventClient({
   // flag is still catching up — the opaque overlay otherwise sits over the
   // native mic/cam toolbar and swallows clicks during the JVB warm-up, so the
   // moderator can't set up their camera in the "allestimento" phase.
+  // Durante un rientro dopo una caduta il bridge c'è: lo stato lo dice la
+  // sala con il proprio avviso, non «Sala in preparazione».
   const showJvbOverlay =
-    eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined;
+    eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined && !rientro;
+  // Microfono e videocamera al montaggio della chiamata: dopo una caduta come
+  // li aveva la persona, altrimenti le scelte della sala d'attesa.
+  const mediaIniziali = mediaAllAvvio ?? { audio: joinPrefs.micOn, video: joinPrefs.cameraOn };
+  // Quello che la regione annunciata dice, per chi usa un lettore di schermo:
+  // un solo testo per volta, educato (polite), mai un errore.
+  const annuncioRete = rientro
+    ? `${t('reconnecting')} ${rientroLungo ? t('reconnectingLong') : t('reconnectingAuto')}`
+    : reteInstabile && jitsiJoined
+      ? t('connectionUnstable')
+      : ripristinata
+        ? t('reconnected')
+        : '';
 
   return (
     <LivePushContext.Provider value={pushLive}>
@@ -1936,6 +1991,38 @@ export default function LiveEventClient({
       <div className="d-flex flex-column flex-lg-row flex-grow-1 live-body">
         <div className="d-flex flex-column flex-grow-1 live-main">
           <div className="flex-grow-1 position-relative">
+            {/* Lo stato della connessione per i lettori di schermo: la regione
+                resta montata e cambia solo il testo, così l'annuncio arriva. */}
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {annuncioRete}
+            </div>
+            {/* Rientro dopo una caduta: al posto della chiamata, finché non è
+                di nuovo dentro. Niente da fare per la persona. */}
+            {rientro && (
+              <div
+                className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center px-3"
+                style={{ zIndex: 10, background: 'rgba(15, 27, 45, 0.92)' }}
+                aria-hidden="true"
+              >
+                <Spinner active small className="mb-3" />
+                <p className="h5 text-white fw-semibold mb-2">{t('reconnecting')}</p>
+                <p className="text-white-50 mb-0" style={{ maxWidth: 420 }}>
+                  {rientroLungo ? t('reconnectingLong') : t('reconnectingAuto')}
+                </p>
+              </div>
+            )}
+            {/* Connessione instabile a chiamata in corso: Jitsi prova a
+                riprendere da sé, la sala lo dice senza coprire niente. */}
+            {!rientro && reteInstabile && jitsiJoined && (
+              <div
+                className="position-absolute top-0 start-50 translate-middle-x mt-2 px-3 py-1 rounded-pill small d-flex align-items-center text-white"
+                style={{ zIndex: 10, background: 'rgba(15, 27, 45, 0.88)', pointerEvents: 'none', gap: '0.5rem' }}
+                aria-hidden="true"
+              >
+                <Spinner active small />
+                <span>{t('connectionUnstable')}</span>
+              </div>
+            )}
             {showJvbOverlay && (
               <div
                 className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
@@ -1954,37 +2041,43 @@ export default function LiveEventClient({
                 </p>
               </div>
             )}
-            <JitsiRoom
-              domain={jitsiDomain}
-              roomName={credentials.roomName}
-              jwt={credentials.jwt}
-              displayName={credentials.displayName}
-              locale={locale}
-              eventSlug={event.slug}
-              // I relatori hanno AV pieno (ADR 3): i limiti dei partecipanti non
-              // valgono per loro, anche se in sala non moderano.
-              role={isActualModerator ? 'moderator' : 'participant'}
-              participantsCanUnmute={event.participantsCanUnmute || isSpeaker}
-              participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
-              participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
-              enableFileSharing={isInstantCall}
-              whiteboardEnabled={whiteboardOn}
-              whiteboardInfraReady={whiteboardInfraReady}
-              videoQuality={event.videoQuality}
-              reactionsMode={reactionsMode}
-              liveCaptions={Boolean(event.liveCaptionsAvailable)}
-              liveCaptionsOn={sottotitoliAccesi}
-              rnnoiseEnforceOff={rnnoiseEnforceOff}
-              startWithVideoMuted={!joinPrefs.cameraOn}
-              startWithAudioMuted={!joinPrefs.micOn}
-              watermark={watermark}
-              onReady={handleJitsiReady}
-              onLeft={handleJitsiLeft}
-              onReadyToClose={handleReadyToClose}
-              onParticipantCountChanged={handleParticipantCountChanged}
-              onRecordingStatusChanged={handleRecordingStatusChanged}
-              onApiReady={handleApiReady}
-            />
+            {(!rientro || rientro.montata) && (
+              <JitsiRoom
+                key={montaggio}
+                domain={jitsiDomain}
+                roomName={credentials.roomName}
+                jwt={credentials.jwt}
+                displayName={credentials.displayName}
+                locale={locale}
+                eventSlug={event.slug}
+                // I relatori hanno AV pieno (ADR 3): i limiti dei partecipanti non
+                // valgono per loro, anche se in sala non moderano.
+                role={isActualModerator ? 'moderator' : 'participant'}
+                participantsCanUnmute={event.participantsCanUnmute || isSpeaker}
+                participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
+                participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
+                enableFileSharing={isInstantCall}
+                whiteboardEnabled={whiteboardOn}
+                whiteboardInfraReady={whiteboardInfraReady}
+                videoQuality={event.videoQuality}
+                reactionsMode={reactionsMode}
+                liveCaptions={Boolean(event.liveCaptionsAvailable)}
+                liveCaptionsOn={sottotitoliAccesi}
+                rnnoiseEnforceOff={rnnoiseEnforceOff}
+                startWithVideoMuted={!mediaIniziali.video}
+                startWithAudioMuted={!mediaIniziali.audio}
+                watermark={watermark}
+                onReady={handleJitsiReady}
+                onLeft={handleJitsiLeft}
+                onReadyToClose={handleReadyToClose}
+                onConnectionLost={avviaRientro}
+                onMediaChanged={handleMediaChanged}
+                inRientro={rientro !== null}
+                onParticipantCountChanged={handleParticipantCountChanged}
+                onRecordingStatusChanged={handleRecordingStatusChanged}
+                onApiReady={handleApiReady}
+              />
+            )}
             {/* Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
                 la barra di Jitsi: impilati, non si coprono mai. Montata da
                 subito e solo nascosta sotto l'avviso di avvio del bridge:
