@@ -188,8 +188,9 @@ sanitization, so treat it as code and restrict who holds administrator access.
 `defaultTimezone` (**Default timezone**, **Branding** tab, default `Europe/Rome`) is the time zone
 that the app's date formatters use on pages, the one preselected for a new event in the wizard, and
 the one used for the date on link-preview cards. Each event keeps its own `timezone`: emails and the
-waiting-room schedule show times in it. Calendar files carry UTC instants, which each calendar
-application shows in the reader's own time zone (see
+waiting-room schedule show times in it. The calendar invitations in the emails carry the event's
+time zone with its definition, or UTC instants when that is not safe; the public calendar download
+carries UTC instants. Each calendar application shows them in the reader's own time zone (see
 [calendar files](../architecture/email.md#time-zones)).
 
 The language settings decide which of the 24 languages are offered and which is the default. What

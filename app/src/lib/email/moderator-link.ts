@@ -24,6 +24,10 @@
  * dell'indirizzo per il principale, evento + concessione per le altre) fa si'
  * che ripubblicare o risalvare l'evento non moltiplichi le email, mentre un
  * indirizzo cambiato riceve il suo link.
+ *
+ * Ogni email porta l'invito di calendario personale (lib/ical/invitation)
+ * con il link della sala: la voce nel calendario apre la sala con il ruolo
+ * giusto.
  */
 
 import { defaultLocale, locales } from '@/i18n/config';
@@ -31,8 +35,10 @@ import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { linguaEmail, linguaPagina, type EmailLocale } from '@/lib/email/lingua';
 import { emailBaseUrl } from '@/lib/email/links';
-import { enqueueEmail, enqueueEmailOnce } from '@/lib/email/outbox';
+import { enqueueEmail, enqueueEmailOnce, type EmailCalendarInvite } from '@/lib/email/outbox';
 import { escapeHtml } from '@/lib/email/templates';
+import { calendarInvite, type CalendarSeat } from '@/lib/ical/invitation';
+import { nomeOrganizzatoreCalendario, sceltaOrganizzatore } from '@/lib/ical/organizer';
 import { getSettings } from '@/lib/settings';
 import { formatDate, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -249,6 +255,81 @@ function button(label: string, url: string, primary: boolean): string {
 </td></tr></table>`;
 }
 
+/** Il link della sala con il token di chi conduce, nella lingua della pagina. */
+export function liveUrlWithToken(base: string, slug: string, token: string, pagina: string): string {
+  return localizedUrl(base, `/events/${slug}/live?token=${encodeURIComponent(token)}`, pagina);
+}
+
+/** La riga che ricorda che il link e' personale, nella lingua dell'email. */
+export function personalLinkNote(locale: EmailLocale, role: ModeratorLinkRole): string {
+  return role === 'PRIMARY' ? COPY[locale].personalPrimary : COPY[locale].personalGrant;
+}
+
+/** Quello che serve dell'evento per l'invito di calendario. */
+interface EventoInvito {
+  id: string;
+  slug: string;
+  title: unknown;
+  description: unknown;
+  startsAt: Date;
+  endsAt: Date;
+  timezone: string;
+  updatedAt: Date;
+}
+
+/**
+ * Il nome dell'organizzatore nell'invito. Una lettura che fallisce non deve
+ * fermare il link: si ricade sul nome dell'istanza.
+ */
+export async function organizzatoreInvito(
+  eventId: string,
+  settings: { organizationName?: string | null; siteName?: string | null },
+): Promise<string> {
+  try {
+    return await nomeOrganizzatoreCalendario(eventId);
+  } catch {
+    return sceltaOrganizzatore(null, settings);
+  }
+}
+
+/**
+ * L'invito di calendario di chi conduce: la sala con il suo link personale.
+ * Undefined se non si compone: il link parte comunque.
+ */
+export function invitoConduzione(
+  event: EventoInvito,
+  opts: {
+    to: string;
+    name: string | null;
+    role: ModeratorLinkRole;
+    pagina: string;
+    testi: EmailLocale;
+    liveUrl: string;
+    organizzatore: string;
+  },
+): EmailCalendarInvite | undefined {
+  const seat: CalendarSeat = opts.role === 'PRIMARY' ? 'primary' : 'grant';
+  return calendarInvite({
+    eventId: event.id,
+    updatedAt: event.updatedAt,
+    title: getLocalized(event.title as LocalizedField, opts.pagina),
+    description: getLocalized(event.description as LocalizedField, opts.pagina),
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+    timezone: event.timezone,
+    joinUrl: opts.liveUrl,
+    eventPageUrl: localizedUrl(emailBaseUrl(), `/events/${event.slug}`, opts.pagina),
+    organizerName: opts.organizzatore,
+    attendeeEmail: opts.to,
+    attendeeName: opts.name,
+    seat,
+    locale: opts.testi,
+    note: personalLinkNote(opts.testi, opts.role),
+    // Credenziale durevole: non nei promemoria a schermo (lib/ical/invitation).
+    linkInLocation: false,
+  });
+}
+
 export function moderatorLinkEmail(input: ModeratorLinkEmailInput): {
   subject: string;
   html: string;
@@ -365,12 +446,7 @@ export async function sendPrimaryModeratorLink(
     const event = await prisma.event.findUnique({
       where: { id: eventId },
       select: {
-        id: true,
-        slug: true,
-        title: true,
-        status: true,
-        startsAt: true,
-        timezone: true,
+        ...EVENT_SELECT,
         moderatorToken: true,
         moderatorName: true,
         moderatorEmail: true,
@@ -388,6 +464,7 @@ export async function sendPrimaryModeratorLink(
     const testi = linguaEmail(pagina);
     const base = emailBaseUrl();
     const token = encodeURIComponent(event.moderatorToken);
+    const liveUrl = liveUrlWithToken(base, event.slug, event.moderatorToken, pagina);
     const mail = moderatorLinkEmail({
       locale: testi,
       role: 'PRIMARY',
@@ -395,9 +472,18 @@ export async function sendPrimaryModeratorLink(
       eventTitle: getLocalized(event.title as LocalizedField, pagina),
       eventDate: formatDate(event.startsAt, testi, event.timezone),
       eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
-      liveUrl: localizedUrl(base, `/events/${event.slug}/live?token=${token}`, pagina),
+      liveUrl,
       manageUrl: localizedUrl(base, `/admin/events/${event.id}?token=${token}`, pagina),
       siteName: settings.siteName || undefined,
+    });
+    const invito = invitoConduzione(event, {
+      to,
+      name: event.moderatorName,
+      role: 'PRIMARY',
+      pagina,
+      testi,
+      liveUrl,
+      organizzatore: await organizzatoreInvito(event.id, settings),
     });
     // La lettura sopra evita di comporre l'email per niente; la garanzia è
     // l'indice unico: due richieste concorrenti ne accodano una sola.
@@ -406,6 +492,7 @@ export async function sendPrimaryModeratorLink(
       subject: mail.subject,
       html: mail.html,
       text: mail.text,
+      calendarInvite: invito,
       metadata: { kind: 'moderator-link', role: 'PRIMARY', eventId: event.id },
       dedupKey,
     });
@@ -457,9 +544,12 @@ const EVENT_SELECT = {
   id: true,
   slug: true,
   title: true,
+  description: true,
   status: true,
   startsAt: true,
+  endsAt: true,
   timezone: true,
+  updatedAt: true,
 } as const;
 
 type GrantRow = {
@@ -470,25 +560,19 @@ type GrantRow = {
   token: string;
   revokedAt: Date | null;
 };
-type GrantEvent = {
-  id: string;
-  slug: string;
-  title: unknown;
-  status: string;
-  startsAt: Date;
-  timezone: string;
-};
+type GrantEvent = EventoInvito & { status: string };
 
 /** Compone e accoda il link di una concessione; false se non deve partire. */
 async function accodaConcessione(
   grant: GrantRow,
   event: GrantEvent,
-  settings: { siteName?: string | null },
+  settings: { siteName?: string | null; organizationName?: string | null },
   /** `ancora`: un nuovo invio chiesto da chi gestisce («Reinvia link»). Se
    *  il primo invio non c'era, questo prende il suo posto (con la sua chiave,
    *  cosi' un salvataggio successivo non ne accoda un altro); se c'era, si
-   *  accoda senza chiave. */
-  opts: { locale: string; ancora?: boolean },
+   *  accoda senza chiave. `organizzatore`: il nome per l'invito di
+   *  calendario, se chi chiama l'ha gia' letto. */
+  opts: { locale: string; ancora?: boolean; organizzatore?: string },
 ): Promise<boolean> {
   if (grant.revokedAt || NO_SEND_STATUSES.has(event.status)) return false;
   const to = tryDecryptPII(grant.email)?.trim();
@@ -497,18 +581,16 @@ async function accodaConcessione(
   const pagina = linguaPagina(opts.locale) ?? defaultLocale;
   const testi = linguaEmail(pagina);
   const role: ModeratorLinkRole = grant.role === 'SPEAKER' ? 'SPEAKER' : 'MODERATOR';
+  const name = tryDecryptPII(grant.name) ?? grant.name;
+  const liveUrl = liveUrlWithToken(emailBaseUrl(), event.slug, grant.token, pagina);
   const mail = moderatorLinkEmail({
     locale: testi,
     role,
-    name: tryDecryptPII(grant.name) ?? grant.name,
+    name,
     eventTitle: getLocalized(event.title as LocalizedField, pagina),
     eventDate: formatDate(event.startsAt, testi, event.timezone),
     eventTime: formatTimeWithZone(event.startsAt, testi, event.timezone),
-    liveUrl: localizedUrl(
-      emailBaseUrl(),
-      `/events/${event.slug}/live?token=${encodeURIComponent(grant.token)}`,
-      pagina,
-    ),
+    liveUrl,
     siteName: settings.siteName || undefined,
   });
   const messaggio = {
@@ -516,6 +598,15 @@ async function accodaConcessione(
     subject: mail.subject,
     html: mail.html,
     text: mail.text,
+    calendarInvite: invitoConduzione(event, {
+      to,
+      name,
+      role,
+      pagina,
+      testi,
+      liveUrl,
+      organizzatore: opts.organizzatore ?? (await organizzatoreInvito(event.id, settings)),
+    }),
     metadata: { kind: 'moderator-link', role, eventId: event.id, grantId: grant.id },
   };
   const primo = await enqueueEmailOnce({ ...messaggio, dedupKey: dedupKeyGrant(event.id, grant.id) });
@@ -574,11 +665,12 @@ export async function sendGrantModeratorLinks(
     });
     const partite = new Set(gia.map((r) => r.dedupKey));
     const settings = await getSettings();
+    const organizzatore = await organizzatoreInvito(event.id, settings);
     let accodate = 0;
     for (const g of grants) {
       if (partite.has(dedupKeyGrant(eventId, g.id))) continue;
       try {
-        if (await accodaConcessione(g, event, settings, opts)) accodate += 1;
+        if (await accodaConcessione(g, event, settings, { ...opts, organizzatore })) accodate += 1;
       } catch (err) {
         // Una concessione che non va in coda non ferma le altre; si ritenta
         // al prossimo salvataggio.

@@ -4,8 +4,9 @@
  */
 
 import nodemailer from 'nodemailer';
-import type { Transporter } from 'nodemailer';
+import type { SendMailOptions, Transporter } from 'nodemailer';
 
+import type { EmailAttachment, EmailCalendarInvite } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
 
 let transporter: Transporter | null = null;
@@ -36,16 +37,13 @@ function getTransporter(): Transporter {
   return transporter;
 }
 
-interface SendEmailInput {
+export interface SendEmailInput {
   to: string;
   subject: string;
   html: string;
   text?: string;
-  attachments?: Array<{
-    filename: string;
-    content: string;
-    contentType: string;
-  }>;
+  attachments?: EmailAttachment[];
+  calendarInvite?: EmailCalendarInvite;
 }
 
 /**
@@ -83,23 +81,46 @@ export async function resolveSender(): Promise<{ fromName: string; replyTo?: str
   }
 }
 
-export async function sendEmail(input: SendEmailInput): Promise<void> {
-  const transport = getTransporter();
-
-  const { fromName, replyTo } = await resolveSender();
-
-  await transport.sendMail({
+/**
+ * Le opzioni nodemailer del messaggio. Separata dall'invio per poter comporre
+ * il MIME vero nei test.
+ *
+ * L'invito di calendario va in `icalEvent`: nodemailer lo mette sia come
+ * parte alternativa `text/calendar; method=REQUEST` accanto a testo e HTML,
+ * sia come allegato `invite.ics`. La parte alternativa e' quella che fa
+ * comparire in Gmail e Outlook la scheda dell'invito; l'allegato serve ai
+ * client che non la leggono.
+ */
+export function mailOptions(
+  input: SendEmailInput,
+  sender: { fromName: string; replyTo?: string },
+): SendMailOptions {
+  return {
     // Object form on purpose: nodemailer quotes and encodes the display name
     // itself. Hand-building `"name" <addr>` meant sanitising by hand, and a
     // sanitiser that strips `"` but not `\` still lets a name ending in a
     // backslash escape the closing quote — the quoted string never terminates
     // and EVERY outgoing message gets a broken From.
-    from: { name: fromName, address: process.env.SMTP_FROM ?? 'noreply@dominio.gov.it' },
+    from: { name: sender.fromName, address: process.env.SMTP_FROM ?? 'noreply@dominio.gov.it' },
     to: input.to,
-    ...(replyTo ? { replyTo } : {}),
+    ...(sender.replyTo ? { replyTo: sender.replyTo } : {}),
     subject: input.subject,
     html: input.html,
     text: input.text,
     attachments: input.attachments,
-  });
+    ...(input.calendarInvite
+      ? {
+          icalEvent: {
+            method: input.calendarInvite.method,
+            filename: 'invite.ics',
+            content: input.calendarInvite.content,
+          },
+        }
+      : {}),
+  };
+}
+
+export async function sendEmail(input: SendEmailInput): Promise<void> {
+  const transport = getTransporter();
+  await transport.sendMail(mailOptions(input, await resolveSender()));
 }

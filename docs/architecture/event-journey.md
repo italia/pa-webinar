@@ -287,7 +287,7 @@ sequenceDiagram
   else registration open to anyone, new registrant
     R->>DB: INSERT Registration, create or refresh Person only with address-book consent
     R->>DB: INSERT GdprAuditLog CONSENT_RECORDED, then COMMIT
-    R->>DB: INSERT EmailOutbox row, confirmation with the entry link signed with proof, and .ics attached
+    R->>DB: INSERT EmailOutbox row, confirmation with the entry link signed with proof, and calendar invitation
     R-->>B: 201 accessToken and joinUrl, Set-Cookie event_access_{eventId}
   else invitation only, chosen by the event or by the site setting
     R->>DB: lookup in transaction, INSERT only for an invited address
@@ -325,7 +325,7 @@ The page's language is sent along and stored on the registration. Later emails u
    - links the address-book person record, which is created or refreshed only with the separate address-book consent ([ADR-011](../adr/011-person-rubrica.md));
    - inserts the registration with the consent timestamp;
    - writes a `CONSENT_RECORDED` entry to `GdprAuditLog` with the consent flags and no personal data.
-6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link as the signed entry link `/api/events/{slug}/registrations/enter?token=…&proof=…&lang=…` (with `sig=…` in place of `proof=…` while registration is by invitation only, as described next), links to add the event to Google, Outlook and Yahoo calendars, which carry the unsigned link, and an `.ics` attachment. A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
+6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link as the signed entry link `/api/events/{slug}/registrations/enter?token=…&proof=…&lang=…` (with `sig=…` in place of `proof=…` while registration is by invitation only, as described next), links to add the event to Google, Outlook and Yahoo calendars, which carry the unsigned link, and the registrant's calendar invitation (`METHOD:REQUEST`, with the unsigned link, [email.md](email.md#the-calendar-invitation)). A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
 7. Answers `201` with the access token and the unsigned personal link, `/events/{slug}/live?token=<accessToken>` localized to the page's language, and sets the signed `event_access_<eventId>` cookie. The cookie lets the same browser return to the live page without the token in the URL. Opening the signed link from the email in the same browser also records that the address is proved, which the profile photo requires ([identity-and-access.md](identity-and-access.md#registrants)). When registration is by invitation only, it answers `202` instead, as described next.
 
 ### Invitation-only registration

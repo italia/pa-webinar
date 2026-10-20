@@ -33,6 +33,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { stripCalendarInvite } from '@/lib/email/outbox';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { ORGANIZATION_TYPES } from '@/lib/validation/schemas';
@@ -122,10 +123,25 @@ export const PATCH = withErrorHandling(async (request, context) => {
     }
 
     if (!cambiaEmail) return 0;
+    const inCoda = { status: 'PENDING' as const, metadata: { path: ['registrationId'], equals: reg.id } };
     const r = await tx.emailOutbox.updateMany({
-      where: { status: 'PENDING', metadata: { path: ['registrationId'], equals: reg.id } },
+      where: inCoda,
       data: { toAddress: encryptPII(b.email!) },
     });
+    // L'invito di calendario in coda porta il vecchio indirizzo: si toglie,
+    // e il prossimo invio porta quello del nuovo (lib/email/outbox).
+    if (r.count > 0) {
+      const righe = await tx.emailOutbox.findMany({
+        where: inCoda,
+        select: { id: true, attachments: true },
+      });
+      for (const riga of righe) {
+        const senzaInvito = stripCalendarInvite(riga.attachments);
+        if (senzaInvito !== null) {
+          await tx.emailOutbox.update({ where: { id: riga.id }, data: { attachments: senzaInvito } });
+        }
+      }
+    }
     return r.count;
   });
 

@@ -9,6 +9,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn(), findMany: vi.fn() },
+    eventOrganizer: { findFirst: vi.fn(async () => ({ name: 'Ente di prova' })) },
     emailOutbox: { findUnique: vi.fn(), findMany: vi.fn() },
   },
 }));
@@ -52,9 +53,12 @@ function eventRow(over: Record<string, unknown> = {}) {
     id: EVENT_ID,
     slug: 'incontro-mensile',
     title: { it: 'Incontro mensile', en: 'Monthly meeting' },
+    description: { it: 'Ordine del giorno', en: 'Agenda' },
     status: 'PUBLISHED',
     startsAt: new Date('2027-03-01T09:00:00Z'),
+    endsAt: new Date('2027-03-01T10:30:00Z'),
     timezone: 'Europe/Rome',
+    updatedAt: new Date('2027-02-01T08:00:00Z'),
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Relatore 1',
     moderatorEmail: 'moderatore@example.test',
@@ -75,7 +79,14 @@ function grantRow(over: Record<string, unknown> = {}) {
   };
 }
 
-function queued(): { to: string; subject: string; html: string; text: string; metadata: Record<string, unknown> } {
+function queued(): {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  metadata: Record<string, unknown>;
+  calendarInvite?: { method: string; content: string };
+} {
   expect(mockedEnqueue).toHaveBeenCalledTimes(1);
   return mockedEnqueue.mock.calls[0]![0];
 }
@@ -111,6 +122,13 @@ describe('sendPrimaryModeratorLink', () => {
     expect(mail.subject).not.toContain(PRIMARY_TOKEN);
     expect(mail.metadata).toMatchObject({ kind: 'moderator-link', role: 'PRIMARY', eventId: EVENT_ID });
     expect(JSON.stringify(mail.metadata)).not.toContain(PRIMARY_TOKEN);
+    // L'invito di calendario: la sala con il token principale, un UID per il
+    // posto da moderatore principale.
+    const ics = mail.calendarInvite!.content.replace(/\r\n /g, '');
+    expect(ics).toContain(`/it/eventi/incontro-mensile/live?token=${PRIMARY_TOKEN}`);
+    expect(ics).toMatch(/^ATTENDEE;[^\r\n]*:mailto:moderatore@example\.test\r?$/m);
+    expect(ics).toContain(`UID:${EVENT_ID}.primary.`);
+    expect(ics).toContain('Questo link è personale');
   });
 
   it('does not send twice for the same address (publish after create, re-publish)', async () => {
@@ -159,6 +177,45 @@ describe('sendGrantModeratorLink', () => {
     expect(mail.text).not.toContain('/admin/');
     expect(mail.text).toContain('This link is personal');
     expect(mail.metadata).toMatchObject({ role: 'SPEAKER', grantId: 'grant-1' });
+  });
+
+  it('carries the personal calendar invitation with the room link and the warning', async () => {
+    await sendGrantModeratorLink('grant-1', { locale: 'en' });
+    const invito = queued().calendarInvite!;
+    expect(invito.method).toBe('REQUEST');
+    const ics = invito.content.replace(/\r\n /g, '');
+    expect(ics).toMatch(/^ATTENDEE;[^\r\n]*CN="Relatrice 2"[^\r\n]*:mailto:relatrice@example\.test\r?$/m);
+    expect(ics).toContain(`URL:https://portale.example.test/en/events/incontro-mensile/live?token=${GRANT_TOKEN}`);
+    // Il token non va in LOCATION, che i promemoria mostrano a schermo.
+    expect(ics).toMatch(/^LOCATION:https:\/\/portale\.example\.test\/en\/events\/incontro-mensile\r?$/m);
+    expect(ics).toContain('This link is personal');
+    expect(ics).toContain('ORGANIZER;CN="Ente di prova"');
+    expect(ics).toContain(`UID:${EVENT_ID}.grant.`);
+    // Ora di Roma con la sua definizione, non l'ora UTC rietichettata.
+    expect(ics).toContain('DTSTART;TZID=Europe/Rome:20270301T100000');
+    expect(ics).toContain('BEGIN:VTIMEZONE');
+  });
+
+  it('still sends the link when the organizer lookup fails', async () => {
+    const org = (prisma as unknown as { eventOrganizer: { findFirst: ReturnType<typeof vi.fn> } })
+      .eventOrganizer.findFirst;
+    org.mockRejectedValueOnce(new Error('db blip'));
+    expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    expect(queued().calendarInvite!.content).toContain('ORGANIZER;CN="Portale eventi"');
+  });
+
+  it('still sends the link when the calendar invitation cannot be built', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    db.eventModerator.findUnique.mockResolvedValue(
+      grantRow({ event: eventRow({ endsAt: new Date('invalid') }) }),
+    );
+    expect(await sendGrantModeratorLink('grant-1', { locale: 'it' })).toBe(true);
+    const mail = queued();
+    expect(mail.calendarInvite).toBeUndefined();
+    expect(mail.text).toContain(`live?token=${GRANT_TOKEN}`);
+    // Nel log mai il link.
+    expect(JSON.stringify(spy.mock.calls)).not.toContain(GRANT_TOKEN);
+    spy.mockRestore();
   });
 
   it('sends a co-moderator the moderation wording', async () => {

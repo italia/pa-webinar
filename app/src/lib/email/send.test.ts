@@ -138,6 +138,24 @@ describe('sendEmail', () => {
     expect(call.attachments[0].filename).toBe('event.ics');
   });
 
+  it('passes the calendar invitation as nodemailer icalEvent, and nothing when absent', async () => {
+    await sendEmail({
+      to: 'user@example.com',
+      subject: 'Test',
+      html: '<p>HTML</p>',
+      calendarInvite: { method: 'REQUEST', content: 'BEGIN:VCALENDAR\r\nMETHOD:REQUEST\r\n' },
+    });
+    expect(mockSendMail.mock.calls[0]![0].icalEvent).toEqual({
+      method: 'REQUEST',
+      filename: 'invite.ics',
+      content: 'BEGIN:VCALENDAR\r\nMETHOD:REQUEST\r\n',
+    });
+
+    mockSendMail.mockClear();
+    await sendEmail({ to: 'user@example.com', subject: 'Test', html: '<p>HTML</p>' });
+    expect(mockSendMail.mock.calls[0]![0]).not.toHaveProperty('icalEvent');
+  });
+
   it('throws when sendMail fails', async () => {
     mockSendMail.mockRejectedValueOnce(new Error('SMTP connection refused'));
     await expect(

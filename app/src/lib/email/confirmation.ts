@@ -6,11 +6,14 @@
  * via the pooled SMTP transport. The API route is no longer coupled
  * to SMTP latency, and if the pod restarts the mail survives in
  * Postgres.
+ *
+ * L'email porta l'invito di calendario personale (lib/ical/invitation): i
+ * client di posta lo mostrano come un invito da aggiungere o accettare.
  */
 
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
-import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { registrationInvite } from '@/lib/ical/invitation';
 import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import {
   generateGoogleCalendarUrl,
@@ -52,7 +55,7 @@ interface ConfirmationEmailInput {
 }
 
 /**
- * Enqueue the confirmation email with iCal attachment into EmailOutbox.
+ * Enqueue the confirmation email into EmailOutbox.
  *
  * Synchronous (single DB insert). Errors are logged and swallowed so
  * the caller's happy path (API 201 response) is never blocked.
@@ -112,18 +115,18 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', input.locale),
     };
 
-    // UID stabile e SEQUENCE dall'ultima modifica: la conferma, i promemoria e
-    // l'avviso di cambio data aggiornano la stessa voce di calendario.
-    const icsContent = generateEventICal({
-      eventId: event.id,
-      updatedAt: event.updatedAt,
+    // L'invito personale: UID stabile per evento e indirizzo e SEQUENCE
+    // dall'ultima modifica, cosi' la conferma, i promemoria e l'avviso di
+    // cambio data aggiornano la stessa voce di calendario. Il link e' quello
+    // della sala, senza la firma dell'email: la voce si inoltra.
+    const invito = registrationInvite(event, {
       title,
       description,
-      startsAt: event.startsAt,
-      endsAt: event.endsAt,
-      timezone: event.timezone,
-      url: input.eventPageUrl,
+      roomUrl: calendarInput.joinUrl,
+      eventPageUrl: input.eventPageUrl,
       organizerName: await nomeOrganizzatoreCalendario(event.id),
+      attendeeEmail: recipientEmail,
+      locale: testi,
     });
 
     const override = await loadEmailTemplateOverride('confirmation', testi);
@@ -146,13 +149,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       subject: resolved.subject,
       html: confirmationHtml(templateInput, resolved),
       text: confirmationText(templateInput, resolved),
-      attachments: [
-        {
-          filename: 'event.ics',
-          content: icsContent,
-          contentType: ICS_ATTACHMENT_CONTENT_TYPE,
-        },
-      ],
+      calendarInvite: invito,
       metadata: {
         kind: 'confirmation',
         registrationId: input.registrationId,

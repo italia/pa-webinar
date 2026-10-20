@@ -9,22 +9,35 @@
 
 import { Prisma } from '@prisma/client';
 
-import { encryptPII } from '@/lib/crypto/pii';
+import { encryptJSON, encryptPII, tryDecryptJSON } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+
+export interface EmailAttachment {
+  filename: string;
+  // nodemailer accepts utf8 strings for text attachments and base64
+  // via `encoding: 'base64'` for binary. We persist the string as-is
+  // in JSONB and re-hydrate at send time.
+  content: string;
+  contentType: string;
+}
+
+/**
+ * Un invito di calendario (iCalendar) da spedire come parte alternativa
+ * `text/calendar; method=…` del messaggio, piu' l'allegato `.ics`: e' la forma
+ * che Gmail e Outlook riconoscono come invito (lib/ical/invitation).
+ */
+export interface EmailCalendarInvite {
+  method: 'REQUEST';
+  content: string;
+}
 
 export interface EnqueueEmailInput {
   to: string;
   subject: string;
   html: string;
   text?: string;
-  attachments?: Array<{
-    filename: string;
-    // nodemailer accepts utf8 strings for text attachments and base64
-    // via `encoding: 'base64'` for binary. We persist the string as-is
-    // in JSONB and re-hydrate at send time.
-    content: string;
-    contentType: string;
-  }>;
+  attachments?: EmailAttachment[];
+  calendarInvite?: EmailCalendarInvite;
   // Free-form metadata — e.g. { kind: 'confirmation', registrationId }
   // — kept purely for audit/debug; the processor never reads it.
   metadata?: Record<string, unknown>;
@@ -49,9 +62,7 @@ export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
       subject: input.subject,
       html: encryptPII(input.html),
       text: input.text != null ? encryptPII(input.text) : null,
-      attachments: input.attachments
-        ? (input.attachments as unknown as Prisma.InputJsonValue)
-        : Prisma.JsonNull,
+      attachments: packOutboxParts(input),
       metadata: input.metadata
         ? (input.metadata as unknown as Prisma.InputJsonValue)
         : Prisma.JsonNull,
@@ -60,6 +71,84 @@ export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
     select: { id: true },
   });
   return row.id;
+}
+
+/**
+ * Allegati e invito di calendario come si salvano nella colonna `attachments`.
+ *
+ * Con un invito la colonna e' cifrata (`{ enc }`, come encryptJSON): l'invito
+ * porta l'indirizzo di chi lo riceve e il suo link personale, che a riposo
+ * stanno cifrati come il corpo dell'email. Senza invito resta l'elenco in
+ * chiaro di sempre. Un processo della versione precedente che legge una riga
+ * cifrata non vede un elenco e spedisce l'email senza allegati, invece di
+ * allegare testo cifrato.
+ */
+export function packOutboxParts(
+  input: Pick<EnqueueEmailInput, 'attachments' | 'calendarInvite'>,
+): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+  const attachments = input.attachments?.length ? input.attachments : undefined;
+  if (input.calendarInvite) {
+    return encryptJSON({ attachments: attachments ?? [], calendarInvite: input.calendarInvite });
+  }
+  return attachments ? (attachments as unknown as Prisma.InputJsonValue) : Prisma.JsonNull;
+}
+
+function isAttachment(v: unknown): v is EmailAttachment {
+  if (typeof v !== 'object' || v === null) return false;
+  const a = v as Record<string, unknown>;
+  return (
+    typeof a.filename === 'string' &&
+    typeof a.content === 'string' &&
+    typeof a.contentType === 'string'
+  );
+}
+
+/**
+ * L'inverso di packOutboxParts: legge sia le righe in chiaro (un elenco di
+ * allegati) sia quelle cifrate. Una forma che non si riconosce non blocca
+ * l'invio: l'email parte senza le parti che non si leggono.
+ */
+export function unpackOutboxParts(stored: unknown): {
+  attachments?: EmailAttachment[];
+  calendarInvite?: EmailCalendarInvite;
+} {
+  const valore = tryDecryptJSON<unknown>(stored);
+  if (Array.isArray(valore)) {
+    const attachments = valore.filter(isAttachment);
+    return attachments.length ? { attachments } : {};
+  }
+  if (typeof valore !== 'object' || valore === null) return {};
+  if ('enc' in valore) {
+    // Cifrato ma illeggibile: l'email parte senza, ma resta traccia (senza dati).
+    console.warn('[email] outbox attachments unreadable, sending without them');
+    return {};
+  }
+  const v = valore as { attachments?: unknown; calendarInvite?: unknown };
+  const attachments = Array.isArray(v.attachments) ? v.attachments.filter(isAttachment) : [];
+  const invito = v.calendarInvite as Partial<EmailCalendarInvite> | undefined;
+  const calendarInvite =
+    invito && invito.method === 'REQUEST' && typeof invito.content === 'string'
+      ? { method: invito.method, content: invito.content }
+      : undefined;
+  return {
+    ...(attachments.length ? { attachments } : {}),
+    ...(calendarInvite ? { calendarInvite } : {}),
+  };
+}
+
+/**
+ * La colonna `attachments` senza l'invito di calendario, oppure null se non
+ * c'e' un invito da togliere. Serve quando cambia l'indirizzo di una riga in
+ * coda: l'invito porta il vecchio indirizzo (ATTENDEE e UID), e mandarlo al
+ * nuovo darebbe una voce intestata ad altri. Le email successive portano
+ * l'invito giusto.
+ */
+export function stripCalendarInvite(
+  stored: unknown,
+): Prisma.InputJsonValue | typeof Prisma.JsonNull | null {
+  const parti = unpackOutboxParts(stored);
+  if (!parti.calendarInvite) return null;
+  return packOutboxParts({ attachments: parti.attachments });
 }
 
 /**

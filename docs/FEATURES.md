@@ -29,7 +29,7 @@ flowchart LR
     direction TB
     B1["Discover<br/>home page, event list,<br/>calendar, a shared link"]
     B2["Register<br/>name, email, consents,<br/>optional organization fields"]
-    B3["Get reminded<br/>confirmation and .ics file,<br/>reminders before the start"]
+    B3["Get reminded<br/>confirmation and calendar invitation,<br/>reminders before the start"]
     B1 --> B2 --> B3
   end
 
@@ -183,7 +183,7 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
 - **Personal link.** Registration returns a personal join link and sets a signed cookie in that browser (with invitation-only registration, opening the emailed link sets the cookie instead). A registrant who comes back to the room without the link is still recognized. A forwarded link does not carry the registrant's name: whoever opens it enters as a guest under a name they type. With invitation-only registration the emailed link is signed, so forwarding the whole email forwards the identity too.
 - **Routing after registration.** If the event starts soon, the new registrant goes straight to the waiting room. How soon is set by the `waitingRoomLeadMinutes` site setting. Otherwise they see a confirmation screen with the calendar links. With invitation-only registration they are told to check their email instead.
 - **Emails.**
-  - A confirmation with the personal link and an `.ics` file.
+  - A confirmation with the personal link and a calendar invitation, which mail clients show as an invitation to accept or add.
   - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them before the event, with **Edit** in the **Notifications** panel of the event page: up to five per event, chosen from presets between **7 days before** and **15 minutes before**. A reminder already sent stays, and a moment already passed cannot be chosen.
   - A notice when the date of a published event changes.
   - An *optional* thank-you email after the event, with a recap and, for those who entered the room, a rating link.
