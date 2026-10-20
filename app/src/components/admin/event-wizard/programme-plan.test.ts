@@ -9,6 +9,7 @@ import {
   concessioneDaChiave,
   erroriProgramma,
   opzioniRelatore,
+  orariDelModulo,
   pianoCambiato,
   pianoDaInviare,
   type AgendaDraft,
@@ -259,5 +260,73 @@ describe('conIdSalvati', () => {
   it('se il numero non torna non tocca niente', () => {
     const righe = [riga({ label: 'Uno' })];
     expect(conIdSalvati(righe, salvato)).toEqual(righe);
+  });
+});
+
+describe('orariDelModulo', () => {
+  const INIZIO = new Date('2026-10-29T09:00:00.000Z');
+  const ore = (inizi: Array<Date | null>) =>
+    inizi.map((d) => d?.toISOString().slice(11, 16) ?? null);
+
+  it('una riga vuota non ha orario e non sposta quelli dopo', () => {
+    const { inizi, totale, fine } = orariDelModulo(
+      [
+        riga({ label: 'Uno', minutes: '10' }),
+        // Vuota, anche con i minuti scritti: non si salva, non conta.
+        riga({ label: '  ', minutes: '30' }),
+        riga({ label: 'Due', minutes: '20' }),
+      ],
+      INIZIO
+    );
+    expect(ore(inizi)).toEqual(['09:00', null, '09:10']);
+    expect(totale).toBe(30);
+    expect(fine?.toISOString()).toBe('2026-10-29T09:30:00.000Z');
+  });
+
+  it('una riga vuota appena aggiunta non toglie il totale né la fine', () => {
+    const { totale, fine } = orariDelModulo(
+      [
+        riga({ label: 'Uno', minutes: '10' }),
+        riga({ label: 'Due', minutes: '20' }),
+        riga({ label: 'Tre', minutes: '30' }),
+        riga({ label: '', minutes: '' }),
+      ],
+      INIZIO
+    );
+    // Come il riepilogo e la pagina pubblica: tre argomenti, un'ora.
+    expect(totale).toBe(60);
+    expect(fine?.toISOString()).toBe('2026-10-29T10:00:00.000Z');
+  });
+
+  it('dal primo argomento senza durata in poi niente orari, e niente totale', () => {
+    const { inizi, totale, fine } = orariDelModulo(
+      [
+        riga({ label: 'Uno', minutes: '10' }),
+        riga({ label: 'Due', minutes: '' }),
+        riga({ label: 'Tre', minutes: '15' }),
+      ],
+      INIZIO
+    );
+    expect(ore(inizi)).toEqual(['09:00', '09:10', null]);
+    expect(totale).toBeNull();
+    expect(fine).toBeNull();
+  });
+
+  it('senza un inizio valido niente orari, ma il totale si conosce', () => {
+    const { inizi, totale, fine } = orariDelModulo(
+      [riga({ label: 'Uno', minutes: '10' })],
+      null
+    );
+    expect(inizi).toEqual([null]);
+    expect(totale).toBe(10);
+    expect(fine).toBeNull();
+  });
+
+  it('senza argomenti con un titolo: nessun totale', () => {
+    expect(orariDelModulo([riga({ label: '' })], INIZIO)).toEqual({
+      inizi: [null],
+      totale: null,
+      fine: null,
+    });
   });
 });

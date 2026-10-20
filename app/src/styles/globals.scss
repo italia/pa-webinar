@@ -6313,18 +6313,29 @@ button.live-time-strip__rec {
 }
 
 .event-programma__elenco {
-  // La colonna dell'ora e quella della linea con i punti.
+  // La colonna dell'ora (almeno questa larghezza) e quella della linea con i
+  // punti. L'ora e' larga quanto la piu' lunga dell'elenco: «15:30», ma anche
+  // «03:30 PM» o «03:30 μ.μ.» nelle lingue con l'orologio a 12 ore.
   --programma-ora: 3.25rem;
   --programma-binario: 2rem;
+  display: grid;
+  grid-template-columns:
+    minmax(var(--programma-ora), max-content) var(--programma-binario)
+    minmax(0, 1fr) auto;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+// Ogni argomento usa le colonne dell'elenco (subgrid), cosi' l'ora, il punto
+// e il testo stanno in colonna da una riga all'altra. Un browser senza
+// subgrid tiene la colonna dell'ora fissa.
 .event-programma__voce {
   position: relative;
   display: grid;
+  grid-column: 1 / -1;
   grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr) auto;
+  grid-template-columns: subgrid;
   grid-template-areas: 'quando . corpo durata';
   align-items: baseline;
   padding-bottom: 1.5rem;
@@ -6333,13 +6344,17 @@ button.live-time-strip__rec {
     padding-bottom: 0;
   }
 
-  // La linea, dal punto di questo argomento a quello del successivo.
+  // La linea, dal punto di questo argomento a quello del successivo. Linea e
+  // punto si posano sulla seconda colonna, quella del binario, qualunque sia
+  // la larghezza dell'ora: per un elemento posizionato la colonna va chiusa
+  // (2 / 3), altrimenti arriva fino al bordo.
   &::before {
     content: '';
     position: absolute;
+    grid-column: 2 / 3;
     top: calc(0.4rem + 12px);
     bottom: -0.4rem;
-    left: calc(var(--programma-ora) + var(--programma-binario) / 2 - 1px);
+    left: calc(50% - 1px);
     width: 2px;
     background: #d6e3f1;
   }
@@ -6352,8 +6367,9 @@ button.live-time-strip__rec {
   &::after {
     content: '';
     position: absolute;
+    grid-column: 2 / 3;
     top: 0.4rem;
-    left: calc(var(--programma-ora) + var(--programma-binario) / 2 - 6px);
+    left: calc(50% - 6px);
     width: 12px;
     height: 12px;
     border: 2px solid #0066cc;
@@ -6488,10 +6504,14 @@ button.live-time-strip__rec {
   .event-programma__elenco {
     --programma-ora: 3rem;
     --programma-binario: 1.75rem;
+    grid-template-columns:
+      minmax(var(--programma-ora), max-content) var(--programma-binario)
+      minmax(0, 1fr);
   }
 
   .event-programma__voce {
     grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr);
+    grid-template-columns: subgrid;
     grid-template-rows: auto 1fr;
     grid-template-areas:
       'quando . corpo'

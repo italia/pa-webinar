@@ -7,12 +7,13 @@
  * spenta il gruppo e' una riga sola, con il pulsante che la accende.
  *
  * Gli orari si calcolano dall'inizio dell'evento, nel suo fuso, sommando le
- * durate: si fermano al primo argomento senza durata. Un programma che va
- * oltre la fine dell'evento lo dice, senza impedire di salvare.
+ * durate: si fermano al primo argomento senza durata. Contano solo le righe
+ * con un titolo, come nel salvataggio e nella pagina pubblica. Un programma
+ * che va oltre la fine dell'evento lo dice, senza impedire di salvare.
  *
- * Quando l'agenda e' gia' stata usata in sala (un argomento avviato, o con le
- * reazioni del pubblico) il gruppo si legge soltanto: da li' l'agenda si
- * guida dalla sala.
+ * Quando l'agenda e' gia' stata usata in sala (un argomento non piu' da
+ * discutere) il gruppo si legge soltanto: da li' l'agenda si guida dalla
+ * sala.
  */
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -20,7 +21,6 @@ import { useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
-import { orariProgramma, parsePlannedMinutes } from '@/lib/agenda/programme';
 import { splitAgendaLines, MAX_AGENDA_ITEMS } from '@/lib/agenda/status';
 import type { PersonRole } from '@/lib/events/grant-profile';
 import { toDatetimeLocalInTz } from '@/lib/utils/date-format';
@@ -28,9 +28,11 @@ import { toDatetimeLocalInTz } from '@/lib/utils/date-format';
 import {
   CHIAVE_PRINCIPALE,
   chiaviOrfane,
+  haTitolo,
   istanteDalModulo,
   nuovaVoce,
   opzioniRelatore,
+  orariDelModulo,
   type AgendaDraft,
 } from './programme-plan';
 import Gruppo from './wizard-group';
@@ -146,19 +148,12 @@ export default function ProgrammeSection({
   const tz = value.timezone;
   const inizio = istanteDalModulo(value.startsAt, tz);
   const fine = istanteDalModulo(value.endsAt, tz);
-  const minuti = agenda.map((v) => parsePlannedMinutes(v.minutes) ?? null);
-  const orari = inizio
-    ? orariProgramma(
-        inizio,
-        minuti.map((m) => ({ plannedMinutes: m }))
-      )
-    : [];
+  // Solo le righe con un titolo: una riga vuota non si salva, non ha orario
+  // e non sposta quelli dopo.
+  const { inizi, totale, fine: fineProgramma } = orariDelModulo(agenda, inizio);
   const ora = (d: Date | null | undefined) =>
     d ? toDatetimeLocalInTz(d, tz).slice(11, 16) : null;
-  const compilate = agenda.filter((v) => v.label.trim()).length;
-  const tutteConDurata = agenda.length > 0 && minuti.every((m) => m !== null);
-  const totale = minuti.reduce<number>((s, m) => s + (m ?? 0), 0);
-  const fineProgramma = tutteConDurata ? (orari.at(-1)?.end ?? null) : null;
+  const compilate = agenda.filter(haTitolo).length;
   const oltre =
     fineProgramma && fine
       ? Math.round((fineProgramma.getTime() - fine.getTime()) / 60_000)
@@ -222,17 +217,20 @@ export default function ProgrammeSection({
               const rid = `wiz-programma-${i}`;
               const scelta = opzioni.find((o) => o.key === v.speakerKey);
               const minutiErrati = !!fieldErrors[`agenda.${i}.minutes`];
-              const orario = ora(orari[i]?.start);
+              const inizioRiga = inizi[i] ?? null;
               return (
                 <li key={v.key} className="wizard-programma__voce">
                   <span className="wizard-programma__ora">
-                    {orario ? (
-                      <time dateTime={orari[i]!.start!.toISOString()}>{orario}</time>
-                    ) : (
+                    {inizioRiga ? (
+                      <time dateTime={inizioRiga.toISOString()}>{ora(inizioRiga)}</time>
+                    ) : haTitolo(v) ? (
                       <span title={t('programTimeUnknown')}>
                         <span aria-hidden="true">–</span>
                         <span className="visually-hidden">{t('programTimeUnknown')}</span>
                       </span>
+                    ) : (
+                      // Una riga senza titolo non ha orario: non si salva.
+                      <span aria-hidden="true">–</span>
                     )}
                   </span>
                   <div className="wizard-programma__argomento">
@@ -354,9 +352,9 @@ export default function ProgrammeSection({
 
       {!locked && <Aggiunta agenda={agenda} onChange={onChange} />}
 
-      {agenda.length > 0 && (
+      {compilate > 0 && (
         <div className="wizard-programma__totale" aria-live="polite">
-          {fineProgramma ? (
+          {fineProgramma && totale !== null ? (
             <p className="mb-0">
               {t('programTotal', {
                 duration: durata(0, totale * 60_000),
@@ -458,7 +456,7 @@ function Aggiunta({
               onClick={() => {
                 // Una sola riga vuota appena aggiunta si sostituisce.
                 const base =
-                  agenda.length === 1 && !agenda[0]!.label.trim() && !agenda[0]!.id
+                  agenda.length === 1 && !haTitolo(agenda[0]!) && !agenda[0]!.id
                     ? []
                     : agenda;
                 ultimoRef.current = base.length;

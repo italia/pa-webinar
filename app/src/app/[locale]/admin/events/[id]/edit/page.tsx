@@ -14,6 +14,7 @@ import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
+import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
@@ -155,7 +156,6 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
             status: true,
             speakerGrantId: true,
             speakerPrimary: true,
-            _count: { select: { reactions: true } },
           },
         },
         questionnaires: {
@@ -322,8 +322,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       speakerPrimary: a.speakerPrimary,
     })),
     // Come la rotta che salva il programma: un argomento non piu' da
-    // discutere, o con le reazioni del pubblico, e l'agenda e' della sala.
-    agendaLocked: event.agendaItems.some((a) => a.status !== 'PENDING' || a._count.reactions > 0),
+    // discutere, e l'agenda e' della sala.
+    agendaLocked: agendaGiaUsata(event.agendaItems),
   };
 
   return (

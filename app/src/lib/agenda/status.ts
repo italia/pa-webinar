@@ -42,6 +42,17 @@ export function agendaStatusData(status: AgendaStatus, now: Date = new Date()): 
   }
 }
 
+/**
+ * Vero se l'agenda e' gia' stata usata in sala: un argomento non e' piu' da
+ * discutere (avviato, discusso o saltato). Da li' in poi il programma non si
+ * riscrive dal wizard: si guida dalla sala. Le reazioni del pubblico non
+ * contano: la sala le offre sull'argomento in corso, che conta gia', e
+ * altrove le manda chiunque, senza che l'agenda sia stata usata.
+ */
+export function agendaGiaUsata(voci: ReadonlyArray<{ status: AgendaStatus }>): boolean {
+  return voci.some((v) => v.status !== 'PENDING');
+}
+
 /** Il vecchio campo `completed` (client precedenti) tradotto in stato. */
 export function statusFromCompleted(completed: boolean): AgendaStatus {
   return completed ? 'DONE' : 'PENDING';

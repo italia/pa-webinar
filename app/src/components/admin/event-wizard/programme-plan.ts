@@ -10,7 +10,11 @@
  * senza indirizzo. Al salvataggio la chiave diventa la concessione.
  */
 
-import { parsePlannedMinutes } from '@/lib/agenda/programme';
+import {
+  durataProgramma,
+  orariProgramma,
+  parsePlannedMinutes,
+} from '@/lib/agenda/programme';
 import type { PersonRole } from '@/lib/events/grant-profile';
 import { fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 
@@ -131,6 +135,11 @@ export function opzioniRelatore(form: {
   return out;
 }
 
+/** Una riga che si salva: ha un titolo. Le righe vuote si lasciano. */
+export function haTitolo(v: Pick<AgendaDraft, 'label'>): boolean {
+  return v.label.trim().length > 0;
+}
+
 /** Gli argomenti da salvare: quelli con un titolo (le righe vuote si
  *  lasciano), con la durata letta dal campo. */
 export function vociCompilate(agenda: readonly AgendaDraft[]): Array<{
@@ -139,17 +148,14 @@ export function vociCompilate(agenda: readonly AgendaDraft[]): Array<{
   plannedMinutes: number | null;
   speakerKey: string | null;
 }> {
-  return agenda
-    .map((v) => ({ ...v, label: v.label.trim() }))
-    .filter((v) => v.label.length > 0)
-    .map((v) => ({
-      ...(v.id ? { id: v.id } : {}),
-      label: v.label.slice(0, 500),
-      // Una durata non valida la ferma la validazione del passo: qui, per
-      // sicurezza, vale come nessuna.
-      plannedMinutes: parsePlannedMinutes(v.minutes) ?? null,
-      speakerKey: v.speakerKey,
-    }));
+  return agenda.filter(haTitolo).map((v) => ({
+    ...(v.id ? { id: v.id } : {}),
+    label: v.label.trim().slice(0, 500),
+    // Una durata non valida la ferma la validazione del passo: qui, per
+    // sicurezza, vale come nessuna.
+    plannedMinutes: parsePlannedMinutes(v.minutes) ?? null,
+    speakerKey: v.speakerKey,
+  }));
 }
 
 /**
@@ -222,6 +228,39 @@ export function agendaDalServer(
   });
 }
 
+/** Gli orari del programma nel modulo. */
+export interface OrariModulo {
+  /** L'inizio previsto di ogni riga del modulo, nell'ordine: null per una
+   *  riga senza titolo e dal primo argomento senza durata in poi. */
+  inizi: Array<Date | null>;
+  /** I minuti previsti in tutto, se ogni argomento ha la durata. */
+  totale: number | null;
+  /** La fine prevista del programma, se si puo' dire. */
+  fine: Date | null;
+}
+
+/**
+ * Gli orari del programma come li mostrera' la pagina pubblica: contano solo
+ * le righe con un titolo, cioe' quelle che si salvano. Una riga vuota non ha
+ * orario e non sposta quelli degli argomenti dopo. Senza un inizio valido
+ * nessun orario, ma il totale si conosce lo stesso.
+ */
+export function orariDelModulo(
+  agenda: readonly AgendaDraft[],
+  inizio: Date | null
+): OrariModulo {
+  const voci = agenda.flatMap((v, riga) =>
+    haTitolo(v) ? [{ riga, plannedMinutes: parsePlannedMinutes(v.minutes) ?? null }] : []
+  );
+  const orari = inizio ? orariProgramma(inizio, voci) : [];
+  const inizi: Array<Date | null> = agenda.map(() => null);
+  voci.forEach((v, k) => {
+    inizi[v.riga] = orari[k]?.start ?? null;
+  });
+  const totale = durataProgramma(voci);
+  return { inizi, totale, fine: totale !== null ? (orari.at(-1)?.end ?? null) : null };
+}
+
 /** Vero se il programma da mandare e' diverso da quello salvato. */
 export function pianoCambiato(
   piano: readonly VocePiano[],
@@ -249,10 +288,10 @@ export function conIdSalvati(
   agenda: readonly AgendaDraft[],
   salvato: readonly VoceSalvata[]
 ): AgendaDraft[] {
-  const compilate = agenda.filter((v) => v.label.trim());
+  const compilate = agenda.filter(haTitolo);
   if (compilate.length !== salvato.length) return [...agenda];
   let i = 0;
-  return agenda.map((v) => (v.label.trim() ? { ...v, id: salvato[i++]!.id } : v));
+  return agenda.map((v) => (haTitolo(v) ? { ...v, id: salvato[i++]!.id } : v));
 }
 
 /** Le chiavi di chi interviene che non sono piu' fra le persone del passo:
@@ -276,7 +315,7 @@ export function erroriProgramma(form: {
   const errs: Record<string, string> = {};
   if (!form.agendaEnabled) return errs;
   (form.agenda ?? []).forEach((v, i) => {
-    if (v.label.trim() && parsePlannedMinutes(v.minutes) === undefined) {
+    if (haTitolo(v) && parsePlannedMinutes(v.minutes) === undefined) {
       errs[`agenda.${i}.minutes`] = 'invalid';
     }
   });

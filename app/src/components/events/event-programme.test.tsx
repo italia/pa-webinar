@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+import messagesEn from '@/i18n/messages/en.json';
 import type { VoceProgramma } from '@/lib/agenda/programme';
 
 import EventProgramme from './event-programme';
@@ -38,10 +39,14 @@ const INIZIO = new Date('2030-03-05T09:00:00.000Z');
 let container: HTMLDivElement;
 let root: Root;
 
-function disegna(live: boolean, voci = VOCI) {
+function disegna(live: boolean, voci = VOCI, locale: 'it' | 'en' = 'it') {
   act(() => {
     root.render(
-      <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+      <NextIntlClientProvider
+        locale={locale}
+        messages={locale === 'en' ? messagesEn : messages}
+        timeZone="Europe/Rome"
+      >
         <EventProgramme items={voci} startsAt={INIZIO} live={live} />
       </NextIntlClientProvider>
     );
@@ -111,6 +116,16 @@ describe('EventProgramme', () => {
     expect(container.querySelector('.event-programma__nota')?.textContent).toContain(
       '1 ora e 30 minuti'
     );
+  });
+
+  it('in una lingua con l’orologio a 12 ore l’ora intera sta nella sua colonna', () => {
+    // La colonna dell'ora e' larga quanto la piu' lunga (globals.scss): qui
+    // conta che l'ora arrivi intera, con il segno del pomeriggio.
+    disegna(false, VOCI, 'en');
+    const ore = Array.from(
+      container.querySelectorAll('.event-programma__quando time')
+    ).map((t) => t.textContent?.replace(/\s/gu, ' '));
+    expect(ore).toEqual(['10:00 AM', '10:10 AM']);
   });
 
   it('senza argomenti non disegna niente', () => {

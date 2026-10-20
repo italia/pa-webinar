@@ -15,6 +15,7 @@ const { tx } = vi.hoisted(() => ({
       deleteMany: vi.fn(),
       findMany: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
     eventModerator: { findMany: vi.fn() },
   },
@@ -70,6 +71,7 @@ beforeEach(() => {
   }));
   tx.eventAgendaItem.findMany.mockResolvedValue([{ id: A }, { id: B }, { id: C }]);
   tx.eventAgendaItem.update.mockResolvedValue({});
+  tx.eventAgendaItem.updateMany.mockResolvedValue({ count: 1 });
   tx.eventAgendaItem.deleteMany.mockResolvedValue({ count: 0 });
   tx.eventModerator.findMany.mockResolvedValue([]);
   mockedEvent.mockResolvedValue({ id: EVENT_ID, agendaEnabled: true });
@@ -194,21 +196,24 @@ describe('GET ?lite=1 (barra della sala)', () => {
 
 describe('PUT /api/events/[slug]/agenda (programma)', () => {
   const RELATRICE = '88888888-8888-4888-8888-888888888888';
-  const intatto = (id: string) => ({ id, status: 'PENDING', _count: { reactions: 0 } });
+  const intatto = (id: string) => ({ id, status: 'PENDING' });
 
   beforeEach(() => {
     tx.eventAgendaItem.findMany.mockResolvedValue([intatto(A), intatto(B)]);
-    tx.eventAgendaItem.update.mockImplementation(
-      async (args: { where: { id: string }; data: Record<string, unknown> }) => ({ id: args.where.id, ...args.data }),
-    );
-    tx.eventAgendaItem.create.mockImplementation(async (args: { data: Record<string, unknown> }) => ({
-      id: C,
-      ...args.data,
+    tx.eventAgendaItem.deleteMany.mockImplementation(async (args: { where: { id: { in: string[] } } }) => ({
+      count: args.where.id.in.length,
     }));
     tx.eventModerator.findMany.mockResolvedValue([{ id: RELATRICE }]);
   });
 
   it('aggiorna, crea e toglie in una richiesta, con le posizioni nuove e chi interviene', async () => {
+    // La seconda lettura e' l'agenda dopo le scritture: quella che torna.
+    tx.eventAgendaItem.findMany
+      .mockResolvedValueOnce([intatto(A), intatto(B)])
+      .mockResolvedValueOnce([
+        { id: C, label: 'Saluti', sortOrder: 1, speakerGrantId: null, speakerPrimary: true },
+        { id: A, label: 'Intervento', sortOrder: 2, speakerGrantId: RELATRICE, speakerPrimary: false },
+      ]);
     const res = await PUT(
       req('PUT', {
         base: [A, B],
@@ -222,8 +227,10 @@ describe('PUT /api/events/[slug]/agenda (programma)', () => {
     expect(res.status).toBe(200);
     // Il turno della transazione: prima il blocco dell'evento.
     expect(tx.$executeRaw).toHaveBeenCalled();
-    // B non c'è più nel programma: si toglie.
-    expect(tx.eventAgendaItem.deleteMany).toHaveBeenCalledWith({ where: { eventId: EVENT_ID, id: { in: [B] } } });
+    // B non c'è più nel programma: si toglie, se è ancora da discutere.
+    expect(tx.eventAgendaItem.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID, id: { in: [B] }, status: 'PENDING' },
+    });
     expect(tx.eventAgendaItem.create.mock.calls[0]?.[0]).toMatchObject({
       data: {
         eventId: EVENT_ID,
@@ -234,14 +241,22 @@ describe('PUT /api/events/[slug]/agenda (programma)', () => {
         sortOrder: 1,
       },
     });
-    expect(tx.eventAgendaItem.update.mock.calls[0]?.[0]).toMatchObject({
-      where: { id: A },
+    // A si aggiorna solo se è ancora da discutere.
+    expect(tx.eventAgendaItem.updateMany.mock.calls[0]?.[0]).toEqual({
+      where: { id: A, eventId: EVENT_ID, status: 'PENDING' },
       data: { label: 'Intervento', plannedMinutes: 30, speakerGrantId: RELATRICE, speakerPrimary: false, sortOrder: 2 },
     });
+    expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
     // La persona si cerca fra quelle valide di QUESTO evento.
     expect(tx.eventModerator.findMany).toHaveBeenCalledWith({
       where: { id: { in: [RELATRICE] }, eventId: EVENT_ID, revokedAt: null },
       select: { id: true },
+    });
+    // La risposta è l'agenda riletta, in ordine, con chi interviene.
+    expect(tx.eventAgendaItem.findMany).toHaveBeenLastCalledWith({
+      where: { eventId: EVENT_ID },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      select: expect.objectContaining({ speakerGrantId: true, speakerPrimary: true }),
     });
     const { items } = (await res.json()) as { items: { id: string; sortOrder: number }[] };
     expect(items.map((i) => [i.id, i.sortOrder])).toEqual([
@@ -262,16 +277,52 @@ describe('PUT /api/events/[slug]/agenda (programma)', () => {
   it('se l’agenda è cambiata nel frattempo si rifiuta, senza toccare niente', async () => {
     const res = await PUT(req('PUT', { base: [A], plan: [{ id: A, label: 'Uno' }] }), ctx());
     expect(res.status).toBe(409);
-    expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
+    expect(tx.eventAgendaItem.updateMany).not.toHaveBeenCalled();
     expect(tx.eventAgendaItem.deleteMany).not.toHaveBeenCalled();
   });
 
-  it('un’agenda già usata in sala non si riscrive: un argomento avviato o con reazioni', async () => {
-    tx.eventAgendaItem.findMany.mockResolvedValue([intatto(A), { id: B, status: 'DONE', _count: { reactions: 0 } }]);
-    expect((await PUT(req('PUT', { base: [A, B], plan: [] }), ctx())).status).toBe(409);
-    tx.eventAgendaItem.findMany.mockResolvedValue([intatto(A), { id: B, status: 'PENDING', _count: { reactions: 2 } }]);
-    expect((await PUT(req('PUT', { base: [A, B], plan: [] }), ctx())).status).toBe(409);
+  it('un’agenda già usata in sala non si riscrive: un argomento avviato, discusso o saltato', async () => {
+    for (const status of ['CURRENT', 'DONE', 'SKIPPED']) {
+      tx.eventAgendaItem.findMany.mockResolvedValue([intatto(A), { id: B, status }]);
+      const res = await PUT(req('PUT', { base: [A, B], plan: [] }), ctx());
+      expect(res.status).toBe(409);
+      expect(((await res.json()) as { error: string }).error).toContain('already in use');
+    }
     expect(tx.eventAgendaItem.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it('le reazioni non bloccano il programma: lo blocca solo un argomento non più da discutere', async () => {
+    // Le reazioni le manda chiunque, anche su un argomento ancora da discutere.
+    tx.eventAgendaItem.findMany.mockResolvedValue([intatto(A), { ...intatto(B), _count: { reactions: 2 } }]);
+    const res = await PUT(req('PUT', { base: [A, B], plan: [{ id: A, label: 'Uno' }] }), ctx());
+    expect(res.status).toBe(200);
+    // La lettura chiede solo gli stati, non le reazioni.
+    expect(tx.eventAgendaItem.findMany.mock.calls[0]?.[0]).toEqual({
+      where: { eventId: EVENT_ID },
+      select: { id: true, status: true },
+    });
+  });
+
+  it('un argomento che la sala cambia mentre si salva non si riscrive: la transazione si annulla', async () => {
+    // Letto da discutere, ma intanto la sala l'ha saltato: l'aggiornamento
+    // condizionato non lo trova.
+    tx.eventAgendaItem.updateMany.mockResolvedValue({ count: 0 });
+    const res = await PUT(req('PUT', { base: [A, B], plan: [{ id: A, label: 'Uno' }, { id: B, label: 'Due' }] }), ctx());
+    expect(res.status).toBe(409);
+    expect(tx.eventAgendaItem.updateMany).toHaveBeenCalledTimes(1);
+    expect(pokeLivePanel).not.toHaveBeenCalled();
+  });
+
+  it('un argomento da togliere che la sala ha appena usato non si cancella', async () => {
+    // B era da discutere alla lettura; la cancellazione condizionata ne trova zero.
+    tx.eventAgendaItem.deleteMany.mockResolvedValue({ count: 0 });
+    const res = await PUT(req('PUT', { base: [A, B], plan: [{ id: A, label: 'Uno' }] }), ctx());
+    expect(res.status).toBe(409);
+    expect(tx.eventAgendaItem.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID, id: { in: [B] }, status: 'PENDING' },
+    });
+    expect(tx.eventAgendaItem.updateMany).not.toHaveBeenCalled();
+    expect(tx.eventAgendaItem.create).not.toHaveBeenCalled();
   });
 
   it('chi interviene dev’essere una persona valida di questo evento', async () => {
@@ -283,7 +334,7 @@ describe('PUT /api/events/[slug]/agenda (programma)', () => {
     expect(res.status).toBe(422);
     const corpo = (await res.json()) as { details: { path: unknown[] }[] };
     expect(corpo.details[0]?.path).toEqual(['plan', 0, 'speakerGrantId']);
-    expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
+    expect(tx.eventAgendaItem.updateMany).not.toHaveBeenCalled();
   });
 
   it('una persona e l’organizzatore principale insieme non si accettano', async () => {
@@ -310,7 +361,7 @@ describe('PUT /api/events/[slug]/agenda (programma)', () => {
         )
       ).status,
     ).toBe(422);
-    expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
+    expect(tx.eventAgendaItem.updateMany).not.toHaveBeenCalled();
   });
 
   it('titolo vuoto o durata fuori misura non passano', async () => {

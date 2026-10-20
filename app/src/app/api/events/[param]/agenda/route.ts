@@ -27,7 +27,7 @@ import {
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 import { deleteCacheByPrefix, getCached, setCache } from '@/lib/cache';
 import { agendaSpeakerSchema, verificaRelatori } from '@/lib/agenda/speaker';
-import { MAX_AGENDA_ITEMS, plannedMinutesSchema } from '@/lib/agenda/status';
+import { MAX_AGENDA_ITEMS, agendaGiaUsata, plannedMinutesSchema } from '@/lib/agenda/status';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,6 +66,9 @@ const planSchema = z.object({
     )
     .max(MAX_AGENDA_ITEMS),
 });
+
+/** L'agenda letta da chi scrive non e' piu' quella di adesso. */
+const AGENDA_CAMBIATA = 'The agenda changed: reload it and try again';
 
 /** Cio' che legge chiunque (GET): senza chi interviene. */
 const ITEM_SELECT = {
@@ -269,7 +272,7 @@ export const PUT = withErrorHandling(async (request, context) => {
     // vecchio (qualcuno ha appena aggiunto o tolto un argomento) si rifiuta,
     // invece di lasciare quelli mancanti in una posizione a caso.
     if (!stessoInsieme(order, ids)) {
-      throw new ConflictError('The agenda changed: reload it and try again');
+      throw new ConflictError(AGENDA_CAMBIATA);
     }
     for (const [i, id] of order.entries()) {
       await tx.eventAgendaItem.update({ where: { id }, data: { sortOrder: i + 1 } });
@@ -293,24 +296,26 @@ function stessoInsieme(elenco: string[], ids: Set<string>): boolean {
  * Il programma preparato prima dell'evento, al posto dell'agenda che c'era.
  *
  * Solo finche' l'agenda non e' stata usata: un argomento gia' avviato,
- * discusso o saltato, o con le reazioni del pubblico, e' la storia della
- * riunione, e da li' in poi l'agenda si guida dalla sala (409). Chi
- * interviene dev'essere una persona di questo evento, non revocata (422).
+ * discusso o saltato e' la storia della riunione, e da li' in poi l'agenda si
+ * guida dalla sala (409, `agendaGiaUsata`). Chi interviene dev'essere una
+ * persona di questo evento, non revocata (422).
  */
 async function salvaProgramma(eventId: string, { base, plan }: z.infer<typeof planSchema>) {
   const items = await prisma.$transaction(async (tx) => {
-    // In fila con le altre scritture dell'agenda (aggiunte, riordini, cambi
-    // di stato dalla sala).
+    // In fila con le aggiunte, i riordini e l'avvio di un argomento, che
+    // prendono lo stesso blocco. Gli altri cambi di stato dalla sala, e le
+    // cancellazioni, non lo prendono: per questo le scritture qui sotto
+    // valgono solo per argomenti ancora da discutere.
     await tx.$executeRaw`SELECT id FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
     const esistenti = await tx.eventAgendaItem.findMany({
       where: { eventId },
-      select: { id: true, status: true, _count: { select: { reactions: true } } },
+      select: { id: true, status: true },
     });
     const ids = new Set(esistenti.map((e) => e.id));
     if (!stessoInsieme(base, ids)) {
-      throw new ConflictError('The agenda changed: reload it and try again');
+      throw new ConflictError(AGENDA_CAMBIATA);
     }
-    if (esistenti.some((e) => e.status !== 'PENDING' || e._count.reactions > 0)) {
+    if (agendaGiaUsata(esistenti)) {
       throw new ConflictError('The agenda is already in use: change it from the room');
     }
 
@@ -327,11 +332,16 @@ async function salvaProgramma(eventId: string, { base, plan }: z.infer<typeof pl
     problemi.push(...(await verificaRelatori(tx, eventId, plan, (i, campo) => ['plan', i, campo])));
     if (problemi.length > 0) throw new ValidationError('Invalid agenda plan', problemi);
 
+    // Un argomento che la sala ha appena chiuso, saltato o tolto non si
+    // cancella e non si riscrive: se uno manca all'appello, l'agenda e'
+    // cambiata dopo la lettura, e la transazione si annulla tutta.
     const daTogliere = base.filter((id) => !visti.has(id));
     if (daTogliere.length > 0) {
-      await tx.eventAgendaItem.deleteMany({ where: { eventId, id: { in: daTogliere } } });
+      const tolti = await tx.eventAgendaItem.deleteMany({
+        where: { eventId, id: { in: daTogliere }, status: 'PENDING' },
+      });
+      if (tolti.count !== daTogliere.length) throw new ConflictError(AGENDA_CAMBIATA);
     }
-    const out = [];
     // In fila, non in parallelo: una transazione e' una connessione sola.
     for (const [i, v] of plan.entries()) {
       const data = {
@@ -341,13 +351,22 @@ async function salvaProgramma(eventId: string, { base, plan }: z.infer<typeof pl
         speakerPrimary: v.speakerPrimary ?? false,
         sortOrder: i + 1,
       };
-      out.push(
-        v.id
-          ? await tx.eventAgendaItem.update({ where: { id: v.id }, data, select: PLAN_SELECT })
-          : await tx.eventAgendaItem.create({ data: { eventId, ...data }, select: PLAN_SELECT }),
-      );
+      if (v.id) {
+        const aggiornati = await tx.eventAgendaItem.updateMany({
+          where: { id: v.id, eventId, status: 'PENDING' },
+          data,
+        });
+        if (aggiornati.count !== 1) throw new ConflictError(AGENDA_CAMBIATA);
+      } else {
+        await tx.eventAgendaItem.create({ data: { eventId, ...data } });
+      }
     }
-    return out;
+    // L'agenda adesso e' il programma, nell'ordine appena scritto.
+    return tx.eventAgendaItem.findMany({
+      where: { eventId },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      select: PLAN_SELECT,
+    });
   });
 
   notify(eventId);
