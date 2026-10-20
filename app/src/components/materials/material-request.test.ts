@@ -170,8 +170,11 @@ describe('caricamento di un file dal pannello', () => {
     const src = readFileSync(path.join(__dirname, 'material-panel.tsx'), 'utf8');
     expect(src).toContain('data?.uploadsEnabled === true');
     expect(src).toContain('uploadMaterialFile(eventSlug, token');
-    expect(src).toContain('accept={MATERIAL_FILE_MIME_TYPES.join');
-    expect(src).toMatch(/checkMaterialFile\(file, MATERIAL_FILE_MIME_TYPES, MATERIAL_FILE_MAX_BYTES\)/);
+    // Le tipologie del server; per un relatore il solo PDF che presenta.
+    expect(src).toContain("const PDF_ONLY: readonly string[] = ['application/pdf'];");
+    expect(src).toContain('speakerUpload ? PDF_ONLY : MATERIAL_FILE_MIME_TYPES');
+    expect(src).toContain('accept={allowedTypes.join');
+    expect(src).toMatch(/checkMaterialFile\(file, allowedTypes, MATERIAL_FILE_MAX_BYTES\)/);
   });
 });
 

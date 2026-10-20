@@ -5,6 +5,10 @@ import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import { Button } from 'design-react-kit';
 
+import {
+  presentationErrorMessage,
+  usePresentationControls,
+} from '@/components/presentation/use-presentation';
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
 import { MATERIAL_KIND_ICON, materialKind, titleFromFileName } from '@/lib/materials/file-kind';
@@ -47,6 +51,9 @@ const FILTER_MIN_ITEMS = 5;
 /** Quanto resta armato «Elimina» in attesa della conferma, come nel resto della sala. */
 const DELETE_ARM_MS = 4_000;
 
+/** Un relatore carica solo il PDF che presenta (POST .../materials/upload). */
+const PDF_ONLY: readonly string[] = ['application/pdf'];
+
 /** I limiti in MB da mostrare nei testi, dalle stesse costanti del server. */
 const MAX_MB = Math.round(MATERIAL_FILE_MAX_BYTES / (1024 * 1024));
 const MAX_EVENT_MB = Math.round(MATERIAL_FILES_PER_EVENT_MAX_BYTES / (1024 * 1024));
@@ -54,9 +61,17 @@ const MAX_EVENT_MB = Math.round(MATERIAL_FILES_PER_EVENT_MAX_BYTES / (1024 * 102
 export default function MaterialPanel({ eventSlug, token, isModerator }: MaterialPanelProps) {
   const t = useTranslations('materials');
   const tf = useTranslations('materials.filter');
+  const tp = useTranslations('presentation');
   const { fileSizeLabel } = useMaterialFormat();
 
   const pushLive = useLivePush();
+  // La presentazione in sala (components/presentation), quando il pannello è
+  // nella sala: chi conduce e i relatori presentano un PDF da qui.
+  const presentation = usePresentationControls();
+  const canPresent = presentation?.canPresent ?? false;
+  const presentedId = presentation?.view.materialId ?? null;
+  // Un relatore non aggiunge materiali, ma può caricare il PDF che presenta.
+  const speakerUpload = !isModerator && canPresent;
 
   const { data, mutate } = useSWR<{ materials: RoomMaterial[]; uploadsEnabled?: boolean }>(
     // Il token parte per chiunque ne abbia uno (./material-request): al
@@ -81,6 +96,8 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   // Quando il pubblico lo vede: il predefinito è quello del server.
   const [visibility, setVisibility] = useState<string>('ALWAYS');
   const [file, setFile] = useState<File | null>(null);
+  // Presentare il PDF appena caricato: proposto a chi carica per presentare.
+  const [presentAfter, setPresentAfter] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileHelpId = useId();
   const [submitting, setSubmitting] = useState(false);
@@ -92,6 +109,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   // chi carica): segue il file se lo si cambia o lo si toglie.
   const titleAutoRef = useRef(false);
   const fileInputId = useId();
+  const presentAfterId = useId();
   const [error, setError] = useState('');
   const [titleMissing, setTitleMissing] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -177,7 +195,13 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   // Il caricamento si offre solo se l'installazione ha uno storage per i file:
   // altrimenti il server risponderebbe 503 a ogni tentativo.
   const uploadsEnabled = data?.uploadsEnabled === true;
-  const fileMode = uploadsEnabled && mode === 'file';
+  const fileMode = uploadsEnabled && (mode === 'file' || speakerUpload);
+  const allowedTypes = speakerUpload ? PDF_ONLY : MATERIAL_FILE_MIME_TYPES;
+  const chosenIsPdf = file?.type === 'application/pdf';
+  // Le tipologie accettate: un relatore carica solo il PDF che presenta.
+  const fileHelp = speakerUpload ? tp('pdfOnlyHelp', { maxMb: MAX_MB }) : t('fileHelp', { maxMb: MAX_MB });
+  // A chi può presentare si ricorda che alla sala si presenta solo un PDF.
+  const presentHint = canPresent && !speakerUpload ? tp('exportHint') : null;
 
   const uploadErrorMessage = useCallback(
     (e: MaterialUploadError): string => {
@@ -210,6 +234,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     setDescription('');
     setVisibility('ALWAYS');
     setFile(null);
+    setPresentAfter(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
     setError('');
     setTitleMissing(false);
@@ -230,22 +255,45 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         }
         return;
       }
-      const invalid = checkMaterialFile(f, MATERIAL_FILE_MIME_TYPES, MATERIAL_FILE_MAX_BYTES);
+      const invalid = checkMaterialFile(f, allowedTypes, MATERIAL_FILE_MAX_BYTES);
       if (invalid) {
         setFile(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
-        setError(uploadErrorMessage(invalid));
+        setError(invalid === 'fileType' && speakerUpload ? tp('errors.pdfOnly') : uploadErrorMessage(invalid));
         return;
       }
       setFile(f);
+      // Chi carica per presentare (un relatore) lo presenta subito, salvo
+      // ripensamenti; chi conduce lo sceglie.
+      setPresentAfter(speakerUpload && f.type === 'application/pdf');
       setTitle((cur) => {
         if (cur.trim() && !titleAutoRef.current) return cur;
         titleAutoRef.current = true;
         return titleFromFileName(f.name);
       });
     },
-    [uploadErrorMessage],
+    [uploadErrorMessage, allowedTypes, speakerUpload, tp],
   );
+
+  /** Avvia la presentazione di un materiale e dice com'è andata. */
+  const presentMaterial = useCallback(
+    async (materialId: string) => {
+      if (!presentation) return;
+      setListError('');
+      const failed = await presentation.start(materialId);
+      if (failed) setListError(presentationErrorMessage(tp, failed));
+      else setAnnouncement(tp('started'));
+    },
+    [presentation, tp],
+  );
+
+  const stopPresenting = useCallback(async () => {
+    if (!presentation) return;
+    setListError('');
+    const failed = await presentation.stop();
+    if (failed) setListError(presentationErrorMessage(tp, failed));
+    else setAnnouncement(tp('stopped'));
+  }, [presentation, tp]);
 
   /** Un materiale è entrato: il modulo si chiude, la lista rilegge, lo si dice. */
   const materialAdded = useCallback(() => {
@@ -268,22 +316,32 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
           setError(t('errors.fileMissing'));
           return;
         }
-        const invalid = checkMaterialFile(file, MATERIAL_FILE_MIME_TYPES, MATERIAL_FILE_MAX_BYTES);
+        const invalid = checkMaterialFile(file, allowedTypes, MATERIAL_FILE_MAX_BYTES);
         if (invalid) {
-          setError(uploadErrorMessage(invalid));
+          setError(invalid === 'fileType' && speakerUpload ? tp('errors.pdfOnly') : uploadErrorMessage(invalid));
           return;
         }
         setSubmitting(true);
         setProgress(0);
         const controller = new AbortController();
         abortRef.current = controller;
+        // Il PDF da presentare appena nasce il materiale.
+        const creato: { id: string | null } = { id: null };
+        const presentNow = presentAfter && canPresent && file.type === 'application/pdf';
         try {
           const failed = await uploadMaterialFile(eventSlug, token, {
             file,
             title: title.trim(),
             description: description.trim(),
-            visibility,
-          }, { onProgress: setProgress, signal: controller.signal });
+            // Un relatore non sceglie la fase: vale quella predefinita del server.
+            ...(speakerUpload ? {} : { visibility }),
+          }, {
+            onProgress: setProgress,
+            signal: controller.signal,
+            onCreated: (id) => {
+              creato.id = id;
+            },
+          });
           if (failed === 'aborted') {
             setAnnouncement(t('uploadCancelled'));
             // Se il server aveva gia' ricevuto tutto, il materiale puo' esserci
@@ -292,10 +350,11 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             return;
           }
           if (failed) {
-            setError(uploadErrorMessage(failed));
+            setError(failed === 'fileType' && speakerUpload ? tp('errors.pdfOnly') : uploadErrorMessage(failed));
             return;
           }
           materialAdded();
+          if (presentNow && creato.id) void presentMaterial(creato.id);
         } catch {
           setError(t('errors.uploadFailed'));
         } finally {
@@ -350,7 +409,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         setSubmitting(false);
       }
     },
-    [fileMode, file, title, url, description, visibility, eventSlug, token, t, materialAdded, uploadErrorMessage, mutate],
+    [fileMode, file, title, url, description, visibility, eventSlug, token, t, tp, materialAdded, uploadErrorMessage, mutate, allowedTypes, speakerUpload, presentAfter, canPresent, presentMaterial],
   );
 
   const handleDelete = useCallback(
@@ -466,7 +525,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             <span className="live-panel-header__count">{materials.length}</span>
           )}
         </h6>
-        {isModerator && !showForm && (
+        {(isModerator || (speakerUpload && uploadsEnabled)) && !showForm && (
           <Button
             innerRef={addButtonRef}
             color="primary"
@@ -475,18 +534,19 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             className="px-2 py-1"
             onClick={() => {
               setAnnouncement('');
+              if (speakerUpload) setMode('file');
               setShowForm(true);
             }}
           >
-            + {t('addMaterial')}
+            + {isModerator ? t('addMaterial') : tp('uploadPdfToPresent')}
           </Button>
         )}
       </div>
 
-      {/* Modulo di chi conduce: un link o un file */}
-      {isModerator && showForm && (
+      {/* Modulo di chi conduce (un link o un file) o di un relatore (il PDF da presentare) */}
+      {(isModerator || speakerUpload) && showForm && (
         <form onSubmit={handleSubmit} className="material-panel__form">
-          {uploadsEnabled && (
+          {uploadsEnabled && !speakerUpload && (
             <div className="material-panel__modes" role="group" aria-label={t('modeLabel')}>
               {(['link', 'file'] as const).map((m) => (
                 <button
@@ -526,7 +586,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                 className="visually-hidden material-panel__file-input"
                 aria-label={t('fileLabel')}
                 aria-describedby={fileHelpId}
-                accept={MATERIAL_FILE_MIME_TYPES.join(',')}
+                accept={allowedTypes.join(',')}
                 onChange={(e) => chooseFile(e.target.files?.[0] ?? null)}
               />
               {file ? (
@@ -568,11 +628,12 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                   <Icon icon="it-upload" size="sm" color="primary" aria-hidden="true" />
                   <span className="material-panel__drop-title">{t('dropzoneTitle')}</span>
                   <span className="material-panel__drop-choose">{t('dropzoneChoose')}</span>
-                  <span className="material-panel__meta">{t('fileHelp', { maxMb: MAX_MB })}</span>
+                  <span className="material-panel__meta">{fileHelp}</span>
                 </label>
               )}
+              {presentHint && <p className="material-panel__meta material-panel__present-hint">{presentHint}</p>}
               <span id={fileHelpId} className="visually-hidden">
-                {t('fileHelp', { maxMb: MAX_MB })}
+                {presentHint ? `${fileHelp} ${presentHint}` : fileHelp}
               </span>
             </div>
           ) : (
@@ -619,7 +680,24 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
               maxLength={500}
             />
           </div>
-          <MaterialVisibilitySelect value={visibility} onChange={setVisibility} disabled={submitting} />
+          {!speakerUpload && (
+            <MaterialVisibilitySelect value={visibility} onChange={setVisibility} disabled={submitting} />
+          )}
+          {fileMode && canPresent && chosenIsPdf && (
+            <div className="form-check material-panel__present-after">
+              <input
+                id={presentAfterId}
+                type="checkbox"
+                className="form-check-input"
+                checked={presentAfter}
+                disabled={submitting}
+                onChange={(e) => setPresentAfter(e.target.checked)}
+              />
+              <label htmlFor={presentAfterId} className="form-check-label">
+                {tp('presentAfterUpload')}
+              </label>
+            </div>
+          )}
           {percent !== null && (
             <div className="material-panel__progress">
               <div
@@ -747,6 +825,17 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                 }}
                 onCancelEdit={() => setEditingId(null)}
                 onSave={(patch) => handleSave(m.id, patch)}
+                {...(presentation
+                  ? {
+                      present: {
+                        presenting: presentedId === m.id,
+                        canPresent,
+                        busy: presentation.busy,
+                        onPresent: () => void presentMaterial(m.id),
+                        onStop: () => void stopPresenting(),
+                      },
+                    }
+                  : {})}
               />
             ))}
           </ul>

@@ -10,7 +10,13 @@ import {
 } from 'react';
 import { mutate as globalMutate } from 'swr';
 
-import type { LiveEnvelope, LiveFlags, PokeablePanel } from '@/lib/live-state/pubsub';
+import type {
+  LiveEnvelope,
+  LiveFlags,
+  PokeablePanel,
+  PresentationPointer,
+} from '@/lib/live-state/pubsub';
+import { newerPointer } from '@/lib/presentation/client-state';
 
 /**
  * Aggancio ai cambiamenti di stato della sala live via SSE.
@@ -92,12 +98,21 @@ export interface LiveStateHook {
   flags: LiveFlags | null;
   /** Ultimo stato dell'evento arrivato dal canale. */
   eventStatus: string | null;
+  /**
+   * Il puntatore piu' recente della presentazione in corso (materiale,
+   * pagina, versione), o null se il canale non ne ha ancora portato uno. Lo
+   * stato completo lo legge la sala da GET .../presentation
+   * (components/presentation/use-presentation): fra i due vince la versione
+   * piu' alta.
+   */
+  presentation: PresentationPointer | null;
 }
 
 export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
   const [pushLive, setPushLive] = useState(false);
   const [flags, setFlags] = useState<LiveFlags | null>(null);
   const [eventStatus, setEventStatus] = useState<string | null>(null);
+  const [presentation, setPresentation] = useState<PresentationPointer | null>(null);
   /** Cosa ha dichiarato il server all'apertura: senza Redis non si riaccende. */
   const pushDisponibileRef = useRef(false);
 
@@ -190,6 +205,20 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
         case 'poke':
           rinfresca(busta.panel);
           break;
+        case 'presentation': {
+          // Snapshot del solo puntatore: arriva all'apertura, a ogni pagina
+          // girata e dopo un riallineamento. Due pubblicazioni possono
+          // incrociarsi: si tiene la versione piu' alta.
+          const arrivato: PresentationPointer = {
+            materialId: busta.materialId,
+            page: busta.page,
+            version: busta.version,
+            // Assente da una replica non ancora aggiornata: resta sconosciuto.
+            ...(busta.startedAt !== undefined ? { startedAt: busta.startedAt } : {}),
+          };
+          if (vivo) setPresentation((prima) => newerPointer(prima, arrivato));
+          break;
+        }
       }
     };
 
@@ -222,5 +251,5 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
     };
   }, [eventSlug, attivo, rinfresca]);
 
-  return { pushLive, flags, eventStatus };
+  return { pushLive, flags, eventStatus, presentation };
 }

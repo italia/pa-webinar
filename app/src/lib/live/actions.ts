@@ -35,6 +35,9 @@ export const LIVE_ACTION_KINDS = [
   'timer.stopped',
   'hand.raised',
   'event.ended',
+  'presentation.started',
+  'presentation.page',
+  'presentation.stopped',
 ] as const;
 export type LiveActionKind = (typeof LIVE_ACTION_KINDS)[number];
 

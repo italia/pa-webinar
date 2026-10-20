@@ -105,6 +105,12 @@ function applySecurityHeaders(
         produzione: process.env.NODE_ENV === 'production',
         webAssembly: wasm,
       }),
+      // worker-src: il visore dei PDF presentati in sala (pdf.js) decodifica
+      // in un worker servito dall'app stessa (/_next/static). Senza questa
+      // direttiva il worker ricadrebbe su script-src, dove 'strict-dynamic'
+      // fa ignorare 'self' e ogni browser decide a modo suo: qui la regola è
+      // esplicita, solo la stessa origine, niente blob: né altri host.
+      "worker-src 'self'",
       // style-src keeps 'unsafe-inline' as an architectural trade-off:
       // React renders `style={{...}}` props as DOM `style="..."`
       // attributes, which CSP treats as inline styles. The codebase

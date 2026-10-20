@@ -968,6 +968,354 @@ button.live-time-strip__rec {
   }
 }
 
+// ── PDF presentato in sala (components/presentation) ──
+//
+// La scena sta dentro `.live-main`, prima del riquadro della chiamata, che non
+// si sposta nell'albero (spostarlo ricaricherebbe l'iframe di Jitsi). Cambiano
+// solo le classi:
+//   ≥992px  `.live-main--presenting` è una riga: la presentazione si prende lo
+//           spazio, la chiamata resta in una colonna accanto, mai sotto 300px;
+//   <992px  una colonna: la presentazione in alto (metà dell'altezza), la
+//           chiamata sotto, con la sua barra dei comandi sempre raggiungibile.
+// Ridotta, la presentazione è una riga sopra la chiamata.
+
+.live-video-area {
+  min-width: 0;
+  min-height: 0;
+
+  &--beside {
+    flex: 1 1 0;
+
+    @media (min-width: 992px) {
+      flex: 0 0 clamp(300px, 34%, 560px);
+    }
+  }
+}
+
+.presentation-stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #fff;
+  color: var(--app-text);
+  border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+
+  @media (min-width: 992px) {
+    flex: 1 1 0;
+    border-bottom: 0;
+    border-right: 2px solid rgba(0, 102, 204, 0.4);
+  }
+
+  @media (max-width: 991.98px) {
+    flex: 0 0 auto;
+    height: 52%;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #0066CC;
+    outline-offset: -3px;
+  }
+
+  &--minimized {
+    flex: 0 0 auto;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-right: 0;
+    border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+
+    @media (min-width: 992px) {
+      flex: 0 0 auto;
+      border-right: 0;
+      border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    fill: var(--app-primary);
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #E3E8EE;
+    flex-shrink: 0;
+  }
+
+  &__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--app-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__by {
+    font-size: 0.78rem;
+    margin: 0;
+    color: var(--app-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__summary {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.5rem;
+  }
+
+  &__summary-title {
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__summary-page {
+    color: var(--app-muted);
+  }
+
+  &__canvas-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #E3E8EE;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(23, 50, 77, 0.25);
+
+    &.is-hidden {
+      visibility: hidden;
+    }
+  }
+
+  &__status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--app-text);
+
+    .btn-outline-light {
+      color: var(--app-primary);
+      border-color: var(--app-primary);
+    }
+  }
+
+  &__spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 102, 204, 0.25);
+    border-top-color: #0066CC;
+    animation: presentation-spin 0.9s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-top: 1px solid #E3E8EE;
+    flex-shrink: 0;
+  }
+
+  &__indicator {
+    margin: 0;
+    min-width: 7.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__goto {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+
+    + .presentation-stage__btn--stop {
+      margin-left: 0;
+    }
+
+    // Su un telefono contano le frecce e la chiusura: lo spazio va alla slide.
+    @media (max-width: 575.98px) {
+      display: none;
+    }
+
+    .form-control {
+      width: 5.5rem;
+      min-height: 36px;
+      padding: 0.2rem 0.4rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #C5D0DA;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover:not(:disabled) {
+      background: #EEF4FB;
+      border-color: var(--app-primary);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      color: #8A9BAB;
+      cursor: not-allowed;
+    }
+
+    &--quiet {
+      border-color: transparent;
+    }
+
+    &--text {
+      min-width: 0;
+    }
+
+    // «Presenta tu»: il passaggio di mano, ben visibile a chi può prenderla.
+    &--take {
+      flex-shrink: 0;
+      background: var(--app-primary);
+      border-color: var(--app-primary);
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: #004D99;
+        border-color: #004D99;
+        color: #fff;
+      }
+
+      &:disabled {
+        color: #fff;
+        opacity: 0.65;
+      }
+    }
+
+    // In fondo alla riga: dopo «Vai» per chi presenta, dopo le frecce per gli
+    // altri che possono chiudere.
+    &--stop {
+      margin-left: auto;
+      color: #A61C2E;
+      border-color: #E3A3AC;
+
+      &:hover:not(:disabled) {
+        background: #FBEDEF;
+        border-color: #A61C2E;
+      }
+    }
+  }
+
+  &__note {
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    border-top: 1px solid #E3E8EE;
+    flex-shrink: 0;
+
+    &--error {
+      color: #A61C2E;
+    }
+  }
+
+  &__text {
+    flex-shrink: 0;
+    max-height: 30%;
+    overflow-y: auto;
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.82rem;
+    border-top: 1px solid #E3E8EE;
+
+    summary {
+      cursor: pointer;
+      color: var(--app-primary);
+      font-weight: 600;
+      padding: 0.2rem 0;
+
+      &:focus-visible {
+        outline: 3px solid #0066CC;
+        outline-offset: 2px;
+      }
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      white-space: pre-line;
+      color: var(--app-text);
+    }
+  }
+}
+
+@keyframes presentation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 // ── Sidebar / floating controls (Meet-style) ──
 //
 // Video takes the full width of .live-body. A "floating control bar"
@@ -3583,6 +3931,17 @@ button.live-time-strip__rec {
     .form-select { font-size: 0.82rem; }
   }
 
+  // Presentare alla sala il PDF appena caricato.
+  &__present-after {
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+  }
+
+  // Alla sala si presenta solo un PDF: il promemoria sotto la scelta del file.
+  &__present-hint {
+    margin: 4px 0 0;
+  }
+
   &__label {
     display: block;
     margin-bottom: 2px;
@@ -3766,6 +4125,52 @@ button.live-time-strip__rec {
     line-height: 1.4;
     color: #17324D;
     font-variant-numeric: tabular-nums;
+  }
+
+  // La presentazione in sala (components/presentation): il materiale che la
+  // sala sta guardando e, a chi conduce o interviene, il comando per
+  // presentarlo o chiuderlo.
+  &__present {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  // Slide in un altro formato: per presentarle serve il PDF.
+  &__present-hint {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #5C6F82;
+  }
+
+  &__badge--live {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-color: #0066CC;
+    background: #E6F0FB;
+    color: #004D99;
+    font-weight: 700;
+
+    .icon { fill: currentColor; }
+  }
+
+  &__present-btn.material-panel__icon-btn {
+    padding: 0 8px;
+    border: 1px solid #C5D3E0;
+    color: #0066CC;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
+  &__present-btn.material-panel__icon-btn--danger {
+    border-color: #E3A3AC;
+    color: #C02B43;
   }
 
   &__edit {

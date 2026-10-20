@@ -340,7 +340,7 @@ Primary and grant tokens are random UUIDs. The primary token is compared in cons
 
 The primary-only routes include managing named grants, co-organizing organizations and reminders, and deleting the event's recording. A named co-moderator never receives the primary token: `GET /api/events/{id}` returns the caller's own token to a co-moderator, not the event's.
 
-A `SPEAKER` grant gets full audio and video from the app, but a participant-level Jitsi token (`moderator: false`). Jitsi's own permissions therefore also refuse moderator-only actions. `verifyModeratorToken` and `isEventModerator` in `app/src/lib/auth/moderator.ts` reject speaker tokens, so speakers cannot call moderation endpoints either.
+A `SPEAKER` grant gets full audio and video from the app, but a participant-level Jitsi token (`moderator: false`). Jitsi's own permissions therefore also refuse moderator-only actions. `verifyModeratorToken` and `isEventModerator` in `app/src/lib/auth/moderator.ts` reject speaker tokens, so speakers cannot call moderation endpoints either. Two room routes accept a speaker on purpose, through `resolveGrantForEvent`: presenting a PDF to the room (`/api/events/{slug}/presentation`) and uploading the PDF to present, PDF only (`POST /api/events/{slug}/materials/upload`); see [Presentation](live-interaction.md#presentation).
 
 Because the primary link is shared, entering the room with it requires a typed display name. Without one, every moderator would appear under the same generic name. Named grants carry their own name.
 
