@@ -75,6 +75,9 @@ interface Props {
   /** Site-wide default video/audio quality. Shown as the resolved value
    *  when the per-event override is null (inherit). */
   siteDefaultVideoQuality: VideoQualityPreset;
+  /** Sotto la descrizione, dove la pagina pubblica mostra il programma: la
+   *  scheda che porta al passo «Programma» (programme-card.tsx). */
+  dopoDescrizione?: ReactNode;
   /**
    * Quale parte mostrare: «Evento» (titolo, descrizione, copertina,
    * categorie), «Quando» (date, fuso, partecipanti attesi, ricorrenza) o le
@@ -101,6 +104,7 @@ export default function Step1Base({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   parte = 'evento',
+  dopoDescrizione,
   onEtichettaCreata,
   traduzione,
   machineLocales = [],
@@ -647,6 +651,8 @@ export default function Step1Base({
           {descrizioneVuota && !descriptionError && promemoria('ev-description-promemoria')}
         </div>
       </section>
+
+      {dopoDescrizione}
 
       {/* Cover image */}
       <section className="mb-4">

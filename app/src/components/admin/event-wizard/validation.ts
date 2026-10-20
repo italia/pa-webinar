@@ -70,7 +70,7 @@ export function validateStep(
       errs['maxParticipants'] = 'outOfRange';
     }
   }
-  if (step === 'invites') {
+  if (step === 'programme') {
     // Il programma: una durata scritta che non e' una durata. Senza, il
     // salvataggio la lascerebbe cadere in silenzio.
     Object.assign(errs, erroriProgramma(form));

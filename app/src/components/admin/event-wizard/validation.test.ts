@@ -45,6 +45,21 @@ describe('validateStep base — descrizione', () => {
   });
 });
 
+describe('validateStep programme — durate', () => {
+  const agenda = [{ key: 'r1', label: 'Intervento', minutes: 'dieci', speakerKey: null }];
+
+  it('una durata che non e una durata ferma il passo del programma, non «Persone»', () => {
+    const form = base({ agendaEnabled: true, agenda } as Partial<WizardForm>);
+    expect(validateStep('programme', form, 'it')).toEqual({ 'agenda.0.minutes': 'invalid' });
+    expect(validateStep('invites', form, 'it')).toEqual({});
+  });
+
+  it('ad agenda spenta il programma non si salva, e non ferma niente', () => {
+    const form = base({ agendaEnabled: false, agenda } as Partial<WizardForm>);
+    expect(validateStep('programme', form, 'it')).toEqual({});
+  });
+});
+
 describe('mapServerIssues', () => {
   // La risposta 422 reale della creazione senza descrizione.
   const descrizioneMancante = [

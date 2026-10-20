@@ -6,12 +6,18 @@ import {
   chiavePersona,
   chiaviOrfane,
   conIdSalvati,
+  conIntervento,
+  opzioniConPrincipale,
+  oraNelFuso,
   concessioneDaChiave,
+  descrizioneConProgramma,
   erroriProgramma,
   opzioniRelatore,
   orariDelModulo,
   pianoCambiato,
   pianoDaInviare,
+  relatoriSenzaIntervento,
+  senzaRelatoriAssenti,
   type AgendaDraft,
 } from './programme-plan';
 
@@ -328,5 +334,133 @@ describe('orariDelModulo', () => {
       totale: null,
       fine: null,
     });
+  });
+});
+
+describe('senzaRelatoriAssenti', () => {
+  const persone = {
+    moderatorName: '',
+    moderators: [
+      { name: 'Anna', email: 'anna@example.org', organizer: false, publicListed: false },
+    ],
+    speakers: [{ name: 'Luca', email: '', grantId: 'g-luca', publicListed: false }],
+  };
+
+  it('toglie solo le scelte di chi non e’ piu’ fra le persone, e dice quali righe', () => {
+    const agenda = [
+      riga({ key: 'a', speakerKey: 'e:anna@example.org' }),
+      riga({ key: 'b', speakerKey: 'e:tolta@example.org' }),
+      riga({ key: 'c', speakerKey: 'g:g-luca' }),
+      riga({ key: 'd', speakerKey: 'g:g-tolto' }),
+      riga({ key: 'e', speakerKey: null }),
+    ];
+    const { form, righe } = senzaRelatoriAssenti({ ...persone, agenda });
+    expect(righe).toEqual(['b', 'd']);
+    expect(form.agenda.map((v) => v.speakerKey)).toEqual([
+      'e:anna@example.org',
+      null,
+      'g:g-luca',
+      null,
+      null,
+    ]);
+  });
+
+  it('l’organizzatore principale resta una scelta anche senza nome; senza orfane il modulo e’ lo stesso', () => {
+    const modulo = { ...persone, agenda: [riga({ speakerKey: CHIAVE_PRINCIPALE })] };
+    const esito = senzaRelatoriAssenti(modulo);
+    expect(esito.righe).toEqual([]);
+    expect(esito.form).toBe(modulo);
+  });
+});
+
+describe('relatoriSenzaIntervento', () => {
+  it('i relatori senza un argomento con un titolo (quello che si salva), non chi conduce', () => {
+    const modulo = {
+      moderatorName: 'Chi organizza',
+      moderators: [{ name: 'Anna', email: 'anna@example.org', organizer: false, publicListed: false }],
+      speakers: [
+        { name: 'Luca', email: 'luca@example.org', publicListed: false },
+        { name: 'Sara', email: 'sara@example.org', publicListed: false },
+      ],
+    };
+    const conTitolo = relatoriSenzaIntervento({
+      ...modulo,
+      agenda: [riga({ speakerKey: 'e:luca@example.org' })],
+    });
+    expect(conTitolo.map((o) => o.name)).toEqual(['Sara']);
+    const senzaTitolo = relatoriSenzaIntervento({
+      ...modulo,
+      agenda: [riga({ speakerKey: 'e:luca@example.org', label: '' })],
+    });
+    expect(senzaTitolo.map((o) => o.name)).toEqual(['Luca', 'Sara']);
+  });
+});
+
+describe('conIntervento', () => {
+  it('una riga nuova in fondo, con la persona', () => {
+    const { agenda, indice } = conIntervento([riga({ key: 'a' })], 'e:anna@example.org');
+    expect(indice).toBe(1);
+    expect(agenda).toHaveLength(2);
+    expect(agenda[1]).toMatchObject({ label: '', minutes: '', speakerKey: 'e:anna@example.org' });
+  });
+
+  it('la riga vuota appena aggiunta si usa; una con qualcosa no', () => {
+    const vuota = { key: 'v', label: '', minutes: '', speakerKey: null };
+    expect(conIntervento([riga({ key: 'a' }), vuota], 'primary')).toEqual({
+      agenda: [expect.objectContaining({ key: 'a' }), { ...vuota, speakerKey: 'primary' }],
+      indice: 1,
+    });
+    expect(conIntervento([{ ...vuota, minutes: '10' }], 'primary').indice).toBe(1);
+    expect(conIntervento([{ ...vuota, speakerKey: 'e:x@example.org' }], 'primary').indice).toBe(1);
+    expect(conIntervento([{ ...vuota, id: 'salvata' }], 'primary').indice).toBe(1);
+  });
+});
+
+describe('descrizioneConProgramma', () => {
+  it('un titolo «Programma» o «Agenda», anche in grassetto o in inglese', () => {
+    expect(descrizioneConProgramma('Intro.\n\n## Programma\n\nSaluti')).toBe(true);
+    expect(descrizioneConProgramma('**Agenda:**\nSaluti')).toBe(true);
+    expect(descrizioneConProgramma('### Programme')).toBe(true);
+  });
+
+  it('due righe che cominciano con un orario, anche in elenco o in tabella', () => {
+    expect(descrizioneConProgramma('- 10:00 Apertura\n- 10.30 Interventi')).toBe(true);
+    expect(descrizioneConProgramma('| 10:00 | Apertura |\n| 11:00 | Chiusura |')).toBe(true);
+  });
+
+  it('le date e i numeri dei paragrafi non sono orari', () => {
+    expect(descrizioneConProgramma('12.05.2026 prima sessione\n19.05.2026 seconda sessione')).toBe(false);
+    expect(descrizioneConProgramma('1.10 Requisiti\n1.20 Modalità')).toBe(false);
+    expect(descrizioneConProgramma('10:00-11:00 Apertura\n11:00-12:00 Lavori')).toBe(true);
+    expect(descrizioneConProgramma('09.30 Apertura\n9:45 Saluti')).toBe(true);
+    expect(descrizioneConProgramma('- 9.30 Accoglienza\n- 9.45 Saluti')).toBe(true);
+  });
+
+  it('una parola in una frase, o un orario solo, non bastano', () => {
+    expect(descrizioneConProgramma('Il programma del governo per il digitale.')).toBe(false);
+    expect(descrizioneConProgramma("L'incontro comincia alle 10:00.\n10:00 ritrovo")).toBe(false);
+    expect(descrizioneConProgramma('')).toBe(false);
+    expect(descrizioneConProgramma(null)).toBe(false);
+  });
+});
+
+describe('opzioniConPrincipale e oraNelFuso', () => {
+  it('l’organizzatore principale c’e’ sempre, anche senza nome, ed e’ il primo', () => {
+    const senzaNome = opzioniConPrincipale({ moderatorName: ' ', moderators: [], speakers: [] });
+    expect(senzaNome).toEqual([
+      { key: CHIAVE_PRINCIPALE, name: '', role: 'organizer', publicListed: false },
+    ]);
+    const conNome = opzioniConPrincipale({
+      moderatorName: 'Chi organizza',
+      moderatorPublicListed: true,
+      moderators: [],
+      speakers: [{ name: 'Luca', email: 'luca@example.org', publicListed: false }],
+    });
+    expect(conNome.map((o) => o.key)).toEqual([CHIAVE_PRINCIPALE, 'e:luca@example.org']);
+    expect(conNome[0]!.name).toBe('Chi organizza');
+  });
+
+  it('l’ora nel fuso dell’evento', () => {
+    expect(oraNelFuso(new Date('2026-10-29T09:05:00Z'), 'Europe/Rome')).toBe('10:05');
   });
 });

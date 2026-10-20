@@ -676,6 +676,33 @@ describe('fanoutEditDiff — programma', () => {
     expect(corpo.plan[1]!.speakerGrantId).toBe('mod-luca');
   });
 
+  it('una persona nuova (aggiunta dal programma): l’argomento va alla concessione appena creata', async () => {
+    respond((url, init) => {
+      if (init.method === 'POST' && url.endsWith('/moderators')) return json(201, { id: 'spk-carla' });
+      if (init.method === 'PUT' && url.endsWith('/agenda')) return json(200, { items: [] });
+      return json(200, {});
+    });
+    const carla = { name: 'Carla Verdi', email: 'carla@example.org', personId: null, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
+    await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      conProgramma({
+        speakers: [...persone.speakers, carla],
+        agenda: [...righe, { key: 'n1', label: 'Domande', minutes: '', speakerKey: 'e:carla@example.org' }],
+      }),
+      scatto(),
+      'it',
+    );
+    const ordine = (fetchMock.mock.calls as Array<[string, RequestInit]>).map(([u, i]) => `${i.method} ${u}`);
+    expect(ordine.indexOf(`PUT /api/events/${EVENT_ID}/agenda`)).toBeGreaterThan(
+      ordine.indexOf(`POST /api/events/${EVENT_ID}/moderators`),
+    );
+    const corpo = JSON.parse(String(calls('PUT', '/agenda')[0]![1].body)) as {
+      plan: { label: string; speakerGrantId: string | null }[];
+    };
+    expect(corpo.plan[2]).toEqual({ label: 'Domande', plannedMinutes: null, speakerGrantId: 'spk-carla', speakerPrimary: false });
+  });
+
   it('un rifiuto finisce fra le risorse non salvate e lo scatto resta: il salvataggio dopo riprova', async () => {
     respond((url, init) =>
       init.method === 'PUT' && url.endsWith('/agenda')

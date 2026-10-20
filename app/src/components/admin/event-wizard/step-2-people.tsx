@@ -15,6 +15,7 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
+import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
 import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
@@ -109,9 +110,9 @@ interface Props {
   /** Prima degli inviti: chi si iscrive e cosa gli si chiede
    *  (SezioneIscrizione). */
   iscrizione?: React.ReactNode;
-  /** Subito dopo le persone, perche' sceglie fra loro: il programma
-   *  dell'incontro (ProgrammeSection). */
-  programma?: React.ReactNode;
+  /** Sotto le persone, il rimando al passo «Programma», dove si preparano
+   *  i loro interventi (non per una chiamata istantanea, che non ne ha). */
+  rimandoProgramma?: boolean;
   /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
    *  non si cambiano. */
   photosLocked?: boolean;
@@ -130,11 +131,12 @@ export default function StepPeople({
   publicRegistrationEnabled = true,
   children,
   iscrizione,
-  programma,
+  rimandoProgramma = false,
   photosLocked = false,
   onPhotoBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
+  const tp = useTranslations('admin.wizard.programme');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
 
   return (
@@ -162,7 +164,12 @@ export default function StepPeople({
         onPhotoBusy={onPhotoBusy}
       />
 
-      {programma}
+      {rimandoProgramma && (
+        <p className="wizard-programma__rimando">
+          <Icon icon="it-info-circle" size="sm" />
+          <span>{tp('peoplePointer')}</span>
+        </p>
+      )}
 
       {iscrizione}
 
@@ -612,40 +619,6 @@ function righe(moderators: ModeratorEntry[], speakers: SpeakerEntry[]): Riga[] {
   ];
 }
 
-interface Bozza extends PersonProfile {
-  name: string;
-  email: string;
-  personId: string | null;
-  role: PersonRole;
-}
-
-// «Mostra nella pagina pubblica» parte spento per tutti: pubblicare nome ed
-// ente di una persona è una scelta, persona per persona.
-const BOZZA_VUOTA: Bozza = {
-  name: '',
-  email: '',
-  personId: null,
-  role: 'speaker',
-  organization: null,
-  organizationLogoUrl: null,
-  publicListed: false,
-  photoId: null,
-};
-
-/** Mette una persona nell'elenco del suo ruolo. */
-function conRuolo(
-  moderators: ModeratorEntry[],
-  speakers: SpeakerEntry[],
-  persona: SpeakerEntry,
-  role: PersonRole
-): Pick<StepPeopleValue, 'moderators' | 'speakers'> {
-  if (role === 'speaker') return { moderators, speakers: [...speakers, persona] };
-  return {
-    moderators: [...moderators, { ...persona, organizer: role === 'organizer' }],
-    speakers,
-  };
-}
-
 /**
  * Le persone dell'evento in un elenco solo: organizzatori, moderatori e
  * relatori. Ognuno riceve un proprio link per entrare con il suo ruolo; il
@@ -678,11 +651,8 @@ function PeopleSection({
   const [fotoInCaricamento, setFotoInCaricamento] = useState(false);
   const [bozzaN, setBozzaN] = useState(0);
   const tutte = righe(moderators, speakers);
-  // Una persona ha un ruolo solo: gli indirizzi, senza distinguere maiuscole
-  // (quelli di un evento esistente possono averne).
-  const giaPresenti = new Set(
-    [...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase())
-  );
+  // Una persona ha un ruolo solo: gli indirizzi gia' usati (people-draft).
+  const giaPresenti = indirizziPresi(moderators, speakers, taken);
 
   const senza = (r: Riga): Pick<StepPeopleValue, 'moderators' | 'speakers'> =>
     r.kind === 'moderators'
@@ -715,36 +685,13 @@ function PeopleSection({
 
   const add = () => {
     if (fotoInCaricamento) return;
-    if (!draft.name.trim() || !draft.email.trim()) {
-      setErr(t('personRequired'));
-      return;
-    }
-    const email = draft.email.trim().toLowerCase();
-    if (!isEmail(email)) {
-      setErr(t('invalidEmail'));
-      return;
-    }
-    if (giaPresenti.has(email)) {
-      setErr(t('duplicateEmail'));
+    const esito = controllaBozza(draft, giaPresenti);
+    if ('errore' in esito) {
+      setErr(t(esito.errore));
       return;
     }
     setErr(null);
-    onChange(
-      conRuolo(
-        moderators,
-        speakers,
-        {
-          name: draft.name.trim(),
-          email,
-          personId: draft.personId,
-          organization: draft.organization?.trim() || null,
-          organizationLogoUrl: draft.organizationLogoUrl?.trim() || null,
-          publicListed: draft.publicListed,
-          photoId: draft.photoId ?? null,
-        },
-        draft.role
-      )
-    );
+    onChange(conRuolo(moderators, speakers, esito.persona, esito.role));
     // Il ruolo resta: di solito si aggiungono più persone con lo stesso.
     setDraft({ ...BOZZA_VUOTA, role: draft.role });
     setBozzaN((n) => n + 1);

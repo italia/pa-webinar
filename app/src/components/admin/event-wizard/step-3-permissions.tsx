@@ -15,6 +15,7 @@ import { useTranslations } from 'next-intl';
 import LanguageChecklist, { parseLocaleList } from '@/components/admin/language-checklist';
 import { lingueDiPartenzaTraduzione } from '@/lib/ai/target-locales';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { Icon } from '@/components/ui/icon';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
@@ -88,6 +89,10 @@ interface Props {
   /** Quale parte mostrare, fra le impostazioni avanzate: chi puo' fare cosa e
    *  le funzioni della sala, oppure registrazione e post-produzione AI. */
   parte: 'partecipazione' | 'registrazione';
+  /** Il programma accanto al suo interruttore: quanti argomenti ha e come
+   *  si arriva al passo dove si prepara. Assente per una chiamata
+   *  istantanea, che non ha il passo. */
+  programma?: { argomenti: number; onVai: () => void };
 }
 
 /** Le funzioni AI che si accendono con la registrazione: chi registra ha
@@ -139,9 +144,11 @@ export default function StepPermissions({
   editing = false,
   showAutoStart = false,
   parte,
+  programma,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
+  const tProgramma = useTranslations('admin.wizard.programme');
 
   const setCell = (feature: EventFeature, role: EventRole, allowed: boolean) => {
     const current = new Set(value.permissionMatrix[feature] ?? []);
@@ -243,6 +250,30 @@ export default function StepPermissions({
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
               {tAdmin('form.agendaEnabledDesc')}
+            </div>
+            {programma && (
+              <button
+                type="button"
+                className="btn btn-link btn-sm p-0 mt-1 text-start"
+                onClick={programma.onVai}
+              >
+                {tProgramma('toggleLink')} <span aria-hidden="true">→</span>
+              </button>
+            )}
+            {/* Spento, il programma preparato non si pubblica e non si salva:
+                in creazione si perde, in modifica resta quello dell'ultimo
+                salvataggio. Lo si dice, perche' sparisce senza che si veda. */}
+            <div role="status">
+              {programma && !value.agendaEnabled && programma.argomenti > 0 && (
+                <p className="wizard-iscrizione__avviso mb-0">
+                  <Icon icon="it-info-circle" size="sm" />
+                  <span>
+                    {editing
+                      ? tProgramma('toggleOffWarning', { count: programma.argomenti })
+                      : tProgramma('toggleOffWarningCreate', { count: programma.argomenti })}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
           <ToggleSwitch

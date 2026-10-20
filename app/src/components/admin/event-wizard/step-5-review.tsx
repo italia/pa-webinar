@@ -71,6 +71,11 @@ interface Props {
   iscrizioneAperta?: boolean;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
+  /** Porta al passo «Programma». Assente per una chiamata istantanea, che
+   *  non ha il passo: la riga del programma compare solo se ce n'e' uno. */
+  onVaiProgramma?: () => void;
+  /** Si sta creando l'evento: ad agenda spenta il programma non si salva. */
+  programmaInCreazione?: boolean;
   /** Quante domande si fanno prima e dopo l'evento, sotto cio' che si chiede
    *  all'iscrizione. */
   questionari?: React.ReactNode;
@@ -97,16 +102,21 @@ export default function Step5Review({
   sopratitolo = false,
   iscrizioneAperta,
   onVaiPersone,
+  onVaiProgramma,
+  programmaInCreazione = false,
   questionari,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const tf = useTranslations('admin.wizard.flow');
   const tp = useTranslations('admin.wizard.step2');
   const tForm = useTranslations('admin.form');
+  const tProgramma = useTranslations('admin.wizard.programme');
   const durata = useDurataTesto();
   const toggles = togglesFromMatrix(form.permissionMatrix);
-  // Il programma, ad agenda accesa: quanti argomenti e quanto dura.
-  const programma = form.agendaEnabled ? vociCompilate(form.agenda ?? []) : [];
+  // Il programma, ad agenda accesa: quanti argomenti e quanto dura. Spenta,
+  // quelli preparati non compaiono (e in creazione non si salvano).
+  const preparati = vociCompilate(form.agenda ?? []);
+  const programma = form.agendaEnabled ? preparati : [];
   const durataDelProgramma = durataProgramma(programma);
   const senzaInvitati = iscrizioneAperta === false && form.invitations.length === 0;
   // Cosa si chiede a chi si iscrive: nome ed email sempre, il resto se scelto.
@@ -319,25 +329,31 @@ export default function Step5Review({
               )}
             </span>
           </li>
-          {programma.length > 0 && (
+          {(onVaiProgramma || programma.length > 0) && (
             <li>
               <span className="anteprima-righe__icona">
                 <Icon icon="it-list" size="sm" />
               </span>
               <span>
-                {durataDelProgramma !== null
-                  ? t('summary.programmeWithDuration', {
-                      count: programma.length,
-                      duration: durata(0, durataDelProgramma * 60_000),
-                    })
-                  : t('summary.programme', { count: programma.length })}{' '}
-                {onVaiPersone && (
+                {programma.length > 0
+                  ? durataDelProgramma !== null
+                    ? t('summary.programmeWithDuration', {
+                        count: programma.length,
+                        duration: durata(0, durataDelProgramma * 60_000),
+                      })
+                    : t('summary.programme', { count: programma.length })
+                  : preparati.length > 0
+                    ? tProgramma(programmaInCreazione ? 'reviewOffCreate' : 'reviewOff', {
+                        count: preparati.length,
+                      })
+                    : tProgramma('reviewEmpty')}{' '}
+                {onVaiProgramma && (
                   <button
                     type="button"
                     className="btn btn-link p-0 align-baseline anteprima-link"
-                    onClick={onVaiPersone}
+                    onClick={onVaiProgramma}
                   >
-                    {tf('change')}
+                    {preparati.length > 0 ? tf('change') : tProgramma('reviewPrepare')}
                   </button>
                 )}
               </span>
