@@ -380,18 +380,25 @@ export default function FileOrUrlInput({
   }, []);
 
   // Il valore puo' cambiare da fuori (dati del modulo arrivati dopo il primo
-  // disegno, un modello, una bozza). Se e' l'eco di quello che si sta
-  // scrivendo nel link, la casella resta com'e': non si riscrive chi digita.
+  // disegno, un modello, una bozza, un modulo azzerato dopo «Aggiungi»). Se
+  // e' l'eco di quello che si sta scrivendo nel link, la casella resta
+  // com'e': non si riscrive chi digita. L'eco c'e' solo con il link toccato:
+  // dopo un caricamento la casella e' vuota, e un valore tornato vuoto da
+  // fuori deve svuotare anche il riquadro, non lasciarci il file di prima.
   const [valoreVisto, setValoreVisto] = useState(value);
   if (value !== valoreVisto) {
     setValoreVisto(value);
-    if ((value ?? '') !== String(withScheme(draft))) {
+    const eco = toccato && (value ?? '') === String(withScheme(draft));
+    if (!eco) {
       const link = !!value && !daCaricamento(value);
       setDraft(link ? (value ?? '') : '');
       setDaLink(link);
       setToccato(false);
       setAnteprima(value);
       setErroreLink(null);
+      setErrore(null);
+      // I dati del file appena caricato valgono finche' il valore e' il suo.
+      setCaricato((c) => (c && c.url === value ? c : null));
     }
   }
 

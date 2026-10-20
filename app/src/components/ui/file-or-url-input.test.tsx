@@ -622,6 +622,77 @@ describe('il link', () => {
     expect(linkInput()!.value).toBe('https://i.ytimg.com/vi/abc/hqdefault.jpg');
   });
 
+  it('un valore azzerato da fuori dopo un caricamento svuota il campo', async () => {
+    // Il modulo che si azzera dopo «Aggiungi» (un materiale, il logo di una
+    // persona nuova): il file di prima non resta in vista.
+    let azzera: () => void = () => {};
+    function Azzerabile() {
+      const [v, setV] = useState<string | null>(null);
+      azzera = () => setV(null);
+      return (
+        <FileOrUrlInput
+          id="doc"
+          label="Documento"
+          value={v}
+          onChange={setV}
+          assetType="document"
+        />
+      );
+    }
+    disegna(<Azzerabile />);
+    await scegliFile(
+      new File([new Uint8Array([1])], 'slide.pdf', { type: 'application/pdf' })
+    );
+    act(() =>
+      ultimoXhr().rispondi(
+        200,
+        risposta({
+          url: `${ORIGINE}/api/assets/document/slide.pdf`,
+          mime: 'application/pdf',
+          filename: 'slide.pdf',
+        })
+      )
+    );
+    await svuota();
+    const zona = () => container.querySelector('.campo-file__zona')!.textContent;
+    expect(zona()).toContain('slide.pdf');
+    expect(linkInput()).toBeNull();
+
+    act(() => azzera());
+    expect(zona()).not.toContain('slide.pdf');
+    expect(pulsante(t.remove)).toBeUndefined();
+    expect(pulsante(t.choose)).toBeDefined();
+    expect(linkInput()!.value).toBe('');
+  });
+
+  it('un file del portale tolto da fuori non resta in vista', () => {
+    const campo = (v: string | null) => (
+      <FileOrUrlInput id="doc" label="Documento" value={v} onChange={vi.fn()} assetType="document" />
+    );
+    disegna(campo(`${ORIGINE}/api/assets/document/slide.pdf`));
+    expect(container.textContent).toContain('slide.pdf');
+    disegna(campo(null));
+    expect(container.textContent).not.toContain('slide.pdf');
+    expect(pulsante(t.remove)).toBeUndefined();
+  });
+
+  it('un link scritto e poi azzerato da fuori svuota la casella', () => {
+    let azzera: () => void = () => {};
+    function Azzerabile() {
+      const [v, setV] = useState<string | null>(null);
+      azzera = () => setV(null);
+      return (
+        <FileOrUrlInput id="doc" label="Documento" value={v} onChange={setV} assetType="document" />
+      );
+    }
+    disegna(<Azzerabile />);
+    scrivi(linkInput()!, 'https://www.ente.it/programma.pdf');
+    // L'eco del valore non riscrive chi digita.
+    expect(linkInput()!.value).toBe('https://www.ente.it/programma.pdf');
+    act(() => azzera());
+    expect(linkInput()!.value).toBe('');
+  });
+
   it('segue il valore arrivato dopo il primo disegno', () => {
     const campo = (v: string | null) => (
       <FileOrUrlInput
