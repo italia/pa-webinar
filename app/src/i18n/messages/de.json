@@ -4665,6 +4665,9 @@
     "pause": "Pause",
     "reset": "Zurücksetzen",
     "presets": {
+      "1min": "1 Min.",
+      "2min": "2 Min.",
+      "3min": "3 Min.",
       "5min": "5 Min.",
       "10min": "10 Min.",
       "15min": "15 Min.",

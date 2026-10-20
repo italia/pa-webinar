@@ -4665,6 +4665,9 @@
     "pause": "Szünet",
     "reset": "Visszaállítás",
     "presets": {
+      "1min": "1 perc",
+      "2min": "2 perc",
+      "3min": "3 perc",
       "5min": "5 perc",
       "10min": "10 perc",
       "15min": "15 perc",

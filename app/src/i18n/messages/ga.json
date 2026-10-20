@@ -4665,6 +4665,9 @@
     "pause": "Cuir ar sos",
     "reset": "Athshocraigh",
     "presets": {
+      "1min": "1 nóim",
+      "2min": "2 nóim",
+      "3min": "3 nóim",
       "5min": "5 nóim",
       "10min": "10 nóim",
       "15min": "15 nóim",
