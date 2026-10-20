@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { CODICE_LINGUA } from '@/lib/ai/target-locales';
 import { REMINDER_PRESETS } from '@/lib/events/reminder-presets';
 
 import {
@@ -158,8 +159,20 @@ export const eventBaseSchema = z.object({
   // Sottotitoli live (ADR-018): attivi di default, li cambia anche chi modera dal vivo.
   liveCaptionsEnabled: z.boolean().optional(),
   captionsTranscriptEnabled: z.boolean().optional(),
-  // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
+  // Le lingue dell'evento, codici separati da virgola: schede di titolo e
+  // descrizione, traduzione automatica al salvataggio e, con
+  // aiTranslationEnabled, sottotitoli e sintesi. Null = quelle del sito
+  // (SiteSetting.aiDefaultTargetLocales).
   aiTargetLocales: z.string().max(200).nullable().optional(),
+  // Dal wizard: le lingue di titolo e descrizione che chi salva ha toccato.
+  // Delle altre resta il testo salvato, con il suo stato (una traduzione
+  // arrivata a wizard aperto non si cancella). Senza, il testo inviato vale
+  // per tutte le lingue (lib/text-translation/unione-testi).
+  textEdits: z
+    .object({
+      touched: z.array(z.string().regex(CODICE_LINGUA)).max(24),
+    })
+    .optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
   // postprod forza k=N nel clustering della diarization invece di
   // auto-detect via silhouette. Null = lascia decidere al modello.

@@ -16,6 +16,7 @@ const push = vi.fn();
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push }),
   percorso: (p: string) => p,
+  Link: ({ href, children }: { href: string; children: React.ReactNode }) => <a href={href}>{children}</a>,
 }));
 const toastError = vi.fn();
 vi.mock('@/components/ui/toast', () => ({
@@ -895,79 +896,397 @@ describe('creazione — risorse non salvate', () => {
   });
 });
 
-describe('creazione — traduzione automatica dopo il salvataggio', () => {
-  const CREATO = { id: 'evt-tradotto', slug: 'evt-tradotto', moderatorToken: 'tok-t' };
+/**
+ * Le lingue dell'evento nel passo «Evento»: un solo elenco (aiTargetLocales)
+ * per le schede, la traduzione automatica al salvataggio (la decide il
+ * server) e quella di sottotitoli e sintesi. Il wizard manda le lingue che ha
+ * toccato (textEdits): delle altre il server tiene il testo che ha.
+ */
+describe('lingue dell evento e traduzione automatica', () => {
   const tt = messages.admin.textTranslation;
+  const CREATO = { id: 'evt-lingue', slug: 'evt-lingue', moderatorToken: 'tok-l' };
 
   function compila() {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
   }
+  function payload(metodo: 'POST' | 'PUT'): Record<string, unknown> {
+    const chiamata = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => init?.method === metodo && /^\/api\/events(\/[^/]+)?$/.test(url),
+    );
+    return JSON.parse(String(chiamata?.[1].body)) as Record<string, unknown>;
+  }
+  const scheda = (nome: string) =>
+    Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find((b) =>
+      b.textContent?.startsWith(nome),
+    )!;
 
-  it('senza la traduzione nell\'installazione il passo non cambia', () => {
-    renderWizard();
-    expect(container.textContent).not.toContain(tt.heading);
-  });
-
-  it('scelta: dopo la creazione la chiede con il testo salvato, nelle lingue vuote', async () => {
+  it('creazione, motore acceso: le lingue senza testo si traducono al salvataggio, e lo decide il server', async () => {
     fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
-      const url = String(input);
-      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
-      if (url.endsWith('/text-translation')) return json(202, { stato: 'accodato', jobId: 'j' });
+      if (String(input) === '/api/events' && init.method === 'POST') return json(201, CREATO);
       return json(200, {});
     });
-    renderWizard({ textTranslationAvailable: true, enabledLocales: ['it', 'en', 'de'] });
+    renderWizard({
+      textTranslationAvailable: true,
+      enabledLocales: ['it', 'en', 'de'],
+      defaultTargetLocales: 'en,de,uk',
+    });
+    expect(container.querySelector('.lingue-evento__riga')!.textContent).toContain('English · Deutsch');
+    expect(container.textContent).toContain(tt.helpAuto);
+    expect(scheda('English').textContent).toContain(tt.state.onSave);
+    // Il campo dice la sua lingua, anche alle tecnologie assistive.
+    click(scheda('English'));
+    expect(byId('ev-title').getAttribute('lang')).toBe('en');
+    expect(container.querySelector('label[for="ev-title"]')!.textContent).toContain(
+      tt.titleLabel.replace('{language}', 'English'),
+    );
+    expect(byId('ev-description-en').getAttribute('lang')).toBe('en');
+    expect(container.textContent).toContain(
+      tt.panel.onSave.replace('{source}', 'italiano'),
+    );
+    click(scheda('Italiano'));
     compila();
-    click(byId<HTMLInputElement>('traduci-dopo'));
     organizzatore();
     goToStep('review');
     await press(button(w.saveDraft));
 
-    const richiesta = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/text-translation'));
-    expect(String(richiesta![0])).toBe(`/api/admin/events/${CREATO.id}/text-translation`);
-    expect(JSON.parse(String(richiesta![1].body))).toEqual({
-      sourceLanguage: 'it',
-      title: 'Evento di prova',
-      description: 'Una descrizione valida per il wizard.',
-      targetLanguages: ['en', 'de'],
+    expect(payload('POST')).toMatchObject({
+      aiTargetLocales: 'en,de,uk',
+      textEdits: { touched: [] },
     });
-    // Tutto salvato: nessuna risorsa mancante da dire.
+    // Nessuna richiesta di traduzione dal browser: la chiede il server.
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/text-translation'))).toBe(false);
     expect(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`)).toBeNull();
   });
 
-  it('una richiesta rifiutata non blocca la creazione: arriva al riepilogo come risorsa non salvata', async () => {
-    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
-      const url = String(input);
-      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
-      if (url.endsWith('/text-translation')) return json(422, { code: 'MT_UNAVAILABLE' });
-      return json(200, {});
-    });
-    renderWizard({ textTranslationAvailable: true });
-    compila();
-    click(byId<HTMLInputElement>('traduci-dopo'));
-    organizzatore();
-    goToStep('review');
-    await press(button(w.saveDraft));
+  it('motore spento: nessuna promessa di traduzione; l amministrazione vede dove accenderla', () => {
+    renderWizard({ enabledLocales: ['it', 'en'], defaultTargetLocales: 'en' });
+    expect(container.textContent).not.toContain(tt.helpAuto);
+    expect(container.textContent).toContain(tt.helpManual.replace('{source}', 'italiano'));
+    expect(scheda('English').textContent).toContain(tt.state.empty);
+    expect(container.textContent).not.toContain(tt.engineOff);
 
-    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
-    expect(JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}')).toEqual({
-      unsaved: ['textTranslation'],
-      publishFailed: false,
+    act(() => root.unmount());
+    root = createRoot(container);
+    renderWizard({ enabledLocales: ['it', 'en'], defaultTargetLocales: 'en', isSiteAdmin: true });
+    expect(container.textContent).toContain(tt.engineOff);
+  });
+
+  const evento: InitialEventShape = {
+    id: 'evt-l',
+    slug: 'evento-lingue',
+    moderatorToken: 'token-l',
+    event: {
+      title: { it: 'Evento di prova', en: 'Test event', de: 'Testveranstaltung' },
+      description: {
+        it: 'Una descrizione valida per il wizard.',
+        en: 'A valid description.',
+        de: 'Eine gültige Beschreibung.',
+      },
+      startsAt: '2030-01-10T09:00:00.000Z',
+      endsAt: '2030-01-10T11:00:00.000Z',
+      timezone: 'Europe/Rome',
+      maxParticipants: 100,
+      coverImageUrl: null,
+      imageUrl: null,
+      waitingRoomAudioUrl: null,
+      tagSlugs: [],
+      recurrenceRule: null,
+      parseTitleKicker: null,
+      waitingRoomEngine: null,
+      videoQuality: null,
+      expectedSenderRatioPct: null,
+      permissionMatrix: null,
+      qaEnabled: false,
+      chatEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      recordingEnabled: false,
+      autoStartRecording: false,
+      aiTargetLocales: 'en,de',
+      dataRetentionDays: 30,
+      postEventPublic: true,
+      status: 'PUBLISHED',
+      gdprTemplateId: null,
+      privacyPolicyText: null,
+      privacyPolicyUrl: null,
+      moderatorName: 'Mario Rossi',
+      moderatorEmail: 'mario@example.org',
+      moderatorOrganization: null,
+      moderatorOrganizationLogoUrl: null,
+      moderatorPublicListed: false,
+      moderatorPhotoId: null,
+      accessMode: null,
+      requireOrganization: false,
+      requireOrganizationRole: false,
+      requireOrganizationType: false,
+    },
+    organizers: [],
+    eventModerators: [],
+    invitations: [],
+    materials: [],
+    preEventQuestionnaire: null,
+    postEventQuestionnaire: null,
+  };
+  const statoServer = {
+    engine: 'available' as const,
+    principale: 'it',
+    lingue: [
+      { code: 'it', page: true, event: true, state: 'principale' as const, origin: null, current: true },
+      { code: 'en', page: true, event: true, state: 'machine' as const, origin: 'MACHINE' as const, current: true },
+      { code: 'de', page: true, event: true, state: 'human' as const, origin: 'HUMAN' as const, current: true },
+    ],
+    job: null,
+    testi: { title: {}, description: {} },
+  };
+
+  it('modifica: manda solo le lingue toccate; «Segna come riletta» tocca la lingua', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: structuredClone(evento),
+      textTranslationAvailable: true,
+      statoLingueIniziale: statoServer,
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    expect(scheda('English').textContent).toContain(tt.state.machine);
+    expect(scheda('Deutsch').textContent).toContain(tt.state.human);
+
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(payload('PUT')).toMatchObject({ textEdits: { touched: [] }, aiTargetLocales: 'en,de' });
+
+    fetchMock.mockClear();
+    goToStep('base');
+    click(scheda('English'));
+    click(button(tt.markReviewed));
+    expect(scheda('English').textContent).toContain(tt.state.human);
+    click(scheda('Deutsch'));
+    type(byId<HTMLInputElement>('ev-title'), 'Neuer Titel');
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(payload('PUT')).toMatchObject({
+      textEdits: { touched: ['de', 'en'] },
+      title: { it: 'Evento di prova', en: 'Test event', de: 'Neuer Titel' },
     });
   });
 
-  it('non scelta: nessuna richiesta', async () => {
-    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
-      const url = String(input);
-      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+  it('il testo principale cambiato: la lingua scritta da una persona e da aggiornare; «Ritraduci» la svuota', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: structuredClone(evento),
+      textTranslationAvailable: true,
+      statoLingueIniziale: statoServer,
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    type(byId<HTMLInputElement>('ev-title'), 'Un altro evento');
+    expect(scheda('Deutsch').textContent).toContain(tt.state.stale);
+    expect(scheda('English').textContent).toContain(tt.state.onSave);
+    click(scheda('Deutsch'));
+    click(button(tt.retranslate));
+    click(button(tt.retranslateConfirm));
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('');
+    expect(scheda('Deutsch').textContent).toContain(tt.state.onSave);
+    goToStep('review');
+    await press(button(w.updateEvent));
+    const corpo = payload('PUT');
+    expect(corpo.textEdits).toEqual({ touched: ['de'] });
+    expect((corpo.title as Record<string, string>).de).toBe('');
+  });
+
+  it('togliere una lingua con un testo chiede conferma, e al salvataggio il testo se ne va', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: structuredClone(evento),
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    click(byId('ev-lingue-cambia'));
+    const deutsch = Array.from(container.querySelectorAll<HTMLInputElement>('#aiTargetLocales input[type="checkbox"]')).find(
+      (c) => c.labels?.[0]?.getAttribute('lang') === 'de',
+    )!;
+    click(deutsch);
+    expect(container.textContent).toContain(tt.removeQuestion.replace(/\{language\}/g, 'Deutsch'));
+    expect(scheda('Deutsch')).toBeTruthy();
+    click(button(tt.removeConfirm));
+    expect(scheda('Deutsch')).toBeUndefined();
+    goToStep('review');
+    await press(button(w.updateEvent));
+    const corpo = payload('PUT');
+    expect(corpo.aiTargetLocales).toBe('en');
+    expect(corpo.textEdits).toEqual({ touched: ['de'] });
+    expect((corpo.title as Record<string, string>).de).toBe('');
+  });
+
+  it('una bozza ripresa tocca le lingue che cambia', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    localStorage.setItem(
+      'pa-wizard-draft:evt-l',
+      JSON.stringify({ title: { ...evento.event.title, en: 'Draft title' } }),
+    );
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(evento), enabledLocales: ['it', 'en', 'de'] });
+    click(button(w.draftRestore));
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(payload('PUT').textEdits).toEqual({ touched: ['en'] });
+  });
+
+  it('una bozza ripresa riporta solo le lingue toccate: le altre restano quelle del server', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    // La bozza ricordava l'inglese vuoto (prima della traduzione) e il tedesco scritto a mano.
+    localStorage.setItem(
+      'pa-wizard-draft:evt-l',
+      JSON.stringify({
+        title: { ...evento.event.title, en: '', de: 'Mein Titel' },
+        lingueToccate: ['de'],
+      }),
+    );
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(evento), enabledLocales: ['it', 'en', 'de'] });
+    click(button(w.draftRestore));
+    goToStep('review');
+    await press(button(w.updateEvent));
+    const corpo = payload('PUT');
+    expect(corpo.textEdits).toEqual({ touched: ['de'] });
+    expect(corpo.title).toMatchObject({ en: 'Test event', de: 'Mein Titel' });
+  });
+
+  it('una bozza di prima senza lingue non diventa «quelle del sito»', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    localStorage.setItem('pa-wizard-draft:evt-l', JSON.stringify({ aiTargetLocales: null }));
+    renderWizard({ mode: 'edit', initialEvent: structuredClone(evento), enabledLocales: ['it', 'en', 'de'] });
+    click(button(w.draftRestore));
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(payload('PUT').aiTargetLocales).toBe('');
+  });
+
+  it('con il link di conduzione le lingue toccate restano tali dopo il salvataggio', async () => {
+    let revocaRiesce = false;
+    fetchMock.mockImplementation(async (_input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (init.method === 'DELETE') return revocaRiesce ? json(200, {}) : json(500, {});
       return json(200, {});
     });
-    renderWizard({ textTranslationAvailable: true });
+    renderWizard({
+      mode: 'edit',
+      viaToken: 'token-l',
+      initialEvent: {
+        ...structuredClone(evento),
+        eventModerators: [
+          { id: 'mod-t', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+        ],
+      },
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    click(scheda('English'));
+    type(byId<HTMLInputElement>('ev-title'), 'Edited title');
+    goToStep('invites');
+    const riga = Array.from(container.querySelectorAll('li')).find((li) => li.textContent?.includes('Anna Bianchi'))!;
+    click(button(w.step3.remove, riga));
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(push).not.toHaveBeenCalled();
+    fetchMock.mockClear();
+    revocaRiesce = true;
+    await press(button(w.updateEvent));
+    // Nessuna lettura dell'amministrazione, e l'inglese resta di chi l'ha scritto.
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/text-translation'))).toBe(false);
+    expect(payload('PUT').textEdits).toEqual({ touched: ['en'] });
+  });
+
+  it('nessuna lingua oltre la principale e una scelta: si salva vuoto, non «quelle del sito»', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    renderWizard({
+      mode: 'edit',
+      initialEvent: { ...structuredClone(evento), event: { ...evento.event, title: { it: 'Evento di prova' }, description: { it: evento.event.description.it! } } },
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    click(byId('ev-lingue-cambia'));
+    for (const l of ['en', 'de']) {
+      const casella = Array.from(
+        container.querySelectorAll<HTMLInputElement>('#aiTargetLocales input[type="checkbox"]'),
+      ).find((c) => c.labels?.[0]?.getAttribute('lang') === l)!;
+      click(casella);
+    }
+    goToStep('review');
+    await press(button(w.updateEvent));
+    expect(payload('PUT').aiTargetLocales).toBe('');
+  });
+
+  it('un evento che non aveva scelto lingue parte da quelle del sito, senza aggiungere quelle con un testo', () => {
+    renderWizard({
+      mode: 'edit',
+      initialEvent: { ...structuredClone(evento), event: { ...evento.event, aiTargetLocales: null } },
+      enabledLocales: ['it', 'en', 'de'],
+      defaultTargetLocales: 'en,fr',
+    });
+    const riga = container.querySelector('.lingue-evento__riga')!.textContent!;
+    expect(riga).toContain('English · ');
+    expect(riga).not.toContain('Deutsch');
+    // Il tedesco ha un testo: la sua scheda resta.
+    expect(scheda('Deutsch')).toBeTruthy();
+  });
+
+  it('salvato e rimasto sulla pagina, le lingue mandate non sono piu toccate', async () => {
+    let revocaRiesce = false;
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      if (init.method === 'DELETE') return revocaRiesce ? json(200, {}) : json(500, {});
+      return json(200, {});
+    });
+    renderWizard({
+      mode: 'edit',
+      initialEvent: {
+        ...structuredClone(evento),
+        eventModerators: [
+          { id: 'mod-l', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+        ],
+      },
+      enabledLocales: ['it', 'en', 'de'],
+    });
+    click(scheda('English'));
+    type(byId<HTMLInputElement>('ev-title'), 'Edited title');
+    goToStep('invites');
+    const riga = Array.from(container.querySelectorAll('li')).find((li) => li.textContent?.includes('Anna Bianchi'))!;
+    click(button(w.step3.remove, riga));
+    goToStep('review');
+    await press(button(w.updateEvent));
+    // La revoca non e' riuscita: il wizard resta aperto.
+    expect(push).not.toHaveBeenCalled();
+    expect(payload('PUT').textEdits).toEqual({ touched: ['en'] });
+
+    fetchMock.mockClear();
+    revocaRiesce = true;
+    await press(button(w.updateEvent));
+    expect(payload('PUT').textEdits).toEqual({ touched: [] });
+  });
+
+  it('le lingue di sottotitoli e sintesi sono quelle dell evento: dal riepilogo si va al passo «Evento»', () => {
+    renderWizard({
+      template: {
+        id: 'tpl-l',
+        name: 'Registrato',
+        qaEnabled: true,
+        chatEnabled: false,
+        recordingEnabled: true,
+        autoStartRecording: false,
+        participantsCanUnmute: false,
+        participantsCanStartVideo: false,
+        participantsCanShareScreen: false,
+        maxParticipants: 100,
+        aiTranscriptEnabled: true,
+        aiTranslationEnabled: true,
+        aiTargetLocales: 'en,fr',
+      },
+      aiPipelineEnabled: true,
+    });
     compila();
     organizzatore();
     goToStep('review');
-    await press(button(w.saveDraft));
-    expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/text-translation'))).toBe(false);
+    const riga = container.querySelector('.anteprima-evento')!;
+    expect(riga.textContent).toContain(w.flow.translationLine.replace('{list}', 'English, Français'));
+    click(button(tt.changeInEventStep.replace('{step}', w.flow.steps.base)));
+    expect(document.activeElement?.id).toBe('ev-lingue-cambia');
   });
 });
 
@@ -1224,20 +1543,6 @@ describe('creazione — i default del modello', () => {
     expect(container.textContent).not.toContain(messages.admin.form.aiTargetLocales);
     await press(button(w.saveDraft));
     expect(payloadInviato()).toMatchObject({ aiTranscriptEnabled: true, aiTranslationEnabled: false });
-  });
-
-  it('le lingue di traduzione si cambiano nel riepilogo', async () => {
-    renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'en,fr' });
-    compila();
-    goToStep('review');
-    // Le lingue si aprono a richiesta, nell'anteprima.
-    click(button(w.flow.changeLanguages));
-    const francese = Array.from(container.querySelectorAll<HTMLInputElement>('#aiTargetLocales input[type="checkbox"]')).find(
-      (el) => el.labels?.[0]?.getAttribute('lang') === 'fr',
-    )!;
-    click(francese);
-    await press(button(w.saveDraft));
-    expect(payloadInviato().aiTargetLocales).toBe('en');
   });
 
   it('senza modello, accendere la registrazione accende anche trascrizione, sintesi, traduzione e tracce', async () => {

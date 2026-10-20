@@ -11,9 +11,7 @@ export type UnsavedResource =
   | 'speakers'
   | 'materials'
   | 'questionnaires'
-  | 'agenda'
-  /** La traduzione automatica di titolo e descrizione chiesta alla creazione. */
-  | 'textTranslation';
+  | 'agenda';
 
 export interface CreationOutcome {
   unsaved: UnsavedResource[];
@@ -29,7 +27,6 @@ const TIPI: readonly UnsavedResource[] = [
   'materials',
   'questionnaires',
   'agenda',
-  'textTranslation',
 ];
 
 const chiave = (eventId: string) => `pa-wizard-unsaved:${eventId}`;

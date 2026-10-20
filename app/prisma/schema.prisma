@@ -226,13 +226,21 @@ model Event {
   // sono dell'evento, non di una registrazione.
   reportJobs               PostprodJob[]
 
-  // Le traduzioni automatiche di titolo e descrizione (lib/text-translation),
-  // come proposta: { sourceLanguage, sourceHash, generatedAt, model,
-  // title: {lingua: testo}, description: {lingua: testo} }. Non cambiano mai
-  // `title` e `description`: chi modifica l'evento le rilegge nel wizard e le
-  // salva lui. `sourceHash` dice da quale testo vengono, per non proporle
-  // dopo che il testo di partenza e' cambiato.
+  // L'ultima traduzione automatica di titolo e descrizione consegnata dal
+  // motore (lib/text-translation), come l'ha restituita: { sourceLanguage,
+  // sourceHash, generatedAt, model, title: {lingua: testo}, description:
+  // {lingua: testo} }. In `title` e `description` va solo nelle lingue vuote
+  // o gia' tradotte in automatico, e solo se viene dal testo principale di
+  // adesso (`sourceHash`).
   textTranslations Json? @map("text_translations")
+
+  // Lo stato di titolo e descrizione in ogni lingua diversa dalla principale
+  // (lib/text-translation/stato-lingue): { [lingua]: { origin, sourceHash,
+  // at, model? } }. `origin` e' MACHINE (tradotta in automatico, la pagina lo
+  // dice) o HUMAN (scritta o riletta da una persona: mai sostituita da sola);
+  // `sourceHash` e' l'impronta del testo principale da cui viene, e dice
+  // quando la lingua e' da aggiornare. Nessun dato personale.
+  textLocaleState Json? @map("text_locale_state")
 
   // Post-event follow-up email (opt-in per event). When enabled, the reminders
   // cron sends a thank-you + recap/feedback email to registrants and a recap
@@ -348,8 +356,10 @@ model Event {
   // trascrizione). On = le tracce sopravvivono fino a retentionUntil del
   // recording, con disclosure/consenso dedicati (PII sensibile).
   retainParticipantTracks Boolean @default(false) @map("retain_participant_tracks")
-  // Comma-separated ISO-639-1 list of target languages for transcript /
-  // summary translation (e.g. "en,fr"). When null, falls back to
+  // Le lingue dell'evento, codici separati da virgola ("en,fr"): fanno le
+  // schede di titolo e descrizione, le lingue in cui si traducono in
+  // automatico al salvataggio (quelle attive sul sito) e, solo con
+  // aiTranslationEnabled, le lingue di sottotitoli e sintesi. Null: quelle di
   // SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales      String? @map("ai_target_locales") @db.VarChar(200)
   // Numero di parlanti attesi nell'evento. Quando valorizzato (1-30),
@@ -2079,8 +2089,9 @@ enum PostprodJobKind {
   // lo staff dopo l'evento; il risultato si congela su Event.postEventReport.
   REPORT
   // La traduzione di titolo e descrizione dell'evento (lib/text-translation)
-  // con il motore di traduzione su CPU, senza vLLM ne' GPU. Lo avvia lo staff
-  // dal wizard; il risultato e' una proposta su Event.textTranslations.
+  // con il motore di traduzione su CPU, senza vLLM ne' GPU. La chiede il
+  // server dopo il salvataggio dell'evento; il risultato va nelle lingue vuote
+  // o tradotte in automatico, e resta su Event.textTranslations.
   TRANSLATE_TEXT
 }
 

@@ -16,7 +16,6 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
-import { parseTargetLocales } from '@/lib/ai/providers';
 import { languageCodeSchema } from '@/lib/ai/schemas';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -26,6 +25,7 @@ import { AppError, ConflictError, NotFoundError, ValidationError } from '@/lib/e
 import {
   accodaResoconto,
   letturaResoconto,
+  lingueDelResoconto,
   linguaResoconto,
   ultimoLavoroResoconto,
 } from '@/lib/report/enqueue';
@@ -52,11 +52,15 @@ export const GET = withErrorHandling(async (_request, context) => {
         endsAt: true,
         dataRetentionDays: true,
         aiTargetLocales: true,
+        aiTranslationEnabled: true,
         postEventReport: true,
         postEventReportPublished: true,
       },
     }),
-    prisma.siteSetting.findUnique({ where: { id: 'singleton' }, select: { aiPipelineEnabled: true } }),
+    prisma.siteSetting.findUnique({
+      where: { id: 'singleton' },
+      select: { aiPipelineEnabled: true, aiDefaultTargetLocales: true },
+    }),
   ]);
   if (!evento) throw new NotFoundError('Event');
 
@@ -107,7 +111,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     },
     languages: {
       source: lingua,
-      targets: parseTargetLocales(evento.aiTargetLocales),
+      targets: lingueDelResoconto(evento, impostazioni?.aiDefaultTargetLocales),
     },
   });
 });

@@ -48,14 +48,29 @@ export function getLocalized(
   locale: string,
   fallbackLocale: string = 'it',
 ): string {
-  if (!field || typeof field !== 'object') return '';
+  return getLocalizedWithLocale(field, locale, fallbackLocale).testo;
+}
+
+/**
+ * Come `getLocalized`, con la lingua del testo restituito: quella chiesta, o
+ * quella da cui viene il testo mostrato al suo posto. Chi mostra un testo in
+ * un'altra lingua lo dice con `lang` (WCAG 3.1.2). `lingua` e' null se non
+ * c'e' nessun testo.
+ */
+export function getLocalizedWithLocale(
+  field: LocalizedField,
+  locale: string,
+  fallbackLocale: string = 'it',
+): { testo: string; lingua: string | null } {
+  if (!field || typeof field !== 'object') return { testo: '', lingua: null };
   const obj = field as Record<string, string>;
   const usable = (v: unknown): v is string =>
     typeof v === 'string' && v.trim().length > 0;
 
-  if (usable(obj[locale])) return obj[locale];
-  if (usable(obj[fallbackLocale])) return obj[fallbackLocale];
-  return Object.values(obj).find(usable) ?? '';
+  if (usable(obj[locale])) return { testo: obj[locale], lingua: locale };
+  if (usable(obj[fallbackLocale])) return { testo: obj[fallbackLocale], lingua: fallbackLocale };
+  const altra = Object.entries(obj).find(([, v]) => usable(v));
+  return altra ? { testo: altra[1], lingua: altra[0] } : { testo: '', lingua: null };
 }
 
 /**

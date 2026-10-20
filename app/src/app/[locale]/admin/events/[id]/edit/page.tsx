@@ -13,7 +13,8 @@ import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
-import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
+import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
+import { calcolaStatoTesti } from '@/lib/text-translation/auto';
 import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
@@ -133,7 +134,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     if (!staffCanManage) return <AccessDenied />;
   }
 
-  const [event, siteSettings, tags, gdprTemplates] = await Promise.all([
+  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione] = await Promise.all([
     prisma.event.findUnique({
       where: { id },
       include: {
@@ -173,6 +174,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
       select: { id: true, name: true, isDefault: true },
     }),
+    ultimoLavoroTraduzione(id),
   ]);
 
   if (!event || (token && event.moderatorToken !== token)) {
@@ -180,6 +182,15 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   }
 
   const defaultLocale = siteSettings.defaultLocale ?? 'it';
+  // Lo stato delle lingue di titolo e descrizione, calcolato qui sull'evento e
+  // le impostazioni gia' letti: con il solo link di conduzione il wizard non
+  // puo' chiederlo all'amministrazione.
+  const statoLingue = calcolaStatoTesti({
+    evento: event,
+    impostazioni: siteSettings,
+    lavoro: ultimaTraduzione,
+    ora: new Date(),
+  });
 
   const pre = event.questionnaires.find(
     (q) => q.placement === 'PRE_REGISTRATION',
@@ -384,8 +395,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
-        // Solo allo staff: la rotta della traduzione e' dell'amministrazione.
-        textTranslationAvailable={staffCanManage && traduzioneDisponibile(siteSettings)}
+        // La traduzione al salvataggio la decide il server, per chiunque salvi.
+        textTranslationAvailable={traduzioneDisponibile(siteSettings)}
+        statoLingueIniziale={statoLingue}
+        isSiteAdmin={session?.role === 'admin'}
         campiLiberi={{
           speakersInfo: (event.speakersInfo ?? null) as Record<string, string> | null,
           organizerName: event.organizerName ?? null,

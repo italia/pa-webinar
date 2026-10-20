@@ -10,8 +10,7 @@
  *   4. Programma   — facoltativo: gli argomenti, chi interviene, le durate
  *                    (non per le chiamate istantanee, che non hanno pagina)
  *   5. Riepilogo   — cio' che manca, l'evento e le scelte del modello in
- *                    schede, le lingue di traduzione, l'informativa; bozza o
- *                    pubblicazione
+ *                    schede, l'informativa; bozza o pubblicazione
  *
  * e, a parte, le impostazioni avanzate: tutto cio' che il modello ha gia'
  * scelto (partecipazione, registrazione e AI, contenuti, sala d'attesa e
@@ -39,10 +38,7 @@ import {
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
-import {
-  lingueDiPartenzaTraduzione,
-  SOURCE_LANGUAGE_FALLBACK,
-} from '@/lib/ai/target-locales';
+import { lingueDiPartenzaTraduzione, parseLocaleList } from '@/lib/ai/target-locales';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
@@ -52,8 +48,8 @@ import {
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
 import { publicRegistrationFor } from '@/lib/events/access-mode';
-import { applicaProposta, type TextTranslations } from '@/lib/text-translation/proposals';
-import { testoSorgente } from '@/lib/text-translation/source';
+import type { StatoTestiEvento } from '@/lib/text-translation/auto';
+import { entroILimiti, haTesto } from '@/lib/text-translation/stato-lingue';
 
 import { RubricaAccessContext } from '../rubrica-picker';
 
@@ -77,7 +73,13 @@ import {
   type StepProgrammeValue,
   type VoceSalvata,
 } from './programme-plan';
-import { lingueDaTradurre, TraduzioneTestiCard, useTraduzioneTesti } from './text-translation';
+import {
+  PannelloLingua,
+  RigaLingue,
+  testoPrincipale,
+  useAspettoSchede,
+  useLingueEvento,
+} from './text-translation';
 import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
 import {
   LibreriaDomandeProvider,
@@ -194,10 +196,16 @@ export interface WizardProps {
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
    *  non ne propone le funzioni. */
   aiPipelineEnabled?: boolean;
-  /** La traduzione automatica di titolo e descrizione c'e' (pipeline AI
-   *  accesa, motore di traduzione su CPU installato) e chi apre il wizard e'
-   *  lo staff: solo allora il passo «Evento» la offre. */
+  /** La traduzione automatica di titolo e descrizione c'e' nell'installazione
+   *  (pipeline AI accesa, motore di traduzione su CPU installato): il passo
+   *  «Evento» dice che le lingue senza testo si traducono al salvataggio. */
   textTranslationAvailable?: boolean;
+  /** In modifica: lo stato delle lingue dell'evento, letto dal server
+   *  (lib/text-translation/auto statoTestiEvento). */
+  statoLingueIniziale?: StatoTestiEvento | null;
+  /** Chi apre il wizard amministra l'istanza: a motore spento vede dove
+   *  accenderlo. */
+  isSiteAdmin?: boolean;
   /** In modifica: relatori e organizzatore scritti a mano (eventi di prima
    *  delle persone strutturate), che la pagina mostra ancora e l'anteprima
    *  quindi pure. */
@@ -374,6 +382,9 @@ export interface Step5ReviewFields {
   requireOrganizationType: boolean;
 }
 
+/** La bozza nel browser: il modulo e le lingue toccate quando la si e' scritta. */
+type BozzaDelModulo = WizardForm & { lingueToccate?: string[] };
+
 export type WizardForm = Step1Value &
   StepPermissionsValue &
   StepPeopleValue &
@@ -439,13 +450,11 @@ export default function EventWizard(props: WizardProps) {
     // un'ora.
     const defaultDurationMin = props.template?.defaultDurationMinutes ?? 60;
     const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
-    // Traduzione accesa senza lingue (un modello o un evento che ereditava le
-    // lingue dell'istanza): si parte da quelle dell'istanza, gia' spuntate.
-    const lingueDiPartenza = (
-      traduce: boolean | null | undefined,
-      lingue: string | null | undefined
-    ) =>
-      lingue ?? (traduce ? lingueDiPartenzaTraduzione(props.defaultTargetLocales) : null);
+    // Le lingue dell'evento: quelle salvate (o del modello); senza, quelle
+    // predefinite dell'istanza, senza la lingua principale. Il wizard le
+    // salva sempre, anche nessuna (''): null vorrebbe dire «quelle del sito».
+    const lingueDiPartenza = (lingue: string | null | undefined): string =>
+      lingue ?? lingueDiPartenzaTraduzione(props.defaultTargetLocales, props.defaultLocale) ?? '';
     if (mode === 'edit' && initialEvent) {
       const ev = initialEvent.event;
       // La matrice salvata; se manca (eventi più vecchi), la si ricava dai
@@ -500,7 +509,7 @@ export default function EventWizard(props: WizardProps) {
         aiDubbingEnabled: ev.aiDubbingEnabled ?? false,
         multitrackRecordingEnabled: ev.multitrackRecordingEnabled ?? false,
         retainParticipantTracks: ev.retainParticipantTracks ?? false,
-        aiTargetLocales: lingueDiPartenza(ev.aiTranslationEnabled, ev.aiTargetLocales),
+        aiTargetLocales: lingueDiPartenza(ev.aiTargetLocales),
         expectedSpeakers: ev.expectedSpeakers ?? null,
 
         // Passo Persone — elenchi dalle entità collegate.
@@ -581,13 +590,10 @@ export default function EventWizard(props: WizardProps) {
 
     const tpl = props.template;
     const conAi = (tpl?.recordingEnabled ?? false) && (props.aiPipelineEnabled ?? true);
-    // La traduzione parte solo se c'e' almeno una lingua in cui tradurre (del
-    // modello, o dell'istanza senza la lingua dell'evento): senza, il wizard
-    // chiederebbe di scegliere lingue che nessuno ha chiesto.
-    const lingueDelModello = lingueDiPartenza(
-      conAi && tpl?.aiTranslationEnabled,
-      tpl?.aiTargetLocales
-    );
+    // Le lingue dell'evento, del modello o dell'istanza. La traduzione di
+    // sottotitoli e sintesi parte solo se ce n'e' almeno una: senza, il
+    // wizard chiederebbe di scegliere lingue che nessuno ha chiesto.
+    const lingueDelModello = lingueDiPartenza(tpl?.aiTargetLocales);
     // La matrice dal modello: quella salvata, se c'è; altrimenti (il caso
     // comune: i modelli salvano i permessi singoli) la si ricava da quelli,
     // perché le scelte del modello arrivino al passo «Permessi». Ripiegare su
@@ -606,9 +612,12 @@ export default function EventWizard(props: WizardProps) {
       // Step 1
       title: { it: '', en: '' },
       // Descrizione pre-compilata dal template (semplificazione), modificabile.
+      // Con la traduzione automatica l'inglese del modello non si propone: e'
+      // uno schema, non la traduzione di questo evento, e al salvataggio la
+      // lingua vuota si traduce dal testo principale.
       description: {
         it: tpl?.descriptionTemplate?.it ?? '',
-        en: tpl?.descriptionTemplate?.en ?? '',
+        en: props.textTranslationAvailable ? '' : (tpl?.descriptionTemplate?.en ?? ''),
       },
       startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
       endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
@@ -981,56 +990,172 @@ export default function EventWizard(props: WizardProps) {
   // una volta sola per tutto il wizard.
   const libreriaDomande = useStatoLibreriaDomande();
 
-  // ── Traduzione automatica di titolo e descrizione ────────────────────────
-  // Le lingue riempite dalla traduzione, da rileggere prima di salvare, e in
-  // creazione la scelta di tradurre dopo il salvataggio.
-  const traduzioneOfferta = !!props.textTranslationAvailable && viaToken === null;
-  const [lingueTradotte, setLingueTradotte] = useState<string[]>([]);
-  const [traduzioneDopo, setTraduzioneDopo] = useState<{ attiva: boolean; lingue: string[] | null }>({
-    attiva: false,
-    lingue: null,
-  });
+  // ── Lingue dell'evento e traduzione automatica di titolo e descrizione ───
+  // Le lingue toccate in questa pagina (una modifica, «Segna come riletta»,
+  // «È ancora corretta», una lingua tolta): al salvataggio sono di una
+  // persona; delle altre il server tiene il testo che ha (textEdits).
+  const [toccate, setToccate] = useState<ReadonlySet<string>>(() => new Set());
+  const tocca = useCallback(
+    (lingue: string[]) => {
+      const nuove = lingue.filter((l) => l !== props.defaultLocale);
+      if (nuove.length === 0) return;
+      setToccate((prima) =>
+        nuove.every((l) => prima.has(l)) ? prima : new Set([...prima, ...nuove])
+      );
+    },
+    [props.defaultLocale]
+  );
   const formRef = useRef(form);
   formRef.current = form;
-  const applicaTraduzione = useCallback((proposta: TextTranslations, lingue: string[]) => {
-    // Solo i campi ancora vuoti: un testo scritto da una persona resta.
-    const { riempite } = applicaProposta(proposta, lingue, formRef.current.title, formRef.current.description);
-    if (riempite.length === 0) return [];
-    setForm((prev) => {
-      const r = applicaProposta(proposta, riempite, prev.title, prev.description);
-      return { ...prev, title: r.title, description: r.description };
-    });
-    setLingueTradotte((prima) => [...new Set([...prima, ...riempite])]);
-    return riempite;
-  }, []);
-  const traduzione = useTraduzioneTesti({
-    attiva: traduzioneOfferta && mode === 'edit' && !!initialEvent,
+  // Il testo principale come lo conosce il server: cambiato nel modulo, le
+  // altre lingue non vengono piu' da lui.
+  const [principaleSalvato, setPrincipaleSalvato] = useState(() =>
+    testoPrincipale(props.defaultLocale, initial.title, initial.description)
+  );
+  // La traduzione automatica c'e' per questo evento: non per le chiamate
+  // istantanee (non hanno una pagina) ne' per gli eventi archiviati.
+  // Neanche per un testo principale oltre i limiti del motore.
+  const motoreEvento =
+    !!props.textTranslationAvailable &&
+    initialEvent?.event.eventType !== 'INSTANT' &&
+    initialEvent?.event.status !== 'ARCHIVED' &&
+    entroILimiti(form.title[props.defaultLocale] ?? '', form.description[props.defaultLocale] ?? '');
+  const lingueEvento = useMemo(
+    () => parseLocaleList(form.aiTargetLocales),
+    [form.aiTargetLocales]
+  );
+  // Una traduzione arrivata a pagina aperta entra nelle lingue non toccate.
+  const toccateRef = useRef(toccate);
+  toccateRef.current = toccate;
+  const onArrivati = useCallback(
+    (testi: StatoTestiEvento['testi']) => {
+      setForm((prima) => {
+        const title = { ...prima.title };
+        const description = { ...prima.description };
+        let cambiato = false;
+        const lingue = new Set([
+          ...Object.keys(testi.title),
+          ...Object.keys(testi.description),
+          ...Object.keys(prima.title),
+          ...Object.keys(prima.description),
+        ]);
+        for (const l of lingue) {
+          if (l === props.defaultLocale || toccateRef.current.has(l)) continue;
+          const t = testi.title[l] ?? '';
+          const d = testi.description[l] ?? '';
+          if ((title[l] ?? '') !== t || (description[l] ?? '') !== d) {
+            title[l] = t;
+            description[l] = d;
+            cambiato = true;
+          }
+        }
+        return cambiato ? { ...prima, title, description } : prima;
+      });
+    },
+    [props.defaultLocale]
+  );
+  const statoLingue = useLingueEvento({
     eventId: initialEvent?.id ?? null,
-    sorgente: props.defaultLocale,
+    iniziale: props.statoLingueIniziale ?? null,
+    motore: motoreEvento,
+    staff: viaToken === null,
+    principale: props.defaultLocale,
+    attive: props.enabledLocales,
+    lingueEvento,
     titoli: form.title,
     descrizioni: form.description,
-    applica: applicaTraduzione,
+    toccate,
+    principaleSalvato,
+    onArrivati,
   });
-  const schedaTraduzione = !traduzioneOfferta ? null : mode === 'edit' ? (
-    <TraduzioneTestiCard
-      mode="edit"
-      stato={traduzione}
-      lingueAttive={props.enabledLocales}
-      sorgente={props.defaultLocale}
-      titoli={form.title}
-      descrizioni={form.description}
-    />
-  ) : (
-    <TraduzioneTestiCard
-      mode="create"
-      dopo={traduzioneDopo}
-      onDopo={setTraduzioneDopo}
-      lingueAttive={props.enabledLocales}
-      sorgente={props.defaultLocale}
-      titoli={form.title}
-      descrizioni={form.description}
-    />
+  const aspettoSchede = useAspettoSchede(statoLingue.stati);
+  const ricaricaLingue = statoLingue.ricarica;
+  const scartaLetture = statoLingue.scarta;
+  // Un campo di titolo o descrizione cambiato in una lingua la tocca.
+  const aggiornaTesti = useCallback(
+    (patch: Partial<WizardForm>) => {
+      if (patch.title || patch.description) {
+        const prima = formRef.current;
+        const lingue = new Set([
+          ...Object.keys(patch.title ?? {}),
+          ...Object.keys(patch.description ?? {}),
+        ]);
+        tocca(
+          [...lingue].filter(
+            (l) =>
+              (patch.title && (patch.title[l] ?? '') !== (prima.title[l] ?? '')) ||
+              (patch.description &&
+                (patch.description[l] ?? '') !== (prima.description[l] ?? ''))
+          )
+        );
+      }
+      updateForm(patch);
+    },
+    [tocca, updateForm]
   );
+  // Togliere una lingua dall'evento: le lingue tolte con un testo lo perdono
+  // al salvataggio (chi toglie ha confermato).
+  const cambiaLingueEvento = useCallback(
+    (valore: string | null, tolte: string[]) => {
+      // Nessuna lingua e' una scelta: si salva '' (null vorrebbe dire «quelle
+      // del sito»).
+      if (tolte.length === 0) {
+        updateForm({ aiTargetLocales: valore ?? '' });
+        return;
+      }
+      const prima = formRef.current;
+      const title = { ...prima.title };
+      const description = { ...prima.description };
+      for (const l of tolte) {
+        title[l] = '';
+        description[l] = '';
+      }
+      tocca(tolte);
+      updateForm({ aiTargetLocales: valore ?? '', title, description });
+    },
+    [tocca, updateForm]
+  );
+  const lingueDelPasso = {
+    riga: (
+      <RigaLingue
+        principale={props.defaultLocale}
+        valore={form.aiTargetLocales}
+        onCambia={cambiaLingueEvento}
+        attive={props.enabledLocales}
+        altreLingue={props.aiPipelineEnabled ?? true}
+        conTesto={(l) => haTesto(l, form.title, form.description)}
+        motore={motoreEvento}
+        avvisoAmministrazione={!props.textTranslationAvailable && !!props.isSiteAdmin}
+        invalid={!!fieldErrors.aiTargetLocales}
+        annuncio={statoLingue.annuncio}
+      />
+    ),
+    schede: statoLingue.schede,
+    aspetto: aspettoSchede,
+    pannello: (lingua: string) => (
+      <PannelloLingua
+        lingua={lingua}
+        stato={statoLingue.stati[lingua] ?? 'principale'}
+        principale={props.defaultLocale}
+        motore={motoreEvento && lingueEvento.includes(lingua)}
+        staff={viaToken === null}
+        fallimento={statoLingue.fallimenti[lingua]}
+        inviando={statoLingue.inviando === lingua}
+        errore={statoLingue.errore}
+        onRiletta={() => tocca([lingua])}
+        onRitraduci={() => {
+          // Il testo di una persona se ne va: al salvataggio la lingua e'
+          // vuota, e il server la traduce.
+          tocca([lingua]);
+          updateForm({
+            title: { ...formRef.current.title, [lingua]: '' },
+            description: { ...formRef.current.description, [lingua]: '' },
+          });
+        }}
+        onRiprova={() => void statoLingue.riprova(lingua)}
+      />
+    ),
+  };
 
   // ── Bozza nel browser ─────────────────────────────────────────────────────
   // Il modulo si salva nel browser (con un attimo di ritardo), cosi' un
@@ -1099,7 +1224,10 @@ export default function EventWizard(props: WizardProps) {
     autosaveRef.current = setTimeout(() => {
       if (usciteRef.current) return;
       try {
-        localStorage.setItem(draftKey, JSON.stringify(form));
+        // Con le lingue toccate: riprendendo la bozza, solo quelle tornano
+        // come le si era scritte (vedi restoreDraft).
+        const bozza: BozzaDelModulo = { ...form, lingueToccate: [...toccate] };
+        localStorage.setItem(draftKey, JSON.stringify(bozza));
       } catch {
         /* quota / unavailable — best effort */
       }
@@ -1107,9 +1235,9 @@ export default function EventWizard(props: WizardProps) {
     return () => {
       if (autosaveRef.current) clearTimeout(autosaveRef.current);
     };
-  }, [form, draftKey]);
+  }, [form, draftKey, toccate]);
 
-  const savedDraftRef = useRef<{ key: string; form: Partial<WizardForm> } | null>(null);
+  const savedDraftRef = useRef<{ key: string; form: Partial<BozzaDelModulo> } | null>(null);
   const [draftAvailable, setDraftAvailable] = useState(false);
   useEffect(() => {
     // I dati appena portati da «Cambia formato» non si fanno coprire da una
@@ -1123,7 +1251,7 @@ export default function EventWizard(props: WizardProps) {
       if (chiave && raw) {
         savedDraftRef.current = {
           key: chiave,
-          form: JSON.parse(raw) as Partial<WizardForm>,
+          form: JSON.parse(raw) as Partial<BozzaDelModulo>,
         };
         setDraftAvailable(true);
       }
@@ -1148,10 +1276,46 @@ export default function EventWizard(props: WizardProps) {
     if (salvata && Array.isArray(salvata.form.agenda) && !initialEvent?.agendaLocked) {
       scelteVisteRef.current = new Map(salvata.form.agenda.map((v) => [v.key, v.speakerKey]));
     }
+    // Le altre lingue tornano come le si era scritte solo se le si era
+    // toccate: le altre restano quelle del server, che nel frattempo puo'
+    // avere una traduzione piu' nuova di quella che la bozza ricorda. Una
+    // bozza di prima, che non dice le lingue toccate, riporta le lingue che
+    // cambia e che hanno un testo (mai una lingua svuotata).
+    const { lingueToccate, ...datiBozza } = salvata?.form ?? {};
+    const testiBozza = (prima: WizardForm) => {
+      const titoli = (datiBozza.title ?? {}) as Record<string, string>;
+      const descrizioni = (datiBozza.description ?? {}) as Record<string, string>;
+      const lingue = [...new Set([...Object.keys(titoli), ...Object.keys(descrizioni)])].filter(
+        (l) => l !== props.defaultLocale
+      );
+      const riprese = Array.isArray(lingueToccate)
+        ? lingue.filter((l) => lingueToccate.includes(l))
+        : lingue.filter(
+            (l) =>
+              haTesto(l, titoli, descrizioni) &&
+              ((l in titoli && (titoli[l] ?? '') !== (prima.title[l] ?? '')) ||
+                (l in descrizioni && (descrizioni[l] ?? '') !== (prima.description[l] ?? '')))
+          );
+      const title = { ...prima.title, [props.defaultLocale]: titoli[props.defaultLocale] ?? prima.title[props.defaultLocale] ?? '' };
+      const description = {
+        ...prima.description,
+        [props.defaultLocale]:
+          descrizioni[props.defaultLocale] ?? prima.description[props.defaultLocale] ?? '',
+      };
+      for (const l of riprese) {
+        if (l in titoli) title[l] = titoli[l] ?? '';
+        if (l in descrizioni) description[l] = descrizioni[l] ?? '';
+      }
+      return { title, description, riprese };
+    };
+    if (salvata) tocca(testiBozza(formRef.current).riprese);
     if (salvata)
       setForm((prima) => conSceltePulite({
         ...prima,
-        ...salvata.form,
+        ...datiBozza,
+        ...(datiBozza.title || datiBozza.description
+          ? { title: testiBozza(prima).title, description: testiBozza(prima).description }
+          : {}),
         ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
         ...((risposte?.pre ?? 0) > 0 ? { preEventQuestionnaire: prima.preEventQuestionnaire } : {}),
         ...((risposte?.post ?? 0) > 0 ? { postEventQuestionnaire: prima.postEventQuestionnaire } : {}),
@@ -1169,7 +1333,7 @@ export default function EventWizard(props: WizardProps) {
       /* ignore */
     }
     setDraftAvailable(false);
-  }, [draftKey, viaToken, initialEvent, conSceltePulite]);
+  }, [draftKey, viaToken, initialEvent, conSceltePulite, tocca, props.defaultLocale]);
   const dismissDraft = useCallback(() => {
     try {
       const salvata = savedDraftRef.current;
@@ -1273,7 +1437,7 @@ export default function EventWizard(props: WizardProps) {
         // Gia' sul passo: il campo e' sullo schermo.
         const el = id ? document.getElementById(id) : null;
         const bersaglio =
-          el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)
+          el && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)
             ? el
             : el?.querySelector<HTMLElement>('input, textarea');
         bersaglio?.focus({ preventScroll: true });
@@ -1291,7 +1455,7 @@ export default function EventWizard(props: WizardProps) {
     campoDaRaggiungere.current = null;
     const el = document.getElementById(id);
     const bersaglio =
-      el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)
+      el && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(el.tagName)
         ? el
         : el?.querySelector<HTMLElement>('input, textarea');
     bersaglio?.focus({ preventScroll: true });
@@ -1424,6 +1588,10 @@ export default function EventWizard(props: WizardProps) {
         ).toISOString();
         const endsAtUTC = fromDatetimeLocalInTz(form.endsAt, form.timezone).toISOString();
 
+        const mandate = [...toccate].sort();
+        // Il testo mandato delle lingue toccate: dopo il salvataggio restano
+        // toccate solo quelle cambiate di nuovo mentre la richiesta viaggiava.
+        const testiMandati = { title: { ...form.title }, description: { ...form.description } };
         const payload: Record<string, unknown> = {
           title: form.title,
           description: form.description,
@@ -1483,7 +1651,13 @@ export default function EventWizard(props: WizardProps) {
             form.aiTranscriptEnabled &&
             form.multitrackRecordingEnabled &&
             form.retainParticipantTracks,
-          aiTargetLocales: form.aiTargetLocales,
+          // Le lingue dell'evento: le schede, la traduzione automatica al
+          // salvataggio e (se accesa) quella di sottotitoli e sintesi. Sempre
+          // esplicite: null (una bozza di prima) vorrebbe dire «quelle del sito».
+          aiTargetLocales: form.aiTargetLocales ?? '',
+          // Le lingue toccate qui: delle altre il server tiene il testo che
+          // ha, anche una traduzione arrivata a pagina aperta.
+          textEdits: { touched: mandate },
           expectedSpeakers: form.expectedSpeakers,
 
           // Review step. In modifica si manda solo se cambiato: un valore
@@ -1550,6 +1724,28 @@ export default function EventWizard(props: WizardProps) {
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(serverErrorMessage(err, putRes.status));
+          }
+          // Il testo salvato e' ora quello del modulo: le lingue mandate non
+          // sono piu' «toccate» (il server ha il loro testo, e una traduzione
+          // che arriva ora le puo' riempire), e lo stato si rilegge. Solo lo
+          // staff rilegge: con il link di conduzione restano com'erano, e la
+          // pagina dice lo stato di prima del salvataggio.
+          if (viaToken === null) {
+            setPrincipaleSalvato(
+              testoPrincipale(props.defaultLocale, testiMandati.title, testiMandati.description)
+            );
+            setToccate((ora) => {
+              const adesso = formRef.current;
+              const resta = [...ora].filter(
+                (l) =>
+                  !mandate.includes(l) ||
+                  (adesso.title[l] ?? '') !== (testiMandati.title[l] ?? '') ||
+                  (adesso.description[l] ?? '') !== (testiMandati.description[l] ?? '')
+              );
+              return resta.length === ora.size ? ora : new Set(resta);
+            });
+            scartaLetture();
+            void ricaricaLingue();
           }
 
           const report = await fanoutEditDiff(
@@ -1742,34 +1938,6 @@ export default function EventWizard(props: WizardProps) {
         );
         if (reportQ.failed.length > 0) failed.add('questionnaires');
 
-        // 5b) La traduzione automatica di titolo e descrizione, se scelta:
-        //     l'evento ora ha un id. Una richiesta rifiutata non blocca niente:
-        //     si dice nel riepilogo, e si puo' chiedere di nuovo dal wizard.
-        if (traduzioneOfferta && traduzioneDopo.attiva) {
-          const sorgente = testoSorgente(props.defaultLocale, form.title, form.description);
-          const candidate = lingueDaTradurre(props.enabledLocales, props.defaultLocale, form.title, form.description);
-          const lingue = traduzioneDopo.lingue
-            ? traduzioneDopo.lingue.filter(
-                (l) => l !== props.defaultLocale && props.enabledLocales.includes(l)
-              )
-            : candidate;
-          if (lingue.length > 0 && (sorgente.title || sorgente.description)) {
-            const ok = await fetch(`/api/admin/events/${created.id}/text-translation`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                sourceLanguage: sorgente.sourceLanguage,
-                title: sorgente.title,
-                description: sorgente.description,
-                targetLanguages: lingue,
-              }),
-            })
-              .then((r) => r.ok)
-              .catch(() => false);
-            if (!ok) failed.add('textTranslation');
-          }
-        }
-
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PUT on the
         //    detail route (the route only exports PUT, not PATCH).
@@ -1863,9 +2031,9 @@ export default function EventWizard(props: WizardProps) {
       retentionMax,
       showError,
       serverErrorMessage,
-      traduzioneOfferta,
-      traduzioneDopo,
-      props.enabledLocales,
+      toccate,
+      ricaricaLingue,
+      scartaLetture,
       fotoInViaggio,
     ]
   );
@@ -2045,15 +2213,14 @@ export default function EventWizard(props: WizardProps) {
                     : undefined
                 }
                 value={form}
-                onChange={updateForm}
+                onChange={aggiornaTesti}
                 enabledLocales={props.enabledLocales}
                 defaultLocale={props.defaultLocale}
                 availableTags={etichette}
                 fieldErrors={fieldErrors}
                 siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
                 siteDefaultVideoQuality={props.siteDefaultVideoQuality}
-                traduzione={schedaTraduzione}
-                machineLocales={lingueTradotte}
+                lingue={activeStep === 'base' ? lingueDelPasso : undefined}
               />
             </div>
             {anteprima && <PagePreview dati={anteprima} />}
@@ -2149,7 +2316,6 @@ export default function EventWizard(props: WizardProps) {
             mancanti={mancanti}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-            eventLocale={SOURCE_LANGUAGE_FALLBACK}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
             onVaiProgramma={istantanea ? undefined : () => vai('programme')}
@@ -2197,9 +2363,7 @@ export default function EventWizard(props: WizardProps) {
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
                   liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-                  defaultTargetLocales={props.defaultTargetLocales}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
-                  eventLocale={SOURCE_LANGUAGE_FALLBACK}
                   editing={mode === 'edit'}
                 />
               ),
@@ -2210,9 +2374,10 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
-                  defaultTargetLocales={props.defaultTargetLocales}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
-                  eventLocale={SOURCE_LANGUAGE_FALLBACK}
+                  onCambiaLingue={() =>
+                    vaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })
+                  }
                   editing={mode === 'edit'}
                   showAutoStart={
                     mode === 'edit' && !!initialEvent?.event.autoStartRecording
@@ -2468,7 +2633,8 @@ function idDelCampo(key: string, defaultLocale: string): string | null {
     case 'moderatorEmail':
       return 'wiz-primary-email';
     case 'aiTargetLocales':
-      return 'aiTargetLocales';
+      // «Cambia lingue», nel passo «Evento».
+      return 'ev-lingue-cambia';
     case 'dataRetentionDays':
       return 'rev-retention';
     default:

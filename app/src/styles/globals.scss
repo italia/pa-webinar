@@ -13409,6 +13409,7 @@ a.campo-file__nome {
   .campo-file .progress-bar {
     transition: none;
   }
+}
 
 // ── Il passo «Programma» del wizard: lo stato, le persone da cui partire,
 // la persona nuova; la scheda nel passo «Evento» e il posto del programma
@@ -13637,4 +13638,91 @@ a.campo-file__nome {
   border-radius: 8px;
   color: var(--app-muted);
   text-align: center;
+}
+
+// ── Le lingue dell'evento nel passo «Evento»: la riga delle lingue con la
+// scelta, le schede di titolo e descrizione con lo stato scritto sotto il
+// nome (mai il solo colore), l'avviso dentro la scheda, e nella pagina
+// pubblica l'avviso del testo tradotto in automatico ─────────────────────────
+.lingue-evento__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.25rem;
+  color: var(--app-text);
+}
+.lingue-evento__cambia {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+.lingue-evento__aiuto {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.lingue-evento__scelta:not([hidden]) {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 4px;
+  background: #fff;
+}
+.lingue-evento__conferma {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #b71918;
+  background: #fdecec;
+  color: var(--app-text);
+}
+.lingue-evento__azione,
+.lingue-pannello__azione {
+  min-height: 44px;
+}
+.lingue-pannello p {
+  font-size: 0.9rem;
+}
+.schede-lingua--stati .schede-lingua__scheda {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 44px;
+  line-height: 1.25;
+  text-align: left;
+}
+.schede-lingua__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+.schede-lingua__icona {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: currentColor;
+}
+.schede-lingua__stato--neutro {
+  color: #516b7e;
+}
+.schede-lingua__stato--info {
+  color: #0066cc;
+}
+.schede-lingua__stato--successo {
+  color: #00703c;
+}
+.schede-lingua__stato--avviso {
+  color: #8a5300;
+}
+.schede-lingua__stato--errore {
+  color: #b71918;
+}
+.traduzione-automatica {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  .icon {
+    fill: currentColor;
+  }
 }

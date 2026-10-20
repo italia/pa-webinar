@@ -1,14 +1,11 @@
 /**
- * Le traduzioni automatiche di titolo e descrizione come proposta
- * (Event.textTranslations): la forma salvata, la pulizia del testo che
- * arriva dal motore, e quali lingue di un modulo una proposta puo' riempire.
+ * L'ultima traduzione automatica di titolo e descrizione consegnata dal
+ * motore (Event.textTranslations): la forma salvata e la pulizia del testo
+ * che arriva dal motore. In titolo e descrizione va solo nelle lingue vuote o
+ * gia' tradotte in automatico, e solo se viene dal testo principale di adesso
+ * (lib/text-translation/enqueue applicaTraduzioni).
  *
- * Una proposta non sostituisce mai un testo scritto da una persona: riempie
- * solo i campi vuoti, e solo se viene dallo stesso testo di partenza
- * (`sourceHash`, lib/text-translation/source). Il salvataggio del wizard e'
- * la revisione umana.
- *
- * Funzioni pure, usate dal portale e dal wizard.
+ * Funzioni pure.
  */
 
 export interface TextTranslations {
@@ -97,64 +94,4 @@ export function normalizzaDescrizione(tradotto: string): string {
     .trim()
     .slice(0, DESCRIZIONE_TRADOTTA_MAX)
     .trim();
-}
-
-const vuoto = (testo: string | undefined) => !testo || !testo.trim();
-
-/**
- * Le lingue in cui la proposta riempie almeno un campo vuoto, se viene dal
- * testo di partenza che ha l'impronta `impronta`.
- */
-export function proposteApplicabili(
-  proposta: TextTranslations | null,
-  impronta: string | null,
-  titoli: Record<string, string>,
-  descrizioni: Record<string, string>
-): string[] {
-  if (!proposta || !impronta || proposta.sourceHash !== impronta) return [];
-  const lingue = new Set([
-    ...Object.keys(proposta.title),
-    ...Object.keys(proposta.description),
-  ]);
-  lingue.delete(proposta.sourceLanguage);
-  return [...lingue]
-    .filter(
-      (l) =>
-        (proposta.title[l] && vuoto(titoli[l])) ||
-        (proposta.description[l] && vuoto(descrizioni[l]))
-    )
-    .sort();
-}
-
-/**
- * I testi del modulo con la proposta nei campi ancora vuoti delle `lingue`;
- * `riempite` sono le lingue in cui almeno un campo e' cambiato.
- */
-export function applicaProposta(
-  proposta: TextTranslations,
-  lingue: readonly string[],
-  titoli: Record<string, string>,
-  descrizioni: Record<string, string>
-): {
-  title: Record<string, string>;
-  description: Record<string, string>;
-  riempite: string[];
-} {
-  const title = { ...titoli };
-  const description = { ...descrizioni };
-  const riempite: string[] = [];
-  for (const l of lingue) {
-    if (l === proposta.sourceLanguage) continue;
-    let cambiata = false;
-    if (proposta.title[l] && vuoto(title[l])) {
-      title[l] = proposta.title[l];
-      cambiata = true;
-    }
-    if (proposta.description[l] && vuoto(description[l])) {
-      description[l] = proposta.description[l];
-      cambiata = true;
-    }
-    if (cambiata) riempite.push(l);
-  }
-  return { title, description, riempite };
 }

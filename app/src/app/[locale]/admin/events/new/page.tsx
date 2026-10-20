@@ -157,6 +157,7 @@ export default async function CreateEventPage({
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         textTranslationAvailable={traduzioneDisponibile(siteSettings)}
+        isSiteAdmin={session.role === 'admin'}
         defaultModerator={moderatoreDiPartenza}
       />
     </div>

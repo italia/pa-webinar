@@ -20,6 +20,11 @@
 
 import { z } from 'zod';
 
+import {
+  DESCRIZIONE_TRADUCIBILE_MAX,
+  TITOLO_TRADUCIBILE_MAX,
+} from '@/lib/text-translation/stato-lingue';
+
 import { POSTPROD_JOB_KINDS } from './job-classes';
 
 // ── Common primitives ────────────────────────────────────────────
@@ -137,14 +142,15 @@ export const reportPayloadSchema = z.object({
   metrics: z.unknown().optional(),
 });
 
-/** Quanto testo si traduce al massimo: titolo e descrizione (Markdown). */
-export const TEXT_TRANSLATION_TITLE_MAX = 300;
-export const TEXT_TRANSLATION_DESCRIPTION_MAX = 10_000;
+/** Quanto testo si traduce al massimo: titolo e descrizione (Markdown). I
+ *  limiti stanno con le lingue dell'evento, che il wizard legge senza zod. */
+export const TEXT_TRANSLATION_TITLE_MAX = TITOLO_TRADUCIBILE_MAX;
+export const TEXT_TRANSLATION_DESCRIPTION_MAX = DESCRIZIONE_TRADUCIBILE_MAX;
 
 /**
  * La traduzione di titolo e descrizione dell'evento (lib/text-translation): il
- * testo di partenza e' quello del modulo al momento della richiesta, anche se
- * non ancora salvato, e `sourceHash` ne e' l'impronta (lib/text-translation/source).
+ * testo di partenza e' quello principale salvato al momento della richiesta, e
+ * `sourceHash` ne e' l'impronta (lib/text-translation/source).
  */
 export const translateTextPayloadSchema = z.object({
   eventId: uuidSchema,

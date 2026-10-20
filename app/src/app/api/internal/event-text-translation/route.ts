@@ -4,10 +4,15 @@
  * Le traduzioni di titolo e descrizione consegnate dal worker (lavoro
  * TRANSLATE_TEXT, lib/text-translation): un testo per lingua. Le lingue
  * devono essere fra quelle chieste; i testi si normalizzano (il titolo tiene
- * al piu' il «|» del sopratitolo) e si salvano sull'evento come proposta, mai
- * in titolo e descrizione. Il lavoro si chiude nella stessa transazione: e'
- * concluso solo se la proposta e' salvata, e vale solo la consegna del claim
- * corrente (lib/report/job).
+ * al piu' il «|» del sopratitolo) e restano sull'evento come versione
+ * automatica (Event.textTranslations). Se il testo principale e' ancora
+ * quello tradotto, vanno anche in titolo e descrizione, nelle lingue vuote o
+ * gia' tradotte in automatico: mai sopra il testo di una persona. Il lavoro si
+ * chiude nella stessa transazione: e' concluso solo se la traduzione e'
+ * salvata, e vale solo la consegna del claim corrente (lib/report/job).
+ *
+ * Dopo, il server guarda di nuovo le lingue dell'evento: un testo principale
+ * cambiato nel frattempo, o una lingua aggiunta, chiedono un'altra traduzione.
  *
  * Auth: CRON_API_KEY (header x-api-key), come gli altri endpoint /internal.
  */
@@ -20,7 +25,8 @@ import { prisma } from '@/lib/db';
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import { postprodJobDurationSeconds, postprodJobsCompletedTotal } from '@/lib/metrics';
 import { consegnaLavoroEvento, statoLavoroEvento } from '@/lib/report/job';
-import { salvaTraduzioni } from '@/lib/text-translation/enqueue';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
+import { applicaTraduzioni, salvaTraduzioni } from '@/lib/text-translation/enqueue';
 import {
   DESCRIZIONE_TRADOTTA_MAX,
   TITOLO_TRADOTTO_MAX,
@@ -81,7 +87,7 @@ export const POST = withErrorHandling(async (request) => {
     );
   }
 
-  const proposta = await prisma.$transaction(async (tx) => {
+  const esito = await prisma.$transaction(async (tx) => {
     const chiuso = await consegnaLavoroEvento(jobId, attempt, 'TRANSLATE_TEXT', tx);
     if (chiuso === null) return null;
     const salvata = await salvaTraduzioni(
@@ -98,9 +104,19 @@ export const POST = withErrorHandling(async (request) => {
       tx
     );
     if (!salvata) throw new NotFoundError('Event');
-    return salvata;
+    return applicaTraduzioni(
+      {
+        eventId: payload.eventId,
+        sourceLanguage: payload.sourceLanguage,
+        sourceHash: payload.sourceHash,
+        targetLanguages: payload.targetLanguages,
+        proposta: salvata,
+        modelId: modelId ?? null,
+      },
+      tx
+    );
   });
-  if (!proposta) {
+  if (!esito) {
     // Chiuso nel frattempo da un altro tentativo, o superato da un claim
     // successivo: chi consegna lo legge e si ferma.
     const ora = await statoLavoroEvento(jobId, attempt);
@@ -113,8 +129,13 @@ export const POST = withErrorHandling(async (request) => {
   postprodJobsCompletedTotal.labels('TRANSLATE_TEXT', 'DONE').inc();
   const secondi = lavoro.startedAt ? (Date.now() - lavoro.startedAt.getTime()) / 1000 : 0;
   if (secondi > 0) postprodJobDurationSeconds.labels('TRANSLATE_TEXT').observe(secondi);
+  // Un testo principale cambiato mentre si traduceva, o lingue aggiunte:
+  // un'altra traduzione, sul testo di adesso.
+  await riconciliaTraduzioni(payload.eventId, { request, actor: 'system', dopoConsegna: true });
   return Response.json({
     ok: true,
     languages: [...new Set([...Object.keys(title), ...Object.keys(description)])].sort(),
+    applied: esito.applicate,
+    ...(esito.superata && { stale: true }),
   });
 });

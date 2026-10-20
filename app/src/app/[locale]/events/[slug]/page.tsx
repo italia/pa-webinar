@@ -17,6 +17,7 @@ import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-vi
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
+import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -466,6 +467,14 @@ export default async function EventDetailPage({
     organizers: enti,
     people: persone,
     programme: programma,
+    // Solo le lingue, mai gli stati e le impronte.
+    lingueAutomatiche: lingueTradotteInAutomatico(
+      event.textLocaleState,
+      event.title as Record<string, string>,
+      event.description as Record<string, string>,
+      linguaPrincipale(settings),
+    ),
+    linguaPrincipale: linguaPrincipale(settings),
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,

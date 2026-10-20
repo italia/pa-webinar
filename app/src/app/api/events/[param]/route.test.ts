@@ -63,8 +63,17 @@ vi.mock('@/lib/live/actions', () => ({
   recordLiveActions: vi.fn(),
 }));
 
+vi.mock('@/lib/settings', () => ({
+  getSettings: vi.fn(async () => ({ defaultLocale: 'it', aiDefaultTargetLocales: 'en,fr' })),
+}));
+const traduzioni = vi.hoisted(() => ({
+  riconciliaTraduzioni: vi.fn(async () => ({ avviata: false, lingue: [] as string[] })),
+}));
+vi.mock('@/lib/text-translation/auto', () => traduzioni);
+
 vi.mock('@/lib/db', () => ({
   prisma: {
+    $queryRaw: vi.fn(async () => []),
     event: { findUnique: vi.fn(), update: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
     tag: { findMany: vi.fn() },
@@ -618,6 +627,137 @@ describe('PUT /api/events/[param] — cronologia della sala', () => {
     expect(r.status).toBe(403);
     expect(recordLiveAction).not.toHaveBeenCalled();
     expect(recordLiveActions).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Titolo e descrizione nelle altre lingue: con `textEdits` (il wizard) le
+ * lingue non toccate tengono il testo salvato, riletto a riga bloccata nella
+ * transazione della scrittura; senza, il testo inviato vale per tutte, come
+ * sempre. Dopo un salvataggio del testo o delle lingue il server chiede la
+ * traduzione automatica.
+ */
+describe('PUT /api/events/[param] — lingue di titolo e descrizione', () => {
+  const VECCHIA = 'v'.repeat(64);
+  const salvato = {
+    title: { it: 'Titolo', en: 'Arrived title', fr: 'Titre' },
+    description: { it: 'Descrizione', en: 'Arrived text', fr: 'Texte' },
+    textLocaleState: {
+      en: { origin: 'MACHINE', sourceHash: VECCHIA, at: '2026-10-20T10:00:00.000Z' },
+      fr: { origin: 'HUMAN', sourceHash: VECCHIA, at: '2026-10-20T09:00:00.000Z' },
+    },
+    aiTargetLocales: 'en,fr',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.findUnique.mockResolvedValue(salvato);
+    mocked.event.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
+      ...eventoEsistente(),
+      ...data,
+    }));
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+    traduzioni.riconciliaTraduzioni.mockResolvedValue({ avviata: true, lingue: ['en'] });
+  });
+
+  it('le lingue non toccate tengono il testo salvato; quella toccata diventa di una persona', async () => {
+    const r = await PUT(
+      richiesta({
+        // Il modulo aveva l'inglese vuoto: la traduzione e' arrivata dopo.
+        title: { it: 'Titolo', en: '', fr: 'Mon titre' },
+        description: { it: 'Descrizione', en: '', fr: 'Mon texte' },
+        aiTargetLocales: 'en,fr',
+        textEdits: { touched: ['fr'] },
+      }),
+      contesto as never
+    );
+    expect(r.status).toBe(200);
+    // Riletto a riga bloccata, nella transazione della scrittura.
+    expect(mocked.$transaction).toHaveBeenCalledTimes(1);
+    expect((prisma as unknown as { $queryRaw: ReturnType<typeof vi.fn> }).$queryRaw).toHaveBeenCalled();
+    const dati = datiScritti();
+    expect(dati.title).toEqual({ it: 'Titolo', en: 'Arrived title', fr: 'Mon titre' });
+    expect(dati.description).toEqual({ it: 'Descrizione', en: 'Arrived text', fr: 'Mon texte' });
+    const stato = dati.textLocaleState as Record<string, { origin: string; sourceHash: string }>;
+    expect(stato.en).toEqual(salvato.textLocaleState.en);
+    expect(stato.fr!.origin).toBe('HUMAN');
+    expect(stato.fr!.sourceHash).not.toBe(VECCHIA);
+    // La traduzione la decide il server, dopo il salvataggio.
+    expect(traduzioni.riconciliaTraduzioni).toHaveBeenCalledWith(EVENT_ID, expect.anything());
+    expect((await r.json()).traduzione).toEqual({ avviata: true, lingue: ['en'] });
+  });
+
+  it('una lingua tolta dalle lingue dell evento perde testo e stato', async () => {
+    await PUT(
+      richiesta({
+        title: salvato.title,
+        description: salvato.description,
+        aiTargetLocales: 'en',
+        textEdits: { touched: [] },
+      }),
+      contesto as never
+    );
+    const dati = datiScritti();
+    expect(dati.title).toEqual({ it: 'Titolo', en: 'Arrived title' });
+    expect(dati.textLocaleState).not.toHaveProperty('fr');
+  });
+
+  it('un evento che non aveva scelto lingue aveva quelle del sito: toglierne una ne toglie il testo', async () => {
+    mocked.event.findUnique.mockResolvedValue({ ...salvato, aiTargetLocales: null });
+    await PUT(
+      richiesta({
+        title: salvato.title,
+        description: salvato.description,
+        aiTargetLocales: 'en',
+        textEdits: { touched: [] },
+      }),
+      contesto as never
+    );
+    expect(datiScritti().title).toEqual({ it: 'Titolo', en: 'Arrived title' });
+  });
+
+  it('senza textEdits il testo inviato vale per tutte le lingue, come sempre', async () => {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce({
+      ...eventoEsistente(),
+      ...salvato,
+    } as never);
+    await PUT(
+      richiesta({
+        title: { it: 'Titolo', en: 'API title' },
+        description: { it: 'Descrizione', en: 'Arrived text' },
+      }),
+      contesto as never
+    );
+    // Nessuna transazione: si scrive come prima.
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    const dati = datiScritti();
+    expect(dati.title).toEqual({ it: 'Titolo', en: 'API title' });
+    const stato = dati.textLocaleState as Record<string, { origin: string }>;
+    expect(stato.en!.origin).toBe('HUMAN');
+    expect(stato).not.toHaveProperty('fr');
+  });
+
+  it('una modifica che non tocca testo ne lingue non chiede traduzioni e non scrive testi', async () => {
+    const r = await PUT(richiesta({ status: 'LIVE' }), contesto as never);
+    expect(traduzioni.riconciliaTraduzioni).not.toHaveBeenCalled();
+    const dati = datiScritti();
+    expect(dati).not.toHaveProperty('title');
+    expect(dati).not.toHaveProperty('textLocaleState');
+    expect(await r.json()).not.toHaveProperty('traduzione');
+  });
+
+  it('cambiare solo le lingue dell evento chiede la traduzione', async () => {
+    await PUT(richiesta({ aiTargetLocales: 'en,fr,de' }), contesto as never);
+    expect(traduzioni.riconciliaTraduzioni).toHaveBeenCalledTimes(1);
+    expect(datiScritti()).not.toHaveProperty('title');
+  });
+
+  it('textEdits accetta solo codici di lingua, al massimo 24', async () => {
+    for (const touched of [['EN'], ['en-'], Array.from({ length: 25 }, () => 'en')]) {
+      const r = await PUT(richiesta({ title: salvato.title, textEdits: { touched } }), contesto as never);
+      expect(r.status).toBe(422);
+    }
   });
 });
 

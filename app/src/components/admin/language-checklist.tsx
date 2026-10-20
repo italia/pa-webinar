@@ -10,6 +10,10 @@
  * `pt-br`, valido per la pipeline: lib/ai/providers parseTargetLocales) non si
  * perde: compare spuntato fra le altre lingue, e resta finche' non lo si
  * toglie.
+ *
+ * Con `available` le prime sono quelle (le lingue del sito), e le altre
+ * stanno nel gruppo che si apre solo se `showOthers` (la post-produzione puo'
+ * usarle): altrimenti compaiono solo quelle gia' scelte, per poterle togliere.
  */
 
 import { useId, useState } from 'react';
@@ -43,6 +47,10 @@ export default function LanguageChecklist({
   errorText,
   emptyHint,
   exclude = [],
+  available,
+  othersLabel,
+  showOthers = true,
+  idBase,
 }: {
   legend: string;
   description?: string;
@@ -54,18 +62,33 @@ export default function LanguageChecklist({
   emptyHint?: string;
   /** Lingue da non offrire: quella in cui si svolge l'evento. */
   exclude?: readonly string[];
+  /** Le lingue offerte per prime, al posto delle piu' richieste. */
+  available?: readonly string[];
+  /** Il titolo del gruppo delle altre lingue. */
+  othersLabel?: string;
+  /** Con `available`: offrire anche le altre lingue. */
+  showOthers?: boolean;
+  /** Il prefisso degli id delle caselle (`${idBase}-${codice}`). */
+  idBase?: string;
 }) {
   const t = useTranslations('admin.form');
-  const base = useId();
+  const generato = useId();
+  const base = idBase ?? generato;
   const scelte = parseLocaleList(value);
   const nome = (c: string) => (localeNames as Record<string, string>)[c] ?? nomeEsterno(c);
   const disponibili = TUTTE.filter((c) => !exclude.includes(c) || scelte.includes(c));
-  const comuni = COMMON_TARGET_LOCALES.filter((c) => disponibili.includes(c));
+  const prime: readonly string[] = available
+    ? available.filter((c) => !exclude.includes(c) || scelte.includes(c))
+    : COMMON_TARGET_LOCALES;
+  const comuni = available ? [...prime] : prime.filter((c) => disponibili.includes(c));
   // Le altre: le lingue dell'Unione e i codici salvati che l'elenco non ha.
-  const altre = [
-    ...disponibili.filter((c) => !(COMMON_TARGET_LOCALES as readonly string[]).includes(c)),
-    ...scelte.filter((c) => !TUTTE.includes(c)),
-  ].sort((a, b) => nome(a).localeCompare(nome(b)));
+  const tutteLeAltre = [
+    ...disponibili.filter((c) => !prime.includes(c)),
+    ...scelte.filter((c) => !TUTTE.includes(c) && !prime.includes(c)),
+  ];
+  const altre = (
+    available && !showOthers ? tutteLeAltre.filter((c) => scelte.includes(c)) : tutteLeAltre
+  ).sort((a, b) => nome(a).localeCompare(nome(b)));
   const altreScelte = altre.filter((c) => scelte.includes(c)).length;
   // Aperto in partenza se c'e' gia' una lingua scelta li' dentro; poi lo
   // apre e chiude solo chi lo usa (togliere l'ultima spunta non lo chiude).
@@ -119,7 +142,7 @@ export default function LanguageChecklist({
       {altre.length > 0 && (
         <details className="lang-checklist__more" open={apertoAllInizio || undefined}>
           <summary>
-            {t('aiLanguagesOther')}
+            {othersLabel ?? t('aiLanguagesOther')}
             {altreScelte > 0 && <span className="lang-checklist__count"> ({altreScelte})</span>}
           </summary>
           <div className="lang-checklist__grid">{altre.map(casella)}</div>

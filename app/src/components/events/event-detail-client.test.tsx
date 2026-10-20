@@ -244,3 +244,48 @@ describe('scheda pubblica — stato e ingresso leggibili', () => {
     expect(container.textContent).not.toContain(detail.willBeRecorded);
   });
 });
+
+describe('scheda pubblica — lingue di titolo e descrizione', () => {
+  function inLingua(locale: string, event: ReturnType<typeof evento>) {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <EventDetailClient locale={locale} appUrl="https://example.org" event={event} registrationOpen />
+        </NextIntlClientProvider>
+      );
+    });
+  }
+  const titolo = () => container.querySelector('h1')!;
+
+  it('tradotti in automatico e non riletti: lo dice, sotto il titolo', () => {
+    inLingua(
+      'en',
+      evento({
+        title: { it: 'Evento di prova', en: 'Test event' },
+        description: { it: 'Descrizione', en: 'Description' },
+        lingueAutomatiche: ['en'],
+        linguaPrincipale: 'it',
+      })
+    );
+    expect(titolo().textContent).toBe('Test event');
+    expect(titolo().getAttribute('lang')).toBeNull();
+    expect(container.querySelector('.traduzione-automatica')?.textContent).toContain(
+      detail.machineTranslation
+    );
+  });
+
+  it('scritti da una persona: nessun avviso', () => {
+    inLingua(
+      'en',
+      evento({ title: { it: 'Evento di prova', en: 'Test event' }, lingueAutomatiche: [] })
+    );
+    expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+
+  it('senza la lingua della pagina: il testo principale, con la sua lingua', () => {
+    inLingua('de', evento({ lingueAutomatiche: ['en'], linguaPrincipale: 'it' }));
+    expect(titolo().textContent).toBe('Evento di prova');
+    expect(titolo().getAttribute('lang')).toBe('it');
+    expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+});

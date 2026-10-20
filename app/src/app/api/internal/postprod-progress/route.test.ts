@@ -14,6 +14,8 @@ const m = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 vi.mock('@/lib/report/job', () => ({ avanzamentoLavoroEvento: m.resoconto }));
+const riconcilia = vi.hoisted(() => vi.fn(async () => ({ avviata: false, lingue: [] })));
+vi.mock('@/lib/text-translation/auto', () => ({ riconciliaTraduzioni: riconcilia }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     postprodJob: { findUnique: m.job, update: m.aggiorna },
@@ -67,6 +69,21 @@ describe('POST /api/internal/postprod-progress', () => {
     expect(m.resoconto).toHaveBeenCalledTimes(1);
     // Un DONE del worker non chiude il lavoro: lo chiude solo la consegna.
     expect(m.aggiorna).not.toHaveBeenCalled();
+  });
+
+  it('una traduzione dei testi fallita del tutto fa guardare di nuovo le lingue dell evento', async () => {
+    m.job.mockResolvedValue(lavoro({ kind: 'TRANSLATE_TEXT', eventId: 'ev-1' }));
+    m.resoconto.mockResolvedValueOnce({ status: 'FAILED', chiusoOra: true });
+    await avanza({ status: 'FAILED', error: 'x', attempt: 1 });
+    expect(riconcilia).toHaveBeenCalledWith('ev-1', expect.objectContaining({ dopoConsegna: true }));
+    // Un tentativo che torna in coda, o un resoconto fallito, no.
+    riconcilia.mockClear();
+    m.resoconto.mockResolvedValueOnce({ status: 'PENDING' });
+    await avanza({ status: 'FAILED', error: 'x', attempt: 1 });
+    m.job.mockResolvedValue(lavoro({ eventId: 'ev-1' }));
+    m.resoconto.mockResolvedValueOnce({ status: 'FAILED', chiusoOra: true });
+    await avanza({ status: 'FAILED', error: 'x', attempt: 1 });
+    expect(riconcilia).not.toHaveBeenCalled();
   });
 
   it('gli altri lavori restano come prima', async () => {

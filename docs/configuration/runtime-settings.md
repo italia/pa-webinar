@@ -170,7 +170,7 @@ writes to the `SiteSetting` row, while the others manage their own tables (`Gdpr
 | **Footer** tab | Footer links (`footerLinks`) | [Branding](branding.md#header-footer-and-legal-pages) |
 | **Features** tab | Public switches, contact links, Gravatar, live captions, email sender, bridge timing, stress thresholds, waiting-room routing window, reactions mode, status-page polling | This page |
 | **Infra sizing** tab | Bridge sizing, default sender ratio, default grace period, default video quality | This page and [scaling](../architecture/scaling.md) |
-| **Post-event AI pipeline** tab | Kill switch, engines, default translation languages, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
+| **Post-event AI pipeline** tab | Kill switch, engines, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
 | **Languages** page (`/en/admin/settings/languages`) | `defaultLocale`, `availableLocales`, `localeNames`, `translationOverrides` | [Languages and localization](../architecture/i18n.md#runtime-language-settings) |
 | No field in the panel | `orphanRecordingGraceDays` | Set it through `PUT /api/admin/settings` ([writing a field the panel does not show](#writing-a-field-the-panel-does-not-show)), or on a chart installation with `scripts/restore.sh --reset-orphan-grace <days>` ([Restore a backup](../operations/upgrades.md#restore-a-backup)) |
 
@@ -321,7 +321,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | Setting | Label | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `aiPipelineEnabled` | **Post-event pipeline active** | `false` | on or off | The kill switch for the whole pipeline (see below) |
-| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | Ticked in the event wizard when translation is turned on, and the translation targets of an event that sets none. The recording's source language is always dropped from the list |
+| `aiDefaultTargetLocales` | **Default event languages** (**Settings › Languages**) | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | The languages every new event starts with, and those of an event that sets none: its tabs, the automatic translation of its title and description (the active site languages) and, with translation on, its subtitles and summary. The recording's source language is always dropped from the list |
 | `aiAsrProvider` | **Transcription engine** | `whisperx` | `whisperx` only | The transcription engine the worker is told to use |
 | `aiLlmProvider` | **Summary and translation engine** | `vllm` | `vllm` only | The language-model engine, served in the cluster |
 | `aiTtsEngine` | **Dubbing engine** | `piper` | `piper` only | The engine for synthetic dubbing voices |
@@ -361,7 +361,7 @@ included, so a copy keeps inheriting.
 | `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |
 | `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, advanced settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
 | `videoQuality` | `videoQuality` | `null` or a preset | Wizard, advanced settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
-| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Summary** (**Change languages**) or advanced settings, **Recording and AI** | Yes |
+| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Event** step (**Change languages**); the wizard always writes it | Yes |
 
 Some event settings have no site-wide counterpart and exist only on the event. They default to off or
 empty in `app/prisma/schema.prisma`:
@@ -447,7 +447,7 @@ How each value resolves:
 | Grace after `endsAt` | `Event.gracePeriodMinutes` → `SiteSetting.eventGracePeriodMinutes` |
 | Sender ratio for sizing | `Event.expectedSenderRatioPct` → `SiteSetting.defaultSenderRatioPct`, forced to 0 when participants cannot start video |
 | Title kicker | `Event.parseTitleKicker` → `SiteSetting.parseTitleKicker` |
-| Translation targets | `Event.aiTargetLocales` → `SiteSetting.aiDefaultTargetLocales`, minus the source language |
+| Event languages | `Event.aiTargetLocales` → `SiteSetting.aiDefaultTargetLocales`. The title and description are translated into those active on the site; subtitles and summary, with translation on, into all of them minus the source language |
 | Email sender name | `SiteSetting.emailFromName` → `SMTP_FROM_NAME` → `SiteSetting.siteName` → `PA Webinar` |
 | Number of bridges | Not a chain but two caps: `SiteSetting.jvbMaxReplicas` limits each event, then `JVB_MAX_REPLICAS` limits the total |
 

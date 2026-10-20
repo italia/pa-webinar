@@ -3,21 +3,28 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * La consegna delle traduzioni di titolo e descrizione: solo le lingue
- * chieste, solo dal claim corrente, e la proposta salvata nella stessa
- * transazione che chiude il lavoro.
+ * chieste, solo dal claim corrente, la versione automatica salvata e
+ * applicata nella stessa transazione che chiude il lavoro, e dopo un altro
+ * giro sulle lingue dell'evento.
  */
 const m = vi.hoisted(() => ({
   lavoro: vi.fn(),
   chiudi: vi.fn(),
   stato: vi.fn(),
   salva: vi.fn(),
+  applica: vi.fn(),
+  riconcilia: vi.fn(),
 }));
 vi.mock('@/lib/auth/cron', () => ({ assertCronApiKey: vi.fn() }));
 vi.mock('@/lib/report/job', () => ({
   consegnaLavoroEvento: m.chiudi,
   statoLavoroEvento: m.stato,
 }));
-vi.mock('@/lib/text-translation/enqueue', () => ({ salvaTraduzioni: m.salva }));
+vi.mock('@/lib/text-translation/enqueue', () => ({
+  salvaTraduzioni: m.salva,
+  applicaTraduzioni: m.applica,
+}));
+vi.mock('@/lib/text-translation/auto', () => ({ riconciliaTraduzioni: m.riconcilia }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     postprodJob: { findUnique: m.lavoro },
@@ -57,6 +64,8 @@ beforeEach(() => {
   });
   m.chiudi.mockResolvedValue(payload);
   m.salva.mockResolvedValue({ title: { en: 'Cycle | Title' } });
+  m.applica.mockResolvedValue({ applicate: ['de', 'en'], superata: false });
+  m.riconcilia.mockResolvedValue({ avviata: false, lingue: [] });
 });
 
 describe('POST /api/internal/event-text-translation', () => {
@@ -68,7 +77,7 @@ describe('POST /api/internal/event-text-translation', () => {
       modelId: 'm',
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true, languages: ['de', 'en'] });
+    expect(await res.json()).toEqual({ ok: true, languages: ['de', 'en'], applied: ['de', 'en'] });
     expect(m.chiudi).toHaveBeenCalledWith(JOB, 2, 'TRANSLATE_TEXT', { tx: true });
     expect(m.salva.mock.calls[0]![0]).toMatchObject({
       eventId: EVENTO,
@@ -79,6 +88,26 @@ describe('POST /api/internal/event-text-translation', () => {
       modelId: 'm',
     });
     expect(m.salva.mock.calls[0]![1]).toEqual({ tx: true });
+    // Applicata nella stessa transazione, con la versione appena salvata.
+    expect(m.applica.mock.calls[0]![0]).toMatchObject({
+      eventId: EVENTO,
+      sourceLanguage: 'it',
+      sourceHash: payload.sourceHash,
+      targetLanguages: ['de', 'en'],
+      proposta: { title: { en: 'Cycle | Title' } },
+      modelId: 'm',
+    });
+    expect(m.applica.mock.calls[0]![1]).toEqual({ tx: true });
+    // Dopo, un altro giro sulle lingue dell'evento.
+    expect(m.riconcilia).toHaveBeenCalledWith(EVENTO, expect.objectContaining({ actor: 'system' }));
+  });
+
+  it('una consegna superata dal testo principale lo dice, e il server ne chiede un altra', async () => {
+    m.applica.mockResolvedValueOnce({ applicate: [], superata: true });
+    m.riconcilia.mockResolvedValueOnce({ avviata: true, lingue: ['de', 'en'] });
+    const res = await consegna({ attempt: 2, title: { en: 'Cycle | Title' } });
+    expect(await res.json()).toEqual({ ok: true, languages: ['en'], applied: [], stale: true });
+    expect(m.riconcilia).toHaveBeenCalledTimes(1);
   });
 
   it('una lingua non chiesta si rifiuta', async () => {
@@ -114,5 +143,6 @@ describe('POST /api/internal/event-text-translation', () => {
       superseded: true,
     });
     expect(m.salva).not.toHaveBeenCalled();
+    expect(m.riconcilia).not.toHaveBeenCalled();
   });
 });

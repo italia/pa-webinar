@@ -7,7 +7,8 @@ export const DEFAULT_TARGET_LOCALES = 'en,fr,es,de';
  *  offre come traduzione, perche' la pipeline la toglie. */
 export const SOURCE_LANGUAGE_FALLBACK = 'it';
 
-const CODICE = /^[a-z]{2,3}(-[a-z]{2,4})?$/;
+/** Il formato di un codice di lingua come lo legge la pipeline (`en`, `pt-br`). */
+export const CODICE_LINGUA = /^[a-z]{2,3}(-[a-z]{2,4})?$/;
 
 /** I codici di una stringa `en,fr`, come li legge la pipeline
  *  (lib/ai/providers parseTargetLocales): minuscoli, validi, senza
@@ -16,7 +17,7 @@ export function parseLocaleList(value: string | null | undefined): string[] {
   const out: string[] = [];
   for (const raw of (value ?? '').split(',')) {
     const c = raw.trim().toLowerCase();
-    if (CODICE.test(c) && !out.includes(c)) out.push(c);
+    if (CODICE_LINGUA.test(c) && !out.includes(c)) out.push(c);
   }
   return out;
 }

@@ -88,17 +88,20 @@ interface MarkdownRendererProps {
   /** Raw markdown text. */
   content: string;
   className?: string;
+  /** La lingua del testo, se non e' quella della pagina. */
+  lang?: string;
 }
 
 /**
  * Read-only renderer. Safe to inject the returned HTML because the
  * sanitizer drops scripts and event handlers before it returns.
  */
-export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, className, lang }: MarkdownRendererProps) {
   const html = useMemo(() => renderMarkdown(content), [content]);
   return (
     <div
       className={`markdown-body${className ? ` ${className}` : ''}`}
+      lang={lang}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -116,6 +119,8 @@ interface MarkdownEditorProps {
   hint?: string;
   invalid?: boolean;
   errorText?: string;
+  /** La lingua del testo che si scrive (il campo e l'anteprima la dicono). */
+  lang?: string;
 }
 
 /**
@@ -132,6 +137,7 @@ export function MarkdownEditor({
   hint,
   invalid,
   errorText,
+  lang,
 }: MarkdownEditorProps) {
   const t = useTranslations('markdown');
   const [preview, setPreview] = useState(false);
@@ -171,10 +177,12 @@ export function MarkdownEditor({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
+          lang={lang}
           style={{ fontFamily: "'Roboto Mono', monospace", fontSize: '0.9rem' }}
         />
       ) : (
         <div
+          lang={lang}
           className="markdown-body border rounded p-3"
           style={{ minHeight: `${rows * 1.6}rem`, background: '#fff' }}
           dangerouslySetInnerHTML={{ __html: html }}
