@@ -115,10 +115,13 @@ const modulo = () =>
 const pulsante = (testo: string) =>
   [...container.querySelectorAll('button')].find((b) => b.textContent?.trim() === testo)!;
 const stato = () => container.querySelector('[role="status"]')!.textContent;
+// L'impronta del testo la calcola crypto.subtle fuori dal ciclo dei
+// microtask: con la macchina carica non basta svuotare le promesse, servono
+// giri veri del ciclo degli eventi (setTimeout non e' finto in questi test).
 const attendi = async () => {
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
     await act(async () => {
-      await Promise.resolve();
+      await new Promise((r) => setTimeout(r, 5));
     });
   }
 };
