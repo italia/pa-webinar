@@ -14,7 +14,14 @@ import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { clampPage } from '@/lib/presentation/client-state';
 
-import { openPdf, type PdfDocument, type PdfLoadingTask } from './pdf-loader';
+import {
+  copiaPagina,
+  disegnaFuoriSchermo,
+  openPdf,
+  testoDellaPagina,
+  type PdfDocument,
+  type PdfLoadingTask,
+} from './pdf-loader';
 import { presentationErrorMessage, usePresentationControls } from './use-presentation';
 
 interface PresentationStageProps {
@@ -33,14 +40,8 @@ interface Misura {
   h: number;
 }
 
-/** Oltre questo rapporto lo schermo non aggiunge nitidezza, solo memoria. */
-const DPR_MAX = 2;
-
 /** Chi assiste scarica il documento entro questo intervallo, non tutti nello stesso istante. */
 const RITARDO_MAX_MS = 1_200;
-
-/** Caratteri al massimo del testo della pagina mostrato sotto la slide. */
-const TESTO_MAX = 4_000;
 
 /**
  * La scena della presentazione: la pagina del PDF che chi presenta mostra a
@@ -184,43 +185,24 @@ export default function PresentationStage({
       try {
         const page = await documento.getPage(clampPage(pagina, documento.numPages));
         if (annullato) return;
-        const base = page.getViewport({ scale: 1 });
-        const scala = Math.min(misura.w / base.width, misura.h / base.height);
-        const dpr = Math.min(window.devicePixelRatio || 1, DPR_MAX);
-        const vista = page.getViewport({ scale: scala * dpr });
-        // Si disegna fuori schermo e si copia alla fine: la pagina vecchia
-        // resta visibile finché la nuova non è pronta, senza lampi bianchi.
-        const fuori = document.createElement('canvas');
-        fuori.width = Math.max(1, Math.floor(vista.width));
-        fuori.height = Math.max(1, Math.floor(vista.height));
-        const compito = page.render({ canvas: fuori, viewport: vista });
-        disegno = compito;
-        await compito.promise;
+        // Fuori schermo e poi copiata (pdf-loader): la pagina vecchia resta
+        // visibile finché la nuova non è pronta, senza lampi bianchi.
+        const fatta = await disegnaFuoriSchermo(
+          page,
+          { w: misura.w, h: misura.h },
+          (c) => {
+            disegno = c;
+          }
+        );
         const canvas = canvasRef.current;
         if (annullato || !canvas) return;
-        canvas.width = fuori.width;
-        canvas.height = fuori.height;
-        canvas.style.width = `${Math.floor(fuori.width / dpr)}px`;
-        canvas.style.height = `${Math.floor(fuori.height / dpr)}px`;
-        canvas.getContext('2d')?.drawImage(fuori, 0, 0);
+        copiaPagina(fatta, canvas);
 
         // Il testo della pagina, per chi usa un lettore di schermo o vuole
         // copiarlo: la slide è un'immagine.
-        const contenuto = await page.getTextContent();
+        const testoPagina = await testoDellaPagina(page);
         if (annullato) return;
-        let righe = '';
-        for (const voce of contenuto.items) {
-          if (!('str' in voce)) continue;
-          righe += voce.str + (voce.hasEOL ? '\n' : ' ');
-          if (righe.length > TESTO_MAX) break;
-        }
-        setTesto(
-          righe
-            .replace(/[ \t]+\n/g, '\n')
-            .replace(/\n{3,}/g, '\n\n')
-            .trim()
-            .slice(0, TESTO_MAX)
-        );
+        setTesto(testoPagina);
       } catch {
         // Disegno annullato da una pagina più recente, o pagina illeggibile:
         // resta quella di prima.

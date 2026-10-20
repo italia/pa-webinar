@@ -14,10 +14,11 @@
  * dall'elenco pubblico non riceve così un indirizzo pubblico: la sala lo vede
  * finché è presentato, come con una condivisione dello schermo.
  *
- * COME. Lato server, come `/api/assets`: il browser non raggiunge lo storage
- * (nessun host in più nella CSP), il file si legge con un URL firmato breve
- * che non esce da qui. La chiave deve essere quella di un materiale
- * dell'evento (lib/events/material-files), mai un altro blob.
+ * COME. Lato server, come `/api/assets` (lib/presentation/serve-pdf): il
+ * browser non raggiunge lo storage (nessun host in più nella CSP), il file si
+ * legge con un URL firmato breve che non esce da qui. La chiave deve essere
+ * quella di un materiale dell'evento (lib/events/material-files), mai un
+ * altro blob.
  *
  * CACHE. Privata e senza memoria: la risposta dipende da chi chiede e da cosa
  * si presenta adesso. Il visore tiene il documento aperto in memoria, quindi
@@ -27,19 +28,19 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
-import { AppError, NotFoundError, RateLimitError } from '@/lib/errors';
+import { NotFoundError, RateLimitError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import {
   PANEL_READ_EVENT_SELECT,
   authorizePanelRead,
 } from '@/lib/events/panel-read-access';
+import { streamMaterialPdf } from '@/lib/presentation/serve-pdf';
 import {
   PRESENTABLE_MATERIAL_SELECT,
   isPresentableMaterial,
   isPresentationOpen,
 } from '@/lib/presentation/state';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
-import { getFilesStorage } from '@/lib/storage';
 import { presentationFileQuerySchema } from '@/lib/validation/presentation';
 
 export const dynamic = 'force-dynamic';
@@ -83,47 +84,5 @@ export const GET = withErrorHandling(async (request, context) => {
     throw new NotFoundError('Presentation');
   if (!isPresentableMaterial(material, event.id)) throw new NotFoundError('Presentation');
 
-  const storage = getFilesStorage();
-  if (!storage) {
-    const err = new AppError(
-      'Files storage is not configured',
-      503,
-      'STORAGE_UNAVAILABLE'
-    );
-    err.expected = true;
-    throw err;
-  }
-
-  let upstream: Response;
-  try {
-    const firmato = await storage.getDownloadUrl(material.blobPath, {
-      expiresInMinutes: 10,
-    });
-    upstream = await fetch(firmato);
-  } catch (err) {
-    console.error(
-      '[presentation/file] lettura dallo storage non riuscita:',
-      err instanceof Error ? err.message : err
-    );
-    throw new AppError(
-      'Failed to read the file from storage',
-      502,
-      'STORAGE_READ_FAILED'
-    );
-  }
-  if (!upstream.ok || !upstream.body) throw new NotFoundError('Presentation');
-
-  const headers = new Headers({
-    // Il tipo lo decide il materiale (un PDF verificato al caricamento), non
-    // lo storage; e non lo indovina il browser.
-    'Content-Type': 'application/pdf',
-    'X-Content-Type-Options': 'nosniff',
-    // Lo legge il visore della sala; aperto direttamente si scarica.
-    'Content-Disposition': 'attachment',
-    'Cache-Control': 'private, no-store',
-  });
-  const len = upstream.headers.get('content-length');
-  if (len) headers.set('Content-Length', len);
-
-  return new Response(upstream.body, { status: 200, headers });
+  return streamMaterialPdf(material.blobPath, 'presentation/file');
 });
