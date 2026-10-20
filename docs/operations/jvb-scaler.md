@@ -414,7 +414,7 @@ organizer declared, not from who has joined:
 | Input | Where it is set | Default or effect |
 |---|---|---|
 | `maxParticipants` | Event form, **Expected participants (estimate)**; event templates | Sizing input. Default `300` in `schema.prisma` |
-| `expectedSenderRatioPct` | Event form, **Expected sender ratio** | Sizing input. Falls back to **Default sender ratio** |
+| `expectedSenderRatioPct` | Event wizard, **Technical details**: **How many webcams will be on?** | Sizing input, read by the scaler as the sender share. Falls back to **Default sender ratio** |
 | `participantsCanStartVideo` | Event form, **Participants can start video**; event templates | Sizing input. Default `false`: every participant counts as a receiver |
 | `gracePeriodMinutes` | Events API only; the wizard has no field | Not a sizing input: the overtime limit of an occupied room past its end. Falls back to **Overtime limit while people are in the room (minutes)** |
 | `recordingEnabled` | Event settings; event templates | Not a sizing input: it decides whether Jibri is scaled up, and kept up while busy after the event ends. Default `false` in `schema.prisma` |

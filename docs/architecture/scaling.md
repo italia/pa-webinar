@@ -176,7 +176,7 @@ started bridge can report meaningless values.
 |---|---|---|
 | Expected participants, `Event.maxParticipants` | Event wizard, **Expected participants (estimate)**. It is an estimate, not a registration cap | `300` in `app/prisma/schema.prisma`; instant calls use `50` unless the request gives a value (`app/src/app/api/events/instant/route.ts`) |
 | Video enabled, `Event.participantsCanStartVideo` | Event audio and video settings, **Participants can start video** | `false` in `schema.prisma`; instant calls set it to `true` |
-| Sender ratio, `Event.expectedSenderRatioPct`, falling back to `SiteSetting.defaultSenderRatioPct` | Wizard, **Estimated active share**; site settings, **Infra sizing** tab, **Default sender ratio** | `30` in `schema.prisma` |
+| Sender ratio, `Event.expectedSenderRatioPct`, falling back to `SiteSetting.defaultSenderRatioPct` | Wizard, **Technical details**, **How many webcams will be on?** (the capacity estimate reads it as the share of webcams on); site settings, **Infra sizing** tab, **Default sender ratio** | `30` in `schema.prisma` |
 | `SiteSetting.jvbSendersPerCore` | **Infra sizing**, **Active senders per core** | `3.125` in `schema.prisma` |
 | `SiteSetting.jvbReceiversPerCore` | **Infra sizing**, **Passive viewers per core** | `18.75` in `schema.prisma` |
 | `SiteSetting.jvbCpuCoresPerPod` | **Infra sizing**, **vCPU per JVB pod** | `16` in `schema.prisma` |
@@ -189,12 +189,11 @@ by default, and in that case the formula counts every participant as a
 receiver. The few streams sent by moderators and speakers are not modeled
 separately.
 
-The admin forms show the same arithmetic before anything runs:
-
-- **Sizing preview** in the **Infra sizing** tab applies the formula to a
-  100-participant event with the default sender ratio;
-- **Estimated JVB capacity** in the wizard's review step calls
-  `jvbsForEvent()` for the event being created.
+The **Sizing preview** in the **Infra sizing** tab shows the same
+arithmetic before anything runs: it applies the formula to a
+100-participant event with the default sender ratio. The event wizard and
+the event page show a different estimate, made for the organizer: see
+[The capacity estimate in the wizard and on the event page](#the-capacity-estimate-in-the-wizard-and-on-the-event-page).
 
 Both use the site's current settings. Each pod caches the site settings
 for 60 seconds, so a change reaches the scaler within about a minute. The
@@ -289,6 +288,92 @@ flowchart TB
   E4 --> SIZE
   SIZE --> PCAP --> SUM --> GCAP --> DESIRED --> JOB --> NODES
 ```
+
+## The capacity estimate in the wizard and on the event page
+
+The event wizard (**Advanced settings**, **Technical details**), its
+summary step and the event page show a second estimate, made for the
+organizer rather than for the scaler: how much one event weighs on one
+bridge and on the network. It is a pure model in
+`app/src/lib/capacity/model.ts`. The scaler does not use it yet and keeps
+the formula above, so the two can disagree: the model is calibrated on
+measured bridge CPU, the scaler's per-core constants are not.
+
+The model counts streams, not people:
+
+- **Webcams on**: the presenters (the primary moderator, the moderators and
+  the speakers) and, when participants can start their camera, the share
+  chosen under **How many webcams will be on?**
+  (`Event.expectedSenderRatioPct`, falling back to
+  `SiteSetting.defaultSenderRatioPct`).
+- **Videos each viewer receives**: at most the 25 tiles of a grid, fewer
+  when the quality preset sets a last-N, and 4 on a phone. With three
+  webcams or fewer the speaker is in the spotlight; with more, a grid. One
+  shared screen is always counted, because presenters can always share.
+- **Open microphones**: the presenters, and up to 10 in all when
+  participants can unmute. Each viewer receives only the loudest voices
+  when the bridge forwards only those (`JVB_NUM_LOUDEST`), and every open
+  voice otherwise.
+- **Bitrates** come from the video-quality presets in
+  `app/src/lib/jitsi/config.ts`: a small tile at 0.75 of the preset's low
+  cap, a medium tile at 0.7 of its standard cap, the spotlight at 0.45 of
+  its high cap. A voice is 0.04 Mbps at 50 packets per second.
+- **Bridge traffic**: out is what every viewer receives, plus one viewer for
+  the recorder and the voices sent to captions. In is the layer each webcam
+  sends (every layer for the presenter in the spotlight, and always with
+  the Maximum preset, which never suspends layers), the open microphones
+  and the shared screen.
+
+The bridge's CPU follows packets more than bits, and the model fits both,
+in and out:
+
+```text
+cores = 0.10 + 0.038 × thousand packets per second + 0.007 × Mbps
+load  = cores / (cores per bridge × 0.9)
+```
+
+The fit comes from a 15-core bridge with synthetic participants, all on
+camera: muted, with the five loudest voices forwarded, and with every voice
+forwarded. It lands within about 7% of the measured bridge CPU. 0.9 is the
+CPU share above which the bridge reports stress. The load is then compared
+with the site's stress thresholds:
+
+| Level shown | Load |
+|---|---|
+| **Ample margin** | Below the warning threshold |
+| **Caution** | From the warning threshold to the critical one |
+| **Close to the limit** | From the critical threshold to 100% |
+| **One bridge is not enough** | Above 100% |
+
+Without cascading, an event stays on one bridge, and above 100% it does not
+fit. With cascading (`JVB_CASCADING=true`), the panel says how many linked
+bridges the event would use, `ceil(load / critical threshold)`, up to
+`JVB_MAX_REPLICAS`. When the level is not **Ample margin**, the panel
+names the first change that brings the load under the warning threshold: a
+lower quality preset, then fewer webcams, then fewer participants. Above 25
+webcams, fewer webcams barely help, because every viewer already sees a
+full grid.
+
+Recording adds about 1.5 cores on the recorder and 4 to 10 Mbps of saved
+video, about 1.8 to 4.4 GB per hour. Captions add about one core per
+transcribed voice, up to `CAPTIONS_MAX_STREAMS` voices at once.
+
+| Input | Source |
+|---|---|
+| Cores per bridge | `SiteSetting.jvbCpuCoresPerPod` |
+| Stress thresholds | `SiteSetting.jvbStressWarnPercent` and `jvbStressCriticalPercent` |
+| Bridges in the instance | `JVB_MAX_REPLICAS` |
+| Loudest voices forwarded | `JVB_NUM_LOUDEST`; unset or `0` means every voice |
+| Linked bridges | `JVB_CASCADING`, `true` or unset |
+| Voices transcribed at once | `CAPTIONS_MAX_STREAMS`, `4` when unset |
+| Webcam share and quality when the event sets none | `SiteSetting.defaultSenderRatioPct` and `SiteSetting.videoQuality` |
+
+The server reads these when it renders the page
+(`app/src/lib/capacity/istanza.ts`) and passes them to the panel; none is a
+`NEXT_PUBLIC_*` variable. Without `JVB_NUM_LOUDEST` the estimate assumes
+that every open voice is forwarded: on a bridge that forwards only the
+loudest it overestimates events with many open microphones, which is the
+safe side.
 
 ## One scaler tick
 
@@ -713,10 +798,11 @@ The portal scales in the usual way for a stateless web application:
   [Where the limits are](#where-the-limits-are-in-the-order-you-meet-them).
 - **The stored estimate can differ from the live one.** The estimate saved
   on an event (`capacityEstimateJson`, at creation and whenever its
-  capacity inputs are edited) uses the built-in sizing defaults, not the
-  site's settings, and on edit it ignores the event's own sender ratio. The
-  scaler recomputes on every tick from the current settings, so compare
-  against the route's `breakdown` instead.
+  capacity inputs are edited) comes from the capacity model with the
+  built-in instance defaults (a 16-core bridge, every voice forwarded), not
+  from the site's settings or the app environment; it carries `model: 2`
+  and nothing reads it back. The scaler recomputes on every tick from the
+  current settings, so compare against the route's `breakdown` instead.
 - **A Redis outage stops scaling.** The snapshot write waits for Redis, so
   no tick applies a replica count until Redis is back (see
   [When something fails](#when-something-fails)).

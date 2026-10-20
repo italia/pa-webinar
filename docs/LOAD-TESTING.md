@@ -568,6 +568,12 @@ The scaler sizes events from per-core constants that an administrator can change
    **Active senders per core** (`jvbSendersPerCore`).
 4. Check the **Sizing preview** in the same tab against what you measured.
 
+The capacity estimate that organizers see in the event wizard does not use the two per-core
+constants. It reads **vCPU per JVB pod** and the stress thresholds, and turns packets and bitrate into
+cores with a fixed fit. To check it against your bridge, compare its cores with the bridge CPU of a run,
+and its packets with `packet_rate_upload` and `packet_rate_download` from `/colibri/stats`; see
+[The capacity estimate in the wizard and on the event page](architecture/scaling.md#the-capacity-estimate-in-the-wizard-and-on-the-event-page).
+
 [Align the defaults with your bridges](architecture/scaling.md#align-the-defaults-with-your-bridges)
 explains why this matters on bridges smaller than 16 cores, and
 [Runtime settings](configuration/runtime-settings.md) is the reference for each setting.
