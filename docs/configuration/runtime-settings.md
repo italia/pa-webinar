@@ -285,7 +285,10 @@ are `NOT NULL`, so these variables have no effect, including the `JVB_PRE_SCALE_
 These settings turn each event's declared audience into a number of Jitsi Videobridge (JVB) replicas.
 Only the JVB scaler acts on the result, so they provision nothing unless the scaler runs
 (`jvbScaler.enabled: true` in the chart's `full` profile, off by default; Docker Compose has no
-scaler). Without it they only feed the capacity estimates in the event wizard and on the status pages.
+scaler). Without it they only feed the estimates on the status pages. The capacity estimate in the
+event wizard and on the event page uses only **vCPU per JVB pod**, the two stress thresholds, the
+default sender ratio and, when the bridges are linked, **Max JVB replicas**
+([how](../architecture/scaling.md#the-capacity-estimate-in-the-wizard-and-on-the-event-page)).
 The formula, a worked example and how the result becomes nodes are in
 [scaling the media plane](../architecture/scaling.md#sizing-from-an-event-to-a-number-of-bridges).
 Defaults are those of `app/prisma/schema.prisma`.
@@ -295,7 +298,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `jvbCpuCoresPerPod` | **vCPU per JVB pod**, **Infra sizing** | `16` | 1 to 128 | The CPU cores one bridge has. The estimated cores of an event are divided by it |
 | `jvbReceiversPerCore` | **Passive viewers per core**, **Infra sizing** | `18.75` | 0.1 to 100 | How many receive-only participants one core serves |
 | `jvbSendersPerCore` | **Active senders per core**, **Infra sizing** | `3.125` | 0.1 to 100 | How many participants sending audio or video one core serves |
-| `defaultSenderRatioPct` | **Default sender ratio**, **Infra sizing** | `30` | 0 to 100 | The share of participants expected to send, when the event does not say. It counts only when participants can start their camera; otherwise every participant is a receiver |
+| `defaultSenderRatioPct` | **Default sender ratio**, **Infra sizing** | `30` | 0 to 100 | The share of participants expected to send, when the event does not say; the capacity estimate in the wizard reads it as the share of webcams on. It counts only when participants can start their camera; otherwise every participant is a receiver |
 | `jvbMaxReplicas` | **Max JVB replicas**, **Infra sizing** | `6` | 1 to 50 | The **per-event** cap: it limits each event's result before the sum. It does not limit the total |
 | `jvbStressWarnPercent` | **Stress warning threshold (%)**, **Features** | `50` | 0 to 100 | Above this measured bridge stress, the scaler adds one replica |
 | `jvbStressCriticalPercent` | **Stress critical threshold (%)**, **Features** | `70` | 0 to 100 | Above this, the scaler adds two replicas instead. Keep it above the warning threshold; the form does not check this |
@@ -355,7 +358,7 @@ included, so a copy keeps inheriting.
 
 | Event column | Falls back to | Values | Where it is set | Pre-filled by a template |
 |---|---|---|---|---|
-| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **Estimated active share** | No |
+| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **How many webcams will be on?** | No |
 | `accessMode` | `publicRegistrationEnabled`. Guest entry follows `guestAccessEnabled` either way, except that `INVITATION` admits no guests | `null`, `OPEN` or `INVITATION` | New-event question **Who can take part?**; wizard, **People**: **Who registers**, where an event left on `null` keeps following the site until a choice is made | No; the new-event questions set it |
 | `gracePeriodMinutes` | `eventGracePeriodMinutes` | `null` or -1 to 240 | Events API only; the wizard has no field. Instant calls are created with `-1` | No |
 | `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |

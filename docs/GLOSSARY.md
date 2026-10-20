@@ -301,9 +301,11 @@ events from it on its own.
 registrants at chosen offsets before the start.
 [Email and calendar](architecture/email.md)
 
-**Sender ratio** (`expectedSenderRatioPct`, UI **Estimated active share**):
-the share of participants expected to send audio or video. It drives bridge
-sizing. [Scaling the media plane](architecture/scaling.md)
+**Sender ratio** (`expectedSenderRatioPct`, UI **How many webcams will be
+on?**): the share of participants expected to have their webcam on. The
+capacity estimate in the wizard and on the event page reads it that way; the
+bridge scaler still reads it as the share sending audio or video.
+[Scaling the media plane](architecture/scaling.md)
 
 **Video quality preset** (`VideoQuality`: `SAVE_DATA`, `BALANCED`, `HIGH`,
 `MAX`): the resolution and bitrate profile applied to the conference, set per

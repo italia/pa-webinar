@@ -10,7 +10,7 @@ import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
+import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
@@ -372,14 +372,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
             : ['it', 'en']
         }
         defaultLocale={defaultLocale}
-        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={event.dataRetentionDays}
-        jvbSizingConfig={{
-          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
-          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
-          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
-          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
-        }}
+        capacita={capacitaIstanza(siteSettings)}
         availableTags={tags.map((tg) => ({
           slug: tg.slug,
           name: (tg.name ?? {}) as Record<string, string>,

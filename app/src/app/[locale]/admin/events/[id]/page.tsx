@@ -8,6 +8,8 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { capacitaIstanza } from '@/lib/capacity/istanza';
+import { durataInOre } from '@/lib/capacity/model';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
@@ -183,7 +185,6 @@ export default async function EventManagePage({
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
     privacyPolicyText: event.privacyPolicyText,
-    speakersInfo: event.speakersInfo as Record<string, string> | null,
     createdAt: event.createdAt.toISOString(),
     accessMode: event.accessMode,
     // Chi si iscrive davvero: la scelta dell'evento, o quella del sito.
@@ -242,6 +243,23 @@ export default async function EventManagePage({
       details: l.details,
       createdAt: l.createdAt.toISOString(),
     })),
+    // La stima della capacita' con le scelte salvate e le impostazioni
+    // correnti del sito; chi presenta: il moderatore principale e le persone
+    // con un ruolo nella sala.
+    capacita: {
+      istanza: capacitaIstanza(settings),
+      evento: {
+        maxParticipants: event.maxParticipants,
+        expectedSenderRatioPct: event.expectedSenderRatioPct,
+        participantsCanStartVideo: event.participantsCanStartVideo,
+        participantsCanUnmute: event.participantsCanUnmute,
+        presenters: 1 + event.additionalMods.filter((m) => m.revokedAt === null).length,
+        videoQuality: event.videoQuality,
+        recordingEnabled: event.recordingEnabled,
+        liveCaptionsEnabled: event.liveCaptionsEnabled,
+        durationHours: durataInOre(event.startsAt, event.endsAt),
+      },
+    },
   };
 
   // The effective kicker flag: per-event override if set, otherwise

@@ -16,7 +16,7 @@ import {
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import CreateInstantCall from '@/components/admin/create-instant-call';
-import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 interface TemplateSummary {
@@ -70,12 +70,12 @@ interface Props {
   siteTimezone: string;
   enabledLocales: string[];
   defaultLocale: string;
-  defaultSenderRatioPct: number;
   defaultRetentionDays: number;
   canUseRubrica: boolean;
   /** Si creano categorie nuove dal wizard: solo l'amministrazione. */
   canManageTags?: boolean;
-  jvbSizingConfig: JvbSizingConfig;
+  /** L'istanza per la stima della capacita'. */
+  capacita: CapacitaIstanza;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   siteDefaultParseTitleKicker: boolean;
@@ -108,11 +108,10 @@ export default function CreateEventWithTemplate({
   siteTimezone,
   enabledLocales,
   defaultLocale,
-  defaultSenderRatioPct,
   defaultRetentionDays,
   canUseRubrica,
   canManageTags = false,
-  jvbSizingConfig,
+  capacita,
   availableTags,
   gdprTemplates,
   siteDefaultParseTitleKicker,
@@ -167,11 +166,10 @@ export default function CreateEventWithTemplate({
       siteTimezone={siteTimezone}
       enabledLocales={enabledLocales}
       defaultLocale={defaultLocale}
-      defaultSenderRatioPct={defaultSenderRatioPct}
       defaultRetentionDays={defaultRetentionDays}
       canUseRubrica={canUseRubrica}
       canManageTags={canManageTags}
-      jvbSizingConfig={jvbSizingConfig}
+      capacita={capacita}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}

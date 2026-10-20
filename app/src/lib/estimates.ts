@@ -1,17 +1,26 @@
+/**
+ * La stima della capacita' salvata con un evento (`capacityEstimateJson`,
+ * alla creazione e quando cambia uno dei suoi ingressi): un adattatore sul
+ * modello di lib/capacity/model, con i valori predefiniti dell'istanza.
+ * Nessuno la rilegge; il pannello e la pagina dell'evento calcolano con le
+ * impostazioni correnti del sito.
+ */
+
 import {
-  DEFAULT_JVB_CONFIG,
-  jvbsForEvent,
-  type JvbSizingConfig,
-} from '@/lib/jvb-sizing';
+  ISTANZA_PREDEFINITA,
+  durataInOre,
+  stimaCapacita,
+  type CapacitaIstanza,
+  type LivelloCapacita,
+} from '@/lib/capacity/model';
+import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import { DEFAULT_JVB_CONFIG, jvbsForEvent } from '@/lib/jvb-sizing';
 
 interface EventConfig {
   maxParticipants: number;
   /**
-   * Registered participants at the time the estimate is computed. When
-   * provided, estimates are sized on this value rather than on
-   * `maxParticipants`, so the moderator sees the *current* demand rather
-   * than the worst-case capacity. Falls back to `maxParticipants` when
-   * omitted or zero.
+   * Gli iscritti al momento della stima. Se sono piu' dei partecipanti attesi
+   * la stima si fa su di loro.
    */
   registeredParticipants?: number;
   startsAt?: string;
@@ -20,148 +29,117 @@ interface EventConfig {
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
-  /**
-   * Percentage of attendees expected to send mic/video. Null → fall back
-   * to a sensible default. Passed through to `jvbsForEvent` so the
-   * creation-time preview matches what the runtime scaler actually does.
-   */
+  /** La quota di webcam accese; null: quella del sito. */
   expectedSenderRatioPct?: number | null;
-  /** JVB sizing constants (cpuCoresPerPod, sendersPerCore, receiversPerCore,
-   *  maxReplicas). Defaults to `DEFAULT_JVB_CONFIG`. */
-  jvbSizingConfig?: JvbSizingConfig;
+  /** Le persone che presentano (1 se non si sa). */
+  presenters?: number;
+  videoQuality?: VideoQualityPreset | null;
+  liveCaptionsEnabled?: boolean;
+  /** L'istanza; senza, i valori predefiniti. */
+  istanza?: CapacitaIstanza;
 }
 
-export interface EventEstimates {
-  /** Number of participants the estimate was sized for. */
+/** Le stime in numeri. */
+export interface EventEstimateNumbers {
+  /** La versione del modello che le ha fatte. */
+  model: 2;
+  /** I partecipanti su cui si e' stimato. */
   sizedFor: number;
-  /** True when the estimate is sized on `registeredParticipants`. */
   basedOnRegistrations: boolean;
+  /** Chi presenta in primo piano: tutti gli strati della webcam. */
+  moderatorUpMbps: number;
+  /** Chi guarda. */
+  participantDownMbps: number;
+  /** Il ponte, entrata piu' uscita. */
+  totalMbps: number;
+  bridgeOutMbps: number;
+  bridgeInMbps: number;
+  packetsPerSecond: number;
+  cores: number;
+  bridgeLoadPct: number;
+  level: LivelloCapacita;
+  /** I ponti che chiederebbe lo scaler (lib/jvb-sizing), che il modello non
+   *  usa ancora: la stima resta confrontabile con il suo conteggio. */
+  jvbCount: number;
+  /** I ponti dell'evento secondo il modello (piu' di uno solo con i ponti
+   *  collegati). */
+  bridges: number;
+  durationHours: number;
+  storageGB: number;
+  storageGBMax: number;
+}
+
+/** Le stesse stime, anche in parole: e' la forma salvata con l'evento. */
+export interface EventEstimates extends EventEstimateNumbers {
   moderatorBandwidth: string;
   participantBandwidth: string;
   totalBandwidth: string;
-  jvbCount: number;
-  jvbRam: string;
   estimatedDuration: string;
   storageEstimate: string;
 }
 
-/** Le stesse stime in numeri, per chi le formatta da se' (il pannello della
- *  capacita' nel wizard). `calculateEstimates` le mette in parole. */
-export interface EventEstimateNumbers {
-  sizedFor: number;
-  basedOnRegistrations: boolean;
-  moderatorUpMbps: number;
-  participantDownMbps: number;
-  totalMbps: number;
-  jvbCount: number;
-  jvbRamMB: number;
-  durationHours: number;
-  storageGB: number;
-}
+/** Senza date si conta un evento di due ore. */
+const DURATA_PREDEFINITA_ORE = 2;
 
 export function estimateNumbers(event: EventConfig): EventEstimateNumbers {
-  const basedOnRegistrations =
-    event.registeredParticipants !== undefined &&
-    event.registeredParticipants > 0;
-  const participants = basedOnRegistrations
-    ? (event.registeredParticipants as number)
-    : event.maxParticipants;
-
-  let moderatorUp = 0.05;
-  let participantDown = 0.05;
-
-  moderatorUp += 2.5;
-  participantDown += 1.0;
-
-  if (event.participantsCanStartVideo) {
-    const videoParticipants = Math.ceil(participants * 0.2);
-    participantDown += videoParticipants * 0.1;
-  }
-
-  if (event.participantsCanUnmute) {
-    participantDown += 0.05;
-  }
-
-  if (event.participantsCanShareScreen) {
-    participantDown += 0.5;
-  }
-
-  const totalBandwidth = participantDown * participants + moderatorUp;
-
-  // Use the same formula the runtime JVB scaler uses, so the creation-
-  // time preview ("≈N JVB") matches the number of replicas the cluster
-  // will actually provision. The scaler keys off maxParticipants ×
-  // sender-ratio, so a webinar with video disabled collapses to 0
-  // senders and receivers dominate.
-  const ratioForSizing =
-    event.expectedSenderRatioPct !== undefined &&
-    event.expectedSenderRatioPct !== null
-      ? event.expectedSenderRatioPct
-      : event.participantsCanStartVideo
-        ? 30
-        : 0;
-  const jvbCount = jvbsForEvent(
-    participants,
-    ratioForSizing,
-    event.participantsCanStartVideo,
-    event.jvbSizingConfig ?? DEFAULT_JVB_CONFIG,
+  const iscritti = event.registeredParticipants ?? 0;
+  const basedOnRegistrations = iscritti > event.maxParticipants;
+  const durationHours =
+    durataInOre(event.startsAt, event.endsAt) ??
+    (event.startsAt && event.endsAt ? 0 : DURATA_PREDEFINITA_ORE);
+  const s = stimaCapacita(
+    {
+      maxParticipants: basedOnRegistrations ? iscritti : event.maxParticipants,
+      expectedSenderRatioPct: event.expectedSenderRatioPct ?? null,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanUnmute: event.participantsCanUnmute,
+      presenters: event.presenters ?? 1,
+      videoQuality: event.videoQuality ?? null,
+      recordingEnabled: event.recordingEnabled,
+      liveCaptionsEnabled: event.liveCaptionsEnabled ?? false,
+      durationHours,
+    },
+    event.istanza ?? ISTANZA_PREDEFINITA
   );
-
-  const jvbRamMB = (2048 + participants * 10) * jvbCount;
-
-  let durationHours = 2;
-  if (event.startsAt && event.endsAt) {
-    const durationMs =
-      new Date(event.endsAt).getTime() - new Date(event.startsAt).getTime();
-    durationHours = Math.max(0, durationMs / (1000 * 60 * 60));
-  }
-
-  const storageGB = event.recordingEnabled ? (1.5 * durationHours * 3600) / 8 / 1024 : 0;
-
   return {
-    sizedFor: participants,
+    model: 2,
+    sizedFor: s.partecipanti,
     basedOnRegistrations,
-    moderatorUpMbps: moderatorUp,
-    participantDownMbps: participantDown,
-    totalMbps: totalBandwidth,
-    jvbCount,
-    jvbRamMB,
+    moderatorUpMbps: s.perPartecipante.upPiccoMbps,
+    participantDownMbps: s.perPartecipante.downMbps,
+    totalMbps: s.ponte.outMbps + s.ponte.inMbps,
+    bridgeOutMbps: s.ponte.outMbps,
+    bridgeInMbps: s.ponte.inMbps,
+    packetsPerSecond: s.ponte.outPps + s.ponte.inPps,
+    cores: s.ponte.core,
+    bridgeLoadPct: s.ponte.carico * 100,
+    level: s.ponte.livello,
+    jvbCount: jvbsForEvent(
+      s.partecipanti,
+      event.expectedSenderRatioPct ?? (event.participantsCanStartVideo ? 30 : 0),
+      event.participantsCanStartVideo,
+      DEFAULT_JVB_CONFIG
+    ),
+    bridges: s.ponte.ponti,
     durationHours,
-    storageGB,
+    storageGB: s.registrazione?.gbMin ?? 0,
+    storageGBMax: s.registrazione?.gbMax ?? 0,
   };
 }
 
 export function calculateEstimates(event: EventConfig): EventEstimates {
-  const {
-    sizedFor: participants,
-    basedOnRegistrations,
-    moderatorUpMbps: moderatorUp,
-    participantDownMbps: participantDown,
-    totalMbps: totalBandwidth,
-    jvbCount,
-    jvbRamMB,
-    durationHours,
-    storageGB,
-  } = estimateNumbers(event);
-
+  const n = estimateNumbers(event);
+  const ore = Math.floor(n.durationHours);
+  const minuti = Math.round((n.durationHours % 1) * 60);
   return {
-    sizedFor: participants,
-    basedOnRegistrations,
-    moderatorBandwidth: `~${moderatorUp.toFixed(1)} Mbps ↑`,
-    participantBandwidth: `~${participantDown.toFixed(1)} Mbps ↓`,
+    ...n,
+    moderatorBandwidth: `~${n.moderatorUpMbps.toFixed(1)} Mbps ↑`,
+    participantBandwidth: `~${n.participantDownMbps.toFixed(1)} Mbps ↓`,
     totalBandwidth:
-      totalBandwidth > 1000
-        ? `~${(totalBandwidth / 1000).toFixed(1)} Gbps`
-        : `~${totalBandwidth.toFixed(0)} Mbps`,
-    jvbCount,
-    jvbRam:
-      jvbRamMB > 1024
-        ? `${(jvbRamMB / 1024).toFixed(0)} GB`
-        : `${jvbRamMB} MB`,
-    estimatedDuration:
-      durationHours >= 1
-        ? `${Math.floor(durationHours)}h ${Math.round((durationHours % 1) * 60)}m`
-        : `${Math.round(durationHours * 60)}m`,
-    storageEstimate: `~${event.recordingEnabled ? storageGB.toFixed(1) : '0'} GB`,
+      n.totalMbps > 1000
+        ? `~${(n.totalMbps / 1000).toFixed(1)} Gbps`
+        : `~${n.totalMbps.toFixed(0)} Mbps`,
+    estimatedDuration: n.durationHours >= 1 ? `${ore}h ${minuti}m` : `${minuti}m`,
+    storageEstimate: `~${event.recordingEnabled ? n.storageGB.toFixed(1) : '0'} GB`,
   };
 }

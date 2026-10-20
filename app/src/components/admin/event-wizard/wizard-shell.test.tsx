@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+import { ISTANZA_PREDEFINITA } from '@/lib/capacity/model';
 
 import EventWizard, { type InitialEventShape, type WizardProps } from './wizard-shell';
 
@@ -53,14 +54,8 @@ const baseProps: WizardProps = {
   siteTimezone: 'Europe/Rome',
   enabledLocales: ['it', 'en'],
   defaultLocale: 'it',
-  defaultSenderRatioPct: 30,
   defaultRetentionDays: 30,
-  jvbSizingConfig: {
-    cpuCoresPerPod: 16,
-    receiversPerCore: 18.75,
-    sendersPerCore: 3.125,
-    maxReplicas: 1,
-  },
+  capacita: { ...ISTANZA_PREDEFINITA, instanceBridges: 1 },
   availableTags: [],
   gdprTemplates: [],
   siteDefaultParseTitleKicker: false,

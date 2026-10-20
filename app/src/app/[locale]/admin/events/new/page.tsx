@@ -5,7 +5,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
-import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
+import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
 import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
@@ -129,17 +129,11 @@ export default async function CreateEventPage({
             : ['it', 'en']
         }
         defaultLocale={siteSettings.defaultLocale ?? 'it'}
-        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={30}
         canUseRubrica={session.role === 'admin'}
         canManageTags={session.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
-        jvbSizingConfig={{
-          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
-          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
-          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
-          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
-        }}
+        capacita={capacitaIstanza(siteSettings)}
         availableTags={tags.map((tg) => ({
           slug: tg.slug,
           name: (tg.name ?? {}) as Record<string, string>,

@@ -4261,126 +4261,6 @@ button.live-time-strip__rec {
   }
 }
 
-// ── Event config diagram ──
-
-.event-config-diagram {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px 20px;
-  border: 1px solid #e8e8e8;
-}
-
-.diagram-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.feature-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: #F6F8FA;
-  color: var(--app-muted);
-  border: 1px solid #E8ECF0;
-
-  &__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #C9D4DE;
-    flex-shrink: 0;
-  }
-
-  &--on {
-    background: #E6F4EA;
-    color: #1B5E20;
-    border-color: #BFE2C8;
-
-    .feature-chip__dot {
-      background: #2E7D32;
-    }
-  }
-
-  &--off {
-    opacity: 0.55;
-    text-decoration: line-through;
-  }
-}
-
-.diagram-metrics {
-  background: #F8FAFE;
-  border-radius: 8px;
-  padding: 12px 14px;
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  &__title {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #17324D;
-  }
-
-  &__basis {
-    font-size: 0.72rem;
-    color: var(--app-muted);
-  }
-
-  &__bar {
-    height: 4px;
-    background: #E8ECF0;
-    border-radius: 2px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  &__bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0066CC, #4A90E2);
-    transition: width 0.3s ease;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
-  }
-}
-
-.metric-cell {
-  background: #fff;
-  border-radius: 6px;
-  padding: 8px 10px;
-  border-left: 2px solid #0066CC;
-
-  &__label {
-    font-size: 0.68rem;
-    color: var(--app-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    line-height: 1.2;
-  }
-
-  &__value {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #17324D;
-    font-variant-numeric: tabular-nums;
-    margin-top: 2px;
-  }
-}
-
 // ── Infrastructure Weathermap ──
 
 .infra-map {
@@ -10489,18 +10369,6 @@ html.live-resizing .live-sidebar-resizer::after {
   vertical-align: baseline;
 }
 
-.anteprima-evento__avviso {
-  display: inline-flex;
-  align-items: center;
-  margin: 0.25rem 0 0;
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #8a5300;
-
-  .icon { fill: #8a5300; }
-}
-
 .anteprima-chip-elenco {
   display: flex;
   flex-wrap: wrap;
@@ -10739,17 +10607,61 @@ html.live-resizing .live-sidebar-resizer::after {
   color: var(--app-muted);
 }
 
-// ── La capacita' di un evento: quanti parlano, il flusso da chi parla ai
-// ponti video a chi ascolta, il carico dei ponti e le risorse.
+// ── La capacita' di un evento: le scelte che contano, quanto riceve e manda
+// ciascuno, quanto del ponte video si usa (con un livello detto a parole) e le
+// ipotesi della stima. Il colore accompagna il testo, non lo sostituisce.
 .capacita {
   display: grid;
   gap: 1.25rem;
+  min-width: 0;
+}
+
+.capacita__intro {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--app-muted);
+}
+
+.capacita__ingressi {
+  display: grid;
+  gap: 1rem;
+}
+
+.capacita__attesi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.4rem;
+  margin: 0;
+  color: var(--app-text);
+}
+
+.capacita__attesi-numero {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.capacita__iscritti {
+  color: var(--app-muted);
+}
+
+// «Cambia»: un collegamento a misura di dito, nella riga del testo.
+.capacita__cambia {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  font-size: inherit;
+  font-weight: 600;
 }
 
 .capacita__quota {
   margin: 0;
   padding: 0;
   border: 0;
+  min-width: 0;
 }
 
 .capacita__domanda {
@@ -10771,7 +10683,7 @@ html.live-resizing .live-sidebar-resizer::after {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 2.5rem;
+  min-height: 44px;
   padding: 0.35rem 0.9rem;
   border: 1px solid #b9d0e8;
   border-radius: 999px;
@@ -10807,9 +10719,20 @@ html.live-resizing .live-sidebar-resizer::after {
 }
 
 .capacita__pct {
-  margin-left: 0.25rem;
+  margin-left: 0.35rem;
   font-weight: 400;
   color: var(--app-muted);
+}
+
+.capacita__altro {
+  margin-top: 0.75rem;
+  max-width: 18rem;
+
+  .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-text);
+  }
 }
 
 .capacita__nota {
@@ -10818,62 +10741,81 @@ html.live-resizing .live-sidebar-resizer::after {
   color: var(--app-muted);
 }
 
-// Tre blocchi con una freccia fra l'uno e l'altro; sul telefono in colonna.
-.capacita__flusso {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.75rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.capacita__impostazioni {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #f2f6fa;
+  font-size: 0.85rem;
+  color: var(--app-muted);
 
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2.25rem;
+  // Bootstrap Italia da' alle liste una misura propria: qui vale quella del
+  // riquadro.
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: inherit;
+    line-height: 1.5;
+  }
+
+  li {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.3rem;
+    min-height: 1.75rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--app-text);
   }
 }
 
-.capacita__nodo {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
+.capacita__impostazioni-titolo {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__modifica {
+  margin: 0.5rem 0 0;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+  }
+}
+
+.capacita__titolo {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.capacita__schede {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.capacita__scheda {
+  min-width: 0;
   padding: 0.9rem 1rem;
   border: 1px solid #d9e2ea;
   border-radius: 8px;
   background: #fff;
 
-  // La freccia verso il blocco dopo.
-  &:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -1.35rem;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-right: 2px solid #8fb3d9;
-    border-bottom: 2px solid #8fb3d9;
-    transform: translateX(-50%) rotate(45deg);
-
-    @media (min-width: 768px) {
-      left: auto;
-      right: -1.6rem;
-      bottom: auto;
-      top: 50%;
-      transform: translateY(-50%) rotate(-45deg);
-    }
-  }
-}
-
-.capacita__nodo--ponte {
-  border-color: var(--app-primary);
-  background: #f0f6fc;
-}
-
-.capacita__nodo--limite {
-  border-color: #c77700;
-  background: #fff7eb;
+  .capacita__titolo { margin-bottom: 0.25rem; }
 }
 
 .capacita__icona {
@@ -10882,98 +10824,169 @@ html.live-resizing .live-sidebar-resizer::after {
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
   border-radius: 50%;
   background: #e6eff8;
-  color: var(--app-primary);
 
-  svg { width: 18px; height: 18px; }
   .icon { fill: var(--app-primary); }
 }
 
-.capacita__numero {
-  font-size: 1.6rem;
+.capacita__valore {
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.2;
   font-variant-numeric: tabular-nums;
   color: var(--app-text);
 }
 
-.capacita__etichetta {
+.capacita__cosa {
+  margin: 0 0 0.35rem;
   font-weight: 600;
   color: var(--app-text);
 }
 
 .capacita__dettaglio {
-  font-size: 0.82rem;
+  margin: 0;
+  font-size: 0.85rem;
   color: var(--app-muted);
 }
 
-.capacita__carico-testa {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.4rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--app-text);
+// Il ponte: il bordo a sinistra e il riempimento della barra hanno il colore
+// del livello; il livello e' sempre detto anche a parole, con la sua icona.
+.capacita__ponte {
+  --capacita-livello: #008055;
+  padding: 1rem 1.1rem;
+  border: 1px solid #d9e2ea;
+  border-left: 4px solid var(--capacita-livello);
+  border-radius: 8px;
+  background: #fff;
 
-  strong { font-variant-numeric: tabular-nums; }
+  p { margin: 0 0 0.6rem; }
 }
 
-.capacita__oltre {
-  color: #a61919;
+.capacita__ponte--attenzione { --capacita-livello: #b56b00; }
+.capacita__ponte--limite { --capacita-livello: #c4321c; }
+.capacita__ponte--nonBasta { --capacita-livello: #a61919; }
+
+.capacita__ponte-testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.4rem;
+
+  .capacita__titolo { margin: 0; }
+}
+
+.capacita__livello {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  .icon { width: 1.1rem; height: 1.1rem; }
+}
+
+.capacita__livello--ampio { border-color: #8cc8ad; background: #e8f5ef; color: #005c3d; .icon { fill: #005c3d; } }
+.capacita__livello--attenzione { border-color: #e3b25c; background: #fff4e0; color: #6e4300; .icon { fill: #6e4300; } }
+.capacita__livello--limite { border-color: #eba59a; background: #fdecea; color: #8a1f11; .icon { fill: #8a1f11; } }
+.capacita__livello--nonBasta { border-color: #e08a8a; background: #fbe4e4; color: #7d1111; .icon { fill: #7d1111; } }
+
+.capacita__uso {
+  font-size: 1rem;
+  color: var(--app-text);
+}
+
+// La barra: le etichette delle soglie sopra i segni; sotto i 576px, dove si
+// sovrapporrebbero, una legenda sotto la barra al loro posto.
+.capacita__barra-segni {
+  position: relative;
+  height: 1.3rem;
+
+  @media (max-width: 575.98px) { display: none; }
+}
+
+.capacita__segno-testo {
+  position: absolute;
+  bottom: 0.15rem;
+  padding-left: 0.3rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: var(--app-muted);
+  border-left: 1px dashed #6b7f8f;
+}
+
+.capacita__segno-testo--prima {
+  padding: 0 0.3rem 0 0;
+  border-left: 0;
+  border-right: 1px dashed #6b7f8f;
 }
 
 .capacita__barra {
-  display: flex;
+  position: relative;
   height: 0.85rem;
+  margin-bottom: 0.6rem;
   overflow: hidden;
   border-radius: 999px;
   background: #e6edf4;
 }
 
-.capacita__parte--parlano { background: var(--app-primary); }
-.capacita__parte--ascolto { background: #7fb2e5; }
+.capacita__riempimento {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--capacita-livello);
+}
 
-.capacita__legenda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
-  margin: 0.5rem 0 0;
+.capacita__segno {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #3d5466;
+}
+
+.capacita__barra-legenda {
+  display: none;
+  margin: -0.2rem 0 0.6rem;
   padding: 0;
   list-style: none;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
   color: var(--app-muted);
 
-  li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
+  li { display: inline; }
+  li + li::before { content: ' · '; }
+
+  @media (max-width: 575.98px) { display: block; }
 }
 
-.capacita__campione {
-  display: inline-block;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 3px;
-  background: #e6edf4;
-  border: 1px solid #c5d3e0;
+.capacita__spiega {
+  font-size: 0.9rem;
+  color: var(--app-text);
 }
-.capacita__campione--parlano { background: var(--app-primary); border-color: var(--app-primary); }
-.capacita__campione--ascolto { background: #7fb2e5; border-color: #7fb2e5; }
+
+.capacita__suggerimento {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
 
 .capacita__risorse {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: 0.75rem;
-  margin: 0;
+  margin: 0.75rem 0 0;
 
   > div {
     padding: 0.6rem 0.8rem;
     border-radius: 6px;
-    background: #f5f8fb;
+    background: #f2f6fa;
   }
 
   dt {
@@ -10984,11 +10997,75 @@ html.live-resizing .live-sidebar-resizer::after {
 
   dd {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--app-text);
   }
+}
+
+.capacita__istanza {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--app-text);
+}
+
+.capacita__come {
+  summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--app-primary);
+    cursor: pointer;
+  }
+}
+
+.capacita__ipotesi {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+
+  th {
+    width: 38%;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+
+  td { color: var(--app-text); }
+
+  @media (max-width: 575.98px) {
+    th, td { display: block; width: auto; }
+    th { border-bottom: 0; padding-bottom: 0; }
+  }
+}
+
+// La riga della capacita' nel riepilogo del wizard: informativa, o un avviso
+// da «attenzione» in su.
+.capacita__riepilogo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+
+  .icon { flex-shrink: 0; margin-top: 0.1rem; fill: var(--app-muted); }
+}
+
+.capacita__riepilogo--avviso {
+  font-weight: 600;
+  color: #6e4300;
+
+  .icon { fill: #6e4300; }
+}
+
+.capacita__riepilogo-link {
+  font-size: inherit;
+  font-weight: 600;
+  vertical-align: baseline;
 }
 
 // ── Le azioni del wizard: la barra si ferma in fondo allo schermo mentre si

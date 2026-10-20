@@ -550,3 +550,28 @@ export function videoQualityMaxHeight(preset?: string | null, opts?: { isMobile?
   const h = QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].maxHeight;
   return opts?.isMobile ? Math.min(h, MOBILE_MAX_HEIGHT) : h;
 }
+
+/** I tetti di un preset che servono alla stima della capacita' di un evento
+ *  (lib/capacity/model): bitrate per strato, video ricevuti, sospensione degli
+ *  strati non guardati, audio stereo, e i video ricevuti da un telefono. La
+ *  stima li legge da qui: un preset cambiato cambia anche la stima. */
+export function videoQualityBudget(preset?: string | null): {
+  maxHeight: number;
+  maxBitratesVideo: { low: number; standard: number; high: number };
+  channelLastN: number;
+  enableLayerSuspension: boolean;
+  stereo: boolean;
+  mobileChannelLastN: number;
+  mobileMaxHeight: number;
+} {
+  const q = QUALITY_DEFINITIONS[normalizeQualityPreset(preset)];
+  return {
+    maxHeight: q.maxHeight,
+    maxBitratesVideo: { ...q.configOverwrite.videoQuality.maxBitratesVideo },
+    channelLastN: q.configOverwrite.channelLastN,
+    enableLayerSuspension: q.configOverwrite.enableLayerSuspension,
+    stereo: q.configOverwrite.stereo,
+    mobileChannelLastN: MOBILE_CHANNEL_LAST_N,
+    mobileMaxHeight: MOBILE_MAX_HEIGHT,
+  };
+}

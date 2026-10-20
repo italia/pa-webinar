@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import CapacityPanel, { capacityWarnings } from '@/components/admin/capacity-panel';
+import CapacityPanel, { type RiepilogoCapacita } from '@/components/admin/capacity-panel';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
@@ -21,7 +21,12 @@ import {
   WIZARD_ADVANCED_SECTIONS,
   type WizardAdvancedSection,
 } from '@/lib/events/wizard-steps';
-import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import {
+  durataInOre,
+  stimaCapacita,
+  type CapacitaIstanza,
+  type InputCapacita,
+} from '@/lib/capacity/model';
 
 import type { WizardForm } from './wizard-shell';
 
@@ -206,49 +211,73 @@ export function SezioneDati({
   );
 }
 
-/** Capacita' e risorse: servono a chi dimensiona l'installazione. */
+/** Le scelte del modulo che pesano sul ponte video. */
+export function inputCapacita(form: WizardForm): InputCapacita {
+  const toggles = togglesFromMatrix(form.permissionMatrix);
+  return {
+    maxParticipants: form.maxParticipants,
+    expectedSenderRatioPct: form.expectedSenderRatioPct,
+    participantsCanStartVideo: toggles.participantsCanStartVideo,
+    participantsCanUnmute: toggles.participantsCanUnmute,
+    // Il moderatore principale, i moderatori e i relatori.
+    presenters: 1 + form.moderators.length + form.speakers.length,
+    videoQuality: form.videoQuality ?? null,
+    recordingEnabled: form.recordingEnabled,
+    liveCaptionsEnabled: form.liveCaptionsEnabled,
+    durationHours: durataInOre(form.startsAt, form.endsAt),
+  };
+}
+
+/** Quanto pesa l'evento sul ponte video e sulla rete, e le scelte che lo
+ *  cambiano: si ricalcola a ogni cambio del modulo. */
 export function SezioneTecnica({
   form,
   onChange,
-  jvbSizingConfig,
-  defaultSenderRatioPct,
+  capacita,
+  onCambiaPartecipanti,
+  onCambiaQualita,
 }: {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
-  jvbSizingConfig: JvbSizingConfig;
-  defaultSenderRatioPct: number;
+  capacita: CapacitaIstanza;
+  /** Porta al campo dei partecipanti attesi (passo «Quando»). */
+  onCambiaPartecipanti?: () => void;
+  /** Apre la sezione della sala e del video. */
+  onCambiaQualita?: () => void;
 }) {
-  const toggles = togglesFromMatrix(form.permissionMatrix);
   return (
     <CapacityPanel
-      maxParticipants={form.maxParticipants}
-      senderRatioPct={form.expectedSenderRatioPct}
-      onSenderRatioChange={(next) => onChange({ expectedSenderRatioPct: next })}
-      videoEnabled={toggles.participantsCanStartVideo}
-      defaultSenderRatioPct={defaultSenderRatioPct}
-      sizingConfig={jvbSizingConfig}
-      recordingEnabled={form.recordingEnabled}
-      participantsCanUnmute={toggles.participantsCanUnmute}
-      participantsCanShareScreen={toggles.participantsCanShareScreen}
-      startsAt={form.startsAt}
-      endsAt={form.endsAt}
+      istanza={capacita}
+      evento={inputCapacita(form)}
+      participantsCanShareScreen={
+        togglesFromMatrix(form.permissionMatrix).participantsCanShareScreen
+      }
+      onCameraPctChange={(next) => onChange({ expectedSenderRatioPct: next })}
+      onCambiaPartecipanti={onCambiaPartecipanti}
+      onCambiaQualita={
+        onCambiaQualita &&
+        (() => {
+          onCambiaQualita();
+          // La sezione si apre in questo giro: la scelta della qualita' prende
+          // il fuoco al prossimo.
+          setTimeout(() => {
+            const campo = document.getElementById('ev-video-quality');
+            campo?.focus({ preventScroll: true });
+            campo?.scrollIntoView?.({ block: 'center' });
+          }, 0);
+        })
+      }
     />
   );
 }
 
-/** C'e' un avviso di capacita' (bridge al tetto, quota ereditata su un
- *  evento grande)? Il riepilogo lo dice, e porta ai dettagli tecnici. */
-export function avvisoCapacita(
-  form: WizardForm,
-  jvbSizingConfig: JvbSizingConfig,
-  defaultSenderRatioPct: number,
-): boolean {
-  const avvisi = capacityWarnings({
-    maxParticipants: form.maxParticipants,
-    senderRatioPct: form.expectedSenderRatioPct,
-    videoEnabled: togglesFromMatrix(form.permissionMatrix).participantsCanStartVideo,
-    defaultSenderRatioPct,
-    sizingConfig: jvbSizingConfig,
-  });
-  return avvisi.atCeiling || avvisi.shouldWarnInherited;
+/** La capacita' in una riga, per il riepilogo: dice il carico e il suo
+ *  livello, e porta ai dettagli tecnici. */
+export function riepilogoCapacita(form: WizardForm, capacita: CapacitaIstanza): RiepilogoCapacita {
+  const s = stimaCapacita(inputCapacita(form), capacita);
+  return {
+    carico: s.ponte.carico,
+    livello: s.ponte.livello,
+    downMbps: s.perPartecipante.downMbps,
+  };
 }
