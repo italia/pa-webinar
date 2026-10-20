@@ -137,6 +137,40 @@ flowchart TB
    before you commit to a capacity figure: see
    [Load testing](../LOAD-TESTING.md).
 
+## Loudest-only audio routing
+
+An open microphone sends about 50 audio packets per second. Without a limit
+the bridge forwards each one to every other participant, so in a meeting
+where everyone keeps the microphone open the audio packets grow with the
+square of the room. Bridge CPU follows packets more than bits, so these small
+packets weigh far more than their bandwidth suggests.
+
+With loudest-only routing the bridge forwards to each participant only the
+audio of the loudest voices of the moment, plus the dominant speaker. Every
+open microphone beyond that number adds its own incoming stream to the
+bridge, and almost nothing to what the bridge sends out. The chart turns the
+routing on with `global.jvb.numLoudest`, default `5`, and `0` turns it off.
+The value reaches the bridge as JVM options in
+`jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS`, and the portal as
+`JVB_NUM_LOUDEST`, which the capacity estimate of an event reads
+([Bridge (JVB)](../DEPLOYMENT.md#bridge-jvb)).
+
+Measured on one bridge with 28 participants on camera, at 180p and 15 fps:
+
+| Microphones | Audio forwarded | Packets out of the bridge | Bridge CPU |
+|---|---|---|---|
+| All muted | none | 6.9k per second | 0.68 core |
+| 28 open | the 5 loudest | 13.8k per second, +6.8k | 1.03 cores |
+| 28 open | every voice | 45k to 48k per second, +38k to +41k | 2.35 cores |
+
+The +6.8k is the 5 voices sent to the other 27 participants at 50 packets
+per second each (5 × 27 × 50 = 6,750).
+
+What it changes for the people in the room: when many speak at once, only the
+loudest are heard, as in a room where everyone talks over each other. One
+person speaking at a time is always forwarded. Changing the value restarts the
+bridge, and the conferences on it drop, so change it when no call is running.
+
 ## Sizing: from an event to a number of bridges
 
 The scaler sizes each event from what the organizer declared, not from how

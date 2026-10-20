@@ -705,3 +705,28 @@ quando qualcuno la chiede dal wizard.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- /*
+Instradamento delle sole voci più forti nel bridge (global.jvb.numLoudest):
+il numero lo legge il bridge dalle opzioni della JVM
+(jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS), e il portale, per la
+stima delle risorse, da quello che il bridge riceve. Un file di valori che
+riscrive quelle opzioni senza le due proprietà, o con un altro numero,
+lascerebbe il valore del chart senza effetto e senza errori: il bridge
+inoltrerebbe ogni voce, e un evento con molti microfoni aperti userebbe più
+del doppio della CPU prevista. Senza la chiave (aggiornamento --reuse-values
+da una versione precedente) non si controlla niente.
+*/}}
+{{- define "pa-webinar.validateJvbLoudest" -}}
+{{- $globale := .Values.global | default dict -}}
+{{- if and .Values.jitsi.enabled (hasKey (dig "jvb" dict $globale | default dict) "numLoudest") -}}
+{{- $voluto := toString (dig "jvb" "numLoudest" 0 $globale) -}}
+{{- if not (regexMatch "^[0-9]+$" $voluto) -}}
+{{- fail (printf "global.jvb.numLoudest è %q: serve un intero da 0 in su, il numero di voci più forti che il bridge inoltra a ogni partecipante (0 = tutte)." $voluto) -}}
+{{- end -}}
+{{- $reso := include "pa-webinar.jvbNumLoudest" . -}}
+{{- if ne $voluto $reso -}}
+{{- fail (printf "global.jvb.numLoudest è %s ma le opzioni della JVM del bridge (jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS) gli fanno inoltrare %s voci (0 = tutte): un file di valori che imposta VIDEOBRIDGE_DEBUG_OPTIONS sostituisce il valore del chart. Riparti da quello di values.yaml e aggiungi le tue opzioni in fondo, separate da uno spazio." $voluto $reso) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

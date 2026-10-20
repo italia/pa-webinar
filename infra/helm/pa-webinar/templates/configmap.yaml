@@ -50,6 +50,21 @@ data:
   JVB_MAX_REPLICAS: {{ $bridge | toString | quote }}
   {{- end }}
   {{- /*
+    Come lavora il bridge del chart, per la stima delle risorse di un evento:
+    quante voci inoltra a ogni partecipante (0 = tutte, vedi
+    pa-webinar.jvbNumLoudest) e se una conferenza può stare su più bridge
+    (Octo, jitsi-meet.octo.enabled). Con una conferenza esterna il chart non
+    lo sa, e non scrive niente.
+  */}}
+  {{- if .Values.jitsi.enabled }}
+  {{- if not (hasKey $env "JVB_NUM_LOUDEST") }}
+  JVB_NUM_LOUDEST: {{ include "pa-webinar.jvbNumLoudest" . | quote }}
+  {{- end }}
+  {{- if and (dig "octo" "enabled" false (index .Values "jitsi-meet" | default dict)) (not (hasKey $env "JVB_CASCADING")) }}
+  JVB_CASCADING: "true"
+  {{- end }}
+  {{- end }}
+  {{- /*
     Come è installata la piattaforma, per la pagina di stato e il pannello
     Infrastruttura: il profilo (jitsi.mode), se il database è quello del
     chart, e il nome del job con cui Prometheus raccoglie le metriche
@@ -88,6 +103,14 @@ data:
   */}}
   {{- if and (include "pa-webinar.captionsEnabled" .) (not (hasKey $env "CAPTIONS_STATUS_URL")) }}
   CAPTIONS_STATUS_URL: {{ include "pa-webinar.captionsStatusUrl" . | quote }}
+  {{- end }}
+  {{- /*
+    Le voci che il servizio trascrive insieme al massimo, lo stesso valore
+    che riceve il gateway: il portale lo usa per stimare le risorse di un
+    evento con i sottotitoli.
+  */}}
+  {{- if and (include "pa-webinar.captionsEnabled" .) (not (hasKey $env "CAPTIONS_MAX_STREAMS")) }}
+  CAPTIONS_MAX_STREAMS: {{ int (dig "maxStreams" 4 (.Values.captions | default dict)) | toString | quote }}
   {{- end }}
   {{- /*
     Il motore di traduzione su CPU (templates/postprod-mt.yaml): il portale

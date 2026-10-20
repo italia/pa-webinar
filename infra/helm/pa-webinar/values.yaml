@@ -1114,6 +1114,28 @@ jitsi-meet:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 6
+    # Stessa tolleranza per la sonda di prontezza: un bridge che la manca esce
+    # dal Service della sua API (JVB_HEALTH_URL), e il portale lo leggerebbe
+    # come spento, nella pagina di stato e all'apertura delle sale.
+    readinessProbe:
+      httpGet:
+        path: /about/health
+        port: 8080
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+    # Opzioni della JVM del bridge. L'immagine passa a java solo
+    # VIDEOBRIDGE_DEBUG_OPTIONS, più -Xmx da VIDEOBRIDGE_MAX_MEMORY (3072m se
+    # vuota): per l'heap si usa VIDEOBRIDGE_MAX_MEMORY, mentre VIDEOBRIDGE_OPTS
+    # non la legge nessuno. Qui il chart accende l'instradamento delle sole
+    # voci più forti con il numero di global.jvb.numLoudest; il valore passa
+    # da `tpl` nel sottochart, che dei valori di questo chart vede solo
+    # `global`. Un file di valori che imposta VIDEOBRIDGE_DEBUG_OPTIONS
+    # sostituisce questo valore: riparti da qui e aggiungi le tue opzioni in
+    # fondo, separate da uno spazio. Il chart si ferma se le voci inoltrate
+    # non sono quelle di global.jvb.numLoudest.
+    extraEnvs:
+      VIDEOBRIDGE_DEBUG_OPTIONS: '{{ $n := int (dig "jvb" "numLoudest" 0 (.Values.global | default dict)) }}{{ if gt $n 0 }}-Dvideobridge.loudest.route-loudest-only=true -Dvideobridge.loudest.num-loudest={{ $n }}{{ end }}'
     useHostPort: true
     useNodeIP: true
     UDPPort: 10000
@@ -1315,6 +1337,19 @@ global:
     # Jicofo, non in un Secret: tiene fuori gli altri pod del cluster, non chi
     # legge i ConfigMap del namespace. Per generarlo: openssl rand -hex 24
     bridgeToken: ""
+  # Instradamento delle sole voci più forti nel bridge: a ogni partecipante
+  # il bridge inoltra l'audio delle `numLoudest` voci più forti del momento
+  # (più chi sta parlando), non quello di ogni microfono aperto. Oltre quel
+  # numero, chi apre il microfono quasi non pesa: con 28 microfoni aperti il
+  # bridge ha inoltrato 6,8 mila pacchetti al secondo in più invece di 38
+  # mila, e ha usato circa un core invece di 2,4. 0 = spento, il bridge
+  # inoltra ogni voce. Lo legge il sottochart della conferenza (l'opzione
+  # della JVM in jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS), e questo
+  # chart scrive nel ConfigMap del portale JVB_NUM_LOUDEST, ricavato da quello
+  # che il bridge riceve davvero, per la stima delle risorse di un evento.
+  # Cambiarlo riavvia il bridge: va fatto a sale vuote.
+  jvb:
+    numLoudest: 5
 
 captions:
   gateway:
