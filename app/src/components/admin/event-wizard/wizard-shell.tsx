@@ -41,7 +41,7 @@ import {
   lingueDiPartenzaTraduzione,
   SOURCE_LANGUAGE_FALLBACK,
 } from '@/lib/ai/target-locales';
-import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import {
   WIZARD_MAIN_STEPS,
@@ -96,7 +96,7 @@ import Step5Review from './step-5-review';
 import AdvancedSettings, {
   SezioneDati,
   SezioneTecnica,
-  avvisoCapacita,
+  riepilogoCapacita,
 } from './advanced-settings';
 import {
   STEP_KEYS,
@@ -152,7 +152,6 @@ export interface WizardProps {
   siteTimezone: string;
   enabledLocales: string[];
   defaultLocale: string;
-  defaultSenderRatioPct: number;
   defaultRetentionDays: number;
   /** Mostrare la ricerca in rubrica negli inviti: solo all'amministrazione. */
   canUseRubrica?: boolean;
@@ -162,7 +161,8 @@ export interface WizardProps {
   /** In modifica, il token con cui si e' entrati se non c'e' una sessione dello
    *  staff: solo allora il ritorno alla pagina dell'evento lo porta con se'. */
   viaToken?: string | null;
-  jvbSizingConfig: JvbSizingConfig;
+  /** L'istanza per la stima della capacita' (lib/capacity/istanza). */
+  capacita: CapacitaIstanza;
   availableTags: Array<{
     slug: string;
     name: Record<string, string>;
@@ -2079,11 +2079,7 @@ export default function EventWizard(props: WizardProps) {
               ) : undefined
             }
             sopratitolo={form.parseTitleKicker ?? props.siteDefaultParseTitleKicker}
-            capacityWarning={avvisoCapacita(
-              form,
-              props.jvbSizingConfig,
-              props.defaultSenderRatioPct
-            )}
+            capacita={riepilogoCapacita(form, props.capacita)}
           />
         )}
         {activeStep === 'advanced' && (
@@ -2167,8 +2163,11 @@ export default function EventWizard(props: WizardProps) {
                 <SezioneTecnica
                   form={form}
                   onChange={updateForm}
-                  jvbSizingConfig={props.jvbSizingConfig}
-                  defaultSenderRatioPct={props.defaultSenderRatioPct}
+                  capacita={props.capacita}
+                  onCambiaPartecipanti={() =>
+                    vaiAlCampo({ key: 'maxParticipants', step: 'schedule', perPubblicare: false })
+                  }
+                  onCambiaQualita={() => apriSezione('room')}
                 />
               ),
             }}

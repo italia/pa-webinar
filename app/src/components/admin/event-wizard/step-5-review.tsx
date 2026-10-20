@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { RigaCapacita, type RiepilogoCapacita } from '@/components/admin/capacity-panel';
 import LanguageChecklist from '@/components/admin/language-checklist';
 import { IconaMicrofono, IconaPersone, IconaRec } from '@/components/admin/guided-format';
 import { Icon } from '@/components/ui/icon';
@@ -62,8 +63,9 @@ interface Props {
   liveCaptionsAvailable?: boolean;
   /** La lingua dell'evento: non si offre come lingua di traduzione. */
   eventLocale?: string;
-  /** C'e' un avviso di capacita': lo si dice, e porta alle impostazioni. */
-  capacityWarning?: boolean;
+  /** La capacita' in una riga: il carico del ponte e quanto riceve chi guarda;
+   *  da «attenzione» in su e' un avviso. Porta ai dettagli tecnici. */
+  capacita?: RiepilogoCapacita;
   /** La parte del titolo prima di «|» si mostra come sopratitolo. */
   sopratitolo?: boolean;
   /** Si iscrive chiunque (scelta dell'evento, o del sito). Assente per una
@@ -93,7 +95,7 @@ export default function Step5Review({
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
   eventLocale,
-  capacityWarning = false,
+  capacita,
   sopratitolo = false,
   iscrizioneAperta,
   onVaiPersone,
@@ -462,15 +464,11 @@ export default function Step5Review({
             <span>{informativa}</span>
           </li>
         </ul>
-        {capacityWarning && (
-          <button
-            type="button"
-            className="btn btn-link p-0 anteprima-evento__avviso"
-            onClick={() => onCustomize?.('technical')}
-          >
-            <Icon icon="it-warning-circle" size="sm" className="me-1" />
-            {tf('capacityWarning')}
-          </button>
+        {capacita && (
+          <RigaCapacita
+            capacita={capacita}
+            onDettagli={onCustomize && (() => onCustomize('technical'))}
+          />
         )}
       </section>
 

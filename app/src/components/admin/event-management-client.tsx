@@ -28,6 +28,7 @@ import { messaggioErroreApi } from '@/lib/api-error-message';
 import { csvText } from '@/lib/utils/csv';
 import { eventAdminPath, eventAdminTab, type EventAdminTab } from '@/lib/events/admin-links';
 import type { WizardAdvancedSection, WizardStep } from '@/lib/events/wizard-steps';
+import type { CapacitaIstanza, InputCapacita } from '@/lib/capacity/model';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import {
@@ -52,7 +53,7 @@ import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
-import EventConfigDiagram from './event-config-diagram';
+import CapacityPanel from './capacity-panel';
 import EventQuestionsPreview from './event-questions-preview';
 import EventInvitationsPanel from './event-invitations-panel';
 import EventRemindersEditor from './event-reminders-editor';
@@ -197,6 +198,8 @@ interface EventData {
   questionnaireCount: number;
   registrations: Registration[]; materials: MaterialData[];
   reminders: ReminderData[]; gdprAuditLogs: GdprAuditLogData[];
+  /** La stima della capacita': l'istanza e le scelte salvate dell'evento. */
+  capacita: { istanza: CapacitaIstanza; evento: InputCapacita };
 }
 
 interface EventManagementClientProps {
@@ -753,7 +756,6 @@ export default function EventManagementClient({
               <OverviewTab
                 event={event}
                 description={description}
-                locale={locale}
                 editUrlAt={editUrlAt}
                 // Di un evento a calendario la pagina pubblica si offre anche
                 // in bozza, da preparare per quando esce; una chiamata rapida
@@ -1108,9 +1110,9 @@ function TabNav({ active, onChange, t }: {
 
 // ── Tabs ──
 function OverviewTab({
-  event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant, textTranslation,
+  event, description, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant, textTranslation,
 }: {
-  event: EventData; description: string; locale: string;
+  event: EventData; description: string;
   editUrlAt: (step: WizardStep, section?: WizardAdvancedSection) => string;
   publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
   instant: boolean;
@@ -1121,7 +1123,6 @@ function OverviewTab({
   const te = useTranslations('events');
   const tl = useTranslations('admin.links');
   const t = useTranslations('admin');
-  const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   // Una voce puo' portare dove si cambia, se non e' fra le funzioni della sala.
   const toggles: { label: string; value: boolean; href?: string }[] = [
@@ -1253,21 +1254,18 @@ function OverviewTab({
           subtitle={td('capacitySubtitle', { max: event.maxParticipants })}
           icon="it-settings"
         >
-        <EventConfigDiagram
-          // Le funzioni dell'evento sono già elencate più su, nella pagina.
-          showFeatureChips={false}
-          event={{
-            maxParticipants: event.maxParticipants,
-            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
-            recordingEnabled: event.recordingEnabled,
-            participantsCanUnmute: event.participantsCanUnmute,
-            participantsCanStartVideo: event.participantsCanStartVideo,
-            participantsCanShareScreen: event.participantsCanShareScreen,
-            speakers: speakers || undefined,
-            startsAt: event.startsAt, endsAt: event.endsAt,
-            expectedSenderRatioPct: event.expectedSenderRatioPct,
-          }}
-          registrationCount={event.registrationCount} adminMode
+        <CapacityPanel
+          solaLettura
+          titolo="h6"
+          istanza={event.capacita.istanza}
+          evento={event.capacita.evento}
+          participantsCanShareScreen={event.participantsCanShareScreen}
+          iscritti={event.registrationCount}
+          modifica={
+            <Link href={percorso(editUrlAt('advanced', 'technical'))}>
+              {t('form.jvbPreview.readOnlyChange')}
+            </Link>
+          }
         />
         </CollapsibleSection>
       </div>

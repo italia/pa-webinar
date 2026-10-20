@@ -28,10 +28,10 @@ model Event {
   createdById String?       @map("created_by_id") @db.Uuid
   createdBy   StaffAccount? @relation("EventCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
-  // Expected share of participants that will actually send media (mic
-  // or webcam). Drives JVB sizing — a webinar with 100 attendees and
-  // 20% senders is *very* different infra-load than 100 all-senders.
-  // Percentage (0-100). Null inherits SiteSetting.defaultSenderRatioPct.
+  // % di webcam accese fra i partecipanti (0-100); null eredita
+  // SiteSetting.defaultSenderRatioPct. La stima della capacita'
+  // (lib/capacity/model) la legge cosi'; lo scaler dei ponti, finche' non
+  // passa a quel modello, la usa ancora come quota di chi manda audio o video.
   expectedSenderRatioPct Int? @map("expected_sender_ratio_pct")
 
   // Tetto del fuori orario per una sala ancora occupata, in minuti dopo

@@ -77,7 +77,7 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError } from '@/lib/errors';
-import { DEFAULT_JVB_CONFIG, jvbsForEvent } from '@/lib/jvb-sizing';
+import { estimateNumbers } from '@/lib/estimates';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { DELETE, PUT } from './route';
@@ -283,30 +283,45 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(staff.isEventManager).not.toHaveBeenCalled();
   });
 
-  // 100 partecipanti con il video: alla quota predefinita (30%) basta un
-  // ponte, con tutti che parlano ne servono due.
+  // 100 partecipanti con il video: la stima dipende dalla quota di webcam
+  // accese (30% quella predefinita, 100% tutte).
   const conVideo = (quota: number | null) => ({
     ...eventoEsistente(),
     maxParticipants: 100,
     participantsCanStartVideo: true,
     expectedSenderRatioPct: quota,
   });
+  const stimaPer = (quota: number | null) => {
+    const e = conVideo(quota);
+    return estimateNumbers({
+      maxParticipants: e.maxParticipants,
+      startsAt: e.startsAt.toISOString(),
+      endsAt: e.endsAt.toISOString(),
+      recordingEnabled: e.recordingEnabled,
+      participantsCanUnmute: e.participantsCanUnmute,
+      participantsCanStartVideo: true,
+      participantsCanShareScreen: e.participantsCanShareScreen,
+      expectedSenderRatioPct: quota,
+    });
+  };
+  type StimaSalvata = { model: number; cores: number } | undefined;
 
-  it('la quota di chi parla rifa la stima della capacita, anche da sola', async () => {
+  it('la quota di webcam rifa la stima della capacita, anche da sola', async () => {
     const { verifyModeratorToken } = await import('@/lib/auth/moderator');
     vi.mocked(verifyModeratorToken).mockResolvedValueOnce(conVideo(null) as never);
     await PUT(richiesta({ expectedSenderRatioPct: 100 }), contesto as never);
-    const stima = datiScritti().capacityEstimateJson as { jvbCount: number } | undefined;
-    expect(stima?.jvbCount).toBe(jvbsForEvent(100, 100, true, DEFAULT_JVB_CONFIG));
-    expect(stima?.jvbCount).not.toBe(jvbsForEvent(100, 30, true, DEFAULT_JVB_CONFIG));
+    const stima = datiScritti().capacityEstimateJson as StimaSalvata;
+    expect(stima?.model).toBe(2);
+    expect(stima?.cores).toBe(stimaPer(100).cores);
+    expect(stima?.cores).not.toBe(stimaPer(null).cores);
   });
 
   it('una stima rifatta per altro tiene la quota gia salvata', async () => {
     const { verifyModeratorToken } = await import('@/lib/auth/moderator');
     vi.mocked(verifyModeratorToken).mockResolvedValueOnce(conVideo(100) as never);
     await PUT(richiesta({ maxParticipants: 100 }), contesto as never);
-    const stima = datiScritti().capacityEstimateJson as { jvbCount: number } | undefined;
-    expect(stima?.jvbCount).toBe(jvbsForEvent(100, 100, true, DEFAULT_JVB_CONFIG));
+    const stima = datiScritti().capacityEstimateJson as StimaSalvata;
+    expect(stima?.cores).toBe(stimaPer(100).cores);
   });
 
   it('chi partecipa lo cambia solo lo staff dell evento, non un link di conduzione', async () => {
