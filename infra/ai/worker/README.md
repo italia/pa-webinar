@@ -287,7 +287,7 @@ The other tunables (`AI_WATERMARK`, `AUDIOSEAL_CACHE_DIR`, `WHISPERX_VERSION`,
 one JSON-shaped line per record on standard error; exception tracebacks
 follow on additional lines.
 
-**Baked voices.** The build downloads Piper voices for `en`, `fr` and `it`
+**Baked voices.** The build downloads Piper voices for `en`, `fr`, `de`, `es` and `it`
 from the public `rhasspy/piper-voices` repository into
 `/opt/piper-voices/<lang>/`, and checks their size and JSON. The exact list
 is in `../Dockerfile.worker`. No other model is baked into the image. The

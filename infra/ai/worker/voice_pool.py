@@ -74,8 +74,8 @@ SINGLE_SPEAKER_GENDER: dict[str, str] = {
     # fr_FR
     "tom": "M", "siwis": "F", "gilles": "M", "upmc-pierre": "M",
     "upmc-jessica": "F",
-    # es_ES / es_MX
-    "davefx": "M", "sharvard": "M", "carlfm": "M",
+    # es_ES / es_MX / es_AR
+    "davefx": "M", "sharvard": "M", "carlfm": "M", "daniela": "F",
     # nl_NL
     "mls_5809": "F", "mls_7432": "M",
     # pt_PT / pt_BR

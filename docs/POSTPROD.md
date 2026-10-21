@@ -710,7 +710,7 @@ it with backoff.
 | Diarization | `pyannote/speaker-diarization-3.1` through WhisperX | `DIARIZATION_MODEL` in `infra/ai/worker/transcribe.py` | Gated model; mixed-audio recordings only |
 | Summary and translation | `mistralai/Mistral-Small-3.2-24B-Instruct-2506` served by vLLM | `AI_VLLM_MODEL_ID` on the app, default in `providers.ts` | OpenAI-compatible `/v1/chat/completions` |
 | Event title and description | `utter-project/EuroLLM-9B-Instruct-2512`, GGUF `Q4_K_M`, served by llama.cpp on CPU | `postprod.mt.model` in the chart, which sets `AI_MT_BASE_URL` and `AI_MT_MODEL_ID` on the app | OpenAI-compatible `/v1/chat/completions`; no GPU ([Event text translation](#event-text-translation)) |
-| Dubbing | Piper voices | `AI_TTS_VOICES_PATH` on the app (default `/models/piper`) | Voices for `en`, `fr` and `it` are baked into the image under `/opt/piper-voices` |
+| Dubbing | Piper voices | `AI_TTS_VOICES_PATH` on the app (default `/models/piper`) | Voices for `en`, `fr`, `de`, `es` and `it` are baked into the image under `/opt/piper-voices` |
 | Watermark | AudioSeal `audioseal_wm_16bits` | `infra/ai/worker/tts.py` | Dubbed audio only; `AI_WATERMARK=0` on the worker turns it off |
 
 Licenses of the models and libraries are listed in
@@ -973,7 +973,7 @@ synthesized line longer than the original is not compressed: it runs over,
 and the lines after it start later. Each speaker
 label gets a different catalog voice; when a language has few voices, pitch
 variants of the same voice provide more timbres. Voices for languages other
-than `en`, `fr` and `it` must be placed under the path in
+than `en`, `fr`, `de`, `es` and `it` must be placed under the path in
 `AI_TTS_VOICES_PATH`, one folder per language code with `.onnx` and
 `.onnx.json` files. When the configured folder has no voice for a language,
 the worker falls back to the voices baked into the image.
@@ -1300,7 +1300,7 @@ generator each time, and publishes unwatermarked audio when it cannot. The
 token is only needed while seeding: at run time the gated models are read from
 the cache, although the worker still needs a well-formed `HF_TOKEN` to attempt
 diarization. Seed an alignment model for every source language you expect,
-and add Piper voices for dubbing languages beyond `en`, `fr` and `it` under
+and add Piper voices for dubbing languages beyond `en`, `fr`, `de`, `es` and `it` under
 `/models/piper/<lang>/`.
 
 ### An example vLLM Deployment
