@@ -4,10 +4,10 @@ This is the index of the PA Webinar documentation. It lists every page, grouped 
 
 ## How these docs work
 
-- **One owner page per topic.** Each subject is described on one page, the owner listed in this index. Other pages summarize it in a sentence and link to it instead of writing a second description. If two pages seem to disagree, the owner is the one to trust and the other one needs fixing.
-- **Current behavior only, checked against the code.** Pages describe what the code does today. When a page and the code disagree, the code wins and the page gets fixed. The authoritative files are the code and its configuration: `app/prisma/schema.prisma`, `infra/helm/pa-webinar/values.yaml`, `.github/workflows/*`, `app/package.json` and the interface catalogs in `app/src/i18n/messages/`. What is still missing is on the [roadmap](ROADMAP.md). What changed, and when, is in the [changelog](../CHANGELOG.md) and the git history.
-- **ADRs record why.** The [Architecture Decision Records](adr/README.md) keep the reasoning behind each architecture-level choice and the alternatives that were rejected. The deep dives under `architecture/` describe how the system works now.
-- **Component READMEs sit next to their code.** Pages under `docs/` explain concepts, procedures and settings. A README inside a component folder, such as `lobby/` or `infra/recorder/`, covers that component's implementation, build and tests, and links back to the concept page.
+- Each subject is described on one owner page, the one listed in this index. Other pages summarize it in a sentence and link to it instead of describing it again. If two pages disagree, trust the owner page and fix the other one.
+- Pages describe only what the code does today, and they are checked against it. When a page and the code disagree, the code wins and the page gets fixed. The authoritative files are the code and its configuration: `app/prisma/schema.prisma`, `infra/helm/pa-webinar/values.yaml`, `.github/workflows/*`, `app/package.json` and the interface catalogs in `app/src/i18n/messages/`. What is still missing is on the [roadmap](ROADMAP.md). What changed, and when, is in the [changelog](../CHANGELOG.md) and the git history.
+- The [Architecture Decision Records](adr/README.md) (ADRs) keep the reasoning behind each architecture-level choice and the alternatives that were rejected. The deep dives under `architecture/` describe how the system works now.
+- Pages under `docs/` explain concepts, procedures and settings. A README inside a component folder, such as `lobby/` or `infra/recorder/`, covers that component's implementation, build and tests, and links back to the concept page.
 
 ## Documentation map
 
@@ -138,7 +138,7 @@ For the IT staff who install and run an installation. Start with [Installing PA 
 
 | Page | What it answers |
 |---|---|
-| [AI post-production](POSTPROD.md) | The in-cluster pipeline that produces transcripts, subtitles, summaries, translations and dubbing: architecture, queue, models, operational checklist, configuration, administration and troubleshooting. |
+| [AI post-production](POSTPROD.md) | The in-cluster pipeline that produces transcripts, subtitles, summaries, translations and dubbing: architecture, queue, models, operational checklist, configuration, administration, the event report, the translation of event titles and descriptions, AI Act transparency and troubleshooting. |
 | [Load testing and reference measurements](LOAD-TESTING.md) | How to load-test the bridges and the portal, what to watch, and the reference results that sizing relies on. |
 | [Service inventory: publishing](SERVICE-INVENTORY.md) | What `/service-inventory` shows, how `SERVICE_INVENTORY_URL` is resolved, where to host the document and the rendering contract. |
 | [Service inventory: generating the document](SERVICE-INVENTORY-GENERATION.md) | How to produce the CycloneDX 1.6 document: the software half from the release SBOMs, the operational half per cloud provider, and a checklist for a new installation. |
@@ -191,6 +191,7 @@ The [ADR index](adr/README.md) gives each record's status and relations, the sta
 | [016](adr/016-in-cluster-ai-postproduction.md) | In-cluster AI post-production |
 | [017](adr/017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point |
 | [018](adr/018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge |
+| [019](adr/019-event-languages-text-translation.md) | One language list per event, and automatic translation of its texts at save |
 
 ## Develop and contribute
 
@@ -236,7 +237,10 @@ Each of these files sits next to the code it describes.
 | [`infra/ai/worker/README.md`](../infra/ai/worker/README.md) | The AI post-production worker from the inside: the portal protocol, job handlers, module map, stub mode, tests and the image build. |
 | [`infra/ai/local-out/README.md`](../infra/ai/local-out/README.md) | A development tool that runs post-production on a workstation GPU and pushes the results to a test installation, with its safety warnings. |
 | [`infra/jitsi-web-patched/README.md`](../infra/jitsi-web-patched/README.md) | The patched `jitsi/web` image: the three fixes, patching by shape, building, bumping to a new Jitsi release and verification. |
-| [`infra/jitsi/README.md`](../infra/jitsi/README.md) | The custom Prosody module and the two Jibri finalize scripts, and which script the chart uses. |
+| [`infra/jitsi/README.md`](../infra/jitsi/README.md) | The custom Prosody modules, the two Jibri finalize scripts and which one the chart uses, and the web overrides that the Docker Compose stack mounts. |
+| [`infra/captions/gateway/README.md`](../infra/captions/gateway/README.md) | The live-captions gateway between the bridge and the recognition engine: what it does with each speaker's audio, the feed to the transcript, load governance, and development and tests. |
+| [`infra/captions/engine/README.md`](../infra/captions/engine/README.md) | The live-captions recognition engine: the image, how the model is downloaded and checked, and sizing. |
+| [`infra/captions/bench/README.md`](../infra/captions/bench/README.md) | The CPU benchmark for live captions: what it measures, how to run it locally and in the cluster, and its accuracy on a real event. |
 | [`infra/helm/pa-webinar/README.md`](../infra/helm/pa-webinar/README.md) | The short README that travels inside the packaged chart, pointing to the full documentation. |
 | [`infra/onprem/k3s/README.md`](../infra/onprem/k3s/README.md) | The reference for each k3s script: `pa-webinar-up.sh`, `pa-webinar-down.sh`, the node scripts and `preload-images.sh`, with their options. The object store and TURN add-ons have their own, [`infra/onprem/k3s/addons/README.md`](../infra/onprem/k3s/addons/README.md). The procedure is in [Installing on your own VMs with k3s](install/k3s.md). |
 | [`infra/tofu/aks/README.md`](../infra/tofu/aks/README.md), [`gke`](../infra/tofu/gke/README.md), [`eks`](../infra/tofu/eks/README.md) | The reference OpenTofu modules for the managed clouds: what each creates, its variables and outputs, network rules and what has been verified. |
@@ -245,6 +249,7 @@ Each of these files sits next to the code it describes.
 | [`scripts/load-test/README.md`](../scripts/load-test/README.md) | The load-test toolkit manual: the image, variables, runs and known issues. Its companion [`SELENIUM-GRID.md`](../scripts/load-test/SELENIUM-GRID.md) is the runbook for an in-cluster load test. |
 | [`app/public/audio/README.md`](../app/public/audio/README.md) | The bundled waiting-room music: when it plays, how to replace it, and its attribution. |
 | [`app/public/fonts/README.md`](../app/public/fonts/README.md) | The self-hosted fonts of the .italia design system: families, coverage and license. |
+| [`app/public/models/selfie-segmentation/README.md`](../app/public/models/selfie-segmentation/README.md) | The segmentation model that draws the virtual background behind the person in the waiting room's camera preview: its source, checksum and license. |
 | [`app/public/images/virtual-backgrounds/README.md`](../app/public/images/virtual-backgrounds/README.md) | The bundled virtual backgrounds: the catalog, format rules and how to add one. |
 | [`docs/examples/service-inventory.example.json`](examples/service-inventory.example.json) | The template for an installation's service-inventory base document. |
 
@@ -283,40 +288,40 @@ Each of these files sits next to the code it describes.
 
 These rules apply to every page in the repository. Documentation changes follow the same review as code, as described in [Contributing](../CONTRIBUTING.md#contributing-documentation).
 
-**Where content goes**
+### Where content goes
 
 - Update the owner page of a subject and link to it from elsewhere. A new subject gets an owner page and a row in this index.
 - Describe behavior on the owner page and the reasoning in an ADR. Put implementation details of a component in the README next to its code.
 - Keep headings stable, because other pages link to them. When a heading must change and other pages link to it, keep the old anchor with an `<a id="...">` tag above the new heading.
 
-**Language and style**
+### Language and style
 
 - Write in English with American spelling: -ize, color, behavior, center, catalog, artifact, license (noun and verb), canceled. The one exception is the official name of the European Union Public Licence (EUPL-1.2). This matches the interface's English catalog and the code identifiers.
 - Use sentence case for headings. Describe behavior in the present tense, and write procedures in the imperative.
-- Quote interface labels verbatim from `app/src/i18n/messages/en.json`, in bold, for example **Start event**. Never translate a label again. The default interface language is Italian, so where a screenshot shows the Italian interface, give the Italian label in parentheses on first use.
+- Quote interface labels verbatim from `app/src/i18n/messages/en.json`, in bold, for example **Start event**. Do not retranslate a label. The default interface language is Italian, so where a screenshot shows the Italian interface, give the Italian label in parentheses on first use.
 - Keep code identifiers, Prisma models and enum values, Helm keys, environment variables, API routes, file paths, i18n keys and commands verbatim in backticks, even when they are Italian.
 - Write the product name as PA Webinar. Use `pa-webinar` only as an identifier: package, repository, image, chart or metric prefix.
 - Keep Italian proper names in Italian with an English gloss on first use, for example Dipartimento per la Trasformazione Digitale (Italian Department for Digital Transformation).
 
-**Placeholders and real data**
+### Placeholders and real data
 
 - Use `webinar.example.com` for the portal and `meet.webinar.example.com` for the conference.
 - Write other names as `<release>`, `<namespace>`, `<cluster>`, `<tenant>`, `<storage-account>` and `<location>`, and a public address as `<public-ip>`. Private address examples use RFC 1918 ranges only.
 - Literal Helm examples use `pa-webinar` as both the release and the namespace.
 - Never publish real environment data: cluster, namespace or resource-group names, hostnames, IP addresses, secret names of a real deployment, or credentials.
 
-**Facts that stay true**
+### Facts that stay true
 
 - Quote a default only together with the file it comes from, such as `infra/helm/pa-webinar/values.yaml` or `app/prisma/schema.prisma`, so a reader can check it.
 - Do not write inventories that drift: no counts of metrics, alerts, tests, packages or models, no version tables and no line numbers. Point to the authoritative file or to the command that produces the answer.
 - Describe the product, not its history: no dates, no "since version X", no people, meetings or internal ticket codes. History lives in the changelog and in `git log`. A roadmap item carries "open since <Month YYYY>".
 
-**Diagrams**
+### Diagrams
 
 - Draw diagrams in Mermaid, one idea per diagram, with explicit labels on nodes and edges.
 - Color them with `classDef` from the palette: primary `#0066CC`, dark `#17324D`, teal `#00A3A3`, green `#008055`, amber `#CC7A00`, red `#D1344C` and neutral `#5C6F82`. Use a light tint of the stroke color as the fill, such as `#E6F0FA`, with dark text, so the diagram reads in both GitHub themes.
 - Render every diagram before you commit it, for example with `npx -y @mermaid-js/mermaid-cli -i diagram.mmd -o diagram.svg`, because GitHub shows a diagram that fails to parse as an error box.
 
-**Reporting drift**
+### Reporting drift
 
 If a page does not match what the code does, open an issue with the [bug report template](../.github/ISSUE_TEMPLATE/bug.md). Name the page and the section, quote the claim, and point to the code that contradicts it. A pull request that fixes the page is just as welcome.

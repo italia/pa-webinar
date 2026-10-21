@@ -19,7 +19,7 @@ The screenshots show the Italian interface with the demo data of the seed script
 
 ## The idea
 
-A video call is not yet a public event. A public event needs a public page, registration with consent, a room that opens and closes on schedule, and someone in charge of it. Once that works, the audience should take part, not only watch: ask questions, vote, raise a hand. Then the event should outlive the stream, with a recap, a recording and a place to find it. Next it should reach the people who were absent, who are deaf or hard of hearing, or who speak another language, through transcripts, subtitles, translations and dubbing. Finally, another administration should be able to install it and run it under its own name. PA Webinar grew along exactly that path, one stage at a time.
+A video call on its own is not a public event. A public event needs a public page, registration with consent, a room that opens and closes on schedule, and someone in charge of it. Its audience takes part as well as watching: people ask questions, vote and raise a hand. The event outlives the stream, with a recap, a recording and a place to find it. It reaches the people who were absent, who are deaf or hard of hearing, or who speak another language, through transcripts, subtitles, translations and dubbing. And another administration can install the platform and run it under its own name. Each stage in the diagram builds on the one before it.
 
 ```mermaid
 flowchart LR
@@ -43,7 +43,9 @@ What is still missing is in the [roadmap](docs/ROADMAP.md). What shipped, releas
 
 ## What it does
 
-**Organizers**
+The [feature tour](docs/FEATURES.md) has the full catalog, role by role.
+
+### Organizers
 
 - Build an event in the five-step event wizard, start from an **Event templates** entry, or reuse a past event with **Duplicate as next occurrence**.
 - Collect registrations and keep an invitation list, which decides who may register when registration is by invitation. Confirmations, calendar files and reminders leave through an email outbox.
@@ -51,7 +53,7 @@ What is still missing is in the [roadmap](docs/ROADMAP.md). What shipped, releas
 - Open a room at once from **Instant calls**.
 - After the event, publish the recording to the **Video library** and read the event analytics on the **Statistics** tab.
 
-**Participants**
+### Participants
 
 - Register with a name, an email address and consents that are never pre-ticked, or, where the administration allows guests, join by name while the event is live.
 - Wait in the waiting room: device check, virtual backgrounds, optional music, and the optional 2D square (**Step into the square**).
@@ -59,21 +61,19 @@ What is still missing is in the [roadmap](docs/ROADMAP.md). What shipped, releas
 - Watch the recording later, with the PDF pages presented in the room beside the video and in sync with it, and with subtitles, a transcript, a summary and dubbed audio when AI post-production runs.
 - Request a copy or the erasure of their data under **My data**.
 
-**Moderators and speakers**
+### Moderators and speakers
 
 - Enter through a magic link. No account is needed, and a speaker link gives full audio and video without moderation powers.
 - Run the room: **Start event**, control participants' microphones and cameras, **Give the floor** to raised hands, switch live panels on and off.
 - Start and stop the recording. On events set up for **Per-participant recording**, a recorder also keeps one audio track per participant, with each participant's consent, so AI transcripts can name every speaker exactly.
 - Leave with **Just leave**, or close the room with **End for everyone** and choose where the event page goes next.
 
-**Administrators and operators**
+### Administrators and operators
 
-- Manage **Staff accounts**: named administrators and organizers who sign in with a one-time link. Organizers see only their own events.
+- Manage **Staff accounts**: named administrators and organizers who sign in with a one-time link. Organizers see only the events they created or co-organize.
 - Brand the installation, pick the offered languages, allow or refuse guests, and make registration public or invitation-only, all at runtime and without a rebuild.
 - Install with a Helm chart whose bridges (Jitsi Videobridge) can scale to zero, with optional recording and in-cluster AI post-production.
 - Publish transparency pages: **System status** (on by default, and it can be withdrawn so that only administrators see its data), **What's new & changelog** with a viewer for the release SBOMs, and the **Service inventory**.
-
-The full catalog, role by role, is the [feature tour](docs/FEATURES.md).
 
 ## Architecture at a glance
 
@@ -139,18 +139,18 @@ flowchart TB
 
 Dashed boxes are optional and off by default.
 
-- **One portal deployable.** A single Next.js application serves the pages, the REST API, the live streams and the endpoints that scheduled work calls. Separate images exist only where work cannot run in a web process: migrations, the patched Jitsi web front end, the recorder bot and its controller, and the AI worker.
-- **State lives in PostgreSQL.** Redis only fans live updates out to every replica and holds short-lived snapshots. Files and media live in object storage. Jitsi is the media plane and knows nothing about registrations.
-- **Two contexts in one browser tab.** The portal page and the Jitsi iframe exchange nothing but IFrame API commands and events.
-- **Media never passes through the app.** Audio and video flow from the browser to a Jitsi Videobridge. Recordings flow from the recorders to object storage through short-lived signed URLs.
+- The portal is one deployable: a single Next.js application serves the pages, the REST API, the live streams and the endpoints that scheduled jobs call. Separate images exist only for work that cannot run in a web process: migrations, the patched Jitsi web front end, the recorder bot and its controller, the live-captions gateway and engine, and the AI workers.
+- Durable state lives in PostgreSQL. Redis carries only short-lived data: it fans live updates out to every replica and holds state that expires, such as the bridge snapshot and positions in the square. Files and media live in object storage. Jitsi is the media plane and knows nothing about registrations.
+- The portal page and the Jitsi iframe share one browser tab as two separate contexts, and they exchange only IFrame API commands and events.
+- Media never passes through the app. Audio and video flow from the browser to a Jitsi Videobridge, and recordings flow from the recorders to object storage through short-lived signed URLs.
 
 Design principles, each backed by an [Architecture Decision Record](docs/adr/README.md):
 
-- **Embed Jitsi, never fork it** ([ADR-001](docs/adr/001-jitsi-iframe-api.md), [ADR-017](docs/adr/017-patched-jitsi-web-image.md)).
-- **No user accounts, no email addresses in Jitsi.** Seats open with magic links, staff sign in with one-time links, and the conference token carries no email address ([ADR-003](docs/adr/003-moderator-magic-links.md), [ADR-004](docs/adr/004-jitsi-jwt.md), [ADR-014](docs/adr/014-organizer-role.md)).
-- **The portal owns interaction.** Q&A, polls and chat are portal data in PostgreSQL, not Jitsi features ([ADR-005](docs/adr/005-live-interaction-in-portal.md)).
-- **Capacity follows the calendar.** Bridges start before scheduled events and scale to zero between them ([ADR-007](docs/adr/007-jvb-scale-to-zero.md)).
-- **Configure at runtime, add capabilities one at a time.** One image serves every installation, runtime settings live in one database row, and recording, AI and scale-to-zero are each switched on separately ([ADR-002](docs/adr/002-nextjs-fullstack.md), [ADR-010](docs/adr/010-site-settings-singleton.md)).
+- Embed Jitsi, never fork it ([ADR-001](docs/adr/001-jitsi-iframe-api.md), [ADR-017](docs/adr/017-patched-jitsi-web-image.md)).
+- No user accounts, and no email addresses in Jitsi. Seats open with magic links, staff sign in with one-time links, and the conference token carries no email address ([ADR-003](docs/adr/003-moderator-magic-links.md), [ADR-004](docs/adr/004-jitsi-jwt.md), [ADR-014](docs/adr/014-organizer-role.md)).
+- The portal owns interaction. Q&A, polls and chat are portal data in PostgreSQL, not Jitsi features ([ADR-005](docs/adr/005-live-interaction-in-portal.md)).
+- Capacity follows the calendar. Bridges start before scheduled events and scale to zero between them ([ADR-007](docs/adr/007-jvb-scale-to-zero.md)).
+- Configure at runtime, and add capabilities one at a time. One image serves every installation, runtime settings live in one database row, and recording, AI and scale-to-zero are each switched on separately ([ADR-002](docs/adr/002-nextjs-fullstack.md), [ADR-010](docs/adr/010-site-settings-singleton.md)).
 
 The components, the three planes and one event followed end to end are in [Architecture](docs/ARCHITECTURE.md).
 
@@ -158,12 +158,12 @@ The components, the three planes and one event followed end to end are in [Archi
 
 A fork would turn every upstream security fix into a merge project for each administration that reuses the platform. PA Webinar uses only the extension points that Jitsi supports, and always the least invasive one that works:
 
-- **An IFrame API wrapper.** `JitsiRoom` is the only place that creates the Jitsi API object. Around the iframe, the portal draws its own control bar, drawer, raised-hand queue and leave prompt, and it sets the Jitsi toolbar and features per role and per device through configuration overrides.
-- **A portal-signed JWT without email addresses.** The portal decides who may enter and signs a short-lived token carrying a display name, a role, the room and an expiry, never an email address or a usable hash of one. Prosody verifies it, and Jitsi's own guest access stays off.
-- **A Prosody module** that takes the room role from the token, so moderator rights follow the portal's decision. The Helm chart and the Docker Compose stack load it, and the chart also stops Jicofo from assigning roles of its own.
-- **A patched `jitsi/web` image.** It fixes three defects that have no configuration point: noise suppression on microphones that do not run at 48 kHz, a hidden self view that cannot be recovered, and reaction emoji that block clicks. The patches find their targets by shape, not by minified names, and the build fails if a shape is missing.
-- **A hidden XMPP domain for the recorder bot.** The per-participant recorder, headless Chrome running `lib-jitsi-meet`, signs in on that domain when it is configured, so it gets no tile and is not counted.
-- **Bridges driven by the event calendar** (see [Scalability](#scalability)).
+- The portal wraps the IFrame API. `JitsiRoom` is the only place that creates the Jitsi API object. Around the iframe, the portal draws its own control bar, drawer, raised-hand queue and leave prompt, and it sets the Jitsi toolbar and features per role and per device through configuration overrides.
+- The portal decides who may enter and signs a short-lived conference token (JWT) carrying a display name, a role, the room and an expiry, never an email address or a usable hash of one. Prosody verifies it, and Jitsi's own guest access stays off.
+- The project's Prosody modules run in the conference's XMPP server. One takes the room role from the token, so moderator rights follow the portal's decision; the others hold the event's media limits on the bridge, open rooms to bridge transcription for live captions, and tell the portal which seat stands behind each bridge endpoint. The Helm chart and the Docker Compose stack load them, and the chart also stops Jicofo from assigning roles of its own.
+- A patched `jitsi/web` image fixes three defects that have no configuration point: noise suppression on microphones that do not run at 48 kHz, a hidden self view that cannot be recovered, and reaction emoji that block clicks. The patches find their targets by shape, not by minified names, and the build fails if a shape is missing.
+- The per-participant recorder bot, headless Chrome running `lib-jitsi-meet`, signs in on a hidden XMPP domain when one is configured, so it gets no tile and is not counted.
+- The event calendar drives the bridges (see [Scalability](#scalability)).
 
 ```mermaid
 flowchart TB
@@ -204,7 +204,7 @@ Each seam, its limits and the checklist for upgrading Jitsi are in [How PA Webin
 
 ## Where it runs
 
-PA Webinar is Kubernetes-native. One Helm chart, `infra/helm/pa-webinar`, installs it everywhere, from a workstation to a managed cluster: only the values files layered on it change. Scheduled work runs as Kubernetes CronJobs, and in the `full` profile a CronJob also scales the bridges through the Kubernetes API.
+PA Webinar is Kubernetes-native. One Helm chart, `infra/helm/pa-webinar`, installs it on every platform, from a workstation to a managed cluster; only the values files layered on it change. Scheduled work runs as Kubernetes CronJobs, and in the `full` profile a CronJob also scales the bridges through the Kubernetes API.
 
 | Platform | Start from | What you get | Status |
 |---|---|---|---|
@@ -219,17 +219,17 @@ The chart's three example profiles are values files in `infra/helm/pa-webinar/ex
 
 Some capabilities need more than one machine. Bridge scale-to-zero and multi-node scaling need a cluster with an autoscaling node pool, and AI post-production needs a GPU node pool in the same cluster. Jibri needs the ALSA loopback kernel module on its node and elevated container privileges (the Jitsi subchart adds `SYS_ADMIN`).
 
-To choose a platform, read the support levels, the stack at a glance, the constraints by platform, the measured requirements and the known limitations, start from [Installing PA Webinar](docs/install/README.md); every checklist, from the preflight to decommissioning, is in [Checklists](docs/install/checklists.md). The chart's keys are in [Deploying with Helm](docs/DEPLOYMENT.md), and the evidence behind the sizes and the network design is in the [Infrastructure reference](docs/INFRASTRUCTURE.md).
+To choose a platform, start from [Installing PA Webinar](docs/install/README.md), which gives the support levels, the stack at a glance, the constraints by platform, the measured requirements and the known limitations. Every checklist, from the preflight to decommissioning, is in [Checklists](docs/install/checklists.md). The chart's keys are in [Deploying with Helm](docs/DEPLOYMENT.md), and the evidence behind the sizes and the network design is in the [Infrastructure reference](docs/INFRASTRUCTURE.md).
 
 ## Scalability
 
-- **Capacity is two numbers.** Per event, the chart does not enable Jitsi's bridge cascading, so a conference stays on one bridge and a bigger event needs a bigger bridge. Across events, more bridges carry more conferences, up to the replica caps and the size of the node pool. Each extra bridge needs its own public address.
-- **Bridges scale to zero, opt-in, in the `full` profile only** (`jitsi.mode: full` with `jvbScaler.enabled: true`). A CronJob reads every bridge's statistics, and the portal decides from the event calendar how many bridges should run and moves events through their statuses. Bridges start before a scheduled event, and the node pool shrinks to zero between events.
-- **Without the scaler**, bridges run at a fixed count, and a lifecycle job moves events every minute: it opens a published event at its start time and ends it after its end time and grace period. Moderators can still start an event early with **Start event** and end it with **End for everyone**.
-- **Without a node autoscaler**, as on minikube and k3s, the `simple` profile runs one bridge at a fixed count, and growing means a bigger node.
-- **Sizing comes from what the organizer declared**: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. The measured requirements of each platform are in [Requirements](docs/install/README.md#requirements), and the bridge measurements in [Load testing](docs/LOAD-TESTING.md).
-- **The app tier is stateless.** Pods scale with a HorizontalPodAutoscaler (`autoscaling` in `infra/helm/pa-webinar/values.yaml`), and Redis delivers live updates to every replica.
-- **Where the limits are**, in the order you meet them: one bridge per event; the replica cap and the size of the bridge pool; one Prosody and one Jicofo shared by every conference; network egress, which in tile view grows with the square of the cameras; and a single PostgreSQL and Redis that scale vertically. Around them sit the limits of the network: participants whose networks block UDP need TURN (coturn, with its own DNS name, and on managed clusters its own address), the chart's HTTP tuning is written for ingress-nginx, and proxies in front of the ingress must be declared so that per-IP limits see real clients. All of them are in [Known limitations](docs/install/README.md#known-limitations).
+- Capacity has two separate limits. Within an event, a conference stays on one bridge, because the chart does not enable Jitsi's bridge cascading, so a bigger event needs a bigger bridge. Across events, more bridges carry more conferences, up to the replica caps and the size of the node pool. Each extra bridge needs its own public address.
+- Bridge scale-to-zero is opt-in and exists only in the `full` profile (`jitsi.mode: full` with `jvbScaler.enabled: true`). A CronJob reads every bridge's statistics, and the portal decides from the event calendar how many bridges should run and moves events through their statuses. Bridges start before a scheduled event, and the node pool shrinks to zero between events.
+- Without the scaler, bridges run at a fixed count, and a lifecycle job moves events every minute: it opens a published event at its start time and ends it after its end time and grace period. Moderators can still start an event early with **Start event** and end it with **End for everyone**.
+- Without a node autoscaler, as on minikube and k3s, the `simple` profile runs one bridge at a fixed count, and growing means a bigger node.
+- Sizing comes from what the organizer declares for the event: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. The measured requirements of each platform are in [Requirements](docs/install/README.md#requirements), and the bridge measurements in [Load testing](docs/LOAD-TESTING.md).
+- The app tier is stateless. Pods scale with a HorizontalPodAutoscaler (`autoscaling` in `infra/helm/pa-webinar/values.yaml`), and Redis delivers live updates to every replica.
+- You meet the limits in this order: one bridge per event; the replica cap and the size of the bridge pool; one Prosody and one Jicofo shared by every conference; network egress, which in tile view grows with the square of the cameras; and a single PostgreSQL and Redis that scale vertically. The network adds its own limits: participants whose networks block UDP need TURN (coturn, with its own DNS name, and on managed clusters its own address), the chart's HTTP tuning is written for ingress-nginx, and proxies in front of the ingress must be declared so that per-IP limits see real clients. All of them are in [Known limitations](docs/install/README.md#known-limitations).
 
 ```mermaid
 stateDiagram-v2
@@ -244,7 +244,7 @@ stateDiagram-v2
   LIVE --> IDLE : scaler: room empty, bridge released
   IDLE --> PROVISIONING : wake: someone opens the room
   LIVE --> ENDED : moderator: End for everyone<br/>scaler or lifecycle job: grace period over
-  ENDED --> ARCHIVED : daily cleanup: retention over
+  ENDED --> ARCHIVED : staff: bulk Archive
   note right of LIVE
     Scaler transitions
     need the full profile
@@ -262,10 +262,10 @@ With the scaler, only `PROVISIONING` and `LIVE` events count toward the number o
 
 ## AI post-production
 
-- **Outputs.** Transcripts with speaker labels, subtitles, structured summaries with chapters, translations, dubbed audio in synthetic catalog voices (a participant's voice is never cloned), and a per-participant archive that only the staff who manage the event can download.
-- **Data sovereignty.** Everything runs inside the installation's own cluster, on open-weights models (WhisperX, pyannote.audio, vLLM, Piper) and on a GPU node pool that scales to zero. No recording, transcript or summary is sent to an external AI service, and the allowed engines are closed lists in `app/src/lib/ai/providers.ts`.
-- **Opt-in at every level.** The chart renders nothing until `postprod.enabled` is set, the site-wide switch on the **Post-event AI pipeline** tab is off by default, and each event chooses its own **Automatic post-production** options.
-- **Marked as machine-generated.** Transcripts and summaries carry the **AI-generated content** label, dubbed audio carries a synthetic-voice banner and, when watermarking succeeds, an audio watermark, and a provenance panel lists the models. Staff can correct a transcript while the machine version is kept.
+- The pipeline produces transcripts with speaker labels, subtitles, structured summaries with chapters, translations, dubbed audio in synthetic catalog voices (a participant's voice is never cloned), and a per-participant archive that only the staff who manage the event can download.
+- Everything runs inside the installation's own cluster, on open-weights models (WhisperX, pyannote.audio, vLLM, Piper) and on a GPU node pool that scales to zero. No recording, transcript or summary is sent to an external AI service, and the allowed engines are closed lists in `app/src/lib/ai/providers.ts`.
+- It is opt-in at every level. The chart renders nothing until `postprod.enabled` is set, the site-wide switch on the **Post-event AI pipeline** tab is off by default, and each event chooses its own **Automatic post-production** options.
+- Machine-generated output is marked as such. Transcripts and summaries carry the **AI-generated content** label, dubbed audio carries a synthetic-voice banner and, when watermarking succeeds, an audio watermark, and a provenance panel lists the models. Staff can correct a transcript while the machine version is kept.
 
 ```mermaid
 flowchart TB
@@ -301,12 +301,12 @@ The queue, the models, the GPU pool and the operating checklist are in [AI post-
 
 ## Privacy and security by design
 
-- **Minimal data, explicit consent.** Registration asks for a name and an email address. Consent boxes are never pre-ticked, the server enforces the required ones, and recording and per-participant audio each need their own consent.
-- **Encrypted at rest.** Email addresses, most names and chat messages are encrypted with AES-256-GCM, and addresses are looked up by a keyed hash. With `NODE_ENV=production`, the portal refuses an encryption key that looks like a placeholder and fails closed.
-- **Jitsi never sees an email address.** The conference token carries a display name, a role and the room, and no email address or usable hash of one.
-- **Retention by default.** A scheduled cleanup job deletes an event's personal data once the event has ended and its retention period has passed, and anyone can request a copy or the erasure of their data, confirmed by email.
-- **No tracking.** No analytics, no tracking cookies and no third-party CDN; fonts are self-hosted, a nonce-based Content Security Policy is enforced, and application logs carry no IP addresses. Pages embed no third-party content: a YouTube video appears as a link. Gravatar avatars are opt-in and fetched by the server.
-- **Hardened runtime and supply chain.** Portal and job pods run as non-root with a read-only root filesystem, CI actions are pinned to commit SHAs, every release ships an SBOM, and vulnerabilities are reported privately.
+- Registration asks for a name and an email address. Consent boxes are never pre-ticked, the server enforces the required ones, and recording and per-participant audio each need their own consent.
+- Email addresses, most names and chat messages are encrypted at rest with AES-256-GCM, and addresses are looked up by a keyed hash. With `NODE_ENV=production`, the portal refuses an encryption key that looks like a placeholder and fails closed.
+- Jitsi never sees an email address. The conference token carries a display name, a role and the room, and no email address or usable hash of one.
+- Retention applies by default. A scheduled cleanup job deletes an event's personal data once the event has ended and its retention period has passed, and anyone can request a copy or the erasure of their data, confirmed by email.
+- There are no analytics, no tracking cookies and no third-party CDN. Fonts are self-hosted, a nonce-based Content Security Policy is enforced, and application logs carry no IP addresses. Pages embed no third-party content: a YouTube video appears as a link. Gravatar avatars are opt-in and fetched by the server.
+- Portal and job pods run as non-root with a read-only root filesystem, CI actions are pinned to commit SHAs, every release ships an SBOM, and vulnerabilities are reported privately.
 
 Each guarantee, and where it stops, is documented: [Privacy and data protection](docs/GDPR.md), [Security architecture](docs/architecture/security.md) and the [security policy](SECURITY.md).
 
@@ -349,7 +349,7 @@ infra/onprem/k3s/pa-webinar-up.sh --host <user>@<server> \
   --tls acme --acme-email it@example.org --smtp-file <smtp-settings-file> --backup
 ```
 
-`--storage garage` adds object storage for uploads and videos, and `--turn` TURN for participants whose networks block UDP. Run again with only `--portal`, after checking out a new release, it upgrades the installation. The support level, the options, the certificates, backups and removal are in [Installing on your own VMs with k3s](docs/install/k3s.md).
+`--storage garage` adds object storage for uploads and videos, and `--turn` TURN for participants whose networks block UDP. Run again with only `--portal` after checking out a new release, the script upgrades the installation. The support level, the options, the certificates, backups and removal are in [Installing on your own VMs with k3s](docs/install/k3s.md).
 
 ### Change the code with Docker Compose
 
@@ -365,13 +365,13 @@ The portal answers on <http://localhost:3000/en>, Mailpit on <http://localhost:8
 
 ## How we build it
 
-- **Decisions are recorded.** Every architecture-level choice has an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md).
-- **Branches and commits.** Conventional Commits with a scope. Every change enters `dev`; `main` moves only through a `dev` → `main` pull request merged with a merge commit, never squashed, and releases are `vX.Y.Z` tags on `main`.
-- **Gates before every commit and push.** Lint, typecheck and unit tests before every commit; before every push, the same commands as each CI job the change touches, because no blocking check runs on `dev`. Git hooks, installed by `npm install`, run them on what changed, check the commit message format and look for secrets in the added lines ([Git hooks](docs/development/methodology.md#git-hooks)).
-- **Code review** of every non-trivial change before it is committed or merged, with every finding resolved or explicitly accepted.
-- **Rules encoded as tests.** A coverage ratchet (thresholds in `app/vitest.config.ts` are never lowered to let a change pass), the 24-language parity test, the localized-URL test and a CI check that the database schema and its migrations agree.
-- **Supply chain.** Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, and an OpenSSF Scorecard workflow exists whose results are not yet published. Production dependency licenses are checked against the policy from the lockfiles, a license report is kept up to date, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
-- **Releases.** Each release publishes the images, an SPDX SBOM, the packaged chart and a GitHub Release. Release notes are written by hand in all 24 languages. CI builds and never deploys.
+- Every architecture-level choice has an Architecture Decision Record in [`docs/adr/`](docs/adr/README.md).
+- Commits follow Conventional Commits with a scope. Every change enters `dev`; `main` moves only through a `dev` → `main` pull request merged with a merge commit, never squashed, and releases are `vX.Y.Z` tags on `main`.
+- Lint, typecheck and unit tests run before every commit. Before every push, the same commands run as in each CI job that the change touches, because no blocking check runs on `dev`. Git hooks, installed by `npm install`, run them on what changed, check the commit message format and look for secrets in the added lines ([Git hooks](docs/development/methodology.md#git-hooks)).
+- Every non-trivial change gets a code review before it is committed or merged, and every finding is resolved or explicitly accepted.
+- Project rules are encoded as tests: a coverage ratchet (thresholds in `app/vitest.config.ts` are never lowered to let a change pass), the 24-language parity test, the localized-URL test and a CI check that the database schema and its migrations agree.
+- Trivy scans the repository and a local build of the app image, CodeQL analyzes the code, and an OpenSSF Scorecard workflow exists whose results are not yet published. Production dependency licenses are checked against the policy from the lockfiles, a license report is kept up to date, every GitHub Action is pinned to a full commit SHA, and pull requests never run on the in-cluster runner.
+- Each release publishes the images, an SPDX SBOM of the application image (and, when it can be generated, a CycloneDX SBOM of the npm dependencies), the packaged chart and a GitHub Release. The release notes shown in the app and in the changelog are written by hand in all 24 languages; the GitHub Release body is generated from the commit log. CI builds and never deploys.
 
 ```mermaid
 flowchart TB
@@ -414,24 +414,24 @@ The full method is in [How we develop PA Webinar](docs/development/methodology.m
 
 ## Governance, security and conduct
 
-- **Governance.** The Dipartimento per la Trasformazione Digitale owns and maintains PA Webinar. Roles, decisions, the roadmap and releases are described in [GOVERNANCE.md](GOVERNANCE.md).
-- **Security.** Report vulnerabilities privately, never in a public issue, as described in [SECURITY.md](SECURITY.md).
-- **Conduct.** Everyone who takes part follows the [Contributor Covenant code of conduct](CODE_OF_CONDUCT.md).
+- The Dipartimento per la Trasformazione Digitale owns and maintains PA Webinar. Roles, decisions, the roadmap and releases are described in [GOVERNANCE.md](GOVERNANCE.md).
+- Report vulnerabilities privately, never in a public issue, as described in [SECURITY.md](SECURITY.md).
+- Everyone who takes part follows the [Contributor Covenant code of conduct](CODE_OF_CONDUCT.md).
 
 ## Documentation
 
 The [documentation hub](docs/README.md) indexes every page by reader journey:
 
-- **Evaluate:** the [feature tour](docs/FEATURES.md), [Reusing PA Webinar](docs/REUSE.md) and the [roadmap](docs/ROADMAP.md).
-- **Install and operate:** [Installing PA Webinar](docs/install/README.md) and its platform guides, [Deploying with Helm](docs/DEPLOYMENT.md), the [configuration reference](docs/CONFIGURATION.md) and the [Infrastructure reference](docs/INFRASTRUCTURE.md).
-- **Understand:** [Architecture](docs/ARCHITECTURE.md), the [decision records](docs/adr/README.md) and the [glossary](docs/GLOSSARY.md).
-- **Develop and contribute:** [Local development](docs/DEVELOPMENT.md), [Extending PA Webinar](docs/development/extending.md) and [Testing](docs/development/testing.md).
-- **Protect data:** [Privacy and data protection](docs/GDPR.md) and the [privacy notice checklist](docs/privacy/privacy-notice-checklist.md).
+- Evaluate: the [feature tour](docs/FEATURES.md), [Reusing PA Webinar](docs/REUSE.md) and the [roadmap](docs/ROADMAP.md).
+- Install and operate: [Installing PA Webinar](docs/install/README.md) and its platform guides, [Deploying with Helm](docs/DEPLOYMENT.md), the [configuration reference](docs/CONFIGURATION.md) and the [Infrastructure reference](docs/INFRASTRUCTURE.md).
+- Understand: [Architecture](docs/ARCHITECTURE.md), the [decision records](docs/adr/README.md) and the [glossary](docs/GLOSSARY.md).
+- Develop and contribute: [Local development](docs/DEVELOPMENT.md), [Extending PA Webinar](docs/development/extending.md) and [Testing](docs/development/testing.md).
+- Protect data: [Privacy and data protection](docs/GDPR.md) and the [privacy notice checklist](docs/privacy/privacy-notice-checklist.md).
 
 ## Reuse and license
 
 PA Webinar is released under the European Union Public Licence ([EUPL-1.2](LICENSE)), written for public-sector software: any public body in the EU, and anyone else, may install, adapt and redistribute it. Modified versions that are distributed, or offered to others as an online service, must be released under the same license or a compatible one. Contributions are accepted under the same license. [`publiccode.yml`](publiccode.yml) describes the project in the metadata format that the Developers Italia catalog reads, following the [AgID Guidelines on the acquisition and reuse of software](https://docs.italia.it/italia/developers-italia/lg-acquisizione-e-riuso-software-per-pa-docs/) (AgID is the Agenzia per l'Italia Digitale, the Italian digital agency). Third-party components keep their own licenses, listed in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
-Maturity, stated plainly: `publiccode.yml` declares the project `beta`. The chart renders and validates on every example profile in CI, and the `simple` profile has been installed from scratch in lab, on minikube and on k3s. A from-scratch installation by another administration, on a managed cluster through to a working event, has not yet been exercised end to end, and the [roadmap](docs/ROADMAP.md#installation-and-operations) tracks that work. What is proven, what it takes and what an adopter is responsible for are in [Reusing PA Webinar](docs/REUSE.md).
+On maturity, `publiccode.yml` declares the project `beta`. The chart renders and validates on every example profile in CI, and the `simple` profile has been installed from scratch in lab, on minikube and on k3s. A from-scratch installation by another administration, on a managed cluster through to a working event, has not yet been exercised end to end, and the [roadmap](docs/ROADMAP.md#installation-and-operations) tracks that work. What is proven, what it takes and what an adopter is responsible for are in [Reusing PA Webinar](docs/REUSE.md).
 
 Copyright © 2026 Dipartimento per la Trasformazione Digitale, Presidenza del Consiglio dei Ministri.
