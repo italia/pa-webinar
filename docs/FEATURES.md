@@ -4,7 +4,7 @@ PA Webinar is a platform that a public administration (PA) can use to run public
 
 This page lists what the platform currently does, grouped by who uses it. Features that stay off until someone turns them on are marked *Optional*. Features not built yet are in the [roadmap](ROADMAP.md). Terms are defined in the [glossary](GLOSSARY.md).
 
-The interface is available in 24 EU languages. An administrator chooses which ones are offered, and the default is Italian. UI labels are quoted in **bold** exactly as they appear in the English interface (`app/src/i18n/messages/en.json`). The screenshots show the Italian interface, so where a screenshot shows a label, the Italian label follows in parentheses on first use.
+The interface is available in 24 EU languages. An administrator chooses which ones are offered, and the default is Italian. UI labels are quoted in **bold** exactly as they appear in the English interface (`app/src/i18n/messages/en.json`). The screenshots show the English interface. Because the default interface language is Italian, the Italian label follows some labels in parentheses on first use.
 
 - [At a glance](#at-a-glance)
 - [Public portal](#public-portal)
@@ -161,7 +161,7 @@ The **Video library** (Libreria video) lists concluded events that have a visibl
 
 ### Screenshots
 
-The screenshots show demo data (`npm run db:seed`) in the Italian interface. The live room is not pictured, because a screenshot would need an event in progress and the faces of the people in it.
+The screenshots show demo data (`npm run db:seed`) in the English interface. The live room is not pictured, because a screenshot would need an event in progress and the faces of the people in it.
 
 | | |
 |---|---|

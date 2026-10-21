@@ -298,7 +298,7 @@ These rules apply to every page in the repository. Documentation changes follow 
 
 - Write in English with American spelling: -ize, color, behavior, center, catalog, artifact, license (noun and verb), canceled. The one exception is the official name of the European Union Public Licence (EUPL-1.2). This matches the interface's English catalog and the code identifiers.
 - Use sentence case for headings. Describe behavior in the present tense, and write procedures in the imperative.
-- Quote interface labels verbatim from `app/src/i18n/messages/en.json`, in bold, for example **Start event**. Do not retranslate a label. The default interface language is Italian, so where a screenshot shows the Italian interface, give the Italian label in parentheses on first use.
+- Quote interface labels verbatim from `app/src/i18n/messages/en.json`, in bold, for example **Start event**. Do not retranslate a label. Take screenshots in the English interface, with demo data. The default interface language is Italian, so give the Italian label in parentheses on first use where a reader is likely to meet it.
 - Keep code identifiers, Prisma models and enum values, Helm keys, environment variables, API routes, file paths, i18n keys and commands verbatim in backticks, even when they are Italian.
 - Write the product name as PA Webinar. Use `pa-webinar` only as an identifier: package, repository, image, chart or metric prefix.
 - Keep Italian proper names in Italian with an English gloss on first use, for example Dipartimento per la Trasformazione Digitale (Italian Department for Digital Transformation).

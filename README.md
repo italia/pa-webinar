@@ -15,7 +15,7 @@ PA Webinar is an open-source platform that public administrations (PAs) use to r
 | ![System status page with the infrastructure map](docs/screenshots/status.png) | ![Changelog with release notes](docs/screenshots/changelog.png) | ![Service inventory](docs/screenshots/service-inventory.png) |
 | **System status** (Stato del sistema): live infrastructure map | **What's new & changelog** (Novità e changelog) | **Provider service inventory** (Inventario servizi del provider): CycloneDX 1.6 |
 
-The screenshots show the Italian interface with the demo data of the seed script (`app/prisma/seed.ts`). The status page is taken on a local development stack, and the service inventory shows the example document in `docs/examples/`, placeholders included. The live room is not pictured, because it would show real people.
+The screenshots show the English interface with the demo data of the seed script (`app/prisma/seed.ts`), with the demo recording marked as published for the video library. They are taken on a local Docker Compose stack, and the service inventory shows the example document in `docs/examples/`, placeholders included. The live room is not pictured, because it would show real people.
 
 ## The idea
 

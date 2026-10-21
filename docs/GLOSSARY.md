@@ -14,8 +14,8 @@ How to read it:
 - Each entry opens with its term, or pair of terms, in bold. Inside an entry,
   **bold** marks a UI label quoted verbatim from the English UI catalog,
   `app/src/i18n/messages/en.json`. The default UI language is Italian:
-  [Italian UI labels](#italian-ui-labels) maps the Italian labels visible in
-  screenshots to their English counterparts and to the terms these docs use.
+  [Italian UI labels](#italian-ui-labels) maps the Italian labels of a live
+  installation to their English counterparts and to the terms these docs use.
 - Abbreviations are expanded in [Abbreviations](#abbreviations).
 
 > **One Italian word, two meanings.** *Registrazione* means both a
@@ -936,8 +936,8 @@ commands as the CI workflow before every push.
 
 ## Italian UI labels
 
-The default UI language is Italian, so screenshots and live installations
-often show Italian labels. The tables below give, for each label, the English
+The default UI language is Italian, so live installations often show
+Italian labels. The tables below give, for each label, the English
 label from `en.json` and the term these docs use. Labels come verbatim from
 `app/src/i18n/messages/it.json` and `en.json`; if a label changes there, the
 catalogs win. The English UI writes **Organiser** for the staff role, while
