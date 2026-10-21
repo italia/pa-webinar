@@ -8,22 +8,12 @@
  * tutta in `reconcile.ts` (pura, testata). Qui solo I/O.
  */
 
-import {
-  KubeConfig,
-  BatchV1Api,
-  type V1Job,
-  type V1EnvVar,
-} from '@kubernetes/client-node';
+import { KubeConfig, BatchV1Api, type V1Job } from '@kubernetes/client-node';
 
 import type { ActualJob, DesiredRecorder, JobPhase } from './reconcile.js';
 import type { RecorderRunner } from './runner.js';
-import {
-  COMPONENT_LABEL,
-  COMPONENT_VALUE,
-  RECORDING_ID_LABEL,
-  EVENT_ID_LABEL,
-  recorderHandleName,
-} from './labels.js';
+import { COMPONENT_LABEL, COMPONENT_VALUE, RECORDING_ID_LABEL } from './labels.js';
+import { buildRecorderJob } from './job.js';
 
 function jobPhase(job: V1Job): JobPhase {
   const s = job.status;
@@ -78,30 +68,7 @@ export class KubernetesRunner implements RecorderRunner {
       );
     }
 
-    const name = recorderHandleName(d.recordingId);
-    const labels = {
-      [COMPONENT_LABEL]: COMPONENT_VALUE,
-      [RECORDING_ID_LABEL]: d.recordingId,
-      [EVENT_ID_LABEL]: d.eventId,
-    };
-
-    // Inietta le env per-recording nel primo container.
-    const containers = tpl.template.spec?.containers ?? [];
-    if (containers[0]) {
-      const env: V1EnvVar[] = (containers[0].env ?? []).filter(
-        (e: V1EnvVar) => e.name !== 'RECORDING_ID' && e.name !== 'EVENT_ID',
-      );
-      env.push({ name: 'RECORDING_ID', value: d.recordingId });
-      env.push({ name: 'EVENT_ID', value: d.eventId });
-      containers[0].env = env;
-    }
-
-    const job: V1Job = {
-      apiVersion: 'batch/v1',
-      kind: 'Job',
-      metadata: { name, namespace: this.namespace, labels },
-      spec: { ...tpl, template: { ...tpl.template, metadata: { labels } } },
-    };
+    const job = buildRecorderJob(tpl, d, this.namespace);
 
     try {
       await this.batch.createNamespacedJob({ namespace: this.namespace, body: job });

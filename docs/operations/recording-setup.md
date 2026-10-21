@@ -381,6 +381,8 @@ the value the bot uses when the variable is empty (`infra/recorder/src/capture.t
 | `recorder.backoffLimit` | `1` | Retries of a failed bot pod |
 | `recorder.ttlSecondsAfterFinished` | `600` | How long a finished Job stays. While it exists, the controller does not start a new bot for the same recording, so speech during that gap is not captured. Tune it together with `idleTimeoutSec` |
 | `recorder.workSizeLimit` | `10Gi` | Size cap of the bot's `emptyDir` for tracks before upload |
+| `recorder.podAnnotations` | `{}` | Extra annotations on the bot pod. `cluster-autoscaler.kubernetes.io/safe-to-evict: "false"` is always set, by the template and by the controller: an evicted bot would lose the tracks on its `emptyDir` |
+| `recorder.terminationGracePeriodSeconds` | `300` | Time a bot that is stopped anyway (node drain, node loss) has to close the capture, upload the tracks recorded so far and notify the portal |
 | `recorder.resources` | 1 CPU and 2 GiB requested, 2 CPU and 4 GiB limit | The bot runs a headless browser |
 | `recorder.nodeSelector`, `recorder.tolerations` | empty | The bot needs no GPU and no media node |
 | `recorder.controller.image` | `ghcr.io/italia/pa-webinar-recorder-controller:dev` | Same pinning advice as the bot. Its `:dev-<sha>` tags come from the commits that rebuilt the controller, so the bot and the controller usually carry different SHAs |

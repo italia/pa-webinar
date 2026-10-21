@@ -92,6 +92,19 @@ describe('buildIngestBody', () => {
     });
     expect(buildIngestBody(m).tracks[0]).not.toHaveProperty('sizeBytes');
   });
+
+  it('segnala al portale una cattura fermata a evento in corso', () => {
+    const m = buildManifest({
+      eventId: 'e1',
+      recordingId: 'r1',
+      roomName: 'room',
+      recordings: [
+        { participantId: 'p1', trackFileId: 'abc-p1-0', displayName: 'Relatore 1', firstFrameAtMs: 1_000, lastFrameAtMs: 5_000, bytesWritten: 900 },
+      ],
+    });
+    expect(buildIngestBody(m, {}, { interrupted: true }).interrupted).toBe(true);
+    expect(buildIngestBody(m)).not.toHaveProperty('interrupted');
+  });
 });
 
 describe('notifyPortal', () => {

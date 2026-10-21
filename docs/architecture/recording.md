@@ -916,15 +916,35 @@ title. The event page puts the pages back beside the published video
   controller starts a second recorder while the first one is still running.
   The event then gets two sets of tracks and two `TRANSCRIBE_MULTITRACK`
   pipelines.
-- **A second recorder run for the same recording.** When a recorder ends while
-  its event is still `LIVE`, a new run starts for the same `Recording`. Its
-  tracks are stored, but the enqueue is idempotent per pipeline run
-  (`Recording.runCount`), so they do not start a new transcription. The ingest
-  still resets the recording's status: if every job of the pipeline already
-  exists, the status stays `POSTPROD_QUEUED` with nothing to move it on, and
-  the public transcript and downloads, which require `POSTPROD_DONE` or
-  `POSTPROD_PARTIAL`, disappear. If the second run's tracks are all silent,
-  the silence guard marks the whole recording `POSTPROD_FAILED` instead.
+- **A second recorder run for the same recording.** The bot pod is never
+  moved by the cluster autoscaler (`safe-to-evict: "false"`), but a node drain
+  or a lost node can still stop it while the event is `LIVE`. On `SIGTERM` the
+  bot closes the capture as it would at the end of the event, uploads the
+  tracks recorded so far, sends the manifest with `interrupted: true` and
+  exits with code 143. A clean exit would mark the Job complete and nothing
+  would record the rest; on a failure the Job starts a new pod, and the
+  chart's `podFailurePolicy` does not count a disruption against
+  `recorder.backoffLimit`. Each run prefixes its
+  track files with its own start time, so the second run never overwrites the
+  first in storage. The portal keeps all tracks on one zero, the earliest
+  first frame (`lib/recorder/track-zero.ts`), and shifts the offsets of the
+  other run onto it; the alignment is as good as the agreement of the node
+  clocks. A manifest marked `interrupted` while the event is still open (not
+  `ENDED` or `ARCHIVED`) stores its tracks but does not enqueue the pipeline:
+  the run that reaches the end enqueues it, with every track. If no later run
+  sends a manifest (it captures nothing, or its pod fails for good), no
+  pipeline starts until an administrator runs it. The silence guard looks at
+  every track of the recording, so a short silent last run does not discard
+  the audio of an earlier one. A run that ends
+  on its own while the event is still `LIVE` (an empty room, then people come
+  back) still enqueues at its end; the next run's tracks are stored, but the
+  enqueue is idempotent per pipeline run (`Recording.runCount`), so they do
+  not start a new transcription. The ingest still resets the recording's
+  status: if every job of the pipeline already exists, the status stays
+  `POSTPROD_QUEUED` with nothing to move it on, and the public transcript and
+  downloads, which require `POSTPROD_DONE` or `POSTPROD_PARTIAL`, disappear.
+  If every track of the recording is silent, the silence guard marks it
+  `POSTPROD_FAILED` instead.
 - **Orphan sweep and event videos.** `recordings-reconcile` derives a name from
   `Event.recordingUrl` by dropping the URL's first path segment, which matches
   the listed object only for virtual-hosted AWS S3 URLs. On Azure Blob, and on

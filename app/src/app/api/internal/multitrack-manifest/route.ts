@@ -6,8 +6,11 @@
  * endpoint col manifest. Il portale:
  *   1. crea/aggiorna le righe `RecordingTrack` (cifrando il displayName,
  *      che nel manifest arriva in chiaro — il recorder non ha le chiavi
- *      PII; vedi ADR-013);
- *   2. accoda la pipeline con job radice TRANSCRIBE_MULTITRACK.
+ *      PII; vedi ADR-013), tutte sullo stesso zero anche quando arrivano da
+ *      piu' esecuzioni del recorder (lib/recorder/track-zero);
+ *   2. accoda la pipeline con job radice TRANSCRIBE_MULTITRACK. Non se il
+ *      recorder e' stato fermato a diretta ancora in corso: un'altra
+ *      esecuzione registra il resto e la accoda lei, con tutte le tracce.
  *
  * Auth: CRON_API_KEY (in-cluster, come gli altri endpoint /internal).
  *
@@ -26,6 +29,7 @@ import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { allTracksSilent, SILENCE_FLOOR_BYTES_PER_SEC } from '@/lib/ai/track-silence';
 import { multitrackRecordingPrefix } from '@/lib/recorder/lifecycle';
+import { unisciZero } from '@/lib/recorder/track-zero';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +52,8 @@ const bodySchema = z.object({
    *  registratori che non la mandano ancora; un valore senza senso si ignora
    *  invece di rifiutare il manifest, che porterebbe via le tracce. */
   recordingStartedAtMs: z.number().optional(),
+  /** Cattura fermata dall'esterno (arresto del pod) prima della fine. */
+  interrupted: z.boolean().optional(),
 });
 
 /** Dal 2020 in poi: prima e' un valore rotto, non un'ora di registrazione. */
@@ -56,7 +62,7 @@ const MIN_PLAUSIBLE_EPOCH_MS = Date.UTC(2020, 0, 1);
 export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
-  const { eventId, recordingId, tracks, recordingStartedAtMs } = bodySchema.parse(
+  const { eventId, recordingId, tracks, recordingStartedAtMs, interrupted } = bodySchema.parse(
     await request.json(),
   );
 
@@ -65,7 +71,7 @@ export const POST = withErrorHandling(async (request) => {
     select: {
       id: true,
       eventId: true,
-      event: { select: { aiTranscriptEnabled: true } },
+      event: { select: { aiTranscriptEnabled: true, status: true } },
     },
   });
   if (!recording) throw new NotFoundError('Recording');
@@ -93,19 +99,50 @@ export const POST = withErrorHandling(async (request) => {
   // admin recordings views and re-runnable via "Genera AI" — rather than
   // silently stuck at READY. Gates on ALL tracks and fails open (see
   // allTracksSilent), so a genuinely-recorded event is never blocked.
-  const skipSilent = allTracksSilent(tracks) && recording.event.aiTranscriptEnabled;
+  // Una parte dell'evento, con l'evento ancora aperto (anche in pausa o in
+  // allestimento): le tracce si tengono, la pipeline la accoda l'esecuzione
+  // che arriva in fondo.
+  const parziale =
+    interrupted === true &&
+    recording.event.status !== 'ENDED' &&
+    recording.event.status !== 'ARCHIVED';
 
+  let skipSilent = false;
   const result = await prisma.$transaction(async (tx) => {
+    // Due manifest della stessa registrazione non si mescolano a meta'.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`multitrack-manifest:${recordingId}`}))`;
     // Lo zero dei tempi della trascrizione: la cronologia della sala ci
     // misura sopra le sue azioni (lib/postprod/live-timeline.ts).
+    let spostaNuoveMs = 0;
     if (
       recordingStartedAtMs !== undefined &&
       Number.isFinite(recordingStartedAtMs) &&
       recordingStartedAtMs >= MIN_PLAUSIBLE_EPOCH_MS
     ) {
+      const prima = await tx.recording.findUnique({
+        where: { id: recordingId },
+        select: { mediaStartedAt: true },
+      });
+      // Le tracce di un'altra esecuzione: quelle di questo manifest, se e'
+      // un nuovo invio dello stesso, hanno gia' lo zero giusto.
+      const altre = await tx.recordingTrack.count({
+        where: { recordingId, blobKey: { notIn: tracks.map((t) => t.blobKey) } },
+      });
+      const unito = unisciZero({
+        esistente: prima?.mediaStartedAt ?? null,
+        conTracce: altre > 0,
+        arrivoMs: recordingStartedAtMs,
+      });
+      if (unito.spostaEsistentiMs > 0) {
+        await tx.recordingTrack.updateMany({
+          where: { recordingId },
+          data: { startOffsetMs: { increment: unito.spostaEsistentiMs } },
+        });
+      }
+      spostaNuoveMs = unito.spostaNuoveMs;
       await tx.recording.update({
         where: { id: recordingId },
-        data: { mediaStartedAt: new Date(recordingStartedAtMs) },
+        data: { mediaStartedAt: unito.zero },
       });
     }
     for (const t of tracks) {
@@ -114,7 +151,7 @@ export const POST = withErrorHandling(async (request) => {
         displayName: encryptPIIOrNull(t.displayName ?? null),
         mimeType: t.mimeType,
         sizeBytes: t.sizeBytes != null ? BigInt(t.sizeBytes) : null,
-        startOffsetMs: t.startOffsetMs,
+        startOffsetMs: t.startOffsetMs + spostaNuoveMs,
         durationMs: t.durationMs ?? null,
       };
       // upsert su (recordingId, blobKey): blobKey è univoco PER SESSIONE
@@ -133,6 +170,22 @@ export const POST = withErrorHandling(async (request) => {
       });
     }
 
+    if (parziale) return { enqueued: 0, skippedExisting: 0, jobIds: [] };
+    // Il silenzio si giudica su tutte le tracce della registrazione, anche
+    // quelle di un'esecuzione precedente: una seconda esecuzione breve e
+    // silenziosa non deve buttare l'audio della prima.
+    if (recording.event.aiTranscriptEnabled) {
+      const tutte = await tx.recordingTrack.findMany({
+        where: { recordingId },
+        select: { sizeBytes: true, durationMs: true },
+      });
+      skipSilent = allTracksSilent(
+        tutte.map((t) => ({
+          sizeBytes: t.sizeBytes != null ? Number(t.sizeBytes) : null,
+          durationMs: t.durationMs,
+        })),
+      );
+    }
     if (skipSilent) {
       // Mark the recording failed (visible + admin-retryable) instead of
       // enqueuing a doomed pipeline; the loud log below is the operator signal.
@@ -163,5 +216,6 @@ export const POST = withErrorHandling(async (request) => {
     enqueued: result.enqueued,
     skipped: result.skippedExisting,
     silent: skipSilent,
+    partial: parziale,
   });
 });

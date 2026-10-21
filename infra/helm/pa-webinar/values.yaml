@@ -1896,6 +1896,12 @@ recorder:
   activeDeadlineSeconds: 21600   # 6h max per evento
   ttlSecondsAfterFinished: 600
   workSizeLimit: "10Gi"
+  # Annotazioni in piu' sul pod del recorder. `safe-to-evict: "false"` c'e'
+  # sempre: un recorder spostato durante la diretta perderebbe le tracce.
+  podAnnotations: {}
+  # Il tempo che un recorder fermato ha per chiudere la cattura, caricare le
+  # tracce registrate fin li' e notificarle al portale.
+  terminationGracePeriodSeconds: 300
   # Timing del bot (env IDLE_TIMEOUT_SEC / INITIAL_GRACE_SEC / MAX_DURATION_SEC,
   # vedi infra/recorder/src/capture.ts). Se vuoti → default del bot
   # (idle 90s, grace 900s, max 4h). initialGrace abbassato di default: il
