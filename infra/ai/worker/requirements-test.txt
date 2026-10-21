@@ -8,8 +8,10 @@
 # per verificare che l'allineamento dei sottotitoli non regredisca.
 numpy>=2.1,<3
 # I parametri Punkt che l'immagine genera (punkt_params.py), caricati come li
-# carica l'allineamento di WhisperX.
-nltk>=3.9.1
+# carica l'allineamento di WhisperX. Stessa versione di requirements.txt: dalla
+# 3.10.4 NLTK scrive i parametri solo sotto i percorsi di nltk.data.path, e la
+# prova deve girare con la versione che genera i file nell'immagine.
+nltk==3.10.3
 httpx==0.28.1
 pydantic==2.9.2
 pytest
