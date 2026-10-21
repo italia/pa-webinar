@@ -152,6 +152,8 @@ Not verified: what was out of reach, and why.
 | `build` | Images, the Dockerfile and the build system |
 | `security` | Hardening and vulnerability remediation |
 | `i18n` | Translations and message catalogs |
+| `style` | Formatting only, with no change to the code's meaning |
+| `revert` | Reverting an earlier commit |
 
 - **Scope** names the area touched, such as `admin`, `live`, `helm`, `recorder`, `postprod` or `lobby`. Run `git log` to see the scopes in use. Omit the scope only for a change that truly cuts across the codebase.
 - **Subject**: imperative mood, 72 characters or fewer, no emoji, no trailing period.
@@ -159,7 +161,7 @@ Not verified: what was out of reach, and why.
 - **Language**: commit messages and pull-request titles are written in English. The earlier history is in Italian and is not rewritten, because rewriting it would change every commit hash under existing tags, forks and open pull requests. A message never mixes languages.
 - **No attribution trailers or signature footers.** Git already records authorship.
 
-Subjects matter beyond `git log`. The release workflow builds the GitHub Release body from the commit subjects since the previous tag, grouped by type. Only `feat`, `fix`, `perf`, `refactor`, `docs`, `ci`, `chore` and `test` get their own section. Every other subject lands under "Other": subjects of the `build`, `security` and `i18n` types, and subjects that do not follow the format ([Release notes and the changelog](ci-and-release.md#release-notes-and-the-changelog)).
+Subjects matter beyond `git log`. The release workflow builds the GitHub Release body from the commit subjects since the previous tag, grouped by type. Only `feat`, `fix`, `perf`, `refactor`, `docs`, `ci`, `chore` and `test` get their own section. Every other subject lands under "Other": subjects of the `build`, `security`, `i18n`, `style` and `revert` types, and subjects that do not follow the format ([Release notes and the changelog](ci-and-release.md#release-notes-and-the-changelog)).
 
 ## Local gates before every commit
 

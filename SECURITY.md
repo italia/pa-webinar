@@ -22,18 +22,15 @@ For the security design of the application itself (trust boundaries, request han
 
 ## Supported versions
 
-Only the **latest released minor version** receives security fixes. A release is a `vX.Y.Z` tag on `main`. It publishes the application image `ghcr.io/italia/pa-webinar:X.Y.Z`, its database-migration image and the packaged Helm chart.
+Only the latest released minor version receives security fixes. A release is a `vX.Y.Z` tag on `main`. It publishes the application image `ghcr.io/italia/pa-webinar:X.Y.Z`, its database-migration image, the auxiliary images and the packaged Helm chart.
 
 - A fix ships as a new release on the latest minor line. Earlier minor versions receive no backports, so an older installation gets the fix by upgrading. The procedure is in [docs/operations/upgrades.md](docs/operations/upgrades.md).
-- To find the latest release, read [CHANGELOG.md](CHANGELOG.md) or the repository's [GitHub Releases](https://github.com/italia/pa-webinar/releases). An installation's `/changelog` page shows the version that installation runs (**Current version**) and the releases before it. Releases whose main purpose is security carry a **Security** badge there.
+- The latest release is listed in [CHANGELOG.md](CHANGELOG.md) and in the repository's [GitHub Releases](https://github.com/italia/pa-webinar/releases). An installation's `/changelog` page shows the version that installation runs (**Current version**) and the releases before it. Releases whose main purpose is security carry a **Security** badge there.
 - Builds from the `dev` branch (`:dev` and `:dev-<sha>` images) are pre-release builds, not supported versions.
 
-Some components have no numbered releases:
+Each release publishes the auxiliary images with the same version, as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z`: the recorder bot, the recorder controller, the post-production workers (with and without a GPU) and the live captions gateway and engine. Their image values in the chart are empty by default, and the chart then pulls them with the application image's tag (`pa-webinar.auxImage` in `infra/helm/pa-webinar/templates/_helpers.tpl`), so a release installs the auxiliary components of the same release. Releases before 0.13.0 have no versioned auxiliary images: for them, pin `:dev-<sha>` tags or digests, as described in [docs/operations/upgrades.md](docs/operations/upgrades.md#making-the-dev-components-roll-back).
 
-- **Recorder bot, recorder controller and AI post-production worker.** Their images are built only from the `dev` branch: a rolling `:dev` tag, plus an immutable `:dev-<sha>` tag for each build. A fix reaches them with the next build from `dev`.
-- **Patched jitsi/web image.** It uses one tag per patch revision, named after the upstream Jitsi build it is based on (`stable-<build>-rnnoise`, with a revision suffix such as `-r2` for a later patch on the same build). The workflow pushes whatever `IMAGE_TAG` says, so every fix must come with a new tag.
-
-**A release tag does not pin every image.** The chart's defaults reference the floating `:dev` tag for the recorder, the recorder controller and the post-production worker, so those components are not reproducible from a release tag. Pin `:dev-<sha>` tags or digests; see [docs/operations/upgrades.md](docs/operations/upgrades.md#making-the-dev-components-roll-back).
+The patched jitsi/web image has no numbered releases. It has one tag per patch revision, named after the upstream Jitsi build it is based on (`stable-<build>-rnnoise`, with a revision suffix such as `-r2` for a later patch on the same build). The workflow pushes whatever `IMAGE_TAG` says, so every fix must come with a new tag.
 
 The release workflow, the image tags and their conventions are described in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
 
@@ -62,14 +59,14 @@ Report the vulnerability privately, through one of these channels:
   Each of these credentials is described in [docs/architecture/identity-and-access.md](docs/architecture/identity-and-access.md).
 - **Steps to reproduce.** Give the steps or a proof of concept.
 - **Impact.** Say what the attacker gains (data, privileges or availability) and who is affected.
-- **A reproduction you ran.** A report produced by an automated or AI tool is considered only when a person has reproduced it on a [supported version](#supported-versions); unverified reports are closed.
-- **Optional.** Suggest a fix if you have one.
+- **A reproduction you ran.** A report produced by an automated or AI tool is considered only when a person has reproduced it on a [supported version](#supported-versions). Unverified reports are closed.
+- **Optional.** A suggested fix, if you have one.
 
 ### Testing responsibly
 
-- **Test only what you run.** Reproduce the issue on your own local stack (see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)) or on an installation you operate. Installations are run by public bodies, and this policy does not authorize testing against them.
-- **Leave personal data alone.** Do not access, keep or share the personal data of participants. If a proof of concept exposes such data, stop at the minimum that shows the issue.
-- **Keep reports free of personal data.** Do not put real personal data in the report.
+- Test only what you run: your own local stack (see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)) or an installation you operate. Installations are run by public bodies, and this policy does not authorize testing against them.
+- Do not access, keep or share the personal data of participants. If a proof of concept exposes such data, stop at the minimum that shows the issue.
+- Do not put real personal data in the report.
 
 ## What we commit to
 
@@ -93,8 +90,8 @@ flowchart LR
   classDef neutral fill:#FFFFFF,stroke:#5C6F82,color:#17324D,stroke-dasharray:4 3
 ```
 
-- **Acknowledgment.** We confirm that we received the report within **3 business days**.
-- **Initial assessment.** We send an initial assessment of the report within **10 business days**.
+- **Acknowledgment.** We confirm receipt of the report within 3 business days.
+- **Initial assessment.** We send an initial assessment of the report within 10 business days.
 - **Confidentiality.** We keep the report confidential until a fix is released.
 
 A confirmed vulnerability is fixed in a new release on the latest minor line (see [Supported versions](#supported-versions)).
@@ -114,11 +111,11 @@ The maintainers do not operate other administrations' installations and cannot p
 | Live captions gateway and engine | `infra/captions/gateway/`, `infra/captions/engine/` | `ghcr.io/italia/pa-webinar-captions-gateway`, `ghcr.io/italia/pa-webinar-captions-engine` |
 | AI post-production worker | `infra/ai/worker/` | `ghcr.io/italia/pa-webinar-postprod-worker` and, without a GPU, `ghcr.io/italia/pa-webinar-postprod-worker-cpu` |
 | Patched jitsi/web image (the patches applied to the upstream bundle) | `infra/jitsi-web-patched/` | `ghcr.io/italia/pa-webinar-jitsi-web` |
-| Jitsi extras: the custom Prosody module used by the Docker Compose stack, and a Jibri finalize script | `infra/jitsi/` | Not published separately |
+| Jitsi extras: the custom Prosody modules (the chart ships its own copies under `infra/helm/pa-webinar/files/`), the web overrides that the Docker Compose stack mounts, and a standalone Jibri finalize script | `infra/jitsi/` | Not published separately |
 | Docker Compose stack | `docker-compose*.yml` | Not published separately |
 | CI and release workflows | `.github/workflows/` | Not applicable |
 
-The rest of the repository is in scope too: the load-test toolkit, the service-inventory generator and the scripts. These are tools, not parts of a running installation.
+The rest of the repository is in scope too, including the load-test toolkit, the service-inventory generator and the scripts. These are tools and do not run in an installation.
 
 ### Report upstream as well
 
@@ -138,7 +135,7 @@ Each installation is run by its **operator**: the public body that deployed it. 
 
 - **A problem specific to one installation.** Report it to that operator. Examples: an exposed service, a leaked key, an outdated version.
 - **A root cause in PA Webinar.** If the cause lies in the code, the chart defaults or this documentation, report it here as well. Describe the flaw, not the installation.
-- **The `security.txt` file.** The application image serves `/.well-known/security.txt` (RFC 9116) from `app/public/.well-known/security.txt`. Its `Contact` is the project's maintenance mailbox, which accepts reports as described in [How to report](#how-to-report). `Policy` points to this file, `Acknowledgments` to the [Acknowledgments](#acknowledgments) section, and `Preferred-Languages` is `it, en`. The file also has an `Encryption` field, but no key is published at that address. The file is part of the image, so an operator that wants reports to reach it directly must serve its own file, for example from the ingress.
+- **The `security.txt` file.** The application image serves `/.well-known/security.txt` (RFC 9116) from `app/public/.well-known/security.txt`. Its `Contact` is the project's maintenance mailbox, which accepts reports as described in [How to report](#how-to-report). `Policy` points to this file, `Acknowledgments` to the [Acknowledgments](#acknowledgments) section, and `Preferred-Languages` is `it, en`. The file has no `Encryption` field, since no encryption key is published for the mailbox. The file is part of the image, so an operator that wants reports to reach it directly must serve its own file, for example from the ingress.
 
 What an operator takes on when adopting PA Webinar is described in [docs/REUSE.md](docs/REUSE.md).
 
@@ -175,8 +172,8 @@ flowchart LR
   pr --> gate
   gate -- "outside contributor:<br/>after maintainer approval" --> gh
   gate -- "repository collaborator:<br/>runs" --> gh
-  ev -- "every workflow<br/>except codeql.yml" --> sh
-  ev -. "codeql.yml" .-> gh
+  ev -- "every workflow except<br/>codeql.yml and<br/>buildcache-cleanup.yml" --> sh
+  ev -. "codeql.yml,<br/>buildcache-cleanup.yml" .-> gh
   sh -- "publishes" --> out
   pr -. "never" .-> sh
 
@@ -196,7 +193,7 @@ flowchart LR
 The self-hosted runner runs inside a Kubernetes cluster. Code running there could reach the cloud metadata endpoint, a Kubernetes ServiceAccount or the Docker socket, so pull-request code must never run there. The workflows enforce this in four ways:
 
 - **Conditional runner in `ci.yml`.** Every job in `.github/workflows/ci.yml` picks its runner with a conditional `runs-on`. `pull_request` events go to GitHub-hosted `ubuntu-latest` runners. Pushes to `main` and manual dispatches go to the self-hosted runner.
-- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml`, `release.yml` and `scorecard.yml` build, publish or analyze on the self-hosted runner. They start only on trusted events: pushes to `dev` or `main`, `v*` tags, manual dispatch or a schedule. `codeql.yml` always runs on GitHub-hosted runners.
+- **Trusted triggers for publishing workflows.** `dev.yml`, `jitsi-web.yml`, `release.yml` and `scorecard.yml` build, publish or analyze on the self-hosted runner. They start only on trusted events: pushes to `dev` or `main`, `v*` tags, manual dispatch or a schedule. `codeql.yml` always runs on GitHub-hosted runners, and so does `buildcache-cleanup.yml`, which starts only on its weekly schedule or a manual dispatch.
 - **No privileged pull-request trigger.** No workflow uses `pull_request_target`.
 - **Approval for outside contributors.** A maintainer must approve workflow runs on pull requests from outside contributors. This is a repository setting, so it does not appear in the workflow files. For pull requests from forks, GitHub also withholds repository secrets.
 
@@ -205,7 +202,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 ### Pinned actions and least-privilege tokens
 
 - **Pinned actions.** Every `uses:` in `.github/workflows/` references a full commit SHA, with the tag in a trailing comment (`actions/checkout@<sha> # v4`). No workflow uses a floating reference such as `@v4` or `@main`. Dependabot updates the SHA and the comment together.
-- **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml` and `release.yml` set a read-only workflow default. `jitsi-web.yml` declares permissions per job only. The jobs that need more than read access are elevated:
+- **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml` and `buildcache-cleanup.yml` set a read-only workflow default. `jitsi-web.yml` declares permissions per job only. Only the jobs that need more than read access get it:
 
   | Workflow | Workflow-level permissions | Elevated jobs |
   |---|---|---|
@@ -214,7 +211,8 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
   | `jitsi-web.yml` | None declared | The job that pushes the image gets `packages: write` |
-  | `release.yml` | `contents: read` | The image job gets `packages: write` and `contents: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
+  | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
+  | `buildcache-cleanup.yml` | `contents: read` | The prune job gets `packages: write` to delete old untagged versions of the layer-cache package |
 
 - **Jobs without a `permissions` block.** Such a job receives the workflow default, or, when the workflow declares none, the repository's default token permissions, a repository setting that the workflow files do not show. The change-detection jobs in `dev.yml` take the workflow's read-only default.
 
@@ -224,17 +222,17 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 
 - **npm:** the root project with its workspaces (the app and the lobby share one lockfile), the recorder, the recorder controller and the live captions gateway.
 - **pip:** the AI post-production worker.
-- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway and captions engine bases, and the build-only `node` stage of the patched jitsi/web image. The app, worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
+- **Docker:** Dependabot updates a base image only when a `FROM` line names it literally: the recorder, recorder-controller, captions gateway, captions engine and CPU post-production worker bases, and the build-only `node` stage of the patched jitsi/web image. The app, GPU worker and patched-image Dockerfiles take their runtime base from a build argument (`NODE_BASE`, `BASE_IMAGE`, `BASE_TAG`), which Dependabot does not update, so those bases are manual bumps.
 - **GitHub Actions:** every action used by the workflows.
 - **Not covered:** the Helm subchart versions in `infra/helm/pa-webinar/Chart.lock`, and the image references in the chart's values.
 
 For npm, minor and patch updates are grouped into one pull request per directory.
 
-**Major versions.** Major updates of the dependencies listed under `ignore` in `.github/dependabot.yml` are excluded from routine updates; the file is the list. They are runtime dependencies whose majors need code changes, such as the framework, the ORM and the worker's machine-learning stack, plus some base images. Each of these majors is done as a dedicated upgrade, with the code adapted, the full gates run and a code review. The Node type definitions (`@types/node`) are matched by hand to the Node major used at runtime, in the same change that moves the runtime.
+**Major versions.** Routine updates leave out the major versions of the dependencies listed under `ignore` in `.github/dependabot.yml`, which is the authoritative list. These are dependencies whose majors need code changes or new testing, such as the framework, the ORM, the build and lint tools and the worker's machine-learning stack, plus some base images. A few entries also hold back minor versions, and a few keep a dependency below a given version, with the reason in a comment next to the entry. Each excluded major is done as a dedicated upgrade, with the code adapted, the full gates run and a code review. The Node type definitions (`@types/node`) are matched by hand to the Node major used at runtime, in the same change that moves the runtime.
 
-**Security updates still arrive.** The exclusions use `version-update:semver-major`, which applies to routine version updates only. When Dependabot security updates are enabled for the repository, a vulnerable dependency still gets its pull request.
+The `update-types` exclusions (`version-update:semver-major`, plus `version-update:semver-minor` where minors are held back) apply to routine version updates only. When Dependabot security updates are enabled for the repository, a vulnerable dependency still gets its pull request.
 
-**Moving to a new upstream Jitsi web build** means changing `BASE_TAG` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
+Moving to a new upstream Jitsi web build means changing `BASE_TAG`, `BASE_IMAGE` and `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`, so it is always a deliberate change. The procedure is in [infra/jitsi-web-patched/README.md](infra/jitsi-web-patched/README.md).
 
 ### Scanners
 
@@ -248,11 +246,11 @@ For npm, minor and patch updates are grouped into one pull request per directory
 
 What the scanners do not cover:
 
-- **Trivy runs only in `ci.yml`.** Pushes to `dev` and pull requests to `dev` get no Trivy scan.
-- **Published images are never scanned.** No workflow scans the images pushed to GHCR. The release image is rebuilt from the tag. The migration, recorder, recorder controller, post-production worker and patched jitsi/web images are never scanned as built images, with their OS packages and everything added at build time. Only their dependency manifests in the repository are covered by the filesystem scan. An operator that needs image scanning should scan the digests it deploys.
-- **Trivy runs with its default scanners:** known vulnerabilities and embedded secrets. `.trivyignore`, at the repository root, records each accepted finding with its justification.
-- **CodeQL does not analyze the Python worker.** Its language matrix is JavaScript and TypeScript only. CodeQL also needs code scanning to be enabled on the repository.
-- **The secret check before a commit is a pattern match.** The pre-commit Git hook ([Git hooks](docs/development/methodology.md#git-hooks)) looks for common key and token formats in the added lines. It runs only where the hooks are installed, and it can be skipped with `--no-verify`. Code review and the Trivy scan remain the controls.
+- Of the workflows, only `ci.yml` runs Trivy. Pushes to `dev` and pull requests to `dev` get no Trivy scan.
+- No workflow scans the images pushed to GHCR. The release image is rebuilt from the tag. The migration image, the auxiliary images (recorder, recorder controller, both post-production workers, captions gateway and engine) and the patched jitsi/web image are never scanned as built images, with their OS packages and everything added at build time. The filesystem scan covers only their dependency manifests in the repository. An operator that needs image scanning should scan the digests it deploys.
+- Trivy runs with its default scanners: known vulnerabilities and embedded secrets. `.trivyignore`, at the repository root, records each accepted finding with its justification.
+- CodeQL does not analyze the Python worker: its language matrix is JavaScript and TypeScript only. CodeQL also needs code scanning to be enabled on the repository.
+- The secret check before a commit is a pattern match. The pre-commit Git hook ([Git hooks](docs/development/methodology.md#git-hooks)) looks for common key and token formats in the added lines. It runs only where the hooks are installed, and it can be skipped with `--no-verify`. Code review and the Trivy scan remain the controls.
 
 ### Release artifacts and SBOMs
 
@@ -264,8 +262,8 @@ What the scanners do not cover:
 
 These artifacts have limits:
 
-- **Only the application image has SBOMs.** The migration image, the recorder, the recorder controller, the worker and the patched jitsi/web image have none.
-- **No image is signed.** No workflow signs images. The release application image carries the OCI labels set by `docker/metadata-action`. They include `org.opencontainers.image.revision`, which binds the image to the commit it was built from. The release migration image is built without these labels.
+- Only the application image has SBOMs. The migration image, the auxiliary images and the patched jitsi/web image have none.
+- No workflow signs images. The release application image carries the OCI labels set by `docker/metadata-action`, which include `org.opencontainers.image.revision`, the commit the image was built from. The release auxiliary images set the same revision label, and the version, in the workflow. The release migration image is built without these labels.
 
 Installations show an **SBOM** button on `/changelog` for releases flagged `sbom`; see [docs/development/ci-and-release.md](docs/development/ci-and-release.md#sboms).
 
@@ -309,9 +307,9 @@ Never replace them with real values in the repository, and never run an installa
 
 ### Secrets in a Helm installation
 
-- **`generate` mode is for development and test only.** The chart renders the Secret from `secrets.generate.*`, so the values also live in the Helm release record and in the values file.
-- **Production uses `existing` or `external`.** With `existing`, the default, the operator creates and rotates the Secret. With `external`, the External Secrets Operator syncs it from a cloud secret manager.
-- **Keep the datastore passwords in their own Secret**, named by `secrets.datastoreSecretName`. The PostgreSQL subchart mounts its password Secret in full inside the database container, so the personal-data encryption key must not sit next to those passwords.
+- `generate` mode is for development and test only. The chart renders the Secret from `secrets.generate.*`, so the values also live in the Helm release record and in the values file.
+- Production uses `existing` or `external`. With `existing`, the default, the operator creates and rotates the Secret. With `external`, the External Secrets Operator syncs it from a cloud secret manager.
+- Keep the datastore passwords in their own Secret, named by `secrets.datastoreSecretName`. The PostgreSQL subchart mounts its password Secret in full inside the database container, so the personal-data encryption key must not sit next to those passwords.
 
 The modes, the providers and how to separate the datastore passwords on an existing installation are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#secrets).
 

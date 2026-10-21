@@ -6,12 +6,10 @@ The page is maintained by hand and describes the repository as it is. It is not 
 
 ## PA Webinar's license
 
-- **License.** EUPL-1.2. The [LICENSE](LICENSE) file is a short notice that links to the full text on Joinup. Neither the repository nor the images carry the full text. See [Open points](#open-points). The same identifier appears in the root `package.json` (`license`) and in `publiccode.yml` (`legal.license`).
+- **License.** EUPL-1.2. The [LICENSE](LICENSE) file is a short notice that links to the full text on Joinup. Neither the repository nor the images carry the full text. See [Open points](#open-points). The same identifier appears in `publiccode.yml` (`legal.license`).
 - **Copyright owner.** `publiccode.yml` names the Dipartimento per la Trasformazione Digitale (Italian Department for Digital Transformation) as `mainCopyrightOwner`.
 - **Contributions.** Contributions come in under the same license: inbound equals outbound. See [CONTRIBUTING.md](CONTRIBUTING.md#license-of-contributions).
-- **Component manifests.** Some component manifests carry their own `license` field:
-  - `lobby/package.json`, `infra/recorder/package.json` and `infra/captions/gateway/package.json` declare `EUPL-1.2`.
-  - `app/package.json` and `infra/recorder-controller/package.json` declare no license.
+- **npm manifests.** Every `package.json` in the repository declares `EUPL-1.2` in its `license` field: the root, the `app` and `lobby` workspaces, and the recorder, recorder controller and captions gateway services.
 
 ## License policy
 
@@ -21,9 +19,9 @@ A third-party component may be used only if PA Webinar stays distributable under
 
 | Group | Examples | Position |
 |---|---|---|
-| Permissive | MIT, MIT-0, ISC, BSD-2-Clause, BSD-3-Clause, 0BSD, Apache-2.0, CC0-1.0, CC-BY-4.0, BlueOak-1.0.0, Python-2.0, Unlicense, Zlib, BSL-1.0 | Accepted. These licenses let a combined work be distributed under another license, EUPL included, provided their notices are kept. |
+| Permissive | MIT, MIT-0, ISC, BSD-2-Clause, BSD-3-Clause, 0BSD, Apache-2.0, CC0-1.0, CC-BY-3.0, CC-BY-4.0, BlueOak-1.0.0, Python-2.0, Unlicense, Zlib, BSL-1.0 | Accepted. These licenses let a combined work be distributed under another license, EUPL included, provided their notices are kept. |
 | Weak copyleft | LGPL-2.1, LGPL-3.0, MPL-2.0 | Accepted case by case, when the component stays a separate library that PA Webinar does not modify. Its own files keep its license, and the rest of PA Webinar stays under EUPL. Each accepted case is listed under [npm licenses assessed individually](#npm-licenses-assessed-individually). |
-| Strong copyleft and source-available | GPL-2.0, GPL-3.0, AGPL-3.0, SSPL-1.0 | Not accepted in the portal's production dependencies. |
+| Strong copyleft and source-available | GPL-2.0, GPL-3.0, AGPL-3.0, SSPL-1.0 | Not accepted in the production npm dependencies of the portal and the Node services. |
 
 ### How the EUPL compatibility clause fits
 
@@ -31,13 +29,13 @@ Article 5 of the EUPL contains a compatibility clause. Suppose a derivative work
 
 This has three consequences for the policy:
 
-- **The appendix is not an allow-list.** It names the licenses a combined work may be moved to. Permissive licenses are absent from it because they need no such clause: they already allow relicensing.
-- **Some listed licenses are blocked on purpose.** GPL-2.0, GPL-3.0 and AGPL-3.0 are in the appendix, yet the CI license check is configured to block them in production dependencies (see [Limits of the automated check](#limits-of-the-automated-check)). If PA Webinar relied on the clause, the combined work would have to be distributed under the GPL or the AGPL, and PA Webinar would no longer be distributable under EUPL.
-- **SSPL-1.0 is not in the appendix.** The clause offers no route for it, and the CI check is configured to block it as well.
+- The appendix names the licenses a combined work may be moved to, so it is not an allow-list. Permissive licenses are absent from it because they need no such clause: they already allow relicensing.
+- GPL-2.0, GPL-3.0 and AGPL-3.0 are in the appendix, yet the CI license check blocks them in production dependencies on purpose (see [Limits of the automated check](#limits-of-the-automated-check)). If PA Webinar relied on the clause, the combined work would have to be distributed under the GPL or the AGPL, and PA Webinar would no longer be distributable under EUPL.
+- SSPL-1.0 is not in the appendix. The clause offers no route for it, and the CI check blocks it as well.
 
 ## Enforcement
 
-A dependency change goes through two CI steps before it reaches `main`, and a reviewer reads the change to the license report. The pre-commit Git hook runs the same two steps when a lockfile is staged ([Git hooks](docs/development/methodology.md#git-hooks)).
+A dependency change goes through two CI steps before it reaches `main`, and a reviewer reads the change to the license report. The pre-commit Git hook runs the first step when a `package.json` or `package-lock.json` is staged, and the second when the root `package-lock.json` is ([Git hooks](docs/development/methodology.md#git-hooks)).
 
 ```mermaid
 flowchart LR
@@ -88,9 +86,9 @@ A new weak-copyleft dependency passes the check, but it is accepted case by case
 
 The rules have tests (`npm run test:scripts`), which the Lint & Typecheck job runs.
 
-**Step 2** keeps the report honest. When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
+**Step 2** fails when the committed report no longer matches the installed tree. When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
 
-**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Step 1 also covers Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`. Updates to the AI worker's Python requirements are covered by no license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
+Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Step 1 also covers Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`. Updates to the AI worker's Python requirements are covered by no license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
 
 ### Limits of the automated check
 
@@ -174,7 +172,7 @@ These entries in `license-report.json` need a reason to be accepted. Every other
 | Package | License | How PA Webinar uses it | Assessment |
 |---|---|---|---|
 | libvips (`@img/sharp-libvips-*`, and compiled into `@img/sharp-wasm32`) | LGPL-3.0-or-later | `sharp` (Apache-2.0) loads libvips as a separate shared library (`libvips-cpp.so`) for Next.js image optimization. `sharp` is an optional dependency of both the app and `next`, and the standalone build copies it and its libvips package into the app image. The migration image carries them too. | Dynamic linking to an unmodified library. Whoever distributes the image also distributes libvips in object form, together with the LGPL's conditions for doing so: the license text, a notice, and access to the library's source, which upstream publishes. The platform packages are missing from the report but listed in the image SBOM (see [Release SBOMs](#release-sboms)). |
-| `axe-core` | MPL-2.0 | Development only. It arrives transitively through `eslint-config-next` and `eslint-plugin-jsx-a11y`. | Not in the runtime image. The migration image contains it unmodified, so the MPL's file-level terms are met by keeping its notices. |
+| `axe-core`, `@axe-core/playwright` | MPL-2.0 | Development only. `@axe-core/playwright` is a development dependency of the app, for the accessibility checks in the end-to-end tests, and brings `axe-core`, which also arrives through `eslint-config-next` and `eslint-plugin-jsx-a11y`. | Not in the runtime image. The migration image contains them unmodified, so the MPL's file-level terms are met by keeping their notices. |
 | `dompurify` | MPL-2.0 OR Apache-2.0 | In production, through `isomorphic-dompurify`, for HTML sanitization. | Dual-licensed. A recipient may take it under Apache-2.0. |
 | `caniuse-lite` | CC-BY-4.0 | Browser-support data, used at build time by `next` and `browserslist`. | The Dockerfile deletes it from the standalone output, so the runtime image does not contain it. The migration image still contains it, and its LICENSE file travels with the package. |
 | `design-react-kit` | reported as `BSD*` | The .italia design system components. | Its manifest says `BSD-3`, which is not an SPDX identifier. Its LICENSE file is BSD-3-Clause. |
@@ -187,9 +185,9 @@ Publishing or redistributing an image distributes everything inside it. Base ima
 |---|---|---|---|
 | Portal | `ghcr.io/italia/pa-webinar:X.Y.Z`, built from `Dockerfile` on `node:20-alpine` (pulled through `mirror.gcr.io` by default) | Node.js: MIT. npm packages: see the report. | The only image with a release SBOM. |
 | Migrations | `ghcr.io/italia/pa-webinar:X.Y.Z-migrate` and `:vX.Y.Z-migrate`, the `builder` stage of the same `Dockerfile` | As the portal, plus the development dependencies | Carries the whole workspace dependency tree, development dependencies included. No SBOM. |
-| Jitsi Meet web | `ghcr.io/italia/pa-webinar-jitsi-web` (`jitsi-meet.web.image` in `values.yaml`), built from `jitsi/web`. `docker-compose.yml` runs stock `jitsi/web:stable`. | Apache-2.0 | Modified third-party code. See [Modified third-party code](#modified-third-party-code). |
-| Prosody | `jitsi/prosody`, through the `jitsi-meet` subchart, or `jitsi/prosody:stable` in `docker-compose.yml` | Prosody: MIT. Image recipe: Apache-2.0. | The module in `infra/jitsi/prosody-plugins/` is PA Webinar's own code. |
-| Jicofo, Jitsi Videobridge (JVB), Jibri | `jitsi/jicofo`, `jitsi/jvb`, `jitsi/jibri`, through the subchart, or `jitsi/jicofo:stable` and `jitsi/jvb:stable` in `docker-compose.yml` | Apache-2.0 | Jibri is off by default (`jitsi-meet.jibri.enabled`). The Jibri image includes Chrome (Google's terms, **to verify** for redistribution) and ffmpeg. |
+| Jitsi Meet web | `ghcr.io/italia/pa-webinar-jitsi-web` (`jitsi-meet.web.image` in `values.yaml`), built from `jitsi/web`. `docker-compose.yml` runs stock `jitsi/web`, pinned to a `stable-<build>` tag. | Apache-2.0 | Modified third-party code. See [Modified third-party code](#modified-third-party-code). |
+| Prosody | `jitsi/prosody`, through the `jitsi-meet` subchart, or `jitsi/prosody` with a `stable-<build>` tag in `docker-compose.yml` | Prosody: MIT. Image recipe: Apache-2.0. | The modules in `infra/jitsi/prosody-plugins/` are PA Webinar's own code. |
+| Jicofo, Jitsi Videobridge (JVB), Jibri | `jitsi/jicofo`, `jitsi/jvb`, `jitsi/jibri`, through the subchart, or `jitsi/jicofo` and `jitsi/jvb` with a `stable-<build>` tag in `docker-compose.yml` | Apache-2.0 | Jibri is off by default (`jitsi-meet.jibri.enabled`). The Jibri image includes Chrome (Google's terms, **to verify** for redistribution) and ffmpeg. |
 | JVB metrics exporter | `systemli/prometheus-jitsi-meet-exporter`, a sidecar the subchart adds to the JVB pod when `jitsi-meet.jvb.metrics.enabled` is set (on in `examples/values-full.yaml` and `values-production.yaml`) | GPL-3.0 | Runs as a separate program in its own container and is not linked with PA Webinar. The subchart's other exporters and Excalidraw are off in every value set the repository ships. |
 | Helm subcharts | `jitsi-meet` (jitsi-contrib), `postgresql` and `redis` (Bitnami), locked in `Chart.lock` | jitsi-helm: MIT. Bitnami charts: Apache-2.0. | |
 | coturn | `coturn/coturn`, through the subchart when `jitsi-meet.coturn.enabled` is set | BSD-3-Clause | |
@@ -278,8 +276,10 @@ The `rhasspy/piper-voices` repository declares MIT. Each voice's `MODEL_CARD` na
 | `fr_FR-tom-medium` | Baked into the image; used for `fr` dubbing | AGPLv3 | **To verify.** A copyleft license on a model file inside a distributed image. It is in the voice pool of every French dub made from the baked voices. |
 | `fr_FR-siwis-medium` | Baked into the image; used for `fr` dubbing | CC-BY 4.0, fine-tuned from `lessac` | Attribution. |
 | `it_IT-paola-medium` | Baked into the image; used for `it` dubbing | Dataset CC0-1.0 (dataset card), fine-tuned from `lessac` | |
-| `de_DE-thorsten-medium` | Not baked. Named in `DEFAULT_VOICES` as the voice to seed under `/models/piper/de/`; used only if the operator seeds it. | CC0, fine-tuned from `lessac` | |
-| `es_ES-davefx-medium` | Not baked. Named in `DEFAULT_VOICES` as the voice to seed under `/models/piper/es/`; used only if the operator seeds it. | CC0, fine-tuned from `lessac` | |
+| `de_DE-thorsten-medium` | Baked into the image; used for `de` dubbing. Also named in `DEFAULT_VOICES` as the voice to seed under `/models/piper/de/`. | CC0, fine-tuned from `lessac` | |
+| `de_DE-kerstin-low` | Baked into the image; used for `de` dubbing | CC0, fine-tuned from `en_US-ryan-low`, whose dataset is CC BY-NC-SA 4.0 | **To verify.** The base voice's data is non-commercial and share-alike. |
+| `es_ES-davefx-medium` | Baked into the image; used for `es` dubbing. Also named in `DEFAULT_VOICES` as the voice to seed under `/models/piper/es/`. | CC0, fine-tuned from `lessac` | |
+| `es_AR-daniela-high` | Baked into the image; used for `es` dubbing | CC BY-SA 4.0 (OpenSLR 61) | **To verify.** Attribution and share-alike. |
 
 The baked voices are listed in `infra/ai/Dockerfile.worker`. The worker builds its pool from every voice in `/models/piper/<lang>/` (the default of `AI_TTS_VOICES_PATH` in `app/src/lib/ai/providers.ts`), or in the baked folder when that is empty; `DEFAULT_VOICES` in `infra/ai/worker/tts.py` only names the voice suggested for seeding. An operator who seeds other voices takes on their terms.
 
@@ -302,7 +302,7 @@ The baked voices are listed in `infra/ai/Dockerfile.worker`. The worker builds i
 Record every new component here, or in `license-report.json` for the npm workspaces, before the change is merged:
 
 - **npm dependency in `app/` or `lobby/`.** Run `npm run license:report` and commit the report with `package-lock.json`. If the new license is not in the permissive group, say so in the pull request and add a row to [npm licenses assessed individually](#npm-licenses-assessed-individually).
-- **npm dependency in `infra/recorder/` or `infra/recorder-controller/`.** The report does not cover these trees. Check the license, and add a note to the component's row if the license is not permissive.
+- **npm dependency in `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/`.** The report does not cover these trees, although `npm run license:check` reads their lockfiles. Check the license, and add a note to the component's row if the license is not permissive.
 - **Python dependency of the AI worker.** Check the PyPI metadata and the source repository. Add a row to [AI stack and model weights](#ai-stack-and-model-weights) if the license is not permissive.
 - **Container image or chart dependency.** Add a row to [Container images and runtime components](#container-images-and-runtime-components). Prefer a pinned tag or digest over `latest` when the license depends on the version.
 - **Model weights or voices.** Read the model card and the license of the training dataset. Record both, and document any gating terms in [docs/POSTPROD.md](docs/POSTPROD.md).
@@ -316,7 +316,7 @@ These points need a decision by the maintainers. Each one is described in the se
 - **Report generator.** It omits platform-specific packages because it assumes they share their parent's license. That assumption does not hold for libvips. The omitted binaries can be seen in the image SBOM. See [The npm report](#the-npm-report-license-reportjson) and [Release SBOMs](#release-sboms).
 - **GPL code in the AI worker image.** `gender-guesser` and espeak-ng (through `piper-phonemize`). See [AI stack and model weights](#ai-stack-and-model-weights).
 - **Non-commercial alignment weights.** The default alignment models for Italian, French, German and Spanish are CC BY-NC 4.0. See [AI stack and model weights](#ai-stack-and-model-weights).
-- **Piper voices.** `fr_FR-tom-medium` is AGPLv3, and several voices descend from `lessac`, whose data is under a research license. See [Piper voices](#piper-voices).
+- **Piper voices.** `fr_FR-tom-medium` is AGPLv3, several voices descend from `lessac`, whose data is under a research license, `de_DE-kerstin-low` descends from `en_US-ryan-low`, whose data is CC BY-NC-SA 4.0, and `es_AR-daniela-high` is trained on CC BY-SA 4.0 data. See [Piper voices](#piper-voices).
 - **Redis license.** The release pinned by the chart is in the Redis 8 line (RSALv2, SSPLv1 or AGPLv3), and Compose uses the 7.4 line (RSALv2 or SSPLv1). No option is permissive. See [Redis](#redis).
 - **Redistribution terms of vendor binaries.** The NVIDIA base image and cuDNN in the worker image, Chrome for Testing in the recorder image, and Chrome in the Jibri image. See [Container images and runtime components](#container-images-and-runtime-components).
 - **Change notice in the patched Jitsi bundle.** See [Modified third-party code](#modified-third-party-code).
