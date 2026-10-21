@@ -284,6 +284,36 @@ describe('il campo vuoto', () => {
   });
 });
 
+describe("l'anteprima di un valore salvato", () => {
+  it('un documento con un indirizzo http(s) o del sito si apre dal link', () => {
+    disegna(<Modulo iniziale="/api/assets/materiali/slide.pdf" assetType="document" />);
+    expect(container.querySelector('a.campo-file__nome')?.getAttribute('href')).toBe(
+      '/api/assets/materiali/slide.pdf'
+    );
+  });
+
+  it("un altro indirizzo non finisce in un link o in un'immagine, neanche se arriva dal valore", () => {
+    for (const [valore, tipo] of [
+      ['javascript:alert(1)', 'document'],
+      ['data:text/html,<b>x</b>', 'document'],
+      ['/\\altro.example/a.pdf', 'document'],
+      ['javascript:alert(1)', 'image'],
+    ] as const) {
+      disegna(<Modulo iniziale={valore} assetType={tipo} />);
+      const attributi = Array.from(container.querySelectorAll('[href], [src]')).map(
+        (el) => el.getAttribute('href') ?? el.getAttribute('src')
+      );
+      expect(attributi).not.toContain(valore);
+    }
+  });
+
+  it("un'immagine incorporata nelle impostazioni resta visibile", () => {
+    const dati = 'data:image/png;base64,iVBORw0KGgo=';
+    disegna(<Modulo iniziale={dati} />);
+    expect(container.querySelector(`img[src="${dati}"]`)).not.toBeNull();
+  });
+});
+
 describe('trascinare un file', () => {
   it('un file rilasciato sul riquadro si carica', async () => {
     disegna(<Modulo />);
@@ -667,7 +697,13 @@ describe('il link', () => {
 
   it('un file del portale tolto da fuori non resta in vista', () => {
     const campo = (v: string | null) => (
-      <FileOrUrlInput id="doc" label="Documento" value={v} onChange={vi.fn()} assetType="document" />
+      <FileOrUrlInput
+        id="doc"
+        label="Documento"
+        value={v}
+        onChange={vi.fn()}
+        assetType="document"
+      />
     );
     disegna(campo(`${ORIGINE}/api/assets/document/slide.pdf`));
     expect(container.textContent).toContain('slide.pdf');
@@ -682,7 +718,13 @@ describe('il link', () => {
       const [v, setV] = useState<string | null>(null);
       azzera = () => setV(null);
       return (
-        <FileOrUrlInput id="doc" label="Documento" value={v} onChange={setV} assetType="document" />
+        <FileOrUrlInput
+          id="doc"
+          label="Documento"
+          value={v}
+          onChange={setV}
+          assetType="document"
+        />
       );
     }
     disegna(<Azzerabile />);

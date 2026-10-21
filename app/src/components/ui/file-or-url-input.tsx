@@ -175,6 +175,20 @@ export function formatoLeggibile(rapporto: number): string {
   return rapporto.toFixed(2);
 }
 
+/**
+ * L'anteprima come indirizzo da mettere in un link, un'immagine o un audio:
+ * solo http(s), un file scelto ora (`blob:`), un'immagine o un audio
+ * incorporati o un percorso di questo sito, senza barre o spazi che il
+ * browser leggerebbe come un altro host. Il valore arriva gia' validato (dal
+ * server o da `linkValido`), ma qui finisce in un attributo della pagina: un
+ * altro indirizzo non ci arriva, e l'anteprima risulta rotta.
+ */
+const SCHEMI_ANTEPRIMA =
+  /^(https?:\/\/|blob:|data:(image|audio)\/|\/(?![\/\\])(?=[^\s\\]*$))/i;
+function indirizzoSicuro(url: string | null): string | undefined {
+  return url && SCHEMI_ANTEPRIMA.test(url) ? url : undefined;
+}
+
 /** Un file servito dal portale (`/api/assets/…`): conta come caricato. */
 function daCaricamento(url: string | null | undefined): boolean {
   if (!url) return false;
@@ -489,7 +503,10 @@ export default function FileOrUrlInput({
   // Un'immagine che non si carica. Non vale per quelle di altri siti, che la
   // CSP blocca comunque: per quelle c'e' gia' l'avviso (o il solo nome).
   const anteprimaRotta =
-    !!anteprima && rotta === anteprima && !esterna && !senzaAnteprima;
+    !!anteprima &&
+    (rotta === anteprima || !indirizzoSicuro(anteprima)) &&
+    !esterna &&
+    !senzaAnteprima;
   const caricatoOra = caricato && caricato.url === value ? caricato : null;
 
   const nomeMostrato = caricatoOra?.nome ?? (anteprima ? nomeDaUrl(anteprima) : null);
@@ -913,7 +930,7 @@ export default function FileOrUrlInput({
       ref={(el) => {
         if (el?.complete) misuraDa(src, el);
       }}
-      src={src}
+      src={indirizzoSicuro(src)}
       alt={t('previewAlt', { label })}
       className={className}
       onLoad={(e) => misuraDa(src, e.currentTarget)}
@@ -1041,7 +1058,7 @@ export default function FileOrUrlInput({
           {sopra && piena && anteprima && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={anteprima}
+              src={indirizzoSicuro(anteprima)}
               alt=""
               className="campo-file__immagine campo-file__immagine--attesa"
             />
@@ -1113,7 +1130,7 @@ export default function FileOrUrlInput({
           {assetType === 'document' ? (
             <a
               className="campo-file__nome"
-              href={anteprima}
+              href={indirizzoSicuro(anteprima)}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -1258,7 +1275,11 @@ export default function FileOrUrlInput({
         {rigaPiena}
         {rigaSenzaCaricamento}
         {assetType === 'audio' && piena && anteprima && !invio && (
-          <audio controls src={anteprima} className="campo-file__audio" />
+          <audio
+            controls
+            src={indirizzoSicuro(anteprima)}
+            className="campo-file__audio"
+          />
         )}
         {noteImmagine.map((n) => (
           <p key={n} className="campo-file__nota">
