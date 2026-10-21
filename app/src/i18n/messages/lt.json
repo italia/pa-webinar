@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Jau užsiregistravote? Prisijunkite asmenine nuoroda iš el. laiško.",
       "willBeRecorded": "Renginys bus įrašomas.",
       "machineTranslation": "Automatinis vertimas",
-      "machineTranslationNote": "Pavadinimą ir aprašymą išvertė automatinis modelis, ir niekas jų dar neperžiūrėjo."
+      "machineTranslationNote": "Pavadinimą ir aprašymą išvertė automatinis modelis, ir niekas jų dar neperžiūrėjo.",
+      "previewTitle": "Peržiūra komandai",
+      "previewBody": "Įrašas dar nepaskelbtas: šią puslapio versiją mato tik renginį valdantys asmenys.",
+      "recordingForRegistrantsTitle": "Įrašas tik užsiregistravusiems",
+      "recordingForRegistrantsBody": "Jei užsiregistravote į renginį, atidarykite asmeninę nuorodą iš el. laiško „įrašas pasiekiamas“ arba paprašykite atsiųsti ją dar kartą.",
+      "recordingLinkEmailLabel": "El. paštas, kuriuo užsiregistravote",
+      "recordingLinkSend": "Atsiųskite nuorodą dar kartą",
+      "recordingLinkSent": "Jei adresas užregistruotas renginyje, netrukus gausite el. laišką su asmenine nuoroda.",
+      "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Sinchronizuotos skaidrės",
     "deleteConfirmTitle": "Ištrinti įrašą",
     "deleteFailed": "Ištrinti nepavyko",
-    "deleteSuccess": "Įrašas ištrintas"
+    "deleteSuccess": "Įrašas ištrintas",
+    "previewPublicPage": "Viešo puslapio peržiūra",
+    "audienceLabel": "Kas gali matyti įrašą",
+    "audiencePublic": "Visi",
+    "audiencePublicDesc": "Bet kas, kas atidaro renginio puslapį. Gali būti rodomas videotekoje.",
+    "audienceRegistrants": "Tik užsiregistravę",
+    "audienceRegistrantsDesc": "Užsiregistravusieji į renginį, net jei neįėjo į kambarį, per asmeninę nuorodą iš el. pašto pranešimo. Videotekoje nerodomas.",
+    "saveFailed": "Pakeitimas neišsaugotas. Bandykite dar kartą."
   },
   "postEvent": {
     "config": "Po renginio konfigūracija",

@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Allerede tilmeldt? Brug det personlige link fra din e-mail.",
       "willBeRecorded": "Arrangementet bliver optaget.",
       "machineTranslation": "Automatisk oversættelse",
-      "machineTranslationNote": "Titel og beskrivelse er oversat af en automatisk model, og ingen har gennemlæst dem endnu."
+      "machineTranslationNote": "Titel og beskrivelse er oversat af en automatisk model, og ingen har gennemlæst dem endnu.",
+      "previewTitle": "Forhåndsvisning for teamet",
+      "previewBody": "Optagelsen er endnu ikke offentliggjort: kun dem, der administrerer begivenheden, ser denne version af siden.",
+      "recordingForRegistrantsTitle": "Optagelse kun for tilmeldte",
+      "recordingForRegistrantsBody": "Hvis du tilmeldte dig begivenheden, så åbn det personlige link i e-mailen \"optagelse tilgængelig\", eller få det sendt igen.",
+      "recordingLinkEmailLabel": "E-mail, du tilmeldte dig med",
+      "recordingLinkSend": "Send mig linket igen",
+      "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
+      "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synkroniserede slides",
     "deleteConfirmTitle": "Slet optagelse",
     "deleteFailed": "Sletningen mislykkedes",
-    "deleteSuccess": "Optagelsen er slettet"
+    "deleteSuccess": "Optagelsen er slettet",
+    "previewPublicPage": "Forhåndsvisning af den offentlige side",
+    "audienceLabel": "Hvem kan se optagelsen",
+    "audiencePublic": "Alle",
+    "audiencePublicDesc": "Alle, der åbner begivenhedens side. Den kan vises i videoteket.",
+    "audienceRegistrants": "Kun tilmeldte",
+    "audienceRegistrantsDesc": "Dem, der har tilmeldt sig begivenheden, også selvom de ikke kom ind i rummet, via det personlige link i e-mailbeskeden. Den vises ikke i videoteket.",
+    "saveFailed": "Ændringen blev ikke gemt. Prøv igen."
   },
   "postEvent": {
     "config": "Konfiguration efter begivenhed",

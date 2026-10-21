@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Már jelentkezett? Lépjen be az e-mailben kapott személyes linkkel.",
       "willBeRecorded": "Az eseményt rögzítik.",
       "machineTranslation": "Automatikus fordítás",
-      "machineTranslationNote": "A címet és a leírást egy automatikus modell fordította, és még senki sem ellenőrizte."
+      "machineTranslationNote": "A címet és a leírást egy automatikus modell fordította, és még senki sem ellenőrizte.",
+      "previewTitle": "Előnézet a csapatnak",
+      "previewBody": "A felvétel még nincs közzétéve: az oldal ezen változatát csak az esemény kezelői látják.",
+      "recordingForRegistrantsTitle": "A felvétel csak a regisztráltaknak szól",
+      "recordingForRegistrantsBody": "Ha regisztráltál az eseményre, nyisd meg a „felvétel elérhető” e-mailben kapott személyes linket, vagy kérd újra.",
+      "recordingLinkEmailLabel": "A regisztrációhoz használt e-mail-cím",
+      "recordingLinkSend": "Küldjétek újra a linket",
+      "recordingLinkSent": "Ha a cím regisztrálva van az eseményre, hamarosan kapsz egy e-mailt a személyes linkkel.",
+      "recordingLinkError": "A kérés nem sikerült. Próbáld újra néhány perc múlva."
     },
     "manage": {
       "toggleChat": "Csevegés",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Szinkronizált diák",
     "deleteConfirmTitle": "Felvétel törlése",
     "deleteFailed": "A törlés nem sikerült",
-    "deleteSuccess": "A felvétel törölve"
+    "deleteSuccess": "A felvétel törölve",
+    "previewPublicPage": "A nyilvános oldal előnézete",
+    "audienceLabel": "Ki láthatja a felvételt",
+    "audiencePublic": "Mindenki",
+    "audiencePublicDesc": "Bárki, aki megnyitja az esemény oldalát. Megjelenhet a videótárban.",
+    "audienceRegistrants": "Csak a regisztráltak",
+    "audienceRegistrantsDesc": "Akik regisztráltak az eseményre, akkor is, ha nem léptek be a terembe, az e-mailes értesítés személyes linkjén keresztül. Nem jelenik meg a videótárban.",
+    "saveFailed": "A módosítás nem mentődött el. Próbáld újra."
   },
   "postEvent": {
     "config": "Esemény utáni konfiguráció",

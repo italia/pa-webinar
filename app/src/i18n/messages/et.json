@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Juba registreerunud? Kasuta e-kirjas saadud isiklikku linki.",
       "willBeRecorded": "Üritus salvestatakse.",
       "machineTranslation": "Automaatne tõlge",
-      "machineTranslationNote": "Pealkirja ja kirjelduse tõlkis automaatne mudel ja keegi ei ole neid veel üle vaadanud."
+      "machineTranslationNote": "Pealkirja ja kirjelduse tõlkis automaatne mudel ja keegi ei ole neid veel üle vaadanud.",
+      "previewTitle": "Eelvaade meeskonnale",
+      "previewBody": "Salvestust pole veel avaldatud: seda lehe versiooni näevad ainult ürituse haldajad.",
+      "recordingForRegistrantsTitle": "Salvestus ainult registreerunutele",
+      "recordingForRegistrantsBody": "Kui registreerusid üritusele, ava e-kirja „salvestus on saadaval“ isiklik link või palu see uuesti saata.",
+      "recordingLinkEmailLabel": "E-post, millega registreerusid",
+      "recordingLinkSend": "Saada link uuesti",
+      "recordingLinkSent": "Kui aadress on üritusele registreeritud, saad peagi e-kirja oma isikliku lingiga.",
+      "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Sünkroonitud slaidid",
     "deleteConfirmTitle": "Kustuta salvestis",
     "deleteFailed": "Kustutamine ebaõnnestus",
-    "deleteSuccess": "Salvestis kustutatud"
+    "deleteSuccess": "Salvestis kustutatud",
+    "previewPublicPage": "Avaliku lehe eelvaade",
+    "audienceLabel": "Kes saab salvestust näha",
+    "audiencePublic": "Kõik",
+    "audiencePublicDesc": "Igaüks, kes avab ürituse lehe. Võib ilmuda videoteeki.",
+    "audienceRegistrants": "Ainult registreerunud",
+    "audienceRegistrantsDesc": "Üritusele registreerunud, ka siis, kui nad ruumi ei sisenenud, e-posti teate isikliku lingi kaudu. Ei ilmu videoteeki.",
+    "saveFailed": "Muudatust ei salvestatud. Proovi uuesti."
   },
   "postEvent": {
     "config": "Üritusejärgne seadistus",

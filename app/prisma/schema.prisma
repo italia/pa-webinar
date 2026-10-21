@@ -167,6 +167,11 @@ model Event {
   recordingUrl             String?   @map("recording_url")
   recordingPublished       Boolean   @default(false) @map("recording_published")
   recordingPublishedAt     DateTime? @map("recording_published_at")
+  // Chi vede la registrazione pubblicata e i suoi derivati (trascrizione,
+  // sintesi, traduzioni, slide): tutti, o solo gli iscritti all'evento
+  // (anche chi non e' mai entrato in sala) e lo staff che lo gestisce.
+  // Regola unica in lib/recording/audience.ts.
+  recordingAudience        RecordingAudience @default(PUBLIC) @map("recording_audience")
   // Avviso agli iscritti quando la registrazione diventa visibile sulla pagina
   // pubblica (lib/events/recording-notify): acceso di predefinito, parte una
   // volta sola; `recordingNotifiedAt` e' quando e' partito.
@@ -1634,6 +1639,11 @@ enum HomePageMode {
 }
 
 // Chi puo' partecipare a un evento (Event.accessMode).
+enum RecordingAudience {
+  PUBLIC
+  REGISTRANTS
+}
+
 enum EventAccessMode {
   OPEN // iscrizione aperta a chiunque
   INVITATION // solo gli invitati, niente ingresso da ospite

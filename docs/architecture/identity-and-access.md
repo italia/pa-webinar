@@ -569,6 +569,7 @@ The role prefix comes from the account **at the time of the action**, not from t
 |---|---|---|---|---|
 | `admin_session` | `POST /api/admin/login`, `POST /api/staff/login-link/verify`, `POST /api/admin/refresh` | HS256 JWT: `role`, plus `sub` for accounts | 24-hour cookie, 6-hour token | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
 | `event_access_<eventId>` | `POST /api/events/{slug}/registrations`, or `GET /api/events/{slug}/registrations/enter` with a valid signature ([Registrants](#registrants)) | HS256 JWT: `eventId`, the access token, and `ev: true` when the cookie comes from the entry link | Until 6 hours after the event ends, clamped between 1 hour and 30 days | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
+| `recording_access_<eventId>` | `GET /api/events/{slug}/recording/access` with a valid viewing token (`lib/recording/viewing.ts`) | The viewing token: base64url `<eventId>:<registrationId>` signed with HMAC-SHA256 for the viewing scope; valid while the registration exists | 180 days | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
 | `join_granted_<eventId>` | `POST /api/events/{slug}/verify-password` | HS256 JWT: `eventId`, `role: "guest"` | 12 hours | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
 | `NEXT_LOCALE` | The next-intl middleware | The interface language code | Browser session | `SameSite=Lax`. Set only when the page language differs from the browser's preferred language or from an earlier value |
 

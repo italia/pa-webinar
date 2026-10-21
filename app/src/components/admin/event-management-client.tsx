@@ -172,6 +172,7 @@ interface EventData {
   expectedSenderRatioPct: number | null;
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
+  recordingAudience: 'PUBLIC' | 'REGISTRANTS';
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
   youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
   /** La registrazione del video dell'evento, quando in sala si è presentato un
@@ -1619,6 +1620,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             tempRecordingStartedAt: event.tempRecordingStartedAt,
             recordingPublished: event.recordingPublished,
             recordingPublishedAt: event.recordingPublishedAt,
+            recordingAudience: event.recordingAudience,
             recordingFileSize: event.recordingFileSize,
             recordingDuration: event.recordingDuration,
             recordingDeleteAfterDays: event.recordingDeleteAfterDays,

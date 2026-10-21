@@ -22,6 +22,7 @@ import { lingueIscrizione } from '@/lib/email/lingua';
 import { recordingPublishedEmail } from '@/lib/email/templates';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
+import { issueViewingToken, viewingLinkUrl } from '@/lib/recording/viewing';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -53,6 +54,9 @@ export async function notifyPublishedRecordings(opts: {
       endsAt: true,
       postEventPublic: true,
       postEventPublicUntil: true,
+      recordingAudience: true,
+      recordingPublished: true,
+      transcriptPublished: true,
     },
   });
 
@@ -87,7 +91,7 @@ export async function notifyPublishedRecordings(opts: {
         const mail = recordingPublishedEmail({
           locale: testi,
           eventTitle: getLocalized(event.title as LocalizedField, pagina),
-          eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
+          eventPageUrl: linkRegistrazione(baseUrl, event, reg.id, pagina),
           siteName,
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, pagina),
         });
@@ -110,4 +114,29 @@ export async function notifyPublishedRecordings(opts: {
   }
 
   return { eventsNotified, emailsQueued, emailsFailed };
+}
+
+/**
+ * Il link dell'avviso: la pagina dell'evento; per una registrazione riservata
+ * agli iscritti il link personale della visione (lib/recording/viewing), che
+ * posa il cookie e porta alla stessa pagina. Un evento con il solo video su
+ * YouTube non ha niente di riservato: va alla pagina.
+ */
+function linkRegistrazione(
+  baseUrl: string,
+  event: {
+    id: string;
+    slug: string;
+    recordingAudience: 'PUBLIC' | 'REGISTRANTS';
+    recordingPublished: boolean;
+    transcriptPublished: boolean;
+  },
+  registrationId: string,
+  pagina: string,
+): string {
+  const riservata =
+    event.recordingAudience === 'REGISTRANTS' && (event.recordingPublished || event.transcriptPublished);
+  const token = riservata ? issueViewingToken(event.id, registrationId) : null;
+  if (!token) return localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
+  return viewingLinkUrl(baseUrl, event.slug, token, pagina);
 }

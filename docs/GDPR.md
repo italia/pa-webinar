@@ -423,6 +423,7 @@ PA Webinar sets only first-party, functional cookies. None is used for analytics
 |---|---|---|---|
 | `admin_session` | Staff | Keeps a staff member signed in | 24-hour cookie holding a 6-hour token, `SameSite=Lax` |
 | `event_access_<eventId>` | The browser that registered, or the browser that opened a personal link from an email built while the event's registration was by invitation only | Lets a registrant return to the room without the link, and binds the registrant's name and transcription consent to that browser. Once the browser has opened the personal link from an email, it also records that the address was proved, which the profile photo requires | Until 6 hours after the event ends, between 1 hour and 30 days, `SameSite=Lax` |
+| `recording_access_<eventId>` | A registrant who opens the personal link of the "recording available" email, for a recording reserved to registrants | Lets the registrant watch the recording and what comes from it. It holds a signed reference to the registration and nothing else, and stops working when the registration is deleted | 180 days, `SameSite=Lax` |
 | `join_granted_<eventId>` | Anyone who enters an event password | Remembers the correct password for that event | 12 hours, `SameSite=Lax` |
 | `NEXT_LOCALE` | Visitors whose page language differs from the browser's | Remembers the interface language | Browser session, `SameSite=Lax` |
 

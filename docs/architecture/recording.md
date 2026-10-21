@@ -718,6 +718,25 @@ stateDiagram-v2
   from a fixed list of options. A published video is exempt from the event's
   data retention: it lives until it is deleted by hand or until
   `recordingDeleteAfterDays` have passed since publication.
+- **Audience.** `Event.recordingAudience` says who sees a published recording
+  and what comes from it (the video, the transcript, the summary, the
+  translations, the dubbing, the slides beside the video): `PUBLIC`, anyone
+  who opens the event page, or `REGISTRANTS`, people who registered for the
+  event, including those who never joined the room. One rule decides it,
+  `lib/recording/audience.ts`, and the event page, the player
+  (`/api/events/<slug>/recording`), the slides and the post-production routes
+  all apply it. A registrant proves the registration with the event access
+  cookie, which lasts until a few hours after the event, or with the viewing
+  cookie (`recording_access_<eventId>`): the "recording available" email sends
+  each registrant a personal link, `/api/events/<slug>/recording/access?t=…`,
+  that sets it. The link is signed for viewing only and does not open the
+  room; it stops working when the registration is deleted. The responses that
+  shared caches keep (`/api/events`, `/api/events/<slug>`, the video library)
+  carry a recording only when its audience is `PUBLIC`, and the video library
+  lists only those. The staff who manage the event see the recording before
+  it is published: the recording panel links to the event page with
+  `?anteprima=1`, which shows the page as it will be published, with a notice,
+  and is not indexed.
 - **Deleted.** `DELETE /api/events/<slug>/recording` (moderator link) removes
   the stored objects, clears the event's recording fields and writes a
   `RECORDING_DELETED` entry to the GDPR audit log. The cleanup job deletes the

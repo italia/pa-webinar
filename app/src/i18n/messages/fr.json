@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Déjà inscrit ? Entrez avec le lien personnel reçu par e-mail.",
       "willBeRecorded": "L'événement sera enregistré.",
       "machineTranslation": "Traduction automatique",
-      "machineTranslationNote": "Le titre et la description ont été traduits par un modèle automatique et personne ne les a encore relus."
+      "machineTranslationNote": "Le titre et la description ont été traduits par un modèle automatique et personne ne les a encore relus.",
+      "previewTitle": "Aperçu réservé à l'équipe",
+      "previewBody": "L'enregistrement n'est pas encore publié : seules les personnes qui gèrent l'événement voient cette version de la page.",
+      "recordingForRegistrantsTitle": "Enregistrement réservé aux inscrits",
+      "recordingForRegistrantsBody": "Si vous vous êtes inscrit à l'événement, ouvrez le lien personnel de l'e-mail « enregistrement disponible », ou demandez à le recevoir à nouveau.",
+      "recordingLinkEmailLabel": "E-mail utilisé pour l'inscription",
+      "recordingLinkSend": "Renvoyez-moi le lien",
+      "recordingLinkSent": "Si l'adresse est inscrite à l'événement, vous recevrez sous peu un e-mail avec votre lien personnel.",
+      "recordingLinkError": "La demande a échoué. Réessayez dans quelques minutes."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Diapositives synchronisées",
     "deleteConfirmTitle": "Supprimer l'enregistrement",
     "deleteFailed": "Échec de la suppression",
-    "deleteSuccess": "Enregistrement supprimé"
+    "deleteSuccess": "Enregistrement supprimé",
+    "previewPublicPage": "Aperçu de la page publique",
+    "audienceLabel": "Qui peut voir l'enregistrement",
+    "audiencePublic": "Tout le monde",
+    "audiencePublicDesc": "Toute personne qui ouvre la page de l'événement. Il peut apparaître dans la vidéothèque.",
+    "audienceRegistrants": "Inscrits uniquement",
+    "audienceRegistrantsDesc": "Les personnes inscrites à l'événement, même sans être entrées dans la salle, via le lien personnel de l'avis par e-mail. Il n'apparaît pas dans la vidéothèque.",
+    "saveFailed": "Modification non enregistrée. Réessayez."
   },
   "postEvent": {
     "config": "Configuration post-événement",

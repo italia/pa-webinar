@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Te-ai înscris deja? Intră cu linkul personal primit pe e-mail.",
       "willBeRecorded": "Evenimentul va fi înregistrat.",
       "machineTranslation": "Traducere automată",
-      "machineTranslationNote": "Titlul și descrierea au fost traduse de un model automat și nimeni nu le-a revizuit încă."
+      "machineTranslationNote": "Titlul și descrierea au fost traduse de un model automat și nimeni nu le-a revizuit încă.",
+      "previewTitle": "Previzualizare pentru echipă",
+      "previewBody": "Înregistrarea nu este încă publicată: doar cei care gestionează evenimentul văd această versiune a paginii.",
+      "recordingForRegistrantsTitle": "Înregistrare rezervată înscrișilor",
+      "recordingForRegistrantsBody": "Dacă te-ai înscris la eveniment, deschide linkul personal din e-mailul „înregistrare disponibilă” sau cere să ți-l trimitem din nou.",
+      "recordingLinkEmailLabel": "E-mailul cu care te-ai înscris",
+      "recordingLinkSend": "Retrimite-mi linkul",
+      "recordingLinkSent": "Dacă adresa este înscrisă la eveniment, vei primi în curând un e-mail cu linkul personal.",
+      "recordingLinkError": "Cererea nu a reușit. Încearcă din nou peste câteva minute."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Diapozitive sincronizate",
     "deleteConfirmTitle": "Șterge înregistrarea",
     "deleteFailed": "Ștergerea nu a reușit",
-    "deleteSuccess": "Înregistrare ștearsă"
+    "deleteSuccess": "Înregistrare ștearsă",
+    "previewPublicPage": "Previzualizarea paginii publice",
+    "audienceLabel": "Cine poate vedea înregistrarea",
+    "audiencePublic": "Toată lumea",
+    "audiencePublicDesc": "Oricine deschide pagina evenimentului. Poate apărea în videotecă.",
+    "audienceRegistrants": "Doar înscrișii",
+    "audienceRegistrantsDesc": "Cei înscriși la eveniment, chiar dacă nu au intrat în sală, prin linkul personal din notificarea pe e-mail. Nu apare în videotecă.",
+    "saveFailed": "Modificarea nu a fost salvată. Încearcă din nou."
   },
   "postEvent": {
     "config": "Configurare post-eveniment",

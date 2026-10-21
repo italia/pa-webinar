@@ -9,11 +9,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * mostra accanto al video (ricalcolato a ogni richiesta), letto lato server
  * con un URL firmato che non esce dalla rotta.
  */
-const { storage, slides } = vi.hoisted(() => ({
+const { storage, slides, accesso } = vi.hoisted(() => ({
   storage: {
     current: null as null | { getDownloadUrl: ReturnType<typeof vi.fn> },
   },
   slides: { publicSlideFileKey: vi.fn() },
+  accesso: { accessoRegistrazione: vi.fn() },
 }));
 
 vi.mock('@/lib/db', () => ({
@@ -23,6 +24,8 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/storage', () => ({ getFilesStorage: () => storage.current }));
 vi.mock('@/lib/presentation/recording-slides-data', () => slides);
+vi.mock('@/lib/recording/audience', () => accesso);
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
 
 import { prisma } from '@/lib/db';
 
@@ -69,6 +72,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   storage.current = { getDownloadUrl: vi.fn().mockResolvedValue(SAS) };
   mockedEvent.mockResolvedValue(evento());
+  accesso.accessoRegistrazione.mockResolvedValue('pubblico');
   slides.publicSlideFileKey.mockImplementation(async (_e: unknown, m: string) =>
     m === MATERIAL_ID ? KEY : null
   );
@@ -126,6 +130,24 @@ describe('GET /api/events/[slug]/recording/slides', () => {
     mockedEvent.mockResolvedValue(evento({ status: 'DRAFT' }));
     expect((await GET(req(), ctx())).status).toBe(404);
     expect(slides.publicSlideFileKey).not.toHaveBeenCalled();
+  });
+
+  it('registrazione riservata agli iscritti, senza prova: 404 prima di calcolare le slide', async () => {
+    accesso.accessoRegistrazione.mockResolvedValue(null);
+    const res = await GET(req(), ctx());
+    expect(res.status).toBe(404);
+    expect(slides.publicSlideFileKey).not.toHaveBeenCalled();
+  });
+
+  it('lo staff in anteprima vede le slide del video non ancora pubblicato', async () => {
+    mockedEvent.mockResolvedValue(evento({ recordingPublished: false }));
+    accesso.accessoRegistrazione.mockResolvedValue('staff');
+    const res = await GET(req(), ctx());
+    expect(res.status).toBe(200);
+    expect(slides.publicSlideFileKey).toHaveBeenCalledWith(
+      expect.objectContaining({ recordingPublished: true }),
+      MATERIAL_ID,
+    );
   });
 
   it('evento inesistente: 404', async () => {

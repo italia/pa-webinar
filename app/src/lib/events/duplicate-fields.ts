@@ -104,6 +104,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'postEventShowWordCloud',
   'postEventEmailEnabled',
   'recordingNotifyEnabled',
+  'recordingAudience',
   'libraryListed',
 
   // series

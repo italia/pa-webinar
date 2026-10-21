@@ -21,6 +21,8 @@ import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
+import { isEventManager } from '@/lib/auth/staff-session';
+import { accessoRegistrazione, pubblicazioneAperta } from '@/lib/recording/audience';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -37,13 +39,16 @@ export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ invalidToken?: string; valuta?: string }>;
+  searchParams?: Promise<{ invalidToken?: string; valuta?: string; anteprima?: string }>;
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  // L'anteprima per lo staff non si indicizza.
+  const inAnteprima = (await searchParams)?.anteprima === '1';
   const locale = await getLocale();
   const settings = await (await import('@/lib/settings')).getSettings();
 
@@ -68,6 +73,7 @@ export async function generateMetadata({
 
   return {
     ...anteprima,
+    ...(inAnteprima && { robots: { index: false, follow: false } }),
     alternates: {
       canonical: pageUrl,
       languages: versioniLinguistiche(`/events/${slug}`, settings.availableLocales),
@@ -122,10 +128,16 @@ export default async function EventDetailPage({
     },
   });
 
+  if (!event) notFound();
+  const cookieStore = await cookies();
+
   // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
   // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
-  // deve trovare un 404. Vedi lib/events/visibility.ts.
-  if (!event || !isEventPageVisible(event)) {
+  // deve trovare un 404. Vedi lib/events/visibility.ts. Lo staff che
+  // gestisce l'evento la apre anche nascosta, in anteprima (`?anteprima=1`).
+  const paginaVisibile = isEventPageVisible(event);
+  const chiedeAnteprima = parametri?.anteprima === '1';
+  if (!paginaVisibile && !(chiedeAnteprima && (await isEventManager(cookieStore, event.id)))) {
     notFound();
   }
 
@@ -135,11 +147,23 @@ export default async function EventDetailPage({
   // Firma VERIFICATA (stesso check di /live), non semplice presenza: un cookie
   // manomesso o firmato con un APP_SECRET ruotato non deve far apparire un
   // link che poi rimbalza.
-  const cookieStore = await cookies();
   const hasRoomAccess = !!(await verifyEventAccess(
     event.id,
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
+
+  // Chi vede la registrazione e cio' che ne deriva (lib/recording/audience):
+  // tutti o i soli iscritti, se pubblicata; lo staff che gestisce l'evento
+  // anche prima, ma solo quando chiede l'anteprima (`?anteprima=1`), cosi'
+  // la pagina che guarda di solito e' quella di tutti.
+  const accesso = event.status === 'ENDED' ? await accessoRegistrazione(event, cookieStore) : null;
+  const aperta = pubblicazioneAperta(event);
+  const previewForStaff = accesso === 'staff' && chiedeAnteprima && (!aperta || !paginaVisibile);
+  const vedeRegistrazione =
+    accesso === 'pubblico' || accesso === 'iscritto' || (accesso === 'staff' && (aperta || previewForStaff));
+  const videoVisibile = vedeRegistrazione && (event.recordingPublished || previewForStaff);
+  const recordingForRegistrants =
+    event.status === 'ENDED' && aperta && event.recordingAudience === 'REGISTRANTS' && !vedeRegistrazione;
 
   // Le due scelte che decidono i pulsanti della scheda: chi può iscriversi,
   // e se in diretta si entra anche senza iscrizione (dell'evento, o del sito).
@@ -363,9 +387,9 @@ export default async function EventDetailPage({
 
     // Un contorno del video: se non si leggono, la pagina resta quella di
     // sempre, con il video senza slide.
-    if (event.recordingPublished && event.recordingUrl) {
+    if (videoVisibile && event.recordingUrl) {
       try {
-        recordingSlides = await publicRecordingSlides(event);
+        recordingSlides = await publicRecordingSlides({ ...event, recordingPublished: true });
       } catch (err) {
         console.error(
           '[events/page] slide della registrazione non lette',
@@ -470,8 +494,10 @@ export default async function EventDetailPage({
     maxParticipants: event.maxParticipants,
     registrationCount: event._count.registrations,
     status: event.status,
-    recordingUrl: event.recordingPublished ? event.recordingUrl : null,
-    transcriptPublished: event.transcriptPublished,
+    recordingUrl: videoVisibile ? event.recordingUrl : null,
+    transcriptPublished: vedeRegistrazione && event.transcriptPublished,
+    // Il video su YouTube e' fuori dalla piattaforma: il pubblico della
+    // registrazione non lo governa.
     youtubeUrl: event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
@@ -519,6 +545,8 @@ export default async function EventDetailPage({
         locale={locale}
         appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
+        previewForStaff={previewForStaff}
+        recordingForRegistrants={recordingForRegistrants}
         hasRoomAccess={hasRoomAccess}
         registrationAccess={registrationAccess}
         registrationOpen={registrationOpen}

@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Už jste přihlášeni? Vstupte přes osobní odkaz z e-mailu.",
       "willBeRecorded": "Akce bude nahrávána.",
       "machineTranslation": "Automatický překlad",
-      "machineTranslationNote": "Název a popis přeložil automatický model a zatím je nikdo nezkontroloval."
+      "machineTranslationNote": "Název a popis přeložil automatický model a zatím je nikdo nezkontroloval.",
+      "previewTitle": "Náhled pro tým",
+      "previewBody": "Záznam zatím není zveřejněn: tuto verzi stránky vidí jen ti, kdo akci spravují.",
+      "recordingForRegistrantsTitle": "Záznam jen pro registrované",
+      "recordingForRegistrantsBody": "Pokud jste se na akci zaregistrovali, otevřete osobní odkaz z e-mailu „záznam je k dispozici“, nebo si ho nechte poslat znovu.",
+      "recordingLinkEmailLabel": "E-mail, kterým jste se registrovali",
+      "recordingLinkSend": "Poslat odkaz znovu",
+      "recordingLinkSent": "Pokud je adresa na akci registrována, brzy vám přijde e-mail s osobním odkazem.",
+      "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synchronizované snímky",
     "deleteConfirmTitle": "Smazat záznam",
     "deleteFailed": "Smazání se nezdařilo",
-    "deleteSuccess": "Záznam byl smazán"
+    "deleteSuccess": "Záznam byl smazán",
+    "previewPublicPage": "Náhled veřejné stránky",
+    "audienceLabel": "Kdo může vidět záznam",
+    "audiencePublic": "Všichni",
+    "audiencePublicDesc": "Kdokoli, kdo otevře stránku akce. Může se objevit ve videotéce.",
+    "audienceRegistrants": "Jen registrovaní",
+    "audienceRegistrantsDesc": "Ti, kdo se na akci zaregistrovali, i když do místnosti nevstoupili, přes osobní odkaz z e-mailového upozornění. Ve videotéce se neobjeví.",
+    "saveFailed": "Změna nebyla uložena. Zkuste to znovu."
   },
   "postEvent": {
     "config": "Konfigurace po události",

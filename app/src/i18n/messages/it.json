@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Ti sei iscritto? Entra con il link personale che hai ricevuto via email.",
       "willBeRecorded": "L'evento sarà registrato.",
       "machineTranslation": "Traduzione automatica",
-      "machineTranslationNote": "Titolo e descrizione sono stati tradotti da un modello automatico e nessuno li ha ancora riletti."
+      "machineTranslationNote": "Titolo e descrizione sono stati tradotti da un modello automatico e nessuno li ha ancora riletti.",
+      "previewTitle": "Anteprima per lo staff",
+      "previewBody": "La registrazione non è ancora pubblicata: questa versione della pagina la vede solo chi gestisce l'evento.",
+      "recordingForRegistrantsTitle": "Registrazione riservata agli iscritti",
+      "recordingForRegistrantsBody": "Se ti eri iscritto all'evento, apri il link personale dell'email «registrazione disponibile», oppure fattelo rimandare.",
+      "recordingLinkEmailLabel": "Email con cui ti sei iscritto",
+      "recordingLinkSend": "Rimandami il link",
+      "recordingLinkSent": "Se l'indirizzo è iscritto all'evento, riceverai a breve un'email con il link personale.",
+      "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Slide sincronizzate",
     "deleteConfirmTitle": "Elimina registrazione",
     "deleteFailed": "Eliminazione non riuscita",
-    "deleteSuccess": "Registrazione eliminata"
+    "deleteSuccess": "Registrazione eliminata",
+    "previewPublicPage": "Anteprima della pagina pubblica",
+    "audienceLabel": "Chi può vedere la registrazione",
+    "audiencePublic": "Tutti",
+    "audiencePublicDesc": "Chiunque apra la pagina dell'evento. Può comparire nella videoteca.",
+    "audienceRegistrants": "Solo gli iscritti",
+    "audienceRegistrantsDesc": "Chi si è iscritto all'evento, anche se non è entrato in sala, con il link personale dell'avviso email. Non compare nella videoteca.",
+    "saveFailed": "Modifica non salvata. Riprova."
   },
   "postEvent": {
     "config": "Configurazione post-evento",

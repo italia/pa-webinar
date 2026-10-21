@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Už ste prihlásení? Vstúpte cez osobný odkaz z e-mailu.",
       "willBeRecorded": "Podujatie bude nahrávané.",
       "machineTranslation": "Automatický preklad",
-      "machineTranslationNote": "Názov a opis preložil automatický model a zatiaľ ich nikto neskontroloval."
+      "machineTranslationNote": "Názov a opis preložil automatický model a zatiaľ ich nikto neskontroloval.",
+      "previewTitle": "Náhľad pre tím",
+      "previewBody": "Záznam ešte nie je zverejnený: túto verziu stránky vidia len tí, ktorí podujatie spravujú.",
+      "recordingForRegistrantsTitle": "Záznam len pre registrovaných",
+      "recordingForRegistrantsBody": "Ak ste sa na podujatie zaregistrovali, otvorte osobný odkaz z e-mailu „záznam je k dispozícii“, alebo si ho dajte poslať znova.",
+      "recordingLinkEmailLabel": "E-mail, ktorým ste sa registrovali",
+      "recordingLinkSend": "Poslať odkaz znova",
+      "recordingLinkSent": "Ak je adresa na podujatie registrovaná, čoskoro vám príde e-mail s osobným odkazom.",
+      "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synchronizované snímky",
     "deleteConfirmTitle": "Odstrániť nahrávku",
     "deleteFailed": "Odstránenie zlyhalo",
-    "deleteSuccess": "Nahrávka bola odstránená"
+    "deleteSuccess": "Nahrávka bola odstránená",
+    "previewPublicPage": "Náhľad verejnej stránky",
+    "audienceLabel": "Kto môže vidieť záznam",
+    "audiencePublic": "Všetci",
+    "audiencePublicDesc": "Ktokoľvek, kto otvorí stránku podujatia. Môže sa zobraziť vo videotéke.",
+    "audienceRegistrants": "Len registrovaní",
+    "audienceRegistrantsDesc": "Tí, ktorí sa na podujatie zaregistrovali, aj keď do miestnosti nevstúpili, cez osobný odkaz z e-mailového upozornenia. Vo videotéke sa nezobrazí.",
+    "saveFailed": "Zmena sa neuložila. Skúste to znova."
   },
   "postEvent": {
     "config": "Konfigurácia po udalosti",

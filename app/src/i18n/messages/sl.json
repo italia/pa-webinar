@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Ste že prijavljeni? Vstopite z osebno povezavo iz e-pošte.",
       "willBeRecorded": "Dogodek bo posnet.",
       "machineTranslation": "Samodejni prevod",
-      "machineTranslationNote": "Naslov in opis je prevedel samodejni model in ju še nihče ni pregledal."
+      "machineTranslationNote": "Naslov in opis je prevedel samodejni model in ju še nihče ni pregledal.",
+      "previewTitle": "Predogled za ekipo",
+      "previewBody": "Posnetek še ni objavljen: to različico strani vidijo samo tisti, ki upravljajo dogodek.",
+      "recordingForRegistrantsTitle": "Posnetek samo za prijavljene",
+      "recordingForRegistrantsBody": "Če ste se prijavili na dogodek, odprite osebno povezavo iz e-pošte »posnetek je na voljo« ali zahtevajte, da vam jo pošljemo znova.",
+      "recordingLinkEmailLabel": "E-pošta, s katero ste se prijavili",
+      "recordingLinkSend": "Pošlji mi povezavo znova",
+      "recordingLinkSent": "Če je naslov prijavljen na dogodek, boste kmalu prejeli e-pošto z osebno povezavo.",
+      "recordingLinkError": "Zahteva ni uspela. Poskusite znova čez nekaj minut."
     },
     "manage": {
       "toggleChat": "Klepet",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Usklajene prosojnice",
     "deleteConfirmTitle": "Izbriši posnetek",
     "deleteFailed": "Brisanje ni uspelo",
-    "deleteSuccess": "Posnetek je izbrisan"
+    "deleteSuccess": "Posnetek je izbrisan",
+    "previewPublicPage": "Predogled javne strani",
+    "audienceLabel": "Kdo lahko vidi posnetek",
+    "audiencePublic": "Vsi",
+    "audiencePublicDesc": "Vsakdo, ki odpre stran dogodka. Lahko se prikaže v videoteki.",
+    "audienceRegistrants": "Samo prijavljeni",
+    "audienceRegistrantsDesc": "Tisti, ki so se prijavili na dogodek, tudi če niso vstopili v sobo, prek osebne povezave iz obvestila po e-pošti. V videoteki se ne prikaže.",
+    "saveFailed": "Sprememba ni shranjena. Poskusite znova."
   },
   "postEvent": {
     "config": "Konfiguracija po dogodku",

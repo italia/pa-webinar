@@ -182,7 +182,10 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
-    recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+    // Risposta in cache condivisa: il video solo se pubblicato per tutti; una
+    // registrazione riservata agli iscritti passa dalla pagina e dal player,
+    // che riconoscono l'iscritto (lib/recording/audience).
+    recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
     tempRecordingUrl: event.status === 'LIVE' ? event.tempRecordingUrl : null,
     tempRecordingStartedAt: event.status === 'LIVE' ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
@@ -564,6 +567,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
+      ...(data.recordingAudience !== undefined && { recordingAudience: data.recordingAudience }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),

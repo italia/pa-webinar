@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Já se inscreveu? Entre com a ligação pessoal que recebeu por e-mail.",
       "willBeRecorded": "O evento será gravado.",
       "machineTranslation": "Tradução automática",
-      "machineTranslationNote": "O título e a descrição foram traduzidos por um modelo automático e ninguém os reviu ainda."
+      "machineTranslationNote": "O título e a descrição foram traduzidos por um modelo automático e ninguém os reviu ainda.",
+      "previewTitle": "Pré-visualização para a equipa",
+      "previewBody": "A gravação ainda não está publicada: só quem gere o evento vê esta versão da página.",
+      "recordingForRegistrantsTitle": "Gravação reservada aos inscritos",
+      "recordingForRegistrantsBody": "Se se inscreveu no evento, abra a ligação pessoal do e-mail «gravação disponível» ou peça para a receber de novo.",
+      "recordingLinkEmailLabel": "E-mail com que se inscreveu",
+      "recordingLinkSend": "Reenviar-me a ligação",
+      "recordingLinkSent": "Se o endereço estiver inscrito no evento, receberá em breve um e-mail com a sua ligação pessoal.",
+      "recordingLinkError": "O pedido falhou. Tente novamente dentro de alguns minutos."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Diapositivos sincronizados",
     "deleteConfirmTitle": "Eliminar a gravação",
     "deleteFailed": "A eliminação falhou",
-    "deleteSuccess": "Gravação eliminada"
+    "deleteSuccess": "Gravação eliminada",
+    "previewPublicPage": "Pré-visualizar a página pública",
+    "audienceLabel": "Quem pode ver a gravação",
+    "audiencePublic": "Todos",
+    "audiencePublicDesc": "Qualquer pessoa que abra a página do evento. Pode aparecer na videoteca.",
+    "audienceRegistrants": "Apenas inscritos",
+    "audienceRegistrantsDesc": "Quem se inscreveu no evento, mesmo sem ter entrado na sala, através da ligação pessoal do aviso por e-mail. Não aparece na videoteca.",
+    "saveFailed": "Alteração não guardada. Tente novamente."
   },
   "postEvent": {
     "config": "Configuração pós-evento",

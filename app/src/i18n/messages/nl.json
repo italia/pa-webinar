@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Al ingeschreven? Gebruik de persoonlijke link uit je e-mail.",
       "willBeRecorded": "Het evenement wordt opgenomen.",
       "machineTranslation": "Automatische vertaling",
-      "machineTranslationNote": "Titel en beschrijving zijn vertaald door een automatisch model en nog door niemand nagelezen."
+      "machineTranslationNote": "Titel en beschrijving zijn vertaald door een automatisch model en nog door niemand nagelezen.",
+      "previewTitle": "Voorbeeld voor het team",
+      "previewBody": "De opname is nog niet gepubliceerd: alleen wie het evenement beheert, ziet deze versie van de pagina.",
+      "recordingForRegistrantsTitle": "Opname alleen voor ingeschrevenen",
+      "recordingForRegistrantsBody": "Als je je voor het evenement hebt ingeschreven, open dan de persoonlijke link uit de e-mail 'opname beschikbaar' of laat hem opnieuw sturen.",
+      "recordingLinkEmailLabel": "E-mailadres waarmee je je hebt ingeschreven",
+      "recordingLinkSend": "Stuur me de link opnieuw",
+      "recordingLinkSent": "Als het adres voor het evenement is ingeschreven, ontvang je binnenkort een e-mail met je persoonlijke link.",
+      "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Gesynchroniseerde dia's",
     "deleteConfirmTitle": "Opname verwijderen",
     "deleteFailed": "Verwijderen mislukt",
-    "deleteSuccess": "Opname verwijderd"
+    "deleteSuccess": "Opname verwijderd",
+    "previewPublicPage": "Voorbeeld van de openbare pagina",
+    "audienceLabel": "Wie de opname mag zien",
+    "audiencePublic": "Iedereen",
+    "audiencePublicDesc": "Iedereen die de evenementpagina opent. Kan in de videotheek verschijnen.",
+    "audienceRegistrants": "Alleen ingeschrevenen",
+    "audienceRegistrantsDesc": "Wie zich voor het evenement heeft ingeschreven, ook zonder de zaal te hebben betreden, via de persoonlijke link in de e-mailmelding. Verschijnt niet in de videotheek.",
+    "saveFailed": "Wijziging niet opgeslagen. Probeer het opnieuw."
   },
   "postEvent": {
     "config": "Configuratie na het evenement",

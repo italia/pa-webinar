@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Oletko jo ilmoittautunut? Liity sähköpostissa saamallasi henkilökohtaisella linkillä.",
       "willBeRecorded": "Tapahtuma tallennetaan.",
       "machineTranslation": "Automaattinen käännös",
-      "machineTranslationNote": "Otsikon ja kuvauksen on kääntänyt automaattinen malli, eikä kukaan ole vielä tarkistanut niitä."
+      "machineTranslationNote": "Otsikon ja kuvauksen on kääntänyt automaattinen malli, eikä kukaan ole vielä tarkistanut niitä.",
+      "previewTitle": "Esikatselu tiimille",
+      "previewBody": "Tallennetta ei ole vielä julkaistu: vain tapahtuman hallinnoijat näkevät tämän version sivusta.",
+      "recordingForRegistrantsTitle": "Tallenne vain ilmoittautuneille",
+      "recordingForRegistrantsBody": "Jos ilmoittauduit tapahtumaan, avaa henkilökohtainen linkki sähköpostista ”tallenne saatavilla” tai pyydä se uudelleen.",
+      "recordingLinkEmailLabel": "Sähköposti, jolla ilmoittauduit",
+      "recordingLinkSend": "Lähetä linkki uudelleen",
+      "recordingLinkSent": "Jos osoite on ilmoittautunut tapahtumaan, saat pian sähköpostin henkilökohtaisella linkillä.",
+      "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synkronoidut diat",
     "deleteConfirmTitle": "Poista tallenne",
     "deleteFailed": "Poisto epäonnistui",
-    "deleteSuccess": "Tallenne poistettu"
+    "deleteSuccess": "Tallenne poistettu",
+    "previewPublicPage": "Julkisen sivun esikatselu",
+    "audienceLabel": "Kuka voi nähdä tallenteen",
+    "audiencePublic": "Kaikki",
+    "audiencePublicDesc": "Kuka tahansa, joka avaa tapahtuman sivun. Voi näkyä videokirjastossa.",
+    "audienceRegistrants": "Vain ilmoittautuneet",
+    "audienceRegistrantsDesc": "Tapahtumaan ilmoittautuneet, vaikka he eivät olisi tulleet huoneeseen, sähköposti-ilmoituksen henkilökohtaisen linkin kautta. Ei näy videokirjastossa.",
+    "saveFailed": "Muutosta ei tallennettu. Yritä uudelleen."
   },
   "postEvent": {
     "config": "Tapahtuman jälkeiset asetukset",

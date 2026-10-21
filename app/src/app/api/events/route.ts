@@ -416,8 +416,8 @@ export const GET = withErrorHandling(async (request) => {
       recordingEnabled: event.recordingEnabled,
       status: event.status,
       eventType: event.eventType,
-      // Come la rotta del singolo evento: il video solo se pubblicato.
-      recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+      // Come la rotta del singolo evento: il video solo se pubblicato per tutti.
+      recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
     };
   });
 

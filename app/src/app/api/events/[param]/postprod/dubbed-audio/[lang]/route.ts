@@ -52,6 +52,10 @@ export const GET = withErrorHandling(async (_request, context) => {
   // `Response.redirect` ha intestazioni immutabili: la si costruisce a mano.
   return new Response(null, {
     status: 302,
-    headers: { Location: url, [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE },
+    headers: {
+      Location: url,
+      [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
+      'Cache-Control': 'private, no-store',
+    },
   });
 });

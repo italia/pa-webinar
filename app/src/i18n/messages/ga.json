@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Cláraithe cheana? Úsáid an nasc pearsanta a fuair tú i ríomhphost.",
       "willBeRecorded": "Taifeadfar an ócáid.",
       "machineTranslation": "Aistriúchán uathoibríoch",
-      "machineTranslationNote": "Rinne samhail uathoibríoch an teideal agus an cur síos a aistriú agus níl athbhreithniú déanta orthu ag aon duine fós."
+      "machineTranslationNote": "Rinne samhail uathoibríoch an teideal agus an cur síos a aistriú agus níl athbhreithniú déanta orthu ag aon duine fós.",
+      "previewTitle": "Réamhamharc don fhoireann",
+      "previewBody": "Níl an taifeadadh foilsithe fós: ní fheiceann ach iad siúd a bhainistíonn an ócáid an leagan seo den leathanach.",
+      "recordingForRegistrantsTitle": "Taifeadadh do chláraitheoirí amháin",
+      "recordingForRegistrantsBody": "Má chláraigh tú don ócáid, oscail an nasc pearsanta sa ríomhphost \"taifeadadh ar fáil\", nó iarr go seolfaí arís é.",
+      "recordingLinkEmailLabel": "An ríomhphost lenar chláraigh tú",
+      "recordingLinkSend": "Seol an nasc chugam arís",
+      "recordingLinkSent": "Má tá an seoladh cláraithe don ócáid, gheobhaidh tú ríomhphost leis an nasc pearsanta go luath.",
+      "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Sleamhnáin shioncrónaithe",
     "deleteConfirmTitle": "Scrios an taifeadadh",
     "deleteFailed": "Theip ar an scriosadh",
-    "deleteSuccess": "Scriosadh an taifeadadh"
+    "deleteSuccess": "Scriosadh an taifeadadh",
+    "previewPublicPage": "Réamhamharc ar an leathanach poiblí",
+    "audienceLabel": "Cé a fheiceann an taifeadadh",
+    "audiencePublic": "Gach duine",
+    "audiencePublicDesc": "Aon duine a osclaíonn leathanach na hócáide. Is féidir leis a bheith le feiceáil sa leabharlann físeán.",
+    "audienceRegistrants": "Cláraitheoirí amháin",
+    "audienceRegistrantsDesc": "Iad siúd a chláraigh don ócáid, fiú mura ndeachaigh siad isteach sa seomra, tríd an nasc pearsanta san fhógra ríomhphoist. Ní bhíonn sé le feiceáil sa leabharlann físeán.",
+    "saveFailed": "Níor sábháladh an t-athrú. Bain triail eile as."
   },
   "postEvent": {
     "config": "Cumraíocht iar-imeachta",

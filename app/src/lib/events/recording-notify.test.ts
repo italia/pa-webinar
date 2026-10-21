@@ -9,9 +9,12 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/crypto/pii', () => ({ decryptPII: (v: string) => v.replace(/^cifrato:/, '') }));
 vi.mock('@/lib/email/outbox', () => ({ enqueueEmail: vi.fn(async () => undefined) }));
 vi.mock('@/lib/persons/opt-out-link', () => ({ rubricaOptOutUrl: () => null }));
+vi.mock('@/lib/auth/app-secret', () => ({ tryGetAppSecret: () => 'segreto-di-prova-abbastanza-lungo-per-hmac' }));
 
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
+
+import { verifyViewingToken } from '@/lib/recording/viewing';
 
 import { notifyPublishedRecordings } from './recording-notify';
 
@@ -26,6 +29,9 @@ const evento = (over: Record<string, unknown> = {}) => ({
   endsAt: new Date('2026-10-08T12:00:00Z'),
   postEventPublic: true,
   postEventPublicUntil: null,
+  recordingAudience: 'PUBLIC',
+  recordingPublished: true,
+  transcriptPublished: false,
   ...over,
 });
 
@@ -66,6 +72,20 @@ describe('notifyPublishedRecordings', () => {
     expect(invii[0].html).toContain('https://webinar.example.gov.it/it/eventi/webinar');
     expect(invii[1].subject).toContain('recording');
     expect(invii[0].metadata).toMatchObject({ kind: 'recording_published', eventId: 'e1' });
+  });
+
+  it('registrazione riservata agli iscritti: ognuno riceve il suo link personale della visione', async () => {
+    fn(prisma.event.findMany).mockResolvedValue([evento({ recordingAudience: 'REGISTRANTS' })]);
+    await notifyPublishedRecordings(opts);
+    const invii = fn(enqueueEmail).mock.calls.map((c) => c[0]);
+    const link = (html: string) => /https:\/\/webinar\.example\.gov\.it\/api\/events\/webinar\/recording\/access\?t=([^&"]+)&(?:amp;)?lang=(\w+)/.exec(html);
+    const primo = link(invii[0].html);
+    const secondo = link(invii[1].html);
+    expect(primo?.[2]).toBe('it');
+    expect(secondo?.[2]).toBe('en');
+    expect(verifyViewingToken(decodeURIComponent(primo![1]!), 'e1')).toBe('r1');
+    expect(verifyViewingToken(decodeURIComponent(secondo![1]!), 'e1')).toBe('r2');
+    expect(invii[0].html).not.toContain('/it/eventi/webinar"');
   });
 
   it('pagina pubblica nascosta: aspetta, senza prenotare', async () => {

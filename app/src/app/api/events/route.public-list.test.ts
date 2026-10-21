@@ -11,7 +11,11 @@ vi.mock('@/lib/db', () => ({ prisma: { event: { findMany: m.eventi } } }));
 
 import { GET } from './route';
 
-const evento = (id: string, recordingPublished: boolean) => ({
+const evento = (
+  id: string,
+  recordingPublished: boolean,
+  recordingAudience: 'PUBLIC' | 'REGISTRANTS' = 'PUBLIC'
+) => ({
   id,
   slug: `evento-${id}`,
   title: { it: 'Evento' },
@@ -27,11 +31,18 @@ const evento = (id: string, recordingPublished: boolean) => ({
   eventType: 'SCHEDULED',
   recordingUrl: `recordings/${id}.mp4`,
   recordingPublished,
+  recordingAudience,
 });
 
 describe('GET /api/events, elenco pubblico', () => {
   it('il video solo per le registrazioni pubblicate', async () => {
-    m.eventi.mockResolvedValueOnce([evento('a', true), evento('b', false)]);
+    m.eventi.mockResolvedValueOnce([
+      evento('a', true),
+      evento('b', false),
+      // Riservata agli iscritti: la risposta e' in cache condivisa, il video
+      // passa solo dalla pagina e dal player che riconoscono l'iscritto.
+      evento('c', true, 'REGISTRANTS'),
+    ]);
     const res = await GET(
       new Request('http://x/api/events') as unknown as NextRequest,
       {
@@ -45,6 +56,7 @@ describe('GET /api/events, elenco pubblico', () => {
     expect(corpo.map((e) => [e.id, e.recordingUrl])).toEqual([
       ['a', 'recordings/a.mp4'],
       ['b', null],
+      ['c', null],
     ]);
   });
 });

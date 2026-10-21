@@ -171,6 +171,7 @@ export default async function EventManagePage({
     tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
     recordingPublished: event.recordingPublished,
     recordingPublishedAt: event.recordingPublishedAt?.toISOString() ?? null,
+    recordingAudience: event.recordingAudience,
     recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
     recordingDuration: event.recordingDuration,
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,

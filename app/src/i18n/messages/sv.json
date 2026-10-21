@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Redan anmäld? Använd den personliga länken i ditt e-postmeddelande.",
       "willBeRecorded": "Evenemanget spelas in.",
       "machineTranslation": "Automatisk översättning",
-      "machineTranslationNote": "Titel och beskrivning har översatts av en automatisk modell och ingen har granskat dem än."
+      "machineTranslationNote": "Titel och beskrivning har översatts av en automatisk modell och ingen har granskat dem än.",
+      "previewTitle": "Förhandsgranskning för teamet",
+      "previewBody": "Inspelningen är inte publicerad ännu: bara de som hanterar evenemanget ser den här versionen av sidan.",
+      "recordingForRegistrantsTitle": "Inspelning endast för anmälda",
+      "recordingForRegistrantsBody": "Om du anmälde dig till evenemanget, öppna den personliga länken i e-postmeddelandet ”inspelning tillgänglig”, eller be att få den skickad igen.",
+      "recordingLinkEmailLabel": "E-postadress du anmälde dig med",
+      "recordingLinkSend": "Skicka länken igen",
+      "recordingLinkSent": "Om adressen är anmäld till evenemanget får du snart ett e-postmeddelande med din personliga länk.",
+      "recordingLinkError": "Begäran misslyckades. Försök igen om några minuter."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synkroniserade bilder",
     "deleteConfirmTitle": "Ta bort inspelning",
     "deleteFailed": "Borttagningen misslyckades",
-    "deleteSuccess": "Inspelningen har tagits bort"
+    "deleteSuccess": "Inspelningen har tagits bort",
+    "previewPublicPage": "Förhandsgranska den offentliga sidan",
+    "audienceLabel": "Vem kan se inspelningen",
+    "audiencePublic": "Alla",
+    "audiencePublicDesc": "Alla som öppnar evenemangets sida. Den kan visas i videoteket.",
+    "audienceRegistrants": "Endast anmälda",
+    "audienceRegistrantsDesc": "De som anmält sig till evenemanget, även om de aldrig kom in i rummet, via den personliga länken i e-postmeddelandet. Den visas inte i videoteket.",
+    "saveFailed": "Ändringen sparades inte. Försök igen."
   },
   "postEvent": {
     "config": "Konfiguration efter evenemang",

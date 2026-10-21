@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Jau pieteicāties? Ieejiet ar personīgo saiti no e-pasta.",
       "willBeRecorded": "Pasākums tiks ierakstīts.",
       "machineTranslation": "Automātiskais tulkojums",
-      "machineTranslationNote": "Nosaukumu un aprakstu iztulkoja automātisks modelis, un neviens tos vēl nav pārskatījis."
+      "machineTranslationNote": "Nosaukumu un aprakstu iztulkoja automātisks modelis, un neviens tos vēl nav pārskatījis.",
+      "previewTitle": "Priekšskatījums komandai",
+      "previewBody": "Ieraksts vēl nav publicēts: šo lapas versiju redz tikai tie, kas pārvalda pasākumu.",
+      "recordingForRegistrantsTitle": "Ieraksts tikai reģistrētajiem",
+      "recordingForRegistrantsBody": "Ja reģistrējāties pasākumam, atveriet personīgo saiti e-pastā “ieraksts pieejams” vai lūdziet to nosūtīt vēlreiz.",
+      "recordingLinkEmailLabel": "E-pasts, ar kuru reģistrējāties",
+      "recordingLinkSend": "Nosūtīt saiti vēlreiz",
+      "recordingLinkSent": "Ja adrese ir reģistrēta pasākumam, drīz saņemsiet e-pastu ar personīgo saiti.",
+      "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Sinhronizēti slaidi",
     "deleteConfirmTitle": "Dzēst ierakstu",
     "deleteFailed": "Dzēšana neizdevās",
-    "deleteSuccess": "Ieraksts ir dzēsts"
+    "deleteSuccess": "Ieraksts ir dzēsts",
+    "previewPublicPage": "Publiskās lapas priekšskatījums",
+    "audienceLabel": "Kas var redzēt ierakstu",
+    "audiencePublic": "Visi",
+    "audiencePublicDesc": "Ikviens, kas atver pasākuma lapu. Var parādīties videotēkā.",
+    "audienceRegistrants": "Tikai reģistrētie",
+    "audienceRegistrantsDesc": "Tie, kas reģistrējās pasākumam, pat ja neienāca telpā, izmantojot personīgo saiti no e-pasta paziņojuma. Neparādās videotēkā.",
+    "saveFailed": "Izmaiņas netika saglabātas. Mēģiniet vēlreiz."
   },
   "postEvent": {
     "config": "Pēcpasākuma konfigurācija",

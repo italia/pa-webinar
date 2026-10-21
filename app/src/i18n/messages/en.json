@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Already registered? Use the personal link you received by email.",
       "willBeRecorded": "The event will be recorded.",
       "machineTranslation": "Automatic translation",
-      "machineTranslationNote": "The title and description were translated by an automatic model and nobody has reviewed them yet."
+      "machineTranslationNote": "The title and description were translated by an automatic model and nobody has reviewed them yet.",
+      "previewTitle": "Staff preview",
+      "previewBody": "The recording is not published yet: only the people who manage the event see this version of the page.",
+      "recordingForRegistrantsTitle": "Recording reserved for registrants",
+      "recordingForRegistrantsBody": "If you registered for the event, open the personal link in the \"recording available\" email, or have it sent again.",
+      "recordingLinkEmailLabel": "Email you registered with",
+      "recordingLinkSend": "Send me the link again",
+      "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
+      "recordingLinkError": "The request failed. Try again in a few minutes."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synced slides",
     "deleteConfirmTitle": "Delete recording",
     "deleteFailed": "Delete failed",
-    "deleteSuccess": "Recording deleted"
+    "deleteSuccess": "Recording deleted",
+    "previewPublicPage": "Preview the public page",
+    "audienceLabel": "Who can see the recording",
+    "audiencePublic": "Everyone",
+    "audiencePublicDesc": "Anyone who opens the event page. It can appear in the video library.",
+    "audienceRegistrants": "Registrants only",
+    "audienceRegistrantsDesc": "People who registered for the event, even if they never joined the room, through the personal link in the email notice. It does not appear in the video library.",
+    "saveFailed": "Change not saved. Try again."
   },
   "postEvent": {
     "config": "Post-event configuration",

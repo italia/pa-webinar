@@ -190,6 +190,8 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
     .optional(),
   recordingPublished: z.boolean().optional(),
   transcriptPublished: z.boolean().optional(),
+  // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
+  recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: z.string().url().nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),

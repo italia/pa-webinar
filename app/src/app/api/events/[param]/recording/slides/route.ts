@@ -17,12 +17,15 @@
  * lo storage e l'URL firmato non esce da qui.
  */
 
+import { cookies } from 'next/headers';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { publicSlideFileKey } from '@/lib/presentation/recording-slides-data';
+import { accessoRegistrazione } from '@/lib/recording/audience';
 import { streamMaterialPdf } from '@/lib/presentation/serve-pdf';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { recordingSlidesFileQuerySchema } from '@/lib/validation/presentation';
@@ -56,10 +59,12 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventPublicUntil: true,
       recordingUrl: true,
       recordingPublished: true,
+      transcriptPublished: true,
+      recordingAudience: true,
       postEventShowMaterials: true,
     },
   });
-  if (!event || !isEventPageVisible(event)) throw new NotFoundError('Event');
+  if (!event) throw new NotFoundError('Event');
 
   const rl = rateLimit(`recording-slides-file:${event.id}:${getClientIp(request)}`, {
     limit: LETTURE_AL_MINUTO,
@@ -67,9 +72,20 @@ export const GET = withErrorHandling(async (request, context) => {
   });
   if (!rl.allowed) throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
 
+  // Le slide vanno con il video: le vede chi vede la registrazione
+  // (lib/recording/audience) sulla pagina pubblica; lo staff anche prima della
+  // pubblicazione o con la pagina nascosta, per l'anteprima.
+  const accesso = await accessoRegistrazione(event, await cookies());
+  if (!accesso || (accesso !== 'staff' && !isEventPageVisible(event))) {
+    throw new NotFoundError('Slides');
+  }
+
   // Le stesse regole della pagina, ricalcolate qui: solo una slide mostrata
   // accanto al video, con il file di un materiale dell'evento.
-  const chiave = await publicSlideFileKey(event, query.data.m);
+  const chiave = await publicSlideFileKey(
+    { ...event, recordingPublished: event.recordingPublished || accesso === 'staff' },
+    query.data.m,
+  );
   if (!chiave) throw new NotFoundError('Slides');
 
   return streamMaterialPdf(chiave, 'recording/slides');

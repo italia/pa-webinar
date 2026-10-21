@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Diġà rreġistrajt? Idħol bil-link personali li rċevejt bl-email.",
       "willBeRecorded": "L-avveniment se jiġi rreġistrat.",
       "machineTranslation": "Traduzzjoni awtomatika",
-      "machineTranslationNote": "It-titolu u d-deskrizzjoni ġew tradotti minn mudell awtomatiku u ħadd għadu ma rrevedihom."
+      "machineTranslationNote": "It-titolu u d-deskrizzjoni ġew tradotti minn mudell awtomatiku u ħadd għadu ma rrevedihom.",
+      "previewTitle": "Previżjoni għat-tim",
+      "previewBody": "Ir-reġistrazzjoni għadha mhix ippubblikata: din il-verżjoni tal-paġna jarawha biss dawk li jmexxu l-avveniment.",
+      "recordingForRegistrantsTitle": "Reġistrazzjoni riservata għar-reġistrati",
+      "recordingForRegistrantsBody": "Jekk irreġistrajt għall-avveniment, iftaħ il-link personali fl-email \"reġistrazzjoni disponibbli\", jew itlob li tintbagħatlek mill-ġdid.",
+      "recordingLinkEmailLabel": "L-email li rreġistrajt biha",
+      "recordingLinkSend": "Ibgħatli l-link mill-ġdid",
+      "recordingLinkSent": "Jekk l-indirizz huwa rreġistrat għall-avveniment, dalwaqt tirċievi email bil-link personali tiegħek.",
+      "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Slajds sinkronizzati",
     "deleteConfirmTitle": "Ħassar ir-reġistrazzjoni",
     "deleteFailed": "It-tħassir ma rnexxiex",
-    "deleteSuccess": "Ir-reġistrazzjoni tħassret"
+    "deleteSuccess": "Ir-reġistrazzjoni tħassret",
+    "previewPublicPage": "Previżjoni tal-paġna pubblika",
+    "audienceLabel": "Min jista' jara r-reġistrazzjoni",
+    "audiencePublic": "Kulħadd",
+    "audiencePublicDesc": "Kull min jiftaħ il-paġna tal-avveniment. Tista' tidher fil-librerija tal-vidjows.",
+    "audienceRegistrants": "Ir-reġistrati biss",
+    "audienceRegistrantsDesc": "Dawk li rreġistraw għall-avveniment, anke jekk qatt ma daħlu fil-kamra, permezz tal-link personali fl-avviż bl-email. Ma tidhirx fil-librerija tal-vidjows.",
+    "saveFailed": "Il-bidla ma ġietx issejvjata. Erġa' pprova."
   },
   "postEvent": {
     "config": "Konfigurazzjoni wara l-avveniment",

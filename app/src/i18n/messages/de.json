@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Bereits angemeldet? Nutzen Sie den persönlichen Link aus Ihrer E-Mail.",
       "willBeRecorded": "Die Veranstaltung wird aufgezeichnet.",
       "machineTranslation": "Automatische Übersetzung",
-      "machineTranslationNote": "Titel und Beschreibung wurden von einem automatischen Modell übersetzt und noch von niemandem geprüft."
+      "machineTranslationNote": "Titel und Beschreibung wurden von einem automatischen Modell übersetzt und noch von niemandem geprüft.",
+      "previewTitle": "Vorschau für das Team",
+      "previewBody": "Die Aufzeichnung ist noch nicht veröffentlicht: Nur wer die Veranstaltung verwaltet, sieht diese Version der Seite.",
+      "recordingForRegistrantsTitle": "Aufzeichnung nur für Angemeldete",
+      "recordingForRegistrantsBody": "Wenn Sie sich für die Veranstaltung angemeldet haben, öffnen Sie den persönlichen Link aus der E-Mail „Aufzeichnung verfügbar“ oder lassen Sie ihn sich erneut senden.",
+      "recordingLinkEmailLabel": "E-Mail-Adresse der Anmeldung",
+      "recordingLinkSend": "Link erneut senden",
+      "recordingLinkSent": "Wenn die Adresse für die Veranstaltung angemeldet ist, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link.",
+      "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Synchronisierte Folien",
     "deleteConfirmTitle": "Aufzeichnung löschen",
     "deleteFailed": "Löschen fehlgeschlagen",
-    "deleteSuccess": "Aufzeichnung gelöscht"
+    "deleteSuccess": "Aufzeichnung gelöscht",
+    "previewPublicPage": "Vorschau der öffentlichen Seite",
+    "audienceLabel": "Wer die Aufzeichnung sehen kann",
+    "audiencePublic": "Alle",
+    "audiencePublicDesc": "Alle, die die Veranstaltungsseite öffnen. Sie kann in der Videothek erscheinen.",
+    "audienceRegistrants": "Nur Angemeldete",
+    "audienceRegistrantsDesc": "Personen, die sich für die Veranstaltung angemeldet haben, auch ohne den Raum betreten zu haben, über den persönlichen Link der E-Mail-Benachrichtigung. Sie erscheint nicht in der Videothek.",
+    "saveFailed": "Änderung nicht gespeichert. Bitte erneut versuchen."
   },
   "postEvent": {
     "config": "Post-Event-Konfiguration",

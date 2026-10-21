@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "¿Ya te inscribiste? Entra con el enlace personal que recibiste por correo.",
       "willBeRecorded": "El evento se grabará.",
       "machineTranslation": "Traducción automática",
-      "machineTranslationNote": "El título y la descripción se han traducido con un modelo automático y nadie los ha revisado todavía."
+      "machineTranslationNote": "El título y la descripción se han traducido con un modelo automático y nadie los ha revisado todavía.",
+      "previewTitle": "Vista previa para el equipo",
+      "previewBody": "La grabación aún no está publicada: solo quienes gestionan el evento ven esta versión de la página.",
+      "recordingForRegistrantsTitle": "Grabación reservada a los inscritos",
+      "recordingForRegistrantsBody": "Si te inscribiste en el evento, abre el enlace personal del correo «grabación disponible» o pide que te lo envíen de nuevo.",
+      "recordingLinkEmailLabel": "Correo con el que te inscribiste",
+      "recordingLinkSend": "Reenviarme el enlace",
+      "recordingLinkSent": "Si la dirección está inscrita en el evento, recibirás en breve un correo con tu enlace personal.",
+      "recordingLinkError": "La solicitud no se ha podido completar. Inténtalo de nuevo en unos minutos."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Diapositivas sincronizadas",
     "deleteConfirmTitle": "Eliminar la grabación",
     "deleteFailed": "No se ha podido eliminar",
-    "deleteSuccess": "Grabación eliminada"
+    "deleteSuccess": "Grabación eliminada",
+    "previewPublicPage": "Vista previa de la página pública",
+    "audienceLabel": "Quién puede ver la grabación",
+    "audiencePublic": "Todos",
+    "audiencePublicDesc": "Cualquier persona que abra la página del evento. Puede aparecer en la videoteca.",
+    "audienceRegistrants": "Solo inscritos",
+    "audienceRegistrantsDesc": "Quienes se inscribieron en el evento, aunque no hayan entrado en la sala, mediante el enlace personal del aviso por correo. No aparece en la videoteca.",
+    "saveFailed": "Cambio no guardado. Inténtalo de nuevo."
   },
   "postEvent": {
     "config": "Configuración post-evento",

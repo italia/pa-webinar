@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Već ste prijavljeni? Uđite osobnom poveznicom iz e-pošte.",
       "willBeRecorded": "Događaj će se snimati.",
       "machineTranslation": "Automatski prijevod",
-      "machineTranslationNote": "Naslov i opis preveo je automatski model i još ih nitko nije pregledao."
+      "machineTranslationNote": "Naslov i opis preveo je automatski model i još ih nitko nije pregledao.",
+      "previewTitle": "Pregled za tim",
+      "previewBody": "Snimka još nije objavljena: ovu verziju stranice vide samo oni koji upravljaju događajem.",
+      "recordingForRegistrantsTitle": "Snimka samo za prijavljene",
+      "recordingForRegistrantsBody": "Ako ste se prijavili na događaj, otvorite osobnu poveznicu iz e-pošte „snimka je dostupna” ili zatražite da vam je ponovno pošaljemo.",
+      "recordingLinkEmailLabel": "E-pošta kojom ste se prijavili",
+      "recordingLinkSend": "Pošalji mi poveznicu ponovno",
+      "recordingLinkSent": "Ako je adresa prijavljena na događaj, uskoro ćete primiti e-poštu s osobnom poveznicom.",
+      "recordingLinkError": "Zahtjev nije uspio. Pokušajte ponovno za nekoliko minuta."
     },
     "manage": {
       "toggleChat": "Razgovor",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Usklađeni slajdovi",
     "deleteConfirmTitle": "Izbriši snimku",
     "deleteFailed": "Brisanje nije uspjelo",
-    "deleteSuccess": "Snimka je izbrisana"
+    "deleteSuccess": "Snimka je izbrisana",
+    "previewPublicPage": "Pregled javne stranice",
+    "audienceLabel": "Tko može vidjeti snimku",
+    "audiencePublic": "Svi",
+    "audiencePublicDesc": "Svatko tko otvori stranicu događaja. Može se pojaviti u videoteci.",
+    "audienceRegistrants": "Samo prijavljeni",
+    "audienceRegistrantsDesc": "Oni koji su se prijavili na događaj, čak i ako nisu ušli u sobu, putem osobne poveznice iz obavijesti e-poštom. Ne pojavljuje se u videoteci.",
+    "saveFailed": "Promjena nije spremljena. Pokušajte ponovno."
   },
   "postEvent": {
     "config": "Konfiguracija nakon događaja",

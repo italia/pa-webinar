@@ -689,8 +689,48 @@ registry.registerPath({
   path: '/api/events/{param}/recording',
   tags: ['Recording'],
   summary: 'Redirect to recording URL',
+  description:
+    'Redirects to a short-lived signed URL of the video for whoever may see the recording ' +
+    '(lib/recording/audience.ts): published inside the post-event window, to anyone or to ' +
+    'registrants only (`recordingAudience`), or the staff who manage the event, also before ' +
+    'publication. A registrant is recognized by the event access cookie or the viewing cookie.',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 302: { description: 'Redirect to recording' } },
+  responses: {
+    302: { description: 'Redirect to recording' },
+    403: { description: 'Not published, or reserved to registrants' },
+    404: { description: 'No recording' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/recording/access',
+  tags: ['Recording'],
+  summary: 'Personal viewing link of a recording reserved to registrants',
+  description:
+    'The link of the "recording available" email. With a valid viewing token of an existing ' +
+    'registration it sets the `recording_access_<eventId>` cookie; it always redirects to the ' +
+    'event page, in the language `lang` or the registration language.',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ t: z.string(), lang: z.string().optional() }),
+  },
+  responses: { 303: { description: 'Redirect to the event page' }, 404: { description: 'Unknown event' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/recording/access',
+  tags: ['Recording'],
+  summary: 'Send the personal viewing link again',
+  description:
+    'For a published recording reserved to registrants, emails the personal viewing link to the ' +
+    'registration with this address. Always answers the same, registered or not; limited per IP.',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ email: z.string() }) } } },
+  },
+  responses: { 200: { description: 'Accepted' }, 429: { description: 'Too many requests' } },
 });
 
 registry.registerPath({

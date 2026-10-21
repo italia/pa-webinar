@@ -193,7 +193,15 @@
       "registeredUseEmailLink": "Masz już zapis? Wejdź przez osobisty link z e-maila.",
       "willBeRecorded": "Wydarzenie będzie nagrywane.",
       "machineTranslation": "Tłumaczenie automatyczne",
-      "machineTranslationNote": "Tytuł i opis zostały przetłumaczone przez model automatyczny i nikt ich jeszcze nie sprawdził."
+      "machineTranslationNote": "Tytuł i opis zostały przetłumaczone przez model automatyczny i nikt ich jeszcze nie sprawdził.",
+      "previewTitle": "Podgląd dla zespołu",
+      "previewBody": "Nagranie nie jest jeszcze opublikowane: tę wersję strony widzą tylko osoby zarządzające wydarzeniem.",
+      "recordingForRegistrantsTitle": "Nagranie tylko dla zarejestrowanych",
+      "recordingForRegistrantsBody": "Jeśli zarejestrowałeś się na wydarzenie, otwórz osobisty link z e-maila „nagranie dostępne” lub poproś o ponowne wysłanie.",
+      "recordingLinkEmailLabel": "E-mail użyty przy rejestracji",
+      "recordingLinkSend": "Wyślij link ponownie",
+      "recordingLinkSent": "Jeśli adres jest zarejestrowany na wydarzenie, wkrótce otrzymasz e-mail z osobistym linkiem.",
+      "recordingLinkError": "Żądanie nie powiodło się. Spróbuj ponownie za kilka minut."
     },
     "manage": {
       "toggleChat": "Czat",
@@ -5344,7 +5352,14 @@
     "slidesManage": "Zsynchronizowane slajdy",
     "deleteConfirmTitle": "Usuń nagranie",
     "deleteFailed": "Usunięcie nie powiodło się",
-    "deleteSuccess": "Nagranie usunięte"
+    "deleteSuccess": "Nagranie usunięte",
+    "previewPublicPage": "Podgląd strony publicznej",
+    "audienceLabel": "Kto może zobaczyć nagranie",
+    "audiencePublic": "Wszyscy",
+    "audiencePublicDesc": "Każdy, kto otworzy stronę wydarzenia. Może pojawić się w wideotece.",
+    "audienceRegistrants": "Tylko zarejestrowani",
+    "audienceRegistrantsDesc": "Osoby zarejestrowane na wydarzenie, nawet jeśli nie weszły do sali, przez osobisty link z powiadomienia e-mail. Nie pojawia się w wideotece.",
+    "saveFailed": "Zmiana nie została zapisana. Spróbuj ponownie."
   },
   "postEvent": {
     "config": "Konfiguracja po wydarzeniu",

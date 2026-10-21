@@ -10,6 +10,7 @@ import { getLocalized, getLocalizedWithLocale, type LocalizedField } from '@/lib
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
+import RecordingLinkRequest from '@/components/events/recording-link-request';
 import VideoPlayer, {
   type VideoPlayerHandle,
   type SubtitleTrack,
@@ -161,6 +162,12 @@ interface EventDetailClientProps {
   /** Le slide presentate in sala da mostrare accanto al video pubblicato
    *  (lib/presentation/recording-slides-data); null se non ce ne sono. */
   recordingSlides?: RecordingSlidesView | null;
+  /** Lo staff guarda la pagina come sara' pubblicata (`?anteprima=1`), con la
+   *  registrazione non ancora pubblica (lib/recording/audience). */
+  previewForStaff?: boolean;
+  /** La registrazione e' pubblicata per i soli iscritti e questa richiesta non
+   *  prova un'iscrizione: la pagina lo dice invece di tacere. */
+  recordingForRegistrants?: boolean;
 }
 
 export default function EventDetailClient({
@@ -175,6 +182,8 @@ export default function EventDetailClient({
   recap = null,
   tags = [],
   invalidToken = false,
+  previewForStaff = false,
+  recordingForRegistrants = false,
   hasRoomAccess = false,
   registrationAccess = 'open',
   registrationOpen,
@@ -463,6 +472,21 @@ export default function EventDetailClient({
                 : t('detail.invalidTokenBody')}
           </div>
         </Alert>
+      )}
+
+      {previewForStaff && (
+        <div className="alert alert-warning mb-4" role="status">
+          <strong>{t('detail.previewTitle')}</strong>
+          <div className="mt-1">{t('detail.previewBody')}</div>
+        </div>
+      )}
+
+      {isEnded && recordingForRegistrants && (
+        <div className="alert alert-info mb-4" role="status">
+          <strong>{t('detail.recordingForRegistrantsTitle')}</strong>
+          <div className="mt-1">{t('detail.recordingForRegistrantsBody')}</div>
+          <RecordingLinkRequest slug={event.slug} locale={locale} />
+        </div>
       )}
 
       {isEnded && (
