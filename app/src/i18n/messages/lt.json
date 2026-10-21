@@ -5386,7 +5386,8 @@
       "polls": "Apklausos",
       "feedback": "Atsiliepimai",
       "transcript": "DI transkripcija",
-      "ratingsCount": "{count, plural, one {# įvertinimas} few {# įvertinimai} many {# įvertinimo} other {# įvertinimų}}"
+      "ratingsCount": "{count, plural, one {# įvertinimas} few {# įvertinimai} many {# įvertinimo} other {# įvertinimų}}",
+      "moments": "Transliacijos akimirkos"
     },
     "recordingNotify": "Pranešti užsiregistravusiems, kai įrašas paskelbtas",
     "recordingNotifyHelp": "Vienas el. laiškas, kai įrašas (ar išorinis vaizdo įrašas) matomas viešame renginio puslapyje. Jis pasiekia vis dar užsiregistravusius: pasibaigus saugojimo laikotarpiui niekam nepranešama.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkripcija (.txt)",
       "subtitles": "Subtitrai (.srt)",
       "summary": "Santrauka (.md)"
+    },
+    "moments": {
+      "title": "Transliacijos akimirkos",
+      "seekTo": "Eiti į {time}",
+      "answer": "Atsakymas:",
+      "votes": "{count, plural, one {# balsas} few {# balsai} many {# balso} other {# balsų}}",
+      "kind": {
+        "topic": "Tema",
+        "presentation": "Pristatymas",
+        "poll": "Apklausa",
+        "question": "Klausimas",
+        "wordcloud": "Vienu žodžiu"
+      }
     }
   },
   "provisioning": {

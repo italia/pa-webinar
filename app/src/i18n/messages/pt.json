@@ -5386,7 +5386,8 @@
       "polls": "Sondagens",
       "feedback": "Feedback",
       "transcript": "Transcrição de IA",
-      "ratingsCount": "{count, plural, one {# avaliação} other {# avaliações}}"
+      "ratingsCount": "{count, plural, one {# avaliação} other {# avaliações}}",
+      "moments": "Momentos do direto"
     },
     "recordingNotify": "Avisar os inscritos quando a gravação for publicada",
     "recordingNotifyHelp": "Um único e-mail, quando a gravação (ou o vídeo externo) fica visível na página pública do evento. Chega a quem ainda está inscrito: após o período de conservação ninguém é avisado.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcrição (.txt)",
       "subtitles": "Legendas (.srt)",
       "summary": "Resumo (.md)"
+    },
+    "moments": {
+      "title": "Momentos do direto",
+      "seekTo": "Ir para {time}",
+      "answer": "Resposta:",
+      "votes": "{count, plural, one {# voto} other {# votos}}",
+      "kind": {
+        "topic": "Tema",
+        "presentation": "Apresentação",
+        "poll": "Sondagem",
+        "question": "Pergunta",
+        "wordcloud": "Numa palavra"
+      }
     }
   },
   "provisioning": {

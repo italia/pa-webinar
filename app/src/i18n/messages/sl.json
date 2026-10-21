@@ -5386,7 +5386,8 @@
       "polls": "Ankete",
       "feedback": "Povratne informacije",
       "transcript": "Prepis AI",
-      "ratingsCount": "{count, plural, one {# ocena} two {# oceni} few {# ocene} other {# ocen}}"
+      "ratingsCount": "{count, plural, one {# ocena} two {# oceni} few {# ocene} other {# ocen}}",
+      "moments": "Trenutki prenosa"
     },
     "recordingNotify": "Obvesti prijavljene, ko je posnetek objavljen",
     "recordingNotifyHelp": "Eno samo sporočilo, ko je posnetek (ali zunanji video) viden na javni strani dogodka. Dobijo ga še prijavljeni: po izteku hrambe nihče.",
@@ -5479,6 +5480,19 @@
       "transcript": "Prepis (.txt)",
       "subtitles": "Podnapisi (.srt)",
       "summary": "Povzetek (.md)"
+    },
+    "moments": {
+      "title": "Trenutki prenosa",
+      "seekTo": "Pojdi na {time}",
+      "answer": "Odgovor:",
+      "votes": "{count, plural, one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
+      "kind": {
+        "topic": "Tema",
+        "presentation": "Predstavitev",
+        "poll": "Anketa",
+        "question": "Vprašanje",
+        "wordcloud": "Z eno besedo"
+      }
     }
   },
   "provisioning": {

@@ -1398,6 +1398,23 @@ button.live-time-strip__rec {
     }
   }
 
+  &__interruttore {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--app-text);
+    cursor: pointer;
+
+    input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--app-primary, #0066cc);
+    }
+  }
+
   &__audio {
     display: inline-flex;
     flex-wrap: wrap;
@@ -1424,6 +1441,157 @@ button.live-time-strip__rec {
       border-color: var(--app-primary, #0066cc);
       color: var(--app-primary, #0066cc);
       font-weight: 600;
+    }
+  }
+}
+
+// ── Momenti della diretta (components/events/replay-moments) ──
+//
+// Una riga per momento: il tempo (un pulsante che porta al punto del video),
+// che cosa e' successo, e per sondaggi e «In una parola» i risultati.
+.replay-moments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid #d6e3f1;
+
+  &__voce {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.6rem 0 0.6rem 0.9rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 1.05rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #9fb6cd;
+    }
+
+    &.is-current {
+      background: #f2f7fd;
+
+      &::before {
+        background: var(--app-primary, #0066cc);
+        border-color: var(--app-primary, #0066cc);
+      }
+    }
+  }
+
+  &__tempo {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    min-width: 4.2rem;
+    min-height: 32px;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #c9d4de;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--app-primary, #0066cc);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--app-primary, #0066cc);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+  }
+
+  &__corpo {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+  }
+
+  &__titolo {
+    margin: 0.15rem 0 0;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+
+  &__risposta,
+  &__nota {
+    margin: 0.3rem 0 0;
+    font-size: 0.88rem;
+    color: var(--app-text);
+  }
+
+  &__nota {
+    color: var(--app-muted);
+  }
+
+  &__risultati {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+
+    li {
+      display: grid;
+      grid-template-columns: minmax(0, 12rem) 1fr auto;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__barra {
+    height: 8px;
+    border-radius: 4px;
+    background: #e6edf4;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      background: var(--app-primary, #0066cc);
+    }
+  }
+
+  &__conto {
+    font-variant-numeric: tabular-nums;
+    color: var(--app-muted);
+  }
+
+  &__parole {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.4rem 0 0;
+
+    span {
+      padding: 0.1rem 0.5rem;
+      border: 1px solid #dee5ec;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 0.85rem;
+      color: var(--app-primary, #0066cc);
+    }
+
+    small {
+      color: var(--app-muted);
     }
   }
 }

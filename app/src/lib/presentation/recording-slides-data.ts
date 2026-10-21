@@ -137,7 +137,7 @@ const MAX_AVVII = 500;
  * registratore avvia quando la sala va in diretta, prima che chi modera
  * avvii il video.
  */
-async function tempiDelVideo(
+export async function tempiDelVideo(
   r: RecordingForSlides
 ): Promise<{ t0: Date; exact: boolean; durationSec: number | null }> {
   const arrivo = r.callSession?.endedAt ?? r.createdAt;

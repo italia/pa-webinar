@@ -5386,7 +5386,8 @@
       "polls": "Aptaujas",
       "feedback": "Atsauksmes",
       "transcript": "MI transkripcija",
-      "ratingsCount": "{count, plural, zero {# vērtējumu} one {# vērtējums} other {# vērtējumi}}"
+      "ratingsCount": "{count, plural, zero {# vērtējumu} one {# vērtējums} other {# vērtējumi}}",
+      "moments": "Tiešraides mirkļi"
     },
     "recordingNotify": "Paziņot reģistrētajiem, kad ieraksts ir publicēts",
     "recordingNotifyHelp": "Viens e-pasts, kad ieraksts (vai ārējais video) ir redzams pasākuma publiskajā lapā. Tas sasniedz tos, kas vēl ir reģistrēti: pēc glabāšanas termiņa neviens netiek informēts.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkripcija (.txt)",
       "subtitles": "Subtitri (.srt)",
       "summary": "Kopsavilkums (.md)"
+    },
+    "moments": {
+      "title": "Tiešraides mirkļi",
+      "seekTo": "Pāriet uz {time}",
+      "answer": "Atbilde:",
+      "votes": "{count, plural, zero {# balsu} one {# balss} other {# balsis}}",
+      "kind": {
+        "topic": "Tēma",
+        "presentation": "Prezentācija",
+        "poll": "Aptauja",
+        "question": "Jautājums",
+        "wordcloud": "Vienā vārdā"
+      }
     }
   },
   "provisioning": {

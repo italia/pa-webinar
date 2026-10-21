@@ -2,15 +2,13 @@
 
 import { useState, type RefObject } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
-import {
-  Badge,
-  Card,
-  CardBody,
-} from 'design-react-kit';
+import { Badge, Card, CardBody } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import TranscriptPanel from '@/components/events/transcript-panel';
 import MaterialList from '@/components/materials/material-list';
+import ReplayMoments from '@/components/events/replay-moments';
+import type { ReplayMoment } from '@/lib/replay/moments';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 
 interface QuestionData {
@@ -68,9 +66,11 @@ interface PostEventTabsProps {
   /** True quando il fetch postprod ha trovato almeno un artifact
    *  visibile (subtitle o audio). Se false la tab non appare. */
   transcriptAvailable?: boolean;
+  /** I momenti della diretta sul tempo del video (lib/replay/moments). */
+  moments?: ReplayMoment[] | null;
 }
 
-type TabKey = 'transcript' | 'qa' | 'materials' | 'polls' | 'feedback';
+type TabKey = 'moments' | 'transcript' | 'qa' | 'materials' | 'polls' | 'feedback';
 
 export default function PostEventTabs({
   questions,
@@ -85,6 +85,7 @@ export default function PostEventTabs({
   playerRef,
   transcriptLanguage,
   transcriptAvailable,
+  moments,
 }: PostEventTabsProps) {
   const t = useTranslations('postEvent.tabs');
 
@@ -96,22 +97,53 @@ export default function PostEventTabs({
   // Mancanza di una qualsiasi → tab nascosta (graceful degradation:
   // l'evento può non aver attivato pipeline AI, oppure non c'è ancora
   // nessun artifact pronto).
-  const transcriptShow =
-    !!transcriptAvailable && !!eventSlug && !!playerRef;
+  const transcriptShow = !!transcriptAvailable && !!eventSlug && !!playerRef;
 
   const tabs: { key: TabKey; label: string; count: number; show: boolean }[] = [
     { key: 'transcript', label: t('transcript'), count: 0, show: transcriptShow },
-    { key: 'qa', label: t('qa'), count: questions.length, show: showQA && questions.length > 0 },
-    { key: 'materials', label: t('materials'), count: materials.length, show: showMaterials && materials.length > 0 },
-    { key: 'polls', label: t('polls'), count: polls.length, show: showPolls && polls.length > 0 },
-    { key: 'feedback', label: t('feedback'), count: feedback?.count ?? 0, show: showFeedback && !!feedback && feedback.count > 0 },
+    {
+      key: 'moments',
+      label: t('moments'),
+      count: moments?.length ?? 0,
+      show: !!playerRef && (moments?.length ?? 0) > 0,
+    },
+    {
+      key: 'qa',
+      label: t('qa'),
+      count: questions.length,
+      show: showQA && questions.length > 0,
+    },
+    {
+      key: 'materials',
+      label: t('materials'),
+      count: materials.length,
+      show: showMaterials && materials.length > 0,
+    },
+    {
+      key: 'polls',
+      label: t('polls'),
+      count: polls.length,
+      show: showPolls && polls.length > 0,
+    },
+    {
+      key: 'feedback',
+      label: t('feedback'),
+      count: feedback?.count ?? 0,
+      show: showFeedback && !!feedback && feedback.count > 0,
+    },
   ];
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
-  const [activeTab, setActiveTab] = useState<TabKey>(
-    visibleTabs[0]?.key ?? 'qa',
-  );
+  // La prima scheda visibile, finche' chi guarda non ne sceglie una: la
+  // trascrizione arriva dopo il primo render (la pagina la legge dalla sua
+  // rotta) e prende il posto che le spetta.
+  const [sceltaTab, setSceltaTab] = useState<TabKey | null>(null);
+  const activeTab: TabKey =
+    sceltaTab && visibleTabs.some((tab) => tab.key === sceltaTab)
+      ? sceltaTab
+      : (visibleTabs[0]?.key ?? 'qa');
+  const setActiveTab = (key: TabKey) => setSceltaTab(key);
 
   if (visibleTabs.length === 0) return null;
 
@@ -124,9 +156,7 @@ export default function PostEventTabs({
             key={tab.key}
             type="button"
             className={`btn btn-sm d-inline-flex align-items-center gap-1 ${
-              activeTab === tab.key
-                ? 'btn-primary'
-                : 'btn-outline-primary'
+              activeTab === tab.key ? 'btn-primary' : 'btn-outline-primary'
             }`}
             onClick={() => setActiveTab(tab.key)}
             style={{ borderRadius: 20 }}
@@ -139,7 +169,10 @@ export default function PostEventTabs({
                 style={{
                   fontSize: '0.68rem',
                   padding: '1px 6px',
-                  backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.25)' : 'rgba(0,102,204,0.1)',
+                  backgroundColor:
+                    activeTab === tab.key
+                      ? 'rgba(255,255,255,0.25)'
+                      : 'rgba(0,102,204,0.1)',
                   color: activeTab === tab.key ? '#fff' : 'var(--app-primary)',
                 }}
               >
@@ -151,6 +184,9 @@ export default function PostEventTabs({
       </div>
 
       {/* Tab content */}
+      {activeTab === 'moments' && moments && playerRef && (
+        <ReplayMoments moments={moments} playerRef={playerRef} />
+      )}
       {activeTab === 'transcript' && transcriptShow && eventSlug && playerRef && (
         <TranscriptPanel
           playerRef={playerRef}
@@ -159,15 +195,11 @@ export default function PostEventTabs({
           activeLanguage={transcriptLanguage ?? null}
         />
       )}
-      {activeTab === 'qa' && showQA && (
-        <QATabContent questions={questions} />
-      )}
+      {activeTab === 'qa' && showQA && <QATabContent questions={questions} />}
       {activeTab === 'materials' && showMaterials && (
         <MaterialList materials={materials} eventSlug={eventSlug} />
       )}
-      {activeTab === 'polls' && showPolls && (
-        <PollsTabContent polls={polls} />
-      )}
+      {activeTab === 'polls' && showPolls && <PollsTabContent polls={polls} />}
       {activeTab === 'feedback' && showFeedback && feedback && (
         <FeedbackTabContent feedback={feedback} />
       )}
@@ -180,7 +212,11 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
   return (
     <div className="d-flex flex-column gap-2">
       {questions.map((q) => (
-        <Card key={q.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
+        <Card
+          key={q.id}
+          className="shadow-sm border-0"
+          style={{ borderRadius: '0.5rem' }}
+        >
           <CardBody className="p-3">
             <div className="d-flex justify-content-between align-items-start">
               <div style={{ minWidth: 0 }}>
@@ -190,7 +226,12 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
                 <div className="text-muted" style={{ fontSize: '0.82rem' }}>
                   {q.authorName}
                   {q.status === 'ANSWERED' && (
-                    <Badge color="success" pill className="ms-2" style={{ fontSize: '0.68rem' }}>
+                    <Badge
+                      color="success"
+                      pill
+                      className="ms-2"
+                      style={{ fontSize: '0.68rem' }}
+                    >
                       {t('status.ANSWERED')}
                     </Badge>
                   )}
@@ -204,7 +245,10 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
               </div>
               <div className="d-flex align-items-center gap-1 flex-shrink-0 ms-2">
                 <Icon icon="it-arrow-up" size="xs" className="text-primary" />
-                <span className="fw-semibold" style={{ fontSize: '0.85rem', color: 'var(--app-primary)' }}>
+                <span
+                  className="fw-semibold"
+                  style={{ fontSize: '0.85rem', color: 'var(--app-primary)' }}
+                >
                   {q.upvotes}
                 </span>
               </div>
@@ -222,7 +266,11 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
   return (
     <div className="d-flex flex-column gap-3">
       {polls.map((poll) => (
-        <Card key={poll.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
+        <Card
+          key={poll.id}
+          className="shadow-sm border-0"
+          style={{ borderRadius: '0.5rem' }}
+        >
           <CardBody className="p-3">
             <p className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {poll.question}
@@ -230,10 +278,14 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
             <div className="d-flex flex-column gap-2">
               {poll.options.map((option, i) => {
                 const count = poll.voteCounts[i] ?? 0;
-                const pct = poll.totalVotes > 0 ? Math.round((count / poll.totalVotes) * 100) : 0;
+                const pct =
+                  poll.totalVotes > 0 ? Math.round((count / poll.totalVotes) * 100) : 0;
                 return (
                   <div key={i}>
-                    <div className="d-flex justify-content-between mb-1" style={{ fontSize: '0.85rem' }}>
+                    <div
+                      className="d-flex justify-content-between mb-1"
+                      style={{ fontSize: '0.85rem' }}
+                    >
                       <span id={`${poll.id}-opzione-${i}`}>{option}</span>
                       <span className="fw-semibold">{pct}%</span>
                     </div>
@@ -275,7 +327,10 @@ function FeedbackTabContent({ feedback }: { feedback: FeedbackSummary }) {
             <div className="display-6 fw-bold" style={{ color: 'var(--app-text)' }}>
               {'⭐'.repeat(Math.round(feedback.average))}
             </div>
-            <div className="fw-semibold" style={{ fontSize: '1.1rem', color: 'var(--app-text)' }}>
+            <div
+              className="fw-semibold"
+              style={{ fontSize: '1.1rem', color: 'var(--app-text)' }}
+            >
               {feedback.average.toFixed(1)}/5
             </div>
             <div className="text-muted" style={{ fontSize: '0.85rem' }}>
@@ -288,10 +343,15 @@ function FeedbackTabContent({ feedback }: { feedback: FeedbackSummary }) {
           {[5, 4, 3, 2, 1].map((rating) => {
             const item = feedback.distribution.find((d) => d.rating === rating);
             const count = item?.count ?? 0;
-            const pct = feedback.count > 0 ? Math.round((count / feedback.count) * 100) : 0;
+            const pct =
+              feedback.count > 0 ? Math.round((count / feedback.count) * 100) : 0;
             const barWidth = maxCount > 0 ? (count / maxCount) * 100 : 0;
             return (
-              <div key={rating} className="d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
+              <div
+                key={rating}
+                className="d-flex align-items-center gap-2"
+                style={{ fontSize: '0.85rem' }}
+              >
                 <span style={{ width: 60, textAlign: 'right' }}>
                   {'⭐'.repeat(rating)}
                 </span>

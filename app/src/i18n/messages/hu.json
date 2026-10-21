@@ -5386,7 +5386,8 @@
       "polls": "Szavazások",
       "feedback": "Visszajelzés",
       "transcript": "AI-átirat",
-      "ratingsCount": "{count, plural, one {# értékelés} other {# értékelés}}"
+      "ratingsCount": "{count, plural, one {# értékelés} other {# értékelés}}",
+      "moments": "Az élő adás pillanatai"
     },
     "recordingNotify": "Értesítés a jelentkezőknek, amikor a felvétel megjelenik",
     "recordingNotifyHelp": "Egyetlen e-mail, amikor a felvétel (vagy a külső videó) látható az esemény nyilvános oldalán. A még jelentkezettekhez jut el: a megőrzési idő után senkihez.",
@@ -5479,6 +5480,19 @@
       "transcript": "Átirat (.txt)",
       "subtitles": "Felirat (.srt)",
       "summary": "Összefoglaló (.md)"
+    },
+    "moments": {
+      "title": "Az élő adás pillanatai",
+      "seekTo": "Ugrás ide: {time}",
+      "answer": "Válasz:",
+      "votes": "{count, plural, one {# szavazat} other {# szavazat}}",
+      "kind": {
+        "topic": "Téma",
+        "presentation": "Prezentáció",
+        "poll": "Szavazás",
+        "question": "Kérdés",
+        "wordcloud": "Egy szóban"
+      }
     }
   },
   "provisioning": {

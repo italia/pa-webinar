@@ -5386,7 +5386,8 @@
       "polls": "Peilingen",
       "feedback": "Feedback",
       "transcript": "AI-transcriptie",
-      "ratingsCount": "{count, plural, one {# beoordeling} other {# beoordelingen}}"
+      "ratingsCount": "{count, plural, one {# beoordeling} other {# beoordelingen}}",
+      "moments": "Momenten van de livesessie"
     },
     "recordingNotify": "Ingeschrevenen waarschuwen wanneer de opname is gepubliceerd",
     "recordingNotifyHelp": "Eén e-mail, wanneer de opname (of externe video) zichtbaar is op de openbare pagina van het evenement. Hij bereikt wie nog ingeschreven is: na de bewaartermijn wordt niemand meer gewaarschuwd.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcriptie (.txt)",
       "subtitles": "Ondertitels (.srt)",
       "summary": "Samenvatting (.md)"
+    },
+    "moments": {
+      "title": "Momenten van de livesessie",
+      "seekTo": "Naar {time}",
+      "answer": "Antwoord:",
+      "votes": "{count, plural, one {# stem} other {# stemmen}}",
+      "kind": {
+        "topic": "Onderwerp",
+        "presentation": "Presentatie",
+        "poll": "Peiling",
+        "question": "Vraag",
+        "wordcloud": "In één woord"
+      }
     }
   },
   "provisioning": {

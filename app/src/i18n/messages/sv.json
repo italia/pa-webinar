@@ -5386,7 +5386,8 @@
       "polls": "Omröstningar",
       "feedback": "Feedback",
       "transcript": "AI-transkription",
-      "ratingsCount": "{count, plural, one {# betyg} other {# betyg}}"
+      "ratingsCount": "{count, plural, one {# betyg} other {# betyg}}",
+      "moments": "Ögonblick från sändningen"
     },
     "recordingNotify": "Meddela anmälda när inspelningen publiceras",
     "recordingNotifyHelp": "Ett enda mejl när inspelningen (eller den externa videon) syns på evenemangets offentliga sida. Det når dem som fortfarande är anmälda: efter lagringstiden meddelas ingen.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkription (.txt)",
       "subtitles": "Undertexter (.srt)",
       "summary": "Sammanfattning (.md)"
+    },
+    "moments": {
+      "title": "Ögonblick från sändningen",
+      "seekTo": "Gå till {time}",
+      "answer": "Svar:",
+      "votes": "{count, plural, one {# röst} other {# röster}}",
+      "kind": {
+        "topic": "Ämne",
+        "presentation": "Presentation",
+        "poll": "Omröstning",
+        "question": "Fråga",
+        "wordcloud": "Med ett ord"
+      }
     }
   },
   "provisioning": {

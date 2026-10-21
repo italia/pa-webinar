@@ -5386,7 +5386,8 @@
       "polls": "Ankete",
       "feedback": "Povratne informacije",
       "transcript": "AI transkript",
-      "ratingsCount": "{count, plural, one {# ocjena} few {# ocjene} other {# ocjena}}"
+      "ratingsCount": "{count, plural, one {# ocjena} few {# ocjene} other {# ocjena}}",
+      "moments": "Trenuci prijenosa"
     },
     "recordingNotify": "Obavijesti prijavljene kad snimka bude objavljena",
     "recordingNotifyHelp": "Jedna poruka e-pošte, kad je snimka (ili vanjski video) vidljiva na javnoj stranici događaja. Stiže onima koji su još prijavljeni: nakon razdoblja čuvanja nitko nije obaviješten.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkript (.txt)",
       "subtitles": "Titlovi (.srt)",
       "summary": "Sažetak (.md)"
+    },
+    "moments": {
+      "title": "Trenuci prijenosa",
+      "seekTo": "Idi na {time}",
+      "answer": "Odgovor:",
+      "votes": "{count, plural, one {# glas} few {# glasa} other {# glasova}}",
+      "kind": {
+        "topic": "Tema",
+        "presentation": "Prezentacija",
+        "poll": "Anketa",
+        "question": "Pitanje",
+        "wordcloud": "Jednom riječju"
+      }
     }
   },
   "provisioning": {

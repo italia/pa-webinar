@@ -5386,7 +5386,8 @@
       "polls": "Pobalbhreitheanna",
       "feedback": "Aiseolas",
       "transcript": "Tras-scríbhinn AI",
-      "ratingsCount": "{count, plural, one {# rátáil} other {# rátáil}}"
+      "ratingsCount": "{count, plural, one {# rátáil} other {# rátáil}}",
+      "moments": "Chuimhneacháin ón gcraoladh beo"
     },
     "recordingNotify": "Cuir in iúl do na rannpháirtithe cláraithe nuair a fhoilsítear an taifeadadh",
     "recordingNotifyHelp": "Ríomhphost amháin, nuair a bhíonn an taifeadadh (nó an físeán seachtrach) le feiceáil ar leathanach poiblí an imeachta. Sroicheann sé na daoine atá fós cláraithe: tar éis na tréimhse coinneála ní chuirtear in iúl d'aon duine.",
@@ -5479,6 +5480,19 @@
       "transcript": "Tras-scríbhinn (.txt)",
       "subtitles": "Fotheidil (.srt)",
       "summary": "Achoimre (.md)"
+    },
+    "moments": {
+      "title": "Chuimhneacháin ón gcraoladh beo",
+      "seekTo": "Téigh go {time}",
+      "answer": "Freagra:",
+      "votes": "{count, plural, one {# vóta} two {# vóta} few {# vóta} many {# vóta} other {# vóta}}",
+      "kind": {
+        "topic": "Ábhar",
+        "presentation": "Cur i láthair",
+        "poll": "Pobalbhreith",
+        "question": "Ceist",
+        "wordcloud": "I bhfocal amháin"
+      }
     }
   },
   "provisioning": {

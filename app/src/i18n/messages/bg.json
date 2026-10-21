@@ -5386,7 +5386,8 @@
       "polls": "Анкети",
       "feedback": "Обратна връзка",
       "transcript": "Транскрипция с ИИ",
-      "ratingsCount": "{count, plural, one {# оценка} other {# оценки}}"
+      "ratingsCount": "{count, plural, one {# оценка} other {# оценки}}",
+      "moments": "Моменти от предаването"
     },
     "recordingNotify": "Уведоми регистрираните, когато записът бъде публикуван",
     "recordingNotifyHelp": "Един-единствен имейл, когато записът (или външното видео) е видим на публичната страница на събитието. Достига до все още регистрираните: след срока за съхранение никой не се уведомява.",
@@ -5479,6 +5480,19 @@
       "transcript": "Транскрипция (.txt)",
       "subtitles": "Субтитри (.srt)",
       "summary": "Резюме (.md)"
+    },
+    "moments": {
+      "title": "Моменти от предаването",
+      "seekTo": "Към {time}",
+      "answer": "Отговор:",
+      "votes": "{count, plural, one {# глас} other {# гласа}}",
+      "kind": {
+        "topic": "Тема",
+        "presentation": "Презентация",
+        "poll": "Анкета",
+        "question": "Въпрос",
+        "wordcloud": "С една дума"
+      }
     }
   },
   "provisioning": {

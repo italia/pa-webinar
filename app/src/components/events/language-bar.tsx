@@ -43,7 +43,11 @@ export default function LanguageBar({
   onAudioChange,
 }: LanguageBarProps) {
   const t = useTranslations('postEvent.languages');
-  const nome = (l: string) => locName(l, locale);
+  // Il nome della lingua come si scrive a inizio di voce («Italiano»).
+  const nome = (l: string) => {
+    const n = locName(l, locale);
+    return n.charAt(0).toLocaleUpperCase(locale) + n.slice(1);
+  };
   const lingue = [
     sourceLanguage,
     ...[...new Set([...subtitleLanguages, ...audioLanguages, ...summaryLanguages])]
@@ -85,19 +89,14 @@ export default function LanguageBar({
       </div>
       <div className="language-bar__opzioni">
         {subtitleLanguages.includes(language) && (
-          <div className="form-check form-switch m-0">
+          <label className="language-bar__interruttore">
             <input
-              id="language-bar-subtitles"
-              className="form-check-input"
               type="checkbox"
-              role="switch"
               checked={subtitlesOn}
               onChange={(e) => onSubtitlesChange(e.target.checked)}
             />
-            <label className="form-check-label" htmlFor="language-bar-subtitles">
-              {t('showSubtitles', { language: nome(language) })}
-            </label>
-          </div>
+            <span>{t('showSubtitles', { language: nome(language) })}</span>
+          </label>
         )}
         {language !== sourceLanguage && audioLanguages.includes(language) && (
           <div className="language-bar__audio" role="group" aria-label={t('audioLabel')}>

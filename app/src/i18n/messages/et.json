@@ -5386,7 +5386,8 @@
       "polls": "Küsitlused",
       "feedback": "Tagasiside",
       "transcript": "AI transkriptsioon",
-      "ratingsCount": "{count, plural, one {# hinnang} other {# hinnangut}}"
+      "ratingsCount": "{count, plural, one {# hinnang} other {# hinnangut}}",
+      "moments": "Otseülekande hetked"
     },
     "recordingNotify": "Teavita registreerunuid, kui salvestis avaldatakse",
     "recordingNotifyHelp": "Üks e-kiri, kui salvestis (või väline video) on ürituse avalikul lehel nähtav. See jõuab nendeni, kes on veel registreeritud: pärast säilitusaega kedagi ei teavitata.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkriptsioon (.txt)",
       "subtitles": "Subtiitrid (.srt)",
       "summary": "Kokkuvõte (.md)"
+    },
+    "moments": {
+      "title": "Otseülekande hetked",
+      "seekTo": "Mine aega {time}",
+      "answer": "Vastus:",
+      "votes": "{count, plural, one {# hääl} other {# häält}}",
+      "kind": {
+        "topic": "Teema",
+        "presentation": "Esitlus",
+        "poll": "Küsitlus",
+        "question": "Küsimus",
+        "wordcloud": "Ühe sõnaga"
+      }
     }
   },
   "provisioning": {

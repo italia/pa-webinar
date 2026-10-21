@@ -5386,7 +5386,8 @@
       "polls": "Sondages",
       "feedback": "Retours",
       "transcript": "Transcription IA",
-      "ratingsCount": "{count, plural, one {# évaluation} other {# évaluations}}"
+      "ratingsCount": "{count, plural, one {# évaluation} other {# évaluations}}",
+      "moments": "Moments du direct"
     },
     "recordingNotify": "Prévenir les inscrits quand l'enregistrement est publié",
     "recordingNotifyHelp": "Un seul e-mail, quand l'enregistrement (ou la vidéo externe) est visible sur la page publique de l'événement. Il atteint les personnes encore inscrites : après la durée de conservation, personne n'est prévenu.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcription (.txt)",
       "subtitles": "Sous-titres (.srt)",
       "summary": "Synthèse (.md)"
+    },
+    "moments": {
+      "title": "Moments du direct",
+      "seekTo": "Aller à {time}",
+      "answer": "Réponse :",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "kind": {
+        "topic": "Sujet",
+        "presentation": "Présentation",
+        "poll": "Sondage",
+        "question": "Question",
+        "wordcloud": "En un mot"
+      }
     }
   },
   "provisioning": {

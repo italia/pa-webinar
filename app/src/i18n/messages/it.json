@@ -5386,7 +5386,8 @@
       "polls": "Sondaggi",
       "feedback": "Feedback",
       "transcript": "Trascrizione AI",
-      "ratingsCount": "{count, plural, one {# valutazione} other {# valutazioni}}"
+      "ratingsCount": "{count, plural, one {# valutazione} other {# valutazioni}}",
+      "moments": "Momenti della diretta"
     },
     "recordingNotify": "Avvisa gli iscritti quando la registrazione è pubblicata",
     "recordingNotifyHelp": "Un'email sola, quando la registrazione (o il video esterno) è visibile sulla pagina pubblica dell'evento. Arriva a chi è ancora iscritto: dopo la conservazione dei dati non avvisa nessuno.",
@@ -5479,6 +5480,19 @@
       "transcript": "Trascrizione (.txt)",
       "subtitles": "Sottotitoli (.srt)",
       "summary": "Sintesi (.md)"
+    },
+    "moments": {
+      "title": "Momenti della diretta",
+      "seekTo": "Vai al minuto {time}",
+      "answer": "Risposta:",
+      "votes": "{count, plural, one {# voto} other {# voti}}",
+      "kind": {
+        "topic": "Argomento",
+        "presentation": "Presentazione",
+        "poll": "Sondaggio",
+        "question": "Domanda",
+        "wordcloud": "In una parola"
+      }
     }
   },
   "provisioning": {

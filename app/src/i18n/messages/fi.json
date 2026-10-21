@@ -5386,7 +5386,8 @@
       "polls": "Kyselyt",
       "feedback": "Palaute",
       "transcript": "Tekoälylitterointi",
-      "ratingsCount": "{count, plural, one {# arvio} other {# arviota}}"
+      "ratingsCount": "{count, plural, one {# arvio} other {# arviota}}",
+      "moments": "Lähetyksen hetket"
     },
     "recordingNotify": "Ilmoita osallistujille, kun tallenne julkaistaan",
     "recordingNotifyHelp": "Yksi sähköposti, kun tallenne (tai ulkoinen video) näkyy tapahtuman julkisella sivulla. Se tavoittaa vielä ilmoittautuneet: säilytysajan jälkeen ketään ei ilmoiteta.",
@@ -5479,6 +5480,19 @@
       "transcript": "Litterointi (.txt)",
       "subtitles": "Tekstitys (.srt)",
       "summary": "Tiivistelmä (.md)"
+    },
+    "moments": {
+      "title": "Lähetyksen hetket",
+      "seekTo": "Siirry kohtaan {time}",
+      "answer": "Vastaus:",
+      "votes": "{count, plural, one {# ääni} other {# ääntä}}",
+      "kind": {
+        "topic": "Aihe",
+        "presentation": "Esitys",
+        "poll": "Kysely",
+        "question": "Kysymys",
+        "wordcloud": "Yhdellä sanalla"
+      }
     }
   },
   "provisioning": {

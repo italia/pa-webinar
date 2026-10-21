@@ -5386,7 +5386,8 @@
       "polls": "Ankiety",
       "feedback": "Opinie",
       "transcript": "Transkrypcja AI",
-      "ratingsCount": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}"
+      "ratingsCount": "{count, plural, one {# ocena} few {# oceny} many {# ocen} other {# oceny}}",
+      "moments": "Momenty transmisji"
     },
     "recordingNotify": "Powiadom zapisanych, gdy nagranie zostanie opublikowane",
     "recordingNotifyHelp": "Jeden e-mail, gdy nagranie (lub zewnętrzne wideo) jest widoczne na publicznej stronie wydarzenia. Trafia do osób wciąż zapisanych: po okresie przechowywania nikt nie jest powiadamiany.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkrypcja (.txt)",
       "subtitles": "Napisy (.srt)",
       "summary": "Podsumowanie (.md)"
+    },
+    "moments": {
+      "title": "Momenty transmisji",
+      "seekTo": "Przejdź do {time}",
+      "answer": "Odpowiedź:",
+      "votes": "{count, plural, one {# głos} few {# głosy} many {# głosów} other {# głosu}}",
+      "kind": {
+        "topic": "Temat",
+        "presentation": "Prezentacja",
+        "poll": "Ankieta",
+        "question": "Pytanie",
+        "wordcloud": "Jednym słowem"
+      }
     }
   },
   "provisioning": {

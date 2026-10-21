@@ -5386,7 +5386,8 @@
       "polls": "Ankety",
       "feedback": "Spätná väzba",
       "transcript": "AI prepis",
-      "ratingsCount": "{count, plural, one {# hodnotenie} few {# hodnotenia} many {# hodnotení} other {# hodnotení}}"
+      "ratingsCount": "{count, plural, one {# hodnotenie} few {# hodnotenia} many {# hodnotení} other {# hodnotení}}",
+      "moments": "Okamihy prenosu"
     },
     "recordingNotify": "Upozorniť prihlásených, keď bude záznam zverejnený",
     "recordingNotifyHelp": "Jediný e-mail, keď je záznam (alebo externé video) viditeľný na verejnej stránke podujatia. Dostanú ho tí, ktorí sú stále prihlásení: po uplynutí doby uchovávania už nikto.",
@@ -5479,6 +5480,19 @@
       "transcript": "Prepis (.txt)",
       "subtitles": "Titulky (.srt)",
       "summary": "Zhrnutie (.md)"
+    },
+    "moments": {
+      "title": "Okamihy prenosu",
+      "seekTo": "Prejsť na {time}",
+      "answer": "Odpoveď:",
+      "votes": "{count, plural, one {# hlas} few {# hlasy} many {# hlasu} other {# hlasov}}",
+      "kind": {
+        "topic": "Téma",
+        "presentation": "Prezentácia",
+        "poll": "Anketa",
+        "question": "Otázka",
+        "wordcloud": "Jedným slovom"
+      }
     }
   },
   "provisioning": {

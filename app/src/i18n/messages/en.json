@@ -5386,7 +5386,8 @@
       "polls": "Polls",
       "feedback": "Feedback",
       "transcript": "AI transcript",
-      "ratingsCount": "{count, plural, one {# rating} other {# ratings}}"
+      "ratingsCount": "{count, plural, one {# rating} other {# ratings}}",
+      "moments": "Live moments"
     },
     "recordingNotify": "Notify registrants when the recording is published",
     "recordingNotifyHelp": "A single email, sent when the recording (or external video) is visible on the event's public page. It reaches whoever is still registered: after the data retention period nobody is notified.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcript (.txt)",
       "subtitles": "Subtitles (.srt)",
       "summary": "Summary (.md)"
+    },
+    "moments": {
+      "title": "Live moments",
+      "seekTo": "Go to {time}",
+      "answer": "Answer:",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "kind": {
+        "topic": "Topic",
+        "presentation": "Presentation",
+        "poll": "Poll",
+        "question": "Question",
+        "wordcloud": "In one word"
+      }
     }
   },
   "provisioning": {

@@ -5386,7 +5386,8 @@
       "polls": "Umfragen",
       "feedback": "Feedback",
       "transcript": "KI-Transkript",
-      "ratingsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}"
+      "ratingsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+      "moments": "Momente der Live-Veranstaltung"
     },
     "recordingNotify": "Angemeldete benachrichtigen, wenn die Aufzeichnung veröffentlicht ist",
     "recordingNotifyHelp": "Eine einzige E-Mail, sobald die Aufzeichnung (oder das externe Video) auf der öffentlichen Seite sichtbar ist. Sie erreicht alle, die noch angemeldet sind: nach Ablauf der Aufbewahrungsfrist wird niemand mehr benachrichtigt.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transkript (.txt)",
       "subtitles": "Untertitel (.srt)",
       "summary": "Zusammenfassung (.md)"
+    },
+    "moments": {
+      "title": "Momente der Live-Veranstaltung",
+      "seekTo": "Zu {time} springen",
+      "answer": "Antwort:",
+      "votes": "{count, plural, one {# Stimme} other {# Stimmen}}",
+      "kind": {
+        "topic": "Thema",
+        "presentation": "Präsentation",
+        "poll": "Umfrage",
+        "question": "Frage",
+        "wordcloud": "In einem Wort"
+      }
     }
   },
   "provisioning": {

@@ -5386,7 +5386,8 @@
       "polls": "Stħarriġ",
       "feedback": "Feedback",
       "transcript": "Traskrizzjoni bl-AI",
-      "ratingsCount": "{count, plural, one {# evalwazzjoni} other {# evalwazzjonijiet}}"
+      "ratingsCount": "{count, plural, one {# evalwazzjoni} other {# evalwazzjonijiet}}",
+      "moments": "Mumenti mid-dirett"
     },
     "recordingNotify": "Avża lill-irreġistrati meta r-reġistrazzjoni tiġi ppubblikata",
     "recordingNotifyHelp": "Email waħda biss, meta r-reġistrazzjoni (jew il-vidjo estern) tidher fil-paġna pubblika tal-avveniment. Tasal għand min għadu rreġistrat: wara l-perjodu taż-żamma ħadd ma jiġi avżat.",
@@ -5479,6 +5480,19 @@
       "transcript": "Traskrizzjoni (.txt)",
       "subtitles": "Sottotitoli (.srt)",
       "summary": "Sommarju (.md)"
+    },
+    "moments": {
+      "title": "Mumenti mid-dirett",
+      "seekTo": "Mur għal {time}",
+      "answer": "Tweġiba:",
+      "votes": "{count, plural, one {# vot} few {# voti} many {# vot} other {# vot}}",
+      "kind": {
+        "topic": "Suġġett",
+        "presentation": "Preżentazzjoni",
+        "poll": "Stħarriġ",
+        "question": "Mistoqsija",
+        "wordcloud": "Fi kelma waħda"
+      }
     }
   },
   "provisioning": {

@@ -41,6 +41,7 @@ import EventProgramme from '@/components/events/event-programme';
 import type { VoceProgramma } from '@/lib/agenda/programme';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import LanguageBar from '@/components/events/language-bar';
+import type { ReplayMoment } from '@/lib/replay/moments';
 
 interface AnsweredQuestion {
   id: string;
@@ -172,6 +173,8 @@ interface EventDetailClientProps {
   /** La registrazione e' pubblicata per i soli iscritti e questa richiesta non
    *  prova un'iscrizione: la pagina lo dice invece di tacere. */
   recordingForRegistrants?: boolean;
+  /** I momenti della diretta sul tempo del video (lib/replay/moments). */
+  replayMoments?: ReplayMoment[] | null;
 }
 
 export default function EventDetailClient({
@@ -188,6 +191,7 @@ export default function EventDetailClient({
   invalidToken = false,
   previewForStaff = false,
   recordingForRegistrants = false,
+  replayMoments = null,
   hasRoomAccess = false,
   registrationAccess = 'open',
   registrationOpen,
@@ -663,6 +667,7 @@ export default function EventDetailClient({
               eventSlug={event.slug}
               playerRef={playerRef}
               transcriptLanguage={linguaTesti}
+              moments={replayMoments}
               transcriptAvailable={postprodMeta?.transcriptAvailable ?? false}
             />
           )}

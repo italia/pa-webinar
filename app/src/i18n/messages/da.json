@@ -5386,7 +5386,8 @@
       "polls": "Afstemninger",
       "feedback": "Feedback",
       "transcript": "AI-transskription",
-      "ratingsCount": "{count, plural, one {# bedømmelse} other {# bedømmelser}}"
+      "ratingsCount": "{count, plural, one {# bedømmelse} other {# bedømmelser}}",
+      "moments": "Øjeblikke fra livesessionen"
     },
     "recordingNotify": "Giv tilmeldte besked, når optagelsen er offentliggjort",
     "recordingNotifyHelp": "Én e-mail, når optagelsen (eller den eksterne video) er synlig på arrangementets offentlige side. Den når dem, der stadig er tilmeldt: efter opbevaringsperioden får ingen besked.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transskription (.txt)",
       "subtitles": "Undertekster (.srt)",
       "summary": "Resumé (.md)"
+    },
+    "moments": {
+      "title": "Øjeblikke fra livesessionen",
+      "seekTo": "Gå til {time}",
+      "answer": "Svar:",
+      "votes": "{count, plural, one {# stemme} other {# stemmer}}",
+      "kind": {
+        "topic": "Emne",
+        "presentation": "Præsentation",
+        "poll": "Afstemning",
+        "question": "Spørgsmål",
+        "wordcloud": "Med ét ord"
+      }
     }
   },
   "provisioning": {

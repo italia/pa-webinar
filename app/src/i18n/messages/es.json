@@ -5386,7 +5386,8 @@
       "polls": "Encuestas",
       "feedback": "Valoraciones",
       "transcript": "Transcripción con IA",
-      "ratingsCount": "{count, plural, one {# valoración} other {# valoraciones}}"
+      "ratingsCount": "{count, plural, one {# valoración} other {# valoraciones}}",
+      "moments": "Momentos del directo"
     },
     "recordingNotify": "Avisar a los inscritos cuando se publique la grabación",
     "recordingNotifyHelp": "Un único correo, cuando la grabación (o el vídeo externo) es visible en la página pública del evento. Llega a quien sigue inscrito: tras el periodo de conservación no se avisa a nadie.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcripción (.txt)",
       "subtitles": "Subtítulos (.srt)",
       "summary": "Resumen (.md)"
+    },
+    "moments": {
+      "title": "Momentos del directo",
+      "seekTo": "Ir a {time}",
+      "answer": "Respuesta:",
+      "votes": "{count, plural, one {# voto} other {# votos}}",
+      "kind": {
+        "topic": "Tema",
+        "presentation": "Presentación",
+        "poll": "Encuesta",
+        "question": "Pregunta",
+        "wordcloud": "En una palabra"
+      }
     }
   },
   "provisioning": {

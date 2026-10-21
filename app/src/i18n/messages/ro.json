@@ -5386,7 +5386,8 @@
       "polls": "Sondaje",
       "feedback": "Feedback",
       "transcript": "Transcriere AI",
-      "ratingsCount": "{count, plural, one {# evaluare} few {# evaluări} other {# de evaluări}}"
+      "ratingsCount": "{count, plural, one {# evaluare} few {# evaluări} other {# de evaluări}}",
+      "moments": "Momentele transmisiunii"
     },
     "recordingNotify": "Anunță înscrișii când înregistrarea este publicată",
     "recordingNotifyHelp": "Un singur e-mail, când înregistrarea (sau videoclipul extern) este vizibilă pe pagina publică a evenimentului. Ajunge la cei încă înscriși: după perioada de păstrare nu este anunțat nimeni.",
@@ -5479,6 +5480,19 @@
       "transcript": "Transcriere (.txt)",
       "subtitles": "Subtitrări (.srt)",
       "summary": "Rezumat (.md)"
+    },
+    "moments": {
+      "title": "Momentele transmisiunii",
+      "seekTo": "Mergi la {time}",
+      "answer": "Răspuns:",
+      "votes": "{count, plural, one {# vot} few {# voturi} other {# de voturi}}",
+      "kind": {
+        "topic": "Subiect",
+        "presentation": "Prezentare",
+        "poll": "Sondaj",
+        "question": "Întrebare",
+        "wordcloud": "Într-un cuvânt"
+      }
     }
   },
   "provisioning": {
