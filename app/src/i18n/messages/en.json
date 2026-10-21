@@ -176,7 +176,10 @@
         "note": "Times are indicative.",
         "noteWithTotal": "Times are indicative · planned duration {duration}",
         "now": "In progress",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "The time is the video's: click it to jump there.",
+        "seekTo": "Go to {time}: {topic}",
+        "planned": "Planned {minutes} min"
       },
       "chatNotSaved": "Chat messages are not published after the event: they are deleted with the rest of the event data.",
       "qaPostEvent": "Q&A from the event",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transcript (.txt)",
       "subtitles": "Subtitles (.srt)",
-      "summary": "Summary (.md)"
+      "summary": "Summary (.md)",
+      "materials": "Materials"
     },
     "moments": {
       "title": "Live moments",

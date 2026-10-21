@@ -176,7 +176,10 @@
         "note": "Horaires indicatifs.",
         "noteWithTotal": "Horaires indicatifs · durée prévue {duration}",
         "now": "En cours",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "La minute est celle de la vidéo : un clic y mène.",
+        "seekTo": "Aller à {time} : {topic}",
+        "planned": "Prévu {minutes} min"
       },
       "chatNotSaved": "Les messages du chat ne sont pas publiés après l'événement : ils sont supprimés avec les autres données de l'événement.",
       "qaPostEvent": "Q&A de l'événement",
@@ -5478,7 +5481,8 @@
       "video": "Vidéo",
       "transcript": "Transcription (.txt)",
       "subtitles": "Sous-titres (.srt)",
-      "summary": "Synthèse (.md)"
+      "summary": "Synthèse (.md)",
+      "materials": "Documents"
     },
     "moments": {
       "title": "Moments du direct",

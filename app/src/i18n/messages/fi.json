@@ -176,7 +176,10 @@
         "note": "Ajat ovat suuntaa antavia.",
         "noteWithTotal": "Ajat ovat suuntaa antavia · suunniteltu kesto {duration}",
         "now": "Käynnissä",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuutti on videon minuutti: napsautus vie siihen kohtaan.",
+        "seekTo": "Siirry kohtaan {time}: {topic}",
+        "planned": "Suunniteltu {minutes} min"
       },
       "chatNotSaved": "Chatin viestejä ei julkaista tapahtuman jälkeen: ne poistetaan tapahtuman muiden tietojen mukana.",
       "qaPostEvent": "Q&A tapahtumasta",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Litterointi (.txt)",
       "subtitles": "Tekstitys (.srt)",
-      "summary": "Tiivistelmä (.md)"
+      "summary": "Tiivistelmä (.md)",
+      "materials": "Materiaalit"
     },
     "moments": {
       "title": "Lähetyksen hetket",

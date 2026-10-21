@@ -176,7 +176,10 @@
         "note": "Orele sunt orientative.",
         "noteWithTotal": "Orele sunt orientative · durată prevăzută {duration}",
         "now": "În desfășurare",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minutul este cel din video: un clic te duce acolo.",
+        "seekTo": "Mergi la {time}: {topic}",
+        "planned": "Planificat {minutes} min"
       },
       "chatNotSaved": "Mesajele din chat nu sunt publicate după eveniment: se șterg împreună cu celelalte date ale evenimentului.",
       "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transcriere (.txt)",
       "subtitles": "Subtitrări (.srt)",
-      "summary": "Rezumat (.md)"
+      "summary": "Rezumat (.md)",
+      "materials": "Materiale"
     },
     "moments": {
       "title": "Momentele transmisiunii",

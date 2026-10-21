@@ -176,7 +176,10 @@
         "note": "Az időpontok tájékoztató jellegűek.",
         "noteWithTotal": "Az időpontok tájékoztató jellegűek · tervezett időtartam {duration}",
         "now": "Folyamatban",
-        "minutes": "{minutes} perc"
+        "minutes": "{minutes} perc",
+        "videoNote": "A perc a videóban értendő: egy kattintással oda ugrasz.",
+        "seekTo": "Ugrás ide: {time} – {topic}",
+        "planned": "Tervezett: {minutes} perc"
       },
       "chatNotSaved": "A csevegés üzeneteit az esemény után nem tesszük közzé: az esemény többi adatával együtt törlődnek.",
       "qaPostEvent": "Kérdések és válaszok az eseményről",
@@ -5478,7 +5481,8 @@
       "video": "Videó",
       "transcript": "Átirat (.txt)",
       "subtitles": "Felirat (.srt)",
-      "summary": "Összefoglaló (.md)"
+      "summary": "Összefoglaló (.md)",
+      "materials": "Anyagok"
     },
     "moments": {
       "title": "Az élő adás pillanatai",

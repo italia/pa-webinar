@@ -10,10 +10,17 @@
  * argomento senza durata in poi non se ne mostrano (lib/agenda/programme).
  * Sono formattati come quelli dell'intestazione, nello stesso fuso. In
  * diretta l'argomento in corso lo dice, anche alle tecnologie assistive
- * (`aria-current="time"`).
+ * (`aria-current="time"`). Dopo l'evento, con il video, diventa l'indice
+ * della registrazione: per ogni argomento il minuto del video in cui e'
+ * cominciato (un clic porta li') e quanto e' durato davvero.
  */
 
+import type { RefObject } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
+
+import type { VideoPlayerHandle } from '@/components/events/video-player';
+import type { ProgrammeVideoTime } from '@/lib/replay/moments';
+import { formatVideoTime } from '@/lib/utils/video-time';
 
 import PersonPhoto from '@/components/events/person-photo';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
@@ -28,20 +35,35 @@ interface Props {
   startsAt: Date;
   /** L'evento e' in diretta: l'argomento in corso si mostra come tale. */
   live?: boolean;
+  /** Dopo l'evento: il minuto del video di ogni argomento (lib/replay/moments). */
+  videoTimes?: Record<string, ProgrammeVideoTime> | null;
+  /** Il lettore della registrazione, per andare al minuto di un argomento. */
+  playerRef?: RefObject<VideoPlayerHandle | null>;
 }
 
-export default function EventProgramme({ items, startsAt, live = false }: Props) {
+export default function EventProgramme({
+  items,
+  startsAt,
+  live = false,
+  videoTimes,
+  playerRef,
+}: Props) {
   const t = useTranslations('events.detail.programme');
   const format = useFormatter();
   const durata = useDurataTesto();
   if (items.length === 0) return null;
 
   const orari = orariProgramma(startsAt, items);
+  // Indice della registrazione: con il video e almeno un argomento nel video.
+  const indice = !!videoTimes && !!playerRef && Object.keys(videoTimes).length > 0;
   const totale = durataProgramma(items);
   const ora = (d: Date) => format.dateTime(d, { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <section className="event-programma mb-4" aria-labelledby="event-programma-title">
+    <section
+      className={`event-programma mb-4${indice ? ' event-programma--indice' : ''}`}
+      aria-labelledby="event-programma-title"
+    >
       <h2
         id="event-programma-title"
         className="h4 fw-semibold mb-1"
@@ -50,9 +72,11 @@ export default function EventProgramme({ items, startsAt, live = false }: Props)
         {t('title')}
       </h2>
       <p className="event-programma__nota">
-        {totale !== null
-          ? t('noteWithTotal', { duration: durata(0, totale * 60_000) })
-          : t('note')}
+        {indice
+          ? t('videoNote')
+          : totale !== null
+            ? t('noteWithTotal', { duration: durata(0, totale * 60_000) })
+            : t('note')}
       </p>
       <ol className="event-programma__elenco" role="list">
         {items.map((v, i) => {
@@ -73,7 +97,25 @@ export default function EventProgramme({ items, startsAt, live = false }: Props)
               aria-current={inCorso ? 'time' : undefined}
             >
               <span className="event-programma__quando">
-                {start && <time dateTime={start.toISOString()}>{ora(start)}</time>}
+                {indice ? (
+                  videoTimes![v.id] ? (
+                    <button
+                      type="button"
+                      className="event-programma__minuto"
+                      onClick={() =>
+                        playerRef!.current?.seekTo(videoTimes![v.id]!.offsetSec)
+                      }
+                      aria-label={t('seekTo', {
+                        time: formatVideoTime(videoTimes![v.id]!.offsetSec),
+                        topic: v.label,
+                      })}
+                    >
+                      {formatVideoTime(videoTimes![v.id]!.offsetSec)}
+                    </button>
+                  ) : null
+                ) : (
+                  start && <time dateTime={start.toISOString()}>{ora(start)}</time>
+                )}
               </span>
               <div className="event-programma__corpo">
                 <p className="event-programma__titolo">
@@ -108,9 +150,24 @@ export default function EventProgramme({ items, startsAt, live = false }: Props)
                   </p>
                 )}
               </div>
-              {v.plannedMinutes ? (
+              {indice && videoTimes![v.id]?.durationSec ? (
                 <span className="event-programma__durata">
-                  {t('minutes', { minutes: v.plannedMinutes })}
+                  {t('minutes', {
+                    minutes: Math.max(1, Math.round(videoTimes![v.id]!.durationSec / 60)),
+                  })}
+                  {v.plannedMinutes ? (
+                    <span className="event-programma__previsto">
+                      {t('planned', { minutes: v.plannedMinutes })}
+                    </span>
+                  ) : null}
+                </span>
+              ) : v.plannedMinutes ? (
+                // Nell'indice un argomento non discusso nel video mostra solo
+                // la durata prevista, detta come tale.
+                <span className="event-programma__durata">
+                  {indice
+                    ? t('planned', { minutes: v.plannedMinutes })
+                    : t('minutes', { minutes: v.plannedMinutes })}
                 </span>
               ) : null}
             </li>

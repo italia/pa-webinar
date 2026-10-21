@@ -176,7 +176,10 @@
         "note": "Laiki ir orientējoši.",
         "noteWithTotal": "Laiki ir orientējoši · plānotais ilgums {duration}",
         "now": "Notiek",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minūte ir video minūte: klikšķis aizved uz to vietu.",
+        "seekTo": "Pāriet uz {time}: {topic}",
+        "planned": "Plānots {minutes} min"
       },
       "chatNotSaved": "Tērzēšanas ziņas pēc pasākuma netiek publicētas: tās tiek dzēstas kopā ar pārējiem pasākuma datiem.",
       "qaPostEvent": "Jautājumi un atbildes no pasākuma",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transkripcija (.txt)",
       "subtitles": "Subtitri (.srt)",
-      "summary": "Kopsavilkums (.md)"
+      "summary": "Kopsavilkums (.md)",
+      "materials": "Materiāli"
     },
     "moments": {
       "title": "Tiešraides mirkļi",

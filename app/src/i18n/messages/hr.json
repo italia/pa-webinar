@@ -176,7 +176,10 @@
         "note": "Vremena su okvirna.",
         "noteWithTotal": "Vremena su okvirna · planirano trajanje {duration}",
         "now": "U tijeku",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuta je ona iz videozapisa: klik vodi na to mjesto.",
+        "seekTo": "Idi na {time}: {topic}",
+        "planned": "Planirano {minutes} min"
       },
       "chatNotSaved": "Poruke chata ne objavljuju se nakon događaja: brišu se zajedno s ostalim podacima događaja.",
       "qaPostEvent": "Pitanja i odgovori s događaja",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transkript (.txt)",
       "subtitles": "Titlovi (.srt)",
-      "summary": "Sažetak (.md)"
+      "summary": "Sažetak (.md)",
+      "materials": "Materijali"
     },
     "moments": {
       "title": "Trenuci prijenosa",

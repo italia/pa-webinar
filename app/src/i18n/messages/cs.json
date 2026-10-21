@@ -176,7 +176,10 @@
         "note": "Časy jsou orientační.",
         "noteWithTotal": "Časy jsou orientační · plánovaná délka {duration}",
         "now": "Probíhá",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuta odpovídá videu: kliknutím na ni přejdete.",
+        "seekTo": "Přejít na {time}: {topic}",
+        "planned": "Plánováno {minutes} min"
       },
       "chatNotSaved": "Zprávy z chatu se po akci nezveřejňují: mažou se spolu s ostatními údaji o akci.",
       "qaPostEvent": "Otázky a odpovědi z události",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Přepis (.txt)",
       "subtitles": "Titulky (.srt)",
-      "summary": "Shrnutí (.md)"
+      "summary": "Shrnutí (.md)",
+      "materials": "Materiály"
     },
     "moments": {
       "title": "Okamžiky přenosu",

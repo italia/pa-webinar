@@ -41,7 +41,8 @@ import EventProgramme from '@/components/events/event-programme';
 import type { VoceProgramma } from '@/lib/agenda/programme';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import LanguageBar from '@/components/events/language-bar';
-import type { ReplayMoment } from '@/lib/replay/moments';
+import { markMaterialOpened, materialOpenHandlers } from '@/components/materials/material-request';
+import type { ProgrammeVideoTime, ReplayMoment } from '@/lib/replay/moments';
 
 interface AnsweredQuestion {
   id: string;
@@ -175,6 +176,8 @@ interface EventDetailClientProps {
   recordingForRegistrants?: boolean;
   /** I momenti della diretta sul tempo del video (lib/replay/moments). */
   replayMoments?: ReplayMoment[] | null;
+  /** Il minuto del video di ogni argomento del programma (lib/replay/moments). */
+  programmeVideoTimes?: Record<string, ProgrammeVideoTime> | null;
 }
 
 export default function EventDetailClient({
@@ -192,6 +195,7 @@ export default function EventDetailClient({
   previewForStaff = false,
   recordingForRegistrants = false,
   replayMoments = null,
+  programmeVideoTimes = null,
   hasRoomAccess = false,
   registrationAccess = 'open',
   registrationOpen,
@@ -626,6 +630,17 @@ export default function EventDetailClient({
             />
           )}
 
+          {/* Il programma come indice della registrazione: ogni argomento al
+              suo minuto del video. */}
+          {videoPubblicato && programmeVideoTimes && (event.programme?.length ?? 0) > 0 && (
+            <EventProgramme
+              items={event.programme!}
+              startsAt={startsAt}
+              videoTimes={programmeVideoTimes}
+              playerRef={playerRef}
+            />
+          )}
+
           {/* Video di un evento concluso. La registrazione pubblicata passa
               dal player del portale (/api/events/[slug]/recording). Il
               `youtubeUrl` è solo un link esterno, mai un player incorporato:
@@ -780,8 +795,9 @@ export default function EventDetailClient({
             </>
           )}
 
-          {/* Il programma, prima dell'evento e durante: dopo lo raccontano il
-              resoconto e i capitoli del video. */}
+          {/* Il programma, prima dell'evento e durante. Dopo, con il video,
+              diventa l'indice della registrazione (sopra, con i minuti del
+              video); senza video lo raccontano il resoconto e i capitoli. */}
           {publicStatus !== 'ENDED' && (event.programme?.length ?? 0) > 0 && (
             <EventProgramme items={event.programme!} startsAt={startsAt} live={isLive} />
           )}
@@ -808,7 +824,9 @@ export default function EventDetailClient({
             concluso (o finito senza essersi tenuto) conta prima il contenuto. */}
         <Col lg={4} className={isEnded || pastEndNotHeld ? undefined : 'order-first order-lg-0 mb-4 mb-lg-0'}>
           <Card
-            className="shadow-sm border-0 sticky-top"
+            // Fissa mentre si scorre solo prima della fine: dopo, con
+            // scaricamenti e materiali, puo' essere piu' alta dello schermo.
+            className={`shadow-sm border-0${isEnded ? '' : ' sticky-top'}`}
             style={{ top: '1.5rem', borderRadius: '0.75rem' }}
           >
             <CardBody className="p-4">
@@ -817,6 +835,7 @@ export default function EventDetailClient({
                   event={event}
                   feedbackSummary={feedbackSummary}
                   videoOnPage={videoPubblicato}
+                  materials={materials}
                   textLanguage={linguaTesti}
                   summaryLanguage={
                     lingua && postprodMeta?.summariesStructured?.[lingua] ? lingua : null
@@ -985,6 +1004,7 @@ function PostEventSidebar({
   event,
   feedbackSummary,
   videoOnPage = false,
+  materials = [],
   textLanguage = null,
   summaryLanguage = null,
   transcriptAvailable = false,
@@ -994,6 +1014,8 @@ function PostEventSidebar({
   /** Il video e' sulla pagina: la colonna offre gli scaricamenti invece
    *  dell'avviso «registrazione disponibile». */
   videoOnPage?: boolean;
+  /** I materiali dell'evento visibili dopo la fine, da aprire o scaricare. */
+  materials?: MaterialData[];
   /** La lingua di trascrizione e sottotitoli da scaricare (una che li ha). */
   textLanguage?: string | null;
   /** La lingua della sintesi da scaricare, se c'e' in quella scelta. */
@@ -1042,12 +1064,43 @@ function PostEventSidebar({
       )}
 
       {videoOnPage ? (
-        <PostEventDownloads
-          slug={event.slug}
-          textLanguage={textLanguage}
-          summaryLanguage={summaryLanguage}
-          transcriptAvailable={transcriptAvailable}
-        />
+        <>
+          <PostEventDownloads
+            slug={event.slug}
+            textLanguage={textLanguage}
+            summaryLanguage={summaryLanguage}
+            transcriptAvailable={transcriptAvailable}
+          />
+          {materials.length > 0 && (
+            <section className="mb-3" aria-labelledby="post-event-materials">
+              <h4
+                id="post-event-materials"
+                className="h6 fw-semibold mb-2"
+                style={{ color: 'var(--app-text)' }}
+              >
+                {tp('downloads.materials')}
+              </h4>
+              <ul className="list-unstyled mb-0">
+                {materials.map((m) => (
+                  <li key={m.id} className="mb-1">
+                    <a
+                      href={m.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary text-decoration-none d-inline-flex align-items-start gap-1"
+                      style={{ fontSize: '0.9rem' }}
+                      // Come nella scheda dei materiali: l'apertura si conta.
+                      {...materialOpenHandlers(() => markMaterialOpened(event.slug, m.id))}
+                    >
+                      <Icon icon="it-file" size="sm" className="flex-shrink-0" />
+                      <span>{m.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       ) : (
         <p className="text-muted text-center mb-3" style={{ fontSize: '0.85rem' }}>
           {t('detail.noRecording')}

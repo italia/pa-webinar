@@ -112,13 +112,7 @@ export async function replayMoments(
   const recording = await recordingOfEventVideo(event.id, event.recordingUrl);
   if (!recording || !registrazioneConVideo(recording)) return null;
 
-  const chiave = `replay-journal:${recording.id}`;
-  let registro = getCached<Registro>(chiave);
-  if (!registro) {
-    registro = await leggiRegistro(event.id, recording);
-    setCache(chiave, registro, TTL_MS);
-  }
-  const { t0Ms, fineMs, agenda, azioni } = registro;
+  const { t0Ms, fineMs, agenda, azioni } = await registroInMemoria(event.id, recording);
 
   const durata = Math.round((fineMs - t0Ms) / 1000);
   const scarto = recording.slidesOffsetSec ?? 0;
@@ -263,4 +257,111 @@ async function leggiRegistro(
     }),
   ]);
   return { t0Ms, fineMs, agenda, azioni };
+}
+
+type RegistrazioneDelVideo = NonNullable<
+  Awaited<ReturnType<typeof recordingOfEventVideo>>
+>;
+
+/** Letture del registro in corso, per registrazione: chi arriva insieme
+ *  aspetta la stessa invece di rifarla (momenti e programma della stessa pagina). */
+const inLettura = new Map<string, Promise<Registro>>();
+
+/** Il registro della registrazione, riletto al piu' ogni qualche secondo. */
+async function registroInMemoria(
+  eventId: string,
+  recording: RegistrazioneDelVideo
+): Promise<Registro> {
+  const chiave = `replay-journal:${recording.id}`;
+  const salvato = getCached<Registro>(chiave);
+  if (salvato) return salvato;
+  let lettura = inLettura.get(chiave);
+  if (!lettura) {
+    lettura = leggiRegistro(eventId, recording)
+      .then((registro) => {
+        setCache(chiave, registro, TTL_MS);
+        return registro;
+      })
+      .finally(() => inLettura.delete(chiave));
+    inLettura.set(chiave, lettura);
+  }
+  return lettura;
+}
+
+/** Il punto del video di un argomento del programma, e quanto e' durato. */
+export interface ProgrammeVideoTime {
+  /** Quando l'argomento e' cominciato per la prima volta nel video. */
+  offsetSec: number;
+  /** Il tempo passato sull'argomento nel video, sommando le riprese. */
+  durationSec: number;
+}
+
+/**
+ * Per ogni argomento del programma discusso durante il video, il minuto in
+ * cui e' cominciato e quanto e' durato: il programma della pagina diventa un
+ * indice della registrazione. Dal registro delle azioni, come i momenti: un
+ * argomento corre dal suo avvio al successivo, alla sua chiusura o alla fine
+ * del video, e un argomento ripreso somma i tratti. Quello in corso allo zero
+ * apre il video a 0:00 (come nei momenti); gli altri prendono lo scarto delle
+ * slide. Null se il video non e' una registrazione composita della sala.
+ */
+export async function programmeVideoTimes(event: {
+  id: string;
+  recordingUrl: string | null;
+}): Promise<Record<string, ProgrammeVideoTime> | null> {
+  if (!event.recordingUrl) return null;
+  const recording = await recordingOfEventVideo(event.id, event.recordingUrl);
+  if (!recording || !registrazioneConVideo(recording)) return null;
+  const { t0Ms, fineMs, agenda } = await registroInMemoria(event.id, recording);
+  const durata = Math.round((fineMs - t0Ms) / 1000);
+  const scarto = recording.slidesOffsetSec ?? 0;
+  // Secondi nel video: prima dello zero si resta a zero, come l'apertura.
+  // Anche con lo scarto non si esce dal video: uno scarto negativo porta a
+  // zero gli argomenti dei primi secondi, e li' apre quello in corso, come
+  // nei momenti.
+  const secondi = (ms: number) => {
+    const grezzi = Math.round((ms - t0Ms) / 1000);
+    return grezzi <= 0 ? 0 : Math.max(0, Math.min(durata, grezzi + scarto));
+  };
+
+  // I tratti di ogni argomento, dal registro in ordine di tempo.
+  const tratti: Array<{ id: string; da: number; a: number }> = [];
+  let corrente = null as { id: string; da: number } | null;
+  // Il registro e' gia' in ordine di tempo. Qui servono gli id e la fine di
+  // ogni tratto, che i capitoli dei momenti (chaptersFromActions) non danno.
+  for (const az of agenda) {
+    const data = oggetto(az.data);
+    const id = String(data.itemId ?? '');
+    const ms = az.at.getTime();
+    if (!id || ms > fineMs) continue;
+    if (data.status === 'CURRENT') {
+      if (corrente?.id === id) continue;
+      if (corrente) tratti.push({ id: corrente.id, da: corrente.da, a: ms });
+      corrente = { id, da: ms };
+    } else if (corrente?.id === id) {
+      tratti.push({ id, da: corrente.da, a: ms });
+      corrente = null;
+    }
+  }
+  // L'ultimo argomento mai chiuso corre fino alla fine del video.
+  if (corrente)
+    tratti.push({ id: corrente.id, da: corrente.da, a: Number.POSITIVE_INFINITY });
+
+  const out: Record<string, ProgrammeVideoTime> = {};
+  for (const t of tratti) {
+    if (t.a <= t0Ms) continue;
+    const da = secondi(t.da);
+    const a = Number.isFinite(t.a) ? secondi(t.a) : durata;
+    // Un tratto che nel video non dura niente non e' nel video.
+    if (a <= da) continue;
+    const prima = out[t.id];
+    out[t.id] = prima
+      ? {
+          offsetSec: Math.min(prima.offsetSec, da),
+          durationSec: prima.durationSec + Math.max(0, a - da),
+        }
+      : { offsetSec: da, durationSec: Math.max(0, a - da) };
+  }
+  // Senza argomenti nel video non c'e' un indice da mostrare.
+  return Object.keys(out).length > 0 ? out : null;
 }

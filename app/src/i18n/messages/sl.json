@@ -176,7 +176,10 @@
         "note": "Ure so okvirne.",
         "noteWithTotal": "Ure so okvirne · načrtovano trajanje {duration}",
         "now": "V teku",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuta je minuta posnetka: klik vas pripelje tja.",
+        "seekTo": "Pojdi na {time}: {topic}",
+        "planned": "Načrtovano {minutes} min"
       },
       "chatNotSaved": "Sporočila klepeta se po dogodku ne objavijo: izbrišejo se skupaj z drugimi podatki dogodka.",
       "qaPostEvent": "Vprašanja in odgovori z dogodka",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Prepis (.txt)",
       "subtitles": "Podnapisi (.srt)",
-      "summary": "Povzetek (.md)"
+      "summary": "Povzetek (.md)",
+      "materials": "Gradiva"
     },
     "moments": {
       "title": "Trenutki prenosa",

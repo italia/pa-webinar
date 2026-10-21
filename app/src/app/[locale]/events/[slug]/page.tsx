@@ -23,7 +23,12 @@ import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-transla
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { isEventManager } from '@/lib/auth/staff-session';
 import { accessoRegistrazione, pubblicazioneAperta } from '@/lib/recording/audience';
-import { replayMoments, type ReplayMoment } from '@/lib/replay/moments';
+import {
+  programmeVideoTimes,
+  replayMoments,
+  type ProgrammeVideoTime,
+  type ReplayMoment,
+} from '@/lib/replay/moments';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -313,6 +318,7 @@ export default async function EventDetailPage({
   // (lib/presentation/recording-slides-data).
   let recordingSlides: RecordingSlidesView | null = null;
   let momenti: ReplayMoment[] | null = null;
+  let orariNelVideo: Record<string, ProgrammeVideoTime> | null = null;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -462,22 +468,23 @@ export default async function EventDetailPage({
     // Una sola media per tutte le pagine (lib/feedback/feedback-summary).
     if (valutazioni && valutazioni.count > 0) feedbackSummary = valutazioni;
 
-    // I momenti della diretta sul tempo del video, con il contenuto che la
-    // pagina mostra gia' (lib/replay/moments).
+    // I momenti della diretta e il programma come indice della registrazione,
+    // sul tempo del video, con il contenuto che la pagina mostra gia'
+    // (lib/replay/moments). Uno che non si legge non toglie l'altro.
     if (videoVisibile && event.recordingUrl) {
-      try {
-        momenti = await replayMoments(event, {
+      const [momentiLetti, orariLetti] = await Promise.allSettled([
+        replayMoments(event, {
           questions: questionsRaw,
           polls: pollsData,
           materials: materialsRaw.map((m) => ({ id: m.id, title: m.title })),
           showWordCloud: event.postEventShowWordCloud,
-        });
-      } catch (err) {
-        console.error(
-          '[events/page] momenti della diretta non letti',
-          err instanceof Error ? err.message : err,
-        );
-      }
+        }),
+        programma.length > 0 ? programmeVideoTimes(event) : Promise.resolve(null),
+      ]);
+      if (momentiLetti.status === 'fulfilled') momenti = momentiLetti.value;
+      else console.error('[events/page] momenti della diretta non letti', String(momentiLetti.reason));
+      if (orariLetti.status === 'fulfilled') orariNelVideo = orariLetti.value;
+      else console.error('[events/page] programma nel video non letto', String(orariLetti.reason));
     }
   }
 
@@ -566,6 +573,7 @@ export default async function EventDetailPage({
         appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
         replayMoments={momenti}
+        programmeVideoTimes={orariNelVideo}
         previewForStaff={previewForStaff}
         recordingForRegistrants={recordingForRegistrants}
         hasRoomAccess={hasRoomAccess}

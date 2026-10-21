@@ -176,7 +176,10 @@
         "note": "Tiderne er vejledende.",
         "noteWithTotal": "Tiderne er vejledende · planlagt varighed {duration}",
         "now": "I gang",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuttet er videoens: et klik fører dertil.",
+        "seekTo": "Gå til {time}: {topic}",
+        "planned": "Planlagt {minutes} min"
       },
       "chatNotSaved": "Chatbeskeder offentliggøres ikke efter begivenheden: de slettes sammen med begivenhedens øvrige data.",
       "qaPostEvent": "Q&A fra begivenheden",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transskription (.txt)",
       "subtitles": "Undertekster (.srt)",
-      "summary": "Resumé (.md)"
+      "summary": "Resumé (.md)",
+      "materials": "Materialer"
     },
     "moments": {
       "title": "Øjeblikke fra livesessionen",

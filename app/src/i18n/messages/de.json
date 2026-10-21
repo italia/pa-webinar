@@ -176,7 +176,10 @@
         "note": "Die Uhrzeiten sind Richtwerte.",
         "noteWithTotal": "Die Uhrzeiten sind Richtwerte · geplante Dauer {duration}",
         "now": "Läuft",
-        "minutes": "{minutes} Min."
+        "minutes": "{minutes} Min.",
+        "videoNote": "Die Minute bezieht sich auf das Video: Ein Klick springt dorthin.",
+        "seekTo": "Zu {time} springen: {topic}",
+        "planned": "Geplant {minutes} Min."
       },
       "chatNotSaved": "Chatnachrichten werden nach der Veranstaltung nicht veröffentlicht: Sie werden mit den übrigen Daten der Veranstaltung gelöscht.",
       "qaPostEvent": "Q&A aus der Veranstaltung",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transkript (.txt)",
       "subtitles": "Untertitel (.srt)",
-      "summary": "Zusammenfassung (.md)"
+      "summary": "Zusammenfassung (.md)",
+      "materials": "Materialien"
     },
     "moments": {
       "title": "Momente der Live-Veranstaltung",

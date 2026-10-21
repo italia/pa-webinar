@@ -176,7 +176,10 @@
         "note": "Is amanna táscacha iad.",
         "noteWithTotal": "Is amanna táscacha iad · fad beartaithe {duration}",
         "now": "Ar siúl",
-        "minutes": "{minutes} nóim."
+        "minutes": "{minutes} nóim.",
+        "videoNote": "Is é nóiméad an fhíseáin é: cliceáil chun dul ann.",
+        "seekTo": "Téigh go {time}: {topic}",
+        "planned": "Beartaithe {minutes} nóim."
       },
       "chatNotSaved": "Ní fhoilsítear teachtaireachtaí an chomhrá tar éis na hócáide: scriostar iad in éineacht le sonraí eile na hócáide.",
       "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
@@ -5478,7 +5481,8 @@
       "video": "Físeán",
       "transcript": "Tras-scríbhinn (.txt)",
       "subtitles": "Fotheidil (.srt)",
-      "summary": "Achoimre (.md)"
+      "summary": "Achoimre (.md)",
+      "materials": "Ábhair"
     },
     "moments": {
       "title": "Chuimhneacháin ón gcraoladh beo",

@@ -176,7 +176,10 @@
         "note": "Godziny orientacyjne.",
         "noteWithTotal": "Godziny orientacyjne · planowany czas {duration}",
         "now": "W toku",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minuta odnosi się do nagrania: kliknięcie przenosi w to miejsce.",
+        "seekTo": "Przejdź do {time}: {topic}",
+        "planned": "Planowane {minutes} min"
       },
       "chatNotSaved": "Wiadomości z czatu nie są publikowane po wydarzeniu: są usuwane razem z pozostałymi danymi wydarzenia.",
       "qaPostEvent": "Pytania i odpowiedzi z wydarzenia",
@@ -5478,7 +5481,8 @@
       "video": "Wideo",
       "transcript": "Transkrypcja (.txt)",
       "subtitles": "Napisy (.srt)",
-      "summary": "Podsumowanie (.md)"
+      "summary": "Podsumowanie (.md)",
+      "materials": "Materiały"
     },
     "moments": {
       "title": "Momenty transmisji",

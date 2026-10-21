@@ -176,7 +176,10 @@
         "note": "Kellaajad on ligikaudsed.",
         "noteWithTotal": "Kellaajad on ligikaudsed · planeeritud kestus {duration}",
         "now": "Käimas",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minut on video oma: klõps viib sinna.",
+        "seekTo": "Mine aega {time}: {topic}",
+        "planned": "Plaanitud {minutes} min"
       },
       "chatNotSaved": "Vestluse sõnumeid pärast üritust ei avaldata: need kustutatakse koos ürituse ülejäänud andmetega.",
       "qaPostEvent": "Ürituse küsimused ja vastused",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transkriptsioon (.txt)",
       "subtitles": "Subtiitrid (.srt)",
-      "summary": "Kokkuvõte (.md)"
+      "summary": "Kokkuvõte (.md)",
+      "materials": "Materjalid"
     },
     "moments": {
       "title": "Otseülekande hetked",

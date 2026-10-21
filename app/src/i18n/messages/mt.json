@@ -176,7 +176,10 @@
         "note": "Il-ħinijiet huma indikattivi.",
         "noteWithTotal": "Il-ħinijiet huma indikattivi · tul ippjanat {duration}",
         "now": "Għaddej",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Il-minuta hija dik tal-vidjo: klikk iwasslek hemm.",
+        "seekTo": "Mur għal {time}: {topic}",
+        "planned": "Ippjanati {minutes} min"
       },
       "chatNotSaved": "Il-messaġġi taċ-chat ma jiġux ippubblikati wara l-avveniment: jitħassru mal-bqija tad-data tal-avveniment.",
       "qaPostEvent": "Q&A mill-avveniment",
@@ -5478,7 +5481,8 @@
       "video": "Vidjo",
       "transcript": "Traskrizzjoni (.txt)",
       "subtitles": "Sottotitoli (.srt)",
-      "summary": "Sommarju (.md)"
+      "summary": "Sommarju (.md)",
+      "materials": "Materjali"
     },
     "moments": {
       "title": "Mumenti mid-dirett",

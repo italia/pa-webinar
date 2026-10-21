@@ -12,7 +12,7 @@ vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/presentation/recording-slides-data', () => slides);
 vi.mock('@/lib/cache', () => ({ getCached: () => null, setCache: vi.fn() }));
 
-import { replayMoments, type ReplaySources } from './moments';
+import { programmeVideoTimes, replayMoments, type ReplaySources } from './moments';
 
 const T0 = new Date('2026-10-21T09:00:40Z');
 const at = (sec: number) => new Date(T0.getTime() + sec * 1000);
@@ -298,5 +298,87 @@ describe('replayMoments', () => {
       { kind: 'question', offsetSec: 600, question: 'Domanda', answer: null },
       { kind: 'presentation', offsetSec: 700, title: 'Titolo nuovo.pdf' },
     ]);
+  });
+});
+
+describe('programmeVideoTimes', () => {
+  const avvio = (sec: number, itemId: string, status = 'CURRENT') => ({
+    at: at(sec),
+    kind: 'agenda.topic',
+    data: { itemId, label: itemId, status },
+  });
+
+  it('ogni argomento al suo minuto del video, con il tempo passato davvero', async () => {
+    registro(
+      [
+        avvio(-600, 'prima'),
+        avvio(-60, 'apertura'),
+        avvio(200, 'secondo'),
+        avvio(900, 'terzo'),
+        avvio(1500, 'terzo', 'DONE'),
+        avvio(2000, 'ultimo'),
+      ],
+      []
+    );
+    expect(await programmeVideoTimes(EVENTO)).toEqual({
+      apertura: { offsetSec: 0, durationSec: 200 },
+      secondo: { offsetSec: 200, durationSec: 700 },
+      terzo: { offsetSec: 900, durationSec: 600 },
+      // L'ultimo, mai chiuso, corre fino alla fine del video.
+      ultimo: { offsetSec: 2000, durationSec: 1600 },
+    });
+  });
+
+  it('un argomento ripreso somma i tratti e resta al primo avvio', async () => {
+    registro(
+      [avvio(100, 'a'), avvio(400, 'b'), avvio(700, 'a'), avvio(800, 'a', 'DONE')],
+      []
+    );
+    expect(await programmeVideoTimes(EVENTO)).toEqual({
+      a: { offsetSec: 100, durationSec: 400 },
+      b: { offsetSec: 400, durationSec: 300 },
+    });
+  });
+
+  it("con lo scarto delle slide l'apertura resta a zero, come nei momenti", async () => {
+    slides.recordingOfEventVideo.mockResolvedValue({
+      id: 'rec-1',
+      blobKey: 'recordings/evt-1_2026-10-21.mp4',
+      slidesOffsetSec: 60,
+      slidesEnabled: true,
+      createdAt: at(3700),
+      callSession: { endedAt: at(3700) },
+    });
+    registro([avvio(-20, 'apertura'), avvio(300, 'dopo')], []);
+    expect(await programmeVideoTimes(EVENTO)).toEqual({
+      apertura: { offsetSec: 0, durationSec: 360 },
+      dopo: { offsetSec: 360, durationSec: 3240 },
+    });
+  });
+
+  it('senza registrazione della sala, null', async () => {
+    slides.recordingOfEventVideo.mockResolvedValue(null);
+    expect(await programmeVideoTimes(EVENTO)).toBeNull();
+  });
+
+  it("con uno scarto negativo gli argomenti dei primi secondi si fondono nell'apertura", async () => {
+    slides.recordingOfEventVideo.mockResolvedValue({
+      id: 'rec-1',
+      blobKey: 'recordings/evt-1_2026-10-21.mp4',
+      slidesOffsetSec: -60,
+      slidesEnabled: true,
+      createdAt: at(3700),
+      callSession: { endedAt: at(3700) },
+    });
+    registro([avvio(-20, 'apertura'), avvio(30, 'secondo'), avvio(300, 'terzo')], []);
+    expect(await programmeVideoTimes(EVENTO)).toEqual({
+      secondo: { offsetSec: 0, durationSec: 240 },
+      terzo: { offsetSec: 240, durationSec: 3360 },
+    });
+  });
+
+  it('senza argomenti nel video, null', async () => {
+    registro([avvio(-600, 'prima'), avvio(-300, 'prima', 'DONE')], []);
+    expect(await programmeVideoTimes(EVENTO)).toBeNull();
   });
 });

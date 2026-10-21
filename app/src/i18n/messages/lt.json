@@ -176,7 +176,10 @@
         "note": "Laikas orientacinis.",
         "noteWithTotal": "Laikas orientacinis · numatyta trukmė {duration}",
         "now": "Vyksta",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minutė yra vaizdo įrašo: spustelėjus nukeliama ten.",
+        "seekTo": "Eiti į {time}: {topic}",
+        "planned": "Planuota {minutes} min."
       },
       "chatNotSaved": "Pokalbio žinutės po renginio neskelbiamos: jos ištrinamos kartu su kitais renginio duomenimis.",
       "qaPostEvent": "Klausimai ir atsakymai iš renginio",
@@ -5478,7 +5481,8 @@
       "video": "Vaizdo įrašas",
       "transcript": "Transkripcija (.txt)",
       "subtitles": "Subtitrai (.srt)",
-      "summary": "Santrauka (.md)"
+      "summary": "Santrauka (.md)",
+      "materials": "Medžiaga"
     },
     "moments": {
       "title": "Transliacijos akimirkos",

@@ -176,7 +176,10 @@
         "note": "Časy sú orientačné.",
         "noteWithTotal": "Časy sú orientačné · plánovaná dĺžka {duration}",
         "now": "Prebieha",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "Minúta zodpovedá videu: kliknutím na ňu prejdete.",
+        "seekTo": "Prejsť na {time}: {topic}",
+        "planned": "Plánované {minutes} min"
       },
       "chatNotSaved": "Správy z chatu sa po podujatí nezverejňujú: vymažú sa spolu s ostatnými údajmi podujatia.",
       "qaPostEvent": "Otázky a odpovede z udalosti",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Prepis (.txt)",
       "subtitles": "Titulky (.srt)",
-      "summary": "Zhrnutie (.md)"
+      "summary": "Zhrnutie (.md)",
+      "materials": "Materiály"
     },
     "moments": {
       "title": "Okamihy prenosu",

@@ -176,7 +176,10 @@
         "note": "De tijden zijn indicatief.",
         "noteWithTotal": "De tijden zijn indicatief · geplande duur {duration}",
         "now": "Bezig",
-        "minutes": "{minutes} min"
+        "minutes": "{minutes} min",
+        "videoNote": "De minuut is die van de video: een klik brengt je erheen.",
+        "seekTo": "Naar {time}: {topic}",
+        "planned": "Gepland {minutes} min"
       },
       "chatNotSaved": "Chatberichten worden na het evenement niet gepubliceerd: ze worden met de overige gegevens van het evenement verwijderd.",
       "qaPostEvent": "Vragen en antwoorden van het evenement",
@@ -5478,7 +5481,8 @@
       "video": "Video",
       "transcript": "Transcriptie (.txt)",
       "subtitles": "Ondertitels (.srt)",
-      "summary": "Samenvatting (.md)"
+      "summary": "Samenvatting (.md)",
+      "materials": "Materialen"
     },
     "moments": {
       "title": "Momenten van de livesessie",
