@@ -4,6 +4,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { nomiOrganizzatori } from '@/lib/events/organizer-names';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -23,6 +24,7 @@ export const GET = withErrorHandling(async (request) => {
       title: true,
       description: true,
       organizerName: true,
+      organizers: { select: { name: true }, orderBy: { sortOrder: 'asc' } },
       moderatorName: true,
       startsAt: true,
       endsAt: true,
@@ -52,7 +54,7 @@ export const GET = withErrorHandling(async (request) => {
   return NextResponse.json({
     title,
     description: description.slice(0, 500),
-    organizer: event.organizerName || event.moderatorName || '',
+    organizer: nomiOrganizzatori(event) || event.moderatorName || '',
     date: event.startsAt.toISOString().split('T')[0],
     startsAt: event.startsAt.toISOString(),
     endsAt: event.endsAt.toISOString(),

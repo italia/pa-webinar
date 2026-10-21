@@ -536,6 +536,13 @@ networkPolicy:
   captions:
     extraIngressRules: []
     extraEgressRules: []
+  # Il motore di traduzione su CPU (postprod.mt) ha una policy propria,
+  # `<fullname>-mt`: entra solo il worker senza GPU sulla 8080, escono DNS e
+  # HTTPS (lo scaricamento del modello, con le eccezioni di
+  # egress.httpsExcept). Regole in più per un mirror del modello dentro il
+  # cluster o su un'altra porta.
+  mt:
+    extraEgressRules: []
 
 # ── ServiceAccount ───────────────────────────────────────────
 
@@ -947,6 +954,19 @@ jitsi-meet:
     - name: ghcr-secret
     - name: dockerhub-secret
 
+  # Versione di Jitsi. Tutti i componenti della conferenza (web, Prosody,
+  # Jicofo, bridge, Jibri) girano alla stessa versione, fissata qui sotto in
+  # ogni `image.tag`: il predefinito del sottochart è più vecchio, e i moduli
+  # Prosody del progetto, la configurazione di Jicofo per i sottotitoli e
+  # l'API di salute di Jibri sono provati su questa. Per cambiare versione si
+  # cambiano tutti insieme, compresa l'immagine web patchata
+  # (`IMAGE_TAG` in .github/workflows/jitsi-web.yml): il chart si rifiuta di
+  # rendere versioni diverse fra i componenti, perché una parte web più nuova
+  # o più vecchia del resto si accorda male con Prosody e Jicofo e il guasto
+  # si vede solo in sala.
+  # Un'installazione esistente che fissava solo l'immagine web va allineata
+  # anche negli altri componenti, alla versione che già usa o a questa.
+
   # Autenticazione della conferenza con i token dell'applicazione. Issuer e
   # audience accettati devono contenere JITSI_JWT_ISSUER e JITSI_JWT_AUDIENCE
   # dell'applicazione, e il segreto deve essere JITSI_JWT_SECRET: se divergono
@@ -955,6 +975,8 @@ jitsi-meet:
   # Prosody questa mappa vince su `extraCommonEnvs`, e il chart si rifiuta di
   # rendere se i due dicono cose diverse.
   prosody:
+    image:
+      tag: stable-11031
     extraEnvs:
       AUTH_TYPE: jwt
       JWT_APP_ID: pa_webinar
@@ -1037,6 +1059,8 @@ jitsi-meet:
   # è entrato per primo o perché il moderatore è uscito. La resa si ferma se
   # l'autenticazione è spenta qui ma Prosody non assegna i ruoli dal token.
   jicofo:
+    image:
+      tag: stable-11031
     extraEnvs:
       JICOFO_ENABLE_AUTH: "false"
       ENABLE_AUTO_OWNER: "false"
@@ -1067,6 +1091,8 @@ jitsi-meet:
   # che questo chart non accende e con cui la lavagna non è stata provata.
 
   jvb:
+    image:
+      tag: stable-11031
     replicaCount: 1
     resources:
       requests:
@@ -1088,6 +1114,28 @@ jitsi-meet:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 6
+    # Stessa tolleranza per la sonda di prontezza: un bridge che la manca esce
+    # dal Service della sua API (JVB_HEALTH_URL), e il portale lo leggerebbe
+    # come spento, nella pagina di stato e all'apertura delle sale.
+    readinessProbe:
+      httpGet:
+        path: /about/health
+        port: 8080
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+    # Opzioni della JVM del bridge. L'immagine passa a java solo
+    # VIDEOBRIDGE_DEBUG_OPTIONS, più -Xmx da VIDEOBRIDGE_MAX_MEMORY (3072m se
+    # vuota): per l'heap si usa VIDEOBRIDGE_MAX_MEMORY, mentre VIDEOBRIDGE_OPTS
+    # non la legge nessuno. Qui il chart accende l'instradamento delle sole
+    # voci più forti con il numero di global.jvb.numLoudest; il valore passa
+    # da `tpl` nel sottochart, che dei valori di questo chart vede solo
+    # `global`. Un file di valori che imposta VIDEOBRIDGE_DEBUG_OPTIONS
+    # sostituisce questo valore: riparti da qui e aggiungi le tue opzioni in
+    # fondo, separate da uno spazio. Il chart si ferma se le voci inoltrate
+    # non sono quelle di global.jvb.numLoudest.
+    extraEnvs:
+      VIDEOBRIDGE_DEBUG_OPTIONS: '{{ $n := int (dig "jvb" "numLoudest" 0 (.Values.global | default dict)) }}{{ if gt $n 0 }}-Dvideobridge.loudest.route-loudest-only=true -Dvideobridge.loudest.num-loudest={{ $n }}{{ end }}'
     useHostPort: true
     useNodeIP: true
     UDPPort: 10000
@@ -1108,6 +1156,8 @@ jitsi-meet:
     # jitsi.requirePinnedCredentials.
 
   jibri:
+    image:
+      tag: stable-11031
     enabled: false
     replicaCount: 0
     singleUseMode: true
@@ -1172,6 +1222,15 @@ jitsi-meet:
         subPath: finalize.sh
         readOnly: true
 
+  # Jigasi e il trascrittore del sottochart: spenti e non usati dal portale,
+  # fissati alla stessa versione degli altri componenti per chi li accende.
+  jigasi:
+    image:
+      tag: stable-11031
+  transcriber:
+    image:
+      tag: stable-11031
+
   web:
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
     # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
@@ -1189,14 +1248,12 @@ jitsi-meet:
     # silenzio. Un prelievo fallito è invece un guasto rumoroso e reversibile.
     # Un aggiornamento con `--reuse-values` non riprende i valori predefiniti
     # del file: passa l'override esplicitamente.
-    # ATTENZIONE: questo tag non coincide con `IMAGE_TAG` in
-    # .github/workflows/jitsi-web.yml, che pubblica una revisione più recente.
-    # Allinearli è un rollout dell'immagine della conferenza e va deciso, non
-    # fatto di passaggio: finché restano diversi, chi si appoggia a questo
-    # valore predefinito serve una revisione più vecchia di quella pubblicata.
+    # Il tag è `IMAGE_TAG` di .github/workflows/jitsi-web.yml, che la pubblica:
+    # stessa versione di Jitsi degli altri componenti (vedi in testa a questa
+    # sezione), più la patch.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
-      tag: stable-10741-rnnoise
+      tag: stable-11031-rnnoise
       pullPolicy: Always
     # Il documento di branding del portale: la filigrana della scena e i colori
     # di barra dei controlli, menu, riquadri e avatar con le iniziali, intonati
@@ -1280,6 +1337,19 @@ global:
     # Jicofo, non in un Secret: tiene fuori gli altri pod del cluster, non chi
     # legge i ConfigMap del namespace. Per generarlo: openssl rand -hex 24
     bridgeToken: ""
+  # Instradamento delle sole voci più forti nel bridge: a ogni partecipante
+  # il bridge inoltra l'audio delle `numLoudest` voci più forti del momento
+  # (più chi sta parlando), non quello di ogni microfono aperto. Oltre quel
+  # numero, chi apre il microfono quasi non pesa: con 28 microfoni aperti il
+  # bridge ha inoltrato 6,8 mila pacchetti al secondo in più invece di 38
+  # mila, e ha usato circa un core invece di 2,4. 0 = spento, il bridge
+  # inoltra ogni voce. Lo legge il sottochart della conferenza (l'opzione
+  # della JVM in jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS), e questo
+  # chart scrive nel ConfigMap del portale JVB_NUM_LOUDEST, ricavato da quello
+  # che il bridge riceve davvero, per la stima delle risorse di un evento.
+  # Cambiarlo riavvia il bridge: va fatto a sale vuote.
+  jvb:
+    numLoudest: 5
 
 captions:
   gateway:
@@ -1584,13 +1654,80 @@ postprod:
   # scale-to-zero e tiene acceso il nodo GPU anche a vuoto.
   vllm:
     # Se true, l'orchestrator scala il Deployment vLLM a 1 quando c'e'
-    # lavoro postprod (desired>0 o worker attivi) e a 0 quando la pipeline
-    # e' idle. Concede automaticamente all'orchestrator l'RBAC
-    # deployments/scale. Default false: abilitare dopo aver reso il
+    # lavoro che usa vLLM (trascrizione, sintesi, traduzioni, resoconto: il
+    # `desiredLlm` del portale) e a 0 quando non ce n'e'. Doppiaggio,
+    # archivio e traduzione dei testi non lo accendono. Concede
+    # automaticamente all'orchestrator l'RBAC deployments/scale.
+    # Default false: abilitare dopo aver reso il
     # Deployment vLLM gestito e tollerante al taint Spot del pool aigpu.
     autoscale: false
     # Nome del Deployment vLLM da scalare. Vuoto => "<fullname>-vllm".
     deploymentName: ""
+
+  # Motore di traduzione su CPU, per titolo e descrizione degli eventi
+  # (lavoro TRANSLATE_TEXT, docs/POSTPROD.md). Un Deployment llama.cpp con
+  # il server OpenAI-compatibile e EuroLLM-9B-Instruct (Apache-2.0, tutte le
+  # 24 lingue dell'UE): niente vLLM e niente GPU. Il worker senza GPU lo
+  # chiama su HTTP; il portale riceve AI_MT_BASE_URL e AI_MT_MODEL_ID e solo
+  # allora offre la traduzione automatica nel wizard. Richiede
+  # postprod.worker.cpu.enabled: la traduzione dei testi gira solo li'.
+  mt:
+    enabled: false
+    # Immagine del server llama.cpp (MIT), fissata per digest: un tag
+    # mobile porterebbe un server diverso a ogni nodo nuovo.
+    image: "ghcr.io/ggml-org/llama.cpp:server-b11277@sha256:6d607629e3dd5e85f45c43d1494648126cb3f93f2122c9cd53f43242c94cde14"
+    imagePullPolicy: IfNotPresent
+    # Il modello, scaricato da un initContainer a ogni avvio del pod (circa
+    # 5,6 GB) e verificato con l'impronta: un'impronta diversa ferma il pod
+    # prima che il server parta. L'indirizzo e' a revisione fissa su Hugging
+    # Face (una conversione GGUF Q4_K_M dei pesi ufficiali; per non fidarsi
+    # della conversione, la si rifa' da utter-project/EuroLLM-9B-Instruct-2512
+    # e si pubblica su un mirror interno con la sua impronta). Senza accesso a
+    # Internet: un mirror interno con lo stesso file.
+    model:
+      url: "https://huggingface.co/mradermacher/EuroLLM-9B-Instruct-2512-GGUF/resolve/5138603fccb9dc1f35c25cfd1a4981a78617e9ff/EuroLLM-9B-Instruct-2512.Q4_K_M.gguf"
+      sha256: "fe9b50d4ba67eb0131f1ceeaab2e56ea8fb6b2bbc37391d3219c791c3b140a28"
+      # Nome del file nel volume del modello.
+      file: "eurollm-9b-instruct-2512.q4_k_m.gguf"
+      # Il nome con cui il server presenta il modello: il portale lo scrive
+      # nelle traduzioni che salva.
+      id: "utter-project/EuroLLM-9B-Instruct-2512"
+    # Thread di calcolo: quanti le CPU richieste. Oltre 4 la generazione non
+    # accelera (la limita la banda della memoria).
+    threads: 4
+    # Contesto del modello in token: richiesta e risposta di una riga.
+    contextSize: 4096
+    # Cache dei prompt di llama.cpp nella memoria del pod, in MiB (--cache-ram;
+    # -1 = nessun tetto). Ogni richiesta è una riga sola e non ne riusa
+    # nessuna: con il valore predefinito di llama.cpp, 8 GiB, la cache cresce
+    # di circa 7 MiB a richiesta, e a metà di una traduzione grande il pod
+    # supera il limite di memoria e viene ucciso. Con 0 la memoria resta
+    # piatta, alla stessa velocità.
+    cacheRamMiB: 0
+    # Un volume gia' presente per il modello (PersistentVolumeClaim): il file
+    # resta fra un avvio e l'altro e non si riscarica. Vuoto: un volume
+    # temporaneo, e il modello si scarica a ogni accensione.
+    modelsPvc: ""
+    modelsSizeLimit: "8Gi"
+    # Acceso solo quando serve: l'orchestratore lo porta a una replica mentre
+    # c'e' una traduzione dei testi in coda o in corso e a zero dopo
+    # `idleMinutes` senza lavoro. Spento: una replica sempre accesa.
+    scaleToZero:
+      enabled: true
+      idleMinutes: 15
+    # Una traduzione occupa le CPU richieste per qualche minuto: il modello
+    # in memoria pesa 4,4-5,1 GiB.
+    resources:
+      requests:
+        cpu: "4"
+        memory: "6Gi"
+      limits:
+        cpu: "4"
+        memory: "7Gi"
+    # Vuoti: quelli dell'app. Mai il pool con la GPU.
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
 
   # Worker template (CronJob, suspended). The orchestrator runs
   # `kubectl create job --from=cronjob/<this>`, inheriting the pod
@@ -1670,8 +1807,8 @@ postprod:
         memory: "200Gi"
 
     # Worker senza GPU per i job che non la usano: sintesi e traduzioni (il
-    # testo lo produce vLLM, sulla sua GPU) e archivio (rimux senza
-    # ricodifica). Con la variante accesa il worker con la GPU prende solo
+    # testo lo produce vLLM, sulla sua GPU), archivio (rimux senza
+    # ricodifica) e traduzione dei testi degli eventi (postprod.mt). Con la variante accesa il worker con la GPU prende solo
     # trascrizione e doppiaggio (la filigrana AudioSeal, su un evento lungo,
     # chiede decine di GB), e una sintesi accende una sola A100 invece di due.
     # Immagine propria e leggera (infra/ai/Dockerfile.worker-cpu, senza CUDA
@@ -1759,6 +1896,12 @@ recorder:
   activeDeadlineSeconds: 21600   # 6h max per evento
   ttlSecondsAfterFinished: 600
   workSizeLimit: "10Gi"
+  # Annotazioni in piu' sul pod del recorder. `safe-to-evict: "false"` c'e'
+  # sempre: un recorder spostato durante la diretta perderebbe le tracce.
+  podAnnotations: {}
+  # Il tempo che un recorder fermato ha per chiudere la cattura, caricare le
+  # tracce registrate fin li' e notificarle al portale.
+  terminationGracePeriodSeconds: 300
   # Timing del bot (env IDLE_TIMEOUT_SEC / INITIAL_GRACE_SEC / MAX_DURATION_SEC,
   # vedi infra/recorder/src/capture.ts). Se vuoti → default del bot
   # (idle 90s, grace 900s, max 4h). initialGrace abbassato di default: il

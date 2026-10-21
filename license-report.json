@@ -147,6 +147,10 @@
     "publisher": "Amazon Web Services",
     "url": "http://aws.amazon.com"
   },
+  "@axe-core/playwright@4.13.0": {
+    "licenses": "MPL-2.0",
+    "repository": "https://github.com/dequelabs/axe-core-npm"
+  },
   "@azure/abort-controller@2.2.0": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
@@ -593,6 +597,10 @@
   "@mediapipe/tasks-vision@0.10.35": {
     "licenses": "Apache-2.0",
     "publisher": "mediapipe@google.com"
+  },
+  "@napi-rs/canvas@1.0.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Brooooooklyn/canvas"
   },
   "@next/env@15.5.27": {
     "licenses": "MIT",
@@ -2790,6 +2798,10 @@
   "pathe@2.0.3": {
     "licenses": "MIT",
     "repository": "https://github.com/unjs/pathe"
+  },
+  "pdfjs-dist@6.4.299": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/mozilla/pdf.js"
   },
   "perfect-debounce@1.0.0": {
     "licenses": "MIT",

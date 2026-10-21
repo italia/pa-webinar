@@ -7,14 +7,17 @@
  *      (uniforme con la status card che torna `null`), a meno che l'evento
  *      tenga la trascrizione dai sottotitoli live, che non passa dalla
  *      pipeline AI (lib/captions/transcript).
- *   2. evento esiste e ha il video pubblicato (`recordingPublished`) o la
- *      sola trascrizione pubblicata (`transcriptPublished`), per esempio
- *      quella dai sottotitoli di un evento senza registrazione.
- *   3. periodo "post-event pubblico" valido: `postEventPublic=true`
- *      e (se settato) `postEventPublicUntil` futuro.
+ *   2. chi chiede puo' vedere la registrazione (lib/recording/audience):
+ *      pubblicata — il video (`recordingPublished`) o la sola trascrizione
+ *      (`transcriptPublished`), per esempio quella dai sottotitoli di un
+ *      evento senza registrazione — nella finestra post-evento
+ *      (`postEventPublic`, `postEventPublicUntil`), per chiunque o per i soli
+ *      iscritti secondo `recordingAudience`; oppure lo staff che gestisce
+ *      l'evento, anche prima della pubblicazione (l'anteprima della pagina).
  *
  * Passati i cancelli, il perimetro (`ambito`) dice che cosa si mostra:
- *   - `tutto`: il video e' pubblicato e la pipeline AI e' accesa. Trascrizione,
+ *   - `tutto`: il video e' pubblicato (o lo guarda lo staff) e la pipeline AI
+ *     e' accesa. Trascrizione,
  *     sottotitoli, sintesi, traduzioni e doppiaggio, come sempre;
  *   - `trascrizione`: e' pubblicata la sola trascrizione, oppure la pipeline
  *     AI e' spenta. Solo il testo della trascrizione nella lingua sorgente:
@@ -26,8 +29,11 @@
  * "evento non esiste" da "trascrizione ritirata", per non leakare
  * informazioni operative.
  */
+import { cookies } from 'next/headers';
+
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
+import { accessoRegistrazione, pubblicazioneAperta } from '@/lib/recording/audience';
 
 export interface PostprodAccessOk {
   eventId: string;
@@ -51,6 +57,7 @@ export async function assertPostprodAccessible(slug: string): Promise<PostprodAc
         postEventPublicUntil: true,
         captionsTranscriptEnabled: true,
         transcriptPublished: true,
+        recordingAudience: true,
       },
     }),
   ]);
@@ -58,15 +65,15 @@ export async function assertPostprodAccessible(slug: string): Promise<PostprodAc
   if (!event) throw new NotFoundError('Event');
   const aiAccesa = !!site?.aiPipelineEnabled;
   if (!aiAccesa && !event.captionsTranscriptEnabled) throw new NotFoundError('Postprod');
-  if (!event.recordingPublished && !event.transcriptPublished) throw new NotFoundError('Postprod');
-  if (!event.postEventPublic) throw new NotFoundError('Postprod');
-  if (event.postEventPublicUntil && event.postEventPublicUntil < new Date()) {
-    throw new NotFoundError('Postprod');
-  }
+  const accesso = await accessoRegistrazione(event, await cookies());
+  if (!accesso) throw new NotFoundError('Postprod');
+  // Lo staff vede cio' che vedra' il pubblico; prima della pubblicazione,
+  // l'anteprima del video pubblicato.
+  const anteprima = accesso === 'staff' && !pubblicazioneAperta(event);
 
   return {
     eventId: event.id,
-    ambito: event.recordingPublished && aiAccesa ? 'tutto' : 'trascrizione',
+    ambito: (event.recordingPublished || anteprima) && aiAccesa ? 'tutto' : 'trascrizione',
     soloSottotitoli: !aiAccesa,
   };
 }

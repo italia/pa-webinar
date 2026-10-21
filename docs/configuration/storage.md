@@ -37,9 +37,9 @@ pipeline cannot run unless the recordings domain is configured.
 A domain that is not configured is disabled, and the features that depend on
 it degrade:
 
-- **Files domain disabled.** The administration area offers only the URL
+- **Files domain disabled.** The administration area offers only the link
   field for its file inputs, with the note "File uploads are not available on
-  this installation: paste the file's URL instead.", the live room offers no file upload for materials, and
+  this installation: paste the file's link.", the live room offers no file upload for materials, and
   the chat shows no attachment button. Called directly, the upload endpoints
   answer `503` with `STORAGE_UNAVAILABLE`, logged at `warn`, not `error`. `/api/assets/…` answers `404`.
   Materials given as links keep working.
@@ -702,10 +702,6 @@ Known gaps:
   deleted after the grace period unless it is marked **Keep**. On AWS S3
   without an endpoint the names match. Jibri recordings are not affected,
   because `CallSession.recordingFilename` matches.
-- **Per-participant objects are flagged as orphans.** Objects under
-  `recordings/multitrack/` are referenced by none of the fields above, so
-  retained tracks and every `tracks.json` go through the orphan sweep (see
-  [Recording](../architecture/recording.md#known-limitations)).
 - **Backup only for a store in the cluster.** The `--include-storage`
   option of `scripts/backup.sh` and `scripts/restore.sh` covers an object
   store on a volume of the cluster, such as the Garage add-on of one k3s

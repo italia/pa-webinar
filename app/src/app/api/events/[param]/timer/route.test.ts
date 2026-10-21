@@ -1,7 +1,8 @@
 /**
- * Il timer del moderatore: cosa finisce nella cronologia della sala. Lo stato
- * del conto alla rovescia vive nella cache in memoria (vera, qui), il resto si
- * stubba.
+ * Il timer del moderatore: cosa finisce nella cronologia della sala, e lo
+ * stato condiviso fra le istanze dell'app. Lo stato del conto alla rovescia
+ * vive in Redis (finto, qui) e, senza Redis, nella memoria del processo
+ * (vera); il resto si stubba.
  */
 import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,6 +16,27 @@ vi.mock('@/lib/auth/moderator', () => ({
   isEventModerator: vi.fn(async (_e: unknown, token: string) => token === 'MOD'),
 }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+
+/** Un Redis finto per GET e SET: quello che ogni istanza dell'app vede. */
+const { redisFinto } = vi.hoisted(() => {
+  const store = new Map<string, string>();
+  return {
+    redisFinto: {
+      status: 'ready',
+      store,
+      get: async (key: string) => store.get(key) ?? null,
+      set: async (key: string, value: string) => {
+        store.set(key, value);
+        return 'OK';
+      },
+    },
+  };
+});
+let redisPresente = false;
+vi.mock('@/lib/redis', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return { ...actual, getRedis: () => (redisPresente ? redisFinto : null) };
+});
 
 import { deleteCache } from '@/lib/cache';
 import { prisma } from '@/lib/db';
@@ -40,9 +62,14 @@ const post = (body: unknown, token = 'MOD') =>
     body: JSON.stringify(body),
   }) as unknown as NextRequest;
 
+/** Dimentica la memoria di questo processo: come rispondesse un'altra istanza. */
+const altraIstanza = () => deleteCache(`timer:${EVENT_ID}`);
+
 beforeEach(() => {
   vi.clearAllMocks();
-  deleteCache(`timer:${EVENT_ID}`);
+  redisPresente = false;
+  redisFinto.store.clear();
+  altraIstanza();
   mockedEvent.mockResolvedValue({ id: EVENT_ID });
 });
 
@@ -132,3 +159,68 @@ describe('POST /api/events/[slug]/timer — cronologia', () => {
     expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });
+
+describe('/api/events/[slug]/timer — più istanze dell’app', () => {
+  beforeEach(() => {
+    redisPresente = true;
+  });
+
+  it('avviato su un’istanza, si legge acceso da un’altra', async () => {
+    await POST(post({ action: 'start', duration: 120 }), ctx());
+    altraIstanza();
+    const body = await (await GET(post({}), ctx())).json();
+    expect(body).toMatchObject({ active: true, duration: 120, visible: true, paused: false });
+    expect(body.remaining).toBeGreaterThan(115);
+  });
+
+  it('messo in pausa da un’istanza e ripreso da un’altra: la durata resta, e la ripresa finisce in cronologia', async () => {
+    await POST(post({ action: 'start', duration: 600 }), ctx());
+    altraIstanza();
+    await POST(post({ action: 'pause' }), ctx());
+    altraIstanza();
+    let body = await (await GET(post({}), ctx())).json();
+    expect(body).toMatchObject({ active: true, paused: true, duration: 600 });
+
+    altraIstanza();
+    vi.mocked(recordLiveAction).mockClear();
+    body = await (await POST(post({ action: 'resume' }), ctx())).json();
+    expect(body).toMatchObject({ active: true, paused: false, duration: 600 });
+    expect(recordLiveAction).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'timer.started', data: { durationSec: 600, resumed: true } }),
+    );
+  });
+
+  it('azzerato da un’istanza, nessuna lo vede più correre', async () => {
+    await POST(post({ action: 'start', duration: 300 }), ctx());
+    // Questa istanza ha letto il timer acceso...
+    expect((await (await GET(post({}), ctx())).json()).active).toBe(true);
+    // ...un'altra lo azzera: la prima lo rilegge spento, non dalla sua memoria.
+    await altraIstanzaCheAzzera();
+    const body = await (await GET(post({}), ctx())).json();
+    expect(body).toMatchObject({ active: false, remaining: 300 });
+  });
+
+  it('la lettura non riscrive lo stato: lo scaduto si spegne senza toccare Redis', async () => {
+    vi.useFakeTimers();
+    try {
+      await POST(post({ action: 'start', duration: 10 }), ctx());
+      const scritto = redisFinto.store.get(`live:timer:${EVENT_ID}`);
+      vi.advanceTimersByTime(45_000);
+      const body = await (await GET(post({}), ctx())).json();
+      expect(body.active).toBe(false);
+      expect(redisFinto.store.get(`live:timer:${EVENT_ID}`)).toBe(scritto);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+/** Un azzeramento arrivato a un'altra istanza: scrive solo in Redis. */
+async function altraIstanzaCheAzzera(): Promise<void> {
+  const prima = redisFinto.store.get(`live:timer:${EVENT_ID}`);
+  const stato = JSON.parse(prima!) as Record<string, unknown>;
+  redisFinto.store.set(
+    `live:timer:${EVENT_ID}`,
+    JSON.stringify({ ...stato, active: false, remaining: stato.duration, startedAt: null, pausedAt: null }),
+  );
+}

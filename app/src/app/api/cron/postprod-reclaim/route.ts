@@ -1,7 +1,7 @@
 /**
  * GET /api/cron/postprod-reclaim
  *
- * Janitor cron — runs every ~1 min. Two responsibilities:
+ * Janitor cron — runs every ~1 min. Three responsibilities:
  *
  *   1. **Reclaim expired leases**: any PostprodJob with status='CLAIMED'
  *      whose `next_attempt_at` is in the past lost its worker (pod
@@ -15,22 +15,33 @@
  *      jobs may still succeed; the orchestrator's overall view is
  *      built by the artifact register endpoint).
  *
+ *   3. **Traduzione dei testi senza motore**: senza il motore di traduzione
+ *      su CPU configurato (AI_MT_BASE_URL, tolto dall'installazione dopo la
+ *      richiesta) un lavoro di MT_JOB_KINDS in coda non lo esegue nessun
+ *      worker, e senza claim i suoi tentativi non crescono mai: si chiude
+ *      come fallito, con il motivo in `last_error`.
+ *
  * Protected by CRON_API_KEY.
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { MT_JOB_KINDS } from '@/lib/ai/job-classes';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
+import { resolveMtProvider } from '@/lib/ai/providers';
+import { postprodJobsCompletedTotal } from '@/lib/metrics';
+import { MOTIVO_MOTORE_ASSENTE } from '@/lib/text-translation/enqueue';
 
 export const dynamic = 'force-dynamic';
 
 interface ReclaimedRow {
   id: string;
-  /** Nulla per il resoconto dell'evento, che non ha registrazione. */
+  /** Nulla per i lavori dell'evento (resoconto, traduzione dei testi), senza registrazione. */
   recording_id: string | null;
   attempts: number;
 }
+
 
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
@@ -77,7 +88,7 @@ export const GET = withErrorHandling(async (request) => {
   // just terminal-failed. Done as a separate update because
   // CASE WHEN inside the UPDATE above complicates the syntax.
   if (failed.length > 0) {
-    // Il resoconto dell'evento non ha registrazione: non cambia lo stato di nessuna.
+    // I lavori dell'evento non hanno registrazione: non cambiano lo stato di nessuna.
     const recordingIds = Array.from(
       new Set(failed.map((r) => r.recording_id).filter((id): id is string => id !== null)),
     );
@@ -88,6 +99,25 @@ export const GET = withErrorHandling(async (request) => {
       },
       data: { status: 'POSTPROD_PARTIAL' },
     });
+  }
+
+  // Step 3 — la traduzione dei testi senza motore. Solo i lavori in coda,
+  // anche quelli appena ripresi dal passo 1: uno preso ha un worker vivo, che
+  // lo chiude da se' o lo rimanda in coda, e al giro dopo si chiude qui.
+  let senzaMotore = 0;
+  if (!resolveMtProvider()) {
+    const chiusi = await prisma.$queryRaw<Array<{ kind: string }>>`
+      UPDATE postprod_jobs
+      SET status = 'FAILED',
+          completed_at = NOW(),
+          last_error = ${MOTIVO_MOTORE_ASSENTE},
+          updated_at = NOW()
+      WHERE status = 'PENDING'
+        AND kind::text = ANY(${[...MT_JOB_KINDS]}::text[])
+      RETURNING kind::text AS kind
+    `;
+    for (const { kind } of chiusi) postprodJobsCompletedTotal.labels(kind, 'FAILED').inc();
+    senzaMotore = chiusi.length;
   }
 
   // Refresha i gauge della coda — il cron è il "battito" canonico,
@@ -102,5 +132,6 @@ export const GET = withErrorHandling(async (request) => {
     ok: true,
     reclaimed: reclaimed.length,
     failed: failed.length,
+    failedNoMtEngine: senzaMotore,
   });
 });

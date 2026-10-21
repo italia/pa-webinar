@@ -152,6 +152,7 @@ example profiles in `infra/helm/pa-webinar/examples/`.
 | JVB scaler CronJob with its ServiceAccount and Role | `jitsi.mode: full` and `jvbScaler.enabled` | off | off | off | on |
 | Recorder controller Deployment, suspended recorder CronJob, RBAC | `recorder.enabled` and `recorder.controller.enabled` | off | off | off | off |
 | Post-production: orchestrator, suspended worker template, reclaim, retention and multitrack-purge jobs | `postprod.enabled`; each job except the multitrack purge also has its own `enabled` | off | off | off | off |
+| CPU translation engine for event titles and descriptions: Deployment and Service `<fullname>-mt` and, with the NetworkPolicy on, a policy of its own | `postprod.enabled` and `postprod.mt.enabled`, with `postprod.worker.cpu.enabled` | off | off | off | off |
 | ServiceMonitor for the app | `metrics.serviceMonitor.enabled` | off | off | off | on |
 | PrometheusRule | `metrics.prometheusRule.enabled` | off | off | off | off |
 | Grafana dashboard ConfigMap | `metrics.grafanaDashboard.enabled` | off | off | off | off |
@@ -177,8 +178,10 @@ Things the table does not show:
   the in-cluster addresses of the conference's components (`JITSI_WEB_INTERNAL_URL`,
   `PROSODY_INTERNAL_URL`, `JICOFO_HEALTH_URL`). Without the scaler it also writes `JVB_MAX_REPLICAS`
   from `jitsi-meet.jvb.replicaCount`, when that is above zero and `app.env` does not declare that
-  another tool scales the bridges (`JVB_SCALER_ENABLED: "true"`). A key set in `app.env` always wins
-  ([Configuration reference](CONFIGURATION.md#videobridge-and-scaler)).
+  another tool scales the bridges (`JVB_SCALER_ENABLED: "true"`). For the capacity estimate of an
+  event it also writes `JVB_NUM_LOUDEST`, the voices the bridge forwards (with `jitsi.enabled`),
+  `JVB_CASCADING` (with `jitsi-meet.octo.enabled`) and `CAPTIONS_MAX_STREAMS` (with live captions).
+  A key set in `app.env` always wins ([Configuration reference](CONFIGURATION.md#videobridge-and-scaler)).
 - **In-cluster addresses use full Service names**, `<service>.<namespace>.svc.<global.clusterDomain>`,
   with `cluster.local` when `global.clusterDomain` is unset and the short name when it is empty. A full
   name resolves at once even when the Service does not exist, where a short name first walks every
@@ -417,8 +420,8 @@ page is in [Conference-root redirect](#conference-root-redirect).
   applies before requests are spread over the app replicas; the app's own limits count per process
   ([Security architecture](architecture/security.md)).
 - **Body size against upload caps.** Three kinds of upload pass through the Ingress as multipart
-  bodies: staff uploads of images up to 10 MiB and audio up to 20 MiB (`MAX_SIZE` in
-  `app/src/app/api/admin/assets/upload-url/route.ts`), event materials up to 25 MiB, from the
+  bodies: staff uploads of images up to 10 MiB and audio up to 20 MiB (`ASSET_MAX_BYTES` in
+  `app/src/lib/uploads/limits.ts`), event materials up to 25 MiB, from the
   administration area or from the live room (`MATERIAL_FILE_MAX_BYTES` in
   `app/src/lib/validation/materials.ts`), and chat attachments up to 10 MiB
   (`CHAT_ATTACHMENT_MAX_BYTES` in `app/src/lib/chat/attachments.ts`). The default `proxy-body-size: 30m`
@@ -1040,12 +1043,13 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
   [infra/jitsi-web-patched](../infra/jitsi-web-patched/README.md).
 - `jitsi-meet.imagePullSecrets` is one list for every Jitsi pod; the subchart has no per-component
   list.
-- **The chart default tag and the published tag are maintained separately.** Compare
-  `jitsi-meet.web.image.tag` in `values.yaml` with `IMAGE_TAG` in `.github/workflows/jitsi-web.yml`
-  before you rely on the default.
-- **To use the stock image**, set `jitsi-meet.web.image.repository: jitsi/web` and
-  `jitsi-meet.web.image.tag: null`, so that the subchart uses its own Jitsi release (its
-  `appVersion`), and set `jitsi-meet.imagePullSecrets: []`:
+- **One Jitsi release for every component.** The chart default for the web image is the tag that
+  `.github/workflows/jitsi-web.yml` publishes (`IMAGE_TAG`), and Prosody, Jicofo, the bridge and Jibri
+  are pinned to the same release. The chart refuses to render components on different releases
+  ([One Jitsi version for the whole conference](architecture/jitsi-integration.md#the-patched-web-image)).
+- **To use the stock image**, set `jitsi-meet.web.image.repository: jitsi/web` and the upstream tag of
+  the same release as the other components (the chart's web tag without `-rnnoise`), and set
+  `jitsi-meet.imagePullSecrets: []`:
 
   ```yaml
   jitsi-meet:
@@ -1053,7 +1057,7 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
     web:
       image:
         repository: jitsi/web
-        tag: null
+        tag: stable-11031
   ```
 
   Advanced noise suppression must then stay off. It is off unless
@@ -1073,6 +1077,9 @@ which enforces on the bridge the participant limits that an event sets. Keep tho
 | `jitsi-meet.jvb.stunServers` | `meet-jit-si-turnrelay.jitsi.net:443`, a third-party server run by the Jitsi project, which learns the bridge's address. The example profiles keep it, and the post-install notes warn about it | STUN lets the bridge discover its public address. Use `""` when the announced address is already right (`publicIPs`, or `useNodeIP` on a node whose network interface carries a reachable address). Otherwise use your own STUN server, or the chart's coturn with `jitsi-meet.turnHost` and `jitsi-meet.jvb.useInternalStun: true`. With neither STUN nor `publicIPs`, a bridge behind NAT announces a private address and remote participants hear and see nobody |
 | `jitsi-meet.jvb.replicaCount` | `1` | Fixed bridges in simple and standard; `0` in full, where the scaler owns the count |
 | `jitsi-meet.jvb.nodeSelector`, `tolerations`, `resources` | any node | The full profile pins bridges to the dedicated pool |
+| `global.jvb.numLoudest` | `5` | Loudest-only routing: the bridge forwards to each participant only the audio of the `numLoudest` loudest voices and of the dominant speaker, and `0` turns it off. It reaches the bridge as JVM options in `jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS`, and the app as `JVB_NUM_LOUDEST`. A values file that sets `VIDEOBRIDGE_DEBUG_OPTIONS` replaces the chart's options: start from them and append yours. The chart stops rendering when the bridge options and `numLoudest` disagree. Changing the value restarts the bridge ([Loudest-only audio routing](architecture/scaling.md#loudest-only-audio-routing)) |
+| `jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_MAX_MEMORY` | unset: the image default, `3072m` | The bridge's Java heap. The image passes `-Xmx` from this variable and the other JVM options from `VIDEOBRIDGE_DEBUG_OPTIONS`. It does not read `VIDEOBRIDGE_OPTS`, so a heap set there has no effect |
+| `jitsi-meet.jvb.livenessProbe`, `readinessProbe` | `/about/health` every 10 s, 5 s timeout, 6 failures | The subchart waits 1 s. On a busy node a failed liveness probe restarts the bridge and drops every conference on it, and a failed readiness probe takes the bridge out of the Service the app reads, so the status page reports it down |
 
 Several bridges behind a single address break calls; the reason and the safe configurations are in
 [The single-IP pitfall](architecture/scaling.md#the-single-ip-pitfall).
@@ -1246,6 +1253,12 @@ Set what the defaults cannot know before you rely on the policy:
   `fromNamespaceSelectors` and `fromPodSelectors` are both empty. Admit the bots with a `networkPolicy.ingress.extraRules` entry for pods labeled
   `app.kubernetes.io/component: recorder` on port 3000
   ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)).
+
+Two other components get a policy of their own when they are rendered: the live captions service
+([Live captions](architecture/live-captions.md)) and the CPU translation engine of the post-production
+(`<fullname>-mt`), which admits only the post-production CPU worker on port 8080 and lets out only DNS
+and HTTPS, for the model download ([Event text translation](POSTPROD.md#event-text-translation)). An
+in-cluster mirror of the model goes in `networkPolicy.mt.extraEgressRules`.
 
 Without a CNI that enforces NetworkPolicy, the object is accepted and ignored. Which platforms enforce
 it is in [Network policies](INFRASTRUCTURE.md#network-policies).

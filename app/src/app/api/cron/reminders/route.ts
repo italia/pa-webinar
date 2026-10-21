@@ -21,7 +21,8 @@ import {
   generateYahooCalendarUrl,
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
-import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { registrationInvite } from '@/lib/ical/invitation';
+import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
@@ -113,6 +114,8 @@ export const GET = withErrorHandling(async (request) => {
 
     if (registrations.length === 0) continue;
     remindersProcessed++;
+    // Solo per gli eventi con qualcuno da avvisare: una lettura per evento.
+    const organizzatoreIcs = await nomeOrganizzatoreCalendario(event.id);
 
     for (const reg of registrations) {
       try {
@@ -173,18 +176,17 @@ export const GET = withErrorHandling(async (request) => {
           myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', locale),
         };
 
-        // Stesso UID della conferma: il promemoria aggiorna la voce di
-        // calendario gia' importata invece di aggiungerne un'altra.
-        const icsContent = generateEventICal({
-          eventId: event.id,
-          updatedAt: event.updatedAt,
+        // Lo stesso invito personale della conferma (stesso UID): il
+        // promemoria aggiorna la voce di calendario gia' accettata invece di
+        // aggiungerne un'altra.
+        const invito = registrationInvite(event, {
           title,
           description,
-          startsAt: event.startsAt,
-          endsAt: event.endsAt,
-          timezone: event.timezone,
-          url: eventPageUrl,
-          organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
+          roomUrl: calendarInput.joinUrl,
+          eventPageUrl,
+          organizerName: organizzatoreIcs,
+          attendeeEmail: recipientEmail,
+          locale: testi,
         });
 
         // Una lettura per lingua, non una per iscritto.
@@ -213,13 +215,7 @@ export const GET = withErrorHandling(async (request) => {
           subject: resolved.subject,
           html: reminderHtml(templateInput, resolved),
           text: reminderText(templateInput, resolved),
-          attachments: [
-            {
-              filename: 'event.ics',
-              content: icsContent,
-              contentType: ICS_ATTACHMENT_CONTENT_TYPE,
-            },
-          ],
+          calendarInvite: invito,
           metadata: {
             kind: 'reminder',
             reminderId: reminder.id,

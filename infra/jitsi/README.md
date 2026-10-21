@@ -75,15 +75,26 @@ The module switches the lock on as the first person who carries it is about to e
 (`muc-occupant-pre-join`, after the room's password and lock checks), before that person is in the
 room. Everyone, the first included, therefore
 enters a room that is already moderated: they join with the microphone and camera off, and a speaker or
-a moderator turns them on and is heard. If that first person is a speaker, they are on the allowed list
+a moderator turns them on and is heard. The room turns them back on by itself for a speaker or a
+moderator who chose them on in the waiting room. If that first person is a speaker, they are on the allowed list
 from the switch-on, which reaches Jicofo first, and get their "allowed" message as soon as they are in. Switched
 on while a speaker's own join into the conference was still in progress, the lock would leave that
 speaker muted on the bridge while their client showed the microphone open.
 
+Jicofo opens a person's media session only when at least two people are in the room. It opens a new
+one for someone who stays alone and loses theirs, and for someone moved to another bridge. With
+moderation on, Jicofo creates every new session of a person who does not moderate muted on the bridge,
+allowed list or not, and does not tell the client. The client asks Jicofo to unmute it only once, the
+first time the person turns the microphone on: a speaker who did that while alone in the room, before
+Jicofo had a session for them, would stay muted on the bridge with the microphone open on screen. Each
+time Jicofo offers a session to someone on the allowed list who does not moderate, the module repeats
+that request on their behalf a second later. Jicofo grants it because they are allowed; clients see
+nothing.
+
 Three details matter when you read its logs or change it:
 
-- the lock is switched on once per room. A moderator can lift it during the call from the control bar
-  (**Participant mic**, **Participant video**), and it stays lifted until the room empties and is
+- the lock is switched on once per room. A moderator can lift it during the call from the
+  **Participants** tab (**Microphones locked**, **Video locked**), and it stays lifted until the room empties and is
   created again. In the same way, a change to the event's participant flags while the room is open
   reaches the room only when it is created again; until then the moderator's toggles decide;
 - when a moderator switches moderation back on, the stock component starts again from an allowed list
@@ -97,7 +108,7 @@ Three details matter when you read its logs or change it:
   `token_affiliation` then restores the token's role, the module removes that participant from the
   allowed list again, unless the token marks them exempt.
 
-The module logs every switch-on, admission and removal at `info` level.
+The module logs every switch-on, admission, removal and reopening on the bridge at `info` level.
 
 ### Where it is loaded
 

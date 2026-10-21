@@ -130,12 +130,13 @@ jitsi-meet:
     stunServers: ""
 
   web:
-    # Immagine standard, alla versione di Jitsi del sottochart. La
-    # soppressione rumore avanzata resta spenta, come già è per impostazione
-    # predefinita dell'applicazione (vedi `jitsi-meet.web.image` in values.yaml).
+    # Immagine standard, alla stessa versione di Jitsi degli altri componenti
+    # (vedi `jitsi-meet` in values.yaml: il chart rifiuta versioni diverse).
+    # La soppressione rumore avanzata resta spenta, come già è per
+    # impostazione predefinita dell'applicazione.
     image:
       repository: jitsi/web
-      tag: null
+      tag: stable-11031
       pullPolicy: IfNotPresent
     ingress:
       # Lo rende il chart: jitsi.conferenceIngress, sopra.

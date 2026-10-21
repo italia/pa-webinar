@@ -29,8 +29,17 @@ spec:
           labels:
             {{- include "pa-webinar.selectorLabels" . | nindent 12 }}
             app.kubernetes.io/component: recorder
+          # Il recorder tiene le tracce su un volume locale per tutta la
+          # diretta: uno spostamento per consolidare i nodi le perderebbe.
+          # `safe-to-evict` vince su recorder.podAnnotations; il controller la
+          # impone comunque, qui vale anche per chi crea il Job a mano.
+          annotations:
+            {{- toYaml (merge (dict "cluster-autoscaler.kubernetes.io/safe-to-evict" "false") (.Values.recorder.podAnnotations | default dict)) | nindent 12 }}
         spec:
           restartPolicy: Never
+          # Fermato comunque (drain, nodo che se ne va), chiude la cattura e
+          # carica le tracce fin li': serve il tempo per il caricamento.
+          terminationGracePeriodSeconds: {{ ternary 300 .Values.recorder.terminationGracePeriodSeconds (kindIs "invalid" .Values.recorder.terminationGracePeriodSeconds) }}
           automountServiceAccountToken: false
           {{- with (.Values.recorder.imagePullSecrets | default .Values.app.imagePullSecrets) }}
           imagePullSecrets:

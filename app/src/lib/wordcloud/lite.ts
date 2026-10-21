@@ -1,8 +1,9 @@
 /**
  * La lettura leggera di «in una parola» (`GET …/wordcloud?lite=1`): c'e' una
  * domanda aperta, e quale. La legge ogni presente per il pallino sulla scheda,
- * quindi resta in caldo qualche secondo; chi apre o chiude una domanda la
- * dimentica, cosi' l'avviso del canale trova subito lo stato nuovo.
+ * quindi, senza canale, resta in caldo qualche secondo; chi apre o chiude una
+ * domanda la dimentica. Col canale attivo non si tiene in caldo (vedi la
+ * rotta): l'avviso arriva a tutte le istanze, la dimenticanza solo a una.
  */
 
 import { deleteCache } from '@/lib/cache';

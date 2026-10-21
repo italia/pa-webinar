@@ -29,11 +29,12 @@ export function warmupFromLifecycle(body: unknown): WaitingRoomWarmup | null {
   if (typeof body !== 'object' || body === null) return null;
   const { jvb, serverTime } = body as { jvb?: unknown; serverTime?: unknown };
   if (typeof jvb !== 'object' || jvb === null) return null;
-  const { phase, startedAt } = jvb as { phase?: unknown; startedAt?: unknown };
+  const { phase, startedAt, ready } = jvb as { phase?: unknown; startedAt?: unknown; ready?: unknown };
   if (!isWarmupPhase(phase) || typeof serverTime !== 'string') return null;
   return {
     phase,
     startedAt: typeof startedAt === 'string' ? startedAt : null,
     serverTime,
+    bridgePronto: typeof ready === 'number' && ready > 0,
   };
 }

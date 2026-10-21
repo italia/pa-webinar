@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
@@ -21,6 +21,13 @@ import type { JitsiMeetExternalAPI } from '@/types/jitsi';
  * stanza a cui scriverlo) e di nuovo a ogni cambio dell'interruttore o
  * rientro. Va usato solo se il servizio è installato: senza, Jitsi tenterebbe
  * la vecchia trascrizione via telefono e mostrerebbe un errore.
+ *
+ * Chi avvia o ferma la registrazione da questa sala rimanda subito la scelta
+ * con la funzione restituita: `startRecording` senza l'opzione
+ * `transcription`, e `stopRecording` sempre, scrivono negli stessi metadati
+ * che la trascrizione è spenta, e Jicofo chiuderebbe i sottotitoli. I comandi
+ * dell'IFrame API si eseguono nell'ordine, quindi l'ultima parola resta la
+ * scelta della sala; anche se la registrazione poi non parte.
  */
 export function useCaptionsControl({
   api,
@@ -41,9 +48,11 @@ export function useCaptionsControl({
   certo?: boolean;
   /** Codice primario della lingua dell'evento ("it"). */
   lingua: string;
-}): void {
+}): () => void {
   const [ingressi, setIngressi] = useState(0);
-  const inviato = useRef<{ accesi: boolean; ingresso: number } | null>(null);
+  const inviato = useRef<{ accesi: boolean; ingresso: number; lingua: string } | null>(
+    null
+  );
 
   useEffect(() => {
     if (!api) return;
@@ -57,17 +66,34 @@ export function useCaptionsControl({
   useEffect(() => {
     if (!api || !attivo || ingressi === 0) return;
     const ultimo = inviato.current;
-    if (ultimo && ultimo.accesi === accesi && ultimo.ingresso === ingressi) return;
+    // All'ingresso e a ogni cambio della scelta o della lingua.
+    const serve =
+      !ultimo ||
+      ultimo.accesi !== accesi ||
+      ultimo.ingresso !== ingressi ||
+      ultimo.lingua !== lingua;
+    if (!serve) return;
     // Anche il primo «spenti» parte, ma solo con il valore del server: a
     // stanza gia' spenta non cambia niente, e se Prosody non ha potuto
     // chiedere al portale la stanza segue comunque l'interruttore. Con il
     // valore con cui la pagina e' stata disegnata, forse vecchio, si aspetta.
     if (!accesi && !ultimo && !certo) return;
-    try {
-      api.executeCommand('setSubtitles', accesi, false, lingua);
-      inviato.current = { accesi, ingresso: ingressi };
-    } catch (err) {
-      console.error('setSubtitles failed', err);
-    }
+    if (manda(api, accesi, lingua))
+      inviato.current = { accesi, ingresso: ingressi, lingua };
   }, [api, attivo, accesi, certo, lingua, ingressi]);
+
+  return useCallback(() => {
+    if (api && attivo && accesi && ingressi > 0) manda(api, true, lingua);
+  }, [api, attivo, accesi, lingua, ingressi]);
+}
+
+/** La scelta a Jitsi; i sottotitoli nativi restano nascosti. Vero se è partita. */
+function manda(api: JitsiMeetExternalAPI, accesi: boolean, lingua: string): boolean {
+  try {
+    api.executeCommand('setSubtitles', accesi, false, lingua);
+    return true;
+  } catch (err) {
+    console.error('setSubtitles failed', err);
+    return false;
+  }
 }

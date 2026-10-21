@@ -79,6 +79,12 @@ export interface CaptureConfig {
    * al portale (consent.ts). Senza, si registra ogni traccia remota.
    */
   consentCheck?: (endpointId: string) => Promise<boolean>;
+  /**
+   * Arresto dall'esterno (SIGTERM del pod): la cattura si chiude come a fine
+   * evento, con l'ultimo pezzo di ogni traccia, e chi chiama carica quello
+   * che c'e'.
+   */
+  stopSignal?: AbortSignal;
 }
 
 /**
@@ -96,6 +102,12 @@ export interface CaptureResult {
    * Distinguerle dal solo numero di tracce era impossibile.
    */
   joinedConference: boolean;
+  /**
+   * True se la cattura e' stata chiusa da `stopSignal` a evento in corso: le
+   * tracce coprono solo una parte dell'evento e un'altra esecuzione puo'
+   * registrare il resto.
+   */
+  interrupted: boolean;
 }
 
 /**
@@ -150,8 +162,15 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // partecipante crea una NUOVA chiave → un NUOVO file (prima riusava
   // `${pid}.opus` e troncava la sessione precedente: audio perso).
   const writers = new Map<string, TrackWriter>();
+  // Un'esecuzione del recorder per lo stesso recording (pod ricreato a
+  // diretta in corso) rivede gli stessi endpoint con lo stesso contatore:
+  // senza un prefisso per esecuzione, i suoi file sovrascriverebbero quelli
+  // della prima nello storage.
+  const esecuzione = Date.now().toString(36);
   // Vedi `CaptureResult.joinedConference`: lo alza la pagina via binding.
   let joinedConference = false;
+  // Vedi `CaptureResult.interrupted`.
+  let interrotto = false;
   // Append in volo (IPC chunk page→Node): vanno attesi PRIMA di chiudere i
   // writer e leggere i file, altrimenti l'upload legge file troncati (i chunk
   // arrivano async via exposeFunction mentre finish() già chiude/uploada).
@@ -165,7 +184,7 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   ): TrackWriter {
     let w = writers.get(trackFileId);
     if (!w) {
-      w = new TrackWriter(pid, trackFileId, name, config.outputDir);
+      w = new TrackWriter(pid, `${esecuzione}-${trackFileId}`, name, config.outputDir);
       writers.set(trackFileId, w);
     }
     if (name && !w.displayName) w.displayName = name;
@@ -189,6 +208,12 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     // ("Runtime.callFunctionOn timed out") uccidendo il recorder PRIMA di
     // finish()/upload/ingest → zero tracce per qualsiasi sessione reale. 0 = no cap.
     protocolTimeout: 0,
+    // I segnali li gestisce index.ts (arresto ordinato): con i gestori di
+    // Puppeteer, SIGTERM chiuderebbe Chrome prima dell'ultimo pezzo delle
+    // tracce e SIGINT uscirebbe dal processo senza caricarle.
+    handleSIGTERM: false,
+    handleSIGINT: false,
+    handleSIGHUP: false,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -202,8 +227,24 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   try {
     const page: Page = await browser.newPage();
     let resolveDone: () => void = () => {};
+    let concluso = false;
     const done = new Promise<void>((r) => {
       resolveDone = r;
+    }).then(() => {
+      concluso = true;
+    });
+    const fermato = new Promise<void>((r) => {
+      const segnale = config.stopSignal;
+      if (!segnale) return;
+      const ferma = () => {
+        // Arrivato a cattura gia' conclusa (durante la chiusura del browser):
+        // l'esecuzione e' arrivata in fondo da sola, non e' interrotta.
+        if (concluso) return;
+        interrotto = true;
+        r();
+      };
+      if (segnale.aborted) ferma();
+      else segnale.addEventListener('abort', ferma, { once: true });
     });
 
     // Node ← page bridge. I chunk audio (Blob → base64 in pagina) arrivano
@@ -313,8 +354,18 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       initialGraceMs,
     });
 
-    // Attendi fine conference o hard-cap di durata.
-    await Promise.race([done, new Promise<void>((r) => setTimeout(r, maxDurationMs))]);
+    // Attendi fine conference, hard-cap di durata o arresto dall'esterno.
+    await Promise.race([done, fermato, new Promise<void>((r) => setTimeout(r, maxDurationMs))]);
+    if (!concluso) {
+      // Chiusura ordinata in pagina, come a stanza vuota: i MediaRecorder si
+      // fermano e consegnano l'ultimo pezzo. Con un tetto: dopo, si carica
+      // quello che e' arrivato.
+      console.warn(`[recorder] chiusura della cattura (${interrotto ? 'arresto' : 'durata massima'})`);
+      await Promise.race([
+        page.evaluate(() => (window as unknown as { paFinish?: () => Promise<void> }).paFinish?.()).catch(() => undefined),
+        new Promise<void>((r) => setTimeout(r, 15_000)),
+      ]);
+    }
   } finally {
     // Drena gli append in volo (IPC chunk page→Node ancora in coda quando la
     // pagina ha risolto finish()), poi una breve attesa per gli ultimi
@@ -332,6 +383,7 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   return {
     recordings: Array.from(writers.values()).map((w) => w.toRecording()),
     joinedConference,
+    interrupted: interrotto,
   };
 }
 
@@ -492,6 +544,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       w.onConferenceDone?.();
       resolve();
     };
+    // Node la chiama all'arresto del pod (vedi `stopSignal`).
+    w.paFinish = finish;
 
     const armIdle = () => {
       if (idleTimer) clearTimeout(idleTimer);

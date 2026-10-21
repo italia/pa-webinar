@@ -14,6 +14,7 @@ import { authorizePanelRead, PANEL_READ_EVENT_SELECT, type PanelReadEvent } from
 import { countWordsByPerson, isRoundExpired } from '@/lib/wordcloud/normalize';
 import { WORDCLOUD_LITE_TTL_MS, forgetWordcloudLite, wordcloudLiteKey } from '@/lib/wordcloud/lite';
 import { getCached, setCache } from '@/lib/cache';
+import { getRedis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,7 +139,7 @@ export const GET = withErrorHandling(async (request, context) => {
   // Lettura leggera per il pallino sulla scheda: c'e' una domanda aperta, e
   // quale. Niente parole e nessuna scrittura (la chiusura allo scadere la fa
   // la lettura completa). Passa la stessa regola di lettura del pannello;
-  // la risposta, uguale per tutti, si tiene in caldo.
+  // la risposta, uguale per tutti, senza canale si tiene in caldo.
   if (new URL(request.url).searchParams.get('lite') === '1') {
     // La segue ogni presente a ogni parola inviata: l'evento e l'esito del
     // controllo di chi ha un token restano in caldo, cosi' una rilettura e'
@@ -155,7 +156,14 @@ export const GET = withErrorHandling(async (request, context) => {
       await authorizePanelRead(ev, token);
       if (autorizzato) setCache(autorizzato, true, LITE_AUTH_TTL_MS);
     }
-    const inCaldo = getCached<{ active: boolean; id?: string }>(wordcloudLiteKey(ev.id));
+    // La risposta resta in caldo solo senza canale. Col canale attivo i
+    // client rileggono appena arriva l'avviso, e un'altra istanza dell'app
+    // risponderebbe con lo stato di prima (la dimentica solo chi ha fatto la
+    // modifica): la domanda appena aperta non comparirebbe fino al giro dopo.
+    const inCaldoAmmesso = getRedis()?.status !== 'ready';
+    const inCaldo = inCaldoAmmesso
+      ? getCached<{ active: boolean; id?: string }>(wordcloudLiteKey(ev.id))
+      : null;
     if (inCaldo) return Response.json(inCaldo);
     const ultimo = await prisma.wordCloudRound.findFirst({
       where: { eventId: ev.id },
@@ -165,7 +173,7 @@ export const GET = withErrorHandling(async (request, context) => {
     const corpo = ultimo
       ? { active: ultimo.status === 'OPEN' && !isRoundExpired(ultimo), id: ultimo.id }
       : { active: false };
-    setCache(wordcloudLiteKey(ev.id), corpo, WORDCLOUD_LITE_TTL_MS);
+    if (inCaldoAmmesso) setCache(wordcloudLiteKey(ev.id), corpo, WORDCLOUD_LITE_TTL_MS);
     return Response.json(corpo);
   }
 

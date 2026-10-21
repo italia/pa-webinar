@@ -31,6 +31,7 @@ function fullSource(): DuplicateSource {
     ],
     additionalMods: [
       {
+        id: 'persona-1',
         name: 'cifrato:nome',
         email: 'cifrato:email',
         emailHash: 'impronta',
@@ -38,8 +39,10 @@ function fullSource(): DuplicateSource {
         organizer: true,
         organization: 'Ente B',
         organizationLogoUrl: '/api/assets/images/b.png',
+        photoId: 'foto-1',
       },
       {
+        id: 'persona-2',
         name: 'cifrato:nome2',
         email: null,
         emailHash: null,
@@ -47,11 +50,12 @@ function fullSource(): DuplicateSource {
         organizer: false,
         organization: null,
         organizationLogoUrl: null,
+        photoId: null,
       },
     ],
     agendaItems: [
-      { label: 'Apertura', sortOrder: 0, plannedMinutes: 10 },
-      { label: 'Domande', sortOrder: 1, plannedMinutes: null },
+      { label: 'Apertura', sortOrder: 0, plannedMinutes: 10, speakerGrantId: null, speakerPrimary: true },
+      { label: 'Domande', sortOrder: 1, plannedMinutes: null, speakerGrantId: null, speakerPrimary: false },
     ],
     reminders: [{ offsetMinutes: 1440, label: 'Un giorno prima' }],
     glossaryTerms: [
@@ -111,7 +115,9 @@ describe('classificazione delle relazioni di Event', () => {
     // L'anello che mancava: elenco e query possono essere allineati mentre il
     // costruttore non ha il ramo corrispondente, e la relazione non viene
     // copiata senza che nessun test se ne accorga.
-    const built = Object.keys(duplicatedRelations(fullSource()));
+    // Il programma si scrive a parte, dopo l'evento (vedi DuplicatedRelations).
+    const { nested, agendaItems } = duplicatedRelations(fullSource());
+    const built = [...Object.keys(nested), ...(agendaItems.length > 0 ? ['agendaItems'] : [])];
     expect([...DUPLICATED_EVENT_RELATIONS].sort()).toEqual(built.sort());
   });
 
@@ -138,20 +144,23 @@ describe('classificazione delle relazioni di Event', () => {
 });
 
 describe('duplicatedRelations', () => {
-  it('copia ruolo ed ente delle persone, non la pubblicazione', () => {
-    const out = duplicatedRelations(fullSource());
+  it('copia ruolo, ente e foto delle persone, non la pubblicazione', () => {
+    const out = duplicatedRelations(fullSource()).nested;
     const created = out.additionalMods?.create as Record<string, unknown>[];
     expect(created[0]).toMatchObject({
       organizer: true,
       organization: 'Ente B',
       organizationLogoUrl: '/api/assets/images/b.png',
+      // La stessa riga della foto: la pulizia la toglie solo quando nessun
+      // evento la usa più.
+      photoId: 'foto-1',
       publicListed: false,
     });
-    expect(created[1]).toMatchObject({ organizer: false, publicListed: false });
+    expect(created[1]).toMatchObject({ organizer: false, photoId: null, publicListed: false });
   });
 
   it('non eredita MAI il token dei co-moderatori: è una credenziale', () => {
-    const out = duplicatedRelations(fullSource());
+    const out = duplicatedRelations(fullSource()).nested;
     const created = out.additionalMods?.create as { token: string }[];
     const tokens = created.map((m) => m.token);
     expect(tokens).toHaveLength(2);
@@ -163,16 +172,32 @@ describe('duplicatedRelations', () => {
   });
 
   it('copia l’agenda ma non il suo stato di esecuzione', () => {
-    const out = duplicatedRelations(fullSource());
-    const items = out.agendaItems?.create as Record<string, unknown>[];
-    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0, plannedMinutes: 10 });
+    const items = duplicatedRelations(fullSource()).agendaItems as Record<string, unknown>[];
+    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0, plannedMinutes: 10, speakerPrimary: true });
     expect(items[1]).toEqual({ label: 'Domande', sortOrder: 1 });
     expect(items[0]?.completed).toBeUndefined();
     expect(items[0]?.completedAt).toBeUndefined();
+    expect(items[0]?.status).toBeUndefined();
+  });
+
+  it('chi interviene nel programma è la copia della persona, con il suo id nuovo', () => {
+    const sorgente = fullSource();
+    sorgente.agendaItems = [
+      { label: 'Intervento', sortOrder: 0, plannedMinutes: 20, speakerGrantId: 'persona-2', speakerPrimary: false },
+      // Una persona revocata non si copia: l'argomento resta, senza nome.
+      { label: 'Saluti', sortOrder: 1, plannedMinutes: 5, speakerGrantId: 'persona-revocata', speakerPrimary: false },
+    ];
+    const { nested, agendaItems } = duplicatedRelations(sorgente);
+    const persone = nested.additionalMods?.create as { id: string; name: string }[];
+    const copiaDi2 = persone.find((p) => p.name === 'cifrato:nome2')!.id;
+    expect(copiaDi2).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(copiaDi2).not.toBe('persona-2');
+    expect(agendaItems[0]).toMatchObject({ label: 'Intervento', speakerGrantId: copiaDi2 });
+    expect(agendaItems[1]).toEqual({ label: 'Saluti', sortOrder: 1, plannedMinutes: 5 });
   });
 
   it('omette i Json nullable invece di passarli come null (Prisma li rifiuta)', () => {
-    const out = duplicatedRelations(fullSource());
+    const out = duplicatedRelations(fullSource()).nested;
     const questionnaires = out.questionnaires?.create as {
       adhocItems: { create: Record<string, unknown>[] };
     }[];
@@ -187,7 +212,7 @@ describe('duplicatedRelations', () => {
     // `title`/`description` non sono nullable e hanno `{}` come default: un null
     // letto dal DB farebbe rifiutare l'insert, e con esso l'INTERA copia, perché
     // è un unico inserimento annidato.
-    const out = duplicatedRelations(fullSource());
+    const out = duplicatedRelations(fullSource()).nested;
     const questionnaires = out.questionnaires?.create as Record<string, unknown>[];
     expect(questionnaires[0]?.description).toEqual({});
     expect(questionnaires[0]?.title).toEqual({ it: 'Come è andata?' });
@@ -203,11 +228,11 @@ describe('duplicatedRelations', () => {
       questionnaires: [],
       glossaryTerms: [],
     };
-    expect(duplicatedRelations(empty)).toEqual({});
+    expect(duplicatedRelations(empty)).toEqual({ nested: {}, agendaItems: [] });
   });
 
   it('copia tag, organizzatori, promemoria e questionari con i loro campi', () => {
-    const out = duplicatedRelations(fullSource());
+    const out = duplicatedRelations(fullSource()).nested;
     expect(out.tagLinks?.create).toEqual([{ tagId: 'tag-1' }]);
     expect(out.organizers?.create).toEqual([
       { name: 'Ente A', logoUrl: null, websiteUrl: 'https://esempio.gov.it', sortOrder: 0 },

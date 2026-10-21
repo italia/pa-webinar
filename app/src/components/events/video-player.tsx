@@ -12,6 +12,8 @@ import {
 } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { formatVideoTime } from '@/lib/utils/video-time';
+
 export interface SubtitleTrack {
   /** ISO-639-1 language code, e.g. "it", "en", "fr". */
   language: string;
@@ -87,21 +89,18 @@ export interface VideoPlayerHandle {
   pause: () => void;
   /** Play the playback (returns a Promise like HTMLMediaElement.play). */
   play: () => Promise<void> | void;
+  /** La lingua dei sottotitoli mostrati (null: spenti), scelta da fuori
+   *  (la barra delle lingue della pagina). Non richiama `onSubtitleChange`. */
+  setSubtitle: (lang: string | null) => void;
+  /** La traccia audio: 'original' o la lingua di un doppiaggio. Non
+   *  richiama `onAudioChange`. */
+  setAudio: (lang: string) => void;
   /** Raw video element — escape hatch for advanced cases (timeupdate
    *  listener registration), used by TranscriptPanel. */
   videoEl: () => HTMLVideoElement | null;
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
-
-function formatTime(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-}
 
 function VideoPlayerImpl(
   {
@@ -140,8 +139,11 @@ function VideoPlayerImpl(
     },
     pause: () => videoRef.current?.pause(),
     play: () => videoRef.current?.play() ?? Promise.resolve(),
+    setSubtitle: (lang) => setActiveSubtitle(lang),
+    setAudio: (lang) => setActiveAudio(lang),
     videoEl: () => videoRef.current,
   }), []);
+
 
   // Sincronizza l'audio dubbed con il video. Quando l'utente cambia
   // traccia audio:
@@ -842,7 +844,7 @@ function VideoPlayerImpl(
 
           {/* Time */}
           <span className="video-player__time">
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {formatVideoTime(currentTime)} / {formatVideoTime(duration)}
           </span>
 
           <div className="video-player__spacer" />

@@ -126,8 +126,39 @@ function toLocalFile(track: ManifestTrack, outputDir: string): LocalTrackFile {
   };
 }
 
-export async function main(): Promise<void> {
+/**
+ * Esito del recorder. `interrupted`: la cattura e' stata chiusa da un arresto
+ * del pod a evento in corso (vedi `CaptureResult.interrupted`).
+ */
+export interface RecorderOutcome {
+  interrupted: boolean;
+}
+
+/**
+ * Codice d'uscita di un recorder fermato a evento in corso: quello
+ * convenzionale di SIGTERM. Uscire con 0 farebbe risultare il Job completato
+ * e nessuno registrerebbe il resto dell'evento; con un errore il Job crea un
+ * nuovo pod (e, se l'arresto e' uno spostamento, non lo conta fra i
+ * tentativi: `podFailurePolicy` del chart).
+ */
+export const EXIT_INTERRUPTED = 143;
+
+export async function main(): Promise<RecorderOutcome> {
   const env = readEnv();
+
+  // Il pod fermato a diretta in corso (drain, nodo che se ne va) riceve
+  // SIGTERM: si chiude la cattura e si caricano le tracce registrate fin li',
+  // invece di perderle con il volume del pod. Node e' il PID 1 del container
+  // (entrypoint.sh fa `exec`): senza un gestore il segnale si ignora e arriva
+  // il SIGKILL a fine grace.
+  const arresto = new AbortController();
+  const fermaOrdinato = (segnale: string) => {
+    if (arresto.signal.aborted) return;
+    console.warn(`[recorder] ${segnale}: chiudo la cattura e carico le tracce registrate fin qui`);
+    arresto.abort();
+  };
+  process.once('SIGTERM', () => fermaOrdinato('SIGTERM'));
+  process.once('SIGINT', () => fermaOrdinato('SIGINT'));
 
   // ── 1-2. Claim del work-order (JWT bot + stanza) ──
   const wo = await claimWorkOrder({
@@ -159,10 +190,11 @@ export async function main(): Promise<void> {
       cronApiKey: env.cronApiKey,
       eventId: wo.eventId,
     }),
+    stopSignal: arresto.signal,
   };
 
   // ── 3. Cattura WebRTC (blocca fino a fine evento) ──
-  let { recordings, joinedConference } = await captureRoom(captureConfig);
+  let { recordings, joinedConference, interrupted } = await captureRoom(captureConfig);
 
   // Rete di sicurezza, e sta QUI di proposito.
   //
@@ -179,7 +211,7 @@ export async function main(): Promise<void> {
   // là non si distingue un login rifiutato da una linea caduta a metà evento, e
   // una riconnessione dopo quaranta minuti avrebbe fatto ricomparire il bot
   // davanti a tutti i partecipanti, a registrazione in corso.
-  if (shouldRetryWithJwt(joinedConference, captureConfig.xmppUser)) {
+  if (!interrupted && shouldRetryWithJwt(joinedConference, captureConfig.xmppUser)) {
     console.warn(
       '[recorder] mai entrati in conferenza col login sul dominio nascosto — ' +
         'riprovo col JWT del portale (il bot sara VISIBILE in stanza)'
@@ -191,6 +223,7 @@ export async function main(): Promise<void> {
     });
     recordings = retry.recordings;
     joinedConference = retry.joinedConference;
+    interrupted = retry.interrupted;
   }
 
   // ── 4. Manifest (puro) ──
@@ -217,7 +250,7 @@ export async function main(): Promise<void> {
     // che abbiamo (`joinedConference` falso) non le distingue, e accusare le
     // credenziali quando era la rete manderebbe chi indaga dalla parte
     // sbagliata.
-    if (!joinedConference) {
+    if (!joinedConference && !interrupted) {
       throw new Error(
         'ingresso in conferenza mai riuscito (nessuna traccia). Cause possibili: ' +
           'credenziali del bot non valide, allowlist del MUC mancante, ' +
@@ -225,7 +258,7 @@ export async function main(): Promise<void> {
       );
     }
     console.warn('[recorder] nessuna traccia catturata — niente upload/ingest');
-    return;
+    return { interrupted };
   }
 
   // ── 5. Upload tracce + manifest (presign per-traccia) ──
@@ -255,15 +288,16 @@ export async function main(): Promise<void> {
   // array vuoto e non avrebbe senso accodare la pipeline).
   if (uploadedManifest.tracks.length === 0) {
     console.warn('[recorder] nessuna traccia caricata con successo — niente ingest');
-    return;
+    return { interrupted };
   }
 
   // ── 6. Ingest al portale (POST /api/internal/multitrack-manifest) ──
-  await notifyPortal(buildIngestBody(uploadedManifest, trackSizes), {
+  await notifyPortal(buildIngestBody(uploadedManifest, trackSizes, { interrupted }), {
     ingestUrl: `${env.portalUrl}/api/internal/multitrack-manifest`,
     cronApiKey: env.cronApiKey,
   });
   console.log('[recorder] portale notificato (multitrack-manifest)');
+  return { interrupted };
 }
 
 // Esegui solo se invocato direttamente (non quando importato dai test).
@@ -273,12 +307,12 @@ const isMain =
 
 if (isMain) {
   main()
-    .then(() => {
+    .then((esito) => {
       // Uscita esplicita: Puppeteer/Chrome può lasciare handle aperti che
       // tengono vivo l'event loop anche dopo browser.close(), impedendo al
       // processo di terminare → il Job resterebbe Running fino ad
       // activeDeadlineSeconds. Forziamo l'exit a lavoro completato.
-      process.exit(0);
+      process.exit(esito.interrupted ? EXIT_INTERRUPTED : 0);
     })
     .catch((err) => {
       console.error('[recorder] errore fatale:', err);

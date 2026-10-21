@@ -257,6 +257,29 @@ describe('sala d\'attesa — la sala che non e\' pronta resta distinta dal nome'
     expect($('#waiting-name-required')).toBeNull();
   });
 
+  it('sala accesa in anticipo e pronta: conto alla rovescia e «Apertura alle …», non «in allestimento»', () => {
+    const serverTime = new Date().toISOString();
+    render({
+      event: { ...eventoLive, status: 'PROVISIONING', startsAt: oraPiu(10), endsAt: oraPiu(70) },
+      warmup: { phase: 'starting', startedAt: serverTime, serverTime, bridgePronto: true },
+    });
+    expect(container.textContent).toContain(t.startsIn);
+    expect(container.textContent).toContain('La sala è pronta: si apre alle');
+    expect(container.textContent).toContain(t.warmup.readyBeforeStartDetail);
+    expect(pulsante('Apertura alle').disabled).toBe(true);
+    expect(container.textContent).not.toContain(t.warmingUpButton);
+  });
+
+  it('sala in accensione dopo l\'orario d\'inizio: resta «in allestimento»', () => {
+    const serverTime = new Date().toISOString();
+    render({
+      event: { ...eventoLive, status: 'PROVISIONING', startsAt: oraPiu(-1), endsAt: oraPiu(59) },
+      warmup: { phase: 'starting', startedAt: serverTime, serverTime, bridgePronto: false },
+    });
+    expect(pulsante(t.warmingUpButton).disabled).toBe(true);
+    expect(container.textContent).not.toContain('La sala è pronta');
+  });
+
   it('il nome non ancora letto dal browser non si segnala come mancante', () => {
     // Il disegno lato server precede la lettura del nome salvato: un campo
     // vuoto li' non vuol dire che il nome manchi.

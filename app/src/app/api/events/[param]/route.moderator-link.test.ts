@@ -24,6 +24,7 @@ vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: vi.fn((v: string | null | undefined) => v ?? null),
 }));
 vi.mock('@/lib/email/notification', () => ({ sendDateChangeNotifications: vi.fn() }));
+vi.mock('@/lib/email/calendar-invite', () => ({ sendStaffCalendarUpdates: vi.fn(async () => undefined) }));
 vi.mock('@/lib/live-state/publish', () => ({
   publishEventStatus: vi.fn(async () => undefined),
   publishFlagsIfChanged: vi.fn(async () => undefined),
@@ -47,7 +48,9 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { prisma } from '@/lib/db';
+import { sendStaffCalendarUpdates } from '@/lib/email/calendar-invite';
 import { sendGrantModeratorLinks, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import { sendDateChangeNotifications } from '@/lib/email/notification';
 
 import { PUT } from './route';
 
@@ -161,5 +164,55 @@ describe('PUT /api/events/[param] — link del moderatore principale', () => {
     expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
     const scritto = db.event.update.mock.calls[0]?.[0] as { data: Record<string, unknown> } | undefined;
     expect(scritto?.data).not.toHaveProperty('moderatorEmail');
+  });
+});
+
+describe('PUT /api/events/[param] — cambio di data e calendari', () => {
+  it('on a published event, registrants get the notice and the people running it the updated invitation', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(
+      put({ startsAt: '2027-03-02T09:00:00.000Z', endsAt: '2027-03-02T10:00:00.000Z' }),
+      ctx as never,
+    );
+    expect(sendDateChangeNotifications).toHaveBeenCalledWith({ eventId: EVENT_ID });
+    await vi.waitFor(() =>
+      expect(sendStaffCalendarUpdates).toHaveBeenCalledWith(EVENT_ID, {
+        staffLocale: 'en',
+        skipPrimary: false,
+      }),
+    );
+  });
+
+  it('a primary contact changed in the same save is skipped: their new link carries the invitation', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(
+      put({ startsAt: '2027-03-02T09:00:00.000Z', moderatorEmail: 'nuovo@example.test' }),
+      ctx as never,
+    );
+    await vi.waitFor(() =>
+      expect(sendStaffCalendarUpdates).toHaveBeenCalledWith(EVENT_ID, {
+        staffLocale: 'en',
+        skipPrimary: true,
+      }),
+    );
+    expect(sendPrimaryModeratorLink).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failure of the calendar update does not fail the save', async () => {
+    stato.status = 'PUBLISHED';
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(sendStaffCalendarUpdates).mockRejectedValueOnce(new Error('boom'));
+    const r = await PUT(put({ startsAt: '2027-03-02T09:00:00.000Z' }), ctx as never);
+    expect(r.status).toBe(200);
+    await vi.waitFor(() => expect(spy).toHaveBeenCalled());
+    spy.mockRestore();
+  });
+
+  it('no calendar update when the date does not change, or on a draft', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(put({ startsAt: '2027-03-01T09:00:00.000Z', qaEnabled: true }), ctx as never);
+    stato.status = 'DRAFT';
+    await PUT(put({ startsAt: '2027-03-05T09:00:00.000Z', endsAt: '2027-03-05T10:00:00.000Z' }), ctx as never);
+    expect(sendStaffCalendarUpdates).not.toHaveBeenCalled();
   });
 });

@@ -7,6 +7,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { tagIdsFromSlugs } from '@/lib/events/event-tags';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -20,6 +21,11 @@ import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { ensurePostEventQuestionnaire } from '@/lib/feedback/default-questionnaire';
+import { getSettings } from '@/lib/settings';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
+import { improntaSorgente, testoSorgente } from '@/lib/text-translation/source';
+import { linguaPrincipale } from '@/lib/text-translation/stato-lingue';
+import { testiDiUnEventoNuovo } from '@/lib/text-translation/unione-testi';
 import {
   ALWAYS_PUBLIC_STATUSES,
   WARMUP_STATUSES,
@@ -120,16 +126,42 @@ export const POST = withErrorHandling(async (request) => {
     ]);
   }
 
+  // La foto dell'organizzatore principale, appena caricata dal wizard (chi crea
+  // e' lo staff): se non c'e' piu' (o e' di un altro evento) l'evento nasce
+  // senza, non si rifiuta.
+  const fotoPrincipale =
+    (await usablePersonPhotoId(data.moderatorPhotoId, null, 'staff')) ?? null;
+
+  // Titolo e descrizione, e chi ha scritto ogni lingua: in un evento nuovo
+  // ogni lingua con un testo, oltre alla principale, e' di chi la scrive.
+  // Le traduzioni vuote non si persistono: il wizard rimanda una chiave per
+  // ogni lingua attiva, anche quelle che nessuno ha compilato.
+  const lingua = linguaPrincipale(await getSettings());
+  const testi = testiDiUnEventoNuovo({
+    principale: lingua,
+    title: pruneEmptyTranslations(data.title as LocalizedField),
+    description: pruneEmptyTranslations(data.description as LocalizedField),
+    impronta: improntaSorgente(
+      testoSorgente(
+        lingua,
+        data.title as Record<string, string>,
+        data.description as Record<string, string>,
+      ),
+    ),
+    ora: new Date(),
+  });
+
   const event = await prisma.event.create({
     data: {
       createdById: session.accountId,
       slug,
       jitsiRoomName,
       moderatorToken,
-      // Le traduzioni vuote non si persistono: il wizard rimanda una chiave
-      // per ogni lingua attiva, anche quelle che nessuno ha compilato.
-      title: pruneEmptyTranslations(data.title as LocalizedField),
-      description: pruneEmptyTranslations(data.description as LocalizedField),
+      title: testi.title,
+      description: testi.description,
+      ...(Object.keys(testi.stato).length > 0 && {
+        textLocaleState: testi.stato as unknown as Prisma.InputJsonValue,
+      }),
       startsAt: new Date(data.startsAt),
       endsAt: new Date(data.endsAt),
       timezone: data.timezone,
@@ -191,6 +223,7 @@ export const POST = withErrorHandling(async (request) => {
       moderatorOrganization: data.moderatorOrganization || null,
       moderatorOrganizationLogoUrl: data.moderatorOrganizationLogoUrl || null,
       moderatorPublicListed: data.moderatorPublicListed ?? false,
+      moderatorPhotoId: fotoPrincipale,
       speakersInfo: data.speakersInfo,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
@@ -282,12 +315,17 @@ export const POST = withErrorHandling(async (request) => {
     details: { slug: event.slug, fields: Object.keys(data) },
   });
 
+  // Le lingue della pagina senza testo si traducono adesso, anche in bozza:
+  // alla pubblicazione sono pronte (lib/text-translation/auto).
+  const traduzione = await riconciliaTraduzioni(event.id, { request });
+
   // Nessun link per email qui: l'evento nasce in bozza, e i link personali
   // partono alla pubblicazione (PUT /api/events/[param], lib/email/moderator-link).
 
   return Response.json(
     {
       ...event,
+      traduzione,
       links: {
         publicPage: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
         moderatorLink: localizedUrl(
@@ -378,7 +416,8 @@ export const GET = withErrorHandling(async (request) => {
       recordingEnabled: event.recordingEnabled,
       status: event.status,
       eventType: event.eventType,
-      recordingUrl: event.recordingUrl,
+      // Come la rotta del singolo evento: il video solo se pubblicato per tutti.
+      recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
     };
   });
 

@@ -269,5 +269,11 @@ export const GET = withErrorHandling(async (_request, context) => {
     summariesStructured,
     dubbedAudio,
     pipelineSnapshot: recording.pipelineSnapshot ?? {},
-  }, { headers: { [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE } });
+  }, {
+    headers: {
+      [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
+      // Chi la riceve dipende dalla richiesta (lib/recording/audience).
+      'Cache-Control': 'private, no-store',
+    },
+  });
 });

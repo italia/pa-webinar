@@ -30,7 +30,7 @@ async function loadUpcomingEvents() {
     maxParticipants: e.maxParticipants,
     registrationCount: e._count.registrations,
     status: e.status,
-    recordingUrl: e.recordingUrl,
+    recordingUrl: e.recordingPublished && e.recordingAudience === 'PUBLIC' ? e.recordingUrl : null,
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,

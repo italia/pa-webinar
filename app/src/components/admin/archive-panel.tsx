@@ -32,7 +32,8 @@ interface TrackDto {
 type ArchiveStatus = 'none' | 'pending' | 'running' | 'done' | 'failed';
 
 interface TracksResponse {
-  mixUrl: string;
+  /** Null senza il video della sala: solo tracce, o solo sottotitoli. */
+  mixUrl: string | null;
   tracks: TrackDto[];
   subtitleVtt: string | null;
   subtitleLang: string | null;
@@ -64,13 +65,14 @@ export default function ArchivePanel({ recordingId }: { recordingId: string }) {
     void load();
   }, [load]);
 
-  // Poll mentre l'archivio è in coda/esecuzione.
+  // Poll mentre l'archivio è in coda/esecuzione. Senza il video lo stato non si
+  // mostra, e ogni giro rifirmerebbe le tracce interrompendo l'ascolto.
   useEffect(() => {
     const s = data?.archive.status;
-    if (s !== 'pending' && s !== 'running') return;
+    if (!data?.mixUrl || (s !== 'pending' && s !== 'running')) return;
     const iv = setInterval(() => void load(), 8000);
     return () => clearInterval(iv);
-  }, [data?.archive.status, load]);
+  }, [data?.archive.status, data?.mixUrl, load]);
 
   // Sottotitoli come Blob same-origin (evita CORS sul SAS Azure).
   const subtitleTracks: SubtitleTrack[] = useMemo(() => {
@@ -171,19 +173,32 @@ export default function ArchivePanel({ recordingId }: { recordingId: string }) {
             </>
           )}
         </div>
+      ) : !data?.mixUrl ? (
+        <div>
+          {/* Tracce senza il video della sala (non registrato, o non ancora
+              arrivato): il player sincronizzato non ha niente da seguire e
+              l'archivio MKV parte dal video. Ogni traccia si ascolta da sola. */}
+          <p className="text-secondary small mb-3" role="status">{t('archiveNoVideo')}</p>
+          <ul className="list-unstyled mb-0">
+            {audioTracks.map((tr) => (
+              <li key={tr.language} className="mb-3">
+                <p className="small fw-semibold mb-1">{tr.label}</p>
+                <audio controls preload="none" src={tr.src} aria-label={tr.label} className="w-100" />
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : (
         <>
           {/* Player di riascolto per-relatore */}
           <h2 className="h6 fw-semibold mb-2">{t('archivePlayerTitle')}</h2>
           <p className="text-secondary small mb-2">{t('archiveAudioHint')}</p>
-          {data && (
-            <VideoPlayer
-              src={data.mixUrl}
-              title={t('archivePlayerTitle')}
-              audioTracks={audioTracks}
-              subtitleTracks={subtitleTracks}
-            />
-          )}
+          <VideoPlayer
+            src={data.mixUrl}
+            title={t('archivePlayerTitle')}
+            audioTracks={audioTracks}
+            subtitleTracks={subtitleTracks}
+          />
 
           {/* Archivio scaricabile */}
           <hr className="my-4" />

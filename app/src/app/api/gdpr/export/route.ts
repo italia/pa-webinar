@@ -119,6 +119,8 @@ export const GET = withErrorHandling(async (request) => {
       createdAt: true,
       revokedAt: true,
       event: { select: { title: true, startsAt: true } },
+      // La foto che lo staff ha caricato per la persona.
+      photo: { select: { contentType: true, bytes: true } },
     },
     orderBy: { createdAt: 'asc' },
   });
@@ -127,6 +129,9 @@ export const GET = withErrorHandling(async (request) => {
     role: g.role === 'SPEAKER' ? 'speaker' : g.organizer ? 'organizer' : 'moderator',
     organization: g.organization,
     shownOnPublicPage: g.publicListed,
+    photo: g.photo
+      ? `data:${g.photo.contentType};base64,${Buffer.from(g.photo.bytes).toString('base64')}`
+      : null,
     createdAt: g.createdAt.toISOString(),
     revokedAt: g.revokedAt?.toISOString() ?? null,
     event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },

@@ -21,17 +21,22 @@ async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
   const events = await prisma.event.findMany({
     where,
     include: {
-      _count: {
-        select: {
-          registrations: true,
-          additionalMods: true,
-          organizers: true,
-        },
-      },
+      _count: { select: { registrations: true } },
+      organizers: { select: { name: true }, orderBy: { sortOrder: 'asc' } },
       tagLinks: { include: { tag: true } },
     },
     orderBy: { startsAt: 'asc' },
   });
+
+  // Le persone con un link valido, contate per ruolo nel database.
+  const perRuolo = await prisma.eventModerator.groupBy({
+    by: ['eventId', 'role'],
+    where: { eventId: { in: events.map((e) => e.id) }, revokedAt: null },
+    _count: { _all: true },
+  });
+  const conteggi = new Map(perRuolo.map((r) => [`${r.eventId}:${r.role}`, r._count._all]));
+  const quanti = (eventId: string, role: 'MODERATOR' | 'SPEAKER') =>
+    conteggi.get(`${eventId}:${role}`) ?? 0;
 
   return events.map((e) => ({
     id: e.id,
@@ -50,8 +55,9 @@ async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
     imageUrl: e.imageUrl,
     organizerName: e.organizerName,
     parseTitleKicker: e.parseTitleKicker,
-    moderatorCount: e._count.additionalMods,
-    organizerCount: e._count.organizers,
+    moderatorCount: quanti(e.id, 'MODERATOR'),
+    speakerCount: quanti(e.id, 'SPEAKER'),
+    organizers: e.organizers,
     tags: e.tagLinks.map((link) => ({
       slug: link.tag.slug,
       name: link.tag.name as Record<string, string>,

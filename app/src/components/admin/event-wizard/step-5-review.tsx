@@ -4,23 +4,25 @@
  * Il riepilogo: in cima cio' che manca ancora per pubblicare (ogni voce porta
  * al suo campo), poi l'evento in un'anteprima sola, come lo vedranno gli
  * altri: quando, chi lo conduce, chi parla, le funzioni della sala, la
- * registrazione (con le lingue di traduzione, che si cambiano qui) e
- * l'informativa. Sotto, «Personalizza le impostazioni» apre le impostazioni
+ * registrazione (con le lingue di traduzione, che si cambiano nel passo
+ * «Evento») e l'informativa. Sotto, «Personalizza le impostazioni» apre le impostazioni
  * avanzate. I pulsanti per salvare li ha il wizard.
  */
 
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import LanguageChecklist from '@/components/admin/language-checklist';
+import { RigaCapacita, type RiepilogoCapacita } from '@/components/admin/capacity-panel';
 import { IconaMicrofono, IconaPersone, IconaRec } from '@/components/admin/guided-format';
 import { Icon } from '@/components/ui/icon';
+import { useDurataTesto } from '@/hooks/use-durata-testo';
+import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
-import { localeNames } from '@/i18n/config';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
 
+import { vociCompilate } from './programme-plan';
+import { nomeLingua } from './text-translation';
 import type { CampoMancante } from './validation';
 import type { WizardForm } from './wizard-shell';
 
@@ -57,10 +59,9 @@ interface Props {
   aiPipelineEnabled?: boolean;
   /** I sottotitoli live ci sono nell'installazione. */
   liveCaptionsAvailable?: boolean;
-  /** La lingua dell'evento: non si offre come lingua di traduzione. */
-  eventLocale?: string;
-  /** C'e' un avviso di capacita': lo si dice, e porta alle impostazioni. */
-  capacityWarning?: boolean;
+  /** La capacita' in una riga: il carico del ponte e quanto riceve chi guarda;
+   *  da «attenzione» in su e' un avviso. Porta ai dettagli tecnici. */
+  capacita?: RiepilogoCapacita;
   /** La parte del titolo prima di «|» si mostra come sopratitolo. */
   sopratitolo?: boolean;
   /** Si iscrive chiunque (scelta dell'evento, o del sito). Assente per una
@@ -68,6 +69,14 @@ interface Props {
   iscrizioneAperta?: boolean;
   /** Porta al passo «Persone», dove si sceglie chi si iscrive. */
   onVaiPersone?: () => void;
+  /** Porta al passo «Programma». Assente per una chiamata istantanea, che
+   *  non ha il passo: la riga del programma compare solo se ce n'e' uno. */
+  onVaiProgramma?: () => void;
+  /** Si sta creando l'evento: ad agenda spenta il programma non si salva. */
+  programmaInCreazione?: boolean;
+  /** Quante domande si fanno prima e dopo l'evento, sotto cio' che si chiede
+   *  all'iscrizione. */
+  questionari?: React.ReactNode;
 }
 
 /** I nomi di un elenco di persone. */
@@ -77,26 +86,34 @@ function nomi(persone: Array<{ name: string }>): string {
 
 export default function Step5Review({
   form,
-  onChange,
   defaultLocale,
   gdprTemplates,
-  fieldErrors = {},
   onCustomize,
   onVaiAlCampo,
   mancanti = [],
   aiPipelineEnabled = true,
   liveCaptionsAvailable = false,
-  eventLocale,
-  capacityWarning = false,
+  capacita,
   sopratitolo = false,
   iscrizioneAperta,
   onVaiPersone,
+  onVaiProgramma,
+  programmaInCreazione = false,
+  questionari,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const tf = useTranslations('admin.wizard.flow');
   const tp = useTranslations('admin.wizard.step2');
   const tForm = useTranslations('admin.form');
+  const tProgramma = useTranslations('admin.wizard.programme');
+  const tTrad = useTranslations('admin.textTranslation');
+  const durata = useDurataTesto();
   const toggles = togglesFromMatrix(form.permissionMatrix);
+  // Il programma, ad agenda accesa: quanti argomenti e quanto dura. Spenta,
+  // quelli preparati non compaiono (e in creazione non si salvano).
+  const preparati = vociCompilate(form.agenda ?? []);
+  const programma = form.agendaEnabled ? preparati : [];
+  const durataDelProgramma = durataProgramma(programma);
   const senzaInvitati = iscrizioneAperta === false && form.invitations.length === 0;
   // Cosa si chiede a chi si iscrive: nome ed email sempre, il resto se scelto.
   const chiesti = [
@@ -111,15 +128,6 @@ export default function Step5Review({
     sopratitolo
   );
   const locale: 'it' | 'en' = defaultLocale === 'it' ? 'it' : 'en';
-  // Le lingue si cambiano sul posto, a richiesta: l'anteprima resta
-  // un'anteprima. Si aprono da sole quando non ce n'e' nessuna (servono per
-  // tradurre) o quando un invio le segnala, e restano aperte finche' le si
-  // sceglie: chiuderle sotto il cursore alla prima spunta toglierebbe la
-  // seconda.
-  const [lingueAperte, setLingueAperte] = useState(false);
-  useEffect(() => {
-    if (fieldErrors.aiTargetLocales) setLingueAperte(true);
-  }, [fieldErrors.aiTargetLocales]);
 
   const ricorrenza =
     form.recurrenceRule && form.recurrencePreset !== 'none'
@@ -162,10 +170,7 @@ export default function Step5Review({
     traduce && tForm('aiTranslationEnabled'),
     traduce && form.aiDubbingEnabled && tForm('aiDubbingEnabled'),
   ].filter((x): x is string => !!x);
-  const lingue = parseLocaleList(form.aiTargetLocales).map(
-    (c) => (localeNames as Record<string, string>)[c] ?? c
-  );
-  const mostraLingue = traduce && (lingueAperte || lingue.length === 0);
+  const lingue = parseLocaleList(form.aiTargetLocales).map(nomeLingua);
   const informativa = form.gdprTemplateId
     ? tf('privacyTemplate', {
         name: gdprTemplates.find((g) => g.id === form.gdprTemplateId)?.name ?? '—',
@@ -195,17 +200,23 @@ export default function Step5Review({
       case 'moderatorEmail':
         return tf('fieldOrganizerEmail');
       case 'aiTargetLocales':
-        return tForm('aiTargetLocales');
+        return tTrad('eventLanguages');
       case 'dataRetentionDays':
         return t('retentionDays');
       case 'gdprTemplateId':
         return t('gdprTemplate');
+      case 'agenda':
+        return tf('fieldProgrammeMinutes', { n: Number(key.split('.')[1] ?? 0) + 1 });
       default:
         return campo ?? key;
     }
   };
 
   const organizzatore = form.moderatorName?.trim();
+  // Chi conduce col segno di organizzatore sta fra chi organizza, non fra i
+  // moderatori: lo stesso ruolo che il passo «Persone» gli ha dato.
+  const altriOrganizzatori = form.moderators.filter((m) => m.organizer);
+  const moderatori = form.moderators.filter((m) => !m.organizer);
 
   return (
     <div>
@@ -280,14 +291,19 @@ export default function Step5Review({
                   {t('summary.primaryOrganizer')}: {t('summary.primaryMissing')}
                 </span>
               )}
+              {altriOrganizzatori.length > 0 && (
+                <span className="d-block">
+                  {t('summary.organizersPeople')}: {nomi(altriOrganizzatori)}
+                </span>
+              )}
+              {moderatori.length > 0 && (
+                <span className="d-block">
+                  {t('summary.moderators')}: {nomi(moderatori)}
+                </span>
+              )}
               {form.speakers.length > 0 && (
                 <span className="d-block">
                   {t('summary.speakers')}: {nomi(form.speakers)}
-                </span>
-              )}
-              {form.moderators.length > 0 && (
-                <span className="d-block">
-                  {t('summary.moderators')}: {nomi(form.moderators)}
                 </span>
               )}
               {form.organizers.length > 0 && (
@@ -297,6 +313,36 @@ export default function Step5Review({
               )}
             </span>
           </li>
+          {(onVaiProgramma || programma.length > 0) && (
+            <li>
+              <span className="anteprima-righe__icona">
+                <Icon icon="it-list" size="sm" />
+              </span>
+              <span>
+                {programma.length > 0
+                  ? durataDelProgramma !== null
+                    ? t('summary.programmeWithDuration', {
+                        count: programma.length,
+                        duration: durata(0, durataDelProgramma * 60_000),
+                      })
+                    : t('summary.programme', { count: programma.length })
+                  : preparati.length > 0
+                    ? tProgramma(programmaInCreazione ? 'reviewOffCreate' : 'reviewOff', {
+                        count: preparati.length,
+                      })
+                    : tProgramma('reviewEmpty')}{' '}
+                {onVaiProgramma && (
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 align-baseline anteprima-link"
+                    onClick={onVaiProgramma}
+                  >
+                    {preparati.length > 0 ? tf('change') : tProgramma('reviewPrepare')}
+                  </button>
+                )}
+              </span>
+            </li>
+          )}
           {iscrizioneAperta !== undefined && (
             <li>
               <span className="anteprima-righe__icona">
@@ -326,6 +372,7 @@ export default function Step5Review({
                 <span className="d-block text-secondary">
                   {tf('askLine', { list: chiesti.join(', ') })}
                 </span>
+                {questionari}
               </span>
             </li>
           )}
@@ -374,36 +421,25 @@ export default function Step5Review({
                 !aiPipelineEnabled && (
                   <span className="d-block text-secondary">{tp('aiPipelineOff')}</span>
                 )}
+              {/* Le lingue sono quelle dell'evento: si cambiano nel passo
+                  «Evento», dove fanno anche le schede di titolo e descrizione. */}
               {traduce && (
                 <span className="d-block">
-                  {tf('translationLine', { list: lingue.join(', ') || tf('none') })}{' '}
-                  {/* Senza lingue l'elenco e' gia' aperto: niente da aprire. */}
-                  {lingue.length > 0 && (
-                    <button
-                      type="button"
-                      className="btn btn-link p-0 align-baseline anteprima-link"
-                      aria-expanded={mostraLingue}
-                      aria-controls={mostraLingue ? 'aiTargetLocales' : undefined}
-                      onClick={() => setLingueAperte((v) => !v)}
-                    >
-                      {tf('changeLanguages')}
-                    </button>
+                  {tf('translationLine', { list: lingue.join(', ') || tf('none') })}
+                  {onVaiAlCampo && (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 align-baseline anteprima-link"
+                        onClick={() =>
+                          onVaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })
+                        }
+                      >
+                        {tTrad('changeInEventStep', { step: tf('steps.base') })}
+                      </button>
+                    </>
                   )}
-                </span>
-              )}
-              {mostraLingue && (
-                <span id="aiTargetLocales" className="d-block mt-2">
-                  <LanguageChecklist
-                    legend={tForm('aiTargetLocales')}
-                    value={form.aiTargetLocales}
-                    onChange={(next) => {
-                      setLingueAperte(true);
-                      onChange({ aiTargetLocales: next });
-                    }}
-                    invalid={!!fieldErrors.aiTargetLocales}
-                    errorText={tForm('aiTargetLocalesRequired')}
-                    exclude={eventLocale ? [eventLocale] : []}
-                  />
                 </span>
               )}
             </span>
@@ -415,15 +451,11 @@ export default function Step5Review({
             <span>{informativa}</span>
           </li>
         </ul>
-        {capacityWarning && (
-          <button
-            type="button"
-            className="btn btn-link p-0 anteprima-evento__avviso"
-            onClick={() => onCustomize?.('technical')}
-          >
-            <Icon icon="it-warning-circle" size="sm" className="me-1" />
-            {tf('capacityWarning')}
-          </button>
+        {capacita && (
+          <RigaCapacita
+            capacita={capacita}
+            onDettagli={onCustomize && (() => onCustomize('technical'))}
+          />
         )}
       </section>
 

@@ -221,6 +221,9 @@ export const GET = withErrorHandling(async (request, context) => {
       moderatorPublicListed: true,
       moderatorOrganization: true,
       moderatorOrganizationLogoUrl: true,
+      moderatorPhotoId: true,
+      // A agenda accesa le persone seguono l'ordine del programma.
+      agendaEnabled: true,
       ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });

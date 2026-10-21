@@ -9,6 +9,8 @@ interface EventTitleProps {
   className?: string;
   style?: CSSProperties;
   wrapMain?: (main: string) => ReactNode;
+  /** La lingua del titolo, se non e' quella della pagina. */
+  lang?: string;
 }
 
 export default function EventTitle({
@@ -18,20 +20,21 @@ export default function EventTitle({
   className,
   style,
   wrapMain,
+  lang,
 }: EventTitleProps) {
   const { kicker, main } = splitTitleKicker(title, kickerEnabled);
   const mainNode = wrapMain ? wrapMain(main) : main;
 
   if (!kicker) {
     return (
-      <Tag className={className} style={style}>
+      <Tag className={className} style={style} lang={lang}>
         {mainNode}
       </Tag>
     );
   }
 
   return (
-    <Tag className={className} style={style}>
+    <Tag className={className} style={style} lang={lang}>
       <span className="event-title-kicker">{kicker}</span>
       <span className="event-title-main">{mainNode}</span>
     </Tag>

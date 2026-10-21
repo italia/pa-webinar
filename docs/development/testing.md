@@ -14,6 +14,7 @@ Run every command from the repository root unless a row or block says otherwise.
 | App unit and guard tests | The Vitest suite under `app/src/` | `npm run test --workspace=app` (also `test:watch`, `test:coverage`) | Nothing: no database, Redis or Jitsi | **Unit Tests**, with the coverage thresholds |
 | Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
+| Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) and the license policy (SPDX expressions, lockfile reading) | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
 | AI worker | Pure logic of the post-production worker | In `infra/ai/worker/`: `pip install -r requirements-test.txt`, then `python -m pytest -q` | Python. No GPU, no models | **Unit Tests (worker AI)** |
 | Helm chart | The chart renders on every profile and meets the installation invariants | `./scripts/validate-chart.sh` | Helm, `python3` with PyYAML, `openssl`, the subcharts | **Helm Chart**, plus a server-side dry run on kind |
 | Migration integrity | Migrations apply to an empty database and match `schema.prisma` | `prisma migrate deploy`, then `prisma migrate diff --exit-code`, against a throwaway database | A disposable PostgreSQL | **Migration Integrity** |
@@ -134,8 +135,12 @@ What the specs cover:
   - a duplicate registration shows the already-registered message with its resend button;
   - returning to the live URL without the token still works, through the signed per-event cookie.
 - **`design-system.spec.ts`.** The institutional header strip must have a solid background in the served stylesheet. This proves that the CSS color repair (`app/src/lib/css/repair-percent-colors.ts`) is still wired into the production build. The spec skips itself when the stylesheet is not minified, as in a development build.
+- **`participation.spec.ts`.** What a participant does in a live event, through the routes the room uses: a registrant asks a question, another one upvotes it, the moderator answers and the asker reads the answer; the moderator opens a poll, a registrant and a guest vote, a second vote is refused and the counts add up. It also downloads the event's `.ics` file, which must name an organizing body and not the moderator, and switches the event page from Italian to English through the language selector, checking the localized address and the page language.
+- **`gdpr-erasure.spec.ts`.** Erasure on request from start to finish: a registrant asks for erasure on the **My data** page, the email arrives in Mailpit with the confirmation link, the link is opened and confirmed, and the same address can then register again. The spec drains the email outbox by calling `/api/cron/email-outbox` instead of waiting for the `cron` service.
+- **`keyboard.spec.ts`.** Keyboard use on the public pages, on the desktop project: the first Tab reaches the skip link and Enter moves focus to the main content; the language menu, when the site has enough languages to show one, opens with Enter and closes with Esc, returning focus to its button; a visitor registers for an event without the mouse; the focused field and button show a visible focus indicator.
+- **`accessibility.spec.ts`.** An automatic accessibility check with axe-core (`@axe-core/playwright`), limited to the WCAG 2.1 level A and AA rules, the level EN 301 549 requires. It covers the public pages, the waiting room, the main administration pages and the live room: the moderator and a participant enter, and every tab of the side column (the bottom bar on a phone) is checked. Any violation fails the spec, and the message lists the rule and the elements. The Jitsi conference is excluded, as a third-party frame. An automatic check covers what a tool can see (contrast, accessible names, structure, ARIA attributes), not keyboard use, reading order or the sense of the texts, which stay manual.
 
-Each group deletes its event when it finishes. No spec joins a Jitsi conference: the suite stops at the waiting room.
+Each group deletes its event when it finishes. Apart from the accessibility spec, which enters the live room to check the side column, no spec joins a Jitsi conference: the suite stops at the waiting room.
 
 The browser runs with the `it-IT` locale. The specs open Italian URLs (`/it/eventi/…`) and match Italian labels, such as "Entra ora" for **Enter now**. If you change one of those strings in `app/src/i18n/messages/it.json` or one of those paths in `app/src/i18n/routing.ts`, update the spec in the same change.
 
@@ -151,6 +156,7 @@ npx playwright test --project=chromium
 
 - `E2E_BASE_URL` points the suite at another address. The default is `http://localhost:3000`.
 - `ADMIN_API_KEY` must match the app's instance API key. The spec's default is the development key set in `docker-compose.yml`.
+- `E2E_MAILPIT_URL` is the Mailpit web address that `gdpr-erasure.spec.ts` reads messages from (default `http://localhost:8025`), and `E2E_CRON_API_KEY` the key it uses to drain the email outbox (default: the development key in `docker-compose.yml`).
 - When the `CI` variable is not set, Playwright reuses a server already listening on the base URL, or starts `npm run dev` if none is. A development server serves unminified CSS, so the stylesheet spec skips.
 - When `CI` is set, Playwright starts no server, retries a failed test twice on a single worker, and fails the run on a leftover `test.only`.
 - The HTML report is written to `app/playwright-report/`. A trace is recorded on the first retry.
@@ -179,6 +185,10 @@ The tests cover pure logic:
 ### Lobby
 
 `npm run lobby:typecheck` runs `tsc --noEmit` with the strict options of `lobby/tsconfig.json`. It checks the library source, the development harness and the Vite configuration. The lobby has no unit tests. On the app side, the presence and schedule adapters in `app/src/lib/lobby/` are unit-tested with the rest of the app. The canvas itself is checked by hand; see [The square](#the-square).
+
+### Repository tooling
+
+`scripts/git-hooks/rules.test.mjs` and `scripts/licenses/policy.test.mjs` cover the logic behind the [Git hooks](methodology.md#git-hooks) and the license check: which commit messages pass, which added lines look like secrets or conflict markers, which checks a set of changed files calls for, how an SPDX expression is judged and which lockfile entries count as production packages. They use `node:test`, with no dependency to install. Test secrets are assembled from fragments, so that no scanner mistakes them for real ones.
 
 ### AI worker
 
@@ -369,7 +379,7 @@ Check keyboard use and the text alternatives against the [accessibility contract
 
 ### Other areas without automated tests
 
-- **Visual rendering with the .italia design system**, including contrast on the light theme and keyboard navigation. Check these in the browser.
+- **Visual rendering with the .italia design system**, and keyboard navigation. Check these in the browser; contrast is part of the automatic accessibility check above.
 - **The Content Security Policy.** Follow the manual plan in [Testing CSP changes](../SECURITY-CSP.md#testing-csp-changes).
 - **Email content and delivery.** In the local stack, Mailpit captures every message. The Compose `cron` service must be running, or nothing is sent. See [Local development](../DEVELOPMENT.md).
 - **Capacity.** See [Load testing](../LOAD-TESTING.md).

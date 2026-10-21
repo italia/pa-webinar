@@ -3,7 +3,7 @@
 /**
  * Generates license-report.json from installed npm dependencies.
  *
- * Uses license-checker under the hood, then strips local filesystem paths
+ * Uses license-checker (pinned below) under the hood, then strips local filesystem paths
  * and empty optional fields so the report is portable and publishable.
  *
  * Usage: node scripts/generate-license-report.mjs
@@ -19,7 +19,7 @@ const projectRoot = resolve(__dirname, "..");
 const outputPath = resolve(projectRoot, "license-report.json");
 
 const raw = execSync(
-  "npx license-checker --json --relativeLicensePath --excludePrivatePackages",
+  "npx --yes license-checker@25.0.1 --json --relativeLicensePath --excludePrivatePackages",
   { cwd: projectRoot, encoding: "utf-8", maxBuffer: 50 * 1024 * 1024 },
 );
 

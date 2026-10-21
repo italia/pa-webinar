@@ -75,31 +75,33 @@ export async function presignArtifactDownload(opts: {
 /**
  * Riscrive il contenuto di un artefatto già presente nell'archivio.
  *
- * Serve alla cancellazione di un contenuto da una trascrizione: il testo vive
- * in due posti — la copia cifrata nella banca dati e il file nell'archivio — e
- * riscrivere solo la prima lascerebbe la frase rimossa dentro il file, che una
- * rotta di ripiego può ancora servire. L'app non carica i file di norma (lo fa
- * il worker con un indirizzo firmato), ma per una cancellazione l'eccezione è
- * giustificata: la scrittura è piccola e deve avvenire adesso.
+ * Il testo di una trascrizione vive in due posti — la copia cifrata nella banca
+ * dati e il file nell'archivio — e due casi devono allinearli: la
+ * cancellazione di un contenuto (riscrivere solo la banca dati lascerebbe la
+ * frase rimossa dentro il file) e la trascrizione corretta a mano, che il
+ * worker scarica dall'archivio per sintesi, traduzioni e doppiaggi
+ * (lib/ai/transcript-input). L'app non carica i file di norma (lo fa il worker
+ * con un indirizzo firmato), ma qui la scrittura è piccola e deve avvenire
+ * adesso. Passa dal fornitore lato server: un PUT su un indirizzo firmato
+ * avrebbe bisogno delle intestazioni proprie di ciascun archivio.
  *
- * Non solleva: la cancellazione nella banca dati è già avvenuta e non va
- * annullata perché l'archivio non risponde. Restituisce false, e chi chiama
- * decide come dirlo.
+ * Non solleva: la modifica nella banca dati è già avvenuta e non va annullata
+ * perché l'archivio non risponde. Restituisce false, e chi chiama decide come
+ * dirlo.
  */
 export async function rewritePostprodBlob(
   blobKey: string,
   body: string,
   contentType: string,
+  /** Oltre questo tempo la scrittura si interrompe e risulta non riuscita. */
+  timeoutMs = 10_000,
 ): Promise<boolean> {
   if (!blobKey.startsWith(`${POSTPROD_PREFIX}/`)) return false;
   try {
-    const { uploadUrl } = await presignArtifactUpload({ blobKey, contentType, expiresInMinutes: 5 });
-    const res = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: { 'content-type': contentType },
-      body,
+    await getPostprodStorage().put(blobKey, Buffer.from(body, 'utf8'), contentType, {
+      signal: AbortSignal.timeout(timeoutMs),
     });
-    return res.ok;
+    return true;
   } catch {
     return false;
   }

@@ -2,11 +2,14 @@
 
 /**
  * Ritaglio di un'immagine nel browser, prima del caricamento: un riquadro
- * nel formato richiesto (per la copertina 16:9), l'immagine che ci si
- * trascina dentro e un cursore per ingrandirla. Il ritaglio si disegna su un
- * canvas alla larghezza richiesta (mai piu' grande dell'originale: niente
- * immagini gonfiate) e torna come JPEG, su fondo bianco per le immagini con
- * trasparenza. Il file originale non lascia il browser.
+ * nel formato richiesto (per la copertina 16:9, quadrato per la foto di una
+ * persona), l'immagine che ci si trascina dentro e un cursore per
+ * ingrandirla. Per una foto mostrata in un cerchio il riquadro scurisce gli
+ * angoli fuori dal cerchio: il file prodotto resta quadrato. Il ritaglio si
+ * disegna su un canvas alla larghezza richiesta (mai piu' grande
+ * dell'originale: niente immagini gonfiate) e torna come JPEG, su fondo
+ * bianco per le immagini con trasparenza. Il file originale non lascia il
+ * browser.
  *
  * Tastiera: con il fuoco sul riquadro le frecce spostano l'immagine
  * (Maiusc per passi lunghi), + e - la ingrandiscono e la rimpiccioliscono.
@@ -28,10 +31,61 @@ export interface Ritaglio {
   rapporto: number;
   /** Larghezza del file prodotto, in pixel, se l'originale basta. */
   larghezza: number;
+  /** Se la pagina mostra l'immagine intera dentro una fascia piu' larga (la
+   *  copertina sugli schermi larghi), il rapporto della fascia: il ritaglio
+   *  la mostra sotto il riquadro, come apparira'. */
+  fascia?: number;
+  /** La pagina mostra l'immagine in un cerchio (la foto di una persona): il
+   *  riquadro lo indica scurendo gli angoli. Solo un'indicazione: il file
+   *  prodotto resta un rettangolo del formato richiesto. */
+  forma?: 'cerchio';
+  /** Il nome del file prodotto quando l'originale non ne ha uno. */
+  nome?: string;
+}
+
+/**
+ * Un'immagine gia' nel formato giusto ma piu' grande del necessario si riduce
+ * nel browser alla larghezza richiesta, senza chiedere: chi apre la pagina non
+ * scarica megabyte che non vedrebbe. Torna JPEG su fondo bianco, come il
+ * ritaglio; null se il browser non ci riesce (si carica l'originale).
+ */
+export async function riduciImmagine(
+  file: File,
+  larghezza: number
+): Promise<File | null> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, ko) => {
+      const i = new Image();
+      i.onload = () => ok(i);
+      i.onerror = () => ko(new Error('immagine illeggibile'));
+      i.src = url;
+    });
+    if (img.naturalWidth <= larghezza) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = larghezza;
+    canvas.height = Math.round((img.naturalHeight * larghezza) / img.naturalWidth);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((r) =>
+      canvas.toBlob(r, 'image/jpeg', 0.9)
+    );
+    if (!blob) return null;
+    const nome = file.name.replace(/\.[^.]+$/, '') || 'immagine';
+    return new File([blob], `${nome}.jpg`, { type: 'image/jpeg' });
+  } catch {
+    return null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 /** Sotto questa larghezza (sul totale richiesto) l'immagine si vede sgranata. */
-const SOGLIA_PICCOLA = 0.75;
+export const SOGLIA_PICCOLA = 0.75;
 const ZOOM_MAX = 3;
 const PASSO = 10;
 const PASSO_LUNGO = 50;
@@ -272,23 +326,31 @@ export default function ImageCropDialog({
       fallito();
       return;
     }
-    const nome = file.name.replace(/\.[^.]+$/, '') || 'copertina';
+    const nome = file.name.replace(/\.[^.]+$/, '') || ritaglio.nome || 'copertina';
     onConferma(new File([blob], `${nome}.jpg`, { type: 'image/jpeg' }));
   };
 
+  const cerchio = ritaglio.forma === 'cerchio';
+  // Un riquadro quadrato largo quanto la finestra grande sarebbe piu' alto
+  // dello schermo: finestra normale e riquadro stretto, al centro.
+  const stretto = ritaglio.rapporto <= 1;
+
   return (
+    // Scorre solo il corpo: intestazione e pulsanti restano in vista anche su
+    // uno schermo basso, dove «Usa questo ritaglio» finiva sotto la piega.
     <Modal
       isOpen
       toggle={annulla}
-      size="lg"
+      size={stretto ? undefined : 'lg'}
       labelledBy="ritaglio-titolo"
       className="ritaglio-immagine"
+      scrollable
     >
       <ModalHeader closeAriaLabel={tc('close')} toggle={annulla}>
         <span id="ritaglio-titolo">{t('title')}</span>
       </ModalHeader>
       <ModalBody>
-        <p className="ritaglio-immagine__testo">{t('intro')}</p>
+        <p className="ritaglio-immagine__testo">{cerchio ? t('introCircle') : t('intro')}</p>
         {errore ? (
           <p className="text-danger" role="alert">
             {t('error')}
@@ -297,7 +359,7 @@ export default function ImageCropDialog({
           <>
             <div
               ref={cornice}
-              className="ritaglio-immagine__cornice"
+              className={`ritaglio-immagine__cornice${stretto ? ' ritaglio-immagine__cornice--stretta' : ''}`}
               style={{ aspectRatio: String(ritaglio.rapporto) }}
               tabIndex={0}
               role="group"
@@ -322,10 +384,65 @@ export default function ImageCropDialog({
                   }}
                 />
               )}
+              {cerchio && <div className="ritaglio-immagine__maschera" aria-hidden="true" />}
             </div>
             <p id="ritaglio-tasti" className="ritaglio-immagine__nota">
               {t('keys')}
             </p>
+            {/* La pagina dell'evento, sugli schermi larghi: l'immagine intera
+                al centro di una fascia, con i lati sfumati. Si aggiorna
+                mentre si sposta il ritaglio. */}
+            {ritaglio.fascia && url && img && lato && (
+              <figure className="ritaglio-immagine__fascia-blocco">
+                <figcaption className="ritaglio-immagine__nota mb-1">
+                  {t('pagePreview')}
+                </figcaption>
+                <div
+                  className="ritaglio-immagine__fascia"
+                  style={{ aspectRatio: String(ritaglio.fascia) }}
+                  aria-hidden="true"
+                >
+                  {/* Lo sfondo sfocato e' la sola parte ritagliata, larga
+                      quanto la fascia e centrata in altezza, sfocata e
+                      ingrandita come .event-cover__sfondo nella pagina. */}
+                  <div
+                    className="ritaglio-immagine__fascia-sfondo"
+                    style={{
+                      height: lato.fw / ritaglio.rapporto,
+                      top: -(lato.fw / ritaglio.rapporto - lato.fw / ritaglio.fascia) / 2,
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      style={{
+                        width: lato.iw * scala,
+                        height: lato.ih * scala,
+                        transform: `translate(${stato.x}px, ${stato.y}px)`,
+                      }}
+                    />
+                  </div>
+                  <div
+                    className="ritaglio-immagine__fascia-finestra"
+                    style={{ aspectRatio: String(ritaglio.rapporto) }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      style={{
+                        width: lato.iw * scala * (ritaglio.rapporto / ritaglio.fascia),
+                        height: lato.ih * scala * (ritaglio.rapporto / ritaglio.fascia),
+                        transform: `translate(${stato.x * (ritaglio.rapporto / ritaglio.fascia)}px, ${
+                          stato.y * (ritaglio.rapporto / ritaglio.fascia)
+                        }px)`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </figure>
+            )}
             <label className="ritaglio-immagine__zoom">
               <span>{t('zoom')}</span>
               <input

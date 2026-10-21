@@ -79,17 +79,22 @@ describe('ogLocale e versioniLinguistiche', () => {
 describe('immagine e persone', () => {
   const conPersone = (nomi: string[]) => ({
     organizers: [{ name: 'Ente A', logoUrl: null, websiteUrl: null }],
-    additionalMods: nomi.map((name) => ({
+    additionalMods: nomi.map((name, i) => ({
+      id: `concessione-${i}`,
       name,
       role: 'SPEAKER' as const,
       organizer: false,
       organization: null,
       organizationLogoUrl: null,
+      photoId: null,
     })),
+    agendaEnabled: true,
+    agendaItems: [] as Array<{ speakerGrantId: string | null; speakerPrimary: boolean }>,
     moderatorName: null,
     moderatorPublicListed: false,
     moderatorOrganization: null,
     moderatorOrganizationLogoUrl: null,
+    moderatorPhotoId: null,
   });
 
   it('togliere un relatore cambia l’indirizzo della scheda', () => {
@@ -105,5 +110,15 @@ describe('immagine e persone', () => {
 
   it('le stesse persone danno lo stesso indirizzo', () => {
     expect(firmaPersone(conPersone(['Relatore 1']))).toBe(firmaPersone(conPersone(['Relatore 1'])));
+  });
+
+  it('un nuovo ordine del programma cambia l’indirizzo: la scheda elenca i relatori in quell’ordine', () => {
+    const persone = conPersone(['Relatore 1', 'Relatore 2']);
+    const alfabetico = firmaPersone(persone);
+    const programma = firmaPersone({
+      ...persone,
+      agendaItems: [{ speakerGrantId: 'concessione-1', speakerPrimary: false }],
+    });
+    expect(programma).not.toBe(alfabetico);
   });
 });

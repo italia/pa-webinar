@@ -71,7 +71,8 @@ export const GET = withErrorHandling(async (request, context) => {
         // Subtitles are small + immutable per run; let the browser
         // cache them for the live session. The blobKey already
         // encodes the runId so a re-run produces a different URL.
-        'cache-control': 'public, max-age=300',
+        // Privata: chi la riceve dipende dalla richiesta (lib/recording/audience).
+        'cache-control': 'private, max-age=300',
       },
     });
   }

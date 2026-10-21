@@ -14,6 +14,7 @@ import { parseLocaleList } from '@/lib/ai/target-locales';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { WIZARD_STEPS, type WizardStep } from '@/lib/events/wizard-steps';
 
+import { erroriProgramma } from './programme-plan';
 import type { WizardForm } from './wizard-shell';
 
 export const STEP_KEYS = WIZARD_STEPS;
@@ -48,6 +49,16 @@ export function validateStep(
     if (descriptionDef.length < EVENT_DESCRIPTION_MIN_LENGTH) {
       errs[`description.${defaultLocale}`] = 'required';
     }
+    // La traduzione di sottotitoli e sintesi usa le lingue dell'evento: senza
+    // nessuna non produce nulla. Le lingue si scelgono qui, nel passo
+    // «Evento». Lette come le legge la pipeline: un valore vecchio scritto a
+    // mano ("english", "en;fr") non conta come lingua. Conta solo una
+    // traduzione che parte davvero: senza registrazione o senza trascrizione
+    // l'interruttore resta nel modulo ma non si salva.
+    const traduce = form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
+    if (traduce && parseLocaleList(form.aiTargetLocales).length === 0) {
+      errs['aiTargetLocales'] = 'required';
+    }
   }
   if (step === 'schedule') {
     try {
@@ -69,19 +80,10 @@ export function validateStep(
       errs['maxParticipants'] = 'outOfRange';
     }
   }
-  if (step === 'review') {
-    // La traduzione automatica senza lingue target non produce nulla:
-    // richiediamo almeno una lingua. Le lingue si scelgono nel riepilogo (e
-    // nelle impostazioni avanzate, alla registrazione).
-    // Letti come li legge la pipeline: un valore vecchio scritto a mano
-    // ("english", "en;fr") non conta come lingua.
-    // Conta solo una traduzione che parte davvero: senza registrazione o senza
-    // trascrizione l'interruttore resta nel modulo ma non si salva (e le
-    // lingue non si vedono).
-    const traduce = form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
-    if (traduce && parseLocaleList(form.aiTargetLocales).length === 0) {
-      errs['aiTargetLocales'] = 'required';
-    }
+  if (step === 'programme') {
+    // Il programma: una durata scritta che non e' una durata. Senza, il
+    // salvataggio la lascerebbe cadere in silenzio.
+    Object.assign(errs, erroriProgramma(form));
   }
   if (step === 'advanced') {
     // Gli stessi limiti del server: un valore fuori misura (arrivato da un
@@ -126,13 +128,14 @@ const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['startsAt', 'schedule'],
   ['endsAt', 'schedule'],
   ['maxParticipants', 'schedule'],
-  ['aiTargetLocales', 'review'],
+  ['aiTargetLocales', 'base'],
   ['gdprTemplateId', 'advanced'],
   ['dataRetentionDays', 'advanced'],
   ['moderatorName', 'invites'],
   ['moderatorEmail', 'invites'],
   ['moderatorOrganization', 'invites'],
   ['moderatorOrganizationLogoUrl', 'invites'],
+  ['moderatorPhotoId', 'invites'],
 ]);
 
 /** Campi multilingua: il passo 1 li evidenzia nella lingua predefinita. */

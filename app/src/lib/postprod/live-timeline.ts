@@ -7,7 +7,8 @@
  * Mette insieme due fonti, entrambe con l'ora del server:
  *  - il registro delle azioni dal vivo (live_actions, lib/live/actions.ts):
  *    agenda, sondaggi, «In una parola», stati delle domande, funzioni,
- *    registrazione, timer, mani alzate, fine evento;
+ *    registrazione, timer, mani alzate, PDF presentati e pagine mostrate,
+ *    fine evento;
  *  - le righe che un'ora ce l'hanno gia': domande del Q&A e domande in chat
  *    (il testo, mai chi le ha scritte), materiali condivisi, e l'attivita'
  *    della chat e delle reazioni contata per finestre di cinque minuti.
@@ -69,12 +70,15 @@ export interface LiveTimeline {
 export function chaptersFromActions(
   azioni: ReadonlyArray<{ at: Date; kind: string; data: unknown }>,
   t0: Date,
-  fine?: Date | null,
+  fine?: Date | null
 ): TimelineChapter[] {
   const voci = azioni
     .filter((a) => a.kind === 'agenda.topic')
     .map((a) => {
-      const data = (a.data && typeof a.data === 'object' ? a.data : {}) as Record<string, unknown>;
+      const data = (a.data && typeof a.data === 'object' ? a.data : {}) as Record<
+        string,
+        unknown
+      >;
       const label = str(data.label).trim();
       return {
         at: a.at,
@@ -125,6 +129,12 @@ const MAX_AGENDA_ACTIONS = 1_000;
 const MAX_ENTRIES = 250;
 /** Lunghezza massima di un testo citato. */
 const MAX_TEXT = 280;
+/**
+ * Una pagina della presentazione lasciata prima di questo tempo e' stata solo
+ * attraversata (chi presenta ne ha girate diverse di fila per arrivare a
+ * un'altra): non entra in cronologia.
+ */
+const PAGE_DWELL_MS = 5_000;
 
 /** Le funzioni che chi modera accende e spegne durante l'evento: una per
  *  ogni flag attivabile dal vivo, e il compilatore pretende che ci siano
@@ -139,7 +149,9 @@ const FEATURE_NAMES: Record<LiveFlagField, string> = {
 };
 
 function cita(testo: unknown): string {
-  const t = String(testo ?? '').replace(/\s+/g, ' ').trim();
+  const t = String(testo ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return t.length > MAX_TEXT ? `${t.slice(0, MAX_TEXT - 1)}…` : t;
 }
 
@@ -151,7 +163,7 @@ function str(v: unknown): string {
 export function describeAction(
   kind: string,
   data: Record<string, unknown>,
-  domande: ReadonlyMap<string, { text: string; answerText: string | null }>,
+  domande: ReadonlyMap<string, { text: string; answerText: string | null }>
 ): string | null {
   switch (kind) {
     case 'agenda.topic': {
@@ -166,16 +178,23 @@ export function describeAction(
       return verbo && label ? `${verbo}: «${label}»` : null;
     }
     case 'poll.opened': {
-      const opzioni = Array.isArray(data.options) ? data.options.map(cita).join(' / ') : '';
+      const opzioni = Array.isArray(data.options)
+        ? data.options.map(cita).join(' / ')
+        : '';
       return `Sondaggio aperto: «${cita(data.question)}»${opzioni ? ` (risposte: ${opzioni})` : ''}`;
     }
     case 'poll.closed':
     case 'poll.published': {
       const opzioni = Array.isArray(data.options) ? data.options : [];
       const conti = Array.isArray(data.counts) ? data.counts : [];
-      const risultati = opzioni.map((o, i) => `${cita(o)} ${Number(conti[i] ?? 0)}`).join(', ');
+      const risultati = opzioni
+        .map((o, i) => `${cita(o)} ${Number(conti[i] ?? 0)}`)
+        .join(', ');
       const totale = Number(data.totalVotes ?? 0);
-      const verbo = kind === 'poll.closed' ? 'Sondaggio chiuso' : 'Risultati del sondaggio pubblicati';
+      const verbo =
+        kind === 'poll.closed'
+          ? 'Sondaggio chiuso'
+          : 'Risultati del sondaggio pubblicati';
       return `${verbo}: «${cita(data.question)}» — ${risultati} (${totale} voti)`;
     }
     case 'poll.reopened':
@@ -187,7 +206,11 @@ export function describeAction(
     case 'wordcloud.closed': {
       const parole = Array.isArray(data.words)
         ? data.words
-            .map((w) => (w && typeof w === 'object' ? (w as { word?: unknown; count?: unknown }) : null))
+            .map((w) =>
+              w && typeof w === 'object'
+                ? (w as { word?: unknown; count?: unknown })
+                : null
+            )
             .filter((w): w is { word?: unknown; count?: unknown } => w !== null)
             .map((w) => `${cita(w.word)} (${Number(w.count ?? 0)})`)
             .join(', ')
@@ -203,13 +226,16 @@ export function describeAction(
       if (data.answered && q.answerText) {
         return `Risposta scritta alla domanda «${cita(q.text)}»: «${cita(q.answerText)}»`;
       }
-      if (data.status === 'ANSWERED') return `Domanda segnata come risposta: «${cita(q.text)}»`;
-      if (data.status === 'HIGHLIGHTED') return `Domanda messa in evidenza: «${cita(q.text)}»`;
+      if (data.status === 'ANSWERED')
+        return `Domanda segnata come risposta: «${cita(q.text)}»`;
+      if (data.status === 'HIGHLIGHTED')
+        return `Domanda messa in evidenza: «${cita(q.text)}»`;
       return null;
     }
     case 'feature.toggled': {
       const chiave = str(data.feature);
-      const nome = chiave in FEATURE_NAMES ? FEATURE_NAMES[chiave as LiveFlagField] : null;
+      const nome =
+        chiave in FEATURE_NAMES ? FEATURE_NAMES[chiave as LiveFlagField] : null;
       if (!nome) return null;
       return `Funzione ${nome} ${data.enabled ? 'attivata' : 'disattivata'}`;
     }
@@ -226,6 +252,31 @@ export function describeAction(
       return 'Timer fermato';
     case 'event.ended':
       return 'Evento terminato dal moderatore';
+    case 'presentation.started': {
+      const titolo = cita(data.title);
+      if (data.handover === true) {
+        // «Presenta tu»: stesso documento, un'altra persona presenta.
+        const pagina = Number(data.page);
+        const da =
+          Number.isInteger(pagina) && pagina > 1 ? ` dalla pagina ${pagina}` : '';
+        return titolo
+          ? `La presentazione «${titolo}» passa a un altro presentatore${da}`
+          : `La presentazione passa a un altro presentatore${da}`;
+      }
+      return titolo ? `Presentazione avviata: «${titolo}»` : 'Presentazione avviata';
+    }
+    case 'presentation.page': {
+      const pagina = Number(data.page);
+      if (!Number.isInteger(pagina) || pagina < 1) return null;
+      const totale = Number(data.pageCount);
+      const di = Number.isInteger(totale) && totale > 0 ? ` di ${totale}` : '';
+      const titolo = cita(data.title);
+      return `Pagina ${pagina}${di} della presentazione${titolo ? ` «${titolo}»` : ''}`;
+    }
+    case 'presentation.stopped': {
+      const titolo = cita(data.title);
+      return titolo ? `Presentazione conclusa: «${titolo}»` : 'Presentazione conclusa';
+    }
     default:
       // chat.hidden, chat.question.status, hand.*: non entrano una per una
       // (le mani alzate si contano per finestra).
@@ -241,6 +292,29 @@ interface Fatto {
   minore?: boolean;
 }
 
+/**
+ * Le azioni senza le pagine della presentazione solo attraversate: una pagina
+ * seguita da un'altra azione della presentazione entro `PAGE_DWELL_MS` non e'
+ * stata mostrata davvero. Le azioni arrivano in ordine di tempo.
+ */
+export function withoutFleetingPages<T extends { at: Date; kind: string }>(
+  azioni: readonly T[]
+): T[] {
+  const presentazione = azioni.filter((a) => a.kind.startsWith('presentation.'));
+  const attraversate = new Set<T>();
+  for (let i = 0; i < presentazione.length - 1; i++) {
+    const a = presentazione[i]!;
+    const dopo = presentazione[i + 1]!;
+    if (
+      a.kind === 'presentation.page' &&
+      dopo.at.getTime() - a.at.getTime() < PAGE_DWELL_MS
+    ) {
+      attraversate.add(a);
+    }
+  }
+  return azioni.filter((a) => !attraversate.has(a));
+}
+
 interface Conteggio {
   /** Finestra: quante di cinque minuti dall'inizio della registrazione. */
   b: number;
@@ -250,9 +324,17 @@ interface Conteggio {
 /** Dove si contano chat, reazioni e mani alzate: tabella, colonna dell'ora,
  *  condizioni in piu'. Costanti, mai input. */
 const FONTI_CONTEGGI = {
-  chat: { tabella: 'chat_messages', colonna: 'created_at', filtro: Prisma.sql`AND "hidden_at" IS NULL` },
+  chat: {
+    tabella: 'chat_messages',
+    colonna: 'created_at',
+    filtro: Prisma.sql`AND "hidden_at" IS NULL`,
+  },
   reactions: { tabella: 'reactions', colonna: 'created_at', filtro: Prisma.empty },
-  hands: { tabella: 'live_actions', colonna: 'at', filtro: Prisma.sql`AND "kind" = 'hand.raised'` },
+  hands: {
+    tabella: 'live_actions',
+    colonna: 'at',
+    filtro: Prisma.sql`AND "kind" = 'hand.raised'`,
+  },
 } as const;
 
 /**
@@ -268,7 +350,7 @@ async function contaPerFinestra(
   eventId: string,
   t0: Date,
   da: Date,
-  a: Date,
+  a: Date
 ): Promise<Conteggio[]> {
   const { tabella, colonna, filtro } = FONTI_CONTEGGI[fonte];
   const col = Prisma.raw(`"${colonna}"`);
@@ -299,80 +381,103 @@ export async function buildLiveTimeline(opts: {
   const a = new Date(opts.until.getTime() + AFTER_MS);
   const nellaFinestra = { gte: da, lte: a };
 
-  const [azioni, agenda, domande, domandeChat, materiali, chat, reazioni, mani] = await Promise.all([
-    prisma.liveAction.findMany({
-      where: { eventId, at: nellaFinestra, kind: { notIn: ['hand.raised', 'hand.lowered'] } },
-      orderBy: { at: 'asc' },
-      select: { at: true, kind: true, data: true },
-    }),
-    // Per i capitoli l'agenda si legge dall'inizio dell'evento, non dalla
-    // finestra: l'argomento in corso quando parte la registrazione puo' essere
-    // stato avviato ben prima dei trenta minuti di contesto.
-    prisma.liveAction.findMany({
-      where: { eventId, kind: 'agenda.topic', at: { lte: opts.until } },
-      orderBy: { at: 'desc' },
-      take: MAX_AGENDA_ACTIONS,
-      select: { at: true, kind: true, data: true },
-    }),
-    prisma.question.findMany({
-      where: { eventId },
-      select: { id: true, text: true, answerText: true, status: true, createdAt: true },
-    }),
-    prisma.chatMessage.findMany({
-      where: { eventId, isQuestion: true, hiddenAt: null, dismissedAt: null, createdAt: nellaFinestra },
-      select: { text: true, createdAt: true },
-    }),
-    prisma.eventMaterial.findMany({
-      where: { eventId, createdAt: nellaFinestra },
-      select: { title: true, createdAt: true },
-    }),
-    contaPerFinestra('chat', eventId, t0, da, a),
-    contaPerFinestra('reactions', eventId, t0, da, a),
-    contaPerFinestra('hands', eventId, t0, da, a),
-  ]);
+  const [azioni, agenda, domande, domandeChat, materiali, chat, reazioni, mani] =
+    await Promise.all([
+      prisma.liveAction.findMany({
+        where: {
+          eventId,
+          at: nellaFinestra,
+          kind: { notIn: ['hand.raised', 'hand.lowered'] },
+        },
+        orderBy: { at: 'asc' },
+        select: { at: true, kind: true, data: true },
+      }),
+      // Per i capitoli l'agenda si legge dall'inizio dell'evento, non dalla
+      // finestra: l'argomento in corso quando parte la registrazione puo' essere
+      // stato avviato ben prima dei trenta minuti di contesto.
+      prisma.liveAction.findMany({
+        where: { eventId, kind: 'agenda.topic', at: { lte: opts.until } },
+        orderBy: { at: 'desc' },
+        take: MAX_AGENDA_ACTIONS,
+        select: { at: true, kind: true, data: true },
+      }),
+      prisma.question.findMany({
+        where: { eventId },
+        select: { id: true, text: true, answerText: true, status: true, createdAt: true },
+      }),
+      prisma.chatMessage.findMany({
+        where: {
+          eventId,
+          isQuestion: true,
+          hiddenAt: null,
+          dismissedAt: null,
+          createdAt: nellaFinestra,
+        },
+        select: { text: true, createdAt: true },
+      }),
+      prisma.eventMaterial.findMany({
+        where: { eventId, createdAt: nellaFinestra },
+        select: { title: true, createdAt: true },
+      }),
+      contaPerFinestra('chat', eventId, t0, da, a),
+      contaPerFinestra('reactions', eventId, t0, da, a),
+      contaPerFinestra('hands', eventId, t0, da, a),
+    ]);
 
   // Le parole tolte dal moderatore dopo la chiusura di una domanda non
   // devono arrivare alla sintesi: la fotografia della chiusura le contiene
   // ancora, si filtrano qui sulle righe nascoste di quei giri.
-  const giri = azioni
-    .filter((az) => az.kind === 'wordcloud.closed')
-    .map((az) => str((az.data as Record<string, unknown> | null)?.roundId))
-    .filter((id) => id.length > 0);
-  const tolte = new Map<string, Set<string>>();
-  if (giri.length > 0) {
-    const nascoste = await prisma.wordCloudSubmission.findMany({
-      where: { roundId: { in: giri }, hiddenAt: { not: null } },
-      select: { roundId: true, word: true },
-    });
-    for (const n of nascoste) {
-      const insieme = tolte.get(n.roundId) ?? new Set<string>();
-      insieme.add(normalizeWord(n.word));
-      tolte.set(n.roundId, insieme);
-    }
-  }
+  const tolte = await paroleTolteDaiGiri(
+    azioni
+      .filter((az) => az.kind === 'wordcloud.closed')
+      .map((az) => str((az.data as Record<string, unknown> | null)?.roundId))
+  );
 
-  const perId = new Map(domande.map((q) => [q.id, { text: q.text, answerText: q.answerText }]));
+  const perId = new Map(
+    domande.map((q) => [q.id, { text: q.text, answerText: q.answerText }])
+  );
   const fatti: Fatto[] = [];
 
-  for (const az of azioni) {
-    let data = (az.data && typeof az.data === 'object' ? az.data : {}) as Record<string, unknown>;
+  for (const az of withoutFleetingPages(azioni)) {
+    let data = (az.data && typeof az.data === 'object' ? az.data : {}) as Record<
+      string,
+      unknown
+    >;
     const via = tolte.get(str(data.roundId));
     if (az.kind === 'wordcloud.closed' && via && Array.isArray(data.words)) {
       data = {
         ...data,
         words: data.words.filter(
-          (w) => !(w && typeof w === 'object' && via.has(normalizeWord(str((w as { word?: unknown }).word)))),
+          (w) =>
+            !(
+              w &&
+              typeof w === 'object' &&
+              via.has(normalizeWord(str((w as { word?: unknown }).word)))
+            )
         ),
       };
     }
     const testo = describeAction(az.kind, data, perId);
-    if (testo) fatti.push({ at: az.at, kind: az.kind, text: testo });
+    // Le pagine della presentazione sono tante: in un prompt troppo lungo se
+    // ne vanno prima delle altre voci.
+    if (testo) {
+      fatti.push({
+        at: az.at,
+        kind: az.kind,
+        text: testo,
+        ...(az.kind === 'presentation.page' && { minore: true }),
+      });
+    }
   }
 
   for (const q of domande) {
     if (q.status === 'DISMISSED') continue;
     if (q.createdAt < da || q.createdAt > a) continue;
-    fatti.push({ at: q.createdAt, kind: 'question.asked', text: `Domanda dal pubblico (Q&A): «${cita(q.text)}»` });
+    fatti.push({
+      at: q.createdAt,
+      kind: 'question.asked',
+      text: `Domanda dal pubblico (Q&A): «${cita(q.text)}»`,
+    });
   }
   for (const m of domandeChat) {
     // Il testo della chat e' cifrato a riposo.
@@ -386,7 +491,11 @@ export async function buildLiveTimeline(opts: {
     });
   }
   for (const m of materiali) {
-    fatti.push({ at: m.createdAt, kind: 'material.added', text: `Materiale condiviso: «${cita(m.title)}»` });
+    fatti.push({
+      at: m.createdAt,
+      kind: 'material.added',
+      text: `Materiale condiviso: «${cita(m.title)}»`,
+    });
   }
 
   const inizioFinestra = (b: number) => new Date(t0.getTime() + b * BUCKET_MS);
@@ -469,4 +578,27 @@ export function recordingTimeZero(r: {
     return { t0: new Date(r.createdAt.getTime() - r.durationSec * 1000), exact: false };
   }
   return { t0: r.createdAt, exact: false };
+}
+
+/**
+ * Per giro di «In una parola», le parole che il moderatore ha nascosto: la
+ * fotografia della chiusura (`wordcloud.closed`) le contiene ancora, chi la
+ * mostra le filtra con queste (normalizzate con `normalizeWord`).
+ */
+export async function paroleTolteDaiGiri(
+  roundIds: ReadonlyArray<string>
+): Promise<Map<string, Set<string>>> {
+  const giri = [...new Set(roundIds.filter((id) => id.length > 0))];
+  const tolte = new Map<string, Set<string>>();
+  if (giri.length === 0) return tolte;
+  const nascoste = await prisma.wordCloudSubmission.findMany({
+    where: { roundId: { in: giri }, hiddenAt: { not: null } },
+    select: { roundId: true, word: true },
+  });
+  for (const n of nascoste) {
+    const insieme = tolte.get(n.roundId) ?? new Set<string>();
+    insieme.add(normalizeWord(n.word));
+    tolte.set(n.roundId, insieme);
+  }
+  return tolte;
 }

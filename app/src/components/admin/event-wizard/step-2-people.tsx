@@ -4,6 +4,7 @@ import { useContext, useEffect, useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Scelta } from '@/components/admin/guided-format';
+import PersonPhotoField, { PersonAvatar } from '@/components/admin/person-photo-field';
 import RubricaPicker, {
   RubricaAccessContext,
   type RubricaPickedPerson,
@@ -14,6 +15,8 @@ import type { PersonRole } from '@/lib/events/grant-profile';
 import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
 
+import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
+import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
 
@@ -24,12 +27,15 @@ export interface OrganizerEntry {
   websiteUrl: string | null;
 }
 
-/** L'ente di una persona e se la pagina pubblica la presenta. L'ente della
- *  persona può essere diverso da quello che organizza l'evento. */
+/** L'ente di una persona, la sua foto e se la pagina pubblica la presenta.
+ *  L'ente della persona può essere diverso da quello che organizza l'evento. */
 export interface PersonProfile {
   organization: string | null;
   organizationLogoUrl: string | null;
   publicListed: boolean;
+  /** La foto caricata dallo staff (EventPersonPhoto). Assente in una bozza
+   *  salvata prima che la foto esistesse: il salvataggio non la tocca. */
+  photoId?: string | null;
 }
 
 /** Organizzatori e moderatori: conducono la sala, ognuno con il proprio link. */
@@ -83,6 +89,7 @@ interface LeadOrganizerPatch {
   moderatorOrganization?: string | null;
   moderatorOrganizationLogoUrl?: string | null;
   moderatorPublicListed?: boolean;
+  moderatorPhotoId?: string | null;
 }
 
 interface Props {
@@ -103,6 +110,16 @@ interface Props {
   /** Prima degli inviti: chi si iscrive e cosa gli si chiede
    *  (SezioneIscrizione). */
   iscrizione?: React.ReactNode;
+  /** Sotto le persone, il rimando al passo «Programma», dove si preparano
+   *  i loro interventi (non per una chiamata istantanea, che non ne ha). */
+  rimandoProgramma?: boolean;
+  /** Le foto le carica lo staff: con il solo link di conduzione si vedono e
+   *  non si cambiano. */
+  photosLocked?: boolean;
+  /** Ogni file che parte per il server (true) e che ha finito (false), foto
+   *  o logo: il wizard non salva e non cambia passo finche' ce n'e' uno in
+   *  viaggio. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 const isEmail = emailValida;
@@ -115,8 +132,12 @@ export default function StepPeople({
   publicRegistrationEnabled = true,
   children,
   iscrizione,
+  rimandoProgramma = false,
+  photosLocked = false,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
+  const tp = useTranslations('admin.wizard.programme');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
 
   return (
@@ -133,6 +154,7 @@ export default function StepPeople({
       <OrganizersSection
         value={value.organizers}
         onChange={(next) => onChange({ organizers: next })}
+        onUploadBusy={onUploadBusy}
       />
 
       <PeopleSection
@@ -140,7 +162,16 @@ export default function StepPeople({
         speakers={value.speakers}
         onChange={onChange}
         taken={principale}
+        photosLocked={photosLocked}
+        onUploadBusy={onUploadBusy}
       />
+
+      {rimandoProgramma && (
+        <p className="wizard-programma__rimando">
+          <Icon icon="it-info-circle" size="sm" />
+          <span>{tp('peoplePointer')}</span>
+        </p>
+      )}
 
       {iscrizione}
 
@@ -158,7 +189,8 @@ export default function StepPeople({
  * L'organizzatore principale: riceve per email il link condiviso per condurre
  * l'evento. Nome ed email servono per pubblicare, non per la bozza: finche'
  * mancano lo dicono (lampeggiano, con la riga «serve per pubblicare»), e
- * dopo un tentativo insistono. Ente, logo e pagina pubblica restano ripiegati.
+ * dopo un tentativo insistono. Foto, ente, logo e pagina pubblica restano
+ * ripiegati.
  */
 export function PrimarySection({
   primary,
@@ -167,6 +199,8 @@ export function PrimarySection({
   prefilledModeratorEmail,
   showLinksOnPublish,
   perPubblicare = true,
+  photosLocked = false,
+  onUploadBusy,
 }: {
   primary: LeadOrganizer;
   onPrimaryChange: (patch: LeadOrganizerPatch) => void;
@@ -175,16 +209,23 @@ export function PrimarySection({
   showLinksOnPublish: boolean;
   /** Si pubblica da qui (creazione): nome ed email lo dicono finche' mancano. */
   perPubblicare?: boolean;
+  /** Senza sessione dello staff la foto si vede e non si cambia. */
+  photosLocked?: boolean;
+  /** La foto o il logo in viaggio verso il server: vedi StepPeople. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tf = useTranslations('admin.wizard.flow');
   const profiloErrato = !!(
-    fieldErrors.moderatorOrganization || fieldErrors.moderatorOrganizationLogoUrl
+    fieldErrors.moderatorOrganization ||
+    fieldErrors.moderatorOrganizationLogoUrl ||
+    fieldErrors.moderatorPhotoId
   );
   // Aperto se all'apertura c'era gia' qualcosa: svuotare un campo non lo
   // richiude sotto il cursore.
   const [altroAperto, setAltroAperto] = useState(
     profiloErrato ||
+      !!primary.photoId ||
       !!primary.organization ||
       !!primary.organizationLogoUrl ||
       primary.publicListed
@@ -293,11 +334,22 @@ export function PrimarySection({
               promemoria('wiz-primary-email-promemoria')}
           </div>
           <div className="col-12">
-            {/* Ente, logo e pagina pubblica: non servono per pubblicare,
-                restano ripiegati (aperti se hanno gia' un valore o un errore). */}
+            {/* Foto, ente, logo e pagina pubblica: non servono per
+                pubblicare, restano ripiegati (aperti se hanno gia' un valore
+                o un errore). */}
             <details className="wizard-primary__more" open={altroAperto || undefined}>
               <summary className="small">{t('primaryMore')}</summary>
               <div className="row g-3 pt-2">
+                <div className="col-12">
+                  <PersonPhotoField
+                    id="wiz-primary-photo"
+                    name={primary.name}
+                    photoId={primary.photoId}
+                    onChange={(v) => onPrimaryChange({ moderatorPhotoId: v })}
+                    readOnly={photosLocked}
+                    onBusy={onUploadBusy}
+                  />
+                </div>
                 <div className="col-md-6">
                   <label className="form-label" htmlFor="wiz-primary-org">
                     {t('personOrganization')}
@@ -351,6 +403,7 @@ export function PrimarySection({
                         onChange={(v) =>
                           onPrimaryChange({ moderatorOrganizationLogoUrl: v })
                         }
+                        onBusy={onUploadBusy}
                       />
                     </div>
                   </details>
@@ -362,42 +415,6 @@ export function PrimarySection({
         </div>
       </div>
     </section>
-  );
-}
-
-/**
- * Una sezione del passo, richiudibile: chiusa finche' e' vuota, aperta se ha
- * gia' qualcuno. Il riassunto dice cosa contiene e quante persone ci sono,
- * cosi' il passo si legge con un colpo d'occhio e si apre solo cio' che serve.
- */
-function Gruppo({
-  title,
-  help,
-  count,
-  aperto = false,
-  children,
-}: {
-  title: string;
-  help: string;
-  count: number;
-  /** Aperto anche se vuoto: serve compilarlo. */
-  aperto?: boolean;
-  children: React.ReactNode;
-}) {
-  const [apertoAllInizio] = useState(count > 0);
-  return (
-    <details className="wizard-group mb-3" open={apertoAllInizio || aperto || undefined}>
-      <summary>
-        <span className="wizard-group__title">
-          {title}
-          {count > 0 && (
-            <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>
-          )}
-        </span>
-        <span className="wizard-group__help">{help}</span>
-      </summary>
-      <div className="wizard-group__body">{children}</div>
-    </details>
   );
 }
 
@@ -492,17 +509,23 @@ function FieldError({ message }: { message: string | null }) {
 function OrganizersSection({
   value,
   onChange,
+  onUploadBusy,
 }: {
   value: OrganizerEntry[];
   onChange: (next: OrganizerEntry[]) => void;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'org';
   const vuoto: OrganizerEntry = { name: '', logoUrl: null, websiteUrl: null };
   const [draft, setDraft] = useState<OrganizerEntry>(vuoto);
   const [err, setErr] = useState<string | null>(null);
+  // Mentre il logo va al server l'ente non si aggiunge: partirebbe senza, e
+  // il logo arrivato dopo finirebbe nell'ente successivo.
+  const [logoInCaricamento, setLogoInCaricamento] = useState(false);
 
   const add = () => {
+    if (logoInCaricamento) return;
     if (!draft.name.trim()) {
       setErr(t('organizerRequired'));
       return;
@@ -566,11 +589,20 @@ function OrganizersSection({
             assetType="image"
             value={draft.logoUrl}
             onChange={(v) => setDraft({ ...draft, logoUrl: v })}
+            onBusy={(b) => {
+              setLogoInCaricamento(b);
+              onUploadBusy?.(b);
+            }}
           />
           <LogoEsterno url={draft.logoUrl} />
         </div>
         <div className="col-md-3">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
+          <button
+            type="button"
+            className="btn btn-primary w-100"
+            onClick={add}
+            disabled={logoInCaricamento}
+          >
             {t('add')}
           </button>
         </div>
@@ -605,39 +637,6 @@ function righe(moderators: ModeratorEntry[], speakers: SpeakerEntry[]): Riga[] {
   ];
 }
 
-interface Bozza extends PersonProfile {
-  name: string;
-  email: string;
-  personId: string | null;
-  role: PersonRole;
-}
-
-// «Mostra nella pagina pubblica» parte spento per tutti: pubblicare nome ed
-// ente di una persona è una scelta, persona per persona.
-const BOZZA_VUOTA: Bozza = {
-  name: '',
-  email: '',
-  personId: null,
-  role: 'speaker',
-  organization: null,
-  organizationLogoUrl: null,
-  publicListed: false,
-};
-
-/** Mette una persona nell'elenco del suo ruolo. */
-function conRuolo(
-  moderators: ModeratorEntry[],
-  speakers: SpeakerEntry[],
-  persona: SpeakerEntry,
-  role: PersonRole
-): Pick<StepPeopleValue, 'moderators' | 'speakers'> {
-  if (role === 'speaker') return { moderators, speakers: [...speakers, persona] };
-  return {
-    moderators: [...moderators, { ...persona, organizer: role === 'organizer' }],
-    speakers,
-  };
-}
-
 /**
  * Le persone dell'evento in un elenco solo: organizzatori, moderatori e
  * relatori. Ognuno riceve un proprio link per entrare con il suo ruolo; il
@@ -648,23 +647,32 @@ function PeopleSection({
   speakers,
   onChange,
   taken,
+  photosLocked,
+  onUploadBusy,
 }: {
   moderators: ModeratorEntry[];
   speakers: SpeakerEntry[];
   onChange: (patch: Partial<StepPeopleValue>) => void;
   /** Gli indirizzi già usati altrove (l'organizzatore principale). */
   taken: readonly string[];
+  photosLocked: boolean;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'person';
   const [draft, setDraft] = useState<Bozza>(BOZZA_VUOTA);
   const [err, setErr] = useState<string | null>(null);
+  // La foto e il logo della persona nuova sono della bozza: mentre vanno al
+  // server la persona non si aggiunge (arriverebbe senza), e ogni aggiunta
+  // da' alla bozza successiva campi nuovi, senza il messaggio del file di
+  // prima e senza poter ricevere un caricamento rimasto indietro.
+  const [fotoInCaricamento, setFotoInCaricamento] = useState(false);
+  const [logoInCaricamento, setLogoInCaricamento] = useState(false);
+  const fileInCaricamento = fotoInCaricamento || logoInCaricamento;
+  const [bozzaN, setBozzaN] = useState(0);
   const tutte = righe(moderators, speakers);
-  // Una persona ha un ruolo solo: gli indirizzi, senza distinguere maiuscole
-  // (quelli di un evento esistente possono averne).
-  const giaPresenti = new Set(
-    [...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase())
-  );
+  // Una persona ha un ruolo solo: gli indirizzi gia' usati (people-draft).
+  const giaPresenti = indirizziPresi(moderators, speakers, taken);
 
   const senza = (r: Riga): Pick<StepPeopleValue, 'moderators' | 'speakers'> =>
     r.kind === 'moderators'
@@ -696,37 +704,17 @@ function PeopleSection({
   };
 
   const add = () => {
-    if (!draft.name.trim() || !draft.email.trim()) {
-      setErr(t('personRequired'));
-      return;
-    }
-    const email = draft.email.trim().toLowerCase();
-    if (!isEmail(email)) {
-      setErr(t('invalidEmail'));
-      return;
-    }
-    if (giaPresenti.has(email)) {
-      setErr(t('duplicateEmail'));
+    if (fileInCaricamento) return;
+    const esito = controllaBozza(draft, giaPresenti);
+    if ('errore' in esito) {
+      setErr(t(esito.errore));
       return;
     }
     setErr(null);
-    onChange(
-      conRuolo(
-        moderators,
-        speakers,
-        {
-          name: draft.name.trim(),
-          email,
-          personId: draft.personId,
-          organization: draft.organization?.trim() || null,
-          organizationLogoUrl: draft.organizationLogoUrl?.trim() || null,
-          publicListed: draft.publicListed,
-        },
-        draft.role
-      )
-    );
+    onChange(conRuolo(moderators, speakers, esito.persona, esito.role));
     // Il ruolo resta: di solito si aggiungono più persone con lo stesso.
     setDraft({ ...BOZZA_VUOTA, role: draft.role });
+    setBozzaN((n) => n + 1);
   };
 
   const onAddMany = (picks: RubricaPickedPerson[]) => {
@@ -748,6 +736,8 @@ function PeopleSection({
           organization: p.organization?.trim() || null,
           organizationLogoUrl: null,
           publicListed: false,
+          // La rubrica non ha foto: la persona la manda a chi organizza.
+          photoId: null,
         },
         draft.role
       );
@@ -778,9 +768,12 @@ function PeopleSection({
                 className="list-group-item wizard-person"
               >
                 <div className="d-flex justify-content-between align-items-start gap-2">
-                  <div className="text-break">
-                    <div className="fw-semibold">{r.entry.name}</div>
-                    <small className="text-muted">{r.entry.email}</small>
+                  <div className="wizard-person__chi">
+                    <PersonAvatar name={r.entry.name} photoId={r.entry.photoId} />
+                    <div className="text-break">
+                      <div className="fw-semibold">{r.entry.name}</div>
+                      <small className="text-muted">{r.entry.email}</small>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -846,10 +839,20 @@ function PeopleSection({
                           assetType="image"
                           value={r.entry.organizationLogoUrl}
                           onChange={(v) => aggiorna(r, { organizationLogoUrl: v })}
+                          onBusy={onUploadBusy}
                         />
                       </div>
                     </details>
                     <LogoEsterno url={r.entry.organizationLogoUrl} />
+                    <PersonPhotoField
+                      id={`${rid}-photo`}
+                      name={r.entry.name}
+                      photoId={r.entry.photoId}
+                      onChange={(v) => aggiorna(r, { photoId: v })}
+                      readOnly={photosLocked}
+                      compact
+                      onBusy={onUploadBusy}
+                    />
                   </div>
                 </div>
               </li>
@@ -925,14 +928,34 @@ function PeopleSection({
         </div>
         <div className="col-12">
           <FileOrUrlInput
+            key={bozzaN}
             id={`${id}-logo`}
             label={t('personLogo')}
             assetType="image"
             value={draft.organizationLogoUrl}
             onChange={(v) => setDraft({ ...draft, organizationLogoUrl: v })}
+            onBusy={(b) => {
+              setLogoInCaricamento(b);
+              onUploadBusy?.(b);
+            }}
           />
           <LogoEsterno url={draft.organizationLogoUrl} />
         </div>
+        {!photosLocked && (
+          <div className="col-12">
+            <PersonPhotoField
+              key={bozzaN}
+              id={`${id}-photo`}
+              name={draft.name}
+              photoId={draft.photoId}
+              onChange={(v) => setDraft((d) => ({ ...d, photoId: v }))}
+              onBusy={(b) => {
+                setFotoInCaricamento(b);
+                onUploadBusy?.(b);
+              }}
+            />
+          </div>
+        )}
         <div className="col-md-8">
           <div className="form-check">
             <input
@@ -948,7 +971,12 @@ function PeopleSection({
           </div>
         </div>
         <div className="col-md-4">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
+          <button
+            type="button"
+            className="btn btn-primary w-100"
+            onClick={add}
+            disabled={fileInCaricamento}
+          >
             {t('add')}
           </button>
         </div>
@@ -1096,6 +1124,7 @@ export function SezioneIscrizione({
   invitati,
   bloccato = false,
   iniziale = null,
+  questionari,
 }: {
   accessMode: EventAccessModeValue | null;
   requireOrganization: boolean;
@@ -1119,6 +1148,9 @@ export function SezioneIscrizione({
   /** La scelta con cui il modulo e' partito: tornarci la rimette com'era (una
    *  scelta fissata resta fissata anche se coincide col sito). */
   iniziale?: EventAccessModeValue | null;
+  /** Le domande dei questionari, prima e dopo l'evento: si vedono qui accanto
+   *  a cio' che si chiede all'iscrizione. */
+  questionari?: React.ReactNode;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const tg = useTranslations('admin.guided');
@@ -1209,6 +1241,7 @@ export function SezioneIscrizione({
         {chiede('requireOrganizationRole', requireOrganizationRole, t('askRole'))}
         {chiede('requireOrganizationType', requireOrganizationType, t('askType'))}
       </fieldset>
+      {questionari}
     </section>
   );
 }

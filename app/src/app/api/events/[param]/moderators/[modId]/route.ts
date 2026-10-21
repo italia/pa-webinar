@@ -2,9 +2,10 @@
  * Revoke (soft-delete) or hard-delete a co-moderator entry, or update the
  * person's public profile.
  *
- *   PATCH  — ente, logo, organizzatore, presenza nella pagina pubblica
- *            (lib/events/grant-profile). Nome, email e ruolo non cambiano:
- *            si revoca e si aggiunge di nuovo, perché il link è della persona.
+ *   PATCH  — ente, logo, foto, organizzatore, presenza nella pagina
+ *            pubblica (lib/events/grant-profile). Nome, email e ruolo non
+ *            cambiano: si revoca e si aggiunge di nuovo, perché il link è
+ *            della persona. Una foto che non c'è più si lascia cadere.
  *
  *   POST   — «Reinvia link»: rimette in coda l'email con il link personale
  *            (lib/email/moderator-link resendGrantModeratorLink). Non in
@@ -20,6 +21,7 @@
  */
 
 import { EventModeratorRole } from '@prisma/client';
+import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
@@ -28,7 +30,9 @@ import { NO_SEND_STATUSES, adminRequestLocale, resendGrantModeratorLink } from '
 import { getSettings } from '@/lib/settings';
 import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
+import { isEventManager } from '@/lib/auth/staff-session';
 import {
   constantTimeEqual,
   extractModeratorToken,
@@ -93,10 +97,17 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const saraOrganizzatore = parsed.data.organizer ?? mod.organizer;
   const puoImprontare = !saraOrganizzatore || daIlSegno;
   const email = mod.emailHash || !puoImprontare ? null : tryDecryptPII(mod.email);
+  // Una foto che nessuno usa ancora la aggancia solo lo staff dell'evento:
+  // con il solo link si tengono le foto che l'evento ha gia'.
+  const photoId = await usablePersonPhotoId(
+    parsed.data.photoId,
+    mod.eventId,
+    parsed.data.photoId && (await isEventManager(await cookies(), mod.eventId)) ? 'staff' : 'link',
+  );
   const updated = await prisma.eventModerator.update({
     where: { id: mod.id },
     data: {
-      ...grantProfileData(parsed.data),
+      ...grantProfileData({ ...parsed.data, photoId }),
       ...(email && { emailHash: hashEmail(email) }),
     },
     select: {
@@ -107,6 +118,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
       organization: true,
       organizationLogoUrl: true,
       publicListed: true,
+      photoId: true,
     },
   });
   return Response.json({ ...updated, name: tryDecryptPII(updated.name) ?? updated.name });

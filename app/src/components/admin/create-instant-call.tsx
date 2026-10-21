@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+/**
+ * La videochiamata al volo: un nome, e si entra subito come moderatori. Il
+ * link per gli ospiti si copia dalla sala o dall'elenco delle chiamate rapide.
+ */
+
+import { useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Input, FormGroup, Label, Alert, Spinner } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { useRouter, percorso } from '@/i18n/navigation';
@@ -13,6 +17,7 @@ export default function CreateInstantCall() {
   const tc = useTranslations('common');
   const tApi = useTranslations('apiErrors');
   const router = useRouter();
+  const id = useId();
 
   const [title, setTitle] = useState('');
   const [moderatorName, setModeratorName] = useState('');
@@ -20,17 +25,18 @@ export default function CreateInstantCall() {
   const [maxParticipants, setMaxParticipants] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [shareLink, setShareLink] = useState('');
-  const [copied, setCopied] = useState(false);
 
   const handleCreate = async () => {
-    if (!title.trim()) return;
+    if (!title.trim() || loading) return;
     if (joinPassword && joinPassword.length < 4) {
       setError(t('passwordTooShort'));
       return;
     }
     const maxParticipantsNum = maxParticipants.trim() ? parseInt(maxParticipants, 10) : undefined;
-    if (maxParticipantsNum !== undefined && (Number.isNaN(maxParticipantsNum) || maxParticipantsNum < 2 || maxParticipantsNum > 500)) {
+    if (
+      maxParticipantsNum !== undefined &&
+      (Number.isNaN(maxParticipantsNum) || maxParticipantsNum < 2 || maxParticipantsNum > 500)
+    ) {
       setError(t('maxParticipantsInvalid'));
       return;
     }
@@ -55,8 +61,7 @@ export default function CreateInstantCall() {
         return;
       }
 
-      const data = await res.json();
-      setShareLink(data.links.shareLink);
+      const data = (await res.json()) as { slug: string; moderatorToken: string };
       router.push(percorso(`/events/${data.slug}/live?token=${data.moderatorToken}`));
     } catch {
       setError(tc('error'));
@@ -64,150 +69,119 @@ export default function CreateInstantCall() {
     }
   };
 
-  const handleCopyLink = async () => {
-    if (!shareLink) return;
-    await navigator.clipboard.writeText(shareLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
-    <div
-      className="p-4 rounded-3"
-      style={{ backgroundColor: '#f8f9fa', border: '1px solid #e8e8e8' }}
+    <form
+      className="chiamata-nuova"
+      aria-labelledby={`${id}-titolo`}
+      onSubmit={(e) => {
+        e.preventDefault();
+        void handleCreate();
+      }}
     >
-      <div className="d-flex align-items-center gap-2 mb-3">
-        <div
-          className="d-flex align-items-center justify-content-center rounded-2"
-          style={{
-            width: 40,
-            height: 40,
-            backgroundColor: 'rgba(0,135,88,0.1)',
-            flexShrink: 0,
-          }}
-        >
-          <Icon icon="it-video" size="sm" style={{ color: '#008758' }} />
-        </div>
+      <div className="chiamata-nuova__testa">
+        <span className="chiamata-nuova__icona" aria-hidden="true">
+          <Icon icon="it-video" size="sm" />
+        </span>
         <div>
-          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
+          <h2 id={`${id}-titolo`} className="chiamata-nuova__titolo">
             {t('title')}
-          </h5>
-          <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-            {t('subtitle')}
-          </p>
+          </h2>
+          <p className="chiamata-nuova__sottotitolo">{t('subtitle')}</p>
         </div>
       </div>
 
       {error && (
-        <Alert color="danger" className="mb-3">
+        <div className="alert alert-danger" role="alert">
           {error}
-        </Alert>
+        </div>
       )}
 
-      <FormGroup className="mb-3">
-        <Label htmlFor="instant-title" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
+      <div className="mb-3">
+        <label htmlFor={`${id}-nome`} className="form-label">
           {t('nameLabel')}
-        </Label>
-        <Input
-          id="instant-title"
+        </label>
+        <input
+          id={`${id}-nome`}
           type="text"
+          className="form-control"
           value={title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder={t('namePlaceholder')}
           disabled={loading}
           maxLength={200}
-          onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter') handleCreate();
-          }}
+          required
         />
-      </FormGroup>
+      </div>
 
-      <FormGroup className="mb-3">
-        <Label htmlFor="instant-moderator" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
+      <div className="mb-3">
+        <label htmlFor={`${id}-moderatore`} className="form-label">
           {t('moderatorLabel')}
-        </Label>
-        <Input
-          id="instant-moderator"
+        </label>
+        <input
+          id={`${id}-moderatore`}
           type="text"
+          className="form-control"
           value={moderatorName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setModeratorName(e.target.value)}
+          onChange={(e) => setModeratorName(e.target.value)}
           placeholder={t('moderatorPlaceholder')}
           disabled={loading}
           maxLength={100}
         />
-      </FormGroup>
-
-      <FormGroup className="mb-3">
-        <Label htmlFor="instant-password" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
-          {t('passwordLabel')}
-        </Label>
-        <Input
-          id="instant-password"
-          type="password"
-          value={joinPassword}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setJoinPassword(e.target.value)}
-          placeholder={t('passwordPlaceholder')}
-          disabled={loading}
-          maxLength={200}
-          autoComplete="new-password"
-        />
-        <small className="form-text text-muted">{t('passwordHint')}</small>
-      </FormGroup>
-
-      <FormGroup className="mb-3">
-        <Label htmlFor="instant-max-participants" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
-          {t('maxParticipantsLabel')}
-        </Label>
-        <Input
-          id="instant-max-participants"
-          type="number"
-          value={maxParticipants}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxParticipants(e.target.value)}
-          placeholder={t('maxParticipantsPlaceholder')}
-          disabled={loading}
-          min={2}
-          max={500}
-        />
-        <small className="form-text text-muted">{t('maxParticipantsHint')}</small>
-      </FormGroup>
-
-      <div className="d-flex align-items-center gap-2">
-        <Button
-          color="primary"
-          onClick={handleCreate}
-          disabled={loading || !title.trim()}
-          className="d-inline-flex align-items-center gap-2"
-        >
-          {loading ? (
-            <>
-              <Spinner active small />
-              {t('creating')}
-            </>
-          ) : (
-            <>
-              <Icon icon="it-video" size="xs" color="white" />
-              {t('create')}
-            </>
-          )}
-        </Button>
-
-        {shareLink && (
-          <Button
-            color="secondary"
-            outline
-            size="sm"
-            onClick={handleCopyLink}
-            className="d-inline-flex align-items-center gap-1"
-          >
-            <Icon icon="it-copy" size="xs" />
-            {copied ? t('copied') : t('copyLink')}
-          </Button>
-        )}
       </div>
 
-      <p className="text-muted mt-3 mb-0" style={{ fontSize: '0.78rem' }}>
-        {t('hint')}
-      </p>
-    </div>
+      <div className="row g-3 mb-3">
+        <div className="col-12 col-md-6">
+          <label htmlFor={`${id}-password`} className="form-label">
+            {t('passwordLabel')}
+          </label>
+          <input
+            id={`${id}-password`}
+            type="password"
+            className="form-control"
+            value={joinPassword}
+            onChange={(e) => setJoinPassword(e.target.value)}
+            placeholder={t('passwordPlaceholder')}
+            disabled={loading}
+            maxLength={200}
+            autoComplete="new-password"
+            aria-describedby={`${id}-password-aiuto`}
+          />
+          <p id={`${id}-password-aiuto`} className="form-text">
+            {t('passwordHint')}
+          </p>
+        </div>
+        <div className="col-12 col-md-6">
+          <label htmlFor={`${id}-partecipanti`} className="form-label">
+            {t('maxParticipantsLabel')}
+          </label>
+          <input
+            id={`${id}-partecipanti`}
+            type="number"
+            className="form-control"
+            value={maxParticipants}
+            onChange={(e) => setMaxParticipants(e.target.value)}
+            placeholder={t('maxParticipantsPlaceholder')}
+            disabled={loading}
+            min={2}
+            max={500}
+            aria-describedby={`${id}-partecipanti-aiuto`}
+          />
+          <p id={`${id}-partecipanti-aiuto`} className="form-text">
+            {t('maxParticipantsHint')}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="btn btn-primary d-inline-flex align-items-center gap-2"
+        disabled={loading || !title.trim()}
+      >
+        <Icon icon="it-video" size="xs" color="white" />
+        {loading ? t('creating') : t('create')}
+      </button>
+
+      <p className="chiamata-nuova__nota">{t('hint')}</p>
+    </form>
   );
 }

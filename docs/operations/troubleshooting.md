@@ -355,11 +355,11 @@ curl -s https://meet.webinar.example.com/config.js | grep -n preferSctp
 
 **Symptom.** A `pa-webinar-jitsi-meet-web` pod is in `ErrImagePull` or `ImagePullBackOff`, and its events show `401 Unauthorized`, `403 Forbidden` or `not found` for `ghcr.io/italia/pa-webinar-jitsi-web:<tag>`.
 
-**Cause.** The chart serves a patched `jitsi/web` image ([jitsi-integration.md](../architecture/jitsi-integration.md#the-patched-web-image)). The web pod pulls it with the Secrets listed in `jitsi-meet.imagePullSecrets` (`ghcr-secret` and `dockerhub-secret` in `values.yaml`), which must already exist in the namespace. The subchart's ServiceAccount carries no pull secrets, so nothing else supplies them. A missing Secret, an expired token or a token without read access to the image fails the pull. `not found` means the tag was never published: `jitsi-meet.web.image.tag` in `values.yaml` is maintained separately from the tag that the image workflow publishes.
+**Cause.** The chart serves a patched `jitsi/web` image ([jitsi-integration.md](../architecture/jitsi-integration.md#the-patched-web-image)). The web pod pulls it with the Secrets listed in `jitsi-meet.imagePullSecrets` (`ghcr-secret` and `dockerhub-secret` in `values.yaml`), which must already exist in the namespace. The subchart's ServiceAccount carries no pull secrets, so nothing else supplies them. A missing Secret, an expired token or a token without read access to the image fails the pull. `not found` means the tag was never published: the default in `values.yaml` is the tag that the image workflow publishes, so check an override in your own values.
 
 **Why it appears at upgrade time.** The image is pulled with `pullPolicy: Always`, and the chart's config-reload hook restarts the web Deployment after every install and upgrade, so every upgrade pulls it again. While an older web pod is still running, the rollout only stalls. Once that pod goes away, after a node drain or an eviction, nobody can open a conference.
 
-**Fix.** Test the pull with the exact image and Secret before every upgrade ([upgrades.md](upgrades.md#check-that-every-image-can-be-pulled)), and recreate the Secret if it fails. An installation that cannot pull the patched image switches to the stock `jitsi/web` with an empty `jitsi-meet.imagePullSecrets`, and must keep advanced noise suppression off; the chart refuses to render the inconsistent combination.
+**Fix.** Test the pull with the exact image and Secret before every upgrade ([upgrades.md](upgrades.md#check-that-every-image-can-be-pulled)), and recreate the Secret if it fails. An installation that cannot pull the patched image switches to the stock `jitsi/web`, with the upstream tag of the same Jitsi release as the other components (the chart's web tag without `-rnnoise`) and an empty `jitsi-meet.imagePullSecrets`, and must keep advanced noise suppression off. The chart refuses to render either inconsistency: a web image on another release, or noise suppression on an image that is not patched ([Without the patched image](../architecture/jitsi-integration.md#the-patched-web-image)).
 
 ## Jobs and integrations
 
@@ -461,7 +461,7 @@ Quick checks before the pipeline's own troubleshooting in [POSTPROD.md](../POSTP
 - `postprod.enabled` is `false` by default in `values.yaml`. Without it the chart renders neither the orchestrator nor the worker template.
 - **Post-event pipeline active** (`aiPipelineEnabled`, off by default in `app/prisma/schema.prisma`), under **Site settings** → **Post-event AI pipeline**. While it is off, the orchestrator is told to start nothing.
 - At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), with and without a GPU together, and a failed job waits for its retry delay.
-- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`.
+- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`, which also needs `postprod.mt.enabled: false` ([Turning off the CPU translation engine](upgrades.md#turning-off-the-cpu-translation-engine)).
 - A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools are covered in [Node pools](../INFRASTRUCTURE.md#node-pools), and quotas in the guide of each managed cloud.
 
 ```bash

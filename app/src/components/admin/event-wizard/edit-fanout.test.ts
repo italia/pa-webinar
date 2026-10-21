@@ -28,8 +28,8 @@ function snapshot(): InitialEventShape {
       { id: 'org-1', name: 'Ente', logoUrl: null, websiteUrl: null },
     ],
     eventModerators: [
-      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
-      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false },
+      { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+      { id: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', role: 'SPEAKER', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
     ],
     invitations: [
       { id: 'inv-1', name: 'Ospite', email: 'ospite@example.org', role: 'GUEST', personId: null },
@@ -367,7 +367,7 @@ describe('materialPayload — file caricato', () => {
 
 describe('differenzaProfilo', () => {
   it('una bozza senza profilo non conta come modifica', () => {
-    const salvato = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false };
+    const salvato = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
     expect(differenzaProfilo(salvato, {})).toBeNull();
     expect(differenzaProfilo(salvato, { organization: '' })).toBeNull();
   });
@@ -375,10 +375,21 @@ describe('differenzaProfilo', () => {
   it('manda solo i campi cambiati', () => {
     expect(
       differenzaProfilo(
-        { organizer: false, organization: 'A', organizationLogoUrl: null, publicListed: false },
-        { organizer: false, organization: 'B', organizationLogoUrl: null, publicListed: true },
+        { organizer: false, organization: 'A', organizationLogoUrl: null, publicListed: false, photoId: null },
+        { organizer: false, organization: 'B', organizationLogoUrl: null, publicListed: true, photoId: null },
       ),
     ).toEqual({ organization: 'B', publicListed: true });
+  });
+
+  it('la foto: messa, cambiata, tolta; assente non si tocca', () => {
+    const senza = { organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
+    const con = { ...senza, photoId: 'foto-1' };
+    expect(differenzaProfilo(senza, { photoId: 'foto-1' })).toEqual({ photoId: 'foto-1' });
+    expect(differenzaProfilo(con, { photoId: 'foto-2' })).toEqual({ photoId: 'foto-2' });
+    expect(differenzaProfilo(con, { photoId: null })).toEqual({ photoId: null });
+    expect(differenzaProfilo(con, { photoId: 'foto-1' })).toBeNull();
+    // Una bozza salvata prima che la foto esistesse non la cancella.
+    expect(differenzaProfilo(con, { publicListed: false })).toBeNull();
   });
 });
 
@@ -393,6 +404,7 @@ describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
     organization: null,
     organizationLogoUrl: null,
     publicListed: false,
+    photoId: null as string | null,
   });
   const voce = (grantId: string, name: string, patch: Record<string, unknown> = {}) => ({
     grantId,
@@ -480,6 +492,43 @@ describe('fanoutEditDiff — persone riconosciute dalla concessione', () => {
     expect(calls('PATCH', '/moderators/')).toEqual([]);
     expect(calls('DELETE', '/moderators/')).toEqual([]);
   });
+
+  it('la foto cambiata va nella PATCH, da sola', async () => {
+    respond(() => json(200, {}));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = { ...formWithout(), moderators: [voce('a', 'A', { photoId: 'foto-2' })] } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    const [patch] = calls('PATCH', '/moderators/');
+    expect(JSON.parse(String(patch![1].body))).toEqual({ photoId: 'foto-2' });
+    expect(initial.eventModerators[0]!.photoId).toBe('foto-2');
+  });
+
+  it('una bozza vecchia, senza la foto, non la toglie', async () => {
+    respond(() => json(200, {}));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = {
+      ...formWithout(),
+      moderators: [{ grantId: 'a', name: 'A', email: '', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false }],
+    } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    expect(calls('PATCH', '/moderators/')).toEqual([]);
+  });
+
+  it('al cambio di ruolo la foto passa alla concessione nuova', async () => {
+    respond((url, init) => (init.method === 'POST' ? json(201, { id: 'nuova' }) : json(200, {})));
+    const initial = { ...snapshot(), eventModerators: [{ ...senzaEmail('a', 'A'), photoId: 'foto-1' }] };
+    const form = { ...formWithout(), speakers: [voce('a', 'A', { photoId: 'foto-1' })] } as unknown as WizardForm;
+
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+
+    const [post] = calls('POST', '/moderators');
+    expect(JSON.parse(String(post![1].body))).toMatchObject({ role: 'SPEAKER', photoId: 'foto-1' });
+    expect(initial.eventModerators.map((m) => [m.id, m.photoId])).toEqual([['nuova', 'foto-1']]);
+  });
 });
 
 /**
@@ -533,5 +582,148 @@ describe('fanoutEditDiff — questionari con risposte', () => {
     const eliminazioni = calls('DELETE', '/questionnaires/');
     expect(eliminazioni).toHaveLength(1);
     expect(eliminazioni[0]![0]).toBe(`/api/admin/events/${EVENT_ID}/questionnaires/POST_EVENT`);
+  });
+});
+
+/**
+ * Il programma: si salva dopo le persone, con chi interviene tradotto nella
+ * concessione che la persona ha adesso, e solo se e' cambiato.
+ */
+describe('fanoutEditDiff — programma', () => {
+  const persone = {
+    moderators: [
+      { grantId: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', personId: null, organizer: false, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+    ],
+    speakers: [
+      { grantId: 'spk-1', name: 'Luca Verdi', email: 'luca@example.org', personId: null, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null },
+    ],
+  };
+  const salvato = [
+    { id: 'a1', label: 'Apertura', plannedMinutes: 10, speakerGrantId: null, speakerPrimary: true },
+    { id: 'a2', label: 'Intervento', plannedMinutes: 30, speakerGrantId: 'spk-1', speakerPrimary: false },
+  ];
+  const righe = [
+    { id: 'a1', key: 'a1', label: 'Apertura', minutes: '10', speakerKey: 'primary' },
+    { id: 'a2', key: 'a2', label: 'Intervento', minutes: '30', speakerKey: 'e:luca@example.org' },
+  ];
+  function conProgramma(over: Record<string, unknown> = {}): WizardForm {
+    return { ...formWithout(), ...persone, agendaEnabled: true, agenda: righe, ...over } as unknown as WizardForm;
+  }
+  function scatto(over: Partial<InitialEventShape> = {}): InitialEventShape {
+    return { ...snapshot(), invitations: [], materials: [], organizers: [], agenda: structuredClone(salvato), ...over };
+  }
+
+  it('un programma non toccato non si manda', async () => {
+    respond(() => json(200, {}));
+    await fanoutEditDiff(EVENT_ID, TOKEN, conProgramma(), scatto(), 'it');
+    expect(calls('PUT', '/agenda')).toHaveLength(0);
+  });
+
+  it('un argomento in piu’: PUT con quelli letti come base, col Bearer, e lo scatto si aggiorna', async () => {
+    const tornati = [
+      ...salvato,
+      { id: 'a3', label: 'Domande', plannedMinutes: 15, speakerGrantId: 'mod-1', speakerPrimary: false, status: 'PENDING' },
+    ];
+    respond((url, init) => (init.method === 'PUT' && url.endsWith('/agenda') ? json(200, { items: tornati }) : json(200, {})));
+    const initial = scatto();
+    const report = await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      conProgramma({
+        agenda: [...righe, { key: 'n1', label: 'Domande', minutes: '15', speakerKey: 'e:anna@example.org' }],
+      }),
+      initial,
+      'it',
+    );
+    expect(report.failed).toEqual([]);
+    const [[url, init]] = calls('PUT', '/agenda') as [[string, RequestInit]];
+    expect(url).toBe(`/api/events/${EVENT_ID}/agenda`);
+    expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${TOKEN}`);
+    expect(JSON.parse(String(init.body))).toEqual({
+      base: ['a1', 'a2'],
+      plan: [
+        { id: 'a1', label: 'Apertura', plannedMinutes: 10, speakerGrantId: null, speakerPrimary: true },
+        { id: 'a2', label: 'Intervento', plannedMinutes: 30, speakerGrantId: 'spk-1', speakerPrimary: false },
+        { label: 'Domande', plannedMinutes: 15, speakerGrantId: 'mod-1', speakerPrimary: false },
+      ],
+    });
+    expect(initial.agenda?.map((a) => a.id)).toEqual(['a1', 'a2', 'a3']);
+  });
+
+  it('un cambio di ruolo: l’argomento passa alla concessione nuova della persona', async () => {
+    respond((url, init) => {
+      if (init.method === 'POST' && url.endsWith('/moderators')) return json(201, { id: 'mod-luca' });
+      if (init.method === 'PUT' && url.endsWith('/agenda')) return json(200, { items: [] });
+      return json(200, {});
+    });
+    const initial = scatto();
+    // Luca da relatore a moderatore: stesso indirizzo, concessione nuova.
+    await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      conProgramma({
+        moderators: [...persone.moderators, { ...persone.speakers[0], organizer: false }],
+        speakers: [],
+      }),
+      initial,
+      'it',
+    );
+    const ordine = (fetchMock.mock.calls as Array<[string, RequestInit]>).map(([u, i]) => `${i.method} ${u}`);
+    const put = ordine.indexOf(`PUT /api/events/${EVENT_ID}/agenda`);
+    expect(put).toBeGreaterThan(ordine.indexOf(`POST /api/events/${EVENT_ID}/moderators`));
+    expect(put).toBeGreaterThan(ordine.indexOf(`DELETE /api/events/${EVENT_ID}/moderators/spk-1`));
+    const corpo = JSON.parse(String(calls('PUT', '/agenda')[0]![1].body)) as { plan: { speakerGrantId: string | null }[] };
+    expect(corpo.plan[1]!.speakerGrantId).toBe('mod-luca');
+  });
+
+  it('una persona nuova (aggiunta dal programma): l’argomento va alla concessione appena creata', async () => {
+    respond((url, init) => {
+      if (init.method === 'POST' && url.endsWith('/moderators')) return json(201, { id: 'spk-carla' });
+      if (init.method === 'PUT' && url.endsWith('/agenda')) return json(200, { items: [] });
+      return json(200, {});
+    });
+    const carla = { name: 'Carla Verdi', email: 'carla@example.org', personId: null, organization: null, organizationLogoUrl: null, publicListed: false, photoId: null };
+    await fanoutEditDiff(
+      EVENT_ID,
+      TOKEN,
+      conProgramma({
+        speakers: [...persone.speakers, carla],
+        agenda: [...righe, { key: 'n1', label: 'Domande', minutes: '', speakerKey: 'e:carla@example.org' }],
+      }),
+      scatto(),
+      'it',
+    );
+    const ordine = (fetchMock.mock.calls as Array<[string, RequestInit]>).map(([u, i]) => `${i.method} ${u}`);
+    expect(ordine.indexOf(`PUT /api/events/${EVENT_ID}/agenda`)).toBeGreaterThan(
+      ordine.indexOf(`POST /api/events/${EVENT_ID}/moderators`),
+    );
+    const corpo = JSON.parse(String(calls('PUT', '/agenda')[0]![1].body)) as {
+      plan: { label: string; speakerGrantId: string | null }[];
+    };
+    expect(corpo.plan[2]).toEqual({ label: 'Domande', plannedMinutes: null, speakerGrantId: 'spk-carla', speakerPrimary: false });
+  });
+
+  it('un rifiuto finisce fra le risorse non salvate e lo scatto resta: il salvataggio dopo riprova', async () => {
+    respond((url, init) =>
+      init.method === 'PUT' && url.endsWith('/agenda')
+        ? json(409, { error: 'The agenda changed: reload it and try again' })
+        : json(200, {}),
+    );
+    const initial = scatto();
+    const form = conProgramma({ agenda: [righe[1], righe[0]] });
+    const report = await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+    expect(report.failed).toEqual(['agenda']);
+    expect(report.reason).toBe('The agenda changed: reload it and try again');
+    expect(initial.agenda).toEqual(salvato);
+    await fanoutEditDiff(EVENT_ID, TOKEN, form, initial, 'it');
+    expect(calls('PUT', '/agenda')).toHaveLength(2);
+  });
+
+  it('un’agenda gia’ usata in sala, o spenta, non si manda', async () => {
+    respond(() => json(200, {}));
+    const cambiato = conProgramma({ agenda: [righe[1], righe[0]] });
+    await fanoutEditDiff(EVENT_ID, TOKEN, cambiato, scatto({ agendaLocked: true }), 'it');
+    await fanoutEditDiff(EVENT_ID, TOKEN, { ...cambiato, agendaEnabled: false }, scatto(), 'it');
+    expect(calls('PUT', '/agenda')).toHaveLength(0);
   });
 });

@@ -82,7 +82,8 @@ recommendations were derived from the measurements.
   add-on; Kubernetes v1.32, and v1.35 for the runs in
   [Try PA Webinar on minikube](install/minikube.md#measured-usage)); Helm 4;
   the simple profile; Jitsi `stable-10741` with the standard `jitsi/web`
-  image.
+  image (the chart now pins a newer release, which these runs did not
+  cover).
 
 The limits of these numbers:
 
@@ -160,6 +161,11 @@ every participant saw all the others in the participant list.
 A linear fit over eight runs, within ±15% on seven of them:
 
 > bridge CPU (millicores) ≈ 87 + 19.4 × (thousand packets per second sent) + 7.3 × (Mbit/s in plus out)
+
+The capacity estimate that organizers see in the event wizard uses a fit of the
+same shape, made on a 15-core bridge and counting packets in both directions; it
+is described in
+[Scaling the media plane](architecture/scaling.md#the-capacity-estimate-in-the-wizard-and-on-the-event-page).
 
 Per forwarded stream:
 

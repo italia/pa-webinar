@@ -113,8 +113,10 @@ the [job graph](../POSTPROD.md#job-graph), the [job states](../POSTPROD.md#job-s
   autoscaler add a node, and the node goes away when no worker needs it.
 - **vLLM on demand.** vLLM is a Deployment that the operator deploys next to the release. With
   `postprod.vllm.autoscale` on (default `false` in `infra/helm/pa-webinar/values.yaml`), it rests at
-  zero replicas and the orchestrator scales it to one while there is work or any worker is active,
-  and back to zero otherwise. The orchestrator skips this step while the site switch is off, so
+  zero replicas and the orchestrator scales it to one while a job that asks the language model for
+  text is runnable, claimed or running (`desiredLlm` from the portal), and back to zero otherwise:
+  dubbing, the archive and the translation of event texts (on a CPU engine of its own) never start
+  it. The orchestrator skips this step while the site switch is off, so
   turning the pipeline off does not scale vLLM down. With autoscale off, the operator keeps vLLM
   running (see *An always-on GPU* below).
 - **No database or storage credentials on the GPU nodes.** The worker holds `CRON_API_KEY` to call the

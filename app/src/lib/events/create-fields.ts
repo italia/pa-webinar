@@ -106,6 +106,7 @@ export const CREATED_EVENT_FIELDS = [
   'moderatorOrganization',
   'moderatorOrganizationLogoUrl',
   'moderatorPublicListed',
+  'moderatorPhotoId',
 
   // serie
   'recurrenceRule',
@@ -122,4 +123,7 @@ export const NOT_CREATED_EVENT_FIELDS: Record<string, string> = {
     'non si conserva in chiaro: viene ridotta a impronta in joinPasswordHash',
   tagSlugs:
     'non è una colonna: diventa una riga di collegamento per ogni etichetta, scritta dopo la creazione',
+  textEdits:
+    'non è una colonna: dice quali lingue di titolo e descrizione ha toccato chi salva; in un evento ' +
+    'nuovo ogni lingua con un testo è di chi la scrive (textLocaleState)',
 };

@@ -23,7 +23,9 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { progressPayloadSchema } from '@/lib/ai/schemas';
-import { avanzamentoResoconto } from '@/lib/report/job';
+import { EVENT_JOB_KINDS } from '@/lib/ai/job-classes';
+import { avanzamentoLavoroEvento } from '@/lib/report/job';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
 import {
   postprodJobDurationSeconds,
   postprodJobsCompletedTotal,
@@ -70,6 +72,7 @@ export const POST = withErrorHandling(async (request) => {
       attempts: true,
       startedAt: true,
       recordingId: true,
+      eventId: true,
     },
   });
   if (!job) throw new NotFoundError('PostprodJob');
@@ -84,11 +87,11 @@ export const POST = withErrorHandling(async (request) => {
       })
     )?.aiJobMaxAttempts ?? 5;
 
-  // Il resoconto dell'evento ha regole sue (lib/report/job): lo conclude solo
-  // la consegna, un lavoro chiuso non si riapre, e vale solo il messaggio del
-  // worker che ha il lease.
-  if (job.kind === 'REPORT') {
-    const { chiusoOra, ...risposta } = await avanzamentoResoconto(job, parsed, {
+  // I lavori dell'evento (resoconto, traduzione dei testi) hanno regole loro
+  // (lib/report/job): li conclude solo la consegna, un lavoro chiuso non si
+  // riapre, e vale solo il messaggio del worker che ha il lease.
+  if (EVENT_JOB_KINDS.includes(job.kind)) {
+    const { chiusoOra, ...risposta } = await avanzamentoLavoroEvento(job, parsed, {
       tentativiMassimi,
       ritardoMs: nextAttemptDelayMs(job.attempts),
     });
@@ -96,6 +99,12 @@ export const POST = withErrorHandling(async (request) => {
       postprodJobsCompletedTotal.labels(job.kind, risposta.status).inc();
       const secs = job.startedAt ? (Date.now() - job.startedAt.getTime()) / 1000 : 0;
       if (secs > 0) postprodJobDurationSeconds.labels(job.kind).observe(secs);
+      // Una traduzione dei testi fallita: se intanto il testo principale e'
+      // cambiato, quello nuovo si traduce adesso (lo stesso testo no: si
+      // riprova a mano, lib/text-translation/auto).
+      if (job.kind === 'TRANSLATE_TEXT' && risposta.status === 'FAILED' && job.eventId) {
+        await riconciliaTraduzioni(job.eventId, { request, actor: 'system', dopoConsegna: true });
+      }
     }
     return Response.json({ ok: true, ...risposta });
   }
@@ -131,7 +140,7 @@ export const POST = withErrorHandling(async (request) => {
       },
     });
 
-    // Il resoconto dell'evento non ha registrazione: il suo fallimento non
+    // I lavori dell'evento non hanno registrazione: il loro fallimento non
     // cambia lo stato di nessuna.
     if (terminal && job.recordingId) {
       // Propagate to recording status: if any job for this recording

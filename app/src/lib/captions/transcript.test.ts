@@ -10,6 +10,7 @@ import {
   componiTrascrizione,
   conservazioneFinita,
   contaVoci,
+  registrazioneConVideo,
   registrazioneSoloSottotitoli,
   senzaLePersone,
   togliPersoneDalleTrascrizioni,
@@ -91,6 +92,15 @@ describe('registrazioneSoloSottotitoli', () => {
     expect(registrazioneSoloSottotitoli({ blobKey: '' })).toBe(true);
     expect(registrazioneSoloSottotitoli({ blobKey: 'recordings/ev/a.mp4' })).toBe(false);
     expect(registrazioneSoloSottotitoli({ blobKey: 'multitrack/ev/' })).toBe(false);
+  });
+});
+
+describe('registrazioneConVideo', () => {
+  it('vero solo per il file della sala', () => {
+    expect(registrazioneConVideo({ blobKey: 'recordings/ev/a.mp4' })).toBe(true);
+    // Segnaposto multitraccia: il video non c'è, o non è ancora arrivato.
+    expect(registrazioneConVideo({ blobKey: 'recordings/multitrack/ev/' })).toBe(false);
+    expect(registrazioneConVideo({ blobKey: '' })).toBe(false);
   });
 });
 

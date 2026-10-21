@@ -28,12 +28,16 @@ interface RecordingManagementProps {
     tempRecordingStartedAt: string | null;
     recordingPublished: boolean;
     recordingPublishedAt: string | null;
+    recordingAudience: 'PUBLIC' | 'REGISTRANTS';
     recordingFileSize: number | null;
     recordingDuration: number | null;
     recordingDeleteAfterDays: number | null;
     moderatorToken: string;
   };
   jibriAvailable?: boolean;
+  /** La registrazione del video, quando ha slide presentate in sala da
+   *  regolare (pagina della post-produzione, scheda «Slide»). */
+  slidesRecordingId?: string | null;
 }
 
 const RETENTION_OPTIONS = [
@@ -61,6 +65,7 @@ function formatFileSize(bytes: number): string {
 export default function RecordingManagement({
   event,
   jibriAvailable = true,
+  slidesRecordingId = null,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
   const toast = useToast();
@@ -69,6 +74,7 @@ export default function RecordingManagement({
   const router = useRouter();
 
   const [published, setPublished] = useState(event.recordingPublished);
+  const [audience, setAudience] = useState(event.recordingAudience);
   const [retentionDays, setRetentionDays] = useState<number | null>(event.recordingDeleteAfterDays);
   const [saving, setSaving] = useState(false);
   const [liveElapsed, setLiveElapsed] = useState('');
@@ -89,11 +95,12 @@ export default function RecordingManagement({
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isLive, event.tempRecordingStartedAt]);
 
+  /** Salva un campo dell'evento; false se il server non l'ha salvato. */
   const updateField = useCallback(
-    async (data: Record<string, unknown>) => {
+    async (data: Record<string, unknown>): Promise<boolean> => {
       setSaving(true);
       try {
-        await fetch(`/api/events/${event.id}`, {
+        const r = await fetch(`/api/events/${event.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -101,6 +108,9 @@ export default function RecordingManagement({
           },
           body: JSON.stringify(data),
         });
+        return r.ok;
+      } catch {
+        return false;
       } finally {
         setSaving(false);
       }
@@ -108,11 +118,29 @@ export default function RecordingManagement({
     [event.id, event.moderatorToken],
   );
 
+  // Pubblicazione e pubblico decidono chi vede il video: se il server non
+  // salva, la scelta torna com'era e lo si dice, invece di mostrare uno stato
+  // che non e' quello vero.
   const handleTogglePublish = useCallback(async () => {
     const next = !published;
     setPublished(next);
-    await updateField({ recordingPublished: next });
-  }, [published, updateField]);
+    if (!(await updateField({ recordingPublished: next }))) {
+      setPublished(!next);
+      toast.error(t('saveFailed'));
+    }
+  }, [published, updateField, toast, t]);
+
+  const handleAudienceChange = useCallback(
+    async (next: 'PUBLIC' | 'REGISTRANTS') => {
+      const prima = audience;
+      setAudience(next);
+      if (!(await updateField({ recordingAudience: next }))) {
+        setAudience(prima);
+        toast.error(t('saveFailed'));
+      }
+    },
+    [audience, updateField, toast, t],
+  );
 
   const handleRetentionChange = useCallback(
     async (days: number) => {
@@ -259,6 +287,46 @@ export default function RecordingManagement({
                   disabled={saving}
                 />
               </div>
+              {/* La pagina come la vedra' chi la apre, video compreso, anche
+                  prima di pubblicare (solo per lo staff). */}
+              <Link
+                href={percorso(`/events/${event.slug}?anteprima=1`)}
+                target="_blank"
+                className="d-inline-flex align-items-center gap-1 mt-2 small"
+              >
+                <Icon icon="it-external-link" size="sm" />
+                {t('previewPublicPage')}
+              </Link>
+            </div>
+
+            {/* Chi vede la registrazione pubblicata (lib/recording/audience). */}
+            <div className="border rounded p-3 mb-3">
+              <fieldset className="border-0 p-0 m-0">
+                <legend
+                  className="fw-semibold mb-2 fs-6 float-none w-auto p-0"
+                  style={{ color: 'var(--app-text)' }}
+                >
+                  {t('audienceLabel')}
+                </legend>
+                {(['PUBLIC', 'REGISTRANTS'] as const).map((value) => (
+                  <div key={value} className="form-check my-1">
+                    <input
+                      type="radio"
+                      id={`audience-${value}`}
+                      name="recording-audience"
+                      checked={audience === value}
+                      onChange={() => handleAudienceChange(value)}
+                      disabled={saving}
+                    />
+                    <label htmlFor={`audience-${value}`}>
+                      {value === 'PUBLIC' ? t('audiencePublic') : t('audienceRegistrants')}
+                      <span className="d-block text-secondary" style={{ fontSize: '0.85rem' }}>
+                        {value === 'PUBLIC' ? t('audiencePublicDesc') : t('audienceRegistrantsDesc')}
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </fieldset>
             </div>
 
             {/* Retention options */}
@@ -325,6 +393,18 @@ export default function RecordingManagement({
                     <Icon icon="it-comment" size="sm" />
                     {t('transcriptManage')}
                   </Link>
+                  {/* Le slide presentate in sala, accanto al video sulla
+                      pagina pubblica: si mostrano, si allineano e si provano
+                      dalla scheda «Slide» della registrazione. */}
+                  {slidesRecordingId && (
+                    <Link
+                      href={percorso(`/admin/postprod/${slidesRecordingId}?tab=slides`)}
+                      className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                    >
+                      <Icon icon="it-presentation" size="sm" />
+                      {t('slidesManage')}
+                    </Link>
+                  )}
                 </>
               )}
               <Button

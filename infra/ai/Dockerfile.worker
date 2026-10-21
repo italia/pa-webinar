@@ -63,8 +63,11 @@ RUN pip uninstall -y apex flash-attn flash_attn transformer-engine transformer_e
 # is fine because Piper only READS the .onnx. This removes the DUB
 # dependency on a seeded /models PVC: worker/tts.py `resolve_voices_path`
 # falls back here when the configured AI_TTS_VOICES_PATH dir is empty
-# (e.g. /models is an unseeded emptyDir). en/fr get an M+F pair for
-# gender-aware multivoice dubbing; it gets paola (source-lang context).
+# (e.g. /models is an unseeded emptyDir). en/fr/de/es get an M+F pair
+# for gender-aware multivoice dubbing; it gets paola (source-lang
+# context). The German female voice exists only in "low" quality; the
+# Spanish one is the Argentine "daniela" (the es_ES female voices are
+# multi-speaker without a gender per speaker).
 RUN set -eux; \
     base="https://huggingface.co/rhasspy/piper-voices/resolve/main"; \
     for spec in \
@@ -72,6 +75,10 @@ RUN set -eux; \
         "en/en_US/amy/medium/en_US-amy-medium:en" \
         "fr/fr_FR/tom/medium/fr_FR-tom-medium:fr" \
         "fr/fr_FR/siwis/medium/fr_FR-siwis-medium:fr" \
+        "de/de_DE/thorsten/medium/de_DE-thorsten-medium:de" \
+        "de/de_DE/kerstin/low/de_DE-kerstin-low:de" \
+        "es/es_ES/davefx/medium/es_ES-davefx-medium:es" \
+        "es/es_AR/daniela/high/es_AR-daniela-high:es" \
         "it/it_IT/paola/medium/it_IT-paola-medium:it" ; do \
         stem="${spec%:*}"; lang="${spec##*:}"; fn="${stem##*/}"; \
         mkdir -p "/opt/piper-voices/$lang"; \

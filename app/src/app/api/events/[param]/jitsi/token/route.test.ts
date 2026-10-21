@@ -427,6 +427,27 @@ describe('POST jitsi/token — accessToken di registrazione', () => {
   });
 });
 
+describe('POST jitsi/token — iscritto prima dell\'inizio', () => {
+  it('PUBLISHED: 409 senza token, anche col link inoltrato', async () => {
+    // La sala d'attesa fa aspettare chi partecipa fino all'avvio: il token
+    // non apre la conferenza prima, né al titolare né a chi ha il link.
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ status: 'PUBLISHED' }) as never);
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+
+    for (const corpo of [
+      { accessToken: ACCESS_TOKEN },
+      { accessToken: ACCESS_TOKEN, displayNameOverride: 'Dal link inoltrato' },
+    ]) {
+      const res = await post(corpo);
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as { code: string; jwt?: string };
+      expect(body.code).toBe('CONFLICT');
+      expect(body.jwt).toBeUndefined();
+    }
+    expect(prisma.registration.update).not.toHaveBeenCalled();
+  });
+});
+
 // ── Stato dell'evento ──
 
 describe('POST jitsi/token — stato dell\'evento', () => {

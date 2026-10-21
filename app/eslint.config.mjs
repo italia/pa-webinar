@@ -77,6 +77,15 @@ const eslintConfig = [
           message:
             "process.env.NEXT_PUBLIC_* viene inlinato al build: usa getPublicEnv() di '@/lib/env'.",
         },
+        // La tendina di design-react-kit (`<Input type="select">`) fa cadere
+        // React e con lui l'intera schermata: si usa un <select> nativo con le
+        // classi di Bootstrap Italia.
+        {
+          selector:
+            "JSXOpeningElement[name.name='Input'] > JSXAttribute[name.name='type'][value.value='select']",
+          message:
+            "<Input type=\"select\"> di design-react-kit fa cadere la pagina: usa un <select className=\"form-select\">.",
+        },
       ],
 
       // Import order

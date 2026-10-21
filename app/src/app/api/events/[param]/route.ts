@@ -18,14 +18,16 @@ import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
+import { usablePersonPhotoId } from '@/lib/events/person-photo-store';
 import { updateEventSchema } from '@/lib/validation/schemas';
-import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
+import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
   isEventModerator,
   constantTimeEqual,
 } from '@/lib/auth/moderator';
+import { sendStaffCalendarUpdates } from '@/lib/email/calendar-invite';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
 import {
   adminRequestLocale,
@@ -36,9 +38,17 @@ import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
-import { requireEventManager } from '@/lib/auth/staff-session';
+import { isEventManager, requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
+import { riconciliaTraduzioni } from '@/lib/text-translation/auto';
+import { improntaSorgente, testoSorgente } from '@/lib/text-translation/source';
+import {
+  letturaStatoTesti,
+  linguaPrincipale,
+  lingueDellEvento,
+} from '@/lib/text-translation/stato-lingue';
+import { unisciTesti } from '@/lib/text-translation/unione-testi';
 
 export const dynamic = 'force-dynamic';
 
@@ -172,7 +182,10 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
-    recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+    // Risposta in cache condivisa: il video solo se pubblicato per tutti; una
+    // registrazione riservata agli iscritti passa dalla pagina e dal player,
+    // che riconoscono l'iscritto (lib/recording/audience).
+    recordingUrl: event.recordingPublished && event.recordingAudience === 'PUBLIC' ? event.recordingUrl : null,
     tempRecordingUrl: event.status === 'LIVE' ? event.tempRecordingUrl : null,
     tempRecordingStartedAt: event.status === 'LIVE' ? event.tempRecordingStartedAt?.toISOString() ?? null : null,
     postEventPublic: event.postEventPublic,
@@ -300,6 +313,17 @@ export const PUT = withErrorHandling(async (request, context) => {
     }
   }
 
+  // La foto dell'organizzatore principale: una che non c'e' piu' (o di un
+  // altro evento) si lascia cadere, senza rifiutare il resto della modifica.
+  // Una foto nuova, che nessuno usa ancora, la aggancia solo lo staff
+  // dell'evento (lo carica solo lo staff): con il solo link di conduzione si
+  // tiene la foto che l'evento ha gia'.
+  const fotoPrincipale = await usablePersonPhotoId(
+    data.moderatorPhotoId,
+    eventId,
+    data.moderatorPhotoId && (await isEventManager(await cookies(), eventId)) ? 'staff' : 'link'
+  );
+
   const dateChanged =
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
     (data.endsAt !== undefined && new Date(data.endsAt).getTime() !== event.endsAt.getTime());
@@ -315,7 +339,8 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.recordingEnabled !== undefined ||
     data.participantsCanUnmute !== undefined ||
     data.participantsCanStartVideo !== undefined ||
-    data.participantsCanShareScreen !== undefined;
+    data.participantsCanShareScreen !== undefined ||
+    data.expectedSenderRatioPct !== undefined;
 
   const nextCapacityEstimate = capacityInputsTouched
     ? {
@@ -332,6 +357,12 @@ export const PUT = withErrorHandling(async (request, context) => {
             data.participantsCanStartVideo ?? event.participantsCanStartVideo,
           participantsCanShareScreen:
             data.participantsCanShareScreen ?? event.participantsCanShareScreen,
+          // La quota di chi parla dell'evento, come alla creazione: senza, i
+          // ponti si stimerebbero sulla quota predefinita.
+          expectedSenderRatioPct:
+            data.expectedSenderRatioPct !== undefined
+              ? data.expectedSenderRatioPct
+              : event.expectedSenderRatioPct,
         }),
         computedAt: new Date().toISOString(),
       }
@@ -367,17 +398,76 @@ export const PUT = withErrorHandling(async (request, context) => {
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
 
+  // Titolo e descrizione, con lo stato di ogni lingua (lib/text-translation/
+  // unione-testi). Con `textEdits` (il wizard) delle lingue non toccate resta
+  // il testo salvato: lo si rilegge a riga bloccata, nella transazione della
+  // scrittura, perche' una traduzione consegnata intanto non si perda. Senza,
+  // il testo inviato vale per tutte le lingue, come sempre.
+  const conTesti = data.title !== undefined || data.description !== undefined;
+  const impostazioniTesti = conTesti ? await getSettings() : null;
+  const principale = linguaPrincipale(impostazioniTesti);
+  const testiDaScrivere = (salvato: {
+    title: unknown;
+    description: unknown;
+    textLocaleState: unknown;
+    aiTargetLocales: string | null;
+  }) => {
+    const toccate = data.textEdits?.touched ?? null;
+    // Le lingue tolte dalle lingue dell'evento con questo salvataggio (un
+    // evento che non ne aveva scelte aveva quelle predefinite del sito):
+    // perdono il testo solo quelle che il modulo dice toccate (unisciTesti).
+    const predefinite = impostazioniTesti?.aiDefaultTargetLocales;
+    const prima = lingueDellEvento(salvato.aiTargetLocales, predefinite);
+    const dopo =
+      data.aiTargetLocales === undefined
+        ? prima
+        : lingueDellEvento(data.aiTargetLocales, predefinite);
+    const titoloPrincipale =
+      data.title !== undefined ? (data.title as Record<string, string>) : salvato.title;
+    const descrizionePrincipale =
+      data.description !== undefined
+        ? (data.description as Record<string, string>)
+        : salvato.description;
+    const testi = unisciTesti({
+      principale,
+      salvati: {
+        title: salvato.title,
+        description: salvato.description,
+        stato: letturaStatoTesti(salvato.textLocaleState),
+      },
+      inviati: { title: data.title, description: data.description },
+      toccate,
+      lingueTolte: prima.filter((l) => !dopo.includes(l)),
+      impronta: improntaSorgente(
+        testoSorgente(
+          principale,
+          titoloPrincipale as Record<string, string> | null,
+          descrizionePrincipale as Record<string, string> | null,
+        ),
+      ),
+      improntaPrecedente: improntaSorgente(
+        testoSorgente(
+          principale,
+          salvato.title as Record<string, string> | null,
+          salvato.description as Record<string, string> | null,
+        ),
+      ),
+      ora: new Date(),
+    });
+    return {
+      title: testi.title,
+      description: testi.description,
+      textLocaleState: testi.stato as unknown as Prisma.InputJsonValue,
+    };
+  };
+  const conUnione = conTesti && data.textEdits !== undefined;
+
   const updateArgs = {
     where: { id: eventId },
     data: {
+      ...(conTesti && !conUnione && testiDaScrivere(event)),
       ...(revivedStatus && { status: revivedStatus }),
       ...(matrixUpdate && { permissionMatrix: matrixUpdate }),
-      ...(data.title !== undefined && {
-        title: pruneEmptyTranslations(data.title as LocalizedField),
-      }),
-      ...(data.description !== undefined && {
-        description: pruneEmptyTranslations(data.description as LocalizedField),
-      }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
@@ -455,6 +545,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.moderatorPublicListed !== undefined && {
         moderatorPublicListed: data.moderatorPublicListed,
       }),
+      ...(fotoPrincipale !== undefined && { moderatorPhotoId: fotoPrincipale }),
       ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
@@ -476,6 +567,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
       }),
       ...(data.transcriptPublished !== undefined && { transcriptPublished: data.transcriptPublished }),
+      ...(data.recordingAudience !== undefined && { recordingAudience: data.recordingAudience }),
       ...(data.recordingDeleteAfterDays !== undefined && { recordingDeleteAfterDays: data.recordingDeleteAfterDays }),
       ...(data.recordingUrl !== undefined && { recordingUrl: data.recordingUrl }),
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
@@ -565,9 +657,19 @@ export const PUT = withErrorHandling(async (request, context) => {
   const closesPolls =
     nextStatus !== event.status && !isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED');
   const updated =
-    closesSessions || closesPolls || tagIds !== null
+    closesSessions || closesPolls || tagIds !== null || conUnione
       ? await prisma.$transaction(async (tx) => {
-          const aggiornato = await tx.event.update(updateArgs);
+          let argomenti: Prisma.EventUpdateArgs = updateArgs;
+          if (conUnione) {
+            await tx.$queryRaw`SELECT id FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
+            const salvato = await tx.event.findUnique({
+              where: { id: eventId },
+              select: { title: true, description: true, textLocaleState: true, aiTargetLocales: true },
+            });
+            if (!salvato) throw new NotFoundError('Event');
+            argomenti = { ...updateArgs, data: { ...updateArgs.data, ...testiDaScrivere(salvato) } };
+          }
+          const aggiornato = await tx.event.update(argomenti);
           if (closesSessions) await closeOpenSessions(tx, [eventId], new Date());
           if (closesPolls) await chiudiSondaggiAperti(tx, [eventId], new Date());
           if (tagIds !== null) await replaceEventTags(tx, eventId, tagIds);
@@ -575,10 +677,14 @@ export const PUT = withErrorHandling(async (request, context) => {
         })
       : await prisma.event.update(updateArgs);
 
-  if (dateChanged && event.status === 'PUBLISHED') {
-    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
-    sendDateChangeNotifications({ eventId });
-  }
+  // Dopo un salvataggio del testo o delle lingue, il server chiede la
+  // traduzione delle lingue della pagina che ne hanno bisogno
+  // (lib/text-translation/auto). Un salvataggio automatico di una bozza non
+  // deve arrivare qui.
+  const traduzione =
+    conTesti || data.aiTargetLocales !== undefined
+      ? await riconciliaTraduzioni(eventId, { request })
+      : undefined;
 
   // I link personali: alla pubblicazione (o all'uscita dalla bozza) partono
   // quello del moderatore principale e quelli delle concessioni create in
@@ -588,6 +694,30 @@ export const PUT = withErrorHandling(async (request, context) => {
   const moderatorEmailChanged =
     data.moderatorEmail !== undefined &&
     (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
+
+  if (dateChanged && event.status === 'PUBLISHED') {
+    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
+    sendDateChangeNotifications({ eventId });
+    // Chi conduce ha l'invito di calendario dai link: riceve quello con la
+    // nuova ora, nella lingua di chi ha fatto la modifica. Come l'avviso, non
+    // trattiene la risposta e non la fa fallire: l'evento e' gia' salvato. Un
+    // principale appena cambiato riceve il suo link (qui sotto), che porta
+    // gia' l'invito con la nuova ora.
+    void (async () => {
+      try {
+        const { defaultLocale: predefinita } = await getSettings();
+        await sendStaffCalendarUpdates(eventId, {
+          staffLocale: adminRequestLocale(request, predefinita),
+          skipPrimary: moderatorEmailChanged,
+        });
+      } catch (err) {
+        console.error('[events] staff calendar updates not queued', {
+          eventId,
+          error: err instanceof Error ? err.name : 'unknown',
+        });
+      }
+    })();
+  }
   const pubblicato =
     (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
     (event.status === 'DRAFT' && updated.status !== 'DRAFT');
@@ -644,6 +774,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       updated.recordingFileSize === null ? null : Number(updated.recordingFileSize),
     dateChanged,
     ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
+    ...(traduzione && { traduzione }),
   });
 });
 

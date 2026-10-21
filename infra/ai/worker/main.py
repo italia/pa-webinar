@@ -12,6 +12,8 @@ Environment:
     HF_TOKEN            HuggingFace access token for pyannote
     WHISPERX_VERSION    optional version label recorded on artifacts
     LLM_CONNECT_WAIT_S  attesa max per il cold-start di vLLM (default 720)
+    MT_CONNECT_WAIT_S   attesa max per l'avvio del motore di traduzione su CPU
+                        (lavoro TRANSLATE_TEXT, default 900)
 
 Risoluzione nomi: SUMMARIZE/TRANSLATE usano `claim.speakerNames`
 (diarLabel→nome reale dai Speaker del DB) per dare all'LLM e ai sottotitoli
@@ -854,6 +856,63 @@ def run_report(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         raise LavoroChiuso(f"report job not delivered by this attempt: {esito}")
 
 
+def _tempo_rimasto_s(margine: float = 300.0) -> float:
+    """Quanto resta alla scadenza del Job (WORKER_DEADLINE_S), meno un margine
+    per l'avvio del pod (la scadenza parte dalla creazione del Job) e per la
+    consegna; senza scadenza nota, senza limite."""
+    raw = os.environ.get("WORKER_DEADLINE_S")
+    try:
+        return float(raw) - (time.monotonic() - _PROCESS_STARTED) - margine if raw else float("inf")
+    except ValueError:
+        return float("inf")
+
+
+def run_translate_text(app: cli.AppClient, job: cli.ClaimResponse) -> None:
+    """Titolo e descrizione dell'evento nelle lingue chieste, con il motore di
+    traduzione su CPU, consegnati al portale come proposta."""
+    # Importato qui: solo questo lavoro lo usa.
+    from . import text_translate as ttmod
+
+    inp = job.textInput
+    if not inp:
+        raise RuntimeError("TRANSLATE_TEXT without textInput")
+    hints = job.providerHints
+
+    def passo(percent: float, message: str) -> None:
+        # Come per il resoconto: se il lavoro e' chiuso o ripreso da un altro
+        # worker, non serve continuare a tradurre.
+        risposta = app.progress(job.jobId, "RUNNING", percent=percent, message=message, attempt=job.attempts) or {}
+        if risposta.get("superseded") or risposta.get("status") in ("DONE", "FAILED"):
+            raise LavoroChiuso(
+                f"text translation job {risposta.get('status')}, taken over: {bool(risposta.get('superseded'))}"
+            )
+
+    esito = ttmod.traduci_testi(
+        inp,
+        base_url=hints.mtBaseUrl,
+        model_id=hints.mtModelId,
+        glossario=glmod.parse(hints.glossary),
+        avanzamento=passo,
+        tempo_rimasto=_tempo_rimasto_s,
+    )
+    if not esito.title and not esito.description:
+        raise RuntimeError(f"no language translated (missing: {', '.join(esito.mancanti) or 'none'})")
+    if esito.mancanti:
+        log.warning("text translation delivered without: %s", ", ".join(esito.mancanti))
+    risposta = (
+        app.deliver_text_translation(
+            job_id=job.jobId,
+            title=esito.title,
+            description=esito.description,
+            model_id=hints.mtModelId,
+            attempt=job.attempts,
+        )
+        or {}
+    )
+    if risposta.get("superseded") or risposta.get("alreadyDelivered") or risposta.get("closed"):
+        raise LavoroChiuso(f"text translation job not delivered by this attempt: {risposta}")
+
+
 def run_one() -> int:
     with cli.AppClient() as app:
         job = app.claim()
@@ -885,6 +944,8 @@ def run_one() -> int:
                 run_archive(app, job)
             elif job.kind == "REPORT":
                 run_report(app, job)
+            elif job.kind == "TRANSLATE_TEXT":
+                run_translate_text(app, job)
             elif job.kind == "SUBTITLE":
                 # SUBTITLE is satisfied by TRANSCRIBE today (it emits
                 # the source-lang VTT). If we ever decouple them this

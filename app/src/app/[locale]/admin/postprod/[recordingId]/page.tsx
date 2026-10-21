@@ -7,12 +7,14 @@ import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingManageClient from '@/components/admin/recording-manage-client';
+import { recordingTabFrom } from '@/components/admin/recording-tabs';
 import { adminPageMetadata } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ recordingId: string }>;
+  searchParams?: Promise<{ tab?: string }>;
 }
 
 /**
@@ -24,7 +26,7 @@ export function generateMetadata() {
   return adminPageMetadata('/admin/postprod/[recordingId]');
 }
 
-export default async function RecordingManagePage({ params }: PageProps) {
+export default async function RecordingManagePage({ params, searchParams }: PageProps) {
   const locale = await getLocale();
   const session = await staffOLogin(locale);
 
@@ -49,6 +51,8 @@ export default async function RecordingManagePage({ params }: PageProps) {
   }
 
   const eventTitle = getLocalized(recording.event?.title as LocalizedField, locale) || '—';
+  // La scheda chiesta dal link (`?tab=slides` dalla scheda dell'evento), se esiste.
+  const initialTab = recordingTabFrom((await searchParams)?.tab);
 
   return (
     <RecordingManageClient
@@ -62,6 +66,7 @@ export default async function RecordingManagePage({ params }: PageProps) {
       // Senza file: la trascrizione e' quella dei sottotitoli live.
       soloSottotitoli={recording.blobKey === ''}
       eventId={recording.eventId}
+      initialTab={initialTab}
     />
   );
 }

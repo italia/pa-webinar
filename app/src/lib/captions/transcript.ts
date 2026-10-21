@@ -35,6 +35,17 @@ export function registrazioneSoloSottotitoli(recording: { blobKey: string }): bo
 }
 
 /**
+ * La registrazione ha il video della sala (il mix). Non ce l'ha la
+ * registrazione «solo sottotitoli», e nemmeno il segnaposto multitraccia: il
+ * video non è stato registrato, o non è ancora arrivato (il webhook della
+ * registrazione sostituisce il segnaposto con il file quando il caricamento
+ * finisce).
+ */
+export function registrazioneConVideo(recording: { blobKey: string }): boolean {
+  return !registrazioneSoloSottotitoli(recording) && !isMultitrackPlaceholder(recording.blobKey);
+}
+
+/**
  * La registrazione ha un media a cui allineare la trascrizione: un file, o le
  * tracce multitraccia arrivate (il segnaposto nasce in diretta, il suo inizio
  * si conosce solo con il manifesto).

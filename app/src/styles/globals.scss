@@ -115,8 +115,14 @@ details > summary {
 
 // Il punto che pulsa accanto a «In diretta». Con il movimento ridotto resta
 // fermo: lo stato lo dice gia' il testo accanto.
+//
+// Le animazioni che richiamano l'attenzione (punti, aloni, pulsanti che
+// pulsano, campi da compilare) si fermano entro cinque secondi: un movimento
+// che parte da solo e dura di più va potuto fermare (WCAG 2.2.2). Restano
+// continue solo quelle che mostrano qualcosa che sta accadendo: caricamento,
+// chi sta scrivendo, il livello della voce.
 .pulse-dot {
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -272,13 +278,13 @@ html.live-call-immersive body {
 }
 
 .live-time-strip__live-core {
-  animation: live-core 2s ease-in-out infinite;
+  animation: live-core 2s ease-in-out 2;
   transform-origin: 12px 12px;
 }
 
 .live-time-strip__live-wave {
   opacity: 0.25;
-  animation: live-wave 2s ease-in-out infinite;
+  animation: live-wave 2s ease-in-out 2;
 }
 
 .live-time-strip__live-wave--2 {
@@ -321,7 +327,7 @@ html.live-call-immersive body {
     inset: 0;
     background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
     transform: translateX(-100%);
-    animation: strip-sheen 3.2s ease-in-out infinite;
+    animation: strip-sheen 3.2s ease-in-out 1;
   }
 }
 
@@ -351,7 +357,7 @@ html.live-call-immersive body {
 
 // Oltre la fine la clessidra si gira, ogni tanto.
 .live-time-strip__hourglass {
-  animation: hourglass-turn 4s ease-in-out infinite;
+  animation: hourglass-turn 4s ease-in-out 1;
 }
 
 @keyframes hourglass-turn {
@@ -376,7 +382,7 @@ html.live-call-immersive body {
       transparent 6px 12px
     );
     background-size: 34px 34px;
-    animation: strip-overtime 1.6s linear infinite;
+    animation: strip-overtime 1.6s linear 3;
   }
 }
 
@@ -447,7 +453,7 @@ html.live-call-immersive body {
 }
 
 .live-time-strip__chip--last {
-  animation: chip-last 1s ease-in-out infinite;
+  animation: chip-last 1s ease-in-out 5;
 }
 
 @keyframes chip-last {
@@ -497,11 +503,11 @@ button.live-time-strip__rec {
   border-color: transparent;
   background: #d9364f;
   box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.55);
-  animation: rec-glow 2.4s ease-out infinite;
+  animation: rec-glow 2.4s ease-out 2;
 
   .live-time-strip__rec-dot {
     background: #fff;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 
   &:hover,
@@ -612,7 +618,7 @@ button.live-time-strip__rec {
 }
 
 .presentation-timer-bar--last {
-  animation: timer-last-minute 1s ease-in-out infinite;
+  animation: timer-last-minute 1s ease-in-out 5;
 }
 
 @keyframes timer-last-minute {
@@ -711,7 +717,7 @@ button.live-time-strip__rec {
   height: 9px;
   border-radius: 50%;
   background: #d9364f;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 .control-room__rec-dot--light {
@@ -865,13 +871,6 @@ button.live-time-strip__rec {
   }
 }
 
-// Ancillary flex-children stacked above the main video area. Without
-// `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
-// these banners and eat into their legibility.
-.live-hint-banner {
-  flex-shrink: 0;
-}
-
 // Registrazione in corso: un'icona nella barra in alto, non una fascia.
 .live-rec-indicator {
   display: inline-flex;
@@ -892,7 +891,7 @@ button.live-time-strip__rec {
   height: 8px;
   border-radius: 50%;
   background: #fff;
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  animation: pulse-dot 1.5s ease-in-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -966,6 +965,928 @@ button.live-time-strip__rec {
   @media (max-width: 991.98px) {
     min-height: 0;
     height: 100%;
+  }
+}
+
+// ── PDF presentato in sala (components/presentation) ──
+//
+// La scena sta dentro `.live-main`, prima del riquadro della chiamata, che non
+// si sposta nell'albero (spostarlo ricaricherebbe l'iframe di Jitsi). Cambiano
+// solo le classi:
+//   ≥992px  `.live-main--presenting` è una riga: la presentazione si prende lo
+//           spazio, la chiamata resta in una colonna accanto, mai sotto 300px;
+//   <992px  una colonna: la presentazione in alto (metà dell'altezza), la
+//           chiamata sotto, con la sua barra dei comandi sempre raggiungibile.
+// Ridotta, la presentazione è una riga sopra la chiamata.
+
+.live-video-area {
+  min-width: 0;
+  min-height: 0;
+
+  &--beside {
+    flex: 1 1 0;
+
+    @media (min-width: 992px) {
+      flex: 0 0 clamp(300px, 34%, 560px);
+    }
+  }
+}
+
+.presentation-stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #fff;
+  color: var(--app-text);
+  border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+
+  @media (min-width: 992px) {
+    flex: 1 1 0;
+    border-bottom: 0;
+    border-right: 2px solid rgba(0, 102, 204, 0.4);
+  }
+
+  @media (max-width: 991.98px) {
+    flex: 0 0 auto;
+    height: 52%;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #0066CC;
+    outline-offset: -3px;
+  }
+
+  &--minimized {
+    flex: 0 0 auto;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-right: 0;
+    border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+
+    @media (min-width: 992px) {
+      flex: 0 0 auto;
+      border-right: 0;
+      border-bottom: 2px solid rgba(0, 102, 204, 0.4);
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    fill: var(--app-primary);
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid #E3E8EE;
+    flex-shrink: 0;
+  }
+
+  &__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--app-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__by {
+    font-size: 0.78rem;
+    margin: 0;
+    color: var(--app-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__summary {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    font-size: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.5rem;
+  }
+
+  &__summary-title {
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__summary-page {
+    color: var(--app-muted);
+  }
+
+  &__canvas-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #E3E8EE;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(23, 50, 77, 0.25);
+
+    &.is-hidden {
+      visibility: hidden;
+    }
+  }
+
+  &__status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--app-text);
+
+    .btn-outline-light {
+      color: var(--app-primary);
+      border-color: var(--app-primary);
+    }
+  }
+
+  &__spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 102, 204, 0.25);
+    border-top-color: #0066CC;
+    animation: presentation-spin 0.9s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-top: 1px solid #E3E8EE;
+    flex-shrink: 0;
+  }
+
+  &__indicator {
+    margin: 0;
+    min-width: 7.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__goto {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+
+    + .presentation-stage__btn--stop {
+      margin-left: 0;
+    }
+
+    // Su un telefono contano le frecce e la chiusura: lo spazio va alla slide.
+    @media (max-width: 575.98px) {
+      display: none;
+    }
+
+    .form-control {
+      width: 5.5rem;
+      min-height: 36px;
+      padding: 0.2rem 0.4rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #C5D0DA;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover:not(:disabled) {
+      background: #EEF4FB;
+      border-color: var(--app-primary);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      color: #8A9BAB;
+      cursor: not-allowed;
+    }
+
+    &--quiet {
+      border-color: transparent;
+    }
+
+    &--text {
+      min-width: 0;
+    }
+
+    // «Presenta tu»: il passaggio di mano, ben visibile a chi può prenderla.
+    &--take {
+      flex-shrink: 0;
+      background: var(--app-primary);
+      border-color: var(--app-primary);
+      color: #fff;
+
+      &:hover:not(:disabled) {
+        background: #004D99;
+        border-color: #004D99;
+        color: #fff;
+      }
+
+      &:disabled {
+        color: #fff;
+        opacity: 0.65;
+      }
+    }
+
+    // In fondo alla riga: dopo «Vai» per chi presenta, dopo le frecce per gli
+    // altri che possono chiudere.
+    &--stop {
+      margin-left: auto;
+      color: #A61C2E;
+      border-color: #E3A3AC;
+
+      &:hover:not(:disabled) {
+        background: #FBEDEF;
+        border-color: #A61C2E;
+      }
+    }
+  }
+
+  &__note {
+    margin: 0;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    border-top: 1px solid #E3E8EE;
+    flex-shrink: 0;
+
+    &--error {
+      color: #A61C2E;
+    }
+  }
+
+  &__text {
+    flex-shrink: 0;
+    max-height: 30%;
+    overflow-y: auto;
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.82rem;
+    border-top: 1px solid #E3E8EE;
+
+    summary {
+      cursor: pointer;
+      color: var(--app-primary);
+      font-weight: 600;
+      padding: 0.2rem 0;
+
+      &:focus-visible {
+        outline: 3px solid #0066CC;
+        outline-offset: 2px;
+      }
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      white-space: pre-line;
+      color: var(--app-text);
+    }
+  }
+}
+
+@keyframes presentation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Lingue della registrazione (components/events/language-bar) ──
+//
+// Sotto il video: una scheda per lingua con cio' che c'e' in quella lingua,
+// poi sottotitoli e audio della lingua scelta.
+.language-bar {
+  border: 1px solid #d6e3f1;
+  border-radius: 8px;
+  background: #f7faff;
+  padding: 0.75rem 1rem;
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+    margin: 0 0 0.5rem;
+  }
+
+  &__lingue {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__lingua {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    min-height: 44px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #c9d4de;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-text);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--app-primary, #0066cc);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    &.is-active {
+      border-color: var(--app-primary, #0066cc);
+      background: var(--app-primary, #0066cc);
+      color: #fff;
+
+      .language-bar__cosa {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+
+  &__nome {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  &__cosa {
+    font-size: 0.72rem;
+    color: var(--app-muted);
+  }
+
+  &__opzioni {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__interruttore {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--app-text);
+    cursor: pointer;
+
+    input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--app-primary, #0066cc);
+    }
+  }
+
+  &__audio {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__scelta {
+    min-height: 32px;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #c9d4de;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--app-text);
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    &.is-active {
+      border-color: var(--app-primary, #0066cc);
+      color: var(--app-primary, #0066cc);
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Momenti della diretta (components/events/replay-moments) ──
+//
+// Una riga per momento: il tempo (un pulsante che porta al punto del video),
+// che cosa e' successo, e per sondaggi e «In una parola» i risultati.
+.replay-moments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid #d6e3f1;
+
+  &__voce {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.6rem 0 0.6rem 0.9rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 1.05rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #9fb6cd;
+    }
+
+    &.is-current {
+      background: #f2f7fd;
+
+      &::before {
+        background: var(--app-primary, #0066cc);
+        border-color: var(--app-primary, #0066cc);
+      }
+    }
+  }
+
+  &__tempo {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    min-width: 4.2rem;
+    min-height: 32px;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #c9d4de;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--app-primary, #0066cc);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--app-primary, #0066cc);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+  }
+
+  &__corpo {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+  }
+
+  &__titolo {
+    margin: 0.15rem 0 0;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+
+  &__risposta,
+  &__nota {
+    margin: 0.3rem 0 0;
+    font-size: 0.88rem;
+    color: var(--app-text);
+  }
+
+  &__nota {
+    color: var(--app-muted);
+  }
+
+  &__risultati {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+
+    li {
+      display: grid;
+      grid-template-columns: minmax(0, 12rem) 1fr auto;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__barra {
+    height: 8px;
+    border-radius: 4px;
+    background: #e6edf4;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      background: var(--app-primary, #0066cc);
+    }
+  }
+
+  &__conto {
+    font-variant-numeric: tabular-nums;
+    color: var(--app-muted);
+  }
+
+  &__parole {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.4rem 0 0;
+
+    span {
+      padding: 0.1rem 0.5rem;
+      border: 1px solid #dee5ec;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 0.85rem;
+      color: var(--app-primary, #0066cc);
+    }
+
+    small {
+      color: var(--app-muted);
+    }
+  }
+}
+
+// ── Slide accanto alla registrazione ──
+//
+// Le pagine presentate in sala, sincronizzate con il video della pagina
+// dell'evento concluso (components/presentation/recording-slides). Superficie
+// chiara come il resto della pagina; il riquadro della slide ha le proporzioni
+// di una slide 16:9, così la pagina non salta quando la slide cambia, e una
+// slide 4:3 resta al centro con i margini.
+.recording-slides {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #fff;
+  color: var(--app-text);
+  border: 1px solid #D9E1E8;
+  border-radius: 8px;
+  overflow: hidden;
+
+  &__icon {
+    flex-shrink: 0;
+    fill: var(--app-primary);
+  }
+
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #E3E8EE;
+  }
+
+  &__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--app-text);
+  }
+
+  &__doc {
+    font-size: 0.82rem;
+    margin: 0;
+    color: var(--app-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__canvas-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #EEF1F4;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(23, 50, 77, 0.25);
+
+    &.is-hidden {
+      visibility: hidden;
+    }
+  }
+
+  &__status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--app-text);
+    background: #EEF1F4;
+  }
+
+  &__spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 102, 204, 0.25);
+    border-top-color: #0066CC;
+    animation: presentation-spin 0.9s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-top: 1px solid #E3E8EE;
+  }
+
+  &__indicator {
+    margin: 0;
+    min-width: 7rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #C5D0DA;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover:not(:disabled) {
+      background: #EEF4FB;
+      border-color: var(--app-primary);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      color: #8A9BAB;
+      cursor: not-allowed;
+    }
+
+    &--text {
+      min-width: 0;
+    }
+  }
+
+  &__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: auto;
+    min-height: 44px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-primary);
+    text-decoration: none;
+
+    .icon {
+      fill: currentColor;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: 2px;
+    }
+  }
+
+  &__text,
+  &__list {
+    padding: 0.25rem 0.75rem 0.5rem;
+    font-size: 0.85rem;
+    border-top: 1px solid #E3E8EE;
+
+    summary {
+      cursor: pointer;
+      color: var(--app-primary);
+      font-weight: 600;
+      padding: 0.35rem 0;
+
+      &:focus-visible {
+        outline: 3px solid #0066CC;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__text p {
+    max-height: 12rem;
+    overflow-y: auto;
+    margin: 0.25rem 0 0;
+    white-space: pre-line;
+    color: var(--app-text);
+  }
+
+  &__chapters {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    max-height: 16rem;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  &__chapter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.6rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: transparent;
+    color: var(--app-text);
+    text-align: left;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      background: #EEF4FB;
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066CC;
+      outline-offset: -3px;
+    }
+
+    &.is-current {
+      border-left-color: var(--app-primary);
+      background: #EEF4FB;
+      font-weight: 600;
+    }
+  }
+
+  &__chapter-time {
+    color: var(--app-primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 3.5rem;
+  }
+
+  &__chapter-doc {
+    flex-basis: 100%;
+    padding-left: 4.1rem;
+    color: var(--app-muted);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__note {
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    border-top: 1px solid #E3E8EE;
+  }
+}
+
+// Il pannello dello staff: l'elenco dei motivi per cui le slide si vedono o no.
+.recording-slides-admin__status {
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  color: var(--app-text);
+
+  li + li {
+    margin-top: 0.25rem;
+  }
+
+  &:empty {
+    display: none;
   }
 }
 
@@ -1134,6 +2055,12 @@ button.live-time-strip__rec {
 // Drawer. Always `position: fixed`; slides in from the right on desktop
 // and from the bottom on mobile. Closed state = translated off-screen
 // (no tab strip peek anymore — the floating bar is the launcher).
+// Il cassetto riceve il fuoco quando si apre (sul telefono): è un contenitore,
+// non un comando, e il bordo del fuoco lo vedono i suoi controlli.
+.live-sidebar:focus {
+  outline: none;
+}
+
 .live-sidebar {
   background: #ffffff;
   width: 100%;
@@ -1948,7 +2875,7 @@ button.live-time-strip__rec {
   // and stays persistently visible in tile view — otherwise the overlay sat
   // right on top of those controls and blocked their clicks.
   bottom: 88px;
-  // #7: the custom bar sits BOTTOM-LEFT (not centre) so it can NEVER overlap
+  // The custom bar sits BOTTOM-LEFT (not centre) so it can NEVER overlap
   // Jitsi's native bottom-centre control bar. It only renders in CUSTOM
   // reactions mode (NATIVE mode uses Jitsi's own toolbar reactions button).
   // Still lifted above the toolbar band and pointer-events:none on the
@@ -2125,7 +3052,7 @@ button.live-time-strip__rec {
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, #fff 0%, #E3EEF9 100%);
     box-shadow: 0 10px 24px -12px rgba(0, 102, 204, 0.45), 0 0 0 6px rgba(0, 102, 204, 0.05);
-    animation: chat-empty-float 4s ease-in-out infinite;
+    animation: chat-empty-float 4s ease-in-out 1;
 
     .icon { fill: #0066CC; }
 
@@ -3578,6 +4505,17 @@ button.live-time-strip__rec {
     .form-select { font-size: 0.82rem; }
   }
 
+  // Presentare alla sala il PDF appena caricato.
+  &__present-after {
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+  }
+
+  // Alla sala si presenta solo un PDF: il promemoria sotto la scelta del file.
+  &__present-hint {
+    margin: 4px 0 0;
+  }
+
   &__label {
     display: block;
     margin-bottom: 2px;
@@ -3761,6 +4699,52 @@ button.live-time-strip__rec {
     line-height: 1.4;
     color: #17324D;
     font-variant-numeric: tabular-nums;
+  }
+
+  // La presentazione in sala (components/presentation): il materiale che la
+  // sala sta guardando e, a chi conduce o interviene, il comando per
+  // presentarlo o chiuderlo.
+  &__present {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  // Slide in un altro formato: per presentarle serve il PDF.
+  &__present-hint {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #5C6F82;
+  }
+
+  &__badge--live {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-color: #0066CC;
+    background: #E6F0FB;
+    color: #004D99;
+    font-weight: 700;
+
+    .icon { fill: currentColor; }
+  }
+
+  &__present-btn.material-panel__icon-btn {
+    padding: 0 8px;
+    border: 1px solid #C5D3E0;
+    color: #0066CC;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+
+  &__present-btn.material-panel__icon-btn--danger {
+    border-color: #E3A3AC;
+    color: #C02B43;
   }
 
   &__edit {
@@ -4253,126 +5237,6 @@ button.live-time-strip__rec {
       outline: 2px solid var(--bs-primary, #0066CC);
       outline-offset: -2px;
     }
-  }
-}
-
-// ── Event config diagram ──
-
-.event-config-diagram {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px 20px;
-  border: 1px solid #e8e8e8;
-}
-
-.diagram-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.feature-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: #F6F8FA;
-  color: var(--app-muted);
-  border: 1px solid #E8ECF0;
-
-  &__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #C9D4DE;
-    flex-shrink: 0;
-  }
-
-  &--on {
-    background: #E6F4EA;
-    color: #1B5E20;
-    border-color: #BFE2C8;
-
-    .feature-chip__dot {
-      background: #2E7D32;
-    }
-  }
-
-  &--off {
-    opacity: 0.55;
-    text-decoration: line-through;
-  }
-}
-
-.diagram-metrics {
-  background: #F8FAFE;
-  border-radius: 8px;
-  padding: 12px 14px;
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  &__title {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #17324D;
-  }
-
-  &__basis {
-    font-size: 0.72rem;
-    color: var(--app-muted);
-  }
-
-  &__bar {
-    height: 4px;
-    background: #E8ECF0;
-    border-radius: 2px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  &__bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0066CC, #4A90E2);
-    transition: width 0.3s ease;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
-  }
-}
-
-.metric-cell {
-  background: #fff;
-  border-radius: 6px;
-  padding: 8px 10px;
-  border-left: 2px solid #0066CC;
-
-  &__label {
-    font-size: 0.68rem;
-    color: var(--app-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    line-height: 1.2;
-  }
-
-  &__value {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #17324D;
-    font-variant-numeric: tabular-nums;
-    margin-top: 2px;
   }
 }
 
@@ -4972,7 +5836,7 @@ button.live-time-strip__rec {
 // class was referenced but never defined — the box sat static. Reuses the
 // arcade pulse so the "starts in" panel draws the eye as the event nears.
 .waiting-countdown--pulse {
-  animation: arcadeChipPulse 1.6s ease-in-out infinite;
+  animation: arcadeChipPulse 1.6s ease-in-out 3;
 }
 
 // ── Waiting-room DSI shell ──
@@ -6048,7 +6912,7 @@ button.live-time-strip__rec {
   inset: 0;
   border-radius: 8px;
   pointer-events: none;
-  animation: wr-cta-ring 1.8s ease-out infinite;
+  animation: wr-cta-ring 1.8s ease-out 2;
 }
 
 .wr-cta--go .wr-cta__btn {
@@ -6057,7 +6921,7 @@ button.live-time-strip__rec {
   background: linear-gradient(120deg, #007a4f 0%, #00a36c 100%) !important;
   border-color: #007a4f !important;
   color: #fff !important;
-  animation: wr-cta-breathe 1.8s ease-in-out infinite;
+  animation: wr-cta-breathe 1.8s ease-in-out 2;
 
   &::before {
     content: '';
@@ -6068,14 +6932,14 @@ button.live-time-strip__rec {
     width: 40%;
     background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
     pointer-events: none;
-    animation: wr-cta-shine 2.8s ease-in-out infinite;
+    animation: wr-cta-shine 2.8s ease-in-out 1;
   }
 }
 
 .wr-cta__arrow {
   display: inline-flex;
   margin-left: 0.6rem;
-  animation: wr-cta-arrow 1.2s ease-in-out infinite;
+  animation: wr-cta-arrow 1.2s ease-in-out 4;
 }
 
 @keyframes wr-cta-ring {
@@ -6146,6 +7010,19 @@ button.live-time-strip__rec {
   font-weight: 700;
 }
 
+// Il questionario dell'iscrizione: un gruppo come quello dei consensi. Con
+// un errore il bordo diventa rosso, e il gruppo riceve il fuoco.
+.registration-questionnaire {
+  padding: 1rem 1rem 0.75rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+}
+
+.registration-questionnaire--error {
+  border-color: #cc334d;
+  box-shadow: inset 4px 0 0 #cc334d;
+}
+
 .registration-consents__notice {
   padding: 0.6rem 0.75rem;
   border-left: 4px solid #0066cc;
@@ -6214,11 +7091,19 @@ button.live-time-strip__rec {
   object-fit: contain;
 }
 
-.event-person__logo {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 6px;
+// La foto di una persona (o le iniziali) in un cerchio: il file e' quadrato,
+// il cerchio lo disegna la pagina. Un filo chiaro la stacca dal fondo.
+.event-person__photo,
+.event-person__initials {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.event-person__photo {
+  object-fit: cover;
   background: #fff;
 }
 
@@ -6228,13 +7113,20 @@ button.live-time-strip__rec {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
   border-radius: 50%;
   background: rgba(0, 102, 204, 0.1);
   color: #004d99;
-  font-size: 0.85rem;
   font-weight: 700;
+}
+
+.event-org__initials {
+  width: 40px;
+  height: 40px;
+  font-size: 0.85rem;
+}
+
+.event-person__initials {
+  font-size: 0.95rem;
 }
 
 .event-org__name {
@@ -6255,6 +7147,278 @@ button.live-time-strip__rec {
 .event-person__org {
   color: #5a6772;
   font-size: 0.85rem;
+}
+
+// Il logo dell'ente della persona, piccolo, in riga con il nome dell'ente: un
+// nome lungo va a capo sotto il logo, non in una colonna accanto.
+.event-person__org-logo {
+  display: inline-block;
+  width: auto;
+  height: 18px;
+  max-width: 72px;
+  margin-right: 0.35rem;
+  object-fit: contain;
+  vertical-align: -4px;
+}
+
+// ── Il programma dell'incontro nella pagina pubblica: l'ora, una linea con
+// un punto per argomento, l'argomento con chi interviene e, a destra, la
+// durata. Niente timeline di Bootstrap Italia (orizzontale, a schede): qui
+// conta leggere l'ordine dall'alto in basso, anche al telefono.
+.event-programma__nota {
+  margin: 0 0 1.25rem;
+  color: #5a6772;
+  font-size: 0.875rem;
+}
+
+.event-programma__elenco {
+  // La colonna dell'ora (almeno questa larghezza) e quella della linea con i
+  // punti. L'ora e' larga quanto la piu' lunga dell'elenco: «15:30», ma anche
+  // «03:30 PM» o «03:30 μ.μ.» nelle lingue con l'orologio a 12 ore.
+  --programma-ora: 3.25rem;
+  --programma-binario: 2rem;
+  display: grid;
+  grid-template-columns:
+    minmax(var(--programma-ora), max-content) var(--programma-binario)
+    minmax(0, 1fr) auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Ogni argomento usa le colonne dell'elenco (subgrid), cosi' l'ora, il punto
+// e il testo stanno in colonna da una riga all'altra. Un browser senza
+// subgrid tiene la colonna dell'ora fissa.
+.event-programma__voce {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr) auto;
+  grid-template-columns: subgrid;
+  grid-template-areas: 'quando . corpo durata';
+  align-items: baseline;
+  padding-bottom: 1.5rem;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  // La linea, dal punto di questo argomento a quello del successivo. Linea e
+  // punto si posano sulla seconda colonna, quella del binario, qualunque sia
+  // la larghezza dell'ora: per un elemento posizionato la colonna va chiusa
+  // (2 / 3), altrimenti arriva fino al bordo.
+  &::before {
+    content: '';
+    position: absolute;
+    grid-column: 2 / 3;
+    top: calc(0.4rem + 12px);
+    bottom: -0.4rem;
+    left: calc(50% - 1px);
+    width: 2px;
+    background: #d6e3f1;
+  }
+
+  &:last-child::before {
+    display: none;
+  }
+
+  // Il punto: vuoto, pieno per l'argomento in corso.
+  &::after {
+    content: '';
+    position: absolute;
+    grid-column: 2 / 3;
+    top: 0.4rem;
+    left: calc(50% - 6px);
+    width: 12px;
+    height: 12px;
+    border: 2px solid #0066cc;
+    border-radius: 50%;
+    background: #fff;
+  }
+}
+
+// Dopo l'evento il minuto del video, che porta a quel punto: la colonna
+// dell'ora si allarga per «1:05:30» con il bordo del pulsante.
+.event-programma--indice .event-programma__elenco {
+  --programma-ora: 5rem;
+}
+
+.event-programma__previsto {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
+.event-programma__minuto {
+  white-space: nowrap;
+  min-height: 32px;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid #c9d4de;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--app-primary, #0066cc);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--app-primary, #0066cc);
+  }
+
+  &:focus-visible {
+    outline: 3px solid #0066cc;
+    outline-offset: 2px;
+  }
+}
+
+.event-programma__quando {
+  grid-area: quando;
+  color: #0066cc;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.event-programma__corpo {
+  grid-area: corpo;
+  min-width: 0;
+}
+
+.event-programma__titolo {
+  margin: 0;
+  color: #17324d;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+// «In corso», accanto all'argomento: lo stesso verde della diretta.
+.event-programma__adesso {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: #008758;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  vertical-align: 0.1em;
+}
+
+.event-programma__chi {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0;
+  min-width: 0;
+}
+
+// La foto (o le iniziali) in un cerchio, come in «Chi organizza e
+// interviene», piu' piccola.
+.event-programma__foto {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.event-programma__iniziali {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 102, 204, 0.1);
+  color: #004d99;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.event-programma__persona {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.event-programma__nome {
+  color: #17324d;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.event-programma__ente {
+  color: #5a6772;
+  font-size: 0.825rem;
+  overflow-wrap: anywhere;
+}
+
+.event-programma__durata {
+  grid-area: durata;
+  padding-left: 1rem;
+  color: #5a6772;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// In diretta: l'argomento in corso ha il punto pieno, con un alone; quelli
+// gia' discussi o saltati restano leggibili, piu' sommessi.
+.event-programma__voce--ora {
+  &::after {
+    border-color: #008758;
+    background: #008758;
+    box-shadow: 0 0 0 4px rgba(0, 135, 88, 0.18);
+  }
+
+  .event-programma__quando {
+    color: #00663f;
+  }
+}
+
+.event-programma__voce--passata {
+  &::after {
+    border-color: #8fa3b7;
+    background: #8fa3b7;
+  }
+
+  .event-programma__quando,
+  .event-programma__titolo {
+    color: #5a6772;
+  }
+}
+
+// Al telefono la durata va sotto l'ora, e l'argomento ha tutta la riga.
+@media (max-width: 575.98px) {
+  .event-programma__elenco {
+    --programma-ora: 3rem;
+    --programma-binario: 1.75rem;
+    grid-template-columns:
+      minmax(var(--programma-ora), max-content) var(--programma-binario)
+      minmax(0, 1fr);
+  }
+
+  .event-programma__voce {
+    grid-template-columns: var(--programma-ora) var(--programma-binario) minmax(0, 1fr);
+    grid-template-columns: subgrid;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'quando . corpo'
+      'durata . corpo';
+    align-items: start;
+  }
+
+  .event-programma__durata {
+    padding-left: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    text-align: right;
+  }
 }
 
 .registration-when {
@@ -6410,7 +7574,8 @@ button.live-time-strip__rec {
     inset: -4px;
     border-radius: 50%;
     border: 2px solid rgba(217, 54, 79, 0.45);
-    animation: wr-ripple 1.8s ease-out infinite;
+    // Finita l'onda, l'anello resta com'è all'ultimo fotogramma: invisibile.
+    animation: wr-ripple 1.8s ease-out 2 forwards;
   }
 }
 
@@ -6681,18 +7846,18 @@ button.live-time-strip__rec {
 // Il richiamo sta sulla linea del campo (Bootstrap Italia disegna solo il
 // bordo inferiore): si ispessisce e si colora, senza riquadri attorno.
 .wr-name-field--empty .form-control {
-  animation: wr-name-line 1.8s ease-in-out infinite;
+  animation: wr-name-line 1.8s ease-in-out 2;
 }
 
 .wr-name-field--empty label {
-  animation: wr-name-label 1.8s ease-in-out infinite;
+  animation: wr-name-label 1.8s ease-in-out 2;
 }
 
 .wr-name-field--insist {
   animation: wr-name-nudge 0.4s ease-in-out;
 
   .form-control {
-    animation: wr-name-line-amber 1.2s ease-in-out infinite;
+    animation: wr-name-line-amber 1.2s ease-in-out 4;
   }
 }
 
@@ -7172,7 +8337,7 @@ button.live-time-strip__rec {
 
 .wr-piazza-card__art {
   flex-shrink: 0;
-  animation: wr-art-float 4s ease-in-out infinite;
+  animation: wr-art-float 4s ease-in-out 1;
 }
 
 .wr-piazza-card__text {
@@ -7266,7 +8431,7 @@ button.live-time-strip__rec {
     height: 7px;
     border-radius: 50%;
     background: currentColor;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 }
 
@@ -7464,7 +8629,7 @@ button.live-time-strip__rec {
   box-sizing: content-box;
   animation:
     tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
-    tab-badge-halo 1.6s ease-out 0.45s infinite;
+    tab-badge-halo 1.6s ease-out 0.45s 2;
 }
 
 .live-sidebar-tab__badge.is-alert {
@@ -7485,7 +8650,7 @@ button.live-time-strip__rec {
 
 .live-sidebar-tab__dot,
 .live-floating-btn__dot {
-  animation: tab-badge-halo 1.6s ease-out infinite;
+  animation: tab-badge-halo 1.6s ease-out 3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7887,7 +9052,7 @@ html.live-resizing .live-sidebar-resizer::after {
   color: #3D2600;
   animation:
     tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
-    tab-badge-halo-mention 1.4s ease-out 0.45s infinite;
+    tab-badge-halo-mention 1.4s ease-out 0.45s 3;
 }
 
 @keyframes tab-badge-halo-mention {
@@ -8053,7 +9218,7 @@ html.live-resizing .live-sidebar-resizer::after {
     height: 7px;
     border-radius: 50%;
     background: currentColor;
-    animation: pulse-dot 1.5s ease-in-out infinite;
+    animation: pulse-dot 1.5s ease-in-out 3;
   }
 }
 
@@ -8549,7 +9714,7 @@ html.live-resizing .live-sidebar-resizer::after {
   height: 10px;
   border-radius: 50%;
   background: #0066CC;
-  animation: agenda-pulse 1.8s ease-in-out infinite;
+  animation: agenda-pulse 1.8s ease-in-out 2;
 }
 
 @keyframes agenda-pulse {
@@ -8830,7 +9995,7 @@ html.live-resizing .live-sidebar-resizer::after {
   border-radius: 50%;
   background: #7FD6A8;
   box-shadow: 0 0 0 0 rgba(127, 214, 168, 0.6);
-  animation: agenda-ticker-dot 1.8s ease-in-out infinite;
+  animation: agenda-ticker-dot 1.8s ease-in-out 2;
 }
 
 @keyframes agenda-ticker-dot {
@@ -10125,6 +11290,41 @@ html.live-resizing .live-sidebar-resizer::after {
   }
 }
 
+// Sotto le quattro domande, le alternative: i modelli e la videochiamata al
+// volo, in righe sobrie dello stesso peso.
+.formato__modelli {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.formato-alternativa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.formato-alternativa__testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.formato-alternativa__titolo {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.formato-alternativa__desc {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
 // ── L'evento in righe con un'icona ciascuna: l'anteprima del formato e quella
 // del riepilogo.
 .anteprima-righe {
@@ -10183,18 +11383,6 @@ html.live-resizing .live-sidebar-resizer::after {
   vertical-align: baseline;
 }
 
-.anteprima-evento__avviso {
-  display: inline-flex;
-  align-items: center;
-  margin: 0.25rem 0 0;
-  text-decoration: none;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #8a5300;
-
-  .icon { fill: #8a5300; }
-}
-
 .anteprima-chip-elenco {
   display: flex;
   flex-wrap: wrap;
@@ -10220,6 +11408,739 @@ html.live-resizing .live-sidebar-resizer::after {
   background: #eef4fb;
   color: var(--app-text);
   font-size: 0.9rem;
+}
+
+// ── Le chiamate rapide: filtri come nell'elenco degli eventi, una riga per
+// chiamata con i dati e i due link da copiare.
+.chiamate-filtri {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #f5f7fb;
+
+  .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+}
+
+.chiamate-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.chiamate-barra__conta {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.chiamate-vuoto {
+  padding: 2.5rem 1rem;
+  border-radius: 8px;
+  background: #f5f7fb;
+  text-align: center;
+  color: var(--app-muted);
+
+  .icon { fill: var(--app-muted); }
+}
+
+.chiamate-elenco {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chiamata {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 8px;
+  background: #fff;
+
+  @media (min-width: 992px) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.chiamata--scelta {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 1px var(--app-primary);
+}
+
+.chiamata__scelta {
+  margin-top: 0.3rem;
+}
+
+.chiamata__corpo {
+  min-width: 0;
+}
+
+.chiamata__testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+
+.chiamata__titolo {
+  font-weight: 700;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.chiamata__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: #eef1f4;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--app-muted);
+}
+
+.chiamata__stato--live {
+  background: #fde8e8;
+  color: #a61919;
+}
+
+.chiamata__punto {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #d1344c;
+}
+
+.chiamata__stato--pausa {
+  background: #fff1dc;
+  color: var(--app-warning-text);
+}
+
+.chiamata__stato--rec {
+  background: #e3f4ec;
+  color: #00704a;
+}
+
+.chiamata__dati {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  svg { width: 14px; height: 14px; }
+  .icon { fill: var(--app-muted); }
+}
+
+.chiamata__link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  grid-column: 2;
+
+  @media (min-width: 992px) {
+    grid-column: auto;
+    justify-content: flex-end;
+  }
+}
+
+// La videochiamata al volo, dal pulsante «Nuova chiamata».
+.chiamata-nuova {
+  max-width: 48rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chiamata-nuova__testa {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.chiamata-nuova__icona {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e6eff8;
+
+  .icon { fill: var(--app-primary); }
+}
+
+.chiamata-nuova__titolo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.chiamata-nuova__sottotitolo {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+}
+
+.chiamata-nuova__nota {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+// ── La capacita' di un evento: le scelte che contano, quanto riceve e manda
+// ciascuno, quanto del ponte video si usa (con un livello detto a parole) e le
+// ipotesi della stima. Il colore accompagna il testo, non lo sostituisce.
+.capacita {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.capacita__intro {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--app-muted);
+}
+
+.capacita__ingressi {
+  display: grid;
+  gap: 1rem;
+}
+
+.capacita__attesi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.4rem;
+  margin: 0;
+  color: var(--app-text);
+}
+
+.capacita__attesi-numero {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.capacita__iscritti {
+  color: var(--app-muted);
+}
+
+// «Cambia»: un collegamento a misura di dito, nella riga del testo.
+.capacita__cambia {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.capacita__quota {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.capacita__domanda {
+  float: none;
+  margin-bottom: 0.5rem;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__profili {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capacita__profilo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #b9d0e8;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-primary);
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:has(input:checked) {
+    border-color: var(--app-primary);
+    background: var(--app-primary);
+    color: #fff;
+
+    .capacita__pct { color: #fff; }
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--app-primary);
+    outline-offset: 2px;
+  }
+
+  &:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.capacita__pct {
+  margin-left: 0.35rem;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
+.capacita__altro {
+  margin-top: 0.75rem;
+  max-width: 18rem;
+
+  .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+}
+
+.capacita__nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.capacita__impostazioni {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #f2f6fa;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  // Bootstrap Italia da' alle liste una misura propria: qui vale quella del
+  // riquadro.
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: inherit;
+    line-height: 1.5;
+  }
+
+  li {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.3rem;
+    min-height: 1.75rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--app-text);
+  }
+}
+
+.capacita__impostazioni-titolo {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__modifica {
+  margin: 0.5rem 0 0;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+  }
+}
+
+.capacita__titolo {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.capacita__schede {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.capacita__scheda {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  background: #fff;
+
+  .capacita__titolo { margin-bottom: 0.25rem; }
+}
+
+.capacita__icona {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.4rem;
+  border-radius: 50%;
+  background: #e6eff8;
+
+  .icon { fill: var(--app-primary); }
+}
+
+.capacita__valore {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text);
+}
+
+.capacita__cosa {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__dettaglio {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+// Il ponte: il bordo a sinistra e il riempimento della barra hanno il colore
+// del livello; il livello e' sempre detto anche a parole, con la sua icona.
+.capacita__ponte {
+  --capacita-livello: #008055;
+  padding: 1rem 1.1rem;
+  border: 1px solid #d9e2ea;
+  border-left: 4px solid var(--capacita-livello);
+  border-radius: 8px;
+  background: #fff;
+
+  p { margin: 0 0 0.6rem; }
+}
+
+.capacita__ponte--attenzione { --capacita-livello: #b56b00; }
+.capacita__ponte--limite { --capacita-livello: #c4321c; }
+.capacita__ponte--nonBasta { --capacita-livello: #a61919; }
+
+.capacita__ponte-testa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.4rem;
+
+  .capacita__titolo { margin: 0; }
+}
+
+.capacita__livello {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  .icon { width: 1.1rem; height: 1.1rem; }
+}
+
+.capacita__livello--ampio { border-color: #8cc8ad; background: #e8f5ef; color: #005c3d; .icon { fill: #005c3d; } }
+.capacita__livello--attenzione { border-color: #e3b25c; background: #fff4e0; color: #6e4300; .icon { fill: #6e4300; } }
+.capacita__livello--limite { border-color: #eba59a; background: #fdecea; color: #8a1f11; .icon { fill: #8a1f11; } }
+.capacita__livello--nonBasta { border-color: #e08a8a; background: #fbe4e4; color: #7d1111; .icon { fill: #7d1111; } }
+
+.capacita__uso {
+  font-size: 1rem;
+  color: var(--app-text);
+}
+
+// La barra: le etichette delle soglie sopra i segni; sotto i 576px, dove si
+// sovrapporrebbero, una legenda sotto la barra al loro posto.
+.capacita__barra-segni {
+  position: relative;
+  height: 1.3rem;
+
+  @media (max-width: 575.98px) { display: none; }
+}
+
+.capacita__segno-testo {
+  position: absolute;
+  bottom: 0.15rem;
+  padding-left: 0.3rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: var(--app-muted);
+  border-left: 1px dashed #6b7f8f;
+}
+
+.capacita__segno-testo--prima {
+  padding: 0 0.3rem 0 0;
+  border-left: 0;
+  border-right: 1px dashed #6b7f8f;
+}
+
+.capacita__barra {
+  position: relative;
+  height: 0.85rem;
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6edf4;
+}
+
+.capacita__riempimento {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--capacita-livello);
+}
+
+.capacita__segno {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #3d5466;
+}
+
+.capacita__barra-legenda {
+  display: none;
+  margin: -0.2rem 0 0.6rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--app-muted);
+
+  li { display: inline; }
+  li + li::before { content: ' · '; }
+
+  @media (max-width: 575.98px) { display: block; }
+}
+
+.capacita__spiega {
+  font-size: 0.9rem;
+  color: var(--app-text);
+}
+
+.capacita__suggerimento {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.capacita__risorse {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 0;
+
+  > div {
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    background: #f2f6fa;
+  }
+
+  dt {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--app-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--app-text);
+  }
+}
+
+.capacita__istanza {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9e2ea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--app-text);
+}
+
+.capacita__come {
+  summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--app-primary);
+    cursor: pointer;
+  }
+}
+
+.capacita__ipotesi {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+
+  th {
+    width: 38%;
+    font-weight: 600;
+    color: var(--app-text);
+  }
+
+  td { color: var(--app-text); }
+
+  @media (max-width: 575.98px) {
+    th, td { display: block; width: auto; }
+    th { border-bottom: 0; padding-bottom: 0; }
+  }
+}
+
+// La riga della capacita' nel riepilogo del wizard: informativa, o un avviso
+// da «attenzione» in su.
+.capacita__riepilogo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
+
+  .icon { flex-shrink: 0; margin-top: 0.1rem; fill: var(--app-muted); }
+}
+
+.capacita__riepilogo--avviso {
+  font-weight: 600;
+  color: #6e4300;
+
+  .icon { fill: #6e4300; }
+}
+
+.capacita__riepilogo-link {
+  font-size: inherit;
+  font-weight: 600;
+  vertical-align: baseline;
+}
+
+// ── Le azioni del wizard: la barra si ferma in fondo allo schermo mentre si
+// scorre il passo, con i pulsanti uno accanto all'altro a destra (non ai due
+// capi della pagina). A sinistra lo stato del salvataggio.
+.wizard-azioni {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #e8e8e8;
+  background: #fff;
+  box-shadow: 0 -8px 12px -10px rgba(23, 50, 77, 0.25);
+}
+
+.wizard-azioni__stato {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.wizard-azioni__pulsanti {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+// Il campo che riceve il fuoco non finisce sotto la barra (WCAG 2.4.11).
+html:has(.wizard-azioni) {
+  scroll-padding-bottom: 6rem;
+}
+
+// ── Una categoria nuova dal wizard, sotto quelle che ci sono.
+.nuova-etichetta {
+  margin-top: 0.75rem;
+}
+
+.nuova-etichetta__campo {
+  max-width: 34rem;
+
+  .form-control {
+    flex: 1 1 14rem;
+    width: auto;
+  }
+}
+
+.nuova-etichetta__apri {
+  border-radius: 20px;
+}
+
+.nuova-etichetta__gestisci {
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 // Il ritorno al riepilogo da un dettaglio (Persone, Permessi, Contenuti).
@@ -10284,12 +12205,12 @@ html.live-resizing .live-sidebar-resizer::after {
 .wizard-campo--vuoto {
   .form-control,
   textarea {
-    animation: wizard-campo-anello 1.8s ease-in-out infinite;
+    animation: wizard-campo-anello 1.8s ease-in-out 2;
   }
 
   label,
   .form-label {
-    animation: wr-name-label 1.8s ease-in-out infinite;
+    animation: wr-name-label 1.8s ease-in-out 2;
   }
 }
 
@@ -10299,7 +12220,7 @@ html.live-resizing .live-sidebar-resizer::after {
   .form-control,
   textarea {
     border-color: #c27700 !important;
-    animation: wizard-campo-anello-ambra 1.2s ease-in-out infinite;
+    animation: wizard-campo-anello-ambra 1.2s ease-in-out 4;
   }
 
   .invalid-feedback,
@@ -10364,6 +12285,144 @@ html.live-resizing .live-sidebar-resizer::after {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--app-text);
+}
+
+// ── I questionari accanto a cio' che si chiede all'iscrizione: una riga per
+// momento (prima, dopo), con le domande da aprire e «Modifica».
+.wizard-questionari {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e6edf4;
+}
+
+.wizard-questionari__righe {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-questionari__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.4rem 0;
+  font-size: 0.92rem;
+  color: var(--app-text);
+
+  > details,
+  > .wizard-questionari__testo {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+}
+
+.wizard-questionari__modifica {
+  font-weight: 600;
+}
+
+// ── «Vedi le domande»: un questionario in sola lettura, come lo leggera'
+// chi risponde.
+.anteprima-domande {
+  margin-top: 0.75rem;
+
+  > summary {
+    cursor: pointer;
+    width: fit-content;
+    font-weight: 600;
+    color: var(--app-primary);
+  }
+
+  &[open] > summary {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.anteprima-domande--riga {
+  margin-top: 0;
+
+  > summary {
+    width: auto;
+    font-weight: 400;
+    color: var(--app-text);
+  }
+}
+
+.anteprima-domande__momento + .anteprima-domande__momento {
+  margin-top: 1rem;
+}
+
+.anteprima-domande__titolo {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.elenco-domande {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e6edf4;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.elenco-domande__gruppo + .elenco-domande__gruppo {
+  margin-top: 0.75rem;
+}
+
+.elenco-domande__fonte {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--app-muted);
+}
+
+.elenco-domande__lista {
+  margin: 0;
+  padding-left: 1.4rem;
+
+  > li + li {
+    margin-top: 0.5rem;
+  }
+}
+
+.elenco-domande__testo {
+  display: block;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.elenco-domande__tipo {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--app-muted);
+}
+
+.elenco-domande__opzioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid #d9e2ea;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.82rem;
+    color: var(--app-text);
+  }
+}
+
+.elenco-domande__vuoto {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--app-muted);
 }
 
 .wizard-iscrizione__avviso {
@@ -10507,7 +12566,7 @@ html.live-resizing .live-sidebar-resizer::after {
   color: #a1253b;
 }
 
-// Ente, logo e pagina pubblica dell'organizzatore principale, ripiegati.
+// Foto, ente, logo e pagina pubblica dell'organizzatore principale, ripiegati.
 .wizard-primary__more > summary {
   cursor: pointer;
   color: var(--app-primary);
@@ -10593,9 +12652,302 @@ html.live-resizing .live-sidebar-resizer::after {
   color: var(--app-primary);
 }
 
+// La foto di una persona (o le sue iniziali) in un cerchio: wizard e
+// anteprima della pagina. Il file e' quadrato, il cerchio e' solo qui.
+.person-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d9e3ee;
+}
+
+.person-avatar--iniziali {
+  background: rgba(0, 102, 204, 0.1);
+  color: #004d99;
+  font-weight: 700;
+}
+
+// La foto nel wizard: il cerchio, il titolo, l'aiuto e i pulsanti.
+.person-photo-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.person-photo-field__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.person-photo-field__title {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.person-photo-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+// Nella riga di una persona gia' in elenco: pulsanti leggeri, come «Cambia il
+// logo dell'ente» accanto.
+.person-photo-field__actions--riga {
+  gap: 0.25rem 0.75rem;
+  margin-top: 0;
+
+  .btn {
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    text-decoration: underline;
+  }
+}
+
+.person-photo-field__msg--ok {
+  color: #00663f;
+}
+
+.person-photo-field__msg--errore {
+  color: #a1112e;
+  font-weight: 600;
+}
+
+// Nella riga di una persona gia' in elenco: la foto accanto al nome.
+.wizard-person__chi {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
 .wizard-group--static {
   > .wizard-group__body {
     padding: 1rem;
+  }
+}
+
+// ── Il programma nel passo «Programma» del wizard: una riga per argomento
+// con l'ora calcolata, l'argomento, chi interviene, i minuti e i comandi.
+.wizard-programma__nota {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: #0066cc;
+  }
+}
+
+.wizard-programma__intestazione,
+.wizard-programma__voce {
+  display: grid;
+  // L'ultima colonna e' larga quanto i tre comandi: l'intestazione, che non
+  // li ha, resta allineata alle righe.
+  grid-template-columns: 3rem minmax(0, 1fr) minmax(10rem, 15rem) 4.5rem 6.5rem;
+  gap: 0.25rem 0.75rem;
+}
+
+.wizard-programma__intestazione {
+  // Il bordo delle righe: un pixel in piu' per lato.
+  padding: 0 calc(0.75rem + 1px) 0.35rem;
+  color: #455b71;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.wizard-programma {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-programma__voce {
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.wizard-programma__ora {
+  color: #0066cc;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wizard-programma__argomento,
+.wizard-programma__chi,
+.wizard-programma__min {
+  min-width: 0;
+}
+
+// Le etichette dei campi: sugli schermi larghi le dice l'intestazione, e qui
+// restano per le tecnologie assistive.
+.wizard-programma__etichetta {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #455b71;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.wizard-programma__comandi {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.wizard-programma__comando {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #c5d0db;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: none;
+
+  .icon {
+    fill: #0066cc;
+  }
+
+  &:hover:not(:disabled) {
+    background: #f2f7fc;
+  }
+
+  &:disabled {
+    border-color: #c5d0db;
+    box-shadow: none;
+    opacity: 0.35;
+  }
+}
+
+.wizard-programma__comando--togli .icon {
+  fill: #a1112e;
+}
+
+.wizard-programma__nascosto {
+  grid-column: 2 / -1;
+  margin: 0;
+  color: #5a6772;
+  font-size: 0.8rem;
+}
+
+.wizard-programma__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.wizard-programma__incolla {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+  background: #f5f7fb;
+}
+
+.wizard-programma__totale {
+  margin-top: 1rem;
+  color: #3d4955;
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+// Fino ai 1200 px il modulo ha tutta la larghezza: le etichette le dice
+// l'intestazione delle colonne. Oltre, il passo ha l'anteprima accanto e le
+// righe vanno a capo come sugli schermi stretti (sotto), con le etichette.
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .wizard-programma__etichetta {
+    @include visually-hidden;
+  }
+}
+
+// Ogni riga va a capo: l'ora a sinistra, poi l'argomento, chi interviene, e
+// i minuti con i comandi sulla stessa riga. Sugli schermi stretti, e nella
+// colonna del modulo accanto all'anteprima (niente container query: il
+// minificatore le ha gia' rovinate una volta).
+@mixin wizard-programma-a-capo {
+  .wizard-programma__intestazione {
+    display: none;
+  }
+
+  .wizard-programma__voce {
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'ora argomento argomento'
+      '. chi chi'
+      '. min comandi'
+      '. nascosto nascosto';
+    align-items: end;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .wizard-programma__ora {
+    grid-area: ora;
+    align-self: end;
+    padding-bottom: 0.4rem;
+  }
+
+  .wizard-programma__argomento {
+    grid-area: argomento;
+  }
+
+  .wizard-programma__chi {
+    grid-area: chi;
+  }
+
+  .wizard-programma__min {
+    grid-area: min;
+
+    .form-control {
+      max-width: 6rem;
+    }
+  }
+
+  .wizard-programma__comandi {
+    grid-area: comandi;
+    padding-bottom: 0.15rem;
+  }
+
+  .wizard-programma__nascosto {
+    grid-area: nascosto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  @include wizard-programma-a-capo;
+}
+
+@media (min-width: 1200px) {
+  .wizard-con-anteprima {
+    @include wizard-programma-a-capo;
   }
 }
 
@@ -11545,6 +13897,13 @@ html.live-resizing .live-sidebar-resizer::after {
   color: var(--app-muted);
   font-style: italic;
 }
+// Nell'anteprima ridotta (solo sugli schermi larghi) la copertina ha la forma
+// che ha nella pagina vera sullo stesso schermo (la fascia di .event-cover,
+// calcolata in lib/events/cover-band), non un riquadro 16:9.
+.anteprima-pagina__ridotta .event-cover {
+  aspect-ratio: var(--fascia-copertina, 1140 / 340);
+  max-height: none;
+}
 
 // ── Ritaglio di un'immagine prima del caricamento ──────────────────────────
 .ritaglio-immagine__testo {
@@ -11577,6 +13936,67 @@ html.live-resizing .live-sidebar-resizer::after {
     pointer-events: none;
   }
 }
+// Il riquadro quadrato (la foto di una persona): stretto e al centro, per
+// restare dentro lo schermo anche in orizzontale.
+.ritaglio-immagine__cornice--stretta {
+  max-width: min(100%, 22rem);
+  margin-inline: auto;
+}
+// Il cerchio in cui la pagina mostra la foto: gli angoli fuori dal cerchio si
+// scuriscono, il bordo bianco segna dove finisce. Solo un'indicazione: il
+// file resta quadrato.
+.ritaglio-immagine__maschera {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(23, 50, 77, 0.55);
+  outline: 2px solid #fff;
+}
+// Sotto il riquadro, la fascia della pagina dell'evento sugli schermi larghi:
+// stesso disegno di .event-cover (immagine intera al centro, lati sfumati).
+.ritaglio-immagine__fascia-blocco {
+  margin: 0.75rem 0 0;
+}
+.ritaglio-immagine__fascia {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #e8f0fe;
+}
+.ritaglio-immagine__fascia-sfondo {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  filter: blur(28px) saturate(0.9);
+  opacity: 0.55;
+  transform: scale(1.15);
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+  }
+}
+.ritaglio-immagine__fascia-finestra {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+  }
+}
 .ritaglio-immagine__nota {
   font-size: 0.85rem;
   color: var(--app-muted);
@@ -11597,16 +14017,6 @@ html.live-resizing .live-sidebar-resizer::after {
   .form-range {
     flex: 1;
   }
-}
-
-// L'anteprima di un'immagine con formato richiesto: il riquadro delle schede.
-.file-or-url-input__riquadro {
-  display: block;
-  width: 100%;
-  max-width: 20rem;
-  object-fit: cover;
-  border-radius: 4px;
-  background: #e8f0fe;
 }
 
 // ── Copertina della pagina dell'evento ─────────────────────────────────────
@@ -11765,5 +14175,645 @@ html.live-resizing .live-sidebar-resizer::after {
   &:hover,
   &:focus-visible {
     text-decoration: underline;
+  }
+}
+
+// ── Campo «file o link» (components/ui/file-or-url-input) ──────────────────
+// Un riquadro che e' anche la zona di rilascio (la copertina, nella forma del
+// formato richiesto) o una riga compatta con la miniatura (loghi, favicon,
+// audio, documenti), e sotto il link. Solo tema chiaro.
+.campo-file {
+  --campo-file-bordo: #99c2eb;
+  --campo-file-fondo: #f2f7fc;
+  --campo-file-errore: #a1112e;
+  --campo-file-linea: #d1d9e0;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+}
+.campo-file__etichetta {
+  display: block;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__aiuto {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.875rem;
+  color: var(--app-muted);
+}
+.campo-file__zona {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+  padding: 1rem;
+  border: 2px dashed var(--campo-file-bordo);
+  border-radius: 4px;
+  background: var(--campo-file-fondo);
+  text-align: center;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  &.is-cliccabile {
+    cursor: pointer;
+  }
+  &.is-cliccabile:hover,
+  &.is-sopra {
+    border-color: var(--app-primary);
+  }
+  &.is-sopra {
+    border-style: solid;
+    background: #e3eefa;
+  }
+  &.is-errore {
+    border-color: #cc334d;
+  }
+  &.is-occupato {
+    cursor: progress;
+  }
+}
+// La forma del formato richiesto; se il testo non ci sta (una finestra
+// stretta), il riquadro si allunga invece di tagliarlo.
+.campo-file__zona--riquadro {
+  width: 100%;
+  max-width: 30rem;
+}
+// Pieno: l'immagine riempie il riquadro, il bordo diventa una linea sottile.
+.campo-file__zona--piena {
+  border: 1px solid var(--campo-file-linea);
+  background: #fff;
+}
+.campo-file__zona--riquadro.campo-file__zona--piena {
+  overflow: hidden;
+  padding: 0;
+  background: #e8f0fe;
+}
+.campo-file__zona--avviso {
+  border: 2px solid #e0b46b;
+  background: #fff8ec;
+}
+.campo-file__zona--segnaposto {
+  border: 1px solid var(--campo-file-linea);
+  background: #f5f7f9;
+}
+// Il velo che riceve il trascinamento: vuoto, sopra tutto il riquadro.
+.campo-file__cattura {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.campo-file__vuoto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.campo-file__immagine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.campo-file__immagine--attesa {
+  opacity: 0.45;
+}
+// Sopra l'immagine mentre si carica (o mentre ci si trascina un file nuovo).
+.campo-file__velo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+.campo-file__progresso {
+  width: 60%;
+  height: 6px;
+  background: #fff;
+}
+.campo-file__velo-testo {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__annulla {
+  background: #fff;
+}
+.campo-file__titolo {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+.campo-file__titolo--avviso {
+  color: var(--app-warning-text);
+}
+.campo-file__icona-avviso {
+  fill: var(--app-warning-text);
+}
+.campo-file__oppure {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.campo-file__formati {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--app-muted);
+}
+.campo-file__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  max-width: 30rem;
+  margin-top: 0.5rem;
+}
+.campo-file__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.35rem;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.campo-file__nome {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 600;
+  color: var(--app-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.campo-file__nome {
+  color: var(--app-primary);
+}
+.campo-file__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.campo-file__rimuovi {
+  text-decoration: none;
+}
+.campo-file__errore {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--campo-file-errore);
+
+  > .icon {
+    flex: none;
+    margin-top: 0.15rem;
+  }
+  > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+.campo-file__riprova {
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}
+.campo-file__nota {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+// La riga compatta: miniatura, testo, azioni; sotto i 30rem le azioni vanno a
+// capo, a tutta larghezza.
+.campo-file__zona--compatta {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+
+  .campo-file__formati {
+    margin: 0;
+  }
+  .campo-file__progresso {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+  .campo-file__annulla {
+    background: transparent;
+  }
+}
+.campo-file__miniatura {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 56px;
+  overflow: hidden;
+  border: 1px solid var(--campo-file-linea);
+  border-radius: 4px;
+  background: #fff;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+// Un logo trasparente resta visibile su una scacchiera chiara.
+.campo-file__miniatura--scacchi {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eef1f4 25%, transparent 25%, transparent 75%, #eef1f4 75%),
+    linear-gradient(45deg, #eef1f4 25%, transparent 25%, transparent 75%, #eef1f4 75%);
+  background-position: 0 0, 6px 6px;
+  background-size: 12px 12px;
+}
+.campo-file__testo {
+  display: flex;
+  flex: 1 1 10rem;
+  flex-direction: column;
+  min-width: 0;
+}
+.campo-file__audio {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin-top: 0.5rem;
+}
+.campo-file__link {
+  max-width: 30rem;
+  margin-top: 0.75rem;
+}
+.campo-file--compatta .campo-file__link {
+  max-width: none;
+}
+.campo-file__link-etichetta {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+.campo-file__link-campo {
+  position: relative;
+}
+.campo-file__link-icona {
+  position: absolute;
+  top: 50%;
+  left: 0.6rem;
+  transform: translateY(-50%);
+  fill: var(--app-muted);
+  pointer-events: none;
+}
+.campo-file .campo-file__input {
+  min-height: 2.75rem;
+  padding-left: 2rem;
+}
+.campo-file .campo-file__input--avviso:not(:focus) {
+  border-color: #e0b46b;
+}
+// Su un telefono non si trascina: restano il pulsante e i formati. Lo
+// nasconde il CSS, cosi' server e browser disegnano lo stesso campo.
+@media (hover: none) and (pointer: coarse) {
+  .campo-file__trascina {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campo-file__zona,
+  .campo-file .progress-bar {
+    transition: none;
+  }
+}
+
+// ── Il passo «Programma» del wizard: lo stato, le persone da cui partire,
+// la persona nuova; la scheda nel passo «Evento» e il posto del programma
+// nell'anteprima della pagina.
+.wizard-programma__stato {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  background: #eef7f1;
+  color: #00532f;
+  font-size: 0.9rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: currentColor;
+  }
+}
+
+.wizard-programma__stato--spento {
+  background: #f2f4f7;
+  color: #3d4955;
+
+  > span {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+}
+
+.wizard-programma__stato-nota {
+  flex-basis: 100%;
+  font-size: 0.85rem;
+}
+
+.wizard-programma__blocco {
+  margin-bottom: 1.5rem;
+}
+
+.wizard-programma__sottotitolo {
+  margin: 0 0 0.5rem;
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.wizard-programma__vuoto {
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.9rem;
+}
+
+.wizard-programma__persone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+// Una persona: un pulsante grande abbastanza per il dito (44 px), con la
+// foto, il nome, il ruolo e l'azione scritta.
+.wizard-programma__persona {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  max-width: 100%;
+  padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+  border: 1px solid #c5d0db;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-text);
+  font-size: 0.875rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #0066cc;
+    background: #f2f7fc;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &[aria-expanded='true'] {
+    border-color: #0066cc;
+    background: #f2f7fc;
+  }
+}
+
+.wizard-programma__persona--nuova {
+  padding-left: 0.75rem;
+  border-style: dashed;
+}
+
+.wizard-programma__persona-testo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.wizard-programma__persona-nome {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wizard-programma__persona-ruolo {
+  color: #455b71;
+  font-size: 0.78rem;
+}
+
+.wizard-programma__persona-azione {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.2rem;
+  color: #0066cc;
+  font-weight: 600;
+
+  .icon {
+    fill: currentColor;
+  }
+}
+
+.wizard-programma__senza {
+  margin: 0 0 0.75rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+}
+
+.wizard-programma__nuova {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid #c5d0db;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+
+.wizard-programma__nuova-titolo {
+  margin: 0 0 0.5rem;
+  color: var(--app-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.wizard-programma__mostra {
+  font-size: 0.8rem;
+}
+
+// Il rimando dal passo «Persone».
+.wizard-programma__rimando {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0 0 1rem;
+  color: #3d4955;
+  font-size: 0.875rem;
+
+  .icon {
+    flex-shrink: 0;
+    fill: #0066cc;
+  }
+}
+
+// La scheda del programma nel passo «Evento», sotto la descrizione.
+.wizard-programma-scheda {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.wizard-programma-scheda__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.wizard-programma-scheda__icona {
+  flex-shrink: 0;
+  fill: #0066cc;
+}
+
+.wizard-programma-scheda__testo {
+  flex: 1 1 16rem;
+  min-width: 0;
+  color: #3d4955;
+  font-size: 0.9rem;
+}
+
+.wizard-programma-scheda__titolo {
+  margin: 0 0 0.15rem;
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+// Nell'anteprima con il programma in primo piano: la descrizione accorciata
+// a qualche riga, e il posto del programma finche' non ha argomenti.
+.anteprima-pagina__descrizione-breve {
+  max-height: 6.5em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+}
+
+.anteprima-pagina__posto-programma {
+  margin: 0 0 1rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed #c5d0db;
+  border-radius: 8px;
+  color: var(--app-muted);
+  text-align: center;
+}
+
+// ── Le lingue dell'evento nel passo «Evento»: la riga delle lingue con la
+// scelta, le schede di titolo e descrizione con lo stato scritto sotto il
+// nome (mai il solo colore), l'avviso dentro la scheda, e nella pagina
+// pubblica l'avviso del testo tradotto in automatico ─────────────────────────
+.lingue-evento__riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.25rem;
+  color: var(--app-text);
+}
+.lingue-evento__cambia {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+.lingue-evento__aiuto {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+.lingue-evento__scelta:not([hidden]) {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #d9dadb;
+  border-radius: 4px;
+  background: #fff;
+}
+.lingue-evento__conferma {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #b71918;
+  background: #fdecec;
+  color: var(--app-text);
+}
+.lingue-evento__azione,
+.lingue-pannello__azione {
+  min-height: 44px;
+}
+.lingue-pannello p {
+  font-size: 0.9rem;
+}
+.schede-lingua--stati .schede-lingua__scheda {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 44px;
+  line-height: 1.25;
+  text-align: left;
+}
+.schede-lingua__stato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+.schede-lingua__icona {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: currentColor;
+}
+.schede-lingua__stato--neutro {
+  color: #516b7e;
+}
+.schede-lingua__stato--info {
+  color: #0066cc;
+}
+.schede-lingua__stato--successo {
+  color: #00703c;
+}
+.schede-lingua__stato--avviso {
+  color: #8a5300;
+}
+.schede-lingua__stato--errore {
+  color: #b71918;
+}
+.traduzione-automatica {
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  .icon {
+    fill: currentColor;
   }
 }

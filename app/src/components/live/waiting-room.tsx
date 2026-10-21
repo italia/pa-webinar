@@ -18,6 +18,7 @@ import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import { canStartManually } from '@/lib/events/lifecycle';
+import { nomiOrganizzatori } from '@/lib/events/organizer-names';
 import {
   annuncioApertura,
   statoIngresso,
@@ -169,6 +170,9 @@ export interface WaitingRoomWarmup {
    *  così il cronometro non parte mai da un timestamp stantìo. */
   startedAt: string | null;
   serverTime: string;
+  /** Almeno un bridge è pronto. Prima dell'orario d'inizio la fase resta
+   *  'starting' anche così: la sala è pronta ma non ancora aperta. */
+  bridgePronto?: boolean;
 }
 
 interface WaitingRoomProps {
@@ -183,6 +187,9 @@ interface WaitingRoomProps {
     hasCallLink: boolean;
   };
   role: 'moderator' | 'participant' | 'guest';
+  /** Microfono e fotocamera che l'evento concede a questa persona in sala
+   *  (chi conduce o interviene li ha sempre). Default: entrambi. */
+  mediaConcessi?: { microfono: boolean; fotocamera: boolean };
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di chi assiste. Per tutti partono spenti. */
   conduce?: boolean;
@@ -267,6 +274,7 @@ export default function WaitingRoom({
   condivisione,
   role,
   conduce = false,
+  mediaConcessi = { microfono: true, fotocamera: true },
   jvbReady,
   defaultName,
   onEnterLive,
@@ -432,6 +440,11 @@ export default function WaitingRoom({
   // the rest of the room (garden, name input, device check, chat).
   const isWarmingUp =
     (event.status === 'IDLE' || event.status === 'PROVISIONING') && !notHeld;
+  // La sala si accende in anticipo (PROVISIONING prima dell'orario
+  // d'inizio): si aspetta l'ora prevista, non l'allestimento. Non IDLE: è una
+  // sala già aperta e messa in pausa, che riparte appena la si sveglia.
+  const accesaInAnticipo = event.status === 'PROVISIONING' && !notHeld;
+  const prontaInAnticipo = accesaInAnticipo && warmup?.bridgePronto === true && !!countdown;
   const isGuest = role === 'guest';
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
@@ -606,9 +619,11 @@ export default function WaitingRoom({
     return () => clearInterval(timer);
   }, [isWarmingUp, warmupStartedAt]);
 
-  // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
+  // Il conto alla rovescia: mentre l'evento è PUBLISHED, e mentre la sala è
+  // accesa in anticipo (PROVISIONING prima dell'orario d'inizio): anche lì si
+  // aspetta l'ora prevista. In diretta e a evento concluso non serve.
   useEffect(() => {
-    if (!isPublished) {
+    if (!isPublished && !accesaInAnticipo) {
       setCountdown('');
       setPulseCountdown(false);
       setStartingSoon(false);
@@ -645,7 +660,7 @@ export default function WaitingRoom({
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isPublished, startsAtMs, endsAtMs, t]);
+  }, [isPublished, accesaInAnticipo, startsAtMs, endsAtMs, t]);
 
   // «Non si è tenuto»: vale per ogni stato da cui l'evento si potrebbe ancora
   // avviare (vedi canStartManually), non solo per PUBLISHED.
@@ -1053,7 +1068,12 @@ export default function WaitingRoom({
   );
 
   const deviceCheckField = (
-    <DeviceCheck conduce={conduce} onStateChange={handleDeviceStateChange} />
+    <DeviceCheck
+      conduce={conduce}
+      microfonoConcesso={mediaConcessi.microfono}
+      fotocameraConcessa={mediaConcessi.fotocamera}
+      onStateChange={handleDeviceStateChange}
+    />
   );
 
   // Le buone pratiche si aprono a richiesta: chi le conosce non le rilegge.
@@ -1283,7 +1303,7 @@ export default function WaitingRoom({
           <div className="d-flex align-items-start">
             {/* Senza scaler non c'è niente in accensione: un orologio, non
                 uno spinner. */}
-            {warmup?.phase === 'scheduled' ? (
+            {warmup?.phase === 'scheduled' || prontaInAnticipo ? (
               <Icon icon="it-clock" size="sm" className="me-2 mt-1 flex-shrink-0" />
             ) : (
               <Spinner active small className="me-2 mt-1 flex-shrink-0" />
@@ -1291,7 +1311,9 @@ export default function WaitingRoom({
             <div className="flex-grow-1">
               <div className="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
                 <strong>
-                  {warmup?.phase === 'scheduled'
+                  {prontaInAnticipo
+                    ? t('warmup.readyBeforeStart', { time: startTimeLabel })
+                    : warmup?.phase === 'scheduled'
                     ? t('warmup.scheduled')
                     : warmup?.phase === 'ready'
                       ? t('warmup.almostReady')
@@ -1301,7 +1323,7 @@ export default function WaitingRoom({
                           : t('warmup.startingBridge')
                         : t('warmup.queued')}
                 </strong>
-                {warmupElapsed !== null && warmupElapsed > 0 && (
+                {warmupElapsed !== null && warmupElapsed > 0 && !prontaInAnticipo && (
                   // aria-hidden: la banda è una live region (role=status +
                   // aria-live), ma il cronometro cambia ogni secondo — senza
                   // questo lo screen reader ri-annuncerebbe la banda a ogni
@@ -1318,7 +1340,9 @@ export default function WaitingRoom({
                 )}
               </div>
               <div className="mt-1">
-                {warmup?.phase === 'scheduled'
+                {prontaInAnticipo
+                  ? t('warmup.readyBeforeStartDetail')
+                  : warmup?.phase === 'scheduled'
                   ? t('warmup.scheduledDetail')
                   : warmup?.phase === 'ready'
                     ? t('warmup.almostReadyDetail')
@@ -1406,7 +1430,7 @@ export default function WaitingRoom({
             </Button>
           </div>
         </>
-      ) : isWarmingUp ? (
+      ) : isWarmingUp && !countdown ? (
         <Button color="primary" size="lg" className="fw-semibold" disabled>
           <Spinner active small className="me-2" />
           {t('warmingUpButton')}
@@ -1542,13 +1566,15 @@ export default function WaitingRoom({
   const nomiPersone = (lista: PersonaPubblica[]) =>
     lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
   const descrizione = event.riepilogo?.descrizione?.trim() || null;
+  // Chi organizza, come nel resto della piattaforma (lib/events/organizer-names).
+  const organizzatori = nomiOrganizzatori({ organizers: enti, organizerName: event.organizerName });
   // La bacheca della piazza: le stesse informazioni del riepilogo.
   const bacheca: DatiBacheca = {
     titolo: event.title,
     voci: [
       { etichetta: t('summaryWhen'), valore: `${dateLabel} · ${startTimeLabel} – ${endTimeLabel} (${durataTesto})` },
-      ...(enti.length > 0 || event.organizerName
-        ? [{ etichetta: te('detail.organizedBy'), valore: enti.length > 0 ? enti.map((e) => e.name).join(', ') : (event.organizerName ?? '') }]
+      ...(organizzatori
+        ? [{ etichetta: te('detail.organizedBy'), valore: organizzatori }]
         : []),
       ...(conduzione.length > 0 ? [{ etichetta: te('detail.peopleModerators'), valore: nomiPersone(conduzione) }] : []),
       ...(relatori.length > 0 || event.speakers
@@ -1746,13 +1772,13 @@ export default function WaitingRoom({
       durataTesto,
     ),
   ];
-  if (enti.length > 0 || event.organizerName) {
+  if (organizzatori) {
     fatti.push(
       fatto(
         'enti',
         svg(<><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M9 21v-6h6v6" /></>),
         te('detail.organizedBy'),
-        enti.length > 0 ? enti.map((e) => e.name).join(', ') : event.organizerName,
+        organizzatori,
       ),
     );
   }
@@ -1898,7 +1924,7 @@ export default function WaitingRoom({
 
                 {presenzeBlock && <div className="mb-3 wr-reveal">{presenzeBlock}</div>}
 
-                {isPublished && countdown && (
+                {(isPublished || accesaInAnticipo) && countdown && (
                   <div className={`waiting-countdown mb-4${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}>
                     <div className="waiting-countdown__label">{t('startsIn')}</div>
                     <div className="waiting-countdown__value">{countdown}</div>

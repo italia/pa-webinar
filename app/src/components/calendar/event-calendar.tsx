@@ -31,7 +31,7 @@ import skLocale from '@fullcalendar/core/locales/sk';
 import slLocale from '@fullcalendar/core/locales/sl';
 import svLocale from '@fullcalendar/core/locales/sv';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { EventInput, DatesSetArg, EventClickArg, EventContentArg, EventMountArg } from '@fullcalendar/core';
+import type { EventInput, DatesSetArg, EventClickArg, EventContentArg, EventMountArg, MoreLinkMountArg } from '@fullcalendar/core';
 
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
@@ -182,6 +182,18 @@ function contenutoEvento(eventInfo: EventContentArg) {
 /** Nell'elenco il link della riga lascia ai modificatori il loro mestiere. */
 function montaEvento(info: EventMountArg) {
   info.el.querySelector<HTMLAnchorElement>('a.calendario-evento-link')?.addEventListener('click', fermaClicConModificatori);
+}
+
+/**
+ * Il «+N» di un giorno pieno apre l'elenco degli eventi di quel giorno:
+ * FullCalendar lo disegna come un link senza indirizzo con aria-expanded, che
+ * senza il ruolo di pulsante non vale. Il nome è il suggerimento («altri N
+ * eventi»), che FullCalendar mette solo nel title.
+ */
+function montaAltri(info: MoreLinkMountArg) {
+  info.el.setAttribute('role', 'button');
+  const suggerimento = info.el.getAttribute('title');
+  if (suggerimento) info.el.setAttribute('aria-label', suggerimento);
 }
 
 export default function EventCalendar({ mode, initialEvents = [] }: EventCalendarProps) {
@@ -448,6 +460,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
           eventClick={handleEventClick}
           dayMaxEvents={3}
           moreLinkText={(n) => `+${n}`}
+          moreLinkDidMount={montaAltri}
           eventTimeFormat={{
             hour: '2-digit',
             minute: '2-digit',

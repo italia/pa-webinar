@@ -52,7 +52,8 @@ vi.mock('@/lib/db', () => ({
     eventAgendaItem: { deleteMany: vi.fn() },
     liveAction: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
-    eventModerator: { deleteMany: vi.fn() },
+    eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
+    eventPersonPhoto: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
     callSession: { updateMany: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     $transaction: vi.fn(),
@@ -128,7 +129,8 @@ const db = prisma as unknown as {
   eventAgendaItem: { deleteMany: Mock };
   liveAction: { deleteMany: Mock };
   eventInvitation: { deleteMany: Mock };
-  eventModerator: { deleteMany: Mock };
+  eventModerator: { deleteMany: Mock; findMany: Mock };
+  eventPersonPhoto: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
   callSession: { updateMany: Mock; findMany: Mock; update: Mock };
   $transaction: Mock;
@@ -750,6 +752,52 @@ describe('GET /api/cron/cleanup', () => {
     });
   });
 
+  it('fase 3: toglie la foto dell’organizzatore principale e quelle delle concessioni, se nessuno le usa', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio', moderatorPhotoId: 'foto-principale' })] });
+    db.eventModerator.findMany.mockResolvedValue([{ photoId: 'foto-1' }, { photoId: 'foto-2' }]);
+    db.event.updateMany.mockResolvedValue({ count: 1 });
+    db.eventPersonPhoto.deleteMany.mockResolvedValue({ count: 2 });
+
+    await runCleanup();
+
+    // Le foto delle concessioni si leggono prima di cancellare le righe.
+    expect(db.eventModerator.findMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', photoId: { not: null } },
+      select: { photoId: true },
+    });
+    expect(db.eventModerator.findMany.mock.invocationCallOrder[0]).toBeLessThan(
+      db.eventModerator.deleteMany.mock.invocationCallOrder[0]!,
+    );
+    // Il nome dell'organizzatore principale resta, la sua foto no.
+    expect(db.event.updateMany).toHaveBeenCalledWith({
+      where: { id: 'evt-vecchio', moderatorPhotoId: { not: null } },
+      data: { moderatorPhotoId: null },
+    });
+    // Una DELETE sola, con il controllo dei riferimenti: la copia di un
+    // evento che usa la stessa foto la tiene.
+    const [arg] = db.eventPersonPhoto.deleteMany.mock.calls[0] as [{ where: Record<string, unknown> }];
+    expect(arg.where).toEqual({
+      id: { in: ['foto-1', 'foto-2', 'foto-principale'] },
+      leadOf: { none: {} },
+      grants: { none: {} },
+    });
+    const registro = JSON.parse(
+      (db.gdprAuditLog.create.mock.calls[0]![0] as { data: { details: string } }).data.details,
+    ) as Record<string, number>;
+    expect(registro).toMatchObject({ leadOrganizerPhotos: 1, personPhotos: 2 });
+  });
+
+  it('fase 3: senza foto non cerca foto da cancellare', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio', moderatorPhotoId: null })] });
+
+    await runCleanup();
+
+    const perEvento = db.eventPersonPhoto.deleteMany.mock.calls.filter(
+      (c: unknown[]) => 'id' in (c[0] as { where: Record<string, unknown> }).where,
+    );
+    expect(perEvento).toEqual([]);
+  });
+
   it('fase 3: cancella gli inviti, che portano email cifrata e link di accesso', async () => {
     // Stessa classe di dati e stessa trappola della cascade delle concessioni
     // nominali: un invito non accettato non ha piu' ragione di esistere quando
@@ -1065,6 +1113,7 @@ describe('GET /api/cron/cleanup', () => {
       recordingBlobsDeleted: 0,
       chatAttachmentBlobsDeleted: 0,
       profilePhotosDeleted: 0,
+      personPhotosDeleted: 0,
     });
   });
 
@@ -1082,6 +1131,28 @@ describe('GET /api/cron/cleanup', () => {
     const limite = chiamata![1] as Date;
     expect(Date.now() - limite.getTime()).toBeGreaterThan(29 * 86_400_000);
     expect(body.profilePhotosDeleted).toBe(3);
+  });
+
+  it('foto delle persone: una sola DELETE per quelle che nessuno usa da oltre sette giorni', async () => {
+    stubEventQueries({});
+    db.eventPersonPhoto.deleteMany.mockResolvedValue({ count: 4 });
+    const body = await (await runCleanup()).json();
+    expect(db.eventPersonPhoto.deleteMany).toHaveBeenCalledTimes(1);
+    const [arg] = db.eventPersonPhoto.deleteMany.mock.calls[0] as [
+      { where: { createdAt: { lt: Date }; leadOf: unknown; grants: unknown } },
+    ];
+    expect(arg.where.leadOf).toEqual({ none: {} });
+    expect(arg.where.grants).toEqual({ none: {} });
+    expect(NOW.getTime() - arg.where.createdAt.lt.getTime()).toBe(7 * DAY);
+    expect(body.personPhotosDeleted).toBe(4);
+  });
+
+  it('foto delle persone: se la pulizia fallisce, il giro lo dice', async () => {
+    stubEventQueries({});
+    db.eventPersonPhoto.deleteMany.mockRejectedValue(new Error('db giu'));
+    const res = await runCleanup();
+    expect(res.status).toBe(500);
+    expect((await res.json()).failures).toEqual(['person-photos']);
   });
 
 });

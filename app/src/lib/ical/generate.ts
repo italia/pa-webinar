@@ -1,7 +1,9 @@
 /**
- * iCal generation for event invitations.
- * Attached to confirmation, reminder and date-change emails, and served by
- * the public `calendar.ics` download.
+ * Il file di calendario pubblico di un evento (`calendar.ics`).
+ *
+ * Le email portano invece l'invito personale (lib/ical/invitation:
+ * METHOD:REQUEST, con chi lo riceve e il suo link); questo file e' uguale per
+ * tutti e non ha ne' l'uno ne' l'altro.
  */
 
 import ical, { ICalCalendarMethod } from 'ical-generator';
@@ -30,9 +32,6 @@ export interface EventICalInput {
  */
 const SEQUENCE_EPOCH_MS = Date.UTC(2024, 0, 1);
 
-/** Content-Type degli allegati .ics: il `method` deve coincidere con METHOD nel file. */
-export const ICS_ATTACHMENT_CONTENT_TYPE = 'text/calendar; charset=utf-8; method=PUBLISH';
-
 /**
  * La revisione del file di calendario per un evento.
  *
@@ -47,10 +46,9 @@ export function icsSequence(updatedAt: Date): number {
 }
 
 /**
- * UID stabile: lo stesso evento ha lo stesso UID nella conferma, in ogni
- * promemoria, nell'avviso di cambio data e nel file scaricato. Con un UID
- * casuale per file il calendario aggiungeva una voce nuova a ogni allegato, e
- * dopo un cambio di data restava anche quella vecchia.
+ * UID stabile: lo stesso evento ha lo stesso UID in ogni file scaricato. Con
+ * un UID casuale per file il calendario aggiungeva una voce nuova a ogni
+ * download, e dopo un cambio di data restava anche quella vecchia.
  */
 export function icsUid(eventId: string): string {
   return `${eventId}@${appBaseUrl()?.host || 'localhost'}`;

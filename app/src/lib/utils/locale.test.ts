@@ -4,6 +4,7 @@ import {
   localiseEvent,
   getLocalized,
   getLocalizedExact,
+  getLocalizedWithLocale,
   pruneEmptyTranslations,
   setLocalized,
 } from './locale';
@@ -234,5 +235,24 @@ describe('getLocalizedExact', () => {
     // privacy/accessibility rely on the empty result to render the built-in,
     // fully translated document instead of the operator's Italian text.
     expect(getLocalizedExact({ it: 'Informativa' }, 'de')).toBe('');
+  });
+});
+
+describe('getLocalizedWithLocale', () => {
+  it('dice la lingua del testo restituito: quella chiesta, o quella al suo posto', () => {
+    const campo = { it: 'Titolo', en: 'Title', de: '  ' };
+    expect(getLocalizedWithLocale(campo, 'en')).toEqual({ testo: 'Title', lingua: 'en' });
+    // Una lingua vuota o mancante mostra quella di ripiego, e lo dice.
+    expect(getLocalizedWithLocale(campo, 'de')).toEqual({ testo: 'Titolo', lingua: 'it' });
+    expect(getLocalizedWithLocale(campo, 'fr')).toEqual({ testo: 'Titolo', lingua: 'it' });
+    expect(getLocalizedWithLocale({ fr: 'Titre' }, 'en')).toEqual({ testo: 'Titre', lingua: 'fr' });
+    expect(getLocalizedWithLocale(null, 'en')).toEqual({ testo: '', lingua: null });
+  });
+
+  it('restituisce lo stesso testo di getLocalized', () => {
+    const campo = { it: 'Titolo', en: '' };
+    for (const l of ['it', 'en', 'fr']) {
+      expect(getLocalizedWithLocale(campo, l).testo).toBe(getLocalized(campo, l));
+    }
   });
 });

@@ -1,11 +1,17 @@
 /**
  * Date-change notification email for registered participants.
  * Sent when a moderator updates the event date on a PUBLISHED event.
+ *
+ * Ogni email porta l'invito di calendario dell'iscritto, con lo stesso UID
+ * della conferma e una SEQUENCE piu' alta: il calendario sposta la voce che
+ * ha gia' alla nuova data invece di aggiungerne una seconda.
  */
 
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
-import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
+import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { registrationInvite } from '@/lib/ical/invitation';
+import { nomeOrganizzatoreCalendario } from '@/lib/ical/organizer';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { lingueIscrizione } from '@/lib/email/lingua';
 import { getSettings } from '@/lib/settings';
@@ -120,10 +126,14 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const { defaultLocale: predefinita } = await getSettings();
+      const organizzatoreIcs = await nomeOrganizzatoreCalendario(event.id);
 
       // Ognuno nella lingua in cui si e' iscritto: testi, titolo, data e
-      // link. Il contenuto si prepara una volta per lingua.
-      const perLingua = new Map<string, { subject: string; html: string; text: string; ics: string }>();
+      // link. Il testo si prepara una volta per lingua, l'invito per persona.
+      const perLingua = new Map<
+        string,
+        { subject: string; html: string; text: string; title: string; description: string; eventPageUrl: string }
+      >();
       const contenuto = (pagina: string, testi: Locale) => {
         const chiave = `${pagina}|${testi}`;
         const pronto = perLingua.get(chiave);
@@ -132,26 +142,13 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         const description = getLocalized(event.description as LocalizedField, pagina);
         const date = formatDate(event.startsAt, testi, event.timezone);
         const time = formatTimeWithZone(event.startsAt, testi, event.timezone);
-        const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
-        // Stesso UID della conferma e SEQUENCE piu' alta (l'evento e' appena
-        // stato modificato): il calendario sposta la voce esistente invece di
-        // aggiungerne una seconda alla nuova data.
-        const ics = generateEventICal({
-          eventId: event.id,
-          updatedAt: event.updatedAt,
-          title,
-          description,
-          startsAt: event.startsAt,
-          endsAt: event.endsAt,
-          timezone: event.timezone,
-          url: eventPageUrl,
-          organizerName: event.moderatorName ?? 'PA Webinar',
-        });
         const nuovo = {
           subject: COPY[testi].subject(title),
           html: notificationHtml(testi, title, date, time),
           text: notificationText(testi, title, date, time),
-          ics,
+          title,
+          description,
+          eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
         };
         perLingua.set(chiave, nuovo);
         return nuovo;
@@ -162,16 +159,31 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
           const { pagina, testi } = lingueIscrizione(registration.locale, predefinita);
           const mail = contenuto(pagina, testi);
           const recipientEmail = decryptPII(registration.email);
+          // Stesso UID della conferma e SEQUENCE piu' alta (l'evento e'
+          // appena stato modificato): il calendario sposta la voce esistente
+          // invece di aggiungerne una seconda alla nuova data.
+          const invito = registrationInvite(event, {
+            title: mail.title,
+            description: mail.description,
+            roomUrl: registrationJoinUrl({
+              baseUrl,
+              slug: event.slug,
+              eventId: event.id,
+              accessToken: registration.accessToken,
+              locale: pagina,
+              viaEmailEntry: false,
+            }),
+            eventPageUrl: mail.eventPageUrl,
+            organizerName: organizzatoreIcs,
+            attendeeEmail: recipientEmail,
+            locale: testi,
+          });
           await enqueueEmail({
             to: recipientEmail,
             subject: mail.subject,
             html: mail.html,
             text: mail.text,
-            attachments: [{
-              filename: 'event-updated.ics',
-              content: mail.ics,
-              contentType: ICS_ATTACHMENT_CONTENT_TYPE,
-            }],
+            calendarInvite: invito,
             metadata: {
               kind: 'date-change-notification',
               registrationId: registration.id,

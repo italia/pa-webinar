@@ -16,6 +16,15 @@ import {
   videoQualityMaxHeight,
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
+import {
+  barraConConcessi,
+  conAmmissione,
+  conModerazione,
+  mediumDi,
+  puoAccendere,
+  statoIniziale,
+  type Medium,
+} from '@/lib/jitsi/media-concessi';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
 import { CAPTIONS_DISABLED_SOUNDS, captionsToolbarButton, readCaptionsVisible } from '@/lib/captions/toolbar-button';
 import {
@@ -23,6 +32,7 @@ import {
   leggiSfondo,
   SFONDO_PREDEFINITO,
 } from '@/lib/jitsi/virtual-background';
+import { erroreDaRientro } from '@/lib/jitsi/riconnessione';
 import { InsecureContextNotice, useInsecureContext } from '@/components/live/insecure-context';
 
 import { loadExternalApi } from './external-api-loader';
@@ -97,6 +107,17 @@ interface JitsiRoomProps {
    *  drop. The parent uses it as the authoritative "the user left" signal so
    *  the native hangup doesn't get mistaken for a network blip and reconnected. */
   onReadyToClose?: () => void;
+  /** La conferenza è persa: un errore che Jitsi considera fatale, della
+   *  connessione o della conferenza. Jitsi mostrerebbe «Sei stato
+   *  disconnesso» e ricaricherebbe la propria pagina dopo 10-30 secondi: la
+   *  sala rientra prima, da sé (lib/jitsi/riconnessione). */
+  onConnectionLost?: () => void;
+  /** Microfono o videocamera accesi o spenti, da chiunque: la sala lo ricorda
+   *  per rientrare, dopo una caduta, come si era. */
+  onMediaChanged?: (mezzo: Medium, muto: boolean) => void;
+  /** Rientro dopo una caduta: lo stato lo mostra la sala, quindi niente
+   *  spinner di caricamento qui. */
+  inRientro?: boolean;
   onParticipantCountChanged?: (count: number) => void;
   onRecordingStatusChanged?: (isRecording: boolean) => void;
   onApiReady?: (api: JitsiAPI) => void;
@@ -146,6 +167,9 @@ export default function JitsiRoom({
   onReady,
   onLeft,
   onReadyToClose,
+  onConnectionLost,
+  onMediaChanged,
+  inRientro = false,
   onParticipantCountChanged,
   onRecordingStatusChanged,
   onApiReady,
@@ -185,6 +209,8 @@ export default function JitsiRoom({
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
   const onReadyToCloseRef = useRef(onReadyToClose);
+  const onConnectionLostRef = useRef(onConnectionLost);
+  const onMediaChangedRef = useRef(onMediaChanged);
   const onParticipantCountChangedRef = useRef(onParticipantCountChanged);
   const onRecordingStatusChangedRef = useRef(onRecordingStatusChanged);
   const onApiReadyRef = useRef(onApiReady);
@@ -192,6 +218,8 @@ export default function JitsiRoom({
   useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   useEffect(() => { onLeftRef.current = onLeft; }, [onLeft]);
   useEffect(() => { onReadyToCloseRef.current = onReadyToClose; }, [onReadyToClose]);
+  useEffect(() => { onConnectionLostRef.current = onConnectionLost; }, [onConnectionLost]);
+  useEffect(() => { onMediaChangedRef.current = onMediaChanged; }, [onMediaChanged]);
   useEffect(() => { onParticipantCountChangedRef.current = onParticipantCountChanged; }, [onParticipantCountChanged]);
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
@@ -315,23 +343,38 @@ export default function JitsiRoom({
       extraConfig.startWithAudioMuted = startWithAudioMuted;
     }
 
-    if (role === 'participant') {
-      if (!participantsCanUnmute) {
-        // Policy override: participants without unmute permission are
-        // always forced muted. Can't be relaxed by the DeviceCheck.
-        extraConfig.startWithAudioMuted = true;
-        extraConfig.disableAudioDenied = true;
-        toolbarButtons = toolbarButtons.filter(b => b !== 'microphone');
-      }
-      if (!participantsCanStartVideo) {
-        extraConfig.startWithVideoMuted = true;
-        extraConfig.disableVideoDenied = true;
-        toolbarButtons = toolbarButtons.filter(b => b !== 'camera');
-      }
-      if (!participantsCanShareScreen) {
-        toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
-      }
+    // Chi partecipa senza microfono o videocamera concessi dall'evento entra
+    // chiuso e senza il pulsante: il server lo tiene chiuso sul bridge
+    // (mod_pa_media_lock), qualunque cosa abbia scelto in sala d'attesa. Il
+    // pulsante torna quando chi conduce gli dà la parola o toglie il blocco
+    // (i listener della moderazione, sotto).
+    const concessi: Record<Medium, boolean> = {
+      audio: role !== 'participant' || participantsCanUnmute,
+      video: role !== 'participant' || participantsCanStartVideo,
+    };
+    if (!concessi.audio) extraConfig.startWithAudioMuted = true;
+    if (!concessi.video) extraConfig.startWithVideoMuted = true;
+    if (role === 'participant' && !participantsCanShareScreen) {
+      toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
     }
+    const barraPiena = [...toolbarButtons];
+    let statoMedia = statoIniziale(concessi);
+    toolbarButtons = barraConConcessi(barraPiena, statoMedia);
+
+    // Chi può parlare e ha scelto in sala d'attesa di entrare con microfono o
+    // videocamera accesi li trova accesi: con il blocco, il server fa entrare
+    // tutti chiusi, anche chi ne è esente. Non da telefono, dove si entra
+    // sempre chiusi (sopra).
+    const vuoleAcceso: Record<Medium, boolean> = {
+      audio: concessi.audio && !isMobileRef.current && !startWithAudioMuted,
+      video: concessi.video && !isMobileRef.current && !startWithVideoMuted,
+    };
+    // Il clic sui pulsanti del microfono e della videocamera arriva anche alla
+    // sala (senza fermarne l'effetto): dice che da lì decide la persona.
+    extraConfig.buttonsWithNotifyClick = [
+      { key: 'microphone', preventExecution: false },
+      { key: 'camera', preventExecution: false },
+    ];
 
     // Sottotitoli live (ADR-018). Il pulsante sta nella barra di Jitsi, con i
     // comandi della chiamata; lo aggiorna e ne ascolta il clic LiveCaptions.
@@ -539,8 +582,15 @@ export default function JitsiRoom({
           sfondoConsegnato = true;
         };
 
+        // Questa chiamata è entrata in conferenza, e da allora non l'ha persa:
+        // decide cosa riferire alla sala per il rientro dopo una caduta.
+        let entrata = false;
+        let persa = false;
+
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
+          entrata = true;
+          persa = false;
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
           if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
@@ -613,8 +663,144 @@ export default function JitsiRoom({
           if (e?.muted === false) enableNoiseSuppression();
         });
 
+        // La barra di chi partecipa segue la moderazione: il pulsante del
+        // microfono o della videocamera c'è solo quando la persona può
+        // accenderli.
+        let barraMostrata = toolbarButtons;
+        const aggiornaBarra = (): void => {
+          if (disposedRef.current) return;
+          const prossima = barraConConcessi(barraPiena, statoMedia);
+          if (prossima.join() === barraMostrata.join()) return;
+          barraMostrata = prossima;
+          api.executeCommand('overwriteConfig', { toolbarButtons: prossima });
+        };
+        // Chi perde la parola (o ritrova il blocco) col microfono aperto: il
+        // bridge lo ha già chiuso, e senza il pulsante la persona crederebbe
+        // di essere ascoltata. Lo si chiude anche qui.
+        const chiudiSeNonConcesso = async (m: Medium): Promise<void> => {
+          if (disposedRef.current || puoAccendere(statoMedia[m]) || inViaggio[m]) return;
+          try {
+            const chiuso = m === 'audio' ? await api.isAudioMuted() : await api.isVideoMuted();
+            if (!disposedRef.current && !chiuso && !puoAccendere(statoMedia[m]) && !inViaggio[m]) {
+              mandaCommuta(m);
+            }
+          } catch {
+            /* best-effort */
+          }
+        };
+        // L'evento arriva con l'id di chi riceve la parola: a chi partecipa
+        // solo il proprio, a chi modera anche quello degli altri.
+        const perMe = (id?: string): boolean => !id || id === myEndpointIdRef.current;
+
+        // Riapertura secondo la scelta della sala d'attesa. Con il blocco,
+        // appena si entra Jitsi chiude il microfono a tutti (anche a chi
+        // modera o interviene) quando riceve dalla sala la regola «si entra
+        // chiusi»: nei primi secondi, se il mezzo scelto si chiude, lo si
+        // riapre, una volta sola. Un tentativo fallisce se la persona non è
+        // ancora ammessa sul bridge; si riprova all'ammissione. Riaperto una
+        // volta, o premuto il pulsante dalla persona, non si tocca più: una
+        // chiusura dopo (un moderatore che silenzia, la persona stessa) resta.
+        const RIAPERTURA_MS = 10_000;
+        const MAX_TENTATIVI = 3;
+        let riaperturaFinoA = 0;
+        const basta: Record<Medium, boolean> = { audio: false, video: false };
+        const tentativi: Record<Medium, number> = { audio: 0, video: 0 };
+        // Il blocco annunciato da Jitsi in questa sala: senza, nessuno chiude
+        // il microfono a chi entra, e una chiusura è sempre voluta (di chi
+        // modera o della persona) e non si tocca.
+        const bloccoAnnunciato: Record<Medium, boolean> = { audio: false, video: false };
+        // Un comando mandato e non ancora visto arrivare: il secondo
+        // invertirebbe il primo. Se Jitsi lo rifiuta (persona non ancora
+        // ammessa, gesto richiesto dal browser) non arriva niente: dopo poco
+        // si considera concluso, così il tentativo all'ammissione resta
+        // possibile.
+        const inViaggio: Record<Medium, boolean> = { audio: false, video: false };
+        const mandaCommuta = (m: Medium): void => {
+          inViaggio[m] = true;
+          setTimeout(() => {
+            inViaggio[m] = false;
+          }, 2000);
+          api.executeCommand(m === 'audio' ? 'toggleAudio' : 'toggleVideo');
+        };
+        const riapri = async (m: Medium): Promise<void> => {
+          if (disposedRef.current || !vuoleAcceso[m] || basta[m] || inViaggio[m] || !bloccoAnnunciato[m]) return;
+          if (Date.now() > riaperturaFinoA || !puoAccendere(statoMedia[m]) || tentativi[m] >= MAX_TENTATIVI) return;
+          try {
+            const chiuso = m === 'audio' ? await api.isAudioMuted() : await api.isVideoMuted();
+            if (disposedRef.current || !chiuso || basta[m] || inViaggio[m]) return;
+            tentativi[m] += 1;
+            mandaCommuta(m);
+          } catch {
+            /* best-effort: resta come Jitsi l'ha aperto */
+          }
+        };
+        const cambioStato = (m: Medium, muto: boolean | undefined): void => {
+          const nostro = inViaggio[m];
+          inViaggio[m] = false;
+          // Aperto dopo un nostro comando: fatto, da qui decide la persona.
+          if (muto === false && nostro) basta[m] = true;
+          if (muto) setTimeout(() => void riapri(m), 300);
+        };
+        // Lo stato dei mezzi, per la sala: dopo una caduta si rientra come si
+        // era. Non quello di una conferenza già persa: smontandosi, Jitsi può
+        // riferire mezzi spenti che la persona non ha spento.
+        const riferisciMezzo = (m: Medium, muto: boolean | undefined): void => {
+          if (disposedRef.current || persa || typeof muto !== 'boolean') return;
+          onMediaChangedRef.current?.(m, muto);
+        };
+        api.addListener('audioMuteStatusChanged', (e: { muted?: boolean }) => {
+          cambioStato('audio', e?.muted);
+          riferisciMezzo('audio', e?.muted);
+        });
+        api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
+          cambioStato('video', e?.muted);
+          riferisciMezzo('video', e?.muted);
+        });
+        api.addListener('toolbarButtonClicked', (e: { key: string }) => {
+          if (e?.key === 'microphone') basta.audio = true;
+          if (e?.key === 'camera') basta.video = true;
+        });
+
+        api.addListener('moderationStatusChanged', (e: { enabled: boolean; mediaType: string }) => {
+          const m = mediumDi(e?.mediaType);
+          if (!m) return;
+          statoMedia = conModerazione(statoMedia, m, e.enabled);
+          bloccoAnnunciato[m] = e.enabled;
+          aggiornaBarra();
+          void chiudiSeNonConcesso(m);
+          void riapri(m);
+        });
+        api.addListener('moderationParticipantApproved', (e: { id?: string; mediaType: string }) => {
+          const m = mediumDi(e?.mediaType);
+          if (!m || !perMe(e.id)) return;
+          statoMedia = conAmmissione(statoMedia, m, true);
+          aggiornaBarra();
+          tentativi[m] = 0;
+          void riapri(m);
+        });
+        api.addListener('moderationParticipantRejected', (e: { id?: string; mediaType: string }) => {
+          const m = mediumDi(e?.mediaType);
+          if (!m || !perMe(e.id)) return;
+          statoMedia = conAmmissione(statoMedia, m, false);
+          aggiornaBarra();
+          void chiudiSeNonConcesso(m);
+        });
+        // Lo stato della moderazione arriva con gli eventi qui sopra. Chi entra
+        // dopo che il blocco è stato tolto non ne riceve: resta senza
+        // pulsante finché chi conduce non gli dà la parola. Meglio così che
+        // fidarsi di una lettura all'ingresso, che può precedere l'annuncio
+        // del blocco e mostrare il pulsante a chi non può parlare.
+        api.addListener('videoConferenceJoined', () => {
+          riaperturaFinoA = Date.now() + RIAPERTURA_MS;
+          setTimeout(() => {
+            void riapri('audio');
+            void riapri('video');
+          }, 1500);
+        });
+
         api.addListener('videoConferenceLeft', () => {
           if (disposedRef.current) return;
+          persa = true;
           if (nsEnforceTimerRef.current) {
             clearInterval(nsEnforceTimerRef.current);
             nsEnforceTimerRef.current = null;
@@ -633,6 +819,18 @@ export default function JitsiRoom({
         api.addListener('readyToClose', () => {
           if (disposedRef.current) return;
           onReadyToCloseRef.current?.();
+        });
+
+        // Conferenza persa (sessione scaduta sul server, Prosody o Jicofo
+        // riavviati, bridge perso): Jitsi aprirebbe la finestra «Sei stato
+        // disconnesso» e ricaricherebbe la propria pagina con le scelte di
+        // partenza. Le cadute brevi non arrivano qui: le riprende Jitsi. Solo
+        // dopo essere entrati: un errore all'ingresso (il bridge che si sta
+        // accendendo) resta a Jitsi e agli avvisi della sala d'ingresso.
+        api.addListener('errorOccurred', (e) => {
+          if (disposedRef.current || !erroreDaRientro(e)) return;
+          persa = true;
+          if (entrata) onConnectionLostRef.current?.();
         });
 
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
@@ -753,7 +951,7 @@ export default function JitsiRoom({
         </div>
       ) : (
         <>
-          {loadState === 'loading' && !revealedWhileLoading && (
+          {loadState === 'loading' && !revealedWhileLoading && !inRientro && (
             <div className="position-absolute top-50 start-50 translate-middle text-center">
               <Spinner active double />
               <p className="mt-3 text-white-50">{t('connecting')}</p>

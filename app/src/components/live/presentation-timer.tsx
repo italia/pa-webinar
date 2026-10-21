@@ -14,6 +14,9 @@ import { useComandiTimer, useTimerInterventi } from '@/hooks/use-presentation-ti
  */
 
 const PRESETS = [
+  { seconds: 60, label: '1min' },
+  { seconds: 120, label: '2min' },
+  { seconds: 180, label: '3min' },
   { seconds: 300, label: '5min' },
   { seconds: 600, label: '10min' },
   { seconds: 900, label: '15min' },

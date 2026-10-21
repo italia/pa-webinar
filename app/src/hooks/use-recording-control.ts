@@ -37,8 +37,12 @@ export function useRecordingControl({
   isRecording,
   faseRegistratore,
   onAvvioRichiesto,
+  dopoComando,
 }: {
   api: JitsiMeetExternalAPI | null;
+  /** Subito dopo ogni comando di avvio o arresto mandato a Jitsi: i
+   *  sottotitoli rimettono la loro scelta, che il comando ha appena spento. */
+  dopoComando?: () => void;
   /** L'avvio parte da questo browser: la sala lo riferisce alla cronologia
    *  anche se arriva nei primi secondi dall'ingresso. */
   onAvvioRichiesto?: () => void;
@@ -109,8 +113,11 @@ export function useRecordingControl({
         tentativi.current = 0;
         mostraAvviso(tl('recorderStartFailed'), 8000);
       }
+      return;
     }
-  }, [api, tl, mostraAvviso]);
+    // Fuori dal try: un suo errore non è un avvio fallito da ritentare.
+    dopoComando?.();
+  }, [api, tl, mostraAvviso, dopoComando]);
 
   // Un errore del servizio di registrazione: si riprova, poi si avvisa.
   useEffect(() => {
@@ -143,10 +150,11 @@ export function useRecordingControl({
   const ferma = useCallback(() => {
     if (!api || !isRecording) return;
     api.executeCommand('stopRecording', 'file');
+    dopoComando?.();
     setInPausa(true);
     if (timerPausa.current) clearTimeout(timerPausa.current);
     timerPausa.current = setTimeout(() => setInPausa(false), PAUSA_DOPO_STOP_MS);
-  }, [api, isRecording]);
+  }, [api, isRecording, dopoComando]);
 
   return {
     azionabile: !!api && !inPausa && (isRecording || !bloccato),

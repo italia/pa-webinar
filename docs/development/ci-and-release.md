@@ -100,14 +100,14 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 
 | Job, as named in the checks list | What it runs | Waits for | Blocking |
 |---|---|---|---|
-| Lint & Typecheck | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | | Yes |
+| Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules and the license policy) | | Yes |
 | Unit Tests | `npm run test:coverage --workspace=app` against a PostgreSQL service container. It fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet | | Yes |
 | Unit Tests (recorder, controller) | For `infra/recorder`, `infra/recorder-controller` and `infra/captions/gateway`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
 | Typecheck (lobby) | `npx tsc --noEmit -p lobby/tsconfig.json` | | Yes |
 | Helm Chart | Builds the subcharts at the versions pinned in `Chart.lock`, runs `./scripts/validate-chart.sh`, then renders the `simple`, `standard` and `full` example values and applies each result with `kubectl apply --dry-run=server` to a throwaway kind cluster | | Yes |
 | Unit Tests (worker AI) | In `infra/ai/worker`: `pip install -r requirements-test.txt`, then `pytest -q`. No GPU is involved: tests that need models skip themselves | | Yes |
 | Security Scan | Trivy filesystem scan of the repository for CRITICAL and HIGH findings. `.trivyignore` at the root records the accepted ones | | Yes |
-| License Compliance | `license-checker` fails on forbidden licenses among production dependencies. The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
+| License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
 | Migration Integrity | `prisma migrate deploy` on an empty database, then `prisma migrate diff --from-migrations app/prisma/migrations --to-schema-datamodel app/prisma/schema.prisma --shadow-database-url <the same throwaway database> --exit-code` | | Yes |
 | E2E Smoke Tests | Starts the Docker Compose stack, runs the `db-migrate` service and runs Playwright on Chromium. It uploads the `playwright-report` artifact | Lint & Typecheck, Unit Tests | No (`continue-on-error`) |
 | Docker Build & Scan | Builds the app image from the checkout with `push: false`, then scans that local image with Trivy for CRITICAL and HIGH findings | Lint & Typecheck, Unit Tests | Yes |
@@ -211,7 +211,7 @@ The self-hosted runner lives inside a Kubernetes cluster, where code could reach
 - `ci.yml` sends `pull_request` events to GitHub-hosted runners through its conditional `runs-on`, and keeps the self-hosted runner for pushes and dispatches.
 - The publishing workflows start only on trusted events: pushes to `dev` or `main`, tags, manual dispatch or a schedule. No workflow uses `pull_request_target`.
 - Every `uses:` is pinned to a full commit SHA, with the tag in a trailing comment.
-- Workflow-level permissions are read-only where they are declared (`ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`); `jitsi-web.yml` sets them on its only job. Only the jobs that publish images or attach files to a release get `packages: write` or `contents: write`; jobs with no block, such as the change-detection jobs of `dev.yml`, take the workflow's read-only default.
+- Workflow-level permissions are read-only where they are declared (`ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml`); `jitsi-web.yml` sets them on its only job. Only the jobs that publish images, prune the layer cache or attach files to a release get `packages: write` or `contents: write`; jobs with no block, such as the change-detection jobs of `dev.yml`, take the workflow's read-only default.
 
 Any new workflow that a pull request can trigger must keep the same conditional runner. The complete policy, including the permission table and fork approval, is in [SECURITY.md](../../SECURITY.md#where-ci-code-runs).
 

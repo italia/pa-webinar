@@ -54,6 +54,9 @@ export const GET = withErrorHandling(async (request) => {
     // public page that isn't in the library (libraryListed=false), just not the
     // reverse. Two OR groups can't sit at one level in Prisma, so combine under AND.
     postEventPublic: true,
+    // La videoteca e' pubblica: una registrazione riservata agli iscritti non
+    // ci compare (lib/recording/audience).
+    recordingAudience: 'PUBLIC',
     AND: [
       { OR: [{ postEventPublicUntil: null }, { postEventPublicUntil: { gt: now } }] },
       {

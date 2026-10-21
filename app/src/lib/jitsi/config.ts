@@ -5,8 +5,9 @@
  * screen share, etc.) while keeping our custom wrapper for moderator
  * features (recording, end event) and the Q&A panel.
  *
- * Chat and reactions are handled by custom components in the app sidebar
- * and as a floating overlay, so they are excluded from the Jitsi toolbar.
+ * La chat è un componente della colonna laterale della sala, quindi non sta
+ * nella barra di Jitsi. Le reazioni usano il pulsante di Jitsi, salvo che il
+ * sito scelga la barra della sala (JitsiRoom, `reactionsMode`).
  *
  * NOTE: the IFrame API ignores customTheme and dynamicBrandingUrl when passed
  * via configOverwrite. The stage colour is set here (DEFAULT_BACKGROUND, which
@@ -30,7 +31,7 @@ import { JITSI_STAGE_BACKGROUND } from './branding';
  * handleLeaveRoom / handleReadyToClose.
  *
  * 'chat' excluded: we use a custom ChatPanel in the sidebar.
- * 'reactions' excluded: we use a custom ReactionBar overlay.
+ * 'reactions' la aggiunge JitsiRoom nella modalità NATIVE (quella predefinita).
  */
 export const baseToolbarButtons = [
   'microphone',
@@ -159,14 +160,22 @@ export const jitsiConfigOverwrite = {
   mainToolbarButtons: [
     ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
     ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
-    ['microphone', 'camera', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
-    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID, 'settings'],
+    // Da sei pulsanti in giu' la condivisione dello schermo resta in barra
+    // (chi presenta la cerca li', anche con la colonna laterale larga) e i
+    // sottotitoli passano nel menu «…». Chi non puo' condividere non la vede:
+    // il posto lo prende un altro pulsante.
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', 'settings'],
+    ['microphone', 'camera', 'desktop', 'raisehand', 'settings'],
     ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
     ['microphone', 'camera', CAPTIONS_BUTTON_ID],
     ['microphone', 'camera'],
   ] as string[][],
 
-  notifications: [] as string[],
+  // Le notifiche di Jitsi sono spente, tranne quelle sulla parola: la
+  // richiesta di chi conduce di intervenire, con il pulsante per accendere il
+  // microfono, e l'avviso a chi è stato silenziato. Senza la prima, chi riceve
+  // la parola in un evento a microfoni bloccati non saprebbe di averla.
+  notifications: ['notify.hostAskedUnmute', 'notify.mutedRemotelyTitle', 'notify.videoMutedRemotelyTitle'] as string[],
 
   // Il nome di chi è sul palco lo disegna la sala (components/live/stage-name),
   // con il suo stile e nella stessa colonna dei sottotitoli: quello di Jitsi
@@ -544,4 +553,29 @@ export function resolveVideoQualityConfig(
 export function videoQualityMaxHeight(preset?: string | null, opts?: { isMobile?: boolean }): number {
   const h = QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].maxHeight;
   return opts?.isMobile ? Math.min(h, MOBILE_MAX_HEIGHT) : h;
+}
+
+/** I tetti di un preset che servono alla stima della capacita' di un evento
+ *  (lib/capacity/model): bitrate per strato, video ricevuti, sospensione degli
+ *  strati non guardati, audio stereo, e i video ricevuti da un telefono. La
+ *  stima li legge da qui: un preset cambiato cambia anche la stima. */
+export function videoQualityBudget(preset?: string | null): {
+  maxHeight: number;
+  maxBitratesVideo: { low: number; standard: number; high: number };
+  channelLastN: number;
+  enableLayerSuspension: boolean;
+  stereo: boolean;
+  mobileChannelLastN: number;
+  mobileMaxHeight: number;
+} {
+  const q = QUALITY_DEFINITIONS[normalizeQualityPreset(preset)];
+  return {
+    maxHeight: q.maxHeight,
+    maxBitratesVideo: { ...q.configOverwrite.videoQuality.maxBitratesVideo },
+    channelLastN: q.configOverwrite.channelLastN,
+    enableLayerSuspension: q.configOverwrite.enableLayerSuspension,
+    stereo: q.configOverwrite.stereo,
+    mobileChannelLastN: MOBILE_CHANNEL_LAST_N,
+    mobileMaxHeight: MOBILE_MAX_HEIGHT,
+  };
 }

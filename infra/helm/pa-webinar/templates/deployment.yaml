@@ -1,4 +1,5 @@
 {{- include "pa-webinar.validateRnnoise" . }}
+{{- include "pa-webinar.validateJitsiVersions" . }}
 {{- include "pa-webinar.validateDatastoreSecret" . }}
 {{- include "pa-webinar.validateJitsiJwt" . }}
 {{- include "pa-webinar.validateJitsiCredentials" . }}
@@ -7,6 +8,8 @@
 {{- include "pa-webinar.validateConferenceIngress" . }}
 {{- include "pa-webinar.validateBackup" . }}
 {{- include "pa-webinar.validateCaptions" . }}
+{{- include "pa-webinar.validateMt" . }}
+{{- include "pa-webinar.validateJvbLoudest" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

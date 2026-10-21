@@ -374,6 +374,33 @@ true
 {{- end }}
 
 {{/*
+Quante voci il bridge inoltra a ogni partecipante, ricavato dalle opzioni
+della JVM che il bridge riceve davvero
+(jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS, valutate con `tpl` come
+fa il sottochart): 0 quando l'instradamento delle sole voci più forti è
+spento, altrimenti -Dvideobridge.loudest.num-loudest, o 3, il predefinito del
+bridge, se manca. Ricavato e non letto da global.jvb.numLoudest: con un
+aggiornamento --reuse-values da una versione precedente le opzioni non ci
+sono, e il portale non deve contare su un instradamento che il bridge non fa.
+Restituisce un intero.
+*/}}
+{{- define "pa-webinar.jvbNumLoudest" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $opzioni := tpl (toString (dig "jvb" "extraEnvs" "VIDEOBRIDGE_DEBUG_OPTIONS" "" $jm | default "")) . -}}
+{{- $acceso := false -}}
+{{- $voci := 3 -}}
+{{- range (regexSplit "\\s+" (trim $opzioni) -1) -}}
+{{- /* Il bridge legge i booleani come la sua libreria di configurazione: vero è true, yes oppure on, in minuscolo. */ -}}
+{{- if hasPrefix "-Dvideobridge.loudest.route-loudest-only=" . -}}
+{{- $acceso = has (trimPrefix "-Dvideobridge.loudest.route-loudest-only=" .) (list "true" "yes" "on") -}}
+{{- else if regexMatch "^-Dvideobridge\\.loudest\\.num-loudest=[0-9]+$" . -}}
+{{- $voci = int (trimPrefix "-Dvideobridge.loudest.num-loudest=" .) -}}
+{{- end -}}
+{{- end -}}
+{{- if $acceso -}}{{ $voci }}{{- else -}}0{{- end -}}
+{{- end }}
+
+{{/*
 Nome base delle risorse del sottochart jitsi-meet, calcolato come lo calcola
 lui (`jitsi-meet.fullname`), override compresi. I Service si chiamano
 `<nome base>-web`, `<nome base>-prosody`, `<nome base>-jvb` e così via.
@@ -514,6 +541,59 @@ Indirizzo della pagina di stato del servizio dei sottotitoli, per il portale
 */}}
 {{- define "pa-webinar.captionsStatusUrl" -}}
 {{- printf "http://%s:8080/status" (include "pa-webinar.inClusterHost" (dict "nome" (include "pa-webinar.captionsServiceName" .) "root" .)) -}}
+{{- end }}
+
+{{/*
+Il motore di traduzione su CPU (postprod.mt, templates/postprod-mt.yaml) è
+reso: con la post-produzione accesa e il motore acceso. `dig`, perché con un
+aggiornamento --reuse-values da una versione precedente `postprod.mt` non
+c'è: il motore resta spento. Restituisce "true" oppure niente.
+*/}}
+{{- define "pa-webinar.mtEnabled" -}}
+{{- $p := .Values.postprod | default dict -}}
+{{- if and (dig "enabled" false $p) (dig "mt" "enabled" false $p) -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Il motore di traduzione su CPU si accende e si spegne con il lavoro: lo scala
+l'orchestratore della post-produzione (postprod.mt.scaleToZero). Stessa
+condizione per il Deployment, che allora non scrive le repliche, e per lo
+script e i permessi dell'orchestratore. Restituisce "true" oppure niente.
+*/}}
+{{- define "pa-webinar.mtScaled" -}}
+{{- $p := .Values.postprod | default dict -}}
+{{- if and (include "pa-webinar.mtEnabled" .) (dig "orchestrator" "enabled" true $p) (dig "mt" "scaleToZero" "enabled" true $p) -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Nome del Deployment e del Service del motore di traduzione su CPU: lo scala
+l'orchestratore della post-produzione e lo chiama il worker senza GPU.
+*/}}
+{{- define "pa-webinar.mtName" -}}
+{{- printf "%s-mt" (include "pa-webinar.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Etichette dei pod del motore: diverse da selectorLabels, come per i
+sottotitoli, così il Service, il PodDisruptionBudget e lo spread
+dell'applicazione non li contano fra i suoi pod.
+*/}}
+{{- define "pa-webinar.mtSelectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-mt" (include "pa-webinar.name" .) | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: postprod-mt
+{{- end }}
+
+{{/*
+Indirizzo OpenAI-compatibile del motore (AI_MT_BASE_URL del portale, che lo
+passa al worker nel claim): nome completo del Service, come per le sonde.
+*/}}
+{{- define "pa-webinar.mtBaseUrl" -}}
+{{- printf "http://%s:8080/v1" (include "pa-webinar.inClusterHost" (dict "nome" (include "pa-webinar.mtName" .) "root" .)) -}}
 {{- end }}
 
 {{/*

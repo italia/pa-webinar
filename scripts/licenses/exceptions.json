@@ -1,0 +1,18 @@
+{
+  "dom-walk@0.1.2": {
+    "license": "MIT",
+    "reason": "Declares its license in the deprecated `licenses` array, which the lockfile does not record. The package's LICENCE file is MIT."
+  },
+  "ssh2@1.17.0": {
+    "license": "MIT",
+    "reason": "Declares its license in the deprecated `licenses` array, which the lockfile does not record. The package's LICENSE file is MIT."
+  },
+  "cpu-features@0.0.10": {
+    "license": "MIT",
+    "reason": "Declares its license in the deprecated `licenses` array, which the lockfile does not record. The package's LICENSE file is MIT."
+  },
+  "buildcheck@0.0.7": {
+    "license": "MIT",
+    "reason": "Declares its license in the deprecated `licenses` array, which the lockfile does not record. The package's LICENSE file is MIT."
+  }
+}

@@ -5,23 +5,18 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { sendReactionSchema, VALID_EMOJIS } from '@/lib/validation/schemas';
+import { sendReactionSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
-import { getCached, setCache } from '@/lib/cache';
+import { contaReazione, leggiReazioni } from '@/lib/live/reactions-count';
 
 export const dynamic = 'force-dynamic';
 
 // Hard cap on persisted reaction rows per event: the POST is public (the live
 // UX needs it), so this bounds table bloat from a spam/abuse burst. Real events
-// stay far below it; the in-memory live counter is unaffected by the cap.
+// stay far below it; the live counter (lib/live/reactions-count) is unaffected
+// by the cap.
 const REACTION_ROW_CAP = 20000;
-
-type ReactionCounts = Record<string, number>;
-
-function getReactionsKey(eventId: string): string {
-  return `reactions:${eventId}`;
-}
 
 // POST /api/events/[slug]/reactions — send a reaction
 export const POST = withErrorHandling(async (request, context) => {
@@ -49,24 +44,12 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   const { emoji } = parsed.data;
-  const key = getReactionsKey(event.id);
-
-  const TTL = 14400_000;
-  let counts = getCached<ReactionCounts>(key);
-
-  if (!counts) {
-    counts = {};
-    for (const e of VALID_EMOJIS) {
-      counts[e] = 0;
-    }
-  }
-
-  counts[emoji] = (counts[emoji] || 0) + 1;
-  setCache(key, counts, TTL);
+  // Il contatore della diretta, condiviso da tutte le istanze dell'app.
+  const total = await contaReazione(event.id, emoji);
 
   // P1 analytics — persist each reaction (one row per click; the POST is
   // already self-originated by the reactor, so there is no broadcast fan-out)
-  // for post-event counts + the engagement timeline. Best-effort: the in-memory
+  // for post-event counts + the engagement timeline. Best-effort: the live
   // counter above drives the real-time UX, so a DB hiccup must not fail the
   // click. No PII stored — only the emoji + timestamp. The conditional INSERT
   // caps rows per event (bounds bloat from an unauthenticated spam burst);
@@ -81,7 +64,7 @@ export const POST = withErrorHandling(async (request, context) => {
     /* analytics-only; never break the live reaction */
   }
 
-  return Response.json({ ok: true, emoji, total: counts[emoji] });
+  return Response.json({ ok: true, emoji, total });
 });
 
 // GET /api/events/[slug]/reactions — get reaction counts
@@ -94,16 +77,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const key = getReactionsKey(event.id);
-  let counts = getCached<ReactionCounts>(key);
-
-  if (!counts) {
-    counts = {};
-    for (const e of VALID_EMOJIS) {
-      counts[e] = 0;
-    }
-  }
-
+  const counts = await leggiReazioni(event.id);
   const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
 
   return Response.json({ counts, total });

@@ -187,6 +187,8 @@ interface EventWithCount {
   maxParticipants: number;
   status: string;
   recordingUrl: string | null;
+  recordingPublished: boolean;
+  recordingAudience: 'PUBLIC' | 'REGISTRANTS';
   speakersInfo: unknown;
   organizerName: string | null;
   imageUrl: string | null;
@@ -213,7 +215,9 @@ function serialise(e: EventWithCount, _locale: string) {
     maxParticipants: e.maxParticipants,
     registrationCount: e._count.registrations,
     status: e.status,
-    recordingUrl: e.recordingUrl,
+    // Serve al contrassegno «registrazione»: solo se pubblicata per tutti,
+    // come nelle API pubbliche (lib/recording/audience).
+    recordingUrl: e.recordingPublished && e.recordingAudience === 'PUBLIC' ? e.recordingUrl : null,
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,

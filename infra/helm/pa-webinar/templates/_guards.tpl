@@ -221,6 +221,77 @@ l'aggiornamento di un'installazione esistente sarebbe peggio del difetto.
 {{- end -}}
 
 {{/*
+Una sola versione di Jitsi per tutta la conferenza.
+
+Parte web, Prosody, Jicofo, bridge e Jibri si parlano con protocolli che
+cambiano fra una versione e l'altra: una parte web piu' nuova o piu' vecchia
+del resto entra in sala, ma funzioni come la moderazione dei microfoni, i
+sottotitoli o la mano alzata si comportano in modo diverso, e lo si scopre a
+evento iniziato. Succede fissando l'immagine di un solo componente, per
+esempio la sola parte web patchata, e lasciando gli altri al valore
+predefinito. Un tag vuoto vale la versione del sottochart; se Helm non la
+espone, il componente conta come versione sconosciuta e la resa si ferma
+finche' il tag non e' scritto.
+
+Si confronta la versione nella forma `stable-<numero>` o `unstable-<numero>`,
+con quello che segue (`-rnnoise`, una revisione, un digest) ignorato. I tag
+mobili `stable`, `unstable` e `latest` contano per quello che sono, anche con
+un digest: non dicono una versione, e accanto a una versione fissata la resa
+si ferma. Un tag di
+forma diversa, per esempio quello di un registro interno con una numerazione
+propria, non viene riconosciuto e non blocca la resa.
+*/}}
+{{/* La versione di Jitsi in un tag, o vuoto se il tag non ne dice una. */}}
+{{- define "pa-webinar.jitsiVersion" -}}
+{{- $tag := regexReplaceAll "@.*$" . "" -}}
+{{- if has $tag (list "stable" "unstable" "latest") -}}
+{{- $tag -}}
+{{- else -}}
+{{- regexFind "^(stable|unstable)-[0-9]+" $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "pa-webinar.validateJitsiVersions" -}}
+{{- if .Values.jitsi.enabled -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $predefinita := "" -}}
+{{- with .Subcharts -}}
+{{- with index . "jitsi-meet" -}}
+{{- $predefinita = .Chart.AppVersion -}}
+{{- end -}}
+{{- end -}}
+{{- $componenti := list "web" "prosody" "jicofo" "jvb" -}}
+{{- range $c := list "jibri" "jigasi" "transcriber" -}}
+{{- if dig $c "enabled" false $jm -}}
+{{- $componenti = append $componenti $c -}}
+{{- end -}}
+{{- end -}}
+{{- $versioni := list -}}
+{{- $dettaglio := list -}}
+{{- range $c := $componenti -}}
+{{- $tag := dig $c "image" "tag" "" $jm | default "" | toString -}}
+{{- $versione := "" -}}
+{{- if $tag -}}
+{{- $versione = include "pa-webinar.jitsiVersion" $tag -}}
+{{- else if $predefinita -}}
+{{- $tag = $predefinita -}}
+{{- $versione = include "pa-webinar.jitsiVersion" $tag -}}
+{{- else -}}
+{{- $tag = "(versione del sottochart sconosciuta)" -}}
+{{- $versione = $tag -}}
+{{- end -}}
+{{- if $versione -}}
+{{- $versioni = append $versioni $versione -}}
+{{- $dettaglio = append $dettaglio (printf "%s=%s" $c $tag) -}}
+{{- end -}}
+{{- end -}}
+{{- if gt (len (uniq $versioni)) 1 -}}
+{{- fail (printf "I componenti della conferenza sono a versioni di Jitsi diverse (%s). Una parte web di una versione con Prosody e Jicofo di un'altra entra in sala ma si comporta in modo diverso in moderazione, sottotitoli e mano alzata. Fissa la stessa versione in jitsi-meet.<componente>.image.tag per tutti i componenti, quella che l'installazione gia' usa oppure quella di values.yaml." (join ", " $dettaglio)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Classe dell'Ingress e annotazione di classe devono coincidere.
 
 Il controller che serve un Ingress lo sceglie `spec.ingressClassName`;
@@ -585,6 +656,77 @@ rifiuterebbe il Deployment. Meglio dirlo qui, con la strada per uscirne.
 {{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) -}}
 {{- if and (dig "jibri" "custom" "other" "_finalize_sh" "" $jm) (include "pa-webinar.jibriFinalizePathMounted" .) -}}
 {{- fail (printf "jitsi-meet.jibri.custom.other._finalize_sh porta una copia dello script di fine registrazione, ma il chart monta gia' il proprio (ConfigMap %s) in /config/finalize.sh: due volumi nello stesso punto. Togli _finalize_sh dai tuoi valori (consigliato: lo script del chart firma l'avviso al portale ed e' aggiornato a ogni rilascio), oppure, per tenere il tuo, imposta jitsi-meet.jibri.extraVolumes ed extraVolumeMounts senza la voce dello script." (include "pa-webinar.jibriFinalizeConfigMap" .)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- /*
+Motore di traduzione su CPU (postprod.mt): valori che, sbagliati, non fermano
+l'installazione ma lasciano la traduzione automatica ferma, e lo si scopre
+quando qualcuno la chiede dal wizard.
+  - la traduzione dei testi gira solo sul worker senza GPU: senza di lui il
+    lavoro resterebbe in coda (e l'orchestratore accenderebbe a ogni giro il
+    worker con la GPU, che non lo prende);
+  - il modello: senza indirizzo o con un'impronta malformata lo scaricamento
+    all'avvio del pod fallisce sempre; il nome del file finisce in un percorso;
+  - thread, contesto e attesa prima dello spegnimento sono numeri.
+*/}}
+{{- define "pa-webinar.validateMt" -}}
+{{- if include "pa-webinar.mtEnabled" . -}}
+{{- $p := .Values.postprod | default dict -}}
+{{- $mt := dig "mt" dict $p | default dict -}}
+{{- if not (and (dig "worker" "enabled" false $p) (dig "worker" "cpu" "enabled" false $p)) -}}
+{{- fail "postprod.mt.enabled richiede postprod.worker.enabled e postprod.worker.cpu.enabled: la traduzione di titolo e descrizione gira solo sul worker senza GPU, e senza di lui il lavoro resterebbe in coda per sempre. Accendi il worker senza GPU, oppure spegni il motore (postprod.mt.enabled: false)." -}}
+{{- end -}}
+{{- $url := toString (dig "model" "url" "" $mt | default "") -}}
+{{- if not (regexMatch "^https?://[^[:space:]]+$" $url) -}}
+{{- fail (printf "postprod.mt.model.url è %q: serve l'indirizzo http(s) da cui il pod scarica il modello di traduzione (quello di values.yaml, o un mirror interno con lo stesso file)." $url) -}}
+{{- end -}}
+{{- $impronta := toString (dig "model" "sha256" "" $mt | default "") -}}
+{{- if not (regexMatch "^[0-9a-f]{64}$" $impronta) -}}
+{{- fail (printf "postprod.mt.model.sha256 è %q: serve l'impronta SHA-256 del file del modello, 64 caratteri esadecimali minuscoli (sha256sum <file>). Senza, lo scaricamento all'avvio del pod non si può verificare e il motore non parte." $impronta) -}}
+{{- end -}}
+{{- if not (regexMatch "^[A-Za-z0-9][A-Za-z0-9._-]*$" (toString (dig "model" "file" "" $mt | default ""))) -}}
+{{- fail "postprod.mt.model.file deve essere un nome di file (lettere, cifre, . _ -), senza percorso: è il file del modello nel volume del pod." -}}
+{{- end -}}
+{{- if not (dig "model" "id" "" $mt) -}}
+{{- fail "postprod.mt.model.id è vuoto: serve il nome del modello, che il portale scrive nelle traduzioni che salva." -}}
+{{- end -}}
+{{- range $voce := list (list "postprod.mt.threads" (dig "threads" 4 $mt)) (list "postprod.mt.contextSize" (dig "contextSize" 4096 $mt)) -}}
+{{- if not (regexMatch "^[1-9][0-9]*$" (toString (index $voce 1))) -}}
+{{- fail (printf "%s è %v: serve un intero da 1 in su." (index $voce 0) (index $voce 1)) -}}
+{{- end -}}
+{{- end -}}
+{{- if not (regexMatch "^[0-9]+$" (toString (dig "scaleToZero" "idleMinutes" 15 $mt))) -}}
+{{- fail (printf "postprod.mt.scaleToZero.idleMinutes è %v: serve un intero da 0 in su." (dig "scaleToZero" "idleMinutes" 15 $mt)) -}}
+{{- end -}}
+{{- if not (regexMatch "^(-1|[0-9]+)$" (toString (dig "cacheRamMiB" 0 $mt))) -}}
+{{- fail (printf "postprod.mt.cacheRamMiB è %v: serve un intero di MiB da 0 in su (0 = nessuna cache dei prompt, il valore consigliato), o -1 per nessun tetto." (dig "cacheRamMiB" 0 $mt)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- /*
+Instradamento delle sole voci più forti nel bridge (global.jvb.numLoudest):
+il numero lo legge il bridge dalle opzioni della JVM
+(jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS), e il portale, per la
+stima delle risorse, da quello che il bridge riceve. Un file di valori che
+riscrive quelle opzioni senza le due proprietà, o con un altro numero,
+lascerebbe il valore del chart senza effetto e senza errori: il bridge
+inoltrerebbe ogni voce, e un evento con molti microfoni aperti userebbe più
+del doppio della CPU prevista. Senza la chiave (aggiornamento --reuse-values
+da una versione precedente) non si controlla niente.
+*/}}
+{{- define "pa-webinar.validateJvbLoudest" -}}
+{{- $globale := .Values.global | default dict -}}
+{{- if and .Values.jitsi.enabled (hasKey (dig "jvb" dict $globale | default dict) "numLoudest") -}}
+{{- $voluto := toString (dig "jvb" "numLoudest" 0 $globale) -}}
+{{- if not (regexMatch "^[0-9]+$" $voluto) -}}
+{{- fail (printf "global.jvb.numLoudest è %q: serve un intero da 0 in su, il numero di voci più forti che il bridge inoltra a ogni partecipante (0 = tutte)." $voluto) -}}
+{{- end -}}
+{{- $reso := include "pa-webinar.jvbNumLoudest" . -}}
+{{- if ne $voluto $reso -}}
+{{- fail (printf "global.jvb.numLoudest è %s ma le opzioni della JVM del bridge (jitsi-meet.jvb.extraEnvs.VIDEOBRIDGE_DEBUG_OPTIONS) gli fanno inoltrare %s voci (0 = tutte): un file di valori che imposta VIDEOBRIDGE_DEBUG_OPTIONS sostituisce il valore del chart. Riparti da quello di values.yaml e aggiungi le tue opzioni in fondo, separate da uno spazio." $voluto $reso) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

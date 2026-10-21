@@ -48,11 +48,12 @@ export function sniffImageType(b: Uint8Array): PhotoType | null {
 
 /**
  * La foto come si salva: decodificata e ricodificata qui, qualunque cosa abbia
- * fatto il browser. Esce un JPEG di PHOTO_SIDE x PHOTO_SIDE ritagliato al
- * centro, solo il primo fotogramma, senza metadati (data, luogo, dispositivo).
- * Null se i byte non sono un JPEG, PNG o WebP leggibile.
+ * fatto il browser. Esce un JPEG quadrato di `side` pixel di lato (PHOTO_SIDE
+ * per la foto della sala) ritagliato al centro, solo il primo fotogramma,
+ * senza metadati (data, luogo, dispositivo). Null se i byte non sono un JPEG,
+ * PNG o WebP leggibile.
  */
-export async function normalizePhoto(input: Uint8Array): Promise<Buffer | null> {
+export async function normalizePhoto(input: Uint8Array, side: number = PHOTO_SIDE): Promise<Buffer | null> {
   if (!sniffImageType(input)) return null;
   try {
     // Caricata solo qui: e' un modulo nativo, e chi entra in sala (il token di
@@ -61,7 +62,7 @@ export async function normalizePhoto(input: Uint8Array): Promise<Buffer | null> 
     return await sharp(input, { limitInputPixels: MAX_INPUT_PIXELS, animated: false })
       // L'orientamento EXIF si applica ai pixel prima che i metadati spariscano.
       .rotate()
-      .resize(PHOTO_SIDE, PHOTO_SIDE, { fit: 'cover' })
+      .resize(side, side, { fit: 'cover' })
       .jpeg({ quality: 85 })
       .toBuffer();
   } catch {

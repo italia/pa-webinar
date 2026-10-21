@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { CODICE_LINGUA } from '@/lib/ai/target-locales';
 import { REMINDER_PRESETS } from '@/lib/events/reminder-presets';
 
 import {
@@ -83,6 +84,9 @@ export const eventBaseSchema = z.object({
   moderatorOrganization: z.string().trim().max(200).nullable().optional(),
   moderatorOrganizationLogoUrl: z.string().url().max(2048).nullable().optional(),
   moderatorPublicListed: z.boolean().optional(),
+  // La sua foto (EventPersonPhoto): un id che non si può usare si lascia
+  // cadere (lib/events/person-photo-store, usablePersonPhotoId).
+  moderatorPhotoId: z.string().uuid().nullable().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
@@ -155,8 +159,20 @@ export const eventBaseSchema = z.object({
   // Sottotitoli live (ADR-018): attivi di default, li cambia anche chi modera dal vivo.
   liveCaptionsEnabled: z.boolean().optional(),
   captionsTranscriptEnabled: z.boolean().optional(),
-  // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
+  // Le lingue dell'evento, codici separati da virgola: schede di titolo e
+  // descrizione, traduzione automatica al salvataggio e, con
+  // aiTranslationEnabled, sottotitoli e sintesi. Null = quelle del sito
+  // (SiteSetting.aiDefaultTargetLocales).
   aiTargetLocales: z.string().max(200).nullable().optional(),
+  // Dal wizard: le lingue di titolo e descrizione che chi salva ha toccato.
+  // Delle altre resta il testo salvato, con il suo stato (una traduzione
+  // arrivata a wizard aperto non si cancella). Senza, il testo inviato vale
+  // per tutte le lingue (lib/text-translation/unione-testi).
+  textEdits: z
+    .object({
+      touched: z.array(z.string().regex(CODICE_LINGUA)).max(24),
+    })
+    .optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
   // postprod forza k=N nel clustering della diarization invece di
   // auto-detect via silhouette. Null = lascia decidere al modello.
@@ -174,6 +190,8 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
     .optional(),
   recordingPublished: z.boolean().optional(),
   transcriptPublished: z.boolean().optional(),
+  // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
+  recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
   privacyPolicyUrl: z.string().url().nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
@@ -275,6 +293,17 @@ export const ORGANIZATION_TYPES = [
   'ASL', 'UNIVERSITY', 'PUBLIC_ENTITY', 'IN_HOUSE', 'OTHER',
 ] as const;
 
+// Submission: one answer per item. Value shape discriminates on the
+// item's type at runtime (not enforced in the schema because we don't
+// know item types at parse time; the service layer validates each
+// answer against its item).
+export const questionnaireAnswerInputSchema = z.object({
+  itemId: z.string().uuid(),
+  valueText: z.string().max(2000).nullable().optional(),
+  valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
+  valueScale: z.number().int().min(0).max(11).nullable().optional(),
+});
+
 export const createRegistrationSchema = z.object({
   displayName: z
     .string()
@@ -292,7 +321,8 @@ export const createRegistrationSchema = z.object({
     }),
   consentRecording: z.boolean().optional(),
   // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
-  // Obbligatorio (true) lato route quando l'evento ha multitrackRecordingEnabled.
+  // Facoltativo: chi non lo da' si iscrive, ma la sua voce non si registra
+  // ne' si trascrive (lo decide il server, voce per voce).
   consentMultitrack: z.boolean().optional(),
   consentFutureCommunications: z.boolean().default(false),
   // Rubrica (Person address book) opt-in. This is a SEPARATE Art. 6.1.a
@@ -305,6 +335,10 @@ export const createRegistrationSchema = z.object({
   // Lingua della pagina da cui ci si iscrive: la lingua delle email
   // successive. Un valore che non e' una lingua della piattaforma si ignora.
   locale: z.string().max(10).optional(),
+  // Le risposte al questionario dell'iscrizione, quando l'evento ne ha uno:
+  // si salvano con l'iscrizione, e un questionario obbligatorio senza
+  // risposte la ferma.
+  questionnaireAnswers: z.array(questionnaireAnswerInputSchema).max(100).optional(),
 });
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
@@ -578,17 +612,6 @@ export const upsertEventQuestionnaireSchema = z.object({
 });
 
 export type UpsertEventQuestionnaireInput = z.infer<typeof upsertEventQuestionnaireSchema>;
-
-// Submission: one answer per item. Value shape discriminates on the
-// item's type at runtime (not enforced in the schema because we don't
-// know item types at parse time; the service layer validates each
-// answer against its item).
-export const questionnaireAnswerInputSchema = z.object({
-  itemId: z.string().uuid(),
-  valueText: z.string().max(2000).nullable().optional(),
-  valueChoices: z.array(z.number().int().min(0).max(50)).max(12).nullable().optional(),
-  valueScale: z.number().int().min(0).max(11).nullable().optional(),
-});
 
 export const submitQuestionnaireResponseSchema = z.object({
   answers: z.array(questionnaireAnswerInputSchema).max(100),

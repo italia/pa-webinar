@@ -1,7 +1,8 @@
 /**
  * Un argomento dell'agenda (solo moderatore).
- *   PATCH { status?, label?, plannedMinutes? } → stato, titolo, durata
- *         prevista. `completed` resta accettato per i client precedenti.
+ *   PATCH { status?, label?, plannedMinutes?, speakerGrantId?, speakerPrimary? }
+ *         → stato, titolo, durata prevista, chi interviene. `completed` resta
+ *         accettato per i client precedenti.
  *   DELETE → toglie l'argomento.
  */
 
@@ -12,8 +13,9 @@ import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
-import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { NotFoundError, UnauthorizedError, ForbiddenError, ValidationError } from '@/lib/errors';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
+import { agendaSpeakerSchema, verificaRelatori } from '@/lib/agenda/speaker';
 import {
   AGENDA_STATUSES,
   agendaStatusData,
@@ -23,13 +25,15 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-const patchSchema = z.object({
-  /** Lo stato dell'argomento. `completed` resta per i client precedenti. */
-  status: z.enum(AGENDA_STATUSES).optional(),
-  completed: z.boolean().optional(),
-  label: z.string().trim().min(1).max(500).optional(),
-  plannedMinutes: plannedMinutesSchema.nullable().optional(),
-});
+const patchSchema = z
+  .object({
+    /** Lo stato dell'argomento. `completed` resta per i client precedenti. */
+    status: z.enum(AGENDA_STATUSES).optional(),
+    completed: z.boolean().optional(),
+    label: z.string().trim().min(1).max(500).optional(),
+    plannedMinutes: plannedMinutesSchema.nullable().optional(),
+  })
+  .merge(agendaSpeakerSchema);
 
 async function authItem(request: Request, slug: string, id: string) {
   const token = extractModeratorToken(request);
@@ -43,8 +47,29 @@ async function authItem(request: Request, slug: string, id: string) {
 
 export const PATCH = withErrorHandling(async (request, context) => {
   const { param: slug, id } = (await context.params) as { param: string; id: string };
-  const { eventId } = await authItem(request, slug, id);
+  const { item, eventId } = await authItem(request, slug, id);
   const body = patchSchema.parse(await parseJsonBody(request));
+
+  // Chi interviene: la persona indicata dev'essere di questo evento, e dopo
+  // la modifica (un campo non mandato resta quello che c'era) non ci sono
+  // una persona e l'organizzatore principale insieme.
+  if (body.speakerGrantId !== undefined || body.speakerPrimary !== undefined) {
+    const problemi = await verificaRelatori(
+      prisma,
+      eventId,
+      [
+        {
+          speakerGrantId: body.speakerGrantId !== undefined ? body.speakerGrantId : item.speakerGrantId,
+          speakerPrimary: body.speakerPrimary ?? item.speakerPrimary,
+        },
+      ],
+      (_i, campo) => [campo],
+      // Una persona gia' indicata, e non cambiata, non si ricontrolla: una
+      // revoca successiva non deve impedire di cambiare il resto.
+      body.speakerGrantId !== undefined,
+    );
+    if (problemi.length > 0) throw new ValidationError('Invalid agenda speaker', problemi);
+  }
 
   const status =
     body.status ?? (body.completed !== undefined ? statusFromCompleted(body.completed) : undefined);
@@ -80,6 +105,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
       data: {
         ...(body.label !== undefined && { label: body.label }),
         ...(body.plannedMinutes !== undefined && { plannedMinutes: body.plannedMinutes }),
+        ...(body.speakerGrantId !== undefined && { speakerGrantId: body.speakerGrantId }),
+        ...(body.speakerPrimary !== undefined && { speakerPrimary: body.speakerPrimary }),
         // Gia' in corso: l'orologio non riparte da zero.
         ...(status !== undefined && !giaInCorso && agendaStatusData(status, now)),
       },
@@ -92,6 +119,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
         completedAt: true,
         plannedMinutes: true,
         sortOrder: true,
+        speakerGrantId: true,
+        speakerPrimary: true,
       },
     });
     return { updated, giaInCorso, chiusi };

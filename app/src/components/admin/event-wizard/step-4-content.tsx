@@ -4,12 +4,13 @@
  * Step 4 — Content.
  *
  * Let the admin attach pre/post questionnaires (reusable templates + ad-hoc
- * questions) and materials. Templates are fetched from
- * /api/admin/question-templates. Ad-hoc questions are default-locale only;
- * the wizard shell wraps them into the multi-locale API shape on submit.
+ * questions) and materials. Templates, with their questions, come from
+ * /api/admin/question-templates (libreria-domande). Ad-hoc questions are
+ * default-locale only; the wizard shell wraps them into the multi-locale API
+ * shape on submit.
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Link, percorso } from '@/i18n/navigation';
@@ -22,6 +23,8 @@ import {
   templatesFor,
   type QuestionnaireMoment,
 } from '@/lib/questionnaires/template-usage';
+
+import { AnteprimaDomande, useLibreriaDomande, type ModelloDiDomande } from './libreria-domande';
 
 export interface MaterialDraft {
   title: string;
@@ -95,13 +98,7 @@ export interface Step4Value {
   materials: MaterialDraft[];
 }
 
-interface TemplateRow {
-  id: string;
-  name: string;
-  description: string | null;
-  itemCount?: number;
-  usage?: QuestionnaireMoment | null;
-}
+type TemplateRow = ModelloDiDomande;
 
 interface Props {
   value: Step4Value;
@@ -124,6 +121,9 @@ interface Props {
   responseCounts?: QuestionnaireResponseCounts;
   /** In modifica: l'evento, per portare alla pagina dei suoi questionari. */
   eventId?: string;
+  /** Il file di un materiale in viaggio verso il server: il wizard aspetta
+   *  che arrivi prima di salvare o cambiare passo. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -151,28 +151,12 @@ export default function Step4Content({
   incorporato = false,
   responseCounts,
   eventId,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
-  const [templates, setTemplates] = useState<TemplateRow[]>([]);
+  // La libreria dei modelli la legge solo lo staff.
+  const templates = useLibreriaDomande(!staffLocked);
   const [savingDraft, setSavingDraft] = useState(false);
-
-  useEffect(() => {
-    // La libreria dei modelli la legge solo lo staff.
-    if (staffLocked) return;
-    let cancelled = false;
-    fetch('/api/admin/question-templates', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { rows: [] }))
-      .then((data) => {
-        if (cancelled) return;
-        setTemplates(Array.isArray(data.rows) ? data.rows : []);
-      })
-      .catch(() => {
-        /* silent */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [staffLocked]);
 
   const handleSaveAndNavigate = onSaveDraftAndNavigate
     ? async () => {
@@ -218,6 +202,7 @@ export default function Step4Content({
           <MaterialsSection
             value={value.materials}
             onChange={(next) => onChange({ materials: next })}
+            onUploadBusy={onUploadBusy}
           />
         </>
       )}
@@ -506,6 +491,8 @@ function PlacementEditor({
           {t('addQuestion')}
         </button>
       </div>
+
+      <AnteprimaDomande blocco={value} libreria={libreria} />
     </div>
   );
 }
@@ -696,9 +683,11 @@ function AdhocQuestionEditor({
 function MaterialsSection({
   value,
   onChange,
+  onUploadBusy,
 }: {
   value: MaterialDraft[];
   onChange: (next: MaterialDraft[]) => void;
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }) {
   const t = useTranslations('admin.wizard.step4');
   const tMaterials = useTranslations('admin.materials');
@@ -709,8 +698,12 @@ function MaterialsSection({
     type: 'file',
     visibility: 'ALWAYS',
   });
+  // Mentre il file va al server il materiale non si aggiunge: partirebbe con
+  // l'indirizzo di prima, e il file arrivato dopo finirebbe nel successivo.
+  const [fileInViaggio, setFileInViaggio] = useState(false);
 
   const add = () => {
+    if (fileInViaggio) return;
     if (!draft.title.trim() || !draft.url.trim()) return;
     onChange([
       ...value,
@@ -814,6 +807,10 @@ function MaterialsSection({
                 blobPath: meta.key,
               }))
             }
+            onBusy={(b) => {
+              setFileInViaggio(b);
+              onUploadBusy?.(b);
+            }}
           />
         </div>
         <div className="row g-2">
@@ -850,7 +847,7 @@ function MaterialsSection({
               type="button"
               className="btn btn-primary w-100"
               onClick={add}
-              disabled={!draft.title.trim() || !draft.url.trim()}
+              disabled={fileInViaggio || !draft.title.trim() || !draft.url.trim()}
             >
               {t('addMaterial')}
             </button>

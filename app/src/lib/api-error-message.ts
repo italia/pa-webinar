@@ -22,25 +22,31 @@ export type ApiErrorKey =
   | 'rateLimited'
   | 'aiPipelineDisabled'
   | 'recordingWithoutMedia'
+  | 'recordingWithoutVideo'
   | 'transcriptCorrected'
   | 'noParticipantTracks'
   | 'summaryMissing'
   | 'storageUnavailable'
   | 'aiDisabledForEvent'
   | 'sourceTranscriptMissing'
-  | 'sameLanguage';
+  | 'captionsTranscriptNotTranslatable'
+  | 'sameLanguage'
+  | 'mtUnavailable';
 
 /** I codici d'errore che le rotte usano per le condizioni sopra. */
 export const API_ERROR_CODES = {
   AI_PIPELINE_DISABLED: 'aiPipelineDisabled',
   RECORDING_WITHOUT_MEDIA: 'recordingWithoutMedia',
+  RECORDING_WITHOUT_VIDEO: 'recordingWithoutVideo',
   TRANSCRIPT_CORRECTED: 'transcriptCorrected',
   NO_PARTICIPANT_TRACKS: 'noParticipantTracks',
   SUMMARY_MISSING: 'summaryMissing',
   STORAGE_UNAVAILABLE: 'storageUnavailable',
   AI_DISABLED_FOR_EVENT: 'aiDisabledForEvent',
   SOURCE_TRANSCRIPT_MISSING: 'sourceTranscriptMissing',
+  CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE: 'captionsTranscriptNotTranslatable',
   SAME_LANGUAGE: 'sameLanguage',
+  MT_UNAVAILABLE: 'mtUnavailable',
 } as const satisfies Record<string, ApiErrorKey>;
 
 const PER_STATO: Partial<Record<number, ApiErrorKey>> = {

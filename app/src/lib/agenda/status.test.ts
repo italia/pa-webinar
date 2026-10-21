@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  agendaGiaUsata,
   agendaStatusData,
   minutesBetween,
   minutesSince,
@@ -33,6 +34,22 @@ describe('agendaStatusData', () => {
     expect(agendaStatusData('PENDING', now)).toEqual({
       status: 'PENDING', completed: false, completedAt: null, startedAt: null,
     });
+  });
+});
+
+describe('agendaGiaUsata', () => {
+  it('usata quando un argomento non e’ piu’ da discutere', () => {
+    expect(agendaGiaUsata([])).toBe(false);
+    expect(agendaGiaUsata([{ status: 'PENDING' }, { status: 'PENDING' }])).toBe(false);
+    for (const status of ['CURRENT', 'DONE', 'SKIPPED'] as const) {
+      expect(agendaGiaUsata([{ status: 'PENDING' }, { status }])).toBe(true);
+    }
+  });
+
+  it('le reazioni su argomenti ancora da discutere non la bloccano', () => {
+    // Una riga come la legge Prisma con il conteggio: il conteggio non conta.
+    const voce = { status: 'PENDING' as const, _count: { reactions: 3 } };
+    expect(agendaGiaUsata([voce])).toBe(false);
   });
 });
 

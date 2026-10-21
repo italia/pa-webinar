@@ -15,6 +15,8 @@ import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
+import { recordingAvailable } from '@/lib/recording/availability';
+import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -59,15 +61,12 @@ export default async function RegistrationPage({
     notFound();
   }
 
-  // A PRE_REGISTRATION questionnaire must be filled in on the success
-  // screen before the participant proceeds — so we only auto-redirect
-  // straight into the waiting room when there is none. Resolved here
-  // (server) so the client doesn't have to wait for the questionnaire
-  // fetch to decide whether to redirect.
-  const preRegistrationQuestionnaire = await prisma.eventQuestionnaire.findFirst({
-    where: { eventId: event.id, placement: 'PRE_REGISTRATION' },
-    select: { id: true },
-  });
+  // Il questionario dell'iscrizione, gia' pronto per il modulo: le sue domande
+  // sono parte del modulo, senza una lettura dal browser che puo' arrivare
+  // tardi o fallire. Un questionario senza domande non chiede niente.
+  const questionario = await findEventQuestionnaireByPlacement(event.id, 'PRE_REGISTRATION');
+  const preRegistrationQuestionnaire =
+    questionario && questionario.items.length > 0 ? questionario : null;
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const settings = await getSettings();
@@ -127,13 +126,15 @@ export default async function RegistrationPage({
             eventSlug={slug}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
-            recordingEnabled={event.recordingEnabled}
+            // Un'installazione che non può registrare non chiede il consenso
+            // alla registrazione e non la annuncia (come la sala d'attesa).
+            recordingEnabled={event.recordingEnabled && recordingAvailable()}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             captionsTranscript={captionsTranscriptActive(event, settings)}
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}
             participantsCanShareScreen={event.participantsCanShareScreen}
-            hasPreRegistrationQuestionnaire={!!preRegistrationQuestionnaire}
+            preRegistrationQuestionnaire={preRegistrationQuestionnaire}
             startsAt={event.startsAt.toISOString()}
             waitingRoomLeadMinutes={settings.waitingRoomLeadMinutes}
             profiling={{

@@ -373,6 +373,10 @@ export interface IngestBody {
   /** t0 della registrazione (epoch ms): il portale lo usa come zero dei
    *  tempi della trascrizione e della cronologia della sala. */
   recordingStartedAtMs?: number;
+  /** La cattura e' stata fermata a evento in corso (vedi
+   *  `CaptureResult.interrupted`): il portale tiene le tracce ma non avvia
+   *  la trascrizione finche' la diretta non e' finita. */
+  interrupted?: boolean;
 }
 
 /**
@@ -382,10 +386,12 @@ export interface IngestBody {
 export function buildIngestBody(
   manifest: Manifest,
   trackSizes: Record<string, number> = {},
+  opts: { interrupted?: boolean } = {},
 ): IngestBody {
   return {
     eventId: manifest.eventId,
     recordingId: manifest.recordingId,
+    ...(opts.interrupted && { interrupted: true }),
     ...(manifest.recordingStartedAtMs > 0 && { recordingStartedAtMs: manifest.recordingStartedAtMs }),
     tracks: manifest.tracks.map((t) => ({
       participantId: t.participantId,

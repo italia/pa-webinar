@@ -166,6 +166,19 @@ export const puoGestire = cache(async function puoGestire(
   return trovati > 0;
 });
 
+/**
+ * Se chi chiama è lo staff che gestisce l'evento (`puoGestire`), senza
+ * rifiutare chi non lo è: per le rotte aperte anche al link di conduzione,
+ * dove la sessione dello staff permette qualcosa in più.
+ */
+export async function isEventManager(
+  cookies: ReadonlyRequestCookies,
+  eventId: string,
+): Promise<boolean> {
+  const session = await getStaffSession(cookies);
+  return !!session && (await puoGestire(session, eventId));
+}
+
 /** Staff con diritto sull'evento della registrazione; altrimenti 401/403. */
 export async function requireRecordingManager(
   cookies: ReadonlyRequestCookies,

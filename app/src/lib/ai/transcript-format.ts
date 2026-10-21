@@ -83,6 +83,27 @@ export function buildVtt(
   return lines.join('\n');
 }
 
+/**
+ * Il testo semplice della trascrizione, nello stesso formato del file che
+ * produce il worker (`segments_to_plain_text`):
+ * `[HH:MM:SS] Nome: testo`, una riga per segmento non vuoto. Senza un nome
+ * per l'etichetta resta l'etichetta, come nel file del worker.
+ */
+export function buildPlainText(
+  segments: TranscriptSegmentLike[],
+  speakerNames: Map<string, string> = new Map(),
+): string {
+  const out: string[] = [];
+  for (const seg of segments) {
+    const text = (seg.text ?? '').trim();
+    if (!text) continue;
+    const ts = formatTs(Number(seg.start) || 0).split('.')[0];
+    const speaker = seg.speaker || 'SPEAKER_??';
+    out.push(`[${ts}] ${speakerNames.get(speaker) ?? speaker}: ${text}`);
+  }
+  return out.join('\n');
+}
+
 /** sha256 hex of a UTF-8 string — matches the worker's content_hash. */
 export function sha256Hex(body: string): string {
   return createHash('sha256').update(body, 'utf8').digest('hex');

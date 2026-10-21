@@ -21,6 +21,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueueArchiveJob } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
+import { registrazioneConVideo } from '@/lib/captions/transcript';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,7 @@ export const POST = withErrorHandling(async (request, context) => {
     where: { id },
     select: {
       id: true,
+      blobKey: true,
       _count: {
         select: {
           tracks: { where: { audioPurgedAt: null } },
@@ -65,6 +67,16 @@ export const POST = withErrorHandling(async (request, context) => {
       'No participant tracks available for this recording (none recorded, or already purged). Enable multi-track recording + track retention before the event.',
       422,
       'NO_PARTICIPANT_TRACKS',
+    );
+  }
+  // Le tracce senza il video della sala (non registrato, o non ancora
+  // arrivato): il worker parte dal video, e fallirebbe al download a ogni
+  // tentativo.
+  if (!registrazioneConVideo(recording)) {
+    throw new AppError(
+      'This recording has the participant tracks but no room video (not recorded, or not uploaded yet): the downloadable archive needs the video.',
+      422,
+      'RECORDING_WITHOUT_VIDEO',
     );
   }
 

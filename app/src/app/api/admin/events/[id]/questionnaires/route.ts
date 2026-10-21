@@ -2,6 +2,8 @@
  * List both placements of questionnaires attached to an event. Returns
  * an array with at most two entries (PRE_REGISTRATION, POST_EVENT) —
  * whichever are configured. Missing placements are simply absent.
+ * Each linked template carries its questions, so the event page can show
+ * what is asked without opening the editor.
  */
 
 import { cookies } from 'next/headers';
@@ -29,7 +31,25 @@ export const GET = withErrorHandling(async (_request, context) => {
     include: {
       templates: {
         orderBy: { sortOrder: 'asc' },
-        include: { template: { select: { id: true, name: true } } },
+        include: {
+          template: {
+            select: {
+              id: true,
+              name: true,
+              items: {
+                orderBy: { sortOrder: 'asc' },
+                select: {
+                  prompt: true,
+                  type: true,
+                  options: true,
+                  scaleMin: true,
+                  scaleMax: true,
+                  required: true,
+                },
+              },
+            },
+          },
+        },
       },
       adhocItems: { orderBy: { sortOrder: 'asc' } },
       _count: { select: { responses: true } },
@@ -49,6 +69,7 @@ export const GET = withErrorHandling(async (_request, context) => {
           id: l.template.id,
           name: l.template.name,
           sortOrder: l.sortOrder,
+          items: l.template.items,
         })),
         adhocItems: q.adhocItems,
         responseCount: q._count.responses,

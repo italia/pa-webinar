@@ -219,6 +219,11 @@ export function expectedArtifactsForJob(
       // Nessun file: il resoconto si consegna alla rotta interna del
       // resoconto (api/internal/event-report) e si congela sull'evento.
       return [];
+    case 'TRANSLATE_TEXT':
+      // Nessun file: le traduzioni di titolo e descrizione si consegnano a
+      // api/internal/event-text-translation e restano sull'evento come
+      // proposta.
+      return [];
     default: {
       const _exhaustive: never = kind;
       throw new Error(`unknown job kind: ${String(_exhaustive)}`);

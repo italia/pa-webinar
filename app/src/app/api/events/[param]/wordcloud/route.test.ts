@@ -30,6 +30,9 @@ vi.mock('@/lib/cache', () => ({
   deleteCacheByPrefix: vi.fn(),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+/** Redis pronto = il canale della sala consegna gli avvisi. */
+const { canale } = vi.hoisted(() => ({ canale: { attivo: false } }));
+vi.mock('@/lib/redis', () => ({ getRedis: () => (canale.attivo ? { status: 'ready' } : null) }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn(async () => false) }));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
@@ -289,6 +292,25 @@ describe('GET ?lite=1 (il pallino sulla scheda)', () => {
     expect(await (await GET(lite(), ctx())).json()).toEqual({ active: false });
     expect(mockedRound).not.toHaveBeenCalled();
     vi.mocked(getCached).mockImplementation(() => null);
+  });
+
+  it('col canale attivo non si tiene in caldo: ogni istanza rilegge lo stato vero', async () => {
+    evento();
+    canale.attivo = true;
+    try {
+      vi.mocked(getCached).mockImplementation(((chiave: string) =>
+        chiave.startsWith('wordcloud-lite:') ? { active: false } : null) as typeof getCached);
+      mockedRound.mockResolvedValue({ id: 'giro-2', status: 'OPEN', duration: 0, createdAt: new Date() });
+      expect(await (await GET(lite(), ctx())).json()).toEqual({ active: true, id: 'giro-2' });
+      expect(vi.mocked(setCache)).not.toHaveBeenCalledWith(
+        `wordcloud-lite:${EVENT_ID}`,
+        expect.anything(),
+        expect.anything(),
+      );
+    } finally {
+      canale.attivo = false;
+      vi.mocked(getCached).mockImplementation(() => null);
+    }
   });
 
   it('chi ha un token si controlla una volta, poi l’esito resta in caldo', async () => {

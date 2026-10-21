@@ -237,9 +237,11 @@ export default async function ServiceInventoryPage() {
           </div>
 
           <section className="mb-4">
-            <h2 className="h4 mb-2">{t('sections.componentsTitle')}</h2>
+            <h2 id="componenti-servizio" className="h4 mb-2">{t('sections.componentsTitle')}</h2>
             <p className="text-muted mb-3">{t('sections.componentsIntro')}</p>
-            <div className="table-responsive">
+            {/* Su uno schermo stretto la tabella scorre di lato: il riquadro
+                si raggiunge con la tastiera e si scorre con le frecce. */}
+            <div className="table-responsive" tabIndex={0} role="group" aria-labelledby="componenti-servizio">
               <table className="table table-sm align-middle">
                 <thead>
                   <tr>

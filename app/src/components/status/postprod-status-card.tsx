@@ -196,8 +196,19 @@ export default function PostprodStatusCard() {
             <div
               className="progress mb-2"
               style={{ height: 14, borderRadius: 7, overflow: 'hidden' }}
-              role="meter"
-              aria-label={t('queueAriaLabel')}
+              role="img"
+              aria-label={`${t('queueAriaLabel')}: ${(
+                [
+                  [pending, t('queuePending')],
+                  [claimed + running, t('queueRunning')],
+                  [done, t('queueDone')],
+                  [failed, t('queueFailed')],
+                ] as const
+              )
+                // Come la legenda sotto: solo gli stati presenti.
+                .filter(([n]) => n > 0)
+                .map(([n, etichetta]) => `${n} ${etichetta}`)
+                .join(', ')}`}
             >
               {pending > 0 && (
                 <div
@@ -350,7 +361,7 @@ function QueueChip({
   return (
     <span
       className="d-inline-flex align-items-center gap-1 px-2 py-1 rounded"
-      style={{ background: `${color}15`, color }}
+      style={{ background: `${color}15`, color: 'var(--app-text)' }}
     >
       <span
         style={{

@@ -83,25 +83,28 @@ except for its colors (see [Inside the Jitsi frame](#inside-the-jitsi-frame)).
 
 ## Images: upload them, do not hotlink
 
-Every image field (logo, favicon, watermark, Open Graph image) and the waiting-room audio field accept
-either **Upload file** or **Paste URL**.
+Every image field (logo, favicon, watermark, Open Graph image) and the waiting-room audio field show
+one **Choose from device** button, an area to drop the file on and, below it, a field for pasting a
+link.
 
-- **Upload** sends the file to `/api/admin/assets/upload-url`. The route checks the declared type,
-  the file's real magic bytes and the size limit per type. The accepted types and size caps are
-  `ALLOWED_MIME` and `MAX_SIZE` in `app/src/app/api/admin/assets/upload-url/route.ts`. Most branding
-  fields show their own help text instead of the format hint, and an oversized or wrong-type file is
-  rejected with an error under the field. The file is stored in the files storage domain under
-  `assets/` (see [object storage](storage.md)). The saved value is a stable URL on the portal's own
-  origin (`/api/assets/...`). An SVG opened directly downloads instead of rendering, so a hostile SVG
-  cannot run as a page.
-- **Upload needs the files storage domain.** Without it, the route answers `503` and the field shows
-  an upload error (see [object storage](storage.md#two-storage-domains)). Until storage is
-  configured, a small image can be pasted as a `data:` URI, which the Content Security Policy
-  allows.
+- **Upload** sends the file to `/api/admin/assets/upload-url`, with a progress bar and a button to
+  cancel. The browser checks the type and size first, with the same rules as the route
+  (`ASSET_MIME_TYPES` and `ASSET_MAX_BYTES` in `app/src/lib/uploads/limits.ts`); the route then
+  checks the declared type, the file's real magic bytes and the size limit per type. A rejected file
+  gets a message under the field, in the page language. The file is stored in the files storage
+  domain under `assets/` (see [object storage](storage.md)). The saved value is a stable URL on the
+  portal's own origin (`/api/assets/...`). An SVG opened directly downloads instead of rendering, so
+  a hostile SVG cannot run as a page.
+- **Upload needs the files storage domain and a staff session.** Without storage the field offers
+  only the link, with a note (see [object storage](storage.md#two-storage-domains)). Someone editing
+  an event with the moderator link has no staff session: the field offers only the link and says
+  that uploads are reserved for staff. Until storage is configured, a small image can be pasted as a
+  `data:` URI, which the Content Security Policy allows.
 - **A URL on another host usually does not display.** The Content Security Policy allows images only
   from the portal itself, `data:` and `blob:` URIs, and YouTube thumbnails (`img-src`, with the
   external hosts in `app/src/lib/security/img-src.ts`). A logo linked from an organization's website
-  is saved without error but blocked by the browser; the image field warns about it under the URL.
+  is saved without error but blocked by the browser; the image field shows a warning in place of the
+  preview.
   The social preview image (SEO) is the exception: crawlers fetch it, so any host works. Audio is limited the same way by `media-src`, which admits the portal, the
   recording storage hosts and any host listed in `RECORDING_MEDIA_CSP_HOSTS`. See
   [Content Security Policy](../SECURITY-CSP.md).

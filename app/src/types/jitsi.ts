@@ -76,6 +76,10 @@ export interface JitsiEventMap {
   audioModerationChanged: [{ enabled: boolean }];
   videoModerationChanged: [{ enabled: boolean }];
   moderationStatusChanged: [{ enabled: boolean; mediaType: string }];
+  /** Chi conduce ha dato la parola: a chi la riceve arriva con il proprio id. */
+  moderationParticipantApproved: [{ id?: string; mediaType: string }];
+  /** Chi conduce ha tolto la parola. */
+  moderationParticipantRejected: [{ id?: string; mediaType: string }];
   displayNameChange: [{ id: string; displayname: string }];
   dominantSpeakerChanged: [{ id: string }];
   tileViewChanged: [{ enabled: boolean }];
@@ -88,6 +92,10 @@ export interface JitsiEventMap {
    *  i client, anche con i sottotitoli nativi di Jitsi nascosti. L'IFrame API
    *  lo consegna dentro `data`. */
   transcriptionChunkReceived: [{ data?: JitsiTranscriptionChunk }];
+  /** Un errore della videochiamata. `type` e `isFatal` li calcola Jitsi: un
+   *  errore fatale della connessione o della conferenza è quello per cui
+   *  ricaricherebbe la propria pagina (lib/jitsi/riconnessione). */
+  errorOccurred: [{ error?: { name?: string; message?: string; type?: string; isFatal?: boolean } }];
 }
 
 /**

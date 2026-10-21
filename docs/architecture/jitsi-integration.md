@@ -318,8 +318,21 @@ Each event has three flags: `participantsCanUnmute`, `participantsCanStartVideo`
 `participantsCanShareScreen`. They apply to the participant role:
 
 - when `participantsCanUnmute` or `participantsCanStartVideo` is off, `JitsiRoom` removes the
-  microphone or camera button and forces that participant to join muted;
+  microphone or camera button and forces that participant to join muted, and the waiting room offers
+  no microphone or camera switch to that participant and says why;
 - when `participantsCanShareScreen` is off, it removes the screen-share button.
+
+The buttons follow the moderation during the call. `JitsiRoom` listens to `moderationStatusChanged`,
+`moderationParticipantApproved` and `moderationParticipantRejected` and rewrites the toolbar with
+`overwriteConfig`. When a moderator gives a participant the floor, that participant gets the
+microphone (and camera) button back, together with Jitsi's notice asking them to speak. When the
+floor is taken back, or the moderation is switched on again, the button goes away and the room closes
+a microphone or camera that was still open, which the bridge has already muted. When the moderation is
+lifted, every participant in the room gets the buttons; someone who joins after that gets them only
+when a moderator gives them the floor, because the room shows a button only after Jitsi's own event
+says the person may use it. The site keeps Jitsi's notifications off except
+`notify.hostAskedUnmute`, `notify.mutedRemotelyTitle` and `notify.videoMutedRemotelyTitle`
+(`notifications` in `app/src/lib/jitsi/config.ts`).
 
 The server enforces them too. Every token of the event carries the flags that are off, and the Prosody
 module `mod_pa_media_lock` switches on Jitsi's audio, video and screen-share moderation as the first
@@ -327,10 +340,19 @@ person enters the room, before any moderator arrives. Jicofo then keeps every pa
 muted on the bridge, so a client that ignores the hidden buttons still cannot be heard or seen.
 Moderators are always allowed, and speakers are allowed as soon as they join. The lock is switched on
 before the first person enters, so everyone, including a speaker who is the first to join, enters a
-room that is already moderated ([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
+room that is already moderated. Jicofo creates each new media session of a person who does not moderate
+muted on the bridge, also when they are allowed; the module asks Jicofo to unmute every allowed person
+it gives a new session to, such as a speaker who was alone in the room when someone else joins
+([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
 
-A moderator can lift or restore the moderation during the call from the control bar
-(**Participant mic**, **Participant video**). Both toggles are always shown to moderators.
+With the lock on, Jitsi closes the microphone and camera of everyone who has just joined, moderators
+and speakers included, when it receives the room's start-muted rule. For a moderator or speaker who
+chose them on in the waiting room, `JitsiRoom` opens them again, once, in the first seconds after
+joining. After that, or as soon as the person presses the button themselves, a mute stays as it is,
+whoever caused it. On a phone, where everyone joins with both off, it does nothing.
+
+A moderator can lift or restore the moderation during the call from the **Participants** tab
+(**Microphones locked**, **Video locked**). Both toggles are always shown to moderators.
 
 ### Video quality presets
 
@@ -716,14 +738,23 @@ bundle still parses, and then pushes the exact image it validated. A patch chang
 `IMAGE_TAG`, so a rollback stays possible. The chart pulls with `pullPolicy: Always` as a safety net in
 case a tag is ever rewritten.
 
-**Chart default versus published tag.** `jitsi-meet.web.image.tag` in `values.yaml` and `IMAGE_TAG` in
-the workflow are maintained separately, and a comment in `values.yaml` records when they diverge.
-Compare them before relying on the chart default. Aligning them is a conference-image rollout, done
-through [upgrades and rollback](../operations/upgrades.md), never in passing.
+**One Jitsi version for the whole conference.** `values.yaml` pins every conference component to the
+same Jitsi release: `jitsi-meet.web.image.tag` is the workflow's `IMAGE_TAG`, and
+`jitsi-meet.{prosody,jicofo,jvb,jibri,jigasi,transcriber}.image.tag` are the same release without the
+patch suffix. The subchart's own `appVersion` is older and is not used. The
+`pa-webinar.validateJitsiVersions` guard refuses to render when the enabled components disagree,
+comparing the `stable-<number>` or `unstable-<number>` part of each tag. The floating tags `stable`,
+`unstable` and `latest` count as themselves, so one of them next to a pinned release stops the render.
+An empty tag counts as the subchart's `appVersion`, and as an unknown version, which also stops the
+render, when Helm does not expose it; a tag in another form is not recognized and does not block. The
+Docker Compose stack pins the same release for its four Jitsi services. The case it catches is an installation that pinned only the web image and left the other
+components to the chart default: when the default moves, the web part and Prosody, Jicofo and the bridge
+end up on different releases. To upgrade such an installation, pin the other components to the release
+the web image already uses, or move all of them to the chart's release.
 
 **Without the patched image.** An installation that cannot pull it sets
-`jitsi-meet.web.image.repository: jitsi/web` and a matching upstream `jitsi-meet.web.image.tag` (the
-subchart's `appVersion`, unless the backend images are pinned to another release), and empties
+`jitsi-meet.web.image.repository: jitsi/web` and the upstream `jitsi-meet.web.image.tag` of the same
+release as the other components (the chart's release without the `-rnnoise` suffix), and empties
 `jitsi-meet.imagePullSecrets`. Changing only the repository keeps the chart's default tag, which exists
 only for the patched image, and the pull fails. It must also leave noise suppression
 enforced off, which the rnnoise guard enforces. It loses the self-view recovery and the click-through
@@ -894,10 +925,12 @@ Bumping Jitsi is a change to the conference that every event depends on. Work th
 order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 
 1. **Bump the subchart and the backend images.** Update the `jitsi-meet` dependency in
-   `infra/helm/pa-webinar/Chart.yaml`. The Prosody, Jicofo and JVB images follow the subchart's
-   `appVersion` unless pinned. Run `helm dependency update infra/helm/pa-webinar`, commit the vendored
-   chart and `Chart.lock`,
-   and run `./scripts/validate-chart.sh`.
+   `infra/helm/pa-webinar/Chart.yaml` when the new release needs it. The Prosody, Jicofo, JVB and Jibri
+   images are pinned in `values.yaml` (`jitsi-meet.<component>.image.tag`): move them together, and
+   move the web image with them in step 3, since the chart refuses to render mixed releases. Update
+   the profiles that use the stock web image (`examples/values-k3s.yaml`, `values-minikube.yaml`,
+   `values-eks.yaml`). Run `helm dependency update infra/helm/pa-webinar` if the dependency changed,
+   commit the vendored chart and `Chart.lock`, and run `./scripts/validate-chart.sh`.
 2. **Rebuild the patched web image on the same Jitsi release.** Update `BASE_TAG` in
    `infra/jitsi-web-patched/Dockerfile`, and `BASE_TAG`, `BASE_IMAGE` and a new `IMAGE_TAG` in
    `.github/workflows/jitsi-web.yml`. Every exactly-one-match assertion and every workflow check must
@@ -909,10 +942,12 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
    still in the image and `mod_token_affiliation_custom` still loads. Jicofo still reads
    `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER` from its environment. The recorder account on the hidden
    domain is still allow-listed. `mod_pa_media_lock` copies parts of the stock `av_moderation_component`
-   (the room's `av_moderation` state and the shape of its messages): in a room of an event that grants
-   participants nothing, check that a guest who forces the microphone on is not heard, that a speaker is
-   heard after turning the microphone on, also when the speaker is the first to join, and that Jicofo's
-   log reads `Moderation for AUDIO ... was enabled by focus`.
+   (the room's `av_moderation` state and the shape of its messages) and the unmute request a client
+   sends Jicofo (`<mute xmlns="http://jitsi.org/jitmeet/audio">false</mute>`): in a room of an event that
+   grants participants nothing, check that a guest who forces the microphone on is not heard, that a
+   speaker is heard after turning the microphone on, also when the speaker joined first and turned it on
+   while alone, and again after everyone else has left and someone joins, and that Jicofo's log reads
+   `Moderation for AUDIO ... was enabled by focus` and `Will unmute ...` for the speaker.
    `mod_pa_occupants` reads the session field `jitsi_meet_context_user`, the occupant's nickname and
    the room's `meetingId`: in a room of an event, check that a row appears in `room_occupants` for each
    person who joins, with the seat of their token, and that Prosody logs no `Occupanti:` warning.
@@ -924,7 +959,9 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 6. **Make a real call.** Use several devices and at least one microphone that does not run at 48 kHz.
    Check that audio works with noise suppression in its configured state, that participants cannot act
    as moderators, and that moderators can. Check self view, reactions over the toolbar, screen sharing,
-   raised hands, the leave prompt and recording if it is enabled.
+   raised hands, the leave prompt and recording if it is enabled. With live captions on, start and stop
+   a recording and check that captions keep coming: Jitsi's recording commands write into the room
+   metadata that transcription is off ([Live captions](live-captions.md)).
 7. **Run a load-test smoke test** with the toolkit in
    [scripts/load-test/README.md](../../scripts/load-test/README.md), and compare with the reference
    measurements in [LOAD-TESTING](../LOAD-TESTING.md).

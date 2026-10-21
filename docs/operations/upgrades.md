@@ -46,7 +46,7 @@ An upgrade moves several parts, each with its own value in the chart:
 | Portal | `app.image.tag` | The Next.js application. |
 | Migration image | `app.migration.image.tag` | The `builder` stage of the same build. It runs the database migrations before each app pod starts. |
 | Chart | the chart you pass to `helm upgrade` | Templates, defaults, the pinned subcharts (PostgreSQL, Redis, Jitsi Meet) and the third-party images `values.yaml` pins, the PostgreSQL server image among them. A new PostgreSQL major version needs care: see [Reading the dry run](#reading-the-dry-run). |
-| Patched Jitsi web image | `jitsi-meet.web.image.tag` | Built by its own workflow. Changing it is a conference-image rollout. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
+| Jitsi conference images | `jitsi-meet.web.image.tag`, and `jitsi-meet.{prosody,jicofo,jvb,jibri}.image.tag` | One Jitsi release for every component, pinned in `values.yaml`; the patched web image is built by its own workflow. Changing them is a conference rollout, and the chart refuses mixed releases. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
 | Recorder bot, recorder controller, AI post-production worker | `recorder.image`, `recorder.controller.image`, `postprod.worker.image` | Empty by default: the chart uses the app image's tag, and each release from 0.13.0 publishes them with its version. See [Rollback](#making-the-dev-components-roll-back). |
 | AI post-production worker without a GPU | `postprod.worker.cpu.image` | Empty by default: `postprod.worker.image` when that is set, otherwise the app image's tag. Published with each release from the first one that includes it. |
 
@@ -330,9 +330,10 @@ app:
   migrations if only the app tag moves. When the new release adds migrations, its pods then fail
   their readiness check against the old schema, and the rollout stalls.
 
-This is also the moment to pin anything you have not pinned yet. That includes
-`jitsi-meet.web.image.tag`, so the conference image changes only when you decide, and the Jitsi
-credentials ([Pin the generated credentials](#pin-the-generated-credentials)).
+This is also the moment to pin anything you have not pinned yet. That includes the Jitsi image tags,
+`jitsi-meet.web.image.tag` and the same release for `prosody`, `jicofo`, `jvb` and `jibri`, so the
+conference changes only when you decide, and the Jitsi credentials
+([Pin the generated credentials](#pin-the-generated-credentials)).
 
 **3. Dry-run and diff.**
 
@@ -426,6 +427,9 @@ option and `--recover-secrets`, which rebuilds the secrets file from the cluster
   `templates/deployment.yaml` includes, stop incoherent values before anything reaches the cluster.
   They catch, among others:
   - advanced noise suppression switched on over a web image that is not patched;
+  - conference components on different Jitsi releases, typically the web image pinned and the others
+    left to a chart default that has moved: pin them all to the same release
+    ([One Jitsi version for the whole conference](../architecture/jitsi-integration.md#the-patched-web-image));
   - a datastore Secret that the subcharts do not point to, or that no template renders;
   - conference token authentication that Prosody could not verify: no secret, two conflicting
     secret settings (`jitsi-meet.prosody.jwt.secret` and `jwt.existingSecretName` together, or an
@@ -582,6 +586,11 @@ brings `pa_media_lock` does, is the same kind of change. A later change to a mod
 not restart Prosody; restart its StatefulSet when no call is running. A values file that sets its own
 `XMPP_MUC_MODULES` keeps its list: add `pa_media_lock` to it, or participant limits stay enforced only
 by the room's toolbar.
+
+Loudest-only routing on the bridge is such a change too. The upgrade that first brings
+`global.jvb.numLoudest` changes the bridge's configuration and restarts the bridge, and so does a
+later change of the number: run it outside events
+([Loudest-only audio routing](../architecture/scaling.md#loudest-only-audio-routing)).
 
 Upgrading Jitsi itself follows the
 [Jitsi upgrade checklist](../architecture/jitsi-integration.md#jitsi-upgrade-checklist).
@@ -759,6 +768,35 @@ keys from the application Secret in the same upgrade. A Secret created with `kub
 claimed by the chart makes the upgrade fail, because Helm refuses to adopt a resource it does not
 own.
 
+## Turning off the CPU translation engine
+
+Setting `postprod.mt.enabled: false` removes the CPU translation engine (`<fullname>-mt`) and
+takes `AI_MT_BASE_URL` away from the portal. The chart refuses `postprod.mt.enabled` without the
+CPU worker, so moving to a profile without it (`postprod.worker.cpu.enabled: false`) turns the
+engine off too.
+
+Translations of event texts (`TRANSLATE_TEXT`) still in the queue then have nothing to run them.
+Once the new app pods are up, the portal handles them without a manual step:
+
+- the post-production orchestrator leaves them out of its counts, so they start no worker, and
+  never a GPU worker;
+- `postprod-reclaim`, which runs every minute, marks the queued ones `FAILED` with `lastError`
+  "The CPU translation engine is not configured (AI_MT_BASE_URL)";
+- a job a CPU worker had already claimed fails when the engine goes away. When it returns to the
+  queue, or its lease expires, the next `postprod-reclaim` run closes it the same way.
+
+The wizard and the event page stop offering machine translation. Proposals already stored stay on
+their events (`events.text_translations`), and text already filled from them and saved stays
+unchanged. To check that no translation is left open:
+
+```sql
+SELECT status, count(*) FROM postprod_jobs WHERE kind = 'TRANSLATE_TEXT' GROUP BY status;
+```
+
+Turning the engine on works the other way round: until every app pod has `AI_MT_BASE_URL`, an old
+pod that answers a claim or a `postprod-reclaim` run can close a translation requested on a new
+pod, with the same reason. Staff request it again once the rollout is done.
+
 ## Rollback
 
 ### Rolling back the release
@@ -807,17 +845,20 @@ written since then is lost, so do it only when the older release cannot run on t
 Under the additive rule, that should not happen.
 
 **Post-production jobs of a kind the older release does not know.** A release can add a job kind,
-as the AI event report (`REPORT`) does. The older release does not run it, and its orchestrator keeps
-asking for a worker, and keeps vLLM running, for each such job still pending. Before rolling back
-past the release that added a kind, close its open jobs with `psql` on the database:
+as the AI event report (`REPORT`) and the machine translation of event texts (`TRANSLATE_TEXT`) do.
+The older release does not run it, and its orchestrator keeps asking for a worker, and keeps vLLM
+running, for each such job still pending. Before rolling back past the release that added a kind,
+close its open jobs with `psql` on the database:
 
 ```sql
 UPDATE postprod_jobs
 SET status = 'FAILED', last_error = 'rolled back', completed_at = NOW(), updated_at = NOW()
-WHERE kind = 'REPORT' AND status IN ('PENDING', 'CLAIMED', 'RUNNING');
+WHERE kind IN ('REPORT', 'TRANSLATE_TEXT') AND status IN ('PENDING', 'CLAIMED', 'RUNNING');
 ```
 
-Staff request the report again once the newer release is back.
+Staff request the report or the translation again once the newer release is back. Machine
+translation proposals stay in `events.text_translations`, which the older release does not read; the
+older chart removes the CPU translation engine (`<fullname>-mt`).
 
 ### Restore a backup
 

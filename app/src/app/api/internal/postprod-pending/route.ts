@@ -13,7 +13,27 @@
  *     "desired": 2,         // min(runnable + claimed, maxConcurrent)
  *     "desiredGpu": 1,      // `desired` diviso fra il worker con la GPU
  *     "desiredCpu": 1,      // e quello senza (lib/ai/job-classes)
+ *     "desiredLlm": 1,      // lavori pronti, presi o in esecuzione che
+ *                           // usano vLLM (LLM_JOB_KINDS)
+ *     "desiredMt": 0,       // lo stesso per il motore di traduzione su CPU
+ *                           // (MT_JOB_KINDS)
+ *     "desiredWithoutMt": 2 // `desired` senza i lavori di MT_JOB_KINDS
  *   }
+ *
+ * `desiredLlm` e `desiredMt` dicono all'orchestratore quale motore tenere
+ * acceso: vLLM (la GPU) solo per i lavori che gli chiedono testo, il motore su
+ * CPU solo per la traduzione di titolo e descrizione. Contano anche i lavori
+ * RUNNING, che `desired` non conta: il motore deve restare acceso finche' il
+ * worker lo usa. Un orchestratore che non li legge accende vLLM come prima.
+ *
+ * `desiredWithoutMt` e' la misura del chart senza worker CPU: li' il worker
+ * con la GPU prende tutti i tipi tranne quelli di MT_JOB_KINDS, che non devono
+ * mai accendere la GPU. Il tetto si applica dopo averli tolti, cosi' una
+ * traduzione dei testi in coda non toglie il posto a una trascrizione.
+ *
+ * Senza il motore di traduzione configurato (resolveMtProvider) nessun worker
+ * puo' eseguire i lavori di MT_JOB_KINDS: non entrano in nessun conteggio, e
+ * postprod-reclaim chiude come falliti quelli rimasti in coda.
  *
  * The orchestrator's policy is: if `desired > currently-running k8s
  * Jobs`, create more; if less, wait (jobs are one-shot, no scale-down
@@ -22,10 +42,13 @@
  * Auth: CRON_API_KEY.
  */
 
+import { Prisma } from '@prisma/client';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { GPU_WORKER_KINDS } from '@/lib/ai/job-classes';
+import { GPU_WORKER_KINDS, LLM_JOB_KINDS, MT_JOB_KINDS } from '@/lib/ai/job-classes';
+import { resolveMtProvider } from '@/lib/ai/providers';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +58,9 @@ interface CountRow {
   running: bigint;
   gpu_runnable: bigint;
   gpu_claimed: bigint;
+  llm_work: bigint;
+  mt_work: bigint;
+  mt_queued: bigint;
 }
 
 export const GET = withErrorHandling(async (request) => {
@@ -60,38 +86,66 @@ export const GET = withErrorHandling(async (request) => {
       desired: 0,
       desiredGpu: 0,
       desiredCpu: 0,
+      desiredLlm: 0,
+      desiredMt: 0,
+      desiredWithoutMt: 0,
     });
   }
 
-  // One query for all three counts — cheap (indexed by status). The
-  // "runnable" set checks dependency-DONE in the same way the claim
-  // endpoint does so the orchestrator and the claim see the same view.
+  // Pronto per il claim: le stesse condizioni dell'endpoint di claim, cosi'
+  // l'orchestratore e il claim vedono la stessa coda.
+  const pronto = Prisma.sql`(
+    j.status = 'PENDING'
+    AND j.next_attempt_at <= NOW()
+    AND (j.depends_on_id IS NULL
+         OR EXISTS (SELECT 1 FROM postprod_jobs dep
+                    WHERE dep.id = j.depends_on_id AND dep.status = 'DONE'))
+  )`;
+  // Un lavoro che tiene acceso il suo motore: pronto, preso o in esecuzione.
+  const inLavoro = Prisma.sql`(j.status IN ('CLAIMED', 'RUNNING') OR ${pronto})`;
+  // Senza motore di traduzione i suoi lavori non li esegue nessuno: contarli
+  // accenderebbe a ogni giro un worker che non li prende (nel chart senza
+  // worker CPU, quello con la GPU).
+  const soloEseguibili = resolveMtProvider()
+    ? Prisma.empty
+    : Prisma.sql`WHERE j.kind::text <> ALL(${[...MT_JOB_KINDS]}::text[])`;
+
+  // One query for all the counts — cheap (indexed by status).
   const rows = await prisma.$queryRaw<CountRow[]>`
     SELECT
-      COUNT(*) FILTER (
-        WHERE j.status = 'PENDING'
-          AND j.next_attempt_at <= NOW()
-          AND (j.depends_on_id IS NULL
-               OR EXISTS (SELECT 1 FROM postprod_jobs dep
-                          WHERE dep.id = j.depends_on_id AND dep.status = 'DONE'))
-      ) AS runnable,
+      COUNT(*) FILTER (WHERE ${pronto}) AS runnable,
       COUNT(*) FILTER (WHERE j.status = 'CLAIMED') AS claimed,
       COUNT(*) FILTER (WHERE j.status = 'RUNNING') AS running,
       COUNT(*) FILTER (
-        WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[])
-          AND j.status = 'PENDING'
-          AND j.next_attempt_at <= NOW()
-          AND (j.depends_on_id IS NULL
-               OR EXISTS (SELECT 1 FROM postprod_jobs dep
-                          WHERE dep.id = j.depends_on_id AND dep.status = 'DONE'))
+        WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[]) AND ${pronto}
       ) AS gpu_runnable,
       COUNT(*) FILTER (
         WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[]) AND j.status = 'CLAIMED'
-      ) AS gpu_claimed
+      ) AS gpu_claimed,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...LLM_JOB_KINDS]}::text[]) AND ${inLavoro}
+      ) AS llm_work,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...MT_JOB_KINDS]}::text[]) AND ${inLavoro}
+      ) AS mt_work,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...MT_JOB_KINDS]}::text[])
+          AND (j.status = 'CLAIMED' OR ${pronto})
+      ) AS mt_queued
     FROM postprod_jobs j
+    ${soloEseguibili}
   `;
 
-  const row = rows[0] ?? { runnable: 0n, claimed: 0n, running: 0n, gpu_runnable: 0n, gpu_claimed: 0n };
+  const row = rows[0] ?? {
+    runnable: 0n,
+    claimed: 0n,
+    running: 0n,
+    gpu_runnable: 0n,
+    gpu_claimed: 0n,
+    llm_work: 0n,
+    mt_work: 0n,
+    mt_queued: 0n,
+  };
   const runnable = Number(row.runnable);
   const claimed = Number(row.claimed);
   const running = Number(row.running);
@@ -107,6 +161,12 @@ export const GET = withErrorHandling(async (request) => {
   // la trascrizione passa per prima, perche' gli altri job ne dipendono.
   const desiredGpu = Math.min(gpuWork, maxConcurrent);
   const desiredCpu = Math.min(cpuWork, maxConcurrent - desiredGpu);
+  // Per il worker con la GPU che fa tutto (chart senza worker CPU): i lavori
+  // di MT_JOB_KINDS, pronti o presi, non li prende mai.
+  const desiredWithoutMt = Math.min(
+    runnable + claimed - Number(row.mt_queued),
+    maxConcurrent
+  );
 
   return Response.json({
     pipelineEnabled: true,
@@ -117,5 +177,8 @@ export const GET = withErrorHandling(async (request) => {
     desired,
     desiredGpu,
     desiredCpu,
+    desiredLlm: Number(row.llm_work),
+    desiredMt: Number(row.mt_work),
+    desiredWithoutMt,
   });
 });

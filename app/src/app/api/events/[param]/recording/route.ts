@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError, ForbiddenError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
@@ -9,6 +11,7 @@ import {
   generateRecordingSasUrl,
   deleteRecordingBlob,
 } from '@/lib/storage/recordings';
+import { accessoRegistrazione } from '@/lib/recording/audience';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,14 +31,27 @@ export const GET = withErrorHandling(async (_request, context) => {
     where: isUuid
       ? { OR: [{ id: param }, { slug: param }] }
       : { slug: param },
-    select: { recordingUrl: true, status: true, recordingPublished: true },
+    select: {
+      id: true,
+      recordingUrl: true,
+      status: true,
+      recordingPublished: true,
+      transcriptPublished: true,
+      recordingAudience: true,
+      postEventPublic: true,
+      postEventPublicUntil: true,
+    },
   });
 
   if (!event?.recordingUrl) throw new NotFoundError('Recording');
   if (event.status !== 'ENDED' && event.status !== 'ARCHIVED') {
     throw new ForbiddenError('Recording not yet available');
   }
-  if (!event.recordingPublished) {
+  // Chi puo' vedere la registrazione (lib/recording/audience): pubblicata nella
+  // finestra post-evento, per tutti o per i soli iscritti; lo staff che
+  // gestisce l'evento anche prima, per l'anteprima della pagina.
+  const accesso = await accessoRegistrazione(event, await cookies());
+  if (!accesso || (!event.recordingPublished && accesso !== 'staff')) {
     throw new ForbiddenError('Recording not published');
   }
 
@@ -49,7 +65,11 @@ export const GET = withErrorHandling(async (_request, context) => {
     PLAYBACK_SAS_EXPIRY_MINUTES,
   ).catch(() => null);
 
-  return Response.redirect(signed ?? event.recordingUrl, 302);
+  // Chi viene rimandato dipende dalla richiesta: niente cache condivise.
+  return new Response(null, {
+    status: 302,
+    headers: { Location: signed ?? event.recordingUrl, 'Cache-Control': 'private, no-store' },
+  });
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {

@@ -13,6 +13,7 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Badge, Row, Col } from 'design-react-kit';
 
 import EventTitle from '@/components/events/event-title';
+import PersonPhoto from '@/components/events/person-photo';
 import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { Link, percorso } from '@/i18n/navigation';
@@ -52,6 +53,11 @@ interface EventHeaderProps {
   /** Il titolo e' l'h1 della pagina; in anteprima, dentro un'altra pagina,
    *  e' un paragrafo con lo stesso aspetto. */
   titleAs?: 'h1' | 'p';
+  /** La lingua del titolo, se non e' quella della pagina (un titolo non
+   *  tradotto, mostrato nella lingua principale). */
+  titleLang?: string;
+  /** Sotto il titolo: l'avviso di un testo tradotto in automatico. */
+  titleNote?: ReactNode;
 }
 
 /**
@@ -93,6 +99,8 @@ export default function EventHeader({
   organizerName = null,
   tagLinks = true,
   titleAs = 'h1',
+  titleLang,
+  titleNote = null,
 }: EventHeaderProps) {
   const t = useTranslations('events');
   const format = useFormatter();
@@ -167,7 +175,9 @@ export default function EventHeader({
             as={titleAs}
             className={titleAs === 'h1' ? 'mb-3' : 'h1 mb-3'}
             style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
+            lang={titleLang}
           />
+          {titleNote}
 
           {tags.length > 0 && (
             <div className="d-flex flex-wrap gap-2 mb-4">
@@ -387,18 +397,33 @@ export function EventPeople({
             <ul className="event-people__list">
               {chi.map((p, i) => (
                 <li key={`${p.name}-${i}`} className="event-person">
-                  {p.logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.logoUrl} alt="" className="event-person__logo" />
-                  ) : (
-                    <span className="event-person__initials" aria-hidden="true">
-                      {initials(p.name)}
-                    </span>
-                  )}
+                  {/* La foto in un cerchio, o le iniziali: accanto al nome, che
+                      la dice gia', e' decorativa. */}
+                  <PersonPhoto
+                    src={p.photoUrl}
+                    name={p.name}
+                    size={48}
+                    loading="lazy"
+                    className="event-person__photo"
+                    initialsClassName="event-person__initials"
+                  />
                   <span className="event-person__who">
                     <span className="event-person__name">{p.name}</span>
-                    {p.organization && (
-                      <span className="event-person__org">{p.organization}</span>
+                    {(p.organization || p.logoUrl) && (
+                      <span className="event-person__org">
+                        {/* Il logo dell'ente, piccolo, accanto al suo nome; da
+                            solo dice di essere il logo dell'ente. */}
+                        {p.logoUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.logoUrl}
+                            alt={p.organization ? '' : t('detail.personOrganizationLogo')}
+                            loading="lazy"
+                            className="event-person__org-logo"
+                          />
+                        )}
+                        {p.organization}
+                      </span>
                     )}
                   </span>
                 </li>

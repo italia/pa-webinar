@@ -24,6 +24,7 @@ import type { Config } from './config.js';
 import type { ContextProvider, RoomContext } from './context.js';
 import { EngineSession } from './engine.js';
 import { LoadGovernor, type LoadSnapshot } from './load.js';
+import { numbersToDigits } from './numbers.js';
 import { TranscriptSink } from './transcript.js';
 import { VoiceDetector } from './vad.js';
 import {
@@ -133,7 +134,7 @@ function toPcm16(channels: Float32Array[], samples: number): Buffer {
 export class Conference {
   private streams = new Map<string, Stream>();
   private context: RoomContext | null = null;
-  private rewrite: (text: string) => string = (t) => t;
+  private glossary: (text: string) => string = (t) => t;
   private closed = false;
 
   constructor(
@@ -160,7 +161,7 @@ export class Conference {
     const context = await this.gateway.contexts.get(this.room, this.meetingId);
     if (this.closed) return;
     this.context = context;
-    this.rewrite = makeRewriter(context.aliases);
+    this.glossary = makeRewriter(context.aliases);
     this.contextTimer = setTimeout(
       () => void this.loadContext(),
       context.enabled
@@ -175,6 +176,22 @@ export class Conference {
 
   get language(): string {
     return this.context?.language ?? this.gateway.config.defaultLanguage;
+  }
+
+  /**
+   * Correzioni del glossario e, per il testo italiano, numeri in cifre. La
+   * lingua è quella della sessione del motore che ha prodotto il testo: la
+   * lingua del contesto può cambiare mentre la sessione resta quella. In
+   * `auto` la lingua di una frase si sa solo alla fine, dal tag del modello,
+   * e i numeri restano in lettere.
+   */
+  private rewrite(text: string, language: string | null): string {
+    const fixed = this.glossary(text);
+    return this.italian(language) ? numbersToDigits(fixed) : fixed;
+  }
+
+  private italian(language: string | null): boolean {
+    return primaryLanguage(language ?? this.language) === 'it';
   }
 
   streamsList(): Stream[] {
@@ -223,7 +240,9 @@ export class Conference {
       assembler: new CaptionAssembler({
         idPrefix: `${tag}-${Date.now().toString(36)}`,
         maxChars: this.gateway.config.maxCaptionChars,
-        rewrite: (t) => this.rewrite(t),
+        rewrite: (t, language) => this.rewrite(t, language),
+        // Le regole dei numeri guardano le parole che seguono.
+        readsAhead: (language) => this.italian(language),
       }),
       lastVoiceAt: 0,
       vad: new VoiceDetector({
@@ -425,17 +444,20 @@ export class Conference {
   private async openEngine(stream: Stream): Promise<void> {
     stream.opening = true;
     const context = this.context;
+    const language = context?.language ?? this.gateway.config.defaultLanguage;
+    // Il testo di questa sessione è nella sua lingua e la porta con sé: un
+    // sottotitolo aperto in un'altra lingua si chiude prima (CaptionAssembler).
     const session = new EngineSession(
       {
         url: this.gateway.config.engineUrl,
-        language: context?.language ?? this.gateway.config.defaultLanguage,
+        language,
         phrases: context?.phrases ?? [],
         boost: this.gateway.config.boost,
       },
       {
         onDelta: (text, lagMs) => {
           if (lagMs !== null) this.gateway.governor.recordLag(lagMs);
-          this.deliver(stream, stream.assembler.push(text));
+          this.deliver(stream, stream.assembler.push(text, language));
         },
         onCompleted: (transcript) => {
           const pending = stream.pendingCommits.shift();
@@ -443,12 +465,12 @@ export class Conference {
           // Già chiusa allo scadere dell'attesa: il testo arrivato tardi non
           // deve riaprire la frase né chiudere a metà quella successiva.
           if (pending?.expired) return;
-          this.deliver(stream, stream.assembler.finish(transcript));
+          this.deliver(stream, stream.assembler.finish(transcript, language));
         },
         onClosed: () => {
           if (stream.engine === session) stream.engine = null;
           stream.speaking = false;
-          this.deliver(stream, stream.assembler.finish());
+          this.deliver(stream, stream.assembler.finish(undefined, language));
           this.gateway.released();
         },
       },
@@ -585,7 +607,7 @@ export class Conference {
       messageId: update.messageId,
       endpointId: stream.endpointId,
       text: update.text,
-      language: primaryLanguage(this.language),
+      language: primaryLanguage(update.language ?? this.language),
       startedAt: new Date(startedAt).toISOString(),
       endedAt: new Date(now).toISOString(),
     });
@@ -599,7 +621,7 @@ export class Conference {
         endpointId: stream.endpointId,
         text: update.text,
         final: update.final,
-        language: primaryLanguage(this.language),
+        language: primaryLanguage(update.language ?? this.language),
         timestamp: this.gateway.now(),
       }),
     );

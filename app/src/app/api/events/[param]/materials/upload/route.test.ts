@@ -6,7 +6,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * Il caricamento di un file dal pannello «Materiali» della sala.
  *
  * Chi può: chi può già aggiungere un link, cioè il token moderatore primario o
- * un co-moderatore non revocato; relatori e iscritti no. Cosa passa: le stesse
+ * un co-moderatore non revocato; un relatore solo per un PDF, il documento che
+ * presenta in sala; gli iscritti no. Cosa passa: le stesse
  * tipologie e lo stesso limite del caricamento dall'area admin, con il tipo
  * verificato sui byte. Cosa resta: un blob sotto `assets/document/…` e una riga
  * FILE che lo punta, create insieme dal server.
@@ -152,12 +153,51 @@ describe('POST /materials/upload — chi può caricare', () => {
     expect(storage.current!.put).not.toHaveBeenCalled();
   });
 
-  it('il token di un relatore: 403, come per i link', async () => {
-    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER' });
+  it('il token di un relatore carica il PDF che presenta', async () => {
+    mockedGrant.mockResolvedValue({
+      id: 'grant-relatore',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: 'Nome Cognome',
+      email: null,
+    });
+    const res = await POST(await upload({ token: 'TOKEN_DEL_RELATORE' }), ctx());
+    expect(res.status).toBe(201);
+    expect(storage.current!.put).toHaveBeenCalled();
+    // Come per i co-moderatori: il nome cifrato non finisce in chiaro nella riga.
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '', mimeType: 'application/pdf' });
+  });
+
+  it('un relatore non sceglie la visibilità: il campo si ignora e vale la predefinita', async () => {
+    mockedGrant.mockResolvedValue({ id: 'grant-relatore', eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER', name: 'R', email: null });
+    for (const visibility of ['AFTER', 'SEMPRE']) {
+      mockedCreate.mockClear();
+      const res = await POST(await upload({ token: 'TOKEN_DEL_RELATORE', fields: { visibility } }), ctx());
+      expect(res.status).toBe(201);
+      expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ visibility: 'ALWAYS' });
+    }
+  });
+
+  it('il token di un relatore con un file che non è un PDF: 415, niente nello storage', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER', name: 'R', email: null });
+    const res = await POST(
+      await upload({
+        token: 'TOKEN_DEL_RELATORE',
+        file: { bytes: Buffer.from('appunti della sessione\n'), name: 'appunti.txt', type: 'text/plain' },
+      }),
+      ctx(),
+    );
+    expect(res.status).toBe(415);
+    expect(storage.current!.put).not.toHaveBeenCalled();
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('un relatore revocato: 403', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: new Date(), role: 'SPEAKER' });
     const res = await POST(await upload({ token: 'TOKEN_DEL_RELATORE' }), ctx());
     expect(res.status).toBe(403);
     expect(storage.current!.put).not.toHaveBeenCalled();
-    expect(mockedCreate).not.toHaveBeenCalled();
   });
 
   it('il token di un iscritto: 403', async () => {

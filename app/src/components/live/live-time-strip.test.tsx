@@ -145,6 +145,21 @@ describe('LiveTimeStrip', () => {
     render(strip({ registrazione: { ...registrazione, avviso: 'La registrazione non è partita.' } }));
     expect(container.querySelector('[role="alert"]')?.textContent).toBe('La registrazione non è partita.');
   });
+
+  it('per chi interviene solo l’orologio: niente registrazione, timer né avvisi del registratore', () => {
+    render(
+      strip({
+        soloOrologio: true,
+        isRecording: true,
+        recordingStartedAt: new Date(ORA - 10 * MIN).toISOString(),
+        registrazione: { ...registrazione, avviso: 'La registrazione non è partita.' },
+      }),
+    );
+    expect(container.textContent).toContain('mancano 59 minuti');
+    expect(container.querySelector('.live-time-strip__side')).toBeNull();
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+    expect(container.querySelectorAll('button')).toHaveLength(0);
+  });
 });
 
 describe('ClosingNotice', () => {

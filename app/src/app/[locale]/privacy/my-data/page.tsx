@@ -68,6 +68,8 @@ interface ExportGrant {
   role: 'organizer' | 'moderator' | 'speaker';
   organization: string | null;
   shownOnPublicPage: boolean;
+  /** La foto caricata dallo staff dell'evento, come data URL. */
+  photo?: string | null;
   createdAt: string;
   revokedAt: string | null;
   event: { title: Record<string, string>; startsAt: string };
@@ -289,27 +291,39 @@ export default function MyDataPage() {
                 </p>
                 <ul className="list-unstyled mb-0">
                   {grants.map((g, i) => (
-                    <li key={i} className="mb-3" style={{ fontSize: '0.9rem' }}>
-                      <div className="fw-semibold">
-                        {getLocalized(g.event.title as LocalizedField, locale)}
-                      </div>
+                    <li key={i} className="mb-3 d-flex gap-3" style={{ fontSize: '0.9rem' }}>
+                      {g.photo && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={g.photo}
+                          alt={t('grantPhoto')}
+                          width={48}
+                          height={48}
+                          style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                        />
+                      )}
                       <div>
-                        {t(GRANT_ROLE_KEY[g.role])} · {g.name}
-                        {g.organization ? ` · ${g.organization}` : ''}
-                      </div>
-                      <div className="text-muted">
-                        {t('grantSince', {
-                          date: format.dateTime(new Date(g.createdAt), { dateStyle: 'long' }),
-                        })}
-                        {g.shownOnPublicPage && <> · {t('grantPublic')}</>}
-                        {g.revokedAt && (
-                          <>
-                            {' · '}
-                            {t('grantRevoked', {
-                              date: format.dateTime(new Date(g.revokedAt), { dateStyle: 'long' }),
-                            })}
-                          </>
-                        )}
+                        <div className="fw-semibold">
+                          {getLocalized(g.event.title as LocalizedField, locale)}
+                        </div>
+                        <div>
+                          {t(GRANT_ROLE_KEY[g.role])} · {g.name}
+                          {g.organization ? ` · ${g.organization}` : ''}
+                        </div>
+                        <div className="text-muted">
+                          {t('grantSince', {
+                            date: format.dateTime(new Date(g.createdAt), { dateStyle: 'long' }),
+                          })}
+                          {g.shownOnPublicPage && <> · {t('grantPublic')}</>}
+                          {g.revokedAt && (
+                            <>
+                              {' · '}
+                              {t('grantRevoked', {
+                                date: format.dateTime(new Date(g.revokedAt), { dateStyle: 'long' }),
+                              })}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </li>
                   ))}

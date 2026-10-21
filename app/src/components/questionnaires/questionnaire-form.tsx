@@ -2,9 +2,10 @@
 
 /**
  * Renders a questionnaire (fetched from the public endpoint) and submits
- * the participant's answers. Usable for both PRE_REGISTRATION (called
- * after a successful registration — passing accessToken) and POST_EVENT
- * (called from the post-event flow / call-exit feedback modal).
+ * the participant's answers. Usable for both PRE_REGISTRATION and
+ * POST_EVENT (called from the post-event flow / call-exit feedback modal).
+ * Inside the registration form it runs `embedded`: no button of its own,
+ * the answers go up to the form and travel with the registration.
  *
  * Two visual variants:
  *   - 'default'  → each item renders a native control (radios, checkboxes,
@@ -21,9 +22,12 @@
  * like the error texts and the yes/no options.
  */
 
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button, Label } from 'design-react-kit';
+
+import { rispostaVuota } from '@/lib/questionnaires/answers';
+import type { QuestionnaireAnswerInput } from '@/lib/validation/schemas';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
@@ -39,15 +43,48 @@ interface RenderedItem {
   required: boolean;
 }
 
-interface RenderedQuestionnaire {
+export interface RenderedQuestionnaire {
   id: string;
   placement: 'PRE_REGISTRATION' | 'POST_EVENT';
   title: Record<string, string>;
   description: Record<string, string>;
+  required?: boolean;
   items: RenderedItem[];
 }
 
 type Value = { text?: string; choices?: number[]; scale?: number };
+
+/** Lo stato delle risposte, per chi incorpora il questionario. */
+export interface QuestionnaireState {
+  /** Le risposte date, senza quelle vuote. */
+  answers: QuestionnaireAnswerInput[];
+  /** Il questionario va compilato per iscriversi. */
+  required: boolean;
+  /** Domande obbligatorie ancora senza risposta. */
+  missing: number;
+}
+
+/** La risposta a una domanda, nella forma delle rotte. */
+function rispostaDa(it: RenderedItem, v: Value | undefined): QuestionnaireAnswerInput {
+  switch (it.type) {
+    case 'OPEN_TEXT':
+      return { itemId: it.id, valueText: v?.text ?? '' };
+    case 'SINGLE_CHOICE':
+    case 'MULTI_CHOICE':
+      return { itemId: it.id, valueChoices: v?.choices ?? [] };
+    case 'YES_NO':
+    case 'LIKERT':
+      return { itemId: it.id, valueScale: v?.scale ?? null };
+  }
+}
+
+/** Le risposte date, senza quelle vuote (la regola della rotta). */
+function risposteDa(
+  q: RenderedQuestionnaire,
+  values: Record<string, Value>,
+): QuestionnaireAnswerInput[] {
+  return q.items.map((it) => rispostaDa(it, values[it.id])).filter((r) => !rispostaVuota(r));
+}
 
 export interface QuestionnaireFormProps {
   eventSlug: string;
@@ -76,6 +113,19 @@ export interface QuestionnaireFormProps {
   /** Chi aveva gia' risposto (409): il chiamante lo dice come un esito, non
    *  come un errore. Senza, resta il messaggio d'errore. */
   onAlreadySubmitted?: () => void;
+  /** Il questionario gia' letto dal server: niente lettura dal browser. */
+  questionnaire?: RenderedQuestionnaire;
+  /** Dentro un altro modulo: niente pulsante proprio, e lo stato delle
+   *  risposte sale a ogni cambio (e al caricamento). */
+  embedded?: {
+    onChange: (state: QuestionnaireState) => void;
+    /** Id dell'errore che il modulo mostra sul questionario. */
+    errorId?: string;
+    /** Il modulo ha un errore sul questionario: il gruppo lo mostra. */
+    invalid?: boolean;
+    /** Il segno «obbligatorio» del modulo, accanto al titolo quando serve. */
+    requiredMark?: ReactNode;
+  };
 }
 
 export default function QuestionnaireForm({
@@ -93,13 +143,15 @@ export default function QuestionnaireForm({
   onNotFound,
   onSubmitted,
   onAlreadySubmitted,
+  questionnaire,
+  embedded,
 }: QuestionnaireFormProps) {
   const locale = useLocale();
   const tc = useTranslations('common');
   const tq = useTranslations('questionnaire');
 
-  const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState<RenderedQuestionnaire | null>(null);
+  const [loading, setLoading] = useState(!questionnaire);
+  const [q, setQ] = useState<RenderedQuestionnaire | null>(questionnaire ?? null);
   const [notFound, setNotFound] = useState(false);
   const [values, setValues] = useState<Record<string, Value>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -108,6 +160,7 @@ export default function QuestionnaireForm({
   const hintId = useId();
 
   useEffect(() => {
+    if (questionnaire) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
@@ -138,33 +191,30 @@ export default function QuestionnaireForm({
     return () => {
       cancelled = true;
     };
-  }, [eventSlug, placement, onNotFound, tq]);
+  }, [eventSlug, placement, onNotFound, tq, questionnaire]);
 
   const setValue = useCallback((id: string, v: Value) => {
     setValues((prev) => ({ ...prev, [id]: v }));
   }, []);
+
+  // Incorporato: il modulo che lo contiene riceve le risposte a ogni cambio.
+  const onEmbeddedChange = embedded?.onChange;
+  useEffect(() => {
+    if (!q || !onEmbeddedChange) return;
+    onEmbeddedChange({
+      answers: risposteDa(q, values),
+      required: q.required ?? false,
+      missing: q.items.filter((it) => it.required && rispostaVuota(rispostaDa(it, values[it.id])))
+        .length,
+    });
+  }, [q, values, onEmbeddedChange]);
 
   const submit = useCallback(async () => {
     if (!q) return;
     setSubmitting(true);
     setError(null);
     try {
-      const answers = q.items
-        .map((it) => {
-          const v = values[it.id];
-          if (!v) return null;
-          switch (it.type) {
-            case 'OPEN_TEXT':
-              return { itemId: it.id, valueText: v.text ?? '' };
-            case 'SINGLE_CHOICE':
-            case 'MULTI_CHOICE':
-              return { itemId: it.id, valueChoices: v.choices ?? [] };
-            case 'YES_NO':
-            case 'LIKERT':
-              return { itemId: it.id, valueScale: v.scale ?? null };
-          }
-        })
-        .filter(Boolean);
+      const answers = risposteDa(q, values);
 
       const res = await fetch(
         `/api/events/${encodeURIComponent(eventSlug)}/questionnaires/${placement}/responses`,
@@ -227,6 +277,41 @@ export default function QuestionnaireForm({
     );
   }
 
+  const domande = q.items.map((it) => (
+    <ItemInput
+      key={it.id}
+      item={it}
+      locale={locale}
+      variant={variant}
+      value={values[it.id]}
+      onChange={(v) => setValue(it.id, v)}
+    />
+  ));
+
+  // Dentro il modulo d'iscrizione: un gruppo del modulo, con il suo titolo,
+  // senza pulsante; l'errore lo mostra il modulo.
+  if (embedded) {
+    const descrizione = localize(q.description, locale);
+    return (
+      <fieldset
+        className={`registration-questionnaire mb-4${embedded.invalid ? ' registration-questionnaire--error' : ''}`}
+        aria-describedby={embedded.errorId}
+        tabIndex={-1}
+      >
+        <legend className="registration-consents__legend">
+          {localize(q.title, locale) || tq('pageTitle')}
+          {q.required && embedded.requiredMark ? <> {embedded.requiredMark}</> : null}
+        </legend>
+        {descrizione && (
+          <p className="text-secondary mb-3" style={{ fontSize: '0.9rem' }}>
+            {descrizione}
+          </p>
+        )}
+        <div className="d-flex flex-column gap-3">{domande}</div>
+      </fieldset>
+    );
+  }
+
   const showHeader = !hideHeader;
   // Nella valutazione si invia dopo almeno una risposta: un invio vuoto non
   // dice niente a chi organizza e consuma l'unica risposta concessa.
@@ -256,16 +341,7 @@ export default function QuestionnaireForm({
       )}
 
       <div className={variant === 'feedback' ? 'qf-feedback' : 'd-flex flex-column gap-3'}>
-        {q.items.map((it) => (
-          <ItemInput
-            key={it.id}
-            item={it}
-            locale={locale}
-            variant={variant}
-            value={values[it.id]}
-            onChange={(v) => setValue(it.id, v)}
-          />
-        ))}
+        {domande}
       </div>
 
       <div className={variant === 'feedback' ? 'qf-feedback__submit' : 'mt-3'}>
@@ -329,14 +405,16 @@ function ItemInput({
       }
       return (
         <div>
-          <Label>
+          <Label htmlFor={`q-${item.id}`}>
             {prompt}
             {item.required && <span className="text-danger"> *</span>}
           </Label>
           <textarea
+            id={`q-${item.id}`}
             className="form-control"
             rows={3}
             maxLength={2000}
+            aria-required={item.required || undefined}
             value={value?.text ?? ''}
             onChange={(e) => onChange({ text: e.target.value })}
           />
@@ -344,8 +422,12 @@ function ItemInput({
       );
     case 'SINGLE_CHOICE':
       return (
-        <div>
-          <Label>
+        <div
+          role="radiogroup"
+          aria-labelledby={`q-${item.id}-titolo`}
+          aria-required={item.required || undefined}
+        >
+          <Label id={`q-${item.id}-titolo`}>
             {prompt}
             {item.required && <span className="text-danger"> *</span>}
           </Label>
@@ -370,8 +452,8 @@ function ItemInput({
       );
     case 'MULTI_CHOICE':
       return (
-        <div>
-          <Label>
+        <div role="group" aria-labelledby={`q-${item.id}-titolo`}>
+          <Label id={`q-${item.id}-titolo`}>
             {prompt}
             {item.required && <span className="text-danger"> *</span>}
           </Label>
@@ -405,8 +487,12 @@ function ItemInput({
       );
     case 'YES_NO':
       return (
-        <div>
-          <Label>
+        <div
+          role="radiogroup"
+          aria-labelledby={`q-${item.id}-titolo`}
+          aria-required={item.required || undefined}
+        >
+          <Label id={`q-${item.id}-titolo`}>
             {prompt}
             {item.required && <span className="text-danger"> *</span>}
           </Label>
@@ -457,8 +543,12 @@ function ItemInput({
       const range = [];
       for (let i = min; i <= max; i++) range.push(i);
       return (
-        <div>
-          <Label>
+        <div
+          role="radiogroup"
+          aria-labelledby={`q-${item.id}-titolo`}
+          aria-required={item.required || undefined}
+        >
+          <Label id={`q-${item.id}-titolo`}>
             {prompt}
             {item.required && <span className="text-danger"> *</span>}
           </Label>

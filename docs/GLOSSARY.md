@@ -14,8 +14,8 @@ How to read it:
 - Each entry opens with its term, or pair of terms, in bold. Inside an entry,
   **bold** marks a UI label quoted verbatim from the English UI catalog,
   `app/src/i18n/messages/en.json`. The default UI language is Italian:
-  [Italian UI labels](#italian-ui-labels) maps the Italian labels visible in
-  screenshots to their English counterparts and to the terms these docs use.
+  [Italian UI labels](#italian-ui-labels) maps the Italian labels of a live
+  installation to their English counterparts and to the terms these docs use.
 - Abbreviations are expanded in [Abbreviations](#abbreviations).
 
 > **One Italian word, two meanings.** *Registrazione* means both a
@@ -83,8 +83,9 @@ durable credential.
 **Named grant** (`EventModerator`, role `MODERATOR` or `SPEAKER`): a
 per-person access grant to one event, with its own magic-link token, that can
 be revoked on its own (`revokedAt`). Organizers, moderators and speakers added
-in the wizard's **People** step each receive one, with their organization and
-whether the public page lists them (`publicListed`). An *event organizer* is a
+in the wizard's **People** step each receive one, with their organization, an
+optional photo uploaded by staff (`photoId`), and whether the public page lists
+them (`publicListed`). An *event organizer* is a
 `MODERATOR` grant with `organizer` set: same powers in the room, listed among
 the organizers. The table is `event_moderators` even though it also holds
 speakers.
@@ -229,9 +230,9 @@ editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
 **Event wizard**: the form that creates or edits an event, after four
-questions on its format: four steps (**Event**, **When**, **People**,
-**Summary**) and the **Advanced settings** with what the format or template
-has already chosen.
+questions on its format: five steps (**Event**, **When**, **People**,
+**Programme**, optional and not for instant calls, and **Summary**) and the
+**Advanced settings** with what the format or template has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
 **Fixed-cadence series** and **moving-date series**: the two ways recurring
@@ -300,9 +301,11 @@ events from it on its own.
 registrants at chosen offsets before the start.
 [Email and calendar](architecture/email.md)
 
-**Sender ratio** (`expectedSenderRatioPct`, UI **Estimated active share**):
-the share of participants expected to send audio or video. It drives bridge
-sizing. [Scaling the media plane](architecture/scaling.md)
+**Sender ratio** (`expectedSenderRatioPct`, UI **How many webcams will be
+on?**): the share of participants expected to have their webcam on. The
+capacity estimate in the wizard and on the event page reads it that way; the
+bridge scaler still reads it as the share sending audio or video.
+[Scaling the media plane](architecture/scaling.md)
 
 **Video quality preset** (`VideoQuality`: `SAVE_DATA`, `BALANCED`, `HIGH`,
 `MAX`): the resolution and bitrate profile applied to the conference, set per
@@ -933,8 +936,8 @@ commands as the CI workflow before every push.
 
 ## Italian UI labels
 
-The default UI language is Italian, so screenshots and live installations
-often show Italian labels. The tables below give, for each label, the English
+The default UI language is Italian, so live installations often show
+Italian labels. The tables below give, for each label, the English
 label from `en.json` and the term these docs use. Labels come verbatim from
 `app/src/i18n/messages/it.json` and `en.json`; if a label changes there, the
 catalogs win. The English UI writes **Organiser** for the staff role, while
@@ -982,7 +985,8 @@ these docs and the code use *organizer*.
 | Evento | **Event** | event wizard, step 1 |
 | Quando | **When** | event wizard, step 2 |
 | Persone | **People** | event wizard, step 3 |
-| Riepilogo | **Summary** | event wizard, step 4 |
+| Programma | **Programme** | event wizard, step 4 (optional, not for instant calls) |
+| Riepilogo | **Summary** | event wizard, step 5 |
 | Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
 | Duplica per la prossima | **Duplicate for next time** | duplicate as the next occurrence |

@@ -3,9 +3,12 @@
  * dell'evento, caricato dalla sala (pannello «Materiali»).
  *
  * CHI. Chi può già aggiungere un link al pannello (POST ../materials): il
- * token moderatore primario o un co-moderatore non revocato. Relatori,
- * iscritti e ospiti no. Organizzatori e amministratori entrano in sala con il
- * link moderatore, e dall'area admin hanno il proprio caricamento.
+ * token moderatore primario o un co-moderatore non revocato. In più un
+ * relatore (concessione SPEAKER non revocata), ma solo per un PDF: è il
+ * documento che porta in sala per presentarlo (lib/presentation/state), e
+ * fuori da quello un relatore non aggiunge materiali. Iscritti e ospiti no.
+ * Organizzatori e amministratori entrano in sala con il link moderatore, e
+ * dall'area admin hanno il proprio caricamento.
  *
  * COME. Lo stesso percorso dell'area admin (`/api/admin/assets/upload-url`
  * con `type=document`): stesse tipologie e stesso limite
@@ -27,7 +30,8 @@
  * dalla sala: ciò che si condivide in diretta (le slide, un documento) di
  * solito serve anche dopo, e un `DURING` lo farebbe sparire dalla pagina
  * dell'evento alla chiusura. Chi conduce la può cambiare anche dopo (PATCH
- * ../materials/[id]).
+ * ../materials/[id]). Un relatore non sceglie la visibilità: il campo, se lo
+ * manda, non si legge, e vale `ALWAYS`.
  *
  * QUANTO. Il link moderatore è condiviso e non scade: oltre al limite per
  * minuto, un tetto per evento sul numero di file e sui byte
@@ -46,8 +50,8 @@ import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import {
+  EventModeratorRole,
   extractModeratorToken,
-  isEventModerator,
   resolveGrantForEvent,
 } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
@@ -135,10 +139,11 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { id: true, moderatorToken: true, moderatorName: true },
   });
   if (!event) throw new NotFoundError('Event');
-  // Stessa regola del link (POST ../materials): moderatori sì, relatori no.
-  if (!(await isEventModerator(event, token))) {
-    throw new ForbiddenError('Unauthorized');
-  }
+  // Moderatori, come per il link (POST ../materials); relatori solo con un PDF,
+  // controllato sul file qui sotto.
+  const grant = await resolveGrantForEvent(event, token);
+  if (!grant) throw new ForbiddenError('Unauthorized');
+  const relatore = grant.role === EventModeratorRole.SPEAKER;
 
   const ip = getClientIp(request);
   const rl = rateLimit(`materials-upload:${ip}:${event.id}`, {
@@ -185,8 +190,8 @@ export const POST = withErrorHandling(async (request, context) => {
   caricamentiInCorso++;
   try {
     // Come per i link: un nome solo se gia' pubblico (lib/events/material-author).
-    const addedBy = materialAddedBy(await resolveGrantForEvent(event, token));
-    return await riceviECrea(request, event, addedBy, storage, giaCaricati.bytes);
+    const addedBy = materialAddedBy(grant);
+    return await riceviECrea(request, event, addedBy, storage, giaCaricati.bytes, relatore);
   } finally {
     caricamentiInCorso--;
   }
@@ -203,6 +208,8 @@ async function riceviECrea(
   addedBy: string,
   storage: NonNullable<ReturnType<typeof getFilesStorage>>,
   bytesGiaCaricati: number,
+  /** Un relatore: solo un PDF, con la visibilità predefinita. */
+  relatore: boolean,
 ): Promise<Response> {
   let form: FormData;
   try {
@@ -219,7 +226,8 @@ async function riceviECrea(
   const fields = uploadFieldsSchema.safeParse({
     title: textField(form, 'title'),
     description: textField(form, 'description'),
-    visibility: textField(form, 'visibility'),
+    // La visibilità la sceglie solo chi conduce: per un relatore vale la predefinita.
+    visibility: relatore ? undefined : textField(form, 'visibility'),
   });
   if (!fields.success) {
     throw new ValidationError(
@@ -229,7 +237,7 @@ async function riceviECrea(
   }
 
   const mime = normalizeMimeType(fileField.type || 'application/octet-stream');
-  if (!ALLOWED_MIME.has(mime)) {
+  if (!ALLOWED_MIME.has(mime) || (relatore && mime !== 'application/pdf')) {
     throw new AppError(
       `MIME type "${mime}" is not allowed for event materials`,
       415,

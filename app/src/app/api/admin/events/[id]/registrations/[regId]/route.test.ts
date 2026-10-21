@@ -19,7 +19,8 @@ vi.mock('@/lib/gdpr/erase-registrations', () => ({
     attachmentFilesNotDeleted: 0,
   })),
 }));
-vi.mock('@/lib/crypto/pii', () => ({
+vi.mock('@/lib/crypto/pii', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   encryptPII: (s: string) => `enc(${s})`,
   hashEmail: (s: string) => `hash(${s})`,
 }));
@@ -27,7 +28,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     registration: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
     person: { findUnique: vi.fn(), update: vi.fn() },
-    emailOutbox: { updateMany: vi.fn() },
+    emailOutbox: { updateMany: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
     $transaction: vi.fn(),
   },
@@ -43,7 +44,7 @@ type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   registration: { findUnique: Fn; findFirst: Fn; update: Fn; count: Fn };
   person: { findUnique: Fn; update: Fn };
-  emailOutbox: { updateMany: Fn };
+  emailOutbox: { updateMany: Fn; findMany: Fn; update: Fn };
   gdprAuditLog: { create: Fn };
   $transaction: Fn;
 };
@@ -80,6 +81,8 @@ beforeEach(() => {
   db.person.findUnique.mockResolvedValue(null);
   db.person.update.mockResolvedValue({});
   db.emailOutbox.updateMany.mockResolvedValue({ count: 0 });
+  db.emailOutbox.findMany.mockResolvedValue([]);
+  db.emailOutbox.update.mockResolvedValue({});
   db.gdprAuditLog.create.mockResolvedValue({});
 });
 
@@ -116,6 +119,29 @@ describe('PATCH registration', () => {
       where: { status: 'PENDING', metadata: { path: ['registrationId'], equals: REG } },
       data: { toAddress: 'enc(nuova@esempio.it)' },
     });
+  });
+
+  it('drops the queued calendar invitation, which names the old address', async () => {
+    db.emailOutbox.updateMany.mockResolvedValue({ count: 2 });
+    const allegato = { filename: 'a.txt', content: 'x', contentType: 'text/plain' };
+    db.emailOutbox.findMany.mockResolvedValue([
+      // Una riga accodata prima (elenco in chiaro, senza invito): resta com'e'.
+      { id: 'vecchia', attachments: [allegato] },
+      // Una riga con l'invito per il vecchio indirizzo: perde l'invito.
+      { id: 'con-invito', attachments: { invito: true } },
+    ]);
+    const outbox = await import('@/lib/email/outbox');
+    const spy = vi
+      .spyOn(outbox, 'stripCalendarInvite')
+      .mockImplementation((v: unknown) => ((v as { invito?: boolean }).invito ? [allegato] : null));
+    const res = await PATCH(req('PATCH', { email: 'nuova@esempio.it' }) as never, ctx as never);
+    expect(res.status).toBe(200);
+    expect(db.emailOutbox.update).toHaveBeenCalledTimes(1);
+    expect(db.emailOutbox.update).toHaveBeenCalledWith({
+      where: { id: 'con-invito' },
+      data: { attachments: [allegato] },
+    });
+    spy.mockRestore();
   });
 
   it('leaves email and queue alone when the same address is written again', async () => {

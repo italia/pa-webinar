@@ -26,6 +26,7 @@ vi.mock('@/lib/db', () => ({
     person: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
+    eventPersonPhoto: { deleteMany: vi.fn() },
     profilePhoto: { deleteMany: vi.fn() },
     registration: { findMany: vi.fn() },
     chatMessage: { findMany: vi.fn() },
@@ -51,6 +52,7 @@ const db = prisma as unknown as {
   person: { deleteMany: Fn };
   eventInvitation: { deleteMany: Fn };
   eventModerator: { deleteMany: Fn; findMany: Fn };
+  eventPersonPhoto: { deleteMany: Fn };
   profilePhoto: { deleteMany: Fn };
   registration: { findMany: Fn };
   chatMessage: { findMany: Fn };
@@ -73,7 +75,8 @@ beforeEach(() => {
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
   db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
-  db.eventModerator.findMany.mockResolvedValue([{ eventId: 'evt-1', token: 'tok-1' }]);
+  db.eventModerator.findMany.mockResolvedValue([{ eventId: 'evt-1', token: 'tok-1', photoId: null }]);
+  db.eventPersonPhoto.deleteMany.mockResolvedValue({ count: 0 });
   db.profilePhoto.deleteMany.mockResolvedValue({ count: 1 });
   db.chatMessage.findMany.mockResolvedValue([]);
   db.gdprAuditLog.create.mockResolvedValue({});
@@ -103,6 +106,7 @@ describe('POST /api/gdpr/erasure', () => {
       addressBookDeleted: true,
       invitationsDeleted: 2,
       grantsDeleted: 1,
+      grantPhotosDeleted: 0,
       profilePhotoDeleted: true,
       feedbackDeleted: 1,
       questionnaireResponsesDeleted: 1,
@@ -182,6 +186,7 @@ describe('POST /api/gdpr/erasure', () => {
       addressBookDeleted: true,
       invitationsDeleted: 2,
       grantsDeleted: 1,
+      grantPhotosDeleted: 0,
       profilePhotoDeleted: true,
     });
     // Le concessioni nominali con lo stesso indirizzo vanno via anche loro, e
@@ -190,6 +195,24 @@ describe('POST /api/gdpr/erasure', () => {
     expect(invalidate).toHaveBeenCalledWith('evt-1', 'tok-1');
     // La foto e' legata all'email: va via anche senza iscrizioni.
     expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
+  });
+
+  it('deletes the photos of the erased grants that no other event uses', async () => {
+    db.registration.findMany.mockResolvedValue([]);
+    db.eventModerator.findMany.mockResolvedValue([
+      { eventId: 'evt-1', token: 'tok-1', photoId: 'foto-1' },
+      { eventId: 'evt-2', token: 'tok-2', photoId: null },
+    ]);
+    db.eventPersonPhoto.deleteMany.mockResolvedValue({ count: 1 });
+    const res = await POST(req('valido') as never, ctx as never);
+    // Dopo le concessioni, e solo se nessun altro le usa.
+    expect(db.eventPersonPhoto.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ['foto-1'] }, leadOf: { none: {} }, grants: { none: {} } },
+    });
+    expect(db.eventModerator.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      db.eventPersonPhoto.deleteMany.mock.invocationCallOrder[0]!,
+    );
+    expect(await res.json()).toMatchObject({ grantsDeleted: 1, grantPhotosDeleted: 1 });
   });
 
   it('touches nothing with an invalid token', async () => {

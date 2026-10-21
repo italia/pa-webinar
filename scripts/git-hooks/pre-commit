@@ -1,0 +1,3 @@
+#!/bin/sh
+# Hook installato da `npm install` (core.hooksPath): vedi hooks.mjs.
+exec node "$(git rev-parse --show-toplevel)/scripts/git-hooks/hooks.mjs" pre-commit "$@"

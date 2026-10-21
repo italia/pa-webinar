@@ -244,21 +244,25 @@ export default function StatusDashboard() {
                         backgroundColor: jvbCapacityColor,
                         borderRadius: 6,
                       }}
-                      aria-valuenow={jvbRunning}
+                      aria-label={t('jvbNodes')}
+                      aria-valuenow={Math.min(jvbRunning, jvbMaxReplicas)}
                       aria-valuemin={0}
                       aria-valuemax={jvbMaxReplicas}
+                      aria-valuetext={
+                        data.metrics.jvbStatus === 'scaling'
+                          ? `${t('jvbScaling')} ${jvbRunning}/${jvbDesired} ${t('nodesReady')}`
+                          : `${jvbRunning}/${jvbMaxReplicas} ${t('nodesActive')}`
+                      }
                     />
+                    {/* I nodi in arrivo: li dice già il valore della barra sopra. */}
                     {jvbDesired > jvbRunning && (
                       <div
                         className="progress-bar progress-bar-striped progress-bar-animated"
-                        role="progressbar"
+                        aria-hidden="true"
                         style={{
                           width: `${Math.min(100, ((jvbDesired - jvbRunning) / jvbMaxReplicas) * 100)}%`,
                           backgroundColor: '#A66300',
                         }}
-                        aria-valuenow={jvbDesired - jvbRunning}
-                        aria-valuemin={0}
-                        aria-valuemax={jvbMaxReplicas}
                       />
                     )}
                   </div>

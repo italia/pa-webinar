@@ -236,39 +236,51 @@ export const POST = withErrorHandling(async (request, context) => {
   const moderatorToken = randomUUID();
   const jitsiRoomName = `evt-${randomUUID()}`;
 
-  const duplicate = await prisma.event.create({
-    data: {
-      // La copia e' di chi la crea, perché possa gestirla (ADR-014); ma se a
-      // duplicare è un co-organizzatore, la copia resta di chi ha creato
-      // l'originale: il co-organizzatore la gestisce comunque, perché la sua
-      // concessione da organizzatore passa alla copia, e chi ha creato la
-      // serie non la perde.
-      createdById:
-        session.role === 'organizer' &&
-        source.createdById &&
-        source.createdById !== session.accountId &&
-        (await creatoreAttivo(source.createdById))
-          ? source.createdById
-          : session.accountId,
-      // Everything the copy inherits, from the single classified list — see
-      // lib/events/duplicate-fields.ts for why this is not spelled out inline.
-      ...duplicatedConfig(source),
+  // La copia e' di chi la crea, perché possa gestirla (ADR-014); ma se a
+  // duplicare è un co-organizzatore, la copia resta di chi ha creato
+  // l'originale: il co-organizzatore la gestisce comunque, perché la sua
+  // concessione da organizzatore passa alla copia, e chi ha creato la
+  // serie non la perde.
+  const createdById =
+    session.role === 'organizer' &&
+    source.createdById &&
+    source.createdById !== session.accountId &&
+    (await creatoreAttivo(source.createdById))
+      ? source.createdById
+      : session.accountId;
+  const { nested, agendaItems } = duplicatedRelations(source);
+  const duplicate = await prisma.$transaction(async (tx) => {
+    const copia = await tx.event.create({
+      data: {
+        createdById,
+        // Everything the copy inherits, from the single classified list — see
+        // lib/events/duplicate-fields.ts for why this is not spelled out inline.
+        ...duplicatedConfig(source),
 
-      // …and the handful of values a copy must NOT inherit.
-      slug: newSlug,
-      title: newTitle,
-      jitsiRoomName,
-      moderatorToken,
-      status: 'DRAFT',
-      startsAt,
-      endsAt,
+        // …and the handful of values a copy must NOT inherit.
+        slug: newSlug,
+        title: newTitle,
+        jitsiRoomName,
+        moderatorToken,
+        status: 'DRAFT',
+        startsAt,
+        endsAt,
 
-      // Le relazioni ereditate, dallo stesso elenco classificato: tag,
-      // organizzatori, co-moderatori (con token NUOVI), agenda, questionari e
-      // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
-      // per questo che tutto il resto si perdeva a ogni duplicazione.
-      ...duplicatedRelations(source),
-    },
+        // Le relazioni ereditate, dallo stesso elenco classificato: tag,
+        // organizzatori, co-moderatori (con token NUOVI), questionari e
+        // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
+        // per questo che tutto il resto si perdeva a ogni duplicazione.
+        ...nested,
+      },
+    });
+    // Il programma dopo l'evento e le persone: chi interviene punta alla
+    // copia della persona, che a questo punto esiste.
+    if (agendaItems.length > 0) {
+      await tx.eventAgendaItem.createMany({
+        data: agendaItems.map((a) => ({ ...a, eventId: copia.id })),
+      });
+    }
+    return copia;
   });
 
   await logAdminAction({

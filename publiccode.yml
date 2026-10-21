@@ -94,7 +94,7 @@ IT:
 description:
   it:
     shortDescription: >
-      Piattaforma open source per eventi pubblici digitali della PA, basata su Jitsi Meet e sul design system .italia.
+      Piattaforma open source per gli eventi pubblici online della PA, basata su Jitsi Meet e sul design system .italia.
     longDescription: >
       PA Webinar è una piattaforma web con cui le pubbliche amministrazioni organizzano eventi
       pubblici online (webinar, presentazioni, incontri aperti) sulla propria infrastruttura. Usa
@@ -102,15 +102,15 @@ description:
       (Bootstrap Italia e design-react-kit) per l'interfaccia, disponibile nelle 24 lingue
       ufficiali dell'Unione europea.
 
-      Ogni evento ha una pagina pubblica, un'iscrizione con consensi mai preselezionati e una sala
-      che si apre e si chiude secondo il calendario. In sala il pubblico partecipa con chat,
+      Ogni evento ha una pagina pubblica, un modulo di iscrizione con consensi mai preselezionati e
+      una sala che si apre e si chiude secondo il calendario. In sala il pubblico partecipa con chat,
       domande con voto, sondaggi, word cloud, reazioni e mani alzate; moderatori e relatori entrano
-      con un link, senza account. Dopo l'evento la registrazione si pubblica nella
-      libreria video e la post-produzione AI facoltativa, eseguita dentro il cluster, aggiunge
+      con un link, senza account. Dopo l'evento la registrazione si pubblica nella libreria
+      video; la post-produzione AI, facoltativa ed eseguita dentro il cluster, aggiunge
       sottotitoli, trascrizione, sintesi, traduzioni e doppiaggio.
 
       Si installa su Kubernetes con un unico chart Helm, da un server k3s a un cluster gestito.
-      Una conferenza resta su un solo bridge (Jitsi Videobridge): più bridge portano più
+      Una conferenza resta su un solo bridge (Jitsi Videobridge). Più bridge ospitano più
       conferenze e, nel profilo completo, si accendono prima degli eventi in calendario e scendono
       a zero tra un evento e l'altro. Marchio, lingue offerte e modalità di iscrizione si
       configurano a runtime, senza ricompilare.
@@ -132,7 +132,7 @@ description:
       - Interfaccia in 24 lingue UE, marchio e impostazioni configurabili a runtime
       - Pagine di trasparenza, stato del sistema, changelog con SBOM, inventario dei servizi
       - Chart Helm per Kubernetes, bridge con scale-to-zero facoltativo
-      - API REST con documento OpenAPI 3.1, a copertura parziale
+      - API REST con un documento OpenAPI 3.1 che copre parte delle rotte
     screenshots:
       - docs/screenshots/home.png
       - docs/screenshots/events.png
@@ -142,7 +142,7 @@ description:
       - docs/screenshots/changelog.png
   en:
     shortDescription: >
-      Open-source platform for public digital events of public administrations, built on Jitsi Meet and the .italia design system.
+      Open-source platform for the public online events of public administrations, built on Jitsi Meet and the .italia design system.
     longDescription: >
       PA Webinar is a web platform that public administrations use to run public online events
       (webinars, presentations, open meetings) on their own infrastructure. It uses self-hosted
@@ -152,13 +152,13 @@ description:
 
       Each event has a public page, registration with consents that are never pre-ticked, and a
       room that opens and closes on schedule. In the room the audience takes part through chat,
-      Q&A with upvotes, polls, word cloud, reactions and raised hands; moderators and speakers
+      Q&A with upvotes, polls, word clouds, reactions and raised hands; moderators and speakers
       join with a link and need no account. After the event the recording is published
-      to the video library, and the optional AI post-production, which runs inside the cluster,
+      to the video library. The optional AI post-production, which runs inside the cluster,
       adds subtitles, a transcript, a summary, translations and dubbing.
 
       It installs on Kubernetes with a single Helm chart, from one k3s server to a managed
-      cluster. A conference stays on one bridge (Jitsi Videobridge): more bridges carry more
+      cluster. A conference stays on one bridge (Jitsi Videobridge). More bridges carry more
       conferences and, in the full profile, they start before scheduled events and scale to zero
       between them. Branding, offered languages and registration mode are configured at runtime,
       without a rebuild.
@@ -169,8 +169,8 @@ description:
       - Confirmation emails with calendar files, and reminders
       - Jitsi Meet room embedded in the portal, with a waiting room and a device check
       - Chat, Q&A with upvotes, polls, word cloud, reactions and a raised-hand queue
-      - Moderators and speakers join through a magic link, with no account
-      - Control of participants' microphones and cameras, giving the floor
+      - Moderators and speakers join through a magic link, without an account
+      - Control of participants' microphones and cameras, including giving the floor
       - Video recording, optionally with one audio track per participant, with their consent
       - Video library, event analytics, pre-event and post-event questionnaires
       - Optional AI post-production inside the cluster, with no external APIs
@@ -180,7 +180,7 @@ description:
       - Interface in 24 EU languages, branding and settings configurable at runtime
       - Transparency pages, system status, changelog with SBOMs, service inventory
       - Helm chart for Kubernetes, with optional bridge scale-to-zero
-      - REST APIs with an OpenAPI 3.1 document, partial coverage
+      - REST API with an OpenAPI 3.1 document that covers part of the routes
     screenshots:
       - docs/screenshots/home.png
       - docs/screenshots/events.png

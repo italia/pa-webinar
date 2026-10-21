@@ -10,9 +10,12 @@ import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
+import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
+import { traduzioneDisponibile, ultimoLavoroTraduzione } from '@/lib/text-translation/enqueue';
+import { calcolaStatoTesti } from '@/lib/text-translation/auto';
+import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
@@ -131,7 +134,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     if (!staffCanManage) return <AccessDenied />;
   }
 
-  const [event, siteSettings, tags, gdprTemplates] = await Promise.all([
+  const [event, siteSettings, tags, gdprTemplates, ultimaTraduzione] = await Promise.all([
     prisma.event.findUnique({
       where: { id },
       include: {
@@ -143,6 +146,19 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           orderBy: { createdAt: 'asc' },
         },
         materials: { orderBy: { createdAt: 'asc' } },
+        // Il programma: gli argomenti in ordine, con chi interviene, e cio'
+        // che dice se l'agenda e' gia' stata usata in sala.
+        agendaItems: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          select: {
+            id: true,
+            label: true,
+            plannedMinutes: true,
+            status: true,
+            speakerGrantId: true,
+            speakerPrimary: true,
+          },
+        },
         questionnaires: {
           include: {
             templates: { orderBy: { sortOrder: 'asc' } },
@@ -158,6 +174,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
       select: { id: true, name: true, isDefault: true },
     }),
+    ultimoLavoroTraduzione(id),
   ]);
 
   if (!event || (token && event.moderatorToken !== token)) {
@@ -165,6 +182,15 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   }
 
   const defaultLocale = siteSettings.defaultLocale ?? 'it';
+  // Lo stato delle lingue di titolo e descrizione, calcolato qui sull'evento e
+  // le impostazioni gia' letti: con il solo link di conduzione il wizard non
+  // puo' chiederlo all'amministrazione.
+  const statoLingue = calcolaStatoTesti({
+    evento: event,
+    impostazioni: siteSettings,
+    lavoro: ultimaTraduzione,
+    ora: new Date(),
+  });
 
   const pre = event.questionnaires.find(
     (q) => q.placement === 'PRE_REGISTRATION',
@@ -252,6 +278,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       moderatorOrganization: event.moderatorOrganization,
       moderatorOrganizationLogoUrl: event.moderatorOrganizationLogoUrl,
       moderatorPublicListed: event.moderatorPublicListed,
+      moderatorPhotoId: event.moderatorPhotoId,
       eventType: event.eventType,
       accessMode: event.accessMode,
       requireOrganization: event.requireOrganization,
@@ -274,6 +301,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       organization: m.organization,
       organizationLogoUrl: m.organizationLogoUrl,
       publicListed: m.publicListed,
+      photoId: m.photoId,
     })),
     invitations: event.invitations.map((i) => ({
       id: i.id,
@@ -297,6 +325,16 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       pre: pre?._count.responses ?? 0,
       post: post?._count.responses ?? 0,
     },
+    agenda: event.agendaItems.map((a) => ({
+      id: a.id,
+      label: a.label,
+      plannedMinutes: a.plannedMinutes,
+      speakerGrantId: a.speakerGrantId,
+      speakerPrimary: a.speakerPrimary,
+    })),
+    // Come la rotta che salva il programma: un argomento non piu' da
+    // discutere, e l'agenda e' della sala.
+    agendaLocked: agendaGiaUsata(event.agendaItems),
   };
 
   return (
@@ -322,6 +360,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         initialStep={initialStep}
         initialSection={initialSection}
         canUseRubrica={session?.role === 'admin'}
+        canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
@@ -333,14 +372,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
             : ['it', 'en']
         }
         defaultLocale={defaultLocale}
-        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={event.dataRetentionDays}
-        jvbSizingConfig={{
-          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
-          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
-          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
-          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
-        }}
+        capacita={capacitaIstanza(siteSettings)}
         availableTags={tags.map((tg) => ({
           slug: tg.slug,
           name: (tg.name ?? {}) as Record<string, string>,
@@ -356,6 +389,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         liveCaptionsAvailable={liveCaptionsAvailable(siteSettings)}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
         aiPipelineEnabled={siteSettings.aiPipelineEnabled}
+        // La traduzione al salvataggio la decide il server, per chiunque salvi.
+        textTranslationAvailable={traduzioneDisponibile(siteSettings)}
+        statoLingueIniziale={statoLingue}
+        isSiteAdmin={session?.role === 'admin'}
         campiLiberi={{
           speakersInfo: (event.speakersInfo ?? null) as Record<string, string> | null,
           organizerName: event.organizerName ?? null,

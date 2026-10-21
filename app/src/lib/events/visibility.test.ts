@@ -118,6 +118,12 @@ describe('isEventOpenForRegistration', () => {
     }
   });
 
+  it('una chiamata istantanea non accetta iscrizioni, nemmeno in diretta', () => {
+    for (const status of ['PUBLISHED', 'LIVE']) {
+      expect(isEventOpenForRegistration({ status, eventType: 'INSTANT', endsAt: FUTURE })).toBe(false);
+    }
+  });
+
   it('un evento mai aperto oltre la sua fine non accetta iscrizioni, qualunque stato abbia ancora', () => {
     // Fra `endsAt` e il giro del ciclo di vita che lo chiude, un PUBLISHED
     // rimasto tale non deve accettare iscrizioni né mandare conferme.

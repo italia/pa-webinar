@@ -76,7 +76,7 @@ With the bridge scaler on, the captions service runs only while an event is live
 - Speech of everyone who speaks is processed while captions are on. Without the transcript from captions nothing is stored, and the waiting room says so. With it, the text and name of those who consented are stored, encrypted, until the event's retention, and so is the transcript built from them unless staff publish it, or the video; erasure of a registration removes the person from it. The waiting room says that the text is kept. See [Privacy and data protection](../GDPR.md).
 - Prosody signs its occupant reports with a key derived from the conference token secret it already shares with the portal, so it holds no other portal credential. Without the module, or with an external Jitsi that does not load it, no transcript text is kept and the multitrack recorder records no track.
 - Captions start once the event is live, within half a minute, moderator or not; a switch changed while no moderator is in the room reaches the room within the same half minute. Before Jitsi stable-10978, Jicofo puts a conference on the bridge only from two participants, so a person alone in the room is captioned once someone else joins.
-- Numbers come out in words: the engine has no Italian inverse text normalization.
+- The engine has no Italian inverse text normalization: the gateway rewrites Italian numbers as digits with its own rules, which read words, not meaning.
 - Sizing depends on the CPU. The gateway's load governance turns an undersized pod into fewer captioned speakers or a visible pause, never into delayed audio or video.
 
 See [Live captions](../architecture/live-captions.md) for how it works, how the transcript is built and how to size it.

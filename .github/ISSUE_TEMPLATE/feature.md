@@ -8,8 +8,8 @@ assignees: ''
 
 <!--
   SECURITY: a weakness that someone could exploit is not a feature request.
-  Report it privately, as described in SECURITY.md:
-  https://github.com/italia/pa-webinar/security
+  Report it privately through one of the channels in SECURITY.md:
+  https://github.com/italia/pa-webinar/blob/main/SECURITY.md#how-to-report
 -->
 
 <!--
@@ -54,7 +54,7 @@ assignees: ''
   "a fixed-cadence series" or "a moving-date series", not one specific event.
   Refer to people by role ("the moderator", "Speaker 1"), never by name.
   Say what each affected role sees and does, and what stays unchanged.
-  Alternatives you considered are welcome.
+  You may also list the alternatives you considered.
 -->
 
 ## Acceptance criteria

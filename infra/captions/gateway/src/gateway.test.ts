@@ -364,8 +364,8 @@ describe('gateway', () => {
     await expect(bridge(port, '/transcribe/x', 'sbagliato')).rejects.toThrow(/401/);
   });
 
-  it('usa il contesto della stanza: lingua, frasi da favorire e correzioni', async () => {
-    const engine = await fakeEngine('Il servizio pago pa.');
+  it('usa il contesto della stanza: lingua, frasi da favorire, correzioni e numeri', async () => {
+    const engine = await fakeEngine('Il servizio pago pa dal duemilaventi.');
     let seen: { room: string | null; auth: string | undefined } | null = null;
     const ctx = createServer((req, res) => {
       const url = new URL(req.url ?? '/', 'http://x');
@@ -387,10 +387,55 @@ describe('gateway', () => {
       language: 'it-IT',
       speech_contexts: [{ phrases: ['PagoPA'], boost: 0.5 }],
     });
-    session.ws.send(JSON.stringify({ type: 'conversation.item.input_audio_transcription.delta', delta: 'Il servizio pago pa', audio_processed: 0.1 }));
+    session.ws.send(JSON.stringify({ type: 'conversation.item.input_audio_transcription.delta', delta: 'Il servizio pago pa dal duemilaventi', audio_processed: 0.1 }));
     const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
-    expect(final.transcript[0]?.text).toBe('Il servizio PagoPA.');
+    expect(final.transcript[0]?.text).toBe('Il servizio PagoPA dal 2020.');
   });
+
+  it('i numeri in cifre solo per una stanza in italiano', async () => {
+    const engine = await fakeEngine('Since duemilaventi.');
+    const ctx = createServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ enabled: true, language: 'en-GB' }));
+    });
+    const ctxPort = await listen(ctx);
+    cleanups.push(() => new Promise<void>((r) => ctx.close(() => r())));
+    const { port } = await startGateway({ CAPTIONS_ENGINE_URL: engine.url }, `http://127.0.0.1:${ctxPort}/ctx`);
+    const b = await bridge(port, '/transcribe/meet-3?room=evento-en');
+    b.start('ee22-1', 'ee22');
+    b.media('ee22-1', 5);
+    const session = await waitFor(() => engine.sessions[0]?.update && engine.sessions[0]);
+    session.ws.send(JSON.stringify({ type: 'conversation.item.input_audio_transcription.delta', delta: 'Since duemilaventi', audio_processed: 0.1 }));
+    const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
+    expect(final.transcript[0]?.text).toBe('Since duemilaventi.');
+  });
+
+  it('i numeri seguono la lingua della sessione, non quella del contesto riletto', async () => {
+    const engine = await fakeEngine('Dal duemilaventi.');
+    let calls = 0;
+    const ctx = createServer((_req, res) => {
+      calls += 1;
+      const language = calls === 1 ? 'it-IT' : 'en-GB';
+      res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ enabled: true, language }));
+    });
+    const ctxPort = await listen(ctx);
+    cleanups.push(() => new Promise<void>((r) => ctx.close(() => r())));
+    const { port } = await startGateway(
+      { CAPTIONS_ENGINE_URL: engine.url, CAPTIONS_CONTEXT_REFRESH_MS: '100' },
+      `http://127.0.0.1:${ctxPort}/ctx`,
+    );
+    const b = await bridge(port, '/transcribe/meet-4?room=evento-cambio');
+    b.start('ee33-1', 'ee33');
+    b.media('ee33-1', 5);
+    const session = await waitFor(() => engine.sessions[0]?.update && engine.sessions[0]);
+    expect(session.update).toMatchObject({ language: 'it-IT' });
+    // Il contesto riletto dice inglese; la sessione aperta resta italiana.
+    await waitFor(() => calls >= 2, 6000);
+    session.ws.send(JSON.stringify({ type: 'conversation.item.input_audio_transcription.delta', delta: 'Dal duemilaventi', audio_processed: 0.1 }));
+    const final = await waitFor(() => results(b.received).find((r) => !r.is_interim));
+    expect(final.transcript[0]?.text).toBe('Dal 2020.');
+    // E la lingua dichiarata è quella del testo, cioè della sessione.
+    expect((final as unknown as { language: string }).language).toBe('it');
+  }, 10_000);
 
   it('una stanza con i sottotitoli spenti non apre sessioni del motore', async () => {
     const engine = await fakeEngine();

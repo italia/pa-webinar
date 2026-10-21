@@ -70,6 +70,7 @@ const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.f
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
+const FOTO = '33333333-3333-4333-8333-333333333333';
 const SLUG = 'evento-di-prova';
 const HOUR = 60 * 60 * 1000;
 
@@ -341,8 +342,8 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
           { name: 'Ente organizzatore', logoUrl: 'https://cdn.example.com/logo.png', websiteUrl: 'https://ente.example.gov.it' },
         ],
         additionalMods: [
-          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: 'Ente 2', organizationLogoUrl: '/api/assets/images/l.png' },
-          { name: 'Organizzatore 1', role: 'MODERATOR', organizer: true, organization: null, organizationLogoUrl: null },
+          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: 'Ente 2', organizationLogoUrl: '/api/assets/images/l.png', photoId: FOTO },
+          { name: 'Organizzatore 1', role: 'MODERATOR', organizer: true, organization: null, organizationLogoUrl: null, photoId: null },
         ],
       }),
     );
@@ -352,9 +353,40 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
       { name: 'Ente organizzatore', logoUrl: null, websiteUrl: 'https://ente.example.gov.it/' },
     ]);
     expect(event.people).toEqual([
-      { name: 'Organizzatore 1', role: 'organizer', organization: null, logoUrl: null },
-      { name: 'Relatore 1', role: 'speaker', organization: 'Ente 2', logoUrl: '/api/assets/images/l.png' },
+      { name: 'Organizzatore 1', role: 'organizer', organization: null, logoUrl: null, photoUrl: null },
+      {
+        name: 'Relatore 1',
+        role: 'speaker',
+        organization: 'Ente 2',
+        logoUrl: '/api/assets/images/l.png',
+        photoUrl: `/api/avatar/person/${FOTO}`,
+      },
     ]);
+  });
+
+  it('la foto di chi interviene va anche nei dati strutturati della pagina', async () => {
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        additionalMods: [
+          { name: 'Relatore 1', role: 'SPEAKER', organizer: false, organization: null, organizationLogoUrl: null, photoId: FOTO },
+          { name: 'Relatore 2', role: 'SPEAKER', organizer: false, organization: null, organizationLogoUrl: null, photoId: null },
+        ],
+      }),
+    );
+    const tree = (await EventDetailPage({
+      params: Promise.resolve({ slug: SLUG }),
+    })) as ReactElement<{ children: ReactNode }>;
+    const script = ([] as ReactNode[])
+      .concat(tree.props.children)
+      .find(
+        (c): c is ReactElement<{ dangerouslySetInnerHTML: { __html: string } }> =>
+          isValidElement(c) && c.type === 'script',
+      );
+    const dati = JSON.parse(script!.props.dangerouslySetInnerHTML.__html) as {
+      performer: Array<{ name: string; image?: string }>;
+    };
+    expect(dati.performer[0]!.image).toMatch(new RegExp(`/api/avatar/person/${FOTO}$`));
+    expect(dati.performer[1]).not.toHaveProperty('image');
   });
 
   it("l'organizzatore principale compare solo se scelto, fra chi organizza", async () => {
@@ -372,7 +404,120 @@ describe('scheda dell’evento — chi organizza e interviene', () => {
       }),
     );
     expect(((await clientProps()).event as { people: unknown[] }).people).toEqual([
-      { name: 'Contatto 1', role: 'organizer', organization: 'Ente 1', logoUrl: null },
+      { name: 'Contatto 1', role: 'organizer', organization: 'Ente 1', logoUrl: null, photoUrl: null },
     ]);
+  });
+});
+
+describe('scheda dell’evento — programma', () => {
+  const agenda = [
+    {
+      id: 'a1',
+      label: 'Apertura',
+      plannedMinutes: 10,
+      status: 'PENDING',
+      speakerGrantId: null,
+      speakerPrimary: true,
+      speaker: null,
+    },
+    {
+      id: 'a2',
+      label: 'Intervento',
+      plannedMinutes: 30,
+      status: 'PENDING',
+      speakerGrantId: 'g-pubblica',
+      speakerPrimary: false,
+      speaker: { name: 'Relatrice 1', organization: 'Ente', photoId: FOTO, publicListed: true, revokedAt: null },
+    },
+    {
+      id: 'a3',
+      label: 'Un caso',
+      plannedMinutes: null,
+      status: 'PENDING',
+      speakerGrantId: 'g-nascosta',
+      speakerPrimary: false,
+      speaker: { name: 'Persona nascosta', organization: null, photoId: null, publicListed: false, revokedAt: null },
+    },
+  ];
+  const INIZIO = new Date('2030-03-05T09:00:00.000Z');
+  const conProgramma = (over: Record<string, unknown> = {}) =>
+    eventRow({
+      startsAt: INIZIO,
+      endsAt: new Date(INIZIO.getTime() + 2 * HOUR),
+      agendaEnabled: true,
+      agendaItems: agenda,
+      moderatorName: 'Organizzatrice',
+      moderatorPublicListed: true,
+      moderatorOrganization: 'Ente A',
+      moderatorOrganizationLogoUrl: null,
+      moderatorPhotoId: null,
+      ...over,
+    });
+
+  async function jsonLd(): Promise<Record<string, unknown>> {
+    const tree = (await EventDetailPage({ params: Promise.resolve({ slug: SLUG }) })) as ReactElement<{
+      children: ReactNode;
+    }>;
+    const script = ([] as ReactNode[])
+      .concat(tree.props.children)
+      .find((c): c is ReactElement<{ dangerouslySetInnerHTML: { __html: string } }> => isValidElement(c) && c.type === 'script');
+    return JSON.parse(script!.props.dangerouslySetInnerHTML.__html) as Record<string, unknown>;
+  }
+
+  it('passa al client gli argomenti, con chi interviene solo se presentato', async () => {
+    mockedEvent.mockResolvedValue(conProgramma());
+    const props = await clientProps();
+    const programma = (props.event as { programme: unknown[] }).programme;
+    expect(programma).toEqual([
+      { id: 'a1', label: 'Apertura', plannedMinutes: 10, status: 'PENDING', speaker: { name: 'Organizzatrice', organization: 'Ente A', photoUrl: null } },
+      {
+        id: 'a2',
+        label: 'Intervento',
+        plannedMinutes: 30,
+        status: 'PENDING',
+        speaker: { name: 'Relatrice 1', organization: 'Ente', photoUrl: `/api/avatar/person/${FOTO}` },
+      },
+      { id: 'a3', label: 'Un caso', plannedMinutes: null, status: 'PENDING', speaker: null },
+    ]);
+    expect(JSON.stringify(props)).not.toContain('Persona nascosta');
+    expect(JSON.stringify(props)).not.toContain('g-nascosta');
+  });
+
+  it('nei dati strutturati un sotto-evento per argomento, con gli orari che si conoscono', async () => {
+    mockedEvent.mockResolvedValue(conProgramma());
+    const ld = await jsonLd();
+    const sotto = ld.subEvent as Array<Record<string, unknown>>;
+    expect(sotto.map((s) => [s.name, s.startDate ?? null, s.endDate ?? null])).toEqual([
+      ['Apertura', '2030-03-05T09:00:00.000Z', '2030-03-05T09:10:00.000Z'],
+      ['Intervento', '2030-03-05T09:10:00.000Z', '2030-03-05T09:40:00.000Z'],
+      // Senza durata: si sa quando comincia, non quando finisce.
+      ['Un caso', '2030-03-05T09:40:00.000Z', null],
+    ]);
+    expect(sotto[1]?.performer).toEqual({
+      '@type': 'Person',
+      name: 'Relatrice 1',
+      affiliation: { '@type': 'Organization', name: 'Ente' },
+    });
+    expect(sotto[2]).not.toHaveProperty('performer');
+    expect(JSON.stringify(ld)).not.toContain('Persona nascosta');
+  });
+
+  it('una persona revocata, o l’organizzatore principale non presentato, non escono', async () => {
+    mockedEvent.mockResolvedValue(
+      conProgramma({
+        moderatorPublicListed: false,
+        agendaItems: [{ ...agenda[1], speaker: { ...agenda[1]!.speaker!, revokedAt: new Date() } }, agenda[0]],
+      }),
+    );
+    const props = await clientProps();
+    const programma = (props.event as { programme: Array<{ speaker: unknown }> }).programme;
+    expect(programma.map((v) => v.speaker)).toEqual([null, null]);
+  });
+
+  it('ad agenda spenta nessun programma, ne’ nei dati strutturati', async () => {
+    mockedEvent.mockResolvedValue(conProgramma({ agendaEnabled: false }));
+    const props = await clientProps();
+    expect((props.event as { programme: unknown[] }).programme).toEqual([]);
+    expect(await jsonLd()).not.toHaveProperty('subEvent');
   });
 });

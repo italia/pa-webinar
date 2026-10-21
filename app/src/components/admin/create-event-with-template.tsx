@@ -16,7 +16,7 @@ import {
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import CreateInstantCall from '@/components/admin/create-instant-call';
-import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 interface TemplateSummary {
@@ -70,10 +70,12 @@ interface Props {
   siteTimezone: string;
   enabledLocales: string[];
   defaultLocale: string;
-  defaultSenderRatioPct: number;
   defaultRetentionDays: number;
   canUseRubrica: boolean;
-  jvbSizingConfig: JvbSizingConfig;
+  /** Si creano categorie nuove dal wizard: solo l'amministrazione. */
+  canManageTags?: boolean;
+  /** L'istanza per la stima della capacita'. */
+  capacita: CapacitaIstanza;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   siteDefaultParseTitleKicker: boolean;
@@ -84,6 +86,10 @@ interface Props {
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
+  /** La traduzione automatica di titolo e descrizione c'e' (vedi il wizard). */
+  textTranslationAvailable?: boolean;
+  /** Chi crea l'evento amministra l'istanza (vedi il wizard). */
+  isSiteAdmin?: boolean;
   defaultModerator?: { name: string; email: string } | null;
   /** L'iscrizione pubblica dell'installazione: vedi il passo «Persone». */
   publicRegistrationEnabled?: boolean;
@@ -102,10 +108,10 @@ export default function CreateEventWithTemplate({
   siteTimezone,
   enabledLocales,
   defaultLocale,
-  defaultSenderRatioPct,
   defaultRetentionDays,
   canUseRubrica,
-  jvbSizingConfig,
+  canManageTags = false,
+  capacita,
   availableTags,
   gdprTemplates,
   siteDefaultParseTitleKicker,
@@ -114,6 +120,8 @@ export default function CreateEventWithTemplate({
   liveCaptionsAvailable = false,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
+  textTranslationAvailable = false,
+  isSiteAdmin = false,
   defaultModerator = null,
   publicRegistrationEnabled = true,
   initialInstant = false,
@@ -158,10 +166,10 @@ export default function CreateEventWithTemplate({
       siteTimezone={siteTimezone}
       enabledLocales={enabledLocales}
       defaultLocale={defaultLocale}
-      defaultSenderRatioPct={defaultSenderRatioPct}
       defaultRetentionDays={defaultRetentionDays}
       canUseRubrica={canUseRubrica}
-      jvbSizingConfig={jvbSizingConfig}
+      canManageTags={canManageTags}
+      capacita={capacita}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
@@ -170,6 +178,8 @@ export default function CreateEventWithTemplate({
       liveCaptionsAvailable={liveCaptionsAvailable}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
+      textTranslationAvailable={textTranslationAvailable}
+      isSiteAdmin={isSiteAdmin}
       defaultModerator={defaultModerator}
       publicRegistrationEnabled={publicRegistrationEnabled}
     />
@@ -217,50 +227,6 @@ export default function CreateEventWithTemplate({
 
   return (
     <div>
-        <div className="mb-4">
-          <button
-            type="button"
-            className="border-0 bg-transparent p-0 w-100 text-start"
-            onClick={() => setShowInstant(true)}
-          >
-            <div
-              className="d-flex align-items-center gap-3 p-3 rounded-3"
-              style={{
-                border: '2px dashed #008758',
-                backgroundColor: 'rgba(0,135,88,0.04)',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,135,88,0.08)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,135,88,0.04)';
-              }}
-            >
-              <div
-                className="d-flex align-items-center justify-content-center rounded-2"
-                style={{
-                  width: 48,
-                  height: 48,
-                  backgroundColor: 'rgba(0,135,88,0.12)',
-                  flexShrink: 0,
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#008758" strokeWidth="2" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-              </div>
-              <div>
-                <h6 className="fw-semibold mb-0" style={{ color: '#00704A' }}>
-                  {ti('title')}
-                </h6>
-                <p className="text-muted mb-0" style={{ fontSize: '0.82rem' }}>
-                  {ti('subtitle')}
-                </p>
-              </div>
-            </div>
-          </button>
-        </div>
-
         <GuidedFormat
           initial={decodificaFormato(scegliParam)}
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
@@ -282,6 +248,21 @@ export default function CreateEventWithTemplate({
               </div>
             </details>
           )}
+          {/* La videochiamata al volo e' un'alternativa, non lo scopo della
+              pagina: sta in fondo, accanto ai modelli, senza colori suoi. */}
+          <div className="formato-alternativa">
+            <span className="formato-alternativa__testo">
+              <span className="formato-alternativa__titolo">{tg('instantAlt')}</span>
+              <span className="formato-alternativa__desc">{ti('subtitle')}</span>
+            </span>
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setShowInstant(true)}
+            >
+              {tg('instantAltAction')}
+            </button>
+          </div>
         </GuidedFormat>
     </div>
   );

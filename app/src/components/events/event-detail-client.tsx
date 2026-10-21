@@ -6,10 +6,11 @@ import { Alert, Button, Card, CardBody, Row, Col } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
-import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getLocalized, getLocalizedWithLocale, type LocalizedField } from '@/lib/utils/locale';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
+import RecordingLinkRequest from '@/components/events/recording-link-request';
 import VideoPlayer, {
   type VideoPlayerHandle,
   type SubtitleTrack,
@@ -30,11 +31,18 @@ import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
 import MiniTranscript from '@/components/events/mini-transcript';
 import BookmarksPanel from '@/components/events/bookmarks-panel';
+import RecordingSlides from '@/components/presentation/recording-slides';
+import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import type { ReportView } from '@/lib/report/types';
 import EventHeader, { EventPeople, type TagChip } from '@/components/events/event-header';
+import EventProgramme from '@/components/events/event-programme';
+import type { VoceProgramma } from '@/lib/agenda/programme';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import LanguageBar from '@/components/events/language-bar';
+import { markMaterialOpened, materialOpenHandlers } from '@/components/materials/material-request';
+import type { ProgrammeVideoTime, ReplayMoment } from '@/lib/replay/moments';
 
 interface AnsweredQuestion {
   id: string;
@@ -44,6 +52,9 @@ interface AnsweredQuestion {
   upvotes: number;
   status: string;
 }
+
+/** La lingua scelta per guardare le registrazioni, su questo browser. */
+const LINGUA_VIDEO_KEY = 'pa-webinar:lingua-video';
 
 interface EventData {
   id: string;
@@ -72,6 +83,13 @@ interface EventData {
   /** Gli enti che organizzano e le persone pubblicate (lib/events/public-people). */
   organizers?: EntePubblico[];
   people?: PersonaPubblica[];
+  /** Il programma, ad agenda accesa (lib/agenda/programme). */
+  programme?: VoceProgramma[];
+  /** Le lingue in cui titolo e descrizione sono tradotti in automatico e
+   *  nessuno li ha ancora riletti: la pagina lo dice. */
+  lingueAutomatiche?: string[];
+  /** La lingua principale dei testi: quella mostrata dove manca la lingua della pagina. */
+  linguaPrincipale?: string;
   imageUrl: string | null;
   peakParticipants?: number;
   postEventPublic?: boolean;
@@ -147,18 +165,19 @@ interface EventDetailClientProps {
   feedbackProof?: { accessToken?: string; ratingToken?: string } | null;
   /** Il resoconto dell'evento, se lo staff l'ha pubblicato (lib/report). */
   report?: ReportView | null;
-}
-
-/** Display name for ISO language codes, used in the subtitle / audio
- *  switcher menus. Uses Intl.DisplayNames con fallback al codice se
- *  Intl non riconosce il tag. */
-function localeDisplayName(lang: string): string {
-  try {
-    const n = new Intl.DisplayNames(['it'], { type: 'language' });
-    return n.of(lang) ?? lang.toUpperCase();
-  } catch {
-    return lang.toUpperCase();
-  }
+  /** Le slide presentate in sala da mostrare accanto al video pubblicato
+   *  (lib/presentation/recording-slides-data); null se non ce ne sono. */
+  recordingSlides?: RecordingSlidesView | null;
+  /** Lo staff guarda la pagina come sara' pubblicata (`?anteprima=1`), con la
+   *  registrazione non ancora pubblica (lib/recording/audience). */
+  previewForStaff?: boolean;
+  /** La registrazione e' pubblicata per i soli iscritti e questa richiesta non
+   *  prova un'iscrizione: la pagina lo dice invece di tacere. */
+  recordingForRegistrants?: boolean;
+  /** I momenti della diretta sul tempo del video (lib/replay/moments). */
+  replayMoments?: ReplayMoment[] | null;
+  /** Il minuto del video di ogni argomento del programma (lib/replay/moments). */
+  programmeVideoTimes?: Record<string, ProgrammeVideoTime> | null;
 }
 
 export default function EventDetailClient({
@@ -173,6 +192,10 @@ export default function EventDetailClient({
   recap = null,
   tags = [],
   invalidToken = false,
+  previewForStaff = false,
+  recordingForRegistrants = false,
+  replayMoments = null,
+  programmeVideoTimes = null,
   hasRoomAccess = false,
   registrationAccess = 'open',
   registrationOpen,
@@ -180,6 +203,7 @@ export default function EventDetailClient({
   hasPostEventQuestionnaire = false,
   feedbackProof = null,
   report = null,
+  recordingSlides = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tr = useTranslations('registration');
@@ -196,7 +220,6 @@ export default function EventDetailClient({
   };
   const tv = useTranslations('video');
   const tm = useTranslations('materials');
-  const tPostprod = useTranslations('postprod');
   const format = useFormatter();
 
   // Ref del player — usato dal TranscriptPanel per click-to-seek + da
@@ -204,12 +227,12 @@ export default function EventDetailClient({
   const playerRef = useRef<VideoPlayerHandle>(null);
   const playerAnchorRef = useRef<HTMLDivElement>(null);
   useDeepLinkSeek(playerRef);
-  // Lingua attiva dei sottotitoli — guida quale variante di summary
-  // mostrare nel TranscriptPanel ("la sintesi nella lingua che stai
-  // guardando").
-  const [activeTranscriptLanguage, setActiveTranscriptLanguage] = useState<string | null>(
-    null
-  );
+  // La lingua in cui si guarda la registrazione (barra delle lingue): guida
+  // sottotitoli, sintesi e trascrizione. Null finche' non si sa che cosa c'e'.
+  const [lingua, setLingua] = useState<string | null>(null);
+  const [sottotitoliAccesi, setSottotitoliAccesi] = useState(false);
+  const [audioScelto, setAudioScelto] = useState('original');
+  const [linguaSorgente, setLinguaSorgente] = useState<string | null>(null);
   // Metadata postprod (subtitle/audio tracks disponibili, transcript
   // endpoint). Fetched solo per recording pubblicate; se la fetch
   // fallisce o ritorna 404 (postprod non abilitato per l'evento) i
@@ -230,8 +253,27 @@ export default function EventDetailClient({
     pipelineSnapshot?: PipelineSnapshot;
   } | null>(null);
 
-  const title = getLocalized(event.title, locale);
-  const description = getLocalized(event.description, locale);
+  // Il testo nella lingua della pagina o, se manca, nella lingua principale:
+  // in quel caso il testo dice la sua lingua (lang). Un testo mostrato che e'
+  // tradotto in automatico e non riletto lo dice anche a chi legge.
+  const titolo = getLocalizedWithLocale(event.title, locale, event.linguaPrincipale);
+  const descrizione = getLocalizedWithLocale(event.description, locale, event.linguaPrincipale);
+  const title = titolo.testo;
+  const description = descrizione.testo;
+  const altraLingua = (lingua: string | null) =>
+    lingua && lingua !== locale ? lingua : undefined;
+  const automatica = [titolo.lingua, descrizione.lingua].some(
+    (l) => !!l && !!event.lingueAutomatiche?.includes(l)
+  );
+  const notaAutomatica = automatica ? (
+    <p className="traduzione-automatica d-flex align-items-start gap-1 mb-3">
+      <Icon icon="it-exchange-circle" size="sm" className="flex-shrink-0" />
+      <span>
+        <strong>{t('detail.machineTranslation')}</strong>{' '}
+        {t('detail.machineTranslationNote')}
+      </span>
+    </p>
+  ) : null;
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
@@ -283,13 +325,16 @@ export default function EventDetailClient({
         const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map((lang) => ({
           language: lang,
           src: `/api/events/${event.slug}/postprod/subtitle/${lang}`,
-          label: localeDisplayName(lang),
+          // Nella lingua della pagina, come i menu del lettore. Quale
+          // mostrare lo decide la barra delle lingue; la predefinita, quella
+          // parlata, e' cio' che accende il tasto dei sottotitoli.
+          label: locName(lang, locale),
           isDefault: lang === data.sourceLanguage,
         }));
         const audio: AudioTrack[] = (data.dubbedAudio ?? []).map((d) => ({
           language: d.language,
           src: d.src,
-          label: `${localeDisplayName(d.language)} (AI)`,
+          label: `${locName(d.language, locale)} (AI)`,
           isSynthetic: true,
         }));
         const segmentsLite = (data.segments ?? []).map((s) => ({
@@ -327,13 +372,147 @@ export default function EventDetailClient({
               ? meta.pipelineSnapshot
               : undefined,
         });
-        setActiveTranscriptLanguage(meta.sourceLang);
+        setLinguaSorgente(meta.sourceLang);
+        // La lingua iniziale: quella scelta l'ultima volta su questo
+        // browser, se c'e'; poi quella della pagina; poi quella parlata.
+        const disponibili = new Set([
+          meta.sourceLang,
+          ...meta.subtitles.map((x) => x.language),
+          ...meta.audio.map((x) => x.language),
+          ...Object.keys(meta.summariesStructured ?? {}),
+        ]);
+        let salvata: string | null = null;
+        try {
+          salvata = window.localStorage.getItem(LINGUA_VIDEO_KEY);
+        } catch {
+          // Archiviazione del browser non disponibile: si parte dalla pagina.
+        }
+        const iniziale =
+          salvata && disponibili.has(salvata)
+            ? salvata
+            : disponibili.has(locale)
+              ? locale
+              : meta.sourceLang;
+        setLingua(iniziale);
+        setSottotitoliAccesi(
+          iniziale !== meta.sourceLang && meta.subtitles.some((x) => x.language === iniziale)
+        );
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug]);
+  }, [isEnded, event.recordingUrl, event.transcriptPublished, event.slug, locale]);
+
+  // Le scelte della barra delle lingue arrivano al lettore e alla trascrizione.
+  useEffect(() => {
+    if (!lingua) return;
+    const player = playerRef.current;
+    const conSottotitoli = postprodMeta?.subtitleTracks?.some((x) => x.language === lingua);
+    player?.setSubtitle(sottotitoliAccesi && conSottotitoli ? lingua : null);
+    player?.setAudio(audioScelto);
+  }, [lingua, sottotitoliAccesi, audioScelto, postprodMeta]);
+
+  // Trascrizione e sottotitoli esistono solo nelle lingue dei sottotitoli: in
+  // un'altra lingua scelta (solo doppiaggio o solo sintesi) si leggono e si
+  // scaricano in quella parlata.
+  const linguaTesti =
+    lingua && postprodMeta?.subtitleTracks?.some((x) => x.language === lingua)
+      ? lingua
+      : linguaSorgente;
+
+  /** Cambia la lingua per tutta la pagina e la ricorda su questo browser. */
+  const scegliLingua = (
+    nuova: string,
+    opzioni: { sottotitoli?: boolean; audio?: string } = {}
+  ) => {
+    setLingua(nuova);
+    setSottotitoliAccesi(opzioni.sottotitoli ?? nuova !== linguaSorgente);
+    // L'audio doppiato resta solo se c'e' nella nuova lingua.
+    setAudioScelto((prima) => {
+      if (opzioni.audio) return opzioni.audio;
+      return prima !== 'original' && postprodMeta?.audioTracks?.some((x) => x.language === nuova)
+        ? nuova
+        : 'original';
+    });
+    try {
+      window.localStorage.setItem(LINGUA_VIDEO_KEY, nuova);
+    } catch {
+      // Archiviazione del browser non disponibile: la scelta vale per questa visita.
+    }
+  };
+
+  // Il video pubblicato di un evento concluso, con cio' che lo accompagna
+  // (chi parla, la trascrizione breve, il doppiaggio, lo scaricamento). La
+  // registrazione passa dal player del portale (/api/events/[slug]/recording).
+  const videoPubblicato = isEnded && !!event.recordingUrl;
+  const bloccoVideo = videoPubblicato ? (
+    <div className="mb-4">
+      <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
+        <VideoPlayer
+          ref={playerRef}
+          src={`/api/events/${event.slug}/recording`}
+          title={title}
+          poster={event.imageUrl ?? undefined}
+          subtitleTracks={postprodMeta?.subtitleTracks}
+          audioTracks={postprodMeta?.audioTracks}
+          // Le scelte fatte dai menu del lettore valgono per tutta la pagina,
+          // come quelle della barra delle lingue.
+          onSubtitleChange={(lang) => {
+            if (lang) scegliLingua(lang, { sottotitoli: true });
+            else setSottotitoliAccesi(false);
+          }}
+          onAudioChange={(lang) => {
+            if (lang === 'original') setAudioScelto('original');
+            else scegliLingua(lang, { sottotitoli: sottotitoliAccesi, audio: lang });
+          }}
+        />
+        {postprodMeta?.segmentsLite && (
+          <NowSpeakingChip
+            playerRef={playerRef}
+            segments={postprodMeta.segmentsLite}
+          />
+        )}
+      </div>
+      <VideoMiniPlayer
+        playerRef={playerRef}
+        anchorRef={playerAnchorRef}
+        title={title}
+        poster={event.imageUrl}
+      />
+
+      {/* Mini-transcript inline sotto al video: 3 righe
+          (precedente / attiva / successiva) seguono il
+          playhead in tempo reale. L'utente vede chi parla e
+          cosa dice senza dover scrollare al transcript
+          completo (che resta disponibile nelle tab più sotto). */}
+      {postprodMeta?.segmentsLite && (
+        <MiniTranscript
+          playerRef={playerRef}
+          segments={postprodMeta.segmentsLite}
+        />
+      )}
+
+      {/* Le lingue in cui si puo' guardare: cosa c'e' per ognuna, e la
+          scelta di sottotitoli e audio. */}
+      {lingua && linguaSorgente && (
+        <LanguageBar
+          sourceLanguage={linguaSorgente}
+          subtitleLanguages={postprodMeta?.subtitleTracks?.map((x) => x.language) ?? []}
+          audioLanguages={postprodMeta?.audioTracks?.map((x) => x.language) ?? []}
+          summaryLanguages={Object.keys(postprodMeta?.summariesStructured ?? {})}
+          locale={locale}
+          language={lingua}
+          onLanguageChange={scegliLingua}
+          subtitlesOn={sottotitoliAccesi}
+          onSubtitlesChange={setSottotitoliAccesi}
+          audio={audioScelto}
+          onAudioChange={setAudioScelto}
+        />
+      )}
+
+    </div>
+  ) : null;
 
   return (
     <div className="container py-5">
@@ -360,7 +539,22 @@ export default function EventDetailClient({
         </Alert>
       )}
 
-      {isEnded && (
+      {previewForStaff && (
+        <div className="alert alert-warning mb-4" role="status">
+          <strong>{t('detail.previewTitle')}</strong>
+          <div className="mt-1">{t('detail.previewBody')}</div>
+        </div>
+      )}
+
+      {isEnded && recordingForRegistrants && (
+        <div className="alert alert-info mb-4" role="status">
+          <strong>{t('detail.recordingForRegistrantsTitle')}</strong>
+          <div className="mt-1">{t('detail.recordingForRegistrantsBody')}</div>
+          <RecordingLinkRequest slug={event.slug} locale={locale} />
+        </div>
+      )}
+
+      {isEnded && !videoPubblicato && (
         // Un'informazione, non un allarme: l'Alert del kit impone
         // role="alert", che la farebbe leggere d'urgenza all'apertura della
         // pagina. Stesso aspetto, ruolo giusto.
@@ -378,8 +572,11 @@ export default function EventDetailClient({
 
       <EventHeader
         title={title}
+        titleLang={altraLingua(titolo.lingua)}
+        titleNote={notaAutomatica}
         parseTitleKicker={parseTitleKicker}
-        imageUrl={event.imageUrl}
+        // Con il video la copertina e' la sua locandina: in testa non si ripete.
+        imageUrl={videoPubblicato ? null : event.imageUrl}
         tags={tags}
         startsAt={startsAt}
         endsAt={endsAt}
@@ -389,11 +586,32 @@ export default function EventDetailClient({
         organizerName={event.organizerName && !(event.organizers && event.organizers.length > 0) ? event.organizerName : null}
       />
 
-      <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
+      {!videoPubblicato && (
+        <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
+      )}
+
+      {/* Con le slide presentate in sala il video sale sopra le colonne, a
+          tutta larghezza: accanto le slide sul desktop, sotto al telefono. */}
+      {videoPubblicato && recordingSlides && (
+        <div className="row g-4 mb-2">
+          <div className="col-lg-7">{bloccoVideo}</div>
+          <div className="col-lg-5 mb-4">
+            <RecordingSlides
+              playerRef={playerRef}
+              cues={recordingSlides.cues}
+              materials={recordingSlides.materials}
+            />
+          </div>
+        </div>
+      )}
 
       {/* ─── Content + Sidebar ─── */}
       <Row>
         <Col lg={8} className="mb-4 mb-lg-0">
+          {/* Senza slide il video apre la colonna; con le slide sta sopra,
+              accanto a loro. */}
+          {videoPubblicato && !recordingSlides && bloccoVideo}
+
           {/* Hero post-evento: renderizzata solo se la pipeline AI ha
               prodotto un SUMMARY_JSON strutturato. Card prominente con
               sintesi + topic-chip-navigator che fa seek al punto del
@@ -407,6 +625,19 @@ export default function EventDetailClient({
               playerRef={playerRef}
               eventSlug={event.slug}
               pipelineSnapshot={postprodMeta.pipelineSnapshot ?? null}
+              language={lingua}
+              onLanguageChange={scegliLingua}
+            />
+          )}
+
+          {/* Il programma come indice della registrazione: ogni argomento al
+              suo minuto del video. */}
+          {videoPubblicato && programmeVideoTimes && (event.programme?.length ?? 0) > 0 && (
+            <EventProgramme
+              items={event.programme!}
+              startsAt={startsAt}
+              videoTimes={programmeVideoTimes}
+              playerRef={playerRef}
             />
           )}
 
@@ -431,110 +662,52 @@ export default function EventDetailClient({
               </div>
             </div>
           )}
-          {isEnded && event.recordingUrl && (
-            <div className="mb-4">
-              <div ref={playerAnchorRef} id="event-video" style={{ position: 'relative' }}>
-                <VideoPlayer
-                  ref={playerRef}
-                  src={`/api/events/${event.slug}/recording`}
-                  title={title}
-                  poster={event.imageUrl ?? undefined}
-                  subtitleTracks={postprodMeta?.subtitleTracks}
-                  audioTracks={postprodMeta?.audioTracks}
-                  onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
-                />
-                {postprodMeta?.segmentsLite && (
-                  <NowSpeakingChip
-                    playerRef={playerRef}
-                    segments={postprodMeta.segmentsLite}
-                  />
-                )}
-              </div>
-              <VideoMiniPlayer
-                playerRef={playerRef}
-                anchorRef={playerAnchorRef}
-                title={title}
-                poster={event.imageUrl}
-              />
 
-              {/* Mini-transcript inline sotto al video: 3 righe
-                  (precedente / attiva / successiva) seguono il
-                  playhead in tempo reale. L'utente vede chi parla e
-                  cosa dice senza dover scrollare al transcript
-                  completo (che resta disponibile nelle tab più sotto). */}
-              {postprodMeta?.segmentsLite && (
-                <MiniTranscript
-                  playerRef={playerRef}
-                  segments={postprodMeta.segmentsLite}
-                />
-              )}
-
-              {/* Scoperibilità del doppiaggio: nota sobria sotto al video
-                  che indica al visitatore dove cliccare per cambiare
-                  audio. Renderizzata solo se ci sono tracce doppiate. */}
-              {postprodMeta?.audioTracks && postprodMeta.audioTracks.length > 0 && (
-                <div
-                  className="d-flex align-items-start gap-2 mb-3"
-                  style={{
-                    fontSize: '0.82rem',
-                    color: 'var(--app-muted)',
-                    background: '#f7faff',
-                    border: '1px solid #d6e3f1',
-                    borderRadius: 8,
-                    padding: '8px 12px',
-                  }}
-                >
-                  <Icon icon="it-hearing" size="sm" color={undefined} />
-                  <span>
-                    {tPostprod('dubAvailableHint', {
-                      langs: postprodMeta.audioTracks
-                        .map((a) => locName(a.language, locale))
-                        .join(', '),
-                    })}
-                  </span>
-                </div>
-              )}
-
-              <div className="mt-2">
-                <a
-                  href={`/api/events/${event.slug}/recording`}
-                  download
-                  className="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-                  style={{ fontSize: '0.9rem' }}
-                >
-                  <Icon icon="it-download" size="sm" />
-                  {tv('download')}
-                </a>
-              </div>
-            </div>
+          {/* Chi ha organizzato e chi e' intervenuto, dopo il video. */}
+          {videoPubblicato && (
+            <EventPeople organizers={event.organizers ?? []} people={event.people ?? []} />
           )}
-          {/* // TODO v0.5.0: Live catch-up player with HLS */}
 
-          {/* Il resoconto dell'evento, pubblicato dallo staff: dopo il video,
-              prima della descrizione. */}
+          {/* Trascrizione, domande, materiali, sondaggi, valutazioni. */}
+          {isEnded && (
+            <PostEventTabs
+              questions={answeredQuestions}
+              materials={materials}
+              polls={polls}
+              feedback={feedbackSummary}
+              showQA={event.postEventShowQA !== false}
+              showMaterials={event.postEventShowMaterials !== false}
+              showPolls={event.postEventShowPolls !== false}
+              showFeedback={event.postEventShowFeedback !== false}
+              eventSlug={event.slug}
+              playerRef={playerRef}
+              transcriptLanguage={linguaTesti}
+              moments={replayMoments}
+              transcriptAvailable={postprodMeta?.transcriptAvailable ?? false}
+            />
+          )}
+
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno e
+              solo a chi ha partecipato, con la sua iscrizione (lo dice il
+              server): a chiunque altro il modulo verrebbe rifiutato all'invio. */}
+          {isEnded &&
+            event.postEventShowFeedback !== false &&
+            hasPostEventQuestionnaire &&
+            feedbackProof && (
+              <PostEventFeedbackInvite
+                eventSlug={event.slug}
+                accessToken={feedbackProof.accessToken}
+                ratingToken={feedbackProof.ratingToken}
+              />
+            )}
+
+          {/* Il resoconto dell'evento, pubblicato dallo staff. */}
           {isEnded && report && (
             <PostEventReport report={report} playerRef={playerRef} hasVideo={!!event.recordingUrl} />
           )}
 
-          <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
-            {t('detail.description')}
-          </h2>
-          <MarkdownRenderer content={description} className="mb-4" />
-
-          {/* Materiali prima dell'inizio: il server manda qui solo quelli che
-              il pubblico può vedere in questa fase (sempre visibili e
-              preparatori), e nessuno da quando l'evento è iniziato. A evento
-              concluso l'elenco sta nelle tab post-evento. */}
-          {!isEnded && materials.length > 0 && (
-            <section className="mb-4">
-              <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
-                {tm('title')}
-              </h2>
-              <MaterialList materials={materials} eventSlug={event.slug} />
-            </section>
-          )}
-
-          {/* Post-event recap: aggregate summary card above the detail tabs. */}
+          {/* Post-event recap: aggregate summary card. Le domande piu' votate
+              stanno gia' nella scheda delle domande, quando c'e'. */}
           {isEnded &&
             event.postEventShowRecap !== false &&
             recap &&
@@ -545,6 +718,7 @@ export default function EventDetailClient({
                 // Words move to the standalone section below whenever it's on,
                 // so the recap card must not repeat them.
                 hideWords={event.postEventShowWordCloud !== false}
+                hideQuestions={event.postEventShowQA !== false && answeredQuestions.length > 0}
               />
             )}
 
@@ -595,37 +769,51 @@ export default function EventDetailClient({
               </Card>
             )}
 
-          {/* Post-event tabbed content */}
-          {isEnded && (
-            <PostEventTabs
-              questions={answeredQuestions}
-              materials={materials}
-              polls={polls}
-              feedback={feedbackSummary}
-              showQA={event.postEventShowQA !== false}
-              showMaterials={event.postEventShowMaterials !== false}
-              showPolls={event.postEventShowPolls !== false}
-              showFeedback={event.postEventShowFeedback !== false}
-              eventSlug={event.slug}
-              playerRef={playerRef}
-              transcriptLanguage={activeTranscriptLanguage}
-              transcriptAvailable={postprodMeta?.transcriptAvailable ?? false}
-            />
+          {/* La descrizione: prima dell'evento in evidenza; con il video
+              diventa un approfondimento, chiuso. */}
+          {videoPubblicato ? (
+            <details className="event-description-details mb-4">
+              <summary className="h5 fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {t('detail.description')}
+              </summary>
+              <MarkdownRenderer
+                content={description}
+                className="mt-3"
+                lang={altraLingua(descrizione.lingua)}
+              />
+            </details>
+          ) : (
+            <>
+              <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                {t('detail.description')}
+              </h2>
+              <MarkdownRenderer
+                content={description}
+                className="mb-4"
+                lang={altraLingua(descrizione.lingua)}
+              />
+            </>
           )}
 
-          {/* Invito al questionario post-evento: solo se l'evento ne ha uno e
-              solo a chi ha partecipato, con la sua iscrizione (lo dice il
-              server): a chiunque altro il modulo verrebbe rifiutato all'invio. */}
-          {isEnded &&
-            event.postEventShowFeedback !== false &&
-            hasPostEventQuestionnaire &&
-            feedbackProof && (
-              <PostEventFeedbackInvite
-                eventSlug={event.slug}
-                accessToken={feedbackProof.accessToken}
-                ratingToken={feedbackProof.ratingToken}
-              />
-            )}
+          {/* Il programma, prima dell'evento e durante. Dopo, con il video,
+              diventa l'indice della registrazione (sopra, con i minuti del
+              video); senza video lo raccontano il resoconto e i capitoli. */}
+          {publicStatus !== 'ENDED' && (event.programme?.length ?? 0) > 0 && (
+            <EventProgramme items={event.programme!} startsAt={startsAt} live={isLive} />
+          )}
+
+          {/* Materiali prima dell'inizio: il server manda qui solo quelli che
+              il pubblico può vedere in questa fase (sempre visibili e
+              preparatori), e nessuno da quando l'evento è iniziato. A evento
+              concluso l'elenco sta nelle tab post-evento. */}
+          {!isEnded && materials.length > 0 && (
+            <section className="mb-4">
+              <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                {tm('title')}
+              </h2>
+              <MaterialList materials={materials} eventSlug={event.slug} />
+            </section>
+          )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
               infra/capacity info, not something public attendees need. */}
@@ -636,7 +824,9 @@ export default function EventDetailClient({
             concluso (o finito senza essersi tenuto) conta prima il contenuto. */}
         <Col lg={4} className={isEnded || pastEndNotHeld ? undefined : 'order-first order-lg-0 mb-4 mb-lg-0'}>
           <Card
-            className="shadow-sm border-0 sticky-top"
+            // Fissa mentre si scorre solo prima della fine: dopo, con
+            // scaricamenti e materiali, puo' essere piu' alta dello schermo.
+            className={`shadow-sm border-0${isEnded ? '' : ' sticky-top'}`}
             style={{ top: '1.5rem', borderRadius: '0.75rem' }}
           >
             <CardBody className="p-4">
@@ -644,6 +834,13 @@ export default function EventDetailClient({
                 <PostEventSidebar
                   event={event}
                   feedbackSummary={feedbackSummary}
+                  videoOnPage={videoPubblicato}
+                  materials={materials}
+                  textLanguage={linguaTesti}
+                  summaryLanguage={
+                    lingua && postprodMeta?.summariesStructured?.[lingua] ? lingua : null
+                  }
+                  transcriptAvailable={postprodMeta?.transcriptAvailable ?? false}
                 />
               ) : pastEndNotHeld ? (
                 // Iscrizione e ingresso porterebbero a una pagina che risponde
@@ -806,9 +1003,24 @@ export default function EventDetailClient({
 function PostEventSidebar({
   event,
   feedbackSummary,
+  videoOnPage = false,
+  materials = [],
+  textLanguage = null,
+  summaryLanguage = null,
+  transcriptAvailable = false,
 }: {
   event: EventData;
   feedbackSummary?: FeedbackSummary | null;
+  /** Il video e' sulla pagina: la colonna offre gli scaricamenti invece
+   *  dell'avviso «registrazione disponibile». */
+  videoOnPage?: boolean;
+  /** I materiali dell'evento visibili dopo la fine, da aprire o scaricare. */
+  materials?: MaterialData[];
+  /** La lingua di trascrizione e sottotitoli da scaricare (una che li ha). */
+  textLanguage?: string | null;
+  /** La lingua della sintesi da scaricare, se c'e' in quella scelta. */
+  summaryLanguage?: string | null;
+  transcriptAvailable?: boolean;
 }) {
   const t = useTranslations('events');
   const tp = useTranslations('postEvent');
@@ -851,21 +1063,44 @@ function PostEventSidebar({
         </div>
       )}
 
-      {event.recordingUrl ? (
-        <div
-          className="mb-3 d-flex align-items-center gap-2"
-          style={{
-            fontSize: '0.88rem',
-            padding: '8px 12px',
-            borderLeft: '3px solid #008758',
-            background: '#E6F4EA',
-            borderRadius: '0 4px 4px 0',
-            color: '#155724',
-          }}
-        >
-          <Icon icon="it-video" size="sm" />
-          <span className="fw-semibold">{t('detail.recording')}</span>
-        </div>
+      {videoOnPage ? (
+        <>
+          <PostEventDownloads
+            slug={event.slug}
+            textLanguage={textLanguage}
+            summaryLanguage={summaryLanguage}
+            transcriptAvailable={transcriptAvailable}
+          />
+          {materials.length > 0 && (
+            <section className="mb-3" aria-labelledby="post-event-materials">
+              <h4
+                id="post-event-materials"
+                className="h6 fw-semibold mb-2"
+                style={{ color: 'var(--app-text)' }}
+              >
+                {tp('downloads.materials')}
+              </h4>
+              <ul className="list-unstyled mb-0">
+                {materials.map((m) => (
+                  <li key={m.id} className="mb-1">
+                    <a
+                      href={m.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary text-decoration-none d-inline-flex align-items-start gap-1"
+                      style={{ fontSize: '0.9rem' }}
+                      // Come nella scheda dei materiali: l'apertura si conta.
+                      {...materialOpenHandlers(() => markMaterialOpened(event.slug, m.id))}
+                    >
+                      <Icon icon="it-file" size="sm" className="flex-shrink-0" />
+                      <span>{m.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       ) : (
         <p className="text-muted text-center mb-3" style={{ fontSize: '0.85rem' }}>
           {t('detail.noRecording')}
@@ -894,5 +1129,62 @@ function PostEventSidebar({
         </div>
       )}
     </>
+  );
+}
+
+/** Cosa si scarica della registrazione: il video e, nella lingua scelta,
+ *  trascrizione, sottotitoli e sintesi (le rotte pubbliche della post-produzione). */
+function PostEventDownloads({
+  slug,
+  textLanguage,
+  summaryLanguage,
+  transcriptAvailable,
+}: {
+  slug: string;
+  textLanguage: string | null;
+  summaryLanguage: string | null;
+  transcriptAvailable: boolean;
+}) {
+  const tp = useTranslations('postEvent.downloads');
+  const lang = (l: string | null) => (l ? `?lang=${encodeURIComponent(l)}` : '');
+  const voci = [
+    { href: `/api/events/${slug}/recording`, label: tp('video'), show: true },
+    {
+      href: `/api/events/${slug}/postprod/download/transcript.txt${lang(textLanguage)}`,
+      label: tp('transcript'),
+      show: transcriptAvailable,
+    },
+    {
+      href: `/api/events/${slug}/postprod/download/transcript.srt${lang(textLanguage)}`,
+      label: tp('subtitles'),
+      show: transcriptAvailable,
+    },
+    {
+      href: `/api/events/${slug}/postprod/download/summary.md${lang(summaryLanguage)}`,
+      label: tp('summary'),
+      show: !!summaryLanguage,
+    },
+  ].filter((v) => v.show);
+  return (
+    <section className="mb-3" aria-labelledby="post-event-downloads">
+      <h4 id="post-event-downloads" className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+        {tp('title')}
+      </h4>
+      <ul className="list-unstyled mb-0">
+        {voci.map((v) => (
+          <li key={v.href} className="mb-1">
+            <a
+              href={v.href}
+              download
+              className="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+              style={{ fontSize: '0.9rem' }}
+            >
+              <Icon icon="it-download" size="sm" />
+              {v.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

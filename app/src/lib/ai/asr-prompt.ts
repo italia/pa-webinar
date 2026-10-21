@@ -10,6 +10,7 @@
  */
 
 import { asrPromptTerms, type GlossaryEntry } from '@/lib/ai/glossary';
+import { nomiOrganizzatori } from '@/lib/events/organizer-names';
 
 /** Lo spazio dei termini del glossario nel suggerimento: circa 60 token. */
 export const GLOSSARY_PROMPT_CHARS = 240;
@@ -26,6 +27,8 @@ export function buildAsrInitialPrompt(
   event: {
     title: unknown;
     organizerName: string | null;
+    /** Gli enti organizzatori: quando ci sono, vincono sul nome libero. */
+    organizers?: Array<{ name: string }>;
     speakersInfo: unknown;
   },
   glossary: GlossaryEntry[] = [],
@@ -47,8 +50,9 @@ export function buildAsrInitialPrompt(
   if (termini) parts.push(`Termini: ${termini}.`);
   const title = localised(event.title);
   if (title) parts.push(title.trim());
-  if (event.organizerName) {
-    parts.push(`Organizzato da ${event.organizerName.trim()}.`);
+  const organizzatori = nomiOrganizzatori(event);
+  if (organizzatori) {
+    parts.push(`Organizzato da ${organizzatori}.`);
   }
   const speakers = localised(event.speakersInfo);
   if (speakers) parts.push(`Partecipanti e relatori: ${speakers.trim()}.`);

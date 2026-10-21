@@ -1,10 +1,14 @@
 /**
- * Il ciclo di vita del lavoro del resoconto (PostprodJob di tipo REPORT).
+ * Il ciclo di vita dei lavori dell'evento: il resoconto (PostprodJob di tipo
+ * REPORT) e la traduzione di titolo e descrizione (TRANSLATE_TEXT,
+ * lib/text-translation). Le regole sono le stesse; il resoconto ha in piu' i
+ * numeri.
  *
- * Il claim calcola i numeri e li scrive nel payload. La consegna li prende,
- * salva il resoconto e chiude il lavoro come concluso, tutto nella stessa
- * transazione: un lavoro del resoconto e' concluso solo se il suo resoconto
- * e' salvato, e un lavoro chiuso (concluso o fallito) non si riapre.
+ * Il claim del resoconto calcola i numeri e li scrive nel payload. La
+ * consegna li prende, salva il resoconto e chiude il lavoro come concluso,
+ * tutto nella stessa transazione: un lavoro dell'evento e' concluso solo se il
+ * suo risultato e' salvato, e un lavoro chiuso (concluso o fallito) non si
+ * riapre.
  *
  * Dopo un lease scaduto due worker possono lavorare sullo stesso lavoro. Ogni
  * claim incrementa `attempts`, e il worker rimanda il numero del suo claim con
@@ -16,15 +20,22 @@
  */
 import { Prisma } from '@prisma/client';
 
+import { EVENT_JOB_KINDS, type PostprodJobKind } from '@/lib/ai/job-classes';
 import { prisma } from '@/lib/db';
 
 type Db = Prisma.TransactionClient | typeof prisma;
 
-/** Il lavoro, ancora aperto e ancora del claim `tentativo`. */
-function delTentativo(jobId: string, tentativo: number): Prisma.Sql {
-  return Prisma.sql`id = ${jobId}::uuid AND kind = 'REPORT'
+/** Il lavoro dell'evento, di uno dei `tipi`, ancora aperto e ancora del claim `tentativo`. */
+function delTentativo(
+  jobId: string,
+  tentativo: number,
+  tipi: readonly PostprodJobKind[] = EVENT_JOB_KINDS
+): Prisma.Sql {
+  return Prisma.sql`id = ${jobId}::uuid AND kind::text = ANY(${[...tipi]}::text[])
     AND status IN ('PENDING', 'CLAIMED', 'RUNNING') AND attempts = ${tentativo}`;
 }
+
+const SOLO_RESOCONTO: readonly PostprodJobKind[] = ['REPORT'];
 
 /**
  * Scrive i numeri nel lavoro appena preso dal claim. Falso se nel frattempo
@@ -39,7 +50,7 @@ export async function scriviNumeriResoconto(
   const n = await db.$executeRaw`
     UPDATE postprod_jobs
     SET payload = payload || jsonb_build_object('metrics', ${JSON.stringify(numeri)}::jsonb), updated_at = NOW()
-    WHERE ${delTentativo(jobId, tentativo)}
+    WHERE ${delTentativo(jobId, tentativo, SOLO_RESOCONTO)}
   `;
   return n > 0;
 }
@@ -56,7 +67,7 @@ export async function consegnaResoconto(jobId: string, tentativo: number, db: Db
     WITH presi AS (
       SELECT id, payload -> 'metrics' AS metrics
       FROM postprod_jobs
-      WHERE ${delTentativo(jobId, tentativo)} AND jsonb_typeof(payload -> 'metrics') = 'object'
+      WHERE ${delTentativo(jobId, tentativo, SOLO_RESOCONTO)} AND jsonb_typeof(payload -> 'metrics') = 'object'
       FOR UPDATE
     )
     UPDATE postprod_jobs p
@@ -75,10 +86,43 @@ export async function consegnaResoconto(jobId: string, tentativo: number, db: Db
 }
 
 /**
+ * La consegna di un lavoro dell'evento senza numeri (la traduzione dei
+ * testi): lo chiude come concluso, se e' ancora del claim `tentativo`, e ne
+ * restituisce il payload. Come per il resoconto la riga resta bloccata fino
+ * alla fine della transazione: se il risultato non si salva, tutto si annulla
+ * e il lavoro resta aperto. Null se il lavoro non e' piu' di quel claim.
+ */
+export async function consegnaLavoroEvento(
+  jobId: string,
+  tentativo: number,
+  tipo: PostprodJobKind,
+  db: Db
+): Promise<Prisma.JsonValue | null> {
+  const righe = await db.$queryRaw<Array<{ payload: Prisma.JsonValue }>>`
+    WITH presi AS (
+      SELECT id FROM postprod_jobs
+      WHERE ${delTentativo(jobId, tentativo, [tipo])}
+      FOR UPDATE
+    )
+    UPDATE postprod_jobs p
+    SET status = 'DONE',
+        completed_at = NOW(),
+        last_error = NULL,
+        leased_at = NULL,
+        leased_by = NULL,
+        updated_at = NOW()
+    FROM presi
+    WHERE p.id = presi.id
+    RETURNING p.payload
+  `;
+  return righe[0]?.payload ?? null;
+}
+
+/**
  * Lo stato del lavoro per il worker del claim `tentativo`: chiuso, superato da
  * un claim successivo, o ancora suo.
  */
-export async function statoResoconto(
+export async function statoLavoroEvento(
   jobId: string,
   tentativo: number | undefined
 ): Promise<{ status: string; superseded?: true }> {
@@ -93,11 +137,12 @@ export async function statoResoconto(
 }
 
 /**
- * Un messaggio di avanzamento per un lavoro del resoconto, con la risposta
- * per il worker. Concluso lo dice solo la consegna (app/api/internal/event-report);
- * un messaggio senza il numero del claim non conta.
+ * Un messaggio di avanzamento per un lavoro dell'evento, con la risposta per
+ * il worker. Concluso lo dice solo la consegna (app/api/internal/event-report,
+ * app/api/internal/event-text-translation); un messaggio senza il numero del
+ * claim non conta.
  */
-export async function avanzamentoResoconto(
+export async function avanzamentoLavoroEvento(
   job: { id: string; status: string; attempts: number },
   messaggio: {
     status: 'RUNNING' | 'DONE' | 'FAILED';
@@ -128,7 +173,7 @@ export async function avanzamentoResoconto(
           updated_at = NOW()
       WHERE ${lavoro}
     `;
-    return n > 0 ? { status: 'RUNNING' } : statoResoconto(job.id, tentativo);
+    return n > 0 ? { status: 'RUNNING' } : statoLavoroEvento(job.id, tentativo);
   }
 
   const errore = messaggio.error ?? messaggio.message ?? null;
@@ -149,6 +194,6 @@ export async function avanzamentoResoconto(
             updated_at = NOW()
         WHERE ${lavoro}
       `;
-  if (n === 0) return statoResoconto(job.id, tentativo);
+  if (n === 0) return statoLavoroEvento(job.id, tentativo);
   return definitivo ? { status: 'FAILED', chiusoOra: true } : { status: 'PENDING' };
 }

@@ -142,13 +142,22 @@ export const POST = withErrorHandling(async (request, context) => {
     // Translation needs the source transcript as input.
     const transcript = await tx.postprodArtifact.findFirst({
       where: { recordingId: recording.id, type: 'TRANSCRIPT_JSON' },
-      select: { id: true },
+      select: { id: true, blobKey: true },
     });
     if (!transcript) {
       throw new AppError(
         'Trascrivi prima questa registrazione: manca il transcript sorgente.',
         422,
         'SOURCE_TRANSCRIPT_MISSING',
+      );
+    }
+    // La trascrizione dai sottotitoli live non ha un file nell'archivio e non
+    // va ai worker (lib/ai/transcript-input): il lavoro fallirebbe nel worker.
+    if (!transcript.blobKey) {
+      throw new AppError(
+        'The transcript comes from the live captions and has no stored file: translation needs an AI transcript of the recording.',
+        422,
+        'CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE',
       );
     }
 

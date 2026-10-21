@@ -5,7 +5,7 @@ const m = vi.hoisted(() => ({ registrazione: vi.fn(), trascrizione: vi.fn() }));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({ get: () => undefined })) }));
 vi.mock('@/lib/auth/staff-session', () => ({ requireRecordingManager: vi.fn(async () => ({ role: 'admin' })) }));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: vi.fn() }));
-vi.mock('@/lib/ai/enqueue', () => ({ enqueueTranslateLanguage: vi.fn() }));
+vi.mock('@/lib/ai/enqueue', () => ({ enqueueTranslateLanguage: vi.fn(async () => ({ enqueued: true, dubEnqueued: false })) }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     siteSetting: { findUnique: vi.fn(async () => ({ aiPipelineEnabled: true })) },
@@ -45,5 +45,18 @@ describe('POST translations: i codici delle condizioni che l\'utente puo\' risol
     const res = await traduci('en');
     expect(res.status).toBe(422);
     expect((await res.json()).code).toBe('SOURCE_TRANSCRIPT_MISSING');
+  });
+
+  it('una trascrizione dai sottotitoli live, senza file: 422 CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE', async () => {
+    m.trascrizione.mockResolvedValue({ id: 't', blobKey: '' });
+    const res = await traduci('en');
+    expect(res.status).toBe(422);
+    expect((await res.json()).code).toBe('CAPTIONS_TRANSCRIPT_NOT_TRANSLATABLE');
+  });
+
+  it('una trascrizione AI con il suo file si traduce', async () => {
+    m.trascrizione.mockResolvedValue({ id: 't', blobKey: 'postprod/e/r/001/transcript.raw.json' });
+    const res = await traduci('en');
+    expect(res.status).toBe(200);
   });
 });

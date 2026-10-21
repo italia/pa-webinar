@@ -601,11 +601,11 @@ on a single VM, where Jibri is impractical.
 As shipped, the Compose file does not complete a recording; the missing
 settings are listed in
 [Setting up recording](../operations/recording-setup.md#docker-compose-the-recorder-profile).
-Its `cron` loop calls only `email-outbox`, `reminders` and `cleanup`: without
-`multitrack-purge`, `postprod-retention` and `recordings-reconcile`, nothing
-removes track audio or `tracks.json` files, and without
-`jvb-desired-replicas` the edge trigger never fires (the reconcile tick still
-runs).
+Its `cron` loop calls `multitrack-purge` and `recordings-reconcile` among
+the others, so track audio and `tracks.json` files go as in the chart, except
+for tracks that an event keeps after an AI transcription, which need
+`postprod-retention`. Without `jvb-desired-replicas` the edge trigger never
+fires (the reconcile tick still runs).
 
 ### Images
 
@@ -653,6 +653,8 @@ erDiagram
     string blobKey "mix key or multitrack placeholder"
     RecordingStatus status
     datetime retentionUntil
+    boolean slidesEnabled "synced slides shown"
+    int slidesOffsetSec "slide alignment"
   }
   RECORDING_TRACK {
     uuid id PK
@@ -716,6 +718,25 @@ stateDiagram-v2
   from a fixed list of options. A published video is exempt from the event's
   data retention: it lives until it is deleted by hand or until
   `recordingDeleteAfterDays` have passed since publication.
+- **Audience.** `Event.recordingAudience` says who sees a published recording
+  and what comes from it (the video, the transcript, the summary, the
+  translations, the dubbing, the slides beside the video): `PUBLIC`, anyone
+  who opens the event page, or `REGISTRANTS`, people who registered for the
+  event, including those who never joined the room. One rule decides it,
+  `lib/recording/audience.ts`, and the event page, the player
+  (`/api/events/<slug>/recording`), the slides and the post-production routes
+  all apply it. A registrant proves the registration with the event access
+  cookie, which lasts until a few hours after the event, or with the viewing
+  cookie (`recording_access_<eventId>`): the "recording available" email sends
+  each registrant a personal link, `/api/events/<slug>/recording/access?t=…`,
+  that sets it. The link is signed for viewing only and does not open the
+  room; it stops working when the registration is deleted. The responses that
+  shared caches keep (`/api/events`, `/api/events/<slug>`, the video library)
+  carry a recording only when its audience is `PUBLIC`, and the video library
+  lists only those. The staff who manage the event see the recording before
+  it is published: the recording panel links to the event page with
+  `?anteprima=1`, which shows the page as it will be published, with a notice,
+  and is not indexed.
 - **Deleted.** `DELETE /api/events/<slug>/recording` (moderator link) removes
   the stored objects, clears the event's recording fields and writes a
   `RECORDING_DELETED` entry to the GDPR audit log. The cleanup job deletes the
@@ -743,7 +764,9 @@ never sets, so kept tracks are deleted by `postprod-retention` once the event
 is `ENDED` or `ARCHIVED` and its data retention (`endsAt` +
 `dataRetentionDays`) has passed, whether or not the video is published. That
 job exists in the chart only when `postprod.enabled` and
-`postprod.retention.enabled` are both true. The retention regimes are
+`postprod.retention.enabled` are both true. Without post-production no
+transcription consumes the tracks, kept or not, and `multitrack-purge` deletes
+them at the same point. The retention regimes are
 described in [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md).
 
 ### Background jobs that touch recordings
@@ -751,9 +774,9 @@ described in [Recordings, voice data and AI outputs](../privacy/recordings-and-a
 | Job | What it does to recordings |
 |---|---|
 | `cleanup` | Deletes catch-up URLs past their fixed window (only when `tempRecordingStartedAt` is set) and published videos past `recordingDeleteAfterDays`. When an event's data retention expires, it deletes the objects of the unpublished video and of the catch-up URL, deletes the track rows whose audio was already purged, clears the participant lists of its call sessions, and, unless the video or the transcript is published, deletes the transcript from captions (with the whole recording when it holds nothing else). |
-| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. In the chart it exists only when `postprod.enabled` is true. |
+| `multitrack-purge` | Deletes per-participant track audio once transcription is done, for events that do not keep their tracks, and tracks that no transcription consumed when the event's data retention expires. Its branch for kept tracks applies only when `Recording.retentionUntil` is set, which the platform does not do. With the last track of a recording it deletes the recording's `tracks.json`, as `postprod-retention` does. In the chart it exists when `postprod.enabled` or `recorder.enabled` is true. |
 | `postprod-retention` | Purges post-production artifacts and remaining tracks, including kept tracks, once the event's data retention has passed; for an event whose video is published it purges only the tracks, and for one whose transcript alone is published it keeps only the transcript. See [AI post-production](../POSTPROD.md). |
-| `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
+| `recordings-reconcile` | Lists every object under `recordings/` in the recordings storage domain, by key without the `recordings/` prefix, and compares it with names derived from `Event.recordingUrl` and `CallSession.recordingUrl` (the URL path after its first segment) and with `CallSession.recordingFilename`, and, while the event's data retention lasts (or a later retention date of the recording, or a pipeline task that reads them), with the keys of the per-participant tracks whose audio is still present and the `tracks.json` of their recordings. An object with no match becomes an orphan, shown in the **Orphans** tab of **Video recordings** in the administration area. Orphans are deleted after `SiteSetting.orphanRecordingGraceDays` unless an administrator marks them **Keep**; **Delete now** deletes them at the next run. It never re-links an orphan to an event. See [Known limitations](#known-limitations) for what the match misses. |
 
 Schedules, Helm keys and what breaks when a job does not run are in
 [Scheduled and background jobs](background-jobs.md).
@@ -798,6 +821,87 @@ link or publicly. From here on, the pipeline is described in
 - **Content Security Policy.** The storage host must be allowed in
   `media-src`; see [Content Security Policy](../SECURITY-CSP.md).
 
+### Synced slides
+
+Jibri records the Jitsi page, not the portal, so a PDF presented in the room
+([Presentation](live-interaction.md#presentation)) is not in the video. The
+room's journal has it: `presentation.started`, `presentation.page` and
+`presentation.stopped`, with the server time, the material, the page and the
+title. The event page puts the pages back beside the published video
+(`app/src/lib/presentation/recording-slides.ts`, pure, and
+`recording-slides-data.ts`, which reads the database).
+
+- **Which recording.** The page plays `Event.recordingUrl`. Slides go beside
+  it only when it is the file of a room recording: the `Recording` whose call
+  session has the same `recordingUrl`, as the recording webhook writes both.
+  That recording gives the time base, the duration and the staff's choices. An
+  event recorded in several segments has one `Recording` per segment, and the
+  page shows the slides of the segment it plays; a video uploaded by hand has
+  no `Recording`, no time base and no slides.
+- **Time base.** The file of a room recording is the Jibri composite, which
+  arrives with the webhook at the end of its call session, after the video
+  ended. Zero is the start of the recording reported by the room
+  (`recording.started`, `videoSegmentFromJournal`). With a duration, it is
+  the start of the closed segment (a start and the `recording.stopped` that
+  follows it, before the arrival) whose length best matches the duration,
+  among those starting around the arrival minus the duration; without
+  journaled stops, the start closest to that estimate, preferring those not
+  after it, so that a recording stopped and restarted at once does not take
+  the next start. Without any start, the estimate itself. Without a
+  duration, the last closed segment before the arrival, which also gives
+  the end; with none, the last start up to the arrival. Either way the
+  entries of another segment of the same event never fall into this
+  video. For a multitrack recording this differs from the zero of its
+  transcript, which is the start of the tracks: the recorder begins when the
+  room goes live, the composite video when a moderator presses **Start
+  recording**. A journal entry at server time `at` lands at
+  `(at − zero) + Recording.slidesOffsetSec` seconds in the video.
+- **From entries to cues.** The entries are read in time order as a state
+  machine: a start puts a document on screen from a page, a page change moves
+  it (and also names the document on screen), a stop of the document on screen
+  clears it, and `event.ended` closes the room. What happens before the first
+  frame decides the opening page; what happens after the end of the video is
+  not in it. Consecutive identical states merge, so a handover on the same page
+  opens no new cue. The result is a list of non-overlapping cues
+  `{start, end, materialId, page}` in video seconds.
+- **Which materials.** A cue stays only when its material is still an
+  uploaded PDF of the event (`isPresentableMaterial`) and visible after the
+  event (`ALWAYS` or `AFTER`, `lib/events/material-visibility.ts`). Other
+  cues are dropped and leave a gap. With no cue left, with
+  `Recording.slidesEnabled` off, or with the page's materials switched off
+  (`postEventShowMaterials`), the page gets no slides: it never shows a
+  document it does not already list.
+- **Serving the PDF.** The page receives the cues and, per material, a
+  `fileUrl` on `GET /api/events/<slug>/recording/slides?m=<materialId>`. That
+  route answers only while the concluded page is public
+  (`isEventPageVisible`) and the video published, checks first that the
+  material can be shown and was presented in the room, then recomputes the
+  slides and serves only a material among them, streaming it from files storage through
+  a short-lived signed URL that never leaves the server
+  (`lib/presentation/serve-pdf.ts`, shared with the room's presentation file
+  route), with `Cache-Control: private, no-store`. It never hands out the
+  material's `/api/assets` address. The page and the route keep what they
+  read from the journal and the materials for 30 seconds per recording, in
+  each app process; the staff's switch and correction apply at once.
+- **In the browser.** `app/src/components/presentation/recording-slides.tsx`
+  follows the `<video>` element on `timeupdate`, `seeked` and
+  `loadedmetadata`, and on every animation frame while it plays, and re-renders
+  only when the video crosses a cue boundary. It downloads each PDF once, the
+  one on screen or the next one coming, and renders the page with the same
+  pdf.js as the room, under `worker-src 'self'`.
+- **Staff.** `GET` and `PATCH /api/admin/postprod/recordings/<id>/slides`
+  (managers of the event) read the journal entries on the recording's time
+  base and the presented materials with the reason one is not shown, and
+  change `slidesEnabled` and `slidesOffsetSec` (whole seconds, within ±3600).
+  The preview in the recording's **Slides** tab recomputes the cues in the
+  browser with the same functions at every correction, plays the recording
+  from `/api/admin/postprod/recordings/<id>/media`, and reads the PDFs from
+  `/api/admin/postprod/recordings/<id>/slides/file`.
+- **Limit.** Only a moderator's **End for everyone** writes `event.ended` to
+  the journal. When the platform closes the room on its own (the lifecycle
+  job) and nobody stopped the presentation, the last page stays beside the
+  video until its end.
+
 ## Known limitations
 
 - **Consent text.** The per-participant consent text states that the track is
@@ -814,6 +918,13 @@ link or publicly. From here on, the pipeline is described in
   session.
 - **Recording indicator.** Only Jibri raises the in-room **Recording in
   progress** banner.
+- **A PDF presented in the room is not in the video.** Jibri records the
+  Jitsi page, and the presentation area belongs to the portal around it; the
+  multitrack recorder captures audio only. The pages reach the recording only
+  if the presenter also shares their screen in the call, which the room
+  suggests while a recording runs. The live action journal still records
+  each start, page shown and stop, so the AI timeline and summary know which
+  page was on screen and when ([Presentation](live-interaction.md#presentation)).
 - **One composite recording at a time.** The JVB scaler asks for at most one
   Jibri replica.
 - **A second multitrack recording in one event.** The portal recognizes the
@@ -824,15 +935,35 @@ link or publicly. From here on, the pipeline is described in
   controller starts a second recorder while the first one is still running.
   The event then gets two sets of tracks and two `TRANSCRIBE_MULTITRACK`
   pipelines.
-- **A second recorder run for the same recording.** When a recorder ends while
-  its event is still `LIVE`, a new run starts for the same `Recording`. Its
-  tracks are stored, but the enqueue is idempotent per pipeline run
-  (`Recording.runCount`), so they do not start a new transcription. The ingest
-  still resets the recording's status: if every job of the pipeline already
-  exists, the status stays `POSTPROD_QUEUED` with nothing to move it on, and
-  the public transcript and downloads, which require `POSTPROD_DONE` or
-  `POSTPROD_PARTIAL`, disappear. If the second run's tracks are all silent,
-  the silence guard marks the whole recording `POSTPROD_FAILED` instead.
+- **A second recorder run for the same recording.** The bot pod is never
+  moved by the cluster autoscaler (`safe-to-evict: "false"`), but a node drain
+  or a lost node can still stop it while the event is `LIVE`. On `SIGTERM` the
+  bot closes the capture as it would at the end of the event, uploads the
+  tracks recorded so far, sends the manifest with `interrupted: true` and
+  exits with code 143. A clean exit would mark the Job complete and nothing
+  would record the rest; on a failure the Job starts a new pod, and the
+  chart's `podFailurePolicy` does not count a disruption against
+  `recorder.backoffLimit`. Each run prefixes its
+  track files with its own start time, so the second run never overwrites the
+  first in storage. The portal keeps all tracks on one zero, the earliest
+  first frame (`lib/recorder/track-zero.ts`), and shifts the offsets of the
+  other run onto it; the alignment is as good as the agreement of the node
+  clocks. A manifest marked `interrupted` while the event is still open (not
+  `ENDED` or `ARCHIVED`) stores its tracks but does not enqueue the pipeline:
+  the run that reaches the end enqueues it, with every track. If no later run
+  sends a manifest (it captures nothing, or its pod fails for good), no
+  pipeline starts until an administrator runs it. The silence guard looks at
+  every track of the recording, so a short silent last run does not discard
+  the audio of an earlier one. A run that ends
+  on its own while the event is still `LIVE` (an empty room, then people come
+  back) still enqueues at its end; the next run's tracks are stored, but the
+  enqueue is idempotent per pipeline run (`Recording.runCount`), so they do
+  not start a new transcription. The ingest still resets the recording's
+  status: if every job of the pipeline already exists, the status stays
+  `POSTPROD_QUEUED` with nothing to move it on, and the public transcript and
+  downloads, which require `POSTPROD_DONE` or `POSTPROD_PARTIAL`, disappear.
+  If every track of the recording is silent, the silence guard marks it
+  `POSTPROD_FAILED` instead.
 - **Orphan sweep and event videos.** `recordings-reconcile` derives a name from
   `Event.recordingUrl` by dropping the URL's first path segment, which matches
   the listed object only for virtual-hosted AWS S3 URLs. On Azure Blob, and on
@@ -845,12 +976,6 @@ link or publicly. From here on, the pipeline is described in
   (30 days by default in `schema.prisma`), even when it is published, unless an
   administrator marks it **Keep**. The chart runs the job by default
   (`cronjobs.recordingsReconcile.enabled: true` in `values.yaml`).
-- **Orphan sweep and multitrack objects.** `recordings-reconcile` also lists
-  the objects under `recordings/multitrack/`, which none of the fields it
-  checks reference. Retained tracks and every `tracks.json` therefore appear as
-  orphans and are deleted after the grace period unless marked **Keep**. The
-  purge jobs delete track audio but not `tracks.json`, which holds display
-  names in plain text; in practice the orphan sweep is what removes it.
 - **No automatic transcript when the recorder captures nothing.** On an event
   with per-participant recording, the Jibri webhook does not enqueue
   post-production. If the recorder produced no tracks, no pipeline starts

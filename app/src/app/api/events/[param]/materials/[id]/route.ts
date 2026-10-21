@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { fileDeletionFailed, removeMaterialBlob } from '@/lib/events/material-files';
 import { roomMaterialJson } from '@/lib/events/material-json';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { endPresentationOfMaterial } from '@/lib/presentation/state';
 import { updateMaterialRoomSchema } from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
@@ -84,6 +85,10 @@ export const DELETE = withErrorHandling(async (request, context) => {
     throw new NotFoundError('Material');
   }
 
+  // Se la sala lo sta guardando, la presentazione si chiude per prima: prima
+  // che il file sparisca (chi lo sta scaricando avrebbe un errore invece di
+  // una chiusura) e prima che la riga se ne vada (lib/presentation/state).
+  await endPresentationOfMaterial(event.id, material, 'moderator');
   // Un file caricato se ne va con il suo materiale, e prima della riga: se lo
   // storage non risponde il materiale resta e si riprova, invece di lasciare
   // un file che nessuno elencherebbe né cancellerebbe più

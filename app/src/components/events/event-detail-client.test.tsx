@@ -38,6 +38,11 @@ vi.mock('@/components/events/add-to-calendar', () => ({
 vi.mock('@/components/events/post-event-tabs', () => ({ default: () => null }));
 vi.mock('@/components/events/video-player', () => ({ default: () => null }));
 vi.mock('@/components/events/bookmarks-panel', () => ({ default: () => null }));
+vi.mock('@/components/presentation/recording-slides', () => ({
+  default: ({ cues }: { cues: unknown[] }) => (
+    <div data-testid="slide-sincronizzate" data-cues={cues.length} />
+  ),
+}));
 vi.mock('@/components/ui/markdown', () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <p>{content}</p>,
 }));
@@ -79,6 +84,10 @@ function evento(over: Record<string, unknown> = {}) {
 function disegna(props: {
   event: ReturnType<typeof evento>;
   registrationOpen: boolean;
+  recordingSlides?: {
+    cues: Array<{ start: number; end: number | null; materialId: string; page: number }>;
+    materials: Array<{ id: string; title: string; fileUrl: string; downloadName: string | null }>;
+  } | null;
   hasRoomAccess?: boolean;
   invalidToken?: boolean;
   hasPostEventQuestionnaire?: boolean;
@@ -242,5 +251,82 @@ describe('scheda pubblica — stato e ingresso leggibili', () => {
     expect(container.textContent).toContain(detail.willBeRecorded);
     disegna({ event: evento({ recordingEnabled: false }), registrationOpen: true });
     expect(container.textContent).not.toContain(detail.willBeRecorded);
+  });
+});
+
+describe('scheda pubblica — lingue di titolo e descrizione', () => {
+  function inLingua(locale: string, event: ReturnType<typeof evento>) {
+    act(() => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <EventDetailClient locale={locale} appUrl="https://example.org" event={event} registrationOpen />
+        </NextIntlClientProvider>
+      );
+    });
+  }
+  const titolo = () => container.querySelector('h1')!;
+
+  it('tradotti in automatico e non riletti: lo dice, sotto il titolo', () => {
+    inLingua(
+      'en',
+      evento({
+        title: { it: 'Evento di prova', en: 'Test event' },
+        description: { it: 'Descrizione', en: 'Description' },
+        lingueAutomatiche: ['en'],
+        linguaPrincipale: 'it',
+      })
+    );
+    expect(titolo().textContent).toBe('Test event');
+    expect(titolo().getAttribute('lang')).toBeNull();
+    expect(container.querySelector('.traduzione-automatica')?.textContent).toContain(
+      detail.machineTranslation
+    );
+  });
+
+  it('scritti da una persona: nessun avviso', () => {
+    inLingua(
+      'en',
+      evento({ title: { it: 'Evento di prova', en: 'Test event' }, lingueAutomatiche: [] })
+    );
+    expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+
+  it('senza la lingua della pagina: il testo principale, con la sua lingua', () => {
+    inLingua('de', evento({ lingueAutomatiche: ['en'], linguaPrincipale: 'it' }));
+    expect(titolo().textContent).toBe('Evento di prova');
+    expect(titolo().getAttribute('lang')).toBe('it');
+    expect(container.querySelector('.traduzione-automatica')).toBeNull();
+  });
+});
+
+describe('scheda pubblica — slide accanto alla registrazione', () => {
+  const M = '55555555-5555-4555-8555-555555555555';
+  const slide = {
+    cues: [{ start: 10, end: 70, materialId: M, page: 1 }],
+    materials: [{ id: M, title: 'Slide', fileUrl: '/x', downloadName: null }],
+  };
+  const concluso = () =>
+    evento({
+      status: 'ENDED',
+      recordingUrl: 'https://storage.example.net/recordings/sala.mp4',
+      startsAt: new Date(Date.now() - 4 * HOUR).toISOString(),
+      endsAt: new Date(Date.now() - 2 * HOUR).toISOString(),
+    });
+  const pannello = () => container.querySelector('[data-testid="slide-sincronizzate"]');
+
+  it('con le slide del server: il riquadro accanto al video', () => {
+    disegna({ event: concluso(), registrationOpen: false, recordingSlides: slide });
+    expect(pannello()?.getAttribute('data-cues')).toBe('1');
+  });
+
+  it('senza slide, o senza video pubblicato: nessun riquadro', () => {
+    disegna({ event: concluso(), registrationOpen: false, recordingSlides: null });
+    expect(pannello()).toBeNull();
+    disegna({
+      event: evento({ ...concluso(), recordingUrl: null }),
+      registrationOpen: false,
+      recordingSlides: slide,
+    });
+    expect(pannello()).toBeNull();
   });
 });

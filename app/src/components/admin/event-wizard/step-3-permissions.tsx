@@ -12,9 +12,9 @@
 
 import { useTranslations } from 'next-intl';
 
-import LanguageChecklist, { parseLocaleList } from '@/components/admin/language-checklist';
-import { lingueDiPartenzaTraduzione } from '@/lib/ai/target-locales';
+import { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { Icon } from '@/components/ui/icon';
 import {
   EVENT_ROLES,
   EVENT_FEATURES,
@@ -23,6 +23,8 @@ import {
   type EventFeature,
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
+
+import { nomeLingua } from './text-translation';
 
 export interface StepPermissionsValue {
   permissionMatrix: PermissionMatrix;
@@ -46,8 +48,8 @@ export interface StepPermissionsValue {
   multitrackRecordingEnabled: boolean;
   /** Conserva le tracce per-partecipante (archivio/riascolto). PII. */
   retainParticipantTracks: boolean;
-  /** Comma-separated ISO-639-1 (es. "en,fr"). Null/empty = usa il
-   *  default impostato a livello sito. */
+  /** Le lingue dell'evento, codici separati da virgola (es. "en,fr"): si
+   *  scelgono nel passo «Evento»; qui valgono per sottotitoli e sintesi. */
   aiTargetLocales: string | null;
   /** Numero di parlanti attesi (forza k nella diarization). */
   expectedSpeakers: number | null;
@@ -67,12 +69,8 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione: senza, l'interruttore
    *  non si mostra (non c'e' niente da accendere). */
   liveCaptionsAvailable?: boolean;
-  /** Le lingue di traduzione predefinite dell'istanza (`en,fr,es,de`):
-   *  si spuntano da sole quando si accende la traduzione. */
-  defaultTargetLocales?: string | null;
-  /** La lingua in cui la pipeline trascrive (SOURCE_LANGUAGE_FALLBACK): non
-   *  si offre come lingua di traduzione, la pipeline la toglierebbe. */
-  eventLocale?: string;
+  /** Porta alle lingue dell'evento, nel passo «Evento». */
+  onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
    *  funzioni non si propongono: si mostrano solo se l'evento le ha gia'
    *  (per poterle togliere). */
@@ -88,28 +86,24 @@ interface Props {
   /** Quale parte mostrare, fra le impostazioni avanzate: chi puo' fare cosa e
    *  le funzioni della sala, oppure registrazione e post-produzione AI. */
   parte: 'partecipazione' | 'registrazione';
+  /** Il programma accanto al suo interruttore: quanti argomenti ha e come
+   *  si arriva al passo dove si prepara. Assente per una chiamata
+   *  istantanea, che non ha il passo. */
+  programma?: { argomenti: number; onVai: () => void };
 }
 
 /** Le funzioni AI che si accendono con la registrazione: chi registra ha
- *  trascrizione, sintesi e traduzione (nelle lingue dell'istanza, finche' non
- *  se ne scelgono altre) e le tracce per partecipante, che dicono chi parla. */
-function aiConLaRegistrazione(
-  value: StepPermissionsValue,
-  defaultTargetLocales: string | null,
-  eventLocale: string | undefined,
-): Partial<StepPermissionsValue> {
-  // La traduzione si accende solo se c'e' almeno una lingua in cui tradurre:
-  // senza, il passo chiederebbe una scelta che nessuno ha chiesto di fare.
-  const lingue =
-    parseLocaleList(value.aiTargetLocales).length > 0
-      ? value.aiTargetLocales
-      : lingueDiPartenzaTraduzione(defaultTargetLocales, eventLocale);
+ *  trascrizione, sintesi e traduzione (nelle lingue dell'evento) e le tracce
+ *  per partecipante, che dicono chi parla. */
+function aiConLaRegistrazione(value: StepPermissionsValue): Partial<StepPermissionsValue> {
+  // La traduzione si accende solo se l'evento ha almeno un'altra lingua: le
+  // lingue dell'evento non si aggiungono da qui (sono anche le schede e le
+  // pagine dell'evento).
   return {
     aiTranscriptEnabled: true,
     aiSummaryEnabled: true,
-    aiTranslationEnabled: !!lingue,
+    aiTranslationEnabled: parseLocaleList(value.aiTargetLocales).length > 0,
     multitrackRecordingEnabled: true,
-    aiTargetLocales: lingue ?? null,
   };
 }
 
@@ -133,15 +127,17 @@ export default function StepPermissions({
   fieldErrors = {},
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
-  defaultTargetLocales = null,
-  eventLocale,
+  onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
   showAutoStart = false,
   parte,
+  programma,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
+  const tProgramma = useTranslations('admin.wizard.programme');
+  const tTrad = useTranslations('admin.textTranslation');
 
   const setCell = (feature: EventFeature, role: EventRole, allowed: boolean) => {
     const current = new Set(value.permissionMatrix[feature] ?? []);
@@ -243,6 +239,30 @@ export default function StepPermissions({
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
               {tAdmin('form.agendaEnabledDesc')}
+            </div>
+            {programma && (
+              <button
+                type="button"
+                className="btn btn-link btn-sm p-0 mt-1 text-start"
+                onClick={programma.onVai}
+              >
+                {tProgramma('toggleLink')} <span aria-hidden="true">→</span>
+              </button>
+            )}
+            {/* Spento, il programma preparato non si pubblica e non si salva:
+                in creazione si perde, in modifica resta quello dell'ultimo
+                salvataggio. Lo si dice, perche' sparisce senza che si veda. */}
+            <div role="status">
+              {programma && !value.agendaEnabled && programma.argomenti > 0 && (
+                <p className="wizard-iscrizione__avviso mb-0">
+                  <Icon icon="it-info-circle" size="sm" />
+                  <span>
+                    {editing
+                      ? tProgramma('toggleOffWarning', { count: programma.argomenti })
+                      : tProgramma('toggleOffWarningCreate', { count: programma.argomenti })}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
           <ToggleSwitch
@@ -366,7 +386,7 @@ export default function StepPermissions({
                 // traduzione e tracce per partecipante, se l'elaborazione AI
                 // e' attiva sull'istanza; si spengono qui sotto.
                 ...(!value.recordingEnabled && aiPipelineEnabled && !editing
-                  ? aiConLaRegistrazione(value, defaultTargetLocales, eventLocale)
+                  ? aiConLaRegistrazione(value)
                   : {}),
               })
             }
@@ -434,7 +454,7 @@ export default function StepPermissions({
                 next
                   ? editing
                     ? { aiTranscriptEnabled: true }
-                    : aiConLaRegistrazione(value, defaultTargetLocales, eventLocale)
+                    : aiConLaRegistrazione(value)
                   : {
                       aiTranscriptEnabled: false,
                       aiSummaryEnabled: false,
@@ -493,42 +513,40 @@ export default function StepPermissions({
                 label={tAdmin('form.aiTranslationEnabled')}
                 desc={tAdmin('form.aiTranslationEnabledDesc')}
                 checked={value.aiTranslationEnabled}
-                onToggle={() => {
-                  const next = !value.aiTranslationEnabled;
+                onToggle={() =>
                   onChange(
-                    next
-                      ? {
-                          aiTranslationEnabled: true,
-                          // Le lingue dell'istanza gia' spuntate: si toglie
-                          // quella che non serve invece di scriverle.
-                          ...(parseLocaleList(value.aiTargetLocales).length === 0
-                            ? { aiTargetLocales: lingueDiPartenzaTraduzione(defaultTargetLocales, eventLocale) }
-                            : {}),
-                        }
-                      : {
-                          aiTranslationEnabled: false,
-                          aiDubbingEnabled: false,
-                        },
-                  );
-                }}
+                    value.aiTranslationEnabled
+                      ? { aiTranslationEnabled: false, aiDubbingEnabled: false }
+                      : { aiTranslationEnabled: true },
+                  )
+                }
               />
 
+              {/* Le lingue sono quelle dell'evento: si cambiano nel passo
+                  «Evento», dove fanno anche le schede di titolo e descrizione. */}
               {value.aiTranslationEnabled && (
-                <div
-                  id="aiTargetLocales"
-                  className="py-2"
-                  style={{ borderTop: '1px solid #e8e8e8' }}
-                >
-                  <LanguageChecklist
-                    legend={tAdmin('form.aiTargetLocales')}
-                    description={tAdmin('form.aiTargetLocalesDesc')}
-                    value={value.aiTargetLocales}
-                    onChange={(next) => onChange({ aiTargetLocales: next })}
-                    invalid={!!fieldErrors.aiTargetLocales}
-                    errorText={tAdmin('form.aiTargetLocalesRequired')}
-                    exclude={eventLocale ? [eventLocale] : []}
-                  />
-                </div>
+                <p className="py-2 mb-0 small" style={{ borderTop: '1px solid #e8e8e8' }}>
+                  {tTrad('languagesLine', {
+                    list:
+                      parseLocaleList(value.aiTargetLocales).map(nomeLingua).join(', ') ||
+                      tTrad('noLanguages'),
+                  })}
+                  {onCambiaLingue && (
+                    <>
+                      {' · '}
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 align-baseline"
+                        onClick={onCambiaLingue}
+                      >
+                        {tTrad('changeInEventStep', { step: tAdmin('wizard.flow.steps.base') })}
+                      </button>
+                    </>
+                  )}
+                  {fieldErrors.aiTargetLocales && (
+                    <span className="d-block text-danger">{tTrad('languagesRequired')}</span>
+                  )}
+                </p>
               )}
 
               {value.aiTranslationEnabled && (

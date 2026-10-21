@@ -22,6 +22,11 @@ import { coerceMatrix } from '@/lib/utils/permission-matrix';
 export const DUPLICATED_EVENT_FIELDS = [
   // content & schedule (dates may be overridden by the caller)
   'description',
+  // Chi ha scritto ogni lingua di titolo e descrizione (il motore o una
+  // persona): la copia ha gli stessi testi, quindi lo stesso avviso e la
+  // stessa revisione. Il titolo «(copia)» li rende da aggiornare fino al
+  // prossimo salvataggio.
+  'textLocaleState',
   'timezone',
   'eventType',
 
@@ -61,6 +66,9 @@ export const DUPLICATED_EVENT_FIELDS = [
   'moderatorEmail',
   'moderatorOrganization',
   'moderatorOrganizationLogoUrl',
+  // La foto segue la persona, come il logo: la copia usa la stessa riga, che
+  // si cancella solo quando nessun evento la usa più (person-photo-store).
+  'moderatorPhotoId',
   'organizerName',
   'speakersInfo',
   'imageUrl',
@@ -96,6 +104,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'postEventShowWordCloud',
   'postEventEmailEnabled',
   'recordingNotifyEnabled',
+  'recordingAudience',
   'libraryListed',
 
   // series
@@ -144,6 +153,9 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   postEventReport: 'generated from the occurrence that ran',
   postEventReportAt: 'generated from the occurrence that ran',
   postEventReportPublished: 'a decision about the occurrence that ran',
+  textTranslations:
+    'the last machine translation delivered for the source event\'s texts: what it applied ' +
+    'is already in the title and description the copy inherits',
   postEventEmailSentAt: 'send state of the occurrence that ran',
   moderatorPublicListed:
     'publishing the lead organizer on the public page is a choice made for each event: ' +
@@ -157,7 +169,12 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
  * and every instant call — would make `create` throw. Omitting the key instead
  * lets the column default to NULL, which is the same end state.
  */
-const JSON_FIELDS = new Set<string>(['description', 'speakersInfo', 'permissionMatrix']);
+const JSON_FIELDS = new Set<string>([
+  'description',
+  'speakersInfo',
+  'permissionMatrix',
+  'textLocaleState',
+]);
 
 /** Build the inherited slice of the create payload. */
 export function duplicatedConfig<T extends Record<string, unknown>>(

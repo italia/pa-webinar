@@ -16,7 +16,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import { salvaResoconto } from '@/lib/report/enqueue';
-import { consegnaResoconto, statoResoconto } from '@/lib/report/job';
+import { consegnaResoconto, statoLavoroEvento } from '@/lib/report/job';
 import { postprodJobDurationSeconds, postprodJobsCompletedTotal } from '@/lib/metrics';
 import type { ReportMetrics } from '@/lib/report/types';
 
@@ -79,7 +79,7 @@ export const POST = withErrorHandling(async (request) => {
   if (!resoconto) {
     // Chiuso nel frattempo da un altro tentativo, o superato da un claim
     // successivo: chi consegna lo legge e si ferma.
-    const ora = await statoResoconto(jobId, attempt);
+    const ora = await statoLavoroEvento(jobId, attempt);
     if (ora.status === 'DONE') return Response.json({ ok: true, alreadyDelivered: true });
     if (ora.status === 'FAILED') return Response.json({ ok: false, closed: true, status: 'FAILED' });
     if (ora.superseded) return Response.json({ ok: false, superseded: true });

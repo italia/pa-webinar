@@ -31,13 +31,18 @@ vi.mock('@/lib/utils/slug', () => ({
   generateUniqueSlug: vi.fn(async () => 'copia-evento'),
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
+vi.mock('@/lib/db', () => {
+  const prisma: Record<string, unknown> = {
     event: { findUnique: vi.fn(), create: vi.fn() },
+    eventAgendaItem: { createMany: vi.fn(async () => ({ count: 0 })) },
     eventReminder: { findMany: vi.fn() },
     staffAccount: { findUnique: vi.fn(async () => ({ active: true })) },
-  },
-}));
+  };
+  // La transazione esegue sullo stesso client finto: le chiamate si leggono
+  // da qui, nell'ordine in cui la rotta le fa.
+  prisma.$transaction = vi.fn(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  return { prisma };
+});
 
 import { prisma } from '@/lib/db';
 
@@ -48,6 +53,7 @@ const SOURCE_ID = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
 
 const mocked = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn> };
+  eventAgendaItem: { createMany: ReturnType<typeof vi.fn> };
   eventReminder: { findMany: ReturnType<typeof vi.fn> };
 };
 
@@ -71,7 +77,7 @@ function sourceEvent() {
     // "spoglia" verifica proprio quel caso.
     tagLinks: [{ tagId: 'tag-1' }],
     organizers: [],
-    additionalMods: [{ name: 'cifrato', email: null, role: 'MODERATOR' }],
+    additionalMods: [{ id: 'persona-originale', name: 'cifrato', email: null, role: 'MODERATOR' }],
     agendaItems: [],
     reminders: [],
     questionnaires: [],
@@ -214,6 +220,38 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     expect(mods).toHaveLength(1);
     expect(mods[0]?.token).toBeTruthy();
     expect(mods[0]?.token).not.toBe('token-di-origine');
+  });
+
+  it('il programma si scrive dopo l’evento, con chi interviene sulla copia della persona', async () => {
+    mocked.event.findUnique.mockResolvedValue({
+      ...sourceEvent(),
+      agendaItems: [
+        { label: 'Apertura', sortOrder: 1, plannedMinutes: 10, speakerGrantId: null, speakerPrimary: true },
+        { label: 'Intervento', sortOrder: 2, plannedMinutes: 30, speakerGrantId: 'persona-originale', speakerPrimary: false },
+      ],
+    });
+    await POST(request(), context as never);
+
+    const created = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    // Niente programma annidato nella creazione dell'evento.
+    expect(created.agendaItems).toBeUndefined();
+    const copiaPersona = (created.additionalMods as { create: { id: string }[] }).create[0]!.id;
+    expect(copiaPersona).not.toBe('persona-originale');
+    expect(mocked.eventAgendaItem.createMany).toHaveBeenCalledWith({
+      data: [
+        { label: 'Apertura', sortOrder: 1, plannedMinutes: 10, speakerPrimary: true, eventId: '6f1b2c3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d' },
+        { label: 'Intervento', sortOrder: 2, plannedMinutes: 30, speakerGrantId: copiaPersona, eventId: '6f1b2c3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d' },
+      ],
+    });
+    // Dopo l'evento, nella stessa transazione.
+    expect(mocked.event.create.mock.invocationCallOrder[0]).toBeLessThan(
+      mocked.eventAgendaItem.createMany.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('senza programma non scrive argomenti', async () => {
+    await POST(request(), context as never);
+    expect(mocked.eventAgendaItem.createMany).not.toHaveBeenCalled();
   });
 
   it('la copia nasce in BOZZA: un clone non deve andare pubblico da solo', async () => {

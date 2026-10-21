@@ -32,6 +32,10 @@ import {
   MATERIAL_VISIBILITIES,
   updateMaterialRoomSchema,
 } from '@/lib/validation/materials';
+import {
+  movePresentationSchema,
+  startPresentationSchema,
+} from '@/lib/validation/presentation';
 
 extendZodWithOpenApi(z);
 
@@ -367,7 +371,7 @@ registry.registerPath({
   method: 'post',
   path: '/api/events/{param}/materials/upload',
   tags: ['Materials'],
-  summary: 'Upload a file material (moderator)',
+  summary: 'Upload a file material (moderator, or speaker for a PDF)',
   description:
     'Multipart form with a `file` field and optional `title` (defaults to the file name) and ' +
     '`description`. Same types and size cap as the admin document upload: PDF, DOCX, PPTX, XLSX, TXT ' +
@@ -375,7 +379,8 @@ registry.registerPath({
     'is stored in the files storage and served from /api/assets; the material is created with the ' +
     'optional `visibility` field (ALWAYS when omitted). ' +
     `An event holds at most ${MATERIAL_FILES_PER_EVENT_MAX} uploaded files and ` +
-    `${MATERIAL_FILES_PER_EVENT_MAX_BYTES / 1024 / 1024} MiB in total.`,
+    `${MATERIAL_FILES_PER_EVENT_MAX_BYTES / 1024 / 1024} MiB in total. ` +
+    'A speaker link may upload a PDF only, the document it is going to present (415 otherwise).',
   security: [{ [moderatorToken.name]: [] }],
   request: {
     params: z.object({ param: z.string() }),
@@ -394,7 +399,7 @@ registry.registerPath({
   },
   responses: {
     201: { description: 'Material created' },
-    403: { description: 'Not a moderator token for this event' },
+    403: { description: 'Not a moderator or speaker token for this event' },
     411: { description: 'Content-Length missing' },
     409: { description: 'The event already holds the maximum number or size of uploaded files (MATERIALS_QUOTA_EXCEEDED)' },
     413: { description: 'File too large' },
@@ -438,6 +443,133 @@ registry.registerPath({
     'whether counted or not. The count is returned by GET /materials to moderators only.',
   request: { params: z.object({ param: z.string(), id: z.string().uuid() }) },
   responses: { 204: { description: 'Received' } },
+});
+
+const presentationRead =
+  'Readable by whoever is admitted to the live room, with the same rule as Q&A and polls: a ' +
+  'moderator, speaker or registration token (Bearer), or no token while the room is open to ' +
+  'guests (with the join-password cookie on a password-protected event).';
+const presentationWrite =
+  'Primary moderator link or a non-revoked named grant, moderator or speaker (Bearer). Every ' +
+  'change bumps `version`, is announced on the live stream as a `presentation` snapshot ' +
+  '(material id, page, version and `startedAt`, which changes when the presentation changes hands) ' +
+  'and is written to the live action journal.';
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/presentation',
+  tags: ['Presentation'],
+  summary: 'The PDF presented in the live room',
+  description:
+    `${presentationRead} Returns \`{version, presentation}\`; \`presentation\` is null when nobody ` +
+    'is presenting, otherwise it carries the material id and title, the current page, the page ' +
+    'count once the presenter reported it, who presents, `yours` (the caller is the current ' +
+    'presenter), `startedAt` and `fileUrl`, the route that serves the document.',
+  request: { params: z.object({ param: z.string() }) },
+  responses: {
+    200: { description: 'Presentation state' },
+    401: { description: 'No token and the room is not open to guests, or the join password is missing' },
+    403: { description: 'A token that does not belong to this event' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/presentation',
+  tags: ['Presentation'],
+  summary: 'Present a PDF to the room (moderator or speaker)',
+  description:
+    `${presentationWrite} Replaces any presentation in progress. On the material already being ` +
+    'presented it hands the presentation over to the caller ("Take over"), from the given page, ' +
+    'keeping the known page count. With `expectedVersion` (the version of the state the caller ' +
+    'was looking at) the take-over is conditional: if the presentation is no longer `materialId` at ' +
+    'that version (another material was started, the presentation was stopped, someone else took ' +
+    'over or turned a page) it answers 409 CONFLICT and changes nothing. Only an uploaded PDF among the ' +
+    "event's materials can be presented, by a moderator or a speaker alike. Once the event is ENDED or " +
+    'ARCHIVED the reads show no presentation.',
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: startPresentationSchema } } },
+  },
+  responses: {
+    200: { description: 'Presentation state' },
+    403: { description: 'Not a moderator or speaker token for this event' },
+    404: { description: 'Material not found or not visible to the caller' },
+    409: {
+      description:
+        'The event is closed (EVENT_CLOSED), or a take-over found the presentation changed since `expectedVersion` (CONFLICT)',
+    },
+    422: { description: 'The material is not an uploaded PDF (NOT_PRESENTABLE)' },
+  },
+});
+
+registry.registerPath({
+  method: 'patch',
+  path: '/api/events/{param}/presentation',
+  tags: ['Presentation'],
+  summary: 'Go to a page of the presented PDF (current presenter)',
+  description:
+    `${presentationWrite} Only the current presenter (the same named grant, or the primary link ` +
+    'for a presentation started with it) may change page; anyone else gets 409 NOT_PRESENTER, so ' +
+    'a page change still in flight from the previous presenter never moves the document after a ' +
+    'take-over. `materialId` must be the material being presented, otherwise 409: ' +
+    "a page change never moves a document someone else has just started. `pageCount` is the " +
+    'number of pages counted by the presenter; past the last page the page is the last one.',
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: movePresentationSchema } } },
+  },
+  responses: {
+    200: { description: 'Presentation state' },
+    403: { description: 'Not a moderator or speaker token for this event' },
+    409: {
+      description:
+        'The presentation changed or ended (CONFLICT), the caller is not the current presenter (NOT_PRESENTER), or the event is closed (EVENT_CLOSED)',
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'delete',
+  path: '/api/events/{param}/presentation',
+  tags: ['Presentation'],
+  summary: 'Stop presenting (moderator or speaker)',
+  description:
+    `${presentationWrite} With \`?materialId=\`, only that material is closed (409 if another one ` +
+    'is being presented). Stopping when nothing is presented answers 200 with the current state.',
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ materialId: z.string().uuid().optional() }),
+  },
+  responses: {
+    200: { description: 'Presentation state' },
+    403: { description: 'Not a moderator or speaker token for this event' },
+    409: { description: 'Another material is being presented' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/presentation/file',
+  tags: ['Presentation'],
+  summary: 'The bytes of the presented PDF',
+  description:
+    `${presentationRead} Serves only the material being presented (\`m\`); any other id, or the ` +
+    'same id once the presentation or the event ended, answers 404. The file is streamed from the files ' +
+    'storage with `Cache-Control: private, no-store` and is never given a public address.',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ m: z.string().uuid() }),
+  },
+  responses: {
+    200: { description: 'application/pdf' },
+    401: { description: 'Not admitted to the room' },
+    404: { description: 'Not the material being presented' },
+    503: { description: 'Files storage not configured' },
+  },
 });
 
 registry.registerPath({
@@ -557,8 +689,71 @@ registry.registerPath({
   path: '/api/events/{param}/recording',
   tags: ['Recording'],
   summary: 'Redirect to recording URL',
+  description:
+    'Redirects to a short-lived signed URL of the video for whoever may see the recording ' +
+    '(lib/recording/audience.ts): published inside the post-event window, to anyone or to ' +
+    'registrants only (`recordingAudience`), or the staff who manage the event, also before ' +
+    'publication. A registrant is recognized by the event access cookie or the viewing cookie.',
   request: { params: z.object({ param: z.string() }) },
-  responses: { 302: { description: 'Redirect to recording' } },
+  responses: {
+    302: { description: 'Redirect to recording' },
+    403: { description: 'Not published, or reserved to registrants' },
+    404: { description: 'No recording' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/recording/access',
+  tags: ['Recording'],
+  summary: 'Personal viewing link of a recording reserved to registrants',
+  description:
+    'The link of the "recording available" email. With a valid viewing token of an existing ' +
+    'registration it sets the `recording_access_<eventId>` cookie; it always redirects to the ' +
+    'event page, in the language `lang` or the registration language.',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ t: z.string(), lang: z.string().optional() }),
+  },
+  responses: { 303: { description: 'Redirect to the event page' }, 404: { description: 'Unknown event' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/recording/access',
+  tags: ['Recording'],
+  summary: 'Send the personal viewing link again',
+  description:
+    'For a published recording reserved to registrants, emails the personal viewing link to the ' +
+    'registration with this address. Always answers the same, registered or not; limited per IP.',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ email: z.string() }) } } },
+  },
+  responses: { 200: { description: 'Accepted' }, 429: { description: 'Too many requests' } },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/recording/slides',
+  tags: ['Recording'],
+  summary: 'The PDF of a slide shown beside the published recording',
+  description:
+    'No credential. Answers only while the concluded event page is public, shows the event ' +
+    'materials and has its video published, and only for a material (`m`) whose pages the page ' +
+    'shows beside the video: ' +
+    'presented in the room during the recording, still an uploaded PDF of the event, visible after ' +
+    'the event, with the synced slides switched on for that recording. Any other id answers 404. ' +
+    'The file is streamed from the files storage with `Cache-Control: private, no-store`.',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ m: z.string().uuid() }),
+  },
+  responses: {
+    200: { description: 'application/pdf' },
+    404: { description: 'Not a slide shown beside the published video' },
+    503: { description: 'Files storage not configured' },
+  },
 });
 
 registry.registerPath({

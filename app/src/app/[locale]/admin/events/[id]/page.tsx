@@ -8,8 +8,12 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { capacitaIstanza } from '@/lib/capacity/istanza';
+import { durataInOre } from '@/lib/capacity/model';
+import { traduzioneDisponibile } from '@/lib/text-translation/enqueue';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
+import { recordingOfEventVideo } from '@/lib/presentation/recording-slides-data';
 import EventManagementClient from '@/components/admin/event-management-client';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { eventPageMetadata } from '@/components/admin/admin-page-title';
@@ -121,6 +125,21 @@ export default async function EventManagePage({
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const settings = await getSettings();
 
+  // Le slide sincronizzate si regolano sulla registrazione del video
+  // dell'evento, dalla pagina della post-produzione (solo staff): il link
+  // compare quando quel video e' della sala e in sala si e' presentato un PDF.
+  const [videoDellaSala, presentazione] =
+    staff && event.recordingUrl
+      ? await Promise.all([
+          recordingOfEventVideo(event.id, event.recordingUrl),
+          prisma.liveAction.findFirst({
+            where: { eventId: event.id, kind: 'presentation.started' },
+            select: { id: true },
+          }),
+        ])
+      : [null, null];
+  const slidesRecordingId = videoDellaSala && presentazione ? videoDellaSala.id : null;
+
   const serialized = {
     id: event.id,
     slug: event.slug,
@@ -152,6 +171,7 @@ export default async function EventManagePage({
     tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
     recordingPublished: event.recordingPublished,
     recordingPublishedAt: event.recordingPublishedAt?.toISOString() ?? null,
+    recordingAudience: event.recordingAudience,
     recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
     recordingDuration: event.recordingDuration,
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,
@@ -161,6 +181,7 @@ export default async function EventManagePage({
     // Gated separately from recordingUrl: an externally/manually-set recordingUrl
     // has no Recording row, so "Generate AI" would 404.
     hasRecordingRow: event._count.recordings > 0,
+    slidesRecordingId,
     captionsTranscriptEnabled: event.captionsTranscriptEnabled,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
@@ -182,7 +203,6 @@ export default async function EventManagePage({
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
     privacyPolicyText: event.privacyPolicyText,
-    speakersInfo: event.speakersInfo as Record<string, string> | null,
     createdAt: event.createdAt.toISOString(),
     accessMode: event.accessMode,
     // Chi si iscrive davvero: la scelta dell'evento, o quella del sito.
@@ -241,6 +261,23 @@ export default async function EventManagePage({
       details: l.details,
       createdAt: l.createdAt.toISOString(),
     })),
+    // La stima della capacita' con le scelte salvate e le impostazioni
+    // correnti del sito; chi presenta: il moderatore principale e le persone
+    // con un ruolo nella sala.
+    capacita: {
+      istanza: capacitaIstanza(settings),
+      evento: {
+        maxParticipants: event.maxParticipants,
+        expectedSenderRatioPct: event.expectedSenderRatioPct,
+        participantsCanStartVideo: event.participantsCanStartVideo,
+        participantsCanUnmute: event.participantsCanUnmute,
+        presenters: 1 + event.additionalMods.filter((m) => m.revokedAt === null).length,
+        videoQuality: event.videoQuality,
+        recordingEnabled: event.recordingEnabled,
+        liveCaptionsEnabled: event.liveCaptionsEnabled,
+        durationHours: durataInOre(event.startsAt, event.endsAt),
+      },
+    },
   };
 
   // The effective kicker flag: per-event override if set, otherwise
@@ -263,6 +300,7 @@ export default async function EventManagePage({
         // orologio, cosi' la prima passata del client coincide col server.
         renderedAt={Date.now()}
         viaToken={staff ? null : (token ?? null)}
+        textTranslationAvailable={!!staff && traduzioneDisponibile(settings)}
       />
     </div>
   );

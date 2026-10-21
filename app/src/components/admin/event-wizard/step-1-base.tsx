@@ -9,11 +9,11 @@
  * collects the full form and POSTs on review.
  */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import EventTitle from '@/components/events/event-title';
-import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import LocaleTabBar, { type StatoScheda as AspettoScheda } from '@/components/ui/locale-tab-bar';
 import { MarkdownEditor } from '@/components/ui/markdown';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import RecurrencePicker from '@/components/admin/recurrence-picker';
@@ -27,6 +27,10 @@ import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import { fondoEtichettaPiena } from '@/lib/utils/tag-color';
+
+import NuovaEtichetta, { type EtichettaCreata } from './nuova-etichetta';
+import { nomeLingua } from './text-translation';
+import { useFasciaCopertina } from './use-fascia-copertina';
 
 export interface Step1Value {
   title: Record<string, string>;
@@ -72,12 +76,32 @@ interface Props {
   /** Site-wide default video/audio quality. Shown as the resolved value
    *  when the per-event override is null (inherit). */
   siteDefaultVideoQuality: VideoQualityPreset;
+  /** Sotto la descrizione, dove la pagina pubblica mostra il programma: la
+   *  scheda che porta al passo «Programma» (programme-card.tsx). */
+  dopoDescrizione?: ReactNode;
   /**
    * Quale parte mostrare: «Evento» (titolo, descrizione, copertina,
    * categorie), «Quando» (date, fuso, partecipanti attesi, ricorrenza) o le
    * scelte sulla sala d'attesa e sul video, fra le impostazioni avanzate.
    */
   parte?: 'evento' | 'quando' | 'avanzate';
+  /** L'amministrazione crea una categoria nuova da qui, gia' scelta per
+   *  l'evento: la riceve chi tiene l'elenco delle categorie. */
+  onEtichettaCreata?: (etichetta: EtichettaCreata) => void;
+  /**
+   * Le lingue dell'evento (text-translation.tsx): la riga «Lingue
+   * dell'evento» sopra le schede, le schede con il loro stato scritto e
+   * l'avviso dentro la scheda. Senza, le schede sono le lingue del sito.
+   */
+  lingue?: {
+    riga: ReactNode;
+    schede: string[];
+    aspetto: Record<string, AspettoScheda>;
+    pannello: (lingua: string) => ReactNode;
+  };
+  /** Ogni file che parte per il server (true) e che ha finito (false): il
+   *  wizard non salva e non cambia passo finche' ce n'e' uno in viaggio. */
+  onUploadBusy?: (inCaricamento: boolean) => void;
 }
 
 export default function Step1Base({
@@ -90,16 +114,25 @@ export default function Step1Base({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   parte = 'evento',
+  dopoDescrizione,
+  onEtichettaCreata,
+  lingue,
+  onUploadBusy,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
+  const fasciaCopertina = useFasciaCopertina();
   // La ricorrenza resta aperta se c'era all'apertura: scegliere «nessuna»
   // non la richiude sotto il cursore.
   const [ricorrenzaAperta] = useState(value.recurrencePreset !== 'none');
   // Il testo del campo partecipanti mentre lo si scrive (null fuori dal campo).
   const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
-  const [contentLocale, setContentLocale] = useState(defaultLocale);
+  const tTrad = useTranslations('admin.textTranslation');
+  const schede = lingue?.schede ?? enabledLocales;
+  const [linguaScelta, setContentLocale] = useState(defaultLocale);
+  // Una lingua tolta dalle schede (tolta dall'evento) lascia il posto alla principale.
+  const contentLocale = schede.includes(linguaScelta) ? linguaScelta : defaultLocale;
   // Titolo e descrizione sono obbligatori solo nella lingua predefinita:
   // l'asterisco compare sulla sua scheda, come quello della barra delle lingue.
   const onDefaultTab = contentLocale === defaultLocale;
@@ -304,6 +337,7 @@ export default function Step1Base({
             value={value.waitingRoomAudioUrl}
             onChange={(next) => onChange({ waitingRoomAudioUrl: next })}
             helpText={t('waitingRoomAudioHelp')}
+            onBusy={onUploadBusy}
           />
         </div>
       </div>
@@ -478,13 +512,26 @@ export default function Step1Base({
 
       {/* Title / description */}
       <section className="mb-4">
+        {lingue?.riga}
         <LocaleTabBar
-          enabledLocales={enabledLocales}
+          enabledLocales={schede}
           defaultLocale={defaultLocale}
           activeLocale={contentLocale}
           onSelectLocale={setContentLocale}
-          filledLocales={Object.keys(value.title).filter((l) => value.title[l])}
+          // Compilata se ha il titolo o la descrizione.
+          filledLocales={schede.filter(
+            (l) => !!value.title[l]?.trim() || !!value.description[l]?.trim()
+          )}
+          ariaLabel={tTrad('tabsLabel')}
+          panelId="ev-testi-pannello"
+          idPrefix="ev-scheda"
+          stati={lingue?.aspetto}
         />
+
+        {/* La scheda: titolo e descrizione nella lingua scelta, che i campi
+            dicono (anche alle tecnologie assistive, con `lang`). */}
+        <div role="tabpanel" id="ev-testi-pannello" aria-labelledby={`ev-scheda-${contentLocale}`}>
+        {lingue?.pannello(contentLocale)}
 
         <div
           className={`mb-3 wizard-campo${
@@ -492,11 +539,12 @@ export default function Step1Base({
           }`}
         >
           <label className="form-label fw-semibold" htmlFor="ev-title">
-            {tAdmin('form.titleLabel')}
+            {tTrad('titleLabel', { language: nomeLingua(contentLocale) })}
             {requiredMark}
           </label>
           <input
             id="ev-title"
+            lang={contentLocale}
             type="text"
             className={`form-control ${
               contentLocale === defaultLocale && fieldErrors[`title.${defaultLocale}`]
@@ -595,7 +643,8 @@ export default function Step1Base({
         >
           <MarkdownEditor
             id={`ev-description-${contentLocale}`}
-            label={`${tAdmin('form.descriptionLabel')}${requiredMark}`}
+            label={`${tTrad('descriptionLabel', { language: nomeLingua(contentLocale) })}${requiredMark}`}
+            lang={contentLocale}
             value={value.description[contentLocale] ?? ''}
             onChange={(v) => setLocalized('description', contentLocale, v)}
             rows={6}
@@ -615,7 +664,10 @@ export default function Step1Base({
           )}
           {descrizioneVuota && !descriptionError && promemoria('ev-description-promemoria')}
         </div>
+        </div>
       </section>
+
+      {dopoDescrizione}
 
       {/* Cover image */}
       <section className="mb-4">
@@ -628,12 +680,18 @@ export default function Step1Base({
             onChange({ coverImageUrl: next, imageUrl: next ?? null })
           }
           helpText={`${t('coverImageSize')} ${t('coverImageHelp')}`}
-          ritaglio={{ rapporto: 16 / 9, larghezza: 1600 }}
+          ritaglio={{
+            rapporto: 16 / 9,
+            larghezza: 1600,
+            // La fascia della pagina dell'evento su uno schermo largo.
+            fascia: fasciaCopertina,
+          }}
+          onBusy={onUploadBusy}
         />
       </section>
 
       {/* Tags */}
-      {availableTags.length > 0 && (
+      {(availableTags.length > 0 || onEtichettaCreata) && (
         <section className="mb-4">
           <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             {t('tagsHeading')}
@@ -662,6 +720,23 @@ export default function Step1Base({
               );
             })}
           </div>
+          {onEtichettaCreata && (
+            <NuovaEtichetta
+              defaultLocale={defaultLocale}
+              esistenti={availableTags}
+              onCreata={(nuova) => {
+                onEtichettaCreata(nuova);
+                if (!value.tagSlugs.includes(nuova.slug)) {
+                  onChange({ tagSlugs: [...value.tagSlugs, nuova.slug] });
+                }
+              }}
+              onScegliEsistente={(slug) => {
+                if (!value.tagSlugs.includes(slug)) {
+                  onChange({ tagSlugs: [...value.tagSlugs, slug] });
+                }
+              }}
+            />
+          )}
         </section>
       )}
     </div>

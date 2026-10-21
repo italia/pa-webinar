@@ -9,6 +9,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * promemoria gia' scattati («inizia domani» a 18 minuti dall'inizio).
  * DB ed effetti collaterali sono stub; la scelta (reminder-plan) gira davvero.
  */
+// Il nome dell'organizzatore nel calendario ha la sua prova (lib/ical/organizer).
+vi.mock('@/lib/ical/organizer', () => ({ nomeOrganizzatoreCalendario: vi.fn(async () => 'Ente di prova') }));
 vi.mock('@/lib/captions/transcript', () => ({
   costruisciTrascrizioniMancanti: vi.fn(async () => 0),
 }));
@@ -217,12 +219,29 @@ describe('GET /api/cron/reminders — at most one reminder per registrant and ru
     expect(subjectsTo('dario@example.test')).toHaveLength(0);
     expect(mockedEnqueue).toHaveBeenCalledTimes(2);
 
-    // Il .ics allegato e' una pubblicazione con UID stabile, non un invito.
-    const mail = mockedEnqueue.mock.calls[0]![0] as {
-      attachments: { content: string; contentType: string }[];
-    };
-    expect(mail.attachments[0]!.contentType).toContain('method=PUBLISH');
-    expect(mail.attachments[0]!.content).toMatch(/^UID:evt-1@/m);
+    // L'invito personale: METHOD:REQUEST con chi lo riceve e il link della
+    // sala senza la firma dell'email; lo stesso UID della conferma per
+    // quella persona, diverso da quello di un altro iscritto.
+    const invito = (n: number) =>
+      (
+        mockedEnqueue.mock.calls[n]![0] as {
+          to: string;
+          attachments?: unknown;
+          calendarInvite: { method: string; content: string };
+        }
+      ).calendarInvite;
+    const primo = invito(0);
+    expect(primo.method).toBe('REQUEST');
+    const ics = primo.content.replace(/\r\n /g, '');
+    expect(ics).toContain('METHOD:REQUEST');
+    expect(ics).toMatch(/^ATTENDEE;[^\r\n]*:mailto:bruno@example\.test\r?$/m);
+    expect(ics).toMatch(/^URL:[^\r\n]*\/live\?token=tok-bruno\r?$/m);
+    expect(ics).not.toContain('sig=');
+    expect(ics).not.toContain('proof=');
+    expect(ics).toMatch(/^UID:evt-1\.registration\.[0-9a-f]{32}@/m);
+    const uid = (c: string) => c.match(/^UID:(.*)$/m)?.[1];
+    expect(uid(invito(1).content)).not.toBe(uid(primo.content));
+    expect((mockedEnqueue.mock.calls[0]![0] as { attachments?: unknown }).attachments).toBeUndefined();
   });
 
   it('keeps sending the normal on-time reminder to early registrants', async () => {

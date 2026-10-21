@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db';
 import { verifyRatingToken } from '@/lib/feedback/rating-link';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { orariProgramma, relatoreDelProgramma, type VoceProgramma } from '@/lib/agenda/programme';
 import { vistaResoconto } from '@/lib/report/view';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
@@ -14,9 +15,20 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import type { RecordingSlidesView } from '@/lib/presentation/recording-slides';
+import { publicRecordingSlides } from '@/lib/presentation/recording-slides-data';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
+import { linguaPrincipale, lingueTradotteInAutomatico } from '@/lib/text-translation/stato-lingue';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
+import { isEventManager } from '@/lib/auth/staff-session';
+import { accessoRegistrazione, pubblicazioneAperta } from '@/lib/recording/audience';
+import {
+  programmeVideoTimes,
+  replayMoments,
+  type ProgrammeVideoTime,
+  type ReplayMoment,
+} from '@/lib/replay/moments';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -33,13 +45,16 @@ export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ invalidToken?: string; valuta?: string }>;
+  searchParams?: Promise<{ invalidToken?: string; valuta?: string; anteprima?: string }>;
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  // L'anteprima per lo staff non si indicizza.
+  const inAnteprima = (await searchParams)?.anteprima === '1';
   const locale = await getLocale();
   const settings = await (await import('@/lib/settings')).getSettings();
 
@@ -64,6 +79,7 @@ export async function generateMetadata({
 
   return {
     ...anteprima,
+    ...(inAnteprima && { robots: { index: false, follow: false } }),
     alternates: {
       canonical: pageUrl,
       languages: versioniLinguistiche(`/events/${slug}`, settings.availableLocales),
@@ -92,13 +108,42 @@ export default async function EventDetailPage({
       // Gli enti, e solo chi è stato scelto per la pagina pubblica con un
       // accesso ancora valido.
       ...PERSONE_PUBBLICHE_INCLUDE,
+      // Il programma: tutti gli argomenti in ordine, con chi interviene.
+      // Della persona si legge se è presentata e non revocata: il nome esce
+      // solo allora (relatoreDelProgramma).
+      agendaItems: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: {
+          id: true,
+          label: true,
+          plannedMinutes: true,
+          status: true,
+          speakerGrantId: true,
+          speakerPrimary: true,
+          speaker: {
+            select: {
+              name: true,
+              organization: true,
+              photoId: true,
+              publicListed: true,
+              revokedAt: true,
+            },
+          },
+        },
+      },
     },
   });
 
+  if (!event) notFound();
+  const cookieStore = await cookies();
+
   // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
   // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
-  // deve trovare un 404. Vedi lib/events/visibility.ts.
-  if (!event || !isEventPageVisible(event)) {
+  // deve trovare un 404. Vedi lib/events/visibility.ts. Lo staff che
+  // gestisce l'evento la apre anche nascosta, in anteprima (`?anteprima=1`).
+  const paginaVisibile = isEventPageVisible(event);
+  const chiedeAnteprima = parametri?.anteprima === '1';
+  if (!paginaVisibile && !(chiedeAnteprima && (await isEventManager(cookieStore, event.id)))) {
     notFound();
   }
 
@@ -108,11 +153,23 @@ export default async function EventDetailPage({
   // Firma VERIFICATA (stesso check di /live), non semplice presenza: un cookie
   // manomesso o firmato con un APP_SECRET ruotato non deve far apparire un
   // link che poi rimbalza.
-  const cookieStore = await cookies();
   const hasRoomAccess = !!(await verifyEventAccess(
     event.id,
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
+
+  // Chi vede la registrazione e cio' che ne deriva (lib/recording/audience):
+  // tutti o i soli iscritti, se pubblicata; lo staff che gestisce l'evento
+  // anche prima, ma solo quando chiede l'anteprima (`?anteprima=1`), cosi'
+  // la pagina che guarda di solito e' quella di tutti.
+  const accesso = event.status === 'ENDED' ? await accessoRegistrazione(event, cookieStore) : null;
+  const aperta = pubblicazioneAperta(event);
+  const previewForStaff = accesso === 'staff' && chiedeAnteprima && (!aperta || !paginaVisibile);
+  const vedeRegistrazione =
+    accesso === 'pubblico' || accesso === 'iscritto' || (accesso === 'staff' && (aperta || previewForStaff));
+  const videoVisibile = vedeRegistrazione && (event.recordingPublished || previewForStaff);
+  const recordingForRegistrants =
+    event.status === 'ENDED' && aperta && event.recordingAudience === 'REGISTRANTS' && !vedeRegistrazione;
 
   // Le due scelte che decidono i pulsanti della scheda: chi può iscriversi,
   // e se in diretta si entra anche senza iscrizione (dell'evento, o del sito).
@@ -141,6 +198,23 @@ export default async function EventDetailPage({
   // Chi organizza e chi interviene (lib/events/public-people).
   const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
 
+  // Il programma preparato prima dell'evento, se l'agenda è accesa. Di chi
+  // interviene solo cio' che la pagina mostra gia' (persona presentata).
+  const programma: VoceProgramma[] = event.agendaEnabled
+    ? event.agendaItems.map((a) => ({
+        id: a.id,
+        label: a.label,
+        plannedMinutes: a.plannedMinutes,
+        status: a.status,
+        speaker: relatoreDelProgramma(a, event, tryDecryptPII),
+      }))
+    : [];
+  const orariDelProgramma = orariProgramma(event.startsAt, programma);
+  const luogo = {
+    '@type': 'VirtualLocation',
+    url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -153,10 +227,7 @@ export default async function EventDetailPage({
     // non ha uno stato «annullato», quindi l'evento e' sempre in programma.
     eventStatus: 'https://schema.org/EventScheduled',
     ...(immagine ? { image: [immagine.startsWith('/') ? `${baseUrl}${immagine}` : immagine] } : {}),
-    location: {
-      '@type': 'VirtualLocation',
-      url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
-    },
+    location: luogo,
     organizer:
       enti.length > 0
         ? enti.map((e) => ({ '@type': 'Organization', name: e.name, ...(e.websiteUrl ? { url: e.websiteUrl } : {}) }))
@@ -172,12 +243,41 @@ export default async function EventDetailPage({
             .map((p) => ({
               '@type': 'Person',
               name: p.name,
+              ...(p.photoUrl ? { image: `${baseUrl}${p.photoUrl}` } : {}),
               ...(p.organization ? { affiliation: { '@type': 'Organization', name: p.organization } } : {}),
             })),
         }
       : {}),
     maximumAttendeeCapacity: event.maxParticipants,
     remainingAttendeeCapacity: event.maxParticipants - event._count.registrations,
+    // Gli argomenti del programma, con gli orari solo quando si conoscono e
+    // chi interviene solo se la pagina lo presenta.
+    ...(programma.length > 0
+      ? {
+          subEvent: programma.map((v, i) => {
+            const { start, end } = orariDelProgramma[i]!;
+            return {
+              '@type': 'Event',
+              name: v.label,
+              eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+              location: luogo,
+              ...(start ? { startDate: start.toISOString() } : {}),
+              ...(end ? { endDate: end.toISOString() } : {}),
+              ...(v.speaker
+                ? {
+                    performer: {
+                      '@type': 'Person',
+                      name: v.speaker.name,
+                      ...(v.speaker.organization
+                        ? { affiliation: { '@type': 'Organization', name: v.speaker.organization } }
+                        : {}),
+                    },
+                  }
+                : {}),
+            };
+          }),
+        }
+      : {}),
   };
 
   // Fetch post-event data for ENDED events
@@ -214,6 +314,11 @@ export default async function EventDetailPage({
   // senza, il modulo chiederebbe al server un questionario che non c'è.
   let hasPostEventQuestionnaire = false;
   let feedbackProof: { accessToken?: string; ratingToken?: string } | null = null;
+  // Le slide presentate in sala accanto al video pubblicato
+  // (lib/presentation/recording-slides-data).
+  let recordingSlides: RecordingSlidesView | null = null;
+  let momenti: ReplayMoment[] | null = null;
+  let orariNelVideo: Record<string, ProgrammeVideoTime> | null = null;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -288,6 +393,19 @@ export default async function EventDetailPage({
 
     hasPostEventQuestionnaire = !!postEventQuestionnaire;
 
+    // Un contorno del video: se non si leggono, la pagina resta quella di
+    // sempre, con il video senza slide.
+    if (videoVisibile && event.recordingUrl) {
+      try {
+        recordingSlides = await publicRecordingSlides({ ...event, recordingPublished: true });
+      } catch (err) {
+        console.error(
+          '[events/page] slide della registrazione non lette',
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
+
     // La valutazione dalla pagina pubblica: solo per un iscritto entrato in
     // sala, riconosciuto dal link della valutazione dell'email di
     // ringraziamento (?valuta=, lib/feedback/rating-link) o dal cookie
@@ -349,6 +467,25 @@ export default async function EventDetailPage({
 
     // Una sola media per tutte le pagine (lib/feedback/feedback-summary).
     if (valutazioni && valutazioni.count > 0) feedbackSummary = valutazioni;
+
+    // I momenti della diretta e il programma come indice della registrazione,
+    // sul tempo del video, con il contenuto che la pagina mostra gia'
+    // (lib/replay/moments). Uno che non si legge non toglie l'altro.
+    if (videoVisibile && event.recordingUrl) {
+      const [momentiLetti, orariLetti] = await Promise.allSettled([
+        replayMoments(event, {
+          questions: questionsRaw,
+          polls: pollsData,
+          materials: materialsRaw.map((m) => ({ id: m.id, title: m.title })),
+          showWordCloud: event.postEventShowWordCloud,
+        }),
+        programma.length > 0 ? programmeVideoTimes(event) : Promise.resolve(null),
+      ]);
+      if (momentiLetti.status === 'fulfilled') momenti = momentiLetti.value;
+      else console.error('[events/page] momenti della diretta non letti', String(momentiLetti.reason));
+      if (orariLetti.status === 'fulfilled') orariNelVideo = orariLetti.value;
+      else console.error('[events/page] programma nel video non letto', String(orariLetti.reason));
+    }
   }
 
   // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova
@@ -384,8 +521,10 @@ export default async function EventDetailPage({
     maxParticipants: event.maxParticipants,
     registrationCount: event._count.registrations,
     status: event.status,
-    recordingUrl: event.recordingPublished ? event.recordingUrl : null,
-    transcriptPublished: event.transcriptPublished,
+    recordingUrl: videoVisibile ? event.recordingUrl : null,
+    transcriptPublished: vedeRegistrazione && event.transcriptPublished,
+    // Il video su YouTube e' fuori dalla piattaforma: il pubblico della
+    // registrazione non lo governa.
     youtubeUrl: event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
@@ -398,6 +537,15 @@ export default async function EventDetailPage({
     organizerName: event.organizerName,
     organizers: enti,
     people: persone,
+    programme: programma,
+    // Solo le lingue, mai gli stati e le impronte.
+    lingueAutomatiche: lingueTradotteInAutomatico(
+      event.textLocaleState,
+      event.title as Record<string, string>,
+      event.description as Record<string, string>,
+      linguaPrincipale(settings),
+    ),
+    linguaPrincipale: linguaPrincipale(settings),
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,
     postEventPublic: event.postEventPublic,
@@ -424,6 +572,10 @@ export default async function EventDetailPage({
         locale={locale}
         appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
+        replayMoments={momenti}
+        programmeVideoTimes={orariNelVideo}
+        previewForStaff={previewForStaff}
+        recordingForRegistrants={recordingForRegistrants}
         hasRoomAccess={hasRoomAccess}
         registrationAccess={registrationAccess}
         registrationOpen={registrationOpen}
@@ -437,6 +589,7 @@ export default async function EventDetailPage({
         polls={pollsData}
         feedbackSummary={feedbackSummary}
         recap={recap}
+        recordingSlides={recordingSlides}
         tags={event.tagLinks.map((l) => ({
           slug: l.tag.slug,
           name: (l.tag.name ?? {}) as Record<string, string>,

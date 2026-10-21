@@ -170,7 +170,7 @@ writes to the `SiteSetting` row, while the others manage their own tables (`Gdpr
 | **Footer** tab | Footer links (`footerLinks`) | [Branding](branding.md#header-footer-and-legal-pages) |
 | **Features** tab | Public switches, contact links, Gravatar, live captions, email sender, bridge timing, stress thresholds, waiting-room routing window, reactions mode, status-page polling | This page |
 | **Infra sizing** tab | Bridge sizing, default sender ratio, default grace period, default video quality | This page and [scaling](../architecture/scaling.md) |
-| **Post-event AI pipeline** tab | Kill switch, engines, default translation languages, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
+| **Post-event AI pipeline** tab | Kill switch, engines, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
 | **Languages** page (`/en/admin/settings/languages`) | `defaultLocale`, `availableLocales`, `localeNames`, `translationOverrides` | [Languages and localization](../architecture/i18n.md#runtime-language-settings) |
 | No field in the panel | `orphanRecordingGraceDays` | Set it through `PUT /api/admin/settings` ([writing a field the panel does not show](#writing-a-field-the-panel-does-not-show)), or on a chart installation with `scripts/restore.sh --reset-orphan-grace <days>` ([Restore a backup](../operations/upgrades.md#restore-a-backup)) |
 
@@ -188,8 +188,9 @@ sanitization, so treat it as code and restrict who holds administrator access.
 `defaultTimezone` (**Default timezone**, **Branding** tab, default `Europe/Rome`) is the time zone
 that the app's date formatters use on pages, the one preselected for a new event in the wizard, and
 the one used for the date on link-preview cards. Each event keeps its own `timezone`: emails and the
-waiting-room schedule show times in it. Calendar files carry UTC instants, which each calendar
-application shows in the reader's own time zone (see
+waiting-room schedule show times in it. The calendar invitations in the emails carry the event's
+time zone with its definition, or UTC instants when that is not safe; the public calendar download
+carries UTC instants. Each calendar application shows them in the reader's own time zone (see
 [calendar files](../architecture/email.md#time-zones)).
 
 The language settings decide which of the 24 languages are offered and which is the default. What
@@ -285,7 +286,10 @@ are `NOT NULL`, so these variables have no effect, including the `JVB_PRE_SCALE_
 These settings turn each event's declared audience into a number of Jitsi Videobridge (JVB) replicas.
 Only the JVB scaler acts on the result, so they provision nothing unless the scaler runs
 (`jvbScaler.enabled: true` in the chart's `full` profile, off by default; Docker Compose has no
-scaler). Without it they only feed the capacity estimates in the event wizard and on the status pages.
+scaler). Without it they only feed the estimates on the status pages. The capacity estimate in the
+event wizard and on the event page uses only **vCPU per JVB pod**, the two stress thresholds, the
+default sender ratio and, when the bridges are linked, **Max JVB replicas**
+([how](../architecture/scaling.md#the-capacity-estimate-in-the-wizard-and-on-the-event-page)).
 The formula, a worked example and how the result becomes nodes are in
 [scaling the media plane](../architecture/scaling.md#sizing-from-an-event-to-a-number-of-bridges).
 Defaults are those of `app/prisma/schema.prisma`.
@@ -295,7 +299,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | `jvbCpuCoresPerPod` | **vCPU per JVB pod**, **Infra sizing** | `16` | 1 to 128 | The CPU cores one bridge has. The estimated cores of an event are divided by it |
 | `jvbReceiversPerCore` | **Passive viewers per core**, **Infra sizing** | `18.75` | 0.1 to 100 | How many receive-only participants one core serves |
 | `jvbSendersPerCore` | **Active senders per core**, **Infra sizing** | `3.125` | 0.1 to 100 | How many participants sending audio or video one core serves |
-| `defaultSenderRatioPct` | **Default sender ratio**, **Infra sizing** | `30` | 0 to 100 | The share of participants expected to send, when the event does not say. It counts only when participants can start their camera; otherwise every participant is a receiver |
+| `defaultSenderRatioPct` | **Default sender ratio**, **Infra sizing** | `30` | 0 to 100 | The share of participants expected to send, when the event does not say; the capacity estimate in the wizard reads it as the share of webcams on. It counts only when participants can start their camera; otherwise every participant is a receiver |
 | `jvbMaxReplicas` | **Max JVB replicas**, **Infra sizing** | `6` | 1 to 50 | The **per-event** cap: it limits each event's result before the sum. It does not limit the total |
 | `jvbStressWarnPercent` | **Stress warning threshold (%)**, **Features** | `50` | 0 to 100 | Above this measured bridge stress, the scaler adds one replica |
 | `jvbStressCriticalPercent` | **Stress critical threshold (%)**, **Features** | `70` | 0 to 100 | Above this, the scaler adds two replicas instead. Keep it above the warning threshold; the form does not check this |
@@ -321,7 +325,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | Setting | Label | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `aiPipelineEnabled` | **Post-event pipeline active** | `false` | on or off | The kill switch for the whole pipeline (see below) |
-| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | Ticked in the event wizard when translation is turned on, and the translation targets of an event that sets none. The recording's source language is always dropped from the list |
+| `aiDefaultTargetLocales` | **Default event languages** (**Settings › Languages**) | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | The languages every new event starts with, and those of an event that sets none: its tabs, the automatic translation of its title and description (the active site languages) and, with translation on, its subtitles and summary. The recording's source language is always dropped from the list |
 | `aiAsrProvider` | **Transcription engine** | `whisperx` | `whisperx` only | The transcription engine the worker is told to use |
 | `aiLlmProvider` | **Summary and translation engine** | `vllm` | `vllm` only | The language-model engine, served in the cluster |
 | `aiTtsEngine` | **Dubbing engine** | `piper` | `piper` only | The engine for synthetic dubbing voices |
@@ -355,13 +359,13 @@ included, so a copy keeps inheriting.
 
 | Event column | Falls back to | Values | Where it is set | Pre-filled by a template |
 |---|---|---|---|---|
-| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **Estimated active share** | No |
+| `expectedSenderRatioPct` | `defaultSenderRatioPct` | `null` or 0 to 100 | Wizard, advanced settings, **Technical details**: **How many webcams will be on?** | No |
 | `accessMode` | `publicRegistrationEnabled`. Guest entry follows `guestAccessEnabled` either way, except that `INVITATION` admits no guests | `null`, `OPEN` or `INVITATION` | New-event question **Who can take part?**; wizard, **People**: **Who registers**, where an event left on `null` keeps following the site until a choice is made | No; the new-event questions set it |
 | `gracePeriodMinutes` | `eventGracePeriodMinutes` | `null` or -1 to 240 | Events API only; the wizard has no field. Instant calls are created with `-1` | No |
 | `parseTitleKicker` | `parseTitleKicker` | `null`, `true` or `false` | Wizard, **Event**, under the title: **Show “…” as a kicker above the title**, offered when the title contains `\|` | No |
 | `waitingRoomEngine` | `waitingRoomEngine` | `null`, `GAME` or `CLASSIC` (legacy `GARDEN` behaves as `GAME`) | Wizard, advanced settings, **Waiting room and video**: **Waiting room (this event)**, where **Site default** means `null` | Yes |
 | `videoQuality` | `videoQuality` | `null` or a preset | Wizard, advanced settings, **Waiting room and video**: **Video/audio quality (this event)** | No |
-| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Summary** (**Change languages**) or advanced settings, **Recording and AI** | Yes |
+| `aiTargetLocales` | `aiDefaultTargetLocales` | `null` or comma-separated codes | Wizard, **Event** step (**Change languages**); the wizard always writes it | Yes |
 
 Some event settings have no site-wide counterpart and exist only on the event. They default to off or
 empty in `app/prisma/schema.prisma`:
@@ -447,7 +451,7 @@ How each value resolves:
 | Grace after `endsAt` | `Event.gracePeriodMinutes` → `SiteSetting.eventGracePeriodMinutes` |
 | Sender ratio for sizing | `Event.expectedSenderRatioPct` → `SiteSetting.defaultSenderRatioPct`, forced to 0 when participants cannot start video |
 | Title kicker | `Event.parseTitleKicker` → `SiteSetting.parseTitleKicker` |
-| Translation targets | `Event.aiTargetLocales` → `SiteSetting.aiDefaultTargetLocales`, minus the source language |
+| Event languages | `Event.aiTargetLocales` → `SiteSetting.aiDefaultTargetLocales`. The title and description are translated into those active on the site; subtitles and summary, with translation on, into all of them minus the source language |
 | Email sender name | `SiteSetting.emailFromName` → `SMTP_FROM_NAME` → `SiteSetting.siteName` → `PA Webinar` |
 | Number of bridges | Not a chain but two caps: `SiteSetting.jvbMaxReplicas` limits each event, then `JVB_MAX_REPLICAS` limits the total |
 

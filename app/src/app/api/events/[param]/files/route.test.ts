@@ -21,6 +21,8 @@ vi.mock('@/lib/db', () => ({
     event: { findFirst: vi.fn(), findUnique: vi.fn() },
     eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), delete: vi.fn(), create: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
+    // Nessuna presentazione in corso: togliere un file non annuncia nulla.
+    eventPresentation: { updateMany: vi.fn(async () => ({ count: 0 })) },
   },
 }));
 vi.mock('@/lib/storage', () => ({

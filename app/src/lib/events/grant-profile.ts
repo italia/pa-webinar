@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 /**
  * Il profilo pubblico di una persona dell'evento (concessione di moderatore o
- * relatore): l'ente a cui appartiene, con il logo, se organizza l'evento e se
- * la pagina pubblica la presenta. L'ente della persona è distinto dall'ente
- * che organizza l'evento (EventOrganizer).
+ * relatore): l'ente a cui appartiene, con il logo, la sua foto, se organizza
+ * l'evento e se la pagina pubblica la presenta. L'ente della persona è
+ * distinto dall'ente che organizza l'evento (EventOrganizer).
  */
 export const grantProfileSchema = z.object({
   /** Organizzatore: solo per un moderatore. */
@@ -12,6 +12,10 @@ export const grantProfileSchema = z.object({
   organization: z.string().trim().max(200).optional().nullable(),
   organizationLogoUrl: z.string().url().max(2048).optional().nullable(),
   publicListed: z.boolean().optional(),
+  /** La foto caricata dallo staff (EventPersonPhoto). Chi scrive la riga
+   *  controlla che esista e la lascia cadere se non c'è più
+   *  (lib/events/person-photo-store, usablePersonPhotoId). */
+  photoId: z.string().uuid().optional().nullable(),
 });
 
 export type GrantProfile = z.infer<typeof grantProfileSchema>;
@@ -25,6 +29,7 @@ export function grantProfileData(p: GrantProfile) {
       ? { organizationLogoUrl: p.organizationLogoUrl || null }
       : {}),
     ...(p.publicListed !== undefined ? { publicListed: p.publicListed } : {}),
+    ...(p.photoId !== undefined ? { photoId: p.photoId || null } : {}),
   };
 }
 
@@ -37,6 +42,7 @@ export interface SavedGrantProfile {
   organization: string | null;
   organizationLogoUrl: string | null;
   publicListed: boolean;
+  photoId: string | null;
 }
 
 /**
@@ -48,12 +54,14 @@ export function profiloSalvato(p: {
   organization?: string | null;
   organizationLogoUrl?: string | null;
   publicListed?: boolean;
+  photoId?: string | null;
 }): SavedGrantProfile {
   return {
     organizer: !!p.organizer,
     organization: p.organization?.trim() || null,
     organizationLogoUrl: p.organizationLogoUrl?.trim() || null,
     publicListed: !!p.publicListed,
+    photoId: p.photoId || null,
   };
 }
 
@@ -80,6 +88,10 @@ export function differenzaProfilo(
   }
   if (dopo.publicListed !== undefined && prima.publicListed !== !!dopo.publicListed) {
     diff.publicListed = !!dopo.publicListed;
+  }
+  if (dopo.photoId !== undefined) {
+    const v = dopo.photoId || null;
+    if ((prima.photoId || null) !== v) diff.photoId = v;
   }
   return Object.keys(diff).length > 0 ? diff : null;
 }

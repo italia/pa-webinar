@@ -17,7 +17,13 @@ vi.mock('@/lib/crypto/pii', () => ({
 
 import { prisma } from '@/lib/db';
 
-import { buildLiveTimeline, chaptersFromActions, describeAction, recordingTimeZero } from './live-timeline';
+import {
+  buildLiveTimeline,
+  chaptersFromActions,
+  describeAction,
+  recordingTimeZero,
+  withoutFleetingPages,
+} from './live-timeline';
 
 const T0 = new Date('2026-10-08T10:00:00Z');
 const at = (min: number, sec = 0) => new Date(T0.getTime() + min * 60_000 + sec * 1000);
@@ -90,6 +96,32 @@ describe('describeAction', () => {
     expect(
       describeAction('question.status', { questionId: 'q1', status: 'ANSWERED', answered: true }, q),
     ).toBe('Risposta scritta alla domanda «Quando?»: «Domani»');
+  });
+
+  it('presentazione: avvio, pagina mostrata, chiusura', () => {
+    expect(describeAction('presentation.started', { title: 'Slide della sessione', page: 1 }, nessuna)).toBe(
+      'Presentazione avviata: «Slide della sessione»',
+    );
+    expect(
+      describeAction('presentation.page', { title: 'Slide della sessione', page: 4, pageCount: 12 }, nessuna),
+    ).toBe('Pagina 4 di 12 della presentazione «Slide della sessione»');
+    // Senza il numero di pagine, senza «di».
+    expect(describeAction('presentation.page', { title: 'Slide', page: 2, pageCount: null }, nessuna)).toBe(
+      'Pagina 2 della presentazione «Slide»',
+    );
+    expect(describeAction('presentation.page', { title: 'Slide', page: 0 }, nessuna)).toBeNull();
+    expect(describeAction('presentation.stopped', { title: 'Slide' }, nessuna)).toBe(
+      'Presentazione conclusa: «Slide»',
+    );
+  });
+
+  it('presentazione: passaggio di mano sullo stesso documento', () => {
+    expect(
+      describeAction('presentation.started', { title: 'Slide', page: 7, handover: true }, nessuna),
+    ).toBe('La presentazione «Slide» passa a un altro presentatore dalla pagina 7');
+    expect(describeAction('presentation.started', { title: 'Slide', page: 1, handover: true }, nessuna)).toBe(
+      'La presentazione «Slide» passa a un altro presentatore',
+    );
   });
 
   it('i testi lunghi si accorciano', () => {
@@ -212,6 +244,44 @@ describe('buildLiveTimeline', () => {
     const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
     expect(tl.entries).toHaveLength(250);
     expect(tl.entries.some((e) => e.kind === 'agenda.topic')).toBe(true);
+  });
+});
+
+describe('withoutFleetingPages', () => {
+  it('una pagina lasciata entro pochi secondi da un’altra azione della presentazione non conta', () => {
+    const azioni = [
+      { at: at(1), kind: 'presentation.started' },
+      { at: at(1, 1), kind: 'presentation.page' },
+      { at: at(1, 2), kind: 'presentation.page' },
+      { at: at(1, 3), kind: 'poll.opened' },
+      { at: at(1, 4), kind: 'presentation.page' },
+      { at: at(3), kind: 'presentation.page' },
+      { at: at(3, 2), kind: 'presentation.stopped' },
+    ];
+    expect(withoutFleetingPages(azioni).map((a) => `${a.kind}@${(a.at.getTime() - T0.getTime()) / 1000}`)).toEqual([
+      'presentation.started@60',
+      // Un'azione di un'altra funzione in mezzo non accorcia la pagina.
+      'poll.opened@63',
+      'presentation.page@64',
+      'presentation.stopped@182',
+    ]);
+  });
+});
+
+describe('buildLiveTimeline — presentazione', () => {
+  it('le pagine mostrate entrano in cronologia come voci minori, quelle attraversate no', async () => {
+    m('liveAction').mockResolvedValue([
+      { at: at(2), kind: 'presentation.started', data: { title: 'Slide', page: 1 } },
+      { at: at(2, 30), kind: 'presentation.page', data: { title: 'Slide', page: 2, pageCount: 3 } },
+      { at: at(2, 31), kind: 'presentation.page', data: { title: 'Slide', page: 3, pageCount: 3 } },
+      { at: at(4), kind: 'presentation.stopped', data: { title: 'Slide' } },
+    ]);
+    const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
+    expect(tl.entries).toEqual([
+      { offsetSec: 120, kind: 'presentation.started', text: 'Presentazione avviata: «Slide»' },
+      { offsetSec: 151, kind: 'presentation.page', text: 'Pagina 3 di 3 della presentazione «Slide»' },
+      { offsetSec: 240, kind: 'presentation.stopped', text: 'Presentazione conclusa: «Slide»' },
+    ]);
   });
 });
 
