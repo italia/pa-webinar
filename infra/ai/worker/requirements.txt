@@ -29,7 +29,7 @@ httpx==0.28.1
 # Pydantic valida la forma della risposta del claim, cosi' un payload
 # malformato non porta a dereferenziare `None`. Corrisponde a quello che
 # impone `lib/ai/schemas.ts` lato server.
-pydantic==2.9.2
+pydantic==2.14.1
 
 # ASR e diarization. WhisperX (requirements-whisperx.txt) si installa SENZA
 # le sue dipendenze: ogni release 3.8.x fissa torch alla 2.8, che non ha le

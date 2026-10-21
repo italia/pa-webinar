@@ -13,5 +13,5 @@ numpy>=2.1,<3
 # prova deve girare con la versione che genera i file nell'immagine.
 nltk==3.10.3
 httpx==0.28.1
-pydantic==2.9.2
+pydantic==2.14.1
 pytest
