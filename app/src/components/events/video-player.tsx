@@ -89,6 +89,12 @@ export interface VideoPlayerHandle {
   pause: () => void;
   /** Play the playback (returns a Promise like HTMLMediaElement.play). */
   play: () => Promise<void> | void;
+  /** La lingua dei sottotitoli mostrati (null: spenti), scelta da fuori
+   *  (la barra delle lingue della pagina). Non richiama `onSubtitleChange`. */
+  setSubtitle: (lang: string | null) => void;
+  /** La traccia audio: 'original' o la lingua di un doppiaggio. Non
+   *  richiama `onAudioChange`. */
+  setAudio: (lang: string) => void;
   /** Raw video element — escape hatch for advanced cases (timeupdate
    *  listener registration), used by TranscriptPanel. */
   videoEl: () => HTMLVideoElement | null;
@@ -133,8 +139,11 @@ function VideoPlayerImpl(
     },
     pause: () => videoRef.current?.pause(),
     play: () => videoRef.current?.play() ?? Promise.resolve(),
+    setSubtitle: (lang) => setActiveSubtitle(lang),
+    setAudio: (lang) => setActiveAudio(lang),
     videoEl: () => videoRef.current,
   }), []);
+
 
   // Sincronizza l'audio dubbed con il video. Quando l'utente cambia
   // traccia audio:

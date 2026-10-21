@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "seiceáil",
     "lowConfidenceTitle": "Tá muinín íseal ag baint leis an gcuid seo den tras-scríbhinn: d'fhéadfadh focail eile a bheith sa taifeadadh. Téigh i muinín an fhíseáin bhunaidh i gcónaí.",
     "miniTranscriptLabel": "Tras-scríbhinn bheo",
-    "dubAvailableHint": "Tá fuaim dhubáilte ar fáil i {langs}. Úsáid roghnóir na fuaime i rialtáin an tseinnteora chun éisteacht leis an leagan aistrithe.",
     "provenance": {
       "triggerLabel": "Trédhearcacht na próiseála AI",
       "closeLabel": "Folaigh sonraí na próiseála",
@@ -5461,6 +5460,25 @@
       "improvements": "Le feabhsú",
       "quotes": "Ó na tráchtanna",
       "aiNotice": "Is samhail intleachta saorga a scríobh an téacs ón tras-scríbhinn, ón gcomhrá, ó na ceisteanna, ó na pobalbhreitheanna agus ó na measúnuithe, agus rinne an fhoireann athbhreithniú air sular foilsíodh é. Is é an t-ardán a ríomhann na figiúirí agus na graif. D'fhéadfadh míchruinneas a bheith ann."
+    },
+    "languages": {
+      "title": "Féach i",
+      "original": "bunleagan",
+      "subtitles": "fotheidil",
+      "dubbedAudio": "fuaim dhubáilte",
+      "summary": "achoimre",
+      "showSubtitles": "Fotheidil: {language}",
+      "audioLabel": "Fuaim",
+      "audioOriginal": "Bunleagan ({language})",
+      "audioDubbed": "Dubáilte: {language} (guth IS)",
+      "summaryNotAvailable": "Níl achoimre ar fáil: {language}"
+    },
+    "downloads": {
+      "title": "Íoslódáil",
+      "video": "Físeán",
+      "transcript": "Tras-scríbhinn (.txt)",
+      "subtitles": "Fotheidil (.srt)",
+      "summary": "Achoimre (.md)"
     }
   },
   "provisioning": {

@@ -127,6 +127,8 @@ beforeEach(() => {
       seekTo,
       pause: vi.fn(),
       play: vi.fn(),
+      setSubtitle: vi.fn(),
+      setAudio: vi.fn(),
       videoEl: () => video,
     },
   };

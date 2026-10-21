@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "ellenőrizendő",
     "lowConfidenceTitle": "Az átirat ezen része alacsony megbízhatóságú: a felvételen más szavak is elhangozhattak. Mindig az eredeti videót vegye alapul.",
     "miniTranscriptLabel": "Élő átirat",
-    "dubAvailableHint": "A szinkronizált hang ezeken a nyelveken érhető el: {langs}. A lefordított változat meghallgatásához használja a lejátszó vezérlőiben a hangválasztót.",
     "provenance": {
       "triggerLabel": "Az AI-feldolgozás átláthatósága",
       "closeLabel": "A feldolgozás részleteinek elrejtése",
@@ -5461,6 +5460,25 @@
       "improvements": "Fejlesztendő",
       "quotes": "A hozzászólásokból",
       "aiNotice": "A szöveget mesterségesintelligencia-modell írta az átirat, a csevegés, a kérdések, a szavazások és az értékelések alapján, és a csapat közzététel előtt átnézte. A számokat és a grafikonokat a platform számítja ki. Pontatlanságokat tartalmazhat."
+    },
+    "languages": {
+      "title": "Megtekintés nyelve",
+      "original": "eredeti",
+      "subtitles": "felirat",
+      "dubbedAudio": "szinkron",
+      "summary": "összefoglaló",
+      "showSubtitles": "Felirat: {language}",
+      "audioLabel": "Hang",
+      "audioOriginal": "Eredeti ({language})",
+      "audioDubbed": "Szinkron: {language} (MI-hang)",
+      "summaryNotAvailable": "Az összefoglaló nem érhető el: {language}"
+    },
+    "downloads": {
+      "title": "Letöltés",
+      "video": "Videó",
+      "transcript": "Átirat (.txt)",
+      "subtitles": "Felirat (.srt)",
+      "summary": "Összefoglaló (.md)"
     }
   },
   "provisioning": {

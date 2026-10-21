@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "à vérifier",
     "lowConfidenceTitle": "Cette portion de la transcription a une faible confiance : l'enregistrement peut contenir des mots différents. Référez-vous toujours à la vidéo d'origine.",
     "miniTranscriptLabel": "Transcription en direct",
-    "dubAvailableHint": "Audio doublé disponible en {langs}. Utilisez le sélecteur audio dans les commandes du lecteur pour écouter la version traduite.",
     "provenance": {
       "triggerLabel": "Transparence du traitement IA",
       "closeLabel": "Masquer les détails du traitement",
@@ -5461,6 +5460,25 @@
       "improvements": "À améliorer",
       "quotes": "Extraits des commentaires",
       "aiNotice": "Le texte est rédigé par un modèle d'intelligence artificielle à partir de la transcription, du chat, des questions, des sondages et des évaluations, et l'équipe l'a relu avant de le publier. Les chiffres et les graphiques sont calculés par la plateforme. Il peut contenir des imprécisions."
+    },
+    "languages": {
+      "title": "Regarder en",
+      "original": "original",
+      "subtitles": "sous-titres",
+      "dubbedAudio": "audio doublé",
+      "summary": "synthèse",
+      "showSubtitles": "Sous-titres en {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Doublé en {language} (voix IA)",
+      "summaryNotAvailable": "Synthèse non disponible en {language}"
+    },
+    "downloads": {
+      "title": "Télécharger",
+      "video": "Vidéo",
+      "transcript": "Transcription (.txt)",
+      "subtitles": "Sous-titres (.srt)",
+      "summary": "Synthèse (.md)"
     }
   },
   "provisioning": {

@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "tarkista",
     "lowConfidenceTitle": "Tämän litterointiosuuden luottamus on matala: tallenteessa voi olla eri sanoja. Tarkista asia aina alkuperäisestä videosta.",
     "miniTranscriptLabel": "Live-litterointi",
-    "dubAvailableHint": "Dubattu ääni on saatavilla kielillä {langs}. Käytä soittimen säätimissä olevaa äänivalitsinta kuunnellaksesi käännettyä versiota.",
     "provenance": {
       "triggerLabel": "Tekoälykäsittelyn läpinäkyvyys",
       "closeLabel": "Piilota käsittelyn tiedot",
@@ -5461,6 +5460,25 @@
       "improvements": "Parannettavaa",
       "quotes": "Kommenteista",
       "aiNotice": "Tekstin on kirjoittanut tekoälymalli litteroinnin, chatin, kysymysten, kyselyjen ja arvioiden pohjalta, ja tiimi on tarkistanut sen ennen julkaisua. Luvut ja kaaviot laskee alusta. Se voi sisältää epätarkkuuksia."
+    },
+    "languages": {
+      "title": "Katso kielellä",
+      "original": "alkuperäinen",
+      "subtitles": "tekstitys",
+      "dubbedAudio": "dubattu ääni",
+      "summary": "tiivistelmä",
+      "showSubtitles": "Tekstitys: {language}",
+      "audioLabel": "Ääni",
+      "audioOriginal": "Alkuperäinen ({language})",
+      "audioDubbed": "Dubattu: {language} (tekoälyääni)",
+      "summaryNotAvailable": "Tiivistelmä ei saatavilla: {language}"
+    },
+    "downloads": {
+      "title": "Lataa",
+      "video": "Video",
+      "transcript": "Litterointi (.txt)",
+      "subtitles": "Tekstitys (.srt)",
+      "summary": "Tiivistelmä (.md)"
     }
   },
   "provisioning": {

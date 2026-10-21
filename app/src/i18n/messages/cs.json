@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "ověřit",
     "lowConfidenceTitle": "Tato část přepisu má nízkou míru jistoty: v záznamu mohou zaznít jiná slova. Vždy se řiďte původním videem.",
     "miniTranscriptLabel": "Živý přepis",
-    "dubAvailableHint": "Nadabovaný zvuk je k dispozici v jazycích: {langs}. Pro poslech přeložené verze použijte volič zvuku v ovládacích prvcích přehrávače.",
     "provenance": {
       "triggerLabel": "Transparentnost zpracování AI",
       "closeLabel": "Skrýt podrobnosti zpracování",
@@ -5461,6 +5460,25 @@
       "improvements": "Ke zlepšení",
       "quotes": "Z komentářů",
       "aiNotice": "Text napsal model umělé inteligence z přepisu, chatu, otázek, anket a hodnocení a tým jej před zveřejněním zkontroloval. Čísla a grafy počítá platforma. Může obsahovat nepřesnosti."
+    },
+    "languages": {
+      "title": "Sledovat v jazyce",
+      "original": "originál",
+      "subtitles": "titulky",
+      "dubbedAudio": "dabing",
+      "summary": "shrnutí",
+      "showSubtitles": "Titulky: {language}",
+      "audioLabel": "Zvuk",
+      "audioOriginal": "Originál ({language})",
+      "audioDubbed": "Dabing: {language} (hlas AI)",
+      "summaryNotAvailable": "Shrnutí není k dispozici: {language}"
+    },
+    "downloads": {
+      "title": "Stáhnout",
+      "video": "Video",
+      "transcript": "Přepis (.txt)",
+      "subtitles": "Titulky (.srt)",
+      "summary": "Shrnutí (.md)"
     }
   },
   "provisioning": {

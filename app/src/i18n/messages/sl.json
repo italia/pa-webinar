@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "preverite",
     "lowConfidenceTitle": "Ta del prepisa ima nizko stopnjo zaupanja: posnetek lahko vsebuje drugačne besede. Vedno se opirajte na izvirni videoposnetek.",
     "miniTranscriptLabel": "Prepis v živo",
-    "dubAvailableHint": "Sinhroniziran zvok je na voljo v: {langs}. Za poslušanje prevedene različice uporabite izbirnik zvoka v kontrolnikih predvajalnika.",
     "provenance": {
       "triggerLabel": "Preglednost obdelave z AI",
       "closeLabel": "Skrij podrobnosti obdelave",
@@ -5461,6 +5460,25 @@
       "improvements": "Za izboljšanje",
       "quotes": "Iz komentarjev",
       "aiNotice": "Besedilo je napisal model umetne inteligence na podlagi prepisa, klepeta, vprašanj, anket in ocen, ekipa pa ga je pred objavo pregledala. Številke in grafe izračuna platforma. Lahko vsebuje netočnosti."
+    },
+    "languages": {
+      "title": "Glej v jeziku",
+      "original": "izvirnik",
+      "subtitles": "podnapisi",
+      "dubbedAudio": "sinhroniziran zvok",
+      "summary": "povzetek",
+      "showSubtitles": "Podnapisi: {language}",
+      "audioLabel": "Zvok",
+      "audioOriginal": "Izvirnik ({language})",
+      "audioDubbed": "Sinhronizirano: {language} (glas UI)",
+      "summaryNotAvailable": "Povzetek ni na voljo: {language}"
+    },
+    "downloads": {
+      "title": "Prenesi",
+      "video": "Video",
+      "transcript": "Prepis (.txt)",
+      "subtitles": "Podnapisi (.srt)",
+      "summary": "Povzetek (.md)"
     }
   },
   "provisioning": {

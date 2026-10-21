@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "verificar",
     "lowConfidenceTitle": "Esta parte da transcrição tem confiança baixa: a gravação pode conter palavras diferentes. Consulte sempre o vídeo original.",
     "miniTranscriptLabel": "Transcrição em direto",
-    "dubAvailableHint": "Áudio dobrado disponível em {langs}. Utilize o seletor de áudio nos controlos do reprodutor para ouvir a versão traduzida.",
     "provenance": {
       "triggerLabel": "Transparência do processamento de IA",
       "closeLabel": "Ocultar os detalhes do processamento",
@@ -5461,6 +5460,25 @@
       "improvements": "A melhorar",
       "quotes": "Dos comentários",
       "aiNotice": "O texto é escrito por um modelo de inteligência artificial a partir da transcrição, do chat, das perguntas, das sondagens e das avaliações, e a equipa reviu-o antes de o publicar. Os números e os gráficos são calculados pela plataforma. Pode conter imprecisões."
+    },
+    "languages": {
+      "title": "Ver em",
+      "original": "original",
+      "subtitles": "legendas",
+      "dubbedAudio": "áudio dobrado",
+      "summary": "resumo",
+      "showSubtitles": "Legendas em {language}",
+      "audioLabel": "Áudio",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Dobrado em {language} (voz IA)",
+      "summaryNotAvailable": "Resumo não disponível em {language}"
+    },
+    "downloads": {
+      "title": "Transferir",
+      "video": "Vídeo",
+      "transcript": "Transcrição (.txt)",
+      "subtitles": "Legendas (.srt)",
+      "summary": "Resumo (.md)"
     }
   },
   "provisioning": {

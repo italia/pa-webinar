@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "pārbaudīt",
     "lowConfidenceTitle": "Šai transkripcijas daļai ir zema ticamība: ierakstā var būt citi vārdi. Vienmēr izmantojiet oriģinālo video.",
     "miniTranscriptLabel": "Sinhronā transkripcija",
-    "dubAvailableHint": "Dublētais audio ir pieejams šādās valodās: {langs}. Izmantojiet audio izvēlni atskaņotāja vadīklās, lai klausītos tulkoto versiju.",
     "provenance": {
       "triggerLabel": "MI apstrādes caurskatāmība",
       "closeLabel": "Slēpt apstrādes informāciju",
@@ -5461,6 +5460,25 @@
       "improvements": "Uzlabojamais",
       "quotes": "No komentāriem",
       "aiNotice": "Tekstu uzrakstījis mākslīgā intelekta modelis, izmantojot atšifrējumu, tērzēšanu, jautājumus, aptaujas un vērtējumus, un komanda to pārskatīja pirms publicēšanas. Skaitļus un grafikus aprēķina platforma. Tas var saturēt neprecizitātes."
+    },
+    "languages": {
+      "title": "Skatīties valodā",
+      "original": "oriģināls",
+      "subtitles": "subtitri",
+      "dubbedAudio": "dublēts audio",
+      "summary": "kopsavilkums",
+      "showSubtitles": "Subtitri: {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Oriģināls ({language})",
+      "audioDubbed": "Dublēts: {language} (MI balss)",
+      "summaryNotAvailable": "Kopsavilkums nav pieejams: {language}"
+    },
+    "downloads": {
+      "title": "Lejupielādēt",
+      "video": "Video",
+      "transcript": "Transkripcija (.txt)",
+      "subtitles": "Subtitri (.srt)",
+      "summary": "Kopsavilkums (.md)"
     }
   },
   "provisioning": {

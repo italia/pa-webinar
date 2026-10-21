@@ -45,6 +45,10 @@ interface Props {
   pipelineSnapshot?: PipelineSnapshot | null;
   /** Hook quando il visitatore espande "vedi tutto" (analytics opzionale). */
   onExpand?: () => void;
+  /** La lingua scelta dalla pagina (barra delle lingue del video): quando
+   *  c'e', la sintesi la segue e il suo menu la cambia per tutta la pagina. */
+  language?: string | null;
+  onLanguageChange?: (lang: string) => void;
 }
 
 /** «MM:SS» o, oltre l'ora, «H:MM:SS». */
@@ -63,6 +67,8 @@ export default function PostEventHero({
   eventSlug,
   pipelineSnapshot,
   onExpand,
+  language,
+  onLanguageChange,
 }: Props) {
   const t = useTranslations('postprod.hero');
   const tShare = useTranslations('postprod');
@@ -71,28 +77,44 @@ export default function PostEventHero({
   const availableLocales = Object.keys(structured);
   // Init lang da localStorage prima del preferred, così la scelta
   // dell'utente persiste fra eventi.
+  const controllata = language !== undefined;
+  const leggiSalvata = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem(LANG_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  };
   const initialLang = (() => {
     if (availableLocales.length === 0) return preferredLocale;
-    if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
-      if (stored && availableLocales.includes(stored)) return stored;
-    }
+    if (controllata && language && availableLocales.includes(language)) return language;
+    const stored = controllata ? null : leggiSalvata();
+    if (stored && availableLocales.includes(stored)) return stored;
     return availableLocales.includes(preferredLocale)
       ? preferredLocale
       : availableLocales[0]!;
   })();
   const [lang, setLang] = useState<string>(initialLang);
-  // Allinea se il browser carica un valore stale (es. SSR mismatch).
+  // Allinea: alla lingua scelta dalla pagina quando c'e' in questa sintesi,
+  // altrimenti a quella salvata (un valore stale dopo l'idratazione).
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
+    if (controllata) {
+      if (language && availableLocales.includes(language) && language !== lang) setLang(language);
+      return;
+    }
+    const stored = leggiSalvata();
     if (stored && availableLocales.includes(stored) && stored !== lang) {
       setLang(stored);
     }
-  }, [availableLocales, lang]);
+  }, [availableLocales, lang, language, controllata]);
 
   const onLangChange = (next: string) => {
     setLang(next);
+    if (controllata) {
+      onLanguageChange?.(next);
+      return;
+    }
     if (typeof window !== 'undefined') {
       try {
         window.localStorage.setItem(LANG_STORAGE_KEY, next);

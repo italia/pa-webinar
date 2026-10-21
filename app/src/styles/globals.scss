@@ -1316,6 +1316,118 @@ button.live-time-strip__rec {
   }
 }
 
+// ── Lingue della registrazione (components/events/language-bar) ──
+//
+// Sotto il video: una scheda per lingua con cio' che c'e' in quella lingua,
+// poi sottotitoli e audio della lingua scelta.
+.language-bar {
+  border: 1px solid #d6e3f1;
+  border-radius: 8px;
+  background: #f7faff;
+  padding: 0.75rem 1rem;
+
+  &__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+    margin: 0 0 0.5rem;
+  }
+
+  &__lingue {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__lingua {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    min-height: 44px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #c9d4de;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--app-text);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--app-primary, #0066cc);
+    }
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    &.is-active {
+      border-color: var(--app-primary, #0066cc);
+      background: var(--app-primary, #0066cc);
+      color: #fff;
+
+      .language-bar__cosa {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+
+  &__nome {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  &__cosa {
+    font-size: 0.72rem;
+    color: var(--app-muted);
+  }
+
+  &__opzioni {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__audio {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__scelta {
+    min-height: 32px;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #c9d4de;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--app-text);
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 3px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    &.is-active {
+      border-color: var(--app-primary, #0066cc);
+      color: var(--app-primary, #0066cc);
+      font-weight: 600;
+    }
+  }
+}
+
 // ── Slide accanto alla registrazione ──
 //
 // Le pagine presentate in sala, sincronizzate con il video della pagina

@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "ivverifika",
     "lowConfidenceTitle": "Din il-parti tat-traskrizzjoni għandha kunfidenza baxxa: ir-reġistrazzjoni jista' jkun fiha kliem differenti. Dejjem irreferi għall-vidjow oriġinali.",
     "miniTranscriptLabel": "Traskrizzjoni live",
-    "dubAvailableHint": "Awdjo doppjat disponibbli f'dawn il-lingwi: {langs}. Uża s-selettur tal-awdjo fil-kontrolli tal-player biex tisma' l-verżjoni tradotta.",
     "provenance": {
       "triggerLabel": "Trasparenza tal-ipproċessar bl-AI",
       "closeLabel": "Aħbi d-dettalji tal-ipproċessar",
@@ -5461,6 +5460,25 @@
       "improvements": "X'għandu jitjieb",
       "quotes": "Mill-kummenti",
       "aiNotice": "It-test inkiteb minn mudell tal-intelliġenza artifiċjali abbażi tat-traskrizzjoni, taċ-chat, tal-mistoqsijiet, tal-istħarriġ u tal-evalwazzjonijiet, u t-tim irreveda qabel il-pubblikazzjoni. In-numri u l-graffs jikkalkulahom il-pjattaforma. Jista' jkun fih ineżattezzi."
+    },
+    "languages": {
+      "title": "Ara bil-",
+      "original": "oriġinali",
+      "subtitles": "sottotitoli",
+      "dubbedAudio": "awdjo ddabbjat",
+      "summary": "sommarju",
+      "showSubtitles": "Sottotitoli: {language}",
+      "audioLabel": "Awdjo",
+      "audioOriginal": "Oriġinali ({language})",
+      "audioDubbed": "Iddabbjat: {language} (vuċi AI)",
+      "summaryNotAvailable": "Is-sommarju mhux disponibbli: {language}"
+    },
+    "downloads": {
+      "title": "Niżżel",
+      "video": "Vidjo",
+      "transcript": "Traskrizzjoni (.txt)",
+      "subtitles": "Sottotitoli (.srt)",
+      "summary": "Sommarju (.md)"
     }
   },
   "provisioning": {

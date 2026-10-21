@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "prüfen",
     "lowConfidenceTitle": "Dieser Teil des Transkripts hat eine geringe Konfidenz: Die Aufzeichnung kann andere Wörter enthalten. Ziehen Sie immer das Originalvideo heran.",
     "miniTranscriptLabel": "Live-Transkript",
-    "dubAvailableHint": "Synchronisiertes Audio verfügbar auf {langs}. Verwenden Sie die Audioauswahl in den Steuerelementen des Players, um die übersetzte Fassung anzuhören.",
     "provenance": {
       "triggerLabel": "Transparenz der KI-Verarbeitung",
       "closeLabel": "Details der Verarbeitung ausblenden",
@@ -5461,6 +5460,25 @@
       "improvements": "Verbesserungsbedarf",
       "quotes": "Aus den Kommentaren",
       "aiNotice": "Der Text wurde von einem KI-Modell aus Transkript, Chat, Fragen, Umfragen und Bewertungen verfasst und vor der Veröffentlichung vom Team geprüft. Zahlen und Diagramme berechnet die Plattform. Er kann Ungenauigkeiten enthalten."
+    },
+    "languages": {
+      "title": "Ansehen auf",
+      "original": "Original",
+      "subtitles": "Untertitel",
+      "dubbedAudio": "synchronisierter Ton",
+      "summary": "Zusammenfassung",
+      "showSubtitles": "Untertitel auf {language}",
+      "audioLabel": "Ton",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Synchronisiert auf {language} (KI-Stimme)",
+      "summaryNotAvailable": "Zusammenfassung auf {language} nicht verfügbar"
+    },
+    "downloads": {
+      "title": "Herunterladen",
+      "video": "Video",
+      "transcript": "Transkript (.txt)",
+      "subtitles": "Untertitel (.srt)",
+      "summary": "Zusammenfassung (.md)"
     }
   },
   "provisioning": {

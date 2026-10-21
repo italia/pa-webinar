@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "de verificat",
     "lowConfidenceTitle": "Această porțiune a transcrierii are încredere scăzută: înregistrarea poate conține alte cuvinte. Consultați întotdeauna videoul original.",
     "miniTranscriptLabel": "Transcriere live",
-    "dubAvailableHint": "Sunet dublat disponibil în {langs}. Folosiți selectorul audio din controalele playerului pentru a asculta versiunea tradusă.",
     "provenance": {
       "triggerLabel": "Transparența procesării AI",
       "closeLabel": "Ascunde detaliile procesării",
@@ -5461,6 +5460,25 @@
       "improvements": "De îmbunătățit",
       "quotes": "Din comentarii",
       "aiNotice": "Textul este scris de un model de inteligență artificială pe baza transcrierii, a chatului, a întrebărilor, a sondajelor și a evaluărilor, iar echipa l-a revizuit înainte de publicare. Cifrele și graficele sunt calculate de platformă. Poate conține inexactități."
+    },
+    "languages": {
+      "title": "Urmărește în",
+      "original": "original",
+      "subtitles": "subtitrări",
+      "dubbedAudio": "audio dublat",
+      "summary": "rezumat",
+      "showSubtitles": "Subtitrări: {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Dublat: {language} (voce IA)",
+      "summaryNotAvailable": "Rezumat indisponibil: {language}"
+    },
+    "downloads": {
+      "title": "Descarcă",
+      "video": "Video",
+      "transcript": "Transcriere (.txt)",
+      "subtitles": "Subtitrări (.srt)",
+      "summary": "Rezumat (.md)"
     }
   },
   "provisioning": {

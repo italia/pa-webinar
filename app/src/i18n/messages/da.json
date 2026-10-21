@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "tjek",
     "lowConfidenceTitle": "Denne del af transskriptionen har lav konfidens: optagelsen kan indeholde andre ord. Se altid den originale video.",
     "miniTranscriptLabel": "Live-transskription",
-    "dubAvailableHint": "Eftersynkroniseret lyd er tilgængelig på {langs}. Brug lydvælgeren i afspillerens kontroller for at lytte til den oversatte version.",
     "provenance": {
       "triggerLabel": "Gennemsigtighed om AI-behandlingen",
       "closeLabel": "Skjul detaljerne om behandlingen",
@@ -5461,6 +5460,25 @@
       "improvements": "Kan forbedres",
       "quotes": "Fra kommentarerne",
       "aiNotice": "Teksten er skrevet af en AI-model ud fra udskriften, chatten, spørgsmålene, afstemningerne og vurderingerne, og teamet har gennemlæst den før offentliggørelsen. Tallene og diagrammerne beregner platformen. Den kan indeholde unøjagtigheder."
+    },
+    "languages": {
+      "title": "Se på",
+      "original": "original",
+      "subtitles": "undertekster",
+      "dubbedAudio": "eftersynkroniseret lyd",
+      "summary": "resumé",
+      "showSubtitles": "Undertekster: {language}",
+      "audioLabel": "Lyd",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Eftersynkroniseret: {language} (AI-stemme)",
+      "summaryNotAvailable": "Resumé ikke tilgængeligt: {language}"
+    },
+    "downloads": {
+      "title": "Download",
+      "video": "Video",
+      "transcript": "Transskription (.txt)",
+      "subtitles": "Undertekster (.srt)",
+      "summary": "Resumé (.md)"
     }
   },
   "provisioning": {

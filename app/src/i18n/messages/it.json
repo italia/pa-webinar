@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "verifica",
     "lowConfidenceTitle": "Questa porzione di trascrizione ha confidenza bassa: la registrazione potrebbe contenere parole diverse. Fai sempre riferimento al video originale.",
     "miniTranscriptLabel": "Trascrizione live",
-    "dubAvailableHint": "Audio doppiato disponibile in {langs}. Usa il selettore audio nei controlli del player per ascoltare la versione tradotta.",
     "provenance": {
       "triggerLabel": "Trasparenza del processing AI",
       "closeLabel": "Nascondi dettagli del processing",
@@ -5461,6 +5460,25 @@
       "improvements": "Da migliorare",
       "quotes": "Dai commenti",
       "aiNotice": "Il testo è scritto da un modello di intelligenza artificiale a partire da trascrizione, chat, domande, sondaggi e valutazioni, e lo staff lo ha riletto prima di pubblicarlo. I numeri e i grafici li calcola la piattaforma. Può contenere imprecisioni."
+    },
+    "languages": {
+      "title": "Guarda in",
+      "original": "originale",
+      "subtitles": "sottotitoli",
+      "dubbedAudio": "audio doppiato",
+      "summary": "sintesi",
+      "showSubtitles": "Sottotitoli in {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Originale ({language})",
+      "audioDubbed": "Doppiato in {language} (voce AI)",
+      "summaryNotAvailable": "Sintesi non disponibile in {language}"
+    },
+    "downloads": {
+      "title": "Scarica",
+      "video": "Video",
+      "transcript": "Trascrizione (.txt)",
+      "subtitles": "Sottotitoli (.srt)",
+      "summary": "Sintesi (.md)"
     }
   },
   "provisioning": {

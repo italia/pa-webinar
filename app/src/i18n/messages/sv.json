@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "granska",
     "lowConfidenceTitle": "Den här delen av transkriptionen har låg konfidens: inspelningen kan innehålla andra ord. Utgå alltid från originalvideon.",
     "miniTranscriptLabel": "Live-transkription",
-    "dubAvailableHint": "Dubbat ljud finns på {langs}. Använd ljudväljaren i spelarens kontroller för att lyssna på den översatta versionen.",
     "provenance": {
       "triggerLabel": "Transparens om AI-bearbetningen",
       "closeLabel": "Dölj detaljerna om bearbetningen",
@@ -5461,6 +5460,25 @@
       "improvements": "Att förbättra",
       "quotes": "Ur kommentarerna",
       "aiNotice": "Texten är skriven av en AI-modell utifrån transkriptionen, chatten, frågorna, omröstningarna och bedömningarna, och teamet har granskat den före publicering. Siffrorna och diagrammen beräknar plattformen. Den kan innehålla felaktigheter."
+    },
+    "languages": {
+      "title": "Titta på",
+      "original": "original",
+      "subtitles": "undertexter",
+      "dubbedAudio": "dubbat ljud",
+      "summary": "sammanfattning",
+      "showSubtitles": "Undertexter: {language}",
+      "audioLabel": "Ljud",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Dubbat: {language} (AI-röst)",
+      "summaryNotAvailable": "Sammanfattning saknas: {language}"
+    },
+    "downloads": {
+      "title": "Ladda ner",
+      "video": "Video",
+      "transcript": "Transkription (.txt)",
+      "subtitles": "Undertexter (.srt)",
+      "summary": "Sammanfattning (.md)"
     }
   },
   "provisioning": {

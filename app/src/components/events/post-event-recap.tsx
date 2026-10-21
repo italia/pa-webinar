@@ -40,6 +40,7 @@ export default function PostEventRecap({
   recap,
   className,
   hideWords = false,
+  hideQuestions = false,
 }: {
   recap: EventRecap;
   className?: string;
@@ -47,6 +48,9 @@ export default function PostEventRecap({
    *  is rendered separately (postEventShowWordCloud), to avoid showing the
    *  same words twice on the concluded-event page. */
   hideWords?: boolean;
+  /** Le domande piu' votate stanno gia' nella scheda delle domande della
+   *  pagina: qui non si ripetono. */
+  hideQuestions?: boolean;
 }) {
   const t = useTranslations('events.recap');
 
@@ -115,7 +119,7 @@ export default function PostEventRecap({
       )}
 
       {/* Top questions */}
-      {recap.topQuestions.length > 0 && (
+      {!hideQuestions && recap.topQuestions.length > 0 && (
         <div className="mb-3">
           <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             {t('topQuestions')}

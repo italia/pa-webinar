@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "review",
     "lowConfidenceTitle": "This part of the transcript has low confidence: the recording may contain different words. Always refer back to the original video.",
     "miniTranscriptLabel": "Live transcript",
-    "dubAvailableHint": "Dubbed audio available in {langs}. Use the audio selector in the player controls to listen to the translated version.",
     "provenance": {
       "triggerLabel": "AI processing transparency",
       "closeLabel": "Hide processing details",
@@ -5461,6 +5460,25 @@
       "improvements": "To improve",
       "quotes": "From the comments",
       "aiNotice": "The text is written by an artificial intelligence model from the transcript, chat, questions, polls and ratings, and the staff reviewed it before publishing. The numbers and charts are computed by the platform. It may contain inaccuracies."
+    },
+    "languages": {
+      "title": "Watch in",
+      "original": "original",
+      "subtitles": "subtitles",
+      "dubbedAudio": "dubbed audio",
+      "summary": "summary",
+      "showSubtitles": "Subtitles in {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Original ({language})",
+      "audioDubbed": "Dubbed in {language} (AI voice)",
+      "summaryNotAvailable": "Summary not available in {language}"
+    },
+    "downloads": {
+      "title": "Download",
+      "video": "Video",
+      "transcript": "Transcript (.txt)",
+      "subtitles": "Subtitles (.srt)",
+      "summary": "Summary (.md)"
     }
   },
   "provisioning": {

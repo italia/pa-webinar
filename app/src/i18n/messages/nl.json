@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "controleren",
     "lowConfidenceTitle": "Dit deel van de transcriptie heeft een lage betrouwbaarheid: de opname kan andere woorden bevatten. Raadpleeg altijd de originele video.",
     "miniTranscriptLabel": "Live transcriptie",
-    "dubAvailableHint": "Nagesynchroniseerde audio beschikbaar in {langs}. Gebruik de audiokiezer in de bedieningsbalk van de speler om de vertaalde versie te beluisteren.",
     "provenance": {
       "triggerLabel": "Transparantie van de AI-verwerking",
       "closeLabel": "Details van de verwerking verbergen",
@@ -5461,6 +5460,25 @@
       "improvements": "Te verbeteren",
       "quotes": "Uit de opmerkingen",
       "aiNotice": "De tekst is geschreven door een AI-model op basis van de transcriptie, de chat, de vragen, de peilingen en de beoordelingen, en het team heeft hem voor publicatie nagelezen. De cijfers en grafieken berekent het platform. Hij kan onnauwkeurigheden bevatten."
+    },
+    "languages": {
+      "title": "Bekijken in",
+      "original": "origineel",
+      "subtitles": "ondertitels",
+      "dubbedAudio": "nagesynchroniseerde audio",
+      "summary": "samenvatting",
+      "showSubtitles": "Ondertitels in het {language}",
+      "audioLabel": "Audio",
+      "audioOriginal": "Origineel ({language})",
+      "audioDubbed": "Nagesynchroniseerd in het {language} (AI-stem)",
+      "summaryNotAvailable": "Samenvatting niet beschikbaar in het {language}"
+    },
+    "downloads": {
+      "title": "Downloaden",
+      "video": "Video",
+      "transcript": "Transcriptie (.txt)",
+      "subtitles": "Ondertitels (.srt)",
+      "summary": "Samenvatting (.md)"
     }
   },
   "provisioning": {

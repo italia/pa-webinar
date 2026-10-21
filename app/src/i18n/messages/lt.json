@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "patikrinti",
     "lowConfidenceTitle": "Šios transkripcijos dalies patikimumas mažas: įraše gali skambėti kiti žodžiai. Visada remkitės originaliu vaizdo įrašu.",
     "miniTranscriptLabel": "Tiesioginė transkripcija",
-    "dubAvailableHint": "Įgarsintas garsas pasiekiamas: {langs}. Norėdami klausytis išverstos versijos, naudokite grotuvo valdiklių garso parinkiklį.",
     "provenance": {
       "triggerLabel": "DI apdorojimo skaidrumas",
       "closeLabel": "Slėpti apdorojimo informaciją",
@@ -5461,6 +5460,25 @@
       "improvements": "Tobulintina",
       "quotes": "Iš komentarų",
       "aiNotice": "Tekstą parašė dirbtinio intelekto modelis pagal stenogramą, pokalbį, klausimus, apklausas ir vertinimus, o komanda jį peržiūrėjo prieš paskelbiant. Skaičius ir diagramas apskaičiuoja platforma. Jame gali būti netikslumų."
+    },
+    "languages": {
+      "title": "Žiūrėti kalba",
+      "original": "originalas",
+      "subtitles": "subtitrai",
+      "dubbedAudio": "dubliuotas garsas",
+      "summary": "santrauka",
+      "showSubtitles": "Subtitrai: {language}",
+      "audioLabel": "Garsas",
+      "audioOriginal": "Originalas ({language})",
+      "audioDubbed": "Dubliuota: {language} (DI balsas)",
+      "summaryNotAvailable": "Santrauka neprieinama: {language}"
+    },
+    "downloads": {
+      "title": "Atsisiųsti",
+      "video": "Vaizdo įrašas",
+      "transcript": "Transkripcija (.txt)",
+      "subtitles": "Subtitrai (.srt)",
+      "summary": "Santrauka (.md)"
     }
   },
   "provisioning": {

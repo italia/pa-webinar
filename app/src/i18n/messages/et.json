@@ -4975,7 +4975,6 @@
     "lowConfidenceBadge": "kontrolli",
     "lowConfidenceTitle": "Sellel transkriptsiooni osal on madal kindlus: salvestises võivad olla teised sõnad. Vaata alati originaalvideot.",
     "miniTranscriptLabel": "Reaalajas transkriptsioon",
-    "dubAvailableHint": "Dubleeritud heli on saadaval keeltes {langs}. Tõlgitud versiooni kuulamiseks kasuta pleieri juhtnuppude helivalijat.",
     "provenance": {
       "triggerLabel": "AI töötluse läbipaistvus",
       "closeLabel": "Peida töötluse üksikasjad",
@@ -5461,6 +5460,25 @@
       "improvements": "Parandada",
       "quotes": "Kommentaaridest",
       "aiNotice": "Teksti on kirjutanud tehisintellekti mudel transkriptsiooni, vestluse, küsimuste, küsitluste ja hinnangute põhjal ning meeskond vaatas selle enne avaldamist üle. Numbrid ja graafikud arvutab platvorm. See võib sisaldada ebatäpsusi."
+    },
+    "languages": {
+      "title": "Vaata keeles",
+      "original": "originaal",
+      "subtitles": "subtiitrid",
+      "dubbedAudio": "dubleeritud heli",
+      "summary": "kokkuvõte",
+      "showSubtitles": "Subtiitrid: {language}",
+      "audioLabel": "Heli",
+      "audioOriginal": "Originaal ({language})",
+      "audioDubbed": "Dubleeritud: {language} (TI hääl)",
+      "summaryNotAvailable": "Kokkuvõte pole saadaval: {language}"
+    },
+    "downloads": {
+      "title": "Laadi alla",
+      "video": "Video",
+      "transcript": "Transkriptsioon (.txt)",
+      "subtitles": "Subtiitrid (.srt)",
+      "summary": "Kokkuvõte (.md)"
     }
   },
   "provisioning": {
