@@ -178,7 +178,7 @@
         "now": "U tijeku",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Poruke iz chata ne čuvaju se nakon završetka događaja.",
+      "chatNotSaved": "Poruke chata ne objavljuju se nakon događaja: brišu se zajedno s ostalim podacima događaja.",
       "qaPostEvent": "Pitanja i odgovori s događaja",
       "peakParticipants": "Vrh: {count} sudionika",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Pokreni događaj",
     "startingEvent": "Pokretanje...",
     "startEventError": "Pogreška pri pokretanju događaja. Pokušajte ponovno.",
-    "chatNotSaved": "Poruke iz chata ne čuvaju se nakon završetka događaja.",
     "registerAndJoin": "Prijavite se i sudjelujte",
     "registerNow": "Uživo — Prijavite se odmah!",
     "enableMusic": "Uključi glazbu",

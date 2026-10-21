@@ -178,7 +178,7 @@
         "now": "Vyksta",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Pokalbių pranešimai nėra saugomi po renginio pabaigos.",
+      "chatNotSaved": "Pokalbio žinutės po renginio neskelbiamos: jos ištrinamos kartu su kitais renginio duomenimis.",
       "qaPostEvent": "Klausimai ir atsakymai iš renginio",
       "peakParticipants": "Pikas: {count} dalyvių",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Pradėti renginį",
     "startingEvent": "Paleidžiama...",
     "startEventError": "Klaida pradedant renginį. Bandykite dar kartą.",
-    "chatNotSaved": "Pokalbių pranešimai nėra saugomi po renginio pabaigos.",
     "registerAndJoin": "Registruotis ir dalyvauti",
     "registerNow": "Vyksta dabar — Registruokitės!",
     "enableMusic": "Įjungti muziką",

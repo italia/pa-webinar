@@ -178,7 +178,7 @@
         "now": "Käynnissä",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Chat-viestejä ei tallenneta tapahtuman päätyttyä.",
+      "chatNotSaved": "Chatin viestejä ei julkaista tapahtuman jälkeen: ne poistetaan tapahtuman muiden tietojen mukana.",
       "qaPostEvent": "Q&A tapahtumasta",
       "peakParticipants": "Huippu: {count} osallistujaa",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Käynnistä tapahtuma",
     "startingEvent": "Käynnistetään...",
     "startEventError": "Tapahtuman käynnistäminen epäonnistui. Yritä uudelleen.",
-    "chatNotSaved": "Chat-viestejä ei tallenneta tapahtuman päätyttyä.",
     "registerAndJoin": "Ilmoittaudu ja liity",
     "registerNow": "Käynnissä — Ilmoittaudu nyt!",
     "enableMusic": "Ota musiikki käyttöön",

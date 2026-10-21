@@ -178,7 +178,7 @@
         "now": "Bezig",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Chatberichten worden niet opgeslagen na afloop van het evenement.",
+      "chatNotSaved": "Chatberichten worden na het evenement niet gepubliceerd: ze worden met de overige gegevens van het evenement verwijderd.",
       "qaPostEvent": "Vragen en antwoorden van het evenement",
       "peakParticipants": "Piek: {count} deelnemers",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Evenement starten",
     "startingEvent": "Starten...",
     "startEventError": "Fout bij het starten van het evenement. Probeer het opnieuw.",
-    "chatNotSaved": "Chatberichten worden niet opgeslagen na afloop van het evenement.",
     "registerAndJoin": "Inschrijven en deelnemen",
     "registerNow": "Nu live — Schrijf u nu in!",
     "enableMusic": "Muziek inschakelen",

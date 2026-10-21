@@ -178,7 +178,7 @@
         "now": "In corso",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "I messaggi della chat non vengono salvati dopo la fine dell'evento.",
+      "chatNotSaved": "I messaggi della chat non vengono pubblicati dopo l'evento: si cancellano con gli altri dati dell'evento.",
       "qaPostEvent": "Domande e risposte dall'evento",
       "peakParticipants": "Picco: {count} partecipanti",
       "calendar": {
@@ -371,7 +371,6 @@
     "startEventButton": "Avvia evento",
     "startingEvent": "Avvio in corso...",
     "startEventError": "Errore nell'avvio dell'evento. Riprova.",
-    "chatNotSaved": "I messaggi della chat non vengono salvati dopo la fine dell'evento.",
     "registerAndJoin": "Iscriviti e partecipa",
     "registerNow": "In corso — Iscriviti ora!",
     "enableMusic": "Attiva musica",

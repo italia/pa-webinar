@@ -178,7 +178,7 @@
         "now": "Folyamatban",
         "minutes": "{minutes} perc"
       },
-      "chatNotSaved": "A csevegés üzenetei az esemény végén nem kerülnek mentésre.",
+      "chatNotSaved": "A csevegés üzeneteit az esemény után nem tesszük közzé: az esemény többi adatával együtt törlődnek.",
       "qaPostEvent": "Kérdések és válaszok az eseményről",
       "peakParticipants": "Csúcs: {count} résztvevő",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Esemény indítása",
     "startingEvent": "Indítás...",
     "startEventError": "Hiba az esemény indításakor. Kérjük, próbálja újra.",
-    "chatNotSaved": "A csevegés üzenetei az esemény végén nem kerülnek mentésre.",
     "registerAndJoin": "Regisztráció és csatlakozás",
     "registerNow": "Éppen zajlik — Regisztráljon most!",
     "enableMusic": "Zene bekapcsolása",

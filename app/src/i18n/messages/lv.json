@@ -178,7 +178,7 @@
         "now": "Notiek",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Tērzēšanas ziņojumi netiek saglabāti pēc pasākuma beigām.",
+      "chatNotSaved": "Tērzēšanas ziņas pēc pasākuma netiek publicētas: tās tiek dzēstas kopā ar pārējiem pasākuma datiem.",
       "qaPostEvent": "Jautājumi un atbildes no pasākuma",
       "peakParticipants": "Maksimums: {count} dalībnieki",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Sākt pasākumu",
     "startingEvent": "Sākšana...",
     "startEventError": "Kļūda, sākot pasākumu. Lūdzu, mēģiniet vēlreiz.",
-    "chatNotSaved": "Tērzēšanas ziņojumi netiek saglabāti pēc pasākuma beigām.",
     "registerAndJoin": "Reģistrēties un pievienoties",
     "registerNow": "Notiek tagad — Reģistrējieties!",
     "enableMusic": "Ieslēgt mūziku",

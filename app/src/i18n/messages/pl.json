@@ -178,7 +178,7 @@
         "now": "W toku",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Wiadomości z czatu nie są zapisywane po zakończeniu wydarzenia.",
+      "chatNotSaved": "Wiadomości z czatu nie są publikowane po wydarzeniu: są usuwane razem z pozostałymi danymi wydarzenia.",
       "qaPostEvent": "Pytania i odpowiedzi z wydarzenia",
       "peakParticipants": "Szczyt: {count} uczestników",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Rozpocznij wydarzenie",
     "startingEvent": "Uruchamianie...",
     "startEventError": "Błąd uruchamiania wydarzenia. Spróbuj ponownie.",
-    "chatNotSaved": "Wiadomości z czatu nie są zapisywane po zakończeniu wydarzenia.",
     "registerAndJoin": "Zarejestruj się i dołącz",
     "registerNow": "Na żywo — Zarejestruj się teraz!",
     "enableMusic": "Włącz muzykę",

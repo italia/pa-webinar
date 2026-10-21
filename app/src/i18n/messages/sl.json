@@ -178,7 +178,7 @@
         "now": "V teku",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
+      "chatNotSaved": "Sporočila klepeta se po dogodku ne objavijo: izbrišejo se skupaj z drugimi podatki dogodka.",
       "qaPostEvent": "Vprašanja in odgovori z dogodka",
       "peakParticipants": "Vrh: {count} udeležencev",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Zaženi dogodek",
     "startingEvent": "Zagon...",
     "startEventError": "Napaka pri zagonu dogodka. Poskusite znova.",
-    "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
     "registerAndJoin": "Prijavite se in sodelujte",
     "registerNow": "V živo — Prijavite se zdaj!",
     "enableMusic": "Vklopi glasbo",

@@ -178,7 +178,7 @@
         "now": "Ar siúl",
         "minutes": "{minutes} nóim."
       },
-      "chatNotSaved": "Ní shábháiltear teachtaireachtaí comhrá tar éis deireadh an imeachta.",
+      "chatNotSaved": "Ní fhoilsítear teachtaireachtaí an chomhrá tar éis na hócáide: scriostar iad in éineacht le sonraí eile na hócáide.",
       "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
       "peakParticipants": "Buaicphointe: {count} rannpháirtí",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Tosaigh an t-imeacht",
     "startingEvent": "Ag tosú...",
     "startEventError": "Theip ar an imeacht a thosú. Bain triail eile as.",
-    "chatNotSaved": "Ní shábháiltear teachtaireachtaí comhrá tar éis deireadh an imeachta.",
     "registerAndJoin": "Cláraigh agus bí páirteach",
     "registerNow": "Beo — Cláraigh anois!",
     "enableMusic": "Cuir ceol ar siúl",

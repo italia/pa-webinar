@@ -178,7 +178,7 @@
         "now": "Għaddej",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Il-messaġġi taċ-chat ma jiġux issejvjati wara li jintemm l-avveniment.",
+      "chatNotSaved": "Il-messaġġi taċ-chat ma jiġux ippubblikati wara l-avveniment: jitħassru mal-bqija tad-data tal-avveniment.",
       "qaPostEvent": "Q&A mill-avveniment",
       "peakParticipants": "Qofol: {count} parteċipant",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Ibda l-avveniment",
     "startingEvent": "Qed jibda...",
     "startEventError": "Żball fil-bidu tal-avveniment. Erġa' pprova.",
-    "chatNotSaved": "Il-messaġġi taċ-chat ma jiġux issejvjati wara li jintemm l-avveniment.",
     "registerAndJoin": "Irreġistra u ipparteċipa",
     "registerNow": "Ħaj — Irreġistra issa!",
     "enableMusic": "Ixgħel il-mużika",

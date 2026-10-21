@@ -178,7 +178,7 @@
         "now": "En cours",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Les messages du chat ne sont pas conservés après la fin de l'événement.",
+      "chatNotSaved": "Les messages du chat ne sont pas publiés après l'événement : ils sont supprimés avec les autres données de l'événement.",
       "qaPostEvent": "Q&A de l'événement",
       "peakParticipants": "Pic : {count} participants",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Démarrer l'événement",
     "startingEvent": "Démarrage en cours...",
     "startEventError": "Erreur lors du démarrage de l'événement. Veuillez réessayer.",
-    "chatNotSaved": "Les messages du chat ne sont pas conservés après la fin de l'événement.",
     "registerAndJoin": "S'inscrire et participer",
     "registerNow": "En direct — Inscrivez-vous maintenant !",
     "enableMusic": "Activer la musique",

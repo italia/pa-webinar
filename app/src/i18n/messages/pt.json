@@ -178,7 +178,7 @@
         "now": "Em curso",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "As mensagens do chat não são guardadas após o fim do evento.",
+      "chatNotSaved": "As mensagens do chat não são publicadas depois do evento: são eliminadas com os restantes dados do evento.",
       "qaPostEvent": "Perguntas e respostas do evento",
       "peakParticipants": "Pico: {count} participantes",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Iniciar evento",
     "startingEvent": "A iniciar...",
     "startEventError": "Erro ao iniciar o evento. Tente novamente.",
-    "chatNotSaved": "As mensagens do chat não são guardadas após o fim do evento.",
     "registerAndJoin": "Inscrever-se e participar",
     "registerNow": "Em direto — Inscreva-se agora!",
     "enableMusic": "Ativar música",

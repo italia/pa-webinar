@@ -178,7 +178,7 @@
         "now": "Läuft",
         "minutes": "{minutes} Min."
       },
-      "chatNotSaved": "Chat-Nachrichten werden nach Ende der Veranstaltung nicht gespeichert.",
+      "chatNotSaved": "Chatnachrichten werden nach der Veranstaltung nicht veröffentlicht: Sie werden mit den übrigen Daten der Veranstaltung gelöscht.",
       "qaPostEvent": "Q&A aus der Veranstaltung",
       "peakParticipants": "Höchstwert: {count} Teilnehmende",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Veranstaltung starten",
     "startingEvent": "Wird gestartet...",
     "startEventError": "Fehler beim Starten des Events. Erneut versuchen.",
-    "chatNotSaved": "Chat-Nachrichten werden nach Ende der Veranstaltung nicht gespeichert.",
     "registerAndJoin": "Anmelden und teilnehmen",
     "registerNow": "Jetzt live — Jetzt anmelden!",
     "enableMusic": "Musik aktivieren",

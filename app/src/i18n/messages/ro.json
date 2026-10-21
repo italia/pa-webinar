@@ -178,7 +178,7 @@
         "now": "În desfășurare",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Mesajele din chat nu sunt salvate după încheierea evenimentului.",
+      "chatNotSaved": "Mesajele din chat nu sunt publicate după eveniment: se șterg împreună cu celelalte date ale evenimentului.",
       "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
       "peakParticipants": "Vârf: {count} participanți",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Porniți evenimentul",
     "startingEvent": "Se pornește...",
     "startEventError": "Eroare la pornirea evenimentului. Încercați din nou.",
-    "chatNotSaved": "Mesajele din chat nu sunt salvate după încheierea evenimentului.",
     "registerAndJoin": "Înregistrați-vă și participați",
     "registerNow": "În desfășurare — Înregistrați-vă acum!",
     "enableMusic": "Activați muzica",

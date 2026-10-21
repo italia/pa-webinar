@@ -178,7 +178,7 @@
         "now": "Käimas",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Vestlussõnumeid ei salvestata pärast ürituse lõppu.",
+      "chatNotSaved": "Vestluse sõnumeid pärast üritust ei avaldata: need kustutatakse koos ürituse ülejäänud andmetega.",
       "qaPostEvent": "Ürituse küsimused ja vastused",
       "peakParticipants": "Tipp: {count} osalejat",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Käivita üritus",
     "startingEvent": "Käivitamine...",
     "startEventError": "Sündmuse käivitamine ebaõnnestus. Palun proovige uuesti.",
-    "chatNotSaved": "Vestlussõnumeid ei salvestata pärast ürituse lõppu.",
     "registerAndJoin": "Registreeru ja osale",
     "registerNow": "Toimub praegu — Registreeruge!",
     "enableMusic": "Lülita muusika sisse",

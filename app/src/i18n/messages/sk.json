@@ -178,7 +178,7 @@
         "now": "Prebieha",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Správy z chatu nie sú po skončení udalosti uchovávané.",
+      "chatNotSaved": "Správy z chatu sa po podujatí nezverejňujú: vymažú sa spolu s ostatnými údajmi podujatia.",
       "qaPostEvent": "Otázky a odpovede z udalosti",
       "peakParticipants": "Špička: {count} účastníkov",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Začať udalosť",
     "startingEvent": "Začíname...",
     "startEventError": "Chyba pri spustení podujatia. Skúste to znova.",
-    "chatNotSaved": "Správy z chatu nie sú po skončení udalosti uchovávané.",
     "registerAndJoin": "Registrovať sa a pripojiť",
     "registerNow": "Práve prebieha — Registrujte sa!",
     "enableMusic": "Zapnúť hudbu",

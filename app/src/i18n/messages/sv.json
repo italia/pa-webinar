@@ -178,7 +178,7 @@
         "now": "Pågår",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
+      "chatNotSaved": "Chattmeddelanden publiceras inte efter evenemanget: de raderas tillsammans med evenemangets övriga uppgifter.",
       "qaPostEvent": "Q&A från evenemanget",
       "peakParticipants": "Toppantal: {count} deltagare",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Starta evenemang",
     "startingEvent": "Startar...",
     "startEventError": "Det gick inte att starta evenemanget. Försök igen.",
-    "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
     "registerAndJoin": "Anmäl dig och delta",
     "registerNow": "Pågår nu — Anmäl dig nu!",
     "enableMusic": "Aktivera musik",

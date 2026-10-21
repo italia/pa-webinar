@@ -178,7 +178,7 @@
         "now": "In progress",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Chat messages are not saved after the event ends.",
+      "chatNotSaved": "Chat messages are not published after the event: they are deleted with the rest of the event data.",
       "qaPostEvent": "Q&A from the event",
       "peakParticipants": "Peak: {count} participants",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Start event",
     "startingEvent": "Starting...",
     "startEventError": "Failed to start event. Please try again.",
-    "chatNotSaved": "Chat messages are not saved after the event ends.",
     "registerAndJoin": "Register and join",
     "registerNow": "Live now — Register now!",
     "enableMusic": "Enable music",

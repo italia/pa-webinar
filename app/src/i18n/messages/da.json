@@ -178,7 +178,7 @@
         "now": "I gang",
         "minutes": "{minutes} min"
       },
-      "chatNotSaved": "Chatbeskeder gemmes ikke efter begivenhedens afslutning.",
+      "chatNotSaved": "Chatbeskeder offentliggøres ikke efter begivenheden: de slettes sammen med begivenhedens øvrige data.",
       "qaPostEvent": "Q&A fra begivenheden",
       "peakParticipants": "Højeste antal: {count} deltagere",
       "calendar": {
@@ -357,7 +357,6 @@
     "startEventButton": "Start begivenhed",
     "startingEvent": "Starter...",
     "startEventError": "Fejl ved start af arrangementet. Prøv igen.",
-    "chatNotSaved": "Chatbeskeder gemmes ikke efter begivenhedens afslutning.",
     "registerAndJoin": "Tilmeld dig og deltag",
     "registerNow": "Live nu — Tilmeld dig nu!",
     "enableMusic": "Aktivér musik",
