@@ -1,9 +1,16 @@
 import { act, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import messages from '@/i18n/messages/it.json';
+
+// Il tetto degli argomenti piu' basso solo qui: le prove al massimo
+// disegnerebbero centinaia di righe, troppo lente sotto la copertura.
+vi.mock('@/lib/agenda/status', async (originale) => ({
+  ...(await originale<Record<string, unknown>>()),
+  MAX_AGENDA_ITEMS: 6,
+}));
 import { MAX_AGENDA_ITEMS } from '@/lib/agenda/status';
 
 import StepProgramma, { type ProgrammaPatch } from './programme-section';
@@ -290,7 +297,7 @@ describe('StepProgramma: dalle persone', () => {
     click(pulsante('Aggiungi un intervento di Anna Rossi'));
     expect(ultimo.agenda).toHaveLength(MAX_AGENDA_ITEMS);
     expect(pulsante(tp.newPersonAssign).disabled).toBe(true);
-  }, 15_000);
+  });
 
   it('al numero massimo di argomenti pulsanti e persone non aggiungono piu’', () => {
     const piene = Array.from({ length: MAX_AGENDA_ITEMS }, (_, i) => riga(`A${i}`, '1'));
