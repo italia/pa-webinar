@@ -43,9 +43,11 @@ export default function LanguageBar({
   onAudioChange,
 }: LanguageBarProps) {
   const t = useTranslations('postEvent.languages');
-  // Il nome della lingua come si scrive a inizio di voce («Italiano»).
+  // Il nome della lingua dentro una frase («Sottotitoli in inglese») e come
+  // voce a se' («Inglese»).
+  const nomeInFrase = (l: string) => locName(l, locale);
   const nome = (l: string) => {
-    const n = locName(l, locale);
+    const n = nomeInFrase(l);
     return n.charAt(0).toLocaleUpperCase(locale) + n.slice(1);
   };
   const lingue = [
@@ -95,7 +97,7 @@ export default function LanguageBar({
               checked={subtitlesOn}
               onChange={(e) => onSubtitlesChange(e.target.checked)}
             />
-            <span>{t('showSubtitles', { language: nome(language) })}</span>
+            <span>{t('showSubtitles', { language: nomeInFrase(language) })}</span>
           </label>
         )}
         {language !== sourceLanguage && audioLanguages.includes(language) && (
@@ -107,7 +109,7 @@ export default function LanguageBar({
               aria-pressed={audio === 'original'}
               onClick={() => onAudioChange('original')}
             >
-              {t('audioOriginal', { language: nome(sourceLanguage) })}
+              {t('audioOriginal', { language: nomeInFrase(sourceLanguage) })}
             </button>
             <button
               type="button"
@@ -115,13 +117,13 @@ export default function LanguageBar({
               aria-pressed={audio === language}
               onClick={() => onAudioChange(language)}
             >
-              {t('audioDubbed', { language: nome(language) })}
+              {t('audioDubbed', { language: nomeInFrase(language) })}
             </button>
           </div>
         )}
         {!summaryLanguages.includes(language) && summaryLanguages.length > 0 && (
           <span className="text-secondary">
-            {t('summaryNotAvailable', { language: nome(language) })}
+            {t('summaryNotAvailable', { language: nomeInFrase(language) })}
           </span>
         )}
       </div>
