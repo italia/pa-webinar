@@ -1,6 +1,6 @@
 # Contributing to PA Webinar
 
-Thank you for considering a contribution. PA Webinar is open-source software built for reuse by public administrations (PA), so every contribution is read, installed and maintained by people who never saw the discussion behind it. This guide explains the process: how to report, propose, set up, branch, commit, check, open a pull request, get reviewed, and license your work.
+Thank you for considering a contribution. PA Webinar is open-source software built for reuse by public administrations (PA), so every contribution is read, installed and maintained by people who never saw the discussion behind it. This guide explains the process: how to report, propose, set up, branch, commit, check, open a pull request, get reviewed, license your work, and use AI tools.
 
 Contributions come from individuals, from public bodies that reuse the platform and their suppliers, and from the maintainers themselves. All of these are welcome:
 
@@ -139,6 +139,7 @@ Tick only what is true, and explain any unticked item.
 - [ ] `CHANGELOG.md` is not edited. It is generated from the release notes, which are written when a release is prepared (see [docs/development/ci-and-release.md](docs/development/ci-and-release.md)).
 - [ ] The change adds no secrets, personal data, internal names (events, meetings, people, ticket codes) or data from a real environment (hosts, IP addresses, cluster, namespace or secret names).
 - [ ] You reviewed your own diff for regressions (see [Review and merge](#review-and-merge)).
+- [ ] You can explain every line of the change, whatever tool produced it, and nothing in it is third-party material that cannot be released under EUPL-1.2 (see [Contributions written with AI tools](#contributions-written-with-ai-tools)).
 
 The [pull request template](.github/pull_request_template.md) turns this list into checkboxes and adds the base branch, the title, the type of change and a confirmation for reviewers.
 
@@ -167,3 +168,12 @@ Documentation follows the same review as code. [docs/README.md](docs/README.md) 
 PA Webinar is distributed under the European Union Public Licence ([EUPL-1.2](LICENSE)). By opening a pull request, you agree that your contribution is released under the same license: inbound equals outbound. The project does not use a separate contributor license agreement.
 
 Contribute only code and assets that you have the right to license this way. Any third-party code, font, image or sound you add must keep PA Webinar distributable under EUPL-1.2 (see the [license policy](THIRD-PARTY-LICENSES.md#license-policy)), and must be recorded as described in [Adding a third-party component](THIRD-PARTY-LICENSES.md#adding-a-third-party-component). For production npm dependencies of the root workspaces, CI enforces a list of blocked licenses in the License Compliance job of [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+## Contributions written with AI tools
+
+You may use AI tools to write a contribution. What they produce follows the same rules as the rest of the contribution, and four of them matter most:
+
+- **You are the author.** Whoever opens the pull request answers for every line of it: they understand it, have reviewed it and can explain it in review. Generated code passes the same gates, tests and review as any other change, and "the tool wrote it" is not an answer to a review comment.
+- **You have the right to license it.** The [license of contributions](#license-of-contributions) applies unchanged: a contribution must not reproduce third-party code, text or assets that cannot be released under EUPL-1.2. If part of a tool's output looks copied from an existing project, find the source and treat it as a [third-party component](THIRD-PARTY-LICENSES.md#adding-a-third-party-component), or write that part yourself.
+- **Nothing confidential goes into the tool.** Do not give an external AI service personal data, secrets or credentials, moderator or magic links, logs of a real installation, or information of a public body that is not public. Reduce a case to placeholders before you ask a tool about it, as you would before opening a public issue.
+- **Generated reports are verified first.** Issues, pull requests and vulnerability reports produced by a tool and not checked by a person against the code are closed without discussion.

@@ -62,6 +62,7 @@ Report the vulnerability privately, through one of these channels:
   Each of these credentials is described in [docs/architecture/identity-and-access.md](docs/architecture/identity-and-access.md).
 - **Steps to reproduce.** Give the steps or a proof of concept.
 - **Impact.** Say what the attacker gains (data, privileges or availability) and who is affected.
+- **A reproduction you ran.** A report produced by an automated or AI tool is considered only when a person has reproduced it on a [supported version](#supported-versions); unverified reports are closed.
 - **Optional.** Suggest a fix if you have one.
 
 ### Testing responsibly
