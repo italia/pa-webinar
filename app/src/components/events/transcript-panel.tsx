@@ -628,7 +628,7 @@ export default function TranscriptPanel({
                 <a
                   role="menuitem"
                   className="postprod-download__item"
-                  href={`/api/events/${eventSlug}/postprod/download/transcript.txt?lang=${downloadLang}`}
+                  href={`/api/events/${encodeURIComponent(eventSlug)}/postprod/download/transcript.txt?lang=${encodeURIComponent(downloadLang)}`}
                   download
                   onClick={() => setShowDownload(false)}
                 >
@@ -637,7 +637,7 @@ export default function TranscriptPanel({
                 <a
                   role="menuitem"
                   className="postprod-download__item"
-                  href={`/api/events/${eventSlug}/postprod/download/transcript.srt?lang=${downloadLang}`}
+                  href={`/api/events/${encodeURIComponent(eventSlug)}/postprod/download/transcript.srt?lang=${encodeURIComponent(downloadLang)}`}
                   download
                   onClick={() => setShowDownload(false)}
                 >
@@ -649,7 +649,7 @@ export default function TranscriptPanel({
                   <a
                     role="menuitem"
                     className="postprod-download__item"
-                    href={`/api/events/${eventSlug}/postprod/subtitle/${downloadLang}`}
+                    href={`/api/events/${encodeURIComponent(eventSlug)}/postprod/subtitle/${encodeURIComponent(downloadLang)}`}
                     download={`subtitles.${downloadLang}.vtt`}
                     onClick={() => setShowDownload(false)}
                   >
@@ -660,7 +660,7 @@ export default function TranscriptPanel({
                   <a
                     role="menuitem"
                     className="postprod-download__item"
-                    href={`/api/events/${eventSlug}/postprod/download/summary.md?lang=${summaryLang}`}
+                    href={`/api/events/${encodeURIComponent(eventSlug)}/postprod/download/summary.md?lang=${encodeURIComponent(summaryLang)}`}
                     download
                     onClick={() => setShowDownload(false)}
                   >

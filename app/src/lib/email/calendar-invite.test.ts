@@ -50,8 +50,8 @@ const enqueue = enqueueEmailOnce as unknown as ReturnType<typeof vi.fn>;
 const enqueueSenzaChiave = enqueueEmail as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '0e5c3a9e-4b1d-4c7e-9f2a-6d8b1c3e5f70';
-const PRIMARY_TOKEN = '7b2f9c1e-3a4d-4e5f-8a6b-9c0d1e2f3a4b';
-const GRANT_TOKEN = '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f';
+const PRIMARY_TOKEN = '00000000-0000-4000-8000-000000000001';
+const GRANT_TOKEN = '00000000-0000-4000-8000-000000000002';
 const UPDATED = new Date('2027-02-01T08:00:00Z');
 const STARTS = new Date(Date.now() + 86_400_000);
 const ENDS = new Date(Date.now() + 90_000_000);
