@@ -97,7 +97,7 @@ Target **`dev`**. It is the integration branch, and every change enters the proj
 
 The project uses [Conventional Commits](https://www.conventionalcommits.org/) with a scope: `type(scope): subject`, then a body that says what changes, why, and how it was verified. The list of types, the scope and subject rules and a body template are in [Commits](docs/development/methodology.md#commits). Three rules matter most to an outside contributor:
 
-- **Language.** Write commit messages and the pull-request title in Italian, the language of the existing history. Never mix languages within a single message.
+- **Language.** Write commit messages and the pull-request title in English. The earlier history is in Italian and is not rewritten. Never mix languages within a single message.
 - **No attribution trailers or signature footers** (such as `Co-authored-by:`). Authorship is recorded by Git itself.
 - **Describe the product and its behavior**, not how the change was produced or which event prompted it.
 
