@@ -55,7 +55,7 @@ webvtt-py==0.5.1
 # la linea 5.x chiede huggingface-hub >= 1.5, che accetta solo `token=` (mai
 # `use_auth_token=`).
 transformers==5.19.0
-huggingface-hub==2.2.0
+huggingface-hub==2.3.0
 
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
