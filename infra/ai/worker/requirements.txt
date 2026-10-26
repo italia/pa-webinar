@@ -40,7 +40,7 @@ faster-whisper==1.2.1
 # CTranslate2 dalla 4.6.3 non chiede piu' cuDNN (le wheel sono costruite
 # senza): il backend di faster-whisper usa solo cuBLAS 12.
 ctranslate2==4.8.3
-nltk==3.10.3
+nltk==3.10.4
 omegaconf==2.4.0
 pandas==2.3.3
 

@@ -11,7 +11,7 @@ numpy>=2.1,<3
 # carica l'allineamento di WhisperX. Stessa versione di requirements.txt: dalla
 # 3.10.4 NLTK scrive i parametri solo sotto i percorsi di nltk.data.path, e la
 # prova deve girare con la versione che genera i file nell'immagine.
-nltk==3.10.3
+nltk==3.10.4
 httpx==0.28.1
 pydantic==2.9.2
 pytest
