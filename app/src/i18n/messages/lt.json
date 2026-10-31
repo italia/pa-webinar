@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Salės funkcijos",
         "aiPipelineOff": "DI pogamyba (transkripcija, santrauka, vertimai) šiame diegime neįjungta.",
         "rolesHeading": "Renginio vaidmenys",
-        "roleModeratorColumn": "Organizatorius ir moderatorius",
+        "roleModeratorColumn": "Bendraorganizatorius ir moderatorius",
         "roleInfo": {
           "organizer": {
-            "name": "Organizatorius",
-            "desc": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Pagrindinis organizatorius prideda ir pašalina kitus asmenis. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį."
+            "name": "Bendraorganizatorius",
+            "desc": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, taip pat valdo renginį."
           },
           "moderator": {
             "name": "Moderatorius",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Dalyvis",
-            "desc": "Stebi renginį ir dalyvauja taip, kaip nuspręsite toliau esančioje lentelėje."
+            "desc": "Stebi renginį ir dalyvauja taip, kaip nuspręsite žingsnyje „Leidimai“."
           }
         },
         "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC."
@@ -960,23 +960,23 @@
         "remove": "Pašalinti",
         "invalidEmail": "Neteisingas el. pašto adresas.",
         "duplicateEmail": "Adresas jau pridėtas.",
-        "rubricaPick": "Ieškoti adresų knygoje…",
+        "rubricaPick": "Ieškoti adresų knygoje pagal organizaciją…",
         "rubricaOrAdd": "arba pridėti rankiniu būdu",
         "removeItem": "Pašalinti {name}",
         "invitationsStaffOnly": "Kvietimus tvarko renginio komanda.",
         "pickSkipped": "Kai kurie asmenys jau buvo sąraše arba neturėjo galiojančio adreso, todėl nebuvo pridėti.",
-        "primaryHeading": "Pagrindinis organizatorius",
+        "primaryHeading": "Pagrindinis moderatorius",
         "primaryHelp": "El. paštu gauna pagrindinę renginio nuorodą: veda kambarį ir prideda ar pašalina kitus asmenis. Vardas ir el. paštas reikalingi paskelbti, ne juodraščiui.",
-        "primaryPrefilled": "Pagrindinis organizatorius esate jūs, su savo paskyros vardu ir el. paštu. Jei renginį veda kitas asmuo, čia įrašykite jo duomenis: nuoroda bus išsiųsta jam.",
-        "primaryNameRequired": "Įveskite pagrindinio organizatoriaus vardą.",
-        "primaryEmailRequired": "Įveskite galiojantį pagrindinio organizatoriaus el. paštą.",
+        "primaryPrefilled": "Pagrindinis moderatorius esate jūs, su savo paskyros vardu ir el. paštu. Jei renginį veda kitas asmuo, įrašykite čia jo duomenis: nuoroda bus išsiųsta jam.",
+        "primaryNameRequired": "Įveskite pagrindinio moderatoriaus vardą.",
+        "primaryEmailRequired": "Įveskite galiojantį pagrindinio moderatoriaus el. paštą.",
         "linksOnPublish": "Asmeninės nuorodos išsiunčiamos el. paštu paskelbus; kol renginys yra juodraštis, nukopijuokite jas iš jo puslapio.",
         "personName": "Vardas",
         "personEmail": "El. paštas",
-        "peopleHeading": "Renginio asmenys",
-        "peopleHelp": "Organizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą prisijungti su savo vaidmeniu; ką gali kiekvienas vaidmuo, rodo skiltis „Išplėstiniai nustatymai“.",
+        "peopleHeading": "Moderatoriai ir pranešėjai",
+        "peopleHelp": "Bendraorganizatoriai, moderatoriai ir pranešėjai. Kiekvienas gauna savo nuorodą įeiti su savo vaidmeniu; ką gali kiekvienas vaidmuo, paaiškinta aukščiau.",
         "personRole": "Vaidmuo",
-        "roleOrganizer": "Organizatorius",
+        "roleOrganizer": "Bendraorganizatorius",
         "roleModerator": "Moderatorius",
         "roleSpeaker": "Pranešėjas",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Numatytos minutės, tema {n}",
         "programTimeUnknown": "Laikas neapskaičiuotas: ankstesnė tema neturi trukmės",
         "programNone": "Niekas",
-        "programLeadOrganizer": "Pagrindinis organizatorius",
+        "programLeadOrganizer": "Pagrindinis moderatorius",
         "programMoveUp": "Perkelti {n} temą aukštyn",
         "programMoveDown": "Perkelti {n} temą žemyn",
         "programRemove": "Pašalinti {n} temą",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Redaguoti",
         "editQuestionsBefore": "Redaguoti registracijos klausimus",
         "editQuestionsAfter": "Redaguoti pasitenkinimo apklausą",
-        "accessStaffOnly": "Kas gali registruotis, sprendžia renginio komanda."
+        "accessStaffOnly": "Kas gali registruotis, sprendžia renginio komanda.",
+        "whoOrganizes": "Kas organizuoja",
+        "rubricaWho": "Adresų knygoje yra žmonės, kurie užsiregistravo į renginį ir sutiko joje likti."
       },
       "step4": {
         "heading": "Turinys ir medžiaga",
@@ -1124,9 +1126,9 @@
           "multitrack": "Atskirų dalyvių įrašymas",
           "multitrackOn": "Įjungta – registruojantis būtinas aiškus sutikimas",
           "organizingEntities": "Organizuojančios institucijos",
-          "primaryOrganizer": "Pagrindinis organizatorius",
+          "primaryOrganizer": "Pagrindinis moderatorius",
           "primaryMissing": "Norodykite žingsnyje „Asmenys“, kad paskelbtumėte",
-          "organizersPeople": "Kiti organizatoriai",
+          "organizersPeople": "Bendraorganizatoriai",
           "moderators": "Moderatoriai",
           "programme": "Programa: {count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}",
           "programmeWithDuration": "Programa: {count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Žmonės",
           "programme": "Programa",
           "review": "Santrauka",
-          "advanced": "Išplėstiniai nustatymai"
+          "advanced": "Išplėstiniai nustatymai",
+          "permissions": "Leidimai"
         },
         "templateInUse": "Šablonas: <b>{name}</b>",
         "noTemplate": "Renginys be šablono",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Reikia renginiui paskelbti.",
         "toComplete": "Reikia užpildyti",
         "missingHeading": "Kad paskelbtumėte, dar trūksta:",
-        "fieldOrganizerName": "Pagrindinio organizatoriaus vardas",
-        "fieldOrganizerEmail": "Pagrindinio organizatoriaus el. paštas",
+        "fieldOrganizerName": "Pagrindinio moderatoriaus vardas",
+        "fieldOrganizerEmail": "Pagrindinio moderatoriaus el. paštas",
         "fieldProgrammeMinutes": "Programos {n} temos trukmė",
         "sections": {
-          "participation": "Dalyvavimas ir salės funkcijos",
           "recording": "Įrašas ir DI",
           "content": "Turinys: medžiaga ir klausimynai",
           "room": "Laukiamasis ir vaizdas",
@@ -1229,7 +1231,9 @@
         "askEmail": "el. paštas",
         "askOrganization": "organizacija",
         "askRole": "pareigos",
-        "askType": "organizacijos tipas"
+        "askType": "organizacijos tipas",
+        "permissionsHeading": "Kas ką gali daryti kambaryje",
+        "permissionsIntro": "Ką gali daryti dalyviai ir kurios kambario funkcijos įjungtos. Viską galima keisti ir renginio metu."
       },
       "preview": {
         "title": "Puslapio peržiūra",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Susitikimo programa",
-        "intro": "Temos eilės tvarka: kas kalba, apie ką ir kiek laiko. Jos rodomos po aprašymu, su laikais, skaičiuojamais nuo pradžios ({start}). Neprivaloma.",
-        "introNoStart": "Temos eilės tvarka: kas kalba, apie ką ir kiek laiko. Jos rodomos po aprašymu, su laikais, skaičiuojamais nuo renginio pradžios. Neprivaloma.",
+        "intro": "Temos eilės tvarka: kas kalba, apie ką ir kiek laiko. Jos rodomos po aprašymu, su laikais, skaičiuojamais nuo pradžios ({start}).",
+        "introNoStart": "Temos eilės tvarka: kas kalba, apie ką ir kiek laiko. Jos rodomos po aprašymu, su laikais, skaičiuojamais nuo renginio pradžios.",
         "statusOn": "Rodoma renginio puslapyje, o kambaryje visiems rodo dabartinę temą.",
         "statusOff": "Išjungta: programa nerodoma nei puslapyje, nei kambaryje.",
         "turnOn": "Įjungti",

@@ -231,8 +231,9 @@ editable, and an event keeps no link to the template it came from.
 [From creation to recap](architecture/event-journey.md#templates)
 
 **Event wizard**: the form that creates or edits an event, after four
-questions on its format: five steps (**Event**, **When**, **People**,
-**Programme**, optional and not for instant calls, and **Summary**) and the
+questions on its format: six steps (**Event**, **When**, **People**,
+**Programme**, optional and not for instant calls, **Permissions** and
+**Summary**) and the
 **Advanced settings** with what the format or template has already chosen.
 [From creation to recap](architecture/event-journey.md)
 
@@ -277,7 +278,7 @@ can link an occurrence to the first event of its series through
 `recurrenceSeriesId`; the administration UI does not set this link.
 [From creation to recap](architecture/event-journey.md)
 
-**Permission matrix** (`permissionMatrix`, wizard advanced settings, section **Participation and room features**): the
+**Permission matrix** (`permissionMatrix`, wizard step **Permissions**): the
 role-by-feature table (chat, Q&A, microphone, camera, screen share, recording
 control) for `GUEST` (the audience), `SPEAKER` and `MODERATOR`. Only the
 `GUEST` column is chosen and applied: moderators can always do everything,

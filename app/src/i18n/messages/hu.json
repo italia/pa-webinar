@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "A terem funkciói",
         "aiPipelineOff": "Az AI-utómunka (átirat, összefoglaló, fordítások) nincs bekapcsolva ezen a telepítésen.",
         "rolesHeading": "Az esemény szerepei",
-        "roleModeratorColumn": "Szervező és moderátor",
+        "roleModeratorColumn": "Társszervező és moderátor",
         "roleInfo": {
           "organizer": {
-            "name": "Szervező",
-            "desc": "Moderátorként vezeti a termet, és a szervezők között szerepel. A fő szervező hozzáadja és eltávolítja a többi személyt. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli."
+            "name": "Társszervező",
+            "desc": "Moderátorként vezeti a termet, és a szervezők között jelenik meg. Ugyanazzal az e-mail-címmel rendelkező munkatársi fiókkal az eseményt is kezeli."
           },
           "moderator": {
             "name": "Moderátor",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Résztvevő",
-            "desc": "Követi az eseményt, és úgy vesz részt, ahogy az alábbi táblázatban dönt."
+            "desc": "Követi az eseményt, és úgy vesz részt, ahogy az „Engedélyek” lépésben eldönti."
           }
         },
         "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal."
@@ -960,23 +960,23 @@
         "remove": "Eltávolítás",
         "invalidEmail": "Érvénytelen e-mail cím.",
         "duplicateEmail": "Az e-mail cím már szerepel.",
-        "rubricaPick": "Keresés a címjegyzékben…",
+        "rubricaPick": "Keresés a címjegyzékben szervezet szerint…",
         "rubricaOrAdd": "vagy adja hozzá kézzel",
         "removeItem": "{name} eltávolítása",
         "invitationsStaffOnly": "A meghívókat az esemény munkatársai kezelik.",
         "pickSkipped": "Néhány személy már szerepelt a listán, vagy nem volt érvényes címe, ezért nem lett hozzáadva.",
-        "primaryHeading": "Fő szervező",
+        "primaryHeading": "Fő moderátor",
         "primaryHelp": "E-mailben megkapja az esemény fő hivatkozását: vezeti a termet, és hozzáadja vagy eltávolítja a többi személyt. A név és az e-mail a közzétételhez kell, a piszkozathoz nem.",
-        "primaryPrefilled": "A fő szervező Ön, a fiókja nevével és e-mail-címével. Ha az eseményt más vezeti, itt adja meg az adatait: a hivatkozást ő kapja meg.",
-        "primaryNameRequired": "Adja meg a fő szervező nevét.",
-        "primaryEmailRequired": "Adja meg a fő szervező érvényes e-mail-címét.",
+        "primaryPrefilled": "A fő moderátor Ön, a fiókja nevével és e-mail-címével. Ha az eseményt más vezeti, itt adja meg az adatait: a hivatkozás neki megy.",
+        "primaryNameRequired": "Adja meg a fő moderátor nevét.",
+        "primaryEmailRequired": "Adja meg a fő moderátor érvényes e-mail-címét.",
         "linksOnPublish": "A személyes hivatkozásokat közzétételkor e-mailben küldjük; amíg az esemény piszkozat, másolja ki őket az oldaláról.",
         "personName": "Név",
         "personEmail": "E-mail",
-        "peopleHeading": "Az esemény személyei",
-        "peopleHelp": "Szervezők, moderátorok és előadók. Mindenki saját hivatkozást kap, hogy a szerepével lépjen be; hogy melyik szerep mit tehet, a „Speciális beállítások” rész mutatja.",
+        "peopleHeading": "Moderátorok és előadók",
+        "peopleHelp": "Társszervezők, moderátorok és előadók. Mindenki saját hivatkozást kap, hogy a szerepével lépjen be; hogy melyik szerep mit tehet, fent olvasható.",
         "personRole": "Szerep",
-        "roleOrganizer": "Szervező",
+        "roleOrganizer": "Társszervező",
         "roleModerator": "Moderátor",
         "roleSpeaker": "Előadó",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Tervezett perc, {n}. téma",
         "programTimeUnknown": "Az időpont nincs kiszámítva: egy korábbi témának nincs időtartama",
         "programNone": "Senki",
-        "programLeadOrganizer": "Fő szervező",
+        "programLeadOrganizer": "Fő moderátor",
         "programMoveUp": "A(z) {n}. téma feljebb",
         "programMoveDown": "A(z) {n}. téma lejjebb",
         "programRemove": "A(z) {n}. téma eltávolítása",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Szerkesztés",
         "editQuestionsBefore": "Szerkesztés: a jelentkezési kérdések",
         "editQuestionsAfter": "Szerkesztés: elégedettségi kérdőív",
-        "accessStaffOnly": "Hogy ki regisztrálhat, arról az esemény csapata dönt."
+        "accessStaffOnly": "Hogy ki regisztrálhat, arról az esemény csapata dönt.",
+        "whoOrganizes": "Ki szervezi",
+        "rubricaWho": "A címjegyzékben azok szerepelnek, akik regisztráltak egy eseményre, és beleegyeztek, hogy benne maradjanak."
       },
       "step4": {
         "heading": "Tartalmak és anyagok",
@@ -1124,9 +1126,9 @@
           "multitrack": "Résztvevőnkénti felvétel",
           "multitrackOn": "Bekapcsolva – kifejezett hozzájárulást igényel a regisztrációkor",
           "organizingEntities": "Szervező intézmények",
-          "primaryOrganizer": "Fő szervező",
+          "primaryOrganizer": "Fő moderátor",
           "primaryMissing": "A közzétételhez meg kell adni a „Személyek” lépésben",
-          "organizersPeople": "További szervezők",
+          "organizersPeople": "Társszervezők",
           "moderators": "Moderátorok",
           "programme": "Program: {count, plural, one {# téma} other {# téma}}",
           "programmeWithDuration": "Program: {count, plural, one {# téma} other {# téma}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Személyek",
           "programme": "Program",
           "review": "Összegzés",
-          "advanced": "Speciális beállítások"
+          "advanced": "Speciális beállítások",
+          "permissions": "Engedélyek"
         },
         "templateInUse": "Sablon: <b>{name}</b>",
         "noTemplate": "Esemény sablon nélkül",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Az esemény közzétételéhez szükséges.",
         "toComplete": "Kitöltendő",
         "missingHeading": "A közzétételhez még hiányzik:",
-        "fieldOrganizerName": "A fő szervező neve",
-        "fieldOrganizerEmail": "A fő szervező e-mail-címe",
+        "fieldOrganizerName": "A fő moderátor neve",
+        "fieldOrganizerEmail": "A fő moderátor e-mail-címe",
         "fieldProgrammeMinutes": "A program {n}. témájának időtartama",
         "sections": {
-          "participation": "Részvétel és a terem funkciói",
           "recording": "Felvétel és MI",
           "content": "Tartalmak: anyagok és kérdőívek",
           "room": "Váróterem és videó",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "szervezet",
         "askRole": "beosztás",
-        "askType": "szervezet típusa"
+        "askType": "szervezet típusa",
+        "permissionsHeading": "Ki mit tehet a teremben",
+        "permissionsIntro": "Mit tehetnek a résztvevők, és mely termi funkciók vannak bekapcsolva. Minden az esemény közben is módosítható."
       },
       "preview": {
         "title": "Az oldal előnézete",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "A találkozó programja",
-        "intro": "A témák sorrendben: ki beszél, miről és mennyi ideig. A leírás alatt jelennek meg, a kezdéstől ({start}) számított időpontokkal. Nem kötelező.",
-        "introNoStart": "A témák sorrendben: ki beszél, miről és mennyi ideig. A leírás alatt jelennek meg, az esemény kezdetétől számított időpontokkal. Nem kötelező.",
+        "intro": "A témák sorrendben: ki beszél, miről és mennyi ideig. A leírás alatt jelennek meg, a kezdéstől ({start}) számított időpontokkal.",
+        "introNoStart": "A témák sorrendben: ki beszél, miről és mennyi ideig. A leírás alatt jelennek meg, az esemény kezdetétől számított időpontokkal.",
         "statusOn": "Megjelenik az esemény oldalán, a teremben pedig mindenkinek mutatja az aktuális témát.",
         "statusOff": "Kikapcsolva: a program nem jelenik meg sem az oldalon, sem a teremben.",
         "turnOn": "Bekapcsolás",

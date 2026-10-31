@@ -85,12 +85,13 @@ function RubricaPickerInner(props: RubricaPickerProps) {
     const mine = ++reqCounter.current;
     setLoading(true);
     try {
-      // Admin picker includes opted-out persons — the admin rubrica may
-      // contain entries that have not (yet) opted in to the address book.
+      // Solo chi ha accettato di restare in rubrica (chi ha revocato il
+      // consenso non si propone), con l'email dell'ultima iscrizione: senza,
+      // la persona non si potrebbe aggiungere all'evento.
       const qs = new URLSearchParams({
         q,
         limit: String(RESULT_LIMIT),
-        includeOpted: 'out',
+        withEmail: '1',
       });
       const res = await fetch(`/api/admin/rubrica?${qs.toString()}`, {
         cache: 'no-store',

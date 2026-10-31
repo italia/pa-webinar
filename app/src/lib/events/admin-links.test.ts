@@ -12,9 +12,10 @@ describe('eventAdminPath', () => {
   });
 
   it('opens the edit wizard on a given step', () => {
-    expect(eventAdminPath(ID, { edit: true, step: 'advanced', section: 'participation' })).toBe(
-      `/admin/events/${ID}/edit?step=advanced&section=participation`,
+    expect(eventAdminPath(ID, { edit: true, step: 'advanced', section: 'data' })).toBe(
+      `/admin/events/${ID}/edit?step=advanced&section=data`,
     );
+    expect(eventAdminPath(ID, { edit: true, step: 'permissions' })).toBe(`/admin/events/${ID}/edit?step=permissions`);
     // La sezione vale solo per le impostazioni avanzate.
     expect(eventAdminPath(ID, { edit: true, step: 'schedule', section: 'data' })).toBe(
       `/admin/events/${ID}/edit?step=schedule`,

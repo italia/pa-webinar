@@ -111,12 +111,13 @@ function goToStep(label: 'base' | 'invites' | 'review' | 'permissions' | 'conten
     click(b);
   };
   const sezione: Record<string, string> = {
-    permissions: 'participation',
     content: 'content',
+    recording: 'recording',
   };
   const passo: Record<string, string> = {
     base: w.flow.steps.base,
     invites: w.flow.steps.invites,
+    permissions: w.flow.steps.permissions,
     review: w.flow.steps.review,
   };
   const s = sezione[label];
@@ -395,9 +396,8 @@ describe('modifica — salvataggio da un passo intermedio', () => {
     const attivo = container.querySelector(
       `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
     );
-    // Le impostazioni avanzate, con la sezione chiesta aperta.
-    expect(attivo?.textContent).toContain(w.flow.steps.advanced);
-    expect(container.querySelector<HTMLDetailsElement>('#wiz-avanzate-participation')?.open).toBe(true);
+    // Il passo «Permessi».
+    expect(attivo?.textContent).toContain(w.flow.steps.permissions);
     await press(button(w.updateEvent));
 
     const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
@@ -1590,7 +1590,7 @@ describe('creazione — i default del modello', () => {
   it('senza modello, accendere la registrazione accende anche trascrizione, sintesi, traduzione e tracce', async () => {
     renderWizard({ aiPipelineEnabled: true, defaultTargetLocales: 'en,de' });
     compila();
-    goToStep('permissions');
+    goToStep('recording');
     click(container.querySelector<HTMLElement>(`[aria-label="${messages.admin.form.recordingEnabled}"]`)!);
     // L'avvio automatico non si offre piu'.
     expect(container.querySelector(`[aria-label="${messages.admin.form.autoStartRecording}"]`)).toBeNull();
@@ -1853,31 +1853,38 @@ describe('programma', () => {
     return b;
   };
 
-  it('un evento ha cinque passi, con il programma fra «Persone» e il riepilogo', () => {
+  it('un evento ha sei passi: il programma dopo «Persone», i permessi prima del riepilogo', () => {
     renderWizard();
     expect(passi()).toEqual([
       w.flow.steps.base,
       w.flow.steps.schedule,
       w.flow.steps.invites,
       w.flow.steps.programme,
+      w.flow.steps.permissions,
       w.flow.steps.review,
     ]);
   });
 
-  it('una chiamata istantanea ne ha quattro, e il programma chiesto per indirizzo apre «Persone»', () => {
+  it('una chiamata istantanea non ha il programma, e il programma chiesto per indirizzo apre «Persone»', () => {
     renderWizard({
       mode: 'edit',
       initialEvent: { ...structuredClone(ATTIVA), event: { ...structuredClone(ATTIVA.event), eventType: 'INSTANT' } },
       initialStep: 'programme',
     });
-    expect(passi()).toEqual([w.flow.steps.base, w.flow.steps.schedule, w.flow.steps.invites, w.flow.steps.review]);
+    expect(passi()).toEqual([
+      w.flow.steps.base,
+      w.flow.steps.schedule,
+      w.flow.steps.invites,
+      w.flow.steps.permissions,
+      w.flow.steps.review,
+    ]);
     expect(passoAttivo()).toContain(w.flow.steps.invites);
     expect(container.textContent).not.toContain(tp.peoplePointer);
     goToStep('base');
     expect(container.querySelector('.wizard-programma-scheda')).toBeNull();
   });
 
-  it('«Avanti» va da «Persone» al programma, e dal programma al riepilogo; in «Persone» lo si dice', () => {
+  it('«Avanti» va da «Persone» al programma, poi ai permessi e al riepilogo; in «Persone» lo si dice', () => {
     compilaEvento();
     expect(container.textContent).toContain(tp.peoplePointer);
     // Il programma non e' piu' nel passo «Persone».
@@ -1888,9 +1895,11 @@ describe('programma', () => {
     // Accanto, l'anteprima della pagina.
     expect(container.querySelector('.anteprima-pagina')).not.toBeNull();
     click(avanti());
+    expect(passoAttivo()).toContain(w.flow.steps.permissions);
+    click(avanti());
     expect(passoAttivo()).toContain(w.flow.steps.review);
     click(button(`← ${messages.common.back}`));
-    expect(passoAttivo()).toContain(w.flow.steps.programme);
+    expect(passoAttivo()).toContain(w.flow.steps.permissions);
   });
 
   it('agenda spenta: lo dice; «Accendi» prepara il primo argomento, che prende il fuoco', () => {
@@ -1902,7 +1911,7 @@ describe('programma', () => {
     expect(document.activeElement).toBe(titolo);
     // Chi interviene: nessuno, l'organizzatore principale e le persone del passo.
     const opzioni = Array.from(byId<HTMLSelectElement>('wiz-programma-0-chi').options).map((o) => o.text);
-    expect(opzioni).toEqual([sp.programNone, 'Mario Rossi (Organizzatore)', 'Relatore 1 (Relatore)']);
+    expect(opzioni).toEqual([sp.programNone, 'Mario Rossi (Co-organizzatore)', 'Relatore 1 (Relatore)']);
   });
 
   it('creazione: il programma parte dopo le persone, con la concessione appena creata', async () => {

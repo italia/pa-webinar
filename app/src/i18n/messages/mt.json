@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funzjonijiet tal-kamra",
         "aiPipelineOff": "Il-post-produzzjoni AI (traskrizzjoni, sommarju, traduzzjonijiet) mhijiex attiva f'din l-installazzjoni.",
         "rolesHeading": "Ir-rwoli tal-avveniment",
-        "roleModeratorColumn": "Organizzatur u moderatur",
+        "roleModeratorColumn": "Ko-organizzatur u moderatur",
         "roleInfo": {
           "organizer": {
-            "name": "Organizzatur",
-            "desc": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. L-organizzatur ewlieni jżid u jneħħi lill-persuni l-oħra. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment."
+            "name": "Ko-organizzatur",
+            "desc": "Jmexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment."
           },
           "moderator": {
             "name": "Moderatur",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Parteċipant",
-            "desc": "Isegwi l-avveniment u jipparteċipa kif tiddeċiedi fit-tabella hawn taħt."
+            "desc": "Isegwi l-avveniment u jieħu sehem kif tiddeċiedi fil-pass «Permessi»."
           }
         },
         "recordingManualNote": "Ir-reġistrazzjoni qatt ma tibda waħedha: moderatur jibdiha bil-buttuna REC."
@@ -960,23 +960,23 @@
         "remove": "Neħħi",
         "invalidEmail": "Indirizz email mhux validu.",
         "duplicateEmail": "L-indirizz diġà jeżisti.",
-        "rubricaPick": "Fittex mid-direttorju…",
+        "rubricaPick": "Fittex fir-rubrika skont l-organizzazzjoni…",
         "rubricaOrAdd": "jew żid manwalment",
         "removeItem": "Neħħi {name}",
         "invitationsStaffOnly": "L-istediniet jimmaniġġjahom l-istaff tal-avveniment.",
         "pickSkipped": "Xi persuni kienu diġà fil-lista jew ma kellhomx indirizz validu, u ma żdidux.",
-        "primaryHeading": "Organizzatur ewlieni",
+        "primaryHeading": "Moderatur ewlieni",
         "primaryHelp": "Jirċievi bl-email il-link ewlieni tal-avveniment: imexxi l-kamra u jżid jew ineħħi lill-persuni l-oħra. L-isem u l-email huma meħtieġa biex tippubblika, mhux għal abbozz.",
-        "primaryPrefilled": "L-organizzatur ewlieni int, bl-isem u l-email tal-kont tiegħek. Jekk persuna oħra tmexxi l-avveniment, daħħal id-dettalji tagħha hawn: il-link jasal għandha.",
-        "primaryNameRequired": "Daħħal l-isem tal-organizzatur ewlieni.",
-        "primaryEmailRequired": "Daħħal email validu tal-organizzatur ewlieni.",
+        "primaryPrefilled": "Il-moderatur ewlieni int, bl-isem u l-email tal-kont tiegħek. Jekk l-avveniment imexxih ħaddieħor, ikteb hawn id-dettalji tiegħu: il-link jasal għandu.",
+        "primaryNameRequired": "Daħħal l-isem tal-moderatur ewlieni.",
+        "primaryEmailRequired": "Daħħal email validu tal-moderatur ewlieni.",
         "linksOnPublish": "Il-links personali jintbagħtu bl-email meta l-avveniment jiġi ppubblikat; sakemm ikun abbozz, ikkopjahom mill-paġna tiegħu.",
         "personName": "Isem",
         "personEmail": "Email",
-        "peopleHeading": "Persuni tal-avveniment",
-        "peopleHelp": "Organizzaturi, moderaturi u kelliema. Kull wieħed jirċievi l-link tiegħu biex jidħol bir-rwol tiegħu; x'jista' jagħmel kull rwol jidher fis-“Settings avvanzati”.",
+        "peopleHeading": "Moderaturi u kelliema",
+        "peopleHelp": "Ko-organizzaturi, moderaturi u kelliema. Kull wieħed jirċievi l-link tiegħu biex jidħol bir-rwol tiegħu; x'jista' jagħmel kull rwol hu spjegat hawn fuq.",
         "personRole": "Rwol",
-        "roleOrganizer": "Organizzatur",
+        "roleOrganizer": "Ko-organizzatur",
         "roleModerator": "Moderatur",
         "roleSpeaker": "Kelliem",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Minuti ppjanati, suġġett {n}",
         "programTimeUnknown": "Il-ħin ma ġiex ikkalkulat: suġġett ta' qabel m'għandux tul",
         "programNone": "Ħadd",
-        "programLeadOrganizer": "Organizzatur prinċipali",
+        "programLeadOrganizer": "Moderatur ewlieni",
         "programMoveUp": "Ċaqlaq is-suġġett {n} 'il fuq",
         "programMoveDown": "Ċaqlaq is-suġġett {n} 'l isfel",
         "programRemove": "Neħħi s-suġġett {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Editja",
         "editQuestionsBefore": "Editja l-mistoqsijiet tar-reġistrazzjoni",
         "editQuestionsAfter": "Editja l-kwestjonarju ta' sodisfazzjon",
-        "accessStaffOnly": "Min jirreġistra jiddeċiedih it-tim tal-avveniment."
+        "accessStaffOnly": "Min jirreġistra jiddeċiedih it-tim tal-avveniment.",
+        "whoOrganizes": "Min jorganizza",
+        "rubricaWho": "Fir-rubrika hemm in-nies li rreġistraw għal avveniment u qablu li jibqgħu fiha."
       },
       "step4": {
         "heading": "Kontenut u materjali",
@@ -1124,9 +1126,9 @@
           "multitrack": "Reġistrazzjoni għal kull parteċipant",
           "multitrackOn": "Attiva — teħtieġ kunsens espliċitu mar-reġistrazzjoni",
           "organizingEntities": "Entitajiet organizzaturi",
-          "primaryOrganizer": "Organizzatur ewlieni",
+          "primaryOrganizer": "Moderatur ewlieni",
           "primaryMissing": "Irid jiġi ssettjat fil-pass “Persuni” biex tippubblika",
-          "organizersPeople": "Organizzaturi oħra",
+          "organizersPeople": "Ko-organizzaturi",
           "moderators": "Moderaturi",
           "programme": "Programm: {count, plural, one {# suġġett} other {# suġġetti}}",
           "programmeWithDuration": "Programm: {count, plural, one {# suġġett} other {# suġġetti}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Persuni",
           "programme": "Programm",
           "review": "Sommarju",
-          "advanced": "Settings avvanzati"
+          "advanced": "Settings avvanzati",
+          "permissions": "Permessi"
         },
         "templateInUse": "Mudell: <b>{name}</b>",
         "noTemplate": "Avveniment mingħajr mudell",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Meħtieġ biex jiġi ppubblikat l-avveniment.",
         "toComplete": "Biex jitlesta",
         "missingHeading": "Biex tippubblika għadu nieqes:",
-        "fieldOrganizerName": "Isem l-organizzatur ewlieni",
-        "fieldOrganizerEmail": "Email tal-organizzatur ewlieni",
+        "fieldOrganizerName": "Isem il-moderatur ewlieni",
+        "fieldOrganizerEmail": "Email tal-moderatur ewlieni",
         "fieldProgrammeMinutes": "Tul tas-suġġett {n} tal-programm",
         "sections": {
-          "participation": "Parteċipazzjoni u funzjonijiet tas-sala",
           "recording": "Reġistrazzjoni u IA",
           "content": "Kontenut: materjali u kwestjonarji",
           "room": "Kamra tal-istennija u vidjo",
@@ -1229,7 +1231,9 @@
         "askEmail": "email",
         "askOrganization": "organizzazzjoni",
         "askRole": "rwol",
-        "askType": "tip ta' organizzazzjoni"
+        "askType": "tip ta' organizzazzjoni",
+        "permissionsHeading": "Min jista' jagħmel xiex fil-kamra",
+        "permissionsIntro": "X'jistgħu jagħmlu l-parteċipanti u liema funzjonijiet tal-kamra huma mixgħula. Kollox jista' jinbidel ukoll waqt l-avveniment."
       },
       "preview": {
         "title": "Anteprima tal-paġna",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Il-programm tal-laqgħa",
-        "intro": "Is-suġġetti f'ordni: min jitkellem, dwar xiex u għal kemm żmien. Jidhru taħt id-deskrizzjoni, bil-ħinijiet ikkalkulati mill-bidu ({start}). Mhux obbligatorju.",
-        "introNoStart": "Is-suġġetti f'ordni: min jitkellem, dwar xiex u għal kemm żmien. Jidhru taħt id-deskrizzjoni, bil-ħinijiet ikkalkulati mill-bidu tal-avveniment. Mhux obbligatorju.",
+        "intro": "Is-suġġetti f'ordni: min jitkellem, dwar xiex u għal kemm żmien. Jidhru taħt id-deskrizzjoni, bil-ħinijiet ikkalkulati mill-bidu ({start}).",
+        "introNoStart": "Is-suġġetti f'ordni: min jitkellem, dwar xiex u għal kemm żmien. Jidhru taħt id-deskrizzjoni, bil-ħinijiet ikkalkulati mill-bidu tal-avveniment.",
         "statusOn": "Jidher fil-paġna tal-avveniment u fil-kamra juri lil kulħadd is-suġġett għaddej.",
         "statusOff": "Mitfi: il-programm ma jidhirx la fil-paġna u lanqas fil-kamra.",
         "turnOn": "Ixgħel",

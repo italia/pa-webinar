@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Ruumi funktsioonid",
         "aiPipelineOff": "AI järeltöötlus (transkriptsioon, kokkuvõte, tõlked) ei ole selles paigalduses sisse lülitatud.",
         "rolesHeading": "Ürituse rollid",
-        "roleModeratorColumn": "Korraldaja ja moderaator",
+        "roleModeratorColumn": "Kaaskorraldaja ja moderaator",
         "roleInfo": {
           "organizer": {
-            "name": "Korraldaja",
-            "desc": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Peakorraldaja lisab ja eemaldab teisi inimesi. Sama e-postiga töötajakontoga haldab ta ka üritust."
+            "name": "Kaaskorraldaja",
+            "desc": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Sama e-postiga töötajakontoga haldab ta ka sündmust."
           },
           "moderator": {
             "name": "Moderaator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Osaleja",
-            "desc": "Jälgib üritust ja osaleb nii, nagu allolevas tabelis otsustate."
+            "desc": "Jälgib sündmust ja osaleb nii, nagu otsustad sammus „Õigused“."
           }
         },
         "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga."
@@ -960,23 +960,23 @@
         "remove": "Eemalda",
         "invalidEmail": "E-posti aadress pole kehtiv.",
         "duplicateEmail": "Aadress on juba lisatud.",
-        "rubricaPick": "Otsi aadressraamatust…",
+        "rubricaPick": "Otsi aadressiraamatust organisatsiooni järgi…",
         "rubricaOrAdd": "või lisa käsitsi",
         "removeItem": "Eemalda {name}",
         "invitationsStaffOnly": "Kutseid haldab ürituse meeskond.",
         "pickSkipped": "Mõned inimesed olid juba loendis või neil polnud kehtivat aadressi ja neid ei lisatud.",
-        "primaryHeading": "Peakorraldaja",
+        "primaryHeading": "Peamoderaator",
         "primaryHelp": "Saab e-postiga ürituse peamise lingi: juhib ruumi ning lisab või eemaldab teisi inimesi. Nimi ja e-post on vajalikud avaldamiseks, mitte mustandi jaoks.",
-        "primaryPrefilled": "Peakorraldaja olete teie, oma konto nime ja e-postiga. Kui üritust juhib keegi teine, sisestage siia tema andmed: link läheb temale.",
-        "primaryNameRequired": "Sisestage peakorraldaja nimi.",
-        "primaryEmailRequired": "Sisestage peakorraldaja kehtiv e-post.",
+        "primaryPrefilled": "Peamoderaator oled sina, oma konto nime ja e-postiga. Kui sündmust juhib keegi teine, kirjuta siia tema andmed: link läheb talle.",
+        "primaryNameRequired": "Sisesta peamoderaatori nimi.",
+        "primaryEmailRequired": "Sisesta peamoderaatori kehtiv e-post.",
         "linksOnPublish": "Isiklikud lingid saadetakse e-postiga avaldamisel; kuni üritus on mustand, kopeerige need selle lehelt.",
         "personName": "Nimi",
         "personEmail": "E-post",
-        "peopleHeading": "Ürituse inimesed",
-        "peopleHelp": "Korraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rollis; mida iga roll teha saab, näitab jaotis „Täpsemad seaded“.",
+        "peopleHeading": "Moderaatorid ja esinejad",
+        "peopleHelp": "Kaaskorraldajad, moderaatorid ja esinejad. Igaüks saab oma lingi, et siseneda oma rolliga; mida iga roll teha saab, on selgitatud ülal.",
         "personRole": "Roll",
-        "roleOrganizer": "Korraldaja",
+        "roleOrganizer": "Kaaskorraldaja",
         "roleModerator": "Moderaator",
         "roleSpeaker": "Esineja",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planeeritud minutid, teema {n}",
         "programTimeUnknown": "Kellaaega ei arvutatud: eelneval teemal pole kestust",
         "programNone": "Mitte keegi",
-        "programLeadOrganizer": "Peakorraldaja",
+        "programLeadOrganizer": "Peamoderaator",
         "programMoveUp": "Liiguta teema {n} üles",
         "programMoveDown": "Liiguta teema {n} alla",
         "programRemove": "Eemalda teema {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Muuda",
         "editQuestionsBefore": "Muuda registreerimise küsimusi",
         "editQuestionsAfter": "Muuda rahuloluküsitlust",
-        "accessStaffOnly": "Kes registreeruda saavad, otsustab ürituse meeskond."
+        "accessStaffOnly": "Kes registreeruda saavad, otsustab ürituse meeskond.",
+        "whoOrganizes": "Kes korraldab",
+        "rubricaWho": "Aadressiraamatus on inimesed, kes registreerusid mõnele sündmusele ja nõustusid sinna jääma."
       },
       "step4": {
         "heading": "Sisu ja materjalid",
@@ -1124,9 +1126,9 @@
           "multitrack": "Osalejapõhine salvestamine",
           "multitrackOn": "Sees – nõuab registreerumisel selgesõnalist nõusolekut",
           "organizingEntities": "Korraldavad asutused",
-          "primaryOrganizer": "Peakorraldaja",
+          "primaryOrganizer": "Peamoderaator",
           "primaryMissing": "Avaldamiseks tuleb määrata sammus „Inimesed“",
-          "organizersPeople": "Teised korraldajad",
+          "organizersPeople": "Kaaskorraldajad",
           "moderators": "Moderaatorid",
           "programme": "Kava: {count, plural, one {# teema} other {# teemat}}",
           "programmeWithDuration": "Kava: {count, plural, one {# teema} other {# teemat}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Inimesed",
           "programme": "Kava",
           "review": "Kokkuvõte",
-          "advanced": "Täpsemad seaded"
+          "advanced": "Täpsemad seaded",
+          "permissions": "Õigused"
         },
         "templateInUse": "Mall: <b>{name}</b>",
         "noTemplate": "Üritus ilma mallita",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Vajalik ürituse avaldamiseks.",
         "toComplete": "Täitmata",
         "missingHeading": "Avaldamiseks on veel puudu:",
-        "fieldOrganizerName": "Peakorraldaja nimi",
-        "fieldOrganizerEmail": "Peakorraldaja e-post",
+        "fieldOrganizerName": "Peamoderaatori nimi",
+        "fieldOrganizerEmail": "Peamoderaatori e-post",
         "fieldProgrammeMinutes": "Kava teema {n} kestus",
         "sections": {
-          "participation": "Osalemine ja ruumi funktsioonid",
           "recording": "Salvestus ja tehisintellekt",
           "content": "Sisu: materjalid ja küsimustikud",
           "room": "Ooteruum ja video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-post",
         "askOrganization": "organisatsioon",
         "askRole": "roll",
-        "askType": "organisatsiooni liik"
+        "askType": "organisatsiooni liik",
+        "permissionsHeading": "Kes mida ruumis teha saab",
+        "permissionsIntro": "Mida osalejad teha saavad ja millised ruumi funktsioonid on sees. Kõike saab muuta ka sündmuse ajal."
       },
       "preview": {
         "title": "Lehe eelvaade",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Kohtumise kava",
-        "intro": "Teemad järjekorras: kes räägib, millest ja kui kaua. Need kuvatakse kirjelduse all, kellaajad arvutatakse algusest ({start}). Valikuline.",
-        "introNoStart": "Teemad järjekorras: kes räägib, millest ja kui kaua. Need kuvatakse kirjelduse all, kellaajad arvutatakse ürituse algusest. Valikuline.",
+        "intro": "Teemad järjekorras: kes räägib, millest ja kui kaua. Need kuvatakse kirjelduse all, kellaajad arvutatakse algusest ({start}).",
+        "introNoStart": "Teemad järjekorras: kes räägib, millest ja kui kaua. Need kuvatakse kirjelduse all, kellaajad arvutatakse ürituse algusest.",
         "statusOn": "Kuvatakse ürituse lehel ja ruumis näitab kõigile käimasolevat teemat.",
         "statusOff": "Väljas: kava ei kuvata ei lehel ega ruumis.",
         "turnOn": "Lülita sisse",

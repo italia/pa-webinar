@@ -154,25 +154,14 @@ export default function StepPermissions({
     (f) => f !== 'recording_control' || value.recordingEnabled,
   );
 
-  // Le due sezioni delle impostazioni avanzate: hanno il titolo nella
-  // sezione che le contiene.
+  // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)
+  // e una sezione delle impostazioni avanzate; il titolo lo mette chi le
+  // contiene.
   if (parte === 'partecipazione') {
     return (
       <div>
-      {/* I ruoli, dal più ampio: chi li ha lo decide il passo «Persone». */}
-      <section className="wizard-roles mb-4" aria-labelledby="wiz-roles-title">
-        <h3 id="wiz-roles-title" className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('rolesHeading')}
-        </h3>
-        <dl className="wizard-roles__list mb-0">
-          {(['organizer', 'moderator', 'speaker', 'guest'] as const).map((r) => (
-            <div key={r} className="wizard-roles__item">
-              <dt>{t(`roleInfo.${r}.name`)}</dt>
-              <dd>{t(`roleInfo.${r}.desc`)}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {/* I ruoli e che cosa fanno stanno nel passo «Persone», dove si
+          assegnano; qui la tabella di cio' che puo' fare ciascuno. */}
 
       <div className="table-responsive mb-4">
         <table

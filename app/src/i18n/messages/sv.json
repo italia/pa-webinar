@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Rummets funktioner",
         "aiPipelineOff": "AI-efterbearbetning (transkribering, sammanfattning, översättningar) är inte aktiverad i den här installationen.",
         "rolesHeading": "Evenemangets roller",
-        "roleModeratorColumn": "Arrangör och moderator",
+        "roleModeratorColumn": "Medarrangör och moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Arrangör",
-            "desc": "Leder rummet som en moderator och presenteras bland arrangörerna. Huvudarrangören lägger till och tar bort de andra personerna. Med ett personalkonto med samma e-post hanterar personen även evenemanget."
+            "name": "Medarrangör",
+            "desc": "Leder rummet som en moderator och presenteras bland arrangörerna. Med ett personalkonto med samma e-post hanterar personen också evenemanget."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Deltagare",
-            "desc": "Följer evenemanget och deltar så som du bestämmer i tabellen nedan."
+            "desc": "Följer evenemanget och deltar så som du bestämmer i steget ”Behörigheter”."
           }
         },
         "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen."
@@ -960,23 +960,23 @@
         "remove": "Ta bort",
         "invalidEmail": "Ogiltig e-postadress.",
         "duplicateEmail": "Adressen finns redan.",
-        "rubricaPick": "Sök i adressboken…",
+        "rubricaPick": "Sök i adressboken efter organisation…",
         "rubricaOrAdd": "eller lägg till manuellt",
         "removeItem": "Ta bort {name}",
         "invitationsStaffOnly": "Inbjudningarna hanteras av evenemangets personal.",
         "pickSkipped": "Några personer fanns redan i listan eller saknade en giltig adress och lades inte till.",
-        "primaryHeading": "Huvudarrangör",
+        "primaryHeading": "Huvudmoderator",
         "primaryHelp": "Får evenemangets huvudlänk via e-post: leder rummet och lägger till eller tar bort de andra personerna. Namn och e-post krävs för att publicera, inte för ett utkast.",
-        "primaryPrefilled": "Huvudarrangör är du, med kontots namn och e-post. Om någon annan leder evenemanget, ange personens uppgifter här: länken går till hen.",
-        "primaryNameRequired": "Ange huvudarrangörens namn.",
-        "primaryEmailRequired": "Ange en giltig e-postadress för huvudarrangören.",
+        "primaryPrefilled": "Huvudmoderatorn är du, med kontots namn och e-post. Om någon annan leder evenemanget skriver du in personens uppgifter här: länken går till hen.",
+        "primaryNameRequired": "Ange huvudmoderatorns namn.",
+        "primaryEmailRequired": "Ange en giltig e-post för huvudmoderatorn.",
         "linksOnPublish": "Personliga länkar skickas via e-post vid publicering; så länge evenemanget är ett utkast kopierar du dem från dess sida.",
         "personName": "Namn",
         "personEmail": "E-post",
-        "peopleHeading": "Evenemangets personer",
-        "peopleHelp": "Arrangörer, moderatorer och talare. Var och en får en egen länk för att delta med sin roll; vad varje roll får göra visas under ”Avancerade inställningar”.",
+        "peopleHeading": "Moderatorer och talare",
+        "peopleHelp": "Medarrangörer, moderatorer och talare. Var och en får en egen länk för att komma in med sin roll; vad varje roll kan göra förklaras ovan.",
         "personRole": "Roll",
-        "roleOrganizer": "Arrangör",
+        "roleOrganizer": "Medarrangör",
         "roleModerator": "Moderator",
         "roleSpeaker": "Talare",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planerade minuter, ämne {n}",
         "programTimeUnknown": "Tiden har inte beräknats: ett tidigare ämne saknar längd",
         "programNone": "Ingen",
-        "programLeadOrganizer": "Huvudarrangör",
+        "programLeadOrganizer": "Huvudmoderator",
         "programMoveUp": "Flytta upp ämne {n}",
         "programMoveDown": "Flytta ned ämne {n}",
         "programRemove": "Ta bort ämne {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Redigera",
         "editQuestionsBefore": "Redigera frågorna vid anmälan",
         "editQuestionsAfter": "Redigera nöjdhetsenkäten",
-        "accessStaffOnly": "Vem som anmäler sig bestämmer evenemangets team."
+        "accessStaffOnly": "Vem som anmäler sig bestämmer evenemangets team.",
+        "whoOrganizes": "Vem arrangerar",
+        "rubricaWho": "I adressboken finns de personer som anmält sig till ett evenemang och godkänt att stå kvar i den."
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -1124,9 +1126,9 @@
           "multitrack": "Inspelning per deltagare",
           "multitrackOn": "På – kräver uttryckligt samtycke vid anmälan",
           "organizingEntities": "Arrangerande organisationer",
-          "primaryOrganizer": "Huvudarrangör",
+          "primaryOrganizer": "Huvudmoderator",
           "primaryMissing": "Ska anges i steget ”Personer” för att publicera",
-          "organizersPeople": "Andra arrangörer",
+          "organizersPeople": "Medarrangörer",
           "moderators": "Moderatorer",
           "programme": "Program: {count, plural, one {# ämne} other {# ämnen}}",
           "programmeWithDuration": "Program: {count, plural, one {# ämne} other {# ämnen}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personer",
           "programme": "Program",
           "review": "Sammanfattning",
-          "advanced": "Avancerade inställningar"
+          "advanced": "Avancerade inställningar",
+          "permissions": "Behörigheter"
         },
         "templateInUse": "Mall: <b>{name}</b>",
         "noTemplate": "Evenemang utan mall",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Behövs för att publicera evenemanget.",
         "toComplete": "Att fylla i",
         "missingHeading": "För att publicera saknas fortfarande:",
-        "fieldOrganizerName": "Huvudarrangörens namn",
-        "fieldOrganizerEmail": "Huvudarrangörens e-post",
+        "fieldOrganizerName": "Huvudmoderatorns namn",
+        "fieldOrganizerEmail": "Huvudmoderatorns e-post",
         "fieldProgrammeMinutes": "Längd för programmets ämne {n}",
         "sections": {
-          "participation": "Deltagande och rummets funktioner",
           "recording": "Inspelning och AI",
           "content": "Innehåll: material och enkäter",
           "room": "Väntrum och video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-post",
         "askOrganization": "organisation",
         "askRole": "roll",
-        "askType": "typ av organisation"
+        "askType": "typ av organisation",
+        "permissionsHeading": "Vem som får göra vad i rummet",
+        "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget."
       },
       "preview": {
         "title": "Förhandsvisning av sidan",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Mötets program",
-        "intro": "Ämnena i ordning: vem som talar, om vad och hur länge. De visas under beskrivningen, med tider räknade från starten ({start}). Valfritt.",
-        "introNoStart": "Ämnena i ordning: vem som talar, om vad och hur länge. De visas under beskrivningen, med tider räknade från evenemangets start. Valfritt.",
+        "intro": "Ämnena i ordning: vem som talar, om vad och hur länge. De visas under beskrivningen, med tider räknade från starten ({start}).",
+        "introNoStart": "Ämnena i ordning: vem som talar, om vad och hur länge. De visas under beskrivningen, med tider räknade från evenemangets start.",
         "statusOn": "Visas på evenemangssidan och visar i rummet alla det pågående ämnet.",
         "statusOff": "Av: programmet visas varken på sidan eller i rummet.",
         "turnOn": "Slå på",

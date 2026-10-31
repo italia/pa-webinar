@@ -735,8 +735,9 @@ export default function EventWizard(props: WizardProps) {
   // dall'inizio.
   // Quale pulsante ha avviato il salvataggio: solo lui dice «Salvataggio…».
   const [azione, setAzione] = useState<'draft' | 'publish' | null>(null);
-  // Il passo di partenza, anche nominato come una volta (`permissions`,
-  // `content`: ora sezioni delle impostazioni avanzate). Una chiamata
+  // Il passo di partenza, anche nominato come una volta (`content`, ora una
+  // sezione delle impostazioni avanzate; `participation`, ora il passo
+  // «Permessi»). Una chiamata
   // istantanea non ha il programma: chi lo chiede arriva a «Persone».
   const istantanea = initialEvent?.event.eventType === 'INSTANT';
   const partenza = mode === 'edit' ? wizardStepFromParam(props.initialStep) : null;
@@ -2354,6 +2355,34 @@ export default function EventWizard(props: WizardProps) {
             {anteprima && <PagePreview dati={anteprima} fuoco="programma" />}
           </div>
         )}
+        {activeStep === 'permissions' && (
+          <div>
+            <h2 className="h4 fw-bold mb-2" style={{ color: 'var(--app-text)' }}>
+              {t('flow.permissionsHeading')}
+            </h2>
+            <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
+              {t('flow.permissionsIntro')}
+            </p>
+            <StepPermissions
+              parte="partecipazione"
+              programma={
+                istantanea
+                  ? undefined
+                  : {
+                      argomenti: (form.agenda ?? []).filter(haTitolo).length,
+                      onVai: () => vai('programme'),
+                    }
+              }
+              value={form}
+              onChange={updateForm}
+              fieldErrors={fieldErrors}
+              whiteboardInfraReady={props.whiteboardInfraReady}
+              liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
+              aiPipelineEnabled={props.aiPipelineEnabled ?? true}
+              editing={mode === 'edit'}
+            />
+          </div>
+        )}
         {activeStep === 'review' && (
           <Step5Review
             form={form}
@@ -2393,26 +2422,6 @@ export default function EventWizard(props: WizardProps) {
                 : null
             }
             sections={{
-              participation: (
-                <StepPermissions
-                  parte="partecipazione"
-                  programma={
-                    istantanea
-                      ? undefined
-                      : {
-                          argomenti: (form.agenda ?? []).filter(haTitolo).length,
-                          onVai: () => vai('programme'),
-                        }
-                  }
-                  value={form}
-                  onChange={updateForm}
-                  fieldErrors={fieldErrors}
-                  whiteboardInfraReady={props.whiteboardInfraReady}
-                  liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
-                  aiPipelineEnabled={props.aiPipelineEnabled ?? true}
-                  editing={mode === 'edit'}
-                />
-              ),
               recording: (
                 <StepPermissions
                   parte="registrazione"

@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funcionalidades da sala",
         "aiPipelineOff": "A pós-produção com IA (transcrição, síntese, traduções) não está ativada nesta instalação.",
         "rolesHeading": "Os papéis do evento",
-        "roleModeratorColumn": "Organizador e moderador",
+        "roleModeratorColumn": "Coorganizador e moderador",
         "roleInfo": {
           "organizer": {
-            "name": "Organizador",
-            "desc": "Conduz a sala como um moderador e é apresentado entre os organizadores. O organizador principal adiciona e remove as outras pessoas. Com uma conta de pessoal com o mesmo e-mail, também gere o evento."
+            "name": "Coorganizador",
+            "desc": "Conduz a sala como um moderador e é apresentado entre quem organiza. Com uma conta de pessoal com o mesmo e-mail, também gere o evento."
           },
           "moderator": {
             "name": "Moderador",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Participante",
-            "desc": "Acompanha o evento e interage como decidir na tabela abaixo."
+            "desc": "Segue o evento e interage como decidir no passo «Permissões»."
           }
         },
         "recordingManualNote": "A gravação nunca começa sozinha: um moderador inicia-a com o botão REC."
@@ -960,23 +960,23 @@
         "remove": "Remover",
         "invalidEmail": "Endereço de e-mail inválido.",
         "duplicateEmail": "Endereço já presente.",
-        "rubricaPick": "Pesquisar na agenda…",
+        "rubricaPick": "Pesquisar no livro de endereços por organização…",
         "rubricaOrAdd": "ou adicione manualmente",
         "removeItem": "Remover {name}",
         "invitationsStaffOnly": "Os convites são geridos pela equipa do evento.",
         "pickSkipped": "Algumas pessoas já constavam da lista ou não tinham um endereço válido, e não foram adicionadas.",
-        "primaryHeading": "Organizador principal",
+        "primaryHeading": "Moderador principal",
         "primaryHelp": "Recebe por e-mail a ligação principal do evento: conduz a sala e adiciona ou remove as outras pessoas. Nome e e-mail são necessários para publicar, não para um rascunho.",
-        "primaryPrefilled": "O organizador principal é você, com o nome e o e-mail da sua conta. Se outra pessoa conduzir o evento, introduza aqui os dados dela: a ligação será enviada para ela.",
-        "primaryNameRequired": "Introduza o nome do organizador principal.",
-        "primaryEmailRequired": "Introduza um e-mail válido do organizador principal.",
+        "primaryPrefilled": "O moderador principal é você, com o nome e o e-mail da sua conta. Se outra pessoa conduzir o evento, escreva aqui os dados dela: a ligação será enviada para ela.",
+        "primaryNameRequired": "Introduza o nome do moderador principal.",
+        "primaryEmailRequired": "Introduza um e-mail válido do moderador principal.",
         "linksOnPublish": "As ligações pessoais são enviadas por e-mail na publicação; enquanto o evento for um rascunho, copie-as da sua página.",
         "personName": "Nome",
         "personEmail": "E-mail",
-        "peopleHeading": "Pessoas do evento",
-        "peopleHelp": "Organizadores, moderadores e oradores. Cada um recebe a sua própria ligação para entrar com o seu papel; o que cada papel pode fazer é indicado em «Definições avançadas».",
+        "peopleHeading": "Moderadores e oradores",
+        "peopleHelp": "Coorganizadores, moderadores e oradores. Cada um recebe a sua ligação para entrar com o seu papel; o que cada papel pode fazer está explicado acima.",
         "personRole": "Papel",
-        "roleOrganizer": "Organizador",
+        "roleOrganizer": "Coorganizador",
         "roleModerator": "Moderador",
         "roleSpeaker": "Orador",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Minutos previstos, tema {n}",
         "programTimeUnknown": "Hora não calculada: um tema anterior não tem duração",
         "programNone": "Ninguém",
-        "programLeadOrganizer": "Organizador principal",
+        "programLeadOrganizer": "Moderador principal",
         "programMoveUp": "Mover o tema {n} para cima",
         "programMoveDown": "Mover o tema {n} para baixo",
         "programRemove": "Remover o tema {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Editar",
         "editQuestionsBefore": "Editar as perguntas de inscrição",
         "editQuestionsAfter": "Editar o questionário de satisfação",
-        "accessStaffOnly": "Quem se inscreve é decidido pela equipa do evento."
+        "accessStaffOnly": "Quem se inscreve é decidido pela equipa do evento.",
+        "whoOrganizes": "Quem organiza",
+        "rubricaWho": "No livro de endereços estão as pessoas que se inscreveram num evento e aceitaram ficar nele."
       },
       "step4": {
         "heading": "Conteúdos e materiais",
@@ -1124,9 +1126,9 @@
           "multitrack": "Gravação por participante",
           "multitrackOn": "Ativa — requer consentimento explícito na inscrição",
           "organizingEntities": "Entidades organizadoras",
-          "primaryOrganizer": "Organizador principal",
+          "primaryOrganizer": "Moderador principal",
           "primaryMissing": "A indicar no passo «Pessoas» para publicar",
-          "organizersPeople": "Outros organizadores",
+          "organizersPeople": "Coorganizadores",
           "moderators": "Moderadores",
           "programme": "Programa: {count, plural, one {# tema} other {# temas}}",
           "programmeWithDuration": "Programa: {count, plural, one {# tema} other {# temas}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Pessoas",
           "programme": "Programa",
           "review": "Resumo",
-          "advanced": "Definições avançadas"
+          "advanced": "Definições avançadas",
+          "permissions": "Permissões"
         },
         "templateInUse": "Modelo: <b>{name}</b>",
         "noTemplate": "Evento sem modelo",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Necessário para publicar o evento.",
         "toComplete": "Por completar",
         "missingHeading": "Para publicar ainda falta:",
-        "fieldOrganizerName": "Nome do organizador principal",
-        "fieldOrganizerEmail": "E-mail do organizador principal",
+        "fieldOrganizerName": "Nome do moderador principal",
+        "fieldOrganizerEmail": "E-mail do moderador principal",
         "fieldProgrammeMinutes": "Duração do tema {n} do programa",
         "sections": {
-          "participation": "Participação e funções da sala",
           "recording": "Gravação e IA",
           "content": "Conteúdos: materiais e questionários",
           "room": "Sala de espera e vídeo",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organização",
         "askRole": "cargo",
-        "askType": "tipo de organização"
+        "askType": "tipo de organização",
+        "permissionsHeading": "Quem pode fazer o quê na sala",
+        "permissionsIntro": "O que os participantes podem fazer e que funções da sala estão ligadas. Tudo pode ser alterado também durante o evento."
       },
       "preview": {
         "title": "Pré-visualização da página",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Programa do encontro",
-        "intro": "Os temas por ordem: quem intervém, sobre o quê e durante quanto tempo. Aparecem por baixo da descrição, com os horários calculados a partir do início ({start}). É opcional.",
-        "introNoStart": "Os temas por ordem: quem intervém, sobre o quê e durante quanto tempo. Aparecem por baixo da descrição, com os horários calculados a partir do início do evento. É opcional.",
+        "intro": "Os temas por ordem: quem intervém, sobre o quê e durante quanto tempo. Aparecem por baixo da descrição, com os horários calculados a partir do início ({start}).",
+        "introNoStart": "Os temas por ordem: quem intervém, sobre o quê e durante quanto tempo. Aparecem por baixo da descrição, com os horários calculados a partir do início do evento.",
         "statusOn": "Aparece na página do evento e, na sala, mostra a todos o tema em curso.",
         "statusOff": "Desativado: o programa não aparece na página nem na sala.",
         "turnOn": "Ativar",

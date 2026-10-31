@@ -648,10 +648,11 @@ Compose stack.
 ### 3. Create a first event
 
 - **A scheduled event.** **New event** first asks four questions on the
-  event's format (the saved templates stay in a folded list below them).
-  The wizard then has five steps, **Event**, **When**, **People**,
-  **Programme** (optional) and **Summary**, with **Advanced settings** apart. Publishing needs the lead
-  organizer's name and email, entered in **People**, used for the moderator
+  event's format (**Start from a template**, next to the heading, offers the
+  saved templates). The wizard then has six steps, **Event**, **When**,
+  **People**, **Programme** (optional), **Permissions** and **Summary**, with
+  **Advanced settings** apart. Publishing needs the lead
+  moderator's name and email, entered in **People**, used for the moderator
   link and the confirmation email; like every email of this setup, it lands
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands
   on the event's page in the administration area, which lists the

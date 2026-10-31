@@ -1142,7 +1142,7 @@ function OverviewTab({
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={percorso(editUrlAt('advanced', 'participation'))}
+          <Link href={percorso(editUrlAt('permissions'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editFeatures')}
           </Link>

@@ -16,6 +16,7 @@ import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-
 import { logoPubblico } from '@/lib/events/public-people';
 
 import { BOZZA_VUOTA, controllaBozza, conRuolo, indirizziPresi, type Bozza } from './people-draft';
+import RuoliEvento from './ruoli-evento';
 import Gruppo from './wizard-group';
 import { emailValida, nomeOrganizzatoreValido } from './validation';
 import type { EventAccessModeValue } from './wizard-shell';
@@ -149,13 +150,22 @@ export default function StepPeople({
         {t('intro')}
       </p>
 
-      {children}
+      {/* Chi organizza, in un posto solo: prima gli enti, poi la persona che
+          conduce con il link principale. */}
+      <section className="mb-4" aria-labelledby="wiz-chi-organizza">
+        <h3 id="wiz-chi-organizza" className="h5 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('whoOrganizes')}
+        </h3>
+        <OrganizersSection
+          value={value.organizers}
+          onChange={(next) => onChange({ organizers: next })}
+          onUploadBusy={onUploadBusy}
+        />
+        {children}
+      </section>
 
-      <OrganizersSection
-        value={value.organizers}
-        onChange={(next) => onChange({ organizers: next })}
-        onUploadBusy={onUploadBusy}
-      />
+      {/* Che cosa fa ogni ruolo, sempre in vista dove i ruoli si assegnano. */}
+      <RuoliEvento />
 
       <PeopleSection
         moderators={value.moderators}
@@ -473,9 +483,12 @@ function RubricaRow({
   onAddMany: (picks: RubricaPickedPerson[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
+  // La pagina la offre solo all'amministrazione e solo se la rubrica ha
+  // qualcuno da aggiungere (RubricaAccessContext): qui si dice chi ci si trova.
   if (!useContext(RubricaAccessContext)) return null;
   return (
     <div className="mb-2">
+      <small className="d-block text-secondary mb-1">{t('rubricaWho')}</small>
       <RubricaPicker mode="multi" onAddMany={onAddMany} placeholder={t('rubricaPick')} />
       <small className="text-muted">{t('rubricaOrAdd')}</small>
     </div>
@@ -864,7 +877,43 @@ function PeopleSection({
 
       <RubricaRow onAddMany={onAddMany} />
 
+      {/* Nell'ordine in cui si pensa a una persona dell'evento: che ruolo ha,
+          di quale ente e', poi chi e' e dove scriverle. */}
       <div className="row g-2 align-items-end">
+        <div className="col-md-6 align-self-start">
+          <label className="form-label" htmlFor={`${id}-role`}>
+            {t('personRole')}
+          </label>
+          <select
+            id={`${id}-role`}
+            className="form-select"
+            value={draft.role}
+            aria-describedby={`${id}-role-help`}
+            onChange={(e) => setDraft({ ...draft, role: e.target.value as PersonRole })}
+          >
+            {opzioniRuolo}
+          </select>
+          <small id={`${id}-role-help`} className="d-block text-secondary mt-1">
+            {t(`roleHelp.${draft.role}`)}
+          </small>
+        </div>
+        <div className="col-md-6 align-self-start">
+          <label className="form-label" htmlFor={`${id}-org`}>
+            {t('personOrganization')}
+          </label>
+          <input
+            id={`${id}-org`}
+            type="text"
+            maxLength={200}
+            className="form-control"
+            value={draft.organization ?? ''}
+            aria-describedby={`${id}-org-help`}
+            onChange={(e) => setDraft({ ...draft, organization: e.target.value || null })}
+          />
+          <small id={`${id}-org-help`} className="d-block text-secondary mt-1">
+            {t('personOrganizationHelp')}
+          </small>
+        </div>
         <div className="col-md-6">
           <label className="form-label" htmlFor={`${id}-name`}>
             {t('personName')}
@@ -890,42 +939,6 @@ function PeopleSection({
               setDraft({ ...draft, email: e.target.value, personId: null })
             }
           />
-        </div>
-        <div className="col-md-4">
-          <label className="form-label" htmlFor={`${id}-role`}>
-            {t('personRole')}
-          </label>
-          <select
-            id={`${id}-role`}
-            className="form-select"
-            value={draft.role}
-            aria-describedby={`${id}-role-help`}
-            onChange={(e) => setDraft({ ...draft, role: e.target.value as PersonRole })}
-          >
-            {opzioniRuolo}
-          </select>
-        </div>
-        <div className="col-md-8">
-          <label className="form-label" htmlFor={`${id}-org`}>
-            {t('personOrganization')}
-          </label>
-          <input
-            id={`${id}-org`}
-            type="text"
-            maxLength={200}
-            className="form-control"
-            value={draft.organization ?? ''}
-            aria-describedby={`${id}-org-help`}
-            onChange={(e) => setDraft({ ...draft, organization: e.target.value || null })}
-          />
-        </div>
-        <div className="col-12">
-          <small id={`${id}-role-help`} className="d-block text-secondary">
-            {t(`roleHelp.${draft.role}`)}
-          </small>
-          <small id={`${id}-org-help`} className="d-block text-secondary">
-            {t('personOrganizationHelp')}
-          </small>
         </div>
         <div className="col-12">
           <FileOrUrlInput

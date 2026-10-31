@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Room features",
         "aiPipelineOff": "AI post-production (transcription, summary, translations) is not enabled on this installation.",
         "rolesHeading": "Event roles",
-        "roleModeratorColumn": "Organizer and moderator",
+        "roleModeratorColumn": "Co-organizer and moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organizer",
-            "desc": "Hosts the room like a moderator and is presented among the organizers. The lead organizer adds and removes the other people. With a staff account under the same email, they also manage the event."
+            "name": "Co-organizer",
+            "desc": "Hosts the room like a moderator and is presented among the organizers. With a staff account under the same email, they also manage the event."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Participant",
-            "desc": "Follows the event and interacts as you decide in the table below."
+            "desc": "Follows the event and interacts as you decide in the \"Permissions\" step."
           }
         },
         "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button."
@@ -960,23 +960,23 @@
         "remove": "Remove",
         "invalidEmail": "Invalid email address.",
         "duplicateEmail": "Email already added.",
-        "rubricaPick": "Search from the address book…",
+        "rubricaPick": "Search the address book by organization…",
         "rubricaOrAdd": "or add manually",
         "removeItem": "Remove {name}",
         "invitationsStaffOnly": "Invitations are managed by the event staff.",
         "pickSkipped": "Some people were already listed, or had no valid address, and were not added.",
-        "primaryHeading": "Lead organizer",
+        "primaryHeading": "Lead moderator",
         "primaryHelp": "Receives the event's main link by email: hosts the room and adds or removes the other people. Name and email are required to publish, not for a draft.",
-        "primaryPrefilled": "You are the lead organizer, with your account's name and email. If someone else runs the event, enter their details here: the link will go to them.",
-        "primaryNameRequired": "Enter the lead organizer's name.",
-        "primaryEmailRequired": "Enter a valid email for the lead organizer.",
+        "primaryPrefilled": "You are the lead moderator, with your account's name and email. If someone else runs the event, enter their details here: the link will go to them.",
+        "primaryNameRequired": "Enter the lead moderator's name.",
+        "primaryEmailRequired": "Enter a valid email for the lead moderator.",
         "linksOnPublish": "Personal links are emailed when the event is published; while it is a draft, copy them from its page.",
         "personName": "Name",
         "personEmail": "Email",
-        "peopleHeading": "Event people",
-        "peopleHelp": "Organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is shown in “Advanced settings”.",
+        "peopleHeading": "Moderators and speakers",
+        "peopleHelp": "Co-organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is explained above.",
         "personRole": "Role",
-        "roleOrganizer": "Organizer",
+        "roleOrganizer": "Co-organizer",
         "roleModerator": "Moderator",
         "roleSpeaker": "Speaker",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planned minutes, topic {n}",
         "programTimeUnknown": "Time not calculated: an earlier topic has no duration",
         "programNone": "Nobody",
-        "programLeadOrganizer": "Lead organizer",
+        "programLeadOrganizer": "Lead moderator",
         "programMoveUp": "Move topic {n} up",
         "programMoveDown": "Move topic {n} down",
         "programRemove": "Remove topic {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Edit",
         "editQuestionsBefore": "Edit the registration questions",
         "editQuestionsAfter": "Edit the satisfaction survey",
-        "accessStaffOnly": "Who registers is decided by the event staff."
+        "accessStaffOnly": "Who registers is decided by the event staff.",
+        "whoOrganizes": "Who organizes",
+        "rubricaWho": "The address book holds the people who registered for an event and agreed to stay in it."
       },
       "step4": {
         "heading": "Content and materials",
@@ -1124,9 +1126,9 @@
           "multitrack": "Per-participant recording",
           "multitrackOn": "On — requires explicit consent at registration",
           "organizingEntities": "Organizing entities",
-          "primaryOrganizer": "Lead organizer",
+          "primaryOrganizer": "Lead moderator",
           "primaryMissing": "To be set in the “People” step to publish",
-          "organizersPeople": "Other organizers",
+          "organizersPeople": "Co-organizers",
           "moderators": "Moderators",
           "programme": "Programme: {count, plural, one {# topic} other {# topics}}",
           "programmeWithDuration": "Programme: {count, plural, one {# topic} other {# topics}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "People",
           "programme": "Programme",
           "review": "Summary",
-          "advanced": "Advanced settings"
+          "advanced": "Advanced settings",
+          "permissions": "Permissions"
         },
         "templateInUse": "Template: <b>{name}</b>",
         "noTemplate": "Event without a template",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Needed to publish the event.",
         "toComplete": "To complete",
         "missingHeading": "Still missing to publish:",
-        "fieldOrganizerName": "Lead organizer's name",
-        "fieldOrganizerEmail": "Lead organizer's email",
+        "fieldOrganizerName": "Lead moderator's name",
+        "fieldOrganizerEmail": "Lead moderator's email",
         "fieldProgrammeMinutes": "Duration of programme topic {n}",
         "sections": {
-          "participation": "Participation and room features",
           "recording": "Recording and AI",
           "content": "Content: materials and questionnaires",
           "room": "Waiting room and video",
@@ -1229,7 +1231,9 @@
         "askEmail": "email",
         "askOrganization": "organization",
         "askRole": "role",
-        "askType": "organization type"
+        "askType": "organization type",
+        "permissionsHeading": "Who can do what in the room",
+        "permissionsIntro": "What participants can do and which room features are on. Everything can also be changed during the event."
       },
       "preview": {
         "title": "Page preview",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Meeting programme",
-        "intro": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start ({start}). It is optional.",
-        "introNoStart": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start of the event. It is optional.",
+        "intro": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start ({start}).",
+        "introNoStart": "The topics in order: who speaks, about what and for how long. They appear under the description, with times worked out from the start of the event.",
         "statusOn": "Shown on the event page, and in the room it shows everyone the current topic.",
         "statusOff": "Off: the programme does not appear on the page or in the room.",
         "turnOn": "Turn on",

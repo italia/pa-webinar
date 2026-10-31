@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funkcije sobe",
         "aiPipelineOff": "AI postprodukcija (transkripcija, sažetak, prijevodi) nije uključena u ovoj instalaciji.",
         "rolesHeading": "Uloge događaja",
-        "roleModeratorColumn": "Organizator i moderator",
+        "roleModeratorColumn": "Suorganizator i moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organizator",
-            "desc": "Vodi sobu kao moderator i prikazan je među organizatorima. Glavni organizator dodaje i uklanja ostale osobe. S računom osoblja s istom e-poštom upravlja i događajem."
+            "name": "Suorganizator",
+            "desc": "Vodi sobu kao moderator i predstavljen je među organizatorima. S računom osoblja s istom e-adresom upravlja i događajem."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Sudionik",
-            "desc": "Prati događaj i sudjeluje kako odlučite u tablici ispod."
+            "desc": "Prati događaj i sudjeluje kako odlučite u koraku „Dopuštenja”."
           }
         },
         "recordingManualNote": "Snimanje nikad ne počinje samo: moderator ga pokreće gumbom REC."
@@ -960,23 +960,23 @@
         "remove": "Ukloni",
         "invalidEmail": "Adresa e-pošte nije valjana.",
         "duplicateEmail": "Adresa je već dodana.",
-        "rubricaPick": "Pretraži iz imenika…",
+        "rubricaPick": "Pretraži imenik po organizaciji…",
         "rubricaOrAdd": "ili dodajte ručno",
         "removeItem": "Ukloni {name}",
         "invitationsStaffOnly": "Pozivnicama upravlja osoblje događaja.",
         "pickSkipped": "Neke osobe već su bile navedene ili nisu imale valjanu adresu, pa nisu dodane.",
-        "primaryHeading": "Glavni organizator",
+        "primaryHeading": "Glavni moderator",
         "primaryHelp": "Prima e-poštom glavnu poveznicu događaja: vodi sobu te dodaje ili uklanja ostale osobe. Ime i e-pošta potrebni su za objavu, ne za skicu.",
-        "primaryPrefilled": "Glavni organizator ste vi, s imenom i e-poštom svog računa. Ako događaj vodi druga osoba, ovdje upišite njezine podatke: poveznica će stići njoj.",
-        "primaryNameRequired": "Unesite ime glavnog organizatora.",
-        "primaryEmailRequired": "Unesite valjanu e-poštu glavnog organizatora.",
+        "primaryPrefilled": "Glavni moderator ste vi, s imenom i e-adresom svog računa. Ako događaj vodi netko drugi, ovdje upišite njegove podatke: poveznica će stići njemu.",
+        "primaryNameRequired": "Unesite ime glavnog moderatora.",
+        "primaryEmailRequired": "Unesite valjanu e-adresu glavnog moderatora.",
         "linksOnPublish": "Osobne poveznice šalju se e-poštom pri objavi; dok je događaj skica, kopirajte ih s njegove stranice.",
         "personName": "Ime",
         "personEmail": "E-pošta",
-        "peopleHeading": "Osobe događaja",
-        "peopleHelp": "Organizatori, moderatori i govornici. Svatko dobiva vlastitu poveznicu za ulazak sa svojom ulogom; što svaka uloga može prikazuje odjeljak „Napredne postavke”.",
+        "peopleHeading": "Moderatori i govornici",
+        "peopleHelp": "Suorganizatori, moderatori i govornici. Svatko dobiva vlastitu poveznicu za ulazak sa svojom ulogom; što svaka uloga može objašnjeno je gore.",
         "personRole": "Uloga",
-        "roleOrganizer": "Organizator",
+        "roleOrganizer": "Suorganizator",
         "roleModerator": "Moderator",
         "roleSpeaker": "Govornik",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planirane minute, tema {n}",
         "programTimeUnknown": "Vrijeme nije izračunano: prethodna tema nema trajanje",
         "programNone": "Nitko",
-        "programLeadOrganizer": "Glavni organizator",
+        "programLeadOrganizer": "Glavni moderator",
         "programMoveUp": "Pomakni temu {n} gore",
         "programMoveDown": "Pomakni temu {n} dolje",
         "programRemove": "Ukloni temu {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Uredi",
         "editQuestionsBefore": "Uredi pitanja pri prijavi",
         "editQuestionsAfter": "Uredi upitnik o zadovoljstvu",
-        "accessStaffOnly": "Tko se može prijaviti, odlučuje tim događaja."
+        "accessStaffOnly": "Tko se može prijaviti, odlučuje tim događaja.",
+        "whoOrganizes": "Tko organizira",
+        "rubricaWho": "U imeniku su osobe koje su se prijavile na događaj i pristale ostati u njemu."
       },
       "step4": {
         "heading": "Sadržaj i materijali",
@@ -1124,9 +1126,9 @@
           "multitrack": "Snimanje po sudioniku",
           "multitrackOn": "Uključeno — zahtijeva izričit pristanak pri prijavi",
           "organizingEntities": "Organizatorske ustanove",
-          "primaryOrganizer": "Glavni organizator",
+          "primaryOrganizer": "Glavni moderator",
           "primaryMissing": "Za objavu treba ga navesti u koraku „Osobe”",
-          "organizersPeople": "Ostali organizatori",
+          "organizersPeople": "Suorganizatori",
           "moderators": "Moderatori",
           "programme": "Program: {count, plural, one {# tema} few {# teme} other {# tema}}",
           "programmeWithDuration": "Program: {count, plural, one {# tema} few {# teme} other {# tema}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Osobe",
           "programme": "Program",
           "review": "Sažetak",
-          "advanced": "Napredne postavke"
+          "advanced": "Napredne postavke",
+          "permissions": "Dopuštenja"
         },
         "templateInUse": "Predložak: <b>{name}</b>",
         "noTemplate": "Događaj bez predloška",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Potrebno za objavu događaja.",
         "toComplete": "Za dopuniti",
         "missingHeading": "Za objavu još nedostaje:",
-        "fieldOrganizerName": "Ime glavnog organizatora",
-        "fieldOrganizerEmail": "E-pošta glavnog organizatora",
+        "fieldOrganizerName": "Ime glavnog moderatora",
+        "fieldOrganizerEmail": "E-adresa glavnog moderatora",
         "fieldProgrammeMinutes": "Trajanje teme {n} programa",
         "sections": {
-          "participation": "Sudjelovanje i funkcije dvorane",
           "recording": "Snimanje i UI",
           "content": "Sadržaji: materijali i upitnici",
           "room": "Čekaonica i video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-pošta",
         "askOrganization": "organizacija",
         "askRole": "uloga",
-        "askType": "vrsta organizacije"
+        "askType": "vrsta organizacije",
+        "permissionsHeading": "Tko što može u sobi",
+        "permissionsIntro": "Što sudionici mogu i koje su funkcije sobe uključene. Sve se može mijenjati i tijekom događaja."
       },
       "preview": {
         "title": "Pregled stranice",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Program sastanka",
-        "intro": "Teme redom: tko govori, o čemu i koliko dugo. Prikazuju se ispod opisa, s vremenima izračunatima od početka ({start}). Neobavezno.",
-        "introNoStart": "Teme redom: tko govori, o čemu i koliko dugo. Prikazuju se ispod opisa, s vremenima izračunatima od početka događaja. Neobavezno.",
+        "intro": "Teme redom: tko govori, o čemu i koliko dugo. Prikazuju se ispod opisa, s vremenima izračunatima od početka ({start}).",
+        "introNoStart": "Teme redom: tko govori, o čemu i koliko dugo. Prikazuju se ispod opisa, s vremenima izračunatima od početka događaja.",
         "statusOn": "Prikazuje se na stranici događaja, a u sobi svima pokazuje trenutnu temu.",
         "statusOff": "Isključeno: program se ne prikazuje ni na stranici ni u sobi.",
         "turnOn": "Uključi",

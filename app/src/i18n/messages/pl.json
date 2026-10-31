@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funkcje sali",
         "aiPipelineOff": "Postprodukcja AI (transkrypcja, podsumowanie, tłumaczenia) nie jest włączona w tej instalacji.",
         "rolesHeading": "Role w wydarzeniu",
-        "roleModeratorColumn": "Organizator i moderator",
+        "roleModeratorColumn": "Współorganizator i moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organizator",
-            "desc": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów. Główny organizator dodaje i usuwa pozostałe osoby. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem."
+            "name": "Współorganizator",
+            "desc": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów. Z kontem pracownika na ten sam e-mail zarządza też wydarzeniem."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Uczestnik",
-            "desc": "Śledzi wydarzenie i bierze w nim udział tak, jak zdecydujesz w tabeli poniżej."
+            "desc": "Śledzi wydarzenie i uczestniczy tak, jak zdecydujesz w kroku „Uprawnienia”."
           }
         },
         "recordingManualNote": "Nagrywanie nigdy nie zaczyna się samo: prowadzący uruchamia je przyciskiem REC."
@@ -960,23 +960,23 @@
         "remove": "Usuń",
         "invalidEmail": "Nieprawidłowy adres e-mail.",
         "duplicateEmail": "Adres jest już dodany.",
-        "rubricaPick": "Wyszukaj w książce adresowej…",
+        "rubricaPick": "Szukaj w książce adresowej według organizacji…",
         "rubricaOrAdd": "lub dodaj ręcznie",
         "removeItem": "Usuń {name}",
         "invitationsStaffOnly": "Zaproszeniami zarządza zespół wydarzenia.",
         "pickSkipped": "Niektóre osoby były już na liście lub nie miały prawidłowego adresu i nie zostały dodane.",
-        "primaryHeading": "Główny organizator",
+        "primaryHeading": "Główny moderator",
         "primaryHelp": "Otrzymuje e-mailem główny link wydarzenia: prowadzi salę oraz dodaje lub usuwa pozostałe osoby. Imię i e-mail są potrzebne do publikacji, nie do wersji roboczej.",
-        "primaryPrefilled": "Głównym organizatorem jesteś ty, z imieniem i e-mailem swojego konta. Jeśli wydarzenie prowadzi ktoś inny, wpisz tu jego dane: link trafi do niego.",
-        "primaryNameRequired": "Wpisz imię i nazwisko głównego organizatora.",
-        "primaryEmailRequired": "Wpisz prawidłowy e-mail głównego organizatora.",
+        "primaryPrefilled": "Głównym moderatorem jesteś ty, z nazwą i e-mailem swojego konta. Jeśli wydarzenie prowadzi ktoś inny, wpisz tu jego dane: link trafi do niego.",
+        "primaryNameRequired": "Wpisz imię i nazwisko głównego moderatora.",
+        "primaryEmailRequired": "Wpisz prawidłowy e-mail głównego moderatora.",
         "linksOnPublish": "Osobiste linki są wysyłane e-mailem przy publikacji; dopóki wydarzenie jest wersją roboczą, skopiuj je z jego strony.",
         "personName": "Imię i nazwisko",
         "personEmail": "E-mail",
-        "peopleHeading": "Osoby wydarzenia",
-        "peopleHelp": "Organizatorzy, moderatorzy i prelegenci. Każdy otrzymuje własny link, by wejść ze swoją rolą; co może każda rola, pokazuje sekcja „Ustawienia zaawansowane”.",
+        "peopleHeading": "Moderatorzy i prelegenci",
+        "peopleHelp": "Współorganizatorzy, moderatorzy i prelegenci. Każdy dostaje własny link, by wejść ze swoją rolą; co może każda rola, wyjaśniono powyżej.",
         "personRole": "Rola",
-        "roleOrganizer": "Organizator",
+        "roleOrganizer": "Współorganizator",
         "roleModerator": "Moderator",
         "roleSpeaker": "Prelegent",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planowane minuty, temat {n}",
         "programTimeUnknown": "Godzina nieobliczona: wcześniejszy temat nie ma czasu trwania",
         "programNone": "Nikt",
-        "programLeadOrganizer": "Główny organizator",
+        "programLeadOrganizer": "Główny moderator",
         "programMoveUp": "Przesuń temat {n} w górę",
         "programMoveDown": "Przesuń temat {n} w dół",
         "programRemove": "Usuń temat {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Edytuj",
         "editQuestionsBefore": "Edytuj pytania przy rejestracji",
         "editQuestionsAfter": "Edytuj ankietę satysfakcji",
-        "accessStaffOnly": "O tym, kto może się zapisać, decyduje zespół wydarzenia."
+        "accessStaffOnly": "O tym, kto może się zapisać, decyduje zespół wydarzenia.",
+        "whoOrganizes": "Kto organizuje",
+        "rubricaWho": "W książce adresowej są osoby, które zapisały się na wydarzenie i zgodziły się w niej pozostać."
       },
       "step4": {
         "heading": "Treści i materiały",
@@ -1124,9 +1126,9 @@
           "multitrack": "Nagrywanie osobno dla każdego uczestnika",
           "multitrackOn": "Włączone — wymaga wyraźnej zgody przy rejestracji",
           "organizingEntities": "Instytucje organizujące",
-          "primaryOrganizer": "Główny organizator",
+          "primaryOrganizer": "Główny moderator",
           "primaryMissing": "Do wskazania w kroku „Osoby”, aby opublikować",
-          "organizersPeople": "Pozostali organizatorzy",
+          "organizersPeople": "Współorganizatorzy",
           "moderators": "Moderatorzy",
           "programme": "Program: {count, plural, one {# temat} few {# tematy} many {# tematów} other {# tematu}}",
           "programmeWithDuration": "Program: {count, plural, one {# temat} few {# tematy} many {# tematów} other {# tematu}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Osoby",
           "programme": "Program",
           "review": "Podsumowanie",
-          "advanced": "Ustawienia zaawansowane"
+          "advanced": "Ustawienia zaawansowane",
+          "permissions": "Uprawnienia"
         },
         "templateInUse": "Szablon: <b>{name}</b>",
         "noTemplate": "Wydarzenie bez szablonu",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Potrzebne do opublikowania wydarzenia.",
         "toComplete": "Do uzupełnienia",
         "missingHeading": "Do publikacji brakuje jeszcze:",
-        "fieldOrganizerName": "Imię głównego organizatora",
-        "fieldOrganizerEmail": "E-mail głównego organizatora",
+        "fieldOrganizerName": "Imię i nazwisko głównego moderatora",
+        "fieldOrganizerEmail": "E-mail głównego moderatora",
         "fieldProgrammeMinutes": "Czas trwania tematu {n} programu",
         "sections": {
-          "participation": "Udział i funkcje sali",
           "recording": "Nagranie i AI",
           "content": "Treści: materiały i ankiety",
           "room": "Poczekalnia i obraz",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "instytucja",
         "askRole": "stanowisko",
-        "askType": "rodzaj instytucji"
+        "askType": "rodzaj instytucji",
+        "permissionsHeading": "Kto co może w sali",
+        "permissionsIntro": "Co mogą robić uczestnicy i które funkcje sali są włączone. Wszystko można zmienić także w trakcie wydarzenia."
       },
       "preview": {
         "title": "Podgląd strony",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Program spotkania",
-        "intro": "Tematy w kolejności: kto zabiera głos, o czym i jak długo. Pojawiają się pod opisem, z godzinami liczonymi od początku ({start}). Opcjonalne.",
-        "introNoStart": "Tematy w kolejności: kto zabiera głos, o czym i jak długo. Pojawiają się pod opisem, z godzinami liczonymi od początku wydarzenia. Opcjonalne.",
+        "intro": "Tematy w kolejności: kto zabiera głos, o czym i jak długo. Pojawiają się pod opisem, z godzinami liczonymi od początku ({start}).",
+        "introNoStart": "Tematy w kolejności: kto zabiera głos, o czym i jak długo. Pojawiają się pod opisem, z godzinami liczonymi od początku wydarzenia.",
         "statusOn": "Pojawia się na stronie wydarzenia, a w sali pokazuje wszystkim bieżący temat.",
         "statusOff": "Wyłączony: program nie pojawia się ani na stronie, ani w sali.",
         "turnOn": "Włącz",

@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Gnéithe an tseomra",
         "aiPipelineOff": "Níl iarléiriú AI (tras-scríobh, achoimre, aistriúcháin) ar siúl ar an tsuiteáil seo.",
         "rolesHeading": "Róil an imeachta",
-        "roleModeratorColumn": "Eagraí agus modhnóir",
+        "roleModeratorColumn": "Comheagraí agus modhnóir",
         "roleInfo": {
           "organizer": {
-            "name": "Eagraí",
-            "desc": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Cuireann an príomh-eagraí na daoine eile leis agus baineann sé iad. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin."
+            "name": "Comheagraí",
+            "desc": "Stiúrann sé an seomra mar mhodhnóir agus cuirtear i láthair é i measc na n-eagraithe. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an ócáid freisin."
           },
           "moderator": {
             "name": "Modhnóir",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Rannpháirtí",
-            "desc": "Leanann sé an imeacht agus glacann sé páirt mar a shocraíonn tú sa tábla thíos."
+            "desc": "Leanann sé an ócáid agus glacann páirt mar a shocraíonn tú sa chéim «Ceadanna»."
           }
         },
         "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC."
@@ -960,23 +960,23 @@
         "remove": "Bain",
         "invalidEmail": "Seoladh ríomhphoist neamhbhailí.",
         "duplicateEmail": "Tá an seoladh ann cheana.",
-        "rubricaPick": "Cuardaigh ón leabhar seoltaí…",
+        "rubricaPick": "Cuardaigh an leabhar seoltaí de réir eagraíochta…",
         "rubricaOrAdd": "nó cuir isteach de láimh é",
         "removeItem": "Bain {name}",
         "invitationsStaffOnly": "Is í foireann an imeachta a bhainistíonn na cuirí.",
         "pickSkipped": "Bhí daoine áirithe ar an liosta cheana nó ní raibh seoladh bailí acu, agus níor cuireadh leis iad.",
-        "primaryHeading": "Príomh-eagraí",
+        "primaryHeading": "Príomh-mhodhnóir",
         "primaryHelp": "Faigheann sé príomhnasc an imeachta trí ríomhphost: óstálann sé an seomra agus cuireann sé na daoine eile leis nó baineann sé iad. Tá ainm agus ríomhphost riachtanach chun foilsiú, ní le haghaidh dréachta.",
-        "primaryPrefilled": "Is tusa an príomh-eagraí, le hainm agus ríomhphost do chuntais. Má reáchtálann duine eile an imeacht, cuir a s(h)onraí isteach anseo: rachaidh an nasc chuige/chuici.",
-        "primaryNameRequired": "Cuir isteach ainm an phríomh-eagraí.",
-        "primaryEmailRequired": "Cuir isteach ríomhphost bailí don phríomh-eagraí.",
+        "primaryPrefilled": "Is tusa an príomh-mhodhnóir, le hainm agus ríomhphost do chuntais. Má stiúrann duine eile an ócáid, scríobh a sonraí anseo: rachaidh an nasc chuige.",
+        "primaryNameRequired": "Cuir isteach ainm an phríomh-mhodhnóra.",
+        "primaryEmailRequired": "Cuir isteach ríomhphost bailí don phríomh-mhodhnóir.",
         "linksOnPublish": "Seoltar naisc phearsanta trí ríomhphost nuair a fhoilsítear an imeacht; fad is dréacht é, cóipeáil iad óna leathanach.",
         "personName": "Ainm",
         "personEmail": "Ríomhphost",
-        "peopleHeading": "Daoine an imeachta",
-        "peopleHelp": "Eagraithe, modhnóirí agus cainteoirí. Faigheann gach duine a nasc féin le dul isteach lena ról; taispeántar sna “Ardsocruithe” cad is féidir le gach ról a dhéanamh.",
+        "peopleHeading": "Modhnóirí agus cainteoirí",
+        "peopleHelp": "Comheagraithe, modhnóirí agus cainteoirí. Faigheann gach duine a nasc féin chun dul isteach lena ról; mínítear thuas cad is féidir le gach ról a dhéanamh.",
         "personRole": "Ról",
-        "roleOrganizer": "Eagraí",
+        "roleOrganizer": "Comheagraí",
         "roleModerator": "Modhnóir",
         "roleSpeaker": "Cainteoir",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Nóiméid beartaithe, ábhar {n}",
         "programTimeUnknown": "Níor ríomhadh an t-am: níl fad ag ábhar roimhe seo",
         "programNone": "Duine ar bith",
-        "programLeadOrganizer": "Príomheagraí",
+        "programLeadOrganizer": "Príomh-mhodhnóir",
         "programMoveUp": "Bog ábhar {n} suas",
         "programMoveDown": "Bog ábhar {n} síos",
         "programRemove": "Bain ábhar {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Cuir in eagar",
         "editQuestionsBefore": "Cuir in eagar na ceisteanna clárúcháin",
         "editQuestionsAfter": "Cuir in eagar an suirbhé sástachta",
-        "accessStaffOnly": "Is í foireann an imeachta a chinneann cé a chláraíonn."
+        "accessStaffOnly": "Is í foireann an imeachta a chinneann cé a chláraíonn.",
+        "whoOrganizes": "Cé a eagraíonn",
+        "rubricaWho": "Sa leabhar seoltaí tá na daoine a chláraigh d'ócáid agus a d'aontaigh fanacht ann."
       },
       "step4": {
         "heading": "Ábhar agus áiseanna",
@@ -1124,9 +1126,9 @@
           "multitrack": "Taifeadadh de réir rannpháirtí",
           "multitrackOn": "Ar siúl — teastaíonn toiliú follasach tráth an chláraithe",
           "organizingEntities": "Eagraíochtaí eagraithe",
-          "primaryOrganizer": "Príomh-eagraí",
+          "primaryOrganizer": "Príomh-mhodhnóir",
           "primaryMissing": "Le socrú sa chéim “Daoine” chun foilsiú",
-          "organizersPeople": "Eagraithe eile",
+          "organizersPeople": "Comheagraithe",
           "moderators": "Modhnóirí",
           "programme": "Clár: {count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}",
           "programmeWithDuration": "Clár: {count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Daoine",
           "programme": "Clár",
           "review": "Achoimre",
-          "advanced": "Ardsocruithe"
+          "advanced": "Ardsocruithe",
+          "permissions": "Ceadanna"
         },
         "templateInUse": "Teimpléad: <b>{name}</b>",
         "noTemplate": "Imeacht gan teimpléad",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Riachtanach chun an t-imeacht a fhoilsiú.",
         "toComplete": "Le comhlánú",
         "missingHeading": "Chun foilsiú, tá easpa fós ar:",
-        "fieldOrganizerName": "Ainm an phríomheagraí",
-        "fieldOrganizerEmail": "Ríomhphost an phríomheagraí",
+        "fieldOrganizerName": "Ainm an phríomh-mhodhnóra",
+        "fieldOrganizerEmail": "Ríomhphost an phríomh-mhodhnóra",
         "fieldProgrammeMinutes": "Fad ábhar {n} den chlár",
         "sections": {
-          "participation": "Rannpháirtíocht agus gnéithe an tseomra",
           "recording": "Taifeadadh agus IS",
           "content": "Ábhar: ábhair agus ceistneoirí",
           "room": "Seomra feithimh agus físeán",
@@ -1229,7 +1231,9 @@
         "askEmail": "ríomhphost",
         "askOrganization": "eagraíocht",
         "askRole": "ról",
-        "askType": "cineál eagraíochta"
+        "askType": "cineál eagraíochta",
+        "permissionsHeading": "Cé atá in ann cad a dhéanamh sa seomra",
+        "permissionsIntro": "Cad is féidir leis na rannpháirtithe a dhéanamh agus cé na feidhmeanna seomra atá ar siúl. Is féidir gach rud a athrú le linn na hócáide freisin."
       },
       "preview": {
         "title": "Réamhamharc ar an leathanach",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Clár an chruinnithe",
-        "intro": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ón tús ({start}). Roghnach.",
-        "introNoStart": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ó thús na hócáide. Roghnach.",
+        "intro": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ón tús ({start}).",
+        "introNoStart": "Na hábhair in ord: cé a labhraíonn, faoi cad agus cé chomh fada. Taispeántar iad faoin gcur síos, leis na hamanna arna ríomh ó thús na hócáide.",
         "statusOn": "Taispeántar é ar leathanach na hócáide, agus sa seomra taispeánann sé an t-ábhar reatha do chách.",
         "statusOff": "Múchta: ní thaispeántar an clár ar an leathanach ná sa seomra.",
         "turnOn": "Cas air",

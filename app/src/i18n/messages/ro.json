@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funcțiile sălii",
         "aiPipelineOff": "Postproducția AI (transcriere, rezumat, traduceri) nu este activată pe această instalare.",
         "rolesHeading": "Rolurile evenimentului",
-        "roleModeratorColumn": "Organizator și moderator",
+        "roleModeratorColumn": "Coorganizator și moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organizator",
-            "desc": "Conduce sala ca un moderator și apare printre organizatori. Organizatorul principal adaugă și elimină celelalte persoane. Cu un cont de personal pe același e-mail, gestionează și evenimentul."
+            "name": "Coorganizator",
+            "desc": "Conduce sala ca un moderator și apare printre organizatori. Cu un cont de personal cu același e-mail, gestionează și evenimentul."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Participant",
-            "desc": "Urmărește evenimentul și interacționează cum decizi în tabelul de mai jos."
+            "desc": "Urmărește evenimentul și interacționează cum decizi în pasul „Permisiuni”."
           }
         },
         "recordingManualNote": "Înregistrarea nu pornește niciodată singură: un moderator o pornește cu butonul REC."
@@ -960,23 +960,23 @@
         "remove": "Eliminați",
         "invalidEmail": "Adresă de e-mail nevalidă.",
         "duplicateEmail": "Adresă deja existentă.",
-        "rubricaPick": "Căutați în agendă…",
+        "rubricaPick": "Caută în agendă după organizație…",
         "rubricaOrAdd": "sau adăugați manual",
         "removeItem": "Eliminați {name}",
         "invitationsStaffOnly": "Invitațiile sunt gestionate de echipa evenimentului.",
         "pickSkipped": "Unele persoane erau deja în listă sau nu aveau o adresă validă și nu au fost adăugate.",
-        "primaryHeading": "Organizator principal",
+        "primaryHeading": "Moderator principal",
         "primaryHelp": "Primește pe e-mail linkul principal al evenimentului: conduce sala și adaugă sau elimină celelalte persoane. Numele și e-mailul sunt necesare pentru publicare, nu pentru o ciornă.",
-        "primaryPrefilled": "Organizatorul principal ești tu, cu numele și e-mailul contului tău. Dacă evenimentul este condus de altă persoană, introdu aici datele ei: linkul va ajunge la ea.",
-        "primaryNameRequired": "Introdu numele organizatorului principal.",
-        "primaryEmailRequired": "Introdu un e-mail valid al organizatorului principal.",
+        "primaryPrefilled": "Moderatorul principal ești tu, cu numele și e-mailul contului tău. Dacă evenimentul este condus de altcineva, scrie aici datele acestei persoane: linkul va ajunge la ea.",
+        "primaryNameRequired": "Introdu numele moderatorului principal.",
+        "primaryEmailRequired": "Introdu un e-mail valid al moderatorului principal.",
         "linksOnPublish": "Linkurile personale pleacă pe e-mail la publicare; cât timp evenimentul e ciornă, copiază-le de pe pagina lui.",
         "personName": "Nume",
         "personEmail": "E-mail",
-        "peopleHeading": "Persoanele evenimentului",
-        "peopleHelp": "Organizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol arată secțiunea „Setări avansate”.",
+        "peopleHeading": "Moderatori și vorbitori",
+        "peopleHelp": "Coorganizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol este explicat mai sus.",
         "personRole": "Rol",
-        "roleOrganizer": "Organizator",
+        "roleOrganizer": "Coorganizator",
         "roleModerator": "Moderator",
         "roleSpeaker": "Vorbitor",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Minute prevăzute, tema {n}",
         "programTimeUnknown": "Ora nu este calculată: o temă anterioară nu are durată",
         "programNone": "Nimeni",
-        "programLeadOrganizer": "Organizator principal",
+        "programLeadOrganizer": "Moderator principal",
         "programMoveUp": "Mutați tema {n} în sus",
         "programMoveDown": "Mutați tema {n} în jos",
         "programRemove": "Eliminați tema {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Editează",
         "editQuestionsBefore": "Editează întrebările de la înscriere",
         "editQuestionsAfter": "Editează chestionarul de satisfacție",
-        "accessStaffOnly": "Cine se poate înscrie decide echipa evenimentului."
+        "accessStaffOnly": "Cine se poate înscrie decide echipa evenimentului.",
+        "whoOrganizes": "Cine organizează",
+        "rubricaWho": "În agendă sunt persoanele care s-au înscris la un eveniment și au acceptat să rămână în ea."
       },
       "step4": {
         "heading": "Conținut și materiale",
@@ -1124,9 +1126,9 @@
           "multitrack": "Înregistrare pe participant",
           "multitrackOn": "Activată — necesită consimțământ explicit la înscriere",
           "organizingEntities": "Instituții organizatoare",
-          "primaryOrganizer": "Organizator principal",
+          "primaryOrganizer": "Moderator principal",
           "primaryMissing": "De indicat la pasul „Persoane” pentru publicare",
-          "organizersPeople": "Alți organizatori",
+          "organizersPeople": "Coorganizatori",
           "moderators": "Moderatori",
           "programme": "Program: {count, plural, one {# temă} few {# teme} other {# de teme}}",
           "programmeWithDuration": "Program: {count, plural, one {# temă} few {# teme} other {# de teme}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Persoane",
           "programme": "Program",
           "review": "Rezumat",
-          "advanced": "Setări avansate"
+          "advanced": "Setări avansate",
+          "permissions": "Permisiuni"
         },
         "templateInUse": "Șablon: <b>{name}</b>",
         "noTemplate": "Eveniment fără șablon",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Necesar pentru a publica evenimentul.",
         "toComplete": "De completat",
         "missingHeading": "Pentru publicare mai lipsește:",
-        "fieldOrganizerName": "Numele organizatorului principal",
-        "fieldOrganizerEmail": "E-mailul organizatorului principal",
+        "fieldOrganizerName": "Numele moderatorului principal",
+        "fieldOrganizerEmail": "E-mailul moderatorului principal",
         "fieldProgrammeMinutes": "Durata temei {n} din program",
         "sections": {
-          "participation": "Participare și funcțiile sălii",
           "recording": "Înregistrare și IA",
           "content": "Conținut: materiale și chestionare",
           "room": "Sala de așteptare și video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organizație",
         "askRole": "funcție",
-        "askType": "tip de organizație"
+        "askType": "tip de organizație",
+        "permissionsHeading": "Cine ce poate face în sală",
+        "permissionsIntro": "Ce pot face participanții și ce funcții ale sălii sunt pornite. Totul se poate schimba și în timpul evenimentului."
       },
       "preview": {
         "title": "Previzualizarea paginii",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Programul întâlnirii",
-        "intro": "Temele în ordine: cine intervine, despre ce și cât timp. Apar sub descriere, cu orele calculate de la început ({start}). Opțional.",
-        "introNoStart": "Temele în ordine: cine intervine, despre ce și cât timp. Apar sub descriere, cu orele calculate de la începutul evenimentului. Opțional.",
+        "intro": "Temele în ordine: cine intervine, despre ce și cât timp. Apar sub descriere, cu orele calculate de la început ({start}).",
+        "introNoStart": "Temele în ordine: cine intervine, despre ce și cât timp. Apar sub descriere, cu orele calculate de la începutul evenimentului.",
         "statusOn": "Apare pe pagina evenimentului, iar în sală arată tuturor tema curentă.",
         "statusOff": "Dezactivat: programul nu apare nici pe pagină, nici în sală.",
         "turnOn": "Activați",

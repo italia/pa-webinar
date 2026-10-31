@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funktioner i mødelokalet",
         "aiPipelineOff": "AI-efterbehandling (transskription, resumé, oversættelser) er ikke slået til på denne installation.",
         "rolesHeading": "Arrangementets roller",
-        "roleModeratorColumn": "Arrangør og moderator",
+        "roleModeratorColumn": "Medarrangør og moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Arrangør",
-            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Hovedarrangøren tilføjer og fjerner de andre personer. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet."
+            "name": "Medarrangør",
+            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Deltager",
-            "desc": "Følger arrangementet og deltager, som du bestemmer i tabellen nedenfor."
+            "desc": "Følger arrangementet og deltager, som du bestemmer i trinnet \"Tilladelser\"."
           }
         },
         "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen."
@@ -960,23 +960,23 @@
         "remove": "Fjern",
         "invalidEmail": "Ugyldig e-mailadresse.",
         "duplicateEmail": "Adressen er allerede tilføjet.",
-        "rubricaPick": "Søg i adressebogen…",
+        "rubricaPick": "Søg i adressebogen efter organisation…",
         "rubricaOrAdd": "eller tilføj manuelt",
         "removeItem": "Fjern {name}",
         "invitationsStaffOnly": "Invitationerne administreres af begivenhedens personale.",
         "pickSkipped": "Nogle personer var allerede på listen eller havde ingen gyldig adresse og blev ikke tilføjet.",
-        "primaryHeading": "Hovedarrangør",
+        "primaryHeading": "Hovedmoderator",
         "primaryHelp": "Modtager arrangementets hovedlink på e-mail: leder rummet og tilføjer eller fjerner de andre personer. Navn og e-mail kræves for at offentliggøre, ikke for en kladde.",
-        "primaryPrefilled": "Du er hovedarrangør med din kontos navn og e-mail. Hvis en anden leder arrangementet, så indtast vedkommendes oplysninger her: linket går til vedkommende.",
-        "primaryNameRequired": "Indtast hovedarrangørens navn.",
-        "primaryEmailRequired": "Indtast en gyldig e-mail for hovedarrangøren.",
+        "primaryPrefilled": "Hovedmoderatoren er dig, med din kontos navn og e-mail. Hvis en anden leder arrangementet, så skriv vedkommendes oplysninger her: linket går til vedkommende.",
+        "primaryNameRequired": "Angiv hovedmoderatorens navn.",
+        "primaryEmailRequired": "Angiv en gyldig e-mail for hovedmoderatoren.",
         "linksOnPublish": "Personlige links sendes på e-mail ved offentliggørelse; så længe arrangementet er en kladde, kopieres de fra dets side.",
         "personName": "Navn",
         "personEmail": "E-mail",
-        "peopleHeading": "Arrangementets personer",
-        "peopleHelp": "Arrangører, moderatorer og talere. Hver får sit eget link til at deltage med sin rolle; hvad hver rolle kan, vises under “Avancerede indstillinger”.",
+        "peopleHeading": "Moderatorer og talere",
+        "peopleHelp": "Medarrangører, moderatorer og talere. Hver får sit eget link til at komme ind i sin rolle; hvad hver rolle kan, er forklaret ovenfor.",
         "personRole": "Rolle",
-        "roleOrganizer": "Arrangør",
+        "roleOrganizer": "Medarrangør",
         "roleModerator": "Moderator",
         "roleSpeaker": "Taler",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Planlagte minutter, emne {n}",
         "programTimeUnknown": "Tiden er ikke beregnet: et tidligere emne har ingen varighed",
         "programNone": "Ingen",
-        "programLeadOrganizer": "Hovedarrangør",
+        "programLeadOrganizer": "Hovedmoderator",
         "programMoveUp": "Flyt emne {n} op",
         "programMoveDown": "Flyt emne {n} ned",
         "programRemove": "Fjern emne {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Rediger",
         "editQuestionsBefore": "Rediger spørgsmålene ved tilmelding",
         "editQuestionsAfter": "Rediger tilfredshedsundersøgelsen",
-        "accessStaffOnly": "Hvem der tilmelder sig, bestemmer arrangementets team."
+        "accessStaffOnly": "Hvem der tilmelder sig, bestemmer arrangementets team.",
+        "whoOrganizes": "Hvem arrangerer",
+        "rubricaWho": "Adressebogen indeholder de personer, der har tilmeldt sig et arrangement og accepteret at blive i den."
       },
       "step4": {
         "heading": "Indhold og materialer",
@@ -1124,9 +1126,9 @@
           "multitrack": "Optagelse pr. deltager",
           "multitrackOn": "Slået til — kræver udtrykkeligt samtykke ved tilmeldingen",
           "organizingEntities": "Arrangerende organisationer",
-          "primaryOrganizer": "Hovedarrangør",
+          "primaryOrganizer": "Hovedmoderator",
           "primaryMissing": "Skal angives i trinnet “Personer” for at offentliggøre",
-          "organizersPeople": "Andre arrangører",
+          "organizersPeople": "Medarrangører",
           "moderators": "Moderatorer",
           "programme": "Program: {count, plural, one {# emne} other {# emner}}",
           "programmeWithDuration": "Program: {count, plural, one {# emne} other {# emner}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personer",
           "programme": "Program",
           "review": "Oversigt",
-          "advanced": "Avancerede indstillinger"
+          "advanced": "Avancerede indstillinger",
+          "permissions": "Tilladelser"
         },
         "templateInUse": "Skabelon: <b>{name}</b>",
         "noTemplate": "Arrangement uden skabelon",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Kræves for at offentliggøre arrangementet.",
         "toComplete": "Mangler",
         "missingHeading": "For at offentliggøre mangler stadig:",
-        "fieldOrganizerName": "Hovedarrangørens navn",
-        "fieldOrganizerEmail": "Hovedarrangørens e-mail",
+        "fieldOrganizerName": "Hovedmoderatorens navn",
+        "fieldOrganizerEmail": "Hovedmoderatorens e-mail",
         "fieldProgrammeMinutes": "Varighed af programmets emne {n}",
         "sections": {
-          "participation": "Deltagelse og rummets funktioner",
           "recording": "Optagelse og AI",
           "content": "Indhold: materialer og spørgeskemaer",
           "room": "Venterum og video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organisation",
         "askRole": "rolle",
-        "askType": "organisationstype"
+        "askType": "organisationstype",
+        "permissionsHeading": "Hvem kan gøre hvad i rummet",
+        "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet."
       },
       "preview": {
         "title": "Forhåndsvisning af siden",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Mødets program",
-        "intro": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra starten ({start}). Valgfrit.",
-        "introNoStart": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra arrangementets start. Valgfrit.",
+        "intro": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra starten ({start}).",
+        "introNoStart": "Emnerne i rækkefølge: hvem der taler, om hvad og hvor længe. De vises under beskrivelsen, med tider regnet fra arrangementets start.",
         "statusOn": "Vises på arrangementets side og viser i rummet alle det aktuelle emne.",
         "statusOff": "Slået fra: programmet vises hverken på siden eller i rummet.",
         "turnOn": "Slå til",

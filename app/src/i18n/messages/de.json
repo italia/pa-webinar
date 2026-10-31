@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funktionen des Raums",
         "aiPipelineOff": "Die KI-Nachbearbeitung (Transkription, Zusammenfassung, Übersetzungen) ist in dieser Installation nicht aktiviert.",
         "rolesHeading": "Rollen der Veranstaltung",
-        "roleModeratorColumn": "Veranstalter und Moderator",
+        "roleModeratorColumn": "Mitveranstalter und Moderation",
         "roleInfo": {
           "organizer": {
-            "name": "Veranstalter",
-            "desc": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt. Der Hauptveranstalter fügt die anderen Personen hinzu oder entfernt sie. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch die Veranstaltung."
+            "name": "Mitveranstalter",
+            "desc": "Leitet den Raum wie eine Moderation und wird bei den Veranstaltenden genannt. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch das Event."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Teilnehmende",
-            "desc": "Verfolgt die Veranstaltung und beteiligt sich so, wie Sie es in der Tabelle unten festlegen."
+            "desc": "Verfolgt das Event und beteiligt sich so, wie Sie es im Schritt „Berechtigungen“ festlegen."
           }
         },
         "recordingManualNote": "Die Aufzeichnung startet nie von selbst: Die Moderation startet sie mit der REC-Taste."
@@ -960,23 +960,23 @@
         "remove": "Entfernen",
         "invalidEmail": "Ungültige E-Mail-Adresse.",
         "duplicateEmail": "Adresse bereits vorhanden.",
-        "rubricaPick": "Aus dem Adressbuch suchen…",
+        "rubricaPick": "Im Adressbuch nach Organisation suchen…",
         "rubricaOrAdd": "oder manuell hinzufügen",
         "removeItem": "{name} entfernen",
         "invitationsStaffOnly": "Die Einladungen verwaltet das Team der Veranstaltung.",
         "pickSkipped": "Einige Personen waren bereits aufgeführt oder hatten keine gültige Adresse und wurden nicht hinzugefügt.",
-        "primaryHeading": "Hauptveranstalter",
+        "primaryHeading": "Hauptmoderation",
         "primaryHelp": "Erhält den Hauptlink der Veranstaltung per E-Mail: leitet den Raum und fügt die anderen Personen hinzu oder entfernt sie. Name und E-Mail sind zum Veröffentlichen nötig, nicht für einen Entwurf.",
-        "primaryPrefilled": "Hauptveranstalter sind Sie, mit Name und E-Mail Ihres Kontos. Leitet eine andere Person die Veranstaltung, geben Sie hier deren Daten ein: Der Link geht an sie.",
-        "primaryNameRequired": "Geben Sie den Namen des Hauptveranstalters ein.",
-        "primaryEmailRequired": "Geben Sie eine gültige E-Mail des Hauptveranstalters ein.",
+        "primaryPrefilled": "Die Hauptmoderation sind Sie, mit Name und E-Mail Ihres Kontos. Leitet eine andere Person das Event, tragen Sie hier deren Daten ein: der Link geht an sie.",
+        "primaryNameRequired": "Geben Sie den Namen der Hauptmoderation ein.",
+        "primaryEmailRequired": "Geben Sie eine gültige E-Mail der Hauptmoderation ein.",
         "linksOnPublish": "Persönliche Links werden bei der Veröffentlichung per E-Mail verschickt; solange die Veranstaltung ein Entwurf ist, kopieren Sie sie von ihrer Seite.",
         "personName": "Name",
         "personEmail": "E-Mail",
-        "peopleHeading": "Personen der Veranstaltung",
-        "peopleHelp": "Veranstalter, Moderatoren und Referenten. Jede Person erhält einen eigenen Link, um mit ihrer Rolle teilzunehmen; was jede Rolle darf, zeigen die „Erweiterten Einstellungen“.",
+        "peopleHeading": "Moderation und Vortragende",
+        "peopleHelp": "Mitveranstaltende, Moderation und Vortragende. Jede Person erhält einen eigenen Link, um mit ihrer Rolle einzutreten; was jede Rolle darf, steht oben.",
         "personRole": "Rolle",
-        "roleOrganizer": "Veranstalter",
+        "roleOrganizer": "Mitveranstalter",
         "roleModerator": "Moderator",
         "roleSpeaker": "Referent",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Geplante Minuten, Thema {n}",
         "programTimeUnknown": "Uhrzeit nicht berechnet: Ein vorheriges Thema hat keine Dauer",
         "programNone": "Niemand",
-        "programLeadOrganizer": "Hauptveranstalter",
+        "programLeadOrganizer": "Hauptmoderation",
         "programMoveUp": "Thema {n} nach oben",
         "programMoveDown": "Thema {n} nach unten",
         "programRemove": "Thema {n} entfernen",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Bearbeiten",
         "editQuestionsBefore": "Bearbeiten: Fragen bei der Anmeldung",
         "editQuestionsAfter": "Bearbeiten: Zufriedenheitsumfrage",
-        "accessStaffOnly": "Wer sich anmelden kann, entscheidet das Team der Veranstaltung."
+        "accessStaffOnly": "Wer sich anmelden kann, entscheidet das Team der Veranstaltung.",
+        "whoOrganizes": "Wer veranstaltet",
+        "rubricaWho": "Im Adressbuch stehen die Personen, die sich zu einem Event angemeldet und zugestimmt haben, darin zu bleiben."
       },
       "step4": {
         "heading": "Inhalte und Materialien",
@@ -1124,9 +1126,9 @@
           "multitrack": "Aufzeichnung pro Teilnehmer",
           "multitrackOn": "Aktiv — erfordert ausdrückliche Einwilligung bei der Anmeldung",
           "organizingEntities": "Veranstaltende Organisationen",
-          "primaryOrganizer": "Hauptveranstalter",
+          "primaryOrganizer": "Hauptmoderation",
           "primaryMissing": "Zum Veröffentlichen im Schritt „Personen“ angeben",
-          "organizersPeople": "Weitere Veranstalter",
+          "organizersPeople": "Mitveranstaltende",
           "moderators": "Moderatoren",
           "programme": "Programm: {count, plural, one {# Thema} other {# Themen}}",
           "programmeWithDuration": "Programm: {count, plural, one {# Thema} other {# Themen}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personen",
           "programme": "Programm",
           "review": "Übersicht",
-          "advanced": "Erweiterte Einstellungen"
+          "advanced": "Erweiterte Einstellungen",
+          "permissions": "Berechtigungen"
         },
         "templateInUse": "Vorlage: <b>{name}</b>",
         "noTemplate": "Veranstaltung ohne Vorlage",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Zum Veröffentlichen der Veranstaltung nötig.",
         "toComplete": "Zu ergänzen",
         "missingHeading": "Zum Veröffentlichen fehlt noch:",
-        "fieldOrganizerName": "Name der hauptverantwortlichen Person",
-        "fieldOrganizerEmail": "E-Mail der hauptverantwortlichen Person",
+        "fieldOrganizerName": "Name der Hauptmoderation",
+        "fieldOrganizerEmail": "E-Mail der Hauptmoderation",
         "fieldProgrammeMinutes": "Dauer von Thema {n} des Programms",
         "sections": {
-          "participation": "Teilnahme und Funktionen des Raums",
           "recording": "Aufzeichnung und KI",
           "content": "Inhalte: Materialien und Fragebögen",
           "room": "Warteraum und Video",
@@ -1229,7 +1231,9 @@
         "askEmail": "E-Mail",
         "askOrganization": "Organisation",
         "askRole": "Funktion",
-        "askType": "Art der Organisation"
+        "askType": "Art der Organisation",
+        "permissionsHeading": "Wer was im Raum darf",
+        "permissionsIntro": "Was Teilnehmende dürfen und welche Raumfunktionen aktiv sind. Alles lässt sich auch während des Events ändern."
       },
       "preview": {
         "title": "Seitenvorschau",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Programm des Treffens",
-        "intro": "Die Themen in ihrer Reihenfolge: wer spricht, worüber und wie lange. Sie erscheinen unter der Beschreibung, mit Uhrzeiten ab dem Beginn ({start}). Optional.",
-        "introNoStart": "Die Themen in ihrer Reihenfolge: wer spricht, worüber und wie lange. Sie erscheinen unter der Beschreibung, mit Uhrzeiten ab dem Beginn der Veranstaltung. Optional.",
+        "intro": "Die Themen in ihrer Reihenfolge: wer spricht, worüber und wie lange. Sie erscheinen unter der Beschreibung, mit Uhrzeiten ab dem Beginn ({start}).",
+        "introNoStart": "Die Themen in ihrer Reihenfolge: wer spricht, worüber und wie lange. Sie erscheinen unter der Beschreibung, mit Uhrzeiten ab dem Beginn der Veranstaltung.",
         "statusOn": "Erscheint auf der Seite der Veranstaltung und zeigt im Raum allen das laufende Thema.",
         "statusOff": "Aus: Das Programm erscheint weder auf der Seite noch im Raum.",
         "turnOn": "Einschalten",

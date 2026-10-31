@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Funkce místnosti",
         "aiPipelineOff": "AI postprodukce (přepis, shrnutí, překlady) není v této instalaci zapnutá.",
         "rolesHeading": "Role v akci",
-        "roleModeratorColumn": "Pořadatel a moderátor",
+        "roleModeratorColumn": "Spoluorganizátor a moderátor",
         "roleInfo": {
           "organizer": {
-            "name": "Pořadatel",
-            "desc": "Vede místnost jako moderátor a je uveden mezi pořadateli. Hlavní pořadatel přidává a odebírá ostatní osoby. S účtem personálu se stejným e-mailem akci také spravuje."
+            "name": "Spoluorganizátor",
+            "desc": "Vede místnost jako moderátor a je uveden mezi organizátory. Se služebním účtem se stejným e-mailem akci také spravuje."
           },
           "moderator": {
             "name": "Moderátor",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Účastník",
-            "desc": "Sleduje akci a zapojuje se tak, jak určíte v tabulce níže."
+            "desc": "Sleduje akci a zapojuje se tak, jak rozhodnete v kroku „Oprávnění“."
           }
         },
         "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC."
@@ -960,23 +960,23 @@
         "remove": "Odstranit",
         "invalidEmail": "Neplatná e-mailová adresa.",
         "duplicateEmail": "Adresa je již zadána.",
-        "rubricaPick": "Hledat v adresáři…",
+        "rubricaPick": "Hledat v adresáři podle organizace…",
         "rubricaOrAdd": "nebo přidejte ručně",
         "removeItem": "Odstranit {name}",
         "invitationsStaffOnly": "Pozvánky spravuje tým události.",
         "pickSkipped": "Některé osoby už byly uvedeny nebo neměly platnou adresu, a nebyly přidány.",
-        "primaryHeading": "Hlavní pořadatel",
+        "primaryHeading": "Hlavní moderátor",
         "primaryHelp": "Dostane e-mailem hlavní odkaz akce: vede místnost a přidává nebo odebírá ostatní osoby. Jméno a e-mail jsou nutné ke zveřejnění, ne pro koncept.",
-        "primaryPrefilled": "Hlavním pořadatelem jste vy, se jménem a e-mailem svého účtu. Pokud akci vede někdo jiný, zadejte sem jeho údaje: odkaz dostane on.",
-        "primaryNameRequired": "Zadejte jméno hlavního pořadatele.",
-        "primaryEmailRequired": "Zadejte platný e-mail hlavního pořadatele.",
+        "primaryPrefilled": "Hlavním moderátorem jste vy, se jménem a e-mailem svého účtu. Pokud akci vede někdo jiný, zadejte sem jeho údaje: odkaz dostane on.",
+        "primaryNameRequired": "Zadejte jméno hlavního moderátora.",
+        "primaryEmailRequired": "Zadejte platný e-mail hlavního moderátora.",
         "linksOnPublish": "Osobní odkazy se odešlou e-mailem při zveřejnění; dokud je akce konceptem, zkopírujte je z její stránky.",
         "personName": "Jméno",
         "personEmail": "E-mail",
-        "peopleHeading": "Osoby akce",
-        "peopleHelp": "Pořadatelé, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup se svou rolí; co která role může, ukazuje část „Pokročilá nastavení“.",
+        "peopleHeading": "Moderátoři a řečníci",
+        "peopleHelp": "Spoluorganizátoři, moderátoři a řečníci. Každý dostane vlastní odkaz pro vstup ve své roli; co která role může, je vysvětleno výše.",
         "personRole": "Role",
-        "roleOrganizer": "Pořadatel",
+        "roleOrganizer": "Spoluorganizátor",
         "roleModerator": "Moderátor",
         "roleSpeaker": "Řečník",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Plánované minuty, téma {n}",
         "programTimeUnknown": "Čas nevypočten: předchozí téma nemá délku",
         "programNone": "Nikdo",
-        "programLeadOrganizer": "Hlavní pořadatel",
+        "programLeadOrganizer": "Hlavní moderátor",
         "programMoveUp": "Posunout téma {n} nahoru",
         "programMoveDown": "Posunout téma {n} dolů",
         "programRemove": "Odebrat téma {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Upravit",
         "editQuestionsBefore": "Upravit otázky při registraci",
         "editQuestionsAfter": "Upravit dotazník spokojenosti",
-        "accessStaffOnly": "Kdo se může přihlásit, rozhoduje tým akce."
+        "accessStaffOnly": "Kdo se může přihlásit, rozhoduje tým akce.",
+        "whoOrganizes": "Kdo pořádá",
+        "rubricaWho": "V adresáři jsou lidé, kteří se zaregistrovali na akci a souhlasili, že v něm zůstanou."
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -1124,9 +1126,9 @@
           "multitrack": "Nahrávání po jednotlivých účastnících",
           "multitrackOn": "Zapnuto — vyžaduje výslovný souhlas při registraci",
           "organizingEntities": "Pořádající organizace",
-          "primaryOrganizer": "Hlavní pořadatel",
+          "primaryOrganizer": "Hlavní moderátor",
           "primaryMissing": "Pro zveřejnění je třeba ho uvést v kroku „Osoby“",
-          "organizersPeople": "Další pořadatelé",
+          "organizersPeople": "Spoluorganizátoři",
           "moderators": "Moderátoři",
           "programme": "Program: {count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}",
           "programmeWithDuration": "Program: {count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Osoby",
           "programme": "Program",
           "review": "Shrnutí",
-          "advanced": "Pokročilá nastavení"
+          "advanced": "Pokročilá nastavení",
+          "permissions": "Oprávnění"
         },
         "templateInUse": "Šablona: <b>{name}</b>",
         "noTemplate": "Akce bez šablony",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Potřeba ke zveřejnění akce.",
         "toComplete": "K doplnění",
         "missingHeading": "Ke zveřejnění ještě chybí:",
-        "fieldOrganizerName": "Jméno hlavního organizátora",
-        "fieldOrganizerEmail": "E-mail hlavního organizátora",
+        "fieldOrganizerName": "Jméno hlavního moderátora",
+        "fieldOrganizerEmail": "E-mail hlavního moderátora",
         "fieldProgrammeMinutes": "Délka tématu {n} programu",
         "sections": {
-          "participation": "Účast a funkce sálu",
           "recording": "Záznam a AI",
           "content": "Obsah: materiály a dotazníky",
           "room": "Čekárna a video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organizace",
         "askRole": "funkce",
-        "askType": "typ organizace"
+        "askType": "typ organizace",
+        "permissionsHeading": "Kdo co může v místnosti",
+        "permissionsIntro": "Co mohou účastníci dělat a které funkce místnosti jsou zapnuté. Vše lze měnit i během akce."
       },
       "preview": {
         "title": "Náhled stránky",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Program setkání",
-        "intro": "Témata v pořadí: kdo vystupuje, o čem a jak dlouho. Zobrazí se pod popisem, s časy počítanými od začátku ({start}). Nepovinné.",
-        "introNoStart": "Témata v pořadí: kdo vystupuje, o čem a jak dlouho. Zobrazí se pod popisem, s časy počítanými od začátku akce. Nepovinné.",
+        "intro": "Témata v pořadí: kdo vystupuje, o čem a jak dlouho. Zobrazí se pod popisem, s časy počítanými od začátku ({start}).",
+        "introNoStart": "Témata v pořadí: kdo vystupuje, o čem a jak dlouho. Zobrazí se pod popisem, s časy počítanými od začátku akce.",
         "statusOn": "Zobrazuje se na stránce akce a v místnosti ukazuje všem probíhající téma.",
         "statusOff": "Vypnuto: program se nezobrazuje na stránce ani v místnosti.",
         "turnOn": "Zapnout",

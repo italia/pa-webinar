@@ -5,6 +5,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
+import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
@@ -130,7 +131,7 @@ export default async function CreateEventPage({
         }
         defaultLocale={siteSettings.defaultLocale ?? 'it'}
         defaultRetentionDays={30}
-        canUseRubrica={session.role === 'admin'}
+        canUseRubrica={session.role === 'admin' && (await rubricaConPersone())}
         canManageTags={session.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         capacita={capacitaIstanza(siteSettings)}

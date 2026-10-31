@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Telpas funkcijas",
         "aiPipelineOff": "MI pēcapstrāde (transkripcija, kopsavilkums, tulkojumi) šajā instalācijā nav ieslēgta.",
         "rolesHeading": "Pasākuma lomas",
-        "roleModeratorColumn": "Organizators un moderators",
+        "roleModeratorColumn": "Līdzorganizators un moderators",
         "roleInfo": {
           "organizer": {
-            "name": "Organizators",
-            "desc": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Galvenais organizators pievieno un noņem pārējās personas. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu."
+            "name": "Līdzorganizators",
+            "desc": "Vada telpu kā moderators un ir minēts starp organizētājiem. Ar darbinieka kontu ar to pašu e-pastu pārvalda arī pasākumu."
           },
           "moderator": {
             "name": "Moderators",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Dalībnieks",
-            "desc": "Seko pasākumam un piedalās tā, kā nolemjat tabulā zemāk."
+            "desc": "Seko pasākumam un piedalās tā, kā jūs izlemjat solī “Atļaujas”."
           }
         },
         "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC."
@@ -960,23 +960,23 @@
         "remove": "Noņemt",
         "invalidEmail": "Nederīga e-pasta adrese.",
         "duplicateEmail": "Adrese jau ir pievienota.",
-        "rubricaPick": "Meklēt no kontaktu grāmatas…",
+        "rubricaPick": "Meklēt adrešu grāmatā pēc organizācijas…",
         "rubricaOrAdd": "vai pievienot manuāli",
         "removeItem": "Noņemt {name}",
         "invitationsStaffOnly": "Ielūgumus pārvalda pasākuma komanda.",
         "pickSkipped": "Dažas personas jau bija sarakstā vai tām nebija derīgas adreses, tāpēc tās netika pievienotas.",
-        "primaryHeading": "Galvenais organizators",
+        "primaryHeading": "Galvenais moderators",
         "primaryHelp": "Saņem pa e-pastu pasākuma galveno saiti: vada telpu un pievieno vai noņem pārējās personas. Vārds un e-pasts vajadzīgi publicēšanai, ne melnrakstam.",
-        "primaryPrefilled": "Galvenais organizators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu vada cita persona, ierakstiet šeit tās datus: saite tiks nosūtīta tai.",
-        "primaryNameRequired": "Ievadiet galvenā organizatora vārdu.",
-        "primaryEmailRequired": "Ievadiet derīgu galvenā organizatora e-pastu.",
+        "primaryPrefilled": "Galvenais moderators esat jūs, ar sava konta vārdu un e-pastu. Ja pasākumu vada kāds cits, ierakstiet šeit viņa datus: saite tiks nosūtīta viņam.",
+        "primaryNameRequired": "Ievadiet galvenā moderatora vārdu.",
+        "primaryEmailRequired": "Ievadiet derīgu galvenā moderatora e-pastu.",
         "linksOnPublish": "Personīgās saites tiek nosūtītas pa e-pastu publicējot; kamēr pasākums ir melnraksts, kopējiet tās no tā lapas.",
         "personName": "Vārds",
         "personEmail": "E-pasts",
-        "peopleHeading": "Pasākuma personas",
-        "peopleHelp": "Organizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko katra loma var darīt, parāda sadaļa “Papildu iestatījumi”.",
+        "peopleHeading": "Moderatori un runātāji",
+        "peopleHelp": "Līdzorganizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko var katra loma, ir paskaidrots augstāk.",
         "personRole": "Loma",
-        "roleOrganizer": "Organizators",
+        "roleOrganizer": "Līdzorganizators",
         "roleModerator": "Moderators",
         "roleSpeaker": "Runātājs",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Plānotās minūtes, tēma {n}",
         "programTimeUnknown": "Laiks nav aprēķināts: iepriekšējai tēmai nav ilguma",
         "programNone": "Neviens",
-        "programLeadOrganizer": "Galvenais organizators",
+        "programLeadOrganizer": "Galvenais moderators",
         "programMoveUp": "Pārvietot {n}. tēmu uz augšu",
         "programMoveDown": "Pārvietot {n}. tēmu uz leju",
         "programRemove": "Noņemt {n}. tēmu",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Rediģēt",
         "editQuestionsBefore": "Rediģēt reģistrācijas jautājumus",
         "editQuestionsAfter": "Rediģēt apmierinātības aptauju",
-        "accessStaffOnly": "Kas var reģistrēties, izlemj pasākuma komanda."
+        "accessStaffOnly": "Kas var reģistrēties, izlemj pasākuma komanda.",
+        "whoOrganizes": "Kas organizē",
+        "rubricaWho": "Adrešu grāmatā ir cilvēki, kuri reģistrējās pasākumam un piekrita tajā palikt."
       },
       "step4": {
         "heading": "Saturs un materiāli",
@@ -1124,9 +1126,9 @@
           "multitrack": "Ieraksts katram dalībniekam",
           "multitrackOn": "Ieslēgts — nepieciešama skaidra piekrišana reģistrācijas laikā",
           "organizingEntities": "Organizējošās iestādes",
-          "primaryOrganizer": "Galvenais organizators",
+          "primaryOrganizer": "Galvenais moderators",
           "primaryMissing": "Lai publicētu, jānorāda solī “Personas”",
-          "organizersPeople": "Citi organizatori",
+          "organizersPeople": "Līdzorganizatori",
           "moderators": "Moderatori",
           "programme": "Programma: {count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}",
           "programmeWithDuration": "Programma: {count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personas",
           "programme": "Programma",
           "review": "Kopsavilkums",
-          "advanced": "Papildu iestatījumi"
+          "advanced": "Papildu iestatījumi",
+          "permissions": "Atļaujas"
         },
         "templateInUse": "Veidne: <b>{name}</b>",
         "noTemplate": "Pasākums bez veidnes",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Vajadzīgs, lai publicētu pasākumu.",
         "toComplete": "Jāaizpilda",
         "missingHeading": "Publicēšanai vēl trūkst:",
-        "fieldOrganizerName": "Galvenā organizatora vārds",
-        "fieldOrganizerEmail": "Galvenā organizatora e-pasts",
+        "fieldOrganizerName": "Galvenā moderatora vārds",
+        "fieldOrganizerEmail": "Galvenā moderatora e-pasts",
         "fieldProgrammeMinutes": "Programmas {n}. tēmas ilgums",
         "sections": {
-          "participation": "Dalība un zāles funkcijas",
           "recording": "Ieraksts un MI",
           "content": "Saturs: materiāli un anketas",
           "room": "Uzgaidāmā telpa un video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-pasts",
         "askOrganization": "organizācija",
         "askRole": "amats",
-        "askType": "organizācijas veids"
+        "askType": "organizācijas veids",
+        "permissionsHeading": "Kas ko var darīt telpā",
+        "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā."
       },
       "preview": {
         "title": "Lapas priekšskatījums",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Sanāksmes programma",
-        "intro": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no sākuma ({start}). Nav obligāti.",
-        "introNoStart": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no pasākuma sākuma. Nav obligāti.",
+        "intro": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no sākuma ({start}).",
+        "introNoStart": "Tēmas secībā: kurš uzstājas, par ko un cik ilgi. Tās redzamas zem apraksta, ar laikiem, kas aprēķināti no pasākuma sākuma.",
         "statusOn": "Redzama pasākuma lapā, un telpā visiem rāda pašreizējo tēmu.",
         "statusOff": "Izslēgta: programma nav redzama ne lapā, ne telpā.",
         "turnOn": "Ieslēgt",

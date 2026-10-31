@@ -10,6 +10,7 @@ import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { rubricaConPersone } from '@/lib/persons/rubrica-picker';
 import { capacitaIstanza } from '@/lib/capacity/istanza';
 import { getSettings } from '@/lib/settings';
 import { liveCaptionsAvailable } from '@/lib/captions/availability';
@@ -128,8 +129,11 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   // cima, perche' la pagina e' la stessa della modifica.
   const copia = copiaParam === 'prossima' || copiaParam === 'stesse' ? copiaParam : null;
   // Il passo da cui partire (dai link «Modifica» della pagina dell'evento),
-  // anche nominato come una volta (`permissions`, `content`).
-  const daIndirizzo = wizardStepFromParam(step);
+  // anche nominato come una volta: `content`, e la vecchia sezione
+  // `section=participation` delle impostazioni avanzate, oggi il passo
+  // «Permessi».
+  const daIndirizzo =
+    section === 'participation' ? { step: 'permissions' as const } : wizardStepFromParam(step);
   const initialStep = daIndirizzo?.step;
   const initialSection: WizardAdvancedSection | undefined =
     (WIZARD_ADVANCED_SECTIONS as readonly string[]).includes(String(section))
@@ -386,7 +390,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         copia={copiaInBozza}
         initialStep={initialStep}
         initialSection={initialSection}
-        canUseRubrica={session?.role === 'admin'}
+        canUseRubrica={session?.role === 'admin' && (await rubricaConPersone())}
         canManageTags={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}

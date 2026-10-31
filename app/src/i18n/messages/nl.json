@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Functies van de zaal",
         "aiPipelineOff": "AI-nabewerking (transcriptie, samenvatting, vertalingen) is niet ingeschakeld op deze installatie.",
         "rolesHeading": "Rollen van het evenement",
-        "roleModeratorColumn": "Organisator en moderator",
+        "roleModeratorColumn": "Mede-organisator en moderator",
         "roleInfo": {
           "organizer": {
-            "name": "Organisator",
-            "desc": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. De hoofdorganisator voegt de andere personen toe en verwijdert ze. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement."
+            "name": "Mede-organisator",
+            "desc": "Leidt de ruimte zoals een moderator en wordt bij de organisatoren vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert diegene ook het evenement."
           },
           "moderator": {
             "name": "Moderator",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Deelnemer",
-            "desc": "Volgt het evenement en doet mee zoals u in de tabel hieronder bepaalt."
+            "desc": "Volgt het evenement en doet mee zoals je bepaalt in de stap 'Rechten'."
           }
         },
         "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop."
@@ -960,23 +960,23 @@
         "remove": "Verwijderen",
         "invalidEmail": "Ongeldig e-mailadres.",
         "duplicateEmail": "Adres al toegevoegd.",
-        "rubricaPick": "Zoeken in adresboek…",
+        "rubricaPick": "Zoek in het adresboek op organisatie…",
         "rubricaOrAdd": "of handmatig toevoegen",
         "removeItem": "{name} verwijderen",
         "invitationsStaffOnly": "De uitnodigingen worden beheerd door het team van het evenement.",
         "pickSkipped": "Sommige personen stonden al in de lijst of hadden geen geldig adres en zijn niet toegevoegd.",
-        "primaryHeading": "Hoofdorganisator",
+        "primaryHeading": "Hoofdmoderator",
         "primaryHelp": "Ontvangt de hoofdlink van het evenement per e-mail: leidt de ruimte en voegt de andere personen toe of verwijdert ze. Naam en e-mail zijn nodig om te publiceren, niet voor een concept.",
-        "primaryPrefilled": "De hoofdorganisator bent u, met de naam en het e-mailadres van uw account. Leidt iemand anders het evenement, vul dan hier diens gegevens in: de link gaat naar die persoon.",
-        "primaryNameRequired": "Vul de naam van de hoofdorganisator in.",
-        "primaryEmailRequired": "Vul een geldig e-mailadres van de hoofdorganisator in.",
+        "primaryPrefilled": "De hoofdmoderator ben jij, met de naam en het e-mailadres van je account. Leidt iemand anders het evenement, vul dan hier diens gegevens in: de link gaat naar die persoon.",
+        "primaryNameRequired": "Vul de naam van de hoofdmoderator in.",
+        "primaryEmailRequired": "Vul een geldig e-mailadres van de hoofdmoderator in.",
         "linksOnPublish": "Persoonlijke links worden bij publicatie per e-mail verstuurd; zolang het evenement een concept is, kopieert u ze van de pagina.",
         "personName": "Naam",
         "personEmail": "E-mail",
-        "peopleHeading": "Personen van het evenement",
-        "peopleHelp": "Organisatoren, moderatoren en sprekers. Ieder krijgt een eigen link om met de eigen rol deel te nemen; wat elke rol mag, staat in ‘Geavanceerde instellingen’.",
+        "peopleHeading": "Moderatoren en sprekers",
+        "peopleHelp": "Mede-organisatoren, moderatoren en sprekers. Iedereen krijgt een eigen link om met de eigen rol binnen te komen; wat elke rol kan, staat hierboven.",
         "personRole": "Rol",
-        "roleOrganizer": "Organisator",
+        "roleOrganizer": "Mede-organisator",
         "roleModerator": "Moderator",
         "roleSpeaker": "Spreker",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Geplande minuten, onderwerp {n}",
         "programTimeUnknown": "Tijd niet berekend: een eerder onderwerp heeft geen duur",
         "programNone": "Niemand",
-        "programLeadOrganizer": "Hoofdorganisator",
+        "programLeadOrganizer": "Hoofdmoderator",
         "programMoveUp": "Onderwerp {n} omhoog",
         "programMoveDown": "Onderwerp {n} omlaag",
         "programRemove": "Onderwerp {n} verwijderen",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Bewerken",
         "editQuestionsBefore": "Bewerken: vragen bij de inschrijving",
         "editQuestionsAfter": "Bewerken: tevredenheidsenquête",
-        "accessStaffOnly": "Wie zich aanmeldt, beslist het team van het evenement."
+        "accessStaffOnly": "Wie zich aanmeldt, beslist het team van het evenement.",
+        "whoOrganizes": "Wie organiseert",
+        "rubricaWho": "In het adresboek staan de mensen die zich voor een evenement hebben ingeschreven en ermee instemden erin te blijven."
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -1124,9 +1126,9 @@
           "multitrack": "Opname per deelnemer",
           "multitrackOn": "Aan — vereist uitdrukkelijke toestemming bij de registratie",
           "organizingEntities": "Organiserende instanties",
-          "primaryOrganizer": "Hoofdorganisator",
+          "primaryOrganizer": "Hoofdmoderator",
           "primaryMissing": "Op te geven in de stap ‘Personen’ om te publiceren",
-          "organizersPeople": "Andere organisatoren",
+          "organizersPeople": "Mede-organisatoren",
           "moderators": "Moderatoren",
           "programme": "Programma: {count, plural, one {# onderwerp} other {# onderwerpen}}",
           "programmeWithDuration": "Programma: {count, plural, one {# onderwerp} other {# onderwerpen}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personen",
           "programme": "Programma",
           "review": "Overzicht",
-          "advanced": "Geavanceerde instellingen"
+          "advanced": "Geavanceerde instellingen",
+          "permissions": "Rechten"
         },
         "templateInUse": "Sjabloon: <b>{name}</b>",
         "noTemplate": "Evenement zonder sjabloon",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Nodig om het evenement te publiceren.",
         "toComplete": "Nog in te vullen",
         "missingHeading": "Om te publiceren ontbreekt nog:",
-        "fieldOrganizerName": "Naam van de hoofdorganisator",
-        "fieldOrganizerEmail": "E-mail van de hoofdorganisator",
+        "fieldOrganizerName": "Naam van de hoofdmoderator",
+        "fieldOrganizerEmail": "E-mailadres van de hoofdmoderator",
         "fieldProgrammeMinutes": "Duur van programmaonderwerp {n}",
         "sections": {
-          "participation": "Deelname en functies van de zaal",
           "recording": "Opname en AI",
           "content": "Inhoud: materiaal en vragenlijsten",
           "room": "Wachtruimte en video",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organisatie",
         "askRole": "functie",
-        "askType": "soort organisatie"
+        "askType": "soort organisatie",
+        "permissionsHeading": "Wie wat mag in de ruimte",
+        "permissionsIntro": "Wat deelnemers kunnen en welke functies van de ruimte aan staan. Alles kan ook tijdens het evenement worden gewijzigd."
       },
       "preview": {
         "title": "Voorbeeld van de pagina",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Programma van de bijeenkomst",
-        "intro": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin ({start}). Optioneel.",
-        "introNoStart": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin van het evenement. Optioneel.",
+        "intro": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin ({start}).",
+        "introNoStart": "De onderwerpen op volgorde: wie spreekt, waarover en hoe lang. Ze verschijnen onder de beschrijving, met tijden berekend vanaf het begin van het evenement.",
         "statusOn": "Verschijnt op de pagina van het evenement en toont in de zaal iedereen het huidige onderwerp.",
         "statusOff": "Uit: het programma verschijnt niet op de pagina en niet in de zaal.",
         "turnOn": "Aanzetten",

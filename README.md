@@ -47,7 +47,7 @@ The [feature tour](docs/FEATURES.md) has the full catalog, role by role.
 
 ### Organizers
 
-- Build an event in the five-step event wizard, start from an **Event templates** entry, or reuse a past event with **Duplicate**.
+- Build an event in the six-step event wizard, start from an **Event templates** entry, or reuse a past event with **Duplicate**.
 - Collect registrations and keep an invitation list, which decides who may register when registration is by invitation. Confirmations, calendar files and reminders leave through an email outbox.
 - Add pre-event and post-event questionnaires, and materials whose visibility follows the phase of the event.
 - Open a room at once from **Instant calls**.

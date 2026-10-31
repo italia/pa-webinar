@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Huoneen toiminnot",
         "aiPipelineOff": "Tekoälyjälkikäsittely (litterointi, tiivistelmä, käännökset) ei ole käytössä tässä asennuksessa.",
         "rolesHeading": "Tapahtuman roolit",
-        "roleModeratorColumn": "Järjestäjä ja moderaattori",
+        "roleModeratorColumn": "Toinen järjestäjä ja moderaattori",
         "roleInfo": {
           "organizer": {
-            "name": "Järjestäjä",
-            "desc": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Pääjärjestäjä lisää ja poistaa muita henkilöitä. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa."
+            "name": "Toinen järjestäjä",
+            "desc": "Vetää huonetta moderaattorin tavoin ja esitellään järjestäjien joukossa. Samalla sähköpostilla olevalla henkilökunnan tilillä hallinnoi myös tapahtumaa."
           },
           "moderator": {
             "name": "Moderaattori",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Osallistuja",
-            "desc": "Seuraa tapahtumaa ja osallistuu niin kuin alla olevassa taulukossa päätät."
+            "desc": "Seuraa tapahtumaa ja osallistuu niin kuin päätät vaiheessa ”Oikeudet”."
           }
         },
         "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella."
@@ -960,23 +960,23 @@
         "remove": "Poista",
         "invalidEmail": "Virheellinen sähköpostiosoite.",
         "duplicateEmail": "Osoite on jo lisätty.",
-        "rubricaPick": "Hae osoitekirjasta…",
+        "rubricaPick": "Hae osoitekirjasta organisaation mukaan…",
         "rubricaOrAdd": "tai lisää manuaalisesti",
         "removeItem": "Poista {name}",
         "invitationsStaffOnly": "Kutsuja hallinnoi tapahtuman henkilökunta.",
         "pickSkipped": "Osa henkilöistä oli jo luettelossa tai heillä ei ollut kelvollista osoitetta, joten heitä ei lisätty.",
-        "primaryHeading": "Pääjärjestäjä",
+        "primaryHeading": "Päämoderaattori",
         "primaryHelp": "Saa tapahtuman päälinkin sähköpostilla: johtaa huonetta ja lisää tai poistaa muita henkilöitä. Nimi ja sähköposti tarvitaan julkaisuun, ei luonnokseen.",
-        "primaryPrefilled": "Pääjärjestäjä olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa johtaa joku muu, kirjoita tähän hänen tietonsa: linkki menee hänelle.",
-        "primaryNameRequired": "Kirjoita pääjärjestäjän nimi.",
-        "primaryEmailRequired": "Kirjoita pääjärjestäjän kelvollinen sähköposti.",
+        "primaryPrefilled": "Päämoderaattori olet sinä, tilisi nimellä ja sähköpostilla. Jos tapahtumaa vetää joku muu, kirjoita tähän hänen tietonsa: linkki menee hänelle.",
+        "primaryNameRequired": "Kirjoita päämoderaattorin nimi.",
+        "primaryEmailRequired": "Kirjoita päämoderaattorin kelvollinen sähköposti.",
         "linksOnPublish": "Henkilökohtaiset linkit lähetetään sähköpostilla julkaisun yhteydessä; niin kauan kuin tapahtuma on luonnos, kopioi ne sen sivulta.",
         "personName": "Nimi",
         "personEmail": "Sähköposti",
-        "peopleHeading": "Tapahtuman henkilöt",
-        "peopleHelp": "Järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin osallistuakseen roolissaan; mitä kukin rooli voi tehdä, näkyy kohdassa ”Lisäasetukset”.",
+        "peopleHeading": "Moderaattorit ja puhujat",
+        "peopleHelp": "Toiset järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin, jolla tulee sisään omassa roolissaan; mitä kukin rooli voi tehdä, selitetään yllä.",
         "personRole": "Rooli",
-        "roleOrganizer": "Järjestäjä",
+        "roleOrganizer": "Toinen järjestäjä",
         "roleModerator": "Moderaattori",
         "roleSpeaker": "Puhuja",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Suunnitellut minuutit, aihe {n}",
         "programTimeUnknown": "Aikaa ei laskettu: aiemmalla aiheella ei ole kestoa",
         "programNone": "Ei kukaan",
-        "programLeadOrganizer": "Pääjärjestäjä",
+        "programLeadOrganizer": "Päämoderaattori",
         "programMoveUp": "Siirrä aihetta {n} ylös",
         "programMoveDown": "Siirrä aihetta {n} alas",
         "programRemove": "Poista aihe {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Muokkaa",
         "editQuestionsBefore": "Muokkaa ilmoittautumisen kysymyksiä",
         "editQuestionsAfter": "Muokkaa tyytyväisyyskyselyä",
-        "accessStaffOnly": "Ilmoittautujista päättää tapahtuman henkilökunta."
+        "accessStaffOnly": "Ilmoittautujista päättää tapahtuman henkilökunta.",
+        "whoOrganizes": "Kuka järjestää",
+        "rubricaWho": "Osoitekirjassa ovat henkilöt, jotka ilmoittautuivat tapahtumaan ja suostuivat jäämään siihen."
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -1124,9 +1126,9 @@
           "multitrack": "Osallistujakohtainen tallennus",
           "multitrackOn": "Käytössä — edellyttää nimenomaista suostumusta ilmoittautumisen yhteydessä",
           "organizingEntities": "Järjestävät organisaatiot",
-          "primaryOrganizer": "Pääjärjestäjä",
+          "primaryOrganizer": "Päämoderaattori",
           "primaryMissing": "Määritettävä vaiheessa ”Henkilöt” julkaisua varten",
-          "organizersPeople": "Muut järjestäjät",
+          "organizersPeople": "Toiset järjestäjät",
           "moderators": "Moderaattorit",
           "programme": "Ohjelma: {count, plural, one {# aihe} other {# aihetta}}",
           "programmeWithDuration": "Ohjelma: {count, plural, one {# aihe} other {# aihetta}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Henkilöt",
           "programme": "Ohjelma",
           "review": "Yhteenveto",
-          "advanced": "Lisäasetukset"
+          "advanced": "Lisäasetukset",
+          "permissions": "Oikeudet"
         },
         "templateInUse": "Malli: <b>{name}</b>",
         "noTemplate": "Tapahtuma ilman mallia",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Tarvitaan tapahtuman julkaisemiseen.",
         "toComplete": "Täydennettävä",
         "missingHeading": "Julkaisemisesta puuttuu vielä:",
-        "fieldOrganizerName": "Pääjärjestäjän nimi",
-        "fieldOrganizerEmail": "Pääjärjestäjän sähköposti",
+        "fieldOrganizerName": "Päämoderaattorin nimi",
+        "fieldOrganizerEmail": "Päämoderaattorin sähköposti",
         "fieldProgrammeMinutes": "Ohjelman aiheen {n} kesto",
         "sections": {
-          "participation": "Osallistuminen ja tilan toiminnot",
           "recording": "Tallenne ja tekoäly",
           "content": "Sisältö: materiaalit ja kyselyt",
           "room": "Odotustila ja video",
@@ -1229,7 +1231,9 @@
         "askEmail": "sähköposti",
         "askOrganization": "organisaatio",
         "askRole": "rooli",
-        "askType": "organisaation tyyppi"
+        "askType": "organisaation tyyppi",
+        "permissionsHeading": "Kuka voi tehdä mitä huoneessa",
+        "permissionsIntro": "Mitä osallistujat voivat tehdä ja mitkä huoneen toiminnot ovat käytössä. Kaikkea voi muuttaa myös tapahtuman aikana."
       },
       "preview": {
         "title": "Sivun esikatselu",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Tapaamisen ohjelma",
-        "intro": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan alusta ({start}). Vapaaehtoinen.",
-        "introNoStart": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan tapahtuman alusta. Vapaaehtoinen.",
+        "intro": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan alusta ({start}).",
+        "introNoStart": "Aiheet järjestyksessä: kuka puhuu, mistä ja kuinka kauan. Ne näkyvät kuvauksen alla, ja kellonajat lasketaan tapahtuman alusta.",
         "statusOn": "Näkyy tapahtuman sivulla, ja huoneessa se näyttää kaikille käynnissä olevan aiheen.",
         "statusOff": "Pois päältä: ohjelma ei näy sivulla eikä huoneessa.",
         "turnOn": "Ota käyttöön",

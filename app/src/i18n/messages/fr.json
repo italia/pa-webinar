@@ -923,11 +923,11 @@
         "roomFeaturesHeading": "Fonctions de la salle",
         "aiPipelineOff": "La post-production IA (transcription, synthèse, traductions) n'est pas activée sur cette installation.",
         "rolesHeading": "Les rôles de l'événement",
-        "roleModeratorColumn": "Organisateur et modérateur",
+        "roleModeratorColumn": "Co-organisateur et modérateur",
         "roleInfo": {
           "organizer": {
-            "name": "Organisateur",
-            "desc": "Anime la salle comme un modérateur et figure parmi les organisateurs. L'organisateur principal ajoute et retire les autres personnes. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement."
+            "name": "Co-organisateur",
+            "desc": "Anime la salle comme un modérateur et figure parmi les organisateurs. Avec un compte du personnel sous la même adresse, gère aussi l'événement."
           },
           "moderator": {
             "name": "Modérateur",
@@ -939,7 +939,7 @@
           },
           "guest": {
             "name": "Participant",
-            "desc": "Suit l'événement et interagit comme vous le décidez dans le tableau ci-dessous."
+            "desc": "Suit l'événement et interagit comme vous le décidez à l'étape « Autorisations »."
           }
         },
         "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC."
@@ -960,23 +960,23 @@
         "remove": "Supprimer",
         "invalidEmail": "Adresse e-mail non valide.",
         "duplicateEmail": "Adresse déjà ajoutée.",
-        "rubricaPick": "Rechercher dans le carnet d'adresses…",
+        "rubricaPick": "Rechercher dans le carnet par organisation…",
         "rubricaOrAdd": "ou ajouter manuellement",
         "removeItem": "Supprimer {name}",
         "invitationsStaffOnly": "Les invitations sont gérées par l'équipe de l'événement.",
         "pickSkipped": "Certaines personnes figuraient déjà dans la liste ou n'avaient pas d'adresse valide, et n'ont pas été ajoutées.",
-        "primaryHeading": "Organisateur principal",
+        "primaryHeading": "Modérateur principal",
         "primaryHelp": "Reçoit par e-mail le lien principal de l'événement : anime la salle et ajoute ou retire les autres personnes. Le nom et l'e-mail sont requis pour publier, pas pour un brouillon.",
-        "primaryPrefilled": "L'organisateur principal, c'est vous, avec le nom et l'e-mail de votre compte. Si quelqu'un d'autre anime l'événement, saisissez ici ses coordonnées : le lien lui sera envoyé.",
-        "primaryNameRequired": "Saisissez le nom de l'organisateur principal.",
-        "primaryEmailRequired": "Saisissez un e-mail valide pour l'organisateur principal.",
+        "primaryPrefilled": "Le modérateur principal, c'est vous, avec le nom et l'adresse de votre compte. Si quelqu'un d'autre anime l'événement, saisissez ici ses coordonnées : le lien lui sera envoyé.",
+        "primaryNameRequired": "Saisissez le nom du modérateur principal.",
+        "primaryEmailRequired": "Saisissez une adresse e-mail valide du modérateur principal.",
         "linksOnPublish": "Les liens personnels partent par e-mail à la publication ; tant que l'événement est un brouillon, copiez-les depuis sa page.",
         "personName": "Nom",
         "personEmail": "E-mail",
-        "peopleHeading": "Personnes de l'événement",
-        "peopleHelp": "Organisateurs, modérateurs et intervenants. Chacun reçoit son propre lien pour entrer avec son rôle ; ce que peut faire chaque rôle est indiqué dans les « Paramètres avancés ».",
+        "peopleHeading": "Modérateurs et intervenants",
+        "peopleHelp": "Co-organisateurs, modérateurs et intervenants. Chacun reçoit son propre lien pour entrer avec son rôle ; ce que chaque rôle peut faire est expliqué ci-dessus.",
         "personRole": "Rôle",
-        "roleOrganizer": "Organisateur",
+        "roleOrganizer": "Co-organisateur",
         "roleModerator": "Modérateur",
         "roleSpeaker": "Intervenant",
         "roleHelp": {
@@ -1015,7 +1015,7 @@
         "programMinutesFor": "Minutes prévues, sujet {n}",
         "programTimeUnknown": "Heure non calculée : un sujet précédent n'a pas de durée",
         "programNone": "Personne",
-        "programLeadOrganizer": "Organisateur principal",
+        "programLeadOrganizer": "Modérateur principal",
         "programMoveUp": "Monter le sujet {n}",
         "programMoveDown": "Descendre le sujet {n}",
         "programRemove": "Retirer le sujet {n}",
@@ -1048,7 +1048,9 @@
         "editQuestions": "Modifier",
         "editQuestionsBefore": "Modifier les questions d'inscription",
         "editQuestionsAfter": "Modifier le questionnaire de satisfaction",
-        "accessStaffOnly": "C'est l'équipe de l'événement qui décide qui peut s'inscrire."
+        "accessStaffOnly": "C'est l'équipe de l'événement qui décide qui peut s'inscrire.",
+        "whoOrganizes": "Qui organise",
+        "rubricaWho": "Le carnet contient les personnes qui se sont inscrites à un événement et ont accepté d'y rester."
       },
       "step4": {
         "heading": "Contenus et ressources",
@@ -1124,9 +1126,9 @@
           "multitrack": "Enregistrement par participant",
           "multitrackOn": "Activé — nécessite un consentement explicite à l'inscription",
           "organizingEntities": "Organismes organisateurs",
-          "primaryOrganizer": "Organisateur principal",
+          "primaryOrganizer": "Modérateur principal",
           "primaryMissing": "À indiquer à l'étape « Personnes » pour publier",
-          "organizersPeople": "Autres organisateurs",
+          "organizersPeople": "Co-organisateurs",
           "moderators": "Modérateurs",
           "programme": "Programme: {count, plural, one {# sujet} other {# sujets}}",
           "programmeWithDuration": "Programme: {count, plural, one {# sujet} other {# sujets}}, {duration}"
@@ -1175,7 +1177,8 @@
           "invites": "Personnes",
           "programme": "Programme",
           "review": "Récapitulatif",
-          "advanced": "Paramètres avancés"
+          "advanced": "Paramètres avancés",
+          "permissions": "Autorisations"
         },
         "templateInUse": "Modèle : <b>{name}</b>",
         "noTemplate": "Événement sans modèle",
@@ -1193,11 +1196,10 @@
         "requiredToPublish": "Nécessaire pour publier l'événement.",
         "toComplete": "À compléter",
         "missingHeading": "Pour publier, il manque encore :",
-        "fieldOrganizerName": "Nom de l'organisateur principal",
-        "fieldOrganizerEmail": "E-mail de l'organisateur principal",
+        "fieldOrganizerName": "Nom du modérateur principal",
+        "fieldOrganizerEmail": "E-mail du modérateur principal",
         "fieldProgrammeMinutes": "Durée du sujet {n} du programme",
         "sections": {
-          "participation": "Participation et fonctions de la salle",
           "recording": "Enregistrement et IA",
           "content": "Contenus : documents et questionnaires",
           "room": "Salle d'attente et vidéo",
@@ -1229,7 +1231,9 @@
         "askEmail": "e-mail",
         "askOrganization": "organisme",
         "askRole": "fonction",
-        "askType": "type d'organisme"
+        "askType": "type d'organisme",
+        "permissionsHeading": "Qui peut faire quoi dans la salle",
+        "permissionsIntro": "Ce que les participants peuvent faire et quelles fonctions de la salle sont actives. Tout se modifie aussi pendant l'événement."
       },
       "preview": {
         "title": "Aperçu de la page",
@@ -1241,8 +1245,8 @@
       },
       "programme": {
         "heading": "Programme de la rencontre",
-        "intro": "Les sujets dans l'ordre : qui intervient, sur quoi et pendant combien de temps. Ils apparaissent sous la description, avec les horaires calculés à partir du début ({start}). Facultatif.",
-        "introNoStart": "Les sujets dans l'ordre : qui intervient, sur quoi et pendant combien de temps. Ils apparaissent sous la description, avec les horaires calculés à partir du début de l'événement. Facultatif.",
+        "intro": "Les sujets dans l'ordre : qui intervient, sur quoi et pendant combien de temps. Ils apparaissent sous la description, avec les horaires calculés à partir du début ({start}).",
+        "introNoStart": "Les sujets dans l'ordre : qui intervient, sur quoi et pendant combien de temps. Ils apparaissent sous la description, avec les horaires calculés à partir du début de l'événement.",
         "statusOn": "Affiché sur la page de l'événement ; dans la salle, il montre à tous le sujet en cours.",
         "statusOff": "Désactivé : le programme n'apparaît ni sur la page ni dans la salle.",
         "turnOn": "Activer",
