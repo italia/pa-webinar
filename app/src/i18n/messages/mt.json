@@ -558,7 +558,8 @@
       "moderatorReveal": "Uri l-link tal-moderatur",
       "moderatorWarning": "Dan il-link jagħti aċċess ta' MODERATUR (issikket lil kulħadd, ibda r-reġistrazzjoni, temm l-avveniment). Aqsmu biss ma' moderaturi oħra.",
       "moderatorLink": "Link tal-moderatur",
-      "moderatorLinkHint": "Min jiftaħ dan il-link jidħol bħala moderatur b'kontroll sħiħ tal-kamra."
+      "moderatorLinkHint": "Min jiftaħ dan il-link jidħol bħala moderatur b'kontroll sħiħ tal-kamra.",
+      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz u kkupjah manwalment."
     },
     "videoCallFrameTitle": "Sejħa bil-vidjo tal-avveniment",
     "insecureContextTitle": "Indirizz mhux sigur",
@@ -1875,7 +1876,8 @@
       "warning": "Kull min għandu dan il-link jamministra l-avveniment: turiehx waqt li taqsam l-iskrin u tehmżux f’chat.",
       "hidden": "Il-link huwa moħbi",
       "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment.",
-      "notYetPublished": "Jaħdem biss wara l-pubblikazzjoni: sa dakinhar jidher “il-paġna ma nstabitx”."
+      "notYetPublished": "Jaħdem biss wara l-pubblikazzjoni: sa dakinhar jidher “il-paġna ma nstabitx”.",
+      "copyFailedShort": "L-ikkupjar ma rnexxiex"
     },
     "feedbackAdmin": {
       "title": "Riżultati tal-Feedback",

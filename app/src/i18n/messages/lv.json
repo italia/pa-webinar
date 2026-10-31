@@ -558,7 +558,8 @@
       "moderatorReveal": "Rādīt moderatora saiti",
       "moderatorWarning": "Šī saite piešķir MODERATORA piekļuvi (izslēgt mikrofonu visiem, sākt ierakstīšanu, beigt pasākumu). Kopīgojiet to tikai ar citiem moderatoriem.",
       "moderatorLink": "Moderatora saite",
-      "moderatorLinkHint": "Ikviens, kas atver šo saiti, pievienojas kā moderators ar pilnām telpas vadības tiesībām."
+      "moderatorLinkHint": "Ikviens, kas atver šo saiti, pievienojas kā moderators ar pilnām telpas vadības tiesībām.",
+      "copyFailed": "Neizdevās nokopēt: atlasiet adresi un nokopējiet to manuāli."
     },
     "videoCallFrameTitle": "Pasākuma videozvans",
     "insecureContextTitle": "Nedroša adrese",
@@ -1875,7 +1876,8 @@
       "warning": "Ikviens, kam ir šī saite, pārvalda pasākumu: nerādiet to, koplietojot ekrānu, un neielīmējiet to tērzēšanā.",
       "hidden": "Saite ir paslēpta",
       "copyFailed": "Kopēšana neizdevās: atlasiet tālāk norādīto adresi un kopējiet to manuāli.",
-      "notYetPublished": "Darbojas tikai pēc publicēšanas: līdz tam tiek rādīts “lapa nav atrasta”."
+      "notYetPublished": "Darbojas tikai pēc publicēšanas: līdz tam tiek rādīts “lapa nav atrasta”.",
+      "copyFailedShort": "Neizdevās nokopēt"
     },
     "feedbackAdmin": {
       "title": "Atsauksmju rezultāti",

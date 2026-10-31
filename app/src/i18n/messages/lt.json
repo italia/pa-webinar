@@ -558,7 +558,8 @@
       "moderatorReveal": "Rodyti moderatoriaus nuorodą",
       "moderatorWarning": "Ši nuoroda suteikia MODERATORIAUS teises (nutildyti visus, pradėti įrašymą, užbaigti renginį). Dalykitės ja tik su kitais moderatoriais.",
       "moderatorLink": "Moderatoriaus nuoroda",
-      "moderatorLinkHint": "Kas atidaro šią nuorodą, prisijungia kaip moderatorius su visomis valdymo teisėmis."
+      "moderatorLinkHint": "Kas atidaro šią nuorodą, prisijungia kaip moderatorius su visomis valdymo teisėmis.",
+      "copyFailed": "Nepavyko nukopijuoti: pažymėkite adresą ir nukopijuokite jį rankiniu būdu."
     },
     "videoCallFrameTitle": "Renginio vaizdo skambutis",
     "insecureContextTitle": "Nesaugus adresas",
@@ -1875,7 +1876,8 @@
       "warning": "Kiekvienas, turintis šią nuorodą, administruoja renginį: nerodykite jos bendrinant ekraną ir neįklijuokite jos į pokalbį.",
       "hidden": "Nuoroda paslėpta",
       "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka.",
-      "notYetPublished": "Veikia tik po paskelbimo: iki tol rodoma „puslapis nerastas“."
+      "notYetPublished": "Veikia tik po paskelbimo: iki tol rodoma „puslapis nerastas“.",
+      "copyFailedShort": "Nepavyko nukopijuoti"
     },
     "feedbackAdmin": {
       "title": "Atsiliepimų rezultatai",

@@ -20,6 +20,7 @@ import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import LinkQr, { nomeFileQr } from '@/components/ui/link-qr';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 
 interface Riga {
   chiave: 'publicPage' | 'guestJoin' | 'callInvite' | 'moderatorLink';
@@ -62,32 +63,9 @@ export default function EventLinksSection({
   const [copiato, setCopiato] = useState<string | null>(null);
   const [fallita, setFallita] = useState<string | null>(null);
 
-  /**
-   * Dire «copiato» quando non e' vero, qui, e' peggio che dire niente: chi
-   * amministra incolla quello che era negli appunti da prima — magari il link
-   * pubblico preso dalla riga sopra al posto di quello moderatore, o il
-   * contrario. Il ripiego a mano non lancia quando fallisce, RESTITUISCE falso:
-   * per questo si guarda il valore di ritorno invece di fidarsi del try.
-   */
+  /** Copia e mostra l'esito vero (vedi `copiaNegliAppunti`). */
   const copia = useCallback(async (chiave: string, url: string) => {
-    let riuscita = false;
-    try {
-      await navigator.clipboard.writeText(url);
-      riuscita = true;
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = url;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        riuscita = document.execCommand('copy');
-      } catch {
-        riuscita = false;
-      }
-      ta.remove();
-    }
+    const riuscita = await copiaNegliAppunti(url);
 
     if (riuscita) {
       setFallita(null);

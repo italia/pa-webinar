@@ -558,7 +558,8 @@
       "moderatorReveal": "Mostrar a ligação de moderador",
       "moderatorWarning": "Esta ligação dá acesso de MODERADOR (silenciar todos, iniciar a gravação, terminar o evento). Partilhe-a apenas com outros moderadores.",
       "moderatorLink": "Ligação de moderador",
-      "moderatorLinkHint": "Quem abrir esta ligação entra como moderador, com pleno controlo da sala."
+      "moderatorLinkHint": "Quem abrir esta ligação entra como moderador, com pleno controlo da sala.",
+      "copyFailed": "Não foi possível copiar: selecione o endereço e copie-o manualmente."
     },
     "videoCallFrameTitle": "Videochamada do evento",
     "insecureContextTitle": "Endereço não seguro",
@@ -1875,7 +1876,8 @@
       "warning": "Quem tiver esta ligação administra o evento: não a mostre durante a partilha de ecrã e não a cole numa conversa.",
       "hidden": "Ligação oculta",
       "copyFailed": "Não foi possível copiar: selecione o endereço abaixo e copie-o manualmente.",
-      "notYetPublished": "Abre depois da publicação: até lá, quem o usar vê «página não encontrada»."
+      "notYetPublished": "Abre depois da publicação: até lá, quem o usar vê «página não encontrada».",
+      "copyFailedShort": "Não foi possível copiar"
     },
     "feedbackAdmin": {
       "title": "Resultados do Feedback",

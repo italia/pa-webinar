@@ -7,6 +7,7 @@ import { Badge, Card, CardBody, Input } from 'design-react-kit';
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -38,6 +39,7 @@ export default function ModeratorsDashboard({
   const tc = useTranslations('common');
   const fmt = useFormatter();
   const toast = useToast();
+  const tLinks = useTranslations('admin.links');
   const confirm = useConfirm();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [search, setSearch] = useState('');
@@ -74,13 +76,12 @@ export default function ModeratorsDashboard({
   }
 
   async function copyLink(row: ModeratorRow) {
-    try {
-      await navigator.clipboard.writeText(buildLink(row));
-      setCopied(row.id);
-      setTimeout(() => setCopied(null), 1500);
-    } catch {
-      // Non-critical — user can still copy manually.
+    if (!(await copiaNegliAppunti(buildLink(row)))) {
+      toast.error(tLinks('copyFailedShort'));
+      return;
     }
+    setCopied(row.id);
+    setTimeout(() => setCopied((c) => (c === row.id ? null : c)), 1500);
   }
 
   async function regenerate(row: ModeratorRow) {

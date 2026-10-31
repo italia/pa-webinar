@@ -558,7 +558,8 @@
       "moderatorReveal": "Pokaż link moderatora",
       "moderatorWarning": "Ten link daje uprawnienia MODERATORA (wyciszenie wszystkich, uruchomienie nagrywania, zakończenie wydarzenia). Udostępniaj go wyłącznie innym moderatorom.",
       "moderatorLink": "Link moderatora",
-      "moderatorLinkHint": "Kto otworzy ten link, dołącza jako moderator z pełną kontrolą nad salą."
+      "moderatorLinkHint": "Kto otworzy ten link, dołącza jako moderator z pełną kontrolą nad salą.",
+      "copyFailed": "Nie udało się skopiować: zaznacz adres i skopiuj go ręcznie."
     },
     "videoCallFrameTitle": "Wideorozmowa wydarzenia",
     "insecureContextTitle": "Niezabezpieczony adres",
@@ -1875,7 +1876,8 @@
       "warning": "Każdy, kto ma ten link, zarządza wydarzeniem: nie pokazuj go podczas udostępniania ekranu i nie wklejaj go na czacie.",
       "hidden": "Link ukryty",
       "copyFailed": "Kopiowanie nie powiodło się: zaznacz adres poniżej i skopiuj go ręcznie.",
-      "notYetPublished": "Działa dopiero po publikacji: do tego czasu pojawi się „nie znaleziono strony”."
+      "notYetPublished": "Działa dopiero po publikacji: do tego czasu pojawi się „nie znaleziono strony”.",
+      "copyFailedShort": "Nie udało się skopiować"
     },
     "feedbackAdmin": {
       "title": "Wyniki ankiety",

@@ -558,7 +558,8 @@
       "moderatorReveal": "Afficher le lien modérateur",
       "moderatorWarning": "Ce lien donne un accès MODÉRATEUR (couper le micro de tout le monde, lancer l'enregistrement, terminer l'événement). Ne le partagez qu'avec d'autres modérateurs.",
       "moderatorLink": "Lien modérateur",
-      "moderatorLinkHint": "Toute personne qui ouvre ce lien entre comme modérateur, avec la pleine maîtrise de la régie."
+      "moderatorLinkHint": "Toute personne qui ouvre ce lien entre comme modérateur, avec la pleine maîtrise de la régie.",
+      "copyFailed": "Échec de la copie : sélectionnez l'adresse et copiez-la manuellement."
     },
     "videoCallFrameTitle": "Visioconférence de l'événement",
     "insecureContextTitle": "Adresse non sécurisée",
@@ -1875,7 +1876,8 @@
       "warning": "Toute personne disposant de ce lien administre l’événement : ne l’affichez pas lors d’un partage d’écran et ne le collez pas dans une conversation.",
       "hidden": "Lien masqué",
       "copyFailed": "Échec de la copie : sélectionnez l’adresse ci-dessous et copiez-la manuellement.",
-      "notYetPublished": "S'ouvre après la publication : d'ici là, la personne qui l'utilise voit « page introuvable »."
+      "notYetPublished": "S'ouvre après la publication : d'ici là, la personne qui l'utilise voit « page introuvable ».",
+      "copyFailedShort": "Échec de la copie"
     },
     "feedbackAdmin": {
       "title": "Résultats des retours",

@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { moderatorRoomOpen } from '@/lib/events/participant-entry';
@@ -43,6 +44,7 @@ export default function EventCardMenu({
   const locale = useLocale();
   const router = useRouter();
   const toast = useToast();
+  const tLinks = useTranslations('admin.links');
   const confirm = useConfirm();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -126,8 +128,8 @@ export default function EventCardMenu({
       // L'indirizzo pubblico nella lingua della pagina, cosi' come lo vedra'
       // chi lo riceve.
       const href = `${window.location.origin}${localizedPath(`/events/${event.slug}`, locale)}`;
-      await navigator.clipboard.writeText(href);
-      toast.success(t('linkCopied'));
+      if (await copiaNegliAppunti(href)) toast.success(t('linkCopied'));
+      else toast.error(tLinks('copyFailedShort'));
     });
 
   const cambiaPubblicazione = () =>

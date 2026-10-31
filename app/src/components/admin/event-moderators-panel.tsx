@@ -6,6 +6,7 @@ import { Badge, Button, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 import { SkeletonLines } from '@/components/ui/skeleton';
 import { mailtoHref } from '@/lib/email/mailto';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -53,6 +54,7 @@ export default function EventModeratorsPanel({
 }: Props) {
   const t = useTranslations('admin.coModerators');
   const toast = useToast();
+  const tLinks = useTranslations('admin.links');
   const tc = useTranslations('common');
   const confirm = useConfirm();
 
@@ -181,10 +183,13 @@ export default function EventModeratorsPanel({
   );
 
   const handleCopy = useCallback(async (row: ModeratorRow) => {
-    await navigator.clipboard.writeText(magicLink(row.token));
+    if (!(await copiaNegliAppunti(magicLink(row.token)))) {
+      toast.error(tLinks('copyFailedShort'));
+      return;
+    }
     setCopiedId(row.id);
-    setTimeout(() => setCopiedId(null), 2000);
-  }, [magicLink]);
+    setTimeout(() => setCopiedId((c) => (c === row.id ? null : c)), 2000);
+  }, [magicLink, toast, tLinks]);
 
   // L'email con il solo link di quella persona: niente «copia tutti i link»,
   // che finirebbe in un messaggio di gruppo con le credenziali di tutti.

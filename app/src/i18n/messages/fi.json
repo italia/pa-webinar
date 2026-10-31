@@ -558,7 +558,8 @@
       "moderatorReveal": "Näytä moderaattorilinkki",
       "moderatorWarning": "Tämä linkki antaa MODERAATTORIN oikeudet (kaikkien mykistys, tallennuksen aloitus, tapahtuman päättäminen). Jaa se vain muille moderaattoreille.",
       "moderatorLink": "Moderaattorilinkki",
-      "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet."
+      "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet.",
+      "copyFailed": "Kopiointi epäonnistui: valitse osoite ja kopioi se käsin."
     },
     "videoCallFrameTitle": "Tapahtuman videopuhelu",
     "insecureContextTitle": "Suojaamaton osoite",
@@ -1875,7 +1876,8 @@
       "warning": "Kuka tahansa, jolla on tämä linkki, hallinnoi tapahtumaa: älä näytä sitä näyttöä jaettaessa äläkä liitä sitä keskusteluun.",
       "hidden": "Linkki on piilotettu",
       "copyFailed": "Kopiointi epäonnistui: valitse alla oleva osoite ja kopioi se käsin.",
-      "notYetPublished": "Toimii vasta julkaisun jälkeen: siihen asti näkyy ”sivua ei löytynyt”."
+      "notYetPublished": "Toimii vasta julkaisun jälkeen: siihen asti näkyy ”sivua ei löytynyt”.",
+      "copyFailedShort": "Kopiointi epäonnistui"
     },
     "feedbackAdmin": {
       "title": "Palautteen tulokset",

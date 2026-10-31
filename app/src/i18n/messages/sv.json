@@ -558,7 +558,8 @@
       "moderatorReveal": "Visa moderatorlänk",
       "moderatorWarning": "Den här länken ger MODERATORBEHÖRIGHET (stänga av allas mikrofoner, starta inspelning, avsluta evenemanget). Dela den bara med andra moderatorer.",
       "moderatorLink": "Moderatorlänk",
-      "moderatorLinkHint": "Den som öppnar den här länken kommer in som moderator med full kontroll över rummet."
+      "moderatorLinkHint": "Den som öppnar den här länken kommer in som moderator med full kontroll över rummet.",
+      "copyFailed": "Kopieringen misslyckades: markera adressen och kopiera den manuellt."
     },
     "videoCallFrameTitle": "Evenemangets videosamtal",
     "insecureContextTitle": "Osäker adress",
@@ -1875,7 +1876,8 @@
       "warning": "Alla som har den här länken administrerar evenemanget: visa den inte när du delar skärm och klistra inte in den i en chatt.",
       "hidden": "Länken är dold",
       "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt.",
-      "notYetPublished": "Fungerar först efter publiceringen: tills dess visas ”sidan hittades inte”."
+      "notYetPublished": "Fungerar först efter publiceringen: tills dess visas ”sidan hittades inte”.",
+      "copyFailedShort": "Kopieringen misslyckades"
     },
     "feedbackAdmin": {
       "title": "Feedbackresultat",

@@ -558,7 +558,8 @@
       "moderatorReveal": "Mostrar el enlace de moderador",
       "moderatorWarning": "Este enlace da acceso de MODERADOR (silenciar a todos, iniciar la grabación, terminar el evento). Compártelo solo con otros moderadores.",
       "moderatorLink": "Enlace de moderador",
-      "moderatorLinkHint": "Quien abra este enlace entra como moderador con pleno control de la sala."
+      "moderatorLinkHint": "Quien abra este enlace entra como moderador con pleno control de la sala.",
+      "copyFailed": "No se pudo copiar: selecciona la dirección y cópiala a mano."
     },
     "videoCallFrameTitle": "Videollamada del evento",
     "insecureContextTitle": "Dirección no segura",
@@ -1875,7 +1876,8 @@
       "warning": "Cualquiera que tenga este enlace administra el evento: no lo muestres al compartir pantalla ni lo pegues en un chat.",
       "hidden": "Enlace oculto",
       "copyFailed": "No se pudo copiar: selecciona la dirección de abajo y cópiala a mano.",
-      "notYetPublished": "Se abre después de la publicación: hasta entonces, quien lo use verá «página no encontrada»."
+      "notYetPublished": "Se abre después de la publicación: hasta entonces, quien lo use verá «página no encontrada».",
+      "copyFailedShort": "No se pudo copiar"
     },
     "feedbackAdmin": {
       "title": "Resultados de valoraciones",

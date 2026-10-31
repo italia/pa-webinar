@@ -558,7 +558,8 @@
       "moderatorReveal": "Pokaži moderatorsko povezavo",
       "moderatorWarning": "Ta povezava daje MODERATORSKI dostop (utišanje vseh, začetek snemanja, zaključek dogodka). Delite jo samo z drugimi moderatorji.",
       "moderatorLink": "Moderatorska povezava",
-      "moderatorLinkHint": "Kdor odpre to povezavo, se pridruži kot moderator s polnim nadzorom nad sobo."
+      "moderatorLinkHint": "Kdor odpre to povezavo, se pridruži kot moderator s polnim nadzorom nad sobo.",
+      "copyFailed": "Kopiranje ni uspelo: označite naslov in ga kopirajte ročno."
     },
     "videoCallFrameTitle": "Videoklic dogodka",
     "insecureContextTitle": "Nevarni naslov",
@@ -1875,7 +1876,8 @@
       "warning": "Kdor koli ima to povezavo, upravlja dogodek: ne prikazujte je med deljenjem zaslona in je ne lepite v klepet.",
       "hidden": "Povezava je skrita",
       "copyFailed": "Kopiranje ni uspelo: izberite spodnji naslov in ga kopirajte ročno.",
-      "notYetPublished": "Deluje šele po objavi: do takrat se prikaže »strani ni mogoče najti«."
+      "notYetPublished": "Deluje šele po objavi: do takrat se prikaže »strani ni mogoče najti«.",
+      "copyFailedShort": "Kopiranje ni uspelo"
     },
     "feedbackAdmin": {
       "title": "Rezultati povratnih informacij",

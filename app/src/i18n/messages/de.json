@@ -558,7 +558,8 @@
       "moderatorReveal": "Moderator-Link anzeigen",
       "moderatorWarning": "Dieser Link gewährt MODERATOR-Zugang (alle stummschalten, Aufzeichnung starten, Veranstaltung beenden). Teilen Sie ihn nur mit anderen Moderatoren.",
       "moderatorLink": "Moderator-Link",
-      "moderatorLinkHint": "Wer diesen Link öffnet, betritt den Raum als Moderator mit voller Regiekontrolle."
+      "moderatorLinkHint": "Wer diesen Link öffnet, betritt den Raum als Moderator mit voller Regiekontrolle.",
+      "copyFailed": "Kopieren fehlgeschlagen: Adresse markieren und von Hand kopieren."
     },
     "videoCallFrameTitle": "Videokonferenz der Veranstaltung",
     "insecureContextTitle": "Unsichere Adresse",
@@ -1875,7 +1876,8 @@
       "warning": "Wer diesen Link hat, verwaltet die Veranstaltung: Zeigen Sie ihn nicht bei der Bildschirmfreigabe und fügen Sie ihn nicht in einen Chat ein.",
       "hidden": "Link ausgeblendet",
       "copyFailed": "Kopieren fehlgeschlagen: Markieren Sie die Adresse unten und kopieren Sie sie manuell.",
-      "notYetPublished": "Öffnet sich nach der Veröffentlichung: bis dahin erscheint „Seite nicht gefunden“."
+      "notYetPublished": "Öffnet sich nach der Veröffentlichung: bis dahin erscheint „Seite nicht gefunden“.",
+      "copyFailedShort": "Kopieren fehlgeschlagen"
     },
     "feedbackAdmin": {
       "title": "Feedback-Ergebnisse",

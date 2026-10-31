@@ -316,7 +316,8 @@
       "moderatorReveal": "Mostra link da moderatore",
       "moderatorWarning": "Questo link dà accesso da MODERATORE (muta tutti, avvia registrazione, termina l'evento). Condividilo solo con altri moderatori.",
       "moderatorLink": "Link da moderatore",
-      "moderatorLinkHint": "Chi apre questo link entra come moderatore con pieni poteri di regia."
+      "moderatorLinkHint": "Chi apre questo link entra come moderatore con pieni poteri di regia.",
+      "copyFailed": "Copia non riuscita: seleziona l'indirizzo e copialo a mano."
     },
     "title": "Sala evento",
     "password": {
@@ -2085,7 +2086,8 @@
       "warning": "Chi ha questo link amministra l’evento: non mostrarlo in condivisione schermo e non incollarlo in chat.",
       "hidden": "Link nascosto",
       "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano.",
-      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata»."
+      "notYetPublished": "Si apre dopo la pubblicazione: fino ad allora chi lo usa trova «pagina non trovata».",
+      "copyFailedShort": "Copia non riuscita"
     },
     "feedbackAdmin": {
       "title": "Risultati Feedback",

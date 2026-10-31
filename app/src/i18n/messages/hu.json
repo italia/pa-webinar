@@ -558,7 +558,8 @@
       "moderatorReveal": "Moderátori link megjelenítése",
       "moderatorWarning": "Ez a link MODERÁTORI hozzáférést ad (mindenki némítása, felvétel indítása, az esemény lezárása). Csak más moderátorokkal ossza meg.",
       "moderatorLink": "Moderátori link",
-      "moderatorLinkHint": "Aki megnyitja ezt a linket, moderátorként lép be, a terem teljes irányításával."
+      "moderatorLinkHint": "Aki megnyitja ezt a linket, moderátorként lép be, a terem teljes irányításával.",
+      "copyFailed": "A másolás nem sikerült: jelölje ki a címet, és másolja ki kézzel."
     },
     "videoCallFrameTitle": "Az esemény videohívása",
     "insecureContextTitle": "Nem biztonságos cím",
@@ -1875,7 +1876,8 @@
       "warning": "Aki rendelkezik ezzel a hivatkozással, az kezeli az eseményt: ne jelenítse meg képernyőmegosztás közben, és ne illessze be csevegésbe.",
       "hidden": "A hivatkozás rejtve van",
       "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel.",
-      "notYetPublished": "Csak a közzététel után működik: addig „az oldal nem található” üzenet jelenik meg."
+      "notYetPublished": "Csak a közzététel után működik: addig „az oldal nem található” üzenet jelenik meg.",
+      "copyFailedShort": "A másolás nem sikerült"
     },
     "feedbackAdmin": {
       "title": "Visszajelzés eredményei",

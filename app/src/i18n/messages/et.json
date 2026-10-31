@@ -558,7 +558,8 @@
       "moderatorReveal": "Näita moderaatori linki",
       "moderatorWarning": "See link annab MODERAATORI õigused (kõigi vaigistamine, salvestamise käivitamine, sündmuse lõpetamine). Jaga seda ainult teiste moderaatoritega.",
       "moderatorLink": "Moderaatori link",
-      "moderatorLinkHint": "Kes selle lingi avab, siseneb moderaatorina ja saab ruumi täielikult juhtida."
+      "moderatorLinkHint": "Kes selle lingi avab, siseneb moderaatorina ja saab ruumi täielikult juhtida.",
+      "copyFailed": "Kopeerimine ebaõnnestus: valige aadress ja kopeerige see käsitsi."
     },
     "videoCallFrameTitle": "Sündmuse videokõne",
     "insecureContextTitle": "Turvamata aadress",
@@ -1875,7 +1876,8 @@
       "warning": "Igaüks, kellel on see link, haldab sündmust: ära näita seda ekraani jagamisel ega kleebi seda vestlusesse.",
       "hidden": "Link on peidetud",
       "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi.",
-      "notYetPublished": "Töötab alles pärast avaldamist: seni kuvatakse „lehte ei leitud“."
+      "notYetPublished": "Töötab alles pärast avaldamist: seni kuvatakse „lehte ei leitud“.",
+      "copyFailedShort": "Kopeerimine ebaõnnestus"
     },
     "feedbackAdmin": {
       "title": "Tagasiside tulemused",

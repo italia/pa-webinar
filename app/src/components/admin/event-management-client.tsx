@@ -68,6 +68,7 @@ import EventClosingChecklist, { ANCORE_CHIUSURA } from './event-closing-checklis
 import EventRoomReview from './event-room-review';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
+import CopyButton from './copy-button';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
@@ -676,8 +677,8 @@ export default function EventManagementClient({
                 sbagliare significa consegnare l'evento a chi riceve il link
                 sbagliato. */}
             {condivisione && (
-              <CopyBtn text={localizedUrl(baseUrl, condivisione.path, locale)}
-                       label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
+              <CopyButton text={localizedUrl(baseUrl, condivisione.path, locale)}
+                          label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
             )}
             {entraModeratore && (
               <Link href={percorso(liveModeratorUrl)}
@@ -1905,7 +1906,7 @@ function CreatedSummary({
                 {tc('publishNow')}
               </button>
             )}
-            {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
+            {shareUrl && <CopyButton text={shareUrl} label={tc('copyParticipantLink')} />}
             <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
               {tc('sendToSpeakers')}
             </button>
@@ -1917,37 +1918,3 @@ function CreatedSummary({
   );
 }
 
-// Minimal copy-to-clipboard button with a caller-supplied label.
-// Non si riusa <CopyButton> perche' quello prende l'etichetta da
-// `admin.links` e basta: qui serve poterla passare da fuori
-// (`copyPublicUrl`). In cima alla pagina ne resta uno solo — gli altri link
-// stanno nella sezione in fondo, dove c'e' spazio per dire a chi vanno dati.
-function CopyBtn({ text, label }: { text: string; label: string }) {
-  const tl = useTranslations('admin.links');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [text]);
-
-  return (
-    <button type="button" onClick={handleCopy}
-            aria-label={label}
-            className="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center gap-2"
-            style={{ fontSize: '0.85rem' }}>
-      <Svg name={copied ? 'check' : 'link'} size={14} />
-      {copied ? tl('copied') : label}
-    </button>
-  );
-}

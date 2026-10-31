@@ -558,7 +558,8 @@
       "moderatorReveal": "Zobrazit odkaz pro moderátora",
       "moderatorWarning": "Tento odkaz uděluje přístup MODERÁTORA (ztlumit všechny, spustit nahrávání, ukončit událost). Sdílejte ho pouze s dalšími moderátory.",
       "moderatorLink": "Odkaz pro moderátora",
-      "moderatorLinkHint": "Kdo otevře tento odkaz, připojí se jako moderátor s plnými právy k řízení místnosti."
+      "moderatorLinkHint": "Kdo otevře tento odkaz, připojí se jako moderátor s plnými právy k řízení místnosti.",
+      "copyFailed": "Kopírování se nezdařilo: označte adresu a zkopírujte ji ručně."
     },
     "videoCallFrameTitle": "Videohovor události",
     "insecureContextTitle": "Nezabezpečená adresa",
@@ -1875,7 +1876,8 @@
       "warning": "Kdokoli s tímto odkazem spravuje událost: nezobrazujte jej při sdílení obrazovky a nevkládejte jej do chatu.",
       "hidden": "Odkaz je skrytý",
       "copyFailed": "Kopírování se nezdařilo: vyberte adresu níže a zkopírujte ji ručně.",
-      "notYetPublished": "Funguje až po zveřejnění: do té doby se zobrazí „stránka nenalezena“."
+      "notYetPublished": "Funguje až po zveřejnění: do té doby se zobrazí „stránka nenalezena“.",
+      "copyFailedShort": "Kopírování se nezdařilo"
     },
     "feedbackAdmin": {
       "title": "Výsledky zpětné vazby",

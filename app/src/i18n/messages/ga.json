@@ -558,7 +558,8 @@
       "moderatorReveal": "Taispeáin an nasc modhnóra",
       "moderatorWarning": "Tugann an nasc seo rochtain MHODHNÓRA (gach duine a bhalbhú, taifeadadh a thosú, deireadh a chur leis an imeacht). Ná comhroinn é ach le modhnóirí eile.",
       "moderatorLink": "Nasc modhnóra",
-      "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra."
+      "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra.",
+      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh agus cóipeáil de láimh é."
     },
     "videoCallFrameTitle": "Físghlao an imeachta",
     "insecureContextTitle": "Seoladh neamhshlán",
@@ -1875,7 +1876,8 @@
       "warning": "Riarann duine ar bith a bhfuil an nasc seo aige an t-imeacht: ná taispeáin é agus tú ag comhroinnt scáileáin agus ná greamaigh i gcomhrá é.",
       "hidden": "Nasc folaithe",
       "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é.",
-      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”."
+      "notYetPublished": "Oibreoidh sé tar éis an fhoilsithe: go dtí sin taispeántar “níor aimsíodh an leathanach”.",
+      "copyFailedShort": "Theip ar an gcóipeáil"
     },
     "feedbackAdmin": {
       "title": "Torthaí aiseolais",

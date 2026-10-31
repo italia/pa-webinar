@@ -558,7 +558,8 @@
       "moderatorReveal": "Vis moderatorlink",
       "moderatorWarning": "Dette link giver MODERATOR-adgang (slå lyden fra for alle, start optagelse, afslut arrangementet). Del det kun med andre moderatorer.",
       "moderatorLink": "Moderatorlink",
-      "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet."
+      "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet.",
+      "copyFailed": "Kopiering mislykkedes: markér adressen, og kopiér den manuelt."
     },
     "videoCallFrameTitle": "Arrangementets videoopkald",
     "insecureContextTitle": "Usikker adresse",
@@ -1875,7 +1876,8 @@
       "warning": "Enhver med dette link administrerer begivenheden: vis det ikke, når du deler din skærm, og indsæt det ikke i en chat.",
       "hidden": "Linket er skjult",
       "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt.",
-      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«."
+      "notYetPublished": "Virker først efter offentliggørelsen: indtil da vises »siden blev ikke fundet«.",
+      "copyFailedShort": "Kopiering mislykkedes"
     },
     "feedbackAdmin": {
       "title": "Feedbackresultater",

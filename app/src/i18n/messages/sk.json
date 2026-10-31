@@ -558,7 +558,8 @@
       "moderatorReveal": "Zobraziť odkaz pre moderátora",
       "moderatorWarning": "Tento odkaz udeľuje prístup MODERÁTORA (stlmiť všetkých, spustiť nahrávanie, ukončiť podujatie). Zdieľajte ho len s ďalšími moderátormi.",
       "moderatorLink": "Odkaz pre moderátora",
-      "moderatorLinkHint": "Kto otvorí tento odkaz, pripojí sa ako moderátor s plnými právami na riadenie miestnosti."
+      "moderatorLinkHint": "Kto otvorí tento odkaz, pripojí sa ako moderátor s plnými právami na riadenie miestnosti.",
+      "copyFailed": "Kopírovanie zlyhalo: označte adresu a skopírujte ju ručne."
     },
     "videoCallFrameTitle": "Videohovor podujatia",
     "insecureContextTitle": "Nezabezpečená adresa",
@@ -1875,7 +1876,8 @@
       "warning": "Ktokoľvek s týmto odkazom spravuje podujatie: nezobrazujte ho pri zdieľaní obrazovky a nevkladajte ho do chatu.",
       "hidden": "Odkaz je skrytý",
       "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne.",
-      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“."
+      "notYetPublished": "Funguje až po zverejnení: dovtedy sa zobrazí „stránka sa nenašla“.",
+      "copyFailedShort": "Kopírovanie zlyhalo"
     },
     "feedbackAdmin": {
       "title": "Výsledky spätnej väzby",

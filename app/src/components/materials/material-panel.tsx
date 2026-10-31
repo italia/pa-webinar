@@ -12,6 +12,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
 import { MATERIAL_KIND_ICON, materialKind, titleFromFileName } from '@/lib/materials/file-kind';
+import { copiaNegliAppunti } from '@/lib/utils/clipboard';
 import {
   MATERIAL_FILE_MAX_BYTES,
   MATERIAL_FILE_MIME_TYPES,
@@ -497,11 +498,10 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     async (m: RoomMaterial) => {
       setListError('');
       setAnnouncement('');
-      try {
-        await navigator.clipboard.writeText(m.url);
+      if (await copiaNegliAppunti(m.url)) {
         setCopiedId(m.id);
         setAnnouncement(t('linkCopied'));
-      } catch {
+      } else {
         // Contesto non sicuro o permesso negato: lo si dice, l'indirizzo resta
         // raggiungibile dal link stesso.
         setListError(t('errors.copyFailed'));

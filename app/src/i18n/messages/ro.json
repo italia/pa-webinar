@@ -558,7 +558,8 @@
       "moderatorReveal": "Arată linkul de moderator",
       "moderatorWarning": "Acest link acordă acces de MODERATOR (oprirea microfoanelor tuturor, pornirea înregistrării, încheierea evenimentului). Partajați-l doar cu alți moderatori.",
       "moderatorLink": "Link de moderator",
-      "moderatorLinkHint": "Cine deschide acest link intră ca moderator, cu control deplin asupra sălii."
+      "moderatorLinkHint": "Cine deschide acest link intră ca moderator, cu control deplin asupra sălii.",
+      "copyFailed": "Copierea nu a reușit: selectați adresa și copiați-o manual."
     },
     "videoCallFrameTitle": "Apelul video al evenimentului",
     "insecureContextTitle": "Adresă nesigură",
@@ -1875,7 +1876,8 @@
       "warning": "Oricine are acest link administrează evenimentul: nu îl afișa în timpul partajării ecranului și nu îl lipi într-un chat.",
       "hidden": "Link ascuns",
       "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual.",
-      "notYetPublished": "Funcționează după publicare: până atunci apare „pagina nu a fost găsită”."
+      "notYetPublished": "Funcționează după publicare: până atunci apare „pagina nu a fost găsită”.",
+      "copyFailedShort": "Copierea nu a reușit"
     },
     "feedbackAdmin": {
       "title": "Rezultate feedback",

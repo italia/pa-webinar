@@ -558,7 +558,8 @@
       "moderatorReveal": "Show moderator link",
       "moderatorWarning": "This link grants MODERATOR access (mute everyone, start recording, end the event). Share it only with other moderators.",
       "moderatorLink": "Moderator link",
-      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
+      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room.",
+      "copyFailed": "Copy failed: select the address and copy it manually."
     },
     "videoCallFrameTitle": "Event video call",
     "insecureContextTitle": "Insecure address",
@@ -1875,7 +1876,8 @@
       "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
       "hidden": "Link hidden",
       "copyFailed": "Copy failed: select the address below and copy it manually.",
-      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”."
+      "notYetPublished": "Opens once the event is published: until then, anyone who uses it gets “page not found”.",
+      "copyFailedShort": "Copy failed"
     },
     "feedbackAdmin": {
       "title": "Feedback Results",

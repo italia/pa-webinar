@@ -558,7 +558,8 @@
       "moderatorReveal": "Moderatorlink tonen",
       "moderatorWarning": "Deze link geeft MODERATOR-toegang (iedereen dempen, opname starten, evenement beëindigen). Deel hem alleen met andere moderatoren.",
       "moderatorLink": "Moderatorlink",
-      "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal."
+      "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal.",
+      "copyFailed": "Kopiëren mislukt: selecteer het adres en kopieer het handmatig."
     },
     "videoCallFrameTitle": "Videogesprek van het evenement",
     "insecureContextTitle": "Onveilig adres",
@@ -1875,7 +1876,8 @@
       "warning": "Iedereen met deze link beheert het evenement: toon hem niet tijdens het delen van je scherm en plak hem niet in een chat.",
       "hidden": "Link verborgen",
       "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig.",
-      "notYetPublished": "Werkt pas na publicatie: tot dan krijgt wie hem gebruikt ‘pagina niet gevonden’."
+      "notYetPublished": "Werkt pas na publicatie: tot dan krijgt wie hem gebruikt ‘pagina niet gevonden’.",
+      "copyFailedShort": "Kopiëren mislukt"
     },
     "feedbackAdmin": {
       "title": "Feedbackresultaten",
