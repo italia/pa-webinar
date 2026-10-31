@@ -44,7 +44,7 @@ import { logoPubblico, sitoPubblico } from '@/lib/events/public-people';
 import { reminderPresetKey } from '@/lib/events/reminder-presets';
 import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
-import { localizedUrl } from '@/lib/utils/localized-url';
+import { localizedPath, localizedUrl } from '@/lib/utils/localized-url';
 import { hexWithAlpha, inchiostroEtichetta } from '@/lib/utils/tag-color';
 
 import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
@@ -680,12 +680,29 @@ export default function EventManagementClient({
               <CopyButton text={localizedUrl(baseUrl, condivisione.path, locale)}
                           label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
             )}
+            {/* Un pulsante, non un link: l'indirizzo porta il token del
+                moderatore, che passandoci sopra comparirebbe nella barra di
+                stato del browser, anche mentre si condivide lo schermo. Con
+                Ctrl/Cmd o la rotella si apre in una scheda nuova, come un
+                link: la sala accanto alla gestione e' l'uso piu' comune. */}
             {entraModeratore && (
-              <Link href={percorso(liveModeratorUrl)}
+              <button type="button"
+                    onClick={(e) => {
+                      if (e.ctrlKey || e.metaKey || e.shiftKey) {
+                        window.open(localizedPath(liveModeratorUrl, locale), '_blank', 'noopener');
+                      } else {
+                        router.push(percorso(liveModeratorUrl));
+                      }
+                    }}
+                    onAuxClick={(e) => {
+                      if (e.button !== 1) return;
+                      e.preventDefault();
+                      window.open(localizedPath(liveModeratorUrl, locale), '_blank', 'noopener');
+                    }}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
                     style={{ fontSize: '0.88rem' }}>
                 <Svg name="video" size={14} /> {t('joinAsModeratorBtn')}
-              </Link>
+              </button>
             )}
             {/* In una scheda nuova: chi organizza tiene aperta la gestione, e
                 spesso anche la sala da moderatore accanto. Il link non porta
