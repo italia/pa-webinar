@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapServerIssues, validateStep } from './validation';
+import { campiMancanti, mapServerIssues, sezioniDegliErrori, validateStep } from './validation';
 import type { WizardForm } from './wizard-shell';
 
 function base(overrides: Partial<WizardForm> = {}): WizardForm {
@@ -154,3 +154,31 @@ describe('validateStep base — lingue dell evento', () => {
     ).toEqual({});
   });
 });
+
+describe('partecipanti attesi: nei dettagli tecnici', () => {
+  it('il passo «Quando» non li controlla piu\', le impostazioni avanzate si\'', () => {
+    const f = base({ maxParticipants: 1 });
+    expect(validateStep('schedule', f, 'it')).not.toHaveProperty('maxParticipants');
+    expect(validateStep('advanced', f, 'it')).toHaveProperty('maxParticipants', 'outOfRange');
+    expect(validateStep('advanced', base({ maxParticipants: 6000 }), 'it')).toHaveProperty('maxParticipants');
+    expect(validateStep('advanced', base({ maxParticipants: 100 }), 'it')).not.toHaveProperty('maxParticipants');
+  });
+
+  it('cio\' che manca porta alle impostazioni avanzate', () => {
+    const mancante = campiMancanti(base({ maxParticipants: 1 }), 'it').find((m) => m.key === 'maxParticipants');
+    expect(mancante?.step).toBe('advanced');
+  });
+
+  it('si aprono tutte le sezioni con un errore', () => {
+    expect(sezioniDegliErrori(['maxParticipants'])).toEqual(['technical']);
+    expect(sezioniDegliErrori(['dataRetentionDays'])).toEqual(['data']);
+    expect(sezioniDegliErrori(['dataRetentionDays', 'maxParticipants'])).toEqual(['data', 'technical']);
+    expect(sezioniDegliErrori([])).toEqual(['data']);
+  });
+
+  it("un errore del server sui partecipanti porta alle impostazioni avanzate", () => {
+    const mapped = mapServerIssues([{ path: ['maxParticipants'], message: 'too big' }], 'it');
+    expect(mapped.step).toBe('advanced');
+  });
+});
+

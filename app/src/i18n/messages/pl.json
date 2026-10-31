@@ -878,11 +878,11 @@
           "BALANCED": "Zrównoważona (540p)",
           "SAVE_DATA": "Oszczędzanie danych (360p)"
         },
-        "requiredLegend": "Pola oznaczone * są potrzebne do zapisania wydarzenia: dopóki są puste, każde to mówi.",
         "kickerHint": "Aby dodać nadtytuł, wpisz go przed tytułem i oddziel znakiem |, na przykład „Cykl spotkań | Pierwsze spotkanie”.",
         "kickerUse": "Pokaż „{kicker}” jako nadtytuł",
         "kickerPreview": "Tak wygląda na stronie wydarzenia",
-        "coverImageSize": "16:9, zalecane 1600 × 900 pikseli."
+        "coverImageSize": "16:9, zalecane 1600 × 900 pikseli.",
+        "requiredNote": "Pola oznaczone * są wymagane."
       },
       "step2": {
         "heading": "Kto może co robić",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Dostępne: rozpoczyna się dopiero, gdy prowadzący naciśnie REC.",
         "aiAfter": "Po nagraniu: {list}.",
         "scheduleHeading": "Kiedy się odbywa",
-        "scheduleIntro": "Data, godzina i ilu osób się spodziewasz: służą do przygotowania sali.",
+        "scheduleIntro": "Kiedy odbywa się wydarzenie: data, godzina i strefa czasowa.",
         "advancedIntro": "Wartości już wybrane przez szablon: zmień tylko to, co potrzeba.",
         "advancedIntroTemplate": "Wartości już wybrane przez szablon „{name}”: zmień tylko to, co potrzeba.",
-        "requiredToSave": "Potrzebne do zapisania wydarzenia.",
         "requiredToPublish": "Potrzebne do opublikowania wydarzenia.",
         "toComplete": "Do uzupełnienia",
         "missingHeading": "Do publikacji brakuje jeszcze:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {oczekiwany uczestnik} few {oczekiwanych uczestników} many {oczekiwanych uczestników} other {oczekiwanego uczestnika}}",
         "registered": "{count, plural, =0 {na razie brak zapisanych} one {# zapisana osoba do tej pory} few {# zapisane osoby do tej pory} many {# zapisanych osób do tej pory} other {# zapisanej osoby do tej pory}}",
         "change": "Zmień",
-        "changeParticipants": "Zmień liczbę oczekiwanych uczestników",
         "sizedOnRegistrations": "Zapisanych jest więcej niż oczekiwanych uczestników: szacunek liczy {count} zapisanych osób.",
         "cameraQuestion": "Ile kamer internetowych będzie włączonych?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatyczna transkrypcja (domyślnie)",
       "aiSummary": "Automatyczne podsumowanie (domyślnie)",
       "aiTranslation": "Automatyczne tłumaczenie (domyślnie)",
-      "pickerTitle": "Wybierz szablon",
       "pickerSubtitle": "Wybierz szablon, aby wstępnie skonfigurować ustawienia wydarzenia, lub pomiń, aby skonfigurować wszystko ręcznie.",
       "skipTemplate": "Konfiguruj ręcznie",
       "postEventPublic": "Publiczna strona po wydarzeniu",
@@ -3466,9 +3463,7 @@
       "preview": "Twoje wydarzenie",
       "previewPeople": "Oczekiwani uczestnicy: około {count}",
       "continue": "Dalej",
-      "useTemplate": "Albo użyj szablonu",
-      "instantAlt": "Lub natychmiastowe połączenie wideo",
-      "instantAltAction": "Utwórz połączenie wideo",
+      "useTemplate": "Zacznij od szablonu",
       "summary": {
         "piccolo": "Do 20 osób",
         "medio": "Do 100 osób",
@@ -3487,7 +3482,9 @@
         "invitation": "Tylko zaproszeni przez ciebie",
         "invitationDesc": "Strona pozostaje widoczna, ale zapisać mogą się tylko zaproszeni; bez zapisu nie da się wejść"
       },
-      "previewInvitation": "Zapisać mogą się tylko osoby, które zaprosisz; nikt nie wejdzie bez zapisu."
+      "previewInvitation": "Zapisać mogą się tylko osoby, które zaprosisz; nikt nie wejdzie bez zapisu.",
+      "templateReplaces": "Szablon wnosi własne ustawienia zamiast odpowiedzi poniżej. Tytuł, daty i osoby wpisujesz w kolejnych krokach.",
+      "instantBack": "Utwórz zamiast tego zaplanowane wydarzenie"
     },
     "captionsTranscript": {
       "title": "Transkrypcja z napisów",

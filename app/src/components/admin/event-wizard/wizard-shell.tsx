@@ -111,6 +111,7 @@ import {
   STEP_KEYS,
   campiMancanti,
   mapServerIssues,
+  sezioniDegliErrori,
   validatePublish,
   validateStep,
   type CampoMancante,
@@ -755,6 +756,13 @@ export default function EventWizard(props: WizardProps) {
   const fermo = submitting || caricamentiInViaggio > 0;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  // Dopo il primo tentativo con un campo da correggere (Avanti, Salva), la
+  // barra dei passi dice quali passi sono da completare; prima no: sarebbe un
+  // errore segnalato a chi non ha ancora fatto niente.
+  const [tentato, setTentato] = useState(false);
+  useEffect(() => {
+    if (Object.keys(fieldErrors).length > 0) setTentato(true);
+  }, [fieldErrors]);
   // Gli errori trovati nel browser: spariscono appena il campo torna valido.
   // Quelli del server restano fino al prossimo invio, perche' qui non si sa
   // ricontrollarli.
@@ -766,18 +774,19 @@ export default function EventWizard(props: WizardProps) {
   // chiesta: chiederla di nuovo (un errore, un'altra scheda) la riapre anche
   // se la si era chiusa a mano.
   const [richiestaSezione, setRichiestaSezione] = useState(0);
-  const [sezione, setSezione] = useState<WizardAdvancedSection | null>(
-    mode === 'edit' ? (props.initialSection ?? partenza?.section ?? null) : null
-  );
-  const apriSezione = (sez: WizardAdvancedSection | null) => {
-    setSezione(sez);
+  const [sezioni, setSezioni] = useState<readonly WizardAdvancedSection[]>(() => {
+    const iniziale = mode === 'edit' ? (props.initialSection ?? partenza?.section ?? null) : null;
+    return iniziale ? [iniziale] : [];
+  });
+  const apriSezione = (sez: WizardAdvancedSection | readonly WizardAdvancedSection[] | null) => {
+    setSezioni(sez == null ? [] : typeof sez === 'string' ? [sez] : sez);
     setRichiestaSezione((n) => n + 1);
   };
 
   // La sezione letta all'arrivo nelle impostazioni avanzate: l'effetto del
   // cambio di passo la legge da qui, cosi' riparte solo al cambio di passo.
-  const sezioneRef = useRef(sezione);
-  sezioneRef.current = sezione;
+  const sezioneRef = useRef<WizardAdvancedSection | null>(sezioni[0] ?? null);
+  sezioneRef.current = sezioni[0] ?? null;
 
   // On step change move focus to the step region and scroll it into view so
   // keyboard/screen-reader users aren't left on the footer button (and a
@@ -1406,8 +1415,7 @@ export default function EventWizard(props: WizardProps) {
       chiaviClientRef.current = new Set(Object.keys(errs));
       fuocoRichiestoRef.current = true;
       // Il campo da correggere sta in una sezione ripiegata: la si apre.
-      if (activeStep === 'advanced' && (errs.dataRetentionDays || errs.gdprTemplateId))
-        apriSezione('data');
+      if (activeStep === 'advanced') apriSezione(sezioniDegliErrori(Object.keys(errs)));
       setFieldErrors(errs);
       showError(t('validationFailed'));
       return;
@@ -1467,7 +1475,7 @@ export default function EventWizard(props: WizardProps) {
   const vaiAlCampo = useCallback(
     (m: CampoMancante) => {
       const id = idDelCampo(m.key, props.defaultLocale);
-      if (m.step === 'advanced') apriSezione('data');
+      if (m.step === 'advanced') apriSezione(sezioniDegliErrori([m.key]));
       if (m.step === activeStep) {
         // Gia' sul passo: il campo e' sullo schermo.
         const el = id ? document.getElementById(id) : null;
@@ -1548,7 +1556,7 @@ export default function EventWizard(props: WizardProps) {
       chiaviClientRef.current = new Set();
       fuocoRichiestoRef.current = true;
       setFieldErrors(mapped.fieldErrors);
-      if (mapped.step === 'advanced') apriSezione('data');
+      if (mapped.step === 'advanced') apriSezione(sezioniDegliErrori(Object.keys(mapped.fieldErrors)));
       if (mapped.step) setActiveStep(mapped.step);
       const parti: string[] = [];
       if (mapped.step) parti.push(t('validationFailed'));
@@ -1605,7 +1613,8 @@ export default function EventWizard(props: WizardProps) {
             (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail))
         );
         if (firstFailing) {
-          if (firstFailing === 'advanced') apriSezione('data');
+          if (firstFailing === 'advanced')
+            apriSezione(sezioniDegliErrori(Object.keys(validateStep('advanced', form, props.defaultLocale, retentionMax))));
           setActiveStep(firstFailing);
         }
         return;
@@ -2189,11 +2198,11 @@ export default function EventWizard(props: WizardProps) {
         steps={passi.map((k) => ({
           key: k,
           label: t(`flow.steps.${k}`),
-          daCompletare: mancanti.some((m) => m.step === k),
+          daCompletare: tentato && mancanti.some((m) => m.step === k),
         }))}
         advanced={{
           label: t('flow.steps.advanced'),
-          daCompletare: mancanti.some((m) => m.step === 'advanced'),
+          daCompletare: tentato && mancanti.some((m) => m.step === 'advanced'),
         }}
         activeStep={activeStep}
         onJump={(k) => vai(k)}
@@ -2261,6 +2270,7 @@ export default function EventWizard(props: WizardProps) {
                 siteDefaultVideoQuality={props.siteDefaultVideoQuality}
                 lingue={activeStep === 'base' ? lingueDelPasso : undefined}
                 onUploadBusy={segnalaCaricamento}
+                linguaAnteprimaPagina={anteprima ? linguaInterfaccia : null}
               />
             </div>
             {anteprima && <PagePreview dati={anteprima} />}
@@ -2375,7 +2385,7 @@ export default function EventWizard(props: WizardProps) {
         )}
         {activeStep === 'advanced' && (
           <AdvancedSettings
-            open={sezione}
+            open={sezioni}
             richiesta={richiestaSezione}
             templateName={
               mode === 'create' && !props.formatoLabel
@@ -2465,10 +2475,8 @@ export default function EventWizard(props: WizardProps) {
                   form={form}
                   onChange={updateForm}
                   capacita={props.capacita}
-                  onCambiaPartecipanti={() =>
-                    vaiAlCampo({ key: 'maxParticipants', step: 'schedule', perPubblicare: false })
-                  }
                   onCambiaQualita={() => apriSezione('room')}
+                  errorePartecipanti={!!fieldErrors.maxParticipants}
                 />
               ),
             }}
@@ -2518,7 +2526,7 @@ export default function EventWizard(props: WizardProps) {
           <>
             {/* In modifica si salva da qualunque passo: cambiare
                 un'impostazione non obbliga a percorrere tutto il wizard. */}
-            {mode === 'edit' && (
+            {mode === 'edit' ? (
               <button
                 type="button"
                 className="btn btn-outline-primary"
@@ -2526,6 +2534,18 @@ export default function EventWizard(props: WizardProps) {
                 disabled={fermo}
               >
                 {submitting && azione === 'draft' ? tc('saving') : (props.copia ? t('saveCopy') : t('updateEvent'))}
+              </button>
+            ) : (
+              // In creazione la bozza si salva da qualunque passo: chi compila
+              // a piu' riprese non deve arrivare al riepilogo per non perdere
+              // il lavoro (nel browser resta comunque una copia).
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => handleSubmit('draft')}
+                disabled={fermo}
+              >
+                {submitting && azione === 'draft' ? tc('saving') : t('saveDraft')}
               </button>
             )}
             <button

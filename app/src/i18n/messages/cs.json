@@ -878,11 +878,11 @@
           "BALANCED": "Vyvážená (540p)",
           "SAVE_DATA": "Úspora dat (360p)"
         },
-        "requiredLegend": "Pole označená * jsou potřeba k uložení akce: dokud jsou prázdná, je to u každého uvedeno.",
         "kickerHint": "Nadtitulek napište před název a oddělte je znakem |, například „Cyklus setkání | První setkání“.",
         "kickerUse": "Zobrazit „{kicker}“ jako nadtitulek",
         "kickerPreview": "Takto vypadá na stránce akce",
-        "coverImageSize": "16:9, doporučeno 1600 × 900 pixelů."
+        "coverImageSize": "16:9, doporučeno 1600 × 900 pixelů.",
+        "requiredNote": "Pole označená * jsou povinná."
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -1187,10 +1187,9 @@
         "recordingManual": "K dispozici: začne až po stisknutí REC moderátorem.",
         "aiAfter": "Po záznamu: {list}.",
         "scheduleHeading": "Kdy se koná",
-        "scheduleIntro": "Datum, čas a kolik lidí čekáte: podle nich se připraví sál.",
+        "scheduleIntro": "Kdy se akce koná: datum, čas a časové pásmo.",
         "advancedIntro": "Hodnoty, které už zvolila šablona: změňte jen to, co je potřeba.",
         "advancedIntroTemplate": "Hodnoty, které už zvolila šablona „{name}“: změňte jen to, co je potřeba.",
-        "requiredToSave": "Potřeba k uložení akce.",
         "requiredToPublish": "Potřeba ke zveřejnění akce.",
         "toComplete": "K doplnění",
         "missingHeading": "Ke zveřejnění ještě chybí:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {očekávaný účastník} few {očekávaní účastníci} many {očekávaného účastníka} other {očekávaných účastníků}}",
         "registered": "{count, plural, =0 {zatím žádní přihlášení} one {zatím # přihlášený} few {zatím # přihlášení} many {zatím # přihlášeného} other {zatím # přihlášených}}",
         "change": "Změnit",
-        "changeParticipants": "Změnit počet očekávaných účastníků",
         "sizedOnRegistrations": "Přihlášených je víc než očekávaných účastníků: odhad počítá s {count} přihlášenými.",
         "cameraQuestion": "Kolik webkamer bude zapnutých?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatický přepis (výchozí)",
       "aiSummary": "Automatické shrnutí (výchozí)",
       "aiTranslation": "Automatický překlad (výchozí)",
-      "pickerTitle": "Vyberte šablonu",
       "pickerSubtitle": "Vyberte šablonu pro předkonfiguraci nastavení události, nebo přeskočte pro ruční konfiguraci.",
       "skipTemplate": "Konfigurovat ručně",
       "postEventPublic": "Veřejná stránka po události",
@@ -3466,9 +3463,7 @@
       "preview": "Vaše akce",
       "previewPeople": "Očekávaní účastníci: asi {count}",
       "continue": "Pokračovat",
-      "useTemplate": "Nebo použijte šablonu",
-      "instantAlt": "Nebo okamžitý videohovor",
-      "instantAltAction": "Vytvořit videohovor",
+      "useTemplate": "Začít ze šablony",
       "summary": {
         "piccolo": "Do 20 osob",
         "medio": "Do 100 osob",
@@ -3487,7 +3482,9 @@
         "invitation": "Jen vámi pozvaní",
         "invitationDesc": "Stránka zůstává viditelná, ale přihlásit se mohou jen pozvaní; bez přihlášky se dovnitř nedostanete"
       },
-      "previewInvitation": "Přihlásit se mohou jen vámi pozvaní; bez přihlášky se nikdo nedostane dovnitř."
+      "previewInvitation": "Přihlásit se mohou jen vámi pozvaní; bez přihlášky se nikdo nedostane dovnitř.",
+      "templateReplaces": "Šablona přinese vlastní nastavení místo odpovědí níže. Název, data a osoby zadáte v dalších krocích.",
+      "instantBack": "Vytvořit místo toho naplánovanou akci"
     },
     "captionsTranscript": {
       "title": "Přepis z titulků",

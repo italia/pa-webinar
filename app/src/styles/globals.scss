@@ -11269,59 +11269,16 @@ html.live-resizing .live-sidebar-resizer::after {
 }
 
 .formato-modelli {
+  padding: 1rem;
   border: 1px solid #d9dadb;
   border-radius: 8px;
   background: #fff;
-
-  > summary {
-    cursor: pointer;
-    padding: 0.75rem 1rem;
-    font-weight: 600;
-    color: var(--app-primary);
-  }
-
-  &[open] > summary {
-    border-bottom: 1px solid #e8e8e8;
-  }
-
-  > div {
-    padding: 0 1rem 1rem;
-  }
 }
 
-// Sotto le quattro domande, le alternative: i modelli e la videochiamata al
-// volo, in righe sobrie dello stesso peso.
+// Sotto il titolo, i modelli quando si aprono.
 .formato__modelli {
   display: grid;
   gap: 0.75rem;
-}
-
-.formato-alternativa {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d9dadb;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.formato-alternativa__testo {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.formato-alternativa__titolo {
-  font-weight: 600;
-  color: var(--app-text);
-}
-
-.formato-alternativa__desc {
-  font-size: 0.85rem;
-  color: var(--app-muted);
 }
 
 // ── L'evento in righe con un'icona ciascuna: l'anteprima del formato e quella
@@ -12133,8 +12090,10 @@ html:has(.wizard-azioni) {
   }
 }
 
+// «Nuova categoria» e' un'azione, non una categoria: forma del pulsante,
+// non della pillola delle categorie accanto.
 .nuova-etichetta__apri {
-  border-radius: 20px;
+  border-radius: 4px;
 }
 
 .nuova-etichetta__gestisci {
@@ -12197,60 +12156,20 @@ html:has(.wizard-azioni) {
   font-size: 0.9rem;
 }
 
-// ── I campi obbligatori del wizard: come il nome nella sala d'attesa,
-// lampeggiano di blu finche' sono vuoti (con la riga che dice a che cosa
-// servono) e, dopo un tentativo, insistono in ambra. Il rosso resta agli
-// errori veri.
-.wizard-campo--vuoto {
-  .form-control,
-  textarea {
-    animation: wizard-campo-anello 1.8s ease-in-out 2;
-  }
-
-  label,
-  .form-label {
-    animation: wr-name-label 1.8s ease-in-out 2;
-  }
-}
-
+// ── I campi obbligatori del wizard: l'asterisco li segna; dopo un
+// tentativo (Avanti, Salva) il campo che manca si mostra come errore, rosso
+// e accanto al campo, come prevede il design system.
 .wizard-campo--insisti {
   animation: wr-name-nudge 0.4s ease-in-out;
 
   .form-control,
   textarea {
-    border-color: #c27700 !important;
-    animation: wizard-campo-anello-ambra 1.2s ease-in-out 4;
+    border-color: var(--bs-form-invalid-border-color, #cc334d) !important;
   }
-
-  .invalid-feedback,
-  .text-danger {
-    color: #6b4400 !important;
-    font-weight: 600;
-  }
-}
-
-@keyframes wizard-campo-anello {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
-  50% { box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.35); }
-}
-
-@keyframes wizard-campo-anello-ambra {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 119, 0, 0.2); }
-  50% { box-shadow: 0 0 0 3px rgba(194, 119, 0, 0.45); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wizard-campo--vuoto .form-control,
-  .wizard-campo--vuoto textarea {
-    animation: none;
-    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.35);
-  }
-
-  .wizard-campo--vuoto label,
-  .wizard-campo--vuoto .form-label,
-  .wizard-campo--insisti,
-  .wizard-campo--insisti .form-control,
-  .wizard-campo--insisti textarea {
+  .wizard-campo--insisti {
     animation: none;
   }
 }

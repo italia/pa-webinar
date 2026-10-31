@@ -236,8 +236,9 @@ export function PrimarySection({
   }, [profiloErrato]);
   const nomeVuoto = perPubblicare && !nomeOrganizzatoreValido(primary.name);
   const emailVuota = perPubblicare && !emailValida(primary.email);
-  const stato = (vuoto: boolean, errore: unknown) =>
-    errore ? ' wizard-campo--insisti' : vuoto ? ' wizard-campo--vuoto' : '';
+  // Come nel primo passo: l'asterisco segna il campo, l'errore compare al
+  // tentativo, rosso e accanto al campo.
+  const stato = (errore: unknown) => (errore ? ' wizard-campo--insisti' : '');
   const promemoria = (id: string) => (
     <div id={id} className="wizard-campo__hint">
       <svg
@@ -284,7 +285,7 @@ export function PrimarySection({
         )}
         <div className="row g-3">
           <div
-            className={`col-md-6 wizard-campo${stato(nomeVuoto, fieldErrors.moderatorName)}`}
+            className={`col-md-6 wizard-campo${stato(fieldErrors.moderatorName)}`}
           >
             <label className="form-label" htmlFor="wiz-primary-name">
               {t('personName')} *
@@ -309,7 +310,7 @@ export function PrimarySection({
               promemoria('wiz-primary-name-promemoria')}
           </div>
           <div
-            className={`col-md-6 wizard-campo${stato(emailVuota, fieldErrors.moderatorEmail)}`}
+            className={`col-md-6 wizard-campo${stato(fieldErrors.moderatorEmail)}`}
           >
             <label className="form-label" htmlFor="wiz-primary-email">
               {t('personEmail')} *

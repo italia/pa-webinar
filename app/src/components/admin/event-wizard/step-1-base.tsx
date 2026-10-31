@@ -80,6 +80,9 @@ interface Props {
   /** Sotto la descrizione, dove la pagina pubblica mostra il programma: la
    *  scheda che porta al passo «Programma» (programme-card.tsx). */
   dopoDescrizione?: ReactNode;
+  /** La lingua del testo che l'anteprima della pagina, accanto, mostra reso
+   *  (null se non c'e'): per quella lingua l'editor non ripete l'anteprima. */
+  linguaAnteprimaPagina?: string | null;
   /**
    * Quale parte mostrare: «Evento» (titolo, descrizione, copertina,
    * categorie), «Quando» (date, fuso, partecipanti attesi, ricorrenza) o le
@@ -116,6 +119,7 @@ export default function Step1Base({
   siteDefaultVideoQuality,
   parte = 'evento',
   dopoDescrizione,
+  linguaAnteprimaPagina = null,
   onEtichettaCreata,
   lingue,
   onUploadBusy,
@@ -123,8 +127,6 @@ export default function Step1Base({
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
   const fasciaCopertina = useFasciaCopertina();
-  // Il testo del campo partecipanti mentre lo si scrive (null fuori dal campo).
-  const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
   const tTrad = useTranslations('admin.textTranslation');
   const schede = lingue?.schede ?? enabledLocales;
@@ -227,29 +229,14 @@ export default function Step1Base({
     onChange({ timezone: tz, ...regolaPerInizio(value.startsAt, tz) });
   };
 
-  // I campi obbligatori si fanno notare finche' sono vuoti (lampeggiano di
-  // blu, con la riga che dice a che cosa servono), e insistono in ambra dopo
-  // un tentativo: come il nome nella sala d'attesa. Il rosso resta agli
-  // errori veri.
-  const titoloVuoto = onDefaultTab && (value.title[defaultLocale] ?? '').trim().length < 3;
-  const descrizioneVuota =
-    onDefaultTab && (value.description[defaultLocale] ?? '').trim().length < EVENT_DESCRIPTION_MIN_LENGTH;
+  // I campi obbligatori li segna l'asterisco; l'errore, rosso e accanto al
+  // campo, compare quando si prova ad andare avanti (o a salvare).
   const titoloScritto = value.title[contentLocale] ?? '';
   const sopratitolo = splitTitleKicker(titoloScritto, true);
   const sopratitoloAcceso = value.parseTitleKicker ?? siteDefaultParseTitleKicker;
   // Il sopratitolo l'ha acceso il titolo, non una scelta: lo si puo' ritirare.
   const accesoDaSolo = useRef(false);
 
-  const promemoria = (id: string) => (
-    <div id={id} className="wizard-campo__hint">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-           strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
-      <span>{tf('requiredToSave')}</span>
-    </div>
-  );
 
   if (parte === 'avanzate') {
     // Le scelte sulla sala d'attesa e sul video: le eredita dal sito, e si
@@ -414,58 +401,7 @@ export default function Step1Base({
                 ))}
               </select>
             </div>
-              <div className="col-md-6">
-              <label className="form-label" htmlFor="ev-max">
-                {tAdmin('form.expectedParticipants')}
-              </label>
-              <div className="d-flex align-items-center gap-3">
-                <input
-                  id="ev-max-range"
-                  type="range"
-                  min={2}
-                  max={5000}
-                  step={1}
-                  className="form-range flex-grow-1"
-                  value={Math.min(5000, Math.max(2, value.maxParticipants || 150))}
-                  onChange={(e) =>
-                    onChange({ maxParticipants: Number(e.target.value) || 2 })
-                  }
-                  aria-label={tAdmin('form.expectedParticipants')}
-                />
-                <input
-                  id="ev-max"
-                  type="number"
-                  min={2}
-                  max={5000}
-                  className={`form-control ${fieldErrors.maxParticipants ? 'is-invalid' : ''}`}
-                  style={{ maxWidth: 96 }}
-                  // Mentre si scrive il campo tiene il testo cosi' com'e' (anche
-                  // vuoto); il valore si riporta nei limiti all'uscita, non a ogni
-                  // tasto: scrivendo «150» il primo «1» diventerebbe 2.
-                  value={maxText ?? value.maxParticipants}
-                  onChange={(e) => {
-                    setMaxText(e.target.value);
-                    const raw = Number(e.target.value);
-                    if (e.target.value.trim() === '' || !Number.isFinite(raw)) return;
-                    onChange({ maxParticipants: Math.floor(raw) });
-                  }}
-                  onBlur={() => {
-                    setMaxText(null);
-                    const clamped = Math.min(5000, Math.max(2, value.maxParticipants || 2));
-                    if (clamped !== value.maxParticipants) onChange({ maxParticipants: clamped });
-                  }}
-                />
-              </div>
-              <small className="form-text text-muted">
-                {t('maxParticipantsHelp')}
-              </small>
-              {fieldErrors.maxParticipants && (
-                <div className="small text-danger mt-1">
-                  {t('validation.maxParticipants')}
-                </div>
-              )}
-            </div>
-            </div>
+          </div>
         </section>
 
         {/* Ricorrenza: un menu col valore in vista («Non si ripete»), non
@@ -491,8 +427,9 @@ export default function Step1Base({
       <p className="text-secondary mb-1" style={{ fontSize: '0.9rem' }}>
         {t('intro')}
       </p>
+      {/* Che cosa vuol dire l'asterisco, una volta sola (WCAG 3.3.2). */}
       <p className="text-secondary mb-4" style={{ fontSize: '0.85rem' }}>
-        {t('requiredLegend')}
+        {t('requiredNote')}
       </p>
 
       {/* Title / description */}
@@ -520,7 +457,7 @@ export default function Step1Base({
 
         <div
           className={`mb-3 wizard-campo${
-            fieldErrors[`title.${defaultLocale}`] ? ' wizard-campo--insisti' : titoloVuoto ? ' wizard-campo--vuoto' : ''
+            fieldErrors[`title.${defaultLocale}`] ? ' wizard-campo--insisti' : ''
           }`}
         >
           <label className="form-label fw-semibold" htmlFor="ev-title">
@@ -565,11 +502,7 @@ export default function Step1Base({
               });
             }}
             required={contentLocale === defaultLocale}
-            aria-describedby={
-              titoloVuoto && !fieldErrors[`title.${defaultLocale}`]
-                ? 'ev-title-sopratitolo ev-title-promemoria'
-                : 'ev-title-sopratitolo'
-            }
+            aria-describedby="ev-title-sopratitolo"
           />
           {fieldErrors[`title.${defaultLocale}`] &&
             (contentLocale === defaultLocale ? (
@@ -618,12 +551,11 @@ export default function Step1Base({
             </small>
           )}
 
-          {titoloVuoto && !fieldErrors[`title.${defaultLocale}`] && promemoria('ev-title-promemoria')}
         </div>
 
         <div
           className={`mb-3 wizard-campo${
-            descriptionError ? ' wizard-campo--insisti' : descrizioneVuota ? ' wizard-campo--vuoto' : ''
+            descriptionError ? ' wizard-campo--insisti' : ''
           }`}
         >
           <MarkdownEditor
@@ -633,6 +565,7 @@ export default function Step1Base({
             value={value.description[contentLocale] ?? ''}
             onChange={(v) => setLocalized('description', contentLocale, v)}
             rows={6}
+            anteprima={linguaAnteprimaPagina !== contentLocale}
             invalid={onDefaultTab && Boolean(descriptionError)}
             errorText={t('validation.descriptionRequired', {
               min: EVENT_DESCRIPTION_MIN_LENGTH,
@@ -647,7 +580,6 @@ export default function Step1Base({
               })}
             </div>
           )}
-          {descrizioneVuota && !descriptionError && promemoria('ev-description-promemoria')}
         </div>
         </div>
       </section>

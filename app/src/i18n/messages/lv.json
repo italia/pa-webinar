@@ -878,11 +878,11 @@
           "BALANCED": "Līdzsvarota (540p)",
           "SAVE_DATA": "Datu taupīšana (360p)"
         },
-        "requiredLegend": "Ar * atzīmētie lauki vajadzīgi pasākuma saglabāšanai: kamēr tie ir tukši, tas norādīts pie katra lauka.",
         "kickerHint": "Lai pievienotu virsvirsrakstu, rakstiet to pirms virsraksta un atdaliet ar |, piemēram, “Tikšanās cikls | Pirmā tikšanās”.",
         "kickerUse": "Rādīt “{kicker}” kā virsvirsrakstu",
         "kickerPreview": "Tā tas izskatās pasākuma lapā",
-        "coverImageSize": "16:9, ieteicams 1600 × 900 pikseļi."
+        "coverImageSize": "16:9, ieteicams 1600 × 900 pikseļi.",
+        "requiredNote": "Ar * atzīmētie lauki ir obligāti."
       },
       "step2": {
         "heading": "Kurš ko var darīt",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Pieejams: sākas tikai tad, kad vadītājs nospiež REC.",
         "aiAfter": "Pēc ieraksta: {list}.",
         "scheduleHeading": "Kad tas notiek",
-        "scheduleIntro": "Datums, laiks un gaidāmais cilvēku skaits: pēc tiem sagatavo zāli.",
+        "scheduleIntro": "Kad notiek pasākums: datums, laiks un laika josla.",
         "advancedIntro": "Veidnes jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
         "advancedIntroTemplate": "Veidnes “{name}” jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
-        "requiredToSave": "Vajadzīgs, lai saglabātu pasākumu.",
         "requiredToPublish": "Vajadzīgs, lai publicētu pasākumu.",
         "toComplete": "Jāaizpilda",
         "missingHeading": "Publicēšanai vēl trūkst:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, zero {gaidīto dalībnieku} one {gaidītais dalībnieks} other {gaidītie dalībnieki}}",
         "registered": "{count, plural, =0 {pagaidām neviena reģistrējušā} zero {līdz šim # reģistrējušos} one {līdz šim # reģistrējies} other {līdz šim # reģistrējušies}}",
         "change": "Mainīt",
-        "changeParticipants": "Mainīt gaidīto dalībnieku skaitu",
         "sizedOnRegistrations": "Reģistrējušos ir vairāk nekā gaidīto dalībnieku: novērtējumā ir ieskaitīti {count} reģistrējušies.",
         "cameraQuestion": "Cik tīmekļa kameru būs ieslēgtas?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automātiskā transkripcija (noklusējums)",
       "aiSummary": "Automātiskais kopsavilkums (noklusējums)",
       "aiTranslation": "Automātiskā tulkošana (noklusējums)",
-      "pickerTitle": "Izvēlieties veidni",
       "pickerSubtitle": "Izvēlieties veidni, lai iepriekš konfigurētu pasākuma iestatījumus, vai izlaidiet, lai visu konfigurētu manuāli.",
       "skipTemplate": "Konfigurēt manuāli",
       "postEventPublic": "Publiska lapa pēc pasākuma",
@@ -3466,9 +3463,7 @@
       "preview": "Jūsu pasākums",
       "previewPeople": "Gaidāmie dalībnieki: aptuveni {count}",
       "continue": "Turpināt",
-      "useTemplate": "Vai izmantojiet veidni",
-      "instantAlt": "Vai tūlītējs videozvans",
-      "instantAltAction": "Izveidot videozvanu",
+      "useTemplate": "Sākt no veidnes",
       "summary": {
         "piccolo": "Līdz 20 cilvēkiem",
         "medio": "Līdz 100 cilvēkiem",
@@ -3487,7 +3482,9 @@
         "invitation": "Tikai jūsu uzaicinātie",
         "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai uzaicinātie; bez reģistrācijas iekļūt nevar"
       },
-      "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā."
+      "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
+      "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
+      "instantBack": "Tā vietā izveidot plānotu pasākumu"
     },
     "captionsTranscript": {
       "title": "Atšifrējums no subtitriem",

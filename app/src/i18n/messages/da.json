@@ -878,11 +878,11 @@
           "BALANCED": "Balanceret (540p)",
           "SAVE_DATA": "Databesparelse (360p)"
         },
-        "requiredLegend": "Felter markeret med * kræves for at gemme arrangementet: så længe de er tomme, står det ved hvert felt.",
         "kickerHint": "Skriv en overlinje før titlen og adskil dem med |, for eksempel »Mødeserie | Det første møde«.",
         "kickerUse": "Vis »{kicker}« som overlinje",
         "kickerPreview": "Sådan ser den ud på arrangementets side",
-        "coverImageSize": "16:9, anbefalet 1600 × 900 pixels."
+        "coverImageSize": "16:9, anbefalet 1600 × 900 pixels.",
+        "requiredNote": "Felter markeret med * skal udfyldes."
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Tilgængelig: starter først, når en ordstyrer trykker på REC.",
         "aiAfter": "Efter optagelsen: {list}.",
         "scheduleHeading": "Hvornår det finder sted",
-        "scheduleIntro": "Dato, klokkeslæt og hvor mange du forventer: de bruges til at forberede rummet.",
+        "scheduleIntro": "Hvornår arrangementet finder sted: dato, klokkeslæt og tidszone.",
         "advancedIntro": "Værdier, som skabelonen allerede har valgt: ret kun det, der er brug for.",
         "advancedIntroTemplate": "Værdier, som skabelonen »{name}« allerede har valgt: ret kun det, der er brug for.",
-        "requiredToSave": "Kræves for at gemme arrangementet.",
         "requiredToPublish": "Kræves for at offentliggøre arrangementet.",
         "toComplete": "Mangler",
         "missingHeading": "For at offentliggøre mangler stadig:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {forventet deltager} other {forventede deltagere}}",
         "registered": "{count, plural, =0 {ingen tilmeldte endnu} one {# tilmeldt indtil nu} other {# tilmeldte indtil nu}}",
         "change": "Skift",
-        "changeParticipants": "Skift antallet af forventede deltagere",
         "sizedOnRegistrations": "Der er flere tilmeldte end forventede deltagere: skønnet tæller de {count} tilmeldte.",
         "cameraQuestion": "Hvor mange webkameraer vil være tændt?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatisk transskription (standard)",
       "aiSummary": "Automatisk resumé (standard)",
       "aiTranslation": "Automatisk oversættelse (standard)",
-      "pickerTitle": "Vælg en skabelon",
       "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
       "skipTemplate": "Konfigurer manuelt",
       "postEventPublic": "Offentlig side efter begivenheden",
@@ -3466,9 +3463,7 @@
       "preview": "Dit arrangement",
       "previewPeople": "Forventede deltagere: ca. {count}",
       "continue": "Fortsæt",
-      "useTemplate": "Eller brug en skabelon",
-      "instantAlt": "Eller et øjeblikkeligt videoopkald",
-      "instantAltAction": "Opret videoopkaldet",
+      "useTemplate": "Start fra en skabelon",
       "summary": {
         "piccolo": "Op til 20 personer",
         "medio": "Op til 100 personer",
@@ -3487,7 +3482,9 @@
         "invitation": "Kun dem, du inviterer",
         "invitationDesc": "Siden forbliver synlig, men kun inviterede kan tilmelde sig; uden tilmelding kommer man ikke ind"
       },
-      "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding."
+      "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding.",
+      "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
+      "instantBack": "Opret i stedet et planlagt arrangement"
     },
     "captionsTranscript": {
       "title": "Udskrift fra undertekster",

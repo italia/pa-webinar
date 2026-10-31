@@ -1088,11 +1088,11 @@
           "BALANCED": "Bilanciata (540p)",
           "SAVE_DATA": "Risparmio dati (360p)"
         },
-        "requiredLegend": "I campi con * servono per salvare l'evento: finché sono vuoti lo vedi accanto a ciascuno.",
         "kickerHint": "Per un sopratitolo, scrivilo prima del titolo e separali con |, per esempio «Ciclo di incontri | Il primo appuntamento».",
         "kickerUse": "Mostra «{kicker}» come sopratitolo",
         "kickerPreview": "Così appare sulla pagina dell'evento",
-        "coverImageSize": "16:9, consigliata 1600 × 900 pixel."
+        "coverImageSize": "16:9, consigliata 1600 × 900 pixel.",
+        "requiredNote": "I campi con * sono obbligatori."
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -1397,10 +1397,9 @@
         "recordingManual": "Disponibile: parte solo quando chi conduce preme REC.",
         "aiAfter": "Dopo la registrazione: {list}.",
         "scheduleHeading": "Quando si svolge",
-        "scheduleIntro": "Data, ora e quante persone ti aspetti: servono a preparare la sala.",
+        "scheduleIntro": "Quando si tiene l'evento: data, ora e fuso orario.",
         "advancedIntro": "Valori già scelti dal modello: cambia solo quello che serve.",
         "advancedIntroTemplate": "Valori già scelti dal modello «{name}»: cambia solo quello che serve.",
-        "requiredToSave": "Serve per salvare l'evento.",
         "requiredToPublish": "Serve per pubblicare l'evento.",
         "toComplete": "Da completare",
         "missingHeading": "Per pubblicare manca ancora:",
@@ -1858,7 +1857,6 @@
         "expected": "{count, plural, one {partecipante atteso} other {partecipanti attesi}}",
         "registered": "{count, plural, =0 {nessun iscritto finora} one {# iscritto finora} other {# iscritti finora}}",
         "change": "Cambia",
-        "changeParticipants": "Cambia il numero di partecipanti attesi",
         "sizedOnRegistrations": "Gli iscritti sono più dei partecipanti attesi: la stima conta i {count} iscritti.",
         "cameraQuestion": "Quante webcam saranno accese?",
         "camera": {
@@ -2527,7 +2525,6 @@
       "aiTranscript": "Trascrizione automatica (default)",
       "aiSummary": "Sintesi automatica (default)",
       "aiTranslation": "Traduzione automatica (default)",
-      "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
       "skipTemplate": "Configura manualmente",
       "postEventPublic": "Pagina dopo l'evento pubblica",
@@ -3676,9 +3673,7 @@
       "preview": "Il tuo evento",
       "previewPeople": "Partecipanti attesi: circa {count}",
       "continue": "Continua",
-      "useTemplate": "Oppure usa un modello",
-      "instantAlt": "Oppure una videocall istantanea",
-      "instantAltAction": "Crea la videocall",
+      "useTemplate": "Parti da un modello",
       "summary": {
         "piccolo": "Fino a 20 persone",
         "medio": "Fino a 100 persone",
@@ -3697,7 +3692,9 @@
         "invitation": "Solo chi inviti",
         "invitationDesc": "La pagina resta visibile, ma si iscrive solo chi è fra gli invitati; senza iscrizione non si entra"
       },
-      "previewInvitation": "Solo chi inviti si iscrive; senza iscrizione non si entra."
+      "previewInvitation": "Solo chi inviti si iscrive; senza iscrizione non si entra.",
+      "templateReplaces": "Un modello porta le sue impostazioni al posto delle risposte qui sotto. Titolo, date e persone li scrivi nei passi seguenti.",
+      "instantBack": "Crea invece un evento programmato"
     },
     "captionsTranscript": {
       "title": "Trascrizione dai sottotitoli",

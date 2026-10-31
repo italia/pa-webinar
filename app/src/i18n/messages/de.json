@@ -878,11 +878,11 @@
           "BALANCED": "Ausgewogen (540p)",
           "SAVE_DATA": "Datensparen (360p)"
         },
-        "requiredLegend": "Mit * markierte Felder sind zum Speichern nötig: Solange sie leer sind, steht es bei jedem Feld.",
         "kickerHint": "Für eine Dachzeile schreiben Sie sie vor den Titel und trennen beide mit |, zum Beispiel „Veranstaltungsreihe | Das erste Treffen“.",
         "kickerUse": "„{kicker}“ als Dachzeile anzeigen",
         "kickerPreview": "So erscheint er auf der Veranstaltungsseite",
-        "coverImageSize": "16:9, empfohlen 1600 × 900 Pixel."
+        "coverImageSize": "16:9, empfohlen 1600 × 900 Pixel.",
+        "requiredNote": "Mit * gekennzeichnete Felder sind Pflichtfelder."
       },
       "step2": {
         "heading": "Wer darf was",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Verfügbar: startet erst, wenn die Moderation REC drückt.",
         "aiAfter": "Nach der Aufzeichnung: {list}.",
         "scheduleHeading": "Wann sie stattfindet",
-        "scheduleIntro": "Datum, Uhrzeit und erwartete Teilnehmendenzahl: Damit wird der Raum vorbereitet.",
+        "scheduleIntro": "Wann das Event stattfindet: Datum, Uhrzeit und Zeitzone.",
         "advancedIntro": "Von der Vorlage bereits gewählte Werte: Ändern Sie nur, was nötig ist.",
         "advancedIntroTemplate": "Von der Vorlage „{name}“ bereits gewählte Werte: Ändern Sie nur, was nötig ist.",
-        "requiredToSave": "Zum Speichern der Veranstaltung nötig.",
         "requiredToPublish": "Zum Veröffentlichen der Veranstaltung nötig.",
         "toComplete": "Zu ergänzen",
         "missingHeading": "Zum Veröffentlichen fehlt noch:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {erwartete teilnehmende Person} other {erwartete Teilnehmende}}",
         "registered": "{count, plural, =0 {bisher keine Anmeldungen} one {# Anmeldung bisher} other {# Anmeldungen bisher}}",
         "change": "Ändern",
-        "changeParticipants": "Die Zahl der erwarteten Teilnehmenden ändern",
         "sizedOnRegistrations": "Es gibt mehr Anmeldungen als erwartete Teilnehmende: Die Schätzung zählt die {count} Angemeldeten.",
         "cameraQuestion": "Wie viele Webcams werden eingeschaltet sein?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatische Transkription (Standard)",
       "aiSummary": "Automatische Zusammenfassung (Standard)",
       "aiTranslation": "Automatische Übersetzung (Standard)",
-      "pickerTitle": "Vorlage auswählen",
       "pickerSubtitle": "Wählen Sie eine Vorlage zur Vorkonfiguration der Veranstaltungseinstellungen, oder überspringen Sie, um alles manuell zu konfigurieren.",
       "skipTemplate": "Manuell konfigurieren",
       "postEventPublic": "Öffentliche Seite nach der Veranstaltung",
@@ -3466,9 +3463,7 @@
       "preview": "Ihre Veranstaltung",
       "previewPeople": "Erwartete Teilnehmende: etwa {count}",
       "continue": "Weiter",
-      "useTemplate": "Oder eine Vorlage verwenden",
-      "instantAlt": "Oder ein spontaner Videoanruf",
-      "instantAltAction": "Videoanruf erstellen",
+      "useTemplate": "Mit einer Vorlage beginnen",
       "summary": {
         "piccolo": "Bis 20 Personen",
         "medio": "Bis 100 Personen",
@@ -3487,7 +3482,9 @@
         "invitation": "Nur Eingeladene",
         "invitationDesc": "Die Seite bleibt sichtbar, aber anmelden können sich nur Eingeladene; ohne Anmeldung kein Zutritt"
       },
-      "previewInvitation": "Nur Eingeladene können sich anmelden; ohne Anmeldung kommt niemand hinein."
+      "previewInvitation": "Nur Eingeladene können sich anmelden; ohne Anmeldung kommt niemand hinein.",
+      "templateReplaces": "Eine Vorlage bringt ihre eigenen Einstellungen anstelle der Antworten unten mit. Titel, Termine und Personen tragen Sie in den nächsten Schritten ein.",
+      "instantBack": "Stattdessen ein geplantes Event erstellen"
     },
     "captionsTranscript": {
       "title": "Transkript aus Untertiteln",

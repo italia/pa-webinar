@@ -878,11 +878,11 @@
           "BALANCED": "Kiegyensúlyozott (540p)",
           "SAVE_DATA": "Adattakarékos (360p)"
         },
-        "requiredLegend": "A *-gal jelölt mezők az esemény mentéséhez kellenek: amíg üresek, mindegyiknél jelezzük.",
         "kickerHint": "Felülcímhez írja a cím elé, és válassza el őket | jellel, például „Találkozósorozat | Az első találkozó”.",
         "kickerUse": "„{kicker}” megjelenítése felülcímként",
         "kickerPreview": "Így jelenik meg az esemény oldalán",
-        "coverImageSize": "16:9, ajánlott méret 1600 × 900 képpont."
+        "coverImageSize": "16:9, ajánlott méret 1600 × 900 képpont.",
+        "requiredNote": "A *-gal jelölt mezők kötelezők."
       },
       "step2": {
         "heading": "Ki mit tehet",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Elérhető: csak akkor indul, ha egy moderátor megnyomja a REC gombot.",
         "aiAfter": "A felvétel után: {list}.",
         "scheduleHeading": "Mikor kerül sor rá",
-        "scheduleIntro": "Dátum, időpont és a várt létszám: ezek alapján készül elő a terem.",
+        "scheduleIntro": "Mikor kerül sor az eseményre: dátum, időpont és időzóna.",
         "advancedIntro": "A sablon által már kiválasztott értékek: csak azt módosítsa, amit kell.",
         "advancedIntroTemplate": "A(z) „{name}” sablon által már kiválasztott értékek: csak azt módosítsa, amit kell.",
-        "requiredToSave": "Az esemény mentéséhez szükséges.",
         "requiredToPublish": "Az esemény közzétételéhez szükséges.",
         "toComplete": "Kitöltendő",
         "missingHeading": "A közzétételhez még hiányzik:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {várt résztvevő} other {várt résztvevő}}",
         "registered": "{count, plural, =0 {még nincs regisztráló} one {eddig # regisztráló} other {eddig # regisztráló}}",
         "change": "Módosítás",
-        "changeParticipants": "A várt résztvevők számának módosítása",
         "sizedOnRegistrations": "Több a regisztráló, mint a várt résztvevő: a becslés a(z) {count} regisztrálóval számol.",
         "cameraQuestion": "Hány webkamera lesz bekapcsolva?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatikus átiratkészítés (alapértelmezés)",
       "aiSummary": "Automatikus összefoglaló (alapértelmezés)",
       "aiTranslation": "Automatikus fordítás (alapértelmezés)",
-      "pickerTitle": "Sablon kiválasztása",
       "pickerSubtitle": "Válasszon sablont az eseménybeállítások előkonfigurálásához, vagy hagyja ki a kézi konfiguráláshoz.",
       "skipTemplate": "Kézi konfigurálás",
       "postEventPublic": "Nyilvános esemény utáni oldal",
@@ -3466,9 +3463,7 @@
       "preview": "Az Ön eseménye",
       "previewPeople": "Várt résztvevők: kb. {count}",
       "continue": "Tovább",
-      "useTemplate": "Vagy használjon sablont",
-      "instantAlt": "Vagy egy azonnali videohívás",
-      "instantAltAction": "Videohívás létrehozása",
+      "useTemplate": "Indítás sablonból",
       "summary": {
         "piccolo": "Legfeljebb 20 fő",
         "medio": "Legfeljebb 100 fő",
@@ -3487,7 +3482,9 @@
         "invitation": "Csak a meghívottjai",
         "invitationDesc": "Az oldal látható marad, de csak a meghívottak regisztrálhatnak; regisztráció nélkül nincs belépés"
       },
-      "previewInvitation": "Csak az Ön által meghívottak regisztrálhatnak; regisztráció nélkül senki sem lép be."
+      "previewInvitation": "Csak az Ön által meghívottak regisztrálhatnak; regisztráció nélkül senki sem lép be.",
+      "templateReplaces": "A sablon a saját beállításait hozza az alábbi válaszok helyett. A címet, a dátumokat és a személyeket a következő lépésekben adja meg.",
+      "instantBack": "Inkább ütemezett esemény létrehozása"
     },
     "captionsTranscript": {
       "title": "Átirat a feliratokból",

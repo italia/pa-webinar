@@ -878,11 +878,11 @@
           "BALANCED": "Echilibrată (540p)",
           "SAVE_DATA": "Economie de date (360p)"
         },
-        "requiredLegend": "Câmpurile marcate cu * sunt necesare pentru a salva evenimentul: cât timp sunt goale, fiecare o spune.",
         "kickerHint": "Pentru un supratitlu, scrie-l înaintea titlului și separă-le cu |, de exemplu „Ciclu de întâlniri | Prima întâlnire”.",
         "kickerUse": "Afișează „{kicker}” ca supratitlu",
         "kickerPreview": "Așa apare pe pagina evenimentului",
-        "coverImageSize": "16:9, recomandat 1600 × 900 pixeli."
+        "coverImageSize": "16:9, recomandat 1600 × 900 pixeli.",
+        "requiredNote": "Câmpurile marcate cu * sunt obligatorii."
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Disponibilă: pornește doar când un moderator apasă REC.",
         "aiAfter": "După înregistrare: {list}.",
         "scheduleHeading": "Când are loc",
-        "scheduleIntro": "Data, ora și câte persoane așteptați: servesc la pregătirea sălii.",
+        "scheduleIntro": "Când are loc evenimentul: data, ora și fusul orar.",
         "advancedIntro": "Valori deja alese de șablon: modificați doar ce este nevoie.",
         "advancedIntroTemplate": "Valori deja alese de șablonul „{name}”: modificați doar ce este nevoie.",
-        "requiredToSave": "Necesar pentru a salva evenimentul.",
         "requiredToPublish": "Necesar pentru a publica evenimentul.",
         "toComplete": "De completat",
         "missingHeading": "Pentru publicare mai lipsește:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {participant așteptat} few {participanți așteptați} other {de participanți așteptați}}",
         "registered": "{count, plural, =0 {niciun înscris deocamdată} one {# înscris până acum} few {# înscriși până acum} other {# de înscriși până acum}}",
         "change": "Schimbă",
-        "changeParticipants": "Schimbă numărul de participanți așteptați",
         "sizedOnRegistrations": "Sunt mai mulți înscriși decât participanți așteptați: estimarea îi numără pe cei {count} înscriși.",
         "cameraQuestion": "Câte camere web vor fi pornite?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Transcriere automată (implicit)",
       "aiSummary": "Rezumat automat (implicit)",
       "aiTranslation": "Traducere automată (implicit)",
-      "pickerTitle": "Alegeți un șablon",
       "pickerSubtitle": "Selectați un șablon pentru a pre-configura setările evenimentului sau omiteți pentru a configura totul manual.",
       "skipTemplate": "Configurați manual",
       "postEventPublic": "Pagină publică după eveniment",
@@ -3466,9 +3463,7 @@
       "preview": "Evenimentul tău",
       "previewPeople": "Participanți așteptați: circa {count}",
       "continue": "Continuă",
-      "useTemplate": "Sau folosește un șablon",
-      "instantAlt": "Sau un apel video instant",
-      "instantAltAction": "Creează apelul video",
+      "useTemplate": "Pornește de la un șablon",
       "summary": {
         "piccolo": "Până la 20 de persoane",
         "medio": "Până la 100 de persoane",
@@ -3487,7 +3482,9 @@
         "invitation": "Doar cei invitați de tine",
         "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar invitații; fără înscriere nu se intră"
       },
-      "previewInvitation": "Se pot înscrie doar persoanele invitate de tine; nimeni nu intră fără înscriere."
+      "previewInvitation": "Se pot înscrie doar persoanele invitate de tine; nimeni nu intră fără înscriere.",
+      "templateReplaces": "Un șablon aduce propriile setări în locul răspunsurilor de mai jos. Titlul, datele și persoanele le scrii în pașii următori.",
+      "instantBack": "Creează în schimb un eveniment programat"
     },
     "captionsTranscript": {
       "title": "Transcriere din subtitrări",

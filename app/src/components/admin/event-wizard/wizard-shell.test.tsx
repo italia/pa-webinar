@@ -1666,32 +1666,32 @@ describe('creazione — i default del modello', () => {
 });
 
 /**
- * Gli obbligatori si fanno notare prima di premere un pulsante: lampeggiano
- * finche' sono vuoti, la barra dice quali passi sono da completare, e il
+ * Gli obbligatori li segna l'asterisco: niente righe ripetute ne' lampeggi
+ * prima di un tentativo. Dopo «Avanti» il campo che manca e' un errore,
+ * accanto al campo, e la barra dice quali passi sono da completare; il
  * riepilogo elenca cio' che manca con il link al campo.
  */
-describe('obbligatori — si fanno notare', () => {
+describe('obbligatori — l\'errore al tentativo', () => {
   beforeEach(() => {
     fetchMock.mockImplementation(async () => json(200, { rows: [] }));
   });
 
-  it('il titolo vuoto lampeggia con la riga «serve per salvare», che sparisce scrivendo', () => {
+  it('il titolo vuoto non ripete che e\' obbligatorio: l\'errore compare con «Avanti»', async () => {
     renderWizard();
     const campo = byId<HTMLInputElement>('ev-title').closest('.wizard-campo')!;
-    expect(campo).toHaveClass('wizard-campo--vuoto');
-    expect(campo.textContent).toContain(w.flow.requiredToSave);
-    expect(byId('ev-title').getAttribute('aria-describedby')?.split(' ')).toContain('ev-title-promemoria');
-    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
-    expect(byId('ev-title').getAttribute('aria-describedby')?.split(' ')).not.toContain('ev-title-promemoria');
-    expect(campo).not.toHaveClass('wizard-campo--vuoto');
-    expect(campo.textContent).not.toContain(w.flow.requiredToSave);
+    expect(campo).not.toHaveClass('wizard-campo--insisti');
+    expect(container.querySelector('#ev-title-promemoria')).toBeNull();
+    await press(button(`${messages.common.next} →`));
+    expect(campo).toHaveClass('wizard-campo--insisti');
   });
 
-  it('la barra dei passi dice quali sono da completare', () => {
+  it('la barra dei passi dice quali sono da completare solo dopo un tentativo', async () => {
     renderWizard();
     const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
     const passo = (nome: string) =>
       Array.from(nav.querySelectorAll('button')).find((b) => b.textContent?.includes(nome))!;
+    expect(passo(w.flow.steps.base).textContent).not.toContain(w.flow.toComplete);
+    await press(button(`${messages.common.next} →`));
     expect(passo(w.flow.steps.base).textContent).toContain(w.flow.toComplete);
     // L'organizzatore principale serve per pubblicare: anche «Persone» e' da completare.
     expect(passo(w.flow.steps.invites).textContent).toContain(w.flow.toComplete);
@@ -1709,12 +1709,18 @@ describe('obbligatori — si fanno notare', () => {
     expect(document.activeElement?.id).toBe('ev-title');
   });
 
-  it('il nome dell organizzatore vuoto dice che serve per pubblicare', () => {
+  it('il nome dell organizzatore vuoto dice che serve per pubblicare (non per salvare)', () => {
     renderWizard();
     goToStep('invites');
     const campo = byId<HTMLInputElement>('wiz-primary-name').closest('.wizard-campo')!;
-    expect(campo).toHaveClass('wizard-campo--vuoto');
     expect(campo.textContent).toContain(w.flow.requiredToPublish);
+  });
+
+  it('in creazione la bozza si salva da ogni passo', () => {
+    renderWizard();
+    expect(button(w.saveDraft)).toBeTruthy();
+    goToStep(w.flow.steps.schedule);
+    expect(button(w.saveDraft)).toBeTruthy();
   });
 });
 

@@ -878,11 +878,11 @@
           "BALANCED": "Subalansuota (540p)",
           "SAVE_DATA": "Duomenų taupymas (360p)"
         },
-        "requiredLegend": "Laukai, pažymėti *, reikalingi renginiui išsaugoti: kol jie tušti, tai nurodyta prie kiekvieno.",
         "kickerHint": "Norėdami pridėti antraštę virš pavadinimo, parašykite ją prieš pavadinimą ir atskirkite ženklu |, pavyzdžiui, „Susitikimų ciklas | Pirmasis susitikimas“.",
         "kickerUse": "Rodyti „{kicker}“ virš pavadinimo",
         "kickerPreview": "Taip atrodo renginio puslapyje",
-        "coverImageSize": "16:9, rekomenduojama 1600 × 900 pikselių."
+        "coverImageSize": "16:9, rekomenduojama 1600 × 900 pikselių.",
+        "requiredNote": "Laukai, pažymėti *, yra privalomi."
       },
       "step2": {
         "heading": "Kas ką gali daryti",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Prieinama: prasideda tik tada, kai vedėjas paspaudžia REC.",
         "aiAfter": "Po įrašymo: {list}.",
         "scheduleHeading": "Kada vyksta",
-        "scheduleIntro": "Data, laikas ir kiek žmonių tikitės: pagal tai paruošiama salė.",
+        "scheduleIntro": "Kada vyksta renginys: data, laikas ir laiko juosta.",
         "advancedIntro": "Šablono jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
         "advancedIntroTemplate": "Šablono „{name}“ jau pasirinktos reikšmės: keiskite tik tai, ko reikia.",
-        "requiredToSave": "Reikia renginiui išsaugoti.",
         "requiredToPublish": "Reikia renginiui paskelbti.",
         "toComplete": "Reikia užpildyti",
         "missingHeading": "Kad paskelbtumėte, dar trūksta:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {laukiamas dalyvis} few {laukiami dalyviai} many {laukiamo dalyvio} other {laukiamų dalyvių}}",
         "registered": "{count, plural, =0 {kol kas užsiregistravusių nėra} one {# užsiregistravęs iki šiol} few {# užsiregistravę iki šiol} many {# užsiregistravusio iki šiol} other {# užsiregistravusių iki šiol}}",
         "change": "Keisti",
-        "changeParticipants": "Keisti laukiamų dalyvių skaičių",
         "sizedOnRegistrations": "Užsiregistravusių yra daugiau nei laukiamų dalyvių: įvertinimas skaičiuoja {count} užsiregistravusius.",
         "cameraQuestion": "Kiek internetinių kamerų bus įjungta?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatinė transkripcija (numatytoji)",
       "aiSummary": "Automatinė santrauka (numatytoji)",
       "aiTranslation": "Automatinis vertimas (numatytasis)",
-      "pickerTitle": "Pasirinkite šabloną",
       "pickerSubtitle": "Pasirinkite šabloną iš anksto konfigūruoti renginio nustatymams arba praleiskite, kad viską sukonfigūruotumėte patys.",
       "skipTemplate": "Konfigūruoti rankiniu būdu",
       "postEventPublic": "Viešas puslapis po renginio",
@@ -3466,9 +3463,7 @@
       "preview": "Jūsų renginys",
       "previewPeople": "Tikimasi dalyvių: apie {count}",
       "continue": "Tęsti",
-      "useTemplate": "Arba naudokite šabloną",
-      "instantAlt": "Arba momentinis vaizdo skambutis",
-      "instantAltAction": "Sukurti vaizdo skambutį",
+      "useTemplate": "Pradėti nuo šablono",
       "summary": {
         "piccolo": "Iki 20 žmonių",
         "medio": "Iki 100 žmonių",
@@ -3487,7 +3482,9 @@
         "invitation": "Tik jūsų pakviesti",
         "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik pakviestieji; neužsiregistravus patekti negalima"
       },
-      "previewInvitation": "Registruotis gali tik jūsų pakviesti; niekas nepateks neužsiregistravęs."
+      "previewInvitation": "Registruotis gali tik jūsų pakviesti; niekas nepateks neužsiregistravęs.",
+      "templateReplaces": "Šablonas atneša savo nustatymus vietoj toliau pateiktų atsakymų. Pavadinimą, datas ir žmones įrašote kituose žingsniuose.",
+      "instantBack": "Vietoj to sukurti suplanuotą renginį"
     },
     "captionsTranscript": {
       "title": "Stenograma iš subtitrų",

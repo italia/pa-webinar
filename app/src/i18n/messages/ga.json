@@ -878,11 +878,11 @@
           "BALANCED": "Cothrom (540p)",
           "SAVE_DATA": "Coigilt sonraí (360p)"
         },
-        "requiredLegend": "Teastaíonn na réimsí le * chun an t-imeacht a shábháil: fad atá siad folamh, deirtear é le gach ceann.",
         "kickerHint": "Le haghaidh forcheannteidil, scríobh roimh an teideal é agus scar iad le |, mar shampla “Sraith cruinnithe | An chéad chruinniú”.",
         "kickerUse": "Taispeáin “{kicker}” mar fhorcheannteideal",
         "kickerPreview": "Mar seo a bhreathnaíonn sé ar leathanach an imeachta",
-        "coverImageSize": "16:9, molta 1600 × 900 picteilín."
+        "coverImageSize": "16:9, molta 1600 × 900 picteilín.",
+        "requiredNote": "Tá na réimsí atá marcáilte le * riachtanach."
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Ar fáil: ní thosaíonn sé go dtí go mbrúnn modhnóir REC.",
         "aiAfter": "Tar éis an taifeadta: {list}.",
         "scheduleHeading": "Cathain a bheidh sé ar siúl",
-        "scheduleIntro": "Dáta, am agus cé mhéad duine a bhfuil súil agat leo: úsáidtear iad chun an seomra a ullmhú.",
+        "scheduleIntro": "Cathain a bheidh an ócáid ar siúl: dáta, am agus crios ama.",
         "advancedIntro": "Luachanna atá roghnaithe ag an teimpléad cheana: ná hathraigh ach an méid is gá.",
         "advancedIntroTemplate": "Luachanna atá roghnaithe ag an teimpléad «{name}» cheana: ná hathraigh ach an méid is gá.",
-        "requiredToSave": "Riachtanach chun an t-imeacht a shábháil.",
         "requiredToPublish": "Riachtanach chun an t-imeacht a fhoilsiú.",
         "toComplete": "Le comhlánú",
         "missingHeading": "Chun foilsiú, tá easpa fós ar:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {rannpháirtí ag súil leis} two {rannpháirtí ag súil leo} few {rannpháirtí ag súil leo} many {rannpháirtí ag súil leo} other {rannpháirtí ag súil leo}}",
         "registered": "{count, plural, =0 {gan aon duine cláraithe fós} one {# duine cláraithe go dtí seo} two {# dhuine cláraithe go dtí seo} few {# dhuine cláraithe go dtí seo} many {# nduine cláraithe go dtí seo} other {# duine cláraithe go dtí seo}}",
         "change": "Athraigh",
-        "changeParticipants": "Athraigh líon na rannpháirtithe a bhfuiltear ag súil leo",
         "sizedOnRegistrations": "Tá níos mó daoine cláraithe ná rannpháirtithe a bhfuiltear ag súil leo: áiríonn an meastachán an {count} duine cláraithe.",
         "cameraQuestion": "Cé mhéad ceamara gréasáin a bheidh ar siúl?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Tras-scríobh uathoibríoch (réamhshocrú)",
       "aiSummary": "Achoimre uathoibríoch (réamhshocrú)",
       "aiTranslation": "Aistriúchán uathoibríoch (réamhshocrú)",
-      "pickerTitle": "Roghnaigh teimpléad",
       "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
       "skipTemplate": "Cumraigh de láimh",
       "postEventPublic": "Leathanach poiblí tar éis an imeachta",
@@ -3466,9 +3463,7 @@
       "preview": "D'imeacht",
       "previewPeople": "Rannpháirtithe a bhfuiltear ag súil leo: timpeall {count}",
       "continue": "Lean ar aghaidh",
-      "useTemplate": "Nó úsáid teimpléad",
-      "instantAlt": "Nó glao físe láithreach",
-      "instantAltAction": "Cruthaigh an glao físe",
+      "useTemplate": "Tosaigh ó theimpléad",
       "summary": {
         "piccolo": "Suas le 20 duine",
         "medio": "Suas le 100 duine",
@@ -3487,7 +3482,9 @@
         "invitation": "Na daoine a dtugann tú cuireadh dóibh amháin",
         "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine a fuair cuireadh clárú; gan clárú ní féidir dul isteach"
       },
-      "previewInvitation": "Ní féidir ach leis na daoine a dtugann tú cuireadh dóibh clárú; ní théann aon duine isteach gan clárú."
+      "previewInvitation": "Ní féidir ach leis na daoine a dtugann tú cuireadh dóibh clárú; ní théann aon duine isteach gan clárú.",
+      "templateReplaces": "Tugann teimpléad a shocruithe féin in ionad na bhfreagraí thíos. Scríobhann tú an teideal, na dátaí agus na daoine sna céimeanna eile.",
+      "instantBack": "Cruthaigh ócáid sceidealta ina ionad"
     },
     "captionsTranscript": {
       "title": "Tras-scríbhinn ó fhotheidil",

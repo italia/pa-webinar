@@ -878,11 +878,11 @@
           "BALANCED": "Balanserad (540p)",
           "SAVE_DATA": "Datasparläge (360p)"
         },
-        "requiredLegend": "Fält markerade med * behövs för att spara evenemanget: så länge de är tomma står det vid varje fält.",
         "kickerHint": "För en överrubrik skriver du den före titeln och skiljer dem åt med |, till exempel ”Mötesserie | Det första mötet”.",
         "kickerUse": "Visa ”{kicker}” som överrubrik",
         "kickerPreview": "Så här ser den ut på evenemangssidan",
-        "coverImageSize": "16:9, rekommenderat 1600 × 900 pixlar."
+        "coverImageSize": "16:9, rekommenderat 1600 × 900 pixlar.",
+        "requiredNote": "Fält markerade med * är obligatoriska."
       },
       "step2": {
         "heading": "Vem får göra vad",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Tillgänglig: startar först när en moderator trycker på REC.",
         "aiAfter": "Efter inspelningen: {list}.",
         "scheduleHeading": "När det äger rum",
-        "scheduleIntro": "Datum, tid och hur många du väntar dig: används för att förbereda rummet.",
+        "scheduleIntro": "När evenemanget äger rum: datum, tid och tidszon.",
         "advancedIntro": "Värden som mallen redan har valt: ändra bara det som behövs.",
         "advancedIntroTemplate": "Värden som mallen ”{name}” redan har valt: ändra bara det som behövs.",
-        "requiredToSave": "Behövs för att spara evenemanget.",
         "requiredToPublish": "Behövs för att publicera evenemanget.",
         "toComplete": "Att fylla i",
         "missingHeading": "För att publicera saknas fortfarande:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {förväntad deltagare} other {förväntade deltagare}}",
         "registered": "{count, plural, =0 {inga anmälda ännu} one {# anmäld hittills} other {# anmälda hittills}}",
         "change": "Ändra",
-        "changeParticipants": "Ändra antalet förväntade deltagare",
         "sizedOnRegistrations": "Det finns fler anmälda än förväntade deltagare: uppskattningen räknar med de {count} anmälda.",
         "cameraQuestion": "Hur många webbkameror kommer att vara på?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatisk transkribering (standard)",
       "aiSummary": "Automatisk sammanfattning (standard)",
       "aiTranslation": "Automatisk översättning (standard)",
-      "pickerTitle": "Välj en mall",
       "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
       "skipTemplate": "Konfigurera manuellt",
       "postEventPublic": "Offentlig sida efter evenemanget",
@@ -3466,9 +3463,7 @@
       "preview": "Ditt evenemang",
       "previewPeople": "Förväntade deltagare: cirka {count}",
       "continue": "Fortsätt",
-      "useTemplate": "Eller använd en mall",
-      "instantAlt": "Eller ett direkt videosamtal",
-      "instantAltAction": "Skapa videosamtalet",
+      "useTemplate": "Utgå från en mall",
       "summary": {
         "piccolo": "Upp till 20 personer",
         "medio": "Upp till 100 personer",
@@ -3487,7 +3482,9 @@
         "invitation": "Bara de du bjuder in",
         "invitationDesc": "Sidan förblir synlig, men bara inbjudna kan anmäla sig; utan anmälan kommer man inte in"
       },
-      "previewInvitation": "Bara de du bjuder in kan anmäla sig; ingen kommer in utan anmälan."
+      "previewInvitation": "Bara de du bjuder in kan anmäla sig; ingen kommer in utan anmälan.",
+      "templateReplaces": "En mall tar med sina egna inställningar i stället för svaren nedan. Titel, datum och personer fyller du i de följande stegen.",
+      "instantBack": "Skapa ett schemalagt evenemang i stället"
     },
     "captionsTranscript": {
       "title": "Transkription från textning",

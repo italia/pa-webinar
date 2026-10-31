@@ -878,11 +878,11 @@
           "BALANCED": "Uravnotežena (540p)",
           "SAVE_DATA": "Varčevanje s podatki (360p)"
         },
-        "requiredLegend": "Polja, označena z *, so potrebna za shranjevanje dogodka: dokler so prazna, je to navedeno pri vsakem.",
         "kickerHint": "Za nadnaslov ga napišite pred naslov in ju ločite z |, na primer »Cikel srečanj | Prvo srečanje«.",
         "kickerUse": "Prikaži »{kicker}« kot nadnaslov",
         "kickerPreview": "Tako je videti na strani dogodka",
-        "coverImageSize": "16:9, priporočeno 1600 × 900 slikovnih pik."
+        "coverImageSize": "16:9, priporočeno 1600 × 900 slikovnih pik.",
+        "requiredNote": "Polja, označena z *, so obvezna."
       },
       "step2": {
         "heading": "Kdo lahko kaj počne",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Na voljo: začne se šele, ko moderator pritisne REC.",
         "aiAfter": "Po snemanju: {list}.",
         "scheduleHeading": "Kdaj poteka",
-        "scheduleIntro": "Datum, ura in koliko ljudi pričakujete: po tem se pripravi dvorana.",
+        "scheduleIntro": "Kdaj bo dogodek: datum, ura in časovni pas.",
         "advancedIntro": "Vrednosti, ki jih je predloga že izbrala: spremenite le, kar je treba.",
         "advancedIntroTemplate": "Vrednosti, ki jih je predloga »{name}« že izbrala: spremenite le, kar je treba.",
-        "requiredToSave": "Potrebno za shranjevanje dogodka.",
         "requiredToPublish": "Potrebno za objavo dogodka.",
         "toComplete": "Za dopolnitev",
         "missingHeading": "Za objavo še manjka:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {pričakovani udeleženec} two {pričakovana udeleženca} few {pričakovani udeleženci} other {pričakovanih udeležencev}}",
         "registered": "{count, plural, =0 {zaenkrat ni prijavljenih} one {doslej # prijavljen} two {doslej # prijavljena} few {doslej # prijavljeni} other {doslej # prijavljenih}}",
         "change": "Spremeni",
-        "changeParticipants": "Spremeni število pričakovanih udeležencev",
         "sizedOnRegistrations": "Prijavljenih je več kot pričakovanih udeležencev: ocena upošteva {count} prijavljenih.",
         "cameraQuestion": "Koliko spletnih kamer bo vklopljenih?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Samodejni prepis (privzeto)",
       "aiSummary": "Samodejni povzetek (privzeto)",
       "aiTranslation": "Samodejno prevajanje (privzeto)",
-      "pickerTitle": "Izberite predlogo",
       "pickerSubtitle": "Izberite predlogo za predkonfiguracijo nastavitev dogodka ali preskočite za ročno konfiguracijo.",
       "skipTemplate": "Konfiguriraj ročno",
       "postEventPublic": "Javna stran po dogodku",
@@ -3466,9 +3463,7 @@
       "preview": "Vaš dogodek",
       "previewPeople": "Pričakovani udeleženci: približno {count}",
       "continue": "Nadaljuj",
-      "useTemplate": "Ali uporabite predlogo",
-      "instantAlt": "Ali takojšnji videoklic",
-      "instantAltAction": "Ustvari videoklic",
+      "useTemplate": "Začni s predlogo",
       "summary": {
         "piccolo": "Do 20 oseb",
         "medio": "Do 100 oseb",
@@ -3487,7 +3482,9 @@
         "invitation": "Samo povabljeni",
         "invitationDesc": "Stran ostane vidna, a prijavijo se lahko samo povabljeni; brez prijave ni vstopa"
       },
-      "previewInvitation": "Prijavijo se lahko samo tisti, ki jih povabite; brez prijave nihče ne vstopi."
+      "previewInvitation": "Prijavijo se lahko samo tisti, ki jih povabite; brez prijave nihče ne vstopi.",
+      "templateReplaces": "Predloga prinese svoje nastavitve namesto spodnjih odgovorov. Naslov, datume in osebe vpišete v naslednjih korakih.",
+      "instantBack": "Namesto tega ustvari načrtovan dogodek"
     },
     "captionsTranscript": {
       "title": "Prepis iz podnapisov",

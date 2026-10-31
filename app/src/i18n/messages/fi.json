@@ -878,11 +878,11 @@
           "BALANCED": "Tasapainoinen (540p)",
           "SAVE_DATA": "Datansäästö (360p)"
         },
-        "requiredLegend": "*-merkityt kentät tarvitaan tapahtuman tallentamiseen: niin kauan kuin ne ovat tyhjiä, se lukee jokaisen kohdalla.",
         "kickerHint": "Kirjoita yläotsikko ennen otsikkoa ja erota ne merkillä |, esimerkiksi ”Tapaamissarja | Ensimmäinen tapaaminen”.",
         "kickerUse": "Näytä ”{kicker}” yläotsikkona",
         "kickerPreview": "Näin se näkyy tapahtuman sivulla",
-        "coverImageSize": "16:9, suositus 1600 × 900 pikseliä."
+        "coverImageSize": "16:9, suositus 1600 × 900 pikseliä.",
+        "requiredNote": "Tähdellä * merkityt kentät ovat pakollisia."
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Käytettävissä: alkaa vasta, kun juontaja painaa REC.",
         "aiAfter": "Tallennuksen jälkeen: {list}.",
         "scheduleHeading": "Milloin se järjestetään",
-        "scheduleIntro": "Päivä, kellonaika ja odotettu osallistujamäärä: niillä tila valmistellaan.",
+        "scheduleIntro": "Milloin tapahtuma järjestetään: päivämäärä, kellonaika ja aikavyöhyke.",
         "advancedIntro": "Mallin jo valitsemat arvot: muuta vain tarvittava.",
         "advancedIntroTemplate": "Mallin ”{name}” jo valitsemat arvot: muuta vain tarvittava.",
-        "requiredToSave": "Tarvitaan tapahtuman tallentamiseen.",
         "requiredToPublish": "Tarvitaan tapahtuman julkaisemiseen.",
         "toComplete": "Täydennettävä",
         "missingHeading": "Julkaisemisesta puuttuu vielä:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {odotettu osallistuja} other {odotettua osallistujaa}}",
         "registered": "{count, plural, =0 {ei vielä ilmoittautuneita} one {# ilmoittautunut tähän mennessä} other {# ilmoittautunutta tähän mennessä}}",
         "change": "Muuta",
-        "changeParticipants": "Muuta odotettujen osallistujien määrää",
         "sizedOnRegistrations": "Ilmoittautuneita on enemmän kuin odotettuja osallistujia: arvio laskee {count} ilmoittautunutta.",
         "cameraQuestion": "Kuinka monta verkkokameraa on päällä?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automaattinen litterointi (oletus)",
       "aiSummary": "Automaattinen yhteenveto (oletus)",
       "aiTranslation": "Automaattinen käännös (oletus)",
-      "pickerTitle": "Valitse malli",
       "pickerSubtitle": "Valitse malli esimäärittääksesi tapahtuma-asetukset tai ohita ja määritä kaikki manuaalisesti.",
       "skipTemplate": "Määritä manuaalisesti",
       "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
@@ -3466,9 +3463,7 @@
       "preview": "Tapahtumasi",
       "previewPeople": "Odotetut osallistujat: noin {count}",
       "continue": "Jatka",
-      "useTemplate": "Tai käytä mallia",
-      "instantAlt": "Tai pikavideopuhelu",
-      "instantAltAction": "Luo videopuhelu",
+      "useTemplate": "Aloita mallista",
       "summary": {
         "piccolo": "Enintään 20 henkilöä",
         "medio": "Enintään 100 henkilöä",
@@ -3487,7 +3482,9 @@
         "invitation": "Vain kutsumasi",
         "invitationDesc": "Sivu pysyy näkyvissä, mutta vain kutsutut voivat ilmoittautua; ilman ilmoittautumista ei pääse sisään"
       },
-      "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta."
+      "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta.",
+      "templateReplaces": "Malli tuo omat asetuksensa alla olevien vastausten sijaan. Otsikon, päivämäärät ja henkilöt kirjoitat seuraavissa vaiheissa.",
+      "instantBack": "Luo sen sijaan aikataulutettu tapahtuma"
     },
     "captionsTranscript": {
       "title": "Litterointi tekstityksestä",

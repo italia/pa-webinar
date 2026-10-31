@@ -878,11 +878,11 @@
           "BALANCED": "Bilanċjata (540p)",
           "SAVE_DATA": "Iffranka d-data (360p)"
         },
-        "requiredLegend": "L-oqsma mmarkati b'* huma meħtieġa biex jiġi ssejvjat l-avveniment: sakemm huma vojta, kull wieħed jgħidha.",
         "kickerHint": "Għal sopratitolu, iktbu qabel it-titolu u isseparahom b'|, pereżempju “Serje ta' laqgħat | L-ewwel laqgħa”.",
         "kickerUse": "Uri “{kicker}” bħala sopratitolu",
         "kickerPreview": "Hekk jidher fuq il-paġna tal-avveniment",
-        "coverImageSize": "16:9, rakkomandat 1600 × 900 pixel."
+        "coverImageSize": "16:9, rakkomandat 1600 × 900 pixel.",
+        "requiredNote": "Il-qasam immarkati b'* huma obbligatorji."
       },
       "step2": {
         "heading": "Min jista' jagħmel xiex",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Disponibbli: tibda biss meta moderatur jagħfas REC.",
         "aiAfter": "Wara r-reġistrazzjoni: {list}.",
         "scheduleHeading": "Meta jsir",
-        "scheduleIntro": "Data, ħin u kemm-il persuna tistenna: jintużaw biex titħejja s-sala.",
+        "scheduleIntro": "Meta jsir l-avveniment: data, ħin u żona tal-ħin.",
         "advancedIntro": "Valuri diġà magħżula mill-mudell: ibdel biss dak li hemm bżonn.",
         "advancedIntroTemplate": "Valuri diġà magħżula mill-mudell «{name}»: ibdel biss dak li hemm bżonn.",
-        "requiredToSave": "Meħtieġ biex jiġi ssejvjat l-avveniment.",
         "requiredToPublish": "Meħtieġ biex jiġi ppubblikat l-avveniment.",
         "toComplete": "Biex jitlesta",
         "missingHeading": "Biex tippubblika għadu nieqes:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {parteċipant mistenni} other {parteċipanti mistennija}}",
         "registered": "{count, plural, =0 {għad m’hemm ħadd irreġistrat} one {# irreġistrat s’issa} other {# irreġistrati s’issa}}",
         "change": "Ibdel",
-        "changeParticipants": "Ibdel l-għadd ta’ parteċipanti mistennija",
         "sizedOnRegistrations": "L-irreġistrati huma aktar mill-parteċipanti mistennija: l-istima tgħodd il-{count} irreġistrati.",
         "cameraQuestion": "Kemm se jkun hemm webcams mixgħula?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Traskrizzjoni awtomatika (prestabbilit)",
       "aiSummary": "Sommarju awtomatiku (prestabbilit)",
       "aiTranslation": "Traduzzjoni awtomatika (prestabbilit)",
-      "pickerTitle": "Agħżel template",
       "pickerSubtitle": "Agħżel template biex tikkonfigura minn qabel is-settings tal-avveniment, jew aqbeż biex tikkonfigura kollox manwalment.",
       "skipTemplate": "Ikkonfigura manwalment",
       "postEventPublic": "Paġna pubblika wara l-avveniment",
@@ -3466,9 +3463,7 @@
       "preview": "L-avveniment tiegħek",
       "previewPeople": "Parteċipanti mistennija: madwar {count}",
       "continue": "Kompli",
-      "useTemplate": "Jew uża mudell",
-      "instantAlt": "Jew vidjokall immedjata",
-      "instantAltAction": "Oħloq il-vidjokall",
+      "useTemplate": "Ibda minn mudell",
       "summary": {
         "piccolo": "Sa 20 persuna",
         "medio": "Sa 100 persuna",
@@ -3487,7 +3482,9 @@
         "invitation": "Biss dawk li tistieden",
         "invitationDesc": "Il-paġna tibqa' tidher, iżda jistgħu jirreġistraw biss il-mistednin; mingħajr reġistrazzjoni ma tidħolx"
       },
-      "previewInvitation": "Jistgħu jirreġistraw biss dawk li tistieden; ħadd ma jidħol mingħajr reġistrazzjoni."
+      "previewInvitation": "Jistgħu jirreġistraw biss dawk li tistieden; ħadd ma jidħol mingħajr reġistrazzjoni.",
+      "templateReplaces": "Mudell iġib l-issettjar tiegħu minflok it-tweġibiet hawn taħt. It-titlu, id-dati u n-nies tiktibhom fil-passi li ġejjin.",
+      "instantBack": "Oħloq minflok avveniment skedat"
     },
     "captionsTranscript": {
       "title": "Traskrizzjoni mis-sottotitoli",

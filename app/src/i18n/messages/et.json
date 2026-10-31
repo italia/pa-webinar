@@ -878,11 +878,11 @@
           "BALANCED": "Tasakaalustatud (540p)",
           "SAVE_DATA": "Andmesääst (360p)"
         },
-        "requiredLegend": "Tärniga * väljad on vajalikud ürituse salvestamiseks: kuni need on tühjad, on see iga välja juures kirjas.",
         "kickerHint": "Pealkirja kohal oleva rea jaoks kirjuta see enne pealkirja ja eralda märgiga |, näiteks „Kohtumiste sari | Esimene kohtumine“.",
         "kickerUse": "Näita „{kicker}“ pealkirja kohal",
         "kickerPreview": "Nii näeb see välja ürituse lehel",
-        "coverImageSize": "16:9, soovitatav 1600 × 900 pikslit."
+        "coverImageSize": "16:9, soovitatav 1600 × 900 pikslit.",
+        "requiredNote": "Tärniga * märgitud väljad on kohustuslikud."
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Saadaval: algab alles siis, kui juht vajutab REC.",
         "aiAfter": "Pärast salvestust: {list}.",
         "scheduleHeading": "Millal see toimub",
-        "scheduleIntro": "Kuupäev, kellaaeg ja oodatav osalejate arv: nendega valmistatakse ruum ette.",
+        "scheduleIntro": "Millal sündmus toimub: kuupäev, kellaaeg ja ajavöönd.",
         "advancedIntro": "Malli juba valitud väärtused: muuda ainult vajalikku.",
         "advancedIntroTemplate": "Malli „{name}” juba valitud väärtused: muuda ainult vajalikku.",
-        "requiredToSave": "Vajalik ürituse salvestamiseks.",
         "requiredToPublish": "Vajalik ürituse avaldamiseks.",
         "toComplete": "Täitmata",
         "missingHeading": "Avaldamiseks on veel puudu:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {oodatav osaleja} other {oodatavat osalejat}}",
         "registered": "{count, plural, =0 {registreerunuid veel pole} one {# registreerunu siiani} other {# registreerunut siiani}}",
         "change": "Muuda",
-        "changeParticipants": "Muuda oodatavate osalejate arvu",
         "sizedOnRegistrations": "Registreerunuid on rohkem kui oodatavaid osalejaid: hinnang arvestab {count} registreerunut.",
         "cameraQuestion": "Mitu veebikaamerat on sees?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automaatne transkribeerimine (vaikimisi)",
       "aiSummary": "Automaatne kokkuvõte (vaikimisi)",
       "aiTranslation": "Automaatne tõlge (vaikimisi)",
-      "pickerTitle": "Valige mall",
       "pickerSubtitle": "Valige mall ürituse seadete eelseadistamiseks või jätke vahele, et kõik käsitsi seadistada.",
       "skipTemplate": "Seadista käsitsi",
       "postEventPublic": "Avalik ürituse järgne leht",
@@ -3466,9 +3463,7 @@
       "preview": "Sinu üritus",
       "previewPeople": "Oodatud osalejad: umbes {count}",
       "continue": "Jätka",
-      "useTemplate": "Või kasuta malli",
-      "instantAlt": "Või kiire videokõne",
-      "instantAltAction": "Loo videokõne",
+      "useTemplate": "Alusta mallist",
       "summary": {
         "piccolo": "Kuni 20 inimest",
         "medio": "Kuni 100 inimest",
@@ -3487,7 +3482,9 @@
         "invitation": "Ainult sinu kutsutud",
         "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult kutsutud; registreerimata sisse ei pääse"
       },
-      "previewInvitation": "Registreeruda saavad ainult sinu kutsutud; registreerimata ei pääse keegi sisse."
+      "previewInvitation": "Registreeruda saavad ainult sinu kutsutud; registreerimata ei pääse keegi sisse.",
+      "templateReplaces": "Mall toob alltoodud vastuste asemel oma seaded. Pealkirja, kuupäevad ja inimesed kirjutad järgmistes sammudes.",
+      "instantBack": "Loo selle asemel plaanitud sündmus"
     },
     "captionsTranscript": {
       "title": "Transkriptsioon subtiitritest",

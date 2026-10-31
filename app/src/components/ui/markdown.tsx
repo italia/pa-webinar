@@ -17,7 +17,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
@@ -121,11 +121,15 @@ interface MarkdownEditorProps {
   errorText?: string;
   /** La lingua del testo che si scrive (il campo e l'anteprima la dicono). */
   lang?: string;
+  /** L'interruttore Scrivi/Anteprima: no dove la pagina mostra gia' il testo reso. */
+  anteprima?: boolean;
 }
 
 /**
- * Textarea + live preview. No toolbar — markdown is the contract, not
- * a mystery button-grid — but with a compact "preview/edit" toggle.
+ * Il campo per il testo in Markdown. Niente barra di pulsanti (il Markdown e'
+ * il contratto). L'interruttore Scrivi/Anteprima c'e' solo dove serve: dove la
+ * pagina mostra gia' lo stesso testo reso accanto al modulo, sarebbe un
+ * doppione (`anteprima={false}`).
  */
 export function MarkdownEditor({
   value,
@@ -138,38 +142,42 @@ export function MarkdownEditor({
   invalid,
   errorText,
   lang,
+  anteprima = true,
 }: MarkdownEditorProps) {
   const t = useTranslations('markdown');
   const [preview, setPreview] = useState(false);
-  const html = useMemo(() => renderMarkdown(value), [value]);
+  const mostraAnteprima = anteprima && preview;
+  const html = useMemo(() => (mostraAnteprima ? renderMarkdown(value) : ''), [mostraAnteprima, value]);
 
   return (
     <div className="markdown-editor">
       <div className="d-flex align-items-center justify-content-between mb-1">
         {label && <label htmlFor={id} className="form-label mb-0">{label}</label>}
         {/* Due pulsanti a stato (non schede): quello attivo e' premuto. */}
-        <div className="btn-group btn-group-sm" role="group" aria-label={label}>
-          <button
-            type="button"
-            className={`btn btn-sm ${preview ? 'btn-outline-secondary' : 'btn-secondary'}`}
-            onClick={() => setPreview(false)}
-            aria-pressed={!preview}
-          >
-            {t('edit')}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-sm ${preview ? 'btn-secondary' : 'btn-outline-secondary'}`}
-            onClick={() => setPreview(true)}
-            disabled={!value}
-            aria-pressed={preview}
-          >
-            {t('preview')}
-          </button>
-        </div>
+        {anteprima && (
+          <div className="btn-group btn-group-sm" role="group" aria-label={label}>
+            <button
+              type="button"
+              className={`btn btn-sm ${preview ? 'btn-outline-secondary' : 'btn-secondary'}`}
+              onClick={() => setPreview(false)}
+              aria-pressed={!preview}
+            >
+              {t('edit')}
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${preview ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              onClick={() => setPreview(true)}
+              disabled={!value}
+              aria-pressed={preview}
+            >
+              {t('preview')}
+            </button>
+          </div>
+        )}
       </div>
 
-      {!preview ? (
+      {!mostraAnteprima ? (
         <textarea
           id={id}
           className={`form-control${invalid ? ' is-invalid' : ''}`}

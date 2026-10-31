@@ -878,11 +878,11 @@
           "BALANCED": "Uravnotežena (540p)",
           "SAVE_DATA": "Ušteda podataka (360p)"
         },
-        "requiredLegend": "Polja označena s * potrebna su za spremanje događaja: dok su prazna, to piše uz svako.",
         "kickerHint": "Za nadnaslov napišite ga prije naslova i odvojite ih znakom |, na primjer „Ciklus susreta | Prvi susret”.",
         "kickerUse": "Prikaži „{kicker}” kao nadnaslov",
         "kickerPreview": "Ovako izgleda na stranici događaja",
-        "coverImageSize": "16:9, preporučeno 1600 × 900 piksela."
+        "coverImageSize": "16:9, preporučeno 1600 × 900 piksela.",
+        "requiredNote": "Polja označena s * su obavezna."
       },
       "step2": {
         "heading": "Tko što može",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Dostupno: počinje tek kad moderator pritisne REC.",
         "aiAfter": "Nakon snimanja: {list}.",
         "scheduleHeading": "Kada se održava",
-        "scheduleIntro": "Datum, vrijeme i koliko ljudi očekujete: prema tome se priprema dvorana.",
+        "scheduleIntro": "Kada se događaj održava: datum, vrijeme i vremenska zona.",
         "advancedIntro": "Vrijednosti koje je predložak već odabrao: promijenite samo ono što treba.",
         "advancedIntroTemplate": "Vrijednosti koje je predložak „{name}” već odabrao: promijenite samo ono što treba.",
-        "requiredToSave": "Potrebno za spremanje događaja.",
         "requiredToPublish": "Potrebno za objavu događaja.",
         "toComplete": "Za dopuniti",
         "missingHeading": "Za objavu još nedostaje:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {očekivani sudionik} few {očekivana sudionika} other {očekivanih sudionika}}",
         "registered": "{count, plural, =0 {zasad nema prijavljenih} one {# prijavljeni zasad} few {# prijavljena zasad} other {# prijavljenih zasad}}",
         "change": "Promijeni",
-        "changeParticipants": "Promijeni broj očekivanih sudionika",
         "sizedOnRegistrations": "Prijavljenih je više od očekivanih sudionika: procjena računa {count} prijavljenih.",
         "cameraQuestion": "Koliko će web-kamera biti uključeno?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatska transkripcija (zadano)",
       "aiSummary": "Automatski sažetak (zadano)",
       "aiTranslation": "Automatski prijevod (zadano)",
-      "pickerTitle": "Odaberite predložak",
       "pickerSubtitle": "Odaberite predložak za predkonfiguraciju postavki događaja ili preskočite za ručnu konfiguraciju.",
       "skipTemplate": "Konfiguriraj ručno",
       "postEventPublic": "Javna stranica nakon događaja",
@@ -3466,9 +3463,7 @@
       "preview": "Vaš događaj",
       "previewPeople": "Očekivani sudionici: oko {count}",
       "continue": "Nastavi",
-      "useTemplate": "Ili upotrijebite predložak",
-      "instantAlt": "Ili trenutni videopoziv",
-      "instantAltAction": "Izradi videopoziv",
+      "useTemplate": "Kreni od predloška",
       "summary": {
         "piccolo": "Do 20 osoba",
         "medio": "Do 100 osoba",
@@ -3487,7 +3482,9 @@
         "invitation": "Samo vaši pozvani",
         "invitationDesc": "Stranica ostaje vidljiva, ali prijaviti se mogu samo pozvani; bez prijave nema ulaska"
       },
-      "previewInvitation": "Prijaviti se mogu samo osobe koje pozovete; nitko ne ulazi bez prijave."
+      "previewInvitation": "Prijaviti se mogu samo osobe koje pozovete; nitko ne ulazi bez prijave.",
+      "templateReplaces": "Predložak donosi svoje postavke umjesto odgovora ispod. Naslov, datume i osobe upisujete u sljedećim koracima.",
+      "instantBack": "Umjesto toga stvori zakazani događaj"
     },
     "captionsTranscript": {
       "title": "Transkript iz titlova",

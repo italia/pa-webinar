@@ -878,11 +878,11 @@
           "BALANCED": "Balanced (540p)",
           "SAVE_DATA": "Save data (360p)"
         },
-        "requiredLegend": "Fields marked * are needed to save the event: while they are empty, each one says so.",
         "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
         "kickerUse": "Show “{kicker}” as a kicker above the title",
         "kickerPreview": "How it looks on the event page",
-        "coverImageSize": "16:9, recommended 1600 × 900 pixels."
+        "coverImageSize": "16:9, recommended 1600 × 900 pixels.",
+        "requiredNote": "Fields marked * are required."
       },
       "step2": {
         "heading": "Who can do what",
@@ -1187,10 +1187,9 @@
         "recordingManual": "Available: it starts only when a host presses REC.",
         "aiAfter": "After the recording: {list}.",
         "scheduleHeading": "When it takes place",
-        "scheduleIntro": "Date, time and how many people you expect: they are used to prepare the room.",
+        "scheduleIntro": "When the event takes place: date, time and time zone.",
         "advancedIntro": "Values already chosen by the template: change only what you need.",
         "advancedIntroTemplate": "Values already chosen by the template «{name}»: change only what you need.",
-        "requiredToSave": "Needed to save the event.",
         "requiredToPublish": "Needed to publish the event.",
         "toComplete": "To complete",
         "missingHeading": "Still missing to publish:",
@@ -1648,7 +1647,6 @@
         "expected": "{count, plural, one {expected participant} other {expected participants}}",
         "registered": "{count, plural, =0 {no registrations yet} one {# registered so far} other {# registered so far}}",
         "change": "Change",
-        "changeParticipants": "Change the number of expected participants",
         "sizedOnRegistrations": "There are more registrations than expected participants: the estimate counts the {count} registered.",
         "cameraQuestion": "How many webcams will be on?",
         "camera": {
@@ -2317,7 +2315,6 @@
       "aiTranscript": "Automatic transcription (default)",
       "aiSummary": "Automatic summary (default)",
       "aiTranslation": "Automatic translation (default)",
-      "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
       "skipTemplate": "Configure manually",
       "postEventPublic": "Public post-event page",
@@ -3466,9 +3463,7 @@
       "preview": "Your event",
       "previewPeople": "Expected participants: about {count}",
       "continue": "Continue",
-      "useTemplate": "Or use a template",
-      "instantAlt": "Or an instant video call",
-      "instantAltAction": "Create the video call",
+      "useTemplate": "Start from a template",
       "summary": {
         "piccolo": "Up to 20 people",
         "medio": "Up to 100 people",
@@ -3487,7 +3482,9 @@
         "invitation": "Only people you invite",
         "invitationDesc": "The page stays visible, but only invitees can register; without registering, nobody gets in"
       },
-      "previewInvitation": "Only the people you invite can register; nobody gets in without registering."
+      "previewInvitation": "Only the people you invite can register; nobody gets in without registering.",
+      "templateReplaces": "A template brings its own settings instead of the answers below. You write the title, dates and people in the next steps.",
+      "instantBack": "Create a scheduled event instead"
     },
     "captionsTranscript": {
       "title": "Transcript from captions",
