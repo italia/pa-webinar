@@ -622,7 +622,15 @@
       "unavailable": "Sottotitoli non disponibili in questo momento.",
       "show": "Mostra i sottotitoli",
       "hide": "Nascondi i sottotitoli",
-      "toggle": "Sottotitoli automatici"
+      "toggle": "Sottotitoli automatici",
+      "controls": "Comandi dei sottotitoli",
+      "smaller": "Sottotitoli più piccoli",
+      "larger": "Sottotitoli più grandi",
+      "moveUp": "Sposta i sottotitoli in alto",
+      "moveDown": "Sposta i sottotitoli in basso",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "L'evento è concluso. Qui sotto trovi le statistiche e, se l'evento è stato registrato, la registrazione e il resoconto.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Pagina pubblica dell'evento"
     },
     "notOpenNow": "La sala non è aperta in questo momento.",
-    "nameRequired": "Manca il nome con cui entrare: torna indietro e scrivilo."
+    "nameRequired": "Manca il nome con cui entrare: torna indietro e scrivilo.",
+    "closeSidebar": "Chiudi il pannello laterale",
+    "contentOnly": "Solo contenuto, senza chat e pannelli",
+    "showPanels": "Mostra chat e pannelli",
+    "confirmFullscreen": "Passa a schermo intero"
   },
   "qa": {
     "title": "Domande e Risposte",

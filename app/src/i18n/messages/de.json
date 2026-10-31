@@ -622,7 +622,15 @@
       "unavailable": "Untertitel sind derzeit nicht verfügbar.",
       "show": "Untertitel einblenden",
       "hide": "Untertitel ausblenden",
-      "toggle": "Automatische Untertitel"
+      "toggle": "Automatische Untertitel",
+      "controls": "Untertitel-Steuerung",
+      "smaller": "Kleinere Untertitel",
+      "larger": "Größere Untertitel",
+      "moveUp": "Untertitel nach oben verschieben",
+      "moveDown": "Untertitel nach unten verschieben",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Die Veranstaltung ist beendet. Unten finden Sie die Statistiken und, wenn sie aufgezeichnet wurde, die Aufzeichnung und den Bericht.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Öffentliche Seite der Veranstaltung"
     },
     "notOpenNow": "Der Raum ist im Moment nicht geöffnet.",
-    "nameRequired": "Der Name für den Beitritt fehlt: Gehen Sie zurück und geben Sie ihn ein."
+    "nameRequired": "Der Name für den Beitritt fehlt: Gehen Sie zurück und geben Sie ihn ein.",
+    "closeSidebar": "Seitenleiste schließen",
+    "contentOnly": "Nur Inhalt, ohne Chat und Seitenleisten",
+    "showPanels": "Chat und Seitenleisten anzeigen",
+    "confirmFullscreen": "Zum Vollbild wechseln"
   },
   "qa": {
     "title": "Fragen und Antworten",

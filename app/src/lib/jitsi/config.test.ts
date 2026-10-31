@@ -368,6 +368,13 @@ describe('barra principale di Jitsi', () => {
     expect(elenchi[0]).toContain('pa-captions');
   });
 
+  it('prima i comandi frequenti; lo schermo intero in barra, le impostazioni nel menu', () => {
+    const largo = jitsiConfigOverwrite.mainToolbarButtons[0] ?? [];
+    expect(largo.slice(0, 3)).toEqual(['microphone', 'camera', 'raisehand']);
+    expect(largo).toContain('pa-fullscreen');
+    expect(largo).not.toContain('settings');
+  });
+
   it('la condivisione dello schermo resta in barra anche negli elenchi da sei e da cinque', () => {
     const elenchi = jitsiConfigOverwrite.mainToolbarButtons;
     expect(elenchi[2]).toContain('desktop');

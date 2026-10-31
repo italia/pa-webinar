@@ -622,7 +622,15 @@
       "unavailable": "Captions are unavailable right now.",
       "show": "Show captions",
       "hide": "Hide captions",
-      "toggle": "Automatic captions"
+      "toggle": "Automatic captions",
+      "controls": "Caption controls",
+      "smaller": "Smaller captions",
+      "larger": "Larger captions",
+      "moveUp": "Move captions to the top",
+      "moveDown": "Move captions to the bottom",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "The event has ended. Below you'll find the statistics and, if the event was recorded, the recording and the report.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Public event page"
     },
     "notOpenNow": "The room is not open right now.",
-    "nameRequired": "The name to join with is missing: go back and type it."
+    "nameRequired": "The name to join with is missing: go back and type it.",
+    "closeSidebar": "Close the side panel",
+    "contentOnly": "Content only, without chat and panels",
+    "showPanels": "Show chat and panels",
+    "confirmFullscreen": "Switch to fullscreen"
   },
   "qa": {
     "title": "Questions & Answers",

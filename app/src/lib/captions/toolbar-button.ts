@@ -8,6 +8,8 @@
  * preme: la trascrizione della sala la accende e la spegne chi modera.
  */
 
+import type { CustomToolbarButton } from '@/lib/jitsi/custom-buttons';
+
 export const CAPTIONS_BUTTON_ID = 'pa-captions';
 
 /**
@@ -62,11 +64,7 @@ export const CAPTIONS_ICON_OFF = dataUri(
     '<path d="M3 3 21 21" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>',
 );
 
-export interface CustomToolbarButton {
-  id: string;
-  icon: string;
-  text: string;
-}
+export type { CustomToolbarButton };
 
 /**
  * Il pulsante nello stato corrente. Il testo è l'azione che il clic compie,

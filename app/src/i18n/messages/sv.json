@@ -622,7 +622,15 @@
       "unavailable": "Undertexter är inte tillgängliga just nu.",
       "show": "Visa undertexter",
       "hide": "Dölj undertexter",
-      "toggle": "Automatiska undertexter"
+      "toggle": "Automatiska undertexter",
+      "controls": "Kontroller för undertexter",
+      "smaller": "Mindre undertexter",
+      "larger": "Större undertexter",
+      "moveUp": "Flytta undertexter uppåt",
+      "moveDown": "Flytta undertexter nedåt",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Evenemanget är slut. Nedan hittar du statistiken och, om det spelades in, inspelningen och rapporten.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Evenemangets offentliga sida"
     },
     "notOpenNow": "Rummet är inte öppet just nu.",
-    "nameRequired": "Namnet du ska ansluta med saknas: gå tillbaka och skriv det."
+    "nameRequired": "Namnet du ska ansluta med saknas: gå tillbaka och skriv det.",
+    "closeSidebar": "Stäng sidopanelen",
+    "contentOnly": "Bara innehåll, utan chatt och paneler",
+    "showPanels": "Visa chatt och paneler",
+    "confirmFullscreen": "Växla till helskärm"
   },
   "qa": {
     "title": "Frågor och svar",

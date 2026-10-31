@@ -33,6 +33,7 @@ import {
   SFONDO_PREDEFINITO,
 } from '@/lib/jitsi/virtual-background';
 import { erroreDaRientro } from '@/lib/jitsi/riconnessione';
+import { pulsantiIniziali, salaPronta, type CustomToolbarButton } from '@/lib/jitsi/custom-buttons';
 import { InsecureContextNotice, useInsecureContext } from '@/components/live/insecure-context';
 
 import { loadExternalApi } from './external-api-loader';
@@ -490,6 +491,8 @@ export default function JitsiRoom({
         });
 
         apiRef.current = api;
+        // Il registro dei pulsanti personalizzati parte da quelli gia' dati a Jitsi.
+        pulsantiIniziali(api, (extraConfig.customToolbarButtons as CustomToolbarButton[] | undefined) ?? []);
         onApiReadyRef.current?.(api);
 
         // Accessible name for the video call iframe (WCAG 4.1.2): without a
@@ -588,6 +591,8 @@ export default function JitsiRoom({
         let persa = false;
 
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
+          // I pulsanti personalizzati chiesti prima dell'ingresso partono ora.
+          salaPronta(api);
           if (disposedRef.current) return;
           entrata = true;
           persa = false;

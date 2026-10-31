@@ -622,7 +622,15 @@
       "unavailable": "Níl fotheidil ar fáil faoi láthair.",
       "show": "Taispeáin fotheidil",
       "hide": "Folaigh fotheidil",
-      "toggle": "Fotheidil uathoibríocha"
+      "toggle": "Fotheidil uathoibríocha",
+      "controls": "Rialuithe fotheideal",
+      "smaller": "Fotheidil níos lú",
+      "larger": "Fotheidil níos mó",
+      "moveUp": "Bog na fotheidil go barr",
+      "moveDown": "Bog na fotheidil go bun",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Tá an ócáid thart. Thíos gheobhaidh tú na staitisticí agus, má taifeadadh an ócáid, an taifeadadh agus an tuarascáil.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Leathanach poiblí na hócáide"
     },
     "notOpenNow": "Níl an seomra oscailte faoi láthair.",
-    "nameRequired": "Tá an t-ainm le dul isteach in easnamh: téigh siar agus scríobh é."
+    "nameRequired": "Tá an t-ainm le dul isteach in easnamh: téigh siar agus scríobh é.",
+    "closeSidebar": "Dún an painéal taoibh",
+    "contentOnly": "Ábhar amháin, gan comhrá ná painéil",
+    "showPanels": "Taispeáin comhrá agus painéil",
+    "confirmFullscreen": "Athraigh go lánscáileán"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",

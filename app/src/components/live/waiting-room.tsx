@@ -518,6 +518,15 @@ export default function WaitingRoom({
   // contrario manderebbe le persone a sbattere con una promessa nostra.
   const salaPronta = pontePresunto;
   const ingressoConsentito = salaPronta || attesaLunga;
+  // Chi arriva quando si puo' gia' entrare non vede la chat: distrarrebbe
+  // dall'ingresso, e la stessa conversazione continua nella sala. Chi l'aveva
+  // gia' davanti mentre aspettava la tiene, con quello che stava scrivendo.
+  const [chatGiaMostrata, setChatGiaMostrata] = useState(false);
+  const ingressoPossibile = canEnterLive && ingressoConsentito;
+  useEffect(() => {
+    if (showChatPreview && !ingressoPossibile) setChatGiaMostrata(true);
+  }, [showChatPreview, ingressoPossibile]);
+  const chatNascosta = ingressoPossibile && !chatGiaMostrata;
 
   // L'apertura va notata. Il passaggio da «aspetta» a «entra» avviene mentre
   // la persona sta guardando altrove — la piazza, la chat, la propria
@@ -541,7 +550,7 @@ export default function WaitingRoom({
   } | null>(null);
   // Sala non pronta e modulo incompleto sono due ragioni diverse per non
   // entrare, con due risposte diverse: vedi lib/waiting-room/entry-state.
-  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, bloccoSpiegato } =
+  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, consensoSegnalato, bloccoSpiegato } =
     statoIngresso({
       canEnterLive,
       ingressoConsentito,
@@ -1005,10 +1014,10 @@ export default function WaitingRoom({
         minLength={2}
         maxLength={100}
         autoComplete="name"
-        // Niente rosso: un nome che manca è una cosa da fare, non un errore.
-        // Il campo lampeggia (vedi .wr-name-field--empty), e dopo un
-        // tentativo lo dice anche ai lettori di schermo.
-        className={nomeSegnalato ? 'wr-name-input--attention' : undefined}
+        // Prima di un tentativo un nome che manca e' una cosa da fare (il
+        // campo lampeggia, vedi .wr-name-field--empty); dopo, e' un errore:
+        // rosso, sul campo, e detto anche ai lettori di schermo.
+        className={nomeSegnalato ? 'is-invalid' : undefined}
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
@@ -1022,11 +1031,15 @@ export default function WaitingRoom({
           id={MESSAGGIO_DEL_BLOCCO.name}
           className={`wr-name-hint${nomeSegnalato ? ' wr-name-hint--insist' : ''}`}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-          </svg>
+          {nomeSegnalato ? (
+            <Icon icon="it-error" size="xs" className="flex-shrink-0" style={{ fill: 'currentColor' }} />
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          )}
           <span>{t('nameRequiredToEnter')}</span>
         </div>
       )}
@@ -1140,6 +1153,7 @@ export default function WaitingRoom({
       </h2>
       {recordingRequired && (
         <>
+          {/* Tutto, anche se lungo: e' l'informativa a cui si acconsente. */}
           <p className="wr-consensi__intro">
             {recordingConsentText?.trim() || t('recordingConsentIntro')}
           </p>
@@ -1151,14 +1165,23 @@ export default function WaitingRoom({
               checked={recordingConsent}
               onChange={(e) => setRecordingConsent(e.target.checked)}
               aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
+              aria-invalid={consensoSegnalato || undefined}
             />
             <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.recording}>
               {tGdpr('recording')}
             </label>
           </div>
           {!recordingConsent && (
-            <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
-              {t('recordingConsentRequired')}
+            // Prima un'indicazione; dopo un tentativo di entrare, un errore
+            // in rosso, qui accanto alla casella che lo risolve.
+            <div
+              id={MESSAGGIO_DEL_BLOCCO.recording}
+              className={`wr-consensi__nota${consensoSegnalato ? ' wr-consensi__nota--errore' : ''}`}
+            >
+              {consensoSegnalato && (
+                <Icon icon="it-error" size="xs" className="flex-shrink-0" style={{ fill: 'currentColor' }} />
+              )}
+              <span>{t('recordingConsentRequired')}</span>
             </div>
           )}
         </>
@@ -1192,7 +1215,7 @@ export default function WaitingRoom({
     </section>
   ) : null;
 
-  const chatPreviewBlock = showChatPreview ? (
+  const chatPreviewBlock = showChatPreview && !chatNascosta ? (
     <div className="wr-chat">
       <div className="wr-chat__head">
         <span className="wr-chat__icon" aria-hidden="true">
@@ -1357,11 +1380,11 @@ export default function WaitingRoom({
           {bloccoSpiegato === 'name' && (
             <p
               className="d-flex align-items-start justify-content-center text-center mb-0"
-              // Il nome mancante è una cosa da fare (ambra).
-              style={{ fontSize: '0.85rem', color: '#6B4400' }}
+              // Dopo un tentativo e' un errore, in rosso come sul campo.
+              style={{ fontSize: '0.85rem', color: nomeSegnalato ? 'var(--bs-danger, #cc334d)' : 'var(--app-muted)' }}
               aria-hidden="true"
             >
-              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+              <Icon icon={nomeSegnalato ? 'it-error' : 'it-info-circle'} size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
               <span>{t('nameRequiredToEnter')}</span>
             </p>
           )}
@@ -1801,6 +1824,7 @@ export default function WaitingRoom({
       </Link>
     ) : null;
 
+  const riepilogoInFondo = canEnterLive && !isEnded && !notHeld;
   const riepilogoBlock = (
     <section className="wr-summary" aria-labelledby="wr-summary-title">
       <h2 className="wr-section-title" id="wr-summary-title">{t('summaryTitle')}</h2>
@@ -1921,7 +1945,12 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
-                <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
+                {/* Quando si puo' entrare, prima cio' che serve per entrare
+                    (nome, dispositivi, consensi, «Entra ora»); il riepilogo
+                    dell'evento scende sotto il pulsante. */}
+                {!riepilogoInFondo && (
+                  <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
+                )}
 
                 {/* Da http:// il browser nega microfono e videocamera: lo si dice
                     qui, con l'indirizzo sicuro, invece di una prova dei
@@ -1985,6 +2014,9 @@ export default function WaitingRoom({
                   <>
                     {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
                     {primaryCta}
+                    {riepilogoInFondo && (
+                      <div className="mb-4 wr-summary-wrap">{riepilogoBlock}</div>
+                    )}
                   </>
                 )}
 

@@ -43,6 +43,8 @@ export interface StatoIngresso {
   nomeDaChiedere: boolean;
   /** Il nome manca dopo un tentativo: la richiesta diventa un errore. */
   nomeSegnalato: boolean;
+  /** Il consenso alla registrazione manca dopo un tentativo: errore sul campo. */
+  consensoSegnalato: boolean;
   /** Il blocco il cui messaggio e' sullo schermo, da usare come descrizione
    *  del pulsante: il nome solo quando lo si sta chiedendo. */
   bloccoSpiegato: BloccoModulo | null;
@@ -67,6 +69,7 @@ export function statoIngresso(i: StatoIngressoInput): StatoIngresso {
     bloccoModulo,
     nomeDaChiedere,
     nomeSegnalato: !i.nameValid && i.ingressoTentato,
+    consensoSegnalato: i.recordingRequired && !i.recordingConsent && i.ingressoTentato,
     bloccoSpiegato: bloccoModulo === 'name' && !nomeDaChiedere ? null : bloccoModulo,
   };
 }

@@ -622,7 +622,15 @@
       "unavailable": "Ondertiteling is op dit moment niet beschikbaar.",
       "show": "Ondertiteling tonen",
       "hide": "Ondertiteling verbergen",
-      "toggle": "Automatische ondertiteling"
+      "toggle": "Automatische ondertiteling",
+      "controls": "Ondertitelbediening",
+      "smaller": "Kleinere ondertitels",
+      "larger": "Grotere ondertitels",
+      "moveUp": "Ondertitels naar boven verplaatsen",
+      "moveDown": "Ondertitels naar beneden verplaatsen",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Het evenement is afgelopen. Hieronder vind je de statistieken en, als het is opgenomen, de opname en het verslag.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Openbare pagina van het evenement"
     },
     "notOpenNow": "De zaal is op dit moment niet open.",
-    "nameRequired": "De naam om mee binnen te komen ontbreekt: ga terug en vul hem in."
+    "nameRequired": "De naam om mee binnen te komen ontbreekt: ga terug en vul hem in.",
+    "closeSidebar": "Zijpaneel sluiten",
+    "contentOnly": "Alleen inhoud, zonder chat en panelen",
+    "showPanels": "Chat en panelen tonen",
+    "confirmFullscreen": "Overschakelen naar volledig scherm"
   },
   "qa": {
     "title": "Vragen en Antwoorden",

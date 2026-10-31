@@ -622,7 +622,15 @@
       "unavailable": "Subtitrările nu sunt disponibile în acest moment.",
       "show": "Afișează subtitrările",
       "hide": "Ascunde subtitrările",
-      "toggle": "Subtitrări automate"
+      "toggle": "Subtitrări automate",
+      "controls": "Comenzi pentru subtitrări",
+      "smaller": "Subtitrări mai mici",
+      "larger": "Subtitrări mai mari",
+      "moveUp": "Mută subtitrările sus",
+      "moveDown": "Mută subtitrările jos",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Evenimentul s-a încheiat. Mai jos găsești statisticile și, dacă evenimentul a fost înregistrat, înregistrarea și raportul.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Pagina publică a evenimentului"
     },
     "notOpenNow": "Sala nu este deschisă în acest moment.",
-    "nameRequired": "Lipsește numele cu care să intri: revino și scrie-l."
+    "nameRequired": "Lipsește numele cu care să intri: revino și scrie-l.",
+    "closeSidebar": "Închide panoul lateral",
+    "contentOnly": "Doar conținutul, fără chat și panouri",
+    "showPanels": "Afișează chatul și panourile",
+    "confirmFullscreen": "Comută pe ecran complet"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",

@@ -622,7 +622,15 @@
       "unavailable": "A feliratok jelenleg nem érhetők el.",
       "show": "Feliratok megjelenítése",
       "hide": "Feliratok elrejtése",
-      "toggle": "Automatikus feliratok"
+      "toggle": "Automatikus feliratok",
+      "controls": "Feliratvezérlők",
+      "smaller": "Kisebb feliratok",
+      "larger": "Nagyobb feliratok",
+      "moveUp": "Feliratok áthelyezése felülre",
+      "moveDown": "Feliratok áthelyezése alulra",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Az esemény véget ért. Lent megtalálja a statisztikákat, és ha rögzítették, a felvételt és a beszámolót.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Az esemény nyilvános oldala"
     },
     "notOpenNow": "A terem jelenleg nincs nyitva.",
-    "nameRequired": "Hiányzik a név, amellyel belép: lépjen vissza, és írja be."
+    "nameRequired": "Hiányzik a név, amellyel belép: lépjen vissza, és írja be.",
+    "closeSidebar": "Oldalsáv bezárása",
+    "contentOnly": "Csak a tartalom, csevegés és panelek nélkül",
+    "showPanels": "Csevegés és panelek megjelenítése",
+    "confirmFullscreen": "Váltás teljes képernyőre"
   },
   "qa": {
     "title": "Kérdések és válaszok",

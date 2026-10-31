@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+
 import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 
 interface ServiceInventoryPageProps {

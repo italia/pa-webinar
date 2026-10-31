@@ -25,8 +25,18 @@ describe('statoIngresso — modulo completo', () => {
       bloccoModulo: null,
       nomeDaChiedere: false,
       nomeSegnalato: false,
+      consensoSegnalato: false,
       bloccoSpiegato: null,
     });
+  });
+});
+
+describe('statoIngresso — consenso alla registrazione mancante', () => {
+  it("diventa un errore solo dopo un tentativo d'ingresso", () => {
+    const senza = { recordingRequired: true, recordingConsent: false };
+    expect(stato(senza).consensoSegnalato).toBe(false);
+    expect(stato({ ...senza, ingressoTentato: true }).consensoSegnalato).toBe(true);
+    expect(stato({ ...senza, recordingConsent: true, ingressoTentato: true }).consensoSegnalato).toBe(false);
   });
 });
 

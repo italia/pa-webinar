@@ -37,7 +37,7 @@ import {
   type ChatReplyRef,
   type ChatAttachmentRef,
 } from '@/lib/chat/pubsub';
-import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { assertChatOpen, authenticateChatSender } from '@/lib/chat/authenticate';
 import { tallyReactions } from '@/lib/chat/emoji';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { authorizeChatRead } from '@/lib/chat/read-access';
@@ -239,6 +239,7 @@ export const POST = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+  assertChatOpen(auth);
 
   // Per-sender rate limit: keep chat flowing for a normal speaker
   // (~1 message/sec bursts) but prevent spam / accidental paste loops.

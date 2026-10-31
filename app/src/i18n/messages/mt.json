@@ -622,7 +622,15 @@
       "unavailable": "Is-sottotitoli mhumiex disponibbli bħalissa.",
       "show": "Uri s-sottotitoli",
       "hide": "Aħbi s-sottotitoli",
-      "toggle": "Sottotitoli awtomatiċi"
+      "toggle": "Sottotitoli awtomatiċi",
+      "controls": "Kontrolli tas-sottotitli",
+      "smaller": "Sottotitli iżgħar",
+      "larger": "Sottotitli akbar",
+      "moveUp": "Mexxi s-sottotitli fuq",
+      "moveDown": "Mexxi s-sottotitli isfel",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "L-avveniment intemm. Hawn taħt issib l-istatistika u, jekk l-avveniment ġie rreġistrat, ir-reġistrazzjoni u r-rapport.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Paġna pubblika tal-avveniment"
     },
     "notOpenNow": "Is-sala mhix miftuħa bħalissa.",
-    "nameRequired": "Nieqes l-isem li bih tidħol: mur lura u iktbu."
+    "nameRequired": "Nieqes l-isem li bih tidħol: mur lura u iktbu.",
+    "closeSidebar": "Agħlaq il-pannell tal-ġenb",
+    "contentOnly": "Kontenut biss, mingħajr chat u pannelli",
+    "showPanels": "Uri ċ-chat u l-pannelli",
+    "confirmFullscreen": "Aqleb għal skrin sħiħ"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",

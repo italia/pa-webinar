@@ -20,7 +20,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { assertChatOpen, authenticateChatSender } from '@/lib/chat/authenticate';
 import { isChatReactionEmoji, tallyReactions } from '@/lib/chat/emoji';
 import { publishChat } from '@/lib/chat/pubsub';
 import { prisma } from '@/lib/db';
@@ -67,6 +67,7 @@ export const POST = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+  assertChatOpen(auth);
 
   // Members only. A guest senderId is a truncated base64 of `ip:name`: behind
   // one NAT two guests with similar names collide, and the unique key

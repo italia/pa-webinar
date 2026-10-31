@@ -834,6 +834,120 @@ button.live-time-strip__rec {
   margin: 0;
 }
 
+// La dimensione la sceglie chi guarda (A− / A+).
+.live-captions--piccoli .live-captions__box {
+  font-size: clamp(0.9375rem, 1.3vw, 1.125rem);
+}
+.live-captions--grandi .live-captions__box {
+  font-size: clamp(1.375rem, 2.3vw, 1.875rem);
+}
+
+// I comandi di chi guarda: piccoli, sopra il riquadro, cliccabili (la
+// colonna intorno lascia passare i clic al video).
+.live-captions__comandi {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background: rgba(14, 42, 71, 0.9);
+  pointer-events: auto;
+}
+.live-captions__comando,
+.live-captions__cc {
+  min-width: 32px;
+  min-height: 28px;
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: auto;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+  }
+  &:disabled {
+    opacity: 0.45;
+  }
+}
+.live-captions__cc {
+  border: 2px solid #fff;
+  background: rgba(14, 42, 71, 0.9);
+  letter-spacing: 0.04em;
+}
+
+// In alto sul video, quando chi guarda li sposta li': sotto gli indicatori
+// di Jitsi, lontano dalla barra dei comandi.
+.live-stage-top {
+  position: absolute;
+  top: 3.75rem;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 0 8.5rem;
+  pointer-events: none;
+  font-family: 'Titillium Web', Geneva, Tahoma, sans-serif;
+
+  &:empty {
+    display: none;
+  }
+}
+@media (max-width: 767.98px) {
+  .live-stage-top {
+    padding: 0 1rem;
+  }
+}
+.live-captions--alto {
+  flex-direction: column-reverse;
+}
+
+// Solo il contenuto: la colonna laterale chiusa del tutto.
+.live-sidebar.live-sidebar--nascosta {
+  display: none !important;
+}
+// La «×» sta nella striscia blu in cima alla colonna, a destra della freccia
+// che la comprime.
+.live-sidebar-close {
+  display: none;
+
+  @media (min-width: 992px) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    min-height: 28px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    .icon {
+      fill: currentColor;
+    }
+    &:hover {
+      background: #003d7a;
+    }
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: -3px;
+    }
+  }
+}
+
 .live-captions__speaker {
   display: inline-block;
   margin-right: 0.5rem;
@@ -7635,6 +7749,18 @@ button.live-time-strip__rec {
   color: var(--app-muted);
   margin-top: 0.4rem;
 }
+.wr-consensi__nota--errore {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bs-danger, #cc334d);
+}
+.wr-consensi .form-check-input[aria-invalid='true'] {
+  border-color: var(--bs-danger, #cc334d);
+  box-shadow: 0 0 0 2px rgba(204, 51, 77, 0.25);
+}
 .wr-consensi__privacy {
   margin-top: 0.7rem;
   font-size: 0.84rem;
@@ -7856,7 +7982,7 @@ button.live-time-strip__rec {
   animation: wr-name-nudge 0.4s ease-in-out;
 
   .form-control {
-    animation: wr-name-line-amber 1.2s ease-in-out 4;
+    animation: wr-name-line-danger 1.2s ease-in-out 4;
   }
 }
 
@@ -7870,9 +7996,9 @@ button.live-time-strip__rec {
   50% { color: #0066cc; }
 }
 
-@keyframes wr-name-line-amber {
-  0%, 100% { box-shadow: inset 0 -2px 0 rgba(194, 119, 0, 0.4); }
-  50% { box-shadow: inset 0 -3px 0 #c27700; }
+@keyframes wr-name-line-danger {
+  0%, 100% { box-shadow: inset 0 -2px 0 rgba(204, 51, 77, 0.4); }
+  50% { box-shadow: inset 0 -3px 0 #cc334d; }
 }
 
 @keyframes wr-name-nudge {
@@ -7881,9 +8007,6 @@ button.live-time-strip__rec {
   75% { transform: translateX(4px); }
 }
 
-.wr-name-input--attention {
-  border-bottom-color: #c27700 !important;
-}
 
 .wr-name-hint {
   display: flex;
@@ -7897,7 +8020,7 @@ button.live-time-strip__rec {
 }
 
 .wr-name-hint--insist {
-  color: #6b4400;
+  color: var(--bs-danger, #cc334d);
   font-weight: 600;
 }
 
@@ -14779,5 +14902,15 @@ button.back-to-top {
   .icon {
     top: 0 !important;
   }
+}
+
+// La conferma dello schermo intero, quando il browser non accetta la
+// richiesta arrivata dalla barra di Jitsi: sopra la barra, al centro.
+.live-fs-conferma {
+  position: absolute;
+  left: 50%;
+  bottom: 6rem;
+  z-index: 6;
+  transform: translateX(-50%);
 }
 

@@ -17,7 +17,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
-import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { assertChatOpen, authenticateChatSender } from '@/lib/chat/authenticate';
 import { encryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
@@ -135,6 +135,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+  assertChatOpen(auth);
 
   // Every sibling write path is throttled (POST /chat 30/min, reactions 60/min)
   // and an edit is a DB write plus a fan-out to every SSE subscriber in the room.

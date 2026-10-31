@@ -469,7 +469,7 @@ The flags are passed to the room as props at mount. After that, the room reads t
 
 Rows 1, 2, 4 and 5 are the four places of the rule. Row 3 is the push channel's copy of row 2, and a comment in `pubsub.ts` requires the two lists to stay identical. The step-by-step recipe is in [development/extending.md](../development/extending.md).
 
-Server enforcement varies: `qaEnabled` gates `POST /questions` (404 while off) and `agendaEnabled` gates agenda reactions (403 while off); `chatEnabled` and `wordCloudEnabled` only hide the tab (the word-cloud tab from everyone but moderators), and the chat and word-cloud write routes keep accepting requests while they are off. A new flag needs its own server check if turning it off must stop writes.
+Server enforcement varies: `qaEnabled` gates `POST /questions` (404 while off) and `agendaEnabled` gates agenda reactions (403 while off); `chatEnabled` hides the tab and stops writes: while it is off, new messages, edits, reactions, attachment uploads and the typing signal answer 403 (`CHAT_DISABLED`) to everyone except moderators, who can still post a closing notice; deleting one's own message stays possible. `wordCloudEnabled` only hides the tab (from everyone but moderators), and the word-cloud write routes keep accepting requests while it is off. A new flag needs its own server check if turning it off must stop writes.
 
 ## Drawer and tabs
 

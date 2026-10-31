@@ -8,6 +8,9 @@ import messages from '@/i18n/messages/it.json';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import type { JitsiMeetExternalAPI, JitsiTranscriptionChunk } from '@/types/jitsi';
 
+import { captionsToolbarButton } from '@/lib/captions/toolbar-button';
+import { pulsantiIniziali, salaPronta } from '@/lib/jitsi/custom-buttons';
+
 import LiveCaptions from './live-captions';
 
 /**
@@ -149,8 +152,38 @@ describe('LiveCaptions', () => {
 
   it('spenti per l’evento, il pulsante esce dalla barra', () => {
     const { api, raw } = fakeApi();
+    // La sala lo aveva gia' ricevuto con la configurazione iniziale.
+    pulsantiIniziali(api, [captionsToolbarButton(true, { show: 'Mostra', hide: 'Nascondi' })]);
+    salaPronta(api);
     render(<LiveCaptions api={api} active={false} />);
     expect(raw.executeCommand).toHaveBeenCalledWith('overwriteConfig', { customToolbarButtons: [] });
+  });
+
+  it('chi guarda li toglie con la «×», li riaccende con «CC», li sposta e li ingrandisce', () => {
+    const { api, emit } = fakeApi();
+    const alto = document.createElement('div');
+    document.body.appendChild(alto);
+    render(<LiveCaptions api={api} active alto={alto} />);
+    act(() => emit('transcriptionChunkReceived', chunk({ messageID: 'm1', stable: 'Testo' })));
+    const clic = (nome: string) =>
+      act(() => (container.ownerDocument.querySelector(`[aria-label="${nome}"]`) as HTMLButtonElement).click());
+
+    clic(messages.live.captions.larger);
+    expect(container.querySelector('.live-captions--grandi')).not.toBeNull();
+    expect(JSON.parse(window.localStorage.getItem('pawebinar.captions.layout') ?? '{}')).toMatchObject({ dimensione: 'grandi' });
+
+    clic(messages.live.captions.moveUp);
+    expect(alto.querySelector('.live-captions__box')?.textContent).toContain('Testo');
+    expect(container.querySelector('.live-captions__box')).toBeNull();
+
+    clic(messages.live.captions.hide);
+    expect(alto.querySelector('.live-captions__box')).toBeNull();
+    expect(window.localStorage.getItem('pawebinar.captions.visible')).toBe('0');
+    expect(alto.querySelector('.live-captions__cc')).not.toBeNull();
+
+    clic(messages.live.captions.show);
+    expect(alto.querySelector('.live-captions__box')).not.toBeNull();
+    alto.remove();
   });
 
   it('accetta anche il frammento senza involucro', () => {

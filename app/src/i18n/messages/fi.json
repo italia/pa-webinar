@@ -622,7 +622,15 @@
       "unavailable": "Tekstitys ei ole juuri nyt käytettävissä.",
       "show": "Näytä tekstitys",
       "hide": "Piilota tekstitys",
-      "toggle": "Automaattinen tekstitys"
+      "toggle": "Automaattinen tekstitys",
+      "controls": "Tekstityksen säätimet",
+      "smaller": "Pienempi tekstitys",
+      "larger": "Suurempi tekstitys",
+      "moveUp": "Siirrä tekstitys ylös",
+      "moveDown": "Siirrä tekstitys alas",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Tapahtuma on päättynyt. Alta löydät tilastot ja, jos tapahtuma tallennettiin, tallenteen ja raportin.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Tapahtuman julkinen sivu"
     },
     "notOpenNow": "Huone ei ole juuri nyt auki.",
-    "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se."
+    "nameRequired": "Nimi, jolla liityt, puuttuu: palaa takaisin ja kirjoita se.",
+    "closeSidebar": "Sulje sivupaneeli",
+    "contentOnly": "Vain sisältö, ilman chattia ja paneeleja",
+    "showPanels": "Näytä chat ja paneelit",
+    "confirmFullscreen": "Vaihda koko näytölle"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",

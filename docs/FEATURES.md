@@ -221,8 +221,8 @@ Every way into an event passes through the waiting room. Personal links and magi
 - **Audio and video.** Camera and microphone switches, off for everyone the first time; the browser asks for no permission until one is turned on. Turning one on opens its test: the camera preview with the virtual backgrounds, the microphone level meter and picker, and an audio test. The last choice is remembered. On phones everyone joins muted, because mobile browsers need a tap to open the camera.
 - **Virtual background.** A few calm images, such as **Light office**, **Institutional blue** and **Studio**. The camera preview already shows the chosen image behind the person, cut out in the browser, and the room applies it on entry. In the room the same images are under Jitsi's backgrounds button, together with blur.
 - **Waiting-room music.** *Optional.* A track set on the event. It plays only before the start, and only after the participant chooses **Enable music**.
-- **Chat preview.** In the side column. If the event has chat turned on, registrants, moderators and speakers can read and write in it while the room warms up, and so can everyone in an instant call. Once the event is live, everyone can.
-- **Your name.** Required to enter. While it is empty, the field pulses gently in blue rather than red.
+- **Chat preview.** In the side column, while the visitor waits. If the event has chat turned on, registrants, moderators and speakers can read and write in it while the room warms up, and so can everyone in an instant call. A visitor who arrives when **Enter now** can already be pressed does not see it: the same conversation continues in the room.
+- **Your name.** Required to enter. While it is empty, the field pulses gently in blue; after an attempt to enter without it, the field and its message turn red. A missing recording consent is shown the same way, next to its checkbox.
 - **Notices and consent gates.**
   - When AI post-production is on for the event, an **AI processing after the event** notice appears. Its text can be customized.
   - When live captions are on, a notice says so and says whether the text is kept: not at all, or, with a transcript from captions, with the name, for the people who consented.
@@ -261,7 +261,7 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [From cr
 
 ### Panels in the drawer
 
-On desktop the drawer is a column on the right, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, or none when the system asks for reduced motion). On smaller screens it is a sheet that rises from the bottom. It holds these panels:
+On desktop the drawer is a column on the right, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, or none when the system asks for reduced motion). Its **×** closes it altogether, leaving only the content (slides, speakers); the **Content only** button in the top bar does the same and brings it back. On smaller screens it is a sheet that rises from the bottom. It holds these panels:
 
 | Panel | What it does | Default |
 |---|---|---|
@@ -315,7 +315,7 @@ A moderator or a speaker can show a PDF to the whole room, page by page, without
 *On by default* where the installation runs the captions service. The service's switch, `global.captions.enabled` in `infra/helm/pa-webinar/values.yaml`, is on by default, and so are the site and event settings in `app/prisma/schema.prisma`.
 
 - While the event runs, what each person says appears as captions over the video, with the speaker's name, a few tenths of a second after the words. A recognizer inside the installation transcribes the speech on CPU. No audio or text leaves the installation, and the text is not kept unless the event keeps a transcript from captions.
-- Each viewer hides or shows the captions for themselves with the captions button in the call's toolbar. Screen readers hear the finished sentences.
+- Each viewer hides or shows the captions for themselves, with the **×** above them or the captions button in the call's toolbar; hidden, a **CC** button brings them back. Each viewer can also make them smaller or larger and move them to the top of the video, away from the toolbar. These choices stay in the browser. Screen readers hear the finished sentences.
 - The waiting room tells participants that captions are on, and whether the text is kept.
 - **Transcript from captions.** *Optional*, per event, a sub-option of **Automatic captions** in the wizard; the new-event questions turn it on when the event can be recorded. The sentences of the people who consented to the transcription of what they say are kept with their name and, when the event ends, become its transcript, even without a recording or AI post-production. Everyone else appears only in the live captions. Staff review the transcript in the **After the event** tab, correct it in the transcript editor and can publish it on the event page without a video. See [After the event](#transcript-from-captions).
 - Captions start once the event is live, within half a minute, with or without a moderator in the room. Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**. Administrators turn them off for the whole instance in the site settings.

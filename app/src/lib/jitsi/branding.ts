@@ -24,10 +24,20 @@ export const JITSI_STAGE_BACKGROUND = '#004D99';
  * evidenziazioni su quelle superfici e i riquadri di chi non ha la
  * telecamera; la terza bordi e passaggi del mouse sui pulsanti. Testi e
  * icone di Jitsi restano bianchi: il contrasto resta oltre 4.5:1 su tutte.
+ *
+ * La prima e' molto piu' scura della scena: la barra dei comandi si legge
+ * come una barra, staccata da cio' che si vede dietro (le slide, i video).
  */
-export const JITSI_SURFACE = '#2F5175';
+export const JITSI_SURFACE = '#0E2A47';
 export const JITSI_SURFACE_RAISED = '#3D6289';
 export const JITSI_SURFACE_STRONG = '#4D7299';
+
+/**
+ * Le notifiche di Jitsi (la richiesta di parlare, il microfono chiuso da chi
+ * modera): chiare, come quelle del sito. Jitsi le scrive con il suo testo
+ * scuro, che su una superficie blu non si leggeva.
+ */
+export const JITSI_NOTIFICATION_BACKGROUND = '#FFFFFF';
 
 /** I riquadri dei partecipanti senza telecamera. */
 export const JITSI_TILE_BACKGROUND = JITSI_SURFACE_RAISED;

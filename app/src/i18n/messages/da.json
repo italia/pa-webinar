@@ -622,7 +622,15 @@
       "unavailable": "Undertekster er ikke tilgængelige lige nu.",
       "show": "Vis undertekster",
       "hide": "Skjul undertekster",
-      "toggle": "Automatiske undertekster"
+      "toggle": "Automatiske undertekster",
+      "controls": "Styring af undertekster",
+      "smaller": "Mindre undertekster",
+      "larger": "Større undertekster",
+      "moveUp": "Flyt undertekster op",
+      "moveDown": "Flyt undertekster ned",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Arrangementet er slut. Nedenfor finder du statistikken og, hvis det blev optaget, optagelsen og rapporten.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Arrangementets offentlige side"
     },
     "notOpenNow": "Rummet er ikke åbent lige nu.",
-    "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det."
+    "nameRequired": "Navnet, du vil deltage med, mangler: gå tilbage og skriv det.",
+    "closeSidebar": "Luk sidepanelet",
+    "contentOnly": "Kun indhold, uden chat og paneler",
+    "showPanels": "Vis chat og paneler",
+    "confirmFullscreen": "Skift til fuld skærm"
   },
   "qa": {
     "title": "Spørgsmål og svar",

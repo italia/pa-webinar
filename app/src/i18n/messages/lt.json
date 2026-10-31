@@ -622,7 +622,15 @@
       "unavailable": "Subtitrai šiuo metu nepasiekiami.",
       "show": "Rodyti subtitrus",
       "hide": "Slėpti subtitrus",
-      "toggle": "Automatiniai subtitrai"
+      "toggle": "Automatiniai subtitrai",
+      "controls": "Subtitrų valdikliai",
+      "smaller": "Mažesni subtitrai",
+      "larger": "Didesni subtitrai",
+      "moveUp": "Perkelti subtitrus į viršų",
+      "moveDown": "Perkelti subtitrus į apačią",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Renginys baigėsi. Žemiau rasite statistiką ir, jei renginys buvo įrašytas, įrašą ir ataskaitą.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Viešasis renginio puslapis"
     },
     "notOpenNow": "Kambarys šiuo metu neatidarytas.",
-    "nameRequired": "Trūksta vardo, kuriuo prisijungsite: grįžkite ir jį įrašykite."
+    "nameRequired": "Trūksta vardo, kuriuo prisijungsite: grįžkite ir jį įrašykite.",
+    "closeSidebar": "Uždaryti šoninį skydelį",
+    "contentOnly": "Tik turinys, be pokalbio ir skydelių",
+    "showPanels": "Rodyti pokalbį ir skydelius",
+    "confirmFullscreen": "Perjungti į viso ekrano režimą"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",

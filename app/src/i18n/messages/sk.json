@@ -622,7 +622,15 @@
       "unavailable": "Titulky momentálne nie sú k dispozícii.",
       "show": "Zobraziť titulky",
       "hide": "Skryť titulky",
-      "toggle": "Automatické titulky"
+      "toggle": "Automatické titulky",
+      "controls": "Ovládanie titulkov",
+      "smaller": "Menšie titulky",
+      "larger": "Väčšie titulky",
+      "moveUp": "Presunúť titulky hore",
+      "moveDown": "Presunúť titulky dole",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Podujatie sa skončilo. Nižšie nájdete štatistiky, a ak sa nahrávalo, aj záznam a správu.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Verejná stránka podujatia"
     },
     "notOpenNow": "Miestnosť teraz nie je otvorená.",
-    "nameRequired": "Chýba meno, pod ktorým sa pripojíte: vráťte sa a napíšte ho."
+    "nameRequired": "Chýba meno, pod ktorým sa pripojíte: vráťte sa a napíšte ho.",
+    "closeSidebar": "Zavrieť bočný panel",
+    "contentOnly": "Iba obsah, bez četu a panelov",
+    "showPanels": "Zobraziť čet a panely",
+    "confirmFullscreen": "Prepnúť na celú obrazovku"
   },
   "qa": {
     "title": "Otázky a odpovede",

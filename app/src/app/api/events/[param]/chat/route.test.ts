@@ -73,6 +73,7 @@ function eventRow(over: Record<string, unknown> = {}) {
     eventType: 'SCHEDULED',
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Segreteria',
+    chatEnabled: true,
     joinPasswordHash: null,
     ...over,
   };
@@ -304,6 +305,17 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     );
     expect(res.status).toBe(403);
     expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('con la chat spenta dal vivo un ospite non scrive, chi modera si', async () => {
+    mockedFindUnique.mockResolvedValue(eventRow({ chatEnabled: false }));
+    const ospite = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(ospite.status).toBe(403);
+    expect((await ospite.json()).code).toBe('CHAT_DISABLED');
+    expect(mockedCreate).not.toHaveBeenCalled();
+
+    const modera = await POST(postRequest({ text: 'chiudo la chat' }, PRIMARY_TOKEN), ctx());
+    expect(modera.status).toBe(201);
   });
 
   it('does not return the raw senderId to the guest who just posted', async () => {

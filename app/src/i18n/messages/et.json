@@ -622,7 +622,15 @@
       "unavailable": "Subtiitrid ei ole praegu saadaval.",
       "show": "Näita subtiitreid",
       "hide": "Peida subtiitrid",
-      "toggle": "Automaatsed subtiitrid"
+      "toggle": "Automaatsed subtiitrid",
+      "controls": "Subtiitrite juhtimine",
+      "smaller": "Väiksemad subtiitrid",
+      "larger": "Suuremad subtiitrid",
+      "moveUp": "Liiguta subtiitrid üles",
+      "moveDown": "Liiguta subtiitrid alla",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Üritus on lõppenud. Allpool leiad statistika ja, kui üritus salvestati, salvestuse ja ülevaate.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Ürituse avalik leht"
     },
     "notOpenNow": "Ruum ei ole praegu avatud.",
-    "nameRequired": "Nimi, millega siseneda, puudub: mine tagasi ja kirjuta see."
+    "nameRequired": "Nimi, millega siseneda, puudub: mine tagasi ja kirjuta see.",
+    "closeSidebar": "Sulge külgpaneel",
+    "contentOnly": "Ainult sisu, ilma vestluse ja paneelideta",
+    "showPanels": "Näita vestlust ja paneele",
+    "confirmFullscreen": "Lülitu täisekraanile"
   },
   "qa": {
     "title": "Küsimused ja vastused",

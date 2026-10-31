@@ -622,7 +622,15 @@
       "unavailable": "As legendas não estão disponíveis neste momento.",
       "show": "Mostrar legendas",
       "hide": "Ocultar legendas",
-      "toggle": "Legendas automáticas"
+      "toggle": "Legendas automáticas",
+      "controls": "Controlos das legendas",
+      "smaller": "Legendas mais pequenas",
+      "larger": "Legendas maiores",
+      "moveUp": "Mover as legendas para cima",
+      "moveDown": "Mover as legendas para baixo",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "O evento terminou. Abaixo encontra as estatísticas e, se o evento foi gravado, a gravação e o relatório.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Página pública do evento"
     },
     "notOpenNow": "A sala não está aberta neste momento.",
-    "nameRequired": "Falta o nome com que entrar: volte atrás e escreva-o."
+    "nameRequired": "Falta o nome com que entrar: volte atrás e escreva-o.",
+    "closeSidebar": "Fechar o painel lateral",
+    "contentOnly": "Só o conteúdo, sem chat nem painéis",
+    "showPanels": "Mostrar chat e painéis",
+    "confirmFullscreen": "Mudar para ecrã inteiro"
   },
   "qa": {
     "title": "Perguntas e Respostas",

@@ -622,7 +622,15 @@
       "unavailable": "Titulky nejsou momentálně k dispozici.",
       "show": "Zobrazit titulky",
       "hide": "Skrýt titulky",
-      "toggle": "Automatické titulky"
+      "toggle": "Automatické titulky",
+      "controls": "Ovládání titulků",
+      "smaller": "Menší titulky",
+      "larger": "Větší titulky",
+      "moveUp": "Přesunout titulky nahoru",
+      "moveDown": "Přesunout titulky dolů",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Akce skončila. Níže najdete statistiky, a pokud se nahrávala, také záznam a zprávu.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Veřejná stránka akce"
     },
     "notOpenNow": "Místnost teď není otevřená.",
-    "nameRequired": "Chybí jméno, pod kterým se připojíte: vraťte se a napište ho."
+    "nameRequired": "Chybí jméno, pod kterým se připojíte: vraťte se a napište ho.",
+    "closeSidebar": "Zavřít boční panel",
+    "contentOnly": "Pouze obsah, bez chatu a panelů",
+    "showPanels": "Zobrazit chat a panely",
+    "confirmFullscreen": "Přepnout na celou obrazovku"
   },
   "qa": {
     "title": "Otázky a odpovědi",

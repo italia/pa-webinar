@@ -622,7 +622,15 @@
       "unavailable": "Podnapisi trenutno niso na voljo.",
       "show": "Prikaži podnapise",
       "hide": "Skrij podnapise",
-      "toggle": "Samodejni podnapisi"
+      "toggle": "Samodejni podnapisi",
+      "controls": "Upravljanje podnapisov",
+      "smaller": "Manjši podnapisi",
+      "larger": "Večji podnapisi",
+      "moveUp": "Premakni podnapise na vrh",
+      "moveDown": "Premakni podnapise na dno",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Dogodek se je končal. Spodaj najdete statistiko in, če je bil posnet, posnetek in poročilo.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Javna stran dogodka"
     },
     "notOpenNow": "Soba trenutno ni odprta.",
-    "nameRequired": "Manjka ime, s katerim boste vstopili: vrnite se in ga vpišite."
+    "nameRequired": "Manjka ime, s katerim boste vstopili: vrnite se in ga vpišite.",
+    "closeSidebar": "Zapri stransko ploščo",
+    "contentOnly": "Samo vsebina, brez klepeta in plošč",
+    "showPanels": "Prikaži klepet in plošče",
+    "confirmFullscreen": "Preklopi na celozaslonski način"
   },
   "qa": {
     "title": "Vprašanja in odgovori",

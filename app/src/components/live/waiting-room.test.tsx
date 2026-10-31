@@ -143,8 +143,8 @@ describe('sala d\'attesa — nome mancante a sala aperta', () => {
     premi(entra);
     expect(onEnterLive).not.toHaveBeenCalled();
     expect(nome.getAttribute('aria-invalid')).toBe('true');
-    // Il richiamo non è rosso: il campo insiste, senza lo stile d'errore.
-    expect(nome.classList.contains('is-invalid')).toBe(false);
+    // Dopo il tentativo il nome mancante e' un errore: rosso, sul campo.
+    expect(nome.classList.contains('is-invalid')).toBe(true);
     expect(nome.closest('.wr-name-field')?.classList.contains('wr-name-field--insist')).toBe(true);
     expect(document.activeElement).toBe(nome);
     expect(Element.prototype.scrollIntoView).toHaveBeenCalled();

@@ -622,7 +622,15 @@
       "unavailable": "Napisy są w tej chwili niedostępne.",
       "show": "Pokaż napisy",
       "hide": "Ukryj napisy",
-      "toggle": "Napisy automatyczne"
+      "toggle": "Napisy automatyczne",
+      "controls": "Sterowanie napisami",
+      "smaller": "Mniejsze napisy",
+      "larger": "Większe napisy",
+      "moveUp": "Przenieś napisy na górę",
+      "moveDown": "Przenieś napisy na dół",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Wydarzenie się zakończyło. Poniżej znajdziesz statystyki, a jeśli było nagrywane, także nagranie i sprawozdanie.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Strona publiczna wydarzenia"
     },
     "notOpenNow": "Sala nie jest teraz otwarta.",
-    "nameRequired": "Brakuje imienia, pod którym chcesz wejść: wróć i je wpisz."
+    "nameRequired": "Brakuje imienia, pod którym chcesz wejść: wróć i je wpisz.",
+    "closeSidebar": "Zamknij panel boczny",
+    "contentOnly": "Tylko treść, bez czatu i paneli",
+    "showPanels": "Pokaż czat i panele",
+    "confirmFullscreen": "Przełącz na pełny ekran"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",

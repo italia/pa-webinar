@@ -49,6 +49,8 @@ import PresentationTimerBar from '@/components/live/presentation-timer';
 import LiveTimeStrip from '@/components/live/live-time-strip';
 import ClosingNotice from '@/components/live/closing-notice';
 import LiveCaptions from '@/components/live/live-captions';
+import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
+import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
 import StageName from '@/components/live/stage-name';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
@@ -1448,21 +1450,77 @@ export default function LiveEventClient({
   // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
   // chaining makes it a safe no-op where Element.requestFullscreen is missing
   // (e.g. iPhone Safari).
+  // Se il browser rifiuta la richiesta (il clic e' arrivato dalla barra di
+  // Jitsi, in un'altra cornice, e non vale come gesto per questa pagina) si
+  // chiede una conferma con un pulsante della pagina: quel clic vale.
+  const [confermaSchermoIntero, setConfermaSchermoIntero] = useState(false);
   const toggleFullscreen = useCallback(() => {
     const root = liveRootRef.current;
     if (!root) return;
     if (document.fullscreenElement) {
-      document.exitFullscreen?.();
-    } else {
-      root.requestFullscreen?.();
+      void document.exitFullscreen?.().catch(() => {});
+      return;
+    }
+    const richiesta = root.requestFullscreen?.();
+    if (richiesta) {
+      richiesta.then(
+        () => setConfermaSchermoIntero(false),
+        () => setConfermaSchermoIntero(true),
+      );
     }
   }, []);
+  useEffect(() => {
+    if (!confermaSchermoIntero) return;
+    const t = window.setTimeout(() => setConfermaSchermoIntero(false), 8000);
+    return () => window.clearTimeout(t);
+  }, [confermaSchermoIntero]);
 
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(document.fullscreenElement != null);
     document.addEventListener('fullscreenchange', onFsChange);
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
+
+  // Lo schermo intero sta nella barra dei comandi di Jitsi, accanto agli
+  // altri, dove lo si cerca. Solo dove il browser lo consente (non su iPhone).
+  const tFs = useTranslations('live');
+  const fsEntra = tFs('enterFullscreen');
+  const fsEsci = tFs('exitFullscreen');
+  useEffect(() => {
+    if (!jitsiApi || !document.fullscreenEnabled) return;
+    impostaPulsante(
+      jitsiApi,
+      FULLSCREEN_BUTTON_ID,
+      fullscreenToolbarButton(isFullscreen, { enter: fsEntra, exit: fsEsci }),
+    );
+  }, [jitsiApi, isFullscreen, fsEntra, fsEsci]);
+  useEffect(() => {
+    if (!jitsiApi) return;
+    // Il clic nella conferenza attiva anche questa pagina (attivazione
+    // dell'utente propagata alle cornici che la contengono): la richiesta di
+    // schermo intero e' ammessa.
+    const onClick = (e: { key: string }) => {
+      if (e?.key === FULLSCREEN_BUTTON_ID) toggleFullscreen();
+    };
+    jitsiApi.addListener('toolbarButtonClicked', onClick);
+    return () => jitsiApi.removeListener('toolbarButtonClicked', onClick);
+  }, [jitsiApi, toggleFullscreen]);
+
+  // Solo il contenuto: la colonna laterale (chat, partecipanti, pannelli)
+  // si chiude del tutto, e il video prende la larghezza. La si riapre dalla
+  // barra in alto. Vale per la pagina aperta, non si ricorda.
+  const [soloContenuto, setSoloContenuto] = useState(false);
+  const mostraColonna = useCallback(() => setSoloContenuto(false), []);
+  // Chiusa dalla sua «×», che sparisce con lei: il fuoco va al pulsante che la
+  // riapre, nella barra in alto, non torna all'inizio della pagina.
+  const nascondiColonna = useCallback(() => {
+    setSoloContenuto(true);
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLButtonElement>('[data-solo-contenuto]')?.focus(),
+    );
+  }, []);
+  // Dove i sottotitoli si spostano quando chi guarda li vuole in alto.
+  const [sottotitoliAlto, setSottotitoliAlto] = useState<HTMLDivElement | null>(null);
 
   // Reactstrap portals every Modal into <body> by default. Once the app owns
   // fullscreen on the live wrapper, <body> is OUTSIDE the fullscreen
@@ -1518,8 +1576,12 @@ export default function LiveEventClient({
   // Sottotitoli live (ADR-018): il flag dell'evento, che chi modera cambia
   // dal vivo, arriva con gli altri flag della sala (canale push o polling,
   // stessa voce della barra laterale). Chi modera li accende nella stanza.
-  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean }>(
-    event.liveCaptionsAvailable ? `/api/events/${event.slug}/flags` : null,
+  // Gli stessi flag dicono alla sala d'attesa se la chat e' ancora accesa:
+  // la si legge finche' la sala puo' mostrarla (in diretta o in preparazione).
+  const flagsServono =
+    !!event.liveCaptionsAvailable || ['LIVE', 'PROVISIONING', 'IDLE'].includes(eventStatus);
+  const { data: flagsSala } = useSWR<{ liveCaptionsEnabled?: boolean; chatEnabled?: boolean }>(
+    flagsServono ? `/api/events/${event.slug}/flags` : null,
     (url: string) => fetch(url).then((r) => r.json()),
     { refreshInterval: pushLive ? 0 : 15000 },
   );
@@ -1681,7 +1743,8 @@ export default function LiveEventClient({
             recordingUrl: event.recordingUrl,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
             feedbackEnabled: event.feedbackEnabled,
-            chatEnabled: event.chatEnabled,
+            // Il valore corrente: chi modera puo' spegnerla dal vivo.
+            chatEnabled: flagsSala?.chatEnabled ?? event.chatEnabled,
             qaEnabled: event.qaEnabled,
             timezone: event.timezone,
             aiPostprodEnabled: event.aiPostprodEnabled,
@@ -1946,8 +2009,8 @@ export default function LiveEventClient({
         locale={locale}
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
-        isFullscreen={isFullscreen}
-        onToggleFullscreen={toggleFullscreen}
+        soloContenuto={soloContenuto}
+        onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
       />
 
       {/* L'orologio dell'evento per chi conduce e per chi interviene; per
@@ -2125,8 +2188,23 @@ export default function LiveEventClient({
                 subito e solo nascosta sotto l'avviso di avvio del bridge:
                 deve ascoltare la sala già dall'ingresso, che è l'evento che
                 fa sparire quell'avviso. */}
+            <div className="live-stage-top" hidden={showJvbOverlay} ref={setSottotitoliAlto} />
+            {confermaSchermoIntero && (
+              <div className="live-fs-conferma">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    setConfermaSchermoIntero(false);
+                    toggleFullscreen();
+                  }}
+                >
+                  {tFs('confirmFullscreen')}
+                </button>
+              </div>
+            )}
             <div className="live-stage-bottom" hidden={showJvbOverlay}>
-              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} alto={sottotitoliAlto} />
               <StageName api={jitsiApi} />
             </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
@@ -2143,6 +2221,9 @@ export default function LiveEventClient({
         </div>
 
         <LiveSidebar
+          nascosta={soloContenuto}
+          onNascondi={nascondiColonna}
+          onMostra={mostraColonna}
           eventSlug={event.slug}
           eventId={event.id}
           token={token}
@@ -2327,6 +2408,12 @@ type SidebarTab =
   | 'participants';
 
 interface LiveSidebarProps {
+  /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
+  nascosta?: boolean;
+  /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
+  onNascondi?: () => void;
+  /** Riapre la colonna chiusa: ogni richiesta di una scheda la riporta. */
+  onMostra?: () => void;
   eventSlug: string;
   /** Persone nella chiamata adesso, dallo stesso conteggio che la sala riceve
    *  da Jitsi: il pannello dei partecipanti lo aggiorna solo quando e' aperto. */
@@ -2380,6 +2467,9 @@ interface LiveSidebarProps {
 }
 
 function LiveSidebar({
+  nascosta = false,
+  onNascondi,
+  onMostra,
   eventSlug,
   roomCount,
   eventId,
@@ -2557,6 +2647,7 @@ function LiveSidebar({
     } catch { /* vale finche' resta aperta la pagina */ }
   }, []);
   const compressa = isDesktop && collapsed;
+  const chiusa = isDesktop && nascosta;
   const salvaLarghezza = useCallback((w: number | null) => {
     try {
       if (w === null) window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
@@ -2612,17 +2703,20 @@ function LiveSidebar({
     mq.addEventListener('change', aggiorna);
     return () => mq.removeEventListener('change', aggiorna);
   }, []);
-  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop ? !compressa : drawerOpen);
+  const onScreen = (key: SidebarTab) =>
+    activeTab === key && (isDesktop ? !compressa && !chiusa : drawerOpen);
   // Aprire una scheda vuol dire mostrarla: su desktop riapre la colonna
   // compressa, sul telefono apre il cassetto. Ogni via per aprire una scheda
   // passa da qui.
   const apriScheda = useCallback(
     (key: SidebarTab) => {
       setActiveTab(key);
-      if (isDesktop) impostaCompressa(false);
-      else setDrawerOpen(true);
+      if (isDesktop) {
+        impostaCompressa(false);
+        onMostra?.();
+      } else setDrawerOpen(true);
     },
-    [isDesktop, impostaCompressa],
+    [isDesktop, impostaCompressa, onMostra],
   );
   // Una scheda chiesta da fuori (la striscia del tempo apre la Regia).
   useEffect(() => {
@@ -3244,7 +3338,7 @@ function LiveSidebar({
       <div
         className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}${
           compressa ? ' live-sidebar--collapsed' : ''
-        }`}
+        }${chiusa ? ' live-sidebar--nascosta' : ''}`}
         style={
           isDesktop && !compressa && sidebarWidth !== null
             ? { width: sidebarWidth, flexBasis: sidebarWidth, maxWidth: 'none' }
@@ -3252,7 +3346,7 @@ function LiveSidebar({
         }
         // Sul telefono il cassetto chiuso esce dallo schermo ma resterebbe
         // raggiungibile con il tasto Tab: chiuso, è inerte.
-        inert={!isDesktop && !drawerOpen ? true : undefined}
+        inert={(!isDesktop && !drawerOpen) || chiusa ? true : undefined}
         ref={sidebarRef}
         tabIndex={-1}
       >
@@ -3272,6 +3366,19 @@ function LiveSidebar({
                   comprime, verso sinistra riapre. */}
               <polyline points="9 18 15 12 9 6" />
             </svg>
+          </button>
+        )}
+        {isDesktop && !compressa && onNascondi && (
+          // La «×»: chiude la colonna del tutto (resta solo il contenuto).
+          // Comprimerla a una striscia di icone resta la freccia accanto.
+          <button
+            type="button"
+            className="live-sidebar-close"
+            onClick={onNascondi}
+            aria-label={t('closeSidebar')}
+            title={t('closeSidebar')}
+          >
+            <Icon icon="it-close" size="sm" />
           </button>
         )}
         {isDesktop && !compressa && (
@@ -3568,10 +3675,9 @@ interface LiveTopBarProps {
    *  Surfaced (collapsed, with a warning) in the share popup. */
   moderatorToken?: string;
   onLeaveRoom?: () => void;
-  /** App-owned fullscreen: current state + toggle. Passed only by the
-   *  live-phase top bar (the consent-pending one renders no video/sidebar). */
-  isFullscreen?: boolean;
-  onToggleFullscreen?: () => void;
+  /** Solo il contenuto: la colonna laterale chiusa del tutto. */
+  soloContenuto?: boolean;
+  onToggleSoloContenuto?: () => void;
 }
 
 function LiveTopBar({
@@ -3590,8 +3696,8 @@ function LiveTopBar({
   hasCallLink = true,
   moderatorToken,
   onLeaveRoom,
-  isFullscreen,
-  onToggleFullscreen,
+  soloContenuto = false,
+  onToggleSoloContenuto,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3717,20 +3823,22 @@ function LiveTopBar({
             })}
           </span>
         )}
-        {onToggleFullscreen && (
+        {onToggleSoloContenuto && (
+          // Solo il contenuto (le slide, chi parla), senza chat e pannelli; lo
+          // stesso pulsante li riporta. Lo schermo intero sta nella barra dei
+          // comandi della conferenza.
           <Button
             color="light"
             outline
             size="xs"
-            className="d-none d-md-inline-flex align-items-center fullscreen-toggle-btn"
-            onClick={onToggleFullscreen}
-            aria-label={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
-            title={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+            className="d-none d-lg-inline-flex align-items-center fullscreen-toggle-btn"
+            onClick={onToggleSoloContenuto}
+            data-solo-contenuto=""
+            aria-pressed={soloContenuto}
+            aria-label={t('contentOnly')}
+            title={soloContenuto ? t('showPanels') : t('contentOnly')}
           >
-            {/* it-expand/it-collapse are the ACCORDION chevrons in the Bootstrap
-                Italia sprite, so this icon-only button read as "open a panel".
-                it-fullscreen is the four-corners glyph people expect here. */}
-            <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
+            <Icon icon={soloContenuto ? 'it-comment' : 'it-presentation'} size="xs" color="white" />
           </Button>
         )}
         <LiveShareButton

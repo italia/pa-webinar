@@ -622,7 +622,15 @@
       "unavailable": "Sous-titres indisponibles pour le moment.",
       "show": "Afficher les sous-titres",
       "hide": "Masquer les sous-titres",
-      "toggle": "Sous-titres automatiques"
+      "toggle": "Sous-titres automatiques",
+      "controls": "Commandes des sous-titres",
+      "smaller": "Sous-titres plus petits",
+      "larger": "Sous-titres plus grands",
+      "moveUp": "Déplacer les sous-titres en haut",
+      "moveDown": "Déplacer les sous-titres en bas",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "L'événement est terminé. Ci-dessous, vous trouverez les statistiques et, si l'événement a été enregistré, l'enregistrement et le compte rendu.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Page publique de l'événement"
     },
     "notOpenNow": "La salle n'est pas ouverte pour le moment.",
-    "nameRequired": "Il manque le nom pour entrer : revenez en arrière et saisissez-le."
+    "nameRequired": "Il manque le nom pour entrer : revenez en arrière et saisissez-le.",
+    "closeSidebar": "Fermer le panneau latéral",
+    "contentOnly": "Contenu seul, sans chat ni panneaux",
+    "showPanels": "Afficher le chat et les panneaux",
+    "confirmFullscreen": "Passer en plein écran"
   },
   "qa": {
     "title": "Questions et Réponses",

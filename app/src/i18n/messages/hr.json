@@ -622,7 +622,15 @@
       "unavailable": "Titlovi trenutačno nisu dostupni.",
       "show": "Prikaži titlove",
       "hide": "Sakrij titlove",
-      "toggle": "Automatski titlovi"
+      "toggle": "Automatski titlovi",
+      "controls": "Upravljanje titlovima",
+      "smaller": "Manji titlovi",
+      "larger": "Veći titlovi",
+      "moveUp": "Premjesti titlove gore",
+      "moveDown": "Premjesti titlove dolje",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Događaj je završio. Ispod ćete pronaći statistiku i, ako je snimljen, snimku i izvješće.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Javna stranica događaja"
     },
     "notOpenNow": "Soba trenutačno nije otvorena.",
-    "nameRequired": "Nedostaje ime s kojim ulazite: vratite se i upišite ga."
+    "nameRequired": "Nedostaje ime s kojim ulazite: vratite se i upišite ga.",
+    "closeSidebar": "Zatvori bočnu ploču",
+    "contentOnly": "Samo sadržaj, bez chata i ploča",
+    "showPanels": "Prikaži chat i ploče",
+    "confirmFullscreen": "Prijeđi na cijeli zaslon"
   },
   "qa": {
     "title": "Pitanja i odgovori",

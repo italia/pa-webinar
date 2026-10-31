@@ -25,7 +25,7 @@ import { z } from 'zod';
 
 import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { assertChatOpen, authenticateChatSender } from '@/lib/chat/authenticate';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { publishTyping } from '@/lib/chat/typing-pubsub';
 import { RateLimitError, ValidationError } from '@/lib/errors';
@@ -75,6 +75,7 @@ export const POST = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+  assertChatOpen(auth);
 
   const rl = rateLimit(`chat-typing:${auth.eventId}:${auth.senderId}`, {
     limit: TYPING_PER_SENDER_LIMIT,

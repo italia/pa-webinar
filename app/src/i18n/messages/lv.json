@@ -622,7 +622,15 @@
       "unavailable": "Subtitri pašlaik nav pieejami.",
       "show": "Rādīt subtitrus",
       "hide": "Paslēpt subtitrus",
-      "toggle": "Automātiskie subtitri"
+      "toggle": "Automātiskie subtitri",
+      "controls": "Subtitru vadīklas",
+      "smaller": "Mazāki subtitri",
+      "larger": "Lielāki subtitri",
+      "moveUp": "Pārvietot subtitrus augšā",
+      "moveDown": "Pārvietot subtitrus lejā",
+      "smallerShort": "A−",
+      "largerShort": "A+",
+      "showShort": "CC"
     },
     "eventEndedModerator": "Pasākums ir beidzies. Zemāk atradīsiet statistiku un, ja pasākums tika ierakstīts, ierakstu un pārskatu.",
     "endLinks": {
@@ -631,7 +639,11 @@
       "publicPage": "Pasākuma publiskā lapa"
     },
     "notOpenNow": "Telpa pašlaik nav atvērta.",
-    "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to."
+    "nameRequired": "Trūkst vārda, ar kuru pievienoties: atgriezieties un ierakstiet to.",
+    "closeSidebar": "Aizvērt sānu paneli",
+    "contentOnly": "Tikai saturs, bez tērzēšanas un paneļiem",
+    "showPanels": "Rādīt tērzēšanu un paneļus",
+    "confirmFullscreen": "Pārslēgt uz pilnekrāna režīmu"
   },
   "qa": {
     "title": "Jautājumi un atbildes",

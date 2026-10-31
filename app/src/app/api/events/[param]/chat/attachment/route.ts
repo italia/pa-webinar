@@ -32,6 +32,7 @@ import {
   assetUrlFromKey,
 } from '@/lib/chat/attachments';
 import { issueChatAttachmentToken } from '@/lib/chat/attachment-token';
+import { assertChatOpen } from '@/lib/chat/authenticate';
 import { resolveTokenSender } from '@/lib/chat/sender';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, RateLimitError, ValidationError } from '@/lib/errors';
@@ -53,7 +54,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const where = UUID_RE.test(param) ? { id: param } : { slug: param };
   const event = await prisma.event.findUnique({
     where,
-    select: { id: true, moderatorToken: true, moderatorName: true },
+    select: { id: true, moderatorToken: true, moderatorName: true, chatEnabled: true },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
@@ -67,6 +68,9 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!sender) {
     throw new ForbiddenError('Attachments require a participant or moderator token');
   }
+  // Con la chat spenta non si caricano file: il messaggio che li porterebbe
+  // verrebbe rifiutato, e il file resterebbe orfano nello storage.
+  assertChatOpen({ ...sender, chatEnabled: event.chatEnabled });
 
   const rl = rateLimit(`chat-attach:${event.id}:${sender.senderId}`, {
     limit: 10,

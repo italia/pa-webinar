@@ -60,6 +60,7 @@ function eventRow(over: Record<string, unknown> = {}) {
     eventType: 'SCHEDULED',
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Segreteria',
+    chatEnabled: true,
     joinPasswordHash: null,
     ...over,
   };

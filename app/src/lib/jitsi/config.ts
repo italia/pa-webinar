@@ -18,6 +18,7 @@
  */
 
 import { CAPTIONS_BUTTON_ID } from '@/lib/captions/toolbar-button';
+import { FULLSCREEN_BUTTON_ID } from '@/lib/jitsi/fullscreen-button';
 
 import { JITSI_STAGE_BACKGROUND } from './branding';
 
@@ -157,16 +158,21 @@ export const jitsiConfigOverwrite = {
   // ricordare: i posti che restano liberi li riempie con altri pulsanti, e
   // un menu «…» con un solo pulsante non lo apre, lo rimette nella barra.
   // Un pulsante personalizzato che non compare qui finisce sempre nel menu.
+  //
+  // Prima cio' che si usa piu' spesso: microfono, videocamera, mano alzata,
+  // condivisione, reazioni, sottotitoli, schermo intero. Le impostazioni dei
+  // dispositivi stanno nel menu «…» (microfono e videocamera hanno gia' la
+  // loro freccia per scegliere il dispositivo).
   mainToolbarButtons: [
-    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
-    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', 'desktop', 'reactions', CAPTIONS_BUTTON_ID, FULLSCREEN_BUTTON_ID, 'tileview'],
+    ['microphone', 'camera', 'raisehand', 'desktop', 'reactions', CAPTIONS_BUTTON_ID, FULLSCREEN_BUTTON_ID],
     // Da sei pulsanti in giu' la condivisione dello schermo resta in barra
     // (chi presenta la cerca li', anche con la colonna laterale larga) e i
     // sottotitoli passano nel menu «…». Chi non puo' condividere non la vede:
     // il posto lo prende un altro pulsante.
-    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', 'settings'],
-    ['microphone', 'camera', 'desktop', 'raisehand', 'settings'],
-    ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
+    ['microphone', 'camera', 'raisehand', 'desktop', 'reactions', FULLSCREEN_BUTTON_ID],
+    ['microphone', 'camera', 'raisehand', 'desktop', CAPTIONS_BUTTON_ID],
+    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID],
     ['microphone', 'camera', CAPTIONS_BUTTON_ID],
     ['microphone', 'camera'],
   ] as string[][],
