@@ -12,11 +12,13 @@ import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
+import AdminSessionKeepAlive from '@/components/admin/admin-session-keepalive';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
@@ -352,7 +354,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const title = getLocalized(event.title as LocalizedField, locale);
 
+  // Lo staff dietro il link primario ha il suo posto finche' vale la sessione:
+  // in sala la si tiene viva come nell'amministrazione.
+  const staffInSala = isPrimaryModerator ? await staffDietroIlPrimario(event.id) : null;
+
   return (
+    <>
+    {staffInSala && <AdminSessionKeepAlive allaScadenza="resta" />}
     <LiveEventClient
       event={{
         id: event.id,
@@ -424,8 +432,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           : isPrimaryModerator
             ? // Primary moderator magic-link (shared): keep the input
               // empty so anyone opening the link types their own name
-              // rather than inheriting the configured moderatorName.
-              ''
+              // rather than inheriting the configured moderatorName — unless
+              // a staff member who manages the event opened it: then it is
+              // their own name (lib/auth/staff-seat).
+              (staffInSala?.nome ?? '')
             : (participantInfo?.displayName ?? 'Partecipante')
       }
       locale={locale}
@@ -436,5 +446,6 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       rnnoiseEnforceOff={rnnoiseEnforceOff}
       whiteboardInfraReady={whiteboardInfraReady}
     />
+    </>
   );
 }

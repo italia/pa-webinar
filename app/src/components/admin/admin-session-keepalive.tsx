@@ -18,12 +18,21 @@ import { useRouter } from '@/i18n/navigation';
  *  - Also runs one attempt on refocus, so returning to a tab whose session
  *    lapsed while it was hidden bounces to login immediately.
  *
- * Mounted only for authenticated admins (see admin/layout.tsx).
+ * Mounted only for authenticated admins (see admin/layout.tsx), and in the
+ * live room for a staff member behind the primary link (lib/auth/staff-seat),
+ * whose personal seat lasts as long as the session: there an expired session
+ * does not leave the room (`allaScadenza="resta"`), the seat just goes back to
+ * the shared one.
  */
 const INTERVAL_MS = 10 * 60_000; // check every 10 min
 const ACTIVITY_WINDOW_MS = 30 * 60_000; // refresh only if active in the last 30 min
 
-export default function AdminSessionKeepAlive() {
+export default function AdminSessionKeepAlive({
+  allaScadenza = 'login',
+}: {
+  /** Con la sessione scaduta: al login (amministrazione) o si resta (sala). */
+  allaScadenza?: 'login' | 'resta';
+} = {}) {
   const router = useRouter();
   const lastActivityRef = useRef(Date.now());
   const inFlightRef = useRef(false);
@@ -47,7 +56,7 @@ export default function AdminSessionKeepAlive() {
           method: 'POST',
           cache: 'no-store',
         });
-        if (res.status === 401) {
+        if (res.status === 401 && allaScadenza === 'login') {
           router.replace('/admin/login');
         }
       } catch {
@@ -78,7 +87,7 @@ export default function AdminSessionKeepAlive() {
       activityEvents.forEach((e) => window.removeEventListener(e, bump));
       document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [router]);
+  }, [router, allaScadenza]);
 
   return null;
 }

@@ -23,7 +23,7 @@ const SEARCH_FROM = 8;
 
 /** Chi c'e' dietro un riquadro, per chi modera (GET /api/events/{slug}/seats). */
 interface SeatView {
-  kind: 'registration' | 'forwardedLink' | 'grant' | 'sharedModeratorLink' | 'contested';
+  kind: 'registration' | 'forwardedLink' | 'grant' | 'staff' | 'sharedModeratorLink' | 'contested';
   name: string | null;
   email: string | null;
 }

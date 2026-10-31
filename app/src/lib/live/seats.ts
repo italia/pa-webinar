@@ -30,6 +30,9 @@ export type Seat =
   | { k: 'grant'; id: string }
   /** Il link condiviso dei moderatori: nessuna persona dietro. */
   | { k: 'primary' }
+  /** Il link condiviso, aperto da una persona dello staff con la sua sessione
+   *  (lib/auth/staff-seat): l'account. */
+  | { k: 'staff'; id: string }
   /** Dichiarato da due posti diversi: non si sa chi c'e'. */
   | { k: 'conflict' };
 
@@ -54,7 +57,7 @@ function parseSeat(raw: string | null | undefined): Seat | null {
   try {
     const v = JSON.parse(raw) as { k?: unknown; id?: unknown };
     if (v.k === 'primary' || v.k === 'conflict') return { k: v.k };
-    if ((v.k === 'reg' || v.k === 'fwd' || v.k === 'grant') && typeof v.id === 'string') {
+    if ((v.k === 'reg' || v.k === 'fwd' || v.k === 'grant' || v.k === 'staff') && typeof v.id === 'string') {
       return { k: v.k, id: v.id };
     }
   } catch {

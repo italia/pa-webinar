@@ -13,6 +13,7 @@ import { getSettings } from '@/lib/settings';
 import { captionsTranscriptActive } from '@/lib/captions/availability';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import {
   generateJitsiJwt,
   mediaLockOf,
@@ -165,10 +166,12 @@ export const POST = withErrorHandling(async (request, context) => {
     const trimmedOverride = displayNameOverride?.trim();
     let name: string;
     if (grant.isPrimaryShared) {
-      if (!trimmedOverride) {
-        throw new ValidationError('Display name is required for moderators');
-      }
-      name = trimmedOverride;
+      // Chi apre il link primario con la sessione dello staff che gestisce
+      // l'evento e' una persona nota (lib/auth/staff-seat): il suo nome vale
+      // anche senza quello scritto in sala d'attesa.
+      const nome = trimmedOverride || (await staffDietroIlPrimario(event.id))?.nome;
+      if (!nome) throw new ValidationError('Display name is required for moderators');
+      name = nome;
     } else {
       name = trimmedOverride || grant.displayName || (isSpeaker ? 'Relatore' : 'Moderatore');
     }

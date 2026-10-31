@@ -19,6 +19,7 @@ import {
   isEventModerator,
   resolveGrantForEvent,
 } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
@@ -67,7 +68,10 @@ export const POST = withErrorHandling(async (request, context) => {
     seat = { k: suo ? 'reg' : 'fwd', id: registration.id };
   } else {
     const grant = await resolveGrantForEvent(event, token);
-    if (grant?.isPrimaryShared) seat = { k: 'primary' };
+    // Il link condiviso aperto da chi dello staff gestisce l'evento: una persona.
+    const staff = grant?.isPrimaryShared ? await staffDietroIlPrimario(event.id) : null;
+    if (staff) seat = { k: 'staff', id: staff.accountId };
+    else if (grant?.isPrimaryShared) seat = { k: 'primary' };
     else if (grant?.grantId) seat = { k: 'grant', id: grant.grantId };
   }
   if (!seat) throw new ForbiddenError('Unknown room token');
@@ -77,7 +81,7 @@ export const POST = withErrorHandling(async (request, context) => {
 });
 
 type SeatView = {
-  kind: 'registration' | 'forwardedLink' | 'grant' | 'sharedModeratorLink' | 'contested';
+  kind: 'registration' | 'forwardedLink' | 'grant' | 'staff' | 'sharedModeratorLink' | 'contested';
   name: string | null;
   email: string | null;
 };
@@ -92,11 +96,13 @@ export const GET = withErrorHandling(async (request, context) => {
   const seats = await readSeats(event.id);
   const regIds = new Set<string>();
   const grantIds = new Set<string>();
+  const staffIds = new Set<string>();
   for (const s of Object.values(seats)) {
     if (s.k === 'reg' || s.k === 'fwd') regIds.add(s.id);
     else if (s.k === 'grant') grantIds.add(s.id);
+    else if (s.k === 'staff') staffIds.add(s.id);
   }
-  const [regs, grants] = await Promise.all([
+  const [regs, grants, staff] = await Promise.all([
     regIds.size
       ? prisma.registration.findMany({
           where: { id: { in: [...regIds] }, eventId: event.id },
@@ -109,10 +115,17 @@ export const GET = withErrorHandling(async (request, context) => {
           select: { id: true, name: true, email: true },
         })
       : Promise.resolve([]),
+    staffIds.size
+      ? prisma.staffAccount.findMany({
+          where: { id: { in: [...staffIds] } },
+          select: { id: true, name: true, email: true },
+        })
+      : Promise.resolve([]),
   ]);
   const chiaro = (v: string | null) => (v ? (tryDecryptPII(v) ?? null) : null);
   const perReg = new Map(regs.map((r) => [r.id, { name: chiaro(r.displayName), email: chiaro(r.email) }]));
   const perGrant = new Map(grants.map((g) => [g.id, { name: chiaro(g.name), email: chiaro(g.email) }]));
+  const perStaff = new Map(staff.map((a) => [a.id, { name: chiaro(a.name), email: chiaro(a.email) }]));
 
   const out: Record<string, SeatView> = {};
   for (const [endpointId, s] of Object.entries(seats)) {
@@ -125,10 +138,11 @@ export const GET = withErrorHandling(async (request, context) => {
       continue;
     }
     // Un'iscrizione cancellata nel frattempo non dice piu' niente.
-    const dati = s.k === 'grant' ? perGrant.get(s.id) : perReg.get(s.id);
+    const dati =
+      s.k === 'grant' ? perGrant.get(s.id) : s.k === 'staff' ? perStaff.get(s.id) : perReg.get(s.id);
     if (!dati) continue;
     out[endpointId] = {
-      kind: s.k === 'reg' ? 'registration' : s.k === 'fwd' ? 'forwardedLink' : 'grant',
+      kind: s.k === 'reg' ? 'registration' : s.k === 'fwd' ? 'forwardedLink' : s.k === 'staff' ? 'staff' : 'grant',
       ...dati,
     };
   }

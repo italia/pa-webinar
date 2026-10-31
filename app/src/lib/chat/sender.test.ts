@@ -17,6 +17,8 @@ vi.mock('@/lib/crypto/pii', () => ({
 vi.mock('@/lib/event-session', () => ({
   readOwnedEventAccessToken: vi.fn(),
 }));
+const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
+vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
@@ -108,3 +110,29 @@ describe('resolveTokenSender — registration name gate', () => {
     expect(mockedOwned).not.toHaveBeenCalled(); // no registration → no cookie read
   });
 });
+
+describe('resolveTokenSender — il link primario aperto dallo staff', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    staff.valore = null;
+    mockedGrant.mockResolvedValue({ role: 'MODERATOR', displayName: null, isPrimaryShared: true, grantId: null });
+  });
+
+  it('senza sessione dello staff resta il posto condiviso', async () => {
+    const sender = await resolveTokenSender(EVENT, 'MOD_TOKEN', 'Chi scrive');
+    expect(sender).toMatchObject({ senderId: 'mod-evt-1-primary', senderName: 'Chi scrive', isPerPersonIdentity: false });
+  });
+
+  it('con la sessione di chi gestisce l\'evento: un posto suo, con il suo nome', async () => {
+    staff.valore = { accountId: 'acc-7', nome: 'Ada Rossi' };
+    // Il nome scritto in sala d'attesa non cambia quello garantito dall'account.
+    const sender = await resolveTokenSender(EVENT, 'MOD_TOKEN', 'Un altro nome');
+    expect(sender).toMatchObject({
+      senderId: 'mod-evt-1-staff-acc-7',
+      senderName: 'Ada Rossi',
+      isModerator: true,
+      isPerPersonIdentity: true,
+    });
+  });
+});
+

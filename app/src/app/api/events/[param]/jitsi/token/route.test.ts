@@ -33,6 +33,9 @@ vi.mock('next/headers', () => ({
   }),
 }));
 
+const staffSeat = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
+vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staffSeat.valore) }));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
@@ -284,6 +287,19 @@ describe('POST jitsi/token — grant da magic link', () => {
     expect(body.jwt).toBeUndefined();
     // Nessun fallback silenzioso su event.moderatorName.
     expect(prisma.eventModerator.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('il link primario aperto da chi gestisce l\'evento con la sessione dello staff: il suo nome', async () => {
+    staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+    try {
+      const res = await post({ moderatorToken: PRIMARY_TOKEN });
+      expect(res.status).toBe(200);
+      const { body, payload } = await minted(res);
+      expect(body.displayName).toBe('Ada Rossi');
+      expect(payload.moderator).toBe(true);
+    } finally {
+      staffSeat.valore = null;
+    }
   });
 
   it('il link primario con nome digitato conia sotto quel nome', async () => {

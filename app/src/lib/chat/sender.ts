@@ -17,6 +17,7 @@
  */
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
@@ -69,6 +70,20 @@ export async function resolveTokenSender(
     // for them (keeps the moderator hot path off an HS256 verify).
     const isGrantModerator = grant.role === 'MODERATOR';
     const override = displayNameOverride?.trim();
+    // Il link primario aperto da una persona dello staff che gestisce
+    // l'evento (lib/auth/staff-seat): un posto suo, con il nome del suo
+    // account. Come per le altre identita' personali il nome lo garantisce il
+    // server, non quello scritto in sala d'attesa.
+    const staff = grant.isPrimaryShared ? await staffDietroIlPrimario(event.id) : null;
+    if (staff) {
+      return {
+        eventId: event.id,
+        senderId: `mod-${event.id}-staff-${staff.accountId}`,
+        senderName: staff.nome,
+        isModerator: true,
+        isPerPersonIdentity: true,
+      };
+    }
     const senderName = grant.isPrimaryShared
       ? override || grant.displayName || 'Moderatore'
       : grant.displayName ?? 'Moderatore';

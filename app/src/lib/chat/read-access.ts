@@ -21,9 +21,10 @@
  *     message, reading exfiltrates everyone else's, so "I have the URL" cannot
  *     be enough for an event whose whole point is that the URL isn't enough.
  *
- * Deliberately lighter than `resolveTokenSender`: it answers "may you read?",
- * not "who are you?", so it never decrypts a name. That keeps the SSE stream —
- * which runs outside the normal route handler wrapper — cheap.
+ * With a token it resolves the full sender (`resolveTokenSender`): the history
+ * has to say which messages are the caller's. For a staff member behind the
+ * primary link that also reads their session (lib/auth/staff-seat), a cost
+ * paid only by staff browsers. The guest path stays light.
  */
 
 import { resolveTokenSender } from '@/lib/chat/sender';

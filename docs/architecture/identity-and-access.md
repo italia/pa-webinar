@@ -363,10 +363,13 @@ The chat attributes messages, attachments and reactions to a **seat**. Q&A, poll
 | Token | Seat id | One person? (`isPerPersonIdentity`) |
 |---|---|---|
 | Primary moderator link | `mod-<eventId>-primary` | No: the link is shared by the team |
+| Primary moderator link, opened with the staff session of an account that manages the event | `mod-<eventId>-staff-<accountId>` | Yes |
 | Named `MODERATOR` grant | `mod-<eventId>-<grantId>` | Yes |
 | Named `SPEAKER` grant | `spk-<eventId>-<grantId>` | Yes |
 | Registrant access token, in the browser that registered | `reg-<registrationId>` | Yes |
 | The same access token, opened elsewhere (forwarded link) | `reg-<registrationId>` | No |
+
+The primary link stays the credential, but whoever opens it in a browser holding the staff session of an account that manages the event (from **Enter room** in the administration area, or from the emailed link in a browser where they are signed in) is a known person (`app/src/lib/auth/staff-seat.ts`): the chat gives them a seat of their own under their account name, the seats view shows the account, the Jitsi token carries the account name when they type none, and the waiting room offers that name. Nothing new is issued: it lasts as long as the session, which the room keeps sliding like the administration area does (without leaving the room if it lapses), so deactivating the account or taking the event away from it ends it. The instance key, which has no account, keeps the shared seat. Materials added from the room keep the event's public conductor name as author, as for the shared link: the account name is personal data kept encrypted.
 
 A forwarded link keeps the registrant's seat on purpose, so that a registrant who switches devices does not split into two identities in analytics. It never inherits the registrant's name, though. The opener is shown under the name they typed. Any action that works *as the author*, such as editing an existing chat message, requires `isPerPersonIdentity`. The single implementation is `resolveTokenSender` in `app/src/lib/chat/sender.ts`.
 
@@ -380,11 +383,12 @@ Jitsi does not say which registration or grant a person in the call belongs to: 
 | The same token from any other browser | The registration, as a forwarded link | **Registration link of {email}** |
 | Named grant, `MODERATOR` or `SPEAKER` | The grant | The grant's email address, when it has one |
 | Primary moderator link | The shared link | **Shared moderator link** |
+| Primary moderator link, in a browser with the staff session of an account that manages the event | The staff account | The account's email address |
 | Any token, for an endpoint another seat has already claimed | Nothing: the endpoint is contested | **Identity cannot be verified** |
 
 - **A clash makes the endpoint contested.** The server cannot tell which browser owns an endpoint: each browser declares its own, and everyone in the call learns its id once it joins. The browser that joined with an endpoint claims it right after joining, and a repeated claim from the same seat changes nothing. When a different seat claims an endpoint that is already bound, the endpoint becomes contested and stays so, and moderators see **Identity cannot be verified** instead of an identity that could be the wrong one. The route answers `204` either way, so it does not reveal the clash. A rejoin gets a new endpoint and claims it again. An unknown token gets `403`, and each token, counted by its hash, can claim 12 times in 10 minutes.
 - **Only references are stored.** Each entry maps an endpoint id to the registration or grant id, never to a name or an address, in the Redis hash `live:seats:<eventId>`. The hash expires 12 hours after the last claim in the event. Without Redis, or when Redis does not answer, the map lives in the memory of the pod, so with several replicas a moderator sees only the claims that reached the same pod. There each entry expires 12 hours after its claim, and expired entries of every event are dropped whenever the map is used.
-- **Moderators only.** `GET /api/events/{slug}/seats` answers the primary moderator link and `MODERATOR` grants, not speakers (`isEventModerator`), with `Cache-Control: no-store`. For each endpoint it returns `kind` (`registration`, `forwardedLink`, `grant`, `sharedModeratorLink` or `contested`) and the name and email address, decrypted from the registration or the grant; a contested endpoint has neither. A registration deleted in the meantime is left out.
+- **Moderators only.** `GET /api/events/{slug}/seats` answers the primary moderator link and `MODERATOR` grants, not speakers (`isEventModerator`), with `Cache-Control: no-store`. For each endpoint it returns `kind` (`registration`, `forwardedLink`, `grant`, `staff`, `sharedModeratorLink` or `contested`) and the name and email address, decrypted from the registration or the grant; a contested endpoint has neither. A registration deleted in the meantime is left out.
 
 The participants panel reads it while it is open in a moderator's browser ([Participants panel](jitsi-integration.md#app-owned-controls-around-the-iframe)). What this means for privacy is in [Privacy and data protection](../GDPR.md#data-inventory-and-retention).
 
