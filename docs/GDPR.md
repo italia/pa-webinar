@@ -412,7 +412,7 @@ Guests join without registering, and only while the event is `LIVE`.
 
 - They give only a display name, typed in the waiting room. It appears in the conference, in chat messages (encrypted), as the author of Q&A questions (plain text) and as the respondent of pre-registration questionnaires (plain text). The end-of-event rating stores no name.
 - Their votes, word-cloud words, agenda reactions and feedback are keyed by `paw_guest_id`, a random identifier kept in the browser's local storage.
-- In one of its layouts, the waiting room offers guests an optional email field with the hint "Only for post-event follow-up". The value stays in the browser's local storage and is never sent to the server ([limitation](#known-limitations)).
+- The waiting room does not ask guests for an email. An address stored in the browser by an earlier version (`pawebinar.participant.email`) is deleted when the room opens.
 - Everything a guest leaves follows event retention: the chat messages are deleted, the name on Q&A questions is removed, and the browser ID on votes, words and answers is replaced by a per-event pseudonym in the content that stays with the event. A guest cannot use the self-service export or erasure, because nothing ties their data to an email address.
 
 ## Cookies and browser storage
@@ -429,7 +429,7 @@ PA Webinar sets only first-party, functional cookies. None is used for analytics
 
 The portal also uses the browser's local storage, which never leaves the device, for these entries:
 
-- the last display name and optional email typed in the waiting room (`pawebinar.participant.name`, `pawebinar.participant.email`);
+- the last display name typed in the waiting room (`pawebinar.participant.name`);
 - the guest identifier `paw_guest_id`, and the separate identifiers with which moderators and speakers vote in the room (`paw_moderator_voter_id`, `paw_speaker_voter_id`);
 - in the administration area, a draft of the event wizard (`pa-wizard-draft:<id>` when editing, `pa-wizard-draft:new:<format or template>` for a new event, `pa-wizard-draft:new` from earlier versions), saved as the form is filled in. It can contain the names and email addresses of the primary contact, moderators, speakers and invitees, in plain text, and stays in the browser until the event is saved or the draft is discarded; saving a new event removes every creation draft;
 - in the administration area, what was written about an event when **Change format** was pressed (`pa-wizard-draft:trasloco`, with the same kind of data), kept for ten minutes so the next format can take it over: it is removed when the next wizard opens, when the format questions are shown again after it expired, or when a new event is saved;
@@ -532,4 +532,3 @@ These are verified differences between what a reader might expect and what the c
 | Changing `APP_SECRET` breaks email lookups | Stored email hashes stop matching, so rights requests no longer find older data, and every session and personal cookie is invalidated | Treat `APP_SECRET` as permanent |
 | Waiting-room consents leave no audit row | A consent given at registration also writes a `CONSENT_RECORDED` row to the GDPR audit log, which outlives the registration. The proofs of consents given in the waiting room (`RecordingConsent`, `MultitrackConsent`) write none, and leave the database at event retention with the rest of the participants' data, also when the recording is published and kept longer | Keep the recording's legal basis and the consent wording in the event's privacy notice, which stays with the event |
 | The waiting-room recording consent is checked in the browser | The conference token route stores the recording consent it receives, but issues a token without it: someone who calls the route directly, instead of entering through the waiting room, enters without the tick and leaves no proof. The transcription consent is different: it is checked on the server for each voice, so whoever enters without it is neither recorded by the per-participant recorder nor kept in the transcript from captions | Mention recording in the event's privacy notice too; the waiting-room summary always says that the event is recorded |
-| The waiting room asks guests for an optional email that goes nowhere | The hint promises post-event follow-up, but the server never receives the address | Nothing needed for privacy; the value stays in the browser |

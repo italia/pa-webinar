@@ -10,7 +10,6 @@ const base: StatoIngressoInput = {
   canEnterLive: true,
   ingressoConsentito: true,
   nameValid: true,
-  emailValid: true,
   recordingRequired: false,
   recordingConsent: false,
   ingressoTentato: false,
@@ -56,10 +55,9 @@ describe('statoIngresso — nome mancante', () => {
     expect(s.nomeSegnalato).toBe(true);
   });
 
-  it('il nome viene prima dell\'email e del consenso: e\' il primo campo della pagina', () => {
+  it('il nome viene prima del consenso: e\' il primo campo della pagina', () => {
     const s = stato({
       nameValid: false,
-      emailValid: false,
       recordingRequired: true,
       recordingConsent: false,
     });
@@ -95,15 +93,7 @@ describe('statoIngresso — la sala che aspetta resta distinta dal nome', () => 
   });
 });
 
-describe('statoIngresso — email e consenso', () => {
-  it('email non valida: blocca, e il nome non si chiede', () => {
-    const s = stato({ emailValid: false });
-    expect(s.canEnter).toBe(false);
-    expect(s.bloccoModulo).toBe('email');
-    expect(s.bloccoSpiegato).toBe('email');
-    expect(s.nomeDaChiedere).toBe(false);
-  });
-
+describe('statoIngresso — consenso', () => {
   it('consenso alla registrazione dell\'evento mancante: blocca, e il pulsante lo spiega', () => {
     const s = stato({ recordingRequired: true, recordingConsent: false });
     expect(s.canEnter).toBe(false);

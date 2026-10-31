@@ -236,18 +236,18 @@ interface WaitingRoomProps {
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
+// L'email dell'ospite non si chiede piu' (non serviva a niente: restava
+// nel browser). Una vecchia copia salvata si cancella all'apertura.
 const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 // Accessibility fallback: when set, the waiting room renders the static
 // scrollable card instead of the full-screen walkable park. New key on
 // purpose so the legacy `pawebinar.garden.hidden=1` from earlier builds
 // no longer disables the (now default) game experience.
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Il campo su cui portare il fuoco per ciascun blocco. */
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
-  email: 'waiting-email',
   recording: 'waiting-recording-consent',
 };
 /** La casella della trascrizione dei propri interventi: facoltativa, non blocca. */
@@ -258,7 +258,6 @@ const LUNGA_ACCENSIONE_S = 6 * 60;
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
-  email: 'waiting-email-invalid',
   recording: 'waiting-recording-consent-required',
 };
 
@@ -317,7 +316,6 @@ export default function WaitingRoom({
   // Diventa vero dopo aver letto il nome salvato nel browser: fino ad allora
   // un campo vuoto non vuol dire che il nome manchi.
   const [nomeNoto, setNomeNoto] = useState(false);
-  const [email, setEmail] = useState('');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
@@ -370,7 +368,7 @@ export default function WaitingRoom({
   // aggiunge i secondi tra un poll e l'altro.
   const [warmupElapsed, setWarmupElapsed] = useState<number | null>(null);
 
-  // Rehydrate name + email from localStorage on mount. Name is merged
+  // Rehydrate the name from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
   // name) so anonymous guests get their last-typed name back while
   // registered participants still see the accurate greeting.
@@ -381,10 +379,7 @@ export default function WaitingRoom({
       if (storedName && !defaultName) {
         setName(storedName);
       }
-      const storedEmail = window.localStorage.getItem(PARTICIPANT_EMAIL_KEY);
-      if (storedEmail) {
-        setEmail(storedEmail);
-      }
+      window.localStorage.removeItem(PARTICIPANT_EMAIL_KEY);
     } catch {
       /* private mode / blocked storage → fall back to defaults */
     }
@@ -406,7 +401,7 @@ export default function WaitingRoom({
       // PHONES (coarse pointer AND narrow viewport) default to the accessible
       // CLASSIC card: the walkable park + joystick don't work well on small
       // touch screens, and the classic layout shows the real controls (name,
-      // email, device check) inline instead of hiding them in the arcade
+      // device check) inline instead of hiding them in the arcade
       // drawer. Tablets (coarse pointer but wider than 768px) keep the rich
       // room. Precedence + the `?engine=` escape hatch live in the pure helper.
       const mode = resolveWaitingRoomMode({
@@ -466,8 +461,6 @@ export default function WaitingRoom({
   const canEnterLive = isLive;
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
-  const trimmedEmail = email.trim();
-  const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
   // La trascrizione dei propri interventi, con il proprio nome: si chiede se
   // l'evento registra una traccia audio per persona (ADR-013) o tiene la
   // trascrizione dai sottotitoli. E' facoltativa e non ferma l'ingresso: chi
@@ -550,7 +543,6 @@ export default function WaitingRoom({
       canEnterLive,
       ingressoConsentito,
       nameValid,
-      emailValid,
       recordingRequired,
       recordingConsent,
       ingressoTentato,
@@ -737,7 +729,7 @@ export default function WaitingRoom({
   }, [bloccoModulo]);
 
   // L'unico cancello del modulo: il pulsante «Entra» resta premibile, quindi
-  // nome, email e consenso alla registrazione li trattiene questo controllo.
+  // nome e consenso alla registrazione li trattiene questo controllo.
   // Ogni ingresso passa di qui (waiting-room.test.tsx lo verifica).
   const handleEnterLive = useCallback(() => {
     if (!canEnter) {
@@ -749,11 +741,6 @@ export default function WaitingRoom({
     if (typeof window !== 'undefined') {
       try {
         window.localStorage.setItem(PARTICIPANT_NAME_KEY, trimmedName);
-        if (trimmedEmail) {
-          window.localStorage.setItem(PARTICIPANT_EMAIL_KEY, trimmedEmail);
-        } else {
-          window.localStorage.removeItem(PARTICIPANT_EMAIL_KEY);
-        }
       } catch {
         /* ignore */
       }
@@ -768,7 +755,6 @@ export default function WaitingRoom({
     segnalaCampoMancante,
     onEnterLive,
     trimmedName,
-    trimmedEmail,
     devicePrefs,
     recordingRequired,
     recordingConsent,
@@ -778,7 +764,7 @@ export default function WaitingRoom({
 
   // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
   // il clic, che e' il momento giusto per guardare cosa manca:
-  // - un campo da completare (nome, email, consenso): lo si segnala;
+  // - un campo da completare (nome, consenso): lo si segnala;
   // - la domanda facoltativa sulla trascrizione non ancora spuntata: entrare
   //   da soli la salterebbe, e la voce di chi conduce resterebbe fuori;
   // - il ponte video ancora in accensione: si aspetta, fino a due minuti dal
@@ -1034,34 +1020,6 @@ export default function WaitingRoom({
             <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
           </svg>
           <span>{t('nameRequiredToEnter')}</span>
-        </div>
-      )}
-    </FormGroup>
-  );
-
-  const emailField = (
-    <FormGroup className="mb-0">
-      <Input
-        id="waiting-email"
-        label={t('emailLabel')}
-        type="email"
-        value={email}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-        maxLength={200}
-        aria-invalid={!emailValid}
-        aria-describedby={!emailValid ? MESSAGGIO_DEL_BLOCCO.email : undefined}
-        autoComplete="email"
-      />
-      <small className="text-muted" style={{ fontSize: '0.8rem' }}>
-        {t('emailHelp')}
-      </small>
-      {!emailValid && (
-        <div
-          id={MESSAGGIO_DEL_BLOCCO.email}
-          className="small text-danger mt-1"
-          style={{ fontSize: '0.8rem' }}
-        >
-          {t('emailInvalid')}
         </div>
       )}
     </FormGroup>
@@ -1388,16 +1346,15 @@ export default function WaitingRoom({
               per gli occhi; il lettore di schermo lo riceve una volta sola,
               come descrizione del pulsante. Il consenso non serve ripeterlo:
               il suo riquadro sta subito sopra. */}
-          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
+          {bloccoSpiegato === 'name' && (
             <p
               className="d-flex align-items-start justify-content-center text-center mb-0"
-              // Il nome mancante è una cosa da fare (ambra), l'email sbagliata
-              // un errore (rosso).
-              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' ? '#6B4400' : '#A1112E' }}
+              // Il nome mancante è una cosa da fare (ambra).
+              style={{ fontSize: '0.85rem', color: '#6B4400' }}
               aria-hidden="true"
             >
               <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
-              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
+              <span>{t('nameRequiredToEnter')}</span>
             </p>
           )}
           {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
@@ -1963,11 +1920,6 @@ export default function WaitingRoom({
                     dietro al token (lo dice il server). */}
                 {!isEnded && chatToken && (
                   <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
-                )}
-                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
-                    per moderatori/speaker è irrilevante). */}
-                {!isEnded && isGuest && (
-                  <div className="mb-4 wr-email-field">{emailField}</div>
                 )}
                 {!isEnded && <div className="mb-4">{deviceCheckField}</div>}
 

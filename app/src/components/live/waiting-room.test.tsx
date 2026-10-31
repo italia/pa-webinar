@@ -230,16 +230,12 @@ describe('sala d\'attesa — gli altri campi che trattengono', () => {
     expect(onEnterLive).toHaveBeenCalledTimes(1);
   });
 
-  it('email non valida: non si entra e il fuoco va sull\'email', () => {
+  it('l\'ospite non deve lasciare un\'email per entrare', () => {
     render();
+    expect($('#waiting-email')).toBeNull();
     scrivi('#waiting-name', 'Relatore 1');
-    scrivi('#waiting-email', 'non-una-email');
-    const entra = pulsante(t.joinNowBtn);
-    expect(entra.getAttribute('aria-describedby')).toBe('waiting-email-invalid');
-
-    premi(entra);
-    expect(onEnterLive).not.toHaveBeenCalled();
-    expect(document.activeElement).toBe($('#waiting-email'));
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledTimes(1);
   });
 });
 
