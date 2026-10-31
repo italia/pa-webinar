@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Revizuiește textele"
       }
+    },
+    "voiceConsent": {
+      "title": "Transcrii înregistrarea completă?",
+      "message": "Acest eveniment a cerut fiecăruia consimțământul pentru transcrierea intervențiilor sale. Înregistrarea completă conține toate vocile, inclusiv ale celor care nu și-au dat consimțământul: transcrie-o doar dacă toți cei care vorbesc în ea au fost de acord. Confirmarea ta rămâne în jurnalul de activitate.",
+      "confirm": "Da, toți au fost de acord",
+      "cancel": "Anulează",
+      "waiting": "Transcrierea înregistrării complete nu a pornit singură: acest eveniment a cerut fiecăruia consimțământul pentru transcrierea intervențiilor sale. Pornește-o cu {button} doar dacă toți cei care vorbesc în înregistrare au fost de acord; altfel rămâne transcrierea din subtitrări."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
       "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
       "multitrack": "Sunt de acord ca intervențiile mele să fie transcrise, cu numele meu, pentru raportul evenimentului. Dacă evenimentul înregistrează o pistă audio separată pentru fiecare persoană, vocea mea este înregistrată numai în acest scop, iar pista se șterge după transcriere; nu este folosită pentru a-mi identifica sau reproduce vocea.",
-      "multitrackOptional": "Este opțional: dacă nu vă dați consimțământul, participați oricum, dar vocea dvs. nu este înregistrată, iar intervențiile dvs. nu intră în transcriere.",
+      "multitrackOptional": "Este opțional: dacă nu îți dai consimțământul, participi oricum, dar intervențiile tale nu intră în transcriere și vocea ta nu este înregistrată pe o pistă separată. Dacă evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
       "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
       "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere."
     },
@@ -5024,7 +5031,9 @@
       "version": "Versiunea pipeline-ului"
     },
     "overlapBadge": "simultan",
-    "overlapTitle": "Vorbire simultană: în acest interval vorbesc mai multe persoane în același timp."
+    "overlapTitle": "Vorbire simultană: în acest interval vorbesc mai multe persoane în același timp.",
+    "anonymousSpeaker": "Participant {n}",
+    "untranscribed": "Netranscris: vorbitorul nu și-a dat consimțământul"
   },
   "waiting": {
     "startsIn": "Evenimentul va începe în",

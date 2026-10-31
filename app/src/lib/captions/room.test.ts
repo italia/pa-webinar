@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const db = vi.hoisted(() => ({
-  registration: { findFirst: vi.fn() },
-  multitrackConsent: { findFirst: vi.fn() },
-  roomOccupant: { findUnique: vi.fn() },
+  registration: { findFirst: vi.fn(), findMany: vi.fn() },
+  multitrackConsent: { findFirst: vi.fn(), findMany: vi.fn() },
+  roomOccupant: { findUnique: vi.fn(), findMany: vi.fn() },
 }));
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => `chiaro:${v}` }));
 
-import { consensoTrascrizione, postoDellEndpoint } from './room';
+import { consensoTrascrizione, endpointConConsenso, postoDellEndpoint } from './room';
 
 const EVENTO = 'e1';
 const ISCRIZIONE = '11111111-2222-4333-8444-555555555555';
@@ -80,3 +80,35 @@ describe('postoDellEndpoint', () => {
     expect(await postoDellEndpoint(EVENTO, 'zz')).toBeNull();
   });
 });
+
+describe('endpointConConsenso', () => {
+  const ALTRA = '99999999-2222-4333-8444-555555555555';
+  it('la stessa regola di consensoTrascrizione, in poche letture', async () => {
+    db.roomOccupant.findMany.mockResolvedValue([
+      { endpointId: 'ep-iscritto', seatId: `reg-${ISCRIZIONE}-ab12cd34` },
+      { endpointId: 'ep-vecchio-testo', seatId: `reg-${ALTRA}-ab12cd34` },
+      { endpointId: 'ep-ospite', seatId: 'guest-1' },
+      { endpointId: 'ep-ospite-no', seatId: 'guest-2' },
+      { endpointId: 'ep-senza-posto', seatId: '' },
+    ]);
+    db.registration.findMany.mockResolvedValue([
+      { id: ISCRIZIONE, consentMultitrack: true, consentMultitrackVersion: 2 },
+      { id: ALTRA, consentMultitrack: true, consentMultitrackVersion: 1 },
+    ]);
+    db.multitrackConsent.findMany.mockResolvedValue([{ registrationId: null, jitsiUserId: 'guest-1' }]);
+
+    const ammessi = await endpointConConsenso(EVENTO, ['ep-iscritto', 'ep-vecchio-testo', 'ep-ospite', 'ep-ospite-no', 'ep-senza-posto', 'ep-ignoto'], 2);
+    expect([...ammessi].sort()).toEqual(['ep-iscritto', 'ep-ospite']);
+    // Con la sola traccia audio vale anche il testo precedente.
+    db.roomOccupant.findMany.mockResolvedValueOnce([{ endpointId: 'ep-vecchio-testo', seatId: `reg-${ALTRA}-ab12cd34` }]);
+    db.multitrackConsent.findMany.mockResolvedValueOnce([]);
+    const tracce = await endpointConConsenso(EVENTO, ['ep-vecchio-testo'], 1);
+    expect([...tracce]).toEqual(['ep-vecchio-testo']);
+  });
+
+  it('nessun endpoint, nessuna lettura', async () => {
+    expect((await endpointConConsenso(EVENTO, [], 2)).size).toBe(0);
+    expect(db.roomOccupant.findMany).not.toHaveBeenCalled();
+  });
+});
+

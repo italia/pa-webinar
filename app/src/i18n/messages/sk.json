@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Skontrolovať texty"
       }
+    },
+    "voiceConsent": {
+      "title": "Prepísať celý záznam?",
+      "message": "Toto podujatie požiadalo každého o súhlas s prepisom jeho príspevkov. Celý záznam obsahuje všetky hlasy, aj tých, ktorí súhlas nedali: prepíšte ho, len ak súhlasili všetci, ktorí v ňom hovoria. Vaše potvrdenie zostane v protokole činností.",
+      "confirm": "Áno, všetci súhlasili",
+      "cancel": "Zrušiť",
+      "waiting": "Prepis celého záznamu sa nespustil sám: toto podujatie požiadalo každého o súhlas s prepisom jeho príspevkov. Spustite ho tlačidlom {button} len vtedy, ak súhlasili všetci, ktorí v zázname hovoria; inak zostane prepis z titulkov."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
       "recordingNotice": "Podujatie sa nahráva (zvuk a video). Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátor neudelí slovo.",
       "multitrack": "Súhlasím s prepisom svojich príspevkov so svojím menom na účely správy z podujatia. Ak podujatie nahráva samostatnú zvukovú stopu každej osoby, môj hlas sa nahráva iba na tento účel a stopa sa po prepise vymaže; nepoužíva sa na identifikáciu ani napodobnenie môjho hlasu.",
-      "multitrackOptional": "Je to dobrovoľné: ak súhlas nedáte, môžete sa aj tak zúčastniť, ale váš hlas sa nenahráva a vaše príspevky nebudú v prepise.",
+      "multitrackOptional": "Je to dobrovoľné: ak nesúhlasíte, aj tak sa zúčastníte, ale vaše príspevky sa nedostanú do prepisu a váš hlas sa nebude nahrávať na samostatnú stopu. Ak sa podujatie nahráva, váš hlas vo videu aj tak zostane.",
       "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
       "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie."
     },
@@ -5024,7 +5031,9 @@
       "version": "Verzia pipeline"
     },
     "overlapBadge": "súbežne",
-    "overlapTitle": "Súbežná reč: v tomto intervale hovorí viac osôb naraz."
+    "overlapTitle": "Súbežná reč: v tomto intervale hovorí viac osôb naraz.",
+    "anonymousSpeaker": "Účastník {n}",
+    "untranscribed": "Neprepísané: rečník nedal súhlas"
   },
   "waiting": {
     "startsIn": "Udalosť začne o",

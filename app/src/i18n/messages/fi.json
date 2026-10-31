@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Tarkista tekstit"
       }
+    },
+    "voiceConsent": {
+      "title": "Litteroidaanko koko tallenne?",
+      "message": "Tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Koko tallenne sisältää kaikki äänet, myös niiden, jotka eivät antaneet suostumusta: litteroi se vain, jos kaikki siinä puhuvat ovat suostuneet. Vahvistuksesi tallentuu tapahtumalokiin.",
+      "confirm": "Kyllä, kaikki ovat suostuneet",
+      "cancel": "Peruuta",
+      "waiting": "Koko tallenteen litterointi ei käynnistynyt itsestään: tämä tapahtuma pyysi jokaiselta suostumusta puheenvuorojensa litterointiin. Käynnistä se painikkeella {button} vain, jos kaikki tallenteessa puhuvat ovat suostuneet; muuten tekstityksistä tehty litteraatio jää voimaan."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
       "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
       "multitrack": "Annan suostumukseni siihen, että puheenvuoroni litteroidaan nimelläni tapahtuman yhteenvetoa varten. Jos tapahtuma tallentaa jokaisesta henkilöstä erillisen ääniraidan, ääneni tallennetaan vain tätä tarkoitusta varten ja raita poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai jäljittelemiseen.",
-      "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, voit silti osallistua, mutta ääntäsi ei tallenneta eivätkä puheenvuorosi tule litterointiin.",
+      "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, osallistut silti, mutta puheenvuorosi eivät tule litteraatioon eikä ääntäsi tallenneta omalle raidalleen. Jos tapahtuma tallennetaan, äänesi on silti mukana videossa.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
       "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset."
     },
@@ -5024,7 +5031,9 @@
       "version": "Putken versio"
     },
     "overlapBadge": "päällekkäinen",
-    "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti."
+    "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti.",
+    "anonymousSpeaker": "Osallistuja {n}",
+    "untranscribed": "Ei litteroitu: puhuja ei antanut suostumusta"
   },
   "waiting": {
     "startsIn": "Tapahtuma alkaa",

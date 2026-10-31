@@ -169,7 +169,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         updatedEvent,
         callSession: { id: placeholder.callSessionId },
         recording,
-        postprod: { enqueued: 0, skippedExisting: 0, jobIds: [] as string[] },
+        postprod: { enqueued: 0, skippedExisting: 0, jobIds: [] as string[], voiceConsentRequired: false },
       };
     }
 
@@ -202,10 +202,17 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       select: { id: true },
     });
 
-    let postprod = { enqueued: 0, skippedExisting: 0, jobIds: [] as string[] };
+    let postprod: { enqueued: number; skippedExisting: number; jobIds: string[]; voiceConsentRequired?: boolean } = {
+      enqueued: 0,
+      skippedExisting: 0,
+      jobIds: [],
+    };
     if (event.aiTranscriptEnabled) {
+      // Senza conferma, il video completo di un evento con il consenso voce
+      // per voce non si trascrive: resta la trascrizione dai sottotitoli.
       postprod = await enqueuePostprodForRecording(tx, {
         recordingId: recording.id,
+        seServeConferma: 'salta',
       });
     }
 
@@ -217,6 +224,15 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     };
   });
 
+  // La trascrizione aspetta lo staff: lo si dice nel log, e la pagina della
+  // registrazione lo mostra accanto a «Genera AI».
+  if (result.postprod.voiceConsentRequired) {
+    console.warn(
+      `[recording-webhook] recording ${result.recording.id}: full-room transcription not started, ` +
+        'the event asked for per-voice consent and staff must confirm',
+    );
+  }
+
   return Response.json({
     success: true,
     eventId: result.updatedEvent.id,
@@ -225,5 +241,6 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     recordingId: result.recording.id,
     postprodEnqueued: result.postprod.enqueued,
     postprodJobIds: result.postprod.jobIds,
+    postprodAwaitsVoiceConsent: result.postprod.voiceConsentRequired === true,
   });
 });

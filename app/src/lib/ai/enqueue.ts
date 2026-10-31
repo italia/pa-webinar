@@ -21,6 +21,8 @@ import { SOURCE_LANGUAGE_FALLBACK } from './target-locales';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
 import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 
+import { confermaVociNecessaria, erroreConfermaVoci } from './voice-consent';
+
 export interface EnqueueOptions {
   recordingId: string;
   /** ISO-639-1 (default 'it'). */
@@ -32,12 +34,30 @@ export interface EnqueueOptions {
    * dipende dallo stesso TRANSCRIPT_JSON prodotto dal job radice.
    */
   multitrack?: boolean;
+  /**
+   * Chi avvia la pipeline a mano conferma che tutte le voci del video
+   * completo hanno acconsentito alla trascrizione. Senza, un evento che
+   * chiede il consenso voce per voce non trascrive il video completo
+   * (vedi `voice-consent.ts`).
+   */
+  allVoicesConsented?: boolean;
+  /**
+   * Cosa fare quando serve quella conferma e manca: `errore` (predefinito)
+   * lancia il 409 che l'interfaccia trasforma in domanda; `salta` non accoda
+   * niente in silenzio (il webhook della registrazione, che nessuno guarda).
+   */
+  seServeConferma?: 'errore' | 'salta';
 }
 
 export interface EnqueueResult {
   enqueued: number;
   skippedExisting: number;
   jobIds: string[];
+  /**
+   * Niente accodato: il video completo di un evento che chiede il consenso
+   * voce per voce si trascrive solo con la conferma esplicita.
+   */
+  voiceConsentRequired?: boolean;
 }
 
 /**
@@ -68,6 +88,8 @@ export async function enqueuePostprodForRecording(
           aiTranslationEnabled: true,
           aiDubbingEnabled: true,
           multitrackRecordingEnabled: true,
+          captionsTranscriptEnabled: true,
+          liveCaptionsEnabled: true,
           aiTargetLocales: true,
         },
       },
@@ -97,7 +119,7 @@ export async function enqueuePostprodForRecording(
   // jobs while the orchestrator is paused.
   const site = await tx.siteSetting.findUnique({
     where: { id: 'singleton' },
-    select: { aiPipelineEnabled: true },
+    select: { aiPipelineEnabled: true, liveCaptionsEnabled: true },
   });
   if (!site?.aiPipelineEnabled) {
     return { enqueued: 0, skippedExisting: 0, jobIds: [] };
@@ -122,6 +144,18 @@ export async function enqueuePostprodForRecording(
     isMultitrack =
       isMultitrackPlaceholder(recording.blobKey) ||
       (await tx.recordingTrack.count({ where: { recordingId: recording.id } })) > 0;
+  }
+
+  // Le tracce per persona contengono solo chi ha acconsentito; il video
+  // completo contiene tutti. In un evento che chiede il consenso voce per
+  // voce, il video completo si trascrive solo con la conferma esplicita:
+  // la trascrizione dell'evento resta quella dai sottotitoli.
+  if (
+    !opts.allVoicesConsented &&
+    (await confermaVociNecessaria(tx, { ...recording, eventId: recording.event.id }, recording.event, site, isMultitrack))
+  ) {
+    if ((opts.seServeConferma ?? 'errore') === 'errore') throw erroreConfermaVoci();
+    return { enqueued: 0, skippedExisting: 0, jobIds: [], voiceConsentRequired: true };
   }
 
   // Snapshot consent flags at enqueue time. Even if an admin flips

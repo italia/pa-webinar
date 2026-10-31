@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Review the texts"
       }
+    },
+    "voiceConsent": {
+      "title": "Transcribe the full recording?",
+      "message": "This event asked each person for consent to the transcription of what they say. The full recording contains every voice, including people who did not consent: transcribe it only if everyone who speaks in it has consented. Your confirmation is kept in the activity log.",
+      "confirm": "Yes, everyone consented",
+      "cancel": "Cancel",
+      "waiting": "The transcription of the full recording did not start on its own: this event asked each person for consent to the transcription of what they say. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the transcript from captions stays."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Recording consent is required to participate in this event",
       "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
       "multitrack": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is deleted after transcription; it is not used to identify or reproduce my voice.",
-      "multitrackOptional": "This is optional: if you do not consent you can still take part, but your voice is not recorded and what you say is not included in the transcript.",
+      "multitrackOptional": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track. If the event is recorded, your voice is still in the video.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
       "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration."
     },
@@ -5024,7 +5031,9 @@
       "version": "Pipeline version"
     },
     "overlapBadge": "overlapping",
-    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval."
+    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval.",
+    "anonymousSpeaker": "Participant {n}",
+    "untranscribed": "Not transcribed: the speaker did not consent"
   },
   "waiting": {
     "startsIn": "The event starts in",

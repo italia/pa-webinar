@@ -4014,6 +4014,13 @@
         "item": "{language}: {state}",
         "review": "Rivedi i testi"
       }
+    },
+    "voiceConsent": {
+      "title": "Trascrivere il video completo?",
+      "message": "Questo evento ha chiesto a ognuno il consenso alla trascrizione dei propri interventi. Il video completo contiene tutte le voci, anche di chi non l'ha dato: trascrivilo solo se tutte le persone che parlano nel video hanno acconsentito. La tua conferma resta nel registro delle attività.",
+      "confirm": "Sì, tutte hanno acconsentito",
+      "cancel": "Annulla",
+      "waiting": "La trascrizione del video completo non è partita da sola: in questo evento è stato chiesto a ognuno il consenso alla trascrizione dei propri interventi. Avviala con {button} solo se tutte le persone che parlano nel video hanno acconsentito; altrimenti resta la trascrizione dai sottotitoli."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Il consenso alla videoregistrazione è obbligatorio per partecipare a questo evento",
       "recordingNotice": "L'evento viene registrato (audio e video). Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
       "multitrack": "Acconsento alla trascrizione dei miei interventi, con il mio nome, per il resoconto dell'evento. Se l'evento registra una traccia audio per ogni persona, la mia voce viene registrata a questo solo scopo e la traccia si cancella dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
-      "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma la tua voce non viene registrata e i tuoi interventi non entrano nella trascrizione.",
+      "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma i tuoi interventi non entrano nella trascrizione e la tua voce non viene registrata in una traccia a parte. Se l'evento è registrato, la tua voce resta comunque nel video.",
       "stayInTouch": "Voglio ricevere informazioni sui prossimi eventi ed essere inserito nella rubrica, per essere invitato a eventi simili",
       "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione."
     },
@@ -5024,7 +5031,9 @@
       "version": "Versione pipeline"
     },
     "overlapBadge": "simultaneo",
-    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente."
+    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.",
+    "anonymousSpeaker": "Partecipante {n}",
+    "untranscribed": "Intervento non trascritto: chi parlava non ha dato il consenso"
   },
   "waiting": {
     "startsIn": "L'evento inizierà tra",

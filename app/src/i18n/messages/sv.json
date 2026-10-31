@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Granska texterna"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkribera hela inspelningen?",
+      "message": "Det här evenemanget bad var och en om samtycke till att det de säger transkriberas. Hela inspelningen innehåller alla röster, även deras som inte samtyckte: transkribera den bara om alla som talar i den har samtyckt. Din bekräftelse sparas i aktivitetsloggen.",
+      "confirm": "Ja, alla har samtyckt",
+      "cancel": "Avbryt",
+      "waiting": "Transkriberingen av hela inspelningen startade inte av sig själv: det här evenemanget bad var och en om samtycke till att det de säger transkriberas. Starta den med {button} bara om alla som talar i inspelningen har samtyckt; annars finns transkriptionen från undertexterna kvar."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
       "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
       "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
-      "multitrackOptional": "Det är frivilligt: om du inte samtycker kan du ändå delta, men din röst spelas inte in och dina inlägg kommer inte med i transkriptionen.",
+      "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
       "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan."
     },
@@ -5024,7 +5031,9 @@
       "version": "Pipelineversion"
     },
     "overlapBadge": "samtidigt",
-    "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt."
+    "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt.",
+    "anonymousSpeaker": "Deltagare {n}",
+    "untranscribed": "Inte transkriberat: talaren gav inte sitt samtycke"
   },
   "waiting": {
     "startsIn": "Evenemanget börjar om",

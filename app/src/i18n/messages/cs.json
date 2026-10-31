@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Zkontrolovat texty"
       }
+    },
+    "voiceConsent": {
+      "title": "Přepsat celý záznam?",
+      "message": "Tato akce požádala každého o souhlas s přepisem jeho příspěvků. Celý záznam obsahuje všechny hlasy, i těch, kdo souhlas nedali: přepište ho jen tehdy, pokud souhlasili všichni, kdo v něm mluví. Vaše potvrzení zůstane v protokolu činností.",
+      "confirm": "Ano, všichni souhlasili",
+      "cancel": "Zrušit",
+      "waiting": "Přepis celého záznamu se nespustil sám: tato akce požádala každého o souhlas s přepisem jeho příspěvků. Spusťte ho tlačítkem {button} jen tehdy, pokud souhlasili všichni, kdo v záznamu mluví; jinak zůstane přepis z titulků."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
       "recordingNotice": "Akce se nahrává (zvuk a video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátor neudělí slovo.",
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
-      "multitrackOptional": "Je to nepovinné: pokud souhlas nedáte, můžete se akce přesto účastnit, ale váš hlas se nenahrává a vaše příspěvky nebudou v přepisu.",
+      "multitrackOptional": "Je to dobrovolné: pokud nesouhlasíte, můžete se přesto zúčastnit, ale vaše příspěvky nebudou v přepisu a váš hlas se nebude nahrávat na samostatnou stopu. Pokud se akce nahrává, váš hlas ve videu přesto zůstane.",
       "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
       "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace."
     },
@@ -5024,7 +5031,9 @@
       "version": "Verze pipeline"
     },
     "overlapBadge": "současně",
-    "overlapTitle": "Souběžná řeč: v tomto úseku mluví více osob najednou."
+    "overlapTitle": "Souběžná řeč: v tomto úseku mluví více osob najednou.",
+    "anonymousSpeaker": "Účastník {n}",
+    "untranscribed": "Nepřepsáno: mluvčí nedal souhlas"
   },
   "waiting": {
     "startsIn": "Událost začne za",

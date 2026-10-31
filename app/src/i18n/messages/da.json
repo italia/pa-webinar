@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Gennemse teksterne"
       }
+    },
+    "voiceConsent": {
+      "title": "Transskribere hele optagelsen?",
+      "message": "Dette arrangement bad hver person om samtykke til transskription af deres indlæg. Hele optagelsen indeholder alle stemmer, også dem der ikke gav samtykke: transskribér den kun, hvis alle, der taler i den, har givet samtykke. Din bekræftelse gemmes i aktivitetsloggen.",
+      "confirm": "Ja, alle har givet samtykke",
+      "cancel": "Annuller",
+      "waiting": "Transskriptionen af hele optagelsen startede ikke af sig selv: dette arrangement bad hver person om samtykke til transskription af deres indlæg. Start den med {button} kun hvis alle, der taler i optagelsen, har givet samtykke; ellers bevares transskriptionen fra underteksterne."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
       "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
-      "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, kan du stadig deltage, men din stemme optages ikke, og dine indlæg kommer ikke med i udskriften.",
+      "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor. Hvis arrangementet optages, er din stemme dog stadig med i videoen.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
       "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding."
     },
@@ -5024,7 +5031,9 @@
       "version": "Pipelineversion"
     },
     "overlapBadge": "samtidig",
-    "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid."
+    "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid.",
+    "anonymousSpeaker": "Deltager {n}",
+    "untranscribed": "Ikke transskriberet: den, der talte, gav ikke samtykke"
   },
   "waiting": {
     "startsIn": "Begivenheden starter om",

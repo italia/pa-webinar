@@ -90,6 +90,12 @@ function overlapMs(aStart: number, aEnd: number, bStart: number, bEnd: number): 
 export function alignDiarizationToSpeakers(
   segments: DiarizationSegment[],
   log: SpeakerLogEntry[],
+  /**
+   * Se il nome di quel partecipante si puo' mostrare (il consenso). Con il
+   * filtro, un cluster il cui partecipante prevalente non ha nome o non lo
+   * ammette resta senza nome: non prende quello di un altro.
+   */
+  nomeAmmesso?: (participantId: string) => boolean,
 ): Map<string, string> {
   const result = new Map<string, string>();
   if (log.length === 0 || segments.length === 0) {
@@ -132,14 +138,18 @@ export function alignDiarizationToSpeakers(
     }
 
     // Best match: partecipante con più ms di overlap che ABBIA un displayName.
+    // Con il filtro del consenso vince chi ha parlato di piu', con o senza
+    // nome: se non lo si puo' nominare il cluster resta senza nome, invece di
+    // prendere quello del secondo (un'attribuzione sbagliata). Senza filtro,
+    // vince il partecipante con nome che ha parlato di piu'.
     let bestName: string | undefined;
     let bestScore = 0;
     for (const [participantId, score] of scoreByParticipant) {
       const name = nameByParticipant.get(participantId);
-      if (!name) continue; // senza nome non possiamo etichettare
+      if (!nomeAmmesso && !name) continue; // senza nome non possiamo etichettare
       if (score > bestScore) {
         bestScore = score;
-        bestName = name;
+        bestName = name && (!nomeAmmesso || nomeAmmesso(participantId)) ? name : undefined;
       }
     }
 

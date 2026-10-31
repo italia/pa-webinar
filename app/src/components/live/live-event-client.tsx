@@ -2260,7 +2260,11 @@ export default function LiveEventClient({
               </label>
             ))}
           </div>
-          {event.recordingEnabled && event.aiPostprodEnabled && (
+          {/* Con la trascrizione dai sottotitoli e senza tracce per persona, il
+              video completo contiene anche le voci di chi ha detto no: non si
+              trascrive da solo, e la casella prometterebbe cio' che non accade. */}
+          {event.recordingEnabled && event.aiPostprodEnabled &&
+            !(event.captionsTranscript && !event.multitrackRecordingEnabled) && (
             <label
               className="d-flex align-items-center gap-2 mt-3"
               style={{ cursor: 'pointer', fontSize: '0.88rem' }}

@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Texte prüfen"
       }
+    },
+    "voiceConsent": {
+      "title": "Die gesamte Aufzeichnung transkribieren?",
+      "message": "Dieses Event hat jede Person um die Einwilligung zur Transkription ihrer Beiträge gebeten. Die gesamte Aufzeichnung enthält alle Stimmen, auch die von Personen ohne Einwilligung: Transkribieren Sie sie nur, wenn alle, die darin sprechen, eingewilligt haben. Ihre Bestätigung wird im Aktivitätsprotokoll gespeichert.",
+      "confirm": "Ja, alle haben eingewilligt",
+      "cancel": "Abbrechen",
+      "waiting": "Die Transkription der gesamten Aufzeichnung ist nicht von selbst gestartet: Dieses Event hat jede Person um die Einwilligung zur Transkription ihrer Beiträge gebeten. Starten Sie sie mit {button} nur, wenn alle, die in der Aufzeichnung sprechen, eingewilligt haben; sonst bleibt das Transkript aus den Untertiteln."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Die Einwilligung zur Aufzeichnung ist für die Teilnahme an dieser Veranstaltung erforderlich",
       "recordingNotice": "Die Veranstaltung wird aufgezeichnet (Ton und Bild). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihre Stimme noch Ihr Bild, es sei denn, die Moderation erteilt Ihnen das Wort.",
       "multitrack": "Ich willige ein, dass meine Wortbeiträge mit meinem Namen für den Bericht der Veranstaltung transkribiert werden. Zeichnet die Veranstaltung für jede Person eine eigene Tonspur auf, wird meine Stimme nur zu diesem Zweck aufgezeichnet und die Spur nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder nachzubilden.",
-      "multitrackOptional": "Das ist freiwillig: Ohne Einwilligung können Sie trotzdem teilnehmen, aber Ihre Stimme wird nicht aufgezeichnet und Ihre Beiträge kommen nicht ins Transkript.",
+      "multitrackOptional": "Freiwillig: Ohne Einwilligung nehmen Sie trotzdem teil, aber Ihre Beiträge kommen nicht in das Transkript und Ihre Stimme wird nicht auf einer eigenen Spur aufgezeichnet. Wird das Event aufgezeichnet, ist Ihre Stimme trotzdem im Video zu hören.",
       "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
       "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung."
     },
@@ -5024,7 +5031,9 @@
       "version": "Version der Pipeline"
     },
     "overlapBadge": "gleichzeitig",
-    "overlapTitle": "Gleichzeitiges Sprechen: In diesem Abschnitt spricht mehr als eine Person zur selben Zeit."
+    "overlapTitle": "Gleichzeitiges Sprechen: In diesem Abschnitt spricht mehr als eine Person zur selben Zeit.",
+    "anonymousSpeaker": "Teilnehmende Person {n}",
+    "untranscribed": "Nicht transkribiert: Die sprechende Person hat nicht eingewilligt"
   },
   "waiting": {
     "startsIn": "Die Veranstaltung beginnt in",

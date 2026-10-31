@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Pregledaj tekstove"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkribirati cijelu snimku?",
+      "message": "Ovaj je događaj tražio od svakoga privolu za transkripciju njegovih izlaganja. Cijela snimka sadrži sve glasove, i one koji nisu dali privolu: transkribirajte je samo ako su svi koji u njoj govore dali privolu. Vaša potvrda ostaje u zapisniku aktivnosti.",
+      "confirm": "Da, svi su dali privolu",
+      "cancel": "Odustani",
+      "waiting": "Transkripcija cijele snimke nije pokrenuta sama: ovaj je događaj od svakoga tražio privolu za transkripciju njegovih izlaganja. Pokrenite je gumbom {button} samo ako su svi koji govore u snimci dali privolu; inače ostaje transkript iz titlova."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Pristanak na snimanje je obvezan za sudjelovanje u ovom događaju",
       "recordingNotice": "Događaj se snima (zvuk i video). Sudjeluješ bez mikrofona i kamere: snimka ne sadrži tvoj glas ni tvoju sliku, osim ako ti voditelj ne da riječ.",
       "multitrack": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događanju. Ako događanje snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se briše nakon transkripcije; ne koristi se za prepoznavanje ili oponašanje mog glasa.",
-      "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaš se glas ne snima i vaša izlaganja ne ulaze u transkript.",
+      "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu. Ako se događaj snima, vaš glas ipak ostaje u videozapisu.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
       "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave."
     },
@@ -5024,7 +5031,9 @@
       "version": "Verzija pipelinea"
     },
     "overlapBadge": "istodobno",
-    "overlapTitle": "Istodobni govor: u ovom intervalu istovremeno govori više osoba."
+    "overlapTitle": "Istodobni govor: u ovom intervalu istovremeno govori više osoba.",
+    "anonymousSpeaker": "Sudionik {n}",
+    "untranscribed": "Nije transkribirano: govornik nije dao privolu"
   },
   "waiting": {
     "startsIn": "Događaj počinje za",

@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Szövegek ellenőrzése"
       }
+    },
+    "voiceConsent": {
+      "title": "Átírja a teljes felvételt?",
+      "message": "Ez az esemény mindenkitől hozzájárulást kért a hozzászólásai átírásához. A teljes felvétel minden hangot tartalmaz, azokét is, akik nem járultak hozzá: csak akkor írja át, ha mindenki hozzájárult, aki beszél benne. A megerősítése a tevékenységnaplóban marad.",
+      "confirm": "Igen, mindenki hozzájárult",
+      "cancel": "Mégse",
+      "waiting": "A teljes felvétel átírása nem indult el magától: ez az esemény mindenkitől hozzájárulást kért a hozzászólásai átírásához. Csak akkor indítsa el az {button} gombbal, ha mindenki hozzájárult, aki a felvételen beszél; különben a feliratokból készült átirat marad."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
       "recordingNotice": "Az eseményről felvétel készül (hang és kép). Mikrofon és kamera nélkül veszel részt: a felvétel nem tartalmazza a hangodat és a képedet, kivéve, ha a házigazda szót ad neked.",
       "multitrack": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sáv az átírás után törlődik; nem használják a hangom azonosítására vagy utánzására.",
-      "multitrackOptional": "Ez nem kötelező: ha nem járul hozzá, ugyanúgy részt vehet, de a hangját nem rögzítik, és a felszólalásai nem kerülnek az átiratba.",
+      "multitrackOptional": "Nem kötelező: ha nem járul hozzá, ugyanúgy részt vesz, de a hozzászólásai nem kerülnek az átiratba, és a hangját nem rögzítjük külön sávon. Ha az eseményt rögzítik, a hangja a videóban így is benne marad.",
       "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
       "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik."
     },
@@ -5024,7 +5031,9 @@
       "version": "A pipeline verziója"
     },
     "overlapBadge": "egyidejű",
-    "overlapTitle": "Egyidejű beszéd: ebben az intervallumban egyszerre több személy beszél."
+    "overlapTitle": "Egyidejű beszéd: ebben az intervallumban egyszerre több személy beszél.",
+    "anonymousSpeaker": "{n}. résztvevő",
+    "untranscribed": "Nincs átírva: a beszélő nem járult hozzá"
   },
   "waiting": {
     "startsIn": "Az esemény kezdéséig hátralévő idő",

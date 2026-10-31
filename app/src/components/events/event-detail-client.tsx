@@ -303,7 +303,7 @@ export default function EventDetailClient({
   useEffect(() => {
     if (!isEnded || (!event.recordingUrl && !event.transcriptPublished)) return;
     let cancelled = false;
-    fetch(`/api/events/${event.slug}/postprod/transcript`, { credentials: 'include' })
+    fetch(`/api/events/${event.slug}/postprod/transcript?locale=${locale}`, { credentials: 'include' })
       .then(async (r) => {
         if (!r.ok) return null;
         const data = (await r.json()) as {

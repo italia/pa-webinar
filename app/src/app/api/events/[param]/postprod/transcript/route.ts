@@ -10,6 +10,8 @@
  * only.
  */
 
+import { getTranslations } from 'next-intl/server';
+
 import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
@@ -19,6 +21,9 @@ import { assertPostprodAccessible } from '@/lib/ai/access';
 import { LOWCONF_AVG_LOGPROB } from '@/lib/ai/reliability';
 import { alignDiarizationToSpeakers } from '@/lib/ai/speaker-align';
 import { CAPTIONS_TRANSCRIPT_MODEL, registrazionePubblica } from '@/lib/captions/transcript';
+import { endpointConConsenso } from '@/lib/captions/room';
+import { regimeConsensoVoce } from '@/lib/ai/voice-consent';
+import { defaultLocale, locales } from '@/i18n/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,11 +46,54 @@ interface Segment {
 
 interface TranscriptJson {
   segments?: Segment[];
+  /** Trascrizione dai sottotitoli: i tratti di chi non ha dato il consenso. */
+  untranscribed?: Array<{ start: number; end: number }>;
   language?: string;
   speakers?: Array<{ diarLabel: string; totalSpeechSec?: number }>;
 }
 
-export const GET = withErrorHandling(async (_request, context) => {
+/**
+ * I partecipanti del registro di chi parlava il cui nome si puo' mostrare:
+ * in un evento in cui il consenso voce per voce e' stato chiesto, solo chi
+ * l'ha dato (dall'endpoint al posto, dal posto al consenso, con la versione
+ * del testo che vale per l'evento). Negli altri eventi tutti (`null`).
+ *
+ * La rotta e' pubblica e non si mette in cache, e dopo l'evento la risposta
+ * cambia di rado (una cancellazione su richiesta): si tiene per qualche
+ * minuto per registrazione, invece di rileggere i consensi a ogni visita.
+ */
+const NOMI_TTL_MS = 5 * 60_000;
+const nomiInCache = new Map<string, { scade: number; ammessi: Set<string> | null }>();
+
+async function partecipantiConNome(
+  eventId: string,
+  recordingId: string,
+  log: Array<{ participantId: string }>,
+): Promise<((participantId: string) => boolean) | undefined> {
+  const adesso = Date.now();
+  let voce = nomiInCache.get(recordingId);
+  if (!voce || voce.scade < adesso) {
+    const [evento, sito] = await Promise.all([
+      prisma.event.findUnique({
+        where: { id: eventId },
+        select: { multitrackRecordingEnabled: true, captionsTranscriptEnabled: true, liveCaptionsEnabled: true },
+      }),
+      prisma.siteSetting.findUnique({ where: { id: 'singleton' }, select: { liveCaptionsEnabled: true } }),
+    ]);
+    const regime = evento ? await regimeConsensoVoce(prisma, eventId, evento, sito ?? {}) : null;
+    const ammessi = regime?.chiesto
+      ? await endpointConConsenso(eventId, [...new Set(log.map((e) => e.participantId))], regime.versione)
+      : null;
+    voce = { scade: adesso + NOMI_TTL_MS, ammessi };
+    if (nomiInCache.size > 500) nomiInCache.clear();
+    nomiInCache.set(recordingId, voce);
+  }
+  // Senza consenso chiesto, nessun filtro: resta la regola di sempre.
+  const { ammessi } = voce;
+  return ammessi ? (id) => ammessi.has(id) : undefined;
+}
+
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = (await (context as { params: Promise<{ param: string }> }).params);
 
   const { eventId, ambito, soloSottotitoli } = await assertPostprodAccessible(slug);
@@ -114,7 +162,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   // Mapping speaker → label umano. Per gli speaker mappati dall'admin
   // usiamo il displayName. Per i SPEAKER_xx anonimi, sostituiamo con
-  // "Partecipante N" ordinato per tempo di parola (top speaker = 1):
+  // «Partecipante N» (tradotto) ordinato per tempo di parola (top speaker = 1):
   // visivamente molto più gentile di "SPEAKER_03" per il visitatore.
   // L'admin può sempre identificarli a posteriori col mapping; finché
   // non lo fa, "Partecipante" è meglio del diar label crudo.
@@ -122,7 +170,8 @@ export const GET = withErrorHandling(async (_request, context) => {
   // usando la timeline del dominant speaker catturata in diretta. Se un
   // cluster pyannote si sovrappone prevalentemente a un partecipante
   // noto, usiamo quel nome invece di "Partecipante N". Best-effort:
-  // senza log o senza match si ricade sul fallback numerico.
+  // senza log o senza match si ricade sul fallback numerico. In un evento
+  // che chiede il consenso voce per voce, il nome solo di chi l'ha dato.
   const dominantLog = Array.isArray(recording.callSession?.dominantSpeakerLog)
     ? (recording.callSession.dominantSpeakerLog as Array<{
         atMs: number;
@@ -130,12 +179,25 @@ export const GET = withErrorHandling(async (_request, context) => {
         displayName?: string;
       }>)
     : [];
-  const alignedNames = alignDiarizationToSpeakers(
-    (transcript.segments ?? [])
-      .filter((s) => s.speaker)
-      .map((s) => ({ start: s.start, end: s.end, speaker: s.speaker as string })),
-    dominantLog,
-  );
+  // Il registro serve solo per le voci che nessuno ha nominato: senza, non
+  // si legge niente (la rotta e' pubblica e non si mette in cache).
+  const daNominare = recording.speakers.some((sp) => !sp.displayName);
+  const alignedNames =
+    daNominare && dominantLog.length > 0
+      ? alignDiarizationToSpeakers(
+          (transcript.segments ?? [])
+            .filter((s) => s.speaker)
+            .map((s) => ({ start: s.start, end: s.end, speaker: s.speaker as string })),
+          dominantLog,
+          await partecipantiConNome(eventId, recording.id, dominantLog),
+        )
+      : new Map<string, string>();
+
+  // L'etichetta delle voci senza nome, nella lingua della pagina che chiede:
+  // si carica solo se c'e' una voce da etichettare.
+  const richiesta = new URL(request.url).searchParams.get('locale') ?? defaultLocale;
+  const lingua = (locales as readonly string[]).includes(richiesta) ? richiesta : defaultLocale;
+  const tVoci = daNominare ? await getTranslations({ locale: lingua, namespace: 'postprod' }) : null;
 
   const speakerMap = new Map<string, string>();
   let anonCounter = 0;
@@ -148,7 +210,7 @@ export const GET = withErrorHandling(async (_request, context) => {
         speakerMap.set(sp.diarLabel, aligned);
       } else {
         anonCounter += 1;
-        speakerMap.set(sp.diarLabel, `Partecipante ${anonCounter}`);
+        speakerMap.set(sp.diarLabel, tVoci ? tVoci('anonymousSpeaker', { n: anonCounter }) : sp.diarLabel);
       }
     });
   for (const sp of recording.speakers) {
@@ -263,6 +325,11 @@ export const GET = withErrorHandling(async (_request, context) => {
     recordingId: recording.id,
     sourceLanguage: recording.sourceLanguage ?? transcript.language ?? 'it',
     segments,
+    untranscribed: Array.isArray(transcript.untranscribed)
+      ? transcript.untranscribed.filter(
+          (v) => typeof v?.start === 'number' && typeof v?.end === 'number',
+        )
+      : [],
     speakers: recording.speakers,
     subtitleTracks,
     summaries,

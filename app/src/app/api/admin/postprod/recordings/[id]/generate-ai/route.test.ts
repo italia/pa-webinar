@@ -5,12 +5,13 @@ const m = vi.hoisted(() => ({
   sito: vi.fn(),
   registrazione: vi.fn(),
   corretta: vi.fn(),
+  accoda: vi.fn(),
   soloSottotitoli: vi.fn(),
 }));
 vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({ get: () => undefined })) }));
 vi.mock('@/lib/auth/staff-session', () => ({ requireRecordingManager: vi.fn(async () => ({ role: 'admin' })) }));
 vi.mock('@/lib/audit/admin-audit', () => ({ logAdminAction: vi.fn() }));
-vi.mock('@/lib/ai/enqueue', () => ({ enqueuePostprodForRecording: vi.fn() }));
+vi.mock('@/lib/ai/enqueue', () => ({ enqueuePostprodForRecording: m.accoda }));
 vi.mock('@/lib/captions/transcript', () => ({
   trascrizioneCorrettaDaiSottotitoli: m.corretta,
   registrazioneSoloSottotitoli: m.soloSottotitoli,
@@ -27,11 +28,11 @@ vi.mock('@/lib/db', () => ({
 import { POST } from './route';
 
 const ID = '11111111-2222-4333-8444-555555555555';
-const genera = () =>
+const genera = (corpo: Record<string, unknown> = { summary: true }) =>
   POST(
     new Request(`http://x/api/admin/postprod/recordings/${ID}/generate-ai`, {
       method: 'POST',
-      body: JSON.stringify({ summary: true }),
+      body: JSON.stringify(corpo),
     }) as never,
     { params: Promise.resolve({ id: ID }) } as never,
   );
@@ -42,6 +43,7 @@ beforeEach(() => {
   m.registrazione.mockResolvedValue({ id: ID, eventId: 'e', blobKey: 'k' });
   m.corretta.mockResolvedValue(false);
   m.soloSottotitoli.mockReturnValue(false);
+  m.accoda.mockResolvedValue({ enqueued: 2, skippedExisting: 0, jobIds: ['a', 'b'] });
 });
 
 // I codici sono il contratto con le schermate, che li traducono
@@ -66,5 +68,30 @@ describe('POST generate-ai: i codici delle condizioni che l\'utente puo\' risolv
     const res = await genera();
     expect(res.status).toBe(422);
     expect((await res.json()).code).toBe('RECORDING_WITHOUT_MEDIA');
+  });
+});
+
+describe('POST generate-ai: il video completo di un evento con consenso voce per voce', () => {
+  it('senza conferma: 409 VOICE_CONSENT_REQUIRED', async () => {
+    const { erroreConfermaVoci } = await import('@/lib/ai/voice-consent');
+    m.accoda.mockRejectedValueOnce(erroreConfermaVoci());
+    const res = await genera();
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('VOICE_CONSENT_REQUIRED');
+    expect(m.accoda).toHaveBeenCalledWith(expect.anything(), { recordingId: ID, allVoicesConsented: false });
+  });
+
+  it('con la conferma la passa alla pipeline', async () => {
+    const res = await genera({ summary: true, allVoicesConsented: true });
+    expect(res.status).toBe(200);
+    expect(m.accoda).toHaveBeenCalledWith(expect.anything(), { recordingId: ID, allVoicesConsented: true });
+  });
+});
+
+describe('POST generate-ai: il corpo', () => {
+  it('rifiuta una conferma che non e\' un booleano', async () => {
+    const res = await genera({ allVoicesConsented: 'true' });
+    expect(res.status).toBe(422);
+    expect(m.accoda).not.toHaveBeenCalled();
   });
 });

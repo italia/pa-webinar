@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Athbhreithnigh na téacsanna"
       }
+    },
+    "voiceConsent": {
+      "title": "An taifeadadh iomlán a thras-scríobh?",
+      "message": "D'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Tá gach guth sa taifeadadh iomlán, lena n-áirítear daoine nár thug toiliú: ná déan é a thras-scríobh ach amháin má thug gach duine a labhraíonn ann toiliú. Coimeádtar do dhearbhú sa loga gníomhaíochta.",
+      "confirm": "Sea, thug gach duine toiliú",
+      "cancel": "Cealaigh",
+      "waiting": "Níor thosaigh tras-scríobh an taifeadta iomláin leis féin: d'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Ná tosaigh é le {button} ach amháin má thug gach duine a labhraíonn sa taifeadadh toiliú; murach sin fanfaidh an tras-scríbhinn ó na fotheidil."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
       "recordingNotice": "Taifeadtar an t-imeacht (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: níl do ghuth ná d'íomhá sa taifeadadh, ach amháin má thugann an t-óstach an t-urlár duit.",
       "multitrack": "Toilím go ndéanfar tras-scríobh ar mo chuid cainte, le m'ainm, do thuarascáil an imeachta. Má thaifeadann an t-imeacht rian fuaime ar leith do gach duine, ní thaifeadtar mo ghuth ach chun na críche sin agus scriostar an rian tar éis an tras-scríofa; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
-      "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, is féidir leat páirt a ghlacadh fós, ach ní thaifeadtar do ghuth agus ní chuirtear do chuid cainte sa tras-scríbhinn.",
+      "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, glacfaidh tú páirt mar sin féin, ach ní rachaidh a ndeir tú isteach sa tras-scríbhinn agus ní thaifeadfar do ghuth ar rian ar leith. Má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
       "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo."
     },
@@ -5024,7 +5031,9 @@
       "version": "Leagan na píblíne"
     },
     "overlapBadge": "comhuaineach",
-    "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo."
+    "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo.",
+    "anonymousSpeaker": "Rannpháirtí {n}",
+    "untranscribed": "Níor tras-scríobhadh é: níor thug an cainteoir toiliú"
   },
   "waiting": {
     "startsIn": "Tosóidh an t-imeacht i gceann",

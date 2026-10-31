@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Peržiūrėti tekstus"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkribuoti visą įrašą?",
+      "message": "Šis renginys kiekvieno paprašė sutikimo transkribuoti jo pasisakymus. Visame įraše yra visi balsai, taip pat ir nedavusių sutikimo: transkribuokite jį tik jei sutiko visi, kurie jame kalba. Jūsų patvirtinimas lieka veiklos žurnale.",
+      "confirm": "Taip, visi sutiko",
+      "cancel": "Atšaukti",
+      "waiting": "Viso įrašo transkripcija nepradėta automatiškai: šis renginys kiekvieno paprašė sutikimo transkribuoti jo pasisakymus. Pradėkite ją mygtuku {button} tik jei sutiko visi, kurie kalba įraše; kitaip lieka transkripcija iš subtitrų."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
       "recordingNotice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nebus jūsų balso ar atvaizdo, nebent vedėjas suteiks jums žodį.",
       "multitrack": "Sutinku, kad mano pasisakymai būtų transkribuoti su mano vardu renginio ataskaitai. Jei renginyje kiekvienam asmeniui įrašomas atskiras garso takelis, mano balsas įrašomas tik šiuo tikslu, o takelis ištrinamas po transkribavimo; jis nenaudojamas mano balsui atpažinti ar atkurti.",
-      "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek galite dalyvauti, tačiau jūsų balsas neįrašomas, o jūsų pasisakymai nepatenka į stenogramą.",
+      "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek dalyvaujate, bet jūsų pasisakymai nepateks į transkripciją ir jūsų balsas nebus įrašomas atskirame takelyje. Jei renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
       "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
       "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos."
     },
@@ -5024,7 +5031,9 @@
       "version": "Grandinės versija"
     },
     "overlapBadge": "vienu metu",
-    "overlapTitle": "Kalbėjimas vienu metu: šiame intervale kalba daugiau nei vienas asmuo."
+    "overlapTitle": "Kalbėjimas vienu metu: šiame intervale kalba daugiau nei vienas asmuo.",
+    "anonymousSpeaker": "Dalyvis {n}",
+    "untranscribed": "Netranskribuota: kalbėtojas nedavė sutikimo"
   },
   "waiting": {
     "startsIn": "Renginys prasidės po",

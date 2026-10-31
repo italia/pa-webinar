@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Pārskatīt tekstus"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkribēt visu ierakstu?",
+      "message": "Šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Viss ieraksts satur visas balsis, arī to, kas piekrišanu nedeva: transkribējiet to tikai tad, ja visi, kas tajā runā, ir piekrituši. Jūsu apstiprinājums paliek darbību žurnālā.",
+      "confirm": "Jā, visi piekrita",
+      "cancel": "Atcelt",
+      "waiting": "Visa ieraksta transkripcija nesākās pati: šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Sāciet to ar pogu {button} tikai tad, ja visi, kas runā ierakstā, ir piekrituši; pretējā gadījumā paliek transkripcija no subtitriem."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
       "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
-      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā varat piedalīties, bet jūsu balss netiek ierakstīta un jūsu teiktais neietilpst atšifrējumā.",
+      "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas."
     },
@@ -5024,7 +5031,9 @@
       "version": "Konveijera versija"
     },
     "overlapBadge": "vienlaikus",
-    "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona."
+    "overlapTitle": "Vienlaicīga runa: šajā intervālā vienlaikus runā vairāk nekā viena persona.",
+    "anonymousSpeaker": "Dalībnieks {n}",
+    "untranscribed": "Nav transkribēts: runātājs nedeva piekrišanu"
   },
   "waiting": {
     "startsIn": "Pasākums sāksies pēc",

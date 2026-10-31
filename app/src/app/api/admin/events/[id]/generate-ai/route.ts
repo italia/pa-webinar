@@ -23,6 +23,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { leggiCorpoAvvio } from '@/lib/ai/voice-consent';
 import { registrazioneSoloSottotitoli, trascrizioneCorrettaDaiSottotitoli } from '@/lib/captions/transcript';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
@@ -47,13 +48,10 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  let alsoSummary = false;
-  try {
-    const body = (await request.json()) as { summary?: boolean } | null;
-    alsoSummary = body?.summary === true;
-  } catch {
-    /* no body → transcript only */
-  }
+  // Senza corpo: solo la trascrizione.
+  const corpo = await leggiCorpoAvvio(request);
+  const alsoSummary = corpo.summary === true;
+  const allVoicesConsented = corpo.allVoicesConsented === true;
 
   const result = await prisma.$transaction(async (tx) => {
     // Latest recording for the event (an event can have multiple CallSessions,
@@ -104,7 +102,7 @@ export const POST = withErrorHandling(async (request, context) => {
       },
     });
 
-    return enqueuePostprodForRecording(tx, { recordingId: recording.id });
+    return enqueuePostprodForRecording(tx, { recordingId: recording.id, allVoicesConsented });
   });
 
   await logAdminAction({
@@ -113,6 +111,7 @@ export const POST = withErrorHandling(async (request, context) => {
     target: id,
     details: {
       source: 'generate-ai',
+      allVoicesConsented,
       enqueued: result.enqueued,
       skipped: result.skippedExisting,
     },

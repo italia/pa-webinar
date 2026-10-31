@@ -3804,6 +3804,13 @@
         "item": "{language} : {state}",
         "review": "Revoir les textes"
       }
+    },
+    "voiceConsent": {
+      "title": "Transcrire l'enregistrement complet ?",
+      "message": "Cet événement a demandé à chaque personne son consentement à la transcription de ses interventions. L'enregistrement complet contient toutes les voix, y compris celles des personnes qui ne l'ont pas donné : ne le transcrivez que si toutes les personnes qui y parlent ont consenti. Votre confirmation est conservée dans le journal d'activité.",
+      "confirm": "Oui, tout le monde a consenti",
+      "cancel": "Annuler",
+      "waiting": "La transcription de l{button}a pas démarré seule : cet événement a demandé à chaque personne son consentement à la transcription de ses interventions. Lancez-la avec « Générer avec l'IA » seulement si toutes les personnes qui parlent dans l'enregistrement ont consenti ; sinon, la transcription issue des sous-titres reste."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Le consentement à l'enregistrement est obligatoire pour participer à cet événement",
       "recordingNotice": "L'événement est enregistré (audio et vidéo). Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si l'animateur vous donne la parole.",
       "multitrack": "J'accepte que mes interventions soient transcrites, avec mon nom, pour le compte rendu de l'événement. Si l'événement enregistre une piste audio distincte pour chaque personne, ma voix est enregistrée à cette seule fin et la piste est supprimée après la transcription ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
-      "multitrackOptional": "C'est facultatif : si vous ne donnez pas votre accord, vous participez quand même, mais votre voix n'est pas enregistrée et vos interventions n'entrent pas dans la transcription.",
+      "multitrackOptional": "C'est facultatif : si vous ne consentez pas, vous participez quand même, mais vos interventions n'entrent pas dans la transcription et votre voix n'est pas enregistrée sur une piste séparée. Si l'événement est enregistré, votre voix reste néanmoins dans la vidéo.",
       "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
       "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription."
     },
@@ -5024,7 +5031,9 @@
       "version": "Version de la chaîne de traitement"
     },
     "overlapBadge": "simultané",
-    "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle."
+    "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle.",
+    "anonymousSpeaker": "Participant·e {n}",
+    "untranscribed": "Intervention non transcrite : la personne qui parlait n'a pas donné son consentement"
   },
   "waiting": {
     "startsIn": "L'événement commence dans",

@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Sprawdź teksty"
       }
+    },
+    "voiceConsent": {
+      "title": "Transkrybować całe nagranie?",
+      "message": "To wydarzenie prosiło każdego o zgodę na transkrypcję jego wypowiedzi. Całe nagranie zawiera wszystkie głosy, także osób, które zgody nie wyraziły: transkrybuj je tylko wtedy, gdy zgodę wyraziły wszystkie osoby, które w nim mówią. Twoje potwierdzenie zostaje w dzienniku działań.",
+      "confirm": "Tak, wszyscy wyrazili zgodę",
+      "cancel": "Anuluj",
+      "waiting": "Transkrypcja całego nagrania nie uruchomiła się sama: to wydarzenie prosiło każdego o zgodę na transkrypcję jego wypowiedzi. Uruchom ją przyciskiem {button} tylko wtedy, gdy zgodę wyraziły wszystkie osoby, które mówią w nagraniu; w przeciwnym razie zostaje transkrypcja z napisów."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
       "recordingNotice": "Wydarzenie jest nagrywane (dźwięk i obraz). Uczestniczysz bez mikrofonu i kamery: nagranie nie zawiera Twojego głosu ani wizerunku, chyba że prowadzący udzieli Ci głosu.",
       "multitrack": "Zgadzam się na transkrypcję moich wypowiedzi wraz z moim imieniem na potrzeby sprawozdania z wydarzenia. Jeśli wydarzenie nagrywa osobną ścieżkę dźwiękową dla każdej osoby, mój głos jest nagrywany wyłącznie w tym celu, a ścieżka jest usuwana po transkrypcji; nie służy do rozpoznawania ani odtwarzania mojego głosu.",
-      "multitrackOptional": "To dobrowolne: jeśli nie wyrazisz zgody, nadal możesz uczestniczyć, ale twój głos nie jest nagrywany, a twoje wypowiedzi nie trafiają do transkrypcji.",
+      "multitrackOptional": "To dobrowolne: jeśli nie wyrazisz zgody, nadal uczestniczysz, ale twoje wypowiedzi nie trafią do transkrypcji, a twój głos nie będzie nagrywany na osobnej ścieżce. Jeśli wydarzenie jest nagrywane, twój głos i tak pozostanie w nagraniu wideo.",
       "stayInTouch": "Chcę otrzymywać informacje o nadchodzących wydarzeniach i zostać dodany do książki adresowej, aby otrzymywać zaproszenia na podobne wydarzenia",
       "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji."
     },
@@ -5024,7 +5031,9 @@
       "version": "Wersja potoku"
     },
     "overlapBadge": "jednocześnie",
-    "overlapTitle": "Mowa równoczesna: w tym przedziale mówi jednocześnie więcej niż jedna osoba."
+    "overlapTitle": "Mowa równoczesna: w tym przedziale mówi jednocześnie więcej niż jedna osoba.",
+    "anonymousSpeaker": "Uczestnik {n}",
+    "untranscribed": "Nie transkrybowano: mówca nie wyraził zgody"
   },
   "waiting": {
     "startsIn": "Wydarzenie rozpocznie się za",

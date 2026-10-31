@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Preglej besedila"
       }
+    },
+    "voiceConsent": {
+      "title": "Prepisati celoten posnetek?",
+      "message": "Ta dogodek je vsakogar prosil za privolitev za prepis njegovih prispevkov. Celoten posnetek vsebuje vse glasove, tudi tistih, ki privolitve niso dali: prepišite ga le, če so privolili vsi, ki v njem govorijo. Vaša potrditev ostane v dnevniku dejavnosti.",
+      "confirm": "Da, vsi so privolili",
+      "cancel": "Prekliči",
+      "waiting": "Prepis celotnega posnetka se ni začel sam: ta dogodek je vsakogar prosil za privolitev za prepis njegovih prispevkov. Zaženite ga z gumbom {button} le, če so privolili vsi, ki v posnetku govorijo; sicer ostane prepis iz podnapisov."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
       "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
       "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
-      "multitrackOptional": "Ni obvezno: če ne privolite, lahko vseeno sodelujete, vendar se vaš glas ne snema in vaši prispevki niso v prepisu.",
+      "multitrackOptional": "Ni obvezno: če ne date privolitve, vseeno sodelujete, vendar vaši prispevki ne pridejo v prepis in vaš glas se ne snema na ločeno sled. Če se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
       "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
       "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave."
     },
@@ -5024,7 +5031,9 @@
       "version": "Različica cevovoda"
     },
     "overlapBadge": "hkratno",
-    "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati."
+    "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati.",
+    "anonymousSpeaker": "Udeleženec {n}",
+    "untranscribed": "Ni prepisano: govornik ni dal privolitve"
   },
   "waiting": {
     "startsIn": "Dogodek se začne čez",

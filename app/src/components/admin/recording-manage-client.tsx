@@ -16,7 +16,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { useToast } from '@/components/ui/toast';
-import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useAvvioPipeline } from '@/hooks/use-avvio-pipeline';
 import { codiceErrore, messaggioErroreApi } from '@/lib/api-error-message';
 
 import RecordingOverview from './recording-overview';
@@ -47,6 +47,8 @@ export default function RecordingManageClient({
   sourceLanguage,
   createdAt,
   soloSottotitoli = false,
+  confermaVoci = false,
+  avvisoConfermaVoci = false,
   eventId,
   initialTab = 'overview',
 }: {
@@ -54,6 +56,10 @@ export default function RecordingManageClient({
   initialTab?: TabKey;
   /** La registrazione non ha un file: la trascrizione viene dai sottotitoli live. */
   soloSottotitoli?: boolean;
+  /** Trascrivere il video richiede la conferma che tutte le voci hanno acconsentito. */
+  confermaVoci?: boolean;
+  /** La pipeline sarebbe partita da sola, e non e' partita solo per quella conferma. */
+  avvisoConfermaVoci?: boolean;
   eventId?: string;
   recordingId: string;
   eventTitle: string;
@@ -67,7 +73,9 @@ export default function RecordingManageClient({
   const tApi = useTranslations('apiErrors');
   const format = useFormatter();
   const toast = useToast();
-  const confirm = useConfirm();
+  const avviaPipeline = useAvvioPipeline();
+  const tVoci = useTranslations('admin.voiceConsent');
+
   const [tab, setTab] = useState<TabKey>(initialTab);
   const [rerunning, setRerunning] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -108,18 +116,19 @@ export default function RecordingManageClient({
   }
 
   async function rerun(): Promise<void> {
-    const ok = await confirm({
-      title: t('rerun'),
-      message: t('rerunTooltip'),
-      confirmLabel: t('rerun'),
-    });
-    if (!ok) return;
     setRerunning(true);
     try {
-      const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      // Una domanda sola: quella dell'azione, unita a quella sulle voci
+      // quando la pagina sa gia' che serve.
+      const r = await avviaPipeline(
+        `/api/admin/postprod/recordings/${recordingId}/rerun`,
+        {},
+        {
+          conferma: { title: t('rerun'), message: t('rerunTooltip'), confirmLabel: t('rerun') },
+          confermaVociNota: confermaVoci,
+        },
+      );
+      if (!r) return;
       if (r.ok) {
         // A successful POST can enqueue NOTHING: either nothing was runnable (AI
         // disabled / pipeline paused → true no-op) or every job already exists at
@@ -153,23 +162,20 @@ export default function RecordingManageClient({
   // auto-detects multitrack, so all three functions (transcript → summary →
   // translation) actually start.
   async function generateAi(): Promise<void> {
-    const ok = await confirm({
-      title: t('generateAi'),
-      message: t('generateAiConfirm'),
-      confirmLabel: t('generateAi'),
-    });
-    if (!ok) return;
     setGenerating(true);
     try {
-      const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/generate-ai`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        // Transcript + summary only. Translations are added explicitly, per
-        // language, from the Translations tab — one click shouldn't blanket
-        // auto-translate to every default locale (consent and scope stay explicit).
-        body: JSON.stringify({ summary: true }),
-      });
+      // Transcript + summary only. Translations are added explicitly, per
+      // language, from the Translations tab — one click shouldn't blanket
+      // auto-translate to every default locale (consent and scope stay explicit).
+      const r = await avviaPipeline(
+        `/api/admin/postprod/recordings/${recordingId}/generate-ai`,
+        { summary: true },
+        {
+          conferma: { title: t('generateAi'), message: t('generateAiConfirm'), confirmLabel: t('generateAi') },
+          confermaVociNota: confermaVoci,
+        },
+      );
+      if (!r) return;
       if (r.ok) {
         const data = (await r.json().catch(() => null)) as {
           enqueued?: number;
@@ -278,6 +284,14 @@ export default function RecordingManageClient({
           )}
         </div>
       </div>
+
+      {/* La trascrizione del video completo non parte da sola in un evento con
+          il consenso voce per voce: lo si dice accanto al pulsante che la avvia. */}
+      {avvisoConfermaVoci && status === 'READY' && (
+        <div className="alert alert-info mb-3" role="status">
+          {tVoci('waiting', { button: t('generateAi') })}
+        </div>
+      )}
 
       {/* Tabs — il pannello sotto è una Card (superficie bianca, bordo,
           ombra leggera) così ogni sezione è contenuta e leggibile, non

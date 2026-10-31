@@ -21,6 +21,7 @@ import { useSearchParams } from 'next/navigation';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useAvvioPipeline } from '@/hooks/use-avvio-pipeline';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
@@ -1584,6 +1585,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   // recordingUrl has no Recording row, so generate-ai would 404 — the button
   // must not offer an action that can never succeed.
   const hasRecording = event.hasRecordingRow;
+  const avviaPipeline = useAvvioPipeline();
   const [generatingAi, setGeneratingAi] = useState(false);
   const [aiGenMsg, setAiGenMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -1593,11 +1595,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     setGeneratingAi(true);
     setAiGenMsg(null);
     try {
-      const res = await fetch(`/api/admin/events/${event.id}/generate-ai`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ summary: true }),
-      });
+      const res = await avviaPipeline(`/api/admin/events/${event.id}/generate-ai`, { summary: true });
+      if (!res) return;
       const data = (await res.json().catch(() => ({}))) as { enqueued?: number; code?: string };
       if (!res.ok) {
         setAiGenMsg({
@@ -1621,7 +1620,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
     } finally {
       setGeneratingAi(false);
     }
-  }, [event.id, td, tApi]);
+  }, [event.id, td, tApi, avviaPipeline]);
 
   // Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. A
   // evento concluso e' la prima cosa da fare, e sta in cima.

@@ -115,3 +115,63 @@ export async function consensoTrascrizione(
   });
   return prova ? { dato: true, nome: tryDecryptPII(prova.displayName) ?? null } : { dato: false, nome: null };
 }
+
+/**
+ * Gli endpoint (tra quelli dati) la cui persona ha dato il consenso alla
+ * trascrizione, con la stessa regola di `consensoTrascrizione` ma in poche
+ * letture: serve alla trascrizione pubblica, che lo chiede per tutte le voci
+ * del registro di chi parlava a ogni visita.
+ */
+export async function endpointConConsenso(
+  eventId: string,
+  endpointIds: readonly string[],
+  versioneMinima: number,
+): Promise<Set<string>> {
+  const ammessi = new Set<string>();
+  if (endpointIds.length === 0) return ammessi;
+  const occupanti = await prisma.roomOccupant.findMany({
+    where: { eventId, endpointId: { in: [...endpointIds] } },
+    select: { endpointId: true, seatId: true },
+  });
+  const posti = occupanti.filter((o) => o.seatId);
+  if (posti.length === 0) return ammessi;
+  const iscrizioni = [
+    ...new Set(posti.map((o) => iscrizioneDelPosto(o.seatId)).filter((r): r is string => r !== null)),
+  ];
+  const [registrazioni, prove] = await Promise.all([
+    iscrizioni.length > 0
+      ? prisma.registration.findMany({
+          where: { eventId, id: { in: iscrizioni } },
+          select: { id: true, consentMultitrack: true, consentMultitrackVersion: true },
+        })
+      : Promise.resolve([]),
+    prisma.multitrackConsent.findMany({
+      where: {
+        eventId,
+        textVersion: { gte: versioneMinima },
+        OR: [
+          ...(iscrizioni.length > 0 ? [{ registrationId: { in: iscrizioni } }] : []),
+          { jitsiUserId: { in: posti.map((o) => o.seatId) } },
+        ],
+      },
+      select: { registrationId: true, jitsiUserId: true },
+    }),
+  ]);
+  const esistenti = new Set(registrazioni.map((r) => r.id));
+  const dateAllIscrizione = new Set(
+    registrazioni
+      .filter((r) => r.consentMultitrack === true && (r.consentMultitrackVersion ?? 1) >= versioneMinima)
+      .map((r) => r.id),
+  );
+  const proveIscrizione = new Set(prove.map((p) => p.registrationId).filter((r): r is string => r !== null));
+  const provePosto = new Set(prove.map((p) => p.jitsiUserId));
+  for (const o of posti) {
+    const iscrizione = iscrizioneDelPosto(o.seatId);
+    const dato = iscrizione
+      ? esistenti.has(iscrizione) && (dateAllIscrizione.has(iscrizione) || proveIscrizione.has(iscrizione))
+      : provePosto.has(o.seatId);
+    if (dato) ammessi.add(o.endpointId);
+  }
+  return ammessi;
+}
+

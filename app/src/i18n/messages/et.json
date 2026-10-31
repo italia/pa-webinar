@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Vaata tekstid üle"
       }
+    },
+    "voiceConsent": {
+      "title": "Kas transkribeerida kogu salvestis?",
+      "message": "See sündmus küsis igaühelt nõusolekut tema sõnavõttude transkribeerimiseks. Kogu salvestis sisaldab kõiki hääli, ka nende omi, kes nõusolekut ei andnud: transkribeeri see ainult siis, kui kõik selles rääkijad on nõustunud. Sinu kinnitus jääb tegevuslogisse.",
+      "confirm": "Jah, kõik on nõustunud",
+      "cancel": "Tühista",
+      "waiting": "Kogu salvestise transkribeerimine ei alanud iseenesest: see sündmus küsis igaühelt nõusolekut tema sõnavõttude transkribeerimiseks. Käivita see nupuga {button} ainult siis, kui kõik salvestises rääkijad on nõustunud; muidu jääb alles subtiitritest tehtud transkriptsioon."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
       "recordingNotice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, välja arvatud juhul, kui moderaator annab teile sõna.",
       "multitrack": "Nõustun, et minu sõnavõtud transkribeeritakse koos minu nimega ürituse kokkuvõtte jaoks. Kui üritus salvestab iga inimese jaoks eraldi helirea, salvestatakse minu häält ainult sel eesmärgil ja helirida kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
-      "multitrackOptional": "See on vabatahtlik: kui te ei nõustu, saate siiski osaleda, kuid teie häält ei salvestata ja teie sõnavõtud ei jõua transkriptsiooni.",
+      "multitrackOptional": "See on vabatahtlik: kui sa nõusolekut ei anna, osaled ikkagi, kuid sinu sõnavõtud ei lähe transkriptsiooni ja sinu häält ei salvestata eraldi rajale. Kui sündmus salvestatakse, jääb sinu hääl siiski videosse.",
       "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
       "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad."
     },
@@ -5024,7 +5031,9 @@
       "version": "Töövoo versioon"
     },
     "overlapBadge": "samaaegne",
-    "overlapTitle": "Samaaegne kõne: selles vahemikus räägib korraga rohkem kui üks inimene."
+    "overlapTitle": "Samaaegne kõne: selles vahemikus räägib korraga rohkem kui üks inimene.",
+    "anonymousSpeaker": "Osaleja {n}",
+    "untranscribed": "Ei transkribeeritud: kõneleja ei andnud nõusolekut"
   },
   "waiting": {
     "startsIn": "Üritus algab",

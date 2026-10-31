@@ -2,8 +2,8 @@
  * La trascrizione dell'evento costruita dai sottotitoli live
  * (Event.captionsTranscriptEnabled).
  *
- * Le frasi salvate durante la diretta (CaptionSegment, solo di chi ha dato il
- * consenso) diventano un artefatto TRANSCRIPT_JSON nella stessa forma di
+ * Le frasi salvate durante la diretta (CaptionSegment: testo e nome solo di
+ * chi ha dato il consenso, degli altri i soli tempi) diventano un artefatto TRANSCRIPT_JSON nella stessa forma di
  * quello della trascrizione AI: l'editor, i download, la pagina dopo
  * l'evento e la sintesi lo usano senza distinguerlo. Sta sulla registrazione
  * della sessione se c'e' (allineato al video), altrimenti su una
@@ -79,7 +79,16 @@ export interface TrascrizioneSottotitoli {
   language: string | null;
   segments: SegmentoTrascrizione[];
   speakers: ParlanteTrascrizione[];
+  /**
+   * I tratti in cui ha parlato chi non ha dato il consenso: solo i tempi,
+   * senza testo ne' nome. Chi legge la trascrizione vede che li' c'e' stato
+   * un intervento, invece di un salto muto.
+   */
+  untranscribed: Array<{ start: number; end: number }>;
 }
+
+/** Interventi non trascritti piu' vicini di cosi' diventano uno solo. */
+const UNIONE_VUOTI_S = 3;
 
 interface FraseSalvata {
   seatId: string | null;
@@ -116,16 +125,34 @@ export function contaVoci(frasi: ReadonlyArray<{ seatId: string | null; speakerN
   return persone.size;
 }
 
-export function componiTrascrizione(frasi: readonly FraseSalvata[], t0: Date): TrascrizioneSottotitoli {
+export function componiTrascrizione(
+  frasi: readonly FraseSalvata[],
+  t0: Date,
+  /** La durata del video, se la trascrizione ci si allinea: i segni fuori non si vedrebbero. */
+  durataS?: number | null,
+): TrascrizioneSottotitoli {
   const etichette = new Map<string, string>();
   const parlanti = new Map<
     string,
     { displayName: string | null; totalSpeechSec: number; registrationId?: string }
   >();
   const segments: SegmentoTrascrizione[] = [];
+  const vuoti: Array<{ start: number; end: number }> = [];
   const lingue = new Map<string, number>();
   for (const f of frasi) {
-    if (!f.text || !f.seatId) continue;
+    if (!f.text) {
+      // Frase di chi non ha dato il consenso (salvata senza posto, nome ne'
+      // testo): se ne tengono solo i tempi, dentro il video. Prima che il
+      // video cominci o dopo la sua fine il segno non indicherebbe niente.
+      const da = (f.startedAt.getTime() - t0.getTime()) / 1000;
+      const a = (f.endedAt.getTime() - t0.getTime()) / 1000;
+      const fine = durataS && durataS > 0 ? Math.min(a, durataS) : a;
+      const inizio = Math.max(0, da);
+      if (fine <= inizio) continue;
+      vuoti.push({ start: round(inizio), end: round(fine) });
+      continue;
+    }
+    if (!f.seatId) continue;
     const testo = tryDecryptPII(f.text)?.trim();
     if (!testo) continue;
     const start = Math.max(0, (f.startedAt.getTime() - t0.getTime()) / 1000);
@@ -149,10 +176,21 @@ export function componiTrascrizione(frasi: readonly FraseSalvata[], t0: Date): T
     segments.push({ start: round(start), end: round(end), text: testo, speaker: etichetta });
   }
   const language = [...lingue.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  const untranscribed: Array<{ start: number; end: number }> = [];
+  for (const v of vuoti.sort((a, b) => a.start - b.start)) {
+    const ultimo = untranscribed[untranscribed.length - 1];
+    // Si uniscono solo se tra i due non c'e' una frase trascritta: un segno
+    // non deve coprire chi ha parlato con il consenso.
+    const inMezzo =
+      ultimo && segments.some((sg) => sg.start < v.start && sg.end > ultimo.end);
+    if (ultimo && !inMezzo && v.start - ultimo.end <= UNIONE_VUOTI_S) ultimo.end = Math.max(ultimo.end, v.end);
+    else untranscribed.push({ ...v });
+  }
   return {
     source: 'live-captions',
     language,
     segments,
+    untranscribed,
     speakers: [...parlanti.entries()].map(([diarLabel, p]) => ({
       diarLabel,
       displayName: p.displayName,
@@ -291,14 +329,18 @@ export async function costruisciTrascrizioneDaiSottotitoli(eventId: string): Pro
     // Le frasi si leggono dentro il lock: una cancellazione su richiesta
     // (lib/gdpr/erase-registrations) che lo prende non si vede annullata da
     // una costruzione partita prima.
+    // Anche le righe di chi non ha dato il consenso (senza testo ne' posto):
+    // diventano i segni «intervento non trascritto». Tempi e durata della
+    // trascrizione restano quelli delle frasi trascritte.
     const frasi = await tx.captionSegment.findMany({
-      where: { eventId, text: { not: null }, seatId: { not: null } },
+      where: { eventId },
       orderBy: { startedAt: 'asc' },
       select: { seatId: true, speakerName: true, text: true, language: true, startedAt: true, endedAt: true },
     });
-    if (frasi.length === 0) return { stato: 'nessuna-frase' };
-    const primo = frasi[0]!.startedAt;
-    const ultimo = new Date(Math.max(...frasi.map((f) => f.endedAt.getTime())));
+    const trascritte = frasi.filter((f) => f.text !== null && f.seatId !== null);
+    if (trascritte.length === 0) return { stato: 'nessuna-frase' };
+    const primo = trascritte[0]!.startedAt;
+    const ultimo = new Date(Math.max(...trascritte.map((f) => f.endedAt.getTime())));
 
     const registrazioni = await tx.recording.findMany({
       where: { eventId },
@@ -330,7 +372,8 @@ export async function costruisciTrascrizioneDaiSottotitoli(eventId: string): Pro
     const artefatto = esistente?.artifacts[0];
 
     const t0 = conVideo && esistente === conVideo ? await zeroDelVideo(tx, conVideo) : primo;
-    const trascrizione = componiTrascrizione(frasi, t0);
+    const allineata = conVideo && esistente === conVideo;
+    const trascrizione = componiTrascrizione(frasi, t0, allineata ? conVideo.durationSec : null);
     if (trascrizione.segments.length === 0) return { stato: 'nessuna-frase' };
     const corpo = JSON.stringify(trascrizione);
     const contentHash = createHash('sha256').update(corpo).digest('hex');

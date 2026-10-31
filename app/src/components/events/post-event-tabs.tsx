@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type RefObject } from 'react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Badge, Card, CardBody } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
@@ -88,6 +88,7 @@ export default function PostEventTabs({
   moments,
 }: PostEventTabsProps) {
   const t = useTranslations('postEvent.tabs');
+  const locale = useLocale();
 
   // Trascrizione visibile solo quando 3 condizioni si verificano insieme:
   //   1. `transcriptAvailable` true (la fetch postprod ha trovato
@@ -190,7 +191,7 @@ export default function PostEventTabs({
       {activeTab === 'transcript' && transcriptShow && eventSlug && playerRef && (
         <TranscriptPanel
           playerRef={playerRef}
-          endpoint={`/api/events/${eventSlug}/postprod/transcript`}
+          endpoint={`/api/events/${eventSlug}/postprod/transcript?locale=${locale}`}
           eventSlug={eventSlug}
           activeLanguage={transcriptLanguage ?? null}
         />

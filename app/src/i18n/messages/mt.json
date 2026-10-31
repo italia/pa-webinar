@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Irrevedi t-testi"
       }
+    },
+    "voiceConsent": {
+      "title": "Tittraskrivi r-reġistrazzjoni sħiħa?",
+      "message": "Dan l-avveniment talab lil kulħadd il-kunsens għat-traskrizzjoni ta' dak li jgħid. Ir-reġistrazzjoni sħiħa fiha l-ilħna kollha, anki ta' min ma tax il-kunsens: ittraskriviha biss jekk kull min jitkellem fiha ta l-kunsens tiegħu. Il-konferma tiegħek tibqa' fir-reġistru tal-attività.",
+      "confirm": "Iva, kulħadd ta l-kunsens",
+      "cancel": "Ikkanċella",
+      "waiting": "It-traskrizzjoni tar-reġistrazzjoni sħiħa ma bdietx waħedha: dan l-avveniment talab lil kulħadd il-kunsens għat-traskrizzjoni ta{button}«Iġġenera bl-IA» biss jekk kull min jitkellem fir-reġistrazzjoni ta l-kunsens tiegħu; inkella tibqa' t-traskrizzjoni mis-sottotitoli."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
       "recordingNotice": "L-avveniment qed jiġi rrekordjat (awdjo u vidjo). Qed tipparteċipa mingħajr mikrofonu jew kamera: ir-reġistrazzjoni ma fihiex il-vuċi jew l-immaġni tiegħek, sakemm min jikkonduċi ma jagħtikx il-kelma.",
       "multitrack": "Nagħti l-kunsens li l-interventi tiegħi jiġu traskritti, b'ismi, għar-rapport tal-avveniment. Jekk l-avveniment jirreġistra korsa tal-awdjo separata għal kull persuna, leħni jiġi rreġistrat għal dan l-iskop biss u l-korsa titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi leħni.",
-      "multitrackOptional": "Huwa fakultattiv: jekk ma tagħtix il-kunsens xorta tista' tipparteċipa, iżda leħnek ma jiġix irreġistrat u l-interventi tiegħek ma jidħlux fit-traskrizzjoni.",
+      "multitrackOptional": "Mhuwiex obbligatorju: jekk ma tagħtix il-kunsens, tipparteċipa xorta waħda, iżda l-interventi tiegħek ma jidħlux fit-traskrizzjoni u leħnek ma jiġix irrekordjat fuq korsija separata. Jekk l-avveniment jiġi rrekordjat, leħnek jibqa' fil-vidjo xorta waħda.",
       "stayInTouch": "Irrid nirċievi informazzjoni dwar l-avvenimenti li ġejjin u nkun miżjud fil-ktieb tal-indirizzi, biex inkun mistieden għal avvenimenti simili",
       "stayInTouchHelp": "Kunsens fakultattiv (art. 6.1.a GDPR). Tista' tirtirah meta trid bil-link \"Neħħini mill-ktieb tal-indirizzi\" fl-emails li tirċievi. L-isem u l-organizzazzjoni huma dawk ta' din ir-reġistrazzjoni."
     },
@@ -5024,7 +5031,9 @@
       "version": "Verżjoni tal-pipeline"
     },
     "overlapBadge": "simultanju",
-    "overlapTitle": "Diskors simultanju: f'dan l-intervall qed titkellem aktar minn persuna waħda fl-istess ħin."
+    "overlapTitle": "Diskors simultanju: f'dan l-intervall qed titkellem aktar minn persuna waħda fl-istess ħin.",
+    "anonymousSpeaker": "Parteċipant {n}",
+    "untranscribed": "Mhux traskritt: min kien qed jitkellem ma tax il-kunsens"
   },
   "waiting": {
     "startsIn": "L-avveniment jibda fi",

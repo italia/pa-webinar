@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Rever os textos"
       }
+    },
+    "voiceConsent": {
+      "title": "Transcrever a gravação completa?",
+      "message": "Este evento pediu a cada pessoa o consentimento para a transcrição das suas intervenções. A gravação completa contém todas as vozes, incluindo as de quem não o deu: transcreva-a apenas se todas as pessoas que nela falam tiverem consentido. A sua confirmação fica no registo de atividade.",
+      "confirm": "Sim, todos consentiram",
+      "cancel": "Cancelar",
+      "waiting": "A transcrição da gravação completa não começou sozinha: este evento pediu a cada pessoa o consentimento para a transcrição das suas intervenções. Inicie-a com {button} apenas se todas as pessoas que falam na gravação tiverem consentido; caso contrário, fica a transcrição a partir das legendas."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
       "recordingNotice": "O evento é gravado (áudio e vídeo). Participa sem microfone nem câmara: a gravação não contém a sua voz nem a sua imagem, salvo se quem modera lhe der a palavra.",
       "multitrack": "Dou o meu consentimento para que as minhas intervenções sejam transcritas, com o meu nome, para o relatório do evento. Se o evento gravar uma faixa áudio separada para cada pessoa, a minha voz é gravada apenas para este fim e a faixa é eliminada após a transcrição; não é usada para identificar ou reproduzir a minha voz.",
-      "multitrackOptional": "É opcional: se não der o seu consentimento, pode participar na mesma, mas a sua voz não é gravada e as suas intervenções não entram na transcrição.",
+      "multitrackOptional": "É facultativo: se não consentir, participa na mesma, mas as suas intervenções não entram na transcrição e a sua voz não é gravada numa faixa à parte. Se o evento for gravado, a sua voz fica mesmo assim no vídeo.",
       "stayInTouch": "Quero receber informações sobre os próximos eventos e ser incluído no livro de endereços, para ser convidado para eventos semelhantes",
       "stayInTouchHelp": "Consentimento facultativo (art. 6.1.a RGPD). Pode retirá-lo a qualquer momento através da ligação «Remover-me do livro de endereços» nos e-mails que receber. O nome e a organização são os desta inscrição."
     },
@@ -5024,7 +5031,9 @@
       "version": "Versão da pipeline"
     },
     "overlapBadge": "simultâneo",
-    "overlapTitle": "Fala simultânea: neste intervalo fala mais do que uma pessoa ao mesmo tempo."
+    "overlapTitle": "Fala simultânea: neste intervalo fala mais do que uma pessoa ao mesmo tempo.",
+    "anonymousSpeaker": "Participante {n}",
+    "untranscribed": "Intervenção não transcrita: quem falava não deu consentimento"
   },
   "waiting": {
     "startsIn": "O evento começa em",

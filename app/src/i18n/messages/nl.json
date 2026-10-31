@@ -3804,6 +3804,13 @@
         "item": "{language}: {state}",
         "review": "Teksten nalezen"
       }
+    },
+    "voiceConsent": {
+      "title": "De volledige opname transcriberen?",
+      "message": "Dit evenement vroeg iedereen om toestemming voor de transcriptie van wat ze zeggen. De volledige opname bevat alle stemmen, ook van wie geen toestemming gaf: transcribeer haar alleen als iedereen die erin spreekt toestemming heeft gegeven. Je bevestiging blijft in het activiteitenlogboek.",
+      "confirm": "Ja, iedereen gaf toestemming",
+      "cancel": "Annuleren",
+      "waiting": "De transcriptie van de volledige opname is niet vanzelf gestart: dit evenement vroeg iedereen om toestemming voor de transcriptie van wat ze zeggen. Start haar met {button} alleen als iedereen die in de opname spreekt toestemming heeft gegeven; anders blijft de transcriptie uit de ondertitels."
     }
   },
   "email": {
@@ -4188,7 +4195,7 @@
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
       "multitrack": "Ik geef toestemming om mijn bijdragen met mijn naam te transcriberen voor het verslag van het evenement. Als het evenement voor elke persoon een apart audiospoor opneemt, wordt mijn stem alleen daarvoor opgenomen en wordt het spoor na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te herkennen of na te bootsen.",
-      "multitrackOptional": "Dit is vrijwillig: zonder toestemming kunt u gewoon deelnemen, maar uw stem wordt niet opgenomen en uw bijdragen komen niet in de transcriptie.",
+      "multitrackOptional": "Dit is vrijwillig: als je geen toestemming geeft, doe je toch mee, maar wat je zegt komt niet in de transcriptie en je stem wordt niet op een apart spoor opgenomen. Als het evenement wordt opgenomen, blijft je stem wel in de video.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
       "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving."
     },
@@ -5024,7 +5031,9 @@
       "version": "Versie van de pijplijn"
     },
     "overlapBadge": "gelijktijdig",
-    "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk."
+    "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk.",
+    "anonymousSpeaker": "Deelnemer {n}",
+    "untranscribed": "Niet getranscribeerd: de spreker gaf geen toestemming"
   },
   "waiting": {
     "startsIn": "Het evenement begint over",

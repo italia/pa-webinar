@@ -128,7 +128,23 @@ browsers do not report them. The log stores the display names in plain text.
 
 The public transcript endpoint uses the log at read time to put names on the
 anonymous voice clusters of a composite recording, so a public transcript can
-show names nobody entered by hand. The post-production worker never reads it,
+show names nobody entered by hand. In an event where each person was asked for the
+transcription consent, a cluster gets a name only when the participant behind
+it, traced from the bridge endpoint to the conference seat (`RoomOccupant`),
+has given that consent (with the text version that applies to the event);
+otherwise it keeps a numbered label and never takes another participant's
+name. The consent counts as asked when the event records per-participant
+tracks or keeps a transcript from captions that actually runs (captions on
+and the service installed), or when the room left traces of it: caption rows,
+consent proofs from the waiting room, or per-participant tracks. Answers given
+at registration alone do not count, because the switch may have been turned
+off before the event. When caption rows exist, the text version that includes
+the name applies. A switch turned off after the event therefore does not bring
+back the names of people who said no (`app/src/lib/ai/voice-consent.ts`). The
+endpoint keeps the answer for a few minutes per recording, so a change of
+consent shows on the public page within that delay. With this check, a
+cluster whose main speaker has no name in the log stays unnamed too, instead
+of taking the name of the second speaker. The post-production worker never reads the speaking log,
 and the names it yields are not stored anywhere. When the cleanup job empties
 the log at the event's data retention, a published transcript shows numbered
 labels again for the clusters nobody named.
@@ -388,6 +404,22 @@ this section covers what matters for privacy.
   transcription of what they say (`waiting.captionsNoticeTranscript`), and the
   transcription box asks for the consent, at registration and in the waiting
   room (see [What participants are told](#what-participants-are-told)).
+- **Voices without consent in the transcript.** The rows without text become
+  marks in the transcript (`untranscribed`: start and end only, with no
+  speaker and no text, nearby rows merged), and the public transcript panel
+  shows them as **Not transcribed: the speaker did not consent**, so a reader
+  following the transcript knows that someone spoke there. Live captions are
+  shown to everyone in the room for accessibility; the consent governs what
+  is kept, not what is captioned live.
+- **The full room recording.** In an event where this consent was asked (same
+  rule as above), the
+  composite video contains every voice, including those of people who said
+  no. The AI pipeline therefore does not transcribe it on its own: the
+  recording webhook enqueues nothing for it, and the event's transcript stays
+  the one from captions (or from the per-participant tracks). Staff can still
+  start the transcription of the composite video from the administration
+  area, after confirming that everyone who speaks in it has consented; the
+  confirmation is written to the admin audit log (`allVoicesConsented`).
 - **The transcript.** After the event the sentences become a
   `TRANSCRIPT_JSON` artifact (model `live-captions`) on the event's recording,
   or on a recording without media created for it, with one speaker label per
@@ -546,7 +578,7 @@ where the rule is enforced. See
   endpoint answers `404`. Public transcripts show
   speaker names. In the transcript panel, an unnamed cluster gets a name from
   the speaking timeline while the log exists, or else a numbered label
-  (`Partecipante N`, in Italian whatever the page language). In the downloads
+  (**Participant N**, in the page language). In the downloads
   and subtitles, an unnamed cluster keeps its raw label (`SPEAKER_00`).
 - **Staff who manage the event** (administrators and the organizer who created
   it) see everything in the administration area. That includes raw
