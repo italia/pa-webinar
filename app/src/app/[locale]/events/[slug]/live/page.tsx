@@ -184,7 +184,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             slug: event.slug,
             title,
             parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
-            waitingRoomEngine: event.waitingRoomEngine ?? settings.waitingRoomEngine,
+            // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
+            waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
+            audienceAnonymous: event.audienceAnonymous,
             videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
@@ -368,7 +370,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         slug: event.slug,
         title,
         parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
-        waitingRoomEngine: event.waitingRoomEngine ?? settings.waitingRoomEngine,
+        // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
+        waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
+        audienceAnonymous: event.audienceAnonymous,
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,

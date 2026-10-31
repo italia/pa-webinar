@@ -210,6 +210,7 @@ export const POST = withErrorHandling(async (request) => {
         recordingConsentText: data.recordingConsentText,
       }),
       listenOnlyWithoutConsent: data.listenOnlyWithoutConsent,
+      audienceAnonymous: data.audienceAnonymous,
       ...(data.wordCloudEnabled !== undefined && {
         wordCloudEnabled: data.wordCloudEnabled,
       }),

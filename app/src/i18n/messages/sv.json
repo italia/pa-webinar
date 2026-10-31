@@ -655,7 +655,8 @@
       "consent": "Jag samtycker till inspelningen och deltar",
       "joining": "Går in i rummet igen…",
       "error": "Det gick inte att gå in igen: försök igen."
-    }
+    },
+    "pseudonym": "Deltagare-{code}"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Den som inte samtycker deltar bara som lyssnare",
         "listenOnlyWithoutConsentOn": "Samtycke till inspelningen är frivilligt: den som inte ger det deltar ändå, följer och skriver i chatten, men mikrofon, kamera och skärm förblir avstängda.",
         "listenOnlyWithoutConsentOff": "Utan samtycke till inspelningen kommer ingen in.",
-        "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet."
+        "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet.",
+        "audienceAnonymous": "Anonym publik",
+        "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
+        "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Det är mer än 30 minuter kvar till den planerade starten ({when}). Om du startar nu kommer alla med länken in direkt och videorummet slås på: tryck igen för att bekräfta.",
     "startEarlyYes": "Starta nu",
-    "startEarlyNo": "Vänta till den planerade tiden"
+    "startEarlyNo": "Vänta till den planerade tiden",
+    "anonymousNameHelp": "På det här evenemanget är publiken anonym: andra ser inte ditt namn, utan en pseudonym med en kod."
   },
   "recording": {
     "management": "Videoinspelning",

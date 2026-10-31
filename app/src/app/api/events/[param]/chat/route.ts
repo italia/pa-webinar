@@ -181,7 +181,7 @@ export const GET = withErrorHandling(async (request, context) => {
         // NOT the raw senderId: a guest one is base64 of `ip:name` and decodes
         // straight back to the attendee's public IP. The client only ever used
         // it to pick a bubble colour, so it gets a one-way key instead.
-        senderKey: senderColourKey(m.senderId),
+        senderKey: senderColourKey(m.senderId, eventId),
         // Whether the CALLER may act on this message. Computed here because the
         // client cannot: a seat id is shared by several people, so comparing ids
         // (or names) client-side got it wrong in both directions.
@@ -351,7 +351,7 @@ export const POST = withErrorHandling(async (request, context) => {
     eventId: created.eventId,
     // La stessa chiave della cronologia: una bolla ha lo stesso colore dal vivo
     // e dopo un ricaricamento, e l'id grezzo non esce dal server.
-    senderKey: senderColourKey(created.senderId),
+    senderKey: senderColourKey(created.senderId, auth.eventId),
     senderName: plaintextSenderName,
     isModerator: created.isModerator,
     text: plaintextText,
@@ -368,7 +368,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // messages are really its own: comparing display names is wrong whenever two
     // people share one (two moderators on the shared link are both "Moderatore"),
     // and that comparison is what decides whether the edit affordance appears.
-    senderKey: senderColourKey(auth.senderId),
+    senderKey: senderColourKey(auth.senderId, auth.eventId),
     // Whether this identity may edit its own messages at all — a shared link
     // cannot, so the UI should not offer it (the server refuses anyway).
     canEdit: auth.isPerPersonIdentity,

@@ -135,6 +135,7 @@ export const GET = withErrorHandling(async (request, context) => {
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
       listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+      audienceAnonymous: event.audienceAnonymous,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -311,12 +312,14 @@ export const PUT = withErrorHandling(async (request, context) => {
   // (mod_pa_media_lock): a sala aperta non si cambiano. Chi e' gia' dentro
   // non ha dato il consenso a una registrazione accesa dopo, e chi entra dopo
   // avrebbe un token che il bridge non fa rispettare.
-  const cambiaRegime =
-    (data.listenOnlyWithoutConsent !== undefined &&
-      data.listenOnlyWithoutConsent !== event.listenOnlyWithoutConsent) ||
-    (data.recordingEnabled !== undefined && data.recordingEnabled !== event.recordingEnabled);
+  // Anche il pubblico anonimo: cambiarlo a sala aperta accosterebbe gli
+  // pseudonimi ai nomi (stesso posto, stesso colore in chat).
+  const CAMPI_DELLA_SALA = ['listenOnlyWithoutConsent', 'recordingEnabled', 'audienceAnonymous'] as const;
+  const cambiaRegime = CAMPI_DELLA_SALA.some(
+    (campo) => data[campo] !== undefined && data[campo] !== event[campo],
+  );
   if (cambiaRegime && (await salaForseAperta(event))) {
-    for (const campo of ['listenOnlyWithoutConsent', 'recordingEnabled'] as const) {
+    for (const campo of CAMPI_DELLA_SALA) {
       if (data[campo] !== undefined && data[campo] !== event[campo]) {
         ignoredCreationOnlyFields.push(campo);
         delete (data as Record<string, unknown>)[campo];
@@ -582,6 +585,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.listenOnlyWithoutConsent !== undefined && { listenOnlyWithoutConsent: data.listenOnlyWithoutConsent }),
+      ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),

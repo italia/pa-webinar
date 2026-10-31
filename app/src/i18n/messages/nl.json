@@ -655,7 +655,8 @@
       "consent": "Ik geef toestemming voor de opname en doe mee",
       "joining": "Opnieuw de ruimte in…",
       "error": "Opnieuw binnenkomen mislukt: probeer het opnieuw."
-    }
+    },
+    "pseudonym": "Deelnemer-{code}"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Wie geen toestemming geeft, doet alleen luisterend mee",
         "listenOnlyWithoutConsentOn": "Toestemming voor de opname is vrij: wie die niet geeft doet toch mee, volgt en schrijft in de chat, maar microfoon, camera en scherm blijven uit.",
         "listenOnlyWithoutConsentOff": "Zonder toestemming voor de opname kom je er niet in.",
-        "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer."
+        "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer.",
+        "audienceAnonymous": "Anoniem publiek",
+        "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",
+        "audienceAnonymousLocked": "Kan niet worden gewijzigd zolang de ruimte open kan zijn: het zou pseudoniemen aan namen koppelen."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Tot de geplande start ({when}) duurt het nog meer dan 30 minuten. Als je nu start, kan iedereen met de link meteen naar binnen en gaat de videoruimte aan: druk nogmaals om te bevestigen.",
     "startEarlyYes": "Nu starten",
-    "startEarlyNo": "Wachten op het geplande tijdstip"
+    "startEarlyNo": "Wachten op het geplande tijdstip",
+    "anonymousNameHelp": "Bij dit evenement is het publiek anoniem: anderen zien niet je naam, maar een pseudoniem met een code."
   },
   "recording": {
     "management": "Video-opname",

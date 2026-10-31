@@ -356,6 +356,10 @@ Because the primary link is shared, entering the room with it requires a typed d
 
 Treat both kinds of link as durable credentials. Do not show them during screen sharing and do not paste them into chat.
 
+### Anonymous audience
+
+With `Event.audienceAnonymous`, the Jitsi token of a registrant, of a forwarded-link opener and of a guest carries a pseudonym instead of the name (`app/src/lib/live/pseudonym.ts`): one word, "Participant" in the site's default language (with the administration's translation overrides) joined to a six-character code from a SHA-256 of the event id and the seat key (`reg-<registrationId>`, or the guest's chat key), so the chat (`resolveTokenSender`, the guest branch of `authenticateChatSender`) and Q&A (`POST /api/events/{slug}/questions`) show the same pseudonym for the same seat, and an @mention reaches one person. The token has no email and no avatar URL; Jitsi's tile view is disabled for participants (`disableTileView`). The chat colour key includes the event, so a guest is not recognized from one event to the next by it. Two limits follow from the seat model: a forwarded registration link shares the registrant's seat, and therefore its pseudonym; a guest's seat depends on the network address, so a guest who changes network gets a new pseudonym. The setting, like recording and listen-only, cannot change while the room may be open. The registration still holds the real name for the organizers; the moderators' seats view (`GET /api/events/{slug}/seats`) still names each tile. Hosts and speakers are not pseudonymized.
+
 ### Seats and people
 
 The chat attributes messages, attachments and reactions to a **seat**. Q&A, polls and the word cloud do not use seats: they identify participation by registration or guest id, and give moderators no seat id.

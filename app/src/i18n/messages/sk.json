@@ -655,7 +655,8 @@
       "consent": "Súhlasím so záznamom a zapojím sa",
       "joining": "Opätovný vstup do miestnosti…",
       "error": "Opätovný vstup sa nepodaril: skúste to znova."
-    }
+    },
+    "pseudonym": "Účastník-{code}"
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Kto nesúhlasí, vstúpi iba ako poslucháč",
         "listenOnlyWithoutConsentOn": "Súhlas so záznamom je dobrovoľný: kto ho nedá, aj tak sa zúčastní, sleduje a píše do četu, ale mikrofón, kamera a obrazovka zostávajú vypnuté.",
         "listenOnlyWithoutConsentOff": "Bez súhlasu so záznamom sa nevstúpi.",
-        "listenOnlyLockedLive": "Kým môže byť miestnosť otvorená, záznam a režim iba počúvania sa nedajú zmeniť: platia od prvého vstupu."
+        "listenOnlyLockedLive": "Kým môže byť miestnosť otvorená, záznam a režim iba počúvania sa nedajú zmeniť: platia od prvého vstupu.",
+        "audienceAnonymous": "Anonymné publikum",
+        "audienceAnonymousDesc": "Účastníci sa ostatným zobrazujú pod pseudonymom („Účastník“ a kód) vo videu, v čete aj v otázkach; zoznam účastníkov zostáva moderátorom a námestie nie je. Užitočné pre veľké podujatia; na komunitných podujatiach sa ľudia chcú spoznať.",
+        "audienceAnonymousLocked": "Kým môže byť miestnosť otvorená, nedá sa to zmeniť: prepojilo by to pseudonymy s menami."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Do plánovaného začiatku ({when}) zostáva viac ako 30 minút. Ak podujatie spustíte teraz, ktokoľvek s odkazom hneď vstúpi a zapne sa videomiestnosť: potvrďte ďalším stlačením.",
     "startEarlyYes": "Spustiť teraz",
-    "startEarlyNo": "Počkať na plánovaný čas"
+    "startEarlyNo": "Počkať na plánovaný čas",
+    "anonymousNameHelp": "Na tomto podujatí je publikum anonymné: ostatní neuvidia vaše meno, ale pseudonym s kódom."
   },
   "recording": {
     "management": "Videozáznam",

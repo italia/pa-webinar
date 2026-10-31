@@ -655,7 +655,8 @@
       "consent": "Acconsento alla registrazione e intervengo",
       "joining": "Rientro in sala…",
       "error": "Non è stato possibile rientrare: riprova."
-    }
+    },
+    "pseudonym": "Partecipante-{code}"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -1185,7 +1186,10 @@
         "listenOnlyWithoutConsent": "Chi non acconsente entra in solo ascolto",
         "listenOnlyWithoutConsentOn": "Il consenso alla registrazione è libero: chi non lo dà partecipa lo stesso, segue e scrive in chat, ma microfono, videocamera e schermo restano chiusi.",
         "listenOnlyWithoutConsentOff": "Senza consenso alla registrazione non si entra.",
-        "listenOnlyLockedLive": "Con la sala aperta registrazione e solo ascolto non si cambiano: valgono dal primo ingresso."
+        "listenOnlyLockedLive": "Con la sala aperta registrazione e solo ascolto non si cambiano: valgono dal primo ingresso.",
+        "audienceAnonymous": "Pubblico anonimo",
+        "audienceAnonymousDesc": "Chi partecipa compare agli altri con uno pseudonimo («Partecipante» e un codice) in video, in chat e nelle domande; l'elenco dei partecipanti resta a chi conduce, e non c'è la piazza. Utile per gli eventi grandi; negli eventi di comunità ci si vuole conoscere.",
+        "audienceAnonymousLocked": "Con la sala aperta non si cambia: accosterebbe gli pseudonimi ai nomi."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Mancano più di 30 minuti all'inizio previsto ({when}). Avviando ora, chi ha il link entra subito e la sala video si accende: premi di nuovo per confermare.",
     "startEarlyYes": "Avvia ora",
-    "startEarlyNo": "Aspetta l'orario previsto"
+    "startEarlyNo": "Aspetta l'orario previsto",
+    "anonymousNameHelp": "In questo evento il pubblico è anonimo: gli altri non vedono il tuo nome, ma uno pseudonimo con un codice."
   },
   "recording": {
     "management": "Registrazione video",

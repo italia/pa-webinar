@@ -2,7 +2,7 @@
 
 Every arrival on an event's live page lands in the waiting room first: participants, guests, moderators and speakers alike, whatever the event status. The waiting room is an ordinary page built with the .italia design system (Bootstrap Italia + design-react-kit). It holds everything a person needs before entering the live room: name, device check, notices, consent and the entry button.
 
-The **square** is optional. It is a 2D place built with Phaser where people who are waiting can walk around as avatars and see each other. A visitor opens it by choice and can leave it at any time. Nothing needed to take part in the event lives only in the square.
+The **square** is optional. It is a 2D place built with Phaser where people who are waiting can walk around as avatars and see each other. An event with an anonymous audience (`audienceAnonymous`) has no square, since people there are recognized by name; its waiting room also tells participants under the name field that the others will see them under a pseudonym. A visitor opens it by choice and can leave it at any time. Nothing needed to take part in the event lives only in the square.
 
 This page is written for front-end developers, accessibility reviewers, and administrators choosing the waiting-room engine. It covers what the page shows in each state, what it contains, how the engine is chosen, how the square is built, how presence works, and the accessibility contract that keeps the square optional.
 

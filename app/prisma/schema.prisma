@@ -266,6 +266,13 @@ model Event {
   // (lo decide la creazione); quelli di prima restano come erano.
   listenOnlyWithoutConsent Boolean @default(false) @map("listen_only_without_consent")
 
+  // Pubblico anonimo: chi partecipa (iscritti e ospiti) compare agli altri
+  // con uno pseudonimo stabile per posto («Partecipante 7K2Q»), in video, in
+  // chat e nelle domande; l'elenco dei partecipanti e la vista a griglia
+  // restano a chi conduce. Chi conduce e chi interviene restano con il nome.
+  // Spento di default: negli eventi di comunita' ci si vuole conoscere.
+  audienceAnonymous Boolean @default(false) @map("audience_anonymous")
+
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
 

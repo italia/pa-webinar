@@ -655,7 +655,8 @@
       "consent": "Nõustun salvestamisega ja osalen",
       "joining": "Ruumi tagasi sisenemine…",
       "error": "Tagasi sisenemine ebaõnnestus: proovi uuesti."
-    }
+    },
+    "pseudonym": "Osaleja-{code}"
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Kes ei nõustu, osaleb ainult kuulajana",
         "listenOnlyWithoutConsentOn": "Nõusolek salvestamiseks on vabatahtlik: kes seda ei anna, osaleb ikkagi, jälgib ja kirjutab vestlusesse, kuid mikrofon, kaamera ja ekraan jäävad välja.",
         "listenOnlyWithoutConsentOff": "Ilma salvestamise nõusolekuta ei pääse sisse.",
-        "listenOnlyLockedLive": "Kuni ruum võib olla avatud, ei saa salvestamist ega ainult kuulamist muuta: need kehtivad esimesest sisenemisest."
+        "listenOnlyLockedLive": "Kuni ruum võib olla avatud, ei saa salvestamist ega ainult kuulamist muuta: need kehtivad esimesest sisenemisest.",
+        "audienceAnonymous": "Anonüümne publik",
+        "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
+        "audienceAnonymousLocked": "Kuni ruum võib olla avatud, seda muuta ei saa: see seoks pseudonüümid nimedega."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Plaanitud alguseni ({when}) on üle 30 minuti. Kui alustad praegu, pääseb lingiga igaüks kohe sisse ja videoruum lülitub sisse: kinnitamiseks vajuta uuesti.",
     "startEarlyYes": "Alusta kohe",
-    "startEarlyNo": "Oota plaanitud aega"
+    "startEarlyNo": "Oota plaanitud aega",
+    "anonymousNameHelp": "Sellel sündmusel on publik anonüümne: teised ei näe sinu nime, vaid koodiga pseudonüümi."
   },
   "recording": {
     "management": "Videosalvestis",

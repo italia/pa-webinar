@@ -54,7 +54,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const where = UUID_RE.test(param) ? { id: param } : { slug: param };
   const event = await prisma.event.findUnique({
     where,
-    select: { id: true, moderatorToken: true, moderatorName: true, chatEnabled: true },
+    select: { id: true, moderatorToken: true, moderatorName: true, chatEnabled: true, audienceAnonymous: true },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 

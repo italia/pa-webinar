@@ -32,6 +32,8 @@ export interface StepPermissionsValue {
   autoStartRecording: boolean;
   /** Chi non acconsente alla registrazione entra in solo ascolto. */
   listenOnlyWithoutConsent: boolean;
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -168,6 +170,31 @@ export default function StepPermissions({
       <div>
       {/* I ruoli e che cosa fanno stanno nel passo «Persone», dove si
           assegnano; qui la tabella di cio' che puo' fare ciascuno. */}
+
+      {/* Pubblico anonimo: per gli eventi grandi. Negli eventi di comunita'
+          ci si vuole riconoscere, per questo parte spento. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('audienceAnonymous')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {t('audienceAnonymousDesc')}
+          </div>
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('audienceAnonymous')}
+          checked={value.audienceAnonymous}
+          disabled={soloAscoltoBloccato}
+          onChange={() => onChange({ audienceAnonymous: !value.audienceAnonymous })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('audienceAnonymousLocked')}
+        </p>
+      )}
 
       <div className="table-responsive mb-4">
         <table

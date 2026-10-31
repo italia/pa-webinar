@@ -655,7 +655,8 @@
       "consent": "Consinto a gravação e participo",
       "joining": "A voltar à sala…",
       "error": "Não foi possível voltar a entrar: tente novamente."
-    }
+    },
+    "pseudonym": "Participante-{code}"
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Quem não consente entra apenas a ouvir",
         "listenOnlyWithoutConsentOn": "O consentimento para a gravação é livre: quem não o dá participa na mesma, acompanha e escreve no chat, mas o microfone, a câmara e o ecrã ficam desligados.",
         "listenOnlyWithoutConsentOff": "Sem consentimento para a gravação não se entra.",
-        "listenOnlyLockedLive": "Enquanto a sala puder estar aberta, a gravação e o modo apenas a ouvir não se alteram: valem a partir da primeira entrada."
+        "listenOnlyLockedLive": "Enquanto a sala puder estar aberta, a gravação e o modo apenas a ouvir não se alteram: valem a partir da primeira entrada.",
+        "audienceAnonymous": "Público anónimo",
+        "audienceAnonymousDesc": "Quem participa aparece aos outros com um pseudónimo («Participante» e um código) no vídeo, no chat e nas perguntas; a lista de participantes fica com a moderação e não há praça. Útil para eventos grandes; nos eventos de comunidade as pessoas querem conhecer-se.",
+        "audienceAnonymousLocked": "Não se pode alterar enquanto a sala puder estar aberta: ligaria os pseudónimos aos nomes."
       },
       "step3": {
         "heading": "Pessoas e convites",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Faltam mais de 30 minutos para o início previsto ({when}). Se iniciar agora, quem tiver a ligação entra logo e a sala de vídeo liga-se: carregue de novo para confirmar.",
     "startEarlyYes": "Iniciar agora",
-    "startEarlyNo": "Aguardar a hora prevista"
+    "startEarlyNo": "Aguardar a hora prevista",
+    "anonymousNameHelp": "Neste evento o público é anónimo: os outros não veem o seu nome, mas um pseudónimo com um código."
   },
   "recording": {
     "management": "Gravação de vídeo",

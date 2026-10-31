@@ -655,7 +655,8 @@
       "consent": "Nagħti l-kunsens għar-reġistrazzjoni u nipparteċipa",
       "joining": "Qed terġa' tidħol fil-kamra…",
       "error": "Ma kienx possibbli terġa' tidħol: erġa' pprova."
-    }
+    },
+    "pseudonym": "Parteċipant-{code}"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Min ma jagħtix il-kunsens jidħol jisma' biss",
         "listenOnlyWithoutConsentOn": "Il-kunsens għar-reġistrazzjoni huwa liberu: min ma jagħtihx xorta jipparteċipa, isegwi u jikteb fiċ-chat, iżda l-mikrofonu, il-kamera u l-iskrin jibqgħu mitfija.",
         "listenOnlyWithoutConsentOff": "Mingħajr kunsens għar-reġistrazzjoni ħadd ma jidħol.",
-        "listenOnlyLockedLive": "Sakemm il-kamra tista' tkun miftuħa, ir-reġistrazzjoni u s-smigħ biss ma jinbidlux: jgħoddu mill-ewwel dħul."
+        "listenOnlyLockedLive": "Sakemm il-kamra tista' tkun miftuħa, ir-reġistrazzjoni u s-smigħ biss ma jinbidlux: jgħoddu mill-ewwel dħul.",
+        "audienceAnonymous": "Udjenza anonima",
+        "audienceAnonymousDesc": "Il-parteċipanti jidhru lill-oħrajn b’psewdonimu (“Parteċipant” u kodiċi) fil-vidjo, fiċ-chat u fil-mistoqsijiet; il-lista tal-parteċipanti tibqa’ għand min imexxi, u m’hemmx pjazza. Utli għal avvenimenti kbar; f’avvenimenti tal-komunità n-nies iridu jsiru jafu lil xulxin.",
+        "audienceAnonymousLocked": "Ma jinbidilx sakemm il-kamra tista’ tkun miftuħa: jorbot il-psewdonimi mal-ismijiet."
       },
       "step3": {
         "heading": "Persuni u stediniet",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Għad baqa' aktar minn 30 minuta għall-bidu ppjanat ({when}). Jekk tibda issa, kull min għandu l-link jidħol mill-ewwel u l-kamra tal-vidjo tinxtegħel: agħfas mill-ġdid biex tikkonferma.",
     "startEarlyYes": "Ibda issa",
-    "startEarlyNo": "Stenna l-ħin ippjanat"
+    "startEarlyNo": "Stenna l-ħin ippjanat",
+    "anonymousNameHelp": "F’dan l-avveniment l-udjenza hija anonima: l-oħrajn ma jarawx ismek, iżda psewdonimu b’kodiċi."
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

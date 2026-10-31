@@ -97,7 +97,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // pubblicazione non fa nulla.
     void publishTyping({
       eventId: auth.eventId,
-      senderKey: senderColourKey(auth.senderId),
+      senderKey: senderColourKey(auth.senderId, auth.eventId),
       senderName: auth.senderName,
     });
   }

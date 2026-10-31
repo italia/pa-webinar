@@ -19,6 +19,7 @@ vi.mock('@/lib/event-session', () => ({
 }));
 const staff = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staff.valore) }));
+vi.mock('@/lib/live/pseudonym', () => ({ pseudonimo: vi.fn(async (_e: string, posto: string) => `Pseudo ${posto}`) }));
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
@@ -133,6 +134,21 @@ describe('resolveTokenSender — il link primario aperto dallo staff', () => {
       isModerator: true,
       isPerPersonIdentity: true,
     });
+  });
+});
+
+describe('resolveTokenSender — pubblico anonimo', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedGrant.mockResolvedValue(null);
+    mockedReg.mockResolvedValue({ id: 'reg-99', displayName: 'Alice', eventId: 'evt-1' });
+  });
+
+  it("l'iscritto scrive con lo pseudonimo del posto, anche dal suo browser", async () => {
+    mockedOwned.mockResolvedValue('ACCESS');
+    const sender = await resolveTokenSender({ ...EVENT, audienceAnonymous: true }, 'ACCESS');
+    expect(sender).toMatchObject({ senderId: 'reg-reg-99', senderName: 'Pseudo reg-reg-99' });
+    expect(sender?.senderName).not.toContain('Alice');
   });
 });
 

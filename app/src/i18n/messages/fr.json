@@ -655,7 +655,8 @@
       "consent": "Je consens à l'enregistrement et j'interviens",
       "joining": "Retour dans la salle…",
       "error": "Impossible de revenir dans la salle : réessayez."
-    }
+    },
+    "pseudonym": "Participant-{code}"
   },
   "qa": {
     "title": "Questions et Réponses",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Les personnes qui ne consentent pas entrent en écoute seule",
         "listenOnlyWithoutConsentOn": "Le consentement à l'enregistrement est libre : qui ne le donne pas participe quand même, suit et écrit dans le chat, mais le micro, la caméra et l'écran restent coupés.",
         "listenOnlyWithoutConsentOff": "Sans consentement à l'enregistrement, on n'entre pas.",
-        "listenOnlyLockedLive": "Tant que la salle peut être ouverte, l'enregistrement et l'écoute seule ne se modifient pas : ils valent dès la première entrée."
+        "listenOnlyLockedLive": "Tant que la salle peut être ouverte, l'enregistrement et l'écoute seule ne se modifient pas : ils valent dès la première entrée.",
+        "audienceAnonymous": "Public anonyme",
+        "audienceAnonymousDesc": "Les participants apparaissent aux autres sous un pseudonyme (« Participant » et un code) en vidéo, dans le chat et les questions ; la liste des participants reste aux animateurs et il n'y a pas de place. Utile pour les grands événements ; aux événements de communauté, on veut se connaître.",
+        "audienceAnonymousLocked": "Non modifiable tant que la salle peut être ouverte : cela relierait les pseudonymes aux noms."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Il reste plus de 30 minutes avant le début prévu ({when}). En démarrant maintenant, toute personne ayant le lien entre aussitôt et la salle vidéo s'allume : appuyez de nouveau pour confirmer.",
     "startEarlyYes": "Démarrer maintenant",
-    "startEarlyNo": "Attendre l'heure prévue"
+    "startEarlyNo": "Attendre l'heure prévue",
+    "anonymousNameHelp": "Lors de cet événement, le public est anonyme : les autres ne voient pas votre nom, mais un pseudonyme avec un code."
   },
   "recording": {
     "management": "Enregistrement vidéo",

@@ -655,7 +655,8 @@
       "consent": "Privolim v snemanje in sodelujem",
       "joining": "Ponoven vstop v sobo…",
       "error": "Ponoven vstop ni uspel: poskusite znova."
-    }
+    },
+    "pseudonym": "Udeleženec-{code}"
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Kdor ne privoli, vstopi samo kot poslušalec",
         "listenOnlyWithoutConsentOn": "Privolitev v snemanje je prostovoljna: kdor je ne da, vseeno sodeluje, spremlja in piše v klepet, mikrofon, kamera in zaslon pa ostanejo izklopljeni.",
         "listenOnlyWithoutConsentOff": "Brez privolitve v snemanje ni vstopa.",
-        "listenOnlyLockedLive": "Dokler je soba lahko odprta, snemanja in načina samo poslušanja ni mogoče spremeniti: veljata od prvega vstopa."
+        "listenOnlyLockedLive": "Dokler je soba lahko odprta, snemanja in načina samo poslušanja ni mogoče spremeniti: veljata od prvega vstopa.",
+        "audienceAnonymous": "Anonimno občinstvo",
+        "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
+        "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Do načrtovanega začetka ({when}) je še več kot 30 minut. Če začnete zdaj, lahko vsak s povezavo takoj vstopi in videosoba se vklopi: za potrditev pritisnite znova.",
     "startEarlyYes": "Začni zdaj",
-    "startEarlyNo": "Počakaj na načrtovani čas"
+    "startEarlyNo": "Počakaj na načrtovani čas",
+    "anonymousNameHelp": "Na tem dogodku je občinstvo anonimno: drugi ne vidijo vašega imena, ampak psevdonim s kodo."
   },
   "recording": {
     "management": "Video posnetek",

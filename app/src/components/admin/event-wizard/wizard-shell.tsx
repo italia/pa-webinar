@@ -287,6 +287,7 @@ export interface InitialEventShape {
     captionsTranscriptEnabled?: boolean | null;
     autoStartRecording: boolean;
     listenOnlyWithoutConsent?: boolean;
+    audienceAnonymous?: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -515,6 +516,7 @@ export default function EventWizard(props: WizardProps) {
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         listenOnlyWithoutConsent: ev.listenOnlyWithoutConsent ?? false,
+        audienceAnonymous: ev.audienceAnonymous ?? false,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
@@ -665,6 +667,7 @@ export default function EventWizard(props: WizardProps) {
       // Il consenso alla registrazione e' libero: chi non lo da' entra in
       // solo ascolto (si puo' spegnere nei permessi).
       listenOnlyWithoutConsent: true,
+      audienceAnonymous: false,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -1681,6 +1684,7 @@ export default function EventWizard(props: WizardProps) {
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
           listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
+          audienceAnonymous: form.audienceAnonymous,
 
           // Postprod AI — subordinate al recording (server-side resta
           // un'invariante: senza recordingEnabled non c'è transcript).
@@ -2384,6 +2388,7 @@ export default function EventWizard(props: WizardProps) {
             </p>
             <StepPermissions
               parte="partecipazione"
+              soloAscoltoBloccato={mode === 'edit' && !!props.salaAperta}
               programma={
                 istantanea
                   ? undefined

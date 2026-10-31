@@ -655,7 +655,8 @@
       "consent": "Toilím leis an taifeadadh agus glacaim páirt",
       "joining": "Ag filleadh ar an seomra…",
       "error": "Níorbh fhéidir filleadh: bain triail eile as."
-    }
+    },
+    "pseudonym": "Rannpháirtí-{code}"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Téann daoine nach dtoilíonn isteach ag éisteacht amháin",
         "listenOnlyWithoutConsentOn": "Tá toiliú leis an taifeadadh saor: glacann daoine nach dtugann é páirt fós, leanann siad agus scríobhann siad sa chomhrá, ach fanann micreafón, ceamara agus scáileán múchta.",
         "listenOnlyWithoutConsentOff": "Gan toiliú leis an taifeadadh ní théann aon duine isteach.",
-        "listenOnlyLockedLive": "Fad is féidir leis an seomra a bheith oscailte, ní féidir an taifeadadh ná an éisteacht amháin a athrú: tá feidhm acu ón gcéad iontráil."
+        "listenOnlyLockedLive": "Fad is féidir leis an seomra a bheith oscailte, ní féidir an taifeadadh ná an éisteacht amháin a athrú: tá feidhm acu ón gcéad iontráil.",
+        "audienceAnonymous": "Lucht féachana gan ainm",
+        "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
+        "audienceAnonymousLocked": "Ní féidir é a athrú fad is féidir leis an seomra a bheith oscailte: nascfadh sé ainmneacha cleite le hainmneacha."
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús beartaithe ({when}). Má thosaíonn tú anois, rachaidh aon duine a bhfuil an nasc aige isteach láithreach agus lasfar an seomra físe: brúigh arís le deimhniú.",
     "startEarlyYes": "Tosaigh anois",
-    "startEarlyNo": "Fan leis an am beartaithe"
+    "startEarlyNo": "Fan leis an am beartaithe",
+    "anonymousNameHelp": "San ócáid seo tá an lucht féachana gan ainm: ní fheiceann daoine eile d’ainm, ach ainm cleite le cód."
   },
   "recording": {
     "management": "Taifeadadh físe",

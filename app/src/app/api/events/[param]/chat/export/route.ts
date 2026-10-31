@@ -66,7 +66,7 @@ export const GET = withErrorHandling(async (request, context) => {
     from: tryDecryptPII(m.senderName) ?? m.senderName,
     // Chiave opaca, non l'id: quello degli ospiti decodifica nell'IP pubblico,
     // e questo è un file che viene scaricato e girato.
-    senderKey: senderColourKey(m.senderId),
+    senderKey: senderColourKey(m.senderId, eventId),
     isModerator: m.isModerator,
     text: tryDecryptPII(m.text) ?? m.text,
     edited: m.editedAt ? m.editedAt.toISOString() : null,

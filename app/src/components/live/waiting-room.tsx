@@ -101,6 +101,8 @@ interface WaitingRoomEvent {
    *  default). GARDEN = SVG garden, GAME = Phaser videogame lobby, CLASSIC =
    *  static accessible card. Defaults to GARDEN when absent. */
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
   startsAt: string;
   endsAt: string;
   status: 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING';
@@ -1006,7 +1008,7 @@ export default function WaitingRoom({
   // prima come indicazione, dopo un tentativo come errore — e il campo lo
   // annuncia a chi usa un lettore di schermo.
   const nameDescribedBy =
-    [isGuest ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
+    [isGuest || (event.audienceAnonymous && !conduce) ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
       .filter(Boolean)
       .join(' ') || undefined;
   const nameField = (
@@ -1028,10 +1030,18 @@ export default function WaitingRoom({
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
-      {isGuest && (
-        <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
-          {t('nameHelp')}
+      {event.audienceAnonymous && !conduce ? (
+        // Pubblico anonimo: il nome resta a chi organizza, gli altri vedono
+        // uno pseudonimo.
+        <small id="waiting-name-help" className="text-muted d-block" style={{ fontSize: '0.8rem' }}>
+          {t('anonymousNameHelp')}
         </small>
+      ) : (
+        isGuest && (
+          <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
+            {t('nameHelp')}
+          </small>
+        )
       )}
       {nomeDaChiedere && (
         <div

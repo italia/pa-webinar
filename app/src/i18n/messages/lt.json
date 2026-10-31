@@ -655,7 +655,8 @@
       "consent": "Sutinku su įrašymu ir dalyvauju",
       "joining": "Grįžtama į kambarį…",
       "error": "Nepavyko grįžti: bandykite dar kartą."
-    }
+    },
+    "pseudonym": "Dalyvis-{code}"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Nesutikusieji įeina tik klausytis",
         "listenOnlyWithoutConsentOn": "Sutikimas dėl įrašymo yra laisvas: jo nedavusieji vis tiek dalyvauja, seka ir rašo pokalbyje, bet mikrofonas, kamera ir ekranas lieka išjungti.",
         "listenOnlyWithoutConsentOff": "Be sutikimo dėl įrašymo neįeinama.",
-        "listenOnlyLockedLive": "Kol kambarys gali būti atviras, įrašymo ir tik klausymo keisti negalima: jie galioja nuo pirmojo įėjimo."
+        "listenOnlyLockedLive": "Kol kambarys gali būti atviras, įrašymo ir tik klausymo keisti negalima: jie galioja nuo pirmojo įėjimo.",
+        "audienceAnonymous": "Anoniminė auditorija",
+        "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
+        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Iki numatytos pradžios ({when}) liko daugiau nei 30 minučių. Pradėjus dabar, kiekvienas, turintis nuorodą, iškart įeis ir vaizdo kambarys įsijungs: paspauskite dar kartą, kad patvirtintumėte.",
     "startEarlyYes": "Pradėti dabar",
-    "startEarlyNo": "Laukti numatyto laiko"
+    "startEarlyNo": "Laukti numatyto laiko",
+    "anonymousNameHelp": "Šiame renginyje auditorija anoniminė: kiti mato ne jūsų vardą, o slapyvardį su kodu."
   },
   "recording": {
     "management": "Vaizdo įrašas",

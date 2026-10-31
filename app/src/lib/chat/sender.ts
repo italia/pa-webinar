@@ -18,6 +18,7 @@
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
+import { pseudonimo } from '@/lib/live/pseudonym';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
@@ -45,6 +46,8 @@ export interface ChatEventForAuth {
   id: string;
   moderatorToken: string;
   moderatorName?: string | null;
+  /** Pubblico anonimo: chi partecipa scrive con lo pseudonimo del posto. */
+  audienceAnonymous?: boolean;
 }
 
 /**
@@ -121,9 +124,12 @@ export async function resolveTokenSender(
     return {
       eventId: event.id,
       senderId: `reg-${registration.id}`,
-      senderName: owns
-        ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
-        : displayNameOverride?.trim() || 'Partecipante',
+      // Pubblico anonimo: lo pseudonimo del posto, lo stesso del video.
+      senderName: event.audienceAnonymous
+        ? await pseudonimo(event.id, `reg-${registration.id}`)
+        : owns
+          ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
+          : displayNameOverride?.trim() || 'Partecipante',
       isModerator: false,
       // Only the browser that registered — the one holding the signed
       // event_access cookie — is provably this person. A forwarded link shares

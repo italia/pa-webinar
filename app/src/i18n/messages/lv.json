@@ -655,7 +655,8 @@
       "consent": "Piekrītu ierakstīšanai un piedalos",
       "joining": "Atkārtota ieiešana telpā…",
       "error": "Neizdevās atgriezties: mēģiniet vēlreiz."
-    }
+    },
+    "pseudonym": "Dalībnieks-{code}"
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Kas nepiekrīt, ieiet tikai klausīties",
         "listenOnlyWithoutConsentOn": "Piekrišana ierakstīšanai ir brīvprātīga: kas to nedod, tomēr piedalās, seko un raksta tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti.",
         "listenOnlyWithoutConsentOff": "Bez piekrišanas ierakstīšanai neviens netiek iekšā.",
-        "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas."
+        "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas.",
+        "audienceAnonymous": "Anonīma auditorija",
+        "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
+        "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Līdz plānotajam sākumam ({when}) ir vairāk nekā 30 minūtes. Sākot tagad, ikviens ar saiti uzreiz ienāks un video telpa ieslēgsies: nospiediet vēlreiz, lai apstiprinātu.",
     "startEarlyYes": "Sākt tagad",
-    "startEarlyNo": "Gaidīt plānoto laiku"
+    "startEarlyNo": "Gaidīt plānoto laiku",
+    "anonymousNameHelp": "Šajā pasākumā auditorija ir anonīma: citi neredz jūsu vārdu, bet pseidonīmu ar kodu."
   },
   "recording": {
     "management": "Video ieraksts",

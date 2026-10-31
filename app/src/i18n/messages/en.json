@@ -655,7 +655,8 @@
       "consent": "I consent to the recording and take part",
       "joining": "Rejoining the room…",
       "error": "Could not rejoin: please try again."
-    }
+    },
+    "pseudonym": "Participant-{code}"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "People who do not consent join listening only",
         "listenOnlyWithoutConsentOn": "Consent to the recording is free: people who do not give it still take part, follow and write in the chat, but microphone, camera and screen stay off.",
         "listenOnlyWithoutConsentOff": "Without consent to the recording, nobody enters.",
-        "listenOnlyLockedLive": "While the room may be open, recording and listen-only cannot change: they apply from the first entry."
+        "listenOnlyLockedLive": "While the room may be open, recording and listen-only cannot change: they apply from the first entry.",
+        "audienceAnonymous": "Anonymous audience",
+        "audienceAnonymousDesc": "Participants appear to the others under a pseudonym (“Participant” and a code) on video, in the chat and in questions; the participant list stays with the hosts, and there is no square. Useful for large events; at community events people want to know each other.",
+        "audienceAnonymousLocked": "It cannot change while the room may be open: it would link pseudonyms to names."
       },
       "step3": {
         "heading": "People and invites",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "The planned start ({when}) is more than 30 minutes away. Starting now lets anyone with the link in and turns on the video room: press again to confirm.",
     "startEarlyYes": "Start now",
-    "startEarlyNo": "Wait for the planned time"
+    "startEarlyNo": "Wait for the planned time",
+    "anonymousNameHelp": "In this event the audience is anonymous: others do not see your name, but a pseudonym with a code."
   },
   "recording": {
     "management": "Video recording",

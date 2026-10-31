@@ -284,6 +284,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       captionsTranscriptEnabled: event.captionsTranscriptEnabled,
       autoStartRecording: event.autoStartRecording,
       listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
+      audienceAnonymous: event.audienceAnonymous,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,

@@ -183,7 +183,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   void publishChat({
     id: messageId,
     eventId: auth.eventId,
-    senderKey: senderColourKey(auth.senderId),
+    senderKey: senderColourKey(auth.senderId, auth.eventId),
     senderName: auth.senderName,
     isModerator: auth.isModerator,
     text: parsed.data.text,

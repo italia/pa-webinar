@@ -655,7 +655,8 @@
       "consent": "Îmi dau acordul pentru înregistrare și intervin",
       "joining": "Reintri în sală…",
       "error": "Nu s-a putut reintra: încearcă din nou."
-    }
+    },
+    "pseudonym": "Participant-{code}"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Cine nu își dă acordul intră doar ca ascultător",
         "listenOnlyWithoutConsentOn": "Acordul pentru înregistrare este liber: cine nu îl dă participă totuși, urmărește și scrie în chat, dar microfonul, camera și ecranul rămân oprite.",
         "listenOnlyWithoutConsentOff": "Fără acord pentru înregistrare nu se intră.",
-        "listenOnlyLockedLive": "Cât timp sala poate fi deschisă, înregistrarea și modul doar ascultare nu se pot schimba: se aplică de la prima intrare."
+        "listenOnlyLockedLive": "Cât timp sala poate fi deschisă, înregistrarea și modul doar ascultare nu se pot schimba: se aplică de la prima intrare.",
+        "audienceAnonymous": "Public anonim",
+        "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
+        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Mai sunt peste 30 de minute până la începutul planificat ({when}). Dacă pornești acum, oricine are linkul intră imediat și sala video se aprinde: apasă din nou pentru a confirma.",
     "startEarlyYes": "Pornește acum",
-    "startEarlyNo": "Așteaptă ora planificată"
+    "startEarlyNo": "Așteaptă ora planificată",
+    "anonymousNameHelp": "La acest eveniment publicul este anonim: ceilalți nu îți văd numele, ci un pseudonim cu un cod."
   },
   "recording": {
     "management": "Înregistrare video",

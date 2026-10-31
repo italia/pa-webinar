@@ -67,6 +67,8 @@ interface JitsiRoomProps {
    *  risolto a runtime dal Server Component. Senza, il pulsante non entra
    *  nella barra nemmeno per un evento che l'ha scelta. Default false. */
   whiteboardInfraReady?: boolean;
+  /** Pubblico anonimo: niente vista a griglia per chi partecipa. */
+  pubblicoAnonimo?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
@@ -155,6 +157,7 @@ export default function JitsiRoom({
   enableFileSharing = false,
   whiteboardEnabled = false,
   whiteboardInfraReady = false,
+  pubblicoAnonimo = false,
   videoQuality,
   reactionsMode = 'NATIVE',
   liveCaptions = false,
@@ -266,8 +269,14 @@ export default function JitsiRoom({
     let toolbarButtons = role === 'moderator'
       ? (isMobileRef.current ? [...mobileModeratorToolbarButtons] : [...moderatorToolbarButtons])
       : (isMobileRef.current ? [...mobileBaseToolbarButtons] : [...baseToolbarButtons]);
+    // Pubblico anonimo: chi partecipa non vede la griglia di tutti i presenti,
+    // ne' dal pulsante ne' dalla scorciatoia da tastiera.
+    if (role !== 'moderator' && pubblicoAnonimo) {
+      toolbarButtons = toolbarButtons.filter((b) => b !== 'tileview');
+    }
 
     const extraConfig: Record<string, unknown> = {};
+    if (role !== 'moderator' && pubblicoAnonimo) extraConfig.disableTileView = true;
 
     // paFaceFx PoC opt-in via `?facefx=1` on the app URL. It rides into the
     // Jitsi configOverwrite → the IFrame API serializes it into the iframe
@@ -943,7 +952,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, pubblicoAnonimo, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">

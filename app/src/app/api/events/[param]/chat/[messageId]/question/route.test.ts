@@ -97,7 +97,7 @@ describe('PATCH /chat/[messageId]/question — published envelope', () => {
     expect(envelope).not.toHaveProperty('senderId');
     expect(payload).not.toContain(GUEST_SENDER_ID);
     expect(payload).not.toContain(GUEST_IP);
-    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID, EVENT_ID));
 
     // La chiave è un HMAC: chi conosce il nome visibile e prova tutti gli IP
     // non la ritrova con uno SHA-256 non firmato dell'id.

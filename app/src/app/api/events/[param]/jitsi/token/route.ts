@@ -27,6 +27,8 @@ import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
+import { pseudonimo } from '@/lib/live/pseudonym';
+import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailable } from '@/lib/recording/availability';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
@@ -261,9 +263,13 @@ export const POST = withErrorHandling(async (request, context) => {
       // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
       // dato ora in sala d'attesa.
       const mediaInoltro = mediaPartecipante(parsed.data.recordingConsent === true);
+      // Pubblico anonimo: lo pseudonimo del posto (lo stesso della chat).
+      const nomeInoltro = event.audienceAnonymous
+        ? await pseudonimo(event.id, `reg-${registration.id}`)
+        : typedName;
       const guestJwt = await generateJitsiJwt({
         roomName: event.jitsiRoomName,
-        displayName: typedName,
+        displayName: nomeInoltro,
         uniqueId: postoOspite,
         isModerator: false,
         ...mediaInoltro,
@@ -277,7 +283,7 @@ export const POST = withErrorHandling(async (request, context) => {
         {
           jwt: guestJwt,
           roomName: event.jitsiRoomName,
-          displayName: typedName,
+          displayName: nomeInoltro,
           role: 'participant',
           consentsRecorded,
           listenOnly: !!mediaInoltro.listenOnly,
@@ -326,19 +332,23 @@ export const POST = withErrorHandling(async (request, context) => {
     const fotoIscritto = accesso?.emailVerified
       ? await findPhotoByEmailHash(registration.emailHash)
       : null;
+    // Pubblico anonimo: in sala lo pseudonimo del posto, senza indirizzo ne'
+    // foto (niente che porti alla persona). Chi e' in solo ascolto ha
+    // rifiutato la registrazione: in sala con le iniziali, senza la sua foto.
+    const anonimo = event.audienceAnonymous;
+    const nomeInSala = anonimo ? await pseudonimo(event.id, `reg-${registration.id}`) : name;
+    const conVolto = !anonimo && !mediaIscritto.listenOnly;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
-      displayName: name,
+      displayName: nomeInSala,
       uniqueId: postoIscritto,
       isModerator: false,
       ...mediaIscritto,
-      email,
-      // Chi e' in solo ascolto ha rifiutato la registrazione: in sala con le
-      // iniziali, senza la sua foto.
-      photoUrl: fotoIscritto && !mediaIscritto.listenOnly ? profilePhotoUrl(fotoIscritto) : null,
+      email: anonimo ? undefined : email,
+      photoUrl: fotoIscritto && conVolto ? profilePhotoUrl(fotoIscritto) : null,
       // La scelta è dell'amministratore, e la legge il chiamante: il minter del
       // token resta puro (vedi JitsiTokenPayload.useGravatar).
-      useGravatar: !mediaIscritto.listenOnly && (await getSettings()).gravatarEnabled,
+      useGravatar: conVolto && (await getSettings()).gravatarEnabled,
     });
     const consentsRecorded = await registraConsensi(event, parsed.data, {
       jitsiUserId: postoIscritto,
@@ -349,7 +359,7 @@ export const POST = withErrorHandling(async (request, context) => {
     return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
-      displayName: name,
+      displayName: nomeInSala,
       role: 'participant',
       consentsRecorded,
       listenOnly: !!mediaIscritto.listenOnly,
@@ -393,9 +403,13 @@ export const POST = withErrorHandling(async (request, context) => {
 
     const postoOspite = guestJitsiId();
     const mediaOspite = mediaPartecipante(parsed.data.recordingConsent === true);
+    // Pubblico anonimo: lo pseudonimo del posto in chat (la chiave dell'ospite).
+    const nomeOspite = event.audienceAnonymous
+      ? await pseudonimo(event.id, guestSenderId(ip, guestName))
+      : guestName;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
-      displayName: guestName,
+      displayName: nomeOspite,
       uniqueId: postoOspite,
       isModerator: false,
       ...mediaOspite,
@@ -409,7 +423,7 @@ export const POST = withErrorHandling(async (request, context) => {
     return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
-      displayName: guestName,
+      displayName: nomeOspite,
       role: 'guest',
       consentsRecorded,
       listenOnly: !!mediaOspite.listenOnly,

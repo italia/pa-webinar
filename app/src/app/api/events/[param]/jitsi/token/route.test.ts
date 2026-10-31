@@ -17,6 +17,9 @@ import { eventAccessCookieName, signEventAccess } from '@/lib/event-session';
 import { readGravatarRef } from '@/lib/gravatar-ref';
 import { invalidateSettingsCache } from '@/lib/settings';
 import { prisma } from '@/lib/db';
+import type * as Pseudonimo from '@/lib/live/pseudonym';
+import { codicePseudonimo } from '@/lib/live/pseudonym';
+import { guestSenderId } from '@/lib/chat/sender-key';
 
 import { POST } from './route';
 
@@ -33,6 +36,10 @@ vi.mock('next/headers', () => ({
   }),
 }));
 
+vi.mock('@/lib/live/pseudonym', async (orig) => {
+  const vero = await orig<typeof Pseudonimo>();
+  return { ...vero, pseudonimo: async (e: string, p: string) => `Partecipante-${vero.codicePseudonimo(e, p)}` };
+});
 const staffSeat = vi.hoisted(() => ({ valore: null as { accountId: string; nome: string } | null }));
 vi.mock('@/lib/auth/staff-seat', () => ({ staffDietroIlPrimario: vi.fn(async () => staffSeat.valore) }));
 
@@ -94,6 +101,7 @@ type EventOverrides = Partial<{
   participantsCanShareScreen: boolean;
   accessMode: 'OPEN' | 'INVITATION' | null;
   listenOnlyWithoutConsent: boolean;
+  audienceAnonymous: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -113,6 +121,7 @@ function eventRow(overrides: EventOverrides = {}) {
     participantsCanShareScreen: false,
     accessMode: null,
     listenOnlyWithoutConsent: false,
+    audienceAnonymous: false,
     ...overrides,
   };
 }
@@ -1007,6 +1016,35 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     expect(user.listenOnly).toBeUndefined();
     expect(user.mediaLock).toEqual({ audio: true, video: true, desktop: true });
     expect(user.mediaAdmit).toEqual({ audio: true, video: false, desktop: false });
+  });
+});
+
+describe('POST jitsi/token — pubblico anonimo', () => {
+  beforeEach(() => {
+    applySettings({ guestAccessEnabled: true, gravatarEnabled: true });
+  });
+
+  it("l'ospite entra con lo pseudonimo del suo posto in chat, non con il nome", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ audienceAnonymous: true }) as never);
+    const res = await post({ guestName: 'Mario Rossi' });
+    expect(res.status).toBe(200);
+    const { body, user } = await minted(res);
+    const atteso = codicePseudonimo(EVENT_ID, guestSenderId(`10.0.0.${ipCounter}`, 'Mario Rossi'));
+    expect(user.name).toBe(`Partecipante-${atteso}`);
+    expect(body.displayName).toBe(user.name);
+    expect(JSON.stringify(user)).not.toContain('Mario');
+  });
+
+  it("l'iscritto entra con lo pseudonimo, senza indirizzo ne' avatar", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ audienceAnonymous: true }) as never);
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+    const res = await post({ accessToken: ACCESS_TOKEN });
+    const { user } = await minted(res);
+    expect(user.name).toBe(`Partecipante-${codicePseudonimo(EVENT_ID, `reg-${REGISTRATION_ID}`)}`);
+    expect(JSON.stringify(user)).not.toContain('Mario');
+    expect(JSON.stringify(user)).not.toContain(REGISTRANT_MD5);
+    expect(user.avatar).not.toContain('/api/avatar');
   });
 });
 

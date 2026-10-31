@@ -100,6 +100,8 @@ interface EventInfo {
   parseTitleKicker?: boolean;
   /** Resolved waiting-room engine (per-event override merged with site default). */
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
+  /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
+  audienceAnonymous?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
   videoQuality?: VideoQualityPreset;
   startsAt: string;
@@ -1775,6 +1777,7 @@ export default function LiveEventClient({
             slug: event.slug,
             parseTitleKicker: event.parseTitleKicker,
             waitingRoomEngine: event.waitingRoomEngine,
+            audienceAnonymous: event.audienceAnonymous ?? false,
             startsAt: event.startsAt,
             endsAt: event.endsAt,
             status: eventStatus as
@@ -2230,6 +2233,8 @@ export default function LiveEventClient({
                 enableFileSharing={isInstantCall}
                 whiteboardEnabled={whiteboardOn}
                 whiteboardInfraReady={whiteboardInfraReady}
+                // Chi interviene resta con il nome e la griglia, come chi conduce.
+                pubblicoAnonimo={(event.audienceAnonymous ?? false) && !isSpeaker}
                 videoQuality={event.videoQuality}
                 reactionsMode={reactionsMode}
                 liveCaptions={Boolean(event.liveCaptionsAvailable)}
@@ -2288,6 +2293,8 @@ export default function LiveEventClient({
 
         <LiveSidebar
           salaSoloAscolto={salaSoloAscolto}
+          guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
+          pubblicoAnonimo={event.audienceAnonymous ?? false}
           nascosta={soloContenuto}
           onNascondi={nascondiColonna}
           onMostra={mostraColonna}
@@ -2477,6 +2484,11 @@ type SidebarTab =
 interface LiveSidebarProps {
   /** Evento con il solo ascolto per chi non acconsente (lib/live/listen-only). */
   salaSoloAscolto?: boolean;
+  /** L'ospite: il nome scritto in sala d'attesa, chiave del suo posto in chat
+   *  e nelle domande (il nome mostrato puo' essere uno pseudonimo). */
+  guestKeyName?: string;
+  /** Pubblico anonimo: l'elenco dei partecipanti solo per chi conduce. */
+  pubblicoAnonimo?: boolean;
   /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
   nascosta?: boolean;
   /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
@@ -2537,6 +2549,8 @@ interface LiveSidebarProps {
 
 function LiveSidebar({
   salaSoloAscolto = false,
+  guestKeyName,
+  pubblicoAnonimo = false,
   nascosta = false,
   onNascondi,
   onMostra,
@@ -3110,7 +3124,8 @@ function LiveSidebar({
       badge: isModerator && handsCount > 0 ? handsCount : presenti,
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
-      show: true,
+      // Pubblico anonimo: l'elenco di chi partecipa resta a chi conduce.
+      show: isModerator || !pubblicoAnonimo,
     },
     // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
     // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
@@ -3595,7 +3610,7 @@ function LiveSidebar({
               eventSlug={eventSlug}
               token={token}
               isModerator={isModerator}
-              guestName={!token ? displayName : undefined}
+              guestName={!token ? guestKeyName || displayName : undefined}
               guestId={!token ? voterGuestId : undefined}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
@@ -3619,6 +3634,7 @@ function LiveSidebar({
                 eventSlug={eventSlug}
                 token={token}
                 displayName={displayName}
+                guestName={guestKeyName}
                 isGuest={!token}
                 isModerator={isModerator}
                 active={isChatActive}

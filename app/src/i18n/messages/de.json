@@ -655,7 +655,8 @@
       "consent": "Ich willige in die Aufzeichnung ein und mache mit",
       "joining": "Erneuter Eintritt in den Raum…",
       "error": "Erneuter Eintritt fehlgeschlagen: bitte erneut versuchen."
-    }
+    },
+    "pseudonym": "Teilnehmende-{code}"
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Wer nicht einwilligt, nimmt nur zuhörend teil",
         "listenOnlyWithoutConsentOn": "Die Einwilligung in die Aufzeichnung ist freiwillig: Wer sie nicht gibt, nimmt trotzdem teil, verfolgt das Event und schreibt im Chat, aber Mikrofon, Kamera und Bildschirm bleiben aus.",
         "listenOnlyWithoutConsentOff": "Ohne Einwilligung in die Aufzeichnung kein Zutritt.",
-        "listenOnlyLockedLive": "Solange der Raum geöffnet sein kann, lassen sich Aufzeichnung und Nur-Zuhören nicht ändern: Sie gelten ab dem ersten Eintritt."
+        "listenOnlyLockedLive": "Solange der Raum geöffnet sein kann, lassen sich Aufzeichnung und Nur-Zuhören nicht ändern: Sie gelten ab dem ersten Eintritt.",
+        "audienceAnonymous": "Anonymes Publikum",
+        "audienceAnonymousDesc": "Teilnehmende erscheinen für andere unter einem Pseudonym („Teilnehmende“ und ein Code) im Video, im Chat und bei Fragen; die Teilnehmerliste bleibt bei der Moderation, und es gibt keinen Platz. Sinnvoll für große Events; bei Community-Events möchte man sich kennenlernen.",
+        "audienceAnonymousLocked": "Bei möglicherweise geöffnetem Raum nicht änderbar: Pseudonyme würden mit Namen verknüpft."
       },
       "step3": {
         "heading": "Personen und Einladungen",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} Sek.",
     "startEarlyConfirm": "Bis zum geplanten Beginn ({when}) sind es mehr als 30 Minuten. Wenn Sie jetzt starten, kommen alle mit dem Link sofort hinein und der Videoraum wird eingeschaltet: Zum Bestätigen erneut drücken.",
     "startEarlyYes": "Jetzt starten",
-    "startEarlyNo": "Auf die geplante Zeit warten"
+    "startEarlyNo": "Auf die geplante Zeit warten",
+    "anonymousNameHelp": "Bei diesem Event ist das Publikum anonym: Andere sehen nicht Ihren Namen, sondern ein Pseudonym mit einem Code."
   },
   "recording": {
     "management": "Videoaufzeichnung",

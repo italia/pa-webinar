@@ -655,7 +655,8 @@
       "consent": "Suostun tallennukseen ja osallistun",
       "joining": "Palataan huoneeseen…",
       "error": "Palaaminen epäonnistui: yritä uudelleen."
-    }
+    },
+    "pseudonym": "Osallistuja-{code}"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Suostumuksen antamatta jättävät osallistuvat vain kuunnellen",
         "listenOnlyWithoutConsentOn": "Suostumus tallennukseen on vapaaehtoinen: sen antamatta jättävä osallistuu silti, seuraa ja kirjoittaa chattiin, mutta mikrofoni, kamera ja näyttö pysyvät pois päältä.",
         "listenOnlyWithoutConsentOff": "Ilman suostumusta tallennukseen ei pääse sisään.",
-        "listenOnlyLockedLive": "Kun huone voi olla auki, tallennusta ja pelkkää kuuntelua ei voi muuttaa: ne ovat voimassa ensimmäisestä sisääntulosta."
+        "listenOnlyLockedLive": "Kun huone voi olla auki, tallennusta ja pelkkää kuuntelua ei voi muuttaa: ne ovat voimassa ensimmäisestä sisääntulosta.",
+        "audienceAnonymous": "Anonyymi yleisö",
+        "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
+        "audienceAnonymousLocked": "Ei voi muuttaa huoneen ollessa mahdollisesti auki: se yhdistäisi salanimet nimiin."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Suunniteltuun alkuun ({when}) on yli 30 minuuttia. Jos aloitat nyt, kaikki linkin saaneet pääsevät heti sisään ja videohuone käynnistyy: vahvista painamalla uudelleen.",
     "startEarlyYes": "Aloita nyt",
-    "startEarlyNo": "Odota suunniteltua aikaa"
+    "startEarlyNo": "Odota suunniteltua aikaa",
+    "anonymousNameHelp": "Tässä tapahtumassa yleisö on anonyymi: muut eivät näe nimeäsi vaan koodillisen salanimen."
   },
   "recording": {
     "management": "Videotallenne",

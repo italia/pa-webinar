@@ -655,7 +655,8 @@
       "consent": "Doy mi consentimiento a la grabación e intervengo",
       "joining": "Volviendo a entrar en la sala…",
       "error": "No se ha podido volver a entrar: inténtalo de nuevo."
-    }
+    },
+    "pseudonym": "Participante-{code}"
   },
   "qa": {
     "title": "Preguntas y Respuestas",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Quien no da su consentimiento entra solo como oyente",
         "listenOnlyWithoutConsentOn": "El consentimiento a la grabación es libre: quien no lo da participa igualmente, sigue el evento y escribe en el chat, pero micrófono, cámara y pantalla siguen apagados.",
         "listenOnlyWithoutConsentOff": "Sin consentimiento a la grabación no se entra.",
-        "listenOnlyLockedLive": "Mientras la sala pueda estar abierta, la grabación y el modo solo escucha no se pueden cambiar: valen desde la primera entrada."
+        "listenOnlyLockedLive": "Mientras la sala pueda estar abierta, la grabación y el modo solo escucha no se pueden cambiar: valen desde la primera entrada.",
+        "audienceAnonymous": "Público anónimo",
+        "audienceAnonymousDesc": "Quien participa aparece ante los demás con un seudónimo («Participante» y un código) en el vídeo, el chat y las preguntas; la lista de participantes queda para la moderación y no hay plaza. Útil para eventos grandes; en los eventos de comunidad la gente quiere conocerse.",
+        "audienceAnonymousLocked": "No se puede cambiar mientras la sala pueda estar abierta: vincularía los seudónimos con los nombres."
       },
       "step3": {
         "heading": "Personas e invitaciones",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds}s",
     "startEarlyConfirm": "Faltan más de 30 minutos para el inicio previsto ({when}). Si empiezas ahora, quien tenga el enlace entra enseguida y la sala de vídeo se enciende: pulsa de nuevo para confirmar.",
     "startEarlyYes": "Iniciar ahora",
-    "startEarlyNo": "Esperar a la hora prevista"
+    "startEarlyNo": "Esperar a la hora prevista",
+    "anonymousNameHelp": "En este evento el público es anónimo: los demás no ven tu nombre, sino un seudónimo con un código."
   },
   "recording": {
     "management": "Grabación de vídeo",

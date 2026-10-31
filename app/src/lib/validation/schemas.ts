@@ -113,6 +113,8 @@ export const eventBaseSchema = z.object({
   // Chi non acconsente alla registrazione entra in solo ascolto: acceso per
   // gli eventi nuovi (il consenso e' libero, art. 7.4 GDPR).
   listenOnlyWithoutConsent: z.boolean().default(true),
+  // Pubblico anonimo: pseudonimi per chi partecipa (spento: ci si conosce).
+  audienceAnonymous: z.boolean().default(false),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),

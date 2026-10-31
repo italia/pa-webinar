@@ -126,7 +126,7 @@ describe('POST /api/events/[param]/chat/typing — chi può avvisare', () => {
     const avviso = published();
     const idGrezzo = guestSenderId(GUEST_IP, 'Anna');
     expect(avviso).not.toHaveProperty('senderId');
-    expect(avviso.senderKey).toBe(senderColourKey(idGrezzo));
+    expect(avviso.senderKey).toBe(senderColourKey(idGrezzo, EVENT_ID));
     const payload = JSON.stringify(avviso);
     expect(payload).not.toContain(idGrezzo);
     expect(payload).not.toContain(GUEST_IP);
@@ -199,7 +199,7 @@ describe('POST /api/events/[param]/chat/typing — nomi', () => {
     expect(res.status).toBe(204);
     const avviso = published();
     expect(avviso.senderName).toBe('Mario');
-    expect(avviso.senderKey).toBe(senderColourKey(`mod-${EVENT_ID}-primary`));
+    expect(avviso.senderKey).toBe(senderColourKey(`mod-${EVENT_ID}-primary`, EVENT_ID));
   });
 
   it('per un grant nominale il nome è quello registrato, non quello digitato', async () => {

@@ -655,7 +655,8 @@
       "consent": "Hozzájárulok a felvételhez, és részt veszek",
       "joining": "Visszalépés a terembe…",
       "error": "Nem sikerült visszalépni: próbálja újra."
-    }
+    },
+    "pseudonym": "Résztvevő-{code}"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Aki nem járul hozzá, csak hallgatóként lép be",
         "listenOnlyWithoutConsentOn": "A felvételhez való hozzájárulás önkéntes: aki nem adja meg, akkor is részt vesz, követi és ír a csevegésbe, de a mikrofon, a kamera és a képernyő kikapcsolva marad.",
         "listenOnlyWithoutConsentOff": "A felvételhez való hozzájárulás nélkül nem lehet belépni.",
-        "listenOnlyLockedLive": "Amíg a terem nyitva lehet, a felvétel és a csak hallgatás nem módosítható: az első belépéstől érvényesek."
+        "listenOnlyLockedLive": "Amíg a terem nyitva lehet, a felvétel és a csak hallgatás nem módosítható: az első belépéstől érvényesek.",
+        "audienceAnonymous": "Névtelen közönség",
+        "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",
+        "audienceAnonymousLocked": "Amíg a terem nyitva lehet, nem módosítható: összekapcsolná az álneveket a nevekkel."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} mp",
     "startEarlyConfirm": "A tervezett kezdésig ({when}) több mint 30 perc van hátra. Ha most indítja, a hivatkozással bárki azonnal beléphet, és a videoterem bekapcsol: a megerősítéshez nyomja meg újra.",
     "startEarlyYes": "Indítás most",
-    "startEarlyNo": "Várakozás a tervezett időpontig"
+    "startEarlyNo": "Várakozás a tervezett időpontig",
+    "anonymousNameHelp": "Ezen az eseményen a közönség névtelen: a többiek nem a nevét látják, hanem egy kódos álnevet."
   },
   "recording": {
     "management": "Videofelvétel",

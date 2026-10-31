@@ -655,7 +655,8 @@
       "consent": "Pristajem na snimanje i uključujem se",
       "joining": "Ponovni ulazak u sobu…",
       "error": "Ponovni ulazak nije uspio: pokušajte ponovno."
-    }
+    },
+    "pseudonym": "Sudionik-{code}"
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Tko ne pristane, ulazi samo kao slušatelj",
         "listenOnlyWithoutConsentOn": "Pristanak na snimanje je slobodan: tko ga ne da, svejedno sudjeluje, prati i piše u chatu, ali mikrofon, kamera i zaslon ostaju isključeni.",
         "listenOnlyWithoutConsentOff": "Bez pristanka na snimanje ne ulazi se.",
-        "listenOnlyLockedLive": "Dok soba može biti otvorena, snimanje i način samo slušanja ne mogu se mijenjati: vrijede od prvog ulaska."
+        "listenOnlyLockedLive": "Dok soba može biti otvorena, snimanje i način samo slušanja ne mogu se mijenjati: vrijede od prvog ulaska.",
+        "audienceAnonymous": "Anonimna publika",
+        "audienceAnonymousDesc": "Sudionici se drugima prikazuju pod pseudonimom („Sudionik” i kod) u videu, chatu i pitanjima; popis sudionika ostaje voditeljima i nema trga. Korisno za velike događaje; na događajima zajednice ljudi se žele upoznati.",
+        "audienceAnonymousLocked": "Ne može se mijenjati dok soba može biti otvorena: povezalo bi pseudonime s imenima."
       },
       "step3": {
         "heading": "Osobe i pozivnice",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Do planiranog početka ({when}) ima više od 30 minuta. Ako pokrenete sada, svatko s poveznicom odmah ulazi i video soba se uključuje: pritisnite ponovno za potvrdu.",
     "startEarlyYes": "Pokreni sada",
-    "startEarlyNo": "Pričekaj planirano vrijeme"
+    "startEarlyNo": "Pričekaj planirano vrijeme",
+    "anonymousNameHelp": "Na ovom događaju publika je anonimna: drugi ne vide vaše ime, nego pseudonim s kodom."
   },
   "recording": {
     "management": "Video snimka",

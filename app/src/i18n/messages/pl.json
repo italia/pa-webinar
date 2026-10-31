@@ -655,7 +655,8 @@
       "consent": "Wyrażam zgodę na nagrywanie i zabieram głos",
       "joining": "Ponowne wejście do pokoju…",
       "error": "Nie udało się wrócić: spróbuj ponownie."
-    }
+    },
+    "pseudonym": "Uczestnik-{code}"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "Osoby bez zgody wchodzą tylko jako słuchacze",
         "listenOnlyWithoutConsentOn": "Zgoda na nagrywanie jest dobrowolna: kto jej nie wyrazi, i tak uczestniczy, śledzi i pisze na czacie, ale mikrofon, kamera i ekran pozostają wyłączone.",
         "listenOnlyWithoutConsentOff": "Bez zgody na nagrywanie nie można wejść.",
-        "listenOnlyLockedLive": "Dopóki pokój może być otwarty, nagrywania i trybu tylko słuchania nie można zmienić: obowiązują od pierwszego wejścia."
+        "listenOnlyLockedLive": "Dopóki pokój może być otwarty, nagrywania i trybu tylko słuchania nie można zmienić: obowiązują od pierwszego wejścia.",
+        "audienceAnonymous": "Anonimowa publiczność",
+        "audienceAnonymousDesc": "Uczestnicy są widoczni dla innych pod pseudonimem („Uczestnik” i kod) w wideo, na czacie i w pytaniach; lista uczestników pozostaje dla prowadzących i nie ma placu. Przydatne przy dużych wydarzeniach; na wydarzeniach społeczności ludzie chcą się poznać.",
+        "audienceAnonymousLocked": "Nie można zmienić, dopóki pokój może być otwarty: powiązałoby to pseudonimy z imionami."
       },
       "step3": {
         "heading": "Osoby i zaproszenia",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Do planowanego początku ({when}) zostało ponad 30 minut. Jeśli zaczniesz teraz, każdy z linkiem od razu wejdzie, a sala wideo się włączy: naciśnij ponownie, aby potwierdzić.",
     "startEarlyYes": "Rozpocznij teraz",
-    "startEarlyNo": "Poczekaj na zaplanowaną godzinę"
+    "startEarlyNo": "Poczekaj na zaplanowaną godzinę",
+    "anonymousNameHelp": "Na tym wydarzeniu publiczność jest anonimowa: inni nie widzą twojego imienia, tylko pseudonim z kodem."
   },
   "recording": {
     "management": "Nagranie wideo",

@@ -655,7 +655,8 @@
       "consent": "Jeg giver samtykke til optagelsen og deltager",
       "joining": "Går ind i rummet igen…",
       "error": "Det lykkedes ikke at komme ind igen: prøv igen."
-    }
+    },
+    "pseudonym": "Deltager-{code}"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -975,7 +976,10 @@
         "listenOnlyWithoutConsent": "De, der ikke giver samtykke, deltager kun som lyttere",
         "listenOnlyWithoutConsentOn": "Samtykke til optagelsen er frivilligt: den, der ikke giver det, deltager alligevel, følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket.",
         "listenOnlyWithoutConsentOff": "Uden samtykke til optagelsen kommer man ikke ind.",
-        "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang."
+        "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang.",
+        "audienceAnonymous": "Anonymt publikum",
+        "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
+        "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -5375,7 +5379,8 @@
     "countdownSeconds": "{seconds} s",
     "startEarlyConfirm": "Der er mere end 30 minutter til det planlagte start ({when}). Starter du nu, kommer alle med linket ind med det samme, og videorummet tændes: tryk igen for at bekræfte.",
     "startEarlyYes": "Start nu",
-    "startEarlyNo": "Vent til det planlagte tidspunkt"
+    "startEarlyNo": "Vent til det planlagte tidspunkt",
+    "anonymousNameHelp": "Til dette arrangement er publikum anonymt: de andre ser ikke dit navn, men et pseudonym med en kode."
   },
   "recording": {
     "management": "Videooptagelse",
