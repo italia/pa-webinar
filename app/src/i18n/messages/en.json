@@ -81,7 +81,8 @@
     "deselectAll": "Deselect all",
     "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "durationHours": "{hours, plural, one {# hour} other {# hours}}",
-    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}"
+    "durationHoursMinutes": "{hours, plural, one {# hour} other {# hours}} {minutes, plural, one {# minute} other {# minutes}}",
+    "backToTop": "Back to top"
   },
   "markdown": {
     "edit": "Write",
@@ -102,7 +103,10 @@
     "switchLanguage": "Switch language",
     "skipToContent": "Skip to content",
     "skipToFooter": "Skip to footer",
-    "mainLabel": "Main navigation"
+    "mainLabel": "Main navigation",
+    "activeLanguage": "Active language:",
+    "languageSelected": "(selected)",
+    "signIn": "Sign in"
   },
   "header": {
     "followUs": "Follow us on"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Email you registered with",
       "recordingLinkSend": "Send me the link again",
       "recordingLinkSent": "If the address is registered for the event, you will shortly receive an email with your personal link.",
-      "recordingLinkError": "The request failed. Try again in a few minutes."
+      "recordingLinkError": "The request failed. Try again in a few minutes.",
+      "registerOrGuest": "If you register, you receive your personal link and updates on the event by email. As a guest you enter at once with just a name, only while the event is live, and receive no email."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Upcoming events",
       "viewAll": "View all events",
-      "noEvents": "No events scheduled. Check back soon!"
+      "noEvents": "No events scheduled. Check back soon!",
+      "seePast": "Past events",
+      "seeRecordings": "Recordings"
     },
     "howItWorks": {
       "title": "How to take part",
@@ -4855,11 +4862,13 @@
     "transparency": "Security and transparency",
     "serviceInventory": "Service inventory",
     "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
     "viewRelease": "View release on GitHub",
     "viewChangelog": "See what's new (changelog)",
-    "buildDatePrefix": "Built on"
+    "newWindow": "opens in a new window",
+    "usefulLinks": "Useful links",
+    "version": "Version {version}",
+    "versionDev": "Development version",
+    "updatedOn": "updated on {date}"
   },
   "changelog": {
     "metaTitle": "What's new & changelog",

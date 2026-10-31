@@ -81,7 +81,8 @@
     "deselectAll": "Poista kaikki valinnat",
     "durationMinutes": "{minutes, plural, one {# minuutti} other {# minuuttia}}",
     "durationHours": "{hours, plural, one {# tunti} other {# tuntia}}",
-    "durationHoursMinutes": "{hours, plural, one {# tunti} other {# tuntia}} ja {minutes, plural, one {# minuutti} other {# minuuttia}}"
+    "durationHoursMinutes": "{hours, plural, one {# tunti} other {# tuntia}} ja {minutes, plural, one {# minuutti} other {# minuuttia}}",
+    "backToTop": "Takaisin ylös"
   },
   "markdown": {
     "edit": "Kirjoita",
@@ -102,7 +103,10 @@
     "switchLanguage": "Vaihda kieli",
     "skipToContent": "Siirry sisältöön",
     "skipToFooter": "Siirry alatunnisteeseen",
-    "mainLabel": "Päänavigaatio"
+    "mainLabel": "Päänavigaatio",
+    "activeLanguage": "Aktiivinen kieli:",
+    "languageSelected": "(valittu)",
+    "signIn": "Kirjaudu"
   },
   "header": {
     "followUs": "Seuraa meitä"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Sähköposti, jolla ilmoittauduit",
       "recordingLinkSend": "Lähetä linkki uudelleen",
       "recordingLinkSent": "Jos osoite on ilmoittautunut tapahtumaan, saat pian sähköpostin henkilökohtaisella linkillä.",
-      "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua."
+      "recordingLinkError": "Pyyntö epäonnistui. Yritä uudelleen muutaman minuutin kuluttua.",
+      "registerOrGuest": "Ilmoittautumalla saat sähköpostiin henkilökohtaisen linkin ja tietoa tapahtumasta. Vieraana pääset heti sisään pelkällä nimellä, vain tapahtuman ollessa käynnissä, etkä saa sähköposteja."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Tulevat tapahtumat",
       "viewAll": "Näytä kaikki tapahtumat",
-      "noEvents": "Ei suunniteltuja tapahtumia. Tule pian uudelleen!"
+      "noEvents": "Ei suunniteltuja tapahtumia. Tule pian uudelleen!",
+      "seePast": "Menneet tapahtumat",
+      "seeRecordings": "Tallenteet"
     },
     "howItWorks": {
       "title": "Miten osallistua",
@@ -4855,11 +4862,13 @@
     "transparency": "Turvallisuus ja läpinäkyvyys",
     "serviceInventory": "Palveluinventaari",
     "sourceCode": "Lähdekoodi",
-    "buildInfoDev": "kehitysversio",
-    "viewCommit": "Näytä commit GitHubissa",
     "viewRelease": "Näytä julkaisu GitHubissa",
     "viewChangelog": "Katso uutuudet (muutosloki)",
-    "buildDatePrefix": "Koostettu"
+    "newWindow": "avautuu uuteen ikkunaan",
+    "usefulLinks": "Hyödyllisiä linkkejä",
+    "version": "Versio {version}",
+    "versionDev": "Kehitysversio",
+    "updatedOn": "päivitetty {date}"
   },
   "changelog": {
     "metaTitle": "Uutuudet ja muutosloki",

@@ -14735,3 +14735,49 @@ a.campo-file__nome {
     fill: currentColor;
   }
 }
+
+// ── Il menu della lingua nello slim header (Designers Italia, header
+// completo): il pulsante con la lingua attiva e, sotto, l'elenco a destra.
+// Senza Popper la posizione la dice il foglio: sotto il pulsante.
+.it-header-slim-wrapper .it-header-slim-wrapper-content .lingua-menu {
+  position: relative;
+
+  > .nav-link {
+    background: transparent;
+    border: 0;
+    padding: 0.25rem 0;
+    font-size: 0.875rem;
+  }
+
+  .lingua-menu__elenco {
+    top: 100% !important;
+    right: 0;
+    left: auto;
+    min-width: 12rem;
+    max-height: 22rem;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+  }
+}
+
+// «Torna su» sta in basso a destra: la riga in fondo al piè di pagina gli
+// lascia lo spazio, cosi' la versione non finisce sotto il pulsante.
+.it-footer-small-prints .container {
+  padding-right: 4.5rem;
+}
+
+// «Torna su» e' un <button>: centrato senza gli spostamenti che il kit da'
+// all'icona di un <a>, e sopra il contenuto della pagina (le etichette delle
+// schede), ma sotto il riproduttore ridotto e le finestre.
+button.back-to-top {
+  z-index: 1030;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .icon {
+    top: 0 !important;
+  }
+}
+

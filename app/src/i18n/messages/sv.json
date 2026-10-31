@@ -81,7 +81,8 @@
     "deselectAll": "Avmarkera alla",
     "durationMinutes": "{minutes, plural, one {# minut} other {# minuter}}",
     "durationHours": "{hours, plural, one {# timme} other {# timmar}}",
-    "durationHoursMinutes": "{hours, plural, one {# timme} other {# timmar}} och {minutes, plural, one {# minut} other {# minuter}}"
+    "durationHoursMinutes": "{hours, plural, one {# timme} other {# timmar}} och {minutes, plural, one {# minut} other {# minuter}}",
+    "backToTop": "Till toppen"
   },
   "markdown": {
     "edit": "Skriv",
@@ -102,7 +103,10 @@
     "switchLanguage": "Byt språk",
     "skipToContent": "Gå till innehåll",
     "skipToFooter": "Gå till sidfot",
-    "mainLabel": "Huvudnavigering"
+    "mainLabel": "Huvudnavigering",
+    "activeLanguage": "Aktivt språk:",
+    "languageSelected": "(vald)",
+    "signIn": "Logga in"
   },
   "header": {
     "followUs": "Följ oss på"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-postadress du anmälde dig med",
       "recordingLinkSend": "Skicka länken igen",
       "recordingLinkSent": "Om adressen är anmäld till evenemanget får du snart ett e-postmeddelande med din personliga länk.",
-      "recordingLinkError": "Begäran misslyckades. Försök igen om några minuter."
+      "recordingLinkError": "Begäran misslyckades. Försök igen om några minuter.",
+      "registerOrGuest": "Om du anmäler dig får du din personliga länk och nyheter om evenemanget via e-post. Som gäst kommer du in direkt med bara ett namn, bara medan evenemanget sänds live, och får ingen e-post."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Kommande evenemang",
       "viewAll": "Visa alla evenemang",
-      "noEvents": "Inga evenemang planerade. Kom tillbaka snart!"
+      "noEvents": "Inga evenemang planerade. Kom tillbaka snart!",
+      "seePast": "Tidigare evenemang",
+      "seeRecordings": "Inspelningar"
     },
     "howItWorks": {
       "title": "Så här deltar du",
@@ -4855,11 +4862,13 @@
     "transparency": "Säkerhet och transparens",
     "serviceInventory": "Tjänsteförteckning",
     "sourceCode": "Källkod",
-    "buildInfoDev": "utvecklingsbygge",
-    "viewCommit": "Visa commit på GitHub",
     "viewRelease": "Visa version på GitHub",
     "viewChangelog": "Se vad som är nytt (changelog)",
-    "buildDatePrefix": "Byggd den"
+    "newWindow": "öppnas i ett nytt fönster",
+    "usefulLinks": "Användbara länkar",
+    "version": "Version {version}",
+    "versionDev": "Utvecklingsversion",
+    "updatedOn": "uppdaterad {date}"
   },
   "changelog": {
     "metaTitle": "Nyheter och changelog",

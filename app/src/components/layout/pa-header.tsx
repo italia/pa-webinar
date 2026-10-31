@@ -10,7 +10,7 @@ import {
 } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
@@ -49,6 +49,7 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
           slimTitle={slimTitle}
           slimSubtitle={slimSubtitle}
           parentUrl={parentUrl}
+          isAdmin={isAdmin}
         />
         <CenterHeader
           appName={appName}
@@ -64,11 +65,16 @@ function SlimHeader({
   slimTitle,
   slimSubtitle,
   parentUrl,
+  isAdmin,
 }: {
   slimTitle: string;
   slimSubtitle: string;
   parentUrl?: string;
+  isAdmin?: boolean;
 }) {
+  const t = useTranslations('nav');
+  // Sulle pagine dell'amministrazione (il login compreso) non serve.
+  const nellAdmin = usePathname().startsWith('/admin');
   const brandInner = (
     <>
       <span className="d-none d-lg-inline">{slimTitle}</span>
@@ -94,6 +100,16 @@ function SlimHeader({
         )}
         <HeaderRightZone>
           <LanguageSwitcher />
+          {/* L'accesso, a destra della lingua come nell'header di Designers
+              Italia. E' l'ingresso dello staff (i partecipanti non hanno un
+              account): con la sessione aperta resta «Amministrazione», sotto. */}
+          {!isAdmin && !nellAdmin && (
+            <div className="it-access-top-wrapper ms-3">
+              <Link href="/admin/login" className="btn btn-primary btn-sm">
+                {t('signIn')}
+              </Link>
+            </div>
+          )}
         </HeaderRightZone>
       </HeaderContent>
     </Header>

@@ -141,10 +141,13 @@ export default function EventListClient({
                   as="h3"
                   className="h5 fw-semibold mb-2"
                   style={{ color: 'var(--app-text)' }}
+                  // Tutta la scheda porta all'evento (il link del titolo si
+                  // allarga sulla scheda), come promette il sollevamento al
+                  // passaggio del mouse; le etichette restano link loro.
                   wrapMain={(main) => (
                     <Link
                       href={percorso(`/events/${event.slug}`)}
-                      className="text-decoration-none"
+                      className="text-decoration-none stretched-link"
                       style={{ color: 'var(--app-text)' }}
                     >
                       {main}
@@ -167,6 +170,8 @@ export default function EventListClient({
                           href={{ pathname: '/events', query: { tag: tag.slug } }}
                           className="badge text-decoration-none"
                           style={{
+                            position: 'relative',
+                            zIndex: 2,
                             backgroundColor: hexWithAlpha(color, 0.15),
                             color: inchiostroEtichetta(color, 0.15),
                             fontWeight: 500,
@@ -257,7 +262,9 @@ export default function EventListClient({
                       design-react-kit passa l'indirizzo senza localizzarlo e
                       disegna la freccia con l'icona che sparisce
                       all'idratazione. */}
-                  <Link className="read-more" href={percorso(`/events/${event.slug}`)}>
+                  {/* Doppione del titolo, che porta gia' alla pagina e copre la
+                      scheda: per gli occhi, non per la tastiera. */}
+                  <Link className="read-more" href={percorso(`/events/${event.slug}`)} tabIndex={-1} aria-hidden="true">
                     <span className="text">{t('card.readMore')}</span>
                     <Icon icon="it-arrow-right" />
                   </Link>

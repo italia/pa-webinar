@@ -81,7 +81,8 @@
     "deselectAll": "Neħħi l-għażla minn kollha",
     "durationMinutes": "{minutes, plural, one {# minuta} other {# minuti}}",
     "durationHours": "{hours, plural, one {# siegħa} other {# sigħat}}",
-    "durationHoursMinutes": "{hours, plural, one {# siegħa} other {# sigħat}} u {minutes, plural, one {# minuta} other {# minuti}}"
+    "durationHoursMinutes": "{hours, plural, one {# siegħa} other {# sigħat}} u {minutes, plural, one {# minuta} other {# minuti}}",
+    "backToTop": "Lura fuq"
   },
   "markdown": {
     "edit": "Ikteb",
@@ -102,7 +103,10 @@
     "switchLanguage": "Ibdel il-lingwa",
     "skipToContent": "Mur il-kontenut",
     "skipToFooter": "Mur il-footer",
-    "mainLabel": "Navigazzjoni ewlenija"
+    "mainLabel": "Navigazzjoni ewlenija",
+    "activeLanguage": "Lingwa attiva:",
+    "languageSelected": "(magħżula)",
+    "signIn": "Idħol"
   },
   "header": {
     "followUs": "Segwina fuq"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "L-email li rreġistrajt biha",
       "recordingLinkSend": "Ibgħatli l-link mill-ġdid",
       "recordingLinkSent": "Jekk l-indirizz huwa rreġistrat għall-avveniment, dalwaqt tirċievi email bil-link personali tiegħek.",
-      "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti."
+      "recordingLinkError": "It-talba ma rnexxietx. Erġa' pprova fi ftit minuti.",
+      "registerOrGuest": "Jekk tirreġistra, tirċievi bl-email il-link personali tiegħek u aġġornamenti dwar l-avveniment. Bħala mistieden tidħol mill-ewwel b'isem biss, biss waqt li l-avveniment ikun live, u ma tirċievix emails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Avvenimenti li ġejjin",
       "viewAll": "Ara l-avvenimenti kollha",
-      "noEvents": "L-ebda avveniment ippjanat. Erġa' lura dalwaqt!"
+      "noEvents": "L-ebda avveniment ippjanat. Erġa' lura dalwaqt!",
+      "seePast": "Avvenimenti li għaddew",
+      "seeRecordings": "Reġistrazzjonijiet"
     },
     "howItWorks": {
       "title": "Kif tieħu sehem",
@@ -4855,11 +4862,13 @@
     "transparency": "Sigurtà u trasparenza",
     "serviceInventory": "Inventario servizi",
     "sourceCode": "Kodiċi sors",
-    "buildInfoDev": "build ta' żvilupp",
-    "viewCommit": "Ara l-commit fuq GitHub",
     "viewRelease": "Ara r-rilaxx fuq GitHub",
     "viewChangelog": "Ara x'hemm ġdid (changelog)",
-    "buildDatePrefix": "Mibni fi"
+    "newWindow": "jinfetaħ f'tieqa ġdida",
+    "usefulLinks": "Links utli",
+    "version": "Verżjoni {version}",
+    "versionDev": "Verżjoni ta' żvilupp",
+    "updatedOn": "aġġornata fil-{date}"
   },
   "changelog": {
     "metaTitle": "X'hemm ġdid u changelog",

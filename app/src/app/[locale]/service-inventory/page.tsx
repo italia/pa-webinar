@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 
 interface ServiceInventoryPageProps {
   params: Promise<{ locale: string }>;
@@ -133,7 +134,7 @@ function renderLicense(licenses?: BomLicense[]): string {
 
 export default async function ServiceInventoryPage() {
   const t = await getTranslations('legal.serviceInventory');
-  const url = process.env.SERVICE_INVENTORY_URL ?? '';
+  const url = serviceInventoryUrl() ?? '';
 
   if (!url) {
     return (

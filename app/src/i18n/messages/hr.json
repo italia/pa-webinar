@@ -81,7 +81,8 @@
     "deselectAll": "Odznači sve",
     "durationMinutes": "{minutes, plural, one {# minuta} few {# minute} other {# minuta}}",
     "durationHours": "{hours, plural, one {# sat} few {# sata} other {# sati}}",
-    "durationHoursMinutes": "{hours, plural, one {# sat} few {# sata} other {# sati}} i {minutes, plural, one {# minuta} few {# minute} other {# minuta}}"
+    "durationHoursMinutes": "{hours, plural, one {# sat} few {# sata} other {# sati}} i {minutes, plural, one {# minuta} few {# minute} other {# minuta}}",
+    "backToTop": "Natrag na vrh"
   },
   "markdown": {
     "edit": "Pisanje",
@@ -102,7 +103,10 @@
     "switchLanguage": "Promijeni jezik",
     "skipToContent": "Preskoči na sadržaj",
     "skipToFooter": "Preskoči na podnožje",
-    "mainLabel": "Glavna navigacija"
+    "mainLabel": "Glavna navigacija",
+    "activeLanguage": "Aktivni jezik:",
+    "languageSelected": "(odabrano)",
+    "signIn": "Prijava"
   },
   "header": {
     "followUs": "Pratite nas na"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-pošta kojom ste se prijavili",
       "recordingLinkSend": "Pošalji mi poveznicu ponovno",
       "recordingLinkSent": "Ako je adresa prijavljena na događaj, uskoro ćete primiti e-poštu s osobnom poveznicom.",
-      "recordingLinkError": "Zahtjev nije uspio. Pokušajte ponovno za nekoliko minuta."
+      "recordingLinkError": "Zahtjev nije uspio. Pokušajte ponovno za nekoliko minuta.",
+      "registerOrGuest": "Ako se prijavite, e-poštom dobivate osobnu poveznicu i novosti o događaju. Kao gost ulazite odmah samo s imenom, samo dok je događaj uživo, i ne dobivate e-poštu."
     },
     "manage": {
       "toggleChat": "Razgovor",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Nadolazeća događanja",
       "viewAll": "Pogledajte sva događanja",
-      "noEvents": "Nema zakazanih događanja. Vratite se uskoro!"
+      "noEvents": "Nema zakazanih događanja. Vratite se uskoro!",
+      "seePast": "Prošli događaji",
+      "seeRecordings": "Snimke"
     },
     "howItWorks": {
       "title": "Kako sudjelovati",
@@ -4855,11 +4862,13 @@
     "transparency": "Sigurnost i transparentnost",
     "serviceInventory": "Inventar usluga",
     "sourceCode": "Izvorni kod",
-    "buildInfoDev": "razvojna verzija",
-    "viewCommit": "Prikaži commit na GitHubu",
     "viewRelease": "Prikaži izdanje na GitHubu",
     "viewChangelog": "Pogledaj novosti (changelog)",
-    "buildDatePrefix": "Izgrađeno"
+    "newWindow": "otvara se u novom prozoru",
+    "usefulLinks": "Korisne poveznice",
+    "version": "Verzija {version}",
+    "versionDev": "Razvojna verzija",
+    "updatedOn": "ažurirano {date}"
   },
   "changelog": {
     "metaTitle": "Novosti i changelog",

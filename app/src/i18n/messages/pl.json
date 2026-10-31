@@ -81,7 +81,8 @@
     "deselectAll": "Odznacz wszystkie",
     "durationMinutes": "{minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}",
     "durationHours": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}}",
-    "durationHoursMinutes": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}} i {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}"
+    "durationHoursMinutes": "{hours, plural, one {# godzina} few {# godziny} many {# godzin} other {# godziny}} i {minutes, plural, one {# minuta} few {# minuty} many {# minut} other {# minuty}}",
+    "backToTop": "Do góry"
   },
   "markdown": {
     "edit": "Edytuj",
@@ -102,7 +103,10 @@
     "switchLanguage": "Zmień język",
     "skipToContent": "Przejdź do treści",
     "skipToFooter": "Przejdź do stopki",
-    "mainLabel": "Nawigacja główna"
+    "mainLabel": "Nawigacja główna",
+    "activeLanguage": "Aktywny język:",
+    "languageSelected": "(wybrany)",
+    "signIn": "Zaloguj się"
   },
   "header": {
     "followUs": "Obserwuj nas na"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail użyty przy rejestracji",
       "recordingLinkSend": "Wyślij link ponownie",
       "recordingLinkSent": "Jeśli adres jest zarejestrowany na wydarzenie, wkrótce otrzymasz e-mail z osobistym linkiem.",
-      "recordingLinkError": "Żądanie nie powiodło się. Spróbuj ponownie za kilka minut."
+      "recordingLinkError": "Żądanie nie powiodło się. Spróbuj ponownie za kilka minut.",
+      "registerOrGuest": "Jeśli się zapiszesz, otrzymasz e-mailem osobisty link i informacje o wydarzeniu. Jako gość wchodzisz od razu, podając tylko imię, tylko podczas transmisji na żywo, i nie dostajesz e-maili."
     },
     "manage": {
       "toggleChat": "Czat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Nadchodzące wydarzenia",
       "viewAll": "Zobacz wszystkie wydarzenia",
-      "noEvents": "Brak zaplanowanych wydarzeń. Zajrzyj wkrótce!"
+      "noEvents": "Brak zaplanowanych wydarzeń. Zajrzyj wkrótce!",
+      "seePast": "Minione wydarzenia",
+      "seeRecordings": "Nagrania"
     },
     "howItWorks": {
       "title": "Jak wziąć udział",
@@ -4855,11 +4862,13 @@
     "transparency": "Bezpieczeństwo i przejrzystość",
     "serviceInventory": "Inwentarz usług",
     "sourceCode": "Kod źródłowy",
-    "buildInfoDev": "kompilacja deweloperska",
-    "viewCommit": "Zobacz commit na GitHubie",
     "viewRelease": "Zobacz wydanie na GitHubie",
     "viewChangelog": "Zobacz nowości (changelog)",
-    "buildDatePrefix": "Zbudowano"
+    "newWindow": "otwiera się w nowym oknie",
+    "usefulLinks": "Przydatne linki",
+    "version": "Wersja {version}",
+    "versionDev": "Wersja deweloperska",
+    "updatedOn": "zaktualizowano {date}"
   },
   "changelog": {
     "metaTitle": "Nowości i changelog",

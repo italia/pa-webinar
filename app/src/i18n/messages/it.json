@@ -81,7 +81,8 @@
     "deselectAll": "Deseleziona tutti",
     "durationMinutes": "{minutes, plural, one {# minuto} other {# minuti}}",
     "durationHours": "{hours, plural, one {# ora} other {# ore}}",
-    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}"
+    "durationHoursMinutes": "{hours, plural, one {# ora} other {# ore}} e {minutes, plural, one {# minuto} other {# minuti}}",
+    "backToTop": "Torna su"
   },
   "markdown": {
     "edit": "Scrivi",
@@ -102,7 +103,10 @@
     "switchLanguage": "Cambia lingua",
     "skipToContent": "Vai al contenuto",
     "skipToFooter": "Vai al footer",
-    "mainLabel": "Navigazione principale"
+    "mainLabel": "Navigazione principale",
+    "activeLanguage": "Lingua attiva:",
+    "languageSelected": "(selezionata)",
+    "signIn": "Accedi"
   },
   "header": {
     "followUs": "Seguici su"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Email con cui ti sei iscritto",
       "recordingLinkSend": "Rimandami il link",
       "recordingLinkSent": "Se l'indirizzo è iscritto all'evento, riceverai a breve un'email con il link personale.",
-      "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto."
+      "recordingLinkError": "Richiesta non riuscita. Riprova tra qualche minuto.",
+      "registerOrGuest": "Iscrivendoti ricevi per email il tuo link personale e gli aggiornamenti sull'evento. Come ospite entri subito con il solo nome, solo mentre l'evento è in diretta, e non ricevi email."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -4050,7 +4055,9 @@
     "upcoming": {
       "title": "Prossimi eventi",
       "viewAll": "Vedi tutti gli eventi",
-      "noEvents": "Nessun evento in programma. Torna presto!"
+      "noEvents": "Nessun evento in programma. Torna presto!",
+      "seePast": "Eventi passati",
+      "seeRecordings": "Registrazioni"
     },
     "howItWorks": {
       "title": "Come si partecipa",
@@ -4855,11 +4862,13 @@
     "transparency": "Sicurezza e trasparenza",
     "serviceInventory": "Inventario servizi",
     "sourceCode": "Codice sorgente",
-    "buildInfoDev": "build di sviluppo",
-    "viewCommit": "Vedi il commit su GitHub",
     "viewRelease": "Vedi la release su GitHub",
     "viewChangelog": "Vedi le novità (changelog)",
-    "buildDatePrefix": "Compilato il"
+    "newWindow": "si apre in una nuova finestra",
+    "usefulLinks": "Link utili",
+    "version": "Versione {version}",
+    "versionDev": "Versione di sviluppo",
+    "updatedOn": "aggiornata il {date}"
   },
   "changelog": {
     "metaTitle": "Novità e changelog",

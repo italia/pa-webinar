@@ -81,7 +81,8 @@
     "deselectAll": "Tühista kõik",
     "durationMinutes": "{minutes, plural, one {# minut} other {# minutit}}",
     "durationHours": "{hours, plural, one {# tund} other {# tundi}}",
-    "durationHoursMinutes": "{hours, plural, one {# tund} other {# tundi}} ja {minutes, plural, one {# minut} other {# minutit}}"
+    "durationHoursMinutes": "{hours, plural, one {# tund} other {# tundi}} ja {minutes, plural, one {# minut} other {# minutit}}",
+    "backToTop": "Tagasi üles"
   },
   "markdown": {
     "edit": "Kirjuta",
@@ -102,7 +103,10 @@
     "switchLanguage": "Vaheta keelt",
     "skipToContent": "Liigu sisuni",
     "skipToFooter": "Liigu jalusesse",
-    "mainLabel": "Peanavigeerimine"
+    "mainLabel": "Peanavigeerimine",
+    "activeLanguage": "Aktiivne keel:",
+    "languageSelected": "(valitud)",
+    "signIn": "Logi sisse"
   },
   "header": {
     "followUs": "Jälgige meid"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-post, millega registreerusid",
       "recordingLinkSend": "Saada link uuesti",
       "recordingLinkSent": "Kui aadress on üritusele registreeritud, saad peagi e-kirja oma isikliku lingiga.",
-      "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti."
+      "recordingLinkError": "Päring ebaõnnestus. Proovi mõne minuti pärast uuesti.",
+      "registerOrGuest": "Registreerudes saad e-postiga oma isikliku lingi ja uudised sündmuse kohta. Külalisena sisened kohe ainult nimega, ainult siis, kui sündmus on otse-eetris, ja e-kirju ei saa."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Tulevased üritused",
       "viewAll": "Vaata kõiki üritusi",
-      "noEvents": "Üritusi pole kavas. Tule varsti tagasi!"
+      "noEvents": "Üritusi pole kavas. Tule varsti tagasi!",
+      "seePast": "Möödunud sündmused",
+      "seeRecordings": "Salvestised"
     },
     "howItWorks": {
       "title": "Kuidas osaleda",
@@ -4855,11 +4862,13 @@
     "transparency": "Turvalisus ja läbipaistvus",
     "serviceInventory": "Teenuste inventuur",
     "sourceCode": "Lähtekood",
-    "buildInfoDev": "arendusversioon",
-    "viewCommit": "Vaata committi GitHubis",
     "viewRelease": "Vaata väljalaset GitHubis",
     "viewChangelog": "Vaata uuendusi (muudatuste logi)",
-    "buildDatePrefix": "Ehitatud"
+    "newWindow": "avaneb uues aknas",
+    "usefulLinks": "Kasulikud lingid",
+    "version": "Versioon {version}",
+    "versionDev": "Arendusversioon",
+    "updatedOn": "uuendatud {date}"
   },
   "changelog": {
     "metaTitle": "Uudised ja muudatuste logi",

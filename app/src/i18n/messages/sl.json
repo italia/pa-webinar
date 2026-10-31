@@ -81,7 +81,8 @@
     "deselectAll": "Odznačite vse",
     "durationMinutes": "{minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
     "durationHours": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}}",
-    "durationHoursMinutes": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}} in {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}"
+    "durationHoursMinutes": "{hours, plural, one {# ura} two {# uri} few {# ure} other {# ur}} in {minutes, plural, one {# minuta} two {# minuti} few {# minute} other {# minut}}",
+    "backToTop": "Na vrh"
   },
   "markdown": {
     "edit": "Napišite",
@@ -102,7 +103,10 @@
     "switchLanguage": "Zamenjaj jezik",
     "skipToContent": "Preskoči na vsebino",
     "skipToFooter": "Preskoči na nogo",
-    "mainLabel": "Glavna navigacija"
+    "mainLabel": "Glavna navigacija",
+    "activeLanguage": "Aktivni jezik:",
+    "languageSelected": "(izbrano)",
+    "signIn": "Prijava"
   },
   "header": {
     "followUs": "Sledite nam na"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-pošta, s katero ste se prijavili",
       "recordingLinkSend": "Pošlji mi povezavo znova",
       "recordingLinkSent": "Če je naslov prijavljen na dogodek, boste kmalu prejeli e-pošto z osebno povezavo.",
-      "recordingLinkError": "Zahteva ni uspela. Poskusite znova čez nekaj minut."
+      "recordingLinkError": "Zahteva ni uspela. Poskusite znova čez nekaj minut.",
+      "registerOrGuest": "Če se prijavite, po e-pošti prejmete svojo osebno povezavo in novice o dogodku. Kot gost vstopite takoj samo z imenom, le med dogodkom v živo, in ne prejemate e-pošte."
     },
     "manage": {
       "toggleChat": "Klepet",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Prihajajoči dogodki",
       "viewAll": "Oglejte si vse dogodke",
-      "noEvents": "Ni načrtovanih dogodkov. Vrnite se kmalu!"
+      "noEvents": "Ni načrtovanih dogodkov. Vrnite se kmalu!",
+      "seePast": "Pretekli dogodki",
+      "seeRecordings": "Posnetki"
     },
     "howItWorks": {
       "title": "Kako sodelovati",
@@ -4855,11 +4862,13 @@
     "transparency": "Varnost in preglednost",
     "serviceInventory": "Inventar storitev",
     "sourceCode": "Izvorna koda",
-    "buildInfoDev": "razvojna zgradba",
-    "viewCommit": "Oglejte si commit na GitHubu",
     "viewRelease": "Oglejte si izdajo na GitHubu",
     "viewChangelog": "Oglejte si novosti (dnevnik sprememb)",
-    "buildDatePrefix": "Zgrajeno"
+    "newWindow": "odpre se v novem oknu",
+    "usefulLinks": "Uporabne povezave",
+    "version": "Različica {version}",
+    "versionDev": "Razvojna različica",
+    "updatedOn": "posodobljeno {date}"
   },
   "changelog": {
     "metaTitle": "Novosti in dnevnik sprememb",

@@ -10,6 +10,8 @@ import { metadataBase, openGraphImages, twitterImageCard } from '@/lib/seo';
 import { Skiplink } from '@/components/layout/skiplinks';
 import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
+import BackToTop from '@/components/layout/back-to-top';
+import { serviceInventoryUrl } from '@/lib/service-inventory-url';
 import { getStaffSession } from '@/lib/auth/staff-session';
 import { getSettings } from '@/lib/settings';
 import { SettingsProvider } from '@/lib/settings-context';
@@ -97,7 +99,8 @@ export default async function LocaleLayout({
             <main id="main-content" className="flex-grow-1" tabIndex={-1}>
               {children}
             </main>
-            <PAFooter />
+            <PAFooter inventarioPubblicato={serviceInventoryUrl() !== null} />
+            <BackToTop />
           </SettingsProvider>
         </NextIntlClientProvider>
       </body>

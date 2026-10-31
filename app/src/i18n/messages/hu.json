@@ -81,7 +81,8 @@
     "deselectAll": "Kijelölés megszüntetése",
     "durationMinutes": "{minutes, plural, one {# perc} other {# perc}}",
     "durationHours": "{hours, plural, one {# óra} other {# óra}}",
-    "durationHoursMinutes": "{hours, plural, one {# óra} other {# óra}} {minutes, plural, one {# perc} other {# perc}}"
+    "durationHoursMinutes": "{hours, plural, one {# óra} other {# óra}} {minutes, plural, one {# perc} other {# perc}}",
+    "backToTop": "Vissza a tetejére"
   },
   "markdown": {
     "edit": "Írás",
@@ -102,7 +103,10 @@
     "switchLanguage": "Nyelv váltása",
     "skipToContent": "Ugrás a tartalomra",
     "skipToFooter": "Ugrás a láblécre",
-    "mainLabel": "Fő navigáció"
+    "mainLabel": "Fő navigáció",
+    "activeLanguage": "Aktív nyelv:",
+    "languageSelected": "(kiválasztva)",
+    "signIn": "Belépés"
   },
   "header": {
     "followUs": "Kövessen minket"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "A regisztrációhoz használt e-mail-cím",
       "recordingLinkSend": "Küldjétek újra a linket",
       "recordingLinkSent": "Ha a cím regisztrálva van az eseményre, hamarosan kapsz egy e-mailt a személyes linkkel.",
-      "recordingLinkError": "A kérés nem sikerült. Próbáld újra néhány perc múlva."
+      "recordingLinkError": "A kérés nem sikerült. Próbáld újra néhány perc múlva.",
+      "registerOrGuest": "Ha regisztrál, e-mailben megkapja a személyes hivatkozását és az esemény híreit. Vendégként azonnal belép csak egy névvel, csak amíg az esemény élőben zajlik, és nem kap e-mailt."
     },
     "manage": {
       "toggleChat": "Csevegés",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Közelgő események",
       "viewAll": "Összes esemény megtekintése",
-      "noEvents": "Nincs tervezett esemény. Nézzen vissza hamarosan!"
+      "noEvents": "Nincs tervezett esemény. Nézzen vissza hamarosan!",
+      "seePast": "Korábbi események",
+      "seeRecordings": "Felvételek"
     },
     "howItWorks": {
       "title": "Hogyan vehet részt",
@@ -4855,11 +4862,13 @@
     "transparency": "Biztonság és átláthatóság",
     "serviceInventory": "Szolgáltatásleltár",
     "sourceCode": "Forráskód",
-    "buildInfoDev": "fejlesztői build",
-    "viewCommit": "Commit megtekintése a GitHubon",
     "viewRelease": "Kiadás megtekintése a GitHubon",
     "viewChangelog": "Újdonságok megtekintése (változásnapló)",
-    "buildDatePrefix": "Összeállítva"
+    "newWindow": "új ablakban nyílik meg",
+    "usefulLinks": "Hasznos hivatkozások",
+    "version": "{version} verzió",
+    "versionDev": "Fejlesztői verzió",
+    "updatedOn": "frissítve: {date}"
   },
   "changelog": {
     "metaTitle": "Újdonságok és változásnapló",

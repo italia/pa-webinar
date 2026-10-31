@@ -81,7 +81,8 @@
     "deselectAll": "Tout désélectionner",
     "durationMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
     "durationHours": "{hours, plural, one {# heure} other {# heures}}",
-    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}"
+    "durationHoursMinutes": "{hours, plural, one {# heure} other {# heures}} et {minutes, plural, one {# minute} other {# minutes}}",
+    "backToTop": "Retour en haut"
   },
   "markdown": {
     "edit": "Écrire",
@@ -102,7 +103,10 @@
     "switchLanguage": "Changer de langue",
     "skipToContent": "Aller au contenu",
     "skipToFooter": "Aller au pied de page",
-    "mainLabel": "Navigation principale"
+    "mainLabel": "Navigation principale",
+    "activeLanguage": "Langue active :",
+    "languageSelected": "(sélectionnée)",
+    "signIn": "Se connecter"
   },
   "header": {
     "followUs": "Suivez-nous sur"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail utilisé pour l'inscription",
       "recordingLinkSend": "Renvoyez-moi le lien",
       "recordingLinkSent": "Si l'adresse est inscrite à l'événement, vous recevrez sous peu un e-mail avec votre lien personnel.",
-      "recordingLinkError": "La demande a échoué. Réessayez dans quelques minutes."
+      "recordingLinkError": "La demande a échoué. Réessayez dans quelques minutes.",
+      "registerOrGuest": "En vous inscrivant, vous recevez par e-mail votre lien personnel et les nouvelles de l'événement. En tant qu'invité, vous entrez tout de suite avec un simple nom, uniquement pendant le direct, et ne recevez aucun e-mail."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Prochains événements",
       "viewAll": "Voir tous les événements",
-      "noEvents": "Aucun événement prévu. Revenez bientôt !"
+      "noEvents": "Aucun événement prévu. Revenez bientôt !",
+      "seePast": "Événements passés",
+      "seeRecordings": "Enregistrements"
     },
     "howItWorks": {
       "title": "Comment participer",
@@ -4855,11 +4862,13 @@
     "transparency": "Sécurité et transparence",
     "serviceInventory": "Inventaire des services",
     "sourceCode": "Code source",
-    "buildInfoDev": "build de développement",
-    "viewCommit": "Voir le commit sur GitHub",
     "viewRelease": "Voir la version sur GitHub",
     "viewChangelog": "Voir les nouveautés (changelog)",
-    "buildDatePrefix": "Compilé le"
+    "newWindow": "s'ouvre dans une nouvelle fenêtre",
+    "usefulLinks": "Liens utiles",
+    "version": "Version {version}",
+    "versionDev": "Version de développement",
+    "updatedOn": "mise à jour le {date}"
   },
   "changelog": {
     "metaTitle": "Nouveautés et changelog",

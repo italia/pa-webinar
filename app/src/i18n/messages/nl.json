@@ -81,7 +81,8 @@
     "deselectAll": "Selectie opheffen",
     "durationMinutes": "{minutes, plural, one {# minuut} other {# minuten}}",
     "durationHours": "{hours, plural, one {# uur} other {# uur}}",
-    "durationHoursMinutes": "{hours, plural, one {# uur} other {# uur}} en {minutes, plural, one {# minuut} other {# minuten}}"
+    "durationHoursMinutes": "{hours, plural, one {# uur} other {# uur}} en {minutes, plural, one {# minuut} other {# minuten}}",
+    "backToTop": "Terug naar boven"
   },
   "markdown": {
     "edit": "Schrijven",
@@ -102,7 +103,10 @@
     "switchLanguage": "Taal wijzigen",
     "skipToContent": "Ga naar inhoud",
     "skipToFooter": "Ga naar footer",
-    "mainLabel": "Hoofdnavigatie"
+    "mainLabel": "Hoofdnavigatie",
+    "activeLanguage": "Actieve taal:",
+    "languageSelected": "(geselecteerd)",
+    "signIn": "Inloggen"
   },
   "header": {
     "followUs": "Volg ons op"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mailadres waarmee je je hebt ingeschreven",
       "recordingLinkSend": "Stuur me de link opnieuw",
       "recordingLinkSent": "Als het adres voor het evenement is ingeschreven, ontvang je binnenkort een e-mail met je persoonlijke link.",
-      "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw."
+      "recordingLinkError": "Het verzoek is mislukt. Probeer het over een paar minuten opnieuw.",
+      "registerOrGuest": "Als je je inschrijft, krijg je per e-mail je persoonlijke link en nieuws over het evenement. Als gast kom je meteen binnen met alleen een naam, alleen terwijl het evenement live is, en krijg je geen e-mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Komende evenementen",
       "viewAll": "Bekijk alle evenementen",
-      "noEvents": "Geen evenementen gepland. Kom snel terug!"
+      "noEvents": "Geen evenementen gepland. Kom snel terug!",
+      "seePast": "Eerdere evenementen",
+      "seeRecordings": "Opnames"
     },
     "howItWorks": {
       "title": "Hoe je meedoet",
@@ -4855,11 +4862,13 @@
     "transparency": "Beveiliging en transparantie",
     "serviceInventory": "Service-inventaris",
     "sourceCode": "Broncode",
-    "buildInfoDev": "ontwikkelbuild",
-    "viewCommit": "Bekijk commit op GitHub",
     "viewRelease": "Bekijk release op GitHub",
     "viewChangelog": "Bekijk wat er nieuw is (changelog)",
-    "buildDatePrefix": "Gebouwd op"
+    "newWindow": "opent in een nieuw venster",
+    "usefulLinks": "Nuttige links",
+    "version": "Versie {version}",
+    "versionDev": "Ontwikkelversie",
+    "updatedOn": "bijgewerkt op {date}"
   },
   "changelog": {
     "metaTitle": "Nieuws en changelog",

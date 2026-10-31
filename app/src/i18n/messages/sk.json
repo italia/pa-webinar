@@ -81,7 +81,8 @@
     "deselectAll": "Zrušiť výber",
     "durationMinutes": "{minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
     "durationHours": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}}",
-    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}"
+    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodín}} a {minutes, plural, one {# minúta} few {# minúty} other {# minút}}",
+    "backToTop": "Späť nahor"
   },
   "markdown": {
     "edit": "Písať",
@@ -102,7 +103,10 @@
     "switchLanguage": "Zmeniť jazyk",
     "skipToContent": "Prejsť na obsah",
     "skipToFooter": "Prejsť na pätu stránky",
-    "mainLabel": "Hlavná navigácia"
+    "mainLabel": "Hlavná navigácia",
+    "activeLanguage": "Aktívny jazyk:",
+    "languageSelected": "(vybraný)",
+    "signIn": "Prihlásiť sa"
   },
   "header": {
     "followUs": "Sledujte nás na"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail, ktorým ste sa registrovali",
       "recordingLinkSend": "Poslať odkaz znova",
       "recordingLinkSent": "Ak je adresa na podujatie registrovaná, čoskoro vám príde e-mail s osobným odkazom.",
-      "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova."
+      "recordingLinkError": "Požiadavka zlyhala. Skúste to o niekoľko minút znova.",
+      "registerOrGuest": "Ak sa zaregistrujete, dostanete e-mailom svoj osobný odkaz a novinky o podujatí. Ako hosť vstúpite hneď len s menom, iba počas živého vysielania, a e-maily nedostávate."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Nadchádzajúce podujatia",
       "viewAll": "Zobraziť všetky podujatia",
-      "noEvents": "Žiadne naplánované podujatia. Pozrite sa čoskoro znova!"
+      "noEvents": "Žiadne naplánované podujatia. Pozrite sa čoskoro znova!",
+      "seePast": "Minulé podujatia",
+      "seeRecordings": "Záznamy"
     },
     "howItWorks": {
       "title": "Ako sa zapojiť",
@@ -4855,11 +4862,13 @@
     "transparency": "Bezpečnosť a transparentnosť",
     "serviceInventory": "Inventár služieb",
     "sourceCode": "Zdrojový kód",
-    "buildInfoDev": "vývojový build",
-    "viewCommit": "Zobraziť commit na GitHube",
     "viewRelease": "Zobraziť vydanie na GitHube",
     "viewChangelog": "Pozrite si novinky (changelog)",
-    "buildDatePrefix": "Zostavené"
+    "newWindow": "otvorí sa v novom okne",
+    "usefulLinks": "Užitočné odkazy",
+    "version": "Verzia {version}",
+    "versionDev": "Vývojová verzia",
+    "updatedOn": "aktualizované {date}"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",

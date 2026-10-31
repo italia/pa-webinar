@@ -81,7 +81,8 @@
     "deselectAll": "Zrušit výběr",
     "durationMinutes": "{minutes, plural, one {# minuta} few {# minuty} other {# minut}}",
     "durationHours": "{hours, plural, one {# hodina} few {# hodiny} other {# hodin}}",
-    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodin}} a {minutes, plural, one {# minuta} few {# minuty} other {# minut}}"
+    "durationHoursMinutes": "{hours, plural, one {# hodina} few {# hodiny} other {# hodin}} a {minutes, plural, one {# minuta} few {# minuty} other {# minut}}",
+    "backToTop": "Zpět nahoru"
   },
   "markdown": {
     "edit": "Psát",
@@ -102,7 +103,10 @@
     "switchLanguage": "Změnit jazyk",
     "skipToContent": "Přejít na obsah",
     "skipToFooter": "Přejít na zápatí",
-    "mainLabel": "Hlavní navigace"
+    "mainLabel": "Hlavní navigace",
+    "activeLanguage": "Aktivní jazyk:",
+    "languageSelected": "(vybráno)",
+    "signIn": "Přihlásit se"
   },
   "header": {
     "followUs": "Sledujte nás na"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail, kterým jste se registrovali",
       "recordingLinkSend": "Poslat odkaz znovu",
       "recordingLinkSent": "Pokud je adresa na akci registrována, brzy vám přijde e-mail s osobním odkazem.",
-      "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu."
+      "recordingLinkError": "Požadavek se nezdařil. Zkuste to za několik minut znovu.",
+      "registerOrGuest": "Když se zaregistrujete, dostanete e-mailem svůj osobní odkaz a novinky o akci. Jako host vstoupíte hned jen se jménem, pouze během živého vysílání, a e-maily nedostáváte."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Nadcházející akce",
       "viewAll": "Zobrazit všechny akce",
-      "noEvents": "Žádné naplánované akce. Podívejte se brzy znovu!"
+      "noEvents": "Žádné naplánované akce. Podívejte se brzy znovu!",
+      "seePast": "Minulé akce",
+      "seeRecordings": "Záznamy"
     },
     "howItWorks": {
       "title": "Jak se zúčastnit",
@@ -4855,11 +4862,13 @@
     "transparency": "Bezpečnost a transparentnost",
     "serviceInventory": "Inventář služeb",
     "sourceCode": "Zdrojový kód",
-    "buildInfoDev": "vývojový build",
-    "viewCommit": "Zobrazit commit na GitHubu",
     "viewRelease": "Zobrazit vydání na GitHubu",
     "viewChangelog": "Zobrazit novinky (changelog)",
-    "buildDatePrefix": "Sestaveno"
+    "newWindow": "otevře se v novém okně",
+    "usefulLinks": "Užitečné odkazy",
+    "version": "Verze {version}",
+    "versionDev": "Vývojová verze",
+    "updatedOn": "aktualizováno {date}"
   },
   "changelog": {
     "metaTitle": "Novinky a changelog",

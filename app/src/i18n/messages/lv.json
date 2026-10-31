@@ -81,7 +81,8 @@
     "deselectAll": "Atcelt atlasi",
     "durationMinutes": "{minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}",
     "durationHours": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}}",
-    "durationHoursMinutes": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}} un {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}"
+    "durationHoursMinutes": "{hours, plural, zero {# stundas} one {# stunda} other {# stundas}} un {minutes, plural, zero {# minūtes} one {# minūte} other {# minūtes}}",
+    "backToTop": "Uz augšu"
   },
   "markdown": {
     "edit": "Rakstīt",
@@ -102,7 +103,10 @@
     "switchLanguage": "Mainīt valodu",
     "skipToContent": "Pāriet uz saturu",
     "skipToFooter": "Pāriet uz kājeni",
-    "mainLabel": "Galvenā navigācija"
+    "mainLabel": "Galvenā navigācija",
+    "activeLanguage": "Aktīvā valoda:",
+    "languageSelected": "(atlasīta)",
+    "signIn": "Pieteikties"
   },
   "header": {
     "followUs": "Sekojiet mums"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-pasts, ar kuru reģistrējāties",
       "recordingLinkSend": "Nosūtīt saiti vēlreiz",
       "recordingLinkSent": "Ja adrese ir reģistrēta pasākumam, drīz saņemsiet e-pastu ar personīgo saiti.",
-      "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm."
+      "recordingLinkError": "Pieprasījums neizdevās. Mēģiniet vēlreiz pēc dažām minūtēm.",
+      "registerOrGuest": "Reģistrējoties pa e-pastu saņemat savu personīgo saiti un jaunumus par pasākumu. Kā viesis ienākat uzreiz tikai ar vārdu, tikai kamēr pasākums notiek tiešraidē, un e-pastus nesaņemat."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Gaidāmie pasākumi",
       "viewAll": "Skatīt visus pasākumus",
-      "noEvents": "Nav ieplānotu pasākumu. Atgriezieties drīz!"
+      "noEvents": "Nav ieplānotu pasākumu. Atgriezieties drīz!",
+      "seePast": "Pagātnes pasākumi",
+      "seeRecordings": "Ieraksti"
     },
     "howItWorks": {
       "title": "Kā piedalīties",
@@ -4855,11 +4862,13 @@
     "transparency": "Drošība un pārredzamība",
     "serviceInventory": "Pakalpojumu inventārs",
     "sourceCode": "Avota kods",
-    "buildInfoDev": "izstrādes būvējums",
-    "viewCommit": "Skatīt commit GitHub",
     "viewRelease": "Skatīt laidienu GitHub",
     "viewChangelog": "Skatīt jaunumus (izmaiņu žurnālu)",
-    "buildDatePrefix": "Izveidots"
+    "newWindow": "atveras jaunā logā",
+    "usefulLinks": "Noderīgas saites",
+    "version": "Versija {version}",
+    "versionDev": "Izstrādes versija",
+    "updatedOn": "atjaunināta {date}"
   },
   "changelog": {
     "metaTitle": "Jaunumi un izmaiņu žurnāls",

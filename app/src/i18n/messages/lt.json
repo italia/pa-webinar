@@ -81,7 +81,8 @@
     "deselectAll": "Atžymėti visus",
     "durationMinutes": "{minutes, plural, one {# minutė} few {# minutės} other {# minučių}}",
     "durationHours": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}}",
-    "durationHoursMinutes": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}} ir {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}"
+    "durationHoursMinutes": "{hours, plural, one {# valanda} few {# valandos} other {# valandų}} ir {minutes, plural, one {# minutė} few {# minutės} other {# minučių}}",
+    "backToTop": "Į viršų"
   },
   "markdown": {
     "edit": "Rašyti",
@@ -102,7 +103,10 @@
     "switchLanguage": "Pakeisti kalbą",
     "skipToContent": "Pereiti prie turinio",
     "skipToFooter": "Pereiti prie poraštės",
-    "mainLabel": "Pagrindinė navigacija"
+    "mainLabel": "Pagrindinė navigacija",
+    "activeLanguage": "Aktyvi kalba:",
+    "languageSelected": "(pasirinkta)",
+    "signIn": "Prisijungti"
   },
   "header": {
     "followUs": "Sekite mus"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "El. paštas, kuriuo užsiregistravote",
       "recordingLinkSend": "Atsiųskite nuorodą dar kartą",
       "recordingLinkSent": "Jei adresas užregistruotas renginyje, netrukus gausite el. laišką su asmenine nuoroda.",
-      "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių."
+      "recordingLinkError": "Užklausa nepavyko. Bandykite dar kartą po kelių minučių.",
+      "registerOrGuest": "Užsiregistravę el. paštu gausite asmeninę nuorodą ir naujienas apie renginį. Kaip svečias įeinate iš karto tik su vardu, tik kol renginys vyksta tiesiogiai, ir el. laiškų negaunate."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Būsimi renginiai",
       "viewAll": "Peržiūrėti visus renginius",
-      "noEvents": "Renginių nesuplanuota. Užsukite netrukus!"
+      "noEvents": "Renginių nesuplanuota. Užsukite netrukus!",
+      "seePast": "Praėję renginiai",
+      "seeRecordings": "Įrašai"
     },
     "howItWorks": {
       "title": "Kaip dalyvauti",
@@ -4855,11 +4862,13 @@
     "transparency": "Saugumas ir skaidrumas",
     "serviceInventory": "Paslaugų inventorius",
     "sourceCode": "Šaltinio kodas",
-    "buildInfoDev": "kūrimo versija",
-    "viewCommit": "Peržiūrėti commit'ą „GitHub“",
     "viewRelease": "Peržiūrėti leidimą „GitHub“",
     "viewChangelog": "Žiūrėti naujienas (pakeitimų sąrašą)",
-    "buildDatePrefix": "Sukurta"
+    "newWindow": "atsidaro naujame lange",
+    "usefulLinks": "Naudingos nuorodos",
+    "version": "Versija {version}",
+    "versionDev": "Kūrimo versija",
+    "updatedOn": "atnaujinta {date}"
   },
   "changelog": {
     "metaTitle": "Naujienos ir pakeitimų sąrašas",

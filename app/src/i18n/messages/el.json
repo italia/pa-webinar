@@ -81,7 +81,8 @@
     "deselectAll": "Αποεπιλογή όλων",
     "durationMinutes": "{minutes, plural, one {# λεπτό} other {# λεπτά}}",
     "durationHours": "{hours, plural, one {# ώρα} other {# ώρες}}",
-    "durationHoursMinutes": "{hours, plural, one {# ώρα} other {# ώρες}} και {minutes, plural, one {# λεπτό} other {# λεπτά}}"
+    "durationHoursMinutes": "{hours, plural, one {# ώρα} other {# ώρες}} και {minutes, plural, one {# λεπτό} other {# λεπτά}}",
+    "backToTop": "Επιστροφή στην αρχή"
   },
   "markdown": {
     "edit": "Σύνταξη",
@@ -102,7 +103,10 @@
     "switchLanguage": "Αλλαγή γλώσσας",
     "skipToContent": "Μετάβαση στο περιεχόμενο",
     "skipToFooter": "Μετάβαση στο υποσέλιδο",
-    "mainLabel": "Κύρια πλοήγηση"
+    "mainLabel": "Κύρια πλοήγηση",
+    "activeLanguage": "Ενεργή γλώσσα:",
+    "languageSelected": "(επιλεγμένη)",
+    "signIn": "Σύνδεση"
   },
   "header": {
     "followUs": "Ακολουθήστε μας"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Email με το οποίο εγγραφήκατε",
       "recordingLinkSend": "Στείλτε μου ξανά τον σύνδεσμο",
       "recordingLinkSent": "Αν η διεύθυνση είναι εγγεγραμμένη στην εκδήλωση, θα λάβετε σύντομα email με τον προσωπικό σας σύνδεσμο.",
-      "recordingLinkError": "Το αίτημα απέτυχε. Δοκιμάστε ξανά σε λίγα λεπτά."
+      "recordingLinkError": "Το αίτημα απέτυχε. Δοκιμάστε ξανά σε λίγα λεπτά.",
+      "registerOrGuest": "Αν εγγραφείτε, λαμβάνετε με email τον προσωπικό σας σύνδεσμο και ενημερώσεις για την εκδήλωση. Ως επισκέπτης μπαίνετε αμέσως μόνο με ένα όνομα, μόνο όσο η εκδήλωση είναι ζωντανά, και δεν λαμβάνετε email."
     },
     "manage": {
       "toggleChat": "Συνομιλία",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Προσεχείς εκδηλώσεις",
       "viewAll": "Δείτε όλες τις εκδηλώσεις",
-      "noEvents": "Δεν υπάρχουν προγραμματισμένες εκδηλώσεις. Ελάτε ξανά σύντομα!"
+      "noEvents": "Δεν υπάρχουν προγραμματισμένες εκδηλώσεις. Ελάτε ξανά σύντομα!",
+      "seePast": "Προηγούμενες εκδηλώσεις",
+      "seeRecordings": "Καταγραφές"
     },
     "howItWorks": {
       "title": "Πώς να συμμετάσχετε",
@@ -4855,11 +4862,13 @@
     "transparency": "Ασφάλεια και διαφάνεια",
     "serviceInventory": "Κατάλογος υπηρεσιών",
     "sourceCode": "Πηγαίος κώδικας",
-    "buildInfoDev": "έκδοση ανάπτυξης",
-    "viewCommit": "Προβολή commit στο GitHub",
     "viewRelease": "Προβολή έκδοσης στο GitHub",
     "viewChangelog": "Δείτε τα νέα (changelog)",
-    "buildDatePrefix": "Κατασκευάστηκε στις"
+    "newWindow": "ανοίγει σε νέο παράθυρο",
+    "usefulLinks": "Χρήσιμοι σύνδεσμοι",
+    "version": "Έκδοση {version}",
+    "versionDev": "Έκδοση ανάπτυξης",
+    "updatedOn": "ενημερώθηκε στις {date}"
   },
   "changelog": {
     "metaTitle": "Νέα και changelog",

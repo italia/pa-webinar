@@ -81,7 +81,8 @@
     "deselectAll": "Deseleccionar todos",
     "durationMinutes": "{minutes, plural, one {# minuto} other {# minutos}}",
     "durationHours": "{hours, plural, one {# hora} other {# horas}}",
-    "durationHoursMinutes": "{hours, plural, one {# hora} other {# horas}} y {minutes, plural, one {# minuto} other {# minutos}}"
+    "durationHoursMinutes": "{hours, plural, one {# hora} other {# horas}} y {minutes, plural, one {# minuto} other {# minutos}}",
+    "backToTop": "Volver arriba"
   },
   "markdown": {
     "edit": "Escribir",
@@ -102,7 +103,10 @@
     "switchLanguage": "Cambiar idioma",
     "skipToContent": "Ir al contenido",
     "skipToFooter": "Ir al pie de página",
-    "mainLabel": "Navegación principal"
+    "mainLabel": "Navegación principal",
+    "activeLanguage": "Idioma activo:",
+    "languageSelected": "(seleccionado)",
+    "signIn": "Acceder"
   },
   "header": {
     "followUs": "Síganos en"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Correo con el que te inscribiste",
       "recordingLinkSend": "Reenviarme el enlace",
       "recordingLinkSent": "Si la dirección está inscrita en el evento, recibirás en breve un correo con tu enlace personal.",
-      "recordingLinkError": "La solicitud no se ha podido completar. Inténtalo de nuevo en unos minutos."
+      "recordingLinkError": "La solicitud no se ha podido completar. Inténtalo de nuevo en unos minutos.",
+      "registerOrGuest": "Si te inscribes, recibes por correo tu enlace personal y novedades sobre el evento. Como invitado entras enseguida solo con un nombre, solo mientras el evento está en directo, y no recibes correos."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Próximos eventos",
       "viewAll": "Ver todos los eventos",
-      "noEvents": "No hay eventos programados. ¡Vuelve pronto!"
+      "noEvents": "No hay eventos programados. ¡Vuelve pronto!",
+      "seePast": "Eventos pasados",
+      "seeRecordings": "Grabaciones"
     },
     "howItWorks": {
       "title": "Cómo participar",
@@ -4855,11 +4862,13 @@
     "transparency": "Seguridad y transparencia",
     "serviceInventory": "Inventario de servicios",
     "sourceCode": "Código fuente",
-    "buildInfoDev": "compilación de desarrollo",
-    "viewCommit": "Ver el commit en GitHub",
     "viewRelease": "Ver la versión en GitHub",
     "viewChangelog": "Ver las novedades (changelog)",
-    "buildDatePrefix": "Compilado el"
+    "newWindow": "se abre en una ventana nueva",
+    "usefulLinks": "Enlaces útiles",
+    "version": "Versión {version}",
+    "versionDev": "Versión de desarrollo",
+    "updatedOn": "actualizada el {date}"
   },
   "changelog": {
     "metaTitle": "Novedades y changelog",

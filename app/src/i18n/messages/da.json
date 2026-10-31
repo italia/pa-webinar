@@ -81,7 +81,8 @@
     "deselectAll": "Fravælg alle",
     "durationMinutes": "{minutes, plural, one {# minut} other {# minutter}}",
     "durationHours": "{hours, plural, one {# time} other {# timer}}",
-    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}"
+    "durationHoursMinutes": "{hours, plural, one {# time} other {# timer}} og {minutes, plural, one {# minut} other {# minutter}}",
+    "backToTop": "Til toppen"
   },
   "markdown": {
     "edit": "Skriv",
@@ -102,7 +103,10 @@
     "switchLanguage": "Skift sprog",
     "skipToContent": "Gå til indhold",
     "skipToFooter": "Gå til sidefod",
-    "mainLabel": "Hovednavigation"
+    "mainLabel": "Hovednavigation",
+    "activeLanguage": "Aktivt sprog:",
+    "languageSelected": "(valgt)",
+    "signIn": "Log ind"
   },
   "header": {
     "followUs": "Følg os på"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail, du tilmeldte dig med",
       "recordingLinkSend": "Send mig linket igen",
       "recordingLinkSent": "Hvis adressen er tilmeldt begivenheden, modtager du snart en e-mail med dit personlige link.",
-      "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter."
+      "recordingLinkError": "Anmodningen mislykkedes. Prøv igen om et par minutter.",
+      "registerOrGuest": "Hvis du tilmelder dig, får du dit personlige link og nyt om arrangementet på e-mail. Som gæst kommer du ind med det samme med kun et navn, kun mens arrangementet er live, og du får ingen e-mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Kommende arrangementer",
       "viewAll": "Se alle arrangementer",
-      "noEvents": "Ingen planlagte arrangementer. Kig forbi igen snart!"
+      "noEvents": "Ingen planlagte arrangementer. Kig forbi igen snart!",
+      "seePast": "Tidligere arrangementer",
+      "seeRecordings": "Optagelser"
     },
     "howItWorks": {
       "title": "Sådan deltager du",
@@ -4855,11 +4862,13 @@
     "transparency": "Sikkerhed og gennemsigtighed",
     "serviceInventory": "Serviceoversigt",
     "sourceCode": "Kildekode",
-    "buildInfoDev": "udviklingsbuild",
-    "viewCommit": "Se commit på GitHub",
     "viewRelease": "Se udgivelse på GitHub",
     "viewChangelog": "Se nyhederne (changelog)",
-    "buildDatePrefix": "Bygget den"
+    "newWindow": "åbner i et nyt vindue",
+    "usefulLinks": "Nyttige links",
+    "version": "Version {version}",
+    "versionDev": "Udviklingsversion",
+    "updatedOn": "opdateret {date}"
   },
   "changelog": {
     "metaTitle": "Nyheder og changelog",

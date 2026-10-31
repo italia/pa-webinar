@@ -81,7 +81,8 @@
     "deselectAll": "Auswahl aufheben",
     "durationMinutes": "{minutes, plural, one {# Minute} other {# Minuten}}",
     "durationHours": "{hours, plural, one {# Stunde} other {# Stunden}}",
-    "durationHoursMinutes": "{hours, plural, one {# Stunde} other {# Stunden}} und {minutes, plural, one {# Minute} other {# Minuten}}"
+    "durationHoursMinutes": "{hours, plural, one {# Stunde} other {# Stunden}} und {minutes, plural, one {# Minute} other {# Minuten}}",
+    "backToTop": "Nach oben"
   },
   "markdown": {
     "edit": "Schreiben",
@@ -102,7 +103,10 @@
     "switchLanguage": "Sprache wechseln",
     "skipToContent": "Zum Inhalt springen",
     "skipToFooter": "Zum Footer springen",
-    "mainLabel": "Hauptnavigation"
+    "mainLabel": "Hauptnavigation",
+    "activeLanguage": "Aktive Sprache:",
+    "languageSelected": "(ausgewählt)",
+    "signIn": "Anmelden"
   },
   "header": {
     "followUs": "Folgen Sie uns auf"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-Mail-Adresse der Anmeldung",
       "recordingLinkSend": "Link erneut senden",
       "recordingLinkSent": "Wenn die Adresse für die Veranstaltung angemeldet ist, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link.",
-      "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut."
+      "recordingLinkError": "Die Anfrage ist fehlgeschlagen. Bitte versuchen Sie es in einigen Minuten erneut.",
+      "registerOrGuest": "Mit einer Anmeldung erhalten Sie Ihren persönlichen Link und Neuigkeiten zum Event per E-Mail. Als Gast treten Sie sofort nur mit einem Namen ein, nur während das Event live ist, und erhalten keine E-Mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Kommende Veranstaltungen",
       "viewAll": "Alle Veranstaltungen ansehen",
-      "noEvents": "Keine Veranstaltungen geplant. Schauen Sie bald wieder vorbei!"
+      "noEvents": "Keine Veranstaltungen geplant. Schauen Sie bald wieder vorbei!",
+      "seePast": "Vergangene Events",
+      "seeRecordings": "Aufzeichnungen"
     },
     "howItWorks": {
       "title": "So nehmen Sie teil",
@@ -4855,11 +4862,13 @@
     "transparency": "Sicherheit und Transparenz",
     "serviceInventory": "Dienste-Inventar",
     "sourceCode": "Quellcode",
-    "buildInfoDev": "Entwicklungsbuild",
-    "viewCommit": "Commit auf GitHub ansehen",
     "viewRelease": "Release auf GitHub ansehen",
     "viewChangelog": "Neuigkeiten ansehen (Changelog)",
-    "buildDatePrefix": "Erstellt am"
+    "newWindow": "öffnet sich in einem neuen Fenster",
+    "usefulLinks": "Nützliche Links",
+    "version": "Version {version}",
+    "versionDev": "Entwicklungsversion",
+    "updatedOn": "aktualisiert am {date}"
   },
   "changelog": {
     "metaTitle": "Neuigkeiten und Changelog",

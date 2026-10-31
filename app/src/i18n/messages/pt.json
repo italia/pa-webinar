@@ -81,7 +81,8 @@
     "deselectAll": "Desselecionar todos",
     "durationMinutes": "{minutes, plural, one {# minuto} other {# minutos}}",
     "durationHours": "{hours, plural, one {# hora} other {# horas}}",
-    "durationHoursMinutes": "{hours, plural, one {# hora} other {# horas}} e {minutes, plural, one {# minuto} other {# minutos}}"
+    "durationHoursMinutes": "{hours, plural, one {# hora} other {# horas}} e {minutes, plural, one {# minuto} other {# minutos}}",
+    "backToTop": "Voltar ao topo"
   },
   "markdown": {
     "edit": "Escrever",
@@ -102,7 +103,10 @@
     "switchLanguage": "Alterar idioma",
     "skipToContent": "Ir para o conteúdo",
     "skipToFooter": "Ir para o rodapé",
-    "mainLabel": "Navegação principal"
+    "mainLabel": "Navegação principal",
+    "activeLanguage": "Língua ativa:",
+    "languageSelected": "(selecionada)",
+    "signIn": "Entrar"
   },
   "header": {
     "followUs": "Siga-nos em"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mail com que se inscreveu",
       "recordingLinkSend": "Reenviar-me a ligação",
       "recordingLinkSent": "Se o endereço estiver inscrito no evento, receberá em breve um e-mail com a sua ligação pessoal.",
-      "recordingLinkError": "O pedido falhou. Tente novamente dentro de alguns minutos."
+      "recordingLinkError": "O pedido falhou. Tente novamente dentro de alguns minutos.",
+      "registerOrGuest": "Se se inscrever, recebe por e-mail a sua ligação pessoal e novidades sobre o evento. Como convidado entra logo só com um nome, apenas enquanto o evento está em direto, e não recebe e-mails."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Próximos eventos",
       "viewAll": "Ver todos os eventos",
-      "noEvents": "Nenhum evento agendado. Volte em breve!"
+      "noEvents": "Nenhum evento agendado. Volte em breve!",
+      "seePast": "Eventos passados",
+      "seeRecordings": "Gravações"
     },
     "howItWorks": {
       "title": "Como participar",
@@ -4855,11 +4862,13 @@
     "transparency": "Segurança e transparência",
     "serviceInventory": "Inventário de serviços",
     "sourceCode": "Código fonte",
-    "buildInfoDev": "build de desenvolvimento",
-    "viewCommit": "Ver o commit no GitHub",
     "viewRelease": "Ver a versão no GitHub",
     "viewChangelog": "Ver as novidades (changelog)",
-    "buildDatePrefix": "Compilado em"
+    "newWindow": "abre numa nova janela",
+    "usefulLinks": "Ligações úteis",
+    "version": "Versão {version}",
+    "versionDev": "Versão de desenvolvimento",
+    "updatedOn": "atualizada em {date}"
   },
   "changelog": {
     "metaTitle": "Novidades e changelog",

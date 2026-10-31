@@ -81,7 +81,8 @@
     "deselectAll": "Премахни избора на всички",
     "durationMinutes": "{minutes, plural, one {# минута} other {# минути}}",
     "durationHours": "{hours, plural, one {# час} other {# часа}}",
-    "durationHoursMinutes": "{hours, plural, one {# час} other {# часа}} и {minutes, plural, one {# минута} other {# минути}}"
+    "durationHoursMinutes": "{hours, plural, one {# час} other {# часа}} и {minutes, plural, one {# минута} other {# минути}}",
+    "backToTop": "Нагоре"
   },
   "markdown": {
     "edit": "Пиши",
@@ -102,7 +103,10 @@
     "switchLanguage": "Смяна на езика",
     "skipToContent": "Към съдържанието",
     "skipToFooter": "Към долния колонтитул",
-    "mainLabel": "Основна навигация"
+    "mainLabel": "Основна навигация",
+    "activeLanguage": "Активен език:",
+    "languageSelected": "(избран)",
+    "signIn": "Вход"
   },
   "header": {
     "followUs": "Последвайте ни"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "Имейл, с който сте се регистрирали",
       "recordingLinkSend": "Изпратете ми линка отново",
       "recordingLinkSent": "Ако адресът е регистриран за събитието, скоро ще получите имейл с личния си линк.",
-      "recordingLinkError": "Заявката не бе успешна. Опитайте отново след няколко минути."
+      "recordingLinkError": "Заявката не бе успешна. Опитайте отново след няколко минути.",
+      "registerOrGuest": "Ако се регистрирате, получавате по имейл личната си връзка и новини за събитието. Като гост влизате веднага само с име, само докато събитието е на живо, и не получавате имейли."
     },
     "manage": {
       "toggleChat": "Чат",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Предстоящи събития",
       "viewAll": "Вижте всички събития",
-      "noEvents": "Няма насрочени събития. Проверете отново скоро!"
+      "noEvents": "Няма насрочени събития. Проверете отново скоро!",
+      "seePast": "Минали събития",
+      "seeRecordings": "Записи"
     },
     "howItWorks": {
       "title": "Как да участвате",
@@ -4855,11 +4862,13 @@
     "transparency": "Сигурност и прозрачност",
     "serviceInventory": "Инвентар на услугите",
     "sourceCode": "Изходен код",
-    "buildInfoDev": "разработческа компилация",
-    "viewCommit": "Преглед на ангажимента в GitHub",
     "viewRelease": "Преглед на версията в GitHub",
     "viewChangelog": "Вижте новостите (changelog)",
-    "buildDatePrefix": "Компилирано на"
+    "newWindow": "отваря се в нов прозорец",
+    "usefulLinks": "Полезни връзки",
+    "version": "Версия {version}",
+    "versionDev": "Версия за разработка",
+    "updatedOn": "обновена на {date}"
   },
   "changelog": {
     "metaTitle": "Новости и changelog",

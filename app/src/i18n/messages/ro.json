@@ -81,7 +81,8 @@
     "deselectAll": "Deselectați tot",
     "durationMinutes": "{minutes, plural, one {# minut} few {# minute} other {# de minute}}",
     "durationHours": "{hours, plural, one {# oră} few {# ore} other {# de ore}}",
-    "durationHoursMinutes": "{hours, plural, one {# oră} few {# ore} other {# de ore}} și {minutes, plural, one {# minut} few {# minute} other {# de minute}}"
+    "durationHoursMinutes": "{hours, plural, one {# oră} few {# ore} other {# de ore}} și {minutes, plural, one {# minut} few {# minute} other {# de minute}}",
+    "backToTop": "Înapoi sus"
   },
   "markdown": {
     "edit": "Scrieți",
@@ -102,7 +103,10 @@
     "switchLanguage": "Schimbați limba",
     "skipToContent": "Salt la conținut",
     "skipToFooter": "Salt la subsol",
-    "mainLabel": "Navigare principală"
+    "mainLabel": "Navigare principală",
+    "activeLanguage": "Limba activă:",
+    "languageSelected": "(selectată)",
+    "signIn": "Autentificare"
   },
   "header": {
     "followUs": "Urmăriți-ne pe"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "E-mailul cu care te-ai înscris",
       "recordingLinkSend": "Retrimite-mi linkul",
       "recordingLinkSent": "Dacă adresa este înscrisă la eveniment, vei primi în curând un e-mail cu linkul personal.",
-      "recordingLinkError": "Cererea nu a reușit. Încearcă din nou peste câteva minute."
+      "recordingLinkError": "Cererea nu a reușit. Încearcă din nou peste câteva minute.",
+      "registerOrGuest": "Dacă te înscrii, primești pe e-mail linkul personal și noutăți despre eveniment. Ca invitat intri imediat doar cu un nume, doar cât timp evenimentul este live, și nu primești e-mailuri."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Evenimente viitoare",
       "viewAll": "Vezi toate evenimentele",
-      "noEvents": "Niciun eveniment programat. Revino în curând!"
+      "noEvents": "Niciun eveniment programat. Revino în curând!",
+      "seePast": "Evenimente trecute",
+      "seeRecordings": "Înregistrări"
     },
     "howItWorks": {
       "title": "Cum participi",
@@ -4855,11 +4862,13 @@
     "transparency": "Securitate și transparență",
     "serviceInventory": "Inventar servicii",
     "sourceCode": "Codul sursă",
-    "buildInfoDev": "versiune de dezvoltare",
-    "viewCommit": "Vezi commit-ul pe GitHub",
     "viewRelease": "Vezi versiunea pe GitHub",
     "viewChangelog": "Vezi noutățile (changelog)",
-    "buildDatePrefix": "Compilat la"
+    "newWindow": "se deschide într-o fereastră nouă",
+    "usefulLinks": "Linkuri utile",
+    "version": "Versiunea {version}",
+    "versionDev": "Versiune de dezvoltare",
+    "updatedOn": "actualizată la {date}"
   },
   "changelog": {
     "metaTitle": "Noutăți și changelog",

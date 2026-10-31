@@ -81,7 +81,8 @@
     "deselectAll": "Díroghnaigh gach ceann",
     "durationMinutes": "{minutes, plural, one {# nóiméad} other {# nóiméad}}",
     "durationHours": "{hours, plural, one {# uair an chloig} other {# uair an chloig}}",
-    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}"
+    "durationHoursMinutes": "{hours, plural, one {# uair an chloig} other {# uair an chloig}} agus {minutes, plural, one {# nóiméad} other {# nóiméad}}",
+    "backToTop": "Ar ais go barr"
   },
   "markdown": {
     "edit": "Scríobh",
@@ -102,7 +103,10 @@
     "switchLanguage": "Athraigh teanga",
     "skipToContent": "Téigh go dtí an t-ábhar",
     "skipToFooter": "Téigh go dtí an buntásc",
-    "mainLabel": "Príomh-nascleanúint"
+    "mainLabel": "Príomh-nascleanúint",
+    "activeLanguage": "Teanga ghníomhach:",
+    "languageSelected": "(roghnaithe)",
+    "signIn": "Sínigh isteach"
   },
   "header": {
     "followUs": "Lean sinn ar"
@@ -204,7 +208,8 @@
       "recordingLinkEmailLabel": "An ríomhphost lenar chláraigh tú",
       "recordingLinkSend": "Seol an nasc chugam arís",
       "recordingLinkSent": "Má tá an seoladh cláraithe don ócáid, gheobhaidh tú ríomhphost leis an nasc pearsanta go luath.",
-      "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad."
+      "recordingLinkError": "Theip ar an iarratas. Bain triail eile as i gceann cúpla nóiméad.",
+      "registerOrGuest": "Má chláraíonn tú, gheobhaidh tú do nasc pearsanta agus nuashonruithe faoin ócáid trí ríomhphost. Mar aoi, téann tú isteach láithreach le hainm amháin, fad atá an ócáid beo amháin, agus ní fhaigheann tú ríomhphoist."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -3840,7 +3845,9 @@
     "upcoming": {
       "title": "Imeachtaí atá le teacht",
       "viewAll": "Féach ar na himeachtaí go léir",
-      "noEvents": "Níl aon imeacht sceidealta. Fill go luath!"
+      "noEvents": "Níl aon imeacht sceidealta. Fill go luath!",
+      "seePast": "Ócáidí roimhe seo",
+      "seeRecordings": "Taifeadtaí"
     },
     "howItWorks": {
       "title": "Conas páirt a ghlacadh",
@@ -4855,11 +4862,13 @@
     "transparency": "Slándáil agus trédhearcacht",
     "serviceInventory": "Fardal seirbhísí",
     "sourceCode": "Cód foinse",
-    "buildInfoDev": "tógáil forbartha",
-    "viewCommit": "Féach ar an gcommit ar GitHub",
     "viewRelease": "Féach ar an eisiúint ar GitHub",
     "viewChangelog": "Féach ar na nuashonruithe (loga athruithe)",
-    "buildDatePrefix": "Tógtha ar"
+    "newWindow": "osclaítear i bhfuinneog nua é",
+    "usefulLinks": "Naisc úsáideacha",
+    "version": "Leagan {version}",
+    "versionDev": "Leagan forbartha",
+    "updatedOn": "nuashonraithe ar {date}"
   },
   "changelog": {
     "metaTitle": "Nuacht agus loga athruithe",
