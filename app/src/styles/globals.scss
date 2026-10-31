@@ -15072,3 +15072,33 @@ button.back-to-top {
   color: var(--app-text);
 }
 
+// In solo ascolto: una fascia sopra la conferenza, con il modo di intervenire.
+.live-listen-only {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.5rem 1rem;
+  background: #fff8e6;
+  border-bottom: 1px solid #f0d58c;
+  color: #3d2e00;
+  font-size: 0.9rem;
+
+  .live-listen-only__icona {
+    fill: #8a6100;
+  }
+
+  // Icona, testo e pulsante su una riga; il testo va a capo dentro di se'.
+  > p:first-of-type {
+    flex: 1 1 0;
+    min-width: 16rem;
+    line-height: 1.4;
+  }
+}
+
+.people__note {
+  font-size: 0.8rem;
+  color: var(--app-muted);
+  line-height: 1.4;
+}
+

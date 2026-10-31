@@ -532,7 +532,8 @@
       "stopVideo": "Išjungti vaizdo įrašą",
       "revokeFloor": "Atimti žodį",
       "lowerHandFailed": "Nepavyko nuleisti rankos: bandykite dar kartą.",
-      "handsRaised": "{count, plural, one {# pakelta ranka} few {# pakeltos rankos} other {# pakeltų rankų}}"
+      "handsRaised": "{count, plural, one {# pakelta ranka} few {# pakeltos rankos} other {# pakeltų rankų}}",
+      "locksByConsent": "Mikrofonai ir kameros paiso sutikimo dėl įrašymo: davusieji naudoja tai, ką leidžia renginys, kiti tik klausosi. Kambario užraktai lieka įjungti."
     },
     "moderator": {
       "muteAll": "Nutildyti visus",
@@ -647,7 +648,14 @@
     "closeSidebar": "Uždaryti šoninį skydelį",
     "contentOnly": "Tik turinys, be pokalbio ir skydelių",
     "showPanels": "Rodyti pokalbį ir skydelius",
-    "confirmFullscreen": "Perjungti į viso ekrano režimą"
+    "confirmFullscreen": "Perjungti į viso ekrano režimą",
+    "listenOnly": {
+      "title": "Tik klausotės.",
+      "body": "Nesutikote su įrašymu: sekate ir rašote pokalbyje, bet mikrofonas, kamera ir ekranas lieka išjungti, net jei vedėjas suteikia jums žodį. Norėdami kalbėti, sutikite.",
+      "consent": "Sutinku su įrašymu ir dalyvauju",
+      "joining": "Grįžtama į kambarį…",
+      "error": "Nepavyko grįžti: bandykite dar kartą."
+    }
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -963,7 +971,11 @@
             "desc": "Stebi renginį ir dalyvauja taip, kaip nuspręsite žingsnyje „Leidimai“."
           }
         },
-        "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC."
+        "recordingManualNote": "Įrašymas niekada neprasideda savaime: vedėjas jį pradeda mygtuku REC.",
+        "listenOnlyWithoutConsent": "Nesutikusieji įeina tik klausytis",
+        "listenOnlyWithoutConsentOn": "Sutikimas dėl įrašymo yra laisvas: jo nedavusieji vis tiek dalyvauja, seka ir rašo pokalbyje, bet mikrofonas, kamera ir ekranas lieka išjungti.",
+        "listenOnlyWithoutConsentOff": "Be sutikimo dėl įrašymo neįeinama.",
+        "listenOnlyLockedLive": "Kol kambarys gali būti atviras, įrašymo ir tik klausymo keisti negalima: jie galioja nuo pirmojo įėjimo."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -4225,7 +4237,8 @@
       "multitrack": "Sutinku, kad mano pasisakymai būtų transkribuoti su mano vardu renginio ataskaitai. Jei renginyje kiekvienam asmeniui įrašomas atskiras garso takelis, mano balsas įrašomas tik šiuo tikslu, o takelis ištrinamas po transkribavimo; jis nenaudojamas mano balsui atpažinti ar atkurti.",
       "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek dalyvaujate, bet jūsų pasisakymai nepateks į transkripciją ir jūsų balsas nebus įrašomas atskirame takelyje. Jei renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
       "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
-      "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos."
+      "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos.",
+      "recordingOptionalListenOnly": "Jei nesutinkate, vis tiek dalyvaujate, tik klausydamiesi: sekate ir rašote pokalbyje, bet mikrofonas, kamera ir ekrano bendrinimas lieka išjungti. Sutikti galite vėliau, iš kambario."
     },
     "export": {
       "title": "Mano duomenys",

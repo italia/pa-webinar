@@ -532,7 +532,8 @@
       "stopVideo": "Videó kikapcsolása",
       "revokeFloor": "Szó visszavonása",
       "lowerHandFailed": "Nem sikerült leengedni a kezet: próbáld újra.",
-      "handsRaised": "{count, plural, one {# feltett kéz} other {# feltett kéz}}"
+      "handsRaised": "{count, plural, one {# feltett kéz} other {# feltett kéz}}",
+      "locksByConsent": "A mikrofonok és kamerák a felvételhez adott hozzájárulást követik: aki megadta, használja, amit az esemény enged, a többiek csak hallgatnak. A terem zárolásai bekapcsolva maradnak."
     },
     "moderator": {
       "muteAll": "Mindenki némítása",
@@ -647,7 +648,14 @@
     "closeSidebar": "Oldalsáv bezárása",
     "contentOnly": "Csak a tartalom, csevegés és panelek nélkül",
     "showPanels": "Csevegés és panelek megjelenítése",
-    "confirmFullscreen": "Váltás teljes képernyőre"
+    "confirmFullscreen": "Váltás teljes képernyőre",
+    "listenOnly": {
+      "title": "Csak hallgatóként vesz részt.",
+      "body": "Nem járult hozzá a felvételhez: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyő kikapcsolva marad, akkor is, ha a moderátor szót ad. A felszólaláshoz járuljon hozzá.",
+      "consent": "Hozzájárulok a felvételhez, és részt veszek",
+      "joining": "Visszalépés a terembe…",
+      "error": "Nem sikerült visszalépni: próbálja újra."
+    }
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -963,7 +971,11 @@
             "desc": "Követi az eseményt, és úgy vesz részt, ahogy az „Engedélyek” lépésben eldönti."
           }
         },
-        "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal."
+        "recordingManualNote": "A felvétel soha nem indul el magától: egy moderátor indítja a REC gombbal.",
+        "listenOnlyWithoutConsent": "Aki nem járul hozzá, csak hallgatóként lép be",
+        "listenOnlyWithoutConsentOn": "A felvételhez való hozzájárulás önkéntes: aki nem adja meg, akkor is részt vesz, követi és ír a csevegésbe, de a mikrofon, a kamera és a képernyő kikapcsolva marad.",
+        "listenOnlyWithoutConsentOff": "A felvételhez való hozzájárulás nélkül nem lehet belépni.",
+        "listenOnlyLockedLive": "Amíg a terem nyitva lehet, a felvétel és a csak hallgatás nem módosítható: az első belépéstől érvényesek."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -4225,7 +4237,8 @@
       "multitrack": "Hozzájárulok, hogy a felszólalásaimat a nevemmel átírják az esemény beszámolójához. Ha az esemény minden résztvevőről külön hangsávot rögzít, a hangomat csak erre a célra rögzítik, és a sáv az átírás után törlődik; nem használják a hangom azonosítására vagy utánzására.",
       "multitrackOptional": "Nem kötelező: ha nem járul hozzá, ugyanúgy részt vesz, de a hozzászólásai nem kerülnek az átiratba, és a hangját nem rögzítjük külön sávon. Ha az eseményt rögzítik, a hangja a videóban így is benne marad.",
       "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
-      "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik."
+      "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik.",
+      "recordingOptionalListenOnly": "Ha nem járul hozzá, akkor is részt vesz, csak hallgatóként: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyőmegosztás kikapcsolva marad. Később a teremből is hozzájárulhat."
     },
     "export": {
       "title": "Az én adataim",

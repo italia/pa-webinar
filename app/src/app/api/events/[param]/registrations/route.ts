@@ -115,7 +115,9 @@ export const POST = withErrorHandling(async (request, context) => {
     recordingEnabled: event.recordingEnabled && recordingAvailable(),
     captionsTranscript: captionsTranscriptActive(event, await getSettings()),
   });
-  if (richiesti.registrazione && consentRecording !== true) {
+  // Con il solo ascolto per chi non acconsente il consenso e' libero: senza,
+  // ci si iscrive e si entra in solo ascolto.
+  if (richiesti.registrazione && !richiesti.registrazioneFacoltativa && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
   }
 
@@ -222,6 +224,8 @@ export const POST = withErrorHandling(async (request, context) => {
           // Il fatto lato server: la regola dell'evento chiedeva o no il
           // consenso alla registrazione (altrimenti l'iscrizione informa).
           recordingConsentRequired: richiesti.registrazione,
+          // Senza consenso si partecipa in solo ascolto: il consenso e' libero.
+          recordingConsentOptional: richiesti.registrazioneFacoltativa,
           consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
           consentMultitrackVersion: richiesti.tracce && consentMultitrack ? VERSIONE_TESTO_TRASCRIZIONE : null,
           consentFutureCommunications: consentFutureCommunications ?? false,

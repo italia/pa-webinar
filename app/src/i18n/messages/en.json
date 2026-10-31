@@ -532,7 +532,8 @@
       "stopVideo": "Turn off video",
       "revokeFloor": "Take back the floor",
       "lowerHandFailed": "The hand could not be lowered: try again.",
-      "handsRaised": "{count, plural, one {# raised hand} other {# raised hands}}"
+      "handsRaised": "{count, plural, one {# raised hand} other {# raised hands}}",
+      "locksByConsent": "Microphones and cameras follow the recording consent: those who gave it use what the event allows, the others stay listening only. The room's locks stay on."
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -647,7 +648,14 @@
     "closeSidebar": "Close the side panel",
     "contentOnly": "Content only, without chat and panels",
     "showPanels": "Show chat and panels",
-    "confirmFullscreen": "Switch to fullscreen"
+    "confirmFullscreen": "Switch to fullscreen",
+    "listenOnly": {
+      "title": "You are listening only.",
+      "body": "You did not consent to the recording: you follow and write in the chat, but microphone, camera and screen stay off, even if the host gives you the floor. To speak, consent.",
+      "consent": "I consent to the recording and take part",
+      "joining": "Rejoining the room…",
+      "error": "Could not rejoin: please try again."
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -963,7 +971,11 @@
             "desc": "Follows the event and interacts as you decide in the \"Permissions\" step."
           }
         },
-        "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button."
+        "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button.",
+        "listenOnlyWithoutConsent": "People who do not consent join listening only",
+        "listenOnlyWithoutConsentOn": "Consent to the recording is free: people who do not give it still take part, follow and write in the chat, but microphone, camera and screen stay off.",
+        "listenOnlyWithoutConsentOff": "Without consent to the recording, nobody enters.",
+        "listenOnlyLockedLive": "While the room may be open, recording and listen-only cannot change: they apply from the first entry."
       },
       "step3": {
         "heading": "People and invites",
@@ -4225,7 +4237,8 @@
       "multitrack": "I consent to my contributions being transcribed, with my name, for the event's report. If the event records a separate audio track for each person, my voice is recorded for this purpose only and the track is deleted after transcription; it is not used to identify or reproduce my voice.",
       "multitrackOptional": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track. If the event is recorded, your voice is still in the video.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
-      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration."
+      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration.",
+      "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room."
     },
     "export": {
       "title": "My data",

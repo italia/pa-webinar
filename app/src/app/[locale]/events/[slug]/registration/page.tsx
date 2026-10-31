@@ -137,6 +137,7 @@ export default async function RegistrationPage({
           <RegistrationFormClient
             eventSlug={slug}
             invito={invito}
+            listenOnlyWithoutConsent={event.listenOnlyWithoutConsent}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             // Un'installazione che non può registrare non chiede il consenso

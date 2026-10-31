@@ -49,6 +49,7 @@ import {
   lingueDellEvento,
 } from '@/lib/text-translation/stato-lingue';
 import { unisciTesti } from '@/lib/text-translation/unione-testi';
+import { salaForseAperta } from '@/lib/live/room-open';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,6 +134,7 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -304,6 +306,23 @@ export const PUT = withErrorHandling(async (request, context) => {
     data.endsAt !== undefined ||
     data.startsAt !== undefined;
   const ignoredCreationOnlyFields: string[] = [];
+  // Registrazione e solo ascolto decidono il consenso chiesto a chi entra e
+  // il blocco dei mezzi che la sala accende al primo ingresso
+  // (mod_pa_media_lock): a sala aperta non si cambiano. Chi e' gia' dentro
+  // non ha dato il consenso a una registrazione accesa dopo, e chi entra dopo
+  // avrebbe un token che il bridge non fa rispettare.
+  const cambiaRegime =
+    (data.listenOnlyWithoutConsent !== undefined &&
+      data.listenOnlyWithoutConsent !== event.listenOnlyWithoutConsent) ||
+    (data.recordingEnabled !== undefined && data.recordingEnabled !== event.recordingEnabled);
+  if (cambiaRegime && (await salaForseAperta(event))) {
+    for (const campo of ['listenOnlyWithoutConsent', 'recordingEnabled'] as const) {
+      if (data[campo] !== undefined && data[campo] !== event[campo]) {
+        ignoredCreationOnlyFields.push(campo);
+        delete (data as Record<string, unknown>)[campo];
+      }
+    }
+  }
   if (isTerminalStatus && !isLifecycleEdit) {
     for (const field of CREATION_ONLY_FIELDS) {
       if (data[field] !== undefined) {
@@ -562,6 +581,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingNotifyEnabled !== undefined && { recordingNotifyEnabled: data.recordingNotifyEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
+      ...(data.listenOnlyWithoutConsent !== undefined && { listenOnlyWithoutConsent: data.listenOnlyWithoutConsent }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),

@@ -532,7 +532,8 @@
       "stopVideo": "Itfi l-vidjo",
       "revokeFloor": "Neħħi l-kelma",
       "lowerHandFailed": "L-id ma setgħetx titniżżel: erġa' pprova.",
-      "handsRaised": "{count, plural, one {# id merfugħa} other {# idejn merfugħin}}"
+      "handsRaised": "{count, plural, one {# id merfugħa} other {# idejn merfugħin}}",
+      "locksByConsent": "Il-mikrofoni u l-kameras isegwu l-kunsens għar-reġistrazzjoni: min tah juża dak li jippermetti l-avveniment, il-bqija jisimgħu biss. Is-serraturi tal-kamra jibqgħu mixgħula."
     },
     "moderator": {
       "muteAll": "Iskot lil kulħadd",
@@ -647,7 +648,14 @@
     "closeSidebar": "Agħlaq il-pannell tal-ġenb",
     "contentOnly": "Kontenut biss, mingħajr chat u pannelli",
     "showPanels": "Uri ċ-chat u l-pannelli",
-    "confirmFullscreen": "Aqleb għal skrin sħiħ"
+    "confirmFullscreen": "Aqleb għal skrin sħiħ",
+    "listenOnly": {
+      "title": "Qed tisma' biss.",
+      "body": "Ma tajtx kunsens għar-reġistrazzjoni: issegwi u tikteb fiċ-chat, iżda l-mikrofonu, il-kamera u l-iskrin jibqgħu mitfija, anki jekk min imexxi jagħtik il-kelma. Biex titkellem, agħti l-kunsens.",
+      "consent": "Nagħti l-kunsens għar-reġistrazzjoni u nipparteċipa",
+      "joining": "Qed terġa' tidħol fil-kamra…",
+      "error": "Ma kienx possibbli terġa' tidħol: erġa' pprova."
+    }
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -963,7 +971,11 @@
             "desc": "Isegwi l-avveniment u jieħu sehem kif tiddeċiedi fil-pass «Permessi»."
           }
         },
-        "recordingManualNote": "Ir-reġistrazzjoni qatt ma tibda waħedha: moderatur jibdiha bil-buttuna REC."
+        "recordingManualNote": "Ir-reġistrazzjoni qatt ma tibda waħedha: moderatur jibdiha bil-buttuna REC.",
+        "listenOnlyWithoutConsent": "Min ma jagħtix il-kunsens jidħol jisma' biss",
+        "listenOnlyWithoutConsentOn": "Il-kunsens għar-reġistrazzjoni huwa liberu: min ma jagħtihx xorta jipparteċipa, isegwi u jikteb fiċ-chat, iżda l-mikrofonu, il-kamera u l-iskrin jibqgħu mitfija.",
+        "listenOnlyWithoutConsentOff": "Mingħajr kunsens għar-reġistrazzjoni ħadd ma jidħol.",
+        "listenOnlyLockedLive": "Sakemm il-kamra tista' tkun miftuħa, ir-reġistrazzjoni u s-smigħ biss ma jinbidlux: jgħoddu mill-ewwel dħul."
       },
       "step3": {
         "heading": "Persuni u stediniet",
@@ -4225,7 +4237,8 @@
       "multitrack": "Nagħti l-kunsens li l-interventi tiegħi jiġu traskritti, b'ismi, għar-rapport tal-avveniment. Jekk l-avveniment jirreġistra korsa tal-awdjo separata għal kull persuna, leħni jiġi rreġistrat għal dan l-iskop biss u l-korsa titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi leħni.",
       "multitrackOptional": "Mhuwiex obbligatorju: jekk ma tagħtix il-kunsens, tipparteċipa xorta waħda, iżda l-interventi tiegħek ma jidħlux fit-traskrizzjoni u leħnek ma jiġix irrekordjat fuq korsija separata. Jekk l-avveniment jiġi rrekordjat, leħnek jibqa' fil-vidjo xorta waħda.",
       "stayInTouch": "Irrid nirċievi informazzjoni dwar l-avvenimenti li ġejjin u nkun miżjud fil-ktieb tal-indirizzi, biex inkun mistieden għal avvenimenti simili",
-      "stayInTouchHelp": "Kunsens fakultattiv (art. 6.1.a GDPR). Tista' tirtirah meta trid bil-link \"Neħħini mill-ktieb tal-indirizzi\" fl-emails li tirċievi. L-isem u l-organizzazzjoni huma dawk ta' din ir-reġistrazzjoni."
+      "stayInTouchHelp": "Kunsens fakultattiv (art. 6.1.a GDPR). Tista' tirtirah meta trid bil-link \"Neħħini mill-ktieb tal-indirizzi\" fl-emails li tirċievi. L-isem u l-organizzazzjoni huma dawk ta' din ir-reġistrazzjoni.",
+      "recordingOptionalListenOnly": "Jekk ma tagħtix il-kunsens, xorta tipparteċipa, tisma' biss: issegwi u tikteb fiċ-chat, iżda l-mikrofonu, il-kamera u l-qsim tal-iskrin jibqgħu mitfija. Tista' tagħti l-kunsens aktar tard, mill-kamra."
     },
     "export": {
       "title": "Id-dejta tiegħi",

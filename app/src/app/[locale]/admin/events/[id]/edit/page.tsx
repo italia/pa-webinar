@@ -19,6 +19,7 @@ import { calcolaStatoTesti } from '@/lib/text-translation/auto';
 import { agendaGiaUsata } from '@/lib/agenda/status';
 import { Link, percorso } from '@/i18n/navigation';
 import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
+import { salaForseAperta } from '@/lib/live/room-open';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -282,6 +283,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       liveCaptionsEnabled: event.liveCaptionsEnabled,
       captionsTranscriptEnabled: event.captionsTranscriptEnabled,
       autoStartRecording: event.autoStartRecording,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,
@@ -396,6 +398,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
+        salaAperta={await salaForseAperta(event)}
         enabledLocales={
           Array.isArray(siteSettings.availableLocales) &&
           siteSettings.availableLocales.length > 0

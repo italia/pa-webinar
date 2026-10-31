@@ -532,7 +532,8 @@
       "stopVideo": "Stäng av video",
       "revokeFloor": "Ta tillbaka ordet",
       "lowerHandFailed": "Handen kunde inte sänkas: försök igen.",
-      "handsRaised": "{count, plural, one {# uppräckt hand} other {# uppräckta händer}}"
+      "handsRaised": "{count, plural, one {# uppräckt hand} other {# uppräckta händer}}",
+      "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på."
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -647,7 +648,14 @@
     "closeSidebar": "Stäng sidopanelen",
     "contentOnly": "Bara innehåll, utan chatt och paneler",
     "showPanels": "Visa chatt och paneler",
-    "confirmFullscreen": "Växla till helskärm"
+    "confirmFullscreen": "Växla till helskärm",
+    "listenOnly": {
+      "title": "Du lyssnar bara.",
+      "body": "Du har inte samtyckt till inspelningen: du följer och skriver i chatten, men mikrofon, kamera och skärm förblir avstängda, även om värden ger dig ordet. Samtyck för att tala.",
+      "consent": "Jag samtycker till inspelningen och deltar",
+      "joining": "Går in i rummet igen…",
+      "error": "Det gick inte att gå in igen: försök igen."
+    }
   },
   "qa": {
     "title": "Frågor och svar",
@@ -963,7 +971,11 @@
             "desc": "Följer evenemanget och deltar så som du bestämmer i steget ”Behörigheter”."
           }
         },
-        "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen."
+        "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen.",
+        "listenOnlyWithoutConsent": "Den som inte samtycker deltar bara som lyssnare",
+        "listenOnlyWithoutConsentOn": "Samtycke till inspelningen är frivilligt: den som inte ger det deltar ändå, följer och skriver i chatten, men mikrofon, kamera och skärm förblir avstängda.",
+        "listenOnlyWithoutConsentOff": "Utan samtycke till inspelningen kommer ingen in.",
+        "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -4225,7 +4237,8 @@
       "multitrack": "Jag samtycker till att mina inlägg transkriberas med mitt namn för evenemangets sammanfattning. Om evenemanget spelar in ett separat ljudspår för varje person spelas min röst in enbart i detta syfte och spåret raderas efter transkriberingen; det används inte för att identifiera eller återskapa min röst.",
       "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
-      "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan."
+      "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan.",
+      "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet."
     },
     "export": {
       "title": "Mina uppgifter",

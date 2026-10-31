@@ -219,6 +219,8 @@ interface WaitingRoomProps {
    *  all'iscrizione (ospite dal link della sala, iscritto da un altro
    *  browser, iscritto prima che la registrazione fosse attivata). */
   recordingConsentRequired?: boolean;
+  /** Il consenso alla registrazione e' facoltativo: senza, solo ascolto. */
+  recordingConsentOptional?: boolean;
   /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
    *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
   recordingListenOnly?: boolean;
@@ -283,6 +285,7 @@ export default function WaitingRoom({
   exitHref,
   multitrackConsentExempt = false,
   recordingConsentRequired = false,
+  recordingConsentOptional = false,
   recordingListenOnly = false,
   recordingConsentText = null,
   privacy,
@@ -477,6 +480,9 @@ export default function WaitingRoom({
   // la piazza: il cancello passa dallo stesso controllo del pulsante, che
   // porta alla casella.
   const recordingRequired = recordingConsentRequired && !isEnded;
+  // Chiesto ma libero: senza la spunta si entra in solo ascolto, e il
+  // pulsante «Entra» non aspetta la casella.
+  const consensoBloccante = recordingRequired && !recordingConsentOptional;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -555,7 +561,8 @@ export default function WaitingRoom({
       canEnterLive,
       ingressoConsentito,
       nameValid,
-      recordingRequired,
+      // Il consenso facoltativo non trattiene l'ingresso.
+      recordingRequired: consensoBloccante,
       recordingConsent,
       ingressoTentato,
       nomeNoto,
@@ -1171,7 +1178,13 @@ export default function WaitingRoom({
               {tGdpr('recording')}
             </label>
           </div>
-          {!recordingConsent && (
+          {!recordingConsent && recordingConsentOptional && (
+            // Libero davvero: si dice che cosa succede senza.
+            <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
+              {tGdpr('recordingOptionalListenOnly')}
+            </div>
+          )}
+          {!recordingConsent && !recordingConsentOptional && (
             // Prima un'indicazione; dopo un tentativo di entrare, un errore
             // in rosso, qui accanto alla casella che lo risolve.
             <div

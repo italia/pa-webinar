@@ -532,7 +532,8 @@
       "stopVideo": "Desligar vídeo",
       "revokeFloor": "Retirar a palavra",
       "lowerHandFailed": "Não foi possível baixar a mão: tente novamente.",
-      "handsRaised": "{count, plural, one {# mão levantada} other {# mãos levantadas}}"
+      "handsRaised": "{count, plural, one {# mão levantada} other {# mãos levantadas}}",
+      "locksByConsent": "Microfones e câmaras seguem o consentimento para a gravação: quem o deu usa o que o evento permite, os outros ficam apenas a ouvir. Os bloqueios da sala mantêm-se ativos."
     },
     "moderator": {
       "muteAll": "Silenciar todos",
@@ -647,7 +648,14 @@
     "closeSidebar": "Fechar o painel lateral",
     "contentOnly": "Só o conteúdo, sem chat nem painéis",
     "showPanels": "Mostrar chat e painéis",
-    "confirmFullscreen": "Mudar para ecrã inteiro"
+    "confirmFullscreen": "Mudar para ecrã inteiro",
+    "listenOnly": {
+      "title": "Está apenas a ouvir.",
+      "body": "Não deu consentimento para a gravação: acompanha e escreve no chat, mas o microfone, a câmara e o ecrã ficam desligados, mesmo que a moderação lhe dê a palavra. Para intervir, consinta.",
+      "consent": "Consinto a gravação e participo",
+      "joining": "A voltar à sala…",
+      "error": "Não foi possível voltar a entrar: tente novamente."
+    }
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -963,7 +971,11 @@
             "desc": "Segue o evento e interage como decidir no passo «Permissões»."
           }
         },
-        "recordingManualNote": "A gravação nunca começa sozinha: um moderador inicia-a com o botão REC."
+        "recordingManualNote": "A gravação nunca começa sozinha: um moderador inicia-a com o botão REC.",
+        "listenOnlyWithoutConsent": "Quem não consente entra apenas a ouvir",
+        "listenOnlyWithoutConsentOn": "O consentimento para a gravação é livre: quem não o dá participa na mesma, acompanha e escreve no chat, mas o microfone, a câmara e o ecrã ficam desligados.",
+        "listenOnlyWithoutConsentOff": "Sem consentimento para a gravação não se entra.",
+        "listenOnlyLockedLive": "Enquanto a sala puder estar aberta, a gravação e o modo apenas a ouvir não se alteram: valem a partir da primeira entrada."
       },
       "step3": {
         "heading": "Pessoas e convites",
@@ -4225,7 +4237,8 @@
       "multitrack": "Dou o meu consentimento para que as minhas intervenções sejam transcritas, com o meu nome, para o relatório do evento. Se o evento gravar uma faixa áudio separada para cada pessoa, a minha voz é gravada apenas para este fim e a faixa é eliminada após a transcrição; não é usada para identificar ou reproduzir a minha voz.",
       "multitrackOptional": "É facultativo: se não consentir, participa na mesma, mas as suas intervenções não entram na transcrição e a sua voz não é gravada numa faixa à parte. Se o evento for gravado, a sua voz fica mesmo assim no vídeo.",
       "stayInTouch": "Quero receber informações sobre os próximos eventos e ser incluído no livro de endereços, para ser convidado para eventos semelhantes",
-      "stayInTouchHelp": "Consentimento facultativo (art. 6.1.a RGPD). Pode retirá-lo a qualquer momento através da ligação «Remover-me do livro de endereços» nos e-mails que receber. O nome e a organização são os desta inscrição."
+      "stayInTouchHelp": "Consentimento facultativo (art. 6.1.a RGPD). Pode retirá-lo a qualquer momento através da ligação «Remover-me do livro de endereços» nos e-mails que receber. O nome e a organização são os desta inscrição.",
+      "recordingOptionalListenOnly": "Se não consentir participa na mesma, apenas a ouvir: acompanha e escreve no chat, mas o microfone, a câmara e a partilha de ecrã ficam desligados. Pode consentir mais tarde, a partir da sala."
     },
     "export": {
       "title": "Os meus dados",

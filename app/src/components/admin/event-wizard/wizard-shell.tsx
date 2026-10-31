@@ -161,6 +161,9 @@ export type EventAccessModeValue = 'OPEN' | 'INVITATION';
 export interface WizardProps {
   template?: WizardTemplatePreset | null;
   siteTimezone: string;
+  /** La sala puo' essere aperta: registrazione e solo ascolto non si cambiano
+   *  (lib/live/room-open). */
+  salaAperta?: boolean;
   enabledLocales: string[];
   defaultLocale: string;
   defaultRetentionDays: number;
@@ -283,6 +286,7 @@ export interface InitialEventShape {
     liveCaptionsEnabled?: boolean | null;
     captionsTranscriptEnabled?: boolean | null;
     autoStartRecording: boolean;
+    listenOnlyWithoutConsent?: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
@@ -510,6 +514,7 @@ export default function EventWizard(props: WizardProps) {
         liveCaptionsEnabled: ev.liveCaptionsEnabled ?? true,
         captionsTranscriptEnabled: ev.captionsTranscriptEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
+        listenOnlyWithoutConsent: ev.listenOnlyWithoutConsent ?? false,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
@@ -657,6 +662,9 @@ export default function EventWizard(props: WizardProps) {
       // La registrazione non parte mai da sola: la avvia chi conduce con il
       // pulsante REC, qualunque cosa dica un modello salvato prima.
       autoStartRecording: false,
+      // Il consenso alla registrazione e' libero: chi non lo da' entra in
+      // solo ascolto (si puo' spegnere nei permessi).
+      listenOnlyWithoutConsent: true,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -1672,6 +1680,7 @@ export default function EventWizard(props: WizardProps) {
           // Senza sottotitoli non c'e' niente da trascrivere.
           captionsTranscriptEnabled: form.liveCaptionsEnabled && form.captionsTranscriptEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
+          listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
 
           // Postprod AI — subordinate al recording (server-side resta
           // un'invariante: senza recordingEnabled non c'è transcript).
@@ -2447,6 +2456,7 @@ export default function EventWizard(props: WizardProps) {
                   showAutoStart={
                     mode === 'edit' && !!initialEvent?.event.autoStartRecording
                   }
+                  soloAscoltoBloccato={mode === 'edit' && !!props.salaAperta}
                 />
               ),
               content: (

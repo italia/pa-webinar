@@ -532,7 +532,8 @@
       "stopVideo": "Vypnout video",
       "revokeFloor": "Odebrat slovo",
       "lowerHandFailed": "Ruku se nepodařilo spustit: zkuste to znovu.",
-      "handsRaised": "{count, plural, one {# zvednutá ruka} few {# zvednuté ruce} other {# zvednutých rukou}}"
+      "handsRaised": "{count, plural, one {# zvednutá ruka} few {# zvednuté ruce} other {# zvednutých rukou}}",
+      "locksByConsent": "Mikrofony a kamery se řídí souhlasem se záznamem: kdo ho dal, používá, co akce povoluje, ostatní jen poslouchají. Zámky místnosti zůstávají zapnuté."
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",
@@ -647,7 +648,14 @@
     "closeSidebar": "Zavřít boční panel",
     "contentOnly": "Pouze obsah, bez chatu a panelů",
     "showPanels": "Zobrazit chat a panely",
-    "confirmFullscreen": "Přepnout na celou obrazovku"
+    "confirmFullscreen": "Přepnout na celou obrazovku",
+    "listenOnly": {
+      "title": "Jste pouze posluchač.",
+      "body": "Nedali jste souhlas se záznamem: sledujete a píšete do chatu, ale mikrofon, kamera a obrazovka zůstávají vypnuté, i když vám moderátor dá slovo. Chcete-li promluvit, udělte souhlas.",
+      "consent": "Souhlasím se záznamem a zapojím se",
+      "joining": "Opětovný vstup do místnosti…",
+      "error": "Znovu vstoupit se nepodařilo: zkuste to znovu."
+    }
   },
   "qa": {
     "title": "Otázky a odpovědi",
@@ -963,7 +971,11 @@
             "desc": "Sleduje akci a zapojuje se tak, jak rozhodnete v kroku „Oprávnění“."
           }
         },
-        "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC."
+        "recordingManualNote": "Záznam se nikdy nespustí sám: moderátor ho spustí tlačítkem REC.",
+        "listenOnlyWithoutConsent": "Kdo nesouhlasí, vstoupí pouze jako posluchač",
+        "listenOnlyWithoutConsentOn": "Souhlas se záznamem je dobrovolný: kdo ho nedá, účastní se i tak, sleduje a píše do chatu, ale mikrofon, kamera a obrazovka zůstávají vypnuté.",
+        "listenOnlyWithoutConsentOff": "Bez souhlasu se záznamem se nevstoupí.",
+        "listenOnlyLockedLive": "Dokud může být místnost otevřená, záznam a režim pouze poslechu nelze měnit: platí od prvního vstupu."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -4225,7 +4237,8 @@
       "multitrack": "Souhlasím s přepisem svých příspěvků se svým jménem pro zprávu z akce. Pokud akce nahrává samostatnou zvukovou stopu každé osoby, můj hlas se nahrává pouze za tímto účelem a stopa se po přepisu smaže; nepoužívá se k identifikaci ani k napodobení mého hlasu.",
       "multitrackOptional": "Je to dobrovolné: pokud nesouhlasíte, můžete se přesto zúčastnit, ale vaše příspěvky nebudou v přepisu a váš hlas se nebude nahrávat na samostatnou stopu. Pokud se akce nahrává, váš hlas ve videu přesto zůstane.",
       "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
-      "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace."
+      "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace.",
+      "recordingOptionalListenOnly": "Pokud nesouhlasíte, účastníte se i tak, pouze jako posluchač: sledujete a píšete do chatu, ale mikrofon, kamera a sdílení obrazovky zůstávají vypnuté. Souhlas můžete dát později v místnosti."
     },
     "export": {
       "title": "Moje údaje",

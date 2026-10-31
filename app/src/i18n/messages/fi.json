@@ -532,7 +532,8 @@
       "stopVideo": "Sammuta video",
       "revokeFloor": "Ota puheenvuoro pois",
       "lowerHandFailed": "Kättä ei voitu laskea: yritä uudelleen.",
-      "handsRaised": "{count, plural, one {# nostettu käsi} other {# nostettua kättä}}"
+      "handsRaised": "{count, plural, one {# nostettu käsi} other {# nostettua kättä}}",
+      "locksByConsent": "Mikrofonit ja kamerat noudattavat suostumusta tallennukseen: sen antaneet käyttävät tapahtuman sallimaa, muut vain kuuntelevat. Huoneen lukitukset pysyvät päällä."
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
@@ -647,7 +648,14 @@
     "closeSidebar": "Sulje sivupaneeli",
     "contentOnly": "Vain sisältö, ilman chattia ja paneeleja",
     "showPanels": "Näytä chat ja paneelit",
-    "confirmFullscreen": "Vaihda koko näytölle"
+    "confirmFullscreen": "Vaihda koko näytölle",
+    "listenOnly": {
+      "title": "Olet vain kuuntelija.",
+      "body": "Et antanut suostumusta tallennukseen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näyttö pysyvät pois päältä, vaikka juontaja antaisi sinulle puheenvuoron. Anna suostumus puhuaksesi.",
+      "consent": "Suostun tallennukseen ja osallistun",
+      "joining": "Palataan huoneeseen…",
+      "error": "Palaaminen epäonnistui: yritä uudelleen."
+    }
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -963,7 +971,11 @@
             "desc": "Seuraa tapahtumaa ja osallistuu niin kuin päätät vaiheessa ”Oikeudet”."
           }
         },
-        "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella."
+        "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella.",
+        "listenOnlyWithoutConsent": "Suostumuksen antamatta jättävät osallistuvat vain kuunnellen",
+        "listenOnlyWithoutConsentOn": "Suostumus tallennukseen on vapaaehtoinen: sen antamatta jättävä osallistuu silti, seuraa ja kirjoittaa chattiin, mutta mikrofoni, kamera ja näyttö pysyvät pois päältä.",
+        "listenOnlyWithoutConsentOff": "Ilman suostumusta tallennukseen ei pääse sisään.",
+        "listenOnlyLockedLive": "Kun huone voi olla auki, tallennusta ja pelkkää kuuntelua ei voi muuttaa: ne ovat voimassa ensimmäisestä sisääntulosta."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -4225,7 +4237,8 @@
       "multitrack": "Annan suostumukseni siihen, että puheenvuoroni litteroidaan nimelläni tapahtuman yhteenvetoa varten. Jos tapahtuma tallentaa jokaisesta henkilöstä erillisen ääniraidan, ääneni tallennetaan vain tätä tarkoitusta varten ja raita poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai jäljittelemiseen.",
       "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, osallistut silti, mutta puheenvuorosi eivät tule litteraatioon eikä ääntäsi tallenneta omalle raidalleen. Jos tapahtuma tallennetaan, äänesi on silti mukana videossa.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
-      "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset."
+      "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset.",
+      "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa."
     },
     "export": {
       "title": "Omat tietoni",

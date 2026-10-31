@@ -94,6 +94,17 @@ interface JitsiTokenPayload {
   mediaLock?: MediaLock;
   /** Audio e video pieni senza moderare: il relatore, ammesso subito. */
   mediaExempt?: boolean;
+  /**
+   * I mezzi per cui la persona e' ammessa senza aspettare chi modera: chi
+   * partecipa avendo dato il consenso alla registrazione, per cio' che
+   * l'evento concede (vale quando l'evento ha il solo ascolto per chi non
+   * acconsente, e il blocco riguarda ogni mezzo: lib/live/listen-only).
+   */
+  mediaAdmit?: MediaLock;
+  /** In solo ascolto: senza consenso alla registrazione, mai ammesso. */
+  listenOnly?: boolean;
+  /** Evento con il solo ascolto: la sala non toglie i blocchi. */
+  consentLock?: boolean;
 }
 
 /** Microfono, videocamera, condivisione dello schermo: true = bloccato. */
@@ -201,6 +212,9 @@ export async function generateJitsiJwt(
         moderator: payload.isModerator ? 'true' : 'false',
         ...(payload.mediaLock ? { mediaLock: payload.mediaLock } : {}),
         ...(payload.mediaExempt ? { mediaExempt: true } : {}),
+        ...(payload.mediaAdmit ? { mediaAdmit: payload.mediaAdmit } : {}),
+        ...(payload.listenOnly ? { listenOnly: true } : {}),
+        ...(payload.consentLock ? { consentLock: true } : {}),
       },
       features,
     },

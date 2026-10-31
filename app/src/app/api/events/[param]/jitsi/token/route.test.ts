@@ -43,7 +43,7 @@ vi.mock('@/lib/db', () => ({
     eventModerator: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
     multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
-    recordingConsent: { createMany: vi.fn() },
+    recordingConsent: { createMany: vi.fn(), findFirst: vi.fn(async () => null) },
     profilePhoto: { findUnique: vi.fn(async () => null) },
   },
 }));
@@ -93,6 +93,7 @@ type EventOverrides = Partial<{
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
   accessMode: 'OPEN' | 'INVITATION' | null;
+  listenOnlyWithoutConsent: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -111,6 +112,7 @@ function eventRow(overrides: EventOverrides = {}) {
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
     accessMode: null,
+    listenOnlyWithoutConsent: false,
     ...overrides,
   };
 }
@@ -191,6 +193,8 @@ interface JitsiUser {
   moderator: string;
   mediaLock?: { audio: boolean; video: boolean; desktop: boolean };
   mediaExempt?: boolean;
+  mediaAdmit?: { audio: boolean; video: boolean; desktop: boolean };
+  listenOnly?: boolean;
 }
 
 async function minted(res: Response) {
@@ -955,3 +959,54 @@ describe('POST jitsi/token — consenso alla registrazione dato in sala d\'attes
     expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
   });
 });
+
+describe('POST jitsi/token — consenso alla registrazione verificato dal server', () => {
+  // L'evento registra e chi partecipa puo' parlare: il consenso si chiede.
+  const interattivo = { recordingEnabled: true, participantsCanUnmute: true };
+  beforeEach(() => {
+    applySettings({ guestAccessEnabled: true, gravatarEnabled: false });
+    vi.mocked(prisma.recordingConsent.createMany).mockResolvedValue({ count: 1 } as never);
+  });
+
+  it('senza solo ascolto, chi non acconsente non entra (anche chiamando la rotta)', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+    const res = await post({ guestName: 'Ospite' });
+    expect(res.status).toBe(403);
+    expect(((await res.json()) as { code: string }).code).toBe('RECORDING_CONSENT_REQUIRED');
+  });
+
+  it("l'iscritto che l'ha dato all'iscrizione entra senza ridarlo", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow(interattivo) as never);
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow({ consentRecording: true }) as never);
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+    const res = await post({ accessToken: ACCESS_TOKEN });
+    expect(res.status).toBe(200);
+    expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(false);
+  });
+
+  it('con il solo ascolto, chi non acconsente entra con i mezzi chiusi per lui', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+    );
+    const res = await post({ guestName: 'Ospite' });
+    expect(res.status).toBe(200);
+    const { body, user } = await minted(res);
+    expect((body as { listenOnly?: boolean }).listenOnly).toBe(true);
+    expect(user.listenOnly).toBe(true);
+    expect(user.mediaLock).toEqual({ audio: true, video: true, desktop: true });
+    expect(user.mediaAdmit).toBeUndefined();
+  });
+
+  it('con il solo ascolto, chi acconsente e\' ammesso per cio\' che l\'evento concede', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+    );
+    const res = await post({ guestName: 'Ospite', recordingConsent: true });
+    const { body, user } = await minted(res);
+    expect((body as { listenOnly?: boolean }).listenOnly).toBe(false);
+    expect(user.listenOnly).toBeUndefined();
+    expect(user.mediaLock).toEqual({ audio: true, video: true, desktop: true });
+    expect(user.mediaAdmit).toEqual({ audio: true, video: false, desktop: false });
+  });
+});
+

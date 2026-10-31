@@ -58,12 +58,16 @@ The token alone decides who is moderator only when Jicofo assigns no roles of it
 ### What it does
 
 `mod_pa_media_lock` makes the event's participant limits hold on the bridge, not only in the room's
-toolbar. The portal writes two claims into every token of an event (`app/src/lib/auth/jwt.ts`):
+toolbar. The portal writes these claims into the tokens of an event (`app/src/lib/auth/jwt.ts`,
+`app/src/lib/live/listen-only.ts`):
 
 | Claim | Meaning |
 |---|---|
 | `context.user.mediaLock` | `{ audio, video, desktop }`: what the event does **not** grant participants (`participantsCanUnmute`, `participantsCanStartVideo`, `participantsCanShareScreen` off) |
 | `context.user.mediaExempt` | `true` for speakers, who have full audio and video without moderating |
+| `context.user.mediaAdmit` | `{ audio, video, desktop }`: the media this person is admitted to without waiting for a moderator. Only on events with listen-only participants, where every token locks all three media: a participant who consented to the recording is admitted to what the event concedes |
+| `context.user.consentLock` | `true` in every token of an event with listen-only participants: the module refuses to switch the moderation off in that room |
+| `context.user.listenOnly` | `true` for a participant who entered without the recording consent: never admitted, and a moderator's approval for them is dropped before it reaches the moderation component |
 
 When the first person whose token carries a lock is about to join a room, the module switches on Jitsi's
 audio/video moderation (the stock `av_moderation_component`) for each locked media type, before any

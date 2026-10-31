@@ -547,7 +547,8 @@
       "stopVideo": "Spegni video",
       "revokeFloor": "Togli la parola",
       "lowerHandFailed": "Non è stato possibile abbassare la mano: riprova.",
-      "handsRaised": "{count, plural, one {# mano alzata} other {# mani alzate}}"
+      "handsRaised": "{count, plural, one {# mano alzata} other {# mani alzate}}",
+      "locksByConsent": "Microfoni e videocamere seguono il consenso alla registrazione: chi l'ha dato usa ciò che l'evento concede, chi no resta in solo ascolto. I blocchi della sala restano accesi."
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
@@ -647,7 +648,14 @@
     "closeSidebar": "Chiudi il pannello laterale",
     "contentOnly": "Solo contenuto, senza chat e pannelli",
     "showPanels": "Mostra chat e pannelli",
-    "confirmFullscreen": "Passa a schermo intero"
+    "confirmFullscreen": "Passa a schermo intero",
+    "listenOnly": {
+      "title": "Sei in solo ascolto.",
+      "body": "Non hai dato il consenso alla registrazione: segui e scrivi in chat, ma microfono, videocamera e schermo restano chiusi, anche se chi conduce ti dà la parola. Per intervenire, acconsenti.",
+      "consent": "Acconsento alla registrazione e intervengo",
+      "joining": "Rientro in sala…",
+      "error": "Non è stato possibile rientrare: riprova."
+    }
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -1173,7 +1181,11 @@
             "desc": "Segue l'evento e interagisce come decidi nel passo «Permessi»."
           }
         },
-        "recordingManualNote": "La registrazione non parte mai da sola: chi conduce la avvia con il pulsante REC."
+        "recordingManualNote": "La registrazione non parte mai da sola: chi conduce la avvia con il pulsante REC.",
+        "listenOnlyWithoutConsent": "Chi non acconsente entra in solo ascolto",
+        "listenOnlyWithoutConsentOn": "Il consenso alla registrazione è libero: chi non lo dà partecipa lo stesso, segue e scrive in chat, ma microfono, videocamera e schermo restano chiusi.",
+        "listenOnlyWithoutConsentOff": "Senza consenso alla registrazione non si entra.",
+        "listenOnlyLockedLive": "Con la sala aperta registrazione e solo ascolto non si cambiano: valgono dal primo ingresso."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -4225,7 +4237,8 @@
       "multitrack": "Acconsento alla trascrizione dei miei interventi, con il mio nome, per il resoconto dell'evento. Se l'evento registra una traccia audio per ogni persona, la mia voce viene registrata a questo solo scopo e la traccia si cancella dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
       "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma i tuoi interventi non entrano nella trascrizione e la tua voce non viene registrata in una traccia a parte. Se l'evento è registrato, la tua voce resta comunque nel video.",
       "stayInTouch": "Voglio ricevere informazioni sui prossimi eventi ed essere inserito nella rubrica, per essere invitato a eventi simili",
-      "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione."
+      "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione.",
+      "recordingOptionalListenOnly": "Se non acconsenti partecipi lo stesso, in solo ascolto: segui e scrivi in chat, ma microfono, videocamera e condivisione dello schermo restano chiusi. Puoi acconsentire più tardi, dalla sala."
     },
     "export": {
       "title": "I miei dati",

@@ -532,7 +532,8 @@
       "stopVideo": "Video ausschalten",
       "revokeFloor": "Wort entziehen",
       "lowerHandFailed": "Die Hand konnte nicht gesenkt werden: Versuchen Sie es erneut.",
-      "handsRaised": "{count, plural, one {# gehobene Hand} other {# gehobene Hände}}"
+      "handsRaised": "{count, plural, one {# gehobene Hand} other {# gehobene Hände}}",
+      "locksByConsent": "Mikrofone und Kameras folgen der Einwilligung in die Aufzeichnung: Wer sie gegeben hat, nutzt, was das Event erlaubt, die anderen hören nur zu. Die Sperren des Raums bleiben aktiv."
     },
     "moderator": {
       "muteAll": "Alle stummschalten",
@@ -647,7 +648,14 @@
     "closeSidebar": "Seitenleiste schließen",
     "contentOnly": "Nur Inhalt, ohne Chat und Seitenleisten",
     "showPanels": "Chat und Seitenleisten anzeigen",
-    "confirmFullscreen": "Zum Vollbild wechseln"
+    "confirmFullscreen": "Zum Vollbild wechseln",
+    "listenOnly": {
+      "title": "Sie hören nur zu.",
+      "body": "Sie haben nicht in die Aufzeichnung eingewilligt: Sie verfolgen das Event und schreiben im Chat, aber Mikrofon, Kamera und Bildschirm bleiben aus, auch wenn die Moderation Ihnen das Wort erteilt. Um zu sprechen, willigen Sie ein.",
+      "consent": "Ich willige in die Aufzeichnung ein und mache mit",
+      "joining": "Erneuter Eintritt in den Raum…",
+      "error": "Erneuter Eintritt fehlgeschlagen: bitte erneut versuchen."
+    }
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -963,7 +971,11 @@
             "desc": "Verfolgt das Event und beteiligt sich so, wie Sie es im Schritt „Berechtigungen“ festlegen."
           }
         },
-        "recordingManualNote": "Die Aufzeichnung startet nie von selbst: Die Moderation startet sie mit der REC-Taste."
+        "recordingManualNote": "Die Aufzeichnung startet nie von selbst: Die Moderation startet sie mit der REC-Taste.",
+        "listenOnlyWithoutConsent": "Wer nicht einwilligt, nimmt nur zuhörend teil",
+        "listenOnlyWithoutConsentOn": "Die Einwilligung in die Aufzeichnung ist freiwillig: Wer sie nicht gibt, nimmt trotzdem teil, verfolgt das Event und schreibt im Chat, aber Mikrofon, Kamera und Bildschirm bleiben aus.",
+        "listenOnlyWithoutConsentOff": "Ohne Einwilligung in die Aufzeichnung kein Zutritt.",
+        "listenOnlyLockedLive": "Solange der Raum geöffnet sein kann, lassen sich Aufzeichnung und Nur-Zuhören nicht ändern: Sie gelten ab dem ersten Eintritt."
       },
       "step3": {
         "heading": "Personen und Einladungen",
@@ -4225,7 +4237,8 @@
       "multitrack": "Ich willige ein, dass meine Wortbeiträge mit meinem Namen für den Bericht der Veranstaltung transkribiert werden. Zeichnet die Veranstaltung für jede Person eine eigene Tonspur auf, wird meine Stimme nur zu diesem Zweck aufgezeichnet und die Spur nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder nachzubilden.",
       "multitrackOptional": "Freiwillig: Ohne Einwilligung nehmen Sie trotzdem teil, aber Ihre Beiträge kommen nicht in das Transkript und Ihre Stimme wird nicht auf einer eigenen Spur aufgezeichnet. Wird das Event aufgezeichnet, ist Ihre Stimme trotzdem im Video zu hören.",
       "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
-      "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung."
+      "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung.",
+      "recordingOptionalListenOnly": "Ohne Einwilligung nehmen Sie trotzdem teil, nur zuhörend: Sie verfolgen das Event und schreiben im Chat, aber Mikrofon, Kamera und Bildschirmfreigabe bleiben aus. Sie können später im Raum einwilligen."
     },
     "export": {
       "title": "Meine Daten",

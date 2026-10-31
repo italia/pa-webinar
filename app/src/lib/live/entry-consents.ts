@@ -19,13 +19,16 @@ export function consensoRegistrazioneIngresso(i: {
   conduce: boolean;
   /** Dato all'iscrizione nel browser che si e' iscritto, o in sala. */
   giaDato: boolean;
-}): { richiesto: boolean; soloAscolto: boolean } {
+}): { richiesto: boolean; facoltativo: boolean; soloAscolto: boolean } {
   const formato = consensiRichiesti({
     ...i.formato,
     recordingEnabled: i.formato.recordingEnabled && i.registrazioneDisponibile,
   });
+  const richiesto = !i.conduce && formato.registrazione && !i.giaDato;
   return {
-    richiesto: !i.conduce && formato.registrazione && !i.giaDato,
+    richiesto,
+    // Chiesto ma libero: senza, si entra in solo ascolto.
+    facoltativo: richiesto && formato.registrazioneFacoltativa,
     soloAscolto: !i.conduce && formato.avvisoRegistrazione,
   };
 }

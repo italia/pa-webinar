@@ -16,7 +16,6 @@ import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import { staffDietroIlPrimario } from '@/lib/auth/staff-seat';
 import {
   generateJitsiJwt,
-  mediaLockOf,
   moderatorJitsiId,
   participantJitsiId,
   guestJitsiId,
@@ -27,6 +26,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
+import { recordingAvailable } from '@/lib/recording/availability';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
 export const dynamic = 'force-dynamic';
@@ -143,9 +144,18 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ConflictError('Event is not active', { currentStatus: event.status });
   }
 
-  // In ogni token dell'evento: chi entra per primo accende il blocco nella
-  // sala (mod_pa_media_lock), e i limiti sono gli stessi per tutti.
-  const mediaLock = mediaLockOf(event);
+  // Il consenso alla registrazione di chi partecipa e i limiti dei mezzi nel
+  // token (lib/live/listen-only): chi entra per primo accende il blocco nella
+  // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
+  const regola = regolaConsenso(event, recordingAvailable());
+  // Il token di chi partecipa: senza consenso, in solo ascolto o fuori. Lo
+  // verifica il server, non solo la sala d'attesa.
+  const mediaPartecipante = (consenso: boolean) => {
+    if (regola.richiesto && !consenso && !regola.soloAscolto) {
+      throw new AppError('Recording consent required', 403, 'RECORDING_CONSENT_REQUIRED');
+    }
+    return mediaDelToken(event, regola, 'partecipante', consenso);
+  };
 
   // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
@@ -184,8 +194,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: postoModeratore,
       isModerator: !isSpeaker,
-      mediaLock,
-      mediaExempt: isSpeaker,
+      ...mediaDelToken(event, regola, isSpeaker ? 'relatore' : 'moderatore', true),
       // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
       // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
       // conta meno. `grant.email` è null per il link primario — condiviso da
@@ -249,12 +258,15 @@ export const POST = withErrorHandling(async (request, context) => {
         throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
       }
       const postoOspite = guestJitsiId();
+      // Il consenso dell'iscritto non passa a chi ha il suo link: vale quello
+      // dato ora in sala d'attesa.
+      const mediaInoltro = mediaPartecipante(parsed.data.recordingConsent === true);
       const guestJwt = await generateJitsiJwt({
         roomName: event.jitsiRoomName,
         displayName: typedName,
         uniqueId: postoOspite,
         isModerator: false,
-        mediaLock,
+        ...mediaInoltro,
         expiresInSeconds: 2 * 60 * 60,
       });
       const consentsRecorded = await registraConsensi(event, parsed.data, {
@@ -268,10 +280,24 @@ export const POST = withErrorHandling(async (request, context) => {
           displayName: typedName,
           role: 'participant',
           consentsRecorded,
+          listenOnly: !!mediaInoltro.listenOnly,
         },
         { headers: { 'Cache-Control': 'no-store' } },
       );
     }
+
+    // Il consenso dell'iscritto: dato all'iscrizione, in sala d'attesa ora o
+    // in una visita precedente (la prova resta legata all'iscrizione). La
+    // lettura serve solo a chi non l'ha dato ne' ora ne' all'iscrizione.
+    const consensoIscritto =
+      parsed.data.recordingConsent === true ||
+      registration.consentRecording === true ||
+      (regola.richiesto &&
+        (await prisma.recordingConsent.findFirst({
+          where: { eventId: event.id, registrationId: registration.id },
+          select: { id: true },
+        })) !== null);
+    const mediaIscritto = mediaPartecipante(consensoIscritto);
 
     // Record the join, set-once. Kept write-free on rejoin so the reconnect
     // path never depends on a DB write (a write failure here would 500 the
@@ -305,12 +331,14 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: postoIscritto,
       isModerator: false,
-      mediaLock,
+      ...mediaIscritto,
       email,
-      photoUrl: fotoIscritto ? profilePhotoUrl(fotoIscritto) : null,
+      // Chi e' in solo ascolto ha rifiutato la registrazione: in sala con le
+      // iniziali, senza la sua foto.
+      photoUrl: fotoIscritto && !mediaIscritto.listenOnly ? profilePhotoUrl(fotoIscritto) : null,
       // La scelta è dell'amministratore, e la legge il chiamante: il minter del
       // token resta puro (vedi JitsiTokenPayload.useGravatar).
-      useGravatar: (await getSettings()).gravatarEnabled,
+      useGravatar: !mediaIscritto.listenOnly && (await getSettings()).gravatarEnabled,
     });
     const consentsRecorded = await registraConsensi(event, parsed.data, {
       jitsiUserId: postoIscritto,
@@ -324,6 +352,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       role: 'participant',
       consentsRecorded,
+      listenOnly: !!mediaIscritto.listenOnly,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -363,12 +392,13 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     const postoOspite = guestJitsiId();
+    const mediaOspite = mediaPartecipante(parsed.data.recordingConsent === true);
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: guestName,
       uniqueId: postoOspite,
       isModerator: false,
-      mediaLock,
+      ...mediaOspite,
       expiresInSeconds: 2 * 60 * 60,
     });
     const consentsRecorded = await registraConsensi(event, parsed.data, {
@@ -382,6 +412,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: guestName,
       role: 'guest',
       consentsRecorded,
+      listenOnly: !!mediaOspite.listenOnly,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 

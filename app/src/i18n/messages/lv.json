@@ -532,7 +532,8 @@
       "stopVideo": "Izslēgt video",
       "revokeFloor": "Atņemt vārdu",
       "lowerHandFailed": "Roku neizdevās nolaist: mēģiniet vēlreiz.",
-      "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}"
+      "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}",
+      "locksByConsent": "Mikrofoni un kameras seko piekrišanai ierakstīšanai: kas to devuši, izmanto pasākuma atļauto, pārējie tikai klausās. Telpas bloķējumi paliek ieslēgti."
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",
@@ -647,7 +648,14 @@
     "closeSidebar": "Aizvērt sānu paneli",
     "contentOnly": "Tikai saturs, bez tērzēšanas un paneļiem",
     "showPanels": "Rādīt tērzēšanu un paneļus",
-    "confirmFullscreen": "Pārslēgt uz pilnekrāna režīmu"
+    "confirmFullscreen": "Pārslēgt uz pilnekrāna režīmu",
+    "listenOnly": {
+      "title": "Jūs tikai klausāties.",
+      "body": "Jūs nepiekritāt ierakstīšanai: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti, pat ja vadītājs dod jums vārdu. Lai runātu, piekrītiet.",
+      "consent": "Piekrītu ierakstīšanai un piedalos",
+      "joining": "Atkārtota ieiešana telpā…",
+      "error": "Neizdevās atgriezties: mēģiniet vēlreiz."
+    }
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -963,7 +971,11 @@
             "desc": "Seko pasākumam un piedalās tā, kā jūs izlemjat solī “Atļaujas”."
           }
         },
-        "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC."
+        "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC.",
+        "listenOnlyWithoutConsent": "Kas nepiekrīt, ieiet tikai klausīties",
+        "listenOnlyWithoutConsentOn": "Piekrišana ierakstīšanai ir brīvprātīga: kas to nedod, tomēr piedalās, seko un raksta tērzēšanā, bet mikrofons, kamera un ekrāns paliek izslēgti.",
+        "listenOnlyWithoutConsentOff": "Bez piekrišanas ierakstīšanai neviens netiek iekšā.",
+        "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -4225,7 +4237,8 @@
       "multitrack": "Piekrītu, ka manas uzstāšanās tiek atšifrētas ar manu vārdu pasākuma pārskatam. Ja pasākumā katram cilvēkam tiek ierakstīts atsevišķs audio celiņš, mana balss tiek ierakstīta tikai šim nolūkam un celiņš pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atveidošanai.",
       "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
-      "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas."
+      "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas.",
+      "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas."
     },
     "export": {
       "title": "Mani dati",

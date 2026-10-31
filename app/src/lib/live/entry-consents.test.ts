@@ -14,7 +14,7 @@ const base = { formato: interattivo, registrazioneDisponibile: true, conduce: fa
 
 describe('consensoRegistrazioneIngresso', () => {
   it('chi partecipa e non l\'ha dato lo da\' in sala d\'attesa', () => {
-    expect(consensoRegistrazioneIngresso(base)).toEqual({ richiesto: true, soloAscolto: false });
+    expect(consensoRegistrazioneIngresso(base)).toEqual({ richiesto: true, facoltativo: false, soloAscolto: false });
   });
 
   it('chi l\'ha gia\' dato (iscrizione o sala) entra senza', () => {
@@ -24,6 +24,7 @@ describe('consensoRegistrazioneIngresso', () => {
   it('moderatori e relatori non lo vedono, nemmeno come informativa', () => {
     expect(consensoRegistrazioneIngresso({ ...base, conduce: true })).toEqual({
       richiesto: false,
+      facoltativo: false,
       soloAscolto: false,
     });
     expect(
@@ -34,16 +35,25 @@ describe('consensoRegistrazioneIngresso', () => {
   it('di solo ascolto si informa e basta', () => {
     expect(consensoRegistrazioneIngresso({ ...base, formato: soloAscolto })).toEqual({
       richiesto: false,
+      facoltativo: false,
       soloAscolto: true,
     });
   });
 
   it('senza registrazione, o senza nulla che possa registrare, niente', () => {
-    const niente = { richiesto: false, soloAscolto: false };
+    const niente = { richiesto: false, facoltativo: false, soloAscolto: false };
     expect(
       consensoRegistrazioneIngresso({ ...base, formato: { ...interattivo, recordingEnabled: false } }),
     ).toEqual(niente);
     expect(consensoRegistrazioneIngresso({ ...base, registrazioneDisponibile: false })).toEqual(niente);
+  });
+});
+
+describe('consensoRegistrazioneIngresso — solo ascolto per chi non acconsente', () => {
+  it('chiesto ma libero; chi l\'ha dato non lo rivede', () => {
+    const libero = { ...base, formato: { ...base.formato, listenOnlyWithoutConsent: true } };
+    expect(consensoRegistrazioneIngresso(libero)).toEqual({ richiesto: true, facoltativo: true, soloAscolto: false });
+    expect(consensoRegistrazioneIngresso({ ...libero, giaDato: true }).facoltativo).toBe(false);
   });
 });
 

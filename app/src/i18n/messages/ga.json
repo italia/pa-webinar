@@ -532,7 +532,8 @@
       "stopVideo": "Múch an físeán",
       "revokeFloor": "Bain an t-urlár",
       "lowerHandFailed": "Níorbh fhéidir an lámh a ísliú: bain triail eile as.",
-      "handsRaised": "{count, plural, one {# lámh ardaithe} other {# lámha ardaithe}}"
+      "handsRaised": "{count, plural, one {# lámh ardaithe} other {# lámha ardaithe}}",
+      "locksByConsent": "Leanann micreafóin agus ceamaraí an toiliú leis an taifeadadh: úsáideann na daoine a thug é a cheadaíonn an ócáid, éisteann an chuid eile amháin. Fanann glais an tseomra air."
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",
@@ -647,7 +648,14 @@
     "closeSidebar": "Dún an painéal taoibh",
     "contentOnly": "Ábhar amháin, gan comhrá ná painéil",
     "showPanels": "Taispeáin comhrá agus painéil",
-    "confirmFullscreen": "Athraigh go lánscáileán"
+    "confirmFullscreen": "Athraigh go lánscáileán",
+    "listenOnly": {
+      "title": "Tá tú ag éisteacht amháin.",
+      "body": "Níor thug tú toiliú leis an taifeadadh: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus an scáileán múchta, fiú má thugann an t-óstach an t-urlár duit. Chun labhairt, toiligh.",
+      "consent": "Toilím leis an taifeadadh agus glacaim páirt",
+      "joining": "Ag filleadh ar an seomra…",
+      "error": "Níorbh fhéidir filleadh: bain triail eile as."
+    }
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -963,7 +971,11 @@
             "desc": "Leanann sé an ócáid agus glacann páirt mar a shocraíonn tú sa chéim «Ceadanna»."
           }
         },
-        "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC."
+        "recordingManualNote": "Ní thosaíonn an taifeadadh as féin riamh: tosaíonn modhnóir é leis an gcnaipe REC.",
+        "listenOnlyWithoutConsent": "Téann daoine nach dtoilíonn isteach ag éisteacht amháin",
+        "listenOnlyWithoutConsentOn": "Tá toiliú leis an taifeadadh saor: glacann daoine nach dtugann é páirt fós, leanann siad agus scríobhann siad sa chomhrá, ach fanann micreafón, ceamara agus scáileán múchta.",
+        "listenOnlyWithoutConsentOff": "Gan toiliú leis an taifeadadh ní théann aon duine isteach.",
+        "listenOnlyLockedLive": "Fad is féidir leis an seomra a bheith oscailte, ní féidir an taifeadadh ná an éisteacht amháin a athrú: tá feidhm acu ón gcéad iontráil."
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -4225,7 +4237,8 @@
       "multitrack": "Toilím go ndéanfar tras-scríobh ar mo chuid cainte, le m'ainm, do thuarascáil an imeachta. Má thaifeadann an t-imeacht rian fuaime ar leith do gach duine, ní thaifeadtar mo ghuth ach chun na críche sin agus scriostar an rian tar éis an tras-scríofa; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
       "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, glacfaidh tú páirt mar sin féin, ach ní rachaidh a ndeir tú isteach sa tras-scríbhinn agus ní thaifeadfar do ghuth ar rian ar leith. Má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
-      "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo."
+      "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo.",
+      "recordingOptionalListenOnly": "Mura dtugann tú toiliú glacann tú páirt fós, ag éisteacht amháin: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus comhroinnt scáileáin múchta. Is féidir leat toiliú níos déanaí, ón seomra."
     },
     "export": {
       "title": "Mo chuid sonraí",

@@ -52,6 +52,8 @@ import LiveCaptions from '@/components/live/live-captions';
 import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
 import StageName from '@/components/live/stage-name';
+import ListenOnlyNotice from '@/components/live/listen-only-notice';
+import { regolaConsenso } from '@/lib/live/consent-rule';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
@@ -144,6 +146,8 @@ interface EventInfo {
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
+  /** Chi non acconsente alla registrazione entra in solo ascolto. */
+  listenOnlyWithoutConsent?: boolean;
   /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
    *  al consenso chiesto in sala d'attesa. */
   privacy?: { url: string; testo?: string };
@@ -295,6 +299,8 @@ interface JitsiCredentials {
   role: string;
   /** Le prove di consenso che il server ha salvato per questo posto. */
   consentsRecorded?: { recording: boolean; multitrack: boolean };
+  /** In solo ascolto: senza consenso alla registrazione (lib/live/listen-only). */
+  listenOnly?: boolean;
 }
 
 export default function LiveEventClient({
@@ -507,11 +513,26 @@ export default function LiveEventClient({
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
     },
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
     giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
   });
+  // L'evento ha il solo ascolto per chi non acconsente (la stessa regola del
+  // server, lib/live/listen-only): i blocchi della sala restano accesi.
+  const salaSoloAscolto = regolaConsenso(
+    {
+      eventType: event.eventType,
+      recordingEnabled: event.recordingEnabled,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
+      participantsCanUnmute: event.participantsCanUnmute,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanShareScreen: event.participantsCanShareScreen,
+      listenOnlyWithoutConsent: event.listenOnlyWithoutConsent ?? false,
+    },
+    recordingAvailable,
+  ).soloAscolto;
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -667,7 +688,12 @@ export default function LiveEventClient({
   // portale, la schermata giusta è già impostata). In un rientro anche un
   // portale momentaneamente in difficoltà (5xx, troppe richieste) vale
   // 'rete': si riprova da soli invece di mostrare un errore.
-  const richiediCredenziali = useCallback(async (rientro = false): Promise<'fatto' | 'rete' | 'gestito'> => {
+  const richiediCredenziali = useCallback(async (
+    rientro = false,
+    // Il consenso dato dalla sala: un rifiuto qualunque resta un messaggio
+    // nella fascia, non chiude la conferenza in cui si e' gia'.
+    senzaUscire = false,
+  ): Promise<'fatto' | 'rete' | 'gestito'> => {
     const body: Record<string, string | boolean> = {};
     if (isGuest || !token) {
       // Ospite senza link personale, a evento pubblico (o con la password
@@ -710,6 +736,7 @@ export default function LiveEventClient({
     if (!res) return 'rete';
 
     if (rientro && (res.status >= 500 || res.status === 429)) return 'rete';
+    if (senzaUscire && !res.ok) return 'rete';
     if (!res.ok) {
       const errore = (res.data ?? {}) as { code?: string };
       // Il cookie della password e' scaduto mentre si era in sala: la
@@ -740,6 +767,15 @@ export default function LiveEventClient({
           setPhase('waiting');
           return 'gestito';
         }
+      }
+      // Il server vuole il consenso alla registrazione che la sala non ha
+      // mandato: si torna in sala d'attesa, dove c'e' la casella.
+      if (errore.code === 'RECORDING_CONSENT_REQUIRED') {
+        setPhase('waiting');
+        // Le regole dell'evento possono essere cambiate da quando la pagina
+        // e' stata aperta: si rileggono, e la sala d'attesa mostra la casella.
+        router.refresh();
+        return 'gestito';
       }
       // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
       // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
@@ -829,6 +865,23 @@ export default function LiveEventClient({
   // ancora, e con microfono e videocamera come li aveva la persona
   // (hooks/use-rientro, lib/jitsi/riconnessione).
   const richiediTokenRientro = useCallback(() => richiediCredenziali(true), [richiediCredenziali]);
+
+  // Solo ascolto: senza consenso alla registrazione. Acconsentire dalla sala
+  // chiede un token nuovo con il consenso; la conferenza rientra con quello
+  // (JitsiRoom si ricollega quando cambia il token).
+  const soloAscolto = !!credentials?.listenOnly;
+  const [riconsenso, setRiconsenso] = useState<'no' | 'chiesto' | 'in-corso' | 'errore'>('no');
+  const acconsentiInSala = useCallback(() => {
+    setJoinPrefs((p) => ({ ...p, recordingConsent: true }));
+    setRiconsenso('chiesto');
+  }, []);
+  useEffect(() => {
+    if (riconsenso !== 'chiesto') return;
+    setRiconsenso('in-corso');
+    // Come un rientro: un errore passeggero (rete, 5xx, troppe richieste)
+    // resta un messaggio nella fascia, non chiude la conferenza in corso.
+    void richiediCredenziali(true, true).then((esito) => setRiconsenso(esito === 'fatto' ? 'no' : 'errore'));
+  }, [riconsenso, richiediCredenziali]);
   const rientroConcluso = useCallback(() => {
     markEnded();
     userHangupRef.current = true;
@@ -1786,6 +1839,7 @@ export default function LiveEventClient({
           // data (all'iscrizione, o in sala in questa visita della pagina).
           multitrackConsentExempt={hasMultitrackConsent || consensiRegistrati.tracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
+          recordingConsentOptional={consensoRegistrazione.facoltativo}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
           recordingConsentText={event.recordingConsentText}
           privacy={event.privacy}
@@ -2013,6 +2067,16 @@ export default function LiveEventClient({
         onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
       />
 
+      {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
+          intervenire. */}
+      {soloAscolto && !showJvbOverlay && (
+        <ListenOnlyNotice
+          onAcconsenti={acconsentiInSala}
+          inCorso={riconsenso === 'in-corso'}
+          errore={riconsenso === 'errore'}
+        />
+      )}
+
       {/* L'orologio dell'evento per chi conduce e per chi interviene; per
           chi interviene senza i comandi di timer e registrazione. */}
       {(isActualModerator || isSpeaker) && !showJvbOverlay && (
@@ -2158,9 +2222,11 @@ export default function LiveEventClient({
                 // I relatori hanno AV pieno (ADR 3): i limiti dei partecipanti non
                 // valgono per loro, anche se in sala non moderano.
                 role={isActualModerator ? 'moderator' : 'participant'}
-                participantsCanUnmute={event.participantsCanUnmute || isSpeaker}
-                participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
-                participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
+                // In solo ascolto niente microfono, videocamera ne' schermo:
+                // il bridge li tiene chiusi comunque, la barra non li offre.
+                participantsCanUnmute={!soloAscolto && (event.participantsCanUnmute || isSpeaker)}
+                participantsCanStartVideo={!soloAscolto && (event.participantsCanStartVideo || isSpeaker)}
+                participantsCanShareScreen={!soloAscolto && (event.participantsCanShareScreen || isSpeaker)}
                 enableFileSharing={isInstantCall}
                 whiteboardEnabled={whiteboardOn}
                 whiteboardInfraReady={whiteboardInfraReady}
@@ -2221,6 +2287,7 @@ export default function LiveEventClient({
         </div>
 
         <LiveSidebar
+          salaSoloAscolto={salaSoloAscolto}
           nascosta={soloContenuto}
           onNascondi={nascondiColonna}
           onMostra={mostraColonna}
@@ -2408,6 +2475,8 @@ type SidebarTab =
   | 'participants';
 
 interface LiveSidebarProps {
+  /** Evento con il solo ascolto per chi non acconsente (lib/live/listen-only). */
+  salaSoloAscolto?: boolean;
   /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
   nascosta?: boolean;
   /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
@@ -2467,6 +2536,7 @@ interface LiveSidebarProps {
 }
 
 function LiveSidebar({
+  salaSoloAscolto = false,
   nascosta = false,
   onNascondi,
   onMostra,
@@ -3619,6 +3689,7 @@ function LiveSidebar({
               visible={onScreen('participants')}
               eventSlug={eventSlug}
               token={token}
+              bloccoDaConsenso={salaSoloAscolto}
             />
           </div>
         </div>

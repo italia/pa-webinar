@@ -532,7 +532,8 @@
       "stopVideo": "Couper la vidéo",
       "revokeFloor": "Retirer la parole",
       "lowerHandFailed": "Impossible de baisser la main : réessayez.",
-      "handsRaised": "{count, plural, one {# main levée} other {# mains levées}}"
+      "handsRaised": "{count, plural, one {# main levée} other {# mains levées}}",
+      "locksByConsent": "Micros et caméras suivent le consentement à l'enregistrement : qui l'a donné utilise ce que l'événement autorise, les autres restent en écoute seule. Les verrous de la salle restent actifs."
     },
     "moderator": {
       "muteAll": "Couper le son de tous",
@@ -647,7 +648,14 @@
     "closeSidebar": "Fermer le panneau latéral",
     "contentOnly": "Contenu seul, sans chat ni panneaux",
     "showPanels": "Afficher le chat et les panneaux",
-    "confirmFullscreen": "Passer en plein écran"
+    "confirmFullscreen": "Passer en plein écran",
+    "listenOnly": {
+      "title": "Vous êtes en écoute seule.",
+      "body": "Vous n'avez pas consenti à l'enregistrement : vous suivez et écrivez dans le chat, mais le micro, la caméra et l'écran restent coupés, même si l'animateur vous donne la parole. Pour intervenir, consentez.",
+      "consent": "Je consens à l'enregistrement et j'interviens",
+      "joining": "Retour dans la salle…",
+      "error": "Impossible de revenir dans la salle : réessayez."
+    }
   },
   "qa": {
     "title": "Questions et Réponses",
@@ -963,7 +971,11 @@
             "desc": "Suit l'événement et interagit comme vous le décidez à l'étape « Autorisations »."
           }
         },
-        "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC."
+        "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC.",
+        "listenOnlyWithoutConsent": "Les personnes qui ne consentent pas entrent en écoute seule",
+        "listenOnlyWithoutConsentOn": "Le consentement à l'enregistrement est libre : qui ne le donne pas participe quand même, suit et écrit dans le chat, mais le micro, la caméra et l'écran restent coupés.",
+        "listenOnlyWithoutConsentOff": "Sans consentement à l'enregistrement, on n'entre pas.",
+        "listenOnlyLockedLive": "Tant que la salle peut être ouverte, l'enregistrement et l'écoute seule ne se modifient pas : ils valent dès la première entrée."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -4225,7 +4237,8 @@
       "multitrack": "J'accepte que mes interventions soient transcrites, avec mon nom, pour le compte rendu de l'événement. Si l'événement enregistre une piste audio distincte pour chaque personne, ma voix est enregistrée à cette seule fin et la piste est supprimée après la transcription ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
       "multitrackOptional": "C'est facultatif : si vous ne consentez pas, vous participez quand même, mais vos interventions n'entrent pas dans la transcription et votre voix n'est pas enregistrée sur une piste séparée. Si l'événement est enregistré, votre voix reste néanmoins dans la vidéo.",
       "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
-      "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription."
+      "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription.",
+      "recordingOptionalListenOnly": "Sans consentement, vous participez quand même, en écoute seule : vous suivez et écrivez dans le chat, mais le micro, la caméra et le partage d'écran restent coupés. Vous pouvez consentir plus tard, depuis la salle."
     },
     "export": {
       "title": "Mes données",

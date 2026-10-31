@@ -532,7 +532,8 @@
       "stopVideo": "Lülita video välja",
       "revokeFloor": "Võta sõna ära",
       "lowerHandFailed": "Kätt ei õnnestunud langetada: proovige uuesti.",
-      "handsRaised": "{count, plural, one {# tõstetud käsi} other {# tõstetud kätt}}"
+      "handsRaised": "{count, plural, one {# tõstetud käsi} other {# tõstetud kätt}}",
+      "locksByConsent": "Mikrofonid ja kaamerad järgivad salvestamise nõusolekut: kes selle andis, kasutab sündmuse lubatut, teised ainult kuulavad. Ruumi lukud jäävad sisse."
     },
     "moderator": {
       "muteAll": "Vaigista kõik",
@@ -647,7 +648,14 @@
     "closeSidebar": "Sulge külgpaneel",
     "contentOnly": "Ainult sisu, ilma vestluse ja paneelideta",
     "showPanels": "Näita vestlust ja paneele",
-    "confirmFullscreen": "Lülitu täisekraanile"
+    "confirmFullscreen": "Lülitu täisekraanile",
+    "listenOnly": {
+      "title": "Oled ainult kuulaja.",
+      "body": "Sa ei andnud salvestamiseks nõusolekut: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraan jäävad välja ka siis, kui juhataja annab sulle sõna. Sõna võtmiseks anna nõusolek.",
+      "consent": "Nõustun salvestamisega ja osalen",
+      "joining": "Ruumi tagasi sisenemine…",
+      "error": "Tagasi sisenemine ebaõnnestus: proovi uuesti."
+    }
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -963,7 +971,11 @@
             "desc": "Jälgib sündmust ja osaleb nii, nagu otsustad sammus „Õigused“."
           }
         },
-        "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga."
+        "recordingManualNote": "Salvestus ei alga kunagi iseenesest: juht käivitab selle REC-nupuga.",
+        "listenOnlyWithoutConsent": "Kes ei nõustu, osaleb ainult kuulajana",
+        "listenOnlyWithoutConsentOn": "Nõusolek salvestamiseks on vabatahtlik: kes seda ei anna, osaleb ikkagi, jälgib ja kirjutab vestlusesse, kuid mikrofon, kaamera ja ekraan jäävad välja.",
+        "listenOnlyWithoutConsentOff": "Ilma salvestamise nõusolekuta ei pääse sisse.",
+        "listenOnlyLockedLive": "Kuni ruum võib olla avatud, ei saa salvestamist ega ainult kuulamist muuta: need kehtivad esimesest sisenemisest."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -4225,7 +4237,8 @@
       "multitrack": "Nõustun, et minu sõnavõtud transkribeeritakse koos minu nimega ürituse kokkuvõtte jaoks. Kui üritus salvestab iga inimese jaoks eraldi helirea, salvestatakse minu häält ainult sel eesmärgil ja helirida kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
       "multitrackOptional": "See on vabatahtlik: kui sa nõusolekut ei anna, osaled ikkagi, kuid sinu sõnavõtud ei lähe transkriptsiooni ja sinu häält ei salvestata eraldi rajale. Kui sündmus salvestatakse, jääb sinu hääl siiski videosse.",
       "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
-      "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad."
+      "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad.",
+      "recordingOptionalListenOnly": "Kui sa ei nõustu, osaled ikkagi, ainult kuulajana: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraani jagamine jäävad välja. Saad nõustuda hiljem ruumis."
     },
     "export": {
       "title": "Minu andmed",

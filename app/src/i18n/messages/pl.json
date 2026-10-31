@@ -532,7 +532,8 @@
       "stopVideo": "Wyłącz wideo",
       "revokeFloor": "Odbierz głos",
       "lowerHandFailed": "Nie udało się opuścić ręki: spróbuj ponownie.",
-      "handsRaised": "{count, plural, one {# podniesiona ręka} few {# podniesione ręce} many {# podniesionych rąk} other {# podniesionej ręki}}"
+      "handsRaised": "{count, plural, one {# podniesiona ręka} few {# podniesione ręce} many {# podniesionych rąk} other {# podniesionej ręki}}",
+      "locksByConsent": "Mikrofony i kamery zależą od zgody na nagrywanie: osoby, które jej udzieliły, korzystają z tego, na co pozwala wydarzenie, pozostałe tylko słuchają. Blokady pokoju pozostają włączone."
     },
     "moderator": {
       "muteAll": "Wycisz wszystkich",
@@ -647,7 +648,14 @@
     "closeSidebar": "Zamknij panel boczny",
     "contentOnly": "Tylko treść, bez czatu i paneli",
     "showPanels": "Pokaż czat i panele",
-    "confirmFullscreen": "Przełącz na pełny ekran"
+    "confirmFullscreen": "Przełącz na pełny ekran",
+    "listenOnly": {
+      "title": "Tylko słuchasz.",
+      "body": "Nie wyraziłeś zgody na nagrywanie: śledzisz i piszesz na czacie, ale mikrofon, kamera i ekran pozostają wyłączone, nawet gdy prowadzący udzieli ci głosu. Aby zabrać głos, wyraź zgodę.",
+      "consent": "Wyrażam zgodę na nagrywanie i zabieram głos",
+      "joining": "Ponowne wejście do pokoju…",
+      "error": "Nie udało się wrócić: spróbuj ponownie."
+    }
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -963,7 +971,11 @@
             "desc": "Śledzi wydarzenie i uczestniczy tak, jak zdecydujesz w kroku „Uprawnienia”."
           }
         },
-        "recordingManualNote": "Nagrywanie nigdy nie zaczyna się samo: prowadzący uruchamia je przyciskiem REC."
+        "recordingManualNote": "Nagrywanie nigdy nie zaczyna się samo: prowadzący uruchamia je przyciskiem REC.",
+        "listenOnlyWithoutConsent": "Osoby bez zgody wchodzą tylko jako słuchacze",
+        "listenOnlyWithoutConsentOn": "Zgoda na nagrywanie jest dobrowolna: kto jej nie wyrazi, i tak uczestniczy, śledzi i pisze na czacie, ale mikrofon, kamera i ekran pozostają wyłączone.",
+        "listenOnlyWithoutConsentOff": "Bez zgody na nagrywanie nie można wejść.",
+        "listenOnlyLockedLive": "Dopóki pokój może być otwarty, nagrywania i trybu tylko słuchania nie można zmienić: obowiązują od pierwszego wejścia."
       },
       "step3": {
         "heading": "Osoby i zaproszenia",
@@ -4225,7 +4237,8 @@
       "multitrack": "Zgadzam się na transkrypcję moich wypowiedzi wraz z moim imieniem na potrzeby sprawozdania z wydarzenia. Jeśli wydarzenie nagrywa osobną ścieżkę dźwiękową dla każdej osoby, mój głos jest nagrywany wyłącznie w tym celu, a ścieżka jest usuwana po transkrypcji; nie służy do rozpoznawania ani odtwarzania mojego głosu.",
       "multitrackOptional": "To dobrowolne: jeśli nie wyrazisz zgody, nadal uczestniczysz, ale twoje wypowiedzi nie trafią do transkrypcji, a twój głos nie będzie nagrywany na osobnej ścieżce. Jeśli wydarzenie jest nagrywane, twój głos i tak pozostanie w nagraniu wideo.",
       "stayInTouch": "Chcę otrzymywać informacje o nadchodzących wydarzeniach i zostać dodany do książki adresowej, aby otrzymywać zaproszenia na podobne wydarzenia",
-      "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji."
+      "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji.",
+      "recordingOptionalListenOnly": "Jeśli nie wyrazisz zgody, i tak uczestniczysz, tylko słuchając: śledzisz i piszesz na czacie, ale mikrofon, kamera i udostępnianie ekranu pozostają wyłączone. Zgodę możesz wyrazić później, z pokoju."
     },
     "export": {
       "title": "Moje dane",

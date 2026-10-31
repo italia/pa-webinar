@@ -110,6 +110,9 @@ export const eventBaseSchema = z.object({
   /** La spiegazione sopra la casella del consenso alla registrazione in sala
    *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
+  // Chi non acconsente alla registrazione entra in solo ascolto: acceso per
+  // gli eventi nuovi (il consenso e' libero, art. 7.4 GDPR).
+  listenOnlyWithoutConsent: z.boolean().default(true),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),

@@ -532,7 +532,8 @@
       "stopVideo": "Isključi video",
       "revokeFloor": "Oduzmi riječ",
       "lowerHandFailed": "Ruku nije bilo moguće spustiti: pokušaj ponovno.",
-      "handsRaised": "{count, plural, one {# podignuta ruka} few {# podignute ruke} other {# podignutih ruku}}"
+      "handsRaised": "{count, plural, one {# podignuta ruka} few {# podignute ruke} other {# podignutih ruku}}",
+      "locksByConsent": "Mikrofoni i kamere slijede pristanak na snimanje: tko ga je dao koristi ono što događaj dopušta, ostali samo slušaju. Zaključavanja sobe ostaju uključena."
     },
     "moderator": {
       "muteAll": "Utišaj sve",
@@ -647,7 +648,14 @@
     "closeSidebar": "Zatvori bočnu ploču",
     "contentOnly": "Samo sadržaj, bez chata i ploča",
     "showPanels": "Prikaži chat i ploče",
-    "confirmFullscreen": "Prijeđi na cijeli zaslon"
+    "confirmFullscreen": "Prijeđi na cijeli zaslon",
+    "listenOnly": {
+      "title": "Samo slušate.",
+      "body": "Niste dali pristanak na snimanje: pratite i pišete u chatu, ali mikrofon, kamera i zaslon ostaju isključeni, čak i ako vam voditelj da riječ. Da biste se uključili, dajte pristanak.",
+      "consent": "Pristajem na snimanje i uključujem se",
+      "joining": "Ponovni ulazak u sobu…",
+      "error": "Ponovni ulazak nije uspio: pokušajte ponovno."
+    }
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -963,7 +971,11 @@
             "desc": "Prati događaj i sudjeluje kako odlučite u koraku „Dopuštenja”."
           }
         },
-        "recordingManualNote": "Snimanje nikad ne počinje samo: moderator ga pokreće gumbom REC."
+        "recordingManualNote": "Snimanje nikad ne počinje samo: moderator ga pokreće gumbom REC.",
+        "listenOnlyWithoutConsent": "Tko ne pristane, ulazi samo kao slušatelj",
+        "listenOnlyWithoutConsentOn": "Pristanak na snimanje je slobodan: tko ga ne da, svejedno sudjeluje, prati i piše u chatu, ali mikrofon, kamera i zaslon ostaju isključeni.",
+        "listenOnlyWithoutConsentOff": "Bez pristanka na snimanje ne ulazi se.",
+        "listenOnlyLockedLive": "Dok soba može biti otvorena, snimanje i način samo slušanja ne mogu se mijenjati: vrijede od prvog ulaska."
       },
       "step3": {
         "heading": "Osobe i pozivnice",
@@ -4225,7 +4237,8 @@
       "multitrack": "Pristajem da se moja izlaganja transkribiraju s mojim imenom za izvješće o događanju. Ako događanje snima zaseban audiozapis za svaku osobu, moj se glas snima samo u tu svrhu, a zapis se briše nakon transkripcije; ne koristi se za prepoznavanje ili oponašanje mog glasa.",
       "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu. Ako se događaj snima, vaš glas ipak ostaje u videozapisu.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
-      "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave."
+      "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave.",
+      "recordingOptionalListenOnly": "Ako ne pristanete, svejedno sudjelujete, samo kao slušatelj: pratite i pišete u chatu, ali mikrofon, kamera i dijeljenje zaslona ostaju isključeni. Pristanak možete dati kasnije, iz sobe."
     },
     "export": {
       "title": "Moji podaci",

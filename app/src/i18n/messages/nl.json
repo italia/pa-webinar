@@ -532,7 +532,8 @@
       "stopVideo": "Video uitzetten",
       "revokeFloor": "Het woord ontnemen",
       "lowerHandFailed": "De hand kon niet worden neergelaten: probeer het opnieuw.",
-      "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}"
+      "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}",
+      "locksByConsent": "Microfoons en camera's volgen de toestemming voor de opname: wie die gaf, gebruikt wat het evenement toestaat, de anderen luisteren alleen. De vergrendelingen van de ruimte blijven aan."
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -647,7 +648,14 @@
     "closeSidebar": "Zijpaneel sluiten",
     "contentOnly": "Alleen inhoud, zonder chat en panelen",
     "showPanels": "Chat en panelen tonen",
-    "confirmFullscreen": "Overschakelen naar volledig scherm"
+    "confirmFullscreen": "Overschakelen naar volledig scherm",
+    "listenOnly": {
+      "title": "Je luistert alleen mee.",
+      "body": "Je hebt geen toestemming gegeven voor de opname: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm blijven uit, ook als de moderator je het woord geeft. Geef toestemming om te spreken.",
+      "consent": "Ik geef toestemming voor de opname en doe mee",
+      "joining": "Opnieuw de ruimte in…",
+      "error": "Opnieuw binnenkomen mislukt: probeer het opnieuw."
+    }
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -963,7 +971,11 @@
             "desc": "Volgt het evenement en doet mee zoals je bepaalt in de stap 'Rechten'."
           }
         },
-        "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop."
+        "recordingManualNote": "De opname start nooit vanzelf: een gespreksleider start haar met de REC-knop.",
+        "listenOnlyWithoutConsent": "Wie geen toestemming geeft, doet alleen luisterend mee",
+        "listenOnlyWithoutConsentOn": "Toestemming voor de opname is vrij: wie die niet geeft doet toch mee, volgt en schrijft in de chat, maar microfoon, camera en scherm blijven uit.",
+        "listenOnlyWithoutConsentOff": "Zonder toestemming voor de opname kom je er niet in.",
+        "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -4225,7 +4237,8 @@
       "multitrack": "Ik geef toestemming om mijn bijdragen met mijn naam te transcriberen voor het verslag van het evenement. Als het evenement voor elke persoon een apart audiospoor opneemt, wordt mijn stem alleen daarvoor opgenomen en wordt het spoor na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te herkennen of na te bootsen.",
       "multitrackOptional": "Dit is vrijwillig: als je geen toestemming geeft, doe je toch mee, maar wat je zegt komt niet in de transcriptie en je stem wordt niet op een apart spoor opgenomen. Als het evenement wordt opgenomen, blijft je stem wel in de video.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
-      "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving."
+      "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving.",
+      "recordingOptionalListenOnly": "Zonder toestemming doe je toch mee, alleen luisterend: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm delen blijven uit. Je kunt later vanuit de ruimte toestemming geven."
     },
     "export": {
       "title": "Mijn gegevens",

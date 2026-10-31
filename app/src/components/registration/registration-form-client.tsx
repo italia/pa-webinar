@@ -54,6 +54,8 @@ interface RegistrationFormClientProps {
    *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
    *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
   registrationAccess?: RegistrationAccess;
+  /** Chi non acconsente alla registrazione partecipa in solo ascolto. */
+  listenOnlyWithoutConsent?: boolean;
   /** Arrivati dall'email d'invito: nome e indirizzo dell'invito. */
   invito?: { name: string | null; email: string } | null;
 }
@@ -87,6 +89,7 @@ export default function RegistrationFormClient({
   profiling,
   registrationAccess = 'open',
   invito = null,
+  listenOnlyWithoutConsent = false,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
@@ -113,6 +116,7 @@ export default function RegistrationFormClient({
     participantsCanUnmute,
     participantsCanStartVideo,
     participantsCanShareScreen,
+    listenOnlyWithoutConsent,
   });
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
@@ -208,7 +212,7 @@ export default function RegistrationFormClient({
       fieldErrors.organization = 'registration.errors.organizationRequired';
     }
     // Consensi obbligatori secondo il formato dell'evento.
-    if (richiesti.registrazione && !consentRecording) {
+    if (richiesti.registrazione && !richiesti.registrazioneFacoltativa && !consentRecording) {
       fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
     }
     // Il questionario: obbligatorio vuol dire almeno una risposta; chi
@@ -850,8 +854,14 @@ export default function RegistrationFormClient({
               type="checkbox"
               id="consentRecording"
               aria-invalid={errors.consentRecording ? true : undefined}
-              aria-required="true"
-              aria-describedby={errors.consentRecording ? 'consentRecordingError' : undefined}
+              aria-required={richiesti.registrazioneFacoltativa ? undefined : 'true'}
+              aria-describedby={
+                errors.consentRecording
+                  ? 'consentRecordingError'
+                  : richiesti.registrazioneFacoltativa
+                    ? 'consentRecordingListenOnly'
+                    : undefined
+              }
               checked={consentRecording}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConsentRecording(e.target.checked);
@@ -860,8 +870,18 @@ export default function RegistrationFormClient({
             />
             <Label for="consentRecording" check>
               {tg('consent.recording')}{' '}
-              <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+              {richiesti.registrazioneFacoltativa ? (
+                <span className="consent-mark">{t('optionalMark')}</span>
+              ) : (
+                <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+              )}
             </Label>
+            {/* Facoltativo davvero: si dice cosa succede senza. */}
+            {richiesti.registrazioneFacoltativa && (
+              <div id="consentRecordingListenOnly" className="form-text">
+                {tg('consent.recordingOptionalListenOnly')}
+              </div>
+            )}
             {errors.consentRecording && (
               <div id="consentRecordingError" className="text-danger small mt-1">
                 {tg('consent.recordingRequired')}

@@ -532,7 +532,8 @@
       "stopVideo": "Izklopi video",
       "revokeFloor": "Odvzemi besedo",
       "lowerHandFailed": "Roke ni bilo mogoče spustiti: poskusi znova.",
-      "handsRaised": "{count, plural, one {# dvignjena roka} two {# dvignjeni roki} few {# dvignjene roke} other {# dvignjenih rok}}"
+      "handsRaised": "{count, plural, one {# dvignjena roka} two {# dvignjeni roki} few {# dvignjene roke} other {# dvignjenih rok}}",
+      "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni."
     },
     "moderator": {
       "muteAll": "Utišaj vse",
@@ -647,7 +648,14 @@
     "closeSidebar": "Zapri stransko ploščo",
     "contentOnly": "Samo vsebina, brez klepeta in plošč",
     "showPanels": "Prikaži klepet in plošče",
-    "confirmFullscreen": "Preklopi na celozaslonski način"
+    "confirmFullscreen": "Preklopi na celozaslonski način",
+    "listenOnly": {
+      "title": "Samo poslušate.",
+      "body": "Niste privolili v snemanje: spremljate in pišete v klepet, mikrofon, kamera in zaslon pa ostanejo izklopljeni, tudi če vam voditelj da besedo. Če želite spregovoriti, privolite.",
+      "consent": "Privolim v snemanje in sodelujem",
+      "joining": "Ponoven vstop v sobo…",
+      "error": "Ponoven vstop ni uspel: poskusite znova."
+    }
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -963,7 +971,11 @@
             "desc": "Spremlja dogodek in sodeluje, kot se odločite v koraku »Dovoljenja«."
           }
         },
-        "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC."
+        "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC.",
+        "listenOnlyWithoutConsent": "Kdor ne privoli, vstopi samo kot poslušalec",
+        "listenOnlyWithoutConsentOn": "Privolitev v snemanje je prostovoljna: kdor je ne da, vseeno sodeluje, spremlja in piše v klepet, mikrofon, kamera in zaslon pa ostanejo izklopljeni.",
+        "listenOnlyWithoutConsentOff": "Brez privolitve v snemanje ni vstopa.",
+        "listenOnlyLockedLive": "Dokler je soba lahko odprta, snemanja in načina samo poslušanja ni mogoče spremeniti: veljata od prvega vstopa."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -4225,7 +4237,8 @@
       "multitrack": "Privolim, da se moji prispevki prepišejo z mojim imenom za poročilo o dogodku. Če dogodek snema ločen zvočni posnetek za vsako osebo, se moj glas snema samo za ta namen, posnetek pa se po prepisu izbriše; ne uporablja se za prepoznavanje ali posnemanje mojega glasu.",
       "multitrackOptional": "Ni obvezno: če ne date privolitve, vseeno sodelujete, vendar vaši prispevki ne pridejo v prepis in vaš glas se ne snema na ločeno sled. Če se dogodek snema, vaš glas kljub temu ostane v videoposnetku.",
       "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
-      "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave."
+      "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave.",
+      "recordingOptionalListenOnly": "Če ne privolite, vseeno sodelujete, samo kot poslušalec: spremljate in pišete v klepet, mikrofon, kamera in deljenje zaslona pa ostanejo izklopljeni. Privolite lahko pozneje, iz sobe."
     },
     "export": {
       "title": "Moji podatki",

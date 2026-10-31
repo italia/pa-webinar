@@ -59,6 +59,9 @@ interface ParticipantPanelProps {
    *  della sala (solo chi modera lo legge). */
   eventSlug?: string;
   token?: string;
+  /** Evento con il solo ascolto per chi non acconsente: microfoni e
+   *  videocamere seguono il consenso, i blocchi della sala non si tolgono. */
+  bloccoDaConsenso?: boolean;
   /** Quante mani sono alzate: la scheda lo mostra a chi modera. */
   onHandsChange?: (count: number) => void;
 }
@@ -80,6 +83,7 @@ export default function ParticipantPanel({
   visible = true,
   eventSlug,
   token,
+  bloccoDaConsenso = false,
   onHandsChange,
 }: ParticipantPanelProps) {
   const t = useTranslations('live.participants');
@@ -658,6 +662,13 @@ export default function ParticipantPanel({
             <button type="button" className="people__tool" onClick={() => muteAll('video')}>
               {t('stopAllVideo')}
             </button>
+            {bloccoDaConsenso ? (
+              // Con il solo ascolto i blocchi restano accesi (il bridge non li
+              // lascerebbe togliere): chi ha acconsentito usa gia' cio' che
+              // l'evento concede.
+              <p className="people__note mb-0">{t('locksByConsent')}</p>
+            ) : (
+            <>
             <button
               type="button"
               className={`people__tool${modAudio ? ' is-locked' : ''}`}
@@ -676,6 +687,8 @@ export default function ParticipantPanel({
             >
               {modVideo ? t('videoLocked') : t('videoUnlocked')}
             </button>
+            </>
+            )}
           </div>
         )}
 

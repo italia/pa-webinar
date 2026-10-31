@@ -532,7 +532,8 @@
       "stopVideo": "Slå video fra",
       "revokeFloor": "Tag ordet tilbage",
       "lowerHandFailed": "Hånden kunne ikke tages ned: prøv igen.",
-      "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}"
+      "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}",
+      "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til."
     },
     "moderator": {
       "muteAll": "Slå alle fra",
@@ -647,7 +648,14 @@
     "closeSidebar": "Luk sidepanelet",
     "contentOnly": "Kun indhold, uden chat og paneler",
     "showPanels": "Vis chat og paneler",
-    "confirmFullscreen": "Skift til fuld skærm"
+    "confirmFullscreen": "Skift til fuld skærm",
+    "listenOnly": {
+      "title": "Du lytter kun med.",
+      "body": "Du har ikke givet samtykke til optagelsen: du følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket, selv hvis værten giver dig ordet. Giv samtykke for at tale.",
+      "consent": "Jeg giver samtykke til optagelsen og deltager",
+      "joining": "Går ind i rummet igen…",
+      "error": "Det lykkedes ikke at komme ind igen: prøv igen."
+    }
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -963,7 +971,11 @@
             "desc": "Følger arrangementet og deltager, som du bestemmer i trinnet \"Tilladelser\"."
           }
         },
-        "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen."
+        "recordingManualNote": "Optagelsen starter aldrig af sig selv: en ordstyrer starter den med REC-knappen.",
+        "listenOnlyWithoutConsent": "De, der ikke giver samtykke, deltager kun som lyttere",
+        "listenOnlyWithoutConsentOn": "Samtykke til optagelsen er frivilligt: den, der ikke giver det, deltager alligevel, følger med og skriver i chatten, men mikrofon, kamera og skærm forbliver slukket.",
+        "listenOnlyWithoutConsentOff": "Uden samtykke til optagelsen kommer man ikke ind.",
+        "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -4225,7 +4237,8 @@
       "multitrack": "Jeg giver samtykke til, at mine indlæg udskrives med mit navn til arrangementets referat. Hvis arrangementet optager et separat lydspor for hver person, optages min stemme kun til dette formål, og sporet slettes efter udskrivningen; det bruges ikke til at identificere eller gengive min stemme.",
       "multitrackOptional": "Det er frivilligt: Hvis du ikke giver samtykke, deltager du stadig, men dine indlæg kommer ikke med i transskriptionen, og din stemme optages ikke på et separat spor. Hvis arrangementet optages, er din stemme dog stadig med i videoen.",
       "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
-      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding."
+      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding.",
+      "recordingOptionalListenOnly": "Hvis du ikke giver samtykke, deltager du alligevel, kun som lytter: du følger med og skriver i chatten, men mikrofon, kamera og skærmdeling forbliver slukket. Du kan give samtykke senere fra rummet."
     },
     "export": {
       "title": "Mine data",
