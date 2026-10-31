@@ -31,11 +31,17 @@ import {
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 import AdminPageHeader from '@/components/admin/admin-page-header';
-import { eventPageMetadata } from '@/components/admin/admin-page-title';
+import { adminPageTitle, eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
-  searchParams: Promise<{ token?: string; step?: string | string[]; section?: string | string[] }>;
+  searchParams: Promise<{
+    token?: string;
+    step?: string | string[];
+    section?: string | string[];
+    /** Una copia appena duplicata (vedi eventAdminPath). */
+    copia?: string | string[];
+  }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -99,15 +105,28 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ token?: string | string[] }>;
+  searchParams: Promise<{ token?: string | string[]; copia?: string | string[] }>;
 }) {
-  const [{ id }, { token }] = await Promise.all([params, searchParams]);
-  return eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+  const [{ id }, { token, copia }] = await Promise.all([params, searchParams]);
+  const meta = await eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+  // Una copia appena duplicata: anche la scheda del browser lo dice, per non
+  // confonderla con l'originale aperto accanto.
+  if ((copia === 'prossima' || copia === 'stesse') && typeof meta.title === 'string') {
+    const nome = await adminPageTitle('/admin/events/[id]/edit');
+    if (nome && meta.title.startsWith(nome)) {
+      const t = await getTranslations('admin');
+      return { ...meta, title: `${t('editCopyTitle')}${meta.title.slice(nome.length)}` };
+    }
+  }
+  return meta;
 }
 
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
-  const { token, step, section } = await searchParams;
+  const { token, step, section, copia: copiaParam } = await searchParams;
+  // Una copia appena duplicata, solo finche' e' in bozza: lo si dice in
+  // cima, perche' la pagina e' la stessa della modifica.
+  const copia = copiaParam === 'prossima' || copiaParam === 'stesse' ? copiaParam : null;
   // Il passo da cui partire (dai link «Modifica» della pagina dell'evento),
   // anche nominato come una volta (`permissions`, `content`).
   const daIndirizzo = wizardStepFromParam(step);
@@ -337,6 +356,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     agendaLocked: agendaGiaUsata(event.agendaItems),
   };
 
+  const copiaInBozza = copia !== null && event.status === 'DRAFT';
+
   return (
     <div className="container py-4">
       {/* Lo staff torna indietro con le briciole; chi ha solo il link del
@@ -353,10 +374,16 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         </div>
       )}
 
-      <AdminPageHeader title={t('editEvent')} />
+      <AdminPageHeader title={copiaInBozza ? t('editCopyTitle') : t('editEvent')} />
+      {copiaInBozza && (
+        <div className="alert alert-info mb-4" role="status">
+          {copia === 'prossima' ? t('editCopyNoticeNext') : t('editCopyNoticeSameDates')}
+        </div>
+      )}
 
       <EventWizard
         mode="edit"
+        copia={copiaInBozza}
         initialStep={initialStep}
         initialSection={initialSection}
         canUseRubrica={session?.role === 'admin'}

@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Zolang het programma uit staat, blijft de laatst opgeslagen versie: wijzigingen hier worden alleen opgeslagen als u het weer aanzet.",
         "toggleOffWarningCreate": "Uit: het programma ({count, plural, one {# onderwerp} other {# onderwerpen}}) verschijnt niet op de pagina en wordt niet met het evenement opgeslagen; zet het aan om het te bewaren.",
         "reviewOffCreate": "Programma: uit, wordt niet met het evenement opgeslagen ({count, plural, one {# onderwerp} other {# onderwerpen}})"
-      }
+      },
+      "saveCopy": "Kopie opslaan"
     },
     "nav": {
       "events": "Evenementen",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Evenement verwijderd",
     "publishSuccess": "Evenement gepubliceerd",
     "unpublishSuccess": "Evenement ingetrokken",
-    "startEvent": "Evenement starten",
-    "startEventSuccess": "Evenement gestart! Wachtende deelnemers worden automatisch doorgestuurd.",
-    "startEventConfirmTitle": "Evenement starten?",
-    "startEventConfirmMessage": "Geplande start: {when}. Iedereen met de link kan meteen deelnemen, en de videoruimte start nu.",
-    "startEventConfirmEarly": "De start is pas over meer dan 30 minuten.",
-    "startEventFailed": "Het evenement is niet gestart. Probeer het opnieuw.",
-    "jvbWarmupWarning": "Videoservers worden gestart (circa 2 minuten). Deelnemers zien een melding in de wachtkamer.",
     "eventIsLive": "Het evenement is live",
     "liveParticipants": "{count} in ruimte / max. {max}",
     "joinAsModeratorBtn": "Als moderator deelnemen",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Snelle link om last-minute een deelnemer uit te nodigen: zij nemen deel als gast wanneer het evenement live is, zonder het aanmeldformulier in te vullen.",
       "callInvite": "Link voor deelnemers",
       "callInviteHint": "Wie hem ontvangt, neemt als gast deel aan het gesprek, zonder aanmelding. Een directe oproep heeft geen openbare pagina: dit is de link om te delen.",
-      "moderatorLink": "Moderatorlink",
+      "moderatorLink": "Beheerlink (moderator)",
       "moderatorLinkHint": "Deel deze link alleen met moderators. Iedereen met deze link kan het evenement beheren.",
       "liveRoomHint": "Link om direct als moderator de ruimte binnen te gaan.",
       "copyLink": "Link kopiëren",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Geen evenementen} one {# evenement} other {# evenementen}}",
       "menu": {
         "actionsFor": "Acties voor ‘{title}’",
-        "manage": "Beheren",
         "edit": "Bewerken",
-        "openPublic": "Openbare pagina openen",
-        "newTab": "(opent in een nieuw tabblad)",
         "copyLink": "Openbare link kopiëren",
         "linkCopied": "Link gekopieerd",
         "publish": "Publiceren",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "‘{title}’ verdwijnt van de openbare pagina’s tot u het opnieuw publiceert. Reeds ontvangen inschrijvingen blijven bewaard.",
         "published": "Evenement gepubliceerd",
         "unpublished": "Evenement ingetrokken",
-        "duplicate": "Dupliceren als volgende editie",
+        "duplicate": "Dupliceren",
         "delete": "Verwijderen",
         "deleteTitle": "Evenement verwijderen?",
         "deleteMessage": "‘{title}’ en alle bijbehorende gegevens worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, na het wachtwoord van het evenement.",
       "participantHintPage": "Opent in een nieuw tabblad: de openbare pagina zoals deelnemers die zien.",
       "editEvent": "Evenement bewerken",
-      "editSettings": "Instellingen bewerken",
       "featureSummary": "Actieve functies",
       "organizers": "Organisatoren",
       "privacyGdpr": "Privacy & AVG",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Kan de AI-pijplijn niet starten. Controleer of AI op siteniveau is ingeschakeld en of er een opname bestaat.",
       "aiGenerateHelp": "Schakelt de AI-transcriptie + samenvatting in en start de pijplijn op de opname, met één klik. Idempotent: twee keer klikken dupliceert de jobs niet.",
       "aiGenerateNoRecording": "Geen opname: AI na het evenement vereist een opname (het vastleggen gebeurt alleen tijdens het evenement). U kunt de postproductie hier wel beheren.",
-      "duplicateNext": "Dupliceren voor de volgende keer",
+      "duplicateNext": "Dupliceren",
       "duplicateNextBusy": "Bezig met dupliceren…",
-      "duplicateNextHint": "Maakt een concept met de volledige configuratie van dit evenement (opname, aparte sporen, AI, agenda, herinneringen). Als het evenement een vaste frequentie heeft, wordt de datum naar de volgende keer verplaatst; anders moet die nog worden ingesteld.",
+      "duplicateNextHint": "Maakt een kopie als concept met de volledige instellingen van dit evenement. Als het evenement zich herhaalt, begint de kopie bij de volgende keer; anders heeft ze dezelfde data, die je moet bijwerken.",
       "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
       "capacitySection": "Capaciteit en infrastructuur",
       "capacitySubtitle": "Gedimensioneerd voor ongeveer {max} verwachte deelnemers",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Publiceren mislukt",
         "publishFailedBody": "Het evenement is als concept opgeslagen: publiceer het vanaf deze pagina zodra het probleem is opgelost.",
         "unsaved": "Niet opgeslagen: {items}. U kunt ze op deze pagina toevoegen.",
-        "copyParticipantLink": "Link voor deelnemers kopiëren",
         "sendToSpeakers": "Links voor moderatoren en sprekers",
         "close": "Overzicht sluiten",
         "publishNow": "Nu publiceren"
-      }
+      },
+      "editFeatures": "Functies bewerken",
+      "editPrivacy": "Privacy en gegevens bewerken"
     },
     "rubrica": {
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
@@ -3811,7 +3802,10 @@
       "confirm": "Ja, iedereen gaf toestemming",
       "cancel": "Annuleren",
       "waiting": "De transcriptie van de volledige opname is niet vanzelf gestart: dit evenement vroeg iedereen om toestemming voor de transcriptie van wat ze zeggen. Start haar met {button} alleen als iedereen die in de opname spreekt toestemming heeft gegeven; anders blijft de transcriptie uit de ondertitels."
-    }
+    },
+    "editCopyTitle": "Kopie van het evenement",
+    "editCopyNoticeNext": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. De datum is al die van de volgende keer: controleer de rest en sla op.",
+    "editCopyNoticeSameDates": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. Ze heeft dezelfde data als het origineel: werk ze bij voordat je opslaat."
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Wachten op de start",
     "countdownHours": "{hours}u",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Tot de geplande start ({when}) duurt het nog meer dan 30 minuten. Als je nu start, kan iedereen met de link meteen naar binnen en gaat de videoruimte aan: druk nogmaals om te bevestigen.",
+    "startEarlyYes": "Nu starten",
+    "startEarlyNo": "Wachten op het geplande tijdstip"
   },
   "recording": {
     "management": "Video-opname",

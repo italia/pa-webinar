@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Fad atá an clár múchta, is é an leagan is déanaí a sábháladh atá i bhfeidhm: ní shábháiltear athruithe a dhéantar anseo ach má chasann tú air arís é.",
         "toggleOffWarningCreate": "Nuair atá sé múchta, ní thaispeántar an clár ({count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}}) ar an leathanach agus ní shábháiltear é leis an ócáid: cas air é chun é a choinneáil.",
         "reviewOffCreate": "Clár: múchta, ní shábháiltear leis an ócáid é ({count, plural, one {# ábhar} two {# ábhar} few {# ábhar} many {# ábhar} other {# ábhar}})"
-      }
+      },
+      "saveCopy": "Sábháil an chóip"
     },
     "nav": {
       "events": "Imeachtaí",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Imeacht scriosta",
     "publishSuccess": "Imeacht foilsithe",
     "unpublishSuccess": "Imeacht tarraingthe siar",
-    "startEvent": "Tosaigh an t-imeacht",
-    "startEventSuccess": "Imeacht tosaithe! Atreorófar rannpháirtithe atá ag fanacht go huathoibríoch.",
-    "startEventConfirmTitle": "An imeacht a thosú?",
-    "startEventConfirmMessage": "Tús beartaithe: {when}. Is féidir le duine ar bith a bhfuil an nasc aige teacht isteach láithreach, agus tosaíonn an seomra físe anois.",
-    "startEventConfirmEarly": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús.",
-    "startEventFailed": "Níor thosaigh an t-imeacht. Bain triail eile as.",
-    "jvbWarmupWarning": "Tá na freastalaithe físe ag tosú (~2 nóiméad). Feicfidh na rannpháirtithe fógra sa seomra feithimh.",
     "eventIsLive": "Tá an t-imeacht beo",
     "liveParticipants": "{count} sa seomra / {max} uasta",
     "joinAsModeratorBtn": "Téigh isteach mar mhodhnóir",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Nasc tapa chun rannpháirtí ar an nóiméad deireanach a thabhairt isteach: téann sé isteach mar aoi nuair a bhíonn an t-imeacht beo, gan an fhoirm chláraithe a líonadh.",
       "callInvite": "Nasc do rannpháirtithe",
       "callInviteHint": "An té a fhaigheann é, glacann sé páirt sa ghlao mar aoi, gan clárú. Níl leathanach poiblí ag glao tapa: is é seo an nasc le comhroinnt.",
-      "moderatorLink": "Nasc modhnóra",
+      "moderatorLink": "Nasc bainistíochta (modhnóir)",
       "moderatorLinkHint": "Roinnigh an nasc seo le modhnóirí amháin. Is féidir le duine ar bith a bhfuil an nasc seo aige an t-imeacht a bhainistiú.",
       "liveRoomHint": "Nasc chun dul isteach díreach sa seomra mar mhodhnóir.",
       "copyLink": "Cóipeáil nasc",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Aon imeacht} one {# imeacht} other {# imeacht}}",
       "menu": {
         "actionsFor": "Gníomhartha do “{title}”",
-        "manage": "Bainistigh",
         "edit": "Cuir in eagar",
-        "openPublic": "Oscail an leathanach poiblí",
-        "newTab": "(osclaítear i gcluaisín nua é)",
         "copyLink": "Cóipeáil an nasc poiblí",
         "linkCopied": "Nasc cóipeáilte",
         "publish": "Foilsigh",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "Imeoidh “{title}” ó na leathanaigh phoiblí go dtí go bhfoilseoidh tú arís é. Coinnítear na clárúcháin a fuarthas cheana.",
         "published": "Imeacht foilsithe",
         "unpublished": "Imeacht tarraingthe siar",
-        "duplicate": "Dúblaigh mar an chéad ócáid eile",
+        "duplicate": "Dúblaigh",
         "delete": "Scrios",
         "deleteTitle": "An imeacht a scriosadh?",
         "deleteMessage": "Scriosfar “{title}” agus a chuid sonraí go léir. Ní féidir é seo a chealú.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Osclaítear i gcluaisín nua é: an seomra mar a fheiceann aoi é, tar éis phasfhocal an imeachta.",
       "participantHintPage": "Osclaítear i gcluaisín nua é: an leathanach poiblí mar a fheiceann na rannpháirtithe é.",
       "editEvent": "Cuir imeacht in eagar",
-      "editSettings": "Cuir socruithe in eagar",
       "featureSummary": "Gnéithe gníomhacha",
       "organizers": "Eagraithe",
       "privacyGdpr": "Príobháideacht & GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Níorbh fhéidir an phíblíne AI a thosú. Deimhnigh go bhfuil an AI cumasaithe ar leibhéal an tsuímh agus go bhfuil taifeadadh ann.",
       "aiGenerateHelp": "Cumasaíonn sé an tras-scríobh + an achoimre AI agus tosaíonn sé an phíblíne ar an taifeadadh, le cliceáil amháin. Idempotent: ní dhúblaíonn dhá chliceáil na jabanna.",
       "aiGenerateNoRecording": "Gan taifeadadh: teastaíonn taifeadadh don AI iarimeachta (ní tharlaíonn an gabháil ach le linn an imeachta). Is féidir leat an t-iarléiriú a bhainistiú anseo mar sin féin.",
-      "duplicateNext": "Dúblaigh don chéad cheann eile",
+      "duplicateNext": "Dúblaigh",
       "duplicateNextBusy": "Á dhúbláil…",
-      "duplicateNextHint": "Cruthaíonn sé dréacht a iompraíonn cumraíocht iomlán an imeachta seo (taifeadadh, rianta ar leith, AI, clár oibre, meabhrúcháin). Má tá minicíocht ag an imeacht, bogtar an dáta go dtí an chéad ócáid eile; murab ea, fágtar duitse é a shocrú.",
+      "duplicateNextHint": "Cruthaíonn sé cóip dréachta le cumraíocht iomlán na hócáide seo. Má athdhéantar an ócáid, tosaíonn an chóip ag an gcéad ócáid eile; murach sin tá na dátaí céanna aici, le nuashonrú.",
       "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as.",
       "capacitySection": "Toilleadh agus bonneagar",
       "capacitySubtitle": "Tomhaiste do thart ar {max} rannpháirtí a bhfuiltear ag súil leo",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Theip ar an bhfoilsiú",
         "publishFailedBody": "Tá an t-imeacht sábháilte mar dhréacht: foilsigh é ón leathanach seo nuair a bheidh an fhadhb réitithe.",
         "unsaved": "Níor sábháladh: {items}. Is féidir leat iad a chur leis ón leathanach seo.",
-        "copyParticipantLink": "Cóipeáil an nasc do na rannpháirtithe",
         "sendToSpeakers": "Naisc na modhnóirí agus na gcainteoirí",
         "close": "Dún an achoimre",
         "publishNow": "Foilsigh anois"
-      }
+      },
+      "editFeatures": "Cuir na feidhmeanna in eagar",
+      "editPrivacy": "Cuir príobháideachas agus sonraí in eagar"
     },
     "rubrica": {
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Nuashonraítear faisnéis phróifíle go huathoibríoch ag gach athchlárúchán.",
@@ -3811,7 +3802,10 @@
       "confirm": "Sea, thug gach duine toiliú",
       "cancel": "Cealaigh",
       "waiting": "Níor thosaigh tras-scríobh an taifeadta iomláin leis féin: d'iarr an ócáid seo ar gach duine toiliú le tras-scríobh a ndeir siad. Ná tosaigh é le {button} ach amháin má thug gach duine a labhraíonn sa taifeadadh toiliú; murach sin fanfaidh an tras-scríbhinn ó na fotheidil."
-    }
+    },
+    "editCopyTitle": "Cóip den ócáid",
+    "editCopyNoticeNext": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Is é dáta na chéad ócáide eile atá ann cheana: seiceáil an chuid eile agus sábháil.",
+    "editCopyNoticeSameDates": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Tá na dátaí céanna aici agus atá ag an mbunleagan: nuashonraigh iad sula sábhálann tú."
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Ag fanacht leis an tús",
     "countdownHours": "{hours}u",
     "countdownMinutes": "{minutes}n",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús beartaithe ({when}). Má thosaíonn tú anois, rachaidh aon duine a bhfuil an nasc aige isteach láithreach agus lasfar an seomra físe: brúigh arís le deimhniú.",
+    "startEarlyYes": "Tosaigh anois",
+    "startEarlyNo": "Fan leis an am beartaithe"
   },
   "recording": {
     "management": "Taifeadadh físe",

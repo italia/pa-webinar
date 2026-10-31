@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Amíg a program ki van kapcsolva, a legutóbb mentett változat marad érvényben: az itt végzett módosítások csak akkor mentődnek, ha újra bekapcsolja.",
         "toggleOffWarningCreate": "Kikapcsolva a program ({count, plural, one {# téma} other {# téma}}) nem jelenik meg az oldalon, és nem mentődik az eseménnyel: kapcsolja be, hogy megtartsa.",
         "reviewOffCreate": "Program: kikapcsolva, nem mentődik az eseménnyel ({count, plural, one {# téma} other {# téma}})"
-      }
+      },
+      "saveCopy": "Másolat mentése"
     },
     "nav": {
       "events": "Események",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Esemény törölve",
     "publishSuccess": "Esemény közzétéve",
     "unpublishSuccess": "Közzététel visszavonva",
-    "startEvent": "Esemény indítása",
-    "startEventSuccess": "Esemény elindítva! A várakozó résztvevők automatikusan átirányításra kerülnek.",
-    "startEventConfirmTitle": "Elindítja az eseményt?",
-    "startEventConfirmMessage": "Tervezett kezdés: {when}. A linkkel rendelkezők azonnal beléphetnek, és a videoterem most elindul.",
-    "startEventConfirmEarly": "A kezdésig még több mint 30 perc van hátra.",
-    "startEventFailed": "Az esemény nem indult el. Próbálja újra.",
-    "jvbWarmupWarning": "A videoszerverek indulóban vannak (kb. 2 perc). A résztvevők értesítést látnak a váróteremben.",
     "eventIsLive": "Az esemény zajlik",
     "liveParticipants": "{count} a teremben / max. {max}",
     "joinAsModeratorBtn": "Belépés moderátorként",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Gyors hivatkozás egy utolsó pillanatban érkező résztvevő meghívásához: vendégként csatlakozhat, amikor az esemény élőben fut, regisztrációs űrlap kitöltése nélkül.",
       "callInvite": "Hivatkozás a résztvevőknek",
       "callInviteHint": "Aki megkapja, vendégként, regisztráció nélkül csatlakozik a híváshoz. Az azonnali hívásnak nincs nyilvános oldala: ezt a hivatkozást kell megosztani.",
-      "moderatorLink": "Moderátor link",
+      "moderatorLink": "Kezelési hivatkozás (moderátor)",
       "moderatorLinkHint": "Ezt a linket csak moderátorokkal ossza meg. Bárki, aki rendelkezik ezzel a linkkel, kezelheti az eseményt.",
       "liveRoomHint": "Közvetlen hivatkozás a moderátorként való belépéshez a terembe.",
       "copyLink": "Link másolása",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Nincs esemény} one {# esemény} other {# esemény}}",
       "menu": {
         "actionsFor": "Műveletek: „{title}”",
-        "manage": "Kezelés",
         "edit": "Szerkesztés",
-        "openPublic": "Nyilvános oldal megnyitása",
-        "newTab": "(új lapon nyílik meg)",
         "copyLink": "Nyilvános link másolása",
         "linkCopied": "Link másolva",
         "publish": "Közzététel",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "A(z) „{title}” eltűnik a nyilvános oldalakról, amíg újra közzé nem teszi. A már beérkezett jelentkezések megmaradnak.",
         "published": "Esemény közzétéve",
         "unpublished": "Közzététel visszavonva",
-        "duplicate": "Duplikálás következő alkalomként",
+        "duplicate": "Másolat készítése",
         "delete": "Törlés",
         "deleteTitle": "Törli az eseményt?",
         "deleteMessage": "A(z) „{title}” és minden adata törlődik. A művelet nem vonható vissza.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Új lapon nyílik meg: a terem úgy, ahogy egy vendég látja, az esemény jelszavának megadása után.",
       "participantHintPage": "Új lapon nyílik meg: a nyilvános oldal úgy, ahogy a résztvevők látják.",
       "editEvent": "Esemény szerkesztése",
-      "editSettings": "Beállítások szerkesztése",
       "featureSummary": "Aktív funkciók",
       "organizers": "Szervezők",
       "privacyGdpr": "Adatvédelem és GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Az AI pipeline-t nem sikerült elindítani. Ellenőrizze, hogy az AI engedélyezve van-e a webhely szintjén, és hogy létezik-e felvétel.",
       "aiGenerateHelp": "Egyetlen kattintással bekapcsolja az AI-átiratot és -összefoglalót, és elindítja a pipeline-t a felvételen. Idempotens: a kétszeri kattintás nem duplázza a feladatokat.",
       "aiGenerateNoRecording": "Nincs felvétel: az esemény utáni AI felvételt igényel (a rögzítés csak az esemény alatt történik). Az utómunkát ettől függetlenül itt kezelheti.",
-      "duplicateNext": "Másolás a következő alkalomra",
+      "duplicateNext": "Másolat készítése",
       "duplicateNextBusy": "Másolás…",
-      "duplicateNextHint": "Létrehoz egy piszkozatot ennek az eseménynek a teljes konfigurációjával (felvétel, külön sávok, AI, napirend, emlékeztetők). Ha az eseménynek van ismétlődése, a dátum a következő alkalomra kerül; egyébként Önnek kell beállítania.",
+      "duplicateNextHint": "Piszkozatmásolatot készít az esemény teljes beállításával. Ha az esemény ismétlődik, a másolat a következő alkalommal kezdődik; különben ugyanazok a dátumai, amelyeket frissíteni kell.",
       "duplicateNextError": "A másolás nem sikerült. Próbálja újra.",
       "capacitySection": "Kapacitás és infrastruktúra",
       "capacitySubtitle": "Körülbelül {max} várható résztvevőre méretezve",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "A közzététel nem sikerült",
         "publishFailedBody": "Az esemény piszkozatként van mentve: tegye közzé ezen az oldalon, ha a hiba megoldódott.",
         "unsaved": "Nincs mentve: {items}. Ezen az oldalon hozzáadhatja őket.",
-        "copyParticipantLink": "Résztvevői link másolása",
         "sendToSpeakers": "Moderátorok és előadók linkjei",
         "close": "Összefoglaló bezárása",
         "publishNow": "Közzététel most"
-      }
+      },
+      "editFeatures": "Funkciók szerkesztése",
+      "editPrivacy": "Adatvédelem és adatok szerkesztése"
     },
     "rubrica": {
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A profilinformációk minden újraregisztrációkor automatikusan frissülnek.",
@@ -3811,7 +3802,10 @@
       "confirm": "Igen, mindenki hozzájárult",
       "cancel": "Mégse",
       "waiting": "A teljes felvétel átírása nem indult el magától: ez az esemény mindenkitől hozzájárulást kért a hozzászólásai átírásához. Csak akkor indítsa el az {button} gombbal, ha mindenki hozzájárult, aki a felvételen beszél; különben a feliratokból készült átirat marad."
-    }
+    },
+    "editCopyTitle": "Az esemény másolata",
+    "editCopyNoticeNext": "Egy piszkozatmásolaton dolgozik: az eredeti esemény nem változik. A dátum már a következő alkalomé: ellenőrizze a többit, és mentse.",
+    "editCopyNoticeSameDates": "Egy piszkozatmásolaton dolgozik: az eredeti esemény nem változik. Ugyanazok a dátumai, mint az eredetinek: mentés előtt frissítse őket."
   },
   "email": {
     "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Várakozás az indításra",
     "countdownHours": "{hours} ó",
     "countdownMinutes": "{minutes} p",
-    "countdownSeconds": "{seconds} mp"
+    "countdownSeconds": "{seconds} mp",
+    "startEarlyConfirm": "A tervezett kezdésig ({when}) több mint 30 perc van hátra. Ha most indítja, a hivatkozással bárki azonnal beléphet, és a videoterem bekapcsol: a megerősítéshez nyomja meg újra.",
+    "startEarlyYes": "Indítás most",
+    "startEarlyNo": "Várakozás a tervezett időpontig"
   },
   "recording": {
     "management": "Videofelvétel",

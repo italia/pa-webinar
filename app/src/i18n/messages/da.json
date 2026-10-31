@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Så længe programmet er slået fra, gælder den senest gemte version: ændringer foretaget her gemmes kun, hvis du slår det til igen.",
         "toggleOffWarningCreate": "Slået fra vises programmet ({count, plural, one {# emne} other {# emner}}) ikke på siden og gemmes ikke med arrangementet: slå det til for at beholde det.",
         "reviewOffCreate": "Program: slået fra, gemmes ikke med arrangementet ({count, plural, one {# emne} other {# emner}})"
-      }
+      },
+      "saveCopy": "Gem kopien"
     },
     "nav": {
       "events": "Begivenheder",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Begivenhed slettet",
     "publishSuccess": "Begivenhed publiceret",
     "unpublishSuccess": "Arrangement trukket tilbage",
-    "startEvent": "Start begivenhed",
-    "startEventSuccess": "Begivenhed startet! Ventende deltagere omdirigeres automatisk.",
-    "startEventConfirmTitle": "Start begivenheden?",
-    "startEventConfirmMessage": "Planlagt start: {when}. Alle med linket kan deltage med det samme, og videorummet starter nu.",
-    "startEventConfirmEarly": "Der er mere end 30 minutter til start.",
-    "startEventFailed": "Begivenheden blev ikke startet. Prøv igen.",
-    "jvbWarmupWarning": "Videoserverne starter op (ca. 2 minutter). Deltagere ser en besked i venteværelset.",
     "eventIsLive": "Begivenheden er i gang",
     "liveParticipants": "{count} i lokalet / maks. {max}",
     "joinAsModeratorBtn": "Deltag som moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Hurtigt link til at invitere en deltager i sidste øjeblik: vedkommende kommer ind som gæst, mens arrangementet er live, uden at udfylde tilmeldingsformularen.",
       "callInvite": "Link til deltagere",
       "callInviteHint": "Den, der modtager det, deltager i opkaldet som gæst uden tilmelding. Et hurtigopkald har ingen offentlig side: det er dette link, der skal deles.",
-      "moderatorLink": "Moderatorlink",
+      "moderatorLink": "Administrationslink (moderator)",
       "moderatorLinkHint": "Del kun dette link med moderatorer. Enhver med dette link kan administrere begivenheden.",
       "liveRoomHint": "Link til at gå direkte ind i lokalet som moderator.",
       "copyLink": "Kopiér link",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Ingen arrangementer} one {# arrangement} other {# arrangementer}}",
       "menu": {
         "actionsFor": "Handlinger for »{title}«",
-        "manage": "Administrer",
         "edit": "Rediger",
-        "openPublic": "Åbn den offentlige side",
-        "newTab": "(åbner i en ny fane)",
         "copyLink": "Kopiér det offentlige link",
         "linkCopied": "Link kopieret",
         "publish": "Udgiv",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "»{title}« forsvinder fra de offentlige sider, indtil du udgiver det igen. Allerede modtagne tilmeldinger bevares.",
         "published": "Arrangement udgivet",
         "unpublished": "Arrangement trukket tilbage",
-        "duplicate": "Duplikér som næste afholdelse",
+        "duplicate": "Duplikér",
         "delete": "Slet",
         "deleteTitle": "Slet arrangementet?",
         "deleteMessage": "»{title}« og alle tilhørende data slettes. Det kan ikke fortrydes.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Åbner i en ny fane: rummet, som en gæst ser det, efter begivenhedens adgangskode.",
       "participantHintPage": "Åbner i en ny fane: den offentlige side, som deltagerne ser den.",
       "editEvent": "Rediger arrangement",
-      "editSettings": "Rediger indstillinger",
       "featureSummary": "Aktive funktioner",
       "organizers": "Arrangører",
       "privacyGdpr": "Privatliv og GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "AI-pipelinen kunne ikke startes. Kontrollér, at AI er slået til for hele sitet, og at der findes en optagelse.",
       "aiGenerateHelp": "Slår AI-transskription + resumé til og starter pipelinen på optagelsen med ét klik. Idempotent: to klik dublerer ikke jobbene.",
       "aiGenerateNoRecording": "Ingen optagelse: AI-behandling efter arrangementet kræver en optagelse (optagelsen sker kun under arrangementet). Du kan stadig administrere efterbehandlingen her.",
-      "duplicateNext": "Dublér til næste gang",
+      "duplicateNext": "Duplikér",
       "duplicateNextBusy": "Dublerer…",
-      "duplicateNextHint": "Opretter en kladde med hele dette arrangements opsætning (optagelse, separate spor, AI, dagsorden, påmindelser). Har arrangementet en kadence, flyttes datoen til næste forekomst; ellers skal du selv sætte den.",
+      "duplicateNextHint": "Opretter en kopi som kladde med hele arrangementets opsætning. Hvis arrangementet gentages, starter kopien ved næste gang; ellers har den de samme datoer, som skal opdateres.",
       "duplicateNextError": "Dubleringen mislykkedes. Prøv igen.",
       "capacitySection": "Kapacitet og infrastruktur",
       "capacitySubtitle": "Dimensioneret til ca. {max} forventede deltagere",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Offentliggørelsen mislykkedes",
         "publishFailedBody": "Arrangementet er gemt som kladde: offentliggør det fra denne side, når problemet er løst.",
         "unsaved": "Ikke gemt: {items}. Du kan tilføje dem fra denne side.",
-        "copyParticipantLink": "Kopiér linket til deltagerne",
         "sendToSpeakers": "Links til moderatorer og talere",
         "close": "Luk oversigten",
         "publishNow": "Offentliggør nu"
-      }
+      },
+      "editFeatures": "Redigér funktioner",
+      "editPrivacy": "Redigér privatliv og data"
     },
     "rubrica": {
       "subtitle": "Personer, der har givet samtykke til at blive optaget i adressebogen (GDPR art. 6.1.a). Profiloplysninger opdateres automatisk ved hver ny tilmelding.",
@@ -3811,7 +3802,10 @@
       "confirm": "Ja, alle har givet samtykke",
       "cancel": "Annuller",
       "waiting": "Transskriptionen af hele optagelsen startede ikke af sig selv: dette arrangement bad hver person om samtykke til transskription af deres indlæg. Start den med {button} kun hvis alle, der taler i optagelsen, har givet samtykke; ellers bevares transskriptionen fra underteksterne."
-    }
+    },
+    "editCopyTitle": "Kopi af arrangementet",
+    "editCopyNoticeNext": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Datoen er allerede den næste gang: tjek resten, og gem.",
+    "editCopyNoticeSameDates": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Den har de samme datoer som originalen: opdatér dem, før du gemmer."
   },
   "email": {
     "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Venter på start",
     "countdownHours": "{hours} t",
     "countdownMinutes": "{minutes} m",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Der er mere end 30 minutter til det planlagte start ({when}). Starter du nu, kommer alle med linket ind med det samme, og videorummet tændes: tryk igen for at bekræfte.",
+    "startEarlyYes": "Start nu",
+    "startEarlyNo": "Vent til det planlagte tidspunkt"
   },
   "recording": {
     "management": "Videooptagelse",

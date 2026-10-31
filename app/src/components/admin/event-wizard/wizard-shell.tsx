@@ -227,6 +227,8 @@ export interface WizardProps {
    *  When `'create'` (default), it POSTs to /api/events and falls into the
    *  classic post-create redirect. */
   mode?: 'create' | 'edit';
+  /** In modifica: una copia appena duplicata, ancora in bozza (il salvataggio si chiama cosi'). */
+  copia?: boolean;
   /** Required when `mode === 'edit'`. Fully-loaded event + related
    *  entities so the wizard can diff on submit. */
   initialEvent?: InitialEventShape;
@@ -2523,7 +2525,7 @@ export default function EventWizard(props: WizardProps) {
                 onClick={() => handleSubmit('draft')}
                 disabled={fermo}
               >
-                {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
+                {submitting && azione === 'draft' ? tc('saving') : (props.copia ? t('saveCopy') : t('updateEvent'))}
               </button>
             )}
             <button
@@ -2542,7 +2544,7 @@ export default function EventWizard(props: WizardProps) {
             onClick={() => handleSubmit('draft')}
             disabled={fermo}
           >
-            {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
+            {submitting && azione === 'draft' ? tc('saving') : (props.copia ? t('saveCopy') : t('updateEvent'))}
           </button>
         ) : (
           <>

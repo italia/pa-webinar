@@ -153,7 +153,9 @@ export default function EventCardMenu({
       const creato = await duplicaComeProssima(event.id);
       // La copia nasce in bozza: si apre subito la modifica, dove va
       // confermata.
-      router.push(percorso(eventAdminPath(creato.id, { edit: true })));
+      router.push(
+        percorso(eventAdminPath(creato.id, { edit: true, copia: creato.dataProssima ? 'prossima' : 'stesse' })),
+      );
     });
 
   const elimina = () =>
@@ -221,14 +223,8 @@ export default function EventCardMenu({
               </button>
             </li>
           )}
-          <li>
-            <Link
-              className={voce}
-              href={percorso(eventAdminPath(event.id, { viaToken }))}
-            >
-              {t('manage')}
-            </Link>
-          </li>
+          {/* Niente «Gestisci»: la scheda porta gia' alla gestione, dal
+              titolo e dal link in basso. */}
           {!istantanea && (
             <li>
               <Link
@@ -239,20 +235,14 @@ export default function EventCardMenu({
               </Link>
             </li>
           )}
+          {/* Della pagina pubblica, solo il link da copiare: aprirla e'
+              un clic in piu' dalla pagina dell'evento. */}
           {pubblico && !istantanea && (
-            <>
-              <li>
-                <Link className={voce} href={percorso(`/events/${event.slug}`)} target="_blank">
-                  {t('openPublic')}
-                  <span className="visually-hidden"> {t('newTab')}</span>
-                </Link>
-              </li>
-              <li>
-                <button type="button" className={voce} onClick={copiaLink}>
-                  {t('copyLink')}
-                </button>
-              </li>
-            </>
+            <li>
+              <button type="button" className={voce} onClick={copiaLink}>
+                {t('copyLink')}
+              </button>
+            </li>
           )}
           {pubblicabile && !istantanea && (
             <li>

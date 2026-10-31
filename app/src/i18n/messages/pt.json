@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Enquanto o programa estiver desativado, fica a última versão guardada: as alterações feitas aqui só são guardadas se o ativar novamente.",
         "toggleOffWarningCreate": "Desativado, o programa ({count, plural, one {# tema} other {# temas}}) não aparece na página e não é guardado com o evento: ative-o para o manter.",
         "reviewOffCreate": "Programa: desativado, não é guardado com o evento ({count, plural, one {# tema} other {# temas}})"
-      }
+      },
+      "saveCopy": "Guardar a cópia"
     },
     "nav": {
       "events": "Eventos",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Evento eliminado",
     "publishSuccess": "Evento publicado",
     "unpublishSuccess": "Evento retirado",
-    "startEvent": "Iniciar evento",
-    "startEventSuccess": "Evento iniciado! Os participantes em espera serão redirecionados automaticamente.",
-    "startEventConfirmTitle": "Iniciar o evento?",
-    "startEventConfirmMessage": "Início previsto: {when}. Quem tiver o link poderá entrar de imediato, e a sala de vídeo arranca agora.",
-    "startEventConfirmEarly": "Faltam mais de 30 minutos para o início.",
-    "startEventFailed": "O evento não foi iniciado. Tente novamente.",
-    "jvbWarmupWarning": "Os servidores de vídeo estão a arrancar (cerca de 2 minutos). Os participantes verão um aviso na sala de espera.",
     "eventIsLive": "O evento está em direto",
     "liveParticipants": "{count} na sala / {max} máx.",
     "joinAsModeratorBtn": "Entrar como moderador",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Ligação rápida para convidar um participante de última hora: entra como convidado quando o evento está em direto, sem preencher o formulário de inscrição.",
       "callInvite": "Ligação para os participantes",
       "callInviteHint": "Quem a recebe entra na chamada como convidado, sem inscrição. Uma chamada rápida não tem página pública: esta é a ligação a partilhar.",
-      "moderatorLink": "Ligação de moderador",
+      "moderatorLink": "Ligação de gestão (moderador)",
       "moderatorLinkHint": "Partilhe esta ligação apenas com os moderadores. Qualquer pessoa com esta ligação pode gerir o evento.",
       "liveRoomHint": "Ligação para entrar diretamente na sala como moderador.",
       "copyLink": "Copiar ligação",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Nenhum evento} one {# evento} other {# eventos}}",
       "menu": {
         "actionsFor": "Ações para «{title}»",
-        "manage": "Gerir",
         "edit": "Editar",
-        "openPublic": "Abrir a página pública",
-        "newTab": "(abre num novo separador)",
         "copyLink": "Copiar a ligação pública",
         "linkCopied": "Ligação copiada",
         "publish": "Publicar",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "«{title}» desaparecerá das páginas públicas até voltar a publicá-lo. As inscrições já recebidas mantêm-se.",
         "published": "Evento publicado",
         "unpublished": "Evento retirado",
-        "duplicate": "Duplicar como próxima edição",
+        "duplicate": "Duplicar",
         "delete": "Eliminar",
         "deleteTitle": "Eliminar o evento?",
         "deleteMessage": "«{title}» e todos os seus dados serão eliminados. Esta ação não pode ser anulada.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Abre num novo separador: a sala tal como um convidado a vê, após a palavra-passe do evento.",
       "participantHintPage": "Abre num novo separador: a página pública tal como os participantes a veem.",
       "editEvent": "Editar evento",
-      "editSettings": "Editar definições",
       "featureSummary": "Funcionalidades ativas",
       "organizers": "Organizadores",
       "privacyGdpr": "Privacidade e RGPD",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Não foi possível iniciar a pipeline de IA. Verifique se a IA está ativada ao nível do site e se existe uma gravação.",
       "aiGenerateHelp": "Ativa a transcrição + resumo com IA e inicia a pipeline sobre a gravação, num só clique. Idempotente: clicar duas vezes não duplica as tarefas.",
       "aiGenerateNoRecording": "Nenhuma gravação: a IA pós-evento requer uma gravação (a captura só acontece durante o evento). Ainda assim, pode gerir aqui a pós-produção.",
-      "duplicateNext": "Duplicar para a próxima",
+      "duplicateNext": "Duplicar",
       "duplicateNextBusy": "A duplicar…",
-      "duplicateNextHint": "Cria um rascunho com toda a configuração deste evento (gravação, faixas separadas, IA, agenda, lembretes). Se o evento tiver uma cadência, a data avança para a ocorrência seguinte; caso contrário, fica por definir.",
+      "duplicateNextHint": "Cria uma cópia em rascunho com toda a configuração deste evento. Se o evento se repetir, a cópia começa na próxima edição; caso contrário tem as mesmas datas, a atualizar.",
       "duplicateNextError": "Não foi possível duplicar. Tente novamente.",
       "capacitySection": "Capacidade e infraestrutura",
       "capacitySubtitle": "Dimensionado para cerca de {max} participantes previstos",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "A publicação falhou",
         "publishFailedBody": "O evento está guardado como rascunho: publique-o a partir desta página quando o problema estiver resolvido.",
         "unsaved": "Não foram guardados: {items}. Pode adicioná-los a partir desta página.",
-        "copyParticipantLink": "Copiar a ligação para os participantes",
         "sendToSpeakers": "Ligações de moderadores e oradores",
         "close": "Fechar o resumo",
         "publishNow": "Publicar agora"
-      }
+      },
+      "editFeatures": "Editar funções",
+      "editPrivacy": "Editar privacidade e dados"
     },
     "rubrica": {
       "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). As informações de perfil são atualizadas automaticamente em cada nova inscrição.",
@@ -3811,7 +3802,10 @@
       "confirm": "Sim, todos consentiram",
       "cancel": "Cancelar",
       "waiting": "A transcrição da gravação completa não começou sozinha: este evento pediu a cada pessoa o consentimento para a transcrição das suas intervenções. Inicie-a com {button} apenas se todas as pessoas que falam na gravação tiverem consentido; caso contrário, fica a transcrição a partir das legendas."
-    }
+    },
+    "editCopyTitle": "Cópia do evento",
+    "editCopyNoticeNext": "Está a trabalhar numa cópia em rascunho: o evento original não muda. A data já é a da próxima edição: verifique o resto e guarde.",
+    "editCopyNoticeSameDates": "Está a trabalhar numa cópia em rascunho: o evento original não muda. Tem as mesmas datas do original: atualize-as antes de guardar."
   },
   "email": {
     "confirmationSubject": "Inscrição confirmada: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "A aguardar o início",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}min",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Faltam mais de 30 minutos para o início previsto ({when}). Se iniciar agora, quem tiver a ligação entra logo e a sala de vídeo liga-se: carregue de novo para confirmar.",
+    "startEarlyYes": "Iniciar agora",
+    "startEarlyNo": "Aguardar a hora prevista"
   },
   "recording": {
     "management": "Gravação de vídeo",

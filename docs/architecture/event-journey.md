@@ -197,7 +197,7 @@ For developers: the new-event page (`app/src/app/[locale]/admin/events/new/page.
 
 ### Duplicating as the next occurrence
 
-A recurring meeting is recreated by duplicating the previous occurrence. Two buttons do it: **Duplicate as next occurrence** in the event card's menu (not offered for instant calls) and **Duplicate for next time** on the event page. Both call `POST /api/admin/events/{id}/duplicate` with `{ "nextOccurrence": true }`, then open the copy's edit page with its new moderator token.
+A recurring meeting is recreated by duplicating the previous occurrence. Two buttons do it, both labelled **Duplicate**: one in the event card's menu (not offered for instant calls) and one on the event page. Both call `POST /api/admin/events/{id}/duplicate` with `{ "nextOccurrence": true }`, then open the copy's edit page with the staff session and `?copia=prossima` or `?copia=stesse`, from the response's `scheduleProjected`. While the copy is a draft, that page is titled **Copy of the event**, says that the original does not change and whether the copy already has the next occurrence's date or the same dates as the original, and its save button reads **Save the copy**.
 
 The route is open to administrators and to the organizer who owns the source event; the copy belongs to whoever creates it. The optional body is validated strictly and accepts either `nextOccurrence` or explicit `startsAt` and `endsAt`. The dates are resolved in this order:
 

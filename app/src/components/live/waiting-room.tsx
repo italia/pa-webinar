@@ -299,6 +299,9 @@ export default function WaitingRoom({
 
   const [countdown, setCountdown] = useState('');
   const [startingEvent, setStartingEvent] = useState(false);
+  // Avviare con molto anticipo apre la sala a chiunque abbia il link: lo si
+  // chiede una volta, qui sotto il pulsante.
+  const [confermaAnticipo, setConfermaAnticipo] = useState(false);
   const [watchingCatchUp, setWatchingCatchUp] = useState(false);
   const [pulseCountdown, setPulseCountdown] = useState(false);
   // PUBLISHED con orario di inizio già passato ma il moderatore non ha ancora
@@ -702,6 +705,11 @@ export default function WaitingRoom({
   const [entraDopoAvvio, setEntraDopoAvvio] = useState<number | null>(null);
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
+    if (!confermaAnticipo && startsAtMs - Date.now() > 30 * 60_000) {
+      setConfermaAnticipo(true);
+      return;
+    }
+    setConfermaAnticipo(false);
     setStartingEvent(true);
     setStartError('');
     setEntraDopoAvvio(Date.now());
@@ -712,7 +720,7 @@ export default function WaitingRoom({
       setStartError(t('startEventError'));
       setStartingEvent(false);
     }
-  }, [onStartEvent, t]);
+  }, [onStartEvent, t, confermaAnticipo, startsAtMs]);
   // Il pulsante «Avvia evento» torna premibile a ogni cambio di stato: se la
   // sala si ferma (IDLE) e chi modera e' ancora qui, deve poterla riavviare.
   useEffect(() => {
@@ -1451,10 +1459,22 @@ export default function WaitingRoom({
           ) : (
             <>
               <Icon icon="it-video" size="sm" color="white" className="me-2" />
-              {t('startEventButton')}
+              {confermaAnticipo ? t('startEarlyYes') : t('startEventButton')}
             </>
           )}
         </Button>
+      )}
+      {confermaAnticipo && !startingEvent && (
+        <div className="small text-center" role="status">
+          <p className="mb-1">
+            {t('startEarlyConfirm', {
+              when: format.dateTime(new Date(startsAtMs), { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+            })}
+          </p>
+          <button type="button" className="btn btn-link btn-sm p-0" onClick={() => setConfermaAnticipo(false)}>
+            {t('startEarlyNo')}
+          </button>
+        </div>
       )}
     </div>
       {/* Su telefono l'azione d'ingresso (e solo lei) resta attaccata al

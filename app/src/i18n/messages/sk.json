@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Kým je program vypnutý, platí naposledy uložená verzia: zmeny urobené tu sa uložia, len keď ho znova zapnete.",
         "toggleOffWarningCreate": "Vypnutý program ({count, plural, one {# téma} few {# témy} many {# témy} other {# tém}}) sa na stránke nezobrazuje a s podujatím sa neuloží: zapnite ho, aby ste ho zachovali.",
         "reviewOffCreate": "Program: vypnutý, s podujatím sa neuloží ({count, plural, one {# téma} few {# témy} many {# témy} other {# tém}})"
-      }
+      },
+      "saveCopy": "Uložiť kópiu"
     },
     "nav": {
       "events": "Udalosti",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Udalosť zmazaná",
     "publishSuccess": "Udalosť publikovaná",
     "unpublishSuccess": "Podujatie stiahnuté",
-    "startEvent": "Začať udalosť",
-    "startEventSuccess": "Udalosť začala! Čakajúci účastníci budú automaticky presmerovaní.",
-    "startEventConfirmTitle": "Spustiť podujatie?",
-    "startEventConfirmMessage": "Plánovaný začiatok: {when}. Ktokoľvek s odkazom sa môže hneď pripojiť a videomiestnosť sa spúšťa teraz.",
-    "startEventConfirmEarly": "Do začiatku zostáva viac ako 30 minút.",
-    "startEventFailed": "Podujatie sa nespustilo. Skúste to znova.",
-    "jvbWarmupWarning": "Video servery sa spúšťajú (približne 2 minúty). Účastníci uvidia upozornenie v čakárni.",
     "eventIsLive": "Udalosť práve prebieha",
     "liveParticipants": "{count} v miestnosti / {max} max",
     "joinAsModeratorBtn": "Pripojiť sa ako moderátor",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Rýchly odkaz na pozvanie účastníka na poslednú chvíľu: vstúpi ako hosť, keď je podujatie naživo, bez vyplnenia registračného formulára.",
       "callInvite": "Odkaz pre účastníkov",
       "callInviteHint": "Kto ho dostane, pripojí sa k hovoru ako hosť, bez registrácie. Rýchly hovor nemá verejnú stránku: zdieľajte tento odkaz.",
-      "moderatorLink": "Odkaz moderátora",
+      "moderatorLink": "Odkaz na správu (moderátor)",
       "moderatorLinkHint": "Tento odkaz zdieľajte iba s moderátormi. Ktokoľvek s týmto odkazom môže udalosť spravovať.",
       "liveRoomHint": "Odkaz na priamy vstup do miestnosti ako moderátor.",
       "copyLink": "Kopírovať odkaz",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Žiadne podujatie} one {# podujatie} other {# podujatí}}",
       "menu": {
         "actionsFor": "Akcie pre „{title}“",
-        "manage": "Spravovať",
         "edit": "Upraviť",
-        "openPublic": "Otvoriť verejnú stránku",
-        "newTab": "(otvorí sa na novej karte)",
         "copyLink": "Kopírovať verejný odkaz",
         "linkCopied": "Odkaz skopírovaný",
         "publish": "Zverejniť",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}“ zmizne z verejných stránok, kým ho znova nezverejníte. Už prijaté registrácie zostanú zachované.",
         "published": "Podujatie zverejnené",
         "unpublished": "Podujatie stiahnuté",
-        "duplicate": "Duplikovať ako ďalší termín",
+        "duplicate": "Duplikovať",
         "delete": "Odstrániť",
         "deleteTitle": "Odstrániť podujatie?",
         "deleteMessage": "„{title}“ a všetky jeho údaje budú odstránené. Túto akciu nemožno vrátiť.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Otvorí sa na novej karte: miestnosť tak, ako ju vidí hosť, po zadaní hesla udalosti.",
       "participantHintPage": "Otvorí sa na novej karte: verejná stránka tak, ako ju vidia účastníci.",
       "editEvent": "Upraviť podujatie",
-      "editSettings": "Upraviť nastavenia",
       "featureSummary": "Aktívne funkcie",
       "organizers": "Organizátori",
       "privacyGdpr": "Súkromie a GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "AI pipeline sa nepodarilo spustiť. Skontrolujte, či je AI zapnutá pre celý web a či existuje nahrávka.",
       "aiGenerateHelp": "Jedným kliknutím zapne AI prepis a zhrnutie a spustí pipeline nad nahrávkou. Idempotentné: dvojité kliknutie úlohy nezduplikuje.",
       "aiGenerateNoRecording": "Žiadna nahrávka: AI po podujatí vyžaduje nahrávku (zachytáva sa len počas podujatia). Postprodukciu tu však môžete spravovať aj tak.",
-      "duplicateNext": "Duplikovať na ďalší raz",
+      "duplicateNext": "Duplikovať",
       "duplicateNextBusy": "Duplikuje sa…",
-      "duplicateNextHint": "Vytvorí koncept s celou konfiguráciou tohto podujatia (nahrávanie, samostatné stopy, AI, agenda, pripomienky). Ak má podujatie pravidelnú kadenciu, dátum sa posunie na ďalší výskyt; inak ho treba nastaviť.",
+      "duplicateNextHint": "Vytvorí kópiu v koncepte s celým nastavením tohto podujatia. Ak sa podujatie opakuje, kópia začína ďalším konaním; inak má rovnaké dátumy, ktoré treba upraviť.",
       "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova.",
       "capacitySection": "Kapacita a infraštruktúra",
       "capacitySubtitle": "Dimenzované pre približne {max} očakávaných účastníkov",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Zverejnenie sa nepodarilo",
         "publishFailedBody": "Udalosť je uložená ako koncept: zverejnite ju na tejto stránke, keď bude problém vyriešený.",
         "unsaved": "Neuložené: {items}. Môžete ich pridať na tejto stránke.",
-        "copyParticipantLink": "Kopírovať odkaz pre účastníkov",
         "sendToSpeakers": "Odkazy moderátorov a rečníkov",
         "close": "Zavrieť súhrn",
         "publishNow": "Zverejniť teraz"
-      }
+      },
+      "editFeatures": "Upraviť funkcie",
+      "editPrivacy": "Upraviť súkromie a údaje"
     },
     "rubrica": {
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Profilové informácie sa automaticky aktualizujú pri každej opätovnej registrácii.",
@@ -3811,7 +3802,10 @@
       "confirm": "Áno, všetci súhlasili",
       "cancel": "Zrušiť",
       "waiting": "Prepis celého záznamu sa nespustil sám: toto podujatie požiadalo každého o súhlas s prepisom jeho príspevkov. Spustite ho tlačidlom {button} len vtedy, ak súhlasili všetci, ktorí v zázname hovoria; inak zostane prepis z titulkov."
-    }
+    },
+    "editCopyTitle": "Kópia podujatia",
+    "editCopyNoticeNext": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Dátum je už nastavený na ďalšie konanie: skontrolujte zvyšok a uložte.",
+    "editCopyNoticeSameDates": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Má rovnaké dátumy ako originál: pred uložením ich upravte."
   },
   "email": {
     "confirmationSubject": "Potvrdenie registrácie: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Čaká sa na začiatok",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do plánovaného začiatku ({when}) zostáva viac ako 30 minút. Ak podujatie spustíte teraz, ktokoľvek s odkazom hneď vstúpi a zapne sa videomiestnosť: potvrďte ďalším stlačením.",
+    "startEarlyYes": "Spustiť teraz",
+    "startEarlyNo": "Počkať na plánovaný čas"
   },
   "recording": {
     "management": "Videozáznam",

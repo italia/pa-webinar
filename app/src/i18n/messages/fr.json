@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Tant que le programme est désactivé, la dernière version enregistrée reste : les modifications faites ici ne sont enregistrées que si vous le réactivez.",
         "toggleOffWarningCreate": "Désactivé, le programme ({count, plural, one {# sujet} other {# sujets}}) n'apparaît pas sur la page et n'est pas enregistré avec l'événement : réactivez-le pour le conserver.",
         "reviewOffCreate": "Programme : désactivé, non enregistré avec l'événement ({count, plural, one {# sujet} other {# sujets}})"
-      }
+      },
+      "saveCopy": "Enregistrer la copie"
     },
     "nav": {
       "events": "Événements",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Événement supprimé",
     "publishSuccess": "Événement publié",
     "unpublishSuccess": "Événement retiré",
-    "startEvent": "Démarrer l'événement",
-    "startEventSuccess": "Événement démarré ! Les participants en attente seront redirigés automatiquement.",
-    "startEventConfirmTitle": "Démarrer l'événement ?",
-    "startEventConfirmMessage": "Début prévu : {when}. Toute personne disposant du lien pourra entrer immédiatement, et la salle vidéo démarre maintenant.",
-    "startEventConfirmEarly": "Le début est dans plus de 30 minutes.",
-    "startEventFailed": "L'événement n'a pas démarré. Veuillez réessayer.",
-    "jvbWarmupWarning": "Les serveurs vidéo démarrent (environ 2 minutes). Les participants verront un avis dans la salle d'attente.",
     "eventIsLive": "L'événement est en cours",
     "liveParticipants": "{count} dans la salle / {max} max",
     "joinAsModeratorBtn": "Rejoindre en tant que modérateur",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Lien rapide pour inviter un participant à la dernière minute : il accède en tant qu'invité quand l'événement est en direct, sans remplir le formulaire d'inscription.",
       "callInvite": "Lien pour les participants",
       "callInviteHint": "La personne qui le reçoit rejoint l'appel en tant qu'invité, sans inscription. Un appel instantané n'a pas de page publique : c'est ce lien qu'il faut partager.",
-      "moderatorLink": "Lien modérateur",
+      "moderatorLink": "Lien de gestion (modérateur)",
       "moderatorLinkHint": "Partagez ce lien uniquement avec les modérateurs. Toute personne disposant de ce lien peut gérer l'événement.",
       "liveRoomHint": "Lien pour entrer directement dans la salle en tant que modérateur.",
       "copyLink": "Copier le lien",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Aucun événement} one {# événement} other {# événements}}",
       "menu": {
         "actionsFor": "Actions pour « {title} »",
-        "manage": "Gérer",
         "edit": "Modifier",
-        "openPublic": "Ouvrir la page publique",
-        "newTab": "(s’ouvre dans un nouvel onglet)",
         "copyLink": "Copier le lien public",
         "linkCopied": "Lien copié",
         "publish": "Publier",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "« {title} » disparaîtra des pages publiques jusqu’à sa republication. Les inscriptions déjà reçues sont conservées.",
         "published": "Événement publié",
         "unpublished": "Événement retiré",
-        "duplicate": "Dupliquer comme prochaine occurrence",
+        "duplicate": "Dupliquer",
         "delete": "Supprimer",
         "deleteTitle": "Supprimer l’événement ?",
         "deleteMessage": "« {title} » et toutes ses données seront supprimés. Cette action est irréversible.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "S'ouvre dans un nouvel onglet : la salle telle qu'un invité la voit, après le mot de passe de l'événement.",
       "participantHintPage": "S'ouvre dans un nouvel onglet : la page publique telle que la voient les participants.",
       "editEvent": "Modifier l'événement",
-      "editSettings": "Modifier les paramètres",
       "featureSummary": "Fonctionnalités actives",
       "organizers": "Organisateurs",
       "privacyGdpr": "Confidentialité & RGPD",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Impossible de lancer le pipeline IA. Vérifiez que l'IA est activée au niveau du site et qu'un enregistrement existe.",
       "aiGenerateHelp": "Active la transcription et la synthèse IA, et lance le pipeline sur l'enregistrement, en un seul clic. Idempotent : cliquer deux fois ne duplique pas les tâches.",
       "aiGenerateNoRecording": "Aucun enregistrement : l'IA post-événement nécessite un enregistrement (la capture n'a lieu que pendant l'événement). Vous pouvez tout de même gérer la post-production ici.",
-      "duplicateNext": "Dupliquer pour la prochaine fois",
+      "duplicateNext": "Dupliquer",
       "duplicateNextBusy": "Duplication…",
-      "duplicateNextHint": "Crée un brouillon reprenant toute la configuration de cet événement (enregistrement, pistes séparées, IA, ordre du jour, rappels). Si l'événement a une périodicité, la date est reportée à la prochaine occurrence ; sinon, elle reste à définir.",
+      "duplicateNextHint": "Crée une copie en brouillon avec toute la configuration de cet événement. Si l'événement se répète, la copie commence à la prochaine édition ; sinon elle a les mêmes dates, à mettre à jour.",
       "duplicateNextError": "Échec de la duplication. Veuillez réessayer.",
       "capacitySection": "Capacité et infrastructure",
       "capacitySubtitle": "Dimensionné pour environ {max} participants attendus",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "La publication a échoué",
         "publishFailedBody": "L'événement est enregistré comme brouillon : publiez-le depuis cette page une fois le problème résolu.",
         "unsaved": "Non enregistrés : {items}. Vous pouvez les ajouter depuis cette page.",
-        "copyParticipantLink": "Copier le lien pour les participants",
         "sendToSpeakers": "Liens des modérateurs et des intervenants",
         "close": "Fermer le récapitulatif",
         "publishNow": "Publier maintenant"
-      }
+      },
+      "editFeatures": "Modifier les fonctions",
+      "editPrivacy": "Modifier la confidentialité et les données"
     },
     "rubrica": {
       "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Les informations de profil sont mises à jour automatiquement à chaque ré-inscription.",
@@ -3811,7 +3802,10 @@
       "confirm": "Oui, tout le monde a consenti",
       "cancel": "Annuler",
       "waiting": "La transcription de l{button}a pas démarré seule : cet événement a demandé à chaque personne son consentement à la transcription de ses interventions. Lancez-la avec « Générer avec l'IA » seulement si toutes les personnes qui parlent dans l'enregistrement ont consenti ; sinon, la transcription issue des sous-titres reste."
-    }
+    },
+    "editCopyTitle": "Copie de l'événement",
+    "editCopyNoticeNext": "Vous travaillez sur une copie en brouillon : l'événement d'origine ne change pas. La date est déjà celle de la prochaine édition : vérifiez le reste et enregistrez.",
+    "editCopyNoticeSameDates": "Vous travaillez sur une copie en brouillon : l'événement d'origine ne change pas. Elle a les mêmes dates que l'original : mettez-les à jour avant d'enregistrer."
   },
   "email": {
     "confirmationSubject": "Confirmation d'inscription : {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "En attente du lancement",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}min",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Il reste plus de 30 minutes avant le début prévu ({when}). En démarrant maintenant, toute personne ayant le lien entre aussitôt et la salle vidéo s'allume : appuyez de nouveau pour confirmer.",
+    "startEarlyYes": "Démarrer maintenant",
+    "startEarlyNo": "Attendre l'heure prévue"
   },
   "recording": {
     "management": "Enregistrement vidéo",

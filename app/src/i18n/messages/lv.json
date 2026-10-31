@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Kamēr programma ir izslēgta, spēkā ir pēdējā saglabātā versija: šeit veiktās izmaiņas tiek saglabātas tikai tad, ja to atkal ieslēdzat.",
         "toggleOffWarningCreate": "Izslēgta programma ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}}) lapā nav redzama un netiek saglabāta kopā ar pasākumu: ieslēdziet to, lai to paturētu.",
         "reviewOffCreate": "Programma: izslēgta, netiek saglabāta kopā ar pasākumu ({count, plural, zero {# tēmu} one {# tēma} other {# tēmas}})"
-      }
+      },
+      "saveCopy": "Saglabāt kopiju"
     },
     "nav": {
       "events": "Pasākumi",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Pasākums dzēsts",
     "publishSuccess": "Pasākums publicēts",
     "unpublishSuccess": "Publicēšana atsaukta",
-    "startEvent": "Sākt pasākumu",
-    "startEventSuccess": "Pasākums sākts! Gaidošie dalībnieki tiks automātiski novirzīti.",
-    "startEventConfirmTitle": "Sākt pasākumu?",
-    "startEventConfirmMessage": "Plānotais sākums: {when}. Ikviens, kam ir saite, var pievienoties uzreiz, un video telpa tiek palaista tagad.",
-    "startEventConfirmEarly": "Līdz sākumam ir vairāk nekā 30 minūtes.",
-    "startEventFailed": "Pasākums netika sākts. Mēģiniet vēlreiz.",
-    "jvbWarmupWarning": "Video serveri tiek startēti (aptuveni 2 minūtes). Dalībnieki redzēs paziņojumu gaidīšanas telpā.",
     "eventIsLive": "Pasākums notiek",
     "liveParticipants": "{count} telpā / {max} maks.",
     "joinAsModeratorBtn": "Pievienoties kā moderators",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Ātrā saite, lai pēdējā brīdī uzaicinātu dalībnieku: tas pievienojas kā viesis, kamēr pasākums ir tiešsaistē, neaizpildot reģistrācijas formu.",
       "callInvite": "Saite dalībniekiem",
       "callInviteHint": "Saņēmējs pievienojas zvanam kā viesis, bez reģistrācijas. Ātrajam zvanam nav publiskas lapas: šī ir kopīgojamā saite.",
-      "moderatorLink": "Moderatora saite",
+      "moderatorLink": "Pārvaldības saite (moderators)",
       "moderatorLinkHint": "Kopīgojiet šo saiti tikai ar moderatoriem. Ikviens ar šo saiti var pārvaldīt pasākumu.",
       "liveRoomHint": "Tieša saite, lai ieietu telpā kā moderators.",
       "copyLink": "Kopēt saiti",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Nav pasākumu} one {# pasākums} other {# pasākumi}}",
       "menu": {
         "actionsFor": "Darbības: “{title}”",
-        "manage": "Pārvaldīt",
         "edit": "Rediģēt",
-        "openPublic": "Atvērt publisko lapu",
-        "newTab": "(atveras jaunā cilnē)",
         "copyLink": "Kopēt publisko saiti",
         "linkCopied": "Saite nokopēta",
         "publish": "Publicēt",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "“{title}” pazudīs no publiskajām lapām, līdz to publicēsiet vēlreiz. Jau saņemtās reģistrācijas tiek saglabātas.",
         "published": "Pasākums publicēts",
         "unpublished": "Publicēšana atsaukta",
-        "duplicate": "Dublēt kā nākamo reizi",
+        "duplicate": "Dublēt",
         "delete": "Dzēst",
         "deleteTitle": "Dzēst pasākumu?",
         "deleteMessage": "“{title}” un visi tā dati tiks dzēsti. Šo darbību nevar atsaukt.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, pēc pasākuma paroles.",
       "participantHintPage": "Atveras jaunā cilnē: publiskā lapa tāda, kādu to redz dalībnieki.",
       "editEvent": "Rediģēt pasākumu",
-      "editSettings": "Rediģēt iestatījumus",
       "featureSummary": "Aktīvās funkcijas",
       "organizers": "Organizatori",
       "privacyGdpr": "Privātums un VDAR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Neizdevās palaist MI konveijeru. Pārbaudiet, vai MI ir iespējots vietnes līmenī un vai pastāv ieraksts.",
       "aiGenerateHelp": "Ar vienu klikšķi iespējo MI transkripciju un kopsavilkumu un palaiž konveijeru ierakstam. Idempotents: divkāršs klikšķis darbus nedublē.",
       "aiGenerateNoRecording": "Nav ieraksta: pēcpasākuma MI ir nepieciešams ieraksts (uzņemšana notiek tikai pasākuma laikā). Pēcapstrādi joprojām varat pārvaldīt šeit.",
-      "duplicateNext": "Izveidot kopiju nākamajai reizei",
+      "duplicateNext": "Dublēt",
       "duplicateNextBusy": "Notiek kopēšana…",
-      "duplicateNextHint": "Izveido melnrakstu ar visu šī pasākuma konfigurāciju (ieraksts, atsevišķi celiņi, MI, darba kārtība, atgādinājumi). Ja pasākumam ir noteikts atkārtošanās biežums, datums tiek pārcelts uz nākamo reizi; pretējā gadījumā tas jānorāda jums.",
+      "duplicateNextHint": "Izveido melnraksta kopiju ar visiem šī pasākuma iestatījumiem. Ja pasākums atkārtojas, kopija sākas ar nākamo reizi; pretējā gadījumā tai ir tie paši datumi, kas jāatjaunina.",
       "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz.",
       "capacitySection": "Ietilpība un infrastruktūra",
       "capacitySubtitle": "Paredzēts aptuveni {max} gaidāmajiem dalībniekiem",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Publicēšana neizdevās",
         "publishFailedBody": "Pasākums ir saglabāts kā melnraksts: publicējiet to šajā lapā, kad problēma būs atrisināta.",
         "unsaved": "Nav saglabāti: {items}. Varat tos pievienot šajā lapā.",
-        "copyParticipantLink": "Kopēt dalībnieku saiti",
         "sendToSpeakers": "Moderatoru un runātāju saites",
         "close": "Aizvērt kopsavilkumu",
         "publishNow": "Publicēt tūlīt"
-      }
+      },
+      "editFeatures": "Rediģēt funkcijas",
+      "editPrivacy": "Rediģēt privātumu un datus"
     },
     "rubrica": {
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Profila informācija tiek atjaunināta automātiski katrā atkārtotā reģistrācijā.",
@@ -3811,7 +3802,10 @@
       "confirm": "Jā, visi piekrita",
       "cancel": "Atcelt",
       "waiting": "Visa ieraksta transkripcija nesākās pati: šis pasākums lūdza katram piekrišanu viņa teiktā transkribēšanai. Sāciet to ar pogu {button} tikai tad, ja visi, kas runā ierakstā, ir piekrituši; pretējā gadījumā paliek transkripcija no subtitriem."
-    }
+    },
+    "editCopyTitle": "Pasākuma kopija",
+    "editCopyNoticeNext": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Datums jau ir nākamās reizes datums: pārbaudiet pārējo un saglabājiet.",
+    "editCopyNoticeSameDates": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Tai ir tie paši datumi kā oriģinālam: atjauniniet tos pirms saglabāšanas."
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Gaida sākumu",
     "countdownHours": "{hours} st.",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Līdz plānotajam sākumam ({when}) ir vairāk nekā 30 minūtes. Sākot tagad, ikviens ar saiti uzreiz ienāks un video telpa ieslēgsies: nospiediet vēlreiz, lai apstiprinātu.",
+    "startEarlyYes": "Sākt tagad",
+    "startEarlyNo": "Gaidīt plānoto laiku"
   },
   "recording": {
     "management": "Video ieraksts",

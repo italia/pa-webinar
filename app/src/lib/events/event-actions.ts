@@ -25,7 +25,7 @@ export async function impostaStatoEvento(
  */
 export async function duplicaComeProssima(
   eventId: string,
-): Promise<{ id: string }> {
+): Promise<{ id: string; dataProssima: boolean }> {
   const res = await fetch(`/api/admin/events/${eventId}/duplicate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -34,7 +34,9 @@ export async function duplicaComeProssima(
   if (!res.ok) throw new Error(`duplicazione: ${res.status}`);
   // La copia si apre con la sessione dello staff (la rotta e' solo sua): il
   // token della copia non serve a chi l'ha creata.
-  const creato = (await res.json()) as { id?: string };
+  const creato = (await res.json()) as { id?: string; scheduleProjected?: boolean };
   if (!creato.id) throw new Error('duplicazione: risposta senza id');
-  return { id: creato.id };
+  // Senza cadenza la copia ha le stesse date dell'originale: chi la apre
+  // deve saperlo.
+  return { id: creato.id, dataProssima: creato.scheduleProjected === true };
 }

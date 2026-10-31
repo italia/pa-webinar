@@ -74,7 +74,7 @@ and Q&A moderation, starting and ending the event. A moderator holds either
 the moderator link or a named `MODERATOR` grant, and their Jitsi JWT carries
 the moderator flag. [ADR-003](adr/003-moderator-magic-links.md)
 
-**Moderator link** (UI **Moderator link**): the event's primary magic link,
+**Moderator link** (UI **Management link (moderator)**): the event's primary magic link,
 carrying `Event.moderatorToken` as `?token=`. It is a UUID with no expiry,
 shared by everyone who holds it, that can be rotated but not revoked: a
 durable credential.
@@ -218,9 +218,10 @@ bridge early for a `PUBLISHED` event.
 
 ### Organizing an event
 
-**Duplicate for next time** (UI **Duplicate for next time**): creates a
+**Duplicate** (UI **Duplicate**): creates a
 `DRAFT` copy of an event with its whole configuration. If the event has a
-recurrence rule, the copy's date moves to the next occurrence.
+recurrence rule, the copy's date moves to the next occurrence; otherwise it
+keeps the original dates, and the editor that opens says so.
 [From creation to recap](architecture/event-journey.md)
 
 **Event template** (`EventTemplate`, UI **Event templates**): a reusable set
@@ -271,7 +272,7 @@ event** materials are listed. It does not restrict who can open a file's URL.
 [From creation to recap](architecture/event-journey.md)
 
 **Occurrence**: one event of a recurring series. Every occurrence is a
-separate `Event`, usually created with **Duplicate for next time**. The API
+separate `Event`, usually created with **Duplicate**. The API
 can link an occurrence to the first event of its series through
 `recurrenceSeriesId`; the administration UI does not set this link.
 [From creation to recap](architecture/event-journey.md)
@@ -989,7 +990,7 @@ these docs and the code use *organizer*.
 | Riepilogo | **Summary** | event wizard, step 5 |
 | Impostazioni avanzate | **Advanced settings** | event wizard, the settings chosen by the format or template |
 | Ricorrenza | **Recurrence** | recurrence rule (`recurrenceRule`) |
-| Duplica per la prossima | **Duplicate for next time** | duplicate as the next occurrence |
+| Duplica | **Duplicate** | duplicate as the next occurrence |
 | Iscrizioni | **Sign-ups** | registrations (`Registration`) |
 | Registrazione all'evento | **Event registration** | registration (never "recording") |
 | Inviti | **Invitations** | invitations (`EventInvitation`) |

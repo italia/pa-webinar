@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Solange das Programm ausgeschaltet ist, bleibt die zuletzt gespeicherte Fassung: Änderungen hier werden nur gespeichert, wenn es wieder eingeschaltet wird.",
         "toggleOffWarningCreate": "Ausgeschaltet erscheint das Programm ({count, plural, one {# Thema} other {# Themen}}) nicht auf der Seite und wird nicht mit der Veranstaltung gespeichert: Zum Behalten einschalten.",
         "reviewOffCreate": "Programm: aus, wird nicht mit der Veranstaltung gespeichert ({count, plural, one {# Thema} other {# Themen}})"
-      }
+      },
+      "saveCopy": "Kopie speichern"
     },
     "nav": {
       "events": "Veranstaltungen",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Veranstaltung gelöscht",
     "publishSuccess": "Veranstaltung veröffentlicht",
     "unpublishSuccess": "Veranstaltung zurückgezogen",
-    "startEvent": "Veranstaltung starten",
-    "startEventSuccess": "Veranstaltung gestartet! Wartende Teilnehmende werden automatisch weitergeleitet.",
-    "startEventConfirmTitle": "Veranstaltung starten?",
-    "startEventConfirmMessage": "Geplanter Beginn: {when}. Alle mit dem Link können sofort beitreten, und der Videoraum startet jetzt.",
-    "startEventConfirmEarly": "Bis zum Beginn sind es noch mehr als 30 Minuten.",
-    "startEventFailed": "Die Veranstaltung wurde nicht gestartet. Bitte versuchen Sie es erneut.",
-    "jvbWarmupWarning": "Die Videoserver werden gestartet (ca. 2 Minuten). Die Teilnehmenden sehen einen Hinweis im Warteraum.",
     "eventIsLive": "Die Veranstaltung ist live",
     "liveParticipants": "{count} im Raum / {max} max.",
     "joinAsModeratorBtn": "Als Moderator beitreten",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Schneller Link, um in letzter Minute einen Teilnehmer einzuladen: Eintritt als Gast während des Live-Events ohne Ausfüllen des Anmeldeformulars.",
       "callInvite": "Link für Teilnehmende",
       "callInviteHint": "Wer ihn erhält, tritt dem Anruf als Gast bei, ohne Anmeldung. Ein Sofortanruf hat keine öffentliche Seite: Dies ist der Link zum Teilen.",
-      "moderatorLink": "Moderator-Link",
+      "moderatorLink": "Verwaltungslink (Moderation)",
       "moderatorLinkHint": "Teilen Sie diesen Link nur mit Moderatoren. Jeder mit diesem Link kann die Veranstaltung verwalten.",
       "liveRoomHint": "Direktlink, um als Moderator den Live-Raum zu betreten.",
       "copyLink": "Link kopieren",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Keine Events} one {# Event} other {# Events}}",
       "menu": {
         "actionsFor": "Aktionen für „{title}“",
-        "manage": "Verwalten",
         "edit": "Bearbeiten",
-        "openPublic": "Öffentliche Seite öffnen",
-        "newTab": "(öffnet in einem neuen Tab)",
         "copyLink": "Öffentlichen Link kopieren",
         "linkCopied": "Link kopiert",
         "publish": "Veröffentlichen",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}“ verschwindet von den öffentlichen Seiten, bis Sie sie erneut veröffentlichen. Bereits eingegangene Anmeldungen bleiben erhalten.",
         "published": "Veranstaltung veröffentlicht",
         "unpublished": "Veranstaltung zurückgezogen",
-        "duplicate": "Als nächsten Termin duplizieren",
+        "duplicate": "Duplizieren",
         "delete": "Löschen",
         "deleteTitle": "Veranstaltung löschen?",
         "deleteMessage": "„{title}“ und alle zugehörigen Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, nach dem Passwort der Veranstaltung.",
       "participantHintPage": "Öffnet sich in einem neuen Tab: die öffentliche Seite, wie Teilnehmende sie sehen.",
       "editEvent": "Event bearbeiten",
-      "editSettings": "Einstellungen bearbeiten",
       "featureSummary": "Aktive Funktionen",
       "organizers": "Veranstalter",
       "privacyGdpr": "Datenschutz & GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Die KI-Pipeline konnte nicht gestartet werden. Prüfen Sie, ob die KI auf Website-Ebene aktiviert ist und ob eine Aufzeichnung vorhanden ist.",
       "aiGenerateHelp": "Aktiviert KI-Transkription + Zusammenfassung und startet die Pipeline für die Aufzeichnung, mit einem einzigen Klick. Idempotent: Zweimal klicken erzeugt keine doppelten Jobs.",
       "aiGenerateNoRecording": "Keine Aufzeichnung: Die KI nach der Veranstaltung benötigt eine Aufzeichnung (die Aufnahme erfolgt nur während der Veranstaltung). Sie können die Nachbearbeitung hier dennoch verwalten.",
-      "duplicateNext": "Für das nächste Mal duplizieren",
+      "duplicateNext": "Duplizieren",
       "duplicateNextBusy": "Wird dupliziert…",
-      "duplicateNextHint": "Erstellt einen Entwurf mit der gesamten Konfiguration dieser Veranstaltung (Aufzeichnung, getrennte Spuren, KI, Agenda, Erinnerungen). Hat die Veranstaltung einen festen Turnus, wird das Datum auf den nächsten Termin gesetzt; andernfalls bleibt es offen.",
+      "duplicateNextHint": "Erstellt eine Kopie als Entwurf mit der gesamten Konfiguration dieses Events. Wiederholt sich das Event, beginnt die Kopie beim nächsten Termin; sonst hat sie dieselben Termine, die anzupassen sind.",
       "duplicateNextError": "Duplizieren fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "capacitySection": "Kapazität und Infrastruktur",
       "capacitySubtitle": "Ausgelegt für etwa {max} erwartete Teilnehmende",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Veröffentlichung fehlgeschlagen",
         "publishFailedBody": "Die Veranstaltung ist als Entwurf gespeichert: Veröffentlichen Sie sie auf dieser Seite, sobald das Problem behoben ist.",
         "unsaved": "Nicht gespeichert: {items}. Sie können sie auf dieser Seite hinzufügen.",
-        "copyParticipantLink": "Link für Teilnehmende kopieren",
         "sendToSpeakers": "Links für Moderierende und Vortragende",
         "close": "Zusammenfassung schließen",
         "publishNow": "Jetzt veröffentlichen"
-      }
+      },
+      "editFeatures": "Funktionen bearbeiten",
+      "editPrivacy": "Datenschutz und Daten bearbeiten"
     },
     "rubrica": {
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a GDPR). Profilinformationen werden bei jeder erneuten Anmeldung automatisch aktualisiert.",
@@ -3811,7 +3802,10 @@
       "confirm": "Ja, alle haben eingewilligt",
       "cancel": "Abbrechen",
       "waiting": "Die Transkription der gesamten Aufzeichnung ist nicht von selbst gestartet: Dieses Event hat jede Person um die Einwilligung zur Transkription ihrer Beiträge gebeten. Starten Sie sie mit {button} nur, wenn alle, die in der Aufzeichnung sprechen, eingewilligt haben; sonst bleibt das Transkript aus den Untertiteln."
-    }
+    },
+    "editCopyTitle": "Kopie des Events",
+    "editCopyNoticeNext": "Sie bearbeiten eine Kopie als Entwurf: Das ursprüngliche Event bleibt unverändert. Das Datum ist bereits das des nächsten Termins: Prüfen Sie den Rest und speichern Sie.",
+    "editCopyNoticeSameDates": "Sie bearbeiten eine Kopie als Entwurf: Das ursprüngliche Event bleibt unverändert. Sie hat dieselben Termine wie das Original: Passen Sie sie vor dem Speichern an."
   },
   "email": {
     "confirmationSubject": "Anmeldebestätigung: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Warten auf den Start",
     "countdownHours": "{hours} Std.",
     "countdownMinutes": "{minutes} Min.",
-    "countdownSeconds": "{seconds} Sek."
+    "countdownSeconds": "{seconds} Sek.",
+    "startEarlyConfirm": "Bis zum geplanten Beginn ({when}) sind es mehr als 30 Minuten. Wenn Sie jetzt starten, kommen alle mit dem Link sofort hinein und der Videoraum wird eingeschaltet: Zum Bestätigen erneut drücken.",
+    "startEarlyYes": "Jetzt starten",
+    "startEarlyNo": "Auf die geplante Zeit warten"
   },
   "recording": {
     "management": "Videoaufzeichnung",

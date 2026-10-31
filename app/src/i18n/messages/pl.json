@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Dopóki program jest wyłączony, obowiązuje ostatnio zapisana wersja: zmiany wprowadzone tutaj zostaną zapisane tylko po ponownym włączeniu.",
         "toggleOffWarningCreate": "Po wyłączeniu program ({count, plural, one {# temat} few {# tematy} many {# tematów} other {# tematu}}) nie pojawia się na stronie i nie jest zapisywany z wydarzeniem: włącz go, aby go zachować.",
         "reviewOffCreate": "Program: wyłączony, nie zostanie zapisany z wydarzeniem ({count, plural, one {# temat} few {# tematy} many {# tematów} other {# tematu}})"
-      }
+      },
+      "saveCopy": "Zapisz kopię"
     },
     "nav": {
       "events": "Wydarzenia",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Wydarzenie usunięte",
     "publishSuccess": "Wydarzenie opublikowane",
     "unpublishSuccess": "Wydarzenie wycofane",
-    "startEvent": "Rozpocznij wydarzenie",
-    "startEventSuccess": "Wydarzenie rozpoczęte! Oczekujący uczestnicy zostaną automatycznie przekierowani.",
-    "startEventConfirmTitle": "Rozpocząć wydarzenie?",
-    "startEventConfirmMessage": "Planowany początek: {when}. Każdy, kto ma link, może od razu dołączyć, a sala wideo uruchamia się teraz.",
-    "startEventConfirmEarly": "Do rozpoczęcia pozostało ponad 30 minut.",
-    "startEventFailed": "Nie udało się rozpocząć wydarzenia. Spróbuj ponownie.",
-    "jvbWarmupWarning": "Serwery wideo uruchamiają się (ok. 2 minuty). Uczestnicy zobaczą powiadomienie w poczekalni.",
     "eventIsLive": "Wydarzenie jest na żywo",
     "liveParticipants": "{count} w pokoju / {max} maks.",
     "joinAsModeratorBtn": "Dołącz jako moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Szybki link do zaproszenia uczestnika w ostatniej chwili: dołącza jako gość, gdy wydarzenie jest na żywo, bez wypełniania formularza rejestracyjnego.",
       "callInvite": "Link dla uczestników",
       "callInviteHint": "Osoba, która go otrzyma, dołącza do połączenia jako gość, bez rejestracji. Szybkie połączenie nie ma strony publicznej: to ten link należy udostępnić.",
-      "moderatorLink": "Link moderatora",
+      "moderatorLink": "Link do zarządzania (moderator)",
       "moderatorLinkHint": "Udostępnij ten link tylko moderatorom. Każda osoba posiadająca ten link może zarządzać wydarzeniem.",
       "liveRoomHint": "Bezpośredni link do wejścia do pokoju jako moderator.",
       "copyLink": "Kopiuj link",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Brak wydarzeń} one {# wydarzenie} few {# wydarzenia} many {# wydarzeń} other {# wydarzeń}}",
       "menu": {
         "actionsFor": "Działania dla „{title}”",
-        "manage": "Zarządzaj",
         "edit": "Edytuj",
-        "openPublic": "Otwórz stronę publiczną",
-        "newTab": "(otwiera się w nowej karcie)",
         "copyLink": "Kopiuj link publiczny",
         "linkCopied": "Link skopiowany",
         "publish": "Opublikuj",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}” zniknie ze stron publicznych, dopóki nie opublikujesz go ponownie. Otrzymane już zgłoszenia zostaną zachowane.",
         "published": "Wydarzenie opublikowane",
         "unpublished": "Wydarzenie wycofane",
-        "duplicate": "Powiel jako następną edycję",
+        "duplicate": "Duplikuj",
         "delete": "Usuń",
         "deleteTitle": "Usunąć wydarzenie?",
         "deleteMessage": "„{title}” i wszystkie jego dane zostaną usunięte. Tej operacji nie można cofnąć.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Otwiera się w nowej karcie: sala tak, jak widzi ją gość, po podaniu hasła wydarzenia.",
       "participantHintPage": "Otwiera się w nowej karcie: strona publiczna tak, jak widzą ją uczestnicy.",
       "editEvent": "Edytuj wydarzenie",
-      "editSettings": "Edytuj ustawienia",
       "featureSummary": "Aktywne funkcje",
       "organizers": "Organizatorzy",
       "privacyGdpr": "Prywatność i RODO",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Nie można uruchomić potoku AI. Sprawdź, czy AI jest włączone dla całej witryny i czy istnieje nagranie.",
       "aiGenerateHelp": "Włącza transkrypcję i podsumowanie AI oraz uruchamia potok na nagraniu jednym kliknięciem. Idempotentne: dwukrotne kliknięcie nie zduplikuje zadań.",
       "aiGenerateNoRecording": "Brak nagrania: AI po wydarzeniu wymaga nagrania (przechwytywanie odbywa się tylko podczas wydarzenia). Nadal możesz tutaj zarządzać postprodukcją.",
-      "duplicateNext": "Powiel na następny raz",
+      "duplicateNext": "Duplikuj",
       "duplicateNextBusy": "Powielanie…",
-      "duplicateNextHint": "Tworzy wersję roboczą z całą konfiguracją tego wydarzenia (nagrywanie, osobne ścieżki, AI, agenda, przypomnienia). Jeśli wydarzenie ma określony cykl, data zostaje przeniesiona na najbliższy termin; w przeciwnym razie pozostaje do ustawienia.",
+      "duplicateNextHint": "Tworzy kopię roboczą z całą konfiguracją tego wydarzenia. Jeśli wydarzenie się powtarza, kopia zaczyna się od kolejnej edycji; w przeciwnym razie ma te same daty, które trzeba zaktualizować.",
       "duplicateNextError": "Nie udało się powielić. Spróbuj ponownie.",
       "capacitySection": "Pojemność i infrastruktura",
       "capacitySubtitle": "Przygotowane na około {max} przewidywanych uczestników",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Publikacja nie powiodła się",
         "publishFailedBody": "Wydarzenie zapisano jako szkic: opublikuj je na tej stronie, gdy problem zostanie rozwiązany.",
         "unsaved": "Nie zapisano: {items}. Możesz je dodać na tej stronie.",
-        "copyParticipantLink": "Kopiuj link dla uczestników",
         "sendToSpeakers": "Linki moderatorów i prelegentów",
         "close": "Zamknij podsumowanie",
         "publishNow": "Opublikuj teraz"
-      }
+      },
+      "editFeatures": "Edytuj funkcje",
+      "editPrivacy": "Edytuj prywatność i dane"
     },
     "rubrica": {
       "subtitle": "Osoby, które wyraziły zgodę na wpisanie do książki adresowej (art. 6.1.a RODO). Informacje o profilu są aktualizowane automatycznie przy każdej ponownej rejestracji.",
@@ -3811,7 +3802,10 @@
       "confirm": "Tak, wszyscy wyrazili zgodę",
       "cancel": "Anuluj",
       "waiting": "Transkrypcja całego nagrania nie uruchomiła się sama: to wydarzenie prosiło każdego o zgodę na transkrypcję jego wypowiedzi. Uruchom ją przyciskiem {button} tylko wtedy, gdy zgodę wyraziły wszystkie osoby, które mówią w nagraniu; w przeciwnym razie zostaje transkrypcja z napisów."
-    }
+    },
+    "editCopyTitle": "Kopia wydarzenia",
+    "editCopyNoticeNext": "Pracujesz na kopii roboczej: pierwotne wydarzenie się nie zmienia. Data jest już ustawiona na kolejną edycję: sprawdź resztę i zapisz.",
+    "editCopyNoticeSameDates": "Pracujesz na kopii roboczej: pierwotne wydarzenie się nie zmienia. Ma te same daty co oryginał: zaktualizuj je przed zapisaniem."
   },
   "email": {
     "confirmationSubject": "Potwierdzenie rejestracji: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Oczekiwanie na rozpoczęcie",
     "countdownHours": "{hours} godz.",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do planowanego początku ({when}) zostało ponad 30 minut. Jeśli zaczniesz teraz, każdy z linkiem od razu wejdzie, a sala wideo się włączy: naciśnij ponownie, aby potwierdzić.",
+    "startEarlyYes": "Rozpocznij teraz",
+    "startEarlyNo": "Poczekaj na zaplanowaną godzinę"
   },
   "recording": {
     "management": "Nagranie wideo",

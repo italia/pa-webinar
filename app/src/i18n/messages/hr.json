@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Dok je program isključen, vrijedi zadnja spremljena verzija: promjene napravljene ovdje spremaju se samo ako ga ponovno uključite.",
         "toggleOffWarningCreate": "Isključen program ({count, plural, one {# tema} few {# teme} other {# tema}}) ne prikazuje se na stranici i ne sprema se s događajem: uključite ga da ga zadržite.",
         "reviewOffCreate": "Program: isključen, ne sprema se s događajem ({count, plural, one {# tema} few {# teme} other {# tema}})"
-      }
+      },
+      "saveCopy": "Spremi kopiju"
     },
     "nav": {
       "events": "Događaji",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Događaj obrisan",
     "publishSuccess": "Događaj objavljen",
     "unpublishSuccess": "Događaj povučen",
-    "startEvent": "Pokreni događaj",
-    "startEventSuccess": "Događaj pokrenut! Sudionici na čekanju automatski će biti preusmjereni.",
-    "startEventConfirmTitle": "Pokrenuti događaj?",
-    "startEventConfirmMessage": "Planirani početak: {when}. Svatko s poveznicom može se odmah pridružiti, a video soba pokreće se sada.",
-    "startEventConfirmEarly": "Do početka je više od 30 minuta.",
-    "startEventFailed": "Događaj nije pokrenut. Pokušajte ponovno.",
-    "jvbWarmupWarning": "Video poslužitelji se pokreću (oko 2 minute). Sudionici će vidjeti obavijest u čekaonici.",
     "eventIsLive": "Događaj je uživo",
     "liveParticipants": "{count} u sobi / {max} maks.",
     "joinAsModeratorBtn": "Uđi kao moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Brza poveznica za pozivanje sudionika u zadnji čas: pristupa kao gost dok je događaj uživo, bez ispunjavanja obrasca za prijavu.",
       "callInvite": "Poveznica za sudionike",
       "callInviteHint": "Tko je primi, pridružuje se pozivu kao gost, bez prijave. Brzi poziv nema javnu stranicu: dijeli se ova poveznica.",
-      "moderatorLink": "Moderatorska poveznica",
+      "moderatorLink": "Poveznica za upravljanje (moderator)",
       "moderatorLinkHint": "Podijelite ovu poveznicu samo s moderatorima. Tko god je ima, može upravljati događajem.",
       "liveRoomHint": "Poveznica za izravan ulazak u sobu kao moderator.",
       "copyLink": "Kopiraj poveznicu",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Nema događaja} one {# događaj} few {# događaja} other {# događaja}}",
       "menu": {
         "actionsFor": "Radnje za „{title}”",
-        "manage": "Upravljaj",
         "edit": "Uredi",
-        "openPublic": "Otvori javnu stranicu",
-        "newTab": "(otvara se u novoj kartici)",
         "copyLink": "Kopiraj javnu poveznicu",
         "linkCopied": "Poveznica kopirana",
         "publish": "Objavi",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}” nestat će s javnih stranica dok ga ponovno ne objavite. Već primljene prijave ostaju sačuvane.",
         "published": "Događaj objavljen",
         "unpublished": "Događaj povučen",
-        "duplicate": "Dupliciraj kao sljedeće izdanje",
+        "duplicate": "Dupliciraj",
         "delete": "Izbriši",
         "deleteTitle": "Izbrisati događaj?",
         "deleteMessage": "„{title}” i svi njegovi podaci bit će izbrisani. Radnju nije moguće poništiti.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Otvara se u novoj kartici: soba kako je vidi gost, nakon lozinke događaja.",
       "participantHintPage": "Otvara se u novoj kartici: javna stranica kako je vide sudionici.",
       "editEvent": "Uredi događaj",
-      "editSettings": "Uredi postavke",
       "featureSummary": "Aktivne funkcionalnosti",
       "organizers": "Organizatori",
       "privacyGdpr": "Privatnost i GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "AI pipeline nije moguće pokrenuti. Provjeri je li AI uključen na razini stranice i postoji li snimka.",
       "aiGenerateHelp": "Uključuje AI transkripciju i sažetak te pokreće pipeline nad snimkom, jednim klikom. Idempotentno: dvostruki klik ne udvostručuje poslove.",
       "aiGenerateNoRecording": "Nema snimke: AI nakon događaja zahtijeva snimku (snimanje se odvija samo tijekom događaja). Postprodukcijom ipak možeš upravljati ovdje.",
-      "duplicateNext": "Dupliciraj za sljedeći put",
+      "duplicateNext": "Dupliciraj",
       "duplicateNextBusy": "Dupliciranje…",
-      "duplicateNextHint": "Stvara skicu s cjelokupnom konfiguracijom ovog događaja (snimanje, zasebne trake, AI, agenda, podsjetnici). Ako događaj ima učestalost, datum se pomiče na sljedeći termin; inače ga treba postaviti.",
+      "duplicateNextHint": "Stvara kopiju u nacrtu s cijelom postavom ovog događaja. Ako se događaj ponavlja, kopija počinje od sljedećeg održavanja; inače ima iste datume, koje treba ažurirati.",
       "duplicateNextError": "Dupliciranje nije uspjelo. Pokušaj ponovno.",
       "capacitySection": "Kapacitet i infrastruktura",
       "capacitySubtitle": "Dimenzionirano za oko {max} očekivanih sudionika",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Objava nije uspjela",
         "publishFailedBody": "Događaj je spremljen kao skica: objavite ga s ove stranice kad se problem riješi.",
         "unsaved": "Nije spremljeno: {items}. Možete ih dodati na ovoj stranici.",
-        "copyParticipantLink": "Kopiraj poveznicu za sudionike",
         "sendToSpeakers": "Poveznice moderatora i govornika",
         "close": "Zatvori sažetak",
         "publishNow": "Objavi sada"
-      }
+      },
+      "editFeatures": "Uredi funkcije",
+      "editPrivacy": "Uredi privatnost i podatke"
     },
     "rubrica": {
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Podaci profila automatski se ažuriraju pri svakoj ponovnoj prijavi.",
@@ -3811,7 +3802,10 @@
       "confirm": "Da, svi su dali privolu",
       "cancel": "Odustani",
       "waiting": "Transkripcija cijele snimke nije pokrenuta sama: ovaj je događaj od svakoga tražio privolu za transkripciju njegovih izlaganja. Pokrenite je gumbom {button} samo ako su svi koji govore u snimci dali privolu; inače ostaje transkript iz titlova."
-    }
+    },
+    "editCopyTitle": "Kopija događaja",
+    "editCopyNoticeNext": "Radite na kopiji u nacrtu: izvorni događaj se ne mijenja. Datum je već onaj sljedećeg održavanja: provjerite ostalo i spremite.",
+    "editCopyNoticeSameDates": "Radite na kopiji u nacrtu: izvorni događaj se ne mijenja. Ima iste datume kao izvornik: ažurirajte ih prije spremanja."
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Čeka se početak",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do planiranog početka ({when}) ima više od 30 minuta. Ako pokrenete sada, svatko s poveznicom odmah ulazi i video soba se uključuje: pritisnite ponovno za potvrdu.",
+    "startEarlyYes": "Pokreni sada",
+    "startEarlyNo": "Pričekaj planirano vrijeme"
   },
   "recording": {
     "management": "Video snimka",

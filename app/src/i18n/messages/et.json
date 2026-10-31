@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Kuni kava on väljas, kehtib viimati salvestatud versioon: siin tehtud muudatused salvestatakse ainult siis, kui selle uuesti sisse lülitad.",
         "toggleOffWarningCreate": "Väljas olles kava ({count, plural, one {# teema} other {# teemat}}) lehel ei kuvata ega üritusega koos salvestata: lülita see sisse, et seda alles hoida.",
         "reviewOffCreate": "Kava: väljas, üritusega koos ei salvestata ({count, plural, one {# teema} other {# teemat}})"
-      }
+      },
+      "saveCopy": "Salvesta koopia"
     },
     "nav": {
       "events": "Üritused",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Üritus kustutatud",
     "publishSuccess": "Üritus avaldatud",
     "unpublishSuccess": "Avaldamine tühistatud",
-    "startEvent": "Käivita üritus",
-    "startEventSuccess": "Üritus käivitatud! Ootavad osalejad suunatakse automaatselt.",
-    "startEventConfirmTitle": "Kas alustada üritust?",
-    "startEventConfirmMessage": "Kavandatud algus: {when}. Kõik, kellel on link, saavad kohe liituda, ja videotuba käivitub nüüd.",
-    "startEventConfirmEarly": "Alguseni on rohkem kui 30 minutit.",
-    "startEventFailed": "Üritus ei käivitunud. Proovige uuesti.",
-    "jvbWarmupWarning": "Videoservereid käivitatakse (umbes 2 minutit). Osalejad näevad teadet ootesaalis.",
     "eventIsLive": "Üritus toimub",
     "liveParticipants": "{count} ruumis / {max} max",
     "joinAsModeratorBtn": "Sisene moderaatorina",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Kiirlink osaleja viimase hetke kutsumiseks: ta siseneb külalisena, kui sündmus on aktiivne, ilma registreerimisvormi täitmata.",
       "callInvite": "Link osalejatele",
       "callInviteHint": "Selle saaja liitub kõnega külalisena, ilma registreerimiseta. Kiirkõnel ei ole avalikku lehte: jagamiseks on see link.",
-      "moderatorLink": "Moderaatori link",
+      "moderatorLink": "Halduslink (moderaator)",
       "moderatorLinkHint": "Jagage seda linki ainult moderaatoritega. Igaüks, kellel on see link, saab üritust hallata.",
       "liveRoomHint": "Otsene link sisenemiseks moderaatorina ruumi.",
       "copyLink": "Kopeeri link",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Sündmusi pole} one {# sündmus} other {# sündmust}}",
       "menu": {
         "actionsFor": "Toimingud: „{title}“",
-        "manage": "Halda",
         "edit": "Muuda",
-        "openPublic": "Ava avalik leht",
-        "newTab": "(avaneb uuel vahekaardil)",
         "copyLink": "Kopeeri avalik link",
         "linkCopied": "Link kopeeritud",
         "publish": "Avalda",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}“ kaob avalikelt lehtedelt, kuni selle uuesti avaldate. Juba saadud registreerimised säilivad.",
         "published": "Üritus avaldatud",
         "unpublished": "Avaldamine tühistatud",
-        "duplicate": "Dubleeri järgmise korrana",
+        "duplicate": "Dubleeri",
         "delete": "Kustuta",
         "deleteTitle": "Kas kustutada üritus?",
         "deleteMessage": "„{title}“ ja kõik selle andmed kustutatakse. Seda ei saa tagasi võtta.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, pärast ürituse parooli.",
       "participantHintPage": "Avaneb uuel vahekaardil: avalik leht nii, nagu osalejad seda näevad.",
       "editEvent": "Muuda sündmust",
-      "editSettings": "Muuda seadeid",
       "featureSummary": "Aktiivsed funktsioonid",
       "organizers": "Korraldajad",
       "privacyGdpr": "Privaatsus ja IKÜM",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "AI töövoogu ei õnnestunud käivitada. Kontrolli, kas AI on saidi tasemel lubatud ja kas salvestis on olemas.",
       "aiGenerateHelp": "Lubab ühe klõpsuga AI transkribeerimise ja kokkuvõtte ning käivitab salvestisel töövoo. Idempotentne: kaks korda klõpsamine ei tekita topelttöid.",
       "aiGenerateNoRecording": "Salvestis puudub: sündmusejärgne AI vajab salvestist (jäädvustamine toimub ainult sündmuse ajal). Järeltöötlust saad siiski siin hallata.",
-      "duplicateNext": "Dubleeri järgmise korra jaoks",
+      "duplicateNext": "Dubleeri",
       "duplicateNextBusy": "Dubleerimine…",
-      "duplicateNextHint": "Loob mustandi, mis kannab üle kogu selle sündmuse seadistuse (salvestamine, eraldi rajad, AI, päevakava, meeldetuletused). Kui sündmusel on kordumissagedus, nihkub kuupäev järgmisele korrale; muul juhul jääb see sinu määrata.",
+      "duplicateNextHint": "Loob mustandkoopia kogu selle sündmuse seadistusega. Kui sündmus kordub, algab koopia järgmisest toimumisest; muidu on sellel samad kuupäevad, mida tuleb uuendada.",
       "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti.",
       "capacitySection": "Maht ja taristu",
       "capacitySubtitle": "Mõõdetud umbes {max} oodatud osalejale",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Avaldamine ebaõnnestus",
         "publishFailedBody": "Sündmus on salvestatud mustandina: avaldage see sellelt lehelt, kui probleem on lahendatud.",
         "unsaved": "Salvestamata: {items}. Saate need sellel lehel lisada.",
-        "copyParticipantLink": "Kopeeri osalejate link",
         "sendToSpeakers": "Moderaatorite ja esinejate lingid",
         "close": "Sulge kokkuvõte",
         "publishNow": "Avalda kohe"
-      }
+      },
+      "editFeatures": "Muuda funktsioone",
+      "editPrivacy": "Muuda privaatsust ja andmeid"
     },
     "rubrica": {
       "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Profiiliteave uuendatakse automaatselt iga uuesti registreerimise käigus.",
@@ -3811,7 +3802,10 @@
       "confirm": "Jah, kõik on nõustunud",
       "cancel": "Tühista",
       "waiting": "Kogu salvestise transkribeerimine ei alanud iseenesest: see sündmus küsis igaühelt nõusolekut tema sõnavõttude transkribeerimiseks. Käivita see nupuga {button} ainult siis, kui kõik salvestises rääkijad on nõustunud; muidu jääb alles subtiitritest tehtud transkriptsioon."
-    }
+    },
+    "editCopyTitle": "Sündmuse koopia",
+    "editCopyNoticeNext": "Töötad mustandkoopiaga: algne sündmus ei muutu. Kuupäev on juba järgmise toimumise oma: kontrolli ülejäänut ja salvesta.",
+    "editCopyNoticeSameDates": "Töötad mustandkoopiaga: algne sündmus ei muutu. Sellel on samad kuupäevad nagu originaalil: uuenda need enne salvestamist."
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Ootame algust",
     "countdownHours": "{hours} t",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Plaanitud alguseni ({when}) on üle 30 minuti. Kui alustad praegu, pääseb lingiga igaüks kohe sisse ja videoruum lülitub sisse: kinnitamiseks vajuta uuesti.",
+    "startEarlyYes": "Alusta kohe",
+    "startEarlyNo": "Oota plaanitud aega"
   },
   "recording": {
     "management": "Videosalvestis",

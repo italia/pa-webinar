@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Dokler je program izklopljen, velja nazadnje shranjena različica: spremembe, narejene tukaj, se shranijo le, če ga znova vklopite.",
         "toggleOffWarningCreate": "Izklopljen program ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}}) ni prikazan na strani in se ne shrani z dogodkom: vklopite ga, da ga ohranite.",
         "reviewOffCreate": "Program: izklopljen, ne shrani se z dogodkom ({count, plural, one {# tema} two {# temi} few {# teme} other {# tem}})"
-      }
+      },
+      "saveCopy": "Shrani kopijo"
     },
     "nav": {
       "events": "Dogodki",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Dogodek izbrisan",
     "publishSuccess": "Dogodek objavljen",
     "unpublishSuccess": "Dogodek umaknjen",
-    "startEvent": "Zaženi dogodek",
-    "startEventSuccess": "Dogodek zagnan! Udeleženci v čakalnici bodo samodejno preusmerjeni.",
-    "startEventConfirmTitle": "Začeti dogodek?",
-    "startEventConfirmMessage": "Predvideni začetek: {when}. Vsak, ki ima povezavo, se lahko takoj pridruži, video soba pa se zažene zdaj.",
-    "startEventConfirmEarly": "Do začetka je še več kot 30 minut.",
-    "startEventFailed": "Dogodek se ni začel. Poskusite znova.",
-    "jvbWarmupWarning": "Video strežniki se zaganjajo (približno 2 minuti). Udeleženci bodo videli obvestilo v čakalnici.",
     "eventIsLive": "Dogodek je v živo",
     "liveParticipants": "{count} v sobi / {max} max",
     "joinAsModeratorBtn": "Vstopi kot moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Hitra povezava za povabilo udeleženca v zadnjem trenutku: pridruži se kot gost med dogodkom v živo, brez izpolnjevanja prijavnega obrazca.",
       "callInvite": "Povezava za udeležence",
       "callInviteHint": "Kdor jo prejme, se klicu pridruži kot gost, brez prijave. Hitri klic nima javne strani: deliti je treba to povezavo.",
-      "moderatorLink": "Moderatorska povezava",
+      "moderatorLink": "Povezava za upravljanje (moderator)",
       "moderatorLinkHint": "To povezavo delite samo z moderatorji. Kdor koli jo ima, lahko upravlja dogodek.",
       "liveRoomHint": "Povezava za neposreden vstop v sobo kot moderator.",
       "copyLink": "Kopiraj povezavo",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Brez dogodkov} one {# dogodek} two {# dogodka} few {# dogodki} other {# dogodkov}}",
       "menu": {
         "actionsFor": "Dejanja za »{title}«",
-        "manage": "Upravljaj",
         "edit": "Uredi",
-        "openPublic": "Odpri javno stran",
-        "newTab": "(odpre se v novem zavihku)",
         "copyLink": "Kopiraj javno povezavo",
         "linkCopied": "Povezava kopirana",
         "publish": "Objavi",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "»{title}« bo izginil z javnih strani, dokler ga ponovno ne objavite. Že prejete prijave ostanejo.",
         "published": "Dogodek objavljen",
         "unpublished": "Dogodek umaknjen",
-        "duplicate": "Podvoji kot naslednjo izvedbo",
+        "duplicate": "Podvoji",
         "delete": "Izbriši",
         "deleteTitle": "Izbrisati dogodek?",
         "deleteMessage": "»{title}« in vsi njegovi podatki bodo izbrisani. Dejanja ni mogoče razveljaviti.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Odpre se v novem zavihku: soba, kot jo vidi gost, po vnosu gesla dogodka.",
       "participantHintPage": "Odpre se v novem zavihku: javna stran, kot jo vidijo udeleženci.",
       "editEvent": "Uredi dogodek",
-      "editSettings": "Uredi nastavitve",
       "featureSummary": "Aktivne funkcije",
       "organizers": "Organizatorji",
       "privacyGdpr": "Zasebnost in GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Cevovoda AI ni bilo mogoče zagnati. Preverite, da je AI vklopljena na ravni spletišča in da posnetek obstaja.",
       "aiGenerateHelp": "Z enim klikom vklopi prepis in povzetek z AI ter zažene cevovod na posnetku. Idempotentno: dvojni klik ne podvoji opravil.",
       "aiGenerateNoRecording": "Ni posnetka: AI po dogodku potrebuje posnetek (zajem poteka samo med dogodkom). Postprodukcijo lahko kljub temu upravljate tukaj.",
-      "duplicateNext": "Podvoji za naslednjič",
+      "duplicateNext": "Podvoji",
       "duplicateNextBusy": "Podvajanje…",
-      "duplicateNextHint": "Ustvari osnutek s celotno nastavitvijo tega dogodka (snemanje, ločene sledi, AI, agenda, opomniki). Če ima dogodek ponavljanje, se datum premakne na naslednjo ponovitev; sicer ga nastavite sami.",
+      "duplicateNextHint": "Ustvari kopijo v osnutku s celotno nastavitvijo tega dogodka. Če se dogodek ponavlja, se kopija začne z naslednjo izvedbo; sicer ima enake datume, ki jih je treba posodobiti.",
       "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova.",
       "capacitySection": "Zmogljivost in infrastruktura",
       "capacitySubtitle": "Dimenzionirano za približno {max} pričakovanih udeležencev",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Objava ni uspela",
         "publishFailedBody": "Dogodek je shranjen kot osnutek: objavite ga na tej strani, ko bo težava odpravljena.",
         "unsaved": "Ni shranjeno: {items}. Dodate jih lahko na tej strani.",
-        "copyParticipantLink": "Kopiraj povezavo za udeležence",
         "sendToSpeakers": "Povezave moderatorjev in govorcev",
         "close": "Zapri povzetek",
         "publishNow": "Objavi zdaj"
-      }
+      },
+      "editFeatures": "Uredi funkcije",
+      "editPrivacy": "Uredi zasebnost in podatke"
     },
     "rubrica": {
       "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Profilne informacije se ob vsaki ponovni prijavi samodejno posodobijo.",
@@ -3811,7 +3802,10 @@
       "confirm": "Da, vsi so privolili",
       "cancel": "Prekliči",
       "waiting": "Prepis celotnega posnetka se ni začel sam: ta dogodek je vsakogar prosil za privolitev za prepis njegovih prispevkov. Zaženite ga z gumbom {button} le, če so privolili vsi, ki v posnetku govorijo; sicer ostane prepis iz podnapisov."
-    }
+    },
+    "editCopyTitle": "Kopija dogodka",
+    "editCopyNoticeNext": "Delate na kopiji v osnutku: izvirni dogodek se ne spremeni. Datum je že datum naslednje izvedbe: preverite ostalo in shranite.",
+    "editCopyNoticeSameDates": "Delate na kopiji v osnutku: izvirni dogodek se ne spremeni. Ima enake datume kot izvirnik: posodobite jih pred shranjevanjem."
   },
   "email": {
     "confirmationSubject": "Potrditev prijave: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Čakanje na začetek",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do načrtovanega začetka ({when}) je še več kot 30 minut. Če začnete zdaj, lahko vsak s povezavo takoj vstopi in videosoba se vklopi: za potrditev pritisnite znova.",
+    "startEarlyYes": "Začni zdaj",
+    "startEarlyNo": "Počakaj na načrtovani čas"
   },
   "recording": {
     "management": "Video posnetek",

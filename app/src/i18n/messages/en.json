@@ -1287,7 +1287,8 @@
         "offKeptEdit": "While the programme is off, the last saved version stays: changes made here are saved only if you turn it on again.",
         "toggleOffWarningCreate": "Off, the programme ({count, plural, one {# topic} other {# topics}}) is not shown on the page and is not saved with the event: turn it on to keep it.",
         "reviewOffCreate": "Programme: off, not saved with the event ({count, plural, one {# topic} other {# topics}})"
-      }
+      },
+      "saveCopy": "Save the copy"
     },
     "nav": {
       "events": "Events",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Event deleted",
     "publishSuccess": "Event published",
     "unpublishSuccess": "Event unpublished",
-    "startEvent": "Start event",
-    "startEventSuccess": "Event started! Waiting participants will be redirected automatically.",
-    "startEventConfirmTitle": "Start the event?",
-    "startEventConfirmMessage": "Scheduled start: {when}. Anyone with the link can join right away, and the video room starts now.",
-    "startEventConfirmEarly": "The start is more than 30 minutes away.",
-    "startEventFailed": "The event did not start. Please try again.",
-    "jvbWarmupWarning": "Video servers are starting up (~2 minutes). Participants will see a notice in the waiting room.",
     "eventIsLive": "The event is live",
     "liveParticipants": "{count} in room / {max} max",
     "joinAsModeratorBtn": "Join as moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
       "callInvite": "Participant link",
       "callInviteHint": "Whoever receives it joins the call as a guest, without registering. An instant call has no public page: this is the link to share.",
-      "moderatorLink": "Moderator link",
+      "moderatorLink": "Management link (moderator)",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
       "menu": {
         "actionsFor": "Actions for “{title}”",
-        "manage": "Manage",
         "edit": "Edit",
-        "openPublic": "Open public page",
-        "newTab": "(opens in a new tab)",
         "copyLink": "Copy public link",
         "linkCopied": "Link copied",
         "publish": "Publish",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "“{title}” will disappear from the public pages until you publish it again. Registrations already received are kept.",
         "published": "Event published",
         "unpublished": "Event unpublished",
-        "duplicate": "Duplicate as next occurrence",
+        "duplicate": "Duplicate",
         "delete": "Delete",
         "deleteTitle": "Delete the event?",
         "deleteMessage": "“{title}” and all its data will be deleted. This cannot be undone.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
       "participantHintPage": "Opens in a new tab: the public page as participants see it.",
       "editEvent": "Edit event",
-      "editSettings": "Edit settings",
       "featureSummary": "Active features",
       "organizers": "Organizers",
       "privacyGdpr": "Privacy & GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Could not start the AI pipeline. Check that AI is enabled site-wide and that a recording exists.",
       "aiGenerateHelp": "Enables AI transcription + summary and starts the pipeline on the recording, in one click. Idempotent: clicking twice won't duplicate jobs.",
       "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here.",
-      "duplicateNext": "Duplicate for next time",
+      "duplicateNext": "Duplicate",
       "duplicateNextBusy": "Duplicating…",
-      "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
+      "duplicateNextHint": "Creates a draft copy with this event's whole configuration. If the event repeats, the copy starts at the next occurrence; otherwise it has the same dates, to be updated.",
       "duplicateNextError": "Could not duplicate. Please try again.",
       "capacitySection": "Capacity and infrastructure",
       "capacitySubtitle": "Sized for about {max} expected participants",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Publishing failed",
         "publishFailedBody": "The event is saved as a draft: publish it from this page once the problem is solved.",
         "unsaved": "Not saved: {items}. You can add them from this page.",
-        "copyParticipantLink": "Copy the participant link",
         "sendToSpeakers": "Moderator and speaker links",
         "close": "Close the summary",
         "publishNow": "Publish now"
-      }
+      },
+      "editFeatures": "Edit features",
+      "editPrivacy": "Edit privacy and data"
     },
     "rubrica": {
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
@@ -3811,7 +3802,10 @@
       "confirm": "Yes, everyone consented",
       "cancel": "Cancel",
       "waiting": "The transcription of the full recording did not start on its own: this event asked each person for consent to the transcription of what they say. Start it with {button} only if everyone who speaks in the recording has consented; otherwise the transcript from captions stays."
-    }
+    },
+    "editCopyTitle": "Copy of the event",
+    "editCopyNoticeNext": "You are working on a draft copy: the original event does not change. The date is already that of the next occurrence: check the rest and save.",
+    "editCopyNoticeSameDates": "You are working on a draft copy: the original event does not change. It has the same dates as the original: update them before saving."
   },
   "email": {
     "confirmationSubject": "Registration confirmed: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Waiting for the start",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "The planned start ({when}) is more than 30 minutes away. Starting now lets anyone with the link in and turns on the video room: press again to confirm.",
+    "startEarlyYes": "Start now",
+    "startEarlyNo": "Wait for the planned time"
   },
   "recording": {
     "management": "Video recording",

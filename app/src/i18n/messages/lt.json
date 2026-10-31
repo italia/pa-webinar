@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Kol programa išjungta, galioja paskutinė išsaugota versija: čia atlikti pakeitimai išsaugomi tik tada, kai vėl ją įjungiate.",
         "toggleOffWarningCreate": "Išjungta programa ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}}) puslapyje nerodoma ir neišsaugoma kartu su renginiu: įjunkite ją, kad ją išlaikytumėte.",
         "reviewOffCreate": "Programa: išjungta, neišsaugoma kartu su renginiu ({count, plural, one {# tema} few {# temos} many {# temos} other {# temų}})"
-      }
+      },
+      "saveCopy": "Išsaugoti kopiją"
     },
     "nav": {
       "events": "Renginiai",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Renginys ištrintas",
     "publishSuccess": "Renginys paskelbtas",
     "unpublishSuccess": "Paskelbimas atšauktas",
-    "startEvent": "Pradėti renginį",
-    "startEventSuccess": "Renginys pradėtas! Laukiantys dalyviai bus automatiškai nukreipti.",
-    "startEventConfirmTitle": "Pradėti renginį?",
-    "startEventConfirmMessage": "Numatyta pradžia: {when}. Visi, turintys nuorodą, gali prisijungti iš karto, o vaizdo kambarys paleidžiamas dabar.",
-    "startEventConfirmEarly": "Iki pradžios liko daugiau nei 30 minučių.",
-    "startEventFailed": "Renginys nepradėtas. Bandykite dar kartą.",
-    "jvbWarmupWarning": "Vaizdo serveriai paleidžiami (apie 2 minutes). Dalyviai matys pranešimą laukimo salėje.",
     "eventIsLive": "Renginys vyksta",
     "liveParticipants": "{count} salėje / {max} maks.",
     "joinAsModeratorBtn": "Prisijungti kaip moderatorius",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Greita nuoroda paskutinę minutę pakviesti dalyvį: jis prisijungia kaip svečias, kai renginys tiesiogiai vyksta, nepildydamas registracijos formos.",
       "callInvite": "Nuoroda dalyviams",
       "callInviteHint": "Ją gavęs asmuo prisijungia prie skambučio kaip svečias, be registracijos. Greitasis skambutis neturi viešo puslapio: dalytis reikia šia nuoroda.",
-      "moderatorLink": "Moderatoriaus nuoroda",
+      "moderatorLink": "Valdymo nuoroda (moderatorius)",
       "moderatorLinkHint": "Dalykitės šia nuoroda tik su moderatoriais. Bet kas, turintis šią nuorodą, gali valdyti renginį.",
       "liveRoomHint": "Nuoroda tiesiogiai įeiti į salę kaip moderatorius.",
       "copyLink": "Kopijuoti nuorodą",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Renginių nėra} one {# renginys} other {# renginiai}}",
       "menu": {
         "actionsFor": "Veiksmai: „{title}“",
-        "manage": "Tvarkyti",
         "edit": "Redaguoti",
-        "openPublic": "Atverti viešąjį puslapį",
-        "newTab": "(atsidaro naujame skirtuke)",
         "copyLink": "Kopijuoti viešąją nuorodą",
         "linkCopied": "Nuoroda nukopijuota",
         "publish": "Paskelbti",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}“ išnyks iš viešųjų puslapių, kol vėl jį paskelbsite. Jau gautos registracijos išsaugomos.",
         "published": "Renginys paskelbtas",
         "unpublished": "Paskelbimas atšauktas",
-        "duplicate": "Dubliuoti kaip kitą renginį",
+        "duplicate": "Dubliuoti",
         "delete": "Ištrinti",
         "deleteTitle": "Ištrinti renginį?",
         "deleteMessage": "„{title}“ ir visi jo duomenys bus ištrinti. Šio veiksmo atšaukti negalima.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, įvedus renginio slaptažodį.",
       "participantHintPage": "Atsidaro naujame skirtuke: viešas puslapis taip, kaip jį mato dalyviai.",
       "editEvent": "Redaguoti renginį",
-      "editSettings": "Redaguoti nustatymus",
       "featureSummary": "Aktyvios funkcijos",
       "organizers": "Organizatoriai",
       "privacyGdpr": "Privatumas ir GDPR/BDAR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Nepavyko paleisti DI grandinės. Patikrinkite, ar DI įjungtas visos svetainės mastu ir ar yra įrašas.",
       "aiGenerateHelp": "Vienu spustelėjimu įjungia DI transkripciją bei santrauką ir paleidžia grandinę įrašui. Idempotentiška: spustelėjus dukart užduotys nesidubliuoja.",
       "aiGenerateNoRecording": "Įrašo nėra: DI po renginio reikalingas įrašas (fiksuojama tik renginio metu). Postprodukciją vis tiek galite tvarkyti čia.",
-      "duplicateNext": "Dubliuoti kitam kartui",
+      "duplicateNext": "Dubliuoti",
       "duplicateNextBusy": "Dubliuojama…",
-      "duplicateNextHint": "Sukuria juodraštį su visa šio renginio konfigūracija (įrašymas, atskiri takeliai, DI, darbotvarkė, priminimai). Jei renginys yra periodinis, data perkeliama į kitą kartą; kitu atveju ją reikia nustatyti patiems.",
+      "duplicateNextHint": "Sukuria juodraščio kopiją su visais šio renginio nustatymais. Jei renginys kartojasi, kopija prasideda nuo kito renginio; kitaip jos datos tokios pačios ir jas reikia atnaujinti.",
       "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą.",
       "capacitySection": "Talpa ir infrastruktūra",
       "capacitySubtitle": "Pritaikyta maždaug {max} numatomiems dalyviams",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Paskelbti nepavyko",
         "publishFailedBody": "Renginys išsaugotas kaip juodraštis: paskelbkite jį šiame puslapyje, kai problema bus išspręsta.",
         "unsaved": "Neišsaugota: {items}. Galite juos pridėti šiame puslapyje.",
-        "copyParticipantLink": "Kopijuoti nuorodą dalyviams",
         "sendToSpeakers": "Moderatorių ir pranešėjų nuorodos",
         "close": "Uždaryti santrauką",
         "publishNow": "Skelbti dabar"
-      }
+      },
+      "editFeatures": "Redaguoti funkcijas",
+      "editPrivacy": "Redaguoti privatumą ir duomenis"
     },
     "rubrica": {
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (GDPR/BDAR str. 6.1.a). Profilio informacija automatiškai atnaujinama kiekvieną kartą iš naujo registruojantis.",
@@ -3811,7 +3802,10 @@
       "confirm": "Taip, visi sutiko",
       "cancel": "Atšaukti",
       "waiting": "Viso įrašo transkripcija nepradėta automatiškai: šis renginys kiekvieno paprašė sutikimo transkribuoti jo pasisakymus. Pradėkite ją mygtuku {button} tik jei sutiko visi, kurie kalba įraše; kitaip lieka transkripcija iš subtitrų."
-    }
+    },
+    "editCopyTitle": "Renginio kopija",
+    "editCopyNoticeNext": "Dirbate su juodraščio kopija: pradinis renginys nesikeičia. Data jau nustatyta kitam renginiui: patikrinkite kitus duomenis ir išsaugokite.",
+    "editCopyNoticeSameDates": "Dirbate su juodraščio kopija: pradinis renginys nesikeičia. Jos datos tokios pačios kaip originalo: atnaujinkite jas prieš išsaugodami."
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Laukiama pradžios",
     "countdownHours": "{hours} val.",
     "countdownMinutes": "{minutes} min.",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Iki numatytos pradžios ({when}) liko daugiau nei 30 minučių. Pradėjus dabar, kiekvienas, turintis nuorodą, iškart įeis ir vaizdo kambarys įsijungs: paspauskite dar kartą, kad patvirtintumėte.",
+    "startEarlyYes": "Pradėti dabar",
+    "startEarlyNo": "Laukti numatyto laiko"
   },
   "recording": {
     "management": "Vaizdo įrašas",

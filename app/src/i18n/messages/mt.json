@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Sakemm il-programm ikun mitfi, tibqa' l-aħħar verżjoni ssejvjata: il-bidliet li ssir hawn jiġu ssejvjati biss jekk terġa' tixgħlu.",
         "toggleOffWarningCreate": "Meta jkun mitfi, il-programm ({count, plural, one {# suġġett} other {# suġġetti}}) ma jidhirx fil-paġna u ma jiġix issejvjat mal-avveniment: ixgħlu biex iżżommu.",
         "reviewOffCreate": "Programm: mitfi, ma jiġix issejvjat mal-avveniment ({count, plural, one {# suġġett} other {# suġġetti}})"
-      }
+      },
+      "saveCopy": "Issejvja l-kopja"
     },
     "nav": {
       "events": "Avvenimenti",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Avveniment imħassar",
     "publishSuccess": "Avveniment ippubblikat",
     "unpublishSuccess": "Avveniment irtirat",
-    "startEvent": "Ibda l-avveniment",
-    "startEventSuccess": "Avveniment beda! Il-parteċipanti li qed jistennew se jiġu ridirezzjonati awtomatikament.",
-    "startEventConfirmTitle": "Tibda l-avveniment?",
-    "startEventConfirmMessage": "Bidu skedat: {when}. Kull min għandu l-link jista' jidħol minnufih, u s-sala tal-vidjo tibda issa.",
-    "startEventConfirmEarly": "Għad fadal aktar minn 30 minuta għall-bidu.",
-    "startEventFailed": "L-avveniment ma bediex. Erġa' pprova.",
-    "jvbWarmupWarning": "Is-servers tal-vidjo qed jinxtegħlu (~2 minuti). Il-parteċipanti se jaraw avviż fis-sala tal-istennija.",
     "eventIsLive": "L-avveniment huwa ħaj",
     "liveParticipants": "{count} fi stanza / {max} max",
     "joinAsModeratorBtn": "Idħol bħala moderatur",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Link rapidu għal invitaru wieħed parteċipant lill-aħħar momento: accedu bħal mistieden meta l'avveniment huwa mill-vivo, mingħajr timla il-form ta' reġistrazzjoni.",
       "callInvite": "Link għall-parteċipanti",
       "callInviteHint": "Min jirċevih jidħol fis-sejħa bħala mistieden, mingħajr reġistrazzjoni. Sejħa rapida m'għandhiex paġna pubblika: din hija l-link li għandha tinqasam.",
-      "moderatorLink": "Link tal-moderatur",
+      "moderatorLink": "Link tal-ġestjoni (moderatur)",
       "moderatorLinkHint": "Aqsam dan il-link mal-moderaturi biss. Kull min għandu dan il-link jista' jimmaniġġja l-avveniment.",
       "liveRoomHint": "Link għal tidħol direttamentità fil-stanza bħal moderatur.",
       "copyLink": "Ikkopja l-link",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Ebda avveniment} one {# avveniment} other {# avvenimenti}}",
       "menu": {
         "actionsFor": "Azzjonijiet għal “{title}”",
-        "manage": "Immaniġġja",
         "edit": "Editja",
-        "openPublic": "Iftaħ il-paġna pubblika",
-        "newTab": "(tinfetaħ f’tab ġdida)",
         "copyLink": "Ikkopja l-link pubbliku",
         "linkCopied": "Link ikkupjat",
         "publish": "Ippubblika",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "“{title}” se jisparixxi mill-paġni pubbliċi sakemm terġa’ tippubblikah. Ir-reġistrazzjonijiet diġà riċevuti jinżammu.",
         "published": "Avveniment ippubblikat",
         "unpublished": "Avveniment irtirat",
-        "duplicate": "Idduplika bħala l-okkażjoni li jmiss",
+        "duplicate": "Idduplika",
         "delete": "Ħassar",
         "deleteTitle": "Tħassar l-avveniment?",
         "deleteMessage": "“{title}” u d-data kollha tiegħu se jitħassru. Din l-azzjoni ma tistax titreġġa’ lura.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, wara l-password tal-avveniment.",
       "participantHintPage": "Jinfetaħ f'tab ġdida: il-paġna pubblika kif jarawha l-parteċipanti.",
       "editEvent": "Editja l-avveniment",
-      "editSettings": "Editja impostazioni",
       "featureSummary": "Funzionalità attive",
       "organizers": "Organizzaturi",
       "privacyGdpr": "Privatezza & GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Il-pipeline tal-AI ma setgħetx tinbeda. Iċċekkja li l-AI hija attivata fil-livell tas-sit u li teżisti reġistrazzjoni.",
       "aiGenerateHelp": "Tattiva t-traskrizzjoni u s-sommarju bl-AI u tibda l-pipeline fuq ir-reġistrazzjoni, bi klikk waħda. Idempotenti: klikk darbtejn ma tiddoppjax ix-xogħlijiet.",
       "aiGenerateNoRecording": "L-ebda reġistrazzjoni: l-AI ta' wara l-avveniment teħtieġ reġistrazzjoni (il-qbid isir biss matul l-avveniment). Xorta tista' timmaniġġja l-post-produzzjoni minn hawn.",
-      "duplicateNext": "Idduplika għad-darba li jmiss",
+      "duplicateNext": "Idduplika",
       "duplicateNextBusy": "Qed jiġi dduplikat…",
-      "duplicateNextHint": "Joħloq abbozz bil-konfigurazzjoni sħiħa ta' dan l-avveniment (reġistrazzjoni, traċċi separati, AI, aġenda, tfakkiriet). Jekk l-avveniment għandu ċiklu regolari, id-data titmexxa għall-okkorrenza li jmiss; inkella tibqa' għalik biex tissettjaha.",
+      "duplicateNextHint": "Toħloq kopja abbozz bil-konfigurazzjoni kollha ta' dan l-avveniment. Jekk l-avveniment jirrepeti ruħu, il-kopja tibda mill-okkażjoni li jmiss; inkella għandha l-istess dati, li jridu jiġu aġġornati.",
       "duplicateNextError": "Id-duplikazzjoni ma rnexxietx. Erġa' pprova.",
       "capacitySection": "Kapaċità u infrastruttura",
       "capacitySubtitle": "Iddimensjonat għal madwar {max} parteċipant mistenni",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Il-pubblikazzjoni ma rnexxietx",
         "publishFailedBody": "L-avveniment huwa ssejvjat bħala abbozz: ippubblikah minn din il-paġna meta tissolva l-problema.",
         "unsaved": "Ma ġewx issejvjati: {items}. Tista' żżidhom minn din il-paġna.",
-        "copyParticipantLink": "Ikkopja l-link għall-parteċipanti",
         "sendToSpeakers": "Links tal-moderaturi u tal-kelliema",
         "close": "Agħlaq is-sommarju",
         "publishNow": "Ippubblika issa"
-      }
+      },
+      "editFeatures": "Editja l-funzjonijiet",
+      "editPrivacy": "Editja l-privatezza u d-data"
     },
     "rubrica": {
       "subtitle": "Personu chu hsena datum kunsens lill-inserimento fi direttorju (art. 6.1.a GDPR). Lu informazzjoni ta' profilo vengono aġġornatu awtomatikament ad kull re-reġistrazzjoni.",
@@ -3811,7 +3802,10 @@
       "confirm": "Iva, kulħadd ta l-kunsens",
       "cancel": "Ikkanċella",
       "waiting": "It-traskrizzjoni tar-reġistrazzjoni sħiħa ma bdietx waħedha: dan l-avveniment talab lil kulħadd il-kunsens għat-traskrizzjoni ta{button}«Iġġenera bl-IA» biss jekk kull min jitkellem fir-reġistrazzjoni ta l-kunsens tiegħu; inkella tibqa' t-traskrizzjoni mis-sottotitoli."
-    }
+    },
+    "editCopyTitle": "Kopja tal-avveniment",
+    "editCopyNoticeNext": "Qed taħdem fuq kopja abbozz: l-avveniment oriġinali ma jinbidilx. Id-data diġà hija dik tal-okkażjoni li jmiss: iċċekkja l-bqija u ssejvja.",
+    "editCopyNoticeSameDates": "Qed taħdem fuq kopja abbozz: l-avveniment oriġinali ma jinbidilx. Għandha l-istess dati tal-oriġinal: aġġornahom qabel tissejvja."
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Qed nistennew il-bidu",
     "countdownHours": "{hours}h",
     "countdownMinutes": "{minutes}m",
-    "countdownSeconds": "{seconds}s"
+    "countdownSeconds": "{seconds}s",
+    "startEarlyConfirm": "Għad baqa' aktar minn 30 minuta għall-bidu ppjanat ({when}). Jekk tibda issa, kull min għandu l-link jidħol mill-ewwel u l-kamra tal-vidjo tinxtegħel: agħfas mill-ġdid biex tikkonferma.",
+    "startEarlyYes": "Ibda issa",
+    "startEarlyNo": "Stenna l-ħin ippjanat"
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

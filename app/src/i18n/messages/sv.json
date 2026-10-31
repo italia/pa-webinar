@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Så länge programmet är avslaget gäller den senast sparade versionen: ändringar som görs här sparas bara om du slår på det igen.",
         "toggleOffWarningCreate": "Avslaget visas programmet ({count, plural, one {# ämne} other {# ämnen}}) inte på sidan och sparas inte med evenemanget: slå på det för att behålla det.",
         "reviewOffCreate": "Program: av, sparas inte med evenemanget ({count, plural, one {# ämne} other {# ämnen}})"
-      }
+      },
+      "saveCopy": "Spara kopian"
     },
     "nav": {
       "events": "Evenemang",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Evenemang raderat",
     "publishSuccess": "Evenemang publicerat",
     "unpublishSuccess": "Evenemanget avpublicerat",
-    "startEvent": "Starta evenemang",
-    "startEventSuccess": "Evenemanget startat! Väntande deltagare omdirigeras automatiskt.",
-    "startEventConfirmTitle": "Starta evenemanget?",
-    "startEventConfirmMessage": "Planerad start: {when}. Alla med länken kan ansluta direkt, och videorummet startar nu.",
-    "startEventConfirmEarly": "Det är mer än 30 minuter kvar till start.",
-    "startEventFailed": "Evenemanget startade inte. Försök igen.",
-    "jvbWarmupWarning": "Videoservrarna startar upp (ca 2 minuter). Deltagare ser ett meddelande i väntrummet.",
     "eventIsLive": "Evenemanget pågår",
     "liveParticipants": "{count} i rummet / {max} max",
     "joinAsModeratorBtn": "Delta som moderator",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Snabb länk för att bjuda in en deltagare i sista minuten: ansluter som gäst medan evenemanget är live, utan att fylla i anmälningsformuläret.",
       "callInvite": "Länk för deltagare",
       "callInviteHint": "Den som får den ansluter till samtalet som gäst, utan anmälan. Ett snabbsamtal har ingen offentlig sida: det här är länken att dela.",
-      "moderatorLink": "Moderatorlänk",
+      "moderatorLink": "Hanteringslänk (moderator)",
       "moderatorLinkHint": "Dela enbart denna länk med moderatorer. Alla med denna länk kan hantera evenemanget.",
       "liveRoomHint": "Direktlänk för att gå direkt in i rummet som moderator.",
       "copyLink": "Kopiera länk",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Inga evenemang} one {# evenemang} other {# evenemang}}",
       "menu": {
         "actionsFor": "Åtgärder för ”{title}”",
-        "manage": "Hantera",
         "edit": "Redigera",
-        "openPublic": "Öppna den offentliga sidan",
-        "newTab": "(öppnas i en ny flik)",
         "copyLink": "Kopiera den offentliga länken",
         "linkCopied": "Länken kopierad",
         "publish": "Publicera",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "”{title}” försvinner från de offentliga sidorna tills du publicerar det igen. Redan mottagna anmälningar sparas.",
         "published": "Evenemanget publicerat",
         "unpublished": "Evenemanget avpublicerat",
-        "duplicate": "Duplicera som nästa tillfälle",
+        "duplicate": "Duplicera",
         "delete": "Ta bort",
         "deleteTitle": "Ta bort evenemanget?",
         "deleteMessage": "”{title}” och alla dess data tas bort. Det går inte att ångra.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Öppnas i en ny flik: rummet som en gäst ser det, efter evenemangets lösenord.",
       "participantHintPage": "Öppnas i en ny flik: den offentliga sidan som deltagarna ser den.",
       "editEvent": "Redigera evenemang",
-      "editSettings": "Redigera inställningar",
       "featureSummary": "Aktiva funktioner",
       "organizers": "Arrangörer",
       "privacyGdpr": "Integritet och GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "Det gick inte att starta AI-pipelinen. Kontrollera att AI är aktiverat för hela webbplatsen och att det finns en inspelning.",
       "aiGenerateHelp": "Aktiverar AI-transkription och sammanfattning och startar pipelinen på inspelningen, med ett klick. Idempotent: att klicka två gånger dubblerar inte jobben.",
       "aiGenerateNoRecording": "Ingen inspelning: AI efter evenemanget kräver en inspelning (inspelning sker bara under evenemanget). Du kan ändå hantera efterproduktionen här.",
-      "duplicateNext": "Duplicera till nästa gång",
+      "duplicateNext": "Duplicera",
       "duplicateNextBusy": "Duplicerar…",
-      "duplicateNextHint": "Skapar ett utkast med hela konfigurationen från det här evenemanget (inspelning, separata spår, AI, agenda, påminnelser). Om evenemanget är återkommande flyttas datumet till nästa tillfälle; annars får du ange det själv.",
+      "duplicateNextHint": "Skapar en kopia som utkast med evenemangets hela konfiguration. Om evenemanget upprepas börjar kopian vid nästa tillfälle; annars har den samma datum, som behöver uppdateras.",
       "duplicateNextError": "Dupliceringen misslyckades. Försök igen.",
       "capacitySection": "Kapacitet och infrastruktur",
       "capacitySubtitle": "Dimensionerat för omkring {max} förväntade deltagare",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Publiceringen misslyckades",
         "publishFailedBody": "Evenemanget är sparat som utkast: publicera det från den här sidan när problemet är löst.",
         "unsaved": "Inte sparade: {items}. Du kan lägga till dem från den här sidan.",
-        "copyParticipantLink": "Kopiera länken för deltagare",
         "sendToSpeakers": "Länkar för moderatorer och talare",
         "close": "Stäng sammanfattningen",
         "publishNow": "Publicera nu"
-      }
+      },
+      "editFeatures": "Redigera funktioner",
+      "editPrivacy": "Redigera integritet och data"
     },
     "rubrica": {
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
@@ -3811,7 +3802,10 @@
       "confirm": "Ja, alla har samtyckt",
       "cancel": "Avbryt",
       "waiting": "Transkriberingen av hela inspelningen startade inte av sig själv: det här evenemanget bad var och en om samtycke till att det de säger transkriberas. Starta den med {button} bara om alla som talar i inspelningen har samtyckt; annars finns transkriptionen från undertexterna kvar."
-    }
+    },
+    "editCopyTitle": "Kopia av evenemanget",
+    "editCopyNoticeNext": "Du arbetar med en kopia som utkast: det ursprungliga evenemanget ändras inte. Datumet är redan nästa tillfälle: kontrollera resten och spara.",
+    "editCopyNoticeSameDates": "Du arbetar med en kopia som utkast: det ursprungliga evenemanget ändras inte. Den har samma datum som originalet: uppdatera dem innan du sparar."
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Väntar på start",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Det är mer än 30 minuter kvar till den planerade starten ({when}). Om du startar nu kommer alla med länken in direkt och videorummet slås på: tryck igen för att bekräfta.",
+    "startEarlyYes": "Starta nu",
+    "startEarlyNo": "Vänta till den planerade tiden"
   },
   "recording": {
     "management": "Videoinspelning",

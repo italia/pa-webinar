@@ -1287,7 +1287,8 @@
         "offKeptEdit": "Dokud je program vypnutý, platí naposledy uložená verze: změny provedené zde se uloží, jen když ho znovu zapnete.",
         "toggleOffWarningCreate": "Vypnutý program ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}}) se na stránce nezobrazuje a s akcí se neuloží: zapněte ho, abyste ho zachovali.",
         "reviewOffCreate": "Program: vypnuto, s akcí se neuloží ({count, plural, one {# téma} few {# témata} many {# tématu} other {# témat}})"
-      }
+      },
+      "saveCopy": "Uložit kopii"
     },
     "nav": {
       "events": "Události",
@@ -1610,13 +1611,6 @@
     "deleteSuccess": "Událost smazána",
     "publishSuccess": "Událost publikována",
     "unpublishSuccess": "Událost stažena",
-    "startEvent": "Zahájit událost",
-    "startEventSuccess": "Událost zahájena! Čekající účastníci budou automaticky přesměrováni.",
-    "startEventConfirmTitle": "Spustit událost?",
-    "startEventConfirmMessage": "Plánovaný začátek: {when}. Kdokoli s odkazem se může hned připojit a videomístnost se spouští nyní.",
-    "startEventConfirmEarly": "Do začátku zbývá více než 30 minut.",
-    "startEventFailed": "Událost se nespustila. Zkuste to znovu.",
-    "jvbWarmupWarning": "Video servery se spouštějí (přibližně 2 minuty). Účastníci uvidí upozornění v čekárně.",
     "eventIsLive": "Událost právě probíhá",
     "liveParticipants": "{count} v místnosti / max. {max}",
     "joinAsModeratorBtn": "Připojit se jako moderátor",
@@ -1866,7 +1860,7 @@
       "guestJoinHint": "Rychlý odkaz pro pozvání účastníka na poslední chvíli: připojí se jako host během živé události bez vyplňování registračního formuláře.",
       "callInvite": "Odkaz pro účastníky",
       "callInviteHint": "Kdo jej obdrží, připojí se k hovoru jako host, bez registrace. Rychlý hovor nemá veřejnou stránku: sdílejte tento odkaz.",
-      "moderatorLink": "Odkaz moderátora",
+      "moderatorLink": "Odkaz pro správu (moderátor)",
       "moderatorLinkHint": "Tento odkaz sdílejte pouze s moderátory. Kdokoli s tímto odkazem může událost spravovat.",
       "liveRoomHint": "Odkaz pro přímý vstup do místnosti jako moderátor.",
       "copyLink": "Kopírovat odkaz",
@@ -2702,10 +2696,7 @@
       "resultsCount": "{count, plural, =0 {Žádné události} one {# událost} few {# události} other {# událostí}}",
       "menu": {
         "actionsFor": "Akce pro „{title}“",
-        "manage": "Spravovat",
         "edit": "Upravit",
-        "openPublic": "Otevřít veřejnou stránku",
-        "newTab": "(otevře se na nové kartě)",
         "copyLink": "Kopírovat veřejný odkaz",
         "linkCopied": "Odkaz zkopírován",
         "publish": "Zveřejnit",
@@ -2714,7 +2705,7 @@
         "unpublishMessage": "„{title}“ zmizí z veřejných stránek, dokud ji znovu nezveřejníte. Již přijaté registrace zůstanou zachovány.",
         "published": "Událost zveřejněna",
         "unpublished": "Událost stažena",
-        "duplicate": "Duplikovat jako další konání",
+        "duplicate": "Duplikovat",
         "delete": "Smazat",
         "deleteTitle": "Smazat událost?",
         "deleteMessage": "„{title}“ a všechna její data budou smazána. Tuto akci nelze vrátit.",
@@ -2772,7 +2763,6 @@
       "participantHintPassword": "Otevře se na nové kartě: místnost tak, jak ji vidí host, po zadání hesla události.",
       "participantHintPage": "Otevře se na nové kartě: veřejná stránka tak, jak ji vidí účastníci.",
       "editEvent": "Upravit událost",
-      "editSettings": "Upravit nastavení",
       "featureSummary": "Aktivní funkce",
       "organizers": "Organizátoři",
       "privacyGdpr": "Soukromí a GDPR",
@@ -2825,9 +2815,9 @@
       "aiGenerateError": "AI pipeline se nepodařilo spustit. Ověřte, že je AI zapnutá na úrovni webu a že existuje záznam.",
       "aiGenerateHelp": "Jediným kliknutím zapne AI přepis a shrnutí a spustí pipeline nad záznamem. Idempotentní: dvojí kliknutí úlohy nezduplikuje.",
       "aiGenerateNoRecording": "Žádný záznam: AI po události vyžaduje záznam (nahrávání probíhá jen v průběhu události). Postprodukci zde přesto můžete spravovat.",
-      "duplicateNext": "Duplikovat pro příště",
+      "duplicateNext": "Duplikovat",
       "duplicateNextBusy": "Duplikuji…",
-      "duplicateNextHint": "Vytvoří koncept s celou konfigurací této události (nahrávání, oddělené stopy, AI, agenda, připomínky). Pokud se událost pravidelně opakuje, datum se posune na další výskyt; jinak jej doplníte sami.",
+      "duplicateNextHint": "Vytvoří kopii v konceptu s celým nastavením této akce. Pokud se akce opakuje, kopie začíná dalším konáním; jinak má stejná data, která je třeba upravit.",
       "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu.",
       "capacitySection": "Kapacita a infrastruktura",
       "capacitySubtitle": "Dimenzováno pro přibližně {max} očekávaných účastníků",
@@ -2839,11 +2829,12 @@
         "publishFailedTitle": "Zveřejnění se nezdařilo",
         "publishFailedBody": "Událost je uložena jako koncept: zveřejněte ji na této stránce, až bude problém vyřešen.",
         "unsaved": "Neuloženo: {items}. Můžete je přidat na této stránce.",
-        "copyParticipantLink": "Kopírovat odkaz pro účastníky",
         "sendToSpeakers": "Odkazy moderátorů a řečníků",
         "close": "Zavřít souhrn",
         "publishNow": "Zveřejnit hned"
-      }
+      },
+      "editFeatures": "Upravit funkce",
+      "editPrivacy": "Upravit soukromí a data"
     },
     "rubrica": {
       "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Informace v profilu se automaticky aktualizují při každé opětovné registraci.",
@@ -3811,7 +3802,10 @@
       "confirm": "Ano, všichni souhlasili",
       "cancel": "Zrušit",
       "waiting": "Přepis celého záznamu se nespustil sám: tato akce požádala každého o souhlas s přepisem jeho příspěvků. Spusťte ho tlačítkem {button} jen tehdy, pokud souhlasili všichni, kdo v záznamu mluví; jinak zůstane přepis z titulků."
-    }
+    },
+    "editCopyTitle": "Kopie akce",
+    "editCopyNoticeNext": "Pracujete na kopii v konceptu: původní akce se nemění. Datum je už nastavené na další konání: zkontrolujte zbytek a uložte.",
+    "editCopyNoticeSameDates": "Pracujete na kopii v konceptu: původní akce se nemění. Má stejná data jako originál: před uložením je upravte."
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",
@@ -5329,7 +5323,10 @@
     "waitingForStartButton": "Čeká se na zahájení",
     "countdownHours": "{hours} h",
     "countdownMinutes": "{minutes} min",
-    "countdownSeconds": "{seconds} s"
+    "countdownSeconds": "{seconds} s",
+    "startEarlyConfirm": "Do plánovaného začátku ({when}) zbývá víc než 30 minut. Když akci spustíte teď, kdokoli s odkazem hned vstoupí a zapne se videomístnost: potvrďte dalším stisknutím.",
+    "startEarlyYes": "Spustit teď",
+    "startEarlyNo": "Počkat na plánovaný čas"
   },
   "recording": {
     "management": "Videozáznam",

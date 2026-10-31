@@ -14,7 +14,7 @@ import { test, expect, type Page } from '@playwright/test';
  */
 
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev_admin_key_2026';
-const DUPLICA = 'Duplica come prossima occorrenza';
+const DUPLICA = 'Duplica';
 
 // Un solo accesso per file: il login dell'amministrazione ha un limite di
 // tentativi, e ogni prova ne chiederebbe uno.
