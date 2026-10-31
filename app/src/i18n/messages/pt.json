@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Temas sem quem intervenha, porque a pessoa foi removida do evento: {count}.",
         "programFrozen": "A agenda já foi usada na sala: vê-se aqui, mas altera-se a partir da sala.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Opcional: a lista das pessoas que convida. A inscrição está aberta, por isso após a publicação qualquer pessoa pode inscrever-se, convidada ou não. A plataforma não envia convites: partilhe você a ligação do evento.",
-        "invitationsHelpRestricted": "A inscrição está restrita: só os endereços desta lista se podem inscrever. A plataforma não envia convites: partilhe você a ligação do evento; a ligação para entrar chega por e-mail após a inscrição.",
+        "invitationsHelpOpen": "As pessoas que convida. A inscrição está aberta: qualquer pessoa se pode inscrever, convidada ou não. Depois de publicar, envia-lhes o convite por e-mail a partir da página do evento.",
+        "invitationsHelpRestricted": "Só os endereços desta lista se podem inscrever. Depois de publicar, envia a cada um o convite por e-mail a partir da página do evento, com a ligação de inscrição; a ligação para entrar chega depois da inscrição.",
         "logoExternal": "A página pública só mostra logótipos carregados nesta plataforma: um logótipo de outro sítio não será apresentado.",
         "primaryProfileInvalid": "Verifique a organização e o endereço do logótipo.",
         "primaryMore": "Fotografia, entidade, logótipo e página pública",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Qualquer pessoa que se inscreva",
         "openDesc": "Quem quiser inscreve-se na página do evento",
-        "invitation": "Só quem convidar",
-        "invitationDesc": "A página continua visível, mas só os convidados se podem inscrever; sem inscrição não se entra"
+        "invitation": "Só pessoas convidadas",
+        "invitationDesc": "A página continua visível, mas só se inscreve quem está na lista; o convite com a ligação de inscrição é enviado por e-mail a partir da página do evento"
       },
-      "previewInvitation": "Só as pessoas que convidar se podem inscrever; ninguém entra sem inscrição.",
+      "previewInvitation": "Só se inscreve quem é convidado; sem inscrição não se entra.",
       "templateReplaces": "Um modelo traz as suas próprias definições em vez das respostas abaixo. O título, as datas e as pessoas escreve-os nos passos seguintes.",
       "instantBack": "Criar antes um evento agendado"
     },
@@ -3597,10 +3597,21 @@
       "status": "Estado",
       "roleSpeaker": "Orador",
       "registered": "Inscrito",
-      "notRegistered": "Ainda não inscrito",
       "organizersTitle": "Entidades organizadoras",
       "organizersEdit": "Editar entidades",
-      "organizersEmpty": "Nenhuma entidade indicada: a página pública não mostra quem organiza."
+      "organizersEmpty": "Nenhuma entidade indicada: a página pública não mostra quem organiza.",
+      "sendAll": "Enviar o convite a quem ainda não o recebeu ({count})",
+      "sending": "A enviar…",
+      "sendDone": "Convites a caminho: {sent}. Ignorados (já inscritos ou sem endereço): {skipped}.",
+      "sendError": "Não foi possível enviar: tente novamente.",
+      "sendNotPublished": "Os convites são enviados enquanto o evento aceita inscrições: depois de publicado e antes do fim.",
+      "invitedOn": "Convidado em {date}",
+      "notInvited": "Convite por enviar",
+      "send": "Enviar convite",
+      "resend": "Enviar de novo",
+      "actions": "Ações",
+      "sendTooMany": "Demasiados envios em pouco tempo: tente novamente dentro de um minuto.",
+      "sendRemaining": "Faltam {remaining}: carregue de novo para os enviar."
     },
     "closing": {
       "title": "Encerrar o evento",

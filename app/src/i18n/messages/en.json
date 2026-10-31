@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "{count, plural, one {One topic no longer has a speaker: the person was removed from the event.} other {# topics no longer have a speaker: the people were removed from the event.}}",
         "programFrozen": "The agenda has already been used in the room: you can see it here, but it is changed from the room.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Optional: the list of people you invite. Registration is open, so after publication anyone can register, invited or not. The platform sends no invitations: share the event link yourself.",
-        "invitationsHelpRestricted": "Registration is restricted: only the addresses in this list can register. The platform sends no invitations: share the event link yourself; the link to enter arrives by email after registering.",
+        "invitationsHelpOpen": "The people you invite yourself. Registration is open: anyone can register, invited or not. After publishing, you send these people the invitation by email from the event page.",
+        "invitationsHelpRestricted": "Only the addresses on this list can register. After publishing, you send each of them the invitation by email from the event page, with the registration link; the link to enter arrives after registering.",
         "logoExternal": "The public page shows only logos uploaded to this platform: a logo from another website will not be shown.",
         "primaryProfileInvalid": "Check the organization and the logo address.",
         "primaryMore": "Photo, organization, logo and public page",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Anyone who registers",
         "openDesc": "Anyone can register from the event page",
-        "invitation": "Only people you invite",
-        "invitationDesc": "The page stays visible, but only invitees can register; without registering, nobody gets in"
+        "invitation": "Invited people only",
+        "invitationDesc": "The page stays visible, but only people on the list can register; you send them the invitation with the registration link by email from the event page"
       },
-      "previewInvitation": "Only the people you invite can register; nobody gets in without registering.",
+      "previewInvitation": "Only invited people register; without registering, nobody enters.",
       "templateReplaces": "A template brings its own settings instead of the answers below. You write the title, dates and people in the next steps.",
       "instantBack": "Create a scheduled event instead"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Speaker",
       "registered": "Signed up",
-      "notRegistered": "Not signed up yet",
       "organizersTitle": "Organizing bodies",
       "organizersEdit": "Edit organizers",
-      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing."
+      "organizersEmpty": "No organizer listed: the public page doesn't show who is organizing.",
+      "sendAll": "Send the invitation to those who have not received it ({count})",
+      "sending": "Sending…",
+      "sendDone": "Invitations on their way: {sent}. Skipped, already registered or without an address: {skipped}.",
+      "sendError": "Sending failed: please try again.",
+      "sendNotPublished": "Invitations go out while the event accepts registrations: after publishing and before it ends.",
+      "invitedOn": "Invited on {date}",
+      "notInvited": "Invitation not sent",
+      "send": "Send invitation",
+      "resend": "Send again",
+      "actions": "Actions",
+      "sendTooMany": "Too many sends in a short time: try again in a minute.",
+      "sendRemaining": "{remaining} left: press again to send them."
     },
     "closing": {
       "title": "Close the event",

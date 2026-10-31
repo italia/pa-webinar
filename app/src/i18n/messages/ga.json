@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Ábhair gan chainteoir, mar baineadh an duine den ócáid: {count}.",
         "programFrozen": "Úsáideadh an clár oibre sa seomra cheana: feiceann tú anseo é, ach athraítear ón seomra é.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Roghnach: liosta na ndaoine a thugann tú cuireadh dóibh. Tá an clárú oscailte, mar sin tar éis an fhoilsithe is féidir le duine ar bith clárú, cuireadh nó gan chuireadh. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin.",
-        "invitationsHelpRestricted": "Tá an clárú srianta: ní féidir ach leis na seoltaí ar an liosta seo clárú. Ní sheolann an t-ardán cuirí: roinn nasc an imeachta tú féin; tagann an nasc le dul isteach trí ríomhphost tar éis clárú.",
+        "invitationsHelpOpen": "Na daoine a dtugann tú féin cuireadh dóibh. Tá an clárú oscailte: is féidir le duine ar bith clárú, le cuireadh nó gan é. Tar éis foilsiú, seolann tú an cuireadh chucu trí ríomhphost ó leathanach na hócáide.",
+        "invitationsHelpRestricted": "Ní féidir ach leis na seoltaí ar an liosta seo clárú. Tar éis foilsiú, seolann tú an cuireadh chuig gach duine trí ríomhphost ó leathanach na hócáide, leis an nasc clárúcháin; tagann an nasc isteach tar éis clárú.",
         "logoExternal": "Ní thaispeánann an leathanach poiblí ach lógónna a uaslódáladh chuig an ardán seo: ní thaispeánfar lógó ó shuíomh eile.",
         "primaryProfileInvalid": "Seiceáil an eagraíocht agus seoladh an lógó.",
         "primaryMore": "Grianghraf, eagraíocht, lógó agus leathanach poiblí",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Duine ar bith a chláraíonn",
         "openDesc": "Cláraíonn duine ar bith ar mian leis ó leathanach an imeachta",
-        "invitation": "Na daoine a dtugann tú cuireadh dóibh amháin",
-        "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine a fuair cuireadh clárú; gan clárú ní féidir dul isteach"
+        "invitation": "Daoine a fuair cuireadh amháin",
+        "invitationDesc": "Fanann an leathanach le feiceáil, ach ní féidir ach le daoine ar an liosta clárú; seolann tú an cuireadh leis an nasc clárúcháin trí ríomhphost ó leathanach na hócáide"
       },
-      "previewInvitation": "Ní féidir ach leis na daoine a dtugann tú cuireadh dóibh clárú; ní théann aon duine isteach gan clárú.",
+      "previewInvitation": "Ní chláraíonn ach daoine a fuair cuireadh; gan clárú ní théann aon duine isteach.",
       "templateReplaces": "Tugann teimpléad a shocruithe féin in ionad na bhfreagraí thíos. Scríobhann tú an teideal, na dátaí agus na daoine sna céimeanna eile.",
       "instantBack": "Cruthaigh ócáid sceidealta ina ionad"
     },
@@ -3597,10 +3597,21 @@
       "status": "Stádas",
       "roleSpeaker": "Cainteoir",
       "registered": "Cláraithe",
-      "notRegistered": "Gan clárú fós",
       "organizersTitle": "Comhlachtaí eagraithe",
       "organizersEdit": "Cuir na comhlachtaí in eagar",
-      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú."
+      "organizersEmpty": "Níl aon chomhlacht luaite: ní thaispeánann an leathanach poiblí cé atá á eagrú.",
+      "sendAll": "Seol an cuireadh chuig na daoine nach bhfuair é ({count})",
+      "sending": "Á sheoladh…",
+      "sendDone": "Cuirí ar an mbealach: {sent}. Scipeáilte (cláraithe cheana nó gan seoladh): {skipped}.",
+      "sendError": "Theip ar an seoladh: bain triail eile as.",
+      "sendNotPublished": "Seoltar cuirí fad a ghlacann an ócáid le clárúcháin: tar éis foilsiú agus roimh an deireadh.",
+      "invitedOn": "Tugadh cuireadh ar {date}",
+      "notInvited": "Cuireadh nár seoladh",
+      "send": "Seol cuireadh",
+      "resend": "Seol arís",
+      "actions": "Gníomhartha",
+      "sendTooMany": "An iomarca seoltaí in achar gearr: bain triail eile as i gceann nóiméid.",
+      "sendRemaining": "{remaining} fágtha: brúigh arís chun iad a sheoladh."
     },
     "closing": {
       "title": "Dún an imeacht",

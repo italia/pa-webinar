@@ -17,9 +17,11 @@ import { informativaEvento } from '@/lib/events/privacy-notice';
 import { anteprimaEventoPubblico } from '@/lib/events/meta-title';
 import { recordingAvailable } from '@/lib/recording/availability';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
+import { invitoDaToken } from '@/lib/email/invitation';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ invito?: string | string[] }>;
 }
 
 export async function generateMetadata({
@@ -43,8 +45,10 @@ export async function generateMetadata({
 
 export default async function RegistrationPage({
   params,
+  searchParams,
 }: RegistrationPageProps) {
   const { slug } = await params;
+  const { invito: tokenInvito } = (await searchParams) ?? {};
   const locale = await getLocale();
   const t = await getTranslations('registration');
   const format = await getFormatter();
@@ -76,6 +80,14 @@ export default async function RegistrationPage({
   const registrationAccess = await registrationAccessFor(
     event,
     settings.publicRegistrationEnabled,
+  );
+
+  // Arrivati dall'email d'invito: il modulo parte con nome e indirizzo
+  // dell'invito (lib/email/invitation). L'indirizzo si puo' cambiare; con
+  // l'iscrizione solo su invito deve restare uno degli invitati.
+  const invito = await invitoDaToken(
+    event.id,
+    typeof tokenInvito === 'string' ? tokenInvito : null,
   );
 
   // La stessa informativa che legge in sala d'attesa chi entra senza
@@ -124,6 +136,7 @@ export default async function RegistrationPage({
 
           <RegistrationFormClient
             eventSlug={slug}
+            invito={invito}
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             // Un'installazione che non può registrare non chiede il consenso

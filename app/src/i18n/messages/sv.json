@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Ämnen utan talare, eftersom personen har tagits bort från evenemanget: {count}.",
         "programFrozen": "Dagordningen har redan använts i rummet: du ser den här, men den ändras från rummet.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valfritt: listan över de personer du bjuder in. Anmälan är öppen, så efter publicering kan vem som helst anmäla sig, inbjuden eller inte. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget.",
-        "invitationsHelpRestricted": "Anmälan är begränsad: endast adresserna i den här listan kan anmäla sig. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget; länken för att delta kommer via e-post efter anmälan.",
+        "invitationsHelpOpen": "De personer du själv bjuder in. Anmälan är öppen: vem som helst kan anmäla sig, inbjuden eller inte. Efter publiceringen skickar du inbjudan via e-post från evenemangssidan.",
+        "invitationsHelpRestricted": "Bara adresserna på den här listan kan anmäla sig. Efter publiceringen skickar du inbjudan via e-post från evenemangssidan till var och en, med anmälningslänken; länken för att komma in kommer efter anmälan.",
         "logoExternal": "Den offentliga sidan visar bara logotyper som laddats upp till den här plattformen: en logotyp från en annan webbplats visas inte.",
         "primaryProfileInvalid": "Kontrollera organisationen och logotypens adress.",
         "primaryMore": "Foto, organisation, logotyp och offentlig sida",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Alla som anmäler sig",
         "openDesc": "Den som vill anmäler sig från evenemangets sida",
-        "invitation": "Bara de du bjuder in",
-        "invitationDesc": "Sidan förblir synlig, men bara inbjudna kan anmäla sig; utan anmälan kommer man inte in"
+        "invitation": "Endast inbjudna",
+        "invitationDesc": "Sidan förblir synlig, men bara de som står på listan kan anmäla sig; inbjudan med anmälningslänken skickar du via e-post från evenemangssidan"
       },
-      "previewInvitation": "Bara de du bjuder in kan anmäla sig; ingen kommer in utan anmälan.",
+      "previewInvitation": "Bara inbjudna anmäler sig; utan anmälan kommer ingen in.",
       "templateReplaces": "En mall tar med sina egna inställningar i stället för svaren nedan. Titel, datum och personer fyller du i de följande stegen.",
       "instantBack": "Skapa ett schemalagt evenemang i stället"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Talare",
       "registered": "Anmäld",
-      "notRegistered": "Inte anmäld ännu",
       "organizersTitle": "Arrangerande organisationer",
       "organizersEdit": "Redigera organisationer",
-      "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar."
+      "organizersEmpty": "Ingen organisation angiven: den offentliga sidan visar inte vem som arrangerar.",
+      "sendAll": "Skicka inbjudan till dem som inte har fått den ({count})",
+      "sending": "Skickar…",
+      "sendDone": "Inbjudningar på väg: {sent}. Hoppade över (redan anmälda eller utan adress): {skipped}.",
+      "sendError": "Det gick inte att skicka: försök igen.",
+      "sendNotPublished": "Inbjudningar skickas medan evenemanget tar emot anmälningar: efter publiceringen och före slutet.",
+      "invitedOn": "Inbjuden {date}",
+      "notInvited": "Inbjudan inte skickad",
+      "send": "Skicka inbjudan",
+      "resend": "Skicka igen",
+      "actions": "Åtgärder",
+      "sendTooMany": "För många utskick på kort tid: försök igen om en minut.",
+      "sendRemaining": "{remaining} kvar: tryck igen för att skicka dem."
     },
     "closing": {
       "title": "Avsluta evenemanget",

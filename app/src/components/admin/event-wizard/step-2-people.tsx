@@ -185,12 +185,17 @@ export default function StepPeople({
 
       {iscrizione}
 
-      <InvitationsSection
-        value={value.invitations}
-        onChange={(next) => onChange({ invitations: next })}
-        locked={invitationsLocked}
-        publicRegistrationEnabled={publicRegistrationEnabled}
-      />
+      {/* Con l'iscrizione solo su invito l'elenco sta dentro quella scelta
+          (SezioneIscrizione); qui resta per l'iscrizione aperta, dove chi
+          organizza invita di persona chi vuole. */}
+      {(publicRegistrationEnabled || !iscrizione) && (
+        <InvitationsSection
+          value={value.invitations}
+          onChange={(next) => onChange({ invitations: next })}
+          locked={invitationsLocked}
+          publicRegistrationEnabled={publicRegistrationEnabled}
+        />
+      )}
     </div>
   );
 }
@@ -1000,16 +1005,20 @@ function PeopleSection({
   );
 }
 
-function InvitationsSection({
+export function InvitationsSection({
   value,
   onChange,
   locked,
   publicRegistrationEnabled,
+  inline = false,
 }: {
   value: InvitationEntry[];
   onChange: (next: InvitationEntry[]) => void;
   locked: boolean;
   publicRegistrationEnabled: boolean;
+  /** Dentro la scelta «solo le persone invitate»: aperto, senza riquadro
+   *  da aprire. */
+  inline?: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'inv';
@@ -1056,16 +1065,8 @@ function InvitationsSection({
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
-  return (
-    <Gruppo
-      title={t('invitationsHeading')}
-      help={t(
-        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
-      )}
-      count={value.length}
-      // Solo su invito l'elenco e' chi puo' iscriversi: lo si vede subito.
-      aperto={!publicRegistrationEnabled}
-    >
+  const contenuto = (
+    <>
       <AddedList
         items={value}
         keyOf={(inv) => inv.email}
@@ -1118,6 +1119,34 @@ function InvitationsSection({
           </div>
         </>
       )}
+    </>
+  );
+
+  if (inline) {
+    return (
+      <div className="wizard-invitati">
+        <p className="wizard-invitati__titolo">
+          {t('invitationsHeading')}
+          {value.length > 0 && (
+            <span className="badge rounded-pill ms-2 wizard-group__count">{value.length}</span>
+          )}
+        </p>
+        <p className="formato__nota mt-0 mb-2">{t('invitationsHelpRestricted')}</p>
+        {contenuto}
+      </div>
+    );
+  }
+  return (
+    <Gruppo
+      title={t('invitationsHeading')}
+      help={t(
+        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
+      )}
+      count={value.length}
+      // Solo su invito l'elenco e' chi puo' iscriversi: lo si vede subito.
+      aperto={!publicRegistrationEnabled}
+    >
+      {contenuto}
     </Gruppo>
   );
 }
@@ -1139,7 +1168,11 @@ export function SezioneIscrizione({
   bloccato = false,
   iniziale = null,
   questionari,
+  elencoInvitati,
 }: {
+  /** L'elenco degli invitati, mostrato dentro la scelta «solo le persone
+   *  invitate» quando la si sceglie. */
+  elencoInvitati?: React.ReactNode;
   accessMode: EventAccessModeValue | null;
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
@@ -1247,6 +1280,7 @@ export function SezioneIscrizione({
           <span>{t('accessNoInvitees')}</span>
         </p>
       )}
+      {effettivo === 'INVITATION' && elencoInvitati}
 
       <fieldset className="mt-3">
         <legend className="wizard-iscrizione__domanda">{t('askHeading')}</legend>

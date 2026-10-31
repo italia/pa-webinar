@@ -1334,7 +1334,8 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
       {canEditRegistrations && (
         <div className="mb-4">
           <EventInvitationsPanel eventId={event.id} invitationOnly={!event.registrationOpen}
-                                 editHref={editPeopleHref} />
+                                 editHref={editPeopleHref}
+                                 inviabile={linksMailable} />
         </div>
       )}
 

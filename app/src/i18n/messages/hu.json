@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Előadó nélküli témák, mert a személyt eltávolították az eseményből: {count}.",
         "programFrozen": "A napirendet a teremben már használták: itt látja, de a teremből módosítható.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Nem kötelező: az Ön által meghívottak listája. A regisztráció nyitott, így közzététel után bárki regisztrálhat, meghívott vagy sem. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg.",
-        "invitationsHelpRestricted": "A regisztráció korlátozott: csak a listán szereplő címek regisztrálhatnak. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg; a belépési hivatkozás a regisztráció után e-mailben érkezik.",
+        "invitationsHelpOpen": "Akiket Ön hív meg. A regisztráció nyitott: bárki regisztrálhat, meghívott vagy sem. Közzététel után az esemény oldaláról e-mailben küldi el nekik a meghívót.",
+        "invitationsHelpRestricted": "Csak a lista címei regisztrálhatnak. Közzététel után az esemény oldaláról mindenkinek e-mailben küldi el a meghívót a regisztrációs linkkel; a belépési link a regisztráció után érkezik.",
         "logoExternal": "A nyilvános oldal csak az erre a platformra feltöltött logókat mutatja: más webhelyről származó logó nem jelenik meg.",
         "primaryProfileInvalid": "Ellenőrizze a szervezetet és a logó címét.",
         "primaryMore": "Fénykép, intézmény, logó és nyilvános oldal",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Bárki, aki regisztrál",
         "openDesc": "Aki szeretne, az esemény oldalán regisztrál",
-        "invitation": "Csak a meghívottjai",
-        "invitationDesc": "Az oldal látható marad, de csak a meghívottak regisztrálhatnak; regisztráció nélkül nincs belépés"
+        "invitation": "Csak meghívottak",
+        "invitationDesc": "Az oldal látható marad, de csak a listán szereplők regisztrálhatnak; a regisztrációs linket tartalmazó meghívót az esemény oldaláról küldi e-mailben"
       },
-      "previewInvitation": "Csak az Ön által meghívottak regisztrálhatnak; regisztráció nélkül senki sem lép be.",
+      "previewInvitation": "Csak a meghívottak regisztrálnak; regisztráció nélkül nem lehet belépni.",
       "templateReplaces": "A sablon a saját beállításait hozza az alábbi válaszok helyett. A címet, a dátumokat és a személyeket a következő lépésekben adja meg.",
       "instantBack": "Inkább ütemezett esemény létrehozása"
     },
@@ -3597,10 +3597,21 @@
       "status": "Állapot",
       "roleSpeaker": "Előadó",
       "registered": "Jelentkezett",
-      "notRegistered": "Még nem jelentkezett",
       "organizersTitle": "Szervező intézmények",
       "organizersEdit": "Intézmények szerkesztése",
-      "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi."
+      "organizersEmpty": "Nincs megadva intézmény: a nyilvános oldal nem mutatja, ki szervezi.",
+      "sendAll": "Meghívó küldése azoknak, akik még nem kapták meg ({count})",
+      "sending": "Küldés…",
+      "sendDone": "Elküldött meghívók: {sent}. Kihagyva (már regisztrált vagy cím nélkül): {skipped}.",
+      "sendError": "A küldés nem sikerült: próbálja újra.",
+      "sendNotPublished": "A meghívók addig mennek ki, amíg az esemény fogad regisztrációt: közzététel után és a vége előtt.",
+      "invitedOn": "Meghívva: {date}",
+      "notInvited": "A meghívó nincs elküldve",
+      "send": "Meghívó küldése",
+      "resend": "Újraküldés",
+      "actions": "Műveletek",
+      "sendTooMany": "Túl sok küldés rövid idő alatt: próbálja újra egy perc múlva.",
+      "sendRemaining": "Még {remaining} maradt: nyomja meg újra a küldéshez."
     },
     "closing": {
       "title": "Az esemény lezárása",

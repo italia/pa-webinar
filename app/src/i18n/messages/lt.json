@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Temos be kalbėtojo, nes asmuo pašalintas iš renginio: {count}.",
         "programFrozen": "Darbotvarkė jau naudota kambaryje: čia ją matote, bet keičiama ji kambaryje.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Neprivaloma: jūsų kviečiamų asmenų sąrašas. Registracija atvira, todėl paskelbus gali registruotis bet kas, pakviestas ar ne. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys.",
-        "invitationsHelpRestricted": "Registracija ribota: registruotis gali tik šio sąrašo adresai. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys; įėjimo nuoroda atkeliauja el. paštu po registracijos.",
+        "invitationsHelpOpen": "Žmonės, kuriuos kviečiate patys. Registracija atvira: registruotis gali bet kas, pakviestas ar ne. Paskelbę jiems iš renginio puslapio išsiunčiate kvietimą el. paštu.",
+        "invitationsHelpRestricted": "Registruotis gali tik šio sąrašo adresai. Paskelbę kiekvienam iš renginio puslapio išsiunčiate kvietimą el. paštu su registracijos nuoroda; įėjimo nuoroda ateina po registracijos.",
         "logoExternal": "Viešame puslapyje rodomi tik į šią platformą įkelti logotipai: logotipas iš kitos svetainės nebus rodomas.",
         "primaryProfileInvalid": "Patikrinkite organizaciją ir logotipo adresą.",
         "primaryMore": "Nuotrauka, įstaiga, logotipas ir viešas puslapis",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Kiekvienas, kas užsiregistruoja",
         "openDesc": "Kas nori, užsiregistruoja renginio puslapyje",
-        "invitation": "Tik jūsų pakviesti",
-        "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik pakviestieji; neužsiregistravus patekti negalima"
+        "invitation": "Tik pakviestieji",
+        "invitationDesc": "Puslapis lieka matomas, bet registruotis gali tik sąraše esantys; kvietimą su registracijos nuoroda siunčiate el. paštu iš renginio puslapio"
       },
-      "previewInvitation": "Registruotis gali tik jūsų pakviesti; niekas nepateks neužsiregistravęs.",
+      "previewInvitation": "Registruojasi tik pakviestieji; be registracijos neįeinama.",
       "templateReplaces": "Šablonas atneša savo nustatymus vietoj toliau pateiktų atsakymų. Pavadinimą, datas ir žmones įrašote kituose žingsniuose.",
       "instantBack": "Vietoj to sukurti suplanuotą renginį"
     },
@@ -3597,10 +3597,21 @@
       "status": "Būsena",
       "roleSpeaker": "Pranešėjas",
       "registered": "Užsiregistravo",
-      "notRegistered": "Dar neužsiregistravo",
       "organizersTitle": "Organizuojančios institucijos",
       "organizersEdit": "Redaguoti institucijas",
-      "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja."
+      "organizersEmpty": "Institucija nenurodyta: viešajame puslapyje nerodoma, kas organizuoja.",
+      "sendAll": "Siųsti kvietimą tiems, kurie jo dar negavo ({count})",
+      "sending": "Siunčiama…",
+      "sendDone": "Siunčiami kvietimai: {sent}. Praleisti (jau užsiregistravę arba be adreso): {skipped}.",
+      "sendError": "Išsiųsti nepavyko: bandykite dar kartą.",
+      "sendNotPublished": "Kvietimai siunčiami, kol renginys priima registracijas: po paskelbimo ir prieš pabaigą.",
+      "invitedOn": "Pakviestas {date}",
+      "notInvited": "Kvietimas neišsiųstas",
+      "send": "Siųsti kvietimą",
+      "resend": "Siųsti dar kartą",
+      "actions": "Veiksmai",
+      "sendTooMany": "Per daug siuntimų per trumpą laiką: bandykite po minutės.",
+      "sendRemaining": "Liko {remaining}: paspauskite dar kartą, kad išsiųstumėte."
     },
     "closing": {
       "title": "Užbaigti renginį",

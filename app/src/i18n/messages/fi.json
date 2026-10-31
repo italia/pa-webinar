@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Aiheet ilman puhujaa, koska henkilö poistettiin tapahtumasta: {count}.",
         "programFrozen": "Esityslistaa on jo käytetty huoneessa: näet sen tässä, mutta sitä muutetaan huoneesta.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valinnainen: luettelo kutsumistasi henkilöistä. Ilmoittautuminen on avoin, joten julkaisun jälkeen kuka tahansa voi ilmoittautua, kutsuttu tai ei. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse.",
-        "invitationsHelpRestricted": "Ilmoittautuminen on rajattu: vain tämän luettelon osoitteet voivat ilmoittautua. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse; liittymislinkki tulee sähköpostilla ilmoittautumisen jälkeen.",
+        "invitationsHelpOpen": "Ihmiset, jotka kutsut itse. Ilmoittautuminen on avoin: kuka tahansa voi ilmoittautua, kutsuttu tai ei. Julkaisun jälkeen lähetät heille kutsun sähköpostilla tapahtuman sivulta.",
+        "invitationsHelpRestricted": "Vain tämän listan osoitteet voivat ilmoittautua. Julkaisun jälkeen lähetät jokaiselle kutsun sähköpostilla tapahtuman sivulta ilmoittautumislinkin kera; sisäänpääsylinkki tulee ilmoittautumisen jälkeen.",
         "logoExternal": "Julkisella sivulla näkyvät vain tälle alustalle ladatut logot: toiselta sivustolta tuleva logo ei näy.",
         "primaryProfileInvalid": "Tarkista organisaatio ja logon osoite.",
         "primaryMore": "Kuva, organisaatio, logo ja julkinen sivu",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Kuka tahansa, joka ilmoittautuu",
         "openDesc": "Kuka tahansa voi ilmoittautua tapahtuman sivulla",
-        "invitation": "Vain kutsumasi",
-        "invitationDesc": "Sivu pysyy näkyvissä, mutta vain kutsutut voivat ilmoittautua; ilman ilmoittautumista ei pääse sisään"
+        "invitation": "Vain kutsutut",
+        "invitationDesc": "Sivu pysyy näkyvissä, mutta ilmoittautua voivat vain listalla olevat; kutsun ilmoittautumislinkkeineen lähetät sähköpostilla tapahtuman sivulta"
       },
-      "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta.",
+      "previewInvitation": "Vain kutsutut ilmoittautuvat; ilman ilmoittautumista ei pääse sisään.",
       "templateReplaces": "Malli tuo omat asetuksensa alla olevien vastausten sijaan. Otsikon, päivämäärät ja henkilöt kirjoitat seuraavissa vaiheissa.",
       "instantBack": "Luo sen sijaan aikataulutettu tapahtuma"
     },
@@ -3597,10 +3597,21 @@
       "status": "Tila",
       "roleSpeaker": "Puhuja",
       "registered": "Ilmoittautunut",
-      "notRegistered": "Ei vielä ilmoittautunut",
       "organizersTitle": "Järjestävät organisaatiot",
       "organizersEdit": "Muokkaa organisaatioita",
-      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää."
+      "organizersEmpty": "Organisaatiota ei ole ilmoitettu: julkinen sivu ei näytä, kuka järjestää.",
+      "sendAll": "Lähetä kutsu niille, jotka eivät ole saaneet sitä ({count})",
+      "sending": "Lähetetään…",
+      "sendDone": "Lähteviä kutsuja: {sent}. Ohitettu (jo ilmoittautuneet tai ilman osoitetta): {skipped}.",
+      "sendError": "Lähetys epäonnistui: yritä uudelleen.",
+      "sendNotPublished": "Kutsut lähtevät, kun tapahtuma ottaa vastaan ilmoittautumisia: julkaisun jälkeen ja ennen loppua.",
+      "invitedOn": "Kutsuttu {date}",
+      "notInvited": "Kutsua ei lähetetty",
+      "send": "Lähetä kutsu",
+      "resend": "Lähetä uudelleen",
+      "actions": "Toiminnot",
+      "sendTooMany": "Liian monta lähetystä lyhyessä ajassa: yritä minuutin päästä uudelleen.",
+      "sendRemaining": "Jäljellä {remaining}: paina uudelleen lähettääksesi ne."
     },
     "closing": {
       "title": "Päätä tapahtuma",

@@ -54,6 +54,8 @@ interface RegistrationFormClientProps {
    *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
    *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
   registrationAccess?: RegistrationAccess;
+  /** Arrivati dall'email d'invito: nome e indirizzo dell'invito. */
+  invito?: { name: string | null; email: string } | null;
 }
 
 type FieldErrors = Partial<Record<string, string>>;
@@ -84,6 +86,7 @@ export default function RegistrationFormClient({
   waitingRoomLeadMinutes,
   profiling,
   registrationAccess = 'open',
+  invito = null,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
@@ -91,8 +94,8 @@ export default function RegistrationFormClient({
   const tlive = useTranslations('live');
   const router = useRouter();
 
-  const [displayName, setDisplayName] = useState('');
-  const [email, setEmail] = useState('');
+  const [displayName, setDisplayName] = useState(invito?.name ?? '');
+  const [email, setEmail] = useState(invito?.email ?? '');
   const [organization, setOrganization] = useState('');
   const [organizationRole, setOrganizationRole] = useState('');
   const [organizationType, setOrganizationType] = useState('');

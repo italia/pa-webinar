@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Témata bez vystupující osoby, protože osoba byla z akce odebrána: {count}.",
         "programFrozen": "Agenda už byla v místnosti použita: zde ji vidíte, ale mění se v místnosti.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Volitelné: seznam lidí, které zvete. Registrace je otevřená, takže po zveřejnění se může registrovat kdokoli, pozvaný i nepozvaný. Platforma pozvánky neposílá: odkaz na akci sdílejte sami.",
-        "invitationsHelpRestricted": "Registrace je omezená: registrovat se mohou jen adresy z tohoto seznamu. Platforma pozvánky neposílá: odkaz na akci sdílejte sami; odkaz pro vstup přijde e-mailem po registraci.",
+        "invitationsHelpOpen": "Lidé, které zvete vy. Registrace je otevřená: registrovat se může kdokoli, pozvaný i nepozvaný. Po zveřejnění jim ze stránky akce pošlete pozvánku e-mailem.",
+        "invitationsHelpRestricted": "Registrovat se mohou jen adresy z tohoto seznamu. Po zveřejnění každému ze stránky akce pošlete pozvánku e-mailem s odkazem k registraci; odkaz pro vstup přijde po registraci.",
         "logoExternal": "Veřejná stránka zobrazuje jen loga nahraná na tuto platformu: logo z jiného webu se nezobrazí.",
         "primaryProfileInvalid": "Zkontrolujte organizaci a adresu loga.",
         "primaryMore": "Fotografie, instituce, logo a veřejná stránka",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Každý, kdo se přihlásí",
         "openDesc": "Kdo chce, přihlásí se na stránce akce",
-        "invitation": "Jen vámi pozvaní",
-        "invitationDesc": "Stránka zůstává viditelná, ale přihlásit se mohou jen pozvaní; bez přihlášky se dovnitř nedostanete"
+        "invitation": "Pouze pozvaní",
+        "invitationDesc": "Stránka zůstává viditelná, ale registrovat se mohou jen lidé ze seznamu; pozvánku s odkazem k registraci pošlete e-mailem ze stránky akce"
       },
-      "previewInvitation": "Přihlásit se mohou jen vámi pozvaní; bez přihlášky se nikdo nedostane dovnitř.",
+      "previewInvitation": "Registrují se jen pozvaní; bez registrace se nevstoupí.",
       "templateReplaces": "Šablona přinese vlastní nastavení místo odpovědí níže. Název, data a osoby zadáte v dalších krocích.",
       "instantBack": "Vytvořit místo toho naplánovanou akci"
     },
@@ -3597,10 +3597,21 @@
       "status": "Stav",
       "roleSpeaker": "Řečník",
       "registered": "Přihlášen",
-      "notRegistered": "Dosud nepřihlášen",
       "organizersTitle": "Pořádající instituce",
       "organizersEdit": "Upravit instituce",
-      "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá."
+      "organizersEmpty": "Není uvedena žádná instituce: veřejná stránka neukazuje, kdo akci pořádá.",
+      "sendAll": "Poslat pozvánku těm, kdo ji ještě nedostali ({count})",
+      "sending": "Odesílání…",
+      "sendDone": "Odesílané pozvánky: {sent}. Přeskočeno (již registrovaní nebo bez adresy): {skipped}.",
+      "sendError": "Odeslání se nezdařilo: zkuste to znovu.",
+      "sendNotPublished": "Pozvánky se odesílají, dokud akce přijímá registrace: po zveřejnění a před jejím koncem.",
+      "invitedOn": "Pozván {date}",
+      "notInvited": "Pozvánka neodeslána",
+      "send": "Poslat pozvánku",
+      "resend": "Poslat znovu",
+      "actions": "Akce",
+      "sendTooMany": "Příliš mnoho odeslání za krátkou dobu: zkuste to za minutu.",
+      "sendRemaining": "Zbývá {remaining}: stiskněte znovu pro jejich odeslání."
     },
     "closing": {
       "title": "Uzavřít akci",

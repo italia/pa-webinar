@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Onderwerpen zonder spreker, omdat de persoon uit het evenement is verwijderd: {count}.",
         "programFrozen": "De agenda is al in de zaal gebruikt: u ziet hem hier, maar hij wordt vanuit de zaal gewijzigd.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Optioneel: de lijst van personen die u uitnodigt. De inschrijving is open, dus na publicatie kan iedereen zich inschrijven, uitgenodigd of niet. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf.",
-        "invitationsHelpRestricted": "De inschrijving is beperkt: alleen de adressen op deze lijst kunnen zich inschrijven. Het platform verstuurt geen uitnodigingen: deel de link van het evenement zelf; de link om binnen te komen volgt na inschrijving per e-mail.",
+        "invitationsHelpOpen": "De mensen die je zelf uitnodigt. De inschrijving is open: iedereen kan zich inschrijven, uitgenodigd of niet. Na publicatie stuur je hun de uitnodiging per e-mail vanaf de evenementpagina.",
+        "invitationsHelpRestricted": "Alleen de adressen op deze lijst kunnen zich inschrijven. Na publicatie stuur je iedereen vanaf de evenementpagina de uitnodiging per e-mail, met de inschrijflink; de link om binnen te komen volgt na de inschrijving.",
         "logoExternal": "De openbare pagina toont alleen logo's die naar dit platform zijn geüpload: een logo van een andere website wordt niet getoond.",
         "primaryProfileInvalid": "Controleer de organisatie en het adres van het logo.",
         "primaryMore": "Foto, organisatie, logo en openbare pagina",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Iedereen die zich aanmeldt",
         "openDesc": "Wie wil, meldt zich aan via de evenementpagina",
-        "invitation": "Alleen wie je uitnodigt",
-        "invitationDesc": "De pagina blijft zichtbaar, maar alleen genodigden kunnen zich aanmelden; zonder aanmelding kom je er niet in"
+        "invitation": "Alleen genodigden",
+        "invitationDesc": "De pagina blijft zichtbaar, maar alleen mensen op de lijst kunnen zich inschrijven; de uitnodiging met de inschrijflink stuur je per e-mail vanaf de evenementpagina"
       },
-      "previewInvitation": "Alleen wie je uitnodigt kan zich aanmelden; zonder aanmelding komt niemand binnen.",
+      "previewInvitation": "Alleen genodigden schrijven zich in; zonder inschrijving kom je er niet in.",
       "templateReplaces": "Een sjabloon brengt zijn eigen instellingen mee in plaats van de antwoorden hieronder. Titel, data en personen vul je in de volgende stappen in.",
       "instantBack": "Maak in plaats daarvan een gepland evenement"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Spreker",
       "registered": "Aangemeld",
-      "notRegistered": "Nog niet aangemeld",
       "organizersTitle": "Organiserende instanties",
       "organizersEdit": "Instanties bewerken",
-      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert."
+      "organizersEmpty": "Geen instantie opgegeven: de openbare pagina toont niet wie organiseert.",
+      "sendAll": "Uitnodiging sturen naar wie die nog niet heeft gekregen ({count})",
+      "sending": "Verzenden…",
+      "sendDone": "Uitnodigingen onderweg: {sent}. Overgeslagen (al ingeschreven of zonder adres): {skipped}.",
+      "sendError": "Verzenden mislukt: probeer het opnieuw.",
+      "sendNotPublished": "Uitnodigingen gaan uit zolang het evenement inschrijvingen aanneemt: na publicatie en vóór het einde.",
+      "invitedOn": "Uitgenodigd op {date}",
+      "notInvited": "Uitnodiging niet verzonden",
+      "send": "Uitnodiging sturen",
+      "resend": "Opnieuw sturen",
+      "actions": "Acties",
+      "sendTooMany": "Te veel verzendingen in korte tijd: probeer het over een minuut opnieuw.",
+      "sendRemaining": "Nog {remaining} over: druk opnieuw om ze te versturen."
     },
     "closing": {
       "title": "Evenement afsluiten",

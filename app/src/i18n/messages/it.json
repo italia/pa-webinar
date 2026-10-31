@@ -1260,8 +1260,8 @@
         "programSpeakerRemoved": "{count, plural, one {Un argomento non ha più chi interviene: la persona è stata tolta dall'evento.} other {# argomenti non hanno più chi interviene: le persone sono state tolte dall'evento.}}",
         "programFrozen": "L'agenda è già stata usata in sala: qui la vedi, ma si cambia dalla sala.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Facoltativo: l'elenco di chi inviti tu. L'iscrizione è aperta, quindi dopo la pubblicazione chiunque può iscriversi, invitato o no. La piattaforma non manda inviti: condividi tu il link dell'evento.",
-        "invitationsHelpRestricted": "L'iscrizione è riservata: possono iscriversi solo gli indirizzi di questo elenco. La piattaforma non manda inviti: condividi tu il link dell'evento; il link per entrare arriva per email dopo l'iscrizione.",
+        "invitationsHelpOpen": "Le persone che inviti tu. L'iscrizione è aperta: chiunque può iscriversi, invitato o no. Dopo la pubblicazione, dalla pagina dell'evento mandi a queste persone l'invito per email.",
+        "invitationsHelpRestricted": "Possono iscriversi solo gli indirizzi di questo elenco. Dopo la pubblicazione, dalla pagina dell'evento mandi a ciascuno l'invito per email, con il link per iscriversi; il link per entrare arriva dopo l'iscrizione.",
         "logoExternal": "Nella pagina pubblica compaiono solo i loghi caricati su questa piattaforma: un logo da un altro sito non si vedrà.",
         "primaryProfileInvalid": "Controlla l'ente e l'indirizzo del logo.",
         "primaryMore": "Foto, ente, logo e pagina pubblica",
@@ -3713,10 +3713,10 @@
       "access": {
         "open": "Chiunque si iscriva",
         "openDesc": "Chi vuole si iscrive dalla pagina dell'evento",
-        "invitation": "Solo chi inviti",
-        "invitationDesc": "La pagina resta visibile, ma si iscrive solo chi è fra gli invitati; senza iscrizione non si entra"
+        "invitation": "Solo persone invitate",
+        "invitationDesc": "La pagina resta visibile, ma si iscrive solo chi è nell'elenco; l'invito con il link per iscriversi lo mandi per email dalla pagina dell'evento"
       },
-      "previewInvitation": "Solo chi inviti si iscrive; senza iscrizione non si entra.",
+      "previewInvitation": "Si iscrive solo chi è invitato; senza iscrizione non si entra.",
       "templateReplaces": "Un modello porta le sue impostazioni al posto delle risposte qui sotto. Titolo, date e persone li scrivi nei passi seguenti.",
       "instantBack": "Crea invece un evento programmato"
     },
@@ -3807,10 +3807,21 @@
       "status": "Stato",
       "roleSpeaker": "Relatore",
       "registered": "Iscritto",
-      "notRegistered": "Non ancora iscritto",
       "organizersTitle": "Enti organizzatori",
       "organizersEdit": "Modifica gli enti",
-      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza."
+      "organizersEmpty": "Nessun ente indicato: la pagina pubblica non mostra chi organizza.",
+      "sendAll": "Invia l'invito a chi non l'ha ancora ricevuto ({count})",
+      "sending": "Invio…",
+      "sendDone": "Inviti in partenza: {sent}. Saltati, perché già iscritti o senza indirizzo: {skipped}.",
+      "sendError": "Invio non riuscito: riprova.",
+      "sendNotPublished": "Gli inviti partono mentre l'evento accetta iscrizioni: dopo la pubblicazione e prima della fine.",
+      "invitedOn": "Invitato il {date}",
+      "notInvited": "Invito da inviare",
+      "send": "Invia l'invito",
+      "resend": "Invia di nuovo",
+      "actions": "Azioni",
+      "sendTooMany": "Troppi invii in poco tempo: riprova tra un minuto.",
+      "sendRemaining": "Ne restano {remaining}: premi di nuovo per mandarli."
     },
     "closing": {
       "title": "Chiudi l'evento",

@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Tematy bez osoby zabierającej głos, bo osobę usunięto z wydarzenia: {count}.",
         "programFrozen": "Agenda była już używana w sali: widać ją tutaj, ale zmienia się ją w sali.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Opcjonalnie: lista osób, które zapraszasz. Rejestracja jest otwarta, więc po publikacji każdy może się zarejestrować, zaproszony czy nie. Platforma nie wysyła zaproszeń: udostępnij link do wydarzenia samodzielnie.",
-        "invitationsHelpRestricted": "Rejestracja jest ograniczona: mogą się rejestrować tylko adresy z tej listy. Platforma nie wysyła zaproszeń: udostępnij link do wydarzenia samodzielnie; link do wejścia przychodzi e-mailem po rejestracji.",
+        "invitationsHelpOpen": "Osoby, które zapraszasz. Zapisy są otwarte: zapisać się może każdy, zaproszony czy nie. Po publikacji wysyłasz im zaproszenie e-mailem ze strony wydarzenia.",
+        "invitationsHelpRestricted": "Zapisać się mogą tylko adresy z tej listy. Po publikacji wysyłasz każdemu ze strony wydarzenia zaproszenie e-mailem z linkiem do zapisu; link do wejścia przychodzi po zapisie.",
         "logoExternal": "Strona publiczna pokazuje tylko logo przesłane na tę platformę: logo z innej witryny nie będzie widoczne.",
         "primaryProfileInvalid": "Sprawdź organizację i adres logo.",
         "primaryMore": "Zdjęcie, instytucja, logo i strona publiczna",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Każdy, kto się zapisze",
         "openDesc": "Kto chce, zapisuje się na stronie wydarzenia",
-        "invitation": "Tylko zaproszeni przez ciebie",
-        "invitationDesc": "Strona pozostaje widoczna, ale zapisać mogą się tylko zaproszeni; bez zapisu nie da się wejść"
+        "invitation": "Tylko zaproszeni",
+        "invitationDesc": "Strona pozostaje widoczna, ale zapisać się mogą tylko osoby z listy; zaproszenie z linkiem do zapisu wysyłasz e-mailem ze strony wydarzenia"
       },
-      "previewInvitation": "Zapisać mogą się tylko osoby, które zaprosisz; nikt nie wejdzie bez zapisu.",
+      "previewInvitation": "Zapisują się tylko zaproszeni; bez zapisu nie można wejść.",
       "templateReplaces": "Szablon wnosi własne ustawienia zamiast odpowiedzi poniżej. Tytuł, daty i osoby wpisujesz w kolejnych krokach.",
       "instantBack": "Utwórz zamiast tego zaplanowane wydarzenie"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Prelegent",
       "registered": "Zapisany",
-      "notRegistered": "Jeszcze niezapisany",
       "organizersTitle": "Instytucje organizujące",
       "organizersEdit": "Edytuj instytucje",
-      "organizersEmpty": "Nie podano instytucji: strona publiczna nie pokazuje, kto organizuje."
+      "organizersEmpty": "Nie podano instytucji: strona publiczna nie pokazuje, kto organizuje.",
+      "sendAll": "Wyślij zaproszenie osobom, które go jeszcze nie otrzymały ({count})",
+      "sending": "Wysyłanie…",
+      "sendDone": "Wysyłane zaproszenia: {sent}. Pominięte (już zapisani lub bez adresu): {skipped}.",
+      "sendError": "Wysyłanie nie powiodło się: spróbuj ponownie.",
+      "sendNotPublished": "Zaproszenia są wysyłane, dopóki wydarzenie przyjmuje zapisy: po publikacji i przed końcem.",
+      "invitedOn": "Zaproszono {date}",
+      "notInvited": "Zaproszenie niewysłane",
+      "send": "Wyślij zaproszenie",
+      "resend": "Wyślij ponownie",
+      "actions": "Działania",
+      "sendTooMany": "Zbyt wiele wysyłek w krótkim czasie: spróbuj ponownie za minutę.",
+      "sendRemaining": "Pozostało {remaining}: naciśnij ponownie, aby je wysłać."
     },
     "closing": {
       "title": "Zamknij wydarzenie",

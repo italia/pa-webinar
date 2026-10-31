@@ -93,6 +93,7 @@ import Step1Base, { type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 import StepPeople, {
   PrimarySection,
+  InvitationsSection,
   SezioneIscrizione,
   type StepPeopleValue,
 } from './step-2-people';
@@ -2302,7 +2303,16 @@ export default function EventWizard(props: WizardProps) {
                     siteOpen={props.publicRegistrationEnabled ?? true}
                     invitati={form.invitations.length}
                     bloccato={viaToken !== null}
-                  iniziale={initial.accessMode}
+                    iniziale={initial.accessMode}
+                    elencoInvitati={
+                      <InvitationsSection
+                        value={form.invitations}
+                        onChange={(next) => updateForm({ invitations: next })}
+                        locked={viaToken !== null}
+                        publicRegistrationEnabled={false}
+                        inline
+                      />
+                    }
                     questionari={
                       // I questionari li gestisce lo staff: chi entra con il
                       // link di conduzione non li vede qui.

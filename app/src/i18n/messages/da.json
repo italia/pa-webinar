@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Emner uden taler, fordi personen er fjernet fra arrangementet: {count}.",
         "programFrozen": "Dagsordenen er allerede brugt i rummet: du kan se den her, men den ændres fra rummet.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valgfrit: listen over de personer, du inviterer. Tilmeldingen er åben, så efter offentliggørelse kan alle tilmelde sig, inviteret eller ej. Platformen sender ingen invitationer: del selv linket til arrangementet.",
-        "invitationsHelpRestricted": "Tilmeldingen er begrænset: kun adresserne på denne liste kan tilmelde sig. Platformen sender ingen invitationer: del selv linket til arrangementet; linket til at deltage kommer på e-mail efter tilmelding.",
+        "invitationsHelpOpen": "De personer, du selv inviterer. Tilmeldingen er åben: alle kan tilmelde sig, inviteret eller ej. Efter offentliggørelsen sender du dem invitationen på e-mail fra arrangementets side.",
+        "invitationsHelpRestricted": "Kun adresserne på denne liste kan tilmelde sig. Efter offentliggørelsen sender du hver af dem invitationen på e-mail fra arrangementets side med tilmeldingslinket; linket til at komme ind kommer efter tilmeldingen.",
         "logoExternal": "Den offentlige side viser kun logoer, der er uploadet til denne platform: et logo fra et andet websted vises ikke.",
         "primaryProfileInvalid": "Kontrollér organisationen og logoets adresse.",
         "primaryMore": "Foto, organisation, logo og offentlig side",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Alle, der tilmelder sig",
         "openDesc": "Alle, der vil, tilmelder sig fra arrangementets side",
-        "invitation": "Kun dem, du inviterer",
-        "invitationDesc": "Siden forbliver synlig, men kun inviterede kan tilmelde sig; uden tilmelding kommer man ikke ind"
+        "invitation": "Kun inviterede",
+        "invitationDesc": "Siden er stadig synlig, men kun personer på listen kan tilmelde sig; invitationen med tilmeldingslinket sender du på e-mail fra arrangementets side"
       },
-      "previewInvitation": "Kun dem, du inviterer, kan tilmelde sig; ingen kommer ind uden tilmelding.",
+      "previewInvitation": "Kun inviterede tilmelder sig; uden tilmelding kommer man ikke ind.",
       "templateReplaces": "En skabelon bruger sine egne indstillinger i stedet for svarene nedenfor. Titel, datoer og personer skriver du i de næste trin.",
       "instantBack": "Opret i stedet et planlagt arrangement"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Taler",
       "registered": "Tilmeldt",
-      "notRegistered": "Endnu ikke tilmeldt",
       "organizersTitle": "Arrangerende organisationer",
       "organizersEdit": "Rediger organisationer",
-      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer."
+      "organizersEmpty": "Ingen organisation angivet: den offentlige side viser ikke, hvem der arrangerer.",
+      "sendAll": "Send invitationen til dem, der ikke har fået den ({count})",
+      "sending": "Sender…",
+      "sendDone": "Invitationer på vej: {sent}. Sprunget over (allerede tilmeldt eller uden adresse): {skipped}.",
+      "sendError": "Afsendelsen mislykkedes: prøv igen.",
+      "sendNotPublished": "Invitationer sendes, mens arrangementet tager imod tilmeldinger: efter offentliggørelsen og før slutningen.",
+      "invitedOn": "Inviteret {date}",
+      "notInvited": "Invitation ikke sendt",
+      "send": "Send invitation",
+      "resend": "Send igen",
+      "actions": "Handlinger",
+      "sendTooMany": "For mange afsendelser på kort tid: prøv igen om et minut.",
+      "sendRemaining": "{remaining} tilbage: tryk igen for at sende dem."
     },
     "closing": {
       "title": "Afslut arrangementet",

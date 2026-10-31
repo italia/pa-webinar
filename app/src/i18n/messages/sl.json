@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Teme brez govorca, ker je bila oseba odstranjena z dogodka: {count}.",
         "programFrozen": "Dnevni red je bil v sobi že uporabljen: tukaj ga vidite, spreminja pa se v sobi.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Neobvezno: seznam oseb, ki jih povabite. Prijava je odprta, zato se po objavi lahko prijavi kdorkoli, povabljen ali ne. Platforma ne pošilja vabil: povezavo do dogodka delite sami.",
-        "invitationsHelpRestricted": "Prijava je omejena: prijavijo se lahko samo naslovi s tega seznama. Platforma ne pošilja vabil: povezavo do dogodka delite sami; povezava za vstop pride po e-pošti po prijavi.",
+        "invitationsHelpOpen": "Osebe, ki jih povabite sami. Prijava je odprta: prijavi se lahko vsak, povabljen ali ne. Po objavi jim s strani dogodka pošljete povabilo po e-pošti.",
+        "invitationsHelpRestricted": "Prijavijo se lahko le naslovi s tega seznama. Po objavi vsakemu s strani dogodka pošljete povabilo po e-pošti s povezavo za prijavo; povezava za vstop pride po prijavi.",
         "logoExternal": "Javna stran prikazuje samo logotipe, naložene na to platformo: logotip z drugega spletnega mesta ne bo prikazan.",
         "primaryProfileInvalid": "Preverite organizacijo in naslov logotipa.",
         "primaryMore": "Fotografija, ustanova, logotip in javna stran",
@@ -3504,9 +3504,9 @@
         "open": "Vsak, ki se prijavi",
         "openDesc": "Kdor želi, se prijavi na strani dogodka",
         "invitation": "Samo povabljeni",
-        "invitationDesc": "Stran ostane vidna, a prijavijo se lahko samo povabljeni; brez prijave ni vstopa"
+        "invitationDesc": "Stran ostane vidna, prijavijo pa se lahko le osebe s seznama; povabilo s povezavo za prijavo pošljete po e-pošti s strani dogodka"
       },
-      "previewInvitation": "Prijavijo se lahko samo tisti, ki jih povabite; brez prijave nihče ne vstopi.",
+      "previewInvitation": "Prijavijo se le povabljeni; brez prijave ni vstopa.",
       "templateReplaces": "Predloga prinese svoje nastavitve namesto spodnjih odgovorov. Naslov, datume in osebe vpišete v naslednjih korakih.",
       "instantBack": "Namesto tega ustvari načrtovan dogodek"
     },
@@ -3597,10 +3597,21 @@
       "status": "Stanje",
       "roleSpeaker": "Govorec",
       "registered": "Prijavljen",
-      "notRegistered": "Še ni prijavljen",
       "organizersTitle": "Organizatorske ustanove",
       "organizersEdit": "Uredi ustanove",
-      "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira."
+      "organizersEmpty": "Ni navedene ustanove: javna stran ne prikazuje, kdo organizira.",
+      "sendAll": "Pošlji povabilo tistim, ki ga še niso prejeli ({count})",
+      "sending": "Pošiljanje…",
+      "sendDone": "Povabila na poti: {sent}. Preskočena (že prijavljeni ali brez naslova): {skipped}.",
+      "sendError": "Pošiljanje ni uspelo: poskusite znova.",
+      "sendNotPublished": "Povabila se pošiljajo, dokler dogodek sprejema prijave: po objavi in pred koncem.",
+      "invitedOn": "Povabljen {date}",
+      "notInvited": "Povabilo ni poslano",
+      "send": "Pošlji povabilo",
+      "resend": "Pošlji znova",
+      "actions": "Dejanja",
+      "sendTooMany": "Preveč pošiljanj v kratkem času: poskusite znova čez minuto.",
+      "sendRemaining": "Ostalo jih je {remaining}: pritisnite znova, da jih pošljete."
     },
     "closing": {
       "title": "Zaključi dogodek",

@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Sujets sans intervenant, car la personne a été retirée de l'événement : {count}.",
         "programFrozen": "L'ordre du jour a déjà été utilisé dans la salle : il est visible ici, mais se modifie depuis la salle.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Facultatif : la liste des personnes que vous invitez. L'inscription est ouverte : après la publication, tout le monde peut s'inscrire, invité ou non. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement.",
-        "invitationsHelpRestricted": "L'inscription est restreinte : seules les adresses de cette liste peuvent s'inscrire. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement ; le lien pour entrer arrive par e-mail après l'inscription.",
+        "invitationsHelpOpen": "Les personnes que vous invitez vous-même. L'inscription est ouverte : tout le monde peut s'inscrire, invité ou non. Après la publication, vous leur envoyez l'invitation par e-mail depuis la page de l'événement.",
+        "invitationsHelpRestricted": "Seules les adresses de cette liste peuvent s'inscrire. Après la publication, vous envoyez à chacune l'invitation par e-mail depuis la page de l'événement, avec le lien d'inscription ; le lien pour entrer arrive après l'inscription.",
         "logoExternal": "La page publique n'affiche que les logos téléversés sur cette plateforme : un logo provenant d'un autre site ne s'affichera pas.",
         "primaryProfileInvalid": "Vérifiez l'organisation et l'adresse du logo.",
         "primaryMore": "Photo, organisme, logo et page publique",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Toute personne inscrite",
         "openDesc": "Qui le souhaite s'inscrit depuis la page de l'événement",
-        "invitation": "Seulement vos invités",
-        "invitationDesc": "La page reste visible, mais seuls les invités peuvent s'inscrire ; sans inscription, on n'entre pas"
+        "invitation": "Personnes invitées uniquement",
+        "invitationDesc": "La page reste visible, mais seules les personnes de la liste s'inscrivent ; l'invitation avec le lien d'inscription s'envoie par e-mail depuis la page de l'événement"
       },
-      "previewInvitation": "Seules les personnes invitées peuvent s'inscrire ; personne n'entre sans inscription.",
+      "previewInvitation": "Seules les personnes invitées s'inscrivent ; sans inscription, on n'entre pas.",
       "templateReplaces": "Un modèle apporte ses propres réglages à la place des réponses ci-dessous. Vous saisissez le titre, les dates et les personnes aux étapes suivantes.",
       "instantBack": "Créer plutôt un événement programmé"
     },
@@ -3597,10 +3597,21 @@
       "status": "Statut",
       "roleSpeaker": "Intervenant",
       "registered": "Inscrit",
-      "notRegistered": "Pas encore inscrit",
       "organizersTitle": "Organismes organisateurs",
       "organizersEdit": "Modifier les organismes",
-      "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise."
+      "organizersEmpty": "Aucun organisme indiqué : la page publique ne montre pas qui organise.",
+      "sendAll": "Envoyer l'invitation à ceux qui ne l'ont pas reçue ({count})",
+      "sending": "Envoi…",
+      "sendDone": "Invitations en cours d'envoi : {sent}. Ignorées (déjà inscrits ou sans adresse) : {skipped}.",
+      "sendError": "L'envoi a échoué : réessayez.",
+      "sendNotPublished": "Les invitations partent tant que l'événement accepte des inscriptions : après la publication et avant la fin.",
+      "invitedOn": "Invité le {date}",
+      "notInvited": "Invitation non envoyée",
+      "send": "Envoyer l'invitation",
+      "resend": "Renvoyer",
+      "actions": "Actions",
+      "sendTooMany": "Trop d'envois en peu de temps : réessayez dans une minute.",
+      "sendRemaining": "Il en reste {remaining} : appuyez de nouveau pour les envoyer."
     },
     "closing": {
       "title": "Clôturer l’événement",

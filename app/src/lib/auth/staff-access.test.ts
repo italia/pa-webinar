@@ -47,6 +47,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/[id]/glossary/[termId]/route.ts': 'glossario della post-produzione del proprio evento',
   'api/admin/events/[id]/invitations/route.ts': 'proprio evento',
   'api/admin/events/[id]/invitations/[invId]/route.ts': 'proprio evento',
+  'api/admin/events/[id]/invitations/send/route.ts': 'proprio evento',
   'api/admin/events/[id]/materials/route.ts': 'proprio evento',
   'api/admin/events/[id]/materials/[materialId]/route.ts': 'proprio evento',
   'api/admin/events/[id]/questionnaires/route.ts': 'proprio evento',

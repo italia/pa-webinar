@@ -245,8 +245,10 @@ separate entity in the data model. [Roadmap](ROADMAP.md)
 
 **Invitation** (`EventInvitation`, UI **Invitations**): an entry in an
 event's invitation list, staged in the wizard's **People** step with role
-`GUEST` or `SPEAKER` and optionally linked to an address-book person. The
-platform sends no invitation email. Each event chooses who can take part
+`GUEST` or `SPEAKER` and optionally linked to an address-book person. Once
+the event is published, staff send the invitation by email from the event
+page: it opens the registration page with the form filled in (`token`), and
+`sentAt` records the last sending. Each event chooses who can take part
 (`accessMode`, UI **Who registers**): **Anyone who registers** or **Only
 people you invite**; an event without a choice follows **Public registration
 enabled**. When only invitees can take part, the list is the set of addresses

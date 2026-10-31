@@ -1532,11 +1532,16 @@ describe('creazione — i default del modello', () => {
     click(scelta(g.access.invitation));
     expect(sezione.textContent).not.toContain(s3.accessSiteDefault);
     expect(sezione.textContent).toContain(s3.accessNoInvitees);
-    // Solo su invito l'elenco degli invitati e' aperto: e' chi puo' iscriversi.
-    const inviti = Array.from(container.querySelectorAll('details.wizard-group')).find((d) =>
-      d.textContent?.includes(s3.invitationsHeading),
-    ) as HTMLDetailsElement;
-    expect(inviti.open).toBe(true);
+    // Solo su invito l'elenco degli invitati sta dentro la scelta, aperto:
+    // e' chi puo' iscriversi. Non resta anche un secondo elenco piu' in basso.
+    const inviti = sezione.querySelector('.wizard-invitati')!;
+    expect(inviti.textContent).toContain(s3.invitationsHeading);
+    expect(inviti.textContent).toContain(s3.invitationsHelpRestricted);
+    expect(
+      Array.from(container.querySelectorAll('details.wizard-group')).some((d) =>
+        d.textContent?.includes(s3.invitationsHeading),
+      ),
+    ).toBe(false);
 
     click(byId<HTMLInputElement>(sezione.querySelector('input[type=checkbox]')!.id));
     goToStep('review');

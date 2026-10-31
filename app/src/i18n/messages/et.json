@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Teemad ilma esinejata, sest isik eemaldati üritusest: {count}.",
         "programFrozen": "Päevakorda on ruumis juba kasutatud: siin näed seda, kuid seda muudetakse ruumist.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Valikuline: nende inimeste loend, keda kutsute. Registreerimine on avatud, nii et pärast avaldamist võib registreeruda igaüks, kutsutud või mitte. Platvorm kutseid ei saada: jagage ürituse linki ise.",
-        "invitationsHelpRestricted": "Registreerimine on piiratud: registreeruda saavad ainult selle loendi aadressid. Platvorm kutseid ei saada: jagage ürituse linki ise; sisenemislink saabub e-postiga pärast registreerimist.",
+        "invitationsHelpOpen": "Inimesed, keda kutsud ise. Registreerumine on avatud: igaüks võib registreeruda, kutsutud või mitte. Pärast avaldamist saadad neile sündmuse lehelt kutse e-postiga.",
+        "invitationsHelpRestricted": "Registreeruda saavad ainult selle nimekirja aadressid. Pärast avaldamist saadad igaühele sündmuse lehelt kutse e-postiga koos registreerimislingiga; sisenemise link tuleb pärast registreerumist.",
         "logoExternal": "Avalikul lehel kuvatakse ainult sellele platvormile üles laaditud logosid: teiselt saidilt pärit logo ei kuvata.",
         "primaryProfileInvalid": "Kontrollige organisatsiooni ja logo aadressi.",
         "primaryMore": "Foto, asutus, logo ja avalik leht",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Kõik, kes registreeruvad",
         "openDesc": "Soovijad registreeruvad ürituse lehel",
-        "invitation": "Ainult sinu kutsutud",
-        "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult kutsutud; registreerimata sisse ei pääse"
+        "invitation": "Ainult kutsutud",
+        "invitationDesc": "Leht jääb nähtavaks, kuid registreeruda saavad ainult nimekirjas olijad; kutse registreerimislingiga saadad e-postiga sündmuse lehelt"
       },
-      "previewInvitation": "Registreeruda saavad ainult sinu kutsutud; registreerimata ei pääse keegi sisse.",
+      "previewInvitation": "Registreeruvad ainult kutsutud; ilma registreerumiseta ei pääse sisse.",
       "templateReplaces": "Mall toob alltoodud vastuste asemel oma seaded. Pealkirja, kuupäevad ja inimesed kirjutad järgmistes sammudes.",
       "instantBack": "Loo selle asemel plaanitud sündmus"
     },
@@ -3597,10 +3597,21 @@
       "status": "Olek",
       "roleSpeaker": "Esineja",
       "registered": "Registreerunud",
-      "notRegistered": "Pole veel registreerunud",
       "organizersTitle": "Korraldavad asutused",
       "organizersEdit": "Muuda asutusi",
-      "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab."
+      "organizersEmpty": "Asutust pole märgitud: avalik leht ei näita, kes korraldab.",
+      "sendAll": "Saada kutse neile, kes pole seda saanud ({count})",
+      "sending": "Saatmine…",
+      "sendDone": "Teel olevad kutsed: {sent}. Vahele jäetud (juba registreerunud või aadressita): {skipped}.",
+      "sendError": "Saatmine ebaõnnestus: proovi uuesti.",
+      "sendNotPublished": "Kutsed saadetakse, kuni sündmus võtab registreerumisi vastu: pärast avaldamist ja enne lõppu.",
+      "invitedOn": "Kutsutud {date}",
+      "notInvited": "Kutse saatmata",
+      "send": "Saada kutse",
+      "resend": "Saada uuesti",
+      "actions": "Toimingud",
+      "sendTooMany": "Liiga palju saatmisi lühikese ajaga: proovi minuti pärast uuesti.",
+      "sendRemaining": "Jäänud {remaining}: vajuta uuesti, et need saata."
     },
     "closing": {
       "title": "Ürituse lõpetamine",

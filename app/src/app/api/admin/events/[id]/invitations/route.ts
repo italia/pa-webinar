@@ -6,9 +6,9 @@
  *
  * Auth: admin session cookie.
  *
- * Tokens for the registration magic link are *not* generated here —
- * they're minted at send-time by a separate endpoint so staging an
- * invitation doesn't commit to emailing it yet.
+ * Tokens for the pre-filled registration link are *not* generated here:
+ * they're minted at send-time (`./send`), so staging an invitation
+ * doesn't commit to emailing it yet.
  */
 
 import { cookies } from 'next/headers';
@@ -91,6 +91,8 @@ export const GET = withErrorHandling(async (_request, context) => {
       name: tryDecryptPII(r.name),
       email: tryDecryptPII(r.email),
       createdAt: r.createdAt,
+      // L'ultimo invio dell'invito per email; null se non e' mai partito.
+      sentAt: r.sentAt,
       registered: iscritte.has(impronte[i] ?? ''),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.

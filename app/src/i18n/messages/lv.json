@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Tēmas bez runātāja, jo persona noņemta no pasākuma: {count}.",
         "programFrozen": "Darba kārtība telpā jau izmantota: šeit to redzat, bet maina telpā.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Pēc izvēles: jūsu uzaicināto personu saraksts. Reģistrācija ir atvērta, tāpēc pēc publicēšanas var reģistrēties ikviens, uzaicināts vai nē. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši.",
-        "invitationsHelpRestricted": "Reģistrācija ir ierobežota: reģistrēties var tikai šī saraksta adreses. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši; ieejas saite pienāk pa e-pastu pēc reģistrācijas.",
+        "invitationsHelpOpen": "Cilvēki, kurus uzaicināt jūs. Reģistrācija ir atvērta: reģistrēties var ikviens, uzaicināts vai nē. Pēc publicēšanas no pasākuma lapas nosūtāt viņiem ielūgumu pa e-pastu.",
+        "invitationsHelpRestricted": "Reģistrēties var tikai šī saraksta adreses. Pēc publicēšanas no pasākuma lapas katram nosūtāt ielūgumu pa e-pastu ar reģistrācijas saiti; ieejas saite pienāk pēc reģistrācijas.",
         "logoExternal": "Publiskajā lapā redzami tikai šajā platformā augšupielādēti logotipi: logotips no citas vietnes netiks rādīts.",
         "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi.",
         "primaryMore": "Fotoattēls, iestāde, logotips un publiskā lapa",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Ikviens, kas reģistrējas",
         "openDesc": "Kas vēlas, reģistrējas pasākuma lapā",
-        "invitation": "Tikai jūsu uzaicinātie",
-        "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai uzaicinātie; bez reģistrācijas iekļūt nevar"
+        "invitation": "Tikai uzaicinātie",
+        "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai sarakstā esošie; ielūgumu ar reģistrācijas saiti sūtāt pa e-pastu no pasākuma lapas"
       },
-      "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
+      "previewInvitation": "Reģistrējas tikai uzaicinātie; bez reģistrācijas neviens netiek iekšā.",
       "templateReplaces": "Veidne atnes savus iestatījumus zemāk esošo atbilžu vietā. Nosaukumu, datumus un personas ierakstāt nākamajos soļos.",
       "instantBack": "Tā vietā izveidot plānotu pasākumu"
     },
@@ -3597,10 +3597,21 @@
       "status": "Statuss",
       "roleSpeaker": "Runātājs",
       "registered": "Reģistrējies",
-      "notRegistered": "Vēl nav reģistrējies",
       "organizersTitle": "Rīkotājiestādes",
       "organizersEdit": "Rediģēt iestādes",
-      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko."
+      "organizersEmpty": "Nav norādīta neviena iestāde: publiskajā lapā nav redzams, kas rīko.",
+      "sendAll": "Sūtīt ielūgumu tiem, kas to vēl nav saņēmuši ({count})",
+      "sending": "Sūta…",
+      "sendDone": "Sūtītie ielūgumi: {sent}. Izlaisti (jau reģistrējušies vai bez adreses): {skipped}.",
+      "sendError": "Sūtīšana neizdevās: mēģiniet vēlreiz.",
+      "sendNotPublished": "Ielūgumi tiek sūtīti, kamēr pasākums pieņem reģistrācijas: pēc publicēšanas un pirms beigām.",
+      "invitedOn": "Uzaicināts {date}",
+      "notInvited": "Ielūgums nav nosūtīts",
+      "send": "Sūtīt ielūgumu",
+      "resend": "Sūtīt vēlreiz",
+      "actions": "Darbības",
+      "sendTooMany": "Pārāk daudz sūtījumu īsā laikā: mēģiniet pēc minūtes.",
+      "sendRemaining": "Atlikuši {remaining}: nospiediet vēlreiz, lai tos nosūtītu."
     },
     "closing": {
       "title": "Noslēgt pasākumu",

@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Themen ohne sprechende Person, weil die Person aus der Veranstaltung entfernt wurde: {count}.",
         "programFrozen": "Die Agenda wurde im Raum bereits verwendet: Sie ist hier sichtbar, wird aber im Raum geändert.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Optional: die Liste der Personen, die Sie einladen. Die Anmeldung ist offen, nach der Veröffentlichung kann sich also jede Person anmelden, ob eingeladen oder nicht. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst.",
-        "invitationsHelpRestricted": "Die Anmeldung ist beschränkt: Nur die Adressen dieser Liste können sich anmelden. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst; der Link zum Eintreten kommt nach der Anmeldung per E-Mail.",
+        "invitationsHelpOpen": "Die Personen, die Sie selbst einladen. Die Anmeldung ist offen: Alle können sich anmelden, eingeladen oder nicht. Nach der Veröffentlichung senden Sie ihnen die Einladung per E-Mail von der Event-Seite.",
+        "invitationsHelpRestricted": "Nur die Adressen auf dieser Liste können sich anmelden. Nach der Veröffentlichung senden Sie allen die Einladung per E-Mail von der Event-Seite, mit dem Anmeldelink; der Zugangslink kommt nach der Anmeldung.",
         "logoExternal": "Die öffentliche Seite zeigt nur auf diese Plattform hochgeladene Logos: Ein Logo von einer anderen Website wird nicht angezeigt.",
         "primaryProfileInvalid": "Prüfen Sie die Organisation und die Adresse des Logos.",
         "primaryMore": "Foto, Organisation, Logo und öffentliche Seite",
@@ -3504,9 +3504,9 @@
         "open": "Alle, die sich anmelden",
         "openDesc": "Wer möchte, meldet sich über die Veranstaltungsseite an",
         "invitation": "Nur Eingeladene",
-        "invitationDesc": "Die Seite bleibt sichtbar, aber anmelden können sich nur Eingeladene; ohne Anmeldung kein Zutritt"
+        "invitationDesc": "Die Seite bleibt sichtbar, aber nur Personen auf der Liste können sich anmelden; die Einladung mit dem Anmeldelink senden Sie per E-Mail von der Event-Seite"
       },
-      "previewInvitation": "Nur Eingeladene können sich anmelden; ohne Anmeldung kommt niemand hinein.",
+      "previewInvitation": "Nur Eingeladene melden sich an; ohne Anmeldung kein Zutritt.",
       "templateReplaces": "Eine Vorlage bringt ihre eigenen Einstellungen anstelle der Antworten unten mit. Titel, Termine und Personen tragen Sie in den nächsten Schritten ein.",
       "instantBack": "Stattdessen ein geplantes Event erstellen"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Referent",
       "registered": "Angemeldet",
-      "notRegistered": "Noch nicht angemeldet",
       "organizersTitle": "Veranstaltende Organisationen",
       "organizersEdit": "Organisationen bearbeiten",
-      "organizersEmpty": "Keine Organisation angegeben: Die öffentliche Seite zeigt nicht, wer veranstaltet."
+      "organizersEmpty": "Keine Organisation angegeben: Die öffentliche Seite zeigt nicht, wer veranstaltet.",
+      "sendAll": "Einladung an alle senden, die sie noch nicht erhalten haben ({count})",
+      "sending": "Wird gesendet…",
+      "sendDone": "Einladungen unterwegs: {sent}. Übersprungen (bereits angemeldet oder ohne Adresse): {skipped}.",
+      "sendError": "Senden fehlgeschlagen: bitte erneut versuchen.",
+      "sendNotPublished": "Einladungen gehen raus, solange das Event Anmeldungen annimmt: nach der Veröffentlichung und vor dem Ende.",
+      "invitedOn": "Eingeladen am {date}",
+      "notInvited": "Einladung nicht gesendet",
+      "send": "Einladung senden",
+      "resend": "Erneut senden",
+      "actions": "Aktionen",
+      "sendTooMany": "Zu viele Sendungen in kurzer Zeit: in einer Minute erneut versuchen.",
+      "sendRemaining": "{remaining} verbleibend: erneut drücken, um sie zu senden."
     },
     "closing": {
       "title": "Veranstaltung abschließen",

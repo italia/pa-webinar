@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Suġġetti mingħajr kelliem, għax il-persuna tneħħiet mill-avveniment: {count}.",
         "programFrozen": "L-aġenda diġà ntużat fil-kamra: tarah hawn, iżda tinbidel mill-kamra.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Fakultattiv: il-lista tal-persuni li tistieden int. Ir-reġistrazzjoni hija miftuħa, allura wara l-pubblikazzjoni kulħadd jista' jirreġistra, mistieden jew le. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment.",
-        "invitationsHelpRestricted": "Ir-reġistrazzjoni hija ristretta: jistgħu jirreġistraw biss l-indirizzi f'din il-lista. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment; il-link biex tidħol jasal bl-email wara r-reġistrazzjoni.",
+        "invitationsHelpOpen": "In-nies li tistieden int. Ir-reġistrazzjoni hija miftuħa: kulħadd jista' jirreġistra, mistieden jew le. Wara l-pubblikazzjoni, mill-paġna tal-avveniment tibgħatilhom l-istedina bl-email.",
+        "invitationsHelpRestricted": "Jistgħu jirreġistraw biss l-indirizzi ta' din il-lista. Wara l-pubblikazzjoni, mill-paġna tal-avveniment tibgħat lil kull wieħed l-istedina bl-email, bil-link tar-reġistrazzjoni; il-link biex tidħol jasal wara r-reġistrazzjoni.",
         "logoExternal": "Il-paġna pubblika turi biss logos imtella' fuq din il-pjattaforma: logo minn sit ieħor mhux se jidher.",
         "primaryProfileInvalid": "Iċċekkja l-organizzazzjoni u l-indirizz tal-logo.",
         "primaryMore": "Ritratt, entità, logo u paġna pubblika",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Kull min jirreġistra",
         "openDesc": "Min irid jirreġistra mill-paġna tal-avveniment",
-        "invitation": "Biss dawk li tistieden",
-        "invitationDesc": "Il-paġna tibqa' tidher, iżda jistgħu jirreġistraw biss il-mistednin; mingħajr reġistrazzjoni ma tidħolx"
+        "invitation": "Persuni mistiedna biss",
+        "invitationDesc": "Il-paġna tibqa' viżibbli, iżda jirreġistraw biss dawk fil-lista; l-istedina bil-link tar-reġistrazzjoni tibagħtha bl-email mill-paġna tal-avveniment"
       },
-      "previewInvitation": "Jistgħu jirreġistraw biss dawk li tistieden; ħadd ma jidħol mingħajr reġistrazzjoni.",
+      "previewInvitation": "Jirreġistraw biss il-mistiedna; mingħajr reġistrazzjoni ħadd ma jidħol.",
       "templateReplaces": "Mudell iġib l-issettjar tiegħu minflok it-tweġibiet hawn taħt. It-titlu, id-dati u n-nies tiktibhom fil-passi li ġejjin.",
       "instantBack": "Oħloq minflok avveniment skedat"
     },
@@ -3597,10 +3597,21 @@
       "status": "Status",
       "roleSpeaker": "Kelliem",
       "registered": "Irreġistrat",
-      "notRegistered": "Għadu mhux irreġistrat",
       "organizersTitle": "Entitajiet organizzaturi",
       "organizersEdit": "Editja l-entitajiet",
-      "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza."
+      "organizersEmpty": "L-ebda entità indikata: il-paġna pubblika ma turix min qed jorganizza.",
+      "sendAll": "Ibgħat l-istedina lil min għadu ma rċevihiex ({count})",
+      "sending": "Qed jintbagħat…",
+      "sendDone": "Stediniet fit-triq: {sent}. Maqbużin (diġà rreġistrati jew mingħajr indirizz): {skipped}.",
+      "sendError": "Il-bgħit ma rnexxiex: erġa' pprova.",
+      "sendNotPublished": "L-istediniet jintbagħtu sakemm l-avveniment jaċċetta reġistrazzjonijiet: wara l-pubblikazzjoni u qabel it-tmiem.",
+      "invitedOn": "Mistieden fil-{date}",
+      "notInvited": "Stedina mhux mibgħuta",
+      "send": "Ibgħat stedina",
+      "resend": "Erġa' ibgħat",
+      "actions": "Azzjonijiet",
+      "sendTooMany": "Wisq bgħit fi ftit ħin: erġa' pprova wara minuta.",
+      "sendRemaining": "Fadal {remaining}: agħfas mill-ġdid biex tibgħathom."
     },
     "closing": {
       "title": "Agħlaq l-avveniment",

@@ -1050,8 +1050,8 @@
         "programSpeakerRemoved": "Teme fără cine să intervină, pentru că persoana a fost eliminată din eveniment: {count}.",
         "programFrozen": "Agenda a fost deja folosită în sală: o vedeți aici, dar se modifică din sală.",
         "programPerson": "{name} ({role})",
-        "invitationsHelpOpen": "Opțional: lista persoanelor pe care le inviți. Înscrierea este deschisă, deci după publicare se poate înscrie oricine, invitat sau nu. Platforma nu trimite invitații: distribuie tu linkul evenimentului.",
-        "invitationsHelpRestricted": "Înscrierea este restricționată: se pot înscrie doar adresele din această listă. Platforma nu trimite invitații: distribuie tu linkul evenimentului; linkul de intrare vine pe e-mail după înscriere.",
+        "invitationsHelpOpen": "Persoanele pe care le inviți tu. Înscrierea este deschisă: oricine se poate înscrie, invitat sau nu. După publicare, le trimiți invitația pe e-mail din pagina evenimentului.",
+        "invitationsHelpRestricted": "Se pot înscrie doar adresele de pe această listă. După publicare, le trimiți fiecăruia invitația pe e-mail din pagina evenimentului, cu linkul de înscriere; linkul de intrare vine după înscriere.",
         "logoExternal": "Pagina publică afișează doar siglele încărcate pe această platformă: o siglă de pe alt site nu va apărea.",
         "primaryProfileInvalid": "Verifică organizația și adresa siglei.",
         "primaryMore": "Fotografie, instituție, logo și pagină publică",
@@ -3503,10 +3503,10 @@
       "access": {
         "open": "Oricine se înscrie",
         "openDesc": "Cine dorește se înscrie din pagina evenimentului",
-        "invitation": "Doar cei invitați de tine",
-        "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar invitații; fără înscriere nu se intră"
+        "invitation": "Doar persoanele invitate",
+        "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar cei de pe listă; invitația cu linkul de înscriere o trimiți pe e-mail din pagina evenimentului"
       },
-      "previewInvitation": "Se pot înscrie doar persoanele invitate de tine; nimeni nu intră fără înscriere.",
+      "previewInvitation": "Se înscriu doar cei invitați; fără înscriere nu se intră.",
       "templateReplaces": "Un șablon aduce propriile setări în locul răspunsurilor de mai jos. Titlul, datele și persoanele le scrii în pașii următori.",
       "instantBack": "Creează în schimb un eveniment programat"
     },
@@ -3597,10 +3597,21 @@
       "status": "Stare",
       "roleSpeaker": "Vorbitor",
       "registered": "Înscris",
-      "notRegistered": "Încă neînscris",
       "organizersTitle": "Instituții organizatoare",
       "organizersEdit": "Editează instituțiile",
-      "organizersEmpty": "Nicio instituție indicată: pagina publică nu arată cine organizează."
+      "organizersEmpty": "Nicio instituție indicată: pagina publică nu arată cine organizează.",
+      "sendAll": "Trimite invitația celor care nu au primit-o ({count})",
+      "sending": "Se trimite…",
+      "sendDone": "Invitații în curs de trimitere: {sent}. Omise (deja înscriși sau fără adresă): {skipped}.",
+      "sendError": "Trimiterea a eșuat: încearcă din nou.",
+      "sendNotPublished": "Invitațiile pleacă cât timp evenimentul acceptă înscrieri: după publicare și înainte de final.",
+      "invitedOn": "Invitat la {date}",
+      "notInvited": "Invitație netrimisă",
+      "send": "Trimite invitația",
+      "resend": "Trimite din nou",
+      "actions": "Acțiuni",
+      "sendTooMany": "Prea multe trimiteri într-un timp scurt: încearcă din nou peste un minut.",
+      "sendRemaining": "Au mai rămas {remaining}: apasă din nou pentru a le trimite."
     },
     "closing": {
       "title": "Închideți evenimentul",
