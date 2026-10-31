@@ -1,17 +1,26 @@
 'use client';
 
+import { useEffect, useId } from 'react';
 import { useTranslations } from 'next-intl';
 
-import AdminLogoutButton from '@/components/admin/admin-logout-button';
 import { Icon } from '@/components/ui/icon';
+import { useTendina } from '@/hooks/use-tendina';
 import { Link, usePathname } from '@/i18n/navigation';
 
-import { sezioneDi, sezioniPerRuolo, voceAttiva, type StaffRole } from './admin-nav-model';
+import {
+  sezioneDi,
+  sezioniPerRuolo,
+  voceAttiva,
+  type NavSection,
+  type StaffRole,
+} from './admin-nav-model';
 
 /**
- * Il menu dell'area di amministrazione: le sezioni in alto, le voci della
- * sezione corrente sotto. La struttura e' in admin-nav-model, la stessa delle
- * briciole e dei titoli delle pagine.
+ * Il menu dell'area di amministrazione: una barra con le sezioni, e per ogni
+ * sezione un megamenu con le sue pagine, come nell'header completo dei
+ * modelli di Designers Italia (niente schede sotto la barra). La struttura e'
+ * in admin-nav-model, la stessa delle briciole e dei titoli delle pagine;
+ * l'uscita sta nell'area utente, in alto.
  */
 export default function AdminNav({ role = 'admin' }: { role?: StaffRole }) {
   const t = useTranslations('admin.nav');
@@ -29,62 +38,94 @@ export default function AdminNav({ role = 'admin' }: { role?: StaffRole }) {
         {t('skipToPage')}
       </a>
       <nav className="admin-nav" aria-label={t('ariaLabel')}>
-        <div className="container d-flex align-items-stretch">
-          <ul className="nav flex-nowrap admin-nav__list">
-            {sezioni.map((s) => {
-              const attiva = corrente?.href === s.href;
-              return (
-                <li key={s.href} className="nav-item">
-                  <Link
-                    href={s.href}
-                    className={`nav-link admin-nav__link${attiva ? ' admin-nav__link--active' : ''}`}
-                    // La sezione dice dove ci si trova; la pagina la indica
-                    // la voce del sotto-menu.
-                    aria-current={attiva ? 'location' : undefined}
-                    // Sui telefoni l'etichetta e' nascosta (`d-none` la toglie
-                    // anche ai lettori di schermo): il nome lo porta l'attributo.
-                    aria-label={t(s.labelKey)}
-                    title={t(s.labelKey)}
-                  >
-                    <Icon icon={s.icon} size="sm" />
-                    <span className="d-none d-xl-inline">{t(s.labelKey)}</span>
-                  </Link>
-                </li>
-              );
-            })}
+        <div className="container admin-nav__contenitore">
+          <ul className="nav admin-nav__list">
+            {sezioni.map((s) => (
+              <Sezione
+                key={s.href}
+                sezione={s}
+                attiva={corrente?.href === s.href}
+                pathname={pathname}
+              />
+            ))}
           </ul>
-          {/* L'uscita sta qui, su ogni pagina e in fondo alla barra. */}
-          <div className="ms-auto d-flex align-items-center ps-2">
-            <AdminLogoutButton variant="nav" />
-          </div>
         </div>
       </nav>
+    </div>
+  );
+}
 
-      {corrente && corrente.voci.length > 1 && (
-        <nav className="admin-subnav" aria-label={t('subNavAriaLabel')}>
-          <div className="container">
-            <ul className="nav admin-nav__list">
-              {corrente.voci.map((v) => {
-                const attiva = voceAttiva(pathname, v);
+function Sezione({
+  sezione,
+  attiva,
+  pathname,
+}: {
+  sezione: NavSection;
+  attiva: boolean;
+  pathname: string;
+}) {
+  const t = useTranslations('admin.nav');
+  const { aperta, setAperta, chiudi, contenitore, pulsante } = useTendina<HTMLLIElement>();
+  const id = useId();
+  // Si chiude quando si cambia pagina (anche con i tasti avanti e indietro).
+  useEffect(() => {
+    chiudi();
+  }, [pathname, chiudi]);
+  const etichetta = t(sezione.labelKey);
+
+  return (
+    <li ref={contenitore} className="nav-item dropdown megamenu admin-nav__sezione">
+      <button
+        ref={pulsante}
+        type="button"
+        className={`nav-link dropdown-toggle admin-nav__link${attiva ? ' admin-nav__link--active' : ''}`}
+        aria-expanded={aperta}
+        aria-controls={id}
+        // La sezione dice dove ci si trova; la pagina la indica la voce.
+        aria-current={attiva ? 'location' : undefined}
+        title={etichetta}
+        onClick={() => setAperta(!aperta)}
+      >
+        <Icon icon={sezione.icon} size="sm" />
+        {/* Sui telefoni resta l'icona; il nome lo legge chi usa un lettore
+            di schermo. */}
+        <span className="d-none d-xl-inline">{etichetta}</span>
+        <span className="visually-hidden d-xl-none">{etichetta}</span>
+        <Icon
+          icon="it-expand"
+          size="xs"
+          className="admin-nav__freccia"
+          style={{ transform: aperta ? 'rotate(180deg)' : undefined }}
+        />
+      </button>
+      <div className={`dropdown-menu admin-mega${aperta ? ' show' : ''}`} id={id}>
+        <div className="megamenu">
+          <p className="admin-mega__titolo" aria-hidden="true">
+            <Icon icon={sezione.icon} size="sm" className="me-2" />
+            {etichetta}
+          </p>
+          <div className="link-list-wrapper">
+            <ul className="link-list admin-mega__voci">
+              {sezione.voci.map((v) => {
+                const corrente = voceAttiva(pathname, v);
                 return (
-                  <li key={v.href} className="nav-item">
+                  <li key={v.href}>
                     <Link
                       href={v.href}
-                      className={`nav-link admin-subnav__link${attiva ? ' admin-nav__link--active' : ''}`}
-                      aria-current={attiva ? 'page' : undefined}
-                      aria-label={t(v.labelKey)}
-                      title={t(v.labelKey)}
+                      className={`dropdown-item list-item${corrente ? ' active' : ''}`}
+                      aria-current={corrente ? 'page' : undefined}
+                      onClick={chiudi}
                     >
-                      <Icon icon={v.icon} size="xs" />
-                      <span className="d-none d-sm-inline">{t(v.labelKey)}</span>
+                      <Icon icon={v.icon} size="sm" className="me-2" />
+                      <span>{t(v.labelKey)}</span>
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </div>
-        </nav>
-      )}
-    </div>
+        </div>
+      </div>
+    </li>
   );
 }

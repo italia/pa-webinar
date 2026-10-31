@@ -106,7 +106,11 @@
     "mainLabel": "Navigare principală",
     "activeLanguage": "Limba activă:",
     "languageSelected": "(selectată)",
-    "signIn": "Autentificare"
+    "signIn": "Autentificare",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Organizator",
+    "instanceKey": "Cheia instanței",
+    "signOutFailed": "Deconectarea a eșuat: încearcă din nou."
   },
   "header": {
     "followUs": "Urmăriți-ne pe"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publicații",
       "publicationsNew": "Publicație nouă",
       "ariaLabel": "Navigare administrare",
-      "subNavAriaLabel": "Navigare secțiune",
       "questionnaires": "Chestionare",
       "questionnairesLibrary": "Șabloane de chestionar",
       "questionnairesResponses": "Răspunsuri",

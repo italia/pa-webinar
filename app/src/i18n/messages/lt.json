@@ -106,7 +106,11 @@
     "mainLabel": "Pagrindinė navigacija",
     "activeLanguage": "Aktyvi kalba:",
     "languageSelected": "(pasirinkta)",
-    "signIn": "Prisijungti"
+    "signIn": "Prisijungti",
+    "roleAdmin": "Administratorius",
+    "roleOrganizer": "Organizatorius",
+    "instanceKey": "Egzemplioriaus raktas",
+    "signOutFailed": "Atsijungti nepavyko: bandykite dar kartą."
   },
   "header": {
     "followUs": "Sekite mus"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publikacijos",
       "publicationsNew": "Nauja publikacija",
       "ariaLabel": "Administravimo navigacija",
-      "subNavAriaLabel": "Skyriaus navigacija",
       "questionnaires": "Klausimynai",
       "questionnairesLibrary": "Klausimynų šablonai",
       "questionnairesResponses": "Atsakymai",

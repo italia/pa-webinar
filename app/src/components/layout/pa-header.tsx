@@ -15,13 +15,15 @@ import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
 import LanguageSwitcher from './language-switcher';
+import MenuUtente, { type StaffIntestazione } from './menu-utente';
 import { LINK_INTESTAZIONE, linkVisibile } from './public-links';
 
 interface PAHeaderProps {
-  isAdmin?: boolean;
+  /** Chi dello staff e' entrato, se qualcuno: l'area utente lo mostra. */
+  staff?: StaffIntestazione | null;
 }
 
-export default function PAHeader({ isAdmin }: PAHeaderProps) {
+export default function PAHeader({ staff = null }: PAHeaderProps) {
   const t = useTranslations();
   const settings = useSettings();
   const locale = useLocale();
@@ -49,13 +51,9 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
           slimTitle={slimTitle}
           slimSubtitle={slimSubtitle}
           parentUrl={parentUrl}
-          isAdmin={isAdmin}
+          staff={staff}
         />
-        <CenterHeader
-          appName={appName}
-          isAdmin={isAdmin}
-          logoUrl={settings.logoUrl}
-        />
+        <CenterHeader appName={appName} logoUrl={settings.logoUrl} />
       </Headers>
     </header>
   );
@@ -65,12 +63,12 @@ function SlimHeader({
   slimTitle,
   slimSubtitle,
   parentUrl,
-  isAdmin,
+  staff,
 }: {
   slimTitle: string;
   slimSubtitle: string;
   parentUrl?: string;
-  isAdmin?: boolean;
+  staff: StaffIntestazione | null;
 }) {
   const t = useTranslations('nav');
   // Sulle pagine dell'amministrazione (il login compreso) non serve.
@@ -102,8 +100,9 @@ function SlimHeader({
           <LanguageSwitcher />
           {/* L'accesso, a destra della lingua come nell'header di Designers
               Italia. E' l'ingresso dello staff (i partecipanti non hanno un
-              account): con la sessione aperta resta «Amministrazione», sotto. */}
-          {!isAdmin && !nellAdmin && (
+              account); con la sessione aperta, al suo posto l'area utente. */}
+          {staff && <MenuUtente staff={staff} />}
+          {!staff && !nellAdmin && (
             <div className="it-access-top-wrapper ms-3">
               <Link href="/admin/login" className="btn btn-primary btn-sm">
                 {t('signIn')}
@@ -118,11 +117,9 @@ function SlimHeader({
 
 function CenterHeader({
   appName,
-  isAdmin,
   logoUrl,
 }: {
   appName: string;
-  isAdmin?: boolean;
   logoUrl?: string | null;
 }) {
   const t = useTranslations('nav');
@@ -177,17 +174,6 @@ function CenterHeader({
                 <span className="d-none d-md-inline">{tr(l.labelKey)}</span>
               </Link>
             ))}
-            {isAdmin && (
-              <Link
-                href="/admin/events"
-                aria-label={t('admin')}
-                className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-                style={{ fontSize: '0.9rem' }}
-              >
-                <Icon icon="it-tool" size="sm" color="white" />
-                <span className="d-none d-md-inline">{t('admin')}</span>
-              </Link>
-            )}
           </nav>
         </HeaderRightZone>
       </HeaderContent>

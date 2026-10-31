@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, useId } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
 import { Icon } from '@/components/ui/icon';
+import { useTendina } from '@/hooks/use-tendina';
 import { Link, usePathname, type Href } from '@/i18n/navigation';
 import { localeNames, type Locale } from '@/i18n/config';
 import { useSettings } from '@/lib/settings-context';
@@ -33,9 +34,7 @@ export default function LanguageSwitcher() {
   } as unknown as Href;
   const settings = useSettings();
   const t = useTranslations('nav');
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { aperta: open, setAperta: setOpen, contenitore: ref, pulsante: buttonRef } = useTendina();
   const listId = useId();
 
   const availableLocales = (
@@ -43,29 +42,6 @@ export default function LanguageSwitcher() {
       ? settings.availableLocales as string[]
       : ['it', 'en']
   ).filter((l): l is Locale => l in localeNames);
-
-  const handleClickOutside = useCallback((e: MouseEvent) => {
-    if (ref.current && !ref.current.contains(e.target as Node)) {
-      setOpen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    // Esc chiude e riporta il focus sul pulsante: chi naviga da tastiera non
-    // deve ritrovarsi col focus su un elenco sparito.
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      setOpen(false);
-      buttonRef.current?.focus();
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open, handleClickOutside]);
 
   if (availableLocales.length <= 1) return null;
 

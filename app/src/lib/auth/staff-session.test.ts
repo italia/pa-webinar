@@ -16,9 +16,13 @@ vi.mock('react', async (orig) => ({
   cache: <T,>(fn: T) => fn,
 }));
 
+const decifra = vi.hoisted(() => ({ fn: (v: string | null) => (v ? `chiaro:${v}` : null) as string | null }));
+vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string | null) => decifra.fn(v) }));
+
 import {
   eventScope,
   getStaffSession,
+  staffPerIntestazione,
   isEventManager,
   puoGestire,
   signStaffSession,
@@ -139,3 +143,38 @@ describe('lo staff dell’evento, su una rotta aperta anche al link', () => {
     expect(await isEventManager(cookiesCon(token), EVENTO)).toBe(true);
   });
 });
+
+describe('chi e\' entrato, per l\'intestazione', () => {
+  const SECRET = 'x'.repeat(40);
+  const ID = '11111111-2222-4333-8444-555555555555';
+  const cookiesCon = (token: string) =>
+    ({ get: (n: string) => (n === 'admin_session' ? { value: token } : undefined) }) as never;
+
+  beforeEach(() => {
+    process.env.APP_SECRET = SECRET;
+    findUnique.mockReset();
+    decifra.fn = (v) => (v ? `chiaro:${v}` : null);
+  });
+
+  it('la chiave dell\'istanza non ha nome; un account ha il suo, letto una volta', async () => {
+    const chiave = await new SignJWT({ role: 'admin' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('1h')
+      .sign(new TextEncoder().encode(SECRET));
+    expect(await staffPerIntestazione(cookiesCon(chiave))).toEqual({ ruolo: 'admin', nome: null });
+
+    findUnique.mockResolvedValue({ id: ID, active: true, role: 'ORGANIZER', emailHash: 'h', name: 'cifrato' });
+    const token = await signStaffSession({ id: ID, role: 'ORGANIZER' });
+    expect(await staffPerIntestazione(cookiesCon(token))).toEqual({ ruolo: 'organizer', nome: 'chiaro:cifrato' });
+  });
+
+  it('una chiave PII guasta non rompe la pagina: resta il ruolo, senza nome', async () => {
+    decifra.fn = () => {
+      throw new Error('PII key');
+    };
+    findUnique.mockResolvedValue({ id: ID, active: true, role: 'ADMIN', emailHash: 'h', name: 'cifrato' });
+    const token = await signStaffSession({ id: ID, role: 'ADMIN' });
+    expect(await staffPerIntestazione(cookiesCon(token))).toEqual({ ruolo: 'admin', nome: null });
+  });
+});
+

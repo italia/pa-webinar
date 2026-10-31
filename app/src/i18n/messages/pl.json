@@ -106,7 +106,11 @@
     "mainLabel": "Nawigacja główna",
     "activeLanguage": "Aktywny język:",
     "languageSelected": "(wybrany)",
-    "signIn": "Zaloguj się"
+    "signIn": "Zaloguj się",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Organizator",
+    "instanceKey": "Klucz instancji",
+    "signOutFailed": "Wylogowanie nie powiodło się: spróbuj ponownie."
   },
   "header": {
     "followUs": "Obserwuj nas na"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publikacje",
       "publicationsNew": "Nowa publikacja",
       "ariaLabel": "Nawigacja administracyjna",
-      "subNavAriaLabel": "Nawigacja sekcji",
       "questionnaires": "Kwestionariusze",
       "questionnairesLibrary": "Szablony kwestionariuszy",
       "questionnairesResponses": "Odpowiedzi",

@@ -106,7 +106,11 @@
     "mainLabel": "Navigazzjoni ewlenija",
     "activeLanguage": "Lingwa attiva:",
     "languageSelected": "(magħżula)",
-    "signIn": "Idħol"
+    "signIn": "Idħol",
+    "roleAdmin": "Amministratur",
+    "roleOrganizer": "Organizzatur",
+    "instanceKey": "Ċavetta tal-istanza",
+    "signOutFailed": "Il-ħruġ ma rnexxiex: erġa' pprova."
   },
   "header": {
     "followUs": "Segwina fuq"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Pubblikazzjonijiet",
       "publicationsNew": "Pubblikazzjoni ġdida",
       "ariaLabel": "Navigazzjoni tal-amministrazzjoni",
-      "subNavAriaLabel": "Navigazzjoni tas-sezzjoni",
       "questionnaires": "Kwestjonarji",
       "questionnairesLibrary": "Templates tal-kwestjonarji",
       "questionnairesResponses": "Tweġibiet",

@@ -106,7 +106,11 @@
     "mainLabel": "Основна навигация",
     "activeLanguage": "Активен език:",
     "languageSelected": "(избран)",
-    "signIn": "Вход"
+    "signIn": "Вход",
+    "roleAdmin": "Администратор",
+    "roleOrganizer": "Организатор",
+    "instanceKey": "Ключ на инстанцията",
+    "signOutFailed": "Изходът не бе успешен: опитайте отново."
   },
   "header": {
     "followUs": "Последвайте ни"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Публикации",
       "publicationsNew": "Нова публикация",
       "ariaLabel": "Навигация на администрацията",
-      "subNavAriaLabel": "Навигация на раздела",
       "questionnaires": "Въпросници",
       "questionnairesLibrary": "Шаблони за въпросници",
       "questionnairesResponses": "Отговори",

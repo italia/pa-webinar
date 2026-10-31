@@ -106,7 +106,11 @@
     "mainLabel": "Peanavigeerimine",
     "activeLanguage": "Aktiivne keel:",
     "languageSelected": "(valitud)",
-    "signIn": "Logi sisse"
+    "signIn": "Logi sisse",
+    "roleAdmin": "Administraator",
+    "roleOrganizer": "Korraldaja",
+    "instanceKey": "Eksemplari võti",
+    "signOutFailed": "Väljalogimine ebaõnnestus: proovi uuesti."
   },
   "header": {
     "followUs": "Jälgige meid"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Väljaanded",
       "publicationsNew": "Uus väljaanne",
       "ariaLabel": "Halduse navigatsioon",
-      "subNavAriaLabel": "Jaotise navigatsioon",
       "questionnaires": "Küsimustikud",
       "questionnairesLibrary": "Küsimustiku mallid",
       "questionnairesResponses": "Vastused",

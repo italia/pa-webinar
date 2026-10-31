@@ -106,7 +106,11 @@
     "mainLabel": "Main navigation",
     "activeLanguage": "Active language:",
     "languageSelected": "(selected)",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Organizer",
+    "instanceKey": "Instance key",
+    "signOutFailed": "Sign-out failed: please try again."
   },
   "header": {
     "followUs": "Follow us on"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publications",
       "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
-      "subNavAriaLabel": "Section navigation",
       "questionnaires": "Questionnaires",
       "questionnairesLibrary": "Questionnaire templates",
       "questionnairesResponses": "Responses",

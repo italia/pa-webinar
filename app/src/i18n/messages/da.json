@@ -106,7 +106,11 @@
     "mainLabel": "Hovednavigation",
     "activeLanguage": "Aktivt sprog:",
     "languageSelected": "(valgt)",
-    "signIn": "Log ind"
+    "signIn": "Log ind",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Arrangør",
+    "instanceKey": "Instansnøgle",
+    "signOutFailed": "Log ud mislykkedes: prøv igen."
   },
   "header": {
     "followUs": "Følg os på"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publikationer",
       "publicationsNew": "Ny publikation",
       "ariaLabel": "Administrationsnavigation",
-      "subNavAriaLabel": "Sektionsnavigation",
       "questionnaires": "Spørgeskemaer",
       "questionnairesLibrary": "Skabeloner til spørgeskemaer",
       "questionnairesResponses": "Svar",

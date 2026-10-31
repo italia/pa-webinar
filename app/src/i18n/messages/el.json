@@ -106,7 +106,11 @@
     "mainLabel": "Κύρια πλοήγηση",
     "activeLanguage": "Ενεργή γλώσσα:",
     "languageSelected": "(επιλεγμένη)",
-    "signIn": "Σύνδεση"
+    "signIn": "Σύνδεση",
+    "roleAdmin": "Διαχειριστής",
+    "roleOrganizer": "Διοργανωτής",
+    "instanceKey": "Κλειδί εγκατάστασης",
+    "signOutFailed": "Η αποσύνδεση απέτυχε: δοκιμάστε ξανά."
   },
   "header": {
     "followUs": "Ακολουθήστε μας"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Δημοσιεύσεις",
       "publicationsNew": "Νέα δημοσίευση",
       "ariaLabel": "Πλοήγηση διαχείρισης",
-      "subNavAriaLabel": "Πλοήγηση ενότητας",
       "questionnaires": "Ερωτηματολόγια",
       "questionnairesLibrary": "Πρότυπα ερωτηματολογίων",
       "questionnairesResponses": "Απαντήσεις",

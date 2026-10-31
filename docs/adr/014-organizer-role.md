@@ -201,7 +201,7 @@ Two mechanisms make it deliberate to open something to organizers:
   does not cover them. They call `requireStaff` directly. The staff calendar feed
   (`GET /api/events/calendar` in admin mode) is in the same position: it reads the staff session
   and filters with `eventScope`.
-- **The allowlisted menu.** `VOCI_ORGANIZZATORE` in `app/src/components/admin/admin-nav.tsx` lists the
+- **The allowlisted menu.** `VOCI_ORGANIZZATORE` in `app/src/components/admin/admin-nav-model.ts` lists the
   menu entries that organizers see. It is an allowlist, so a new section starts as administrator-only
   until someone decides otherwise. Pages follow the same rule: without an explicit staff guard, an
   organizer gets the access-denied page.
@@ -263,7 +263,7 @@ To open a route or a page to organizers, see
 | Link lifetime | `app/src/lib/auth/staff-link-config.ts` |
 | Account management | `app/src/app/api/admin/organizers/`, `app/src/components/admin/organizers-management.tsx` |
 | Sign-in email text | `staffLoginEmail` in `app/src/lib/email/templates.ts` |
-| Organizer menu | `VOCI_ORGANIZZATORE` in `app/src/components/admin/admin-nav.tsx` |
+| Organizer menu | `VOCI_ORGANIZZATORE` in `app/src/components/admin/admin-nav-model.ts` |
 | Guard test | `app/src/lib/auth/staff-access.test.ts` |
 
 ## Related

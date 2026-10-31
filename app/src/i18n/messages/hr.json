@@ -106,7 +106,11 @@
     "mainLabel": "Glavna navigacija",
     "activeLanguage": "Aktivni jezik:",
     "languageSelected": "(odabrano)",
-    "signIn": "Prijava"
+    "signIn": "Prijava",
+    "roleAdmin": "Administrator",
+    "roleOrganizer": "Organizator",
+    "instanceKey": "Ključ instance",
+    "signOutFailed": "Odjava nije uspjela: pokušajte ponovno."
   },
   "header": {
     "followUs": "Pratite nas na"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Objave",
       "publicationsNew": "Nova objava",
       "ariaLabel": "Navigacija administracije",
-      "subNavAriaLabel": "Navigacija odjeljka",
       "questionnaires": "Upitnici",
       "questionnairesLibrary": "Predlošci upitnika",
       "questionnairesResponses": "Odgovori",

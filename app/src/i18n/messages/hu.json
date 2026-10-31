@@ -106,7 +106,11 @@
     "mainLabel": "Fő navigáció",
     "activeLanguage": "Aktív nyelv:",
     "languageSelected": "(kiválasztva)",
-    "signIn": "Belépés"
+    "signIn": "Belépés",
+    "roleAdmin": "Adminisztrátor",
+    "roleOrganizer": "Szervező",
+    "instanceKey": "Példánykulcs",
+    "signOutFailed": "A kijelentkezés nem sikerült: próbálja újra."
   },
   "header": {
     "followUs": "Kövessen minket"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Közzétételek",
       "publicationsNew": "Új közzététel",
       "ariaLabel": "Adminisztrációs navigáció",
-      "subNavAriaLabel": "Szekció navigáció",
       "questionnaires": "Kérdőívek",
       "questionnairesLibrary": "Kérdőívsablonok",
       "questionnairesResponses": "Válaszok",

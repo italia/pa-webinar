@@ -106,7 +106,11 @@
     "mainLabel": "Navegação principal",
     "activeLanguage": "Língua ativa:",
     "languageSelected": "(selecionada)",
-    "signIn": "Entrar"
+    "signIn": "Entrar",
+    "roleAdmin": "Administrador",
+    "roleOrganizer": "Organizador",
+    "instanceKey": "Chave da instância",
+    "signOutFailed": "Não foi possível terminar a sessão: tente novamente."
   },
   "header": {
     "followUs": "Siga-nos em"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publicações",
       "publicationsNew": "Nova publicação",
       "ariaLabel": "Navegação de administração",
-      "subNavAriaLabel": "Navegação da secção",
       "questionnaires": "Questionários",
       "questionnairesLibrary": "Modelos de questionário",
       "questionnairesResponses": "Respostas",

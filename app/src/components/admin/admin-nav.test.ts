@@ -58,7 +58,7 @@ describe('menu dello staff', () => {
   });
 
   it('nessuna icona si ripete fra intestazione, sezioni e voci di una stessa sezione', () => {
-    // L'intestazione mostra i link pubblici e «Amministrazione».
+    // L'intestazione mostra i link pubblici; «Amministrazione» sta nell'area utente.
     const intestazione = [...LINK_INTESTAZIONE.map((l) => l.icon), 'it-tool'].filter(Boolean);
     const sezioni = SEZIONI.map((s) => s.icon);
     expect(new Set(sezioni).size).toBe(sezioni.length);

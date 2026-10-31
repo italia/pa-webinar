@@ -106,7 +106,11 @@
     "mainLabel": "Navigation principale",
     "activeLanguage": "Langue active :",
     "languageSelected": "(sélectionnée)",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "roleAdmin": "Administrateur",
+    "roleOrganizer": "Organisateur",
+    "instanceKey": "Clé de l'instance",
+    "signOutFailed": "La déconnexion a échoué : réessayez."
   },
   "header": {
     "followUs": "Suivez-nous sur"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publications",
       "publicationsNew": "Nouvelle publication",
       "ariaLabel": "Navigation d'administration",
-      "subNavAriaLabel": "Navigation de section",
       "questionnaires": "Questionnaires",
       "questionnairesLibrary": "Modèles de questionnaire",
       "questionnairesResponses": "Réponses",

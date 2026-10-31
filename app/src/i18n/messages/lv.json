@@ -106,7 +106,11 @@
     "mainLabel": "Galvenā navigācija",
     "activeLanguage": "Aktīvā valoda:",
     "languageSelected": "(atlasīta)",
-    "signIn": "Pieteikties"
+    "signIn": "Pieteikties",
+    "roleAdmin": "Administrators",
+    "roleOrganizer": "Organizators",
+    "instanceKey": "Instances atslēga",
+    "signOutFailed": "Iziešana neizdevās: mēģiniet vēlreiz."
   },
   "header": {
     "followUs": "Sekojiet mums"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publikācijas",
       "publicationsNew": "Jauna publikācija",
       "ariaLabel": "Administrēšanas navigācija",
-      "subNavAriaLabel": "Sadaļas navigācija",
       "questionnaires": "Anketas",
       "questionnairesLibrary": "Anketu veidnes",
       "questionnairesResponses": "Atbildes",

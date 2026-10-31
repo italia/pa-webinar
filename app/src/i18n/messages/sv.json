@@ -106,7 +106,11 @@
     "mainLabel": "Huvudnavigering",
     "activeLanguage": "Aktivt språk:",
     "languageSelected": "(vald)",
-    "signIn": "Logga in"
+    "signIn": "Logga in",
+    "roleAdmin": "Administratör",
+    "roleOrganizer": "Arrangör",
+    "instanceKey": "Instansnyckel",
+    "signOutFailed": "Utloggningen misslyckades: försök igen."
   },
   "header": {
     "followUs": "Följ oss på"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publiceringar",
       "publicationsNew": "Ny publicering",
       "ariaLabel": "Administrationsnavigering",
-      "subNavAriaLabel": "Sektionsnavigering",
       "questionnaires": "Enkäter",
       "questionnairesLibrary": "Enkätmallar",
       "questionnairesResponses": "Svar",

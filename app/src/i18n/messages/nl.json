@@ -106,7 +106,11 @@
     "mainLabel": "Hoofdnavigatie",
     "activeLanguage": "Actieve taal:",
     "languageSelected": "(geselecteerd)",
-    "signIn": "Inloggen"
+    "signIn": "Inloggen",
+    "roleAdmin": "Beheerder",
+    "roleOrganizer": "Organisator",
+    "instanceKey": "Instantiesleutel",
+    "signOutFailed": "Afmelden mislukt: probeer het opnieuw."
   },
   "header": {
     "followUs": "Volg ons op"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publicaties",
       "publicationsNew": "Nieuwe publicatie",
       "ariaLabel": "Beheernavigatie",
-      "subNavAriaLabel": "Sectienavigatie",
       "questionnaires": "Vragenlijsten",
       "questionnairesLibrary": "Vragenlijstsjablonen",
       "questionnairesResponses": "Antwoorden",

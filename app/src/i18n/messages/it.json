@@ -106,7 +106,11 @@
     "mainLabel": "Navigazione principale",
     "activeLanguage": "Lingua attiva:",
     "languageSelected": "(selezionata)",
-    "signIn": "Accedi"
+    "signIn": "Accedi",
+    "roleAdmin": "Amministratore",
+    "roleOrganizer": "Organizzatore",
+    "instanceKey": "Chiave dell'istanza",
+    "signOutFailed": "Uscita non riuscita: riprova."
   },
   "header": {
     "followUs": "Seguici su"
@@ -1547,7 +1551,6 @@
       "questionnairesLibrary": "Modelli di questionario",
       "questionnairesResponses": "Risposte",
       "ariaLabel": "Navigazione amministrazione",
-      "subNavAriaLabel": "Navigazione sezione",
       "rubrica": "Rubrica",
       "settingsEmailTemplates": "Template email",
       "settingsTags": "Tag",

@@ -228,7 +228,7 @@ Some changes do need a rebuild: fonts, the compiled component palette, the defau
 - [ ] For a page in the administration area:
   - declare its audience at the top: `const denied = await soloAdmin(locale); if (denied) return denied;` for administrators only, or `const session = await staffOLogin(locale)` for any staff member, then filter the data with the session. Both helpers are in `app/src/lib/auth/staff-page.ts`. `app/src/lib/auth/staff-access.test.ts` fails for a page that declares no audience;
   - add its breadcrumb label in `app/src/components/admin/admin-breadcrumb.tsx`, with the key in the `admin.nav` namespace in all 24 catalogs. `localized-url.test.ts` fails for an administration page with no breadcrumb entry, and the parity test covers the catalogs;
-  - add a menu entry in `app/src/components/admin/admin-nav.tsx` if it needs one. Organizers see an entry only when it is listed in `VOCI_ORGANIZZATORE`, so a new section starts as administrator-only.
+  - add a menu entry in `app/src/components/admin/admin-nav-model.ts` if it needs one (it appears in its section's megamenu). Organizers see an entry only when it is listed in `VOCI_ORGANIZZATORE`, so a new section starts as administrator-only.
 - [ ] For a public page that search engines should index, add it to the static list in `app/src/app/sitemap.ts`.
 - [ ] If the page loads anything from a new origin, the Content Security Policy must allow it ([Content Security Policy](../SECURITY-CSP.md)).
 

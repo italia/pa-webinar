@@ -106,7 +106,11 @@
     "mainLabel": "Príomh-nascleanúint",
     "activeLanguage": "Teanga ghníomhach:",
     "languageSelected": "(roghnaithe)",
-    "signIn": "Sínigh isteach"
+    "signIn": "Sínigh isteach",
+    "roleAdmin": "Riarthóir",
+    "roleOrganizer": "Eagraí",
+    "instanceKey": "Eochair an chóipe",
+    "signOutFailed": "Theip ar shíniú amach: bain triail eile as."
   },
   "header": {
     "followUs": "Lean sinn ar"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Foilseacháin",
       "publicationsNew": "Foilseachán nua",
       "ariaLabel": "Nascleanúint riaracháin",
-      "subNavAriaLabel": "Nascleanúint rannáin",
       "questionnaires": "Ceistneoirí",
       "questionnairesLibrary": "Teimpléid cheistneora",
       "questionnairesResponses": "Freagraí",

@@ -106,7 +106,11 @@
     "mainLabel": "Hlavná navigácia",
     "activeLanguage": "Aktívny jazyk:",
     "languageSelected": "(vybraný)",
-    "signIn": "Prihlásiť sa"
+    "signIn": "Prihlásiť sa",
+    "roleAdmin": "Správca",
+    "roleOrganizer": "Organizátor",
+    "instanceKey": "Kľúč inštancie",
+    "signOutFailed": "Odhlásenie zlyhalo: skúste to znova."
   },
   "header": {
     "followUs": "Sledujte nás na"
@@ -1334,7 +1338,6 @@
       "publicationsList": "Publikácie",
       "publicationsNew": "Nová publikácia",
       "ariaLabel": "Navigácia administrácie",
-      "subNavAriaLabel": "Navigácia sekcie",
       "questionnaires": "Dotazníky",
       "questionnairesLibrary": "Šablóny dotazníkov",
       "questionnairesResponses": "Odpovede",

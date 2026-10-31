@@ -12,7 +12,7 @@ import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
 import BackToTop from '@/components/layout/back-to-top';
 import { serviceInventoryUrl } from '@/lib/service-inventory-url';
-import { getStaffSession } from '@/lib/auth/staff-session';
+import { staffPerIntestazione } from '@/lib/auth/staff-session';
 import { getSettings } from '@/lib/settings';
 import { SettingsProvider } from '@/lib/settings-context';
 
@@ -81,9 +81,9 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  // Il collegamento all'area di amministrazione nell'intestazione, per chiunque
-  // dello staff vi sia entrato: anche l'organizzatore (ADR-014).
-  const isAdmin = (await getStaffSession(await cookies())) !== null;
+  // L'area utente nell'intestazione, per chiunque dello staff sia entrato:
+  // anche l'organizzatore (ADR-014).
+  const staff = await staffPerIntestazione(await cookies());
   const settings = await getSettings();
 
   return (
@@ -95,7 +95,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <SettingsProvider settings={settings}>
             <Skiplink />
-            <PAHeader isAdmin={isAdmin} />
+            <PAHeader staff={staff} />
             <main id="main-content" className="flex-grow-1" tabIndex={-1}>
               {children}
             </main>
