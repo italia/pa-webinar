@@ -833,7 +833,6 @@
         "coverImageHelp": "Zobrazuje sa na verejnej stránke a v e-mailoch prihláseným.",
         "scheduleHeading": "Kalendár",
         "timezone": "Časové pásmo",
-        "recurrenceHeading": "Opakovanie",
         "tagsHeading": "Kategórie (tagy)",
         "newTag": "Nová kategória",
         "newTagLabel": "Názov novej kategórie",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Opakovanie",
-      "helpText": "Nastavte podujatie ako opakované. Vytvorí sa séria počnúc dátumom začiatku.",
+      "helpText": "Ak sa podujatie opakuje, kópia pri duplikovaní navrhne dátum ďalšieho konania.",
       "preset": {
-        "none": "Žiadne",
+        "none": "Neopakuje sa",
         "daily": "Každý deň",
         "weekly": "Každý týždeň",
         "weekdays": "Pracovné dni",

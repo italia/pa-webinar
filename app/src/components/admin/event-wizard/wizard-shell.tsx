@@ -38,6 +38,7 @@ import {
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
+import { presetForEditing } from '@/lib/utils/recurrence';
 import { lingueDiPartenzaTraduzione, parseLocaleList } from '@/lib/ai/target-locales';
 import type { CapacitaIstanza } from '@/lib/capacity/model';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
@@ -469,6 +470,8 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: ev.participantsCanShareScreen,
         });
 
+      const ricorrenzaSalvata = presetForEditing(ev.recurrenceRule, new Date(ev.startsAt));
+
       return {
         // Step 1
         title: { it: ev.title.it ?? '', en: ev.title.en ?? '', ...ev.title },
@@ -486,9 +489,9 @@ export default function EventWizard(props: WizardProps) {
         waitingRoomAudioUrl: ev.waitingRoomAudioUrl,
         tagSlugs: ev.tagSlugs,
         recurrenceRule: ev.recurrenceRule,
-        recurrencePreset: ev.recurrenceRule ? 'custom' : ('none' as const),
-        recurrenceUntil: null,
-        recurrenceCount: null,
+        recurrencePreset: ricorrenzaSalvata.preset,
+        recurrenceUntil: ricorrenzaSalvata.until,
+        recurrenceCount: ricorrenzaSalvata.count,
         parseTitleKicker: ev.parseTitleKicker,
         waitingRoomEngine: ev.waitingRoomEngine,
         videoQuality: ev.videoQuality,

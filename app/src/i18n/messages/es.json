@@ -833,7 +833,6 @@
         "coverImageHelp": "Se muestra en la página pública y en los correos a las personas inscritas.",
         "scheduleHeading": "Calendario",
         "timezone": "Zona horaria",
-        "recurrenceHeading": "Recurrencia",
         "tagsHeading": "Categorías (etiquetas)",
         "newTag": "Nueva categoría",
         "newTagLabel": "Nombre de la nueva categoría",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Recurrencia",
-      "helpText": "Convierta el evento en recurrente. Se creará una serie a partir de la fecha de inicio.",
+      "helpText": "Si el evento se repite, al duplicarlo la copia propone la fecha de la próxima edición.",
       "preset": {
-        "none": "Ninguna",
+        "none": "No se repite",
         "daily": "Diaria",
         "weekly": "Semanal",
         "weekdays": "Días laborables",

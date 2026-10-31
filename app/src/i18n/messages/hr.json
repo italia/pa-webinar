@@ -833,7 +833,6 @@
         "coverImageHelp": "Prikazuje se na javnoj stranici i u e-porukama prijavljenima.",
         "scheduleHeading": "Raspored",
         "timezone": "Vremenska zona",
-        "recurrenceHeading": "Ponavljanje",
         "tagsHeading": "Kategorije (oznake)",
         "newTag": "Nova kategorija",
         "newTagLabel": "Naziv nove kategorije",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Ponavljanje",
-      "helpText": "Postavite ponavljanje događaja. Bit će stvorena serija od datuma početka.",
+      "helpText": "Ako se događaj ponavlja, kopija pri dupliciranju predlaže datum sljedećeg održavanja.",
       "preset": {
-        "none": "Nema",
+        "none": "Ne ponavlja se",
         "daily": "Svaki dan",
         "weekly": "Svaki tjedan",
         "weekdays": "Radni dani",

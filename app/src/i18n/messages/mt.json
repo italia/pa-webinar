@@ -833,7 +833,6 @@
         "coverImageHelp": "Tidher fil-paġna pubblika u fl-emails lil min irreġistra.",
         "scheduleHeading": "Kalendarju",
         "timezone": "Żona tal-ħin",
-        "recurrenceHeading": "Rikorrenza",
         "tagsHeading": "Kategoriji (tags)",
         "newTag": "Kategorija ġdida",
         "newTagLabel": "Isem il-kategorija l-ġdida",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Rikorrenza",
-      "helpText": "Rendi l'avveniment ricorrente. Se jiġi maħluqa waħda seriu minn mill-data di bidu.",
+      "helpText": "Jekk l-avveniment jirrepeti ruħu, meta tidduplikah il-kopja tissuġġerixxi d-data tal-okkażjoni li jmiss.",
       "preset": {
-        "none": "Nessuna",
+        "none": "Ma jirrepetix ruħu",
         "daily": "Kull jum",
         "weekly": "Kull ġimgħa",
         "weekdays": "Jiem feriali",

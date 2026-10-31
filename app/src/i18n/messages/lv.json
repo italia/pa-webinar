@@ -833,7 +833,6 @@
         "coverImageHelp": "Tiek rādīts publiskajā lapā un e-pastos reģistrētajiem dalībniekiem.",
         "scheduleHeading": "Kalendārs",
         "timezone": "Laika josla",
-        "recurrenceHeading": "Atkārtošanās",
         "tagsHeading": "Kategorijas (tagi)",
         "newTag": "Jauna kategorija",
         "newTagLabel": "Jaunās kategorijas nosaukums",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Atkārtošanās",
-      "helpText": "Padariet pasākumu atkārtotu. Sākot no sākuma datuma tiks izveidota sērija.",
+      "helpText": "Ja pasākums atkārtojas, to dublējot, kopija piedāvā nākamās reizes datumu.",
       "preset": {
-        "none": "Nav",
+        "none": "Neatkārtojas",
         "daily": "Katru dienu",
         "weekly": "Katru nedēļu",
         "weekdays": "Darba dienās",

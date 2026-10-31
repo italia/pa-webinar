@@ -833,7 +833,6 @@
         "coverImageHelp": "Rodoma viešame puslapyje ir el. laiškuose užsiregistravusiems.",
         "scheduleHeading": "Kalendorius",
         "timezone": "Laiko juosta",
-        "recurrenceHeading": "Pasikartojimas",
         "tagsHeading": "Kategorijos (žymos)",
         "newTag": "Nauja kategorija",
         "newTagLabel": "Naujos kategorijos pavadinimas",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Pasikartojimas",
-      "helpText": "Padarykite renginį pasikartojantį. Bus sukurta serija nuo pradžios datos.",
+      "helpText": "Jei renginys kartojasi, jį dubliuojant kopija pasiūlo kito renginio datą.",
       "preset": {
-        "none": "Nėra",
+        "none": "Nesikartoja",
         "daily": "Kasdien",
         "weekly": "Kas savaitę",
         "weekdays": "Darbo dienomis",

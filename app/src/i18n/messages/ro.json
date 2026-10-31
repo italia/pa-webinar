@@ -833,7 +833,6 @@
         "coverImageHelp": "Apare pe pagina publică și în e-mailurile trimise celor înscriși.",
         "scheduleHeading": "Calendar",
         "timezone": "Fus orar",
-        "recurrenceHeading": "Recurență",
         "tagsHeading": "Categorii (etichete)",
         "newTag": "Categorie nouă",
         "newTagLabel": "Numele noii categorii",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Recurență",
-      "helpText": "Faceți evenimentul recurent. Se va crea o serie începând cu data de început.",
+      "helpText": "Dacă evenimentul se repetă, la duplicare copia propune data următoarei ediții.",
       "preset": {
-        "none": "Niciuna",
+        "none": "Nu se repetă",
         "daily": "Zilnic",
         "weekly": "Săptămânal",
         "weekdays": "Zile lucrătoare",

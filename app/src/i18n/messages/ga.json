@@ -833,7 +833,6 @@
         "coverImageHelp": "Taispeántar é ar an leathanach poiblí agus sna ríomhphoist chuig na daoine cláraithe.",
         "scheduleHeading": "Sceideal",
         "timezone": "Crios ama",
-        "recurrenceHeading": "Athrá",
         "tagsHeading": "Catagóirí (clibeanna)",
         "newTag": "Catagóir nua",
         "newTagLabel": "Ainm na catagóire nua",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Atarlú",
-      "helpText": "Déan an t-imeacht atarlach. Cruthófar sraith ag tosú ón dáta tosaigh.",
+      "helpText": "Má athdhéantar an ócáid, nuair a dhéanann tú dúblach di molann an chóip dáta na chéad ócáide eile.",
       "preset": {
-        "none": "Faic",
+        "none": "Ní athdhéantar é",
         "daily": "Gach lá",
         "weekly": "Gach seachtain",
         "weekdays": "Laethanta seachtaine",

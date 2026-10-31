@@ -833,7 +833,6 @@
         "coverImageHelp": "Shown on the public page and in the emails to registrants.",
         "scheduleHeading": "Schedule",
         "timezone": "Timezone",
-        "recurrenceHeading": "Recurrence",
         "tagsHeading": "Tags",
         "newTag": "New category",
         "newTagLabel": "Name of the new category",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Recurrence",
-      "helpText": "Make this event recurring. A series will be generated starting from the start date.",
+      "helpText": "If the event repeats, duplicating it suggests the date of the next occurrence.",
       "preset": {
-        "none": "None",
+        "none": "Does not repeat",
         "daily": "Daily",
         "weekly": "Weekly",
         "weekdays": "Weekdays",

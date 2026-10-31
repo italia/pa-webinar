@@ -833,7 +833,6 @@
         "coverImageHelp": "Wyświetlany na stronie publicznej i w e-mailach do zapisanych osób.",
         "scheduleHeading": "Kalendarz",
         "timezone": "Strefa czasowa",
-        "recurrenceHeading": "Powtarzanie",
         "tagsHeading": "Kategorie (tagi)",
         "newTag": "Nowa kategoria",
         "newTagLabel": "Nazwa nowej kategorii",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Powtarzanie",
-      "helpText": "Spraw, aby wydarzenie było cykliczne. Seria zostanie utworzona od daty rozpoczęcia.",
+      "helpText": "Jeśli wydarzenie się powtarza, przy duplikowaniu kopia zaproponuje datę kolejnej edycji.",
       "preset": {
-        "none": "Brak",
+        "none": "Nie powtarza się",
         "daily": "Codziennie",
         "weekly": "Co tydzień",
         "weekdays": "Dni robocze",

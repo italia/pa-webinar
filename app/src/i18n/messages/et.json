@@ -833,7 +833,6 @@
         "coverImageHelp": "Kuvatakse avalikul lehel ja registreerunutele saadetavates e-kirjades.",
         "scheduleHeading": "Ajakava",
         "timezone": "Ajavöönd",
-        "recurrenceHeading": "Kordumine",
         "tagsHeading": "Kategooriad (sildid)",
         "newTag": "Uus kategooria",
         "newTagLabel": "Uue kategooria nimi",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Kordumine",
-      "helpText": "Muuda sündmus korduvaks. Algusajast luuakse seeria.",
+      "helpText": "Kui sündmus kordub, pakub koopia dubleerimisel järgmise toimumise kuupäeva.",
       "preset": {
-        "none": "Pole",
+        "none": "Ei kordu",
         "daily": "Iga päev",
         "weekly": "Iga nädal",
         "weekdays": "Tööpäevad",

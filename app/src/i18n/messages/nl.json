@@ -833,7 +833,6 @@
         "coverImageHelp": "Verschijnt op de openbare pagina en in de e-mails aan de ingeschrevenen.",
         "scheduleHeading": "Agenda",
         "timezone": "Tijdzone",
-        "recurrenceHeading": "Herhaling",
         "tagsHeading": "Categorieën (tags)",
         "newTag": "Nieuwe categorie",
         "newTagLabel": "Naam van de nieuwe categorie",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Herhaling",
-      "helpText": "Maak het evenement terugkerend. Er wordt een serie aangemaakt vanaf de startdatum.",
+      "helpText": "Als het evenement zich herhaalt, stelt de kopie bij dupliceren de datum van de volgende keer voor.",
       "preset": {
-        "none": "Geen",
+        "none": "Herhaalt niet",
         "daily": "Elke dag",
         "weekly": "Elke week",
         "weekdays": "Werkdagen",

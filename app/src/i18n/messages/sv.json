@@ -833,7 +833,6 @@
         "coverImageHelp": "Visas på den offentliga sidan och i e-postmeddelandena till de anmälda.",
         "scheduleHeading": "Schema",
         "timezone": "Tidszon",
-        "recurrenceHeading": "Återkommande",
         "tagsHeading": "Kategorier (taggar)",
         "newTag": "Ny kategori",
         "newTagLabel": "Namn på den nya kategorin",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Återkommande",
-      "helpText": "Gör evenemanget återkommande. En serie skapas från startdatumet.",
+      "helpText": "Om evenemanget upprepas föreslår kopian datumet för nästa tillfälle när du duplicerar det.",
       "preset": {
-        "none": "Ingen",
+        "none": "Upprepas inte",
         "daily": "Varje dag",
         "weekly": "Varje vecka",
         "weekdays": "Vardagar",

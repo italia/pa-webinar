@@ -7,6 +7,8 @@ import {
   nextOccurrences,
   nextOccurrenceAfter,
   jsWeekdayToRRule,
+  presetForEditing,
+  rebuildForNewStart,
 } from './recurrence';
 
 // A Wednesday (2026-01-14 is a Wednesday) at 10:00 UTC.
@@ -269,5 +271,52 @@ describe('nextOccurrenceAfter', () => {
       'UTC',
     );
     expect(hit!.getTime()).toBeGreaterThan(new Date('2026-10-01T08:00:00.000Z').getTime());
+  });
+});
+
+describe('presetForEditing', () => {
+  // venerdì 2 gennaio 2026, 10:00 UTC
+  const dtstart = new Date(Date.UTC(2026, 0, 2, 10, 0, 0));
+
+  it('senza regola: non si ripete', () => {
+    expect(presetForEditing(null, dtstart)).toEqual({ preset: 'none', count: null, until: null });
+  });
+
+  it('riconosce una regola che il modulo ricostruisce identica', () => {
+    expect(presetForEditing('FREQ=WEEKLY;BYDAY=FR', dtstart).preset).toBe('weekly');
+    expect(presetForEditing('FREQ=MONTHLY;COUNT=6', dtstart)).toMatchObject({ preset: 'monthly', count: 6 });
+    // piu' giorni: il modulo li conserva
+    expect(presetForEditing('FREQ=WEEKLY;BYDAY=MO,FR', dtstart).preset).toBe('weekly');
+  });
+
+  it('resta personalizzata se ricostruirla cambierebbe la regola', () => {
+    // fine a mezzanotte: il modulo la scriverebbe a fine giornata
+    expect(presetForEditing('FREQ=DAILY;UNTIL=20260301T000000Z', dtstart).preset).toBe('custom');
+    // intervallo
+    expect(presetForEditing('FREQ=WEEKLY;INTERVAL=2;BYDAY=FR', dtstart).preset).toBe('custom');
+  });
+});
+
+describe('rebuildForNewStart', () => {
+  const venerdi = new Date(Date.UTC(2026, 0, 2, 10, 0, 0));
+  const lunedi = new Date(Date.UTC(2026, 0, 5, 10, 0, 0));
+
+  it('un giorno solo segue il nuovo inizio', () => {
+    const r = rebuildForNewStart({ preset: 'weekly', rrule: 'FREQ=WEEKLY;BYDAY=FR', until: null, count: null }, lunedi);
+    expect(r).toBe('FREQ=WEEKLY;BYDAY=MO');
+  });
+
+  it('tiene i giorni scelti, la fine e le ripetizioni', () => {
+    const giorni = rebuildForNewStart({ preset: 'weekly', rrule: 'FREQ=WEEKLY;BYDAY=MO,FR', until: null, count: null }, venerdi);
+    expect(giorni).toContain('BYDAY=MO,FR');
+    const fine = rebuildForNewStart({ preset: 'daily', rrule: 'FREQ=DAILY', until: '2026-03-01', count: null }, lunedi);
+    expect(fine).toContain('UNTIL=20260301T235959Z');
+    const volte = rebuildForNewStart({ preset: 'monthly', rrule: 'FREQ=MONTHLY;COUNT=4', until: null, count: 4 }, lunedi);
+    expect(volte).toContain('COUNT=4');
+  });
+
+  it('non tocca una regola personalizzata', () => {
+    expect(rebuildForNewStart({ preset: 'custom', rrule: 'FREQ=YEARLY', until: null, count: null }, lunedi)).toBe('FREQ=YEARLY');
+    expect(rebuildForNewStart({ preset: 'none', rrule: null, until: null, count: null }, lunedi)).toBeNull();
   });
 });

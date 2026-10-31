@@ -833,7 +833,6 @@
         "coverImageHelp": "Zobrazuje se na veřejné stránce a v e-mailech přihlášeným.",
         "scheduleHeading": "Kalendář",
         "timezone": "Časové pásmo",
-        "recurrenceHeading": "Opakování",
         "tagsHeading": "Kategorie (štítky)",
         "newTag": "Nová kategorie",
         "newTagLabel": "Název nové kategorie",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Opakování",
-      "helpText": "Nastavte událost jako opakovanou. Bude vytvořena série začínající datem začátku.",
+      "helpText": "Pokud se akce opakuje, kopie při duplikování navrhne datum dalšího konání.",
       "preset": {
-        "none": "Žádné",
+        "none": "Neopakuje se",
         "daily": "Každý den",
         "weekly": "Každý týden",
         "weekdays": "Pracovní dny",

@@ -18,11 +18,12 @@ import { MarkdownEditor } from '@/components/ui/markdown';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import RecurrencePicker from '@/components/admin/recurrence-picker';
 import {
-  buildRRule,
+  rebuildForNewStart,
   type RecurrencePreset,
   type RecurrenceValue,
 } from '@/lib/utils/recurrence';
 import { fromDatetimeLocalInTz, toDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { timezoneLabel, timezoneOptions } from '@/lib/time/timezones';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
@@ -122,9 +123,6 @@ export default function Step1Base({
   const t = useTranslations('admin.wizard.step1');
   const tf = useTranslations('admin.wizard.flow');
   const fasciaCopertina = useFasciaCopertina();
-  // La ricorrenza resta aperta se c'era all'apertura: scegliere «nessuna»
-  // non la richiude sotto il cursore.
-  const [ricorrenzaAperta] = useState(value.recurrencePreset !== 'none');
   // Il testo del campo partecipanti mentre lo si scrive (null fuori dal campo).
   const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
@@ -212,23 +210,21 @@ export default function Step1Base({
     if (fine) onChange({ endsAt: fine });
   };
 
-  // When startsAt or preset changes, refresh the RRULE body so BYDAY etc stay in sync.
-  const handleStartsAt = (next: string) => {
-    const patch: Partial<Step1Value> = { startsAt: next };
-    if (value.recurrencePreset !== 'none' && value.recurrencePreset !== 'custom') {
-      try {
-        const newDt = fromDatetimeLocalInTz(next, value.timezone);
-        const rebuilt = buildRRule({
-          preset: value.recurrencePreset,
-          dtstart: newDt,
-          count: value.recurrenceCount ?? undefined,
-        });
-        patch.recurrenceRule = rebuilt || null;
-      } catch {
-        /* ignore */
-      }
+  // Quando cambiano l'inizio o il fuso, la regola si ricostruisce sul nuovo
+  // inizio, tenendo giorni, fine e ripetizioni gia' scelti.
+  const regolaPerInizio = (startsAt: string, timezone: string): Partial<Step1Value> => {
+    if (value.recurrencePreset === 'none' || value.recurrencePreset === 'custom' || !startsAt) return {};
+    try {
+      return { recurrenceRule: rebuildForNewStart(recurrenceValue, fromDatetimeLocalInTz(startsAt, timezone)) };
+    } catch {
+      return {};
     }
-    onChange(patch);
+  };
+  const handleStartsAt = (next: string) => {
+    onChange({ startsAt: next, ...regolaPerInizio(next, value.timezone) });
+  };
+  const handleTimezone = (tz: string) => {
+    onChange({ timezone: tz, ...regolaPerInizio(value.startsAt, tz) });
   };
 
   // I campi obbligatori si fanno notare finche' sono vuoti (lampeggiano di
@@ -411,13 +407,11 @@ export default function Step1Base({
                 id="ev-tz"
                 className="form-select"
                 value={value.timezone}
-                onChange={(e) => onChange({ timezone: e.target.value })}
+                onChange={(e) => handleTimezone(e.target.value)}
               >
-                <option value="Europe/Rome">Europe/Rome</option>
-                <option value="UTC">UTC</option>
-                <option value="Europe/London">Europe/London</option>
-                <option value="Europe/Paris">Europe/Paris</option>
-                <option value="Europe/Berlin">Europe/Berlin</option>
+                {timezoneOptions(value.timezone).map((tz) => (
+                  <option key={tz} value={tz}>{timezoneLabel(tz)}</option>
+                ))}
               </select>
             </div>
               <div className="col-md-6">
@@ -474,25 +468,16 @@ export default function Step1Base({
             </div>
         </section>
 
-        {/* Recurrence */}
-        {/* Recurrence collapsed by default — most single events won't touch it.
-            Kept open when a recurrence is already configured (edit case). */}
-        <details className="mb-4" open={ricorrenzaAperta || undefined}>
-          <summary
-            className="h6 fw-semibold mb-2"
-            style={{ cursor: 'pointer', color: 'var(--app-text)' }}
-          >
-            {t('recurrenceHeading')}
-          </summary>
-          <div className="mt-2">
-            <RecurrencePicker
-              value={recurrenceValue}
-              onChange={onRecurrenceChange}
-              dtstart={dtstart}
-              timezone={value.timezone}
-            />
-          </div>
-        </details>
+        {/* Ricorrenza: un menu col valore in vista («Non si ripete»), non
+            una sezione da aprire per scoprire che cosa c'è sotto. */}
+        <div className="mb-4">
+          <RecurrencePicker
+            value={recurrenceValue}
+            onChange={onRecurrenceChange}
+            dtstart={dtstart}
+            timezone={value.timezone}
+          />
+        </div>
 
       </div>
     );

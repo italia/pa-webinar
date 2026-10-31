@@ -2,10 +2,12 @@
 
 import { useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+
 import {
   buildRRule,
   nextOccurrences,
   jsWeekdayToRRule,
+  parseIsoDateToUtc,
   type RecurrencePreset,
   type RecurrenceValue,
 } from '@/lib/utils/recurrence';
@@ -141,7 +143,7 @@ export default function RecurrencePicker({
     // l'anteprima prometterebbe un orario e la copia ne produrrebbe un
     // altro a cavallo del cambio d'ora.
     return nextOccurrences(value.rrule, dtstart, 5, timezone);
-  }, [value.rrule, dtstart]);
+  }, [value.rrule, dtstart, timezone]);
 
   const customValid = useMemo(() => {
     if (preset !== 'custom') return true;
@@ -151,27 +153,24 @@ export default function RecurrencePicker({
 
   return (
     <div className="recurrence-picker">
-      {/* Preset segmented group */}
-      <div className="mb-3">
-        <div className="form-label mb-2">{t('label')}</div>
-        <div className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-          {t('helpText')}
-        </div>
-        <div className="d-flex flex-wrap gap-2" role="radiogroup" aria-label={t('label')}>
+      {/* Il valore scelto resta sempre in vista, come il fuso orario: si
+          capisce subito che l'evento non si ripete, senza aprire nulla. */}
+      <div className="row mb-3">
+        <div className="col-md-6">
+        <label className="form-label" htmlFor="rp-preset">{t('label')}</label>
+        <select
+          id="rp-preset"
+          className="form-select"
+          value={preset}
+          disabled={disabled}
+          aria-describedby="rp-preset-help"
+          onChange={(e) => emit({ preset: e.target.value as RecurrencePreset })}
+        >
           {PRESETS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="radio"
-              aria-checked={preset === p}
-              disabled={disabled}
-              onClick={() => emit({ preset: p })}
-              className={`btn btn-sm ${preset === p ? 'btn-primary' : 'btn-outline-primary'}`}
-              style={{ borderRadius: 20 }}
-            >
-              {t(`preset.${p}`)}
-            </button>
+            <option key={p} value={p}>{t(`preset.${p}`)}</option>
           ))}
+        </select>
+        <div id="rp-preset-help" className="form-text">{t('helpText')}</div>
         </div>
       </div>
 
@@ -339,18 +338,6 @@ export default function RecurrencePicker({
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────
-
-function parseIsoDateToUtc(iso: string): Date | undefined {
-  // "YYYY-MM-DD" → UTC end-of-day so that the UNTIL includes the selected day.
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  if (!m) return undefined;
-  return new Date(Date.UTC(
-    Number(m[1]),
-    Number(m[2]) - 1,
-    Number(m[3]),
-    23, 59, 59,
-  ));
-}
 
 function defaultUntilIso(dtstart: Date): string {
   // Default: 3 months from dtstart.

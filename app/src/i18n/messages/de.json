@@ -833,7 +833,6 @@
         "coverImageHelp": "Erscheint auf der öffentlichen Seite und in den E-Mails an die Angemeldeten.",
         "scheduleHeading": "Zeitplan",
         "timezone": "Zeitzone",
-        "recurrenceHeading": "Wiederholung",
         "tagsHeading": "Kategorien (Tags)",
         "newTag": "Neue Kategorie",
         "newTagLabel": "Name der neuen Kategorie",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Wiederholung",
-      "helpText": "Macht das Event wiederkehrend. Eine Serie wird ab dem Startdatum erstellt.",
+      "helpText": "Wenn sich das Event wiederholt, schlägt die Kopie beim Duplizieren das Datum des nächsten Termins vor.",
       "preset": {
-        "none": "Keine",
+        "none": "Wiederholt sich nicht",
         "daily": "Täglich",
         "weekly": "Wöchentlich",
         "weekdays": "Werktage",

@@ -1043,7 +1043,6 @@
         "coverImageHelp": "Compare nella pagina pubblica e nelle email agli iscritti.",
         "scheduleHeading": "Calendario",
         "timezone": "Fuso orario",
-        "recurrenceHeading": "Ricorrenza",
         "tagsHeading": "Categorie (tag)",
         "newTag": "Nuova categoria",
         "newTagLabel": "Nome della nuova categoria",
@@ -2476,9 +2475,9 @@
     },
     "recurrence": {
       "label": "Ricorrenza",
-      "helpText": "Rendi l'evento ricorrente. Verrà creata una serie a partire dalla data di inizio.",
+      "helpText": "Se l'evento si ripete, quando lo duplichi la copia propone già la data della prossima edizione.",
       "preset": {
-        "none": "Nessuna",
+        "none": "Non si ripete",
         "daily": "Ogni giorno",
         "weekly": "Ogni settimana",
         "weekdays": "Giorni feriali",

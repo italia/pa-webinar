@@ -833,7 +833,6 @@
         "coverImageHelp": "Näkyy julkisella sivulla ja ilmoittautuneille lähetettävissä sähköposteissa.",
         "scheduleHeading": "Aikataulu",
         "timezone": "Aikavyöhyke",
-        "recurrenceHeading": "Toistuvuus",
         "tagsHeading": "Kategoriat (tagit)",
         "newTag": "Uusi luokka",
         "newTagLabel": "Uuden luokan nimi",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Toistuvuus",
-      "helpText": "Tee tapahtumasta toistuva. Sarja luodaan alkamispäivästä lähtien.",
+      "helpText": "Jos tapahtuma toistuu, kopio ehdottaa monistettaessa seuraavan kerran päivämäärää.",
       "preset": {
-        "none": "Ei mitään",
+        "none": "Ei toistu",
         "daily": "Päivittäin",
         "weekly": "Viikoittain",
         "weekdays": "Arkipäivät",

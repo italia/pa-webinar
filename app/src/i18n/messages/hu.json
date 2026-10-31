@@ -833,7 +833,6 @@
         "coverImageHelp": "Megjelenik a nyilvános oldalon és a jelentkezőknek küldött e-mailekben.",
         "scheduleHeading": "Naptár",
         "timezone": "Időzóna",
-        "recurrenceHeading": "Ismétlődés",
         "tagsHeading": "Kategóriák (címkék)",
         "newTag": "Új kategória",
         "newTagLabel": "Az új kategória neve",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Ismétlődés",
-      "helpText": "Tegye ismétlődővé az eseményt. A kezdési dátumtól sorozat jön létre.",
+      "helpText": "Ha az esemény ismétlődik, másoláskor a másolat a következő alkalom dátumát javasolja.",
       "preset": {
-        "none": "Nincs",
+        "none": "Nem ismétlődik",
         "daily": "Naponta",
         "weekly": "Hetente",
         "weekdays": "Hétköznapok",

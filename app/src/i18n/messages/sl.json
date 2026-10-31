@@ -833,7 +833,6 @@
         "coverImageHelp": "Prikazana na javni strani in v e-poštnih sporočilih prijavljenim.",
         "scheduleHeading": "Koledar",
         "timezone": "Časovni pas",
-        "recurrenceHeading": "Ponovitev",
         "tagsHeading": "Kategorije (oznake)",
         "newTag": "Nova kategorija",
         "newTagLabel": "Ime nove kategorije",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Ponovitev",
-      "helpText": "Naredite dogodek ponavljajoč. Niz bo ustvarjen od datuma začetka.",
+      "helpText": "Če se dogodek ponavlja, kopija pri podvajanju predlaga datum naslednje izvedbe.",
       "preset": {
-        "none": "Brez",
+        "none": "Se ne ponavlja",
         "daily": "Vsak dan",
         "weekly": "Vsak teden",
         "weekdays": "Delovni dnevi",

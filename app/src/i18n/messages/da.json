@@ -833,7 +833,6 @@
         "coverImageHelp": "Vises på den offentlige side og i e-mails til de tilmeldte.",
         "scheduleHeading": "Tidsplan",
         "timezone": "Tidszone",
-        "recurrenceHeading": "Gentagelse",
         "tagsHeading": "Kategorier (tags)",
         "newTag": "Ny kategori",
         "newTagLabel": "Navn på den nye kategori",
@@ -2266,9 +2265,9 @@
     },
     "recurrence": {
       "label": "Gentagelse",
-      "helpText": "Gør arrangementet tilbagevendende. En serie oprettes med startdatoen som udgangspunkt.",
+      "helpText": "Hvis arrangementet gentages, foreslår kopien datoen for næste gang, når du duplikerer det.",
       "preset": {
-        "none": "Ingen",
+        "none": "Gentages ikke",
         "daily": "Hver dag",
         "weekly": "Hver uge",
         "weekdays": "Hverdage",
