@@ -10,6 +10,7 @@ import { getPublicEnv } from '@/lib/env';
 import { captionsTranscriptActive, liveCaptionsAvailable } from '@/lib/captions/availability';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
+import { registraChiConduce } from '@/lib/live/entry-consents';
 import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
 import AdminSessionKeepAlive from '@/components/admin/admin-session-keepalive';
@@ -357,6 +358,19 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
+  } else if (isPrimaryModerator && registraChiConduce(event, canRecord)) {
+    // Chi conduce dal link primario con la sessione del proprio account: il
+    // consenso alla registrazione dato a un ingresso precedente non si
+    // richiede. Solo qui, dove dietro il link c'e' una persona: un link
+    // nominale puo' essere inoltrato, e chi lo apre non eredita il consenso
+    // di un altro (lo da' a ogni visita della pagina).
+    const staff = await staffDietroIlPrimario(event.id);
+    hasRecordingConsent = staff
+      ? !!(await prisma.recordingConsent.findFirst({
+          where: { eventId: event.id, staffAccountId: staff.accountId },
+          select: { id: true },
+        }))
+      : false;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);

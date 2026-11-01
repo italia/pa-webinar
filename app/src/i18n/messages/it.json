@@ -4242,7 +4242,8 @@
       "multitrackOptional": "È facoltativo: se non acconsenti partecipi lo stesso, ma i tuoi interventi non entrano nella trascrizione e la tua voce non viene registrata in una traccia a parte. Se l'evento è registrato, la tua voce resta comunque nel video.",
       "stayInTouch": "Voglio ricevere informazioni sui prossimi eventi ed essere inserito nella rubrica, per essere invitato a eventi simili",
       "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione.",
-      "recordingOptionalListenOnly": "Se non acconsenti partecipi lo stesso, in solo ascolto: segui e scrivi in chat, ma microfono, videocamera e condivisione dello schermo restano chiusi. Puoi acconsentire più tardi, dalla sala."
+      "recordingOptionalListenOnly": "Se non acconsenti partecipi lo stesso, in solo ascolto: segui e scrivi in chat, ma microfono, videocamera e condivisione dello schermo restano chiusi. Puoi acconsentire più tardi, dalla sala.",
+      "recordingOptionalHost": "Se non acconsenti entri lo stesso e conduci come sempre, ma la tua voce non resta nelle tracce per persona né nella trascrizione. Il video della sala, se registrato, ti riprende comunque."
     },
     "export": {
       "title": "I miei dati",

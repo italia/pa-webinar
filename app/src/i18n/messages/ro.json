@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Este opțional: dacă nu îți dai consimțământul, participi oricum, dar intervențiile tale nu intră în transcriere și vocea ta nu este înregistrată pe o pistă separată. Dacă evenimentul este înregistrat, vocea ta rămâne totuși în videoclip.",
       "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
       "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere.",
-      "recordingOptionalListenOnly": "Dacă nu îți dai acordul, participi totuși, doar ascultând: urmărești și scrii în chat, dar microfonul, camera și partajarea ecranului rămân oprite. Poți să îți dai acordul mai târziu, din sală."
+      "recordingOptionalListenOnly": "Dacă nu îți dai acordul, participi totuși, doar ascultând: urmărești și scrii în chat, dar microfonul, camera și partajarea ecranului rămân oprite. Poți să îți dai acordul mai târziu, din sală.",
+      "recordingOptionalHost": "Dacă nu îți dai consimțământul, intri oricum și conduci ca de obicei, dar vocea ta nu rămâne în pistele pe persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te include oricum."
     },
     "export": {
       "title": "Datele mele",

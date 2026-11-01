@@ -121,6 +121,8 @@ export const GET = withErrorHandling(async (request) => {
       event: { select: { title: true, startsAt: true } },
       // La foto che lo staff ha caricato per la persona.
       photo: { select: { contentType: true, bytes: true } },
+      // I consensi alla registrazione dati entrando in sala con la concessione.
+      recordingConsents: { select: { consentedAt: true }, orderBy: { consentedAt: 'asc' } },
     },
     orderBy: { createdAt: 'asc' },
   });
@@ -134,6 +136,7 @@ export const GET = withErrorHandling(async (request) => {
       : null,
     createdAt: g.createdAt.toISOString(),
     revokedAt: g.revokedAt?.toISOString() ?? null,
+    recordingConsentsGivenAt: (g.recordingConsents ?? []).map((c) => c.consentedAt.toISOString()),
     event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },
   }));
 

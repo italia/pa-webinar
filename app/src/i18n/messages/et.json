@@ -4242,7 +4242,8 @@
       "multitrackOptional": "See on vabatahtlik: kui sa nõusolekut ei anna, osaled ikkagi, kuid sinu sõnavõtud ei lähe transkriptsiooni ja sinu häält ei salvestata eraldi rajale. Kui sündmus salvestatakse, jääb sinu hääl siiski videosse.",
       "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
       "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad.",
-      "recordingOptionalListenOnly": "Kui sa ei nõustu, osaled ikkagi, ainult kuulajana: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraani jagamine jäävad välja. Saad nõustuda hiljem ruumis."
+      "recordingOptionalListenOnly": "Kui sa ei nõustu, osaled ikkagi, ainult kuulajana: jälgid ja kirjutad vestlusesse, kuid mikrofon, kaamera ja ekraani jagamine jäävad välja. Saad nõustuda hiljem ruumis.",
+      "recordingOptionalHost": "Kui sa nõusolekut ei anna, saad ikkagi siseneda ja juhtida nagu tavaliselt, kuid sinu häält ei säilitata isiklikel radadel ega transkriptsioonis. Ruumi video, kui see salvestatakse, näitab sind siiski."
     },
     "export": {
       "title": "Minu andmed",

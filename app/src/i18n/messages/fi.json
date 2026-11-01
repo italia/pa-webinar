@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Tämä on vapaaehtoista: jos et anna suostumusta, osallistut silti, mutta puheenvuorosi eivät tule litteraatioon eikä ääntäsi tallenneta omalle raidalleen. Jos tapahtuma tallennetaan, äänesi on silti mukana videossa.",
       "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
       "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset.",
-      "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa."
+      "recordingOptionalListenOnly": "Jos et anna suostumusta, osallistut silti, vain kuunnellen: seuraat ja kirjoitat chattiin, mutta mikrofoni, kamera ja näytön jakaminen pysyvät pois päältä. Voit antaa suostumuksen myöhemmin huoneessa.",
+      "recordingOptionalHost": "Jos et anna suostumusta, pääset silti sisään ja johdat tavalliseen tapaan, mutta ääntäsi ei säilytetä henkilökohtaisissa raidoissa eikä litteroinnissa. Huoneen video, jos se tallennetaan, näyttää sinut silti."
     },
     "export": {
       "title": "Omat tietoni",

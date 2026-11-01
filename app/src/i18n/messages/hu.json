@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Nem kötelező: ha nem járul hozzá, ugyanúgy részt vesz, de a hozzászólásai nem kerülnek az átiratba, és a hangját nem rögzítjük külön sávon. Ha az eseményt rögzítik, a hangja a videóban így is benne marad.",
       "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
       "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik.",
-      "recordingOptionalListenOnly": "Ha nem járul hozzá, akkor is részt vesz, csak hallgatóként: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyőmegosztás kikapcsolva marad. Később a teremből is hozzájárulhat."
+      "recordingOptionalListenOnly": "Ha nem járul hozzá, akkor is részt vesz, csak hallgatóként: követi az eseményt és ír a csevegésbe, de a mikrofon, a kamera és a képernyőmegosztás kikapcsolva marad. Később a teremből is hozzájárulhat.",
+      "recordingOptionalHost": "Hozzájárulás nélkül is belép és a szokásos módon vezet, de a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha rögzítik, így is tartalmazza Önt."
     },
     "export": {
       "title": "Az én adataim",

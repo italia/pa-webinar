@@ -4242,7 +4242,8 @@
       "multitrackOptional": "To dobrowolne: jeśli nie wyrazisz zgody, nadal uczestniczysz, ale twoje wypowiedzi nie trafią do transkrypcji, a twój głos nie będzie nagrywany na osobnej ścieżce. Jeśli wydarzenie jest nagrywane, twój głos i tak pozostanie w nagraniu wideo.",
       "stayInTouch": "Chcę otrzymywać informacje o nadchodzących wydarzeniach i zostać dodany do książki adresowej, aby otrzymywać zaproszenia na podobne wydarzenia",
       "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji.",
-      "recordingOptionalListenOnly": "Jeśli nie wyrazisz zgody, i tak uczestniczysz, tylko słuchając: śledzisz i piszesz na czacie, ale mikrofon, kamera i udostępnianie ekranu pozostają wyłączone. Zgodę możesz wyrazić później, z pokoju."
+      "recordingOptionalListenOnly": "Jeśli nie wyrazisz zgody, i tak uczestniczysz, tylko słuchając: śledzisz i piszesz na czacie, ale mikrofon, kamera i udostępnianie ekranu pozostają wyłączone. Zgodę możesz wyrazić później, z pokoju.",
+      "recordingOptionalHost": "Bez zgody i tak wchodzisz i prowadzisz jak zwykle, ale Twój głos nie zostaje zachowany w ścieżkach poszczególnych osób ani w transkrypcji. Nagranie wideo sali, jeśli jest prowadzone, i tak Cię obejmuje."
     },
     "export": {
       "title": "Moje dane",

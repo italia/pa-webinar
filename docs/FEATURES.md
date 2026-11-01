@@ -224,6 +224,7 @@ Every way into an event passes through the waiting room. Personal links and magi
   - When AI post-production is on for the event, an **AI processing after the event** notice appears. Its text can be customized.
   - When live captions are on, a notice says so and says whether the text is kept: not at all, or, with a transcript from captions, with the name, for the people who consented.
   - When the event records per-participant audio or keeps a transcript from captions, everyone who has not given it yet, moderators and speakers included, is asked for the optional consent to the transcription of what they say. Entry does not depend on it: without it, the person's voice is not recorded and their words are not kept.
+  - When the event records, moderators and speakers are asked for the recording consent too (once per staff account; with a named link, at every visit of the page). It is optional: without it they enter and lead as usual, but their voice is not kept in the per-participant tracks or in the transcript; the room video still includes them.
 
 ### Classic view and the square
 

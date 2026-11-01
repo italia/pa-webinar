@@ -21,15 +21,28 @@ describe('consensoRegistrazioneIngresso', () => {
     expect(consensoRegistrazioneIngresso({ ...base, giaDato: true }).richiesto).toBe(false);
   });
 
-  it('moderatori e relatori non lo vedono, nemmeno come informativa', () => {
+  it('moderatori e relatori lo danno in ogni evento che registra, facoltativo', () => {
     expect(consensoRegistrazioneIngresso({ ...base, conduce: true })).toEqual({
-      richiesto: false,
-      facoltativo: false,
+      richiesto: true,
+      facoltativo: true,
       soloAscolto: false,
     });
+    // Anche quando chi partecipa e' di solo ascolto: e' la loro voce a essere registrata.
+    expect(consensoRegistrazioneIngresso({ ...base, formato: soloAscolto, conduce: true })).toEqual({
+      richiesto: true,
+      facoltativo: true,
+      soloAscolto: false,
+    });
+  });
+
+  it('moderatori e relatori: non a chi l\'ha gia\' dato, non senza registrazione, non in una chiamata rapida', () => {
+    const conduce = { ...base, conduce: true };
+    expect(consensoRegistrazioneIngresso({ ...conduce, giaDato: true }).richiesto).toBe(false);
+    expect(consensoRegistrazioneIngresso({ ...conduce, registrazioneDisponibile: false }).richiesto).toBe(false);
     expect(
-      consensoRegistrazioneIngresso({ ...base, formato: soloAscolto, conduce: true }).soloAscolto,
+      consensoRegistrazioneIngresso({ ...conduce, formato: { ...interattivo, recordingEnabled: false } }).richiesto,
     ).toBe(false);
+    expect(consensoRegistrazioneIngresso({ ...conduce, istantanea: true }).richiesto).toBe(false);
   });
 
   it('di solo ascolto si informa e basta', () => {

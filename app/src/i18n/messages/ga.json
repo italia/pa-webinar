@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Is roghnach é: mura dtugann tú toiliú, glacfaidh tú páirt mar sin féin, ach ní rachaidh a ndeir tú isteach sa tras-scríbhinn agus ní thaifeadfar do ghuth ar rian ar leith. Má thaifeadtar an ócáid, beidh do ghuth san fhíseán fós.",
       "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
       "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo.",
-      "recordingOptionalListenOnly": "Mura dtugann tú toiliú glacann tú páirt fós, ag éisteacht amháin: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus comhroinnt scáileáin múchta. Is féidir leat toiliú níos déanaí, ón seomra."
+      "recordingOptionalListenOnly": "Mura dtugann tú toiliú glacann tú páirt fós, ag éisteacht amháin: leanann tú agus scríobhann tú sa chomhrá, ach fanann an micreafón, an ceamara agus comhroinnt scáileáin múchta. Is féidir leat toiliú níos déanaí, ón seomra.",
+      "recordingOptionalHost": "Mura dtugann tú toiliú, téann tú isteach agus stiúrann tú mar is gnách, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Má thaifeadtar físeán an tseomra, beidh tú ann mar sin féin."
     },
     "export": {
       "title": "Mo chuid sonraí",

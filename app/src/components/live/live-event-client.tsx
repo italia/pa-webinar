@@ -524,6 +524,7 @@ export default function LiveEventClient({
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
     giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
+    istantanea: event.eventType === 'INSTANT',
   });
   // L'evento ha il solo ascolto per chi non acconsente (la stessa regola del
   // server, lib/live/listen-only): i blocchi della sala restano accesi.
@@ -730,7 +731,13 @@ export default function LiveEventClient({
     // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
     // traccia per partecipante): il server ne conserva la prova insieme al
     // posto nella conferenza, uno nuovo a ogni ingresso.
-    const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
+    // Chi conduce e l'ha gia' dato (la pagina l'ha trovato sul suo account):
+    // lo porta con ogni ingresso, come quelli dati in questa visita.
+    const prove = consensiDaInviare(joinPrefs, {
+      ...consensiRegistrati,
+      registrazione:
+        consensiRegistrati.registrazione || ((isModerator || isSpeaker) && hasRecordingConsent),
+    });
     if (prove.registrazione) body.recordingConsent = true;
     if (prove.tracce) body.multitrackConsent = true;
     if (prove.registrazione || prove.tracce) body.locale = locale;
@@ -832,6 +839,7 @@ export default function LiveEventClient({
     markEnded,
     joinPrefs,
     consensiRegistrati,
+    hasRecordingConsent,
     locale,
   ]);
 
@@ -1819,6 +1827,7 @@ export default function LiveEventClient({
           presenze={presenze}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
           conduce={conduceOInterviene}
+          conduceDaIncarico={isModerator || isSpeaker}
           // Gli stessi permessi che la sala dà a JitsiRoom.
           mediaConcessi={{
             microfono: isModerator || isSpeaker || event.participantsCanUnmute,

@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Je to dobrovoľné: ak nesúhlasíte, aj tak sa zúčastníte, ale vaše príspevky sa nedostanú do prepisu a váš hlas sa nebude nahrávať na samostatnú stopu. Ak sa podujatie nahráva, váš hlas vo videu aj tak zostane.",
       "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
       "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie.",
-      "recordingOptionalListenOnly": "Ak nesúhlasíte, aj tak sa zúčastníte, iba ako poslucháč: sledujete a píšete do četu, ale mikrofón, kamera a zdieľanie obrazovky zostávajú vypnuté. Súhlas môžete dať neskôr v miestnosti."
+      "recordingOptionalListenOnly": "Ak nesúhlasíte, aj tak sa zúčastníte, iba ako poslucháč: sledujete a píšete do četu, ale mikrofón, kamera a zdieľanie obrazovky zostávajú vypnuté. Súhlas môžete dať neskôr v miestnosti.",
+      "recordingOptionalHost": "Ak nesúhlasíte, aj tak vstúpite a vediete ako zvyčajne, ale váš hlas sa neuchová v samostatných stopách účastníkov ani v prepise. Video miestnosti, ak sa nahráva, vás aj tak zachytí."
     },
     "export": {
       "title": "Moje údaje",

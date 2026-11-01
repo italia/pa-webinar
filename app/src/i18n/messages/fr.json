@@ -4242,7 +4242,8 @@
       "multitrackOptional": "C'est facultatif : si vous ne consentez pas, vous participez quand même, mais vos interventions n'entrent pas dans la transcription et votre voix n'est pas enregistrée sur une piste séparée. Si l'événement est enregistré, votre voix reste néanmoins dans la vidéo.",
       "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
       "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription.",
-      "recordingOptionalListenOnly": "Sans consentement, vous participez quand même, en écoute seule : vous suivez et écrivez dans le chat, mais le micro, la caméra et le partage d'écran restent coupés. Vous pouvez consentir plus tard, depuis la salle."
+      "recordingOptionalListenOnly": "Sans consentement, vous participez quand même, en écoute seule : vous suivez et écrivez dans le chat, mais le micro, la caméra et le partage d'écran restent coupés. Vous pouvez consentir plus tard, depuis la salle.",
+      "recordingOptionalHost": "Sans consentement, vous entrez quand même et animez comme d’habitude, mais votre voix n’est conservée ni dans les pistes par personne ni dans la transcription. La vidéo de la salle, si elle est enregistrée, vous montre tout de même."
     },
     "export": {
       "title": "Mes données",

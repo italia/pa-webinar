@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Dit is vrijwillig: als je geen toestemming geeft, doe je toch mee, maar wat je zegt komt niet in de transcriptie en je stem wordt niet op een apart spoor opgenomen. Als het evenement wordt opgenomen, blijft je stem wel in de video.",
       "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
       "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving.",
-      "recordingOptionalListenOnly": "Zonder toestemming doe je toch mee, alleen luisterend: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm delen blijven uit. Je kunt later vanuit de ruimte toestemming geven."
+      "recordingOptionalListenOnly": "Zonder toestemming doe je toch mee, alleen luisterend: je volgt het evenement en schrijft in de chat, maar microfoon, camera en scherm delen blijven uit. Je kunt later vanuit de ruimte toestemming geven.",
+      "recordingOptionalHost": "Zonder toestemming kom je toch binnen en leid je zoals gewoonlijk, maar je stem wordt niet bewaard in de sporen per persoon of in de transcriptie. De video van de ruimte, als die wordt opgenomen, laat je toch zien."
     },
     "export": {
       "title": "Mijn gegevens",

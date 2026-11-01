@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Freiwillig: Ohne Einwilligung nehmen Sie trotzdem teil, aber Ihre Beiträge kommen nicht in das Transkript und Ihre Stimme wird nicht auf einer eigenen Spur aufgezeichnet. Wird das Event aufgezeichnet, ist Ihre Stimme trotzdem im Video zu hören.",
       "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
       "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung.",
-      "recordingOptionalListenOnly": "Ohne Einwilligung nehmen Sie trotzdem teil, nur zuhörend: Sie verfolgen das Event und schreiben im Chat, aber Mikrofon, Kamera und Bildschirmfreigabe bleiben aus. Sie können später im Raum einwilligen."
+      "recordingOptionalListenOnly": "Ohne Einwilligung nehmen Sie trotzdem teil, nur zuhörend: Sie verfolgen das Event und schreiben im Chat, aber Mikrofon, Kamera und Bildschirmfreigabe bleiben aus. Sie können später im Raum einwilligen.",
+      "recordingOptionalHost": "Ohne Einwilligung treten Sie trotzdem ein und moderieren wie gewohnt, aber Ihre Stimme bleibt weder in den Einzelspuren noch im Transkript erhalten. Das Video des Raums zeigt Sie, falls aufgezeichnet, trotzdem."
     },
     "export": {
       "title": "Meine Daten",

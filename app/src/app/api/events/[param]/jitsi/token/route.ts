@@ -27,6 +27,7 @@ import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
+import { registraChiConduce } from '@/lib/live/entry-consents';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
 import { recordingAvailable } from '@/lib/recording/availability';
@@ -63,7 +64,14 @@ async function registraConsensi(
     captionsTranscriptEnabled: boolean;
   },
   data: { recordingConsent?: boolean; multitrackConsent?: boolean; locale?: string },
-  posto: { jitsiUserId: string; displayName: string; registrationId?: string },
+  posto: {
+    jitsiUserId: string;
+    displayName: string;
+    registrationId?: string;
+    /** Chi conduce o interviene: a chi si lega la prova della registrazione. */
+    eventModeratorId?: string;
+    staffAccountId?: string;
+  },
 ): Promise<ConsensiSalvati> {
   const registrazione = event.recordingEnabled && data.recordingConsent === true;
   // La trascrizione dei propri interventi: la traccia audio per persona o la
@@ -97,7 +105,16 @@ async function registraConsensi(
   const [recording, multitrack] = await Promise.all([
     registrazione &&
       alMeglio('recording', () =>
-        prisma.recordingConsent.createMany({ data: [prova()], skipDuplicates: true }),
+        prisma.recordingConsent.createMany({
+          data: [
+            {
+              ...prova(),
+              eventModeratorId: posto.eventModeratorId ?? null,
+              staffAccountId: posto.staffAccountId ?? null,
+            },
+          ],
+          skipDuplicates: true,
+        }),
       ),
     tracce &&
       alMeglio('multitrack', async () => {
@@ -176,12 +193,13 @@ export const POST = withErrorHandling(async (request, context) => {
     // Per-row grants (named co-moderator / speaker) keep their own
     // decrypted grant.displayName.
     const trimmedOverride = displayNameOverride?.trim();
+    // Chi apre il link primario con la sessione dello staff che gestisce
+    // l'evento e' una persona nota (lib/auth/staff-seat).
+    const staff = grant.isPrimaryShared ? await staffDietroIlPrimario(event.id) : null;
     let name: string;
     if (grant.isPrimaryShared) {
-      // Chi apre il link primario con la sessione dello staff che gestisce
-      // l'evento e' una persona nota (lib/auth/staff-seat): il suo nome vale
-      // anche senza quello scritto in sala d'attesa.
-      const nome = trimmedOverride || (await staffDietroIlPrimario(event.id))?.nome;
+      // Il suo nome vale anche senza quello scritto in sala d'attesa.
+      const nome = trimmedOverride || staff?.nome;
       if (!nome) throw new ValidationError('Display name is required for moderators');
       name = nome;
     } else {
@@ -204,10 +222,27 @@ export const POST = withErrorHandling(async (request, context) => {
       email: grant.email ?? undefined,
       useGravatar: (await getSettings()).gravatarEnabled,
     });
-    const consentsRecorded = await registraConsensi(event, parsed.data, {
-      jitsiUserId: postoModeratore,
-      displayName: name,
-    });
+    // Il consenso alla registrazione di chi conduce o interviene: facoltativo,
+    // con la prova legata alla sua concessione o al suo account. Viaggia con
+    // ogni ingresso (la sala lo rimanda, come per gli ospiti). Senza, entra lo
+    // stesso, ma in un evento che lo registra la sua voce non resta nelle
+    // tracce per persona ne' nella trascrizione: quel consenso non vale da solo.
+    const registraVideo = registraChiConduce(event, recordingAvailable());
+    const consensoConduce = parsed.data.recordingConsent === true;
+    const consentsRecorded = await registraConsensi(
+      event,
+      {
+        ...parsed.data,
+        multitrackConsent:
+          registraVideo && !consensoConduce ? false : parsed.data.multitrackConsent,
+      },
+      {
+        jitsiUserId: postoModeratore,
+        displayName: name,
+        eventModeratorId: grant.grantId ?? undefined,
+        staffAccountId: staff?.accountId,
+      },
+    );
 
     return Response.json({
       jwt,

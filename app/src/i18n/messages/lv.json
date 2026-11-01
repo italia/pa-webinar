@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Tas nav obligāti: ja nepiekrītat, jūs tik un tā piedalāties, bet jūsu teiktais netiek iekļauts transkripcijā un jūsu balss netiek ierakstīta atsevišķā celiņā. Ja pasākums tiek ierakstīts, jūsu balss tomēr paliek video.",
       "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
       "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas.",
-      "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas."
+      "recordingOptionalListenOnly": "Ja nepiekrītat, jūs tomēr piedalāties, tikai klausoties: sekojat un rakstāt tērzēšanā, bet mikrofons, kamera un ekrāna kopīgošana paliek izslēgti. Piekrist varat vēlāk, no telpas.",
+      "recordingOptionalHost": "Ja nepiekrītat, jūs tik un tā ieejat un vadāt kā parasti, bet jūsu balss netiek saglabāta personu ierakstos un transkripcijā. Telpas video, ja tas tiek ierakstīts, jūs tik un tā iekļauj."
     },
     "export": {
       "title": "Mani dati",

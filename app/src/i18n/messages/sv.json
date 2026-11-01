@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Det är frivilligt: om du inte samtycker deltar du ändå, men det du säger kommer inte med i transkriptionen och din röst spelas inte in på ett eget spår. Om evenemanget spelas in finns din röst ändå kvar i videon.",
       "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
       "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan.",
-      "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet."
+      "recordingOptionalListenOnly": "Om du inte samtycker deltar du ändå, bara som lyssnare: du följer och skriver i chatten, men mikrofon, kamera och skärmdelning förblir avstängda. Du kan samtycka senare, från rummet.",
+      "recordingOptionalHost": "Om du inte samtycker kommer du ändå in och leder som vanligt, men din röst sparas inte i spåren per person eller i transkriptionen. Videon av rummet, om den spelas in, visar dig ändå."
     },
     "export": {
       "title": "Mina uppgifter",

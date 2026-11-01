@@ -969,6 +969,81 @@ describe('POST jitsi/token — consenso alla registrazione dato in sala d\'attes
   });
 });
 
+describe('POST jitsi/token — consenso alla registrazione di chi conduce o interviene', () => {
+  const concessione = {
+    id: 'grant-1',
+    eventId: EVENT_ID,
+    revokedAt: null,
+    role: 'SPEAKER',
+    name: encryptPII('Relatore 1'),
+    email: null,
+  };
+  type Riga = { eventModeratorId: string | null; staffAccountId: string | null; registrationId: string | null };
+  const righe = () =>
+    (vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as { data: Riga[] }).data;
+
+  beforeEach(() => {
+    vi.mocked(prisma.recordingConsent.createMany).mockResolvedValue({ count: 1 } as never);
+    vi.mocked(prisma.multitrackConsent.create).mockResolvedValue({} as never);
+    vi.mocked(prisma.multitrackConsent.findFirst).mockResolvedValue(null as never);
+  });
+
+  it('lega la prova alla concessione nominale', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    const res = await post({ moderatorToken: GRANT_TOKEN, recordingConsent: true });
+    expect(res.status).toBe(200);
+    expect(righe()[0]).toMatchObject({ eventModeratorId: 'grant-1', staffAccountId: null, registrationId: null });
+  });
+
+  it("lega la prova all'account dello staff dietro il link primario", async () => {
+    staffSeat.valore = { accountId: 'acc-1', nome: 'Ada Rossi' };
+    try {
+      vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
+      const res = await post({ moderatorToken: PRIMARY_TOKEN, recordingConsent: true });
+      expect(res.status).toBe(200);
+      expect(righe()[0]).toMatchObject({ eventModeratorId: null, staffAccountId: 'acc-1' });
+    } finally {
+      staffSeat.valore = null;
+    }
+  });
+
+  it('senza consenso alla registrazione entra, ma la sua voce non resta nelle tracce', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    const res = await post({ moderatorToken: GRANT_TOKEN, multitrackConsent: true });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.consentsRecorded).toEqual({ recording: false, multitrack: false });
+    expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+    // Nessun consenso ereditato: quello dato da un altro con lo stesso link non conta.
+    expect(prisma.recordingConsent.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('con il consenso alla registrazione, la trascrizione vale', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    const res = await post({ moderatorToken: GRANT_TOKEN, recordingConsent: true, multitrackConsent: true });
+    const { body } = await minted(res);
+    expect(body.consentsRecorded).toEqual({ recording: true, multitrack: true });
+    expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("in un evento che non registra il video, la trascrizione non dipende dall'altro consenso", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    await post({ moderatorToken: GRANT_TOKEN, multitrackConsent: true });
+    expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
+    expect(prisma.recordingConsent.findFirst).not.toHaveBeenCalled();
+  });
+});
+
 describe('POST jitsi/token — consenso alla registrazione verificato dal server', () => {
   // L'evento registra e chi partecipa puo' parlare: il consenso si chiede.
   const interattivo = { recordingEnabled: true, participantsCanUnmute: true };

@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Nije obvezno: ako ne date privolu, svejedno sudjelujete, ali vaša izlaganja ne ulaze u transkript i vaš se glas ne snima na zasebnu stazu. Ako se događaj snima, vaš glas ipak ostaje u videozapisu.",
       "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
       "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave.",
-      "recordingOptionalListenOnly": "Ako ne pristanete, svejedno sudjelujete, samo kao slušatelj: pratite i pišete u chatu, ali mikrofon, kamera i dijeljenje zaslona ostaju isključeni. Pristanak možete dati kasnije, iz sobe."
+      "recordingOptionalListenOnly": "Ako ne pristanete, svejedno sudjelujete, samo kao slušatelj: pratite i pišete u chatu, ali mikrofon, kamera i dijeljenje zaslona ostaju isključeni. Pristanak možete dati kasnije, iz sobe.",
+      "recordingOptionalHost": "Ako ne pristanete, svejedno ulazite i vodite kao i obično, ali vaš se glas ne čuva u zasebnim zapisima sudionika ni u transkripciji. Videozapis sobe, ako se snima, svejedno vas obuhvaća."
     },
     "export": {
       "title": "Moji podaci",

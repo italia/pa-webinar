@@ -6,11 +6,26 @@ import { consensiRichiesti, type FormatoEvento } from '@/lib/registration/consen
  *
  * Se chi partecipa ha microfono, videocamera o schermo, la sala lo chiede a
  * chi non l'ha gia' dato (all'iscrizione, o in sala in questa visita della
- * pagina); di solo ascolto informa e basta (lib/registration/consents). Chi
- * conduce o interviene per incarico non lo vede: la registrazione e' cosa
- * sua. Senza nulla che possa registrare (lib/recording/availability) non si
- * chiede e non si informa.
+ * pagina); di solo ascolto informa e basta (lib/registration/consents).
+ * Chi conduce o interviene lo vede in ogni evento che registra, facoltativo:
+ * senza, entra lo stesso, ma la sua voce non resta nelle tracce per persona
+ * ne' nella trascrizione (lo decide la rotta del token). Senza nulla che
+ * possa registrare (lib/recording/availability), e nelle chiamate rapide,
+ * non si chiede e non si informa.
  */
+/**
+ * L'evento registra chi conduce o interviene: la stessa regola per la sala
+ * d'attesa, la pagina della sala e la rotta del token. Nelle chiamate rapide
+ * la sala non mostra la registrazione, e senza nulla che possa registrare non
+ * c'e' niente a cui acconsentire.
+ */
+export function registraChiConduce(
+  evento: { recordingEnabled: boolean; eventType?: string | null },
+  registrazioneDisponibile: boolean,
+): boolean {
+  return evento.recordingEnabled && registrazioneDisponibile && evento.eventType !== 'INSTANT';
+}
+
 export function consensoRegistrazioneIngresso(i: {
   formato: FormatoEvento;
   /** L'installazione puo' registrare. */
@@ -19,17 +34,27 @@ export function consensoRegistrazioneIngresso(i: {
   conduce: boolean;
   /** Dato all'iscrizione nel browser che si e' iscritto, o in sala. */
   giaDato: boolean;
+  /** Chiamata rapida (eventType INSTANT): la sala non ne mostra la registrazione. */
+  istantanea?: boolean;
 }): { richiesto: boolean; facoltativo: boolean; soloAscolto: boolean } {
+  if (i.conduce) {
+    const registra = registraChiConduce(
+      { recordingEnabled: i.formato.recordingEnabled, eventType: i.istantanea ? 'INSTANT' : null },
+      i.registrazioneDisponibile,
+    );
+    const richiesto = registra && !i.giaDato;
+    return { richiesto, facoltativo: richiesto, soloAscolto: false };
+  }
   const formato = consensiRichiesti({
     ...i.formato,
     recordingEnabled: i.formato.recordingEnabled && i.registrazioneDisponibile,
   });
-  const richiesto = !i.conduce && formato.registrazione && !i.giaDato;
+  const richiesto = formato.registrazione && !i.giaDato;
   return {
     richiesto,
     // Chiesto ma libero: senza, si entra in solo ascolto.
     facoltativo: richiesto && formato.registrazioneFacoltativa,
-    soloAscolto: !i.conduce && formato.avvisoRegistrazione,
+    soloAscolto: formato.avvisoRegistrazione,
   };
 }
 

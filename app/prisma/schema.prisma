@@ -468,6 +468,8 @@ model EventModerator {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   // Gli argomenti del programma su cui la persona interviene.
   agendaItems EventAgendaItem[]
+  // Le prove del consenso alla registrazione date entrando in sala.
+  recordingConsents RecordingConsent[]
 
   presentations EventPresentation[]
 
@@ -2598,6 +2600,9 @@ model StaffAccount {
   events        Event[]           @relation("EventCreatedBy")
   loginTokens   StaffLoginToken[]
   glossaryTerms GlossaryTerm[]    @relation("GlossaryTermCreatedBy")
+  // Le prove del consenso alla registrazione date entrando in sala dal link
+  // primario con la propria sessione.
+  recordingConsents RecordingConsent[]
 
   @@map("staff_accounts")
 }
@@ -2718,17 +2723,27 @@ model RecordingConsent {
   // Nome mostrato in sala, cifrato (encryptPII).
   displayName    String   @map("display_name")
   registrationId String?  @map("registration_id") @db.Uuid
+  // Chi conduce o interviene: la concessione nominale, o l'account dello
+  // staff dietro il link primario, a cui la prova si lega (null per chi
+  // partecipa e per il link primario senza un account dietro). Serve a non
+  // richiedere il consenso a ogni ingresso.
+  eventModeratorId String? @map("event_moderator_id") @db.Uuid
+  staffAccountId   String? @map("staff_account_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
 
-  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  eventModerator EventModerator? @relation(fields: [eventModeratorId], references: [id], onDelete: SetNull)
+  staffAccount   StaffAccount?   @relation(fields: [staffAccountId], references: [id], onDelete: SetNull)
 
   // Una prova per iscrizione: due richieste insieme (due schede, un
   // rientro mentre la prima e' in volo) non la raddoppiano. Gli ospiti non
   // hanno iscrizione (NULL), e il vincolo non li tocca.
   @@unique([eventId, registrationId])
   @@index([registrationId])
+  @@index([eventModeratorId])
+  @@index([staffAccountId])
   @@map("recording_consents")
 }
 

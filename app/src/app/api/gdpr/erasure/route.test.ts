@@ -26,6 +26,7 @@ vi.mock('@/lib/db', () => ({
     person: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
+    recordingConsent: { deleteMany: vi.fn() },
     eventPersonPhoto: { deleteMany: vi.fn() },
     profilePhoto: { deleteMany: vi.fn() },
     registration: { findMany: vi.fn() },
@@ -52,6 +53,7 @@ const db = prisma as unknown as {
   person: { deleteMany: Fn };
   eventInvitation: { deleteMany: Fn };
   eventModerator: { deleteMany: Fn; findMany: Fn };
+  recordingConsent: { deleteMany: Fn };
   eventPersonPhoto: { deleteMany: Fn };
   profilePhoto: { deleteMany: Fn };
   registration: { findMany: Fn };
@@ -75,7 +77,8 @@ beforeEach(() => {
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
   db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
-  db.eventModerator.findMany.mockResolvedValue([{ eventId: 'evt-1', token: 'tok-1', photoId: null }]);
+  db.eventModerator.findMany.mockResolvedValue([{ id: 'grant-1', eventId: 'evt-1', token: 'tok-1', photoId: null }]);
+  db.recordingConsent.deleteMany.mockResolvedValue({ count: 1 });
   db.eventPersonPhoto.deleteMany.mockResolvedValue({ count: 0 });
   db.profilePhoto.deleteMany.mockResolvedValue({ count: 1 });
   db.chatMessage.findMany.mockResolvedValue([]);
@@ -192,6 +195,10 @@ describe('POST /api/gdpr/erasure', () => {
     // Le concessioni nominali con lo stesso indirizzo vanno via anche loro, e
     // il loro link smette subito di valere.
     expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
+    // Le prove del consenso date con quelle concessioni vanno via con loro.
+    expect(db.recordingConsent.deleteMany).toHaveBeenCalledWith({
+      where: { eventModeratorId: { in: ['grant-1'] } },
+    });
     expect(invalidate).toHaveBeenCalledWith('evt-1', 'tok-1');
     // La foto e' legata all'email: va via anche senza iscrizioni.
     expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });

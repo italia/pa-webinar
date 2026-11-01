@@ -195,6 +195,10 @@ interface WaitingRoomProps {
   /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
    *  a parte da quella di chi assiste. Per tutti partono spenti. */
   conduce?: boolean;
+  /** Moderatore o relatore (non chi e' in una chiamata rapida): il consenso
+   *  alla registrazione gli si chiede libero, e la trascrizione dei propri
+   *  interventi vale solo insieme a quello. */
+  conduceDaIncarico?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
   /** Chi entra dal proprio link d'iscrizione: in sala compare con il nome
@@ -281,6 +285,7 @@ export default function WaitingRoom({
   condivisione,
   role,
   conduce = false,
+  conduceDaIncarico = false,
   mediaConcessi = { microfono: true, fotocamera: true },
   jvbReady,
   defaultName,
@@ -490,6 +495,10 @@ export default function WaitingRoom({
   // Chiesto ma libero: senza la spunta si entra in solo ascolto, e il
   // pulsante «Entra» non aspetta la casella.
   const consensoBloccante = recordingRequired && !recordingConsentOptional;
+  // Chi conduce o interviene, in un evento che registra: la trascrizione dei
+  // propri interventi vale solo con il consenso alla registrazione (la rotta
+  // del token la ignora senza), quindi la casella si apre dopo quella.
+  const trascrizioneSospesa = conduceDaIncarico && recordingRequired && !recordingConsent;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -779,7 +788,9 @@ export default function WaitingRoom({
     onEnterLive(trimmedName, {
       ...devicePrefs,
       ...(recordingRequired && recordingConsent ? { recordingConsent: true } : {}),
-      ...(trascrizioneChiesta && multitrackConsent ? { multitrackConsent: true } : {}),
+      ...(trascrizioneChiesta && multitrackConsent && !trascrizioneSospesa
+        ? { multitrackConsent: true }
+        : {}),
     });
   }, [
     canEnter,
@@ -791,6 +802,7 @@ export default function WaitingRoom({
     recordingConsent,
     trascrizioneChiesta,
     multitrackConsent,
+    trascrizioneSospesa,
   ]);
 
   // Si entra da soli solo quando tutto e' a posto davvero. Altrimenti resta
@@ -812,8 +824,13 @@ export default function WaitingRoom({
       segnalaCampoMancante();
       return;
     }
-    if (trascrizioneChiesta && !multitrackConsent) {
+    // Lo stesso per le domande facoltative ancora senza risposta.
+    if ((trascrizioneChiesta && !multitrackConsent) || (recordingRequired && !recordingConsent)) {
       setEntraDopoAvvio(null);
+      // Si dice perche' non si entra da soli: il fuoco va sulla domanda aperta.
+      document
+        .getElementById(recordingRequired && !recordingConsent ? CAMPO_DEL_BLOCCO.recording : CAMPO_TRASCRIZIONE)
+        ?.focus();
       return;
     }
     if (!salaAperta) return;
@@ -828,6 +845,8 @@ export default function WaitingRoom({
     bloccoModulo,
     trascrizioneChiesta,
     multitrackConsent,
+    recordingRequired,
+    recordingConsent,
     salaAperta,
     canEnter,
     handleEnterLive,
@@ -1192,7 +1211,12 @@ export default function WaitingRoom({
               type="checkbox"
               id={CAMPO_DEL_BLOCCO.recording}
               checked={recordingConsent}
-              onChange={(e) => setRecordingConsent(e.target.checked)}
+              onChange={(e) => {
+                setRecordingConsent(e.target.checked);
+                // Chi conduce: senza registrazione la trascrizione non vale, e
+                // non deve ritrovarsi spuntata se la rimette.
+                if (!e.target.checked && conduceDaIncarico) setMultitrackConsent(false);
+              }}
               aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
               aria-invalid={consensoSegnalato || undefined}
             />
@@ -1203,7 +1227,7 @@ export default function WaitingRoom({
           {!recordingConsent && recordingConsentOptional && (
             // Libero davvero: si dice che cosa succede senza.
             <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
-              {tGdpr('recordingOptionalListenOnly')}
+              {conduceDaIncarico ? tGdpr('recordingOptionalHost') : tGdpr('recordingOptionalListenOnly')}
             </div>
           )}
           {!recordingConsent && !recordingConsentOptional && (
@@ -1233,9 +1257,14 @@ export default function WaitingRoom({
               className="form-check-input"
               type="checkbox"
               id={CAMPO_TRASCRIZIONE}
-              checked={multitrackConsent}
+              checked={multitrackConsent && !trascrizioneSospesa}
+              disabled={trascrizioneSospesa}
               onChange={(e) => setMultitrackConsent(e.target.checked)}
-              aria-describedby={`${CAMPO_TRASCRIZIONE}-nota`}
+              aria-describedby={
+                trascrizioneSospesa
+                  ? `${MESSAGGIO_DEL_BLOCCO.recording} ${CAMPO_TRASCRIZIONE}-nota`
+                  : `${CAMPO_TRASCRIZIONE}-nota`
+              }
             />
             <label className="form-check-label" htmlFor={CAMPO_TRASCRIZIONE}>
               {tGdpr('multitrack')}

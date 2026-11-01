@@ -4242,7 +4242,8 @@
       "multitrackOptional": "It is optional: if you do not consent you still take part, but what you say stays out of the transcript and your voice is not recorded on a separate track. If the event is recorded, your voice is still in the video.",
       "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
       "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration.",
-      "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room."
+      "recordingOptionalListenOnly": "If you do not consent you still take part, listening only: you follow and write in the chat, but microphone, camera and screen sharing stay off. You can consent later, from the room.",
+      "recordingOptionalHost": "If you do not consent you still enter and lead as usual, but your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still includes you."
     },
     "export": {
       "title": "My data",

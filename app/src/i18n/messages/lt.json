@@ -4242,7 +4242,8 @@
       "multitrackOptional": "Tai neprivaloma: jei nesutinkate, vis tiek dalyvaujate, bet jūsų pasisakymai nepateks į transkripciją ir jūsų balsas nebus įrašomas atskirame takelyje. Jei renginys įrašomas, jūsų balsas vis tiek liks vaizdo įraše.",
       "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
       "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos.",
-      "recordingOptionalListenOnly": "Jei nesutinkate, vis tiek dalyvaujate, tik klausydamiesi: sekate ir rašote pokalbyje, bet mikrofonas, kamera ir ekrano bendrinimas lieka išjungti. Sutikti galite vėliau, iš kambario."
+      "recordingOptionalListenOnly": "Jei nesutinkate, vis tiek dalyvaujate, tik klausydamiesi: sekate ir rašote pokalbyje, bet mikrofonas, kamera ir ekrano bendrinimas lieka išjungti. Sutikti galite vėliau, iš kambario.",
+      "recordingOptionalHost": "Jei nesutinkate, vis tiek įeinate ir vedate kaip įprastai, tačiau jūsų balsas neišsaugomas atskirų asmenų įrašuose ir transkripcijoje. Kambario vaizdo įraše, jei jis įrašomas, vis tiek būsite."
     },
     "export": {
       "title": "Mano duomenys",
