@@ -63,9 +63,10 @@ test('il primo Tab porta al salto al contenuto, e Invio ci arriva', async ({ pag
 
 test('il selettore della lingua si apre e si chiude da tastiera', async ({ page }) => {
   await page.goto('/it');
-  const scelta = page.getByRole('button', { name: /^Cambia lingua/ });
-  // Con poche lingue attive il selettore è un elenco di link, senza menu.
-  test.skip(!(await scelta.isVisible()), 'elenco di link: nessun menu da aprire');
+  // Il menu della lingua dello slim header: un pulsante con la lingua attiva.
+  const scelta = page.getByRole('button', { name: /^Lingua attiva/ });
+  // Con una sola lingua attiva il selettore non c'e'.
+  test.skip(!(await scelta.isVisible()), 'una sola lingua attiva: nessun selettore');
   await tabFino(page, scelta);
   await page.keyboard.press('Enter');
   await expect(scelta).toHaveAttribute('aria-expanded', 'true');
