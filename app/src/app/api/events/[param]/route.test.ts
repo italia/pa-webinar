@@ -800,6 +800,7 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
   const tx = {
     $queryRaw: vi.fn(),
     event: { delete: vi.fn() },
+    emailOutbox: { deleteMany: vi.fn(async () => ({ count: 0 })) },
   };
 
   beforeEach(() => {
@@ -829,6 +830,13 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     expect(
       files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]
     ).toBeLessThan(tx.event.delete.mock.invocationCallOrder[0]!);
+    // Le email dell'evento ancora da inviare non partono piu'.
+    expect(tx.emailOutbox.deleteMany).toHaveBeenCalledWith({
+      where: {
+        status: { in: ['PENDING', 'FAILED'] },
+        OR: [{ metadata: { path: ['eventId'], equals: EVENT_ID } }],
+      },
+    });
   });
 
   it('un evento in diretta non si elimina: 409, nessun file toccato', async () => {

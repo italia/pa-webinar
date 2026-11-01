@@ -84,13 +84,18 @@ export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
  * allegare testo cifrato.
  */
 export function packOutboxParts(
-  input: Pick<EnqueueEmailInput, 'attachments' | 'calendarInvite'>,
+  input: Pick<EnqueueEmailInput, 'attachments' | 'calendarInvite'>
 ): Prisma.InputJsonValue | typeof Prisma.JsonNull {
   const attachments = input.attachments?.length ? input.attachments : undefined;
   if (input.calendarInvite) {
-    return encryptJSON({ attachments: attachments ?? [], calendarInvite: input.calendarInvite });
+    return encryptJSON({
+      attachments: attachments ?? [],
+      calendarInvite: input.calendarInvite,
+    });
   }
-  return attachments ? (attachments as unknown as Prisma.InputJsonValue) : Prisma.JsonNull;
+  return attachments
+    ? (attachments as unknown as Prisma.InputJsonValue)
+    : Prisma.JsonNull;
 }
 
 function isAttachment(v: unknown): v is EmailAttachment {
@@ -124,7 +129,9 @@ export function unpackOutboxParts(stored: unknown): {
     return {};
   }
   const v = valore as { attachments?: unknown; calendarInvite?: unknown };
-  const attachments = Array.isArray(v.attachments) ? v.attachments.filter(isAttachment) : [];
+  const attachments = Array.isArray(v.attachments)
+    ? v.attachments.filter(isAttachment)
+    : [];
   const invito = v.calendarInvite as Partial<EmailCalendarInvite> | undefined;
   const calendarInvite =
     invito && invito.method === 'REQUEST' && typeof invito.content === 'string'
@@ -144,7 +151,7 @@ export function unpackOutboxParts(stored: unknown): {
  * l'invito giusto.
  */
 export function stripCalendarInvite(
-  stored: unknown,
+  stored: unknown
 ): Prisma.InputJsonValue | typeof Prisma.JsonNull | null {
   const parti = unpackOutboxParts(stored);
   if (!parti.calendarInvite) return null;
@@ -158,7 +165,7 @@ export function stripCalendarInvite(
  * richieste concorrenti.
  */
 export async function enqueueEmailOnce(
-  input: EnqueueEmailInput & { dedupKey: string },
+  input: EnqueueEmailInput & { dedupKey: string }
 ): Promise<boolean> {
   try {
     await enqueueEmail(input);
@@ -184,3 +191,30 @@ export function nextAttemptDelayMs(attempts: number): number {
 }
 
 export const MAX_EMAIL_OUTBOX_ATTEMPTS = 6;
+
+/**
+ * Le email ancora da inviare (in coda, o fallite e in attesa di un nuovo
+ * tentativo) di eventi o iscrizioni che se ne vanno: una conferma, un
+ * promemoria o un invito non partono per un evento cancellato, ne' verso chi
+ * ha chiesto la cancellazione dei propri dati. Le righe gia' inviate seguono
+ * la conservazione della coda (cron cleanup). Va chiamata nella stessa
+ * transazione che cancella.
+ */
+export async function annullaEmailInCoda(
+  tx: Prisma.TransactionClient,
+  chi: { eventIds?: readonly string[]; registrationIds?: readonly string[] }
+): Promise<number> {
+  const condizioni = [
+    ...(chi.eventIds ?? []).map((id) => ({
+      metadata: { path: ['eventId'], equals: id },
+    })),
+    ...(chi.registrationIds ?? []).map((id) => ({
+      metadata: { path: ['registrationId'], equals: id },
+    })),
+  ];
+  if (condizioni.length === 0) return 0;
+  const { count } = await tx.emailOutbox.deleteMany({
+    where: { status: { in: ['PENDING', 'FAILED'] }, OR: condizioni },
+  });
+  return count;
+}

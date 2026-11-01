@@ -50,6 +50,7 @@ import {
 } from '@/lib/text-translation/stato-lingue';
 import { unisciTesti } from '@/lib/text-translation/unione-testi';
 import { salaForseAperta } from '@/lib/live/room-open';
+import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -854,6 +855,8 @@ export const DELETE = withErrorHandling(async (request, context) => {
       // prima: la cascata porta via le righe, e dopo nessuno saprebbe più
       // quali blob cancellare. Se lo storage non risponde l'evento resta (503).
       await removeFilesOfEventsBeingDeleted({ id: eventId });
+      // Le email dell'evento ancora da inviare non partono piu'.
+      await annullaEmailInCoda(tx, { eventIds: [eventId] });
       await tx.event.delete({ where: { id: eventId } });
     },
     { timeout: DELETE_TIMEOUT_MS },

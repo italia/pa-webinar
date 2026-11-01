@@ -7,6 +7,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { ValidationError } from '@/lib/errors';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
+import { annullaEmailInCoda } from '@/lib/email/outbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,8 @@ export const POST = withErrorHandling(async (request) => {
       // prima: la cascata porta via le righe, e dopo nessuno saprebbe più
       // quali blob cancellare. Se lo storage non risponde gli eventi restano (503).
       await removeFilesOfEventsBeingDeleted({ id: { in: daEliminare } });
+      // Le email degli eventi ancora da inviare non partono piu'.
+      await annullaEmailInCoda(tx, { eventIds: daEliminare });
       const result = await tx.event.deleteMany({ where: { id: { in: daEliminare } } });
       return { deleted: result.count, skippedLive: righe.length - daEliminare.length };
     },
