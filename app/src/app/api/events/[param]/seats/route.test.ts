@@ -40,7 +40,7 @@ vi.mock('@/lib/crypto/pii', () => ({
 
 import type * as Moderatore from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
-import { resetSeatsMemoryForTests } from '@/lib/live/seats';
+import { resetSeatsMemoryForTests, segnaSoloAscolto } from '@/lib/live/seats';
 
 import { GET, POST } from './route';
 
@@ -115,6 +115,11 @@ describe('/api/events/[slug]/seats', () => {
     expect((await dichiara('ISCR9', 'aa01')).status).toBe(204);
     const seats = (await (await leggi('MOD')).json()).seats;
     expect(seats.aa01).toEqual({ kind: 'contested', name: null, email: null });
+  });
+
+  it("chi modera vede gli endpoint dichiarati in solo ascolto", async () => {
+    await segnaSoloAscolto('e1', 'ep-zitto');
+    expect((await (await leggi('MOD')).json()).listenOnly).toEqual(['ep-zitto']);
   });
 
   it('solo chi modera legge; un token sconosciuto non dichiara', async () => {

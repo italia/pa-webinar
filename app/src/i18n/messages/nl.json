@@ -533,7 +533,9 @@
       "revokeFloor": "Het woord ontnemen",
       "lowerHandFailed": "De hand kon niet worden neergelaten: probeer het opnieuw.",
       "handsRaised": "{count, plural, one {# opgestoken hand} other {# opgestoken handen}}",
-      "locksByConsent": "Microfoons en camera's volgen de toestemming voor de opname: wie die gaf, gebruikt wat het evenement toestaat, de anderen luisteren alleen. De vergrendelingen van de ruimte blijven aan."
+      "locksByConsent": "Microfoons en camera's volgen de toestemming voor de opname: wie die gaf, gebruikt wat het evenement toestaat, de anderen luisteren alleen. De vergrendelingen van de ruimte blijven aan.",
+      "listenOnlyBadge": "alleen luisteren",
+      "listenOnlyNoFloor": "Heeft geen toestemming gegeven voor de opname: kan pas spreken na toestemming vanuit de eigen zaal."
     },
     "moderator": {
       "muteAll": "Iedereen dempen",

@@ -533,7 +533,9 @@
       "revokeFloor": "Wort entziehen",
       "lowerHandFailed": "Die Hand konnte nicht gesenkt werden: Versuchen Sie es erneut.",
       "handsRaised": "{count, plural, one {# gehobene Hand} other {# gehobene Hände}}",
-      "locksByConsent": "Mikrofone und Kameras folgen der Einwilligung in die Aufzeichnung: Wer sie gegeben hat, nutzt, was das Event erlaubt, die anderen hören nur zu. Die Sperren des Raums bleiben aktiv."
+      "locksByConsent": "Mikrofone und Kameras folgen der Einwilligung in die Aufzeichnung: Wer sie gegeben hat, nutzt, was das Event erlaubt, die anderen hören nur zu. Die Sperren des Raums bleiben aktiv.",
+      "listenOnlyBadge": "nur zuhören",
+      "listenOnlyNoFloor": "Hat nicht in die Aufzeichnung eingewilligt: kann erst sprechen, wenn die Einwilligung im eigenen Raum erteilt wird."
     },
     "moderator": {
       "muteAll": "Alle stummschalten",

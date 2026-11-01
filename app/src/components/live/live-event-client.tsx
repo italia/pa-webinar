@@ -913,6 +913,33 @@ export default function LiveEventClient({
   // chiede un token nuovo con il consenso; la conferenza rientra con quello
   // (JitsiRoom si ricollega quando cambia il token).
   const soloAscolto = !!credentials?.listenOnly;
+  // Chi e' in solo ascolto dice al server quale riquadro e' il suo, con il
+  // token della sala che lo dice: chi modera lo vede nella scheda Partecipanti
+  // e non gli offre una parola che il bridge non apre (api/events/listen-only).
+  // Un nuovo ingresso ha un endpoint nuovo, e lo dichiara di nuovo.
+  useEffect(() => {
+    const jwt = credentials?.jwt;
+    if (!localEndpointId || !soloAscolto || !jwt) return;
+    let annullato = false;
+    const dichiara = async (tentativo: number) => {
+      try {
+        const res = await fetch(`/api/events/${event.slug}/listen-only`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpointId: localEndpointId, roomToken: jwt }),
+        });
+        // Rifiutata per il token o per il corpo: riprovare non cambia niente.
+        if (res.ok || res.status === 401 || res.status === 422) return;
+      } catch {
+        /* rete: si riprova qui sotto */
+      }
+      if (!annullato && tentativo < 3) setTimeout(() => void dichiara(tentativo + 1), 3000 * tentativo);
+    };
+    void dichiara(1);
+    return () => {
+      annullato = true;
+    };
+  }, [localEndpointId, soloAscolto, credentials?.jwt, event.slug]);
   const [riconsenso, setRiconsenso] = useState<'no' | 'chiesto' | 'in-corso' | 'errore'>('no');
   const acconsentiInSala = useCallback(() => {
     setJoinPrefs((p) => ({ ...p, recordingConsent: true }));

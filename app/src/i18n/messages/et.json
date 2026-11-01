@@ -533,7 +533,9 @@
       "revokeFloor": "Võta sõna ära",
       "lowerHandFailed": "Kätt ei õnnestunud langetada: proovige uuesti.",
       "handsRaised": "{count, plural, one {# tõstetud käsi} other {# tõstetud kätt}}",
-      "locksByConsent": "Mikrofonid ja kaamerad järgivad salvestamise nõusolekut: kes selle andis, kasutab sündmuse lubatut, teised ainult kuulavad. Ruumi lukud jäävad sisse."
+      "locksByConsent": "Mikrofonid ja kaamerad järgivad salvestamise nõusolekut: kes selle andis, kasutab sündmuse lubatut, teised ainult kuulavad. Ruumi lukud jäävad sisse.",
+      "listenOnlyBadge": "ainult kuulab",
+      "listenOnlyNoFloor": "Ei ole salvestamiseks nõusolekut andnud: ei saa sõna võtta enne, kui annab selle oma ruumis."
     },
     "moderator": {
       "muteAll": "Vaigista kõik",

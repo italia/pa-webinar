@@ -533,7 +533,9 @@
       "revokeFloor": "Neħħi l-kelma",
       "lowerHandFailed": "L-id ma setgħetx titniżżel: erġa' pprova.",
       "handsRaised": "{count, plural, one {# id merfugħa} other {# idejn merfugħin}}",
-      "locksByConsent": "Il-mikrofoni u l-kameras isegwu l-kunsens għar-reġistrazzjoni: min tah juża dak li jippermetti l-avveniment, il-bqija jisimgħu biss. Is-serraturi tal-kamra jibqgħu mixgħula."
+      "locksByConsent": "Il-mikrofoni u l-kameras isegwu l-kunsens għar-reġistrazzjoni: min tah juża dak li jippermetti l-avveniment, il-bqija jisimgħu biss. Is-serraturi tal-kamra jibqgħu mixgħula.",
+      "listenOnlyBadge": "jisma' biss",
+      "listenOnlyNoFloor": "Ma tax il-kunsens għar-reġistrazzjoni: ma jistax jitkellem sakemm ma jagħtihx mis-sala tiegħu."
     },
     "moderator": {
       "muteAll": "Iskot lil kulħadd",

@@ -533,7 +533,9 @@
       "revokeFloor": "Odvzemi besedo",
       "lowerHandFailed": "Roke ni bilo mogoče spustiti: poskusi znova.",
       "handsRaised": "{count, plural, one {# dvignjena roka} two {# dvignjeni roki} few {# dvignjene roke} other {# dvignjenih rok}}",
-      "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni."
+      "locksByConsent": "Mikrofoni in kamere sledijo privolitvi v snemanje: kdor jo je dal, uporablja, kar dogodek dovoljuje, ostali le poslušajo. Zaklepi sobe ostanejo vklopljeni.",
+      "listenOnlyBadge": "samo posluša",
+      "listenOnlyNoFloor": "Ni dal privolitve v snemanje: ne more govoriti, dokler je ne da v svoji dvorani."
     },
     "moderator": {
       "muteAll": "Utišaj vse",

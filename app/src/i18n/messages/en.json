@@ -533,7 +533,9 @@
       "revokeFloor": "Take back the floor",
       "lowerHandFailed": "The hand could not be lowered: try again.",
       "handsRaised": "{count, plural, one {# raised hand} other {# raised hands}}",
-      "locksByConsent": "Microphones and cameras follow the recording consent: those who gave it use what the event allows, the others stay listening only. The room's locks stay on."
+      "locksByConsent": "Microphones and cameras follow the recording consent: those who gave it use what the event allows, the others stay listening only. The room's locks stay on.",
+      "listenOnlyBadge": "listen-only",
+      "listenOnlyNoFloor": "Has not consented to the recording: cannot speak until they consent from their room."
     },
     "moderator": {
       "muteAll": "Mute all",

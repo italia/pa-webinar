@@ -533,7 +533,9 @@
       "revokeFloor": "Szó visszavonása",
       "lowerHandFailed": "Nem sikerült leengedni a kezet: próbáld újra.",
       "handsRaised": "{count, plural, one {# feltett kéz} other {# feltett kéz}}",
-      "locksByConsent": "A mikrofonok és kamerák a felvételhez adott hozzájárulást követik: aki megadta, használja, amit az esemény enged, a többiek csak hallgatnak. A terem zárolásai bekapcsolva maradnak."
+      "locksByConsent": "A mikrofonok és kamerák a felvételhez adott hozzájárulást követik: aki megadta, használja, amit az esemény enged, a többiek csak hallgatnak. A terem zárolásai bekapcsolva maradnak.",
+      "listenOnlyBadge": "csak hallgat",
+      "listenOnlyNoFloor": "Nem járult hozzá a felvételhez: amíg a saját termében hozzá nem járul, nem szólalhat fel."
     },
     "moderator": {
       "muteAll": "Mindenki némítása",

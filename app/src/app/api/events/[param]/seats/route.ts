@@ -24,7 +24,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
-import { claimSeat, readSeats, type Seat } from '@/lib/live/seats';
+import { claimSeat, leggiSoloAscolto, readSeats, type Seat } from '@/lib/live/seats';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -146,5 +146,8 @@ export const GET = withErrorHandling(async (request, context) => {
       ...dati,
     };
   }
-  return Response.json({ seats: out }, { headers: { 'Cache-Control': 'no-store' } });
+  // Chi e' in solo ascolto (dichiarato dal suo browser con il token che lo
+  // dice): chi modera non gli da' una parola che il bridge non apre.
+  const listenOnly = await leggiSoloAscolto(event.id);
+  return Response.json({ seats: out, listenOnly }, { headers: { 'Cache-Control': 'no-store' } });
 });

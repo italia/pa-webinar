@@ -533,7 +533,9 @@
       "revokeFloor": "Atņemt vārdu",
       "lowerHandFailed": "Roku neizdevās nolaist: mēģiniet vēlreiz.",
       "handsRaised": "{count, plural, zero {# paceltu roku} one {# pacelta roka} other {# paceltas rokas}}",
-      "locksByConsent": "Mikrofoni un kameras seko piekrišanai ierakstīšanai: kas to devuši, izmanto pasākuma atļauto, pārējie tikai klausās. Telpas bloķējumi paliek ieslēgti."
+      "locksByConsent": "Mikrofoni un kameras seko piekrišanai ierakstīšanai: kas to devuši, izmanto pasākuma atļauto, pārējie tikai klausās. Telpas bloķējumi paliek ieslēgti.",
+      "listenOnlyBadge": "tikai klausās",
+      "listenOnlyNoFloor": "Nav devis piekrišanu ierakstam: nevar runāt, kamēr to nedos savā telpā."
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",

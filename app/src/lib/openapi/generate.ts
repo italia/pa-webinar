@@ -249,6 +249,21 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'post',
+  path: '/api/events/{param}/listen-only',
+  tags: ['Jitsi'],
+  summary: 'Declare the bridge endpoint of a listen-only participant',
+  description:
+    'The browser of a listen-only participant sends its bridge endpoint with its room token; only a token ' +
+    'that carries listenOnly marks it. Moderators read the list in GET /api/events/{param}/seats (listenOnly).',
+  request: {
+    params: z.object({ param: z.string() }),
+    body: { content: { 'application/json': { schema: z.object({ endpointId: z.string(), roomToken: z.string() }) } } },
+  },
+  responses: { 204: { description: 'Recorded, or nothing to record' }, 401: { description: 'Invalid room token' } },
+});
+
+registry.registerPath({
+  method: 'post',
   path: '/api/events/{param}/consents/withdraw',
   tags: ['Jitsi'],
   summary: 'Withdraw consents given for the event',

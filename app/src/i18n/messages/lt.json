@@ -533,7 +533,9 @@
       "revokeFloor": "Atimti žodį",
       "lowerHandFailed": "Nepavyko nuleisti rankos: bandykite dar kartą.",
       "handsRaised": "{count, plural, one {# pakelta ranka} few {# pakeltos rankos} other {# pakeltų rankų}}",
-      "locksByConsent": "Mikrofonai ir kameros paiso sutikimo dėl įrašymo: davusieji naudoja tai, ką leidžia renginys, kiti tik klausosi. Kambario užraktai lieka įjungti."
+      "locksByConsent": "Mikrofonai ir kameros paiso sutikimo dėl įrašymo: davusieji naudoja tai, ką leidžia renginys, kiti tik klausosi. Kambario užraktai lieka įjungti.",
+      "listenOnlyBadge": "tik klausosi",
+      "listenOnlyNoFloor": "Nedavė sutikimo įrašymui: negali kalbėti, kol neduos jo savo salėje."
     },
     "moderator": {
       "muteAll": "Nutildyti visus",

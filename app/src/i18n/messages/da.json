@@ -533,7 +533,9 @@
       "revokeFloor": "Tag ordet tilbage",
       "lowerHandFailed": "Hånden kunne ikke tages ned: prøv igen.",
       "handsRaised": "{count, plural, one {# rakt hånd} other {# rakte hænder}}",
-      "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til."
+      "locksByConsent": "Mikrofoner og kameraer følger samtykket til optagelsen: de, der har givet det, bruger det, arrangementet tillader, de øvrige lytter kun. Rummets låse forbliver slået til.",
+      "listenOnlyBadge": "lytter kun",
+      "listenOnlyNoFloor": "Har ikke givet samtykke til optagelsen: kan ikke tale, før vedkommende giver det i sit rum."
     },
     "moderator": {
       "muteAll": "Slå alle fra",

@@ -263,7 +263,7 @@ export async function postoDaTokenSala(
   /** Vale anche il token di chi modera: per il ritiro dei consensi, che
    *  riguarda ogni posto (lib/live/consent-withdrawal). */
   opzioni: { ancheChiModera?: boolean } = {},
-): Promise<{ posto: string; iscrizioneId: string | null } | null> {
+): Promise<{ posto: string; iscrizioneId: string | null; listenOnly: boolean } | null> {
   try {
     const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
       issuer: getJitsiJwtIssuer(),
@@ -271,9 +271,14 @@ export async function postoDaTokenSala(
       clockTolerance: PROVA_PRESENZA_SECONDI,
     });
     if (payload.room !== roomName || (payload.moderator === true && !opzioni.ancheChiModera)) return null;
-    const id = (payload.context as { user?: { id?: unknown } } | undefined)?.user?.id;
+    const user = (payload.context as { user?: { id?: unknown; listenOnly?: unknown } } | undefined)?.user;
+    const id = user?.id;
     if (typeof id !== 'string' || id.length === 0) return null;
-    return { posto: id, iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null };
+    return {
+      posto: id,
+      iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null,
+      listenOnly: user?.listenOnly === true,
+    };
   } catch {
     return null;
   }

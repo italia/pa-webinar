@@ -380,8 +380,12 @@ and Jitsi shows it as **The moderator asks you to speak**, though nobody asked: 
 of each entry the room closes that notification (`hideNotification`, uid `asked-to-unmute`), while the
 floor given later by a moderator (**Give the floor**, `askToUnmute`) still shows it. The same goes the other way: withdrawing the consent from **Your consents**
 in the top bar asks for a new token without it, and the conference rejoins listening only
-([Withdrawing consent](../GDPR.md#withdrawing-consent)). A moderator who gives the floor to a listen-only person sees no change;
-the person's own room explains what is needed. Every token of such an event also carries
+([Withdrawing consent](../GDPR.md#withdrawing-consent)). In the moderator's **Participants** tab a listen-only
+person is marked **listen-only**, and in place of **Give the floor** the row says that they have not
+consented and cannot speak until they consent from their room (`listenOnly` in
+`GET /api/events/{param}/seats`: the person's browser declares its bridge endpoint with its room token,
+`POST /api/events/{param}/listen-only`, and only a token that carries `listenOnly`, the value the bridge
+enforces, marks it). The person's own room explains what is needed. Every token of such an event also carries
 `consentLock`: in that room the module refuses to switch the moderation off (the **Participants** tab
 shows a note instead of **Microphones locked** and **Video locked**), and a listen-only person made
 moderator stays out of the admitted. Neither this setting nor `recordingEnabled` changes while the room may be

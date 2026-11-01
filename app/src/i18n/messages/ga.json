@@ -533,7 +533,9 @@
       "revokeFloor": "Bain an t-urlár",
       "lowerHandFailed": "Níorbh fhéidir an lámh a ísliú: bain triail eile as.",
       "handsRaised": "{count, plural, one {# lámh ardaithe} other {# lámha ardaithe}}",
-      "locksByConsent": "Leanann micreafóin agus ceamaraí an toiliú leis an taifeadadh: úsáideann na daoine a thug é a cheadaíonn an ócáid, éisteann an chuid eile amháin. Fanann glais an tseomra air."
+      "locksByConsent": "Leanann micreafóin agus ceamaraí an toiliú leis an taifeadadh: úsáideann na daoine a thug é a cheadaíonn an ócáid, éisteann an chuid eile amháin. Fanann glais an tseomra air.",
+      "listenOnlyBadge": "éisteacht amháin",
+      "listenOnlyNoFloor": "Níor thoiligh leis an taifeadadh: ní féidir labhairt go dtoileoidh sé óna sheomra féin."
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",

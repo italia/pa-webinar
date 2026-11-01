@@ -533,7 +533,9 @@
       "revokeFloor": "Odbierz głos",
       "lowerHandFailed": "Nie udało się opuścić ręki: spróbuj ponownie.",
       "handsRaised": "{count, plural, one {# podniesiona ręka} few {# podniesione ręce} many {# podniesionych rąk} other {# podniesionej ręki}}",
-      "locksByConsent": "Mikrofony i kamery zależą od zgody na nagrywanie: osoby, które jej udzieliły, korzystają z tego, na co pozwala wydarzenie, pozostałe tylko słuchają. Blokady pokoju pozostają włączone."
+      "locksByConsent": "Mikrofony i kamery zależą od zgody na nagrywanie: osoby, które jej udzieliły, korzystają z tego, na co pozwala wydarzenie, pozostałe tylko słuchają. Blokady pokoju pozostają włączone.",
+      "listenOnlyBadge": "tylko słucha",
+      "listenOnlyNoFloor": "Nie wyraził zgody na nagrywanie: nie może zabrać głosu, dopóki nie wyrazi jej w swojej sali."
     },
     "moderator": {
       "muteAll": "Wycisz wszystkich",

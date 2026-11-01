@@ -533,7 +533,9 @@
       "revokeFloor": "Retirar a palavra",
       "lowerHandFailed": "Não foi possível baixar a mão: tente novamente.",
       "handsRaised": "{count, plural, one {# mão levantada} other {# mãos levantadas}}",
-      "locksByConsent": "Microfones e câmaras seguem o consentimento para a gravação: quem o deu usa o que o evento permite, os outros ficam apenas a ouvir. Os bloqueios da sala mantêm-se ativos."
+      "locksByConsent": "Microfones e câmaras seguem o consentimento para a gravação: quem o deu usa o que o evento permite, os outros ficam apenas a ouvir. Os bloqueios da sala mantêm-se ativos.",
+      "listenOnlyBadge": "só ouvir",
+      "listenOnlyNoFloor": "Não deu o consentimento à gravação: não pode intervir até o dar na sua sala."
     },
     "moderator": {
       "muteAll": "Silenciar todos",

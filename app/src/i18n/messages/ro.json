@@ -533,7 +533,9 @@
       "revokeFloor": "Retrage cuvântul",
       "lowerHandFailed": "Mâna nu a putut fi coborâtă: încearcă din nou.",
       "handsRaised": "{count, plural, one {# mână ridicată} few {# mâini ridicate} other {# de mâini ridicate}}",
-      "locksByConsent": "Microfoanele și camerele urmează acordul pentru înregistrare: cei care l-au dat folosesc ce permite evenimentul, ceilalți doar ascultă. Blocările sălii rămân active."
+      "locksByConsent": "Microfoanele și camerele urmează acordul pentru înregistrare: cei care l-au dat folosesc ce permite evenimentul, ceilalți doar ascultă. Blocările sălii rămân active.",
+      "listenOnlyBadge": "doar ascultă",
+      "listenOnlyNoFloor": "Nu și-a dat consimțământul la înregistrare: nu poate interveni până nu îl dă din sala sa."
     },
     "moderator": {
       "muteAll": "Dezactivați sunetul tuturor",

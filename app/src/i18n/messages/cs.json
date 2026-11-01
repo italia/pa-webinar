@@ -533,7 +533,9 @@
       "revokeFloor": "Odebrat slovo",
       "lowerHandFailed": "Ruku se nepodařilo spustit: zkuste to znovu.",
       "handsRaised": "{count, plural, one {# zvednutá ruka} few {# zvednuté ruce} other {# zvednutých rukou}}",
-      "locksByConsent": "Mikrofony a kamery se řídí souhlasem se záznamem: kdo ho dal, používá, co akce povoluje, ostatní jen poslouchají. Zámky místnosti zůstávají zapnuté."
+      "locksByConsent": "Mikrofony a kamery se řídí souhlasem se záznamem: kdo ho dal, používá, co akce povoluje, ostatní jen poslouchají. Zámky místnosti zůstávají zapnuté.",
+      "listenOnlyBadge": "jen poslech",
+      "listenOnlyNoFloor": "Nedal souhlas se záznamem: nemůže vystoupit, dokud ho neudělí ve své místnosti."
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",

@@ -533,7 +533,9 @@
       "revokeFloor": "Ta tillbaka ordet",
       "lowerHandFailed": "Handen kunde inte sänkas: försök igen.",
       "handsRaised": "{count, plural, one {# uppräckt hand} other {# uppräckta händer}}",
-      "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på."
+      "locksByConsent": "Mikrofoner och kameror följer samtycket till inspelningen: de som gett det använder det evenemanget tillåter, övriga lyssnar bara. Rummets lås förblir på.",
+      "listenOnlyBadge": "lyssnar bara",
+      "listenOnlyNoFloor": "Har inte samtyckt till inspelningen: kan inte tala förrän samtycke ges i det egna rummet."
     },
     "moderator": {
       "muteAll": "Tysta alla",

@@ -10425,6 +10425,19 @@ html.live-resizing .live-sidebar-resizer::after {
   vertical-align: 1px;
 }
 
+// Chi e' in solo ascolto (lo vede chi modera): un'etichetta diversa da «tu».
+.people-row__tag {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #fff3cd;
+  color: #5c4300;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
 .people-row__state {
   display: flex;
   flex-wrap: wrap;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useId, useRef } from 'react';
+import { useState, useEffect, useCallback, useId, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
@@ -291,7 +291,7 @@ export default function ParticipantPanel({
   // Chi c'e' dietro i riquadri: solo per chi modera, a scheda aperta. Si
   // rilegge quando cambia l'elenco, e ogni tanto per chi dichiara in ritardo.
   const seatsUrl = isModerator && visible && eventSlug && token ? `/api/events/${eventSlug}/seats` : null;
-  const { data: seatsData } = useSWR<{ seats: Record<string, SeatView> }>(
+  const { data: seatsData, mutate: rileggiPosti } = useSWR<{ seats: Record<string, SeatView>; listenOnly?: string[] }>(
     seatsUrl ? [seatsUrl, token, participants.length] : null,
     async ([url, bearer]: [string, string]) => {
       const res = await fetch(url, { headers: { Authorization: `Bearer ${bearer}` } });
@@ -301,6 +301,16 @@ export default function ParticipantPanel({
     { refreshInterval: 20_000, keepPreviousData: true },
   );
   const seats = seatsData?.seats ?? {};
+  // Chi e' in solo ascolto (senza consenso alla registrazione): il bridge non
+  // gli apre microfono ne' videocamera, nemmeno con la parola data.
+  const inSoloAscolto = useMemo(() => new Set(seatsData?.listenOnly ?? []), [seatsData?.listenOnly]);
+  // Chi entra dichiara il suo riquadro un attimo dopo che Jitsi lo mostra:
+  // una seconda lettura poco dopo ogni cambio dell'elenco lo trova.
+  useEffect(() => {
+    if (!seatsUrl) return;
+    const t = setTimeout(() => void rileggiPosti(), 4000);
+    return () => clearTimeout(t);
+  }, [seatsUrl, participants.length, rileggiPosti]);
 
   const handleKick = useCallback(
     (participantId: string) => {
@@ -455,6 +465,7 @@ export default function ParticipantPanel({
     const seat = isModerator ? seats[p.participantId] : undefined;
     const nomeDiverso =
       seat?.kind === 'registration' && !!seat.name && !stessoNome(seat.name, shownName);
+    const soloAscolto = isModerator && inSoloAscolto.has(p.participantId);
     return (
       <li
         key={p.participantId}
@@ -477,6 +488,7 @@ export default function ParticipantPanel({
             <span className="people-row__name">
               {shownName}
               {isSelf && <span className="people-row__self">{t('you')}</span>}
+              {soloAscolto && <span className="people-row__tag">{t('listenOnlyBadge')}</span>}
             </span>
             {seat && (
               <span className="people-row__identity">
@@ -546,14 +558,23 @@ export default function ParticipantPanel({
         </div>
         {/* La coda delle mani è qui, una sola: chi modera dà la parola o
             abbassa la mano dalla riga di chi l'ha alzata. */}
+        {/* A chi e' in solo ascolto la parola non si da': resta abbassare la
+            mano, con il motivo. */}
+        {mod && manoAlzata && soloAscolto && (
+          <p className="small text-secondary mb-0 mt-1">{t('listenOnlyNoFloor')}</p>
+        )}
         {mod && manoAlzata && (
           <div className="people-row__hand-actions">
-            <button type="button" className="people-row__act is-primary" onClick={() => giveFloor(p.participantId, true)}>
-              {tm('approveAll')}
-            </button>
-            <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, false)}>
-              {tm('audioOnly')}
-            </button>
+            {!soloAscolto && (
+              <>
+                <button type="button" className="people-row__act is-primary" onClick={() => giveFloor(p.participantId, true)}>
+                  {tm('approveAll')}
+                </button>
+                <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, false)}>
+                  {tm('audioOnly')}
+                </button>
+              </>
+            )}
             <button
               type="button"
               className="people-row__act"
@@ -571,10 +592,13 @@ export default function ParticipantPanel({
             <button type="button" className="people-row__act" onClick={() => muteOne(p.participantId, 'video')}>
               {t('stopVideo')}
             </button>
-            {(modAudio || modVideo) && !manoAlzata && (
+            {(modAudio || modVideo) && !manoAlzata && !soloAscolto && (
               <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, true)}>
                 {tm('approveAll')}
               </button>
+            )}
+            {soloAscolto && !manoAlzata && (
+              <p className="small text-secondary mb-0 mt-1">{t('listenOnlyNoFloor')}</p>
             )}
             {(modAudio || modVideo) && (
               <button type="button" className="people-row__act" onClick={() => revokeFloor(p.participantId)}>

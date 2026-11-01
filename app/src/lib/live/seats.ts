@@ -142,4 +142,47 @@ export async function readSeats(eventId: string): Promise<Record<string, Seat>> 
 /** Solo per i test: svuota la memoria del processo. */
 export function resetSeatsMemoryForTests(): void {
   memoria.clear();
+  memoriaAscolto.clear();
+}
+
+// ── Solo ascolto ──
+// Gli endpoint di chi e' in solo ascolto, dichiarati dal proprio browser con
+// il token della sala che lo dice (`listenOnly`, il valore che il bridge
+// applica: mod_pa_media_lock). Chi modera li legge con i posti, per non dare
+// la parola a chi non puo' prenderla. Stessa durata e stesso ripiego in
+// memoria dei posti.
+const chiaveAscolto = (eventId: string) => `live:listen-only:${eventId}`;
+const memoriaAscolto = new Map<string, Map<string, number>>();
+
+export async function segnaSoloAscolto(eventId: string, endpointId: string): Promise<void> {
+  const redis = getRedis();
+  if (redis) {
+    const fatto = await withDeadline(
+      redis
+        .multi()
+        .hset(chiaveAscolto(eventId), endpointId, '1')
+        .expire(chiaveAscolto(eventId), SEATS_TTL_SECONDS)
+        .exec(),
+      REDIS_TIMEOUT_MS,
+      null,
+    );
+    if (fatto) return;
+  }
+  const scadenza = Date.now() - SEATS_TTL_SECONDS * 1000;
+  for (const [ev, endpoint] of memoriaAscolto) {
+    for (const [id, at] of endpoint) if (at < scadenza) endpoint.delete(id);
+    if (endpoint.size === 0 && ev !== eventId) memoriaAscolto.delete(ev);
+  }
+  const m = memoriaAscolto.get(eventId) ?? new Map<string, number>();
+  if (m.size < MEMORY_CAP) m.set(endpointId, Date.now());
+  memoriaAscolto.set(eventId, m);
+}
+
+export async function leggiSoloAscolto(eventId: string): Promise<string[]> {
+  const redis = getRedis();
+  if (redis) {
+    const tutti = await withDeadline(redis.hkeys(chiaveAscolto(eventId)), REDIS_TIMEOUT_MS, null);
+    if (tutti) return tutti;
+  }
+  return [...(memoriaAscolto.get(eventId)?.keys() ?? [])];
 }

@@ -533,7 +533,9 @@
       "revokeFloor": "Ota puheenvuoro pois",
       "lowerHandFailed": "Kättä ei voitu laskea: yritä uudelleen.",
       "handsRaised": "{count, plural, one {# nostettu käsi} other {# nostettua kättä}}",
-      "locksByConsent": "Mikrofonit ja kamerat noudattavat suostumusta tallennukseen: sen antaneet käyttävät tapahtuman sallimaa, muut vain kuuntelevat. Huoneen lukitukset pysyvät päällä."
+      "locksByConsent": "Mikrofonit ja kamerat noudattavat suostumusta tallennukseen: sen antaneet käyttävät tapahtuman sallimaa, muut vain kuuntelevat. Huoneen lukitukset pysyvät päällä.",
+      "listenOnlyBadge": "vain kuuntelee",
+      "listenOnlyNoFloor": "Ei ole antanut suostumusta tallennukseen: ei voi puhua ennen kuin antaa sen omasta huoneestaan."
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
