@@ -197,6 +197,10 @@ interface WaitingRoomProps {
   conduce?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
+  /** Chi entra dal proprio link d'iscrizione: in sala compare con il nome
+   *  dell'iscrizione (lo decide la rotta del token), quindi il campo non si
+   *  modifica e lo dice. */
+  nomeDellIscrizione?: boolean;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
    *  The name the user typed is passed through so the parent can forward
    *  it to the JWT fetch (displayNameOverride / guestName). The pre-join
@@ -280,6 +284,7 @@ export default function WaitingRoom({
   mediaConcessi = { microfono: true, fotocamera: true },
   jvbReady,
   defaultName,
+  nomeDellIscrizione = false,
   onEnterLive,
   onStartEvent,
   onLeaveFeedback,
@@ -1007,8 +1012,21 @@ export default function WaitingRoom({
   // pulsante spento non dice perche' lo e'. Qui si dice, accanto al campo —
   // prima come indicazione, dopo un tentativo come errore — e il campo lo
   // annuncia a chi usa un lettore di schermo.
+  // Il nome dell'iscrizione resta quello: un campo modificabile prometterebbe
+  // un cambio che la sala non applica. Solo se e' un nome valido per entrare,
+  // altrimenti va scritto (e la rotta usa quello scritto).
+  const nomeFisso = nomeDellIscrizione && !conduce && defaultName.trim().length >= 2;
+  // Una sola nota sotto il campo, quella che vale per chi entra.
+  const aiutoNome =
+    event.audienceAnonymous && !conduce
+      ? 'anonymousNameHelp'
+      : nomeFisso
+        ? 'registeredNameHelp'
+        : isGuest
+          ? 'nameHelp'
+          : null;
   const nameDescribedBy =
-    [isGuest || (event.audienceAnonymous && !conduce) ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
+    [aiutoNome ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
       .filter(Boolean)
       .join(' ') || undefined;
   const nameField = (
@@ -1019,6 +1037,8 @@ export default function WaitingRoom({
         type="text"
         value={name}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+        readOnly={nomeFisso || undefined}
+        normalized={nomeFisso || undefined}
         required
         minLength={2}
         maxLength={100}
@@ -1030,18 +1050,10 @@ export default function WaitingRoom({
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
-      {event.audienceAnonymous && !conduce ? (
-        // Pubblico anonimo: il nome resta a chi organizza, gli altri vedono
-        // uno pseudonimo.
+      {aiutoNome && (
         <small id="waiting-name-help" className="text-muted d-block" style={{ fontSize: '0.8rem' }}>
-          {t('anonymousNameHelp')}
+          {t(aiutoNome)}
         </small>
-      ) : (
-        isGuest && (
-          <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
-            {t('nameHelp')}
-          </small>
-        )
       )}
       {nomeDaChiedere && (
         <div

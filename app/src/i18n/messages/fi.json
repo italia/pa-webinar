@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Suunniteltuun alkuun ({when}) on yli 30 minuuttia. Jos aloitat nyt, kaikki linkin saaneet pääsevät heti sisään ja videohuone käynnistyy: vahvista painamalla uudelleen.",
     "startEarlyYes": "Aloita nyt",
     "startEarlyNo": "Odota suunniteltua aikaa",
-    "anonymousNameHelp": "Tässä tapahtumassa yleisö on anonyymi: muut eivät näe nimeäsi vaan koodillisen salanimen."
+    "anonymousNameHelp": "Tässä tapahtumassa yleisö on anonyymi: muut eivät näe nimeäsi vaan koodillisen salanimen.",
+    "registeredNameHelp": "Tämä on nimi, jolla ilmoittauduit: näin näyt huoneessa."
   },
   "recording": {
     "management": "Videotallenne",

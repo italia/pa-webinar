@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Tá níos mó ná 30 nóiméad fágtha go dtí an tús beartaithe ({when}). Má thosaíonn tú anois, rachaidh aon duine a bhfuil an nasc aige isteach láithreach agus lasfar an seomra físe: brúigh arís le deimhniú.",
     "startEarlyYes": "Tosaigh anois",
     "startEarlyNo": "Fan leis an am beartaithe",
-    "anonymousNameHelp": "San ócáid seo tá an lucht féachana gan ainm: ní fheiceann daoine eile d’ainm, ach ainm cleite le cód."
+    "anonymousNameHelp": "San ócáid seo tá an lucht féachana gan ainm: ní fheiceann daoine eile d’ainm, ach ainm cleite le cód.",
+    "registeredNameHelp": "Seo an t-ainm a chláraigh tú leis: is mar seo a fheicfear thú sa seomra."
   },
   "recording": {
     "management": "Taifeadadh físe",

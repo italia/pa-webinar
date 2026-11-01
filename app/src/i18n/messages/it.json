@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Mancano più di 30 minuti all'inizio previsto ({when}). Avviando ora, chi ha il link entra subito e la sala video si accende: premi di nuovo per confermare.",
     "startEarlyYes": "Avvia ora",
     "startEarlyNo": "Aspetta l'orario previsto",
-    "anonymousNameHelp": "In questo evento il pubblico è anonimo: gli altri non vedono il tuo nome, ma uno pseudonimo con un codice."
+    "anonymousNameHelp": "In questo evento il pubblico è anonimo: gli altri non vedono il tuo nome, ma uno pseudonimo con un codice.",
+    "registeredNameHelp": "È il nome dato all'iscrizione: in sala comparirai così."
   },
   "recording": {
     "management": "Registrazione video",

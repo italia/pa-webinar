@@ -202,6 +202,9 @@ interface LiveEventClientProps {
   /** L'iscrizione risulta entrata in sala (Registration.joinedAt): la
    *  valutazione si propone anche senza il token della sala di questa pagina. */
   registrationJoined?: boolean;
+  /** Chi apre il proprio link d'iscrizione dal browser con cui si e' iscritto:
+   *  in sala compare con il nome dell'iscrizione. */
+  registrantOwnsLink?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -315,6 +318,7 @@ export default function LiveEventClient({
   hasMultitrackConsent = false,
   hasRecordingConsent = false,
   registrationJoined = false,
+  registrantOwnsLink = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -716,8 +720,11 @@ export default function LiveEventClient({
       }
     } else {
       body.accessToken = token;
-      if (chosenName && chosenName !== initialDisplayName) {
-        body.displayNameOverride = chosenName;
+      // Sempre il nome scritto: per chi apre il proprio link la rotta usa
+      // quello dell'iscrizione e lo ignora; se non lo riconosce come suo (il
+      // cookie scaduto nel frattempo) e' il nome con cui entra.
+      if (chosenName.trim()) {
+        body.displayNameOverride = chosenName.trim();
       }
     }
     // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
@@ -819,7 +826,6 @@ export default function LiveEventClient({
     isGuest,
     token,
     chosenName,
-    initialDisplayName,
     router,
     t,
     tApi,
@@ -1833,6 +1839,9 @@ export default function LiveEventClient({
           chatToken={token}
           eventType={event.eventType === 'INSTANT' ? 'INSTANT' : 'SCHEDULED'}
           defaultName={chosenName || initialDisplayName}
+          // Chi apre il proprio link d'iscrizione entra con il nome dato
+          // all'iscrizione.
+          nomeDellIscrizione={registrantOwnsLink && !isGuest && !isModerator && !isSpeaker}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
           onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}

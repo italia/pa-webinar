@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Do planiranog početka ({when}) ima više od 30 minuta. Ako pokrenete sada, svatko s poveznicom odmah ulazi i video soba se uključuje: pritisnite ponovno za potvrdu.",
     "startEarlyYes": "Pokreni sada",
     "startEarlyNo": "Pričekaj planirano vrijeme",
-    "anonymousNameHelp": "Na ovom događaju publika je anonimna: drugi ne vide vaše ime, nego pseudonim s kodom."
+    "anonymousNameHelp": "Na ovom događaju publika je anonimna: drugi ne vide vaše ime, nego pseudonim s kodom.",
+    "registeredNameHelp": "To je ime s kojim ste se prijavili: tako ćete se prikazivati u sobi."
   },
   "recording": {
     "management": "Video snimka",

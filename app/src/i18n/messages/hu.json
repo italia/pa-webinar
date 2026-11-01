@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "A tervezett kezdésig ({when}) több mint 30 perc van hátra. Ha most indítja, a hivatkozással bárki azonnal beléphet, és a videoterem bekapcsol: a megerősítéshez nyomja meg újra.",
     "startEarlyYes": "Indítás most",
     "startEarlyNo": "Várakozás a tervezett időpontig",
-    "anonymousNameHelp": "Ezen az eseményen a közönség névtelen: a többiek nem a nevét látják, hanem egy kódos álnevet."
+    "anonymousNameHelp": "Ezen az eseményen a közönség névtelen: a többiek nem a nevét látják, hanem egy kódos álnevet.",
+    "registeredNameHelp": "Ezzel a névvel regisztrált: így fog megjelenni a teremben."
   },
   "recording": {
     "management": "Videofelvétel",

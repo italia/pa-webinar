@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Tot de geplande start ({when}) duurt het nog meer dan 30 minuten. Als je nu start, kan iedereen met de link meteen naar binnen en gaat de videoruimte aan: druk nogmaals om te bevestigen.",
     "startEarlyYes": "Nu starten",
     "startEarlyNo": "Wachten op het geplande tijdstip",
-    "anonymousNameHelp": "Bij dit evenement is het publiek anoniem: anderen zien niet je naam, maar een pseudoniem met een code."
+    "anonymousNameHelp": "Bij dit evenement is het publiek anoniem: anderen zien niet je naam, maar een pseudoniem met een code.",
+    "registeredNameHelp": "Dit is de naam waarmee je je hebt ingeschreven: zo verschijn je in de ruimte."
   },
   "recording": {
     "management": "Video-opname",

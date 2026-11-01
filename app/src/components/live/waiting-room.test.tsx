@@ -642,3 +642,29 @@ describe('sala d\'attesa — evento concluso', () => {
     expect(container.textContent).toContain(t.netiquetteTitle);
   });
 });
+
+describe('sala d\'attesa — il nome di chi entra dal proprio link d\'iscrizione', () => {
+  it('non si modifica e dice che e\' quello dell\'iscrizione', () => {
+    render({ role: 'participant', defaultName: 'Anna Bianchi', nomeDellIscrizione: true });
+    const campo = $<HTMLInputElement>('#waiting-name')!;
+    expect(campo.readOnly).toBe(true);
+    expect(campo.value).toBe('Anna Bianchi');
+    expect($('#waiting-name-help')?.textContent).toBe(t.registeredNameHelp);
+    expect(campo.getAttribute('aria-describedby')).toContain('waiting-name-help');
+  });
+
+  it('senza nome (link inoltrato) resta da scrivere', () => {
+    render({ role: 'participant', defaultName: '', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+
+  it('chi conduce lo puo\' sempre cambiare', () => {
+    render({ role: 'moderator', conduce: true, defaultName: 'Relatore 1', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+
+  it('un nome dell\'iscrizione troppo corto per entrare resta da correggere', () => {
+    render({ role: 'participant', defaultName: 'A ', nomeDellIscrizione: true });
+    expect($<HTMLInputElement>('#waiting-name')!.readOnly).toBe(false);
+  });
+});

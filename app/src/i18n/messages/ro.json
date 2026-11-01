@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Mai sunt peste 30 de minute până la începutul planificat ({when}). Dacă pornești acum, oricine are linkul intră imediat și sala video se aprinde: apasă din nou pentru a confirma.",
     "startEarlyYes": "Pornește acum",
     "startEarlyNo": "Așteaptă ora planificată",
-    "anonymousNameHelp": "La acest eveniment publicul este anonim: ceilalți nu îți văd numele, ci un pseudonim cu un cod."
+    "anonymousNameHelp": "La acest eveniment publicul este anonim: ceilalți nu îți văd numele, ci un pseudonim cu un cod.",
+    "registeredNameHelp": "Este numele cu care te-ai înscris: așa vei apărea în sală."
   },
   "recording": {
     "management": "Înregistrare video",

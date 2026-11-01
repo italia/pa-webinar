@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Iki numatytos pradžios ({when}) liko daugiau nei 30 minučių. Pradėjus dabar, kiekvienas, turintis nuorodą, iškart įeis ir vaizdo kambarys įsijungs: paspauskite dar kartą, kad patvirtintumėte.",
     "startEarlyYes": "Pradėti dabar",
     "startEarlyNo": "Laukti numatyto laiko",
-    "anonymousNameHelp": "Šiame renginyje auditorija anoniminė: kiti mato ne jūsų vardą, o slapyvardį su kodu."
+    "anonymousNameHelp": "Šiame renginyje auditorija anoniminė: kiti mato ne jūsų vardą, o slapyvardį su kodu.",
+    "registeredNameHelp": "Tai vardas, kuriuo užsiregistravote: taip būsite matomi kambaryje."
   },
   "recording": {
     "management": "Vaizdo įrašas",

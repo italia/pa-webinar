@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Do plánovaného začátku ({when}) zbývá víc než 30 minut. Když akci spustíte teď, kdokoli s odkazem hned vstoupí a zapne se videomístnost: potvrďte dalším stisknutím.",
     "startEarlyYes": "Spustit teď",
     "startEarlyNo": "Počkat na plánovaný čas",
-    "anonymousNameHelp": "Na této akci je publikum anonymní: ostatní neuvidí vaše jméno, ale pseudonym s kódem."
+    "anonymousNameHelp": "Na této akci je publikum anonymní: ostatní neuvidí vaše jméno, ale pseudonym s kódem.",
+    "registeredNameHelp": "Je to jméno, pod kterým jste se zaregistrovali: tak se zobrazíte v místnosti."
   },
   "recording": {
     "management": "Videozáznam",

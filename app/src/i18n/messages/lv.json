@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Līdz plānotajam sākumam ({when}) ir vairāk nekā 30 minūtes. Sākot tagad, ikviens ar saiti uzreiz ienāks un video telpa ieslēgsies: nospiediet vēlreiz, lai apstiprinātu.",
     "startEarlyYes": "Sākt tagad",
     "startEarlyNo": "Gaidīt plānoto laiku",
-    "anonymousNameHelp": "Šajā pasākumā auditorija ir anonīma: citi neredz jūsu vārdu, bet pseidonīmu ar kodu."
+    "anonymousNameHelp": "Šajā pasākumā auditorija ir anonīma: citi neredz jūsu vārdu, bet pseidonīmu ar kodu.",
+    "registeredNameHelp": "Šis ir vārds, ar kuru reģistrējāties: tā jūs redzēs telpā."
   },
   "recording": {
     "management": "Video ieraksts",

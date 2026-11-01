@@ -283,6 +283,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // valutazione di fine evento gli si puo' proporre anche senza il token
   // della sala di questa pagina.
   let iscrizioneEntrata = false;
+  // Il browser che si e' iscritto apre il proprio link: entra con il nome
+  // dell'iscrizione (la rotta del token applica la stessa regola).
+  let linkDellIscritto = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
@@ -320,6 +323,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         event.id,
         cookieStore.get(eventAccessCookieName(event.id))?.value,
       )) === token;
+    linkDellIscritto = ownsToken;
     participantInfo = {
       displayName: ownsToken
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
@@ -430,6 +434,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       hasMultitrackConsent={hasMultitrackConsent}
       hasRecordingConsent={hasRecordingConsent}
       registrationJoined={iscrizioneEntrata}
+      registrantOwnsLink={linkDellIscritto}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —

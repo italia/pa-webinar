@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Bis zum geplanten Beginn ({when}) sind es mehr als 30 Minuten. Wenn Sie jetzt starten, kommen alle mit dem Link sofort hinein und der Videoraum wird eingeschaltet: Zum Bestätigen erneut drücken.",
     "startEarlyYes": "Jetzt starten",
     "startEarlyNo": "Auf die geplante Zeit warten",
-    "anonymousNameHelp": "Bei diesem Event ist das Publikum anonym: Andere sehen nicht Ihren Namen, sondern ein Pseudonym mit einem Code."
+    "anonymousNameHelp": "Bei diesem Event ist das Publikum anonym: Andere sehen nicht Ihren Namen, sondern ein Pseudonym mit einem Code.",
+    "registeredNameHelp": "Das ist der Name, mit dem Sie sich angemeldet haben: So erscheinen Sie im Raum."
   },
   "recording": {
     "management": "Videoaufzeichnung",

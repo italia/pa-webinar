@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Il reste plus de 30 minutes avant le début prévu ({when}). En démarrant maintenant, toute personne ayant le lien entre aussitôt et la salle vidéo s'allume : appuyez de nouveau pour confirmer.",
     "startEarlyYes": "Démarrer maintenant",
     "startEarlyNo": "Attendre l'heure prévue",
-    "anonymousNameHelp": "Lors de cet événement, le public est anonyme : les autres ne voient pas votre nom, mais un pseudonyme avec un code."
+    "anonymousNameHelp": "Lors de cet événement, le public est anonyme : les autres ne voient pas votre nom, mais un pseudonyme avec un code.",
+    "registeredNameHelp": "C’est le nom indiqué lors de l’inscription : c’est ainsi que les autres vous verront dans la salle."
   },
   "recording": {
     "management": "Enregistrement vidéo",

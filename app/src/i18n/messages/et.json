@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Plaanitud alguseni ({when}) on üle 30 minuti. Kui alustad praegu, pääseb lingiga igaüks kohe sisse ja videoruum lülitub sisse: kinnitamiseks vajuta uuesti.",
     "startEarlyYes": "Alusta kohe",
     "startEarlyNo": "Oota plaanitud aega",
-    "anonymousNameHelp": "Sellel sündmusel on publik anonüümne: teised ei näe sinu nime, vaid koodiga pseudonüümi."
+    "anonymousNameHelp": "Sellel sündmusel on publik anonüümne: teised ei näe sinu nime, vaid koodiga pseudonüümi.",
+    "registeredNameHelp": "See on nimi, millega registreerusid: nii oled ruumis nähtav."
   },
   "recording": {
     "management": "Videosalvestis",

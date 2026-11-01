@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Do načrtovanega začetka ({when}) je še več kot 30 minut. Če začnete zdaj, lahko vsak s povezavo takoj vstopi in videosoba se vklopi: za potrditev pritisnite znova.",
     "startEarlyYes": "Začni zdaj",
     "startEarlyNo": "Počakaj na načrtovani čas",
-    "anonymousNameHelp": "Na tem dogodku je občinstvo anonimno: drugi ne vidijo vašega imena, ampak psevdonim s kodo."
+    "anonymousNameHelp": "Na tem dogodku je občinstvo anonimno: drugi ne vidijo vašega imena, ampak psevdonim s kodo.",
+    "registeredNameHelp": "To je ime, s katerim ste se prijavili: tako boste prikazani v sobi."
   },
   "recording": {
     "management": "Video posnetek",

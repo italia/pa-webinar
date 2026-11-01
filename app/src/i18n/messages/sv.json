@@ -5380,7 +5380,8 @@
     "startEarlyConfirm": "Det är mer än 30 minuter kvar till den planerade starten ({when}). Om du startar nu kommer alla med länken in direkt och videorummet slås på: tryck igen för att bekräfta.",
     "startEarlyYes": "Starta nu",
     "startEarlyNo": "Vänta till den planerade tiden",
-    "anonymousNameHelp": "På det här evenemanget är publiken anonym: andra ser inte ditt namn, utan en pseudonym med en kod."
+    "anonymousNameHelp": "På det här evenemanget är publiken anonym: andra ser inte ditt namn, utan en pseudonym med en kod.",
+    "registeredNameHelp": "Det är namnet du anmälde dig med: så visas du i rummet."
   },
   "recording": {
     "management": "Videoinspelning",
