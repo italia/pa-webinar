@@ -309,6 +309,9 @@ interface JitsiCredentials {
   listenOnly?: boolean;
 }
 
+/** La notifica di Jitsi «Il moderatore ti chiede di intervenire» (il suo uid). */
+const NOTIFICA_PAROLA_DATA = 'asked-to-unmute';
+
 export default function LiveEventClient({
   event,
   token,
@@ -1236,6 +1239,22 @@ export default function LiveEventClient({
     };
     tryStart();
   }, []);
+
+  // Chi entra ammesso dal token (chi ha dato il consenso in un evento con il
+  // solo ascolto, chi interviene con i microfoni bloccati) riceve da Jitsi
+  // l'«ammesso» appena entra, e Jitsi lo mostra come «Il moderatore ti chiede
+  // di intervenire», anche se nessuno gliel'ha chiesto. Nei primi secondi di
+  // ogni ingresso quella notifica si chiude; la parola data davvero da chi
+  // conduce (askToUnmute, components/participants) arriva dopo e resta.
+  useEffect(() => {
+    if (!jitsiApi || isModerator || ingressi === 0) return;
+    // L'«ammesso» arriva subito dopo l'ingresso: un controllo ogni quarto di
+    // secondo nei primi tre, poi due piu' radi per un messaggio in ritardo.
+    const timer = [...Array.from({ length: 12 }, (_, i) => 250 * (i + 1)), 4500, 6500].map((ms) =>
+      setTimeout(() => jitsiApi.executeCommand('hideNotification', NOTIFICA_PAROLA_DATA), ms),
+    );
+    return () => timer.forEach(clearTimeout);
+  }, [jitsiApi, isModerator, ingressi]);
 
   const autoOrPromptRecording = useCallback(
     (api: JitsiMeetExternalAPI | null) => {

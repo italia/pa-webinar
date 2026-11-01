@@ -139,6 +139,7 @@ export interface JitsiMeetExternalAPI {
   executeCommand(command: 'disableVideoModeration'): void;
   executeCommand(command: 'approveAudio', participantId: string): void;
   executeCommand(command: 'approveVideo', participantId: string): void;
+  executeCommand(command: 'hideNotification', uid: string): void;
   executeCommand(command: 'setNoiseSuppressionEnabled', enabled: boolean): void;
   /** Set a remote participant's playback volume for the LOCAL user only
    *  (0 = muted … 1 = 100%). Does not affect what other participants hear. */
