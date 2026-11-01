@@ -1305,7 +1305,15 @@
         "askRole": "ról",
         "askType": "cineál eagraíochta",
         "permissionsHeading": "Cé atá in ann cad a dhéanamh sa seomra",
-        "permissionsIntro": "Cad is féidir leis na rannpháirtithe a dhéanamh agus cé na feidhmeanna seomra atá ar siúl. Is féidir gach rud a athrú le linn na hócáide freisin."
+        "permissionsIntro": "Cad is féidir leis na rannpháirtithe a dhéanamh agus cé na feidhmeanna seomra atá ar siúl. Is féidir gach rud a athrú le linn na hócáide freisin.",
+        "consentsLine": "Toilithe ag an gclárú agus sa seomra: {list}",
+        "consentRecordingRequired": "taifeadadh, riachtanach chun dul isteach",
+        "consentRecordingFree": "taifeadadh, roghnach (gan é, éisteacht amháin)",
+        "consentRecordingNotice": "don taifeadadh fógra amháin (ní labhraíonn ná ní thaispeántar na rannpháirtithe)",
+        "consentTranscription": "tras-scríobh a ndeir siad, roghnach",
+        "consentsNone": "Gan aon toiliú seachas toiliú an chláraithe.",
+        "consentsHosts": "Iarrtar ar mhodhnóirí agus ar chainteoirí an taifeadadh sa seomra, go roghnach.",
+        "consentsWithdraw": "Is féidir le rannpháirtithe iad a tharraingt siar sa seomra, leis an gcnaipe “Toilithe”."
       },
       "preview": {
         "title": "Réamhamharc ar an leathanach",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Cóip den ócáid",
     "editCopyNoticeNext": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Is é dáta na chéad ócáide eile atá ann cheana: seiceáil an chuid eile agus sábháil.",
-    "editCopyNoticeSameDates": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Tá na dátaí céanna aici agus atá ag an mbunleagan: nuashonraigh iad sula sábhálann tú."
+    "editCopyNoticeSameDates": "Tá tú ag obair ar chóip dréachta: ní athraítear an ócáid bhunaidh. Tá na dátaí céanna aici agus atá ag an mbunleagan: nuashonraigh iad sula sábhálann tú.",
+    "consentProofs": {
+      "title": "Cruthúnais toilithe",
+      "intro": "Na toilithe le taifeadadh agus le tras-scríobh a tugadh ag an gclárú, sa seomra feithimh nó sa seomra, agus na cinn a tarraingíodh siar. Is chun iad a chruthú atá an liosta le hainmneacha.",
+      "loading": "Á lódáil…",
+      "loadFailed": "Níorbh fhéidir na cruthúnais toilithe a lódáil.",
+      "none": "Gan toiliú le taifeadadh ná le tras-scríobh don ócáid seo.",
+      "kinds": {
+        "recording": "Taifeadadh",
+        "transcription": "Tras-scríobh a ndeirtear"
+      },
+      "counts": "ag toiliú {given} · tarraingthe siar {withdrawn}",
+      "download": "Íoslódáil an liosta (CSV)",
+      "downloading": "Á íoslódáil…",
+      "downloadNote": "Tá ainmneacha daoine sa liosta: scríobhtar an easpórtáil i loga GDPR na hócáide.",
+      "downloadFailed": "Níorbh fhéidir an liosta a íoslódáil: bain triail eile as.",
+      "csv": {
+        "kind": "Toiliú",
+        "source": "Cá háit",
+        "role": "Ról",
+        "name": "Ainm",
+        "givenAt": "Tugtha ar",
+        "withdrawnAt": "Tarraingthe siar ar",
+        "textVersion": "Leagan an téacs",
+        "kinds": {
+          "recording": "Taifeadadh",
+          "transcription": "Tras-scríobh a ndeirtear"
+        },
+        "sources": {
+          "registration": "clárú",
+          "room": "seomra"
+        },
+        "roles": {
+          "registrant": "cláraithe",
+          "guest": "aoi",
+          "host": "i gceannas nó ag labhairt"
+        },
+        "unreadableName": "(ní féidir an t-ainm a léamh)"
+      },
+      "countsNote": "Áirítear daoine: áirítear clárú, cuntas foirne nó nasc ainmnithe uair amháin; áirítear aoi a fhilleann ar chuairt eile arís."
+    }
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",

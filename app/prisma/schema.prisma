@@ -2742,6 +2742,9 @@ model RecordingConsent {
   // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
   // consenso non vale piu'.
   withdrawnAt    DateTime? @map("withdrawn_at")
+  // I periodi precedenti di un consenso ridato dopo un ritiro (una sola
+  // prova per iscrizione): [{ consentedAt, withdrawnAt }], dal piu' vecchio.
+  earlierPeriods Json?    @map("earlier_periods") @db.JsonB
 
   event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)

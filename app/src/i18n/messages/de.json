@@ -1305,7 +1305,15 @@
         "askRole": "Funktion",
         "askType": "Art der Organisation",
         "permissionsHeading": "Wer was im Raum darf",
-        "permissionsIntro": "Was Teilnehmende dürfen und welche Raumfunktionen aktiv sind. Alles lässt sich auch während des Events ändern."
+        "permissionsIntro": "Was Teilnehmende dürfen und welche Raumfunktionen aktiv sind. Alles lässt sich auch während des Events ändern.",
+        "consentsLine": "Einwilligungen bei der Anmeldung und im Raum: {list}",
+        "consentRecordingRequired": "Aufzeichnung, Voraussetzung für die Teilnahme",
+        "consentRecordingFree": "Aufzeichnung, freiwillig (ohne: nur zuhören)",
+        "consentRecordingNotice": "für die Aufzeichnung nur ein Hinweis (Teilnehmende sprechen nicht und zeigen sich nicht)",
+        "consentTranscription": "Transkription der eigenen Beiträge, freiwillig",
+        "consentsNone": "Keine Einwilligung außer der zur Anmeldung.",
+        "consentsHosts": "Moderierende und Vortragende werden im Raum freiwillig um die Einwilligung in die Aufzeichnung gebeten.",
+        "consentsWithdraw": "Teilnehmende können sie im Raum über die Schaltfläche „Einwilligungen“ widerrufen."
       },
       "preview": {
         "title": "Seitenvorschau",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopie des Events",
     "editCopyNoticeNext": "Sie bearbeiten eine Kopie als Entwurf: Das ursprüngliche Event bleibt unverändert. Das Datum ist bereits das des nächsten Termins: Prüfen Sie den Rest und speichern Sie.",
-    "editCopyNoticeSameDates": "Sie bearbeiten eine Kopie als Entwurf: Das ursprüngliche Event bleibt unverändert. Sie hat dieselben Termine wie das Original: Passen Sie sie vor dem Speichern an."
+    "editCopyNoticeSameDates": "Sie bearbeiten eine Kopie als Entwurf: Das ursprüngliche Event bleibt unverändert. Sie hat dieselben Termine wie das Original: Passen Sie sie vor dem Speichern an.",
+    "consentProofs": {
+      "title": "Einwilligungsnachweise",
+      "intro": "Die Einwilligungen in Aufzeichnung und Transkription, erteilt bei der Anmeldung, im Warteraum oder im Raum, und die widerrufenen. Die Liste mit Namen dient als Nachweis.",
+      "loading": "Wird geladen…",
+      "loadFailed": "Die Einwilligungsnachweise konnten nicht geladen werden.",
+      "none": "Keine Einwilligung in Aufzeichnung oder Transkription für diese Veranstaltung.",
+      "kinds": {
+        "recording": "Aufzeichnung",
+        "transcription": "Transkription der Beiträge"
+      },
+      "counts": "eingewilligt {given} · widerrufen {withdrawn}",
+      "download": "Liste herunterladen (CSV)",
+      "downloading": "Wird heruntergeladen…",
+      "downloadNote": "Die Liste enthält die Namen der Personen: Der Export wird im DSGVO-Protokoll der Veranstaltung vermerkt.",
+      "downloadFailed": "Die Liste konnte nicht heruntergeladen werden: Bitte erneut versuchen.",
+      "csv": {
+        "kind": "Einwilligung",
+        "source": "Wo",
+        "role": "Rolle",
+        "name": "Name",
+        "givenAt": "Erteilt am",
+        "withdrawnAt": "Widerrufen am",
+        "textVersion": "Textversion",
+        "kinds": {
+          "recording": "Aufzeichnung",
+          "transcription": "Transkription der Beiträge"
+        },
+        "sources": {
+          "registration": "Anmeldung",
+          "room": "Raum"
+        },
+        "roles": {
+          "registrant": "angemeldet",
+          "guest": "Gast",
+          "host": "moderiert oder spricht"
+        },
+        "unreadableName": "(Name nicht lesbar)"
+      },
+      "countsNote": "Gezählt werden Personen: eine Anmeldung, ein Mitarbeiterkonto oder ein persönlicher Link zählen einmal; ein Gast, der in einem anderen Besuch zurückkehrt, zählt erneut."
+    }
   },
   "email": {
     "confirmationSubject": "Anmeldebestätigung: {eventTitle}",

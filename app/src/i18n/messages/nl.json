@@ -1305,7 +1305,15 @@
         "askRole": "functie",
         "askType": "soort organisatie",
         "permissionsHeading": "Wie wat mag in de ruimte",
-        "permissionsIntro": "Wat deelnemers kunnen en welke functies van de ruimte aan staan. Alles kan ook tijdens het evenement worden gewijzigd."
+        "permissionsIntro": "Wat deelnemers kunnen en welke functies van de ruimte aan staan. Alles kan ook tijdens het evenement worden gewijzigd.",
+        "consentsLine": "Toestemmingen bij inschrijving en in de zaal: {list}",
+        "consentRecordingRequired": "opname, verplicht om binnen te komen",
+        "consentRecordingFree": "opname, vrij (zonder: alleen meeluisteren)",
+        "consentRecordingNotice": "voor de opname alleen een melding (deelnemers spreken niet en tonen zich niet)",
+        "consentTranscription": "transcriptie van de eigen bijdragen, optioneel",
+        "consentsNone": "Geen toestemming behalve die voor de inschrijving.",
+        "consentsHosts": "Aan moderatoren en sprekers wordt de opname in de zaal gevraagd, optioneel.",
+        "consentsWithdraw": "Deelnemers kunnen ze in de zaal intrekken met de knop ‘Toestemmingen’."
       },
       "preview": {
         "title": "Voorbeeld van de pagina",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopie van het evenement",
     "editCopyNoticeNext": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. De datum is al die van de volgende keer: controleer de rest en sla op.",
-    "editCopyNoticeSameDates": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. Ze heeft dezelfde data als het origineel: werk ze bij voordat je opslaat."
+    "editCopyNoticeSameDates": "Je werkt aan een kopie als concept: het oorspronkelijke evenement verandert niet. Ze heeft dezelfde data als het origineel: werk ze bij voordat je opslaat.",
+    "consentProofs": {
+      "title": "Bewijs van toestemmingen",
+      "intro": "De toestemmingen voor opname en transcriptie, gegeven bij inschrijving, in de wachtruimte of in de zaal, en de ingetrokken. De lijst met namen dient als bewijs.",
+      "loading": "Laden…",
+      "loadFailed": "Het bewijs van toestemmingen kon niet worden geladen.",
+      "none": "Geen toestemming voor opname of transcriptie voor dit evenement.",
+      "kinds": {
+        "recording": "Opname",
+        "transcription": "Transcriptie van bijdragen"
+      },
+      "counts": "stemmen in {given} · ingetrokken {withdrawn}",
+      "download": "Lijst downloaden (CSV)",
+      "downloading": "Bezig met downloaden…",
+      "downloadNote": "De lijst bevat namen van personen: de export wordt vastgelegd in het AVG-logboek van het evenement.",
+      "downloadFailed": "De lijst kon niet worden gedownload: probeer het opnieuw.",
+      "csv": {
+        "kind": "Toestemming",
+        "source": "Waar",
+        "role": "Rol",
+        "name": "Naam",
+        "givenAt": "Gegeven op",
+        "withdrawnAt": "Ingetrokken op",
+        "textVersion": "Tekstversie",
+        "kinds": {
+          "recording": "Opname",
+          "transcription": "Transcriptie van bijdragen"
+        },
+        "sources": {
+          "registration": "inschrijving",
+          "room": "zaal"
+        },
+        "roles": {
+          "registrant": "ingeschreven",
+          "guest": "gast",
+          "host": "leidt of spreekt"
+        },
+        "unreadableName": "(naam niet leesbaar)"
+      },
+      "countsNote": "Er worden personen geteld: een inschrijving, een medewerkersaccount of een persoonlijke link tellen één keer; een gast die in een ander bezoek terugkomt, telt opnieuw."
+    }
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",

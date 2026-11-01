@@ -1305,7 +1305,15 @@
         "askRole": "funkce",
         "askType": "typ organizace",
         "permissionsHeading": "Kdo co může v místnosti",
-        "permissionsIntro": "Co mohou účastníci dělat a které funkce místnosti jsou zapnuté. Vše lze měnit i během akce."
+        "permissionsIntro": "Co mohou účastníci dělat a které funkce místnosti jsou zapnuté. Vše lze měnit i během akce.",
+        "consentsLine": "Souhlasy při registraci a v místnosti: {list}",
+        "consentRecordingRequired": "záznam, povinný pro vstup",
+        "consentRecordingFree": "záznam, dobrovolný (bez něj jen poslech)",
+        "consentRecordingNotice": "k záznamu jen upozornění (účastníci nemluví ani se neukazují)",
+        "consentTranscription": "přepis vlastních příspěvků, dobrovolný",
+        "consentsNone": "Žádný souhlas kromě souhlasu při registraci.",
+        "consentsHosts": "Moderátoři a řečníci jsou o souhlas se záznamem požádáni v místnosti, dobrovolně.",
+        "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“."
       },
       "preview": {
         "title": "Náhled stránky",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopie akce",
     "editCopyNoticeNext": "Pracujete na kopii v konceptu: původní akce se nemění. Datum je už nastavené na další konání: zkontrolujte zbytek a uložte.",
-    "editCopyNoticeSameDates": "Pracujete na kopii v konceptu: původní akce se nemění. Má stejná data jako originál: před uložením je upravte."
+    "editCopyNoticeSameDates": "Pracujete na kopii v konceptu: původní akce se nemění. Má stejná data jako originál: před uložením je upravte.",
+    "consentProofs": {
+      "title": "Doklady souhlasů",
+      "intro": "Souhlasy se záznamem a přepisem udělené při registraci, v čekárně nebo v místnosti, a ty odvolané. Seznam se jmény slouží k jejich doložení.",
+      "loading": "Načítání…",
+      "loadFailed": "Doklady souhlasů se nepodařilo načíst.",
+      "none": "Pro tuto akci žádný souhlas se záznamem ani přepisem.",
+      "kinds": {
+        "recording": "Záznam",
+        "transcription": "Přepis příspěvků"
+      },
+      "counts": "souhlasí {given} · odvolali {withdrawn}",
+      "download": "Stáhnout seznam (CSV)",
+      "downloading": "Stahování…",
+      "downloadNote": "Seznam obsahuje jména osob: export se zapíše do protokolu GDPR akce.",
+      "downloadFailed": "Seznam se nepodařilo stáhnout: zkuste to znovu.",
+      "csv": {
+        "kind": "Souhlas",
+        "source": "Kde",
+        "role": "Role",
+        "name": "Jméno",
+        "givenAt": "Uděleno",
+        "withdrawnAt": "Odvoláno",
+        "textVersion": "Verze textu",
+        "kinds": {
+          "recording": "Záznam",
+          "transcription": "Přepis příspěvků"
+        },
+        "sources": {
+          "registration": "registrace",
+          "room": "místnost"
+        },
+        "roles": {
+          "registrant": "registrovaný",
+          "guest": "host",
+          "host": "moderuje nebo vystupuje"
+        },
+        "unreadableName": "(jméno nelze přečíst)"
+      },
+      "countsNote": "Počítají se osoby: registrace, účet týmu nebo jmenný odkaz se počítají jednou; host, který se vrátí při jiné návštěvě, se počítá znovu."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",

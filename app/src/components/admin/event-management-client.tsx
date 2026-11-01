@@ -51,6 +51,7 @@ import { forgetCreation, readCreation, type CreationOutcome } from './event-wiza
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
+import EventConsentProofsPanel from './event-consent-proofs-panel';
 import EventFeedbackPanel from './event-feedback-panel';
 import GlossaryManager from './glossary-manager';
 import CapacityPanel from './capacity-panel';
@@ -1532,6 +1533,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const tct = useTranslations('admin.captionsTranscript');
   const trp = useTranslations('admin.eventReport');
   const trr = useTranslations('admin.roomReview');
+  const tcp = useTranslations('admin.consentProofs');
   const tApi = useTranslations('apiErrors');
   const locale = useLocale();
   const format = useFormatter();
@@ -1780,6 +1782,15 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
           <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
                              moderatorToken={event.moderatorToken} />
         </div>
+
+        {/* Le prove dei consensi, con i nomi: solo per lo staff. */}
+        {!viaToken && (
+          <div className="mb-4">
+            <H>{tcp('title')}</H>
+            <p style={{ color: C_MUTED, fontSize: '0.9rem', maxWidth: 680 }}>{tcp('intro')}</p>
+            <EventConsentProofsPanel eventId={event.id} locale={locale} />
+          </div>
+        )}
 
         {event.gdprAuditLogs.length > 0 && (
           <div>

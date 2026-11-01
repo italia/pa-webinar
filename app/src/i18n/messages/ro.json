@@ -1305,7 +1305,15 @@
         "askRole": "funcție",
         "askType": "tip de organizație",
         "permissionsHeading": "Cine ce poate face în sală",
-        "permissionsIntro": "Ce pot face participanții și ce funcții ale sălii sunt pornite. Totul se poate schimba și în timpul evenimentului."
+        "permissionsIntro": "Ce pot face participanții și ce funcții ale sălii sunt pornite. Totul se poate schimba și în timpul evenimentului.",
+        "consentsLine": "Consimțăminte la înscriere și în sală: {list}",
+        "consentRecordingRequired": "înregistrare, obligatorie pentru a intra",
+        "consentRecordingFree": "înregistrare, liberă (fără ea, doar ascultare)",
+        "consentRecordingNotice": "pentru înregistrare doar o informare (participanții nu vorbesc și nu apar)",
+        "consentTranscription": "transcrierea propriilor intervenții, opțională",
+        "consentsNone": "Niciun consimțământ în afara celui de la înscriere.",
+        "consentsHosts": "Celor care conduc și intervin li se cere înregistrarea în sală, opțional.",
+        "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”."
       },
       "preview": {
         "title": "Previzualizarea paginii",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Copia evenimentului",
     "editCopyNoticeNext": "Lucrezi la o copie ciornă: evenimentul original nu se schimbă. Data este deja cea a următoarei ediții: verifică restul și salvează.",
-    "editCopyNoticeSameDates": "Lucrezi la o copie ciornă: evenimentul original nu se schimbă. Are aceleași date ca originalul: actualizează-le înainte de a salva."
+    "editCopyNoticeSameDates": "Lucrezi la o copie ciornă: evenimentul original nu se schimbă. Are aceleași date ca originalul: actualizează-le înainte de a salva.",
+    "consentProofs": {
+      "title": "Dovezile consimțămintelor",
+      "intro": "Consimțămintele la înregistrare și la transcriere date la înscriere, în sala de așteptare sau în sală, și cele retrase. Lista cu nume servește la dovedirea lor.",
+      "loading": "Se încarcă…",
+      "loadFailed": "Dovezile consimțămintelor nu au putut fi încărcate.",
+      "none": "Niciun consimțământ la înregistrare sau transcriere pentru acest eveniment.",
+      "kinds": {
+        "recording": "Înregistrare",
+        "transcription": "Transcrierea intervențiilor"
+      },
+      "counts": "consimt {given} · au retras {withdrawn}",
+      "download": "Descarcă lista (CSV)",
+      "downloading": "Se descarcă…",
+      "downloadNote": "Lista conține numele persoanelor: exportul rămâne în registrul GDPR al evenimentului.",
+      "downloadFailed": "Lista nu a putut fi descărcată: încearcă din nou.",
+      "csv": {
+        "kind": "Consimțământ",
+        "source": "Unde",
+        "role": "Rol",
+        "name": "Nume",
+        "givenAt": "Dat la",
+        "withdrawnAt": "Retras la",
+        "textVersion": "Versiunea textului",
+        "kinds": {
+          "recording": "Înregistrare",
+          "transcription": "Transcrierea intervențiilor"
+        },
+        "sources": {
+          "registration": "înscriere",
+          "room": "sală"
+        },
+        "roles": {
+          "registrant": "înscris",
+          "guest": "invitat",
+          "host": "conduce sau intervine"
+        },
+        "unreadableName": "(nume ilizibil)"
+      },
+      "countsNote": "Se numără persoane: o înscriere, un cont al personalului sau un link nominal contează o dată; un invitat care revine la altă vizită contează din nou."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",

@@ -112,7 +112,7 @@ async function registraConsensi(
         const ritirata = registrationId
           ? await prisma.recordingConsent.findFirst({
               where: { eventId: event.id, registrationId, withdrawnAt: { not: null } },
-              select: { consentedAt: true, withdrawnAt: true },
+              select: { consentedAt: true, withdrawnAt: true, earlierPeriods: true },
             })
           : null;
         if (registrationId && ritirata) {
@@ -121,6 +121,14 @@ async function registraConsensi(
             data: {
               withdrawnAt: null,
               consentedAt: new Date(),
+              // Il periodo di prima resta nella prova (lib/gdpr/consent-proofs).
+              earlierPeriods: [
+                ...(Array.isArray(ritirata.earlierPeriods) ? ritirata.earlierPeriods : []),
+                {
+                  consentedAt: ritirata.consentedAt.toISOString(),
+                  withdrawnAt: ritirata.withdrawnAt?.toISOString() ?? null,
+                },
+              ],
               jitsiUserId: posto.jitsiUserId,
               displayName: encryptPII(posto.displayName),
               locale: data.locale ?? null,

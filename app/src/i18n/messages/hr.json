@@ -1305,7 +1305,15 @@
         "askRole": "uloga",
         "askType": "vrsta organizacije",
         "permissionsHeading": "Tko što može u sobi",
-        "permissionsIntro": "Što sudionici mogu i koje su funkcije sobe uključene. Sve se može mijenjati i tijekom događaja."
+        "permissionsIntro": "Što sudionici mogu i koje su funkcije sobe uključene. Sve se može mijenjati i tijekom događaja.",
+        "consentsLine": "Privole pri prijavi i u dvorani: {list}",
+        "consentRecordingRequired": "snimanje, obvezno za ulazak",
+        "consentRecordingFree": "snimanje, dobrovoljno (bez nje samo slušanje)",
+        "consentRecordingNotice": "za snimanje samo obavijest (sudionici ne govore i ne prikazuju se)",
+        "consentTranscription": "transkripcija vlastitih izlaganja, neobvezna",
+        "consentsNone": "Nema privola osim one pri prijavi.",
+        "consentsHosts": "Moderatore i govornike za snimanje pitamo u dvorani, neobvezno.",
+        "consentsWithdraw": "Sudionici ih mogu povući u dvorani gumbom „Privole”."
       },
       "preview": {
         "title": "Pregled stranice",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopija događaja",
     "editCopyNoticeNext": "Radite na kopiji u nacrtu: izvorni događaj se ne mijenja. Datum je već onaj sljedećeg održavanja: provjerite ostalo i spremite.",
-    "editCopyNoticeSameDates": "Radite na kopiji u nacrtu: izvorni događaj se ne mijenja. Ima iste datume kao izvornik: ažurirajte ih prije spremanja."
+    "editCopyNoticeSameDates": "Radite na kopiji u nacrtu: izvorni događaj se ne mijenja. Ima iste datume kao izvornik: ažurirajte ih prije spremanja.",
+    "consentProofs": {
+      "title": "Dokazi o privolama",
+      "intro": "Privole za snimanje i transkripciju dane pri prijavi, u čekaonici ili u dvorani, te povučene. Popis s imenima služi kao dokaz.",
+      "loading": "Učitavanje…",
+      "loadFailed": "Dokaze o privolama nije bilo moguće učitati.",
+      "none": "Za ovaj događaj nema privola za snimanje ili transkripciju.",
+      "kinds": {
+        "recording": "Snimanje",
+        "transcription": "Transkripcija izlaganja"
+      },
+      "counts": "pristaju {given} · povukli {withdrawn}",
+      "download": "Preuzmi popis (CSV)",
+      "downloading": "Preuzimanje…",
+      "downloadNote": "Popis sadrži imena osoba: izvoz se bilježi u GDPR zapisnik događaja.",
+      "downloadFailed": "Popis nije bilo moguće preuzeti: pokušajte ponovno.",
+      "csv": {
+        "kind": "Privola",
+        "source": "Gdje",
+        "role": "Uloga",
+        "name": "Ime",
+        "givenAt": "Dano",
+        "withdrawnAt": "Povučeno",
+        "textVersion": "Verzija teksta",
+        "kinds": {
+          "recording": "Snimanje",
+          "transcription": "Transkripcija izlaganja"
+        },
+        "sources": {
+          "registration": "prijava",
+          "room": "dvorana"
+        },
+        "roles": {
+          "registrant": "prijavljen",
+          "guest": "gost",
+          "host": "vodi ili govori"
+        },
+        "unreadableName": "(ime nije čitljivo)"
+      },
+      "countsNote": "Broje se osobe: prijava, račun osoblja ili imenska poveznica broje se jednom; gost koji se vrati u drugom posjetu broji se ponovno."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",

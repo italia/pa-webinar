@@ -1305,7 +1305,15 @@
         "askRole": "vloga",
         "askType": "vrsta organizacije",
         "permissionsHeading": "Kdo lahko kaj počne v sobi",
-        "permissionsIntro": "Kaj lahko počnejo udeleženci in katere funkcije sobe so vklopljene. Vse se lahko spremeni tudi med dogodkom."
+        "permissionsIntro": "Kaj lahko počnejo udeleženci in katere funkcije sobe so vklopljene. Vse se lahko spremeni tudi med dogodkom.",
+        "consentsLine": "Privolitve ob prijavi in v dvorani: {list}",
+        "consentRecordingRequired": "snemanje, obvezno za vstop",
+        "consentRecordingFree": "snemanje, prostovoljno (brez njega samo poslušanje)",
+        "consentRecordingNotice": "za snemanje samo obvestilo (udeleženci ne govorijo in se ne kažejo)",
+        "consentTranscription": "prepis lastnih govorov, neobvezen",
+        "consentsNone": "Nobene privolitve razen tiste ob prijavi.",
+        "consentsHosts": "Moderatorje in govornike za snemanje vprašamo v dvorani, neobvezno.",
+        "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«."
       },
       "preview": {
         "title": "Predogled strani",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopija dogodka",
     "editCopyNoticeNext": "Delate na kopiji v osnutku: izvirni dogodek se ne spremeni. Datum je že datum naslednje izvedbe: preverite ostalo in shranite.",
-    "editCopyNoticeSameDates": "Delate na kopiji v osnutku: izvirni dogodek se ne spremeni. Ima enake datume kot izvirnik: posodobite jih pred shranjevanjem."
+    "editCopyNoticeSameDates": "Delate na kopiji v osnutku: izvirni dogodek se ne spremeni. Ima enake datume kot izvirnik: posodobite jih pred shranjevanjem.",
+    "consentProofs": {
+      "title": "Dokazila o privolitvah",
+      "intro": "Privolitve v snemanje in prepis, dane ob prijavi, v čakalnici ali v dvorani, in preklicane. Seznam z imeni služi kot dokazilo.",
+      "loading": "Nalaganje…",
+      "loadFailed": "Dokazil o privolitvah ni bilo mogoče naložiti.",
+      "none": "Za ta dogodek ni privolitev v snemanje ali prepis.",
+      "kinds": {
+        "recording": "Snemanje",
+        "transcription": "Prepis govorov"
+      },
+      "counts": "privolijo {given} · preklicali {withdrawn}",
+      "download": "Prenesi seznam (CSV)",
+      "downloading": "Prenašanje…",
+      "downloadNote": "Seznam vsebuje imena oseb: izvoz se zapiše v dnevnik GDPR dogodka.",
+      "downloadFailed": "Seznama ni bilo mogoče prenesti: poskusite znova.",
+      "csv": {
+        "kind": "Privolitev",
+        "source": "Kje",
+        "role": "Vloga",
+        "name": "Ime",
+        "givenAt": "Dano",
+        "withdrawnAt": "Preklicano",
+        "textVersion": "Različica besedila",
+        "kinds": {
+          "recording": "Snemanje",
+          "transcription": "Prepis govorov"
+        },
+        "sources": {
+          "registration": "prijava",
+          "room": "dvorana"
+        },
+        "roles": {
+          "registrant": "prijavljen",
+          "guest": "gost",
+          "host": "vodi ali govori"
+        },
+        "unreadableName": "(ime ni berljivo)"
+      },
+      "countsNote": "Štejejo se osebe: prijava, račun osebja ali poimenska povezava štejejo enkrat; gost, ki se vrne ob drugem obisku, šteje znova."
+    }
   },
   "email": {
     "confirmationSubject": "Potrditev prijave: {eventTitle}",

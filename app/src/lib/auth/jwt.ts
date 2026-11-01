@@ -284,8 +284,11 @@ export async function postoDaTokenSala(
  * Each call produces a different ID so multiple moderator tabs are
  * treated as separate participants.
  */
+/** Il prefisso del posto di chi conduce o interviene con un link da moderatore. */
+export const PREFISSO_POSTO_MODERATORE = 'mod-';
+
 export function moderatorJitsiId(eventId: string): string {
-  return `mod-${eventId}-${randomUUID().slice(0, 8)}`;
+  return `${PREFISSO_POSTO_MODERATORE}${eventId}-${randomUUID().slice(0, 8)}`;
 }
 
 /**

@@ -1305,7 +1305,15 @@
         "askRole": "cargo",
         "askType": "tipo de organización",
         "permissionsHeading": "Quién puede hacer qué en la sala",
-        "permissionsIntro": "Qué pueden hacer los participantes y qué funciones de la sala están activas. Todo se puede cambiar también durante el evento."
+        "permissionsIntro": "Qué pueden hacer los participantes y qué funciones de la sala están activas. Todo se puede cambiar también durante el evento.",
+        "consentsLine": "Consentimientos en la inscripción y en la sala: {list}",
+        "consentRecordingRequired": "grabación, obligatoria para entrar",
+        "consentRecordingFree": "grabación, libre (sin ella, solo escuchar)",
+        "consentRecordingNotice": "para la grabación solo un aviso (quien participa no habla ni se muestra)",
+        "consentTranscription": "transcripción de las propias intervenciones, opcional",
+        "consentsNone": "Ningún consentimiento aparte del de la inscripción.",
+        "consentsHosts": "A quien conduce e interviene se le pide la grabación en la sala, de forma opcional.",
+        "consentsWithdraw": "Quien participa puede retirarlos en la sala, con el botón «Consentimientos»."
       },
       "preview": {
         "title": "Vista previa de la página",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Copia del evento",
     "editCopyNoticeNext": "Estás trabajando en una copia en borrador: el evento original no cambia. La fecha ya es la de la próxima edición: revisa el resto y guarda.",
-    "editCopyNoticeSameDates": "Estás trabajando en una copia en borrador: el evento original no cambia. Tiene las mismas fechas que el original: actualízalas antes de guardar."
+    "editCopyNoticeSameDates": "Estás trabajando en una copia en borrador: el evento original no cambia. Tiene las mismas fechas que el original: actualízalas antes de guardar.",
+    "consentProofs": {
+      "title": "Pruebas de los consentimientos",
+      "intro": "Los consentimientos a la grabación y a la transcripción dados en la inscripción, en la sala de espera o en la sala, y los retirados. La lista con los nombres sirve para demostrarlos.",
+      "loading": "Cargando…",
+      "loadFailed": "No se han podido cargar las pruebas de los consentimientos.",
+      "none": "Ningún consentimiento a la grabación o a la transcripción para este evento.",
+      "kinds": {
+        "recording": "Grabación",
+        "transcription": "Transcripción de las intervenciones"
+      },
+      "counts": "consienten {given} · han retirado {withdrawn}",
+      "download": "Descargar la lista (CSV)",
+      "downloading": "Descargando…",
+      "downloadNote": "La lista contiene los nombres de las personas: la exportación queda en el registro RGPD del evento.",
+      "downloadFailed": "No se ha podido descargar la lista: inténtalo de nuevo.",
+      "csv": {
+        "kind": "Consentimiento",
+        "source": "Dónde",
+        "role": "Rol",
+        "name": "Nombre",
+        "givenAt": "Dado el",
+        "withdrawnAt": "Retirado el",
+        "textVersion": "Versión del texto",
+        "kinds": {
+          "recording": "Grabación",
+          "transcription": "Transcripción de las intervenciones"
+        },
+        "sources": {
+          "registration": "inscripción",
+          "room": "sala"
+        },
+        "roles": {
+          "registrant": "inscrito",
+          "guest": "invitado",
+          "host": "conduce o interviene"
+        },
+        "unreadableName": "(nombre no legible)"
+      },
+      "countsNote": "Se cuentan personas: una inscripción, una cuenta del personal o un enlace nominal cuentan una vez; un invitado que vuelve en otra visita cuenta de nuevo."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmación de inscripción: {eventTitle}",

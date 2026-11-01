@@ -1305,7 +1305,15 @@
         "askRole": "roll",
         "askType": "organisatsiooni liik",
         "permissionsHeading": "Kes mida ruumis teha saab",
-        "permissionsIntro": "Mida osalejad teha saavad ja millised ruumi funktsioonid on sees. Kõike saab muuta ka sündmuse ajal."
+        "permissionsIntro": "Mida osalejad teha saavad ja millised ruumi funktsioonid on sees. Kõike saab muuta ka sündmuse ajal.",
+        "consentsLine": "Nõusolekud registreerimisel ja ruumis: {list}",
+        "consentRecordingRequired": "salvestamine, sisenemiseks kohustuslik",
+        "consentRecordingFree": "salvestamine, vabatahtlik (ilma selleta ainult kuulamine)",
+        "consentRecordingNotice": "salvestamise kohta ainult teade (osalejad ei räägi ega paista)",
+        "consentTranscription": "oma sõnavõttude transkribeerimine, vabatahtlik",
+        "consentsNone": "Peale registreerimise nõusoleku muid ei ole.",
+        "consentsHosts": "Moderaatoritelt ja esinejatelt küsitakse salvestamise kohta ruumis, vabatahtlikult.",
+        "consentsWithdraw": "Osalejad saavad need ruumis tagasi võtta nupuga „Nõusolekud”."
       },
       "preview": {
         "title": "Lehe eelvaade",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Sündmuse koopia",
     "editCopyNoticeNext": "Töötad mustandkoopiaga: algne sündmus ei muutu. Kuupäev on juba järgmise toimumise oma: kontrolli ülejäänut ja salvesta.",
-    "editCopyNoticeSameDates": "Töötad mustandkoopiaga: algne sündmus ei muutu. Sellel on samad kuupäevad nagu originaalil: uuenda need enne salvestamist."
+    "editCopyNoticeSameDates": "Töötad mustandkoopiaga: algne sündmus ei muutu. Sellel on samad kuupäevad nagu originaalil: uuenda need enne salvestamist.",
+    "consentProofs": {
+      "title": "Nõusolekute tõendid",
+      "intro": "Salvestamise ja transkribeerimise nõusolekud, mis anti registreerimisel, ooteruumis või ruumis, ning tagasi võetud. Nimedega loend on nende tõendamiseks.",
+      "loading": "Laadimine…",
+      "loadFailed": "Nõusolekute tõendeid ei õnnestunud laadida.",
+      "none": "Sellele üritusele pole salvestamise ega transkribeerimise nõusolekuid.",
+      "kinds": {
+        "recording": "Salvestamine",
+        "transcription": "Sõnavõttude transkribeerimine"
+      },
+      "counts": "nõus {given} · tagasi võtnud {withdrawn}",
+      "download": "Laadi loend alla (CSV)",
+      "downloading": "Allalaadimine…",
+      "downloadNote": "Loend sisaldab inimeste nimesid: eksport kantakse ürituse GDPR-logisse.",
+      "downloadFailed": "Loendit ei õnnestunud alla laadida: proovi uuesti.",
+      "csv": {
+        "kind": "Nõusolek",
+        "source": "Kus",
+        "role": "Roll",
+        "name": "Nimi",
+        "givenAt": "Antud",
+        "withdrawnAt": "Tagasi võetud",
+        "textVersion": "Teksti versioon",
+        "kinds": {
+          "recording": "Salvestamine",
+          "transcription": "Sõnavõttude transkribeerimine"
+        },
+        "sources": {
+          "registration": "registreerimine",
+          "room": "ruum"
+        },
+        "roles": {
+          "registrant": "registreerunud",
+          "guest": "külaline",
+          "host": "juhib või esineb"
+        },
+        "unreadableName": "(nimi pole loetav)"
+      },
+      "countsNote": "Loetakse inimesi: registreerimine, töötaja konto või nimeline link loetakse üks kord; teisel külastusel naasev külaline loetakse uuesti."
+    }
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",

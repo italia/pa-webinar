@@ -1305,7 +1305,15 @@
         "askRole": "stanowisko",
         "askType": "rodzaj instytucji",
         "permissionsHeading": "Kto co może w sali",
-        "permissionsIntro": "Co mogą robić uczestnicy i które funkcje sali są włączone. Wszystko można zmienić także w trakcie wydarzenia."
+        "permissionsIntro": "Co mogą robić uczestnicy i które funkcje sali są włączone. Wszystko można zmienić także w trakcie wydarzenia.",
+        "consentsLine": "Zgody przy rejestracji i w sali: {list}",
+        "consentRecordingRequired": "nagrywanie, wymagane do wejścia",
+        "consentRecordingFree": "nagrywanie, dobrowolne (bez zgody tylko słuchanie)",
+        "consentRecordingNotice": "dla nagrywania tylko informacja (uczestnicy nie mówią i się nie pokazują)",
+        "consentTranscription": "transkrypcja własnych wypowiedzi, dobrowolna",
+        "consentsNone": "Brak zgód poza zgodą przy rejestracji.",
+        "consentsHosts": "Prowadzących i prelegentów prosi się o zgodę na nagrywanie w sali, dobrowolnie.",
+        "consentsWithdraw": "Uczestnicy mogą je wycofać w sali przyciskiem „Zgody”."
       },
       "preview": {
         "title": "Podgląd strony",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopia wydarzenia",
     "editCopyNoticeNext": "Pracujesz na kopii roboczej: pierwotne wydarzenie się nie zmienia. Data jest już ustawiona na kolejną edycję: sprawdź resztę i zapisz.",
-    "editCopyNoticeSameDates": "Pracujesz na kopii roboczej: pierwotne wydarzenie się nie zmienia. Ma te same daty co oryginał: zaktualizuj je przed zapisaniem."
+    "editCopyNoticeSameDates": "Pracujesz na kopii roboczej: pierwotne wydarzenie się nie zmienia. Ma te same daty co oryginał: zaktualizuj je przed zapisaniem.",
+    "consentProofs": {
+      "title": "Dowody zgód",
+      "intro": "Zgody na nagrywanie i transkrypcję udzielone przy rejestracji, w poczekalni lub w sali, oraz wycofane. Lista z nazwiskami służy do ich wykazania.",
+      "loading": "Ładowanie…",
+      "loadFailed": "Nie udało się wczytać dowodów zgód.",
+      "none": "Brak zgód na nagrywanie lub transkrypcję dla tego wydarzenia.",
+      "kinds": {
+        "recording": "Nagrywanie",
+        "transcription": "Transkrypcja wypowiedzi"
+      },
+      "counts": "zgoda {given} · wycofali {withdrawn}",
+      "download": "Pobierz listę (CSV)",
+      "downloading": "Pobieranie…",
+      "downloadNote": "Lista zawiera nazwiska osób: eksport zostaje zapisany w rejestrze RODO wydarzenia.",
+      "downloadFailed": "Nie udało się pobrać listy: spróbuj ponownie.",
+      "csv": {
+        "kind": "Zgoda",
+        "source": "Gdzie",
+        "role": "Rola",
+        "name": "Imię i nazwisko",
+        "givenAt": "Udzielona",
+        "withdrawnAt": "Wycofana",
+        "textVersion": "Wersja tekstu",
+        "kinds": {
+          "recording": "Nagrywanie",
+          "transcription": "Transkrypcja wypowiedzi"
+        },
+        "sources": {
+          "registration": "rejestracja",
+          "room": "sala"
+        },
+        "roles": {
+          "registrant": "zarejestrowany",
+          "guest": "gość",
+          "host": "prowadzi lub występuje"
+        },
+        "unreadableName": "(nazwa nieczytelna)"
+      },
+      "countsNote": "Liczone są osoby: rejestracja, konto personelu lub link imienny liczą się raz; gość, który wraca podczas innej wizyty, liczy się ponownie."
+    }
   },
   "email": {
     "confirmationSubject": "Potwierdzenie rejestracji: {eventTitle}",

@@ -190,6 +190,10 @@ Recording is off unless both the operator and the event turn it on. Jibri is dis
 - Each registration writes a `CONSENT_RECORDED` row to `GdprAuditLog` with the flags given, including `consentAddressBook`, and no personal data.
 - When a recording enters AI post-production, `Recording.consentSnapshot` freezes the event-level AI and multitrack flags of that moment.
 
+- The proofs given in the waiting room or in the room (`RecordingConsent`, `MultitrackConsent`) keep the time, the page language and, after a withdrawal, the time of the withdrawal.
+
+Staff who manage an event (administrators, and organizers on their own events) see the proofs under **Consent proofs** in the event's **After the event** tab: how many people hold a valid recording or transcription consent and how many withdrew it (a registration, a staff account or a named link counts once; a guest who comes back in another visit has a new seat and counts again), and a CSV list with one row per proof (consent, where it was given, role, name, when given, when withdrawn, text version) to prove them. A name that cannot be decrypted is written as such, not left empty (`GET /api/admin/events/{id}/consents`, `app/src/lib/gdpr/consent-proofs.ts`). The list holds names, so the moderator link does not open it, and every export writes a `DATA_EXPORTED` row to the event's GDPR audit log.
+
 When the registration is deleted, at retention or by erasure, the per-person proof goes with it. The `CONSENT_RECORDED` rows remain, and they prove that consents were collected without saying by whom.
 
 `Registration` also has the columns `aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation`, left over from an earlier design. The application ignores them (`@ignore` in the schema) and they are always empty; they stay in the database because a release that dropped them would break the pods of the previous release during a rolling update. A person's consent to the transcription of what they say is the per-participant consent above; the rest of AI processing is governed at the event level.
@@ -205,7 +209,7 @@ The room proves the person's seats with the conference tokens the portal issued 
 
 If the call cannot reconnect after a withdrawal (three attempts), the room leaves the conference and goes back to the waiting room: the old token, which carried the consent, is not kept in use.
 
-Every withdrawal writes a `CONSENT_WITHDRAWN` row to the event's GDPR audit log, with the number of proofs and caption sentences it touched and no personal data. A registrant who gives the recording consent again gets the registration's proof back with the new time, and a `CONSENT_RECORDED` row keeps the time of the earlier consent and of the withdrawal.
+Every withdrawal writes a `CONSENT_WITHDRAWN` row to the event's GDPR audit log, with the number of proofs and caption sentences it touched and no personal data. A registrant who gives the recording consent again gets the registration's proof back with the new time; the earlier period (when it was given and withdrawn) stays in the proof (`RecordingConsent.earlierPeriods`) and in a `CONSENT_RECORDED` row of the audit log.
 
 A consent given again from the room after a withdrawal counts with a new proof. For a guest, and for anyone outside the cases above, the withdrawal covers the seats of the page they are on: a seat from an earlier visit, in another tab or browser, is not reached. The same goes for staff on the primary link who gave only the transcription consent, since only the recording proof is linked to the account.
 

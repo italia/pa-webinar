@@ -1127,7 +1127,9 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     vi.mocked(prisma.recordingConsent.updateMany).mockResolvedValueOnce({ count: 1 } as never);
     const res = await post({ accessToken: ACCESS_TOKEN, recordingConsent: true, locale: 'it' });
     expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(false);
-    // Il consenso di prima e il ritiro restano nel registro GDPR.
+    // Il periodo di prima resta nella prova, e nel registro GDPR.
+    const dati = vi.mocked(prisma.recordingConsent.updateMany).mock.calls[0]![0].data as { earlierPeriods: unknown };
+    expect(dati.earlierPeriods).toEqual([{ consentedAt: prima.toISOString(), withdrawnAt: ritiro.toISOString() }]);
     expect(prisma.gdprAuditLog.create).toHaveBeenCalledWith({
       data: expect.objectContaining({
         action: 'CONSENT_RECORDED',

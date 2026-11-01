@@ -1305,7 +1305,15 @@
         "askRole": "role",
         "askType": "organization type",
         "permissionsHeading": "Who can do what in the room",
-        "permissionsIntro": "What participants can do and which room features are on. Everything can also be changed during the event."
+        "permissionsIntro": "What participants can do and which room features are on. Everything can also be changed during the event.",
+        "consentsLine": "Consents at registration and in the room: {list}",
+        "consentRecordingRequired": "recording, required to enter",
+        "consentRecordingFree": "recording, optional (without it, listen-only)",
+        "consentRecordingNotice": "for the recording only a notice (participants neither speak nor show)",
+        "consentTranscription": "transcription of what they say, optional",
+        "consentsNone": "No consent beyond the registration one.",
+        "consentsHosts": "Moderators and speakers are asked for the recording in the room, optionally.",
+        "consentsWithdraw": "Participants can withdraw them in the room, with the “Consents” button."
       },
       "preview": {
         "title": "Page preview",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Copy of the event",
     "editCopyNoticeNext": "You are working on a draft copy: the original event does not change. The date is already that of the next occurrence: check the rest and save.",
-    "editCopyNoticeSameDates": "You are working on a draft copy: the original event does not change. It has the same dates as the original: update them before saving."
+    "editCopyNoticeSameDates": "You are working on a draft copy: the original event does not change. It has the same dates as the original: update them before saving.",
+    "consentProofs": {
+      "title": "Consent proofs",
+      "intro": "The recording and transcription consents given at registration, in the waiting room or in the room, and those withdrawn. The list with names is there to prove them.",
+      "loading": "Loading…",
+      "loadFailed": "The consent proofs could not be loaded.",
+      "none": "No recording or transcription consent for this event.",
+      "kinds": {
+        "recording": "Recording",
+        "transcription": "Transcription of what people say"
+      },
+      "counts": "consenting {given} · withdrawn {withdrawn}",
+      "download": "Download the list (CSV)",
+      "downloading": "Downloading…",
+      "downloadNote": "The list holds people's names: the export is written to the event's GDPR log.",
+      "downloadFailed": "The list could not be downloaded: try again.",
+      "csv": {
+        "kind": "Consent",
+        "source": "Where",
+        "role": "Role",
+        "name": "Name",
+        "givenAt": "Given at",
+        "withdrawnAt": "Withdrawn at",
+        "textVersion": "Text version",
+        "kinds": {
+          "recording": "Recording",
+          "transcription": "Transcription of what people say"
+        },
+        "sources": {
+          "registration": "registration",
+          "room": "room"
+        },
+        "roles": {
+          "registrant": "registrant",
+          "guest": "guest",
+          "host": "hosts or speaks"
+        },
+        "unreadableName": "(name not readable)"
+      },
+      "countsNote": "People are counted: a registration, a staff account or a named link count once; a guest who comes back in another visit counts again."
+    }
   },
   "email": {
     "confirmationSubject": "Registration confirmed: {eventTitle}",

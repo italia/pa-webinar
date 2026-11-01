@@ -197,6 +197,9 @@ export interface WizardProps {
    *  impostazioni e con il servizio installato (lib/captions/availability).
    *  Senza, l'interruttore dell'evento non si mostra. */
   liveCaptionsAvailable?: boolean;
+  /** L'installazione puo' registrare (lib/recording/availability): senza,
+   *  il riepilogo non promette consensi alla registrazione. */
+  recordingAvailable?: boolean;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo Permessi
@@ -2419,6 +2422,8 @@ export default function EventWizard(props: WizardProps) {
             mancanti={mancanti}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
+            recordingAvailable={props.recordingAvailable ?? true}
+            istantanea={istantanea}
             iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
             onVaiPersone={() => vai('invites')}
             onVaiProgramma={istantanea ? undefined : () => vai('programme')}

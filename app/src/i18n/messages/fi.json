@@ -1305,7 +1305,15 @@
         "askRole": "rooli",
         "askType": "organisaation tyyppi",
         "permissionsHeading": "Kuka voi tehdä mitä huoneessa",
-        "permissionsIntro": "Mitä osallistujat voivat tehdä ja mitkä huoneen toiminnot ovat käytössä. Kaikkea voi muuttaa myös tapahtuman aikana."
+        "permissionsIntro": "Mitä osallistujat voivat tehdä ja mitkä huoneen toiminnot ovat käytössä. Kaikkea voi muuttaa myös tapahtuman aikana.",
+        "consentsLine": "Suostumukset ilmoittautuessa ja huoneessa: {list}",
+        "consentRecordingRequired": "tallennus, pakollinen sisäänpääsyyn",
+        "consentRecordingFree": "tallennus, vapaaehtoinen (ilman: vain kuuntelu)",
+        "consentRecordingNotice": "tallennuksesta vain ilmoitus (osallistujat eivät puhu eivätkä näy)",
+        "consentTranscription": "omien puheenvuorojen litterointi, vapaaehtoinen",
+        "consentsNone": "Ei muita suostumuksia kuin ilmoittautumisen.",
+        "consentsHosts": "Juontajilta ja puhujilta kysytään tallennuksesta huoneessa, vapaaehtoisesti.",
+        "consentsWithdraw": "Osallistujat voivat peruuttaa ne huoneessa Suostumukset-painikkeella."
       },
       "preview": {
         "title": "Sivun esikatselu",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Tapahtuman kopio",
     "editCopyNoticeNext": "Muokkaat luonnoskopiota: alkuperäinen tapahtuma ei muutu. Päivämäärä on jo seuraavan kerran: tarkista muut tiedot ja tallenna.",
-    "editCopyNoticeSameDates": "Muokkaat luonnoskopiota: alkuperäinen tapahtuma ei muutu. Sillä on samat päivämäärät kuin alkuperäisellä: päivitä ne ennen tallentamista."
+    "editCopyNoticeSameDates": "Muokkaat luonnoskopiota: alkuperäinen tapahtuma ei muutu. Sillä on samat päivämäärät kuin alkuperäisellä: päivitä ne ennen tallentamista.",
+    "consentProofs": {
+      "title": "Suostumusten todisteet",
+      "intro": "Tallennukseen ja litterointiin annetut suostumukset ilmoittautuessa, odotushuoneessa tai huoneessa, sekä peruutetut. Nimellinen luettelo toimii todisteena.",
+      "loading": "Ladataan…",
+      "loadFailed": "Suostumusten todisteita ei voitu ladata.",
+      "none": "Tähän tapahtumaan ei ole suostumuksia tallennukseen tai litterointiin.",
+      "kinds": {
+        "recording": "Tallennus",
+        "transcription": "Puheenvuorojen litterointi"
+      },
+      "counts": "suostuneita {given} · peruuttaneita {withdrawn}",
+      "download": "Lataa luettelo (CSV)",
+      "downloading": "Ladataan…",
+      "downloadNote": "Luettelossa on henkilöiden nimiä: vienti kirjataan tapahtuman GDPR-lokiin.",
+      "downloadFailed": "Luetteloa ei voitu ladata: yritä uudelleen.",
+      "csv": {
+        "kind": "Suostumus",
+        "source": "Missä",
+        "role": "Rooli",
+        "name": "Nimi",
+        "givenAt": "Annettu",
+        "withdrawnAt": "Peruutettu",
+        "textVersion": "Tekstin versio",
+        "kinds": {
+          "recording": "Tallennus",
+          "transcription": "Puheenvuorojen litterointi"
+        },
+        "sources": {
+          "registration": "ilmoittautuminen",
+          "room": "huone"
+        },
+        "roles": {
+          "registrant": "ilmoittautunut",
+          "guest": "vieras",
+          "host": "juontaa tai puhuu"
+        },
+        "unreadableName": "(nimeä ei voi lukea)"
+      },
+      "countsNote": "Lasketaan henkilöitä: ilmoittautuminen, henkilökunnan tili tai nimetty linkki lasketaan kerran; toisella käynnillä palaava vieras lasketaan uudelleen."
+    }
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",

@@ -17,6 +17,8 @@ import { Icon } from '@/components/ui/icon';
 import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
+import { registraChiConduce } from '@/lib/live/entry-consents';
+import { consensiRichiesti } from '@/lib/registration/consents';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { describeRRule } from '@/lib/utils/recurrence';
@@ -56,6 +58,10 @@ interface Props {
   /** Cio' che manca ancora, nell'ordine del wizard. */
   mancanti?: CampoMancante[];
   /** La post-produzione AI e' accesa sull'installazione. */
+  /** L'installazione puo' registrare: senza, non si chiede il consenso. */
+  recordingAvailable?: boolean;
+  /** Chiamata rapida: nessuna iscrizione, e chi conduce non e' interpellato. */
+  istantanea?: boolean;
   aiPipelineEnabled?: boolean;
   /** I sottotitoli live ci sono nell'installazione. */
   liveCaptionsAvailable?: boolean;
@@ -92,6 +98,8 @@ export default function Step5Review({
   onVaiAlCampo,
   mancanti = [],
   aiPipelineEnabled = true,
+  recordingAvailable = true,
+  istantanea = false,
   liveCaptionsAvailable = false,
   capacita,
   sopratitolo = false,
@@ -161,6 +169,28 @@ export default function Step5Review({
       form.liveCaptionsEnabled &&
       form.captionsTranscriptEnabled &&
       tForm('captionsTranscriptEnabled'),
+  ].filter((x): x is string => !!x);
+  // I consensi che modulo d'iscrizione e sala d'attesa chiederanno a chi
+  // partecipa, con la stessa regola (lib/registration/consents): chi crea
+  // l'evento vede prima cosa si chiedera', e se la scelta e' quella voluta.
+  const registra = form.recordingEnabled && recordingAvailable;
+  const consensi = consensiRichiesti({
+    recordingEnabled: registra,
+    multitrackRecordingEnabled: form.recordingEnabled && !!form.multitrackRecordingEnabled,
+    captionsTranscript:
+      liveCaptionsAvailable && form.liveCaptionsEnabled && !!form.captionsTranscriptEnabled,
+    participantsCanUnmute: toggles.participantsCanUnmute,
+    participantsCanStartVideo: toggles.participantsCanStartVideo,
+    participantsCanShareScreen: toggles.participantsCanShareScreen,
+    listenOnlyWithoutConsent: form.listenOnlyWithoutConsent,
+  });
+  const vociConsenso = [
+    consensi.registrazione &&
+      (consensi.registrazioneFacoltativa
+        ? tf('consentRecordingFree')
+        : tf('consentRecordingRequired')),
+    consensi.avvisoRegistrazione && tf('consentRecordingNotice'),
+    consensi.tracce && tf('consentTranscription'),
   ].filter((x): x is string => !!x);
   const traduce =
     form.recordingEnabled && form.aiTranscriptEnabled && form.aiTranslationEnabled;
@@ -449,6 +479,22 @@ export default function Step5Review({
               <Icon icon="it-locked" size="sm" />
             </span>
             <span>{informativa}</span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-check-circle" size="sm" />
+            </span>
+            <span>
+              {vociConsenso.length > 0
+                ? tf('consentsLine', { list: vociConsenso.join(' · ') })
+                : tf('consentsNone')}
+              {registraChiConduce({ recordingEnabled: form.recordingEnabled, eventType: istantanea ? 'INSTANT' : null }, recordingAvailable) && (
+                <span className="d-block text-secondary small mt-1">{tf('consentsHosts')}</span>
+              )}
+              {(consensi.registrazione || consensi.tracce) && (
+                <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
+              )}
+            </span>
           </li>
         </ul>
         {capacita && (

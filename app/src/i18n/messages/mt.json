@@ -1305,7 +1305,15 @@
         "askRole": "rwol",
         "askType": "tip ta' organizzazzjoni",
         "permissionsHeading": "Min jista' jagħmel xiex fil-kamra",
-        "permissionsIntro": "X'jistgħu jagħmlu l-parteċipanti u liema funzjonijiet tal-kamra huma mixgħula. Kollox jista' jinbidel ukoll waqt l-avveniment."
+        "permissionsIntro": "X'jistgħu jagħmlu l-parteċipanti u liema funzjonijiet tal-kamra huma mixgħula. Kollox jista' jinbidel ukoll waqt l-avveniment.",
+        "consentsLine": "Kunsensi fir-reġistrazzjoni u fis-sala: {list}",
+        "consentRecordingRequired": "reġistrazzjoni, meħtieġa biex tidħol",
+        "consentRecordingFree": "reġistrazzjoni, libera (mingħajrha, tisma' biss)",
+        "consentRecordingNotice": "għar-reġistrazzjoni avviż biss (il-parteċipanti la jitkellmu u lanqas jidhru)",
+        "consentTranscription": "traskrizzjoni ta' dak li jgħidu, fakultattiva",
+        "consentsNone": "L-ebda kunsens lil hinn minn dak tar-reġistrazzjoni.",
+        "consentsHosts": "Lil min imexxi u jitkellem tintalab ir-reġistrazzjoni fis-sala, b'mod fakultattiv.",
+        "consentsWithdraw": "Il-parteċipanti jistgħu jirtirawhom fis-sala, bil-buttuna “Kunsensi”."
       },
       "preview": {
         "title": "Anteprima tal-paġna",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopja tal-avveniment",
     "editCopyNoticeNext": "Qed taħdem fuq kopja abbozz: l-avveniment oriġinali ma jinbidilx. Id-data diġà hija dik tal-okkażjoni li jmiss: iċċekkja l-bqija u ssejvja.",
-    "editCopyNoticeSameDates": "Qed taħdem fuq kopja abbozz: l-avveniment oriġinali ma jinbidilx. Għandha l-istess dati tal-oriġinal: aġġornahom qabel tissejvja."
+    "editCopyNoticeSameDates": "Qed taħdem fuq kopja abbozz: l-avveniment oriġinali ma jinbidilx. Għandha l-istess dati tal-oriġinal: aġġornahom qabel tissejvja.",
+    "consentProofs": {
+      "title": "Provi tal-kunsensi",
+      "intro": "Il-kunsensi għar-reġistrazzjoni u t-traskrizzjoni mogħtija fir-reġistrazzjoni, fis-sala tal-istennija jew fis-sala, u dawk irtirati. Il-lista bl-ismijiet isservi biex jiġu ppruvati.",
+      "loading": "Qed jillowdja…",
+      "loadFailed": "Ma kienx possibbli jiġu mtella' l-provi tal-kunsensi.",
+      "none": "L-ebda kunsens għar-reġistrazzjoni jew għat-traskrizzjoni għal dan l-avveniment.",
+      "kinds": {
+        "recording": "Reġistrazzjoni",
+        "transcription": "Traskrizzjoni ta' dak li jingħad"
+      },
+      "counts": "jagħtu l-kunsens {given} · irtiraw {withdrawn}",
+      "download": "Niżżel il-lista (CSV)",
+      "downloading": "Qed jitniżżel…",
+      "downloadNote": "Il-lista fiha l-ismijiet tan-nies: l-esportazzjoni tibqa' fir-reġistru GDPR tal-avveniment.",
+      "downloadFailed": "Ma kienx possibbli tinżel il-lista: erġa' pprova.",
+      "csv": {
+        "kind": "Kunsens",
+        "source": "Fejn",
+        "role": "Rwol",
+        "name": "Isem",
+        "givenAt": "Mogħti fi",
+        "withdrawnAt": "Irtirat fi",
+        "textVersion": "Verżjoni tat-test",
+        "kinds": {
+          "recording": "Reġistrazzjoni",
+          "transcription": "Traskrizzjoni ta' dak li jingħad"
+        },
+        "sources": {
+          "registration": "reġistrazzjoni",
+          "room": "sala"
+        },
+        "roles": {
+          "registrant": "reġistrat",
+          "guest": "mistieden",
+          "host": "imexxi jew jitkellem"
+        },
+        "unreadableName": "(isem mhux leġibbli)"
+      },
+      "countsNote": "Jingħaddu n-nies: reġistrazzjoni, kont tal-persunal jew link nominali jgħoddu darba; mistieden li jerġa' lura f'żjara oħra jgħodd mill-ġdid."
+    }
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",

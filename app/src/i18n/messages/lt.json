@@ -1305,7 +1305,15 @@
         "askRole": "pareigos",
         "askType": "organizacijos tipas",
         "permissionsHeading": "Kas ką gali daryti kambaryje",
-        "permissionsIntro": "Ką gali daryti dalyviai ir kurios kambario funkcijos įjungtos. Viską galima keisti ir renginio metu."
+        "permissionsIntro": "Ką gali daryti dalyviai ir kurios kambario funkcijos įjungtos. Viską galima keisti ir renginio metu.",
+        "consentsLine": "Sutikimai registruojantis ir salėje: {list}",
+        "consentRecordingRequired": "įrašymas, privalomas norint įeiti",
+        "consentRecordingFree": "įrašymas, savanoriškas (be jo tik klausymas)",
+        "consentRecordingNotice": "dėl įrašymo tik pranešimas (dalyviai nekalba ir nesirodo)",
+        "consentTranscription": "savo pasisakymų transkripcija, neprivaloma",
+        "consentsNone": "Jokių sutikimų, išskyrus registracijos.",
+        "consentsHosts": "Vedėjų ir pranešėjų apie įrašymą klausiama salėje, neprivalomai.",
+        "consentsWithdraw": "Dalyviai gali juos atšaukti salėje mygtuku „Sutikimai“."
       },
       "preview": {
         "title": "Puslapio peržiūra",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Renginio kopija",
     "editCopyNoticeNext": "Dirbate su juodraščio kopija: pradinis renginys nesikeičia. Data jau nustatyta kitam renginiui: patikrinkite kitus duomenis ir išsaugokite.",
-    "editCopyNoticeSameDates": "Dirbate su juodraščio kopija: pradinis renginys nesikeičia. Jos datos tokios pačios kaip originalo: atnaujinkite jas prieš išsaugodami."
+    "editCopyNoticeSameDates": "Dirbate su juodraščio kopija: pradinis renginys nesikeičia. Jos datos tokios pačios kaip originalo: atnaujinkite jas prieš išsaugodami.",
+    "consentProofs": {
+      "title": "Sutikimų įrodymai",
+      "intro": "Sutikimai įrašymui ir transkripcijai, duoti registruojantis, laukiamajame ar salėje, ir atšaukti. Sąrašas su vardais skirtas juos įrodyti.",
+      "loading": "Įkeliama…",
+      "loadFailed": "Sutikimų įrodymų įkelti nepavyko.",
+      "none": "Šiam renginiui nėra sutikimų įrašymui ar transkripcijai.",
+      "kinds": {
+        "recording": "Įrašymas",
+        "transcription": "Pasisakymų transkripcija"
+      },
+      "counts": "sutinka {given} · atšaukė {withdrawn}",
+      "download": "Atsisiųsti sąrašą (CSV)",
+      "downloading": "Atsisiunčiama…",
+      "downloadNote": "Sąraše yra asmenų vardai: eksportas įrašomas į renginio BDAR žurnalą.",
+      "downloadFailed": "Sąrašo atsisiųsti nepavyko: bandykite dar kartą.",
+      "csv": {
+        "kind": "Sutikimas",
+        "source": "Kur",
+        "role": "Vaidmuo",
+        "name": "Vardas",
+        "givenAt": "Duota",
+        "withdrawnAt": "Atšaukta",
+        "textVersion": "Teksto versija",
+        "kinds": {
+          "recording": "Įrašymas",
+          "transcription": "Pasisakymų transkripcija"
+        },
+        "sources": {
+          "registration": "registracija",
+          "room": "salė"
+        },
+        "roles": {
+          "registrant": "užsiregistravęs",
+          "guest": "svečias",
+          "host": "veda arba kalba"
+        },
+        "unreadableName": "(vardas neįskaitomas)"
+      },
+      "countsNote": "Skaičiuojami asmenys: registracija, darbuotojo paskyra ar vardinė nuoroda skaičiuojamos vieną kartą; svečias, grįžęs kito apsilankymo metu, skaičiuojamas iš naujo."
+    }
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",

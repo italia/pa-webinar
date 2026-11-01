@@ -1305,7 +1305,15 @@
         "askRole": "fonction",
         "askType": "type d'organisme",
         "permissionsHeading": "Qui peut faire quoi dans la salle",
-        "permissionsIntro": "Ce que les participants peuvent faire et quelles fonctions de la salle sont actives. Tout se modifie aussi pendant l'événement."
+        "permissionsIntro": "Ce que les participants peuvent faire et quelles fonctions de la salle sont actives. Tout se modifie aussi pendant l'événement.",
+        "consentsLine": "Consentements à l'inscription et dans la salle : {list}",
+        "consentRecordingRequired": "enregistrement, obligatoire pour entrer",
+        "consentRecordingFree": "enregistrement, libre (sans, écoute seule)",
+        "consentRecordingNotice": "pour l'enregistrement, seulement un avis (les participants ne parlent ni ne se montrent)",
+        "consentTranscription": "transcription de ses interventions, facultative",
+        "consentsNone": "Aucun consentement en dehors de celui de l'inscription.",
+        "consentsHosts": "Aux animateurs et intervenants, l'enregistrement est demandé dans la salle, facultatif.",
+        "consentsWithdraw": "Les participants peuvent les retirer dans la salle, avec le bouton « Consentements »."
       },
       "preview": {
         "title": "Aperçu de la page",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Copie de l'événement",
     "editCopyNoticeNext": "Vous travaillez sur une copie en brouillon : l'événement d'origine ne change pas. La date est déjà celle de la prochaine édition : vérifiez le reste et enregistrez.",
-    "editCopyNoticeSameDates": "Vous travaillez sur une copie en brouillon : l'événement d'origine ne change pas. Elle a les mêmes dates que l'original : mettez-les à jour avant d'enregistrer."
+    "editCopyNoticeSameDates": "Vous travaillez sur une copie en brouillon : l'événement d'origine ne change pas. Elle a les mêmes dates que l'original : mettez-les à jour avant d'enregistrer.",
+    "consentProofs": {
+      "title": "Preuves des consentements",
+      "intro": "Les consentements à l'enregistrement et à la transcription donnés à l'inscription, en salle d'attente ou dans la salle, et ceux retirés. La liste avec les noms sert à les prouver.",
+      "loading": "Chargement…",
+      "loadFailed": "Impossible de charger les preuves des consentements.",
+      "none": "Aucun consentement à l'enregistrement ou à la transcription pour cet événement.",
+      "kinds": {
+        "recording": "Enregistrement",
+        "transcription": "Transcription des interventions"
+      },
+      "counts": "consentent {given} · ont retiré {withdrawn}",
+      "download": "Télécharger la liste (CSV)",
+      "downloading": "Téléchargement…",
+      "downloadNote": "La liste contient les noms des personnes : l'exportation est inscrite au journal RGPD de l'événement.",
+      "downloadFailed": "Impossible de télécharger la liste : réessayez.",
+      "csv": {
+        "kind": "Consentement",
+        "source": "Où",
+        "role": "Rôle",
+        "name": "Nom",
+        "givenAt": "Donné le",
+        "withdrawnAt": "Retiré le",
+        "textVersion": "Version du texte",
+        "kinds": {
+          "recording": "Enregistrement",
+          "transcription": "Transcription des interventions"
+        },
+        "sources": {
+          "registration": "inscription",
+          "room": "salle"
+        },
+        "roles": {
+          "registrant": "inscrit",
+          "guest": "invité",
+          "host": "anime ou intervient"
+        },
+        "unreadableName": "(nom illisible)"
+      },
+      "countsNote": "On compte les personnes : une inscription, un compte du personnel ou un lien nominatif comptent une fois ; un invité qui revient lors d'une autre visite compte à nouveau."
+    }
   },
   "email": {
     "confirmationSubject": "Confirmation d'inscription : {eventTitle}",

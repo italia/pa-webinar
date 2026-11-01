@@ -83,6 +83,7 @@ interface Props {
   whiteboardInfraReady: boolean;
   /** I sottotitoli live ci sono nell'installazione (lib/captions/availability). */
   liveCaptionsAvailable?: boolean;
+  recordingAvailable?: boolean;
   defaultTargetLocales?: string | null;
   /** La post-produzione AI e' accesa sull'installazione. */
   aiPipelineEnabled?: boolean;
@@ -118,6 +119,7 @@ export default function CreateEventWithTemplate({
   siteDefaultVideoQuality,
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
+  recordingAvailable = true,
   defaultTargetLocales = null,
   aiPipelineEnabled = true,
   textTranslationAvailable = false,
@@ -175,6 +177,7 @@ export default function CreateEventWithTemplate({
       siteDefaultVideoQuality={siteDefaultVideoQuality}
       whiteboardInfraReady={whiteboardInfraReady}
       liveCaptionsAvailable={liveCaptionsAvailable}
+      recordingAvailable={recordingAvailable}
       defaultTargetLocales={defaultTargetLocales}
       aiPipelineEnabled={aiPipelineEnabled}
       textTranslationAvailable={textTranslationAvailable}

@@ -1305,7 +1305,15 @@
         "askRole": "beosztás",
         "askType": "szervezet típusa",
         "permissionsHeading": "Ki mit tehet a teremben",
-        "permissionsIntro": "Mit tehetnek a résztvevők, és mely termi funkciók vannak bekapcsolva. Minden az esemény közben is módosítható."
+        "permissionsIntro": "Mit tehetnek a résztvevők, és mely termi funkciók vannak bekapcsolva. Minden az esemény közben is módosítható.",
+        "consentsLine": "Hozzájárulások a regisztrációkor és a teremben: {list}",
+        "consentRecordingRequired": "felvétel, a belépés feltétele",
+        "consentRecordingFree": "felvétel, önkéntes (nélküle csak hallgatás)",
+        "consentRecordingNotice": "a felvételhez csak tájékoztatás (a résztvevők nem beszélnek és nem látszanak)",
+        "consentTranscription": "a saját hozzászólások átirata, önkéntes",
+        "consentsNone": "A regisztrációs hozzájáruláson kívül nincs más.",
+        "consentsHosts": "A moderátoroktól és előadóktól a teremben kérjük a felvételhez való hozzájárulást, önkéntesen.",
+        "consentsWithdraw": "A résztvevők a teremben a „Hozzájárulások” gombbal vonhatják vissza őket."
       },
       "preview": {
         "title": "Az oldal előnézete",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Az esemény másolata",
     "editCopyNoticeNext": "Egy piszkozatmásolaton dolgozik: az eredeti esemény nem változik. A dátum már a következő alkalomé: ellenőrizze a többit, és mentse.",
-    "editCopyNoticeSameDates": "Egy piszkozatmásolaton dolgozik: az eredeti esemény nem változik. Ugyanazok a dátumai, mint az eredetinek: mentés előtt frissítse őket."
+    "editCopyNoticeSameDates": "Egy piszkozatmásolaton dolgozik: az eredeti esemény nem változik. Ugyanazok a dátumai, mint az eredetinek: mentés előtt frissítse őket.",
+    "consentProofs": {
+      "title": "Hozzájárulások igazolása",
+      "intro": "A felvételhez és az átirathoz adott hozzájárulások a regisztrációkor, a váróteremben vagy a teremben, és a visszavontak. A névsor ezek igazolására szolgál.",
+      "loading": "Betöltés…",
+      "loadFailed": "A hozzájárulások igazolását nem sikerült betölteni.",
+      "none": "Ehhez az eseményhez nincs hozzájárulás felvételhez vagy átirathoz.",
+      "kinds": {
+        "recording": "Felvétel",
+        "transcription": "A hozzászólások átirata"
+      },
+      "counts": "hozzájárult {given} · visszavonta {withdrawn}",
+      "download": "Lista letöltése (CSV)",
+      "downloading": "Letöltés…",
+      "downloadNote": "A lista személyek nevét tartalmazza: az exportálás bekerül az esemény GDPR-naplójába.",
+      "downloadFailed": "A listát nem sikerült letölteni: próbálja újra.",
+      "csv": {
+        "kind": "Hozzájárulás",
+        "source": "Hol",
+        "role": "Szerep",
+        "name": "Név",
+        "givenAt": "Megadva",
+        "withdrawnAt": "Visszavonva",
+        "textVersion": "Szövegváltozat",
+        "kinds": {
+          "recording": "Felvétel",
+          "transcription": "A hozzászólások átirata"
+        },
+        "sources": {
+          "registration": "regisztráció",
+          "room": "terem"
+        },
+        "roles": {
+          "registrant": "regisztrált",
+          "guest": "vendég",
+          "host": "vezet vagy előad"
+        },
+        "unreadableName": "(a név nem olvasható)"
+      },
+      "countsNote": "Személyeket számolunk: egy regisztráció, egy munkatársi fiók vagy egy névre szóló link egyszer számít; a másik látogatáskor visszatérő vendég újra számít."
+    }
   },
   "email": {
     "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",

@@ -1305,7 +1305,15 @@
         "askRole": "rolle",
         "askType": "organisationstype",
         "permissionsHeading": "Hvem kan gøre hvad i rummet",
-        "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet."
+        "permissionsIntro": "Hvad deltagerne kan, og hvilke funktioner i rummet der er slået til. Alt kan også ændres under arrangementet.",
+        "consentsLine": "Samtykker ved tilmelding og i rummet: {list}",
+        "consentRecordingRequired": "optagelse, påkrævet for at komme ind",
+        "consentRecordingFree": "optagelse, frivillig (uden: kun lytte med)",
+        "consentRecordingNotice": "for optagelsen kun en meddelelse (deltagerne hverken taler eller vises)",
+        "consentTranscription": "transskription af egne indlæg, frivillig",
+        "consentsNone": "Intet samtykke ud over det ved tilmeldingen.",
+        "consentsHosts": "Ordstyrere og talere bliver spurgt om optagelsen i rummet, frivilligt.",
+        "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”."
       },
       "preview": {
         "title": "Forhåndsvisning af siden",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopi af arrangementet",
     "editCopyNoticeNext": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Datoen er allerede den næste gang: tjek resten, og gem.",
-    "editCopyNoticeSameDates": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Den har de samme datoer som originalen: opdatér dem, før du gemmer."
+    "editCopyNoticeSameDates": "Du arbejder på en kopi som kladde: det oprindelige arrangement ændres ikke. Den har de samme datoer som originalen: opdatér dem, før du gemmer.",
+    "consentProofs": {
+      "title": "Dokumentation for samtykker",
+      "intro": "Samtykker til optagelse og transskription givet ved tilmelding, i venterummet eller i rummet, og dem der er trukket tilbage. Listen med navne tjener som dokumentation.",
+      "loading": "Indlæser…",
+      "loadFailed": "Dokumentationen for samtykker kunne ikke indlæses.",
+      "none": "Intet samtykke til optagelse eller transskription for dette arrangement.",
+      "kinds": {
+        "recording": "Optagelse",
+        "transcription": "Transskription af indlæg"
+      },
+      "counts": "samtykker {given} · trukket tilbage {withdrawn}",
+      "download": "Hent listen (CSV)",
+      "downloading": "Henter…",
+      "downloadNote": "Listen indeholder personers navne: eksporten registreres i arrangementets GDPR-log.",
+      "downloadFailed": "Listen kunne ikke hentes: prøv igen.",
+      "csv": {
+        "kind": "Samtykke",
+        "source": "Hvor",
+        "role": "Rolle",
+        "name": "Navn",
+        "givenAt": "Givet",
+        "withdrawnAt": "Trukket tilbage",
+        "textVersion": "Tekstversion",
+        "kinds": {
+          "recording": "Optagelse",
+          "transcription": "Transskription af indlæg"
+        },
+        "sources": {
+          "registration": "tilmelding",
+          "room": "rum"
+        },
+        "roles": {
+          "registrant": "tilmeldt",
+          "guest": "gæst",
+          "host": "leder eller taler"
+        },
+        "unreadableName": "(navn kan ikke læses)"
+      },
+      "countsNote": "Der tælles personer: en tilmelding, en personalekonto eller et personligt link tæller én gang; en gæst, der kommer igen ved et andet besøg, tæller igen."
+    }
   },
   "email": {
     "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",

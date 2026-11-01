@@ -1305,7 +1305,15 @@
         "askRole": "roll",
         "askType": "typ av organisation",
         "permissionsHeading": "Vem som får göra vad i rummet",
-        "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget."
+        "permissionsIntro": "Vad deltagarna kan göra och vilka funktioner i rummet som är på. Allt kan också ändras under evenemanget.",
+        "consentsLine": "Samtycken vid anmälan och i rummet: {list}",
+        "consentRecordingRequired": "inspelning, krävs för att komma in",
+        "consentRecordingFree": "inspelning, frivillig (utan: bara lyssna)",
+        "consentRecordingNotice": "för inspelningen bara ett meddelande (deltagarna varken talar eller syns)",
+        "consentTranscription": "transkription av egna inlägg, frivillig",
+        "consentsNone": "Inget samtycke utöver det vid anmälan.",
+        "consentsHosts": "Moderatorer och talare tillfrågas om inspelningen i rummet, frivilligt.",
+        "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”."
       },
       "preview": {
         "title": "Förhandsvisning av sidan",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kopia av evenemanget",
     "editCopyNoticeNext": "Du arbetar med en kopia som utkast: det ursprungliga evenemanget ändras inte. Datumet är redan nästa tillfälle: kontrollera resten och spara.",
-    "editCopyNoticeSameDates": "Du arbetar med en kopia som utkast: det ursprungliga evenemanget ändras inte. Den har samma datum som originalet: uppdatera dem innan du sparar."
+    "editCopyNoticeSameDates": "Du arbetar med en kopia som utkast: det ursprungliga evenemanget ändras inte. Den har samma datum som originalet: uppdatera dem innan du sparar.",
+    "consentProofs": {
+      "title": "Bevis på samtycken",
+      "intro": "Samtycken till inspelning och transkription som getts vid anmälan, i väntrummet eller i rummet, och de som återkallats. Listan med namn tjänar som bevis.",
+      "loading": "Läser in…",
+      "loadFailed": "Bevisen på samtycken kunde inte läsas in.",
+      "none": "Inga samtycken till inspelning eller transkription för detta evenemang.",
+      "kinds": {
+        "recording": "Inspelning",
+        "transcription": "Transkription av inlägg"
+      },
+      "counts": "samtycker {given} · har återkallat {withdrawn}",
+      "download": "Ladda ned listan (CSV)",
+      "downloading": "Laddar ned…",
+      "downloadNote": "Listan innehåller personers namn: exporten registreras i evenemangets GDPR-logg.",
+      "downloadFailed": "Listan kunde inte laddas ned: försök igen.",
+      "csv": {
+        "kind": "Samtycke",
+        "source": "Var",
+        "role": "Roll",
+        "name": "Namn",
+        "givenAt": "Givet",
+        "withdrawnAt": "Återkallat",
+        "textVersion": "Textversion",
+        "kinds": {
+          "recording": "Inspelning",
+          "transcription": "Transkription av inlägg"
+        },
+        "sources": {
+          "registration": "anmälan",
+          "room": "rum"
+        },
+        "roles": {
+          "registrant": "anmäld",
+          "guest": "gäst",
+          "host": "leder eller talar"
+        },
+        "unreadableName": "(namnet kan inte läsas)"
+      },
+      "countsNote": "Personer räknas: en anmälan, ett personalkonto eller en personlig länk räknas en gång; en gäst som kommer tillbaka vid ett annat besök räknas igen."
+    }
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",

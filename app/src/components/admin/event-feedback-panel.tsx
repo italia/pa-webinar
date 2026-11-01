@@ -12,6 +12,7 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
 import type { EventFeedbackReport, FeedbackItemStats } from '@/lib/feedback/event-feedback-report';
+import { salvaRisposta } from '@/lib/utils/download';
 
 const COMMENTI_VISIBILI = 8;
 
@@ -58,12 +59,7 @@ export default function EventFeedbackPanel({
         ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const url = URL.createObjectURL(await res.blob());
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `valutazioni-${eventId.slice(0, 8)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await salvaRisposta(res, `valutazioni-${eventId.slice(0, 8)}.csv`);
     } catch {
       window.alert(t('downloadFailed'));
     } finally {

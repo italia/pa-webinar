@@ -1305,7 +1305,15 @@
         "askRole": "funkcia",
         "askType": "typ organizácie",
         "permissionsHeading": "Kto čo môže v miestnosti",
-        "permissionsIntro": "Čo môžu účastníci robiť a ktoré funkcie miestnosti sú zapnuté. Všetko sa dá meniť aj počas podujatia."
+        "permissionsIntro": "Čo môžu účastníci robiť a ktoré funkcie miestnosti sú zapnuté. Všetko sa dá meniť aj počas podujatia.",
+        "consentsLine": "Súhlasy pri registrácii a v miestnosti: {list}",
+        "consentRecordingRequired": "záznam, povinný na vstup",
+        "consentRecordingFree": "záznam, dobrovoľný (bez neho iba počúvanie)",
+        "consentRecordingNotice": "k záznamu iba upozornenie (účastníci nehovoria ani sa neukazujú)",
+        "consentTranscription": "prepis vlastných príspevkov, dobrovoľný",
+        "consentsNone": "Žiadny súhlas okrem súhlasu pri registrácii.",
+        "consentsHosts": "Moderátori a rečníci sú o súhlas so záznamom požiadaní v miestnosti, dobrovoľne.",
+        "consentsWithdraw": "Účastníci ich môžu v miestnosti odvolať tlačidlom „Súhlasy“."
       },
       "preview": {
         "title": "Náhľad stránky",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Kópia podujatia",
     "editCopyNoticeNext": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Dátum je už nastavený na ďalšie konanie: skontrolujte zvyšok a uložte.",
-    "editCopyNoticeSameDates": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Má rovnaké dátumy ako originál: pred uložením ich upravte."
+    "editCopyNoticeSameDates": "Pracujete na kópii v koncepte: pôvodné podujatie sa nemení. Má rovnaké dátumy ako originál: pred uložením ich upravte.",
+    "consentProofs": {
+      "title": "Doklady súhlasov",
+      "intro": "Súhlasy so záznamom a prepisom udelené pri registrácii, v čakárni alebo v miestnosti, a tie odvolané. Zoznam s menami slúži na ich preukázanie.",
+      "loading": "Načítava sa…",
+      "loadFailed": "Doklady súhlasov sa nepodarilo načítať.",
+      "none": "Pre toto podujatie žiadny súhlas so záznamom ani prepisom.",
+      "kinds": {
+        "recording": "Záznam",
+        "transcription": "Prepis príspevkov"
+      },
+      "counts": "súhlasia {given} · odvolali {withdrawn}",
+      "download": "Stiahnuť zoznam (CSV)",
+      "downloading": "Sťahuje sa…",
+      "downloadNote": "Zoznam obsahuje mená osôb: export sa zapíše do protokolu GDPR podujatia.",
+      "downloadFailed": "Zoznam sa nepodarilo stiahnuť: skúste to znova.",
+      "csv": {
+        "kind": "Súhlas",
+        "source": "Kde",
+        "role": "Rola",
+        "name": "Meno",
+        "givenAt": "Udelené",
+        "withdrawnAt": "Odvolané",
+        "textVersion": "Verzia textu",
+        "kinds": {
+          "recording": "Záznam",
+          "transcription": "Prepis príspevkov"
+        },
+        "sources": {
+          "registration": "registrácia",
+          "room": "miestnosť"
+        },
+        "roles": {
+          "registrant": "registrovaný",
+          "guest": "hosť",
+          "host": "moderuje alebo vystupuje"
+        },
+        "unreadableName": "(meno nie je čitateľné)"
+      },
+      "countsNote": "Počítajú sa osoby: registrácia, účet tímu alebo menný odkaz sa počítajú raz; hosť, ktorý sa vráti pri inej návšteve, sa počíta znova."
+    }
   },
   "email": {
     "confirmationSubject": "Potvrdenie registrácie: {eventTitle}",

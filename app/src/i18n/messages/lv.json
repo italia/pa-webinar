@@ -1305,7 +1305,15 @@
         "askRole": "amats",
         "askType": "organizācijas veids",
         "permissionsHeading": "Kas ko var darīt telpā",
-        "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā."
+        "permissionsIntro": "Ko var darīt dalībnieki un kuras telpas funkcijas ir ieslēgtas. Visu var mainīt arī pasākuma laikā.",
+        "consentsLine": "Piekrišanas reģistrējoties un telpā: {list}",
+        "consentRecordingRequired": "ieraksts, obligāts, lai ienāktu",
+        "consentRecordingFree": "ieraksts, brīvprātīgs (bez tā tikai klausīšanās)",
+        "consentRecordingNotice": "par ierakstu tikai paziņojums (dalībnieki nerunā un nav redzami)",
+        "consentTranscription": "savas runas atšifrēšana, brīvprātīga",
+        "consentsNone": "Nav citu piekrišanu kā tikai reģistrācijas.",
+        "consentsHosts": "Vadītājiem un runātājiem ierakstu jautā telpā, brīvprātīgi.",
+        "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”."
       },
       "preview": {
         "title": "Lapas priekšskatījums",
@@ -3890,7 +3898,47 @@
     },
     "editCopyTitle": "Pasākuma kopija",
     "editCopyNoticeNext": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Datums jau ir nākamās reizes datums: pārbaudiet pārējo un saglabājiet.",
-    "editCopyNoticeSameDates": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Tai ir tie paši datumi kā oriģinālam: atjauniniet tos pirms saglabāšanas."
+    "editCopyNoticeSameDates": "Jūs strādājat ar melnraksta kopiju: sākotnējais pasākums nemainās. Tai ir tie paši datumi kā oriģinālam: atjauniniet tos pirms saglabāšanas.",
+    "consentProofs": {
+      "title": "Piekrišanu pierādījumi",
+      "intro": "Piekrišanas ierakstam un atšifrēšanai, kas dotas reģistrējoties, uzgaidāmajā telpā vai telpā, un atsauktās. Saraksts ar vārdiem kalpo to pierādīšanai.",
+      "loading": "Ielādē…",
+      "loadFailed": "Piekrišanu pierādījumus neizdevās ielādēt.",
+      "none": "Šim pasākumam nav piekrišanu ierakstam vai atšifrēšanai.",
+      "kinds": {
+        "recording": "Ieraksts",
+        "transcription": "Runas atšifrēšana"
+      },
+      "counts": "piekrīt {given} · atsaukuši {withdrawn}",
+      "download": "Lejupielādēt sarakstu (CSV)",
+      "downloading": "Lejupielādē…",
+      "downloadNote": "Sarakstā ir personu vārdi: eksportēšana tiek reģistrēta pasākuma VDAR žurnālā.",
+      "downloadFailed": "Sarakstu neizdevās lejupielādēt: mēģiniet vēlreiz.",
+      "csv": {
+        "kind": "Piekrišana",
+        "source": "Kur",
+        "role": "Loma",
+        "name": "Vārds",
+        "givenAt": "Dota",
+        "withdrawnAt": "Atsaukta",
+        "textVersion": "Teksta versija",
+        "kinds": {
+          "recording": "Ieraksts",
+          "transcription": "Runas atšifrēšana"
+        },
+        "sources": {
+          "registration": "reģistrācija",
+          "room": "telpa"
+        },
+        "roles": {
+          "registrant": "reģistrējies",
+          "guest": "viesis",
+          "host": "vada vai runā"
+        },
+        "unreadableName": "(vārds nav nolasāms)"
+      },
+      "countsNote": "Tiek skaitītas personas: reģistrācija, darbinieka konts vai personalizēta saite tiek skaitīta vienreiz; viesis, kurš atgriežas citā apmeklējumā, tiek skaitīts vēlreiz."
+    }
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",

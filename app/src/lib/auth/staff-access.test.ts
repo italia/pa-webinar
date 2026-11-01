@@ -34,6 +34,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/[id]/analytics/route.ts': 'proprio evento',
   'api/admin/events/[id]/duplicate/route.ts': 'proprio evento; la copia e’ sua',
   'api/admin/events/[id]/feedback/route.ts': 'valutazioni del proprio evento, senza nomi',
+  'api/admin/events/[id]/consents/route.ts': 'prove dei consensi del proprio evento',
   'api/admin/events/[id]/captions-transcript/route.ts': 'proprio evento',
   'api/admin/events/[id]/closing/route.ts': 'stati del dopo-evento del proprio evento',
   'api/admin/events/[id]/recap/route.ts': 'riepilogo pubblico del proprio evento',
