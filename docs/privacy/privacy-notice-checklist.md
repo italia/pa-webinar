@@ -55,6 +55,10 @@ room, next to the consents it asks for. On an event that asks for no consent
 (no recording, or listen-only), the only notice link they meet is the footer's
 **Privacy policy**, which leads to the site page, not to the event's notice.
 
+The notice can say that the recording and transcription consents are
+withdrawn from the room, under **Consents** in the top bar, at any time during
+the event, and what follows ([Withdrawing consent](../GDPR.md#withdrawing-consent)).
+
 ### Which notice the registration form shows
 
 The registration form shows one notice, chosen in this order

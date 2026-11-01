@@ -50,7 +50,8 @@ vi.mock('@/lib/db', () => ({
     eventModerator: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
     multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
-    recordingConsent: { createMany: vi.fn(), findFirst: vi.fn(async () => null) },
+    recordingConsent: { createMany: vi.fn(), updateMany: vi.fn(async () => ({ count: 0 })), findFirst: vi.fn(async () => null) },
+    gdprAuditLog: { create: vi.fn() },
     profilePhoto: { findUnique: vi.fn(async () => null) },
   },
 }));
@@ -1091,6 +1092,63 @@ describe('POST jitsi/token — consenso alla registrazione verificato dal server
     expect(user.listenOnly).toBeUndefined();
     expect(user.mediaLock).toEqual({ audio: true, video: true, desktop: true });
     expect(user.mediaAdmit).toEqual({ audio: true, video: false, desktop: false });
+  });
+
+  it("il consenso dell'iscrizione ritirato dalla sala non vale piu': si entra in solo ascolto", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+    );
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow({ consentRecording: true, consentRecordingWithdrawnAt: new Date() }) as never,
+    );
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+    const res = await post({ accessToken: ACCESS_TOKEN });
+    expect(res.status).toBe(200);
+    expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(true);
+    // La prova in sala si cerca solo tra quelle non ritirate.
+    expect(prisma.recordingConsent.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { eventId: EVENT_ID, registrationId: REGISTRATION_ID, withdrawnAt: null },
+      }),
+    );
+  });
+
+  it("ridato dopo un ritiro, la prova dell'iscrizione torna valida con l'ora nuova", async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ ...interattivo, listenOnlyWithoutConsent: true }) as never,
+    );
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow({ consentRecording: true, consentRecordingWithdrawnAt: new Date() }) as never,
+    );
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+    const prima = new Date('2026-11-01T10:00:00Z');
+    const ritiro = new Date('2026-11-01T10:30:00Z');
+    vi.mocked(prisma.recordingConsent.findFirst).mockResolvedValueOnce({ consentedAt: prima, withdrawnAt: ritiro } as never);
+    vi.mocked(prisma.recordingConsent.updateMany).mockResolvedValueOnce({ count: 1 } as never);
+    const res = await post({ accessToken: ACCESS_TOKEN, recordingConsent: true, locale: 'it' });
+    expect(((await minted(res)).body as { listenOnly?: boolean }).listenOnly).toBe(false);
+    // Il consenso di prima e il ritiro restano nel registro GDPR.
+    expect(prisma.gdprAuditLog.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: 'CONSENT_RECORDED',
+        details: expect.stringContaining(prima.toISOString()),
+      }),
+    });
+    const call = vi.mocked(prisma.recordingConsent.updateMany).mock.calls[0]![0] as {
+      where: Record<string, unknown>;
+      data: { withdrawnAt: null; consentedAt: Date };
+    };
+    expect(call.where).toEqual({
+      eventId: EVENT_ID,
+      registrationId: REGISTRATION_ID,
+      withdrawnAt: { not: null },
+    });
+    expect(call.data.withdrawnAt).toBeNull();
+    expect(call.data.consentedAt).toBeInstanceOf(Date);
+    // Un ospite non ha una prova d'iscrizione da far rivivere.
+    vi.mocked(prisma.recordingConsent.updateMany).mockClear();
+    await post({ guestName: 'Ospite', recordingConsent: true });
+    expect(prisma.recordingConsent.updateMany).not.toHaveBeenCalled();
   });
 });
 

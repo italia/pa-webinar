@@ -853,6 +853,11 @@ model Registration {
   // comprendesse la trascrizione dei propri interventi con il nome: valgono
   // per la traccia audio, non per la trascrizione dai sottotitoli.
   consentMultitrackVersion    Int?     @map("consent_multitrack_version")
+  // Ritiro dalla sala dei consensi dati all'iscrizione (art. 7.3 GDPR): da
+  // quel momento il consenso dell'iscrizione non vale piu'. Uno ridato in sala
+  // dopo il ritiro vale con la sua prova (RecordingConsent, MultitrackConsent).
+  consentRecordingWithdrawnAt  DateTime? @map("consent_recording_withdrawn_at")
+  consentMultitrackWithdrawnAt DateTime? @map("consent_multitrack_withdrawn_at")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
@@ -1222,7 +1227,7 @@ model ReminderSent {
 model GdprAuditLog {
   id          String  @id @default(uuid()) @db.Uuid
   eventId     String  @map("event_id") @db.Uuid
-  action      String // DATA_DELETED, CONSENT_RECORDED, DATA_EXPORTED
+  action      String // DATA_DELETED, CONSENT_RECORDED, CONSENT_WITHDRAWN, DATA_EXPORTED
   recordCount Int     @map("record_count")
   details     String? @db.Text // JSON, no PII
 
@@ -2641,6 +2646,9 @@ model MultitrackConsent {
   registrationId String?  @map("registration_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
+  // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
+  // consenso non vale piu'.
+  withdrawnAt    DateTime? @map("withdrawn_at")
   // Il testo con cui e' stato dato: le prove scritte prima che il testo
   // comprendesse la trascrizione con il nome hanno 1 (vedi
   // Registration.consentMultitrackVersion).
@@ -2731,6 +2739,9 @@ model RecordingConsent {
   staffAccountId   String? @map("staff_account_id") @db.Uuid
   locale         String?  @db.VarChar(8)
   consentedAt    DateTime @default(now()) @map("consented_at")
+  // Ritirato dalla sala (lib/live/consent-withdrawal): la prova resta, il
+  // consenso non vale piu'.
+  withdrawnAt    DateTime? @map("withdrawn_at")
 
   event          Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   registration   Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)

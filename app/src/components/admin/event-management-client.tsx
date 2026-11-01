@@ -1541,6 +1541,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const actionColor = (action: string) => {
     if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
     if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    if (action === 'CONSENT_WITHDRAWN') return { bg: '#F3E5F5', fg: '#5B2C6F' };
     return { bg: '#D4EDDA', fg: '#155724' };
   };
   // A Recording ROW exists (live capture happened) → the AI pipeline can run on

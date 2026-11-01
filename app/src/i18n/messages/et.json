@@ -656,7 +656,42 @@
       "joining": "Ruumi tagasi sisenemine…",
       "error": "Tagasi sisenemine ebaõnnestus: proovi uuesti."
     },
-    "pseudonym": "Osaleja-{code}"
+    "pseudonym": "Osaleja-{code}",
+    "consents": {
+      "open": "Sinu nõusolekud",
+      "button": "Nõusolekud",
+      "title": "Sinu nõusolekud",
+      "intro": "Saad oma nõusolekuid anda või tagasi võtta ürituse ajal igal hetkel. Iga muudatus ühendab konverentsi mõneks sekundiks uuesti.",
+      "given": "Nõusolek antud",
+      "notGiven": "Nõusolekut pole antud",
+      "withdraw": "Võta nõusolek tagasi",
+      "confirmTitle": "Kas võtad tagasi?",
+      "confirm": "Võta tagasi",
+      "working": "Uuendamine…",
+      "error": "Nõusolekut ei õnnestunud uuendada: proovi uuesti.",
+      "recording": {
+        "title": "Ürituse salvestamine",
+        "give": "Annan nõusoleku salvestamiseks",
+        "without": {
+          "soloAscolto": "Ilma selle nõusolekuta oled ainult kuulaja: mikrofon, kaamera ja ekraan jäävad suletuks.",
+          "conduce": "Ilma selle nõusolekuta juhid ikka, kuid su hääl ei jää isikupõhistele radadele ega transkriptsiooni.",
+          "uscita": "Sellel üritusel osalemiseks on vaja nõusolekut salvestamiseks."
+        },
+        "alreadyRecorded": "Juba salvestatu jääb ürituse videosse: eemaldamiseks kirjuta korraldajatele.",
+        "withdraw": {
+          "soloAscolto": "Kui võtad selle tagasi, jääd ruumi ainult kuulajana: mikrofon, kaamera ja ekraan suletakse. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
+          "uscita": "Kui võtad selle tagasi, lahkud konverentsist ja naased ooteruumi: osalemiseks on vaja nõusolekut salvestamiseks. Võtad tagasi ka nõusoleku oma sõnavõttude transkribeerimiseks.",
+          "conduce": "Kui võtad selle tagasi, juhid edasi, kuid nüüdsest su hääl ei jää isikupõhistele radadele ega transkriptsiooni. Ruumi video näitab sind siiski, kui seda salvestatakse."
+        }
+      },
+      "transcription": {
+        "title": "Sinu sõnavõttude transkribeerimine",
+        "give": "Annan nõusoleku transkribeerimiseks",
+        "giveEffect": "Sinu sõnavõtud lähevad ürituse transkriptsiooni sinu nimega. Ilma nõusolekuta osaled ikka.",
+        "withdrawEffect": "Kui võtad selle tagasi, kaotavad su juba transkribeeritud laused teksti ja nime ning nüüdsest su häält ei salvestata eraldi rajale ega transkribeerita.",
+        "needsRecording": "Saad selle anda pärast nõusolekut salvestamiseks."
+      }
+    }
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
-        "DATA_EXPORTED": "Andmed eksporditud"
+        "DATA_EXPORTED": "Andmed eksporditud",
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
       },
       "recordsAffected": "{count} kirjet mõjutatud",
       "colWhen": "Millal",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Andmed kustutatud",
         "CONSENT_RECORDED": "Nõusolek registreeritud",
-        "DATA_EXPORTED": "Andmed eksporditud"
+        "DATA_EXPORTED": "Andmed eksporditud",
+        "CONSENT_WITHDRAWN": "Nõusolek tagasi võetud"
       }
     },
     "settings": {

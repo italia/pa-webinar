@@ -656,7 +656,42 @@
       "joining": "Qed terġa' tidħol fil-kamra…",
       "error": "Ma kienx possibbli terġa' tidħol: erġa' pprova."
     },
-    "pseudonym": "Parteċipant-{code}"
+    "pseudonym": "Parteċipant-{code}",
+    "consents": {
+      "open": "Il-kunsensi tiegħek",
+      "button": "Kunsensi",
+      "title": "Il-kunsensi tiegħek",
+      "intro": "Tista' tagħti jew tirtira l-kunsensi tiegħek fi kwalunkwe ħin matul l-avveniment. Kull bidla terġa' tqabbad il-konferenza għal ftit sekondi.",
+      "given": "Kunsens mogħti",
+      "notGiven": "Kunsens mhux mogħti",
+      "withdraw": "Irtira l-kunsens",
+      "confirmTitle": "Tikkonferma l-irtirar?",
+      "confirm": "Irtira",
+      "working": "Qed jaġġorna…",
+      "error": "Ma kienx possibbli jiġi aġġornat il-kunsens: erġa' pprova.",
+      "recording": {
+        "title": "Reġistrazzjoni tal-avveniment",
+        "give": "Nagħti l-kunsens għar-reġistrazzjoni",
+        "without": {
+          "soloAscolto": "Mingħajr dan il-kunsens tisma' biss: il-mikrofonu, il-kamera u l-iskrin jibqgħu magħluqa.",
+          "conduce": "Mingħajr dan il-kunsens tmexxi xorta, iżda leħnek ma jibqax fil-binarji għal kull persuna u lanqas fit-traskrizzjoni.",
+          "uscita": "Biex tipparteċipa f'dan l-avveniment hemm bżonn il-kunsens għar-reġistrazzjoni."
+        },
+        "alreadyRecorded": "Dak li diġà ġie rreġistrat jibqa' fil-vidjo tal-avveniment: biex jitneħħa, ikteb lill-organizzaturi.",
+        "withdraw": {
+          "soloAscolto": "Jekk tirtirah tibqa' fis-sala tisma' biss: il-mikrofonu, il-kamera u l-iskrin jingħalqu. Tirtira wkoll il-kunsens għat-traskrizzjoni ta' dak li tgħid.",
+          "uscita": "Jekk tirtirah toħroġ mill-konferenza u terġa' lura fis-sala tal-istennija: biex tipparteċipa hemm bżonn il-kunsens għar-reġistrazzjoni. Tirtira wkoll il-kunsens għat-traskrizzjoni ta' dak li tgħid.",
+          "conduce": "Jekk tirtirah tkompli tmexxi, iżda minn issa 'l quddiem leħnek ma jibqax fil-binarji għal kull persuna u lanqas fit-traskrizzjoni. Il-vidjo tas-sala, jekk jiġi rreġistrat, xorta juruk."
+        }
+      },
+      "transcription": {
+        "title": "Traskrizzjoni ta' dak li tgħid",
+        "give": "Nagħti l-kunsens għat-traskrizzjoni",
+        "giveEffect": "Dak li tgħid jidħol fit-traskrizzjoni tal-avveniment b'ismek. Mingħajru xorta tipparteċipa.",
+        "withdrawEffect": "Jekk tirtirah, is-sentenzi tiegħek diġà traskritti jitilfu t-test u ismek, u minn issa 'l quddiem leħnek la jiġi rreġistrat f'binarju separat u lanqas traskritt.",
+        "needsRecording": "Tista' tagħtih wara l-kunsens għar-reġistrazzjoni."
+      }
+    }
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Data imħassrin",
         "CONSENT_RECORDED": "Kunsens reġistrat",
-        "DATA_EXPORTED": "Data esportati"
+        "DATA_EXPORTED": "Data esportati",
+        "CONSENT_WITHDRAWN": "Kunsens irtirat"
       },
       "recordsAffected": "{count} record coinvolti",
       "colWhen": "Quando",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Dejta mħassra",
         "CONSENT_RECORDED": "Kunsens irreġistrat",
-        "DATA_EXPORTED": "Dejta esportata"
+        "DATA_EXPORTED": "Dejta esportata",
+        "CONSENT_WITHDRAWN": "Kunsens irtirat"
       }
     },
     "settings": {

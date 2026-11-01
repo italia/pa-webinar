@@ -8,7 +8,7 @@ const db = vi.hoisted(() => ({
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => `chiaro:${v}` }));
 
-import { consensoTrascrizione, endpointConConsenso, postoDellEndpoint } from './room';
+import { consensoTrascrizione, endpointConConsenso, endpointRitirati, postoDellEndpoint } from './room';
 
 const EVENTO = 'e1';
 const ISCRIZIONE = '11111111-2222-4333-8444-555555555555';
@@ -24,7 +24,7 @@ describe('consensoTrascrizione', () => {
     expect(await consensoTrascrizione(EVENTO, `reg-${ISCRIZIONE}-ab12cd34`, 2)).toEqual({ dato: false, nome: null });
     // La prova in sala si cerca solo con il testo richiesto.
     expect(db.multitrackConsent.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { eventId: EVENTO, registrationId: ISCRIZIONE, textVersion: { gte: 2 } } }),
+      expect.objectContaining({ where: { eventId: EVENTO, registrationId: ISCRIZIONE, textVersion: { gte: 2 }, withdrawnAt: null } }),
     );
     // Per la traccia audio vale ancora.
     expect(await consensoTrascrizione(EVENTO, `reg-${ISCRIZIONE}-ab12cd34`, 1)).toEqual({
@@ -65,7 +65,7 @@ describe('consensoTrascrizione', () => {
     db.multitrackConsent.findFirst.mockResolvedValue({ displayName: 'mod' });
     expect(await consensoTrascrizione(EVENTO, 'mod-e1-ab12cd34', 2)).toEqual({ dato: true, nome: 'chiaro:mod' });
     expect(db.multitrackConsent.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { eventId: EVENTO, jitsiUserId: 'mod-e1-ab12cd34', textVersion: { gte: 2 } } }),
+      expect.objectContaining({ where: { eventId: EVENTO, jitsiUserId: 'mod-e1-ab12cd34', textVersion: { gte: 2 }, withdrawnAt: null } }),
     );
     db.multitrackConsent.findFirst.mockResolvedValue(null);
     expect((await consensoTrascrizione(EVENTO, 'guest-abc', 2)).dato).toBe(false);
@@ -112,3 +112,44 @@ describe('endpointConConsenso', () => {
   });
 });
 
+
+describe('ritiro dalla sala', () => {
+  it("il consenso dell'iscrizione ritirato non vale piu'", async () => {
+    db.registration.findFirst.mockResolvedValue({
+      displayName: 'nome',
+      consentMultitrack: true,
+      consentMultitrackVersion: 2,
+      consentMultitrackWithdrawnAt: new Date(),
+    });
+    db.multitrackConsent.findFirst.mockResolvedValue(null);
+    expect(await consensoTrascrizione(EVENTO, `reg-${ISCRIZIONE}-ab12cd34`, 2)).toEqual({ dato: false, nome: null });
+  });
+
+  it('endpointRitirati: solo i ritiri accertati e non ridati', async () => {
+    const ALTRA = '99999999-2222-4333-8444-555555555555';
+    db.roomOccupant.findMany.mockResolvedValue([
+      { endpointId: 'ep-iscritto', seatId: `reg-${ISCRIZIONE}-aaaa` },
+      { endpointId: 'ep-ridato', seatId: `reg-${ALTRA}-bbbb` },
+      { endpointId: 'ep-ospite', seatId: 'guest-1' },
+      { endpointId: 'ep-ospite-ridato', seatId: 'guest-2' },
+    ]);
+    db.registration.findMany.mockResolvedValue([
+      { id: ISCRIZIONE, consentMultitrackWithdrawnAt: new Date() },
+      { id: ALTRA, consentMultitrackWithdrawnAt: new Date() },
+    ]);
+    db.multitrackConsent.findMany.mockResolvedValue([
+      // Ridato in sala dopo il ritiro: vale.
+      { registrationId: ALTRA, jitsiUserId: `reg-${ALTRA}-cccc`, withdrawnAt: null },
+      { registrationId: null, jitsiUserId: 'guest-1', withdrawnAt: new Date() },
+      { registrationId: null, jitsiUserId: 'guest-2', withdrawnAt: new Date() },
+      { registrationId: null, jitsiUserId: 'guest-2', withdrawnAt: null },
+    ]);
+    const ritirati = await endpointRitirati(EVENTO, ['ep-iscritto', 'ep-ridato', 'ep-ospite', 'ep-ospite-ridato', 'ep-ignoto']);
+    expect([...ritirati].sort()).toEqual(['ep-iscritto', 'ep-ospite']);
+  });
+
+  it('endpointRitirati: senza endpoint non legge niente', async () => {
+    expect((await endpointRitirati(EVENTO, [])).size).toBe(0);
+    expect(db.roomOccupant.findMany).not.toHaveBeenCalled();
+  });
+});

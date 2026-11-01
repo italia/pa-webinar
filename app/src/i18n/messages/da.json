@@ -656,7 +656,42 @@
       "joining": "Går ind i rummet igen…",
       "error": "Det lykkedes ikke at komme ind igen: prøv igen."
     },
-    "pseudonym": "Deltager-{code}"
+    "pseudonym": "Deltager-{code}",
+    "consents": {
+      "open": "Dine samtykker",
+      "button": "Samtykker",
+      "title": "Dine samtykker",
+      "intro": "Du kan give eller trække dine samtykker tilbage når som helst under arrangementet. Hver ændring forbinder mødet igen i nogle sekunder.",
+      "given": "Samtykke givet",
+      "notGiven": "Samtykke ikke givet",
+      "withdraw": "Træk samtykket tilbage",
+      "confirmTitle": "Vil du trække det tilbage?",
+      "confirm": "Træk tilbage",
+      "working": "Opdaterer…",
+      "error": "Samtykket kunne ikke opdateres: prøv igen.",
+      "recording": {
+        "title": "Optagelse af arrangementet",
+        "give": "Jeg giver samtykke til optagelsen",
+        "without": {
+          "soloAscolto": "Uden dette samtykke lytter du kun med: mikrofon, kamera og skærm forbliver lukket.",
+          "conduce": "Uden dette samtykke leder du stadig, men din stemme gemmes ikke i sporene pr. person eller i transskriptionen.",
+          "uscita": "Deltagelse i dette arrangement kræver samtykke til optagelsen."
+        },
+        "alreadyRecorded": "Det, der allerede er optaget, forbliver i videoen af arrangementet: skriv til arrangørerne for at få det fjernet.",
+        "withdraw": {
+          "soloAscolto": "Hvis du trækker det tilbage, bliver du i rummet og lytter kun med: mikrofon, kamera og skærm lukkes. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
+          "uscita": "Hvis du trækker det tilbage, forlader du mødet og går tilbage til venterummet: deltagelse kræver samtykke til optagelsen. Dit samtykke til transskription af dine indlæg trækkes også tilbage.",
+          "conduce": "Hvis du trækker det tilbage, leder du videre, men fra nu af gemmes din stemme ikke i sporene pr. person eller i transskriptionen. Videoen af rummet viser dig stadig, hvis den optages."
+        }
+      },
+      "transcription": {
+        "title": "Transskription af dine indlæg",
+        "give": "Jeg giver samtykke til transskriptionen",
+        "giveEffect": "Dine indlæg kommer med i arrangementets transskription med dit navn. Uden samtykke deltager du stadig.",
+        "withdrawEffect": "Hvis du trækker det tilbage, mister dine allerede transskriberede sætninger tekst og navn, og fra nu af optages din stemme hverken på et separat spor eller transskriberes.",
+        "needsRecording": "Du kan give det efter samtykke til optagelsen."
+      }
+    }
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
-        "DATA_EXPORTED": "Data eksporteret"
+        "DATA_EXPORTED": "Data eksporteret",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
       },
       "recordsAffected": "{count} berørte poster",
       "colWhen": "Hvornår",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Data slettet",
         "CONSENT_RECORDED": "Samtykke registreret",
-        "DATA_EXPORTED": "Data eksporteret"
+        "DATA_EXPORTED": "Data eksporteret",
+        "CONSENT_WITHDRAWN": "Samtykke trukket tilbage"
       }
     },
     "settings": {

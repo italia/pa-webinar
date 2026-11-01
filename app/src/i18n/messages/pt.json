@@ -656,7 +656,42 @@
       "joining": "A voltar à sala…",
       "error": "Não foi possível voltar a entrar: tente novamente."
     },
-    "pseudonym": "Participante-{code}"
+    "pseudonym": "Participante-{code}",
+    "consents": {
+      "open": "Os seus consentimentos",
+      "button": "Consentimentos",
+      "title": "Os seus consentimentos",
+      "intro": "Pode dar ou retirar os seus consentimentos em qualquer momento do evento. Cada alteração volta a ligar a conferência durante alguns segundos.",
+      "given": "Consentimento dado",
+      "notGiven": "Consentimento não dado",
+      "withdraw": "Retirar o consentimento",
+      "confirmTitle": "Confirma a retirada?",
+      "confirm": "Retirar",
+      "working": "A atualizar…",
+      "error": "Não foi possível atualizar o consentimento: tente novamente.",
+      "recording": {
+        "title": "Gravação do evento",
+        "give": "Dou o meu consentimento à gravação",
+        "without": {
+          "soloAscolto": "Sem este consentimento acompanha apenas a ouvir: microfone, câmara e ecrã ficam fechados.",
+          "conduce": "Sem este consentimento conduz na mesma, mas a sua voz não fica nas faixas por pessoa nem na transcrição.",
+          "uscita": "Para participar neste evento é necessário o consentimento à gravação."
+        },
+        "alreadyRecorded": "O que já foi gravado fica no vídeo do evento: para o retirar, escreva a quem organiza.",
+        "withdraw": {
+          "soloAscolto": "Se o retirar, fica na sala apenas a ouvir: microfone, câmara e ecrã fecham-se. Retira também o consentimento à transcrição das suas intervenções.",
+          "uscita": "Se o retirar, sai da conferência e volta à sala de espera: para participar neste evento é necessário o consentimento à gravação. Retira também o consentimento à transcrição das suas intervenções.",
+          "conduce": "Se o retirar, continua a conduzir, mas a partir de agora a sua voz não fica nas faixas por pessoa nem na transcrição. O vídeo da sala, se for gravado, mostra-o na mesma."
+        }
+      },
+      "transcription": {
+        "title": "Transcrição das suas intervenções",
+        "give": "Dou o meu consentimento à transcrição",
+        "giveEffect": "As suas intervenções entram na transcrição do evento com o seu nome. Sem ele, participa na mesma.",
+        "withdrawEffect": "Se o retirar, as suas frases já transcritas perdem o texto e o nome, e a partir de agora a sua voz não é gravada numa faixa à parte nem transcrita.",
+        "needsRecording": "Pode dá-lo depois do consentimento à gravação."
+      }
+    }
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
-        "DATA_EXPORTED": "Dados exportados"
+        "DATA_EXPORTED": "Dados exportados",
+        "CONSENT_WITHDRAWN": "Consentimento retirado"
       },
       "recordsAffected": "{count} registos afetados",
       "colWhen": "Quando",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Dados eliminados",
         "CONSENT_RECORDED": "Consentimento registado",
-        "DATA_EXPORTED": "Dados exportados"
+        "DATA_EXPORTED": "Dados exportados",
+        "CONSENT_WITHDRAWN": "Consentimento retirado"
       }
     },
     "settings": {

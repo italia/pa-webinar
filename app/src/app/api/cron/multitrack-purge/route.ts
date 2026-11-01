@@ -19,6 +19,7 @@ import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
+import { endpointRitirati } from '@/lib/captions/room';
 import { prisma } from '@/lib/db';
 import { isEventEligibleForCleanup } from '@/lib/gdpr/cleanup-selection';
 import { cancellaManifestiSenzaTracce } from '@/lib/recorder/manifest';
@@ -126,6 +127,50 @@ export const GET = withErrorHandling(async (request) => {
         });
   tracks.push(...expired);
 
+  // Tracce di chi ha ritirato dalla sala il consenso alla trascrizione
+  // (lib/live/consent-withdrawal): non passano piu' alla trascrizione e non
+  // hanno altro scopo, quindi si cancellano subito, anche con «conserva».
+  // Si aspetta solo un job che le abbia gia' prese in carico (il claim le
+  // esclude, ma uno preso prima del ritiro ne ha l'indirizzo).
+  const diEventiConRitiri = await prisma.recordingTrack.findMany({
+    where: {
+      audioPurgedAt: null,
+      recording: {
+        jobs: {
+          none: {
+            kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+            status: { in: ['CLAIMED', 'RUNNING'] },
+          },
+        },
+        event: {
+          OR: [
+            { multitrackConsents: { some: { withdrawnAt: { not: null } } } },
+            { registrations: { some: { consentMultitrackWithdrawnAt: { not: null } } } },
+          ],
+        },
+      },
+    },
+    select: { ...SELEZIONE, participantId: true },
+    take: 500,
+  });
+  const giaScelte = new Set(tracks.map((t) => t.id));
+  const perEvento = new Map<string, typeof diEventiConRitiri>();
+  for (const t of diEventiConRitiri) {
+    if (giaScelte.has(t.id)) continue;
+    const l = perEvento.get(t.recording.eventId) ?? [];
+    l.push(t);
+    perEvento.set(t.recording.eventId, l);
+  }
+  let ritirate = 0;
+  for (const [eventId, righe] of perEvento) {
+    const ritirati = await endpointRitirati(eventId, [...new Set(righe.map((t) => t.participantId))]);
+    for (const t of righe) {
+      if (!ritirati.has(t.participantId)) continue;
+      tracks.push(t);
+      ritirate += 1;
+    }
+  }
+
   const storage = getPostprodStorage();
   let purged = 0;
   let failed = 0;
@@ -154,6 +199,7 @@ export const GET = withErrorHandling(async (request) => {
     ok: true,
     candidates: tracks.length,
     untranscribedExpired: expired.length,
+    withdrawnConsent: ritirate,
     purged,
     failed,
     manifestsDeleted: manifesti.cancellati,

@@ -656,7 +656,42 @@
       "joining": "Palataan huoneeseen…",
       "error": "Palaaminen epäonnistui: yritä uudelleen."
     },
-    "pseudonym": "Osallistuja-{code}"
+    "pseudonym": "Osallistuja-{code}",
+    "consents": {
+      "open": "Suostumuksesi",
+      "button": "Suostumukset",
+      "title": "Suostumuksesi",
+      "intro": "Voit antaa tai peruuttaa suostumuksesi milloin tahansa tapahtuman aikana. Jokainen muutos yhdistää kokouksen uudelleen muutamaksi sekunniksi.",
+      "given": "Suostumus annettu",
+      "notGiven": "Suostumusta ei annettu",
+      "withdraw": "Peruuta suostumus",
+      "confirmTitle": "Peruutetaanko suostumus?",
+      "confirm": "Peruuta",
+      "working": "Päivitetään…",
+      "error": "Suostumusta ei voitu päivittää: yritä uudelleen.",
+      "recording": {
+        "title": "Tapahtuman tallennus",
+        "give": "Suostun tallennukseen",
+        "without": {
+          "soloAscolto": "Ilman tätä suostumusta olet vain kuuntelija: mikrofoni, kamera ja näyttö pysyvät suljettuina.",
+          "conduce": "Ilman tätä suostumusta johdat silti, mutta äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin.",
+          "uscita": "Tähän tapahtumaan osallistuminen edellyttää suostumusta tallennukseen."
+        },
+        "alreadyRecorded": "Jo tallennettu jää tapahtuman videoon: pyydä poistoa järjestäjiltä.",
+        "withdraw": {
+          "soloAscolto": "Jos peruutat sen, jäät huoneeseen vain kuuntelijaksi: mikrofoni, kamera ja näyttö suljetaan. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
+          "uscita": "Jos peruutat sen, poistut kokouksesta ja palaat odotushuoneeseen: osallistuminen edellyttää suostumusta tallennukseen. Myös suostumuksesi puheenvuorojesi litterointiin peruutetaan.",
+          "conduce": "Jos peruutat sen, jatkat johtamista, mutta tästä lähtien äänesi ei jää henkilökohtaisille raidoille eikä litteraattiin. Huoneen video näyttää sinut silti, jos sitä tallennetaan."
+        }
+      },
+      "transcription": {
+        "title": "Puheenvuorojesi litterointi",
+        "give": "Suostun litterointiin",
+        "giveEffect": "Puheenvuorosi tulevat tapahtuman litteraattiin nimelläsi. Ilman suostumusta osallistut silti.",
+        "withdrawEffect": "Jos peruutat sen, jo litteroidut lauseesi menettävät tekstinsä ja nimesi, eikä ääntäsi tästä lähtien tallenneta omalle raidalle eikä litteroida.",
+        "needsRecording": "Voit antaa sen suostuttuasi tallennukseen."
+      }
+    }
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
-        "DATA_EXPORTED": "Tiedot viety"
+        "DATA_EXPORTED": "Tiedot viety",
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
       },
       "recordsAffected": "{count} tietuetta vaikuttunut",
       "colWhen": "Milloin",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Tiedot poistettu",
         "CONSENT_RECORDED": "Suostumus kirjattu",
-        "DATA_EXPORTED": "Tiedot viety"
+        "DATA_EXPORTED": "Tiedot viety",
+        "CONSENT_WITHDRAWN": "Suostumus peruutettu"
       }
     },
     "settings": {

@@ -53,6 +53,7 @@ import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
 import StageName from '@/components/live/stage-name';
 import ListenOnlyNotice from '@/components/live/listen-only-notice';
+import ConsentsDialog, { type ConsensiInSala } from '@/components/live/consents-dialog';
 import { regolaConsenso } from '@/lib/live/consent-rule';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
@@ -510,9 +511,20 @@ export default function LiveEventClient({
     registrazione: false,
     tracce: false,
   });
+  // I consensi ritirati dalla sala in questa visita (finestra «I tuoi
+  // consensi»): quelli che la pagina aveva trovato dati non valgono piu'.
+  const [ritirati, setRitirati] = useState<ProveConsenso>({ registrazione: false, tracce: false });
+  const haConsensoRegistrazione =
+    (hasRecordingConsent && !ritirati.registrazione) || consensiRegistrati.registrazione;
+  const haConsensoTracce = (hasMultitrackConsent && !ritirati.tracce) || consensiRegistrati.tracce;
+  // I token della sala consegnati in questa visita: provano i posti di chi
+  // ritira un consenso (lib/live/consent-withdrawal). Gli ultimi cinquanta:
+  // un ospite con la rete instabile ne riceve uno nuovo, con un posto nuovo,
+  // a ogni rientro.
+  const tokenSalaRef = useRef<string[]>([]);
   // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
   // chiederne il consenso, o se basta informare.
-  const consensoRegistrazione = consensoRegistrazioneIngresso({
+  const argomentiRegistrazione = {
     formato: {
       recordingEnabled: event.recordingEnabled,
       multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
@@ -523,9 +535,18 @@ export default function LiveEventClient({
     },
     registrazioneDisponibile: recordingAvailable,
     conduce: isModerator || isSpeaker,
-    giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
     istantanea: event.eventType === 'INSTANT',
+  };
+  const consensoRegistrazione = consensoRegistrazioneIngresso({
+    ...argomentiRegistrazione,
+    giaDato: haConsensoRegistrazione,
   });
+  // L'evento chiede a questa persona il consenso alla registrazione (dato o
+  // no): la finestra «I tuoi consensi» lo mostra.
+  const registrazioneChiesta = consensoRegistrazioneIngresso({
+    ...argomentiRegistrazione,
+    giaDato: false,
+  }).richiesto;
   // L'evento ha il solo ascolto per chi non acconsente (la stessa regola del
   // server, lib/live/listen-only): i blocchi della sala restano accesi.
   const salaSoloAscolto = regolaConsenso(
@@ -736,7 +757,8 @@ export default function LiveEventClient({
     const prove = consensiDaInviare(joinPrefs, {
       ...consensiRegistrati,
       registrazione:
-        consensiRegistrati.registrazione || ((isModerator || isSpeaker) && hasRecordingConsent),
+        consensiRegistrati.registrazione ||
+        ((isModerator || isSpeaker) && hasRecordingConsent && !ritirati.registrazione),
     });
     if (prove.registrazione) body.recordingConsent = true;
     if (prove.tracce) body.multitrackConsent = true;
@@ -824,6 +846,7 @@ export default function LiveEventClient({
         tracce: c.tracce || salvati.multitrack,
       }));
     }
+    tokenSalaRef.current = [...tokenSalaRef.current.filter((j) => j !== data.jwt), data.jwt].slice(-50);
     setCredentials(data);
     return 'fatto';
   }, [
@@ -840,6 +863,7 @@ export default function LiveEventClient({
     joinPrefs,
     consensiRegistrati,
     hasRecordingConsent,
+    ritirati.registrazione,
     locale,
   ]);
 
@@ -898,6 +922,97 @@ export default function LiveEventClient({
     // resta un messaggio nella fascia, non chiude la conferenza in corso.
     void richiediCredenziali(true, true).then((esito) => setRiconsenso(esito === 'fatto' ? 'no' : 'errore'));
   }, [riconsenso, richiediCredenziali]);
+
+  // ── I tuoi consensi, dalla sala ──
+  // Dare e ritirare i consensi in qualunque momento (components/live/
+  // consents-dialog). Dare passa dalla stessa strada del solo ascolto: un
+  // token nuovo con il consenso. Ritirare lo dice al server, con i token della
+  // sala di questa visita come prova dei posti, e poi chiede un token nuovo
+  // senza: la conferenza si ricollega e il registratore smette di registrare
+  // la voce. Chi senza consenso alla registrazione non puo' restare (niente
+  // solo ascolto) torna in sala d'attesa, dove la casella lo aspetta.
+  const [consensiAperti, setConsensiAperti] = useState(false);
+  const [ritiro, setRitiro] = useState<'no' | 'in-corso' | 'errore'>('no');
+  const effettoRitiro = isModerator || isSpeaker ? 'conduce' : salaSoloAscolto ? 'soloAscolto' : 'uscita';
+  // Dopo un ritiro la conferenza deve ricollegarsi senza il consenso: finche'
+  // resta sul token di prima, microfono, videocamera e registratore per voce
+  // valgono ancora. Tre tentativi; se non riesce, si esce dalla conferenza e
+  // la sala d'attesa fa rientrare con le scelte nuove.
+  const [ricollegamento, setRicollegamento] = useState<'no' | 'chiesto' | 'in-corso'>('no');
+  useEffect(() => {
+    if (ricollegamento !== 'chiesto') return;
+    setRicollegamento('in-corso');
+    void (async () => {
+      for (const attesa of [0, 1500, 4000]) {
+        if (attesa) await new Promise((r) => setTimeout(r, attesa));
+        if ((await richiediCredenziali(true, true)) === 'fatto') {
+          setRicollegamento('no');
+          return;
+        }
+      }
+      setRicollegamento('no');
+      setConsensiAperti(false);
+      setPhase('waiting');
+    })();
+  }, [ricollegamento, richiediCredenziali]);
+  const acconsentiInSalaDaFinestra = useCallback(() => {
+    setRitiro('no');
+    acconsentiInSala();
+  }, [acconsentiInSala]);
+  const acconsentiTrascrizioneInSala = useCallback(() => {
+    setRitiro('no');
+    setJoinPrefs((p) => ({ ...p, multitrackConsent: true }));
+    setRiconsenso('chiesto');
+  }, []);
+  const ritiraInSala = useCallback(
+    async (registrazione: boolean) => {
+      setRiconsenso((r) => (r === 'errore' ? 'no' : r));
+      setRitiro('in-corso');
+      const res = await richiestaJson(`/api/events/${event.slug}/consents/withdraw`, {
+        method: 'POST',
+        body: JSON.stringify({ roomTokens: tokenSalaRef.current, recording: registrazione }),
+      });
+      if (!res || !res.ok) {
+        setRitiro('errore');
+        return;
+      }
+      setRitirati((r) => ({ registrazione: r.registrazione || registrazione, tracce: true }));
+      setConsensiRegistrati((c) => ({
+        registrazione: registrazione ? false : c.registrazione,
+        tracce: false,
+      }));
+      setJoinPrefs((p) => ({
+        ...p,
+        multitrackConsent: false,
+        ...(registrazione ? { recordingConsent: false } : {}),
+      }));
+      setRitiro('no');
+      if (registrazione && effettoRitiro === 'uscita') {
+        setConsensiAperti(false);
+        setPhase('waiting');
+        return;
+      }
+      setRicollegamento('chiesto');
+    },
+    [event.slug, effettoRitiro],
+  );
+  const trascrizioneInSala =
+    (!!event.multitrackRecordingEnabled || !!event.captionsTranscript) && eventStatus !== 'ENDED';
+  const registrazioneData = haConsensoRegistrazione && !soloAscolto;
+  const consensiInSala: ConsensiInSala = {
+    ...(registrazioneChiesta
+      ? { registrazione: { dato: registrazioneData, ritiro: effettoRitiro } }
+      : {}),
+    ...(trascrizioneInSala
+      ? {
+          trascrizione: {
+            dato: haConsensoTracce,
+            serveRegistrazione: registrazioneChiesta && !registrazioneData,
+          },
+        }
+      : {}),
+  };
+  const haConsensiInSala = !!consensiInSala.registrazione || !!consensiInSala.trascrizione;
   const rientroConcluso = useCallback(() => {
     markEnded();
     userHangupRef.current = true;
@@ -1858,7 +1973,7 @@ export default function LiveEventClient({
           // chi conduce e a chi interviene: e' facoltativa, e decide se la loro
           // voce si registra e si trascrive. Non la si richiede a chi l'ha gia'
           // data (all'iscrizione, o in sala in questa visita della pagina).
-          multitrackConsentExempt={hasMultitrackConsent || consensiRegistrati.tracce}
+          multitrackConsentExempt={haConsensoTracce}
           recordingConsentRequired={consensoRegistrazione.richiesto}
           recordingConsentOptional={consensoRegistrazione.facoltativo}
           recordingListenOnly={consensoRegistrazione.soloAscolto}
@@ -2086,6 +2201,7 @@ export default function LiveEventClient({
         onLeaveRoom={handleLeaveRoom}
         soloContenuto={soloContenuto}
         onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
+        onApriConsensi={haConsensiInSala ? () => setConsensiAperti(true) : undefined}
       />
 
       {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
@@ -2349,6 +2465,26 @@ export default function LiveEventClient({
           }
         />
       </div>
+
+      {/* I consensi della persona per l'evento: darli e ritirarli. */}
+      {haConsensiInSala && (
+        <ConsentsDialog
+          aperta={consensiAperti}
+          onChiudi={() => setConsensiAperti(false)}
+          consensi={consensiInSala}
+          onAcconsentiRegistrazione={acconsentiInSalaDaFinestra}
+          onAcconsentiTrascrizione={acconsentiTrascrizioneInSala}
+          onRitira={(registrazione) => void ritiraInSala(registrazione)}
+          inCorso={
+            riconsenso === 'in-corso' ||
+            riconsenso === 'chiesto' ||
+            ritiro === 'in-corso' ||
+            ricollegamento !== 'no'
+          }
+          errore={riconsenso === 'errore' || ritiro === 'errore'}
+          container={modalContainer}
+        />
+      )}
 
       {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
       <Modal
@@ -3783,6 +3919,8 @@ interface LiveTopBarProps {
   /** Solo il contenuto: la colonna laterale chiusa del tutto. */
   soloContenuto?: boolean;
   onToggleSoloContenuto?: () => void;
+  /** I consensi della persona per l'evento, se l'evento ne chiede. */
+  onApriConsensi?: () => void;
 }
 
 function LiveTopBar({
@@ -3803,6 +3941,7 @@ function LiveTopBar({
   onLeaveRoom,
   soloContenuto = false,
   onToggleSoloContenuto,
+  onApriConsensi,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3944,6 +4083,22 @@ function LiveTopBar({
             title={soloContenuto ? t('showPanels') : t('contentOnly')}
           >
             <Icon icon={soloContenuto ? 'it-comment' : 'it-presentation'} size="xs" color="white" />
+          </Button>
+        )}
+        {onApriConsensi && (
+          // I consensi dati per l'evento, da rivedere, dare o ritirare.
+          <Button
+            color="light"
+            outline
+            size="xs"
+            className="d-inline-flex align-items-center gap-1 live-consents-btn"
+            onClick={onApriConsensi}
+            aria-haspopup="dialog"
+            aria-label={t('consents.open')}
+            title={t('consents.open')}
+          >
+            <Icon icon="it-locked" size="xs" color="white" />
+            <span className="d-none d-xl-inline">{t('consents.button')}</span>
           </Button>
         )}
         <LiveShareButton

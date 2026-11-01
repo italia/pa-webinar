@@ -656,7 +656,42 @@
       "joining": "Ponovni ulazak u sobu…",
       "error": "Ponovni ulazak nije uspio: pokušajte ponovno."
     },
-    "pseudonym": "Sudionik-{code}"
+    "pseudonym": "Sudionik-{code}",
+    "consents": {
+      "open": "Vaše privole",
+      "button": "Privole",
+      "title": "Vaše privole",
+      "intro": "Svoje privole možete dati ili povući u bilo kojem trenutku događaja. Svaka promjena na nekoliko sekundi ponovno povezuje konferenciju.",
+      "given": "Privola dana",
+      "notGiven": "Privola nije dana",
+      "withdraw": "Povuci privolu",
+      "confirmTitle": "Potvrđujete povlačenje?",
+      "confirm": "Povuci",
+      "working": "Ažuriranje…",
+      "error": "Privolu nije bilo moguće ažurirati: pokušajte ponovno.",
+      "recording": {
+        "title": "Snimanje događaja",
+        "give": "Pristajem na snimanje",
+        "without": {
+          "soloAscolto": "Bez ove privole samo slušate: mikrofon, kamera i zaslon ostaju zatvoreni.",
+          "conduce": "Bez ove privole i dalje vodite, ali vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji.",
+          "uscita": "Za sudjelovanje u ovom događaju potrebna je privola za snimanje."
+        },
+        "alreadyRecorded": "Ono što je već snimljeno ostaje u videozapisu događaja: za uklanjanje pišite organizatorima.",
+        "withdraw": {
+          "soloAscolto": "Ako je povučete, ostajete u dvorani i samo slušate: mikrofon, kamera i zaslon se zatvaraju. Povlačite i privolu za transkripciju svojih izlaganja.",
+          "uscita": "Ako je povučete, napuštate konferenciju i vraćate se u čekaonicu: za sudjelovanje je potrebna privola za snimanje. Povlačite i privolu za transkripciju svojih izlaganja.",
+          "conduce": "Ako je povučete, nastavljate voditi, ali od sada vaš glas ne ostaje u zasebnim zapisima osoba ni u transkripciji. Videozapis dvorane, ako se snima, i dalje vas prikazuje."
+        }
+      },
+      "transcription": {
+        "title": "Transkripcija vaših izlaganja",
+        "give": "Pristajem na transkripciju",
+        "giveEffect": "Vaša izlaganja ulaze u transkripciju događaja s vašim imenom. Bez privole svejedno sudjelujete.",
+        "withdrawEffect": "Ako je povučete, vaše već transkribirane rečenice gube tekst i ime, a od sada se vaš glas ne snima u zaseban zapis niti transkribira.",
+        "needsRecording": "Možete je dati nakon privole za snimanje."
+      }
+    }
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Podaci izbrisani",
         "CONSENT_RECORDED": "Privola zabilježena",
-        "DATA_EXPORTED": "Podaci izvezeni"
+        "DATA_EXPORTED": "Podaci izvezeni",
+        "CONSENT_WITHDRAWN": "Privola povučena"
       },
       "recordsAffected": "{count} obuhvaćenih zapisa",
       "colWhen": "Kada",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Podaci obrisani",
         "CONSENT_RECORDED": "Pristanak zabilježen",
-        "DATA_EXPORTED": "Podaci izvezeni"
+        "DATA_EXPORTED": "Podaci izvezeni",
+        "CONSENT_WITHDRAWN": "Privola povučena"
       }
     },
     "settings": {

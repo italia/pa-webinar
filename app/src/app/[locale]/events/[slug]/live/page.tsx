@@ -297,6 +297,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         consentRecording: true,
         consentMultitrack: true,
         consentMultitrackVersion: true,
+        consentRecordingWithdrawnAt: true,
+        consentMultitrackWithdrawnAt: true,
         joinedAt: true,
       },
     });
@@ -333,28 +335,32 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Dati all'iscrizione, o in sala d'attesa a un ingresso precedente (chi si
     // e' iscritto prima che l'evento registrasse): la prova sta legata
     // all'iscrizione solo nel browser che si e' iscritto.
-    const prove = { eventId: event.id, registrationId: registration.id };
+    // Un consenso ritirato dalla sala non vale piu' (lib/live/consent-withdrawal).
+    const prove = { eventId: event.id, registrationId: registration.id, withdrawnAt: null };
     // Per la trascrizione dai sottotitoli vale solo il consenso dato con il
     // testo che la comprende (lib/registration/consents): a chi aveva dato
     // quello per la sola traccia audio si richiede.
     const versioneMinima = captionsTranscriptActive(event, settings) ? VERSIONE_TESTO_TRASCRIZIONE : 1;
     const datoAllIscrizione =
       registration.consentMultitrack === true &&
+      !registration.consentMultitrackWithdrawnAt &&
       (registration.consentMultitrackVersion ?? 1) >= versioneMinima;
+    const registrazioneAllIscrizione =
+      registration.consentRecording === true && !registration.consentRecordingWithdrawnAt;
     const [proveTracce, proveRegistrazione] = ownsToken
       ? await Promise.all([
           !datoAllIscrizione &&
           (event.multitrackRecordingEnabled || captionsTranscriptActive(event, settings))
             ? prisma.multitrackConsent.count({ where: { ...prove, textVersion: { gte: versioneMinima } } })
             : 0,
-          registration.consentRecording !== true && event.recordingEnabled
+          !registrazioneAllIscrizione && event.recordingEnabled
             ? prisma.recordingConsent.count({ where: prove })
             : 0,
         ])
       : [0, 0];
     hasMultitrackConsent = ownsToken && (datoAllIscrizione || proveTracce > 0);
     hasRecordingConsent =
-      ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
+      ownsToken && (registrazioneAllIscrizione || proveRegistrazione > 0);
     // Solo per chi ha il proprio link: un link inoltrato non risponde a nome
     // di chi l'ha ricevuto.
     iscrizioneEntrata = ownsToken && registration.joinedAt !== null;
@@ -367,7 +373,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     const staff = await staffDietroIlPrimario(event.id);
     hasRecordingConsent = staff
       ? !!(await prisma.recordingConsent.findFirst({
-          where: { eventId: event.id, staffAccountId: staff.accountId },
+          where: { eventId: event.id, staffAccountId: staff.accountId, withdrawnAt: null },
           select: { id: true },
         }))
       : false;

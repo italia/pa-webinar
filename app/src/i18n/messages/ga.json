@@ -656,7 +656,42 @@
       "joining": "Ag filleadh ar an seomra…",
       "error": "Níorbh fhéidir filleadh: bain triail eile as."
     },
-    "pseudonym": "Rannpháirtí-{code}"
+    "pseudonym": "Rannpháirtí-{code}",
+    "consents": {
+      "open": "Do thoilithe",
+      "button": "Toilithe",
+      "title": "Do thoilithe",
+      "intro": "Is féidir leat do thoilithe a thabhairt nó a tharraingt siar ag am ar bith le linn na hócáide. Athnascann gach athrú an comhdháil ar feadh cúpla soicind.",
+      "given": "Toiliú tugtha",
+      "notGiven": "Níor tugadh toiliú",
+      "withdraw": "Tarraing siar an toiliú",
+      "confirmTitle": "An ndeimhníonn tú an tarraingt siar?",
+      "confirm": "Tarraing siar",
+      "working": "Á nuashonrú…",
+      "error": "Níorbh fhéidir an toiliú a nuashonrú: bain triail eile as.",
+      "recording": {
+        "title": "Taifeadadh na hócáide",
+        "give": "Toilím leis an taifeadadh",
+        "without": {
+          "soloAscolto": "Gan an toiliú seo bíonn tú ag éisteacht amháin: fanann an micreafón, an ceamara agus an scáileán dúnta.",
+          "conduce": "Gan an toiliú seo bíonn tú i gceannas fós, ach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn.",
+          "uscita": "Chun páirt a ghlacadh san ócáid seo, teastaíonn toiliú leis an taifeadadh."
+        },
+        "alreadyRecorded": "Fanann a bhfuil taifeadta cheana féin i bhfíseán na hócáide: chun é a bhaint, scríobh chuig na heagraithe.",
+        "withdraw": {
+          "soloAscolto": "Má tharraingíonn tú siar é, fanann tú sa seomra ag éisteacht amháin: dúntar an micreafón, an ceamara agus an scáileán. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
+          "uscita": "Má tharraingíonn tú siar é, fágann tú an chomhdháil agus filleann tú ar an seomra feithimh: teastaíonn toiliú leis an taifeadadh chun páirt a ghlacadh. Tarraingítear siar freisin do thoiliú le tras-scríobh a ndeir tú.",
+          "conduce": "Má tharraingíonn tú siar é, leanann tú ort i gceannas, ach as seo amach ní choinnítear do ghuth sna rianta in aghaidh an duine ná sa tras-scríbhinn. Taispeánann físeán an tseomra thú fós, má thaifeadtar é."
+        }
+      },
+      "transcription": {
+        "title": "Tras-scríobh a ndeir tú",
+        "give": "Toilím leis an tras-scríobh",
+        "giveEffect": "Téann a ndeir tú isteach i dtras-scríbhinn na hócáide faoi d'ainm. Gan é, glacann tú páirt fós.",
+        "withdrawEffect": "Má tharraingíonn tú siar é, cailleann na habairtí atá tras-scríofa cheana a dtéacs agus d'ainm, agus as seo amach ní thaifeadtar do ghuth ar rian ar leith ná ní thras-scríobhtar é.",
+        "needsRecording": "Is féidir leat é a thabhairt tar éis toiliú leis an taifeadadh."
+      }
+    }
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
-        "DATA_EXPORTED": "Sonraí easpórtáilte"
+        "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
       },
       "recordsAffected": "{count} taifead i gceist",
       "colWhen": "Cathain",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Sonraí scriosta",
         "CONSENT_RECORDED": "Toiliú taifeadta",
-        "DATA_EXPORTED": "Sonraí easpórtáilte"
+        "DATA_EXPORTED": "Sonraí easpórtáilte",
+        "CONSENT_WITHDRAWN": "Toiliú tarraingthe siar"
       }
     },
     "settings": {

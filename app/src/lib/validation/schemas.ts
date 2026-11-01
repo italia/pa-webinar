@@ -419,6 +419,17 @@ export const jitsiTokenRequestSchema = z.object({
 
 export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;
 
+/**
+ * Ritiro dalla sala dei consensi dati per l'evento (lib/live/consent-withdrawal).
+ * I posti si provano con i token della sala consegnati in questa visita della
+ * pagina; `recording` ritira anche il consenso alla registrazione (e con esso
+ * quello alla trascrizione), altrimenti solo quello alla trascrizione.
+ */
+export const consentWithdrawalSchema = z.object({
+  roomTokens: z.array(z.string().min(1).max(4096)).min(1).max(50),
+  recording: z.boolean(),
+}).strict();
+
 // ── Poll Schemas ────────────────────────────────────────
 
 export const createPollSchema = z.object({

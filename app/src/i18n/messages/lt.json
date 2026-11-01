@@ -656,7 +656,42 @@
       "joining": "Grįžtama į kambarį…",
       "error": "Nepavyko grįžti: bandykite dar kartą."
     },
-    "pseudonym": "Dalyvis-{code}"
+    "pseudonym": "Dalyvis-{code}",
+    "consents": {
+      "open": "Jūsų sutikimai",
+      "button": "Sutikimai",
+      "title": "Jūsų sutikimai",
+      "intro": "Savo sutikimus galite duoti arba atšaukti bet kuriuo renginio metu. Kiekvienas pakeitimas kelioms sekundėms iš naujo prijungia konferenciją.",
+      "given": "Sutikimas duotas",
+      "notGiven": "Sutikimas neduotas",
+      "withdraw": "Atšaukti sutikimą",
+      "confirmTitle": "Ar tikrai atšaukti?",
+      "confirm": "Atšaukti",
+      "working": "Atnaujinama…",
+      "error": "Sutikimo atnaujinti nepavyko: bandykite dar kartą.",
+      "recording": {
+        "title": "Renginio įrašymas",
+        "give": "Sutinku su įrašymu",
+        "without": {
+          "soloAscolto": "Be šio sutikimo tik klausotės: mikrofonas, kamera ir ekranas lieka uždaryti.",
+          "conduce": "Be šio sutikimo vis tiek vedate, bet jūsų balsas nelieka atskirų asmenų takeliuose ir nuorašuose.",
+          "uscita": "Norint dalyvauti šiame renginyje, reikia sutikimo įrašymui."
+        },
+        "alreadyRecorded": "Tai, kas jau įrašyta, lieka renginio vaizdo įraše: norėdami tai pašalinti, parašykite organizatoriams.",
+        "withdraw": {
+          "soloAscolto": "Jei jį atšauksite, liksite salėje tik klausydamiesi: mikrofonas, kamera ir ekranas užsidarys. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
+          "uscita": "Jei jį atšauksite, išeisite iš konferencijos ir grįšite į laukiamąjį: dalyvauti galima tik sutikus su įrašymu. Atšauksite ir sutikimą transkribuoti jūsų pasisakymus.",
+          "conduce": "Jei jį atšauksite, toliau vesite, bet nuo šiol jūsų balsas neliks atskirų asmenų takeliuose ir nuorašuose. Salės vaizdo įrašas, jei įrašinėjamas, jus vis tiek rodo."
+        }
+      },
+      "transcription": {
+        "title": "Jūsų pasisakymų transkripcija",
+        "give": "Sutinku su transkripcija",
+        "giveEffect": "Jūsų pasisakymai patenka į renginio nuorašą su jūsų vardu. Be sutikimo vis tiek dalyvaujate.",
+        "withdrawEffect": "Jei jį atšauksite, jūsų jau transkribuoti sakiniai neteks teksto ir vardo, o nuo šiol jūsų balsas nebus nei įrašomas atskirame takelyje, nei transkribuojamas.",
+        "needsRecording": "Jį galite duoti sutikę su įrašymu."
+      }
+    }
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Duomenys pašalinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
-        "DATA_EXPORTED": "Duomenys eksportuoti"
+        "DATA_EXPORTED": "Duomenys eksportuoti",
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
       },
       "recordsAffected": "{count} susiję įrašai",
       "colWhen": "Kada",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Duomenys ištrinti",
         "CONSENT_RECORDED": "Sutikimas užregistruotas",
-        "DATA_EXPORTED": "Duomenys eksportuoti"
+        "DATA_EXPORTED": "Duomenys eksportuoti",
+        "CONSENT_WITHDRAWN": "Sutikimas atšauktas"
       }
     },
     "settings": {

@@ -656,7 +656,42 @@
       "joining": "Opnieuw de ruimte in…",
       "error": "Opnieuw binnenkomen mislukt: probeer het opnieuw."
     },
-    "pseudonym": "Deelnemer-{code}"
+    "pseudonym": "Deelnemer-{code}",
+    "consents": {
+      "open": "Je toestemmingen",
+      "button": "Toestemmingen",
+      "title": "Je toestemmingen",
+      "intro": "Je kunt je toestemmingen op elk moment tijdens het evenement geven of intrekken. Bij elke wijziging wordt de vergadering een paar seconden opnieuw verbonden.",
+      "given": "Toestemming gegeven",
+      "notGiven": "Toestemming niet gegeven",
+      "withdraw": "Toestemming intrekken",
+      "confirmTitle": "Toestemming echt intrekken?",
+      "confirm": "Intrekken",
+      "working": "Bezig met bijwerken…",
+      "error": "De toestemming kon niet worden bijgewerkt: probeer het opnieuw.",
+      "recording": {
+        "title": "Opname van het evenement",
+        "give": "Ik geef toestemming voor de opname",
+        "without": {
+          "soloAscolto": "Zonder deze toestemming luister je alleen mee: microfoon, camera en scherm blijven dicht.",
+          "conduce": "Zonder deze toestemming leid je gewoon, maar je stem blijft niet in de sporen per persoon of in de transcriptie.",
+          "uscita": "Voor deelname aan dit evenement is toestemming voor de opname nodig."
+        },
+        "alreadyRecorded": "Wat al is opgenomen, blijft in de video van het evenement: schrijf de organisatoren om het te laten verwijderen.",
+        "withdraw": {
+          "soloAscolto": "Als je hem intrekt, blijf je in de zaal en luister je alleen mee: microfoon, camera en scherm gaan dicht. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
+          "uscita": "Als je hem intrekt, verlaat je de vergadering en ga je terug naar de wachtruimte: voor deelname is toestemming voor de opname nodig. Je toestemming voor de transcriptie van je bijdragen wordt ook ingetrokken.",
+          "conduce": "Als je hem intrekt, blijf je leiden, maar vanaf nu blijft je stem niet in de sporen per persoon of in de transcriptie. De video van de zaal, als die wordt opgenomen, laat je toch zien."
+        }
+      },
+      "transcription": {
+        "title": "Transcriptie van je bijdragen",
+        "give": "Ik geef toestemming voor de transcriptie",
+        "giveEffect": "Je bijdragen komen met je naam in de transcriptie van het evenement. Zonder toestemming doe je gewoon mee.",
+        "withdrawEffect": "Als je hem intrekt, verliezen je al getranscribeerde zinnen hun tekst en je naam, en vanaf nu wordt je stem niet meer op een apart spoor opgenomen of getranscribeerd.",
+        "needsRecording": "Je kunt hem geven na toestemming voor de opname."
+      }
+    }
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
-        "DATA_EXPORTED": "Gegevens geëxporteerd"
+        "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
       },
       "recordsAffected": "{count} betrokken records",
       "colWhen": "Wanneer",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Gegevens verwijderd",
         "CONSENT_RECORDED": "Toestemming geregistreerd",
-        "DATA_EXPORTED": "Gegevens geëxporteerd"
+        "DATA_EXPORTED": "Gegevens geëxporteerd",
+        "CONSENT_WITHDRAWN": "Toestemming ingetrokken"
       }
     },
     "settings": {

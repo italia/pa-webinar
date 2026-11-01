@@ -14,6 +14,7 @@ import {
   updateQuestionSchema,
   upvoteQuestionSchema,
   jitsiTokenRequestSchema,
+  consentWithdrawalSchema,
   createPollSchema,
   updatePollStatusSchema,
   pollVoteSchema,
@@ -243,6 +244,22 @@ registry.registerPath({
   responses: {
     200: { description: 'JWT token, room name, display name, role' },
     403: { description: 'Guest request refused: GUEST_ACCESS_DISABLED (guest access turned off, scheduled events only) or JOIN_PASSWORD_REQUIRED (password-protected event without the join grant cookie)' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/consents/withdraw',
+  tags: ['Jitsi'],
+  summary: 'Withdraw consents given for the event',
+  description:
+    'Withdraws the transcription consent and, with `recording: true`, the recording consent too. ' +
+    'The caller proves its seats with the room tokens (Jitsi JWTs) the portal issued to it; ' +
+    'tokens up to one day past expiry still count. The proofs stay, with the withdrawal time.',
+  request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: consentWithdrawalSchema } } } },
+  responses: {
+    200: { description: '`withdrawn.recording` and `withdrawn.transcription`: whether there was a consent to withdraw' },
+    401: { description: 'None of the room tokens is valid for this event' },
   },
 });
 

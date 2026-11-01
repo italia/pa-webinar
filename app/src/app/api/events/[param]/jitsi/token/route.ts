@@ -104,8 +104,46 @@ async function registraConsensi(
   // Due prove indipendenti: si scrivono insieme, sul percorso d'ingresso.
   const [recording, multitrack] = await Promise.all([
     registrazione &&
-      alMeglio('recording', () =>
-        prisma.recordingConsent.createMany({
+      alMeglio('recording', async () => {
+        // Ridato dopo un ritiro dalla sala (lib/live/consent-withdrawal): la
+        // prova dell'iscrizione e' una sola (vincolo unico), e torna valida
+        // con l'ora nuova; il consenso di prima e il ritiro restano nel
+        // registro GDPR dell'evento, senza dati personali.
+        const ritirata = registrationId
+          ? await prisma.recordingConsent.findFirst({
+              where: { eventId: event.id, registrationId, withdrawnAt: { not: null } },
+              select: { consentedAt: true, withdrawnAt: true },
+            })
+          : null;
+        if (registrationId && ritirata) {
+          const ridata = await prisma.recordingConsent.updateMany({
+            where: { eventId: event.id, registrationId, withdrawnAt: { not: null } },
+            data: {
+              withdrawnAt: null,
+              consentedAt: new Date(),
+              jitsiUserId: posto.jitsiUserId,
+              displayName: encryptPII(posto.displayName),
+              locale: data.locale ?? null,
+            },
+          });
+          if (ridata.count > 0) {
+            await prisma.gdprAuditLog.create({
+              data: {
+                eventId: event.id,
+                action: 'CONSENT_RECORDED',
+                recordCount: 1,
+                details: JSON.stringify({
+                  source: 'room',
+                  kind: 'recording',
+                  givenAgain: true,
+                  previousConsentedAt: ritirata.consentedAt.toISOString(),
+                  withdrawnAt: ritirata.withdrawnAt?.toISOString() ?? null,
+                }),
+              },
+            });
+          }
+        }
+        await prisma.recordingConsent.createMany({
           data: [
             {
               ...prova(),
@@ -114,8 +152,8 @@ async function registraConsensi(
             },
           ],
           skipDuplicates: true,
-        }),
-      ),
+        });
+      }),
     tracce &&
       alMeglio('multitrack', async () => {
         // Una prova per iscrizione e per testo: chi l'aveva data con il testo
@@ -127,6 +165,7 @@ async function registraConsensi(
                 eventId: event.id,
                 registrationId,
                 textVersion: { gte: VERSIONE_TESTO_TRASCRIZIONE },
+                withdrawnAt: null,
               },
               select: { id: true },
             })
@@ -330,12 +369,13 @@ export const POST = withErrorHandling(async (request, context) => {
     // Il consenso dell'iscritto: dato all'iscrizione, in sala d'attesa ora o
     // in una visita precedente (la prova resta legata all'iscrizione). La
     // lettura serve solo a chi non l'ha dato ne' ora ne' all'iscrizione.
+    // Un consenso ritirato dalla sala non vale piu' (lib/live/consent-withdrawal).
     const consensoIscritto =
       parsed.data.recordingConsent === true ||
-      registration.consentRecording === true ||
+      (registration.consentRecording === true && !registration.consentRecordingWithdrawnAt) ||
       (regola.richiesto &&
         (await prisma.recordingConsent.findFirst({
-          where: { eventId: event.id, registrationId: registration.id },
+          where: { eventId: event.id, registrationId: registration.id, withdrawnAt: null },
           select: { id: true },
         })) !== null);
     const mediaIscritto = mediaPartecipante(consensoIscritto);

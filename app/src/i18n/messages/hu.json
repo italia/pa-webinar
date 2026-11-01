@@ -656,7 +656,42 @@
       "joining": "Visszalépés a terembe…",
       "error": "Nem sikerült visszalépni: próbálja újra."
     },
-    "pseudonym": "Résztvevő-{code}"
+    "pseudonym": "Résztvevő-{code}",
+    "consents": {
+      "open": "Az Ön hozzájárulásai",
+      "button": "Hozzájárulások",
+      "title": "Az Ön hozzájárulásai",
+      "intro": "Hozzájárulásait az esemény alatt bármikor megadhatja vagy visszavonhatja. Minden változtatás néhány másodpercre újracsatlakoztatja a konferenciát.",
+      "given": "Hozzájárulás megadva",
+      "notGiven": "Hozzájárulás nincs megadva",
+      "withdraw": "Hozzájárulás visszavonása",
+      "confirmTitle": "Biztosan visszavonja?",
+      "confirm": "Visszavonás",
+      "working": "Frissítés folyamatban…",
+      "error": "A hozzájárulást nem sikerült frissíteni: próbálja újra.",
+      "recording": {
+        "title": "Az esemény felvétele",
+        "give": "Hozzájárulok a felvételhez",
+        "without": {
+          "soloAscolto": "E hozzájárulás nélkül csak hallgatóként vesz részt: a mikrofon, a kamera és a képernyő zárva marad.",
+          "conduce": "E hozzájárulás nélkül is vezetheti az eseményt, de a hangja nem marad meg a személyenkénti sávokban és az átiratban.",
+          "uscita": "Az eseményen való részvételhez hozzájárulás szükséges a felvételhez."
+        },
+        "alreadyRecorded": "Ami már felvételre került, az az esemény videójában marad: az eltávolításért írjon a szervezőknek.",
+        "withdraw": {
+          "soloAscolto": "Ha visszavonja, a teremben marad, de csak hallgatóként: a mikrofon, a kamera és a képernyő bezárul. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
+          "uscita": "Ha visszavonja, kilép a konferenciából és visszakerül a váróterembe: a részvételhez hozzájárulás szükséges a felvételhez. A hozzászólásai átiratához adott hozzájárulását is visszavonja.",
+          "conduce": "Ha visszavonja, tovább vezeti az eseményt, de mostantól a hangja nem marad meg a személyenkénti sávokban és az átiratban. A terem videója, ha készül felvétel, így is mutatja Önt."
+        }
+      },
+      "transcription": {
+        "title": "A hozzászólásai átirata",
+        "give": "Hozzájárulok az átirathoz",
+        "giveEffect": "A hozzászólásai a nevével együtt bekerülnek az esemény átiratába. Hozzájárulás nélkül is részt vehet.",
+        "withdrawEffect": "Ha visszavonja, a már átírt mondatai elveszítik a szövegüket és a nevét, és mostantól a hangját sem külön sávon nem rögzítjük, sem át nem írjuk.",
+        "needsRecording": "A felvételhez adott hozzájárulás után adhatja meg."
+      }
+    }
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
-        "DATA_EXPORTED": "Adatok exportálva"
+        "DATA_EXPORTED": "Adatok exportálva",
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
       },
       "recordsAffected": "{count} érintett rekord",
       "colWhen": "Mikor",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Adatok törölve",
         "CONSENT_RECORDED": "Hozzájárulás rögzítve",
-        "DATA_EXPORTED": "Adatok exportálva"
+        "DATA_EXPORTED": "Adatok exportálva",
+        "CONSENT_WITHDRAWN": "Hozzájárulás visszavonva"
       }
     },
     "settings": {

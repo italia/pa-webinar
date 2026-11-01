@@ -10,8 +10,11 @@ vi.mock('@/lib/db', () => ({
     recording: { findUnique: vi.fn() },
     speaker: { findMany: vi.fn(async () => []) },
     postprodArtifact: { findFirst: vi.fn(async () => null) },
+    recordingTrack: { findMany: vi.fn(async () => []) },
   },
 }));
+const ritirati = vi.hoisted(() => vi.fn(async () => new Set<string>()));
+vi.mock('@/lib/captions/room', () => ({ endpointRitirati: ritirati }));
 const ingressi = vi.hoisted(() => ({
   trascrizione: vi.fn(async () => ({ downloadUrl: 'https://archivio/trascrizione', blobKey: 'postprod/e/r/001/transcript.raw.json' })),
   sottotitoli: vi.fn(async () => null),
@@ -165,6 +168,43 @@ describe('POST /api/internal/postprod-claim', () => {
     const body = (await res.json()) as { inputs: Array<{ role: string; downloadUrl: string }> };
     expect(ingressi.trascrizione).toHaveBeenCalledWith(expect.objectContaining({ id: recordingId, runCount: 1 }), expect.any(Number));
     expect(body.inputs).toContainEqual(expect.objectContaining({ role: 'transcript', downloadUrl: 'https://archivio/trascrizione' }));
+  });
+
+  it('le tracce di chi ha ritirato il consenso alla trascrizione non passano al worker', async () => {
+    const recordingId = '22222222-3333-4444-8555-666666666667';
+    const eventId = '11111111-2222-4333-8444-555555555555';
+    fn(prisma.$queryRaw).mockResolvedValueOnce([
+      {
+        id: '66666666-7777-4888-8999-000000000002',
+        recording_id: recordingId,
+        kind: 'TRANSCRIBE_MULTITRACK',
+        payload: { runId: '77777777-8888-4999-8aaa-bbbbbbbbbbbc', sourceLanguage: 'it' },
+        attempts: 1,
+        next_attempt_at: new Date(),
+        depends_on_id: null,
+      },
+    ]);
+    fn(prisma.recording.findUnique).mockResolvedValueOnce({
+      id: recordingId,
+      eventId,
+      runCount: 1,
+      sourceLanguage: 'it',
+      blobKey: 'recordings/y.mp4',
+      event: { id: eventId, slug: 'e', aiTargetLocales: [], title: { it: 'E' }, organizerName: null, speakersInfo: null, expectedSpeakers: null, agendaItems: [] },
+      callSession: null,
+      _count: { tracks: 2 },
+    });
+    fn(prisma.recordingTrack.findMany).mockResolvedValueOnce([
+      { participantId: 'ep-resta', displayName: null, blobKey: 'tracce/ep-resta-1.ogg', startOffsetMs: 0 },
+      { participantId: 'ep-ritirato', displayName: null, blobKey: 'tracce/ep-ritirato-1.ogg', startOffsetMs: 10 },
+    ]);
+    ritirati.mockResolvedValueOnce(new Set(['ep-ritirato']));
+    const res = await claim({ workerId: 'w-gpu', kinds: ['TRANSCRIBE_MULTITRACK'] });
+    expect(res.status).toBe(200);
+    expect(ritirati).toHaveBeenCalledWith(eventId, ['ep-resta', 'ep-ritirato']);
+    const body = (await res.json()) as { inputs: Array<{ role: string; participantId?: string }> };
+    const tracce = body.inputs.filter((i) => i.role === 'track').map((i) => i.participantId);
+    expect(tracce).toEqual(['ep-resta']);
   });
 
   describe('traduzione di titolo e descrizione (TRANSLATE_TEXT)', () => {

@@ -656,7 +656,42 @@
       "joining": "Erneuter Eintritt in den Raum…",
       "error": "Erneuter Eintritt fehlgeschlagen: bitte erneut versuchen."
     },
-    "pseudonym": "Teilnehmende-{code}"
+    "pseudonym": "Teilnehmende-{code}",
+    "consents": {
+      "open": "Ihre Einwilligungen",
+      "button": "Einwilligungen",
+      "title": "Ihre Einwilligungen",
+      "intro": "Sie können Ihre Einwilligungen während der Veranstaltung jederzeit erteilen oder widerrufen. Jede Änderung verbindet die Konferenz für einige Sekunden neu.",
+      "given": "Einwilligung erteilt",
+      "notGiven": "Einwilligung nicht erteilt",
+      "withdraw": "Einwilligung widerrufen",
+      "confirmTitle": "Einwilligung wirklich widerrufen?",
+      "confirm": "Widerrufen",
+      "working": "Wird aktualisiert…",
+      "error": "Die Einwilligung konnte nicht aktualisiert werden: Bitte versuchen Sie es erneut.",
+      "recording": {
+        "title": "Aufzeichnung der Veranstaltung",
+        "give": "Ich willige in die Aufzeichnung ein",
+        "without": {
+          "soloAscolto": "Ohne diese Einwilligung hören Sie nur zu: Mikrofon, Kamera und Bildschirm bleiben geschlossen.",
+          "conduce": "Ohne diese Einwilligung moderieren Sie trotzdem, aber Ihre Stimme bleibt weder in den Einzelspuren noch im Transkript.",
+          "uscita": "Für die Teilnahme an dieser Veranstaltung ist die Einwilligung in die Aufzeichnung erforderlich."
+        },
+        "alreadyRecorded": "Bereits Aufgezeichnetes bleibt im Video der Veranstaltung: Wenden Sie sich für die Entfernung an die Organisatoren.",
+        "withdraw": {
+          "soloAscolto": "Wenn Sie sie widerrufen, bleiben Sie im Raum und hören nur zu: Mikrofon, Kamera und Bildschirm werden geschlossen. Auch Ihre Einwilligung in die Transkription Ihrer Beiträge wird widerrufen.",
+          "uscita": "Wenn Sie sie widerrufen, verlassen Sie die Konferenz und kehren in den Warteraum zurück: Für die Teilnahme ist die Einwilligung in die Aufzeichnung erforderlich. Auch Ihre Einwilligung in die Transkription Ihrer Beiträge wird widerrufen.",
+          "conduce": "Wenn Sie sie widerrufen, moderieren Sie weiter, aber ab jetzt bleibt Ihre Stimme weder in den Einzelspuren noch im Transkript. Das Video des Raums zeigt Sie, falls es aufgezeichnet wird, trotzdem."
+        }
+      },
+      "transcription": {
+        "title": "Transkription Ihrer Beiträge",
+        "give": "Ich willige in die Transkription ein",
+        "giveEffect": "Ihre Beiträge kommen mit Ihrem Namen in das Transkript der Veranstaltung. Ohne Einwilligung nehmen Sie trotzdem teil.",
+        "withdrawEffect": "Wenn Sie sie widerrufen, verlieren Ihre bereits transkribierten Sätze Text und Namen, und ab jetzt wird Ihre Stimme weder auf einer eigenen Spur aufgezeichnet noch transkribiert.",
+        "needsRecording": "Sie können sie nach der Einwilligung in die Aufzeichnung erteilen."
+      }
+    }
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
-        "DATA_EXPORTED": "Daten exportiert"
+        "DATA_EXPORTED": "Daten exportiert",
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
       },
       "recordsAffected": "{count} betroffene Datensätze",
       "colWhen": "Wann",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Daten gelöscht",
         "CONSENT_RECORDED": "Einwilligung erfasst",
-        "DATA_EXPORTED": "Daten exportiert"
+        "DATA_EXPORTED": "Daten exportiert",
+        "CONSENT_WITHDRAWN": "Einwilligung widerrufen"
       }
     },
     "settings": {

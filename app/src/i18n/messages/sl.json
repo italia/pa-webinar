@@ -656,7 +656,42 @@
       "joining": "Ponoven vstop v sobo…",
       "error": "Ponoven vstop ni uspel: poskusite znova."
     },
-    "pseudonym": "Udeleženec-{code}"
+    "pseudonym": "Udeleženec-{code}",
+    "consents": {
+      "open": "Vaše privolitve",
+      "button": "Privolitve",
+      "title": "Vaše privolitve",
+      "intro": "Svoje privolitve lahko kadar koli med dogodkom date ali prekličete. Vsaka sprememba za nekaj sekund znova poveže konferenco.",
+      "given": "Privolitev dana",
+      "notGiven": "Privolitev ni dana",
+      "withdraw": "Prekliči privolitev",
+      "confirmTitle": "Res prekličete?",
+      "confirm": "Prekliči",
+      "working": "Posodabljanje…",
+      "error": "Privolitve ni bilo mogoče posodobiti: poskusite znova.",
+      "recording": {
+        "title": "Snemanje dogodka",
+        "give": "Privolim v snemanje",
+        "without": {
+          "soloAscolto": "Brez te privolitve samo poslušate: mikrofon, kamera in zaslon ostanejo zaprti.",
+          "conduce": "Brez te privolitve vseeno vodite, vendar vaš glas ne ostane v posameznih sledeh niti v prepisu.",
+          "uscita": "Za udeležbo na tem dogodku je potrebna privolitev v snemanje."
+        },
+        "alreadyRecorded": "Kar je že posneto, ostane v videu dogodka: za odstranitev pišite organizatorjem.",
+        "withdraw": {
+          "soloAscolto": "Če jo prekličete, ostanete v dvorani in samo poslušate: mikrofon, kamera in zaslon se zaprejo. Prekličete tudi privolitev v prepis svojih govorov.",
+          "uscita": "Če jo prekličete, zapustite konferenco in se vrnete v čakalnico: za udeležbo je potrebna privolitev v snemanje. Prekličete tudi privolitev v prepis svojih govorov.",
+          "conduce": "Če jo prekličete, vodite naprej, vendar od zdaj vaš glas ne ostane v posameznih sledeh niti v prepisu. Video dvorane, če se snema, vas vseeno prikazuje."
+        }
+      },
+      "transcription": {
+        "title": "Prepis vaših govorov",
+        "give": "Privolim v prepis",
+        "giveEffect": "Vaši govori pridejo v prepis dogodka z vašim imenom. Brez privolitve vseeno sodelujete.",
+        "withdrawEffect": "Če jo prekličete, vaši že prepisani stavki izgubijo besedilo in ime, od zdaj pa se vaš glas ne snema na ločeno sled in se ne prepisuje.",
+        "needsRecording": "Date jo lahko po privolitvi v snemanje."
+      }
+    }
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Izbrisani podatki",
         "CONSENT_RECORDED": "Zabeleženo soglasje",
-        "DATA_EXPORTED": "Izvoženi podatki"
+        "DATA_EXPORTED": "Izvoženi podatki",
+        "CONSENT_WITHDRAWN": "Privolitev preklicana"
       },
       "recordsAffected": "{count} prizadetih zapisov",
       "colWhen": "Kdaj",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Podatki izbrisani",
         "CONSENT_RECORDED": "Soglasje zabeleženo",
-        "DATA_EXPORTED": "Podatki izvoženi"
+        "DATA_EXPORTED": "Podatki izvoženi",
+        "CONSENT_WITHDRAWN": "Privolitev preklicana"
       }
     },
     "settings": {

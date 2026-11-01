@@ -656,7 +656,42 @@
       "joining": "Reintri în sală…",
       "error": "Nu s-a putut reintra: încearcă din nou."
     },
-    "pseudonym": "Participant-{code}"
+    "pseudonym": "Participant-{code}",
+    "consents": {
+      "open": "Consimțămintele tale",
+      "button": "Consimțăminte",
+      "title": "Consimțămintele tale",
+      "intro": "Poți da sau retrage consimțămintele oricând în timpul evenimentului. Fiecare modificare reconectează conferința pentru câteva secunde.",
+      "given": "Consimțământ dat",
+      "notGiven": "Consimțământ nedat",
+      "withdraw": "Retrage consimțământul",
+      "confirmTitle": "Confirmi retragerea?",
+      "confirm": "Retrage",
+      "working": "Se actualizează…",
+      "error": "Consimțământul nu a putut fi actualizat: încearcă din nou.",
+      "recording": {
+        "title": "Înregistrarea evenimentului",
+        "give": "Sunt de acord cu înregistrarea",
+        "without": {
+          "soloAscolto": "Fără acest consimțământ doar asculți: microfonul, camera și ecranul rămân închise.",
+          "conduce": "Fără acest consimțământ conduci în continuare, dar vocea ta nu rămâne în pistele per persoană și nici în transcriere.",
+          "uscita": "Pentru a participa la acest eveniment este necesar consimțământul la înregistrare."
+        },
+        "alreadyRecorded": "Ce a fost deja înregistrat rămâne în videoclipul evenimentului: pentru a-l elimina, scrie organizatorilor.",
+        "withdraw": {
+          "soloAscolto": "Dacă îl retragi, rămâi în sală doar ca ascultător: microfonul, camera și ecranul se închid. Retragi și consimțământul la transcrierea intervențiilor tale.",
+          "uscita": "Dacă îl retragi, ieși din conferință și revii în sala de așteptare: pentru a participa este necesar consimțământul la înregistrare. Retragi și consimțământul la transcrierea intervențiilor tale.",
+          "conduce": "Dacă îl retragi, continui să conduci, dar de acum vocea ta nu rămâne în pistele per persoană și nici în transcriere. Videoclipul sălii, dacă este înregistrat, te arată în continuare."
+        }
+      },
+      "transcription": {
+        "title": "Transcrierea intervențiilor tale",
+        "give": "Sunt de acord cu transcrierea",
+        "giveEffect": "Intervențiile tale intră în transcrierea evenimentului cu numele tău. Fără acest consimțământ participi în continuare.",
+        "withdrawEffect": "Dacă îl retragi, frazele tale deja transcrise își pierd textul și numele, iar de acum vocea ta nu mai este înregistrată pe o pistă separată și nici transcrisă.",
+        "needsRecording": "Îl poți da după consimțământul la înregistrare."
+      }
+    }
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
-        "DATA_EXPORTED": "Date exportate"
+        "DATA_EXPORTED": "Date exportate",
+        "CONSENT_WITHDRAWN": "Consimțământ retras"
       },
       "recordsAffected": "{count} înregistrări afectate",
       "colWhen": "Când",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Date șterse",
         "CONSENT_RECORDED": "Consimțământ înregistrat",
-        "DATA_EXPORTED": "Date exportate"
+        "DATA_EXPORTED": "Date exportate",
+        "CONSENT_WITHDRAWN": "Consimțământ retras"
       }
     },
     "settings": {

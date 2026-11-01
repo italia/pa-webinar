@@ -233,6 +233,16 @@ holds for a given installation is for the controller to confirm in its DPIA.
 A per-participant track exists to be transcribed. After that, only the
 attributed text is needed.
 
+A person who withdraws the transcription consent from the room
+([Withdrawing consent](../GDPR.md#withdrawing-consent)) is not recorded from
+the reconnection on, and the tracks recorded before are no longer handed to
+the transcription: the claim of a per-participant transcription or of an
+archive leaves out every track whose bridge endpoint belongs to a seat with a
+withdrawn consent and no consent given again
+(`app/src/app/api/internal/postprod-claim/route.ts`). The next
+`multitrack-purge` run deletes those track files, also when the event keeps
+participant tracks, unless a job that already took them is still running.
+
 ```mermaid
 flowchart LR
     gate["Transcription consent<br/>registration form or waiting room<br/>(consentMultitrack, MultitrackConsent)"]

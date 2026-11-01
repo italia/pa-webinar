@@ -656,7 +656,42 @@
       "joining": "Atkārtota ieiešana telpā…",
       "error": "Neizdevās atgriezties: mēģiniet vēlreiz."
     },
-    "pseudonym": "Dalībnieks-{code}"
+    "pseudonym": "Dalībnieks-{code}",
+    "consents": {
+      "open": "Jūsu piekrišanas",
+      "button": "Piekrišanas",
+      "title": "Jūsu piekrišanas",
+      "intro": "Savas piekrišanas varat dot vai atsaukt jebkurā pasākuma brīdī. Katra izmaiņa uz dažām sekundēm atkārtoti savieno konferenci.",
+      "given": "Piekrišana dota",
+      "notGiven": "Piekrišana nav dota",
+      "withdraw": "Atsaukt piekrišanu",
+      "confirmTitle": "Vai tiešām atsaukt?",
+      "confirm": "Atsaukt",
+      "working": "Notiek atjaunināšana…",
+      "error": "Piekrišanu neizdevās atjaunināt: mēģiniet vēlreiz.",
+      "recording": {
+        "title": "Pasākuma ieraksts",
+        "give": "Piekrītu ierakstam",
+        "without": {
+          "soloAscolto": "Bez šīs piekrišanas jūs tikai klausāties: mikrofons, kamera un ekrāns paliek aizvērti.",
+          "conduce": "Bez šīs piekrišanas jūs tāpat vadāt, bet jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā.",
+          "uscita": "Lai piedalītos šajā pasākumā, nepieciešama piekrišana ierakstam."
+        },
+        "alreadyRecorded": "Tas, kas jau ierakstīts, paliek pasākuma video: lai to izņemtu, rakstiet organizatoriem.",
+        "withdraw": {
+          "soloAscolto": "Ja to atsaucat, paliekat telpā tikai kā klausītājs: mikrofons, kamera un ekrāns tiek aizvērti. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
+          "uscita": "Ja to atsaucat, jūs pametat konferenci un atgriežaties uzgaidāmajā telpā: dalībai nepieciešama piekrišana ierakstam. Tiek atsaukta arī piekrišana jūsu runas atšifrēšanai.",
+          "conduce": "Ja to atsaucat, jūs turpināt vadīt, bet turpmāk jūsu balss nepaliek atsevišķo personu celiņos un atšifrējumā. Telpas video, ja tas tiek ierakstīts, jūs tāpat rāda."
+        }
+      },
+      "transcription": {
+        "title": "Jūsu runas atšifrēšana",
+        "give": "Piekrītu atšifrēšanai",
+        "giveEffect": "Jūsu runa tiek iekļauta pasākuma atšifrējumā ar jūsu vārdu. Bez piekrišanas jūs tāpat piedalāties.",
+        "withdrawEffect": "Ja to atsaucat, jūsu jau atšifrētie teikumi zaudē tekstu un vārdu, un turpmāk jūsu balss netiek ierakstīta atsevišķā celiņā un netiek atšifrēta.",
+        "needsRecording": "To var dot pēc piekrišanas ierakstam."
+      }
+    }
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
-        "DATA_EXPORTED": "Dati eksportēti"
+        "DATA_EXPORTED": "Dati eksportēti",
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
       },
       "recordsAffected": "{count} ietekmēti ieraksti",
       "colWhen": "Kad",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Dati dzēsti",
         "CONSENT_RECORDED": "Piekrišana reģistrēta",
-        "DATA_EXPORTED": "Dati eksportēti"
+        "DATA_EXPORTED": "Dati eksportēti",
+        "CONSENT_WITHDRAWN": "Piekrišana atsaukta"
       }
     },
     "settings": {

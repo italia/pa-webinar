@@ -656,7 +656,42 @@
       "joining": "Opětovný vstup do místnosti…",
       "error": "Znovu vstoupit se nepodařilo: zkuste to znovu."
     },
-    "pseudonym": "Účastník-{code}"
+    "pseudonym": "Účastník-{code}",
+    "consents": {
+      "open": "Vaše souhlasy",
+      "button": "Souhlasy",
+      "title": "Vaše souhlasy",
+      "intro": "Své souhlasy můžete kdykoli během akce udělit nebo odvolat. Každá změna na několik sekund znovu připojí konferenci.",
+      "given": "Souhlas udělen",
+      "notGiven": "Souhlas neudělen",
+      "withdraw": "Odvolat souhlas",
+      "confirmTitle": "Opravdu odvolat?",
+      "confirm": "Odvolat",
+      "working": "Probíhá aktualizace…",
+      "error": "Souhlas se nepodařilo aktualizovat: zkuste to znovu.",
+      "recording": {
+        "title": "Záznam akce",
+        "give": "Souhlasím se záznamem",
+        "without": {
+          "soloAscolto": "Bez tohoto souhlasu jste pouze posluchač: mikrofon, kamera a obrazovka zůstávají zavřené.",
+          "conduce": "Bez tohoto souhlasu moderujete dál, ale váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu.",
+          "uscita": "Účast na této akci vyžaduje souhlas se záznamem."
+        },
+        "alreadyRecorded": "Co už bylo zaznamenáno, zůstává ve videu akce: o odstranění požádejte pořadatele.",
+        "withdraw": {
+          "soloAscolto": "Pokud ho odvoláte, zůstanete v místnosti jen jako posluchač: mikrofon, kamera a obrazovka se zavřou. Odvoláte i souhlas s přepisem svých příspěvků.",
+          "uscita": "Pokud ho odvoláte, opustíte konferenci a vrátíte se do čekárny: účast na akci vyžaduje souhlas se záznamem. Odvoláte i souhlas s přepisem svých příspěvků.",
+          "conduce": "Pokud ho odvoláte, moderujete dál, ale od teď váš hlas nezůstane ve stopách jednotlivých osob ani v přepisu. Video místnosti, pokud se nahrává, vás zachytí i tak."
+        }
+      },
+      "transcription": {
+        "title": "Přepis vašich příspěvků",
+        "give": "Souhlasím s přepisem",
+        "giveEffect": "Vaše příspěvky se dostanou do přepisu akce s vaším jménem. Bez souhlasu se účastníte i tak.",
+        "withdrawEffect": "Pokud ho odvoláte, vaše již přepsané věty přijdou o text i jméno a od teď se váš hlas nenahrává na samostatnou stopu ani nepřepisuje.",
+        "needsRecording": "Můžete ho udělit po souhlasu se záznamem."
+      }
+    }
   },
   "qa": {
     "title": "Otázky a odpovědi",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Smazaná data",
         "CONSENT_RECORDED": "Souhlas zaznamenán",
-        "DATA_EXPORTED": "Data exportována"
+        "DATA_EXPORTED": "Data exportována",
+        "CONSENT_WITHDRAWN": "Souhlas odvolán"
       },
       "recordsAffected": "Zahrnuto záznamů: {count}",
       "colWhen": "Kdy",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Data smazána",
         "CONSENT_RECORDED": "Souhlas zaznamenán",
-        "DATA_EXPORTED": "Data exportována"
+        "DATA_EXPORTED": "Data exportována",
+        "CONSENT_WITHDRAWN": "Souhlas odvolán"
       }
     },
     "settings": {

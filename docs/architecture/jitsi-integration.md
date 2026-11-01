@@ -374,7 +374,9 @@ so the moderation is on for each from the first entry; a participant who consent
 listen-only participant carries `listenOnly` and is never admitted, not even when a moderator gives
 them the floor (`mod_pa_media_lock` drops that approval). The room tells them, with
 **I consent to the recording and take part**: consenting asks for a new token with the consent, and
-the conference rejoins with it. A moderator who gives the floor to a listen-only person sees no change;
+the conference rejoins with it. The same goes the other way: withdrawing the consent from **Your consents**
+in the top bar asks for a new token without it, and the conference rejoins listening only
+([Withdrawing consent](../GDPR.md#withdrawing-consent)). A moderator who gives the floor to a listen-only person sees no change;
 the person's own room explains what is needed. Every token of such an event also carries
 `consentLock`: in that room the module refuses to switch the moderation off (the **Participants** tab
 shows a note instead of **Microphones locked** and **Video locked**), and a listen-only person made
@@ -388,7 +390,8 @@ a participant of a listen-only event: their name is on their tile, without voice
 token carries no profile photo.
 Without `listenOnlyWithoutConsent`, the token route refuses a participant who has not consented
 (`403 RECORDING_CONSENT_REQUIRED`, and the room goes back to the waiting room, where the box is): the
-waiting room is not the only gate.
+waiting room is not the only gate. A participant who withdraws the consent from the room on such an event
+goes back to the waiting room at once.
 
 ### Video quality presets
 

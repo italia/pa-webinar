@@ -656,7 +656,42 @@
       "joining": "Rejoining the room…",
       "error": "Could not rejoin: please try again."
     },
-    "pseudonym": "Participant-{code}"
+    "pseudonym": "Participant-{code}",
+    "consents": {
+      "open": "Your consents",
+      "button": "Consents",
+      "title": "Your consents",
+      "intro": "You can give or withdraw your consents at any time during the event. Each change reconnects the call for a few seconds.",
+      "given": "Consent given",
+      "notGiven": "Consent not given",
+      "withdraw": "Withdraw consent",
+      "confirmTitle": "Withdraw this consent?",
+      "confirm": "Withdraw",
+      "working": "Updating…",
+      "error": "The consent could not be updated: try again.",
+      "recording": {
+        "title": "Event recording",
+        "give": "I consent to the recording",
+        "without": {
+          "soloAscolto": "Without this consent you follow in listen-only mode: microphone, camera and screen stay closed.",
+          "conduce": "Without this consent you still host, but your voice is not kept in the per-person tracks or in the transcript.",
+          "uscita": "Taking part in this event requires consent to the recording."
+        },
+        "alreadyRecorded": "What has already been recorded stays in the event video: to have it removed, write to the organisers.",
+        "withdraw": {
+          "soloAscolto": "If you withdraw it you stay in the room in listen-only mode: microphone, camera and screen close. Your consent to the transcription of what you say is withdrawn too.",
+          "uscita": "If you withdraw it you leave the call and go back to the waiting room: taking part in this event requires consent to the recording. Your consent to the transcription of what you say is withdrawn too.",
+          "conduce": "If you withdraw it you keep hosting, but from now on your voice is not kept in the per-person tracks or in the transcript. The room video, if recorded, still shows you."
+        }
+      },
+      "transcription": {
+        "title": "Transcription of what you say",
+        "give": "I consent to the transcription",
+        "giveEffect": "What you say goes into the event transcript under your name. Without it you still take part.",
+        "withdrawEffect": "If you withdraw it, your sentences already transcribed lose their text and your name, and from now on your voice is neither recorded on a separate track nor transcribed.",
+        "needsRecording": "You can give it after consenting to the recording."
+      }
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
-        "DATA_EXPORTED": "Data exported"
+        "DATA_EXPORTED": "Data exported",
+        "CONSENT_WITHDRAWN": "Consent withdrawn"
       },
       "recordsAffected": "{count} records affected",
       "colWhen": "When",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
-        "DATA_EXPORTED": "Data exported"
+        "DATA_EXPORTED": "Data exported",
+        "CONSENT_WITHDRAWN": "Consent withdrawn"
       }
     },
     "settings": {

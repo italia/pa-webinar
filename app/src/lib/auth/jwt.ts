@@ -251,14 +251,18 @@ const POSTO_ISCRITTO = /^reg-([0-9a-f-]{36})-[0-9a-f]+$/i;
  * Il posto in sala provato da un token della sala: un token che il portale ha
  * firmato per questa stanza (`room`) e consegnato a chi e' entrato. Vale anche
  * scaduto da meno di un giorno: la valutazione arriva a fine evento, quando il
- * token di chi e' entrato all'inizio e' gia' scaduto. Non vale il token di chi
- * modera (chi conduce non valuta l'evento). Restituisce l'identificativo del
+ * token di chi e' entrato all'inizio e' gia' scaduto. Il token di chi modera
+ * non vale (chi conduce non valuta l'evento), salvo `ancheChiModera`: il
+ * ritiro dei consensi riguarda ogni posto. Restituisce l'identificativo del
  * posto (`context.user.id`) e, per un iscritto, l'iscrizione che contiene.
  * Null se il token non e' nostro, non e' di questa stanza o e' troppo vecchio.
  */
 export async function postoDaTokenSala(
   token: string,
   roomName: string,
+  /** Vale anche il token di chi modera: per il ritiro dei consensi, che
+   *  riguarda ogni posto (lib/live/consent-withdrawal). */
+  opzioni: { ancheChiModera?: boolean } = {},
 ): Promise<{ posto: string; iscrizioneId: string | null } | null> {
   try {
     const { payload } = await jwtVerify(token, getJitsiJwtSecret(), {
@@ -266,7 +270,7 @@ export async function postoDaTokenSala(
       audience: getJitsiJwtAudience(),
       clockTolerance: PROVA_PRESENZA_SECONDI,
     });
-    if (payload.room !== roomName || payload.moderator === true) return null;
+    if (payload.room !== roomName || (payload.moderator === true && !opzioni.ancheChiModera)) return null;
     const id = (payload.context as { user?: { id?: unknown } } | undefined)?.user?.id;
     if (typeof id !== 'string' || id.length === 0) return null;
     return { posto: id, iscrizioneId: POSTO_ISCRITTO.exec(id)?.[1] ?? null };

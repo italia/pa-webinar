@@ -656,7 +656,42 @@
       "joining": "Ponowne wejście do pokoju…",
       "error": "Nie udało się wrócić: spróbuj ponownie."
     },
-    "pseudonym": "Uczestnik-{code}"
+    "pseudonym": "Uczestnik-{code}",
+    "consents": {
+      "open": "Twoje zgody",
+      "button": "Zgody",
+      "title": "Twoje zgody",
+      "intro": "Możesz udzielić zgód lub je wycofać w dowolnym momencie wydarzenia. Każda zmiana łączy konferencję ponownie na kilka sekund.",
+      "given": "Zgoda udzielona",
+      "notGiven": "Zgoda nieudzielona",
+      "withdraw": "Wycofaj zgodę",
+      "confirmTitle": "Potwierdzasz wycofanie?",
+      "confirm": "Wycofaj",
+      "working": "Aktualizowanie…",
+      "error": "Nie udało się zaktualizować zgody: spróbuj ponownie.",
+      "recording": {
+        "title": "Nagrywanie wydarzenia",
+        "give": "Wyrażam zgodę na nagrywanie",
+        "without": {
+          "soloAscolto": "Bez tej zgody tylko słuchasz: mikrofon, kamera i ekran pozostają zamknięte.",
+          "conduce": "Bez tej zgody nadal prowadzisz, ale twój głos nie zostaje w ścieżkach poszczególnych osób ani w transkrypcji.",
+          "uscita": "Udział w tym wydarzeniu wymaga zgody na nagrywanie."
+        },
+        "alreadyRecorded": "To, co już zostało nagrane, pozostaje w nagraniu wydarzenia: aby to usunąć, napisz do organizatorów.",
+        "withdraw": {
+          "soloAscolto": "Jeśli ją wycofasz, zostajesz w sali i tylko słuchasz: mikrofon, kamera i ekran się zamykają. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi.",
+          "uscita": "Jeśli ją wycofasz, opuścisz konferencję i wrócisz do poczekalni: udział w tym wydarzeniu wymaga zgody na nagrywanie. Wycofujesz też zgodę na transkrypcję swoich wypowiedzi.",
+          "conduce": "Jeśli ją wycofasz, nadal prowadzisz, ale od teraz twój głos nie zostaje w ścieżkach poszczególnych osób ani w transkrypcji. Nagranie sali, jeśli jest prowadzone, nadal cię pokazuje."
+        }
+      },
+      "transcription": {
+        "title": "Transkrypcja twoich wypowiedzi",
+        "give": "Wyrażam zgodę na transkrypcję",
+        "giveEffect": "Twoje wypowiedzi trafiają do transkrypcji wydarzenia z twoim imieniem. Bez tej zgody nadal uczestniczysz.",
+        "withdrawEffect": "Jeśli ją wycofasz, twoje już przetranskrybowane zdania tracą tekst i imię, a od teraz twój głos nie jest nagrywany na osobnej ścieżce ani transkrybowany.",
+        "needsRecording": "Możesz jej udzielić po wyrażeniu zgody na nagrywanie."
+      }
+    }
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
-        "DATA_EXPORTED": "Dane wyeksportowane"
+        "DATA_EXPORTED": "Dane wyeksportowane",
+        "CONSENT_WITHDRAWN": "Zgoda wycofana"
       },
       "recordsAffected": "{count} powiązanych rekordów",
       "colWhen": "Kiedy",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Dane usunięte",
         "CONSENT_RECORDED": "Zgoda zarejestrowana",
-        "DATA_EXPORTED": "Dane wyeksportowane"
+        "DATA_EXPORTED": "Dane wyeksportowane",
+        "CONSENT_WITHDRAWN": "Zgoda wycofana"
       }
     },
     "settings": {

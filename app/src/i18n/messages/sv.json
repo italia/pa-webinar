@@ -656,7 +656,42 @@
       "joining": "Går in i rummet igen…",
       "error": "Det gick inte att gå in igen: försök igen."
     },
-    "pseudonym": "Deltagare-{code}"
+    "pseudonym": "Deltagare-{code}",
+    "consents": {
+      "open": "Dina samtycken",
+      "button": "Samtycken",
+      "title": "Dina samtycken",
+      "intro": "Du kan ge eller återkalla dina samtycken när som helst under evenemanget. Varje ändring ansluter mötet på nytt i några sekunder.",
+      "given": "Samtycke givet",
+      "notGiven": "Samtycke inte givet",
+      "withdraw": "Återkalla samtycket",
+      "confirmTitle": "Vill du återkalla det?",
+      "confirm": "Återkalla",
+      "working": "Uppdaterar…",
+      "error": "Samtycket kunde inte uppdateras: försök igen.",
+      "recording": {
+        "title": "Inspelning av evenemanget",
+        "give": "Jag samtycker till inspelningen",
+        "without": {
+          "soloAscolto": "Utan detta samtycke lyssnar du bara: mikrofon, kamera och skärm förblir stängda.",
+          "conduce": "Utan detta samtycke leder du ändå, men din röst sparas inte i spåren per person eller i transkriptionen.",
+          "uscita": "För att delta i evenemanget krävs samtycke till inspelningen."
+        },
+        "alreadyRecorded": "Det som redan har spelats in finns kvar i evenemangets video: skriv till arrangörerna för att få det borttaget.",
+        "withdraw": {
+          "soloAscolto": "Om du återkallar det stannar du i rummet och lyssnar bara: mikrofon, kamera och skärm stängs. Ditt samtycke till transkription av dina inlägg återkallas också.",
+          "uscita": "Om du återkallar det lämnar du mötet och går tillbaka till väntrummet: deltagande kräver samtycke till inspelningen. Ditt samtycke till transkription av dina inlägg återkallas också.",
+          "conduce": "Om du återkallar det fortsätter du leda, men från och med nu sparas din röst inte i spåren per person eller i transkriptionen. Rummets video visar dig ändå om den spelas in."
+        }
+      },
+      "transcription": {
+        "title": "Transkription av dina inlägg",
+        "give": "Jag samtycker till transkriptionen",
+        "giveEffect": "Dina inlägg kommer med i evenemangets transkription med ditt namn. Utan samtycke deltar du ändå.",
+        "withdrawEffect": "Om du återkallar det förlorar dina redan transkriberade meningar text och namn, och från och med nu spelas din röst varken in på ett eget spår eller transkriberas.",
+        "needsRecording": "Du kan ge det efter samtycke till inspelningen."
+      }
+    }
   },
   "qa": {
     "title": "Frågor och svar",
@@ -1528,7 +1563,8 @@
       "actions": {
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
-        "DATA_EXPORTED": "Data exporterad"
+        "DATA_EXPORTED": "Data exporterad",
+        "CONSENT_WITHDRAWN": "Samtycke återkallat"
       },
       "recordsAffected": "{count} poster berörda",
       "colWhen": "När",
@@ -1985,7 +2021,8 @@
       "actions": {
         "DATA_DELETED": "Data raderad",
         "CONSENT_RECORDED": "Samtycke registrerat",
-        "DATA_EXPORTED": "Data exporterad"
+        "DATA_EXPORTED": "Data exporterad",
+        "CONSENT_WITHDRAWN": "Samtycke återkallat"
       }
     },
     "settings": {
