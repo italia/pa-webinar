@@ -17,7 +17,7 @@ torchvision==0.29.1+cu126
 # dichiara una versione di torch. Il worker non usa API di torchaudio;
 # WhisperX usa solo `torchaudio.pipelines` (modelli di allineamento), che la
 # 2.11 mantiene.
-torchaudio==2.11.0+cu126
+torchaudio==2.11.1
 # Lettura dell'audio per pyannote.audio 4 (ha sostituito l'I/O di torchaudio).
 torchcodec==0.17.0+cu126
 numpy==2.2.6
