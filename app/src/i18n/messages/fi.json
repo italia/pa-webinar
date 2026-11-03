@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Sanasto",
       "breadcrumbAriaLabel": "Murupolku",
-      "skipToPage": "Siirry sivun sisältöön"
+      "skipToPage": "Siirry sivun sisältöön",
+      "openMenu": "Avaa valikko",
+      "closeMenu": "Sulje valikko"
     },
     "publications": {
       "subtitle": "Yhtenäinen toimituksellinen keskus kaikille julkaistuille videoille: aikataulutetut tapahtumat, pikapuhelut, ladatut arkistotallenteet ja istunnot, jotka odottavat julkaisua.",

@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Ordlista",
       "breadcrumbAriaLabel": "Brödsmulor",
-      "skipToPage": "Gå till sidans innehåll"
+      "skipToPage": "Gå till sidans innehåll",
+      "openMenu": "Öppna menyn",
+      "closeMenu": "Stäng menyn"
     },
     "publications": {
       "subtitle": "Enhetlig redaktionell hubb för alla publicerade videor: schemalagda evenemang, snabbsamtal, uppladdade arkiv och sessioner som väntar på att marknadsföras.",

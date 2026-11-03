@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosár",
       "breadcrumbAriaLabel": "Navigačná cesta",
-      "skipToPage": "Prejsť na obsah stránky"
+      "skipToPage": "Prejsť na obsah stránky",
+      "openMenu": "Otvoriť ponuku",
+      "closeMenu": "Zavrieť ponuku"
     },
     "publications": {
       "subtitle": "Jednotný redakčný hub pre všetky zverejnené videá: naplánované podujatia, rýchle hovory, nahrané historické archívy a relácie čakajúce na zverejnenie.",

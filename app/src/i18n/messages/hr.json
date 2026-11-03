@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Pojmovnik",
       "breadcrumbAriaLabel": "Navigacijski put",
-      "skipToPage": "Idi na sadržaj stranice"
+      "skipToPage": "Idi na sadržaj stranice",
+      "openMenu": "Otvori izbornik",
+      "closeMenu": "Zatvori izbornik"
     },
     "publications": {
       "subtitle": "Jedinstveno uredničko središte za sve objavljene videozapise: planirani događaji, brzi pozivi, prenesene povijesne arhive i sesije koje čekaju promociju.",

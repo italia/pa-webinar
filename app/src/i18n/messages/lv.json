@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosārijs",
       "breadcrumbAriaLabel": "Navigācijas ceļš",
-      "skipToPage": "Pāriet uz lapas saturu"
+      "skipToPage": "Pāriet uz lapas saturu",
+      "openMenu": "Atvērt izvēlni",
+      "closeMenu": "Aizvērt izvēlni"
     },
     "publications": {
       "subtitle": "Vienots redakcionālais centrs visiem publicētajiem video: plānoti pasākumi, ātrie zvani, augšupielādēti vēsturiski arhīvi un sesijas, kas gaida publicēšanu.",

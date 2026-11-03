@@ -1417,7 +1417,9 @@
       "video": "Vídeo",
       "glossary": "Glossário",
       "breadcrumbAriaLabel": "Percurso de navegação",
-      "skipToPage": "Ir para o conteúdo da página"
+      "skipToPage": "Ir para o conteúdo da página",
+      "openMenu": "Abrir o menu",
+      "closeMenu": "Fechar o menu"
     },
     "publications": {
       "subtitle": "Núcleo editorial único para todos os vídeos publicados: eventos planeados, chamadas rápidas, arquivos históricos carregados e sessões à espera de promoção.",

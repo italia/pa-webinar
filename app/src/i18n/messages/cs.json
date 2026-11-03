@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosář",
       "breadcrumbAriaLabel": "Drobečková navigace",
-      "skipToPage": "Přejít na obsah stránky"
+      "skipToPage": "Přejít na obsah stránky",
+      "openMenu": "Otevřít nabídku",
+      "closeMenu": "Zavřít nabídku"
     },
     "publications": {
       "subtitle": "Jednotný redakční hub pro všechna publikovaná videa: plánované události, rychlé hovory, nahrané historické archivy a relace čekající na zveřejnění.",

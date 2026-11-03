@@ -1417,7 +1417,9 @@
       "video": "Videó",
       "glossary": "Szójegyzék",
       "breadcrumbAriaLabel": "Morzsamenü",
-      "skipToPage": "Ugrás az oldal tartalmára"
+      "skipToPage": "Ugrás az oldal tartalmára",
+      "openMenu": "Menü megnyitása",
+      "closeMenu": "Menü bezárása"
     },
     "publications": {
       "subtitle": "Egységes szerkesztőségi központ minden közzétett videóhoz: ütemezett események, azonnali hívások, feltöltött archív felvételek és előléptetésre váró munkamenetek.",

@@ -1417,7 +1417,9 @@
       "video": "Vidjo",
       "glossary": "Glossarju",
       "breadcrumbAriaLabel": "Mogħdija",
-      "skipToPage": "Mur għall-kontenut tal-paġna"
+      "skipToPage": "Mur għall-kontenut tal-paġna",
+      "openMenu": "Iftaħ il-menu",
+      "closeMenu": "Agħlaq il-menu"
     },
     "publications": {
       "subtitle": "Hub editorjali uniku għall-vidjos pubblikati kollha: avvenimenti skedati, telefonati istantanji, arkivji storiċi mtellgħin u sessjonijiet jistennew il-promozzjoni.",

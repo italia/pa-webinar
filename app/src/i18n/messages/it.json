@@ -1627,7 +1627,9 @@
       "video": "Video",
       "glossary": "Glossario",
       "breadcrumbAriaLabel": "Percorso",
-      "skipToPage": "Vai al contenuto della pagina"
+      "skipToPage": "Vai al contenuto della pagina",
+      "openMenu": "Apri il menu",
+      "closeMenu": "Chiudi il menu"
     },
     "publications": {
       "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, archivi storici caricati e sessioni in attesa di promozione.",

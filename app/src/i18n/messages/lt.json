@@ -1417,7 +1417,9 @@
       "video": "Vaizdo įrašai",
       "glossary": "Žodynėlis",
       "breadcrumbAriaLabel": "Naršymo kelias",
-      "skipToPage": "Pereiti į puslapio turinį"
+      "skipToPage": "Pereiti į puslapio turinį",
+      "openMenu": "Atidaryti meniu",
+      "closeMenu": "Uždaryti meniu"
     },
     "publications": {
       "subtitle": "Bendras redakcinis centras visiems paskelbtiems vaizdo įrašams: planuoti renginiai, greitieji skambučiai, įkelti istoriniai archyvai ir sesijos, laukiančios paskelbimo.",

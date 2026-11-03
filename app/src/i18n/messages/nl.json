@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Woordenlijst",
       "breadcrumbAriaLabel": "Kruimelpad",
-      "skipToPage": "Naar de inhoud van de pagina"
+      "skipToPage": "Naar de inhoud van de pagina",
+      "openMenu": "Menu openen",
+      "closeMenu": "Menu sluiten"
     },
     "publications": {
       "subtitle": "Centrale redactiehub voor alle gepubliceerde video's: geplande evenementen, snelgesprekken, geladen archieven en sessies die wachten op promotie.",

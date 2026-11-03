@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Ordliste",
       "breadcrumbAriaLabel": "Brødkrumme",
-      "skipToPage": "Gå til sidens indhold"
+      "skipToPage": "Gå til sidens indhold",
+      "openMenu": "Åbn menuen",
+      "closeMenu": "Luk menuen"
     },
     "publications": {
       "subtitle": "Samlet redaktionel hub for alle offentliggjorte videoer: planlagte arrangementer, hurtige opkald, uploadede arkivoptagelser og sessioner, der venter på udgivelse.",

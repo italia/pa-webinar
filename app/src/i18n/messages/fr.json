@@ -1417,7 +1417,9 @@
       "video": "Vidéo",
       "glossary": "Glossaire",
       "breadcrumbAriaLabel": "Fil d'Ariane",
-      "skipToPage": "Aller au contenu de la page"
+      "skipToPage": "Aller au contenu de la page",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu"
     },
     "publications": {
       "subtitle": "Hub éditorial unique pour toutes les vidéos publiées : événements planifiés, appels instantanés, archives historiques téléversées et sessions en attente de promotion.",

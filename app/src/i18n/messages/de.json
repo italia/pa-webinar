@@ -1417,7 +1417,9 @@
       "video": "Videos",
       "glossary": "Glossar",
       "breadcrumbAriaLabel": "Brotkrümelnavigation",
-      "skipToPage": "Zum Seiteninhalt springen"
+      "skipToPage": "Zum Seiteninhalt springen",
+      "openMenu": "Menü öffnen",
+      "closeMenu": "Menü schließen"
     },
     "publications": {
       "subtitle": "Zentraler Redaktions-Hub für alle veröffentlichten Videos: geplante Events, Sofortanrufe, hochgeladene Archivaufzeichnungen und auf Promotion wartende Sitzungen.",

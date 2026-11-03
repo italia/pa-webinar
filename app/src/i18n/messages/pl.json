@@ -1417,7 +1417,9 @@
       "video": "Wideo",
       "glossary": "Słowniczek",
       "breadcrumbAriaLabel": "Ścieżka nawigacji",
-      "skipToPage": "Przejdź do treści strony"
+      "skipToPage": "Przejdź do treści strony",
+      "openMenu": "Otwórz menu",
+      "closeMenu": "Zamknij menu"
     },
     "publications": {
       "subtitle": "Jednolity hub redakcyjny dla wszystkich opublikowanych nagrań: zaplanowane wydarzenia, szybkie połączenia, przesłane archiwa historyczne i sesje oczekujące na promocję.",

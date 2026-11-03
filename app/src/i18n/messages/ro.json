@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosar",
       "breadcrumbAriaLabel": "Cale de navigare",
-      "skipToPage": "Salt la conținutul paginii"
+      "skipToPage": "Salt la conținutul paginii",
+      "openMenu": "Deschide meniul",
+      "closeMenu": "Închide meniul"
     },
     "publications": {
       "subtitle": "Hub editorial unic pentru toate clipurile video publicate: evenimente programate, apeluri instant, arhive istorice încărcate și sesiuni în așteptare de promovare.",

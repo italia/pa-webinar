@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Sõnastik",
       "breadcrumbAriaLabel": "Asukoharada",
-      "skipToPage": "Mine lehe sisu juurde"
+      "skipToPage": "Mine lehe sisu juurde",
+      "openMenu": "Ava menüü",
+      "closeMenu": "Sulge menüü"
     },
     "publications": {
       "subtitle": "Ühtne toimetuskeskus kõigi avaldatud videote jaoks: planeeritud sündmused, kiirkõned, üleslaaditud arhiivisalvestused ja avaldamist ootavad sessioonid.",

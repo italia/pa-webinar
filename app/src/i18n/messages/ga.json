@@ -1417,7 +1417,9 @@
       "video": "Físeán",
       "glossary": "Gluais",
       "breadcrumbAriaLabel": "Cosán nascleanúna",
-      "skipToPage": "Téigh chuig ábhar an leathanaigh"
+      "skipToPage": "Téigh chuig ábhar an leathanaigh",
+      "openMenu": "Oscail an roghchlár",
+      "closeMenu": "Dún an roghchlár"
     },
     "publications": {
       "subtitle": "Mol eagarthóireachta amháin do gach físeán foilsithe: imeachtaí sceidealta, glaonna meara, físthaifeadtaí cartlainne uaslódáilte agus seisiúin ag fanacht le cur chun cinn.",

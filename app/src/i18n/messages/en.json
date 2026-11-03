@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glossary",
       "breadcrumbAriaLabel": "Breadcrumb",
-      "skipToPage": "Skip to page content"
+      "skipToPage": "Skip to page content",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
     },
     "publications": {
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",

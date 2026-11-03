@@ -1417,7 +1417,9 @@
       "video": "Video",
       "glossary": "Glosar",
       "breadcrumbAriaLabel": "Drobtinice",
-      "skipToPage": "Pojdi na vsebino strani"
+      "skipToPage": "Pojdi na vsebino strani",
+      "openMenu": "Odpri meni",
+      "closeMenu": "Zapri meni"
     },
     "publications": {
       "subtitle": "Enotno uredniško središče za vse objavljene videe: načrtovani dogodki, hitri klici, naloženi zgodovinski arhivi in seje, ki čakajo na promocijo.",
