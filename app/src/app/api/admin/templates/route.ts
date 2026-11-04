@@ -89,6 +89,9 @@ function toTemplateData<
 }
 
 export const GET = withErrorHandling(async () => {
+  const isAdmin = await isAdminAuthenticated(await cookies());
+  if (!isAdmin) throw new UnauthorizedError();
+
   const templates = await prisma.eventTemplate.findMany({
     orderBy: { sortOrder: 'asc' },
   });
@@ -134,7 +137,7 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   if (!isAdmin) throw new UnauthorizedError();
 
   const body = await parseJsonBody(request);
-  const { id, ...data } = body as { id: string } & Record<string, unknown>;
+  const { id, ...data } = (body ?? {}) as { id: string } & Record<string, unknown>;
 
   if (!id) throw new ValidationError('Missing template id');
 

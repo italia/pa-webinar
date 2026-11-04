@@ -190,7 +190,7 @@ The dependencies of **Recording and AI** apply when a template is loaded: a temp
 
 System templates (`isSystem`) are inserted by database migrations that skip templates already present. Administrators can edit and delete them like any other: events copy the template's values at creation and keep no reference to it, so deleting a template never changes an existing event.
 
-The API is `/api/admin/templates`: `GET` lists templates, and `POST`, `PUT` and `DELETE` require the administrator session and write an audit entry. Organizers use templates but cannot manage them.
+The API is `/api/admin/templates`: every method requires the administrator session, and `POST`, `PUT` and `DELETE` write an audit entry. Organizers use templates but cannot manage them.
 
 For developers: the new-event page (`app/src/app/[locale]/admin/events/new/page.tsx`) passes the selected template to the wizard through an explicit list of fields. A new template column reaches the wizard only after it is added to that list and to `WizardTemplatePreset`.
 

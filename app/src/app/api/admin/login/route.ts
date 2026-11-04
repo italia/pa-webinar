@@ -22,10 +22,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
-  const body = await parseJsonBody(request) as { key?: string };
+  const body = (await parseJsonBody(request)) as { key?: unknown } | null;
+  const key = typeof body?.key === 'string' ? body.key : '';
 
   const adminKey = process.env.ADMIN_API_KEY;
-  if (!adminKey || !constantTimeEqual(body.key ?? '', adminKey)) {
+  if (!adminKey || !constantTimeEqual(key, adminKey)) {
     throw new UnauthorizedError('invalid_key');
   }
 

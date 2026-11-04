@@ -214,7 +214,7 @@ Every staff member uses the same cookie, `admin_session`.
 
 **The role comes from the account.** `getStaffSession` verifies the signature. For an account session it then reads the `StaffAccount` row on every request, once per request because the call is memoized, and uses that row's `active` flag and `role`. For account sessions, the role inside the token is used by only one component: the middleware, which cannot read the database and only decides whether a page under `/admin` may render at all. A key session has no account to re-read, so its token's `role: "admin"` is its whole identity.
 
-**Ending a session.** `POST /api/admin/logout` clears the cookie in that browser and writes `ADMIN_LOGOUT`. The token is not blocklisted, so a copy of it stays valid until it expires. What cuts a session short depends on its kind:
+**Ending a session.** `POST /api/admin/logout` always clears the cookie in that browser, and writes `ADMIN_LOGOUT` only for a valid session. The token is not blocklisted, so a copy of it stays valid until it expires. What cuts a session short depends on its kind:
 
 - An **account session** ends as soon as the account is deactivated or deleted, and loses administrator rights as soon as it is demoted, because the role and state are re-read on every request.
 - A **key session** survives a change of `ADMIN_API_KEY`: the key is checked only at sign-in, and the refresh keeps extending the session while it is in use. Only a change of `APP_SECRET` ends every session at once.
@@ -277,10 +277,7 @@ The event management page, `/admin/events/{id}`, has two paths. With `?token=`, 
 
 ### Staff guards on the administration API
 
-Route handlers under `app/src/app/api/admin` call one of these guards from `app/src/lib/auth/staff-session.ts` or `admin-session.ts`. Three routes have no guard by design: `login`, `logout` and `refresh`. Two handlers answer without a session:
-
-- `GET /api/admin/settings` returns the public subset of the site settings to anyone, and the full row only to administrators.
-- `GET /api/admin/templates` returns the event template list without any guard, while its `POST`, `PUT` and `DELETE` siblings require an administrator. Templates hold wizard defaults, not personal data, but the handler is a gap rather than a decision. The [guard test](#the-guard-test) does not catch it, because it checks route files rather than handlers.
+Route handlers under `app/src/app/api/admin` call one of these guards from `app/src/lib/auth/staff-session.ts` or `admin-session.ts`. Three routes have no guard by design: `login`, `logout` and `refresh`. `GET /api/admin/settings` also answers without a session: it returns the public subset of the site settings to anyone, and the full row only to administrators. The [guard test](#the-guard-test) checks route files rather than handlers, so a file with one guarded method passes even if another method has no guard.
 
 | Guard | Admits |
 |---|---|

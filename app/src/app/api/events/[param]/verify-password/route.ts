@@ -61,8 +61,8 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Event has no password set', 400, 'BAD_REQUEST');
   }
 
-  const body = await parseJsonBody(request) as { password?: unknown };
-  const password = typeof body.password === 'string' ? body.password : '';
+  const body = (await parseJsonBody(request)) as { password?: unknown } | null;
+  const password = typeof body?.password === 'string' ? body.password : '';
 
   if (!verifyJoinPassword(password, event.joinPasswordHash)) {
     // Return a generic 403 so the client can't distinguish "wrong
