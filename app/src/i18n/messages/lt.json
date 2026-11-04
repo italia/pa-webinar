@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Koks jūsų renginys?",
       "intro": "Keturi klausimai, kad pradėtumėte su tinkamais nustatymais. Kiekvieną funkciją galima įjungti ar išjungti ir renginio metu.",
+      "introNoRecording": "Trys klausimai, kad pradėtumėte su tinkamais nustatymais. Kiekvieną funkciją galima įjungti ar išjungti ir renginio metu.",
       "peopleQ": "Kiek žmonių tikitės?",
       "people": {
         "piccolo": "Iki 20",

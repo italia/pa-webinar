@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Kakav je vaš događaj?",
       "intro": "Četiri pitanja za početak s pravim postavkama. Svaku funkciju možete uključiti ili isključiti i tijekom događaja.",
+      "introNoRecording": "Tri pitanja za početak s pravim postavkama. Svaku funkciju možete uključiti ili isključiti i tijekom događaja.",
       "peopleQ": "Koliko ljudi očekujete?",
       "people": {
         "piccolo": "Do 20",

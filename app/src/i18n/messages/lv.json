@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Kāds ir jūsu pasākums?",
       "intro": "Četri jautājumi, lai sāktu ar pareizajiem iestatījumiem. Katru funkciju var ieslēgt vai izslēgt arī pasākuma laikā.",
+      "introNoRecording": "Trīs jautājumi, lai sāktu ar pareizajiem iestatījumiem. Katru funkciju var ieslēgt vai izslēgt arī pasākuma laikā.",
       "peopleQ": "Cik cilvēkus jūs gaidāt?",
       "people": {
         "piccolo": "Līdz 20",

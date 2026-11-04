@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Comment est votre événement ?",
       "intro": "Quatre questions pour démarrer avec les bons réglages. Chaque fonction peut aussi être activée ou désactivée pendant l'événement.",
+      "introNoRecording": "Trois questions pour démarrer avec les bons réglages. Chaque fonction peut aussi être activée ou désactivée pendant l'événement.",
       "peopleQ": "Combien de personnes attendez-vous ?",
       "people": {
         "piccolo": "Jusqu'à 20",

@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Hur ser ditt evenemang ut?",
       "intro": "Fyra frågor för att börja med rätt inställningar. Alla funktioner kan också slås på och av under evenemanget.",
+      "introNoRecording": "Tre frågor för att börja med rätt inställningar. Alla funktioner kan också slås på och av under evenemanget.",
       "peopleQ": "Hur många personer väntar du dig?",
       "people": {
         "piccolo": "Upp till 20",

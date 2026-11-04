@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Milline on sinu üritus?",
       "intro": "Neli küsimust, et alustada õigete seadetega. Iga funktsiooni saab ka ürituse ajal sisse või välja lülitada.",
+      "introNoRecording": "Kolm küsimust, et alustada õigete seadetega. Iga funktsiooni saab ka ürituse ajal sisse või välja lülitada.",
       "peopleQ": "Kui palju inimesi ootad?",
       "people": {
         "piccolo": "Kuni 20",

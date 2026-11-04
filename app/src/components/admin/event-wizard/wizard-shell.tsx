@@ -606,7 +606,9 @@ export default function EventWizard(props: WizardProps) {
     }
 
     const tpl = props.template;
-    const conAi = (tpl?.recordingEnabled ?? false) && (props.aiPipelineEnabled ?? true);
+    // Dove non si puo' registrare un modello non accende la registrazione.
+    const registra = (tpl?.recordingEnabled ?? false) && (props.recordingAvailable ?? true);
+    const conAi = registra && (props.aiPipelineEnabled ?? true);
     // Le lingue dell'evento, del modello o dell'istanza. La traduzione di
     // sottotitoli e sintesi parte solo se ce n'e' almeno una: senza, il
     // wizard chiederebbe di scegliere lingue che nessuno ha chiesto.
@@ -657,7 +659,7 @@ export default function EventWizard(props: WizardProps) {
 
       // Passo Permessi
       permissionMatrix: matrix,
-      recordingEnabled: tpl?.recordingEnabled ?? false,
+      recordingEnabled: registra,
       agendaEnabled: tpl?.agendaEnabled ?? false,
       wordCloudEnabled: tpl?.wordCloudEnabled ?? false,
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
@@ -2405,6 +2407,7 @@ export default function EventWizard(props: WizardProps) {
               fieldErrors={fieldErrors}
               whiteboardInfraReady={props.whiteboardInfraReady}
               liveCaptionsAvailable={props.liveCaptionsAvailable ?? false}
+              recordingAvailable={props.recordingAvailable ?? true}
               aiPipelineEnabled={props.aiPipelineEnabled ?? true}
               editing={mode === 'edit'}
             />
@@ -2458,6 +2461,7 @@ export default function EventWizard(props: WizardProps) {
                   onChange={updateForm}
                   fieldErrors={fieldErrors}
                   whiteboardInfraReady={props.whiteboardInfraReady}
+                  recordingAvailable={props.recordingAvailable ?? true}
                   aiPipelineEnabled={props.aiPipelineEnabled ?? true}
                   onCambiaLingue={() =>
                     vaiAlCampo({ key: 'aiTargetLocales', step: 'base', perPubblicare: false })

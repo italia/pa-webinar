@@ -10,6 +10,7 @@ import {
   FORMATO_PREDEFINITO,
   codificaFormato,
   decodificaFormato,
+  formatoPossibile,
   presetDaFormato,
   type FormatoGuidato,
 } from '@/lib/events/guided-format';
@@ -135,7 +136,8 @@ export default function CreateEventWithTemplate({
   const [showInstant, setShowInstant] = useState(initialInstant);
   const [modelliAperti, setModelliAperti] = useState(false);
   // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
-  const formato: FormatoGuidato | null = selectedTemplate ? null : decodificaFormato(formatoParam);
+  const letto = selectedTemplate ? null : decodificaFormato(formatoParam);
+  const formato: FormatoGuidato | null = letto && formatoPossibile(letto, recordingAvailable);
 
   if (showInstant) {
     return (
@@ -234,6 +236,7 @@ export default function CreateEventWithTemplate({
           accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
           aiPipelineEnabled={aiPipelineEnabled}
           liveCaptionsAvailable={liveCaptionsAvailable}
+          recordingAvailable={recordingAvailable}
           onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
           // Il modello si sceglie prima di rispondere, non dopo: un'azione
           // accanto al titolo. La videochiamata istantanea non sta qui: ha il

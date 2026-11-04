@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Kakšen je vaš dogodek?",
       "intro": "Štiri vprašanja za začetek s pravimi nastavitvami. Vsako funkcijo lahko vklopite ali izklopite tudi med dogodkom.",
+      "introNoRecording": "Tri vprašanja za začetek s pravimi nastavitvami. Vsako funkcijo lahko vklopite ali izklopite tudi med dogodkom.",
       "peopleQ": "Koliko ljudi pričakujete?",
       "people": {
         "piccolo": "Do 20",

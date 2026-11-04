@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Wie ist Ihre Veranstaltung?",
       "intro": "Vier Fragen für den Start mit den richtigen Einstellungen. Jede Funktion lässt sich auch während der Veranstaltung ein- oder ausschalten.",
+      "introNoRecording": "Drei Fragen für den Start mit den richtigen Einstellungen. Jede Funktion lässt sich auch während der Veranstaltung ein- oder ausschalten.",
       "peopleQ": "Wie viele Personen erwarten Sie?",
       "people": {
         "piccolo": "Bis 20",

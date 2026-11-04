@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Como é o seu evento?",
       "intro": "Quatro perguntas para começar com as definições certas. Cada função também pode ser ligada ou desligada durante o evento.",
+      "introNoRecording": "Três perguntas para começar com as definições certas. Cada função também pode ser ligada ou desligada durante o evento.",
       "peopleQ": "Quantas pessoas espera?",
       "people": {
         "piccolo": "Até 20",

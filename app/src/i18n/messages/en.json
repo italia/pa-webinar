@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "What is your event like?",
       "intro": "Four questions to start with the right settings. Every feature can also be switched on or off during the event.",
+      "introNoRecording": "Three questions to start with the right settings. Every feature can also be switched on or off during the event.",
       "peopleQ": "How many people do you expect?",
       "people": {
         "piccolo": "Up to 20",

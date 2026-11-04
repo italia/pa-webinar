@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Jaká je vaše akce?",
       "intro": "Čtyři otázky pro začátek se správným nastavením. Každou funkci lze zapnout nebo vypnout i během akce.",
+      "introNoRecording": "Tři otázky pro začátek se správným nastavením. Každou funkci lze zapnout nebo vypnout i během akce.",
       "peopleQ": "Kolik lidí čekáte?",
       "people": {
         "piccolo": "Do 20",

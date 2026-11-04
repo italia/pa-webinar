@@ -3738,6 +3738,7 @@
     "guided": {
       "title": "Com'è il tuo evento?",
       "intro": "Quattro domande per partire con le impostazioni giuste. Ogni funzione si può accendere o spegnere anche durante l'evento.",
+      "introNoRecording": "Tre domande per partire con le impostazioni giuste. Ogni funzione si può accendere o spegnere anche durante l'evento.",
       "peopleQ": "Quante persone ti aspetti?",
       "people": {
         "piccolo": "Fino a 20",

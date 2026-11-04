@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Jakie jest Twoje wydarzenie?",
       "intro": "Cztery pytania, aby zacząć z właściwymi ustawieniami. Każdą funkcję można też włączyć lub wyłączyć w trakcie wydarzenia.",
+      "introNoRecording": "Trzy pytania, aby zacząć z właściwymi ustawieniami. Każdą funkcję można też włączyć lub wyłączyć w trakcie wydarzenia.",
       "peopleQ": "Ilu osób się spodziewasz?",
       "people": {
         "piccolo": "Do 20",

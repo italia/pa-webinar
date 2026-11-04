@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Kif inhu l-avveniment tiegħek?",
       "intro": "Erba' mistoqsijiet biex tibda bl-issettjar it-tajjeb. Kull funzjoni tista' tinxtegħel jew tintefa anke waqt l-avveniment.",
+      "introNoRecording": "Tliet mistoqsijiet biex tibda bl-issettjar it-tajjeb. Kull funzjoni tista' tinxtegħel jew tintefa anke waqt l-avveniment.",
       "peopleQ": "Kemm-il persuna tistenna?",
       "people": {
         "piccolo": "Sa 20",

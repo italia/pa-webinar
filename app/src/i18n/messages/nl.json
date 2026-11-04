@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Hoe ziet je evenement eruit?",
       "intro": "Vier vragen om te beginnen met de juiste instellingen. Elke functie kan ook tijdens het evenement aan- of uitgezet worden.",
+      "introNoRecording": "Drie vragen om te beginnen met de juiste instellingen. Elke functie kan ook tijdens het evenement aan- of uitgezet worden.",
       "peopleQ": "Hoeveel mensen verwacht je?",
       "people": {
         "piccolo": "Tot 20",

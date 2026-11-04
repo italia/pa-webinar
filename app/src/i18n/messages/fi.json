@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Millainen tapahtumasi on?",
       "intro": "Neljä kysymystä, joilla aloitat oikeilla asetuksilla. Jokaisen toiminnon voi kytkeä päälle tai pois myös tapahtuman aikana.",
+      "introNoRecording": "Kolme kysymystä, joilla aloitat oikeilla asetuksilla. Jokaisen toiminnon voi kytkeä päälle tai pois myös tapahtuman aikana.",
       "peopleQ": "Kuinka monta osallistujaa odotat?",
       "people": {
         "piccolo": "Enintään 20",

@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Cum este evenimentul tău?",
       "intro": "Patru întrebări pentru a începe cu setările potrivite. Fiecare funcție poate fi activată sau dezactivată și în timpul evenimentului.",
+      "introNoRecording": "Trei întrebări pentru a începe cu setările potrivite. Fiecare funcție poate fi activată sau dezactivată și în timpul evenimentului.",
       "peopleQ": "Câte persoane aștepți?",
       "people": {
         "piccolo": "Până la 20",

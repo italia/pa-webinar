@@ -73,6 +73,9 @@ interface Props {
   /** I sottotitoli live ci sono nell'installazione: senza, l'interruttore
    *  non si mostra (non c'e' niente da accendere). */
   liveCaptionsAvailable?: boolean;
+  /** L'installazione puo' registrare. Senza, la registrazione non si propone:
+   *  si mostra solo se l'evento ce l'ha gia' accesa, per poterla spegnere. */
+  recordingAvailable?: boolean;
   /** Porta alle lingue dell'evento, nel passo «Evento». */
   onCambiaLingue?: () => void;
   /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
@@ -134,6 +137,7 @@ export default function StepPermissions({
   fieldErrors = {},
   whiteboardInfraReady,
   liveCaptionsAvailable = false,
+  recordingAvailable = true,
   onCambiaLingue,
   aiPipelineEnabled = true,
   editing = false,
@@ -159,7 +163,7 @@ export default function StepPermissions({
   };
 
   const visibleFeatures = EVENT_FEATURES.filter(
-    (f) => f !== 'recording_control' || value.recordingEnabled,
+    (f) => f !== 'recording_control' || (value.recordingEnabled && recordingAvailable),
   );
 
   // Le due parti: il passo «Permessi» (partecipazione e funzioni della sala)
@@ -376,6 +380,14 @@ export default function StepPermissions({
       </section>
 
       </div>
+    );
+  }
+
+  if (!recordingAvailable && !value.recordingEnabled) {
+    return (
+      <p className="text-secondary mb-0" style={{ fontSize: '0.85rem' }}>
+        {tAdmin('recording.notConfigured')}
+      </p>
     );
   }
 

@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Milyen az eseménye?",
       "intro": "Négy kérdés, hogy a megfelelő beállításokkal kezdjen. Minden funkció az esemény közben is be- vagy kikapcsolható.",
+      "introNoRecording": "Három kérdés, hogy a megfelelő beállításokkal kezdjen. Minden funkció az esemény közben is be- vagy kikapcsolható.",
       "peopleQ": "Hány résztvevőre számít?",
       "people": {
         "piccolo": "Legfeljebb 20",

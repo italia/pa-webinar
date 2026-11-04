@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Cén sórt imeachta atá agat?",
       "intro": "Ceithre cheist chun tosú leis na socruithe cearta. Is féidir gach gné a chasadh air nó as le linn an imeachta freisin.",
+      "introNoRecording": "Trí cheist chun tosú leis na socruithe cearta. Is féidir gach gné a chasadh air nó as le linn an imeachta freisin.",
       "peopleQ": "Cé mhéad duine a bhfuil súil agat leo?",
       "people": {
         "piccolo": "Suas le 20",

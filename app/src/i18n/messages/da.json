@@ -3528,6 +3528,7 @@
     "guided": {
       "title": "Hvordan er dit arrangement?",
       "intro": "Fire spørgsmål for at starte med de rigtige indstillinger. Alle funktioner kan også slås til og fra under arrangementet.",
+      "introNoRecording": "Tre spørgsmål for at starte med de rigtige indstillinger. Alle funktioner kan også slås til og fra under arrangementet.",
       "peopleQ": "Hvor mange personer forventer du?",
       "people": {
         "piccolo": "Op til 20",
