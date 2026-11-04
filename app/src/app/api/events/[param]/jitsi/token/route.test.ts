@@ -971,14 +971,15 @@ describe('POST jitsi/token — consenso alla registrazione dato in sala d\'attes
 });
 
 describe('POST jitsi/token — consenso alla registrazione di chi conduce o interviene', () => {
-  const concessione = {
+  // Una funzione: la chiave PII la fissa beforeAll, dopo la raccolta dei test.
+  const concessione = () => ({
     id: 'grant-1',
     eventId: EVENT_ID,
     revokedAt: null,
     role: 'SPEAKER',
     name: encryptPII('Relatore 1'),
     email: null,
-  };
+  });
   type Riga = { eventModeratorId: string | null; staffAccountId: string | null; registrationId: string | null };
   const righe = () =>
     (vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as { data: Riga[] }).data;
@@ -991,7 +992,7 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
 
   it('lega la prova alla concessione nominale', async () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow({ recordingEnabled: true }) as never);
-    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
     const res = await post({ moderatorToken: GRANT_TOKEN, recordingConsent: true });
     expect(res.status).toBe(200);
     expect(righe()[0]).toMatchObject({ eventModeratorId: 'grant-1', staffAccountId: null, registrationId: null });
@@ -1013,7 +1014,7 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
       eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
     );
-    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
     const res = await post({ moderatorToken: GRANT_TOKEN, multitrackConsent: true });
     expect(res.status).toBe(200);
     const { body } = await minted(res);
@@ -1027,7 +1028,7 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
       eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
     );
-    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
     const res = await post({ moderatorToken: GRANT_TOKEN, recordingConsent: true, multitrackConsent: true });
     const { body } = await minted(res);
     expect(body.consentsRecorded).toEqual({ recording: true, multitrack: true });
@@ -1038,7 +1039,7 @@ describe('POST jitsi/token — consenso alla registrazione di chi conduce o inte
     vi.mocked(prisma.event.findUnique).mockResolvedValue(
       eventRow({ multitrackRecordingEnabled: true }) as never,
     );
-    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(concessione() as never);
     await post({ moderatorToken: GRANT_TOKEN, multitrackConsent: true });
     expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
     expect(prisma.recordingConsent.findFirst).not.toHaveBeenCalled();
