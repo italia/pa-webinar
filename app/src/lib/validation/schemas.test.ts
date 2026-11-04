@@ -41,7 +41,10 @@ describe('createEventSchema', () => {
     const result = createEventSchema.safeParse({
       ...validEvent(),
       title: { it: 'PA Digitale 2026', en: 'PA Digital 2026' },
-      description: { it: 'Un evento sulla digitalizzazione della PA italiana.', en: 'An event about Italian PA digitalization.' },
+      description: {
+        it: 'Un evento sulla digitalizzazione della PA italiana.',
+        en: 'An event about Italian PA digitalization.',
+      },
       timezone: 'Europe/Rome',
       maxParticipants: 100,
       qaEnabled: false,
@@ -61,7 +64,10 @@ describe('createEventSchema', () => {
   });
 
   it('treats an empty privacy text as no text, so the GDPR template applies', () => {
-    const vuoto = createEventSchema.safeParse({ ...validEvent(), privacyPolicyText: '  ' });
+    const vuoto = createEventSchema.safeParse({
+      ...validEvent(),
+      privacyPolicyText: '  ',
+    });
     expect(vuoto.success && vuoto.data.privacyPolicyText).toBeNull();
     const assente = updateEventSchema.safeParse({});
     expect(assente.success && assente.data.privacyPolicyText).toBeUndefined();
@@ -87,17 +93,26 @@ describe('createEventSchema', () => {
   });
 
   it('rejects description.it shorter than 10 chars', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), description: { it: 'Short' } });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      description: { it: 'Short' },
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects title without it locale', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), title: { en: 'English only' } });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      title: { en: 'English only' },
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects description without it locale', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), description: { en: 'English only description here.' } });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      description: { en: 'English only description here.' },
+    });
     expect(result.success).toBe(false);
   });
 
@@ -138,12 +153,18 @@ describe('createEventSchema', () => {
     // expected attendance (not a hard per-event capacity). The cap
     // protects against typos; anything above that would indicate a
     // form error or abuse.
-    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 10001 });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      maxParticipants: 10001,
+    });
     expect(result.success).toBe(false);
   });
 
   it('accepts maxParticipants up to 10000', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 10000 });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      maxParticipants: 10000,
+    });
     expect(result.success).toBe(true);
   });
 
@@ -153,12 +174,18 @@ describe('createEventSchema', () => {
   });
 
   it('rejects invalid datetime format for startsAt', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), startsAt: 'not-a-date' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      startsAt: 'not-a-date',
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects invalid privacyPolicyUrl', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), privacyPolicyUrl: 'not-a-url' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      privacyPolicyUrl: 'not-a-url',
+    });
     expect(result.success).toBe(false);
   });
 
@@ -184,7 +211,10 @@ describe('createEventSchema', () => {
   });
 
   it('rejects dataRetentionDays over 365', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), dataRetentionDays: 366 });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      dataRetentionDays: 366,
+    });
     expect(result.success).toBe(false);
   });
 
@@ -194,46 +224,72 @@ describe('createEventSchema', () => {
   // admin can't set `gracePeriodMinutes: 99999` and blow the scaler.
 
   it('accepts expectedSenderRatioPct at bounds (0 and 100)', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 0 }).success).toBe(true);
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 100 }).success).toBe(true);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 0 }).success
+    ).toBe(true);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 100 })
+        .success
+    ).toBe(true);
   });
 
   it('accepts expectedSenderRatioPct: null (inherit default)', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: null }).success).toBe(true);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: null })
+        .success
+    ).toBe(true);
   });
 
   it('rejects expectedSenderRatioPct over 100', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 101 }).success).toBe(false);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 101 })
+        .success
+    ).toBe(false);
   });
 
   it('rejects negative expectedSenderRatioPct', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: -1 }).success).toBe(false);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: -1 }).success
+    ).toBe(false);
   });
 
   it('rejects non-integer expectedSenderRatioPct', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 33.5 }).success).toBe(false);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 33.5 })
+        .success
+    ).toBe(false);
   });
 
   it('accepts gracePeriodMinutes: -1 (never auto-close)', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -1 }).success).toBe(true);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -1 }).success
+    ).toBe(true);
   });
 
   it('accepts gracePeriodMinutes: 0, 5, 15, 30, 60', () => {
     for (const v of [0, 5, 15, 30, 60]) {
-      expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: v }).success).toBe(true);
+      expect(
+        createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: v }).success
+      ).toBe(true);
     }
   });
 
   it('accepts gracePeriodMinutes at upper bound (240)', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 240 }).success).toBe(true);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 240 }).success
+    ).toBe(true);
   });
 
   it('rejects gracePeriodMinutes below -1', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -2 }).success).toBe(false);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -2 }).success
+    ).toBe(false);
   });
 
   it('rejects gracePeriodMinutes over 240', () => {
-    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 241 }).success).toBe(false);
+    expect(
+      createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 241 }).success
+    ).toBe(false);
   });
 });
 
@@ -241,22 +297,34 @@ describe('createEventSchema', () => {
 
 describe('createEventSchema timezone', () => {
   it('accepts Europe/Rome', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Europe/Rome' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      timezone: 'Europe/Rome',
+    });
     expect(result.success).toBe(true);
   });
 
   it('accepts America/New_York', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'America/New_York' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      timezone: 'America/New_York',
+    });
     expect(result.success).toBe(true);
   });
 
   it('accepts Asia/Tokyo', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Asia/Tokyo' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      timezone: 'Asia/Tokyo',
+    });
     expect(result.success).toBe(true);
   });
 
   it('rejects Invalid/Zone', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Invalid/Zone' });
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      timezone: 'Invalid/Zone',
+    });
     expect(result.success).toBe(false);
   });
 
@@ -276,6 +344,17 @@ describe('createEventSchema timezone', () => {
 // ── updateEventSchema ───────────────────────────────────────
 
 describe('updateEventSchema', () => {
+  it('video e informativa sono solo indirizzi http o https', () => {
+    for (const campo of ['recordingUrl', 'tempRecordingUrl', 'privacyPolicyUrl']) {
+      expect(
+        updateEventSchema.safeParse({ [campo]: 'javascript:alert(1)' }).success
+      ).toBe(false);
+      expect(
+        updateEventSchema.safeParse({ [campo]: 'https://esempio.it/a' }).success
+      ).toBe(true);
+    }
+  });
+
   it('accepts empty partial update', () => {
     const result = updateEventSchema.safeParse({});
     expect(result.success).toBe(true);
@@ -350,22 +429,34 @@ describe('createRegistrationSchema', () => {
   });
 
   it('rejects short displayName', () => {
-    const result = createRegistrationSchema.safeParse({ ...validReg(), displayName: 'A' });
+    const result = createRegistrationSchema.safeParse({
+      ...validReg(),
+      displayName: 'A',
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects invalid email', () => {
-    const result = createRegistrationSchema.safeParse({ ...validReg(), email: 'not-email' });
+    const result = createRegistrationSchema.safeParse({
+      ...validReg(),
+      email: 'not-email',
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects consentGiven = false', () => {
-    const result = createRegistrationSchema.safeParse({ ...validReg(), consentGiven: false });
+    const result = createRegistrationSchema.safeParse({
+      ...validReg(),
+      consentGiven: false,
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects invalid organizationType', () => {
-    const result = createRegistrationSchema.safeParse({ ...validReg(), organizationType: 'INVALID' });
+    const result = createRegistrationSchema.safeParse({
+      ...validReg(),
+      organizationType: 'INVALID',
+    });
     expect(result.success).toBe(false);
   });
 
@@ -414,7 +505,7 @@ describe('updateQuestionSchema', () => {
     (status) => {
       const result = updateQuestionSchema.safeParse({ status });
       expect(result.success).toBe(true);
-    },
+    }
   );
 
   it('rejects invalid status', () => {
@@ -436,7 +527,9 @@ describe('updateQuestionSchema', () => {
   });
 
   it('rifiuta una risposta oltre i 2000 caratteri', () => {
-    expect(updateQuestionSchema.safeParse({ answer: 'x'.repeat(2001) }).success).toBe(false);
+    expect(updateQuestionSchema.safeParse({ answer: 'x'.repeat(2001) }).success).toBe(
+      false
+    );
   });
 });
 
@@ -522,7 +615,10 @@ describe('createPollSchema', () => {
   });
 
   it('rejects empty option string', () => {
-    const result = createPollSchema.safeParse({ question: 'Test poll?', options: ['A', ''] });
+    const result = createPollSchema.safeParse({
+      question: 'Test poll?',
+      options: ['A', ''],
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -586,7 +682,9 @@ describe('createMaterialSchema', () => {
   });
 
   it('rejects missing title', () => {
-    const result = createMaterialSchema.safeParse({ url: 'https://example.com/slides.pdf' });
+    const result = createMaterialSchema.safeParse({
+      url: 'https://example.com/slides.pdf',
+    });
     expect(result.success).toBe(false);
   });
 
@@ -596,7 +694,10 @@ describe('createMaterialSchema', () => {
   });
 
   it('rejects empty title', () => {
-    const result = createMaterialSchema.safeParse({ title: '', url: 'https://example.com' });
+    const result = createMaterialSchema.safeParse({
+      title: '',
+      url: 'https://example.com',
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -702,12 +803,16 @@ describe('updateEventSchema privacyPolicyUrl', () => {
 describe('createQuestionTemplateSchema — quando si propone', () => {
   it('accetta prima, dopo o nessuna indicazione', () => {
     for (const usage of ['PRE_REGISTRATION', 'POST_EVENT', null, undefined]) {
-      expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage }).success).toBe(true);
+      expect(
+        createQuestionTemplateSchema.safeParse({ name: 'Modello', usage }).success
+      ).toBe(true);
     }
   });
 
   it('rifiuta un momento sconosciuto', () => {
-    expect(createQuestionTemplateSchema.safeParse({ name: 'Modello', usage: 'DURING' }).success).toBe(false);
+    expect(
+      createQuestionTemplateSchema.safeParse({ name: 'Modello', usage: 'DURING' }).success
+    ).toBe(false);
   });
 
   it("l'aggiornamento può cambiare solo il momento", () => {

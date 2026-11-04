@@ -23,7 +23,11 @@ const HEX_COLOR_RE = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 const patchSchema = z.object({
   slug: z.string().min(1).max(100).regex(SLUG_RE).optional(),
-  name: z.record(z.string(), z.string().min(1).max(80)).optional(),
+  // Come alla creazione: il nome italiano e' quello da cui si ripiega.
+  name: z
+    .record(z.string(), z.string().min(1).max(80))
+    .refine((n) => !!n.it, { message: 'name.it is required' })
+    .optional(),
   color: z.string().regex(HEX_COLOR_RE).nullable().optional(),
   sortOrder: z.number().int().min(0).max(9999).optional(),
 });

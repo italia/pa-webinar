@@ -31,6 +31,15 @@ describe('postEventModeratorEmail', () => {
     recapSummary: 'Partecipanti (picco): 42\nRegistrati: 100',
   };
 
+  it('l’indirizzo del video non esce dall’attributo del link', () => {
+    const m = postEventModeratorEmail({
+      ...base,
+      recordingUrl: 'https://video.example.com/v"onclick="x',
+    });
+    expect(m.html).not.toContain('"onclick="x');
+    expect(m.html).toContain('https://video.example.com/v&quot;onclick=&quot;x');
+  });
+
   it('include il riepilogo e il link alla pagina evento', () => {
     const m = postEventModeratorEmail(base);
     expect(m.subject).toContain('Caffè Digitale');

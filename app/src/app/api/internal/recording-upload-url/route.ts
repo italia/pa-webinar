@@ -28,9 +28,9 @@ const SAS_EXPIRY_MINUTES = 30;
 export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
-  const body = (await parseJsonBody(request)) as Record<string, unknown>;
-  const filename = typeof body.filename === 'string' ? body.filename : '';
-  const roomName = typeof body.roomName === 'string' ? body.roomName : '';
+  const body = (await parseJsonBody(request)) as Record<string, unknown> | null;
+  const filename = typeof body?.filename === 'string' ? body.filename : '';
+  const roomName = typeof body?.roomName === 'string' ? body.roomName : '';
 
   if (!filename || !roomName) {
     throw new ValidationError('roomName and filename are required');
@@ -39,7 +39,7 @@ export const POST = withErrorHandling(async (request) => {
   // Prevent path traversal — the SAS is scoped per blob, but sanitising
   // the filename keeps the resulting URL predictable and defends against
   // a compromised Jibri from uploading to arbitrary blob paths.
-  if (filename.includes('/') || filename.includes('..')) {
+  if (/[/\\\x00-\x1f]|\.\.|^\.$/.test(filename)) {
     throw new ValidationError('filename must not contain path separators');
   }
 

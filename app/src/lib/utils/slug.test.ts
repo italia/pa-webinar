@@ -25,6 +25,11 @@ describe('generateUniqueSlug', () => {
     expect(slug).toBe('citta-metropolitana');
   });
 
+  it('un titolo senza lettere latine ne’ cifre non da’ uno slug vuoto', async () => {
+    expect(await generateUniqueSlug(loc('!!!'))).toBe('evento');
+    expect(await generateUniqueSlug(loc('Προβολή'))).toBe('evento');
+  });
+
   it('removes special characters', async () => {
     const slug = await generateUniqueSlug(loc('Q&A: Domande!'));
     expect(slug).toBe('q-a-domande');

@@ -55,7 +55,7 @@ export const eventBaseSchema = z.object({
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
-  privacyPolicyUrl: z.string().url().optional(),
+  privacyPolicyUrl: materialUrlSchema.optional(),
   // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
   // all'iscrizione si mostra quella del template GDPR scelto.
   privacyPolicyText: z
@@ -198,10 +198,10 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
   // Chi vede la registrazione pubblicata: tutti o i soli iscritti (lib/recording/audience).
   recordingAudience: z.enum(['PUBLIC', 'REGISTRANTS']).optional(),
   // In modifica null toglie il documento dell'informativa dell'evento.
-  privacyPolicyUrl: z.string().url().nullable().optional(),
+  privacyPolicyUrl: materialUrlSchema.nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
-  recordingUrl: z.string().url().nullable().optional(),
-  tempRecordingUrl: z.string().url().nullable().optional(),
+  recordingUrl: materialUrlSchema.nullable().optional(),
+  tempRecordingUrl: materialUrlSchema.nullable().optional(),
   recordingFileSize: z.number().int().nullable().optional(),
   recordingDuration: z.number().int().nullable().optional(),
 }).refine(
@@ -256,7 +256,7 @@ export const createLegacyEventSchema = z.object({
   description: localizedStringField.optional().default({ it: '' }),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
-  recordingUrl: z.string().url(),
+  recordingUrl: materialUrlSchema,
   recordingFileSize: z.number().int().positive().optional(),
   recordingDuration: z.number().int().positive().optional(),
   youtubeUrl: z
@@ -272,6 +272,9 @@ export const createLegacyEventSchema = z.object({
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   libraryListed: z.boolean().optional().default(true),
+}).refine((d) => new Date(d.endsAt) > new Date(d.startsAt), {
+  message: 'endsAt must be after startsAt',
+  path: ['endsAt'],
 });
 export type CreateLegacyEventInput = z.infer<typeof createLegacyEventSchema>;
 

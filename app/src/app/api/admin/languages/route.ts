@@ -44,7 +44,8 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
-  const body = await parseJsonBody(request) as Record<string, unknown>;
+  const grezzo = await parseJsonBody(request);
+  const body = (typeof grezzo === 'object' && grezzo !== null ? grezzo : {}) as Record<string, unknown>;
 
   if ('locale' in body && 'overrides' in body) {
     const parsed = updateTranslationsSchema.safeParse(body);
