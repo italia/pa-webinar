@@ -70,22 +70,13 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   const session = await prisma.callSession.findFirst({
     where: { id, eventId: event.id },
-    select: { id: true, recordingUrl: true },
+    select: { id: true, recordingUrl: true, recording: { select: { id: true } } },
   });
   if (!session) throw new NotFoundError('CallSession');
 
-  // Delete the blob from the RECORDINGS domain, keyed off the stored URL
-  // (not a guessed files-domain key). Best-effort.
-  if (session.recordingUrl) {
-    try {
-      await deleteRecordingBlob(session.recordingUrl);
-    } catch {
-      /* best effort */
-    }
-  }
-
   // Se il file tolto e' quello pubblicato sull'evento, la pagina non deve piu'
-  // puntarci. La cancellazione di una registrazione resta tracciata.
+  // puntarci. La cancellazione di una registrazione resta tracciata, anche
+  // quando la sessione aveva solo la riga della registrazione: va via a cascata.
   const eraPubblicato =
     !!session.recordingUrl && session.recordingUrl === event.recordingUrl;
   await prisma.$transaction([
@@ -98,7 +89,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
           }),
         ]
       : []),
-    ...(session.recordingUrl
+    ...(session.recordingUrl || session.recording
       ? [
           prisma.gdprAuditLog.create({
             data: {
@@ -114,6 +105,17 @@ export const DELETE = withErrorHandling(async (request, context) => {
         ]
       : []),
   ]);
+
+  // Dopo la transazione: se fallisse, il file c'e' ancora e la pagina continua a
+  // funzionare. Il file si cancella dallo storage delle registrazioni partendo
+  // dall'URL salvato. Se resta, la riconciliazione lo trova come orfano.
+  if (session.recordingUrl) {
+    try {
+      await deleteRecordingBlob(session.recordingUrl);
+    } catch (err) {
+      console.error('[sessions DELETE] blob delete failed:', err);
+    }
+  }
 
   return Response.json({ deleted: true });
 });

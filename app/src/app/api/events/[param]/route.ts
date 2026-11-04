@@ -14,6 +14,7 @@ import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publ
 import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
+import { CAMPI_VIDEO_VUOTI } from '@/lib/events/recording-fields';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { chiudiSondaggiAperti } from '@/lib/events/close-polls';
 import { eventTagIds, replaceEventTags, resolveTags, sameTagIds } from '@/lib/events/event-tags';
@@ -598,6 +599,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.tempRecordingUrl !== undefined && { tempRecordingUrl: data.tempRecordingUrl }),
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),
       ...(data.recordingDuration !== undefined && { recordingDuration: data.recordingDuration }),
+      // Dopo i campi qui sopra, per vincere su di loro: togliere il video toglie
+      // anche pubblicazione, peso e durata.
+      ...(data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
       ...(data.status !== undefined && { status: data.status }),
       ...(nextCapacityEstimate !== undefined && {
         capacityEstimateJson: nextCapacityEstimate,

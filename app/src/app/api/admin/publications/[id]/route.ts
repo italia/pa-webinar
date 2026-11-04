@@ -89,17 +89,13 @@ export const PATCH = withErrorHandling(async (request, context) => {
       ...(parsed.data.youtubeUrl !== undefined && {
         youtubeUrl: parsed.data.youtubeUrl,
       }),
-      ...(parsed.data.recordingUrl === null
-        ? CAMPI_VIDEO_VUOTI
-        : setsRecording && {
-            recordingUrl: parsed.data.recordingUrl,
-            // Enable the flag even on retroactive uploads (Jibri was off
-            // during the event) so the detail page surfaces the player.
-            recordingEnabled: true,
-          }),
-      // Togliere il video toglie anche la pubblicazione: senza video non c'e'
-      // niente da pubblicare, qualunque cosa chieda la richiesta.
-      ...(publishWith !== undefined && parsed.data.recordingUrl !== null && {
+      ...(setsRecording && parsed.data.recordingUrl !== null && {
+        recordingUrl: parsed.data.recordingUrl,
+        // Enable the flag even on retroactive uploads (Jibri was off
+        // during the event) so the detail page surfaces the player.
+        recordingEnabled: true,
+      }),
+      ...(publishWith !== undefined && {
         recordingPublished: publishWith,
         ...(publishWith && { recordingPublishedAt: new Date() }),
       }),
@@ -112,6 +108,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
       ...(parsed.data.recordingDuration !== undefined && {
         recordingDuration: parsed.data.recordingDuration,
       }),
+      // Ultimi, per vincere sui campi qui sopra: togliere il video toglie anche
+      // pubblicazione, peso e durata, qualunque cosa chieda la richiesta.
+      ...(parsed.data.recordingUrl === null && CAMPI_VIDEO_VUOTI),
     },
   });
 

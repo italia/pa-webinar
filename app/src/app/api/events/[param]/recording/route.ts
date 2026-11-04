@@ -117,7 +117,6 @@ export const DELETE = withErrorHandling(async (request, context) => {
         ...CAMPI_VIDEO_VUOTI,
         tempRecordingUrl: null,
         tempRecordingStartedAt: null,
-        recordingDeleteAfterDays: null,
       },
     }),
     prisma.gdprAuditLog.create({

@@ -484,7 +484,7 @@ Whether this storage needs consent under the ePrivacy rules is the controller's 
 | `CONSENT_RECORDED` | Every registration | The consent flags given, including `consentAddressBook` |
 | `DATA_DELETED` | The cleanup, per event past retention, on each run that deletes or anonymizes something: the first run after the retention passes, and any later run that finds data written since; self-service erasure, per event; deletion of one registration by staff | For the cleanup, counts of each kind deleted or anonymized; for self-service erasure, the source and an 8-character hash prefix; for deletion by staff, the source `admin-registration-delete` and the counts |
 | `DATA_EXPORTED` | Self-service export, per event | An 8-character hash prefix |
-| `RECORDING_DELETED` | The cleanup when a published video expires; manual deletion by the primary moderator link | The reason and the retention days, or which files existed |
+| `RECORDING_DELETED` | The cleanup when a published video expires; manual deletion of the video or of a call session by the primary moderator link | The reason and the retention days, which files existed, or the call session and whether its file was the event's video |
 | `TEMP_RECORDING_DELETED` | The cleanup, 24 hours after a temporary recording | The reason |
 
 Address-book deletions by the retention job, AI-output purges and track purges write no `GdprAuditLog` row; the jobs report counts in their response and in the application log.
