@@ -9,14 +9,19 @@
  * Identità: partecipante registrato (accessToken → registrationId) oppure
  * guest anonimo (guestId client-side). I moderatori guidano la discussione e
  * non votano (il client non mostra loro i pulsanti).
+ *
+ * Chi vota con l'identificativo del browser passa dal cancello della lettura
+ * (authorizePanelRead), come per i sondaggi, e a evento finito non si vota.
  */
 
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
+import { authorizePanelRead, PANEL_READ_EVENT_SELECT } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import {
+  AppError,
   NotFoundError,
   ForbiddenError,
   ValidationError,
@@ -26,6 +31,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 export const dynamic = 'force-dynamic';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const reactionSchema = z.object({
   value: z.enum(['AGREE', 'DISAGREE']).nullable(),
@@ -49,12 +56,17 @@ export const POST = withErrorHandling(async (request, context) => {
   }
   const { value, accessToken, guestId } = parsed.data;
 
+  if (!UUID_RE.test(itemId)) throw new NotFoundError('Agenda item');
+
   const event = await prisma.event.findUnique({
     where: { slug },
-    select: { id: true, agendaEnabled: true },
+    select: { ...PANEL_READ_EVENT_SELECT, agendaEnabled: true },
   });
   if (!event) throw new NotFoundError('Event');
   if (!event.agendaEnabled) throw new ForbiddenError('Agenda disabled');
+  if (event.status === 'ENDED' || event.status === 'ARCHIVED') {
+    throw new AppError('Agenda is closed', 409, 'AGENDA_CLOSED');
+  }
 
   // Coarse per-IP backstop against guestId-rotation spam. Kept generous: a
   // large share of a PA audience can share one institutional egress IP, and a
@@ -94,6 +106,10 @@ export const POST = withErrorHandling(async (request, context) => {
       windowMs: 60_000,
     });
     if (!rl.allowed) throw new RateLimitError();
+
+    // Vota col browser solo un ospite: chi conduce non vota e chi e' iscritto
+    // passa dal ramo sopra. Vale la stessa soglia della lettura.
+    await authorizePanelRead(event, null);
   } else {
     throw new ValidationError('Identity required (accessToken or guestId)');
   }
@@ -115,7 +131,7 @@ export const POST = withErrorHandling(async (request, context) => {
       create: {
         agendaItemId: itemId,
         registrationId,
-        guestId: guestId ?? null,
+        guestId: registrationId ? null : (guestId ?? null),
         value,
       },
       update: { value },

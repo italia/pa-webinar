@@ -15,6 +15,7 @@
  * stays attributable even after a display-name change.
  */
 
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -118,7 +119,9 @@ export const POST = withErrorHandling(async (request, context) => {
       .create({
         data: { messageId, senderId: auth.senderId, emoji: parsed.data.emoji },
       })
-      .catch(() => {});
+      .catch((err: unknown) => {
+        if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')) throw err;
+      });
   }
 
   const rows = await prisma.chatMessageReaction.findMany({
