@@ -1158,6 +1158,11 @@ points to this section.
      --from-literal=HF_TOKEN=<hugging-face-read-token>
    ```
 
+   Each installation creates its own token, of type **Read**, at
+   <https://huggingface.co/settings/tokens>; the repository ships none. Use an
+   account of your organization, because the models stop being downloadable
+   when a personal account goes away.
+
    Set `postprod.worker.hfTokenSecret.name: hf-token`. The token must belong to
    an account that accepted the conditions of the gated pyannote models:
    `pyannote/speaker-diarization-3.1`, `pyannote/segmentation-3.0` and
@@ -2438,6 +2443,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   ([checklist](#operational-checklist), step 3).
 - **The worker image has no release tag.** It is published only as `:dev`
   and `:dev-<sha>` ([Roadmap](ROADMAP.md#installation-and-operations)).
+- **No transcription on CPU.** The worker loads WhisperX on `cuda` and offers
+  no setting to change it. A workstation GPU can run it: see
+  [AI on your own hardware](install/minikube.md#ai-on-your-own-hardware).
 - **No post-production on a single VM**, and without `postprod.enabled` no
   job deletes per-participant tracks
   ([Scheduled and background jobs](architecture/background-jobs.md)).

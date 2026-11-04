@@ -2,8 +2,8 @@
 
 This page takes you from an empty workstation to a working PA Webinar
 installation on [minikube](https://minikube.sigs.k8s.io/), in one command and
-three to five minutes when Docker's build cache is already warm (a first build
-takes longer). It is written for the IT staff of a public body who want to
+three to seven minutes, depending on how the images arrive and what is already
+cached ([Measured usage](#measured-usage)). It is written for the IT staff of a public body who want to
 see the product and the Helm chart before they choose where to run it, and
 for developers who work on the chart. minikube is supported for evaluation
 and development, not for events
@@ -26,6 +26,9 @@ On this page:
 - [Update, stop and remove](#update-stop-and-remove)
 - [More than one profile](#more-than-one-profile)
 - [The development loop](#the-development-loop)
+- [Object storage with MinIO](#object-storage-with-minio)
+- [Live captions](#live-captions)
+- [AI on your own hardware](#ai-on-your-own-hardware)
 - [Limits of this setup](#limits-of-this-setup)
 - [Related pages](#related-pages)
 
@@ -53,13 +56,10 @@ evaluating an installation. Compared with it, minikube:
 
 - serves the portal and the conference over HTTPS through an ingress
   controller, as a real installation does. Compose serves the portal over plain
-  HTTP, so the staff session works only on `localhost`;
+  HTTP, so the staff session works only on `localhost`; and
 - runs every scheduled job of the simple profile as a Kubernetes CronJob.
-  Compose runs the email outbox, the reminders and the hourly cleanup of
-  expired event data through one `cron` service, and the other retention jobs
-  do not run;
-- runs the Jitsi release that the chart pins. Compose follows the floating
-  `stable` tag.
+  Compose runs the same jobs through one `cron` service, some of them more
+  often.
 
 Compose is still the better choice for changing the code: on minikube, a
 one-string change took 2 min 21 s from the edit to the running pod, most of
@@ -138,10 +138,25 @@ Not included, by design of the evaluation setup:
   once its end time and the grace period have passed; the moderator can still
   press **Start event** earlier and **End for everyone**. The administration
   area's **Infrastructure** page shows **Fixed mode**.
-- **Recording, file uploads and AI post-production.** They need object
-  storage, which the chart does not ship. Materials given as links work.
-  Without storage the portal hides the upload controls
-  ([Two storage domains](../configuration/storage.md#two-storage-domains)).
+- **Recording and file uploads.** They need object storage, which the chart
+  does not ship, and Jibri and the recorder are off. Materials given as links
+  work. Without storage the portal hides the upload controls
+  ([Two storage domains](../configuration/storage.md#two-storage-domains)), and
+  the room has no recording control. The event wizard does not ask whether to
+  record, and **Infrastructure** states that events will not be recorded.
+- **AI post-production.** No flag of the script turns it off: `postprod.enabled`
+  defaults to `false` and the overlay leaves it there, so no worker,
+  orchestrator or vLLM is installed, and `/api/status/postprod` answers
+  `"status":"disabled"`. The switch under **Settings** > **Post-event AI
+  pipeline** exists, but turning it on here produces nothing, because there
+  are no recordings and no worker. The pipeline needs recordings, object
+  storage and a GPU ([AI post-production](../POSTPROD.md)). `worker.stub: true`
+  exercises the flow without models, still with storage and the worker images;
+  it was not tried on minikube.
+- **Live captions.** The overlay sets `global.captions.enabled: false`: the
+  engine alone asks for a whole CPU and 1.5 GiB. Without the service the portal
+  hides the switches. They run on the default profile when you turn them on
+  ([Live captions](#live-captions)).
 - **The shared whiteboard.** Jitsi's whiteboard needs a collaboration server
   that the chart does not install or configure, so rooms have no whiteboard
   ([Gaps you fill yourself](README.md#gaps-you-fill-yourself)).
@@ -225,13 +240,13 @@ flowchart TD
 
 | Mode | When to use it | What it needs | First install, measured |
 |---|---|---|---|
-| Registry, with a pull Secret | To try what the development branch publishes, without building | A token with `read:packages` for ghcr.io | 2 min 47 s |
-| Local | No credentials, or to try your own changes | Docker on the workstation. The migration image alone is about 2.4 GB | 4 min 56 s with Docker's build cache warm |
+| Registry, with a pull Secret | To try what the development branch publishes, without building | A token with `read:packages` for ghcr.io | 2 min 47 s to 3 min 11 s |
+| Local | No credentials, or to try your own changes | Docker on the workstation. The migration image alone is about 2.9 GB | 4 min 56 s to 5 min 34 s with Docker's build cache warm |
 
 `--images registry|host|local` forces a mode. `registry` stops at once when
 the node cannot pull. `host` pulls with the workstation's Docker, after
-`docker login ghcr.io`, and loads the images into the node; it was not
-exercised in the lab.
+`docker login ghcr.io`, and loads the images into the node: no token enters
+the cluster, and the first install took 4 min 35 s.
 
 **To see your own changes, always pass `--images local`.** With registry
 credentials, in the environment or in the `ghcr-pull` Secret that an earlier
@@ -319,7 +334,7 @@ this repository's sources".
    them with the commit of your checkout, so that `/api/health` answers
    `"version":"local"` and that commit (with `-dirty` when the checkout has
    uncommitted changes). The build's output goes to `build.log` in the state
-   folder (`tail -f` it while you wait), and the 2.4 GB migration image is
+   folder (`tail -f` it while you wait), and the 2.9 GB migration image is
    loaded into the node again only when the Dockerfile, the lockfiles or
    `app/prisma` changed.
 4. **Creates a certificate authority once**, in the same folder: the key
@@ -397,7 +412,7 @@ It exits 0 when nothing failed. On a local build it warns that the images do
 not match the chart's appVersion, which is expected. `--call` needs `npm ci` at
 the repository root and a Chromium (`npx playwright install chromium`, or
 `--browser /usr/bin/google-chrome`); in the lab the whole check with the call
-took 23 s. It can run as soon as the script returns: the script waits for
+took 25 s. It can run as soon as the script returns: the script waits for
 every rollout, the conference's front end that each upgrade restarts
 included, and the check retries the conference for up to 90 s
 (`--conference-wait`).
@@ -437,7 +452,7 @@ docker save pa-webinar:local-$P-migrate | minikube -p $P image load -
 Load the images from `docker save`, as above, not by name: loading by name
 goes through minikube's own image cache, which keeps the previous image when
 the tag has not changed, and the node would run stale code. Loading the two
-images, the migration one about 2.4 GB, took between 1 minute and 96 s in
+images, the migration one about 2.9 GB, took between 54 and 96 s in
 the lab. If `minikube start` warned that the kernel does not support CPU cfs
 period/quota, cap the node container as the script does:
 `docker update --cpus=4 $P`, then check with
@@ -538,7 +553,8 @@ On top of the simple profile, `examples/values-minikube.yaml`:
 - leaves `tls` empty on both Ingresses. The script adds its TLS Secrets in
   `values-local.yaml`; without them the controller's self-signed certificate
   applies;
-- sets `jitsi.requirePinnedCredentials: true`.
+- sets `jitsi.requirePinnedCredentials: true`;
+- turns live captions off (`global.captions.enabled: false`).
 
 The requests of Jicofo, Prosody and Jitsi web, and the bridge's tolerant
 liveness probe, are the chart's defaults on every profile.
@@ -647,8 +663,8 @@ Compose stack.
 
 ### 3. Create a first event
 
-- **A scheduled event.** **New event** first asks four questions on the
-  event's format (**Start from a template**, next to the heading, offers the
+- **A scheduled event.** **New event** first asks three questions on the
+  event's format; an installation that can record adds a fourth (**Start from a template**, next to the heading, offers the
   saved templates). The wizard then has six steps, **Event**, **When**,
   **People**, **Programme** (optional), **Permissions** and **Summary**, with
   **Advanced settings** apart. Publishing needs the lead
@@ -657,7 +673,7 @@ Compose stack.
   in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands
   on the event's page in the administration area, which lists the
   **Event links**: the **Public event page**, the
-  **Direct invite (no registration)** and the **Moderator link**. The
+  **Direct invite (no registration)** and the **Management link (moderator)**. The
   default templates carry Italian names and descriptions in every language.
 - **An instant call.** **Instant calls** > **New call** creates a call that is
   live at once, with no public page. **Create and join** opens its page:
@@ -666,11 +682,12 @@ Compose stack.
 
 ### 4. Open the room
 
-Open the **Moderator link**. The event lifecycle job, which runs every
+Open the **Management link (moderator)**. The event lifecycle job, which runs every
 minute, opens a published event at its start time and ends it once its end
 time and the grace period have passed. Before the start time the moderator
-opens the room with **Start event**, then enters with **Enter now**, and
-**End for everyone** closes it at any time
+opens the room with **Start event**, which also takes them in; more than 30
+minutes ahead it asks to confirm with **Start now**. **End for everyone**
+closes the room at any time
 ([Event lifecycle](../architecture/event-lifecycle.md)).
 
 In the room, only moderator links make someone a moderator: the event's
@@ -764,8 +781,10 @@ total, so you can compare your own runs:
 
 | Operation | Time |
 |---|---|
-| First install, published images with a pull Secret | 2 min 47 s, of which Helm 117 s |
-| First install, no credentials, Docker's build cache warm | 2 min 57 s to 4 min 56 s: about 50 s to start the node and the ingress, from a few seconds to 2 min 26 s to build the images, 50 s to 1 min to load them into the node, about 70 s of Helm |
+| First install, published images with a pull Secret | 2 min 47 s to 3 min 11 s, of which Helm 117 to 131 s |
+| The same, with an empty minikube cache | 3 min 34 s: 75 s for the node and the ingress, 132 s of Helm |
+| First install, `--images host` | 4 min 35 s: 57 s for the node, 85 s to pull and load the images, 123 s of Helm |
+| First install, no credentials, Docker's build cache warm | 2 min 57 s to 5 min 34 s: about 1 min to start the node and the ingress, from a few seconds to 2 min 26 s to build the images, 50 s to 1 min to load them into the node, about 75 s of Helm |
 | First install, no credentials, 2 CPU / 3 GB node | 6 min 10 s, build cache state not recorded |
 | The development loop: one string changed in the portal, then the script again with `--images local` | 2 min 21 s: 1 min 50 s of build with a warm cache, the application image loaded into the node (the migration image unchanged, not loaded), 21 s of Helm |
 | Running the script again, nothing changed | 11 to 15 s |
@@ -773,8 +792,13 @@ total, so you can compare your own runs:
 | Restarting a stopped profile with the script | 1 min 18 s, data kept |
 | `scripts/minikube-down.sh --purge` | 18 to 19 s |
 
-A first build on a machine with an empty build cache takes several minutes
-more.
+The image build alone, with an empty cache and the base images pulled, took
+2 min 27 s on 24 threads and 2 min 32 s limited to 4 cores and 8 GB (AMD Ryzen 9
+7900), without exporting the images to Docker. Slower processors take longer.
+
+The first install on a new workstation downloads about 3 GB: the node image,
+Kubernetes, the conference and the data services, plus 829 MB of portal images
+in registry mode. At 100 Mbit/s that adds about 4 minutes.
 
 ## Troubleshooting
 
@@ -863,6 +887,20 @@ To check the CPU cap the script applied:
 ```bash
 docker exec pa-webinar cat /sys/fs/cgroup/cpu.max   # 4 CPUs: 400000 100000
 ```
+
+### The check reports a full database volume
+
+"volume del database pieno al 90%" ("database volume 90% full"). With the
+Docker driver the node's volume is the workstation's disk, so the check
+measures that disk. Free space on the workstation, or raise the threshold with
+`--disk-fail PCT`.
+
+### The call check fails with the moderator outside the conference
+
+"il moderatore non entra nella conferenza" ("the moderator does not enter the
+conference"), with `--call` on a busy workstation, for example during an image
+build. Run the check again once the workstation is free. If it fails again,
+start from [The room does not load in the portal](#the-room-does-not-load-in-the-portal).
 
 ### The script refuses the registry credentials
 
@@ -1022,6 +1060,189 @@ pod, with Docker's build cache warm. A change to the chart or a values file
 alone skips the build and the image load, which leaves about half a minute
 for the Helm upgrade and the checks (derived from the measured phases).
 
+## Object storage with MinIO
+
+Uploads, uploaded videos and AI outputs need an S3 service. Without one, run
+MinIO in the profile with `infra/helm/pa-webinar/examples/minio-minikube.yaml`.
+It is one replica with one key, for evaluation only. A browser uploaded a file
+through it in the lab.
+
+MinIO's own images were not available without credentials, on Docker Hub or
+on Quay, so the example uses Chainguard's public `latest` tag, which does not
+pin a version.
+
+The signed addresses reach browsers as well as the cluster, so the endpoint
+is an HTTPS name, signed by the local authority:
+
+```bash
+P=pa-webinar; NS=pa-webinar
+S=~/.config/pa-webinar/minikube/$P
+H=s3.$(minikube -p $P ip).nip.io
+
+(cd $S && umask 077
+ openssl ecparam -name prime256v1 -genkey -noout -out tls/$H.key
+ openssl req -new -key tls/$H.key -subj "/CN=$H" -out tls/$H.csr
+ openssl x509 -req -in tls/$H.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+   -days 397 -sha256 -out tls/$H.crt \
+   -extfile <(printf 'subjectAltName=DNS:%s\nextendedKeyUsage=serverAuth\n' $H))
+kubectl --context $P -n $NS create secret tls s3-tls \
+  --cert=$S/tls/$H.crt --key=$S/tls/$H.key
+
+U=$(openssl rand -hex 10); W=$(openssl rand -hex 24)
+kubectl --context $P -n $NS create secret generic minio-root \
+  --from-literal=MINIO_ROOT_USER=$U --from-literal=MINIO_ROOT_PASSWORD=$W
+sed "s/<s3-host>/$H/g" infra/helm/pa-webinar/examples/minio-minikube.yaml \
+  | kubectl --context $P -n $NS apply -f -
+```
+
+Then write a values file next to the secrets, readable only by you, and pass it
+with `--values` on every run. `<s3-host>`, `<user>` and `<password>` are `$H`,
+`$U` and `$W`:
+
+```yaml
+app:
+  env:
+    STORAGE_FILES_PROVIDER: "s3"
+    STORAGE_FILES_S3_BUCKET: "pa-webinar-files"
+    STORAGE_FILES_S3_ENDPOINT: "https://<s3-host>"
+    RECORDING_S3_BUCKET: "pa-webinar-recordings"
+    RECORDING_S3_ENDPOINT: "https://<s3-host>"
+secrets:
+  generate:
+    STORAGE_FILES_S3_ACCESS_KEY_ID: "<user>"
+    STORAGE_FILES_S3_SECRET_ACCESS_KEY: "<password>"
+    RECORDING_S3_ACCESS_KEY_ID: "<user>"
+    RECORDING_S3_SECRET_ACCESS_KEY: "<password>"
+```
+
+Leave `RECORDING_STORAGE_TYPE` unset: it would announce a Jibri that this setup
+does not have. Storage alone does not make the room record, so the wizard still
+does not ask. Staff can upload a video, which is the way to give a recording to
+the pipeline without a recorder.
+
+## Live captions
+
+Captions run on CPU, so they work on the default 4 CPU and 6 GB profile, without
+a GPU. In the lab, a synthetic Italian voice appeared as text for the moderator
+and a guest. With one voice the service used about 0.3 CPU and 1.25 GiB. Their
+images are public, so no credentials are needed:
+
+```yaml
+global:
+  captions:
+    enabled: true
+captions:
+  gateway:
+    image: ghcr.io/italia/pa-webinar-captions-gateway:dev
+  engine:
+    image: ghcr.io/italia/pa-webinar-captions-engine:dev
+```
+
+Pass the file with `--values`. The pod downloads the model, about 750 MB, every
+time it starts. Each voice takes CPU: the limits are in
+[Live captions](../architecture/live-captions.md).
+
+On Docker Compose they are the `captions` profile: uncomment the three lines in
+`.env.example`, copied to `.env`, then run
+`scripts/compose-up.sh --profile captions`.
+
+## AI on your own hardware
+
+The script installs no AI component and has no GPU option. This section tells
+you what a workstation can run. In the lab, a profile started as below exposed
+one `nvidia.com/gpu` and a pod read the GPU with `nvidia-smi`. The pipeline
+itself was not tried on minikube.
+
+### What each model does
+
+| Step | Model | Runs on | Needs |
+|---|---|---|---|
+| Live captions | Nemotron 3.5 ASR streaming, 0.6 billion parameters | CPU | About 1 GB of memory, 750 MB to download |
+| Transcription | WhisperX `large-v3` | GPU | 16 GB of video memory, with pyannote |
+| Who is speaking | `pyannote/speaker-diarization-3.1` | GPU | A Hugging Face token |
+| Summaries, translations, event report | `mistralai/Mistral-Small-3.2-24B-Instruct-2506`, on vLLM | GPU | About 48 GB of weights, so an 80 GB GPU |
+| Event title and description | EuroLLM-9B, `Q4_K_M`, on llama.cpp | CPU | 4 CPU and 6 GiB, 5.6 GB to download |
+| Dubbing | Piper voices | GPU worker | The voices are in the image |
+
+The language model decides the hardware. It has 24 billion parameters and, at
+16 bits, each takes 2 bytes: 48 GB. The context of the conversation comes on
+top, and it grows with the transcript. At 8 bits the same weights would take
+24 GB and at 4 bits 12 GB, for some loss of quality. A replacement must fit
+next to its context, keep JSON output and hold your longest transcript
+([Choosing another model](../POSTPROD.md#choosing-another-model)).
+
+### Hardware limits
+
+Only NVIDIA GPUs work: the worker uses CUDA, on Linux. AMD and Apple GPUs do not.
+
+| Video memory | What it can hold |
+|---|---|
+| Less than 16 GB, as on many gaming laptops | Below what the pipeline is sized for. Not tried. Captions and the CPU models still work |
+| 16 GB | Transcription, with no room for a language model |
+| 24 to 32 GB | Transcription and a reduced language model, one at a time. Not tried |
+| 80 GB | The default configuration |
+
+Beyond the GPU, plan for:
+
+- 15 GB to download for the worker image, plus the models: about 6 GB for
+  transcription, and the weights of the language model;
+- 16 GiB of memory or more for the worker, which asks for 32 GiB by default,
+  on top of the node;
+- the one-hour limit of a worker Job, `postprod.worker.activeDeadlineSeconds`.
+  It suits a two-hour event on an 80 GB GPU; a slower GPU needs more.
+
+### What runs where
+
+| Part | With a local NVIDIA GPU | CPU only |
+|---|---|---|
+| Transcription (WhisperX, pyannote) | Yes, on 16 GB of video memory | No. The worker loads the models on `cuda`, with no setting to change it |
+| Dubbing | Yes | No. It is a job of the GPU worker |
+| Summaries and translations | With a model smaller than the default, which needs an 80 GB GPU ([Choosing another model](../POSTPROD.md#choosing-another-model)) | The worker calls an OpenAI-compatible server inside the cluster, so llama.cpp should work slowly. Not tried |
+| Transcript from captions | Runs on CPU, without the pipeline: `global.captions.enabled: true` and the option on the event | Same |
+| Translation of event titles and descriptions | Runs on CPU with EuroLLM on llama.cpp: `postprod.mt.enabled: true`, 4 CPU and 6 GiB ([Event text translation](../POSTPROD.md#event-text-translation)) | Same |
+
+To give a profile the GPU, install the NVIDIA driver and the NVIDIA Container
+Toolkit on the workstation, create the profile yourself, and let the script
+reuse it. The sizes are a starting point, not a measurement:
+
+```bash
+minikube start -p pa-webinar --keep-context --driver=docker \
+  --container-runtime=docker --gpus=all \
+  --cpus=12 --memory=40g --disk-size=150g --kubernetes-version=v1.35.1
+kubectl --context pa-webinar get node \
+  -o jsonpath='{.items[0].status.allocatable.nvidia\.com/gpu}'   # 1
+scripts/minikube-up.sh --images local --values ai.yaml
+```
+
+The file `ai.yaml` needs at least the following. The worker's defaults ask for
+a GPU node pool, 8 CPU and 32 GiB:
+
+```yaml
+postprod:
+  enabled: true
+  worker:
+    nodeSelector: null    # null removes the chart default
+    tolerations: []
+    modelsPvc: ai-models
+    hfTokenSecret:
+      name: hf-token
+    resources:
+      requests: { cpu: "4", memory: 16Gi }
+```
+
+The rest comes from the [operational checklist](../POSTPROD.md#operational-checklist):
+object storage ([MinIO](#object-storage-with-minio) is enough here), the seeded
+models volume, a vLLM Deployment and the worker images. The Hugging Face token
+is your own: create it as step 3 of that checklist describes.
+
+One GPU is a limit. The worker and vLLM each request a whole `nvidia.com/gpu`,
+so the second stays `Pending` unless the device plugin shares the GPU with
+time-slicing, which was not tried.
+
+To try a model or a prompt on a test recording, without all of this, use
+[infra/ai/local-out](../../infra/ai/local-out/README.md), which runs on the
+workstation's GPU outside the cluster. It is for test data only.
+
 ## Limits of this setup
 
 - **Browsers on the same workstation only**, with the Docker driver. A VM
@@ -1036,8 +1257,9 @@ for the Helm upgrade and the checks (derived from the measured phases).
   needs Docker.
 - **One bridge, fixed.** One conference always runs on one bridge; the
   measured limits are in [Measured usage](#measured-usage).
-- **No object storage, recording, Jibri, TURN, AI post-production or shared
-  whiteboard.** Without object storage the portal hides the upload controls.
+- **No object storage, recording, Jibri, TURN, AI post-production, live
+  captions or shared whiteboard.** Without object storage the portal hides the
+  upload controls.
 - **Bridge counts stay at zero** until a room has two participants
   ([Look around](#6-look-around)).
 - **No Prometheus.** The chart does not install one and `PROMETHEUS_URL` is
