@@ -272,14 +272,14 @@ git worktree remove ../pa-webinar-scan
 
 ```bash
 docker compose up --build -d --wait
-docker compose --profile setup run --rm --build db-migrate
+docker compose --profile setup run --rm db-seed
 cd app
 npx playwright install chromium   # first time only
 ADMIN_API_KEY=<the value set for the app service in docker-compose.yml> \
   npx playwright test --project=chromium
 ```
 
-Keep `--build` in both commands. The `app` and `db-migrate` services are built from the working tree, and without the flag Compose reuses an image built earlier, so the tests would run against old code.
+Keep `--build` in the first command. The `app` and `db-migrate` services are built from the working tree, and without the flag Compose reuses an image built earlier, so the tests would run against old code.
 
 ### Declaring what you skipped
 

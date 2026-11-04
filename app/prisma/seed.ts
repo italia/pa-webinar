@@ -149,14 +149,27 @@ async function main() {
   console.log('System event templates ensured.');
 
   // Seed site settings
+  // Il portale crea la riga con i valori dello schema alla prima lettura delle
+  // impostazioni, e il seed puo' arrivare dopo: i valori dimostrativi valgono
+  // anche sulla riga gia' esistente.
+  const impostazioniDemo = {
+    siteDescription:
+      'Webinar ed eventi pubblici delle community della trasformazione digitale',
+    calendarPublic: true,
+    // Un elenco, non un testo JSON: la colonna e' JSON, e le impostazioni
+    // lette tornano indietro cosi' come sono quando si salva dal pannello.
+    footerLinks: [
+      { title: 'Privacy', url: '/privacy', section: 'legal' },
+      { title: 'Accessibilità', url: '/accessibility', section: 'legal' },
+      { title: 'Note legali', url: '/legal-notice', section: 'legal' },
+    ],
+  };
   await prisma.siteSetting.upsert({
     where: { id: 'singleton' },
-    update: {},
+    update: impostazioniDemo,
     create: {
       id: 'singleton',
       siteName: 'PA Webinar',
-      siteDescription:
-        'Webinar ed eventi pubblici delle community della trasformazione digitale',
       organizationName: '',
       organizationNameShort: '',
       organizationUrl: '',
@@ -169,14 +182,7 @@ async function main() {
       statusPageEnabled: true,
       guestAccessEnabled: true,
       publicRegistrationEnabled: true,
-      calendarPublic: true,
-      // Un elenco, non un testo JSON: la colonna e' JSON, e le impostazioni
-      // lette tornano indietro cosi' come sono quando si salva dal pannello.
-      footerLinks: [
-        { title: 'Privacy', url: '/privacy', section: 'legal' },
-        { title: 'Accessibilità', url: '/accessibility', section: 'legal' },
-        { title: 'Note legali', url: '/legal-notice', section: 'legal' },
-      ],
+      ...impostazioniDemo,
     },
   });
   console.log('Seeded site settings.');

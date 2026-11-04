@@ -845,7 +845,7 @@ From the repository root:
 
 ```bash
 docker build -t pa-webinar:local .                                 # portal
-docker build --target builder -t pa-webinar:local-migrate .        # migrations (about 2.4 GB)
+docker build --target builder -t pa-webinar:local-migrate .        # migrations (about 2.9 GB)
 ```
 
 The browser-facing settings (`NEXT_PUBLIC_*`) are read at runtime, so one image

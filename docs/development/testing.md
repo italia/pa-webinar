@@ -147,8 +147,8 @@ The browser runs with the `it-IT` locale. The specs open Italian URLs (`/it/even
 To run the suite against the local stack:
 
 ```bash
-docker compose up --build -d --wait
-docker compose --profile setup run --rm db-migrate   # migrations and seed data
+docker compose up --build -d --wait                  # migrations run before the app
+docker compose --profile setup run --rm db-seed      # demo data
 cd app
 npx playwright install chromium                      # first run only
 npx playwright test --project=chromium
@@ -164,7 +164,7 @@ npx playwright test --project=chromium
 In CI, the **E2E Smoke Tests** job runs after **Lint & Typecheck** and **Unit Tests**. It:
 
 1. starts the whole Compose stack, which builds the production image of the app;
-2. runs `db-migrate`;
+2. loads the demo data with `db-seed`;
 3. waits for `/api/health`;
 4. runs the `chromium` project;
 5. uploads the report as an artifact.
@@ -241,7 +241,7 @@ What each patch fixes, and how to build and bump the image, are in [Patched jits
 
 `scripts/verify-install.sh` checks a running Helm installation on any platform and exits non-zero when a check fails. From outside, it tests the portal (`/api/health`, `/api/ready`, component status), the conference `config.js`, the HTTP to HTTPS redirect, and certificate validity and days to expiry for both host names. From the cluster, it checks that the release's pods are ready, that the app and migration images match, the last successful run of each scheduled job, overdue and failed emails, and the free space on the database volume. It changes nothing, so it can also run from cron with `--quiet`, which prints only warnings and errors.
 
-With `--call`, two headless browsers join a throwaway instant call and check that audio and video reach both of them; the call is deleted at the end. This needs Node.js, the root `npm ci` (for Playwright) and a Chromium (`npx playwright install chromium`, or `--browser <path>`).
+With `--call`, two headless browsers join a throwaway instant call, open their microphone and camera, which are closed on entry, and check that audio and video reach both of them; the call is deleted at the end. This needs Node.js, the root `npm ci` (for Playwright) and a Chromium (`npx playwright install chromium`, or `--browser <path>`).
 
 The administrator key comes from a secrets file or standard input (`--secrets-file`), or from the release's Secret (`--keys-from-cluster`), never from the command line. Every sign-in with the key is recorded in the administrator audit log.
 

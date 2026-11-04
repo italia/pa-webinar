@@ -44,7 +44,7 @@ values depending on how they were set up:
 | Installation | How the row is created | Starting values |
 |---|---|---|
 | Helm chart | The `db-migrate` init container runs `prisma migrate deploy` only. The first request that reads the settings creates the row | The schema defaults |
-| Docker Compose, `setup` profile | `db-migrate` runs the migrations, then `prisma/seed.ts` | The schema defaults, except a site description, **Public calendar** turned on, and footer links to the privacy, accessibility and legal-notice pages |
+| Docker Compose, `setup` profile | `db-seed` runs `prisma/seed.ts` | The schema defaults, except a site description, **Public calendar** turned on, and footer links to the privacy, accessibility and legal-notice pages |
 
 A default applies only when the row is created. If a later release changes a default in
 `schema.prisma`, the value already stored in an existing installation stays as it was. After an

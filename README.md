@@ -356,8 +356,8 @@ infra/onprem/k3s/pa-webinar-up.sh --host <user>@<server> \
 Docker Compose is the loop for developing PA Webinar, not a way to install it: it serves the portal over plain HTTP, keeps public placeholder secrets and runs only some of the scheduled jobs.
 
 ```bash
-docker compose up --build -d                        # build and start the stack
-docker compose --profile setup run --rm db-migrate  # first run only: migrations and demo data
+scripts/compose-up.sh                               # build, migrate, demo data on the first run
+scripts/compose-up.sh --images registry             # the same with the published images (needs docker login ghcr.io)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # optional: hot reload
 ```
 

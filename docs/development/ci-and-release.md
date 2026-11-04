@@ -109,7 +109,7 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 | Security Scan | Trivy filesystem scan of the repository for CRITICAL and HIGH findings. `.trivyignore` at the root records the accepted ones | | Yes |
 | License Compliance | `npm run license:check` reads the lockfiles and fails on forbidden or missing licenses among production dependencies ([policy](../../THIRD-PARTY-LICENSES.md#what-ci-runs)). The job then regenerates `license-report.json` and fails if the committed file differs | | Yes |
 | Migration Integrity | `prisma migrate deploy` on an empty database, then `prisma migrate diff --from-migrations app/prisma/migrations --to-schema-datamodel app/prisma/schema.prisma --shadow-database-url <the same throwaway database> --exit-code` | | Yes |
-| E2E Smoke Tests | Starts the Docker Compose stack, runs the `db-migrate` service and runs Playwright on Chromium. It uploads the `playwright-report` artifact | Lint & Typecheck, Unit Tests | No (`continue-on-error`) |
+| E2E Smoke Tests | Starts the Docker Compose stack, loads the demo data with the `db-seed` service and runs Playwright on Chromium. It uploads the `playwright-report` artifact | Lint & Typecheck, Unit Tests | No (`continue-on-error`) |
 | Docker Build & Scan | Builds the app image from the checkout with `push: false`, then scans that local image with Trivy for CRITICAL and HIGH findings | Lint & Typecheck, Unit Tests | Yes |
 
 Details worth knowing:

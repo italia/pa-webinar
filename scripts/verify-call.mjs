@@ -161,7 +161,7 @@ async function api(pagina, percorso, init) {
 
 function frameConferenza(pagina) {
   return pagina.frames().find((f) => {
-    try { return new URL(f.url()).hostname === conferenza.hostname; } catch { return false; }
+    try { return new URL(f.url()).host === conferenza.host; } catch { return false; }
   });
 }
 
@@ -257,24 +257,52 @@ async function statisticheMedia(pagina) {
   }).catch(() => null);
 }
 
+// In sala si entra con microfono e videocamera chiusi, salvo una scelta diversa
+// in sala d'attesa: senza aprirli non parte nessun media, e la prova segnalerebbe
+// un guasto del ponte video che non c'e'.
+async function apriMedia(pagina, chi) {
+  const frame = frameConferenza(pagina);
+  if (!frame) throw new Error(`${chi}: frame della conferenza non trovato`);
+  await frame.evaluate(() => {
+    window.APP.conference.muteAudio(false);
+    window.APP.conference.muteVideo(false);
+  });
+}
+
+// Il primo fotogramma arriva qualche secondo dopo l'apertura, di piu' su una
+// macchina carica: si misura per finestre di 4 secondi, fino a FINESTRE_MEDIA.
+const FINESTRE_MEDIA = 5;
+
 async function controllaMedia(pagina, chi) {
-  const prima = await statisticheMedia(pagina);
-  await attendi(4000);
-  const dopo = await statisticheMedia(pagina);
-  if (!prima || !dopo) {
-    errore(`${chi}: statistiche WebRTC non leggibili`);
-    return;
+  let audio = 0;
+  let video = 0;
+  let fotogrammi = 0;
+  let percorso = '';
+  for (let i = 0; i < FINESTRE_MEDIA; i++) {
+    const prima = await statisticheMedia(pagina);
+    await attendi(4000);
+    const dopo = await statisticheMedia(pagina);
+    if (!prima || !dopo) {
+      errore(`${chi}: statistiche WebRTC non leggibili`);
+      return;
+    }
+    audio = dopo.audio - prima.audio;
+    video = dopo.video - prima.video;
+    fotogrammi = dopo.fotogrammi;
+    percorso = dopo.percorso ? `, percorso ${dopo.percorso}` : '';
+    if (audio > 0 && video > 0 && fotogrammi > 0) {
+      const kbit = Math.round(((audio + video) * 8) / 4 / 1000);
+      ok(`${chi}: riceve audio e video (${kbit} kbit/s${percorso})`);
+      return;
+    }
   }
-  const audio = dopo.audio - prima.audio;
-  const video = dopo.video - prima.video;
-  const percorso = dopo.percorso ? `, percorso ${dopo.percorso}` : '';
-  if (audio > 0 && video > 0 && dopo.fotogrammi > 0) {
-    const kbit = Math.round(((audio + video) * 8) / 4 / 1000);
-    ok(`${chi}: riceve audio e video (${kbit} kbit/s${percorso})`);
+  const secondi = FINESTRE_MEDIA * 4;
+  if (video > 0 && fotogrammi === 0) {
+    errore(`${chi}: in ${secondi} secondi riceve dati video ma non decodifica nessun fotogramma${percorso}`);
   } else if (audio > 0 || video > 0) {
-    avviso(`${chi}: riceve ${audio > 0 ? 'solo audio' : 'solo video'}${percorso}`);
+    avviso(`${chi}: in ${secondi} secondi riceve ${audio > 0 ? 'solo audio' : 'solo video'}${percorso}`);
   } else {
-    errore(`${chi}: nessun media ricevuto in 4 secondi${percorso} (porta UDP del ponte video raggiungibile? TURN?)`);
+    errore(`${chi}: nessun media ricevuto in ${secondi} secondi${percorso} (porta UDP del ponte video raggiungibile? TURN?)`);
   }
 }
 
@@ -351,8 +379,8 @@ try {
   } else {
     throw new Error(`i partecipanti non si vedono (moderatore: ${JSON.stringify(mod)}, ospite: ${JSON.stringify(ospite)})`);
   }
-  // Qualche secondo perché i flussi si stabilizzino.
-  await attendi(6000);
+  await apriMedia(paginaAdmin, 'moderatore');
+  await apriMedia(guest, 'ospite');
   await controllaMedia(guest, 'ospite');
   await controllaMedia(paginaAdmin, 'moderatore');
 } catch (e) {

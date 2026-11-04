@@ -967,16 +967,18 @@ The Docker Compose stack builds from source and is a development environment
 ```bash
 git fetch --tags
 git checkout vX.Y.Z
-docker compose --profile setup build
-docker compose --profile setup run --rm db-migrate npx prisma migrate deploy
-docker compose up -d
+scripts/compose-up.sh
 ```
 
-Always pass `npx prisma migrate deploy` explicitly. The default command of the `db-migrate` service
-runs the seed script (`app/prisma/seed.ts`) after the migrations. The seed deletes every event,
-with its registrations, questions, polls, materials and reminders, as well as the GDPR audit log
-and user-created event templates, and then creates example events. Run the default command only on
-an empty database.
+The project name is fixed to `pa-webinar`. A stack started before the name was fixed keeps its data
+in volumes named after its folder, and stays reachable only with that name: run
+`COMPOSE_PROJECT_NAME=<folder> scripts/compose-up.sh`, or the script starts on new, empty volumes and
+warns that the old ones exist.
+
+The script rebuilds the images and starts the stack, and the `db-migrate` service applies the new
+migrations before the app starts. Do not run the `db-seed` service on a stack with data: the seed
+deletes every event, with its registrations, questions, polls, materials and reminders, as well as
+the GDPR audit log and user-created event templates, and then creates example events.
 
 To go back, check out the previous tag, build, and start the stack again. The schema stays at the
 newer version, as it does with Helm.

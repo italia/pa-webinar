@@ -2,16 +2,28 @@
 # pa-webinar — Docker Compose (full local stack)
 #
 # Usage:
-#   docker compose up --build -d          # Start everything
-#   docker compose --profile setup run --rm db-migrate  # Migrate + seed
-#   docker compose logs -f app            # Watch app logs
-#   docker compose down -v                # Stop + remove volumes
+#   scripts/compose-up.sh                     # Build, start, demo data on first run
+#   scripts/compose-up.sh --images registry   # Same, with the published images
+#
+#   docker compose up --build -d              # Build and start: migrations run first
+#   docker compose --profile setup run --rm db-seed  # Reset to the demo data
+#   docker compose logs -f app                # Watch app logs
+#   docker compose down -v                    # Stop + remove volumes
+#
+# PA_WEBINAR_IMAGE and PA_WEBINAR_MIGRATE_IMAGE choose the portal images
+# (default: built locally as pa-webinar:local and pa-webinar:local-migrate).
 # ─────────────────────────────────────────────────────────────
+
+# Nome fisso del progetto: senza, volumi e rete cambiano con il nome della
+# cartella del checkout, e con loro i dati che lo stack vede. Due checkout
+# condividono quindi lo stesso stack: -p e COMPOSE_PROJECT_NAME li separano.
+name: pa-webinar
 
 services:
 
   # ── Next.js Application ──────────────────────────────────
   app:
+    image: ${PA_WEBINAR_IMAGE:-pa-webinar:local}
     build:
       context: .
       dockerfile: Dockerfile
@@ -73,6 +85,8 @@ services:
       # variabili CAPTIONS_* (vedi .env.example).
       - CAPTIONS_STATUS_URL=${CAPTIONS_STATUS_URL:-}
     depends_on:
+      db-migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -85,20 +99,34 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # ── Database migration + seed (one-shot) ─────────────────
+  # ── Database migrations (one-shot) ───────────────────────
+  # Girano a ogni `up`, prima dell'app, come l'initContainer del chart: dopo un
+  # aggiornamento dei sorgenti lo schema non resta indietro rispetto al codice.
   db-migrate:
+    image: ${PA_WEBINAR_MIGRATE_IMAGE:-pa-webinar:local-migrate}
     build:
       context: .
       dockerfile: Dockerfile
       target: builder
     working_dir: /workspace/app
-    command: >
-      sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts"
+    command: npx prisma migrate deploy
     environment:
       - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/pa_webinar
     depends_on:
       postgres:
         condition: service_healthy
+
+  # ── Demo data (one-shot, --profile setup) ────────────────
+  # Sta a parte dalle migrazioni perche' cancella gli eventi esistenti.
+  db-seed:
+    image: ${PA_WEBINAR_MIGRATE_IMAGE:-pa-webinar:local-migrate}
+    working_dir: /workspace/app
+    command: npx tsx prisma/seed.ts
+    environment:
+      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/pa_webinar
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
     profiles: ["setup"]
 
   # ── PostgreSQL ───────────────────────────────────────────
@@ -281,7 +309,7 @@ services:
       retries: 5
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.31.2
     restart: unless-stopped
     ports:
       - "1025:1025"
@@ -308,9 +336,9 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        # tick=30s. I contatori replicano le cadenze del chart:
-        # email-outbox e lifecycle ogni minuto, reminders ogni 5, cleanup
-        # ogni ora. lifecycle apre gli eventi all'ora di inizio e chiude quelli
+        # tick=30s. Gli stessi lavori del chart: email-outbox e lifecycle ogni
+        # minuto, come li'; reminders ogni 5 minuti e cleanup ogni ora, piu'
+        # spesso che in cluster, per vederli all'opera. lifecycle apre gli eventi all'ora di inizio e chiude quelli
         # finiti: qui non c'è lo scaler dei bridge che lo farebbe.
         # multitrack-purge ogni 15 minuti, recordings-reconcile ogni 6 ore,
         # postprod-retention e rubrica-retention una volta al giorno: le prime
@@ -343,6 +371,7 @@ services:
   # ATTENZIONE: monta /var/run/docker.sock (accesso Docker host) — abilitare
   # solo se si vuole la registrazione multi-traccia.
   recorder-controller:
+    image: pa-webinar-recorder-controller:local
     build:
       context: ./infra/recorder-controller
       dockerfile: Dockerfile
@@ -356,7 +385,7 @@ services:
       - PORT=8080
       # Network compose a cui agganciare i container recorder, così
       # raggiungono `app` e `jitsi-web`. Default = network di default del
-      # progetto compose; adatta se usi un COMPOSE_PROJECT_NAME diverso.
+      # progetto compose, di cui segue il nome.
       - DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-pa-webinar}_default
       # Env statiche passate a ogni recorder (allowlist passthrough):
       - RECORDER_ENV_JITSI_DOMAIN=localhost:8443
