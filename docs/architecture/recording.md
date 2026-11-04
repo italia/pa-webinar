@@ -916,8 +916,13 @@ title. The event page puts the pages back beside the published video
   `XMPP_MUC_MODULES` does not load `pa_occupants`. A track whose seat the
   portal still does not know after the last retry is skipped for its whole
   session.
-- **Recording indicator.** Only Jibri raises the in-room **Recording in
-  progress** banner.
+- **Recording indicator.** The room signals a recording from two sources:
+  Jibri's own status event, and the `capture` field of
+  `GET /api/events/{slug}/lifecycle` (`app/src/lib/live/capture-state.ts`),
+  which the room reads every five seconds and which says from the event's
+  configuration that the per-participant recorder should be running. A recorder
+  that is still starting counts as running, so the signal can come on a few
+  seconds before the bot joins.
 - **A PDF presented in the room is not in the video.** Jibri records the
   Jitsi page, and the presentation area belongs to the portal around it; the
   multitrack recorder captures audio only. The pages reach the recording only

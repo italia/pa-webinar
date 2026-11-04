@@ -1000,6 +1000,12 @@ button.live-time-strip__rec {
   letter-spacing: 0.04em;
 }
 
+.live-rec-indicator--testo {
+  background: #fff;
+  color: #0b3a6e;
+  letter-spacing: 0;
+}
+
 .live-rec-indicator__dot {
   width: 8px;
   height: 8px;
@@ -1012,6 +1018,49 @@ button.live-time-strip__rec {
   .live-rec-indicator__dot {
     animation: none;
   }
+}
+
+// L'avviso che una registrazione o una trascrizione parte o si ferma: sopra il
+// video, senza spostarlo, e dentro la sala anche a schermo intero.
+.live-capture-notice-slot {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  z-index: 60;
+  width: min(560px, calc(100% - 32px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.live-capture-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem 0.65rem 1rem;
+  border-radius: 8px;
+  background: #17324d;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
+  pointer-events: auto;
+}
+
+.live-capture-notice--on {
+  background: #c4122f;
+}
+
+.live-capture-notice__chiudi {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
 }
 
 // Main video flex-child. `min-width: 0` is the classic flexbox fix that

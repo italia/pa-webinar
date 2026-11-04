@@ -51,6 +51,8 @@ import ClosingNotice from '@/components/live/closing-notice';
 import LiveCaptions from '@/components/live/live-captions';
 import { impostaPulsante } from '@/lib/jitsi/custom-buttons';
 import { FULLSCREEN_BUTTON_ID, fullscreenToolbarButton } from '@/lib/jitsi/fullscreen-button';
+import CaptureNotice from '@/components/live/capture-notice';
+import { catturaDallaRisposta, type StatoCattura } from '@/lib/live/capture-state';
 import StageName from '@/components/live/stage-name';
 import ListenOnlyNotice from '@/components/live/listen-only-notice';
 import ConsentsDialog, { type ConsensiInSala } from '@/components/live/consents-dialog';
@@ -384,6 +386,7 @@ export default function LiveEventClient({
   const participantCountRef = useRef(0);
   useEffect(() => { participantCountRef.current = participantCount; }, [participantCount]);
   const [isRecording, setIsRecording] = useState(false);
+  const [cattura, setCattura] = useState<StatoCattura | null>(null);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
   // App-owned fullscreen: fullscreen the whole live wrapper (video +
@@ -1107,7 +1110,7 @@ export default function LiveEventClient({
     const aggiornaRete = () => {
       setReteInstabile(connessioneInstabile(proveFalliteRef.current, navigator.onLine));
     };
-    const pollInterval = setInterval(async () => {
+    const controlla = async () => {
       // Durante un rientro le stesse domande le fa il rientro.
       if (rientroRef.current) return;
       // Qui serve solo lo `status`, e questa chiamata la ripete ogni
@@ -1121,6 +1124,11 @@ export default function LiveEventClient({
       // portale (un aggiornamento in corso) no: la rete c'è.
       proveFalliteRef.current = res ? 0 : proveFalliteRef.current + 1;
       aggiornaRete();
+      // Il registratore per persona e la trascrizione dai sottotitoli non
+      // passano da un comando in sala: li dice il server. Una risposta senza
+      // lo stato tiene l'ultimo noto: nel dubbio il segnale resta acceso.
+      const statoCatturaOra = catturaDallaRisposta(res?.ok ? res.data : null);
+      if (statoCatturaOra) setCattura(statoCatturaOra);
       if (statoEvento(res) === 'ENDED' && eventStatus !== 'ENDED') {
         markEnded();
         // La schermata «Evento concluso» invece di restare in 'ready', che
@@ -1131,7 +1139,9 @@ export default function LiveEventClient({
         // La valutazione e' dentro la schermata di chiusura (phase 'ended').
         setPhase('ended');
       }
-    }, 5000);
+    };
+    void controlla();
+    const pollInterval = setInterval(() => void controlla(), 5000);
     window.addEventListener('online', aggiornaRete);
     window.addEventListener('offline', aggiornaRete);
     return () => {
@@ -1835,6 +1845,8 @@ export default function LiveEventClient({
   useEffect(() => {
     riaffermaSottotitoliRef.current = riaffermaSottotitoliOra;
   }, [riaffermaSottotitoliOra]);
+  const registrazioneInCorso = isRecording || !!cattura?.registrazione;
+  const trascrizioneInCorso = !!cattura?.trascrizione;
   // L'ora d'avvio della registrazione secondo il server (la cronologia della
   // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
   // Si chiede finché la registrazione è in corso e il server non la sa. Una
@@ -2250,6 +2262,8 @@ export default function LiveEventClient({
         registrationCount={event.registrationCount}
         maxParticipants={event.maxParticipants}
         isRecording={isRecording}
+        inRegistrazione={registrazioneInCorso}
+        inTrascrizione={trascrizioneInCorso}
         role={isActualModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         slug={event.slug}
         locale={locale}
@@ -2259,6 +2273,8 @@ export default function LiveEventClient({
         onToggleSoloContenuto={() => setSoloContenuto((v) => !v)}
         onApriConsensi={haConsensiInSala ? () => setConsensiAperti(true) : undefined}
       />
+
+      <CaptureNotice video={isRecording} voci={!!cattura?.registrazione} trascrizione={trascrizioneInCorso} />
 
       {/* Chi e' in solo ascolto lo vede, con il modo di acconsentire e
           intervenire. */}
@@ -3960,6 +3976,10 @@ interface LiveTopBarProps {
    *  pill in the top bar and as fallback when no one has joined yet. */
   maxParticipants?: number;
   isRecording: boolean;
+  /** Si registra: Jibri o il registratore per persona. */
+  inRegistrazione: boolean;
+  /** Si conserva il testo degli interventi. */
+  inTrascrizione: boolean;
   role: UserRole;
   /** Event slug + active locale → build the shareable, token-free call and
    *  event-page links (never derived from the current URL, which carries the
@@ -3991,6 +4011,8 @@ function LiveTopBar({
   registrationCount,
   maxParticipants: _maxParticipants,
   isRecording,
+  inRegistrazione,
+  inTrascrizione,
   role,
   slug,
   locale,
@@ -4096,21 +4118,26 @@ function LiveTopBar({
           va su una riga sua, sotto titolo e comandi. */}
       <AgendaTicker eventSlug={slug} isModerator={role === 'moderator'} />
       <div className="live-top-bar__actions d-flex align-items-center gap-2">
-        {/* Un'icona, non una fascia: chi è in sala sa che si registra senza
-            perdere una riga di video. Il ruolo status la annuncia quando
-            compare. Chi conduce la trova, con la durata, nella striscia del
-            tempo. */}
-        {isRecording && role !== 'moderator' && (
-          <span className="live-rec-indicator" title={t('recordingActive')} aria-hidden="true">
+        {/* Un segnale fisso, non una fascia: chi è in sala sa che si registra o
+            si trascrive senza perdere una riga di video. All'avvio c'è anche
+            l'avviso, con il suono (CaptureNotice). Chi conduce trova la
+            registrazione di Jibri, con la durata, nella striscia del tempo. */}
+        {inRegistrazione && (role !== 'moderator' || !isRecording) && (
+          <span className="live-rec-indicator" title={t('recordingActive')} role="img" aria-label={t('recordingActive')}>
             <span className="live-rec-indicator__dot" />
             {t('recordingShort')}
           </span>
         )}
-        {/* La regione resta montata e cambia testo: un contenitore che nasce
-            già pieno molti lettori di schermo non lo annunciano. */}
-        <span className="visually-hidden" role="status">
-          {isRecording ? t('recordingActive') : ''}
-        </span>
+        {inTrascrizione && (
+          <span
+            className="live-rec-indicator live-rec-indicator--testo"
+            title={t('transcriptionActive')}
+            role="img"
+            aria-label={t('transcriptionActive')}
+          >
+            {t('transcriptionShort')}
+          </span>
+        )}
         {/* The "active vs registered" figure is moderator-only:
             participants shouldn't see attendance numbers. The live people-count
             now lives only in the participants sidebar, so non-moderators get

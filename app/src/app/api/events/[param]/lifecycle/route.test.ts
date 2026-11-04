@@ -19,6 +19,7 @@ vi.mock('@/lib/events/lifecycle-driver', () => ({
   scalerDriverActive: mocks.scalerDriverActive,
 }));
 vi.mock('@/lib/jvb-snapshot', () => ({ readJvbSnapshot: mocks.readJvbSnapshot }));
+vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => ({ liveCaptionsEnabled: true })) }));
 
 import { GET } from './route';
 
@@ -68,6 +69,24 @@ describe('GET /lifecycle', () => {
 
     expect(body.jvb.phase).toBe('queued');
     expect(body.jvb.startedAt).not.toBeNull();
+  });
+
+  it('dice cosa si cattura in sala', async () => {
+    mocks.findUnique.mockResolvedValue({
+      ...evento('LIVE'),
+      recordingEnabled: true,
+      aiTranscriptEnabled: true,
+      multitrackRecordingEnabled: true,
+    });
+    expect((await leggi()).capture).toEqual({ recording: true, transcription: true });
+
+    mocks.findUnique.mockResolvedValue({
+      ...evento('LIVE'),
+      recordingEnabled: false,
+      aiTranscriptEnabled: false,
+      multitrackRecordingEnabled: false,
+    });
+    expect((await leggi()).capture).toEqual({ recording: false, transcription: false });
   });
 
   it('fuori dal warm-up non c\'è telemetria e non si chiede chi conduce', async () => {

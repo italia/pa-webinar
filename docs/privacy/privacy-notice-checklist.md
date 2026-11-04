@@ -45,7 +45,7 @@ owner:
 | Waiting room, before entering | For whoever has not given it at registration (guests, registrants on another browser), the recording consent box under **Event recording**, with the event's notice next to it: the same text or link as the registration form. Moderators and speakers get the same box in every event that records, always optional, with a note on what happens without it | Built-in text (`waiting.recordingConsentIntro`), or the event's `recordingConsentText`; the hosts' note is `gdpr.consent.recordingOptionalHost` |
 | Waiting room, before entering | For whoever has not given it (moderators and speakers included), the optional transcription box under **Transcript of what you say**, when the event records per-participant audio or keeps a transcript from captions | Built-in texts `gdpr.consent.multitrack` and `gdpr.consent.multitrackOptional` |
 | Waiting room, live captions | That speech is transcribed in real time for the captions, and whether the text is kept: not at all, or with the name for the people who consented | Built-in texts `waiting.captionsNotice` and `waiting.captionsNoticeTranscript`; the event's **Automatic captions** and **Transcript from captions** |
-| During the call | A **Recording in progress** banner for everyone while a recording runs | Automatic |
+| During the call | A written notice and a short tone for everyone when a recording or a transcript starts or stops, also on entry while one runs; **REC** and **Transcript** marks in the top bar while they run | Automatic |
 
 The event page does not link the event's notice. Guests, where they are
 admitted (see item 8 of
