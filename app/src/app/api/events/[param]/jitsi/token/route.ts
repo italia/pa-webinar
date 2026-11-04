@@ -27,6 +27,7 @@ import { limiteTokenOspiti } from '@/lib/room-rate-limit';
 import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { mediaDelToken, regolaConsenso } from '@/lib/live/listen-only';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { registraChiConduce } from '@/lib/live/entry-consents';
 import { pseudonimo } from '@/lib/live/pseudonym';
 import { guestSenderId } from '@/lib/chat/sender-key';
@@ -214,6 +215,8 @@ export const POST = withErrorHandling(async (request, context) => {
   // token (lib/live/listen-only): chi entra per primo accende il blocco nella
   // sala (mod_pa_media_lock), con gli stessi tipi per tutti.
   const regola = regolaConsenso(event, recordingAvailable());
+  // Vale da quando si entra: chi aspetta da prima non ha una scelta vecchia.
+  const participantListVisible = elencoVisibileAlPubblico(event);
   // Il token di chi partecipa: senza consenso, in solo ascolto o fuori. Lo
   // verifica il server, non solo la sala d'attesa.
   const mediaPartecipante = (consenso: boolean) => {
@@ -297,6 +300,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       role: isSpeaker ? 'speaker' : 'moderator',
       consentsRecorded,
+      participantListVisible,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -368,6 +372,7 @@ export const POST = withErrorHandling(async (request, context) => {
           displayName: nomeInoltro,
           role: 'participant',
           consentsRecorded,
+          participantListVisible,
           listenOnly: !!mediaInoltro.listenOnly,
         },
         { headers: { 'Cache-Control': 'no-store' } },
@@ -445,6 +450,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: nomeInSala,
       role: 'participant',
       consentsRecorded,
+      participantListVisible,
       listenOnly: !!mediaIscritto.listenOnly,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
@@ -509,6 +515,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: nomeOspite,
       role: 'guest',
       consentsRecorded,
+      participantListVisible,
       listenOnly: !!mediaOspite.listenOnly,
     }, { headers: { 'Cache-Control': 'no-store' } });
   }

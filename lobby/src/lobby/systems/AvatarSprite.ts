@@ -455,7 +455,7 @@ export class AvatarSprite {
     }
 
     // Nametag: pinned for inCall, otherwise driven by culling.
-    this.nametag.setVisible(this.pinnedName || this.nameWanted);
+    this.nametag.setVisible((this.pinnedName || this.nameWanted) && this.nametag.text !== '');
 
     // Depth follows feet y so the world y-sorts.
     this.container.setDepth(this.container.y);
@@ -468,7 +468,8 @@ export class AvatarSprite {
 }
 
 function displayName(p: PlayerProfile, isSelf: boolean): string {
-  return p.name.trim() || (isSelf ? 'Tu' : 'Ospite');
+  // Senza nome (chi guarda non ha il diritto di vederlo): nessuna etichetta.
+  return p.name.trim() || (isSelf ? 'Tu' : '');
 }
 
 function profileAppearance(p: PlayerProfile, inCall: boolean): AvatarAppearance {

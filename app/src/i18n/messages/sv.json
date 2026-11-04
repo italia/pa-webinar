@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Medan rummet kan vara öppet går inspelning och endast lyssning inte att ändra: de gäller från första inträdet.",
         "audienceAnonymous": "Anonym publik",
         "audienceAnonymousDesc": "Deltagare visas för andra under en pseudonym (”Deltagare” och en kod) i video, chatt och frågor; deltagarlistan stannar hos värdarna och det finns inget torg. Bra för stora evenemang; på gemenskapsevenemang vill man lära känna varandra.",
-        "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn."
+        "audienceAnonymousLocked": "Kan inte ändras medan rummet kan vara öppet: det skulle koppla pseudonymer till namn.",
+        "participantListVisible": "Visa deltagarlistan för publiken",
+        "participantListVisibleDesc": "Av: listan, rutnätet och namnen på torget stannar hos värdar och talare; publiken ser bara den som talar. På: alla ser vilka som är i rummet.",
+        "participantListAnonymous": "Med anonym publik förblir listan dold.",
+        "participantListLocked": "Kan inte ändras när rummet är öppet: de som redan är inne skulle inte se ändringen.",
+        "participantListCameraNote": "Med dold lista ser den som slår på kameran inte sin egen ruta. Visa listan vid ett möte där alla ser varandra."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transkription av egna inlägg, frivillig",
         "consentsNone": "Inget samtycke utöver det vid anmälan.",
         "consentsHosts": "Moderatorer och talare tillfrågas om inspelningen i rummet, frivilligt.",
-        "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”."
+        "consentsWithdraw": "Deltagarna kan återkalla dem i rummet med knappen ”Samtycken”.",
+        "participantListShown": "Deltagarlista: synlig för alla.",
+        "participantListHidden": "Deltagarlista: endast för värdar och talare."
       },
       "preview": {
         "title": "Förhandsvisning av sidan",

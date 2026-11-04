@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Sakemm il-kamra tista' tkun miftuħa, ir-reġistrazzjoni u s-smigħ biss ma jinbidlux: jgħoddu mill-ewwel dħul.",
         "audienceAnonymous": "Udjenza anonima",
         "audienceAnonymousDesc": "Il-parteċipanti jidhru lill-oħrajn b’psewdonimu (“Parteċipant” u kodiċi) fil-vidjo, fiċ-chat u fil-mistoqsijiet; il-lista tal-parteċipanti tibqa’ għand min imexxi, u m’hemmx pjazza. Utli għal avvenimenti kbar; f’avvenimenti tal-komunità n-nies iridu jsiru jafu lil xulxin.",
-        "audienceAnonymousLocked": "Ma jinbidilx sakemm il-kamra tista’ tkun miftuħa: jorbot il-psewdonimi mal-ismijiet."
+        "audienceAnonymousLocked": "Ma jinbidilx sakemm il-kamra tista’ tkun miftuħa: jorbot il-psewdonimi mal-ismijiet.",
+        "participantListVisible": "Uri l-lista tal-parteċipanti lill-udjenza",
+        "participantListVisibleDesc": "Mitfi: il-lista, il-grilja u l-ismijiet fil-pjazza jibqgħu għal min imexxi u min jitkellem; l-udjenza tara biss min qed jitkellem. Mixgħul: kulħadd jara min hemm fis-sala.",
+        "participantListAnonymous": "B'udjenza anonima l-lista tibqa' moħbija.",
+        "participantListLocked": "Ma jinbidilx bis-sala miftuħa: min diġà ġewwa ma jarax il-bidla.",
+        "participantListCameraNote": "Bil-lista moħbija, min ixgħel il-kamera ma jarax il-kwadru tiegħu. Għal laqgħa fejn kulħadd jara lil xulxin, uri l-lista."
       },
       "step3": {
         "heading": "Persuni u stediniet",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "traskrizzjoni ta' dak li jgħidu, fakultattiva",
         "consentsNone": "L-ebda kunsens lil hinn minn dak tar-reġistrazzjoni.",
         "consentsHosts": "Lil min imexxi u jitkellem tintalab ir-reġistrazzjoni fis-sala, b'mod fakultattiv.",
-        "consentsWithdraw": "Il-parteċipanti jistgħu jirtirawhom fis-sala, bil-buttuna “Kunsensi”."
+        "consentsWithdraw": "Il-parteċipanti jistgħu jirtirawhom fis-sala, bil-buttuna “Kunsensi”.",
+        "participantListShown": "Lista tal-parteċipanti: viżibbli għal kulħadd.",
+        "participantListHidden": "Lista tal-parteċipanti: biss għal min imexxi u min jitkellem."
       },
       "preview": {
         "title": "Anteprima tal-paġna",

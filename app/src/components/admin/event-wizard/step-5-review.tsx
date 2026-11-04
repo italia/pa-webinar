@@ -18,6 +18,7 @@ import { useDurataTesto } from '@/hooks/use-durata-testo';
 import { durataProgramma } from '@/lib/agenda/programme';
 import { parseLocaleList } from '@/lib/ai/target-locales';
 import { registraChiConduce } from '@/lib/live/entry-consents';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { consensiRichiesti } from '@/lib/registration/consents';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
@@ -493,6 +494,23 @@ export default function Step5Review({
               )}
               {(consensi.registrazione || consensi.tracce) && (
                 <span className="d-block text-secondary small">{tf('consentsWithdraw')}</span>
+              )}
+            </span>
+          </li>
+          <li>
+            <span className="anteprima-righe__icona">
+              <Icon icon="it-user" size="sm" />
+            </span>
+            <span>
+              {elencoVisibileAlPubblico({
+                participantListVisible: form.participantListVisible,
+                audienceAnonymous: form.audienceAnonymous,
+                eventType: istantanea ? 'INSTANT' : null,
+              })
+                ? tf('participantListShown')
+                : tf('participantListHidden')}
+              {!form.participantListVisible && toggles.participantsCanStartVideo && (
+                <span className="d-block text-secondary small mt-1">{tp('participantListCameraNote')}</span>
               )}
             </span>
           </li>

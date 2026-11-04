@@ -115,6 +115,8 @@ export const eventBaseSchema = z.object({
   listenOnlyWithoutConsent: z.boolean().default(true),
   // Pubblico anonimo: pseudonimi per chi partecipa (spento: ci si conosce).
   audienceAnonymous: z.boolean().default(false),
+  // L'elenco di chi partecipa, per il pubblico: spento di default.
+  participantListVisible: z.boolean().default(false),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
   recurrenceRule: z.string().max(500).nullable().optional(),

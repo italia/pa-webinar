@@ -22,6 +22,7 @@ import {
   type EventRole,
   type EventFeature,
   type PermissionMatrix,
+  togglesFromMatrix,
 } from '@/lib/utils/permission-matrix';
 
 import { nomeLingua } from './text-translation';
@@ -34,6 +35,8 @@ export interface StepPermissionsValue {
   listenOnlyWithoutConsent: boolean;
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous: boolean;
+  /** L'elenco di chi partecipa, per il pubblico: spento di default. */
+  participantListVisible: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
   /** Nuvola di parole live (opt-in). */
@@ -197,6 +200,36 @@ export default function StepPermissions({
       {soloAscoltoBloccato && (
         <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
           {t('audienceAnonymousLocked')}
+        </p>
+      )}
+
+      {/* L'elenco di chi partecipa: nascosto al pubblico di default, lo mostra
+          solo la scelta di chi organizza. Con gli pseudonimi resta nascosto. */}
+      <div className="py-2 mb-3 d-flex justify-content-between align-items-start" style={{ borderBottom: '1px solid #e8e8e8' }}>
+        <div className="me-3">
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+            {t('participantListVisible')}
+          </div>
+          <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+            {value.audienceAnonymous ? t('participantListAnonymous') : t('participantListVisibleDesc')}
+          </div>
+          {!value.participantListVisible && togglesFromMatrix(value.permissionMatrix).participantsCanStartVideo && (
+            <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
+              {t('participantListCameraNote')}
+            </div>
+          )}
+        </div>
+        <ToggleSwitch
+          label=""
+          ariaLabel={t('participantListVisible')}
+          checked={value.participantListVisible && !value.audienceAnonymous}
+          disabled={soloAscoltoBloccato || value.audienceAnonymous}
+          onChange={() => onChange({ participantListVisible: !value.participantListVisible })}
+        />
+      </div>
+      {soloAscoltoBloccato && (
+        <p className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {t('participantListLocked')}
         </p>
       )}
 

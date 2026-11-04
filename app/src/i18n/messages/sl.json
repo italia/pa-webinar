@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Dokler je soba lahko odprta, snemanja in načina samo poslušanja ni mogoče spremeniti: veljata od prvega vstopa.",
         "audienceAnonymous": "Anonimno občinstvo",
         "audienceAnonymousDesc": "Udeleženci so drugim vidni pod psevdonimom (»Udeleženec« in koda) v videu, klepetu in vprašanjih; seznam udeležencev ostane voditeljem, trga ni. Uporabno za velike dogodke; na dogodkih skupnosti se ljudje želijo spoznati.",
-        "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni."
+        "audienceAnonymousLocked": "Dokler je soba lahko odprta, se ne da spremeniti: povezalo bi psevdonime z imeni.",
+        "participantListVisible": "Pokaži občinstvu seznam udeležencev",
+        "participantListVisibleDesc": "Izklopljeno: seznam, mreža in imena na trgu ostanejo voditeljem in govorcem; občinstvo vidi samo tistega, ki govori. Vklopljeno: vsi vidijo, kdo je v dvorani.",
+        "participantListAnonymous": "Pri anonimnem občinstvu seznam ostane skrit.",
+        "participantListLocked": "Ko je dvorana odprta, tega ni mogoče spremeniti: tisti, ki so že v njej, spremembe ne bi videli.",
+        "participantListCameraNote": "Ko je seznam skrit, tisti, ki vklopi kamero, ne vidi svojega okna. Za srečanje, na katerem se vsi vidijo, pokažite seznam."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "prepis lastnih govorov, neobvezen",
         "consentsNone": "Nobene privolitve razen tiste ob prijavi.",
         "consentsHosts": "Moderatorje in govornike za snemanje vprašamo v dvorani, neobvezno.",
-        "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«."
+        "consentsWithdraw": "Udeleženci jih lahko v dvorani prekličejo z gumbom »Privolitve«.",
+        "participantListShown": "Seznam udeležencev: viden vsem.",
+        "participantListHidden": "Seznam udeležencev: samo za voditelje in govorce."
       },
       "preview": {
         "title": "Predogled strani",

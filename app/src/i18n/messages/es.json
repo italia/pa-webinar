@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Mientras la sala pueda estar abierta, la grabación y el modo solo escucha no se pueden cambiar: valen desde la primera entrada.",
         "audienceAnonymous": "Público anónimo",
         "audienceAnonymousDesc": "Quien participa aparece ante los demás con un seudónimo («Participante» y un código) en el vídeo, el chat y las preguntas; la lista de participantes queda para la moderación y no hay plaza. Útil para eventos grandes; en los eventos de comunidad la gente quiere conocerse.",
-        "audienceAnonymousLocked": "No se puede cambiar mientras la sala pueda estar abierta: vincularía los seudónimos con los nombres."
+        "audienceAnonymousLocked": "No se puede cambiar mientras la sala pueda estar abierta: vincularía los seudónimos con los nombres.",
+        "participantListVisible": "Mostrar al público la lista de participantes",
+        "participantListVisibleDesc": "Desactivado: la lista, la cuadrícula y los nombres en la plaza quedan para quien modera e interviene; el público solo ve a quien habla. Activado: todos ven quién está en la sala.",
+        "participantListAnonymous": "Con público anónimo la lista sigue oculta.",
+        "participantListLocked": "No se cambia con la sala abierta: quien ya está dentro no vería el cambio.",
+        "participantListCameraNote": "Con la lista oculta, quien enciende la cámara no ve su propio recuadro. Para un encuentro en el que todos se ven, muestra la lista."
       },
       "step3": {
         "heading": "Personas e invitaciones",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcripción de las propias intervenciones, opcional",
         "consentsNone": "Ningún consentimiento aparte del de la inscripción.",
         "consentsHosts": "A quien conduce e interviene se le pide la grabación en la sala, de forma opcional.",
-        "consentsWithdraw": "Quien participa puede retirarlos en la sala, con el botón «Consentimientos»."
+        "consentsWithdraw": "Quien participa puede retirarlos en la sala, con el botón «Consentimientos».",
+        "participantListShown": "Lista de participantes: visible para todos.",
+        "participantListHidden": "Lista de participantes: solo para quien modera e interviene."
       },
       "preview": {
         "title": "Vista previa de la página",

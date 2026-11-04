@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Kol kambarys gali būti atviras, įrašymo ir tik klausymo keisti negalima: jie galioja nuo pirmojo įėjimo.",
         "audienceAnonymous": "Anoniminė auditorija",
         "audienceAnonymousDesc": "Dalyviai kitiems rodomi slapyvardžiu („Dalyvis“ ir kodas) vaizdo įraše, pokalbyje ir klausimuose; dalyvių sąrašas lieka vedėjams, aikštės nėra. Naudinga dideliems renginiams; bendruomenės renginiuose žmonės nori susipažinti.",
-        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais."
+        "audienceAnonymousLocked": "Kol kambarys gali būti atviras, keisti negalima: tai susietų slapyvardžius su vardais.",
+        "participantListVisible": "Rodyti dalyvių sąrašą auditorijai",
+        "participantListVisibleDesc": "Išjungta: sąrašas, tinklelis ir vardai aikštėje lieka vedėjams ir pranešėjams; auditorija mato tik kalbantįjį. Įjungta: visi mato, kas yra salėje.",
+        "participantListAnonymous": "Esant anoniminei auditorijai sąrašas lieka paslėptas.",
+        "participantListLocked": "Kai salė atidaryta, keisti negalima: jau esantys viduje pakeitimo nematytų.",
+        "participantListCameraNote": "Kai sąrašas paslėptas, kamerą įjungęs asmuo nemato savo vaizdo. Susitikimui, kuriame visi mato vieni kitus, parodykite sąrašą."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "savo pasisakymų transkripcija, neprivaloma",
         "consentsNone": "Jokių sutikimų, išskyrus registracijos.",
         "consentsHosts": "Vedėjų ir pranešėjų apie įrašymą klausiama salėje, neprivalomai.",
-        "consentsWithdraw": "Dalyviai gali juos atšaukti salėje mygtuku „Sutikimai“."
+        "consentsWithdraw": "Dalyviai gali juos atšaukti salėje mygtuku „Sutikimai“.",
+        "participantListShown": "Dalyvių sąrašas: matomas visiems.",
+        "participantListHidden": "Dalyvių sąrašas: tik vedėjams ir pranešėjams."
       },
       "preview": {
         "title": "Puslapio peržiūra",

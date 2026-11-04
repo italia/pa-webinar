@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Kamēr telpa var būt atvērta, ierakstīšanu un tikai klausīšanos nevar mainīt: tās ir spēkā no pirmās ieiešanas.",
         "audienceAnonymous": "Anonīma auditorija",
         "audienceAnonymousDesc": "Dalībnieki citiem redzami ar pseidonīmu (“Dalībnieks” un kods) video, tērzēšanā un jautājumos; dalībnieku saraksts paliek vadītājiem, un laukuma nav. Noderīgi lieliem pasākumiem; kopienas pasākumos cilvēki vēlas iepazīties.",
-        "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem."
+        "audienceAnonymousLocked": "Kamēr telpa var būt atvērta, to nevar mainīt: tas sasaistītu pseidonīmus ar vārdiem.",
+        "participantListVisible": "Rādīt dalībnieku sarakstu auditorijai",
+        "participantListVisibleDesc": "Izslēgts: saraksts, režģis un vārdi laukumā paliek vadītājiem un runātājiem; auditorija redz tikai runātāju. Ieslēgts: visi redz, kas ir telpā.",
+        "participantListAnonymous": "Ar anonīmu auditoriju saraksts paliek paslēpts.",
+        "participantListLocked": "Kamēr telpa ir atvērta, to mainīt nevar: tie, kas jau ir iekšā, izmaiņas neredzētu.",
+        "participantListCameraNote": "Kad saraksts ir paslēpts, kameru ieslēdzis cilvēks neredz savu attēlu. Tikšanās reizēm, kur visi redz cits citu, parādiet sarakstu."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "savas runas atšifrēšana, brīvprātīga",
         "consentsNone": "Nav citu piekrišanu kā tikai reģistrācijas.",
         "consentsHosts": "Vadītājiem un runātājiem ierakstu jautā telpā, brīvprātīgi.",
-        "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”."
+        "consentsWithdraw": "Dalībnieki tās var atsaukt telpā ar pogu “Piekrišanas”.",
+        "participantListShown": "Dalībnieku saraksts: redzams visiem.",
+        "participantListHidden": "Dalībnieku saraksts: tikai vadītājiem un runātājiem."
       },
       "preview": {
         "title": "Lapas priekšskatījums",

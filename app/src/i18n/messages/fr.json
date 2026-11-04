@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Tant que la salle peut être ouverte, l'enregistrement et l'écoute seule ne se modifient pas : ils valent dès la première entrée.",
         "audienceAnonymous": "Public anonyme",
         "audienceAnonymousDesc": "Les participants apparaissent aux autres sous un pseudonyme (« Participant » et un code) en vidéo, dans le chat et les questions ; la liste des participants reste aux animateurs et il n'y a pas de place. Utile pour les grands événements ; aux événements de communauté, on veut se connaître.",
-        "audienceAnonymousLocked": "Non modifiable tant que la salle peut être ouverte : cela relierait les pseudonymes aux noms."
+        "audienceAnonymousLocked": "Non modifiable tant que la salle peut être ouverte : cela relierait les pseudonymes aux noms.",
+        "participantListVisible": "Afficher la liste des participants au public",
+        "participantListVisibleDesc": "Désactivé : la liste, la grille et les noms sur la place restent réservés aux personnes qui animent et interviennent ; le public ne voit que la personne qui parle. Activé : tout le monde voit qui est dans la salle.",
+        "participantListAnonymous": "Avec un public anonyme, la liste reste masquée.",
+        "participantListLocked": "Non modifiable quand la salle est ouverte : les personnes déjà présentes ne verraient pas le changement.",
+        "participantListCameraNote": "Avec la liste masquée, les personnes qui activent leur caméra ne voient pas leur propre image. Pour une réunion où tout le monde se voit, affichez la liste."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcription de ses interventions, facultative",
         "consentsNone": "Aucun consentement en dehors de celui de l'inscription.",
         "consentsHosts": "Aux animateurs et intervenants, l'enregistrement est demandé dans la salle, facultatif.",
-        "consentsWithdraw": "Les participants peuvent les retirer dans la salle, avec le bouton « Consentements »."
+        "consentsWithdraw": "Les participants peuvent les retirer dans la salle, avec le bouton « Consentements ».",
+        "participantListShown": "Liste des participants : visible par tous.",
+        "participantListHidden": "Liste des participants : réservée aux personnes qui animent et interviennent."
       },
       "preview": {
         "title": "Aperçu de la page",

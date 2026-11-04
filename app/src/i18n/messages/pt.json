@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Enquanto a sala puder estar aberta, a gravação e o modo apenas a ouvir não se alteram: valem a partir da primeira entrada.",
         "audienceAnonymous": "Público anónimo",
         "audienceAnonymousDesc": "Quem participa aparece aos outros com um pseudónimo («Participante» e um código) no vídeo, no chat e nas perguntas; a lista de participantes fica com a moderação e não há praça. Útil para eventos grandes; nos eventos de comunidade as pessoas querem conhecer-se.",
-        "audienceAnonymousLocked": "Não se pode alterar enquanto a sala puder estar aberta: ligaria os pseudónimos aos nomes."
+        "audienceAnonymousLocked": "Não se pode alterar enquanto a sala puder estar aberta: ligaria os pseudónimos aos nomes.",
+        "participantListVisible": "Mostrar ao público a lista de participantes",
+        "participantListVisibleDesc": "Desligado: a lista, a grelha e os nomes na praça ficam para quem modera e intervém; o público só vê quem está a falar. Ligado: todos veem quem está na sala.",
+        "participantListAnonymous": "Com público anónimo a lista fica oculta.",
+        "participantListLocked": "Não se altera com a sala aberta: quem já está dentro não veria a alteração.",
+        "participantListCameraNote": "Com a lista oculta, quem liga a câmara não vê o próprio quadro. Para um encontro em que todos se veem, mostre a lista."
       },
       "step3": {
         "heading": "Pessoas e convites",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcrição das próprias intervenções, facultativa",
         "consentsNone": "Nenhum consentimento além do da inscrição.",
         "consentsHosts": "A quem conduz e intervém pede-se a gravação na sala, de forma facultativa.",
-        "consentsWithdraw": "Quem participa pode retirá-los na sala, com o botão «Consentimentos»."
+        "consentsWithdraw": "Quem participa pode retirá-los na sala, com o botão «Consentimentos».",
+        "participantListShown": "Lista de participantes: visível para todos.",
+        "participantListHidden": "Lista de participantes: só para quem modera e intervém."
       },
       "preview": {
         "title": "Pré-visualização da página",

@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Kým môže byť miestnosť otvorená, záznam a režim iba počúvania sa nedajú zmeniť: platia od prvého vstupu.",
         "audienceAnonymous": "Anonymné publikum",
         "audienceAnonymousDesc": "Účastníci sa ostatným zobrazujú pod pseudonymom („Účastník“ a kód) vo videu, v čete aj v otázkach; zoznam účastníkov zostáva moderátorom a námestie nie je. Užitočné pre veľké podujatia; na komunitných podujatiach sa ľudia chcú spoznať.",
-        "audienceAnonymousLocked": "Kým môže byť miestnosť otvorená, nedá sa to zmeniť: prepojilo by to pseudonymy s menami."
+        "audienceAnonymousLocked": "Kým môže byť miestnosť otvorená, nedá sa to zmeniť: prepojilo by to pseudonymy s menami.",
+        "participantListVisible": "Zobraziť publiku zoznam účastníkov",
+        "participantListVisibleDesc": "Vypnuté: zoznam, mriežka a mená na námestí zostávajú moderátorom a rečníkom; publikum vidí len toho, kto hovorí. Zapnuté: všetci vidia, kto je v miestnosti.",
+        "participantListAnonymous": "Pri anonymnom publiku zostáva zoznam skrytý.",
+        "participantListLocked": "Pri otvorenej miestnosti to nemožno zmeniť: ľudia vo vnútri by zmenu nevideli.",
+        "participantListCameraNote": "Pri skrytom zozname nevidí ten, kto zapne kameru, svoje okno. Na stretnutie, kde sa všetci vidia, zoznam zobrazte."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "prepis vlastných príspevkov, dobrovoľný",
         "consentsNone": "Žiadny súhlas okrem súhlasu pri registrácii.",
         "consentsHosts": "Moderátori a rečníci sú o súhlas so záznamom požiadaní v miestnosti, dobrovoľne.",
-        "consentsWithdraw": "Účastníci ich môžu v miestnosti odvolať tlačidlom „Súhlasy“."
+        "consentsWithdraw": "Účastníci ich môžu v miestnosti odvolať tlačidlom „Súhlasy“.",
+        "participantListShown": "Zoznam účastníkov: viditeľný pre všetkých.",
+        "participantListHidden": "Zoznam účastníkov: len pre moderátorov a rečníkov."
       },
       "preview": {
         "title": "Náhľad stránky",

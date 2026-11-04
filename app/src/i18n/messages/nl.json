@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Zolang de ruimte open kan zijn, kunnen opname en alleen luisteren niet worden gewijzigd: ze gelden vanaf de eerste deelnemer.",
         "audienceAnonymous": "Anoniem publiek",
         "audienceAnonymousDesc": "Deelnemers verschijnen voor anderen onder een pseudoniem (‘Deelnemer’ en een code) in de video, de chat en bij vragen; de deelnemerslijst blijft bij de moderatoren en er is geen plein. Handig voor grote evenementen; bij communityevenementen wil men elkaar leren kennen.",
-        "audienceAnonymousLocked": "Kan niet worden gewijzigd zolang de ruimte open kan zijn: het zou pseudoniemen aan namen koppelen."
+        "audienceAnonymousLocked": "Kan niet worden gewijzigd zolang de ruimte open kan zijn: het zou pseudoniemen aan namen koppelen.",
+        "participantListVisible": "Deelnemerslijst aan het publiek tonen",
+        "participantListVisibleDesc": "Uit: de lijst, het raster en de namen op het plein blijven bij moderatoren en sprekers; het publiek ziet alleen wie spreekt. Aan: iedereen ziet wie er in de zaal is.",
+        "participantListAnonymous": "Bij een anoniem publiek blijft de lijst verborgen.",
+        "participantListLocked": "Niet te wijzigen terwijl de zaal open is: wie al binnen is, zou de wijziging niet zien.",
+        "participantListCameraNote": "Met een verborgen lijst ziet wie de camera aanzet het eigen beeld niet. Toon de lijst voor een bijeenkomst waarin iedereen elkaar ziet."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcriptie van de eigen bijdragen, optioneel",
         "consentsNone": "Geen toestemming behalve die voor de inschrijving.",
         "consentsHosts": "Aan moderatoren en sprekers wordt de opname in de zaal gevraagd, optioneel.",
-        "consentsWithdraw": "Deelnemers kunnen ze in de zaal intrekken met de knop ‘Toestemmingen’."
+        "consentsWithdraw": "Deelnemers kunnen ze in de zaal intrekken met de knop ‘Toestemmingen’.",
+        "participantListShown": "Deelnemerslijst: zichtbaar voor iedereen.",
+        "participantListHidden": "Deelnemerslijst: alleen voor moderatoren en sprekers."
       },
       "preview": {
         "title": "Voorbeeld van de pagina",

@@ -83,6 +83,7 @@ export const DUPLICATED_EVENT_FIELDS = [
   'recordingConsentText',
   'listenOnlyWithoutConsent',
   'audienceAnonymous',
+  'participantListVisible',
 
   // recording & AI post-production
   'recordingEnabled',

@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Kun huone voi olla auki, tallennusta ja pelkkää kuuntelua ei voi muuttaa: ne ovat voimassa ensimmäisestä sisääntulosta.",
         "audienceAnonymous": "Anonyymi yleisö",
         "audienceAnonymousDesc": "Osallistujat näkyvät muille salanimellä (”Osallistuja” ja koodi) videossa, chatissa ja kysymyksissä; osallistujaluettelo jää juontajille, eikä aukiota ole. Hyödyllinen suurissa tapahtumissa; yhteisötapahtumissa halutaan tutustua toisiin.",
-        "audienceAnonymousLocked": "Ei voi muuttaa huoneen ollessa mahdollisesti auki: se yhdistäisi salanimet nimiin."
+        "audienceAnonymousLocked": "Ei voi muuttaa huoneen ollessa mahdollisesti auki: se yhdistäisi salanimet nimiin.",
+        "participantListVisible": "Näytä osallistujaluettelo yleisölle",
+        "participantListVisibleDesc": "Pois: luettelo, ruudukko ja nimet aukiolla jäävät juontajille ja puhujille; yleisö näkee vain puhujan. Päällä: kaikki näkevät, ketkä ovat huoneessa.",
+        "participantListAnonymous": "Nimettömällä yleisöllä luettelo pysyy piilotettuna.",
+        "participantListLocked": "Ei muutettavissa huoneen ollessa auki: sisällä olevat eivät näkisi muutosta.",
+        "participantListCameraNote": "Kun luettelo on piilotettu, kameran avaava ei näe omaa ruutuaan. Näytä luettelo tapaamisessa, jossa kaikki näkevät toisensa."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "omien puheenvuorojen litterointi, vapaaehtoinen",
         "consentsNone": "Ei muita suostumuksia kuin ilmoittautumisen.",
         "consentsHosts": "Juontajilta ja puhujilta kysytään tallennuksesta huoneessa, vapaaehtoisesti.",
-        "consentsWithdraw": "Osallistujat voivat peruuttaa ne huoneessa Suostumukset-painikkeella."
+        "consentsWithdraw": "Osallistujat voivat peruuttaa ne huoneessa Suostumukset-painikkeella.",
+        "participantListShown": "Osallistujaluettelo: näkyy kaikille.",
+        "participantListHidden": "Osallistujaluettelo: vain juontajille ja puhujille."
       },
       "preview": {
         "title": "Sivun esikatselu",

@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Amíg a terem nyitva lehet, a felvétel és a csak hallgatás nem módosítható: az első belépéstől érvényesek.",
         "audienceAnonymous": "Névtelen közönség",
         "audienceAnonymousDesc": "A résztvevők másoknak álnéven jelennek meg („Résztvevő” és egy kód) a videóban, a csevegésben és a kérdésekben; a résztvevők listája a moderátoroknál marad, és nincs tér. Nagy eseményekhez hasznos; közösségi eseményeken az emberek meg akarják ismerni egymást.",
-        "audienceAnonymousLocked": "Amíg a terem nyitva lehet, nem módosítható: összekapcsolná az álneveket a nevekkel."
+        "audienceAnonymousLocked": "Amíg a terem nyitva lehet, nem módosítható: összekapcsolná az álneveket a nevekkel.",
+        "participantListVisible": "Résztvevők listájának megjelenítése a közönségnek",
+        "participantListVisibleDesc": "Ki: a lista, a rács és a téren látható nevek a házigazdáknál és az előadóknál maradnak; a közönség csak azt látja, aki beszél. Be: mindenki látja, ki van a teremben.",
+        "participantListAnonymous": "Névtelen közönségnél a lista rejtve marad.",
+        "participantListLocked": "Nyitott teremnél nem módosítható: akik már bent vannak, nem látnák a változást.",
+        "participantListCameraNote": "Rejtett listánál aki bekapcsolja a kameráját, nem látja a saját képét. Olyan találkozónál, ahol mindenki látja egymást, jelenítse meg a listát."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "a saját hozzászólások átirata, önkéntes",
         "consentsNone": "A regisztrációs hozzájáruláson kívül nincs más.",
         "consentsHosts": "A moderátoroktól és előadóktól a teremben kérjük a felvételhez való hozzájárulást, önkéntesen.",
-        "consentsWithdraw": "A résztvevők a teremben a „Hozzájárulások” gombbal vonhatják vissza őket."
+        "consentsWithdraw": "A résztvevők a teremben a „Hozzájárulások” gombbal vonhatják vissza őket.",
+        "participantListShown": "Résztvevők listája: mindenki számára látható.",
+        "participantListHidden": "Résztvevők listája: csak a házigazdáknak és az előadóknak."
       },
       "preview": {
         "title": "Az oldal előnézete",

@@ -273,6 +273,13 @@ model Event {
   // Spento di default: negli eventi di comunita' ci si vuole conoscere.
   audienceAnonymous Boolean @default(false) @map("audience_anonymous")
 
+  // L'elenco di chi partecipa, per il pubblico: la scheda Partecipanti, la
+  // griglia e la striscia dei video, i nomi nella piazza. Spento di default,
+  // anche per gli eventi di prima: lo mostra solo la scelta di chi organizza.
+  // Chi conduce e chi interviene lo vedono sempre. Conta il valore letto da
+  // lib/live/participant-list, non la colonna.
+  participantListVisible Boolean @default(false) @map("participant_list_visible")
+
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
 

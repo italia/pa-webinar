@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Mens rummet kan være åbent, kan optagelse og kun lytning ikke ændres: de gælder fra den første indgang.",
         "audienceAnonymous": "Anonymt publikum",
         "audienceAnonymousDesc": "Deltagerne vises for de andre under et pseudonym (»Deltager« og en kode) i video, chat og spørgsmål; deltagerlisten er kun for værterne, og der er ingen plads. Nyttigt til store arrangementer; til fællesskabsarrangementer vil folk gerne lære hinanden at kende.",
-        "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne."
+        "audienceAnonymousLocked": "Kan ikke ændres, mens rummet kan være åbent: det ville koble pseudonymer til navne.",
+        "participantListVisible": "Vis deltagerlisten for publikum",
+        "participantListVisibleDesc": "Fra: listen, gitteret og navnene på pladsen forbeholdes værter og talere; publikum ser kun den, der taler. Til: alle kan se, hvem der er i rummet.",
+        "participantListAnonymous": "Med anonymt publikum forbliver listen skjult.",
+        "participantListLocked": "Kan ikke ændres, mens rummet er åbent: dem, der allerede er inde, ville ikke se ændringen.",
+        "participantListCameraNote": "Med skjult liste kan den, der tænder kameraet, ikke se sit eget billede. Vis listen til et møde, hvor alle ser hinanden."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transskription af egne indlæg, frivillig",
         "consentsNone": "Intet samtykke ud over det ved tilmeldingen.",
         "consentsHosts": "Ordstyrere og talere bliver spurgt om optagelsen i rummet, frivilligt.",
-        "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”."
+        "consentsWithdraw": "Deltagerne kan trække dem tilbage i rummet med knappen “Samtykker”.",
+        "participantListShown": "Deltagerliste: synlig for alle.",
+        "participantListHidden": "Deltagerliste: kun værter og talere."
       },
       "preview": {
         "title": "Forhåndsvisning af siden",

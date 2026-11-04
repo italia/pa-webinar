@@ -15,6 +15,7 @@ import JitsiRoom from './jitsi-room';
 type Listener = (...args: unknown[]) => void;
 
 interface FakeApi {
+  opzioni: { configOverwrite: Record<string, unknown> };
   listeners: Map<string, Set<Listener>>;
   emit: (event: string, payload?: unknown) => void;
   dispose: ReturnType<typeof vi.fn>;
@@ -25,7 +26,9 @@ let istanze: FakeApi[] = [];
 class FakeExternalApi {
   listeners = new Map<string, Set<Listener>>();
   dispose = vi.fn();
-  constructor() {
+  opzioni: unknown;
+  constructor(_dominio: string, opzioni: unknown) {
+    this.opzioni = opzioni;
     istanze.push(this as unknown as FakeApi);
   }
   addListener(event: string, fn: Listener) {
@@ -193,6 +196,25 @@ describe('JitsiRoom, microfono e videocamera', () => {
       ['audio', false],
       ['video', false],
     ]);
+  });
+});
+
+describe('JitsiRoom, elenco nascosto', () => {
+  const conf = () => istanze[0]!.opzioni.configOverwrite;
+
+  it('il pubblico non ha griglia né striscia dei video', () => {
+    monta({ role: 'participant', elencoNascosto: true });
+
+    expect(conf()).toMatchObject({ disableTileView: true, filmstrip: { disabled: true } });
+    expect(conf().toolbarButtons).not.toContain('tileview');
+    expect(conf().toolbarButtons).not.toContain('filmstrip');
+  });
+
+  it('con l\'elenco mostrato restano a tutti', () => {
+    monta({ role: 'participant', elencoNascosto: false });
+
+    expect(conf()).not.toHaveProperty('filmstrip');
+    expect(conf().toolbarButtons).toContain('tileview');
   });
 });
 

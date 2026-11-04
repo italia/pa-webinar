@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "While the room may be open, recording and listen-only cannot change: they apply from the first entry.",
         "audienceAnonymous": "Anonymous audience",
         "audienceAnonymousDesc": "Participants appear to the others under a pseudonym (“Participant” and a code) on video, in the chat and in questions; the participant list stays with the hosts, and there is no square. Useful for large events; at community events people want to know each other.",
-        "audienceAnonymousLocked": "It cannot change while the room may be open: it would link pseudonyms to names."
+        "audienceAnonymousLocked": "It cannot change while the room may be open: it would link pseudonyms to names.",
+        "participantListVisible": "Show the participant list to the audience",
+        "participantListVisibleDesc": "Off: the list, the grid and the names in the square stay with hosts and speakers; the audience sees only who is speaking. On: everyone sees who is in the room.",
+        "participantListAnonymous": "With an anonymous audience the list stays hidden.",
+        "participantListLocked": "It cannot change while the room is open: people already inside would not see the change.",
+        "participantListCameraNote": "With the list hidden, people who turn on their camera do not see their own tile. For a meeting where everyone sees each other, show the list."
       },
       "step3": {
         "heading": "People and invites",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcription of what they say, optional",
         "consentsNone": "No consent beyond the registration one.",
         "consentsHosts": "Moderators and speakers are asked for the recording in the room, optionally.",
-        "consentsWithdraw": "Participants can withdraw them in the room, with the “Consents” button."
+        "consentsWithdraw": "Participants can withdraw them in the room, with the “Consents” button.",
+        "participantListShown": "Participant list: visible to everyone.",
+        "participantListHidden": "Participant list: hosts and speakers only."
       },
       "preview": {
         "title": "Page preview",

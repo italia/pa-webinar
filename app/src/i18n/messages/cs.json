@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Dokud může být místnost otevřená, záznam a režim pouze poslechu nelze měnit: platí od prvního vstupu.",
         "audienceAnonymous": "Anonymní publikum",
         "audienceAnonymousDesc": "Účastníci se ostatním zobrazují pod pseudonymem („Účastník“ a kód) ve videu, v chatu i v dotazech; seznam účastníků vidí jen moderátoři a náměstí není k dispozici. Hodí se pro velké akce; na komunitních akcích se lidé chtějí poznat.",
-        "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény."
+        "audienceAnonymousLocked": "Dokud může být místnost otevřená, nelze to změnit: propojilo by to pseudonymy se jmény.",
+        "participantListVisible": "Zobrazit publiku seznam účastníků",
+        "participantListVisibleDesc": "Vypnuto: seznam, mřížka a jména na náměstí zůstávají moderátorům a řečníkům; publikum vidí jen toho, kdo mluví. Zapnuto: všichni vidí, kdo je v místnosti.",
+        "participantListAnonymous": "U anonymního publika zůstává seznam skrytý.",
+        "participantListLocked": "Při otevřené místnosti to nelze změnit: lidé uvnitř by změnu neviděli.",
+        "participantListCameraNote": "Při skrytém seznamu nevidí ten, kdo zapne kameru, své vlastní okno. Pro schůzku, kde se všichni vidí, seznam zobrazte."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "přepis vlastních příspěvků, dobrovolný",
         "consentsNone": "Žádný souhlas kromě souhlasu při registraci.",
         "consentsHosts": "Moderátoři a řečníci jsou o souhlas se záznamem požádáni v místnosti, dobrovolně.",
-        "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“."
+        "consentsWithdraw": "Účastníci je mohou v místnosti odvolat tlačítkem „Souhlasy“.",
+        "participantListShown": "Seznam účastníků: viditelný pro všechny.",
+        "participantListHidden": "Seznam účastníků: jen pro moderátory a řečníky."
       },
       "preview": {
         "title": "Náhled stránky",

@@ -251,6 +251,12 @@ Moderators get a larger set of buttons than other participants.
 Jitsi's own participants pane and mute-everyone are left out on purpose: the roster, muting, the
 audio and video locks and the raised hands live in one place, the drawer's **Participants** panel.
 
+When the participant list is hidden from the audience (`app/src/lib/live/participant-list.ts`),
+`JitsiRoom` also removes `tileview` and `filmstrip` for everyone but moderators and speakers, and sets
+`disableTileView` and `filmstrip.disabled`: both views would list whoever is in the room, cameras off
+included. The audience sees the speaker on the stage. Until someone speaks, Jitsi elects the last
+person who joined, so `StageName` names only people who have spoken (`soloChiParla`).
+
 On top of these, `JitsiRoom` adds `reactions` when the reactions mode is native, `whiteboard` for
 moderators on desktop when the event has opted in and the installation declares the whiteboard
 service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), and the live captions button when captions are available

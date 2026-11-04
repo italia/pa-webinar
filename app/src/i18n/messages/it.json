@@ -1226,7 +1226,12 @@
         "listenOnlyLockedLive": "Con la sala aperta registrazione e solo ascolto non si cambiano: valgono dal primo ingresso.",
         "audienceAnonymous": "Pubblico anonimo",
         "audienceAnonymousDesc": "Chi partecipa compare agli altri con uno pseudonimo («Partecipante» e un codice) in video, in chat e nelle domande; l'elenco dei partecipanti resta a chi conduce, e non c'è la piazza. Utile per gli eventi grandi; negli eventi di comunità ci si vuole conoscere.",
-        "audienceAnonymousLocked": "Con la sala aperta non si cambia: accosterebbe gli pseudonimi ai nomi."
+        "audienceAnonymousLocked": "Con la sala aperta non si cambia: accosterebbe gli pseudonimi ai nomi.",
+        "participantListVisible": "Mostra al pubblico l'elenco dei partecipanti",
+        "participantListVisibleDesc": "Spento: l'elenco, la griglia e i nomi nella piazza restano a chi conduce e a chi interviene; il pubblico vede solo chi sta parlando. Acceso: tutti vedono chi è in sala.",
+        "participantListAnonymous": "Con il pubblico anonimo l'elenco resta nascosto.",
+        "participantListLocked": "Con la sala aperta non si cambia: chi è già dentro non vedrebbe la modifica.",
+        "participantListCameraNote": "Con l'elenco nascosto, chi accende la videocamera non vede il proprio riquadro. Per un incontro in cui tutti si vedono, mostra l'elenco."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -1525,7 +1530,9 @@
         "consentTranscription": "trascrizione dei propri interventi, facoltativa",
         "consentsNone": "Nessun consenso oltre a quello dell'iscrizione.",
         "consentsHosts": "A chi conduce e interviene la registrazione si chiede in sala, facoltativa.",
-        "consentsWithdraw": "Chi partecipa può ritirarli in sala, dal pulsante «Consensi»."
+        "consentsWithdraw": "Chi partecipa può ritirarli in sala, dal pulsante «Consensi».",
+        "participantListShown": "Elenco dei partecipanti: visibile a tutti.",
+        "participantListHidden": "Elenco dei partecipanti: solo per chi conduce e chi interviene."
       },
       "preview": {
         "title": "Anteprima della pagina",

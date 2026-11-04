@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Fad is féidir leis an seomra a bheith oscailte, ní féidir an taifeadadh ná an éisteacht amháin a athrú: tá feidhm acu ón gcéad iontráil.",
         "audienceAnonymous": "Lucht féachana gan ainm",
         "audienceAnonymousDesc": "Feictear rannpháirtithe do dhaoine eile faoi ainm cleite (“Rannpháirtí” agus cód) san fhíseán, sa chomhrá agus sna ceisteanna; fanann liosta na rannpháirtithe ag na hóstaigh, agus níl aon chearnóg ann. Úsáideach d’ócáidí móra; ag ócáidí pobail is mian le daoine aithne a chur ar a chéile.",
-        "audienceAnonymousLocked": "Ní féidir é a athrú fad is féidir leis an seomra a bheith oscailte: nascfadh sé ainmneacha cleite le hainmneacha."
+        "audienceAnonymousLocked": "Ní féidir é a athrú fad is féidir leis an seomra a bheith oscailte: nascfadh sé ainmneacha cleite le hainmneacha.",
+        "participantListVisible": "Taispeáin liosta na rannpháirtithe don lucht féachana",
+        "participantListVisibleDesc": "As: fanann an liosta, an ghreille agus na hainmneacha sa chearnóg ag na hóstaigh agus na cainteoirí; ní fheiceann an lucht féachana ach an té atá ag caint. Ar: feiceann gach duine cé atá sa seomra.",
+        "participantListAnonymous": "Le lucht féachana anaithnid fanann an liosta i bhfolach.",
+        "participantListLocked": "Ní féidir é a athrú agus an seomra oscailte: ní fheicfeadh na daoine atá istigh an t-athrú.",
+        "participantListCameraNote": "Agus an liosta i bhfolach, ní fheiceann an té a chuireann a cheamara air a thíl féin. Le haghaidh cruinnithe ina bhfeiceann gach duine a chéile, taispeáin an liosta."
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "tras-scríobh a ndeir siad, roghnach",
         "consentsNone": "Gan aon toiliú seachas toiliú an chláraithe.",
         "consentsHosts": "Iarrtar ar mhodhnóirí agus ar chainteoirí an taifeadadh sa seomra, go roghnach.",
-        "consentsWithdraw": "Is féidir le rannpháirtithe iad a tharraingt siar sa seomra, leis an gcnaipe “Toilithe”."
+        "consentsWithdraw": "Is féidir le rannpháirtithe iad a tharraingt siar sa seomra, leis an gcnaipe “Toilithe”.",
+        "participantListShown": "Liosta na rannpháirtithe: infheicthe do chách.",
+        "participantListHidden": "Liosta na rannpháirtithe: do na hóstaigh agus na cainteoirí amháin."
       },
       "preview": {
         "title": "Réamhamharc ar an leathanach",

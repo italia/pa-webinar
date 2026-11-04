@@ -67,8 +67,9 @@ interface JitsiRoomProps {
    *  risolto a runtime dal Server Component. Senza, il pulsante non entra
    *  nella barra nemmeno per un evento che l'ha scelta. Default false. */
   whiteboardInfraReady?: boolean;
-  /** Pubblico anonimo: niente vista a griglia per chi partecipa. */
-  pubblicoAnonimo?: boolean;
+  /** L'elenco di chi partecipa e' nascosto: niente griglia ne' striscia dei
+   *  video per il pubblico, che vede solo chi sta parlando. */
+  elencoNascosto?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
@@ -157,7 +158,7 @@ export default function JitsiRoom({
   enableFileSharing = false,
   whiteboardEnabled = false,
   whiteboardInfraReady = false,
-  pubblicoAnonimo = false,
+  elencoNascosto = false,
   videoQuality,
   reactionsMode = 'NATIVE',
   liveCaptions = false,
@@ -269,14 +270,18 @@ export default function JitsiRoom({
     let toolbarButtons = role === 'moderator'
       ? (isMobileRef.current ? [...mobileModeratorToolbarButtons] : [...moderatorToolbarButtons])
       : (isMobileRef.current ? [...mobileBaseToolbarButtons] : [...baseToolbarButtons]);
-    // Pubblico anonimo: chi partecipa non vede la griglia di tutti i presenti,
-    // ne' dal pulsante ne' dalla scorciatoia da tastiera.
-    if (role !== 'moderator' && pubblicoAnonimo) {
-      toolbarButtons = toolbarButtons.filter((b) => b !== 'tileview');
+    // Elenco nascosto: griglia e striscia dei video elencherebbero chiunque e'
+    // in sala, anche a camera spenta. Il pubblico vede chi sta parlando, e non
+    // li riapre ne' dai pulsanti ne' dalla scorciatoia da tastiera.
+    if (elencoNascosto) {
+      toolbarButtons = toolbarButtons.filter((b) => b !== 'tileview' && b !== 'filmstrip');
     }
 
     const extraConfig: Record<string, unknown> = {};
-    if (role !== 'moderator' && pubblicoAnonimo) extraConfig.disableTileView = true;
+    if (elencoNascosto) {
+      extraConfig.disableTileView = true;
+      extraConfig.filmstrip = { disabled: true };
+    }
 
     // paFaceFx PoC opt-in via `?facefx=1` on the app URL. It rides into the
     // Jitsi configOverwrite → the IFrame API serializes it into the iframe
@@ -952,7 +957,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, pubblicoAnonimo, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, elencoNascosto, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">

@@ -54,6 +54,7 @@ const permessi = (patch: Partial<StepPermissionsValue> = {}): StepPermissionsVal
   autoStartRecording: false,
   listenOnlyWithoutConsent: true,
   audienceAnonymous: false,
+  participantListVisible: false,
   agendaEnabled: false,
   wordCloudEnabled: false,
   whiteboardEnabled: false,

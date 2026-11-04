@@ -18,7 +18,9 @@
  * dell'iscrizione, oppure ospite mentre la stanza e' aperta a chi arriva col
  * link: la stessa regola dei pannelli, lib/events/panel-read-access) compare
  * nella piazza e vede i nomi degli altri. Chi conosce solo l'indirizzo
- * dell'evento non compare e vede soltanto quanti sono, senza nomi.
+ * dell'evento non compare e vede soltanto quanti sono, senza nomi. Con
+ * l'elenco nascosto (lib/live/participant-list) i nomi restano a chi conduce e
+ * a chi interviene: il pubblico compare e cammina, ma degli altri non li riceve.
  * Rate-limited per IP. Not persistent: positions live only in Redis for 10 s.
  */
 
@@ -51,7 +53,9 @@ import {
   authorizePanelRead,
   PANEL_READ_EVENT_SELECT,
   type PanelReadEvent,
+  type PanelReaderKind,
 } from '@/lib/events/panel-read-access';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -105,7 +109,27 @@ const CHIAVE_ANONIMI = process.env.APP_SECRET || randomBytes(32).toString('hex')
  * rimescolano a ogni ping.
  */
 function identificativoOpaco(eventId: string, userId: string): string {
-  return `anon_${createHmac('sha256', CHIAVE_ANONIMI).update(`${eventId}:${userId}`).digest('hex').slice(0, 16)}`;
+  const chiave = `${eventId}:${userId}`;
+  let opaco = opachi.get(chiave);
+  if (!opaco) {
+    if (opachi.size >= OPACHI_MAX) opachi.clear();
+    opaco = `anon_${createHmac('sha256', CHIAVE_ANONIMI).update(chiave).digest('hex').slice(0, 16)}`;
+    opachi.set(chiave, opaco);
+  }
+  return opaco;
+}
+
+/** Il ping arriva a 5 Hz per persona, con tutti i presenti in ogni risposta. */
+const OPACHI_MAX = 5_000;
+const opachi = new Map<string, string>();
+
+/** I presenti senza chi sono. `io` resta com'e': il client si riconosce da li'. */
+function senzaIdentita(eventId: string, peers: readonly GardenPeer[], io?: string) {
+  return peers.map((p) =>
+    p.userId === io
+      ? senzaUmore(p)
+      : { ...senzaUmore(p), userId: identificativoOpaco(eventId, p.userId), displayName: '' },
+  );
 }
 
 /**
@@ -113,15 +137,15 @@ function identificativoOpaco(eventId: string, userId: string): string {
  * far fallire a voce alta, la persona vede la piazza senza nomi. Un errore
  * del database invece risale (500), e non resta in memoria come un rifiuto.
  */
-async function haAccessoAllaSala(
+async function chiLeggeLaSala(
   event: PanelReadEvent,
   token: string | null,
-): Promise<boolean> {
+): Promise<PanelReaderKind | 'nessuno'> {
   const decidi = () =>
     authorizePanelRead(event, token).then(
-      () => true,
+      (lettore): PanelReaderKind => lettore.kind,
       (err: unknown) => {
-        if (err instanceof UnauthorizedError || err instanceof ForbiddenError) return false;
+        if (err instanceof UnauthorizedError || err instanceof ForbiddenError) return 'nessuno' as const;
         throw err;
       },
     );
@@ -129,7 +153,7 @@ async function haAccessoAllaSala(
   // password): niente da memorizzare.
   if (!token) return decidi();
   const chiave = `garden-access:${event.id}:${createHash('sha256').update(token).digest('hex')}`;
-  const memo = getCached<boolean>(chiave);
+  const memo = getCached<PanelReaderKind | 'nessuno'>(chiave);
   if (memo !== null) return memo;
   const esito = await decidi();
   setCache(chiave, esito, ACCESSO_TTL_MS);
@@ -160,7 +184,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const isUuid = UUID_RE.test(param);
   const event = await prisma.event.findFirst({
     where: isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param },
-    select: PANEL_READ_EVENT_SELECT,
+    select: { ...PANEL_READ_EVENT_SELECT, participantListVisible: true, audienceAnonymous: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -178,15 +202,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // Senza accesso alla sala: nessuna presenza scritta, e degli altri solo il
   // numero (posizioni senza nomi).
-  if (!(await haAccessoAllaSala(event, extractModeratorToken(request)))) {
+  const lettore = await chiLeggeLaSala(event, extractModeratorToken(request));
+  if (lettore === 'nessuno') {
     const altri = await listGardenPeers(event.id);
     if (altri === null) return NextResponse.json({ peers: [], active: true, degraded: true });
     return NextResponse.json({
-      peers: altri.map((p) => ({
-        ...senzaUmore(p),
-        userId: identificativoOpaco(event.id, p.userId),
-        displayName: '',
-      })),
+      peers: senzaIdentita(event.id, altri),
       umori: contaUmori(altri),
       active: true,
       anonymous: true,
@@ -220,6 +241,18 @@ export const POST = withErrorHandling(async (request, context) => {
   // has to keep them.
   if (peers === null) {
     return NextResponse.json({ peers: [], active: true, degraded: true });
+  }
+
+  // Elenco nascosto: il pubblico vede gli avatar, non chi sono. Il proprio
+  // record resta com'e': il client lo riconosce dall'identificativo.
+  const conduce = lettore === 'moderator' || lettore === 'speaker';
+  if (!conduce && !elencoVisibileAlPubblico(event)) {
+    return NextResponse.json({
+      peers: senzaIdentita(event.id, peers, peer.userId),
+      umori: contaUmori(peers),
+      active: true,
+      anonymous: true,
+    });
   }
 
   return NextResponse.json({ peers: peers.map(senzaUmore), umori: contaUmori(peers), active: true });

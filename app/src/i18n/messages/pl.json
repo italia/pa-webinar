@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Dopóki pokój może być otwarty, nagrywania i trybu tylko słuchania nie można zmienić: obowiązują od pierwszego wejścia.",
         "audienceAnonymous": "Anonimowa publiczność",
         "audienceAnonymousDesc": "Uczestnicy są widoczni dla innych pod pseudonimem („Uczestnik” i kod) w wideo, na czacie i w pytaniach; lista uczestników pozostaje dla prowadzących i nie ma placu. Przydatne przy dużych wydarzeniach; na wydarzeniach społeczności ludzie chcą się poznać.",
-        "audienceAnonymousLocked": "Nie można zmienić, dopóki pokój może być otwarty: powiązałoby to pseudonimy z imionami."
+        "audienceAnonymousLocked": "Nie można zmienić, dopóki pokój może być otwarty: powiązałoby to pseudonimy z imionami.",
+        "participantListVisible": "Pokazuj publiczności listę uczestników",
+        "participantListVisibleDesc": "Wyłączone: lista, siatka i imiona na placu pozostają dla prowadzących i prelegentów; publiczność widzi tylko osobę mówiącą. Włączone: wszyscy widzą, kto jest w sali.",
+        "participantListAnonymous": "Przy anonimowej publiczności lista pozostaje ukryta.",
+        "participantListLocked": "Nie można zmienić przy otwartej sali: osoby już obecne nie zobaczyłyby zmiany.",
+        "participantListCameraNote": "Przy ukrytej liście osoba, która włączy kamerę, nie widzi własnego okna. Na spotkanie, na którym wszyscy się widzą, pokaż listę."
       },
       "step3": {
         "heading": "Osoby i zaproszenia",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transkrypcja własnych wypowiedzi, dobrowolna",
         "consentsNone": "Brak zgód poza zgodą przy rejestracji.",
         "consentsHosts": "Prowadzących i prelegentów prosi się o zgodę na nagrywanie w sali, dobrowolnie.",
-        "consentsWithdraw": "Uczestnicy mogą je wycofać w sali przyciskiem „Zgody”."
+        "consentsWithdraw": "Uczestnicy mogą je wycofać w sali przyciskiem „Zgody”.",
+        "participantListShown": "Lista uczestników: widoczna dla wszystkich.",
+        "participantListHidden": "Lista uczestników: tylko dla prowadzących i prelegentów."
       },
       "preview": {
         "title": "Podgląd strony",

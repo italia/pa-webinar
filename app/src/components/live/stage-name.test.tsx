@@ -80,6 +80,16 @@ describe('StageName', () => {
     expect(nome()).toBeNull();
   });
 
+  it('con l\'elenco nascosto non nomina chi sta solo guardando', () => {
+    const { api, emit, onStage } = fakeApi({ aa: 'Ospite di prova', me: 'Pubblico' });
+    act(() => root.render(<StageName api={api} soloChiParla />));
+    act(() => emit('videoConferenceJoined', { id: 'me' }));
+    act(() => onStage('aa'));
+    expect(nome()).toBeNull();
+    act(() => emit('dominantSpeakerChanged', { id: 'aa' }));
+    expect(nome()).toBe('Ospite di prova');
+  });
+
   it('una sala nuova riparte da zero, senza il palco né la griglia di prima', () => {
     const vecchia = fakeApi({ aa: 'Ospite di prova', me: 'Moderatore' });
     act(() => root.render(<StageName api={vecchia.api} />));

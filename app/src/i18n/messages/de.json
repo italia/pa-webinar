@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Solange der Raum geöffnet sein kann, lassen sich Aufzeichnung und Nur-Zuhören nicht ändern: Sie gelten ab dem ersten Eintritt.",
         "audienceAnonymous": "Anonymes Publikum",
         "audienceAnonymousDesc": "Teilnehmende erscheinen für andere unter einem Pseudonym („Teilnehmende“ und ein Code) im Video, im Chat und bei Fragen; die Teilnehmerliste bleibt bei der Moderation, und es gibt keinen Platz. Sinnvoll für große Events; bei Community-Events möchte man sich kennenlernen.",
-        "audienceAnonymousLocked": "Bei möglicherweise geöffnetem Raum nicht änderbar: Pseudonyme würden mit Namen verknüpft."
+        "audienceAnonymousLocked": "Bei möglicherweise geöffnetem Raum nicht änderbar: Pseudonyme würden mit Namen verknüpft.",
+        "participantListVisible": "Teilnehmerliste dem Publikum zeigen",
+        "participantListVisibleDesc": "Aus: Liste, Raster und Namen auf dem Platz bleiben Moderierenden und Vortragenden vorbehalten; das Publikum sieht nur, wer gerade spricht. Ein: Alle sehen, wer im Raum ist.",
+        "participantListAnonymous": "Bei anonymem Publikum bleibt die Liste verborgen.",
+        "participantListLocked": "Bei geöffnetem Raum nicht änderbar: Wer schon im Raum ist, sähe die Änderung nicht.",
+        "participantListCameraNote": "Bei verborgener Liste sehen Personen, die ihre Kamera einschalten, ihr eigenes Bild nicht. Für ein Treffen, bei dem sich alle sehen, zeigen Sie die Liste."
       },
       "step3": {
         "heading": "Personen und Einladungen",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "Transkription der eigenen Beiträge, freiwillig",
         "consentsNone": "Keine Einwilligung außer der zur Anmeldung.",
         "consentsHosts": "Moderierende und Vortragende werden im Raum freiwillig um die Einwilligung in die Aufzeichnung gebeten.",
-        "consentsWithdraw": "Teilnehmende können sie im Raum über die Schaltfläche „Einwilligungen“ widerrufen."
+        "consentsWithdraw": "Teilnehmende können sie im Raum über die Schaltfläche „Einwilligungen“ widerrufen.",
+        "participantListShown": "Teilnehmerliste: für alle sichtbar.",
+        "participantListHidden": "Teilnehmerliste: nur für Moderierende und Vortragende."
       },
       "preview": {
         "title": "Seitenvorschau",

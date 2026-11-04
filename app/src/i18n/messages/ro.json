@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Cât timp sala poate fi deschisă, înregistrarea și modul doar ascultare nu se pot schimba: se aplică de la prima intrare.",
         "audienceAnonymous": "Public anonim",
         "audienceAnonymousDesc": "Participanții apar celorlalți sub un pseudonim („Participant” și un cod) în video, în chat și la întrebări; lista participanților rămâne la moderatori și nu există piață. Util pentru evenimente mari; la evenimentele comunității oamenii vor să se cunoască.",
-        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume."
+        "audienceAnonymousLocked": "Nu se poate schimba cât timp sala poate fi deschisă: ar lega pseudonimele de nume.",
+        "participantListVisible": "Afișează publicului lista participanților",
+        "participantListVisibleDesc": "Dezactivat: lista, grila și numele din piață rămân la moderatori și vorbitori; publicul vede doar cine vorbește. Activat: toată lumea vede cine este în sală.",
+        "participantListAnonymous": "Cu public anonim, lista rămâne ascunsă.",
+        "participantListLocked": "Nu se poate schimba cu sala deschisă: cei deja înăuntru nu ar vedea modificarea.",
+        "participantListCameraNote": "Cu lista ascunsă, cine pornește camera nu își vede propria imagine. Pentru o întâlnire în care toți se văd, afișează lista."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "transcrierea propriilor intervenții, opțională",
         "consentsNone": "Niciun consimțământ în afara celui de la înscriere.",
         "consentsHosts": "Celor care conduc și intervin li se cere înregistrarea în sală, opțional.",
-        "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”."
+        "consentsWithdraw": "Participanții le pot retrage în sală, cu butonul „Consimțăminte”.",
+        "participantListShown": "Lista participanților: vizibilă pentru toți.",
+        "participantListHidden": "Lista participanților: doar pentru moderatori și vorbitori."
       },
       "preview": {
         "title": "Previzualizarea paginii",

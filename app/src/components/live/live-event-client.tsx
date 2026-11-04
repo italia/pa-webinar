@@ -103,6 +103,8 @@ interface EventInfo {
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
   /** Pubblico anonimo: chi partecipa compare con uno pseudonimo. */
   audienceAnonymous?: boolean;
+  /** L'elenco di chi partecipa e' visibile al pubblico (lib/live/participant-list). */
+  participantListVisible?: boolean;
   /** Resolved video/audio quality preset (per-event override merged with site default). */
   videoQuality?: VideoQualityPreset;
   startsAt: string;
@@ -307,6 +309,8 @@ interface JitsiCredentials {
   consentsRecorded?: { recording: boolean; multitrack: boolean };
   /** In solo ascolto: senza consenso alla registrazione (lib/live/listen-only). */
   listenOnly?: boolean;
+  /** L'elenco di chi partecipa, al momento dell'ingresso. */
+  participantListVisible?: boolean;
 }
 
 /** La notifica di Jitsi «Il moderatore ti chiede di intervenire» (il suo uid). */
@@ -2192,6 +2196,12 @@ export default function LiveEventClient({
 
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
+  // L'elenco nascosto riguarda il pubblico, e vale la scelta di quando si e'
+  // entrati: chi aspettava da prima non ha un valore vecchio.
+  const elencoNascosto =
+    !(credentials.participantListVisible ?? event.participantListVisible) &&
+    !isActualModerator &&
+    !isSpeaker;
   const isInstantCall = event.eventType === 'INSTANT';
   // Lavagna in sala: scelta dell'evento (le chiamate istantanee l'hanno
   // sempre) E backend presente nell'installazione. Senza backend nessuna
@@ -2413,8 +2423,7 @@ export default function LiveEventClient({
                 enableFileSharing={isInstantCall}
                 whiteboardEnabled={whiteboardOn}
                 whiteboardInfraReady={whiteboardInfraReady}
-                // Chi interviene resta con il nome e la griglia, come chi conduce.
-                pubblicoAnonimo={(event.audienceAnonymous ?? false) && !isSpeaker}
+                elencoNascosto={elencoNascosto}
                 videoQuality={event.videoQuality}
                 reactionsMode={reactionsMode}
                 liveCaptions={Boolean(event.liveCaptionsAvailable)}
@@ -2456,7 +2465,10 @@ export default function LiveEventClient({
             )}
             <div className="live-stage-bottom" hidden={showJvbOverlay}>
               <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} alto={sottotitoliAlto} />
-              <StageName api={jitsiApi} />
+              <StageName
+                api={jitsiApi}
+                soloChiParla={elencoNascosto}
+              />
             </div>
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
@@ -2474,7 +2486,7 @@ export default function LiveEventClient({
         <LiveSidebar
           salaSoloAscolto={salaSoloAscolto}
           guestKeyName={isGuest || !token ? chosenName.trim() : undefined}
-          pubblicoAnonimo={event.audienceAnonymous ?? false}
+          elencoNascosto={elencoNascosto}
           nascosta={soloContenuto}
           onNascondi={nascondiColonna}
           onMostra={mostraColonna}
@@ -2687,8 +2699,9 @@ interface LiveSidebarProps {
   /** L'ospite: il nome scritto in sala d'attesa, chiave del suo posto in chat
    *  e nelle domande (il nome mostrato puo' essere uno pseudonimo). */
   guestKeyName?: string;
-  /** Pubblico anonimo: l'elenco dei partecipanti solo per chi conduce. */
-  pubblicoAnonimo?: boolean;
+  /** L'elenco dei partecipanti resta a chi conduce e a chi interviene: niente
+   *  scheda e niente nomi suggeriti per le @menzioni. */
+  elencoNascosto?: boolean;
   /** Solo il contenuto: la colonna e' chiusa del tutto (desktop). */
   nascosta?: boolean;
   /** La «×» della colonna: chiude tutto, si riapre dalla barra in alto. */
@@ -2750,7 +2763,7 @@ interface LiveSidebarProps {
 function LiveSidebar({
   salaSoloAscolto = false,
   guestKeyName,
-  pubblicoAnonimo = false,
+  elencoNascosto = false,
   nascosta = false,
   onNascondi,
   onMostra,
@@ -3324,8 +3337,8 @@ function LiveSidebar({
       badge: isModerator && handsCount > 0 ? handsCount : presenti,
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
-      // Pubblico anonimo: l'elenco di chi partecipa resta a chi conduce.
-      show: isModerator || !pubblicoAnonimo,
+      // Nascosto al pubblico finche' chi organizza non sceglie di mostrarlo.
+      show: !elencoNascosto,
     },
     // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
     // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
@@ -3841,7 +3854,7 @@ function LiveSidebar({
                 onUnreadCountChange={setChatUnread}
                 onPreview={setChatPreview}
                 onUnreadMentionsChange={setChatMentions}
-                getRoster={getRoster}
+                getRoster={elencoNascosto ? undefined : getRoster}
               />
             </div>
           )}

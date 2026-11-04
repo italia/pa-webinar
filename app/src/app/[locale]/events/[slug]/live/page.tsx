@@ -28,6 +28,7 @@ import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
+import { elencoVisibileAlPubblico } from '@/lib/live/participant-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -188,6 +189,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
             waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
             audienceAnonymous: event.audienceAnonymous,
+            participantListVisible: elencoVisibileAlPubblico(event),
             videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
@@ -397,6 +399,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         // Pubblico anonimo: niente piazza, dove ci si riconosce dal nome.
         waitingRoomEngine: event.audienceAnonymous ? 'CLASSIC' : (event.waitingRoomEngine ?? settings.waitingRoomEngine),
         audienceAnonymous: event.audienceAnonymous,
+        participantListVisible: elencoVisibileAlPubblico(event),
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,

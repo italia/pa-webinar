@@ -1016,7 +1016,12 @@
         "listenOnlyLockedLive": "Kuni ruum võib olla avatud, ei saa salvestamist ega ainult kuulamist muuta: need kehtivad esimesest sisenemisest.",
         "audienceAnonymous": "Anonüümne publik",
         "audienceAnonymousDesc": "Osalejad on teistele nähtavad pseudonüümiga („Osaleja“ ja kood) videos, vestluses ja küsimustes; osalejate nimekiri jääb juhatajatele ja väljakut pole. Kasulik suurtel sündmustel; kogukonna sündmustel tahetakse üksteist tundma õppida.",
-        "audienceAnonymousLocked": "Kuni ruum võib olla avatud, seda muuta ei saa: see seoks pseudonüümid nimedega."
+        "audienceAnonymousLocked": "Kuni ruum võib olla avatud, seda muuta ei saa: see seoks pseudonüümid nimedega.",
+        "participantListVisible": "Näita publikule osalejate loendit",
+        "participantListVisibleDesc": "Väljas: loend, ruudustik ja nimed väljakul jäävad juhtidele ja esinejatele; publik näeb ainult kõnelejat. Sees: kõik näevad, kes on ruumis.",
+        "participantListAnonymous": "Anonüümse publiku korral jääb loend peidetuks.",
+        "participantListLocked": "Avatud ruumiga seda muuta ei saa: juba sees olijad muudatust ei näeks.",
+        "participantListCameraNote": "Peidetud loendi korral ei näe kaamera sisselülitaja oma pilti. Kohtumiseks, kus kõik üksteist näevad, näita loendit."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -1315,7 +1320,9 @@
         "consentTranscription": "oma sõnavõttude transkribeerimine, vabatahtlik",
         "consentsNone": "Peale registreerimise nõusoleku muid ei ole.",
         "consentsHosts": "Moderaatoritelt ja esinejatelt küsitakse salvestamise kohta ruumis, vabatahtlikult.",
-        "consentsWithdraw": "Osalejad saavad need ruumis tagasi võtta nupuga „Nõusolekud”."
+        "consentsWithdraw": "Osalejad saavad need ruumis tagasi võtta nupuga „Nõusolekud”.",
+        "participantListShown": "Osalejate loend: nähtav kõigile.",
+        "participantListHidden": "Osalejate loend: ainult juhtidele ja esinejatele."
       },
       "preview": {
         "title": "Lehe eelvaade",

@@ -138,6 +138,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingConsentText: event.recordingConsentText,
       listenOnlyWithoutConsent: event.listenOnlyWithoutConsent,
       audienceAnonymous: event.audienceAnonymous,
+      participantListVisible: event.participantListVisible,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
       // già lo ammettono), mai quello del primario.
       moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
@@ -316,7 +317,14 @@ export const PUT = withErrorHandling(async (request, context) => {
   // avrebbe un token che il bridge non fa rispettare.
   // Anche il pubblico anonimo: cambiarlo a sala aperta accosterebbe gli
   // pseudonimi ai nomi (stesso posto, stesso colore in chat).
-  const CAMPI_DELLA_SALA = ['listenOnlyWithoutConsent', 'recordingEnabled', 'audienceAnonymous'] as const;
+  // L'elenco dei partecipanti vale da quando la sala si monta: a sala aperta
+  // cambierebbe solo per chi entra dopo.
+  const CAMPI_DELLA_SALA = [
+    'listenOnlyWithoutConsent',
+    'recordingEnabled',
+    'audienceAnonymous',
+    'participantListVisible',
+  ] as const;
   const cambiaRegime = CAMPI_DELLA_SALA.some(
     (campo) => data[campo] !== undefined && data[campo] !== event[campo],
   );
@@ -588,6 +596,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.listenOnlyWithoutConsent !== undefined && { listenOnlyWithoutConsent: data.listenOnlyWithoutConsent }),
       ...(data.audienceAnonymous !== undefined && { audienceAnonymous: data.audienceAnonymous }),
+      ...(data.participantListVisible !== undefined && { participantListVisible: data.participantListVisible }),
       ...(data.recordingPublished !== undefined && {
         recordingPublished: data.recordingPublished,
         ...(data.recordingPublished ? { recordingPublishedAt: new Date() } : { recordingPublishedAt: null }),
