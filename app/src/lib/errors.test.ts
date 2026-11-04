@@ -144,6 +144,23 @@ describe('errorResponse', () => {
     expect(body.code).toBe('CONFLICT');
   });
 
+  it('handles Prisma P2023 on a malformed uuid as not found', async () => {
+    const prismaError = {
+      code: 'P2023',
+      message: 'Inconsistent column data: Error creating UUID, invalid character',
+      meta: {},
+    };
+    const response = errorResponse(prismaError);
+    expect(response.status).toBe(404);
+  });
+
+  it('keeps any other Prisma P2023 as a server error', async () => {
+    const errori = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const response = errorResponse({ code: 'P2023', message: 'Inconsistent column data', meta: {} });
+    expect(response.status).toBe(500);
+    errori.mockRestore();
+  });
+
   it('handles Prisma P2025 (record not found)', async () => {
     const prismaError = { code: 'P2025', meta: {} };
     const res = errorResponse(prismaError);

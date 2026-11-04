@@ -385,7 +385,9 @@ export function shapeTemplateItemsWrite(
       required: input.required,
       sortOrder: input.sortOrder,
     };
-    if (input.id) {
+    // Un id che non e' di questo modello (una domanda copiata da un altro) e'
+    // una domanda nuova: aggiornarlo farebbe fallire il salvataggio.
+    if (input.id && existingIds.includes(input.id)) {
       inputIds.add(input.id);
       update.push({ where: { id: input.id }, data });
     } else {

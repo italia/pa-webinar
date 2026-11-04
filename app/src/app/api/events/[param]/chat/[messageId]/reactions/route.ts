@@ -120,7 +120,12 @@ export const POST = withErrorHandling(async (request, context) => {
         data: { messageId, senderId: auth.senderId, emoji: parsed.data.emoji },
       })
       .catch((err: unknown) => {
-        if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')) throw err;
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          if (err.code === 'P2002') return;
+          // Il messaggio e' stato tolto dopo il controllo qui sopra.
+          if (err.code === 'P2003') throw new NotFoundError('Message');
+        }
+        throw err;
       });
   }
 

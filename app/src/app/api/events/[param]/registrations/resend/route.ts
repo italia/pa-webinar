@@ -43,8 +43,8 @@ export const POST = withErrorHandling(async (request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const body = (await parseJsonBody(request)) as { email?: unknown; locale?: unknown };
-  const email = typeof body.email === 'string' ? body.email.trim() : '';
+  const body = (await parseJsonBody(request)) as { email?: unknown; locale?: unknown } | null;
+  const email = typeof body?.email === 'string' ? body.email.trim() : '';
 
   // Neutral response shared by every path so existence isn't leaked.
   const ok = () =>
@@ -68,7 +68,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // lingua in cui l'iscritto riceve il proprio link.
     const locale =
       linguaPagina(registration.locale) ??
-      linguaPagina(typeof body.locale === 'string' ? body.locale : null) ??
+      linguaPagina(typeof body?.locale === 'string' ? body.locale : null) ??
       linguaDaIntestazione(request.headers.get('Accept-Language')) ??
       defaultLocale;
     // Con l'iscrizione non aperta (per l'evento o per il sito) il link

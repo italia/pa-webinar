@@ -91,12 +91,7 @@ export const POST = withErrorHandling(async (request) => {
   }
   const data = parsed.data;
 
-  // Un modello nuovo non ha domande da aggiornare: un `id` nel corpo (una domanda
-  // copiata da un altro modello) non deve far sparire la domanda.
-  const { create } = shapeTemplateItemsWrite(
-    (data.items ?? []).map((item) => ({ ...item, id: undefined })),
-    [],
-  );
+  const { create } = shapeTemplateItemsWrite(data.items ?? [], []);
 
   const created = await prisma.questionTemplate.create({
     data: {

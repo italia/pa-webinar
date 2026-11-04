@@ -93,14 +93,19 @@ export function errorResponse(error: unknown): Response {
 
   // Prisma errors
   if (error && typeof error === 'object' && 'code' in error) {
-    const prismaError = error as { code: string; meta?: unknown };
+    const prismaError = error as { code: string; message?: string; meta?: unknown };
     if (prismaError.code === 'P2002') {
       return Response.json(
         { error: 'Resource already exists', code: 'CONFLICT' },
         { status: 409 }
       );
     }
-    if (prismaError.code === 'P2025') {
+    // Un id malformato su una colonna uuid: nessuna riga puo' averlo, e la
+    // risposta non cambia se la rotta non lo controlla da se'. Le altre forme di
+    // P2023 sono dati sul database che non si leggono: restano un guasto.
+    const idMalformato =
+      prismaError.code === 'P2023' && /\buuid\b/i.test(prismaError.message ?? '');
+    if (prismaError.code === 'P2025' || idMalformato) {
       return Response.json(
         { error: 'Resource not found', code: 'NOT_FOUND' },
         { status: 404 }

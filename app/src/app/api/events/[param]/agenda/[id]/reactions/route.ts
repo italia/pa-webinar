@@ -18,6 +18,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
+import { isUuid } from '@/lib/events/event-param';
 import { authorizePanelRead, PANEL_READ_EVENT_SELECT } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import {
@@ -31,8 +32,6 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { limiteDellaSala } from '@/lib/room-rate-limit';
 
 export const dynamic = 'force-dynamic';
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const reactionSchema = z.object({
   value: z.enum(['AGREE', 'DISAGREE']).nullable(),
@@ -56,7 +55,7 @@ export const POST = withErrorHandling(async (request, context) => {
   }
   const { value, accessToken, guestId } = parsed.data;
 
-  if (!UUID_RE.test(itemId)) throw new NotFoundError('Agenda item');
+  if (!isUuid(itemId)) throw new NotFoundError('Agenda item');
 
   const event = await prisma.event.findUnique({
     where: { slug },
