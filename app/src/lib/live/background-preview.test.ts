@@ -14,9 +14,7 @@ import {
   PERCORSO_MODELLO,
   PERCORSO_WASM,
   mascheraInAlfa,
-  prendiSegmentatore,
   rettangoloCopertura,
-  rilasciaSegmentatore,
 } from './background-preview';
 
 afterEach(() => {
@@ -58,7 +56,15 @@ describe('mascheraInAlfa', () => {
 });
 
 describe('segmentatore condiviso', () => {
+  // Il modulo ricorda il segmentatore e se la scheda grafica ha fallito: ogni
+  // prova parte da uno nuovo, cosi' l'esito non dipende dall'ordine.
+  const nuovoModulo = async () => {
+    vi.resetModules();
+    return import('./background-preview');
+  };
+
   it('si carica dal portale, con la scheda grafica o, se non va, con il processore', async () => {
+    const { prendiSegmentatore, rilasciaSegmentatore } = await nuovoModulo();
     const segmentatore = { close: mp.close };
     mp.createFromOptions.mockRejectedValueOnce(new Error('niente WebGL')).mockResolvedValueOnce(segmentatore);
 
@@ -81,6 +87,7 @@ describe('segmentatore condiviso', () => {
   });
 
   it('un caricamento fallito non resta in memoria: la volta dopo si riprova', async () => {
+    const { prendiSegmentatore, rilasciaSegmentatore } = await nuovoModulo();
     mp.createFromOptions.mockRejectedValue(new Error('rotto'));
     await expect(prendiSegmentatore()).rejects.toThrow('rotto');
     rilasciaSegmentatore();

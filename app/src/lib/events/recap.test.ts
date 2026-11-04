@@ -39,6 +39,8 @@ const mocked = prisma as unknown as {
 describe('buildRecap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // clearAllMocks tiene le implementazioni: un altro blocco ne imposta una qui.
+    mocked.questionnaireAnswer.findMany.mockResolvedValue([]);
     mocked.event.findUnique.mockResolvedValue({ peakParticipants: 42 });
     mocked.registration.count.mockResolvedValue(100);
     mocked.question.findMany.mockResolvedValue([
