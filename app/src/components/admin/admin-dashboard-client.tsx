@@ -560,7 +560,7 @@ export default function AdminDashboardClient({
                     {tList('menu.enterRoom')}
                   </button>
                   <Link href={percorso(eventAdminPath(event.id, { viaToken: token }))} className="btn btn-outline-primary btn-sm">
-                    {tList('menu.manage')}
+                    {t('manage')}
                   </Link>
                 </span>
               </li>
