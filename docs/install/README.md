@@ -214,11 +214,10 @@ scripts/minikube-up.sh
 The script starts a minikube profile named `pa-webinar` without changing your
 current kubectl context, generates the secrets once outside the repository,
 and installs the chart with the simple profile and
-`examples/values-minikube.yaml`. The published images refuse anonymous
-pulls, so without registry credentials the script builds the two application
-images from your checkout and loads them into the node. In the lab, a first install
-took three to five minutes with Docker's build cache already warm; a first
-build on a new machine takes longer.
+`examples/values-minikube.yaml`. The script pulls the published development
+images, with no credentials; with `--images local` it builds them from your
+checkout instead and loads them into the node. In the lab, a first install took
+three to six minutes.
 
 The script also creates a certificate authority of its own, once, and signs
 the portal's and the conference's certificates with it. `--trust-ca` adds it
@@ -508,11 +507,12 @@ send traffic straight to pods need an `ipBlock` rule for their ranges. See
 
 ### Registry access to the published images
 
-- No published image accepts an anonymous pull. Each platform has a way
-  around it:
-  - minikube: the script builds the images from your checkout, uncommitted
-    changes included, and needs Docker; with a token that can read packages
-    it uses the published `:dev` images;
+- The portal, migration, recorder controller, live-captions and CPU worker
+  images accept anonymous pulls. The patched web image, the recorder bot and
+  the GPU worker image do not. Each platform has a way around it:
+  - minikube: the script uses the published `:dev` images and the standard web
+    image, or builds from your checkout with `--images local`; with a token
+    that can read packages it uses the patched web image;
   - k3s: `pa-webinar-up.sh` builds the two application images from the
     checkout on your workstation and imports them into the server over ssh;
     for a server with no Internet, `preload-images.sh build` bundles them with
@@ -520,9 +520,9 @@ send traffic straight to pods need an `ipBlock` rule for their ranges. See
     ([Images without registry access](k3s.md#images-without-registry-access));
   - managed clusters: a pull Secret (`app.imagePullSecrets` and
     `jitsi-meet.imagePullSecrets`), or a mirror in your own registry.
-- A token is not enough by itself. The packages are not public: a GitHub
-  token with `read:packages` pulls them only for an account that has been
-  given read access to them. Without that access, build the images from the
+- A token is not enough by itself for those three images. They are not
+  public: a GitHub token with `read:packages` pulls them only for an account
+  that has been given read access to them. Without that access, build the images from the
   release tag ([Building locally](../INFRASTRUCTURE.md#building-locally)) and
   serve them from a registry you control, or load them into the nodes as the
   minikube and k3s scripts do.

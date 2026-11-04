@@ -90,9 +90,9 @@ Gather these before you start.
       published with a DMARC policy for the sender's domain
       ([Email delivery](../configuration/email.md)). Until it is ready,
       `--mailpit` on k3s keeps the emails in a test mailbox.
-- [ ] **Access to the images**: Docker on the workstation to build them, since
-      the published images refuse anonymous pulls today, or read access to the
-      packages ([Registry access](README.md#registry-access-to-the-published-images)).
+- [ ] **Access to the images**: the portal images are public. The patched web
+      image, the recorder and the GPU worker need read access to the packages
+      ([Registry access](README.md#registry-access-to-the-published-images)).
 - [ ] **Object storage credentials**, when you use your provider's: static
       keys with the permissions in
       [Creating buckets and containers](../configuration/storage.md#creating-buckets-and-containers).

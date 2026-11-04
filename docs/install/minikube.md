@@ -207,7 +207,8 @@ VM driver there (`--driver vfkit` or `--driver qemu`). Not tested.
 
 The portal comes in two images: the application and the migrations. The
 development branch publishes them as `ghcr.io/italia/pa-webinar:dev` and
-`:dev-migrate`. Today ghcr.io refuses anonymous pulls of these packages, so
+`:dev-migrate`, and anyone can pull them. The chart's patched `jitsi/web` image
+is not public: without credentials the conference uses the standard one, and
 the script chooses by itself. Registry credentials are `GHCR_USERNAME` and
 `GHCR_TOKEN` in the environment, a file passed with `--pull-secret-file`, or
 the Secret `ghcr-pull` left in the namespace by an earlier run. The script
@@ -234,25 +235,25 @@ flowchart TD
   TEST -->|"yes"| REG
   TEST -->|"no"| STOP
   CRED -->|"no"| ANON
-  ANON -->|"yes"| REG2
-  ANON -->|"no, today"| LOC
+  ANON -->|"yes, today"| REG2
+  ANON -->|"no"| LOC
 ```
 
 | Mode | When to use it | What it needs | First install, measured |
 |---|---|---|---|
-| Registry, with a pull Secret | To try what the development branch publishes, without building | A token with `read:packages` for ghcr.io | 2 min 47 s to 3 min 11 s |
-| Local | No credentials, or to try your own changes | Docker on the workstation. The migration image alone is about 2.9 GB | 4 min 56 s to 5 min 34 s with Docker's build cache warm |
+| Registry, no credentials | To try what the development branch publishes, without building | Nothing | 3 min 19 s |
+| Registry, with a pull Secret | The same, with the patched web image | A token with `read:packages` that can read that image | 2 min 47 s to 3 min 11 s |
+| Local | To try your own changes | Docker on the workstation. The migration image alone is about 2.9 GB | 4 min 56 s to 5 min 34 s with Docker's build cache warm |
 
 `--images registry|host|local` forces a mode. `registry` stops at once when
 the node cannot pull. `host` pulls with the workstation's Docker, after
 `docker login ghcr.io`, and loads the images into the node: no token enters
 the cluster, and the first install took 4 min 35 s.
 
-**To see your own changes, always pass `--images local`.** With registry
-credentials, in the environment or in the `ghcr-pull` Secret that an earlier
-run left in the namespace, the automatic choice installs the published
-images, and your changes never reach the cluster. The script warns when it
-does so, and more loudly when the checkout has uncommitted changes. In local
+**To see your own changes, always pass `--images local`.** The automatic
+choice installs the published images, and your changes never reach the
+cluster. The script warns when it does so, and more loudly when the checkout
+has uncommitted changes. In local
 mode the images are tagged per profile, `pa-webinar:local-<profile>` and
 `pa-webinar:local-<profile>-migrate`, so two profiles or two checkouts do not
 overwrite each other's images.
@@ -275,7 +276,25 @@ list, so your Helm configuration is not touched.
 
 ### 2a. With the published development images
 
-Give the script a token that can read the packages, without leaving it in the
+```bash
+scripts/minikube-up.sh
+```
+
+No credentials are needed. The node pulls `:dev` and `:dev-migrate` from
+ghcr.io, and the conference uses the standard `jitsi/web` image.
+
+### 2b. From your checkout
+
+```bash
+scripts/minikube-up.sh --images local
+```
+
+The script builds both images from your checkout with Docker, uncommitted
+changes included, and loads them into the node.
+
+### 2c. With the patched web image
+
+Give the script a token that can read that package, without leaving it in the
 shell history:
 
 ```bash
@@ -297,24 +316,6 @@ with those credentials before it uses them. It then creates the pull Secret
 namespace until the profile is deleted, so later runs need no credentials.
 Anyone who can read Secrets in the profile can read the token, so delete the
 profile when you are done.
-
-### 2b. Without credentials
-
-```bash
-scripts/minikube-up.sh
-```
-
-The script finds that ghcr.io refuses the anonymous pull, builds both images
-from your checkout with Docker, and loads them into the node. It prints
-(the script's messages are in Italian):
-
-```text
-   ghcr.io non concede il prelievo di ghcr.io/italia/pa-webinar senza credenziali:
-   costruisco le immagini dai sorgenti di questo repository (--images local).
-```
-
-"ghcr.io does not allow pulling without credentials: building the images from
-this repository's sources".
 
 ### What the script does
 
@@ -781,11 +782,12 @@ total, so you can compare your own runs:
 
 | Operation | Time |
 |---|---|
+| First install, published images, no credentials | 3 min 19 s: 52 s for the node and the ingress, 138 s of Helm |
 | First install, published images with a pull Secret | 2 min 47 s to 3 min 11 s, of which Helm 117 to 131 s |
 | The same, with an empty minikube cache | 3 min 34 s: 75 s for the node and the ingress, 132 s of Helm |
 | First install, `--images host` | 4 min 35 s: 57 s for the node, 85 s to pull and load the images, 123 s of Helm |
-| First install, no credentials, Docker's build cache warm | 2 min 57 s to 5 min 34 s: about 1 min to start the node and the ingress, from a few seconds to 2 min 26 s to build the images, 50 s to 1 min to load them into the node, about 75 s of Helm |
-| First install, no credentials, 2 CPU / 3 GB node | 6 min 10 s, build cache state not recorded |
+| First install, built from the checkout, Docker's build cache warm | 2 min 57 s to 5 min 34 s: about 1 min to start the node and the ingress, from a few seconds to 2 min 26 s to build the images, 50 s to 1 min to load them into the node, about 75 s of Helm |
+| First install, built from the checkout, 2 CPU / 3 GB node | 6 min 10 s, build cache state not recorded |
 | The development loop: one string changed in the portal, then the script again with `--images local` | 2 min 21 s: 1 min 50 s of build with a warm cache, the application image loaded into the node (the migration image unchanged, not loaded), 21 s of Helm |
 | Running the script again, nothing changed | 11 to 15 s |
 | `scripts/minikube-down.sh --stop` | 15 s |
@@ -1252,9 +1254,8 @@ workstation's GPU outside the cluster. It is for test data only.
 - **Certificates from a local authority.** They work only where you trusted
   it; other browser profiles accept the warnings by hand, the conference's
   first.
-- **Development images need credentials** until the packages are public.
-  Without them the script builds the checkout, which takes a few minutes and
-  needs Docker.
+- **The patched web image needs credentials.** Without them the conference
+  uses the standard `jitsi/web` image.
 - **One bridge, fixed.** One conference always runs on one bridge; the
   measured limits are in [Measured usage](#measured-usage).
 - **No object storage, recording, Jibri, TURN, AI post-production, live

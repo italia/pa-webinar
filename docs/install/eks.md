@@ -140,9 +140,10 @@ The node groups carry the labels and taints that the chart values select on:
   DNS-01 certificate check.
 - An SMTP relay. Without it no email is ever sent
   ([Email delivery](../configuration/email.md)).
-- Access to the portal images: a token with `read:packages` for
+- Access to the images that are not public (the patched web image, the
+  recorder and the GPU worker): a token with `read:packages` for
   `ghcr.io/italia`, or a copy of the images in Amazon ECR
-  ([Images](../INFRASTRUCTURE.md#images)).
+  ([Images](../INFRASTRUCTURE.md#images)). The portal images are public.
 
 **Default sizes.** These are the module defaults in
 `infra/tofu/eks/variables.tf`, not sizes measured on EKS. The vCPU and memory
@@ -191,7 +192,7 @@ well. The items below are specific to EKS.
 - [ ] Administration network range for the Kubernetes API endpoint (never `0.0.0.0/0`).
 - [ ] Portal and conference DNS names, and the TURN name if you turn TURN on.
 - [ ] SMTP relay, with host, port, user, password and sender.
-- [ ] Registry token with `read:packages`, or the images copied into ECR.
+- [ ] Registry token with `read:packages`, or the images copied into ECR, for the images that are not public.
 - [ ] The release you install, for both image tags (`<version>` and `v<version>-migrate`).
 - [ ] The decisions above written down.
 - [ ] A folder outside the repository for the installation files, readable only by you.

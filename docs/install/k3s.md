@@ -543,7 +543,7 @@ without its `backups/`, encrypted when you give it a recipient
 
 ### Images without registry access
 
-The published images refuse anonymous pulls today
+The portal images can be pulled anonymously, and the patched web image cannot
 ([Registry access](README.md#registry-access-to-the-published-images)). The
 script handles this for you:
 

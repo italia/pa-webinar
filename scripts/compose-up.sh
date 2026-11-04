@@ -32,9 +32,7 @@ Uso: scripts/compose-up.sh [opzioni]
 Immagini del portale
   (predefinito)             le costruisce dai sorgenti di questo repository,
                             modifiche non salvate comprese
-  --images registry         le preleva da ghcr.io: serve `docker login ghcr.io`
-                            con un token read:packages finché i pacchetti non
-                            sono pubblici
+  --images registry         le preleva da ghcr.io, senza credenziali
   --tag TAG                 tag pubblicato (predefinito: dev). Il tag delle
                             migrazioni si ricava: dev -> dev-migrate,
                             dev-<sha> -> dev-migrate-<sha>, X.Y.Z -> vX.Y.Z-migrate
@@ -172,7 +170,7 @@ if [ "$IMMAGINI" = "registry" ]; then
   export PA_WEBINAR_MIGRATE_IMAGE="$REPO_IMMAGINE:$TAG_MIGRAZIONE"
   nota "prelevo $PA_WEBINAR_IMAGE e $PA_WEBINAR_MIGRATE_IMAGE"
   docker compose pull --quiet app db-migrate \
-    || errore "Prelievo non riuscito. I pacchetti richiedono 'docker login ghcr.io' con un token read:packages; senza, lancia lo script senza --images registry per costruire dai sorgenti."
+    || errore "Prelievo non riuscito: controlla la rete e il tag, oppure lancia lo script senza --images registry per costruire dai sorgenti."
 else
   nota "costruisco dai sorgenti; la prima volta alcuni minuti"
   ARGOMENTI_UP+=(--build)

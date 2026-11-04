@@ -357,7 +357,7 @@ Docker Compose is the loop for developing PA Webinar, not a way to install it: i
 
 ```bash
 scripts/compose-up.sh                               # build, migrate, demo data on the first run
-scripts/compose-up.sh --images registry             # the same with the published images (needs docker login ghcr.io)
+scripts/compose-up.sh --images registry             # the same with the published images
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # optional: hot reload
 ```
 

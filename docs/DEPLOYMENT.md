@@ -284,10 +284,12 @@ Get these ready before the first install. The first item is the one that surpris
   An evaluation works without it. Staff browsers upload videos straight to it, so the bucket or container
   must allow `PUT` from the portal's origin (CORS), and an S3-compatible endpoint must be an HTTPS address
   that browsers can reach ([Creating buckets and containers](configuration/storage.md#creating-buckets-and-containers)).
-- **Access to the container images.** The images published under `ghcr.io/italia/` accept no
-  anonymous pulls ([CI, images and releases](development/ci-and-release.md#image-tags)). For each
-  image you have three options: registry credentials in a pull Secret, a mirror in your own registry,
-  or a build from source (for the patched web image, see
+- **Access to the container images.** Under `ghcr.io/italia/`, the portal, migration, recorder
+  controller, live-captions and CPU worker images accept anonymous pulls. The patched web image, the
+  recorder bot and the GPU worker image do not
+  ([CI, images and releases](development/ci-and-release.md#image-tags)). For each of those three you
+  have three options: registry credentials in a pull Secret, a mirror in your own registry, or a build
+  from source (for the patched web image, see
   [infra/jitsi-web-patched](../infra/jitsi-web-patched/README.md)). Pull secrets reach the pods by two
   lists:
   - `app.imagePullSecrets` covers the app and migration images, the config-reload hook, and the

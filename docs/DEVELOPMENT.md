@@ -33,7 +33,7 @@ cd pa-webinar
 scripts/compose-up.sh
 ```
 
-`--images registry` takes the published images instead of building them, which skips the Docker build and leaves only the download; until the packages are public it needs `docker login ghcr.io` with a `read:packages` token. `--call` ends with a call between two headless browsers, and `--help` lists the rest. Run the script again after a `git pull`: it rebuilds what changed, applies new migrations and keeps your data.
+`--images registry` takes the published images instead of building them, which skips the Docker build and leaves only the download, with no credentials. `--call` ends with a call between two headless browsers, and `--help` lists the rest. Run the script again after a `git pull`: it rebuilds what changed, applies new migrations and keeps your data.
 
 The script wraps these commands, which also work on their own:
 
