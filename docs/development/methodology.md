@@ -220,7 +220,7 @@ Run every command from the repository root unless the table says otherwise.
 | Job in `ci.yml` | Local equivalent | You may skip it when |
 |---|---|---|
 | Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` | Never |
-| Unit Tests | `npm run test:coverage --workspace=app`. **Not** `npm run test`: only the coverage run enforces the thresholds. | Never |
+| Unit Tests | `npm run test:coverage --workspace=app`. **Not** `npm run test`: only the coverage run enforces the thresholds. Then `npm run test:db --workspace=app` against a disposable PostgreSQL ([Database tests](testing.md#database-tests)). | Never for the coverage run. The database tests when nothing changed under `app/` |
 | Unit Tests (recorder, controller) | In `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Nothing changed in those folders |
 | Typecheck (lobby) | `npm run lobby:typecheck`, which runs the same `tsc --noEmit` as `npx tsc --noEmit -p lobby/tsconfig.json` | Nothing changed in `lobby/` |
 | Helm Chart | `./scripts/validate-chart.sh`. The second step, `kubectl apply --dry-run=server`, needs a cluster (see below). | Nothing changed in `infra/helm/` |

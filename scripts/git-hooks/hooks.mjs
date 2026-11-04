@@ -383,6 +383,14 @@ function prePush() {
     'test:coverage',
     '--workspace=app',
   ]);
+  if (process.env.TEST_DATABASE_URL) {
+    controllo('Unit Tests (real database)', 'npm', ['run', 'test:db', '--workspace=app']);
+  } else {
+    salta(
+      'Unit Tests (real database)',
+      'set TEST_DATABASE_URL to a throwaway database named *_test to run it'
+    );
+  }
   for (const dir of c.servizi) {
     const cwd = join(RADICE, dir);
     if (!existsSync(join(cwd, 'node_modules')))

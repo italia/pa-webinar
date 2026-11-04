@@ -101,7 +101,7 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 | Job, as named in the checks list | What it runs | Waits for | Blocking |
 |---|---|---|---|
 | Lint & Typecheck | `npm run lint --workspace=app`, `npx tsc --noEmit --project app/tsconfig.json` and `npm run test:scripts` (the Git-hook rules and the license policy) | | Yes |
-| Unit Tests | `npm run test:coverage --workspace=app` against a PostgreSQL service container. It fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet | | Yes |
+| Unit Tests | `npm run test:coverage --workspace=app`, which fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet. Then `npm run test:db --workspace=app` against a PostgreSQL service container | | Yes |
 | Unit Tests (recorder, controller) | For `infra/recorder`, `infra/recorder-controller` and `infra/captions/gateway`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
 | Typecheck (lobby) | `npx tsc --noEmit -p lobby/tsconfig.json` | | Yes |
 | Helm Chart | Builds the subcharts at the versions pinned in `Chart.lock`, runs `./scripts/validate-chart.sh`, then renders the `simple`, `standard` and `full` example values and applies each result with `kubectl apply --dry-run=server` to a throwaway kind cluster | | Yes |

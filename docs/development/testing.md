@@ -12,6 +12,7 @@ Run every command from the repository root unless a row or block says otherwise.
 |---|---|---|---|---|
 | Lint and type check | ESLint rules and TypeScript `strict` for the `app` workspace | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | Nothing | **Lint & Typecheck** |
 | App unit and guard tests | The Vitest suite under `app/src/` | `npm run test --workspace=app` (also `test:watch`, `test:coverage`) | Nothing: no database, Redis or Jitsi | **Unit Tests**, with the coverage thresholds |
+| App database tests | Route handlers against real PostgreSQL: constraints, cascades, transactions, races between requests, column types | `npm run test:db --workspace=app` | A disposable PostgreSQL in `TEST_DATABASE_URL`, with a superuser and a database name ending in `_test` | **Unit Tests** |
 | Recorder bot, recorder controller and captions gateway | Pure logic of `infra/recorder` and `infra/recorder-controller`; the captions gateway, end to end over WebSockets with a fake bridge and a fake engine | In each folder: `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test` | Each folder's own dependencies | **Unit Tests (recorder, controller)** |
 | Lobby | Type check of the Phaser square | `npm run lobby:typecheck` | Nothing | **Typecheck (lobby)** |
 | Repository tooling | The rules of the Git hooks (commit message, secret patterns, choice of checks) and the license policy (SPDX expressions, lockfile reading) | `npm run test:scripts` (Node's built-in test runner) | Nothing | **Lint & Typecheck** |
@@ -119,6 +120,30 @@ At the repository root, `npm test` runs the same suite: the root script only del
 The suite needs no running service. Tests that touch data mock the Prisma client with `vi.mock('@/lib/db', ...)`, declaring only the delegates the code under test calls. Storage, email and other I/O modules are mocked the same way. The suite passes with an unreachable `DATABASE_URL`. The CI job still starts a PostgreSQL service, which the tests do not use.
 
 Most tests cover `app/src/lib/` and route handlers. A route test sits next to its `route.ts`, imports the exported handler (`GET`, `POST`, and so on) and calls it directly. React components have almost no unit tests. The end-to-end smoke tests and manual checks exercise them.
+
+### Database tests
+
+A mocked client cannot say whether a unique index fires, a cascade removes the right rows, a transaction rolls back or a malformed id reaches a `uuid` column. The tests in `app/src/test/db/` call the same route handlers against a real PostgreSQL to answer those questions. Only the session cookies are faked, plus file storage where a route deletes a blob.
+
+```bash
+docker run -d --rm --name pa-webinar-test-db \
+  -e POSTGRES_DB=pa_webinar_test -e POSTGRES_USER=eventi -e POSTGRES_PASSWORD=test \
+  -p 127.0.0.1:55433:5432 postgres:16-alpine
+
+TEST_DATABASE_URL=postgresql://eventi:test@127.0.0.1:55433/pa_webinar_test \
+  npm run test:db --workspace=app
+```
+
+[`app/vitest.db.config.ts`](../../app/vitest.db.config.ts) sets up the run:
+
+- it applies the migrations with `prisma migrate deploy`, the command production uses;
+- it refuses a database whose name does not end in `_test`, because every test empties every table;
+- it uses `TEST_DATABASE_URL` and ignores `DATABASE_URL`, so a development connection cannot be picked up by accident;
+- it runs one file at a time, since all files share the database.
+
+The user must be a superuser: the cleanup between tests turns off foreign key checks for its transaction. The user created by the official PostgreSQL image is one.
+
+Add a test here when the behavior depends on the database itself. Logic that depends only on the input belongs in the unit suite.
 
 ### End-to-end tests (Playwright)
 

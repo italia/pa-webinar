@@ -22,7 +22,7 @@ export default defineConfig({
     passWithNoTests: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', '.next', 'e2e'],
+    exclude: ['node_modules', '.next', 'e2e', '**/*.db.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

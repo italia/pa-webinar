@@ -24,7 +24,8 @@
     "copy-sprites": "mkdir -p public/svg && cp $(node -e \"console.log(require.resolve('bootstrap-italia/dist/svg/sprites.svg'))\") public/svg/sprites.svg",
     "copy-vision": "node -e \"const p=require('path'),f=require('fs');const d=p.join(p.dirname(require.resolve('@mediapipe/tasks-vision')),'wasm'),o='public/vendor/mediapipe';f.mkdirSync(o,{recursive:true});for(const n of f.readdirSync(d))if(/^vision_wasm(_nosimd)?_internal[.]/.test(n))f.copyFileSync(p.join(d,n),p.join(o,n))\"",
     "postinstall": "prisma generate && npm run copy-sprites && npm run copy-vision",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:db": "vitest run --config vitest.db.config.ts"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
