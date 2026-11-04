@@ -4389,7 +4389,12 @@
       "grantSince": "Minn {date}",
       "grantPublic": "jidher fil-paġna pubblika",
       "grantPhoto": "Ritratt imtella' mit-tim tal-avveniment",
-      "grantRevoked": "aċċess revokat fil-{date}"
+      "grantRevoked": "aċċess revokat fil-{date}",
+      "consentsIntro": "Tista' tirtira kull kunsens f'kull ħin, qabel jew wara l-avveniment. Ir-reġistrazzjoni tiegħek tibqa' valida.",
+      "consentFuture": "Komunikazzjonijiet futuri",
+      "consentWithdrawnOn": "Irtirat fil-{date}",
+      "consentNoteInRoom": "Jekk bħalissa qiegħed fis-sala, l-irtirar jgħodd mid-dħul li jmiss: biex jgħodd mill-ewwel, uża Kunsensi fis-sala.",
+      "consentFutureEffect": "Jekk tirtirah ma tibqax tirċievi komunikazzjonijiet dwar avvenimenti li ġejjin u toħroġ mill-ktieb tal-indirizzi, għar-reġistrazzjonijiet kollha tiegħek."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",

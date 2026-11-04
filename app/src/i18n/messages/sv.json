@@ -4389,7 +4389,12 @@
       "grantSince": "Sedan {date}",
       "grantPublic": "visas på den offentliga sidan",
       "grantPhoto": "Foto uppladdat av evenemangets team",
-      "grantRevoked": "åtkomst återkallad {date}"
+      "grantRevoked": "åtkomst återkallad {date}",
+      "consentsIntro": "Du kan när som helst återkalla varje samtycke, före eller efter evenemanget. Din anmälan gäller fortfarande.",
+      "consentFuture": "Framtida meddelanden",
+      "consentWithdrawnOn": "Återkallat {date}",
+      "consentNoteInRoom": "Om du är i rummet just nu gäller återkallelsen från nästa inträde: använd Samtycken i rummet för att den ska gälla direkt.",
+      "consentFutureEffect": "Om du återkallar det får du inte längre meddelanden om kommande evenemang och du lämnar adressboken, för alla dina anmälningar."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",

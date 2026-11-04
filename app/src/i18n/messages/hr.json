@@ -4389,7 +4389,12 @@
       "grantSince": "Od {date}",
       "grantPublic": "prikazan na javnoj stranici",
       "grantPhoto": "Fotografija koju je učitao tim događaja",
-      "grantRevoked": "pristup opozvan {date}"
+      "grantRevoked": "pristup opozvan {date}",
+      "consentsIntro": "Svaku privolu možete povući u bilo kojem trenutku, prije ili nakon događaja. Vaša prijava ostaje valjana.",
+      "consentFuture": "Buduće obavijesti",
+      "consentWithdrawnOn": "Povučeno {date}",
+      "consentNoteInRoom": "Ako ste trenutačno u dvorani, povlačenje vrijedi od sljedećeg ulaska: da vrijedi odmah, upotrijebite Privole u dvorani.",
+      "consentFutureEffect": "Ako je povučete, više nećete primati obavijesti o sljedećim događajima i izlazite iz adresara, za sve svoje prijave."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",

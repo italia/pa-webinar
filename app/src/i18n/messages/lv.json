@@ -4389,7 +4389,12 @@
       "grantSince": "Kopš {date}",
       "grantPublic": "redzams publiskajā lapā",
       "grantPhoto": "Pasākuma komandas augšupielādēts fotoattēls",
-      "grantRevoked": "piekļuve atsaukta {date}"
+      "grantRevoked": "piekļuve atsaukta {date}",
+      "consentsIntro": "Katru piekrišanu varat atsaukt jebkurā laikā, pirms vai pēc pasākuma. Jūsu reģistrācija paliek spēkā.",
+      "consentFuture": "Turpmākie paziņojumi",
+      "consentWithdrawnOn": "Atsaukts {date}",
+      "consentNoteInRoom": "Ja pašlaik esat telpā, atsaukums ir spēkā no nākamās ienākšanas: lai tas stātos spēkā uzreiz, telpā izmantojiet Piekrišanas.",
+      "consentFutureEffect": "Ja to atsauksiet, vairs nesaņemsiet paziņojumus par nākamajiem pasākumiem un izstāsieties no adrešu grāmatas visām savām reģistrācijām."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",

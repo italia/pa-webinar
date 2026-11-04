@@ -4389,7 +4389,12 @@
       "grantSince": "Ó {date}",
       "grantPublic": "taispeánta ar an leathanach poiblí",
       "grantPhoto": "Grianghraf a d'uaslódáil foireann na hócáide",
-      "grantRevoked": "rochtain cúlghairthe ar {date}"
+      "grantRevoked": "rochtain cúlghairthe ar {date}",
+      "consentsIntro": "Is féidir leat gach toiliú a tharraingt siar am ar bith, roimh an imeacht nó ina dhiaidh. Fanann do chlárú bailí.",
+      "consentFuture": "Cumarsáid amach anseo",
+      "consentWithdrawnOn": "Tarraingthe siar ar {date}",
+      "consentNoteInRoom": "Má tá tú sa seomra faoi láthair, tá an tarraingt siar i bhfeidhm ó do chéad iontráil eile: chun é a chur i bhfeidhm láithreach, úsáid Toilithe sa seomra.",
+      "consentFutureEffect": "Má tharraingíonn tú siar é ní bhfaighidh tú cumarsáid faoi imeachtaí amach anseo a thuilleadh agus fágann tú an leabhar seoltaí, do do chláruithe go léir."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",

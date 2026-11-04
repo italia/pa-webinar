@@ -79,7 +79,7 @@ export const POST = withErrorHandling(async (request) => {
     }),
     prisma.registration.updateMany({
       where: { personId: person.id, consentFutureCommunications: true },
-      data: { consentFutureCommunications: false },
+      data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: new Date() },
     }),
   ]);
 

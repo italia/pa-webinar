@@ -4389,7 +4389,12 @@
       "grantSince": "Desde el {date}",
       "grantPublic": "mostrado en la página pública",
       "grantPhoto": "Foto subida por el equipo del evento",
-      "grantRevoked": "acceso revocado el {date}"
+      "grantRevoked": "acceso revocado el {date}",
+      "consentsIntro": "Puedes retirar cada consentimiento en cualquier momento, antes o después del evento. Tu inscripción sigue siendo válida.",
+      "consentFuture": "Comunicaciones futuras",
+      "consentWithdrawnOn": "Retirado el {date}",
+      "consentNoteInRoom": "Si ahora estás en la sala, la retirada vale desde tu próxima entrada: para aplicarla enseguida, usa Consentimientos en la sala.",
+      "consentFutureEffect": "Si lo retiras, dejas de recibir comunicaciones sobre próximos eventos y sales de la agenda, para todas tus inscripciones."
     },
     "erasure": {
       "title": "Supresión de sus datos",

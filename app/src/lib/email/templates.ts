@@ -102,7 +102,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserva questa email, contiene il tuo link personale per accedere all\u2019evento.',
     viewEvent: 'Visualizza la pagina dell\u2019evento',
-    myData: 'I tuoi dati: vederli, correggerli o cancellare l\u2019iscrizione',
+    myData: 'I tuoi dati: vederli, correggerli, ritirare un consenso o cancellare l\u2019iscrizione',
     addToCalendar: 'Aggiungi al tuo calendario:',
     downloadIcs: 'Scarica .ics',
     footer: '',
@@ -142,7 +142,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Keep this email \u2014 it contains your personal link to access the event.',
     viewEvent: 'View event page',
-    myData: 'Your data: see it, correct it or cancel your registration',
+    myData: 'Your data: see it, correct it, withdraw a consent or cancel your registration',
     addToCalendar: 'Add to your calendar:',
     downloadIcs: 'Download .ics',
     footer: '',
@@ -182,7 +182,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conservez cet e-mail : il contient votre lien personnel pour accéder à l’événement.',
     viewEvent: 'Voir la page de l’événement',
-    myData: 'Vos données : les consulter, les corriger ou annuler l’inscription',
+    myData: 'Vos données : les consulter, les corriger, retirer un consentement ou annuler l’inscription',
     addToCalendar: 'Ajoutez-le à votre agenda :',
     downloadIcs: 'Télécharger le fichier .ics',
     footer: '',
@@ -222,7 +222,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Bitte bewahren Sie diese E-Mail auf: Sie enthält Ihren persönlichen Link zur Veranstaltung.',
     viewEvent: 'Seite der Veranstaltung anzeigen',
-    myData: 'Ihre Daten: einsehen, berichtigen oder die Anmeldung löschen',
+    myData: 'Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen',
     addToCalendar: 'Zu Ihrem Kalender hinzufügen:',
     downloadIcs: '.ics herunterladen',
     footer: '',
@@ -262,7 +262,7 @@ const copy: Record<Locale, LocaleCopy> = {
     keepNote:
       'Conserve este correo electrónico: contiene su enlace personal para acceder al evento.',
     viewEvent: 'Ver la página del evento',
-    myData: 'Tus datos: verlos, corregirlos o cancelar la inscripción',
+    myData: 'Tus datos: verlos, corregirlos, retirar un consentimiento o cancelar la inscripción',
     addToCalendar: 'Añada el evento a su calendario:',
     downloadIcs: 'Descargar .ics',
     footer: '',

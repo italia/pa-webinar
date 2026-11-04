@@ -51,7 +51,7 @@ describe('POST /api/rubrica/opt-out', () => {
     );
     expect(prisma.registration.updateMany).toHaveBeenCalledWith({
       where: { personId: 'p-1', consentFutureCommunications: true },
-      data: { consentFutureCommunications: false },
+      data: { consentFutureCommunications: false, consentFutureCommunicationsWithdrawnAt: expect.any(Date) },
     });
   });
 

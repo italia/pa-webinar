@@ -4389,7 +4389,12 @@
       "grantSince": "Nuo {date}",
       "grantPublic": "rodomas viešame puslapyje",
       "grantPhoto": "Renginio komandos įkelta nuotrauka",
-      "grantRevoked": "prieiga atšaukta {date}"
+      "grantRevoked": "prieiga atšaukta {date}",
+      "consentsIntro": "Kiekvieną sutikimą galite atšaukti bet kada, prieš renginį arba po jo. Jūsų registracija lieka galioti.",
+      "consentFuture": "Būsimi pranešimai",
+      "consentWithdrawnOn": "Atšaukta {date}",
+      "consentNoteInRoom": "Jei dabar esate salėje, atšaukimas galioja nuo kito įėjimo: kad galiotų iš karto, salėje naudokite Sutikimai.",
+      "consentFutureEffect": "Jei jį atšauksite, nebegausite pranešimų apie būsimus renginius ir pasitrauksite iš adresų knygos dėl visų savo registracijų."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",

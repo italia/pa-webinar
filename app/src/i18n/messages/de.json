@@ -4389,7 +4389,12 @@
       "grantSince": "Seit {date}",
       "grantPublic": "auf der öffentlichen Seite gezeigt",
       "grantPhoto": "Vom Team der Veranstaltung hochgeladenes Foto",
-      "grantRevoked": "Zugang am {date} widerrufen"
+      "grantRevoked": "Zugang am {date} widerrufen",
+      "consentsIntro": "Sie können jede Einwilligung jederzeit widerrufen, vor oder nach der Veranstaltung. Ihre Anmeldung bleibt gültig.",
+      "consentFuture": "Künftige Mitteilungen",
+      "consentWithdrawnOn": "Widerrufen am {date}",
+      "consentNoteInRoom": "Wenn Sie gerade im Raum sind, gilt der Widerruf ab dem nächsten Eintritt: Damit er sofort gilt, nutzen Sie „Einwilligungen“ im Raum.",
+      "consentFutureEffect": "Wenn Sie sie widerrufen, erhalten Sie keine Mitteilungen zu kommenden Veranstaltungen mehr und verlassen das Adressbuch, für alle Ihre Anmeldungen."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",

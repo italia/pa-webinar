@@ -4389,7 +4389,12 @@
       "grantSince": "Od {date}",
       "grantPublic": "widoczny na stronie publicznej",
       "grantPhoto": "Zdjęcie przesłane przez zespół wydarzenia",
-      "grantRevoked": "dostęp cofnięty {date}"
+      "grantRevoked": "dostęp cofnięty {date}",
+      "consentsIntro": "Każdą zgodę możesz wycofać w dowolnym momencie, przed wydarzeniem lub po nim. Rejestracja pozostaje ważna.",
+      "consentFuture": "Przyszłe komunikaty",
+      "consentWithdrawnOn": "Wycofano {date}",
+      "consentNoteInRoom": "Jeśli jesteś teraz w sali, wycofanie działa od następnego wejścia: aby zadziałało od razu, użyj Zgody w sali.",
+      "consentFutureEffect": "Jeśli ją wycofasz, nie będziesz już otrzymywać komunikatów o kolejnych wydarzeniach i wypiszesz się z książki adresowej, dla wszystkich swoich rejestracji."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",

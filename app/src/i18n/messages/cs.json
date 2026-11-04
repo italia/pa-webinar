@@ -4389,7 +4389,12 @@
       "grantSince": "Od {date}",
       "grantPublic": "zobrazen na veřejné stránce",
       "grantPhoto": "Fotografie nahraná týmem akce",
-      "grantRevoked": "přístup zrušen {date}"
+      "grantRevoked": "přístup zrušen {date}",
+      "consentsIntro": "Každý souhlas můžete kdykoli odvolat, před akcí i po ní. Vaše registrace zůstává platná.",
+      "consentFuture": "Budoucí sdělení",
+      "consentWithdrawnOn": "Odvoláno {date}",
+      "consentNoteInRoom": "Pokud jste právě v místnosti, odvolání platí od příštího vstupu: aby platilo hned, použijte v místnosti Souhlasy.",
+      "consentFutureEffect": "Pokud jej odvoláte, nebudete dostávat sdělení o dalších akcích a opustíte adresář, a to pro všechny své registrace."
     },
     "erasure": {
       "title": "Výmaz vašich údajů",

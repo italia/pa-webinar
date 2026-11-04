@@ -4389,7 +4389,12 @@
       "grantSince": "{date} alkaen",
       "grantPublic": "näytetään julkisella sivulla",
       "grantPhoto": "Tapahtuman henkilökunnan lataama kuva",
-      "grantRevoked": "pääsy peruttu {date}"
+      "grantRevoked": "pääsy peruttu {date}",
+      "consentsIntro": "Voit peruuttaa jokaisen suostumuksen milloin tahansa, ennen tapahtumaa tai sen jälkeen. Ilmoittautumisesi pysyy voimassa.",
+      "consentFuture": "Tulevat viestit",
+      "consentWithdrawnOn": "Peruutettu {date}",
+      "consentNoteInRoom": "Jos olet nyt huoneessa, peruutus tulee voimaan seuraavalla kerralla: käytä huoneen Suostumukset-painiketta, jos haluat sen voimaan heti.",
+      "consentFutureEffect": "Jos peruutat sen, et enää saa viestejä tulevista tapahtumista ja poistut osoitekirjasta kaikkien ilmoittautumistesi osalta."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",

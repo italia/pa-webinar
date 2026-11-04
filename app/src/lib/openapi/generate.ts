@@ -853,6 +853,31 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'post',
+  path: '/api/gdpr/consents',
+  tags: ['GDPR'],
+  summary: 'Withdraw one consent of a registration (Art. 7.3), with the token the export returns',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            token: z.string(),
+            registrationId: z.string().uuid(),
+            consent: z.enum(['recording', 'transcription', 'futureCommunications']),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: { description: 'Consent withdrawn' },
+    401: { description: 'Invalid or expired token' },
+    404: { description: 'No such registration for this address' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
   path: '/api/webhooks/recording',
   tags: ['Webhooks'],
   summary: 'Jibri recording finalize webhook',

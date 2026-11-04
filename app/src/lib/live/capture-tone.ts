@@ -7,6 +7,7 @@
  */
 const DURATA_NOTA_S = 0.16;
 const VOLUME = 0.12;
+const ATTESA_AUDIO_MS = 300;
 
 let contesto: AudioContext | null = null;
 
@@ -36,7 +37,8 @@ export async function suonaAvvisoCattura(acceso: boolean): Promise<void> {
     // Dopo il clic di ingresso il browser lo permette. Se non lo permette
     // (un ricaricamento senza clic), niente nota: resterebbe in coda su un
     // orologio fermo e suonerebbe dopo, sopra quella successiva.
-    await contesto.resume();
+    // Senza un clic la promessa puo' restare aperta: non la si aspetta oltre.
+    await Promise.race([contesto.resume(), new Promise((r) => setTimeout(r, ATTESA_AUDIO_MS))]);
     if (contesto.state === 'running') suona(contesto, acceso);
   } catch {
     // Un browser senza audio non deve fermare la sala.

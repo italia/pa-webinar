@@ -386,6 +386,7 @@ The values below come from the route files. To list every call site with its val
 | Square presence ping | `POST …/garden/ping` | IP | 600 per minute × `ROOM_RATE_LIMIT_MULTIPLIER` |
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
 | Export download, erasure confirmation | `GET /api/gdpr/export`, `POST /api/gdpr/erasure` | IP | 10 per hour |
+| Withdrawal of a consent | `POST /api/gdpr/consents` | IP | 30 per hour |
 | Address-book opt-out | `POST /api/rubrica/opt-out` | IP | 10 per minute |
 | Link-preview image | `GET /api/og/event/{slug}` | IP | 60 per minute |
 

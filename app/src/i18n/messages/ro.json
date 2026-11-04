@@ -4389,7 +4389,12 @@
       "grantSince": "Din {date}",
       "grantPublic": "afișat pe pagina publică",
       "grantPhoto": "Fotografie încărcată de echipa evenimentului",
-      "grantRevoked": "acces revocat la {date}"
+      "grantRevoked": "acces revocat la {date}",
+      "consentsIntro": "Poți retrage fiecare consimțământ oricând, înainte sau după eveniment. Înscrierea ta rămâne valabilă.",
+      "consentFuture": "Comunicări viitoare",
+      "consentWithdrawnOn": "Retras la {date}",
+      "consentNoteInRoom": "Dacă ești acum în sală, retragerea se aplică de la următoarea intrare: pentru a se aplica imediat, folosește Consimțăminte în sală.",
+      "consentFutureEffect": "Dacă îl retragi, nu mai primești comunicări despre evenimentele viitoare și ieși din agendă, pentru toate înscrierile tale."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",

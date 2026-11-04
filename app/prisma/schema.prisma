@@ -866,6 +866,8 @@ model Registration {
   consentRecordingWithdrawnAt  DateTime? @map("consent_recording_withdrawn_at")
   consentMultitrackWithdrawnAt DateTime? @map("consent_multitrack_withdrawn_at")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
+  // Il ritiro dalla pagina dei propri dati: il consenso torna a false, l'ora resta.
+  consentFutureCommunicationsWithdrawnAt DateTime? @map("consent_future_communications_withdrawn_at")
 
   // Access token (for personal join link)
   accessToken String @unique @map("access_token") // nanoid

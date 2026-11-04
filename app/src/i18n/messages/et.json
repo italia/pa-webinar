@@ -4389,7 +4389,12 @@
       "grantSince": "Alates {date}",
       "grantPublic": "kuvatud avalikul lehel",
       "grantPhoto": "Ürituse meeskonna üles laaditud foto",
-      "grantRevoked": "juurdepääs tühistati {date}"
+      "grantRevoked": "juurdepääs tühistati {date}",
+      "consentsIntro": "Võite iga nõusoleku igal ajal tagasi võtta, enne või pärast üritust. Teie registreerimine jääb kehtima.",
+      "consentFuture": "Tulevased teated",
+      "consentWithdrawnOn": "Tagasi võetud {date}",
+      "consentNoteInRoom": "Kui olete praegu ruumis, kehtib tagasivõtmine järgmisest sisenemisest: et see kehtiks kohe, kasutage ruumis nuppu Nõusolekud.",
+      "consentFutureEffect": "Kui selle tagasi võtate, ei saa te enam teateid järgmiste ürituste kohta ja lahkute aadressiraamatust kõigi oma registreerimiste puhul."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",

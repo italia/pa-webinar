@@ -4389,7 +4389,12 @@
       "grantSince": "Siden {date}",
       "grantPublic": "vist på den offentlige side",
       "grantPhoto": "Foto uploadet af eventets team",
-      "grantRevoked": "adgang tilbagekaldt den {date}"
+      "grantRevoked": "adgang tilbagekaldt den {date}",
+      "consentsIntro": "Du kan til enhver tid trække hvert samtykke tilbage, før eller efter arrangementet. Din tilmelding forbliver gyldig.",
+      "consentFuture": "Fremtidige meddelelser",
+      "consentWithdrawnOn": "Trukket tilbage den {date}",
+      "consentNoteInRoom": "Hvis du er i rummet lige nu, gælder tilbagetrækningen fra din næste indgang: brug Samtykker i rummet, hvis den skal gælde straks.",
+      "consentFutureEffect": "Hvis du trækker det tilbage, modtager du ikke længere meddelelser om kommende arrangementer, og du fjernes fra adressebogen for alle dine tilmeldinger."
     },
     "erasure": {
       "title": "Sletning af dine data",

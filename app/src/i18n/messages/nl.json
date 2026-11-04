@@ -4389,7 +4389,12 @@
       "grantSince": "Sinds {date}",
       "grantPublic": "getoond op de openbare pagina",
       "grantPhoto": "Foto geüpload door het team van het evenement",
-      "grantRevoked": "toegang ingetrokken op {date}"
+      "grantRevoked": "toegang ingetrokken op {date}",
+      "consentsIntro": "U kunt elke toestemming op elk moment intrekken, vóór of na het evenement. Uw inschrijving blijft geldig.",
+      "consentFuture": "Toekomstige berichten",
+      "consentWithdrawnOn": "Ingetrokken op {date}",
+      "consentNoteInRoom": "Bent u nu in de zaal, dan geldt de intrekking vanaf uw volgende binnenkomst: gebruik Toestemmingen in de zaal om die meteen toe te passen.",
+      "consentFutureEffect": "Als u deze intrekt, ontvangt u geen berichten meer over komende evenementen en verlaat u het adresboek, voor al uw inschrijvingen."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",

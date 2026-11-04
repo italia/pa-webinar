@@ -4389,7 +4389,12 @@
       "grantSince": "Od {date}",
       "grantPublic": "prikazan na javni strani",
       "grantPhoto": "Fotografija, ki jo je naložila ekipa dogodka",
-      "grantRevoked": "dostop preklican {date}"
+      "grantRevoked": "dostop preklican {date}",
+      "consentsIntro": "Vsako privolitev lahko kadar koli prekličete, pred dogodkom ali po njem. Vaša prijava ostane veljavna.",
+      "consentFuture": "Prihodnja sporočila",
+      "consentWithdrawnOn": "Preklicano {date}",
+      "consentNoteInRoom": "Če ste zdaj v dvorani, preklic velja od naslednjega vstopa: da velja takoj, uporabite Privolitve v dvorani.",
+      "consentFutureEffect": "Če jo prekličete, ne boste več prejemali sporočil o prihodnjih dogodkih in izstopite iz imenika, za vse svoje prijave."
     },
     "erasure": {
       "title": "Izbris vaših podatkov",

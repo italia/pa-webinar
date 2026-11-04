@@ -4389,7 +4389,12 @@
       "grantSince": "Since {date}",
       "grantPublic": "shown on the public page",
       "grantPhoto": "Photo uploaded by the event staff",
-      "grantRevoked": "access revoked on {date}"
+      "grantRevoked": "access revoked on {date}",
+      "consentsIntro": "You can withdraw each consent at any time, before or after the event. Your registration stays valid.",
+      "consentFuture": "Future communications",
+      "consentWithdrawnOn": "Withdrawn on {date}",
+      "consentNoteInRoom": "If you are in the room right now, the withdrawal counts from your next entry: to apply it at once, use Consents in the room.",
+      "consentFutureEffect": "If you withdraw it you no longer receive communications about upcoming events and you leave the address book, for all your registrations."
     },
     "erasure": {
       "title": "Erase your data",

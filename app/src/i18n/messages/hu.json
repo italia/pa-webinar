@@ -4389,7 +4389,12 @@
       "grantSince": "{date} óta",
       "grantPublic": "megjelenik a nyilvános oldalon",
       "grantPhoto": "Az esemény csapata által feltöltött fénykép",
-      "grantRevoked": "hozzáférés visszavonva: {date}"
+      "grantRevoked": "hozzáférés visszavonva: {date}",
+      "consentsIntro": "Minden hozzájárulását bármikor visszavonhatja, az esemény előtt vagy után. A regisztrációja érvényes marad.",
+      "consentFuture": "Jövőbeli értesítések",
+      "consentWithdrawnOn": "Visszavonva: {date}",
+      "consentNoteInRoom": "Ha most a teremben van, a visszavonás a következő belépéstől érvényes: az azonnali érvényhez használja a teremben a Hozzájárulások gombot.",
+      "consentFutureEffect": "Ha visszavonja, többé nem kap értesítést a következő eseményekről, és kikerül a címjegyzékből, minden regisztrációja esetében."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
