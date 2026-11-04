@@ -345,6 +345,11 @@ services:
         # tre cancellano tracce, risultati AI e oggetti orfani quando c'è un
         # archivio a oggetti, e senza archivio rispondono che non c'è niente
         # da fare.
+        # Il primo giro parte quando il portale risponde: a vuoto, i lavori
+        # che girano una volta al giorno salterebbero un giorno intero.
+        until curl -sf --max-time 5 http://app:3000/api/ready >/dev/null 2>&1; do
+          sleep 5
+        done
         i=0
         while true; do
           call() {
