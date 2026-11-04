@@ -530,6 +530,27 @@ docker compose exec postgres pg_isready -U eventi -d pa_webinar
 
 After `docker compose down -v`, the database is empty: `scripts/compose-up.sh` loads the demo data again.
 
+### The ports are taken, or `docker compose ps` shows nothing
+
+The project is named `pa-webinar`. A stack started when the project took its
+name from the folder keeps running under that name: `docker compose ps` and
+`docker compose logs` from the repository do not see it, and it still holds
+the ports. `scripts/compose-up.sh` stops before the build and names the stack.
+To update that stack with its data:
+
+```bash
+COMPOSE_PROJECT_NAME=<old-name> scripts/compose-up.sh
+```
+
+To leave it and start on new volumes, stop it first:
+
+```bash
+docker stop $(docker ps -q --filter label=com.docker.compose.project=<old-name>)
+scripts/compose-up.sh
+```
+
+Its volumes stay on disk under the old name.
+
 ### Database errors after updating the code
 
 Errors about a missing table or column after a pull mean that the images are older than the code. Build them again, which also applies the new migrations:

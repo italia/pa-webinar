@@ -119,6 +119,35 @@ fi
 INIZIO=$SECONDS
 dc() { docker compose ${PROFILI[@]+"${PROFILI[@]}"} "$@"; }
 
+# Le porte si controllano prima della build: un altro stack le terrebbe
+# occupate fino all'ultimo, e l'avvio fallirebbe a metà. Il caso tipico è uno
+# stack avviato quando il progetto prendeva il nome dalla cartella: i comandi
+# `docker compose` lanciati da qui non lo vedono, ma è ancora acceso.
+PROGETTO="${COMPOSE_PROJECT_NAME:-pa-webinar}"
+occupate=()
+altri=()
+for porta in 3000 5432 8443 8025 1025; do
+  [ -n "$(docker ps -q --filter "label=com.docker.compose.project=$PROGETTO" --filter "publish=$porta")" ] && continue
+  (exec 3<>"/dev/tcp/127.0.0.1/$porta") 2>/dev/null || continue
+  occupate+=("$porta")
+  chi="$(docker ps --filter "publish=$porta" --format '{{.Label "com.docker.compose.project"}}' | head -1)"
+  [ -n "$chi" ] && [[ " ${altri[*]-} " != *" $chi "* ]] && altri+=("$chi")
+done
+if [ "${#occupate[@]}" -gt 0 ]; then
+  printf '✗ Porte occupate: %s.\n' "${occupate[*]}" >&2
+  if [ "${#altri[@]}" -gt 0 ]; then
+    for chi in "${altri[@]}"; do
+      printf "\n  Le tiene lo stack Docker Compose '%s'. I comandi docker compose lanciati da\n" "$chi" >&2
+      printf "  qui non lo vedono, perché questo progetto si chiama '%s'.\n" "$PROGETTO" >&2
+      printf '\n  Per aggiornare quello stack, con i suoi dati:\n    COMPOSE_PROJECT_NAME=%s scripts/compose-up.sh\n' "$chi" >&2
+      printf '\n  Per fermarlo e partire qui, su volumi nuovi:\n    docker stop $(docker ps -q --filter label=com.docker.compose.project=%s)\n    scripts/compose-up.sh\n' "$chi" >&2
+    done
+  else
+    printf '  Non le tiene Docker: ferma il programma che le usa, poi rilancia.\n' >&2
+  fi
+  exit 1
+fi
+
 # Dice quale servizio si è fermato. La cancellazione dei volumi si propone solo
 # quando serve davvero: PostgreSQL legge utente, password e nome del database
 # soltanto alla prima partenza su un volume vuoto.
