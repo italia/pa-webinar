@@ -11,8 +11,10 @@ and development, not for events
 
 Status: **tested in lab**. Linux workstation (Fedora, cgroup v2), Docker
 driver, minikube 1.38.1, Kubernetes v1.35.1, Helm 4.2.2. The chart with the
-minikube overlay also renders with Helm 3.16.3, the version CI uses. macOS,
-Windows and the VM drivers were not tested.
+minikube overlay also renders with Helm 3.16.3, the version CI uses. The same
+install also ran on an empty Debian 12 virtual machine with 4 vCPU and 8 GiB,
+Docker driver, minikube 1.39.0, Helm 3.22.1. macOS, Windows and the VM drivers
+were not tested.
 
 On this page:
 
@@ -282,6 +284,16 @@ scripts/minikube-up.sh
 
 No credentials are needed. The node pulls `:dev` and `:dev-migrate` from
 ghcr.io, and the conference uses the standard `jitsi/web` image.
+
+`:dev` moves with every publication. When several people must run the same
+version, pass a fixed tag with `--images registry`: `--tag X.Y.Z` for a release,
+or `--tag dev-<sha>` with the first seven characters of a commit that `dev.yml`
+published. Without `--images registry`, a tag that cannot be pulled silently
+becomes a build from your checkout. Only the head of a push gets that tag. The auxiliary images, such as the recorder and
+the captions, get it only when that push rebuilt them, so with `dev-<sha>` those
+services can fail to pull if you turn them on. The tag fixes the images only:
+the chart comes from your checkout, so also check out the release tag or commit
+that matches the image.
 
 ### 2b. From your checkout
 
@@ -783,6 +795,7 @@ total, so you can compare your own runs:
 | Operation | Time |
 |---|---|
 | First install, published images, no credentials | 3 min 19 s: 52 s for the node and the ingress, 138 s of Helm |
+| First install on an empty Debian 12 VM (4 vCPU, 8 GiB), published images, no credentials | 3 min 51 s, 2.6 GB downloaded |
 | First install, published images with a pull Secret | 2 min 47 s to 3 min 11 s, of which Helm 117 to 131 s |
 | The same, with an empty minikube cache | 3 min 34 s: 75 s for the node and the ingress, 132 s of Helm |
 | First install, `--images host` | 4 min 35 s: 57 s for the node, 85 s to pull and load the images, 123 s of Helm |
@@ -1000,8 +1013,8 @@ other.
   mode `:dev` is a moving tag, and running the script again does not pull a
   newer build. To take one:
   `kubectl --context pa-webinar -n pa-webinar rollout restart deployment/pa-webinar`,
-  or install a fixed build with `--tag dev-<sha>`, whose migration tag the
-  script derives (`dev-migrate-<sha>`).
+  or install a fixed build with `--images registry --tag dev-<sha>`, whose
+  migration tag the script derives (`dev-migrate-<sha>`).
 - **Stop.** `scripts/minikube-down.sh --stop` stops the profile.
   `scripts/minikube-up.sh` starts it again with its data.
 - **Delete.** `scripts/minikube-down.sh` deletes the profile: the cluster, the

@@ -11,7 +11,7 @@ Other pages own the neighboring topics:
 
 ## In short
 
-- **`ci.yml` is the gate on the way to `main`.** It runs on pull requests into `main`, on pushes to `main` and on manual dispatch. It does not run on `dev`. A red run stops a merge by project rule, not by anything in the workflow files (see [What a red check blocks](#what-a-red-check-blocks)).
+- **`ci.yml` is the gate on the way to `main`.** It runs on pull requests into `main`, on pushes to `main` and on manual dispatch. It does not run on `dev`. A red run stops a merge through the branch protection of `main`, not through the workflow files (see [What a red check blocks](#what-a-red-check-blocks)).
 - **`dev.yml` publishes development images** on every push to `dev`: moving `:dev` tags plus an immutable `:dev-<sha>` per build. No SBOM, chart or GitHub Release comes out of it.
 - **`release.yml` publishes a release** when a `vX.Y.Z` tag is pushed: the app and migration images, an SPDX SBOM, the packaged Helm chart and a GitHub Release.
 - **Auxiliary images follow the release.** The recorder bot, the recorder controller, the AI post-production workers and the captions gateway and engine are published as `:dev` from `dev` and with the release version from `release.yml`; the chart derives their tag from the app's. The patched Jitsi web image has its own workflow and its own tags.
@@ -92,7 +92,7 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 
 ### What a red check blocks
 
-"Blocking" on this page means that a failing job turns the workflow run red. The workflow files make no check required. A red run blocks a merge only if the repository's branch protection or rulesets list these jobs as required status checks. The project rule is that nothing merges into `main` while a blocking job is red ([Governance](../../GOVERNANCE.md#everyday-changes)). A fork that wants the rule enforced must configure required status checks itself.
+"Blocking" on this page means that a failing job turns the workflow run red. The workflow files make no check required: the branch protection of this repository does. On `main` it requires a pull request, lists the blocking jobs below as required status checks, applies to administrators too, and refuses force pushes and deletion. No approving review is required. The required checks are a list kept by hand in the repository settings and matched by job name, matrix entries included: renaming a job stops every pull request until the list follows, and a new job is not required until someone adds it. The project rule is that nothing merges into `main` while a blocking job is red ([Governance](../../GOVERNANCE.md#everyday-changes)). Branch protection is a repository setting and does not travel with a fork: a fork that wants the rule enforced must configure it itself.
 
 ### `ci.yml`: the gate on the way to `main`
 
@@ -211,7 +211,7 @@ The self-hosted runner lives inside a Kubernetes cluster, where code could reach
 - `ci.yml` sends `pull_request` events to GitHub-hosted runners through its conditional `runs-on`, and keeps the self-hosted runner for pushes and dispatches.
 - The publishing workflows start only on trusted events: pushes to `dev` or `main`, tags, manual dispatch or a schedule. No workflow uses `pull_request_target`.
 - Every `uses:` is pinned to a full commit SHA, with the tag in a trailing comment.
-- Workflow-level permissions are read-only where they are declared (`ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml`); `jitsi-web.yml` sets them on its only job. Only the jobs that publish images, prune the layer cache or attach files to a release get `packages: write` or `contents: write`; jobs with no block, such as the change-detection jobs of `dev.yml`, take the workflow's read-only default.
+- Workflow-level permissions are read-only in every workflow (`ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml`, `jitsi-web.yml`). Only the jobs that publish images, prune the layer cache or attach files to a release get `packages: write` or `contents: write`; jobs with no block, such as the change-detection jobs of `dev.yml`, take the workflow's read-only default.
 
 Any new workflow that a pull request can trigger must keep the same conditional runner. The complete policy, including the permission table and fork approval, is in [SECURITY.md](../../SECURITY.md#where-ci-code-runs).
 
@@ -399,7 +399,7 @@ Make one commit on `dev` with the subject `chore(release): vX.Y.Z` and a body th
 
 ### 2. Check, then open the pull request to `main`
 
-1. Run the pre-commit gates and the CI-parity commands described in [How we develop PA Webinar](methodology.md#ci-parity-before-every-push). `release.yml` runs no checks of its own, so this pull request is the last gate, and it holds only by the project rule described in [What a red check blocks](#what-a-red-check-blocks).
+1. Run the pre-commit gates and the CI-parity commands described in [How we develop PA Webinar](methodology.md#ci-parity-before-every-push). `release.yml` runs no checks of its own, so this pull request is the last gate, enforced as described in [What a red check blocks](#what-a-red-check-blocks).
 2. Open the pull request from `dev` to `main`. `ci.yml` runs on it.
 3. Review it like any non-trivial change. Resolve every confirmed finding before the merge.
 

@@ -22,11 +22,11 @@ Three other pages cover what this one does not:
 | Schema and migrations in sync | The Migration Integrity job |
 | A chart that renders on every profile, and that a Kubernetes API server accepts for the example profiles | [`scripts/validate-chart.sh`](../../scripts/validate-chart.sh), and `kubectl apply --dry-run=server` on a throwaway kind cluster |
 | Dependency license policy | `npm run license:check` in the License Compliance job and in the Git hooks |
-| Vulnerability and secret scanning | Trivy on the repository and on the image (blocking by rule); CodeQL (non-blocking) |
+| Vulnerability and secret scanning | Trivy on the repository and on the image (blocking); CodeQL (non-blocking); GitHub secret scanning with push protection |
 | Architecture decisions | Architecture Decision Records in [`docs/adr/`](../adr/README.md) |
 | Release notes in all 24 languages | A test on the release-note catalogs |
 
-The CI jobs block a merge by rule, not by a repository setting: `main` has no required status checks, so a red job does not technically stop a merge. The maintainers do not merge the `dev` → `main` pull request until every job of `ci.yml` that is not marked `continue-on-error` is green.
+The CI jobs block a merge through the branch protection of `main`: the jobs of `ci.yml` that are not marked `continue-on-error` are listed as required status checks, for administrators too, so a red job on that list stops the `dev` → `main` pull request. [CI, images and releases](ci-and-release.md#what-a-red-check-blocks) has the details.
 
 ## Principles
 

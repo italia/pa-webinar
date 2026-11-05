@@ -202,7 +202,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
 ### Pinned actions and least-privilege tokens
 
 - **Pinned actions.** Every `uses:` in `.github/workflows/` references a full commit SHA, with the tag in a trailing comment (`actions/checkout@<sha> # v4`). No workflow uses a floating reference such as `@v4` or `@main`. Dependabot updates the SHA and the comment together.
-- **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml` and `buildcache-cleanup.yml` set a read-only workflow default. `jitsi-web.yml` declares permissions per job only. Only the jobs that need more than read access get it:
+- **Least-privilege tokens.** `ci.yml`, `codeql.yml`, `scorecard.yml`, `dev.yml`, `release.yml`, `buildcache-cleanup.yml` and `jitsi-web.yml` set a read-only workflow default. Only the jobs that need more than read access get it:
 
   | Workflow | Workflow-level permissions | Elevated jobs |
   |---|---|---|
@@ -210,7 +210,7 @@ As a result, code from a pull request reaches the self-hosted runner only after 
   | `codeql.yml` | `read-all` | The analysis job gets `security-events: write` to upload results |
   | `scorecard.yml` | `read-all` | The analysis job gets `security-events: write`, plus `id-token: write` to publish results |
   | `dev.yml` | `contents: read` | The jobs that push images get `packages: write` |
-  | `jitsi-web.yml` | None declared | The job that pushes the image gets `packages: write` |
+  | `jitsi-web.yml` | `contents: read` | The job that pushes the image gets `packages: write` |
   | `release.yml` | `contents: read` | The application image job gets `packages: write` and `contents: write`. The auxiliary images job gets `packages: write`. The chart job gets `contents: write` to attach files to the GitHub Release |
   | `buildcache-cleanup.yml` | `contents: read` | The prune job gets `packages: write` to delete old untagged versions of the layer-cache package |
 
@@ -243,14 +243,16 @@ Moving to a new upstream Jitsi web build means changing `BASE_TAG`, `BASE_IMAGE`
 | CodeQL, JavaScript and TypeScript, `security-extended` queries | `codeql.yml` | Pushes and pull requests to `main` and `dev`, weekly | No (`continue-on-error`). Results go to the Security tab when code scanning is enabled in the repository settings |
 | OpenSSF Scorecard | `scorecard.yml` | Pushes to `main`, weekly | No (`continue-on-error`). Nothing is published yet: the job runs on the self-hosted runner, and scorecard-action accepts publication only from GitHub-hosted runners ([details](docs/development/ci-and-release.md#codeqlyml-and-scorecardyml-code-analysis)) |
 | Forbidden-license check | `ci.yml`, `License Compliance` | Same as `ci.yml` | Yes |
+| GitHub secret scanning, with push protection | Repository setting, not a workflow. A fork must turn it on | Every push | Yes for the formats of known providers, unless the person pushing gives a reason to bypass it |
 
 What the scanners do not cover:
 
 - Of the workflows, only `ci.yml` runs Trivy. Pushes to `dev` and pull requests to `dev` get no Trivy scan.
 - No workflow scans the images pushed to GHCR. The release image is rebuilt from the tag. The migration image, the auxiliary images (recorder, recorder controller, both post-production workers, captions gateway and engine) and the patched jitsi/web image are never scanned as built images, with their OS packages and everything added at build time. The filesystem scan covers only their dependency manifests in the repository. An operator that needs image scanning should scan the digests it deploys.
 - Trivy runs with its default scanners: known vulnerabilities and embedded secrets. `.trivyignore`, at the repository root, records each accepted finding with its justification.
+- GitHub secret scanning matches the formats of known providers. Generic patterns are off, and anyone who can push can bypass push protection by giving a reason.
 - CodeQL does not analyze the Python worker: its language matrix is JavaScript and TypeScript only. CodeQL also needs code scanning to be enabled on the repository.
-- The secret check before a commit is a pattern match. The pre-commit Git hook ([Git hooks](docs/development/methodology.md#git-hooks)) looks for common key and token formats in the added lines. It runs only where the hooks are installed, and it can be skipped with `--no-verify`. Code review and the Trivy scan remain the controls.
+- The secret check before a commit is a pattern match. The pre-commit Git hook ([Git hooks](docs/development/methodology.md#git-hooks)) looks for common key and token formats in the added lines. It runs only where the hooks are installed, and it can be skipped with `--no-verify`. Code review, the Trivy scan and GitHub secret scanning remain the controls.
 
 ### Release artifacts and SBOMs
 
