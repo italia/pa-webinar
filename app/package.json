@@ -55,7 +55,7 @@
     "next": "^15.5.28",
     "next-intl": "^4.14.9",
     "nodemailer": "^10.1.4",
-    "pdfjs-dist": "^6.4.299",
+    "pdfjs-dist": "^6.5.438",
     "prom-client": "^15.0.0",
     "qrcode-generator": "^2.0.4",
     "react": "^19.2.8",
