@@ -26,6 +26,8 @@ import {
 import { useTranslations } from 'next-intl';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'design-react-kit';
 
+import { indirizzoSicuro } from '@/lib/security/indirizzo-sicuro';
+
 export interface Ritaglio {
   /** Larghezza diviso altezza del riquadro (16/9 per la copertina). */
   rapporto: number;
@@ -140,9 +142,14 @@ export default function ImageCropDialog({
   useEffect(() => {
     let attiva = true;
     const u = URL.createObjectURL(file);
-    setUrl(u);
+    const indirizzo = indirizzoSicuro(u);
+    setUrl(indirizzo ?? null);
     setImg(null);
-    setErrore(false);
+    setErrore(!indirizzo);
+    if (!indirizzo) {
+      URL.revokeObjectURL(u);
+      return;
+    }
     const i = new Image();
     i.onload = () => {
       if (attiva) setImg(i);
@@ -150,7 +157,7 @@ export default function ImageCropDialog({
     i.onerror = () => {
       if (attiva) setErrore(true);
     };
-    i.src = u;
+    i.src = indirizzo;
     return () => {
       attiva = false;
       i.onload = null;

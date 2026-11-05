@@ -49,6 +49,7 @@ import {
   useUploadsReason,
 } from '@/components/ui/uploads-availability';
 import { IMMAGINI_ESTERNE_AMMESSE } from '@/lib/security/img-src';
+import { indirizzoSicuro } from '@/lib/security/indirizzo-sicuro';
 import {
   ASSET_MAX_BYTES,
   ASSET_MIME_TYPES,
@@ -173,20 +174,6 @@ export function formatoLeggibile(rapporto: number): string {
     if (a > 0 && Math.abs(a / b - rapporto) < 0.005) return `${a}:${b}`;
   }
   return rapporto.toFixed(2);
-}
-
-/**
- * L'anteprima come indirizzo da mettere in un link, un'immagine o un audio:
- * solo http(s), un file scelto ora (`blob:`), un'immagine o un audio
- * incorporati o un percorso di questo sito, senza barre o spazi che il
- * browser leggerebbe come un altro host. Il valore arriva gia' validato (dal
- * server o da `linkValido`), ma qui finisce in un attributo della pagina: un
- * altro indirizzo non ci arriva, e l'anteprima risulta rotta.
- */
-const SCHEMI_ANTEPRIMA =
-  /^(https?:\/\/|blob:|data:(image|audio)\/|\/(?![\/\\])(?=[^\s\\]*$))/i;
-function indirizzoSicuro(url: string | null): string | undefined {
-  return url && SCHEMI_ANTEPRIMA.test(url) ? url : undefined;
 }
 
 /** Un file servito dal portale (`/api/assets/…`): conta come caricato. */
