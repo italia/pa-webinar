@@ -5188,9 +5188,7 @@
         "none": "L-ebda waħda"
       },
       "voices": {
-        "title": "Vuċijiet sintetiċi assenjati lill-kelliema",
-        "male": "vuċi maskili",
-        "female": "vuċi femminili"
+        "title": "Vuċijiet sintetiċi assenjati lill-kelliema"
       },
       "runAt": "L-ipproċessar tlesta fi",
       "version": "Verżjoni tal-pipeline"

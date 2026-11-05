@@ -5188,9 +5188,7 @@
         "none": "Žádné"
       },
       "voices": {
-        "title": "Syntetické hlasy přiřazené mluvčím",
-        "male": "mužský hlas",
-        "female": "ženský hlas"
+        "title": "Syntetické hlasy přiřazené mluvčím"
       },
       "runAt": "Zpracování dokončeno dne",
       "version": "Verze pipeline"

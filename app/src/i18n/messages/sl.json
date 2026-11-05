@@ -5188,9 +5188,7 @@
         "none": "Ni jih"
       },
       "voices": {
-        "title": "Sintetični glasovi, dodeljeni govorcem",
-        "male": "moški glas",
-        "female": "ženski glas"
+        "title": "Sintetični glasovi, dodeljeni govorcem"
       },
       "runAt": "Obdelava končana dne",
       "version": "Različica cevovoda"

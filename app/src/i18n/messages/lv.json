@@ -5188,9 +5188,7 @@
         "none": "Nav"
       },
       "voices": {
-        "title": "Runātājiem piešķirtās sintētiskās balsis",
-        "male": "vīrieša balss",
-        "female": "sievietes balss"
+        "title": "Runātājiem piešķirtās sintētiskās balsis"
       },
       "runAt": "Apstrāde pabeigta",
       "version": "Konveijera versija"

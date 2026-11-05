@@ -5188,9 +5188,7 @@
         "none": "Nincs"
       },
       "voices": {
-        "title": "A beszélőkhöz rendelt szintetikus hangok",
-        "male": "férfihang",
-        "female": "női hang"
+        "title": "A beszélőkhöz rendelt szintetikus hangok"
       },
       "runAt": "A feldolgozás befejezésének időpontja",
       "version": "A pipeline verziója"

@@ -5188,9 +5188,7 @@
         "none": "Aucune"
       },
       "voices": {
-        "title": "Voix synthétiques attribuées aux intervenants",
-        "male": "voix masculine",
-        "female": "voix féminine"
+        "title": "Voix synthétiques attribuées aux intervenants"
       },
       "runAt": "Traitement terminé le",
       "version": "Version de la chaîne de traitement"

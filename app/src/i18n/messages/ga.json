@@ -5188,9 +5188,7 @@
         "none": "Ceann ar bith"
       },
       "voices": {
-        "title": "Guthanna sintéiseacha sannta do na cainteoirí",
-        "male": "guth fir",
-        "female": "guth mná"
+        "title": "Guthanna sintéiseacha sannta do na cainteoirí"
       },
       "runAt": "Críochnaíodh an phróiseáil ar",
       "version": "Leagan na píblíne"

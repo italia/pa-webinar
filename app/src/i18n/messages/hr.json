@@ -5188,9 +5188,7 @@
         "none": "Nema"
       },
       "voices": {
-        "title": "Sintetski glasovi dodijeljeni govornicima",
-        "male": "muški glas",
-        "female": "ženski glas"
+        "title": "Sintetski glasovi dodijeljeni govornicima"
       },
       "runAt": "Obrada dovršena",
       "version": "Verzija pipelinea"

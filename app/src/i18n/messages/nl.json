@@ -5188,9 +5188,7 @@
         "none": "Geen"
       },
       "voices": {
-        "title": "Aan de sprekers toegewezen synthetische stemmen",
-        "male": "mannelijke stem",
-        "female": "vrouwelijke stem"
+        "title": "Aan de sprekers toegewezen synthetische stemmen"
       },
       "runAt": "Verwerking voltooid op",
       "version": "Versie van de pijplijn"

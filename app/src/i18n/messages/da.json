@@ -5188,9 +5188,7 @@
         "none": "Ingen"
       },
       "voices": {
-        "title": "Syntetiske stemmer tildelt talerne",
-        "male": "mandsstemme",
-        "female": "kvindestemme"
+        "title": "Syntetiske stemmer tildelt talerne"
       },
       "runAt": "Behandlingen blev afsluttet den",
       "version": "Pipelineversion"

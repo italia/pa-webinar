@@ -5188,9 +5188,7 @@
         "none": "Niciuna"
       },
       "voices": {
-        "title": "Voci sintetice atribuite vorbitorilor",
-        "male": "voce masculină",
-        "female": "voce feminină"
+        "title": "Voci sintetice atribuite vorbitorilor"
       },
       "runAt": "Procesare finalizată la",
       "version": "Versiunea pipeline-ului"

@@ -5188,9 +5188,7 @@
         "none": "Ei yhtään"
       },
       "voices": {
-        "title": "Puhujille määritetyt synteettiset äänet",
-        "male": "miesääni",
-        "female": "naisääni"
+        "title": "Puhujille määritetyt synteettiset äänet"
       },
       "runAt": "Käsittely valmistui",
       "version": "Putken versio"

@@ -5188,9 +5188,7 @@
         "none": "Inga"
       },
       "voices": {
-        "title": "Syntetiska röster tilldelade talarna",
-        "male": "manlig röst",
-        "female": "kvinnlig röst"
+        "title": "Syntetiska röster tilldelade talarna"
       },
       "runAt": "Bearbetningen slutfördes den",
       "version": "Pipelineversion"

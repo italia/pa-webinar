@@ -5188,9 +5188,7 @@
         "none": "Puuduvad"
       },
       "voices": {
-        "title": "Kõnelejatele määratud sünteeshääled",
-        "male": "meeshääl",
-        "female": "naishääl"
+        "title": "Kõnelejatele määratud sünteeshääled"
       },
       "runAt": "Töötlus lõpetati",
       "version": "Töövoo versioon"

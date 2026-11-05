@@ -5188,9 +5188,7 @@
         "none": "Brak"
       },
       "voices": {
-        "title": "Głosy syntetyczne przypisane mówcom",
-        "male": "głos męski",
-        "female": "głos żeński"
+        "title": "Głosy syntetyczne przypisane mówcom"
       },
       "runAt": "Przetwarzanie zakończone",
       "version": "Wersja potoku"

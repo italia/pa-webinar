@@ -5188,9 +5188,7 @@
         "none": "Ninguno"
       },
       "voices": {
-        "title": "Voces sintéticas asignadas a los hablantes",
-        "male": "voz masculina",
-        "female": "voz femenina"
+        "title": "Voces sintéticas asignadas a los hablantes"
       },
       "runAt": "Procesamiento completado el",
       "version": "Versión del pipeline"

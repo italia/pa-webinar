@@ -5188,9 +5188,7 @@
         "none": "Keine"
       },
       "voices": {
-        "title": "Den Sprechern zugewiesene synthetische Stimmen",
-        "male": "männliche Stimme",
-        "female": "weibliche Stimme"
+        "title": "Den Sprechern zugewiesene synthetische Stimmen"
       },
       "runAt": "Verarbeitung abgeschlossen am",
       "version": "Version der Pipeline"

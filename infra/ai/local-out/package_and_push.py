@@ -88,7 +88,7 @@ def build_pipeline_snapshot(tx: dict, sm: dict, target_langs: list, dub_langs: l
         "tts": {
             "engine": "piper-tts",
             "license": "MIT",
-            "voiceAssignmentPolicy": "deterministic-by-speech-time, gender-aware",
+            "voiceAssignmentPolicy": "deterministic-by-speech-time",
         },
         "voiceAssignments": voice_assignments,
         "languages": {

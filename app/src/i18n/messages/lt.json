@@ -5188,9 +5188,7 @@
         "none": "Nėra"
       },
       "voices": {
-        "title": "Kalbėtojams priskirti sintetiniai balsai",
-        "male": "vyriškas balsas",
-        "female": "moteriškas balsas"
+        "title": "Kalbėtojams priskirti sintetiniai balsai"
       },
       "runAt": "Apdorojimas baigtas",
       "version": "Grandinės versija"
