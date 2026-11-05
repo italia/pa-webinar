@@ -21,6 +21,7 @@ import {
   generateYahooCalendarUrl,
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
+import { linkIMieiDati } from '@/lib/email/my-data-link';
 import { enqueueEmail } from '@/lib/email/outbox';
 import {
   absoluteEventImage,
@@ -33,7 +34,6 @@ import {
   loadEmailTemplateOverride,
 } from '@/lib/email/resolve-template';
 import { formatDate, formatDuration, formatTimeWithZone } from '@/lib/utils/date-format';
-import { localizedUrl } from '@/lib/utils/localized-url';
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { linguaEmail } from '@/lib/email/lingua';
@@ -112,7 +112,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       // pubblica ma non è mai arrivata in posta).
       eventImageUrl: absoluteEventImage(event, baseUrl),
       addressBookOptOutUrl: rubricaOptOutUrl(registration.person, baseUrl, input.locale),
-      myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', input.locale),
+      myDataLink: await linkIMieiDati(baseUrl, input.locale),
     };
 
     // L'invito personale: UID stabile per evento e indirizzo e SEQUENCE

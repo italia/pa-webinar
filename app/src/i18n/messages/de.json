@@ -3979,7 +3979,8 @@
     "eventLabel": "Veranstaltung",
     "dateLabel": "Datum",
     "timeLabel": "Uhrzeit",
-    "durationLabel": "Dauer"
+    "durationLabel": "Dauer",
+    "myDataLink": "Ihre Daten: einsehen, berichtigen, eine Einwilligung widerrufen oder die Anmeldung löschen"
   },
   "home": {
     "hero": {

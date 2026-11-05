@@ -3979,7 +3979,8 @@
     "eventLabel": "Begivenhed",
     "dateLabel": "Dato",
     "timeLabel": "Klokkeslæt",
-    "durationLabel": "Varighed"
+    "durationLabel": "Varighed",
+    "myDataLink": "Dine data: se dem, ret dem, træk et samtykke tilbage eller annullér tilmeldingen"
   },
   "home": {
     "hero": {

@@ -3979,7 +3979,8 @@
     "eventLabel": "Eveniment",
     "dateLabel": "Data",
     "timeLabel": "Ora",
-    "durationLabel": "Durată"
+    "durationLabel": "Durată",
+    "myDataLink": "Datele tale: vizualizare, corectare, retragerea unui consimțământ sau anularea înscrierii"
   },
   "home": {
     "hero": {

@@ -3979,7 +3979,8 @@
     "eventLabel": "Evenement",
     "dateLabel": "Datum",
     "timeLabel": "Tijd",
-    "durationLabel": "Duur"
+    "durationLabel": "Duur",
+    "myDataLink": "Uw gegevens: bekijken, corrigeren, een toestemming intrekken of de inschrijving annuleren"
   },
   "home": {
     "hero": {

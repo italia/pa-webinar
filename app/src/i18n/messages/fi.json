@@ -3979,7 +3979,8 @@
     "eventLabel": "Tapahtuma",
     "dateLabel": "Päivämäärä",
     "timeLabel": "Aika",
-    "durationLabel": "Kesto"
+    "durationLabel": "Kesto",
+    "myDataLink": "Tietosi: tarkastele, korjaa, peruuta suostumus tai peru ilmoittautuminen"
   },
   "home": {
     "hero": {

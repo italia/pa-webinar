@@ -3979,7 +3979,8 @@
     "eventLabel": "Događaj",
     "dateLabel": "Datum",
     "timeLabel": "Vrijeme",
-    "durationLabel": "Trajanje"
+    "durationLabel": "Trajanje",
+    "myDataLink": "Vaši podaci: pregled, ispravak, povlačenje privole ili otkazivanje prijave"
   },
   "home": {
     "hero": {

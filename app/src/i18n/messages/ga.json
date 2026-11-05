@@ -3979,7 +3979,8 @@
     "eventLabel": "Imeacht",
     "dateLabel": "Dáta",
     "timeLabel": "Am",
-    "durationLabel": "Fad"
+    "durationLabel": "Fad",
+    "myDataLink": "Do shonraí: iad a fheiceáil, a cheartú, toiliú a tharraingt siar nó do chlárú a chealú"
   },
   "home": {
     "hero": {

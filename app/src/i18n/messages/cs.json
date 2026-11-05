@@ -3979,7 +3979,8 @@
     "eventLabel": "Událost",
     "dateLabel": "Datum",
     "timeLabel": "Čas",
-    "durationLabel": "Délka trvání"
+    "durationLabel": "Délka trvání",
+    "myDataLink": "Vaše údaje: zobrazit, opravit, odvolat souhlas nebo zrušit registraci"
   },
   "home": {
     "hero": {

@@ -3979,7 +3979,8 @@
     "eventLabel": "Pasākums",
     "dateLabel": "Datums",
     "timeLabel": "Laiks",
-    "durationLabel": "Ilgums"
+    "durationLabel": "Ilgums",
+    "myDataLink": "Jūsu dati: skatīt, labot, atsaukt piekrišanu vai atcelt reģistrāciju"
   },
   "home": {
     "hero": {

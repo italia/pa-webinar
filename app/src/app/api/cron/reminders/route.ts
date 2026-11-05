@@ -2,6 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { linkIMieiDati } from '@/lib/email/my-data-link';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { publicRegistrationFor } from '@/lib/events/registration-access';
 import { getSettings } from '@/lib/settings';
@@ -173,7 +174,7 @@ export const GET = withErrorHandling(async (request) => {
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
           addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
-          myDataUrl: localizedUrl(baseUrl, '/privacy/my-data', locale),
+          myDataLink: await linkIMieiDati(baseUrl, locale),
         };
 
         // Lo stesso invito personale della conferma (stesso UID): il

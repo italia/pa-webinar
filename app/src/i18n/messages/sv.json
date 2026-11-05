@@ -3979,7 +3979,8 @@
     "eventLabel": "Evenemang",
     "dateLabel": "Datum",
     "timeLabel": "Tid",
-    "durationLabel": "Längd"
+    "durationLabel": "Längd",
+    "myDataLink": "Dina uppgifter: se dem, rätta dem, återkalla ett samtycke eller avbryt anmälan"
   },
   "home": {
     "hero": {

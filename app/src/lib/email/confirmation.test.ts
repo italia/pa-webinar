@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * iscrive vede in Gmail o Outlook la scheda «aggiungi / accetta», con il link
  * della sala (senza la firma del link dell'email, che resta nell'email).
  */
+vi.mock('next-intl/server', () => ({ getTranslations: async () => (chiave: string) => chiave }));
 vi.mock('@/lib/db', () => ({
   prisma: { registration: { findUnique: vi.fn(), update: vi.fn() } },
 }));

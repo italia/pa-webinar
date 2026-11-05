@@ -3979,7 +3979,8 @@
     "eventLabel": "Avveniment",
     "dateLabel": "Data",
     "timeLabel": "Ħin",
-    "durationLabel": "Tul"
+    "durationLabel": "Tul",
+    "myDataLink": "Id-data tiegħek: araha, ikkoreġiha, irtira kunsens jew ikkanċella r-reġistrazzjoni"
   },
   "home": {
     "hero": {

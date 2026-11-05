@@ -3979,7 +3979,8 @@
     "eventLabel": "Wydarzenie",
     "dateLabel": "Data",
     "timeLabel": "Godzina",
-    "durationLabel": "Czas trwania"
+    "durationLabel": "Czas trwania",
+    "myDataLink": "Twoje dane: wyświetl, popraw, wycofaj zgodę lub anuluj rejestrację"
   },
   "home": {
     "hero": {

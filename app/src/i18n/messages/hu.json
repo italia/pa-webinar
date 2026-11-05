@@ -3979,7 +3979,8 @@
     "eventLabel": "Esemény",
     "dateLabel": "Dátum",
     "timeLabel": "Időpont",
-    "durationLabel": "Időtartam"
+    "durationLabel": "Időtartam",
+    "myDataLink": "Az adatai: megtekintés, javítás, hozzájárulás visszavonása vagy a regisztráció törlése"
   },
   "home": {
     "hero": {

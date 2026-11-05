@@ -3979,7 +3979,8 @@
     "eventLabel": "Üritus",
     "dateLabel": "Kuupäev",
     "timeLabel": "Kellaaeg",
-    "durationLabel": "Kestus"
+    "durationLabel": "Kestus",
+    "myDataLink": "Teie andmed: vaadake, parandage, võtke nõusolek tagasi või tühistage registreerimine"
   },
   "home": {
     "hero": {

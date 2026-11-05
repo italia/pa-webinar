@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * DB ed effetti collaterali sono stub; la scelta (reminder-plan) gira davvero.
  */
 // Il nome dell'organizzatore nel calendario ha la sua prova (lib/ical/organizer).
+vi.mock('next-intl/server', () => ({ getTranslations: async () => (chiave: string) => chiave }));
 vi.mock('@/lib/ical/organizer', () => ({ nomeOrganizzatoreCalendario: vi.fn(async () => 'Ente di prova') }));
 vi.mock('@/lib/captions/transcript', () => ({
   costruisciTrascrizioniMancanti: vi.fn(async () => 0),

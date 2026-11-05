@@ -3979,7 +3979,8 @@
     "eventLabel": "Dogodek",
     "dateLabel": "Datum",
     "timeLabel": "Ura",
-    "durationLabel": "Trajanje"
+    "durationLabel": "Trajanje",
+    "myDataLink": "Vaši podatki: ogled, popravek, preklic privolitve ali preklic prijave"
   },
   "home": {
     "hero": {

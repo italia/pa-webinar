@@ -3979,7 +3979,8 @@
     "eventLabel": "Renginys",
     "dateLabel": "Data",
     "timeLabel": "Laikas",
-    "durationLabel": "Trukmė"
+    "durationLabel": "Trukmė",
+    "myDataLink": "Jūsų duomenys: peržiūrėti, ištaisyti, atšaukti sutikimą arba atšaukti registraciją"
   },
   "home": {
     "hero": {
